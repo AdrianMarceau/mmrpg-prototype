@@ -1631,6 +1631,247 @@ class rpg_player extends rpg_object {
 
     }
 
+    // Define a function to trigger when a given robot finds an item (in this context, "target" is the player and robot getting the item)
+    public static function trigger_item_find($this_battle, $target_player, $target_robot, $item_reward_key, $item_reward_token, $item_quantity_dropped = 1){
+
+        // Create the temporary item object for event creation
+        $item_reward_info = rpg_item::get_index_info($item_reward_token);
+        if (empty($item_reward_info)){ return false; }
+        $temp_item = rpg_game::get_item($this_battle, $target_player, $target_robot, $item_reward_info);
+        $temp_item->item_name = $item_reward_info['item_name'];
+        $temp_item->item_image = $item_reward_info['item_token'];
+        $temp_item->item_quantity = $item_quantity_dropped;
+        $temp_item->update_session();
+
+        // Collect or define the item variables
+        $temp_item_token = $item_reward_info['item_token'];
+        $temp_item_name = $item_reward_info['item_name'];
+        $temp_item_colour = !empty($item_reward_info['item_type']) ? $item_reward_info['item_type'] : 'none';
+        if (!empty($item_reward_info['item_type2'])){ $temp_item_colour .= '_'.$item_reward_info['item_type2']; }
+        $temp_type_name = !empty($item_reward_info['item_type']) ? ucfirst($item_reward_info['item_type']) : 'Neutral';
+
+        // Check if this is a core or a shard item
+        $temp_is_shard = preg_match('/^([a-z]+)-shard$/i', $temp_item_token) ? true : false;
+        $temp_is_core = preg_match('/^([a-z]+)-core/i', $temp_item_token) ? true : false;
+
+        // Define the max quantity limit for this particular item
+        $allow_over_max = false;
+        if ($temp_is_shard){ $temp_item_quantity_max = MMRPG_SETTINGS_SHARDS_MAXQUANTITY; $allow_over_max = true; }
+        elseif ($temp_is_core){ $temp_item_quantity_max = MMRPG_SETTINGS_CORES_MAXQUANTITY; }
+        else { $temp_item_quantity_max = MMRPG_SETTINGS_ITEMS_MAXQUANTITY; }
+
+        // Create the session variable for this item if it does not exist and collect its value
+        $temp_item_is_new = !isset($_SESSION['GAME']['values']['battle_items'][$temp_item_token]) ? true : false;
+        if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
+        $temp_item_quantity = $_SESSION['GAME']['values']['battle_items'][$temp_item_token];
+        $temp_item_quantity_old = $temp_item_quantity;
+
+        // If this item is already at the quantity limit, skip it entirely
+        if ($temp_item_quantity >= $temp_item_quantity_max){
+            //$this_battle->events_create(false, false, 'DEBUG', 'max count for '.$temp_item_token.' of '.$temp_item_quantity_max.' has been reached ('.($allow_over_max ? 'allow' : 'disallow').')');
+            $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = $temp_item_quantity_max;
+            $temp_item_quantity = $temp_item_quantity_max;
+            if (!$allow_over_max){ return true; }
+        }
+
+        // Remove the shop/item frame from the history array so that it appears with the "new" indicator
+        if ($temp_item_is_new){
+            $menu_frame_token = 'items';
+            $menu_frame_content_token = $temp_item_token;
+            rpg_prototype::mark_menu_frame_as_unseen($menu_frame_token);
+            rpg_prototype::mark_menu_frame_content_as_unseen($menu_frame_token, $menu_frame_content_token);
+        }
+
+        // Update the target player and robot's frames and update
+        if (!empty($target_player)){
+            $target_player->player_frame = $item_reward_key % 3 == 0 ? 'victory' : 'taunt';
+            $target_player->update_session();
+        }
+        if (!empty($target_robot)){
+            $target_robot->robot_frame = $item_reward_key % 2 == 0 ? 'taunt' : 'base';
+            $target_robot->update_session();
+        }
+
+        // Update the item frame and offsets then save
+        $temp_item->item_frame = 0;
+        $temp_item->item_frame_offset = array('x' => 50, 'y' => 0, 'z' => 10);
+        if ($item_quantity_dropped > 1){ $temp_item->item_name = $temp_item->item_base_name.'s'; }
+        else { $temp_item->item_name = $temp_item->item_base_name; }
+        $temp_item->update_session();
+
+        // Define the new item quantity after increment
+        $temp_item_quantity_new = $temp_item_quantity + $item_quantity_dropped;
+        $shards_remaining = false;
+
+        // If this is a shard piece, show the reaction message
+        if ($temp_is_shard){
+
+            // Define the number of shards remaining for a new core
+            $temp_item_quantity_max = MMRPG_SETTINGS_SHARDS_MAXQUANTITY;
+            $shards_remaining = $temp_item_quantity_max - $temp_item_quantity_new;
+            // If this player has collected enough shards to create a new core
+            if ($shards_remaining == 0){ $temp_body_addon = 'The other '.$temp_type_name.' Shards from the inventory started glowing&hellip;'; }
+            // Otherwise, if more shards are required to create a new core
+            else { $temp_body_addon = 'Collect '.$shards_remaining.' more shard'.($shards_remaining > 1 ? 's' : '').' to create a new '.$temp_type_name.' Core!'; }
+
+        }
+        // Else if this is a core, show the altered inventory text
+        elseif ($temp_is_core){
+
+            // Define the robot core drop text for display
+
+            $temp_body_addon = $target_player->print_name().' added the new core to the inventory.';
+            $temp_body_addon .= ' <span class="item_stat item_type item_type_none">'.$temp_item_quantity_old.' <sup style="bottom: 2px;">&raquo;</sup> '.$temp_item_quantity_new.'</span>';
+
+        }
+        // Otherwise, if a normal item show the standard message
+        else {
+
+            // Define the normal item drop text for display
+            $temp_body_addon = $target_player->print_name().' added the dropped item'.($item_quantity_dropped > 1 ? 's' : '').' to the inventory.';
+            $temp_body_addon .= ' <span class="item_stat item_type item_type_none">'.$temp_item_quantity_old.' <sup style="bottom: 2px;">&raquo;</sup> '.$temp_item_quantity_new.'</span>';
+
+        }
+
+        // Given everything, check to see if shards will be fusing this turn
+        $shards_fusing_this_turn = false;
+        if ($shards_remaining !== false && $shards_remaining < 1){ $shards_fusing_this_turn = true; }
+
+        // Display the robot reward message markup
+        $event_header = $temp_item_name.' Item Drop';
+        if ($item_quantity_dropped > 1){
+            $event_body = rpg_battle::random_positive_word().' '.$target_robot->print_name().' found <strong>x'.$item_quantity_dropped.'</strong> '.' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.($item_quantity_dropped > 1 ? 's' : '').'</span>!<br />';
+        } else {
+            $event_body = rpg_battle::random_positive_word().' '.$target_robot->print_name().' found '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
+        }
+        $event_body .= $temp_body_addon;
+        //$event_body .= ' ('.$temp_item_quantity_old.' &raquo; '.$temp_item_quantity_new.')';
+        $event_options = array();
+        $event_options['console_show_target'] = false;
+        $event_options['this_header_float'] = $target_player->player_side;
+        $event_options['this_body_float'] = $target_player->player_side;
+        $event_options['this_item'] = $temp_item;
+        $event_options['this_item_image'] = 'icon';
+        $event_options['this_item_quantity'] = $item_quantity_dropped;
+        $event_options['console_show_this_player'] = false;
+        $event_options['console_show_this_robot'] = false;
+        $event_options['console_show_this_item'] = true;
+        $event_options['canvas_show_this_item'] = true;
+        $event_options['event_flag_sound_effects'] = array(
+            array('name' => 'get-item', 'volume' => 1.0)
+            );
+        rpg_canvas::apply_camera_action_flags($event_options, $target_robot, $temp_item);
+        $this_battle->events_create($target_robot, false, $event_header, $event_body, $event_options);
+        if ($shards_fusing_this_turn){
+            $event_options['event_flag_sound_effects'] = array(
+                array('name' => 'shards-fusing', 'volume' => 0.8)
+                );
+            $temp_item->set_frame_styles('filter: brightness(2); ');
+            $this_battle->events_create($target_robot, false, '', '', $event_options);
+            $event_options['this_item_quantity'] = MMRPG_SETTINGS_SHARDS_MAXQUANTITY;
+            $this_battle->events_create($target_robot, false, '', '', $event_options);
+            $temp_item->set_frame_styles('');
+        } else {
+            $temp_item->set_frame_styles('');
+            $this_battle->events_create(false, false, '', '', array_filter($event_options, function($k){ return strstr($k, '_camera_'); }, ARRAY_FILTER_USE_KEY));
+        }
+
+        // Create and/or increment the session variable for this item increasing its quantity
+        if (empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0; }
+        $_SESSION['GAME']['values']['battle_items'][$temp_item_token] += $item_quantity_dropped;
+
+        // If this item is not on the list of key items (un-equippable), don't add it
+        $temp_key_items = array('large-screw', 'small-screw', 'heart', 'star');
+        if (!in_array($temp_item_token, $temp_key_items)){
+            // If there is room in this player's current item omega, add the new item
+            $temp_session_token = $target_player->player_token.'_this-item-omega_prototype';
+            if (!empty($_SESSION['GAME']['values'][$temp_session_token])){
+                $temp_count = count($_SESSION['GAME']['values'][$temp_session_token]);
+                if ($temp_count < 8 && !in_array($temp_item_token, $_SESSION['GAME']['values'][$temp_session_token])){
+                    $_SESSION['GAME']['values'][$temp_session_token][] = $temp_item_token;
+                    $target_player->player_items[] = $temp_item_token;
+                    $target_player->update_session();
+                }
+            }
+        }
+
+        // If this was a shard, and it was the LAST shard
+        if ($shards_fusing_this_turn){
+
+            // Define the new core token and increment value in session
+            $temp_core_token = str_replace('shard', 'core', $temp_item_token);
+            $temp_core_name = str_replace('Shard', 'Core', $temp_item_name);
+            $item_core_info = array('item_token' => $temp_core_token, 'item_name' => $temp_core_name, 'item_type' => $item_reward_info['item_type']);
+
+            // Create the temporary item object for event creation
+            $item_core_info['item_id'] = $item_reward_info['item_id'] + 1;
+            $item_core_info['item_token'] = $temp_core_token;
+            $temp_core = rpg_game::get_item($this_battle, $target_player, $target_robot, $item_core_info);
+            $temp_core->item_name = $item_core_info['item_name'];
+            $temp_core->item_image = $item_core_info['item_token'];
+            $temp_core->update_session();
+
+            // Collect or define the item variables
+            $temp_type_name = !empty($temp_core->item_type) ? ucfirst($temp_core->item_type) : 'Neutral';
+            $temp_core_colour = !empty($temp_core->item_type) ? $temp_core->item_type : 'none';
+
+            // Define the max quantity limit for this particular item
+            $temp_core_quantity_max = MMRPG_SETTINGS_ITEMS_MAXQUANTITY;
+
+            // Create the session variable for this item if it does not exist and collect its value
+            if (empty($_SESSION['GAME']['values']['battle_items'][$temp_core_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_core_token] = 0; }
+            $temp_core_quantity = $_SESSION['GAME']['values']['battle_items'][$temp_core_token];
+            $temp_core_quantity_old = $temp_core_quantity;
+
+            // If this item is already at the quantity limit, skip it entirely
+            if ($temp_core_quantity >= $temp_core_quantity_max){
+                $_SESSION['GAME']['values']['battle_items'][$temp_core_token] = $temp_core_quantity_max;
+                $temp_core_quantity = $temp_core_quantity_max;
+                return true;
+            }
+
+            // Create and/or increment the session variable for this item increasing its quantity
+            if (empty($_SESSION['GAME']['values']['battle_items'][$temp_core_token])){ $_SESSION['GAME']['values']['battle_items'][$temp_core_token] = 0; }
+            if ($temp_core_quantity < $temp_core_quantity_max){ $_SESSION['GAME']['values']['battle_items'][$temp_core_token] += 1; }
+            $temp_core_quantity_new = $_SESSION['GAME']['values']['battle_items'][$temp_core_token];
+
+            // Display the robot reward message markup
+            $event_header = $temp_core_name.' Item Fusion';
+            $event_body = rpg_battle::random_positive_word().' The glowing shards fused to create a new '.$temp_core->print_name().'!<br />';
+            $event_body .= $target_player->print_name().' added the new core to the inventory.';
+            $event_body .= ' <span class="item_stat item_type item_type_none">'.$temp_core_quantity_old.' <sup style="bottom: 2px;">&raquo;</sup> '.$temp_core_quantity_new.'</span>';
+            $event_options = array();
+            $event_options['console_show_target'] = false;
+            $event_options['this_header_float'] = $target_player->player_side;
+            $event_options['this_body_float'] = $target_player->player_side;
+            $event_options['this_item'] = $temp_core;
+            $event_options['this_item_image'] = 'icon';
+            $event_options['console_show_this_player'] = false;
+            $event_options['console_show_this_robot'] = false;
+            $event_options['console_show_this_item'] = true;
+            $event_options['canvas_show_this_item'] = true;
+            $event_options['event_flag_sound_effects'] = array(
+                array('name' => 'get-big-item', 'volume' => 1.0)
+                );
+            $target_player->set_frame(($item_reward_key + 1 % 3 == 0 ? 'taunt' : 'victory'));
+            $target_robot->set_frame($item_reward_key % 2 == 0 ? 'base' : 'taunt');
+            $temp_core->set_frame('base');
+            $temp_core->set_frame_offset(array('x' => 50, 'y' => 0, 'z' => 10));
+            rpg_canvas::apply_camera_action_flags($event_options, $target_robot, $temp_core);
+            $this_battle->events_create($target_robot, false, $event_header, $event_body, $event_options);
+            $this_battle->events_create(false, false, '', '', array_filter($event_options, function($k){ return strstr($k, '_camera_'); }, ARRAY_FILTER_USE_KEY));
+
+            // Set the old shard counter back to zero now that they've fused
+            $_SESSION['GAME']['values']['battle_items'][$temp_item_token] = 0;
+            $temp_item_quantity = 0;
+
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
     // Define a function to trigger when an enemy robot drops an item (in this context, "target" is the player getting the item, and "this" if the one who dropped it)
     public static function trigger_item_drop($this_battle, $target_player, $target_robot, $this_robot, $item_reward_key, $item_reward_token, $item_quantity_dropped = 1){
 
@@ -1687,10 +1928,14 @@ class rpg_player extends rpg_object {
         }
 
         // Update the target player and robot's frames and update
-        $target_player->player_frame = $item_reward_key % 3 == 0 ? 'victory' : 'taunt';
-        $target_player->update_session();
-        $target_robot->robot_frame = $item_reward_key % 2 == 0 ? 'taunt' : 'base';
-        $target_robot->update_session();
+        if (!empty($target_player)){
+            $target_player->player_frame = $item_reward_key % 3 == 0 ? 'victory' : 'taunt';
+            $target_player->update_session();
+        }
+        if (!empty($target_robot)){
+            $target_robot->robot_frame = $item_reward_key % 2 == 0 ? 'taunt' : 'base';
+            $target_robot->update_session();
+        }
 
         // Update the item frame and offsets then save
         $temp_item->item_frame = 0;
