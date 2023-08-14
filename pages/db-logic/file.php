@@ -696,8 +696,8 @@ while ($this_action == 'load'){
                     elseif (!empty($temp_database_user['user_flag_approved'])){ $bypass_dateofbirth = true; }
 
                     // Ensure the dateofbirth is valid
-                    error_log('$_REQUEST = '.print_r($_REQUEST, true));
-                    error_log(isset($_REQUEST['dateofbirth']) ? '$_REQUEST[\'dateofbirth\'](before) = '.print_r($_REQUEST['dateofbirth'], true) : '');
+                    //error_log('$_REQUEST = '.print_r($_REQUEST, true));
+                    //error_log(isset($_REQUEST['dateofbirth']) ? '$_REQUEST[\'dateofbirth\'](before) = '.print_r($_REQUEST['dateofbirth'], true) : '');
                     $_REQUEST['dateofbirth'] = !empty($_REQUEST['dateofbirth']) ? str_replace(array('/', '_', '.', ' '), '-', $_REQUEST['dateofbirth']) : '';
                     if (empty($_REQUEST['dateofbirth'])){
                         $html_form_messages .= '<span class="error">(!) Your date of birth must be confirmed in order to continue.</span>';
@@ -719,7 +719,7 @@ while ($this_action == 'load'){
                         $html_form_verified = false;
                         $html_form_show_coppa = true;
                     }
-                    error_log('$_REQUEST[\'dateofbirth\'](after) = '.print_r($_REQUEST['dateofbirth'], true));
+                    //error_log('$_REQUEST[\'dateofbirth\'](after) = '.print_r($_REQUEST['dateofbirth'], true));
 
                     // If the account is not verified, break now
                     if (!$html_form_verified){ break; }
@@ -734,8 +734,8 @@ while ($this_action == 'load'){
                     $_SESSION['GAME']['USER'] = $this_user;
                     $_SESSION['GAME']['USER'] = array_merge($_SESSION['GAME']['USER'], $updated_session_info);
                     $_SESSION['GAME']['PENDING_LOGIN_ID'] = $temp_database_user['user_id'];
-                    error_log('$_SESSION[\'GAME\'][\'USER\'][\'dateofbirth\'] = '.print_r($_SESSION['GAME']['USER']['dateofbirth'], true));
-                    error_log('date(\'Y-m-d\', $_SESSION[\'GAME\'][\'USER\'][\'dateofbirth\']) = '.print_r(date('Y-m-d', $_SESSION['GAME']['USER']['dateofbirth']), true));
+                    //error_log('$_SESSION[\'GAME\'][\'USER\'][\'dateofbirth\'] = '.print_r($_SESSION['GAME']['USER']['dateofbirth'], true));
+                    //error_log('date(\'Y-m-d\', $_SESSION[\'GAME\'][\'USER\'][\'dateofbirth\']) = '.print_r(date('Y-m-d', $_SESSION['GAME']['USER']['dateofbirth']), true));
                     //exit();
 
                     // Update the database with the new approved status and date of birth value
