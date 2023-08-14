@@ -3093,6 +3093,7 @@ function mmrpg_toggle_index_loaded(toggleValue){
         //console.log('unfade the splash loader');
         // Fade out the splash loader text, change it to PLAY, then flade it in
         $('a.toggle span', gameMusic).css({opacity:1}).animate({opacity:0}, 1000, 'swing', function(){
+            $('a.toggle', gameMusic).addClass('ready');
             $('a.toggle span', gameMusic).html('<div class="start"><div class="title">START</div><div class="subtitle">MEGA MAN RPG PROTOTYPE</div><div class="info">(Toggle music with &nbsp;&nbsp;)<div class="icon">&nbsp;</div></div></div>').animate({opacity:1}, 1000, 'swing', function(){
                 // Remove the loading class from the iframe and fade it into view
                 //$('iframe', gameWindow).css({opacity:0}).removeClass('loading').animate({opacity:1}, 1000, 'swing'); // DEBUG

@@ -1543,7 +1543,7 @@ body.index #header {
     padding: 0;
     border: 0 none transparent;
     background: transparent none scroll no-repeat 0 0;
-    background-image: url(../images/assets/mmrpg-prototype-banner-logo-2k19.png?20200906);
+    background-image: url('../images/assets/mmrpg-game-start_logo-base.png?20230813');
     background-repeat: no-repeat;
     background-position: center 75px;
     font-size: 78px;
@@ -1554,10 +1554,18 @@ body.index #header {
     background-color: rgb(20, 20, 20);
     background-color: rgba(20, 20, 20, 0.75);
     text-shadow: 2px 2px 3px #000000;
+    transition: background-image 1s;
 }
 #music.onload a span {
     display: block;
-    margin: 256px auto;
+    margin: 320px auto 0;
+    transform: translate(9px, 0);
+}
+#music.onload a.ready {
+    background-image: url('../images/assets/mmrpg-game-start_logo-full.png?20230813');
+}
+#music.onload a.ready span {
+
 }
 #music.onload a span span {
     font-size: 20px;
