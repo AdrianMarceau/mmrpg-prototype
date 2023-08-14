@@ -7099,6 +7099,13 @@ body.windowFlag_landscapeMode #window .page_community .form .field_post_body .te
     display: block;
     font-size: 11px;
 }
+#window .page .form .messages_wrapper a {
+    color: inherit;
+    text-decoration: underline;
+}
+#window .page .form .messages_wrapper a:hover {
+    text-decoration: underline;
+}
 #window .page .form .messages_wrapper .error a,
 #window .page .form .messages_wrapper .success a,
 #window .page .form .messages_wrapper .help a {

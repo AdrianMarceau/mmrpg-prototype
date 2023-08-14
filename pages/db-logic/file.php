@@ -696,6 +696,8 @@ while ($this_action == 'load'){
                     elseif (!empty($temp_database_user['user_flag_approved'])){ $bypass_dateofbirth = true; }
 
                     // Ensure the dateofbirth is valid
+                    error_log('$_REQUEST = '.print_r($_REQUEST, true));
+                    error_log(isset($_REQUEST['dateofbirth']) ? '$_REQUEST[\'dateofbirth\'](before) = '.print_r($_REQUEST['dateofbirth'], true) : '');
                     $_REQUEST['dateofbirth'] = !empty($_REQUEST['dateofbirth']) ? str_replace(array('/', '_', '.', ' '), '-', $_REQUEST['dateofbirth']) : '';
                     if (empty($_REQUEST['dateofbirth'])){
                         $html_form_messages .= '<span class="error">(!) Your date of birth must be confirmed in order to continue.</span>';
@@ -717,18 +719,30 @@ while ($this_action == 'load'){
                         $html_form_verified = false;
                         $html_form_show_coppa = true;
                     }
+                    error_log('$_REQUEST[\'dateofbirth\'](after) = '.print_r($_REQUEST['dateofbirth'], true));
 
                     // If the account is not verified, break now
                     if (!$html_form_verified){ break; }
 
                     // The password was correct! Update the session with these credentials
                     mmrpg_reset_game_session();
+                    $updated_session_info = array();
+                    $updated_session_info['userid'] = $temp_database_user['user_id'];
+                    $updated_session_info['dateofbirth'] = trim(strtotime($_REQUEST['dateofbirth']));
+                    $updated_session_info['approved'] = 1;
                     $_SESSION['GAME']['DEMO'] = 0;
                     $_SESSION['GAME']['USER'] = $this_user;
-                    $_SESSION['GAME']['USER']['userid'] = $temp_database_user['user_id'];
-                    $_SESSION['GAME']['USER']['dateofbirth'] = strtotime($_REQUEST['dateofbirth']);
-                    $_SESSION['GAME']['USER']['approved'] = 1;
+                    $_SESSION['GAME']['USER'] = array_merge($_SESSION['GAME']['USER'], $updated_session_info);
                     $_SESSION['GAME']['PENDING_LOGIN_ID'] = $temp_database_user['user_id'];
+                    error_log('$_SESSION[\'GAME\'][\'USER\'][\'dateofbirth\'] = '.print_r($_SESSION['GAME']['USER']['dateofbirth'], true));
+                    error_log('date(\'Y-m-d\', $_SESSION[\'GAME\'][\'USER\'][\'dateofbirth\']) = '.print_r(date('Y-m-d', $_SESSION['GAME']['USER']['dateofbirth']), true));
+                    //exit();
+
+                    // Update the database with the new approved status and date of birth value
+                    $db->query("UPDATE `mmrpg_users`
+                        SET `user_date_birth` = '{$updated_session_info['dateofbirth']}', `user_flag_approved` = 1
+                        WHERE `user_id` = {$temp_database_user['user_id']}
+                        ;");
 
                     // Load the save file into memory and overwrite the session
                     mmrpg_load_game_session();
@@ -737,6 +751,7 @@ while ($this_action == 'load'){
                     } elseif (empty($_SESSION['GAME']['values']['battle_rewards'])){
                         mmrpg_reset_game_session();
                     } else {
+                        $_SESSION['GAME']['USER'] = array_merge($_SESSION['GAME']['USER'], $updated_session_info);
                         mmrpg_save_game_session();
                     }
 
@@ -773,7 +788,7 @@ while ($this_action == 'load'){
 
     // Update the header markup text
     if ($html_form_show_coppa){
-        $html_form_messages .= '<span class="notice">(!) Your date of birth must now be confirmed in accordance with <a href="http://www.coppa.org/" target="_blank">COPPA</a> guidelines.</span>';
+        $html_form_messages .= '<span class="notice">(!) Your date of birth must now be confirmed in accordance with <a class="coppa-link" href="https://www.google.com/search?q=coppa+regulations" target="_blank">COPPA</a> guidelines.</span>';
     }
     // Update the form markup fields
     $html_form_fields .= '<input type="hidden" name="return" value="'.(!empty($_REQUEST['return']) ? htmlentities(trim($_REQUEST['return']), ENT_QUOTES, 'UTF-8', true) : '').'" />';
