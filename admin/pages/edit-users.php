@@ -358,7 +358,7 @@
 
             $form_data['user_email_address'] = !empty($_POST['user_email_address']) && preg_match('/^[-_0-9a-z\.]+@[-_0-9a-z\.]+\.[-_0-9a-z\.]+$/i', $_POST['user_email_address']) ? trim(strtolower($_POST['user_email_address'])) : '';
             $form_data['user_website_address'] = !empty($_POST['user_website_address']) && preg_match('/^(https?:\/\/)?[-_0-9a-z\.]+\.[-_0-9a-z\.]+/i', $_POST['user_website_address']) ? trim(strtolower($_POST['user_website_address'])) : '';
-            $form_data['user_ip_addresses'] = !empty($_POST['user_ip_addresses']) && preg_match('/^((([0-9]{1,3}\.){3}([0-9]{1,3}){1}),?\s?)+$/i', $_POST['user_ip_addresses']) ? trim($_POST['user_ip_addresses']) : '';
+            $form_data['user_ip_addresses'] = !empty($_POST['user_ip_addresses']) && preg_match('/^((([0-9]{1,3}\.){3}([0-9]{1,3}){1}),?\s?|::[0-9]{1,3},?\s?)+$/i', $_POST['user_ip_addresses']) ? trim($_POST['user_ip_addresses']) : '';
 
             $form_data['user_profile_text'] = !empty($_POST['user_profile_text']) ? trim(strip_tags($_POST['user_profile_text'])) : '';
             $form_data['user_credit_line'] = !empty($_POST['user_credit_line']) ? trim(strip_tags($_POST['user_credit_line'])) : '';
