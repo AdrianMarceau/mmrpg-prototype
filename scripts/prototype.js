@@ -266,16 +266,18 @@ $(document).ready(function(){
             });
 
         // If this script is being loaded from within an iframe, let the parent prototype window know
-        if (thisBody.hasClass('iframe')){
-            var frameToken = thisBody.is('[data-frame]') ? thisBody.attr('data-frame') : 'unknown';
-            //top.console.log('we have loaded '+frameToken+' from within an iframe');
-            parent.prototype_menu_frame_seen(frameToken);
-            parent.prototype_menu_links_refresh();
-            }
-        // Otherwise, we can immediately trigger the menu links refresh
-        else {
-            prototype_menu_frame_seen('home');
-            prototype_menu_links_refresh();
+        if (gameSettings.allowEditing){
+            if (thisBody.hasClass('iframe')){
+                var frameToken = thisBody.is('[data-frame]') ? thisBody.attr('data-frame') : 'unknown';
+                //top.console.log('we have loaded '+frameToken+' from within an iframe');
+                if (typeof parent.prototype_menu_frame_seen !== 'undefined'){ parent.prototype_menu_frame_seen(frameToken); }
+                if (typeof parent.prototype_menu_links_refresh !== 'undefined'){ parent.prototype_menu_links_refresh(); }
+                }
+            // Otherwise, we can immediately trigger the menu links refresh
+            else {
+                prototype_menu_frame_seen('home');
+                prototype_menu_links_refresh();
+                }
             }
 
         // Define the click event for the chapter select menu links
