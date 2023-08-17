@@ -66,6 +66,7 @@ $this_tooltip_count = !empty($prototype_tooltip_index) ? count($prototype_toolti
 <title>Mega Man RPG Prototype | Rulebook | Last Updated <?= mmrpg_print_cache_date() ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
+<meta name="darkreader-lock" content="already-dark-mode" />
 <meta name="format-detection" content="telephone=no" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />

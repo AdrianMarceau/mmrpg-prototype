@@ -797,6 +797,7 @@ if (true){
 <title>Mega Man RPG Prototype | Data Library | Last Updated <?= mmrpg_print_cache_date() ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
+<meta name="darkreader-lock" content="already-dark-mode" />
 <meta name="format-detection" content="telephone=no" />
 <link type="text/css" href=".libs/fontawesome/v5.6.3/css/solid.css" rel="stylesheet" />
 <link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />

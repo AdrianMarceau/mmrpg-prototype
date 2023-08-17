@@ -126,6 +126,8 @@ if (count($matches)>1){
 <? } else { ?>
     <meta name="robots" content="noindex,nofollow,noodp" />
 <? } ?>
+<meta name="darkreader-lock" content="already-dark-mode" />
+<meta name="format-detection" content="telephone=no" />
 
 <base href="<?= MMRPG_CONFIG_ROOTURL ?>">
 
@@ -150,7 +152,6 @@ if (count($matches)>1){
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
-<meta name="format-detection" content="telephone=no" />
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
 <? /* <meta name="viewport" content="user-scalable=yes, width=768, height=1004"> */ ?>
 <meta name="viewport" content="user-scalable=yes, width=device-width, min-width=768, initial-scale=1">

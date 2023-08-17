@@ -218,6 +218,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 <title>Mega Man RPG Prototype | Battle Engine | Last Updated <?= mmrpg_print_cache_date() ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
+<meta name="darkreader-lock" content="already-dark-mode" />
 <meta name="format-detection" content="telephone=no" />
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/<?= mmrpg_get_favicon() ?>">
 <link type="text/css" href="styles/reset.css" rel="stylesheet" />

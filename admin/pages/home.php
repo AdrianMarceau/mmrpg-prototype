@@ -566,7 +566,7 @@
             }
 
             if (rpg_user::current_user_has_permission('edit-skills')){
-                $option_name = 'Passive Skill Editor';
+                $option_name = 'Skill Editor';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-skills/', 'text' => $option_name, 'bullet' => 'dna'),
                     'desc' => 'Manage in-game passive skill details and effects',

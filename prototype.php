@@ -294,7 +294,7 @@ foreach ($this_menu_tooltips AS $token => $text){
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 
 <meta name="robots" content="noindex,nofollow" />
-
+<meta name="darkreader-lock" content="already-dark-mode" />
 <meta name="format-detection" content="telephone=no" />
 
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/<?= mmrpg_get_favicon() ?>">
@@ -311,7 +311,6 @@ foreach ($this_menu_tooltips AS $token => $text){
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
-<meta name="format-detection" content="telephone=no" />
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
 <? /* <meta name="viewport" content="user-scalable=yes, width=768, height=1004"> */ ?>
 <meta name="viewport" content="user-scalable=yes, width=device-width, min-width=768, initial-scale=1">

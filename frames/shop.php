@@ -319,6 +319,7 @@ if (true){
 <title>View Shop | Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="shops" content="noindex,nofollow" />
+<meta name="darkreader-lock" content="already-dark-mode" />
 <meta name="format-detection" content="telephone=no" />
 <link rel="shortcut icon" type="image/x-icon" href="images/assets/<?= mmrpg_get_favicon() ?>">
 <link type="text/css" href=".libs/fontawesome/v5.6.3/css/solid.css" rel="stylesheet" />

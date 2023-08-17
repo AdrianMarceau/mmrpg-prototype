@@ -308,6 +308,8 @@ if (empty($this_markup_body)
 <? } else { ?>
     <meta name="robots" content="noindex,nofollow,noodp" />
 <? } ?>
+<meta name="darkreader-lock" content="already-dark-mode" />
+<meta name="format-detection" content="telephone=no" />
 
 <base href="<?= MMRPG_CONFIG_ROOTURL ?>">
 
@@ -340,7 +342,6 @@ if (empty($this_markup_body)
     <link type="text/css" href="styles/robots.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <? endif; ?>
 
-<meta name="format-detection" content="telephone=no" />
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
 <?
 // Define whether not this page/subpage combination require the legacy viewport settings
