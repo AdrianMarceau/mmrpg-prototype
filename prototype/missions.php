@@ -352,8 +352,11 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
                 // Define the details for the main real_final boss and append them to the array
                 $final_boss_token = 'slur';
+                $final_boss_image = 'slur'; // base sprite
+                if ($this_prototype_player_data['player_token'] === 'dr-wily'){ $final_boss_image .= '_alt'; } // emboldened alt
+                elseif ($this_prototype_player_data['player_token'] === 'dr-cossack'){ $final_boss_image .= '_alt2'; } // crestfallen alt
                 $final_boss_index_info = $mmrpg_index_robots[$final_boss_token];
-                $final_boss_info = array('robot_token' => $final_boss_token);
+                $final_boss_info = array('robot_token' => $final_boss_token, 'robot_image' => $final_boss_image);
                 $final_boss_info['counters'] = array();
                 $final_boss_info['counters']['attack_mods'] = $this_prototype_player_data['player_number'];
                 $final_boss_info['counters']['defense_mods'] = $this_prototype_player_data['player_number'];
@@ -361,7 +364,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $final_boss_info['counters'][$this_player_stat_token.'_mods'] += 2;
                 $final_boss_info['robot_level'] = $temp_final_option['battle_level'];
                 $final_boss_info['robot_item'] = 'space-core';
-                //$final_boss_info['robot_abilities'] = array('space-shot', 'space-buster', 'space-overdrive', 'buster-charge');
+                if ($this_prototype_player_data['player_token'] === 'dr-wily'){ $final_boss_info['robot_item'] = 'energy-upgrade'; }
+                elseif ($this_prototype_player_data['player_token'] === 'dr-cossack'){ $final_boss_info['robot_item'] = 'target-module'; }
                 $final_boss_info['robot_abilities'] = array();
                 if ($this_prototype_player_data['player_number'] >= 1){ $final_boss_info['robot_abilities'][] = 'space-overdrive'; }
                 if ($this_prototype_player_data['player_number'] >= 2){ $final_boss_info['robot_abilities'][] = 'space-buster'; }
@@ -507,13 +511,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
                 }
 
-                // Final Destination AFTER-III (CRESTFALLEN SLUR w/ DUO SUPPORT)
+                // Final Destination AFTER-III (FINAL WEAPON SLUR w/ DUO SUPPORT)
                 // Only prepend this battle to the final one if we're in the third and final player campaign
                 if ($this_prototype_player_data['player_number'] >= 3){
 
-                    // Append the Crestfallen Slur battle here
-                    // "Defeat the crestfallen Slur in this climactic final encounter!"
-                    //error_log($this_prototype_data['this_player_token'].' // Append the Crestfallen Slur battle');
+                    // Append the Final Weapon Slur battle here
+                    // "Defeat the forlorn soldier Slur in this climactic final encounter!"
+                    //error_log($this_prototype_data['this_player_token'].' // Append the Final Weapon Slur battle');
                     if (true){
 
                         // Unlock the last of the final destination III battles
@@ -551,8 +555,9 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
                         // Define the details for the main real_final boss and append them to the array
                         $real_final_boss_token = 'slur';
+                        $real_final_boss_image = 'slur_alt3';
                         $real_final_boss_index_info = $mmrpg_index_robots[$real_final_boss_token];
-                        $real_final_boss_info = array('robot_token' => $real_final_boss_token);
+                        $real_final_boss_info = array('robot_token' => $real_final_boss_token, 'robot_image' => $real_final_boss_image);
                         $real_final_boss_info['flags'] = array();
                         $real_final_boss_info['flags']['final_boss'] = true;
                         $real_final_boss_info['flags']['absolute_final_boss'] = true;
@@ -561,7 +566,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         $real_final_boss_info['counters']['defense_mods'] = MMRPG_SETTINGS_STATS_MOD_MAX;
                         $real_final_boss_info['counters']['speed_mods'] = MMRPG_SETTINGS_STATS_MOD_MAX;
                         $real_final_boss_info['robot_level'] = $temp_after_final_option['battle_level'] + 10;
-                        $real_final_boss_info['robot_item'] = 'omega-seed';
+                        $real_final_boss_info['robot_item'] = 'reverse-module';
                         $real_final_boss_info['robot_abilities'] = array('space-overdrive', 'laser-overdrive', 'shield-overdrive', 'buster-charge');
                         $temp_addon_abilties = array('freeze-overdrive', 'flame-overdrive', 'water-overdrive', 'electric-overdrive');
                         if (!empty($temp_addon_abilties)){ $real_final_boss_info['robot_abilities'] = array_merge($real_final_boss_info['robot_abilities'], $temp_addon_abilties); }
