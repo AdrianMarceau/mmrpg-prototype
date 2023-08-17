@@ -3118,7 +3118,7 @@ class rpg_ability extends rpg_object {
                 );
             $this_ability->target_options_update(array(
                 'frame' => 'shoot',
-                'success' => array(0, 105, 0, 10, $target_text)
+                'success' => array(0, 95, 0, 10, $target_text)
                 ));
             $this_robot->trigger_target($target_robot, $this_ability, $target_options);
 
