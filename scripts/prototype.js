@@ -815,6 +815,7 @@ function prototype_menu_click_option(thisContext, thisOption){
 
         // Find the parent token container
         var tokenParent = $('.option[data-parent]', thisParent);
+        var tokenParentLabel = $('label', tokenParent);
         var tokenParentLimit = thisParent.attr('data-limit');
         var tokenParentValue = tokenParent.attr('data-token');
 
@@ -831,15 +832,19 @@ function prototype_menu_click_option(thisContext, thisOption){
         if (tempSprite.hasClass('sprite_40x40')){ var tempSize = 40; }
         else if (tempSprite.hasClass('sprite_80x80')){ var tempSize = 80; }
         else if (tempSprite.hasClass('sprite_160x160')){ var tempSize = 160; }
+        var tempSizeSize = tempSize+'x'+tempSize;
         var tempSpriteKey = tokenParentCount - 1;
         var tempSpriteShift = parseInt($('.sprite[data-key="'+tempSpriteKey+'"]', tokenParent).css('right'));
         if (tempSize == 80){ tempSpriteShift -= 20; }
         //console.log('tempSize = '+tempSize+'; tempSpriteKey = '+tempSpriteKey+'; tempSpriteShift = '+tempSpriteShift+'; ');
-        var cloneShift = tempSpriteShift+'px'; //someValue+'px';
-        var cloneSprite = tempSprite.clone().addClass('sprite_clone').css({right:cloneShift,left:'auto',bottom:'6px',zIndex:'2'});
 
-        // Prepend the sprite to the parent's label value
-        $('label', tokenParent).append(cloneSprite);
+        var cloneSprite = $('<span class="sprite sprite_robot sprite_clone"></span>');
+        cloneSprite.addClass('sprite_'+tempSizeSize+' sprite_'+tempSizeSize+'_base');
+        var cloneSpriteCSS = {right:tempSpriteShift+'px',left:'auto',bottom:'6px',zIndex:'2'};
+        cloneSpriteCSS['background-image'] = tempSprite.css('background-image');
+        cloneSpriteCSS['animation-duration'] = tempSprite.css('animation-duration');
+        cloneSprite.css(cloneSpriteCSS);
+        cloneSprite.appendTo(tokenParentLabel);
 
         // Hide the placeholder appropriate sprite
         $('.sprite_40x40_placeholder:eq('+(gameSettings.nextRobotLimit - tokenParentCount)+')', tokenParent).css({display:'none'});
@@ -849,7 +854,7 @@ function prototype_menu_click_option(thisContext, thisOption){
         tokenParent.css({opacity:newOpacity});
         //tokenParent.find('.count').html((tokenParentCount >= tokenParentLimit) ? 'Start!' : (tokenParentCount+'/'+tokenParentLimit));
         tokenParent.find('.count').html((tokenParentCount >= 1) ? (tokenParentCount+'/'+gameSettings.nextRobotLimit)+' Start!' : (tokenParentCount+'/'+gameSettings.nextRobotLimit));
-        tokenParent.find('.arrow').html('&#9658;');
+        tokenParent.find('.arrow').html('<i class="fas fa-play"></i>');
 
         // If robots have not been selected, hide the reselector
         if (tokenParentCount < 1){
@@ -992,7 +997,7 @@ function prototype_menu_click_option(thisContext, thisOption){
                 var tempOffset = 80 + ((tokenParentLimit * 40) - (iCounter * 40) + 40);
 
                 var heartClass = 'sprite sprite_40x40 sprite_40x40_heartback sticky ';
-                var heartStyle = ' bottom: 4px; right: '+(tempOffset - 2)+'px; left: auto; z-index: 1; text-indent: 0; text-align: center; color: #262626; font-size: 24px; ';
+                var heartStyle = 'right: '+(tempOffset - 2)+'px; ';
                 spriteMarkup += '<span class="'+heartClass+'" style="'+heartStyle+'"><i class="fa fas fa-heart"></i></span>';
 
                 var spriteClass = 'sprite sprite_40x40 sprite_40x40_base sprite_40x40_placeholder sticky ';

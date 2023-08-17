@@ -2235,7 +2235,10 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $info_tooltip_icons = ' <span class="icons info color '.$this_robot_core_or_none.'" data-click-tooltip="'.$this_option_title_tooltip.'" data-tooltip-type="'.$this_option_type_token.'"><i class="fa fas fa-info-circle"></i></span>';
 
         $robot_sprite_url = 'images/robots/'.$this_option_image.'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
-        $robot_sprite_markup = '<span class="sprite sprite_robot sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url('.$robot_sprite_url.'); top: '.$temp_sprite_top.'px;"></span>';
+        $robot_animation_duration = 1;
+        $robot_animation_duration -= $robot_animation_duration * ($this_robot_speed / ($this_robot_attack + $this_robot_defense + $this_robot_speed));
+        if ($robot_animation_duration < 0.1){ $robot_animation_duration = 0.1; }
+        $robot_sprite_markup = '<span class="sprite sprite_robot sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url('.$robot_sprite_url.'); top: '.$temp_sprite_top.'px; animation-duration: '.$robot_animation_duration.'s;"></span>';
 
         $robot_item_sprite_markup = '';
         if (!empty($this_robot_item_info)){

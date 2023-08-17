@@ -933,7 +933,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container.ps-active-y {
     padding-right: 10px;
     padding-left: 10px;
-    min-height: 232px;
+    height: 232px;
 }
 #prototype .menu[data-select] .option_wrapper > .wrap .option_1x1,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x1 {
@@ -953,7 +953,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 }
 #prototype .menu[data-select="this_player_robots"] .option_wrapper,
 #prototype .menu[data-select="this_player_robots"] .option_wrapper > .wrap {
-    min-height: 257px;
+
 }
 #prototype .select_this_player_robots .option_wrapper {
     padding-top: 80px;
@@ -1464,6 +1464,10 @@ body[data-source="website"] #prototype .menu {
     background-image: url(../images/menus/menu-options_this-dr-cossack-team-select.gif);
 }
 
+
+#mmrpg #prototype .option_this-robot-select {
+
+}
 #mmrpg #prototype .option_this-robot-select .sprite {
     pointer-events: none;
     right: auto;
@@ -1478,6 +1482,17 @@ body[data-source="website"] #prototype .menu {
     top: -8px;
     z-index: 2;
 }
+
+@keyframes team-select-robot-bounce {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-1px); }
+    100% { transform: translateY(0px); }
+}
+#mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_robot {
+    transform: translateY(0px);
+    animation: team-select-robot-bounce 0.6s steps(1) infinite;
+}
+
 #mmrpg #prototype .option_this-robot-select .has_image .sprite_item {
     left: -8px;
     bottom: -5px;
@@ -1545,8 +1560,20 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype .option_this-robot-select .multi .subtext2 {
     width: auto;
 }
+#mmrpg #prototype .option_this-robot-select.option_disabled {
+    cursor: not-allowed;
+}
+#mmrpg #prototype .option_this-robot-select.option_disabled .chrome {
+    filter: brightness(0.6) saturate(1.6);
+}
+#mmrpg #prototype .option_this-robot-select.option_disabled .chrome .inset {
+    opacity: 0.3;
+}
+#mmrpg #prototype .option_this-robot-select.option_disabled .chrome .sprite_robot,
+#mmrpg #prototype .option_this-robot-select.option_disabled .chrome .sprite_item {
+    filter: brightness(0.6) saturate(0);
+}
 
-/* write a keyframe animation that moves the team select background image to the left infinitly over time slowly */
 @keyframes team-select-background-scroll {
     0% { background-position: 0 0; }
     100% { background-position: 100px 0; }
@@ -1557,6 +1584,9 @@ body[data-source="website"] #prototype .menu {
     left: 5px;
     min-width: 750px;
     animation: team-select-background-scroll 60s linear infinite;
+}
+#prototype .option.option_this-team-select:not(.option_disabled) {
+    border-color: #121212;
 }
 #prototype .option.option_this-team-select .count {
     text-transform: uppercase;
@@ -1583,11 +1613,31 @@ body[data-source="website"] #prototype .menu {
     margin-left: 460px !important;
     padding-left: 0 !important;
 }
-body.windowFlag_landscapeMode #prototype .option_this-team-select .chrome label,
-body.mobileFlag_landscapeMode #prototype .option_this-team-select .chrome label {
-    margin-left: 560px !important;
+#prototype .option_this-team-select .chrome label .sprite_40x40_heartback {
+    bottom: 4px;
+    right: auto;
+    left: auto;
+    z-index: 1;
+    text-indent: 0;
+    text-align: center;
+    color: #393939;
+    font-size: 24px;
+    transition: color 0.3s;
+}
+#prototype .option_this-team-select.option_disabled .chrome label .sprite_40x40_heartback {
+    color: #696969;
 }
 
+/* write an animation that makes the arrow pulse larger and smaller */
+@keyframes team-select-arrow-pulse {
+    0% { transform: scale(1.2); }
+    50% { transform: scale(1.6); }
+    100% { transform: scale(1.2); }
+}
+#prototype .option_this-team-select .chrome label .arrow i {
+    transform: scale(1.2);
+    animation: team-select-arrow-pulse 1s infinite;
+}
 
 #mmrpg #prototype .canvas_overlay_footer {
     left: auto;
