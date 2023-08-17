@@ -339,6 +339,7 @@ if ($request_kind === 'event'){
         $defender_token = 'met';
         $darksoul_tokens = array('met', 'met', 'met');
         $final_boss_token = $player_token !== 'player' ? 'slur' : 'met';
+        $final_boss_image = $final_boss_token;
         if ($player_token === 'dr-light'){
             $field_token = 'final-destination';
             $defender_token = 'enker';
@@ -347,10 +348,12 @@ if ($request_kind === 'event'){
             $field_token = 'final-destination-2';
             $defender_token = 'punk';
             $darksoul_tokens = array('bass-ds', 'proto-man-ds', 'mega-man-ds');
+            $final_boss_image .= '_alt';
         } elseif ($player_token === 'dr-cossack'){
             $field_token = 'final-destination-3';
             $defender_token = 'ballade';
             $darksoul_tokens = array('proto-man-ds', 'mega-man-ds', 'bass-ds');
+            $final_boss_image .= '_alt2';
         }
         $banner_config = array(
             'field_background' => $field_token,
@@ -362,7 +365,7 @@ if ($request_kind === 'event'){
                 array('kind' => 'robot', 'image' => $support_token, 'frame' => 7, 'direction' => 'right', 'float' => 'left', 'left' => 255, 'bottom' => 90),
 
                 array('kind' => 'robot', 'image' => $defender_token, 'frame' => 8, 'direction' => 'left', 'float' => 'right', 'right' => 250, 'bottom' => 80),
-                array('kind' => 'robot', 'image' => $final_boss_token, 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 200, 'bottom' => 82),
+                array('kind' => 'robot', 'image' => $final_boss_image, 'frame' => 1, 'direction' => 'left', 'float' => 'right', 'right' => 200, 'bottom' => 82),
                 array('kind' => 'robot', 'image' => $darksoul_tokens[2], 'frame' => 8, 'direction' => 'left', 'float' => 'right', 'right' => 150, 'bottom' => 90),
                 array('kind' => 'robot', 'image' => $darksoul_tokens[1], 'frame' => 0, 'direction' => 'left', 'float' => 'right', 'right' => 135, 'bottom' => 82),
                 array('kind' => 'robot', 'image' => $darksoul_tokens[0], 'frame' => 10, 'direction' => 'left', 'float' => 'right', 'right' => 120, 'bottom' => 70),
