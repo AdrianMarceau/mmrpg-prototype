@@ -328,6 +328,11 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
                 $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6] + 5;
                 $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
+                $temp_final_option_descriptor = 'intense';
+                if ($this_prototype_player_data['player_token'] === 'dr-light'){ $temp_final_option_descriptor = 'daunting'; }
+                elseif ($this_prototype_player_data['player_token'] === 'dr-wily'){ $temp_final_option_descriptor = 'desperate'; }
+                elseif ($this_prototype_player_data['player_token'] === 'dr-cossack'){ $temp_final_option_descriptor = 'decisive'; }
+                $temp_final_option['battle_description'] = 'Defeat the alien robot Slur in this '.$temp_final_option_descriptor.' final battle!';
 
                 // Define the stats we'll be working with for the real_final boss
                 $temp_this_player_info = $mmrpg_index_players[$this_prototype_data['this_player_token']];
@@ -354,7 +359,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $final_boss_token = 'slur';
                 $final_boss_image = 'slur'; // base sprite
                 if ($this_prototype_player_data['player_token'] === 'dr-wily'){ $final_boss_image .= '_alt'; } // emboldened alt
-                elseif ($this_prototype_player_data['player_token'] === 'dr-cossack'){ $final_boss_image .= '_alt2'; } // crestfallen alt
+                elseif ($this_prototype_player_data['player_token'] === 'dr-cossack'){ $final_boss_image .= '_alt2'; } // final weapon alt
                 $final_boss_index_info = $mmrpg_index_robots[$final_boss_token];
                 $final_boss_info = array('robot_token' => $final_boss_token, 'robot_image' => $final_boss_image);
                 $final_boss_info['counters'] = array();
@@ -443,6 +448,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     $temp_before_final_option['battle_token'] = $temp_before_final_option_token;
                     $temp_before_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
                     $temp_before_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6];
+                    $temp_before_final_option['battle_description'] = 'Defeat the army of robot master clones augmented with darkness energy!';
 
                     // Collect and define the robot masters and support mechas to appear on this field
                     $temp_robot_masters = array();
@@ -511,13 +517,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
                 }
 
-                // Final Destination AFTER-III (FINAL WEAPON SLUR w/ DUO SUPPORT)
+                // Final Destination AFTER-III (CRESTFALLEN SLUR w/ DUO SUPPORT)
                 // Only prepend this battle to the final one if we're in the third and final player campaign
                 if ($this_prototype_player_data['player_number'] >= 3){
 
-                    // Append the Final Weapon Slur battle here
+                    // Append the Crestfallen Slur battle here
                     // "Defeat the forlorn soldier Slur in this climactic final encounter!"
-                    //error_log($this_prototype_data['this_player_token'].' // Append the Final Weapon Slur battle');
+                    //error_log($this_prototype_data['this_player_token'].' // Append the Crestfallen Slur battle');
                     if (true){
 
                         // Unlock the last of the final destination III battles
@@ -527,6 +533,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         $temp_after_final_option['battle_token'] = $temp_after_final_option_token;
                         $temp_after_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
                         $temp_after_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6];
+                        $temp_after_final_option['battle_description'] = 'Defeat the forlorn soldier Slur in this climactic final encounter!';
 
                         // Update the battle field base with more dynamic options
                         $backup_battle_field_base = $temp_after_final_option['battle_field_base'];
