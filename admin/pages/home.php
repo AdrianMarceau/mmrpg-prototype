@@ -31,26 +31,26 @@
         // Populate the group options array with relevant pages and buttons
         if (rpg_user::current_user_has_permission('edit-user-accounts')){
             $this_option = array(
-                'link' => array('url' => 'admin/edit-users/', 'text' => 'Moderate User Accounts', 'bullet' => 'users'),
+                'link' => array('url' => 'admin/edit-users/', 'text' => 'User Accounts', 'bullet' => 'users'),
                 'desc' => 'Manage user account information and permissions'
                 );
             $this_group_options[] = $this_option;
         }
         if (rpg_user::current_user_has_permission('edit-user-challenges')){
             $this_option = array(
-                'link' => array('url' => 'admin/edit-user-challenges/', 'text' => 'Moderate User Challenges', 'bullet' => 'users-cog'),
+                'link' => array('url' => 'admin/edit-user-challenges/', 'text' => 'User Challenges', 'bullet' => 'users-cog'),
                 'desc' => 'Manage user-created challenge missions for the post-game'
                 );
             $this_group_options[] = $this_option;
         }
         if (rpg_user::current_user_has_permission('edit-private-messages')){
             $this_option = array(
-                'link' => array('url' => 'admin/edit-messages/', 'text' => 'Moderate Personal Messages', 'bullet' => 'envelope'),
+                'link' => array('url' => 'admin/edit-messages/', 'text' => 'Personal Messages', 'bullet' => 'envelope'),
                 'desc' => 'Review and moderate personal message invites between users'
                 );
             $this_group_options[] = $this_option;
             $this_option = array(
-                'link' => array('url' => 'admin/edit-message-replies/', 'text' => 'Moderate Message Replies', 'bullet' => 'stream'), //envelope-square
+                'link' => array('url' => 'admin/edit-message-replies/', 'text' => 'Message Replies', 'bullet' => 'stream'), //envelope-square
                 'desc' => 'Review and moderate individual replies within personal messages'
                 );
             $this_group_options[] = $this_option;
@@ -81,12 +81,12 @@
         // Populate the group options array with relevant pages and buttons
         if (rpg_user::current_user_has_permission('edit-community-threads')){
             $this_option = array(
-                'link' => array('url' => 'admin/edit-threads/', 'text' => 'Moderate Community Threads', 'bullet' => 'comment-alt'),
+                'link' => array('url' => 'admin/edit-threads/', 'text' => 'Community Threads', 'bullet' => 'comment-alt'),
                 'desc' => 'Review and moderate community forum threads'
                 );
             $this_group_options[] = $this_option;
             $this_option = array(
-                'link' => array('url' => 'admin/edit-thread-comments/', 'text' => 'Moderate Thread Comments', 'bullet' => 'stream'), //comments
+                'link' => array('url' => 'admin/edit-thread-comments/', 'text' => 'Thread Comments', 'bullet' => 'stream'), //comments
                 'desc' => 'Review and moderate individual comments within community threads'
                 );
             $this_group_options[] = $this_option;
@@ -261,7 +261,7 @@
             // Populate the group options array with relevant pages and buttons
 
             if (rpg_user::current_user_has_permission('edit-players')){
-                $option_name = 'Edit Players';
+                $option_name = 'Player Editor';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-players/', 'text' => $option_name, 'bullet' => 'mask'),
                     'desc' => 'Manage in-game player character details and images',
@@ -299,7 +299,7 @@
             }
 
             if (rpg_user::current_user_has_permission('edit-robot-masters')){
-                $option_name = 'Edit Robot Masters';
+                $option_name = 'Robot Master Editor';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-robot-masters/', 'text' => $option_name, 'bullet' => 'robot'),
                     'desc' => 'Manage in-game robot master details and images',
@@ -343,9 +343,9 @@
                 $this_group_options[] = $this_option;
             }
             if (rpg_user::current_user_has_permission('edit-master-abilities')){
-                $option_name = 'Edit Master Abilities';
+                $option_name = 'Master Ability Editor';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-master-abilities/', 'text' => $option_name, 'bullet' => 'fire-alt'),
+                    'link' => array('url' => 'admin/edit-master-abilities/', 'text' => $option_name, 'bullet' => 'fire-alt', 'class' => 'edit-master-abilities'),
                     'desc' => 'Manage robot master ability details and images',
                     'repo' => array(
                         'name' => 'abilities',
@@ -388,7 +388,7 @@
             }
 
             if (rpg_user::current_user_has_permission('edit-support-mechas')){
-                $option_name = 'Edit Support Mechas';
+                $option_name = 'Support Mecha Editor';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-support-mechas/', 'text' => $option_name, 'bullet' => 'ghost'),
                     'desc' => 'Manage in-game support mecha details and images',
@@ -432,9 +432,9 @@
                 $this_group_options[] = $this_option;
             }
             if (rpg_user::current_user_has_permission('edit-mecha-abilities')){
-                $option_name = 'Edit Mecha Abilities';
+                $option_name = 'Mecha Ability Editor';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-mecha-abilities/', 'text' => $option_name, 'bullet' => 'fire'),
+                    'link' => array('url' => 'admin/edit-mecha-abilities/', 'text' => $option_name, 'bullet' => 'fire', 'class' => 'edit-mecha-abilities'),
                     'desc' => 'Manage support mecha ability details and images',
                     'repo' => array(
                         'name' => 'abilities',
@@ -477,7 +477,7 @@
             }
 
             if (rpg_user::current_user_has_permission('edit-fortress-bosses')){
-                $option_name = 'Edit Fortress Bosses';
+                $option_name = 'Fortress Boss Editor';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-fortress-bosses/', 'text' => $option_name, 'bullet' => 'skull'),
                     'desc' => 'Manage in-game fortress boss details and images',
@@ -521,9 +521,9 @@
                 $this_group_options[] = $this_option;
             }
             if (rpg_user::current_user_has_permission('edit-boss-abilities')){
-                $option_name = 'Edit Boss Abilities';
+                $option_name = 'Boss Ability Editor';
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-boss-abilities/', 'text' => $option_name, 'bullet' => 'meteor'),
+                    'link' => array('url' => 'admin/edit-boss-abilities/', 'text' => $option_name, 'bullet' => 'meteor', 'class' => 'edit-boss-abilities'),
                     'desc' => 'Manage fortress boss ability details and images',
                     'repo' => array(
                         'name' => 'abilities',
@@ -566,7 +566,7 @@
             }
 
             if (rpg_user::current_user_has_permission('edit-skills')){
-                $option_name = 'Edit Passive Skills';
+                $option_name = 'Passive Skill Editor';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-skills/', 'text' => $option_name, 'bullet' => 'dna'),
                     'desc' => 'Manage in-game passive skill details and effects',
@@ -604,7 +604,7 @@
             }
 
             if (rpg_user::current_user_has_permission('edit-items')){
-                $option_name = 'Edit Items';
+                $option_name = 'Item Editor';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-items/', 'text' => $option_name, 'bullet' => 'flask'),
                     'desc' => 'Manage in-game item details and images',
@@ -642,7 +642,7 @@
             }
 
             if (rpg_user::current_user_has_permission('edit-fields')){
-                $option_name = 'Edit Fields';
+                $option_name = 'Field Editor';
                 $this_option = array(
                     'link' => array('url' => 'admin/edit-fields/', 'text' => $option_name, 'bullet' => 'map'),
                     'desc' => 'Manage in-game battle field details and images',
@@ -683,7 +683,7 @@
                 && defined('MMRPG_CONFIG_CDN_ROOTDIR')
                 && file_exists(MMRPG_CONFIG_CDN_ROOTDIR)){
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-music/', 'text' => 'Edit Music', 'bullet' => 'music'),
+                    'link' => array('url' => 'admin/edit-music/', 'text' => 'Music Editor', 'bullet' => 'music'),
                     'desc' => 'Manage in-game music track details and sound files',
                     );
                 $this_group_options[] = $this_option;
@@ -697,7 +697,7 @@
                 || rpg_user::current_user_has_permission('edit-fields')
                 ){
                 $this_option = array(
-                    'link' => array('url' => 'admin/view-sprites/', 'text' => 'View Game Sprites', 'target' => '_blank', 'bullet' => 'running'),
+                    'link' => array('url' => 'admin/view-sprites/', 'text' => 'Game Sprites', 'target' => '_blank', 'bullet' => 'running'),
                     'desc' => 'Quickly view game sprites all together in bulk',
                     );
                 $this_group_options[] = $this_option;
@@ -711,7 +711,7 @@
                 || rpg_user::current_user_has_permission('edit-fields')
                 ){
                 $this_option = array(
-                    'link' => array('url' => 'admin/view-banners/?kind=events&refresh=false', 'text' => 'View Event Banners', 'target' => '_blank', 'bullet' => 'rectangle-wide'),
+                    'link' => array('url' => 'admin/view-banners/?kind=events&refresh=false', 'text' => 'Event Banners', 'target' => '_blank', 'bullet' => 'rectangle-wide'),
                     'desc' => 'Quickly review all in-game event banners at once',
                     );
                 $this_group_options[] = $this_option;
@@ -725,7 +725,7 @@
                 || rpg_user::current_user_has_permission('edit-fields')
                 ){
                 $this_option = array(
-                    'link' => array('url' => 'admin/view-banners/?kind=challenges&refresh=false&max=10&page=1', 'text' => 'View Challenge Banners', 'target' => '_blank', 'bullet' => 'rectangle-wide'),
+                    'link' => array('url' => 'admin/view-banners/?kind=challenges&refresh=false&max=10&page=1', 'text' => 'Challenge Banners', 'target' => '_blank', 'bullet' => 'rectangle-wide'),
                     'desc' => 'Quickly review challenge mission banners at once',
                     );
                 $this_group_options[] = $this_option;
@@ -749,7 +749,7 @@
             // Populate the group options array with relevant pages and buttons
             if (rpg_user::current_user_has_permission('edit-stars')){
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-stars/', 'text' => 'Edit Rogue Stars', 'bullet' => 'star'),
+                    'link' => array('url' => 'admin/edit-stars/', 'text' => 'Rogue Stars', 'bullet' => 'star'),
                     'desc' => 'Schedule and manage post-game rogue star appearances',
                     'repo' => array(
                         'name' => 'stars',
@@ -785,7 +785,7 @@
             }
             if (rpg_user::current_user_has_permission('edit-event-challenges')){
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-event-challenges/', 'text' => 'Edit Event Challenges', 'bullet' => 'trophy'),
+                    'link' => array('url' => 'admin/edit-event-challenges/', 'text' => 'Event Challenges', 'bullet' => 'trophy'),
                     'desc' => 'Create or modify post-game event-based challenge missions',
                     'repo' => array(
                         'name' => 'challenges',
@@ -838,7 +838,7 @@
             // Populate the group options array with relevant pages and buttons
             if (rpg_user::current_user_has_permission('edit-pages')){
                 $this_option = array(
-                    'link' => array('url' => 'admin/edit-pages/', 'text' => 'Edit Website Pages', 'bullet' => 'sitemap'),
+                    'link' => array('url' => 'admin/edit-pages/', 'text' => 'Website Pages', 'bullet' => 'sitemap'),
                     'desc' => 'Manage text and images on various website pages',
                     'repo' => array(
                         'name' => 'pages',

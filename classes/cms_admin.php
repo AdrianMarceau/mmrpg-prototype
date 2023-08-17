@@ -411,7 +411,8 @@ class cms_admin {
                 }
             }
             $item_class = 'item';
-            if (isset($option_info['link']['text'])){ $item_class .= ' '.preg_replace('/\s+/', '-', strtolower($option_info['link']['text'])); }
+            if (isset($option_info['link']['class'])){ $item_class .= ' '.$option_info['link']['class']; }
+            elseif (isset($option_info['link']['text'])){ $item_class .= ' '.trim(preg_replace('/[^-_a-z0-9]+/', '-', strtolower($option_info['link']['text'])), '-'); }
             echo('<li class="'.$item_class.'">'.PHP_EOL);
                 $link_url = isset($option_info['link']['url']) ? ' href="'.$option_info['link']['url'].'"' : '';
                 $link_target = isset($option_info['link']['target']) ? ' target="'.$option_info['link']['target'].'"' : '';
