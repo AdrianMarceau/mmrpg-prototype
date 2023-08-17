@@ -909,8 +909,10 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 
 #prototype .option_wrapper {
     display: block;
-    height: 284px;
+    /* height: 284px;  */
     overflow: visible;
+    box-sizing: border-box;
+    height: 339px;
 }
 #prototype .option_wrapper:after {
     content: "";
@@ -967,7 +969,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 
 }
 #prototype .option_wrapper_missions {
-    padding-top: 13px;
+    padding-top: 24px;
     position: relative;
 }
 #prototype .option_wrapper_missions .chapter_select {
@@ -1220,6 +1222,13 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     /*cursor: default !important;*/
 }
 
+#prototype .option_message[data-chapter] {
+    margin: 0 auto 5px;
+}
+#prototype .option_message[data-chapter] .chrome {
+    padding: 0;
+}
+
 /*
 #prototype .option_message_collapsed {
     margin-top: 5px;
@@ -1323,7 +1332,7 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     background-image: none;
     color: #CACACA;
     position: absolute;
-    bottom: -25px;
+    bottom: -30px;
     left: 8px;
     z-index: 200;
 }
@@ -1540,7 +1549,7 @@ body[data-source="website"] #prototype .menu {
 /* write a keyframe animation that moves the team select background image to the left infinitly over time slowly */
 @keyframes team-select-background-scroll {
     0% { background-position: 0 0; }
-    100% { background-position: -100px 0; }
+    100% { background-position: 100px 0; }
 }
 #prototype .option.option_this-team-select {
     position: absolute;

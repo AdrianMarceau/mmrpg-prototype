@@ -1370,6 +1370,9 @@ body.index #header {
 
 #winmods {
     margin: 0 auto;
+
+    display: none;
+    /* 2017-10-16: Disabling this feature going forward, the game has one sized window */
 }
 #winmods .field {
     display: inline-block;
@@ -1423,6 +1426,20 @@ body.index #header {
 }
 
 
+#window,
+#window[data-window-width],
+#window[data-window-height] {
+    width: 768px !important;
+    height: 626px !important;
+}
+#window iframe,
+#window[data-window-width] iframe,
+#window[data-window-height] iframe {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/*
 #window[data-window-width="small"] {
     width: 768px !important;
 }
@@ -1442,7 +1459,7 @@ body.index #header {
     width: 100% !important;
     height: 100% !important;
 }
-
+*/
 
 #music,
 #animate,

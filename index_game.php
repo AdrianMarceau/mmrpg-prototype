@@ -314,8 +314,9 @@ $(document).ready(function(){
         && $windowMods.length){
 
         // Load previous preferences if present
-        var previousWidth = localStorage.getItem('mmrpg-window-width') || 'small';
-        var previousHeight = localStorage.getItem('mmrpg-window-height') || 'small';
+        // 2017-10-16: Disabling this feature going forward, the game has one sized window
+        var previousWidth = 'small'; //localStorage.getItem('mmrpg-window-width') || 'small';
+        var previousHeight = 'small'; //localStorage.getItem('mmrpg-window-height') || 'small';
 
         // Set previous preferences
         $gameWindow.attr('data-window-width', previousWidth);

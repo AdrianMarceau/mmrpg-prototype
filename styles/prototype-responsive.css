@@ -30,14 +30,16 @@ body:before {
         content: "12";
     }
 
-    body,
-    #mmrpg,
+    html:not([data-index]),
+    body:not(.index),
+    #mmrpg:not(.index),
     #prototype {
-        width: auto !important;
-        height: auto;
-        height: 100svh;
-        min-width: 768px;
-        min-height: 924px;
+        width: 768px !important;
+        min-width: 768px !important;
+        max-width: 768px !important;
+        height: 622px !important;
+        min-height: 622px !important;
+        max-height: 622px !important;
     }
 
     #mmrpg.windowFlag_landscapeMode {

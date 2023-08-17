@@ -521,31 +521,6 @@ function windowResizePrototype(){
     thisPrototype.css({height:newBodyHeight+'px'});
     thisFalloff.css({width:newBodyWidth+'px'});
     $('iframe', thisPrototype).css({height:newFrameHeight+'px'}).attr('height', newFrameHeight);
-    //$('.option_wrapper', thisPrototype).css({height:newWrapperHeight+'px'});
-    $('.option_wrapper', thisPrototype).each(function(){
-        var thisWrapper = $(this);
-        thisWrapper.addClass('option_wrapper_full'); //.css({height:'auto',overflow:'hidden'});
-        //return true;
-        var totalHeight = thisWrapper.height();
-        var tempNewWrapperHeight = newWrapperHeight;
-        var excludeElement = $('.option_this-team-select', thisWrapper);
-        var backElement = $('.option_back', thisWrapper.parent());
-        if (excludeElement.length){
-            //var excludeHeight = excludeElement.height() + excludeElement.outerHeight(true);
-            //excludeHeight += backElement.height() + backElement.outerHeight(true);
-            //excludeHeight += 13;
-            //var excludeHeight = 140;
-            //var excludeHeight = 40;
-            var excludeHeight = 134;
-            //alert('exclude '+excludeHeight);
-            tempNewWrapperHeight -= excludeHeight;
-            }
-        thisWrapper.removeClass('option_wrapper_full');
-        thisWrapper.css({height:tempNewWrapperHeight+'px'});
-        thisWrapper.attr('data-content',totalHeight);
-        //thisWrapper.scrollTop(totalHeight);
-        //if (thisWrapper.hasClass('option_wrapper_noscroll')){  }
-        });
 
 }
 
