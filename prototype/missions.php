@@ -538,23 +538,17 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         // Update the battle field base with more dynamic options
                         $backup_battle_field_base = $temp_after_final_option['battle_field_base'];
                         $temp_fusion_field = 'prototype-subspace';
+                        $temp_fusion_field_background_variant = 'final-destination';
+                        $temp_fusion_field_foreground_variant = 'decayed';
                         $temp_after_final_option['battle_field_base'] = array();
                         $temp_after_final_option['battle_field_base']['field_music'] = 'sega-remix/final-boss-rnf';
-                        $temp_after_final_option['battle_field_base']['field_multipliers'] = array('experience' => 2);
-                        if ($this_prototype_player_data['player_number'] >= 2){
-                            $temp_fusion_field_background_variant = '';
-                            $temp_after_final_option['battle_field_base']['field_background'] = $temp_fusion_field;
-                            $temp_after_final_option['battle_field_base']['field_background_variant'] = $temp_fusion_field_background_variant;
-                            $temp_after_final_option['battle_field_base']['field_background_attachments'] = array();
-                            $temp_after_final_option['battle_field_base']['field_multipliers']['experience'] += 1;
-                        }
-                        if ($this_prototype_player_data['player_number'] >= 3){
-                            $temp_fusion_field_foreground_variant = '';
-                            $temp_after_final_option['battle_field_base']['field_foreground'] = $temp_fusion_field;
-                            $temp_after_final_option['battle_field_base']['field_foreground_variant'] = $temp_fusion_field_foreground_variant;
-                            $temp_after_final_option['battle_field_base']['field_foreground_attachments'] = array();
-                            $temp_after_final_option['battle_field_base']['field_multipliers']['experience'] += 1;
-                        }
+                        $temp_after_final_option['battle_field_base']['field_multipliers'] = array('experience' => 4);
+                        $temp_after_final_option['battle_field_base']['field_background'] = $temp_fusion_field;
+                        $temp_after_final_option['battle_field_base']['field_background_variant'] = $temp_fusion_field_background_variant;
+                        $temp_after_final_option['battle_field_base']['field_background_attachments'] = array();
+                        $temp_after_final_option['battle_field_base']['field_foreground'] = $temp_fusion_field;
+                        $temp_after_final_option['battle_field_base']['field_foreground_variant'] = $temp_fusion_field_foreground_variant;
+                        $temp_after_final_option['battle_field_base']['field_foreground_attachments'] = array();
                         $temp_after_final_option['battle_field_base'] = array_merge($backup_battle_field_base, $temp_after_final_option['battle_field_base']);
 
                         // The default for this battle are nice, but we should replace them with better options
