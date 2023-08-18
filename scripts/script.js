@@ -2566,11 +2566,23 @@ function mmrpg_music_play(){
     var musicStreamSource = $('source', musicStream).attr('src');
     // Define local function for playing sprite music
     var playSpriteMusic = function(){
-        mmrpgMusicSound.once('end', function(){
-            mmrpgMusicSound.stop();
-            mmrpgMusicSound.play('loop');
-            });
-        mmrpgMusicSound.play('intro');
+        if (typeof mmrpgMusicConfig.sprite !== 'undefined'
+            && typeof mmrpgMusicConfig.sprite.intro !== 'undefined'
+            && typeof mmrpgMusicConfig.sprite.loop !== 'undefined'){
+            //console.log('playing music with a loop');
+            mmrpgMusicSound.once('end', function(){
+                //console.log('music intro complete, playing loop now');
+                mmrpgMusicSound.stop();
+                mmrpgMusicSound.play('loop');
+                });
+            //console.log('music intro starting now');
+            mmrpgMusicSound.play('intro');
+            }
+        else {
+            //console.log('playing music without any loop');
+            mmrpgMusicSound.once('end', function(){ /* ... */ });
+            mmrpgMusicSound.play();
+            }
         };
     if (!mmrpgMusicSound.playing()){
         mmrpg_reset_music_volume();
@@ -2585,10 +2597,12 @@ function mmrpg_music_play(){
             }
         else {
             if (mmrpgMusicSound.state() === 'loaded'){
-                mmrpgMusicSound.play();
+                //mmrpgMusicSound.play();
+                playSpriteMusic();
                 } else {
                 mmrpgMusicSound.once('load', function(){
-                    mmrpgMusicSound.play();
+                    //mmrpgMusicSound.play();
+                    playSpriteMusic();
                     });
                 }
             }
@@ -2621,7 +2635,7 @@ function mmrpg_music_onend(onendFunction){
 }
 // Define a function for playing the current music
 function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
-    //console.log('%cmmrpg_music_load', 'color: magenta;', '(', newTrack, resartTrack, playOnce, ')');
+    //console.log('%cmmrpg_music_load', 'color: magenta;', '(newTrack:', newTrack, ', resartTrack:', resartTrack, ', playOnce:', playOnce, ', onendFunction:', typeof onendFunction, ')');
     var musicStream = $('.audio-stream.music', gameMusic);
     var musicToggle = $('a.toggle', gameMusic);
     var thisTrack = musicStream.attr('data-track');
@@ -2651,10 +2665,12 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
         onplay: onplayFunction,
         onend: onendFunction
         };
+    //console.log('musicMeta =', musicMeta);
     if (musicMeta !== false
         && typeof musicMeta.loop !== 'undefined'
         && typeof musicMeta.loop.start === 'number'
         && typeof musicMeta.loop.end === 'number'){
+        //console.log('musicMeta.loop is defined');
         var milliFrame = Math.ceil(1000 / 60);
         var introStart = 0;
         var introDuration = musicMeta.loop.start - (milliFrame * 10);
@@ -2667,7 +2683,6 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
             };
         }
     if (waitTime > 0){ audioConfig.autoplay = false; }
-    //console.log('musicMeta =', musicMeta);
     //console.log('audioConfig =', audioConfig);
     mmrpg_music_volume(0, false);
     mmrpg_music_stop();
