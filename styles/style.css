@@ -1468,8 +1468,8 @@ body.index #header {
     top: 19px;
     left: 48%;
     display: block;
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     border: 0 none transparent;
     border-top: 0 none transparent;
     background-color: transparent;
@@ -1479,26 +1479,30 @@ body.index #header {
     -webkit-border-radius: 0 0 0.5em 0.5em;
     text-align: center;
 }
+#music {
+    left: calc(50% - 5px);
+    transform: translateX(-100%);
+}
 #animate {
-    left: 51%;
+    left: calc(50% + 5px);
     top: 8px;
 }
 #music a.toggle,
 #animate a.toggle {
     position: relative;
     display: block;
-    height: 30px;
-    width: 30px;
+    height: 20px;
+    width: 20px;
     margin: 0;
     color: #FFFFFF;
     text-decoration: none;
     border: 0 none transparent;
     background-color: transparent;
-    background-image: url(../images/assets/volume-control.png?123);
+    background-image: none;
     background-position: 0 0;
     background-repeat: no-repeat;
-    font-size: 10px;
-    line-height: 30px;
+    font-size: 20px;
+    line-height: 20px;
     font-family: Arial;
     text-indent: -9999px;
     cursor: pointer;
@@ -1507,9 +1511,6 @@ body.index #header {
     -webkit-border-radius: 0.3em;
     opacity: 0.40;
     transition: opacity 0.3s;
-}
-#animate a.toggle {
-    background-image: url(../images/assets/animate-control.png?123);
 }
 #music a.toggle:hover,
 #animate a.toggle:hover {
@@ -1523,6 +1524,26 @@ body.index #header {
 #animate a.paused {
     background-position: 0 -30px;
 }
+#music a.toggle i,
+#animate a.toggle i {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    text-indent: 0;
+    font-size: 20px;
+    line-height: 20px;
+    pointer-events: none;
+}
+#music a.toggle i {
+    font-size: 20px;
+}
+#animate a.toggle i {
+    font-size: 15px;
+    top: -1px;
+}
 
 #music.onload {
     top: 2px;
@@ -1531,6 +1552,7 @@ body.index #header {
     right: 2px;
     width: auto;
     height: auto;
+    transform: none;
     border: 0 none transparent;
     background-color: rgb(13,13,13);
     background-color: rgba(13,13,13,1.00);

@@ -2404,6 +2404,7 @@ function mmrpg_toggle_animation(){
 function mmrpg_start_animation(){
     var animateToggle = $('a.toggle', gameAnimate);
     animateToggle.removeClass('paused').addClass('playing');
+    animateToggle.html('<i class="fas fa-play"></i>');
     gameSettings.idleAnimation = true;
     gameSettings.eventAutoPlay = true;
     mmrpg_canvas_animate();
@@ -2415,6 +2416,7 @@ function mmrpg_start_animation(){
 function mmrpg_stop_animation(){
     var animateToggle = $('a.toggle', gameAnimate);
     animateToggle.removeClass('playing').addClass('paused');
+    animateToggle.html('<i class="fas fa-pause"></i>');
     gameSettings.idleAnimation = false;
     gameSettings.eventAutoPlay = false;
     mmrpg_canvas_animate();
@@ -2543,14 +2545,14 @@ function mmrpg_music_toggle(){
         gameSettings.effectVolumeEnabled = true;
         mmrpg_reset_music_volume();
         mmrpg_music_play();
-        musicToggle.html('&#9658;');
+        musicToggle.html('<i class="fas fa-volume"></i>');
         musicToggle.removeClass('paused').addClass('playing');
     } else {
         gameSettings.musicVolumeEnabled = false;
         gameSettings.effectVolumeEnabled = false;
         mmrpg_music_volume(0, false);
         mmrpgMusicSound.pause();
-        musicToggle.html('&#8226;');
+        musicToggle.html('<i class="fas fa-volume-mute"></i>');
         musicToggle.removeClass('playing').addClass('paused');
     }
     if (!mmrpgMusicInit){
@@ -2606,7 +2608,7 @@ function mmrpg_music_play(){
                     });
                 }
             }
-        musicToggle.html('&#9658;');
+        musicToggle.html('<i class="fas fa-volume"></i>');
         musicToggle.removeClass('paused').addClass('playing');
         }
 }
