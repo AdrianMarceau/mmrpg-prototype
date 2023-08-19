@@ -6256,6 +6256,20 @@ class rpg_robot extends rpg_object {
         return $desc;
     }
 
+    // Define a function that takes a given robot's stats and
+    public static function get_css_animation_duration($robot_token_or_info){
+        if (!empty($robot_token_or_info) && is_string($robot_token_or_info)){ $robot_info = self::get_index_info($robot_token_or_info); }
+        elseif (!empty($robot_token_or_info) && is_array($robot_token_or_info)){ $robot_info = $robot_token_or_info; }
+        if (empty($robot_info)){ return false; }
+        $this_robot_attack = !empty($robot_info['robot_attack']) ? $robot_info['robot_attack'] : 100;
+        $this_robot_defense = !empty($robot_info['robot_defense']) ? $robot_info['robot_defense'] : 100;
+        $this_robot_speed = !empty($robot_info['robot_speed']) ? $robot_info['robot_speed'] : 100;
+        $robot_animation_duration = 1;
+        $robot_animation_duration -= $robot_animation_duration * ($this_robot_speed / ($this_robot_attack + $this_robot_defense + $this_robot_speed));
+        if ($robot_animation_duration < 0.1){ $robot_animation_duration = 0.1; }
+        return $robot_animation_duration;
+    }
+
     // Define a function for translating a robot class to its proper nound
     public static function robot_class_to_noun($class, $full = true, $plural = false){
         if ($plural){

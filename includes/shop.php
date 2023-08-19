@@ -613,7 +613,21 @@ if (!empty($this_shop_index['kalinka'])){
             $this_shop_index['kalinka']['shop_robots']['robots_selling'] = array();
             $buyable_robots = array_keys($buyable_robots);
             foreach ($buyable_robots AS $token){
-                $this_shop_index['kalinka']['shop_robots']['robots_selling'][$token] = MMRPG_SETTINGS_SHOP_ROBOT_PRICE;
+                //error_log('------');
+                //error_log('$buyable_robots('.$token.')');
+                $level = 1;
+                if (!empty($_SESSION[$session_token]['values']['robot_database'][$token])){
+                    $records = $_SESSION[$session_token]['values']['robot_database'][$token];
+                    //error_log('$records = '.print_r($records, true));
+                    if (!empty($records['robot_defeated'])){ $level += $records['robot_defeated']; }
+                    if ($level >= 100){ $level = 99; }
+                }
+                //error_log('$level = '.print_r($level, true));
+                $price = MMRPG_SETTINGS_SHOP_ROBOT_PRICE;
+                //error_log('$price(before) = '.print_r($price, true));
+                $price += ceil(($level / 100) * $price);
+                //error_log('$price(after) = '.print_r($price, true));
+                $this_shop_index['kalinka']['shop_robots']['robots_selling'][$token] = $price;
             }
 
         }

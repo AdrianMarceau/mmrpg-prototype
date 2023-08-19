@@ -724,7 +724,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     font-size: 14px;
     line-height: 45px;
     letter-spacing: 2px;
-    text-transform: uppercase;
+    text-transform: none;
     text-decoration: none;
     padding: 0;
     -moz-border-radius: 0.75em;
@@ -868,6 +868,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     width: 150px;
     height: 60px;
     top: 0;
+    opacity: 0.8;
     background-color: transparent;
     background-image: none;
     background-repeat: no-repeat;
@@ -884,12 +885,12 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 }
 #prototype .header_types .count:before {
     left: 0;
-    background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-black_top-left.png');
+    background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-white_top-left.png');
     background-position: left top;
 }
 #prototype .header_types .count:after {
     right: 0;
-    background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-black_top-right.png');
+    background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-white_top-right.png');
     background-position: right top;
 }
 
@@ -1517,16 +1518,6 @@ body[data-source="website"] #prototype .menu {
     z-index: 2;
 }
 
-@keyframes team-select-robot-bounce {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-1px); }
-    100% { transform: translateY(0px); }
-}
-#mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_robot {
-    transform: translateY(0px);
-    animation: team-select-robot-bounce 0.6s steps(1) infinite;
-}
-
 #mmrpg #prototype .option_this-robot-select .has_image .sprite_item {
     left: -8px;
     bottom: -5px;
@@ -1673,6 +1664,49 @@ body[data-source="website"] #prototype .menu {
     transform: scale(1.2);
     animation: team-select-arrow-pulse 1s infinite;
 }
+
+
+/* animate robot sprites appearing in option buttons appropriately */
+
+@keyframes option-robot-sprite-bounce {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-1px); }
+    100% { transform: translateY(0px); }
+}
+@keyframes option-robot-sprite-shake {
+    0% { transform: translateX(0px); }
+    50% { transform: translateX(1px); }
+    100% { transform: translateX(0px); }
+}
+@keyframes option-robot-sprite-squish {
+    0% { transform: scaleX(1.0); }
+    50% { transform: scaleX(0.9); }
+    100% { transform: scaleX(1.0); }
+}
+@keyframes option-robot-sprite-darken {
+    0% { filter: brightness(1.0); }
+    50% { filter: brightness(0.6); }
+    100% { filter: brightness(1.0); }
+}
+#mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_robot {
+    transform: translateY(0px);
+    animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
+}
+#mmrpg #prototype .option_this-battle-select:not(.option_complete) .sprite_robot {
+    transform: translateY(0px);
+    animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
+}
+#mmrpg #prototype .option_this-battle-select.option_complete .sprite_robot {
+    transform: translate(0, 0) scale(1.0);
+    filter: brightness(1.0);
+    animation: option-robot-sprite-darken 0.6s infinite;
+    animation-delay: 1s;
+}
+#mmrpg #prototype .option_this-player-select:not(.option_disabled) .sprite_robot {
+    transform: translateY(0px);
+    animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
+}
+
 
 #mmrpg #prototype .canvas_overlay_footer {
     left: auto;

@@ -144,8 +144,8 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
     $temp_kind = !empty($_REQUEST['kind']) ? $_REQUEST['kind'] : '';
     $temp_action = !empty($_REQUEST['action']) ? $_REQUEST['action'] : '';
     $temp_token = !empty($_REQUEST['token']) ? $_REQUEST['token'] : '';
-    $temp_quantity = !empty($_REQUEST['quantity']) ? $_REQUEST['quantity'] : 0;
-    $temp_price = !empty($_REQUEST['price']) ? $_REQUEST['price'] : 0;
+    $temp_quantity = !empty($_REQUEST['quantity']) ? (int)($_REQUEST['quantity']) : 0;
+    $temp_price = !empty($_REQUEST['price']) ? (int)($_REQUEST['price']) : 0;
     $temp_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : '';
 
     // If key variables are not provided, kill the script in error
@@ -190,6 +190,22 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
                 mmrpg_prototype_refresh_battle_points();
                 $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
                 $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
+
+                /*
+                // DEBUG DEBUG DEBUG
+                if ($temp_token === 'yashichi' && $temp_quantity === 7){
+                    $delete_robots = array('acid-man', 'bounce-man', 'oil-man');
+                    $possible_players = array('dr-light', 'dr-wily', 'dr-cossack');
+                    foreach ($delete_robots as $delete_robot){
+                        error_log('destroy '.$delete_robot.' in the player data for unlock testing!');
+                        unset($_SESSION[$session_token]['values']['robot_database'][$delete_robot]);
+                        foreach ($possible_players as $possible_player){
+                            unset($_SESSION[$session_token]['values']['battle_rewards'][$possible_player]['player_robots'][$delete_robot]);
+                            unset($_SESSION[$session_token]['values']['battle_settings'][$possible_player]['player_robots'][$delete_robot]);
+                        }
+                    }
+                }
+                */
 
                 // Save, produce the success message with the new field order
                 exit('success|item-bought|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank));
@@ -327,12 +343,21 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
             // Manually unlock this robot using the predefined global function
             $temp_current_quantity = 1;
             if (!mmrpg_prototype_robot_unlocked(false, $temp_actual_token)){
-                // Unlock Roll as a playable character
+                // Unlock the robot as a playable character
+                //error_log('$temp_actual_token = '.print_r($temp_actual_token, true));
                 $unlock_player_info = $mmrpg_database_players[$unlock_player_token];
                 $unlock_robot_info = rpg_robot::get_index_info($temp_actual_token);
-                $unlock_robot_info['robot_level'] = 99;
+                $unlock_robot_info['robot_level'] = 1;
                 $unlock_robot_info['robot_experience'] = 999;
-                mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true);
+                if (!empty($_SESSION[$session_token]['values']['robot_database'])
+                    && !empty($_SESSION[$session_token]['values']['robot_database'][$temp_actual_token])){
+                    $unlock_robot_records = $_SESSION[$session_token]['values']['robot_database'][$temp_actual_token];
+                    //error_log('$unlock_robot_records = '.print_r($unlock_robot_records, true));
+                    if (!empty($unlock_robot_records['robot_defeated'])){ $unlock_robot_info['robot_level'] += $unlock_robot_records['robot_defeated']; }
+                    if ($unlock_robot_info['robot_level'] >= 100){ $unlock_robot_info['robot_level'] = 99; }
+                }
+                //error_log('$unlock_robot_info = '.print_r($unlock_robot_info, true));
+                mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
             }
 
             // Decrement the player's zenny count based on the provided price
