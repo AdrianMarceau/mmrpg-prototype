@@ -1703,6 +1703,20 @@ body[data-source="website"] #prototype .menu {
     50% { filter: brightness(0.6); }
     100% { filter: brightness(1.0); }
 }
+@keyframes option-player-sprite-bounce {
+    0% { transform: translateY(0px); background-position: 0 0; }
+
+    20% { transform: translateY(-1px); background-position: 0 0; }
+    25% { transform: translateY(0px); background-position: 0 0; }
+
+    45% { transform: translateY(-1px); background-position: 0 0; }
+    50% { transform: translateY(0px); background-position: 0 0; }
+
+    70% { transform: translateY(0px); background-position: -240px 0; }
+    75% { transform: translateY(0px); background-position: -240px 0; }
+
+    100% { transform: translateY(0px); background-position: 0 0; }
+}
 #mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_robot {
     transform: translateY(0px);
     animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
@@ -1720,6 +1734,11 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype .option_this-player-select:not(.option_disabled) .sprite_robot {
     transform: translateY(0px);
     animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
+}
+#prototype .banner .option_1x1 div label.has_image .sprite_player {
+    transform: translateY(0px);
+    background-position: 0 0;
+    animation: option-player-sprite-bounce 3s steps(1) infinite;
 }
 
 
