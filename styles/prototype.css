@@ -2421,20 +2421,20 @@ body[data-source="website"] #prototype .menu {
     right: calc(-200% - 3px);
 }
 
-@keyframes starhover {
+@keyframes mission-sprite-starfield-hover {
   0% { transform: translate(0, 0); }
   33% { transform: translate(0, -4px); }
   66% { transform: translate(0, 0); }
   100% { transform: translate(0, 0); }
 }
-#prototype .option_wrapper .option_1x1.starfield:hover div label.has_image .sprite,
-#prototype .option_wrapper .option_1x2.starfield:hover div label.has_image .sprite,
-#prototype .option_wrapper .option_1x3.starfield:hover div label.has_image .sprite,
-#prototype .option_wrapper .option_1x4.starfield:hover div label.has_image .sprite,
-#prototype .banner .option_1x1.starfield div label.has_image .sprite,
-#prototype .banner .option_1x2.starfield div label.has_image .sprite,
-#prototype .banner .option_1x3.starfield div label.has_image .sprite,
-#prototype .banner .option_1x4.starfield div label.has_image .sprite {
+#prototype .option_wrapper .option_1x1.starfield div label.has_image .sprite_star,
+#prototype .option_wrapper .option_1x2.starfield div label.has_image .sprite_star,
+#prototype .option_wrapper .option_1x3.starfield div label.has_image .sprite_star,
+#prototype .option_wrapper .option_1x4.starfield div label.has_image .sprite_star,
+#prototype .banner .option_1x1.starfield div label.has_image .sprite_star,
+#prototype .banner .option_1x2.starfield div label.has_image .sprite_star,
+#prototype .banner .option_1x3.starfield div label.has_image .sprite_star,
+#prototype .banner .option_1x4.starfield div label.has_image .sprite_star {
 
     transform: translate(0, 0);
     transition: none;
@@ -2443,21 +2443,35 @@ body[data-source="website"] #prototype .menu {
     -webkit-animation-name: none;
     animation-name: none;
 
-    -moz-animation-duration: 2s;
-    -webkit-animation-duration: 2s;
-    animation-duration: 2s;
+    -moz-animation-duration: 3s;
+    -webkit-animation-duration: 3s;
+    animation-duration: 3s;
 
     -moz-animation-iteration-count: infinite;
     -webkit-animation-iteration-count: infinite;
     animation-iteration-count: infinite;
 
-    -moz-animation-delay: 0s;
-    -webkit-animation-delay: 0s;
-    animation-delay: 0s;
+    -moz-animation-timing-function: linear;
+    -webkit-animation-timing-function: linear;
+    animation-timeline: linear;
 
-    -moz-animation-name: starhover;
-    -webkit-animation-name: starhover;
-    animation-name: starhover;
+    -moz-animation-delay: inherit;
+    -webkit-animation-delay: inherit;
+    animation-delay: inherit;
+
+    -moz-animation-name: mission-sprite-starfield-hover;
+    -webkit-animation-name: mission-sprite-starfield-hover;
+    animation-name: mission-sprite-starfield-hover;
+
+}
+#prototype .option_wrapper .option_1x1.starfield:hover div label.has_image .sprite_star,
+#prototype .option_wrapper .option_1x2.starfield:hover div label.has_image .sprite_star,
+#prototype .option_wrapper .option_1x3.starfield:hover div label.has_image .sprite_star,
+#prototype .option_wrapper .option_1x4.starfield:hover div label.has_image .sprite_star {
+
+    -moz-animation-duration: 2s;
+    -webkit-animation-duration: 2s;
+    animation-duration: 2s;
 
 }
 

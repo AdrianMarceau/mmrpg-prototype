@@ -1690,8 +1690,13 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     if ($star_shake_delay[$player_token] >= 7){ $star_shake_delay[$player_token] = 0; }
                     $star_shake_delay[$player_token] += 1;
                     $this_option_class .= ' starshake';
-                    $star_shake_seconds = ($star_shake_delay[$player_token] / 3) + (0.1 * mt_rand(1, 3));
-                    $this_image_style .= ' -moz-animation-delay: '.$star_shake_seconds.'s; -webkit-animation-delay: '.$star_shake_seconds.'s; animation-delay: '.$star_shake_seconds.'s;';
+                    $animation_delay_seconds = ($star_shake_delay[$player_token] / 3) + (0.1 * mt_rand(1, 3));
+                    $this_image_style .= ' -moz-animation-delay: '.$animation_delay_seconds.'s; -webkit-animation-delay: '.$animation_delay_seconds.'s; animation-delay: '.$animation_delay_seconds.'s;';
+                } else {
+                    $animation_delay_seconds = -5 + (1 * ($this_key * 0.12));
+                    //error_log('$this_key = '.print_r($this_key, true));
+                    //error_log('$animation_delay_seconds = '.print_r($animation_delay_seconds, true));
+                    $this_image_style .= ' -moz-animation-delay: '.$animation_delay_seconds.'s; -webkit-animation-delay: '.$animation_delay_seconds.'s; animation-delay: '.$animation_delay_seconds.'s;';
                 }
             }
 
