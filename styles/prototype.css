@@ -859,6 +859,12 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     z-index: 2;
 }
 
+/* write an animation that makes the header count before/after fade opacity in and out slowly infinitly */
+@keyframes prototype-header-count-fade {
+    0%   { opacity: 0.8; }
+    50%  { opacity: 0.4; }
+    100% { opacity: 0.8; }
+}
 #prototype .header_types .count:before,
 #prototype .header_types .count:after {
     content: "";
@@ -882,6 +888,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
     -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+    animation: prototype-header-count-fade 10s infinite;
 }
 #prototype .header_types .count:before {
     left: 0;
@@ -893,6 +900,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-white_top-right.png');
     background-position: right top;
 }
+
 
 
 #prototype .header_types .count,
@@ -1068,13 +1076,20 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     width: 12.8%;
 }
 
-
+@keyframes chapter-link-marker-bounce {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+    100% { transform: translateY(0); }
+}
 #prototype .option_wrapper_missions .chapter_select .chapter_link img.marker {
     display: block;
     position: absolute;
     pointer-events: none;
     top: 0;
     left: 1%;
+    transform: translate(0, 0);
+    transform-origin: center center;
+    animation: chapter-link-marker-bounce 6s linear infinite;
 }
 #prototype .option_wrapper_missions .chapter_select_5 .chapter_link img.marker {
     left: 10%;
