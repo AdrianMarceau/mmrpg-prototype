@@ -20,10 +20,12 @@ ob_start();
 
         // Display available main actions
         ?><div class="main_actions"><?
+            $button_sprite_markup = '';
+            $button_sprite_markup .= '<span class="robot_sprite sprite sprite_40x40 sprite_40x40_shoot" style="background-image: url(images/robots/flash-man/sprite_right_80x80.png?20230817-2116);"></span>';
             if (!empty($temp_player_ability_actions) || $this_robot->robot_class == 'mecha'){
                 ?><a class="button action_ability" type="button" data-panel="ability" data-order="<?= $dataOrder ?>"><label><i class="fa fas fa-fire-alt"></i> <strong>Ability</strong></label></a><?
             } else {
-                ?><a class="button button_disabled action_ability" type="button" data-action="ability_8_action-noweapons" data-order="<?= $dataOrder ?>"><label style="text-decoration: line-through;">Ability</label></a><?
+                ?><a class="button button_disabled action_ability" type="button" data-action="ability_8_action-noweapons" data-order="<?= $dataOrder ?>"><label><i class="fa fas fa-battery-empty"></i> <strong style="text-decoration: line-through;">Ability</strong></label></a><?
             } $dataOrder++;
         ?></div><?
 

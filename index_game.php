@@ -170,6 +170,7 @@ if (count($matches)>1){
             <iframe class="loading" name="prototype" src="<?= MMRPG_CONFIG_ROOTURL ?>prototype.php?wap=true" width="768" height="748" frameborder="0" scrolling="no"></iframe>
         <?endif;?>
         <div id="music" class="onload">
+            <span class="btn-fx fx-1"></span><span class="btn-fx fx-2"></span>
             <a class="toggle paused has_pixels" href="#" onclick=""><span><span>loading&hellip;</span></span></a>
             <input type="hidden" class="audio-stream music paused" />
             <input type="hidden" class="audio-stream effects paused" />

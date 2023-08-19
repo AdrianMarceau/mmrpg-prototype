@@ -855,9 +855,43 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 }
 #prototype .header_types .count {
     position: relative;
+    overflow: hidden;
     z-index: 2;
 }
 
+#prototype .header_types .count:before,
+#prototype .header_types .count:after {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    width: 150px;
+    height: 60px;
+    top: 0;
+    background-color: transparent;
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: auto;
+    pointer-events: none;
+    image-rendering: -moz-crisp-edges;         /* Firefox */
+    image-rendering:   -o-crisp-edges;         /* Opera */
+    image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+}
+#prototype .header_types .count:before {
+    left: 0;
+    background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-black_top-left.png');
+    background-position: left top;
+}
+#prototype .header_types .count:after {
+    right: 0;
+    background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-black_top-right.png');
+    background-position: right top;
+}
 
 
 #prototype .header_types .count,

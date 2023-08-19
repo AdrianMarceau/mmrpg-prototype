@@ -1043,7 +1043,7 @@ function prototype_menu_click_option(thisContext, thisOption){
             //console.log('credits have been animated to '+creditsOpacity);
             $(this).addClass('is_shifted');
             }});
-        $('.banner_foreground:not(.is_shifted)', thisBanner).animate({opacity:0.75},{duration:600,easing:'swing',sync:false,complete:function(){
+        $('.banner_foreground:not(.is_shifted)', thisBanner).css({opacity:0.6}).animate({opacity:1.0},{duration:600,easing:'swing',sync:false,complete:function(){
             $(this).addClass('is_shifted');
             }});
 

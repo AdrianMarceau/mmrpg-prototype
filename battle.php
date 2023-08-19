@@ -687,7 +687,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
         <a id="actions_resend" class="actions_resend button">RESEND</a>
         <div id="actions_loading" class="actions_loading wrapper">
             <div class="main_actions">
-                <a class="button action_loading button_disabled" type="button"><label>Loading...</label></a>
+                <a class="button action_loading button_disabled" type="button"><label><strong>Loading...</strong></label></a>
             </div>
         </div>
         <div id="actions_battle" class="actions_battle wrapper"></div>
