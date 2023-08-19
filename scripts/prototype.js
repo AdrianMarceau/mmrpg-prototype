@@ -317,6 +317,8 @@ $(document).ready(function(){
             // Prevent the default click action
             e.preventDefault();
             //alert('option clicked!');
+            // If we're already loading another option click, return false
+            if (typeof gameSettings.customValues.optionClicked !== 'undefined'){ return false; }
             // If this option is in the banner, return false
             if ($(this).parents('.banner').length == 1){ return false; }
             // Check if this option has been disabled or not
@@ -325,8 +327,18 @@ $(document).ready(function(){
                     return false;
                 }
             }
+            // Set a timeout just in case something weird happens
+            gameSettings.customValues.optionClicked = setTimeout(function(){
+                //console.log('setTimeout triggered for optionClicked');
+                clearTimeout(gameSettings.customValues.optionClicked);
+                delete gameSettings.customValues.optionClicked;
+                }, 1000);
             // Trigger the prototype option function
-            prototype_menu_click_option(thisContext, this);
+            prototype_menu_click_option(thisContext, this, function(){
+                //console.log('onComplete triggered for optionClicked');
+                clearTimeout(gameSettings.customValues.optionClicked);
+                delete gameSettings.customValues.optionClicked;
+                });
             });
 
         // Create the click events for the prototype menu back button
@@ -767,7 +779,7 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
 }
 
 // Define a function for triggering a prototype option link
-function prototype_menu_click_option(thisContext, thisOption){
+function prototype_menu_click_option(thisContext, thisOption, onComplete){
 
     // If this option is disabled, ignore its input
     if ($(this).hasClass('option_disabled')
@@ -782,11 +794,11 @@ function prototype_menu_click_option(thisContext, thisOption){
     var thisSelect = thisParent.attr('data-select');
     var thisToken = thisOption.attr('data-token');
     var thisTokenID = thisOption.attr('data-token-id');
-    var thisComplete = function(){};
     var nextStep = $('.menu[data-step="'+(thisStep + 1)+'"]', thisContext);
     var nextFlag = true;
     var nextLimit = thisOption.attr('data-next-limit');
     if (nextLimit != undefined){ nextLimit = parseInt(nextLimit); }
+    var onComplete = typeof onComplete !== 'undefined' ? onComplete : function(){};
     //var nextLimit = parseInt(thisOption.attr('data-next-limit'));
 
     // DEBUG
@@ -799,7 +811,10 @@ function prototype_menu_click_option(thisContext, thisOption){
     //console.log('nextLimit', nextLimit);
 
     // If the token was empty, return false
-    if (!thisToken.length){ return false; }
+    if (!thisToken.length){
+        onComplete();
+        return false;
+    }
 
     // If the next limit was set, apply to the next step
     if (nextLimit != undefined){
@@ -811,7 +826,7 @@ function prototype_menu_click_option(thisContext, thisOption){
     //console.log('gameSettings', gameSettings);
 
     // If this is a child token, update the parent
-    if (thisOption.attr('data-child') != undefined){
+    if (typeof thisOption.attr('data-child') !== 'undefined'){
 
         // Find the parent token container
         var tokenParent = $('.option[data-parent]', thisParent);
@@ -886,6 +901,7 @@ function prototype_menu_click_option(thisContext, thisOption){
             }
 
         // Set the next flag to false to prevent menu switching
+        onComplete();
         nextFlag = false;
 
         } else {
@@ -1164,20 +1180,20 @@ function prototype_menu_click_option(thisContext, thisOption){
                 // Check if there is another menu step to complete
                 if (nextStep.length){
                     // Automatically switch to the next step in sequence
-                    prototype_menu_switch({stepNumber:thisStep + 1,onComplete:thisComplete});
+                    prototype_menu_switch({stepNumber:thisStep + 1,onComplete:onComplete});
                     } else {
                     // Redirect to the battle page
-                    prototype_menu_switch({redirectLink:thisRedirect,onComplete:thisComplete}); // checkpoint
+                    prototype_menu_switch({redirectLink:thisRedirect,onComplete:onComplete}); // checkpoint
                     }
                 });
         } else if (nextFlag != false){
         // Check if there is another menu step to complete
         if (nextStep.length){
             // Automatically switch to the next step in sequence
-            prototype_menu_switch({stepNumber:thisStep + 1,onComplete:thisComplete});
+            prototype_menu_switch({stepNumber:thisStep + 1,onComplete:onComplete});
             } else {
             // Redirect to the battle page
-            prototype_menu_switch({redirectLink:thisRedirect,onComplete:thisComplete});
+            prototype_menu_switch({redirectLink:thisRedirect,onComplete:onComplete});
             }
         }
 
