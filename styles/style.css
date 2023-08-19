@@ -3807,6 +3807,12 @@ body.index #header {
     color: #CACACA;
     pointer-events: none;
 }
+
+#actions .button_disabled.robot_type,
+#actions .button_disabled.item_type,
+#actions .button_disabled.ability_type {
+    filter: brightness(0.5) saturate(0.8);
+}
 #actions .button_disabled > label {
     opacity: 0.45;
 }

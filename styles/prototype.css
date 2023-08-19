@@ -1596,6 +1596,7 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .option_this-robot-select.option_disabled {
     cursor: not-allowed;
+    filter: brightness(0.8) saturate(0.8);
 }
 #mmrpg #prototype .option_this-robot-select.option_disabled .chrome {
     filter: brightness(0.6) saturate(1.6);
