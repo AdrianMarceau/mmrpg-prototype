@@ -1426,7 +1426,10 @@ body.index #header {
 }
 
 
-#window,
+#window {
+    width: 768px;
+    height: 626px;
+}
 #window[data-window-width],
 #window[data-window-height] {
     width: 768px !important;
