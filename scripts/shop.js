@@ -500,14 +500,15 @@ $(document).ready(function(){
                         thisConfirmCell.animate({opacity:0.3},600,'swing',function(){
                             $(this).css({opacity:1.0}).empty().append('<div class="placeholder">&hellip;</div>');
                             $('#zenny_counter', thisBody).css({color:''});
-                            console.log('we just completed an action... postData = ', postData);
+                            //console.log('we just completed an action... postData = ', postData);
 
                             // If the completed action was buying a new robot, refresh page
                             if (postData.kind === 'robot'
                                 && postData.action === 'buy'
                                 && postData.quantity >= 1){
 
-                                // Not needed anymore as popup works!
+                                // We have a popup now so editing is totally allowed
+                                thisShopData.allowEdit = true;
 
                                 }
                             // Otherwise turn editing back on and process other actions
@@ -554,12 +555,12 @@ $(document).ready(function(){
                     //console.log('queuing the windowEventsPull event (via shop)');
                     if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
                         window.top.mmrpg_queue_for_game_start(function(){
-                            console.log('i guess the game has started');
+                            //console.log('i guess the game has started');
                             setTimeout(function(){ parent.windowEventsPull(); }, 1000);
                             });
                         }
                     else if (typeof window.top.windowEventsPull !== 'undefined'){
-                        console.log('i guess we pull events manually');
+                        //console.log('i guess we pull events manually');
                         setTimeout(function(){ parent.windowEventsPull(); }, 1000);
                         }
 

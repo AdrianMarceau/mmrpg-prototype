@@ -789,9 +789,11 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
     }
 
     // Check to see if player info has been provided, and unlock for this player if it has
-    if (!empty($player_info)){
+    if (!empty($player_info)){ $unlock_for_player_tokens = array($player_info['player_token']); }
+    else { $unlock_for_player_tokens = array_keys($_SESSION[$session_token]['values']['battle_rewards']); }
+    foreach ($unlock_for_player_tokens AS $unlock_for_player_token){
         // This request is for a player, so let's unlocked
-        $_SESSION[$session_token]['values']['battle_rewards'][$player_info['player_token']]['player_abilities'][$this_ability_token] = $this_reward;
+        $_SESSION[$session_token]['values']['battle_rewards'][$unlock_for_player_token]['player_abilities'][$this_ability_token] = $this_reward;
     }
 
     // No matter what, always unlock new abilities in the main array
@@ -799,39 +801,54 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
     if (!in_array($this_ability_token, $_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'][] = $this_ability_token; }
 
     // Only show the event if allowed by the function args
-    if ($events_create != false && !empty($player_info)){
+    if ($events_create != false){
 
         // Generate the attributes and text variables for this ability unlock
         global $db;
-        $this_player_token = $player_info['player_token'];
-        $player_info = rpg_player::get_index_info($this_player_token);
-        $player_type = !empty($player_info['player_type']) ? $player_info['player_type'] : 'none';
-        $player_robots_unlocked = mmrpg_prototype_robots_unlocked($player_info['player_token']);
-        $player_battles_complete = mmrpg_prototype_battles_complete($player_info['player_token'], true);
+        if (!empty($player_info)){
+            $this_player_token = $player_info['player_token'];
+            $player_info = rpg_player::get_index_info($this_player_token);
+            $player_type = !empty($player_info['player_type']) ? $player_info['player_type'] : 'none';
+            $player_battles_complete = mmrpg_prototype_battles_complete($player_info['player_token'], true);
+            $player_field_info = $player_battles_complete >= 2 ? rpg_player::get_homebase_field($this_player_token, true) : rpg_player::get_intro_field($this_player_token, true);
+            $player_field_token = $player_field_info['field_token'];
+            $player_buster_token = str_replace('dr-', '', $player_info['player_token']).'-buster';
+            $player_unlock_name = rpg_type::print_span($player_type, $player_info['player_name']);
+        } else {
+            $this_player_token = 'player';
+            $player_info = array('player_token' => 'player', 'player_name' => 'You');
+            $player_type = defined('MMRPG_SETTINGS_CURRENT_FIELDTYPE') ? MMRPG_SETTINGS_CURRENT_FIELDTYPE : 'none';
+            $player_field_token = 'prototype-complete';
+            $player_buster_token = 'mega-buster';
+            $player_unlock_name = 'You';
+        }
         $ability_info_size = isset($ability_info['ability_image_size']) ? $ability_info['ability_image_size'] * 2 : 40 * 2;
         $ability_info_size_token = $ability_info_size.'x'.$ability_info_size;
         $ability_type_or_none = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
         $this_name = $ability_info['ability_name'];
-        $this_type_token = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : '';
-        if (!empty($ability_info['ability_type2'])){ $this_type_token .= '_'.$ability_info['ability_type2']; }
-        if (empty($this_type_token)){ $this_type_token = 'none'; }
+        $ability_type_token = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : '';
+        if (!empty($ability_info['ability_type2'])){ $ability_type_token .= '_'.$ability_info['ability_type2']; }
+        if (empty($ability_type_token)){ $ability_type_token = 'none'; }
         $this_description = rpg_ability::get_parsed_ability_description($ability_info);
-        $this_field = $player_battles_complete >= 2 ? rpg_player::get_homebase_field($this_player_token, true) : rpg_player::get_intro_field($this_player_token, true);
         $temp_ability_index = rpg_ability::get_index(true);
         // Generate the window event's canvas and message markup then append to the global array
-        $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(1px) brightness(0.6);"></div>';
-        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$this_field['field_token'].'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; brightness(0.8);"></div>';
-        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: 220px; transform: scale(1.5, 0.5) skew(26deg, 0); transform-origin: bottom; filter: brightness(0); opacity: 0.1;"></div>';
-        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: 220px; transform: scale(1.5); transform-origin: bottom;"></div>';
-        $temp_canvas_markup .= '<div class="sprite_wrapper flipping_animation" style="bottom: 52px; right: 212px;"><div class="wrap">';
+        $temp_canvas_markup = '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$player_field_token.'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(1px) brightness(0.6);"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$player_field_token.'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; brightness(0.8);"></div>';
+        $temp_sprite_wrap_offset = 270;
+        if ($this_player_token !== 'player'){
+            $temp_sprite_wrap_offset = 212;
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: 220px; transform: scale(1.5, 0.5) skew(26deg, 0); transform-origin: bottom; filter: brightness(0); opacity: 0.1;"></div>';
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(images/players/'.$player_info['player_token'].'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: 220px; transform: scale(1.5); transform-origin: bottom;"></div>';
+        }
+        $temp_canvas_markup .= '<div class="sprite_wrapper flipping_animation" style="bottom: 52px; right: '.$temp_sprite_wrap_offset.'px;"><div class="wrap">';
             $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="
-                background-image: url(images/abilities/'.str_replace('dr-', '', $player_info['player_token']).'-buster/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.');
+                background-image: url(images/abilities/'.$player_buster_token.'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.');
                 bottom: -20px;
                 right: -20px;
                 filter: brightness(2) blur(10px);
                 opacity: 0.5;
                 ">&nbsp;</div>';
-            $temp_canvas_markup .= '<div class="ability_type ability_type_'.$this_type_token.' sprite sprite_40x40 sprite_40x40_00" style="
+            $temp_canvas_markup .= '<div class="ability_type ability_type_'.$ability_type_token.' sprite sprite_40x40 sprite_40x40_00" style="
                 position: absolute;
                 bottom: -8px;
                 right: -8px;
@@ -872,10 +889,10 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
         else { $temp_console_extra_text = 'special move with unique effects'; }
 
         $temp_console_markup = '';
-        $temp_console_markup .= '<p class="headline ability_type type_'.$player_info['player_type'].'"><strong>You Got A New Ability!</strong></p>';
+        $temp_console_markup .= '<p class="headline ability_type type_'.$player_type.'"><strong>You Got A New Ability!</strong></p>';
         $temp_console_markup .= '<div class="inset_panel compact">';
             $temp_console_markup .= '<p style="text-align: center; margin: 5px auto;">';
-                $temp_console_markup .= rpg_type::print_span($player_type, $player_info['player_name']).' unlocked the '.rpg_type::print_span($this_type_token, $this_name).' ability!';
+                $temp_console_markup .= $player_unlock_name.' unlocked the '.rpg_type::print_span($ability_type_token, $this_name).' ability!';
             $temp_console_markup .= '</p>';
             $temp_console_markup .= '<p style="text-align: center; margin: 5px auto;">';
                 $temp_console_markup .= 'It\'s '.(!empty($ability_info['ability_type']) && preg_match('/^(a|e|i|o|u)/i', $ability_info['ability_type']) ? 'an ' : 'a ').$temp_console_type_text.' type '.$temp_console_extra_text.'!';
