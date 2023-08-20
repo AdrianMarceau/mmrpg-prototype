@@ -6012,6 +6012,10 @@ class rpg_robot extends rpg_object {
                 ));
             $this->reset_frame();
 
+            // Trigger this robot's item function if one has been defined for this context
+            $function_name = 'rpg-robot_check-items'.(!empty($phase) ? '_'.$phase : '');
+            $this->trigger_custom_function($function_name, $extra_objects, $extra_item_info);
+
         }
 
     }
