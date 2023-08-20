@@ -3759,8 +3759,8 @@ class rpg_ability extends rpg_object {
         if ($robot_attachment_index === false){
             $robot_attachment_index = array(
                 // negative
-                array('token' => 'bass_crush', 'source' => 'bass-crush', 'noun' => 'Bass Crush', 'where' => 'behind'),
-                array('token' => 'crash_bomb', 'source' => 'crash-bomber', 'noun' => 'Crash Bomb', 'where' => 'attached to'),
+                array('token' => 'bass_crush', 'source' => 'bass-crush', 'object' => 'bass-crush', 'noun' => 'Bass Crush', 'where' => 'behind'),
+                array('token' => 'crash_bomb', 'source' => 'crash-bomber', 'object' => 'crash-bomb', 'noun' => 'Crash Bomb', 'where' => 'attached to'),
                 );
             }
         return $robot_attachment_index;
@@ -3772,7 +3772,7 @@ class rpg_ability extends rpg_object {
         if ($field_hazard_index === false){
             $field_hazard_index = array(
                 // positive
-                array('token' => 'super_blocks', 'source' => 'super-arm', 'noun' => 'super block', 'where' => 'in front of', 'frame' => 0, 'offset' => array('x' => 55, 'y' => 2, 'z' => -20)),
+                array('token' => 'super_blocks', 'source' => 'super-arm', 'object' => 'super-block', 'noun' => 'super block', 'where' => 'in front of', 'frame' => 0, 'offset' => array('x' => 55, 'y' => 2, 'z' => -20)),
                 );
             }
         return $field_hazard_index;
@@ -3784,15 +3784,15 @@ class rpg_ability extends rpg_object {
         if ($field_hazard_index === false){
             $field_hazard_index = array(
                 // negative
-                array('token' => 'crude_oil', 'source' => 'oil-shooter', 'noun' => 'crude oil', 'where' => 'below', 'frame' => 1, 'offset' => array('x' => 0, 'y' => -10, 'z' => -8)),
-                array('token' => 'foamy_bubbles', 'source' => 'bubble-spray', 'noun' => 'foamy bubbles', 'where' => 'below', 'frame' => 2, 'offset' => array('x' => 0, 'y' => -5, 'z' => 6)),
-                array('token' => 'frozen_footholds', 'source' => 'ice-breath', 'noun' => 'frozen foothold', 'where' => 'below', 'frame' => 2, 'offset' => array('x' => 0, 'y' => -5, 'z' => 8)),
-                array('token' => 'black_holes', 'source' => 'galaxy-bomb', 'noun' => 'black hole', 'where' => 'behind', 'frame' => 1, 'offset' => array('x' => -5, 'y' => 5, 'z' => -10)),
-                array('token' => 'disco_balls', 'source' => 'disco-fever', 'noun' => 'disco ball', 'where' => 'above', 'frame' => 0, 'offset' => array('x' => 70, 'y' => 10, 'z' => 20)),
-                array('token' => 'woolly_cloud', 'source' => 'thunder-wool', 'noun' => 'woolly cloud', 'where' => 'above', 'frame' => 0, 'offset' => array('x' => -5, 'y' => 40, 'z' => -8)),
-                array('token' => 'acid_globs', 'source' => 'acid-glob', 'noun' => 'acid glob', 'where' => 'below', 'frame' => 2, 'offset' => array('x' => 5, 'y' => 0, 'z' => 10)),
-                array('token' => 'gravity_well', 'source' => 'gravity-hold', 'noun' => 'gravity well', 'where' => 'below', 'frame' => 2, 'offset' => array('x' => 0, 'y' => 0, 'z' => -10)),
-                array('token' => 'remote_mine', 'source' => 'remote-mine', 'noun' => 'remote mine', 'where' => 'in front of', 'frame' => 6, 'offset' => array('x' => 30, 'y' => -5, 'z' => 6)),
+                array('token' => 'crude_oil', 'source' => 'oil-shooter', 'object' => 'crude-oil', 'noun' => 'crude oil', 'where' => 'below', 'frame' => 1, 'offset' => array('x' => 0, 'y' => -10, 'z' => -8)),
+                array('token' => 'foamy_bubbles', 'source' => 'bubble-spray', 'object' => 'foamy-bubbles', 'noun' => 'foamy bubbles', 'where' => 'below', 'frame' => 2, 'offset' => array('x' => 0, 'y' => -5, 'z' => 6)),
+                array('token' => 'frozen_footholds', 'source' => 'ice-breath', 'object' => 'frozen-foothold', 'noun' => 'frozen foothold', 'where' => 'below', 'frame' => 2, 'offset' => array('x' => 0, 'y' => -5, 'z' => 8)),
+                array('token' => 'black_holes', 'source' => 'galaxy-bomb', 'object' => 'black-hole', 'noun' => 'black hole', 'where' => 'behind', 'frame' => 1, 'offset' => array('x' => -5, 'y' => 5, 'z' => -10)),
+                array('token' => 'disco_balls', 'source' => 'disco-fever', 'object' => 'disco-ball', 'noun' => 'disco ball', 'where' => 'above', 'frame' => 0, 'offset' => array('x' => 70, 'y' => 10, 'z' => 20)),
+                array('token' => 'woolly_cloud', 'source' => 'thunder-wool', 'object' => 'woolly-cloud', 'noun' => 'woolly cloud', 'where' => 'above', 'frame' => 0, 'offset' => array('x' => -5, 'y' => 40, 'z' => -8)),
+                array('token' => 'acid_globs', 'source' => 'acid-glob', 'object' => 'acid-glob', 'noun' => 'acid glob', 'where' => 'below', 'frame' => 2, 'offset' => array('x' => 5, 'y' => 0, 'z' => 10)),
+                array('token' => 'gravity_well', 'source' => 'gravity-hold', 'object' => 'gravity-well', 'noun' => 'gravity well', 'where' => 'below', 'frame' => 2, 'offset' => array('x' => 0, 'y' => 0, 'z' => -10)),
+                array('token' => 'remote_mine', 'source' => 'remote-mine', 'object' => 'remote-mine', 'noun' => 'remote mine', 'where' => 'in front of', 'frame' => 6, 'offset' => array('x' => 30, 'y' => -5, 'z' => 6)),
                 );
             }
         return $field_hazard_index;
