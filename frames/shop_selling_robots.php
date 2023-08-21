@@ -46,6 +46,13 @@ $mmrpg_index_robots = rpg_robot::get_index(true, false);
                 // Collect the unlocked robots for this game file
                 $robot_list_unlocked = !empty($_SESSION[$session_token]['values']['battle_robots']) ? $_SESSION[$session_token]['values']['battle_robots'] : array();
 
+                // Define the base URL for all shop item images
+                $composite_sprite_config = array('kind' => 'robots', 'image' => 'mug_right_40x40', 'size' => 40, 'frame' => 0, 'alt' => 'all', 'class' => 'master');
+                $composite_sprite_image = rpg_game::get_sprite_composite_path($composite_sprite_config);
+                $composite_sprite_index = rpg_game::get_sprite_composite_index($composite_sprite_config);
+                $composite_sprite_image_markup = '<span class="icon_sprite"><span class="sprite smooth-scaling sprite_40x40 sprite_40x40_00" style="background-image: url('.$composite_sprite_image.'); background-position: 0 0;"></span></span>';
+                //error_log('$composite_sprite_image_markup = '.print_r($composite_sprite_image_markup, true));
+
                 // Loop through the items and print them one by one
                 $robot_counter = 0;
                 foreach ($robot_list_array AS $token => $price){
@@ -112,11 +119,9 @@ $mmrpg_index_robots = rpg_robot::get_index(true, false);
 
                     // See if we should block the purchase for any reason
                     $robot_block_purchase = !$robot_info_unlocked && ($robot_info_exclusive || !$robot_was_scanned || !$robot_was_defeated) ? true : false;
-
-                    $robot_sprite_image = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_image'];
-                    $robot_sprite_image_size = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
-                    $robot_sprite_image_xsize = $robot_sprite_image_size.'x'.$robot_sprite_image_size;
-                    $robot_sprite_image_markup = '<span class="icon_sprite"><span class="sprite smooth-scaling sprite_'.$robot_sprite_image_xsize.' sprite_'.$robot_sprite_image_xsize.'_00" style="background-image: url(images/robots/'.$robot_sprite_image.'/mug_right_'.$robot_sprite_image_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span></span>';
+                    $robot_sprite_token = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_image'];
+                    $robot_sprite_offset = !empty($composite_sprite_index[$robot_sprite_token]['offset']) ? $composite_sprite_index[$robot_sprite_token]['offset'] : array('x' => 9999, 'y' => 9999);
+                    $robot_sprite_image_markup = str_replace('background-position: 0 0;', 'background-position: -'.$robot_sprite_offset['x'].'px -'.$robot_sprite_offset['y'].'px;', $composite_sprite_image_markup);
                     $robot_info_name = $robot_sprite_image_markup.'<span class="wrap">'.$robot_info_name.'</span>';
 
                     ?>

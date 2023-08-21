@@ -60,6 +60,13 @@
                 $alt_symbol_index['alt8'] = 'π';
                 $alt_symbol_index['alt9'] = 'Σ';
 
+                // Define the base URL for all shop item images
+                $composite_sprite_config = array('kind' => 'robots', 'image' => 'mug_right_40x40', 'size' => 40, 'frame' => 0, 'alt' => 'all', 'class' => 'master');
+                $composite_sprite_image = rpg_game::get_sprite_composite_path($composite_sprite_config);
+                $composite_sprite_index = rpg_game::get_sprite_composite_index($composite_sprite_config);
+                $composite_sprite_image_markup = '<span class="icon_sprite"><span class="sprite smooth-scaling sprite_40x40 sprite_40x40_00" style="background-image: url('.$composite_sprite_image.'); background-position: 0 0;"></span></span>';
+                //error_log('$composite_sprite_image_markup = '.print_r($composite_sprite_image_markup, true));
+
                 // Loop through the items and print them one by one
                 $alt_counter = 0;
                 foreach ($alt_list_array AS $token => $price){
@@ -129,11 +136,9 @@
                     $alt_counter++;
                     $alt_cell_float = $alt_counter % 2 == 0 ? 'right' : 'left';
 
-                    $alt_sprite_image = $alt_info_token; //!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_image'];
-                    $alt_sprite_image_size = $alt_image_size; //!empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
-                    $alt_sprite_image_xsize = $alt_sprite_image_size.'x'.$alt_sprite_image_size;
-                    $alt_sprite_image_url = 'images/robots/'.$alt_sprite_image.'/mug_right_'.$alt_sprite_image_xsize.'.png';
-                    $alt_sprite_image_markup = '<span class="icon_sprite"><span class="sprite smooth-scaling sprite_'.$alt_sprite_image_xsize.' sprite_'.$alt_sprite_image_xsize.'_00" style="background-image: url('.$alt_sprite_image_url.'?'.MMRPG_CONFIG_CACHE_DATE.');"></span></span>';
+                    $alt_sprite_token = $alt_info_token;
+                    $alt_sprite_offset = !empty($composite_sprite_index[$alt_sprite_token]['offset']) ? $composite_sprite_index[$alt_sprite_token]['offset'] : array('x' => 9999, 'y' => 9999);
+                    $alt_sprite_image_markup = str_replace('background-position: 0 0;', 'background-position: -'.$alt_sprite_offset['x'].'px -'.$alt_sprite_offset['y'].'px;', $composite_sprite_image_markup);
                     $alt_info_name = $alt_sprite_image_markup.'<span class="wrap">'.$alt_info_name.'</span>';
 
                     ?>
