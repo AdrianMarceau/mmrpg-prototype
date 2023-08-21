@@ -40,6 +40,13 @@
                 // Collect the items for buying and slice/shuffle if nessary
                 $item_list_array = $shop_info['shop_items']['items_buying'];
 
+                // Define the base URL for all shop item images
+                $composite_sprite_config = array('kind' => 'items', 'image' => 'icon_right_40x40', 'size' => 40, 'frame' => 0);
+                $composite_sprite_image = rpg_game::get_sprite_composite_path($composite_sprite_config);
+                $composite_sprite_index = rpg_game::get_sprite_composite_index($composite_sprite_config);
+                $composite_sprite_image_markup = '<span class="icon_sprite"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url('.$composite_sprite_image.'); background-position: 0 0;"></span></span>';
+                //error_log('$composite_sprite_image_markup = '.print_r($composite_sprite_image_markup, true));
+
                 // Loop through the items and print them one by one
                 $item_counter = 0;
                 foreach ($item_list_array AS $token => $price){
@@ -62,8 +69,9 @@
                     $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, array('show_quantity' => false));
                     $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
-                    $item_sprite_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_info['item_token'];
-                    $item_sprite_image_markup = '<span class="icon_sprite"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/'.$item_sprite_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span></span>';
+                    $item_sprite_token = $token;
+                    $item_sprite_offset = !empty($composite_sprite_index[$item_sprite_token]['offset']) ? $composite_sprite_index[$item_sprite_token]['offset'] : array('x' => 9999, 'y' => 9999);
+                    $item_sprite_image_markup = str_replace('background-position: 0 0;', 'background-position: -'.$item_sprite_offset['x'].'px -'.$item_sprite_offset['y'].'px;', $composite_sprite_image_markup);
                     $item_info_name = $item_sprite_image_markup.'<span class="wrap">'.$item_info_name.'</span>';
 
                     ?>
