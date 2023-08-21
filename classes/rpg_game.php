@@ -1770,6 +1770,61 @@ class rpg_game {
 
     }
 
+    // Define a function for converting a sprite config array into a path string
+    // Example: turning this: `array('size' => 40, 'frame' => 0)` into this: `size:40+frame:0` with support for various args
+    public static function sprite_config_to_path_vars($config){
+        $path_vars = array();
+        foreach ($config AS $key => $value){
+            if ($key === 'kind'){ continue; }
+            elseif ($key === 'image'){ continue; }
+            $path_vars[] = $key.':'.$value;
+        }
+        return implode('+', $path_vars);
+    }
+
+    // Define a function for collecting a given sprite image's composite path w/ arguments
+    public static function get_sprite_composite_path($config = array(), $include_cache_date = true){
+        //error_log('get_sprite_composite_path($config) w/ $config = '.print_r($config, true));
+        // Ensure we have mandatory config values
+        if (empty($config['kind'])){ return false; }
+        if (empty($config['image'])){ return false; }
+        // Generate the path variables given the kind, image, and other config values
+        $kind_path = $config['kind'].'/';
+        $image_path = $config['image'].'.png';
+        $config_path = !empty($config) ? self::sprite_config_to_path_vars($config).'/' : '';
+        //error_log('$kind_path = '.print_r($kind_path, true));
+        //error_log('$image_path = '.print_r($image_path, true));
+        //error_log('$config_path = '.print_r($config_path, true));
+        $composite_sprite_path = 'images/'.$kind_path.'all/'.$config_path.$image_path;
+        if ($include_cache_date){ $composite_sprite_path .= '?'.MMRPG_CONFIG_CACHE_DATE; }
+        // Return the generated path value
+        //error_log('$composite_sprite_path = '.print_r($composite_sprite_path, true));
+        return $composite_sprite_path;
+    }
+
+    // Define a function for collecting a given sprite image's composite index w/ arguments
+    public static function get_sprite_composite_index($config = array()){
+        //error_log('get_sprite_composite_index($config) w/ $config = '.print_r($config, true));
+        // Collect the composite sprite path and index
+        $composite_sprite_path = self::get_sprite_composite_path($config);
+        //error_log('$composite_sprite_path = '.print_r($composite_sprite_path, true));
+        // Create a cache for the composite index and populate w/ this request if applicable
+        static $composite_index_cache = array();
+        //error_log('$composite_index_cache = '.print_r($composite_index_cache, true));
+        if (!isset($composite_index_cache[$composite_sprite_path])){
+            $composite_index_path = str_replace('.png', '.json', $composite_sprite_path);
+            $composite_index_array = file_get_contents(MMRPG_CONFIG_ROOTURL.$composite_index_path);
+            $composite_index_array = !empty($composite_index_array) ? json_decode($composite_index_array, true) : array();
+            //error_log('$composite_index_path = '.print_r($composite_index_path, true));
+            //error_log('$composite_index_array = '.print_r($composite_index_array, true));
+            $composite_index_cache[$composite_sprite_path] = $composite_index_array;
+        }
+        // Return the composite index array
+        $composite_sprite_index = $composite_index_cache[$composite_sprite_path];
+        //error_log('$composite_sprite_index = '.print_r($composite_sprite_index, true));
+        return $composite_sprite_index;
+    }
+
 
     // -- SOUND FUNCTIONS -- //
 
