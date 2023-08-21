@@ -195,6 +195,13 @@
                 //echo('<pre>$star_list_array_raw[today] = '.print_r($star_list_array_raw['today'], true).'</pre>');
                 //exit();
 
+                // Define the base URL for all shop item images
+                $composite_sprite_config = array('kind' => 'items', 'image' => 'icon_right_40x40', 'size' => 40, 'frame' => 0, 'alt' => 'all', 'token' => array('field-star', 'fusion-star'));
+                $composite_sprite_image = rpg_game::get_sprite_composite_path($composite_sprite_config);
+                $composite_sprite_index = rpg_game::get_sprite_composite_index($composite_sprite_config);
+                $composite_sprite_image_markup = '<span class="icon_sprite"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url('.$composite_sprite_image.'); background-position: 0 0;"></span></span>';
+                //error_log('$composite_sprite_image_markup = '.print_r($composite_sprite_image_markup, true));
+
                 // Loop through the items and print them one by one
                 $star_counter = 0;
                 foreach ($star_list_array AS $key => $token){
@@ -244,8 +251,9 @@
                     $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
                     $temp_info_tooltip .= '</span>';
 
-                    $star_sprite_image = $star_info['star_kind'].'-star_'.$star_info_type.(!empty($star_info_type2) ? '-'.$star_info_type2 : '');
-                    $star_sprite_image_markup = '<span class="icon_sprite"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/'.$star_sprite_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span></span>';
+                    $star_sprite_token = $star_info['star_kind'].'-star_'.$star_info_type.(!empty($star_info_type2) ? '-'.$star_info_type2 : '');
+                    $star_sprite_offset = !empty($composite_sprite_index[$star_sprite_token]['offset']) ? $composite_sprite_index[$star_sprite_token]['offset'] : array('x' => 9999, 'y' => 9999);
+                    $star_sprite_image_markup = str_replace('background-position: 0 0;', 'background-position: -'.$star_sprite_offset['x'].'px -'.$star_sprite_offset['y'].'px;', $composite_sprite_image_markup);
                     $star_info_name = $star_sprite_image_markup.'<span class="wrap">'.$star_info_name.'</span>';
 
                     ?>

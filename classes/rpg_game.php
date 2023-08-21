@@ -1777,6 +1777,7 @@ class rpg_game {
         foreach ($config AS $key => $value){
             if ($key === 'kind'){ continue; }
             elseif ($key === 'image'){ continue; }
+            if (is_array($value)){ $value = implode(',', $value); }
             $path_vars[] = $key.':'.$value;
         }
         return implode('+', $path_vars);
