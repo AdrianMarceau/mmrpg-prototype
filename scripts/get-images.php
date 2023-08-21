@@ -247,6 +247,9 @@ if ($must_regenerate){
     }
     //error_log('$composite_objects (after) = '.print_r($composite_objects, true));
 
+    // Check to see if the target sprite is an icon just-in-case we need to adjust calculations
+    $target_sprite_is_icon = strstr($request_file_name, 'icon_') || strstr($request_file_name, 'mug_') ? true : false;
+
     // Loop through the objects and filter out any that shouldn't be here (incomplete, etc.)
     if (!empty($composite_objects)){
         foreach ($composite_objects AS $object_token => $object_info){
@@ -256,7 +259,7 @@ if ($must_regenerate){
                 || $object_info['class'] === 'system'
                 || empty($object_info['flag_published'])
                 || empty($object_info['flag_complete'])
-                || (isset($object_info['image_sheets']) && empty($object_info['image_sheets']))
+                || (isset($object_info['image_sheets']) && empty($object_info['image_sheets']) && !$target_sprite_is_icon)
                 || ($request_type === 'abilities' && $object_info['class'] === 'mecha')
                 ){
                 unset($composite_objects[$object_token]);
@@ -293,9 +296,7 @@ if ($must_regenerate){
     // Set the target width and height for the sprites
     $target_sprite_size = !empty($request_size) ? $request_size : $max_sprite_height;
     $target_sprite_height = !empty($request_size) ? $request_size : $max_sprite_height;
-    if ($request_crop
-        || strstr($request_file_name, 'icon_')
-        || strstr($request_file_name, 'mug_')){
+    if ($request_crop || $target_sprite_is_icon){
         $target_sprite_width = !empty($request_size) ? $request_size : $max_sprite_width;
     } else {
         $num_frames = count($object_frame_index);
