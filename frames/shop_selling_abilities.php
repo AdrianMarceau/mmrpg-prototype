@@ -68,7 +68,14 @@
                 $ability_list_array_count = count($ability_list_array);
                 $ability_list_array = array_reverse($ability_list_array, true);
 
-                // Loop through the items and print them one by one
+                // Define the base URL for all shop item images
+                $composite_sprite_config = array('kind' => 'abilities', 'image' => 'icon_right_40x40', 'size' => 40, 'frame' => 0);
+                $composite_sprite_image = rpg_game::get_sprite_composite_path($composite_sprite_config);
+                $composite_sprite_index = rpg_game::get_sprite_composite_index($composite_sprite_config);
+                $composite_sprite_image_markup = '<span class="icon_sprite"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url('.$composite_sprite_image.'); background-position: 0 0;"></span></span>';
+                //error_log('$composite_sprite_image_markup = '.print_r($composite_sprite_image_markup, true));
+
+                // Loop through the abilities and print them one by one
                 $ability_counter = 0;
                 if (!empty($ability_list_array)){
                     foreach ($ability_list_array AS $token => $price){
@@ -105,8 +112,9 @@
                         $ability_counter++;
                         $ability_cell_float = $ability_counter % 2 == 0 ? 'right' : 'left';
 
-                        $ability_sprite_image = !empty($ability_info['ability_image']) ? $ability_info['ability_image'] : $ability_info['ability_token'];
-                        $ability_sprite_image_markup = '<span class="icon_sprite"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/abilities/'.$ability_sprite_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span></span>';
+                        $ability_sprite_token = $token;
+                        $ability_sprite_offset = !empty($composite_sprite_index[$ability_sprite_token]['offset']) ? $composite_sprite_index[$ability_sprite_token]['offset'] : array('x' => 9999, 'y' => 9999);
+                        $ability_sprite_image_markup = str_replace('background-position: 0 0;', 'background-position: -'.$ability_sprite_offset['x'].'px -'.$ability_sprite_offset['y'].'px;', $composite_sprite_image_markup);
                         $ability_info_name = $ability_sprite_image_markup.'<span class="wrap">'.$ability_info_name.'</span>';
 
                         ?>
