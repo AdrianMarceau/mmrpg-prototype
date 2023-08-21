@@ -305,6 +305,103 @@ if ($must_regenerate){
     //error_log('$target_sprite_height = '.print_r($target_sprite_height, true));
     //error_log('$target_sprite_width = '.print_r($target_sprite_width, true));
 
+    // If this is a special kind of image, we may need to assume the available alts in the absense of defined ones
+    if ($request_alt === 'all'){
+        //error_log('request for ALL alts means we gotta check which ones exist');
+        if (!empty($composite_objects)){
+
+            // Define flags for whether or not certain types of alts are required
+            $elemental_alts_required = false;
+            $elemental_fusion_alts_required = false;
+            if ($request_type === 'robots'){ $elemental_alts_required = true; }
+            if ($request_type === 'items' && (in_array('field-star', $request_tokens) || in_array('fusion-star', $request_tokens))){ $elemental_alts_required = true; }
+            if ($request_type === 'items' && in_array('fusion-star', $request_tokens)){ $elemental_fusion_alts_required = true; }
+
+            // Before we start, grab the types index and generate some alt templates
+            $mmrpg_types_index = rpg_type::get_index();
+            $mmrpg_alt_templates = array();
+            if ($elemental_alts_required){
+                foreach ($mmrpg_types_index AS $type_token => $type_info){
+                    if ($type_token === 'none' && $request_type === 'robots'){ continue; }
+                    if (!isset($mmrpg_alt_templates['base'])){ $mmrpg_alt_templates['base'] = array(); }
+                    $type_name = $type_info['type_name'];
+                    //error_log('generate alt template for $type_info = '.print_r($type_info, true));
+                    //error_log('generate alt template for $type_token = '.print_r($type_token, true));
+                    $alt_template = array('token' => $type_token, 'name' => $type_name, 'summons' => 0, 'color' => $type_token);
+                    //error_log('new $alt_template = '.print_r($alt_template, true));
+                    $mmrpg_alt_templates['base'][] = $alt_template;
+                    if (!$elemental_fusion_alts_required){ continue; }
+                    if ($type_token === 'none' || $type_token === 'copy'){ continue; }
+                    foreach ($mmrpg_types_index AS $type2_token => $type2_info){
+                        if ($type2_token === $type_token){ continue; }
+                        if ($type2_token === 'none' || $type2_token === 'copy'){ continue; }
+                        //error_log('new $type2_info = '.print_r($type2_info, true));
+                        if ($type2_info['type_class'] !== 'normal'){ continue; }
+                        if (!isset($mmrpg_alt_templates['fusion'])){ $mmrpg_alt_templates['fusion'] = array(); }
+                        $fusion_type_token = $type_token.'-'.$type2_token;
+                        $fusion_type_name = $type_name.' / '.$type2_info['type_name'];
+                        //error_log('generate alt template for $type_info + $type2_info = '.print_r($type2_info, true));
+                        //error_log('generate alt template for $type_token + $type2_token = '.print_r($type2_token, true));
+                        $fusion_alt_template = array('token' => $fusion_type_token, 'name' => $fusion_type_name, 'summons' => 0, 'color' => $fusion_type_token);
+                        //error_log('new $fusion_alt_template = '.print_r($fusion_alt_template, true));
+                        $mmrpg_alt_templates['fusion'][] = $fusion_alt_template;
+                    }
+                }
+            }
+
+            //error_log('$request_type = '.print_r($request_type, true));
+            //error_log('$composite_objects = '.print_r($composite_objects, true));
+            foreach ($composite_objects AS $object_token => $object_info){
+                //error_log('$object_info = '.print_r($object_info, true));
+                if (empty($object_info['image_alts'])){
+                    //error_log($object_token.' doesnt have alts so that means we gotta generate them');
+                    // Define an array to hold the new image alts
+                    $new_image_alts = array();
+                    //error_log('$object_info = '.print_r($object_info, true));
+                    // If this is a ROBOT object and is also COPY type, we can generate elemental alts
+                    if ($request_type === 'robots' && $object_info['core'] === 'copy'){
+                        //error_log('generate elemental base alts for copy core robots');
+                        $base_image_alts = array_map(function($type_info) use ($object_info){
+                            $type_token = $type_info['token'];
+                            $type_name = $type_info['name'];
+                            $alt_info = array('token' => $type_token, 'name' => $object_info['name'].' ('.$type_name.' Core)');
+                            return $alt_info;
+                        }, $mmrpg_alt_templates['base']);
+                        $new_image_alts = array_merge($new_image_alts, $base_image_alts);
+                    }
+                    // If this is an ITEM object and is also a FIELD STAR or a FUSION STAR, we can generate elemental alts
+                    if ($request_type === 'items' && ($object_token === 'field-star' || $object_token === 'fusion-star')){
+                        //error_log('generate elemental base alts for field/fusion star items');
+                        $base_image_alts = array_map(function($type_info) use ($object_info){
+                            $type_token = $type_info['token'];
+                            $type_name = $type_info['name'];
+                            $alt_info = array('token' => $type_token, 'name' => $object_info['name'].' ('.$type_name.' Type)');
+                            return $alt_info;
+                        }, $mmrpg_alt_templates['base']);
+                        $new_image_alts = array_merge($new_image_alts, $base_image_alts);
+                    }
+                    // If this is an ITEM object and is also a FIELD STAR or a FUSION STAR, we can generate elemental alts
+                    if ($request_type === 'items' && $object_token === 'fusion-star'){
+                        //error_log('generate elemental fusion alts for fusion star items');
+                        $fusion_image_alts = array_map(function($type_info) use ($object_info){
+                            $type_token = $type_info['token'];
+                            $type_name = $type_info['name'];
+                            $alt_info = array('token' => $type_token, 'name' => $object_info['name'].' ('.$type_name.' Type)');
+                            return $alt_info;
+                        }, $mmrpg_alt_templates['fusion']);
+                        $new_image_alts = array_merge($new_image_alts, $fusion_image_alts);
+                    }
+                    // If new alts were generated, we can add them to the object info
+                    if (!empty($new_image_alts)){
+                        $object_info['image_alts'] = $new_image_alts;
+                        $composite_objects[$object_token] = $object_info;
+                    }
+                }
+            }
+        }
+    }
+    // ref: http://local.prototype.mmrpg-world.net/images/items/all/size:40+frame:0+token:field-star+alt:all/icon_right_40x40.png?20230820-1139
+
     // Preliminary loop to count the total number of objects, including alts
     $sprite_objects_num = 0;
     if (!empty($composite_objects)){
