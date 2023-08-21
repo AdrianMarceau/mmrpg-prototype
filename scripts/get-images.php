@@ -30,9 +30,11 @@ if (!empty($request_args)){
 // Collect required parameters from the request header (kind, type, file)
 $allowed_kinds = array('composite');
 $allowed_types = array('players', 'robots', 'abilities', 'items', 'skills', 'fields');
+$allowed_types_classes = array('robots' => array('mecha', 'master', 'boss'));
 $allowed_file_regex = '/^([-_a-z0-9]+)\.([a-z0-9]{3,})$/i';
 $request_kind = isset($_GET['kind']) && in_array($_GET['kind'], $allowed_kinds) ? $_GET['kind'] : false;
 $request_type = isset($_GET['type']) && in_array($_GET['type'], $allowed_types) ? $_GET['type'] : false;
+$request_sub_type = isset($_GET['class']) && isset($allowed_types_classes[$request_type]) && in_array($_GET['class'], $allowed_types_classes[$request_type]) ? $_GET['class'] : false;
 $request_token = isset($_GET['token']) && preg_match('/^[-_a-z0-9,]+$/i', $_GET['token']) ? $_GET['token'] : false;
 $request_editor = isset($_GET['editor']) && preg_match('/^[-_a-z0-9,]+$/', $_GET['editor']) ? $_GET['editor'] : false;
 $request_file = isset($_GET['file']) && preg_match($allowed_file_regex, $_GET['file']) ? $_GET['file'] : false;
@@ -46,6 +48,7 @@ if (is_numeric($request_editor)){ $request_editor = (int)($request_editor); }
 if (!$request_crop){ $request_frame = 'all'; }
 //error_log('$request_kind = '.print_r($request_kind, true));
 //error_log('$request_type = '.print_r($request_type, true));
+//error_log('$request_sub_type = '.print_r($request_sub_type, true));
 //error_log('$request_token = '.print_r($request_token, true));
 //error_log('$request_editor = '.print_r($request_editor, true));
 //error_log('$request_file = '.print_r($request_file, true));
@@ -177,6 +180,18 @@ if ($must_regenerate){
         $composite_objects = array_filter($composite_objects, function($object) use ($object_name, $request_tokens){
             $allow = false;
             if (in_array($object[$object_name.'_token'], $request_tokens)){ $allow = true; }
+            return $allow;
+            });
+    }
+
+    // If the user requested only a specific sub type of object, filter the list by object class = sub type
+    if (!empty($request_sub_type)
+        && !empty($composite_objects)){
+        $request_sub_types = strstr($request_sub_type, ',') ? explode(',', $request_sub_type) : array($request_sub_type);
+        //error_log('filter by $request_sub_types = '.print_r(array_keys($request_sub_types), true));
+        $composite_objects = array_filter($composite_objects, function($object) use ($object_name, $request_sub_types){
+            $allow = false;
+            if (in_array($object[$object_name.'_class'], $request_sub_types)){ $allow = true; }
             return $allow;
             });
     }
