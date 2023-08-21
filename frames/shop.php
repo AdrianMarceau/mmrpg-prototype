@@ -130,6 +130,15 @@ if (true){
                     ?>
                     <div class="gauge cores">
                         <?
+
+                        // Define the base URL for all shop item images
+                        $composite_sprite_config = array('kind' => 'items', 'image' => 'icon_right_40x40', 'size' => 40, 'frame' => 0);
+                        $composite_sprite_image = rpg_game::get_sprite_composite_path($composite_sprite_config);
+                        $composite_sprite_index = rpg_game::get_sprite_composite_index($composite_sprite_config);
+                        $composite_sprite_image_markup = '<span class="sprite sprite_core sprite_left"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url('.$composite_sprite_image.'); background-position: 0 0;"></span></span>';
+                        //$composite_sprite_image_markup = '<div class="sprite sprite_left sprite_left_40x40" style="background-image: url('.$composite_sprite_image.'); background-position: 0 0;"></div>';
+                        //error_log('$composite_sprite_image_markup = '.print_r($composite_sprite_image_markup, true));
+
                         // Loop through all elements and display gauge's for relevant ones
                         $core_max_levels = $db->get_array_list("SELECT
                             (CASE WHEN ability_type = '' THEN 'none' ELSE ability_type END) AS core_type,
@@ -148,9 +157,12 @@ if (true){
                             $core_level = !empty($core_level_index[$type_token]) ? $core_level_index[$type_token] : 0;
                             $core_max_level = !empty($core_max_levels[$type_token]) ? $core_max_levels[$type_token]['core_max'] : 9;
                             $core_opacity = 0.1 + (($core_level < 3 ? $core_level / 3 : 1) * 0.9);
+                            $core_item_token = $type_token.'-core';
+                            $core_sprite_offset = !empty($composite_sprite_index[$core_item_token]['offset']) ? $composite_sprite_index[$core_item_token]['offset'] : array('x' => 9999, 'y' => 9999);
+                            $core_sprite_image_markup = str_replace('background-position: 0 0;', 'background-position: -'.$core_sprite_offset['x'].'px -'.$core_sprite_offset['y'].'px;', $composite_sprite_image_markup);
                             ?>
                             <div class="element" style="opacity: <?= $core_opacity ?>;" data-type="<?= $type_token ?>" data-count="<?= $core_level ?>" data-max-count="<?= $core_max_level ?>" data-click-tooltip="<?= $core_name.' Cores &times; '.$core_level ?>" data-tooltip-type="item_type type_<?= $type_token ?>">
-                                <div class="sprite sprite_left sprite_left_40x40" style="background-image: url(images/items/<?= $type_token ?>-core/icon_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"></div>
+                                <?= $core_sprite_image_markup ?>
                                 <div class="count"><?= $core_level >= $core_max_level ? '&bigstar;' : $core_level ?></div>
                             </div>
                             <?

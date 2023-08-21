@@ -874,18 +874,27 @@
     display: block;
     clear: both;
 }
-#shop #console .gauge.cores .element .sprite {
+#shop #console .gauge.cores .element .sprite_core {
     display: block;
     float: left;
     background-position: center center;
     position: relative;
-    background-color: transparent;
+    background-color: #090909;
+    background-color: rgba(0, 0, 0, 0.1);
     border: 0 none transparent;
     margin: 0 4px 0 -4px;
     width: 12px;
     height: 6px;
     top: 1px;
+    left: 5px;
     padding: 0;
+    text-indent: 0;
+    overflow: hidden;
+}
+#shop #console .gauge.cores .element .sprite_core .sprite {
+    position: absolute;
+    top: -15px;
+    left: -14px;
 }
 #shop #console .gauge.cores .element .count {
     display: block;
