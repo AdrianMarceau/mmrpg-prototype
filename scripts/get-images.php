@@ -673,6 +673,20 @@ if ($must_regenerate && !empty($composite_index)){
 
 
 // If the requested file already exists, we can just return it verbatim
+if ($request_format === 'image' && file_exists($composite_base_path.$composite_image_binary_path)
+    || $request_format === 'index' && file_exists($composite_base_path.$composite_image_index_path)){
+
+    // Define and set the cache headers for this file
+    $cache_time = 24 * 60 * 60; // hours * minutes * seconds
+    header("Expires: " . gmdate("D, d M Y H:i:s", (time()+$cache_time)) . " GMT");
+    header("Last-Modified: " . gmdate("D, d M Y H:i:s", (time()+$cache_time)) . " GMT");
+    header("Cache-control: public, max-age={$cache_time}, must-revalidate");
+    header("Pragma: cache");
+
+}
+
+
+// If the requested file already exists, we can just return it verbatim
 if ($request_format === 'image' && file_exists($composite_base_path.$composite_image_binary_path)){
 
     // Gather the composite image properties, update the headers, return the file
