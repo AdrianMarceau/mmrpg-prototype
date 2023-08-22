@@ -607,7 +607,8 @@ class rpg_prototype {
         // Return the list of unseen menu frame content
         $settings_token = 'menu_frame_'.str_replace('_', '-', $frame_token).'_unseen';
         $menu_frame_content_unseen = isset($_SESSION[$session_token]['battle_settings'][$settings_token]) ? $_SESSION[$session_token]['battle_settings'][$settings_token] : '';
-        $menu_frame_content_unseen = strstr($menu_frame_content_unseen, '|') ? explode('|', $menu_frame_content_unseen) : array($menu_frame_content_unseen);
+        if (!empty($menu_frame_content_unseen)){ $menu_frame_content_unseen = strstr($menu_frame_content_unseen, '|') ? explode('|', $menu_frame_content_unseen) : array($menu_frame_content_unseen); }
+        else { $menu_frame_content_unseen = array(); }
         //error_log('$menu_frame_content_unseen  = '.print_r($menu_frame_content_unseen, true));
         return $menu_frame_content_unseen;
     }

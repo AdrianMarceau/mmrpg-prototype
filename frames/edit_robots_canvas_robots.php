@@ -13,6 +13,7 @@ $mmrpg_database_robots = rpg_robot::get_index(true, false);
 // Collect the array of unseen menu frame robots if there is one, then clear it
 $frame_token = 'edit_robots';
 $menu_frame_content_unseen = rpg_prototype::get_menu_frame_content_unseen($frame_token);
+//error_log('$menu_frame_content_unseen = '.print_r($menu_frame_content_unseen, true));
 rpg_prototype::clear_menu_frame_content_unseen($frame_token);
 
 // Loop through the allowed edit data for all players
@@ -58,7 +59,7 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                     $robot_image_offset_x = -5 - $robot_image_offset;
                     $robot_image_offset_y = -10 - $robot_image_offset;
                     $robot_tooltip_text = $robot_info['robot_name'].' ('.(!empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']).' Core' : 'Neutral Core').') &lt;br /&gt;Lv '.$robot_info['robot_level'].' | '.$robot_info['robot_experience'].' Exp';
-                    $robot_is_new = !empty($menu_frame_content_unseen[$robot_token]) ? true : false;
+                    $robot_is_new = in_array($robot_token, $menu_frame_content_unseen) ? true : false;
 
                     $robot_link_styles = 'background-image: none;';
                     $robot_link_classes = 'sprite sprite_robot sprite_robot_'.$player_token.' sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == 0 ? 'sprite_robot_current sprite_robot_'.$player_token.'_current ' : '').' robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').'';

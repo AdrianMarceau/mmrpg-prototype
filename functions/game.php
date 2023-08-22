@@ -455,9 +455,11 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
             $temp_console_markup .= '</p>';
         $temp_console_markup .= '</div>';
 
-        // Remove the robot editor frame from the history array so that it appears with the "new" indicator
-        $clear_seen_frame_token = 'edit_robots';
-        rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
+        // Remove the robots frame from the history array so that it appears with the "new" indicator
+        $menu_frame_token = 'edit_robots';
+        $menu_frame_content_token = $robot_info['robot_token'];
+        rpg_prototype::mark_menu_frame_as_unseen($menu_frame_token);
+        rpg_prototype::mark_menu_frame_content_as_unseen($menu_frame_token, $menu_frame_content_token);
 
         // Append this event to the global events array
         $_SESSION[$session_token]['EVENTS'][] = array(
