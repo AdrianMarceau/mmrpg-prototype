@@ -923,13 +923,17 @@ gameSettings.currentBattleData = <?= json_encode($this_battle_data) ?>;
 $(document).ready(function(){
 
 <?
-// Preload battle related image files
-if (!empty($this_battle_data)){
-    echo "  top.mmrpg_preload_field_sprites('background', '{$this_field_data['field_background']}');\n";
-    echo "  top.mmrpg_preload_field_sprites('foreground', '{$this_field_data['field_foreground']}');\n";
+// Preload the target player robot sprites first because we see them first
+if (!empty($target_player_data) && !empty($target_player_data['player_robots'])){
+    foreach ($target_player_data['player_robots'] AS $temp_key => $temp_robotinfo){
+        $temp_robot_indexinfo = rpg_robot::get_index_info($temp_robotinfo['robot_token']);
+        $temp_robot_imagesize =!empty($temp_robot_indexinfo) && !empty($temp_robot_indexinfo['robot_image_size']) ? $temp_robot_indexinfo['robot_image_size'] : 40;
+        $temp_robot_zoomsize = $temp_robot_imagesize * 2;
+        echo "  top.mmrpg_preload_robot_sprites('{$temp_robotinfo['robot_token']}', 'left', {$temp_robot_zoomsize});\n";
+    }
 }
+// Preload this player robot sprites second as we see them after the target
 if (!empty($this_player_data) && !empty($this_player_data['player_robots'])){
-    // Preload this player robot sprites
     foreach ($this_player_data['player_robots'] AS $temp_key => $temp_robotinfo){
         $temp_robot_indexinfo = rpg_robot::get_index_info($temp_robotinfo['robot_token']);
         $temp_robot_imagesize =!empty($temp_robot_indexinfo) && !empty($temp_robot_indexinfo['robot_image_size']) ? $temp_robot_indexinfo['robot_image_size'] : 40;
@@ -937,14 +941,10 @@ if (!empty($this_player_data) && !empty($this_player_data['player_robots'])){
         echo "  top.mmrpg_preload_robot_sprites('{$temp_robotinfo['robot_token']}', 'right', {$temp_robot_zoomsize});\n";
     }
 }
-if (!empty($target_player_data) && !empty($target_player_data['player_robots'])){
-    // Preload the target player robot sprites
-    foreach ($target_player_data['player_robots'] AS $temp_key => $temp_robotinfo){
-        $temp_robot_indexinfo = rpg_robot::get_index_info($temp_robotinfo['robot_token']);
-        $temp_robot_imagesize =!empty($temp_robot_indexinfo) && !empty($temp_robot_indexinfo['robot_image_size']) ? $temp_robot_indexinfo['robot_image_size'] : 40;
-        $temp_robot_zoomsize = $temp_robot_imagesize * 2;
-        echo "  top.mmrpg_preload_robot_sprites('{$temp_robotinfo['robot_token']}', 'left', {$temp_robot_zoomsize});\n";
-    }
+// Preload the field sprites last as they're mostly taken care of by the battle script
+if (!empty($this_battle_data)){
+    echo "  top.mmrpg_preload_field_sprites('background', '{$this_field_data['field_background']}');\n";
+    echo "  top.mmrpg_preload_field_sprites('foreground', '{$this_field_data['field_foreground']}');\n";
 }
 ?>
 

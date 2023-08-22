@@ -1692,19 +1692,32 @@ function mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel){
 // Define a function for preloading assets
 var asset_sprite_cache = [];
 var asset_sprite_images = [
-    'images/assets/battle-scene_robot-details.gif',
-    'images/assets/battle-scene_robot-results.gif',
-    'images/abilities/_effects/stat-arrows/sprite_left_80x80.png',
-    'images/abilities/_effects/stat-arrows/sprite_right_80x80.png'
+    'images/assets/battle-scene_gridlines-2k23_under.png?20230616',
+    'images/assets/battle-scene_gridlines-2k23_over.png?20230616',
+    'images/assets/battle-scene_robot-details-5.png?20230609-6',
+    'images/tiles/horizontal-gradient_energy-bar-large.png?20150719-01',
+    'images/tiles/horizontal-gradient_weapons-bar-large.gif?20130805-02',
+    'images/tiles/horizontal-gradient_experience-bar-large.gif?20130805-02',
+    'images/assets/battle-scene_robot-details-5_item.png?20230609-3',
+    'images/tiles/horizontal-gradient_energy-bar.gif',
+    'images/assets/battle-scene_gridlines-resized_event-banner.png',
+    'images/assets/battle-scene_robot-results_2k23.png?20230608-3',
+    'images/abilities/_effects/stat-arrows/sprite_left_80x80.png??',
+    'images/abilities/_effects/stat-arrows/sprite_right_80x80.png??',
+    'images/objects/defeat-explosion/sprite_left_80x80.png??'
     ];
 function mmrpg_preload_assets(){
+    //console.log('mmrpg_preload_assets()');
     // Loop through each of the asset images
     for (key in asset_sprite_images){
         // Define the sprite path value
         var sprite_path = asset_sprite_images[key];
+        // check if the last two characters of the path is a question mark, replace the last one with the gameSettings.cacheTime manually
+        if (sprite_path.substr(-2) === '??'){ sprite_path = sprite_path.replace(/\?$/, gameSettings.cacheTime); }
         // Cache this image in the appropriate array
         var cacheImage = document.createElement('img');
         cacheImage.src = sprite_path;
+        //console.log('cacheImage.src =', cacheImage.src)
         asset_sprite_cache.push(cacheImage);
     }
 }
@@ -1713,7 +1726,7 @@ function mmrpg_preload_assets(){
 var field_sprite_cache = {};
 var field_sprite_frames = ['base'];
 var field_sprite_kinds = ['background', 'foreground'];
-var field_sprite_type = 'png';
+var field_sprite_types = ['gif', 'png'];
 function mmrpg_preload_field_sprites(fieldKind, fieldToken){
     // If this sprite has not already been cached
     if (!field_sprite_cache[fieldToken]){
@@ -1728,11 +1741,12 @@ function mmrpg_preload_field_sprites(fieldKind, fieldToken){
         for (var i = 0; i < num_frames; i++){
             // Collect the current frame, size, and filename
             var this_frame = field_sprite_frames[i];
+            var this_type = field_sprite_types[field_sprite_kinds.indexOf(fieldKind)];
             var this_kind = fieldKind;
-            var file_name = 'battle-field_'+this_kind+'_'+this_frame+'.'+field_sprite_type;
+            var file_name = 'battle-field_'+this_kind+'_'+this_frame+'.'+this_type;
             // Cache this image in the apporiate array
             var cacheImage = document.createElement('img');
-            cacheImage.src = sprite_path+file_name;
+            cacheImage.src = sprite_path+file_name+'?'+gameSettings.cacheTime;
             field_sprite_cache[fieldToken].push(cacheImage);
             //alert(field_path+file_name);
         }
@@ -1760,7 +1774,8 @@ function mmrpg_preload_robot_sprites(thisRobotToken, thisRobotDirection, thisRob
         for (var i = 0; i < numRobotTypes; i++){
             // Collect the current frame, size, and filename
             var thisSpriteType = robotSpriteTypes[i];
-            var thisSpriteToken = thisSpriteType+'_'+thisRobotDirection+'_'+thisRobotSize+'x'+thisRobotSize;
+            var thisSpriteSizeAdjusted = thisSpriteType === 'mug' ? Math.ceil(thisRobotSize / 2) : thisRobotSize;
+            var thisSpriteToken = thisSpriteType+'_'+thisRobotDirection+'_'+thisSpriteSizeAdjusted+'x'+thisSpriteSizeAdjusted;
             var thisSpriteFilename = thisSpriteToken+'.'+robotSpriteExtension;
             //console.log('thisSpriteFilename =', thisSpriteFilename, ';');
             // Cache this image in the apporiate array
