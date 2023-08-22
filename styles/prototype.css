@@ -1704,18 +1704,9 @@ body[data-source="website"] #prototype .menu {
     100% { filter: brightness(1.0); }
 }
 @keyframes option-player-sprite-bounce {
-    0% { transform: translateY(0px); background-position: 0 0; }
-
-    20% { transform: translateY(-1px); background-position: 0 0; }
-    25% { transform: translateY(0px); background-position: 0 0; }
-
-    45% { transform: translateY(-1px); background-position: 0 0; }
-    50% { transform: translateY(0px); background-position: 0 0; }
-
-    70% { transform: translateY(0px); background-position: -240px 0; }
-    75% { transform: translateY(0px); background-position: -240px 0; }
-
-    100% { transform: translateY(0px); background-position: 0 0; }
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-1px); }
+    100% { transform: translateY(0px); }
 }
 #mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_robot {
     transform: translateY(0px);
@@ -1737,8 +1728,7 @@ body[data-source="website"] #prototype .menu {
 }
 #prototype .banner .option_1x1 div label.has_image .sprite_player {
     transform: translateY(0px);
-    background-position: 0 0;
-    animation: option-player-sprite-bounce 3s steps(1) infinite;
+    animation: option-player-sprite-bounce 1s steps(1) infinite;
 }
 
 
