@@ -1803,20 +1803,37 @@ class rpg_game {
         return $composite_sprite_path;
     }
 
+    // Define a function that returns the actual cached sprite path for a given composite image assuming it exists
+    public static function get_sprite_composite_cache_path($config){
+        // Given what we know above, construct the filename for the cached file
+        $composite_base_path = MMRPG_CONFIG_CACHE_PATH.'sprites/';
+        $composite_base_token = str_replace('_', '-', $config['image']);
+        if (!empty($config['size'])){ $composite_base_token .= '_s-'.$config['size']; }
+        if (!empty($config['alt'])){ $composite_base_token .= '_a-'.$config['alt']; }
+        if (!empty($config['frame'])){ $composite_base_token .= '_f-'.$config['frame']; }
+        if (!empty($config['editor'])){ $composite_base_token .= '_e-'.$config['editor']; }
+        if (!empty($config['token'])){ $composite_base_token .= '_t-'.preg_replace('/[^-a-z0-9]+/i', '-', (is_array($config['token']) ? implode(',', $config['token']) : $config['token'])); }
+        $composite_cache_token = $config['kind'].'_'.$composite_base_token;
+        $composite_cache_path_full = $composite_base_path.$composite_cache_token.'.png';
+        $composite_cache_path_rel = str_replace(MMRPG_CONFIG_ROOTDIR, '', $composite_cache_path_full);
+        //error_log('$composite_cache_token = '.print_r($composite_cache_token, true));
+        //error_log('$composite_cache_path_full = '.print_r($composite_cache_path_full, true));
+        //error_log('$composite_cache_path_rel = '.print_r($composite_cache_path_rel, true));
+        return $composite_cache_path_rel;
+    }
+
     // Define a function for collecting a given sprite image's composite index w/ arguments
     public static function get_sprite_composite_index($config = array()){
         //error_log('get_sprite_composite_index($config) w/ $config = '.print_r($config, true));
         // Collect the composite sprite path and index
         $composite_sprite_path = self::get_sprite_composite_path($config);
+        $composite_sprite_cache_path = self::get_sprite_composite_cache_path($config);
         //error_log('$composite_sprite_path = '.print_r($composite_sprite_path, true));
         // Create a cache for the composite index and populate w/ this request if applicable
         static $composite_index_cache = array();
         //error_log('$composite_index_cache = '.print_r($composite_index_cache, true));
         if (!isset($composite_index_cache[$composite_sprite_path])){
-            $composite_index_path = str_replace('.png', '.json', $composite_sprite_path);
-            $composite_index_array = file_get_contents(MMRPG_CONFIG_ROOTURL.$composite_index_path);
-            $composite_index_array = !empty($composite_index_array) ? json_decode($composite_index_array, true) : array();
-            //error_log('$composite_index_path = '.print_r($composite_index_path, true));
+            $composite_index_array = self::get_sprite_composite_index_json($composite_sprite_cache_path);
             //error_log('$composite_index_array = '.print_r($composite_index_array, true));
             $composite_index_cache[$composite_sprite_path] = $composite_index_array;
         }
@@ -1824,6 +1841,52 @@ class rpg_game {
         $composite_sprite_index = $composite_index_cache[$composite_sprite_path];
         //error_log('$composite_sprite_index = '.print_r($composite_sprite_index, true));
         return $composite_sprite_index;
+    }
+
+    // Define a function for loading a given sprite image's composite file either using the appropriate loading/streaming method
+    public static function get_sprite_composite_index_json($composite_sprite_path){
+
+        // Collect the global cache time and break it down to an exact time
+        list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
+        $yyyy = substr($new_cache_date, 0, 4); $mm = substr($new_cache_date, 4, 2); $dd = substr($new_cache_date, 6, 2);
+        $hh = substr($new_cache_time, 0, 2); $ii = substr($new_cache_time, 2, 2);
+        $mmrpg_config_cache_time = mktime($hh, $ii, 0, $mm, $dd, $yyyy);
+        //error_log('$mmrpg_config_cache_time = '.print_r($mmrpg_config_cache_time, true));
+
+        //  Define the index JSON's path give the provided sprite path
+        $composite_index_path = str_replace('.png', '.json', $composite_sprite_path);
+        $composite_index_path_clean = preg_replace('/\?.*/', '', $composite_index_path);
+        //error_log('$composite_index_path = '.print_r($composite_index_path, true));
+        //error_log('$composite_index_path_clean = '.print_r($composite_index_path_clean, true));
+
+        // Check to see if we need to stream or load the static version already cached
+        $can_load_static_file = false;
+        if (file_exists(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean)){
+            $composite_index_filemtime = filemtime(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean);
+            //error_log('$composite_index_filemtime = '.print_r($composite_index_filemtime, true));
+            if ($composite_index_filemtime >= $mmrpg_config_cache_time){
+                //error_log('static file is up-to-date ($composite_index_filemtime >= $mmrpg_config_cache_time)');
+                $can_load_static_file = true;
+            }
+        }
+        //error_log('$can_load_static_file = '.($can_load_static_file ? 'true' : 'false'));
+
+        // If we can load the static file do so now, otherwise we have to use file_get_contents() and stream it
+        $composite_index_json = '';
+        if ($can_load_static_file) {
+            $file_handle = fopen(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean, "r");
+            $composite_index_json = fread($file_handle, filesize(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean));
+            fclose($file_handle);
+        } else {
+            $composite_index_json = file_get_contents(MMRPG_CONFIG_ROOTURL.$composite_index_path);
+        }
+        //error_log('$composite_index_json = '.print_r($composite_index_json, true));
+
+        // Decode the JSON and return the array to the calling function
+        $composite_index_array = !empty($composite_index_json) ? json_decode($composite_index_json, true) : array();
+        //error_log('$composite_index_array = '.print_r($composite_index_array, true));
+        return $composite_index_array;
+
     }
 
 
