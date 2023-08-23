@@ -948,6 +948,91 @@ function mmrpg_prototype_robots_unlocked($player_token = ''){
     }
 
 }
+// Define a function for getting a robots unlocked index for reference
+function mmrpg_prototype_robots_unlocked_index(){
+
+    // Define the game session helper var
+    $session_token = rpg_game::session_token();
+
+    // Collect the actual robots index for reference later
+    $mmrpg_robots_index = rpg_robot::get_index();
+
+    // Define an empty array to hold the unlocked robots index
+    $this_unlocked_robots_index = array();
+
+    // Loop through relevant sessions keys and collect plus merge any robot data
+    $session_battle_keys = array('battle_settings', 'battle_rewards');
+    foreach ($session_battle_keys AS $session_battle_key){
+        if (!empty($_SESSION[$session_token]['values'][$session_battle_key])){
+            foreach ($_SESSION[$session_token]['values'][$session_battle_key] AS $player_token => $player_array){
+                if (!empty($player_array['player_robots'])){
+                    foreach ($player_array['player_robots'] AS $robot_token => $robot_array){
+                        $robot_array['current_player'] = $player_token;
+                        if (!isset($this_unlocked_robots_index[$robot_token])){ $this_unlocked_robots_index[$robot_token] = $robot_array; }
+                        else { $this_unlocked_robots_index[$robot_token] = array_merge($this_unlocked_robots_index[$robot_token], $robot_array); }
+                    }
+                }
+            }
+        }
+    }
+
+    // If robots were found, we need to parse the data and clean it a bit before returning
+    if (!empty($this_unlocked_robots_index)){
+        foreach ($this_unlocked_robots_index AS $robot_token => $robot_array){
+            $robot_info = $mmrpg_robots_index[$robot_token];
+            if (isset($robot_array['flags'])){ $robot_array['flags'] = array_keys($robot_array['flags']); }
+            if (isset($robot_array['robot_abilities'])){ $robot_array['robot_abilities'] = array_keys($robot_array['robot_abilities']); }
+            $robot_array['robot_image_size'] = $robot_info['robot_image_size'];
+            $robot_array['robot_energy_base'] = $robot_info['robot_energy'];
+            $robot_array['robot_weapons_base'] = $robot_info['robot_weapons'];
+            $robot_array['robot_attack_base'] = $robot_info['robot_attack'];
+            $robot_array['robot_defense_base'] = $robot_info['robot_defense'];
+            $robot_array['robot_speed_base'] = $robot_info['robot_speed'];
+            $this_unlocked_robots_index[$robot_token] = $robot_array;
+        }
+    }
+
+    // We're all done so we can return the collected data
+    return $this_unlocked_robots_index;
+
+}
+// Define a function for getting a robots unlocked index in a JSON compatible format
+function mmrpg_prototype_robots_unlocked_index_json(){
+
+    // Define the game session helper var
+    $session_token = rpg_game::session_token();
+
+    // Collect the actual robots index for reference later
+    $mmrpg_robots_index = rpg_robot::get_index();
+
+    // Collect the unlocked robots index from the other function so we can reformat
+    $this_unlocked_robots_index = mmrpg_prototype_robots_unlocked_index();
+
+    // If unlocked robots were found, we can loop through and reformat into the new array
+    $this_unlocked_robots_index_json = array();
+    if (!empty($this_unlocked_robots_index)){
+        foreach ($this_unlocked_robots_index AS $robot_token => $robot_array){
+            $new_robot_array = array();
+            foreach ($robot_array AS $key => $value){
+                $new_key = preg_replace('/^robot_/i', '', $key);
+                if (strpos($new_key, '_') !== false){
+                    $key_parts = explode('_', $new_key);
+                    $new_key = $key_parts[0];
+                    for ($i = 1; $i < count($key_parts); $i++){
+                        $new_key .= ucfirst($key_parts[$i]);
+                    }
+                }
+                $new_robot_array[$new_key] = $value;
+            }
+            $this_unlocked_robots_index_json[$robot_token] = $new_robot_array;
+        }
+    }
+
+    // We're all done so we can return the reformatted data
+    return $this_unlocked_robots_index_json;
+
+}
+
 // Define a function for checking how many hearts have been unlocked by a player
 function mmrpg_prototype_hearts_unlocked($player_token = ''){
     // Define the game session helper var
