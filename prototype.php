@@ -628,15 +628,23 @@ gameSettings.passwordUnlocked = 0;
 gameSettings.startLink = '<?= $prototype_start_link ?>';
 gameSettings.windowEventsCanvas = [];
 gameSettings.windowEventsMessages = [];
+gameSettings.totalMissionsComplete = <?= mmrpg_prototype_battles_complete(false, true) ?>;
 gameSettings.totalPlayerOptions = <?= $unlock_count_players ?>;
 gameSettings.totalRobotOptions = <?= mmrpg_prototype_robots_unlocked() ?>;
 gameSettings.prototypeBannerKey = 0;
 gameSettings.prototypeBanners = ['prototype-banners_title-screen_01.gif'];
 <?
+
 // Define any menu frames already seen so know what's new
 $menu_frames_seen = !empty($_SESSION[$session_token]['battle_settings']['menu_frames_seen']) ? $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] : 'home';
 $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
 echo('gameSettings.menuFramesSeen = '.json_encode($menu_frames_seen).';'.PHP_EOL);
+
+// Generate a JSON array of all currently unlocked player robots w/ basic data for prototype menu reference
+$this_unlocked_robots_index = mmrpg_prototype_robots_unlocked_index_json();
+//error_log('$this_unlocked_robots_index ='.print_r($this_unlocked_robots_index, true));
+echo 'gameSettings.customIndex.unlockedRobotsIndex = '.json_encode($this_unlocked_robots_index).';'.PHP_EOL;
+
 ?>
 
 // Define any preset menu selections
