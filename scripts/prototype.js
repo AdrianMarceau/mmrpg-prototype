@@ -506,7 +506,7 @@ $(document).ready(function(){
     //gameSettings.skipPlayerSelect = false;
 
     // If we're on the actual prototype parent frame, load the ready room now
-    if (window.top == window.self){
+    if (!$('#mmrpg').hasClass('iframe')){
         if (typeof gameSettings.totalMissionsComplete !== 'undefined'
             && gameSettings.totalMissionsComplete >= 2){
             prototype_ready_room_init();
