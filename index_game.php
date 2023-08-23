@@ -88,6 +88,9 @@ $_SESSION['ABILITIES'] = array();
 $_SESSION['ITEMS'] = array();
 $_SESSION['SKILLS'] = array();
 
+// If the player has unlocked more than one playable character,
+// we should clear the player selection so they see the title screen
+if (mmrpg_prototype_players_unlocked() > 1){ unset($_SESSION['GAME']['battle_settings']['this_player_token']); }
 
 // Define the flag that toggles the game's online/offline status
 $this_online_flag = true;
