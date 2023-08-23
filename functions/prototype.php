@@ -895,21 +895,47 @@ function mmrpg_prototype_altimage_unlocked($robot_token, $alt_token = ''){
 
 // Define a function for counting the number of completed prototype battles
 function mmrpg_prototype_battles_complete($player_token, $unique = true){
+
     // Define the game session helper var
     $session_token = mmrpg_game_token();
-    // Collect the battle complete count from the session if set
-    $temp_battle_completes = isset($_SESSION[$session_token]['values']['battle_complete'][$player_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token] : array();
-    //die(count($temp_battle_completes).'<br />'.print_r($temp_battle_completes, true));
-    // Check if only unique battles were requested or ALL battles
-    if (!empty($unique)){
-     $temp_count = count($temp_battle_completes);
-     return $temp_count;
-    } else {
-     $temp_count = 0;
-     foreach ($temp_battle_completes AS $info){ $temp_count += !empty($info['battle_count']) ? $info['battle_count'] : 1; }
-     return $temp_count;
+
+    // Backup the player token that has been requested
+    $requested_player_token = $player_token;
+
+    // Collect the available player tokens from the session
+    $available_player_tokens = isset($_SESSION[$session_token]['values']['battle_complete']) ? array_keys($_SESSION[$session_token]['values']['battle_complete']) : array();
+    //error_log('$available_player_tokens = '.print_r($available_player_tokens, true));
+
+    // Loop through available player tokens one by one
+    $temp_count_total = 0;
+    foreach ($available_player_tokens AS $player_key => $player_token){
+
+        // If the user has requested a specific token and this is not it, continue
+        if (!empty($requested_player_token) && $requested_player_token != $player_token){ continue; }
+
+        // Collect the battle complete count from the session if set
+        $temp_battle_completes = isset($_SESSION[$session_token]['values']['battle_complete'][$player_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token] : array();
+        //error_log('$temp_battle_completes = '.count($temp_battle_completes).' = '.print_r($temp_battle_completes, true));
+
+        // Check if only unique battles were requested or ALL battles
+        if (!empty($unique)){
+            $temp_unique_count = count($temp_battle_completes);
+            //error_log('$temp_unique_count = '.print_r($temp_unique_count, true));
+            $temp_count_total += $temp_unique_count;
+        } else {
+            $temp_all_count = 0;
+            foreach ($temp_battle_completes AS $info){ $temp_all_count += !empty($info['battle_count']) ? $info['battle_count'] : 1; }
+            //error_log('$temp_all_count = '.print_r($temp_all_count, true));
+            $temp_count_total += $temp_all_count;
+        }
+
     }
+    //error_log('$temp_count_total = '.print_r($temp_count_total, true));
+
+    // Return the total number of battles complete
+    return $temp_count_total;
 }
+
 // Define a function for counting the number of failured prototype battles
 function mmrpg_prototype_battles_failure($player_token, $unique = true){
     // Define the game session helper var
@@ -926,12 +952,14 @@ function mmrpg_prototype_battles_failure($player_token, $unique = true){
      return $temp_count;
     }
 }
+
 // Define a function for checking is a prototype player has been unlocked
 function mmrpg_prototype_players_unlocked(){
     // Check if this battle has been completed and return true is it was
     $session_token = mmrpg_game_token();
     return isset($_SESSION[$session_token]['values']['battle_rewards']) ? count($_SESSION[$session_token]['values']['battle_rewards']) : 0;
 }
+
 // Define a function for checking is a prototype robot has been unlocked
 function mmrpg_prototype_robots_unlocked($player_token = ''){
     // Define the game session helper var
