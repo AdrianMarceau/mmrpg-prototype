@@ -7,6 +7,7 @@ var thisWindow = false;
 // Create the prototype battle options object
 gameSettings.fadeIn = false;
 gameSettings.totalRobotLimit = 8;
+gameSettings.totalMissionsComplete = 1;
 gameSettings.totalPlayerOptions = 1;
 gameSettings.nextRobotLimit = 8;
 gameSettings.nextStepName = 'home';
@@ -503,6 +504,18 @@ $(document).ready(function(){
 
     // Reset the animation back to normal
     //gameSettings.skipPlayerSelect = false;
+
+    // If we're on the actual prototype parent frame, load the ready room now
+    if (window.top == window.self){
+        if (typeof gameSettings.totalMissionsComplete !== 'undefined'
+            && gameSettings.totalMissionsComplete >= 2){
+            prototype_ready_room_init();
+            if (typeof battleOptions['this_player_token'] !== 'undefined'
+                && battleOptions['this_player_token'].length){
+                prototype_ready_room_refresh(battleOptions['this_player_token']);
+                }
+            }
+        }
 
 
 });
@@ -1328,23 +1341,23 @@ function prototype_menu_switch(switchOptions){
     if (switchOptions.stepName == 'loading'){
         var newHeight = 124;
         //console.log('Shrinking the banner height to '+newHeight);
-        thisBanner.animate({height:newHeight+'px'},{duration:500,easing:'swing',queue:false});
+        thisBanner.removeClass('fullsize').addClass('compact').animate({height:newHeight+'px'},{duration:500,easing:'swing',queue:false});
         //var thisLoadingMenu = $('.menu[data-step=loading]', thisPrototype);
         //thisLoadingMenu.css({height:'800px',border:'2px solid red'});
         //$('.option_wrapper', thisLoadingMenu).css({height:'800px',border:'2px solid blue'});
         $('.banner_credits', thisBanner).animate({opacity:0},{duration:500,easing:'swing',queue:false,complete:function(){ $(this).css({display:'none'}); } });
-    }
+        }
 
     // Else if this is the HOME screen, expand the banner height
     if ((switchOptions.stepName == '1' || switchOptions.stepNumber == 1)
-            || (gameSettings.demo == true && (switchOptions.stepName == '2' || switchOptions.stepNumber == 2))
-            || (gameSettings.demo != true && gameSettings.totalPlayerOptions == 1 && (switchOptions.stepName == '2' || switchOptions.stepNumber == 2))
-            ){
+        || (gameSettings.demo == true && (switchOptions.stepName == '2' || switchOptions.stepNumber == 2))
+        || (gameSettings.demo != true && gameSettings.totalPlayerOptions == 1 && (switchOptions.stepName == '2' || switchOptions.stepNumber == 2))
+        ){
         var newHeight = 184;
         //console.log('Expanding the banner height to '+newHeight);
-        thisBanner.animate({height:newHeight+'px'},{duration:500,easing:'swing',queue:false});
+        thisBanner.removeClass('compact').addClass('fullsize').animate({height:newHeight+'px'},{duration:500,easing:'swing',queue:false});
         $('.banner_credits', thisBanner).removeClass('is_shifted').css({display:'block'}).animate({opacity:1},{duration:500,easing:'swing',queue:false});
-    }
+        }
 
     // Change the background music to the appropriate file
     if (switchOptions.stepNumber == 1){
@@ -1355,7 +1368,6 @@ function prototype_menu_switch(switchOptions){
         var newMusicPath = newMusicToken.indexOf('/') === -1 ? 'misc/'+newMusicToken : newMusicToken;
         parent.mmrpg_music_load(newMusicPath, true, false);
         }
-    //
 
     // Define the prototype context events
     if (thisContext.length){
@@ -1391,10 +1403,38 @@ function prototype_menu_switch(switchOptions){
             currentMenuCondition = 'this_player_token='+battleOptions.this_player_token;
             }
 
+        // Define a function for checking and managing the read room content
+        var tempReadyRoomFunction = function(loadState){
+            //console.log('tempReadyRoomFunction(loadState:', typeof loadState, loadState, ')');
+            if (typeof loadState === 'undefined'){ loadState = ''; }
+
+            // Update, show, or update the READY ROOM based on option-specific commands for special cases
+            //console.log('switchOptions.stepNumber =', switchOptions.stepNumber);
+            //console.log('currentMenuSelect =', currentMenuSelect);
+            if (currentMenuSelect === 'this_battle_token'
+                && typeof battleOptions['this_player_token'] !== 'undefined'
+                && battleOptions['this_player_token'].length){
+                prototype_ready_room_show();
+                if (loadState === 'fadein'){
+                    prototype_ready_room_refresh(battleOptions['this_player_token']);
+                    }
+                }
+            else if (currentMenuSelect === 'this_player_token'){
+                if (loadState === 'fadein'){
+                    prototype_ready_room_refresh();
+                    }
+                }
+            else if (currentMenuSelect === 'this_player_robots'){
+                prototype_ready_room_hide();
+                }
+
+            };
+
         // Define the function for reloading content
         var tempReloadFunction = function(tempCallbackFunction){
-
+            //console.log('tempReloadFunction(tempCallbackFunction:', typeof tempCallbackFunction, ')');
             if (tempCallbackFunction == undefined){ tempCallbackFunction = function(){}; }
+            tempReadyRoomFunction('reload');
 
             // DEBUG
             //console.log('tempReloadFunction triggered, switchOptions:');
@@ -1549,12 +1589,13 @@ function prototype_menu_switch(switchOptions){
             }
 
 
-        };
+            };
 
         // Create the temporary fadein function for this menu
         var tempFadeinFunction = function(tempCallbackFunction){
-
+            //console.log('tempReloadFunction(tempCallbackFunction:', typeof tempCallbackFunction, ')');
             if (tempCallbackFunction == undefined){ tempCallbackFunction = function(){}; }
+            tempReadyRoomFunction('fadein');
 
             // DEBUG
             //console.log('tempFadeinFunction triggered');
@@ -1648,6 +1689,8 @@ function prototype_menu_switch(switchOptions){
             $('.menu[data-step]:not(.menu_hide)', thisContext).animate(slideOutAnimation, switchOptions.slideDuration, 'swing', tempFadeoutFunction);
 
             // Execute option-specific commands for special cases
+            //console.log('switchOptions.stepNumber =', switchOptions.stepNumber);
+            //console.log('currentMenuSelect =', currentMenuSelect);
             switch (currentMenuSelect){
                 case 'this_battle_token': {
 
@@ -1660,6 +1703,8 @@ function prototype_menu_switch(switchOptions){
                     $('.header', tempMenu).find('.count').html('Mission Select ('+(availableMissions.length == 1 ? '1 Mission' : availableMissions.length+' Missions')+')');
                     $('.menu[data-select="this_battle_token"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
                     $('.menu[data-select="this_player_robots"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
+
+                    // Break when done this case
                     break;
 
                     }
@@ -1674,6 +1719,8 @@ function prototype_menu_switch(switchOptions){
                     var availableRobots = $('.option[data-child]', tempWrapper);
                     var tempMenuHeader = $('.header', tempMenu);
                     tempMenuHeader.find('.count').html('Robot Select ('+(availableRobots.length == 1 ? '1 Robot' : availableRobots.length+' Robots')+')');
+
+                    // Break when done this case
                     break;
 
                     }
@@ -1700,10 +1747,10 @@ function prototype_menu_switch(switchOptions){
 
         // Trigger the reload function for this menu
         tempReloadFunction(tempFadeinFunction);
-        //tempFadeinFunction(tempReloadFunction);
 
 
         }
+
 }
 
 // Define a function for updating the zenny amount in the prototype banner
@@ -1825,4 +1872,211 @@ function prototype_menu_links_refresh(){
                 }
             });
         }
+}
+
+// -- PROTOTYPE READY ROOM FUNCTIONALITY -- //
+
+// Define a function for initializing the ready room with unlocked robots
+function prototype_ready_room_init(){
+    //console.log('prototype_ready_room_init()');
+    // Collect references to important elements relevant to the ready-room
+    var $thisPrototype = $('#prototype');
+    var $thisBanner = $('.banner', $thisPrototype);
+
+    // If the ready room has not been created yet do so now, else collect references
+    if (!$('.ready_room', $thisBanner).length){
+        var $readyRoom = $('<div class="ready_room"></div>');
+        var $readyRoomWrapper = $('<div class="wrapper"></div>');
+        var $readyRoomScene = $('<div class="scene"></div>');
+        var $readyRoomTeam = $('<div class="team"></div>');
+        $readyRoomScene.appendTo($readyRoomWrapper);
+        $readyRoomTeam.appendTo($readyRoomWrapper);
+        $readyRoomWrapper.appendTo($readyRoom);
+        $readyRoomScene.append('<div class="sprite" data-kind="background" data-token="light-laboratory" style="background-image: url(images/fields/light-laboratory/battle-field_background_base.gif?'+gameSettings.cacheTime+'); z-index: 1;"></div>');
+        $readyRoomScene.append('<div class="sprite" data-kind="foreground" data-token="light-laboratory" style="background-image: url(images/fields/light-laboratory/battle-field_foreground_base.png?'+gameSettings.cacheTime+'); z-index: 2;"></div>');
+        $readyRoom.css({opacity: 0});
+        $readyRoom.appendTo($thisBanner);
+        // TEMP TEMP TEMP (for now, hard-code light-laboratory as the background)
+    } else {
+        var $readyRoom = $('.ready_room', $thisBanner);
+        var $readyRoomScene = $('.scene', $readyRoom);
+        var $readyRoomTeam = $('.team', $readyRoom);
+    }
+
+    // If there's no robot index to work with, we can't display the ready room
+    if (typeof gameSettings.customIndex.unlockedRobotsIndex === 'undefined'
+        || !Object.keys(gameSettings.customIndex.unlockedRobotsIndex).length){
+        $readyRoomTeam.find('.sprite').remove();
+        prototype_ready_room_hide();
+        return;
+    }
+
+    // Collect the unlocked robot index and tokens for looping through momentarily
+    var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
+    var unlockedRobotsTokens = Object.keys(unlockedRobotsIndex);
+    //console.log('unlockedRobotsTokens = ', unlockedRobotsTokens.length, unlockedRobotsTokens);
+    //console.log('unlockedRobotsIndex = ', unlockedRobotsIndex.length, unlockedRobotsIndex);
+    // Empty the ready room of any existing sprites
+    $readyRoomTeam.find('.sprite').remove();
+
+    // Define the min and max values for the X and Y offsets
+    var minX = 10, maxX = 90;
+    var minY = 14, maxY = 36;
+
+    // Using the above, define offset ranges mimicking 8 columns and 8 rows for later
+    var colMax = 8, rowMax = 8;
+    var colWidth = Math.floor((maxX - minX) / colMax), rowHeight = Math.floor((maxY - minY) / rowMax);
+    var columnOffsets = {}, rowOffsets = {};
+    for (var i = 0; i < colMax; i++){ columnOffsets[i] = Math.floor(minX + ((maxX - minX) / (colMax - 1)) * i); }
+    for (var i = 0; i < rowMax; i++){ rowOffsets[i] = Math.floor(minY + ((maxY - minY) / (rowMax - 1)) * i); }
+    //console.log('colMax =', colMax, 'rowMax =', rowMax);
+    //console.log('colWidth =', colWidth, 'rowHeight =', rowHeight);
+    //console.log('columnOffsets =', columnOffsets, 'rowOffsets =', rowOffsets);
+
+    // Define an array for keeping track of how many sprites are in each row/column as they're populated
+    var gridCounts = {}, columnCounts = {}, rowCounts = {};
+
+    // Define a function for getting a random column and row within that the above offsets
+    function getRandomColumnRow(limitPerCell){
+        if (typeof limitPerCell !== 'number'){ limitPerCell = 4; }
+        var randomColumn = Math.floor(Math.random() * colMax);
+        var randomRow = Math.floor(Math.random() * rowMax);
+        var randomCell = randomColumn+'-'+randomRow;
+        var columnCount = typeof columnCounts[randomColumn] !== 'undefined' ? columnCounts[randomColumn] : 0;
+        var rowCount = typeof rowCounts[randomRow] !== 'undefined' ? rowCounts[randomRow] : 0;
+        var cellSpriteCount = typeof gridCounts[randomCell] !== 'undefined' ? gridCounts[randomCell] : 0;
+        //console.log('randomColumn =', randomColumn);
+        //console.log('randomRow =', randomRow);
+        //console.log('randomCell =', randomCell);
+        //console.log('columnCount =', columnCount);
+        //console.log('rowCount =', rowCount);
+        //console.log('cellSpriteCount =', cellSpriteCount);
+        if (cellSpriteCount < limitPerCell){
+            columnCounts[randomColumn] = columnCount + 1;
+            rowCounts[randomRow] = rowCount + 1;
+            gridCounts[randomCell] = cellSpriteCount + 1;
+            return [randomColumn, randomRow];
+        } else {
+            return getRandomColumnRow(limitPerCell * 2);
+        }
+    }
+
+    // Define a function for getting the offset values for a given column and row given defined offsets in columnOffsets and rowOffsets
+    function getColumnRowOffsetCenter(thisColumn, thisRow){
+        var thisColumnOffset = columnOffsets[thisColumn];
+        var thisRowOffset = rowOffsets[thisRow];
+        var thisColumnOffsetCenter = thisColumnOffset - (colWidth / 2);
+        var thisRowOffsetCenter = thisRowOffset - (rowHeight / 2);
+        return [thisColumnOffsetCenter, thisRowOffsetCenter];
+    }
+
+    // Loop through unlocked robots and add them to the team div as "sprite" elements
+    for (var i = 0; i < unlockedRobotsTokens.length; i++){
+        var robotToken = unlockedRobotsTokens[i];
+        var unlockedRobot = unlockedRobotsIndex[robotToken];
+        var thisPlayerToken = unlockedRobot.currentPlayer;
+        var thisRobotToken = unlockedRobot.token;
+        var thisSpriteImage = typeof unlockedRobot.image !== 'undefined' && unlockedRobot.image.length ? unlockedRobot.image : unlockedRobot.token;
+        var thisSpriteSize = unlockedRobot.imageSize;
+        var thisSpriteSizeX = thisSpriteSize+'x'+thisSpriteSize;
+        var spriteDirection = Math.floor(Math.random() * 2) ? 'left' : 'right';
+        //console.log('robotToken =', robotToken);
+        //console.log('unlockedRobot =', unlockedRobot);
+        //console.log('thisRobotToken =', thisRobotToken);
+        //console.log('thisPlayerToken =', thisPlayerToken);
+        //console.log('spriteDirection =', spriteDirection);
+        // pick a random column and row for this robot to start off in
+        var randColRow = getRandomColumnRow(1);
+        var randColRowOffsets = getColumnRowOffsetCenter(randColRow[0], randColRow[1]);
+        //console.log('randColRow =', randColRow);
+        //console.log('randColRowOffsets =', randColRowOffsets);
+        var spriteOffsetX = randColRowOffsets[0];
+        var spriteOffsetY = randColRowOffsets[1];
+        if (spriteDirection === 'right'){ spriteOffsetX -= Math.floor(Math.random() * colWidth); }
+        else { spriteOffsetX += Math.floor(Math.random() * colWidth); }
+        var spriteOffsetZ = 100 - spriteOffsetY;
+        var spriteBrightness = (spriteOffsetZ / 100);
+        var spriteFilterValue = 'brightness('+spriteBrightness+')';
+        //console.log('spriteOffsetX =', spriteOffsetX);
+        //console.log('spriteOffsetY =', spriteOffsetY);
+        //console.log('spriteOffsetZ =', spriteOffsetZ);
+        var spriteAnimationDuration = prototype_get_css_animation_duration(unlockedRobot);
+        //console.log('spriteAnimationDuration(C) =', spriteAnimationDuration);
+        // generate the actual markup for the sprite and the inner sprite as well
+        var $sprite = $('<div class="sprite" data-kind="robot" data-player="'+thisPlayerToken+'" data-robot="'+thisRobotToken+'"></div>');
+        $sprite.css({'left': spriteOffsetX+'%', 'bottom': spriteOffsetY+'%', 'z-index': spriteOffsetZ});
+        $sprite.css({'filter': spriteFilterValue});
+        var $spriteInner = $('<div class="sprite" data-size="'+thisSpriteSize+'" data-direction="'+spriteDirection+'"></div>');
+        $spriteInner.css('background-image', 'url(images/robots/'+thisSpriteImage+'/sprite_'+spriteDirection+'_'+thisSpriteSizeX+'.png?'+gameSettings.cacheTime+')');
+        $spriteInner.css({'animation-duration': spriteAnimationDuration+'s'});
+        $sprite.append($spriteInner);
+        // append the newly generated sprite to the ready room
+        //console.log('$readyRoomTeam.append($sprite = ', $sprite, ');');
+        $readyRoomTeam.append($sprite);
+        }
+
+    // We can fade-in the ready room now
+    $readyRoom.css({opacity: 1});
+
+    //console.log('gridCounts =', gridCounts);
+    //console.log('columnCounts =', columnCounts);
+    //console.log('rowCounts =', rowCounts);
+
+}
+
+
+// Define a function for refreshing the ready room with unlocked robots, optionally filtering by player token
+function prototype_ready_room_refresh(filterByPlayerToken) {
+    //console.log('prototype_ready_room_refresh(', filterByPlayerToken, ')');
+    if (typeof filterByPlayerToken !== 'string') { filterByPlayerToken = false; }
+    //console.log('filterByPlayerToken =', filterByPlayerToken);
+    var $thisPrototype = $('#prototype');
+    var $thisBanner = $('.banner', $thisPrototype);
+    var $readyRoom = $('.ready_room', $thisBanner);
+    var $readyRoomTeam = $('.team', $readyRoom);
+    var $allSprites = $readyRoomTeam.find('.sprite[data-kind]');
+    //console.log('$allSprites.length =', $allSprites.length);
+    if (filterByPlayerToken === false) {
+        $allSprites.css({opacity: 1});
+    } else {
+        $allSprites.each(function() {
+            var $thisSprite = $(this);
+            var thisPlayerToken = $thisSprite.attr('data-player');
+            if (thisPlayerToken !== filterByPlayerToken) {
+                $thisSprite.css({opacity: 0});
+            } else {
+                $thisSprite.css({opacity: 1});
+            }
+        });
+    }
+}
+
+// Define a function for calculating the css animation duration for a given robot sprite
+function prototype_get_css_animation_duration(robotInfo){
+    if (typeof robotInfo === 'undefined'){ return false; }
+    this_robot_attack = typeof robotInfo.attackBase !== 'undefined' ? robotInfo.attackBase : 100;
+    this_robot_defense = typeof robotInfo.defenseBase !== 'undefined' ? robotInfo.defenseBase : 100;
+    this_robot_speed = typeof robotInfo.speedBase !== 'undefined' ? robotInfo.speedBase : 100;
+    robot_animation_duration = 1;
+    robot_animation_duration -= robot_animation_duration * (this_robot_speed / (this_robot_attack + this_robot_defense + this_robot_speed));
+    if (robot_animation_duration < 0.1){ robot_animation_duration = 0.1; }
+    return robot_animation_duration;
+}
+
+// Define a function for showing the prototype ready room element
+function prototype_ready_room_show(){
+    //console.log('prototype_ready_room_show()');
+    var $thisBanner = $('#prototype .banner');
+    var $readyRoom = $('.ready_room', $thisBanner);
+    $readyRoom.removeClass('hidden');
+    $readyRoom.css({opacity: 1});
+}
+
+// Define a function for hiding the prototype ready room element
+function prototype_ready_room_hide(){
+    //console.log('prototype_ready_room_hide()');
+    var $thisBanner = $('#prototype .banner');
+    var $readyRoom = $('.ready_room', $thisBanner);
+    $readyRoom.css({opacity: 0});
+    $readyRoom.addClass('hidden');
 }
