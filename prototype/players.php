@@ -83,11 +83,12 @@ else {
     // Print out the normal mode's player select screen for Dr. Light
     if ($unlock_flag_light){
         $doctor_info = $mmrpg_player_index['dr-light'];
+        $doctor_sprite_path = 'images/players/dr-light/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $text_robots_unlocked = $prototype_data['dr-light']['robots_unlocked'].' Robot'.($prototype_data['dr-light']['robots_unlocked'] != 1 ? 's' : '');
         $text_points_unlocked = number_format($prototype_data['dr-light']['points_unlocked'], 0, '.', ',').' Point'.($prototype_data['dr-light']['points_unlocked'] != 1 ? 's' : '');
         $text_battles_complete = $prototype_data['dr-light']['battles_complete'].' Mission'.($prototype_data['dr-light']['battles_complete'] != 1 ? 's' : '');
         $text_player_special = $prototype_data['dr-light']['prototype_complete'] ? true : false;
-        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url(images/players/dr-light/sprite_right_40x40.png); top: -2px; right: 14px; z-index: 60;">Dr. Light</span>';
+        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.'); top: -2px; right: 14px; z-index: 60;">Dr. Light</span>';
         $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites('dr-light', $session_token);
         $text_player_music = mmrpg_prototype_get_player_mission_music('dr-light', $session_token);
         $text_player_chapter = $get_current_chapter_text('dr-light', $chapters_unlocked_light);
@@ -103,11 +104,12 @@ else {
     // Print out the normal mode's player select screen for Dr. Wily
     if ($unlock_flag_wily){
         $doctor_info = $mmrpg_player_index['dr-wily'];
+        $doctor_sprite_path = 'images/players/dr-wily/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $text_robots_unlocked = $prototype_data['dr-wily']['robots_unlocked'].' Robot'.($prototype_data['dr-wily']['robots_unlocked'] != 1 ? 's' : '');
         $text_points_unlocked = number_format($prototype_data['dr-wily']['points_unlocked'], 0, '.', ',').' Point'.($prototype_data['dr-wily']['points_unlocked'] != 1 ? 's' : '');
         $text_battles_complete = $prototype_data['dr-wily']['battles_complete'].' Mission'.($prototype_data['dr-light']['battles_complete'] != 1 ? 's' : '');
         $text_player_special = $prototype_data['dr-wily']['prototype_complete'] ? true : false;
-        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url(images/players/dr-wily/sprite_right_40x40.png); top: -2px; right: 14px; z-index: 60;">Dr. Wily</span>';
+        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.'); top: -2px; right: 14px; z-index: 60;">Dr. Wily</span>';
         $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites('dr-wily', $session_token);
         $text_player_music = mmrpg_prototype_get_player_mission_music('dr-wily', $session_token);
         $text_player_chapter = $get_current_chapter_text('dr-wily', $chapters_unlocked_wily);
@@ -123,11 +125,12 @@ else {
     // Print out the normal mode's player select screen for Dr. Cossack
     if ($unlock_flag_cossack){
         $doctor_info = $mmrpg_player_index['dr-cossack'];
+        $doctor_sprite_path = 'images/players/dr-cossack/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $text_robots_unlocked = $prototype_data['dr-cossack']['robots_unlocked'].' Robot'.($prototype_data['dr-cossack']['robots_unlocked'] != 1 ? 's' : '');
         $text_points_unlocked = number_format($prototype_data['dr-cossack']['points_unlocked'], 0, '.', ',').' Point'.($prototype_data['dr-cossack']['points_unlocked'] != 1 ? 's' : '');
         $text_battles_complete = $prototype_data['dr-cossack']['battles_complete'].' Mission'.($prototype_data['dr-light']['battles_complete'] != 1 ? 's' : '');
         $text_player_special = $prototype_data['dr-cossack']['prototype_complete'] ? true : false;
-        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url(images/players/dr-cossack/sprite_right_40x40.png); top: -2px; right: 14px; z-index: 60;">Dr. Cossack</span>';
+        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.'); top: -2px; right: 14px; z-index: 60;">Dr. Cossack</span>';
         $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites('dr-cossack', $session_token);
         $text_player_music = mmrpg_prototype_get_player_mission_music('dr-cossack', $session_token);
         $text_player_chapter = $get_current_chapter_text('dr-cossack', $chapters_unlocked_cossack);
