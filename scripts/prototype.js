@@ -1762,11 +1762,14 @@ function prototype_menu_switch(switchOptions){
             $('.menu[data-step]:not(.menu_hide)', thisContext).animate(slideOutAnimation, switchOptions.slideDuration, 'swing', tempFadeoutFunction);
 
             // Remove any running classes from the player sprites in the banner until we know they're needed
-            $('.banner .option_this-player-select', thisContext).removeClass('is_running');
+            // (do not remove if the next step is undefined / aka we are entering a battle)
+            if (switchOptions.stepNumber !== false){
+                $('.banner .option_this-player-select', thisContext).removeClass('is_running');
+                }
 
             // Execute option-specific commands for special cases
-            //console.log('switchOptions.stepNumber =', switchOptions.stepNumber);
-            //console.log('currentMenuSelect =', currentMenuSelect);
+            console.log('switchOptions.stepNumber =', switchOptions.stepNumber);
+            console.log('currentMenuSelect =', currentMenuSelect);
             switch (currentMenuSelect){
                 case 'this_battle_token': {
 
