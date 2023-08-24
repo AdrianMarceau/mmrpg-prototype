@@ -505,13 +505,13 @@ $(document).ready(function(){
     // Reset the animation back to normal
     //gameSettings.skipPlayerSelect = false;
 
+    // -- READY ROOM INIT AND TRANSITIONS -- //
+
     // If we're on the actual prototype parent frame, load the ready room now
     if (!$('#mmrpg').hasClass('iframe')){
-
         // Only add the ready room to the banner after the player has unlocked their first homebase
         if (typeof gameSettings.totalMissionsComplete !== 'undefined'
             && gameSettings.totalMissionsComplete >= 2){
-
             // Initialize the ready room on prototype home page load
             prototype_ready_room_init(function(){
 
@@ -524,25 +524,52 @@ $(document).ready(function(){
                 // Start the actual ready room animation when it's appropriate to do so
                 prototype_ready_room_start_animation();
 
-                // Auto-fade the logo after we've seen it for long enough (we wanna see the ready room!)
-                if (true){
-                    //console.log('queue fading the logo');
-                    setTimeout(function(){
-                        //console.log('time to fade the logo');
-                        $('.banner .banner_credits', thisContext).removeClass('is_shifted').animate({opacity:0},{duration:3000,easing:'swing',sync:false,complete:function(){
-                            //console.log('logo has been faded');
-                            $(this).addClass('is_shifted');
-                            $(this).addClass('hidden');
-                            }});
-                        }, 3000);
+                // Define a function to auto-fade the logo after we've seen it for long enough (we wanna see the ready room!)
+                var fadeOutLogo = function(){
+                    fadeOutLogo = function(){}; // prevent from triggering again
+                    //console.log('time to fade the logo');
+                    $('.banner .banner_credits', thisContext).removeClass('is_shifted').animate({opacity:0},{duration:1000,easing:'swing',sync:false,complete:function(){
+                        //console.log('logo has been faded');
+                        $(this).addClass('is_shifted');
+                        $(this).addClass('hidden');
+                        }});
+                    };
+
+                // Either fade out the logo immediately (if we have focus) or queue it for when the game (as per the parent window) is ready
+                if (document.hasFocus()){
+
+                    //console.log('document already has focus');
+                    //console.log('we can queue logo fade');
+                    setTimeout(fadeOutLogo, 3000);
+
+                    }
+                else {
+
+                    //console.log('wait for window focus/hover');
+                    var checkPrototypeFocus;
+                    checkPrototypeFocus = function(){
+                        //console.log('checkPrototypeFocus()');
+                        var parentGameSettings = typeof window.top.gameSettings !== 'undefined' ? window.top.gameSettings : {};
+                        var gameHasStarted = typeof parentGameSettings.gameHasStarted !== 'undefined' ? parentGameSettings.gameHasStarted : false;
+                        //console.log('parentGameSettings =', parentGameSettings);
+                        //console.log('gameHasStarted =', gameHasStarted);
+                        if (gameHasStarted){
+                            //console.log('game has started, queue logo fade');
+                            setTimeout(fadeOutLogo, 3000);
+                            } else {
+                            setTimeout(checkPrototypeFocus, 1000);
+                            }
+                        };
+                    setTimeout(checkPrototypeFocus, 1000);
+
                     }
 
                 });
-
             }
-
         }
 
+
+    // -- end of document ready markup -- //
 
 });
 
