@@ -507,13 +507,21 @@ $(document).ready(function(){
 
     // If we're on the actual prototype parent frame, load the ready room now
     if (!$('#mmrpg').hasClass('iframe')){
+
+        // Only add the ready room to the banner after the player has unlocked their first homebase
         if (typeof gameSettings.totalMissionsComplete !== 'undefined'
             && gameSettings.totalMissionsComplete >= 2){
+
+            // Initialize the ready room on prototype home page load
             prototype_ready_room_init();
+
+            // Filter to only the current player if one has been set
             if (typeof battleOptions['this_player_token'] !== 'undefined'
                 && battleOptions['this_player_token'].length){
                 prototype_ready_room_refresh(battleOptions['this_player_token']);
                 }
+
+            // Start the actual ready room animation when it's appropriate to do so
             if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
                 window.top.mmrpg_queue_for_game_start(function(){
                     setTimeout(function(){ prototype_ready_room_start_animation(); }, 1000);
@@ -521,7 +529,22 @@ $(document).ready(function(){
                 } else {
                 prototype_ready_room_start_animation();
                 }
+
+            // Auto-fade the logo after we've seen it for long enough (we wanna see the ready room!)
+            if (true){
+                //console.log('queue fading the logo');
+                setTimeout(function(){
+                    //console.log('time to fade the logo');
+                    $('.banner .banner_credits', thisContext).removeClass('is_shifted').animate({opacity:0},{duration:3000,easing:'swing',sync:false,complete:function(){
+                        //console.log('logo has been faded');
+                        $(this).addClass('is_shifted');
+                        $(this).addClass('hidden');
+                        }});
+                    }, 3000);
+                }
+
             }
+
         }
 
 
@@ -1105,7 +1128,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
             // Append this option object to the main banner window
             var cloneOption = thisOption.clone();
             var cloneWidth = ((numOptions * 8) + 42);
-            if (thisSelect === 'this_player_token'){ cloneWidth = 28; }
+            if (thisSelect === 'this_player_token'){ cloneWidth = 25; }
             cloneOption.attr('data-select', thisSelect);
             cloneOption.removeClass('option_1x1 option_1x2 option_1x3 option_1x4').addClass('option_1x'+thisPosition);
             cloneOption.find('.arrow').css({right:0});
@@ -1695,6 +1718,9 @@ function prototype_menu_switch(switchOptions){
             // Automatically fade-out the previous menu screen
             $('.menu[data-step]:not(.menu_hide)', thisContext).animate(slideOutAnimation, switchOptions.slideDuration, 'swing', tempFadeoutFunction);
 
+            // Remove any running classes from the player sprites in the banner until we know they're needed
+            $('.banner .option_this-player-select', thisContext).removeClass('is_running');
+
             // Execute option-specific commands for special cases
             //console.log('switchOptions.stepNumber =', switchOptions.stepNumber);
             //console.log('currentMenuSelect =', currentMenuSelect);
@@ -1716,6 +1742,9 @@ function prototype_menu_switch(switchOptions){
 
                     }
                 case 'this_player_robots': {
+
+                    // Update the player option in the banner to the "running" sprite
+                    $('.banner .option_this-player-select', thisContext).addClass('is_running');
 
                     // Prevent the player from fighting themselves in battle
                     var tempCondition = 'this_player_token='+battleOptions['this_player_token'];
@@ -1890,6 +1919,7 @@ gameSettings.readyRoomAnimateLastUpdate = 0;
 gameSettings.readyRoomAnimateThreshold = 1000;
 gameSettings.readyRoomAnimateChargeUps = {};
 gameSettings.readyRoomFramesPerSecond = 30;
+gameSettings.readyRoomSpriteGrid = {};
 gameSettings.readyRoomSpriteBounds = {minX: 10, maxX: 90, minY: 14, maxY: 36};
 gameSettings.readyRoomSpritesIndex = {};
 gameSettings.readyRoomIsReady = false;
@@ -1940,130 +1970,51 @@ function prototype_ready_room_init(){
 
     // Define the min and max values for the X and Y offsets
     var spriteBounds = gameSettings.readyRoomSpriteBounds;
-    var minX = spriteBounds.minX, maxX = spriteBounds.maxX;
-    var minY = spriteBounds.minY, maxY = spriteBounds.maxY;
+    var spriteGrid = gameSettings.readyRoomSpriteGrid;
+
+    // Update the sprite bounds if there aren't that many robots
+    var readyRoomShrinkFactor = 30;
+    if (gameSettings.totalRobotOptions < readyRoomShrinkFactor){
+        var missingRobots = readyRoomShrinkFactor - gameSettings.totalRobotOptions;
+        var shiftLimit = readyRoomShrinkFactor / 2;
+        var xOffsetShift = Math.ceil(missingRobots * 2);
+        if (xOffsetShift > shiftLimit){ xOffsetShift = shiftLimit; }
+        spriteBounds.minX += xOffsetShift;
+        spriteBounds.maxX -= xOffsetShift;
+        //console.log('modded spriteBounds =', spriteBounds);
+        }
 
     // Using the above, define offset ranges mimicking 8 columns and 8 rows for later
-    var colMax = 8, rowMax = 8;
-    var colWidth = Math.floor((maxX - minX) / colMax), rowHeight = Math.floor((maxY - minY) / rowMax);
-    var columnOffsets = {}, rowOffsets = {};
-    for (var i = 0; i < colMax; i++){ columnOffsets[i] = Math.floor(minX + ((maxX - minX) / (colMax - 1)) * i); }
-    for (var i = 0; i < rowMax; i++){ rowOffsets[i] = Math.floor(minY + ((maxY - minY) / (rowMax - 1)) * i); }
-    //console.log('colMax =', colMax, 'rowMax =', rowMax);
-    //console.log('colWidth =', colWidth, 'rowHeight =', rowHeight);
-    //console.log('columnOffsets =', columnOffsets, 'rowOffsets =', rowOffsets);
+    spriteGrid.colMax = 8;
+    spriteGrid.rowMax = 8;
+    spriteGrid.colWidth = Math.floor((spriteBounds.maxX - spriteBounds.minX) / spriteGrid.colMax);
+    spriteGrid.rowHeight = Math.floor((spriteBounds.maxY - spriteBounds.minY) / spriteGrid.rowMax);
+    spriteGrid.columnOffsets = {};
+    spriteGrid.rowOffsets = {};
+    for (var i = 0; i < spriteGrid.colMax; i++){ spriteGrid.columnOffsets[i] = Math.floor(spriteBounds.minX + ((spriteBounds.maxX - spriteBounds.minX) / (spriteGrid.colMax - 1)) * i); }
+    for (var i = 0; i < spriteGrid.rowMax; i++){ spriteGrid.rowOffsets[i] = Math.floor(spriteBounds.minY + ((spriteBounds.maxY - spriteBounds.minY) / (spriteGrid.rowMax - 1)) * i); }
+    //console.log('spriteGrid.colMax =', spriteGrid.colMax, 'spriteGrid.rowMax =', spriteGrid.rowMax);
+    //console.log('spriteGrid.colWidth =', spriteGrid.colWidth, 'spriteGrid.rowHeight =', spriteGrid.rowHeight);
+    //console.log('spriteGrid.columnOffsets =', spriteGrid.columnOffsets, 'spriteGrid.rowOffsets =', spriteGrid.rowOffsets);
 
     // Define an array for keeping track of how many sprites are in each row/column as they're populated
-    var gridCounts = {}, columnCounts = {}, rowCounts = {};
-
-    // Define a function for getting a random column and row within that the above offsets
-    function getRandomColumnRow(limitPerCell){
-        if (typeof limitPerCell !== 'number'){ limitPerCell = 4; }
-        var randomColumn = Math.floor(Math.random() * colMax);
-        var randomRow = Math.floor(Math.random() * rowMax);
-        var randomCell = randomColumn+'-'+randomRow;
-        var columnCount = typeof columnCounts[randomColumn] !== 'undefined' ? columnCounts[randomColumn] : 0;
-        var rowCount = typeof rowCounts[randomRow] !== 'undefined' ? rowCounts[randomRow] : 0;
-        var cellSpriteCount = typeof gridCounts[randomCell] !== 'undefined' ? gridCounts[randomCell] : 0;
-        //console.log('randomColumn =', randomColumn);
-        //console.log('randomRow =', randomRow);
-        //console.log('randomCell =', randomCell);
-        //console.log('columnCount =', columnCount);
-        //console.log('rowCount =', rowCount);
-        //console.log('cellSpriteCount =', cellSpriteCount);
-        if (cellSpriteCount < limitPerCell){
-            columnCounts[randomColumn] = columnCount + 1;
-            rowCounts[randomRow] = rowCount + 1;
-            gridCounts[randomCell] = cellSpriteCount + 1;
-            return [randomColumn, randomRow];
-        } else {
-            return getRandomColumnRow(limitPerCell * 2);
-        }
-    }
-
-    // Define a function for getting the offset values for a given column and row given defined offsets in columnOffsets and rowOffsets
-    function getColumnRowOffsetCenter(thisColumn, thisRow){
-        var thisColumnOffset = columnOffsets[thisColumn];
-        var thisRowOffset = rowOffsets[thisRow];
-        var thisColumnOffsetCenter = thisColumnOffset - (colWidth / 2);
-        var thisRowOffsetCenter = thisRowOffset - (rowHeight / 2);
-        return [thisColumnOffsetCenter, thisRowOffsetCenter];
-    }
+    spriteGrid.gridCounts = {};
+    spriteGrid.columnCounts = {};
+    spriteGrid.rowCounts = {};
 
     // Loop through unlocked robots and add them to the team div as "sprite" elements
     for (var i = 0; i < unlockedRobotsTokens.length; i++){
         var robotToken = unlockedRobotsTokens[i];
         var unlockedRobot = unlockedRobotsIndex[robotToken];
-        var thisPlayerToken = unlockedRobot.currentPlayer;
-        var thisRobotToken = unlockedRobot.token;
-        var thisSpriteSize = unlockedRobot.imageSize;
-        var thisSpriteSizeX = thisSpriteSize+'x'+thisSpriteSize;
-        var spriteDirection = Math.floor(Math.random() * 2) ? 'left' : 'right';
-        var spriteFrame = 0;
-        //console.log('robotToken =', robotToken);
-        //console.log('unlockedRobot =', unlockedRobot);
-        //console.log('thisRobotToken =', thisRobotToken);
-        //console.log('thisPlayerToken =', thisPlayerToken);
-        //console.log('spriteDirection =', spriteDirection);
-        var thisSpriteImage = typeof unlockedRobot.image !== 'undefined' && unlockedRobot.image.length ? unlockedRobot.image : unlockedRobot.token;
-        var thisSpriteImageDirection = 'right';
-        //var thisSpriteImagePath = 'images/robots/'+thisSpriteImage+'/sprite_'+spriteDirection+'_'+thisSpriteSizeX+'.png'; // lets save resources
-        var thisSpriteImagePath = 'images/robots/'+thisSpriteImage+'/sprite_'+thisSpriteImageDirection+'_'+thisSpriteSizeX+'.png';
-        // pick a random column and row for this robot to start off in
-        var randColRow = getRandomColumnRow(1);
-        var randColRowOffsets = getColumnRowOffsetCenter(randColRow[0], randColRow[1]);
-        //console.log('randColRow =', randColRow);
-        //console.log('randColRowOffsets =', randColRowOffsets);
-        var spriteOffsetX = randColRowOffsets[0];
-        var spriteOffsetY = randColRowOffsets[1];
-        if (spriteDirection === 'right'){ spriteOffsetX -= Math.floor(Math.random() * colWidth); }
-        else { spriteOffsetX += Math.floor(Math.random() * colWidth); }
-        var spriteOffsetZ = 100 - spriteOffsetY;
-        var spriteBrightness = (spriteOffsetZ / 100);
-        var spriteFilterValue = 'brightness('+spriteBrightness+')';
-        //console.log('spriteOffsetX =', spriteOffsetX);
-        //console.log('spriteOffsetY =', spriteOffsetY);
-        //console.log('spriteOffsetZ =', spriteOffsetZ);
-        var spriteAnimationDuration = prototype_get_css_animation_duration(unlockedRobot);
-        //console.log('spriteAnimationDuration(C) =', spriteAnimationDuration);
-        // generate the actual markup for the sprite and the inner sprite as well
-        var $sprite = $('<div class="sprite" data-kind="robot" data-player="'+thisPlayerToken+'" data-robot="'+thisRobotToken+'"></div>');
-        $sprite.css({'left': spriteOffsetX+'%', 'bottom': spriteOffsetY+'%', 'z-index': spriteOffsetZ});
-        $sprite.css({'filter': spriteFilterValue});
-        $sprite.css({'transform': 'scale('+(spriteDirection !== thisSpriteImageDirection ? -2 : 2)+', 2)'});
-        var $spriteInner = $('<div class="sprite" data-size="'+thisSpriteSize+'" data-direction="'+spriteDirection+'" data-frame="'+spriteFrame+'"></div>');
-        $spriteInner.css('background-image', 'url('+thisSpriteImagePath+'?'+gameSettings.cacheTime+')');
-        $spriteInner.css({'animation-duration': spriteAnimationDuration+'s'});
-        $sprite.append($spriteInner);
-        // append the newly generated sprite to the ready room
-        //console.log('$readyRoomTeam.append($sprite = ', $sprite, ');');
-        $sprite.appendTo($readyRoomTeam);
-        readyRoomSpritesIndex[robotToken] = {
-            sprite: $sprite,
-            spriteInner: $spriteInner,
-            image: thisSpriteImage,
-            imagePath: thisSpriteImagePath,
-            imageDirection: thisSpriteImageDirection,
-            kind: 'robot',
-            player: thisPlayerToken,
-            robot: thisRobotToken,
-            size: thisSpriteSize,
-            direction: spriteDirection,
-            frame: spriteFrame,
-            position: [spriteOffsetX, spriteOffsetY, spriteOffsetZ],
-            animate: true,
-            haste: spriteAnimationDuration,
-            charge: 0,
-            cooldown: 0
-            };
+        prototype_ready_room_add_robot_sprite(robotToken, unlockedRobot);
         }
 
     // We can fade-in the ready room now
     $readyRoom.css({opacity: 1});
 
-    //console.log('gridCounts =', gridCounts);
-    //console.log('columnCounts =', columnCounts);
-    //console.log('rowCounts =', rowCounts);
+    //console.log('spriteGrid.gridCounts =', spriteGrid.gridCounts);
+    //console.log('spriteGrid.columnCounts =', spriteGrid.columnCounts);
+    //console.log('spriteGrid.rowCounts =', spriteGrid.rowCounts);
     //console.log('readyRoomSpritesIndex =', readyRoomSpritesIndex);
 
     // Update the ready flag for the ready room
@@ -2425,4 +2376,127 @@ function prototype_ready_room_hide(){
     var $readyRoom = gameSettings.thisReadyRoomElement;
     $readyRoom.css({opacity: 0});
     $readyRoom.addClass('hidden');
+}
+
+// Define a function for adding a new robot to the unlocked robot index
+function prototype_ready_room_add_robot(robotToken, robotInfo){
+    //console.log('prototype_ready_room_add_robot(robotToken:', robotToken, ', robotInfo:', robotInfo, ')');
+    // Collect the unlocked robots index
+    var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
+    //console.log('unlockedRobotsIndex =', unlockedRobotsIndex);
+    // If the robot is already in the index, we don't need to do anything
+    if (typeof unlockedRobotsIndex[robotToken] !== 'undefined'){ return false; }
+    // Otherwise we need to add the robot to the index
+    unlockedRobotsIndex[robotToken] = robotInfo;
+    //console.log('unlockedRobotsIndex =', unlockedRobotsIndex);
+    // Now we need to update the robot's sprite in the ready room
+    prototype_ready_room_add_robot_sprite(robotToken, robotInfo);
+}
+
+// Define a function for adding a new sprite to the ready room given info
+function prototype_ready_room_add_robot_sprite(robotToken, robotInfo){
+    //console.log('prototype_ready_room_add_robot_sprite(robotToken:', robotToken, ', robotInfo:', robotInfo, ')');
+    var spriteGrid = gameSettings.readyRoomSpriteGrid;
+    var spritesIndex = gameSettings.readyRoomSpritesIndex;
+    var $readyRoom = gameSettings.thisReadyRoomElement;
+    var $readyRoomTeam = $('.team', $readyRoom);
+    var thisPlayerToken = robotInfo.currentPlayer;
+    var thisRobotToken = robotInfo.token;
+    var thisSpriteSize = robotInfo.imageSize;
+    var thisSpriteSizeX = thisSpriteSize+'x'+thisSpriteSize;
+    var spriteDirection = Math.floor(Math.random() * 2) ? 'left' : 'right';
+    var spriteFrame = 0;
+    //console.log('robotToken =', robotToken);
+    //console.log('robotInfo =', robotInfo);
+    //console.log('thisRobotToken =', thisRobotToken);
+    //console.log('thisPlayerToken =', thisPlayerToken);
+    //console.log('spriteDirection =', spriteDirection);
+    var thisSpriteImage = typeof robotInfo.image !== 'undefined' && robotInfo.image.length ? robotInfo.image : robotInfo.token;
+    var thisSpriteImageDirection = 'right';
+    //var thisSpriteImagePath = 'images/robots/'+thisSpriteImage+'/sprite_'+spriteDirection+'_'+thisSpriteSizeX+'.png'; // lets save resources
+    var thisSpriteImagePath = 'images/robots/'+thisSpriteImage+'/sprite_'+thisSpriteImageDirection+'_'+thisSpriteSizeX+'.png';
+    // pick a random column and row for this robot to start off in
+    var randColRow = prototype_ready_room_random_colrow(1);
+    var randColRowOffsets = prototype_ready_room_colrow_center(randColRow[0], randColRow[1]);
+    //console.log('randColRow =', randColRow);
+    //console.log('randColRowOffsets =', randColRowOffsets);
+    var spriteOffsetX = randColRowOffsets[0];
+    var spriteOffsetY = randColRowOffsets[1];
+    if (spriteDirection === 'right'){ spriteOffsetX -= Math.floor(Math.random() * spriteGrid.colWidth); }
+    else { spriteOffsetX += Math.floor(Math.random() * spriteGrid.colWidth); }
+    var spriteOffsetZ = 100 - spriteOffsetY;
+    var spriteBrightness = (spriteOffsetZ / 100);
+    var spriteFilterValue = 'brightness('+spriteBrightness+')';
+    //console.log('spriteOffsetX =', spriteOffsetX);
+    //console.log('spriteOffsetY =', spriteOffsetY);
+    //console.log('spriteOffsetZ =', spriteOffsetZ);
+    var spriteAnimationDuration = prototype_get_css_animation_duration(robotInfo);
+    //console.log('spriteAnimationDuration(C) =', spriteAnimationDuration);
+    // generate the actual markup for the sprite and the inner sprite as well
+    var $sprite = $('<div class="sprite" data-kind="robot" data-player="'+thisPlayerToken+'" data-robot="'+thisRobotToken+'"></div>');
+    $sprite.css({'left': spriteOffsetX+'%', 'bottom': spriteOffsetY+'%', 'z-index': spriteOffsetZ});
+    $sprite.css({'filter': spriteFilterValue});
+    $sprite.css({'transform': 'scale('+(spriteDirection !== thisSpriteImageDirection ? -2 : 2)+', 2)'});
+    var $spriteInner = $('<div class="sprite" data-size="'+thisSpriteSize+'" data-direction="'+spriteDirection+'" data-frame="'+spriteFrame+'"></div>');
+    $spriteInner.css('background-image', 'url('+thisSpriteImagePath+'?'+gameSettings.cacheTime+')');
+    $spriteInner.css({'animation-duration': spriteAnimationDuration+'s'});
+    $sprite.append($spriteInner);
+    // append the newly generated sprite to the ready room
+    //console.log('$readyRoomTeam.append($sprite = ', $sprite, ');');
+    $sprite.appendTo($readyRoomTeam);
+    spritesIndex[robotToken] = {
+        sprite: $sprite,
+        spriteInner: $spriteInner,
+        image: thisSpriteImage,
+        imagePath: thisSpriteImagePath,
+        imageDirection: thisSpriteImageDirection,
+        kind: 'robot',
+        player: thisPlayerToken,
+        robot: thisRobotToken,
+        size: thisSpriteSize,
+        direction: spriteDirection,
+        frame: spriteFrame,
+        position: [spriteOffsetX, spriteOffsetY, spriteOffsetZ],
+        animate: true,
+        haste: spriteAnimationDuration,
+        charge: 0,
+        cooldown: 0
+        };
+
+}
+
+// Define a function for getting a random column and row within that the above offsets
+function prototype_ready_room_random_colrow(limitPerCell){
+    var spriteGrid = gameSettings.readyRoomSpriteGrid;
+    if (typeof limitPerCell !== 'number'){ limitPerCell = 4; }
+    var randomColumn = Math.floor(Math.random() * spriteGrid.colMax);
+    var randomRow = Math.floor(Math.random() * spriteGrid.rowMax);
+    var randomCell = randomColumn+'-'+randomRow;
+    var columnCount = typeof spriteGrid.columnCounts[randomColumn] !== 'undefined' ? spriteGrid.columnCounts[randomColumn] : 0;
+    var rowCount = typeof spriteGrid.rowCounts[randomRow] !== 'undefined' ? spriteGrid.rowCounts[randomRow] : 0;
+    var cellSpriteCount = typeof spriteGrid.gridCounts[randomCell] !== 'undefined' ? spriteGrid.gridCounts[randomCell] : 0;
+    //console.log('randomColumn =', randomColumn);
+    //console.log('randomRow =', randomRow);
+    //console.log('randomCell =', randomCell);
+    //console.log('columnCount =', columnCount);
+    //console.log('rowCount =', rowCount);
+    //console.log('cellSpriteCount =', cellSpriteCount);
+    if (cellSpriteCount < limitPerCell){
+        spriteGrid.columnCounts[randomColumn] = columnCount + 1;
+        spriteGrid.rowCounts[randomRow] = rowCount + 1;
+        spriteGrid.gridCounts[randomCell] = cellSpriteCount + 1;
+        return [randomColumn, randomRow];
+    } else {
+        return prototype_ready_room_random_colrow(limitPerCell * 2);
+    }
+}
+
+// Define a function for getting the offset values for a given column and row given defined offsets in columnOffsets and rowOffsets
+function prototype_ready_room_colrow_center(thisColumn, thisRow){
+    var spriteGrid = gameSettings.readyRoomSpriteGrid;
+    var thisColumnOffset = spriteGrid.columnOffsets[thisColumn];
+    var thisRowOffset = spriteGrid.rowOffsets[thisRow];
+    var thisColumnOffsetCenter = thisColumnOffset - (spriteGrid.colWidth / 2);
+    var thisRowOffsetCenter = thisRowOffset - (spriteGrid.rowHeight / 2);
+    return [thisColumnOffsetCenter, thisRowOffsetCenter];
 }

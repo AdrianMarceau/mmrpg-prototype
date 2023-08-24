@@ -135,6 +135,10 @@ body.prototype {
     background-position: center 5px;
     pointer-events: none;
 }
+#prototype .banner .credits.hidden {
+    display: none !important;
+    visibility: hidden !important;
+}
 #prototype .banner .overlay {
     z-index: 40;
     background-color: #000000;
@@ -1709,6 +1713,13 @@ body[data-source="website"] #prototype .menu {
     50% { transform: translateY(-1px); }
     100% { transform: translateY(0px); }
 }
+@keyframes option-player-sprite-run {
+    0% { transform: translateY(0px); background-position: 0px 0px; }
+    25% { transform: translateY(-1px); background-position: -280px 0px; }
+    50% { transform: translateY(0px); background-position: -320px 0px; }
+    75% { transform: translateY(-1px); background-position: -360px 0px; }
+    100% { transform: translateY(0px); background-position: 0px 0px; }
+}
 #mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_robot {
     transform: translateY(0px);
     animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
@@ -1730,6 +1741,10 @@ body[data-source="website"] #prototype .menu {
 #prototype .banner .option_1x1 div label.has_image .sprite_player {
     transform: translateY(0px);
     animation: option-player-sprite-bounce 1s steps(1) infinite;
+}
+#prototype .banner .option_1x1.is_running div label.has_image .sprite_player {
+    transform: translateY(0px);
+    animation: option-player-sprite-run 0.6s steps(1) infinite;
 }
 
 
@@ -2768,6 +2783,10 @@ body[data-source="website"] #prototype .menu {
     overflow: hidden;
     filter: blur(1px);
 }
+@keyframes ready-room-scanline-scroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -300px; }
+}
 #prototype .banner .ready_room > .wrapper:after {
     content: "";
     display: block;
@@ -2783,7 +2802,7 @@ body[data-source="website"] #prototype .menu {
     background-color: transparent;
     background-image: url('../images/assets/canvas-scanlines.png?20230820-1139');
     background-repeat: repeat;
-    background-position: center center;
+    background-position: 0 0;
     background-size: 20px auto;
     opacity: 1.0;
     image-rendering: -moz-crisp-edges;         /* Firefox */
@@ -2793,6 +2812,7 @@ body[data-source="website"] #prototype .menu {
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
     -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+    animation: ready-room-scanline-scroll 60s linear infinite;
 }
 #prototype .banner .ready_room > .wrapper > .scene,
 #prototype .banner .ready_room > .wrapper > .team {
