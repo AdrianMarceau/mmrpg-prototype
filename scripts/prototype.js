@@ -513,35 +513,31 @@ $(document).ready(function(){
             && gameSettings.totalMissionsComplete >= 2){
 
             // Initialize the ready room on prototype home page load
-            prototype_ready_room_init();
+            prototype_ready_room_init(function(){
 
-            // Filter to only the current player if one has been set
-            if (typeof battleOptions['this_player_token'] !== 'undefined'
-                && battleOptions['this_player_token'].length){
-                prototype_ready_room_refresh(battleOptions['this_player_token']);
-                }
+                // Filter to only the current player if one has been set
+                if (typeof battleOptions['this_player_token'] !== 'undefined'
+                    && battleOptions['this_player_token'].length){
+                    prototype_ready_room_refresh(battleOptions['this_player_token']);
+                    }
 
-            // Start the actual ready room animation when it's appropriate to do so
-            if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
-                window.top.mmrpg_queue_for_game_start(function(){
-                    setTimeout(function(){ prototype_ready_room_start_animation(); }, 1000);
-                    });
-                } else {
+                // Start the actual ready room animation when it's appropriate to do so
                 prototype_ready_room_start_animation();
-                }
 
-            // Auto-fade the logo after we've seen it for long enough (we wanna see the ready room!)
-            if (true){
-                //console.log('queue fading the logo');
-                setTimeout(function(){
-                    //console.log('time to fade the logo');
-                    $('.banner .banner_credits', thisContext).removeClass('is_shifted').animate({opacity:0},{duration:3000,easing:'swing',sync:false,complete:function(){
-                        //console.log('logo has been faded');
-                        $(this).addClass('is_shifted');
-                        $(this).addClass('hidden');
-                        }});
-                    }, 3000);
-                }
+                // Auto-fade the logo after we've seen it for long enough (we wanna see the ready room!)
+                if (true){
+                    //console.log('queue fading the logo');
+                    setTimeout(function(){
+                        //console.log('time to fade the logo');
+                        $('.banner .banner_credits', thisContext).removeClass('is_shifted').animate({opacity:0},{duration:3000,easing:'swing',sync:false,complete:function(){
+                            //console.log('logo has been faded');
+                            $(this).addClass('is_shifted');
+                            $(this).addClass('hidden');
+                            }});
+                        }, 3000);
+                    }
+
+                });
 
             }
 
@@ -585,13 +581,16 @@ function mmrpg_trigger_reset(fullReset){
     var fullReset = typeof fullReset !== 'boolean' ? false : true;
     var confirmText = 'Are you sure you want to reset your entire game?\nAll progress will be lost and cannot be restored including any and all unlocked missions, robots, and abilities. Continue?';
     var confirmText2 = 'Let me repeat that one more time.\nIf you reset your game ALL unlocks and progress with be lost. \nEverything. \nReset anyway?';
-    // Attempt to confirm with the user of they want to resey
+    // Attempt to confirm with the user of they want to reset
+    prototype_ready_room_update_robot('all', {frame: 9}); // damage
+    prototype_ready_room_stop_animation();
     if (confirm(confirmText) && confirm(confirmText2)){
         // Redirect the user to the prototype reset page
         var postURL = 'prototype.php?action=reset';
         if (fullReset){ postURL += '&full_reset=true'; }
         $.post(postURL, function(){
             //alert('reset complete!');
+            prototype_ready_room_update_robot('all', {frame: 4}); // defeat
             if (window.self != window.parent){
                 window.location = 'prototype.php';
                 } else {
@@ -601,6 +600,7 @@ function mmrpg_trigger_reset(fullReset){
         return true;
         } else {
         // Return false
+        prototype_ready_room_start_animation();
         return false;
         }
 }
@@ -679,19 +679,35 @@ function prototype_trigger_redirect(thisContext, thisLink){
 
 // Define a function for automatically going to the next menu, if defined
 function prototype_menu_loaded(){
+    //console.log('prototype_menu_loaded()');
     // If the nextMenu value is not empty, switch to the next menu tab
     if (gameSettings.nextStepName.length
             && gameSettings.nextSlideDirection.length){
         // SWITCH TO NEXT MENU
-        //return false;
-        //alert('SWITCH TO NEXT MENU '+gameSettings.nextStepName);
+        //console.log('SWITCH TO NEXT MENU '+gameSettings.nextStepName);
         var bannerOverlay = $('.banner_overlay', thisPrototype);
         prototype_menu_switch({stepName:gameSettings.nextStepName,slideDirection:gameSettings.nextSlideDirection,onComplete:function(){
+            var animateReadyRoom = true;
+            if (animateReadyRoom){
+                //console.log('menu '+gameSettings.nextStepName+' has loaded');
+                var newRobotFrame = 0;
+                if (gameSettings.nextStepName === 'abilities'){ newRobotFrame = 4; } // shoot
+                else if (gameSettings.nextStepName === 'items'){ newRobotFrame = 6; } // summon
+                else if (gameSettings.nextStepName === 'shop'){ newRobotFrame = 5; } // throw (money away)
+                else if (gameSettings.nextStepName === 'edit_robots'){ newRobotFrame = 1; } // taunt
+                else if (gameSettings.nextStepName === 'edit_players'){ newRobotFrame = 1; } // taunt
+                else if (gameSettings.nextStepName === 'database'){ newRobotFrame = 10; } // base2
+                else if (parseInt(gameSettings.nextStepName) > 0){ newRobotFrame = 2; } // victory
+                else { newRobotFrame = 8; } // defend
+                prototype_ready_room_update_robot('most', {frame: newRobotFrame});
+                }
             gameSettings.nextStepName = false;
             gameSettings.nextSlideDirection = false;
             // Fade out the overlay to prevent clicking other banner links
-            bannerOverlay.stop().css({opacity:0.75}).animate({opacity:0.0},{duration:1000,easing:'swing',queue:false,complete:function(){ $(this).addClass('overlay_hidden'); }});
             $('.banner .points, .banner .subpoints, .banner .options, .banner .tooltip', thisPrototype).stop().animate({opacity:1},500,'swing');
+            bannerOverlay.stop().css({opacity:0.33}).animate({opacity:0.0},{duration:1000,easing:'swing',queue:false,complete:function(){
+                $(this).addClass('overlay_hidden');
+                }});
             }});
         }
 }
@@ -794,7 +810,7 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
     if (gameSettings.startLink == 'home'){
 
         var bannerOverlay = $('.banner_overlay', thisPrototype);
-        bannerOverlay.stop().css({opacity:0.00}).removeClass('overlay_hidden').animate({opacity:0.75},{duration:1000,easing:'swing',queue:false});
+        bannerOverlay.stop().css({opacity:0.00}).removeClass('overlay_hidden').animate({opacity:0.33},{duration:1000,easing:'swing',queue:false});
         var thisBanner = $('.banner', thisPrototype);
         $('.canvas_overlay_footer', thisBanner).remove();
         $('.points, .subpoints, .options, .tooltip', thisBanner).stop().animate({opacity:0},500,'swing');
@@ -1178,7 +1194,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
             // Fade in the overlay to prevent clicking on banner links
             var bannerOverlay = $('.banner_overlay', thisBanner);
             //thisBanner.stop().removeClass('banner_compact').animate({height:'124px'},{duration:1000,easing:'swing',queue:false});
-            bannerOverlay.stop().removeClass('overlay_hidden').animate({opacity:0.75},{duration:1000,easing:'swing',queue:false});
+            bannerOverlay.stop().removeClass('overlay_hidden').animate({opacity:0.33},{duration:1000,easing:'swing',queue:false});
             $('.points, .subpoints, .options, .tooltip', thisBanner).stop().animate({opacity:0},{duration:500,easing:'swing',queue:false});
             // Add the canvas overlay footer to the canvas with multipliers
             var thisFieldName = thisOption.attr('data-field');
@@ -1923,7 +1939,7 @@ gameSettings.readyRoomSpriteGrid = {};
 gameSettings.readyRoomSpriteBounds = {minX: 10, maxX: 90, minY: 14, maxY: 36};
 gameSettings.readyRoomSpritesIndex = {};
 gameSettings.readyRoomIsReady = false;
-function prototype_ready_room_init(){
+function prototype_ready_room_init(onComplete){
     //console.log('prototype_ready_room_init()');
 
     // If there's no robot index to work with, we can't display the ready room
@@ -1931,6 +1947,9 @@ function prototype_ready_room_init(){
         || !Object.keys(gameSettings.customIndex.unlockedRobotsIndex).length){
         return false;
         }
+
+    // Compensate for missing onComplete function
+    if (typeof onComplete !== 'function'){ onComplete = function(){}; }
 
     // Collect references to important elements relevant to the ready-room
     var $thisPrototype = $('#prototype');
@@ -1980,7 +1999,7 @@ function prototype_ready_room_init(){
         var xOffsetShift = Math.ceil(missingRobots * 2);
         if (xOffsetShift > shiftLimit){ xOffsetShift = shiftLimit; }
         spriteBounds.minX += xOffsetShift;
-        spriteBounds.maxX -= xOffsetShift;
+        spriteBounds.maxX -= Math.ceil(xOffsetShift * 1.2);
         //console.log('modded spriteBounds =', spriteBounds);
         }
 
@@ -2020,10 +2039,8 @@ function prototype_ready_room_init(){
     // Update the ready flag for the ready room
     gameSettings.readyRoomIsReady = true;
 
-    // TEMP TEMP TEMP TEMP TEMP TEMP
-    prototype_ready_room_start_animation();
-    //setTimeout(function(){ prototype_ready_room_stop_animation(); }, 5000);
-    // TEMP TEMP TEMP TEMP
+    // Run the onComplete function now that we're done
+    onComplete();
 
 }
 
@@ -2349,6 +2366,7 @@ function prototype_get_css_animation_duration(robotInfo){
 
 // Define a function for abruptly stopping the ready room animation
 function prototype_ready_room_start_animation(){
+    //console.log('prototype_ready_room_start_animation()');
     gameSettings.readyRoomAnimateEnabled = true;
     prototype_ready_room_animate();
     return;
@@ -2356,6 +2374,7 @@ function prototype_ready_room_start_animation(){
 
 // Define a function for abruptly stopping the ready room animation
 function prototype_ready_room_stop_animation(){
+    //console.log('prototype_ready_room_stop_animation()');
     gameSettings.readyRoomAnimateEnabled = false;
     return;
 }
@@ -2391,6 +2410,47 @@ function prototype_ready_room_add_robot(robotToken, robotInfo){
     //console.log('unlockedRobotsIndex =', unlockedRobotsIndex);
     // Now we need to update the robot's sprite in the ready room
     prototype_ready_room_add_robot_sprite(robotToken, robotInfo);
+}
+
+// Define a function for updating an existing sprite in the ready room given values
+function prototype_ready_room_update_robot(robotToken, newSpriteProperties){
+    //console.log('prototype_ready_room_update_robot(robotToken:', robotToken, ', newSpriteProperties:', newSpriteProperties, ')');
+    // Collect the unlocked robots index
+    var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
+    var spritesIndex = gameSettings.readyRoomSpritesIndex;
+    //console.log('unlockedRobotsIndex =', unlockedRobotsIndex);
+    //console.log('spritesIndex =', spritesIndex);
+    // Abstract the robotToken in case the user has provided the "all" option
+    var requiredRobots = [];
+    if (robotToken === 'all'
+        || robotToken === 'most'
+        || robotToken === 'some'){
+        requiredRobots = Object.keys(unlockedRobotsIndex);
+        if (robotToken !== 'all'){
+            // shuffle and slice the robots
+            var sliceToPercent = robotToken === 'most' ? 50 : 25;
+            var sliceToCount = Math.floor(requiredRobots.length * (sliceToPercent / 100));
+            shuffleArray(requiredRobots);
+            requiredRobots = requiredRobots.slice(0, sliceToCount);
+            }
+        }
+    else {
+        requiredRobots.push(robotToken);
+        }
+    // Loop through required robots and apply the changes to all of them
+    for (var i = 0; i < requiredRobots.length; i++){
+        var robotToken = requiredRobots[i];
+        // If the robot is doesn't exist in the index, we can't do anything to it
+        if (typeof unlockedRobotsIndex[robotToken] === 'undefined'){ return false; }
+        if (typeof spritesIndex[robotToken] === 'undefined'){ return false; }
+        // Otherwise we can collect info about the robot
+        var robotInfo = unlockedRobotsIndex[robotToken];
+        var spriteInfo = spritesIndex[robotToken];
+        //console.log('robotInfo =', robotInfo);
+        //console.log('spriteInfo =', spriteInfo);
+        // Trigger the animate function with the provided new values
+        prototype_ready_room_animate_robot(robotToken, newSpriteProperties);
+    }
 }
 
 // Define a function for adding a new sprite to the ready room given info
