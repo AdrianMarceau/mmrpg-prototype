@@ -514,6 +514,13 @@ $(document).ready(function(){
                 && battleOptions['this_player_token'].length){
                 prototype_ready_room_refresh(battleOptions['this_player_token']);
                 }
+            if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
+                window.top.mmrpg_queue_for_game_start(function(){
+                    setTimeout(function(){ prototype_ready_room_start_animation(); }, 1000);
+                    });
+                } else {
+                prototype_ready_room_start_animation();
+                }
             }
         }
 
@@ -1877,8 +1884,24 @@ function prototype_menu_links_refresh(){
 // -- PROTOTYPE READY ROOM FUNCTIONALITY -- //
 
 // Define a function for initializing the ready room with unlocked robots
+gameSettings.thisReadyRoomElement = false;
+gameSettings.readyRoomAnimateEnabled = false;
+gameSettings.readyRoomAnimateLastUpdate = 0;
+gameSettings.readyRoomAnimateThreshold = 1000;
+gameSettings.readyRoomAnimateChargeUps = {};
+gameSettings.readyRoomFramesPerSecond = 30;
+gameSettings.readyRoomSpriteBounds = {minX: 10, maxX: 90, minY: 14, maxY: 36};
+gameSettings.readyRoomSpritesIndex = {};
+gameSettings.readyRoomIsReady = false;
 function prototype_ready_room_init(){
     //console.log('prototype_ready_room_init()');
+
+    // If there's no robot index to work with, we can't display the ready room
+    if (typeof gameSettings.customIndex.unlockedRobotsIndex === 'undefined'
+        || !Object.keys(gameSettings.customIndex.unlockedRobotsIndex).length){
+        return false;
+        }
+
     // Collect references to important elements relevant to the ready-room
     var $thisPrototype = $('#prototype');
     var $thisBanner = $('.banner', $thisPrototype);
@@ -1903,15 +1926,11 @@ function prototype_ready_room_init(){
         var $readyRoomTeam = $('.team', $readyRoom);
     }
 
-    // If there's no robot index to work with, we can't display the ready room
-    if (typeof gameSettings.customIndex.unlockedRobotsIndex === 'undefined'
-        || !Object.keys(gameSettings.customIndex.unlockedRobotsIndex).length){
-        $readyRoomTeam.find('.sprite').remove();
-        prototype_ready_room_hide();
-        return;
-    }
+    // Make sure this ready room has a refernce in the game settings
+    gameSettings.thisReadyRoomElement = $readyRoom;
 
     // Collect the unlocked robot index and tokens for looping through momentarily
+    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
     var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
     var unlockedRobotsTokens = Object.keys(unlockedRobotsIndex);
     //console.log('unlockedRobotsTokens = ', unlockedRobotsTokens.length, unlockedRobotsTokens);
@@ -1920,8 +1939,9 @@ function prototype_ready_room_init(){
     $readyRoomTeam.find('.sprite').remove();
 
     // Define the min and max values for the X and Y offsets
-    var minX = 10, maxX = 90;
-    var minY = 14, maxY = 36;
+    var spriteBounds = gameSettings.readyRoomSpriteBounds;
+    var minX = spriteBounds.minX, maxX = spriteBounds.maxX;
+    var minY = spriteBounds.minY, maxY = spriteBounds.maxY;
 
     // Using the above, define offset ranges mimicking 8 columns and 8 rows for later
     var colMax = 8, rowMax = 8;
@@ -1976,15 +1996,19 @@ function prototype_ready_room_init(){
         var unlockedRobot = unlockedRobotsIndex[robotToken];
         var thisPlayerToken = unlockedRobot.currentPlayer;
         var thisRobotToken = unlockedRobot.token;
-        var thisSpriteImage = typeof unlockedRobot.image !== 'undefined' && unlockedRobot.image.length ? unlockedRobot.image : unlockedRobot.token;
         var thisSpriteSize = unlockedRobot.imageSize;
         var thisSpriteSizeX = thisSpriteSize+'x'+thisSpriteSize;
         var spriteDirection = Math.floor(Math.random() * 2) ? 'left' : 'right';
+        var spriteFrame = 0;
         //console.log('robotToken =', robotToken);
         //console.log('unlockedRobot =', unlockedRobot);
         //console.log('thisRobotToken =', thisRobotToken);
         //console.log('thisPlayerToken =', thisPlayerToken);
         //console.log('spriteDirection =', spriteDirection);
+        var thisSpriteImage = typeof unlockedRobot.image !== 'undefined' && unlockedRobot.image.length ? unlockedRobot.image : unlockedRobot.token;
+        var thisSpriteImageDirection = 'right';
+        //var thisSpriteImagePath = 'images/robots/'+thisSpriteImage+'/sprite_'+spriteDirection+'_'+thisSpriteSizeX+'.png'; // lets save resources
+        var thisSpriteImagePath = 'images/robots/'+thisSpriteImage+'/sprite_'+thisSpriteImageDirection+'_'+thisSpriteSizeX+'.png';
         // pick a random column and row for this robot to start off in
         var randColRow = getRandomColumnRow(1);
         var randColRowOffsets = getColumnRowOffsetCenter(randColRow[0], randColRow[1]);
@@ -2006,13 +2030,32 @@ function prototype_ready_room_init(){
         var $sprite = $('<div class="sprite" data-kind="robot" data-player="'+thisPlayerToken+'" data-robot="'+thisRobotToken+'"></div>');
         $sprite.css({'left': spriteOffsetX+'%', 'bottom': spriteOffsetY+'%', 'z-index': spriteOffsetZ});
         $sprite.css({'filter': spriteFilterValue});
-        var $spriteInner = $('<div class="sprite" data-size="'+thisSpriteSize+'" data-direction="'+spriteDirection+'"></div>');
-        $spriteInner.css('background-image', 'url(images/robots/'+thisSpriteImage+'/sprite_'+spriteDirection+'_'+thisSpriteSizeX+'.png?'+gameSettings.cacheTime+')');
+        $sprite.css({'transform': 'scale('+(spriteDirection !== thisSpriteImageDirection ? -2 : 2)+', 2)'});
+        var $spriteInner = $('<div class="sprite" data-size="'+thisSpriteSize+'" data-direction="'+spriteDirection+'" data-frame="'+spriteFrame+'"></div>');
+        $spriteInner.css('background-image', 'url('+thisSpriteImagePath+'?'+gameSettings.cacheTime+')');
         $spriteInner.css({'animation-duration': spriteAnimationDuration+'s'});
         $sprite.append($spriteInner);
         // append the newly generated sprite to the ready room
         //console.log('$readyRoomTeam.append($sprite = ', $sprite, ');');
-        $readyRoomTeam.append($sprite);
+        $sprite.appendTo($readyRoomTeam);
+        readyRoomSpritesIndex[robotToken] = {
+            sprite: $sprite,
+            spriteInner: $spriteInner,
+            image: thisSpriteImage,
+            imagePath: thisSpriteImagePath,
+            imageDirection: thisSpriteImageDirection,
+            kind: 'robot',
+            player: thisPlayerToken,
+            robot: thisRobotToken,
+            size: thisSpriteSize,
+            direction: spriteDirection,
+            frame: spriteFrame,
+            position: [spriteOffsetX, spriteOffsetY, spriteOffsetZ],
+            animate: true,
+            haste: spriteAnimationDuration,
+            charge: 0,
+            cooldown: 0
+            };
         }
 
     // We can fade-in the ready room now
@@ -2021,18 +2064,25 @@ function prototype_ready_room_init(){
     //console.log('gridCounts =', gridCounts);
     //console.log('columnCounts =', columnCounts);
     //console.log('rowCounts =', rowCounts);
+    //console.log('readyRoomSpritesIndex =', readyRoomSpritesIndex);
+
+    // Update the ready flag for the ready room
+    gameSettings.readyRoomIsReady = true;
+
+    // TEMP TEMP TEMP TEMP TEMP TEMP
+    prototype_ready_room_start_animation();
+    //setTimeout(function(){ prototype_ready_room_stop_animation(); }, 5000);
+    // TEMP TEMP TEMP TEMP
 
 }
-
 
 // Define a function for refreshing the ready room with unlocked robots, optionally filtering by player token
 function prototype_ready_room_refresh(filterByPlayerToken) {
     //console.log('prototype_ready_room_refresh(', filterByPlayerToken, ')');
+    if (!gameSettings.readyRoomIsReady){ return false; }
     if (typeof filterByPlayerToken !== 'string') { filterByPlayerToken = false; }
     //console.log('filterByPlayerToken =', filterByPlayerToken);
-    var $thisPrototype = $('#prototype');
-    var $thisBanner = $('.banner', $thisPrototype);
-    var $readyRoom = $('.ready_room', $thisBanner);
+    var $readyRoom = gameSettings.thisReadyRoomElement;
     var $readyRoomTeam = $('.team', $readyRoom);
     var $allSprites = $readyRoomTeam.find('.sprite[data-kind]');
     //console.log('$allSprites.length =', $allSprites.length);
@@ -2051,23 +2101,319 @@ function prototype_ready_room_refresh(filterByPlayerToken) {
     }
 }
 
+// Define a function for animating the prototype ready room sprites = 0;
+function prototype_ready_room_animate() {
+    if (!gameSettings.readyRoomIsReady){ return false; }
+    if (!gameSettings.readyRoomAnimateEnabled){ return false; }
+    //console.log('prototype_ready_room_animate()');
+
+    // Collect references to important elements relevant to the ready-room
+    var $readyRoom = gameSettings.thisReadyRoomElement;
+    var $readyRoomScene = $('.scene', $readyRoom);
+    var $readyRoomTeam = $('.team', $readyRoom);
+
+    // Get all robot sprites currently in the ready room
+    var $allRobotSprites = $('.sprite[data-kind="robot"]', $readyRoomTeam);
+
+    // Preset the last update time if not already set
+    if (gameSettings.readyRoomAnimateLastUpdate === 0){ new Date().getTime(); }
+
+    // Collect the current timestamp and the previous update timestamp for comparrison
+    var thisUpdateTime = new Date().getTime();
+    var lastUpdateTime = gameSettings.readyRoomAnimateLastUpdate;
+    var diffUpdateTime = thisUpdateTime - lastUpdateTime;
+    var minUpdateDiff = (1000 / gameSettings.readyRoomFramesPerSecond);
+    //console.log('thisUpdateTime =', thisUpdateTime);
+    //console.log('lastUpdateTime =', lastUpdateTime);
+    //console.log('diffUpdateTime =', diffUpdateTime);
+    //console.log('minUpdateDiff =', minUpdateDiff);
+
+    // Prevent animations from happening more than the defined fps value gameSettings.readyRoomFramesPerSecond
+    if (diffUpdateTime < minUpdateDiff) {
+        //console.log('diffUpdateTime:', diffUpdateTime, ' < minUpdateDiff:', minUpdateDiff);
+        window.requestAnimationFrame(prototype_ready_room_animate);
+        return false;
+        }
+
+    // Otherwise update the last-update time to right now for future reference
+    gameSettings.readyRoomAnimateLastUpdate = thisUpdateTime;
+
+    // Loop through unlocked robots one-by-one and check if we should animate
+    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
+    var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
+    var unlockedRobotsIndexTokens = Object.keys(unlockedRobotsIndex);
+    for (var i = 0; i < unlockedRobotsIndexTokens.length; i++){
+        var thisRobotToken = unlockedRobotsIndexTokens[i];
+        var thisRobotInfo = unlockedRobotsIndex[thisRobotToken];
+
+        // Check if we're allowed to animated this robot based on it's speed stat
+        if (!prototype_ready_room_animate_speed_check(thisRobotInfo)){ continue; }
+        //console.log('thisRobotToken/Info =', thisRobotToken, thisRobotInfo);
+
+        // Collect refererences to the robot's sprite and sprite inner elements now that we know we can animate
+        var thisSprite = readyRoomSpritesIndex[thisRobotToken];
+        var $thisSprite = thisSprite.sprite;
+        var $thisSpriteInner = thisSprite.spriteInner;
+        var oldSpriteProperties = {frame: thisSprite.frame, direction: thisSprite.direction, position: Object.values(thisSprite.position)};
+        var newSpriteProperties = {};
+        //console.log('oldSpriteProperties =', oldSpriteProperties);
+
+        // If a robot is currently in a non-base frame, priority one is to change it back
+        if (oldSpriteProperties.frame !== 0){
+
+            // Set the new sprite frame to zero
+            newSpriteProperties.frame = 0;
+
+            // Define the cooldown so we don't have them go too crazy
+            var baseCooldownValue = 100;
+            var newCooldownValue = Math.floor(baseCooldownValue * thisSprite.haste);
+            thisSprite.cooldown = newCooldownValue;
+
+            }
+        // Otherwise, we can decide whether or not to trigger a frame and position change
+        else {
+
+            // Define possible actions we can take and ratio of each happenings
+            var possibleDiceRolls = 20;
+            var possibleTransitions = [];
+            possibleTransitions.push({name: 'frame', chances: [1, 2, 3, 4, 5]});
+            possibleTransitions.push({name: 'position', chances: [6, 8, 10]});
+            possibleTransitions.push({name: 'direction', chances: [16, 18]});
+            possibleTransitions.push({name: 'elevation', chances: [20]});
+            //console.log('possibleDiceRolls =', possibleDiceRolls);
+            //console.log('possibleTransitions =', possibleTransitions);
+
+            // Using the above transitions and their chances of each happening, select a random one considering their ratios in the process
+            var randomDiceRoll = Math.floor(Math.random() * possibleDiceRolls) + 1;
+            var randomTransition = (function(roll){
+                for (var i = 0; i < possibleTransitions.length; i++){
+                    var transition = possibleTransitions[i];
+                    var chances = transition.chances;
+                    if (chances.indexOf(roll) !== -1){
+                        return transition.name;
+                        }
+                    }
+                return false;
+                })(randomDiceRoll);
+            //console.log('randomDiceRoll =', randomDiceRoll);
+            //console.log('randomTransition =', randomTransition);
+
+            // If the robot was too close to the edge, we should force a direction change
+            var spriteBounds = gameSettings.readyRoomSpriteBounds;
+            if ((oldSpriteProperties.position[0] <= spriteBounds.minX && oldSpriteProperties.direction !== 'right')
+                || (oldSpriteProperties.position[0] >= spriteBounds.maxX && oldSpriteProperties.direction !== 'left')){
+                randomTransition = 'direction';
+                }
+
+            // If a transition was decided, we should apply it now
+            if (randomTransition !== false
+                && randomTransition.length){
+                //console.log('randomTransition =', randomTransition);
+
+                // If a simple frame change was decided, process that
+                if (randomTransition === 'frame'){
+
+                    // Define the allowed frames we can transition to then pick one at random
+                    var randInt = Math.floor(Math.random() * 10) + 1;
+                    var possibleRandomFrames = [];
+                    possibleRandomFrames.push(1); // taunt
+                    possibleRandomFrames.push(8); // defend
+                    possibleRandomFrames.push(10); // base2
+                    if (randInt >= 10){ possibleRandomFrames.push(4); } // shoot
+                    if (randInt >= 8){ possibleRandomFrames.push(5); } // throw
+                    if (randInt >= 6){ possibleRandomFrames.push(6); } // summon
+                    newSpriteProperties.frame = possibleRandomFrames[Math.floor(Math.random() * possibleRandomFrames.length)];
+
+                    }
+                // If a directional change was directed
+                if (randomTransition === 'direction'){
+
+                    // Flip the direction from whatever it is now
+                    newSpriteProperties.direction = (oldSpriteProperties.direction !== 'left') ? 'left' : 'right';
+
+                    // Define the cooldown so we don't have them go too crazy
+                    var baseCooldownValue = 200;
+                    var newCooldownValue = baseCooldownValue * thisSprite.haste;
+                    thisSprite.cooldown = newCooldownValue;
+
+                    }
+                // If a positional change was directed
+                if (randomTransition === 'position'
+                    || randomTransition === 'elevation'){
+
+                    // Set the robot to it's slide frame (7) first
+                    newSpriteProperties.frame = 7;
+                    // Then move the robot in the direction they're facing
+                    var oldPosition = oldSpriteProperties.position;
+                    var newXPosition = oldPosition[0];
+                    var moveDirection = oldSpriteProperties.direction === 'right' ? 'right' : 'left';
+                    if (oldPosition[0] >= spriteBounds.maxX){ moveDirection = 'left'; }
+                    else if (oldPosition[0] <= spriteBounds.minX){ moveDirection = 'right'; }
+
+                    //console.log('oldPosition =', oldPosition);
+                    var shiftBase = 10;
+                    var shiftVal = (shiftBase - Math.floor(shiftBase * thisSprite.haste));
+                    newXPosition += shiftVal * (moveDirection === 'right' ? 1 : -1);
+                    //console.log('shiftBase =', shiftBase, 'shiftVal =', shiftVal);
+                    //console.log('newXPosition =', newXPosition);
+                    if (typeof newSpriteProperties.position === 'undefined'){ newSpriteProperties.position = oldPosition; }
+                    newSpriteProperties.position[0] = newXPosition;
+
+                    }
+                // If an elevational change was directed
+                if (randomTransition === 'elevation'){
+                    //console.log('elevation transition triggered for ', thisRobotToken);
+
+                    // Move the robot up or down depending on where they are
+                    var oldPosition = oldSpriteProperties.position;
+                    var newYPosition = oldPosition[1];
+                    var newZPosition = oldPosition[2];
+                    var moveDirection = Math.floor(Math.random() * 2) ? 'up' : 'down';
+                    if (oldPosition[1] >= spriteBounds.maxY){ moveDirection = 'down'; }
+                    else if (oldPosition[1] <= spriteBounds.minY){ moveDirection = 'up'; }
+                    //console.log('oldPosition =', oldPosition);
+                    var shiftBase = 5;
+                    var shiftVal = Math.floor(Math.random() * shiftBase) + 1;
+                    newYPosition += shiftVal * (moveDirection === 'up' ? 1 : -1);
+                    newZPosition = Math.floor(100 - newYPosition);
+                    //console.log('shiftBase =', shiftBase, 'shiftVal =', shiftVal);
+                    //console.log('newYPosition =', newYPosition, 'newZPosition =', newZPosition);
+                    if (typeof newSpriteProperties.position === 'undefined'){ newSpriteProperties.position = oldPosition; }
+                    newSpriteProperties.position[1] = newYPosition;
+                    newSpriteProperties.position[2] = newZPosition;
+
+                    }
+
+                }
+
+            }
+        //console.log('newSpriteProperties =', newSpriteProperties);
+
+        if (Object.keys(newSpriteProperties).length){
+            //console.log('ANIMATE ME!!! (', thisRobotToken, ')');
+            prototype_ready_room_animate_robot(thisRobotToken, newSpriteProperties);
+            }
+
+        }
+
+    // Request the next animation frame when ready
+    requestAnimationFrame(prototype_ready_room_animate);
+
+}
+
+// Define a function for actually animating a given ready room robot in some way
+function prototype_ready_room_animate_robot(robotToken, newValues, onComplete){
+    //console.log('prototype_ready_room_animate_robot(robotToken:', robotToken, ', newValues:', newValues, ', onComplete:', typeof onComplete, ')');
+    if (!gameSettings.readyRoomIsReady){ return false; }
+    //if (!gameSettings.readyRoomAnimateEnabled){ return false; }
+    if (typeof robotToken !== 'string' || !robotToken.length){ return false; }
+    if (typeof newValues !== 'object'){ newValues = {}; }
+    if (typeof onComplete !== 'function'){ onComplete = function(){ /* ... */ }; }
+
+    // Collect this robot's info from the unlock index for later
+    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
+    var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
+    var robotIndexInfo = unlockedRobotsIndex[robotToken];
+
+    // Pull the sprite data and element reference from the index
+    var thisSprite = readyRoomSpritesIndex[robotToken];
+    var $thisSprite = thisSprite.sprite;
+    var $thisSpriteInner = thisSprite.spriteInner;
+
+    // Collect refererences to the robot's sprite and sprite inner elements now that we know we can animate
+    var thisSpriteSize = thisSprite.size;
+    var thisSpriteFrame = thisSprite.frame;
+    var thisSpriteDirection = thisSprite.direction;
+    //console.log('OKAY I WILL ANIMATE YOU!!! (', robotToken, ' to frame ', newValues.frame, ')');
+
+    // If a frame change was requested, we can process that now
+    if (typeof newValues.frame !== 'undefined'){
+        var newSpriteFrame = newValues.frame;
+        var newBackgroundOffset = -1 * (thisSpriteSize * newSpriteFrame);
+        thisSprite.frame = newSpriteFrame;
+        $thisSpriteInner.attr('data-frame', newSpriteFrame);
+        $thisSpriteInner.css({'background-position': newBackgroundOffset+'px 0'});
+        }
+
+    // If a direction change was requested, we can process that now
+    if (typeof newValues.direction !== 'undefined'){
+        var newSpriteDirection = newValues.direction;
+        thisSprite.direction = newSpriteDirection;
+        $thisSpriteInner.attr('data-direction', newSpriteDirection);
+        $thisSprite.css({'transform': 'scale('+(thisSprite.direction !== thisSprite.imageDirection ? -2 : 2)+', 2)'});
+        }
+
+    // If a position change was requested, we can process that now
+    if (typeof newValues.position !== 'undefined'){
+        var newSpritePosition = newValues.position;
+        thisSprite.position = newSpritePosition;
+        var newCSS = {
+            'left': newSpritePosition[0]+'%',
+            'bottom': newSpritePosition[1]+'%',
+            'z-index': newSpritePosition[2],
+            'filter': 'brightness('+(newSpritePosition[2] / 100)+')'
+            };
+        //console.log('updating sprite position for ', robotToken, ' to ', newCSS);
+        $thisSprite.css(newCSS);
+        }
+
+}
+
+// Define a function for determining whether a sprite should animate based on its speed
+function prototype_ready_room_animate_speed_check(robotInfo){
+    //console.log('prototype_ready_room_animate_speed_check(robotInfo:', robotInfo.token, ')');
+    // Collect the robot's key details to make this easier
+    var robotToken = robotInfo.token;
+    //console.log('robotToken/Info =', robotToken, robotInfo);
+    // Collect a reference to the sprite's entry in the animation index
+    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
+    var thisSprite = readyRoomSpritesIndex[robotToken];
+    //console.log('thisSprite =', typeof thisSprite, thisSprite);
+    // If this robot has a cooldown we gotta decease and wait
+    //console.log('thisSprite.cooldown =', thisSprite.cooldown);
+    if (thisSprite.cooldown > 0){ thisSprite.cooldown--; return; }
+    else { thisSprite.cooldown = 0; }
+    // Increase the cooldown value by the robot's speed value
+    thisSprite.charge += robotInfo.speedBase;
+    //console.log(robotToken, '\n +robotSpeedBase(', robotInfo.speedBase, ')\n robotCharge(', thisSprite.charge, ')\n animateThreshold(', gameSettings.readyRoomAnimateThreshold, ')');
+    // If the cooldown value is less than the robot's speed stat, we're not ready to animate yet
+    if (thisSprite.charge < gameSettings.readyRoomAnimateThreshold) { return false; }
+    // Otherwise we're ready to animate and we need to reset the cooldown value
+    thisSprite.charge = thisSprite.charge % gameSettings.readyRoomAnimateThreshold;
+    return true;
+
+}
+
 // Define a function for calculating the css animation duration for a given robot sprite
 function prototype_get_css_animation_duration(robotInfo){
     if (typeof robotInfo === 'undefined'){ return false; }
     this_robot_attack = typeof robotInfo.attackBase !== 'undefined' ? robotInfo.attackBase : 100;
     this_robot_defense = typeof robotInfo.defenseBase !== 'undefined' ? robotInfo.defenseBase : 100;
     this_robot_speed = typeof robotInfo.speedBase !== 'undefined' ? robotInfo.speedBase : 100;
-    robot_animation_duration = 1;
+    robot_animation_duration = 1.2;
     robot_animation_duration -= robot_animation_duration * (this_robot_speed / (this_robot_attack + this_robot_defense + this_robot_speed));
     if (robot_animation_duration < 0.1){ robot_animation_duration = 0.1; }
     return robot_animation_duration;
 }
 
+// Define a function for abruptly stopping the ready room animation
+function prototype_ready_room_start_animation(){
+    gameSettings.readyRoomAnimateEnabled = true;
+    prototype_ready_room_animate();
+    return;
+}
+
+// Define a function for abruptly stopping the ready room animation
+function prototype_ready_room_stop_animation(){
+    gameSettings.readyRoomAnimateEnabled = false;
+    return;
+}
+
 // Define a function for showing the prototype ready room element
 function prototype_ready_room_show(){
     //console.log('prototype_ready_room_show()');
-    var $thisBanner = $('#prototype .banner');
-    var $readyRoom = $('.ready_room', $thisBanner);
+    if (!gameSettings.readyRoomIsReady){ return false; }
+    var $readyRoom = gameSettings.thisReadyRoomElement;
     $readyRoom.removeClass('hidden');
     $readyRoom.css({opacity: 1});
 }
@@ -2075,8 +2421,8 @@ function prototype_ready_room_show(){
 // Define a function for hiding the prototype ready room element
 function prototype_ready_room_hide(){
     //console.log('prototype_ready_room_hide()');
-    var $thisBanner = $('#prototype .banner');
-    var $readyRoom = $('.ready_room', $thisBanner);
+    if (!gameSettings.readyRoomIsReady){ return false; }
+    var $readyRoom = gameSettings.thisReadyRoomElement;
     $readyRoom.css({opacity: 0});
     $readyRoom.addClass('hidden');
 }

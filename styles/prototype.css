@@ -2857,7 +2857,7 @@ body[data-source="website"] #prototype .menu {
     overflow: visible;
     transform: scale(2);
     transform-origin: bottom center;
-    transition: opacity 0.6s;
+    transition: opacity 0.6s, left 1s, bottom 1s, z-index 1s;
     image-rendering: -moz-crisp-edges;         /* Firefox */
     image-rendering:   -o-crisp-edges;         /* Opera */
     image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
