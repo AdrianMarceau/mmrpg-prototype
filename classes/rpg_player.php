@@ -1919,6 +1919,13 @@ class rpg_player extends rpg_object {
             if (!$allow_over_max){ return true; }
         }
 
+        // If the requested drop would put the user over the limit, prevent that
+        if (!$temp_is_shard
+            && (($temp_item_quantity + $item_quantity_dropped) > $temp_item_quantity_max)){
+            $item_quantity_dropped -= (($temp_item_quantity + $item_quantity_dropped) - $temp_item_quantity_max);
+            if (empty($item_quantity_dropped)){ return false; }
+        }
+
         // Remove the shop/item frame from the history array so that it appears with the "new" indicator
         if ($temp_item_is_new){
             $menu_frame_token = 'items';
