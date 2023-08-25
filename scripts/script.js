@@ -859,6 +859,7 @@ function windowResizeUpdate(updateType){
     var windowModWidth = localStorage.getItem('mmrpg-window-width') || 'small';
     var windowModHeight = localStorage.getItem('mmrpg-window-height') || 'small';
 
+    /*
     // Check if the window is in landscape mode and update the session
     var thisRequestType = 'session';
     var thisRequestData = 'index_settings,windowFlag,';
@@ -873,6 +874,7 @@ function windowResizeUpdate(updateType){
         $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
         //console.log('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
         }, 1000);
+    */
 
     // Calculate the new game and console height values
     var newGameHeight = windowHeight - 25; //15;

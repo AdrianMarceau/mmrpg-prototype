@@ -351,12 +351,25 @@ $(document).ready(function(){
             });
 
         // Check if the player token has already been selected
+        // and collect any data attributes for styling
+        //console.log('first load of prototype > predefining selections and data attributes');
+        var dataStepName = 'home';
+        var dataStepNumber = 1;
         if (battleOptions['this_player_token'] !== undefined){
+
             //alert('player selected : '+battleOptions['this_player_token']);
             gameSettings.skipPlayerSelect = true;
             var thisMenu = $('.menu[data-select="this_player_token"]', thisContext);
             $('.option[data-token="'+battleOptions['this_player_token']+'"]', thisMenu).triggerSilentClick();
+            dataStepNumber = 2;
+
             }
+
+        // Update the prototype element with the data attributes for styling
+        thisPrototype.attr('data-step-name', dataStepName);
+        thisPrototype.attr('data-step-number', dataStepNumber);
+        //console.log('dataStepName =>', dataStepName);
+        //console.log('dataStepNumber =>', dataStepNumber);
 
         // Attempt to define the top frame
         var topFrame = window.top;
@@ -756,6 +769,7 @@ function prototype_menu_preload_source(thisContext, thisMenu){
 
 // Define a function for triggering a prototype step link
 function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlideDuration){
+    //console.log('prototype_menu_click_step(thisContext:', thisContext, ', thisLink:', thisLink, ', thisCallback:', typeof thisCallback, ', thisSlideDuration:', thisSlideDuration, ')');
 
     // Collect information about the previous and current link
     var thisLink = $(thisLink);
@@ -866,6 +880,7 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
 
 // Define a function for triggering a prototype option link
 function prototype_menu_click_option(thisContext, thisOption, onComplete){
+    //console.log('prototype_menu_click_option(thisContext:', thisContext, ', thisOption:', thisOption, ', onComplete:', onComplete, ')');
 
     // If this option is disabled, ignore its input
     if ($(this).hasClass('option_disabled')
@@ -1171,7 +1186,10 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
             // Append this option object to the main banner window
             var cloneOption = thisOption.clone();
             var cloneWidth = ((numOptions * 8) + 42);
-            if (thisSelect === 'this_player_token'){ cloneWidth = 25; }
+            if (thisSelect === 'this_player_token'){
+                cloneWidth = 19 + battleOptions['this_player_token'].length;
+                // player button / player icon / player select in banner
+                }
             cloneOption.attr('data-select', thisSelect);
             cloneOption.removeClass('option_1x1 option_1x2 option_1x3 option_1x4').addClass('option_1x'+thisPosition);
             cloneOption.find('.arrow').css({right:0});
@@ -1390,6 +1408,17 @@ function prototype_menu_switch(switchOptions){
 
     // Collect the current step token
     var currentStepToken = $('.menu[data-step]:not(.menu_hide)', thisContext).attr('data-step');
+
+    // Update the prototype element with data attributes for styling
+    var dataStepName = switchOptions.stepName;
+    if (dataStepName === false){ dataStepName = 'home'; }
+    else if (parseInt(dataStepName) > 0){ dataStepName = 'home'; }
+    var dataStepNumber = switchOptions.stepNumber;
+    if (!dataStepNumber){ dataStepNumber = 1; }
+    thisPrototype.attr('data-step-name', dataStepName);
+    thisPrototype.attr('data-step-number', dataStepNumber);
+    //console.log('dataStepName =>', switchOptions.stepName, '=>', dataStepName);
+    //console.log('dataStepNumber =>', switchOptions.stepNumber, '=>', dataStepNumber);
 
     // Only proceed normally if the current start link is home
     if (gameSettings.startLink != 'home'){
@@ -1768,8 +1797,8 @@ function prototype_menu_switch(switchOptions){
                 }
 
             // Execute option-specific commands for special cases
-            console.log('switchOptions.stepNumber =', switchOptions.stepNumber);
-            console.log('currentMenuSelect =', currentMenuSelect);
+            //console.log('switchOptions.stepNumber =', switchOptions.stepNumber);
+            //console.log('currentMenuSelect =', currentMenuSelect);
             switch (currentMenuSelect){
                 case 'this_battle_token': {
 

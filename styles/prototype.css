@@ -225,23 +225,15 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .subpoints {
     display: block;
     position: absolute;
-    top: 0;
-    right: 0;
-    padding: 0;
-    width: 228px;
-    height: 42px;
     border: 1px solid #090909;
     border-color: #090909 !important;
-    border-width: 0 0 1px 1px;
+    border-width: 0 1px 1px 1px;
     font-size: 10px;
     line-height: 10px;
     letter-spacing: 3px;
     text-align: right;
     text-transform: uppercase;
     padding: 0;
-    border-radius: 0 0.5em 0 5em;
-    -moz-border-radius: 0 0.5em 0 5em;
-    -webkit-border-radius: 0 0.5em 0 5em;
     color: #EFEFEF;
     background-color: rgb(43,43,43);
     text-shadow: 1px 1px 4px #333333;
@@ -256,6 +248,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
     overflow: hidden;
     z-index: 30;
+    transition: left 1s, right 1s, width 1s;
 }
 #prototype .banner .points[data-step],
 #prototype .banner .points[data-step] * {
@@ -264,7 +257,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .points[data-step] .label,
 #prototype .banner .points[data-step] .amount {
     transform: translate(0, 0);
-    transition: transform 0.3s;
+    transition: transform 0.3s, padding 1s;
 }
 #prototype .banner .points[data-step]:hover .label,
 #prototype .banner .points[data-step]:hover .amount,
@@ -272,12 +265,58 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .points[data-step].link_active .amount {
     transform: translate(-3px, 0);
 }
+#prototype .banner .points {
+    top: 0;
+    width: 320px;
+    height: 42px;
+    right: -40px;
+    font-size: 10px;
+    line-height: 10px;
+    letter-spacing: 3px;
+    -moz-border-radius: 0 0 5em 5em;
+    -webkit-border-radius: 0 0 5em 5em;
+    border-radius: 0 0 5em 5em;
+}
 #prototype .banner .subpoints {
     top: 43px;
-    width: 190px;
+    width: 230px;
     height: 19px;
+    right: -30px;
     font-size: 9px;
+    -moz-border-radius: 0 0 2em 2em;
+    -webkit-border-radius: 0 0 2em 2em;
+    border-radius: 0 0 2em 2em;
 }
+#prototype .banner .points > .wrapper,
+#prototype .banner .subpoints > .wrapper {
+    transition: text-align 1s;
+}
+#prototype .banner .points > .wrapper {
+    padding: 3px 45px;
+    text-align: right;
+}
+#prototype .banner .subpoints > .wrapper {
+    padding: 3px 35px;
+    text-align: right;
+}
+
+#prototype[data-step-number="1"] .banner .points {
+    right: calc(100% - 320px + 35px);
+}
+#prototype[data-step-number="1"] .banner .points .label {
+    padding-left: 0;
+    padding-right: 20px;
+}
+#prototype[data-step-number="1"] .banner .points > .wrapper {
+    text-align: left;
+}
+#prototype[data-step-number="1"] .banner .subpoints {
+    right: calc(100% - 230px + 25px);
+}
+#prototype[data-step-number="1"] .banner .subpoints > .wrapper {
+    text-align: left;
+}
+
 #prototype .banner .points .label {
     display: block;
     font-weight: bold;
@@ -602,7 +641,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     display: block;
     box-sizing: border-box;
     margin: 0;
-    padding: 3px 5px;
+    /* padding: 3px 5px; */
     width: 100%;
     height: 100%;
     font-size: 10px;
@@ -635,7 +674,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     display: block;
     box-sizing: border-box;
     margin: 0;
-    padding: 3px 5px;
+    /* padding: 3px 5px; */
     width: 100%;
     height: 100%;
     font-size: 10px;
