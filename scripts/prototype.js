@@ -1275,6 +1275,23 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
     //var thisRedirect = 'battle.new.php?wap='+(gameSettings.wapFlag ? 'true' : 'false');
     for (var key in battleOptions){ thisRedirect += '&'+key+'='+battleOptions[key]; }
 
+    // If this was a mission select, make sure we re-flow the robot select when ready
+    if (thisSelect == 'this_battle_token'){
+        var oldOnComplete = onComplete;
+        var newOnComplete = function(){
+            var tempCondition = 'this_player_token='+battleOptions['this_player_token'];
+            var $tempMenu = $('.menu[data-select="this_player_robots"]', thisContext);
+            var $tempWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', $tempMenu);
+            var $tempInnerWrapper = $tempWrapper.find('> .wrap');
+            if ($tempInnerWrapper.length){
+                $tempInnerWrapper.scrollTop(1);
+                $tempInnerWrapper.perfectScrollbar(thisScrollbarSettings);
+                }
+            oldOnComplete();
+            };
+        onComplete = newOnComplete;
+        }
+
     // Check if image preloading was requested
     if (thisPreload.length){
         // Preload the requested image

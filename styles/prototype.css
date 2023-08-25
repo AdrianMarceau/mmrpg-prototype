@@ -1011,14 +1011,42 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     position: relative;
     height: inherit;
 }
+
+
+#prototype .menu[data-select] .option_wrapper .ps-container {
+
+}
+#prototype .menu[data-select] .option_wrapper .ps__rail-x,
+#prototype .menu[data-select] .option_wrapper .ps__rail-y {
+    opacity: 0.6;
+}
+#prototype .menu[data-select] .option_wrapper .ps-container > .ps-scrollbar-y-rail {
+    background-color: #494949;
+    opacity: 0.3;
+    filter: alpha(opacity=30);
+}
+#prototype .menu[data-select] .option_wrapper .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+
+}
+#prototype .menu[data-select] .option_wrapper .ps-container:hover > .ps-scrollbar-y-rail:hover {
+    background-color: #363636;
+}
+#prototype .menu[data-select] .option_wrapper .ps-container.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail {
+    background-color: #696969;
+}
+#prototype .menu[data-select] .option_wrapper .ps-container:hover > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
+    background-color: #969696;
+}
+
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container {
     padding-right: 0;
 }
-#prototype .menu[data-select] .option_wrapper > .wrap.ps-container.ps-active-y {
+#prototype .menu[data-select] .option_wrapper > .wrap.ps-container {
     padding-right: 10px;
     padding-left: 10px;
     height: 232px;
 }
+
 #prototype .menu[data-select] .option_wrapper > .wrap .option_1x1,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x1 {
     width: calc((100% / 4) - 8px);
