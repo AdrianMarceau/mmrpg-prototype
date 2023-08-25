@@ -1195,7 +1195,7 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     text-decoration: none;
 }
 #prototype .option_wrapper_missions .chapter_select .chapter_link.extra.first {
-    margin-left: 3%;
+    margin-left: 2%;
 }
 body.windowFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra,
 body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_select .chapter_link.extra {

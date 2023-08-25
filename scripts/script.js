@@ -686,30 +686,6 @@ $(document).ready(function(){
             //alert('launched from a regular old browser...');
             }
 
-        // Prevent scrolling as long as the exclusion class isn't present
-        if (false){
-            /*
-            // Prevent window scrolling, or scrolling of any kind, for mobile views
-            $(document).bind('touchmove', function(e){
-                //alert('touchmove');
-                //alert('touchmove etarget : '.$(e.target).attr('class'));
-                e.preventDefault();
-                });
-            $('*').live('touchstart', function(e) {
-                //alert('touchstart etarget : '.$(e.target).attr('class'));
-                this.onclick = this.onclick || function () { };
-                });
-            */
-        }
-
-
-
-        // Change the body's orientation flag classes
-        orientationModeUpdate('startup');
-        window.onorientationchange = function(){ return orientationModeUpdate('onorientationchange'); }
-        window.onresize = function(){ return orientationModeUpdate('onresize'); }
-        if (gameSettings.autoScrollTop === true){ window.onscroll = function(){ return orientationModeUpdate('onscroll'); } }
-
     }
 
     // Create the variable functions for Pausing/Unpausing the game
@@ -782,8 +758,7 @@ function windowResizeUpdate(updateType){
     // Re-generate the viewport settings, skipping any unsupported settings
     var windowWidth = $(window).width();
     var windowHeight = $(window).height();
-    if (windowWidth >= windowHeight){ var newOrientation = 'landscape'; }
-    else { var newOrientation = 'portrait'; }
+    var newOrientation = 'portrait';
     if (window === window.top && (updateType === 'startup' || lastOrientation !== newOrientation)){
         var newViewportSettings = $.extend(true,{},defaultViewportSettings);
         if (typeof newViewportSettings['min-width'] !== 'undefined'){
@@ -859,23 +834,6 @@ function windowResizeUpdate(updateType){
     var windowModWidth = localStorage.getItem('mmrpg-window-width') || 'small';
     var windowModHeight = localStorage.getItem('mmrpg-window-height') || 'small';
 
-    /*
-    // Check if the window is in landscape mode and update the session
-    var thisRequestType = 'session';
-    var thisRequestData = 'index_settings,windowFlag,';
-    //if (windowWidth >= (1024 + 12)){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
-    //if (Math.ceil(windowModWidth === 'flex' ? windowWidth : gameWidth) >= 1024){ $('body').addClass('windowFlag_landscapeMode'); thisRequestData += 'landscapeMode'; }
-    //else { $('body').removeClass('windowFlag_landscapeMode'); thisRequestData += 'portraitMode'; }
-    $('body').removeClass('windowFlag_portraitMode'); // we hate "portraitMode" now
-    $('body').removeClass('windowFlag_landscapeMode'); // we hate "landscapeMode" now
-    thisRequestData += 'portraitMode'; // we still gotta send "portraitMode" every update I guess
-    if (windowResizeUpdateTimeout !== false){ clearTimeout(windowResizeUpdateTimeout); }
-    windowResizeUpdateTimeout = setTimeout(function(){
-        $.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
-        //console.log('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
-        }, 1000);
-    */
-
     // Calculate the new game and console height values
     var newGameHeight = windowHeight - 25; //15;
     if (gameSettings.wapFlagIphone && newGameHeight > 924){ newGameHeight = 924; }
@@ -924,54 +882,6 @@ function windowResizeUpdate(updateType){
 
     // Return true on success
     return true;
-}
-
-
-
-
-// Define a function for updating the orientation Mode
-function orientationModeUpdate(updateType){
-    // Check if this is the main window or if it's a child
-    if (window === window.top){
-        // If this is the main window, collect it's orientation variable
-        if (!isNaN(window.orientation)){ var orientationMode = (window.orientation == 0 || window.orientation == 180) ? 'portrait' : 'landscape'; }
-        else { var orientationMode = ($(window).width() < 980) ? 'portrait' : 'landscape'; }
-        } else {
-        // Otherwise, check the parent window's orientation variable
-        window.top.testValue = true;
-        if (!isNaN(window.top.orientation)){ var orientationMode = (window.top.orientation == 0 || window.top.orientation == 180) ? 'portrait' : 'landscape'; }
-        else { var orientationMode = ($(window.top).width() < 980) ? 'portrait' : 'landscape'; }
-        }
-    // Determine if this user is running is non-fullscreen mode
-    var notFullscreenMode = ('standalone' in window.navigator) && !window.navigator.standalone ? true : false;
-    // Update the orientation variables on this window's body elements
-    if (orientationMode == 'portrait'){
-        $('body').removeClass('mobileFlag_landscapeMode').addClass('mobileFlag_portraitMode');
-        if (notFullscreenMode){ $('body').removeClass('mobileFlag_landscapeMode_notFullscreen').addClass('mobileFlag_portraitMode_notFullscreen');  }
-        } else {
-        $('body').removeClass('mobileFlag_portraitMode').addClass('mobileFlag_landscapeMode');
-        if (notFullscreenMode){ $('body').removeClass('mobileFlag_portraitMode_notFullscreen').addClass('mobileFlag_landscapeMode_notFullscreen');   }
-        }
-
-    // Reset the window scroll to center elements properly
-    if (gameSettings.autoScrollTop === true && updateType != 'onscroll'){
-        //console.log('gameSettings.autoScrollTop == true;\nwindow.scrollTo(0, 1);');
-        window.scrollTo(0, 1);
-        if (window !== window.top){ parent.window.scrollTo(0, 1); }
-        }
-
-    //$('body').css('border', '10px solid red').animate({borderWidth : '0'}, 1000, 'swing');
-    // DEBUG
-    //alert('<body class="'+$('body').attr('class')+'">\n'+updateType+'\n</body>');
-    // Check if this is a child frame and this is not a startup call
-    if (window !== window.top){
-        // Alert the user of the orientation change (used to fix a bug with iframe not updating)
-        parent.window.location.hash = '#'+orientationMode;
-        //alert('Screen orientation changed...\nGame display updated!');
-        }
-    // Return the final orientation mode
-    //console.log({orientationMode:orientationMode,notFullscreenMode:notFullscreenMode,bodyClass:$('body').attr('class')});
-    return orientationMode;
 }
 
 function localFunction(myMessage){
