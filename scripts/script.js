@@ -146,9 +146,18 @@ $(document).ready(function(){
 
     if (mmrpgBody.length){
 
-        // Update the dimensions
-        gameSettings.currentBodyWidth = $(document).width(); //mmrpgBody.outerWidth();
-        gameSettings.currentBodyHeight = $(document).height(); //mmrpgBody.outerHeight();
+        // Update the tooltip reference dimensions
+        //console.log('Update the tooltip reference dimensions');
+        gameSettings.currentBodyWidth = mmrpgBody.outerWidth();
+        gameSettings.currentBodyHeight = mmrpgBody.outerHeight();
+        //gameSettings.currentBodyWidth = $(document).width();
+        //gameSettings.currentBodyHeight = $(document).height();
+        //console.log('mmrpgBody.width() =', mmrpgBody.width());
+        //console.log('mmrpgBody.height() =', mmrpgBody.height());
+        //console.log('mmrpgBody.outerWidth() =', mmrpgBody.outerWidth());
+        //console.log('mmrpgBody.outerHeight() =', mmrpgBody.outerHeight());
+        //console.log('gameSettings.currentBodyWidth =', gameSettings.currentBodyWidth);
+        //console.log('gameSettings.currentBodyHeight =', gameSettings.currentBodyHeight);
 
         // Tooltip only Text
         //console.log('assigning event for '+document.URL+';\n gameSettings.currentBodyWidth = '+gameSettings.currentBodyWidth+';\n gameSettings.currentBodyHeight = '+gameSettings.currentBodyHeight+'; ');
@@ -210,6 +219,10 @@ $(document).ready(function(){
 
             // Define the function for positioning the tooltip
             var alignTooltipFunction = function(e){
+                //console.log('alignTooltipFunction()');
+                //console.log('gameSettings.currentBodyWidth =', gameSettings.currentBodyWidth);
+                //console.log('gameSettings.currentBodyHeight =', gameSettings.currentBodyHeight);
+
 
                 var mouseX = e.pageX;
                 var mouseY = e.pageY;
@@ -815,19 +828,20 @@ function windowResizeUpdate(updateType){
     //console.log('windowType = '+windowType+' \nwindowWidth = '+windowWidth+' \nwindowHeight = '+windowHeight+' \nbodyInnerHeight = '+bodyInnerHeight);
     if (bodyInnerHeight < windowHeight){ windowHeight = bodyInnerHeight; }
 
-    /*
-    if (window === window.top && windowHeight <= 924){
-        alert('preventOverflow');
-        $('html,body').css({height:windowHeight+'px',overflow:'hidden'});
-    } else {
-        alert('resetOverflow');
-        $('html,body').css({height:'',overflow:''});
-    }
-    */
-
-    // Update the dimensions
-    gameSettings.currentBodyWidth = windowWidth; //$(document).width(); //mmrpgBody.outerWidth();
-    gameSettings.currentBodyHeight = windowHeight; //$(document).height(); //mmrpgBody.outerHeight();
+    // Update the window resize dimensions
+    //console.log('Update the window resize dimensions');
+    //gameSettings.currentBodyWidth = windowWidth;
+    //gameSettings.currentBodyHeight = windowHeight;
+    //gameSettings.currentBodyWidth = $(document).width();
+    //gameSettings.currentBodyHeight = $(document).height();
+    gameSettings.currentBodyWidth = mmrpgBody.outerWidth();
+    gameSettings.currentBodyHeight = mmrpgBody.outerHeight();
+    //console.log('mmrpgBody.width() =', mmrpgBody.width());
+    //console.log('mmrpgBody.height() =', mmrpgBody.height());
+    //console.log('mmrpgBody.outerWidth() =', mmrpgBody.outerWidth());
+    //console.log('mmrpgBody.outerHeight() =', mmrpgBody.outerHeight());
+    //console.log('gameSettings.currentBodyWidth =', gameSettings.currentBodyWidth);
+    //console.log('gameSettings.currentBodyHeight =', gameSettings.currentBodyHeight);
 
     //console.log({windowWidth:windowWidth,windowHeight:windowHeight,gameWidth:gameWidth,gameHeight:gameHeight,gameSettings:gameSettings});
 
