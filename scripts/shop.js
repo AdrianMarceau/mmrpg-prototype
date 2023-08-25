@@ -421,6 +421,14 @@ $(document).ready(function(){
             data: postData,
             success: function(data, status){
 
+                // If the `data` is multi-line, immediately break off anything after the first for later into a `dataExtra` var
+                //console.log('data =', data);
+                var newlineIndex = data.indexOf("\n");
+                var dataExtra = newlineIndex !== -1 ? data.substr(newlineIndex + 1) : false;
+                data = newlineIndex !== -1 ? data.substr(0, newlineIndex) : data;
+                //console.log('data (after) =', data);
+                //console.log('dataExtra =', dataExtra);
+
                 // Break apart the response into parts
                 var data = data.split('|');
                 var dataStatus = data[0] != undefined ? data[0] : false;
@@ -509,6 +517,29 @@ $(document).ready(function(){
 
                                 // We have a popup now so editing is totally allowed
                                 thisShopData.allowEdit = true;
+
+                                // We should add the new robot to the parent ready room
+                                if (typeof window.parent.prototype_ready_room_add_robot !== 'undefined'){
+                                    // If the extra data in dataExtra was not empty and is JSON, parse it into robotInfo
+                                    var newRobotToken = postData.token;
+                                    newRobotToken = newRobotToken.replace(/^robot-/i, '');
+                                    var newRobotInfo = {};
+                                    if (dataExtra !== false){
+                                        try {
+                                            newRobotInfo = JSON.parse(dataExtra);
+                                            }
+                                        catch (e) {
+                                            //console.log('error parsing robotInfo JSON: ', e);
+                                            }
+                                        }
+                                    //console.log('newRobotToken = ', newRobotToken);
+                                    //console.log('newRobotInfo = ', newRobotInfo);
+                                    if (typeof newRobotInfo.token !== 'undefined'
+                                        && newRobotInfo.token === newRobotToken){
+                                        //console.log('newRobotToken(', newRobotToken, ') === newRobotInfo.token(', newRobotInfo.token, ')');
+                                        window.parent.prototype_ready_room_add_robot(newRobotToken, newRobotInfo, true);
+                                        }
+                                    }
 
                                 }
                             // Otherwise turn editing back on and process other actions

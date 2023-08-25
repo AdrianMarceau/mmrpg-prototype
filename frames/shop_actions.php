@@ -194,7 +194,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
                 /*
                 // DEBUG DEBUG DEBUG
                 if ($temp_token === 'yashichi' && $temp_quantity === 7){
-                    $delete_robots = array('acid-man', 'bounce-man', 'oil-man');
+                    $delete_robots = array('acid-man', 'bounce-man');
                     $possible_players = array('dr-light', 'dr-wily', 'dr-cossack');
                     foreach ($delete_robots as $delete_robot){
                         error_log('destroy '.$delete_robot.' in the player data for unlock testing!');
@@ -375,8 +375,29 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
             $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
             $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
 
+            // Collect the newly regenerated unlocked robots index
+            $this_unlocked_robots_index = mmrpg_prototype_robots_unlocked_index_json();
+            $this_unlocked_robot_info = rpg_robot::get_index_info($temp_actual_token);
+            if (!empty($this_unlocked_robots_index[$temp_actual_token])){
+                $this_unlocked_robot_data = $this_unlocked_robots_index[$temp_actual_token];
+            } else {
+                $this_unlocked_robot_data = array(
+                    'token' => $temp_actual_token,
+                    'originalPlayer' => $unlock_player_token,
+                    'currentPlayer' => $unlock_player_token,
+                    'image' => $temp_actual_token,
+                    'imageSize' => $this_unlocked_robot_info['robot_image_size'],
+                    'energyBase' => $this_unlocked_robot_info['robot_energy'],
+                    'weaponsBase' => $this_unlocked_robot_info['robot_weapons'],
+                    'attackBase' => $this_unlocked_robot_info['robot_attack'],
+                    'defenseBase' => $this_unlocked_robot_info['robot_defense'],
+                    'speedBase' => $this_unlocked_robot_info['robot_speed']
+                    );
+            }
+
             // Save, produce the success message with the new robot order
-            exit('success|robot-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank));
+            exit('success|robot-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank).PHP_EOL.json_encode($this_unlocked_robot_data));
+
 
         }
         // Otherwise if this robot does not exist

@@ -2521,8 +2521,9 @@ function prototype_ready_room_hide(){
 }
 
 // Define a function for adding a new robot to the unlocked robot index
-function prototype_ready_room_add_robot(robotToken, robotInfo){
-    //console.log('prototype_ready_room_add_robot(robotToken:', robotToken, ', robotInfo:', robotInfo, ')');
+function prototype_ready_room_add_robot(robotToken, robotInfo, focusRobot){
+    //console.log('prototype_ready_room_add_robot(robotToken:', robotToken, ', robotInfo:', robotInfo, ', focusRobot:', focusRobot, ')');
+    if (typeof focusRobot !== 'boolean'){ focusRobot = false; }
     // Collect the unlocked robots index
     var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
     //console.log('unlockedRobotsIndex =', unlockedRobotsIndex);
@@ -2532,7 +2533,15 @@ function prototype_ready_room_add_robot(robotToken, robotInfo){
     unlockedRobotsIndex[robotToken] = robotInfo;
     //console.log('unlockedRobotsIndex =', unlockedRobotsIndex);
     // Now we need to update the robot's sprite in the ready room
-    prototype_ready_room_add_robot_sprite(robotToken, robotInfo);
+    prototype_ready_room_add_robot_sprite(robotToken, robotInfo, {position: [110,15]});
+    // Immediately update this robot's sprite after a short timeout
+    var focusUpdateTimeout = setTimeout(function(){
+        prototype_ready_room_update_robot(robotToken, {frame: 'slide', direction: 'left', position: [80,5]});
+        clearTimeout(focusUpdateTimeout);
+        focusUpdateTimeout = setTimeout(function(){
+            prototype_ready_room_update_robot(robotToken, {frame: 'taunt'});
+            }, 600);
+        }, 100);
 }
 
 // Define a function for updating an existing sprite in the ready room given values
@@ -2587,8 +2596,8 @@ function prototype_ready_room_update_robot(robotToken, newSpriteProperties){
 }
 
 // Define a function for adding a new sprite to the ready room given info
-function prototype_ready_room_add_robot_sprite(robotToken, robotInfo){
-    //console.log('prototype_ready_room_add_robot_sprite(robotToken:', robotToken, ', robotInfo:', robotInfo, ')');
+function prototype_ready_room_add_robot_sprite(robotToken, robotInfo, spriteProperties){
+    //console.log('prototype_ready_room_add_robot_sprite(robotToken:', robotToken, ', robotInfo:', robotInfo, ', spriteProperties:', spriteProperties, ')');
     var spriteGrid = gameSettings.readyRoomSpriteGrid;
     var spritesIndex = gameSettings.readyRoomSpritesIndex;
     var $readyRoom = gameSettings.thisReadyRoomElement;
@@ -2597,6 +2606,7 @@ function prototype_ready_room_add_robot_sprite(robotToken, robotInfo){
     var thisRobotToken = robotInfo.token;
     var thisSpriteSize = robotInfo.imageSize;
     var thisSpriteSizeX = thisSpriteSize+'x'+thisSpriteSize;
+    if (typeof spriteProperties !== 'object'){ spriteProperties = {}; }
     var spriteDirection = Math.floor(Math.random() * 2) ? 'left' : 'right';
     var spriteFrame = 0;
     //console.log('robotToken =', robotToken);
@@ -2613,10 +2623,20 @@ function prototype_ready_room_add_robot_sprite(robotToken, robotInfo){
     var randColRowOffsets = prototype_ready_room_colrow_center(randColRow[0], randColRow[1]);
     //console.log('randColRow =', randColRow);
     //console.log('randColRowOffsets =', randColRowOffsets);
-    var spriteOffsetX = randColRowOffsets[0];
-    var spriteOffsetY = randColRowOffsets[1];
-    if (spriteDirection === 'right'){ spriteOffsetX -= Math.floor(Math.random() * spriteGrid.colWidth); }
-    else { spriteOffsetX += Math.floor(Math.random() * spriteGrid.colWidth); }
+    if (typeof spriteProperties.position !== 'undefined'
+        && typeof spriteProperties.position[0] !== 'undefined'){
+        var spriteOffsetX = parseInt(spriteProperties.position[0]);
+        } else {
+        var spriteOffsetX = randColRowOffsets[0];
+        if (spriteDirection === 'right'){ spriteOffsetX -= Math.floor(Math.random() * spriteGrid.colWidth); }
+        else { spriteOffsetX += Math.floor(Math.random() * spriteGrid.colWidth); }
+        }
+    if (typeof spriteProperties.position !== 'undefined'
+        && typeof spriteProperties.position[1] !== 'undefined'){
+        var spriteOffsetY = parseInt(spriteProperties.position[1]);
+        } else {
+        var spriteOffsetY = randColRowOffsets[1];
+        }
     var spriteOffsetZ = 100 - spriteOffsetY;
     var spriteBrightness = (spriteOffsetZ / 100);
     var spriteFilterValue = 'brightness('+spriteBrightness+')';
@@ -2635,9 +2655,7 @@ function prototype_ready_room_add_robot_sprite(robotToken, robotInfo){
     $spriteInner.css({'animation-duration': spriteAnimationDuration+'s'});
     $sprite.append($spriteInner);
     // append the newly generated sprite to the ready room
-    //console.log('$readyRoomTeam.append($sprite = ', $sprite, ');');
-    $sprite.appendTo($readyRoomTeam);
-    spritesIndex[robotToken] = {
+    var spriteData = {
         sprite: $sprite,
         spriteInner: $spriteInner,
         image: thisSpriteImage,
@@ -2655,6 +2673,10 @@ function prototype_ready_room_add_robot_sprite(robotToken, robotInfo){
         charge: 0,
         cooldown: 0
         };
+    //console.log('$readyRoomTeam.append($sprite); // $sprite =', $sprite);
+    //console.log('spritesIndex['+robotToken+'] = spriteData; // spriteData =', spriteData);
+    $sprite.appendTo($readyRoomTeam);
+    spritesIndex[robotToken] = spriteData;
 
 }
 
