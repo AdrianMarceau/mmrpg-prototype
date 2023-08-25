@@ -251,7 +251,7 @@
                     $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
                     $temp_info_tooltip .= '</span>';
 
-                    $star_sprite_token = $star_info['star_kind'].'-star_'.$star_info_type.(!empty($star_info_type2) ? '-'.$star_info_type2 : '');
+                    $star_sprite_token = $star_info['star_kind'].'-star_'.$star_info_type.(!empty($star_info_type2) && $star_info_type2 !== $star_info_type ? '-'.$star_info_type2 : '');
                     $star_sprite_offset = !empty($composite_sprite_index[$star_sprite_token]['offset']) ? $composite_sprite_index[$star_sprite_token]['offset'] : array('x' => 9999, 'y' => 9999);
                     $star_sprite_image_markup = str_replace('background-position: 0 0;', 'background-position: -'.$star_sprite_offset['x'].'px -'.$star_sprite_offset['y'].'px;', $composite_sprite_image_markup);
                     $star_info_name = $star_sprite_image_markup.'<span class="wrap">'.$star_info_name.'</span>';
