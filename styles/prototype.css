@@ -2418,7 +2418,11 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_wrapper .option_1x1.starfield div label.has_image,
 #prototype .option_wrapper .option_1x2.starfield div label.has_image,
 #prototype .option_wrapper .option_1x3.starfield div label.has_image,
-#prototype .option_wrapper .option_1x4.starfield div label.has_image {
+#prototype .option_wrapper .option_1x4.starfield div label.has_image,
+#prototype .option_wrapper .option_1x1.starfield div label.no_image,
+#prototype .option_wrapper .option_1x2.starfield div label.no_image,
+#prototype .option_wrapper .option_1x3.starfield div label.no_image,
+#prototype .option_wrapper .option_1x4.starfield div label.no_image {
     position: relative;
     box-sizing: border-box;
     width: 40px;
