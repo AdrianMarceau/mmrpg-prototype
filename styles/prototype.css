@@ -385,11 +385,14 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     text-transform: none;
 }
 #prototype .banner .points.overflow {
-    width: 290px;
+    /* width: 290px;  */
 }
 #prototype .banner .subpoints.overflow {
-    height: 33px;
+    height: 35px;
     width: 240px;
+}
+#prototype[data-step-number="1"] .banner .subpoints.overflow {
+    right: calc(100% - 250px + 35px);
 }
 #prototype .banner .subpoints.overflow .amount.zenny {
     display: block;
