@@ -622,7 +622,7 @@ function mmrpg_trigger_reset(fullReset){
     var confirmText = 'Are you sure you want to reset your entire game?\nAll progress will be lost and cannot be restored including any and all unlocked missions, robots, and abilities. Continue?';
     var confirmText2 = 'Let me repeat that one more time.\nIf you reset your game ALL unlocks and progress with be lost. \nEverything. \nReset anyway?';
     // Attempt to confirm with the user of they want to reset
-    prototype_ready_room_update_robot('all', {frame: 9}); // damage
+    prototype_ready_room_update_robot('all', {frame: 'damage'}); // damage
     prototype_ready_room_stop_animation();
     if (confirm(confirmText) && confirm(confirmText2)){
         // Redirect the user to the prototype reset page
@@ -630,7 +630,7 @@ function mmrpg_trigger_reset(fullReset){
         if (fullReset){ postURL += '&full_reset=true'; }
         $.post(postURL, function(){
             //alert('reset complete!');
-            prototype_ready_room_update_robot('all', {frame: 4}); // defeat
+            prototype_ready_room_update_robot('all', {frame: 'defeat'}); // defeat
             if (window.self != window.parent){
                 window.location = 'prototype.php';
                 } else {
@@ -731,14 +731,14 @@ function prototype_menu_loaded(){
             if (animateReadyRoom){
                 //console.log('menu '+gameSettings.nextStepName+' has loaded');
                 var newRobotFrame = 0;
-                if (gameSettings.nextStepName === 'abilities'){ newRobotFrame = 4; } // shoot
-                else if (gameSettings.nextStepName === 'items'){ newRobotFrame = 6; } // summon
-                else if (gameSettings.nextStepName === 'shop'){ newRobotFrame = 5; } // throw (money away)
-                else if (gameSettings.nextStepName === 'edit_robots'){ newRobotFrame = 1; } // taunt
-                else if (gameSettings.nextStepName === 'edit_players'){ newRobotFrame = 1; } // taunt
-                else if (gameSettings.nextStepName === 'database'){ newRobotFrame = 10; } // base2
-                else if (parseInt(gameSettings.nextStepName) > 0){ newRobotFrame = 2; } // victory
-                else { newRobotFrame = 8; } // defend
+                if (gameSettings.nextStepName === 'abilities'){ newRobotFrame = 'shoot'; } // shoot
+                else if (gameSettings.nextStepName === 'items'){ newRobotFrame = 'summon'; } // summon
+                else if (gameSettings.nextStepName === 'shop'){ newRobotFrame = 'throw'; } // throw (money away)
+                else if (gameSettings.nextStepName === 'edit_robots'){ newRobotFrame = 'taunt'; } // taunt
+                else if (gameSettings.nextStepName === 'edit_players'){ newRobotFrame = 'taunt'; } // taunt
+                else if (gameSettings.nextStepName === 'database'){ newRobotFrame = 'base2'; } // base2
+                else if (parseInt(gameSettings.nextStepName) > 0){ newRobotFrame = 'victory'; } // victory
+                else { newRobotFrame = 'defend'; } // defend
                 prototype_ready_room_update_robot('most', {frame: newRobotFrame});
                 }
             gameSettings.nextStepName = false;
@@ -1517,7 +1517,17 @@ function prototype_menu_switch(switchOptions){
                 && typeof battleOptions['this_player_token'] !== 'undefined'
                 && battleOptions['this_player_token'].length){
                 prototype_ready_room_show();
-                if (loadState === 'fadein'){
+                if (loadState === 'reload'){
+                    var spriteBounds = gameSettings.readyRoomSpriteBounds;
+                    var filterPlayer = battleOptions['this_player_token'];
+                    prototype_ready_room_update_robot(function(token, info){
+                        return info.currentPlayer === filterPlayer;
+                        }, {frame: 'slide', direction: 'right', position: ['+=2', null], opacity: 1});
+                    prototype_ready_room_update_robot(function(token, info){
+                        return info.currentPlayer !== filterPlayer;
+                        }, {frame: 'slide', direction: 'left', position: ['-=4', null], opacity: 0});
+                    }
+                else if (loadState === 'fadein'){
                     prototype_ready_room_refresh(battleOptions['this_player_token']);
                     }
                 }
@@ -2243,12 +2253,12 @@ function prototype_ready_room_animate() {
                     // Define the allowed frames we can transition to then pick one at random
                     var randInt = Math.floor(Math.random() * 10) + 1;
                     var possibleRandomFrames = [];
-                    possibleRandomFrames.push(1); // taunt
-                    possibleRandomFrames.push(8); // defend
-                    possibleRandomFrames.push(10); // base2
-                    if (randInt >= 10){ possibleRandomFrames.push(4); } // shoot
-                    if (randInt >= 8){ possibleRandomFrames.push(5); } // throw
-                    if (randInt >= 6){ possibleRandomFrames.push(6); } // summon
+                    possibleRandomFrames.push('taunt'); // taunt
+                    possibleRandomFrames.push('defend'); // defend
+                    possibleRandomFrames.push('base2'); // base2
+                    if (randInt >= 10){ possibleRandomFrames.push('shoot'); } // shoot
+                    if (randInt >= 8){ possibleRandomFrames.push('throw'); } // throw
+                    if (randInt >= 6){ possibleRandomFrames.push('summon'); } // summon
                     newSpriteProperties.frame = possibleRandomFrames[Math.floor(Math.random() * possibleRandomFrames.length)];
 
                     }
@@ -2269,7 +2279,7 @@ function prototype_ready_room_animate() {
                     || randomTransition === 'elevation'){
 
                     // Set the robot to it's slide frame (7) first
-                    newSpriteProperties.frame = 7;
+                    newSpriteProperties.frame = 'slide';
                     // Then move the robot in the direction they're facing
                     var oldPosition = oldSpriteProperties.position;
                     var newXPosition = oldPosition[0];
@@ -2356,6 +2366,11 @@ function prototype_ready_room_animate_robot(robotToken, newValues, onComplete){
     // If a frame change was requested, we can process that now
     if (typeof newValues.frame !== 'undefined'){
         var newSpriteFrame = newValues.frame;
+        if (typeof newSpriteFrame === 'string'){
+            var spriteFrameTokens = ['base', 'taunt', 'victory', 'defeat', 'shoot', 'throw', 'summon', 'slide', 'defend', 'damage', 'base2'];
+            if (spriteFrameTokens.indexOf(newSpriteFrame) !== -1){ newSpriteFrame = spriteFrameTokens.indexOf(newSpriteFrame); }
+            else { newSpriteFrame = 0; }
+            }
         var newBackgroundOffset = -1 * (thisSpriteSize * newSpriteFrame);
         thisSprite.frame = newSpriteFrame;
         $thisSpriteInner.attr('data-frame', newSpriteFrame);
@@ -2370,9 +2385,40 @@ function prototype_ready_room_animate_robot(robotToken, newValues, onComplete){
         $thisSprite.css({'transform': 'scale('+(thisSprite.direction !== thisSprite.imageDirection ? -2 : 2)+', 2)'});
         }
 
+    // If an opacity change was requested, we can process that now
+    if (typeof newValues.opacity !== 'undefined'){
+        var newSpriteOpacity = newValues.opacity;
+        if (newSpriteOpacity > 1){ newSpriteOpacity = 1; }
+        else if (newSpriteOpacity < 0){ newSpriteOpacity = 0; }
+        thisSprite.opacity = newSpriteOpacity;
+        $thisSprite.css({'opacity': newSpriteOpacity});
+        }
+
     // If a position change was requested, we can process that now
     if (typeof newValues.position !== 'undefined'){
-        var newSpritePosition = newValues.position;
+        //console.log('position change requested w/ newValues.position =', newValues.position);
+        //var newSpritePosition = newValues.position;
+        if (typeof newValues.position[0] === 'undefined'){ newValues.position[0] = null; }
+        if (typeof newValues.position[1] === 'undefined'){ newValues.position[1] = null; }
+        var parsePositionValue = function(newValue, oldValue){
+            //console.log('parsePositionValue(newValue:', newValue, ', oldValue:', oldValue, ')');
+            if (typeof newValue === 'undefined'){ return oldValue; }
+            else if (typeof newValue === 'number'){ return newValue; }
+            else if (typeof newValue !== 'string'){ return oldValue; }
+            var modValue = oldValue;
+            if (newValue.indexOf('+=') !== -1){ return modValue + parseInt(newValue.replace('+=', '')); }
+            else if (newValue.indexOf('-=') !== -1){ return modValue - parseInt(newValue.replace('-=', '')); }
+            else if (newValue.indexOf('*=') !== -1){ return modValue * parseInt(newValue.replace('*=', '')); }
+            else if (newValue.indexOf('/=') !== -1){ return modValue / parseInt(newValue.replace('/=', '')); }
+            else if (newValue.indexOf('%=') !== -1){ return modValue % parseInt(newValue.replace('%=', '')); }
+            else if (newValue.indexOf('++') !== -1){ return modValue + 1; }
+            else { return parseInt(newValue); }
+            };
+        var newSpritePosition = [];
+        newSpritePosition.push(parsePositionValue(newValues.position[0], thisSprite.position[0]));
+        newSpritePosition.push(parsePositionValue(newValues.position[1], thisSprite.position[1]));
+        newSpritePosition.push(100 - newSpritePosition[1]);
+        //console.log('newSpritePosition =', newSpritePosition);
         thisSprite.position = newSpritePosition;
         var newCSS = {
             'left': newSpritePosition[0]+'%',
@@ -2383,6 +2429,7 @@ function prototype_ready_room_animate_robot(robotToken, newValues, onComplete){
         //console.log('updating sprite position for ', robotToken, ' to ', newCSS);
         $thisSprite.css(newCSS);
         }
+
 
 }
 
@@ -2491,6 +2538,16 @@ function prototype_ready_room_update_robot(robotToken, newSpriteProperties){
             var sliceToCount = Math.floor(requiredRobots.length * (sliceToPercent / 100));
             shuffleArray(requiredRobots);
             requiredRobots = requiredRobots.slice(0, sliceToCount);
+            }
+        }
+    else if (typeof robotToken === 'function'){
+        var robotTokenFunction = robotToken;
+        var unlockedRobotsTokens = Object.keys(unlockedRobotsIndex);
+        for (var i = 0; i < unlockedRobotsTokens.length; i++){
+            var robotToken = unlockedRobotsTokens[i];
+            var robotInfo = unlockedRobotsIndex[robotToken];
+            if (!robotTokenFunction(robotToken, robotInfo)){ continue; }
+            requiredRobots.push(robotToken);
             }
         }
     else {
