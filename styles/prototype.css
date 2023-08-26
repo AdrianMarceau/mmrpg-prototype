@@ -1997,6 +1997,9 @@ body[data-source="website"] #prototype .menu {
     background-position: 0 0;
     animation: player-button-background-scroll 40s linear infinite;
 }
+#mmrpg #prototype[data-step-number="0"] .banner .option_this-player-select[data-token] {
+    display: none;
+}
 
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"],
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-endless-mission"],
