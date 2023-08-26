@@ -994,11 +994,9 @@ function mmrpg_prototype_players_unlocked_index(){
     foreach ($session_battle_keys AS $session_battle_key){
         if (!empty($_SESSION[$session_token]['values'][$session_battle_key])){
             foreach ($_SESSION[$session_token]['values'][$session_battle_key] AS $player_token => $player_array){
-                if (!isset($this_unlocked_players_index[$player_token])){
-                    $player_array['player_robots'] = array_keys($player_array['player_robots']);
-                    $player_array['player_fields'] = array_keys($player_array['player_fields']);
-                    $this_unlocked_players_index[$player_token] = $player_array;
-                }
+                $existing_player_array = array();
+                if (isset($this_unlocked_players_index[$player_token])){ $existing_player_array = $this_unlocked_players_index[$player_token];}
+                $this_unlocked_players_index[$player_token] = array_merge($existing_player_array, $player_array);
             }
         }
     }
@@ -1009,6 +1007,7 @@ function mmrpg_prototype_players_unlocked_index(){
             $player_info = $mmrpg_players_index[$player_token];
             if (isset($player_array['flags'])){ $player_array['flags'] = array_keys($player_array['flags']); }
             if (isset($player_array['player_abilities'])){ $player_array['player_abilities'] = array_keys($player_array['player_abilities']); }
+            if (!isset($player_array['player_token'])){ $player_array['player_token'] = $player_token; }
             $player_array['player_type'] = $player_info['player_type'];
             $player_array['player_image'] = $player_info['player_image'];
             $player_array['player_image_size'] = $player_info['player_image_size'];
@@ -1017,6 +1016,9 @@ function mmrpg_prototype_players_unlocked_index(){
             $player_array['player_attack_base'] = 100;
             $player_array['player_defense_base'] = 100;
             $player_array['player_speed_base'] = 100;
+            $player_array['player_robots'] = array_keys($player_array['player_robots']);
+            $player_array['player_fields'] = array_keys($player_array['player_fields']);
+            unset($player_array['player_items'], $player_array['player_abilities']);
             if (isset($player_array['player_'.$player_array['player_type'].'_base'])){
                 $player_array['player_'.$player_array['player_type'].'_base'] += 25;
             }
@@ -1025,6 +1027,7 @@ function mmrpg_prototype_players_unlocked_index(){
     }
 
     // Return the collected data
+    //error_log('$this_unlocked_players_index = '.print_r($this_unlocked_players_index, true));
     return $this_unlocked_players_index;
 }
 

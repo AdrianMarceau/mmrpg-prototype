@@ -1565,9 +1565,12 @@ function prototype_menu_switch(switchOptions){
                 if (loadState === 'reload'){
                     // If not already filtered, animate the player's robots sliding into place
                     if (!gameSettings.readyRoomIsFiltered){
+                        prototype_ready_room_update_player(function(token, info){ return info.player !== filterPlayer; }, {frame: 'running', direction: 'left', position: ['-=4', null], opacity: 0});
+                        prototype_ready_room_update_player(filterPlayer, {frame: 'running', direction: 'right', position: [(spriteBounds.maxX / 2), (spriteBounds.minY - 1)], opacity: 1});
                         prototype_ready_room_update_robot(filterOtherPlayersFunction, {frame: 'slide', direction: 'left', position: ['-=4', null], opacity: 0});
                         prototype_ready_room_update_robot(filterPlayerFunction, {frame: 'slide', direction: 'right', position: ['+=2', null], opacity: 1});
                         var updateTimeout = setTimeout(function(){
+                            prototype_ready_room_update_player(filterPlayer, {frame: 'base'});
                             prototype_ready_room_update_robot(filterPlayerFunction, {frame: 'base'});
                             clearTimeout(updateTimeout);
                             updateTimeout = setTimeout(function(){
@@ -2316,9 +2319,10 @@ function prototype_ready_room_animate() {
         var thisCharacterKind = thisSpriteData.kind;
         var thisCharacterInfo = thisSpriteData.info;
 
-        //console.log('Animating thisCharacter =', thisCharacterToken, thisCharacterKind, thisCharacterInfo);
+        //console.log('Animating character ', thisCharacterToken, thisCharacterKind, thisCharacterInfo);
 
         // Collect refererences to the character's sprite and sprite inner elements now that we know we can animate
+        //if (typeof readyRoomSpritesIndex[thisSpriteToken] === 'undefined'){ continue; }
         var thisSprite = readyRoomSpritesIndex[thisSpriteToken];
         var $thisSprite = thisSprite.sprite;
         var $thisSpriteInner = thisSprite.spriteInner;
@@ -2710,9 +2714,9 @@ function prototype_ready_room_update_character(characterKind, characterToken, ne
     else if (characterKind === 'robot'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedRobotsIndex; }
     //else if (characterKind === 'shop'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedShopsIndex; }
     else { return false; }
-    var spritesIndex = gameSettings.readyRoomSpritesIndex;
+    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
     //console.log('unlockedCharactersIndex =', unlockedCharactersIndex);
-    //console.log('spritesIndex =', spritesIndex);
+    //console.log('readyRoomSpritesIndex =', readyRoomSpritesIndex);
     // Abstract the characterToken in case the user has provided the "all" option
     var requiredCharacters = [];
     if (characterToken === 'all'
@@ -2745,10 +2749,10 @@ function prototype_ready_room_update_character(characterKind, characterToken, ne
         var characterToken = requiredCharacters[i];
         // If the character is doesn't exist in the index, we can't do anything to it
         if (typeof unlockedCharactersIndex[characterToken] === 'undefined'){ return false; }
-        if (typeof spritesIndex[characterToken] === 'undefined'){ return false; }
+        if (typeof readyRoomSpritesIndex[characterToken] === 'undefined'){ return false; }
         // Otherwise we can collect info about the character
         var characterInfo = unlockedCharactersIndex[characterToken];
-        var spriteInfo = spritesIndex[characterToken];
+        var spriteInfo = readyRoomSpritesIndex[characterToken];
         //console.log('characterInfo =', characterInfo);
         //console.log('spriteInfo =', spriteInfo);
         // Trigger the animate function with the provided new values
@@ -2780,13 +2784,13 @@ function prototype_ready_room_add_character_sprite(kind, characterToken, charact
 
     // Initial setup for both player and robot
     var spriteGrid = gameSettings.readyRoomSpriteGrid;
-    var spritesIndex = gameSettings.readyRoomSpritesIndex;
+    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
     var $readyRoom = gameSettings.thisReadyRoomElement;
     var $readyRoomTeam = $('.team', $readyRoom);
     var thisSpriteSize = characterInfo.imageSize;
     var thisSpriteSizeX = thisSpriteSize + 'x' + thisSpriteSize;
     //console.log('spriteGrid =', spriteGrid);
-    //console.log('spritesIndex =', spritesIndex);
+    //console.log('readyRoomSpritesIndex =', readyRoomSpritesIndex);
     //console.log('$readyRoom =', typeof $readyRoom, $readyRoom);
     //console.log('$readyRoomTeam =', typeof $readyRoomTeam, $readyRoomTeam);
     //console.log('thisSpriteSize =', thisSpriteSize);
@@ -2863,6 +2867,7 @@ function prototype_ready_room_add_character_sprite(kind, characterToken, charact
     $sprite.append($spriteInner);
 
     // Generate the sprite data object and then add it to the index
+    var spriteToken = thisToken;
     var spriteData = {
         sprite: $sprite,
         spriteInner: $spriteInner,
@@ -2885,9 +2890,9 @@ function prototype_ready_room_add_character_sprite(kind, characterToken, charact
 
     // Add the newly generates sprite data to the ready room
     //console.log('$readyRoomTeam.append($sprite); // $sprite =', $sprite);
-    //console.log('spritesIndex['+thisToken+'] = spriteData; // spriteData =', spriteData);
+    //console.log('readyRoomSpritesIndex['+thisToken+'] = spriteData; // spriteData =', spriteData);
     $sprite.appendTo($readyRoomTeam);
-    spritesIndex[thisToken] = spriteData;
+    readyRoomSpritesIndex[thisToken] = spriteData;
 
 }
 
