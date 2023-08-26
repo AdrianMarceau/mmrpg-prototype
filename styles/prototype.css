@@ -300,19 +300,24 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     text-align: right;
 }
 
+#prototype[data-step-number="0"] .banner .points,
 #prototype[data-step-number="1"] .banner .points {
     right: calc(100% - 320px + 35px);
 }
+#prototype[data-step-number="0"] .banner .points .label,
 #prototype[data-step-number="1"] .banner .points .label {
     padding-left: 0;
     padding-right: 20px;
 }
+#prototype[data-step-number="0"] .banner .points > .wrapper,
 #prototype[data-step-number="1"] .banner .points > .wrapper {
     text-align: left;
 }
+#prototype[data-step-number="0"] .banner .subpoints,
 #prototype[data-step-number="1"] .banner .subpoints {
     right: calc(100% - 230px + 25px);
 }
+#prototype[data-step-number="0"] .banner .subpoints > .wrapper,
 #prototype[data-step-number="1"] .banner .subpoints > .wrapper {
     text-align: left;
 }

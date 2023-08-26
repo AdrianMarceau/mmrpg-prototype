@@ -353,23 +353,26 @@ $(document).ready(function(){
         // Check if the player token has already been selected
         // and collect any data attributes for styling
         //console.log('first load of prototype > predefining selections and data attributes');
+        //console.log('kanto');
         var dataStepName = 'home';
         var dataStepNumber = 1;
-        if (battleOptions['this_player_token'] !== undefined){
+        if (typeof battleOptions['this_player_token'] !== 'undefined'
+            && battleOptions['this_player_token'].length){
 
             //alert('player selected : '+battleOptions['this_player_token']);
             gameSettings.skipPlayerSelect = true;
             var thisMenu = $('.menu[data-select="this_player_token"]', thisContext);
             $('.option[data-token="'+battleOptions['this_player_token']+'"]', thisMenu).triggerSilentClick();
-            dataStepNumber = 2;
+
+            if (dataStepNumber === 1){ dataStepNumber = 2; }
 
             }
 
         // Update the prototype element with the data attributes for styling
         thisPrototype.attr('data-step-name', dataStepName);
         thisPrototype.attr('data-step-number', dataStepNumber);
-        //console.log('dataStepName =>', dataStepName);
-        //console.log('dataStepNumber =>', dataStepNumber);
+        //console.log('dataStepName =>', typeof dataStepName, dataStepName);
+        //console.log('dataStepNumber =>', typeof dataStepNumber, dataStepNumber);
 
         // Attempt to define the top frame
         var topFrame = window.top;
@@ -1427,15 +1430,33 @@ function prototype_menu_switch(switchOptions){
     var currentStepToken = $('.menu[data-step]:not(.menu_hide)', thisContext).attr('data-step');
 
     // Update the prototype element with data attributes for styling
+    //console.log('johto');
     var dataStepName = switchOptions.stepName;
-    if (dataStepName === false){ dataStepName = 'home'; }
-    else if (parseInt(dataStepName) > 0){ dataStepName = 'home'; }
     var dataStepNumber = switchOptions.stepNumber;
-    if (!dataStepNumber){ dataStepNumber = 1; }
+    if (dataStepName === false){
+        dataStepName = 'home';
+        }
+    else if (parseInt(dataStepName) > 0){
+        dataStepNumber = parseInt(dataStepName);
+        dataStepName = 'home';
+        }
+    if (dataStepName === 'home'){
+        if (!dataStepNumber){
+            dataStepNumber = 1;
+            }
+        if (dataStepNumber === 1
+            && typeof battleOptions['this_player_token'] !== 'undefined'
+            && battleOptions['this_player_token'].length){
+            dataStepNumber == 2;
+            }
+        }
+    else if (dataStepName !== 'home'){
+        dataStepNumber = 0;
+        }
     thisPrototype.attr('data-step-name', dataStepName);
     thisPrototype.attr('data-step-number', dataStepNumber);
-    //console.log('dataStepName =>', switchOptions.stepName, '=>', dataStepName);
-    //console.log('dataStepNumber =>', switchOptions.stepNumber, '=>', dataStepNumber);
+    //console.log('dataStepName =>', typeof switchOptions.stepName, switchOptions.stepName, '=>', typeof dataStepName, dataStepName);
+    //console.log('dataStepNumber =>', typeof switchOptions.stepNumber, switchOptions.stepNumber, '=>', typeof dataStepNumber, dataStepNumber);
 
     // Only proceed normally if the current start link is home
     if (gameSettings.startLink != 'home'){
@@ -1523,9 +1544,15 @@ function prototype_menu_switch(switchOptions){
             }
 
         // Define a function for checking and managing the read room content
+        //console.log('hoenn');
         var tempReadyRoomFunction = function(loadState){
             //console.log('tempReadyRoomFunction(loadState:', typeof loadState, loadState, ')');
             if (typeof loadState === 'undefined'){ loadState = ''; }
+
+            // Define some quick filter functions for dealing with player-specific robots
+            var filterPlayer = typeof battleOptions['this_player_token'] !== 'undefined' && battleOptions['this_player_token'].length ? battleOptions['this_player_token'] : '';
+            var filterPlayerFunction = function(token, info){ return info.currentPlayer === filterPlayer; };
+            var filterOtherPlayersFunction = function(token, info){ return info.currentPlayer !== filterPlayer; };
 
             // Update, show, or update the READY ROOM based on option-specific commands for special cases
             //console.log('switchOptions.stepNumber =', switchOptions.stepNumber);
@@ -1534,15 +1561,31 @@ function prototype_menu_switch(switchOptions){
                 && typeof battleOptions['this_player_token'] !== 'undefined'
                 && battleOptions['this_player_token'].length){
                 prototype_ready_room_show();
+                var spriteBounds = gameSettings.readyRoomSpriteBounds;
                 if (loadState === 'reload'){
-                    var spriteBounds = gameSettings.readyRoomSpriteBounds;
-                    var filterPlayer = battleOptions['this_player_token'];
-                    prototype_ready_room_update_robot(function(token, info){
-                        return info.currentPlayer === filterPlayer;
-                        }, {frame: 'slide', direction: 'right', position: ['+=2', null], opacity: 1});
-                    prototype_ready_room_update_robot(function(token, info){
-                        return info.currentPlayer !== filterPlayer;
-                        }, {frame: 'slide', direction: 'left', position: ['-=4', null], opacity: 0});
+                    // If not already filtered, animate the player's robots sliding into place
+                    if (!gameSettings.readyRoomIsFiltered){
+                        prototype_ready_room_update_robot(filterOtherPlayersFunction, {frame: 'slide', direction: 'left', position: ['-=4', null], opacity: 0});
+                        prototype_ready_room_update_robot(filterPlayerFunction, {frame: 'slide', direction: 'right', position: ['+=2', null], opacity: 1});
+                        var updateTimeout = setTimeout(function(){
+                            prototype_ready_room_update_robot(filterPlayerFunction, {frame: 'base'});
+                            clearTimeout(updateTimeout);
+                            updateTimeout = setTimeout(function(){
+                                prototype_ready_room_update_robot('some', {direction: 'left'});
+                                prototype_ready_room_update_robot('most', {frame: 'taunt'});
+                                clearTimeout(updateTimeout);
+                                }, 900);
+                            }, 900);
+
+                        }
+                    // Otherwise if already filtered that means they changed their mind about a mission
+                    else {
+                        prototype_ready_room_update_robot(filterPlayerFunction, {frame: 'damage'});
+                        var updateTimeout = setTimeout(function(){
+                            prototype_ready_room_update_robot(filterPlayerFunction, {frame: 'base'});
+                            clearTimeout(updateTimeout);
+                            }, 1200);
+                        }
                     }
                 else if (loadState === 'fadein'){
                     prototype_ready_room_refresh(battleOptions['this_player_token']);
@@ -1554,9 +1597,22 @@ function prototype_menu_switch(switchOptions){
                     }
                 }
             else if (currentMenuSelect === 'this_player_robots'){
-                prototype_ready_room_hide();
-                }
 
+                if (typeof battleOptions['this_player_token'] !== 'undefined'
+                    && battleOptions['this_player_token'].length){
+                    prototype_ready_room_update_robot(filterPlayerFunction, {frame: 'taunt'});
+                    var updateTimeout = setTimeout(function(){
+                        prototype_ready_room_hide();
+                        clearTimeout(updateTimeout);
+                        }, 900);
+                    }
+                else {
+                    prototype_ready_room_hide();
+                    }
+                }
+            else if (typeof currentMenuSelect === 'undefined'){
+                prototype_ready_room_refresh();
+                }
             };
 
         // Define the function for reloading content
@@ -2131,6 +2187,7 @@ function prototype_ready_room_init(onComplete){
 }
 
 // Define a function for refreshing the ready room with unlocked robots, optionally filtering by player token
+gameSettings.readyRoomIsFiltered = false;
 function prototype_ready_room_refresh(filterByPlayerToken) {
     //console.log('prototype_ready_room_refresh(', filterByPlayerToken, ')');
     if (!gameSettings.readyRoomIsReady){ return false; }
@@ -2141,8 +2198,10 @@ function prototype_ready_room_refresh(filterByPlayerToken) {
     var $allSprites = $readyRoomTeam.find('.sprite[data-kind]');
     //console.log('$allSprites.length =', $allSprites.length);
     if (filterByPlayerToken === false) {
+        gameSettings.readyRoomIsFiltered = false;
         $allSprites.css({opacity: 1});
     } else {
+        gameSettings.readyRoomIsFiltered = true;
         $allSprites.each(function() {
             var $thisSprite = $(this);
             var thisPlayerToken = $thisSprite.attr('data-player');
