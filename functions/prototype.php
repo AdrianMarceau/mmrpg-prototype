@@ -976,6 +976,92 @@ function mmrpg_prototype_robots_unlocked($player_token = ''){
     }
 
 }
+
+// Define a function for getting a players unlocked index for reference
+function mmrpg_prototype_players_unlocked_index(){
+
+    // Define the game session helper var
+    $session_token = rpg_game::session_token();
+
+    // Collect the actual players index for reference later
+    $mmrpg_players_index = rpg_player::get_index();
+
+    // Define an empty array to hold the unlocked players index
+    $this_unlocked_players_index = array();
+
+    // Loop through relevant sessions keys and collect player data
+    $session_battle_keys = array('battle_settings', 'battle_rewards');
+    foreach ($session_battle_keys AS $session_battle_key){
+        if (!empty($_SESSION[$session_token]['values'][$session_battle_key])){
+            foreach ($_SESSION[$session_token]['values'][$session_battle_key] AS $player_token => $player_array){
+                if (!isset($this_unlocked_players_index[$player_token])){
+                    $player_array['player_robots'] = array_keys($player_array['player_robots']);
+                    $player_array['player_fields'] = array_keys($player_array['player_fields']);
+                    $this_unlocked_players_index[$player_token] = $player_array;
+                }
+            }
+        }
+    }
+
+    // If players were found, we need to parse the data and clean it a bit before returning
+    if (!empty($this_unlocked_players_index)){
+        foreach ($this_unlocked_players_index AS $player_token => $player_array){
+            $player_info = $mmrpg_players_index[$player_token];
+            if (isset($player_array['flags'])){ $player_array['flags'] = array_keys($player_array['flags']); }
+            if (isset($player_array['player_abilities'])){ $player_array['player_abilities'] = array_keys($player_array['player_abilities']); }
+            $player_array['player_type'] = $player_info['player_type'];
+            $player_array['player_image'] = $player_info['player_image'];
+            $player_array['player_image_size'] = $player_info['player_image_size'];
+            $player_array['player_energy_base'] = 100;
+            $player_array['player_weapons_base'] = 100;
+            $player_array['player_attack_base'] = 100;
+            $player_array['player_defense_base'] = 100;
+            $player_array['player_speed_base'] = 100;
+            if (isset($player_array['player_'.$player_array['player_type'].'_base'])){
+                $player_array['player_'.$player_array['player_type'].'_base'] += 25;
+            }
+            $this_unlocked_players_index[$player_token] = $player_array;
+        }
+    }
+
+    // Return the collected data
+    return $this_unlocked_players_index;
+}
+
+// Define a function for getting a players unlocked index in a JSON compatible format
+function mmrpg_prototype_players_unlocked_index_json(){
+
+    // Define the game session helper var
+    $session_token = rpg_game::session_token();
+
+    // Collect the unlocked players index from the other function so we can reformat
+    $this_unlocked_players_index = mmrpg_prototype_players_unlocked_index();
+
+    // If unlocked players were found, we can loop through and reformat into the new array
+    $this_unlocked_players_index_json = array();
+    if (!empty($this_unlocked_players_index)){
+        foreach ($this_unlocked_players_index AS $player_token => $player_array){
+            $new_player_array = array();
+            foreach ($player_array AS $key => $value){
+                $new_key = preg_replace('/^player_/i', '', $key);
+                if (strpos($new_key, '_') !== false){
+                    $key_parts = explode('_', $new_key);
+                    $new_key = $key_parts[0];
+                    for ($i = 1; $i < count($key_parts); $i++){
+                        $new_key .= ucfirst($key_parts[$i]);
+                    }
+                }
+                $new_player_array[$new_key] = $value;
+            }
+            $this_unlocked_players_index_json[$player_token] = $new_player_array;
+        }
+    }
+
+    // Return the reformatted data
+    return $this_unlocked_players_index_json;
+}
+
+
 // Define a function for getting a robots unlocked index for reference
 function mmrpg_prototype_robots_unlocked_index(){
 
@@ -1024,6 +1110,7 @@ function mmrpg_prototype_robots_unlocked_index(){
     return $this_unlocked_robots_index;
 
 }
+
 // Define a function for getting a robots unlocked index in a JSON compatible format
 function mmrpg_prototype_robots_unlocked_index_json(){
 
