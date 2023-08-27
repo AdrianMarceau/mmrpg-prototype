@@ -1001,6 +1001,9 @@ function mmrpg_prototype_players_unlocked_index(){
         }
     }
 
+    // Collect any predefined relationship data between characters we can possibly insert later
+    $preset_character_relationships = rpg_player::get_character_relationships();
+
     // If players were found, we need to parse the data and clean it a bit before returning
     if (!empty($this_unlocked_players_index)){
         foreach ($this_unlocked_players_index AS $player_token => $player_array){
@@ -1018,9 +1021,18 @@ function mmrpg_prototype_players_unlocked_index(){
             $player_array['player_speed_base'] = 100;
             $player_array['player_robots'] = array_keys($player_array['player_robots']);
             $player_array['player_fields'] = array_keys($player_array['player_fields']);
+            $player_array['player_type_weaknesses'] = array();
+            $player_array['player_type_resistances'] = array();
+            $player_array['player_type_affinities'] = array();
+            $player_array['player_type_immunities'] = array();
+            $player_array['player_relationships'] = array();
             unset($player_array['player_items'], $player_array['player_abilities']);
             if (isset($player_array['player_'.$player_array['player_type'].'_base'])){
                 $player_array['player_'.$player_array['player_type'].'_base'] += 25;
+            }
+            if (isset($preset_character_relationships[$player_token])){
+                $relationships = $preset_character_relationships[$player_token];
+                $player_array['player_relationships'] = $relationships;
             }
             $this_unlocked_players_index[$player_token] = $player_array;
         }
@@ -1093,6 +1105,9 @@ function mmrpg_prototype_robots_unlocked_index(){
         }
     }
 
+    // Collect any predefined relationship data between characters we can possibly insert later
+    $preset_character_relationships = rpg_player::get_character_relationships();
+
     // If robots were found, we need to parse the data and clean it a bit before returning
     if (!empty($this_unlocked_robots_index)){
         foreach ($this_unlocked_robots_index AS $robot_token => $robot_array){
@@ -1105,6 +1120,17 @@ function mmrpg_prototype_robots_unlocked_index(){
             $robot_array['robot_attack_base'] = $robot_info['robot_attack'];
             $robot_array['robot_defense_base'] = $robot_info['robot_defense'];
             $robot_array['robot_speed_base'] = $robot_info['robot_speed'];
+            $robot_array['robot_type'] = $robot_info['robot_core'];
+            $robot_array['robot_type2'] = $robot_info['robot_core2'];
+            $robot_array['robot_type_weaknesses'] = $robot_info['robot_weaknesses'];
+            $robot_array['robot_type_resistances'] = $robot_info['robot_resistances'];
+            $robot_array['robot_type_affinities'] = $robot_info['robot_affinities'];
+            $robot_array['robot_type_immunities'] = $robot_info['robot_immunities'];
+            $robot_array['robot_relationships'] = array();
+            if (isset($preset_character_relationships[$robot_token])){
+                $relationships = $preset_character_relationships[$robot_token];
+                $robot_array['robot_relationships'] = $relationships;
+            }
             $this_unlocked_robots_index[$robot_token] = $robot_array;
         }
     }
