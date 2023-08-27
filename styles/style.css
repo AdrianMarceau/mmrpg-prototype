@@ -2275,6 +2275,7 @@ body.index #header {
     transform: scaleX(1);
     transform-origin: center bottom;
     animation: sprite-wrapper-flipping-animation 9s infinite;
+    animation-delay: 1s;
 }
 /* define a quick and subtle breathing animation for appropriate sprite wrappers */
 @keyframes sprite-wrapper-breathing-animation {
