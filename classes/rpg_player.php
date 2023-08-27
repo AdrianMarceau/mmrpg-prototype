@@ -4169,5 +4169,56 @@ class rpg_player extends rpg_object {
         }
     }
 
+    // Define a function for getting a list of positive and negative relationships among main characters
+    public static function get_character_relationships(){
+        return array(
+            'dr-light' => array(
+                'rival' => 'dr-wily',
+                'positive' => array('dr-cossack', 'mega-man', 'roll', 'proto-man', 'rhythm', 'auto'),
+                'negative' => array('dr-wily', 'bass'),
+                ),
+            'dr-wily' => array(
+                'rival' => 'dr-cossack',
+                'positive' => array('bass', 'disco', 'proto-man'),
+                'negative' => array('dr-light', 'dr-cossack', 'mega-man'),
+                ),
+            'dr-cossack' => array(
+                'rival' => 'dr-light',
+                'positive' => array('dr-light', 'mega-man', 'rhythm', 'kalinka'),
+                'negative' => array('dr-wily'),
+                ),
+            'mega-man' => array(
+                'rival' => 'bass',
+                'positive' => array('dr-light', 'roll', 'proto-man', 'auto'),
+                'negative' => array('dr-wily', 'bass', 'disco'),
+                ),
+            'bass' => array(
+                'rival' => 'mega-man',
+                'positive' => array('splash-woman', 'reggae'),
+                'negative' => array('dr-wily', 'dr-light', 'dr-cossack', 'mega-man', 'proto-man', 'roll', 'disco'),
+                ),
+            'proto-man' => array(
+                'rival' => 'mega-man',
+                'positive' => array('mega-man', 'roll', 'rhythm'),
+                'negative' => array('dr-wily'),
+                ),
+            'roll' => array(
+                'rival' => 'auto',
+                'positive' => array('dr-light', 'mega-man', 'proto-man', 'auto'),
+                'negative' => array('dr-wily', 'bass', 'disco', 'reggae'),
+                ),
+            'disco' => array(
+                'rival' => 'roll',
+                'positive' => array('dr-wily', 'proto-man'),
+                'negative' => array('dr-light', 'dr-cossack', 'roll', 'rhythm'),
+                ),
+            'rhythm' => array(
+                'rival' => 'bright-man',
+                'positive' => array('dr-cossack', 'dr-light', 'mega-man', 'proto-man', 'roll', 'kalinka'),
+                'negative' => array('disco'),
+                ),
+            );
+    }
+
 }
 ?>
