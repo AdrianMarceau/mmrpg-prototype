@@ -3418,7 +3418,7 @@ function dump(arr,level) {
     };
 })(jQuery);
 
-/* Randomize array in-place using Durstenfeld shuffle algorithm */
+/* Define a function to randomize an array in-place using Durstenfeld shuffle algorithm */
 if (typeof window.shuffleArray === 'undefined'){
     function shuffleArray(array) {
         for (var i = array.length - 1; i > 0; i--) {
@@ -3427,6 +3427,13 @@ if (typeof window.shuffleArray === 'undefined'){
             array[i] = array[j];
             array[j] = temp;
         }
+    }
+}
+
+/* Define a function to calculate distance between two points */
+if (typeof window.calcDistance === 'undefined'){
+    function calculateDistance(x1, y1, x2, y2) {
+      return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 }
 
