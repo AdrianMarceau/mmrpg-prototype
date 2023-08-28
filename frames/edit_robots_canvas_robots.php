@@ -14,7 +14,7 @@ $mmrpg_database_robots = rpg_robot::get_index(true, false);
 $frame_token = 'edit_robots';
 $menu_frame_content_unseen = rpg_prototype::get_menu_frame_content_unseen($frame_token);
 //error_log('$menu_frame_content_unseen = '.print_r($menu_frame_content_unseen, true));
-rpg_prototype::clear_menu_frame_content_unseen($frame_token);
+//rpg_prototype::clear_menu_frame_content_unseen($frame_token); // do not clear these here we will extract individual tokens later
 
 // Loop through the allowed edit data for all players
 $key_counter = 0;

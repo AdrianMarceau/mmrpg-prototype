@@ -1009,7 +1009,9 @@ function mmrpg_prototype_players_unlocked_index(){
         foreach ($this_unlocked_players_index AS $player_token => $player_array){
             $player_info = $mmrpg_players_index[$player_token];
             if (isset($player_array['flags'])){ $player_array['flags'] = array_keys($player_array['flags']); }
+            else { $player_array['flags'] = array(); }
             if (isset($player_array['player_abilities'])){ $player_array['player_abilities'] = array_keys($player_array['player_abilities']); }
+            else { $player_array['player_abilities'] = array(); }
             if (!isset($player_array['player_token'])){ $player_array['player_token'] = $player_token; }
             $player_array['player_type'] = $player_info['player_type'];
             $player_array['player_image'] = $player_info['player_image'];
@@ -1113,7 +1115,9 @@ function mmrpg_prototype_robots_unlocked_index(){
         foreach ($this_unlocked_robots_index AS $robot_token => $robot_array){
             $robot_info = $mmrpg_robots_index[$robot_token];
             if (isset($robot_array['flags'])){ $robot_array['flags'] = array_keys($robot_array['flags']); }
+            else { $robot_array['flags'] = array(); }
             if (isset($robot_array['robot_abilities'])){ $robot_array['robot_abilities'] = array_keys($robot_array['robot_abilities']); }
+            else { $robot_array['robot_abilities'] = array(); }
             $robot_array['robot_image_size'] = $robot_info['robot_image_size'];
             $robot_array['robot_energy_base'] = $robot_info['robot_energy'];
             $robot_array['robot_weapons_base'] = $robot_info['robot_weapons'];

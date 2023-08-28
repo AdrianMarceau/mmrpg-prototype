@@ -111,6 +111,11 @@ foreach($allowed_edit_data AS $player_token => $player_info){
             $temp_editor_markup = rpg_robot::print_editor_markup($player_info, $robot_info);
             echo $temp_editor_markup;
 
+            // Collect the array of unseen menu frame robots if there is one, then clear it
+            $frame_token = 'edit_robots';
+            $content_token = $robot_info['robot_token'];
+            rpg_prototype::remove_menu_frame_content_unseen($frame_token, $content_token);
+
             // Collect the contents of the buffer
             $edit_console_markup = ob_get_clean();
             $edit_console_markup = preg_replace('/\s+/', ' ', trim($edit_console_markup));
