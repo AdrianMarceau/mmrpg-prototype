@@ -9,6 +9,7 @@ gameSettings.fadeIn = false;
 gameSettings.totalRobotLimit = 8;
 gameSettings.totalMissionsComplete = 1;
 gameSettings.totalPlayerOptions = 1;
+gameSettings.totalRobotOptions = 1;
 gameSettings.nextRobotLimit = 8;
 gameSettings.nextStepName = 'home';
 gameSettings.nextSlideDirection = 'left';
@@ -556,7 +557,7 @@ $(document).ready(function(){
 
                     //console.log('document already has focus');
                     //console.log('we can queue logo fade');
-                    setTimeout(fadeOutLogo, 3000);
+                    setTimeout(fadeOutLogo, 4000);
 
                     }
                 else {
@@ -2080,9 +2081,10 @@ function prototype_menu_links_refresh(){
 gameSettings.thisReadyRoomElement = false;
 gameSettings.readyRoomAnimateEnabled = false;
 gameSettings.readyRoomAnimateLastUpdate = 0;
+gameSettings.readyRoomAnimateFrameTotal = 0;
 gameSettings.readyRoomAnimateThreshold = 1000;
 gameSettings.readyRoomAnimateChargeUps = {};
-gameSettings.readyRoomFramesPerSecond = 15;
+gameSettings.readyRoomFramesPerSecond = 10;
 gameSettings.readyRoomSpriteGrid = {};
 gameSettings.readyRoomSpriteBounds = {minX: 10, maxX: 90, minY: 13, maxY: 36};
 gameSettings.readyRoomSpritesIndex = {};
@@ -2115,8 +2117,10 @@ function prototype_ready_room_init(onComplete){
         var $readyRoomWrapper = $('<div class="wrapper"></div>');
         var $readyRoomScene = $('<div class="scene"></div>');
         var $readyRoomTeam = $('<div class="team"></div>');
+        var $readyRoomClicker = $('<div class="clicker"></div>');
         $readyRoomScene.appendTo($readyRoomWrapper);
         $readyRoomTeam.appendTo($readyRoomWrapper);
+        $readyRoomClicker.appendTo($readyRoomWrapper);
         $readyRoomWrapper.appendTo($readyRoom);
         $readyRoomScene.append('<div class="sprite" data-kind="background" data-token="light-laboratory" style="background-image: url(images/fields/light-laboratory/battle-field_background_base.gif?'+gameSettings.cacheTime+'); z-index: 1;"></div>');
         $readyRoomScene.append('<div class="sprite" data-kind="foreground" data-token="light-laboratory" style="background-image: url(images/fields/light-laboratory/battle-field_foreground_base.png?'+gameSettings.cacheTime+'); z-index: 2;"></div>');
@@ -2127,6 +2131,7 @@ function prototype_ready_room_init(onComplete){
         var $readyRoom = $('.ready_room', $thisBanner);
         var $readyRoomScene = $('.scene', $readyRoom);
         var $readyRoomTeam = $('.team', $readyRoom);
+        var $readyRoomClicker = $('.clicker', $readyRoom);
     }
 
     // Make sure this ready room has a refernce in the game settings
@@ -2188,10 +2193,34 @@ function prototype_ready_room_init(onComplete){
         }
 
     // Loop through unlocked robots and add them to the team div as "sprite" elements
+    var newEntranceTimeout = 1000;
+    var newEntranceOffsetX = 90; //spriteBounds.maxX;
+    var newEntranceOffsetY = spriteBounds.minY;
     for (var i = 0; i < unlockedRobotsTokens.length; i++){
         var robotToken = unlockedRobotsTokens[i];
         var unlockedRobot = unlockedRobotsIndex[robotToken];
-        prototype_ready_room_add_robot_sprite(robotToken, unlockedRobot);
+        if (typeof unlockedRobot.flags !== 'undefined'
+            && unlockedRobot.flags.indexOf('is_newly_unlocked') !== -1){
+            newEntranceTimeout += 1000;
+            newEntranceOffsetX -= 6;
+            newEntranceOffsetY -= 1;
+            (function(robotToken, unlockedRobot, newEntranceTimeout, newEntranceOffsetX, newEntranceOffsetY){
+                //console.log('queue entrance animation for ', unlockedRobot.token);
+                //console.log('unlockedRobot =', unlockedRobot);
+                prototype_ready_room_add_robot_sprite(robotToken, unlockedRobot, {position: [110, (spriteBounds.maxY + 6)], direction: 'left', frame: 'slide'});
+                setTimeout(function(){
+                    //console.log('slide-in triggered for ', unlockedRobot.token);
+                    prototype_ready_room_update_robot(robotToken, {position: [newEntranceOffsetX, newEntranceOffsetY], direction: 'left', frame: 'slide'});
+                    setTimeout(function(){
+                        //console.log('taunt triggered for ', unlockedRobot.token);
+                        prototype_ready_room_update_robot(robotToken, {frame: 'taunt'});
+                        unlockedRobot.flags.splice(unlockedRobot.flags.indexOf('is_newly_unlocked'), 1);
+                        }, 900);
+                    }, newEntranceTimeout);
+                })(robotToken, unlockedRobot, newEntranceTimeout, newEntranceOffsetX, newEntranceOffsetY);
+            } else {
+            prototype_ready_room_add_robot_sprite(robotToken, unlockedRobot);
+            }
         }
 
     // We can fade-in the ready room now
@@ -2201,6 +2230,48 @@ function prototype_ready_room_init(onComplete){
     //console.log('spriteGrid.columnCounts =', spriteGrid.columnCounts);
     //console.log('spriteGrid.rowCounts =', spriteGrid.rowCounts);
     //console.log('readyRoomSpritesIndex =', readyRoomSpritesIndex);
+
+    // Define click events for the clicker element now that everything is set up
+    var clickTimeout = false;
+    var clickHandler = function(e){
+        e.preventDefault();
+        //console.log('%cCLICKED the ready room clicker!', 'color: green;');
+        if (clickTimeout !== false){ return false; }
+        // get the click position of the element as a percentage of the element's width/height
+        var clickX = e.pageX - $readyRoom.offset().left;
+        var clickY = $readyRoom.height() - (e.pageY - $readyRoom.offset().top);
+        var clickXPercent = Math.ceil((clickX / $readyRoom.width()) * 100);
+        var clickYPercent = Math.ceil((clickY / $readyRoom.height()) * 100);
+        //console.log('clickX =', clickX, 'clickY =', clickY);
+        //console.log('clickXPercent =', clickXPercent, 'clickYPercent =', clickYPercent);
+        // using the above information, check if there are any nearby sprites to this location
+        var searchRadius = 30;
+        var filterProperties = false;
+        var pseudoSprite = {token: 'user', position: [clickXPercent, clickYPercent]};
+        var nearbySprites = prototype_ready_room_nearby_sprites(pseudoSprite, searchRadius, filterProperties);
+        //console.log('nearbySprites =', nearbySprites.length, nearbySprites);
+        //console.log('readyRoomSpritesIndex =', gameSettings.readyRoomSpritesIndex);
+        // loop through the nearby sprites and update them all to be facing the click
+        for (var i = 0; i < nearbySprites.length; i++){
+            //console.log('for (i = ', i, '){ ... }');
+            var nearbySpriteData = nearbySprites[i];
+            var nearbySprite = nearbySpriteData.sprite;
+            var nearbyDistance = nearbySpriteData.distance;
+            //console.log('nearbySprite @', nearbyDistance, 'away w/', nearbySprite);
+            var newDirection = nearbySprite.position[0] > clickXPercent ? 'left' : 'right';
+            prototype_ready_room_update_character(nearbySprite.kind, nearbySprite.token, {direction: newDirection});
+            }
+        $readyRoom.addClass('clicked');
+        if (clickTimeout !== false){ clearTimeout(clickTimeout); }
+        clickTimeout = setTimeout(function(){
+            $readyRoom.removeClass('clicked');
+            clearTimeout(clickTimeout);
+            clickTimeout = false;
+            }, 100);
+        };
+    $readyRoomClicker.bind('click', clickHandler);
+    $readyRoomClicker.bind('touchstart', clickHandler);
+    $readyRoomClicker.bind('touchend', clickHandler);
 
     // Update the ready flag for the ready room
     gameSettings.readyRoomIsReady = true;
@@ -2284,6 +2355,8 @@ function prototype_ready_room_animate() {
 
     // Otherwise update the last-update time to right now for future reference
     gameSettings.readyRoomAnimateLastUpdate = thisUpdateTime;
+    gameSettings.readyRoomAnimateFrameTotal++;
+    //console.log('gameSettings.readyRoomAnimateFrameTotal =', gameSettings.readyRoomAnimateFrameTotal);
 
     // Define a list variable to hold which sprites we should animate this round
     var spritesToAnimate = {};
@@ -2349,7 +2422,7 @@ function prototype_ready_room_animate() {
             newSpriteProperties.frame = 0;
 
             // Define the cooldown so we don't have them go too crazy
-            var baseCooldownValue = 100;
+            var baseCooldownValue = gameSettings.readyRoomFramesPerSecond * 4;
             var newCooldownValue = Math.floor(baseCooldownValue * thisSprite.haste);
             thisSprite.cooldown = newCooldownValue;
 
@@ -2384,6 +2457,7 @@ function prototype_ready_room_animate() {
 
             // If the sprite was too close to the edge, we should force a direction change
             var spriteBounds = gameSettings.readyRoomSpriteBounds;
+            var spriteAxisScale = 0.5; // the Y-axis is visually squished and we want to adjust the distance calculation to account for that
             if ((oldSpriteProperties.position[0] <= spriteBounds.minX && oldSpriteProperties.direction !== 'right')
                 || (oldSpriteProperties.position[0] >= spriteBounds.maxX && oldSpriteProperties.direction !== 'left')){
                 randomTransition = 'direction';
@@ -2395,16 +2469,31 @@ function prototype_ready_room_animate() {
                 //console.log('randomTransition =', randomTransition);
 
                 // Every once and a while, play it "smart" and react based on surroundings
-                var possibleDiceRolls2 = 30;
-                var randomDiceRoll2 = Math.floor(Math.random() * possibleDiceRolls2) + 1;
-                if (randomDiceRoll2 % 7 === 0){
-                    //console.log('LUCKY smart-transition requested for', thisCharacterToken, ' w/ info =', thisCharacterInfo);
+                var allowSmartTransition = true;
+                var allowFrameAdjustments = true;
+                var allowDirectionAdjustments = true;
+                var allowOffsetAdjustments = true;
+                if (thisCharacterInfo.flags.indexOf('is_newly_unlocked') !== -1){
+                    allowSmartTransition = false;
+                    allowFrameAdjustments = false;
+                    allowDirectionAdjustments = false;
+                    allowOffsetAdjustments = false;
+                    }
+                var smartDiceRollMax = gameSettings.totalRobotOptions >= 10 ? gameSettings.totalRobotOptions : 10;
+                var smartDiceRollValue = Math.floor(Math.random() * smartDiceRollMax) + 1;
+                //console.log('smartDiceRollMax = ', smartDiceRollMax);
+                //console.log('smartDiceRollValue = ', smartDiceRollValue);
+                //console.log('allowSmartTransition = ', allowSmartTransition);
+                if (allowSmartTransition && smartDiceRollValue <= 7){
+                    //console.log('LUCKY smartDiceRollValue(', smartDiceRollValue, ') <= 7 || (max:', smartDiceRollMax, ')');
+                    //console.log('-> smart-transition requested for', thisCharacterToken, ' w/ info =', thisCharacterInfo);
 
                     // Calculate which sprites are nearby this robot for artificial intelligence purposes
-                    var searchRadius = 10;
+                    var searchRadius = 30 - Math.floor(30 * (gameSettings.totalRobotOptions / 100));
                     var filterProperties = false;
                     var nearbySprites = prototype_ready_room_nearby_sprites(thisSprite, searchRadius, filterProperties);
-                    //console.log('nearbySprites =', nearbySprites);
+                    //console.log('searchRadius =', searchRadius);
+                    //console.log('nearbySprites =', nearbySprites.length, nearbySprites);
                     if (nearbySprites.length){
 
                         // Given each nearby sprite in format {sprite: object, distance: number}, sort by closest distance
@@ -2432,6 +2521,7 @@ function prototype_ready_room_animate() {
                             //console.log('nearbySpriteToken =', nearbySpriteToken);
                             //console.log('nearbySpriteKind =', nearbySpriteKind);
                             //console.log('facingNearbySprite =', facingNearbySprite);
+                            //console.log('nearbySpriteDistance =', nearbySpriteDistance);
                             if (!facingNearbySprite){ continue; }
                             var nearbySpriteVibeMeter = 0;
                             // If the nearby sprite is a player, we can do some interesting things
@@ -2462,25 +2552,36 @@ function prototype_ready_room_animate() {
                                 }
                             //console.log('nearbySpriteVibeMeter for ', thisCharacterToken, ' vs ', nearbySpriteToken, ' =', nearbySpriteVibeMeter);
 
-                            // If the current sprite has a positive vibe meter, we should do a positive action
-                            if (nearbySpriteVibeMeter > 0){
+                            // If the other robot is just too close, we should give them some space
+                            if (nearbySpriteDistance < (searchRadius / 3)) {
+                                randomTransition = 'position';
+                                //console.log('vibeCheck: ' + thisCharacterToken + ' feels ' + nearbySpriteToken + ' is too close and backs away');
+                                newSpriteProperties.frame = thisCharacterKind === 'player' ? 'running' : 'defend';
+                                newSpriteProperties.position = prototype_ready_room_getRelativePositionChange(thisSprite, nearbySprite, 'farther', 0.10, spriteBounds, spriteAxisScale);
+                                }
+
+                            // Else if the current sprite has a positive vibe meter, we should do a positive action
+                            else if (nearbySpriteVibeMeter > 0
+                                && nearbySpriteDistance > (searchRadius / 2)) {
                                 randomTransition = nearbySpriteDistance > (searchRadius / 3) ? 'position' : 'depth';
-                                //console.log('inch toward the other character on positive vibes');
-                                break;
+                                //console.log('vibeCheck: ' + thisCharacterToken + ' inches toward ' + nearbySpriteToken + ' on positive vibes');
+                                newSpriteProperties.position = prototype_ready_room_getRelativePositionChange(thisSprite, nearbySprite, 'closer', 0.25, spriteBounds, spriteAxisScale);
                                 }
+
                             // Else if the current sprite has a negative vibe meter, we should do a negative action
-                            else if (nearbySpriteVibeMeter < 0){
+                            else if (nearbySpriteVibeMeter < 0
+                                && nearbySpriteDistance < (searchRadius / 2)) {
                                 randomTransition = 'direction';
-                                //console.log('run the other direction on negative vibes');
-                                if (typeof newSpriteProperties.position === 'undefined'){ newSpriteProperties.position = oldSpriteProperties.position; }
-                                var newXPosition = newSpriteProperties.position[0];
-                                var shiftBase = 10;
-                                var shiftVal = (shiftBase - Math.floor(shiftBase * thisSprite.haste));
-                                if (thisSprite.position[0] < nearbySprite.position[0]){ newXPosition -= shiftBase; }
-                                else if (thisSprite.position[0] > nearbySprite.position[0]){ newXPosition += shiftBase; }
-                                newSpriteProperties.position[0] = newXPosition;
-                                break;
+                                //console.log('vibeCheck: ' + thisCharacterToken + ' runs away from ' + nearbySpriteToken + ' on negative vibes');
+                                newSpriteProperties.frame = thisCharacterKind === 'player' ? 'running' : 'slide';
+                                newSpriteProperties.position = prototype_ready_room_getRelativePositionChange(thisSprite, nearbySprite, 'farther', 0.50, spriteBounds, spriteAxisScale);
+                                if (thisSprite.position[0] < nearbySprite.position[0]) {
+                                    thisSprite.direction = 'left';
+                                    } else {
+                                    thisSprite.direction = 'right';
+                                    }
                                 }
+
                             }
 
                         }
@@ -2488,7 +2589,9 @@ function prototype_ready_room_animate() {
                     }
 
                 // If a simple frame change was decided, process that
-                if (randomTransition === 'frame'){
+                if (allowFrameAdjustments
+                    && randomTransition === 'frame'
+                    && typeof newSpriteProperties.frame === 'undefined'){
 
                     // Define the allowed frames we can transition to then pick one at random
                     var randInt = Math.floor(Math.random() * 10) + 1;
@@ -2515,13 +2618,15 @@ function prototype_ready_room_animate() {
                     }
 
                 // If a directional change was directed
-                if (randomTransition === 'direction'){
+                if (allowDirectionAdjustments
+                    && randomTransition === 'direction'
+                    && typeof newSpriteProperties.direction === 'undefined'){
 
                     // Flip the direction from whatever it is now
                     newSpriteProperties.direction = (oldSpriteProperties.direction !== 'left') ? 'left' : 'right';
 
                     // Define the cooldown so we don't have them go too crazy
-                    var baseCooldownValue = 200;
+                    var baseCooldownValue = gameSettings.readyRoomFramesPerSecond * 2;
                     var newCooldownValue = baseCooldownValue * thisSprite.haste;
                     thisSprite.cooldown = newCooldownValue;
 
@@ -2532,29 +2637,40 @@ function prototype_ready_room_animate() {
                     || randomTransition === 'depth'){
 
                     // Set the sprite to it's running or slide frames first (where available)
-                    if (thisCharacterKind === 'player'){ newSpriteProperties.frame = oldSpriteProperties.direction === 'left' ? 'running' : 'running3'; }
-                    else if (thisCharacterKind === 'robot'){ newSpriteProperties.frame = 'slide'; }
-                    // Then move the sprite in the direction they're facing
-                    var oldPosition = oldSpriteProperties.position;
-                    var newXPosition = oldPosition[0];
-                    var moveDirection = oldSpriteProperties.direction === 'right' ? 'right' : 'left';
-                    if (oldPosition[0] >= spriteBounds.maxX){ moveDirection = 'left'; }
-                    else if (oldPosition[0] <= spriteBounds.minX){ moveDirection = 'right'; }
+                    if (typeof newSpriteProperties.frame === 'undefined'){
+                        if (thisCharacterKind === 'player'){ newSpriteProperties.frame = oldSpriteProperties.direction === 'left' ? 'running' : 'running3'; }
+                        else if (thisCharacterKind === 'robot'){ newSpriteProperties.frame = 'slide'; }
+                        }
 
-                    // Define the basic shift about for the robot given base vs haste (speed) value
-                    //console.log('oldPosition =', oldPosition);
-                    var shiftBase = 10;
-                    var shiftVal = (shiftBase - Math.floor(shiftBase * thisSprite.haste));
-                    newXPosition += shiftVal * (moveDirection === 'right' ? 1 : -1);
-                    // If the character's position is someout out of bounds, it's okay to move them back into bounds abruptly now
-                    if (newXPosition < spriteBounds.minX){ newXPosition = spriteBounds.minX + 2; }
-                    else if (newXPosition > spriteBounds.maxX){ newXPosition = spriteBounds.maxX - 2; }
-                    //console.log('shiftBase =', shiftBase, 'shiftVal =', shiftVal);
-                    //console.log('newXPosition =', newXPosition);
+                    // Only redefine position variables if they've not already been defined
+                    if (typeof newSpriteProperties.position === 'undefined'){
+                        // Then move the sprite in the direction they're facing
+                        var oldPosition = oldSpriteProperties.position;
+                        var newXPosition = oldPosition[0];
+                        var moveDirection = oldSpriteProperties.direction === 'right' ? 'right' : 'left';
+                        if (allowOffsetAdjustments && oldPosition[0] >= spriteBounds.maxX){ moveDirection = 'left'; }
+                        else if (allowOffsetAdjustments && oldPosition[0] <= spriteBounds.minX){ moveDirection = 'right'; }
 
-                    // Update the properites with the new X positon
-                    if (typeof newSpriteProperties.position === 'undefined'){ newSpriteProperties.position = oldPosition; }
-                    newSpriteProperties.position[0] = newXPosition;
+                        // Define the basic shift about for the robot given base vs haste (speed) value
+                        //console.log('oldPosition =', oldPosition);
+                        var shiftBase = 10;
+                        var shiftVal = (shiftBase - Math.floor(shiftBase * thisSprite.haste));
+                        newXPosition += shiftVal * (moveDirection === 'right' ? 1 : -1);
+                        // If the character's position is someout out of bounds, it's okay to move them back into bounds abruptly now
+                        if (allowOffsetAdjustments && newXPosition < spriteBounds.minX){ newXPosition = spriteBounds.minX + 2; }
+                        else if (allowOffsetAdjustments && newXPosition > spriteBounds.maxX){ newXPosition = spriteBounds.maxX - 2; }
+                        //console.log('shiftBase =', shiftBase, 'shiftVal =', shiftVal);
+                        //console.log('newXPosition =', newXPosition);
+
+                        // Update the properites with the new X positon
+                        if (typeof newSpriteProperties.position === 'undefined'){ newSpriteProperties.position = oldPosition; }
+                        newSpriteProperties.position[0] = newXPosition;
+                        }
+
+                    // Define the cooldown so we don't have them go too crazy
+                    var baseCooldownValue = gameSettings.readyRoomFramesPerSecond * 1;
+                    var newCooldownValue = baseCooldownValue * thisSprite.haste;
+                    thisSprite.cooldown = newCooldownValue;
 
                     }
 
@@ -2562,23 +2678,25 @@ function prototype_ready_room_animate() {
                 if (randomTransition === 'depth'){
                     //console.log('depth transition triggered for ', thisSpriteToken);
 
-                    // Move the sprite up or down depending on where they are
-                    var oldPosition = oldSpriteProperties.position;
-                    var newYPosition = oldPosition[1];
-                    var newZPosition = oldPosition[2];
-                    var moveDirection = Math.floor(Math.random() * 2) ? 'up' : 'down';
-                    if (oldPosition[1] >= spriteBounds.maxY){ moveDirection = 'down'; }
-                    else if (oldPosition[1] <= spriteBounds.minY){ moveDirection = 'up'; }
-                    //console.log('oldPosition =', oldPosition);
-                    var shiftBase = 5;
-                    var shiftVal = Math.floor(Math.random() * shiftBase) + 1;
-                    newYPosition += shiftVal * (moveDirection === 'up' ? 1 : -1);
-                    newZPosition = Math.floor(100 - newYPosition);
-                    //console.log('shiftBase =', shiftBase, 'shiftVal =', shiftVal);
-                    //console.log('newYPosition =', newYPosition, 'newZPosition =', newZPosition);
-                    if (typeof newSpriteProperties.position === 'undefined'){ newSpriteProperties.position = oldPosition; }
-                    newSpriteProperties.position[1] = newYPosition;
-                    newSpriteProperties.position[2] = newZPosition;
+                    // Only redefine position variables if they've not already been defined
+                    if (typeof newSpriteProperties.position === 'undefined'){// Move the sprite up or down depending on where they are
+                        var oldPosition = oldSpriteProperties.position;
+                        var newYPosition = oldPosition[1];
+                        var newZPosition = oldPosition[2];
+                        var moveDirection = Math.floor(Math.random() * 2) ? 'up' : 'down';
+                        if (oldPosition[1] >= spriteBounds.maxY){ moveDirection = 'down'; }
+                        else if (oldPosition[1] <= spriteBounds.minY){ moveDirection = 'up'; }
+                        //console.log('oldPosition =', oldPosition);
+                        var shiftBase = 5;
+                        var shiftVal = Math.floor(Math.random() * shiftBase) + 1;
+                        newYPosition += shiftVal * (moveDirection === 'up' ? 1 : -1);
+                        newZPosition = Math.floor(100 - newYPosition);
+                        //console.log('shiftBase =', shiftBase, 'shiftVal =', shiftVal);
+                        //console.log('newYPosition =', newYPosition, 'newZPosition =', newZPosition);
+                        if (typeof newSpriteProperties.position === 'undefined'){ newSpriteProperties.position = oldPosition; }
+                        newSpriteProperties.position[1] = newYPosition;
+                        newSpriteProperties.position[2] = newZPosition;
+                        }
 
                     }
 
@@ -2688,12 +2806,14 @@ function prototype_ready_room_animate_character(kind, characterToken, newValues,
         newSpritePosition.push(parsePositionValue(newValues.position[1], thisSprite.position[1]));
         newSpritePosition.push(100 - newSpritePosition[1]);
         //console.log('newSpritePosition =', newSpritePosition);
+        var brightExponent = 1 + (gameSettings.totalRobotOptions / 100);
+        var newSpriteBrightness = Math.pow((newSpritePosition[2] / 100), brightExponent);
         thisSprite.position = newSpritePosition;
         var newCSS = {
             'left': newSpritePosition[0]+'%',
             'bottom': newSpritePosition[1]+'%',
             'z-index': newSpritePosition[2],
-            'filter': 'brightness('+(newSpritePosition[2] / 100)+')'
+            'filter': 'brightness('+newSpriteBrightness+')'
             };
         //console.log('updating sprite position for ', characterToken, ' to ', newCSS);
         $thisSprite.css(newCSS);
@@ -2955,7 +3075,8 @@ function prototype_ready_room_add_character_sprite(kind, characterToken, charact
         var spriteOffsetY = randColRowOffsets[1];
         }
     var spriteOffsetZ = 100 - spriteOffsetY;
-    var spriteBrightness = (spriteOffsetZ / 100);
+    var brightExponent = 1 + (gameSettings.totalRobotOptions / 100);
+    var spriteBrightness = Math.pow((spriteOffsetZ / 100), brightExponent);
     var spriteFilterValue = 'brightness('+spriteBrightness+')';
     //console.log('spriteOffsetX =', spriteOffsetX);
     //console.log('spriteOffsetY =', spriteOffsetY);
@@ -3062,6 +3183,32 @@ function prototype_ready_room_colrow_center(thisColumn, thisRow){
     return [thisColumnOffsetCenter, thisRowOffsetCenter];
 }
 
+
+// Define a function that will return a new position for the current sprite based on the nearby sprite
+function prototype_ready_room_getRelativePositionChange(sourceSprite, targetSprite, direction, distancePercent, spriteBounds, axisFactor) {
+    if (!spriteBounds || typeof spriteBounds === 'undefined'){ spriteBounds = { minX: 0, maxX: 100, minY: 0, maxY: 100 }; }
+    if (!axisFactor || typeof axisFactor === 'undefined'){ axisFactor = 0.5; }
+
+    var newPosition = sourceSprite.position.slice();
+    var xDiff = targetSprite.position[0] - sourceSprite.position[0];
+    var yDiff = (targetSprite.position[1] - sourceSprite.position[1]) * axisFactor;  // Scale the Y-axis distance
+
+    var newX = direction === 'closer' ? xDiff : -xDiff;
+    var newY = direction === 'closer' ? yDiff : -yDiff;
+
+    // Calculate tentative new position
+    var tentativeX = newPosition[0] + Math.ceil(newX * distancePercent);
+    var tentativeY = newPosition[1] + Math.ceil(newY * distancePercent);
+
+    // Respect sprite boundaries for X-axis
+    newPosition[0] = Math.min(Math.max(tentativeX, spriteBounds.minX), spriteBounds.maxX);
+
+    // Respect sprite boundaries for Y-axis
+    newPosition[1] = Math.min(Math.max(tentativeY, spriteBounds.minY), spriteBounds.maxY);
+
+    return newPosition;
+}
+
 // Define a function to find ready room sprites within a given radius that match some criteria
 function prototype_ready_room_nearby_sprites(targetSprite, searchRadius, filterProperties){
     //console.log('prototype_ready_room_nearby_sprites(targetSprite:', typeof targetSprite, targetSprite, ', searchRadius:', typeof searchRadius, searchRadius, ', filterProperties:', typeof filterProperties, filterProperties, ')');
@@ -3083,6 +3230,7 @@ function prototype_ready_room_nearby_sprites(targetSprite, searchRadius, filterP
         //console.log('spriteToken =', typeof spriteToken, spriteToken);
         //console.log('sprite =', typeof sprite, sprite);
         if (!sprite.opacity){ continue; }
+        //console.log('targetX =', typeof targetX, targetX);
         //console.log('targetY =', typeof targetY, targetY);
         // Skip the target sprite
         //console.log('check spriteToken(', spriteToken, ') === targetSprite.token(', targetSprite.token, ')');

@@ -2845,7 +2845,7 @@ body[data-source="website"] #prototype .menu {
     z-index: 25;
     opacity: 1.0;
     filter: brightness(0.6) sepia(1) hue-rotate(175deg) saturate(1.5);
-    transition: opacity 1s, height 0.3s;
+    transition: opacity 1s, filter 0.1s, height 0.3s;
     /* filter: brightness(0.6); */
 }
 #prototype .banner .ready_room.hidden {
@@ -2892,9 +2892,20 @@ body[data-source="website"] #prototype .menu {
     image-rendering: crisp-edges;
     -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
     animation: ready-room-scanline-scroll 60s linear infinite;
+    transform: scale(1.0);
+    transition: transform 0.1s;
+}
+/*
+#prototype .banner .ready_room.clicked {
+    filter: brightness(0.6);
+}
+*/
+#prototype .banner .ready_room.clicked > .wrapper:after {
+    transform: scale(2.0);
 }
 #prototype .banner .ready_room > .wrapper > .scene,
-#prototype .banner .ready_room > .wrapper > .team {
+#prototype .banner .ready_room > .wrapper > .team,
+#prototype .banner .ready_room > .wrapper > .clicker {
     display: block;
     position: absolute;
     width: auto;
@@ -2903,6 +2914,10 @@ body[data-source="website"] #prototype .menu {
     left: 0;
     right: 0;
     transition: top 0.6s, bottom 0.6s;
+}
+#prototype .banner .ready_room > .wrapper > .scene,
+#prototype .banner .ready_room > .wrapper > .team {
+    pointer-events: none;
 }
 #prototype .banner .ready_room > .wrapper > .scene {
     z-index: 1;
@@ -2919,6 +2934,13 @@ body[data-source="website"] #prototype .menu {
 #prototype .banner.compact .ready_room > .wrapper > .team {
     top: 64px;
     bottom: 20px;
+}
+#prototype .banner .ready_room > .wrapper > .clicker {
+    z-index: 3;
+    top: 64px;
+    bottom: 34px;
+    overflow: visible;
+    background-color: transparent;
 }
 
 #prototype .banner .ready_room .scene .sprite {
@@ -2945,6 +2967,38 @@ body[data-source="website"] #prototype .menu {
     bottom: -68px;
 }
 
+/* gridlines overlay mods */
+#prototype .banner .ready_room .scene .sprite[data-kind="foreground"]:before,
+#prototype .banner .ready_room .scene .sprite[data-kind="foreground"]:after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 1290px;
+  height: 168px;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  transform: translateX(-50%) perspective(90px) rotateX(26deg);
+  transform-origin: center bottom;
+  -moz-mix-blend-mode: overlay;
+  -webkit-mix-blend-mode: overlay;
+  mix-blend-mode: overlay;
+}
+#prototype .banner .ready_room .scene .sprite[data-kind="foreground"]:before {
+  z-index: 3;
+  bottom: 32px;
+  background-image: url(../images/assets/battle-scene_gridlines-2k23_under.png?20230616);
+  opacity: 0.6;
+}
+#prototype .banner .ready_room .scene .sprite[data-kind="foreground"]:after {
+  z-index: 4;
+  bottom: 32px;
+  background-image: url(../images/assets/battle-scene_gridlines-2k23_over.png?20230616);
+  opacity: 0.8;
+}
+
 @keyframes ready-room-sprite-bounce {
     0% { transform: translateY(0px); }
     50% { transform: translateY(-1px); }
@@ -2956,7 +3010,7 @@ body[data-source="website"] #prototype .menu {
     overflow: visible;
     transform: scale(2);
     transform-origin: bottom center;
-    transition: opacity 0.6s, left 1s, bottom 1s, z-index 1s;
+    transition: opacity 0.6s, filter 0.6s, left 1s, bottom 1s, z-index 1s;
     image-rendering: -moz-crisp-edges;         /* Firefox */
     image-rendering:   -o-crisp-edges;         /* Opera */
     image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */

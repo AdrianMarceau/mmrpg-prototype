@@ -643,12 +643,32 @@ echo('gameSettings.menuFramesSeen = '.json_encode($menu_frames_seen).';'.PHP_EOL
 // Generate a JSON array of all currently unlocked player players w/ basic data for prototype menu reference
 $this_unlocked_players_index = mmrpg_prototype_players_unlocked_index_json();
 //error_log('$this_unlocked_players_index ='.print_r($this_unlocked_players_index, true));
-echo 'gameSettings.customIndex.unlockedPlayersIndex = '.json_encode($this_unlocked_players_index).';'.PHP_EOL;
 
 // Generate a JSON array of all currently unlocked player robots w/ basic data for prototype menu reference
 $this_unlocked_robots_index = mmrpg_prototype_robots_unlocked_index_json();
 //error_log('$this_unlocked_robots_index ='.print_r($this_unlocked_robots_index, true));
+
+// Check to see if we need to display entrance animations for any recently unlocked robots
+$robots_pending_entrance_animations = rpg_prototype::get_robots_pending_entrance_animations();
+//error_log('$robots_pending_entrance_animations = '.print_r($robots_pending_entrance_animations, true));
+if (!empty($robots_pending_entrance_animations)){
+    foreach ($robots_pending_entrance_animations AS $robot_key => $robot_token){
+        if (!isset($this_unlocked_robots_index[$robot_token])){ continue; }
+        $new_robot_data = $this_unlocked_robots_index[$robot_token];
+        //error_log('add entrance animation for '.$robot_token);
+        if (!isset($new_robot_data['flags'])){ $new_robot_data['flags'] = array(); }
+        $new_robot_data['flags'][] = 'is_newly_unlocked';
+        //error_log('$new_robot_data = '.print_r($new_robot_data, true));
+        $this_unlocked_robots_index[$robot_token] = $new_robot_data;
+    }
+    rpg_prototype::clear_robots_pending_entrance_animations();
+}
+
+// Print out the generated indexes for use in the game settings
+echo 'gameSettings.customIndex.unlockedPlayersIndex = '.json_encode($this_unlocked_players_index).';'.PHP_EOL;
 echo 'gameSettings.customIndex.unlockedRobotsIndex = '.json_encode($this_unlocked_robots_index).';'.PHP_EOL;
+
+
 
 ?>
 
