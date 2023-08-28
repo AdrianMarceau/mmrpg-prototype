@@ -351,106 +351,45 @@ button {
     filter: brightness(0.9) blur(0);
 }
 
-/*
-#window .banner .banner_background {
-    filter: brightness(0.7) blur(0);
-    transform: translate(-50%, 0) scale(1.5);
-}
-#window .banner .banner_foreground {
-    filter: brightness(0.8) blur(0);
-    transform: translate(-50%, 0) scale(2.0);
-}
-body.loaded #window .banner .banner_background,
-body.loaded #window .banner .banner_foreground {
-    transition: 120s;
-    transition-delay: 0;
-}
-body.loaded #window .banner .banner_background {
-    filter: brightness(0.6) blur(2px);
-    transform: translate(-50%, 0) scale(1.0);
-}
-body.loaded #window .banner .banner_foreground {
-    filter: brightness(0.7) blur(1px);
-    transform: translate(-50%, 0) scale(1.0);
-}
-body.loaded #window .banner:hover .banner_background {
-    filter: brightness(0.7) blur(0);
-    transform: translate(-50%, 0) scale(1.5);
-}
-body.loaded #window .banner:hover .banner_foreground {
-    filter: brightness(0.8) blur(0);
-    transform: translate(-50%, 0) scale(2.0);
-}
-*/
-
-@keyframes foreground_canvas_fade {
-  0% { opacity: 0.2; }
+@keyframes window-banner-foreground-gridlines-fade {
+  0%, 100% { opacity: 0.2; }
   50% { opacity: 0.8; }
-  100% { opacity: 0.2; }
 }
+
 #window .banner .banner_foreground:before,
 #window .banner .banner_foreground:after {
-    content: "";
-    display: block;
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, 0);
-    bottom: 35px;
-    width: 750px;
-    height: 84px;
-    background-color: transparent;
-    background-image: none;
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-
-    -ms-interpolation-mode: bicubic;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    image-rendering:   -o-crisp-edges;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: -webkit-optimize-contrast;
-
-}
-#window .banner .banner_foreground:before,
-#window .banner .banner_foreground:after {
-    bottom: -8px;
-    width: 1290px;
-    height: 168px;
-    background-image: url(../images/assets/battle-scene_gridlines-2k23.png?20230611);
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    transform: translateX(-50%) perspective(90px) rotateX(26deg);
-    transform-origin: center bottom;
-    -moz-mix-blend-mode: overlay;
-    -webkit-mix-blend-mode: overlay;
-    mix-blend-mode: overlay;
+  content: "";
+  display: block;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 1290px;
+  height: 168px;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  transform: translateX(-50%) perspective(90px) rotateX(26deg);
+  transform-origin: center bottom;
+  -moz-mix-blend-mode: overlay;
+  -webkit-mix-blend-mode: overlay;
+  mix-blend-mode: overlay;
 }
 #window .banner .banner_foreground:before {
-    z-index: 1;
-    background-image: url(../images/assets/battle-scene_gridlines-2k23_under.png?20230616);
-    opacity: 0.6;
-    -moz-mix-blend-mode: overlay;
-    -webkit-mix-blend-mode: overlay;
-    mix-blend-mode: overlay;
-
-    /* Animation properties */
-    animation-name: foreground_canvas_fade;
-    animation-duration: 5s; /* Adjust the duration as per your preference */
-    animation-duration: calc(var(--camera-shift-transition-duration) * 10);
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
+  z-index: 1;
+  bottom: -8px;
+  background-image: url(../images/assets/battle-scene_gridlines-2k23_under.png?20230616);
+  opacity: 0.6;
+  animation-name: window-banner-foreground-gridlines-fade;
+  animation-duration: calc(var(--camera-shift-transition-duration) * 10);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 #window .banner .banner_foreground:after {
-    z-index: 2;
-    background-image: url(../images/assets/battle-scene_gridlines-2k23_over.png?20230616);
-    opacity: 0.8;
-    -moz-mix-blend-mode: overlay;
-    -webkit-mix-blend-mode: overlay;
-    mix-blend-mode: overlay;
+  z-index: 2;
+  bottom: -8px;
+  background-image: url(../images/assets/battle-scene_gridlines-2k23_over.png?20230616);
+  opacity: 0.8;
 }
-
 
 #window .banner .credits > a {
     display: block;
