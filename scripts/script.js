@@ -2970,6 +2970,15 @@ function windowEventDisplay(){
                 }
             });
 
+        // Bind the keyboard's spacebar and enter key to the "continue" button while it exists
+        $(document).bind('keydown', function(e){
+            // capture the key pressed and compare it to the code for enter/return and spacebar to see if it matches either
+            var key = e.which || e.keyCode;
+            if (key == 13 || key == 32){
+                eventContinue.trigger('click');
+                }
+            });
+
         }
 
     // Collect a reference to the inner event container within the parent one
