@@ -394,14 +394,23 @@
     cursor: pointer;
     transform: scale(1.0);
     transition: 0.3s;
+    text-shadow: none;
 }
 #database #console .event .this_complete:hover,
 #database #console .event .this_unlockable:hover {
     transform: scale(1.2);
 }
 
-#database #console .event .this_complete {
-
+/* add a continuous rotating animation to the this_complete icon */
+@keyframes robot-complete-icon-spin {
+    from { transform:rotate(0deg); }
+    to { transform:rotate(360deg); }
+}
+#database #console .event .this_complete > i {
+    animation-name: robot-complete-icon-spin;
+    animation-duration: 10s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
 }
 
 
