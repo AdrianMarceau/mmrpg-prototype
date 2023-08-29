@@ -1,18 +1,22 @@
 
 // -- PROTOTYPE READY ROOM FUNCTIONALITY -- //
 
+// Predefine ready room config settings we can work with later
+var readyRoomSettings = {};
+readyRoomSettings.parentElement = false;
+readyRoomSettings.animateEnabled = false;
+readyRoomSettings.animateLastUpdate = 0;
+readyRoomSettings.animateFrameTotal = 0;
+readyRoomSettings.animateThreshold = 1000;
+readyRoomSettings.animateChargeUps = {};
+readyRoomSettings.framesPerSecond = 10;
+readyRoomSettings.spriteGrid = {};
+readyRoomSettings.spriteBounds = {minX: 10, maxX: 90, minY: 13, maxY: 36};
+readyRoomSettings.spritesIndex = {};
+readyRoomSettings.isFiltered = false;
+readyRoomSettings.isReady = false;
+
 // Define a function for initializing the ready room with unlocked robots
-gameSettings.thisReadyRoomElement = false;
-gameSettings.readyRoomAnimateEnabled = false;
-gameSettings.readyRoomAnimateLastUpdate = 0;
-gameSettings.readyRoomAnimateFrameTotal = 0;
-gameSettings.readyRoomAnimateThreshold = 1000;
-gameSettings.readyRoomAnimateChargeUps = {};
-gameSettings.readyRoomFramesPerSecond = 10;
-gameSettings.readyRoomSpriteGrid = {};
-gameSettings.readyRoomSpriteBounds = {minX: 10, maxX: 90, minY: 13, maxY: 36};
-gameSettings.readyRoomSpritesIndex = {};
-gameSettings.readyRoomIsReady = false;
 function prototype_ready_room_init(onComplete){
     //console.log('prototype_ready_room_init()');
 
@@ -59,10 +63,10 @@ function prototype_ready_room_init(onComplete){
     }
 
     // Make sure this ready room has a refernce in the game settings
-    gameSettings.thisReadyRoomElement = $readyRoom;
+    readyRoomSettings.parentElement = $readyRoom;
 
     // Collect the unlocked robot index and tokens for looping through momentarily
-    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
+    var readyRoomSpritesIndex = readyRoomSettings.spritesIndex;
     var unlockedPlayersIndex = gameSettings.customIndex.unlockedPlayersIndex;
     var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
     var unlockedPlayersTokens = Object.keys(unlockedPlayersIndex);
@@ -75,8 +79,8 @@ function prototype_ready_room_init(onComplete){
     $readyRoomTeam.find('.sprite').remove();
 
     // Define the min and max values for the X and Y offsets
-    var spriteBounds = gameSettings.readyRoomSpriteBounds;
-    var spriteGrid = gameSettings.readyRoomSpriteGrid;
+    var spriteBounds = readyRoomSettings.spriteBounds;
+    var spriteGrid = readyRoomSettings.spriteGrid;
 
     // Update the sprite bounds if there aren't that many robots
     var readyRoomShrinkFactor = 30;
@@ -174,7 +178,7 @@ function prototype_ready_room_init(onComplete){
         var pseudoSprite = {token: 'user', position: [clickXPercent, clickYPercent]};
         var nearbySprites = prototype_ready_room_nearby_sprites(pseudoSprite, searchRadius, filterProperties);
         //console.log('nearbySprites =', nearbySprites.length, nearbySprites);
-        //console.log('readyRoomSpritesIndex =', gameSettings.readyRoomSpritesIndex);
+        //console.log('readyRoomSpritesIndex =', readyRoomSettings.spritesIndex);
         // loop through the nearby sprites and update them all to be facing the click
         for (var i = 0; i < nearbySprites.length; i++){
             //console.log('for (i = ', i, '){ ... }');
@@ -198,7 +202,7 @@ function prototype_ready_room_init(onComplete){
     $readyRoomClicker.bind('touchend', clickHandler);
 
     // Update the ready flag for the ready room
-    gameSettings.readyRoomIsReady = true;
+    readyRoomSettings.isReady = true;
 
     // Run the onComplete function now that we're done
     onComplete();
@@ -206,20 +210,19 @@ function prototype_ready_room_init(onComplete){
 }
 
 // Define a function for refreshing the ready room with unlocked robots, optionally filtering by player token
-gameSettings.readyRoomIsFiltered = false;
 function prototype_ready_room_refresh(filterByPlayerToken) {
     //console.log('prototype_ready_room_refresh(', filterByPlayerToken, ')');
-    if (!gameSettings.readyRoomIsReady){ return false; }
+    if (!readyRoomSettings.isReady){ return false; }
     if (typeof filterByPlayerToken !== 'string') { filterByPlayerToken = false; }
     //console.log('filterByPlayerToken =', filterByPlayerToken);
-    var $readyRoom = gameSettings.thisReadyRoomElement;
+    var $readyRoom = readyRoomSettings.parentElement;
     var $readyRoomTeam = $('.team', $readyRoom);
-    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
+    var readyRoomSpritesIndex = readyRoomSettings.spritesIndex;
     var readyRoomSpritesIndexTokens = Object.keys(readyRoomSpritesIndex);
     //console.log('readyRoomSpritesIndexTokens =', readyRoomSpritesIndexTokens.length, readyRoomSpritesIndexTokens);
     //console.log('readyRoomSpritesIndex =', typeof readyRoomSpritesIndex, readyRoomSpritesIndex);
-    if (filterByPlayerToken === false){ gameSettings.readyRoomIsFiltered = false; }
-    else { gameSettings.readyRoomIsFiltered = true; }
+    if (filterByPlayerToken === false){ readyRoomSettings.isFiltered = false; }
+    else { readyRoomSettings.isFiltered = true; }
     for (var i = 0; i < readyRoomSpritesIndexTokens.length; i++){
         var spriteToken = readyRoomSpritesIndexTokens[i];
         var spriteData = readyRoomSpritesIndex[spriteToken];
@@ -243,34 +246,34 @@ function prototype_ready_room_refresh(filterByPlayerToken) {
 
 // Define a function for animating the prototype ready room sprites = 0;
 function prototype_ready_room_animate() {
-    if (!gameSettings.readyRoomIsReady){ return false; }
-    if (!gameSettings.readyRoomAnimateEnabled){ return false; }
+    if (!readyRoomSettings.isReady){ return false; }
+    if (!readyRoomSettings.animateEnabled){ return false; }
     //console.log('prototype_ready_room_animate()');
 
     // Collect references to important elements relevant to the ready-room
-    var $readyRoom = gameSettings.thisReadyRoomElement;
+    var $readyRoom = readyRoomSettings.parentElement;
     var $readyRoomScene = $('.scene', $readyRoom);
     var $readyRoomTeam = $('.team', $readyRoom);
 
     // Get all robot sprites currently in the ready room w/ the index
     var $allPlayerSprites = $('.sprite[data-kind="player"]', $readyRoomTeam);
     var $allRobotSprites = $('.sprite[data-kind="robot"]', $readyRoomTeam);
-    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
+    var readyRoomSpritesIndex = readyRoomSettings.spritesIndex;
 
     // Preset the last update time if not already set
-    if (gameSettings.readyRoomAnimateLastUpdate === 0){ new Date().getTime(); }
+    if (readyRoomSettings.animateLastUpdate === 0){ new Date().getTime(); }
 
     // Collect the current timestamp and the previous update timestamp for comparrison
     var thisUpdateTime = new Date().getTime();
-    var lastUpdateTime = gameSettings.readyRoomAnimateLastUpdate;
+    var lastUpdateTime = readyRoomSettings.animateLastUpdate;
     var diffUpdateTime = thisUpdateTime - lastUpdateTime;
-    var minUpdateDiff = (1000 / gameSettings.readyRoomFramesPerSecond);
+    var minUpdateDiff = (1000 / readyRoomSettings.framesPerSecond);
     //console.log('thisUpdateTime =', thisUpdateTime);
     //console.log('lastUpdateTime =', lastUpdateTime);
     //console.log('diffUpdateTime =', diffUpdateTime);
     //console.log('minUpdateDiff =', minUpdateDiff);
 
-    // Prevent animations from happening more than the defined fps value gameSettings.readyRoomFramesPerSecond
+    // Prevent animations from happening more than the defined fps value readyRoomSettings.framesPerSecond
     if (diffUpdateTime < minUpdateDiff) {
         //console.log('diffUpdateTime:', diffUpdateTime, ' < minUpdateDiff:', minUpdateDiff);
         window.requestAnimationFrame(prototype_ready_room_animate);
@@ -278,9 +281,9 @@ function prototype_ready_room_animate() {
         }
 
     // Otherwise update the last-update time to right now for future reference
-    gameSettings.readyRoomAnimateLastUpdate = thisUpdateTime;
-    gameSettings.readyRoomAnimateFrameTotal++;
-    //console.log('gameSettings.readyRoomAnimateFrameTotal =', gameSettings.readyRoomAnimateFrameTotal);
+    readyRoomSettings.animateLastUpdate = thisUpdateTime;
+    readyRoomSettings.animateFrameTotal++;
+    //console.log('readyRoomSettings.animateFrameTotal =', readyRoomSettings.animateFrameTotal);
 
     // Define a list variable to hold which sprites we should animate this round
     var spritesToAnimate = {};
@@ -346,7 +349,7 @@ function prototype_ready_room_animate() {
             newSpriteProperties.frame = 0;
 
             // Define the cooldown so we don't have them go too crazy
-            var baseCooldownValue = gameSettings.readyRoomFramesPerSecond * 4;
+            var baseCooldownValue = readyRoomSettings.framesPerSecond * 4;
             var newCooldownValue = Math.floor(baseCooldownValue * thisSprite.haste);
             thisSprite.cooldown = newCooldownValue;
 
@@ -380,7 +383,7 @@ function prototype_ready_room_animate() {
             //console.log('randomTransition =', randomTransition);
 
             // If the sprite was too close to the edge, we should force a direction change
-            var spriteBounds = gameSettings.readyRoomSpriteBounds;
+            var spriteBounds = readyRoomSettings.spriteBounds;
             var spriteAxisScale = 0.5; // the Y-axis is visually squished and we want to adjust the distance calculation to account for that
             if ((oldSpriteProperties.position[0] <= spriteBounds.minX && oldSpriteProperties.direction !== 'right')
                 || (oldSpriteProperties.position[0] >= spriteBounds.maxX && oldSpriteProperties.direction !== 'left')){
@@ -550,7 +553,7 @@ function prototype_ready_room_animate() {
                     newSpriteProperties.direction = (oldSpriteProperties.direction !== 'left') ? 'left' : 'right';
 
                     // Define the cooldown so we don't have them go too crazy
-                    var baseCooldownValue = gameSettings.readyRoomFramesPerSecond * 2;
+                    var baseCooldownValue = readyRoomSettings.framesPerSecond * 2;
                     var newCooldownValue = baseCooldownValue * thisSprite.haste;
                     thisSprite.cooldown = newCooldownValue;
 
@@ -592,7 +595,7 @@ function prototype_ready_room_animate() {
                         }
 
                     // Define the cooldown so we don't have them go too crazy
-                    var baseCooldownValue = gameSettings.readyRoomFramesPerSecond * 1;
+                    var baseCooldownValue = readyRoomSettings.framesPerSecond * 1;
                     var newCooldownValue = baseCooldownValue * thisSprite.haste;
                     thisSprite.cooldown = newCooldownValue;
 
@@ -645,14 +648,14 @@ function prototype_ready_room_animate() {
 // Define a function for actually animating a given ready room character in some way
 function prototype_ready_room_animate_character(kind, characterToken, newValues, onComplete){
     //console.log('prototype_ready_room_animate_character(characterToken:', characterToken, ', newValues:', newValues, ', onComplete:', typeof onComplete, ')');
-    if (!gameSettings.readyRoomIsReady){ return false; }
-    //if (!gameSettings.readyRoomAnimateEnabled){ return false; }
+    if (!readyRoomSettings.isReady){ return false; }
+    //if (!readyRoomSettings.animateEnabled){ return false; }
     if (typeof characterToken !== 'string' || !characterToken.length){ return false; }
     if (typeof newValues !== 'object'){ newValues = {}; }
     if (typeof onComplete !== 'function'){ onComplete = function(){ /* ... */ }; }
 
     // Collect this character's info from the unlock index for later
-    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
+    var readyRoomSpritesIndex = readyRoomSettings.spritesIndex;
     var unlockedCharactersIndex = {};
     if (kind === 'player'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedPlayersIndex; }
     else if (kind === 'robot'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedRobotsIndex; }
@@ -771,7 +774,7 @@ function prototype_ready_room_animate_speed_check(characterInfo){
     var characterToken = characterInfo.token;
     //console.log('characterToken/Info =', characterToken, characterInfo);
     // Collect a reference to the sprite's entry in the animation index
-    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
+    var readyRoomSpritesIndex = readyRoomSettings.spritesIndex;
     var thisSprite = readyRoomSpritesIndex[characterToken];
     //console.log('thisSprite =', typeof thisSprite, thisSprite);
     // If this character has a cooldown we gotta decease and wait
@@ -780,11 +783,11 @@ function prototype_ready_room_animate_speed_check(characterInfo){
     else { thisSprite.cooldown = 0; }
     // Increase the cooldown value by the character's speed value
     thisSprite.charge += characterInfo.speedBase;
-    //console.log(characterToken, '\n +characterSpeedBase(', characterInfo.speedBase, ')\n characterCharge(', thisSprite.charge, ')\n animateThreshold(', gameSettings.readyRoomAnimateThreshold, ')');
+    //console.log(characterToken, '\n +characterSpeedBase(', characterInfo.speedBase, ')\n characterCharge(', thisSprite.charge, ')\n animateThreshold(', readyRoomSettings.animateThreshold, ')');
     // If the cooldown value is less than the character's speed stat, we're not ready to animate yet
-    if (thisSprite.charge < gameSettings.readyRoomAnimateThreshold) { return false; }
+    if (thisSprite.charge < readyRoomSettings.animateThreshold) { return false; }
     // Otherwise we're ready to animate and we need to reset the cooldown value
-    thisSprite.charge = thisSprite.charge % gameSettings.readyRoomAnimateThreshold;
+    thisSprite.charge = thisSprite.charge % readyRoomSettings.animateThreshold;
     return true;
 
 }
@@ -804,7 +807,7 @@ function prototype_get_css_animation_duration(characterInfo){
 // Define a function for abruptly stopping the ready room animation
 function prototype_ready_room_start_animation(){
     //console.log('prototype_ready_room_start_animation()');
-    gameSettings.readyRoomAnimateEnabled = true;
+    readyRoomSettings.animateEnabled = true;
     prototype_ready_room_animate();
     return;
 }
@@ -812,15 +815,15 @@ function prototype_ready_room_start_animation(){
 // Define a function for abruptly stopping the ready room animation
 function prototype_ready_room_stop_animation(){
     //console.log('prototype_ready_room_stop_animation()');
-    gameSettings.readyRoomAnimateEnabled = false;
+    readyRoomSettings.animateEnabled = false;
     return;
 }
 
 // Define a function for showing the prototype ready room element
 function prototype_ready_room_show(){
     //console.log('prototype_ready_room_show()');
-    if (!gameSettings.readyRoomIsReady){ return false; }
-    var $readyRoom = gameSettings.thisReadyRoomElement;
+    if (!readyRoomSettings.isReady){ return false; }
+    var $readyRoom = readyRoomSettings.parentElement;
     $readyRoom.removeClass('hidden');
     $readyRoom.css({opacity: 1});
 }
@@ -828,8 +831,8 @@ function prototype_ready_room_show(){
 // Define a function for hiding the prototype ready room element
 function prototype_ready_room_hide(){
     //console.log('prototype_ready_room_hide()');
-    if (!gameSettings.readyRoomIsReady){ return false; }
-    var $readyRoom = gameSettings.thisReadyRoomElement;
+    if (!readyRoomSettings.isReady){ return false; }
+    var $readyRoom = readyRoomSettings.parentElement;
     $readyRoom.css({opacity: 0});
     $readyRoom.addClass('hidden');
 }
@@ -867,7 +870,7 @@ function prototype_ready_room_update_character(characterKind, characterToken, ne
     else if (characterKind === 'robot'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedRobotsIndex; }
     //else if (characterKind === 'shop'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedShopsIndex; }
     else { return false; }
-    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
+    var readyRoomSpritesIndex = readyRoomSettings.spritesIndex;
     //console.log('unlockedCharactersIndex =', unlockedCharactersIndex);
     //console.log('readyRoomSpritesIndex =', readyRoomSpritesIndex);
     // Abstract the characterToken in case the user has provided the "all" option
@@ -936,9 +939,9 @@ function prototype_ready_room_add_character_sprite(kind, characterToken, charact
     //console.log('prototype_ready_room_add_character_sprite(kind:', kind, ', characterToken:', characterToken, ', characterInfo:', characterInfo, ', spriteProperties:', spriteProperties, ')');
 
     // Initial setup for both player and robot
-    var spriteGrid = gameSettings.readyRoomSpriteGrid;
-    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
-    var $readyRoom = gameSettings.thisReadyRoomElement;
+    var spriteGrid = readyRoomSettings.spriteGrid;
+    var readyRoomSpritesIndex = readyRoomSettings.spritesIndex;
+    var $readyRoom = readyRoomSettings.parentElement;
     var $readyRoomTeam = $('.team', $readyRoom);
     var thisSpriteSize = characterInfo.imageSize;
     var thisSpriteSizeX = thisSpriteSize + 'x' + thisSpriteSize;
@@ -1073,7 +1076,7 @@ function prototype_ready_room_add_shop_sprite(shopToken, shopInfo, spritePropert
 
 // Define a function for getting a random column and row within that the above offsets
 function prototype_ready_room_random_colrow(limitPerCell){
-    var spriteGrid = gameSettings.readyRoomSpriteGrid;
+    var spriteGrid = readyRoomSettings.spriteGrid;
     if (typeof limitPerCell !== 'number'){ limitPerCell = 4; }
     var randomColumn = Math.floor(Math.random() * spriteGrid.colMax);
     var randomRow = Math.floor(Math.random() * spriteGrid.rowMax);
@@ -1099,7 +1102,7 @@ function prototype_ready_room_random_colrow(limitPerCell){
 
 // Define a function for getting the offset values for a given column and row given defined offsets in columnOffsets and rowOffsets
 function prototype_ready_room_colrow_center(thisColumn, thisRow){
-    var spriteGrid = gameSettings.readyRoomSpriteGrid;
+    var spriteGrid = readyRoomSettings.spriteGrid;
     var thisColumnOffset = spriteGrid.columnOffsets[thisColumn];
     var thisRowOffset = spriteGrid.rowOffsets[thisRow];
     var thisColumnOffsetCenter = thisColumnOffset - (spriteGrid.colWidth / 2);
@@ -1140,7 +1143,7 @@ function prototype_ready_room_nearby_sprites(targetSprite, searchRadius, filterP
     var nearbySprites = [];
     var targetX = targetSprite.position[0];
     var targetY = targetSprite.position[1];
-    var readyRoomSpritesIndex = gameSettings.readyRoomSpritesIndex;
+    var readyRoomSpritesIndex = readyRoomSettings.spritesIndex;
     var readyRoomSpritesIndexTokens = Object.keys(readyRoomSpritesIndex);
     //console.log('nearbySprites =', typeof nearbySprites, nearbySprites);
     //console.log('targetX =', typeof targetX, targetX);
