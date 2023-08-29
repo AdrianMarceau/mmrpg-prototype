@@ -519,8 +519,10 @@ $(document).ready(function(){
                                 thisShopData.allowEdit = true;
 
                                 // We should add the new robot to the parent ready room
-                                if (typeof window.parent.prototype_ready_room_add_robot !== 'undefined'){
+                                if (typeof window.parent.mmrpgReadyRoom !== 'undefined'
+                                    && typeof window.parent.mmrpgReadyRoom.addRobot !== 'undefined'){
                                     // If the extra data in dataExtra was not empty and is JSON, parse it into robotInfo
+                                    var readyRoom = window.parent.mmrpgReadyRoom;
                                     var newRobotToken = postData.token;
                                     newRobotToken = newRobotToken.replace(/^robot-/i, '');
                                     var newRobotInfo = {};
@@ -537,7 +539,7 @@ $(document).ready(function(){
                                     if (typeof newRobotInfo.token !== 'undefined'
                                         && newRobotInfo.token === newRobotToken){
                                         //console.log('newRobotToken(', newRobotToken, ') === newRobotInfo.token(', newRobotInfo.token, ')');
-                                        window.parent.prototype_ready_room_add_robot(newRobotToken, newRobotInfo, true);
+                                        readyRoom.addRobot(newRobotToken, newRobotInfo, true);
                                         }
                                     }
 

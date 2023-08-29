@@ -3,6 +3,7 @@ var thisBody = false;
 var thisPrototype = false;
 var thisFalloff = false;
 var thisWindow = false;
+var thisReadyRoom = false;
 
 // Create the prototype battle options object
 gameSettings.fadeIn = false;
@@ -530,7 +531,9 @@ $(document).ready(function(){
         if (typeof gameSettings.totalMissionsComplete !== 'undefined'
             && gameSettings.totalMissionsComplete >= 2){
             // Initialize the ready room on prototype home page load
-            mmrpgReadyRoom.init(function(){
+            var $thisPrototype = $('#prototype');
+            var $thisBanner = $('.banner', $thisPrototype);
+            mmrpgReadyRoom.init($thisBanner, function(){
 
                 // Filter to only the current player if one has been set
                 if (typeof battleOptions['this_player_token'] !== 'undefined'
@@ -1562,10 +1565,10 @@ function prototype_menu_switch(switchOptions){
                 && typeof battleOptions['this_player_token'] !== 'undefined'
                 && battleOptions['this_player_token'].length){
                 mmrpgReadyRoom.show();
-                var spriteBounds = gameSettings.readyRoomSpriteBounds;
+                var spriteBounds = mmrpgReadyRoom.config.spriteBounds;
                 if (loadState === 'reload'){
                     // If not already filtered, animate the player's robots sliding into place
-                    if (!gameSettings.readyRoomIsFiltered){
+                    if (!mmrpgReadyRoom.config.isFiltered){
                         mmrpgReadyRoom.updatePlayer(function(token, info){ return info.player !== filterPlayer; }, {frame: 'running', direction: 'left', position: ['-=4', null], opacity: 0});
                         mmrpgReadyRoom.updatePlayer(filterPlayer, {frame: 'running', direction: 'right', position: [(spriteBounds.maxX / 2), (spriteBounds.minY - 1)], opacity: 1});
                         mmrpgReadyRoom.updateRobot(filterOtherPlayersFunction, {frame: 'slide', direction: 'left', position: ['-=4', null], opacity: 0});

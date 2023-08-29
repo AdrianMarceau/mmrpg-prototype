@@ -310,6 +310,7 @@ foreach ($this_menu_tooltips AS $token => $text){
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/ready-room.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
 <? /* <meta name="viewport" content="user-scalable=yes, width=768, height=1004"> */ ?>
