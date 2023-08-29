@@ -3270,3 +3270,66 @@ function prototype_ready_room_nearby_sprites(targetSprite, searchRadius, filterP
     //console.log('nearbySprites =', typeof nearbySprites, nearbySprites);
     return nearbySprites;
 }
+
+// Define a function for synthetically determining a given robot's affinity towards certain animals
+function prototype_ready_room_calculate_animal_affinity(robotInfo, animalTokens){
+
+    // If the animal affinity wasn't provided, defined them all
+    if (!animalTokens || typeof animalTokens !== 'array'){ animalTokens = ['dog', 'cat', 'bird', 'rodent']; }
+
+    // Extract the stats from the robotInfo object
+    var energyBase = robotInfo.energyBase;
+    var attackBase = robotInfo.attackBase;
+    var defenseBase = robotInfo.defenseBase;
+    var speedBase = robotInfo.speedBase;
+    var totalBase = energyBase + attackBase + defenseBase + speedBase;
+
+    // Define an array to hold ranked animal tokens and the index of scores
+    var animalTokensRanked = [];
+    var animalScoresIndex = {'dog': 1, 'cat': 1, 'bird': 1, 'rodent': 1};
+    var animalScoresIndexTokens = Object.keys(animalScoresIndex);
+
+    // Use the existing stats to craft more abstract values we can use for pet preferences
+    var baseHardyValue = (energyBase + defenseBase) / 2;
+    var baseHunterValue = (attackBase + speedBase) / 2;
+    var baseCombatValue = (attackBase + defenseBase) / 2;
+    var baseTravelValue = (energyBase + speedBase) / 2;
+
+    // Compare the abstract values to grant positive animal affinity points for each animal
+    if (baseHardyValue > baseHunterValue){ animalScoresIndex['dog'] += (baseHardyValue / totalBase); }
+    if (baseHunterValue > baseHardyValue){ animalScoresIndex['cat'] += (baseHunterValue / totalBase); }
+    if (baseCombatValue > baseTravelValue){ animalScoresIndex['bird'] += (baseCombatValue / totalBase); }
+    if (baseTravelValue > baseCombatValue){ animalScoresIndex['rodent'] += (baseTravelValue / totalBase); }
+
+    // Compare the abstract values again in a different way to grant negative animal affinity points for each animal type
+    if (baseHunterValue > baseHardyValue){ animalScoresIndex['dog'] -= (baseHunterValue / totalBase / totalBase); }
+    if (baseHardyValue > baseHunterValue){ animalScoresIndex['cat'] -= (baseHardyValue / totalBase / totalBase); }
+    if (baseTravelValue > baseCombatValue){ animalScoresIndex['bird'] -= (baseTravelValue / totalBase / totalBase); }
+    if (baseCombatValue > baseTravelValue){ animalScoresIndex['rodent'] -= (baseCombatValue / totalBase / totalBase); }
+
+
+    // Extract the animal tokens and then sort them by their score values above
+    animalTokensRanked = Object.keys(animalScoresIndex);
+    animalTokensRanked = animalTokensRanked.sort(function(a,b){
+        if (animalScoresIndex[b] === animalScoresIndex[a]){ return 0; }
+        return animalScoresIndex[b] < animalScoresIndex[a] ? -1 : 1;
+        });
+
+    // Determine the best ranked and the worst ranked given above (in cases of duplicates, use the order defined in animalScoresIndexTokens)
+    var bestMatch = animalTokensRanked[0];
+    var worstMatch = animalTokensRanked[animalTokensRanked.length - 1];
+
+    // Return the index of animal affinity scores
+    var animalAffinities = {
+        ranked: animalTokensRanked,
+        scores: animalScoresIndex,
+        best: bestMatch,
+        worst: worstMatch
+        };
+    //console.log('robotInfo.token =', robotInfo.token, robotInfo);
+    //console.log('animalAffinities =', animalAffinities);
+    //console.log('animalTokensRanked =', animalTokensRanked);
+    //console.log('animalScoresIndex =', animalScoresIndex);
+    return animalAffinities;
+
+}
