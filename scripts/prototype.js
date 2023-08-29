@@ -530,16 +530,16 @@ $(document).ready(function(){
         if (typeof gameSettings.totalMissionsComplete !== 'undefined'
             && gameSettings.totalMissionsComplete >= 2){
             // Initialize the ready room on prototype home page load
-            prototype_ready_room_init(function(){
+            mmrpgReadyRoom.init(function(){
 
                 // Filter to only the current player if one has been set
                 if (typeof battleOptions['this_player_token'] !== 'undefined'
                     && battleOptions['this_player_token'].length){
-                    prototype_ready_room_refresh(battleOptions['this_player_token']);
+                    mmrpgReadyRoom.refresh(battleOptions['this_player_token']);
                     }
 
                 // Start the actual ready room animation when it's appropriate to do so
-                prototype_ready_room_start_animation();
+                mmrpgReadyRoom.startAnimation();
 
                 // Define a function to auto-fade the logo after we've seen it for long enough (we wanna see the ready room!)
                 var fadeOutLogo = function(){
@@ -626,15 +626,15 @@ function mmrpg_trigger_reset(fullReset){
     var confirmText = 'Are you sure you want to reset your entire game?\nAll progress will be lost and cannot be restored including any and all unlocked missions, robots, and abilities. Continue?';
     var confirmText2 = 'Let me repeat that one more time.\nIf you reset your game ALL unlocks and progress with be lost. \nEverything. \nReset anyway?';
     // Attempt to confirm with the user of they want to reset
-    prototype_ready_room_update_robot('all', {frame: 'damage'}); // damage
-    prototype_ready_room_stop_animation();
+    mmrpgReadyRoom.updateRobot('all', {frame: 'damage'}); // damage
+    mmrpgReadyRoom.stopAnimation();
     if (confirm(confirmText) && confirm(confirmText2)){
         // Redirect the user to the prototype reset page
         var postURL = 'prototype.php?action=reset';
         if (fullReset){ postURL += '&full_reset=true'; }
         $.post(postURL, function(){
             //alert('reset complete!');
-            prototype_ready_room_update_robot('all', {frame: 'defeat'}); // defeat
+            mmrpgReadyRoom.updateRobot('all', {frame: 'defeat'}); // defeat
             if (window.self != window.parent){
                 window.location = 'prototype.php';
                 } else {
@@ -644,7 +644,7 @@ function mmrpg_trigger_reset(fullReset){
         return true;
         } else {
         // Return false
-        prototype_ready_room_start_animation();
+        mmrpgReadyRoom.startAnimation();
         return false;
         }
 }
@@ -743,7 +743,7 @@ function prototype_menu_loaded(){
                 else if (gameSettings.nextStepName === 'database'){ newRobotFrame = 'base2'; } // base2
                 else if (parseInt(gameSettings.nextStepName) > 0){ newRobotFrame = 'victory'; } // victory
                 else { newRobotFrame = 'defend'; } // defend
-                prototype_ready_room_update_robot('most', {frame: newRobotFrame});
+                mmrpgReadyRoom.updateRobot('most', {frame: newRobotFrame});
                 }
             gameSettings.nextStepName = false;
             gameSettings.nextSlideDirection = false;
@@ -1561,22 +1561,22 @@ function prototype_menu_switch(switchOptions){
             if (currentMenuSelect === 'this_battle_token'
                 && typeof battleOptions['this_player_token'] !== 'undefined'
                 && battleOptions['this_player_token'].length){
-                prototype_ready_room_show();
+                mmrpgReadyRoom.show();
                 var spriteBounds = gameSettings.readyRoomSpriteBounds;
                 if (loadState === 'reload'){
                     // If not already filtered, animate the player's robots sliding into place
                     if (!gameSettings.readyRoomIsFiltered){
-                        prototype_ready_room_update_player(function(token, info){ return info.player !== filterPlayer; }, {frame: 'running', direction: 'left', position: ['-=4', null], opacity: 0});
-                        prototype_ready_room_update_player(filterPlayer, {frame: 'running', direction: 'right', position: [(spriteBounds.maxX / 2), (spriteBounds.minY - 1)], opacity: 1});
-                        prototype_ready_room_update_robot(filterOtherPlayersFunction, {frame: 'slide', direction: 'left', position: ['-=4', null], opacity: 0});
-                        prototype_ready_room_update_robot(filterPlayerFunction, {frame: 'slide', direction: 'right', position: ['+=2', null], opacity: 1});
+                        mmrpgReadyRoom.updatePlayer(function(token, info){ return info.player !== filterPlayer; }, {frame: 'running', direction: 'left', position: ['-=4', null], opacity: 0});
+                        mmrpgReadyRoom.updatePlayer(filterPlayer, {frame: 'running', direction: 'right', position: [(spriteBounds.maxX / 2), (spriteBounds.minY - 1)], opacity: 1});
+                        mmrpgReadyRoom.updateRobot(filterOtherPlayersFunction, {frame: 'slide', direction: 'left', position: ['-=4', null], opacity: 0});
+                        mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'slide', direction: 'right', position: ['+=2', null], opacity: 1});
                         var updateTimeout = setTimeout(function(){
-                            prototype_ready_room_update_player(filterPlayer, {frame: 'base'});
-                            prototype_ready_room_update_robot(filterPlayerFunction, {frame: 'base'});
+                            mmrpgReadyRoom.updatePlayer(filterPlayer, {frame: 'base'});
+                            mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'base'});
                             clearTimeout(updateTimeout);
                             updateTimeout = setTimeout(function(){
-                                prototype_ready_room_update_robot('some', {direction: 'left'});
-                                prototype_ready_room_update_robot('most', {frame: 'taunt'});
+                                mmrpgReadyRoom.updateRobot('some', {direction: 'left'});
+                                mmrpgReadyRoom.updateRobot('most', {frame: 'taunt'});
                                 clearTimeout(updateTimeout);
                                 }, 900);
                             }, 900);
@@ -1584,33 +1584,33 @@ function prototype_menu_switch(switchOptions){
                         }
                     // Otherwise if already filtered that means they changed their mind about a mission
                     else {
-                        prototype_ready_room_update_player(filterPlayer, {direction: 'left', frame: 'damage', position: ['-=1', null]});
-                        prototype_ready_room_update_robot(filterPlayerFunction, {frame: 'damage', position: ['-=2', null]});
+                        mmrpgReadyRoom.updatePlayer(filterPlayer, {direction: 'left', frame: 'damage', position: ['-=1', null]});
+                        mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'damage', position: ['-=2', null]});
                         var updateTimeout = setTimeout(function(){
-                            prototype_ready_room_update_robot(filterPlayerFunction, {frame: 'base'});
+                            mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'base'});
                             clearTimeout(updateTimeout);
                             }, 1200);
                         }
                     }
                 else if (loadState === 'fadein'){
-                    prototype_ready_room_refresh(battleOptions['this_player_token']);
+                    mmrpgReadyRoom.refresh(battleOptions['this_player_token']);
                     }
                 }
             else if (currentMenuSelect === 'this_player_token'){
                 if (loadState === 'fadein'){
-                    prototype_ready_room_refresh();
+                    mmrpgReadyRoom.refresh();
                     }
                 }
             else if (currentMenuSelect === 'this_player_robots'){
 
                 if (loadState === 'reload'){
-                    prototype_ready_room_update_player(filterPlayer, {direction: 'right', frame: 'command'});
+                    mmrpgReadyRoom.updatePlayer(filterPlayer, {direction: 'right', frame: 'command'});
                     }
                 else if (loadState === 'fadein'){
-                    prototype_ready_room_update_player(filterPlayer, {direction: 'right', frame: 'running', position: ['+=10', null]});
-                    prototype_ready_room_update_robot(filterPlayerFunction, {direction: 'right', frame: 'slide', position: ['+=12', null]});
+                    mmrpgReadyRoom.updatePlayer(filterPlayer, {direction: 'right', frame: 'running', position: ['+=10', null]});
+                    mmrpgReadyRoom.updateRobot(filterPlayerFunction, {direction: 'right', frame: 'slide', position: ['+=12', null]});
                     var updateTimeout = setTimeout(function(){
-                        prototype_ready_room_hide();
+                        mmrpgReadyRoom.hide();
                         clearTimeout(updateTimeout);
                         }, 100);
 
@@ -1618,7 +1618,7 @@ function prototype_menu_switch(switchOptions){
 
                 }
             else if (typeof currentMenuSelect === 'undefined'){
-                prototype_ready_room_refresh();
+                mmrpgReadyRoom.refresh();
                 }
             };
 

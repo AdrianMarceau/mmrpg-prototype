@@ -16,9 +16,12 @@ readyRoomSettings.spritesIndex = {};
 readyRoomSettings.isFiltered = false;
 readyRoomSettings.isReady = false;
 
+// Define a function for holding other functions
+var mmrpgReadyRoom = function(){};
+
 // Define a function for initializing the ready room with unlocked robots
-function prototype_ready_room_init(onComplete){
-    //console.log('prototype_ready_room_init()');
+mmrpgReadyRoom.init = function(onComplete){
+    //console.log('mmrpgReadyRoom.init()');
 
     // If there's no player index to work with, we can't display the ready room
     if (typeof gameSettings.customIndex.unlockedPlayersIndex === 'undefined'
@@ -117,7 +120,7 @@ function prototype_ready_room_init(onComplete){
     for (var i = 0; i < unlockedPlayersTokens.length; i++){
         var playerToken = unlockedPlayersTokens[i];
         var unlockedPlayer = unlockedPlayersIndex[playerToken];
-        prototype_ready_room_add_player_sprite(playerToken, unlockedPlayer);
+        mmrpgReadyRoom.addPlayerSprite(playerToken, unlockedPlayer);
         }
 
     // Loop through unlocked robots and add them to the team div as "sprite" elements
@@ -135,19 +138,19 @@ function prototype_ready_room_init(onComplete){
             (function(robotToken, unlockedRobot, newEntranceTimeout, newEntranceOffsetX, newEntranceOffsetY){
                 //console.log('queue entrance animation for ', unlockedRobot.token);
                 //console.log('unlockedRobot =', unlockedRobot);
-                prototype_ready_room_add_robot_sprite(robotToken, unlockedRobot, {position: [110, (spriteBounds.maxY + 6)], direction: 'left', frame: 'slide'});
+                mmrpgReadyRoom.addRobotSprite(robotToken, unlockedRobot, {position: [110, (spriteBounds.maxY + 6)], direction: 'left', frame: 'slide'});
                 setTimeout(function(){
                     //console.log('slide-in triggered for ', unlockedRobot.token);
-                    prototype_ready_room_update_robot(robotToken, {position: [newEntranceOffsetX, newEntranceOffsetY], direction: 'left', frame: 'slide'});
+                    mmrpgReadyRoom.updateRobot(robotToken, {position: [newEntranceOffsetX, newEntranceOffsetY], direction: 'left', frame: 'slide'});
                     setTimeout(function(){
                         //console.log('taunt triggered for ', unlockedRobot.token);
-                        prototype_ready_room_update_robot(robotToken, {frame: 'taunt'});
+                        mmrpgReadyRoom.updateRobot(robotToken, {frame: 'taunt'});
                         unlockedRobot.flags.splice(unlockedRobot.flags.indexOf('is_newly_unlocked'), 1);
                         }, 900);
                     }, newEntranceTimeout);
                 })(robotToken, unlockedRobot, newEntranceTimeout, newEntranceOffsetX, newEntranceOffsetY);
             } else {
-            prototype_ready_room_add_robot_sprite(robotToken, unlockedRobot);
+            mmrpgReadyRoom.addRobotSprite(robotToken, unlockedRobot);
             }
         }
 
@@ -176,7 +179,7 @@ function prototype_ready_room_init(onComplete){
         var searchRadius = 30;
         var filterProperties = false;
         var pseudoSprite = {token: 'user', position: [clickXPercent, clickYPercent]};
-        var nearbySprites = prototype_ready_room_nearby_sprites(pseudoSprite, searchRadius, filterProperties);
+        var nearbySprites = mmrpgReadyRoom.getNearbySprites(pseudoSprite, searchRadius, filterProperties);
         //console.log('nearbySprites =', nearbySprites.length, nearbySprites);
         //console.log('readyRoomSpritesIndex =', readyRoomSettings.spritesIndex);
         // loop through the nearby sprites and update them all to be facing the click
@@ -187,7 +190,7 @@ function prototype_ready_room_init(onComplete){
             var nearbyDistance = nearbySpriteData.distance;
             //console.log('nearbySprite @', nearbyDistance, 'away w/', nearbySprite);
             var newDirection = nearbySprite.position[0] > clickXPercent ? 'left' : 'right';
-            prototype_ready_room_update_character(nearbySprite.kind, nearbySprite.token, {direction: newDirection});
+            mmrpgReadyRoom.updateCharacter(nearbySprite.kind, nearbySprite.token, {direction: newDirection});
             }
         $readyRoom.addClass('clicked');
         if (clickTimeout !== false){ clearTimeout(clickTimeout); }
@@ -210,8 +213,8 @@ function prototype_ready_room_init(onComplete){
 }
 
 // Define a function for refreshing the ready room with unlocked robots, optionally filtering by player token
-function prototype_ready_room_refresh(filterByPlayerToken) {
-    //console.log('prototype_ready_room_refresh(', filterByPlayerToken, ')');
+mmrpgReadyRoom.refresh = function(filterByPlayerToken) {
+    //console.log('mmrpgReadyRoom.refresh(', filterByPlayerToken, ')');
     if (!readyRoomSettings.isReady){ return false; }
     if (typeof filterByPlayerToken !== 'string') { filterByPlayerToken = false; }
     //console.log('filterByPlayerToken =', filterByPlayerToken);
@@ -245,10 +248,10 @@ function prototype_ready_room_refresh(filterByPlayerToken) {
 }
 
 // Define a function for animating the prototype ready room sprites = 0;
-function prototype_ready_room_animate() {
+mmrpgReadyRoom.animate = function() {
     if (!readyRoomSettings.isReady){ return false; }
     if (!readyRoomSettings.animateEnabled){ return false; }
-    //console.log('prototype_ready_room_animate()');
+    //console.log('mmrpgReadyRoom.animate()');
 
     // Collect references to important elements relevant to the ready-room
     var $readyRoom = readyRoomSettings.parentElement;
@@ -276,7 +279,7 @@ function prototype_ready_room_animate() {
     // Prevent animations from happening more than the defined fps value readyRoomSettings.framesPerSecond
     if (diffUpdateTime < minUpdateDiff) {
         //console.log('diffUpdateTime:', diffUpdateTime, ' < minUpdateDiff:', minUpdateDiff);
-        window.requestAnimationFrame(prototype_ready_room_animate);
+        window.requestAnimationFrame(mmrpgReadyRoom.animate);
         return false;
         }
 
@@ -295,7 +298,7 @@ function prototype_ready_room_animate() {
         var thisPlayerToken = unlockedPlayersIndexTokens[i];
         var thisPlayerInfo = unlockedPlayersIndex[thisPlayerToken];
         //console.log('thisPlayerToken/Info =', thisPlayerToken, thisPlayerInfo);
-        if (!prototype_ready_room_animate_speed_check(thisPlayerInfo)){ continue; }
+        if (!mmrpgReadyRoom.animateSpeedCheck(thisPlayerInfo)){ continue; }
         var thisSpriteToken = thisPlayerToken;
         var thisSpriteData = {kind: 'player', token: thisPlayerToken, info: thisPlayerInfo}
         spritesToAnimate[thisSpriteToken] = thisSpriteData;
@@ -309,7 +312,7 @@ function prototype_ready_room_animate() {
         var thisRobotToken = unlockedRobotsIndexTokens[i];
         var thisRobotInfo = unlockedRobotsIndex[thisRobotToken];
         //console.log('thisRobotToken/Info =', thisRobotToken, thisRobotInfo);
-        if (!prototype_ready_room_animate_speed_check(thisRobotInfo)){ continue; }
+        if (!mmrpgReadyRoom.animateSpeedCheck(thisRobotInfo)){ continue; }
         var thisSpriteToken = thisRobotToken;
         var thisSpriteData = {kind: 'robot', token: thisRobotToken, info: thisRobotInfo}
         spritesToAnimate[thisSpriteToken] = thisSpriteData;
@@ -418,7 +421,7 @@ function prototype_ready_room_animate() {
                     // Calculate which sprites are nearby this robot for artificial intelligence purposes
                     var searchRadius = 30 - Math.floor(30 * (gameSettings.totalRobotOptions / 100));
                     var filterProperties = false;
-                    var nearbySprites = prototype_ready_room_nearby_sprites(thisSprite, searchRadius, filterProperties);
+                    var nearbySprites = mmrpgReadyRoom.getNearbySprites(thisSprite, searchRadius, filterProperties);
                     //console.log('searchRadius =', searchRadius);
                     //console.log('nearbySprites =', nearbySprites.length, nearbySprites);
                     if (nearbySprites.length){
@@ -484,7 +487,7 @@ function prototype_ready_room_animate() {
                                 randomTransition = 'position';
                                 //console.log('vibeCheck: ' + thisCharacterToken + ' feels ' + nearbySpriteToken + ' is too close and backs away');
                                 newSpriteProperties.frame = thisCharacterKind === 'player' ? 'running' : 'defend';
-                                newSpriteProperties.position = prototype_ready_room_getRelativePositionChange(thisSprite, nearbySprite, 'farther', 0.10, spriteBounds, spriteAxisScale);
+                                newSpriteProperties.position = mmrpgReadyRoom.getRelativePositionChange(thisSprite, nearbySprite, 'farther', 0.10, spriteBounds, spriteAxisScale);
                                 }
 
                             // Else if the current sprite has a positive vibe meter, we should do a positive action
@@ -492,7 +495,7 @@ function prototype_ready_room_animate() {
                                 && nearbySpriteDistance > (searchRadius / 2)) {
                                 randomTransition = nearbySpriteDistance > (searchRadius / 3) ? 'position' : 'depth';
                                 //console.log('vibeCheck: ' + thisCharacterToken + ' inches toward ' + nearbySpriteToken + ' on positive vibes');
-                                newSpriteProperties.position = prototype_ready_room_getRelativePositionChange(thisSprite, nearbySprite, 'closer', 0.25, spriteBounds, spriteAxisScale);
+                                newSpriteProperties.position = mmrpgReadyRoom.getRelativePositionChange(thisSprite, nearbySprite, 'closer', 0.25, spriteBounds, spriteAxisScale);
                                 }
 
                             // Else if the current sprite has a negative vibe meter, we should do a negative action
@@ -501,7 +504,7 @@ function prototype_ready_room_animate() {
                                 randomTransition = 'direction';
                                 //console.log('vibeCheck: ' + thisCharacterToken + ' runs away from ' + nearbySpriteToken + ' on negative vibes');
                                 newSpriteProperties.frame = thisCharacterKind === 'player' ? 'running' : 'slide';
-                                newSpriteProperties.position = prototype_ready_room_getRelativePositionChange(thisSprite, nearbySprite, 'farther', 0.50, spriteBounds, spriteAxisScale);
+                                newSpriteProperties.position = mmrpgReadyRoom.getRelativePositionChange(thisSprite, nearbySprite, 'farther', 0.50, spriteBounds, spriteAxisScale);
                                 if (thisSprite.position[0] < nearbySprite.position[0]) {
                                     thisSprite.direction = 'left';
                                     } else {
@@ -635,19 +638,20 @@ function prototype_ready_room_animate() {
 
         if (Object.keys(newSpriteProperties).length){
             //console.log('ANIMATE ME!!! (', thisSpriteToken, ')');
-            prototype_ready_room_animate_character(thisCharacterKind, thisCharacterToken, newSpriteProperties);
+            mmrpgReadyRoom.animateCharacter(thisCharacterKind, thisCharacterToken, newSpriteProperties);
             }
 
         }
 
     // Request the next animation frame when ready
-    requestAnimationFrame(prototype_ready_room_animate);
+    requestAnimationFrame(mmrpgReadyRoom.animate);
 
 }
 
 // Define a function for actually animating a given ready room character in some way
-function prototype_ready_room_animate_character(kind, characterToken, newValues, onComplete){
-    //console.log('prototype_ready_room_animate_character(characterToken:', characterToken, ', newValues:', newValues, ', onComplete:', typeof onComplete, ')');
+mmrpgReadyRoom.animateCharacter = function(kind, characterToken, newValues, onComplete){
+    //console.log('mmrpgReadyRoom.animateCharacter(characterToken:', characterToken, ', newValues:', newValues, ', onComplete:', typeof onComplete, ')');
+
     if (!readyRoomSettings.isReady){ return false; }
     //if (!readyRoomSettings.animateEnabled){ return false; }
     if (typeof characterToken !== 'string' || !characterToken.length){ return false; }
@@ -746,30 +750,29 @@ function prototype_ready_room_animate_character(kind, characterToken, newValues,
         $thisSprite.css(newCSS);
         }
 
-
 }
 
 // Define a function for actually animating a given ready room player in some way
-function prototype_ready_room_animate_player(playerToken, newValues, onComplete){
-    //console.log('prototype_ready_room_animate_player(playerToken:', playerToken, ', newValues:', newValues, ', onComplete:', typeof onComplete, ')');
-    return prototype_ready_room_animate_character('player', playerToken, newValues, onComplete);
+mmrpgReadyRoom.animatePlayer = function(playerToken, newValues, onComplete){
+    //console.log('mmrpgReadyRoom.animatePlayer(playerToken:', playerToken, ', newValues:', newValues, ', onComplete:', typeof onComplete, ')');
+    return mmrpgReadyRoom.animateCharacter('player', playerToken, newValues, onComplete);
 }
 
 // Define a function for actually animating a given ready room robot in some way
-function prototype_ready_room_animate_robot(robotToken, newValues, onComplete){
-    //console.log('prototype_ready_room_animate_robot(robotToken:', robotToken, ', newValues:', newValues, ', onComplete:', typeof onComplete, ')');
-    return prototype_ready_room_animate_character('robot', robotToken, newValues, onComplete);
+mmrpgReadyRoom.animateRobot = function(robotToken, newValues, onComplete){
+    //console.log('mmrpgReadyRoom.animateRobot(robotToken:', robotToken, ', newValues:', newValues, ', onComplete:', typeof onComplete, ')');
+    return mmrpgReadyRoom.animateCharacter('robot', robotToken, newValues, onComplete);
 }
 
 // Define a function for actually animating a given ready room shop in some way
-function prototype_ready_room_animate_shop(shopToken, newValues, onComplete){
-    //console.log('prototype_ready_room_animate_shop(shopToken:', shopToken, ', newValues:', newValues, ', onComplete:', typeof onComplete, ')');
-    return prototype_ready_room_animate_character('shop', shopToken, newValues, onComplete);
+mmrpgReadyRoom.animateShop = function(shopToken, newValues, onComplete){
+    //console.log('mmrpgReadyRoom.animateShop(shopToken:', shopToken, ', newValues:', newValues, ', onComplete:', typeof onComplete, ')');
+    return mmrpgReadyRoom.animateCharacter('shop', shopToken, newValues, onComplete);
 }
 
 // Define a function for determining whether a sprite should animate based on its speed
-function prototype_ready_room_animate_speed_check(characterInfo){
-    //console.log('prototype_ready_room_animate_speed_check(characterInfo:', characterInfo.token, ')');
+mmrpgReadyRoom.animateSpeedCheck = function(characterInfo){
+    //console.log('mmrpgReadyRoom.animateSpeedCheck(characterInfo:', characterInfo.token, ')');
     // Collect the character's key details to make this easier
     var characterToken = characterInfo.token;
     //console.log('characterToken/Info =', characterToken, characterInfo);
@@ -793,7 +796,7 @@ function prototype_ready_room_animate_speed_check(characterInfo){
 }
 
 // Define a function for calculating the css animation duration for a given character sprite
-function prototype_get_css_animation_duration(characterInfo){
+mmrpgReadyRoom.getAnimationDuration = function(characterInfo){
     if (typeof characterInfo === 'undefined'){ return false; }
     var this_character_attack = typeof characterInfo.attackBase !== 'undefined' ? characterInfo.attackBase : 100;
     var this_character_defense = typeof characterInfo.defenseBase !== 'undefined' ? characterInfo.defenseBase : 100;
@@ -805,23 +808,23 @@ function prototype_get_css_animation_duration(characterInfo){
 }
 
 // Define a function for abruptly stopping the ready room animation
-function prototype_ready_room_start_animation(){
-    //console.log('prototype_ready_room_start_animation()');
+mmrpgReadyRoom.startAnimation = function(){
+    //console.log('mmrpgReadyRoom.startAnimation()');
     readyRoomSettings.animateEnabled = true;
-    prototype_ready_room_animate();
+    mmrpgReadyRoom.animate();
     return;
 }
 
 // Define a function for abruptly stopping the ready room animation
-function prototype_ready_room_stop_animation(){
-    //console.log('prototype_ready_room_stop_animation()');
+mmrpgReadyRoom.stopAnimation = function(){
+    //console.log('mmrpgReadyRoom.stopAnimation()');
     readyRoomSettings.animateEnabled = false;
     return;
 }
 
 // Define a function for showing the prototype ready room element
-function prototype_ready_room_show(){
-    //console.log('prototype_ready_room_show()');
+mmrpgReadyRoom.show = function(){
+    //console.log('mmrpgReadyRoom.show()');
     if (!readyRoomSettings.isReady){ return false; }
     var $readyRoom = readyRoomSettings.parentElement;
     $readyRoom.removeClass('hidden');
@@ -829,8 +832,8 @@ function prototype_ready_room_show(){
 }
 
 // Define a function for hiding the prototype ready room element
-function prototype_ready_room_hide(){
-    //console.log('prototype_ready_room_hide()');
+mmrpgReadyRoom.hide = function(){
+    //console.log('mmrpgReadyRoom.hide()');
     if (!readyRoomSettings.isReady){ return false; }
     var $readyRoom = readyRoomSettings.parentElement;
     $readyRoom.css({opacity: 0});
@@ -838,8 +841,8 @@ function prototype_ready_room_hide(){
 }
 
 // Define a function for adding a new robot to the unlocked robot index
-function prototype_ready_room_add_robot(robotToken, robotInfo, focusRobot){
-    //console.log('prototype_ready_room_add_robot(robotToken:', robotToken, ', robotInfo:', robotInfo, ', focusRobot:', focusRobot, ')');
+mmrpgReadyRoom.addRobot = function(robotToken, robotInfo, focusRobot){
+    //console.log('mmrpgReadyRoom.addRobot(robotToken:', robotToken, ', robotInfo:', robotInfo, ', focusRobot:', focusRobot, ')');
     if (typeof focusRobot !== 'boolean'){ focusRobot = false; }
     // Collect the unlocked robots index
     var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
@@ -850,20 +853,20 @@ function prototype_ready_room_add_robot(robotToken, robotInfo, focusRobot){
     unlockedRobotsIndex[robotToken] = robotInfo;
     //console.log('unlockedRobotsIndex =', unlockedRobotsIndex);
     // Now we need to update the robot's sprite in the ready room
-    prototype_ready_room_add_robot_sprite(robotToken, robotInfo, {position: [110,15]});
+    mmrpgReadyRoom.addRobotSprite(robotToken, robotInfo, {position: [110,15]});
     // Immediately update this robot's sprite after a short timeout
     var focusUpdateTimeout = setTimeout(function(){
-        prototype_ready_room_update_robot(robotToken, {frame: 'slide', direction: 'left', position: [80,5]});
+        mmrpgReadyRoom.updateRobot(robotToken, {frame: 'slide', direction: 'left', position: [80,5]});
         clearTimeout(focusUpdateTimeout);
         focusUpdateTimeout = setTimeout(function(){
-            prototype_ready_room_update_robot(robotToken, {frame: 'taunt'});
+            mmrpgReadyRoom.updateRobot(robotToken, {frame: 'taunt'});
             }, 600);
         }, 100);
 }
 
 // Define a function for updating an existing sprite in the ready room given values
-function prototype_ready_room_update_character(characterKind, characterToken, newSpriteProperties){
-    //console.log('prototype_ready_room_update_character(characterKind:', characterKind, ', characterToken:', characterToken, ', newSpriteProperties:', newSpriteProperties, ')');
+mmrpgReadyRoom.updateCharacter = function(characterKind, characterToken, newSpriteProperties){
+    //console.log('mmrpgReadyRoom.updateCharacter(characterKind:', characterKind, ', characterToken:', characterToken, ', newSpriteProperties:', newSpriteProperties, ')');
     // Collect the unlocked characters index
     var unlockedCharactersIndex = {};
     if (characterKind === 'player'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedPlayersIndex; }
@@ -912,31 +915,31 @@ function prototype_ready_room_update_character(characterKind, characterToken, ne
         //console.log('characterInfo =', characterInfo);
         //console.log('spriteInfo =', spriteInfo);
         // Trigger the animate function with the provided new values
-        prototype_ready_room_animate_character(characterKind, characterToken, newSpriteProperties);
+        mmrpgReadyRoom.animateCharacter(characterKind, characterToken, newSpriteProperties);
     }
 }
 
 // Define a function for updating a existing player sprite(s) in the ready room given values
-function prototype_ready_room_update_player(playerToken, newSpriteProperties){
-    //console.log('prototype_ready_room_update_player(playerToken:', playerToken, ', newSpriteProperties:', newSpriteProperties, ')');
-    return prototype_ready_room_update_character('player', playerToken, newSpriteProperties);
+mmrpgReadyRoom.updatePlayer = function(playerToken, newSpriteProperties){
+    //console.log('mmrpgReadyRoom.updatePlayer(playerToken:', playerToken, ', newSpriteProperties:', newSpriteProperties, ')');
+    return mmrpgReadyRoom.updateCharacter('player', playerToken, newSpriteProperties);
 }
 
 // Define a function for updating existing robot sprite(s) in the ready room given values
-function prototype_ready_room_update_robot(robotToken, newSpriteProperties){
-    //console.log('prototype_ready_room_update_robot(robotToken:', robotToken, ', newSpriteProperties:', newSpriteProperties, ')');
-    return prototype_ready_room_update_character('robot', robotToken, newSpriteProperties);
+mmrpgReadyRoom.updateRobot = function(robotToken, newSpriteProperties){
+    //console.log('mmrpgReadyRoom.updateRobot(robotToken:', robotToken, ', newSpriteProperties:', newSpriteProperties, ')');
+    return mmrpgReadyRoom.updateCharacter('robot', robotToken, newSpriteProperties);
 }
 
 // Define a function for updating existing shop sprite(s) in the ready room given values
-function prototype_ready_room_update_shop(shopToken, newSpriteProperties){
-    //console.log('prototype_ready_room_update_shop(shopToken:', shopToken, ', newSpriteProperties:', newSpriteProperties, ')');
-    return prototype_ready_room_update_character('shop', shopToken, newSpriteProperties);
+mmrpgReadyRoom.updateShop = function(shopToken, newSpriteProperties){
+    //console.log('mmrpgReadyRoom.updateShop(shopToken:', shopToken, ', newSpriteProperties:', newSpriteProperties, ')');
+    return mmrpgReadyRoom.updateCharacter('shop', shopToken, newSpriteProperties);
 }
 
 // Define a function for adding a new character sprite to the ready room given info
-function prototype_ready_room_add_character_sprite(kind, characterToken, characterInfo, spriteProperties){
-    //console.log('prototype_ready_room_add_character_sprite(kind:', kind, ', characterToken:', characterToken, ', characterInfo:', characterInfo, ', spriteProperties:', spriteProperties, ')');
+mmrpgReadyRoom.addCharacterSprite = function(kind, characterToken, characterInfo, spriteProperties){
+    //console.log('mmrpgReadyRoom.addCharacterSprite(kind:', kind, ', characterToken:', characterToken, ', characterInfo:', characterInfo, ', spriteProperties:', spriteProperties, ')');
 
     // Initial setup for both player and robot
     var spriteGrid = readyRoomSettings.spriteGrid;
@@ -983,8 +986,8 @@ function prototype_ready_room_add_character_sprite(kind, characterToken, charact
     //console.log('spriteImagePathPrefix =', spriteImagePathPrefix);
 
     // pick a random column and row for this robot to start off in
-    var randColRow = prototype_ready_room_random_colrow(1);
-    var randColRowOffsets = prototype_ready_room_colrow_center(randColRow[0], randColRow[1]);
+    var randColRow = mmrpgReadyRoom.getRandColRow(1);
+    var randColRowOffsets = mmrpgReadyRoom.getColRowCenter(randColRow[0], randColRow[1]);
     //console.log('randColRow =', randColRow);
     //console.log('randColRowOffsets =', randColRowOffsets);
     if (typeof spriteProperties.position !== 'undefined'
@@ -1008,7 +1011,7 @@ function prototype_ready_room_add_character_sprite(kind, characterToken, charact
     //console.log('spriteOffsetX =', spriteOffsetX);
     //console.log('spriteOffsetY =', spriteOffsetY);
     //console.log('spriteOffsetZ =', spriteOffsetZ);
-    var spriteAnimationDuration = prototype_get_css_animation_duration(characterInfo);
+    var spriteAnimationDuration = mmrpgReadyRoom.getAnimationDuration(characterInfo);
     //console.log('spriteAnimationDuration(C) =', spriteAnimationDuration);
 
     // Generate the markup for the sprite and the inner sprite
@@ -1056,26 +1059,25 @@ function prototype_ready_room_add_character_sprite(kind, characterToken, charact
 }
 
 // Define a function for adding a new player sprite to the ready room given info
-function prototype_ready_room_add_player_sprite(playerToken, playerInfo, spriteProperties){
-    //console.log('prototype_ready_room_add_player_sprite(playerToken:', playerToken, ', playerInfo:', playerInfo, ', spriteProperties:', spriteProperties, ')');
-    return prototype_ready_room_add_character_sprite('player', playerToken, playerInfo, spriteProperties);
+mmrpgReadyRoom.addPlayerSprite = function(playerToken, playerInfo, spriteProperties){
+    //console.log('mmrpgReadyRoom.addPlayerSprite(playerToken:', playerToken, ', playerInfo:', playerInfo, ', spriteProperties:', spriteProperties, ')');
+    return mmrpgReadyRoom.addCharacterSprite('player', playerToken, playerInfo, spriteProperties);
 }
 
 // Define a function for adding a new robot sprite to the ready room given info
-function prototype_ready_room_add_robot_sprite(robotToken, robotInfo, spriteProperties){
-    //console.log('prototype_ready_room_add_robot_sprite(robotToken:', robotToken, ', robotInfo:', robotInfo, ', spriteProperties:', spriteProperties, ')');
-    return prototype_ready_room_add_character_sprite('robot', robotToken, robotInfo, spriteProperties);
+mmrpgReadyRoom.addRobotSprite = function(robotToken, robotInfo, spriteProperties){
+    //console.log('mmrpgReadyRoom.addRobotSprite(robotToken:', robotToken, ', robotInfo:', robotInfo, ', spriteProperties:', spriteProperties, ')');
+    return mmrpgReadyRoom.addCharacterSprite('robot', robotToken, robotInfo, spriteProperties);
 }
 
 // Define a function for adding a new shop sprite to the ready room given info
-function prototype_ready_room_add_shop_sprite(shopToken, shopInfo, spriteProperties){
-    //console.log('prototype_ready_room_add_shop_sprite(shopToken:', shopToken, ', shopInfo:', shopInfo, ', spriteProperties:', spriteProperties, ')');
-    return prototype_ready_room_add_character_sprite('shop', shopToken, shopInfo, spriteProperties);
+mmrpgReadyRoom.addShopSprite = function(shopToken, shopInfo, spriteProperties){
+    //console.log('mmrpgReadyRoom.addShopSprite(shopToken:', shopToken, ', shopInfo:', shopInfo, ', spriteProperties:', spriteProperties, ')');
+    return mmrpgReadyRoom.addCharacterSprite('shop', shopToken, shopInfo, spriteProperties);
 }
 
-
 // Define a function for getting a random column and row within that the above offsets
-function prototype_ready_room_random_colrow(limitPerCell){
+mmrpgReadyRoom.getRandColRow = function(limitPerCell){
     var spriteGrid = readyRoomSettings.spriteGrid;
     if (typeof limitPerCell !== 'number'){ limitPerCell = 4; }
     var randomColumn = Math.floor(Math.random() * spriteGrid.colMax);
@@ -1096,12 +1098,12 @@ function prototype_ready_room_random_colrow(limitPerCell){
         spriteGrid.gridCounts[randomCell] = cellSpriteCount + 1;
         return [randomColumn, randomRow];
     } else {
-        return prototype_ready_room_random_colrow(limitPerCell * 2);
+        return mmrpgReadyRoom.getRandColRow(limitPerCell * 2);
     }
 }
 
 // Define a function for getting the offset values for a given column and row given defined offsets in columnOffsets and rowOffsets
-function prototype_ready_room_colrow_center(thisColumn, thisRow){
+mmrpgReadyRoom.getColRowCenter = function(thisColumn, thisRow){
     var spriteGrid = readyRoomSettings.spriteGrid;
     var thisColumnOffset = spriteGrid.columnOffsets[thisColumn];
     var thisRowOffset = spriteGrid.rowOffsets[thisRow];
@@ -1112,7 +1114,7 @@ function prototype_ready_room_colrow_center(thisColumn, thisRow){
 
 
 // Define a function that will return a new position for the current sprite based on the nearby sprite
-function prototype_ready_room_getRelativePositionChange(sourceSprite, targetSprite, direction, distancePercent, spriteBounds, axisFactor) {
+mmrpgReadyRoom.getRelativePositionChange = function(sourceSprite, targetSprite, direction, distancePercent, spriteBounds, axisFactor) {
     if (!spriteBounds || typeof spriteBounds === 'undefined'){ spriteBounds = { minX: 0, maxX: 100, minY: 0, maxY: 100 }; }
     if (!axisFactor || typeof axisFactor === 'undefined'){ axisFactor = 0.5; }
 
@@ -1137,8 +1139,8 @@ function prototype_ready_room_getRelativePositionChange(sourceSprite, targetSpri
 }
 
 // Define a function to find ready room sprites within a given radius that match some criteria
-function prototype_ready_room_nearby_sprites(targetSprite, searchRadius, filterProperties){
-    //console.log('prototype_ready_room_nearby_sprites(targetSprite:', typeof targetSprite, targetSprite, ', searchRadius:', typeof searchRadius, searchRadius, ', filterProperties:', typeof filterProperties, filterProperties, ')');
+mmrpgReadyRoom.getNearbySprites = function(targetSprite, searchRadius, filterProperties){
+    //console.log('mmrpgReadyRoom.getNearbySprites(targetSprite:', typeof targetSprite, targetSprite, ', searchRadius:', typeof searchRadius, searchRadius, ', filterProperties:', typeof filterProperties, filterProperties, ')');
     if (typeof filterProperties !== 'object'){ filterProperties = false; }
     var nearbySprites = [];
     var targetX = targetSprite.position[0];
@@ -1199,7 +1201,7 @@ function prototype_ready_room_nearby_sprites(targetSprite, searchRadius, filterP
 }
 
 // Define a function for synthetically determining a given robot's affinity towards certain animals
-function prototype_ready_room_calculate_animal_affinity(robotInfo, animalTokens){
+mmrpgReadyRoom.getAnimalAffinities = function(robotInfo, animalTokens){
 
     // If the animal affinity wasn't provided, defined them all
     if (!animalTokens || typeof animalTokens !== 'array'){ animalTokens = ['dog', 'cat', 'bird', 'rodent']; }
