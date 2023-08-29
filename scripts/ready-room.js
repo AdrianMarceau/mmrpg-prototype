@@ -262,9 +262,9 @@
 
     // Define a function for animating the prototype ready room sprites = 0;
     thisReadyRoom.animate = function() {
+        //console.log('thisReadyRoom.animate()');
         if (!thisReadyRoomConfig.isReady){ return false; }
         if (!thisReadyRoomConfig.animateEnabled){ return false; }
-        //console.log('thisReadyRoom.animate()');
 
         // Collect references to important elements relevant to the ready-room
         var $readyRoom = thisReadyRoomConfig.parentElement;
@@ -664,9 +664,8 @@
     // Define a function for actually animating a given ready room character in some way
     thisReadyRoom.animateCharacter = function(kind, characterToken, newValues, onComplete){
         //console.log('thisReadyRoom.animateCharacter(characterToken:', characterToken, ', newValues:', newValues, ', onComplete:', typeof onComplete, ')');
-
         if (!thisReadyRoomConfig.isReady){ return false; }
-        //if (!thisReadyRoomConfig.animateEnabled){ return false; }
+        if (!thisReadyRoomConfig.animateEnabled){ return false; }
         if (typeof characterToken !== 'string' || !characterToken.length){ return false; }
         if (typeof newValues !== 'object'){ newValues = {}; }
         if (typeof onComplete !== 'function'){ onComplete = function(){ /* ... */ }; }
@@ -823,6 +822,7 @@
     // Define a function for abruptly stopping the ready room animation
     thisReadyRoom.startAnimation = function(){
         //console.log('thisReadyRoom.startAnimation()');
+        if (!thisReadyRoomConfig.isReady){ return false; }
         thisReadyRoomConfig.animateEnabled = true;
         thisReadyRoom.animate();
         return;
@@ -857,6 +857,7 @@
     thisReadyRoom.addRobot = function(robotToken, robotInfo, focusRobot){
         //console.log('thisReadyRoom.addRobot(robotToken:', robotToken, ', robotInfo:', robotInfo, ', focusRobot:', focusRobot, ')');
         if (typeof focusRobot !== 'boolean'){ focusRobot = false; }
+        if (typeof thisReadyRoomConfig.charactersIndex['robot'] === 'undefined'){ return; }
         // Collect the unlocked robots index
         var thisRobotsIndex = thisReadyRoomConfig.charactersIndex['robot'];
         //console.log('thisRobotsIndex =', thisRobotsIndex);
@@ -880,6 +881,9 @@
     // Define a function for updating an existing sprite in the ready room given values
     thisReadyRoom.updateCharacter = function(characterKind, characterToken, newSpriteProperties){
         //console.log('thisReadyRoom.updateCharacter(characterKind:', characterKind, ', characterToken:', characterToken, ', newSpriteProperties:', newSpriteProperties, ')');
+        if (!thisReadyRoomConfig.isReady){ return false; }
+        if (typeof thisReadyRoomConfig.charactersIndex['player'] === 'undefined'){ return; }
+        if (typeof thisReadyRoomConfig.charactersIndex['robot'] === 'undefined'){ return; }
         // Collect the unlocked characters index
         var loadedCharactersIndex = {};
         if (characterKind === 'player'){ loadedCharactersIndex = thisReadyRoomConfig.charactersIndex['player']; }
@@ -935,24 +939,28 @@
     // Define a function for updating a existing player sprite(s) in the ready room given values
     thisReadyRoom.updatePlayer = function(playerToken, newSpriteProperties){
         //console.log('thisReadyRoom.updatePlayer(playerToken:', playerToken, ', newSpriteProperties:', newSpriteProperties, ')');
+        if (typeof thisReadyRoomConfig.charactersIndex['player'] === 'undefined'){ return; }
         return thisReadyRoom.updateCharacter('player', playerToken, newSpriteProperties);
     }
 
     // Define a function for updating existing robot sprite(s) in the ready room given values
     thisReadyRoom.updateRobot = function(robotToken, newSpriteProperties){
         //console.log('thisReadyRoom.updateRobot(robotToken:', robotToken, ', newSpriteProperties:', newSpriteProperties, ')');
+        if (typeof thisReadyRoomConfig.charactersIndex['robot'] === 'undefined'){ return; }
         return thisReadyRoom.updateCharacter('robot', robotToken, newSpriteProperties);
     }
 
     // Define a function for updating existing shop sprite(s) in the ready room given values
     thisReadyRoom.updateShop = function(shopToken, newSpriteProperties){
         //console.log('thisReadyRoom.updateShop(shopToken:', shopToken, ', newSpriteProperties:', newSpriteProperties, ')');
+        if (typeof thisReadyRoomConfig.charactersIndex['shop'] === 'undefined'){ return; }
         return thisReadyRoom.updateCharacter('shop', shopToken, newSpriteProperties);
     }
 
     // Define a function for adding a new character sprite to the ready room given info
     thisReadyRoom.addCharacterSprite = function(kind, characterToken, characterInfo, spriteProperties){
         //console.log('thisReadyRoom.addCharacterSprite(kind:', kind, ', characterToken:', characterToken, ', characterInfo:', characterInfo, ', spriteProperties:', spriteProperties, ')');
+        if (typeof thisReadyRoomConfig.charactersIndex[kind] === 'undefined'){ return; }
 
         // Initial setup for both player and robot
         var spriteGrid = thisReadyRoomConfig.spriteGrid;
@@ -1074,18 +1082,21 @@
     // Define a function for adding a new player sprite to the ready room given info
     thisReadyRoom.addPlayerSprite = function(playerToken, playerInfo, spriteProperties){
         //console.log('thisReadyRoom.addPlayerSprite(playerToken:', playerToken, ', playerInfo:', playerInfo, ', spriteProperties:', spriteProperties, ')');
+        if (typeof thisReadyRoomConfig.charactersIndex['player'] === 'undefined'){ return; }
         return thisReadyRoom.addCharacterSprite('player', playerToken, playerInfo, spriteProperties);
     }
 
     // Define a function for adding a new robot sprite to the ready room given info
     thisReadyRoom.addRobotSprite = function(robotToken, robotInfo, spriteProperties){
         //console.log('thisReadyRoom.addRobotSprite(robotToken:', robotToken, ', robotInfo:', robotInfo, ', spriteProperties:', spriteProperties, ')');
+        if (typeof thisReadyRoomConfig.charactersIndex['robot'] === 'undefined'){ return; }
         return thisReadyRoom.addCharacterSprite('robot', robotToken, robotInfo, spriteProperties);
     }
 
     // Define a function for adding a new shop sprite to the ready room given info
     thisReadyRoom.addShopSprite = function(shopToken, shopInfo, spriteProperties){
         //console.log('thisReadyRoom.addShopSprite(shopToken:', shopToken, ', shopInfo:', shopInfo, ', spriteProperties:', spriteProperties, ')');
+        if (typeof thisReadyRoomConfig.charactersIndex['shop'] === 'undefined'){ return; }
         return thisReadyRoom.addCharacterSprite('shop', shopToken, shopInfo, spriteProperties);
     }
 
@@ -1275,5 +1286,10 @@
         return animalAffinities;
 
     }
+
+    // Define a function for easily checking when the ready room is ready
+    thisReadyRoom.isReady = function(){
+        return thisReadyRoomConfig.isReady;
+        };
 
 })();
