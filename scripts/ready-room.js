@@ -22,22 +22,25 @@
     thisReadyRoomConfig.spriteGrid = {};
     thisReadyRoomConfig.spriteBounds = {minX: 10, maxX: 90, minY: 13, maxY: 36};
     thisReadyRoomConfig.spritesIndex = {};
+    thisReadyRoomConfig.charactersIndex = {};
+    thisReadyRoomConfig.charactersIndexKinds = [];
     thisReadyRoomConfig.isFiltered = false;
     thisReadyRoomConfig.isReady = false;
 
     // Define a function for initializing the ready room with unlocked robots
     thisReadyRoom.init = function($thisBanner, onComplete){
         //console.log('thisReadyRoom.init()');
+        //console.log('thisReadyRoomConfig.charactersIndex =', thisReadyRoomConfig.charactersIndex);
 
         // If there's no player index to work with, we can't display the ready room
-        if (typeof gameSettings.customIndex.unlockedPlayersIndex === 'undefined'
-            || !Object.keys(gameSettings.customIndex.unlockedPlayersIndex).length){
+        if (typeof thisReadyRoomConfig.charactersIndex['player'] === 'undefined'
+            || !Object.keys(thisReadyRoomConfig.charactersIndex['player']).length){
             return false;
             }
 
         // If there's no robot index to work with, we can't display the ready room
-        if (typeof gameSettings.customIndex.unlockedRobotsIndex === 'undefined'
-            || !Object.keys(gameSettings.customIndex.unlockedRobotsIndex).length){
+        if (typeof thisReadyRoomConfig.charactersIndex['robot'] === 'undefined'
+            || !Object.keys(thisReadyRoomConfig.charactersIndex['robot']).length){
             return false;
             }
 
@@ -47,14 +50,16 @@
         // If the ready room has not been created yet do so now, else collect references
         if (!$('.ready_room', $thisBanner).length){
             var $readyRoom = $('<div class="ready_room"></div>');
-            var $readyRoomWrapper = $('<div class="wrapper"></div>');
+            var $readyRoomWrapper = $('<div class="wrapper inner"></div>');
+            var $readyRoomWrapper2 = $('<div class="wrapper outer"></div>');
             var $readyRoomScene = $('<div class="scene"></div>');
             var $readyRoomTeam = $('<div class="team"></div>');
             var $readyRoomClicker = $('<div class="clicker"></div>');
             $readyRoomScene.appendTo($readyRoomWrapper);
             $readyRoomTeam.appendTo($readyRoomWrapper);
             $readyRoomClicker.appendTo($readyRoomWrapper);
-            $readyRoomWrapper.appendTo($readyRoom);
+            $readyRoomWrapper.appendTo($readyRoomWrapper2);
+            $readyRoomWrapper2.appendTo($readyRoom);
             $readyRoomScene.append('<div class="sprite" data-kind="background" data-token="light-laboratory" style="background-image: url(images/fields/light-laboratory/battle-field_background_base.gif?'+gameSettings.cacheTime+'); z-index: 1;"></div>');
             $readyRoomScene.append('<div class="sprite" data-kind="foreground" data-token="light-laboratory" style="background-image: url(images/fields/light-laboratory/battle-field_foreground_base.png?'+gameSettings.cacheTime+'); z-index: 2;"></div>');
             $readyRoom.css({opacity: 0});
@@ -72,14 +77,14 @@
 
         // Collect the unlocked robot index and tokens for looping through momentarily
         var readyRoomSpritesIndex = thisReadyRoomConfig.spritesIndex;
-        var unlockedPlayersIndex = gameSettings.customIndex.unlockedPlayersIndex;
-        var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
-        var unlockedPlayersTokens = Object.keys(unlockedPlayersIndex);
-        var unlockedRobotsTokens = Object.keys(unlockedRobotsIndex);
-        //console.log('unlockedRobotsTokens = ', unlockedRobotsTokens.length, unlockedRobotsTokens);
-        //console.log('unlockedRobotsIndex = ', typeof unlockedRobotsIndex, unlockedRobotsIndex);
-        //console.log('unlockedPlayersTokens = ', unlockedPlayersTokens.length, unlockedPlayersTokens);
-        //console.log('unlockedPlayersIndex = ', typeof unlockedPlayersIndex, unlockedPlayersIndex);
+        var thisPlayersIndex = thisReadyRoomConfig.charactersIndex['player'];
+        var thisRobotsIndex = thisReadyRoomConfig.charactersIndex['robot'];
+        var thisPlayersTokens = Object.keys(thisPlayersIndex);
+        var thisRobotsTokens = Object.keys(thisRobotsIndex);
+        //console.log('thisRobotsTokens = ', thisRobotsTokens.length, thisRobotsTokens);
+        //console.log('thisRobotsIndex = ', typeof thisRobotsIndex, thisRobotsIndex);
+        //console.log('thisPlayersTokens = ', thisPlayersTokens.length, thisPlayersTokens);
+        //console.log('thisPlayersIndex = ', typeof thisPlayersIndex, thisPlayersIndex);
         // Empty the ready room of any existing sprites
         $readyRoomTeam.find('.sprite').remove();
 
@@ -119,9 +124,9 @@
         spriteGrid.rowCounts = {};
 
         // Loop through unlocked players and add them to the team div as "sprite" elements
-        for (var i = 0; i < unlockedPlayersTokens.length; i++){
-            var playerToken = unlockedPlayersTokens[i];
-            var unlockedPlayer = unlockedPlayersIndex[playerToken];
+        for (var i = 0; i < thisPlayersTokens.length; i++){
+            var playerToken = thisPlayersTokens[i];
+            var unlockedPlayer = thisPlayersIndex[playerToken];
             thisReadyRoom.addPlayerSprite(playerToken, unlockedPlayer);
             }
 
@@ -129,30 +134,30 @@
         var newEntranceTimeout = 1000;
         var newEntranceOffsetX = 90; //spriteBounds.maxX;
         var newEntranceOffsetY = spriteBounds.minY;
-        for (var i = 0; i < unlockedRobotsTokens.length; i++){
-            var robotToken = unlockedRobotsTokens[i];
-            var unlockedRobot = unlockedRobotsIndex[robotToken];
-            if (typeof unlockedRobot.flags !== 'undefined'
-                && unlockedRobot.flags.indexOf('is_newly_unlocked') !== -1){
+        for (var i = 0; i < thisRobotsTokens.length; i++){
+            var robotToken = thisRobotsTokens[i];
+            var robotInfo = thisRobotsIndex[robotToken];
+            if (typeof robotInfo.flags !== 'undefined'
+                && robotInfo.flags.indexOf('is_newly_unlocked') !== -1){
                 newEntranceTimeout += 1000;
                 newEntranceOffsetX -= 6;
                 newEntranceOffsetY -= 1;
-                (function(robotToken, unlockedRobot, newEntranceTimeout, newEntranceOffsetX, newEntranceOffsetY){
-                    //console.log('queue entrance animation for ', unlockedRobot.token);
-                    //console.log('unlockedRobot =', unlockedRobot);
-                    thisReadyRoom.addRobotSprite(robotToken, unlockedRobot, {position: [110, (spriteBounds.maxY + 6)], direction: 'left', frame: 'slide'});
+                (function(robotToken, robotInfo, newEntranceTimeout, newEntranceOffsetX, newEntranceOffsetY){
+                    //console.log('queue entrance animation for ', robotInfo.token);
+                    //console.log('robotInfo =', robotInfo);
+                    thisReadyRoom.addRobotSprite(robotToken, robotInfo, {position: [110, (spriteBounds.maxY + 6)], direction: 'left', frame: 'slide'});
                     setTimeout(function(){
-                        //console.log('slide-in triggered for ', unlockedRobot.token);
+                        //console.log('slide-in triggered for ', robotInfo.token);
                         thisReadyRoom.updateRobot(robotToken, {position: [newEntranceOffsetX, newEntranceOffsetY], direction: 'left', frame: 'slide'});
                         setTimeout(function(){
-                            //console.log('taunt triggered for ', unlockedRobot.token);
+                            //console.log('taunt triggered for ', robotInfo.token);
                             thisReadyRoom.updateRobot(robotToken, {frame: 'taunt'});
-                            unlockedRobot.flags.splice(unlockedRobot.flags.indexOf('is_newly_unlocked'), 1);
+                            robotInfo.flags.splice(robotInfo.flags.indexOf('is_newly_unlocked'), 1);
                             }, 900);
                         }, newEntranceTimeout);
-                    })(robotToken, unlockedRobot, newEntranceTimeout, newEntranceOffsetX, newEntranceOffsetY);
+                    })(robotToken, robotInfo, newEntranceTimeout, newEntranceOffsetX, newEntranceOffsetY);
                 } else {
-                thisReadyRoom.addRobotSprite(robotToken, unlockedRobot);
+                thisReadyRoom.addRobotSprite(robotToken, robotInfo);
                 }
             }
 
@@ -213,6 +218,12 @@
         onComplete();
 
     }
+
+    // Define a function for loading new type of character index into the ready room
+    thisReadyRoom.preloadCharacterIndex = function(characterKind, characterIndex){
+        thisReadyRoomConfig.charactersIndex[characterKind] = characterIndex;
+        thisReadyRoomConfig.charactersIndexKinds.push(characterKind);
+    };
 
     // Define a function for refreshing the ready room with unlocked robots, optionally filtering by player token
     thisReadyRoom.refresh = function(filterByPlayerToken) {
@@ -294,11 +305,11 @@
         var spritesToAnimate = {};
 
         // Loop through players and append to the list of ones we should animate
-        var unlockedPlayersIndex = gameSettings.customIndex.unlockedPlayersIndex;
-        var unlockedPlayersIndexTokens = Object.keys(unlockedPlayersIndex);
-        for (var i = 0; i < unlockedPlayersIndexTokens.length; i++){
-            var thisPlayerToken = unlockedPlayersIndexTokens[i];
-            var thisPlayerInfo = unlockedPlayersIndex[thisPlayerToken];
+        var thisPlayersIndex = thisReadyRoomConfig.charactersIndex['player'];
+        var thisPlayersIndexTokens = Object.keys(thisPlayersIndex);
+        for (var i = 0; i < thisPlayersIndexTokens.length; i++){
+            var thisPlayerToken = thisPlayersIndexTokens[i];
+            var thisPlayerInfo = thisPlayersIndex[thisPlayerToken];
             //console.log('thisPlayerToken/Info =', thisPlayerToken, thisPlayerInfo);
             if (!thisReadyRoom.animateSpeedCheck(thisPlayerInfo)){ continue; }
             var thisSpriteToken = thisPlayerToken;
@@ -308,11 +319,11 @@
         }
 
         // Loop through robots and append to the list of ones we should animate
-        var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
-        var unlockedRobotsIndexTokens = Object.keys(unlockedRobotsIndex);
-        for (var i = 0; i < unlockedRobotsIndexTokens.length; i++){
-            var thisRobotToken = unlockedRobotsIndexTokens[i];
-            var thisRobotInfo = unlockedRobotsIndex[thisRobotToken];
+        var thisRobotsIndex = thisReadyRoomConfig.charactersIndex['robot'];
+        var thisRobotsIndexTokens = Object.keys(thisRobotsIndex);
+        for (var i = 0; i < thisRobotsIndexTokens.length; i++){
+            var thisRobotToken = thisRobotsIndexTokens[i];
+            var thisRobotInfo = thisRobotsIndex[thisRobotToken];
             //console.log('thisRobotToken/Info =', thisRobotToken, thisRobotInfo);
             if (!thisReadyRoom.animateSpeedCheck(thisRobotInfo)){ continue; }
             var thisSpriteToken = thisRobotToken;
@@ -459,7 +470,7 @@
                                 // If the nearby sprite is a player, we can do some interesting things
                                 if (nearbySpriteKind === 'player'){
                                     //console.log('nearbySprite is a player!');
-                                    var nearbyPlayerInfo = unlockedPlayersIndex[nearbySpriteToken];
+                                    var nearbyPlayerInfo = thisPlayersIndex[nearbySpriteToken];
                                     //console.log('nearbyPlayerInfo =', typeof nearbyPlayerInfo, nearbyPlayerInfo);
                                     // Does the current sprite have an ATTRACTION TO the nearby player?
                                     if (typeof thisCharacterInfo.originalPlayer !== 'undefined' && thisCharacterInfo.originalPlayer === nearbyPlayerInfo.token){ nearbySpriteVibeMeter += 2; }
@@ -470,7 +481,7 @@
                                     }
                                 else if (nearbySpriteKind === 'robot'){
                                     //console.log('nearbySprite is a robot!');
-                                    var nearbyRobotInfo = unlockedRobotsIndex[nearbySpriteToken];
+                                    var nearbyRobotInfo = thisRobotsIndex[nearbySpriteToken];
                                     //console.log('nearbyRobotInfo =', typeof nearbyRobotInfo, nearbyRobotInfo);
                                     // Does the current sprite have an ATTRACTION TO the nearby robot?
                                     if (thisCharacterInfo.type === nearbyRobotInfo.type){ nearbySpriteVibeMeter += 2; }
@@ -662,12 +673,12 @@
 
         // Collect this character's info from the unlock index for later
         var readyRoomSpritesIndex = thisReadyRoomConfig.spritesIndex;
-        var unlockedCharactersIndex = {};
-        if (kind === 'player'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedPlayersIndex; }
-        else if (kind === 'robot'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedRobotsIndex; }
-        //else if (kind === 'shop'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedShopsIndex; }
+        var loadedCharactersIndex = {};
+        if (kind === 'player'){ loadedCharactersIndex = thisReadyRoomConfig.charactersIndex['player']; }
+        else if (kind === 'robot'){ loadedCharactersIndex = thisReadyRoomConfig.charactersIndex['robot']; }
+        //else if (kind === 'shop'){ loadedCharactersIndex = gameSettings.customIndex.unlockedShopsIndex; }
         else { return false; }
-        var characterIndexInfo = unlockedCharactersIndex[characterToken];
+        var characterIndexInfo = loadedCharactersIndex[characterToken];
 
         // Pull the sprite data and element reference from the index
         var thisSprite = readyRoomSpritesIndex[characterToken];
@@ -847,13 +858,13 @@
         //console.log('thisReadyRoom.addRobot(robotToken:', robotToken, ', robotInfo:', robotInfo, ', focusRobot:', focusRobot, ')');
         if (typeof focusRobot !== 'boolean'){ focusRobot = false; }
         // Collect the unlocked robots index
-        var unlockedRobotsIndex = gameSettings.customIndex.unlockedRobotsIndex;
-        //console.log('unlockedRobotsIndex =', unlockedRobotsIndex);
+        var thisRobotsIndex = thisReadyRoomConfig.charactersIndex['robot'];
+        //console.log('thisRobotsIndex =', thisRobotsIndex);
         // If the robot is already in the index, we don't need to do anything
-        if (typeof unlockedRobotsIndex[robotToken] !== 'undefined'){ return false; }
+        if (typeof thisRobotsIndex[robotToken] !== 'undefined'){ return false; }
         // Otherwise we need to add the robot to the index
-        unlockedRobotsIndex[robotToken] = robotInfo;
-        //console.log('unlockedRobotsIndex =', unlockedRobotsIndex);
+        thisRobotsIndex[robotToken] = robotInfo;
+        //console.log('thisRobotsIndex =', thisRobotsIndex);
         // Now we need to update the robot's sprite in the ready room
         thisReadyRoom.addRobotSprite(robotToken, robotInfo, {position: [110,15]});
         // Immediately update this robot's sprite after a short timeout
@@ -870,20 +881,20 @@
     thisReadyRoom.updateCharacter = function(characterKind, characterToken, newSpriteProperties){
         //console.log('thisReadyRoom.updateCharacter(characterKind:', characterKind, ', characterToken:', characterToken, ', newSpriteProperties:', newSpriteProperties, ')');
         // Collect the unlocked characters index
-        var unlockedCharactersIndex = {};
-        if (characterKind === 'player'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedPlayersIndex; }
-        else if (characterKind === 'robot'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedRobotsIndex; }
-        //else if (characterKind === 'shop'){ unlockedCharactersIndex = gameSettings.customIndex.unlockedShopsIndex; }
+        var loadedCharactersIndex = {};
+        if (characterKind === 'player'){ loadedCharactersIndex = thisReadyRoomConfig.charactersIndex['player']; }
+        else if (characterKind === 'robot'){ loadedCharactersIndex = thisReadyRoomConfig.charactersIndex['robot']; }
+        //else if (characterKind === 'shop'){ loadedCharactersIndex = gameSettings.customIndex.unlockedShopsIndex; }
         else { return false; }
         var readyRoomSpritesIndex = thisReadyRoomConfig.spritesIndex;
-        //console.log('unlockedCharactersIndex =', unlockedCharactersIndex);
+        //console.log('loadedCharactersIndex =', loadedCharactersIndex);
         //console.log('readyRoomSpritesIndex =', readyRoomSpritesIndex);
         // Abstract the characterToken in case the user has provided the "all" option
         var requiredCharacters = [];
         if (characterToken === 'all'
             || characterToken === 'most'
             || characterToken === 'some'){
-            requiredCharacters = Object.keys(unlockedCharactersIndex);
+            requiredCharacters = Object.keys(loadedCharactersIndex);
             if (characterToken !== 'all'){
                 // shuffle and slice the characters
                 var sliceToPercent = characterToken === 'most' ? 50 : 25;
@@ -894,10 +905,10 @@
             }
         else if (typeof characterToken === 'function'){
             var characterTokenFunction = characterToken;
-            var unlockedCharactersTokens = Object.keys(unlockedCharactersIndex);
+            var unlockedCharactersTokens = Object.keys(loadedCharactersIndex);
             for (var i = 0; i < unlockedCharactersTokens.length; i++){
                 var characterToken = unlockedCharactersTokens[i];
-                var characterInfo = unlockedCharactersIndex[characterToken];
+                var characterInfo = loadedCharactersIndex[characterToken];
                 if (!characterTokenFunction(characterToken, characterInfo)){ continue; }
                 requiredCharacters.push(characterToken);
                 }
@@ -909,10 +920,10 @@
         for (var i = 0; i < requiredCharacters.length; i++){
             var characterToken = requiredCharacters[i];
             // If the character is doesn't exist in the index, we can't do anything to it
-            if (typeof unlockedCharactersIndex[characterToken] === 'undefined'){ return false; }
+            if (typeof loadedCharactersIndex[characterToken] === 'undefined'){ return false; }
             if (typeof readyRoomSpritesIndex[characterToken] === 'undefined'){ return false; }
             // Otherwise we can collect info about the character
-            var characterInfo = unlockedCharactersIndex[characterToken];
+            var characterInfo = loadedCharactersIndex[characterToken];
             var spriteInfo = readyRoomSpritesIndex[characterToken];
             //console.log('characterInfo =', characterInfo);
             //console.log('spriteInfo =', spriteInfo);

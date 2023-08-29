@@ -530,9 +530,14 @@ $(document).ready(function(){
         // Only add the ready room to the banner after the player has unlocked their first homebase
         if (typeof gameSettings.totalMissionsComplete !== 'undefined'
             && gameSettings.totalMissionsComplete >= 2){
+
             // Initialize the ready room on prototype home page load
             var $thisPrototype = $('#prototype');
             var $thisBanner = $('.banner', $thisPrototype);
+            var playersIndex = typeof gameSettings.customIndex.unlockedPlayersIndex !== 'undefined' ? gameSettings.customIndex.unlockedPlayersIndex : {};
+            var robotsIndex = typeof gameSettings.customIndex.unlockedRobotsIndex !== 'undefined' ? gameSettings.customIndex.unlockedRobotsIndex : {};
+            mmrpgReadyRoom.preloadCharacterIndex('player', playersIndex);
+            mmrpgReadyRoom.preloadCharacterIndex('robot', robotsIndex);
             mmrpgReadyRoom.init($thisBanner, function(){
 
                 // Filter to only the current player if one has been set

@@ -6,6 +6,8 @@
     position: absolute;
     width: auto;
     height: auto;
+    max-width: 750px;
+    max-height: 184px;
     top: 0;
     left: 0;
     right: 0;
@@ -23,13 +25,13 @@
     z-index: 25;
     opacity: 1.0;
     filter: brightness(0.6) sepia(1) hue-rotate(175deg) saturate(1.5);
-    transition: opacity 1s, filter 0.1s, height 0.3s;
+    transition: opacity 1s, filter 0.2s, height 0.3s;
     /* filter: brightness(0.6); */
 }
 #mmrpg .ready_room.hidden {
     opacity: 0;
 }
-#mmrpg .ready_room > .wrapper {
+#mmrpg .ready_room .wrapper {
     display: block;
     position: relative;
     width: 100%;
@@ -38,13 +40,23 @@
     border: 0 none transparent;
     border-radius: 3px;
     overflow: hidden;
+}
+#mmrpg .ready_room .wrapper.inner {
+    position: absolute;
+    width: 748px;
+    height: 100%;
+    min-height: 122px;
+    max-height: 182px;
     filter: blur(1px);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 @keyframes ready-room-scanline-scroll {
     0% { background-position: 0 0; }
     100% { background-position: 0 -300px; }
 }
-#mmrpg .ready_room > .wrapper:after {
+#mmrpg .ready_room .wrapper.inner:after {
     content: "";
     display: block;
     position: absolute;
@@ -73,17 +85,15 @@
     transform: scale(1.0);
     transition: transform 0.1s;
 }
-/*
-#mmrpg .ready_room.clicked {
-    filter: brightness(0.6);
+#mmrpg .ready_room.colour {
+    filter: brightness(0.8);
 }
-*/
 #mmrpg .ready_room.clicked > .wrapper:after {
     transform: scale(2.0);
 }
-#mmrpg .ready_room > .wrapper > .scene,
-#mmrpg .ready_room > .wrapper > .team,
-#mmrpg .ready_room > .wrapper > .clicker {
+#mmrpg .ready_room .wrapper.inner > .scene,
+#mmrpg .ready_room .wrapper.inner > .team,
+#mmrpg .ready_room .wrapper.inner > .clicker {
     display: block;
     position: absolute;
     width: auto;
@@ -93,27 +103,27 @@
     right: 0;
     transition: top 0.6s, bottom 0.6s;
 }
-#mmrpg .ready_room > .wrapper > .scene,
-#mmrpg .ready_room > .wrapper > .team {
+#mmrpg .ready_room .wrapper.inner > .scene,
+#mmrpg .ready_room .wrapper.inner > .team {
     pointer-events: none;
 }
-#mmrpg .ready_room > .wrapper > .scene {
+#mmrpg .ready_room .wrapper.inner > .scene {
     z-index: 1;
     top: 0;
     bottom: 0;
     overflow: hidden;
 }
-#mmrpg .ready_room > .wrapper > .team {
+#mmrpg .ready_room .wrapper.inner > .team {
     z-index: 2;
     top: 0;
     bottom: 34px;
     overflow: visible;
 }
-#prototype .banner.compact .ready_room > .wrapper > .team {
+#prototype .banner.compact .ready_room .wrapper.inner > .team {
     top: 64px;
     bottom: 20px;
 }
-#mmrpg .ready_room > .wrapper > .clicker {
+#mmrpg .ready_room .wrapper.inner > .clicker {
     z-index: 3;
     top: 64px;
     bottom: 34px;
