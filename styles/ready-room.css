@@ -47,7 +47,8 @@
     height: 100%;
     min-height: 122px;
     max-height: 182px;
-    filter: blur(1px);
+    /* filter: blur(1px); */
+    filter: blur(0.5px);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -64,10 +65,10 @@
     pointer-events: none;
     width: auto;
     height: auto;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: -20%;
+    left: -20%;
+    right: -20%;
+    bottom: -20%;
     background-color: transparent;
     background-image: url('../images/assets/canvas-scanlines.png?20230820-1139');
     background-repeat: repeat;
@@ -83,13 +84,13 @@
     -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
     animation: ready-room-scanline-scroll 60s linear infinite;
     transform: scale(1.0);
-    transition: transform 0.1s;
+    transition: transform 0.2s;
 }
 #mmrpg .ready_room.colour {
     filter: brightness(0.8);
 }
-#mmrpg .ready_room.clicked > .wrapper:after {
-    transform: scale(2.0);
+#mmrpg .ready_room.clicked .wrapper.inner:after {
+    transform: scale(0.9);
 }
 #mmrpg .ready_room .wrapper.inner > .scene,
 #mmrpg .ready_room .wrapper.inner > .team,
@@ -141,7 +142,7 @@
 #mmrpg .ready_room .scene .sprite[data-kind="background"] {
     z-index: 1;
     top: -60px;
-    filter: brightness(0.6);
+    filter: brightness(0.6) blur(1px);
 }
 #mmrpg .ready_room .scene .sprite[data-kind="foreground"] {
     z-index: 2;
@@ -188,15 +189,15 @@
 }
 
 @keyframes ready-room-sprite-bounce {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-1px); }
-    100% { transform: translateY(0px); }
+    0% { transform: scale(2) translateY(0px); }
+    50% { transform: scale(2) translateY(-1%); }
+    100% { transform: scale(2) translateY(0px); }
 }
 #mmrpg .ready_room .team > .sprite {
     width: 40px;
     height: 40px;
     overflow: visible;
-    transform: scale(2);
+    transform: scale(1);
     transform-origin: bottom center;
     transition: opacity 0.6s, filter 0.6s, left 1s, bottom 1s, z-index 1s;
     image-rendering: -moz-crisp-edges;         /* Firefox */
@@ -210,6 +211,8 @@
 #mmrpg .ready_room .team .sprite .sprite {
     position: relative;
     overflow: hidden;
+    transform: scale(2);
+    transform-origin: bottom center;
     animation: ready-room-sprite-bounce 0.3s steps(1) infinite;
 }
 #mmrpg .ready_room .team .sprite .sprite[data-size="40"] {

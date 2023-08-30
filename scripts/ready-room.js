@@ -20,7 +20,7 @@
     thisReadyRoomConfig.animateChargeUps = {};
     thisReadyRoomConfig.framesPerSecond = 10;
     thisReadyRoomConfig.spriteGrid = {};
-    thisReadyRoomConfig.spriteBounds = {minX: 10, maxX: 90, minY: 13, maxY: 36};
+    thisReadyRoomConfig.spriteBounds = {minX: 10, maxX: 90, minY: 10, maxY: 52};
     thisReadyRoomConfig.spritesIndex = {};
     thisReadyRoomConfig.charactersIndex = {};
     thisReadyRoomConfig.charactersIndexKinds = [];
@@ -197,7 +197,11 @@
                 var nearbyDistance = nearbySpriteData.distance;
                 //console.log('nearbySprite @', nearbyDistance, 'away w/', nearbySprite);
                 var newDirection = nearbySprite.position[0] > clickXPercent ? 'left' : 'right';
-                thisReadyRoom.updateCharacter(nearbySprite.kind, nearbySprite.token, {direction: newDirection});
+                var newCooldown = Math.floor((thisReadyRoomConfig.framesPerSecond * 1) * nearbySprite.haste);
+                var newProperties = {direction: newDirection};
+                if (nearbySprite.kind === 'player'){ newProperties.frame = 'damage'; }
+                else if (nearbySprite.kind === 'robot'){ newProperties.frame = 'defend'; }
+                thisReadyRoom.updateCharacter(nearbySprite.kind, nearbySprite.token, newProperties, newCooldown);
                 }
             $readyRoom.addClass('clicked');
             if (clickTimeout !== false){ clearTimeout(clickTimeout); }
@@ -205,7 +209,7 @@
                 $readyRoom.removeClass('clicked');
                 clearTimeout(clickTimeout);
                 clickTimeout = false;
-                }, 100);
+                }, 200);
             };
         $readyRoomClicker.bind('click', clickHandler);
         $readyRoomClicker.bind('touchstart', clickHandler);
@@ -376,10 +380,14 @@
                 // Define possible actions we can take and ratio of each happenings
                 var possibleDiceRolls = 20;
                 var possibleTransitions = [];
-                possibleTransitions.push({name: 'frame', chances: [1, 2, 3, 4, 5]});
-                possibleTransitions.push({name: 'position', chances: [6, 8, 10]});
-                possibleTransitions.push({name: 'direction', chances: [14, 18]});
-                possibleTransitions.push({name: 'depth', chances: [20]});
+                possibleTransitions.push({name: 'frame', chances: [1, 2, 3, 4]});
+                possibleTransitions.push({name: 'position', chances: [5, 6, 7, 8]});
+                possibleTransitions.push({name: 'direction', chances: [9, 10]});
+                possibleTransitions.push({name: 'depth', chances: [11, 12]});
+                if (thisCharacterKind === 'player'){
+                    possibleTransitions.push({name: 'position', chances: [12, 14, 15]});
+                    possibleTransitions.push({name: 'depth', chances: [16, 17, 18]});
+                }
                 //console.log('possibleDiceRolls =', possibleDiceRolls);
                 //console.log('possibleTransitions =', possibleTransitions);
 
@@ -428,11 +436,12 @@
                     //console.log('smartDiceRollValue = ', smartDiceRollValue);
                     //console.log('allowSmartTransition = ', allowSmartTransition);
                     if (allowSmartTransition && smartDiceRollValue <= 7){
+                        //console.log('%c'+thisCharacterToken+' needs a smart transition', 'color: magenta;');
                         //console.log('LUCKY smartDiceRollValue(', smartDiceRollValue, ') <= 7 || (max:', smartDiceRollMax, ')');
-                        //console.log('-> smart-transition requested for', thisCharacterToken, ' w/ info =', thisCharacterInfo);
+                        //console.log('-> smart-transition requested for '+ thisCharacterToken + ' w/ info =', thisCharacterInfo);
 
                         // Calculate which sprites are nearby this robot for artificial intelligence purposes
-                        var searchRadius = 30 - Math.floor(30 * (gameSettings.totalRobotOptions / 100));
+                        var searchRadius = 30 - Math.floor(25 * (gameSettings.totalRobotOptions / 100));
                         var filterProperties = false;
                         var nearbySprites = thisReadyRoom.getNearbySprites(thisSprite, searchRadius, filterProperties);
                         //console.log('searchRadius =', searchRadius);
@@ -451,77 +460,98 @@
                                 if (typeof relationships.negative !== 'undefined'){ thisCharacterRepellents = thisCharacterRepellents.concat(relationships.negative); }
                                 }
 
-                            // Now loop through the sprites in that order looking for some kind of relationship between characters
-                            for (var j = 0; j < nearbySprites.length; j++){
-                                var nearbySprite = nearbySprites[j].sprite;
-                                var nearbySpriteDistance = nearbySprites[j].distance;
-                                var nearbySpriteToken = nearbySprite.token;
-                                var nearbySpriteKind = nearbySprite.kind;
-                                var facingNearbySprite = false;
-                                if (thisSprite.direction === 'right' && thisSprite.position[0] < nearbySprite.position[0]){ facingNearbySprite = true; }
-                                else if (thisSprite.direction === 'left' && thisSprite.position[0] > nearbySprite.position[0]){ facingNearbySprite = true; }
-                                //console.log('nearbySprite =', nearbySprite);
-                                //console.log('nearbySpriteToken =', nearbySpriteToken);
-                                //console.log('nearbySpriteKind =', nearbySpriteKind);
-                                //console.log('facingNearbySprite =', facingNearbySprite);
-                                //console.log('nearbySpriteDistance =', nearbySpriteDistance);
-                                if (!facingNearbySprite){ continue; }
-                                var nearbySpriteVibeMeter = 0;
-                                // If the nearby sprite is a player, we can do some interesting things
-                                if (nearbySpriteKind === 'player'){
-                                    //console.log('nearbySprite is a player!');
-                                    var nearbyPlayerInfo = thisPlayersIndex[nearbySpriteToken];
-                                    //console.log('nearbyPlayerInfo =', typeof nearbyPlayerInfo, nearbyPlayerInfo);
-                                    // Does the current sprite have an ATTRACTION TO the nearby player?
-                                    if (typeof thisCharacterInfo.originalPlayer !== 'undefined' && thisCharacterInfo.originalPlayer === nearbyPlayerInfo.token){ nearbySpriteVibeMeter += 2; }
-                                    else if (typeof thisCharacterInfo.currentPlayer !== 'undefined' && thisCharacterInfo.currentPlayer === nearbyPlayerInfo.token){ nearbySpriteVibeMeter += 1; }
-                                    if (thisCharacterAttractions.indexOf(nearbyPlayerInfo.token) !== -1){ nearbySpriteVibeMeter += 2; }
-                                    // Is the current sprite REPELLENT BY the nearby player?
-                                    if (thisCharacterRepellents.indexOf(nearbyPlayerInfo.token) !== -1){ nearbySpriteVibeMeter -= 2; }
-                                    }
-                                else if (nearbySpriteKind === 'robot'){
-                                    //console.log('nearbySprite is a robot!');
-                                    var nearbyRobotInfo = thisRobotsIndex[nearbySpriteToken];
-                                    //console.log('nearbyRobotInfo =', typeof nearbyRobotInfo, nearbyRobotInfo);
-                                    // Does the current sprite have an ATTRACTION TO the nearby robot?
-                                    if (thisCharacterInfo.type === nearbyRobotInfo.type){ nearbySpriteVibeMeter += 2; }
-                                    if (thisCharacterAttractions.indexOf(nearbyRobotInfo.type) !== -1){ nearbySpriteVibeMeter += 1; }
-                                    if (thisCharacterAttractions.indexOf(nearbyRobotInfo.type2) !== -1){ nearbySpriteVibeMeter += 1; }
-                                    if (thisCharacterAttractions.indexOf(nearbyRobotInfo.token) !== -1){ nearbySpriteVibeMeter += 2; }
-                                    // Is the current sprite REPELLENT BY the nearby robot?
-                                    if (thisCharacterRepellents.indexOf(nearbyRobotInfo.type) !== -1){ nearbySpriteVibeMeter -= 1; }
-                                    if (thisCharacterRepellents.indexOf(nearbyRobotInfo.type2) !== -1){ nearbySpriteVibeMeter -= 1; }
-                                    if (thisCharacterRepellents.indexOf(nearbyRobotInfo.token) !== -1){ nearbySpriteVibeMeter -= 2; }
-                                    }
-                                //console.log('nearbySpriteVibeMeter for ', thisCharacterToken, ' vs ', nearbySpriteToken, ' =', nearbySpriteVibeMeter);
+                            // If there are too many sprites around, have this player zoom somewhere where
+                            var stressThreshold = 5;
+                            if (typeof thisSprite.stress === 'undefined'){ thisSprite.stress = 0; }
+                            //console.log('nearbySprites.length =', nearbySprites.length);
+                            if (nearbySprites.length > 1){
+                                var stressVal = (nearbySprites.length - 1);
+                                thisSprite.stress += stressVal;
+                                //console.log(thisSpriteToken+' / nearbySprites.length(', nearbySprites.length, ') => thisSprite.stress +=', stressVal);
+                                }
+                            if (thisSprite.stress >= stressThreshold){
+                                //console.log(thisSpriteToken+' / stressThreshold(', stressThreshold, ') vs thisSprite.stress(', thisSprite.stress, ')');
+                                randomTransition = 'position';
+                                //console.log('%cvibeCheck%c: ' + thisCharacterToken + ' feels crowded and backs away', 'color: orange;', 'color: inherit;');
+                                newSpriteProperties.frame = thisCharacterKind === 'player' ? 'running' : 'defend';
+                                newSpriteProperties.position = thisReadyRoom.getRelativePositionChange(thisSprite, nearbySprites[0].sprite, 'farther', 1, spriteBounds, spriteAxisScale);
+                                thisSprite.stress = 0;
+                                //console.log(thisSpriteToken+' / thisSprite.stress =', thisSprite.stress);
+                                }
+                            // Otherwise we can loop through the sprites in that order looking for some kind of relationship between characters
+                            else {
+                                for (var j = 0; j < nearbySprites.length; j++){
+                                    var nearbySprite = nearbySprites[j].sprite;
+                                    var nearbySpriteDistance = nearbySprites[j].distance;
+                                    var nearbySpriteToken = nearbySprite.token;
+                                    var nearbySpriteKind = nearbySprite.kind;
+                                    var facingNearbySprite = false;
+                                    if (thisSprite.direction === 'right' && thisSprite.position[0] < nearbySprite.position[0]){ facingNearbySprite = true; }
+                                    else if (thisSprite.direction === 'left' && thisSprite.position[0] > nearbySprite.position[0]){ facingNearbySprite = true; }
+                                    //console.log('nearbySprite =', nearbySprite);
+                                    //console.log('nearbySpriteToken =', nearbySpriteToken);
+                                    //console.log('nearbySpriteKind =', nearbySpriteKind);
+                                    //console.log('facingNearbySprite =', facingNearbySprite);
+                                    //console.log('nearbySpriteDistance =', nearbySpriteDistance);
+                                    if (!facingNearbySprite){ continue; }
+                                    var nearbySpriteVibeMeter = 0;
+                                    // If the nearby sprite is a player, we can do some interesting things
+                                    if (nearbySpriteKind === 'player'){
+                                        //console.log('nearbySprite is a player!');
+                                        var nearbyPlayerInfo = thisPlayersIndex[nearbySpriteToken];
+                                        //console.log('nearbyPlayerInfo =', typeof nearbyPlayerInfo, nearbyPlayerInfo);
+                                        // Does the current sprite have an ATTRACTION TO the nearby player?
+                                        if (typeof thisCharacterInfo.originalPlayer !== 'undefined' && thisCharacterInfo.originalPlayer === nearbyPlayerInfo.token){ nearbySpriteVibeMeter += 2; }
+                                        else if (typeof thisCharacterInfo.currentPlayer !== 'undefined' && thisCharacterInfo.currentPlayer === nearbyPlayerInfo.token){ nearbySpriteVibeMeter += 1; }
+                                        if (thisCharacterAttractions.indexOf(nearbyPlayerInfo.token) !== -1){ nearbySpriteVibeMeter += 2; }
+                                        // Is the current sprite REPELLENT BY the nearby player?
+                                        if (thisCharacterRepellents.indexOf(nearbyPlayerInfo.token) !== -1){ nearbySpriteVibeMeter -= 2; }
+                                        }
+                                    else if (nearbySpriteKind === 'robot'){
+                                        //console.log('nearbySprite is a robot!');
+                                        var nearbyRobotInfo = thisRobotsIndex[nearbySpriteToken];
+                                        //console.log('nearbyRobotInfo =', typeof nearbyRobotInfo, nearbyRobotInfo);
+                                        // Does the current sprite have an ATTRACTION TO the nearby robot?
+                                        if (thisCharacterInfo.type === nearbyRobotInfo.type){ nearbySpriteVibeMeter += 2; }
+                                        if (thisCharacterAttractions.indexOf(nearbyRobotInfo.type) !== -1){ nearbySpriteVibeMeter += 1; }
+                                        if (thisCharacterAttractions.indexOf(nearbyRobotInfo.type2) !== -1){ nearbySpriteVibeMeter += 1; }
+                                        if (thisCharacterAttractions.indexOf(nearbyRobotInfo.token) !== -1){ nearbySpriteVibeMeter += 2; }
+                                        // Is the current sprite REPELLENT BY the nearby robot?
+                                        if (thisCharacterRepellents.indexOf(nearbyRobotInfo.type) !== -1){ nearbySpriteVibeMeter -= 1; }
+                                        if (thisCharacterRepellents.indexOf(nearbyRobotInfo.type2) !== -1){ nearbySpriteVibeMeter -= 1; }
+                                        if (thisCharacterRepellents.indexOf(nearbyRobotInfo.token) !== -1){ nearbySpriteVibeMeter -= 2; }
+                                        }
+                                    //console.log('nearbySpriteVibeMeter for ', thisCharacterToken, ' vs ', nearbySpriteToken, ' =', nearbySpriteVibeMeter);
 
-                                // If the other robot is just too close, we should give them some space
-                                if (nearbySpriteDistance < (searchRadius / 3)) {
-                                    randomTransition = 'position';
-                                    //console.log('vibeCheck: ' + thisCharacterToken + ' feels ' + nearbySpriteToken + ' is too close and backs away');
-                                    newSpriteProperties.frame = thisCharacterKind === 'player' ? 'running' : 'defend';
-                                    newSpriteProperties.position = thisReadyRoom.getRelativePositionChange(thisSprite, nearbySprite, 'farther', 0.10, spriteBounds, spriteAxisScale);
-                                    }
+                                    // If the other robot is just too close, we should give them some space
+                                    if (nearbySpriteDistance < (searchRadius / 3)) {
+                                        randomTransition = 'position';
+                                        //console.log('%cvibeCheck%c: ' + thisCharacterToken + ' feels ' + nearbySpriteToken + ' is too close and backs away', 'color: yellow;', 'color: inherit;');
+                                        newSpriteProperties.frame = thisCharacterKind === 'player' ? 'running2' : 'defend';
+                                        newSpriteProperties.position = thisReadyRoom.getRelativePositionChange(thisSprite, nearbySprite, 'farther', 0.20, spriteBounds, spriteAxisScale);
+                                        }
 
-                                // Else if the current sprite has a positive vibe meter, we should do a positive action
-                                else if (nearbySpriteVibeMeter > 0
-                                    && nearbySpriteDistance > (searchRadius / 2)) {
-                                    randomTransition = nearbySpriteDistance > (searchRadius / 3) ? 'position' : 'depth';
-                                    //console.log('vibeCheck: ' + thisCharacterToken + ' inches toward ' + nearbySpriteToken + ' on positive vibes');
-                                    newSpriteProperties.position = thisReadyRoom.getRelativePositionChange(thisSprite, nearbySprite, 'closer', 0.25, spriteBounds, spriteAxisScale);
-                                    }
+                                    // Else if the current sprite has a positive vibe meter, we should do a positive action
+                                    else if (nearbySpriteVibeMeter > 0
+                                        && nearbySpriteDistance > (searchRadius / 2)) {
+                                        randomTransition = nearbySpriteDistance > (searchRadius / 3) ? 'position' : 'depth';
+                                        //console.log('%cvibeCheck%c: ' + thisCharacterToken + ' inches toward ' + nearbySpriteToken + ' on positive vibes', 'color: green;', 'color: inherit;');
+                                        newSpriteProperties.frame = thisCharacterKind === 'player' ? 'running' : 'slide';
+                                        newSpriteProperties.position = thisReadyRoom.getRelativePositionChange(thisSprite, nearbySprite, 'closer', (0.10 + (nearbySpriteVibeMeter * 0.10)), spriteBounds, spriteAxisScale);
+                                        }
 
-                                // Else if the current sprite has a negative vibe meter, we should do a negative action
-                                else if (nearbySpriteVibeMeter < 0
-                                    && nearbySpriteDistance < (searchRadius / 2)) {
-                                    randomTransition = 'direction';
-                                    //console.log('vibeCheck: ' + thisCharacterToken + ' runs away from ' + nearbySpriteToken + ' on negative vibes');
-                                    newSpriteProperties.frame = thisCharacterKind === 'player' ? 'running' : 'slide';
-                                    newSpriteProperties.position = thisReadyRoom.getRelativePositionChange(thisSprite, nearbySprite, 'farther', 0.50, spriteBounds, spriteAxisScale);
-                                    if (thisSprite.position[0] < nearbySprite.position[0]) {
-                                        thisSprite.direction = 'left';
-                                        } else {
-                                        thisSprite.direction = 'right';
+                                    // Else if the current sprite has a negative vibe meter, we should do a negative action
+                                    else if (nearbySpriteVibeMeter < 0
+                                        && nearbySpriteDistance < (searchRadius / 1)) {
+                                        randomTransition = 'direction';
+                                        //console.log('%cvibeCheck%c: ' + thisCharacterToken + ' runs away from ' + nearbySpriteToken + ' on negative vibes', 'color: red;', 'color: inherit;');
+                                        newSpriteProperties.frame = thisCharacterKind === 'player' ? 'running' : 'slide';
+                                        newSpriteProperties.position = thisReadyRoom.getRelativePositionChange(thisSprite, nearbySprite, 'farther', (0.40 + -(nearbySpriteVibeMeter * 0.10)), spriteBounds, spriteAxisScale);
+                                        if (thisSprite.position[0] < nearbySprite.position[0]) {
+                                            thisSprite.direction = 'left';
+                                            } else {
+                                            thisSprite.direction = 'right';
+                                            }
                                         }
                                     }
 
@@ -630,10 +660,10 @@
                             if (oldPosition[1] >= spriteBounds.maxY){ moveDirection = 'down'; }
                             else if (oldPosition[1] <= spriteBounds.minY){ moveDirection = 'up'; }
                             //console.log('oldPosition =', oldPosition);
-                            var shiftBase = 5;
+                            var shiftBase = 10;
                             var shiftVal = Math.floor(Math.random() * shiftBase) + 1;
                             newYPosition += shiftVal * (moveDirection === 'up' ? 1 : -1);
-                            newZPosition = Math.floor(100 - newYPosition);
+                            newZPosition = Math.floor(spriteBounds.maxY - newYPosition);
                             //console.log('shiftBase =', shiftBase, 'shiftVal =', shiftVal);
                             //console.log('newYPosition =', newYPosition, 'newZPosition =', newZPosition);
                             if (typeof newSpriteProperties.position === 'undefined'){ newSpriteProperties.position = oldPosition; }
@@ -671,6 +701,8 @@
         if (typeof onComplete !== 'function'){ onComplete = function(){ /* ... */ }; }
 
         // Collect this character's info from the unlock index for later
+        var spriteGrid = thisReadyRoomConfig.spriteGrid;
+        var spriteBounds = thisReadyRoomConfig.spriteBounds;
         var readyRoomSpritesIndex = thisReadyRoomConfig.spritesIndex;
         var loadedCharactersIndex = {};
         if (kind === 'player'){ loadedCharactersIndex = thisReadyRoomConfig.charactersIndex['player']; }
@@ -712,7 +744,7 @@
             var newSpriteDirection = newValues.direction;
             thisSprite.direction = newSpriteDirection;
             $thisSpriteInner.attr('data-direction', newSpriteDirection);
-            $thisSprite.css({'transform': 'scale('+(thisSprite.direction !== thisSprite.imageDirection ? -2 : 2)+', 2)'});
+            $thisSprite.css({'transform': 'scale('+(thisSprite.direction !== thisSprite.imageDirection ? -1 : 1)+', 1)'});
             }
 
         // If an opacity change was requested, we can process that now
@@ -747,10 +779,10 @@
             var newSpritePosition = [];
             newSpritePosition.push(parsePositionValue(newValues.position[0], thisSprite.position[0]));
             newSpritePosition.push(parsePositionValue(newValues.position[1], thisSprite.position[1]));
-            newSpritePosition.push(100 - newSpritePosition[1]);
+            newSpritePosition.push(Math.floor(spriteBounds.maxY - newSpritePosition[1]));
+            var newSpriteBrightness = thisReadyRoom.getSpriteBrightness(newSpritePosition[2]);
             //console.log('newSpritePosition =', newSpritePosition);
-            var brightExponent = 1 + (gameSettings.totalRobotOptions / 100);
-            var newSpriteBrightness = Math.pow((newSpritePosition[2] / 100), brightExponent);
+            //console.log('newSpriteBrightness =', newSpriteBrightness);
             thisSprite.position = newSpritePosition;
             var newCSS = {
                 'left': newSpritePosition[0]+'%',
@@ -805,6 +837,17 @@
         thisSprite.charge = thisSprite.charge % thisReadyRoomConfig.animateThreshold;
         return true;
 
+    }
+
+    // Define a function for calculating the brightness a sprite should be given its z-index
+    thisReadyRoom.getSpriteBrightness = function(zIndex){
+        if (typeof zIndex !== 'number'){ return 1; }
+        var spriteBounds = thisReadyRoomConfig.spriteBounds;
+        var totalRobotOptions = gameSettings.totalRobotOptions;
+        var maxOffsetZ = spriteBounds.maxY;
+        var newBrightness = Math.ceil((0.3 + (0.6 * (zIndex / maxOffsetZ))) * 1000) / 1000;
+        if (newBrightness > 1){ newBrightness = 1; }
+        return newBrightness;
     }
 
     // Define a function for calculating the css animation duration for a given character sprite
@@ -879,8 +922,8 @@
     }
 
     // Define a function for updating an existing sprite in the ready room given values
-    thisReadyRoom.updateCharacter = function(characterKind, characterToken, newSpriteProperties){
-        //console.log('thisReadyRoom.updateCharacter(characterKind:', characterKind, ', characterToken:', characterToken, ', newSpriteProperties:', newSpriteProperties, ')');
+    thisReadyRoom.updateCharacter = function(characterKind, characterToken, newSpriteProperties, cooldownValue){
+        //console.log('thisReadyRoom.updateCharacter(characterKind:', characterKind, ', characterToken:', characterToken, ', newSpriteProperties:', newSpriteProperties, ', cooldownValue:', cooldownValue, ')');
         if (!thisReadyRoomConfig.isReady){ return false; }
         if (typeof thisReadyRoomConfig.charactersIndex['player'] === 'undefined'){ return; }
         if (typeof thisReadyRoomConfig.charactersIndex['robot'] === 'undefined'){ return; }
@@ -933,6 +976,7 @@
             //console.log('spriteInfo =', spriteInfo);
             // Trigger the animate function with the provided new values
             thisReadyRoom.animateCharacter(characterKind, characterToken, newSpriteProperties);
+            if (typeof cooldownValue === 'number' && cooldownValue > 0){ spriteInfo.cooldown = cooldownValue; }
         }
     }
 
@@ -963,6 +1007,7 @@
         if (typeof thisReadyRoomConfig.charactersIndex[kind] === 'undefined'){ return; }
 
         // Initial setup for both player and robot
+        var spriteBounds = thisReadyRoomConfig.spriteBounds;
         var spriteGrid = thisReadyRoomConfig.spriteGrid;
         var readyRoomSpritesIndex = thisReadyRoomConfig.spritesIndex;
         var $readyRoom = thisReadyRoomConfig.parentElement;
@@ -1025,9 +1070,9 @@
             } else {
             var spriteOffsetY = randColRowOffsets[1];
             }
-        var spriteOffsetZ = 100 - spriteOffsetY;
+        var spriteOffsetZ = Math.floor(spriteBounds.maxY - spriteOffsetY);
         var brightExponent = 1 + (gameSettings.totalRobotOptions / 100);
-        var spriteBrightness = Math.pow((spriteOffsetZ / 100), brightExponent);
+        var spriteBrightness = thisReadyRoom.getSpriteBrightness(spriteOffsetZ);
         var spriteFilterValue = 'brightness('+spriteBrightness+')';
         //console.log('spriteOffsetX =', spriteOffsetX);
         //console.log('spriteOffsetY =', spriteOffsetY);
@@ -1041,7 +1086,7 @@
         if (kind === 'shop'){ $sprite.attr('data-shop', thisShopToken); }
         $sprite.css({'left': spriteOffsetX+'%', 'bottom': spriteOffsetY+'%', 'z-index': spriteOffsetZ});
         $sprite.css({'filter': spriteFilterValue});
-        $sprite.css({'transform': 'scale('+(spriteDirection !== thisSpriteImageDirection ? -2 : 2)+', 2)'});
+        $sprite.css({'transform': 'scale('+(spriteDirection !== thisSpriteImageDirection ? -1 : 1)+', 1)'});
         var $spriteInner = $('<div class="sprite" data-size="'+thisSpriteSize+'" data-direction="'+spriteDirection+'" data-frame="'+spriteFrame+'"></div>');
         $spriteInner.css('background-image', 'url('+thisSpriteImagePath+'?'+gameSettings.cacheTime+')');
         $spriteInner.css({'animation-duration': spriteAnimationDuration+'s'});
@@ -1285,6 +1330,38 @@
         //console.log('animalScoresIndex =', animalScoresIndex);
         return animalAffinities;
 
+    }
+
+    // Define a function for updating the sprite bounds of the ready room
+    thisReadyRoom.updateSpriteBounds = function(newSpriteBounds){
+        //console.log('thisReadyRoom.updateSpriteBounds(newSpriteBounds:', newSpriteBounds, ')');
+        if (typeof newSpriteBounds !== 'object'){ return; }
+        var spriteBounds = thisReadyRoomConfig.spriteBounds;
+        var newSpriteBoundsKeys = Object.keys(newSpriteBounds);
+        for (var i = 0; i < newSpriteBoundsKeys.length; i++){
+            var propKey = newSpriteBoundsKeys[i];
+            var propValue = newSpriteBounds[propKey];
+            var propBackupKey = propKey + '_Backup';
+            if (typeof spriteBounds[propKey] !== 'undefined'){ spriteBounds[propBackupKey] = spriteBounds[propKey];  }
+            spriteBounds[propKey] = propValue;
+            }
+        //console.log('updated spriteBounds =', spriteBounds);
+    }
+
+    // Define a function for resetting the sprite bounds of the ready room
+    thisReadyRoom.resetSpriteBounds = function(){
+        //console.log('thisReadyRoom.resetSpriteBounds()');
+        var spriteBounds = thisReadyRoomConfig.spriteBounds;
+        var spriteBoundsKeys = Object.keys(spriteBounds);
+        for (var i = 0; i < spriteBoundsKeys.length; i++){
+            var propKey = spriteBoundsKeys[i];
+            var propBackupKey = propKey + '_Backup';
+            if (typeof spriteBounds[propBackupKey] !== 'undefined'){
+                spriteBounds[propKey] = spriteBounds[propBackupKey];
+                delete spriteBounds[propBackupKey];
+                }
+            }
+        //console.log('reset spriteBounds =', spriteBounds);
     }
 
     // Define a function for easily checking when the ready room is ready

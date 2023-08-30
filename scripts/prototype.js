@@ -549,46 +549,6 @@ $(document).ready(function(){
                 // Start the actual ready room animation when it's appropriate to do so
                 mmrpgReadyRoom.startAnimation();
 
-                // Define a function to auto-fade the logo after we've seen it for long enough (we wanna see the ready room!)
-                var fadeOutLogo = function(){
-                    fadeOutLogo = function(){}; // prevent from triggering again
-                    //console.log('time to fade the logo');
-                    $('.banner .banner_credits', thisContext).removeClass('is_shifted').animate({opacity:0},{duration:1000,easing:'swing',sync:false,complete:function(){
-                        //console.log('logo has been faded');
-                        $(this).addClass('is_shifted');
-                        $(this).addClass('hidden');
-                        }});
-                    };
-
-                // Either fade out the logo immediately (if we have focus) or queue it for when the game (as per the parent window) is ready
-                if (document.hasFocus()){
-
-                    //console.log('document already has focus');
-                    //console.log('we can queue logo fade');
-                    setTimeout(fadeOutLogo, 4000);
-
-                    }
-                else {
-
-                    //console.log('wait for window focus/hover');
-                    var checkPrototypeFocus;
-                    checkPrototypeFocus = function(){
-                        //console.log('checkPrototypeFocus()');
-                        var parentGameSettings = typeof window.top.gameSettings !== 'undefined' ? window.top.gameSettings : {};
-                        var gameHasStarted = typeof parentGameSettings.gameHasStarted !== 'undefined' ? parentGameSettings.gameHasStarted : false;
-                        //console.log('parentGameSettings =', parentGameSettings);
-                        //console.log('gameHasStarted =', gameHasStarted);
-                        if (gameHasStarted){
-                            //console.log('game has started, queue logo fade');
-                            setTimeout(fadeOutLogo, 3000);
-                            } else {
-                            setTimeout(checkPrototypeFocus, 1000);
-                            }
-                        };
-                    setTimeout(checkPrototypeFocus, 1000);
-
-                    }
-
                 });
             }
         }
@@ -1164,14 +1124,14 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
         // Collect the context for the banner area and remove and foregrounds
 
         var thisBanner = $('.banner', thisContext);
-        //.credits:not(.is_shifted)
-        //|| gameSettings.demo != true && gameSettings.totalPlayerOptions == 1
-        var creditsOpacity = ((gameSettings.demo == true || (gameSettings.demo != true && gameSettings.totalPlayerOptions == 1 && thisSelect == 'this_player_token')) ? 1.0 : 0.0);
+        /*
         //console.log('get ready to fade credits to '+creditsOpacity+'!');
+        var creditsOpacity = ((gameSettings.demo == true || (gameSettings.demo != true && gameSettings.totalPlayerOptions == 1 && thisSelect == 'this_player_token')) ? 1.0 : 0.0);
         $('.banner_credits', thisBanner).removeClass('is_shifted').animate({opacity:creditsOpacity},{duration:600,easing:'swing',sync:false,complete:function(){
             //console.log('credits have been animated to '+creditsOpacity);
             $(this).addClass('is_shifted');
             }});
+        */
         $('.banner_foreground:not(.is_shifted)', thisBanner).css({opacity:0.6}).animate({opacity:1.0},{duration:600,easing:'swing',sync:false,complete:function(){
             $(this).addClass('is_shifted');
             }});
@@ -1417,6 +1377,7 @@ function prototype_menu_click_back(thisContext, thisLink){
 
 // Create a function for switching to a specific menu step
 function prototype_menu_switch(switchOptions){
+    //console.log('prototype_menu_switch(switchOptions:', switchOptions, ')');
 
     // Redefine the options array populating defaults
     switchOptions = {
@@ -1442,21 +1403,41 @@ function prototype_menu_switch(switchOptions){
     //console.log('johto');
     var dataStepName = switchOptions.stepName;
     var dataStepNumber = switchOptions.stepNumber;
+    //console.log('battleOptions =>', typeof battleOptions, battleOptions);
+    //console.log('dataStepName =>', typeof dataStepName, dataStepName);
+    //console.log('dataStepNumber =>', typeof dataStepNumber, dataStepNumber);
     if (dataStepName === false){
+        //console.log('dataStepName === false');
         dataStepName = 'home';
         }
     else if (parseInt(dataStepName) > 0){
+        //console.log('parseInt(dataStepName) > 0');
         dataStepNumber = parseInt(dataStepName);
         dataStepName = 'home';
         }
     if (dataStepName === 'home'){
+        //console.log('dataStepName === home');
         if (!dataStepNumber){
+            //console.log('!dataStepNumber');
             dataStepNumber = 1;
             }
-        if (dataStepNumber === 1
+        if (dataStepNumber < 2
             && typeof battleOptions['this_player_token'] !== 'undefined'
             && battleOptions['this_player_token'].length){
-            dataStepNumber == 2;
+            //console.log('dataStepNumber < 2 && this_player_token.length');
+            dataStepNumber = 2;
+            }
+        if (dataStepNumber < 3
+            && typeof battleOptions['this_player_robots'] !== 'undefined'
+            && battleOptions['this_player_robots'].length){
+            //console.log('dataStepNumber < 3 && this_player_robots.length');
+            dataStepNumber = 3;
+            }
+        if (dataStepNumber < 4
+            && typeof switchOptions.redirectLink !== 'undefined'
+            && switchOptions.redirectLink.length){
+            //console.log('dataStepNumber < 4 && redirectLink.length');
+            dataStepNumber = 4;
             }
         }
     else if (dataStepName !== 'home'){
@@ -1466,6 +1447,14 @@ function prototype_menu_switch(switchOptions){
     thisPrototype.attr('data-step-number', dataStepNumber);
     //console.log('dataStepName =>', typeof switchOptions.stepName, switchOptions.stepName, '=>', typeof dataStepName, dataStepName);
     //console.log('dataStepNumber =>', typeof switchOptions.stepNumber, switchOptions.stepNumber, '=>', typeof dataStepNumber, dataStepNumber);
+    // If we're on the mission select screen, let's shrink the spriteBounds a bit for the ready room, else revert to default
+    if (dataStepName === 'home'
+        && dataStepNumber === 2){
+        mmrpgReadyRoom.updateSpriteBounds({minX: 20, maxX: 80});
+        } else {
+        mmrpgReadyRoom.resetSpriteBounds();
+        }
+
 
     // Only proceed normally if the current start link is home
     if (gameSettings.startLink != 'home'){
@@ -1494,7 +1483,7 @@ function prototype_menu_switch(switchOptions){
         //var thisLoadingMenu = $('.menu[data-step=loading]', thisPrototype);
         //thisLoadingMenu.css({height:'800px',border:'2px solid red'});
         //$('.option_wrapper', thisLoadingMenu).css({height:'800px',border:'2px solid blue'});
-        $('.banner_credits', thisBanner).animate({opacity:0},{duration:500,easing:'swing',queue:false,complete:function(){ $(this).css({display:'none'}); } });
+        //$('.banner_credits', thisBanner).animate({opacity:0},{duration:500,easing:'swing',queue:false,complete:function(){ $(this).css({display:'none'}); } });
         }
 
     // Else if this is the HOME screen, expand the banner height
@@ -1505,7 +1494,7 @@ function prototype_menu_switch(switchOptions){
         var newHeight = 184;
         //console.log('Expanding the banner height to '+newHeight);
         thisBanner.removeClass('compact').addClass('fullsize').animate({height:newHeight+'px'},{duration:500,easing:'swing',queue:false});
-        $('.banner_credits', thisBanner).removeClass('is_shifted').css({display:'block'}).animate({opacity:1},{duration:500,easing:'swing',queue:false});
+        //$('.banner_credits', thisBanner).removeClass('is_shifted').css({display:'block'}).animate({opacity:1},{duration:500,easing:'swing',queue:false});
         }
 
     // Change the background music to the appropriate file
@@ -1577,7 +1566,7 @@ function prototype_menu_switch(switchOptions){
                         mmrpgReadyRoom.updatePlayer(function(token, info){ return info.player !== filterPlayer; }, {frame: 'running', direction: 'left', position: ['-=4', null], opacity: 0});
                         mmrpgReadyRoom.updatePlayer(filterPlayer, {frame: 'running', direction: 'right', position: [(spriteBounds.maxX / 2), (spriteBounds.minY - 1)], opacity: 1});
                         mmrpgReadyRoom.updateRobot(filterOtherPlayersFunction, {frame: 'slide', direction: 'left', position: ['-=4', null], opacity: 0});
-                        mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'slide', direction: 'right', position: ['+=2', null], opacity: 1});
+                        mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'slide', direction: 'right', position: ['+=2', '+=4'], opacity: 1});
                         var updateTimeout = setTimeout(function(){
                             mmrpgReadyRoom.updatePlayer(filterPlayer, {frame: 'base'});
                             mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'base'});
