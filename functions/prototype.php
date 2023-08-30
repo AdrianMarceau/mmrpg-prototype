@@ -1045,39 +1045,6 @@ function mmrpg_prototype_players_unlocked_index(){
     return $this_unlocked_players_index;
 }
 
-// Define a function for getting a players unlocked index in a JSON compatible format
-function mmrpg_prototype_players_unlocked_index_json(){
-
-    // Define the game session helper var
-    $session_token = rpg_game::session_token();
-
-    // Collect the unlocked players index from the other function so we can reformat
-    $this_unlocked_players_index = mmrpg_prototype_players_unlocked_index();
-
-    // If unlocked players were found, we can loop through and reformat into the new array
-    $this_unlocked_players_index_json = array();
-    if (!empty($this_unlocked_players_index)){
-        foreach ($this_unlocked_players_index AS $player_token => $player_array){
-            $new_player_array = array();
-            foreach ($player_array AS $key => $value){
-                $new_key = preg_replace('/^player_/i', '', $key);
-                if (strpos($new_key, '_') !== false){
-                    $key_parts = explode('_', $new_key);
-                    $new_key = $key_parts[0];
-                    for ($i = 1; $i < count($key_parts); $i++){
-                        $new_key .= ucfirst($key_parts[$i]);
-                    }
-                }
-                $new_player_array[$new_key] = $value;
-            }
-            $this_unlocked_players_index_json[$player_token] = $new_player_array;
-        }
-    }
-
-    // Return the reformatted data
-    return $this_unlocked_players_index_json;
-}
-
 
 // Define a function for getting a robots unlocked index for reference
 function mmrpg_prototype_robots_unlocked_index(){
@@ -1145,24 +1112,15 @@ function mmrpg_prototype_robots_unlocked_index(){
 }
 
 // Define a function for getting a robots unlocked index in a JSON compatible format
-function mmrpg_prototype_robots_unlocked_index_json(){
-
-    // Define the game session helper var
-    $session_token = rpg_game::session_token();
-
-    // Collect the actual robots index for reference later
-    $mmrpg_robots_index = rpg_robot::get_index();
-
-    // Collect the unlocked robots index from the other function so we can reformat
-    $this_unlocked_robots_index = mmrpg_prototype_robots_unlocked_index();
+function mmrpg_prototype_reformat_index_for_json($kind, $index){
 
     // If unlocked robots were found, we can loop through and reformat into the new array
-    $this_unlocked_robots_index_json = array();
-    if (!empty($this_unlocked_robots_index)){
-        foreach ($this_unlocked_robots_index AS $robot_token => $robot_array){
-            $new_robot_array = array();
-            foreach ($robot_array AS $key => $value){
-                $new_key = preg_replace('/^robot_/i', '', $key);
+    $index_json = array();
+    if (!empty($index)){
+        foreach ($index AS $token => $info){
+            $new_info = array();
+            foreach ($info AS $key => $value){
+                $new_key = preg_replace('/^'.$kind.'_/i', '', $key);
                 if (strpos($new_key, '_') !== false){
                     $key_parts = explode('_', $new_key);
                     $new_key = $key_parts[0];
@@ -1170,14 +1128,41 @@ function mmrpg_prototype_robots_unlocked_index_json(){
                         $new_key .= ucfirst($key_parts[$i]);
                     }
                 }
-                $new_robot_array[$new_key] = $value;
+                $new_info[$new_key] = $value;
             }
-            $this_unlocked_robots_index_json[$robot_token] = $new_robot_array;
+            $index_json[$token] = $new_info;
         }
     }
 
     // We're all done so we can return the reformatted data
-    return $this_unlocked_robots_index_json;
+    return $index_json;
+
+}
+
+// Define a function for getting a players unlocked index in a JSON compatible format
+function mmrpg_prototype_players_unlocked_index_json(){
+
+    // Collect the unlocked players index from the other function so we can reformat
+    $unlocked_players = mmrpg_prototype_players_unlocked_index();
+
+    // Reformat the unlocked robots index into a JSON compatible format
+    $unlocked_players_json = mmrpg_prototype_reformat_index_for_json('player', $unlocked_players);
+
+    // Return the reformatted data
+    return $unlocked_players_json;
+}
+
+// Define a function for getting a robots unlocked index in a JSON compatible format
+function mmrpg_prototype_robots_unlocked_index_json(){
+
+    // Collect the unlocked robots index from the other function so we can reformat
+    $unlocked_robots = mmrpg_prototype_robots_unlocked_index();
+
+    // Reformat the unlocked robots index into a JSON compatible format
+    $unlocked_robots_json = mmrpg_prototype_reformat_index_for_json('robot', $unlocked_robots);
+
+    // We're all done so we can return the reformatted data
+    return $unlocked_robots_json;
 
 }
 
