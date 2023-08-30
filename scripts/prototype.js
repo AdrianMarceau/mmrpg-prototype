@@ -1565,8 +1565,8 @@ function prototype_menu_switch(switchOptions){
                     if (!mmrpgReadyRoom.config.isFiltered){
                         mmrpgReadyRoom.updatePlayer(function(token, info){ return info.player !== filterPlayer; }, {frame: 'running', direction: 'left', position: ['-=4', null], opacity: 0});
                         mmrpgReadyRoom.updatePlayer(filterPlayer, {frame: 'running', direction: 'right', position: [(spriteBounds.maxX / 2), (spriteBounds.minY - 1)], opacity: 1});
-                        mmrpgReadyRoom.updateRobot(filterOtherPlayersFunction, {frame: 'slide', direction: 'left', position: ['-=4', null], opacity: 0});
-                        mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'slide', direction: 'right', position: ['+=2', '+=4'], opacity: 1});
+                        mmrpgReadyRoom.updateRobot(filterOtherPlayersFunction, {frame: 'slide', direction: 'left', position: ['-=2', null], opacity: 0});
+                        mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'slide', direction: 'right', position: ['+=1', '>=20'], opacity: 1});
                         var updateTimeout = setTimeout(function(){
                             mmrpgReadyRoom.updatePlayer(filterPlayer, {frame: 'base'});
                             mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'base'});
@@ -1576,16 +1576,20 @@ function prototype_menu_switch(switchOptions){
                                 mmrpgReadyRoom.updateRobot('most', {frame: 'taunt'});
                                 clearTimeout(updateTimeout);
                                 }, 900);
-                            }, 900);
+                            }, 1200);
 
                         }
                     // Otherwise if already filtered that means they changed their mind about a mission
                     else {
                         mmrpgReadyRoom.updatePlayer(filterPlayer, {direction: 'left', frame: 'damage', position: ['-=1', null]});
-                        mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'damage', position: ['-=2', null]});
+                        mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'damage', position: ['-=1', null]});
                         var updateTimeout = setTimeout(function(){
                             mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'base'});
                             clearTimeout(updateTimeout);
+                            updateTimeout = setTimeout(function(){
+                                mmrpgReadyRoom.updateRobot('some', {frame: 'slide', direction: 'left', position: ['<=60', null]});
+                                clearTimeout(updateTimeout);
+                                }, 1200);
                             }, 1200);
                         }
                     }

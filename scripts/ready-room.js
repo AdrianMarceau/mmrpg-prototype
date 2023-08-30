@@ -762,23 +762,40 @@
             //var newSpritePosition = newValues.position;
             if (typeof newValues.position[0] === 'undefined'){ newValues.position[0] = null; }
             if (typeof newValues.position[1] === 'undefined'){ newValues.position[1] = null; }
-            var parsePositionValue = function(newValue, oldValue){
-                //console.log('parsePositionValue(newValue:', newValue, ', oldValue:', oldValue, ')');
+            var parsePositionValue = function(newValue, oldValue, minValue, maxValue){
+                //console.log('parsePositionValue(newValue:', newValue, ', oldValue:', oldValue, 'minValue:', minValue, 'maxValue:', maxValue, ')');
                 if (typeof newValue === 'undefined'){ return oldValue; }
                 else if (typeof newValue === 'number'){ return newValue; }
                 else if (typeof newValue !== 'string'){ return oldValue; }
                 var modValue = oldValue;
-                if (newValue.indexOf('+=') !== -1){ return modValue + parseInt(newValue.replace('+=', '')); }
-                else if (newValue.indexOf('-=') !== -1){ return modValue - parseInt(newValue.replace('-=', '')); }
-                else if (newValue.indexOf('*=') !== -1){ return modValue * parseInt(newValue.replace('*=', '')); }
-                else if (newValue.indexOf('/=') !== -1){ return modValue / parseInt(newValue.replace('/=', '')); }
-                else if (newValue.indexOf('%=') !== -1){ return modValue % parseInt(newValue.replace('%=', '')); }
-                else if (newValue.indexOf('++') !== -1){ return modValue + 1; }
-                else { return parseInt(newValue); }
+                if (newValue.indexOf('+=') !== -1){ modValue = modValue + parseInt(newValue.replace('+=', '')); }
+                else if (newValue.indexOf('-=') !== -1){ modValue = modValue - parseInt(newValue.replace('-=', '')); }
+                else if (newValue.indexOf('*=') !== -1){ modValue = modValue * parseInt(newValue.replace('*=', '')); }
+                else if (newValue.indexOf('/=') !== -1){ modValue = modValue / parseInt(newValue.replace('/=', '')); }
+                else if (newValue.indexOf('%=') !== -1){ modValue = modValue % parseInt(newValue.replace('%=', '')); }
+                else if (newValue.indexOf('++') !== -1){ modValue = modValue + 1; }
+                else if (newValue.indexOf('>=') !== -1){
+                    //console.log('newValue:', newValue, 'oldValue:', oldValue, 'minValue:', minValue, 'maxValue:', maxValue);
+                    var limit = parseInt(newValue.replace('>=', ''));
+                    if (modValue < limit){ modValue = limit; }
+                    //console.log('limit:', limit, 'modValue:', modValue);
+                    }
+                else if (newValue.indexOf('<=') !== -1){
+                    //console.log('newValue:', newValue, 'oldValue:', oldValue, 'minValue:', minValue, 'maxValue:', maxValue);
+                    var limit = parseInt(newValue.replace('<=', ''));
+                    if (modValue > limit){ modValue = limit; }
+                    //console.log('limit:', limit, 'modValue:', modValue);
+                    }
+                else {
+                    modValue = parseInt(newValue);
+                    }
+                if (typeof minValue !== 'undefined' && modValue < minValue){ modValue = minValue; }
+                if (typeof maxValue !== 'undefined' && modValue > maxValue){ modValue = maxValue; }
+                return modValue;
                 };
             var newSpritePosition = [];
-            newSpritePosition.push(parsePositionValue(newValues.position[0], thisSprite.position[0]));
-            newSpritePosition.push(parsePositionValue(newValues.position[1], thisSprite.position[1]));
+            newSpritePosition.push(parsePositionValue(newValues.position[0], thisSprite.position[0], spriteBounds.minX, spriteBounds.maxX));
+            newSpritePosition.push(parsePositionValue(newValues.position[1], thisSprite.position[1], spriteBounds.minY, spriteBounds.maxY));
             newSpritePosition.push(Math.floor(spriteBounds.maxY - newSpritePosition[1]));
             var newSpriteBrightness = thisReadyRoom.getSpriteBrightness(newSpritePosition[2]);
             //console.log('newSpritePosition =', newSpritePosition);
@@ -792,6 +809,39 @@
                 };
             //console.log('updating sprite position for ', characterToken, ' to ', newCSS);
             $thisSprite.css(newCSS);
+            }
+
+        // If an image change was requested, we can process that now
+        if (typeof newValues.image !== 'undefined'){
+            //console.log('image change requested w/ newValues.image =', newValues.image);
+            var newSpriteImage = newValues.image;
+            var thisSpriteSize = characterIndexInfo.imageSize;
+            var thisSpriteSizeX = thisSpriteSize + 'x' + thisSpriteSize;
+            var thisSpritePathPrefix = 'objects';
+            if (kind === 'player') { thisSpritePathPrefix = 'players'; }
+            else if (kind === 'robot') { thisSpritePathPrefix = 'robots'; }
+            else if (kind === 'shop'){ thisSpritePathPrefix = 'shops'; }
+            var newSpriteImageDirection = 'right';
+            var newSpriteImagePath = 'images/' + thisSpritePathPrefix + '/' + newSpriteImage + '/sprite_' + newSpriteImageDirection + '_' + thisSpriteSizeX + '.png';
+            thisSprite.image = newSpriteImage;
+            $thisSpriteInner.css('background-image', 'url('+newSpriteImagePath+'?'+gameSettings.cacheTime+')');
+            }
+
+        // If an size change was requested, we can process that now
+        if (typeof newValues.size !== 'undefined'){
+            //console.log('size change requested w/ newValues.size =', newValues.size);
+            var thisSpriteImage = thisSprite.image;
+            var newSpriteImageSize = newValues.size;
+            var newSpriteImageSizeX = newSpriteImageSize + 'x' + newSpriteImageSize;
+            var thisSpritePathPrefix = 'objects';
+            if (kind === 'player') { thisSpritePathPrefix = 'players'; }
+            else if (kind === 'robot') { thisSpritePathPrefix = 'robots'; }
+            else if (kind === 'shop'){ thisSpritePathPrefix = 'shops'; }
+            var newSpriteImageDirection = 'right';
+            var newSpriteImagePath = 'images/' + thisSpritePathPrefix + '/' + thisSpriteImage + '/sprite_' + newSpriteImageDirection + '_' + newSpriteImageSizeX + '.png';
+            thisSprite.size = newSpriteImageSize;
+            $thisSpriteInner.attr('data-size', newSpriteImageSize);
+            $thisSpriteInner.css('background-image', 'url('+newSpriteImagePath+'?'+gameSettings.cacheTime+')');
             }
 
     }
@@ -1014,6 +1064,10 @@
         var $readyRoomTeam = $('.team', $readyRoom);
         var thisSpriteSize = characterInfo.imageSize;
         var thisSpriteSizeX = thisSpriteSize + 'x' + thisSpriteSize;
+        var thisSpritePathPrefix = 'objects';
+        if (kind === 'player') { thisSpritePathPrefix = 'players'; }
+        else if (kind === 'robot') { thisSpritePathPrefix = 'robots'; }
+        else if (kind === 'shop'){ thisSpritePathPrefix = 'shops'; }
         //console.log('spriteGrid =', spriteGrid);
         //console.log('readyRoomSpritesIndex =', readyRoomSpritesIndex);
         //console.log('$readyRoom =', typeof $readyRoom, $readyRoom);
@@ -1022,21 +1076,18 @@
         //console.log('thisSpriteSizeX =', thisSpriteSizeX);
 
         // Differences scoped by kind of character sprite
-        var thisToken, thisPlayerToken, thisRobotToken, thisShopToken, spriteImagePathPrefix;
+        var thisToken, thisPlayerToken, thisRobotToken, thisShopToken;
         if (kind === 'player') {
             thisToken = thisPlayerToken = characterInfo.token;
-            spriteImagePathPrefix = 'players';
         } else if (kind === 'robot') {
             thisPlayerToken = characterInfo.currentPlayer;
             thisToken = thisRobotToken = characterInfo.token;
-            spriteImagePathPrefix = 'robots';
         } else if (kind === 'shop'){
             thisPlayerToken = characterInfo.currentPlayer;
             thisToken = thisShopToken = characterInfo.token;
-            spriteImagePathPrefix = 'shops';
         }
         //console.log('{} =', {thisToken: thisToken, thisPlayerToken: thisPlayerToken, thisRobotToken: thisRobotToken, thisShopToken: thisShopToken});
-        //console.log('spriteImagePathPrefix =', spriteImagePathPrefix);
+        //console.log('thisSpritePathPrefix =', thisSpritePathPrefix);
 
         // Common logic continues
         if (typeof spriteProperties !== 'object') { spriteProperties = {}; }
@@ -1044,12 +1095,12 @@
         var spriteFrame = 0;
         var thisSpriteImage = typeof characterInfo.image !== 'undefined' && characterInfo.image.length ? characterInfo.image : characterInfo.token;
         var thisSpriteImageDirection = 'right';
-        var thisSpriteImagePath = 'images/' + spriteImagePathPrefix + '/' + thisSpriteImage + '/sprite_' + thisSpriteImageDirection + '_' + thisSpriteSizeX + '.png';
+        var thisSpriteImagePath = 'images/' + thisSpritePathPrefix + '/' + thisSpriteImage + '/sprite_' + thisSpriteImageDirection + '_' + thisSpriteSizeX + '.png';
         //console.log('spriteDirection =', spriteDirection);
         //console.log('spriteFrame =', spriteFrame);
         //console.log('thisSpriteImage =', thisSpriteImage);
         //console.log('thisSpriteImageDirection =', thisSpriteImageDirection);
-        //console.log('spriteImagePathPrefix =', spriteImagePathPrefix);
+        //console.log('thisSpritePathPrefix =', thisSpritePathPrefix);
 
         // pick a random column and row for this robot to start off in
         var randColRow = thisReadyRoom.getRandColRow(1);

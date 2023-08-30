@@ -213,6 +213,18 @@ $(document).ready(function(){
                 complete();
                 }});
 
+            // We should add the new robot to the parent ready room
+            if (typeof window.parent.mmrpgReadyRoom !== 'undefined'
+                && typeof window.parent.mmrpgReadyRoom.updateRobot !== 'undefined'){
+                // If the extra data in dataExtra was not empty and is JSON, parse it into robotInfo
+                var readyRoom = window.parent.mmrpgReadyRoom;
+                var spriteBounces = readyRoom.config.spriteBounds;
+                readyRoom.updatePlayer('all', {frame: 'base', position: [null, (spriteBounces.maxY - 2)]});
+                readyRoom.updateRobot('all', {frame: 'base', position: [null, '>=20']});
+                readyRoom.updatePlayer(thisPlayerToken, {frame: 'victory', direction: 'right', position: [44, (spriteBounces.minY - 2)]});
+                readyRoom.updateRobot(thisRobotToken, {frame: 'victory', direction: 'left', position: [56, (spriteBounces.minY - 2)]});
+                }
+
             countRobotsLoaded++;
             loadedConsoleRobotTokens.push(thisRobotToken);
 
@@ -1761,6 +1773,7 @@ function robotEditorCanvasInit(){
 
 
 //Define a function for changing a robot's image (to an alt, for example)
+var updateRobotImageAltTimeout = false;
 function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
     //console.log('updateRobotImageAlt('+thisPlayerToken+', '+thisRobotToken+', '+newImageToken+');');
 
@@ -1809,6 +1822,28 @@ function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
     // Update this robot to its victory frame so it's ready for switching
     updateSpriteFrame(thisSprite, 'victory');
 
+    // We should also update the image in the ready room so it looks nice for the player
+    if (typeof window.parent.mmrpgReadyRoom !== 'undefined'
+        && typeof window.parent.mmrpgReadyRoom.updateRobot !== 'undefined'){
+        // If the extra data in dataExtra was not empty and is JSON, parse it into robotInfo
+        if (updateRobotImageAltTimeout !== false){ clearTimeout(updateRobotImageAltTimeout); }
+        var readyRoom = window.parent.mmrpgReadyRoom;
+        var newRobotToken = thisRobotToken;
+        var newRobotInfo = {frame: 'summon'};
+        readyRoom.updateRobot(newRobotToken, newRobotInfo, 10);
+        updateRobotImageAltTimeout = setTimeout(function(){
+            clearTimeout(updateRobotImageAltTimeout);
+            newRobotInfo = {frame: 'victory', image: thisRobotToken+(newImageToken !== 'base' ? '_'+newImageToken : '')};
+            readyRoom.updateRobot(newRobotToken, newRobotInfo, 10);
+            updateRobotImageAltTimeout = setTimeout(function(){
+                clearTimeout(updateRobotImageAltTimeout);
+                newRobotInfo = {frame: 'base'};
+                readyRoom.updateRobot(newRobotToken, newRobotInfo, 1);
+                }, 900);
+            }, 900);
+        }
+
+
     // DEBUG
     //console.log( {robotSize:robotSize,robotSizeText:robotSizeText,robotSizeClass:robotSizeClass});
     //console.log( {robotImageIndex:robotImageIndex,thisCurrentImageToken:thisCurrentImageToken,thisCurrentImageIndex:thisCurrentImageIndex,thisCurrentFilePath:thisCurrentFilePath});
@@ -1819,6 +1854,7 @@ function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
     var afterBackgroundUpdateComplete = function(nextGroup){
      //console.log('backgrounds have finished switching');
      if (nextGroup != undefined){
+
          // We still have to update the mugshot images and tokens
          //console.log('nextGroup provided, updating tokens and then mugshot background images');
          if (newImageIndex != -1){
@@ -1836,6 +1872,15 @@ function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
              url: 'frames/edit_robots.php',
              data: postData,
              success: function(data, status){
+
+                // If the `data` is multi-line, immediately break off anything after the first for later into a `dataExtra` var
+                //console.log('data =', data);
+                var newlineIndex = data.indexOf("\n");
+                var dataExtra = newlineIndex !== -1 ? data.substr(newlineIndex + 1) : false;
+                data = newlineIndex !== -1 ? data.substr(0, newlineIndex) : data;
+                //console.log('data (after) =', data);
+                //console.log('dataExtra =', dataExtra);
+
                  // DEBUG
                  //alert(data);
                  // Break apart the response into parts
@@ -1849,10 +1894,11 @@ function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
                  //console.log('dataStatus:'+dataStatus);
                  //console.log('dataMessage:'+dataMessage);
                  //console.log('dataContent:'+dataContent);
-                 // If the ability change was a success, flash the box green
+
+                 // If the alt change was a success, flash the box green
                  if (dataStatus == 'success'){
                      //console.log('success! this robot alt image has been updated');
-                     //console.log( data);
+                     //console.log(data);
                      return true;
                      }
 
