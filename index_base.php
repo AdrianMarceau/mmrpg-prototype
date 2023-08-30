@@ -10,6 +10,10 @@ if (MMRPG_CONFIG_MAINTENANCE_MODE){
 // Include the TOP file
 require_once('top.php');
 
+// Define strings to hold custom script and style links and/or markup
+$website_include_stylesheets = '';
+$website_include_javascript = '';
+
 // Only process session updates if we're NOT in critical error mode
 if (!defined('MMRPG_CRITICAL_ERROR')){
 
@@ -342,6 +346,10 @@ if (empty($this_markup_body)
     <link type="text/css" href="styles/robots.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <? endif; ?>
 
+<? if (!empty($website_include_stylesheets)){ ?>
+    <?= $website_include_stylesheets ?>
+<? } ?>
+
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
 <?
 // Define whether not this page/subpage combination require the legacy viewport settings
@@ -554,6 +562,9 @@ if ($this_current_page == 'file' // File sub-pages
     });
 
     </script>
+    <? if (!empty($website_include_javascript)){ ?>
+        <?= $website_include_javascript ?>
+    <? } ?>
     <?
     // Require the remote bottom in case we're in viewer mode
     require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php');
