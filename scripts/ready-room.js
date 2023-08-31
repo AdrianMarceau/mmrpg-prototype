@@ -328,7 +328,9 @@
         for (var i = 0; i < thisRobotsIndexTokens.length; i++){
             var thisRobotToken = thisRobotsIndexTokens[i];
             var thisRobotInfo = thisRobotsIndex[thisRobotToken];
+            var thisRobotSprite = thisReadyRoomConfig.spritesIndex[thisRobotToken];
             //console.log('thisRobotToken/Info =', thisRobotToken, thisRobotInfo);
+            if (thisRobotSprite.frame !== 0){ thisRobotSprite.cooldown = 0; }
             if (!thisReadyRoom.animateSpeedCheck(thisRobotInfo)){ continue; }
             var thisSpriteToken = thisRobotToken;
             var thisSpriteData = {kind: 'robot', token: thisRobotToken, info: thisRobotInfo}
