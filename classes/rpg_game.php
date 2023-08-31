@@ -1759,14 +1759,18 @@ class rpg_game {
     public static function sprite_exists($sym_path){
 
         // Get the real path given the sym link
-        $real_path = self::get_real_sprite_path($sym_path);
-
-        //echo('$sym_path = '.$sym_path.'<br />');
-        //echo('$real_path = '.$real_path.'<br />');
-        //exit();
+        $real_path = self::get_real_sprite_path($sym_path, true);
 
         // Now that we have the real path, check to see if it exists
-        return file_exists(MMRPG_CONFIG_ROOTDIR.$real_path);
+        $file_exists = file_exists($real_path);
+
+        //error_log('$sym_path = '.print_r($sym_path, true));
+        //error_log('$real_path = '.print_r($real_path, true));
+        //error_log('$file_exists = '.($file_exists ? 'true' : 'false'));
+        //exit();
+
+        // Return the result of the check
+        return $file_exists;
 
     }
 
