@@ -13,6 +13,7 @@ var resizePlayerWrapper = function(){};
 var loadConsoleRobotMarkup = function(thisSprite, index, complete){};
 var loadCanvasAbilitiesMarkup = function(){};
 var loadCanvasItemsMarkup = function(){};
+var showRobotInReadyRoom = function(){};
 var loadedConsoleRobotTokens = [];
 gameSettings.shareProgramUnlocked = false;
 gameSettings.transferProgramUnlocked = false;
@@ -213,23 +214,27 @@ $(document).ready(function(){
                 complete();
                 }});
 
-            // We should add the new robot to the parent ready room
-            if (typeof window.parent.mmrpgReadyRoom !== 'undefined'
-                && typeof window.parent.mmrpgReadyRoom.updateRobot !== 'undefined'){
-                // If the extra data in dataExtra was not empty and is JSON, parse it into robotInfo
-                var readyRoom = window.parent.mmrpgReadyRoom;
-                var spriteBounces = readyRoom.config.spriteBounds;
-                readyRoom.updatePlayer('all', {frame: 'base', position: [null, (spriteBounces.maxY - 2)]});
-                readyRoom.updateRobot('all', {frame: 'base', position: [null, '>=20']});
-                readyRoom.updatePlayer(thisPlayerToken, {frame: 'victory', direction: 'right', position: [44, (spriteBounces.minY - 2)]});
-                readyRoom.updateRobot(thisRobotToken, {frame: 'victory', direction: 'left', position: [56, (spriteBounces.minY - 2)]});
-                }
-
             countRobotsLoaded++;
             loadedConsoleRobotTokens.push(thisRobotToken);
 
             });
 
+        };
+
+    // Define a function for showing/highlighting a robot in the above ready room when possible
+    showRobotInReadyRoom = function(playerToken, robotToken){
+        //console.log('showRobotInReadyRoom(playerToken:', playerToken, 'robotToken:', robotToken, ')');
+        // We should add the new robot to the parent ready room
+        if (typeof window.parent.mmrpgReadyRoom !== 'undefined'
+            && typeof window.parent.mmrpgReadyRoom.updateRobot !== 'undefined'){
+            // If the extra data in dataExtra was not empty and is JSON, parse it into robotInfo
+            var readyRoom = window.parent.mmrpgReadyRoom;
+            var spriteBounces = readyRoom.config.spriteBounds;
+            readyRoom.updatePlayer('all', {frame: 'base', position: [null, (spriteBounces.maxY - 2)]});
+            readyRoom.updateRobot('all', {frame: 'base', position: [null, '>=20']});
+            readyRoom.updatePlayer(playerToken, {frame: 'victory', direction: 'right', position: [44, (spriteBounces.minY - 2)]});
+            readyRoom.updateRobot(robotToken, {frame: 'victory', direction: 'left', position: [56, (spriteBounces.minY - 2)]});
+            }
         };
 
     // Define the batch function for loading all unlocked player data
@@ -390,6 +395,10 @@ $(document).ready(function(){
                 setTimeout(function(){ playSoundEffect('link-click', {volume: 1.0}); }, 250);
                 }
             dataSprite.removeClass('loading');
+
+            // We should add the new robot to the parent ready room
+            showRobotInReadyRoom(dataPlayer, dataRobot);
+
             }
 
         // Load the robot data if not already loaded
@@ -1426,13 +1435,6 @@ $(document).ready(function(){
 
                     }
 
-                    /*
-                    // Reload the console robot markup
-                    reloadConsoleRobotMarkup(targetPlayerToken, targetRobotToken, function(){
-                        //console.log('complete me targetPlayerToken='+targetPlayerToken+' and targetRobotToken='+targetRobotToken);
-                        });
-                    */
-
                     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
                         playSoundEffect('link-click-action', {volume: 1.0});
                         }
@@ -1674,7 +1676,7 @@ function robotEditorCanvasInit(){
                     var tempPlayer = $(this).attr('data-player');
                     var tempRobot = $('.sprite[data-robot]', tempWrapper).eq(countWrapperLoop);
                     if (!tempRobot.length || tempRobot == undefined){ return false; }
-                    else { loadConsoleRobotMarkup(tempRobot, index); }
+                    else { loadConsoleRobotMarkup(tempRobot, index, function(){ showRobotInReadyRoom(tempPlayer, tempRobot.attr('data-robot')); }); }
                     return false;
 
                     });
