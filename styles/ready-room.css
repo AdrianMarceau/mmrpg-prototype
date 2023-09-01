@@ -130,6 +130,7 @@
     bottom: 34px;
     overflow: visible;
     background-color: transparent;
+    cursor: pointer;
 }
 
 #mmrpg .ready_room .scene .sprite {

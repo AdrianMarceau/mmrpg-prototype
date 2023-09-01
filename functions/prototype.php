@@ -553,6 +553,24 @@ function mmrpg_prototype_player_settings($player_token){
 }
 
 // Define a function for checking a player's prototype settings array
+function mmrpg_prototype_player_currently_selected_chapter($player_token){
+    //error_log('mmrpg_prototype_player_currently_selected_chapter($player_token:'.$player_token.')');
+    // Return the current rewards array for this player
+    $session_token = mmrpg_game_token();
+    $battle_settings = !empty($_SESSION[$session_token]['battle_settings']) ? $_SESSION[$session_token]['battle_settings'] : array();
+    $player_token_clean = preg_replace('/^dr-/', '', $player_token);
+    $current_chapter_token = $player_token_clean.'_current_chapter';
+    $current_chapter_value = (isset($battle_settings[$current_chapter_token]) ? $battle_settings[$current_chapter_token] : 0) + 1;
+    //error_log('$session_token ='.print_r($session_token, true));
+    //error_log('$battle_settings ='.print_r($battle_settings, true));
+    //error_log('$battle_settings (keys) = '.print_r(array_keys($battle_settings), true));
+    //error_log('$player_token_clean = '.print_r($player_token_clean, true));
+    //error_log('$current_chapter_token = '.print_r($current_chapter_token, true));
+    //error_log('$current_chapter_value = '.print_r($current_chapter_value, true));
+    return $current_chapter_value;
+}
+
+// Define a function for checking a player's prototype settings array
 function mmrpg_prototype_player_stars_available($player_token){
     // Return the current rewards array for this player
     $session_token = mmrpg_game_token();
@@ -3041,6 +3059,23 @@ function mmrpg_prototype_get_player_mission_music($player_token, $session_token 
         }
     }
     return 'sega-remix/stage-select-mm1';
+}
+
+// Define a function for determining the music to play during each player's given chapter of the campaign
+function mmrpg_prototype_get_chapter_music($player_token, $data_chapter, $session_token = 'GAME'){
+    $chapter_music = 'sega-remix/stage-select-mm1';
+    if ($data_chapter === 1){ $chapter_music = 'sega-remix/opening-3-mm9';  }
+    elseif ($data_chapter === 2){ $chapter_music = mmrpg_prototype_get_player_mission_music($player_token, $session_token); }
+    elseif ($data_chapter === 3){ $chapter_music = 'sega-remix/opening-2-mm9';  }
+    elseif ($data_chapter === 4){ $chapter_music = mmrpg_prototype_get_player_mission_music($player_token, $session_token); }
+    elseif ($data_chapter === 5){ $chapter_music = 'sega-remix/wily-fortress-4-mm9';  }
+    elseif ($data_chapter === 6){ $chapter_music = 'sega-remix/stage-select-mm7';  } // bonus
+    elseif ($data_chapter === 8){ $chapter_music = 'sega-remix/stage-select-mm9';  } // star
+    elseif ($data_chapter === 7){ $chapter_music = 'sega-remix/bass-mm7-v2';  } // player
+    elseif ($data_chapter === 9){ $chapter_music = 'sega-remix/stage-select-mm10';  } // challenge
+    if (empty($chapter_music)){ $chapter_music = mmrpg_prototype_get_player_mission_music($player_token, $session_token); }
+    if (empty($chapter_music)){ $chapter_music = 'sega-remix/stage-select-mm1'; }
+    return $chapter_music;
 }
 
 // Define a function for determining a player's boss music

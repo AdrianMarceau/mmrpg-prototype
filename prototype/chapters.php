@@ -112,7 +112,8 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
             $chapters_display_count++;
             $chapter_title_markup = '<span>Chapter 1</span>';
             if (!$chapters_unlocked['1']){ $chapter_title_markup .= $chapter_sprite_markup; }
-            echo '<a class="chapter_link '.($temp_last_chapter === '0' ? 'chapter_link_active ' : '').'" href="#" data-chapter="0">'.$chapter_title_markup.'</a>';
+            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 1);
+            echo '<a class="chapter_link '.($temp_last_chapter === '0' ? 'chapter_link_active ' : '').'" href="#" data-chapter="0" data-music="'.$chapter_music.'">'.$chapter_title_markup.'</a>';
         } else {
             $chapters_display_count++;
             echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -123,7 +124,8 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
             $chapters_display_count++;
             $chapter_title_markup = '<span>Chapter 2</span>';
             if (!$chapters_unlocked['2']){ $chapter_title_markup .= $chapter_sprite_markup; }
-            echo '<a class="chapter_link '.($temp_last_chapter === '1' ? 'chapter_link_active ' : '').'" href="#" data-chapter="1">'.$chapter_title_markup.'</a>';
+            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 2);
+            echo '<a class="chapter_link '.($temp_last_chapter === '1' ? 'chapter_link_active ' : '').'" href="#" data-chapter="1" data-music="'.$chapter_music.'">'.$chapter_title_markup.'</a>';
         } else {
             $chapters_display_count++;
             echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -134,7 +136,8 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
             $chapters_display_count++;
             $chapter_title_markup = '<span>Chapter 3</span>';
             if (!$chapters_unlocked['3']){ $chapter_title_markup .= $chapter_sprite_markup; }
-            echo '<a class="chapter_link '.($temp_last_chapter === '2' ? 'chapter_link_active ' : '').'" href="#" data-chapter="2">'.$chapter_title_markup.'</a>';
+            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 3);
+            echo '<a class="chapter_link '.($temp_last_chapter === '2' ? 'chapter_link_active ' : '').'" href="#" data-chapter="2" data-music="'.$chapter_music.'">'.$chapter_title_markup.'</a>';
         } else {
             $chapters_display_count++;
             echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -145,7 +148,8 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
             $chapters_display_count++;
             $chapter_title_markup = '<span>Chapter 4</span>';
             if (!$chapters_unlocked['4a']){ $chapter_title_markup .= $chapter_sprite_markup; }
-            echo '<a class="chapter_link '.($temp_last_chapter === '3' ? 'chapter_link_active ' : '').'" href="#" data-chapter="3">'.$chapter_title_markup.'</a>';
+            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 4);
+            echo '<a class="chapter_link '.($temp_last_chapter === '3' ? 'chapter_link_active ' : '').'" href="#" data-chapter="3" data-music="'.$chapter_music.'">'.$chapter_title_markup.'</a>';
         } else {
             $chapters_display_count++;
             echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -156,7 +160,8 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
             $chapters_display_count++;
             $chapter_title_markup = '<span>Chapter 5</span>';
             if (true){ $chapter_title_markup .= $chapter_sprite_markup; }
-            echo '<a class="chapter_link '.($temp_last_chapter === '4' ? 'chapter_link_active ' : '').'" href="#" data-chapter="4">'.$chapter_title_markup.'</a>';
+            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 5);
+            echo '<a class="chapter_link '.($temp_last_chapter === '4' ? 'chapter_link_active ' : '').'" href="#" data-chapter="4" data-music="'.$chapter_music.'">'.$chapter_title_markup.'</a>';
         } else {
             $chapters_display_count++;
             echo '<a class="chapter_link chapter_link_disabled">???</a>';
@@ -176,7 +181,8 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
         // CHAPTER RANDOM(5)
         if ($allow_bonus_fields){
             $chapters_display_count++;
-            $enabled_extra_tab_markup .= '<a class="chapter_link extra first random '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5" data-maybe-title="Bonus Chapter : Mission Randomizer || [[Face off against randomized mechas, robots, and bosses!]]">Random</a>';
+            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 6);
+            $enabled_extra_tab_markup .= '<a class="chapter_link extra first random '.($temp_last_chapter === '5' ? 'chapter_link_active ' : '').'" href="#" data-chapter="5" data-music="'.$chapter_music.'" data-maybe-title="Bonus Chapter : Mission Randomizer || [[Face off against randomized mechas, robots, and bosses!]]">Random</a>';
             } elseif ($num_extra > 0){
             $chapters_display_count++;
             $disabled_extra_tab_markup .= '<a class="chapter_link extra first random chapter_link_disabled">???</a>';
@@ -185,7 +191,8 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
         // CHAPTER STARS(7)
         if ($allow_star_fields){
             $chapters_display_count++;
-            $enabled_extra_tab_markup .= '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7" data-maybe-title="Bonus Chapter : Star Fields || [[Collect elemental stars to power up your robots!]]">Stars'.($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL ? ' &check;' : '').'</a>';
+            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 8);
+            $enabled_extra_tab_markup .= '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7" data-music="'.$chapter_music.'" data-maybe-title="Bonus Chapter : Star Fields || [[Collect elemental stars to power up your robots!]]">Stars'.($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL ? ' &check;' : '').'</a>';
             } elseif ($num_extra > 0){
             $chapters_display_count++;
             $disabled_extra_tab_markup .= '<a class="chapter_link extra stars chapter_link_disabled">???</a>';
@@ -194,7 +201,8 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
         // CHAPTER PLAYERS(6)
         if ($allow_player_battles){
             $chapters_display_count++;
-            $enabled_extra_tab_markup .= '<a class="chapter_link extra players '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6" data-maybe-title="Bonus Chapter : Player Battles || [[Fight against other players\' ghost data!]] || [[Limited robots + only hold items allowed!]]'.(!empty($this_rogue_star) ? ' || [[(Rogue Stars are disabled here!)]]' : '').'">Players</a>';
+            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 7);
+            $enabled_extra_tab_markup .= '<a class="chapter_link extra players '.($temp_last_chapter === '6' ? 'chapter_link_active ' : '').'" href="#" data-chapter="6" data-music="'.$chapter_music.'" data-maybe-title="Bonus Chapter : Player Battles || [[Fight against other players\' ghost data!]] || [[Limited robots + only hold items allowed!]]'.(!empty($this_rogue_star) ? ' || [[(Rogue Stars are disabled here!)]]' : '').'">Players</a>';
             } elseif ($num_extra > 0){
             $chapters_display_count++;
             $disabled_extra_tab_markup .= '<a class="chapter_link extra players chapter_link_disabled">???</a>';
@@ -203,7 +211,8 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
         // CHAPTER CHALLENGES(8)
         if ($allow_challenge_battles){
             $chapters_display_count++;
-            $enabled_extra_tab_markup .= '<a class="chapter_link extra challenges '.($temp_last_chapter === '8' ? 'chapter_link_active ' : '').'" href="#" data-chapter="8" data-maybe-title="Bonus Chapter : Challenge Mode || [[Fight in unique challenges designed by MMRPG staff!]] || [[Limited turns and robots + only hold items allowed!]]'.(!empty($this_rogue_star) ? ' || [[(Rogue Stars are disabled here!)]]' : '').'">Challenges</a>';
+            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 9);
+            $enabled_extra_tab_markup .= '<a class="chapter_link extra challenges '.($temp_last_chapter === '8' ? 'chapter_link_active ' : '').'" href="#" data-chapter="8" data-music="'.$chapter_music.'" data-maybe-title="Bonus Chapter : Challenge Mode || [[Fight in unique challenges designed by MMRPG staff!]] || [[Limited turns and robots + only hold items allowed!]]'.(!empty($this_rogue_star) ? ' || [[(Rogue Stars are disabled here!)]]' : '').'">Challenges</a>';
             } elseif ($num_extra > 0){
             $chapters_display_count++;
             $disabled_extra_tab_markup .= '<a class="chapter_link extra challenges chapter_link_disabled">???</a>';

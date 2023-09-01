@@ -146,6 +146,14 @@ $(document).ready(function(){
                     }, 800);
                 });
 
+            // READY ROOM GLASS
+
+            // Add a click sound to the ready-room glass if it exists
+            $('.ready_room .wrapper.inner > .clicker', thisContext).live('click', function(){
+                console.log('testing 123');
+                playSoundEffect.call(this, 'glass-klink');
+                });
+
 
             }
 
@@ -302,6 +310,9 @@ $(document).ready(function(){
                 // Hide all the other chapter links from view
                 $('.option[data-chapter!="'+thisChapterToken+'"]', thisChapterWrapper).addClass('hidden_chapter_option');
                 $('.option[data-chapter="'+thisChapterToken+'"]', thisChapterWrapper).removeClass('hidden_chapter_option');
+                // If there was music requested, start playing it
+                var chapterMusic = typeof thisChapterLink.attr('data-music') !== 'undefined' ? thisChapterLink.attr('data-music') : false;
+                if (chapterMusic.length){ parent.mmrpg_music_load(chapterMusic, false); }
                 // Update the battle options with the last selected chapter
                 $.post('scripts/script.php',{requestType:'session',requestData:'battle_settings,'+thisChapterPlayer+'_current_chapter,'+thisChapterToken});
                 // DEBUG DEBUG

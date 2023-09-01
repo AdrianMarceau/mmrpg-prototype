@@ -82,63 +82,72 @@ else {
 
     // Print out the normal mode's player select screen for Dr. Light
     if ($unlock_flag_light){
-        $doctor_info = $mmrpg_player_index['dr-light'];
-        $doctor_sprite_path = 'images/players/dr-light/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
-        $text_robots_unlocked = $prototype_data['dr-light']['robots_unlocked'].' Robot'.($prototype_data['dr-light']['robots_unlocked'] != 1 ? 's' : '');
-        $text_points_unlocked = number_format($prototype_data['dr-light']['points_unlocked'], 0, '.', ',').' Point'.($prototype_data['dr-light']['points_unlocked'] != 1 ? 's' : '');
-        $text_battles_complete = $prototype_data['dr-light']['battles_complete'].' Mission'.($prototype_data['dr-light']['battles_complete'] != 1 ? 's' : '');
-        $text_player_special = $prototype_data['dr-light']['prototype_complete'] ? true : false;
+        $doctor_token = 'dr-light';
+        $doctor_info = $mmrpg_player_index[$doctor_token];
+        $doctor_sprite_path = 'images/players/'.$doctor_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
+        $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
+        $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
+        $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
+        $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
         $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.'); top: -2px; right: 14px; z-index: 60;">Dr. Light</span>';
-        $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites('dr-light', $session_token);
-        $text_player_music = mmrpg_prototype_get_player_mission_music('dr-light', $session_token);
-        $text_player_chapter = $get_current_chapter_text('dr-light', $chapters_unlocked_light);
-        $text_player_hearts = $get_current_limit_hearts('dr-light', $chapters_unlocked_light);
-        $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_this-dr-light-player-select option_dr-light block_1';
-        echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_light.'" class="'.$text_option_classes.'" data-token="dr-light" data-token-id="'.$doctor_info['player_id'].'">';
+        $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites($doctor_token, $session_token);
+        //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
+        $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
+        $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_light);
+        $text_player_hearts = $get_current_limit_hearts($doctor_token, $chapters_unlocked_light);
+        $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_this-'.$doctor_token.'-player-select option_'.$doctor_token.' block_1';
+        echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_light.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
         echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">Dr. Light'.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_dr-light-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">Dr. Light'.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
         echo '</div></div></div>';
         echo '</a>'."\n";
     }
 
     // Print out the normal mode's player select screen for Dr. Wily
     if ($unlock_flag_wily){
-        $doctor_info = $mmrpg_player_index['dr-wily'];
-        $doctor_sprite_path = 'images/players/dr-wily/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
-        $text_robots_unlocked = $prototype_data['dr-wily']['robots_unlocked'].' Robot'.($prototype_data['dr-wily']['robots_unlocked'] != 1 ? 's' : '');
-        $text_points_unlocked = number_format($prototype_data['dr-wily']['points_unlocked'], 0, '.', ',').' Point'.($prototype_data['dr-wily']['points_unlocked'] != 1 ? 's' : '');
-        $text_battles_complete = $prototype_data['dr-wily']['battles_complete'].' Mission'.($prototype_data['dr-light']['battles_complete'] != 1 ? 's' : '');
-        $text_player_special = $prototype_data['dr-wily']['prototype_complete'] ? true : false;
-        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.'); top: -2px; right: 14px; z-index: 60;">Dr. Wily</span>';
-        $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites('dr-wily', $session_token);
-        $text_player_music = mmrpg_prototype_get_player_mission_music('dr-wily', $session_token);
-        $text_player_chapter = $get_current_chapter_text('dr-wily', $chapters_unlocked_wily);
-        $text_player_hearts = $get_current_limit_hearts('dr-wily', $chapters_unlocked_wily);
-        $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_this-dr-wily-player-select option_dr-wily block_1';
-        echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_wily.'" class="'.$text_option_classes.'" data-token="dr-wily" data-token-id="'.$doctor_info['player_id'].'">';
+        $doctor_token = 'dr-wily';
+        $doctor_info = $mmrpg_player_index[$doctor_token];
+        $doctor_sprite_path = 'images/players/'.$doctor_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
+        $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
+        $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
+        $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
+        $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
+        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.'); top: -2px; right: 14px; z-index: 60;">Dr. Light</span>';
+        $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites($doctor_token, $session_token);
+        //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
+        $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
+        $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_wily);
+        $text_player_hearts = $get_current_limit_hearts($doctor_token, $chapters_unlocked_wily);
+        $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_this-'.$doctor_token.'-player-select option_'.$doctor_token.' block_1';
+        echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_wily.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
         echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image">'.$text_sprites_markup.'<span class="multi"><span class="maintext">Dr. Wily'.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_dr-wily-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Wily Campaign Complete!" data-tooltip-type="player_type player_type_attack">&clubs;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">Dr. Light'.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
         echo '</div></div></div>';
         echo '</a>'."\n";
     }
 
     // Print out the normal mode's player select screen for Dr. Cossack
     if ($unlock_flag_cossack){
-        $doctor_info = $mmrpg_player_index['dr-cossack'];
-        $doctor_sprite_path = 'images/players/dr-cossack/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
-        $text_robots_unlocked = $prototype_data['dr-cossack']['robots_unlocked'].' Robot'.($prototype_data['dr-cossack']['robots_unlocked'] != 1 ? 's' : '');
-        $text_points_unlocked = number_format($prototype_data['dr-cossack']['points_unlocked'], 0, '.', ',').' Point'.($prototype_data['dr-cossack']['points_unlocked'] != 1 ? 's' : '');
-        $text_battles_complete = $prototype_data['dr-cossack']['battles_complete'].' Mission'.($prototype_data['dr-light']['battles_complete'] != 1 ? 's' : '');
-        $text_player_special = $prototype_data['dr-cossack']['prototype_complete'] ? true : false;
-        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.'); top: -2px; right: 14px; z-index: 60;">Dr. Cossack</span>';
-        $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites('dr-cossack', $session_token);
-        $text_player_music = mmrpg_prototype_get_player_mission_music('dr-cossack', $session_token);
-        $text_player_chapter = $get_current_chapter_text('dr-cossack', $chapters_unlocked_cossack);
-        $text_player_hearts = $get_current_limit_hearts('dr-cossack', $chapters_unlocked_cossack);
-        $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_this-dr-cossack-player-select option_dr-cossack block_1';
-        echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_cossack.'" class="'.$text_option_classes.'" data-token="dr-cossack" data-token-id="'.$doctor_info['player_id'].'">';
+        $doctor_token = 'dr-cossack';
+        $doctor_info = $mmrpg_player_index[$doctor_token];
+        $doctor_sprite_path = 'images/players/'.$doctor_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
+        $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
+        $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
+        $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
+        $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
+        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.'); top: -2px; right: 14px; z-index: 60;">Dr. Light</span>';
+        $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites($doctor_token, $session_token);
+        //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
+        $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
+        $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_cossack);
+        $text_player_hearts = $get_current_limit_hearts($doctor_token, $chapters_unlocked_cossack);
+        $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_this-'.$doctor_token.'-player-select option_'.$doctor_token.' block_1';
+        echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_cossack.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
         echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image">'.$text_sprites_markup.'<span class="multi"><span class="maintext">Dr. Cossack'.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_dr-cossack-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Cossack Campaign Complete!" data-tooltip-type="player_type player_type_speed">&diams;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">Dr. Light'.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
         echo '</div></div></div>';
         echo '</a>'."\n";
     }
