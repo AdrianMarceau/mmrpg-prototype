@@ -491,9 +491,9 @@ button {
 @keyframes website-banner-logo-idle-fade {
     0% { filter: brightness(1.0) blur(0); top: 0; }
     20% { filter: brightness(1.0) blur(0); top: 0; }
-    30% { filter: brightness(0.1) blur(0.5px); top: 64px; }
+    30% { filter: brightness(0.2) blur(0.5px); top: 50px; }
 
-    70% { filter: brightness(0.1) blur(0.5px); top: 64px; }
+    70% { filter: brightness(0.2) blur(0.5px); top: 50px; }
     80% { filter: brightness(1.0) blur(0); top: 0; }
     100% { filter: brightness(1.0) blur(0); top: 0; }
 }
