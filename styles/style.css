@@ -4661,6 +4661,61 @@ body.index #header {
 }
 
 
+/* -- In-Battle UI Effect Styles -- */
+
+#effects {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    margin: 0 auto;
+    vertical-align: top;
+    width: 768px;
+    height: 626px;
+    border: 0 none transparent;
+    background-color: transparent;
+    overflow: visible;
+}
+#effects .wrapper {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+@keyframes battle-canvas-effect-glow {
+    0%, 100% { filter: opacity(0.1) blur(3px);  }
+    50% { filter: opacity(0.3) blur(6px);  }
+}
+#effects .canvas_border,
+#effects .actions_border {
+    display: block;
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    background-color: #2A2A2A;
+    border: 0 none transparent;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    filter: opacity(0.1) blur(3px);
+    background-blend-mode: hue;
+    animation: battle-canvas-effect-glow 6s infinite;
+}
+#effects .canvas_border {
+    top: 4px;
+    height: 259px;
+    animation-delay: 0s;
+}
+#effects .actions_border {
+    bottom: 14px;
+    height: 213px;
+    animation-delay: -3s;
+}
+
+
 /* -- Achievement Icon Styles -- */
 
 #mmrpg .achievement_icon {

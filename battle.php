@@ -897,6 +897,21 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
         </div>
     </div>
 
+    <div id="effects">
+        <div class="wrapper">
+            <?
+            $temp_button_colours = array();
+            $temp_button_colours[] = !empty($this_player_data['player_type']) ? $this_player_data['player_type'] : 'none';
+            if (!empty($this_field_data['field_type'])){ $temp_button_colours[] = $this_field_data['field_type']; }
+            $temp_button_colours = array_unique($temp_button_colours);
+            $temp_button_colours_string1 = 'type_'.implode('_', $temp_button_colours);
+            $temp_button_colours_string2 = 'type_'.implode('_', array_reverse($temp_button_colours));
+            ?>
+            <div class="canvas_border type <?= $temp_button_colours_string1 ?>"></div>
+            <div class="actions_border type <?= $temp_button_colours_string2 ?>"></div>
+        </div>
+    </div>
+
     <iframe id="connect" name="connect" src="about:blank">
     </iframe>
 
