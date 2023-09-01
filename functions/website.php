@@ -6,6 +6,7 @@
 
 // Define a function for generating the float player markup for the various website pages
 function mmrpg_website_text_float_player_markup($player_token, $float_side = 'right', $frame_key = '00', $player_image_size = 40, $player_alt_token = '', $player_item_token = '', $extra_float_classes = ''){
+    $player_info = rpg_player::get_index_info($player_token);
     $zoom_size = $player_image_size * 2;
     $zoom_size_text = $zoom_size.'x'.$zoom_size;
     $player_direction = $float_side != 'left' ? 'left' : 'right';
@@ -16,7 +17,13 @@ function mmrpg_website_text_float_player_markup($player_token, $float_side = 'ri
     if ($player_image_size >= 80){ $player_image_styles .= 'margin: -'.($player_image_size + 10).'px auto 0 -'.($player_image_size / 2).'px; '; }
     else { $player_image_styles .= 'margin: -10px auto 0 0; '; }
     $player_image_styles .= 'z-index: 1; ';
+    $animation_duration = 1.0;
+    if ($player_info['player_type'] === 'attack'){ $animation_duration = 1.2; }
+    elseif ($player_info['player_type'] === 'defense'){ $animation_duration = 0.9; }
+    elseif ($player_info['player_type'] === 'speed'){ $animation_duration = 0.6; }
+    $player_image_styles .= 'animation-duration: '.$animation_duration.'s; ';
     $player_image_classes = 'sprite sprite_'.$zoom_size_text.' sprite_'.$zoom_size_text.'_'.$frame_key;
+    $player_image_classes .= ' sprite_animated';
     if (!empty($player_item_token)){
         $item_image_size = 40;
         $zoom_size = $item_image_size * 2;
@@ -39,6 +46,7 @@ function mmrpg_website_text_float_player_markup($player_token, $float_side = 'ri
 
 // Define a function for generating the float robot markup for the various website pages
 function mmrpg_website_text_float_robot_markup($robot_token, $float_side = 'right', $frame_key = '00', $robot_image_size = 40, $robot_alt_token = '', $robot_item_token = '', $extra_float_classes = ''){
+    $robot_info = rpg_robot::get_index_info($robot_token);
     $zoom_size = $robot_image_size * 2;
     $zoom_size_text = $zoom_size.'x'.$zoom_size;
     $robot_direction = $float_side != 'left' ? 'left' : 'right';
@@ -49,7 +57,10 @@ function mmrpg_website_text_float_robot_markup($robot_token, $float_side = 'righ
     if ($robot_image_size >= 80){ $robot_image_styles .= 'margin: -'.($robot_image_size + 10).'px auto 0 -'.($robot_image_size / 2).'px; '; }
     else { $robot_image_styles .= 'margin: -10px auto 0 0; '; }
     $robot_image_styles .= 'z-index: 1; ';
+    $animation_duration = rpg_robot::get_css_animation_duration($robot_info);
+    $robot_image_styles .= 'animation-duration: '.$animation_duration.'s; ';
     $robot_image_classes = 'sprite sprite_'.$zoom_size_text.' sprite_'.$zoom_size_text.'_'.$frame_key;
+    $robot_image_classes .= ' sprite_animated';
     if (!empty($robot_item_token)){
         $item_image_size = 40;
         $zoom_size = $item_image_size * 2;

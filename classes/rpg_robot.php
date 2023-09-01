@@ -6262,6 +6262,7 @@ class rpg_robot extends rpg_object {
 
     // Define a function that takes a given robot's stats and
     public static function get_css_animation_duration($robot_token_or_info){
+        //error_log('get_css_animation_duration() // $robot_token_or_info = '.print_r($robot_token_or_info, true));
         if (!empty($robot_token_or_info) && is_string($robot_token_or_info)){ $robot_info = self::get_index_info($robot_token_or_info); }
         elseif (!empty($robot_token_or_info) && is_array($robot_token_or_info)){ $robot_info = $robot_token_or_info; }
         if (empty($robot_info)){ return false; }

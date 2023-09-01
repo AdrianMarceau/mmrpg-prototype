@@ -293,7 +293,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
             }
             if (!empty($this_awards_string)
                 && $this_leaderboard_metric === MMRPG_SETTINGS_DEFAULT_LEADERBOARD_METRIC){
-                $db->query("UPDATE mmrpg_leaderboard SET board_awards = '{$this_awards_string}' WHERE user_id = {$board['user_id']};");
+                $db->query("UPDATE `mmrpg_leaderboard` SET `board_awards` = '{$this_awards_string}' WHERE `user_id` = {$board['user_id']};");
             }
 
             // -- LEADERBOARD MARKUP -- //
@@ -316,26 +316,35 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
             $this_colour = !empty($board['user_colour_token']) ? $board['user_colour_token'] : '';
             if (!empty($this_colour) && !empty($board['user_colour_token2'])){ $this_colour .= '_'.$board['user_colour_token2']; }
             if (empty($this_colour)){ $this_colour = 'none'; }
+            if (!empty($this_user_awards_sticky)){ echo $this_user_awards_sticky."\n"; }
+            if (!empty($board['user_image_path'])){ list($avatar_class, $avatar_token, $avatar_base_size) = explode('/', $board['user_image_path']); }
+            else { $avatar_class = 'robots'; $avatar_token = 'mega-man'; $avatar_base_size = 40; }
+            if (!empty($board['user_background_path'])){ list($background_class, $background_token) = explode('/', $board['user_background_path']); }
+            else { $background_class = 'fields'; $background_token = rpg_player::get_intro_field('player'); }
+            $avatar_size = $avatar_base_size * 2;
+            $place_frame = 'base';
+            //if ($place_counter == 3){ $place_frame = 'summon'; }
+            //elseif ($place_counter == 2){ $place_frame = 'taunt'; }
+            //elseif ($place_counter == 1){ $place_frame = 'victory'; }
+            if ($place_counter <= 3){ $place_frame = 'victory'; }
+            $y_offset = 0;
+            if (strstr($avatar_token, 'astro-man') && $this_place > 1){ $y_offset = -18; }
+            elseif (strstr($avatar_token, 'cloud-man') && $this_place > 1){ $y_offset = -19; }
+            elseif (strstr($avatar_token, 'guts-man') && $this_place > 1){ $y_offset = -12; }
+            elseif (strstr($avatar_token, 'sword-man') && $this_place > 1){ $y_offset = -12; }
+            elseif (strstr($avatar_token, 'splash-woman') && $this_place > 1){ $y_offset = -9; }
+            elseif (strstr($avatar_token, 'frost-man') && $this_place > 1){ $y_offset = -12; }
+            $character_token = preg_replace('/_([-a-z0-9]+)$/i', '', $avatar_token);
+            $avatar_animation_duration = rpg_robot::get_css_animation_duration($character_token);
+            if (empty($avatar_animation_duration)){ $avatar_animation_duration = 1.0; }
             echo '<a data-id="'.$board['user_id'].'" data-player="'.$board['user_name_clean'].'" class="file file_'.strip_tags($this_place).'" name="file_'.$key.'" style="'.$this_style.'" href="'.$current_leaderboard_url.$board['user_name_clean'].'/">'."\n";
-                echo '<div class="inset player_type type_'.$this_colour.'">'."\n";
+                echo '<div class="inset player_type type_'.$this_colour.'" style="animation-delay: '.($board_key % 2 === 0 ? -5 : -10).'s;">'."\n";
                     echo '<span class="place">'.$this_place.'</span>'."\n";
                     echo '<span class="userinfo"><span class="username">'.$this_username.$this_user_awards.'</span><span class="details">'.$this_details.'</span></span>'."\n";
                     echo '<span class="points">'.$this_points_html.'</span>'."\n";
                     echo '<span class="records">'.$this_records_html.'</span>'."\n";
                 echo '</div>'."\n";
-                if (!empty($this_user_awards_sticky)){ echo $this_user_awards_sticky."\n"; }
-                if (!empty($board['user_image_path'])){ list($avatar_class, $avatar_token, $avatar_base_size) = explode('/', $board['user_image_path']); }
-                else { $avatar_class = 'robots'; $avatar_token = 'mega-man'; $avatar_base_size = 40; }
-                if (!empty($board['user_background_path'])){ list($background_class, $background_token) = explode('/', $board['user_background_path']); }
-                else { $background_class = 'fields'; $background_token = rpg_player::get_intro_field('player'); }
-                $avatar_size = $avatar_base_size * 2;
-                $place_frame = 'base';
-                if ($place_counter == 3){ $place_frame = 'taunt'; }
-                elseif ($place_counter == 2){ $place_frame = 'summon'; }
-                elseif ($place_counter == 1){ $place_frame = 'victory'; }
-                $y_offset = 0;
-                if (strstr($avatar_token, 'astro-man') && $this_place > 1){ $y_offset = -16; }
-                echo '<span class="avatar"><span class="avatar_wrapper"'.(!empty($y_offset) ? 'style="bottom: '.$y_offset.'px;"' : '').'>';
+                echo '<span class="avatar"><span class="avatar_wrapper" style="bottom: '.$y_offset.'px; animation-duration: '.$avatar_animation_duration.'s;">';
                     echo '<span class="sprite sprite_shadow sprite_'.$avatar_size.'x'.$avatar_size.' sprite_shadow_'.$avatar_size.'x'.$avatar_size.' sprite_'.$avatar_size.'x'.$avatar_size.'_'.$place_frame.'" style="background-image: url(images/'.$avatar_class.'/'.preg_replace('/^([-a-z0-9]+)(_[a-z0-9]+)?$/i', '$1', $avatar_token).'/sprite_left_'.$avatar_base_size.'x'.$avatar_base_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-size: auto '.$avatar_size.'px;">'.$this_username.'</span>';
                     echo '<span class="sprite sprite_'.$avatar_size.'x'.$avatar_size.' sprite_'.$avatar_size.'x'.$avatar_size.'_'.$place_frame.'" style="background-image: url(images/'.$avatar_class.'/'.$avatar_token.'/sprite_left_'.$avatar_base_size.'x'.$avatar_base_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-size: auto '.$avatar_size.'px;">'.$this_username.'</span>';
                 echo '</span></span>'."\n";

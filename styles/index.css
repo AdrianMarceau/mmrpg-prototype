@@ -350,12 +350,10 @@ button {
     background-position: center -50px;
     filter: brightness(0.9) blur(0);
 }
-
 @keyframes window-banner-foreground-gridlines-fade {
   0%, 100% { opacity: 0.2; }
   50% { opacity: 0.8; }
 }
-
 #window .banner .banner_foreground:before,
 #window .banner .banner_foreground:after {
   content: "";
@@ -391,11 +389,48 @@ button {
   opacity: 0.8;
 }
 
+#window .banner .credits:before {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    top: -20px;
+    transform-origin: center bottom;
+    filter: brightness(0.0) opacity(0);
+    transform: scale(0.5);
+    width: 368px;
+    height: 256px;
+    background-color: transparent;
+    background-image: url('../images/assets/website-banner_behind-logo-2k23_slur-on-horizon.gif?20230901');
+    background-position: 0 0;
+    background-size: auto;
+    background-repeat: no-repeat;
+}
+#window .banner .credits:after {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    position: absolute;
+    z-index: 3;
+    top: 104px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 244px;
+    height: 49px;
+    background-color: transparent;
+    background-image: url('../images/assets/website-banner_over-logo-2k23_text-only.png?20230901');
+    background-position: 0 0;
+    background-size: auto;
+    background-repeat: no-repeat;
+}
 #window .banner .credits > a {
     display: block;
-    width: 244px;
-    height: 150px;
-    background-image: url(../images/assets/mmrpg-prototype-banner-logo-2k19.png?20200906);
+    position: relative;
+    z-index: 2;
+    width: 194px;
+    height: 108px;
+    background-image: url('../images/assets/website-banner_main-logo-2k23_heroes-only.png?20230901');
     background-color: transparent;
     background-repeat: no-repeat;
     background-position: center top;
@@ -403,6 +438,8 @@ button {
     top: 0;
     left: 50%;
     transform: translateX(-50%);
+    opacity: 1.0;
+    filter: brightness(1.0);
 }
 #window .banner .overlay {
     z-index: 30;
@@ -420,6 +457,82 @@ button {
     ) !important;
     opacity: 0.5;
 }
+
+
+
+
+@keyframes website-banner-background-idle-fade {
+    0% { filter: brightness(0.8) saturate(1) blur(0); }
+    20% { filter: brightness(0.8) saturate(1) blur(0); }
+    30% { filter: brightness(0.1) saturate(1.6) blur(2px); }
+
+    70% { filter: brightness(0.1) saturate(1) blur(2px); }
+    80% { filter: brightness(0.8) saturate(1) blur(0); }
+    100% { filter: brightness(0.8) saturate(1.6) blur(0); }
+}
+@keyframes website-banner-foreground-idle-fade {
+    0% { filter: brightness(0.9) saturate(1) blur(0); }
+    20% { filter: brightness(0.9) saturate(1) blur(0); }
+    30% { filter: brightness(0.2) saturate(1.4) blur(1px) opacity(0); }
+
+    70% { filter: brightness(0.2) saturate(1.4) blur(1px) opacity(0); }
+    80% { filter: brightness(0.9) saturate(1) blur(0); }
+    100% { filter: brightness(0.9) saturate(1) blur(0); }
+}
+@keyframes website-banner-behind-logo-idle-fade {
+    0% { filter: brightness(0.0) opacity(0); transform: scale(0.5); }
+    20% { filter: brightness(0.0) opacity(0); transform: scale(0.5); }
+    30% { filter: brightness(1.2) opacity(100%); transform: scale(1.0); }
+
+    70% { filter: brightness(1.2) opacity(100%); transform: scale(1.0); }
+    80% { filter: brightness(0.0) opacity(0); transform: scale(0.5); }
+    100% { filter: brightness(0.0) opacity(0); transform: scale(0.5); }
+}
+@keyframes website-banner-logo-idle-fade {
+    0% { filter: brightness(1.0) blur(0); top: 0; }
+    20% { filter: brightness(1.0) blur(0); top: 0; }
+    30% { filter: brightness(0.1) blur(0.5px); top: 64px; }
+
+    70% { filter: brightness(0.1) blur(0.5px); top: 64px; }
+    80% { filter: brightness(1.0) blur(0); top: 0; }
+    100% { filter: brightness(1.0) blur(0); top: 0; }
+}
+#window .banner .banner_background {
+    filter: brightness(0.8) blur(0);
+    animation-name: website-banner-background-idle-fade;
+    animation-duration: 60s;
+    animation-timing-function: ease-in-out;
+    animation-delay: 4s;
+    animation-iteration-count: infinite;
+}
+#window .banner .banner_foreground {
+    filter: brightness(0.9) blur(0) opacity(1);
+    animation-name: website-banner-foreground-idle-fade;
+    animation-duration: 60s;
+    animation-timing-function: ease-in-out;
+    animation-delay: 4s;
+    animation-iteration-count: infinite;
+}
+#window .banner .credits:before {
+    filter: brightness(0.0) opacity(0);
+    transform: scale(0.5);
+    animation-name: website-banner-behind-logo-idle-fade;
+    animation-duration: 60s;
+    animation-timing-function: ease-in-out;
+    animation-delay: 4s;
+    animation-iteration-count: infinite;
+}
+#window .banner .credits > a {
+    top: 0;
+    filter: brightness(1.0);
+    animation-name: website-banner-logo-idle-fade;
+    animation-duration: 60s;
+    animation-timing-function: ease-in-out;
+    animation-delay: 4s;
+    animation-iteration-count: infinite;
+}
+
+
 #window .banner .userinfo {
     display: block;
     position: absolute;
@@ -1344,10 +1457,19 @@ button {
     width: 160px;
     height: 160px;
 }
+@keyframes page-body-sprite-bounce {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-1px); }
+    100% { transform: translateY(0); }
+}
 #window .page .body .subbody .sprite {
     display: block;
     position: static;
     margin: -24px 0 10px;
+}
+#window .page .body .subbody .float .sprite_animated {
+    transform: translateY(0);
+    animation: page-body-sprite-bounce 1.2s infinite;
 }
 #window .page .body .subbody .link,
 #window .page .body .subbody .link_inline {
@@ -1401,6 +1523,9 @@ button {
 
 #window .page .body .subbody_databaselinks {
     margin-bottom: 4px;
+}
+#window .page .body .subbody_databaselinks .float .sprite {
+    animation: none;
 }
 #window .page .body .subbody_databaselinks .float_link.incomplete {
     opacity: 0.25;
@@ -2803,19 +2928,19 @@ button {
     border-bottom-width: 2px;
 }
 #window .page .leaderboard .file_1st {
-    background-color: rgba(218, 178, 16, 0.75);
+    background-color: rgb(218, 178, 16);
     box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
     -moz-box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
     -webkit-box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
 }
 #window .page .leaderboard .file_2nd {
-    background-color: rgba(101, 108, 112, 0.75);
+    background-color: rgb(101, 108, 112);
     box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
     -moz-box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
     -webkit-box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
 }
 #window .page .leaderboard .file_3rd {
-    background-color: rgba(99, 61, 21, 0.75);
+    background-color: rgb(99, 61, 21);
     box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
     -moz-box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
     -webkit-box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
@@ -2839,6 +2964,7 @@ button {
     overflow: hidden;
     position: relative;
     z-index: 2;
+    animation-delay: none;
 }
 #window .page .leaderboard .file:hover .inset,
 #window .page .leaderboard .file .inset:hover {
@@ -2857,18 +2983,43 @@ button {
     background-color: transparent;
     /* IE9 SVG, needs conditional override of 'filter' to 'none' */
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjE1Ii8+CiAgICA8c3RvcCBvZmZzZXQ9IjElIiBzdG9wLWNvbG9yPSIjMDAwMDAwIiBzdG9wLW9wYWNpdHk9IjAuMTUiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjQ1Ii8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
-    background: -moz-linear-gradient(top,  rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.15) 1%, rgba(0,0,0,0.45) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.15)), color-stop(1%,rgba(0,0,0,0.15)), color-stop(100%,rgba(0,0,0,0.45))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.15) 1%,rgba(0,0,0,0.45) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.15) 1%,rgba(0,0,0,0.45) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.15) 1%,rgba(0,0,0,0.45) 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.15) 1%,rgba(0,0,0,0.45) 100%); /* W3C */
+    background: -moz-linear-gradient(top,  rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.15) 1%, rgba(0,0,0,0.25) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.15)), color-stop(1%,rgba(0,0,0,0.15)), color-stop(100%,rgba(0,0,0,0.25))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.15) 1%,rgba(0,0,0,0.25) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.15) 1%,rgba(0,0,0,0.25) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.15) 1%,rgba(0,0,0,0.25) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.15) 1%,rgba(0,0,0,0.25) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#26000000', endColorstr='#73000000',GradientType=0 ); /* IE6-8 */
     opacity: 1.0;
     transition: opacity 0.3s;
+    pointer-events: none;
 }
 #window .page .leaderboard .file .inset:hover:before {
     opacity: 0.8;
+}
+
+@keyframes leaderboard-inset-background-scroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 -934px; }
+}
+#window .page .leaderboard .file .inset:after {
+    z-index: 2;
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-color: transparent;
+    background-position: 0 0;
+    background-repeat: repeat;
+    background-size: 768px 934px;
+    background-image: url(../images/assets/prototype-background-2k23_stars-only.png);
+    animation: leaderboard-inset-background-scroll 120s linear infinite;
+    animation-delay: inherit;
 }
 
 /*
@@ -2888,7 +3039,7 @@ button {
 #window .page .leaderboard .file .points,
 #window .page .leaderboard .file .records {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     display: block;
     float: left;
     margin-left: 5px;
@@ -2910,6 +3061,11 @@ button {
     bottom: 16px;
     z-index: 3;
 }
+@keyframes leaderboard-avatar-wrapper-bounce {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-1px); }
+    100% { transform: translateY(0px); }
+}
 #window .page .leaderboard .file .avatar_wrapper {
     display: block;
     width: 40px;
@@ -2918,6 +3074,7 @@ button {
     position: relative;
     overflow: visible;
     pointer-events: none;
+    animation: leaderboard-avatar-wrapper-bounce 0.6s steps(1) infinite;
 }
 #window .page .leaderboard .file .avatar .sprite_80x80 {
     left: -14px;
@@ -2940,6 +3097,27 @@ button {
     -webkit-filter: brightness(0) blur(2px);
     filter: brightness(0) blur(2px);
 }
+
+
+#window .page .leaderboard .file:hover .avatar .sprite_80x80_base {
+    background-position: -80px 0;
+}
+#window .page .leaderboard .file:hover .avatar .sprite_160x160_base {
+    background-position: -160px 0;
+}
+
+
+#window .page .leaderboard .file:hover .avatar .sprite_80x80_taunt,
+#window .page .leaderboard .file:hover .avatar .sprite_80x80_summon,
+#window .page .leaderboard .file:hover .avatar .sprite_80x80_victory {
+    background-position: -800px 0;
+}
+#window .page .leaderboard .file:hover .avatar .sprite_160x160_taunt,
+#window .page .leaderboard .file:hover .avatar .sprite_160x160_summon,
+#window .page .leaderboard .file:hover .avatar .sprite_160x160_victory {
+    background-position: -1600px 0;
+}
+
 #window .page .leaderboard .file .place {
     display: block;
     float: left;
