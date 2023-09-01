@@ -159,6 +159,7 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_robot_rewards = array('robot_attack' => 9999, 'robot_defense' => 9999, 'robot_speed' => 9999);
 
         // Generate the challenge token based on available data
+        if (!isset($this_prototype_data['this_current_chapter'])){ $this_prototype_data['this_current_chapter'] = 9; } // challenges are apparently chapter 9
         $challenge_kind = $challenge_data['challenge_kind'];
         $challenge_xid = ($challenge_kind == 'user' ? 'u' : '').$challenge_data['challenge_id'];
         $challenge_token = $this_prototype_data['phase_battle_token'].'-'.$challenge_kind.'-'.$challenge_data['challenge_creator'].'-'.$challenge_xid;
