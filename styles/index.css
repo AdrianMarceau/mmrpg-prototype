@@ -458,24 +458,21 @@ button {
     opacity: 0.5;
 }
 
-
-
-
 @keyframes website-banner-background-idle-fade {
     0% { filter: brightness(0.8) saturate(1) blur(0); }
     20% { filter: brightness(0.8) saturate(1) blur(0); }
-    30% { filter: brightness(0.1) saturate(1.6) blur(2px); }
+    30% { filter: brightness(0.3) saturate(1.6) blur(2px); }
 
-    70% { filter: brightness(0.1) saturate(1) blur(2px); }
+    70% { filter: brightness(0.3) saturate(1) blur(2px); }
     80% { filter: brightness(0.8) saturate(1) blur(0); }
     100% { filter: brightness(0.8) saturate(1.6) blur(0); }
 }
 @keyframes website-banner-foreground-idle-fade {
     0% { filter: brightness(0.9) saturate(1) blur(0); }
     20% { filter: brightness(0.9) saturate(1) blur(0); }
-    30% { filter: brightness(0.2) saturate(1.4) blur(1px) opacity(0); }
+    30% { filter: brightness(0.4) saturate(1.4) blur(1px) opacity(0); }
 
-    70% { filter: brightness(0.2) saturate(1.4) blur(1px) opacity(0); }
+    70% { filter: brightness(0.4) saturate(1.4) blur(1px) opacity(0); }
     80% { filter: brightness(0.9) saturate(1) blur(0); }
     100% { filter: brightness(0.9) saturate(1) blur(0); }
 }
