@@ -3064,9 +3064,9 @@ function mmrpg_prototype_get_player_mission_music($player_token, $session_token 
 // Define a function for determining the music to play during each player's given chapter of the campaign
 function mmrpg_prototype_get_chapter_music($player_token, $data_chapter, $session_token = 'GAME'){
     $chapter_music = 'sega-remix/stage-select-mm1';
-    if ($data_chapter === 1){ $chapter_music = 'sega-remix/opening-3-mm9';  }
+    if ($data_chapter === 1){ $chapter_music = 'sega-remix/opening-2-mm9';  }
     elseif ($data_chapter === 2){ $chapter_music = mmrpg_prototype_get_player_mission_music($player_token, $session_token); }
-    elseif ($data_chapter === 3){ $chapter_music = 'sega-remix/opening-2-mm9';  }
+    elseif ($data_chapter === 3){ $chapter_music = 'sega-remix/opening-3-mm9';  }
     elseif ($data_chapter === 4){ $chapter_music = mmrpg_prototype_get_player_mission_music($player_token, $session_token); }
     elseif ($data_chapter === 5){ $chapter_music = 'sega-remix/wily-fortress-4-mm9';  }
     elseif ($data_chapter === 6){ $chapter_music = 'sega-remix/stage-select-mm7';  } // bonus
