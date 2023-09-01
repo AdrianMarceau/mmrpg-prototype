@@ -29,7 +29,8 @@
             "tooltip-open": "refill_mmii-gb",
             "tooltip-text": "atomic-fire-charge-b_mmi-gb",
             "shop-success": "selected_mmv-gb",
-            "zenny-spent": "refill_mmv-gb"
+            "zenny-spent": "refill_mmv-gb",
+            "glass-klink": "dink_mmii-gb"
         }
     },
 
