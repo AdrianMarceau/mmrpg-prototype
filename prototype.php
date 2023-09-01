@@ -696,7 +696,9 @@ $(document).ready(function(){
     if ($prototype_start_link === 'home'
         && !empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){
         $current_player = $_SESSION[$session_token]['battle_settings']['this_player_token'];
-        $autoplay_music = mmrpg_prototype_get_player_mission_music($current_player, $session_token);
+        //$autoplay_music = mmrpg_prototype_get_player_mission_music($current_player, $session_token);
+        $current_chapter = mmrpg_prototype_player_currently_selected_chapter($current_player);
+        $autoplay_music = mmrpg_prototype_get_chapter_music($current_player, $current_chapter, $session_token);
         if (empty($autoplay_music)){ $autoplay_music = 'misc/stage-select-'.$current_player; }
     }
     ?>
