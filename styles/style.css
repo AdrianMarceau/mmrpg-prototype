@@ -4685,16 +4685,14 @@ body.index #header {
     height: 100%;
     position: relative;
 }
-@keyframes battle-canvas-effect-glow {
-    0%, 100% { filter: opacity(0.1) blur(3px);  }
-    50% { filter: opacity(0.3) blur(6px);  }
-}
-#effects .canvas_border,
-#effects .actions_border {
+#effects .canvas_border {
     display: block;
     position: absolute;
+    top: 4px;
     left: 4px;
     right: 4px;
+    height: 612px;
+    filter: opacity(0.3) blur(1px);
     background-color: #2A2A2A;
     border: 0 none transparent;
     -moz-border-radius: 6px;
@@ -4702,17 +4700,6 @@ body.index #header {
     border-radius: 6px;
     filter: opacity(0.1) blur(3px);
     background-blend-mode: hue;
-    animation: battle-canvas-effect-glow 6s infinite;
-}
-#effects .canvas_border {
-    top: 4px;
-    height: 259px;
-    animation-delay: 0s;
-}
-#effects .actions_border {
-    bottom: 14px;
-    height: 213px;
-    animation-delay: -3s;
 }
 
 

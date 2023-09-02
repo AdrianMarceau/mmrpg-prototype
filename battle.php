@@ -908,7 +908,6 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             $temp_button_colours_string2 = 'type_'.implode('_', array_reverse($temp_button_colours));
             ?>
             <div class="canvas_border type <?= $temp_button_colours_string1 ?>"></div>
-            <div class="actions_border type <?= $temp_button_colours_string2 ?>"></div>
         </div>
     </div>
 
