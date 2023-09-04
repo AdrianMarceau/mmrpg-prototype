@@ -2373,7 +2373,7 @@ class rpg_canvas {
                 }
 
                 // ABILITY/ITEM/SKILL ANIMATION STUFF
-                //error_log('attempting to showing object animation stuff for '.$results_type.' with option keys '.print_r(array_keys(array_filter($this_options)), true));
+                //error_log('attempting to showing object animation stuff for $results_type ('.$results_type.') with option keys '.print_r(array_keys(array_filter($this_options)), true));
                 if (!empty($this_options['this_'.$results_type]) && !empty($this_options['canvas_show_this_'.$results_type])){
 
                     // If this is an ability, collect its markup
@@ -2382,20 +2382,48 @@ class rpg_canvas {
                         // Define the object data array and generate markup data
                         $attachment_options['data_type'] = 'ability';
                         $this_ability_data = $this_options['this_ability']->canvas_markup($this_options, $this_player_data, $this_robot_data);
+                        //error_log('generating canvas markup for ability animation stuff ('.$this_options['this_ability']->ability_token.')');
+                        //error_log('$this_options[\'this_ability_results\'][\'total_actions\'] = '.print_r($this_options['this_ability_results']['total_actions'], true));
+                        //error_log('$this_options[\'this_ability\']->flags[\'skip_canvas_header\'] = '.print_r((isset($this_options['this_ability']->flags['skip_canvas_header']) ? $this_options['this_ability']->flags['skip_canvas_header'] : 'undefined'), true));
 
                         // Display the object's icon sprite
                         if (empty($this_options['this_ability_results']['total_actions'])
                             && empty($this_options['this_ability']->flags['skip_canvas_header'])){
-                            $this_icon_image = !empty($this_options['this_ability']->ability_image) ? $this_options['this_ability']->ability_image : $this_options['this_ability']->ability_token;
-                            $this_icon_image2 = !empty($this_options['this_ability']->ability_image2) ? $this_options['this_ability']->ability_image2 : '';
-                            $this_icon_markup_left = '<div class="sprite ability_icon ability_icon_left" style="background-image: url(images/abilities/'.$this_icon_image.'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
-                            $this_icon_markup_right = '<div class="sprite ability_icon ability_icon_right" style="background-image: url(images/abilities/'.$this_icon_image.'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
-                            if (!empty($this_options['this_ability']->ability_image2)){
+                            $this_icon_image = false;
+                            $this_icon_image2 = false;
+                            if ($this_options['this_ability']->ability_class === 'master'){
+                                $this_icon_image = !empty($this_options['this_ability']->ability_image) ? $this_options['this_ability']->ability_image : $this_options['this_ability']->ability_token;
+                                $this_icon_image2 = !empty($this_options['this_ability']->ability_image2) ? $this_options['this_ability']->ability_image2 : '';
+                                $this_icon_size = !empty($this_options['this_ability']->ability_image_size) ? $this_options['this_ability']->ability_image_size : 40;
+                                $this_icon_sizex = $this_icon_size.'x'.$this_icon_size;
+                                $this_icon_image_path = 'images/abilities/'.$this_icon_image.'/icon_'.$this_robot_data['robot_direction'].'_'.$this_icon_sizex.'.png';
+                                $this_icon_image_path2 = $this_icon_image2 ? 'images/abilities/'.$this_icon_image2.'/icon_'.$this_robot_data['robot_direction'].'_'.$this_icon_sizex.'.png' : '';
+                            } elseif ($this_options['this_ability']->ability_class === 'mecha'
+                                || $this_options['this_ability']->ability_class === 'boss') {
+                                $this_icon_image = !empty($this_robot->robot_image) ? $this_robot->robot_image : 'robot';
+                                $this_icon_image2 = !empty($this_robot->robot_image2) ? $this_robot->robot_image2 : '';
+                                $this_icon_size = !empty($this_robot->robot_image_size) ? $this_robot->robot_image_size : 40;
+                                $this_icon_sizex = $this_icon_size.'x'.$this_icon_size;
+                                $this_icon_image_path = 'images/robots/'.$this_icon_image.'/mug_'.$this_robot_data['robot_direction'].'_'.$this_icon_sizex.'.png';
+                                $this_icon_image_path2 = $this_icon_image2 ? 'images/robots/'.$this_icon_image2.'/mug_'.$this_robot_data['robot_direction'].'_'.$this_icon_sizex.'.png' : '';
+                            } else {
+                                $this_icon_image = 'ability';
+                                $this_icon_image2 = '';
+                                $this_icon_size = 40;
+                                $this_icon_sizex = $this_icon_size.'x'.$this_icon_size;
+                                $this_icon_image_path = 'images/abilities/'.$this_icon_image.'/icon_'.$this_robot_data['robot_direction'].'_'.$this_icon_sizex.'.png';
+                                $this_icon_image_path2 = $this_icon_image2 ? 'images/abilities/'.$this_icon_image2.'/icon_'.$this_robot_data['robot_direction'].'_'.$this_icon_sizex.'.png' : '';
+                            }
+                            $this_icon_markup_left = '<div class="sprite ability_icon ability_icon_'.$this_icon_sizex.' ability_icon_left" style="background-image: url('.$this_icon_image_path.'?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
+                            $this_icon_markup_right = '<div class="sprite ability_icon ability_icon_'.$this_icon_sizex.' ability_icon_right" style="background-image: url('.$this_icon_image_path.'?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
+                            if (!empty($this_icon_image2)){
                                 $this_icon_markup_left .= str_replace('/'.$this_icon_image.'/', '/'.$this_icon_image2.'/', $this_icon_markup_left);
                                 $this_icon_markup_right .= str_replace('/'.$this_icon_image.'/', '/'.$this_icon_image2.'/', $this_icon_markup_right);
                             }
-                            $this_icon_markup_combined =  '<div class="'.$this_ability_data['ability_markup_class'].' canvas_ability_details ability_type type type_'.(!empty($this_options['this_ability']->ability_type) ? $this_options['this_ability']->ability_type : 'none').(!empty($this_options['this_ability']->ability_type2) ? '_'.$this_options['this_ability']->ability_type2 : '').'">'.$this_icon_markup_left.'<div class="ability_name">'.$this_ability_data['ability_title'].'</div>'.$this_icon_markup_right.'</div>';
+                            $this_icon_markup_type = (!empty($this_options['this_ability']->ability_type) ? $this_options['this_ability']->ability_type : 'none').(!empty($this_options['this_ability']->ability_type2) ? '_'.$this_options['this_ability']->ability_type2 : '');
+                            $this_icon_markup_combined =  '<div class="'.$this_ability_data['ability_markup_class'].' canvas_ability_details ability_type type type_'.$this_icon_markup_type.'">'.$this_icon_markup_left.'<div class="ability_name">'.$this_ability_data['ability_title'].'</div>'.$this_icon_markup_right.'</div>';
                             $this_underlay_markup .=  $this_icon_markup_combined;
+                            //error_log('-> with canvas header for ability details ('.$this_options['this_ability']->ability_token.')');
                         }
 
                         // Append this object's markup to the main markup array
