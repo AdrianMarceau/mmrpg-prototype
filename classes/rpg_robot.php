@@ -5964,6 +5964,16 @@ class rpg_robot extends rpg_object {
         $function_name = 'rpg-robot_check-items'.(!empty($phase) ? '_'.$phase : '');
         $this->trigger_custom_function($function_name, $extra_objects, $extra_item_info);
 
+        // Check if the item has been disabled and if we should show the lost-and-found message
+        $show_lost_and_found = false;
+        if (isset($this->counters['item_disabled'])){
+            $show_lost_and_found = true;
+            if (isset($this->flags['item_disabled_not_dropped'])){
+                if (!empty($this->flags['item_disabled_not_dropped'])){ $show_lost_and_found = false; }
+                unset($this->flags['item_disabled_not_dropped']);
+            }
+        }
+
         // If this robot has an item disabled counter, decrement it
         $item_disabled_ended = false;
         if (isset($this->counters['item_disabled'])){
@@ -5971,8 +5981,10 @@ class rpg_robot extends rpg_object {
             // If the counter has exactly one left, we can display the robot looking for the item
             if ($this->counters['item_disabled'] === 1){
                 // First show the robot turning around to pick up the item
+                $this_battle->queue_sound_effect('timer-sound');
                 $this->set_frame('defend');
-                $this->set_frame_styles('transform: scaleX(-1);');
+                if ($show_lost_and_found){ $this->set_frame_styles('transform: scaleX(-1); '); }
+                else { $this->set_frame_styles('transform: translateX(-5%); filter: brightness(0.9); '); }
                 $this_battle->events_create(false, false, '', '', array(
                     'event_flag_camera_action' => true,
                     'event_flag_camera_side' => $this->player->player_side,
@@ -5996,23 +6008,29 @@ class rpg_robot extends rpg_object {
         if ($item_disabled_ended){
 
             // Now show the robot re-equipping the picked up item
-            $temp_item = rpg_game::get_item($this_battle, $this->player, $this, array('item_token' => $this->robot_item), false);
-            $event_head = $this->robot_name.'\'s '.$temp_item->item_name;
-            $event_body = $this->print_name().' found '.$this->get_pronoun('possessive2').' dropped item!';
-            $event_body .= '<br /> The '.$temp_item->print_name().' was restored!';
-            $this->set_frame('taunt');
-            $this_battle->events_create($this_robot, false, $event_head, $event_body, array(
-                'this_item' => $temp_item,
-                'this_item_image' => $temp_item->item_image,
-                'canvas_show_this_item' => true,
-                'event_flag_camera_action' => true,
-                'event_flag_camera_side' => $this->player->player_side,
-                'event_flag_camera_focus' => $this->robot_position,
-                'event_flag_camera_depth' => $this->robot_key
-                ));
-            $this->reset_frame();
+            if ($show_lost_and_found){
+                $temp_item = rpg_game::get_item($this_battle, $this->player, $this, array('item_token' => $this->robot_item), false);
+                $event_head = $this->robot_name.'\'s '.$temp_item->item_name;
+                $event_body = $this->print_name().' found '.$this->get_pronoun('possessive2').' dropped item!';
+                $event_body .= '<br /> The '.$temp_item->print_name().' was restored!';
+                $this->set_frame('taunt');
+                $this_battle->queue_sound_effect('buff-received');
+                $this_battle->events_create($this_robot, false, $event_head, $event_body, array(
+                    'this_item' => $temp_item,
+                    'this_item_image' => $temp_item->item_image,
+                    'canvas_show_this_item' => true,
+                    'event_flag_camera_action' => true,
+                    'event_flag_camera_side' => $this->player->player_side,
+                    'event_flag_camera_focus' => $this->robot_position,
+                    'event_flag_camera_depth' => $this->robot_key
+                    ));
+                $this->reset_frame();
+            } else {
+                $this->set_frame_styles('');
+            }
 
             // Trigger this robot's item function if one has been defined for this context
+            $this_battle->queue_sound_effect('recovery-stats');
             $function_name = 'rpg-robot_check-items'.(!empty($phase) ? '_'.$phase : '');
             $this->trigger_custom_function($function_name, $extra_objects, $extra_item_info);
 
