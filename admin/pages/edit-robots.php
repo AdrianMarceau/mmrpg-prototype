@@ -844,7 +844,7 @@
                         <strong class="label">By Type</strong>
                         <select class="select" name="robot_core"><option value=""></option><?
                             foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                if ($type_info['type_class'] === 'special' && $type_token !== 'none'){ continue; }
+                                if ($type_info['type_class'] === 'special' && $type_token !== 'none' && $type_token !== 'empty'){ continue; }
                                 ?><option value="<?= $type_token ?>"<?= !empty($search_data['robot_core']) && $search_data['robot_core'] === $type_token ? ' selected="selected"' : '' ?>><?= $type_token === 'none' ? 'Neutral' : ucfirst($type_token) ?></option><?
                                 } ?>
                         </select><span></span>
@@ -1243,7 +1243,7 @@
                                             <option value=""<?= empty($robot_data['robot_core']) ? ' selected="selected"' : '' ?>>Neutral</option>
                                             <?
                                             foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                                if ($type_info['type_class'] === 'special'){ continue; }
+                                                if ($type_info['type_class'] === 'special' && $type_info['type_token'] !== 'none' && $type_info['type_token'] !== 'empty'){ continue; }
                                                 $label = $type_info['type_name'];
                                                 if (!empty($robot_data['robot_core']) && $robot_data['robot_core'] === $type_token){ $selected = 'selected="selected"'; }
                                                 else { $selected = ''; }

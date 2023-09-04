@@ -998,7 +998,7 @@
                                             <option value=""<?= empty($ability_data['ability_type']) ? ' selected="selected"' : '' ?>>Neutral</option>
                                             <?
                                             foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                                if ($type_info['type_class'] === 'special'){ continue; }
+                                                if ($type_info['type_class'] === 'special' && $type_info['type_token'] !== 'none' && $type_info['type_token'] !== 'empty'){ continue; }
                                                 $label = $type_info['type_name'];
                                                 if (!empty($ability_data['ability_type']) && $ability_data['ability_type'] === $type_token){ $selected = 'selected="selected"'; }
                                                 else { $selected = ''; }
