@@ -3,8 +3,9 @@
 // FORTRESS BOSS DATABASE
 
 // Define the index of counters for boss types
+$mmrpg_database_all_types = rpg_type::get_index(true);
 $mmrpg_database_bosses_types = array('cores' => array(), 'weaknesses' => array(), 'resistances' => array(), 'affinities' => array(), 'immunities' => array());
-foreach ($mmrpg_database_types AS $token => $info){
+foreach ($mmrpg_database_all_types AS $token => $info){
     $mmrpg_database_bosses_types['cores'][$token] = 0;
     $mmrpg_database_bosses_types['weaknesses'][$token] = 0;
     $mmrpg_database_bosses_types['resistances'][$token] = 0;
