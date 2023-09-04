@@ -290,11 +290,6 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 
                     // Display the markup of the background layer
                     $field_background_class = 'background_canvas has_pixels background background_00'.(!$flag_skip_fadein ? ' animate_fadein' : '');
-                    $field_background_style = 'background-color: #000000; background-image: url(images/fields/'.$this_field_data['field_background'].'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.');';
-                    echo '<div class="'.$field_background_class.'" style="'.$field_background_style.'" data-frame="00">&nbsp;</div>';
-
-                    // Display the markup of the background layer
-                    $field_background_class = 'background_canvas has_pixels background background_00'.(!$flag_skip_fadein ? ' animate_fadein' : '');
                     $field_background_style = 'background-color: #000000;';
                     if (!empty($this_field_data['field_background'])){
                         $image_name = 'battle-field_background_base';
