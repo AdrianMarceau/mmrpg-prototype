@@ -1877,6 +1877,9 @@ body.index #header {
     text-shadow: 1px 1px 4px #333333;
     text-overflow: ellipsis;
     z-index: 5100;
+    background-repeat: repeat !important;
+    background-position: 0 0 !important;
+    background-size: auto !important;
 }
 #canvas .canvas_battle_results .results_icon,
 #canvas .canvas_ability_details .ability_icon,
