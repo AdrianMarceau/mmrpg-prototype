@@ -96,9 +96,9 @@ if (!empty($this_battle->flags['starfield_mission'])
 
     // Generate the actual battle given the provided star info, whether fusion or field variety
     if (!empty($info) && !empty($info2) && $info['field'] != $info2['field']){
-        $temp_battle_omega = rpg_mission_double::generate($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $next_star_level, true, false, true);
+        $temp_battle_omega = rpg_mission_starfield::generate_double($this_prototype_data, array($info['robot'], $info2['robot']), array($info['field'], $info2['field']), $next_star_level, true, false, true);
     } elseif (!empty($info)){
-        $temp_battle_omega = rpg_mission_single::generate($this_prototype_data, $info['robot'], $info['field'], $next_star_level, true, false, true);
+        $temp_battle_omega = rpg_mission_starfield::generate_single($this_prototype_data, $info['robot'], $info['field'], $next_star_level, true, false, true);
     }
 
     //echo('$temp_battle_token = '.print_r($temp_battle_omega['battle_token'], true).PHP_EOL.PHP_EOL);

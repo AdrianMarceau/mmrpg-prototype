@@ -170,6 +170,7 @@ require('classes/rpg_mission_bonus.php');
 require('classes/rpg_mission_player.php');
 require('classes/rpg_mission_challenge.php');
 require('classes/rpg_mission_endless.php');
+require('classes/rpg_mission_starfield.php');
 require('classes/rpg_rogue_star.php');
 require('classes/rpg_type.php');
 require('classes/rpg_object.php');
