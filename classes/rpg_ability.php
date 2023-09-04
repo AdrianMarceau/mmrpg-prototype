@@ -3999,6 +3999,7 @@ class rpg_ability extends rpg_object {
         $this_attachment_info = array(
             'class' => 'ability',
             'ability_token' => $this_ability_token,
+            'ability_type' => $shield_type,
             'ability_image' => $this_attachment_image,
             'attachment_token' => $this_attachment_token,
             'attachment_duration' => $shield_duration + 1, // we do +1 so the summon turn doesn't count
