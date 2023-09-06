@@ -928,21 +928,23 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
 
         // Create a clone of this option's sprite element
         var tempSprite = $('.sprite.sprite_robot', thisOption.get(0));
-        if (tempSprite.hasClass('sprite_40x40')){ var tempSize = 40; }
-        else if (tempSprite.hasClass('sprite_80x80')){ var tempSize = 80; }
-        else if (tempSprite.hasClass('sprite_160x160')){ var tempSize = 160; }
+        var tempSpriteInner = tempSprite.find('.sprite');
+        if (tempSpriteInner.hasClass('sprite_40x40')){ var tempSize = 40; }
+        else if (tempSpriteInner.hasClass('sprite_80x80')){ var tempSize = 80; }
+        else if (tempSpriteInner.hasClass('sprite_160x160')){ var tempSize = 160; }
         var tempSizeSize = tempSize+'x'+tempSize;
         var tempSpriteKey = tokenParentCount - 1;
         var tempSpriteShift = parseInt($('.sprite[data-key="'+tempSpriteKey+'"]', tokenParent).css('right'));
-        if (tempSize == 80){ tempSpriteShift -= 20; }
+        //if (tempSize == 80){ tempSpriteShift -= 20; }
         //console.log('tempSize = '+tempSize+'; tempSpriteKey = '+tempSpriteKey+'; tempSpriteShift = '+tempSpriteShift+'; ');
 
-        var cloneSprite = $('<span class="sprite sprite_robot sprite_clone"></span>');
-        cloneSprite.addClass('sprite_'+tempSizeSize+' sprite_'+tempSizeSize+'_base');
+        var cloneSprite = $('<span class="sprite sprite_robot sprite_clone sprite_40x40"></span>');
+        var cloneSpriteInner = $('<span class="sprite sprite_'+tempSizeSize+' sprite_'+tempSizeSize+'_base"></span>');
         var cloneSpriteCSS = {right:tempSpriteShift+'px',left:'auto',bottom:'6px',zIndex:'2'};
-        cloneSpriteCSS['background-image'] = tempSprite.css('background-image');
-        cloneSpriteCSS['animation-duration'] = tempSprite.css('animation-duration');
+        var cloneSpriteInnerCSS = {backgroundImage: tempSpriteInner.css('background-image'), animationDuration: tempSpriteInner.css('animation-duration')};
         cloneSprite.css(cloneSpriteCSS);
+        cloneSpriteInner.css(cloneSpriteInnerCSS);
+        cloneSpriteInner.appendTo(cloneSprite);
         cloneSprite.appendTo(tokenParentLabel);
 
         // Hide the placeholder appropriate sprite
@@ -1194,9 +1196,6 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
                 //width:'120px'
                 margin: cloneOption.hasClass('option_this-team-select') ? '0 4px 0 260px' : '0 4px 0 20px',
                 width: 'auto'
-                });
-            cloneOption.find('.subtext').css({
-                fontSize:'8px'
                 });
             cloneOption.unbind('click');
             thisBanner.append(cloneOption);

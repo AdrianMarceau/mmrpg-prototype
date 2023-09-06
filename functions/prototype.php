@@ -1665,9 +1665,9 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 $temp_right = false;
                 $temp_layer = 100;
                 $temp_count = count($this_battleinfo['battle_sprite']);
-                $temp_last_size = 0;
                 $disable_hiding_robots = false;
                 if (MMRPG_CONFIG_IS_LIVE === false && MMRPG_CONFIG_DEBUG_MODE === true){ $disable_hiding_robots = true; }
+                $this_option_label .= '<span class="battle_sprites">';
                 foreach ($this_battleinfo['battle_sprite'] AS $temp_key => $this_battle_sprite){
                     $temp_opacity = $temp_layer == 10 ? 1 : 1 - ($temp_key * 0.09);
                     $temp_path = $this_battle_sprite['path'];
@@ -1677,7 +1677,6 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $temp_kind_token = isset($this_battle_sprite['token']) ? $this_battle_sprite['token'] : '';
                     $temp_other_styles = '';
                     if ($temp_shadow){
-                        //$temp_other_styles .= 'filter: contrast(0%) brightness(0%); ';
                         $temp_other_styles .= '-webkit-filter: grayscale(100%); filter: grayscale(100%); ';
                         $temp_opacity *= 0.5;
                         }
@@ -1689,39 +1688,22 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         }
                     $temp_frame = !empty($this_battle_sprite['frame']) ? $this_battle_sprite['frame'] : '';
                     $temp_size_text = $temp_size.'x'.$temp_size;
-                    $temp_top = -2 + (40 - $temp_size);
+                    $temp_top = -2;
                     if (!preg_match('/^(abilities|items)/i', $temp_path)){
                         if ($temp_right === false){
-
-                            if ($temp_size == 40){
-                                $temp_right_inc =  0;
-                                $temp_right += 18 + $temp_right_inc;
-                            } else {
-                                $temp_right_inc =  -1 * ceil(($temp_size - 40) * 0.5);
-                                $temp_right += 18 + $temp_right_inc;
-                            }
-
+                            $temp_right_inc =  0;
+                            $temp_right = 0;
+                            $temp_right += $temp_right_inc;
                         } else {
-                            if ($temp_size == 40){
-                                $temp_right_inc = ceil($temp_size * 0.5);
-                                $temp_right += $temp_right_inc;
-                            } else {
-                                $temp_right_inc = ceil(($temp_size - 40) * 0.5); //ceil($temp_size * 0.5);
-                                $temp_right += $temp_right_inc;
-                            }
-                            if ($temp_size > $temp_last_size){
-                                $temp_right -= ceil(($temp_size - $temp_last_size) / 2);
-                            } elseif ($temp_size < $temp_last_size){
-                                $temp_right += ceil(($temp_last_size - $temp_size) / 2);
-                            }
+                            $temp_right_inc = 20;
+                            $temp_right += $temp_right_inc;
                         }
                     } else {
-                        $temp_right = 5;
-                        if ($this_has_challenge_marker){ $temp_right = 30; }
+                        $temp_right = 0;
                     }
 
                     if (strstr($temp_path, 'challenge-marker')){
-                        $this_option_label .= '<span class="sprite sprite_'.$temp_kind.' sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: -3px; right: 15px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.'; '.$temp_other_styles.'">&nbsp;</span>';
+                        $this_option_label .= '<span class="sprite sprite_'.$temp_kind.' sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: -3px; right: -5px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.'; '.$temp_other_styles.'">&nbsp;</span>';
                     } elseif (preg_match('/^(abilities|items)/i', $temp_path)){
                         $this_option_label .= '<span class="sprite sprite_'.$temp_kind.' sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: 1px; right: -3px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.'; '.$temp_other_styles.'">&nbsp;</span>';
                     } else {
@@ -1731,12 +1713,14 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                             $temp_other_styles .= 'animation-duration: '.$robot_animation_duration.'s; ';
                             if ($this_option_complete){ $temp_other_styles .= 'animation-delay: '.(-1 * (($this_key + $temp_key) * 0.1)).'s; '; }
                         }
-                        $this_option_label .= '<span class="sprite sprite_'.$temp_kind.' sprite_'.$temp_size_text.' '.($this_option_complete && !$this_has_field_star && $this_option_frame == 'base' ? 'sprite_'.$temp_size_text.'_defeat ' : 'sprite_'.$temp_size_text.'_'.$this_option_frame.' ').'" style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_top.'px; right: '.$temp_right.'px; z-index: '.$temp_layer.'; filter: brightness('.$temp_opacity.'); '.$temp_other_styles.'">&nbsp;</span>';
+                        $this_option_label .= '<span class="sprite sprite_'.$temp_kind.' sprite_40x40 sprite_40x40_00" style="right: '.$temp_right.'px; z-index: '.$temp_layer.';">';
+                            $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' '.($this_option_complete && !$this_has_field_star && $this_option_frame == 'base' ? 'sprite_'.$temp_size_text.'_defeat ' : 'sprite_'.$temp_size_text.'_'.$this_option_frame.' ').'" style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.$temp_other_styles.'">&nbsp;</span>';
+                        $this_option_label .= '</span>';
                     }
 
                     $temp_layer -= 1;
-                    $temp_last_size = $temp_size;
                 }
+                $this_option_label .= '</span>';
             }
 
             if (!empty($this_battleinfo['battle_button'])){ $this_option_button_text = $this_battleinfo['battle_button']; }
@@ -1776,7 +1760,10 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         $this_option_label .= '<span class="subtext">'.$robots.' | ???? Ts | ???? Zs</span>';
                         $this_option_label .= '<span class="subtext2">All-Star Challenge Mission</span>';
                     } else {
-                        $this_option_label .= '<span class="maintext">'.$this_option_button_text.'</span>';
+                        $modded_this_option_button_text = $this_option_button_text;
+                        $modded_this_option_button_text = str_replace(' ', ' <br />', $modded_this_option_button_text);
+                        $modded_this_option_button_text = str_replace('<br />II', 'II', $modded_this_option_button_text);
+                        $this_option_label .= '<span class="maintext">'.$modded_this_option_button_text.'</span>';
                         $this_option_label .= '<span class="subtext">'.$this_option_level_range.'</span>';
                         $this_option_label .= '<span class="subtext2">'.$this_option_zenny_amount.'</span>';
                     }
@@ -2388,7 +2375,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_option_size = !empty($info['robot_image_size']) ? $info['robot_image_size'] : 40;
         $temp_size = $this_option_size;
         $temp_size_text = $temp_size.'x'.$temp_size;
-        $temp_sprite_top = -2 + (40 - $temp_size);
+        $temp_sprite_top = 0;
         $temp_right_inc = $temp_size > 40 ? ceil(($temp_size * 0.5) - 60) : 0;
         $temp_right = 15 + $temp_right_inc;
         $this_robot_name = $info['robot_name'];
@@ -2482,7 +2469,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_option_type_token = 'robot_type robot_type_'.($this_robot_core_or_none).(!empty($this_robot_core2) ? '_'.$this_robot_core2 : '');
 
         $stat_reward_icons = !empty($namestring) ? ' <span class="icons stats">'.$namestring.'</span>' : '';
-        if (!empty($stat_reward_icons)){ $temp_sprite_top -= 6; }
+        if (empty($stat_reward_icons)){ $temp_sprite_top += 6; }
         $pinned_fav_icons = $this_robot_favourite ? ' <span class="icons favs"><i class="fa fas fa-thumbtack"></i></span>' : '';
 
         $info_tooltip_icons = ' <span class="icons info color '.$this_robot_core_or_none.'" data-click-tooltip="'.$this_option_title_tooltip.'" data-tooltip-type="'.$this_option_type_token.'"><i class="fa fas fa-info-circle"></i></span>';
@@ -2495,7 +2482,10 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
             'robot_speed' => $this_robot_speed
             ));
 
-        $robot_sprite_markup = '<span class="sprite sprite_robot sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url('.$robot_sprite_url.'); top: '.$temp_sprite_top.'px; animation-duration: '.$robot_animation_duration.'s;"></span>';
+        $robot_sprite_markup = '';
+        $robot_sprite_markup .= '<span class="sprite sprite_robot sprite_40x40 sprite_40x40_base" style="top: '.$temp_sprite_top.'px;">';
+            $robot_sprite_markup .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url('.$robot_sprite_url.'); animation-duration: '.$robot_animation_duration.'s;"></span>';
+        $robot_sprite_markup .= '</span>';
 
         $robot_item_sprite_markup = '';
         if (!empty($this_robot_item_info)){
@@ -2505,6 +2495,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
 
         $this_option_label = '';
         $this_option_label .= $robot_sprite_markup;
+        //$this_option_label .= '<span class="battle_sprites">'.$robot_sprite_markup.'</span>';
         if (!empty($robot_item_sprite_markup)){ $this_option_label .= $robot_item_sprite_markup; }
         $this_option_label .= '<span class="multi">';
             $this_option_label .= $info_tooltip_icons;
@@ -3157,7 +3148,7 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
 
     global $db;
 
-    $temp_offset_x = 14;
+    $temp_offset_x = 5;
     $temp_offset_z = 50;
     $temp_offset_y = -2;
     $temp_offset_opacity = 0.75;
@@ -3199,14 +3190,15 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
         if (mmrpg_prototype_robot_unlocked($player_token, $token)){
             $temp_size = !empty($info['robot_image_size']) ? $info['robot_image_size'] : 40;
             $temp_size_text = $temp_size.'x'.$temp_size;
-            $temp_offset_x += $temp_size > 40 ? 0 : 20;
-            $temp_offset_y = $temp_size > 40 ? -42 : -2;
+            $temp_offset_x += 20;
+            $temp_offset_y = -2;
             $temp_offset_z -= 1;
             $temp_offset_opacity -= 0.04;
             if ($temp_offset_opacity <= 0){ $temp_offset_opacity = 0; }
             $temp_animation_direction = rpg_robot::get_css_animation_duration($index);
-            $text_sprites_markup .= '<span class="sprite sprite_robot sprite_nobanner sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url(images/robots/'.(!empty($info['robot_image']) ? $info['robot_image'] : $info['robot_token']).'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: '.$temp_offset_y.'px; right: '.$temp_offset_x.'px; z-index: '.$temp_offset_z.'; filter: brightness('.$temp_offset_opacity.'); animation-duration: '.$temp_animation_direction.'s;">'.$info['robot_name'].'</span>';
-            if ($temp_size > 40){ $temp_offset_x += 20;  }
+            $text_sprites_markup .= '<span class="sprite sprite_robot sprite_nobanner sprite_40x40 sprite_40x40_00" style="top: '.$temp_offset_y.'px; right: '.$temp_offset_x.'px; z-index: '.$temp_offset_z.'; filter: brightness('.$temp_offset_opacity.');">';
+                $text_sprites_markup .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url(images/robots/'.(!empty($info['robot_image']) ? $info['robot_image'] : $info['robot_token']).'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); animation-duration: '.$temp_animation_direction.'s;">'.$info['robot_name'].'</span>';
+            $text_sprites_markup .= '</span>';
             $sprites_displayed++;
             if (!empty($robot_limit)
                 && $sprites_displayed >= $robot_limit){

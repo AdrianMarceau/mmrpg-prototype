@@ -1093,19 +1093,19 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 
 #prototype .menu[data-select] .option_wrapper > .wrap .option_1x1,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x1 {
-    width: calc((100% / 4) - 8px);
+    width: calc((100% / 4) - 4px);
 }
 #prototype .menu[data-select] .option_wrapper > .wrap .option_1x2,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x2 {
-    width: calc((100% / 2) - 8px);
+    width: calc((100% / 2) - 4px);
 }
 #prototype .menu[data-select] .option_wrapper > .wrap .option_1x3,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x3 {
-    width: calc(((100% / 4) * 3) - 8px);
+    width: calc(((100% / 4) * 3) - 4px);
 }
 #prototype .menu[data-select] .option_wrapper > .wrap .option_1x4,
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container .option_1x4 {
-    width: calc(100% - 8px);
+    width: calc(100% - 4px);
 }
 #prototype .menu[data-select="this_player_robots"] .option_wrapper,
 #prototype .menu[data-select="this_player_robots"] .option_wrapper > .wrap {
@@ -1471,10 +1471,10 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     filter: brightness(0.9) saturate(1.0);
 }
 #prototype .option_wrapper_complete .option_complete {
-    opacity: 0.75;
+    /* opacity: 0.75;  */
 }
 #prototype .option_wrapper_complete .option_complete:hover {
-    opacity: 1.00;
+    /* opacity: 1.00;  */
 }
 
 #prototype .option_disabled {
@@ -1627,6 +1627,64 @@ body[data-source="website"] #prototype .menu {
     background-image: url(../images/menus/menu-options_this-dr-cossack-team-select.gif);
 }
 
+#mmrpg #prototype .option_this-player-select {
+
+}
+#mmrpg #prototype .option_this-battle-select {
+
+}
+#mmrpg #prototype .option_this-robot-select {
+
+}
+#mmrpg #prototype .option_this-player-select .battle_sprites,
+#mmrpg #prototype .option_this-battle-select .battle_sprites,
+#mmrpg #prototype .option_this-robot-select .battle_sprites {
+    display: block;
+    position: absolute;
+    z-index: 40;
+    width: 40px;
+    height: 40px;
+    bottom: 10px;
+    right: 20px;
+}
+#mmrpg #prototype .option_this-player-select .battle_sprites {
+
+}
+#mmrpg #prototype .option_this-battle-select .battle_sprites {
+
+}
+#mmrpg #prototype .option_this-robot-select .battle_sprites {
+
+}
+#mmrpg #prototype .option_this-player-select .battle_sprites .sprite .sprite,
+#mmrpg #prototype .option_this-battle-select .battle_sprites .sprite .sprite,
+#mmrpg #prototype .option_this-robot-select .battle_sprites .sprite .sprite {
+    display: block;
+    position: relative;
+    top: 0;
+    left: 0;
+}
+#mmrpg #prototype .option_this-player-select .battle_sprites .sprite .sprite_40x40,
+#mmrpg #prototype .option_this-battle-select .battle_sprites .sprite .sprite_40x40,
+#mmrpg #prototype .option_this-robot-select .battle_sprites .sprite .sprite_40x40 {
+    top: 0;
+    left: 0;
+}
+#mmrpg #prototype .option_this-player-select .battle_sprites .sprite .sprite_80x80,
+#mmrpg #prototype .option_this-battle-select .battle_sprites .sprite .sprite_80x80,
+#mmrpg #prototype .option_this-robot-select .battle_sprites .sprite .sprite_80x80 {
+    top: -40px;
+    left: -20px;
+}
+#mmrpg #prototype .option_this-player-select .battle_sprites .sprite .sprite_160x160,
+#mmrpg #prototype .option_this-battle-select .battle_sprites .sprite .sprite_160x160,
+#mmrpg #prototype .option_this-robot-select .battle_sprites .sprite .sprite_160x160 {
+    top: -120px;
+    left: -60px;
+}
+
+
+
 
 #mmrpg #prototype .option_this-robot-select {
 
@@ -1635,14 +1693,24 @@ body[data-source="website"] #prototype .menu {
     pointer-events: none;
     right: auto;
 }
-#mmrpg #prototype .option_this-robot-select .sprite_40x40 {
-    left: 5px;
+#mmrpg #prototype .option_this-robot-select .sprite .sprite {
+    position: relative;
 }
-#mmrpg #prototype .option_this-robot-select .sprite_80x80 {
-    left: -15px;
+#mmrpg #prototype .option_this-robot-select .sprite .sprite_40x40 {
+    left: 0;
+    top: 0;
+}
+#mmrpg #prototype .option_this-robot-select .sprite .sprite_80x80 {
+    left: -20px;
+    top: -40px;
+}
+#mmrpg #prototype .option_this-robot-select .sprite .sprite_160x160 {
+    left: -60px;
+    top: -120px;
 }
 #mmrpg #prototype .option_this-robot-select .sprite_robot {
     top: -8px;
+    left: 5px;
     z-index: 2;
 }
 
@@ -1663,7 +1731,7 @@ body[data-source="website"] #prototype .menu {
     text-align: center;
 }
 #mmrpg #prototype .option_this-robot-select .icons.stats {
-    bottom: 0;
+    bottom: 3px;
     left: 5px;
     font-size: 8px;
     letter-spacing: 1px;
@@ -1708,6 +1776,12 @@ body[data-source="website"] #prototype .menu {
     padding-left: 6px;
     border-left: 1px solid rgba(0, 0, 0, 0.2);
 }
+#mmrpg #prototype .option_this-robot-select .multi .maintext {
+    font-size: 90%;
+}
+#mmrpg #prototype .option_this-robot-select .multi .subtext {
+    font-size: 80%;
+}
 #mmrpg #prototype .option_this-robot-select .multi .maintext,
 #mmrpg #prototype .option_this-robot-select .multi .subtext,
 #mmrpg #prototype .option_this-robot-select .multi .subtext2 {
@@ -1734,9 +1808,9 @@ body[data-source="website"] #prototype .menu {
 }
 #prototype .option.option_this-team-select {
     position: absolute;
-    top: 55px;
-    left: 5px;
-    min-width: 750px;
+    top: 52px;
+    left: 7px;
+    width: calc((100% / 1) - 18px);
     animation: team-select-background-scroll 60s linear infinite;
 }
 #prototype .option.option_this-team-select:not(.option_disabled) {
@@ -1762,10 +1836,12 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_disabled.option_this-team-select .platform .sprite {
     filter: brightness(2.0) opacity(0.8);
 }
-#prototype .option_this-team-select .chrome label {
+#mmrpg #prototype .option_this-team-select .chrome label,
+#mmrpg #prototype .option_this-team-select:hover .chrome label {
     width: 100px !important;
     margin-left: 460px !important;
     padding-left: 0 !important;
+    min-height: 5em;
 }
 #prototype .option_this-team-select .chrome label .sprite_40x40_heartback {
     bottom: 4px;
@@ -1778,8 +1854,29 @@ body[data-source="website"] #prototype .menu {
     font-size: 24px;
     transition: color 0.3s;
 }
+#prototype .option_this-team-select .chrome label .sprite_40x40_heartback > i {
+    line-height: 1.75em;
+}
 #prototype .option_this-team-select.option_disabled .chrome label .sprite_40x40_heartback {
     color: #696969;
+}
+#prototype .option_this-team-select .chrome .inset label .single {
+    line-height: 4em;
+}
+#prototype .option_this-team-select .chrome label .sprite_robot .sprite {
+    position: relative;
+}
+#prototype .option_this-team-select .chrome label .sprite_robot .sprite_40x40 {
+    left: 0;
+    top: 0;
+}
+#prototype .option_this-team-select .chrome label .sprite_robot .sprite_80x80 {
+    left: -20px;
+    top: -40px;
+}
+#prototype .option_this-team-select .chrome label .sprite_robot .sprite_160x160 {
+    left: -40px;
+    top: -120px;
 }
 
 /* write an animation that makes the arrow pulse larger and smaller */
@@ -1828,29 +1925,29 @@ body[data-source="website"] #prototype .menu {
     75% { transform: translateY(-1px); background-position: -360px 0px; }
     100% { transform: translateY(0px); background-position: 0px 0px; }
 }
-#mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_robot {
+#mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_robot .sprite  {
     transform: translateY(0px);
     animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
 }
-#mmrpg #prototype .option_this-battle-select:not(.option_complete) .sprite_robot {
+#mmrpg #prototype .option_this-battle-select:not(.option_complete) .sprite_robot .sprite  {
     transform: translateY(0px);
     animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
 }
-#mmrpg #prototype .option_this-battle-select.option_complete .sprite_robot {
+#mmrpg #prototype .option_this-battle-select.option_complete .sprite_robot .sprite  {
     transform: translate(0, 0) scale(1.0);
     filter: brightness(1.0);
     animation: option-robot-sprite-darken 0.6s infinite;
     animation-delay: 1s;
 }
-#mmrpg #prototype .option_this-player-select:not(.option_disabled) .sprite_robot {
+#mmrpg #prototype .option_this-player-select:not(.option_disabled) .sprite_robot .sprite {
     transform: translateY(0px);
     animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
 }
-#prototype .banner .option_1x1 div label.has_image .sprite_player {
+#prototype .banner .option_1x1 div label.has_image .sprite_player .sprite {
     transform: translateY(0px);
     animation: option-player-sprite-bounce 1s steps(1) infinite;
 }
-#prototype .banner .option_1x1.is_running div label.has_image .sprite_player {
+#prototype .banner .option_1x1.is_running div label.has_image .sprite_player .sprite  {
     transform: translateY(0px);
     animation: option-player-sprite-run 0.6s steps(1) infinite;
 }
@@ -1929,27 +2026,26 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_1x2,
 #prototype .option_1x3,
 #prototype .option_1x4 {
-    /*
-    height: 73px;
-    line-height: 73px;
-    */
     margin-right: 3px;
-
-    height: 68px;
-    line-height: 68px;
-
+    height: auto;
+    line-height: 1;
+    box-sizing: border-box;
 }
 #prototype .option_1x1 {
     width: 181px;
+    width: calc((100% / 4) - 3px);
 }
 #prototype .option_1x2 {
     width: 369px;
+    width: calc((100% / 2) - 3px);
 }
 #prototype .option_1x3 {
     width: 557px;
+    width: calc((100% / 3) - 3px);
 }
 #prototype .option_1x4 {
     width: 745px;
+    width: calc((100% / 1) - 3px);
 }
 
 #prototype .option_scroll {
@@ -2090,8 +2186,8 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_1x4 .chrome {
     display: block;
     margin: 0;
-    height: 52px;
-    line-height: 52px;
+    height: 100%;
+    line-height: 1;
     padding: 8px;
     border: 0 solid transparent;
     background-image: -webkit-gradient(
@@ -2110,6 +2206,7 @@ body[data-source="website"] #prototype .menu {
     border-radius: 0.60em;
     -moz-border-radius: 0.60em;
     -webkit-border-radius: 0.60em;
+    box-sizing: border-box;
 }
 #prototype .option_1x1 .platform,
 #prototype .option_1x2 .platform,
@@ -2160,19 +2257,24 @@ body[data-source="website"] #prototype .menu {
             linear,
             left bottom,
             left top,
-            color-stop(0.75, rgba(255, 255, 255, 0.05)),
-            color-stop(0.15, rgba(0, 0, 0, 0.05))
-
-    );
+            color-stop(0.75, rgba(26, 26, 26, 0.40)),
+            color-stop(0.15, rgba(0, 0, 0, 0.60))
+        );
     background-image: -moz-linear-gradient(
             center bottom,
-            rgba(255, 255, 255, 0.05) 15%,
-            rgba(0, 0, 0, 0.05) 75%
-    );
+            rgba(26, 26, 26, 0.40) 15%,
+            rgba(0, 0, 0, 0.60) 75%
+        );
+    background-image: linear-gradient(
+            to top,
+            rgba(26, 26, 26, 0.40) 15%,
+            rgba(0, 0, 0, 0.60) 75%
+        );
     cursor: pointer;
-    height: 50px;
-    line-height: 50px;
+    height: 100%;
+    line-height: 1;
     overflow: visible;
+    box-sizing: border-box;
 }
 
 
@@ -2182,7 +2284,9 @@ body[data-source="website"] #prototype .menu {
     overflow: hidden;
 }
 #prototype .option_message .inset .multi .maintext {
-    top: 2px;
+    top: 0;
+    font-size: 100%;
+    line-height: 1.4;
 }
 
 #prototype .option_1x1 div label,
@@ -2201,50 +2305,21 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_1x2 div label:hover,
 #prototype .option_1x3 div label:hover,
 #prototype .option_1x4 div label:hover {
+    text-shadow: 1px 1px 1px #000000;
     background-color: transparent;
     border-color: transparent;
     box-shadow: none;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
     display: block;
-    height: 13px;
-    line-height: 13px;
     margin: 0 auto;
     padding: 0 7px;
     text-align: center;
-    /*width: 106px;*/
     width: auto;
-    height: 44px;
-    line-height: 44px;
-    text-shadow: 1px 1px 1px #000000;
+    height: 100%;
+    min-height: 5.6em;
+    line-height: 1;
 }
-
-/*
-#prototype .option_1x1 div label,
-#prototype .option_1x1:hover div label,
-#prototype .option_1x1 div:hover label,
-#prototype .option_1x1 div label:hover {
-    width: 150px;
-}
-#prototype .option_1x2 div label,
-#prototype .option_1x2:hover div label,
-#prototype .option_1x2 div:hover label,
-#prototype .option_1x2 div label:hover {
-    width: 150px;
-}
-#prototype .option_1x3 div label,
-#prototype .option_1x3:hover div label,
-#prototype .option_1x3 div:hover label,
-#prototype .option_1x3 div label:hover {
-    width: 150px;
-}
-#prototype .option_1x4 div label,
-#prototype .option_1x4:hover div label,
-#prototype .option_1x4 div:hover label,
-#prototype .option_1x4 div label:hover {
-    width: 150px;
-}
-*/
 
 #prototype .option_1x1 div label.has_image,
 #prototype .option_1x2 div label.has_image,
@@ -2313,11 +2388,13 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_1x3 div label .multi,
 #prototype .option_1x4 div label .multi {
     display: block;
+    font-size: 11px;
     line-height: 11px;
     text-align: left;
     top: 1px;
     bottom: 1px;
     height: 100%;
+    box-sizing: border-box;
 }
 #prototype .option_1x1 div label .info[data-click-tooltip],
 #prototype .option_1x2 div label .info[data-click-tooltip],
@@ -2350,17 +2427,24 @@ body[data-source="website"] #prototype .menu {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 11px;
-    line-height: 13px;
+    font-size: 110%;
+    line-height: 1.6;
     font-weight: bold;
     top: 3px;
     z-index: 20;
+    box-sizing: border-box;
+}
+#prototype .option_1x1 div label .maintext br,
+#prototype .option_1x2 div label .maintext br,
+#prototype .option_1x3 div label .maintext br,
+#prototype .option_1x4 div label .maintext br {
+    display: none;
 }
 #prototype .option_1x1 div label .maintext {
-    font-size: 9px;
+    font-size: 100%;
 }
 #prototype .option_1x2 div label .maintext {
-    font-size: 10px;
+    font-size: 105%;
 }
 #prototype .option_1x1 div label .icons {
     position: absolute;
@@ -2388,17 +2472,19 @@ body[data-source="website"] #prototype .menu {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 9px;
-    line-height: 11px;
+    font-size: 90%;
+    line-height: 1.4;
+    top: 38%;
     opacity: 0.8;
-    top: 16px;
     z-index: 20;
+    box-sizing: border-box;
 }
 #prototype .option_1x1 div label .subtext2,
 #prototype .option_1x2 div label .subtext2,
 #prototype .option_1x3 div label .subtext2,
 #prototype .option_1x4 div label .subtext2 {
-    top: 28px;
+    top: 66%;
+    font-size: 80%;
 }
 
 #prototype .option_1x1 div label .arrow,
@@ -2409,7 +2495,8 @@ body[data-source="website"] #prototype .menu {
     margin: 0;
     padding: 0;
     position: absolute;
-    top: 0;
+    top: 50%;
+    transform: translateY(-50%);
     right: 5px;
     width: 1em;
     overflow: visible;
@@ -2462,28 +2549,38 @@ body[data-source="website"] #prototype .menu {
 
 /* STAR FIELD OPTION STYLES */
 
-#prototype .option_wrapper .option_1x1.starfield div label.has_image,
-#prototype .option_wrapper .option_1x2.starfield div label.has_image,
-#prototype .option_wrapper .option_1x3.starfield div label.has_image,
-#prototype .option_wrapper .option_1x4.starfield div label.has_image,
-#prototype .option_wrapper .option_1x1.starfield div label.no_image,
-#prototype .option_wrapper .option_1x2.starfield div label.no_image,
-#prototype .option_wrapper .option_1x3.starfield div label.no_image,
-#prototype .option_wrapper .option_1x4.starfield div label.no_image {
+#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.has_image,
+#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.has_image,
+#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.has_image,
+#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.has_image,
+#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.no_image,
+#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.no_image,
+#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.no_image,
+#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.no_image {
     position: relative;
     box-sizing: border-box;
     width: 40px;
 }
-#prototype .option_wrapper .option_1x1.starfield div label .multi,
-#prototype .option_wrapper .option_1x2.starfield div label .multi,
-#prototype .option_wrapper .option_1x3.starfield div label .multi,
-#prototype .option_wrapper .option_1x4.starfield div label .multi {
+#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.has_image .battle_sprites,
+#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.has_image .battle_sprites,
+#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.has_image .battle_sprites,
+#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.has_image .battle_sprites,
+#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.no_image .battle_sprites,
+#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.no_image .battle_sprites,
+#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.no_image .battle_sprites,
+#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.no_image .battle_sprites {
+    right: -5px;
+}
+#mmrpg #prototype .option_wrapper .option_1x1.starfield div label .multi,
+#mmrpg #prototype .option_wrapper .option_1x2.starfield div label .multi,
+#mmrpg #prototype .option_wrapper .option_1x3.starfield div label .multi,
+#mmrpg #prototype .option_wrapper .option_1x4.starfield div label .multi {
     display: none;
 }
-#prototype .option_wrapper .option_1x1.starfield div label.no_image .arrow,
-#prototype .option_wrapper .option_1x2.starfield div label.no_image .arrow,
-#prototype .option_wrapper .option_1x3.starfield div label.no_image .arrow,
-#prototype .option_wrapper .option_1x4.starfield div label.no_image .arrow {
+#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.no_image .arrow,
+#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.no_image .arrow,
+#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.no_image .arrow,
+#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.no_image .arrow {
     padding-right: calc(50% - 12px);
 }
 
@@ -2508,10 +2605,10 @@ body[data-source="website"] #prototype .menu {
   4%, 6% { transform: translate(2px, 2px) rotate(4deg); }
   10% { transform: translate(0, 0) rotate(0); }
 }
-#prototype .option_wrapper .option_1x1.starfield.starshake div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x2.starfield.starshake div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x3.starfield.starshake div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x4.starfield.starshake div label.has_image .sprite_star {
+#mmrpg #prototype .option_wrapper .option_1x1.starfield.starshake div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x2.starfield.starshake div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x3.starfield.starshake div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x4.starfield.starshake div label.has_image .sprite_star {
 
     transform: translate(0, 0), rotate(0);
     transition: transform 0.3s;
@@ -2533,18 +2630,18 @@ body[data-source="website"] #prototype .menu {
     animation-delay: 0s;
 
 }
-#prototype .option_wrapper .option_1x1:nth-child(odd).starfield.starshake div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x2:nth-child(odd).starfield.starshake div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x3:nth-child(odd).starfield.starshake div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x4:nth-child(odd).starfield.starshake div label.has_image .sprite_star {
+#mmrpg #prototype .option_wrapper .option_1x1:nth-child(odd).starfield.starshake div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x2:nth-child(odd).starfield.starshake div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x3:nth-child(odd).starfield.starshake div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x4:nth-child(odd).starfield.starshake div label.has_image .sprite_star {
     -moz-animation-name: starshakeB;
     -webkit-animation-name: starshakeB;
     animation-name: starshakeB;
 }
-#prototype .option_wrapper .option_1x1.starfield.starshake.dx div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x2.starfield.starshake.dx div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x3.starfield.starshake.dx div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x4.starfield.starshake.dx div label.has_image .sprite_star {
+#mmrpg #prototype .option_wrapper .option_1x1.starfield.starshake.dx div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x2.starfield.starshake.dx div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x3.starfield.starshake.dx div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x4.starfield.starshake.dx div label.has_image .sprite_star {
     -moz-animation-delay: 0.1s;
     -webkit-animation-delay: 0.1s;
     animation-delay: 0.1s;
@@ -2553,10 +2650,10 @@ body[data-source="website"] #prototype .menu {
     animation-name: starshakeX;
 }
 
-#prototype > div:not(.banner) .option_1x1.starfield div label .info[data-click-tooltip],
-#prototype > div:not(.banner) .option_1x2.starfield div label .info[data-click-tooltip],
-#prototype > div:not(.banner) .option_1x3.starfield div label .info[data-click-tooltip],
-#prototype > div:not(.banner) .option_1x4.starfield div label .info[data-click-tooltip] {
+#mmrpg #prototype > div:not(.banner) .option_1x1.starfield div label .info[data-click-tooltip],
+#mmrpg #prototype > div:not(.banner) .option_1x2.starfield div label .info[data-click-tooltip],
+#mmrpg #prototype > div:not(.banner) .option_1x3.starfield div label .info[data-click-tooltip],
+#mmrpg #prototype > div:not(.banner) .option_1x4.starfield div label .info[data-click-tooltip] {
     right: -200%;
     right: calc(-200% - 3px);
 }
@@ -2567,14 +2664,14 @@ body[data-source="website"] #prototype .menu {
   66% { transform: translate(0, 0); }
   100% { transform: translate(0, 0); }
 }
-#prototype .option_wrapper .option_1x1.starfield div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x2.starfield div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x3.starfield div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x4.starfield div label.has_image .sprite_star,
-#prototype .banner .option_1x1.starfield div label.has_image .sprite_star,
-#prototype .banner .option_1x2.starfield div label.has_image .sprite_star,
-#prototype .banner .option_1x3.starfield div label.has_image .sprite_star,
-#prototype .banner .option_1x4.starfield div label.has_image .sprite_star {
+#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.has_image .sprite_star,
+#mmrpg #prototype .banner .option_1x1.starfield div label.has_image .sprite_star,
+#mmrpg #prototype .banner .option_1x2.starfield div label.has_image .sprite_star,
+#mmrpg #prototype .banner .option_1x3.starfield div label.has_image .sprite_star,
+#mmrpg #prototype .banner .option_1x4.starfield div label.has_image .sprite_star {
 
     transform: translate(0, 0);
     transition: none;
@@ -2604,10 +2701,10 @@ body[data-source="website"] #prototype .menu {
     animation-name: mission-sprite-starfield-hover;
 
 }
-#prototype .option_wrapper .option_1x1.starfield:hover div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x2.starfield:hover div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x3.starfield:hover div label.has_image .sprite_star,
-#prototype .option_wrapper .option_1x4.starfield:hover div label.has_image .sprite_star {
+#mmrpg #prototype .option_wrapper .option_1x1.starfield:hover div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x2.starfield:hover div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x3.starfield:hover div label.has_image .sprite_star,
+#mmrpg #prototype .option_wrapper .option_1x4.starfield:hover div label.has_image .sprite_star {
 
     -moz-animation-duration: 2s;
     -webkit-animation-duration: 2s;
@@ -2856,3 +2953,211 @@ body[data-source="website"] #prototype .menu {
 #mmrpg.index[data-cinema-mode="true"] #winmods {
     filter: brightness(0.6);
 }
+
+
+/* CINEMATIC CHAPTER BUTTON STYLES */
+
+
+/*
+
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"],
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="4"] {
+    width: calc((100% / 3) - 3px);
+    height: 26em;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="1"] {
+    width: calc((100% / 4) - 3px);
+    height: calc((26em / 2) - 3px);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="2"] {
+    width: calc((100% / 1) - 3px);
+    height: 26em;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"] {
+    width: calc((100% / 2) - 3px);
+    height: calc((26em / 2) - 3px);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .platform {
+    filter: none;
+    background-position: center 4em;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="4"]
+    ) .battle_sprites {
+    transform: scale(3);
+    transform-origin: bottom right;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="1"], [data-chapter="3"]
+    ) .battle_sprites {
+    transform: scale(2);
+    transform-origin: bottom right;
+    right: 30%;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="2"]
+    ) .battle_sprites {
+    transform: scale(4);
+    transform-origin: bottom right;
+    right: 36%;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"].block_2 .battle_sprites {
+    right: 12%;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"].block_3 .battle_sprites,
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"].block_4 .battle_sprites,
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="4"].block_22 .battle_sprites {
+    right: 30%;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .arrow {
+    font-size: 160%;
+    display: none;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="2"], [data-chapter="4"]
+    ) .multi {
+    font-size: 20px;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="1"]
+    ) .multi {
+    font-size: 16px;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="3"]
+    ) .multi {
+    font-size: 18px;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .maintext {
+    white-space: break-spaces;
+    text-align: center;
+    top: 10%;
+    right: 0;
+    width: 100%;
+    box-sizing: border-box;
+    left: 0;
+    filter: brightness(0.6);
+    transition: filter 0.3s;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ):hover .maintext {
+    filter: brightness(1.0);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .maintext br {
+    display: inline;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .subtext,
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .subtext2 {
+    display: none;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot {
+    right: -5px !important;
+    transform: translateX(0);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot.sprite_80x80 {
+    right: -25px !important;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot.sprite_160x160 {
+    right: -45px !important;
+}
+
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot:nth-child(1) {
+    transform: translateX(0);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot:nth-child(2) {
+    transform: translateX(-40%);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot:nth-child(3) {
+    transform: translateX(-80%);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot:nth-child(4) {
+    transform: translateX(-120%);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot:nth-child(5) {
+    display: none;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot:nth-child(6) {
+    display: none;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot:nth-child(7) {
+    display: none;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot:nth-child(8) {
+    display: none;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite_robot:nth-child(9) {
+    display: none;
+}
+
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"] .battle_sprites .sprite_robot:nth-child(1) {
+    transform: translateX(0) translateY(0);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"] .battle_sprites .sprite_robot:nth-child(2) {
+    transform: translateX(-30%) translateY(0);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"] .battle_sprites .sprite_robot:nth-child(3) {
+    transform: translateX(-60%) translateY(0);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"] .battle_sprites .sprite_robot:nth-child(4) {
+    transform: translateX(-52%) translateY(-8%);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"] .battle_sprites .sprite_robot:nth-child(5) {
+    transform: translateX(-28%) translateY(-8%);
+    display: block;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"] .battle_sprites .sprite_robot:nth-child(6) {
+    transform: translateX(-8%) translateY(-8%);
+    display: block;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"] .battle_sprites .sprite_robot:nth-child(7) {
+    transform: translateX(-18%) translateY(-16%);
+    display: block;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"] .battle_sprites .sprite_robot:nth-child(8) {
+    transform: translateX(-38%) translateY(-16%);
+    display: block;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"] .battle_sprites .sprite_robot:nth-child(9) {
+    transform: translateX(-44%) translateY(-24%);
+    display: block;
+}
+
+
+*/
