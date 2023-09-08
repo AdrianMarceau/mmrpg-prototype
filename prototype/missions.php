@@ -450,6 +450,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     $temp_before_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6];
                     $temp_before_final_option['battle_description'] = 'Defeat the army of robot master clones augmented with darkness energy!';
 
+                    /*
                     // Collect and define the robot masters and support mechas to appear on this field
                     $temp_robot_masters = array();
                     $temp_support_mechas = array();
@@ -461,6 +462,19 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         if (!empty($temp_field_info['field_master'])){ $temp_robot_masters[] = $temp_field_info['field_master']; }
                         if (!empty($temp_field_info['field_mechas'])){ $temp_support_mechas[] = array_pop($temp_field_info['field_mechas']); }
                     }
+                    */
+
+                    // Define the "asteroid" robot masters (alt10) that should appear in Slur's pre-battle
+                    $temp_asteroid_robots = array('slash-man', 'cold-man', 'gravity-man', 'napalm-man', 'plant-man', 'stone-man', 'sword-man', 'yamato-man');
+
+                    // Decide how many robots to pull into this battle depending on player
+                    $asteroid_tier = 0;
+                    if ($this_prototype_data['this_player_token'] == 'dr-light'){ $asteroid_tier = 2; }
+                    elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){ $asteroid_tier = 4; }
+                    elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){ $asteroid_tier = 8; }
+                    shuffle($temp_asteroid_robots);
+                    $temp_robot_masters = array_slice($temp_asteroid_robots, 0, $asteroid_tier);
+                    $temp_support_mechas = array('sniper-joe', 'skeleton-joe', 'crystal-joe');
 
                     // Define randomized hold item options based on player
                     $item_tier = 0;
@@ -494,8 +508,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         $info = array();
                         $info['robot_id'] = ($key + 1); // temp, is changed later
                         $info['robot_token'] = $token;
-                        $info['robot_name'] = $index['robot_name'].' Σ';
-                        $info['robot_image'] = $token.'_alt9';
+                        //$info['robot_name'] = $index['robot_name'].' Σ';
+                        //$info['robot_image'] = $token.'_alt9';
+                        $info['robot_name'] = $index['robot_name'].' ☆';
+                        $info['robot_image'] = $token.'_alt10';
                         $info['robot_level'] = $temp_before_final_option['battle_level'] - 5;
                         $info['robot_core'] = 'empty';
                         if (!empty($item_options)){ $info['robot_item'] = $item_options[mt_rand(0, $item_max_key)]; }
