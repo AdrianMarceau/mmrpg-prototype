@@ -2673,6 +2673,13 @@ class rpg_robot extends rpg_object {
             $core_type_token4 = str_replace('-subcore', '', $this_robot['robot_skill']);
         }
 
+        // If the robot is an EMPTY type, they do not adhere normal weapon energy mechanics
+        if ($core_type_token === 'empty'
+            || $core_type_token2 === 'empty'){
+            $core_type_token = $ability_type_token;
+            $core_type_token2 = $ability_type_token2;
+        }
+
         // Check this ability's FIRST type for multiplier matches
         if (!empty($ability_type_token)){
 
