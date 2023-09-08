@@ -2008,18 +2008,19 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     if (!empty($temp_battle_omega['flags']['starfield_mission'])){ $is_starfield_mission = true; }
 
     // Define the number of mechas + abilities to add based on player + phase
+    $num_support_mechas = $battle_phase > 1 ? 4 : 3;
     if ($player_token == 'dr-light'){
-        $num_support_mechas = $battle_phase > 1 ? 4 : 3;
+        //$num_support_mechas = $battle_phase > 1 ? 4 : 3;
         $num_mecha_abilities = $battle_phase > 1 ? 2 : 1;
         $super_block_position = false;
     } elseif ($player_token == 'dr-wily'){
-        $num_support_mechas = $battle_phase > 1 ? 5 : 4;
+        //$num_support_mechas = $battle_phase > 1 ? 5 : 4;
         $num_mecha_abilities = $battle_phase > 1 ? 3 : 2;
-        $super_block_position = $battle_phase > 1 ? 'right-active' : false;
+        $super_block_position = $battle_phase > 1 ? 'right-bench' : false;
     } elseif ($player_token == 'dr-cossack'){
-        $num_support_mechas = $battle_phase > 1 ? 6 : 5;
+        //$num_support_mechas = $battle_phase > 1 ? 6 : 5;
         $num_mecha_abilities = $battle_phase > 1 ? 4 : 3;
-        $super_block_position = $battle_phase > 1 ? 'right' : 'right-active';
+        $super_block_position = $battle_phase > 1 ? 'right' : false;
     }
 
     // Collect details about this battle field
@@ -2029,12 +2030,22 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
 
     /* REMOVE DEFAULT MECHAS */
 
+    // Create an array to hold any robots that were intentionally added for the alpha battle
+    $temp_added_alpha_robots = array();
+
     // First and foremost, remove and previously added mecha from the battle
     $temp_player_robots = $temp_battle_omega['battle_target_player']['player_robots'];
     foreach ($temp_player_robots AS $key => $robot_info){
         $robot_token = $robot_info['robot_token'];
         $index_info = $mmrpg_index_robots[$robot_token];
         if ($index_info['robot_class'] == 'mecha'){
+            unset($temp_player_robots[$key]);
+            continue;
+        }
+        if (!empty($robot_info['flags'])
+            && !empty($robot_info['flags']['robot_is_visitor'])){
+            //error_log('robot_is_visitor for '.$robot_token);
+            $temp_added_alpha_robots[] = $robot_info;
             unset($temp_player_robots[$key]);
             continue;
         }
@@ -2048,6 +2059,9 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     /* GENERATE ALPHA BATTLE (MECHAS) */
 
     // Clone the omega battle and then adjust some variables, then remove robot masters
+    $temp_include_visitor_robot = false;
+    $temp_include_doctor_mecha = $battle_kind === 'double' && !$is_starfield_mission ? true : false;
+    if (!empty($temp_added_alpha_robots)){ $temp_include_visitor_robot = true; $temp_include_doctor_mecha = false;  }
     $temp_battle_alpha = array_merge(array(), $temp_battle_omega);
     $temp_battle_alpha['battle_token'] = $temp_battle_omega['battle_token'].'-alpha';
     $temp_battle_alpha['battle_complete_redirect_token'] = $temp_battle_omega['battle_token'];
@@ -2060,13 +2074,24 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     $temp_player_id = $temp_battle_alpha['battle_target_player']['player_id'];
     $temp_player_robots = array();
     $temp_mecha_options = $temp_battle_omega['battle_field_base']['field_mechas'];
+    if ($temp_include_doctor_mecha){
+        array_unshift($temp_mecha_options, rpg_player::get_support_mecha($this_prototype_data['this_player_token'], false));
+        //error_log('(t2) $temp_mecha_options = '.print_r($temp_mecha_options, true));
+    }
     $temp_mecha_options_num = count($temp_mecha_options);
     $temp_mecha_options_maxkey = $temp_mecha_options_num - 1;
     $temp_mecha_counters = array();
     for ($i = 0; $i < $num_support_mechas; $i++){
-        if ($temp_mecha_options_maxkey > 0){ $option_key = (($i + 1) % $temp_mecha_options_num); }
-        else { $option_key = 0; }
-        $mecha_token = $temp_mecha_options[$option_key];
+        if ($temp_include_doctor_mecha
+            && $i === 0){
+            $mecha_token = array_shift($temp_mecha_options);
+            $temp_mecha_options_num = count($temp_mecha_options);
+            $temp_mecha_options_maxkey = $temp_mecha_options_num - 1;
+        } else {
+            if ($temp_mecha_options_maxkey > 0){ $option_key = (($i + 1) % $temp_mecha_options_num); }
+            else { $option_key = 0; }
+            $mecha_token = $temp_mecha_options[$option_key];
+        }
         $index_info = $mmrpg_index_robots[$mecha_token];
         $robot_info = array();
         $robot_info['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $index_info['robot_id'], ($i + 1));
@@ -2075,31 +2100,39 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
         $robot_info['robot_abilities'] = mmrpg_prototype_generate_abilities($index_info, $robot_info['robot_level'], $num_mecha_abilities, '');
         if (!isset($temp_mecha_counters[$mecha_token])){ $temp_mecha_counters[$mecha_token] = 0; }
         $temp_mecha_counters[$mecha_token] += 1;
-        if (!empty($index_info['robot_image_alts'])){
-            if ($temp_mecha_counters[$mecha_token] == 1
-                || ($battle_phase == 1
-                    && $num_support_mechas > 3
-                    && $temp_mecha_counters[$mecha_token] > 1
-                    && $temp_mecha_counters[$mecha_token] % 2 != 0)){
-                $temp_alt_key = $battle_phase > 1 ? 0 : -1;
-            } else {
-                $temp_alt_key = $battle_phase > 1 ? 1 : 0;
-            }
-            if (isset($index_info['robot_image_alts'][$temp_alt_key])){
-                $temp_alt = $index_info['robot_image_alts'][$temp_alt_key];
-                $temp_image = $robot_info['robot_token'].'_'.$temp_alt['token'];
-                $robot_info['robot_image'] = $temp_image;
-                //$best_stat = rpg_robot::get_best_stat($index_info);
-                //$robot_info['counters'][$best_stat.'_mods'] = ($temp_alt_key + 2);
-                $robot_info['robot_name'] = $index_info['robot_name'].' '.($temp_alt_key + 2);
-                $robot_info['robot_name'] = preg_replace('/\s([a-z0-9])\s([a-z0-9])$/i', ' $1$2', $robot_info['robot_name']);
+        $temp_player_robots[] = $robot_info;
+    }
+    // If there are visitor robots, place them somewhere on the bench
+    if ($temp_include_visitor_robot){
+        // If there's exactly one visitor robot, place it in the middle of the bench
+        if (count($temp_added_alpha_robots) === 1){
+            // odd-numbered robots, so replace the middle robot
+            $key_to_replace = ceil(($num_support_mechas - 1) / 2);
+            $temp_player_robots[$key_to_replace] = $temp_added_alpha_robots[0];
+        }
+        // Otherwise if there are exactly two robots, place them at each end
+        elseif (count($temp_added_alpha_robots) === 2){
+            $temp_player_robots[1] = $temp_added_alpha_robots[0];
+            $temp_player_robots[$num_support_mechas - 1] = $temp_added_alpha_robots[1];
+        }
+        // Otherwise, simply replace every-other benched robot until we've reached the limit
+        else {
+            $key_to_replace = 1;
+            foreach ($temp_added_alpha_robots AS $robot_info){
+                $temp_player_robots[$key_to_replace] = $robot_info;
+                $key_to_replace += 2;
             }
         }
-        $temp_player_robots[] = $robot_info;
     }
     //shuffle($temp_player_robots);
     //$temp_player_robots = array_values($temp_player_robots);
+    $temp_battle_alpha['battle_target_player']['player_switch'] = 1.5;
     $temp_battle_alpha['battle_target_player']['player_robots'] = $temp_player_robots;
+    if ($temp_include_visitor_robot || $temp_include_doctor_mecha){
+        //error_log('(t2) $temp_mecha_counters = '.print_r($temp_mecha_counters, true));
+        //error_log('(t2) $temp_battle_alpha[\'battle_field_base\'][\'field_mechas\'] = '.print_r($temp_battle_alpha['battle_field_base']['field_mechas'], true));
+        //error_log('(t2) $temp_battle_alpha[\'battle_target_player\'][\'player_robots\'] = '.print_r($temp_battle_alpha['battle_target_player']['player_robots'], true));
+    }
 
     // Update the zenny and turns for this alpha mecha battle
     if (isset($temp_battle_alpha['battle_zenny'])){ $temp_battle_alpha['battle_zenny'] = ceil($temp_battle_alpha['battle_zenny'] * 0.10); }
