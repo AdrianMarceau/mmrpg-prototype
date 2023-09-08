@@ -1171,7 +1171,9 @@
                                             echo('<option value=""'.(empty($ability_data['ability_master']) ? 'selected="selected"' : '').'>- none -</option>');
                                             $last_option_group = false;
                                             foreach ($mmrpg_robots_index AS $robot_token => $robot_info){
-                                                if ($robot_info['robot_class'] !== $this_ability_class){ continue; }
+                                                //if ($robot_info['robot_class'] !== $this_ability_class){ continue; }
+                                                if ($this_ability_class === 'mecha' && $robot_info['robot_class'] !== 'mecha'){ continue; }
+                                                if ($robot_info['robot_class'] === 'mecha' && $this_ability_class !== 'mecha'){ continue; }
                                                 $class_group = (ucfirst($robot_info['robot_class']).(substr($robot_info['robot_class'], -2, 2) === 'ss' ? 'es' : 's')).' | '.$robot_info['robot_group'];
                                                 if ($last_option_group !== $class_group){
                                                     if (!empty($last_option_group)){ $robot_options_markup[] = '</optgroup>'; }
