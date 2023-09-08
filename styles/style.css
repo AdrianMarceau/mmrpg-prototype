@@ -4695,14 +4695,14 @@ body.index #header {
     left: 4px;
     right: 4px;
     height: 612px;
-    filter: opacity(0.3) blur(1px);
     background-color: #2A2A2A;
     border: 0 none transparent;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     border-radius: 6px;
-    filter: opacity(0.1) blur(3px);
-    background-blend-mode: hue;
+    filter: opacity(0.2);
+    mix-blend-mode: color;
+    background-blend-mode: color;
 }
 
 
