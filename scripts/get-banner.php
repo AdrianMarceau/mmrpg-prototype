@@ -328,7 +328,7 @@ if ($request_kind === 'event'){
         }
 
     }
-    // Else if the player has requested the banner for unlocking CHAPTER 5 (The Final Battles)
+    // Else if the player has requested the banner for unlocking CHAPTER 5 (The Final Destination)
     elseif ($request_event === 'chapter-5-unlocked'){
 
         // Construct the banner config for the given event banner
