@@ -1165,6 +1165,8 @@
                                         <?
                                         $data_path = '';
                                         $data_backup_path = '';
+                                        $mmrpg_music_rootdir = '';
+                                        $mmrpg_music_rooturl = '';
                                         if (!empty($field_data['field_music'])){
                                             $mmrpg_music_path = 'prototype/sounds/';
                                             $mmrpg_music_rootdir = MMRPG_CONFIG_CDN_ROOTDIR.$mmrpg_music_path;
