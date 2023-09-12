@@ -65,7 +65,7 @@ elseif ($image_data['action'] == 'delete' && !$image_data['exists']){ js_exit('e
 // Ensure the main folder is created for this file
 if (!file_exists(MMRPG_CONFIG_ROOTDIR.$image_data['path'])){
     @mkdir(MMRPG_CONFIG_ROOTDIR.$image_data['path']);
-    @chown(MMRPG_CONFIG_ROOTDIR.$image_data['path'], 'mmrpgworld');
+    @chown(MMRPG_CONFIG_ROOTDIR.$image_data['path'], MMRPG_CONFIG_SERVER_USER);
 }
 
 // Initialize the image utility object
@@ -283,7 +283,7 @@ elseif ($image_data['action'] == 'delete'){
 
     // Return success of error by checking that the file has been added to the destination
     if ($unlink_success){ js_exit('success','file-removed', json_encode(array('updated' => $updated_image_files))); }
-    else { js_exit('error','remove-error', 'error-code-'.$copy_status);  }
+    else { js_exit('error','remove-error', 'error-code-'.$unlink_success);  }
 
 }
 
