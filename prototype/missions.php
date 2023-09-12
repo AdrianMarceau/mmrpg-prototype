@@ -147,6 +147,21 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         }
 
+        /*
+        // DEBUG DEBUG DEBUG
+
+        // GENERATE DOC ROBOT BATTLE
+        // Generate a single battle against a specific robot master
+        $temp_battle_omega = rpg_mission_single::generate($this_prototype_data, 'doc-robot', 'robot-museum', $this_prototype_data['this_chapter_levels'][1]);
+        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+        $temp_battle_omega['battle_field_base']['field_background_variant'] = 'mm1';
+        $temp_battle_omega['battle_size'] = '1x4';
+        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+        $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+        // DEBUG DEBUG DEBUG
+        */
+
     }
 
 
@@ -274,7 +289,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $this_prototype_data['battle_options'][] = array(
             'option_type' => 'message',
             'option_chapter' => $this_prototype_data['this_current_chapter'],
-            'option_maintext' => 'Chapter Five : The Final Battles'
+            'option_maintext' => 'Chapter Five : The Final Destination'
             );
 
         // Collect information on this prototype player so we can use it later
