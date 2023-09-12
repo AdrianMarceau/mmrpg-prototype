@@ -1207,13 +1207,19 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
         // If this was a mission select, update the banner background image
         if (thisSelect == 'this_battle_token'){
             // Change the background image based on the current option data
-            var newBackgroundImage = 'url(images/fields/'+thisOption.attr('data-background')+'/battle-field_background_base.gif?'+gameSettings.cacheTime+')';
+            var newBackgroundToken = thisOption.attr('data-background');
+            var backgroundFileToken = 'battle-field_background_base';
+            if (typeof thisOption.attr('data-background-variant') !== 'undefined'){ backgroundFileToken += '_'+thisOption.attr('data-background-variant'); }
+            var newBackgroundImage = 'url(images/fields/'+newBackgroundToken+'/'+backgroundFileToken+'.gif?'+gameSettings.cacheTime+')';
             var oldBannerBackground = $('.banner_background', thisBanner);
             oldBannerBackground.stop();
             var newBannerBackground = $('<div class="sprite background banner_background" style="opacity: 0; z-index: 11; background-position: center -30px; background-image: '+newBackgroundImage+';">&nbsp;</div>');
             newBannerBackground.insertAfter(oldBannerBackground).animate({opacity:1.0},{duration:1000,easing:'swing',queue:false,complete:function(){ oldBannerBackground.remove(); $(this).css({zIndex:''}); }});
             // Change the foreground image based on the current option data
-            var newForegroundImage = 'url(images/fields/'+thisOption.attr('data-foreground')+'/battle-field_foreground_base.png?'+gameSettings.cacheTime+')';
+            var newForegroundToken = thisOption.attr('data-foreground');
+            var foregroundFileToken = 'battle-field_foreground_base';
+            if (typeof thisOption.attr('data-foreground-variant') !== 'undefined'){ foregroundFileToken += '_'+thisOption.attr('data-foreground-variant'); }
+            var newForegroundImage = 'url(images/fields/'+newForegroundToken+'/'+foregroundFileToken+'.png?'+gameSettings.cacheTime+')';
             var oldBannerForeground = $('.banner_foreground', thisBanner);
             oldBannerForeground.stop();
             var newBannerForeground = $('<div class="sprite background banner_foreground" style="opacity: 0; z-index: 21; background-position: center -30px; background-image: '+newForegroundImage+';">&nbsp;</div>');
