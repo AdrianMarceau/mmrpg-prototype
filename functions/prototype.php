@@ -1943,7 +1943,9 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 'data-description="'.htmlentities(($this_battleinfo['battle_description'].(!empty($this_battleinfo['battle_description2']) ? ' '.$this_battleinfo['battle_description2'] : '')), ENT_QUOTES, 'UTF-8', true).'" '.
                 'data-multipliers="'.$temp_field_multipliers.'" '.
                 'data-background="'.(!empty($this_fieldinfo['field_background']) ? $this_fieldinfo['field_background'] : '').'" '.
+                (!empty($this_fieldinfo['field_background_variant']) ? 'data-background-variant="'.$this_fieldinfo['field_background_variant'].'" ' : '').
                 'data-foreground="'.(!empty($this_fieldinfo['field_foreground']) ? $this_fieldinfo['field_foreground'] : '').'" '.
+                (!empty($this_fieldinfo['field_foreground_variant']) ? 'data-foreground-variant="'.$this_fieldinfo['field_foreground_variant'].'" ' : '').
                 'style="'.$this_option_style.(!empty($this_info['option_style']) ? ' '.$this_info['option_style'] : '').'" '.
                 '>';
                 $this_markup .= '<div class="platform" style="'.$this_option_platform_style.'">';
