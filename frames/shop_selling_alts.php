@@ -59,6 +59,7 @@
                 $alt_symbol_index['alt7'] = 'μ';
                 $alt_symbol_index['alt8'] = 'π';
                 $alt_symbol_index['alt9'] = 'Σ';
+                $alt_symbol_index['alt10'] = '☆';
 
                 // Define the base URL for all shop item images
                 $composite_sprite_config = array('kind' => 'robots', 'image' => 'mug_right_40x40', 'size' => 40, 'frame' => 0, 'alt' => 'all', 'class' => 'master');
