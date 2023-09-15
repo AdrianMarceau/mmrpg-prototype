@@ -543,7 +543,7 @@ class rpg_canvas {
                 'data-scale="'.$this_data['robot_scale'].'" '.
                 '></div>';
 
-            // If this robot has any overlays, display them too (like for Mega Man and Copy Core robots when they pallet-swap)
+            // If this robot has any overlays, display them too (like for Mega Man and Copy Core robots when they [used to] pallet-swap)
             if (!empty($this_data['robot_image_overlay'])){
                 foreach ($this_data['robot_image_overlay'] AS $key => $overlay_token){
                     if (empty($overlay_token)){ continue; }

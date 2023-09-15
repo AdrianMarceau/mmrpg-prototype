@@ -1688,7 +1688,7 @@
                                         // Otherwise, if this is a copy robot, append based on all the types in the index
                                         if ($has_elemental_alts){
                                             foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                                if (empty($type_token) || $type_token == 'none' || $type_token == 'copy' || $type_info['type_class'] == 'special'){ continue; }
+                                                if (empty($type_token) || $type_token == 'none' || $type_token == 'copy' || $type_info['type_class'] !== 'normal'){ continue; }
                                                 $temp_alts_array[] = array('token' => $type_token, 'name' => $robot_data['robot_name'].' ('.ucfirst($type_token).' Core)', 'summons' => 0, 'colour' => $type_token);
                                             }
                                         }

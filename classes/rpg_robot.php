@@ -82,7 +82,10 @@ class rpg_robot extends rpg_object {
                 if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$this_robotinfo = rpg_robot::get_index_info({$this_robotinfo['robot_token']}); on line ".__LINE__;  }
                 $token = $this_robotinfo['robot_token'];
                 $this_robotinfo = rpg_robot::get_index_info($token);
-                if (!is_array($this_robotinfo)){ error_log('$this_robotinfo is not an array! robot token was: '.$token.' (from '.__FILE__.' on line '.__LINE__.')'); }
+                if (!is_array($this_robotinfo)){
+                    error_log('$this_robotinfo is not an array! robot token was: '.$token.' (from '.__FILE__.' on line '.__LINE__.')');
+                    $this_robotinfo = rpg_robot::get_index_info('robot');
+                }
                 $this_robotinfo = array_replace($this_robotinfo, $this_robotinfo_backup);
             }
         }
@@ -1994,7 +1997,7 @@ class rpg_robot extends rpg_object {
         global $db;
 
         // Update this robot's history with the triggered ability
-        $this->history['triggered_abilities'][] = $this_ability->ability_token;
+        $this->add_history('triggered_abilities', $this_ability->ability_token);
 
         // Reset the ability options to default
         $this_ability->ability_results_reset();
@@ -2007,31 +2010,25 @@ class rpg_robot extends rpg_object {
         else { $temp_ability_energy = $this->calculate_weapon_energy($this_ability); }
 
         // Decrease this robot's weapon energy
-        $this->robot_weapons = $this->robot_weapons - $temp_ability_energy;
-        if ($this->robot_weapons < 0){ $this->robot_weapons = 0; }
-        $this->update_session();
+        $new_robot_weapons = $this->robot_weapons - $temp_ability_energy;
+        if ($this->robot_weapons < 0){ $new_robot_weapons = 0; }
+        $this->set_weapons($new_robot_weapons);
 
         // Default this and the target robot's frames to their base
-        $this->robot_frame = 'base';
-        $target_robot->robot_frame = 'base';
+        $this->set_frame('base');
+        $target_robot->set_frame('base');
 
         // Default the robot's stances to attack/defend
-        $this->robot_stance = 'attack';
-        $target_robot->robot_stance = 'defend';
+        $this->set_stance('attack');
+        $target_robot->set_stance('defend');
 
         // If this is a copy core robot and the ability type does not match its core
         $temp_image_changed = false;
         $temp_ability_type = !empty($this_ability->ability_type) ? $this_ability->ability_type : '';
         $temp_ability_type2 = !empty($this_ability->ability_type2) ? $this_ability->ability_type2 : $temp_ability_type;
-        if (!empty($temp_ability_type)
-            && $this->robot_base_core === 'copy'
-            && $temp_ability_type !== 'copy'
-            && !strstr($this->robot_base_image, '_')){
-            $this->robot_image_overlay['copy_type1'] = $this->robot_base_image.'_'.$temp_ability_type.'2';
-            $this->robot_image_overlay['copy_type2'] = $this->robot_base_image.'_'.$temp_ability_type2.'3';
-            $this->update_session();
-            $temp_image_changed = true;
-        }
+        $this->add_history('triggered_abilities_types', array_unique(array($temp_ability_type, $temp_ability_type2)));
+        //error_log($this->robot_token.' uses '.$this_ability->ability_token.' w/ t1:'.$temp_ability_type.' t2:'.$temp_ability_type2);
+        //error_log('-> triggered_abilities_types = '.print_r($this->history['triggered_abilities_types'], true));
 
         // Copy the ability function to local scope and execute it
         $this_ability_function = $this_ability->ability_function;
@@ -2043,27 +2040,15 @@ class rpg_robot extends rpg_object {
                 )));
         }
 
-
-        // If this robot's image has been changed, reveert it back to what it was
-        if ($temp_image_changed){
-            unset($this->robot_image_overlay['copy_type1']);
-            unset($this->robot_image_overlay['copy_type2']);
-            $this->update_session();
-        }
-
         // DEBUG DEBUG DEBUG
         // Update this ability's history with the triggered ability data and results
-        $this_ability->history['ability_results'][] = $this_ability->ability_results;
+        $this_ability->add_history('ability_results', $this_ability->ability_results);
         // Update this ability's history with the triggered ability damage options
-        $this_ability->history['ability_options'][] = $this_ability->ability_options;
+        $this_ability->add_history('ability_options', $this_ability->ability_options);
 
         // Reset the robot's stances to the base
-        $this->robot_stance = 'base';
-        $target_robot->robot_stance = 'base';
-
-        // Update internal variables
-        $target_robot->update_session();
-        $this_ability->update_session();
+        $this->set_stance('base');
+        $target_robot->set_stance('base');
 
 
         // -- CHECK ATTACHMENTS -- //
@@ -2074,7 +2059,7 @@ class rpg_robot extends rpg_object {
         if (!empty($this_attachments)){
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
             $db_ability_fields = rpg_ability::get_index_fields(true);
-            $temp_attachments_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+            $temp_attachments_index = $db->get_array_list("SELECT {$db_ability_fields} FROM `mmrpg_index_abilities` WHERE `ability_flag_complete` = 1;", 'ability_token');
             foreach ($this_attachments AS $attachment_token => $attachment_info){
 
                 // Ensure this ability has a type before checking weaknesses, resistances, etc.
@@ -3151,14 +3136,37 @@ class rpg_robot extends rpg_object {
             $this->$prop_stat = $new_value;
         }
 
-        // If this is a Copy type robot, make sure their colour is synced to held item
-        if ($this->robot_base_core == 'copy'){
-            $this->robot_image = $this->robot_base_image;
+        // If this is a Copy Core robot, make sure their colour is synced to abilities and held items
+        $sync_to_elemental_energy = false;
+        if ($this->robot_base_core === 'copy'
+            && $this->robot_base_image === $this->robot_token){
+            $sync_to_elemental_energy = true;
+        }
+
+        // If we're syncing this robot's outfit to their elemental energy, let's check that now
+        if ($sync_to_elemental_energy){
+            //error_log('We must $sync_to_elemental_energy for '.$this->robot_token);
+            // If this robot is holding an elemental core, that takes priority
             if (!empty($this->robot_item)
                 && substr($this->robot_item, -5, 5) === '-core'){
                 list($core_type) = explode('-', $this->robot_item);
                 $this->robot_image = $this->robot_base_image.'_'.$core_type;
+                //error_log('-> using held item '.$this->robot_item.' for new image '.$this->robot_image);
             }
+            // Otherwise, if they've used any abilities, check the most recent one
+            elseif (!empty($this->history['triggered_abilities_types'])){
+                // collect the array (which contains nested arrays of 1 or 2 lenth, type1 and type2 if exists)
+                $triggered_abilities_types = array_reverse($this->history['triggered_abilities_types']);
+                foreach ($triggered_abilities_types AS $key => $types){
+                    if (empty($types)){ continue; }
+                    $ability_type = $types[0];
+                    if (!empty($ability_type)){ $this->robot_image = $this->robot_base_image.'_'.$ability_type; }
+                    else { $this->robot_image = $this->robot_base_image; }
+                    //error_log('-> using last ability type '.$ability_type.' for new image '.$this->robot_image);
+                    break;
+                }
+            }
+
         }
 
         // Reset this robot's elemental properties back to base
