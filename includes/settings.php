@@ -164,11 +164,11 @@ define('MMRPG_SETTINGS_GAMESTORY3_STARTLEVEL', 19); // The level the third playe
 
 // Define the global counters for missions in each campaign
 define('MMRPG_SETTINGS_CHAPTER0_MISSIONS', 0);  // Void
-define('MMRPG_SETTINGS_CHAPTER1_MISSIONS', 3);  // Intro
-define('MMRPG_SETTINGS_CHAPTER2_MISSIONS', 8);  // Masters
-define('MMRPG_SETTINGS_CHAPTER3_MISSIONS', 1);  // Rivals
-define('MMRPG_SETTINGS_CHAPTER4_MISSIONS', 4);  // Fusions
-define('MMRPG_SETTINGS_CHAPTER5_MISSIONS', 3);  // Finals
+define('MMRPG_SETTINGS_CHAPTER1_MISSIONS', 3);  // Intro (Met + Joe + Trill)
+define('MMRPG_SETTINGS_CHAPTER2_MISSIONS', 9);  // Masters (x8 Masters + Doc)
+define('MMRPG_SETTINGS_CHAPTER3_MISSIONS', 3);  // Rivals (Hero + Killer + King)
+define('MMRPG_SETTINGS_CHAPTER4_MISSIONS', 5);  // Fusions (x4 Fusions + Genesis)
+define('MMRPG_SETTINGS_CHAPTER5_MISSIONS', 3);  // Finals (Terra + Dark + Slur)
 
 // Define the global counters for missions in each campaign
 define('MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT', MMRPG_SETTINGS_CHAPTER1_MISSIONS);                                         // 1   (Intro)
