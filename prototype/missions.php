@@ -17,6 +17,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // Define a reusable array + function to keep track of this specific groups of battles and their status for unlocking purposes
     $this_battle_options_groups = array();
+    $new_group_name = function(){
+        //error_log('new_group_name()');
+        global $this_prototype_data;
+        $new_group_name = '';
+        $new_group_name .= 'p'.$this_prototype_data['this_player_number'];
+        $new_group_name .= 'c'.($this_prototype_data['this_current_chapter'] + 1);
+        return $new_group_name;
+        };
     $new_battle_options_group = function($name){
         //error_log('new_battle_options_group($name:'.print_r($name, true).')');
         global $this_prototype_data, $this_battle_options_groups;

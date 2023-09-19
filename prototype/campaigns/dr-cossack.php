@@ -4,6 +4,7 @@
 
 // Define the robot options and counter for this mode
 $this_prototype_data['this_player_token'] = 'dr-cossack';
+$this_prototype_data['this_player_number'] = 3;
 $this_prototype_data['this_intro_field'] = 'wintry-forefront';
 $this_prototype_data['this_player_field'] = 'cossack-citadel';
 $this_prototype_data['this_support_robot'] = 'rhythm';

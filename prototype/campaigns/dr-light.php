@@ -4,6 +4,7 @@
 
 // Define the robot options and counter for this mode
 $this_prototype_data['this_player_token'] = 'dr-light';
+$this_prototype_data['this_player_number'] = 1;
 $this_prototype_data['this_intro_field'] = 'gentle-countryside';
 $this_prototype_data['this_player_field'] = 'light-laboratory';
 $this_prototype_data['this_support_robot'] = 'roll';
