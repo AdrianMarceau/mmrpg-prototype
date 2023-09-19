@@ -15,6 +15,52 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $mmrpg_index_robots = rpg_robot::get_index(true);
     $mmrpg_index_fields = rpg_field::get_index();
 
+    // Define a reusable array + function to keep track of this specific groups of battles and their status for unlocking purposes
+    $this_battle_options_groups = array();
+    $new_battle_options_group = function($name){
+        //error_log('new_battle_options_group($name:'.print_r($name, true).')');
+        global $this_prototype_data, $this_battle_options_groups;
+        $new_options_group = array();
+        $this_battle_options_groups[$name] = $new_options_group;
+        };
+    $get_battle_options_group = function($name){
+        //error_log('get_battle_options_group($name:'.print_r($name, true).')');
+        global $this_prototype_data, $this_battle_options_groups;
+        global $new_battle_options_group;
+        if (!isset($this_battle_options_groups[$name])){ $new_battle_options_group($name); }
+        $this_options_group = $this_battle_options_groups[$name];
+        return $this_options_group;
+        };
+    $update_battle_options_group = function($name, $updated_options_group){
+        //error_log('get_battle_options_group($name:'.print_r($name, true).', $updated_options_group:'.print_r($updated_options_group, true).')');
+        global $this_prototype_data, $this_battle_options_groups;
+        global $new_battle_options_group, $get_battle_options_group;
+        if (!isset($this_battle_options_groups[$name])){ $new_battle_options_group($name); }
+        $old_options_group = $this_battle_options_groups[$name];
+        $merged_options_group = array_merge($old_options_group, $updated_options_group);
+        $this_battle_options_groups[$name] = $merged_options_group;
+        };
+    $append_last_battle_option_to_group = function($name){
+        //error_log('append_last_battle_option_to_group($name:'.print_r($name, true).')');
+        global $this_prototype_data, $this_battle_options_groups;
+        global $new_battle_options_group, $get_battle_options_group, $update_battle_options_group;
+        $temp_option_key = count($this_prototype_data['battle_options']) - 1;
+        $temp_battle_token = $this_prototype_data['battle_options'][$temp_option_key]['battle_token'];
+        //error_log('$temp_option_key = '.print_r($temp_option_key, true));
+        //error_log('$temp_battle_token = '.print_r($temp_battle_token, true));
+        $this_options_group = $this_battle_options_groups[$name];
+        $temp_battle_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_token) ? true : false;
+        $this_options_group[] = array('battle_token' => $temp_battle_token, 'battle_complete' => $temp_battle_complete);
+        $this_battle_options_groups[$name] = $this_options_group;
+        };
+    $get_battle_options_group_locks = function($name){
+        //error_log('$get_battle_options_group_locks($name:'.print_r($name, true).')');
+        global $this_prototype_data, $this_battle_options_groups;
+        if (!isset($this_battle_options_groups[$name])){ return array(); }
+        $this_options_group = $this_battle_options_groups[$name];
+        return array_map(function($option){ return $option['battle_complete']; }, $this_options_group);
+        };
+
     // -- STARTER BATTLE : CHAPTER ONE -- //
 
     // Update the prototype data's global current chapter variable
