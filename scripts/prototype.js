@@ -2091,3 +2091,21 @@ function prototype_menu_links_refresh(){
             });
         }
 }
+
+// Define a function for updating prototype game settings from anywhere
+function prototype_update_game_settings(newSettings){
+    //console.log('prototype_update_game_settings(newSettings) w/ newSettings:', newSettings);
+
+    // If provided, update the spriteRenderMode in the prototype settings and markup
+    if (typeof newSettings.spriteRenderMode !== 'undefined'){
+        gameSettings.spriteRenderMode = newSettings.spriteRenderMode;
+        $('#prototype').attr('data-render-mode', gameSettings.spriteRenderMode);
+        }
+
+    // If provided, update the battleButtonMode in the prototype settings and markup
+    if (typeof newSettings.battleButtonMode !== 'undefined'){
+        gameSettings.battleButtonMode = newSettings.battleButtonMode;
+        $('#prototype').attr('data-button-mode', gameSettings.battleButtonMode);
+        }
+
+}

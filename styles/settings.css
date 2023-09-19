@@ -479,6 +479,11 @@ input::-webkit-calendar-picker-indicator {
     margin: 0 auto 0 0;
     padding-right: 20px;
 }
+#settings .tab_sections .section .field .subfield:after {
+    content: "";
+    display: block;
+    clear: both;
+}
 #settings .tab_sections .section .field .label + .subfield {
     padding-top: 5px;
 }
@@ -638,6 +643,14 @@ input::-webkit-calendar-picker-indicator {
     left: -10px;
 }
 
+#settings .game-settings .field[data-setting="battleButtonMode"] {
+    float: right;
+}
+#settings .game-settings .field[data-setting="battleButtonMode"] .radiofield {
+    float: none;
+    display: inline-block;
+    margin: 0 10px 0 0;
+}
 
 #settings pre {
     display: block;

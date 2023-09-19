@@ -59,6 +59,7 @@ gameSettings.musicVolumeEnabled = true; // default to true to allow music unless
 gameSettings.effectVolumeEnabled = true; // default to true to allow music unless otherwise stated
 gameSettings.audioBalanceConfig = {}; // default to empty but can hold custom overrides for above
 gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
+gameSettings.battleButtonMode = 'default'; // the button mode we should be using for missions
 gameSettings.enableGameMusic = true; // default to true to turn off on unsupported devices
 gameSettings.enableSoundEffects = true; // default to true to turn off on unsupported devices
 

@@ -217,6 +217,7 @@ $(document).ready(function(){
         // Collect references to the applicable form fields
         var $audoBalanceConfigField = $('.field[data-setting="audioBalanceConfig"]', $gameSettings);
         var $spriteRenderModeField = $('.field[data-setting="spriteRenderMode"]', $gameSettings);
+        var $battleButtonModeField = $('.field[data-setting="battleButtonMode"]', $gameSettings);
 
         // Define a function for updating the audio balance config w/ form changes
         var prevMasterVolume = false;
@@ -256,6 +257,21 @@ $(document).ready(function(){
             return true;
         }
 
+        // Define a function for updating the battle button mode w/ form changes
+        function updateBattleButtonMode(newMode, updateParent){
+            //console.log('updateBattleButtonMode(newMode) w/', newMode);
+            if (typeof newMode !== 'string'){ return false; }
+            if (typeof updateParent === 'undefined'){ updateParent = false; }
+            var newButtonMode = newMode.length ? newMode : thisGameSettings.battleButtonMode;
+            thisGameSettings.battleButtonMode = newButtonMode;
+            $('#mmrpg').attr('data-button-mode', newButtonMode);
+            if (updateParent && typeof window.parent.prototype_update_game_settings !== 'undefined'){
+                //console.log('sending update request to parent prototype_update_game_settings() w/ '+newButtonMode);
+                window.parent.prototype_update_game_settings({'battleButtonMode': newButtonMode});
+                }
+            return true;
+        }
+
         // Define a function for parsing the audio balance config from the form
         function parseAudioBalanceConfig(){
             // collect refs to all three fields manually
@@ -282,6 +298,13 @@ $(document).ready(function(){
             return checkedValue;
             };
 
+        // Define a function for parsing the battle button mode setting from the form
+        function parseBattleButtonMode(){
+            var $checkedInput = $('input[type="radio"]:checked', $battleButtonModeField);
+            var checkedValue = $checkedInput.val();
+            return checkedValue;
+            };
+
         // Backup the user's audio changes in case we need to reset them
         var userAudioConfigBackup = {};
         userAudioConfigBackup = parseAudioBalanceConfig();
@@ -289,6 +312,10 @@ $(document).ready(function(){
         // Backup the user's sprite render mode in case we need to reset it
         var userSpriteRenderModeBackup = '';
         userSpriteRenderModeBackup = parseSpriteRenderMode();
+
+        // Backup the user's battle button mode in case we need to reset it
+        var userBattleButtonModeBackup = '';
+        userBattleButtonModeBackup = parseBattleButtonMode();
 
         // Define click events for the game settings form elements
         $('input[type="range"]', $audoBalanceConfigField).bind('change', function(e){
@@ -299,36 +326,51 @@ $(document).ready(function(){
             });
 
         // Make it so when the user clicks on a radio button's container it automatically triggers the radio button inside
-        $('.radiofield', $spriteRenderModeField).bind('click', function(e){
-            //console.log('click event on sprite render mode field');
-            var $thisField = $(this);
-            var $radioButton = $('input[type="radio"]', $thisField);
-            $radioButton.prop('checked', true);
-            $radioButton.trigger('change');
+        var $radioFieldParents = [$spriteRenderModeField, $battleButtonModeField];
+        $.each($radioFieldParents, function(i, $radioFieldParent){
+            $('.radiofield', $radioFieldParent).bind('click', function(e){
+                //console.log('click event on sprite render mode field');
+                var $thisField = $(this);
+                var $radioButton = $('input[type="radio"]', $thisField);
+                $radioButton.prop('checked', true);
+                $radioButton.trigger('change');
+                });
+            $('input[type="radio"]', $radioFieldParent).bind('change', function(e){
+                //console.log('change event on sprite render mode field');
+                e.stopPropagation();
+                if ($radioFieldParent === $spriteRenderModeField){
+                    var checkedValue = parseSpriteRenderMode();
+                    updateSpriteRenderMode(checkedValue);
+                    }
+                else if ($radioFieldParent === $battleButtonModeField){
+                    var checkedValue = parseBattleButtonMode();
+                    updateBattleButtonMode(checkedValue);
+                    }
+                $radioFieldParent.find('.radiofield').removeClass('active');
+                $('input[type="radio"]:checked', $radioFieldParent).closest('.radiofield').addClass('active');
+                });
+
             });
-        $('input[type="radio"]', $spriteRenderModeField).bind('change', function(e){
-            //console.log('change event on sprite render mode field');
-            e.stopPropagation();
-            var checkedValue = parseSpriteRenderMode();
-            updateSpriteRenderMode(checkedValue);
-            $spriteRenderModeField.find('.radiofield').removeClass('active');
-            $('input[type="radio"]:checked', $spriteRenderModeField).closest('.radiofield').addClass('active');
-            });
+
 
         // Reset back to backup values if the user switches windows without saving
         var resetGameSettings = function(){
             //console.log('resetGameSettings()');
             //console.log('userAudioConfigBackup = ', userAudioConfigBackup);
             //console.log('userSpriteRenderModeBackup = ', userSpriteRenderModeBackup);
+            //console.log('userBattleButtonModeBackup = ', userBattleButtonModeBackup);
             updateAudioBalanceConfig(userAudioConfigBackup);
             updateSpriteRenderMode(userSpriteRenderModeBackup);
+            updateBattleButtonMode(userBattleButtonModeBackup);
             };
         var applyGameSettings = function(){
             //console.log('applyGameSettings()');
             //console.log('parseAudioBalanceConfig() = ', parseAudioBalanceConfig());
             //console.log('parseSpriteRenderMode() = ', parseSpriteRenderMode());
+            //console.log('parseBattleButtonMode() = ', parseBattleButtonMode());
             updateAudioBalanceConfig(parseAudioBalanceConfig());
             updateSpriteRenderMode(parseSpriteRenderMode());
+            updateBattleButtonMode(parseBattleButtonMode());
             };
         window.addEventListener('message', function(event){
             //console.log('iframe received a message from', event.origin);
@@ -352,6 +394,7 @@ $(document).ready(function(){
         // Automatically update saved game settings to be sure it's working
         updateAudioBalanceConfig(parseAudioBalanceConfig());
         updateSpriteRenderMode(parseSpriteRenderMode());
+        updateBattleButtonMode(parseBattleButtonMode(), true);
 
     }
 

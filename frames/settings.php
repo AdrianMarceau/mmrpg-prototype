@@ -265,6 +265,9 @@ if (!empty($form_actions)){
         $allowed_render_modes = array('default', 'crisp-edges', 'pixelated');
         $form_data['spriteRenderMode'] = !empty($_POST['spriteRenderMode']) && in_array($_POST['spriteRenderMode'], $allowed_render_modes) ? $_POST['spriteRenderMode'] : $allowed_render_modes[0];
 
+        $allowed_button_modes = array('default', 'classic');
+        $form_data['battleButtonMode'] = !empty($_POST['battleButtonMode']) && in_array($_POST['battleButtonMode'], $allowed_button_modes) ? $_POST['battleButtonMode'] : $allowed_button_modes[0];
+
         //error_log('$form_data = '.print_r($form_data, true));
 
         $audioBalanceConfig = array();
@@ -276,9 +279,13 @@ if (!empty($form_actions)){
         $spriteRenderMode = !empty($form_data['spriteRenderMode']) ? $form_data['spriteRenderMode'] : $allowed_render_modes[0];
         //error_log('$spriteRenderMode = '.print_r($spriteRenderMode, true));
 
+        $battleButtonMode = !empty($form_data['battleButtonMode']) ? $form_data['battleButtonMode'] : $allowed_button_modes[0];
+        //error_log('$battleButtonMode = '.print_r($battleButtonMode, true));
+
         $session_token = rpg_game::session_token();
         $_SESSION[$session_token]['battle_settings']['audioBalanceConfig'] = $audioBalanceConfig;
         $_SESSION[$session_token]['battle_settings']['spriteRenderMode'] = $spriteRenderMode;
+        $_SESSION[$session_token]['battle_settings']['battleButtonMode'] = $battleButtonMode;
 
         //error_log('(A) $_SESSION[$session_token][\'battle_settings\'][\'audioBalanceConfig\'] = '.print_r($_SESSION[$session_token]['battle_settings']['audioBalanceConfig'], true));
 
@@ -340,6 +347,7 @@ if (true){
             $session_token = rpg_game::session_token();
             $battleSettings = $_SESSION[$session_token]['battle_settings'];
             $spriteRenderMode = isset($battleSettings['spriteRenderMode']) ? $battleSettings['spriteRenderMode'] : 'default';
+            $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default';
             $audioBalanceConfig = isset($battleSettings['audioBalanceConfig']) ? $battleSettings['audioBalanceConfig'] : array(
                 'masterVolume' => MMRPG_SETTINGS_AUDIODEFAULT_MASTERVOLUME,
                 'musicVolume' => MMRPG_SETTINGS_AUDIODEFAULT_MUSICVOLUME,
@@ -376,7 +384,7 @@ if (true){
                     <? $active = empty($spriteRenderMode) || $spriteRenderMode === 'default'; ?>
                     <div class="radiofield <?= $active ? 'active' : '' ?>">
                         <input type="radio" name="spriteRenderMode" value="default" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="auto">Auto</label>
+                        <label for="default">Auto</label>
                     </div>
                     <? $active = $spriteRenderMode === 'crisp-edges'; ?>
                     <div class="radiofield <?= $active ? 'active' : '' ?>">
@@ -416,6 +424,24 @@ if (true){
                         <?
                     }
                     ?>
+                </div>
+            </div>
+
+            <div class="field" data-setting="battleButtonMode">
+                <div class="label">
+                    <strong>Mission Buttons</strong>
+                </div>
+                <div class="subfield input-group">
+                    <? $active = empty($battleButtonMode) || $battleButtonMode === 'default'; ?>
+                    <div class="radiofield <?= $active ? 'active' : '' ?>">
+                        <input type="radio" name="battleButtonMode" value="default" <?= $active ? 'checked="checked"' : '' ?> />
+                        <label for="default">Default &nbsp;(Aesthetic)</label>
+                    </div>
+                    <? $active = $battleButtonMode === 'classic'; ?>
+                    <div class="radiofield <?= $active ? 'active' : '' ?>">
+                        <input type="radio" name="battleButtonMode" value="classic" <?= $active ? 'checked="checked"' : '' ?> />
+                        <label for="classic">Classic &nbsp;(Detailed)</label>
+                    </div>
                 </div>
             </div>
 

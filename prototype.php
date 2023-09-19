@@ -317,9 +317,16 @@ foreach ($this_menu_tooltips AS $token => $text){
 <meta name="viewport" content="user-scalable=yes, width=device-width, min-width=768, initial-scale=1">
 
 </head>
+<?
+// Collect and prototype-menu settings from the session for display
+$session_token = rpg_game::session_token();
+$battleSettings = $_SESSION[$session_token]['battle_settings'];
+$spriteRenderMode = isset($battleSettings['spriteRenderMode']) ? $battleSettings['spriteRenderMode'] : 'default';
+$battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default';
+?>
 <body id="mmrpg" class="prototype <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?>">
 
-<div id="prototype" class="hidden">
+<div id="prototype" class="hidden" data-render-mode="<?= $spriteRenderMode ?>" data-button-mode="<?= $battleButtonMode ?>">
     <div class="bgfx-layer layer-1"></div>
     <div class="bgfx-layer layer-2"></div>
 
