@@ -10,12 +10,12 @@ $this_prototype_data['this_support_robot'] = 'roll';
 $this_prototype_data['this_intro_targets'] = array('met', 'sniper-joe', 'trill/speed');
 $this_prototype_data['this_chapter_levels'] = array(
     0 => 1,   // Intro
-    1 => 02,  // Singles
-    2 => 10,  // Rivals
-    3 => 15,  // Doubles
-    4 => 20,  // Final I
+    1 => 04,  // Singles
+    2 => 13,  // Rivals
+    3 => 16,  // Doubles
+    4 => 25,  // Final I
     5 => 30,  // Final II
-    6 => 40   // Final III
+    6 => 35   // Final III
     );
 $this_prototype_data['this_chapter_unlocked'] = $chapters_unlocked_light;
 $this_prototype_data['target_player_token'] = 'dr-wily';

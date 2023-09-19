@@ -344,9 +344,10 @@ class rpg_mission_double extends rpg_mission {
             $omega_robot_level_max = $this_start_level;
             $omega_robot_level = $this_start_level;
         } else {
-            $omega_robot_level_max = $this_start_level + 3;
+            $omega_robot_level_max = $this_start_level + 7;
             if ($omega_robot_level_max >= 100){ $omega_robot_level_max = 100; }
-            $omega_robot_level = $this_start_level + (!empty($this_prototype_data['battles_complete']) ? ($this_prototype_data['battles_complete'] - MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT) * 1 : 0);
+            $omega_robot_level = $this_start_level;
+            if (!empty($temp_option_completed) && !empty($temp_option_completed['battle_count'])){ $omega_robot_level += $temp_option_completed['battle_count']; }
             if ($omega_robot_level >= $omega_robot_level_max){ $omega_robot_level = $omega_robot_level_max; }
             if ($omega_robot_level >= 100){ $omega_robot_level = 100; }
         }
@@ -389,15 +390,8 @@ class rpg_mission_double extends rpg_mission {
         $temp_complete_count = 0;
         if (!empty($temp_battle_omega['battle_complete'])){
             $temp_complete_level = $temp_omega_robot_level;
-            //if (!empty($temp_battle_omega['battle_complete']['battle_min_level'])){ $temp_complete_level = $temp_battle_omega['battle_complete']['battle_min_level']; }
-            //else { $temp_complete_level = $temp_omega_robot_level; }
             if (!empty($temp_battle_omega['battle_complete']['battle_count'])){ $temp_complete_count = $temp_battle_omega['battle_complete']['battle_count']; }
             else { $temp_complete_count = 1; }
-            //$temp_omega_robot_level = $temp_complete_level + $temp_complete_count - 1;
-            $temp_omega_robot_level = $temp_complete_level + $temp_complete_count;
-            if ($temp_omega_robot_level > 100){ $temp_omega_robot_level = 100; }
-            // DEBUG
-            //echo('battle is complete '.$temp_battle_omega['battle_token'].' | omega robot level'.$temp_omega_robot_level.' | battle_level '.$temp_battle_omega['battle_complete']['battle_level'].' | battle_count '.$temp_battle_omega['battle_complete']['battle_count'].'<br />');
         }
 
         // Define the battle difficulty level (0 - 8) based on level and completed count
@@ -424,7 +418,10 @@ class rpg_mission_double extends rpg_mission {
             // Update the robot level and battle zenny plus turns
             $temp_robot_level = $robot_info['robot_class'] != 'mecha' ? $temp_omega_robot_level : mt_rand(1, ceil($temp_omega_robot_level / 3));
             $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_level'] = $temp_robot_level;
-            if ($robot_info['robot_class'] == 'master'){
+            if ($robot_info['robot_class'] == 'boss'){
+                $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL0 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * $temp_robot_level);
+                $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERBOSS;
+            } elseif ($robot_info['robot_class'] == 'master'){
                 $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * $temp_robot_level);
                 $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
             } elseif ($robot_info['robot_class'] == 'mecha'){

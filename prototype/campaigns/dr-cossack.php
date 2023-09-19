@@ -10,12 +10,12 @@ $this_prototype_data['this_support_robot'] = 'rhythm';
 $this_prototype_data['this_intro_targets'] = array('met', 'crystal-joe', 'trill/attack');
 $this_prototype_data['this_chapter_levels'] = array(
     0 => 20,   // Intro
-    1 => 22,  // Singles
-    2 => 30,  // Rivals
+    1 => 23,  // Singles
+    2 => 32,  // Rivals
     3 => 35,  // Doubles
     4 => 40,  // Final I
-    5 => 50,  // Final II
-    6 => 60   // Final III
+    5 => 45,  // Final II
+    6 => 50   // Final III
     );
 $this_prototype_data['this_chapter_unlocked'] = $chapters_unlocked_cossack;
 $this_prototype_data['target_player_token'] = 'dr-light';
