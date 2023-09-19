@@ -637,7 +637,7 @@ elseif ($request_kind === 'challenge'){
         $challenge_player_info = !empty($challenge_mission_info['battle_target_player']) ? $challenge_mission_info['battle_target_player'] : false;
         $challenge_player_robots = !empty($challenge_player_info['player_robots']) ? $challenge_player_info['player_robots'] : false;
         $challenge_player_team_size = count($challenge_player_robots);
-        error_log('$challenge_field_info: '.print_r($challenge_field_info, true));
+        //error_log('$challenge_field_info: '.print_r($challenge_field_info, true));
         //error_log('$challenge_player_info: '.print_r($challenge_player_info, true));
         //error_log('$challenge_player_robots: '.print_r($challenge_player_robots, true));
 
