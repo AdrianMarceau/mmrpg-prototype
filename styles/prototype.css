@@ -1630,6 +1630,27 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype .option_this-player-select {
 
 }
+#mmrpg #prototype .option_this-player-select .chrome,
+#mmrpg #prototype .option_this-player-select .inset {
+    background-color: rgba(0, 0, 0, 0.2);
+    background-image: -webkit-gradient(
+            linear,
+            left bottom,
+            left top,
+            color-stop(0.75, rgba(0, 0, 0, 0.60)),
+            color-stop(0.15, rgba(26, 26, 26, 0.40))
+        );
+    background-image: -moz-linear-gradient(
+            center bottom,
+            rgba(0, 0, 0, 0.60) 15%,
+            rgba(26, 26, 26, 0.40) 75%
+        );
+    background-image: linear-gradient(
+            to top,
+            rgba(0, 0, 0, 0.60) 15%,
+            rgba(26, 26, 26, 0.40) 75%
+        );
+}
 #mmrpg #prototype .option_this-battle-select {
 
 }
@@ -2197,12 +2218,17 @@ body[data-source="website"] #prototype .menu {
             color-stop(0.75, rgba(255, 255, 255, 0.10)),
             color-stop(0.15, rgba(0, 0, 0, 0.30))
 
-    );
+        );
     background-image: -moz-linear-gradient(
             center bottom,
             rgba(255, 255, 255, 0.10) 15%,
             rgba(0, 0, 0, 0.30) 75%
-    );
+        );
+    background-image: linear-gradient(
+            to top,
+            rgba(255, 255, 255, 0.10) 15%,
+            rgba(0, 0, 0, 0.30) 75%
+        );
     border-radius: 0.60em;
     -moz-border-radius: 0.60em;
     -webkit-border-radius: 0.60em;
@@ -2287,6 +2313,66 @@ body[data-source="website"] #prototype .menu {
     top: 0;
     font-size: 100%;
     line-height: 1.4;
+}
+
+#prototype .option_placeholder {
+    cursor: not-allowed;
+}
+#prototype .option_placeholder * {
+    cursor: inherit;
+    pointer-events: none;
+}
+#prototype .option_placeholder .platform,
+#prototype .option_placeholder .chrome {
+    background-size: 100% 100%;
+    background-size: cover;
+    background-position: center center !important;
+}
+#prototype .option_placeholder .platform {
+    background-image: url('../images/menus/menu-options_this-battle-select.png?2020') !important;
+    background-repeat: repeat !important;
+    background-size: auto auto !important;
+    background-blend-mode: difference;
+    background-color: #262626;
+}
+#prototype .option_placeholder .inset {
+    background-color: #1a1a1a;
+    border-color: #1a1a1a;
+    overflow: hidden;
+}
+#prototype .option_placeholder .inset .multi .maintext {
+    top: 0;
+    font-size: 160%;
+    line-height: 3;
+    letter-spacing: 0.2em;
+    text-align: center;
+    width: 100%;
+}
+#prototype .option_placeholder .inset .multi .maintext > i {
+    display: inline-block;
+    text-align: center;
+    margin: 0 3px;
+}
+#prototype .option_placeholder .inset .multi .maintext > i.fa-lock-open,
+#prototype .option_placeholder .inset .multi .maintext > i.fa-lock-open-alt {
+    filter: brightness(0.5);
+}
+#prototype .option_placeholder .inset .multi .maintext > i.fa-lock,
+#prototype .option_placeholder .inset .multi .maintext > i.fa-lock-alt {
+    filter: brightness(1.0);
+}
+@keyframes placeholder-lock-bounce-animation {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-1px); }
+    100% { transform: translateY(0); }
+}
+#prototype .option_placeholder .inset .multi .maintext > i.fa-lock,
+#prototype .option_placeholder .inset .multi .maintext > i.fa-lock-alt {
+    transform: translateY(0);
+    animation-name: placeholder-lock-bounce-animation;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: steps(1);
 }
 
 #prototype .option_1x1 div label,
@@ -2957,6 +3043,7 @@ body[data-source="website"] #prototype .menu {
 
 /* CINEMATIC CHAPTER BUTTON STYLES */
 
+
 /*
 
 #mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"],
@@ -2988,6 +3075,24 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_20 {
     clear: left;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_22 {
+    width: 25%;
+    height: calc(26em - 3px);
+    position: absolute;
+    top: 51px;
+    right: 0;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14.option_placeholder .maintext,
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_22.option_placeholder .maintext {
+    font-size: 200%;
+    line-height: 6rem;
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14.option_placeholder .maintext > i {
+    width: calc(25% - 6px);
+}
+#mmrpg #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_22.option_placeholder .maintext > i {
+    width: calc(50% - 6px);
 }
 
 
@@ -3215,5 +3320,4 @@ body[data-source="website"] #prototype .menu {
 }
 
 
-/*
 */

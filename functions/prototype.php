@@ -1416,7 +1416,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
     // Collect the robot index for calculation purposes
     $db_robot_fields = rpg_robot::get_index_fields(true);
-    $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+    $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM `mmrpg_index_robots` WHERE `robot_flag_complete` = 1;", 'robot_token');
 
     // Count the number of completed battle options for this group and update the variable
     $battle_options_reversed = $battle_options; //array_reverse($battle_options);
@@ -1429,10 +1429,50 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             // Generate the option markup for the event message
             $temp_optiontitle = $this_info['option_maintext'];
+            $temp_optionsize = !empty($this_info['option_size']) ? $this_info['option_size'] : '1x4';
             $temp_optionimages = !empty($this_info['option_images']) ? $this_info['option_images'] : '';
             if (empty($temp_optionimages)){ $this_info['option_maintext'] = '<i class="fa fas fa-book"></i> '.$this_info['option_maintext']; }
             $temp_optiontext = '<span class="multi"><span class="maintext">'.$this_info['option_maintext'].'</span></span>';
-            $this_markup .= '<a data-chapter="'.$this_info['option_chapter'].'" class="option option_message option_1x4 option_this-'.$player_token.'-message" style="'.(!empty($this_info['option_style']) ? $this_info['option_style'] : '').'"><div class="chrome"><div class="inset"><label class="'.(!empty($temp_optionimages) ? 'has_image' : '').'">'.$temp_optionimages.$temp_optiontext.'</label></div></div></a>'."\n";
+            $this_markup .= '<a data-chapter="'.$this_info['option_chapter'].'" class="option option_message option_'.$temp_optionsize.' option_this-'.$player_token.'-message block_'.($this_key + 1).'" style="'.(!empty($this_info['option_style']) ? $this_info['option_style'] : '').'"><div class="chrome"><div class="inset"><label class="'.(!empty($temp_optionimages) ? 'has_image' : '').'">'.$temp_optionimages.$temp_optiontext.'</label></div></div></a>'."\n";
+
+        }
+        // Else if this is a placeholder type option, display a disabled button in the requested size
+        elseif (!empty($this_info['option_type']) && $this_info['option_type'] == 'placeholder'){
+
+            // Generate the option markup for the event placeholder
+            $temp_optiontitle = $this_info['option_maintext'];
+            $temp_optionsize = !empty($this_info['option_size']) ? $this_info['option_size'] : '1x4';
+            $temp_optionimages = !empty($this_info['option_images']) ? $this_info['option_images'] : '';
+            if (!empty($this_info['option_locks'])){
+                if (is_numeric($this_info['option_locks'])){
+                    $this_info['option_maintext'] = trim(str_repeat('<i class="lock-icon fa fas fa-lock"></i>', $this_info['option_locks']));
+                } elseif (is_array($this_info['option_locks'])){
+                    $this_info['option_maintext'] = '';
+                    foreach ($this_info['option_locks'] AS $lock_key => $this_lock){
+                        $lock_class = 'lock-icon fa fas '.($this_lock ? 'fa-lock-open-alt' : 'fa-lock-alt');
+                        $animation_duration = 1 - (0.1 * $lock_key);
+                        $lock_style = 'animation-duraction: '.$animation_duration.'s; ';
+                        $this_info['option_maintext'] .= '<i class="'.$lock_class.'" style="'.$lock_style.'"></i>';
+                    }
+                    $this_info['option_maintext'] = trim($this_info['option_maintext']);
+                }
+            } elseif (empty($temp_optionimages)){
+                $this_info['option_maintext'] = '<i class="fa fas fa-lock"></i> '.$this_info['option_maintext'];
+            }
+            $temp_optiontext = '<span class="multi"><span class="maintext">'.$this_info['option_maintext'].'</span></span>';
+            $temp_optionclass = 'option ';
+            $temp_optionclass .= 'option_placeholder option_this-'.$player_token.'-placeholder  ';
+            $temp_optionclass .= 'option_'.$temp_optionsize.' option_this-battle-select option_this-'.$player_token.'-battle-select ';
+            $temp_optionclass .= 'option_disabled type empty block_'.($this_key + 1);
+            $this_markup .= '<a data-chapter="'.$this_info['option_chapter'].'" class="'.$temp_optionclass.'" style="'.(!empty($this_info['option_style']) ? $this_info['option_style'] : '').'">';
+                $this_markup .= '<div class="platform">';
+                    $this_markup .= '<div class="chrome">';
+                        $this_markup .= '<div class="inset">';
+                            $this_markup .= '<label class="'.(!empty($temp_optionimages) ? 'has_image' : '').'">'.$temp_optionimages.$temp_optiontext.'</label>';
+                        $this_markup .= '</div>';
+                    $this_markup .= '</div>';
+                $this_markup .= '</div>';
+            $this_markup .= '</a>'."\n";
 
         }
         // Otherwise, if this is a normal battle option
