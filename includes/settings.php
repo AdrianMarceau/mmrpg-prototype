@@ -90,6 +90,7 @@ define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MIN', 1); // The minimum number of r
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX', 8); // The maximum number of robots allowed for battle per side
 
 // Define the global multiplier for battle points per level
+define('MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL0', 2500); // The point rate per fortress boss level for normal battles
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL', 1000); // The point rate per robot master level for normal battles
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2', 100); // The point rate per support mecha level for normal battles
 define('MMRPG_SETTINGS_BATTLETURNS_PERBOSS', 9); // The point rate per target robot master for normal battles
