@@ -61,6 +61,16 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $this_options_group[] = array('battle_token' => $temp_battle_token, 'battle_complete' => $temp_battle_complete);
         $this_battle_options_groups[$name] = $this_options_group;
         };
+    $append_faux_battle_option_to_group = function($name, $battle_complete = false){
+        //error_log('$append_faux_battle_option_to_group($name:'.print_r($name, true).')');
+        global $this_prototype_data, $this_battle_options_groups;
+        global $new_battle_options_group, $get_battle_options_group, $update_battle_options_group;
+        $this_options_group = $this_battle_options_groups[$name];
+        $temp_battle_token = 'faux-battle-x'.count($this_options_group);
+        $temp_battle_complete = $battle_complete;
+        $this_options_group[] = array('battle_token' => $temp_battle_token, 'battle_complete' => $temp_battle_complete);
+        $this_battle_options_groups[$name] = $this_options_group;
+        };
     $get_battle_options_group_locks = function($name){
         //error_log('$get_battle_options_group_locks($name:'.print_r($name, true).')');
         global $this_prototype_data, $this_battle_options_groups;
@@ -84,6 +94,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Chapter One : An Unexpected Attack'
             );
 
+        // Define an array to keep track of group option progress
+        $this_group_name = $new_group_name();
+        $new_battle_options_group($this_group_name);
+
         // Intro Battle I (Vs. MET)
         // Always generate the very first battle no matter what
         if (true){
@@ -101,11 +115,15 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             }
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
+            // Add this battle and it's status to the appropriate group array
+            $append_last_battle_option_to_group($this_group_name);
+
         }
 
         // Intro Battle II (Vs. SNIPER/CRYSTAL/SKELETON-JOE)
         // Only continue if the player has defeated the first 1 battles
-        if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0b'])){
+        $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
+        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 1){
 
             // Generate the battle option with the starter data
             $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'b';
@@ -120,11 +138,22 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             }
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
+            // Add this battle and it's status to the appropriate group array
+            $append_last_battle_option_to_group($this_group_name);
+
+        } else {
+            $temp_placeholder = array();
+            $temp_placeholder['option_type'] = 'placeholder';
+            $temp_placeholder['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $temp_placeholder['option_locks'] = $get_battle_options_group_locks($this_group_name);
+            $this_prototype_data['battle_options'][] = $temp_placeholder;
+            $append_faux_battle_option_to_group($this_group_name);
         }
 
         // Intro Battle III (Vs. TRILL [SPEED/DEFENSE/ATTACK])
         // Only continue if the player has defeated the first 2 battles
-        if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0c'])){
+        $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
+        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 2){
 
             // Generate the battle option with the starter data
             $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'c';
@@ -139,8 +168,17 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             }
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
-        }
+            // Add this battle and it's status to the appropriate group array
+            $append_last_battle_option_to_group($this_group_name);
 
+        } else {
+            $temp_placeholder = array();
+            $temp_placeholder['option_type'] = 'placeholder';
+            $temp_placeholder['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $temp_placeholder['option_locks'] = $get_battle_options_group_locks($this_group_name);
+            $this_prototype_data['battle_options'][] = $temp_placeholder;
+            $append_faux_battle_option_to_group($this_group_name);
+        }
 
     }
 
