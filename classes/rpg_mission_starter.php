@@ -37,6 +37,7 @@ class rpg_mission_starter extends rpg_mission {
         $temp_battle_token = $this_prototype_data['phase_battle_token'].'-'.$this_robot_token;
         $temp_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
         $temp_player_id = rpg_game::unique_player_id($temp_user_id, 0);
+        $temp_player_robots_unlocked = mmrpg_prototype_robots_unlocked($this_prototype_data['this_player_token']);
         $temp_battle_omega = array();
         $temp_battle_omega['battle_field_base']['field_id'] = 100;
         $temp_battle_omega['battle_field_base']['field_token'] = $this_intro_field;
@@ -44,7 +45,8 @@ class rpg_mission_starter extends rpg_mission {
         $temp_battle_omega['battle_token'] = $temp_battle_token;
         $temp_battle_omega['battle_size'] = '1x4';
         $temp_battle_omega_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_omega['battle_token']);
-        if (!empty($temp_battle_omega_complete['battle_count'])){ $temp_target_count = 1 + $temp_battle_omega_complete['battle_count']; }
+        //if (!empty($temp_battle_omega_complete['battle_count'])){ $temp_target_count = 1 + $temp_battle_omega_complete['battle_count']; }
+        if ($temp_player_robots_unlocked > 2){ $temp_target_count = 1 + ($temp_player_robots_unlocked - 2); }
         if ($temp_target_count > 8){ $temp_target_count = 8; }
         $temp_battle_omega['battle_level'] = $this_start_level;
         $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
