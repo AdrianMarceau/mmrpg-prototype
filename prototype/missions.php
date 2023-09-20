@@ -198,6 +198,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Chapter Two : Robot Master Revival'
             );
 
+        // Define an array to keep track of group option progress
+        $this_group_name = $new_group_name();
+        $new_battle_options_group($this_group_name);
+
         // Increment the phase counter
         $this_prototype_data['battle_phase'] += 1;
         $this_prototype_data['phase_token'] = 'phase'.$this_prototype_data['battle_phase'];
@@ -206,6 +210,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Populate the battle options with the initial eight robots
         if (isset($this_prototype_data['target_robot_omega'][1][0])){ $this_prototype_data['target_robot_omega'] = $this_prototype_data['target_robot_omega'][1]; }
         //die('<pre>'.print_r($this_prototype_data['target_robot_omega'], true).'</pre>');
+
+        // Loop through each of the eight robot masters
         foreach ($this_prototype_data['target_robot_omega'] AS $key => $info){
 
             // Check to see if we're generating from scratch or pulling from cache
@@ -237,22 +243,61 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
             }
 
+            // Add this battle and it's status to the appropriate group array
+            $append_last_battle_option_to_group($this_group_name);
+
         }
 
-        /*
-        // DEBUG DEBUG DEBUG
+        // ---------------------- //
+        // WIP WIP WIP WIP CH4-DR //
+        // ---------------------- //
 
-        // GENERATE DOC ROBOT BATTLE
-        // Generate a single battle against a specific robot master
-        $temp_battle_omega = rpg_mission_single::generate($this_prototype_data, 'doc-robot', 'robot-museum', $this_prototype_data['this_chapter_levels'][1]);
-        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-        $temp_battle_omega['battle_field_base']['field_background_variant'] = 'mm1';
-        $temp_battle_omega['battle_size'] = '1x4';
-        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-        $this_prototype_data['battle_options'][] = $temp_battle_omega;
+        // -- CHAPTER TWO FORTRESS BATTLE -- //
 
-        // DEBUG DEBUG DEBUG
-        */
+        // GENERATE THE ROBOT MUSEUM BATTLE VS DOC ROBOT
+        // Ensure the player has completed an appropriate number of pre-battles before unlocking this one
+        $group_option_locks = $get_battle_options_group_locks($this_group_name);
+        $group_options_total = count($group_option_locks);
+        $group_options_complete_total = array_sum($group_option_locks);
+        if ($this_prototype_data['prototype_complete'] || $group_options_complete_total >= $group_options_total){
+            $temp_battle_config = array();
+            $temp_battle_config['battle_size'] = '1x4';
+            $temp_target_robots = array();
+            $temp_boss_robot = array('robot_token' => 'doc-robot', 'robot_item' => 'weapon-upgrade');
+            $temp_target_field = array('field_token' => 'robot-museum');
+            if ($this_prototype_data['this_player_token'] === 'dr-light'){
+                $temp_target_field['field_background_variant'] = 'mm1';
+                $temp_boss_robot['robot_abilities'] = array('rolling-cutter', 'super-arm', 'ice-breath', 'hyper-bomb', 'fire-storm', 'thunder-strike', 'time-arrow', 'oil-shooter');
+                $temp_battle_config['ability_rewards'] = array(array('token' => 'copy-shot', 'level' => 0));
+            }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){
+                $temp_target_field['field_background_variant'] = 'mm2';
+                $temp_boss_robot['robot_abilities'] = array('metal-blade', 'air-shooter', 'bubble-spray', 'quick-strike', 'crash-bomber', 'flash-pulse', 'atomic-fire', 'leaf-fall');
+                $temp_battle_config['ability_rewards'] = array(array('token' => 'copy-soul', 'level' => 0));
+            }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){
+                $temp_target_field['field_background_variant'] = 'mm4';
+                $temp_boss_robot['robot_abilities'] = array('bright-burst', 'rain-flush', 'drill-blitz', 'ring-boomerang', 'dust-crusher', 'skull-barrier', 'pharaoh-shot', 'dive-torpedo');
+                //$temp_battle_config['ability_rewards'] = array(array('token' => 'copy-style', 'level' => 0));
+            }
+            $temp_target_robots[] = $temp_boss_robot;
+            $temp_target_level = $this_prototype_data['this_chapter_levels'][1] + 8;
+            $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
+            $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+            $this_prototype_data['battle_options'][] = $temp_battle_omega;
+            $append_last_battle_option_to_group($this_group_name);
+        } else {
+            $temp_placeholder = array();
+            $temp_placeholder['option_type'] = 'placeholder';
+            $temp_placeholder['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $temp_placeholder['option_locks'] = $group_option_locks;
+            $temp_placeholder['option_maintext'] = '';
+            $temp_placeholder['option_subtext'] = '';
+            $this_prototype_data['battle_options'][] = $temp_placeholder;
+            $append_faux_battle_option_to_group($this_group_name);
+        }
+
 
     }
 
