@@ -317,34 +317,217 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Chapter Three : The Rival Challengers'
             );
 
-        // Unlock the first fortress battle
-        $temp_rival_option_token = $this_prototype_data['this_player_token'].'-fortress-i';
-        $temp_rival_option = rpg_battle::get_index_info($temp_rival_option_token, true);
-        $temp_rival_option['battle_phase'] = $this_prototype_data['battle_phase'];
-        $temp_rival_option['battle_level'] = $this_prototype_data['this_chapter_levels'][2];
-        $temp_rival_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
+        // Define an array to keep track of group option progress
+        $this_group_name = $new_group_name();
+        $new_battle_options_group($this_group_name);
 
-        // If the battle is complete, remove the player from the description
-        $temp_battle_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_rival_option_token);
-        if ($temp_battle_complete){
-            $temp_rival_option['battle_target_player']['player_token'] = 'player';
-            $temp_rival_option['battle_description'] = preg_replace('/^Defeat (Dr. (Wily|Light|Cossack)\'s)/i', 'Defeat', $temp_rival_option['battle_description']);
-            // Also make sure any unlocked robots appear in greyscale on the button
-            foreach ($temp_rival_option['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
-                if (mmrpg_prototype_robot_unlocked(false, $rm_robot['robot_token'])){
-                    //$rm_robot['flags']['hide_from_mission_select'] = true;
-                    $rm_robot['flags']['shadow_on_mission_select'] = true;
-                    $temp_rival_option['battle_target_player']['player_robots'][$rm_key] = $rm_robot;
+        // Always unlock the first fortress battle in this chapter
+        if (true){
+
+            // Unlock the first fortress battle
+            $temp_rival_option_token = $this_prototype_data['this_player_token'].'-fortress-i';
+            $temp_rival_option = rpg_battle::get_index_info($temp_rival_option_token, true);
+            $temp_rival_option['battle_phase'] = $this_prototype_data['battle_phase'];
+            $temp_rival_option['battle_level'] = $this_prototype_data['this_chapter_levels'][2];
+            $temp_rival_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
+
+            // If the battle is complete, remove the player from the description
+            $temp_battle_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_rival_option_token);
+            if ($temp_battle_complete){
+                $temp_rival_option['battle_target_player']['player_token'] = 'player';
+                $temp_rival_option['battle_description'] = preg_replace('/^Defeat (Dr. (Wily|Light|Cossack)\'s)/i', 'Defeat', $temp_rival_option['battle_description']);
+                // Also make sure any unlocked robots appear in greyscale on the button
+                foreach ($temp_rival_option['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
+                    if (mmrpg_prototype_robot_unlocked(false, $rm_robot['robot_token'])){
+                        //$rm_robot['flags']['hide_from_mission_select'] = true;
+                        $rm_robot['flags']['shadow_on_mission_select'] = true;
+                        $temp_rival_option['battle_target_player']['player_robots'][$rm_key] = $rm_robot;
+                    }
                 }
             }
+
+            // Recalculate zenny and turns for this fortress mission
+            rpg_mission_fortress::prepare($temp_rival_option, $this_prototype_data);
+
+            // Add the omega battle to the battle options
+            $this_prototype_data['battle_options'][] = $temp_rival_option;
+            rpg_battle::update_index_info($temp_rival_option['battle_token'], $temp_rival_option);
+
+            // Add this battle and it's status to the appropriate group array
+            $append_last_battle_option_to_group($this_group_name);
+
         }
 
-        // Recalculate zenny and turns for this fortress mission
-        rpg_mission_fortress::prepare($temp_rival_option, $this_prototype_data);
 
-        // Add the omega battle to the battle options
-        $this_prototype_data['battle_options'][] = $temp_rival_option;
-        rpg_battle::update_index_info($temp_rival_option['battle_token'], $temp_rival_option);
+        // ----------------------- //
+        // WIP WIP WIP WIP CH3-MMK //
+        // ----------------------- //
+
+        // -- CHAPTER THREE FORTRESS-II BATTLE -- //
+
+        // GENERATE THE HUNTER COMPOUND BATTLE VS MEGAMAN KILLER
+        // Ensure the player has completed an appropriate number of pre-battles before unlocking this one
+        $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
+        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 1){
+            $temp_battle_config = array();
+            $temp_battle_config['battle_size'] = '1x4';
+            $temp_battle_config['auto_hide_mechas'] = true;
+            $temp_target_robots = array();
+            $temp_target_field = array('field_token' => 'hunter-compound');
+            if ($this_prototype_data['this_player_token'] === 'dr-light'){
+                $hunter_token = 'enker';
+                $hunter_abilities = array(
+                    "shield-buster",
+                    "shield-shot",
+                    "shield-overdrive",
+                    "buster-shot",
+                    "buster-charge",
+                    "energy-boost",
+                    "attack-boost",
+                    "defense-boost",
+                    "speed-boost",
+                    "mega-slide",
+                    "bass-baroque",
+                    "proto-strike",
+                    "mecha-support"
+                    );
+                $temp_target_field['field_multipliers'] = array('experience' => 2, 'shield' => 1.6, 'shadow' => 1.4);
+                $temp_target_field['field_music'] = 'sega-remix/special-stage-1-mm10';
+                $temp_target_field['field_background_variant'] = $hunter_token;
+                $temp_target_robots[] = array('robot_token' => $hunter_token, 'robot_item' => 'charge-module');
+                $temp_target_robots[] = array('robot_token' => 'beak', 'robot_item' => 'energy-pellet');
+                $temp_target_robots[] = array('robot_token' => 'dark-man', 'robot_item' => 'attack-booster');
+                $temp_target_robots[] = array('robot_token' => 'beak', 'robot_item' => 'energy-pellet');
+            }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){
+                $hunter_token = 'punk';
+                $hunter_abilities = array(
+                    "cutter-buster",
+                    "cutter-shot",
+                    "cutter-overdrive",
+                    "buster-shot",
+                    "buster-charge",
+                    "energy-break",
+                    "attack-break",
+                    "defense-break",
+                    "speed-break",
+                    "rising-cutter",
+                    "shadow-blade",
+                    "hard-knuckle",
+                    "spark-shock",
+                    "bright-burst",
+                    "metal-press",
+                    "mecha-support"
+                    );
+                $temp_target_field['field_multipliers'] = array('experience' => 2, 'cutter' => 1.6, 'shadow' => 1.4);
+                $temp_target_field['field_music'] = 'sega-remix/special-stage-2-mm10';
+                $temp_target_field['field_background_variant'] = $hunter_token;
+                $temp_target_robots[] = array('robot_token' => $hunter_token, 'robot_item' => 'xtreme-module');
+                $temp_target_robots[] = array('robot_token' => 'shield-attacker', 'robot_item' => 'energy-capsule');
+                $temp_target_robots[] = array('robot_token' => 'dark-man-2', 'robot_item' => 'defense-booster');
+                $temp_target_robots[] = array('robot_token' => 'shield-attacker', 'robot_item' => 'energy-capsule');
+            }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){
+                $hunter_token = 'ballade';
+                $hunter_abilities = array(
+                    "laser-buster",
+                    "laser-shot",
+                    "laser-overdrive",
+                    "buster-shot",
+                    "buster-charge",
+                    "energy-assault",
+                    "attack-assault",
+                    "defense-assault",
+                    "speed-assault",
+                    "hyper-bomb",
+                    "crash-avenger",
+                    "quick-boomerang",
+                    "gemini-laser",
+                    "core-laser",
+                    "mecha-support"
+                    );
+                $temp_target_field['field_multipliers'] = array('experience' => 2, 'explode' => 1.6, 'shadow' => 1.4);
+                $temp_target_field['field_music'] = 'sega-remix/special-stage-3-mm10';
+                $temp_target_field['field_background_variant'] = $hunter_token;
+                $temp_target_robots[] = array('robot_token' => $hunter_token, 'robot_item' => 'target-module');
+                $temp_target_robots[] = array('robot_token' => 'mouslider', 'robot_item' => 'energy-tank');
+                $temp_target_robots[] = array('robot_token' => 'dark-man-3', 'robot_item' => 'speed-booster');
+                $temp_target_robots[] = array('robot_token' => 'mouslider', 'robot_item' => 'energy-tank');
+            }
+            $temp_target_level = $this_prototype_data['this_chapter_levels'][2] + 1;
+            $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
+            $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+            $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+            // Add this battle and it's status to the appropriate group array
+            $append_last_battle_option_to_group($this_group_name);
+
+        } else {
+            $temp_placeholder = array();
+            $temp_placeholder['option_type'] = 'placeholder';
+            $temp_placeholder['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $temp_placeholder['option_locks'] = $get_battle_options_group_locks($this_group_name);
+            $this_prototype_data['battle_options'][] = $temp_placeholder;
+            $append_faux_battle_option_to_group($this_group_name);
+        }
+
+        // ----------------------- //
+        // WIP WIP WIP WIP CH3-KNG //
+        // ----------------------- //
+
+        // -- CHAPTER THREE FORTRESS-III BATTLE -- //
+
+        // GENERATE THE HUNTER COMPOUND BATTLE VS CONTROLLED KING
+        // Ensure the player has completed an appropriate number of pre-battles before unlocking this one
+        $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
+        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 2){
+            $temp_battle_config = array();
+            $temp_battle_config['battle_size'] = '1x4';
+            $temp_target_robots = array();
+            $temp_target_field = array('field_token' => 'royal-palace', 'field_music' => 'sega-remix/kings-fortress-rnf');
+            $temp_target_field['field_multipliers'] = array('experience' => 3, 'shadow' => 1.8, 'space' => 1.6, 'shield' => 1.4, 'cutter' => 1.2);
+            $temp_boss_robot = array('robot_token' => 'king', 'robot_image' => 'king_alt', 'robot_item' => 'reverse-module');
+            $temp_support_robot1 = array('robot_token' => 'trill', 'robot_item' => 'energy-capsule', 'robot_abilities' => array('buster-charge', 'energy-boost'));
+            $temp_support_robot2 = array('robot_token' => 'trill', 'robot_item' => 'energy-capsule', 'robot_abilities' => array('buster-charge', 'energy-boost'));
+            if ($this_prototype_data['this_player_token'] === 'dr-light'){
+                array_unshift($temp_support_robot1['robot_abilities'], 'space-shot');
+                array_unshift($temp_support_robot2['robot_abilities'], 'space-shot');
+                $temp_support_robot1['robot_item'] = 'speed-booster';
+                $temp_support_robot1['robot_item'] = 'defense-booster';
+            }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){
+                array_unshift($temp_support_robot1['robot_abilities'], 'space-shot', 'space-buster');
+                array_unshift($temp_support_robot2['robot_abilities'], 'space-shot', 'space-buster');
+                $temp_support_robot1['robot_item'] = 'defense-booster';
+                $temp_support_robot1['robot_item'] = 'attack-booster';
+            }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){
+                array_unshift($temp_support_robot1['robot_abilities'], 'space-shot', 'space-buster', 'space-overdrive');
+                array_unshift($temp_support_robot2['robot_abilities'], 'space-shot', 'space-buster', 'space-overdrive');
+                $temp_support_robot1['robot_item'] = 'attack-booster';
+                $temp_support_robot1['robot_item'] = 'speed-booster';
+            }
+            $temp_target_robots[] = $temp_boss_robot;
+            $temp_target_robots[] = $temp_support_robot1;
+            $temp_target_robots[] = $temp_support_robot2;
+            $temp_target_level = $this_prototype_data['this_chapter_levels'][2] + 2;
+            $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
+            $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+            $this_prototype_data['battle_options'][] = $temp_battle_omega;
+
+            // Add this battle and it's status to the appropriate group array
+            $append_last_battle_option_to_group($this_group_name);
+
+        } else {
+            $temp_placeholder = array();
+            $temp_placeholder['option_type'] = 'placeholder';
+            $temp_placeholder['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $temp_placeholder['option_locks'] = $get_battle_options_group_locks($this_group_name);
+            $this_prototype_data['battle_options'][] = $temp_placeholder;
+            $append_faux_battle_option_to_group($this_group_name);
+        }
 
     }
 
