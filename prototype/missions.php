@@ -552,8 +552,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $this_prototype_data['phase_token'] = 'phase'.$this_prototype_data['battle_phase'];
         $this_prototype_data['phase_battle_token'] = $this_prototype_data['this_player_token'].'-'.$this_prototype_data['phase_token'];
 
+        // Define an array to keep track of group option progress
+        $this_group_name = $new_group_name();
+        $new_battle_options_group($this_group_name);
+
         // Populate the battle options with the initial eight robots combined
         if (isset($this_prototype_data['target_robot_omega'][1][0])){ $this_prototype_data['target_robot_omega'] = $this_prototype_data['target_robot_omega'][1]; }
+
+        // Loop through the target robots and generate the battle options
         foreach ($this_prototype_data['target_robot_omega'] AS $key => $info){
 
             // Generate the second info option and skip if already used
@@ -589,7 +595,51 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
             }
 
+            // Add this battle and it's status to the appropriate group array
+            $append_last_battle_option_to_group($this_group_name);
+
         }
+
+        // ---------------------- //
+        // WIP WIP WIP WIP CH2-HU //
+        // ---------------------- //
+
+        // -- CHAPTER FOUR FORTRESS BATTLE -- //
+
+        // GENERATE THE GENESIS TOWER BATTLE VS THE GENESIS UNIT
+        // Ensure the player has completed an appropriate number of pre-battles before unlocking this one
+        $group_option_locks = $get_battle_options_group_locks($this_group_name);
+        $group_options_total = count($group_option_locks);
+        $group_options_complete_total = array_sum($group_option_locks);
+        if ($this_prototype_data['prototype_complete'] || $group_options_complete_total >= $group_options_total){
+            $temp_battle_config = array();
+            $temp_battle_config['battle_size'] = '1x4';
+            $temp_target_robots = array();
+            $temp_target_robots[] = array('robot_token' => 'buster-rod-g', 'robot_item' => 'water-core');
+            $temp_target_robots[] = array('robot_token' => 'mega-water-s', 'robot_item' => 'wind-core');
+            $temp_target_robots[] = array('robot_token' => 'hyper-storm-h', 'robot_item' => 'swift-core');
+            if ($this_prototype_data['this_player_token'] === 'dr-light'){ $rotate_targets = 0; }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){ $rotate_targets = 1; }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){  $rotate_targets = 2; }
+            for ($i = 0; $i < $rotate_targets; $i++){ $first = array_shift($temp_target_robots); $temp_target_robots[] = $first; }
+            $temp_target_field = array('field_token' => 'genesis-tower');
+            $temp_target_level = $this_prototype_data['this_chapter_levels'][3] + 4;;
+            $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
+            $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+            $this_prototype_data['battle_options'][] = $temp_battle_omega;
+            $append_last_battle_option_to_group($this_group_name);
+        } else {
+            $temp_placeholder = array();
+            $temp_placeholder['option_type'] = 'placeholder';
+            $temp_placeholder['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $temp_placeholder['option_locks'] = $group_option_locks;
+            $temp_placeholder['option_maintext'] = '';
+            $temp_placeholder['option_subtext'] = '';
+            $this_prototype_data['battle_options'][] = $temp_placeholder;
+            $append_faux_battle_option_to_group($this_group_name);
+        }
+
 
     }
 
@@ -622,7 +672,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
             // Unlock the first of the final destination battles
             $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-ii';
-            $temp_final_option = rpg_battle::get_index_info($temp_final_option_token);
+            $temp_final_option = rpg_battle::get_index_info($temp_final_option_token, true);
             $temp_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
             $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][4];
             $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
@@ -638,7 +688,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
             // Unlock the first of the final destination battles
             $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-iii';
-            $temp_final_option = rpg_battle::get_index_info($temp_final_option_token);
+            $temp_final_option = rpg_battle::get_index_info($temp_final_option_token, true);
             $temp_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
             $temp_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][4];
             $temp_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
