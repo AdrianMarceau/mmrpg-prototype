@@ -787,10 +787,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     $final_replacement_quotes['battle_victory'] = 'Can you see me, Master? I have finally completed my mission!';
                     $final_replacement_quotes['battle_defeat'] = 'Savour your temporary victory... I will return even more powerful...!';
                 } else if ($this_prototype_player_data['player_token'] === 'dr-wily'){
-                    $final_replacement_quotes['battle_start'] = 'I sense an Evil in your heart. Allow me to erase you for it!';
+                    $final_replacement_quotes['battle_start'] = 'I sense an Evil in your heart. My master will be pleased at your erasure!';
                     $final_replacement_quotes['battle_taunt'] = 'Stupid Earth creatures! You are only delaying the inevitable!';
                     $final_replacement_quotes['battle_victory'] = 'The Earth should thank me for saving it from your tragic future!';
-                    $final_replacement_quotes['battle_defeat'] = 'It doesn\'t end like this... I still have one more fight left in me...';
+                    $final_replacement_quotes['battle_defeat'] = 'It doesn\'t end like this... I still haven\'t found my master...';
                 } else if ($this_prototype_player_data['player_token'] === 'dr-cossack'){
                     $final_replacement_quotes['battle_start'] = 'I sense you are somehow... responsible... for my suffering!';
                     $final_replacement_quotes['battle_taunt'] = 'Stop resisting! It is time you Earthlings met your deserved ends!';
