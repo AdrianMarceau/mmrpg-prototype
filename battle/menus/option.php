@@ -80,6 +80,9 @@ ob_start();
                 echo '<span class="float_links">';
                     echo '<span class="page">Page</span>';
                     for ($i = 1; $i <= $current_options_pages; $i++){ echo '<a class="button num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
+                    if (MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev'){
+                    	echo '<a class="button num" data-action="ability_10_action-devpower-clearmission" style="position: absolute; left: 420px; top: 0px; z-index: 9;"><i class="fa fas fa-skull"></i></a>';
+                    }
                 echo '</span> ';
             }
             // Otherwise, simply print the item select text label
