@@ -3082,14 +3082,14 @@ body[data-source="website"] #prototype .menu {
     line-height: 12rem;
 }
 #mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14.option_placeholder .maintext,
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_22.option_placeholder .maintext {
+#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_24.option_placeholder .maintext {
     font-size: 200%;
     line-height: 6rem;
 }
 #mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14.option_placeholder .maintext > i {
     width: calc(25% - 6px);
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_22.option_placeholder .maintext > i {
+#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_24.option_placeholder .maintext > i {
     width: calc(50% - 6px);
 }
 
