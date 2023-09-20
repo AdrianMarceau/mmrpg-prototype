@@ -315,6 +315,9 @@ class rpg_robot extends rpg_object {
 
             // Update this robot's flag's to reflect unlockability
             $this->flags['robot_is_unlockable'] = $is_unlockable;
+            //error_log('test $this->robot_token = '.print_r($this->robot_token, true));
+            //error_log('$this->flags[\'robot_is_unlockable\'] = '.print_r($this->flags['robot_is_unlockable'], true));
+            //error_log('|| based on $this->battle->battle_rewards = '.print_r($this->battle->battle_rewards, true));
 
             // Set the session settings flag to true
             $this->flags['check_robot_unlockable'] = true;

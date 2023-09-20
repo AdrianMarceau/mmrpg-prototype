@@ -2076,6 +2076,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
 
     // Create an array to hold any robots that were intentionally added for the alpha battle
     $temp_added_alpha_robots = array();
+    $temp_added_alpha_robots_tokens = array();
 
     // First and foremost, remove and previously added mecha from the battle
     $temp_player_robots = $temp_battle_omega['battle_target_player']['player_robots'];
@@ -2090,6 +2091,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
             && !empty($robot_info['flags']['robot_is_visitor'])){
             //error_log('robot_is_visitor for '.$robot_token);
             $temp_added_alpha_robots[] = $robot_info;
+            $temp_added_alpha_robots_tokens[] = $robot_token;
             unset($temp_player_robots[$key]);
             continue;
         }
@@ -2181,7 +2183,21 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     // Update the zenny and turns for this alpha mecha battle
     if (isset($temp_battle_alpha['battle_zenny'])){ $temp_battle_alpha['battle_zenny'] = ceil($temp_battle_alpha['battle_zenny'] * 0.10); }
     if (isset($temp_battle_alpha['battle_turns'])){ $temp_battle_alpha['battle_turns'] = count($temp_battle_alpha['battle_target_player']['player_robots']) * MMRPG_SETTINGS_BATTLETURNS_PERMECHA; }
-    if (isset($temp_battle_alpha['battle_rewards'])){ $temp_battle_alpha['battle_rewards'] = array(); }
+
+    // Clear the rewards, but make sure we don't remove any related to visitor robots
+    if (isset($temp_battle_alpha['battle_rewards'])){
+        $backup_battle_rewards = $temp_battle_alpha['battle_rewards'];
+        $temp_battle_alpha['battle_rewards'] = array();
+        if ($temp_include_visitor_robot
+            && !empty($backup_battle_rewards['robots'])){
+            foreach ($backup_battle_rewards['robots'] AS $key => $robot){
+                if (in_array($robot['token'], $temp_added_alpha_robots_tokens)){
+                    $temp_battle_alpha['battle_rewards']['robots'][] = $robot;
+                    unset($temp_battle_omega['battle_rewards']['robots'][$key]);
+                }
+            }
+        }
+    }
 
 
     /* UPDATE EXISTING OMEGA BATTLE (MASTERS) */
