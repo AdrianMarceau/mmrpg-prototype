@@ -899,6 +899,17 @@
         $this_group_options = array();
 
         // Populate the group options array with relevant pages and buttons
+        if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
+            && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
+            if (rpg_user::current_user_has_permission('pull-content-updates')
+                || rpg_user::current_user_has_permission('push-content-updates')){
+                $this_option = array(
+                    'link' => array('url' => 'admin/scripts/publish-game-content.php?return=html&kind=all&token=all&source=github', 'text' => 'Push Content Updates', 'target' => '_blank', 'bullet' => 'cloud-upload-alt'),
+                    'desc' => 'Published game content updates to the cloud'
+                    );
+                $this_group_options[] = $this_option;
+            }
+        }
         if (rpg_user::current_user_has_permission('pull-content-updates')){
             $this_option = array(
                 'link' => array('url' => 'admin/scripts/update-game-content.php?return=html', 'text' => 'Pull Content Updates', 'target' => '_blank', 'bullet' => 'cloud-download-alt'),
@@ -908,8 +919,8 @@
         }
         if (rpg_user::current_user_has_permission('pull-core-updates')){
             $this_option = array(
-                'link' => array('url' => 'admin/scripts/update-core.php?return=html', 'text' => 'Pull Core Updates', 'target' => '_blank', 'bullet' => 'caret-square-down'),
-                'desc' => 'Apply master code updates, typically for lead dev use'
+                'link' => array('url' => 'admin/scripts/update-core.php?return=html', 'text' => 'Download Core Updates', 'target' => '_blank', 'bullet' => 'caret-square-down'),
+                'desc' => 'Download and apply any system updates pending install'
                 );
             $this_group_options[] = $this_option;
         }
@@ -917,19 +928,8 @@
             && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
             if (rpg_user::current_user_has_permission('pull-user-data')){
                 $this_option = array(
-                    'link' => array('url' => 'admin/scripts/pull-live-user-data.php?return=html', 'text' => 'Pull Live User Data', 'target' => '_blank', 'bullet' => 'arrow-alt-circle-down'),
-                    'desc' => 'Overwrite '.MMRPG_CONFIG_SERVER_ENV.' user data with '.MMRPG_CONFIG_PULL_LIVE_DATA_FROM.' build data'
-                    );
-                $this_group_options[] = $this_option;
-            }
-        }
-        if (MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== false
-            && MMRPG_CONFIG_PULL_LIVE_DATA_FROM !== MMRPG_CONFIG_SERVER_ENV){
-            if (rpg_user::current_user_has_permission('pull-content-updates')
-                || rpg_user::current_user_has_permission('push-content-updates')){
-                $this_option = array(
-                    'link' => array('url' => 'admin/scripts/publish-game-content.php?return=html&kind=all&token=all&source=github', 'text' => 'Push Content Updates', 'target' => '_blank', 'bullet' => 'cloud-upload-alt'),
-                    'desc' => 'Published game content updates to the cloud'
+                    'link' => array('url' => 'admin/scripts/pull-live-user-data.php?return=html', 'text' => 'Purge & ReSync User Data', 'target' => '_blank', 'bullet' => 'users'),
+                    'desc' => 'Delete '.MMRPG_CONFIG_SERVER_ENV.' user data and overwrite with data from the '.MMRPG_CONFIG_PULL_LIVE_DATA_FROM.' build'
                     );
                 $this_group_options[] = $this_option;
             }
