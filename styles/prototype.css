@@ -2329,7 +2329,7 @@ body[data-source="website"] #prototype .menu {
     background-position: center center !important;
 }
 #prototype .option_placeholder .platform {
-    background-image: url('../images/menus/menu-options_this-battle-select.png?2020') !important;
+    background-image: url('../images/menus/menu-options_this-types-select.png?2020') !important;
     background-repeat: repeat !important;
     background-size: auto auto !important;
     background-blend-mode: difference;
@@ -3076,6 +3076,10 @@ body[data-source="website"] #prototype .menu {
     position: absolute;
     top: 51px;
     right: 0;
+}
+#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter].option_placeholder .maintext {
+    font-size: 200%;
+    line-height: 12rem;
 }
 #mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14.option_placeholder .maintext,
 #mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_22.option_placeholder .maintext {
