@@ -3237,14 +3237,6 @@ body[data-source="website"] #prototype .menu {
     width: 44%;
     text-align: right;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
-    [data-chapter="3"]
-    ):is(
-    .block_24
-    ) .battle_sprites {
-    padding-left: 2%;
-    text-align: left;
-}
 
 #mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
@@ -3269,4 +3261,17 @@ body[data-source="website"] #prototype .menu {
     [data-chapter="0"]
     ).block_2 .battle_sprites .sprite_robot {
     margin: 0 -16px;
+}
+
+#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"][data-token*="dr-light"].block_24 .battle_sprites {
+    padding-left: 2%;
+    text-align: left;
+}
+#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"][data-token*="dr-wily"].block_24 .battle_sprites {
+    padding-left: 7%;
+    text-align: left;
+}
+#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"][data-token*="dr-cossack"].block_24 .battle_sprites {
+    padding-left: 11%;
+    text-align: left;
 }
