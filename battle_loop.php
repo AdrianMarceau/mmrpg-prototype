@@ -170,6 +170,15 @@ $target_playerinfo = array(
 $target_playerinfo['player_autopilot'] = true;
 $target_playerinfo['player_side'] = 'right';
 
+// Make sure the current and target player info are always available in the battle
+if (!isset($this_battle->values['battle_players'])
+    || empty($this_battle->values['battle_players'])){
+    $this_battle->values['battle_players'] = array(
+        'this_player' => $this_playerinfo,
+        'target_player' => $target_playerinfo
+        );
+}
+
 // Only create the arrays with minimal info if NOT start
 if ($this_action != 'start'){
 
