@@ -380,7 +380,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     "shield-buster",
                     "shield-shot",
                     "shield-overdrive",
-                    "buster-shot",
+                    //"buster-shot",
                     "buster-charge",
                     "energy-boost",
                     "attack-boost",
@@ -394,7 +394,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_target_field['field_multipliers'] = array('experience' => 2, 'shield' => 1.6, 'shadow' => 1.4);
                 $temp_target_field['field_music'] = 'sega-remix/special-stage-1-mm10';
                 $temp_target_field['field_background_variant'] = $hunter_token;
-                $temp_target_robots[] = array('robot_token' => $hunter_token, 'robot_item' => 'charge-module');
+                $temp_target_robots[] = array('robot_token' => $hunter_token, 'robot_item' => 'charge-module', 'robot_abilities' => $hunter_abilities);
                 $temp_target_robots[] = array('robot_token' => 'beak', 'robot_item' => 'energy-pellet');
                 $temp_target_robots[] = array('robot_token' => 'dark-man', 'robot_item' => 'attack-booster');
                 $temp_target_robots[] = array('robot_token' => 'beak', 'robot_item' => 'energy-pellet');
@@ -405,7 +405,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     "cutter-buster",
                     "cutter-shot",
                     "cutter-overdrive",
-                    "buster-shot",
+                    //"buster-shot",
                     "buster-charge",
                     "energy-break",
                     "attack-break",
@@ -422,7 +422,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_target_field['field_multipliers'] = array('experience' => 2, 'cutter' => 1.6, 'shadow' => 1.4);
                 $temp_target_field['field_music'] = 'sega-remix/special-stage-2-mm10';
                 $temp_target_field['field_background_variant'] = $hunter_token;
-                $temp_target_robots[] = array('robot_token' => $hunter_token, 'robot_item' => 'xtreme-module');
+                $temp_target_robots[] = array('robot_token' => $hunter_token, 'robot_item' => 'xtreme-module', 'robot_abilities' => $hunter_abilities);
                 $temp_target_robots[] = array('robot_token' => 'shield-attacker', 'robot_item' => 'energy-capsule');
                 $temp_target_robots[] = array('robot_token' => 'dark-man-2', 'robot_item' => 'defense-booster');
                 $temp_target_robots[] = array('robot_token' => 'shield-attacker', 'robot_item' => 'energy-capsule');
@@ -433,7 +433,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     "laser-buster",
                     "laser-shot",
                     "laser-overdrive",
-                    "buster-shot",
+                    //"buster-shot",
                     "buster-charge",
                     "energy-assault",
                     "attack-assault",
@@ -449,7 +449,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_target_field['field_multipliers'] = array('experience' => 2, 'explode' => 1.6, 'shadow' => 1.4);
                 $temp_target_field['field_music'] = 'sega-remix/special-stage-3-mm10';
                 $temp_target_field['field_background_variant'] = $hunter_token;
-                $temp_target_robots[] = array('robot_token' => $hunter_token, 'robot_item' => 'target-module');
+                $temp_target_robots[] = array('robot_token' => $hunter_token, 'robot_item' => 'target-module', 'robot_abilities' => $hunter_abilities);
                 $temp_target_robots[] = array('robot_token' => 'mouslider', 'robot_item' => 'energy-tank');
                 $temp_target_robots[] = array('robot_token' => 'dark-man-3', 'robot_item' => 'speed-booster');
                 $temp_target_robots[] = array('robot_token' => 'mouslider', 'robot_item' => 'energy-tank');
