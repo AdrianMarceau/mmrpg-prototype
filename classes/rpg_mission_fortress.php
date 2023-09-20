@@ -37,7 +37,7 @@ class rpg_mission_fortress extends rpg_mission {
     }
 
     // Define a function for generating the FORTRESS  missions
-    public static function generate($this_prototype_data, $this_battle_config, $this_robot_tokens_or_data, $this_field_tokens_or_data, $this_start_level = 1, $this_unlock_robots = false, $this_unlock_abilities = false){
+    public static function generate($this_prototype_data, $this_battle_config, $this_robot_tokens_or_data, $this_field_tokens_or_data, $this_start_level = 1){
 
         // Collect the session token
         $session_token = mmrpg_game_token();
@@ -51,6 +51,8 @@ class rpg_mission_fortress extends rpg_mission {
 
         // Predefine some battle config defaults if not already set
         if (!isset($this_battle_config['auto_hide_mechas'])){ $this_battle_config['auto_hide_mechas'] = true; }
+        if (!isset($this_battle_config['auto_unlock_target_robots'])){ $this_battle_config['auto_unlock_target_robots'] = false; }
+        if (!isset($this_battle_config['auto_unlock_target_abilities'])){ $this_battle_config['auto_unlock_target_abilities'] = false; }
 
         // If the provided robot tokens were actually data, extract the tokens
         $this_robot_tokens = array();
@@ -319,7 +321,7 @@ class rpg_mission_fortress extends rpg_mission {
 
         // Empty the robot rewards array if not allowed
         $temp_battle_omega['battle_rewards']['robots'] = array();
-        if ($this_unlock_robots){
+        if ($this_battle_config['auto_unlock_target_robots']){
             foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot_info){
                 $index_info = $mmrpg_robots_index[$robot_info['robot_token']];
                 if ($index_info['robot_class'] == 'master'
@@ -329,11 +331,13 @@ class rpg_mission_fortress extends rpg_mission {
                     $temp_battle_omega['battle_rewards']['robots'][] = array('token' => $robot_info['robot_token'], 'level' => $omega_robot_level, 'experience' => 999);
                 }
             }
+        } elseif (!empty($this_battle_config['robot_rewards'])){
+            $temp_battle_omega['battle_rewards']['robots'] = $this_battle_config['robot_rewards'];
         }
 
         // Empty the ability rewards array if not allowed
         $temp_battle_omega['battle_rewards']['abilities'] = array();
-        if ($this_unlock_abilities){
+        if ($this_battle_config['auto_unlock_target_abilities']){
             $temp_option_robot = $mmrpg_robots_index[$this_robot_tokens[0]];
             $temp_option_robot2 = isset($this_robot_tokens[1]) ? $mmrpg_robots_index[$this_robot_tokens[1]] : false;
             if (!empty($temp_option_robot['robot_rewards']['abilities'])){
@@ -351,6 +355,8 @@ class rpg_mission_fortress extends rpg_mission {
                     break; // only unlock first ability (T1) if simply clearing the stage
                 }
             }
+        } elseif (!empty($this_battle_config['ability_rewards'])){
+            $temp_battle_omega['battle_rewards']['abilities'] = $this_battle_config['ability_rewards'];
         }
 
         // Define the number of abilities and robots left to unlock and start at zero
