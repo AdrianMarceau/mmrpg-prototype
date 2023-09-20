@@ -1440,6 +1440,8 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
         elseif (!empty($this_info['option_type']) && $this_info['option_type'] == 'placeholder'){
 
             // Generate the option markup for the event placeholder
+            if (!isset($this_info['option_maintext'])){ $this_info['option_maintext'] = ''; }
+            if (!isset($this_info['option_subtext'])){ $this_info['option_subtext'] = ''; }
             $temp_optiontitle = $this_info['option_maintext'];
             $temp_optionsize = !empty($this_info['option_size']) ? $this_info['option_size'] : '1x4';
             $temp_optionimages = !empty($this_info['option_images']) ? $this_info['option_images'] : '';
@@ -1450,8 +1452,8 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $this_info['option_maintext'] = '';
                     foreach ($this_info['option_locks'] AS $lock_key => $this_lock){
                         $lock_class = 'lock-icon fa fas '.($this_lock ? 'fa-lock-open-alt' : 'fa-lock-alt');
-                        $animation_duration = 1 - (0.1 * $lock_key);
-                        $lock_style = 'animation-duraction: '.$animation_duration.'s; ';
+                        $animation_duration = 2 - (0.1 * $lock_key);
+                        $lock_style = 'animation-duration: '.$animation_duration.'s; ';
                         $this_info['option_maintext'] .= '<i class="'.$lock_class.'" style="'.$lock_style.'"></i>';
                     }
                     $this_info['option_maintext'] = trim($this_info['option_maintext']);
