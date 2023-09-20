@@ -651,6 +651,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
     if ($this_prototype_data['prototype_complete']
+        || !empty($this_prototype_data['this_chapter_unlocked']['4'])
         || !empty($this_prototype_data['this_chapter_unlocked']['4a'])
         || !empty($this_prototype_data['this_chapter_unlocked']['4b'])
         || !empty($this_prototype_data['this_chapter_unlocked']['4c'])){
@@ -666,9 +667,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $this_prototype_player_data = $mmrpg_index_players[$this_prototype_data['this_player_token']];
         $target_prototype_player_data = $mmrpg_index_players[$this_prototype_data['target_player_token']];
 
+        // Define an array to keep track of group option progress
+        $this_group_name = $new_group_name();
+        $new_battle_options_group($this_group_name);
+
         // Final Destination I (ENKER/PUNK/BALLADE)
-        // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
-        if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4a'])){
+        // Always add the first of the final destination battles
+        if (true){
 
             // Unlock the first of the final destination battles
             $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-ii';
@@ -679,12 +684,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
             $this_prototype_data['battle_options'][] = $temp_final_option;
             rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
+            $append_last_battle_option_to_group($this_group_name);
 
         }
 
         // Final Destination II (MEGA-DS/BASS-DS/PROTO-DS)
-        // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
-        if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4b'])){
+        // Only continue if the player has defeated the first final destination battle
+        $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
+        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 1){
 
             // Unlock the first of the final destination battles
             $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-iii';
@@ -695,12 +702,21 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
             $this_prototype_data['battle_options'][] = $temp_final_option;
             rpg_battle::update_index_info($temp_final_option['battle_token'], $temp_final_option);
+            $append_last_battle_option_to_group($this_group_name);
 
+        } else {
+            $temp_placeholder = array();
+            $temp_placeholder['option_type'] = 'placeholder';
+            $temp_placeholder['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $temp_placeholder['option_locks'] = $get_battle_options_group_locks($this_group_name);
+            $this_prototype_data['battle_options'][] = $temp_placeholder;
+            $append_faux_battle_option_to_group($this_group_name);
         }
 
         // Final Destination III (SLUR w/ TRILL SUPPORT)
-        // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
-        if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['4c'])){
+        // Only continue if the player has defeated the first and second final destination battles
+        $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
+        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 2){
 
             // Insert Slur w/ Trill battle here
             // "Defeat the alien robot Slur in this daunting/desperate/decisive final battle!"
@@ -1006,6 +1022,16 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
             }
 
+            // Add this battle and it's status to the appropriate group array
+            $append_last_battle_option_to_group($this_group_name);
+
+        } else {
+            $temp_placeholder = array();
+            $temp_placeholder['option_type'] = 'placeholder';
+            $temp_placeholder['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $temp_placeholder['option_locks'] = $get_battle_options_group_locks($this_group_name);
+            $this_prototype_data['battle_options'][] = $temp_placeholder;
+            $append_faux_battle_option_to_group($this_group_name);
         }
 
 

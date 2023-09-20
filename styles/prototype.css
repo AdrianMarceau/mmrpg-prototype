@@ -3081,6 +3081,12 @@ body[data-source="website"] #prototype .menu {
     font-size: 200%;
     line-height: 12rem;
 }
+#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="2"].option_placeholder .maintext {
+    font-size: 250%;
+}
+#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="4"].option_placeholder .maintext {
+    font-size: 300%;
+}
 #mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14.option_placeholder .maintext,
 #mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_24.option_placeholder .maintext {
     font-size: 200%;
@@ -3091,6 +3097,11 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_24.option_placeholder .maintext > i {
     width: calc(50% - 6px);
+}
+#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="0"].block_4.option_placeholder .maintext > i,
+#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="2"].block_18.option_placeholder .maintext > i,
+#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="4"].block_28.option_placeholder .maintext > i {
+    width: calc(33% - 6px);
 }
 
 #mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
