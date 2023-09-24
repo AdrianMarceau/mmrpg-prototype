@@ -54,15 +54,11 @@ ob_start();
         $equipped_abilities_count = 0;
 
         // Collect the temp ability and robot indexes
-        $db_robot_fields = rpg_robot::get_index_fields(true);
-        $db_ability_fields = rpg_ability::get_index_fields(true);
-        $temp_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-        $temp_abilities_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-        $temp_robotinfo = $temp_robots_index[$this_robot->robot_token];
-        $temp_robotinfo = rpg_robot::parse_index_info($temp_robotinfo);
-        if ($temp_robotinfo['robot_core'] != $this_robot->robot_core){ $temp_robotinfo['robot_core'] = $this_robot->robot_core; }
-        $temp_robotinfo['robot_core2'] = preg_match('/-core$/i', $current_robot_item) ? preg_replace('/-core$/i', '', $current_robot_item) : '';
-        if ($temp_robotinfo['robot_core2'] == 'none'){ $temp_robotinfo['robot_core2'] = ''; }
+        $mmrpg_robots_index = rpg_robot::get_index(true);
+        $mmrpg_abilities_index = rpg_ability::get_index(true);
+        $temp_robotinfo = $mmrpg_robots_index[$this_robot->robot_token];
+        $temp_robotinfo['robot_core'] = $this_robot->robot_core;
+        $temp_robotinfo['robot_core2'] = $this_robot->robot_core2;
 
         // Loop through each ability and display its button
         $ability_key = 0;
@@ -72,7 +68,7 @@ ob_start();
             if (!empty($ability_token)){
 
                 // If this ability is invalid, continue
-                if (!isset($temp_abilities_index[$ability_token])){ continue; }
+                if (!isset($mmrpg_abilities_index[$ability_token])){ continue; }
 
                 // Check if this ability has been unlocked
                 $this_ability_unlocked = true;
@@ -81,8 +77,7 @@ ob_start();
                 $block_num = $equipped_abilities_count > 8 ? $equipped_abilities_count % 8 : $equipped_abilities_count;
 
                 // Create the ability object using the session/index data
-                $temp_abilityinfo = $temp_abilities_index[$ability_token];
-                $temp_abilityinfo = rpg_ability::parse_index_info($temp_abilityinfo);
+                $temp_abilityinfo = $mmrpg_abilities_index[$ability_token];
                 $temp_abilityinfo['ability_id'] = $this_robot->robot_id.str_pad($temp_abilityinfo['ability_id'], 3, '0', STR_PAD_LEFT);
                 $temp_ability = rpg_game::get_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
                 $temp_ability->trigger_onload(true);
@@ -379,6 +374,7 @@ ob_start();
             }
             $ability_key++;
         }
+
         // If there were less than 8 abilities, fill in the empty spaces
         if ($equipped_abilities_count < 8){
             for ($i = $equipped_abilities_count; $i < 8; $i++){
@@ -387,9 +383,7 @@ ob_start();
                 echo('<a type="button" class="'.$btn_class.'">&nbsp;</a>');
             }
         }
-        // Unset the temp abilities index
-        $temp_abilities_index = false;
-        unset($temp_abilities_index);
+
     }
 
     // End the main action container tag
