@@ -1486,6 +1486,8 @@ class rpg_robot extends rpg_object {
 
         // Define the compatibility flag and default to false
         $temp_compatible = false;
+        //$debug_fragment = '';
+        //$debug_fragment .= 'has_ability_compatibility('.$robot_token.', '.$ability_token.', '.$robot_core.', '.$robot_core2.')'."\n";
 
         // Collect the global list and return true if match is found
         $global_abilities = rpg_ability::get_global_abilities();
@@ -1497,7 +1499,8 @@ class rpg_robot extends rpg_object {
             //$debug_fragment .= 'has-type '; // DEBUG
             if (!empty($robot_core) || !empty($robot_core2) || !empty($item_core) || !empty($skill_core)){
             //$debug_fragment .= 'has-core '; // DEBUG
-                if ($robot_core == 'copy' || $robot_base_core == 'copy'){
+                if ($robot_core == 'copy' || $robot_base_core == 'copy'
+                    || $robot_core2 == 'copy' || $robot_base_core2 == 'copy'){
                     //$debug_fragment .= 'copy-core '; // DEBUG
                     $temp_compatible = true;
                 }
@@ -1542,7 +1545,7 @@ class rpg_robot extends rpg_object {
 
         //$robot_info['robot_abilities']
         // DEBUG
-        //die('Found '.$debug_fragment.' - robot '.($temp_compatible ? 'is' : 'is not').' compatible!');
+        //error_log('Found '.$debug_fragment.' - robot '.($temp_compatible ? 'is' : 'is not').' compatible!');
         // Return the temp compatible result
         return $temp_compatible;
 
