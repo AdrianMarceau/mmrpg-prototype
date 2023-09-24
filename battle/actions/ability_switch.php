@@ -225,6 +225,8 @@ if (empty($active_target_robot->robot_abilities)){ $active_target_robot->robot_a
 // Update the robot's session with ability changes
 $active_target_robot->update_session();
 
+error_log('---------'.basename(__FILE__).'---------');
+
 // Collect the ability choice from the robot
 $temp_token = rpg_robot::robot_choices_abilities(array(
     'this_battle' => $this_battle,
@@ -257,20 +259,56 @@ $temp_targetability = rpg_game::get_ability($this_battle, $target_player, $activ
 
 // If the target player's temporary ability allows target selection
 if ($temp_targetability->ability_target == 'select_target'){
+    //error_log('$temp_targetability->ability_target == select_target');
 
-    // Select a random active robot on this player's side of the field
-    $temp_activerobots = $this_player->values['robots_active'];
-    shuffle($temp_activerobots);
-    $temp_targetability_targetinfo = array_shift($temp_activerobots);
-    if ($temp_targetability_targetinfo['robot_id'] == $this_robot->robot_id){
+    // If the target has focused attention, only select active
+    $temp_select_focus = 'auto';
+    if (!empty($active_target_robot->values['robot_focus'])){ $temp_select_focus = $active_target_robot->values['robot_focus']; }
+    if ($temp_select_focus == 'auto'){
+        if ($this_player->counters['robots_active'] == 1){
+            $temp_select_focus = 'active';
+        } elseif (!empty($active_target_robot->values['robot_focus_targets'])){
+            $possible_targets = $active_target_robot->values['robot_focus_targets'];
+            shuffle($possible_targets);
+            $temp_target_id = array_shift($possible_targets);
+            $temp_target_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $temp_target_id));
+            $temp_select_focus = $temp_target_robot->robot_position;
+        } else {
+            $temp_select_focus = mt_rand(0, 1) == 0 ? 'active' : 'bench';
+        }
+    }
+
+    // Select either the active robot on this player's side of the field or a random benched one
+    if ($temp_select_focus == 'active'
+        || $this_player->counters['robots_active'] == 1){
+        // We select the active robot as it's out only choice
         $temp_targetability_targetplayer = $this_player;
         $temp_targetability_targetrobot = $this_robot;
     } else {
+        // We select a random (or curated) benched robot given our choices
+        $temp_targetability_targetinfo = false;
+        $temp_activerobots = $this_player->values['robots_active'];
+        if (!empty($active_target_robot->values['robot_focus_targets'])){
+            $possible_targets = $active_target_robot->values['robot_focus_targets'];
+            //error_log('$possible_targets for '.$active_target_robot->robot_token.' = '.print_r($possible_targets, true));
+            shuffle($possible_targets);
+            $temp_target_id = array_shift($possible_targets);
+            $temp_targetability_targetinfo = array('robot_id' => $temp_target_id);
+        } else {
+            shuffle($temp_activerobots);
+            while (empty($temp_targetability_targetinfo)
+                || $temp_targetability_targetinfo['robot_id'] == $this_robot->robot_id){
+                $temp_targetability_targetinfo = array_shift($temp_activerobots);
+            }
+        }
         $temp_targetability_targetplayer = $this_player;
         $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $this_player, $temp_targetability_targetinfo);
     }
 
+    //error_log('$temp_targetability_targetrobot->robot_string == '.$temp_targetability_targetrobot->robot_string);
+
 } elseif ($temp_targetability->ability_target == 'select_this'){
+    //error_log('$temp_targetability->ability_target == select_this');
 
     // Select a random active robot on this player's side of the field
     $temp_activerobots = $target_player->values['robots_active'];
@@ -281,14 +319,43 @@ if ($temp_targetability->ability_target == 'select_target'){
         $temp_targetability_targetrobot = $active_target_robot;
     } else {
         $temp_targetability_targetplayer = $target_player;
+        if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$temp_targetability_targetrobot = rpg_game::get_robot(\$this_battle, \$target_player, \$temp_targetability_targetinfo); on line ".__LINE__." {$temp_targetability_targetinfo['robot_token']} ";  }
         $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $target_player, $temp_targetability_targetinfo);
     }
 
-} else {
+    //error_log('$temp_targetability_targetrobot->robot_string == '.$temp_targetability_targetrobot->robot_string);
 
-    // Otherwise target the opposing robot directly
+} elseif ($temp_targetability->ability_target == 'select_this_ally'){
+    //error_log('$temp_targetability->ability_target == select_this_ally');
+
+    // Select a random active robot on this player's side of the field
+    $temp_activerobots = $target_player->values['robots_active'];
+    shuffle($temp_activerobots);
+    $temp_targetability_targetinfo = array();
+    if (!empty($temp_activerobots)){
+        foreach ($temp_activerobots AS $key => $info){
+            if ($info['robot_id'] == $active_target_robot->robot_id){ continue; }
+            $temp_targetability_targetinfo = $info;
+            break;
+        }
+    }
+    $temp_targetability_targetplayer = $target_player;
+    if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$temp_targetability_targetrobot = rpg_game::get_robot(\$this_battle, \$target_player, \$temp_targetability_targetinfo); on line ".__LINE__." {$temp_targetability_targetinfo['robot_token']} ";  }
+    if (!empty($temp_targetability_targetinfo)){
+        $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $target_player, $temp_targetability_targetinfo);
+    } else {
+        $temp_targetability_targetrobot = $active_target_robot;
+    }
+
+    //error_log('$temp_targetability_targetrobot->robot_string == '.$temp_targetability_targetrobot->robot_string);
+
+} else {
+    //error_log('$temp_targetability->ability_target == other');
+
     $temp_targetability_targetplayer = $this_player;
     $temp_targetability_targetrobot = $this_robot;
+
+    //error_log('$temp_targetability_targetrobot->robot_string == '.$temp_targetability_targetrobot->robot_string);
 
 }
 
