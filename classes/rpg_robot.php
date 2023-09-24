@@ -3168,10 +3168,13 @@ class rpg_robot extends rpg_object {
         // If we're syncing this robot's outfit to their elemental energy, let's check that now
         if ($sync_to_elemental_energy){
             //error_log('We must $sync_to_elemental_energy for '.$this->robot_token);
+            //error_log('-> core types = '.implode(',', array($this->robot_core, $this->robot_core2)));
             // If this robot is holding an elemental core, that takes priority
             if (!empty($this->robot_item)
                 && substr($this->robot_item, -5, 5) === '-core'){
                 list($core_type) = explode('-', $this->robot_item);
+                $this->robot_core = $core_type;
+                $this->robot_core2 = 'copy';
                 $this->robot_image = $this->robot_base_image.'_'.$core_type;
                 //error_log('-> using held item '.$this->robot_item.' for new image '.$this->robot_image);
             }
@@ -3182,13 +3185,20 @@ class rpg_robot extends rpg_object {
                 foreach ($triggered_abilities_types AS $key => $types){
                     if (empty($types)){ continue; }
                     $ability_type = $types[0];
-                    if (!empty($ability_type)){ $this->robot_image = $this->robot_base_image.'_'.$ability_type; }
-                    else { $this->robot_image = $this->robot_base_image; }
+                    if (!empty($ability_type)){
+                        $this->robot_core = $ability_type;
+                        $this->robot_core2 = 'copy';
+                        $this->robot_image = $this->robot_base_image.'_'.$ability_type;
+                    } else {
+                        $this->robot_core = 'copy';
+                        $this->robot_core2 = '';
+                        $this->robot_image = $this->robot_base_image;
+                    }
                     //error_log('-> using last ability type '.$ability_type.' for new image '.$this->robot_image);
                     break;
                 }
             }
-
+            //error_log('-> core types = '.implode(',', array($this->robot_core, $this->robot_core2)));
         }
 
         // Reset this robot's elemental properties back to base
