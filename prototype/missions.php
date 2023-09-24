@@ -1014,6 +1014,23 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         $real_final_boss_info['robot_quotes'] = array_merge($mmrpg_index_robots[$real_final_boss_token]['robot_quotes'], $real_final_replacement_quotes);
                         $temp_after_final_option['battle_target_player']['player_robots'][] = $real_final_boss_info;
 
+                        // Define the details for the real_final boss's minion "trill" and append them to the array
+                        $final_boss_support_token = 'trille-bot';
+                        $final_boss_support_image = 'trille-bot_alt6';
+                        $final_boss_support_count = 2;
+                        $final_boss_support_info = array('robot_token' => $final_boss_support_token, 'robot_image' => $final_boss_support_image);
+                        $final_boss_support_info['counters'] = array();
+                        $final_boss_support_info['counters'][$this_player_stat_token.'_mods'] = 2;
+                        $final_boss_support_info['robot_level'] = $real_final_boss_info['robot_level'] - 5;
+                        $final_boss_support_info['robot_item'] = 'space-shard';
+                        $final_boss_support_info['robot_abilities'] = array(
+                            'space-shot', 'space-buster', 'space-overdrive', 'buster-charge',
+                            'energy-boost', 'attack-boost', 'defense-boost', 'speed-boost'
+                            );
+                        for ($i = 0; $i < $final_boss_support_count; $i++){
+                            $temp_after_final_option['battle_target_player']['player_robots'][] = $final_boss_support_info;
+                            }
+
                         // Prepare the final battle details, add it to the index and/or buttons, and then queue it up
                         rpg_mission_fortress::prepare($temp_after_final_option, $this_prototype_data);
                         //$this_prototype_data['battle_options'][] = $temp_after_final_option;
