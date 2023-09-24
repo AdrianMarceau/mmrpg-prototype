@@ -266,17 +266,23 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_boss_robot = array('robot_token' => 'doc-robot', 'robot_item' => 'weapon-upgrade');
             $temp_target_field = array('field_token' => 'robot-museum');
             if ($this_prototype_data['this_player_token'] === 'dr-light'){
+                $temp_target_field['field_mechas'] = array('sniper-joe');
                 $temp_target_field['field_background_variant'] = 'mm1';
+                $temp_boss_robot['robot_item'] = 'defense-capsule';
                 $temp_boss_robot['robot_abilities'] = array('rolling-cutter', 'super-arm', 'ice-breath', 'hyper-bomb', 'fire-storm', 'thunder-strike', 'time-arrow', 'oil-shooter');
                 $temp_battle_config['ability_rewards'] = array(array('token' => 'copy-shot', 'level' => 0));
             }
             elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){
+                $temp_target_field['field_mechas'] = array('skeleton-joe');
                 $temp_target_field['field_background_variant'] = 'mm2';
+                $temp_boss_robot['robot_item'] = 'attack-capsule';
                 $temp_boss_robot['robot_abilities'] = array('metal-blade', 'air-shooter', 'bubble-spray', 'quick-strike', 'crash-bomber', 'flash-pulse', 'atomic-fire', 'leaf-fall');
                 $temp_battle_config['ability_rewards'] = array(array('token' => 'copy-soul', 'level' => 0));
             }
             elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){
+                $temp_target_field['field_mechas'] = array('crystal-joe');
                 $temp_target_field['field_background_variant'] = 'mm4';
+                $temp_boss_robot['robot_item'] = 'speed-capsule';
                 $temp_boss_robot['robot_abilities'] = array('bright-burst', 'rain-flush', 'drill-blitz', 'ring-boomerang', 'dust-crusher', 'skull-barrier', 'pharaoh-shot', 'dive-torpedo');
                 //$temp_battle_config['ability_rewards'] = array(array('token' => 'copy-style', 'level' => 0));
             }
