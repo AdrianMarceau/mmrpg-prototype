@@ -2289,27 +2289,9 @@ function mmrpg_console_event(thisMarkup, eventFlags){ //, flagsMarkup
             if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
                 // We're at a normal speed, so we can animate normally
                 $('.event:first-child', thisContext).animate({top:0}, 400, 'swing');
-                $('.event:eq(1)', thisContext).animate({opacity:0.90}, 100, 'swing');
-                $('.event:eq(2)', thisContext).animate({opacity:0.80}, 100, 'swing');
-                $('.event:eq(3)', thisContext).animate({opacity:0.70}, 100, 'swing');
-                $('.event:eq(4)', thisContext).animate({opacity:0.65}, 100, 'swing');
-                $('.event:eq(5)', thisContext).animate({opacity:0.60}, 100, 'swing');
-                $('.event:eq(6)', thisContext).animate({opacity:0.55}, 100, 'swing');
-                $('.event:eq(7)', thisContext).animate({opacity:0.50}, 100, 'swing');
-                $('.event:eq(8)', thisContext).animate({opacity:0.45}, 100, 'swing');
-                $('.event:gt(9)', thisContext).animate({opacity:0.40}, 100, 'swing');
                 } else {
                 // We're at a super-fast speed, so we should NOT cross-fade
                 $('.event:first-child', thisContext).css({top:0});
-                $('.event:eq(1)', thisContext).css({opacity:0.90});
-                $('.event:eq(2)', thisContext).css({opacity:0.80});
-                $('.event:eq(3)', thisContext).css({opacity:0.70});
-                $('.event:eq(4)', thisContext).css({opacity:0.65});
-                $('.event:eq(5)', thisContext).css({opacity:0.60});
-                $('.event:eq(6)', thisContext).css({opacity:0.55});
-                $('.event:eq(7)', thisContext).css({opacity:0.50});
-                $('.event:eq(8)', thisContext).css({opacity:0.45});
-                $('.event:gt(9)', thisContext).css({opacity:0.40});
                 }
         // Hide any leftover boxes from previous events over the limit
         $('.event:gt(50)', thisContext).appendTo('#event_console_backup');

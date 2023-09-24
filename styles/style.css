@@ -1863,9 +1863,10 @@ body.index #header {
 #mmrpg .canvas_skill_details {
     position: absolute;
     text-indent: 0;
-    left: 250px;
-    right: 250px;
     top: 42px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
     background-color: rgba(41, 41, 41, 0.75);
     border: 2px solid rgba(255, 255, 255, 0.15);
     height: 42px;
@@ -1978,6 +1979,18 @@ body.index #header {
 #canvas .canvas_skill_details .skill_name:before {
     content: "Skill";
 }
+
+#canvas .canvas_ability_details.wide,
+#canvas .canvas_item_details.wide,
+#canvas .canvas_skill_details.wide {
+    width: 260px;
+}
+#canvas .canvas_ability_details.wide .skill_name,
+#canvas .canvas_item_details.wide .skill_name,
+#canvas .canvas_skill_details.wide .skill_name {
+    font-size: 10px;
+}
+
 
 #events {
     top: 0;
@@ -3300,6 +3313,19 @@ body.index #header {
     background-position: left top, right top, left bottom, right bottom;
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
 }
+
+#console > .wrapper > .event:nth-child(0) { filter: brightness(1.0); }
+#console > .wrapper > .event:nth-child(1) { filter: brightness(0.98); }
+#console > .wrapper > .event:nth-child(2) { filter: brightness(0.96); }
+#console > .wrapper > .event:nth-child(3) { filter: brightness(0.94); }
+#console > .wrapper > .event:nth-child(4) { filter: brightness(0.92); }
+#console > .wrapper > .event:nth-child(5) { filter: brightness(0.90); }
+#console > .wrapper > .event:nth-child(6) { filter: brightness(0.88); }
+#console > .wrapper > .event:nth-child(7) { filter: brightness(0.86); }
+#console > .wrapper > .event:nth-child(8) { filter: brightness(0.84); }
+#console > .wrapper > .event:nth-child(9) { filter: brightness(0.82); }
+#console > .wrapper > .event:nth-child(n+9) { filter: brightness(0.80); }
+
 #console .wrapper.ps-container .event {
     margin: 3px 16px;
 }
