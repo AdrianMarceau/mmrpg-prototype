@@ -2162,7 +2162,15 @@ class rpg_robot extends rpg_object {
         global $db;
 
         // Update this robot's history with the triggered item
-        $this->history['triggered_items'][] = $this_item->item_token;
+        $this->add_history('triggered_items', $this_item->item_token);
+
+        // If this item's type to the
+        $temp_image_changed = false;
+        $temp_item_type = !empty($this_item->item_type) ? $this_item->item_type : '';
+        $temp_item_type2 = !empty($temp_item_type) && !empty($this_item->item_type2) ? $this_item->item_type2 : $temp_item_type;
+        $this->add_history('triggered_items_types', array_unique(array($temp_item_type, $temp_item_type2)));
+        //error_log($this->robot_token.' uses '.$this_item->item_token.' w/ t1:'.$temp_item_type.' t2:'.$temp_item_type2);
+        //error_log('-> triggered_items_types = '.print_r($this->history['triggered_items_types'], true));
 
         // Reset the item options to default
         $this_item->item_results_reset();
@@ -2170,32 +2178,33 @@ class rpg_robot extends rpg_object {
         $this_item->damage_options_reset();
         $this_item->recovery_options_reset();
 
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $extra_objects = array('options' => $options, 'this_item' => $this_item, 'target_robot' => $target_robot);
+        $options->required_weapon_energy = 0;
+        $options->new_robot_weapons = 0;
+
         // Determine how much weapon energy this should take
-        $temp_item_energy = $this->calculate_weapon_energy($this_item);
+        $options->required_weapon_energy = $this->calculate_weapon_energy($this_item);
+
+        // Determine how much of this robot's weapon energy will be left over
+        $options->new_robot_weapons = $this->robot_weapons - $options->required_weapon_energy;
+        if ($this->robot_weapons < 0){ $options->new_robot_weapons = 0; }
+
+        // Trigger this robot's custom function if one has been defined for this context
+        $this->trigger_custom_function('rpg-robot_trigger-item_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
 
         // Decrease this robot's weapon energy
-        $this->robot_weapons = $this->robot_weapons - $temp_item_energy;
-        if ($this->robot_weapons < 0){ $this->robot_weapons = 0; }
-        $this->update_session();
+        $this->set_weapons($options->new_robot_weapons);
 
         // Default this and the target robot's frames to their base
-        $this->robot_frame = 'base';
-        $target_robot->robot_frame = 'base';
+        $this->set_frame('base');
+        $target_robot->set_frame('base');
 
         // Default the robot's stances to attack/defend
-        $this->robot_stance = 'attack';
-        $target_robot->robot_stance = 'defend';
-
-        // If this is a copy core robot and the item type does not match its core
-        $temp_image_changed = false;
-        $temp_item_type = !empty($this_item->item_type) ? $this_item->item_type : '';
-        $temp_item_type2 = !empty($this_item->item_type2) ? $this_item->item_type2 : $temp_item_type;
-        if (preg_match('/^([a-z0-9]+)-(shard|core|star)/', $this_item->item_token) && !empty($temp_item_type) && $this->robot_base_core == 'copy'){
-            $this->robot_image_overlay['copy_type1'] = $this->robot_base_image.'_'.$temp_item_type.'2';
-            $this->robot_image_overlay['copy_type2'] = $this->robot_base_image.'_'.$temp_item_type2.'3';
-            $this->update_session();
-            $temp_image_changed = true;
-        }
+        $this->set_stance('attack');
+        $target_robot->set_stance('defend');
 
         // Copy the item function to local scope and execute it
         $this_item_function = $this_item->item_function;
@@ -2204,27 +2213,14 @@ class rpg_robot extends rpg_object {
             'this_item' => $this_item
             )));
 
-
-        // If this robot's image has been changed, reveert it back to what it was
-        if ($temp_image_changed){
-            unset($this->robot_image_overlay['copy_type1']);
-            unset($this->robot_image_overlay['copy_type2']);
-            $this->update_session();
-        }
-
-        // DEBUG DEBUG DEBUG
         // Update this item's history with the triggered item data and results
-        $this_item->history['item_results'][] = $this_item->item_results;
+        $this_item->add_history('item_results', $this_item->item_results);
         // Update this item's history with the triggered item damage options
-        $this_item->history['item_options'][] = $this_item->item_options;
+        $this_item->add_history('item_options', $this_item->item_options);
 
         // Reset the robot's stances to the base
-        $this->robot_stance = 'base';
-        $target_robot->robot_stance = 'base';
-
-        // Update internal variables
-        $target_robot->update_session();
-        $this_item->update_session();
+        $this->set_stance('base');
+        $target_robot->set_stance('base');
 
 
         // -- CHECK ATTACHMENTS -- //
@@ -2305,6 +2301,10 @@ class rpg_robot extends rpg_object {
         // Update internal variables
         $target_robot->update_session();
         $this_item->update_session();
+
+        // Trigger this robot's custom function if one has been defined for this context
+        $this->trigger_custom_function('rpg-robot_trigger-item_after', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
 
         // Return the item results
         return $this_item->item_results;
