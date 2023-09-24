@@ -316,7 +316,6 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
             $this_colour = !empty($board['user_colour_token']) ? $board['user_colour_token'] : '';
             if (!empty($this_colour) && !empty($board['user_colour_token2'])){ $this_colour .= '_'.$board['user_colour_token2']; }
             if (empty($this_colour)){ $this_colour = 'none'; }
-            if (!empty($this_user_awards_sticky)){ echo $this_user_awards_sticky."\n"; }
             if (!empty($board['user_image_path'])){ list($avatar_class, $avatar_token, $avatar_base_size) = explode('/', $board['user_image_path']); }
             else { $avatar_class = 'robots'; $avatar_token = 'mega-man'; $avatar_base_size = 40; }
             if (!empty($board['user_background_path'])){ list($background_class, $background_token) = explode('/', $board['user_background_path']); }
@@ -344,6 +343,7 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
                     echo '<span class="points">'.$this_points_html.'</span>'."\n";
                     echo '<span class="records">'.$this_records_html.'</span>'."\n";
                 echo '</div>'."\n";
+                if (!empty($this_user_awards_sticky)){ echo $this_user_awards_sticky."\n"; }
                 echo '<span class="avatar"><span class="avatar_wrapper" style="bottom: '.$y_offset.'px; animation-duration: '.$avatar_animation_duration.'s;">';
                     echo '<span class="sprite sprite_shadow sprite_'.$avatar_size.'x'.$avatar_size.' sprite_shadow_'.$avatar_size.'x'.$avatar_size.' sprite_'.$avatar_size.'x'.$avatar_size.'_'.$place_frame.'" style="background-image: url(images/'.$avatar_class.'/'.preg_replace('/^([-a-z0-9]+)(_[a-z0-9]+)?$/i', '$1', $avatar_token).'/sprite_left_'.$avatar_base_size.'x'.$avatar_base_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-size: auto '.$avatar_size.'px;">'.$this_username.'</span>';
                     echo '<span class="sprite sprite_'.$avatar_size.'x'.$avatar_size.' sprite_'.$avatar_size.'x'.$avatar_size.'_'.$place_frame.'" style="background-image: url(images/'.$avatar_class.'/'.$avatar_token.'/sprite_left_'.$avatar_base_size.'x'.$avatar_base_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-size: auto '.$avatar_size.'px;">'.$this_username.'</span>';
