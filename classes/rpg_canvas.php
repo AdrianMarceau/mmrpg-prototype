@@ -2473,12 +2473,24 @@ class rpg_canvas {
                             if (empty($this_skill_type) && !empty($this_options['this_skill']->robot->robot_core)){ $this_skill_type = $this_options['this_skill']->robot->robot_core; }
                             if (empty($this_skill_type)){ $this_skill_type = 'none'; }
                             $this_skill_label = $this_options['this_skill']->skill_name;
-                            $this_skill_robot_image = !empty($this_options['this_skill']->robot->robot_image) ? $this_options['this_skill']->robot->robot_image : $this_options['this_skill']->robot->robot_token;
-                            $this_skill_robot_image_size = $this_options['this_skill']->robot->robot_image_size.'x'.$this_options['this_skill']->robot->robot_image_size;
+                            if (!empty($this_options['this_skill']->values['skill_source_robot'])){
+                                $temp_robot_token = $this_options['this_skill']->values['skill_source_robot'];
+                                $temp_robot_alt = '';
+                                if (strstr($temp_robot_token, '_')){  list($temp_robot_token, $temp_robot_alt) = explode('_', $temp_robot_token); }
+                                $temp_robot_info = rpg_robot::get_index_info($temp_robot_token);
+                                $this_skill_robot_image = !empty($temp_robot_info['robot_image']) ? $temp_robot_info['robot_image'] : $temp_robot_info['robot_token'];
+                                if (!empty($temp_robot_alt)){ $this_skill_robot_image .= '_'.$temp_robot_alt; }
+                                $this_skill_robot_image_size = $temp_robot_info['robot_image_size'].'x'.$temp_robot_info['robot_image_size'];
+                            } else {
+                                $this_skill_robot_image = !empty($this_options['this_skill']->robot->robot_image) ? $this_options['this_skill']->robot->robot_image : $this_options['this_skill']->robot->robot_token;
+                                $this_skill_robot_image_size = $this_options['this_skill']->robot->robot_image_size.'x'.$this_options['this_skill']->robot->robot_image_size;
+                            }
                             $this_skill_mugshot = 'images/robots/'.$this_skill_robot_image.'/mug_'.$this_robot_data['robot_direction'].'_'.$this_skill_robot_image_size.'.png?'.MMRPG_CONFIG_CACHE_DATE;
                             $this_icon_markup_left = '<div class="sprite skill_icon skill_icon_'.$this_skill_robot_image_size.' skill_icon_left" style="background-image: url('.$this_skill_mugshot.');"></div>';
                             $this_icon_markup_right = '<div class="sprite skill_icon skill_icon_'.$this_skill_robot_image_size.' skill_icon_right" style="background-image: url('.$this_skill_mugshot.');"></div>';
-                            $this_icon_markup_combined = '<div class="sprite skill_sprite canvas_skill_details skill_type type type_'.$this_skill_type.'">'.$this_icon_markup_left.'<div class="skill_name">'.$this_skill_label.'</div>'.$this_icon_markup_right.'</div>';
+                            $this_icon_markup_combined_class = 'sprite skill_sprite canvas_skill_details skill_type type type_'.$this_skill_type;
+                            if (strlen($this_skill_label) >= 16){ $this_icon_markup_combined_class .= ' wide'; }
+                            $this_icon_markup_combined = '<div class="'.$this_icon_markup_combined_class.'">'.$this_icon_markup_left.'<div class="skill_name">'.$this_skill_label.'</div>'.$this_icon_markup_right.'</div>';
                             if (isset($this_options['canvas_show_this_skill_underlay'])
                                 && empty($this_options['canvas_show_this_skill_underlay'])
                                 && !empty($this_options['canvas_show_this_skill_overlay'])){
