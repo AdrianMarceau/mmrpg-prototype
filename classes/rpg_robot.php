@@ -2005,20 +2005,40 @@ class rpg_robot extends rpg_object {
         // Update this robot's history with the triggered ability
         $this->add_history('triggered_abilities', $this_ability->ability_token);
 
+        // Add this ability's type to the history, and if it's a copy core it may use that for colour change
+        $temp_image_changed = false;
+        $temp_ability_type = !empty($this_ability->ability_type) ? $this_ability->ability_type : '';
+        $temp_ability_type2 = !empty($this_ability->ability_type2) ? $this_ability->ability_type2 : $temp_ability_type;
+        $this->add_history('triggered_abilities_types', array_unique(array($temp_ability_type, $temp_ability_type2)));
+        //error_log($this->robot_token.' uses '.$this_ability->ability_token.' w/ t1:'.$temp_ability_type.' t2:'.$temp_ability_type2);
+        //error_log('-> triggered_abilities_types = '.print_r($this->history['triggered_abilities_types'], true));
+
         // Reset the ability options to default
         $this_ability->ability_results_reset();
         $this_ability->target_options_reset();
         $this_ability->damage_options_reset();
         $this_ability->recovery_options_reset();
 
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $extra_objects = array('options' => $options, 'this_ability' => $this_ability, 'target_robot' => $target_robot);
+        $options->required_weapon_energy = 0;
+        $options->new_robot_weapons = 0;
+
         // Determine how much weapon energy this should take
-        if (!empty($this_ability->ability_energy_percent)){ $temp_ability_energy = ceil($this->robot_base_weapons * ($this_ability->ability_energy / 100)); }
-        else { $temp_ability_energy = $this->calculate_weapon_energy($this_ability); }
+        if (!empty($this_ability->ability_energy_percent)){ $options->required_weapon_energy = ceil($this->robot_base_weapons * ($this_ability->ability_energy / 100)); }
+        else { $options->required_weapon_energy = $this->calculate_weapon_energy($this_ability); }
+
+        // Determine how much of this robot's weapon energy will be left over
+        $options->new_robot_weapons = $this->robot_weapons - $options->required_weapon_energy;
+        if ($this->robot_weapons < 0){ $options->new_robot_weapons = 0; }
+
+        // Trigger this robot's custom function if one has been defined for this context
+        $this->trigger_custom_function('rpg-robot_trigger-ability_before', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
 
         // Decrease this robot's weapon energy
-        $new_robot_weapons = $this->robot_weapons - $temp_ability_energy;
-        if ($this->robot_weapons < 0){ $new_robot_weapons = 0; }
-        $this->set_weapons($new_robot_weapons);
+        $this->set_weapons($options->new_robot_weapons);
 
         // Default this and the target robot's frames to their base
         $this->set_frame('base');
@@ -2027,14 +2047,6 @@ class rpg_robot extends rpg_object {
         // Default the robot's stances to attack/defend
         $this->set_stance('attack');
         $target_robot->set_stance('defend');
-
-        // If this is a copy core robot and the ability type does not match its core
-        $temp_image_changed = false;
-        $temp_ability_type = !empty($this_ability->ability_type) ? $this_ability->ability_type : '';
-        $temp_ability_type2 = !empty($this_ability->ability_type2) ? $this_ability->ability_type2 : $temp_ability_type;
-        $this->add_history('triggered_abilities_types', array_unique(array($temp_ability_type, $temp_ability_type2)));
-        //error_log($this->robot_token.' uses '.$this_ability->ability_token.' w/ t1:'.$temp_ability_type.' t2:'.$temp_ability_type2);
-        //error_log('-> triggered_abilities_types = '.print_r($this->history['triggered_abilities_types'], true));
 
         // Copy the ability function to local scope and execute it
         $this_ability_function = $this_ability->ability_function;
@@ -2136,6 +2148,10 @@ class rpg_robot extends rpg_object {
         // Update internal variables
         $target_robot->update_session();
         $this_ability->update_session();
+
+        // Trigger this robot's custom function if one has been defined for this context
+        $this->trigger_custom_function('rpg-robot_trigger-ability_after', $extra_objects);
+        if ($options->return_early){ return $options->return_value; }
 
         // Return the ability results
         return $this_ability->ability_results;
