@@ -225,7 +225,7 @@ if (empty($active_target_robot->robot_abilities)){ $active_target_robot->robot_a
 // Update the robot's session with ability changes
 $active_target_robot->update_session();
 
-error_log('---------'.basename(__FILE__).'---------');
+//error_log('---------'.basename(__FILE__).'---------');
 
 // Collect the ability choice from the robot
 $temp_token = rpg_robot::robot_choices_abilities(array(
