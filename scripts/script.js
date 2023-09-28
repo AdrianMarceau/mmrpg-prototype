@@ -2316,6 +2316,10 @@ function mmrpg_toggle_screenshot_mode(screenshotMode){
         if (gameSettings.screenshotMode){ gameWindow.addClass('screenshot-mode'); }
         else { gameWindow.removeClass('screenshot-mode'); }
         }
+    if (window.self !== window.top
+        && typeof window.top.mmrpg_toggle_screenshot_mode !== 'undefined'){
+        window.top.mmrpg_toggle_screenshot_mode(screenshotMode);
+    }
 }
 
 // Define a function for toggling the canvas animation

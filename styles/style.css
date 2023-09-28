@@ -1747,13 +1747,13 @@ body.index #header {
 
 #mmrpg .canvas_overlay_header {
     position: absolute;
-    top: 11px;
-    height: 22px;
+    top: 7px;
+    height: 18px;
     left: 0;
     right: 0;
     background-color: transparent;
-    background-color: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     border-width: 1px 0;
     z-index: 100;
 }
