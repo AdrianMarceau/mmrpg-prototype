@@ -72,7 +72,7 @@ class rpg_mission_single extends rpg_mission {
 
         // Determine the amount of targets and their ability counts
         $temp_target_count = 1;
-        $temp_ability_count = 1;
+        $temp_ability_count = !empty($this_prototype_data['this_player_number']) ? $this_prototype_data['this_player_number'] : 1;
         $temp_limit_count = 4;
         $temp_battle_count = 0;
         if ($starfield_mission){
