@@ -184,7 +184,7 @@ if (!empty($mmrpg_database_robots)){
         // If this is the first in a new group
         $game_code = !empty($robot_info['robot_group']) ? $robot_info['robot_group'] : (!empty($robot_info['robot_game']) ? $robot_info['robot_game'] : 'MMRPG');
         if ($show_in_link_list && $game_code != $last_game_code){
-            if ($key_counter != 0){ $mmrpg_database_robots_links .= '</div>'; }
+            if (!empty($mmrpg_database_robots_links)){ $mmrpg_database_robots_links .= '</div>'; }
             $mmrpg_database_robots_links .= '<div class="float link group" data-game="'.$game_code.'">';
             $last_game_code = $game_code;
         }

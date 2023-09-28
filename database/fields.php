@@ -115,7 +115,7 @@ if (!empty($mmrpg_database_fields)){
         // If this is the first in a new group
         $game_code = !empty($field_info['field_group']) ? $field_info['field_group'] : (!empty($field_info['field_game']) ? $field_info['field_game'] : 'MMRPG');
         if ($show_in_link_list && $game_code != $last_game_code){
-            if ($key_counter != 0){ $mmrpg_database_fields_links .= '</div>'; }
+            if (!empty($mmrpg_database_fields_links)){ $mmrpg_database_fields_links .= '</div>'; }
             $mmrpg_database_fields_links .= '<div class="float link group" data-game="'.$game_code.'">';
             $last_game_code = $game_code;
         }

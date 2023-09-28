@@ -146,7 +146,7 @@ if (!empty($mmrpg_database_abilities)){
             $game_code = 'HERO/Weapons/T0';
         }
         if ($show_in_link_list && $game_code != $last_game_code){
-            if ($key_counter != 0){ $mmrpg_database_abilities_links .= '</div>'; }
+            if (!empty($mmrpg_database_abilities_links)){ $mmrpg_database_abilities_links .= '</div>'; }
             $mmrpg_database_abilities_links .= '<div class="float_link float_link_group" data-game="'.$game_code.'">';
             $last_game_code = $game_code;
         }
