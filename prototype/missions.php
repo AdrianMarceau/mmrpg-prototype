@@ -832,6 +832,12 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_description_key = $this_prototype_player_data['player_number'] - 1;
                 $temp_final_option['battle_description'] = 'Defeat the alien robot '.$final_boss_index_info['robot_name'].' in this '.$temp_description_options[$temp_description_key].' final battle!';
 
+                // If this is NOT the final battle, make sure it doesn't count towards completion
+                if ($this_prototype_player_data['player_token'] === 'dr-wily'
+                    || $this_prototype_player_data['player_token'] === 'dr-cossack'){
+                    $temp_final_option['battle_counts'] = false;
+                }
+
                 // Now that everything is as we want it, we can prepare the battle and update the index
                 rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
                 $this_prototype_data['battle_options'][] = $temp_final_option;
@@ -931,6 +937,9 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     $temp_before_final_option['battle_field_base']['field_music'] = 'sega-remix/wily-fortress-2-mm9';
                     $temp_before_final_option['battle_field_base']['field_mechas'] = $temp_support_mechas;
                     shuffle($temp_before_final_option['battle_target_player']['player_robots']);
+
+                    // This is NOT the final battle, so make sure it doesn't count towards completion
+                    $temp_before_final_option['battle_counts'] = false;
 
                     // Prepare the final battle details, add it to the index and/or buttons, and then queue it up
                     rpg_mission_fortress::prepare($temp_before_final_option, $this_prototype_data);
