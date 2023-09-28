@@ -621,13 +621,62 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_battle_config = array();
             $temp_battle_config['battle_size'] = '1x4';
             $temp_target_robots = array();
-            $temp_target_robots[] = array('robot_token' => 'buster-rod-g', 'robot_item' => 'water-core');
-            $temp_target_robots[] = array('robot_token' => 'mega-water-s', 'robot_item' => 'wind-core');
-            $temp_target_robots[] = array('robot_token' => 'hyper-storm-h', 'robot_item' => 'swift-core');
-            if ($this_prototype_data['this_player_token'] === 'dr-light'){ $rotate_targets = 0; }
-            elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){ $rotate_targets = 1; }
-            elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){  $rotate_targets = 2; }
-            for ($i = 0; $i < $rotate_targets; $i++){ $first = array_shift($temp_target_robots); $temp_target_robots[] = $first; }
+            $temp_target_robots[] = array(
+                'robot_token' => 'buster-rod-g',
+                'robot_item' => 'water-core',
+                'robot_abilities' => array(
+                    'quick-strike', 'laser-trident',
+                    'swift-shot', 'water-shot',
+                    )
+                );
+            $temp_target_robots[] = array(
+                'robot_token' => 'mega-water-s',
+                'robot_item' => 'wind-core',
+                'robot_abilities' => array(
+                    'rain-flush', 'air-twister',
+                    'water-shot', 'wind-shot',
+                    )
+                );
+            $temp_target_robots[] = array(
+                'robot_token' => 'hyper-storm-h',
+                'robot_item' => 'swift-core',
+                'robot_abilities' => array(
+                    'wind-storm', 'charge-kick',
+                    'wind-shot', 'swift-shot',
+                    )
+                );
+            if ($this_prototype_data['this_player_token'] === 'dr-light'){
+                $rotate_targets = 0;
+                $temp_addon_abilties = array(
+                    'energy-break', 'barrier-drive'
+                    );
+            }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){
+                $rotate_targets = 1;
+                $temp_addon_abilties = array(
+                    'energy-break', array('attack-swap', 'speed-swap', 'defense-swap'),
+                    'barrier-drive',
+                    );
+            }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){
+                $rotate_targets = 2;
+                $temp_addon_abilties = array(
+                    'energy-break', array('speed-swap', 'defense-swap', 'attack-swap'),
+                    'barrier-drive', 'shield-eater',
+                    );
+            }
+            if (!empty($temp_addon_abilties)){
+                foreach ($temp_target_robots AS $key => $info){
+                    foreach ($temp_addon_abilties AS $key2 => $ability){
+                        if (is_array($ability)){ $ability = isset($ability[$key]) ? $ability[$key] : $ability[array_rand($ability)]; }
+                        $temp_target_robots[$key]['robot_abilities'][] = $ability;
+                    }
+                }
+            }
+            for ($i = 0; $i < $rotate_targets; $i++){
+                $first = array_shift($temp_target_robots);
+                $temp_target_robots[] = $first;
+            }
             $temp_target_field = array('field_token' => 'genesis-tower');
             $temp_target_level = $this_prototype_data['this_chapter_levels'][3] + 4;;
             $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
