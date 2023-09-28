@@ -902,12 +902,12 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     }
                     if ($item_tier >= 2){
                         $item_options = array_merge($item_options,
-                            array('energy-tank', 'weapon-tank', 'attack-booster', 'defense-booster', 'speed-booster')
+                            array('energy-tank', 'weapon-tank', 'attack-diverter', 'defense-diverter', 'speed-diverter')
                             );
                     }
                     if ($item_tier >= 3){
                         $item_options = array_merge($item_options,
-                            array('energy-upgrade', 'weapon-upgrade', 'yashichi', 'super-capsule')
+                            array('energy-upgrade', 'weapon-upgrade', 'super-capsule')
                             );
                     }
                     $item_max_key = count($item_options) - 1;
