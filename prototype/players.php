@@ -11,33 +11,6 @@ if (!empty($_SESSION[$session_token]['DEMO'])){
         echo('It looks like you were logged out of your account! <br /> This was either due to inactivity or the result of an action in another tab. <br /> Please reload your game if you want to continue playing.');
     echo('</p>'.PHP_EOL);
 
-    /*
-    // Define the button size based on player count
-    $this_button_size = '1x4';
-
-    // Print out the normal mode's player select screen for Dr. Light
-    if ($unlock_flag_light){
-        $doctor_info = $mmrpg_player_index['dr-light'];
-        $text_robots_unlocked = $prototype_data['demo']['robots_unlocked'].' Robot'.($prototype_data['demo']['robots_unlocked'] != 1 ? 's' : '');
-        $text_points_unlocked = number_format($prototype_data['demo']['points_unlocked'], 0, '.', ',').' Point'.($prototype_data['demo']['points_unlocked'] != 1 ? 's' : '');
-        $text_player_hearts = ucfirst($doctor_info['player_type']).' +'.$doctor_info['player_'.$doctor_info['player_type']].'%';
-        $text_battles_complete = $prototype_data['demo']['battles_complete'].' Mission'.($prototype_data['demo']['battles_complete'] != 1 ? 's' : '');
-        $text_player_special = $prototype_data['demo']['battles_complete'] >= 4 ? true : false;
-        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40 sprite_40x40_base" style="background-image: url(images/players/dr-light/sprite_right_40x40.png); top: -2px; right: 14px; z-index: 10;">Dr. Light</span>';
-        $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites('dr-light', $session_token);
-        $text_player_music = 'player-select';
-        $text_player_chapter = $text_robots_unlocked;
-        if ($prototype_data['demo']['battles_complete'] > 0){ $text_player_chapter .= ' <span class="pipe" style="color: #616161;">|</span> '.($prototype_data['demo']['battles_complete'] == 1 ? '1 Mission' : $prototype_data['demo']['battles_complete'].' Missions'); }
-        //if ($ability_counter_light > 0){ $text_player_chapter .= ' <span class="pipe" style="color: #616161;">|</span> '.($ability_counter_light == 1 ? '1 Ability' : $ability_counter_light.' Abilities'); }
-        //if ($star_counter_light > 0){ $text_player_chapter .= ' <span class="pipe" style="color: #616161;">|</span> '.($star_counter_light == 1 ? '1 Star' : $star_counter_light.' Stars'); }
-        echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_light.'" class="option option_'.$this_button_size.' option_this-player-select option_this-dr-light-player-select option_dr-light block_1" data-token="dr-light">';
-        echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">Dr. Light'.(!empty($text_player_special) ? ' <span style="position: relative; bottom: 2px;" title="Thank you for playing!!! :D">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_hearts.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
-        echo '</div></div></div>';
-        echo '</a>'."\n";
-    }
-    */
-
 }
 /*
  * NORMAL PLAYER SELECT
@@ -79,18 +52,25 @@ else {
         return $limit_hearts_markup;
         };
 
+    // Collect any endless attack data so we can mess around with it
+    $endless_attack_savedata = mmrpg_prototype_get_endless_sessions();
 
     // Print out the normal mode's player select screen for Dr. Light
     if ($unlock_flag_light){
         $doctor_token = 'dr-light';
         $doctor_info = $mmrpg_player_index[$doctor_token];
+        $doctor_is_away = isset($endless_attack_savedata[$doctor_token]) ? true : false;
         $doctor_sprite_path = 'images/players/'.$doctor_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
         $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
         $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
         $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
         $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
-        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40" style="top: -2px; right: 0; z-index: 60;"><span class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.');"></span></span>';
+        $text_sprites_markup = '';
+        $text_sprites_markup .= '<span class="sprite sprite_player sprite_40x40" style="top: -2px; right: 0; z-index: 60;">';
+            $text_sprites_markup .= '<span class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.');'.($doctor_is_away ? ' filter: brightness(0);' : '').'"></span>';
+            if ($doctor_is_away){ $text_sprites_markup .= '<span class="endless"><i class="fa fas fa-infinity"></i></span>'; }
+        $text_sprites_markup .= '</span>';
         $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites($doctor_token, $session_token);
         $text_sprites_markup = '<span class="battle_sprites">'.$text_sprites_markup.'</span>';
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
@@ -109,13 +89,18 @@ else {
     if ($unlock_flag_wily){
         $doctor_token = 'dr-wily';
         $doctor_info = $mmrpg_player_index[$doctor_token];
+        $doctor_is_away = isset($endless_attack_savedata[$doctor_token]) ? true : false;
         $doctor_sprite_path = 'images/players/'.$doctor_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
         $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
         $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
         $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
         $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
-        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40" style="top: -2px; right: 0; z-index: 60;"><span class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.');"></span></span>';
+        $text_sprites_markup = '';
+        $text_sprites_markup .= '<span class="sprite sprite_player sprite_40x40" style="top: -2px; right: 0; z-index: 60;">';
+            $text_sprites_markup .= '<span class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.');'.($doctor_is_away ? ' filter: brightness(0);' : '').'"></span>';
+            if ($doctor_is_away){ $text_sprites_markup .= '<span class="endless"><i class="fa fas fa-infinity"></i></span>'; }
+        $text_sprites_markup .= '</span>';
         $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites($doctor_token, $session_token);
         $text_sprites_markup = '<span class="battle_sprites">'.$text_sprites_markup.'</span>';
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
@@ -134,13 +119,18 @@ else {
     if ($unlock_flag_cossack){
         $doctor_token = 'dr-cossack';
         $doctor_info = $mmrpg_player_index[$doctor_token];
+        $doctor_is_away = isset($endless_attack_savedata[$doctor_token]) ? true : false;
         $doctor_sprite_path = 'images/players/'.$doctor_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
         $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
         $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
         $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
         $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
-        $text_sprites_markup = '<span class="sprite sprite_player sprite_40x40" style="top: -2px; right: 0; z-index: 60;"><span class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.');"></span></span>';
+        $text_sprites_markup = '';
+        $text_sprites_markup .= '<span class="sprite sprite_player sprite_40x40" style="top: -2px; right: 0; z-index: 60;">';
+            $text_sprites_markup .= '<span class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.');'.($doctor_is_away ? ' filter: brightness(0);' : '').'"></span>';
+            if ($doctor_is_away){ $text_sprites_markup .= '<span class="endless"><i class="fa fas fa-infinity"></i></span>'; }
+        $text_sprites_markup .= '</span>';
         $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites($doctor_token, $session_token);
         $text_sprites_markup = '<span class="battle_sprites">'.$text_sprites_markup.'</span>';
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);

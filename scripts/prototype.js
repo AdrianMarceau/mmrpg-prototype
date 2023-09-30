@@ -150,7 +150,7 @@ $(document).ready(function(){
 
             // Add a click sound to the ready-room glass if it exists
             $('.ready_room .wrapper.inner > .clicker', thisContext).live('click', function(){
-                console.log('testing 123');
+                //console.log('testing 123');
                 playSoundEffect.call(this, 'glass-klink');
                 });
 
@@ -880,8 +880,9 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
     var thisTokenID = thisOption.attr('data-token-id');
     var nextStep = $('.menu[data-step="'+(thisStep + 1)+'"]', thisContext);
     var nextFlag = true;
-    var nextLimit = thisOption.attr('data-next-limit');
-    if (nextLimit != undefined){ nextLimit = parseInt(nextLimit); }
+    var nextLimit = thisOption.attr('data-next-limit') || false;
+    if (nextLimit){ nextLimit = parseInt(nextLimit); }
+    var nextHref = thisOption.attr('data-next-href') || false;
     var onComplete = typeof onComplete !== 'undefined' ? onComplete : function(){};
     //var nextLimit = parseInt(thisOption.attr('data-next-limit'));
 
@@ -893,6 +894,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
     //console.log('nextStep', nextStep, nextStep.length);
     //console.log('nextFlag', nextFlag);
     //console.log('nextLimit', nextLimit);
+    //console.log('nextHref', nextHref);
 
     // If the token was empty, return false
     if (!thisToken.length){
@@ -901,7 +903,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
     }
 
     // If the next limit was set, apply to the next step
-    if (nextLimit != undefined){
+    if (nextLimit){
         nextStep.attr('data-limit', nextLimit);
         gameSettings.nextRobotLimit = nextLimit;
         }
@@ -1278,6 +1280,15 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
             oldOnComplete();
             };
         onComplete = newOnComplete;
+        }
+
+    // If a "NEXT" link was provided, use it instead of the default
+    if (nextHref){
+        //console.log('Replace the usual redirect link with the next href instead');
+        // Clear the usual next step data
+        nextStep = '';
+        // Replace the usual redirect link with the next href instead
+        thisRedirect = nextHref;
         }
 
     // Check if image preloading was requested

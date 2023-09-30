@@ -1704,7 +1704,21 @@ body[data-source="website"] #prototype .menu {
     left: -60px;
 }
 
-
+#mmrpg #prototype .option_this-player-select .battle_sprites .sprite .endless {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: auto;
+    height: auto;
+    font-size: 8px;
+    color: #696969;
+    text-indent: 0;
+}
+#mmrpg #prototype .banner .option_this-player-select .battle_sprites {
+    right: 5px;
+}
 
 
 #mmrpg #prototype .option_this-robot-select {
@@ -2156,7 +2170,8 @@ body[data-source="website"] #prototype .menu {
 
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"],
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-endless-mission"],
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"] {
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"],
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"] {
     display: block;
     position: absolute;
     box-sizing: border-box;
@@ -2169,7 +2184,8 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"]:before,
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-endless-mission"]:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"]:before {
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"]:before,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"]:before {
     content: "\0221e";
     display: block;
     text-align: center;
@@ -2185,15 +2201,40 @@ body[data-source="website"] #prototype .menu {
     padding-left: 2px;
     box-sizing: border-box;
     color: #dedede;
+    position: relative;
+    z-index: 1;
+}
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"]:after {
+    content: "\0020e0";
+    display: block;
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+    background-color: rgb(38, 38, 38);
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid #090909;
+    margin: 2px 4px 0;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 15px;
+    height: 20px;
+    padding-left: 2px;
+    box-sizing: border-box;
+    color: #dedede;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    width: 22px;
 }
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"]:hover:before,
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-endless-mission"]:hover:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"]:hover:before {
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"]:hover:before,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"]:hover:before {
     color: #ffffff;
 }
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"] .platform,
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-endless-mission"] .platform,
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"] .platform {
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"] .platform,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"] .platform {
     display: none;
 }
 

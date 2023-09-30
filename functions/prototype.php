@@ -1986,6 +1986,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             $this_markup .= '<a '.
                 'class="'.$this_option_class.'" '.
                 'data-token="'.(!empty($this_battleinfo['alpha_battle_token']) ? $this_battleinfo['alpha_battle_token'] : $this_battleinfo['battle_token']).'" '.
+                (!empty($this_battleinfo['option_target_href']) ? 'data-next-href="'.$this_battleinfo['option_target_href'].'" ' : '').
                 'data-next-limit="'.$data_next_limit.'" '.
                 'data-chapter="'.$this_info['option_chapter'].'" '.
                 'data-field="'.htmlentities($this_fieldinfo['field_name'], ENT_QUOTES, 'UTF-8', true).'" '.
@@ -2252,6 +2253,9 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
         }
     }
 
+    // Add this alpha battle's token to the parent for later
+    $temp_battle_omega['alpha_battle_token'] = $temp_battle_alpha['battle_token'];
+
     // Return the generated alpha battle
     return $temp_battle_alpha;
 
@@ -2443,6 +2447,17 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
     // Collect this player's index info
     $this_player_info = $mmrpg_index_players[$this_prototype_data['this_player_token']];
 
+    // Check for any robots that are locked in the endless attack or otherwise
+    $player_robots_locked = array();
+    $endless_attack_savedata = mmrpg_prototype_get_endless_sessions($this_player_info['player_token']);
+    //error_log('$endless_attack_savedata for '.$player_token.': '.print_r(array_keys($endless_attack_savedata), true));
+    if (!empty($endless_attack_savedata)
+        && !empty($endless_attack_savedata['robots'])){
+        $endless_robot_robots = $endless_attack_savedata['robots'];
+        $player_robots_locked = array_merge($player_robots_locked, $endless_robot_robots);
+        $player_robots_locked = array_unique($player_robots_locked);
+    }
+
     // Collect the list of robot and ability tokens we'll need
     $rtokens = array();
     $atokens = array();
@@ -2464,8 +2479,11 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
 
     // Loop through and display the available robot options for this player
     $temp_robot_option_count = count($this_prototype_data['robot_options']);
+    $temp_robot_option_count_shown = 0;
     $temp_player_favourites = mmrpg_prototype_robot_favourites();
     foreach ($this_prototype_data['robot_options'] AS $key => $info){
+        if (in_array($info['robot_token'], $player_robots_locked)){ continue; }
+        $temp_robot_option_count_shown++;
         $info = array_merge($this_robot_index[$info['robot_token']], $info);
         if (!isset($info['original_player'])){ $info['original_player'] = $this_prototype_data['this_player_token']; }
         $this_option_class = 'option option_this-robot-select option_this-'.$info['original_player'].'-robot-select option_'.($this_prototype_data['robots_unlocked'] === 1 ? '1x4' : ($this_prototype_data['robots_unlocked'] <= 2 ? '1x2' : '1x1')).' option_'.$info['robot_token'].' block_'.($key + 1);
@@ -2623,12 +2641,12 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
 
     // Loop through and display any option padding cells
     //if ($this_prototype_data['robots_unlocked'] >= 3){
-    if ($temp_robot_option_count >= 3){
+    if ($temp_robot_option_count_shown >= 3){
         //$this_prototype_data['padding_num'] = $this_prototype_data['robots_unlocked'] <= 8 ? 4 : 2;
         $this_prototype_data['padding_num'] = 4;
-        $this_prototype_data['robots_padding'] = $temp_robot_option_count % $this_prototype_data['padding_num'];
+        $this_prototype_data['robots_padding'] = $temp_robot_option_count_shown % $this_prototype_data['padding_num'];
         if (!empty($this_prototype_data['robots_padding'])){
-            $counter = ($temp_robot_option_count % $this_prototype_data['padding_num']) + 1;
+            $counter = ($temp_robot_option_count_shown % $this_prototype_data['padding_num']) + 1;
             for ($counter; $counter <= $this_prototype_data['padding_num']; $counter++){
                 $this_option_class = 'option option_this-robot-select option_this-'.$this_prototype_data['this_player_token'].'-robot-select option_1x1 option_disabled block_'.$counter;
                 $this_option_style = '';
@@ -3247,39 +3265,57 @@ function mmrpg_prototype_database_summoned($robot_token = ''){
 function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token = 'GAME', $robot_limit = 99){
 
     global $db;
+    $mmrpg_index_robots = rpg_robot::get_index(true, false);
 
     $temp_offset_x = 5;
     $temp_offset_z = 50;
     $temp_offset_y = -2;
     $temp_offset_opacity = 0.75;
     $text_sprites_markup = '';
+    $sprites_displayed = 0;
 
+    // Check for any robots that are locked in the endless attack or otherwise
+    $player_robots_locked = array();
+    $endless_attack_savedata = mmrpg_prototype_get_endless_sessions($player_token);
+    //error_log('$endless_attack_savedata for '.$player_token.': '.print_r(array_keys($endless_attack_savedata), true));
+    if (!empty($endless_attack_savedata)
+        && !empty($endless_attack_savedata['robots'])){
+        $endless_robot_robots = $endless_attack_savedata['robots'];
+        $player_robots_locked = array_merge($player_robots_locked, $endless_robot_robots);
+        $player_robots_locked = array_unique($player_robots_locked);
+    }
+
+    // Check to see if any robots have been marked as favourites
     $player_robot_favourites = rpg_game::robot_favourites();
     if (empty($player_robot_favourites)){ $player_robot_favourites = array(); }
+
+    // Collect the player's robot settings and rewards arrays then marge 'em for reference
     $temp_player_robots_settings = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'];
     $temp_player_robots_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'];
     $temp_player_robots_tokens = array_unique(array_merge(array_keys($temp_player_robots_settings), array_keys($temp_player_robots_rewards)));
-    $mmrpg_index_robots = rpg_robot::get_index(true, false);
-    $sprites_displayed = 0;
+
     //error_log('$temp_player_robots_tokens(before): '.print_r($temp_player_robots_tokens, true));
     //error_log('$player_robot_favourites: '.print_r($player_robot_favourites, true));
-    usort($temp_player_robots_tokens, function($a, $b) use($temp_player_robots_tokens, $player_robot_favourites){
+    usort($temp_player_robots_tokens, function($a, $b) use($temp_player_robots_tokens, $player_robot_favourites, $player_robots_locked){
         $a_pos = array_search($a, $temp_player_robots_tokens);
         $b_pos = array_search($b, $temp_player_robots_tokens);
         $a_fav = in_array($a, $player_robot_favourites) ? 1 : 0;
         $b_fav = in_array($b, $player_robot_favourites) ? 1 : 0;
-        if ($a_fav < $b_fav){ return 1; }
+        $a_locked = in_array($a, $player_robots_locked) ? 1 : 0;
+        $b_locked = in_array($b, $player_robots_locked) ? 1 : 0;
+        if ($a_locked < $b_locked){ return -1; }
+        elseif ($a_locked > $b_locked){ return 1; }
+        elseif ($a_fav < $b_fav){ return 1; }
         elseif ($a_fav > $b_fav){ return -1; }
         elseif ($a_pos < $b_pos){ return -1; }
         elseif ($a_pos > $b_pos){ return 1; }
         else { return 0; }
         });
+
     //error_log('$temp_player_robots_tokens(after)['.count($temp_player_robots_tokens).']: '.print_r($temp_player_robots_tokens, true));
     foreach ($temp_player_robots_tokens AS $key => $token){
-        if (!isset($mmrpg_index_robots[$token])){
-            //error_log('$token '.$token.' does not exist in $mmrpg_index_robots');
-            continue;
-        }
+        if (!isset($mmrpg_index_robots[$token])){ continue; }
+        //if (in_array($token, $player_robots_locked)){ continue; }
         $info = array();
         if (isset($temp_player_robots_rewards[$token])){ $info = array_merge($info, $temp_player_robots_rewards[$token]); }
         if (isset($temp_player_robots_settings[$token])){ $info = array_merge($info, $temp_player_robots_settings[$token]); }
@@ -3295,8 +3331,10 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
             $temp_offset_z -= 1;
             $temp_offset_opacity -= 0.04;
             if ($temp_offset_opacity <= 0){ $temp_offset_opacity = 0; }
+            if (in_array($token, $player_robots_locked)){ $temp_offset_brightness = 0; }
+            else { $temp_offset_brightness = $temp_offset_opacity; }
             $temp_animation_direction = rpg_robot::get_css_animation_duration($index);
-            $text_sprites_markup .= '<span class="sprite sprite_robot sprite_nobanner sprite_40x40 sprite_40x40_00" style="top: '.$temp_offset_y.'px; right: '.$temp_offset_x.'px; z-index: '.$temp_offset_z.'; filter: brightness('.$temp_offset_opacity.');">';
+            $text_sprites_markup .= '<span class="sprite sprite_robot sprite_nobanner sprite_40x40 sprite_40x40_00" style="top: '.$temp_offset_y.'px; right: '.$temp_offset_x.'px; z-index: '.$temp_offset_z.'; filter: brightness('.$temp_offset_brightness.');">';
                 $text_sprites_markup .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url(images/robots/'.(!empty($info['robot_image']) ? $info['robot_image'] : $info['robot_token']).'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); animation-duration: '.$temp_animation_direction.'s;">'.$info['robot_name'].'</span>';
             $text_sprites_markup .= '</span>';
             $sprites_displayed++;
