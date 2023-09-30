@@ -98,6 +98,7 @@ class rpg_player extends rpg_object {
         $this->player_points = isset($this_playerinfo['player_points']) ? $this_playerinfo['player_points'] : 0;
         $this->player_switch = isset($this_playerinfo['player_switch']) ? $this_playerinfo['player_switch'] : 1;
         $this->player_next_action = isset($this_playerinfo['player_next_action']) ? $this_playerinfo['player_next_action'] : 'auto';
+        $this->player_visible = $this->player_token !== 'player' && empty($this->flags['player_disabled']) ? true : false;
 
         // Define the internal player base values using the players index array
         $this->player_base_name = isset($this_playerinfo['player_base_name']) ? $this_playerinfo['player_base_name'] : $this->player_name;
@@ -1495,7 +1496,8 @@ class rpg_player extends rpg_object {
         // Define the quote text variable
         $quote_text = '';
         // If the player is visible and has the requested quote text
-        if ($this->player_token != 'player' && isset($this->player_quotes[$quote_type])){
+        if ($this->player_visible
+            && isset($this->player_quotes[$quote_type])){
             // Collect the quote text with any search/replace modifications
             $this_quote_text = str_replace($this_find, $this_replace, $this->player_quotes[$quote_type]);
             // Collect the text colour for this player
