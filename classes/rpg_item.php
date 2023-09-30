@@ -2123,16 +2123,34 @@ class rpg_item extends rpg_object {
         // Extract all objects into the current scope
         extract($objects);
 
-        // Target this robot's self and print item use text
+        // If this player is visible, we can show them as having used the item
         $this_battle->queue_sound_effect('use-recovery-item');
-        $this_item->target_options_update(array(
-            'frame' => 'summon',
-            'success' => array(0, 40, -2, 99,
-                $this_player->print_name().' uses an item from the inventory&hellip; <br />'.
-                $target_robot->print_name().' is given the '.$this_item->print_name().'!'
-                )
-            ));
-        $target_robot->trigger_target($target_robot, $this_item);
+        if ($this_player->player_visible){
+
+            // Target this robot's self and print item use text
+            $this_item->target_options_update(array(
+                'frame' => 'summon',
+                'success' => array(0, 40, -2, 99,
+                    $this_player->print_name().' uses an item from the inventory&hellip; <br />'.
+                    $target_robot->print_name().' is given the '.$this_item->print_name().'!'
+                    )
+                ));
+            $target_robot->trigger_target($target_robot, $this_item);
+
+        }
+        // Otherwise, we should display it as the robot using the item themselves
+        else {
+
+            // Target this robot's self and print item use text
+            $this_item->target_options_update(array(
+                'frame' => 'summon',
+                'success' => array(0, 40, -2, 99,
+                    $target_robot->print_name().' uses the '.$this_item->print_name().'!'
+                    )
+                ));
+            $target_robot->trigger_target($target_robot, $this_item);
+
+        }
 
         // Define the stat(s) this item will boost and how much
         $stat_boost_tokens = array();
