@@ -1180,7 +1180,8 @@ class rpg_robot extends rpg_object {
             $this->$prop_stat_max = $this_robot_stats[$stat]['max'];
             // If this robot's player has any stat bonuses, apply them as well
             $prop_player_stat = 'player_'.$stat;
-            if (!empty($this->player->$prop_player_stat)){
+            if ($this->player->player_visible
+                && !empty($this->player->$prop_player_stat)){
                 $temp_boost = ceil($this->$prop_stat * ($this->player->$prop_player_stat / 100));
                 $this->$prop_stat += $temp_boost;
                 $this->$prop_stat_base += $temp_boost;
