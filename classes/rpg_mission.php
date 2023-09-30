@@ -45,5 +45,32 @@ class rpg_mission {
 
     }
 
+    // Define a function that takes an existing battle array and then updates it with campaign context
+    public static function insert_context(&$this_battle_omega, $this_prototype_data){
+        //error_log('$this_battle_omega '.$this_battle_omega['battle_token']);
+
+        // Add the current chapter and other contextual details about this battle to the info
+        global $db;
+        $this_context = array();
+        $this_context['player'] = $this_prototype_data['this_player_token'];
+        $this_context['chapter'] = $this_prototype_data['this_current_chapter'] + 1;
+        $this_context['phase'] = $this_prototype_data['battle_phase'] + 1;
+        $this_context['round'] = 1;
+        //error_log('$this_battle_omega = '.print_r($this_battle_omega, true));
+        //error_log('alpha_battle_token = '.print_r((isset($this_battle_omega['alpha_battle_token']) ? '"'.$this_battle_omega['alpha_battle_token'].'"' : ''), true));
+        //error_log('battle_complete_redirect_token = '.print_r((isset($this_battle_omega['battle_complete_redirect_token']) ? '"'.$this_battle_omega['battle_complete_redirect_token'].'"' : ''), true));
+        if (!empty($this_battle_omega['alpha_battle_token'])){
+            $alpha_token = $this_battle_omega['alpha_battle_token'];
+            $this_context['round'] += 1;
+        }
+        if (!empty($this_battle_omega['battle_complete_redirect_token'])){
+            $alpha_token = $this_battle_omega['battle_complete_redirect_token'];
+            $this_context['round'] -= 1;
+        }
+        $this_battle_omega['values']['context'] = $this_context;
+        //error_log('context = '.print_r($this_battle_omega['values']['context'], true));
+
+    }
+
 }
 ?>

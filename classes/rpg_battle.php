@@ -49,11 +49,17 @@ class rpg_battle extends rpg_object {
     }
 
     // Define a public function for updating index info
-    public static function update_index_info($battle_token, $battle_info){
+    public static function update_index_info($battle_token, &$battle_info){
         global $db;
 
         // If the internal index has not been created yet, load it into memory
         if (!isset($db->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
+
+        // If prototype context is provided, we should add it to the battle
+        global $this_prototype_data;
+        if (!empty($this_prototype_data)){
+            rpg_mission::insert_context($battle_info, $this_prototype_data);
+        }
 
         // Update and/or overwrite the current info in the index
         $db->INDEX['BATTLES'][$battle_token] = json_encode($battle_info);
