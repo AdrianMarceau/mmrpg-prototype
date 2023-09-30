@@ -13,7 +13,7 @@ class rpg_canvas {
         $this_results = !empty($options['this_ability']->ability_results) ? $options['this_ability']->ability_results : array();
 
         // Only proceed if this is a real player
-        if ($this_player->player_token != 'player'){
+        if ($this_player->player_visible){
 
             // Define and calculate the simpler markup and positioning variables for this player
             $this_data['data_type'] = 'player';

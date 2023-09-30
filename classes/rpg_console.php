@@ -34,7 +34,7 @@ class rpg_console {
         // Generate the final markup for the console player
         $this_data['player_markup'] = '';
         // If this was an undefined player, do not create markup
-        if ($this_player->player_token != 'player'){
+        if ($this_player->player_visible){
             $this_data['player_markup'] .= '<div class="'.$this_data['container_class'].'" style="'.$this_data['container_style'].'">';
             //$this_data['player_markup'] .= '<div class="'.$this_data['player_class'].'" style="'.$this_data['player_style'].'" title="'.$this_data['player_title'].'" data-tooltip-align="'.$this_data['player_float'].'">'.$this_data['player_title'].'</div>';
             $this_data['player_markup'] .= '<div class="'.$this_data['player_class'].'" style="'.$this_data['player_style'].'"></div>';
