@@ -627,11 +627,18 @@ if (!empty($robots_pending_entrance_animations)){
     rpg_prototype::clear_robots_pending_entrance_animations();
 }
 
+// Remove any players or robots that are currently locked in endless attack mode
+$endless_attack_savedata = mmrpg_prototype_get_endless_sessions();
+if (!empty($endless_attack_savedata)){
+    foreach ($endless_attack_savedata AS $player => $savedata){
+        if (isset($this_unlocked_players_index[$player])){ unset($this_unlocked_players_index[$player]); }
+        foreach ($savedata['robots'] AS $robot){ if (isset($this_unlocked_robots_index[$robot])){ unset($this_unlocked_robots_index[$robot]); } }
+    }
+}
+
 // Print out the generated indexes for use in the game settings
 echo 'gameSettings.customIndex.unlockedPlayersIndex = '.json_encode($this_unlocked_players_index).';'.PHP_EOL;
 echo 'gameSettings.customIndex.unlockedRobotsIndex = '.json_encode($this_unlocked_robots_index).';'.PHP_EOL;
-
-
 
 ?>
 
