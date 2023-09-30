@@ -649,7 +649,7 @@ class rpg_battle extends rpg_object {
 
         // NON-INVISIBLE PLAYER DEFEATED
         // Display the defeat message for the target character if not default/hidden
-        if ($target_player->player_token != 'player'){
+        if ($target_player->player_visible){
 
             // DEBUG
             //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
@@ -703,7 +703,7 @@ class rpg_battle extends rpg_object {
             $event_options['console_show_target'] = false;
             $event_options['event_flag_defeat'] = true;
             $event_options['this_header_float'] = $event_options['this_body_float'] = $target_player->player_side;
-            if ($target_player->player_token != 'player'
+            if ($target_player->player_visible
                 && isset($target_player->player_quotes['battle_defeat'])){
                 $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                 $this_replace = array($this_player->player_name, $this_robot->robot_name, $target_player->player_name, $target_robot->robot_name);
@@ -745,7 +745,7 @@ class rpg_battle extends rpg_object {
                 $event_options['event_flag_sound_effects'] = array(
                     // maybe nothing?
                     );
-                if ($this_player->player_token != 'player'
+                if ($this_player->player_visible
                     && isset($this_player->player_quotes['battle_victory'])){
                     $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                     $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
@@ -821,28 +821,59 @@ class rpg_battle extends rpg_object {
             // Update the global variable with the zenny reward
             $temp_human_rewards['battle_zenny'] = $this_player_zenny;
 
-            // Display the win message for this player with battle zenny
-            $this_robot->robot_frame = 'victory';
-            $this_player->player_frame = 'victory';
-            $this_robot->update_session();
-            $this_player->update_session();
-            $event_header = $this_player->player_name.' Victorious';
-            $event_body = $this_player->print_name().' was victorious! ';
-            $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
-            $event_body .= '<br />';
-            $event_options = array();
-            $event_options['console_show_this_player'] = true;
-            $event_options['console_show_target'] = false;
-            $event_options['this_header_float'] = $event_options['this_body_float'] = $this_player->player_side;
-            if ($this_player->player_token != 'player'
-                && isset($this_player->player_quotes['battle_victory'])){
-                $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
-                $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
-                $event_body .= $this_player->print_quote('battle_victory', $this_find, $this_replace);
-                //$this_quote_text = str_replace($this_find, $this_replace, $this_player->player_quotes['battle_victory']);
-                //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
+            // If the player was visible, we can display the victory as their own
+            if ($this_player->player_visible){
+
+                // Display the win message for this player with battle zenny
+                $this_robot->robot_frame = 'victory';
+                $this_player->player_frame = 'victory';
+                $this_robot->update_session();
+                $this_player->update_session();
+                $event_header = $this_player->player_name.' Victorious';
+                $event_body = $this_player->print_name().' was victorious! ';
+                $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
+                $event_body .= '<br />';
+                $event_options = array();
+                $event_options['console_show_this_player'] = true;
+                $event_options['console_show_target'] = false;
+                $event_options['this_header_float'] = $event_options['this_body_float'] = $this_player->player_side;
+                if ($this_player->player_visible
+                    && isset($this_player->player_quotes['battle_victory'])){
+                    $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                    $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                    $event_body .= $this_player->print_quote('battle_victory', $this_find, $this_replace);
+                    //$this_quote_text = str_replace($this_find, $this_replace, $this_player->player_quotes['battle_victory']);
+                    //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
+                }
+                $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
+
             }
-            $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
+            // Otherwise, we need to attribute the victory to the lead robot instead
+            else {
+
+                // DEBUG
+                //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
+
+                // Display the win message for this player with battle zenny
+                $this_robot->robot_frame = 'victory';
+                $this_robot->update_session();
+                $event_header = $this_robot->robot_name.' Victorious';
+                $event_body = $this_robot->print_name().' was victorious! ';
+                $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
+                $event_body .= '<br />';
+                $event_options = array();
+                $event_options['console_show_this_robot'] = true;
+                $event_options['console_show_target'] = false;
+                $event_options['this_header_float'] = $event_options['this_body_float'] = $this_robot->player->player_side;
+                if ($this_robot->robot_token != 'robot'
+                    && isset($this_robot->robot_quotes['battle_victory'])){
+                    $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                    $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                    $event_body .= $this_robot->print_quote('battle_victory', $this_find, $this_replace);
+                }
+                $this->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
+
+            }
 
             // If this was a PLAYER BATTLE and the human user won against them (this/human/victory | target/computer/defeat)
             $target_user_id = $target_player->player_id;
@@ -1421,7 +1452,7 @@ class rpg_battle extends rpg_object {
             if ($this_action == 'start'){
 
                 // Ensure this is an actual player
-                if ($this_player->player_token !== 'player'){
+                if ($this_player->player_visible){
 
                     // If there's a whole team, we should display it as a team entrance
                     if ($this_player->counters['robots_active'] > 1){
@@ -1430,7 +1461,7 @@ class rpg_battle extends rpg_object {
                         $event_header = ''.$this_player->player_name.'\'s Robots';
                         $event_body = $this_player->print_name_s().' robots appear on the battle field!<br />';
                         //if (isset($this_player->player_quotes['battle_start'])){ $event_body .= '&quot;<em>'.$this_player->player_quotes['battle_start'].'</em>&quot;'; }
-                        if ($this_player->player_token != 'player'
+                        if ($this_player->player_visible
                             && isset($this_player->player_quotes['battle_start'])){
                             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                             $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
@@ -1683,11 +1714,11 @@ class rpg_battle extends rpg_object {
                         && $actual_target_robot->robot_status != 'disabled'
                         && $this->critical_chance(3)){
                         // Generate this robot's taunt event after dealing damage, which only happens once per battle
-                        $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
+                        $event_header = ($this_player->player_visible ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                         $this_replace = array($target_player->player_name, $actual_target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
                         //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_taunt']);
-                        $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
+                        $event_body = ($this_player->player_visible ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
                         $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
                         $event_options = array();
                         $event_options['console_show_target'] = false;
@@ -1735,11 +1766,11 @@ class rpg_battle extends rpg_object {
                             && $actual_target_robot->robot_status != 'disabled'
                             && $this->critical_chance(3)){
                             // Generate this robot's taunt event after dealing damage, which only happens once per battle
-                            $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
+                            $event_header = ($this_player->player_visible ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
                             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                             $this_replace = array($target_player->player_name, $actual_target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
                             //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_taunt']);
-                            $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
+                            $event_body = ($this_player->player_visible ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
                             $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
                             $event_options = array();
                             $event_options['console_show_target'] = false;
@@ -1827,11 +1858,11 @@ class rpg_battle extends rpg_object {
                         && $target_robot->robot_status != 'disabled'
                         && $this->critical_chance(3)){
                         // Generate this robot's taunt event after dealing damage, which only happens once per battle
-                        $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
+                        $event_header = ($this_player->player_visible ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
                         $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                         $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
                         //$this_quote_text = str_replace($this_find, $this_replace, $this_robot->robot_quotes['battle_taunt']);
-                        $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
+                        $event_body = ($this_player->player_visible ? $this_player->print_name().'&#39;s ' : '').$this_robot->print_name().' taunts the opponent!<br />';
                         $event_body .= $this_robot->print_quote('battle_taunt', $this_find, $this_replace);
                         //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                         $event_options = array();
@@ -1976,7 +2007,7 @@ class rpg_battle extends rpg_object {
                         $this_player->set_frame('base');
                         $this_player->set_value('current_robot', false);
                         $this_player->set_value('current_robot_enter', false);
-                        $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$old_robot->robot_name;
+                        $event_header = ($this_player->player_visible ? $this_player->player_name.'&#39;s ' : '').$old_robot->robot_name;
                         $event_body = $old_robot->print_name().' is '.$this_switch_reason.' from battle!';
                         $event_options = array();
                         $event_options['canvas_show_disabled_bench'] = $old_robot->robot_id.'_'.$old_robot->robot_token;
@@ -2019,7 +2050,7 @@ class rpg_battle extends rpg_object {
                         $this_player->set_frame('command');
                         $this_player->set_value('current_robot', $temp_new_robot->robot_string);
                         $this_player->set_value('current_robot_enter', $this_battle->counters['battle_turn']);
-                        $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$temp_new_robot->robot_name;
+                        $event_header = ($this_player->player_visible ? $this_player->player_name.'&#39;s ' : '').$temp_new_robot->robot_name;
                         $event_body = "{$temp_new_robot->print_name()} ".($this_player->player_side === 'left' ? 'joins' : 'enters')." the battle!<br />";
                         $event_options = array();
                         rpg_canvas::apply_camera_action_flags($event_options, $temp_new_robot);
@@ -2190,7 +2221,7 @@ class rpg_battle extends rpg_object {
                 if (empty($_SESSION['GAME']['values']['robot_database'][$temp_target_robot->robot_token]['robot_scanned'])){ $is_new_scan = true; }
 
                 // Create an event showing the scanned robot's data
-                $event_header = ($temp_target_player->player_token != 'player' ? $temp_target_player->player_name.'&#39;s ' : '').$temp_target_robot->robot_name;
+                $event_header = ($temp_target_player->player_visible ? $temp_target_player->player_name.'&#39;s ' : '').$temp_target_robot->robot_name;
                 if ($is_new_scan){ $event_header .= '  <span class="robot_stat robot_type robot_type_electric" style="font-size: 90%; top: -1px;">New!</span>'; }
                 $event_body = '';
                 ob_start();
