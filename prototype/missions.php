@@ -1084,6 +1084,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Bonus Chapter : Star Fields'
             );
 
+        // Define an array to keep track of group option progress
+        $this_group_name = $new_group_name();
+        $new_battle_options_group($this_group_name);
+
         // Define how many fields we should show at once
         $star_fields_to_show = 12;
 
@@ -1225,6 +1229,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 'option_maintext' => 'Bonus Chapter : Player Battles'
                 );
 
+            // Define an array to keep track of group option progress
+            $this_group_name = $new_group_name();
+            $new_battle_options_group($this_group_name);
+
             // Include the leaderboard data for pruning
             $this_leaderboard_online_players = mmrpg_prototype_leaderboard_online();
             $temp_include_usernames = array();
@@ -1358,6 +1366,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_maintext' => 'Bonus Chapter : Mission Randomizer'
             );
 
+        // Define an array to keep track of group option progress
+        $this_group_name = $new_group_name();
+        $new_battle_options_group($this_group_name);
+
         // Generate the bonus battle and using the prototype data
         $temp_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 8, 'mecha');
         $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
@@ -1396,6 +1408,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             'option_chapter' => $this_prototype_data['this_current_chapter'],
             'option_maintext' => 'Bonus Chapter : Challenge Mode'
             );
+
+        // Define an array to keep track of group option progress
+        $this_group_name = $new_group_name();
+        $new_battle_options_group($this_group_name);
 
         // Create an array to hold all the challenge missions
         $temp_challenge_missions = array();
