@@ -862,12 +862,12 @@ elseif ($request_kind === 'challenge'){
             if (!empty($challenge_field_info['field_type2'])){ $field_types[] = $challenge_field_info['field_type2']; }
             $field_types = array_unique($field_types);
             $types_index = mmrpgGetIndex('types');
-            error_log('$field_types: '.print_r($field_types, true));
-            error_log('$types_index: '.print_r($types_index, true));
+            //error_log('$field_types: '.print_r($field_types, true));
+            //error_log('$types_index: '.print_r($types_index, true));
             if (isset($field_types[0]) && isset($types_index[$field_types[0]])){ $banner_config['frame_colour'] = $types_index[$field_types[0]]['type_colour_dark']; }
             if (isset($field_types[1]) && isset($types_index[$field_types[1]])){ $banner_config['frame_colour2'] = $types_index[$field_types[1]]['type_colour_light']; }
             elseif (isset($field_types[0]) && isset($types_index[$field_types[0]])){ $banner_config['frame_colour2'] = $types_index[$field_types[0]]['type_colour_light']; }
-            error_log('$banner_config: '.print_r($banner_config, true));
+            //error_log('$banner_config: '.print_r($banner_config, true));
         }
 
     }
