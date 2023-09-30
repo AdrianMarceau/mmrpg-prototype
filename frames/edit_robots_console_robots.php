@@ -70,8 +70,22 @@ foreach($allowed_edit_data AS $player_token => $player_info){
     $counter_player_missions = rpg_prototype::battles_complete($player_info['player_token']);
     $allow_player_selector = $allowed_edit_player_count > 1 && $counter_player_missions > 0 ? true : false;
 
+    // Check for any robots that are locked in the endless attack or otherwise
+    $player_robots_locked = array();
+    $endless_attack_savedata = mmrpg_prototype_get_endless_sessions($player_token);
+    //error_log('$endless_attack_savedata for '.$player_token.': '.print_r(array_keys($endless_attack_savedata), true));
+    if (!empty($endless_attack_savedata)
+        && !empty($endless_attack_savedata['robots'])){
+        $endless_robot_robots = $endless_attack_savedata['robots'];
+        $player_robots_locked = array_merge($player_robots_locked, $endless_robot_robots);
+        $player_robots_locked = array_unique($player_robots_locked);
+    }
+
     // Loop through the player robots and display their edit boxes
     foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
+
+        // If this robot is locked, skip it
+        if (in_array($robot_token, $player_robots_locked)){ continue; }
 
         // Update the robot key to the current counter
         $robot_key = $key_counter;

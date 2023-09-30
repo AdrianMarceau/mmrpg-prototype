@@ -344,6 +344,28 @@ body.windowFlag_landscapeMode #prototype {
     border-radius: 50%;
     pointer-events: none;
 }
+#edit #canvas .sprite_robot .endless {
+    display: inline-block;
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 0 none transparent;
+    background-color: transparent;
+    color: #696969;
+    padding: 0;
+    font-size: 8px;
+    line-height: 1.2;
+    width: auto;
+    height: auto;
+    pointer-events: none;
+    text-indent: 0;
+}
+#edit #canvas .sprite_robot .endless i {
+    display: inline-block;
+}
 /*
 #edit #canvas .sprite_robot_dr-light_current {
     border-color: rgb(80, 100, 255) !important;
@@ -355,6 +377,17 @@ body.windowFlag_landscapeMode #prototype {
     border-color: rgb(144, 61, 190) !important;
 }
 */
+#edit #canvas .sprite_robot.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+#edit #canvas .sprite_robot.locked {
+    pointer-events: none;
+    cursor: default;
+}
+#edit #canvas .sprite_robot.locked .sprite {
+    filter: brightness(0.1) saturate(0) !important;
+}
 
 #edit #canvas .wrapper_left .sprite_robot {
 

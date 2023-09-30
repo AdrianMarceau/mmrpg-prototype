@@ -21,18 +21,44 @@ $key_counter = 0;
 $player_counter = 0;
 $player_keys = array_keys($allowed_edit_data);
 foreach($allowed_edit_data AS $player_token => $player_info){
+
+    // Increment the player counter
     $player_counter++;
+
+    // Default the player colour to energy but adapt if there are any other stats
     $player_colour = 'energy';
     if (!empty($player_info['player_attack'])){ $player_colour = 'attack'; }
     elseif (!empty($player_info['player_defense'])){ $player_colour = 'defense'; }
     elseif (!empty($player_info['player_speed'])){ $player_colour = 'speed'; }
+
+    // Check for any robots that are locked in the endless attack or otherwise
+    $player_robots_locked = array();
+    $player_robots_endless = array();
+    $endless_attack_savedata = mmrpg_prototype_get_endless_sessions($player_token);
+    //error_log('$endless_attack_savedata for '.$player_token.': '.print_r(array_keys($endless_attack_savedata), true));
+    if (!empty($endless_attack_savedata)
+        && !empty($endless_attack_savedata['robots'])){
+        $player_robots_endless = $endless_attack_savedata['robots'];
+        $player_robots_locked = array_merge($player_robots_locked, $player_robots_endless);
+        $player_robots_locked = array_unique($player_robots_locked);
+    }
+
     //echo '<td style="width: '.floor(100 / $allowed_edit_player_count).'%;">'."\n";
         echo '<div class="wrapper wrapper_'.($player_counter % 2 != 0 ? 'left' : 'right').' wrapper_'.$player_token.'" data-select="robots" data-player="'.$player_info['player_token'].'" style="width: '.(floor(100 / $allowed_edit_player_count) - ($allowed_edit_player_count)).'%; margin-right: 0.5%;">'."\n";
             echo '<div class="wrapper_header player_type player_type_'.$player_colour.'">'.$player_info['player_name'].' <span class="count">'.count($player_info['player_robots']).'</span></div>';
             echo '<div class="wrapper_overflow">';
+                $player_canvas_robots = array();
+                $player_canvas_robots_locked = array();
                 foreach ($player_info['player_robots'] AS $robot_token => $robot_info){
+                    if (!isset($mmrpg_database_robots[$robot_token])){ continue; }
+                    if (!in_array($robot_token, $player_robots_locked)){ $player_canvas_robots[$robot_token] = $robot_info; }
+                    else { $player_canvas_robots_locked[$robot_token] = $robot_info; }
+                }
+                $player_canvas_robots_sorted = array_merge($player_canvas_robots, $player_canvas_robots_locked);
+                foreach ($player_canvas_robots_sorted AS $robot_token => $robot_info){
                     $robot_key = $key_counter;
                     if (!isset($mmrpg_database_robots[$robot_token])){ continue; }
+                    //if (in_array($robot_token, $player_robots_locked)){ continue; }
                     $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
                     $temp_robot_rewards = array();
 
@@ -62,7 +88,10 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                     $robot_is_new = in_array($robot_token, $menu_frame_content_unseen) ? true : false;
 
                     $robot_link_styles = 'background-image: none;';
-                    $robot_link_classes = 'sprite sprite_robot sprite_robot_'.$player_token.' sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == 0 ? 'sprite_robot_current sprite_robot_'.$player_token.'_current ' : '').' robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').'';
+                    $robot_link_classes = 'sprite sprite_robot sprite_robot_'.$player_token.' sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == 0 ? 'sprite_robot_current sprite_robot_'.$player_token.'_current ' : '').' robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').' ';
+
+                    if (in_array($robot_token, $player_robots_locked)){ $robot_link_classes .= 'locked disabled '; }
+                    $robot_is_endless = in_array($robot_token, $player_robots_endless) ? true : false;
 
                     $robot_sprite_styles = 'background-image: url(images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: '.$robot_image_offset_x.'px '.$robot_image_offset_y.'px;';
                     $robot_sprite_classes = 'sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot';
@@ -80,6 +109,7 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                         '<span class="'.$robot_sprite_classes.'" style="'.$robot_sprite_styles.'"></span>'.
                         '<span class="name">'.$robot_info['robot_name'].'</span>'.
                         ($robot_is_new ? '<i class="new type electric"></i>' : '').
+                        ($robot_is_endless ? '<span class="endless"><i class="fa fas fa-infinity"></i></span>' : '').
                         '</a>'."\n";
                     $key_counter++;
                 }

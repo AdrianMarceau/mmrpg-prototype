@@ -4549,6 +4549,9 @@ class rpg_robot extends rpg_object {
             // Collect starforce values for the current player
             $player_starforce = rpg_game::starforce_unlocked();
 
+            // Check to see if this player is disabled for any reason
+            $player_is_disabled = !empty($player_info['flags']['player_disabled']) ? true : false;
+
             // Update the robot key to the current counter
             $robot_key = $key_counter;
             // Make a backup of the player selector
@@ -4582,7 +4585,7 @@ class rpg_robot extends rpg_object {
                 $robot_info['robot_'.$stat_token.'_base'] = $robot_stats[$stat_token]['current_noboost'];
                 $robot_info['robot_'.$stat_token.'_rewards'] = $robot_stats[$stat_token]['bonus'];
                 if (!empty($player_info['player_'.$stat_token])){
-                    $robot_stats[$stat_token]['player'] = ceil($robot_info['robot_'.$stat_token] * ($player_info['player_'.$stat_token] / 100));
+                    $robot_stats[$stat_token]['player'] = !$player_is_disabled ? ceil($robot_info['robot_'.$stat_token] * ($player_info['player_'.$stat_token] / 100)) : 0;
                     $robot_info['robot_'.$stat_token.'_player'] = $robot_stats[$stat_token]['player'];
                     $robot_info['robot_'.$stat_token] += $robot_stats[$stat_token]['player'];
                 }
@@ -4871,12 +4874,15 @@ class rpg_robot extends rpg_object {
                             <label class="original_player original_player_<?= $robot_info['original_player'] ?>" data-tooltip-type="player_type player_type_<?= str_replace('dr-', '', $robot_info['original_player']) ?>" style="display: block; float: left; <?= $player_style ?>"><span class="current_player current_player_<?= $player_info['player_token'] ?>">Player</span> :</label>
                         <? endif; ?>
 
+                        <? $player_selector_image = $player_info['player_token']; ?>
+                        <? $player_selector_image_style = 'background-image: url(images/players/'.$player_selector_image.'/mug_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.'); '; ?>
+                        <? if ($player_is_disabled){ $player_selector_image_style .= 'background-image: none; '; } ?>
                         <?if($global_allow_editing && $allow_player_selector):?>
-                            <a class="player_name player_type player_type_<?= str_replace('dr-', '', $player_info['player_token']) ?>"><label style="background-image: url(images/players/<?= $player_info['player_token']?>/mug_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $player_info['player_name']?><span class="arrow"><i class="fa fas fa-angle-double-down"></i></span></label></a>
+                            <a class="player_name player_type player_type_<?= str_replace('dr-', '', $player_selector_image) ?>"><label style="<?= $player_selector_image_style ?>"><?= $player_info['player_name']?><span class="arrow"><i class="fa fas fa-angle-double-down"></i></span></label></a>
                         <?elseif(!$global_allow_editing && $allow_player_selector):?>
-                            <a class="player_name player_type player_type_<?= str_replace('dr-', '', $player_info['player_token']) ?>" style="cursor: default; "><label style="background-image: url(images/players/<?= $player_info['player_token']?>/mug_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); cursor: default; "><?= $player_info['player_name']?></label></a>
+                            <a class="player_name player_type player_type_<?= str_replace('dr-', '', $player_selector_image) ?>" style="cursor: default; "><label style="<?= $player_selector_image_style ?> cursor: default; "><?= $player_info['player_name']?></label></a>
                         <?else:?>
-                            <a class="player_name player_type player_type_<?= str_replace('dr-', '', $player_info['player_token']) ?>" style="opacity: 0.5; filter: alpha(opacity=50); cursor: default;"><label style="background-image: url(images/players/<?= $player_info['player_token']?>/mug_left_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);"><?= $player_info['player_name']?></label></a>
+                            <a class="player_name player_type player_type_<?= str_replace('dr-', '', $player_selector_image) ?>" style="opacity: 0.5; filter: alpha(opacity=50); cursor: default;"><label style="<?= $player_selector_image_style ?>"><?= $player_info['player_name']?></label></a>
                         <?endif;?>
                     </td>
                     <?
@@ -5103,8 +5109,8 @@ class rpg_robot extends rpg_object {
                         ?>
                         <td class="right">
                             <label class="<?=
-                                (!empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '').
-                                (!empty($player_info['player_weapons']) ? 'statboost_player_'.$player_info['player_token'] : '')
+                                (!$player_is_disabled && !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '').
+                                (!$player_is_disabled && !empty($player_info['player_weapons']) ? 'statboost_player_'.$player_info['player_token'] : '')
                                 ?>" style="display: block; float: left;">Energy :</label>
                             <?
                             // Print out the energy stat breakdown
@@ -5126,7 +5132,7 @@ class rpg_robot extends rpg_object {
                         ob_start();
                         ?>
                         <td class="right">
-                            <label class="<?= !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Energy :</label>
+                            <label class="<?= !$player_is_disabled && !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Energy :</label>
                             <?
                             // Print out the energy stat breakdown
                             $print_robot_stat_function('energy');
@@ -5141,7 +5147,7 @@ class rpg_robot extends rpg_object {
                         ob_start();
                         ?>
                         <td class="right">
-                            <label class="<?= !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Weapons :</label>
+                            <label class="<?= !$player_is_disabled && !empty($player_info['player_energy']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Weapons :</label>
                             <?
                             // Print out the energy stat breakdown
                             $print_robot_stat_function('weapons');
@@ -5159,7 +5165,7 @@ class rpg_robot extends rpg_object {
                     ob_start();
                     ?>
                     <td class="right">
-                        <label class="<?= !empty($player_info['player_attack']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Attack :</label>
+                        <label class="<?= !$player_is_disabled && !empty($player_info['player_attack']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Attack :</label>
                         <?
                         // Print out the attack stat breakdown
                         $print_robot_stat_function('attack');
@@ -5174,7 +5180,7 @@ class rpg_robot extends rpg_object {
                     ob_start();
                     ?>
                     <td class="right">
-                        <label class="<?= !empty($player_info['player_defense']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Defense :</label>
+                        <label class="<?= !$player_is_disabled && !empty($player_info['player_defense']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Defense :</label>
                         <?
                         // Print out the defense stat breakdown
                         $print_robot_stat_function('defense');
@@ -5189,7 +5195,7 @@ class rpg_robot extends rpg_object {
                     ob_start();
                     ?>
                     <td class="right">
-                        <label class="<?= !empty($player_info['player_speed']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Speed :</label>
+                        <label class="<?= !$player_is_disabled && !empty($player_info['player_speed']) ? 'statboost_player_'.$player_info['player_token'] : '' ?>" style="display: block; float: left;">Speed :</label>
                         <?
                         // Print out the speed stat breakdown
                         $print_robot_stat_function('speed');

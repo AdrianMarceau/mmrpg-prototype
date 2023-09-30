@@ -33,6 +33,9 @@ function refresh_editor_arrays( &$allowed_edit_players, &$allowed_edit_robots, &
     $temp_player_index = rpg_player::get_index_custom($temp_player_tokens);
     $temp_type_tokens = rpg_type::get_index_tokens();
 
+    // Check to see if we're in an endless battle in progress and if so, collect the savedata
+    $endless_attack_savedata = mmrpg_prototype_get_endless_sessions();
+
     // Now to actually loop through and update the allowed players, robots, and abilities arrays
     foreach ($temp_player_array AS $player_token => $player_info){
         if (empty($player_token) || !isset($temp_player_index[$player_token])){ continue; }
@@ -40,6 +43,7 @@ function refresh_editor_arrays( &$allowed_edit_players, &$allowed_edit_robots, &
 
         // Merge the player and index info then append the token and info
         $player_info = array_merge($player_index_info, $player_info);
+        if (!empty($endless_attack_savedata[$player_token])){ $player_info['flags']['player_disabled'] = true; }
         $allowed_edit_players[] = $player_token;
         $allowed_edit_data[$player_token] = $player_info;
 

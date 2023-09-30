@@ -17,6 +17,17 @@ if (empty($temp_token) || empty($temp_order) || empty($temp_player)){
     die('error|request-error|'.preg_replace('/\s+/', ' ', print_r($_REQUEST, true)));
 }
 
+// Check for any robots that are locked in the endless attack or otherwise
+$player_robots_locked = array();
+$endless_attack_savedata = mmrpg_prototype_get_endless_sessions($temp_player);
+error_log('$endless_attack_savedata for '.$temp_player.': '.print_r(array_keys($endless_attack_savedata), true));
+if (!empty($endless_attack_savedata)
+    && !empty($endless_attack_savedata['robots'])){
+    $endless_robot_robots = $endless_attack_savedata['robots'];
+    $player_robots_locked = array_merge($player_robots_locked, $endless_robot_robots);
+    $player_robots_locked = array_unique($player_robots_locked);
+}
+
 // Ensure this player's robots exist in the current game session
 if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'])
     && !empty($_SESSION[$session_token]['values']['battle_rewards'][$temp_player]['player_robots'])){
@@ -191,6 +202,17 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
 
         // Sort the robots and maintain index association
         uasort($temp_player_robots, 'temp_player_robots_sort');
+
+        // If there are any locked robots, make sure we anchor them to the bottom without hurting the existing order
+        if (!empty($player_robots_locked)){
+            $temp_locked_robots = array();
+            $temp_unlocked_robots = array();
+            foreach ($temp_player_robots AS $token => $info){
+                if (in_array($token, $player_robots_locked)){ $temp_locked_robots[$token] = $info; }
+                else { $temp_unlocked_robots[$token] = $info; }
+            }
+            $temp_player_robots = array_merge($temp_unlocked_robots, $temp_locked_robots);
+        }
 
         // Ensure nothing went wrong with the array before copying
         if (!empty($temp_player_robots)){
