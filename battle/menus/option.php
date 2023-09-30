@@ -35,10 +35,21 @@ ob_start();
     $block_num++;
     $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_animationEffects"><label><span class="multi">Animation<br />Settings</span></label></a>';
 
-    // Display a SPACERs in this slot
-    $block_num++;
-    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option button_disabled block_'.$block_num.'" type="button">&nbsp;</a>';
+    // If we're in ENDLESS MODE, display the quit button here
+    if (!empty($this_battle->flags['challenge_battle'])
+        && !empty($this_battle->flags['endless_battle'])){
 
+		// Display the option for GIVE UP ON ENDLESS
+		$block_num++;
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="withdraw"><label><span class="multi">Give&nbsp;Up<br />On&nbsp;Endless</span></label></a>';
+
+    } else {
+
+     	// Display a SPACERs in this slot
+	    $block_num++;
+	    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option button_disabled block_'.$block_num.'" type="button">&nbsp;</a>';
+
+    }
 
     // Display a SPACER in this slot
     //$block_num++;
