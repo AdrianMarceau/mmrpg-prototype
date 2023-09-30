@@ -173,10 +173,40 @@ $target_playerinfo['player_side'] = 'right';
 // Make sure the current and target player info are always available in the battle
 if (!isset($this_battle->values['battle_players'])
     || empty($this_battle->values['battle_players'])){
-    $this_battle->values['battle_players'] = array(
+
+    // Check to see if there are already any ENDLESS ATTACK MODE sessions in progress
+    $is_endless_battle = !empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle']) ? true : false;
+    $endless_attack_savedata = mmrpg_prototype_get_endless_sessions($this_playerinfo['player_token']);
+    //error_log('we are in battle with player '.$this_playerinfo['player_token'].' and have '.print_r(array_keys($endless_attack_savedata), true));
+    if (!isset($this_playerinfo['flags'])){ $this_playerinfo['flags'] = array(); }
+    if (!$is_endless_battle
+        && !empty($endless_attack_savedata)){
+        //error_log($this_playerinfo['player_token'].' is currently in endless attack mode');
+        $this_playerinfo['flags']['player_disabled'] = true;
+        $this_playerinfo['player_image'] = 'player';
+    }
+
+    // Add the start data for this and the target player into the battle itself
+    $temp_battle_players = array(
         'this_player' => $this_playerinfo,
         'target_player' => $target_playerinfo
         );
+
+    // Make sure we leave a reference to the start robots on each side for later
+    $temp_player_robot_string = $this_player_robots;
+    $temp_target_robot_string = implode(',', array_map(function($r){ return $r['robot_id'].'_'.$r['robot_token']; }, $this_battle->battle_target_player['player_robots']));
+    $temp_battle_players['this_player']['player_robots'] = $this_player_robots;
+    $temp_battle_players['target_player']['player_robots'] = $temp_target_robot_string;
+
+    // And finally, it's important to check if the player(s) are visible or not
+    $temp_battle_players['this_player']['player_visible'] = true;
+    $temp_battle_players['target_player']['player_visible'] = false;
+    if (!empty($this_playerinfo['flags']['player_disabled'])){ $temp_battle_players['this_player']['player_visible'] = false; }
+    if ($temp_battle_players['target_player']['player_token'] !== 'player'){ $temp_battle_players['target_player']['player_visible'] = true; }
+
+    // Update the battle values with the calculated cached player info
+    $this_battle->values['battle_players'] = $temp_battle_players;
+
 }
 
 // Only create the arrays with minimal info if NOT start
@@ -480,6 +510,13 @@ if ($this_action == 'prototype'){
 
     // Require the prototype action file
     require_once('battle/actions/prototype.php');
+
+}
+// Else if the player is has requested to withdraw from the battle (endless mode)
+elseif ($this_action == 'withdraw'){
+
+    // Require the giveup action file
+    require_once('battle/actions/withdraw.php');
 
 }
 // Else if the player is has requested to restart the battle
