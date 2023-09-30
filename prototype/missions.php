@@ -835,24 +835,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $final_boss_info['robot_abilities'][] = 'buster-charge';
                 $temp_addon_abilties = array('core-laser', $target_player_stat_token.'-assault');
                 if (!empty($temp_addon_abilties)){ $final_boss_info['robot_abilities'] = array_merge($final_boss_info['robot_abilities'], $temp_addon_abilties); }
-                $final_replacement_quotes = array();
-                if ($this_prototype_player_data['player_token'] === 'dr-light'){
-                    $final_replacement_quotes['battle_start'] = 'The human they call Hikari? Your hubris will be your demise.';
-                    $final_replacement_quotes['battle_taunt'] = 'You remind me of a Creator. It will be shame to extingish you.';
-                    $final_replacement_quotes['battle_victory'] = 'Can you see me, Master? I have finally completed my mission!';
-                    $final_replacement_quotes['battle_defeat'] = 'Savour your temporary victory... I will return even more powerful...!';
-                } else if ($this_prototype_player_data['player_token'] === 'dr-wily'){
-                    $final_replacement_quotes['battle_start'] = 'I sense an Evil in your heart. My master will be pleased at your erasure!';
-                    $final_replacement_quotes['battle_taunt'] = 'Stupid Earth creatures! You are only delaying the inevitable!';
-                    $final_replacement_quotes['battle_victory'] = 'The Earth should thank me for saving it from your tragic future!';
-                    $final_replacement_quotes['battle_defeat'] = 'It doesn\'t end like this... I still haven\'t found my master...';
-                } else if ($this_prototype_player_data['player_token'] === 'dr-cossack'){
-                    $final_replacement_quotes['battle_start'] = 'I sense you are somehow... responsible... for my suffering!';
-                    $final_replacement_quotes['battle_taunt'] = 'Stop resisting! It is time you Earthlings met your deserved ends!';
-                    $final_replacement_quotes['battle_victory'] = 'You wretched Earth NetNavis are all the same! Weak! Nyahahaha!';
-                    $final_replacement_quotes['battle_defeat'] = 'Master... why have you forsaken me again? Was it all for nothing...?';
-                }
-                $final_boss_info['robot_quotes'] = array_merge($mmrpg_index_robots[$final_boss_token]['robot_quotes'], $final_replacement_quotes);
                 $temp_final_option['battle_target_player']['player_robots'][] = $final_boss_info;
 
                 // Define the details for the real_final boss's minion "trill" and append them to the array
@@ -911,20 +893,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     $temp_before_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
                     $temp_before_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6];
                     $temp_before_final_option['battle_description'] = 'Defeat the army of robot master clones augmented with darkness energy!';
-
-                    /*
-                    // Collect and define the robot masters and support mechas to appear on this field
-                    $temp_robot_masters = array();
-                    $temp_support_mechas = array();
-                    $temp_omega_session_key = $this_prototype_data['prev_player_token'].'_target-robot-omega_prototype';
-                    $temp_omega_robots_array = !empty($_SESSION['GAME']['values'][$temp_omega_session_key]) ? $_SESSION['GAME']['values'][$temp_omega_session_key] : array();
-                    if (isset($temp_omega_robots_array[1][0])){ $temp_omega_robots_array = $temp_omega_robots_array[1]; }
-                    foreach ($temp_omega_robots_array AS $key => $info){
-                        $temp_field_info = rpg_field::parse_index_info($mmrpg_index_fields[$info['field']]);
-                        if (!empty($temp_field_info['field_master'])){ $temp_robot_masters[] = $temp_field_info['field_master']; }
-                        if (!empty($temp_field_info['field_mechas'])){ $temp_support_mechas[] = array_pop($temp_field_info['field_mechas']); }
-                    }
-                    */
 
                     // Define the "asteroid" robot masters (alt10) that should appear in Slur's pre-battle
                     $temp_asteroid_robots = array('slash-man', 'cold-man', 'gravity-man', 'napalm-man', 'plant-man', 'stone-man', 'sword-man', 'yamato-man');
@@ -1052,24 +1020,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         $real_final_boss_info['robot_abilities'] = array('space-overdrive', 'laser-overdrive', 'shield-overdrive', 'buster-charge');
                         $temp_addon_abilties = array('freeze-overdrive', 'flame-overdrive', 'water-overdrive', 'electric-overdrive');
                         if (!empty($temp_addon_abilties)){ $real_final_boss_info['robot_abilities'] = array_merge($real_final_boss_info['robot_abilities'], $temp_addon_abilties); }
-                        $real_final_replacement_quotes = array();
-                        if ($this_prototype_player_data['player_token'] === 'dr-light'){
-                            $real_final_replacement_quotes['battle_start'] = '...';
-                            $real_final_replacement_quotes['battle_taunt'] = '...';
-                            $real_final_replacement_quotes['battle_victory'] = '...!';
-                            $real_final_replacement_quotes['battle_defeat'] = '...!';
-                        } else if ($this_prototype_player_data['player_token'] === 'dr-wily'){
-                            $real_final_replacement_quotes['battle_start'] = '...';
-                            $real_final_replacement_quotes['battle_taunt'] = '...';
-                            $real_final_replacement_quotes['battle_victory'] = '...!';
-                            $real_final_replacement_quotes['battle_defeat'] = '...!';
-                        } else if ($this_prototype_player_data['player_token'] === 'dr-cossack'){
-                            $real_final_replacement_quotes['battle_start'] = 'No! I refuse to let it end this way!';
-                            $real_final_replacement_quotes['battle_taunt'] = 'Master, why have not come for me? Are you even out there?'; //'Master! Have you have finally come for me?!';
-                            $real_final_replacement_quotes['battle_victory'] = 'Master, I have completed my task! Are you still out there?'; //'Master, forgive me for what have I done....';
-                            $real_final_replacement_quotes['battle_defeat'] = 'Master, forgive me for I have failed you...';
-                        }
-                        $real_final_boss_info['robot_quotes'] = array_merge($mmrpg_index_robots[$real_final_boss_token]['robot_quotes'], $real_final_replacement_quotes);
                         $temp_after_final_option['battle_target_player']['player_robots'][] = $real_final_boss_info;
 
                         // Define the details for the real_final boss's minion "trill" and append them to the array
