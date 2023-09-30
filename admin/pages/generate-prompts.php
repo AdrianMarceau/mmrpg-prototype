@@ -288,7 +288,7 @@
                 $prompt_valid = true;
                 $prompt_errors = array();
                 $prompt_data = json_decode($prompt_data, true);
-                error_log('$prompt_data = '.print_r($prompt_data, true));
+                //error_log('$prompt_data = '.print_r($prompt_data, true));
                 if (empty($prompt_data['player1'])){ $prompt_errors[] = 'undefined player1'; $prompt_valid = false; }
                 elseif (empty($prompt_data['player1']['robots'])){ $prompt_errors[] = 'undefined player1 robots'; $prompt_valid = false; }
                 if (empty($prompt_data['player2'])){ $prompt_errors[] = 'undefined player2'; $prompt_valid = false; }
@@ -362,7 +362,7 @@
                         $replace_in_markup_index['{"'.$key.'"}'] = '"'.str_replace(', ', '", "', $value).'"';
                     }
 
-                    error_log('$replace_in_markup_index = '.print_r($replace_in_markup_index, true));
+                    //error_log('$replace_in_markup_index = '.print_r($replace_in_markup_index, true));
 
                     // Define a quick function that will loop through a given string and search/replace $player1 and $player2 variables
                     $replace_player_variables = function($string) use ($replace_in_markup_index){
