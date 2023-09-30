@@ -1454,10 +1454,60 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             }
         }
 
-        // Always add a final button for the ENDLESS ATTACK MODE challenge mission
-        $temp_battle_sigma = rpg_mission_endless::generate_endless_mission($this_prototype_data, 1);
-        rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
-        $this_prototype_data['battle_options'][] = $temp_battle_sigma;
+
+
+
+        // -- ENDLESS ATTACK MODE LOGISTICS -- //
+
+        // Check to see if there are already any ENDLESS ATTACK MODE sessions in progress
+        $endless_attack_savedata = mmrpg_prototype_get_endless_sessions();
+
+        // Always some kind of final button for the ENDLESS ATTACK MODE challenge mission
+        // Check to see if the user has any ACTIVE ENDLESS SAVEDATE before generating a new one
+        $player_token = $this_prototype_data['this_player_token'];
+        //error_log('Checking for ENDLESS_MODE_SAVEDATA '.print_r(array_keys($endless_attack_savedata), true));
+        if (!empty($endless_attack_savedata)
+            && !empty($endless_attack_savedata[$player_token])){
+
+            // We already have existing save data for this player, so let's just add the link
+            //error_log('We already have endless savedata for '.$player_token);
+            $temp_endless_saveinfo = $endless_attack_savedata[$player_token];
+            //error_log('$temp_endless_saveinfo: '.print_r($temp_endless_saveinfo, true));
+            //error_log('$temp_endless_saveinfo: '.print_r(array_keys($temp_endless_saveinfo), true));
+            $temp_battle_sigma = $temp_endless_saveinfo['battle'];
+            $temp_battle_sigma['option_target_href'] = $temp_endless_saveinfo['redirect'];
+            $this_prototype_data['battle_options'][] = $temp_battle_sigma;
+
+
+        } elseif (!empty($endless_attack_savedata)){
+
+            // We have save data but it's for another player, so just add a placeholder instead
+            $other_player_token = array_keys($endless_attack_savedata)[0];
+            $other_player_info = rpg_player::get_index_info($other_player_token);
+            $this_player_info = rpg_player::get_index_info($player_token);
+            //error_log('We already have endless savedata for another player ('.$other_player_token.')');
+            $temp_placeholder = array();
+            $temp_placeholder['option_type'] = 'placeholder';
+            $temp_placeholder['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $temp_placeholder['option_locks'] = array(0 => false);
+            $temp_placeholder['option_pseudo_token'] = 'endless-mission-placeholder';
+            $temp_placeholder['option_pseudo_type'] = str_replace('dr-', '', $other_player_token);
+            $temp_placeholder['option_click_tooltip'] = '&laquo; Endless Attack Mode &raquo; ';
+            $temp_placeholder['option_click_tooltip'] .= '|| '.$other_player_info['player_name'].' is currently exploring this area! ';
+            $temp_placeholder['option_click_tooltip'] .= '|| Bring him home if you want to start a new run with '.$this_player_info['player_name'].'!';
+            $this_prototype_data['battle_options'][] = $temp_placeholder;
+            $append_faux_battle_option_to_group($this_group_name);
+
+
+        } else {
+
+            // We can generate totally new save data as there aren't any stored sessions right now
+            //error_log('We can generate NEW endless savedata for '.$player_token);
+            $temp_battle_sigma = rpg_mission_endless::generate_endless_mission($this_prototype_data, 1);
+            rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
+            $this_prototype_data['battle_options'][] = $temp_battle_sigma;
+
+        }
 
     }
 
