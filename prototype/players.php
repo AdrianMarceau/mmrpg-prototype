@@ -80,7 +80,7 @@ else {
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_this-'.$doctor_token.'-player-select option_'.$doctor_token.' block_1';
         echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_light.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
         echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">Dr. Light'.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$doctor_info['player_name'].(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
         echo '</div></div></div>';
         echo '</a>'."\n";
     }
@@ -110,7 +110,7 @@ else {
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_this-'.$doctor_token.'-player-select option_'.$doctor_token.' block_1';
         echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_wily.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
         echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">Dr. Light'.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$doctor_info['player_name'].(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
         echo '</div></div></div>';
         echo '</a>'."\n";
     }
@@ -140,7 +140,7 @@ else {
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_this-'.$doctor_token.'-player-select option_'.$doctor_token.' block_1';
         echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_cossack.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
         echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">Dr. Light'.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$doctor_info['player_name'].(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
         echo '</div></div></div>';
         echo '</a>'."\n";
     }
