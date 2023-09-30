@@ -3888,8 +3888,8 @@ class rpg_ability extends rpg_object {
             $new_attachment_info = call_user_func_array($static_attachment_function, $static_attachment_function_args);
             if (!empty($new_attachment_info)){ $this_attachment_info = array_merge($this_attachment_info, $new_attachment_info); }
         } else {
-            error_log('Unable to get `static_attachment_function_'.$attachment_token.'` from ability `'.$ability_token.'`');
-            error_log('Available functions in  '.$temp_functions_path.' : '.implode(', ', array_keys($functions)));
+            //error_log('Unable to get `static_attachment_function_'.$attachment_token.'` from ability `'.$ability_token.'`');
+            //error_log('Available functions in  '.$temp_functions_path.' : '.implode(', ', array_keys($functions)));
             //error_log('$functions = '.print_r($functions, true));
         }
 
@@ -3971,8 +3971,8 @@ class rpg_ability extends rpg_object {
             $new_index_info = call_user_func_array($static_index_function, $static_index_function_args);
             if (!empty($new_index_info)){ $this_index_info = array_merge($this_index_info, $new_index_info); }
         } else {
-            error_log('Unable to get `static_index_function_'.$index_token.'` from ability `'.$ability_token.'`');
-            error_log('Available functions in  '.$temp_functions_path.' : '.implode(', ', array_keys($functions)));
+            //error_log('Unable to get `static_index_function_'.$index_token.'` from ability `'.$ability_token.'`');
+            //error_log('Available functions in  '.$temp_functions_path.' : '.implode(', ', array_keys($functions)));
             //error_log('$functions = '.print_r($functions, true));
         }
 
