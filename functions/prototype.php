@@ -3839,4 +3839,111 @@ function mmrpg_get_robot_database_records_markup($robot_class, $record_limit = 1
 
 }
 
+
+// Define a function for collecting any ENDLESS ATTACK MODE sessions from the database for the loaded player
+function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh = false){
+    //error_log('mmrpg_prototype_get_endless_sessions($player_token = '.$player_token.', $force_refresh = '.$force_refresh.')');
+
+    // Collect the currently logged in userid else return false
+    if (!rpg_game::is_user()){ return false; }
+    $this_userid = rpg_game::get_userid();
+
+    // If the variable has already been set, then just return it as-is
+    if (!$force_refresh
+        && isset($_SESSION['PROTOTYPE_TEMP']['ENDLESS_MODE_SAVEDATA'])){
+        // Return any generated ENDLESS ATTACK MODE savedata
+        $endless_mode_savedata = $_SESSION['PROTOTYPE_TEMP']['ENDLESS_MODE_SAVEDATA'];
+        //error_log('(A) requested player_token = '.$player_token.' | endless_mode_savedata = '.print_r(array_keys($endless_mode_savedata), true));
+        if (!empty($player_token)){ $endless_mode_savedata = isset($endless_mode_savedata[$player_token]) ? $endless_mode_savedata[$player_token] : array(); }
+        //error_log('(B) requested player_token = '.$player_token.' | endless_mode_savedata = '.print_r(array_keys($endless_mode_savedata), true));
+        return $endless_mode_savedata;
+    }
+
+    // Ensure the variable to hold ENDLESS ATTACK MODE savedata exists across all doctors
+    $_SESSION['PROTOTYPE_TEMP']['ENDLESS_MODE_SAVEDATA'] = array();
+
+    // Check if we're allowed and there is an ENDLESS ATTACK MODE savestate in the waveboard to load now
+    if (mmrpg_prototype_item_unlocked('wily-program')){
+        global $db;
+        global $flag_wap;
+        $challenge_mode_savestate = $db->get_value("SELECT
+            `challenge_wave_savestate`
+            FROM `mmrpg_challenges_waveboard`
+            WHERE `user_id` = {$this_userid}
+            AND `challenge_wave_savestate` IS NOT NULL
+            AND `challenge_wave_savestate` <> ''
+            ;", 'challenge_wave_savestate');
+        if (!empty($challenge_mode_savestate)){
+            //echo('<pre>$challenge_mode_savestate = '.print_r($challenge_mode_savestate, true).'</pre>'.PHP_EOL.PHP_EOL);
+            $challenge_mode_savestate = json_decode($challenge_mode_savestate, true);
+            //echo('<pre>$challenge_mode_savestate = '.print_r($challenge_mode_savestate, true).'</pre>'.PHP_EOL.PHP_EOL);
+            if (!empty($challenge_mode_savestate['BATTLES_CHAIN'])
+                && !empty($challenge_mode_savestate['ROBOTS_PRELOAD'])
+                && !empty($challenge_mode_savestate['NEXT_MISSION'])){
+                // Load the saved battle chain and robot preload data into session
+                $_SESSION['BATTLES_CHAIN'] = $challenge_mode_savestate['BATTLES_CHAIN'];
+                $_SESSION['ROBOTS_PRELOAD'] = $challenge_mode_savestate['ROBOTS_PRELOAD'];
+                // Generate the URL for the next mission with saved data and redirect
+                $next_mission_data = $challenge_mode_savestate['NEXT_MISSION'];
+                $next_mission_href = 'battle.php?wap='.($flag_wap ? 'true' : 'false');
+                $next_mission_href .= '&this_battle_id='.$next_mission_data['this_battle_id'];
+                $next_mission_href .= '&this_battle_token='.$next_mission_data['this_battle_token'];
+                $next_mission_href .= '&this_player_id='.$next_mission_data['this_player_id'];
+                $next_mission_href .= '&this_player_token='.$next_mission_data['this_player_token'];
+                $next_mission_href .= '&this_player_robots='.$next_mission_data['this_player_robots'];
+                $next_mission_href .= '&flag_skip_fadein=true';
+                //echo('<pre>$next_mission_href = '.print_r($next_mission_href, true).'</pre>'.PHP_EOL.PHP_EOL);
+                // Generate the first ENDLESS ATTACK MODE mission and append it to the list
+                $next_mission_player = $next_mission_data['this_player_token'];
+                $next_mission_robots = $next_mission_data['this_player_robots'];
+                $next_mission_robots = !empty($next_mission_robots) ? array_map(function($s){ list($i, $r) = explode('_', $s); return $r; }, explode(',', $next_mission_robots)) : array();
+                $next_mission_number = count($_SESSION['BATTLES_CHAIN']) + 1;
+                $this_prototype_data = array();
+                $this_prototype_data['this_player_token'] = $next_mission_player;
+                $this_prototype_data['this_current_chapter'] = '8';
+                $this_prototype_data['battle_phase'] = 4;
+                $temp_battle_sigma = rpg_mission_endless::generate_endless_mission($this_prototype_data, $next_mission_number);
+                rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
+                //echo('<pre>$temp_battle_sigma = '.print_r($temp_battle_sigma, true).'</pre>'.PHP_EOL.PHP_EOL);
+                // Redirect to the mission URL now that everything is loaded and set up
+                //header('Location: '.$next_mission_href);
+                //exit();
+
+                //error_log('Collecting ENDLESS ATTACK MODE next mission href: '.$next_mission_href);
+                //error_log('$next_mission_player = '.print_r($next_mission_player, true));
+                //error_log('$next_mission_robots = '.print_r($next_mission_robots, true));
+                //error_log('BATTLES_CHAIN = '.print_r($_SESSION['BATTLES_CHAIN'], true));
+                //error_log('ROBOTS_PRELOAD = '.print_r($_SESSION['ROBOTS_PRELOAD'], true));
+                // Check to see which robots are preoccupied with this mission
+                /*
+                $temp_preload_robots_key = $next_mission_player.'-endless-mission';
+                $temp_preload_robots = isset($_SESSION['ROBOTS_PRELOAD'][$temp_preload_robots_key]) ? $_SESSION['ROBOTS_PRELOAD'][$temp_preload_robots_key] : array();
+                $temp_locked_robots = array_map(function($s){ list($i, $r) = explode('_', $s); return $r; }, array_keys($temp_preload_robots));
+                //error_log('$temp_preload_robots_key = '.print_r($temp_preload_robots_key, true));
+                //error_log('$temp_preload_robots = '.print_r($temp_preload_robots, true));
+                //error_log('$temp_locked_robots = '.print_r($temp_locked_robots, true));
+                */
+                // Store the next mission URL in the session for later
+                $_SESSION['PROTOTYPE_TEMP']['ENDLESS_MODE_SAVEDATA'][$next_mission_player] = array(
+                    'redirect' => $next_mission_href,
+                    'battle' => $temp_battle_sigma,
+                    'player' => $next_mission_player,
+                    'robots' => $next_mission_robots
+                    );
+
+            }
+        }
+    }
+
+    // Return any generated ENDLESS ATTACK MODE savedata
+    $endless_mode_savedata = $_SESSION['PROTOTYPE_TEMP']['ENDLESS_MODE_SAVEDATA'];
+    //error_log('(C) requested player_token = '.$player_token.' | endless_mode_savedata = '.print_r(array_keys($endless_mode_savedata), true));
+    if (!empty($player_token)){ $endless_mode_savedata = isset($endless_mode_savedata[$player_token]) ? $endless_mode_savedata[$player_token] : array(); }
+    //error_log('(D) requested player_token = '.$player_token.' | endless_mode_savedata = '.print_r(array_keys($endless_mode_savedata), true));
+    return $endless_mode_savedata;
+
+}
+
+
+
 ?>
