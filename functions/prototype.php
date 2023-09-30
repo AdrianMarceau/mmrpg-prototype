@@ -1461,12 +1461,19 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             } elseif (empty($temp_optionimages)){
                 $this_info['option_maintext'] = '<i class="fa fas fa-lock"></i> '.$this_info['option_maintext'];
             }
+            $temp_optiontype = !empty($this_info['option_pseudo_type']) ? $this_info['option_pseudo_type'] : 'empty';
             $temp_optiontext = '<span class="multi"><span class="maintext">'.$this_info['option_maintext'].'</span></span>';
             $temp_optionclass = 'option ';
             $temp_optionclass .= 'option_placeholder option_this-'.$player_token.'-placeholder  ';
             $temp_optionclass .= 'option_'.$temp_optionsize.' option_this-battle-select option_this-'.$player_token.'-battle-select ';
-            $temp_optionclass .= 'option_disabled type empty block_'.($this_key + 1);
-            $this_markup .= '<a data-chapter="'.$this_info['option_chapter'].'" class="'.$temp_optionclass.'" style="'.(!empty($this_info['option_style']) ? $this_info['option_style'] : '').'">';
+            $temp_optionclass .= 'option_disabled type '.$temp_optiontype.' block_'.($this_key + 1);
+            $this_markup .= '<a '.
+                'class="'.$temp_optionclass.'" '.
+                'data-chapter="'.$this_info['option_chapter'].'" '.
+                (!empty($this_info['option_pseudo_token']) ? 'data-pseudo-token="'.$this_info['option_pseudo_token'].'" ' : '').
+                (!empty($this_info['option_click_tooltip']) ? 'data-click-tooltip="'.$this_info['option_click_tooltip'].'" ' : '').
+                'style="'.(!empty($this_info['option_style']) ? $this_info['option_style'] : '').'" '.
+                '>';
                 $this_markup .= '<div class="platform">';
                     $this_markup .= '<div class="chrome">';
                         $this_markup .= '<div class="inset">';
