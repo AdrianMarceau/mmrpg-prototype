@@ -612,6 +612,9 @@ if (!mmrpg_prototype_item_unlocked('auto-link')
         'field_foreground' => 'light-laboratory'
         ));
 
+    // Make sure Auto pops up in the ready-room with the rest of his family
+    rpg_prototype::mark_robot_as_pending_entrance_animation('auto');
+
 }
 // Unlock the ITEM CODES immediately after the Auto Link has been unlocked
 if (mmrpg_prototype_item_unlocked('auto-link')
@@ -683,6 +686,9 @@ if (!mmrpg_prototype_item_unlocked('reggae-link')
         'field_foreground' => 'wily-castle'
         ));
 
+    // Make sure Reggae pops up in the ready-room with the rest of his family
+    rpg_prototype::mark_robot_as_pending_entrance_animation('reggae');
+
 }
 // Unlock the ABILITY CODES immediately after the Reggae Link has been unlocked
 if (mmrpg_prototype_item_unlocked('reggae-link')
@@ -753,6 +759,9 @@ if (!mmrpg_prototype_item_unlocked('kalinka-link')
         'field_background' => 'cossack-citadel',
         'field_foreground' => 'cossack-citadel'
         ));
+
+    // Make sure Kalinka pops up in the ready-room with the rest of his family
+    rpg_prototype::mark_player_as_pending_entrance_animation('kalinka');
 
 }
 // Unlock the MASTER CODES immediately after the Kalinka Link has been unlocked
