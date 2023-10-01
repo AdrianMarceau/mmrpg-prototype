@@ -585,7 +585,7 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
 
 // Update relevent game settings and flags
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-gameSettings.fadeIn = true;
+gameSettings.fadeIn = <?= isset($_GET['flag_skip_fadein']) && $_GET['flag_skip_fadein'] == 'true' ? 'false' : 'true' ?>;
 gameSettings.demo = false;
 gameSettings.passwordUnlocked = 0;
 gameSettings.startLink = '<?= $prototype_start_link ?>';
@@ -604,12 +604,34 @@ $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_s
 echo('gameSettings.menuFramesSeen = '.json_encode($menu_frames_seen).';'.PHP_EOL);
 
 // Generate a JSON array of all currently unlocked player players w/ basic data for prototype menu reference
+$include_extra = array();
+if (mmrpg_prototype_item_unlocked('kalinka-link')){ $include_extra['kalinka'] = array('player_token' => 'kalinka', 'current_player' => 'dr-cossack'); }
 $this_unlocked_players_index = mmrpg_prototype_players_unlocked_index_json();
 //error_log('$this_unlocked_players_index ='.print_r($this_unlocked_players_index, true));
 
 // Generate a JSON array of all currently unlocked player robots w/ basic data for prototype menu reference
-$this_unlocked_robots_index = mmrpg_prototype_robots_unlocked_index_json();
+$include_extra = array();
+if (mmrpg_prototype_item_unlocked('auto-link')){ $include_extra['auto'] = array('robot_token' => 'auto', 'robot_image_size' => 80, 'current_player' => 'dr-light'); }
+if (mmrpg_prototype_item_unlocked('reggae-link')){ $include_extra['reggae'] = array('robot_token' => 'reggae', 'current_player' => 'dr-wily'); }
+$this_unlocked_robots_index = mmrpg_prototype_robots_unlocked_index_json($include_extra);
 //error_log('$this_unlocked_robots_index ='.print_r($this_unlocked_robots_index, true));
+//error_log('$this_unlocked_robots_index ='.print_r(array_keys($this_unlocked_robots_index), true));
+
+// Check to see if we need to display entrance animations for any recently unlocked players
+$players_pending_entrance_animations = rpg_prototype::get_players_pending_entrance_animations();
+//error_log('$players_pending_entrance_animations = '.print_r($players_pending_entrance_animations, true));
+if (!empty($players_pending_entrance_animations)){
+    foreach ($players_pending_entrance_animations AS $player_key => $player_token){
+        if (!isset($this_unlocked_players_index[$player_token])){ continue; }
+        $new_player_data = $this_unlocked_players_index[$player_token];
+        //error_log('add entrance animation for '.$player_token);
+        if (!isset($new_player_data['flags'])){ $new_player_data['flags'] = array(); }
+        $new_player_data['flags'][] = 'is_newly_unlocked';
+        //error_log('$new_player_data = '.print_r($new_player_data, true));
+        $this_unlocked_players_index[$player_token] = $new_player_data;
+    }
+    rpg_prototype::clear_players_pending_entrance_animations();
+}
 
 // Check to see if we need to display entrance animations for any recently unlocked robots
 $robots_pending_entrance_animations = rpg_prototype::get_robots_pending_entrance_animations();
