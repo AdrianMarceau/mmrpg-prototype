@@ -253,7 +253,8 @@
                 }
             else {
                 if (typeof spriteData.player !== 'undefined'
-                    && spriteData.player !== filterByPlayerToken) {
+                    && spriteData.player !== filterByPlayerToken
+                    && spriteData.player !== 'all') {
                     spriteData.opacity = 0;
                     $thisSprite.css({opacity: 0});
                     } else {

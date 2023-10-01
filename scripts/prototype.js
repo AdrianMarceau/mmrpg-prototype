@@ -1576,8 +1576,8 @@ function prototype_menu_switch(switchOptions){
 
             // Define some quick filter functions for dealing with player-specific robots
             var filterPlayer = typeof battleOptions['this_player_token'] !== 'undefined' && battleOptions['this_player_token'].length ? battleOptions['this_player_token'] : '';
-            var filterPlayerFunction = function(token, info){ return info.currentPlayer === filterPlayer; };
-            var filterOtherPlayersFunction = function(token, info){ return info.currentPlayer !== filterPlayer; };
+            var filterPlayerFunction = function(token, info){ return info.currentPlayer === filterPlayer || info.currentPlayer === 'all'; };
+            var filterOtherPlayersFunction = function(token, info){ return info.currentPlayer !== filterPlayer && info.currentPlayer === 'all'; };
 
             // Update, show, or update the READY ROOM based on option-specific commands for special cases
             //console.log('switchOptions.stepNumber =', switchOptions.stepNumber);
