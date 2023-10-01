@@ -655,6 +655,8 @@ class rpg_prototype {
         //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$menu_frame_content_unseen);
         // If this is for the "edit_robots" frame token, we should add the token to an array with same structure with $settings_token "robots_pending_entrance_animations"
         if ($frame_token === 'edit_robots'){
+            self::mark_robot_as_pending_entrance_animation($content_token);
+            /*
             // Add the requested frame to the unseen queue array if not already present
             $settings_token = 'robots_pending_entrance_animations';
             $menu_frame_content_unseen = isset($_SESSION[$session_token]['battle_settings'][$settings_token]) ? $_SESSION[$session_token]['battle_settings'][$settings_token] : '';
@@ -663,6 +665,7 @@ class rpg_prototype {
             $menu_frame_content_unseen = implode('|', array_filter($menu_frame_content_unseen));
             $_SESSION[$session_token]['battle_settings'][$settings_token] = $menu_frame_content_unseen;
             //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$menu_frame_content_unseen);
+            */
         }
     }
 
@@ -679,6 +682,21 @@ class rpg_prototype {
         $menu_frame_content_unseen = implode('|', array_filter($menu_frame_content_unseen));
         $_SESSION[$session_token]['battle_settings'][$settings_token] = $menu_frame_content_unseen;
         //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$menu_frame_content_unseen);
+    }
+
+    // Define a subfunction for above that allows us to specifically markup a given robot token as pending an entrance animation
+    public static function mark_robot_as_pending_entrance_animation($robot_token){
+        //error_log('rpg_prototype::mark_robot_as_pending_entrance_animation($robot_token = '.$robot_token.')');
+        // Ensure the session array exists before continuing
+        $session_token = rpg_game::session_token();
+        // Add the requested frame to the unseen queue array if not already present
+        $settings_token = 'robots_pending_entrance_animations';
+        $menu_frame_content_unseen = isset($_SESSION[$session_token]['battle_settings'][$settings_token]) ? $_SESSION[$session_token]['battle_settings'][$settings_token] : '';
+        $menu_frame_content_unseen = strstr($menu_frame_content_unseen, '|') ? explode('|', $menu_frame_content_unseen) : array($menu_frame_content_unseen);
+        if (!in_array($robot_token, $menu_frame_content_unseen)){ $menu_frame_content_unseen[] = $robot_token; }
+        $menu_frame_content_unseen = implode('|', array_filter($menu_frame_content_unseen));
+        $_SESSION[$session_token]['battle_settings'][$settings_token] = $menu_frame_content_unseen;
+        error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$menu_frame_content_unseen);
     }
 
     // Define a function for getting the list of robots with pending entrance animations
@@ -705,6 +723,47 @@ class rpg_prototype {
         $robots_pending_entrance_animations = '';
         $_SESSION[$session_token]['battle_settings'][$settings_token] = $robots_pending_entrance_animations;
         //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$robots_pending_entrance_animations);
+    }
+
+    // Define a subfunction for above that allows us to specifically markup a given player token as pending an entrance animation
+    public static function mark_player_as_pending_entrance_animation($player_token){
+        //error_log('rpg_prototype::mark_player_as_pending_entrance_animation($player_token = '.$player_token.')');
+        // Ensure the session array exists before continuing
+        $session_token = rpg_game::session_token();
+        // Add the requested frame to the unseen queue array if not already present
+        $settings_token = 'players_pending_entrance_animations';
+        $menu_frame_content_unseen = isset($_SESSION[$session_token]['battle_settings'][$settings_token]) ? $_SESSION[$session_token]['battle_settings'][$settings_token] : '';
+        $menu_frame_content_unseen = strstr($menu_frame_content_unseen, '|') ? explode('|', $menu_frame_content_unseen) : array($menu_frame_content_unseen);
+        if (!in_array($player_token, $menu_frame_content_unseen)){ $menu_frame_content_unseen[] = $player_token; }
+        $menu_frame_content_unseen = implode('|', array_filter($menu_frame_content_unseen));
+        $_SESSION[$session_token]['battle_settings'][$settings_token] = $menu_frame_content_unseen;
+        error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$menu_frame_content_unseen);
+    }
+
+    // Define a function for getting the list of players with pending entrance animations
+    public static function get_players_pending_entrance_animations(){
+        //error_log('rpg_prototype::get_menu_frame_content_unseen($frame_token = '.$frame_token.')');
+        // Ensure the session array exists before continuing
+        $session_token = rpg_game::session_token();
+        // Return the list of unseen menu frame content
+        $settings_token = 'players_pending_entrance_animations';
+        $players_pending_entrance_animations = isset($_SESSION[$session_token]['battle_settings'][$settings_token]) ? $_SESSION[$session_token]['battle_settings'][$settings_token] : '';
+        if (!empty($players_pending_entrance_animations)){ $players_pending_entrance_animations = strstr($players_pending_entrance_animations, '|') ? explode('|', $players_pending_entrance_animations) : array($players_pending_entrance_animations); }
+        else { $players_pending_entrance_animations = array(); }
+        //error_log('$players_pending_entrance_animations  = '.print_r($players_pending_entrance_animations, true));
+        return $players_pending_entrance_animations;
+    }
+
+    // Define a function for clearing the list of players with pending entrance animations
+    public static function clear_players_pending_entrance_animations(){
+        //error_log('rpg_prototype::clear_menu_frame_content_unseen($frame_token = '.$frame_token.')');
+        // Ensure the session array exists before continuing
+        $session_token = rpg_game::session_token();
+        // Clear the list of unseen menu frame content
+        $settings_token = 'players_pending_entrance_animations';
+        $players_pending_entrance_animations = '';
+        $_SESSION[$session_token]['battle_settings'][$settings_token] = $players_pending_entrance_animations;
+        //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$players_pending_entrance_animations);
     }
 
 
