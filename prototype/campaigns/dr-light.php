@@ -19,6 +19,7 @@ $this_prototype_data['this_chapter_levels'] = array(
     6 => 35   // Final III
     );
 $this_prototype_data['this_chapter_unlocked'] = $chapters_unlocked_light;
+$this_prototype_data['this_current_chapter'] = '0';
 $this_prototype_data['target_player_token'] = 'dr-wily';
 $this_prototype_data['battle_phase'] = 0;
 $this_prototype_data['battle_options'] = array();
