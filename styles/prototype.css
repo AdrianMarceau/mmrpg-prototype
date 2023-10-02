@@ -1669,7 +1669,7 @@ body[data-source="website"] #prototype .menu {
     right: 20px;
 }
 #mmrpg #prototype .option_this-player-select .battle_sprites {
-
+    z-index: 15;
 }
 #mmrpg #prototype .option_this-battle-select .battle_sprites {
 
