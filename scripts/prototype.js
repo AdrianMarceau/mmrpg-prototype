@@ -1576,8 +1576,8 @@ function prototype_menu_switch(switchOptions){
 
             // Define some quick filter functions for dealing with player-specific robots
             var filterPlayer = typeof battleOptions['this_player_token'] !== 'undefined' && battleOptions['this_player_token'].length ? battleOptions['this_player_token'] : '';
-            var filterPlayerFunction = function(token, info){ return info.currentPlayer === filterPlayer || info.currentPlayer === 'all'; };
-            var filterOtherPlayersFunction = function(token, info){ return info.currentPlayer !== filterPlayer && info.currentPlayer === 'all'; };
+            var filterPlayerFunction = function(token, info){ return info.player === filterPlayer || info.currentPlayer === filterPlayer || info.currentPlayer === 'all'; };
+            var filterOtherPlayersFunction = function(token, info){ return info.player !== filterPlayer && info.currentPlayer !== filterPlayer && info.currentPlayer !== 'all'; };
 
             // Update, show, or update the READY ROOM based on option-specific commands for special cases
             //console.log('switchOptions.stepNumber =', switchOptions.stepNumber);
@@ -1590,7 +1590,7 @@ function prototype_menu_switch(switchOptions){
                 if (loadState === 'reload'){
                     // If not already filtered, animate the player's robots sliding into place
                     if (!mmrpgReadyRoom.config.isFiltered){
-                        mmrpgReadyRoom.updatePlayer(function(token, info){ return info.player !== filterPlayer; }, {frame: 'running', direction: 'left', position: ['-=4', null], opacity: 0});
+                        mmrpgReadyRoom.updatePlayer(function(token, info){ return info.player !== filterPlayer && info.currentPlayer !== filterPlayer; }, {frame: 'running', direction: 'left', position: ['-=4', null], opacity: 0});
                         mmrpgReadyRoom.updatePlayer(filterPlayer, {frame: 'running', direction: 'right', position: [(spriteBounds.maxX / 2), (spriteBounds.minY - 1)], opacity: 1});
                         mmrpgReadyRoom.updateRobot(filterOtherPlayersFunction, {frame: 'slide', direction: 'left', position: ['-=2', null], opacity: 0});
                         mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'slide', direction: 'right', position: ['+=1', '>=20'], opacity: 1});

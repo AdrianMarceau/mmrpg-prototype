@@ -237,6 +237,7 @@
         //console.log('filterByPlayerToken =', filterByPlayerToken);
         var $readyRoom = thisReadyRoomConfig.parentElement;
         var $readyRoomTeam = $('.team', $readyRoom);
+        var readyRoomCharactersIndex = thisReadyRoomConfig.charactersIndex;
         var readyRoomSpritesIndex = thisReadyRoomConfig.spritesIndex;
         var readyRoomSpritesIndexTokens = Object.keys(readyRoomSpritesIndex);
         //console.log('readyRoomSpritesIndexTokens =', readyRoomSpritesIndexTokens.length, readyRoomSpritesIndexTokens);
@@ -246,15 +247,21 @@
         for (var i = 0; i < readyRoomSpritesIndexTokens.length; i++){
             var spriteToken = readyRoomSpritesIndexTokens[i];
             var spriteData = readyRoomSpritesIndex[spriteToken];
+            var spriteInfo = readyRoomCharactersIndex[spriteData.kind][spriteToken];
             var $thisSprite = spriteData.sprite;
             if (filterByPlayerToken === false) {
                 spriteData.opacity = 1;
                 $thisSprite.css({opacity: 1});
                 }
             else {
-                if (typeof spriteData.player !== 'undefined'
-                    && spriteData.player !== filterByPlayerToken
-                    && spriteData.player !== 'all') {
+                var spriteVisible = true;
+                if (typeof spriteData.player !== 'undefined'){
+                    spriteVisible = false;
+                    if (spriteData.player === 'all'){ spriteVisible = true; }
+                    else if (spriteData.player === filterByPlayerToken){ spriteVisible = true; }
+                    else if (spriteInfo.currentPlayer === filterByPlayerToken){ spriteVisible = true; }
+                }
+                if (!spriteVisible) {
                     spriteData.opacity = 0;
                     $thisSprite.css({opacity: 0});
                     } else {

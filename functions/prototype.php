@@ -996,7 +996,7 @@ function mmrpg_prototype_robots_unlocked($player_token = ''){
 }
 
 // Define a function for getting a players unlocked index for reference
-function mmrpg_prototype_players_unlocked_index(){
+function mmrpg_prototype_players_unlocked_index($include_extra = array()){
 
     // Define the game session helper var
     $session_token = rpg_game::session_token();
@@ -1052,8 +1052,8 @@ function mmrpg_prototype_players_unlocked_index(){
             $player_array['player_attack_base'] = 100;
             $player_array['player_defense_base'] = 100;
             $player_array['player_speed_base'] = 100;
-            $player_array['player_robots'] = array_keys($player_array['player_robots']);
-            $player_array['player_fields'] = array_keys($player_array['player_fields']);
+            $player_array['player_robots'] = !empty($player_array['player_robots']) ? array_keys($player_array['player_robots']) : array();
+            $player_array['player_fields'] = !empty($player_array['player_fields']) ? array_keys($player_array['player_fields']) : array();
             $player_array['player_type_weaknesses'] = array();
             $player_array['player_type_resistances'] = array();
             $player_array['player_type_affinities'] = array();

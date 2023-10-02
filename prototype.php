@@ -606,8 +606,10 @@ echo('gameSettings.menuFramesSeen = '.json_encode($menu_frames_seen).';'.PHP_EOL
 // Generate a JSON array of all currently unlocked player players w/ basic data for prototype menu reference
 $include_extra = array();
 if (mmrpg_prototype_item_unlocked('kalinka-link')){ $include_extra['kalinka'] = array('player_token' => 'kalinka', 'current_player' => 'dr-cossack'); }
-$this_unlocked_players_index = mmrpg_prototype_players_unlocked_index_json();
+$this_unlocked_players_index = mmrpg_prototype_players_unlocked_index_json($include_extra);
+//error_log('$include_extra ='.print_r($include_extra, true));
 //error_log('$this_unlocked_players_index ='.print_r($this_unlocked_players_index, true));
+//error_log('$this_unlocked_players_index(A) ='.print_r(array_keys($this_unlocked_players_index), true));
 
 // Generate a JSON array of all currently unlocked player robots w/ basic data for prototype menu reference
 $include_extra = array();
