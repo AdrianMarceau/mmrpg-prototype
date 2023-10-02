@@ -84,15 +84,39 @@ if (!defined('MMRPG_SCRIPT_REQUEST') && empty($this_prototype_data['robots_unloc
 // Require the PASSWORDS file for this player
 if (!defined('MMRPG_SCRIPT_REQUEST')){ require_once(MMRPG_CONFIG_ROOTDIR.'prototype/passwords/'.$this_prototype_data['this_player_token'].'.php'); }
 
+// Check to see if we have reason to load mission and robot markup
+$load_missions_and_robots = false;
+if (empty($this_data_condition)
+    && !empty($_SESSION[$session_token]['battle_settings']['this_player_token'])
+    && $_SESSION[$session_token]['battle_settings']['this_player_token'] === $this_prototype_data['this_player_token']){
+    $load_missions_and_robots = true;
+} elseif (!empty($this_data_condition)
+    && in_array('this_player_token='.$this_prototype_data['this_player_token'],
+        $this_data_condition)){
+    $load_missions_and_robots = true;
+}
+
+// Only generate mission and robot markup if absolutely necessary
+if (!$load_missions_and_robots){
+    // Add all these options to the global prototype data variable then return early
+    $prototype_data[$this_prototype_data['this_player_token']] = $this_prototype_data;
+    unset($this_prototype_data);
+    return;
+}
+
 // Require the common MISSIONS file for all players
 require(MMRPG_CONFIG_ROOTDIR.'prototype/missions.php');
 
 // Define the robot options and counter for this mode
 if (empty($_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_robot_options'])){
-    $this_prototype_data['robot_options'] = $db->get_array_list("SELECT robot_id, robot_token FROM mmrpg_index_robots
-        WHERE robot_flag_published = 1 AND robot_flag_complete = 1 AND robot_flag_unlockable = 1 AND robot_class = 'master'
-        ORDER BY robot_order ASC
-        ;");
+    $mmrpg_index_robots = rpg_robot::get_index(true);
+    $this_prototype_data['robot_options'] = array_values($mmrpg_index_robots);
+    $this_prototype_data['robot_options'] = array_filter($this_prototype_data['robot_options'], function($r){
+        return ($r['robot_flag_published'] && $r['robot_flag_complete'] && $r['robot_flag_unlockable'] && $r['robot_class'] == 'master');
+        });
+    $this_prototype_data['robot_options'] = array_map(function($r){
+        return array('robot_id' => $r['robot_id'], 'robot_token' => $r['robot_token']);
+        }, $this_prototype_data['robot_options']);
     foreach ($this_prototype_data['robot_options'] AS $key => $info){
         if (!mmrpg_prototype_robot_unlocked($this_prototype_data['this_player_token'], $info['robot_token'])){
             unset($this_prototype_data['robot_options'][$key]);
