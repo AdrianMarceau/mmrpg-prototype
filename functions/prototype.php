@@ -70,10 +70,11 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
     // Collect the user's save details from the database, if possible
     $user_save_array = $db->get_array("SELECT
         save_id, user_id,
-        save_counters, save_values, save_flags, save_settings,
+        -- save_counters, save_settings,
+        save_values, save_flags,
         save_values_battle_rewards, save_values_battle_settings,
-        save_values_battle_items, save_values_battle_abilities,
-        save_values_battle_stars, save_values_robot_database,
+        -- save_values_battle_items, save_values_battle_abilities,
+        -- save_values_battle_stars, save_values_robot_database,
         save_values_robot_alts,
         save_date_modified, save_date_created
         FROM mmrpg_saves
