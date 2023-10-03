@@ -941,9 +941,7 @@
                 );
             $this_group_options[] = $this_option;
         }
-        if ((MMRPG_CONFIG_SERVER_ENV === 'local'
-                || MMRPG_CONFIG_PULL_LIVE_DATA_FROM === false)
-            && rpg_user::current_user_has_permission('refresh-leaderboard')){
+        if (rpg_user::current_user_has_permission('refresh-leaderboard')){
             $this_option = array(
                 'link' => array('url' => 'admin/scripts/refresh-battle-points.php?limit=10&offset=0&return=html', 'text' => 'Refresh Leaderboard', 'target' => '_blank', 'bullet' => 'sync-alt'),
                 'desc' => 'Recalculate battle points and update leaderboard for specified users'
