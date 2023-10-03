@@ -451,7 +451,7 @@ class rpg_mission_challenge extends rpg_mission {
         if (empty($victory_results)){ return 0; }
         if ($victory_results['challenge_turns_used'] > $victory_results['challenge_turn_limit']){ $victory_results['challenge_turn_limit'] = $victory_results['challenge_turns_used']; }
         if ($victory_results['challenge_robots_used'] > $victory_results['challenge_robot_limit']){ $victory_results['challenge_robot_limit'] = $victory_results['challenge_robots_used']; }
-        $victory_points_possible = 100000;
+        $victory_points_possible = 200000;
         if ($challenge_kind == 'event'){ $victory_points_possible *= 10; }
         $victory_points = ($victory_points_possible / 2);
         $victory_points += ($victory_points_possible / 4) - ceil(($victory_points_possible / 4) * (($victory_results['challenge_turns_used'] - 1) / $victory_results['challenge_turn_limit']));
