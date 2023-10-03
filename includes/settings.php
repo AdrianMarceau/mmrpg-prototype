@@ -159,8 +159,8 @@ define('MMRPG_SETTINGS_THREADS_PERPAGE', 50); // How many comment posts should b
 
 // Define the global values for robot unlocks in each campaign
 define('MMRPG_SETTINGS_GAMESTORY1_STARTLEVEL', 1); // The level the first player's hero robot starts at
-define('MMRPG_SETTINGS_GAMESTORY2_STARTLEVEL', 9); // The level the second player's hero robot starts at
-define('MMRPG_SETTINGS_GAMESTORY3_STARTLEVEL', 19); // The level the third player's hero robot starts at
+define('MMRPG_SETTINGS_GAMESTORY2_STARTLEVEL', 19); // The level the second player's hero robot starts at
+define('MMRPG_SETTINGS_GAMESTORY3_STARTLEVEL', 39); // The level the third player's hero robot starts at
 
 // Define the global counters for missions in each campaign
 define('MMRPG_SETTINGS_CHAPTER0_MISSIONS', 0);  // Void
