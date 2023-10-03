@@ -1078,6 +1078,8 @@ $(document).ready(function(){
                     var abilityInfo = window.mmrpgAbilitiesIndex[abilityToken];
                     var abilityName = abilityInfo['ability_name'];
                     var abilityTypes = [];
+                    //console.log(abilityToken+' abilityInfo[\'ability_group\'] = ', typeof abilityInfo['ability_group'], abilityInfo['ability_group'])
+                    if (typeof abilityInfo['ability_group'] !== 'string'){ abilityInfo['ability_group'] = 'Undefined'; }
                     if (abilityInfo['ability_type'].length){ abilityTypes.push(upperCaseFirst(abilityInfo['ability_type'])); }
                     if (abilityTypes.length && abilityInfo['ability_type2'].length){ abilityTypes.push(upperCaseFirst(abilityInfo['ability_type2'])); }
                     abilityTypes = abilityTypes.length ? abilityTypes.join(' / ') : 'Neutral';
