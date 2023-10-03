@@ -271,7 +271,7 @@ if (true || strstr($page_content_parsed, $find)){
                         &nbsp;
                     </div>
                 </div>
-                <div class="<?= $temp_avatar_class ?> avatar_userimage" style="margin-top: 0;"  title="<?= isset($temp_item_title) ? $temp_item_title : 'Member' ?>" data-tooltip-type="type player_type_<?= $temp_header_colour_token ?>">
+                <div class="<?= $temp_avatar_class ?> avatar_userimage" style="margin-top: 0;"  data-click-tooltip="<?= isset($temp_item_title) ? $temp_item_title : 'Member' ?>" data-tooltip-type="type player_type_<?= $temp_header_colour_token ?>">
                     <? if($temp_is_contributor): ?><div class="<?= $temp_item_class ?>" style="background-image: url(<?= $temp_item_path ?>); background-size: auto 80px; position: absolute; top: -22px; right: -30px;" alt="<?= $temp_item_title ?>"><?= $temp_item_title ?></div><? endif; ?>
                     <div class="<?= $temp_sprite_class ?>" style="background-image: url(<?= $temp_sprite_path ?>); background-size: auto <?= $temp_avatar_size ?>px;"><?= $temp_display_name ?></div>
                 </div>
@@ -664,7 +664,7 @@ if (true || strstr($page_content_parsed, $find)){
                                                     '| Reward: '.number_format($data['challenge_victory_points'], 0, '.', ',').' BP ('.$data['challenge_victory_percent'].'%) '.
                                                     '// '.$data['challenge_victory_rank'].'-Rank Victory! '.
                                                     '';
-                                                $details_markup[] = '<li><a class="field_type type_'.$type.'" title="'.$title.'" data-href="challenges/'.$data['challenge_id'].'/">'.
+                                                $details_markup[] = '<li><a class="field_type type_'.$type.'" data-click-tooltip="'.$title.'" data-href="challenges/'.$data['challenge_id'].'/">'.
                                                     $data['challenge_name'].' ('.$data['challenge_victory_rank'].')'.
                                                     '</a></li>';
                                             } elseif ($category_token === 'endless_waves_completed'){
