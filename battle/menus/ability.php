@@ -8,8 +8,8 @@ ob_start();
     // Display container for the main actions
     ?><div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Ability</span><?
 
-    // Collect the abilities for this robot, by whatever means
-    if ($this_robot->robot_class == 'master'){
+    // Collect the abilities for this actual unlocked user robot, by whatever means
+    if ($this_robot->robot_class === 'master'){
 
         $this_robot_settings = rpg_game::robot_settings($this_player->player_token, $this_robot->robot_token);
 
@@ -27,7 +27,7 @@ ob_start();
         //if (!empty($_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item'])){ $current_robot_item = $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item']; }
         //else { $current_robot_item = ''; }
 
-    } elseif ($this_robot->robot_class == 'mecha'){
+    } elseif ($this_robot->robot_class !== 'master'){
 
         // Collect the temp ability index
         $current_robot_abilities = array();

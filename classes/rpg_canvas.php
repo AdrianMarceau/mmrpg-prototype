@@ -493,16 +493,18 @@ class rpg_canvas {
                 $this_data['weapons_title'] = $this_data['weapons_fraction'].' WE | '.$this_data['weapons_percent'].'%';
                 $this_data['robot_title'] .= ' | '.$this_data['weapons_fraction'].' WE';
 
+                $this_data['experience_title'] = '- EXP';
                 if ($this_data['robot_class'] == 'master'){
                     $this_data['experience_title'] = $this_data['experience_fraction'].' EXP | '.$this_data['experience_percent'].'%';
                     $this_data['robot_title'] .= ' | '.$this_data['experience_fraction'].' EXP';
-                } elseif ($this_data['robot_class'] == 'mecha'){
+                }
+                /* elseif ($this_data['robot_class'] == 'mecha'){
                     $temp_generation = '1st';
                     if (preg_match('/-2$/', $this_data['robot_token'])){ $temp_generation = '2nd'; }
                     elseif (preg_match('/-3$/', $this_data['robot_token'])){ $temp_generation = '3rd'; }
                     $this_data['experience_title'] = $temp_generation.' Gen';
                     $this_data['robot_title'] .= ' | '.$temp_generation.' Gen';
-                }
+                } */
 
                 $this_data['robot_title'] .= ' <br />'.$this_robot->robot_attack.' / '.$this_robot->robot_base_attack.' AT';
                 $this_data['robot_title'] .= ' | '.$this_robot->robot_defense.' / '.$this_robot->robot_base_defense.' DF';
