@@ -142,7 +142,7 @@ class rpg_mission_challenge extends rpg_mission {
         static $mmrpg_index_fields;
         static $mmrpg_index_robots;
         if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(); }
-        if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(); }
+        if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
 
         // Collect any victories records so we can show 'em
         static $challenge_mission_victories;
