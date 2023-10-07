@@ -141,7 +141,7 @@ class rpg_mission_challenge extends rpg_mission {
         // Collect a field index for reference later
         static $mmrpg_index_fields;
         static $mmrpg_index_robots;
-        if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(); }
+        if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(true); }
         if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
 
         // Collect any victories records so we can show 'em
@@ -214,7 +214,9 @@ class rpg_mission_challenge extends rpg_mission {
         if (!isset($challenge_target_player['player_token'])){ $challenge_target_player['player_token'] = 'player'; }
         if (!isset($challenge_target_player['player_name'])){ $challenge_target_player['player_name'] = ucwords(str_replace('-', '. ', $challenge_target_player['player_token'])); }
         foreach ($challenge_target_player['player_robots'] AS $k => $r){
-            $challenge_target_player['player_robots'][$k]['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $mmrpg_index_robots[$r['robot_token']]['robot_id'], ($k + 1));
+            $rtoken = $r['robot_token'];
+            if (!isset($mmrpg_index_robots[$rtoken])){ continue; }
+            $challenge_target_player['player_robots'][$k]['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $mmrpg_index_robots[$rtoken]['robot_id'], ($k + 1));
             $challenge_target_player['player_robots'][$k]['robot_level'] = $challenge_robot_level;
             $challenge_target_player['player_robots'][$k]['values']['robot_rewards'] = $challenge_robot_rewards;
         }
@@ -283,7 +285,10 @@ class rpg_mission_challenge extends rpg_mission {
             foreach ($challenge_target_player['player_robots'] AS $key => $robot){
                 if (!empty($robot['robot_image'])){ continue; }
                 $rtoken = $robot['robot_token'];
-                if (!isset($mmrpg_index_robots[$rtoken])){ continue; }
+                if (!isset($mmrpg_index_robots[$rtoken])){
+                    unset($challenge_target_player['player_robots'][$key]);
+                    continue;
+                }
                 $rindex = $mmrpg_index_robots[$rtoken];
                 if (empty($rindex['robot_flag_published'])){ continue; }
                 elseif (empty($rindex['robot_flag_complete'])){ continue; }
@@ -323,7 +328,11 @@ class rpg_mission_challenge extends rpg_mission {
         $challenge_values['challenge_records']['personal'] = !empty($challenge_mission_victories[$challenge_kind][$challenge_xid]) ? $challenge_mission_victories[$challenge_kind][$challenge_xid] : array();
         if ($challenge_kind == 'event'){
             $vsrobot = $challenge_target_player['player_robots'][0]['robot_token'];
-            $challenge_values['colour_token'] = $mmrpg_index_robots[$vsrobot]['robot_core'];
+            if (!empty($mmrpg_index_robots[$vsrobot])){
+                $challenge_values['colour_token'] = $mmrpg_index_robots[$vsrobot]['robot_core'];
+            } else {
+                $challenge_values['colour_token'] = $challenge_field_base['field_type'];
+            }
         } else {
             $challenge_values['colour_token'] = $challenge_field_base['field_type'];
         }
