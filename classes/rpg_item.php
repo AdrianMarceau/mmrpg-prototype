@@ -1423,7 +1423,7 @@ class rpg_item extends rpg_object {
         $btn_type = 'item_type item_type_'.$all_types_or_none;
         $btn_info_circle = '<span class="info color" data-click-tooltip="'.$item_info_title_tooltip.'" data-tooltip-type="'.$btn_type.'">';
             $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$any_type_or_none.'"></i>';
-            if (!empty($type2_or_false) && $type2_or_false !== $any_type_or_none){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type2_or_false.'"></i>'; }
+            //if (!empty($type2_or_false) && $type2_or_false !== $any_type_or_none){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type2_or_false.'"></i>'; }
         $btn_info_circle .= '</span>';
 
         $item_info_title_html = '';

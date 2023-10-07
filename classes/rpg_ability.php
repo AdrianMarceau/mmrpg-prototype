@@ -1484,7 +1484,7 @@ class rpg_ability extends rpg_object {
         $btn_type = 'ability_type ability_type_'.(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '');
         $btn_info_circle = '<span class="info color" data-click-tooltip="'.$ability_info_title_tooltip.'" data-tooltip-type="'.$btn_type.'">';
             $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type_or_none.'"></i>';
-            if (!empty($type2_or_false)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type2_or_false.'"></i>'; }
+            //if (!empty($type2_or_false)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type2_or_false.'"></i>'; }
         $btn_info_circle .= '</span>';
 
         $ability_info_title_html = '';
