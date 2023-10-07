@@ -1,7 +1,10 @@
 <?php
 
 // Include the TOP file
+//require('admin/includes/debug_profiler_top.php');
+//debug_profiler_checkpoint('before-top');
 require_once('top.php');
+//debug_profiler_checkpoint('after-top');
 
 // If the user is not logged in, don't allow them here
 if (!rpg_game::is_user()){
@@ -17,6 +20,7 @@ if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){ $mmrpg_index_p
 
 // Restore any dropped items to their owners if able to
 mmrpg_prototype_restore_dropped_items();
+//debug_profiler_checkpoint('after-restore-items');
 
 // Automatically empty all temporary battle variables
 $_SESSION['BATTLES'] = array();
@@ -37,6 +41,8 @@ $prototype_start_link = !empty($_GET['start']) ? $_GET['start'] : 'home';
 // Define the arrays for holding potential prototype messages
 $prototype_window_event_canvas = array();
 $prototype_window_event_messages = array();
+
+//debug_profiler_checkpoint('before-actions');
 
 // Check if a reset request has been placed
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset'){
@@ -99,6 +105,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'exit'){
 
 }
 
+//debug_profiler_checkpoint('after-actions');
 
 // Cache the currently online players
 if (!isset($_SESSION['LEADERBOARD']['online_timestamp'])
@@ -107,116 +114,33 @@ if (!isset($_SESSION['LEADERBOARD']['online_timestamp'])
     $_SESSION['LEADERBOARD']['online_timestamp'] = time();
 }
 
-
 // Require the prototype data file
 require_once('prototype/include.php');
-
-
-
-/*
- * PASSWORD PROCESSING
- */
-
-// Collect the game flags for easier password processing
-$temp_flags = !empty($_SESSION[$session_token]['flags']) ? $_SESSION[$session_token]['flags'] : array();
-
-// Filter out the password flags for easier looping
-$temp_password_flags = array();
-if (!empty($temp_flags)){
-    foreach ($temp_flags AS $flag_token => $flag_value){
-        if (strstr($flag_token, '_password_')){
-            $temp_password_flags[$flag_token] = $flag_value;
-        }
-    }
-}
-
-//die('wtf1-'.time());
-//die('$temp_flags = <pre>'.print_r($temp_flags, true).'</pre>');
-
-// Only proceed if there are actually flags to check
-$is_admin = in_array($_SERVER['REMOTE_ADDR'], $dev_whitelist) ? true : false;
-if ($is_admin && !empty($temp_password_flags)){
-
-    // PLAYERS / ABILITIES
-    $this_player_index = $mmrpg_index_players;
-
-    // Collect the robot index for calculation purposes
-    $robot_fields = rpg_robot::get_index_fields(true);
-    $this_robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-
-    // Collect the ability index for calculation purposes
-    $ability_fields = rpg_ability::get_index_fields(true);
-    $this_ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-
-    // DEBUG PLAYERS / ABILITIES
-    foreach ($this_player_index AS $player_token => $player_info){
-        //$player_info = rpg_player::parse_index_info($player_info);
-        $player_string = str_replace('-', '', $player_token);
-        $player_pass = strlen($player_string);
-
-        // ABILITY UNLOCKS
-        foreach ($this_ability_index AS $ability_token => $ability_info){
-            $ability_info = rpg_ability::parse_index_info($ability_info);
-            $ability_string = str_replace('-', '', $ability_token);
-            $flag_token = $player_string.'_password_ability'.$ability_string.$player_pass;
-            if ($ability_token != 'ability' && !empty($temp_password_flags[$flag_token])){
-                // Unlock the requested ability
-                if (!mmrpg_prototype_ability_unlocked($player_token, false, $ability_token)){
-                    mmrpg_game_unlock_ability($player_info, false, $ability_info, true);
-                }
-                // Unset this flag's value from the session
-                unset($_SESSION[$session_token]['flags'][$flag_token]);
-                // And now redirect to the same page
-                header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
-                exit();
-
-            }
-        }
-
-        // ROBOT UNLOCKS
-        foreach ($this_robot_index AS $robot_token => $robot_info){
-            $robot_info = rpg_robot::parse_index_info($robot_info);
-            $robot_string = str_replace('-', '', $robot_token);
-            $flag_token = $player_string.'_password_robot'.$robot_string.$player_pass;
-            if ($robot_token != 'robot' && !empty($temp_password_flags[$flag_token])){
-                // Unlock the requested robot
-                if (!mmrpg_prototype_robot_unlocked(false, $robot_token)){
-                    mmrpg_game_unlock_robot($player_info, $robot_info, true, true);
-                }
-                // Unset this flag's value from the session
-                unset($_SESSION[$session_token]['flags'][$flag_token]);
-                // And now redirect to the same page
-                header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
-                exit();
-            }
-
-        }
-
-    }
-
-    // Unset temporary indexes
-    unset($this_robot_index, $this_ability_index);
-
-}
+//debug_profiler_checkpoint('after-prototype-include');
 
 // Include the prototype awards file to check stuff
+//debug_profiler_checkpoint('before-awards');
 require(MMRPG_CONFIG_ROOTDIR.'prototype/awards.php');
-
+//debug_profiler_checkpoint('after-awards');
 
 // If possible, attempt to save the game to the session
+//debug_profiler_checkpoint('before-refresh-points-and-save');
 if (rpg_game::is_user()){
     $old_points = !empty($_SESSION[$session_token]['counters']['battle_points']) ? $_SESSION[$session_token]['counters']['battle_points'] : 0;
-    mmrpg_prototype_refresh_battle_points();
-    mmrpg_save_game_session();
+    //debug_profiler_checkpoint('before-save-game');
+    mmrpg_save_game_session(); // the game automatically refreshes battle points on save
+    //debug_profiler_checkpoint('after-save-game');
     $new_points = !empty($_SESSION[$session_token]['counters']['battle_points']) ? $_SESSION[$session_token]['counters']['battle_points'] : 0;
     if ($old_points != $new_points){
         header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
         exit();
     }
 }
+//debug_profiler_checkpoint('after-refresh-points-and-save');
 
 // Check to see if the prototype is "complete" for display purposes
 $temp_prototype_complete = mmrpg_prototype_complete();
+//debug_profiler_checkpoint('after-check-prototype-complete');
 
 // Define tooltips for the game options that appear in the main menu and surrounding UI
 $this_menu_tooltips = array();
@@ -238,6 +162,7 @@ foreach ($this_menu_tooltips AS $token => $text){
     $this_menu_indexes[$token] = $temp_data_index++;
 }
 
+//debug_profiler_checkpoint('before-html-body');
 ?>
 <!DOCTYPE html>
 <html>
@@ -575,6 +500,8 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
 
 <div id="falloff" class="falloff_bottom"></div>
 <?
+//debug_profiler_checkpoint('after-html-body');
+
 ?>
 <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
 <script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
@@ -602,6 +529,9 @@ gameSettings.prototypeBanners = ['prototype-banners_title-screen_01.gif'];
 $menu_frames_seen = !empty($_SESSION[$session_token]['battle_settings']['menu_frames_seen']) ? $_SESSION[$session_token]['battle_settings']['menu_frames_seen'] : 'home';
 $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
 echo('gameSettings.menuFramesSeen = '.json_encode($menu_frames_seen).';'.PHP_EOL);
+
+
+//debug_profiler_checkpoint('before-ready-room');
 
 // Generate a JSON array of all currently unlocked player players w/ basic data for prototype menu reference
 $include_extra = array();
@@ -664,6 +594,8 @@ if (!empty($endless_attack_savedata)){
 echo 'gameSettings.customIndex.unlockedPlayersIndex = '.json_encode($this_unlocked_players_index).';'.PHP_EOL;
 echo 'gameSettings.customIndex.unlockedRobotsIndex = '.json_encode($this_unlocked_robots_index).';'.PHP_EOL;
 
+//debug_profiler_checkpoint('after-ready-room');
+
 ?>
 
 // Define any preset menu selections
@@ -684,6 +616,7 @@ $(document).ready(function(){
 
     // Define the type of music we'll be using and autoplay it
     <?
+    //debug_profiler_checkpoint('before-music-calc');
     $autoplay_music = 'misc/player-select';
     if ($prototype_start_link === 'home'
         && !empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){
@@ -693,6 +626,7 @@ $(document).ready(function(){
         $autoplay_music = mmrpg_prototype_get_chapter_music($current_player, $current_chapter, $session_token);
         if (empty($autoplay_music)){ $autoplay_music = 'misc/stage-select-'.$current_player; }
     }
+    //debug_profiler_checkpoint('after-music-calc');
     ?>
     parent.mmrpg_music_load('<?= $autoplay_music ?>', true, false);
 
@@ -719,5 +653,7 @@ require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php');
 
 // Unset the database variable
 unset($db);
+//debug_profiler_checkpoint('after-everything');
+//require('admin/includes/debug_profiler_bottom.php');
 
 ?>

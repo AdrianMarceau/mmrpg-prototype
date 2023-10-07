@@ -60,6 +60,7 @@ function mmrpg_prototype_complete($player_token = ''){
 
 // Define a BETTER function to calculating a player's current battle points
 function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index = array()){
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before/');
 
     // Return early if arguments provided are invalid
     if (empty($user_id) || !is_numeric($user_id)){ return false; }
@@ -68,6 +69,7 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
     global $db;
 
     // Collect the user's save details from the database, if possible
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-user-query');
     $user_save_array = $db->get_array("SELECT
         save_id, user_id,
         -- save_counters, save_settings,
@@ -80,6 +82,7 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         FROM mmrpg_saves
         WHERE user_id = {$user_id}
         ;");
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-user-query');
 
     // If user data was empty, we should just return now
     if (empty($user_save_array)){ return false; }
@@ -105,20 +108,25 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
     //$user_robot_database = !empty($user_save_array['save_values_robot_database']) ? $user_save_array['save_values_robot_database'] : array();
 
     // Manually collect save data for certain progress using their dedicated functions
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-pull-unlocked');
     rpg_user::pull_unlocked_abilities($user_id, $user_battle_abilities);
     rpg_user::pull_unlocked_items($user_id, $user_battle_items);
     rpg_user::pull_unlocked_stars($user_id, $user_battle_stars);
     rpg_user::pull_robot_records($user_id, $user_robot_database);
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-pull-unlocked');
 
     // Collect a quick robot, ability, and item index for reference
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-get-indexes');
     $mmrpg_robots = rpg_robot::get_index();
     $mmrpg_abilities = rpg_ability::get_index();
     $mmrpg_items = rpg_item::get_index();
     $mmrpg_fields = rpg_field::get_index();
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-get-indexes');
 
     // -- CHAPTER POINTS -- //
 
     // Grant the player bonuses for completing any of the doctor's chapters (chapter complete)
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-chapter-points');
     if (true){
         $chapter_events_completed = array();
         if (!empty($user_save_array['save_flags']['events'])){
@@ -138,10 +146,12 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $points_index['chapters_completed_points'] = count($chapter_events_completed) * 25000;
         $total_battle_points += $points_index['chapters_completed_points'];
     }
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-chapter-points');
 
     // -- CAMPAIGN POINTS -- //
 
     // Grant the player huge bonuses for completing any of the doctor's campaigns (prototype complete)
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-campaign-points');
     if (true){
         $complete_events_unlocked = array();
         if (!empty($user_save_array['save_values']['prototype_awards'])){
@@ -154,10 +164,12 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $points_index['campaigns_completed_points'] = count($complete_events_unlocked) * 250000;
         $total_battle_points += $points_index['campaigns_completed_points'];
     }
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-campaign-points');
 
     // -- DOCTOR POINTS -- //
 
     // Loop through and grant the user battle points for each doctor unlocked
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-doctor-points');
     if (true){
         $doctors_unlocked = array();
         foreach ($user_battle_rewards AS $doctor_token => $doctor_info){
@@ -168,11 +180,13 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $points_index['doctors_unlocked_points'] = count($doctors_unlocked) * 50000;
         $total_battle_points += $points_index['doctors_unlocked_points'];
     }
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-doctor-points');
 
 
     // -- ABILITY POINTS -- //
 
     // Loop through and grant the user battle points for each ability unlocked
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-ability-points');
     if (true){
         $ability_points = 0;
         $abilities_unlocked = array();
@@ -194,10 +208,13 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $points_index['abilities_unlocked_points'] = $ability_points;
         $total_battle_points += $points_index['abilities_unlocked_points'];
     }
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-ability-points');
+
 
     // -- ITEM POINTS -- //
 
     // Loop through and grant the user battle points for each item unlocked
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-item-points');
     if (true){
         $item_points = 0;
         $items_unlocked = array();
@@ -219,11 +236,12 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $points_index['items_unlocked_points'] = $item_points;
         $total_battle_points += $points_index['items_unlocked_points'];
     }
-
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-item-points');
 
     // -- ROBOT POINTS -- //
 
     // Loop through and grant the user battle points for each robot unlocked
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-robot-points');
     if (true){
         $robots_unlocked = array();
         $robots_unlocked_max_level = array();
@@ -288,10 +306,12 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $points_index['robots_unlocked_alt_outfits_points'] = $robots_unlocked_alt_outfits_points;
         $total_battle_points += $points_index['robots_unlocked_alt_outfits_points'];
     }
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-robot-points');
 
     // -- DATABASE POINTS -- //
 
     // Loop through all robots in the robot database and award points for seeing and for scanning
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-database-points');
     if (true){
         $database_robots_encountered = array();
         $database_robots_defeated = array();
@@ -319,10 +339,12 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $points_index['database_robots_scanned_points'] = count($database_robots_scanned) * 1000;
         $total_battle_points += $points_index['database_robots_scanned_points'];
     }
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-database-points');
 
     // -- STAR POINTS -- //
 
     // Loop through and grant the user battle points for each field star unlocked
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-star-points');
     if (true){
         $field_stars_unlocked = array();
         $fusion_stars_unlocked = array();
@@ -340,10 +362,12 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         $points_index['fusion_stars_collected_points'] = count($fusion_stars_unlocked) * $mmrpg_items['fusion-star']['item_value'];
         $total_battle_points += $points_index['fusion_stars_collected_points'];
     }
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-star-points');
 
     // -- CHALLENGE POINTS -- //
 
     // Grant the user points for each unique challenge mission they've completed in a challenge mode
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-challenge-points');
     if (true){
         $temp_db_fields = rpg_mission_challenge::get_index_fields(true, 'challenges');
         $temp_challenge_kinds = array();
@@ -387,44 +411,49 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
         //$points_index['challenges_completed_points'] = !empty($challenges_completed) ? (count($challenges_completed) * 10000) : 0;
         $total_battle_points += $points_index['challenges_completed_points'];
     }
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-challenge-points');
 
-    // -- PLAYER POINTS -- //
+    // -- PLAYER BATTLE POINTS -- //
 
     // Grant the user points for each unique player they've defeated in a player battle
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-player-battle-points');
     if (true){
         $defeated_players = $db->get_array_list("SELECT
-              DISTINCT(battles.target_user_id) AS target_user_id,
-              (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS target_user_name,
-              users.user_name_clean AS target_user_token,
-              users.user_colour_token AS target_user_colour,
-              users.user_colour_token2 AS target_user_colour2
-            FROM mmrpg_battles AS battles
-              LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
-            WHERE
-              battles.this_user_id = {$user_id}
-              AND battles.this_player_result = 'victory'
-              AND users.user_flag_approved = 1
-              AND battles.battle_id > COALESCE((
-                SELECT MAX(opponent_battles.battle_id)
-                FROM mmrpg_battles AS opponent_battles
-                WHERE
-                  opponent_battles.target_user_id = {$user_id}
-                  AND opponent_battles.this_user_id = battles.target_user_id
-                  AND opponent_battles.this_player_result = 'victory'
-              ), 0)
-            ORDER BY target_user_name
-            ;", 'target_user_name');
+            battles.target_user_id AS target_user_id,
+            (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS target_user_name,
+            users.user_name_clean AS target_user_token,
+            users.user_colour_token AS target_user_colour,
+            users.user_colour_token2 AS target_user_colour2
+        FROM mmrpg_battles AS battles
+        INNER JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
+        LEFT JOIN (
+            SELECT this_user_id, MAX(battle_id) as max_battle_id
+            FROM mmrpg_battles
+            WHERE this_player_result = 'victory'
+            GROUP BY this_user_id
+        ) AS opponent_battles ON battles.target_user_id = opponent_battles.this_user_id
+        WHERE
+            battles.this_user_id = {$user_id}
+            AND battles.this_player_result = 'victory'
+            AND users.user_flag_approved = 1
+            AND battles.battle_id > COALESCE(opponent_battles.max_battle_id, 0)
+        GROUP BY battles.target_user_id
+        ORDER BY target_user_name
+        ;", 'target_user_name');
         $points_index['players_defeated'] = !empty($defeated_players) ? $defeated_players : array();
         $points_index['players_defeated_points'] = !empty($defeated_players) ? (count($defeated_players) * 10000) : 0;
         $total_battle_points += $points_index['players_defeated_points'];
     }
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-player-battle-points');
 
     // -- ENDLESS ATTACK POINTS -- //
 
     // Grant the user points for their personal best record in the ENDLESS ATTACK MODE challenge
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-endless-attack-points');
     if (true){
         $wave_value = MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE;
         $challenge_waveboard_results = $db->get_array("SELECT
+            board.user_id,
             board.challenge_waves_completed,
             board.challenge_robots_used,
             board.challenge_turns_used,
@@ -444,29 +473,13 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
             $total_battle_points += $points_index['endless_waves_completed_points'];
         }
     }
-
-    // -- BONUS POINTS -- //
-
-    /*
-    // Grant the user bonus veteran points based on their account age (date created vs date modified)
-    if (false){
-        $date_modified = $user_save_array['save_date_modified'];
-        $date_created = $user_save_array['save_date_created'];
-        $total_days = ceil((((($date_modified - $date_created) / 60) / 60) / 24));
-        $veteran_bonus = $total_days * 100;
-        $points_index['veteran_bonus'] = 'First Save: '.date('Y/m/d', $date_created).'';
-        $points_index['veteran_bonus'] .= '<br /> Last Save: '.date('Y/m/d', $date_modified).'';
-        $points_index['veteran_bonus'] .= '<br /> Total Days: '.number_format($total_days, 0, '.', ',').' Days';
-        $points_index['veteran_bonus'] .= '<br /> <strong>Veteran Bonus: '.number_format($veteran_bonus, 0, '.', ',').' BP</strong>';
-        $points_index['veteran_bonus_points'] = $veteran_bonus;
-        $total_battle_points += $points_index['veteran_bonus_points'];
-    }
-    */
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-endless-attack-points');
 
     // Return calculated battle points
     $points_index['total_battle_points'] = $total_battle_points;
     return $total_battle_points;
 
+    //debug_profiler_checkpoint('func/calc-battle-points-2k19/after/');
 }
 
 // Define a function for calculating the battle's prototype points total
@@ -489,6 +502,7 @@ function mmrpg_prototype_calculate_battle_points($update_session = false, $_GAME
 
 // Define a function that automatically refreshes the user's battle point total and ranking
 function mmrpg_prototype_refresh_battle_points(){
+    //debug_profiler_checkpoint('func/refresh-battle-points/before/');
 
     // Do not refresh anything unless this is a logged-in user
     if (rpg_game::is_user()){
@@ -498,20 +512,25 @@ function mmrpg_prototype_refresh_battle_points(){
         if (empty($_GAME)){ $_GAME = &$_SESSION[$session_token]; }
 
         // Recalculate the overall battle points total with new values
+        //debug_profiler_checkpoint('func/refresh-battle-points/before-calc');
         mmrpg_prototype_calculate_battle_points(true);
+        //debug_profiler_checkpoint('func/refresh-battle-points/after-calc');
 
         // Save the game session
         mmrpg_save_game_session();
 
         // Collect and update the new rank based on point score
+        //debug_profiler_checkpoint('func/refresh-battle-points/before-rank');
         global $this_boardinfo;
         $old_board_rank = $this_boardinfo['board_rank'];
         $new_board_rank = mmrpg_prototype_leaderboard_rank($_GAME['USER']['userid']);
         $_GAME['BOARD']['boardrank'] = $new_board_rank;
         $this_boardinfo['board_rank'] = $new_board_rank;
+        //debug_profiler_checkpoint('func/refresh-battle-points/after-rank');
 
     }
 
+    //debug_profiler_checkpoint('func/refresh-battle-points/after/');
 }
 
 // Define a function for calculating a player's prototype points total
