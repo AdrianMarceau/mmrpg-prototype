@@ -292,6 +292,14 @@ class rpg_battle extends rpg_object {
     public function print_description(){ return '<span class="battle_description">'.$this->battle_description.'</span>'; }
     public function print_zenny(){ return '<span class="battle_zenny">'.$this->battle_zenny.'</span>'; }
 
+    // Define a function for checking if that battle in particular is endgame content
+    public function has_endgame_context(){
+        $is_endgame = false;
+        $context = $this->values['context'];
+        if (rpg_mission::is_endgame($context)){ $is_endgame = true; }
+        return $is_endgame;
+    }
+
     // Define a static public function for encouraging battle words
     public static function random_positive_word(){
         $temp_text_options = array('Awesome!', 'Nice!', 'Fantastic!', 'Yeah!', 'Yay!', 'Yes!', 'Great!', 'Super!', 'Rock on!', 'Amazing!', 'Fabulous!', 'Wild!', 'Sweet!', 'Wow!', 'Oh my!', 'Excellent!', 'Wonderful!');
@@ -1389,6 +1397,20 @@ class rpg_battle extends rpg_object {
             $first_event_body .= '<div class="details">'.$first_event_body_details.'</div> ';
             $first_event_body .= '<div class="foot">'.$first_event_body_foot.'</div> ';
         $first_event_body .= '</div>';
+
+        // Charge up STAR SUPPORT if relevant to do at this time
+        if ($this->battle_result == 'victory'
+            && rpg_prototype::star_support_unlocked()
+            && empty($this->flags['star_support_summoned'])){
+            $current_cooldown = rpg_prototype::get_star_support_cooldown();
+            if ($current_cooldown > 0){
+                $num_stars_unlocked = mmrpg_prototype_stars_unlocked();
+                $num_stars_total = count(mmrpg_prototype_possible_stars());
+                $charge_amount = round((($num_stars_unlocked / $num_stars_total) * 100), 2);
+                //error_log('$num_stars_unlocked = '.print_r($num_stars_unlocked, true));
+                rpg_prototype::decrease_star_support_cooldown($charge_amount);
+            }
+        }
 
         // Print the battle complete message
         $event_options = array();
