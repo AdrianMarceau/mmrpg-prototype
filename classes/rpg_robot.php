@@ -1166,7 +1166,7 @@ class rpg_robot extends rpg_object {
 
         // Collect this robot's stat values for later reference
         $this_index_info = self::get_index_info($this->robot_token);
-        $this_robot_stats = self::calculate_stat_values($this->robot_level, $this_index_info, $this_rewards, true, $this->robot_core, $this->player->player_starforce);
+        $this_robot_stats = self::calculate_stat_values($this->robot_level, $this_index_info, $this_rewards, true, array($this->robot_core, $this->robot_core2), $this->player->player_starforce);
 
         // Update the robot's stat values with calculated totals
         $stat_tokens = array('energy', 'weapons', 'attack', 'defense', 'speed');
@@ -4935,7 +4935,7 @@ class rpg_robot extends rpg_object {
                     $btn_type = 'item_type item_type_'.$all_types_or_none;
                     $btn_info_circle = '<span class="info color" data-click-tooltip="'.$title_markup_encoded.'" data-tooltip-type="'.$btn_type.'">';
                         $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$any_type_or_none.'"></i>';
-                        if (!empty($type2_or_false) && $type2_or_false !== $any_type_or_none){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type2_or_false.'"></i>'; }
+                        //if (!empty($type2_or_false) && $type2_or_false !== $any_type_or_none){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type2_or_false.'"></i>'; }
                     $btn_info_circle .= '</span>';
 
                     ob_start();
@@ -5479,7 +5479,13 @@ class rpg_robot extends rpg_object {
         $stat_tokens = array('energy', 'weapons', 'attack', 'defense', 'speed');
 
         // Check if this is of a special core type
-        $is_copy_core = $core == 'copy' ? true : false;
+        if (is_array($core)){
+            $core2 = !empty($core[1]) ? $core[1] : '';
+            $core = !empty($core[0]) ? $core[0] : '';
+        } else {
+            $core2 = '';
+        }
+        $is_copy_core = $core == 'copy' || $core2 == 'copy' ? true : false;
         $is_neutral_core = $core == '' ? true : false;
         $is_elemental_core = !$is_copy_core && !$is_neutral_core ? true : false;
 
