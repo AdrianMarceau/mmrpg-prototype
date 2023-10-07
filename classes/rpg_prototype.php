@@ -523,7 +523,7 @@ class rpg_prototype {
         $btn_info_new = $show_as_new ? ' new' : '';
         $btn_info_circle = '<span class="info color'.$btn_info_new.'" data-click-tooltip="'.$robot_title_tooltip.'" data-tooltip-type="'.$btn_type.'">';
             $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$robot_core_or_none.'"></i>';
-            if (!empty($robot_core2)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$robot_core2.'"></i>'; }
+            //if (!empty($robot_core2)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$robot_core2.'"></i>'; }
         $btn_info_circle .= '</span>';
 
         // Now that everything is ready, we can actually generate the button markup
@@ -696,7 +696,7 @@ class rpg_prototype {
         if (!in_array($robot_token, $menu_frame_content_unseen)){ $menu_frame_content_unseen[] = $robot_token; }
         $menu_frame_content_unseen = implode('|', array_filter($menu_frame_content_unseen));
         $_SESSION[$session_token]['battle_settings'][$settings_token] = $menu_frame_content_unseen;
-        error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$menu_frame_content_unseen);
+        //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$menu_frame_content_unseen);
     }
 
     // Define a function for getting the list of robots with pending entrance animations
@@ -737,7 +737,7 @@ class rpg_prototype {
         if (!in_array($player_token, $menu_frame_content_unseen)){ $menu_frame_content_unseen[] = $player_token; }
         $menu_frame_content_unseen = implode('|', array_filter($menu_frame_content_unseen));
         $_SESSION[$session_token]['battle_settings'][$settings_token] = $menu_frame_content_unseen;
-        error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$menu_frame_content_unseen);
+        //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$menu_frame_content_unseen);
     }
 
     // Define a function for getting the list of players with pending entrance animations
@@ -766,6 +766,76 @@ class rpg_prototype {
         //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$players_pending_entrance_animations);
     }
 
+    // Define a new function for checking if star support has been unlocked yet
+    public static function star_support_unlocked(){
+        //error_log('rpg_prototype::star_support_unlocked()');
+        $star_support_unlocked = false;
+        $session_token = rpg_game::session_token();
+        $settings_token = 'star_support_cooldown';
+        if (isset($_SESSION[$session_token]['battle_settings'][$settings_token])){ $star_support_unlocked = true; }
+        //elseif (MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev'){ $star_support_unlocked = true; }
+        //error_log('$star_support_unlocked = '.($star_support_unlocked ? 'true' : 'false'));
+        return $star_support_unlocked;
+    }
+
+    // Define a new function for resetting the value of the battle settings called "star_support_cooldown" to its max value
+    public static function reset_star_support_cooldown(){
+        //error_log('rpg_prototype::reset_star_support_cooldown()');
+        // Ensure the session array exists before continuing
+        $session_token = rpg_game::session_token();
+        // Set the value of the "star_support_cooldown" setting
+        $star_support_cooldown = 100;
+        $settings_token = 'star_support_cooldown';
+        $_SESSION[$session_token]['battle_settings'][$settings_token] = $star_support_cooldown;
+        //error_log('$star_support_cooldown  = '.$star_support_cooldown);
+        //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$star_support_cooldown);
+    }
+
+    // Define a new function for getting the value of the battle settings called "star_support_cooldown" and returning it
+    public static function get_star_support_cooldown(){
+        //error_log('rpg_prototype::get_star_support_cooldown()');
+        // Ensure the session array exists before continuing
+        $session_token = rpg_game::session_token();
+        // Return the value of the "star_support_cooldown" setting
+        $settings_token = 'star_support_cooldown';
+        $star_support_cooldown = isset($_SESSION[$session_token]['battle_settings'][$settings_token]) ? $_SESSION[$session_token]['battle_settings'][$settings_token] : 0;
+        //error_log('$star_support_cooldown  = '.$star_support_cooldown);
+        return $star_support_cooldown;
+    }
+
+    // Define a new function for setting the value of the battle settings called "star_support_cooldown" and returning it
+    public static function set_star_support_cooldown($value){
+        //error_log('rpg_prototype::set_star_support_cooldown($value = '.$value.')');
+        // Ensure the session array exists before continuing
+        $session_token = rpg_game::session_token();
+        // Set the value of the "star_support_cooldown" setting
+        $settings_token = 'star_support_cooldown';
+        $star_support_cooldown = is_numeric($value) ? $value : 0;
+        $_SESSION[$session_token]['battle_settings'][$settings_token] = $star_support_cooldown;
+        //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$star_support_cooldown);
+    }
+
+    // Define a new function for decrementing the value of star support cooldown by a defined amount representing a percentage
+    public static function decrease_star_support_cooldown($percent = 1){
+        //error_log('rpg_prototype::decrement_star_support_cooldown($percent = '.$percent.')');
+        // Ensure the session array exists before continuing
+        $session_token = rpg_game::session_token();
+        // Get the current value of the "star_support_cooldown" setting
+        $settings_token = 'star_support_cooldown';
+        $star_support_cooldown = isset($_SESSION[$session_token]['battle_settings'][$settings_token]) ? $_SESSION[$session_token]['battle_settings'][$settings_token] : '';
+        //error_log('$star_support_cooldown  = '.$star_support_cooldown);
+        // Decrement the value of the "star_support_cooldown" setting by the given percentage
+        $star_support_cooldown = $star_support_cooldown - $percent; //($star_support_cooldown * ($percent / 100));
+        if ($star_support_cooldown < 0){ $star_support_cooldown = 0; }
+        else { $star_support_cooldown = round($star_support_cooldown, 2); }
+        //error_log('$star_support_cooldown  = '.$star_support_cooldown);
+        // Set the value of the "star_support_cooldown" setting
+        $_SESSION[$session_token]['battle_settings'][$settings_token] = $star_support_cooldown;
+        //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$star_support_cooldown);
+    }
+    public static function dec_star_support_cooldown($percent = 1){
+        return self::decrease_star_support_cooldown($percent);
+    }
 
 }
 ?>
