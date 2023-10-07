@@ -85,6 +85,9 @@ define('MMRPG_SETTINGS_STARFORCE_FIELDCOUNT', 32);
 define('MMRPG_SETTINGS_STARFORCE_FUSIONCOUNT', 992);
 define('MMRPG_SETTINGS_STARFORCE_STARTOTAL', 1024);
 
+// Define the global variables for the total number of abilities allowed per robot
+define('MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX', 8); // The maximum number of abilities allowed per robot
+
 // Define the global variables for the total number of robots allower per player
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MIN', 1); // The minimum number of robots required for battle per side
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX', 8); // The maximum number of robots allowed for battle per side
