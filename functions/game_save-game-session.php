@@ -1,11 +1,12 @@
 <?
 // Define a function for saving the game session
 function mmrpg_save_game_session(){
+    //debug_profiler_checkpoint('func/save-game-session/before/');
 
     // Reference global variables
     global $db;
     $session_token = mmrpg_game_token();
-    global $mmrpg_index_players, $mmrpg_index_robots;
+    static $mmrpg_index_players, $mmrpg_index_robots;
     if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
     if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
 
@@ -417,6 +418,7 @@ function mmrpg_save_game_session(){
     //exit();
 
     // Return true on success
+    //debug_profiler_checkpoint('func/save-game-session/after/');
     return true;
 
 }
