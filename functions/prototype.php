@@ -1421,7 +1421,7 @@ function mmrpg_prototype_remaining_stars($return_arrays = false, $possible_star_
 function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '', &$ability_tokens = array()){
 
     // Pull in global variables
-    global $mmrpg_index_players, $mmrpg_index_abilities;
+    static $mmrpg_index_players, $mmrpg_index_abilities;
     if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
     if (empty($mmrpg_index_abilities)){ $mmrpg_index_abilities = rpg_ability::get_index(true); }
     $session_token = mmrpg_game_token();
