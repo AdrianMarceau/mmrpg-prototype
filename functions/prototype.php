@@ -1398,8 +1398,8 @@ function mmrpg_prototype_remaining_stars($return_arrays = false, $possible_star_
 
 }
 
-// Define a function for checking if a prototype ability has been unlocked
-function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = ''){
+// Define a function for checking how many prototype abilities has been unlocked
+function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '', &$ability_tokens = array()){
 
     // Pull in global variables
     global $mmrpg_index_players, $mmrpg_index_abilities;
@@ -1436,6 +1436,8 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
     return !empty($ability_tokens) ? count($ability_tokens) : 0;
 
 }
+
+
 // Define a function for displaying prototype battle option markup
 function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     // Refence the global config and index objects for easy access
@@ -2156,6 +2158,7 @@ function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     $temp_battle_alpha['battle_token'] = $temp_battle_omega['battle_token'].'-alpha';
     $temp_battle_alpha['battle_complete_redirect_token'] = $temp_battle_omega['battle_token'];
     $temp_battle_alpha['battle_name'] = $battle_name.' (1/2)';
+    $temp_battle_alpha['battle_round'] = 0;
     $temp_battle_alpha['battle_description'] = 'Defeat the support mechas blocking your path to the robot master'.($battle_phase > 1 ? 's' : '').'!';
     $temp_battle_alpha['battle_counts'] = false;
     $temp_battle_alpha['battle_field_base']['values']['hazards'] = array();
