@@ -55,21 +55,27 @@ class rpg_mission {
         $this_context['player'] = $this_prototype_data['this_player_token'];
         $this_context['chapter'] = $this_prototype_data['this_current_chapter'] + 1;
         $this_context['phase'] = $this_prototype_data['battle_phase'] + 1;
-        $this_context['round'] = 1;
-        //error_log('$this_battle_omega = '.print_r($this_battle_omega, true));
-        //error_log('alpha_battle_token = '.print_r((isset($this_battle_omega['alpha_battle_token']) ? '"'.$this_battle_omega['alpha_battle_token'].'"' : ''), true));
-        //error_log('battle_complete_redirect_token = '.print_r((isset($this_battle_omega['battle_complete_redirect_token']) ? '"'.$this_battle_omega['battle_complete_redirect_token'].'"' : ''), true));
-        if (!empty($this_battle_omega['alpha_battle_token'])){
-            $alpha_token = $this_battle_omega['alpha_battle_token'];
-            $this_context['round'] += 1;
-        }
-        if (!empty($this_battle_omega['battle_complete_redirect_token'])){
-            $alpha_token = $this_battle_omega['battle_complete_redirect_token'];
-            $this_context['round'] -= 1;
-        }
+        $this_context['round'] = isset($this_battle_omega['battle_round']) ? $this_battle_omega['battle_round'] : 1;
         $this_battle_omega['values']['context'] = $this_context;
+
+        //if (!strstr($this_battle_omega['battle_token'], 'dr-cossack-fortress-iv')){ return; }
         //error_log('context = '.print_r($this_battle_omega['values']['context'], true));
 
+    }
+
+    // Define a function for easily checking if a given context is the "endgame" final battle
+    public static function is_endgame($context){
+        //error_log('rpg_mission::context_is_endgame '.$this_battle_omega['battle_token']);
+        $context_is_endgame = false;
+        if (!isset($context['player'])){ $context['player'] = ''; }
+        if (!isset($context['chapter'])){ $context['chapter'] = 0; }
+        if (!isset($context['round'])){ $context['round'] = 0; }
+        if ($context['player'] === 'dr-cossack'
+            && $context['chapter'] === 5
+            && $context['round'] > 1){
+            $context_is_endgame = true;
+        }
+        return $context_is_endgame;
     }
 
 }
