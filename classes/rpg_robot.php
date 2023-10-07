@@ -1101,6 +1101,7 @@ class rpg_robot extends rpg_object {
 
         // Only continue if this hasn't been done already
         if (!empty($this->flags['apply_stat_bonuses'])){ return false; }
+        //error_log('apply_stat_bonuses() to '.$this->robot_name);
 
         /*
          * ROBOT CLASS FUNCTION APPLY STAT BONUSES
@@ -1335,16 +1336,22 @@ class rpg_robot extends rpg_object {
         if ($implode){ $this_markup = implode(', ', $this_markup); }
         return $this_markup;
     }
-    public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
+    public function print_quote($quote_type, $this_find = array(), $this_replace = array(), $quote_text_custom = ''){
 
         static $mmrpg_index_types;
         if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(true); }
+        if (!is_array($this_find)){ $this_find = array(); }
+        if (!is_array($this_replace)){ $this_replace = array(); }
 
         // Define the quote text variable
         $quote_text = '';
 
+        // If custom text was provided, include that here
+        $this_robot_quotes = $this->robot_quotes;
+        if (!empty($quote_text_custom)){ $this_robot_quotes['custom'] = $quote_text_custom; }
+
         // If the robot is visible and has the requested quote text
-        if ($this->robot_token != 'robot' && isset($this->robot_quotes[$quote_type])){
+        if ($this->robot_token != 'robot' && isset($this_robot_quotes[$quote_type])){
 
             // Loop through and replace ambiguous "Player" references in quotes
             $num_words = count($this_find);
@@ -1358,7 +1365,7 @@ class rpg_robot extends rpg_object {
             }
 
             // Collect the quote text with any search/replace modifications
-            $this_quote_text = str_replace($this_find, $this_replace, $this->robot_quotes[$quote_type]);
+            $this_quote_text = str_replace($this_find, $this_replace, $this_robot_quotes[$quote_type]);
             $this_quote_text = preg_replace('/^xmasterx([^a-z0-9])/', 'Master$1', $this_quote_text);
             $this_quote_text = preg_replace('/ or xmasterx([^a-z0-9])/', '$1', $this_quote_text);
             $this_quote_text = preg_replace('/, xmasterx([^a-z0-9])/', '$1', $this_quote_text);

@@ -1490,16 +1490,24 @@ class rpg_player extends rpg_object {
     }
     public function print_token(){ return '<span class="player_token">'.$this->player_token.'</span>'; }
     public function print_description(){ return '<span class="player_description">'.$this->player_description.'</span>'; }
-    public function print_quote($quote_type, $this_find = array(), $this_replace = array()){
+    public function print_quote($quote_type, $this_find = array(), $this_replace = array(), $quote_text_custom = ''){
         static $mmrpg_index_types;
         if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(true); }
+        if (!is_array($this_find)){ $this_find = array(); }
+        if (!is_array($this_replace)){ $this_replace = array(); }
+
         // Define the quote text variable
         $quote_text = '';
+
+        // If custom text was provided, include that here
+        $this_player_quotes = $this->player_quotes;
+        if (!empty($quote_text_custom)){ $this_player_quotes['custom'] = $quote_text_custom; }
+
         // If the player is visible and has the requested quote text
         if ($this->player_visible
-            && isset($this->player_quotes[$quote_type])){
+            && isset($this_player_quotes[$quote_type])){
             // Collect the quote text with any search/replace modifications
-            $this_quote_text = str_replace($this_find, $this_replace, $this->player_quotes[$quote_type]);
+            $this_quote_text = str_replace($this_find, $this_replace, $this_player_quotes[$quote_type]);
             // Collect the text colour for this player
             $this_type_token = str_replace('dr-', '', $this->player_token);
             $this_text_colour = !empty($mmrpg_index_types[$this_type_token]) ? $mmrpg_index_types[$this_type_token]['type_colour_light'] : array(200, 200, 200);
@@ -1507,6 +1515,7 @@ class rpg_player extends rpg_object {
             // Generate the quote text markup with the appropriate RGB values
             $quote_text = '<span style="color: rgb('.implode(',', $this_text_colour).');">&quot;<em>'.$this_quote_text.'</em>&quot;</span>';
         }
+
         return $quote_text;
     }
 
