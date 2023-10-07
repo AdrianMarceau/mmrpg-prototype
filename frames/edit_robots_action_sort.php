@@ -20,7 +20,7 @@ if (empty($temp_token) || empty($temp_order) || empty($temp_player)){
 // Check for any robots that are locked in the endless attack or otherwise
 $player_robots_locked = array();
 $endless_attack_savedata = mmrpg_prototype_get_endless_sessions($temp_player);
-error_log('$endless_attack_savedata for '.$temp_player.': '.print_r(array_keys($endless_attack_savedata), true));
+//error_log('$endless_attack_savedata for '.$temp_player.': '.print_r(array_keys($endless_attack_savedata), true));
 if (!empty($endless_attack_savedata)
     && !empty($endless_attack_savedata['robots'])){
     $endless_robot_robots = $endless_attack_savedata['robots'];
