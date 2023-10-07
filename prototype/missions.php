@@ -891,6 +891,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     $temp_before_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
                     $temp_before_final_option['battle_token'] = $temp_before_final_option_token;
                     $temp_before_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
+                    $temp_before_final_option['battle_round'] = 0;
                     $temp_before_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6];
                     $temp_before_final_option['battle_description'] = 'Defeat the army of robot master clones augmented with darkness energy!';
 
@@ -981,6 +982,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         $temp_after_final_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
                         $temp_after_final_option['battle_token'] = $temp_after_final_option_token;
                         $temp_after_final_option['battle_phase'] = $this_prototype_data['battle_phase'];
+                        $temp_after_final_option['battle_round'] = 2;
                         $temp_after_final_option['battle_level'] = $this_prototype_data['this_chapter_levels'][6];
                         $temp_after_final_option['battle_description'] = 'Defeat the forlorn soldier Slur in this climactic final encounter!';
 
