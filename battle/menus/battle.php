@@ -8,6 +8,19 @@ ob_start();
     elseif (rpg_game::is_demo()){ $items_unlocked = true; }
     else { $items_unlocked = false; }
 
+    // Decide whether or not we should show the STAR SUPPORT button in the menu
+    $show_star_support = false;
+    $star_support_cooldown = 9999;
+    $num_robots_active = $this_player->counters['robots_active'];
+    if ($num_robots_active < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX
+        && empty($this_battle->flags['challenge_battle'])
+        && empty($this_battle->flags['player_battle'])
+        && empty($this_player->flags['star_support_summoned'])
+        && rpg_prototype::star_support_unlocked()){
+        $show_star_support = true;
+        $star_support_cooldown = rpg_prototype::get_star_support_cooldown();
+    }
+
     // Check to see whether or not switching is allowed right now
     $switch_allowed = true;
     //if ($this_battle->counters['battle_turn'] < 1){ $switch_allowed = false; }
@@ -21,7 +34,10 @@ ob_start();
         // Display available main actions
         ?><div class="main_actions"><?
             if (!empty($temp_player_ability_actions) || $this_robot->robot_class !== 'master'){
-                ?><a class="button action_ability" type="button" data-panel="ability" data-order="<?= $dataOrder ?>"><label><i class="fa fas fa-fire-alt"></i> <strong>Ability</strong></label></a><?
+                $icon = 'fire-alt';
+                $class = 'button action_ability';
+                if ($show_star_support && empty($star_support_cooldown)){ $icon = 'star'; $class .= ' type space'; }
+                ?><a class="<?= $class ?>" type="button" data-panel="ability" data-order="<?= $dataOrder ?>"><label><i class="fa fas fa-<?= $icon ?>"></i> <strong>Ability</strong></label></a><?
             } else {
                 ?><a class="button button_disabled action_ability" type="button" data-action="ability_8_action-noweapons" data-order="<?= $dataOrder ?>"><label><i class="fa fas fa-battery-empty"></i> <strong style="text-decoration: line-through;">Ability</strong></label></a><?
             } $dataOrder++;

@@ -300,7 +300,7 @@ ob_start();
 
                 $btn_info_circle = '<span class="info color" data-click-tooltip="'.$temp_item_details_tooltip.'" data-tooltip-type="'.$btn_type.'">';
                     $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$temp_type_or_none.'"></i>';
-                    if (!empty($temp_type2)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$temp_type2.'"></i>'; }
+                    //if (!empty($temp_type2)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$temp_type2.'"></i>'; }
                 $btn_info_circle .= '</span>';
 
                 if ($temp_button_enabled){

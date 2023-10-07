@@ -5,8 +5,52 @@ ob_start();
     // Define and start the order counter
     $temp_order_counter = 1;
 
+    // Decide whether or not we should show the STAR SUPPORT button in the menu
+    $show_star_support = false;
+    $star_support_cooldown = 9999;
+    $num_robots_active = $this_player->counters['robots_active'];
+    if ($num_robots_active < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX
+        && empty($this_battle->flags['challenge_battle'])
+        && empty($this_battle->flags['player_battle'])
+        && empty($this_player->flags['star_support_summoned'])
+        && rpg_prototype::star_support_unlocked()){
+        $show_star_support = true;
+        $star_support_cooldown = rpg_prototype::get_star_support_cooldown();
+    }
+
     // Display container for the main actions
-    ?><div class="main_actions main_actions_hastitle"><span class="main_actions_title">Select Ability</span><?
+    echo('<div class="main_actions main_actions_hastitle">');
+
+        // Display the actual title for the abilities submenu
+        echo('<span class="main_actions_title">');
+            echo('<span class="float_title">Select Ability</span>');
+            if ($show_star_support){
+                echo '<span class="float_links">';
+                    if (empty($star_support_cooldown)){
+                        $text = 'Duo';
+                        if (!empty($this_battle->flags['star_support_is_new'])){ $text .= '?'; }
+                        elseif ($this_battle->has_endgame_context()){ $text .= '!'; }
+                        $turn = !empty($this_battle->counters['battle_turn']) ? $this_battle->counters['battle_turn'] : 0;
+                        $power = min((1 + $turn), 6);
+                        echo '<a class="button star-support type space" data-action="ability_13_star-support" data-power="'.$power.'">';
+                            echo '<span class="label">'.$text.'</span>';
+                            echo '<i class="fx fx1"></i>';
+                            echo '<i class="fx fx2"></i>';
+                            echo '<i class="fx fx3"></i>';
+                            echo str_repeat('<i class="star fa fas fa-star"></i>', $power);
+                        echo '</a>';
+                    } else {
+                        $num_cooldown_pips = ceil($star_support_cooldown / 10);
+                        $cooldown_pips_text = str_repeat('.', $num_cooldown_pips);
+                        echo '<a class="button button_disabled star-support type empty">';
+                            echo '<span class="charge">'.$cooldown_pips_text.'</span>';
+                            echo '<i class="star fa fas fa-star-half-alt"></i>';
+                        echo '</a>';
+                    }
+                echo '</span>';
+            }
+        echo('</span>');
+
 
     // Collect the abilities for this actual unlocked user robot, by whatever means
     if ($this_robot->robot_class === 'master'){
@@ -349,7 +393,7 @@ ob_start();
 
                 $btn_info_circle = '<span class="info color" data-click-tooltip="'.$temp_ability_details_tooltip.'" data-tooltip-type="'.$btn_type.'">';
                     $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$temp_type_or_none.'"></i>';
-                    if (!empty($temp_type2)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$temp_type2.'"></i>'; }
+                    //if (!empty($temp_type2)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$temp_type2.'"></i>'; }
                 $btn_info_circle .= '</span>';
 
                 if ($allow_button){
@@ -389,7 +433,7 @@ ob_start();
     // End the main action container tag
     //echo 'Abilities : ['.print_r($this_robot->robot_abilities, true).']';
     //echo preg_replace('#\s+#', ' ', print_r($this_robot_settings, true));
-    ?></div><?
+    echo('</div>');
 
     // Display the back button by default
     ?><div class="sub_actions"><a data-order="<?=$temp_order_counter?>" class="button action_back" type="button" data-panel="battle"><label>Back</label></a></div><?
