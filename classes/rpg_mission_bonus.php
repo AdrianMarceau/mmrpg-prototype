@@ -46,12 +46,18 @@ class rpg_mission_bonus extends rpg_mission {
         } elseif ($this_robot_class == 'boss'){
             $robot_index_query .= "AND robot_class = 'boss' ";
             $robot_index_query .= "AND base_total >= 400 ";
-            $robot_index_query .= "AND (robot_flag_hidden = 0 OR (robot_flag_unlockable = 1 AND robot_number NOT LIKE 'RPG-%' AND robot_number NOT LIKE 'PCR-%')) ";
-            $robot_index_query .= "AND robot_token IN ('enker', 'punk', 'ballade', 'mega-man-ds', 'bass-ds', 'proto-man-ds', 'quint') ";
+            $robot_index_query .= "AND robot_flag_hidden = 0 AND (robot_flag_fightable = 1
+                AND robot_number NOT LIKE 'EXN-%'
+                AND robot_number NOT LIKE 'SRN-%'
+                AND robot_number NOT LIKE 'PCR-%'
+                AND robot_number NOT LIKE 'RPG-%'
+                ) ";
+            $robot_index_query .= "AND robot_token NOT IN ('quint', 'sunstar', 'cache') ";
         }
         $robot_index_query .= "AND robot_flag_published = 1 ";
         $robot_index_query .= "AND robot_flag_exclusive = 0 ";
         $robot_index_query .= "ORDER BY robot_id ASC ";
+        //error_log($robot_index_query);
         $this_robot_index = $db->get_array_list($robot_index_query, 'robot_token');
 
         // Populate the battle options with the starter battle option
@@ -112,27 +118,17 @@ class rpg_mission_bonus extends rpg_mission {
         $temp_player_rewards = mmrpg_prototype_player_rewards($this_prototype_data['this_player_token']);
         $temp_total_level = 0;
         $temp_total_robots = 0;
-        $temp_bonus_level_min = 100;
-        $temp_bonus_level_max = 1;
+        $temp_bonus_level_min = 1;
+        $temp_bonus_level_max = 10;
         if (!empty($temp_player_rewards['player_robots'])){
             foreach ($temp_player_rewards['player_robots'] AS $token => $info){
                 $temp_level = !empty($info['robot_level']) ? $info['robot_level'] : 1;
                 if ($temp_level > $temp_bonus_level_max){ $temp_bonus_level_max = $temp_level; }
-                if ($temp_level < $temp_bonus_level_min){ $temp_bonus_level_min = $temp_level; }
                 $temp_total_robots++;
             }
-            //$temp_bonus_level_max = ceil($temp_total_level / $temp_total_robots);
-            //$temp_bonus_level_min = ceil($temp_bonus_level_max / 3);
-        }
-        if ($temp_bonus_level_min > $temp_bonus_level_max){
-            list($temp_bonus_level_min, $temp_bonus_level_max) = array($temp_bonus_level_max, $temp_bonus_level_min);
-        }
-        if ($temp_bonus_level_min < 1){
-            $temp_bonus_level_min = 1;
-        }
-        if ($temp_bonus_level_max < 1
-            || $temp_bonus_level_max < $temp_bonus_level_min){
-            $temp_bonus_level_max = $temp_bonus_level_min;
+            if ($temp_bonus_level_max > 10){
+                $temp_bonus_level_min = $temp_bonus_level_max - 10;
+            }
         }
 
         // Define a list of items that can be equipped to target robots

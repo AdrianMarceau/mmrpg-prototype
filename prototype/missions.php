@@ -1169,6 +1169,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             // Add the omega battle to the options, index, and session
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
+            /*
+            // TODO: QUINT => STARDROID
             // If random encounter has not been added, check to see if we can add now
             if (empty($random_encounter_added)
                 && $random_encounter_chance
@@ -1204,6 +1206,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 mmrpg_prototype_mission_autoplay_append($temp_battle_omega, $temp_battle_sigma, $this_prototype_data, true);
                 //$this_prototype_data['battle_options'][] = $temp_battle_sigma;
             }
+            */
 
             // If we're over the limit, break now
             $added_star_fields++;
@@ -1392,6 +1395,52 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Add the omega battle to the options, index, and session
         $this_prototype_data['battle_options'][] = $temp_battle_omega;
         rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+
+        // Check to see if we can add an endgame battle against the SUPERBOSS known as QUINT
+        $superboss_battle_unlocked = false;
+        $required_target_tokens = array('enker', 'punk', 'ballade');
+        $required_targets_total = count($required_target_tokens);
+        $required_targets_visible = 0;
+        if (!empty($temp_battle_omega['battle_target_player']['player_robots'])){
+            foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $robot_info){
+                if (in_array($robot_info['robot_token'], $required_target_tokens)){ $required_targets_visible++; }
+            }
+            if ($required_targets_visible >= $required_targets_total){
+                $superboss_battle_unlocked = true;
+            }
+        }
+
+        // If the SUPERBOSS has been unlocked, we can add it after the last battle
+        if ($superboss_battle_unlocked){
+            // Add a subtle indicator to the battle name
+            $temp_option_key = count($this_prototype_data['battle_options']) - 1;
+            $this_prototype_data['battle_options'][$temp_option_key]['battle_description2'] = rtrim($this_prototype_data['battle_options'][$temp_option_key]['battle_description2']).' Let\'s go!';
+            // Generate a random encounter mission for the star fields
+            //$player_starforce_levels = !empty($_SESSION[$session_token]['values']['star_force']) ? $_SESSION[$session_token]['values']['star_force'] : array();
+            $random_encounter_added = true;
+            $random_field_type = !empty($info2) ? $mmrpg_index_fields[$info2['field']]['field_type'] : $mmrpg_index_fields[$info['field']]['field_type'];
+            $temp_battle_sigma = mmrpg_prototype_generate_mission($this_prototype_data,
+                $temp_battle_omega['battle_token'].'-random-encounter', array(
+                    'battle_name' => 'Challenger from the Future?',
+                    'battle_level' => 100,
+                    'battle_description' => 'A mysterious challenger has appeared! Can you defeat them in battle?',
+                    'battle_counts' => false
+                    ), array_merge($temp_battle_omega['battle_field_base'], array(
+                        'field_background' => 'prototype-complete',
+                        'field_background_attachments' => array(),
+                        'field_music' => 'sega-remix/boss-theme-mm10',
+                        'values' => array('hazards' => array('super_blocks' => 'right'))
+                        )
+                    ), array(
+                    'player_token' => 'player',
+                    'player_starforce' => $max_star_force
+                    ), array(
+                    array('robot_token' => 'quint', 'robot_item' => 'guard-module', 'counters' => array('attack_mods' => 5, 'defense_mods' => 5, 'speed_mods' => 5)),
+                    ), true);
+            rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
+            mmrpg_prototype_mission_autoplay_append($temp_battle_omega, $temp_battle_sigma, $this_prototype_data, true);
+            //$this_prototype_data['battle_options'][] = $temp_battle_sigma;
+        }
 
     }
 
