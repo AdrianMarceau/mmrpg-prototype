@@ -58,6 +58,14 @@ function refresh_editor_arrays( &$allowed_edit_players, &$allowed_edit_robots, &
             }
             $robot_index_info = $temp_robot_index[$robot_token];
 
+            // LEGACYFIX 2023-10-08: If this is not a robot master, that means it shouldn't be unlocked
+            if (isset($robot_index_info['robot_class'])
+                && $robot_index_info['robot_class'] !== 'master'){
+                //error_log('deleting errant robot data for '.$robot_token);
+                unset($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]);
+                unset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]);
+            }
+
             // LEGACYFIX: If this is a copy-core robot with an elemental alt, remove it now
             if (isset($robot_info['robot_core'])
                 && $robot_info['robot_core'] == 'copy'
