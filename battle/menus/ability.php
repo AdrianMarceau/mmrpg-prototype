@@ -7,7 +7,7 @@ ob_start();
 
     // Decide whether or not we should show the STAR SUPPORT button in the menu
     $show_star_support = false;
-    $star_support_cooldown = 9999;
+    $star_support_cooldown = rpg_prototype::get_star_support_cooldown_max();
     $num_robots_active = $this_player->counters['robots_active'];
     if ($num_robots_active < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX
         && empty($this_battle->flags['challenge_battle'])
@@ -16,6 +16,8 @@ ob_start();
         && rpg_prototype::star_support_unlocked()){
         $show_star_support = true;
         $star_support_cooldown = rpg_prototype::get_star_support_cooldown();
+        $star_support_charge = rpg_prototype::get_star_support_charge();
+        $star_support_force = rpg_prototype::get_star_support_force();
     }
 
     // Display container for the main actions
@@ -41,9 +43,15 @@ ob_start();
                         echo '</a>';
                     } else {
                         $num_cooldown_pips = ceil($star_support_cooldown / 10);
+                        $num_charge_pips = ceil($star_support_charge / 10);
+                        $num_force_pips = ceil($star_support_force / 10);
                         $cooldown_pips_text = str_repeat('.', $num_cooldown_pips);
+                        $charge_pips_text = str_repeat('.', $num_charge_pips);
+                        $force_pips_text = str_repeat('.', $num_force_pips);
                         echo '<a class="button button_disabled star-support type empty">';
-                            echo '<span class="charge">'.$cooldown_pips_text.'</span>';
+                            echo '<span class="cooldown">'.$cooldown_pips_text.'</span>';
+                            echo '<span class="charge">'.$charge_pips_text.'</span>';
+                            echo '<span class="force">'.$force_pips_text.'</span>';
                             echo '<i class="star fa fas fa-star-half-alt"></i>';
                         echo '</a>';
                     }
