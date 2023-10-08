@@ -293,7 +293,7 @@ class rpg_mission_challenge extends rpg_mission {
                 if (empty($rindex['robot_flag_published'])){ continue; }
                 elseif (empty($rindex['robot_flag_complete'])){ continue; }
                 elseif (empty($rindex['robot_flag_unlockable'])){ continue; }
-                elseif ($rindex['robot_class'] != 'master'){ continue; }
+                elseif ($rindex['robot_class'] !== 'master'){ continue; }
                 $challenge_battle_rewards['robots'][] = array('token' => $robot['robot_token'], 'level' => 99, 'experience' => 999);
             }
         }
