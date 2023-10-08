@@ -1128,6 +1128,13 @@ function mmrpg_prototype_robots_unlocked_index($include_extra = array()){
                         $robot_array['current_player'] = $player_token;
                         if (!isset($this_unlocked_robots_index[$robot_token])){ $this_unlocked_robots_index[$robot_token] = $robot_array; }
                         else { $this_unlocked_robots_index[$robot_token] = array_merge($this_unlocked_robots_index[$robot_token], $robot_array); }
+                        $robot_info = $mmrpg_robots_index[$robot_token];
+                        if (empty($robot_info['robot_flag_published'])
+                            || empty($robot_info['robot_flag_complete'])
+                            || $robot_info['robot_class'] !== 'master'){
+                            unset($this_unlocked_robots_index[$robot_token]);
+                            continue;
+                        }
                     }
                 }
             }
