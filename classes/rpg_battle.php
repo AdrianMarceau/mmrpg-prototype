@@ -1404,11 +1404,9 @@ class rpg_battle extends rpg_object {
             && empty($this->flags['star_support_summoned'])){
             $current_cooldown = rpg_prototype::get_star_support_cooldown();
             if ($current_cooldown > 0){
-                $num_stars_unlocked = mmrpg_prototype_stars_unlocked();
-                $num_stars_total = count(mmrpg_prototype_possible_stars());
-                $charge_amount = round((($num_stars_unlocked / $num_stars_total) * 100), 2);
-                //error_log('$num_stars_unlocked = '.print_r($num_stars_unlocked, true));
-                rpg_prototype::decrease_star_support_cooldown($charge_amount);
+                $force_amount = rpg_prototype::get_star_support_force();
+                //error_log('battle victory charging star support by $force_amount = '.$force_amount);
+                rpg_prototype::decrease_star_support_cooldown($force_amount);
             }
         }
 

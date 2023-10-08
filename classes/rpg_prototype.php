@@ -778,13 +778,19 @@ class rpg_prototype {
         return $star_support_unlocked;
     }
 
+    // Define a new function for getting the max star support cooldown value for reference and calc
+    public static function get_star_support_cooldown_max(){
+        //error_log('rpg_prototype::get_star_support_cooldown_max()');
+        return 100;
+    }
+
     // Define a new function for resetting the value of the battle settings called "star_support_cooldown" to its max value
     public static function reset_star_support_cooldown(){
         //error_log('rpg_prototype::reset_star_support_cooldown()');
         // Ensure the session array exists before continuing
         $session_token = rpg_game::session_token();
         // Set the value of the "star_support_cooldown" setting
-        $star_support_cooldown = 100;
+        $star_support_cooldown = self::get_star_support_cooldown_max();
         $settings_token = 'star_support_cooldown';
         $_SESSION[$session_token]['battle_settings'][$settings_token] = $star_support_cooldown;
         //error_log('$star_support_cooldown  = '.$star_support_cooldown);
@@ -834,7 +840,30 @@ class rpg_prototype {
         //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$star_support_cooldown);
     }
     public static function dec_star_support_cooldown($percent = 1){
+        //error_log('rpg_prototype::dec_star_support_cooldown($percent = '.$percent.')');
         return self::decrease_star_support_cooldown($percent);
+    }
+
+    // Define a function for calculating the star support charge given current cooldown vs max
+    public static function get_star_support_charge(){
+        //error_log('rpg_prototype::get_star_support_charge()');
+        $star_support_cooldown = self::get_star_support_cooldown();
+        $star_support_cooldown_max = self::get_star_support_cooldown_max();
+        $star_support_charge = $star_support_cooldown_max - $star_support_cooldown;
+        //error_log('$star_support_charge  = '.$star_support_charge);
+        return $star_support_charge;
+    }
+
+    // Define a function for collecting the current star support force given collected starforce
+    public static function get_star_support_force(){
+        //error_log('rpg_prototype::get_star_support_force()');
+        $num_stars_unlocked = mmrpg_prototype_stars_unlocked();
+        $num_stars_total = count(mmrpg_prototype_possible_stars());
+        $force_amount = round((($num_stars_unlocked / $num_stars_total) * 100), 2);
+        //error_log('$num_stars_unlocked = '.$num_stars_unlocked);
+        //error_log('$num_stars_total = '.$num_stars_total);
+        //error_log('$force_amount = '.$force_amount);
+        return $force_amount;
     }
 
 }
