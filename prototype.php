@@ -197,11 +197,26 @@ foreach ($this_menu_tooltips AS $token => $text){
 
 </head>
 <?
+
+// Collect the number of missions complete and the number or robots unlocked by this player
+$total_missions_complete = mmrpg_prototype_battles_complete(false, true);
+$total_player_options = $unlock_count_players;
+$total_robot_options = mmrpg_prototype_robots_unlocked();
+
+// Check to see if the ready room should be unlocked yet or not
+$ready_room_unlocked = false;
+if ($total_missions_complete >= 2){ $ready_room_unlocked = true; }
+
+// Decide whether to use an animated or static background for prototype home
+$prototype_banner_image = 'prototype-banners_title-screen_01.gif';
+if ($ready_room_unlocked){ $prototype_banner_image = 'prototype-banners_title-screen_01.png'; }
+
 // Collect and prototype-menu settings from the session for display
 $session_token = rpg_game::session_token();
 $battleSettings = $_SESSION[$session_token]['battle_settings'];
 $spriteRenderMode = isset($battleSettings['spriteRenderMode']) ? $battleSettings['spriteRenderMode'] : 'default';
 $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default';
+
 ?>
 <body id="mmrpg" class="prototype <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?>">
 
@@ -211,7 +226,7 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
 
     <div class="banner">
         <div class="sprite background banner_background" style="background-image: url(images/menus/menu-banner_this-battle-select.png);">&nbsp;</div>
-        <div class="sprite foreground banner_foreground banner_dynamic" style="background-image: url(images/menus/prototype-banners_title-screen_01.gif?<?=MMRPG_CONFIG_CACHE_DATE?>); background-position: center -10px;">&nbsp;</div>
+        <div class="sprite foreground banner_foreground banner_dynamic" style="background-image: url(images/menus/<?= $prototype_banner_image ?>?<?=MMRPG_CONFIG_CACHE_DATE?>); background-position: center -10px;">&nbsp;</div>
         <div class="sprite credits banner_credits"><h1>Mega Man RPG Prototype | Browser-Based Battle Simulator</h1></div>
         <div class="sprite overlay overlay_hidden banner_overlay">&nbsp;</div>
 
@@ -518,11 +533,12 @@ gameSettings.passwordUnlocked = 0;
 gameSettings.startLink = '<?= $prototype_start_link ?>';
 gameSettings.windowEventsCanvas = [];
 gameSettings.windowEventsMessages = [];
-gameSettings.totalMissionsComplete = <?= mmrpg_prototype_battles_complete(false, true) ?>;
-gameSettings.totalPlayerOptions = <?= $unlock_count_players ?>;
-gameSettings.totalRobotOptions = <?= mmrpg_prototype_robots_unlocked() ?>;
+gameSettings.totalMissionsComplete = <?= $total_missions_complete ?>;
+gameSettings.totalPlayerOptions = <?= $total_player_options ?>;
+gameSettings.totalRobotOptions = <?= $total_robot_options ?>;
 gameSettings.prototypeBannerKey = 0;
-gameSettings.prototypeBanners = ['prototype-banners_title-screen_01.gif'];
+gameSettings.prototypeBanners = ['<?= $prototype_banner_image ?>'];
+gameSettings.readyRoomUnlocked = <?= $ready_room_unlocked ? 'true' : 'false' ?>;
 <?
 
 // Define any menu frames already seen so know what's new
@@ -530,70 +546,78 @@ $menu_frames_seen = !empty($_SESSION[$session_token]['battle_settings']['menu_fr
 $menu_frames_seen = strstr($menu_frames_seen, '|') ? explode('|', $menu_frames_seen) : array($menu_frames_seen);
 echo('gameSettings.menuFramesSeen = '.json_encode($menu_frames_seen).';'.PHP_EOL);
 
-
+// Load all the Ready Room details if allowed, otherwise define them as empty
 //debug_profiler_checkpoint('before-ready-room');
+if ($ready_room_unlocked){
 
-// Generate a JSON array of all currently unlocked player players w/ basic data for prototype menu reference
-$include_extra = array();
-if (mmrpg_prototype_item_unlocked('kalinka-link')){ $include_extra['kalinka'] = array('player_token' => 'kalinka', 'current_player' => 'dr-cossack'); }
-$this_unlocked_players_index = mmrpg_prototype_players_unlocked_index_json($include_extra);
-//error_log('$include_extra ='.print_r($include_extra, true));
-//error_log('$this_unlocked_players_index ='.print_r($this_unlocked_players_index, true));
-//error_log('$this_unlocked_players_index(A) ='.print_r(array_keys($this_unlocked_players_index), true));
+    // Generate a JSON array of all currently unlocked player players w/ basic data for prototype menu reference
+    $include_extra = array();
+    if (mmrpg_prototype_item_unlocked('kalinka-link')){ $include_extra['kalinka'] = array('player_token' => 'kalinka', 'current_player' => 'dr-cossack'); }
+    $this_unlocked_players_index = mmrpg_prototype_players_unlocked_index_json($include_extra);
+    //error_log('$include_extra ='.print_r($include_extra, true));
+    //error_log('$this_unlocked_players_index ='.print_r($this_unlocked_players_index, true));
+    //error_log('$this_unlocked_players_index(A) ='.print_r(array_keys($this_unlocked_players_index), true));
 
-// Generate a JSON array of all currently unlocked player robots w/ basic data for prototype menu reference
-$include_extra = array();
-if (mmrpg_prototype_item_unlocked('auto-link')){ $include_extra['auto'] = array('robot_token' => 'auto', 'robot_image_size' => 80, 'current_player' => 'dr-light'); }
-if (mmrpg_prototype_item_unlocked('reggae-link')){ $include_extra['reggae'] = array('robot_token' => 'reggae', 'current_player' => 'dr-wily'); }
-$this_unlocked_robots_index = mmrpg_prototype_robots_unlocked_index_json($include_extra);
-//error_log('$this_unlocked_robots_index ='.print_r($this_unlocked_robots_index, true));
-//error_log('$this_unlocked_robots_index ='.print_r(array_keys($this_unlocked_robots_index), true));
+    // Generate a JSON array of all currently unlocked player robots w/ basic data for prototype menu reference
+    $include_extra = array();
+    if (mmrpg_prototype_item_unlocked('auto-link')){ $include_extra['auto'] = array('robot_token' => 'auto', 'robot_image_size' => 80, 'current_player' => 'dr-light'); }
+    if (mmrpg_prototype_item_unlocked('reggae-link')){ $include_extra['reggae'] = array('robot_token' => 'reggae', 'current_player' => 'dr-wily'); }
+    $this_unlocked_robots_index = mmrpg_prototype_robots_unlocked_index_json($include_extra);
+    //error_log('$this_unlocked_robots_index ='.print_r($this_unlocked_robots_index, true));
+    //error_log('$this_unlocked_robots_index ='.print_r(array_keys($this_unlocked_robots_index), true));
 
-// Check to see if we need to display entrance animations for any recently unlocked players
-$players_pending_entrance_animations = rpg_prototype::get_players_pending_entrance_animations();
-//error_log('$players_pending_entrance_animations = '.print_r($players_pending_entrance_animations, true));
-if (!empty($players_pending_entrance_animations)){
-    foreach ($players_pending_entrance_animations AS $player_key => $player_token){
-        if (!isset($this_unlocked_players_index[$player_token])){ continue; }
-        $new_player_data = $this_unlocked_players_index[$player_token];
-        //error_log('add entrance animation for '.$player_token);
-        if (!isset($new_player_data['flags'])){ $new_player_data['flags'] = array(); }
-        $new_player_data['flags'][] = 'is_newly_unlocked';
-        //error_log('$new_player_data = '.print_r($new_player_data, true));
-        $this_unlocked_players_index[$player_token] = $new_player_data;
+    // Check to see if we need to display entrance animations for any recently unlocked players
+    $players_pending_entrance_animations = rpg_prototype::get_players_pending_entrance_animations();
+    //error_log('$players_pending_entrance_animations = '.print_r($players_pending_entrance_animations, true));
+    if (!empty($players_pending_entrance_animations)){
+        foreach ($players_pending_entrance_animations AS $player_key => $player_token){
+            if (!isset($this_unlocked_players_index[$player_token])){ continue; }
+            $new_player_data = $this_unlocked_players_index[$player_token];
+            //error_log('add entrance animation for '.$player_token);
+            if (!isset($new_player_data['flags'])){ $new_player_data['flags'] = array(); }
+            $new_player_data['flags'][] = 'is_newly_unlocked';
+            //error_log('$new_player_data = '.print_r($new_player_data, true));
+            $this_unlocked_players_index[$player_token] = $new_player_data;
+        }
+        rpg_prototype::clear_players_pending_entrance_animations();
     }
-    rpg_prototype::clear_players_pending_entrance_animations();
-}
 
-// Check to see if we need to display entrance animations for any recently unlocked robots
-$robots_pending_entrance_animations = rpg_prototype::get_robots_pending_entrance_animations();
-//error_log('$robots_pending_entrance_animations = '.print_r($robots_pending_entrance_animations, true));
-if (!empty($robots_pending_entrance_animations)){
-    foreach ($robots_pending_entrance_animations AS $robot_key => $robot_token){
-        if (!isset($this_unlocked_robots_index[$robot_token])){ continue; }
-        $new_robot_data = $this_unlocked_robots_index[$robot_token];
-        //error_log('add entrance animation for '.$robot_token);
-        if (!isset($new_robot_data['flags'])){ $new_robot_data['flags'] = array(); }
-        $new_robot_data['flags'][] = 'is_newly_unlocked';
-        //error_log('$new_robot_data = '.print_r($new_robot_data, true));
-        $this_unlocked_robots_index[$robot_token] = $new_robot_data;
+    // Check to see if we need to display entrance animations for any recently unlocked robots
+    $robots_pending_entrance_animations = rpg_prototype::get_robots_pending_entrance_animations();
+    //error_log('$robots_pending_entrance_animations = '.print_r($robots_pending_entrance_animations, true));
+    if (!empty($robots_pending_entrance_animations)){
+        foreach ($robots_pending_entrance_animations AS $robot_key => $robot_token){
+            if (!isset($this_unlocked_robots_index[$robot_token])){ continue; }
+            $new_robot_data = $this_unlocked_robots_index[$robot_token];
+            //error_log('add entrance animation for '.$robot_token);
+            if (!isset($new_robot_data['flags'])){ $new_robot_data['flags'] = array(); }
+            $new_robot_data['flags'][] = 'is_newly_unlocked';
+            //error_log('$new_robot_data = '.print_r($new_robot_data, true));
+            $this_unlocked_robots_index[$robot_token] = $new_robot_data;
+        }
+        rpg_prototype::clear_robots_pending_entrance_animations();
     }
-    rpg_prototype::clear_robots_pending_entrance_animations();
-}
 
-// Remove any players or robots that are currently locked in endless attack mode
-$endless_attack_savedata = mmrpg_prototype_get_endless_sessions();
-if (!empty($endless_attack_savedata)){
-    foreach ($endless_attack_savedata AS $player => $savedata){
-        if (isset($this_unlocked_players_index[$player])){ unset($this_unlocked_players_index[$player]); }
-        foreach ($savedata['robots'] AS $robot){ if (isset($this_unlocked_robots_index[$robot])){ unset($this_unlocked_robots_index[$robot]); } }
+    // Remove any players or robots that are currently locked in endless attack mode
+    $endless_attack_savedata = mmrpg_prototype_get_endless_sessions();
+    if (!empty($endless_attack_savedata)){
+        foreach ($endless_attack_savedata AS $player => $savedata){
+            if (isset($this_unlocked_players_index[$player])){ unset($this_unlocked_players_index[$player]); }
+            foreach ($savedata['robots'] AS $robot){ if (isset($this_unlocked_robots_index[$robot])){ unset($this_unlocked_robots_index[$robot]); } }
+        }
     }
+
+    // Print out the generated indexes for use in the game settings
+    echo 'gameSettings.customIndex.unlockedPlayersIndex = '.json_encode($this_unlocked_players_index).';'.PHP_EOL;
+    echo 'gameSettings.customIndex.unlockedRobotsIndex = '.json_encode($this_unlocked_robots_index).';'.PHP_EOL;
+
+} else {
+
+    // Print out empty indexes to prevent issues in the game settings
+    echo 'gameSettings.customIndex.unlockedPlayersIndex = {};'.PHP_EOL;
+    echo 'gameSettings.customIndex.unlockedRobotsIndex = {};'.PHP_EOL;
+
 }
-
-// Print out the generated indexes for use in the game settings
-echo 'gameSettings.customIndex.unlockedPlayersIndex = '.json_encode($this_unlocked_players_index).';'.PHP_EOL;
-echo 'gameSettings.customIndex.unlockedRobotsIndex = '.json_encode($this_unlocked_robots_index).';'.PHP_EOL;
-
 //debug_profiler_checkpoint('after-ready-room');
 
 ?>
@@ -613,6 +637,9 @@ battleOptions['this_user_id'] = <?= $this_userid ?>;
 
 // Create the document ready events
 $(document).ready(function(){
+
+    // Make sure the music button is in the appropriate place
+    top.mmrpg_music_context('home');
 
     // Define the type of music we'll be using and autoplay it
     <?

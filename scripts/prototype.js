@@ -17,6 +17,7 @@ gameSettings.nextSlideDirection = 'left';
 gameSettings.startLink = 'home';
 gameSettings.skipPlayerSelect = false;
 gameSettings.menuFramesSeen = [];
+gameSettings.readyRoomUnlocked = false;
 var battleOptions = {};
 
 // Define the perfect scrollbar settings
@@ -539,8 +540,7 @@ $(document).ready(function(){
     // If we're on the actual prototype parent frame, load the ready room now
     if (!$('#mmrpg').hasClass('iframe')){
         // Only add the ready room to the banner after the player has unlocked their first homebase
-        if (typeof gameSettings.totalMissionsComplete !== 'undefined'
-            && gameSettings.totalMissionsComplete >= 2){
+        if (gameSettings.readyRoomUnlocked){
 
             // Initialize the ready room on prototype home page load
             var $thisPrototype = $('#prototype');
