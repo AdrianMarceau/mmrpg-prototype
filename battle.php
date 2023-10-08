@@ -931,6 +931,9 @@ gameSettings.currentBattleData = <?= json_encode($this_battle_data) ?>;
 // Create the document ready events
 $(document).ready(function(){
 
+    // Make sure the music button is in the appropriate place
+    top.mmrpg_music_context('battle');
+
 <?
 // Preload the target player robot sprites first because we see them first
 if (!empty($target_player_data) && !empty($target_player_data['player_robots'])){
