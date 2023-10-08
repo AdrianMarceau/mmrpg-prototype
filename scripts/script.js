@@ -1829,7 +1829,7 @@ function mmrpg_action_panel(thisPanel, currentPanel){
 
     // If there are buttons in the new wrapper
     var hoverButton = $('.button_hover', newWrapper);
-    var currentButtons = $('.button:not(.button_disabled)', newWrapper);
+    var currentButtons = $('.button:not(.button_disabled)', newWrapper).not('.main_actions_title .button');
     var currentButtonCount = currentButtons.length;
     if (currentButtonCount > 0 && !hoverButton.length){
         var firstButton = currentButtons.first();
@@ -2705,6 +2705,14 @@ function mmrpg_music_preload(newTrack){
         // Does not need to be preloaded
         return false;
         }
+}
+
+// Define a function for updating the current context of the music player
+function mmrpg_music_context(newContext){
+    //console.log('mmrpg_music_context(newContext:', newContext, ')');
+    if (!gameMusic || !gameMusic.length){ return false; }
+    if (typeof newContext !== 'string'){ newContext = ''; }
+    gameMusic.attr('data-context', newContext);
 }
 
 // Define variables related to sound effects for game runtime
