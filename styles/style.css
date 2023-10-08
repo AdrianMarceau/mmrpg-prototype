@@ -1490,6 +1490,26 @@ body.index #header {
     left: calc(50% + 5px);
     top: 8px;
 }
+/*
+#animate {
+    left: auto;
+    right: 4px;
+    top: 226px;
+}
+#music[data-context] {
+    transition: top 0.5s, left 0.5s, right 0.5s, transform 0.5s;
+}
+#music[data-context="home"] {
+    left: calc(50% - 5px);
+    transform: translateX(-100%);
+}
+#music[data-context="battle"] {
+    right: auto;
+    left: 22px;
+    top: 238px;
+    transform: none;
+}
+*/
 #music a.toggle,
 #animate a.toggle {
     position: relative;
@@ -1756,6 +1776,8 @@ body.index #header {
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-width: 1px 0;
     z-index: 100;
+
+    display: none; /* do we really need this? */
 }
 #mmrpg .canvas_overlay_footer {
     display: block;
@@ -3097,11 +3119,13 @@ body.index #header {
     mix-blend-mode: overlay;
 
     /* Animation properties */
+    /*
     animation-name: foreground_canvas_fade;
-    animation-duration: 5s; /* Adjust the duration as per your preference */
+    animation-duration: 5s;
     animation-duration: calc(var(--camera-shift-transition-duration) * 10);
     animation-timing-function: linear;
     animation-iteration-count: infinite;
+    */
 }
 #canvas .event .foreground_canvas:after {
     z-index: 2;
@@ -4092,7 +4116,9 @@ body.index #header {
     color: #dedede;
     animation: none;
 }
-#actions .main_actions_hastitle .main_actions_title .star-support.button_disabled .charge {
+#actions .main_actions_hastitle .main_actions_title .star-support.button_disabled .cooldown,
+#actions .main_actions_hastitle .main_actions_title .star-support.button_disabled .charge,
+#actions .main_actions_hastitle .main_actions_title .star-support.button_disabled .force {
     position: absolute;
     z-index: 1;
     display: block;
@@ -4104,6 +4130,15 @@ body.index #header {
     font-size: 9px;
     line-height: 10px;
     text-align: right;
+}
+#actions .main_actions_hastitle .main_actions_title .star-support.button_disabled .cooldown {
+    top: -3px;
+}
+#actions .main_actions_hastitle .main_actions_title .star-support.button_disabled .charge {
+    top: 1px;
+}
+#actions .main_actions_hastitle .main_actions_title .star-support.button_disabled .force {
+    top: 5px;
 }
 
 #actions .main_actions .button .label {
