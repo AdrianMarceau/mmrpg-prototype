@@ -182,7 +182,7 @@
 
         // Collect form data for processing
         $search_data['robot_id'] = !empty($_GET['robot_id']) && is_numeric($_GET['robot_id']) ? trim($_GET['robot_id']) : '';
-        $search_data['robot_name'] = !empty($_GET['robot_name']) && preg_match('/[-_0-9a-z\.\*\s]+/i', $_GET['robot_name']) ? trim(strtolower($_GET['robot_name'])) : '';
+        $search_data['robot_name'] = !empty($_GET['robot_name']) && preg_match('/[-_0-9a-z\.\*\s\(\)\[\]]+/i', $_GET['robot_name']) ? trim(strtolower($_GET['robot_name'])) : '';
         $search_data['robot_core'] = !empty($_GET['robot_core']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_core']) ? trim(strtolower($_GET['robot_core'])) : '';
         $search_data['robot_class'] = !empty($_GET['robot_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_class']) ? trim(strtolower($_GET['robot_class'])) : '';
         $search_data['robot_skill'] = !empty($_GET['robot_skill']) && preg_match('/[-_0-9a-z]+/i', $_GET['robot_skill']) ? trim(strtolower($_GET['robot_skill'])) : '';
@@ -409,7 +409,7 @@
 
             $form_data['robot_id'] = !empty($_POST['robot_id']) && is_numeric($_POST['robot_id']) ? trim($_POST['robot_id']) : 0;
             $form_data['robot_token'] = !empty($_POST['robot_token']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['robot_token']) ? trim(strtolower($_POST['robot_token'])) : '';
-            $form_data['robot_name'] = !empty($_POST['robot_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['robot_name']) ? trim($_POST['robot_name']) : '';
+            $form_data['robot_name'] = !empty($_POST['robot_name']) && preg_match('/^[-_0-9a-z\.\*\s\(\)\[\]]+$/i', $_POST['robot_name']) ? trim($_POST['robot_name']) : '';
             $form_data['robot_class'] = $this_robot_class; //!empty($_POST['robot_class']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_class']) ? trim(strtolower($_POST['robot_class'])) : '';
             $form_data['robot_core'] = !empty($_POST['robot_core']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_core']) ? trim(strtolower($_POST['robot_core'])) : '';
             $form_data['robot_core2'] = !empty($_POST['robot_core2']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['robot_core2']) ? trim(strtolower($_POST['robot_core2'])) : '';
