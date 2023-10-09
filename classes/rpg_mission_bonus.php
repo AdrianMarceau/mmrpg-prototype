@@ -65,21 +65,21 @@ class rpg_mission_bonus extends rpg_mission {
         $temp_battle_token = $this_prototype_data['phase_battle_token'].'-prototype-bonus-'.$this_robot_class;
         if ($this_robot_class == 'mecha'){
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete');
-            $temp_battle_omega['battle_field_base']['field_name'] = 'Mecha Field';
+            $temp_battle_omega['battle_field_base']['field_name'] = 'Bonus Field I (Mecha Support)';
             $temp_battle_omega['battle_name'] = 'Bonus Battle vs Random Mechas';
             $temp_battle_omega['battle_description'] = 'Face off against a randomized assortment of support mechas in this special bonus battle!';
             $temp_battle_omega['battle_description2'] = 'This mission is great for grinding EXP or collecting Small Screws and Mecha Shards!';
         }
         elseif ($this_robot_class == 'master'){
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete-2');
-            $temp_battle_omega['battle_field_base']['field_name'] = 'Master Field';
+            $temp_battle_omega['battle_field_base']['field_name'] = 'Bonus Field II (Robot Masters)';
             $temp_battle_omega['battle_name'] = 'Bonus Battle vs Random Masters';
             $temp_battle_omega['battle_description'] = 'Face off against a randomized assortment of robot masters in this special bonus battle!';
             $temp_battle_omega['battle_description2'] = 'This mission is great for grinding EXP or collecting Large Screws and Robot Cores!';
         }
         elseif ($this_robot_class == 'boss'){
             $temp_battle_omega = rpg_battle::get_index_info('bonus-prototype-complete-2');
-            $temp_battle_omega['battle_field_base']['field_name'] = 'Boss Field';
+            $temp_battle_omega['battle_field_base']['field_name'] = 'Bonus Field III (Fortress Bosses)';
             $temp_battle_omega['battle_name'] = 'Bonus Battle vs Random Bosses';
             $temp_battle_omega['battle_description'] = 'Face off against a randomized assortment of fortress bosses in this special bonus battle!';
             $temp_battle_omega['battle_description2'] = 'This mission is great for grinding EXP or collecting Large Screws and Robot Cores!';
