@@ -18,7 +18,17 @@ ob_start();
         && empty($this_player->flags['star_support_summoned'])
         && rpg_prototype::star_support_unlocked()){
         $show_star_support = true;
-        $star_support_cooldown = rpg_prototype::get_star_support_cooldown();
+        $star_support_force = rpg_prototype::get_star_support_force();
+        if (!empty($this_battle->flags['star_support_required'])){
+            $show_star_support = true;
+            $star_support_cooldown = 0;
+        } elseif (isset($this_battle->flags['star_support_allowed']) && empty($this_battle->flags['star_support_allowed'])){
+            $show_star_support = false;
+            $star_support_cooldown = 100;
+        } else {
+            $show_star_support = true;
+            $star_support_cooldown = rpg_prototype::get_star_support_cooldown();
+        }
     }
 
     // Check to see whether or not switching is allowed right now

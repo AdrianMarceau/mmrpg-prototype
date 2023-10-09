@@ -14,10 +14,20 @@ ob_start();
         && empty($this_battle->flags['player_battle'])
         && empty($this_player->flags['star_support_summoned'])
         && rpg_prototype::star_support_unlocked()){
-        $show_star_support = true;
-        $star_support_cooldown = rpg_prototype::get_star_support_cooldown();
-        $star_support_charge = rpg_prototype::get_star_support_charge();
         $star_support_force = rpg_prototype::get_star_support_force();
+        if (!empty($this_battle->flags['star_support_required'])){
+            $show_star_support = true;
+            $star_support_cooldown = 0;
+            $star_support_charge = 100;
+        } elseif (isset($this_battle->flags['star_support_allowed']) && empty($this_battle->flags['star_support_allowed'])){
+            $show_star_support = false;
+            $star_support_cooldown = 100;
+            $star_support_charge = 0;
+        } else {
+            $show_star_support = true;
+            $star_support_cooldown = rpg_prototype::get_star_support_cooldown();
+            $star_support_charge = rpg_prototype::get_star_support_charge();
+        }
     }
 
     // Display container for the main actions
