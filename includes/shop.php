@@ -425,6 +425,9 @@ if (!empty($this_shop_index['auto'])){
 $core_level_index = array();
 if (!empty($this_shop_index['reggae'])){
 
+        // Collect a list of all abilities already unlocked
+        $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
+
         // Collect the list of abilities Reggae is selling based on his level
         $unlocked_abilities = $db->get_array_list("SELECT
             abilities.ability_token
@@ -447,6 +450,16 @@ if (!empty($this_shop_index['reggae'])){
         // Update the actual shop index with our finalized abilities we're selling
         $reggae_abilities_selling = array_keys($unlocked_abilities);
         $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = call_user_func_array('get_abilities_with_prices', $reggae_abilities_selling);
+
+        // Finally, sort the abilities again so that ones which are NOT unlocked appear first (but keep the order the same otherwise)
+        if (!empty($unlocked_ability_tokens)
+            && !empty($this_shop_index['reggae']['shop_weapons']['abilities_selling'])){
+            $old_abilities_selling = $this_shop_index['reggae']['shop_weapons']['abilities_selling'];
+            $new_abilities_selling = array();
+            foreach ($old_abilities_selling AS $token => $price){ if (!in_array($token, $unlocked_ability_tokens)){ $new_abilities_selling[$token] = $price; } }
+            foreach ($old_abilities_selling AS $token => $price){ if (in_array($token, $unlocked_ability_tokens)){ $new_abilities_selling[$token] = $price; } }
+            $this_shop_index['reggae']['shop_weapons']['abilities_selling'] = $new_abilities_selling;
+        }
 
         // If the player has unlocked the Weapon Codes, Reggae's Shop also sells weapons
         if (mmrpg_prototype_item_unlocked('weapon-codes')){
@@ -473,9 +486,6 @@ if (!empty($this_shop_index['reggae'])){
                     $core_level_index[$type_token] += $item_quantity;
                 }
             }
-
-            // Collect a list of all abilities already unlocked
-            $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
 
             // Collect the list of weapons Reggae is selling based on his level
             $conditions = array();
@@ -532,6 +542,16 @@ if (!empty($this_shop_index['reggae'])){
                     $new_price = $price - floor(($price / 2) * $level_discount);
                     $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $new_price;
                 }
+            }
+
+            // Finally, sort the weapons again so that ones which are NOT unlocked appear first (but keep the order the same otherwise)
+            if (!empty($unlocked_ability_tokens)
+                && !empty($this_shop_index['reggae']['shop_weapons']['weapons_selling'])){
+                $old_weapons_selling = $this_shop_index['reggae']['shop_weapons']['weapons_selling'];
+                $new_weapons_selling = array();
+                foreach ($old_weapons_selling AS $token => $price){ if (!in_array($token, $unlocked_ability_tokens)){ $new_weapons_selling[$token] = $price; } }
+                foreach ($old_weapons_selling AS $token => $price){ if (in_array($token, $unlocked_ability_tokens)){ $new_weapons_selling[$token] = $price; } }
+                $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = $new_weapons_selling;
             }
 
         }
