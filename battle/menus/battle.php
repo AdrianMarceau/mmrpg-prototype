@@ -46,7 +46,11 @@ ob_start();
             if (!empty($temp_player_ability_actions) || $this_robot->robot_class !== 'master'){
                 $icon = 'fire-alt';
                 $class = 'button action_ability';
-                if ($show_star_support && empty($star_support_cooldown)){ $icon = 'star'; $class .= ' type space'; }
+                if ($show_star_support
+                    && empty($star_support_cooldown)){
+                    $icon = 'star';
+                    //$class .= ' type space';
+                    }
                 ?><a class="<?= $class ?>" type="button" data-panel="ability" data-order="<?= $dataOrder ?>"><label><i class="fa fas fa-<?= $icon ?>"></i> <strong>Ability</strong></label></a><?
             } else {
                 ?><a class="button button_disabled action_ability" type="button" data-action="ability_8_action-noweapons" data-order="<?= $dataOrder ?>"><label><i class="fa fas fa-battery-empty"></i> <strong style="text-decoration: line-through;">Ability</strong></label></a><?

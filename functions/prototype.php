@@ -2092,7 +2092,7 @@ function mmrpg_prototype_option_message_markup($player_token, $subject, $lineone
 }
 
 // Define a function for extracting a mecha-only "alpha" battle from an omega one
-function mmrpg_prototypt_extract_alpha_battle(&$temp_battle_omega, $this_prototype_data){
+function mmrpg_prototype_extract_alpha_battle(&$temp_battle_omega, $this_prototype_data){
 
     // Collect a temporary object indexes for reference
     static $mmrpg_index_robots, $mmrpg_index_fields;
@@ -2452,6 +2452,303 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
 
     // Return the generated omega battle
     return $temp_battle_omega;
+
+}
+
+// Define a function for calculating random encounters with hunters based on current starforce levels
+function mmrpg_prototype_hunter_encounter_data(){
+    //error_log('mmrpg_prototype_hunter_encounter_data()');
+
+    // Return any information we might need about these encounters
+    return array(
+        'required_target_tokens' => array('enker', 'punk', 'ballade'),
+        );
+
+}
+
+// Define a function for appending the encounter data for the SUPERBOSS QUINT to a given battle omega
+function mmrpg_prototype_append_hunter_encounter_data(&$this_prototype_data, &$temp_battle_omega, $field_info = array(), $field_info2 = array()){
+    //error_log('mmrpg_prototype_append_hunter_encounter_data()');
+
+    // Add a subtle indicator to the battle name
+    $temp_option_key = count($this_prototype_data['battle_options']) - 1;
+    $this_prototype_data['battle_options'][$temp_option_key]['battle_description2'] = rtrim($this_prototype_data['battle_options'][$temp_option_key]['battle_description2']).' Let\'s go!';
+    // Generate a random encounter mission for the star fields
+    //$player_starforce_levels = !empty($_SESSION[$session_token]['values']['star_force']) ? $_SESSION[$session_token]['values']['star_force'] : array();
+    $random_encounter_added = true;
+    $temp_battle_sigma = mmrpg_prototype_generate_mission($this_prototype_data,
+        $temp_battle_omega['battle_token'].'-killer-superboss-encounter', array(
+            'battle_name' => 'Challenger from the Future?',
+            'battle_level' => 100,
+            'battle_description' => 'A mysterious challenger has appeared! Can you defeat them in battle?',
+            'battle_counts' => false,
+            'flags' => array(
+                'hunter_battle' => true,
+                'superboss_battle' => true,
+                'star_support_allowed' => false
+                )
+            ), array_merge($temp_battle_omega['battle_field_base'], array(
+                'field_background' => 'prototype-complete',
+                'field_background_attachments' => array(),
+                'field_music' => 'sega-remix/boss-theme-mm10',
+                'values' => array('hazards' => array('super_blocks' => 'right'))
+                )
+            ), array(
+            'player_token' => 'player',
+            'player_starforce' => $this_prototype_data['max_starforce']
+            ), array(
+            array('robot_token' => 'quint', 'robot_item' => 'guard-module', 'counters' => array('attack_mods' => 5, 'defense_mods' => 5, 'speed_mods' => 5)),
+            ), true);
+    rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
+    mmrpg_prototype_mission_autoplay_append($temp_battle_omega, $temp_battle_sigma, $this_prototype_data, true);
+    //$this_prototype_data['battle_options'][] = $temp_battle_sigma;
+    return $random_encounter_added;
+
+}
+
+// Define a function for calculating random encounters with stardroids based on current starforce levels
+function mmrpg_prototype_stardroid_encounter_data(){
+    //error_log('mmrpg_prototype_stardroid_encounter_data()');
+
+    // Collect a reference to the robot database for later
+    $mmrpg_index_robots = rpg_robot::get_index(true);
+
+    // Collect a reference to the player's robot database for reference
+    $current_database_records = rpg_game::robot_database();
+    //error_log('$current_database_records: '.print_r($current_database_records, true));
+
+    // Calculate the current starforce total vs max starforce total for mission gen
+    $session_token = rpg_game::session_token();
+    $current_starforce = !empty($_SESSION[$session_token]['values']['star_force']) ? $_SESSION[$session_token]['values']['star_force'] : array();
+
+    // Collect the stardroids from the robot database for reference
+    $stardroid_robots_index = array_filter($mmrpg_index_robots, function($info){
+        if (!strstr($info['robot_number'], 'SRN-')){ return false; }
+        return true;
+        });
+
+    // DEBUG DEBUG DEBUG
+    //$current_database_records['venus']['robot_defeated'] = 1;
+
+    // Loop through the collected stardroids and map their power levels and appearance rates accordingly
+    $stardroid_power_levels = array();
+    $stardroid_appearance_rates = array();
+    $stardroid_robots_defeated = array();
+    foreach ($stardroid_robots_index AS $token => $info){
+        //error_log('--- '.$token.' ---');
+        $type1 = !empty($info['robot_core']) ? $info['robot_core'] : 'none';
+        $type2 = !empty($info['robot_core2']) ? $info['robot_core2'] : 'none';
+        $type1_power = !empty($current_starforce[$type1]) ? $current_starforce[$type1] : 0;
+        $type2_power = !empty($current_starforce[$type2]) ? $current_starforce[$type2] : 0;
+        $power = $type1_power + $type2_power;
+        $stardroid_power_levels[$token] = $power;
+        //error_log('power => '.$type1.' ('.$type1_power.') + '.$type2.' ('.$type2_power.') = '.$power);
+        $rate = 0;
+        $records = !empty($current_database_records[$token]) ? $current_database_records[$token] : array();
+        $defeated = !empty($records['robot_defeated']) ? $records['robot_defeated'] : 0;
+        if ($power > 0){ $rate = ($power / pow((1 + $defeated), 2)); }
+        $rate = round($rate, 4);
+        $stardroid_appearance_rates[$token] = $rate;
+        //error_log('appearance => '.$power.' / (1 + '.$defeated.') = '.$rate);
+        if ($defeated > 0){ $stardroid_robots_defeated[] = $token; }
+    }
+
+    // Use the appearance rates to determine who shows up next in line
+    $stardroid_robots_defeated_count = count($stardroid_robots_defeated);
+    if ($stardroid_robots_defeated_count < 9){
+        // do not let sunstar show until the others are done
+        unset($stardroid_appearance_rates['sunstar']);
+        asort($stardroid_appearance_rates);
+        $stardroid_appearance_rates = array_reverse($stardroid_appearance_rates, true);
+        $selected_stardroid_token = key($stardroid_appearance_rates);
+    }
+    elseif ($stardroid_robots_defeated_count >= 10){
+        // just use a random token from the appearance keys
+        $possible_stardroid_tokens = array_keys($stardroid_appearance_rates);
+        $selected_stardroid_token = $possible_stardroid_tokens[array_rand($possible_stardroid_tokens)];
+    }
+    $selected_stardroid_info = $stardroid_robots_index[$selected_stardroid_token];
+    $selected_stardroid_triggers = array($selected_stardroid_info['robot_core'], $selected_stardroid_info['robot_core2']);
+
+    //error_log('$current_starforce: '.print_r($current_starforce, true));
+    //error_log('$stardroid_robots_index: '.print_r(array_keys($stardroid_robots_index), true));
+    //error_log('$stardroid_robots_index: '.print_r($stardroid_robots_index, true));
+    //error_log('$stardroid_power_levels: '.print_r($stardroid_power_levels, true));
+    //error_log('$stardroid_appearance_rates: '.print_r($stardroid_appearance_rates, true));
+    //error_log('$selected_stardroid_token: '.print_r($selected_stardroid_token, true));
+    //error_log('$selected_stardroid_triggers: '.print_r($selected_stardroid_triggers, true));
+    //error_log('$possible_star_list: '.print_r($possible_star_list, true));
+    //error_log('$stardroid_robots_defeated: '.print_r($stardroid_robots_defeated, true));
+
+    // Return the collect information about this stardroid, if any
+    return array(
+        'stardroid_power_levels' => $stardroid_power_levels,
+        'stardroid_appearance_rates' => $stardroid_appearance_rates,
+        'stardroid_robots_defeated' => $stardroid_robots_defeated,
+        'selected_stardroid_token' => $selected_stardroid_token,
+        'selected_stardroid_info' => $selected_stardroid_info,
+        'selected_stardroid_triggers' => $selected_stardroid_triggers,
+        );
+
+}
+
+// Define a function for getting the encounter data for the SUPERBOSS STARDROIDS + SUNSTAR to a given battle omega provided it passes trigger checks
+function mmrpg_prototype_get_stardroid_encounter_data(&$this_prototype_data, &$temp_battle_omega, $field_info = array(), $field_info2 = array(), &$stardroid_encounter_data){
+    //error_log('mmrpg_prototype_get_stardroid_encounter_data()');
+
+    // Collect stardroid encounter data so that we can check to see if applies and append
+    $stardroid_encounter_data = mmrpg_prototype_stardroid_encounter_data();
+    //error_log('$stardroid_encounter_data: '.print_r($stardroid_encounter_data, true));
+    $stardroid_power_levels = $stardroid_encounter_data['stardroid_power_levels'];
+    $stardroid_appearance_rates = $stardroid_encounter_data['stardroid_appearance_rates'];
+    $stardroid_robots_defeated = $stardroid_encounter_data['stardroid_robots_defeated'];
+    $selected_stardroid_token = $stardroid_encounter_data['selected_stardroid_token'];
+    $selected_stardroid_info = $stardroid_encounter_data['selected_stardroid_info'];
+    $selected_stardroid_triggers = $stardroid_encounter_data['selected_stardroid_triggers'];
+    $random_encounter_added = false;
+
+    // Collect the field types we're currently using and then check if either are a trigger
+    $field_type_1 = !empty($field_info['field_type']) ? $field_info['field_type'] : '';
+    $field_type_2 = !empty($field_info2['field_type']) ? $field_info2['field_type'] : '';
+    //if (empty($field_type_1)){ //error_log('$field_type_1 is empty || $field_info = '.print_r($field_info, true)); }
+    //if (empty($field_type_2)){ //error_log('$field_type_2 is empty || $field_info2 = '.print_r($field_info2, true)); }
+    //error_log('check if in_array($field_type_1:'.$field_type_1.', '.print_r($selected_stardroid_triggers, true).')');
+    //error_log('check if in_array($field_type_2:'.$field_type_2.', '.print_r($selected_stardroid_triggers, true).')');
+    if (in_array($field_type_1, $selected_stardroid_triggers)
+        || in_array($field_type_2, $selected_stardroid_triggers)){
+        //error_log('random encounter w/ '.$selected_stardroid_token.' triggered!');
+
+        // Add a subtle indicator to the battle name
+        if (isset($this_prototype_data['battle_options'])){
+            $temp_option_key = isset($this_prototype_data['battle_options']) ? (count($this_prototype_data['battle_options']) - 1) : 0;
+            $this_prototype_data['battle_options'][$temp_option_key]['battle_description2'] = rtrim($this_prototype_data['battle_options'][$temp_option_key]['battle_description2']).' Let\'s go!';
+        }
+        // Generate a random encounter mission for the star fields
+        //$player_starforce_levels = !empty($_SESSION[$session_token]['values']['star_force']) ? $_SESSION[$session_token]['values']['star_force'] : array();
+        $random_encounter_added = true;
+        $temp_battle_level = 150;
+        $temp_battle_mecha = 'ring-ring';
+        $temp_battle_hazards = array();
+        $temp_battle_token = $temp_battle_omega['battle_token'].'-stardroid-encounter';
+        $temp_battle_name = 'Challenger from the Stars!';
+        $temp_battle_description = 'An intergalactic challenger has appeared! Can you defeat them in battle?';
+        if ($selected_stardroid_token === 'sunstar'){
+            $temp_battle_level = 200;
+            $temp_battle_mecha = 'novamite';
+            $temp_battle_hazards['black_holes'] = 'left';
+            $temp_battle_hazards['super_blocks'] = 'right';
+            $temp_battle_token = str_replace('stardroid', 'stardroid-superboss', $temp_battle_token);
+            $temp_battle_name = 'Ultimate Challenger from the Stars!';
+            $temp_battle_description = 'The ultimate intergalactic challenger has appeared! Can you defeat them in battle?';
+        }
+        $temp_battle_field = $temp_battle_omega['battle_field_base'];
+        //$temp_battle_field = in_array($field_type_1, $selected_stardroid_triggers) ? $field_info : $field_info2;
+        //unset($temp_battle_field['field_description'], $temp_battle_field['field_description2']);
+        $temp_battle_field = array_merge($temp_battle_field, array(
+            'field_name' => 'Star Field '.$selected_stardroid_info['robot_name'],
+            'field_foreground' => 'final-destination-3',
+            'field_background' => 'final-destination-3',
+            'field_mechas' => array($temp_battle_mecha),
+            'field_music' => 'sega-remix/wily-machine-8-mm8',
+            'values' => array('hazards' => $temp_battle_hazards),
+            ));
+        $temp_battle_player = array(
+            'player_token' => 'player',
+            'player_starforce' => $this_prototype_data['max_starforce']
+            );
+        $temp_battle_robots = array();
+        $temp_battle_robots[] = array(
+            'robot_token' => $selected_stardroid_token,
+            'robot_item' => 'field-booster',
+            'counters' => array(
+                'attack_mods' => 5,
+                'defense_mods' => 5,
+                'speed_mods' => 5
+                )
+            );
+        $temp_battle_robots[] = array(
+            'robot_token' => $temp_battle_mecha,
+            'robot_item' => $selected_stardroid_info['robot_core'].'-core',
+            'counters' => array(
+                'attack_mods' => 2,
+                'defense_mods' => 2,
+                'speed_mods' => 2
+                ),
+            );
+        $temp_battle_robots[] = array(
+            'robot_token' => $temp_battle_mecha,
+            'robot_item' => $selected_stardroid_info['robot_core2'].'-core',
+            'counters' => array(
+                'attack_mods' => 2,
+                'defense_mods' => 2,
+                'speed_mods' => 2
+                ),
+            );
+        $temp_battle_sigma = mmrpg_prototype_generate_mission($this_prototype_data, $temp_battle_token, array(
+                'battle_name' => $temp_battle_name,
+                'battle_level' => $temp_battle_level,
+                'battle_description' => $temp_battle_description,
+                'battle_counts' => false,
+                'flags' => array(
+                    'starfield_mission' => true,
+                    'stardroid_battle' => true,
+                    'superboss_battle' => true,
+                    'star_support_required' => true
+                    )
+                ),
+                $temp_battle_field,
+                $temp_battle_player,
+                $temp_battle_robots,
+                true);
+
+        return $temp_battle_sigma;
+
+    }
+
+    // Return false if nothing could be generated
+    return false;
+
+}
+
+// Define a function for appending the encounter data for the SUPERBOSS STARDROIDS + SUNSTAR to a given battle omega provided it passes trigger checks
+function mmrpg_prototype_append_stardroid_encounter_data(&$this_prototype_data, &$temp_battle_omega, $field_info = array(), $field_info2 = array()){
+    //error_log('mmrpg_prototype_append_stardroid_encounter_data()');
+
+    // Attempt to collect stardroid encounter data and append it if it comes back non-empty
+    $random_encounter_added = false;
+    $temp_battle_sigma = mmrpg_prototype_get_stardroid_encounter_data($this_prototype_data, $temp_battle_omega, $field_info, $field_info2, $stardroid_encounter_data);
+    if (!empty($temp_battle_sigma)){
+        //error_log('appending random encounter w/ '.$stardroid_encounter_data['selected_stardroid_token'].'!');
+        $random_encounter_added = true;
+        rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
+        mmrpg_prototype_mission_autoplay_append($temp_battle_omega, $temp_battle_sigma, $this_prototype_data, true);
+        //$this_prototype_data['battle_options'][] = $temp_battle_sigma;
+    }
+
+    // Return whether or not a random encounter was added
+    return $random_encounter_added;
+
+}
+
+// Define a function for overwriting the encounter data for the SUPERBOSS STARDROIDS + SUNSTAR to a given battle omega provided it passes trigger checks
+function mmrpg_prototype_overwrite_with_stardroid_encounter_data(&$this_prototype_data, &$temp_battle_omega, $field_info = array(), $field_info2 = array()){
+    //error_log('mmrpg_prototype_overwrite_with_stardroid_encounter_data()');
+
+    // Attempt to collect stardroid encounter data and use it to overwrite the base if it comes back non-empty
+    $random_encounter_added = false;
+    $temp_battle_sigma = mmrpg_prototype_get_stardroid_encounter_data($this_prototype_data, $temp_battle_omega, $field_info, $field_info2, $stardroid_encounter_data);
+    if (!empty($temp_battle_sigma)){
+        //error_log('injecting random encounter w/ '.$stardroid_encounter_data['selected_stardroid_token'].'!');
+        $random_encounter_added = true;
+        $backup_battle_token = $temp_battle_omega['battle_token'];
+        $temp_battle_omega = array_merge($temp_battle_omega, $temp_battle_sigma);
+        $temp_battle_omega['battle_token'] = $backup_battle_token;
+        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+        //$this_prototype_data['battle_options'][] = $temp_battle_sigma;
+    }
+
+    // Return whether or not a random encounter was added
+    return $random_encounter_added;
 
 }
 

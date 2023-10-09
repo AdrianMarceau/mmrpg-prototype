@@ -19,6 +19,13 @@ if (!empty($this_battle->flags['starfield_mission'])
     //echo('$this_action_token = '.print_r($this_action_token, true).PHP_EOL);
     //echo('$next_star_type = '.print_r($next_star_type, true).PHP_EOL.PHP_EOL);
 
+    // Collect the fields index in case we need it later
+    $mmrpg_index_fields = rpg_field::get_index();
+
+    // Count the number of stars collected to determine level
+    $star_count = mmrpg_prototype_stars_unlocked();
+    $star_level = 50 + ceil(50 * ($star_count / MMRPG_SETTINGS_STARFORCE_STARTOTAL));
+
     // Collect a list of possible stars
     $possible_star_list = mmrpg_prototype_possible_stars(true);
     $max_star_force = array();
@@ -57,6 +64,20 @@ if (!empty($this_battle->flags['starfield_mission'])
         }
     }
 
+    // Create a flag variables for the random encounter
+    $random_encounter_chance = false;
+    if (empty($this_battle->flags['superboss_battle'])){
+        if ($star_count >= 10){
+            for ($i = 0; $i < 10; $i++){
+                if (mt_rand(0, MMRPG_SETTINGS_STARFORCE_STARTOTAL) <= $star_count){
+                    $random_encounter_chance = true;
+                    break;
+                }
+            }
+        }
+    }
+    //error_log('next//$random_encounter_chance: '.print_r($random_encounter_chance ? 'true' : 'false', true));
+
     // Ensure there is a star for the requested type, else return to home if we can't
     if (empty($temp_remaining_stars_types[$next_star_type])){ $this_redirect = 'prototype.php?'.($flag_wap ? 'wap=true' : ''); return; }
     $next_star_options = $temp_remaining_stars_types[$next_star_type];
@@ -69,6 +90,8 @@ if (!empty($this_battle->flags['starfield_mission'])
     // Collect basic star variables necessary to generating next battle
     $info = $next_star_info['info1'];
     $info2 = $next_star_info['info2'];
+    $field_info = $mmrpg_index_fields[$info['field']];
+    $field_info2 = !empty($info2) ? $mmrpg_index_fields[$info2['field']] : $field_info;
     $next_star_level = $this_battle->battle_level + 1;
     if ($next_star_level > 100){ $next_star_level = 100; }
 
@@ -83,7 +106,9 @@ if (!empty($this_battle->flags['starfield_mission'])
 
     // Calculate the current starforce total vs max starforce total for mission gen
     $session_token = mmrpg_game_token();
+    $current_starforce = !empty($_SESSION[$session_token]['values']['star_force']) ? $_SESSION[$session_token]['values']['star_force'] : array();
     $this_prototype_data['current_starforce_total'] = !empty($_SESSION[$session_token]['values']['star_force']) ? array_sum($_SESSION[$session_token]['values']['star_force']) : 0;
+    $this_prototype_data['max_starforce'] = $max_star_force;
     $this_prototype_data['max_starforce_total'] = array_sum($max_star_force);
 
     //echo('$info = '.print_r($info, true).PHP_EOL);
@@ -107,6 +132,13 @@ if (!empty($this_battle->flags['starfield_mission'])
     // Update the chapter number and then save this data to the temp index
     $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
     rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+
+
+    // SUPERBOSS STARTDROIDS (+ SUNSTAR) : RANDOM ENCOUNTERS
+    // If random encounter has not been added, check to see if we can add now
+    if ($random_encounter_chance){
+        mmrpg_prototype_overwrite_with_stardroid_encounter_data($this_prototype_data, $temp_battle_omega, $field_info, $field_info2);
+    }
 
     // Update the redirect token to that of the new star field mission
     $battle_complete_redirect_token = $temp_battle_omega['battle_token'];
