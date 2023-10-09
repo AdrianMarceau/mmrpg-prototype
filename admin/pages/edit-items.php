@@ -88,7 +88,7 @@
 
         // Collect form data for processing
         $search_data['item_id'] = !empty($_GET['item_id']) && is_numeric($_GET['item_id']) ? trim($_GET['item_id']) : '';
-        $search_data['item_name'] = !empty($_GET['item_name']) && preg_match('/[-_0-9a-z\.\*\s]+/i', $_GET['item_name']) ? trim(strtolower($_GET['item_name'])) : '';
+        $search_data['item_name'] = !empty($_GET['item_name']) && preg_match('/[-_0-9a-z\.\*\s\(\)\[\]]+/i', $_GET['item_name']) ? trim(strtolower($_GET['item_name'])) : '';
         $search_data['item_type'] = !empty($_GET['item_type']) && preg_match('/[-_0-9a-z]+/i', $_GET['item_type']) ? trim(strtolower($_GET['item_type'])) : '';
         $search_data['item_subclass'] = !empty($_GET['item_subclass']) && preg_match('/[-_0-9a-z]+/i', $_GET['item_subclass']) ? trim(strtolower($_GET['item_subclass'])) : '';
         $search_data['item_flavour'] = !empty($_GET['item_flavour']) && preg_match('/[-_0-9a-z\.\*\s\{\}]+/i', $_GET['item_flavour']) ? trim($_GET['item_flavour']) : '';
@@ -290,7 +290,7 @@
 
             $form_data['item_id'] = !empty($_POST['item_id']) && is_numeric($_POST['item_id']) ? trim($_POST['item_id']) : 0;
             $form_data['item_token'] = !empty($_POST['item_token']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['item_token']) ? trim(strtolower($_POST['item_token'])) : '';
-            $form_data['item_name'] = !empty($_POST['item_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['item_name']) ? trim($_POST['item_name']) : '';
+            $form_data['item_name'] = !empty($_POST['item_name']) && preg_match('/^[-_0-9a-z\.\*\s\(\)\[\]]+$/i', $_POST['item_name']) ? trim($_POST['item_name']) : '';
             $form_data['item_class'] = 'item';
             $form_data['item_subclass'] = !empty($_POST['item_subclass']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['item_subclass']) ? trim(strtolower($_POST['item_subclass'])) : '';
             $form_data['item_type'] = !empty($_POST['item_type']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['item_type']) ? trim(strtolower($_POST['item_type'])) : '';
