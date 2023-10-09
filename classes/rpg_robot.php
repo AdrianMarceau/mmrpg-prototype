@@ -1212,6 +1212,7 @@ class rpg_robot extends rpg_object {
     }
 
     // Define public print functions for markup generation
+    public function print_token(){ return '<span class="robot_token">'.$this->robot_token.'</span>'; }
     public function print_number(){ return '<span class="robot_number">'.$this->robot_number.'</span>'; }
     public function print_name(){
         $gemini_clone_active = false;
@@ -1222,8 +1223,18 @@ class rpg_robot extends rpg_object {
         $ends_with_s = substr($this->robot_name, -1) === 's' ? true : false;
         return $this->print_name()."'".(!$ends_with_s ? 's' : '');
     }
-    public function print_token(){ return '<span class="robot_token">'.$this->robot_token.'</span>'; }
-    public function print_core(){ return '<span class="robot_core '.(!empty($this->robot_core) ? 'robot_type_'.$this->robot_core : '').'">'.(!empty($this->robot_core) ? ucfirst($this->robot_core) : 'Neutral').'</span>'; }
+    public function print_core(){
+        if (!empty($this->robot_core2)
+            && !empty($this->robot_core)
+            && $this->robot_core2 !== $this->robot_core){
+            $cls = 'robot_type_'.$this->robot_core.'_'.$this->robot_core2;
+            $label = ucfirst($this->robot_core).' / '.ucfirst($this->robot_core2);
+        } else {
+            $cls = 'robot_type_'.(!empty($this->robot_core) ? $this->robot_core : 'none');
+            $label = !empty($this->robot_core) ? ucfirst($this->robot_core) : 'Neutral';
+        }
+        return '<span class="robot_core '.$cls.'">'.$label.'</span>';
+    }
     public function print_description(){ return '<span class="robot_description">'.$this->robot_description.'</span>'; }
     public function print_energy(){ return '<span class="robot_stat robot_stat_energy">'.$this->robot_energy.'</span>'; }
     public function print_robot_base_energy(){ return '<span class="robot_stat robot_stat_base_energy">'.$this->robot_base_energy.'</span>'; }
