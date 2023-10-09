@@ -144,7 +144,7 @@
 
         // Collect form data for processing
         $search_data['ability_id'] = !empty($_GET['ability_id']) && is_numeric($_GET['ability_id']) ? trim($_GET['ability_id']) : '';
-        $search_data['ability_name'] = !empty($_GET['ability_name']) && preg_match('/[-_0-9a-z\.\*\s]+/i', $_GET['ability_name']) ? trim(strtolower($_GET['ability_name'])) : '';
+        $search_data['ability_name'] = !empty($_GET['ability_name']) && preg_match('/[-_0-9a-z\.\*\s\(\)\[\]]+/i', $_GET['ability_name']) ? trim(strtolower($_GET['ability_name'])) : '';
         $search_data['ability_type'] = !empty($_GET['ability_type']) && preg_match('/[-_0-9a-z]+/i', $_GET['ability_type']) ? trim(strtolower($_GET['ability_type'])) : '';
         $search_data['ability_class'] = !empty($_GET['ability_class']) && preg_match('/[-_0-9a-z]+/i', $_GET['ability_class']) ? trim(strtolower($_GET['ability_class'])) : '';
         $search_data['ability_flavour'] = !empty($_GET['ability_flavour']) && preg_match('/[-_0-9a-z\.\*\s\{\}]+/i', $_GET['ability_flavour']) ? trim($_GET['ability_flavour']) : '';
@@ -347,7 +347,7 @@
 
             $form_data['ability_id'] = !empty($_POST['ability_id']) && is_numeric($_POST['ability_id']) ? trim($_POST['ability_id']) : 0;
             $form_data['ability_token'] = !empty($_POST['ability_token']) && preg_match('/^[-_0-9a-z]+$/i', $_POST['ability_token']) ? trim(strtolower($_POST['ability_token'])) : '';
-            $form_data['ability_name'] = !empty($_POST['ability_name']) && preg_match('/^[-_0-9a-z\.\*\s]+$/i', $_POST['ability_name']) ? trim($_POST['ability_name']) : '';
+            $form_data['ability_name'] = !empty($_POST['ability_name']) && preg_match('/^[-_0-9a-z\.\*\s\(\)\[\]]+$/i', $_POST['ability_name']) ? trim($_POST['ability_name']) : '';
             $form_data['ability_class'] = $this_ability_class; //!empty($_POST['ability_class']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['ability_class']) ? trim(strtolower($_POST['ability_class'])) : '';
             $form_data['ability_type'] = !empty($_POST['ability_type']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['ability_type']) ? trim(strtolower($_POST['ability_type'])) : '';
             $form_data['ability_type2'] = !empty($_POST['ability_type2']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['ability_type2']) ? trim(strtolower($_POST['ability_type2'])) : '';
