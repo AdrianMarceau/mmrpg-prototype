@@ -429,9 +429,9 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_target_field['field_music'] = 'sega-remix/special-stage-2-mm10';
                 $temp_target_field['field_background_variant'] = $hunter_token;
                 $temp_target_robots[] = array('robot_token' => $hunter_token, 'robot_item' => 'xtreme-module', 'robot_abilities' => $hunter_abilities);
-                $temp_target_robots[] = array('robot_token' => 'shield-attacker', 'robot_item' => 'energy-capsule');
+                $temp_target_robots[] = array('robot_token' => 'mouslider', 'robot_item' => 'energy-capsule');
                 $temp_target_robots[] = array('robot_token' => 'dark-man-2', 'robot_item' => 'defense-booster');
-                $temp_target_robots[] = array('robot_token' => 'shield-attacker', 'robot_item' => 'energy-capsule');
+                $temp_target_robots[] = array('robot_token' => 'mouslider', 'robot_item' => 'energy-capsule');
             }
             elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){
                 $hunter_token = 'ballade';
@@ -456,9 +456,9 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_target_field['field_music'] = 'sega-remix/special-stage-3-mm10';
                 $temp_target_field['field_background_variant'] = $hunter_token;
                 $temp_target_robots[] = array('robot_token' => $hunter_token, 'robot_item' => 'target-module', 'robot_abilities' => $hunter_abilities);
-                $temp_target_robots[] = array('robot_token' => 'mouslider', 'robot_item' => 'energy-tank');
+                $temp_target_robots[] = array('robot_token' => 'shield-attacker', 'robot_item' => 'energy-tank');
                 $temp_target_robots[] = array('robot_token' => 'dark-man-3', 'robot_item' => 'speed-booster');
-                $temp_target_robots[] = array('robot_token' => 'mouslider', 'robot_item' => 'energy-tank');
+                $temp_target_robots[] = array('robot_token' => 'shield-attacker', 'robot_item' => 'energy-tank');
             }
             $temp_target_level = $this_prototype_data['this_chapter_levels'][2] + 1;
             $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
