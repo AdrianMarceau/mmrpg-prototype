@@ -1842,6 +1842,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
 
             if ($this_option_min_level < 1){ $this_option_min_level = 1; }
             if ($this_option_max_level > 100){ $this_option_max_level = 100; }
+            if ($this_option_min_level > $this_option_max_level){ $this_option_max_level = $this_option_min_level; }
             $this_option_level_range = $this_option_min_level == $this_option_max_level ? 'Level '.$this_option_min_level : 'Levels '.$this_option_min_level.'-'.$this_option_max_level;
 
             $this_option_zenny_amount = number_format($this_option_zenny, 0, '.', ',').' Zenny';
@@ -2433,6 +2434,10 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
             if ($num_abilities < 1){ $num_abilities = 1; } elseif ($num_abilities > 8){ $num_abilities = 8; }
             $num_abilities = 8;
             $robot_info['robot_abilities'] = mmrpg_prototype_generate_abilities($index_info, $robot_info['robot_level'], $num_abilities, $robot_info['robot_item']);
+        }
+        if ($robot_info['robot_level'] > 100){
+            if (!isset($robot_info['values'])){ $robot_info['values'] = array(); }
+            $robot_info['values']['robot_level_max'] = $robot_info['robot_level'];
         }
         $target_robots[$key] = $robot_info;
     }
