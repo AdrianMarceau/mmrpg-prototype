@@ -739,8 +739,9 @@ class rpg_game {
     // Define a function for updating a player setting for use in battle
     public static function player_setting($player_info, $setting_token, $setting_value){
         // Update or create the player setting in the session
+        $session_token = self::session_token();
         $player_token = $player_info['player_token'];
-        $_SESSION[self::session_token()]['values']['battle_settings'][$player_token][$setting_token] = $setting_value;
+        $_SESSION[$session_token]['values']['battle_settings'][$player_token][$setting_token] = $setting_value;
         // Return true on success
         return true;
     }
