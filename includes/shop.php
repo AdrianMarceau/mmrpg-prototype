@@ -602,6 +602,10 @@ if (!empty($this_shop_index['kalinka'])){
     // If the player has unlocked the Master Codes, Kalinka's Shop also has a Robot Shop and a Field Shop tab
     if (mmrpg_prototype_item_unlocked('master-codes')){
 
+        // Collect a list of all robots already unlocked
+        $unlocked_robot_tokens = rpg_game::robot_tokens_unlocked();
+        $unlocked_robot_records = rpg_game::robot_database();
+
         // Collect a list of robot masters that we're allowed to sell
         $buyable_robots = $db->get_array_list("SELECT
             robots.robot_token
@@ -650,6 +654,35 @@ if (!empty($this_shop_index['kalinka'])){
                 $this_shop_index['kalinka']['shop_robots']['robots_selling'][$token] = $price;
             }
 
+            // Finally, sort the robots again so that ones which are NOT unlocked appear first (but keep the order the same otherwise)
+            if (!empty($unlocked_robot_tokens)
+                && !empty($this_shop_index['kalinka']['shop_robots']['robots_selling'])){
+                $old_robots_selling = $this_shop_index['kalinka']['shop_robots']['robots_selling'];
+                $new_robots_selling = array();
+                foreach ($old_robots_selling AS $token => $price){
+                    $info = $mmrpg_database_robots[$token];
+                    if ($info['robot_flag_exclusive'] === 0
+                        && !in_array($token, $unlocked_robot_tokens)){
+                        $new_robots_selling[$token] = $price;
+                    }
+                }
+                foreach ($old_robots_selling AS $token => $price){
+                    $info = $mmrpg_database_robots[$token];
+                    if ($info['robot_flag_exclusive'] === 1
+                        && !in_array($token, $unlocked_robot_tokens)){
+                        $new_robots_selling[$token] = $price;
+                    }
+                }
+                foreach ($old_robots_selling AS $token => $price){
+                    $info = $mmrpg_database_robots[$token];
+                    if (!isset($new_robots_selling[$token])
+                        || in_array($token, $unlocked_robot_tokens)){
+                        $new_robots_selling[$token] = $price;
+                    }
+                }
+                $this_shop_index['kalinka']['shop_robots']['robots_selling'] = $new_robots_selling;
+            }
+
         }
 
     }
@@ -659,6 +692,10 @@ if (!empty($this_shop_index['kalinka'])){
 
         // Generate the max tier of alts to sell based on level
         $max_alt_tier_key = floor($this_shop_index['kalinka']['shop_level'] / 10);
+
+        // Collect the unlocked alts for this game file
+        $alt_list_unlocked = !empty($_SESSION[$session_token]['values']['robot_alts']) ? $_SESSION[$session_token]['values']['robot_alts'] : array();
+        //error_log('$alt_list_unlocked = '.print_r($alt_list_unlocked, true));
 
         // Create an array to hold any alts unlocked for selling
         $unlocked_alts_list = array();
@@ -695,11 +732,15 @@ if (!empty($this_shop_index['kalinka'])){
                 ;");
 
             // If alts were found, loop through and collect their details
+            $unlocked_alts_index = array();
             if (!empty($unlocked_robot_data)){
                 foreach ($unlocked_robot_data AS $key => $robot_info){
                     // Collect the alt data and decompress its fields
                     $robot_token = $robot_info['robot_token'];
                     $alt_array = json_decode($robot_info['robot_image_alts'], true);
+                    $alt_array_indexed = array();
+                    foreach ($alt_array AS $k => $alt){ $alt_array_indexed[$alt['token']] = $alt; }
+                    $unlocked_alts_index[$robot_token] = $alt_array_indexed;
                     // Loop through the alts themselves and add any with prices
                     foreach ($alt_array AS $key2 => $alt_info){
                         // Skip alts without defined prices
@@ -712,6 +753,8 @@ if (!empty($this_shop_index['kalinka'])){
                     }
                 }
             }
+
+            //error_log('<pre>$unlocked_alts_list = '.print_r($unlocked_alts_list, true).'</pre>');
 
             // If any alts groups were unlocked, loop through and extract into parent array
             if (!empty($unlocked_alts_list)){
@@ -727,15 +770,42 @@ if (!empty($this_shop_index['kalinka'])){
                 }
             }
 
-            //echo('<pre>$unlocked_robot_data = '.print_r($unlocked_robot_data, true).'</pre>');
-            //echo('<pre>$unlocked_alts_list = '.print_r($unlocked_alts_list, true).'</pre>');
-            //exit();
+            //error_log('$unlocked_robot_data = '.print_r($unlocked_robot_data, true));
+            //error_log('$unlocked_alts_list = '.print_r($unlocked_alts_list, true));
+            //error_log('$unlocked_alts_index = '.print_r($unlocked_alts_index, true));
 
             // If any alts were unlocked, add them to the parent shop array
             if (!empty($unlocked_alts_list)){
                 if (!in_array('alts', $this_shop_index['kalinka']['shop_kind_selling'])){ $this_shop_index['kalinka']['shop_kind_selling'][] = 'alts'; }
                 $this_shop_index['kalinka']['shop_quote_selling']['alts'] = 'Would you be interested in new outfits for your robots? I\'ve already designed so many great looks!';
                 $this_shop_index['kalinka']['shop_alts']['alts_selling'] = $unlocked_alts_list;
+            }
+
+            // Finally, sort the robots again so that ones which are NOT unlocked appear first (but keep the order the same otherwise)
+            if (!empty($unlocked_alts_list)
+                && !empty($this_shop_index['kalinka']['shop_alts']['alts_selling'])){
+                $old_alts_selling = $this_shop_index['kalinka']['shop_alts']['alts_selling'];
+                //error_log('$old_alts_selling = '.print_r($old_alts_selling, true));
+                $new_alts_selling = array();
+                foreach ($old_alts_selling AS $token => $price){
+                    list($robot, $alt) = explode('_', $token);
+                    $robot_info = $mmrpg_database_robots[$robot];
+                    $alt_info = $unlocked_alts_index[$robot][$alt];
+                    $unlocked = !empty($alt_list_unlocked[$robot]) && in_array($alt, $alt_list_unlocked[$robot]) ? true : false;
+                    $summons = !empty($unlocked_robot_records[$robot]['robot_summoned']) ? $unlocked_robot_records[$robot]['robot_summoned'] : 0;
+                    if (empty($alt_info['summons']) || $summons >= $alt_info['summons']){ $unlocked = true; }
+                    //error_log('$robot_info = '.print_r($robot_info, true));
+                    //error_log('$alt_info = '.print_r($alt_info, true));
+                    //error_log('$summons = '.print_r($summons, true));
+                    //error_log('$unlocked = '.($unlocked ? 'true' : 'false'));
+                    if (!$unlocked){ $new_alts_selling[$token] = $price; }
+                }
+                foreach ($old_alts_selling AS $token => $price){
+                    if (!isset($new_alts_selling[$token])){
+                        $new_alts_selling[$token] = $price;
+                    }
+                }
+                $this_shop_index['kalinka']['shop_alts']['alts_selling'] = $new_alts_selling;
             }
 
         }
