@@ -40,9 +40,11 @@ class rpg_mission_bonus extends rpg_mission {
             $robot_index_query .= "AND base_total = 400 ";
             $robot_index_query .= "AND (robot_flag_hidden = 0 OR (robot_flag_unlockable = 1 AND robot_number NOT LIKE 'RPG-%' AND robot_number NOT LIKE 'PCR-%')) ";
             $robot_index_query .= "AND robot_token NOT LIKE '%-copy' ";
+            $robot_index_query .= "AND robot_token NOT IN ('auto', 'bond-man', 'pulse-man') ";
         } elseif ($this_robot_class == 'mecha'){
             $robot_index_query .= "AND robot_class = 'mecha' ";
             $robot_index_query .= "AND base_total <= 400 ";
+            $robot_index_query .= "AND robot_token NOT IN ('rush', 'beat', 'tango', 'mariachi', 'reggae', 'treble') ";
         } elseif ($this_robot_class == 'boss'){
             $robot_index_query .= "AND robot_class = 'boss' ";
             $robot_index_query .= "AND base_total >= 400 ";
