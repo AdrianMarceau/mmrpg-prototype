@@ -453,10 +453,10 @@ class rpg_prototype {
 
         // Collect the robot's core types for display
         $robot_core_type = !empty($robot->robot_core) ? $robot->robot_core : 'none';
-        $robot_core2_type = !empty($robot->robot_core2) ? $robot->robot_core2 : '';
+        $robot_core2 = !empty($robot->robot_core2) ? $robot->robot_core2 : '';
         if (!empty($robot->robot_item) && preg_match('/-core$/', $robot->robot_item)){
             $item_core_type = preg_replace('/-core$/', '', $robot->robot_item);
-            if (empty($robot_core2_type) && $robot_core_type != $item_core_type){ $robot_core2_type = $item_core_type; }
+            if (empty($robot_core2) && $robot_core_type != $item_core_type){ $robot_core2 = $item_core_type; }
         }
         $robot_core = !empty($robot->robot_core) ? $robot->robot_core : '';
         $robot_core2 = !empty($robot->robot_core2) ? $robot->robot_core2 : '';
@@ -517,7 +517,7 @@ class rpg_prototype {
         }
 
         // Now use the new object to generate a snapshot of this switch button
-        $btn_type = 'robot_type robot_type_'.(!empty($robot->robot_core) ? $robot->robot_core : 'none').(!empty($robot->robot_core2_type) ? '_'.$robot->robot_core2_type : '');
+        $btn_type = 'robot_type robot_type_'.(!empty($robot->robot_core) ? $robot->robot_core : 'none').(!empty($robot->robot_core2) ? '_'.$robot->robot_core2 : '');
         $btn_class = 'button action_'.$action_token.' '.$action_token.'_'.$robot->robot_token.' '.$btn_type.' block_'.$block_num.' ';
         $btn_action = $action_token.'_'.$robot->robot_id.'_'.$robot->robot_token;
         $btn_info_new = $show_as_new ? ' new' : '';
