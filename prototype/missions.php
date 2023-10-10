@@ -849,7 +849,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 if ($this_prototype_player_data['player_number'] >= 2){ $final_boss_support_info['robot_item'] = $this_player_stat_token.'-capsule'; }
                 if ($this_prototype_player_data['player_number'] >= 3){ $final_boss_support_info['robot_item'] = $this_player_stat_token.'-booster'; }
                 $final_boss_support_info['robot_abilities'] = array();
-                if ($this_prototype_player_data['player_number'] >= 1){ $final_boss_support_info['robot_abilities'][] = 'space-overdrive'; }
+                if ($this_prototype_player_data['player_number'] >= 1){ $final_boss_support_info['robot_abilities'][] = 'astro-crush'; }
                 if ($this_prototype_player_data['player_number'] >= 2){ $final_boss_support_info['robot_abilities'][] = 'space-buster'; }
                 if ($this_prototype_player_data['player_number'] >= 3){ $final_boss_support_info['robot_abilities'][] = 'space-shot'; }
                 $final_boss_support_info['robot_abilities'][] = 'energy-break';
@@ -1020,8 +1020,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         $real_final_boss_info['counters']['speed_mods'] = MMRPG_SETTINGS_STATS_MOD_MAX;
                         $real_final_boss_info['robot_level'] = $temp_after_final_option['battle_level'] + 10;
                         $real_final_boss_info['robot_item'] = 'reverse-module';
-                        $real_final_boss_info['robot_abilities'] = array('space-overdrive', 'laser-overdrive', 'shield-overdrive', 'buster-charge');
-                        $temp_addon_abilties = array('freeze-overdrive', 'flame-overdrive', 'water-overdrive', 'electric-overdrive');
+                        $real_final_boss_info['robot_abilities'] = array('space-overdrive', 'laser-shot', 'shield-shot', 'buster-charge');
+                        $temp_addon_abilties = array('freeze-buster', 'flame-buster', 'water-buster', 'electric-buster');
                         if (!empty($temp_addon_abilties)){ $real_final_boss_info['robot_abilities'] = array_merge($real_final_boss_info['robot_abilities'], $temp_addon_abilties); }
                         $temp_after_final_option['battle_target_player']['player_robots'][] = $real_final_boss_info;
 
@@ -1035,7 +1035,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         $final_boss_support_info['robot_level'] = $real_final_boss_info['robot_level'] - 5;
                         $final_boss_support_info['robot_item'] = 'space-shard';
                         $final_boss_support_info['robot_abilities'] = array(
-                            'space-shot', 'space-buster', 'space-overdrive', 'buster-charge',
+                            'space-shot', 'space-buster', 'energy-assault', 'buster-charge',
                             'energy-boost', 'attack-boost', 'defense-boost', 'speed-boost'
                             );
                         for ($i = 0; $i < $final_boss_support_count; $i++){
