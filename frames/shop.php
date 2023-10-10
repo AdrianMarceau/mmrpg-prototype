@@ -369,6 +369,9 @@ thisShopData.unlockedPlayers = <?= json_encode(array_keys($_SESSION[$session_tok
 thisShopData.zennyCounter = <?= $global_zenny_counter ?>;
 thisShopData.itemPrices = <?= json_encode($global_item_prices) ?>;
 thisShopData.itemQuantities = <?= json_encode($global_item_quantities) ?>;
+<?= isset($_SESSION['GAME']['battle_settings']['last_shop_token'])
+    ? "thisShopData.lastShopToken = '{$_SESSION['GAME']['battle_settings']['last_shop_token']}';".PHP_EOL
+    : '' ?>
 
 // Define the global arrays to hold the shop console and canvas markup
 var shopCanvasMarkup = '<?= str_replace("'", "\'", $shop_canvas_markup) ?>';

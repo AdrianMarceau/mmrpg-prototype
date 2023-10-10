@@ -3,7 +3,7 @@ var thisBody = false;
 var thisPrototype = false;
 var thisWindow = false;
 var thisShop = false;
-var thisShopData = {shopTotal:0,zennyCounter:0,itemQuantities:{},itemPrices:{},allowEdit:true,unlockedPlayers:{}};
+var thisShopData = {shopTotal:0,zennyCounter:0,itemQuantities:{},itemPrices:{},allowEdit:true,unlockedPlayers:{},lastShopToken:''};
 var resizePlayerWrapper = function(){};
 $(document).ready(function(){
 
@@ -12,6 +12,8 @@ $(document).ready(function(){
     thisPrototype = $('#prototype', thisBody);
     thisWindow = $(window);
     thisShop = $('#shop', thisBody);
+
+    //console.log('thisShopData =', thisShopData);
 
     // -- SOUND EFFECT FUNCTIONALITY -- //
 
@@ -96,10 +98,14 @@ $(document).ready(function(){
     // Start playing the appropriate stage music
     //top.mmrpg_music_load('misc/data-base');
 
+    // Define a variable to hold the timeout for saving shop settings
+    var saveShopSettingTimeout;
+    var lastShopToken = thisShopData.lastShopToken.length ? thisShopData.lastShopToken.split('/') : [];
+    //console.log('lastShopToken', lastShopToken);
 
     // Create the click event for canvas sprites
     //$('.sprite[data-token]', gameCanvas).live('click', function(e){
-    $('.wrapper', gameCanvas).live('click', function(e){
+    $('.wrapper[data-shop]', gameCanvas).live('click', function(e){
         e.preventDefault();
         if (!thisShopData.allowEdit){ return false; }
         var dataParent = $(this);
@@ -116,17 +122,41 @@ $(document).ready(function(){
         $('#console .scroll_wrapper', thisShop).perfectScrollbar('update');
         dataParent.addClass('wrapper_active').css({display:'block'});
         dataSprite.addClass('sprite_shop_current');
+        var $firstTabLink = false;
         if ($(dataSelectorCurrent, gameConsole).length){
+            //console.log('dataSelectorCurrent (', dataSelectorCurrent, ') exists');
             $(dataSelectorCurrent, gameConsole).stop().animate({opacity:0},250,'swing',function(){
                 $(this).removeClass('event_visible').addClass('event_hidden').css({opacity:1});
                 $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
-                $(dataSelectorNext, gameConsole).find('.tab_link').first().triggerSilentClick();
+                if (lastShopToken.length && lastShopToken[0] === dataShop){
+                    $firstTabLink = $(dataSelectorNext, gameConsole).find('.tab_link[data-tab="'+lastShopToken[1]+'"][data-tab-type="'+lastShopToken[2]+'"]');
+                    } else {
+                    $firstTabLink = $(dataSelectorNext, gameConsole).find('.tab_link').first();
+                    }
+                $firstTabLink.triggerSilentClick();
+                //console.log('$firstTabLink', $firstTabLink);
                 });
             } else {
-                $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
-                $(dataSelectorNext, gameConsole).find('.tab_link').first().triggerSilentClick();
+            //console.log('dataSelectorCurrent (', dataSelectorCurrent, ') does NOT exist');
+            $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
+            if (lastShopToken.length && lastShopToken[0] === dataShop){
+                //console.log('shop ('+dataShop+') matches last shop ('+lastShopToken[0]+'), let\'s click the tab matching data-tab:', lastShopToken[1], ', data-tab-type:', lastShopToken[2]);
+                $firstTabLink = $(dataSelectorNext, gameConsole).find('.tab_link[data-tab="'+lastShopToken[1]+'"][data-tab-type="'+lastShopToken[2]+'"]');
+                } else {
+                //console.log('shop ('+dataShop+') does NOT match last shop ('+lastShopToken[0]+'), let\'s click the first tab');
+                $firstTabLink = $(dataSelectorNext, gameConsole).find('.tab_link').first();
+                }
+            $firstTabLink.triggerSilentClick();
+            //console.log('$firstTabLink', $firstTabLink);
             }
-
+        if (saveShopSettingTimeout){ clearTimeout(saveShopSettingTimeout); }
+        saveShopSettingTimeout = setTimeout(function(){
+            var newLastShopToken = dataShop+($firstTabLink ? '/'+$firstTabLink.attr('data-tab') : '')+($firstTabLink ? '/'+$firstTabLink.attr('data-tab-type') : '');
+            //console.log('NOT saving shop settings for '+newLastShopToken);
+            $.post('scripts/script.php',{requestType:'session',requestData:'battle_settings,last_shop_token,'+newLastShopToken});
+            lastShopToken = newLastShopToken.split('/');
+            }, 2000);
+        return true;
         });
 
     // Attach tab events to any shop tabs so that we can switch between selling/buying
@@ -136,7 +166,8 @@ $(document).ready(function(){
         var thisTab = $(this);
         var thisTabToken = thisTab.attr('data-tab');
         var thisTabType = thisTab.attr('data-tab-type');
-        //console.log('clicked .tab_link[data-tab='+thisTabToken+'][data-tab-type='+thisTabType+']');
+        var thisTabShopToken = thisTab.closest('.event[data-token]').attr('data-token');
+        //console.log('clicked [data-token='+thisTabShopToken+'] .tab_link[data-tab='+thisTabToken+'][data-tab-type='+thisTabType+']');
         var tabLinkBlock = thisTab.parent();
         var eventContainer = tabLinkBlock.parent();
         var tabContainerBlock = $('.shop_tabs_containers', eventContainer);
@@ -150,6 +181,13 @@ $(document).ready(function(){
         thisConfirmCell.empty().html('<div class="placeholder">&hellip;</div>');
         //console.log('updating perfect scrollbar 2');
         $('#console .scroll_wrapper', thisShop).perfectScrollbar('update');
+        if (saveShopSettingTimeout){ clearTimeout(saveShopSettingTimeout); }
+        saveShopSettingTimeout = setTimeout(function(){
+            var newLastShopToken = thisTabShopToken+'/'+thisTabToken+'/'+thisTabType;
+            //console.log('NOT saving shop settings for '+newLastShopToken);
+            $.post('scripts/script.php',{requestType:'session',requestData:'battle_settings,last_shop_token,'+newLastShopToken});
+            lastShopToken = newLastShopToken.split('/');
+            }, 2000);
         return true;
         });
 
@@ -627,7 +665,16 @@ $(document).ready(function(){
     $('#console .scroll_wrapper', thisShop).perfectScrollbar({suppressScrollX: true, scrollYMarginOffset: 6});
 
     // Automatically click the first shop link
-    $('#canvas #links .sprite[data-token]').first().triggerSilentClick();
+    if (lastShopToken.length){
+        var $lastShop = $('#canvas #links .sprite[data-token="'+lastShopToken[0]+'"]');
+        $lastShop.triggerSilentClick();
+        } else {
+        var $firstShop = $('#canvas #links .sprite[data-token]').first();
+        $firstShop.triggerSilentClick();
+        }
+
+
+    // Update the scrollbar to make sure it's sized correctly
     //console.log('updating perfect scrollbar 3');
     $('#console .scroll_wrapper', thisShop).perfectScrollbar('update');
 
