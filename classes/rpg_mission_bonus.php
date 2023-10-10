@@ -164,7 +164,8 @@ class rpg_mission_bonus extends rpg_mission {
             if ($this_robot_class == 'boss'){ $extra_count = 8; }
             elseif ($this_robot_class == 'master'){ $extra_count = 6; }
             elseif ($this_robot_class == 'mecha'){ $extra_count = 4; }
-            $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index, $info['robot_level'], $extra_count);
+            $index_plus_info = array_merge($index, $info);
+            $info['robot_abilities'] = mmrpg_prototype_generate_abilities($index_plus_info, $info['robot_level'], $extra_count);
             // Use a random alt image for this robot if available (not for bosses though)
             if ($this_robot_class != 'boss'
                 && !empty($index['robot_image_alts'])

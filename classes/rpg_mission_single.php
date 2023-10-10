@@ -335,7 +335,8 @@ class rpg_mission_single extends rpg_mission {
             }
 
             // Generate abilities and update the omega robot array
-            $temp_abilities = mmrpg_prototype_generate_abilities($robot_info, $omega_robot_level, $ability_count, $temp_item);
+            $robot_info_plus_data = array_merge($robot_info, $robot_data);
+            $temp_abilities = mmrpg_prototype_generate_abilities($robot_info_plus_data, $omega_robot_level, $ability_count, $temp_item);
             $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_abilities'] = $temp_abilities;
 
             // If this is a mecha with alt images, randomly assign one

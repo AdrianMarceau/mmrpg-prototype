@@ -2096,7 +2096,7 @@ function mmrpg_prototype_extract_alpha_battle(&$temp_battle_omega, $this_prototy
 
     // Collect a temporary object indexes for reference
     static $mmrpg_index_robots, $mmrpg_index_fields;
-    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(); }
+    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
     if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(); }
 
     // DEBUG DEBUG DEBUG
@@ -2217,7 +2217,8 @@ function mmrpg_prototype_extract_alpha_battle(&$temp_battle_omega, $this_prototy
         $robot_info['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $index_info['robot_id'], ($i + 1));
         $robot_info['robot_token'] = $index_info['robot_token'];
         $robot_info['robot_level'] = $omega_robot_level > 1 ? ($omega_robot_level - 1) : 1;
-        $robot_info['robot_abilities'] = mmrpg_prototype_generate_abilities($index_info, $robot_info['robot_level'], $num_mecha_abilities, '');
+        $robot_index_plus_info = array_merge($index_info, $robot_info);
+        $robot_info['robot_abilities'] = mmrpg_prototype_generate_abilities($robot_index_plus_info, $robot_info['robot_level'], $num_mecha_abilities, '');
         if (!isset($temp_mecha_counters[$mecha_token])){ $temp_mecha_counters[$mecha_token] = 0; }
         $temp_mecha_counters[$mecha_token] += 1;
         $temp_player_robots[] = $robot_info;
@@ -2430,10 +2431,12 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
         $auto_battle_robot_limit += $index_info['robot_class'] == 'mecha' ? 0.5 : ($index_info['robot_class'] == 'boss' ? 1.5 : 1.0);
         if ($robot_info['robot_abilities'] === 'auto'
             || !is_array($robot_info['robot_abilities'])){
+            unset($robot_info['robot_abilities']);
             $num_abilities = ceil($temp_battle_omega['battle_level'] / 10);
             if ($num_abilities < 1){ $num_abilities = 1; } elseif ($num_abilities > 8){ $num_abilities = 8; }
             $num_abilities = 8;
-            $robot_info['robot_abilities'] = mmrpg_prototype_generate_abilities($index_info, $robot_info['robot_level'], $num_abilities, $robot_info['robot_item']);
+            $robot_index_plus_info = array_merge($index_info, $robot_info);
+            $robot_info['robot_abilities'] = mmrpg_prototype_generate_abilities($robot_index_plus_info, $robot_info['robot_level'], $num_abilities, $robot_info['robot_item']);
         }
         if ($robot_info['robot_level'] > 100){
             if (!isset($robot_info['values'])){ $robot_info['values'] = array(); }
@@ -3699,7 +3702,7 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
         if (isset($temp_player_robots_settings[$token])){ $info = array_merge($info, $temp_player_robots_settings[$token]); }
         //error_log('$info['.$token.']: '.print_r($info, true));
         //error_log('$info['.$token.']: '.print_r(json_encode($info), true));
-        $index = rpg_robot::parse_index_info($mmrpg_index_robots[$token]);
+        $index = $mmrpg_index_robots[$token];
         $info = array_merge($index, $info);
         if (mmrpg_prototype_robot_unlocked($player_token, $token)){
             $temp_size = !empty($info['robot_image_size']) ? $info['robot_image_size'] : 40;

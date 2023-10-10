@@ -297,33 +297,33 @@ class rpg_mission_starfield extends rpg_mission {
         $temp_battle_omega['battle_turns'] = 0;
 
         // Loop through the target robots again update with omega values
-        foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key2 => $robot){
+        foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key2 => $robot_data){
 
             // Ensure this robot's token exists in the index, else continue
-            if (isset($this_robot_index[$robot['robot_token']])){ $robot = rpg_robot::parse_index_info($this_robot_index[$robot['robot_token']]); }
+            if (isset($this_robot_index[$robot_data['robot_token']])){ $robot_info = rpg_robot::parse_index_info($this_robot_index[$robot_data['robot_token']]); }
             else { continue; }
 
             // Update the robot level and battle zenny plus turns
-            $temp_robot_level = $robot['robot_class'] != 'mecha' ? $temp_omega_robot_level : mt_rand(1, ceil($temp_omega_robot_level / 3));
+            $temp_robot_level = $robot_info['robot_class'] != 'mecha' ? $temp_omega_robot_level : mt_rand(1, ceil($temp_omega_robot_level / 3));
             $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_level'] = $temp_robot_level;
-            if ($robot['robot_class'] == 'master'){
+            if ($robot_info['robot_class'] == 'master'){
                 $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * $temp_robot_level);
                 $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
-            } elseif ($robot['robot_class'] == 'mecha'){
+            } elseif ($robot_info['robot_class'] == 'mecha'){
                 $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * $temp_robot_level);
                 $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERMECHA;
             }
 
             // If this is a mecha, only allow limited extra abilities
             $ability_count = $temp_ability_count;
-            if ($robot['robot_class'] == 'mecha'){
+            if ($robot_info['robot_class'] == 'mecha'){
                 $ability_count = ceil($ability_count / 2);
                 if ($ability_count > 2){ $ability_count = 2; }
             }
 
             // Randomly assign this robot a hold item if applicable
             $temp_item = '';
-            if ($robot['robot_class'] == 'master'){
+            if ($robot_info['robot_class'] == 'master'){
                 if ($starfield_mission
                     || $temp_field_star_present){
                     $rand = mt_rand(1, 3);
@@ -338,15 +338,16 @@ class rpg_mission_starfield extends rpg_mission {
             }
 
             // Generate abilities and update the omega robot array
-            $temp_abilities = mmrpg_prototype_generate_abilities($robot, $omega_robot_level, $ability_count, $temp_item);
+            $robot_info_plus_data = array_merge($robot_info, $robot_data);
+            $temp_abilities = mmrpg_prototype_generate_abilities($robot_info_plus_data, $omega_robot_level, $ability_count, $temp_item);
             $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_abilities'] = $temp_abilities;
 
             // If this is a mecha with alt images, randomly assign one
-            if ($robot['robot_class'] == 'mecha' && !empty($robot['robot_image_alts'])){
-                $images = array($robot['robot_token']);
-                foreach ($robot['robot_image_alts'] AS $alt){
+            if ($robot_info['robot_class'] == 'mecha' && !empty($robot_info['robot_image_alts'])){
+                $images = array($robot_info['robot_token']);
+                foreach ($robot_info['robot_image_alts'] AS $alt){
                     if (count($images) > $temp_complete_count){ break; }
-                    $images[] = $robot['robot_token'].'_'.$alt['token'];
+                    $images[] = $robot_info['robot_token'].'_'.$alt['token'];
                 }
                 shuffle($images);
                 $temp_image = array_shift($images);
@@ -540,9 +541,8 @@ class rpg_mission_starfield extends rpg_mission {
         global $this_omega_factors_eleven;
 
         // Collect the robot index for calculation purposes
-        $db_robot_fields = rpg_robot::get_index_fields(true);
-        $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-        $this_field_index = rpg_field::get_index();
+        $this_robot_index = rpg_robot::get_index(true);
+        $this_field_index = rpg_field::get_index(true);
 
         // Define the omega battle option and default to empty
         $temp_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
@@ -550,8 +550,8 @@ class rpg_mission_starfield extends rpg_mission {
         $temp_battle_omega = array();
         $temp_option_battle = array();
         $temp_option_battle2 = array();
-        $temp_option_field = rpg_field::parse_index_info($this_field_index[$this_field_tokens[0]]);
-        $temp_option_field2 = rpg_field::parse_index_info($this_field_index[$this_field_tokens[1]]);
+        $temp_option_field = $this_field_index[$this_field_tokens[0]];
+        $temp_option_field2 = $this_field_index[$this_field_tokens[1]];
         $temp_option_robot = $this_robot_index[(is_array($this_robot_tokens[0]) ? $this_robot_tokens[0]['robot_token'] : $this_robot_tokens[0])];
         $temp_option_robot2 = $this_robot_index[(is_array($this_robot_tokens[1]) ? $this_robot_tokens[1]['robot_token'] : $this_robot_tokens[1])];
         $temp_battle_omega['flags']['double_battle'] = true;
@@ -695,7 +695,8 @@ class rpg_mission_starfield extends rpg_mission {
                 foreach ($this_list AS $this_factor){
                     //$debug_backup .= 'factor = '.implode(',', array_values($this_factor)).' // ';
                     if (empty($this_factor['robot'])){ continue; }
-                    $bonus_robot_info = rpg_robot::parse_index_info($this_robot_index[$this_factor['robot']]);
+                    elseif (!isset($this_robot_index[$this_factor['robot']])){ continue; }
+                    $bonus_robot_info = $this_robot_index[$this_factor['robot']];
                     if (!empty($bonus_robot_info['robot_flag_exclusive'])){ continue; }
                     if (!isset($bonus_robot_info['robot_core'])){ $bonus_robot_info['robot_core'] = ''; }
                     if ($bonus_robot_info['robot_core'] == $temp_option_field['field_type']
@@ -760,7 +761,7 @@ class rpg_mission_starfield extends rpg_mission {
                 $temp_mook_token = $temp_mook_options[array_rand($temp_mook_options)];
                 if (!isset($temp_mook_counts[$temp_mook_token])){ $temp_mook_counts[$temp_mook_token] = 0; }
                 else { $temp_mook_counts[$temp_mook_token]++; }
-                $temp_mook_info = rpg_robot::parse_index_info($this_robot_index[$temp_mook_token]);
+                $temp_mook_info = $this_robot_index[$temp_mook_token];
                 $bonus_robot_info = array('robot_token' => $temp_mook_token, 'robot_id' => 1, 'robot_level' => 1);
                 $bonus_robot_info['robot_abilities'] = $temp_mook_info['robot_abilities'];
                 $bonus_robot_info['robot_class'] = !empty($temp_mook_info['robot_class']) ? $temp_mook_info['robot_class'] : 'master';
@@ -822,33 +823,33 @@ class rpg_mission_starfield extends rpg_mission {
         $temp_battle_omega['battle_turns'] = 0;
 
         // Loop through the target robots again update with omega values
-        foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key2 => $robot){
+        foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key2 => $robot_data){
 
             // Ensure this robot's token exists in the index, else continue
-            if (isset($this_robot_index[$robot['robot_token']])){ $robot = rpg_robot::parse_index_info($this_robot_index[$robot['robot_token']]); }
+            if (isset($this_robot_index[$robot_data['robot_token']])){ $robot_info = $this_robot_index[$robot_data['robot_token']]; }
             else { continue; }
 
             // Update the robot level and battle zenny plus turns
-            $temp_robot_level = $robot['robot_class'] != 'mecha' ? $temp_omega_robot_level : mt_rand(1, ceil($temp_omega_robot_level / 3));
+            $temp_robot_level = $robot_info['robot_class'] != 'mecha' ? $temp_omega_robot_level : mt_rand(1, ceil($temp_omega_robot_level / 3));
             $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_level'] = $temp_robot_level;
-            if ($robot['robot_class'] == 'master'){
+            if ($robot_info['robot_class'] == 'master'){
                 $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * $temp_robot_level);
                 $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERROBOT;
-            } elseif ($robot['robot_class'] == 'mecha'){
+            } elseif ($robot_info['robot_class'] == 'mecha'){
                 $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * $temp_robot_level);
                 $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERMECHA;
             }
 
             // If this is a mecha, only allow limited extra abilities
             $ability_count = $temp_ability_count;
-            if ($robot['robot_class'] == 'mecha'){
+            if ($robot_info['robot_class'] == 'mecha'){
                 $ability_count = ceil($ability_count / 2);
                 if ($ability_count > 4){ $ability_count = 4; }
             }
 
             // Randomly assign this robot a hold item if applicable
             $temp_item = '';
-            if ($robot['robot_class'] == 'master'){
+            if ($robot_info['robot_class'] == 'master'){
                 if ($starfield_mission
                     || $temp_fusion_star_present){
                     $rand = mt_rand(1, 3);
@@ -857,12 +858,12 @@ class rpg_mission_starfield extends rpg_mission {
                         $items = array('pellet', 'capsule');
                         $temp_item = $stats[mt_rand(0, (count($stats) - 1))].'-'.$items[mt_rand(0, (count($items) - 1))];
                     } elseif ($rand == 2){
-                        if ($robot['robot_core'] != $temp_option_field['field_type']){ $temp_item = $temp_option_field['field_type'].'-core'; }
+                        if ($robot_info['robot_core'] != $temp_option_field['field_type']){ $temp_item = $temp_option_field['field_type'].'-core'; }
                         else { $temp_item = $temp_option_field2['field_type'].'-core'; }
                         $ability_count += 1;
                     }
                 } else {
-                    if ($robot['robot_core'] != $temp_option_field['field_type']){ $temp_item = $temp_option_field['field_type'].'-core'; }
+                    if ($robot_info['robot_core'] != $temp_option_field['field_type']){ $temp_item = $temp_option_field['field_type'].'-core'; }
                     else { $temp_item = $temp_option_field2['field_type'].'-core'; }
                     $ability_count += 1;
                 }
@@ -870,15 +871,16 @@ class rpg_mission_starfield extends rpg_mission {
             }
 
             // Generate abilities and update the omega robot array
-            $temp_abilities = mmrpg_prototype_generate_abilities($robot, $omega_robot_level, $ability_count, $temp_item);
+            $robot_info_plus_data = array_merge($robot_info, $robot_data);
+            $temp_abilities = mmrpg_prototype_generate_abilities($robot_info_plus_data, $omega_robot_level, $ability_count, $temp_item);
             $temp_battle_omega['battle_target_player']['player_robots'][$key2]['robot_abilities'] = $temp_abilities;
 
             // If this is a mecha with alt images, randomly assign one
-            if ($robot['robot_class'] == 'mecha' && !empty($robot['robot_image_alts'])){
-                $images = array($robot['robot_token']);
-                foreach ($robot['robot_image_alts'] AS $alt){
+            if ($robot_info['robot_class'] == 'mecha' && !empty($robot_info['robot_image_alts'])){
+                $images = array($robot_info['robot_token']);
+                foreach ($robot_info['robot_image_alts'] AS $alt){
                     if (count($images) > $temp_complete_count){ break; }
-                    $images[] = $robot['robot_token'].'_'.$alt['token'];
+                    $images[] = $robot_info['robot_token'].'_'.$alt['token'];
                 }
                 shuffle($images);
                 $temp_image = array_shift($images);
@@ -903,7 +905,7 @@ class rpg_mission_starfield extends rpg_mission {
         $temp_battle_omega['battle_rewards']['robots'] = array();
         if ($this_unlock_robots){
             foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot_info){
-                $index_info = rpg_robot::parse_index_info($this_robot_index[$robot_info['robot_token']]);
+                $index_info = $this_robot_index[$robot_info['robot_token']];
                 if ($index_info['robot_class'] == 'master'
                     && $index_info['robot_flag_unlockable']
                     && !$index_info['robot_flag_exclusive']
