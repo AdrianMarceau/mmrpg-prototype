@@ -2636,47 +2636,61 @@ function mmrpg_prototype_get_stardroid_encounter_data(&$this_prototype_data, &$t
         $random_encounter_added = true;
         $temp_battle_level = 150;
         $temp_battle_boss = $selected_stardroid_token;
+        $temp_battle_boss_item = 'field-booster';
         $temp_battle_boss_abilities = array();
         $temp_battle_mecha = 'ring-ring';
         $temp_battle_mecha_abilities = array('field-support', 'energy-boost', 'defense-break', 'speed-break');
         $temp_battle_hazards = array();
+        $temp_battle_multipliers = array(
+            'experience' => (1 + count($stardroid_robots_defeated)),
+            $selected_stardroid_info['robot_core'] => 1.6,
+            $selected_stardroid_info['robot_core2'] => 1.4,
+            'space' => 1.2
+            );
         $temp_battle_token = $temp_battle_omega['battle_token'].'-stardroid-encounter';
         $temp_battle_name = 'Challenger from the Stars!';
         $temp_battle_description = 'An intergalactic challenger has appeared! Can you defeat them in battle?';
+
         if ($temp_battle_boss === 'sunstar'){
             $temp_battle_level = 200;
+            $temp_battle_boss_item = 'xtreme-module';
             $temp_battle_boss_abilities = array(
                 'astro-crush', 'barrier-drive', 'shield-eater', 'core-laser',
                 'atomic-crasher', 'flame-buster', 'time-buster', 'star-crash'
                 );
-            $temp_battle_boss_abilities = 'auto';
             $temp_battle_mecha = 'novamite';
             $temp_battle_mecha_abilities = array('field-support', 'energy-support', 'defense-assault', 'speed-assault');
-            $temp_battle_hazards['black_holes'] = 'both-active';
-            $temp_battle_hazards['super_blocks'] = 'right-bench';
             $temp_battle_token = str_replace('stardroid', 'stardroid-superboss', $temp_battle_token);
             $temp_battle_name = 'Ultimate Challenger from the Stars!';
             $temp_battle_description = 'The ultimate intergalactic challenger has appeared! Can you defeat them in battle?';
+            $temp_battle_multipliers[$selected_stardroid_info['robot_core']] += 0.2;
+            $temp_battle_multipliers[$selected_stardroid_info['robot_core2']] += 0.2;
+            $temp_battle_multipliers['space'] += 0.2;
+            $temp_battle_hazards['black_holes'] = 'both-active';
+            $temp_battle_hazards['super_blocks'] = 'right-bench';
         }
+
         $temp_battle_field = $temp_battle_omega['battle_field_base'];
-        //$temp_battle_field = in_array($field_type_1, $selected_stardroid_triggers) ? $field_info : $field_info2;
-        //unset($temp_battle_field['field_description'], $temp_battle_field['field_description2']);
         $temp_battle_field = array_merge($temp_battle_field, array(
             'field_name' => 'Star Field '.$selected_stardroid_info['robot_name'],
             'field_foreground' => 'final-destination-3',
             'field_background' => 'final-destination-3',
             'field_mechas' => array($temp_battle_mecha),
             'field_music' => 'sega-remix/wily-machine-8-mm8',
+            'field_type' => 'space',
+            'field_multipliers' => $temp_battle_multipliers,
             'values' => array('hazards' => $temp_battle_hazards),
             ));
+
         $temp_battle_player = array(
             'player_token' => 'player',
             'player_starforce' => $this_prototype_data['max_starforce']
             );
+
         $temp_battle_robots = array();
         $temp_battle_robots[] = array(
             'robot_token' => $temp_battle_boss,
-            'robot_item' => 'field-booster',
+            'robot_item' => $temp_battle_boss_item,
             'robot_abilities' => $temp_battle_boss_abilities,
             'flags' => array(
                 'skip_neutral_abilities_on_generate' => true,
@@ -2749,7 +2763,7 @@ function mmrpg_prototype_append_stardroid_encounter_data(&$this_prototype_data, 
         $random_encounter_added = true;
         rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
         mmrpg_prototype_mission_autoplay_append($temp_battle_omega, $temp_battle_sigma, $this_prototype_data, true);
-        $this_prototype_data['battle_options'][] = $temp_battle_sigma;
+        //$this_prototype_data['battle_options'][] = $temp_battle_sigma;
     }
 
     // Return whether or not a random encounter was added
