@@ -1865,6 +1865,21 @@ class rpg_robot extends rpg_object {
             else { $weights[] = 0;  }
         }
 
+        // If the user has any of the element overdrives loop through and check 'em
+        // (decreased frequency if not taken significant damage yet)
+        $existin_robot_ability_tokens = $this_robot->robot_abilities;
+        foreach ($existin_robot_ability_tokens AS $key => $ability){
+            if (strstr($ability, '-overdrive')
+                && $this_robot->has_ability($ability)){
+                $options[] = $ability;
+                if ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 3)){ $weights[] = 0;  }
+                elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 4)){ $weights[] = 8;  }
+                elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 3)){ $weights[] = 6;  }
+                elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy / 2)){ $weights[] = 4;  }
+                else { $weights[] = 0;  }
+            }
+        }
+
         // Check to see if this robot has any damage-resistant cores or attachments
         $this_core_shields = array();
         $this_other_attachments = array();
