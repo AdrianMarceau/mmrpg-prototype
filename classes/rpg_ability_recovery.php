@@ -1118,6 +1118,11 @@ class rpg_ability_recovery extends rpg_recovery {
 
             // Add the final recovery text showing the amount based on life energy recovery
             if ($this_ability->recovery_options['recovery_kind'] == 'energy'){
+                // If the recovering robot is in the "damage" frame (like due to weakness/affinity), update to a better alternative
+                if ($this_ability->recovery_options['recovery_frame'] === 'damage'){
+                    $this_ability->recovery_options['recovery_frame'] = 'taunt';
+                    $this_robot->robot_frame = $this_ability->recovery_options['recovery_frame'];
+                }
                 $this_ability->ability_results['this_text'] .= "{$this_robot->print_name()} recovers {$this_ability->ability_results['print_amount']} life energy";
                 //$this_ability->ability_results['this_text'] .= ($this_ability->ability_results['this_overkill'] > 0 ? " and {$this_ability->ability_results['print_overkill']} overkill" : '');
                 $this_ability->ability_results['this_text'] .= '!<br />';
@@ -1322,6 +1327,7 @@ class rpg_ability_recovery extends rpg_recovery {
                                     if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
                                     if (isset($attachment_info['ability_token'])){ $temp_attachment = rpg_game::get_ability($this_robot->battle, $this_robot->player, $this_robot, array('ability_token' => $attachment_info['ability_token'])); }
                                     elseif (isset($attachment_info['item_token'])){ $temp_attachment = rpg_game::get_item($this_robot->battle, $this_robot->player, $this_robot, array('item_token' => $attachment_info['item_token'])); }
+                                    elseif (isset($attachment_info['skill_token'])){ $temp_attachment = rpg_game::get_skill($this_robot->battle, $this_robot->player, $this_robot, array('skill_token' => $attachment_info['skill_token'])); }
                                     else { continue; }
                                     $temp_trigger_type = !empty($attachment_destroy_info['trigger']) ? $attachment_destroy_info['trigger'] : 'damage';
                                     //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');
