@@ -805,6 +805,12 @@ elseif ($request_kind === 'challenge'){
                     $hazard_sprites_required[] = 'left-bench';
                     $hazard_sprites_required[] = 'right-active';
                     $hazard_sprites_required[] = 'right-bench';
+                } elseif ($hazard_position === 'both-active'){
+                    $hazard_sprites_required[] = 'left-active';
+                    $hazard_sprites_required[] = 'right-active';
+                } elseif ($hazard_position === 'both-bench'){
+                    $hazard_sprites_required[] = 'left-bench';
+                    $hazard_sprites_required[] = 'right-bench';
                 } else {
                     $hazard_sprites_required[] = $hazard_position;
                 }

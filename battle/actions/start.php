@@ -21,8 +21,11 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
         if (!method_exists('rpg_ability', $method_name)){ continue; }
         foreach ($player_sides AS $player_side){
             if ($hazard_value != 'both' // not [both]
+                && $hazard_value != 'both-active' // not [both-active]
+                && $hazard_value != 'both-bench' // not [both-bench]
                 && $hazard_value != $player_side // not [left/right]
-                && $hazard_value != $player_side.'-active' && $hazard_value != $player_side.'-bench' // not [left/right]-[active/bench]
+                && $hazard_value != $player_side.'-active' // not [left/right]-[active]
+                && $hazard_value != $player_side.'-bench' // not [left/right]-[bench]
                 ){ continue; } // doesn't match any criteria, so skip this player side
             $bench_size = $player_bench_sizes[$player_side];
             $hazards_added = 0;
@@ -31,7 +34,9 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
             for ($key = -1; $key < $max_bench_size; $key++){
                 if ($key == 0){ continue; }
                 elseif ($key == -1 && $hazard_value == ($player_side.'-bench')){ continue; } // skip if active but bench-only
-                elseif ($key != -1 && $hazard_value == ($player_side.'-active')){ continue; } // skip of bench but active-only
+                elseif ($key != -1 && $hazard_value == ($player_side.'-active')){ continue; } // skip of bench but active-only    // Add this check for both-active and both-bench
+                if ($hazard_value == 'both-active' && $key != -1) { continue; }  // skip bench
+                if ($hazard_value == 'both-bench' && $key == -1) { continue; }  // skip active
                 if ($hazards_added >= $hazards_to_add){ break; }
                 if ($key == -1){  $static_key = $player_side.'-active';  }
                 else { $static_key = $player_side.'-bench-'.$key; }

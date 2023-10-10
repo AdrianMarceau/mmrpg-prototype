@@ -1052,6 +1052,8 @@
                                             ?>
                                                 <option value=""<?= empty($challenge_field_hazards[$hazard_token]) ? ' selected="selected"' : '' ?>>-</option>
                                                 <option value="both"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'both' ? ' selected="selected"' : '' ?>>Both Sides</option>
+                                                <option value="both-active"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'both-active' ? ' selected="selected"' : '' ?>>Both Sides (Active)</option>
+                                                <option value="both-bench"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'both-bench' ? ' selected="selected"' : '' ?>>Both Sides (Bench)</option>
                                                 <option value="left"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'left' ? ' selected="selected"' : '' ?>>Player Side (Left)</option>
                                                 <option value="left-active"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'left-active' ? ' selected="selected"' : '' ?>>Player Side (Left / Active Only)</option>
                                                 <option value="left-bench"<?= !empty($challenge_field_hazards[$hazard_token]) && $challenge_field_hazards[$hazard_token] == 'left-bench' ? ' selected="selected"' : '' ?>>Player Side (Left / Bench Only)</option>
