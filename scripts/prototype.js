@@ -18,6 +18,7 @@ gameSettings.startLink = 'home';
 gameSettings.skipPlayerSelect = false;
 gameSettings.menuFramesSeen = [];
 gameSettings.readyRoomUnlocked = false;
+gameSettings.readyRoomActive = false;
 var battleOptions = {};
 
 // Define the perfect scrollbar settings
@@ -31,6 +32,7 @@ $(document).ready(function(){
     thisPrototype = $('#prototype', thisBody);
     thisFalloff = $('#falloff', thisBody);
     thisWindow = $(window);
+    thisReadyRoom = typeof window.mmrpgReadyRoom !== 'undefined' ? window.mmrpgReadyRoom : false;
 
     // If we're not in an iframe, adjust background
     if (window.top == window.self){
@@ -547,18 +549,19 @@ $(document).ready(function(){
             var $thisBanner = $('.banner', $thisPrototype);
             var playersIndex = typeof gameSettings.customIndex.unlockedPlayersIndex !== 'undefined' ? gameSettings.customIndex.unlockedPlayersIndex : {};
             var robotsIndex = typeof gameSettings.customIndex.unlockedRobotsIndex !== 'undefined' ? gameSettings.customIndex.unlockedRobotsIndex : {};
-            mmrpgReadyRoom.preloadCharacterIndex('player', playersIndex);
-            mmrpgReadyRoom.preloadCharacterIndex('robot', robotsIndex);
-            mmrpgReadyRoom.init($thisBanner, function(){
+            thisReadyRoom.preloadCharacterIndex('player', playersIndex);
+            thisReadyRoom.preloadCharacterIndex('robot', robotsIndex);
+            thisReadyRoom.init($thisBanner, function(){
 
                 // Filter to only the current player if one has been set
                 if (typeof battleOptions['this_player_token'] !== 'undefined'
                     && battleOptions['this_player_token'].length){
-                    mmrpgReadyRoom.refresh(battleOptions['this_player_token']);
+                    thisReadyRoom.refresh(battleOptions['this_player_token']);
                     }
 
                 // Start the actual ready room animation when it's appropriate to do so
-                mmrpgReadyRoom.startAnimation();
+                thisReadyRoom.startAnimation();
+                gameSettings.readyRoomActive = true;
 
                 });
             }
@@ -605,15 +608,15 @@ function mmrpg_trigger_reset(fullReset){
     var confirmText = 'Are you sure you want to reset your entire game?\nAll progress will be lost and cannot be restored including any and all unlocked missions, robots, and abilities. Continue?';
     var confirmText2 = 'Let me repeat that one more time.\nIf you reset your game ALL unlocks and progress with be lost. \nEverything. \nReset anyway?';
     // Attempt to confirm with the user of they want to reset
-    mmrpgReadyRoom.updateRobot('all', {frame: 'damage'}); // damage
-    mmrpgReadyRoom.stopAnimation();
+    thisReadyRoom.updateRobot('all', {frame: 'damage'}); // damage
+    thisReadyRoom.stopAnimation();
     if (confirm(confirmText) && confirm(confirmText2)){
         // Redirect the user to the prototype reset page
         var postURL = 'prototype.php?action=reset';
         if (fullReset){ postURL += '&full_reset=true'; }
         $.post(postURL, function(){
             //alert('reset complete!');
-            mmrpgReadyRoom.updateRobot('all', {frame: 'defeat'}); // defeat
+            thisReadyRoom.updateRobot('all', {frame: 'defeat'}); // defeat
             if (window.self != window.parent){
                 window.location = 'prototype.php';
                 } else {
@@ -623,7 +626,7 @@ function mmrpg_trigger_reset(fullReset){
         return true;
         } else {
         // Return false
-        mmrpgReadyRoom.startAnimation();
+        thisReadyRoom.startAnimation();
         return false;
         }
 }
@@ -722,7 +725,7 @@ function prototype_menu_loaded(){
                 else if (gameSettings.nextStepName === 'database'){ newRobotFrame = 'base2'; } // base2
                 else if (parseInt(gameSettings.nextStepName) > 0){ newRobotFrame = 'victory'; } // victory
                 else { newRobotFrame = 'defend'; } // defend
-                mmrpgReadyRoom.updateRobot('most', {frame: newRobotFrame});
+                thisReadyRoom.updateRobot('most', {frame: newRobotFrame});
                 }
             gameSettings.nextStepName = false;
             gameSettings.nextSlideDirection = false;
@@ -1475,11 +1478,13 @@ function prototype_menu_switch(switchOptions){
     //console.log('dataStepName =>', typeof switchOptions.stepName, switchOptions.stepName, '=>', typeof dataStepName, dataStepName);
     //console.log('dataStepNumber =>', typeof switchOptions.stepNumber, switchOptions.stepNumber, '=>', typeof dataStepNumber, dataStepNumber);
     // If we're on the mission select screen, let's shrink the spriteBounds a bit for the ready room, else revert to default
-    if (dataStepName === 'home'
-        && dataStepNumber === 2){
-        mmrpgReadyRoom.updateSpriteBounds({minX: 20, maxX: 80});
-        } else {
-        mmrpgReadyRoom.resetSpriteBounds();
+    if (thisReadyRoom){
+        if (dataStepName === 'home'
+            && dataStepNumber === 2){
+            thisReadyRoom.updateSpriteBounds({minX: 20, maxX: 80});
+            } else {
+            thisReadyRoom.resetSpriteBounds();
+            }
         }
 
 
@@ -1585,22 +1590,22 @@ function prototype_menu_switch(switchOptions){
             if (currentMenuSelect === 'this_battle_token'
                 && typeof battleOptions['this_player_token'] !== 'undefined'
                 && battleOptions['this_player_token'].length){
-                mmrpgReadyRoom.show();
-                var spriteBounds = mmrpgReadyRoom.config.spriteBounds;
+                thisReadyRoom.show();
+                var spriteBounds = thisReadyRoom.config.spriteBounds;
                 if (loadState === 'reload'){
                     // If not already filtered, animate the player's robots sliding into place
-                    if (!mmrpgReadyRoom.config.isFiltered){
-                        mmrpgReadyRoom.updatePlayer(function(token, info){ return info.player !== filterPlayer && info.currentPlayer !== filterPlayer; }, {frame: 'running', direction: 'left', position: ['-=4', null], opacity: 0});
-                        mmrpgReadyRoom.updatePlayer(filterPlayer, {frame: 'running', direction: 'right', position: [(spriteBounds.maxX / 2), (spriteBounds.minY - 1)], opacity: 1});
-                        mmrpgReadyRoom.updateRobot(filterOtherPlayersFunction, {frame: 'slide', direction: 'left', position: ['-=2', null], opacity: 0});
-                        mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'slide', direction: 'right', position: ['+=1', '>=20'], opacity: 1});
+                    if (!thisReadyRoom.config.isFiltered){
+                        thisReadyRoom.updatePlayer(function(token, info){ return info.player !== filterPlayer && info.currentPlayer !== filterPlayer; }, {frame: 'running', direction: 'left', position: ['-=4', null], opacity: 0});
+                        thisReadyRoom.updatePlayer(filterPlayer, {frame: 'running', direction: 'right', position: [(spriteBounds.maxX / 2), (spriteBounds.minY - 1)], opacity: 1});
+                        thisReadyRoom.updateRobot(filterOtherPlayersFunction, {frame: 'slide', direction: 'left', position: ['-=2', null], opacity: 0});
+                        thisReadyRoom.updateRobot(filterPlayerFunction, {frame: 'slide', direction: 'right', position: ['+=1', '>=20'], opacity: 1});
                         var updateTimeout = setTimeout(function(){
-                            mmrpgReadyRoom.updatePlayer(filterPlayer, {frame: 'base'});
-                            mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'base'});
+                            thisReadyRoom.updatePlayer(filterPlayer, {frame: 'base'});
+                            thisReadyRoom.updateRobot(filterPlayerFunction, {frame: 'base'});
                             clearTimeout(updateTimeout);
                             updateTimeout = setTimeout(function(){
-                                mmrpgReadyRoom.updateRobot('some', {direction: 'left'});
-                                mmrpgReadyRoom.updateRobot('most', {frame: 'taunt'});
+                                thisReadyRoom.updateRobot('some', {direction: 'left'});
+                                thisReadyRoom.updateRobot('most', {frame: 'taunt'});
                                 clearTimeout(updateTimeout);
                                 }, 900);
                             }, 1200);
@@ -1608,37 +1613,37 @@ function prototype_menu_switch(switchOptions){
                         }
                     // Otherwise if already filtered that means they changed their mind about a mission
                     else {
-                        mmrpgReadyRoom.updatePlayer(filterPlayer, {direction: 'left', frame: 'damage', position: ['-=1', null]});
-                        mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'damage', position: ['-=1', null]});
+                        thisReadyRoom.updatePlayer(filterPlayer, {direction: 'left', frame: 'damage', position: ['-=1', null]});
+                        thisReadyRoom.updateRobot(filterPlayerFunction, {frame: 'damage', position: ['-=1', null]});
                         var updateTimeout = setTimeout(function(){
-                            mmrpgReadyRoom.updateRobot(filterPlayerFunction, {frame: 'base'});
+                            thisReadyRoom.updateRobot(filterPlayerFunction, {frame: 'base'});
                             clearTimeout(updateTimeout);
                             updateTimeout = setTimeout(function(){
-                                mmrpgReadyRoom.updateRobot('some', {frame: 'slide', direction: 'left', position: ['<=60', null]});
+                                thisReadyRoom.updateRobot('some', {frame: 'slide', direction: 'left', position: ['<=60', null]});
                                 clearTimeout(updateTimeout);
                                 }, 1200);
                             }, 1200);
                         }
                     }
                 else if (loadState === 'fadein'){
-                    mmrpgReadyRoom.refresh(battleOptions['this_player_token']);
+                    thisReadyRoom.refresh(battleOptions['this_player_token']);
                     }
                 }
             else if (currentMenuSelect === 'this_player_token'){
                 if (loadState === 'fadein'){
-                    mmrpgReadyRoom.refresh();
+                    thisReadyRoom.refresh();
                     }
                 }
             else if (currentMenuSelect === 'this_player_robots'){
 
                 if (loadState === 'reload'){
-                    mmrpgReadyRoom.updatePlayer(filterPlayer, {direction: 'right', frame: 'command'});
+                    thisReadyRoom.updatePlayer(filterPlayer, {direction: 'right', frame: 'command'});
                     }
                 else if (loadState === 'fadein'){
-                    mmrpgReadyRoom.updatePlayer(filterPlayer, {direction: 'right', frame: 'running', position: ['+=10', null]});
-                    mmrpgReadyRoom.updateRobot(filterPlayerFunction, {direction: 'right', frame: 'slide', position: ['+=12', null]});
+                    thisReadyRoom.updatePlayer(filterPlayer, {direction: 'right', frame: 'running', position: ['+=10', null]});
+                    thisReadyRoom.updateRobot(filterPlayerFunction, {direction: 'right', frame: 'slide', position: ['+=12', null]});
                     var updateTimeout = setTimeout(function(){
-                        mmrpgReadyRoom.hide();
+                        thisReadyRoom.hide();
                         clearTimeout(updateTimeout);
                         }, 100);
 
@@ -1646,7 +1651,7 @@ function prototype_menu_switch(switchOptions){
 
                 }
             else if (typeof currentMenuSelect === 'undefined'){
-                mmrpgReadyRoom.refresh();
+                thisReadyRoom.refresh();
                 }
             };
 
@@ -1654,7 +1659,7 @@ function prototype_menu_switch(switchOptions){
         var tempReloadFunction = function(tempCallbackFunction){
             //console.log('tempReloadFunction(tempCallbackFunction:', typeof tempCallbackFunction, ')');
             if (tempCallbackFunction == undefined){ tempCallbackFunction = function(){}; }
-            tempReadyRoomFunction('reload');
+            if (thisReadyRoom){ tempReadyRoomFunction('reload'); }
 
             // DEBUG
             //console.log('tempReloadFunction triggered, switchOptions:');
@@ -1815,7 +1820,7 @@ function prototype_menu_switch(switchOptions){
         var tempFadeinFunction = function(tempCallbackFunction){
             //console.log('tempReloadFunction(tempCallbackFunction:', typeof tempCallbackFunction, ')');
             if (tempCallbackFunction == undefined){ tempCallbackFunction = function(){}; }
-            tempReadyRoomFunction('fadein');
+            if (thisReadyRoom){ tempReadyRoomFunction('fadein'); }
 
             // DEBUG
             //console.log('tempFadeinFunction triggered');
