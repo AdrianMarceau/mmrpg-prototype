@@ -78,11 +78,20 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
     // Ensure we always have at least one ability
     if ($ability_num < 1){ $ability_num = 1; }
 
+    // Check to see if this robot has any ability generation flags
+    $flags = !empty($robot_info['flags']) ? $robot_info['flags'] : array();
+    $skip_neutral_abilities = in_array('skip_neutral_abilities_on_generate', $flags) ? true : false;
+    $skip_boost_abilities = in_array('skip_boost_abilities_on_generate', $flags) ? true : false;
+    $skip_break_abilities = in_array('skip_break_abilities_on_generate', $flags) ? true : false;
+    $skip_swap_abilities = in_array('skip_swap_abilities_on_generate', $flags) ? true : false;
+    $skip_mode_abilities = in_array('skip_mode_abilities_on_generate', $flags) ? true : false;
+
     // Define the array for holding all of this robot's abilities
     $this_robot_abilities = array();
 
     // Loop through this robot's level-up abilities looking for one
     $robot_index_info = $robot_info;
+    if (!is_array($robot_index_info['robot_abilities'])){ $robot_index_info['robot_abilities'] = array(); }
     if (!empty($robot_index_info['robot_rewards']['abilities'])){
         foreach ($robot_index_info['robot_rewards']['abilities'] AS $info){
             // If this is the buster shot or too high of a level, continue
@@ -145,6 +154,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 foreach ($group_abilities AS $ability_key => $ability_token){
                     if (in_array($ability_token, $this_robot_abilities)){ continue; }
                     $ability_info = $this_ability_index[$ability_token];
+                    if ($skip_neutral_abilities && empty($ability_info['ability_type'])){ continue; }
                     $is_compatible = false;
                     if (!$is_compatible && in_array($ability_token, $robot_index_info['robot_abilities'])){
                         $is_compatible = true;
@@ -184,6 +194,10 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                     if (!empty($this_robot_abilities) && floor($robot_level / 10) < ($group_key + 1)){ continue; }
                     foreach ($group_abilities AS $ability_key => $ability_token){
                         if (in_array($ability_token, $this_robot_abilities)){ continue; }
+                        if ($skip_boost_abilities && preg_match('/-boost$/i', $ability_token)){ continue; }
+                        if ($skip_break_abilities && preg_match('/-break$/i', $ability_token)){ continue; }
+                        if ($skip_swap_abilities && preg_match('/-swap$/i', $ability_token)){ continue; }
+                        if ($skip_mode_abilities && preg_match('/-mode$/i', $ability_token)){ continue; }
                         $ability_info = $this_ability_index[$ability_token];
                         $is_compatible = false;
                         if (!$is_compatible
@@ -222,6 +236,10 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                     if (!empty($this_robot_abilities) && floor($robot_level / 20) < ($group_key + 1)){ continue; }
                     foreach ($group_abilities AS $ability_key => $ability_token){
                         if (in_array($ability_token, $this_robot_abilities)){ continue; }
+                        if ($skip_boost_abilities && preg_match('/-boost$/i', $ability_token)){ continue; }
+                        if ($skip_break_abilities && preg_match('/-break$/i', $ability_token)){ continue; }
+                        if ($skip_swap_abilities && preg_match('/-swap$/i', $ability_token)){ continue; }
+                        if ($skip_mode_abilities && preg_match('/-mode$/i', $ability_token)){ continue; }
                         $ability_info = $this_ability_index[$ability_token];
                         $is_compatible = false;
                         if (!$is_compatible && (in_array($ability_token, $robot_index_info['robot_abilities']) || in_array($ability_token, $temp_global_abilities))){
