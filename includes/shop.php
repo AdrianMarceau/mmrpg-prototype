@@ -425,171 +425,171 @@ if (!empty($this_shop_index['auto'])){
 $core_level_index = array();
 if (!empty($this_shop_index['reggae'])){
 
-        // Collect a list of all abilities already unlocked
-        $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
+    // Collect a list of all abilities already unlocked
+    $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
 
-        // Collect the list of abilities Reggae is selling based on his level
-        $unlocked_abilities = $db->get_array_list("SELECT
-            abilities.ability_token
+    // Collect the list of abilities Reggae is selling based on his level
+    $unlocked_abilities = $db->get_array_list("SELECT
+        abilities.ability_token
+        FROM mmrpg_index_abilities AS abilities
+        LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
+        LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_class = 'master' AND groups.group_token = tokens.group_token
+        WHERE
+        abilities.ability_flag_published = 1
+        AND abilities.ability_flag_complete = 1
+        AND abilities.ability_flag_unlockable = 1
+        AND abilities.ability_shop_tab = 'reggae/abilities'
+        AND abilities.ability_shop_level <= {$this_shop_index['reggae']['shop_level']}
+        AND abilities.ability_price > 0
+        ORDER BY
+        groups.group_order ASC,
+        tokens.token_order ASC,
+        abilities.ability_token ASC
+        ;", 'ability_token');
+
+    // Update the actual shop index with our finalized abilities we're selling
+    $reggae_abilities_selling = array_keys($unlocked_abilities);
+    $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = call_user_func_array('get_abilities_with_prices', $reggae_abilities_selling);
+
+    // Finally, sort the abilities again so that ones which are NOT unlocked appear first (but keep the order the same otherwise)
+    if (!empty($unlocked_ability_tokens)
+        && !empty($this_shop_index['reggae']['shop_weapons']['abilities_selling'])){
+        $old_abilities_selling = $this_shop_index['reggae']['shop_weapons']['abilities_selling'];
+        $new_abilities_selling = array();
+        foreach ($old_abilities_selling AS $token => $price){ if (!in_array($token, $unlocked_ability_tokens)){ $new_abilities_selling[$token] = $price; } }
+        foreach ($old_abilities_selling AS $token => $price){ if (in_array($token, $unlocked_ability_tokens)){ $new_abilities_selling[$token] = $price; } }
+        $this_shop_index['reggae']['shop_weapons']['abilities_selling'] = $new_abilities_selling;
+    }
+
+    // If the player has unlocked the Weapon Codes, Reggae's Shop also sells weapons
+    if (mmrpg_prototype_item_unlocked('weapon-codes')){
+
+        // Add the Weapons Shop token to the selling array if not there already
+        if (!in_array('parts', $this_shop_index['reggae']['shop_kind_selling'])){ $this_shop_index['reggae']['shop_kind_selling'][] = 'weapons'; }
+        $this_shop_index['reggae']['shop_quote_selling']['weapons'] = 'Reggae use cores make new weapons! Squaaak! Heroes use weapons defeat bad guys! Squaaak!';
+
+        // Define the weapon selling array and start it empty
+        $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = array();
+
+        // Preset the level of all core types to zero before continuing
+        $mmrpg_index_types = rpg_type::get_index(false, false, false, true);
+        foreach ($mmrpg_index_types AS $type_token => $type_info){ $core_level_index[$type_token] = 0; }
+
+        // If the player has sold any cores, loop through them and add associated abilities
+        $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 101 : 0;
+        if (!empty($this_battle_shops['reggae']['cores_bought'])){
+            foreach ($this_battle_shops['reggae']['cores_bought'] AS $item_token => $item_quantity){
+                if (preg_match('/^item-core-/i', $item_token)){ $type_token = preg_replace('/^item-core-/i', '', $item_token); }
+                else { $type_token = preg_replace('/-core$/i', '', $item_token); }
+                $type_info = $mmrpg_database_types[$type_token];
+                if (!isset($core_level_index[$type_token])){ $core_level_index[$type_token] = 0; }
+                $core_level_index[$type_token] += $item_quantity;
+            }
+        }
+
+        // Collect the list of weapons Reggae is selling based on his level
+        $conditions = array();
+        foreach ($core_level_index AS $type_token => $core_level){
+            if ($type_token === 'none'){ $type_token = ''; }
+            $conditions[] = "(abilities.ability_type = '{$type_token}' AND abilities.ability_shop_level <= {$core_level})";
+        }
+        $conditions = implode(PHP_EOL.'OR ', $conditions);
+        $unlocked_weapons = $db->get_array_list("SELECT
+            abilities.ability_token,
+            abilities.ability_type,
+            abilities.ability_type2,
+            abilities.ability_shop_tab,
+            abilities.ability_shop_level
             FROM mmrpg_index_abilities AS abilities
             LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
             LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_class = 'master' AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_types AS types ON (types.type_token = abilities.ability_type OR types.type_token = 'none' AND abilities.ability_type = '')
+            LEFT JOIN mmrpg_index_types AS types2 ON (types2.type_token = abilities.ability_type2 OR types2.type_token = 'none' AND abilities.ability_type2 = '')
             WHERE
             abilities.ability_flag_published = 1
             AND abilities.ability_flag_complete = 1
             AND abilities.ability_flag_unlockable = 1
-            AND abilities.ability_shop_tab = 'reggae/abilities'
-            AND abilities.ability_shop_level <= {$this_shop_index['reggae']['shop_level']}
+            AND abilities.ability_shop_tab = 'reggae/weapons'
+            AND (
+                {$conditions}
+                )
             AND abilities.ability_price > 0
             ORDER BY
+            types.type_order ASC,
+            abilities.ability_token LIKE '%-shot' DESC,
+            abilities.ability_token LIKE '%-buster' DESC,
+            abilities.ability_token LIKE '%-overdrive' DESC,
+            abilities.ability_shop_level ASC,
             groups.group_order ASC,
             tokens.token_order ASC,
             abilities.ability_token ASC
             ;", 'ability_token');
 
-        // Update the actual shop index with our finalized abilities we're selling
-        $reggae_abilities_selling = array_keys($unlocked_abilities);
-        $this_shop_index['reggae']['shop_abilities']['abilities_selling'] = call_user_func_array('get_abilities_with_prices', $reggae_abilities_selling);
+        // Update the actual shop index with our finalized weapons we're selling
+        $reggae_weapons_selling = !empty($unlocked_weapons) ? array_keys($unlocked_weapons) : array();
+        $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = call_user_func_array('get_abilities_with_prices', $reggae_weapons_selling);
 
-        // Finally, sort the abilities again so that ones which are NOT unlocked appear first (but keep the order the same otherwise)
+        // If the Omega Seed is not unlocked yet, prevent those abilities from being purchased
+        if (!mmrpg_prototype_item_unlocked('omega-seed')){
+            unset($this_shop_index['reggae']['shop_weapons']['weapons_selling']['omega-pulse']);
+            unset($this_shop_index['reggae']['shop_weapons']['weapons_selling']['omega-wave']);
+        }
+
+        // Loop through unlocked abilities and apply the level discount, if any
+        if (!empty($level_discount)
+            && isset($this_shop_index['reggae']['shop_weapons']['weapons_selling'])){
+            foreach ($this_shop_index['reggae']['shop_weapons']['weapons_selling'] AS $token => $price){
+                $new_price = $price - floor(($price / 2) * $level_discount);
+                $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $new_price;
+            }
+        }
+
+        // Finally, sort the weapons again so that ones which are NOT unlocked appear first (but keep the order the same otherwise)
         if (!empty($unlocked_ability_tokens)
-            && !empty($this_shop_index['reggae']['shop_weapons']['abilities_selling'])){
-            $old_abilities_selling = $this_shop_index['reggae']['shop_weapons']['abilities_selling'];
-            $new_abilities_selling = array();
-            foreach ($old_abilities_selling AS $token => $price){ if (!in_array($token, $unlocked_ability_tokens)){ $new_abilities_selling[$token] = $price; } }
-            foreach ($old_abilities_selling AS $token => $price){ if (in_array($token, $unlocked_ability_tokens)){ $new_abilities_selling[$token] = $price; } }
-            $this_shop_index['reggae']['shop_weapons']['abilities_selling'] = $new_abilities_selling;
+            && !empty($this_shop_index['reggae']['shop_weapons']['weapons_selling'])){
+            $old_weapons_selling = $this_shop_index['reggae']['shop_weapons']['weapons_selling'];
+            $new_weapons_selling = array();
+            foreach ($old_weapons_selling AS $token => $price){ if (!in_array($token, $unlocked_ability_tokens)){ $new_weapons_selling[$token] = $price; } }
+            foreach ($old_weapons_selling AS $token => $price){ if (in_array($token, $unlocked_ability_tokens)){ $new_weapons_selling[$token] = $price; } }
+            $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = $new_weapons_selling;
         }
 
-        // If the player has unlocked the Weapon Codes, Reggae's Shop also sells weapons
-        if (mmrpg_prototype_item_unlocked('weapon-codes')){
+    }
 
-            // Add the Weapons Shop token to the selling array if not there already
-            if (!in_array('parts', $this_shop_index['reggae']['shop_kind_selling'])){ $this_shop_index['reggae']['shop_kind_selling'][] = 'weapons'; }
-            $this_shop_index['reggae']['shop_quote_selling']['weapons'] = 'Reggae use cores make new weapons! Squaaak! Heroes use weapons defeat bad guys! Squaaak!';
-
-            // Define the weapon selling array and start it empty
-            $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = array();
-
-            // Preset the level of all core types to zero before continuing
-            $mmrpg_index_types = rpg_type::get_index(false, false, false, true);
-            foreach ($mmrpg_index_types AS $type_token => $type_info){ $core_level_index[$type_token] = 0; }
-
-            // If the player has sold any cores, loop through them and add associated abilities
-            $level_discount = $this_battle_shops['reggae']['shop_level'] > 1 ? $this_battle_shops['reggae']['shop_level'] / 101 : 0;
-            if (!empty($this_battle_shops['reggae']['cores_bought'])){
-                foreach ($this_battle_shops['reggae']['cores_bought'] AS $item_token => $item_quantity){
-                    if (preg_match('/^item-core-/i', $item_token)){ $type_token = preg_replace('/^item-core-/i', '', $item_token); }
-                    else { $type_token = preg_replace('/-core$/i', '', $item_token); }
-                    $type_info = $mmrpg_database_types[$type_token];
-                    if (!isset($core_level_index[$type_token])){ $core_level_index[$type_token] = 0; }
-                    $core_level_index[$type_token] += $item_quantity;
-                }
-            }
-
-            // Collect the list of weapons Reggae is selling based on his level
-            $conditions = array();
-            foreach ($core_level_index AS $type_token => $core_level){
-                if ($type_token === 'none'){ $type_token = ''; }
-                $conditions[] = "(abilities.ability_type = '{$type_token}' AND abilities.ability_shop_level <= {$core_level})";
-            }
-            $conditions = implode(PHP_EOL.'OR ', $conditions);
-            $unlocked_weapons = $db->get_array_list("SELECT
-                abilities.ability_token,
-                abilities.ability_type,
-                abilities.ability_type2,
-                abilities.ability_shop_tab,
-                abilities.ability_shop_level
-                FROM mmrpg_index_abilities AS abilities
-                LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
-                LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_class = 'master' AND groups.group_token = tokens.group_token
-                LEFT JOIN mmrpg_index_types AS types ON (types.type_token = abilities.ability_type OR types.type_token = 'none' AND abilities.ability_type = '')
-                LEFT JOIN mmrpg_index_types AS types2 ON (types2.type_token = abilities.ability_type2 OR types2.type_token = 'none' AND abilities.ability_type2 = '')
-                WHERE
-                abilities.ability_flag_published = 1
-                AND abilities.ability_flag_complete = 1
-                AND abilities.ability_flag_unlockable = 1
-                AND abilities.ability_shop_tab = 'reggae/weapons'
-                AND (
-                    {$conditions}
-                    )
-                AND abilities.ability_price > 0
-                ORDER BY
-                types.type_order ASC,
-                abilities.ability_token LIKE '%-shot' DESC,
-                abilities.ability_token LIKE '%-buster' DESC,
-                abilities.ability_token LIKE '%-overdrive' DESC,
-                abilities.ability_shop_level ASC,
-                groups.group_order ASC,
-                tokens.token_order ASC,
-                abilities.ability_token ASC
-                ;", 'ability_token');
-
-            // Update the actual shop index with our finalized weapons we're selling
-            $reggae_weapons_selling = !empty($unlocked_weapons) ? array_keys($unlocked_weapons) : array();
-            $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = call_user_func_array('get_abilities_with_prices', $reggae_weapons_selling);
-
-            // If the Omega Seed is not unlocked yet, prevent those abilities from being purchased
-            if (!mmrpg_prototype_item_unlocked('omega-seed')){
-                unset($this_shop_index['reggae']['shop_weapons']['weapons_selling']['omega-pulse']);
-                unset($this_shop_index['reggae']['shop_weapons']['weapons_selling']['omega-wave']);
-            }
-
-            // Loop through unlocked abilities and apply the level discount, if any
-            if (!empty($level_discount)
-                && isset($this_shop_index['reggae']['shop_weapons']['weapons_selling'])){
-                foreach ($this_shop_index['reggae']['shop_weapons']['weapons_selling'] AS $token => $price){
-                    $new_price = $price - floor(($price / 2) * $level_discount);
-                    $this_shop_index['reggae']['shop_weapons']['weapons_selling'][$token] = $new_price;
-                }
-            }
-
-            // Finally, sort the weapons again so that ones which are NOT unlocked appear first (but keep the order the same otherwise)
-            if (!empty($unlocked_ability_tokens)
-                && !empty($this_shop_index['reggae']['shop_weapons']['weapons_selling'])){
-                $old_weapons_selling = $this_shop_index['reggae']['shop_weapons']['weapons_selling'];
-                $new_weapons_selling = array();
-                foreach ($old_weapons_selling AS $token => $price){ if (!in_array($token, $unlocked_ability_tokens)){ $new_weapons_selling[$token] = $price; } }
-                foreach ($old_weapons_selling AS $token => $price){ if (in_array($token, $unlocked_ability_tokens)){ $new_weapons_selling[$token] = $price; } }
-                $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = $new_weapons_selling;
-            }
-
-        }
-
-        // If Robots or Abilities have been unlocked, increase the core selling prices
-        if (!empty($global_unlocked_robots_cores) || !empty($global_unlocked_abilities_types) || !empty($this_star_force)){
-            if (!empty($this_shop_index['reggae']['shop_items']['items_buying'])){
-                $items_list = $this_shop_index['reggae']['shop_items']['items_buying'];
-                foreach ($items_list AS $item_token => $item_price){
-                    if (!isset($mmrpg_database_items[$item_token])){ continue; }
-                    $item_info = $mmrpg_database_items[$item_token];
-                    $type_token = !empty($item_info['item_type']) ? $item_info['item_type'] : '';
-                    $star_boost = !empty($this_star_force[$type_token]) ? $this_star_force[$type_token] : 0;
-                    $ability_boost = !empty($global_unlocked_abilities_types[$type_token]) ? $global_unlocked_abilities_types[$type_token] : 0;
-                    $robot_boost = !empty($global_unlocked_robots_cores[$type_token]) ? $global_unlocked_robots_cores[$type_token] : 0;
-                    $star_price_boost = ceil($star_boost * 25);
-                    $ability_price_boost = ceil($ability_boost * 50);
-                    $robot_price_boost = ceil($robot_boost * 100);
-                    $item_price += $star_price_boost;
-                    $item_price += $ability_price_boost;
-                    $item_price += $robot_price_boost;
-                    $omega_boost = $this_shop_index['reggae']['shop_hidden_power'] == $type_token ? true : false;
-                    if (!empty($omega_boost)){ $item_price = ceil($item_price * 1.5); }
-                    $this_shop_index['reggae']['shop_items']['items_buying'][$item_token] = $item_price;
-                }
+    // If Robots or Abilities have been unlocked, increase the core selling prices
+    if (!empty($global_unlocked_robots_cores) || !empty($global_unlocked_abilities_types) || !empty($this_star_force)){
+        if (!empty($this_shop_index['reggae']['shop_items']['items_buying'])){
+            $items_list = $this_shop_index['reggae']['shop_items']['items_buying'];
+            foreach ($items_list AS $item_token => $item_price){
+                if (!isset($mmrpg_database_items[$item_token])){ continue; }
+                $item_info = $mmrpg_database_items[$item_token];
+                $type_token = !empty($item_info['item_type']) ? $item_info['item_type'] : '';
+                $star_boost = !empty($this_star_force[$type_token]) ? $this_star_force[$type_token] : 0;
+                $ability_boost = !empty($global_unlocked_abilities_types[$type_token]) ? $global_unlocked_abilities_types[$type_token] : 0;
+                $robot_boost = !empty($global_unlocked_robots_cores[$type_token]) ? $global_unlocked_robots_cores[$type_token] : 0;
+                $star_price_boost = ceil($star_boost * 25);
+                $ability_price_boost = ceil($ability_boost * 50);
+                $robot_price_boost = ceil($robot_boost * 100);
+                $item_price += $star_price_boost;
+                $item_price += $ability_price_boost;
+                $item_price += $robot_price_boost;
+                $omega_boost = $this_shop_index['reggae']['shop_hidden_power'] == $type_token ? true : false;
+                if (!empty($omega_boost)){ $item_price = ceil($item_price * 1.5); }
+                $this_shop_index['reggae']['shop_items']['items_buying'][$item_token] = $item_price;
             }
         }
+    }
 
-        // If Reggae's Shop has reached sufficient levels, decrease his selling prices
-        if ($this_shop_index['reggae']['shop_level'] > 1){
-            $level_discount = $this_battle_shops['reggae']['shop_level'] / 101;
-            if (!empty($this_shop_index['reggae']['shop_abilities']['abilities_selling'])){
-                foreach ($this_shop_index['reggae']['shop_abilities']['abilities_selling'] AS $ability_kind => $ability_price){
-                    $ability_price -= round(($ability_price / 2) * $level_discount);
-                    $this_shop_index['reggae']['shop_abilities']['abilities_selling'][$ability_kind] = $ability_price;
-                }
+    // If Reggae's Shop has reached sufficient levels, decrease his selling prices
+    if ($this_shop_index['reggae']['shop_level'] > 1){
+        $level_discount = $this_battle_shops['reggae']['shop_level'] / 101;
+        if (!empty($this_shop_index['reggae']['shop_abilities']['abilities_selling'])){
+            foreach ($this_shop_index['reggae']['shop_abilities']['abilities_selling'] AS $ability_kind => $ability_price){
+                $ability_price -= round(($ability_price / 2) * $level_discount);
+                $this_shop_index['reggae']['shop_abilities']['abilities_selling'][$ability_kind] = $ability_price;
             }
         }
+    }
 
 }
 
