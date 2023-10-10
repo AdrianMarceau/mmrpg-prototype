@@ -425,6 +425,10 @@ if (!empty($this_shop_index['auto'])){
 $core_level_index = array();
 if (!empty($this_shop_index['reggae'])){
 
+    // Define variables to hold the total number of available collectibles
+    $num_available_new_abilities = 0;
+    $num_available_new_weapons = 0;
+
     // Collect a list of all abilities already unlocked
     $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
 
@@ -457,6 +461,7 @@ if (!empty($this_shop_index['reggae'])){
         $old_abilities_selling = $this_shop_index['reggae']['shop_weapons']['abilities_selling'];
         $new_abilities_selling = array();
         foreach ($old_abilities_selling AS $token => $price){ if (!in_array($token, $unlocked_ability_tokens)){ $new_abilities_selling[$token] = $price; } }
+        $num_available_new_abilities = count($new_abilities_selling);
         foreach ($old_abilities_selling AS $token => $price){ if (in_array($token, $unlocked_ability_tokens)){ $new_abilities_selling[$token] = $price; } }
         $this_shop_index['reggae']['shop_weapons']['abilities_selling'] = $new_abilities_selling;
     }
@@ -550,6 +555,7 @@ if (!empty($this_shop_index['reggae'])){
             $old_weapons_selling = $this_shop_index['reggae']['shop_weapons']['weapons_selling'];
             $new_weapons_selling = array();
             foreach ($old_weapons_selling AS $token => $price){ if (!in_array($token, $unlocked_ability_tokens)){ $new_weapons_selling[$token] = $price; } }
+            $num_available_new_weapons = count($new_weapons_selling);
             foreach ($old_weapons_selling AS $token => $price){ if (in_array($token, $unlocked_ability_tokens)){ $new_weapons_selling[$token] = $price; } }
             $this_shop_index['reggae']['shop_weapons']['weapons_selling'] = $new_weapons_selling;
         }
@@ -591,6 +597,12 @@ if (!empty($this_shop_index['reggae'])){
         }
     }
 
+    // If there are no new abilities to purchase but there are weapons, make sure we reorder the tabs
+    if ($num_available_new_abilities == 0
+        && $num_available_new_weapons > 0){
+        $this_shop_index['reggae']['shop_kind_selling'] = array('weapons', 'abilities');
+    }
+
 }
 
 
@@ -598,6 +610,10 @@ if (!empty($this_shop_index['reggae'])){
 
 // Only continue if the shop has been unlocked
 if (!empty($this_shop_index['kalinka'])){
+
+    // Define variables to hold the total number of available collectibles
+    $num_available_new_robots = 0;
+    $num_available_new_alts = 0;
 
     // If the player has unlocked the Master Codes, Kalinka's Shop also has a Robot Shop and a Field Shop tab
     if (mmrpg_prototype_item_unlocked('master-codes')){
@@ -673,6 +689,7 @@ if (!empty($this_shop_index['kalinka'])){
                         $new_robots_selling[$token] = $price;
                     }
                 }
+                $num_available_new_robots = count($new_robots_selling);
                 foreach ($old_robots_selling AS $token => $price){
                     $info = $mmrpg_database_robots[$token];
                     if (!isset($new_robots_selling[$token])
@@ -800,6 +817,7 @@ if (!empty($this_shop_index['kalinka'])){
                     //error_log('$unlocked = '.($unlocked ? 'true' : 'false'));
                     if (!$unlocked){ $new_alts_selling[$token] = $price; }
                 }
+                $num_available_new_alts = count($new_alts_selling);
                 foreach ($old_alts_selling AS $token => $price){
                     if (!isset($new_alts_selling[$token])){
                         $new_alts_selling[$token] = $price;
@@ -845,6 +863,12 @@ if (!empty($this_shop_index['kalinka'])){
             }
         }
 
+    }
+
+    // If there are no new robots to purchase but there are alts, make sure we reorder the tabs
+    if ($num_available_new_robots == 0
+        && $num_available_new_alts > 0){
+        $this_shop_index['kalinka']['shop_kind_selling'] = array('alts', 'robots');
     }
 
 }
