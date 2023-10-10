@@ -2562,6 +2562,11 @@ function mmrpg_prototype_stardroid_encounter_data(){
         $stardroid_appearance_rates = array_reverse($stardroid_appearance_rates, true);
         $selected_stardroid_token = key($stardroid_appearance_rates);
     }
+    elseif ($stardroid_robots_defeated_count === 9){
+        // only allow sunstar as a possible encounter now
+        $selected_stardroid_token = 'sunstar';
+        $stardroid_appearance_rates = array($selected_stardroid_token => $stardroid_appearance_rates[$selected_stardroid_token]);
+    }
     elseif ($stardroid_robots_defeated_count >= 10){
         // just use a random token from the appearance keys
         $possible_stardroid_tokens = array_keys($stardroid_appearance_rates);
