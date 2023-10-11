@@ -55,9 +55,24 @@ class rpg_disabled {
         // Update the target player's session
         $this_player->update_session();
 
+        // Check to see if this was a friendly robot that we need to avoid showing disabled messages for
+        $is_friendly_target = false;
+        $skip_knockout_messages = false;
+        $skip_knockout_rewards = false;
+        $skip_knockout_items = false;
+        if (!empty($this_robot->flags['is_friendly'])){
+            $is_friendly_target = true;
+            $skip_knockout_rewards = true;
+            if (!empty($this_robot->flags['is_recruited'])){
+                $skip_knockout_messages = true;
+                $skip_knockout_items = true;
+            }
+        }
+
         // Create the robot disabled event if not disabled already some other way
         $disabled_message_flag = 'disabled_on_'.$this_battle->counters['battle_turn'];
-        if (!isset($this_robot->flags[$disabled_message_flag])){
+        if (!$skip_knockout_messages
+            && !isset($this_robot->flags[$disabled_message_flag])){
             $this_robot->flags[$disabled_message_flag] = true;
             $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
             $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The target ').' '.$this_robot->print_name().' was disabled!<br />';
@@ -84,7 +99,8 @@ class rpg_disabled {
         }
 
         // Check to see if this robot is holding an Extra Life before disabling
-        if ($this_robot->has_item()){
+        if (!$skip_knockout_items
+            && $this_robot->has_item()){
 
             // Define the item info based on token and load into memory
             $item_token = $this_robot->get_item();
@@ -186,7 +202,8 @@ class rpg_disabled {
         $event_options['this_ability_results']['total_actions'] = 0;
 
         // Calculate the bonus boosts from defeating the target robot (if NOT player battle)
-        if ($target_player->player_side === 'left'
+        if (!$skip_knockout_rewards
+            && $target_player->player_side === 'left'
             && $target_robot->robot_class === 'master'
             && $target_robot->robot_status !== 'disabled'
             && empty($this_battle->flags['player_battle'])
@@ -360,7 +377,8 @@ class rpg_disabled {
          * Reward the player and robots with items and experience if not in demo mode
          */
 
-        if ($target_player->player_side == 'left'
+        if (!$skip_knockout_rewards
+            && $target_player->player_side == 'left'
             && empty($this_battle->flags['player_battle'])
             && empty($this_battle->flags['challenge_battle'])
             && empty($_SESSION['GAME']['DEMO'])){
@@ -1284,7 +1302,8 @@ class rpg_disabled {
         // -- ROBOT UNLOCKING STUFF!!! -- //
 
         // Check if this target winner was a HUMAN player and update the robot database counter for defeats
-        if ($target_player->player_side == 'left'){
+        if (!$skip_knockout_rewards
+            && $target_player->player_side == 'left'){
             // Add this robot to the global robot database array
             if (!isset($_SESSION['GAME']['values']['robot_database'][$this_robot->robot_token])){ $_SESSION['GAME']['values']['robot_database'][$this_robot->robot_token] = array('robot_token' => $this_robot->robot_token); }
             if (!isset($_SESSION['GAME']['values']['robot_database'][$this_robot->robot_token]['robot_defeated'])){ $_SESSION['GAME']['values']['robot_database'][$this_robot->robot_token]['robot_defeated'] = 0; }
@@ -1292,7 +1311,9 @@ class rpg_disabled {
         }
 
         // Check if this battle has any robot rewards to unlock and the winner was a HUMAN player
-        if ($target_player->player_side == 'left' && !empty($this_battle->battle_rewards['robots'])){
+        if (!$skip_knockout_rewards
+            && $target_player->player_side == 'left'
+            && !empty($this_battle->battle_rewards['robots'])){
 
             // Only continue if this robot is unlockable
             if (!empty($this_robot->flags['robot_is_unlockable'])){

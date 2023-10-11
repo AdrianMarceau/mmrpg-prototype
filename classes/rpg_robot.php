@@ -2601,18 +2601,43 @@ class rpg_robot extends rpg_object {
         // If the battle has ended, trigger no disables
         if ($this->battle->battle_status == 'complete'){ return false; }
 
+        // Check to see if we can show the usual defeat or if the target was friendly and recruited
+        $show_friendly_target_disabled = false;
+        if (!empty($this->flags['is_friendly'])
+            && !empty($this->flags['is_recruited'])){
+            $show_friendly_target_disabled = true;
+        }
+
         // Show a quick pre-defeat defend sprite for dramatic pause
-        $this->set_frame('defend');
-        $this->set_frame_styles('filter: brightness(3.0);');
-        $this->battle->queue_sound_effect($this->robot_class.'-overloading-sound');
-        $this->battle->events_create(false, false, '', '', array(
-            'event_flag_camera_action' => true,
-            'event_flag_camera_side' => $this->player->player_side,
-            'event_flag_camera_focus' => $this->robot_position,
-            'event_flag_camera_depth' => $this->robot_key
-            ));
-        $this->reset_frame('');
-        $this->reset_frame_styles();
+        if (!$show_friendly_target_disabled){
+            //error_log('show blowing up animation');
+            $this->set_frame('defend');
+            $this->set_frame_styles('filter: brightness(3.0);');
+            $this->battle->queue_sound_effect($this->robot_class.'-overloading-sound');
+            $this->battle->events_create(false, false, '', '', array(
+                'event_flag_camera_action' => true,
+                'event_flag_camera_side' => $this->player->player_side,
+                'event_flag_camera_focus' => $this->robot_position,
+                'event_flag_camera_depth' => $this->robot_key
+                ));
+            $this->reset_frame('');
+            $this->reset_frame_styles();
+        }
+        // Otherwise we'll use a less dramatic exit animation
+        else {
+            //error_log('show glowing away animation');
+            $this->set_frame('base2');
+            $this->set_frame_styles('filter: brightness(2.0);');
+            $this->battle->queue_sound_effect($this->robot_class.'-taunt-sound');
+            $this->battle->events_create(false, false, '', '', array(
+                'event_flag_camera_action' => true,
+                'event_flag_camera_side' => $this->player->player_side,
+                'event_flag_camera_focus' => $this->robot_position,
+                'event_flag_camera_depth' => $this->robot_key
+                ));
+            $this->reset_frame('');
+            $this->reset_frame_styles();
+        }
 
         // This was an ability so delegate to the ability class function
         return rpg_disabled::trigger_robot_disabled($this, $target_robot, $trigger_options);

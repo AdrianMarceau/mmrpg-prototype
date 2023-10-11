@@ -523,16 +523,26 @@ class rpg_battle extends rpg_object {
                 $temp_this_robot = false;
                 $temp_target_robot = false;
                 if (!empty($current_action['this_robot'])){
-                    $current_action['this_robot']->robot_frame = $current_action['this_robot']->robot_status != 'disabled' ? 'base' : 'defeat';
+                    $current_action['this_robot']->robot_frame = 'base';
+                    $current_action['this_player']->player_frame = 'base';
+                    if ($current_action['this_robot']->robot_status === 'disabled'
+                        && empty($current_action['this_robot']->flags['is_recruited'])){
+                        $current_action['this_robot']->robot_frame = 'defeat';
+                        $current_action['this_player']->player_frame = 'defeat';
+                    }
                     $current_action['this_robot']->update_session();
-                    $current_action['this_player']->player_frame = $current_action['this_robot']->robot_status != 'disabled' ? 'base' : 'defeat';
                     $current_action['this_player']->update_session();
                     $temp_this_robot = $current_action['this_robot'];
                 }
                 if (!empty($current_action['target_robot'])){
-                    $current_action['target_robot']->robot_frame = $current_action['target_robot']->robot_status != 'disabled' ? 'base' : 'defeat';
+                    $current_action['target_robot']->robot_frame = 'base';
+                    $current_action['target_player']->player_frame = 'defeat';
+                    if ($current_action['target_robot']->robot_status === 'disabled'
+                        && empty($current_action['target_robot']->flags['is_recruited'])){
+                        $current_action['target_robot']->robot_frame = 'defeat';
+                        $current_action['target_player']->player_frame = 'defeat';
+                    }
                     $current_action['target_robot']->update_session();
-                    $current_action['target_player']->player_frame = $current_action['target_robot']->robot_status != 'disabled' ? 'base' : 'defeat';
                     $current_action['target_player']->update_session();
                     $temp_target_robot = $current_action['target_robot'];
                 }
@@ -1463,7 +1473,6 @@ class rpg_battle extends rpg_object {
 
         }
 
-
         // Start the battle loop to allow breaking
         $battle_loop = true;
         while ($battle_loop == true && $this->battle_status != 'complete'){
@@ -2020,10 +2029,19 @@ class rpg_battle extends rpg_object {
 
                     // Withdraw the player's robot and display an event for it
                     if ($old_robot->robot_position != 'bench'){
-                        $old_robot->set_frame($old_robot->robot_status != 'disabled' ? 'base' : 'defeat');
+                        $skip_switch_message = false;
+                        if (!empty($old_robot->flags['is_friendly'])
+                            && !empty($old_robot->flags['is_recruited'])){
+                            $old_robot->set_frame('base');
+                            $skip_switch_message = true;
+                            //error_log('switch a friendly target out');
+                        } else {
+                            $old_robot->set_frame($old_robot->robot_status !== 'disabled' ? 'base' : 'defeat');
+                            $old_robot->set_frame_styles('transform: translate('.$temp_shift_amount.'%, 0); -webkit-transform: translate('.$temp_shift_amount.'%, 0); ');
+                            //error_log('switch a normal target out');
+                        }
                         $old_robot->set_position('bench');
                         $old_robot->set_key($temp_new_robot_key);
-                        $old_robot->set_frame_styles('transform: translate('.$temp_shift_amount.'%, 0); -webkit-transform: translate('.$temp_shift_amount.'%, 0); ');
                         $this_player->set_frame('base');
                         $this_player->set_value('current_robot', false);
                         $this_player->set_value('current_robot_enter', false);
@@ -2044,6 +2062,7 @@ class rpg_battle extends rpg_object {
                             //$event_body .= '&quot;<em>'.$this_quote_text.'</em>&quot;';
                         }
                         // Only show the removed event or the withdraw event if there's more than one robot
+                        if ($skip_switch_message){ $event_header = $event_body = ''; }
                         if ($this_switch_reason == 'removed' || $this_player->counters['robots_active'] > 1){
                             $this_battle->events_create($old_robot, false, $event_header, $event_body, $event_options);
                         }
