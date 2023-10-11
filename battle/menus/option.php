@@ -43,7 +43,16 @@ ob_start();
 		$block_num++;
 		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="withdraw"><label><span class="multi">Give&nbsp;Up<br />On&nbsp;Endless</span></label></a>';
 
-    } else {
+    }
+	// Else if we're in a STARFIELD MISSION, display the next button here
+    if (!empty($this_battle->flags['starfield_mission'])){
+
+		// Display the option for FIND ANOTHER STAR FIELD
+		$block_num++;
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="next_same-star"><label><span class="multi">Skip&nbsp;To<br />Next&nbsp;Starfield</span></label></a>';
+
+    }
+    else {
 
      	// Display a SPACERs in this slot
 	    $block_num++;

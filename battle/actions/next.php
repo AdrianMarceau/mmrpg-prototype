@@ -64,6 +64,38 @@ if (!empty($this_battle->flags['starfield_mission'])
         }
     }
 
+    // If the user has requested an auto-selected type, selected it now
+    if ($next_star_type === 'same'
+        || $next_star_type === 'any'){
+        //error_log('next//$temp_remaining_stars_types: '.print_r($temp_remaining_stars_types, true));
+        $possible_types = array();
+        // If the user has requested the same star type, pick one at random from the remaining
+        if ($next_star_type === 'same'){
+            if (!empty($this_battle->battle_field_base['field_type'])
+                && !empty($temp_remaining_stars_types[$this_battle->battle_field_base['field_type']])){
+                $possible_types[] = $this_battle->battle_field_base['field_type'];
+            }
+            if (!empty($this_battle->battle_field_base['field_type2'])
+                && !empty($temp_remaining_stars_types[$this_battle->battle_field_base['field_type2']])){
+                $possible_types[] = $this_battle->battle_field_base['field_type2'];
+            }
+            //error_log('next//same//$possible_types: '.print_r($possible_types, true));
+        }
+        // Else if the user has requested any star type, pick one at random from the remaining
+        elseif ($next_star_type === 'any'){
+            $possible_types = array_keys(array_filter($temp_remaining_stars_types));
+            //error_log('next//any//$possible_types: '.print_r($possible_types, true));
+        }
+        if (!empty($possible_types)){
+            $next_star_type = $possible_types[mt_rand(0, (count($possible_types) - 1))];
+            //error_log('next//$next_star_type: '.print_r($next_star_type, true));
+        } else {
+            //error_log('next//empty-possible-types//redirect');
+            $this_redirect = 'prototype.php?'.($flag_wap ? 'wap=true' : '');
+            return;
+        }
+    }
+
     // Create a flag variables for the random encounter
     $random_encounter_chance = false;
     if (empty($this_battle->flags['superboss_battle'])){

@@ -11,7 +11,7 @@ ob_start();
 
             // Display available main actions
             ?><div class="main_actions"><?
-                ?><a class="button action_ability" data-action="next" type="button" data-order="1"><label>Continue</label></a><?
+                ?><a class="button action_ability" data-action="next" type="button" data-order="1"><label>Continue <i class="fas fa-chevron-circle-right"></i></label></a><?
             ?></div><?
             // Display the available sub options
             ?><div class="sub_actions"><?
@@ -26,10 +26,6 @@ ob_start();
 
             // Display available main actions
             ?><div class="main_actions"><?
-                ?><a class="button action_ability" data-action="prototype" type="button" data-order="1"><label>Mission Complete!</label></a><?
-            ?></div><?
-            // Display the available sub options
-            ?><div class="sub_actions"><?
 
                 // If this is a STAR FIELD mission, display customized menu options
                 if (!empty($this_battle->flags['starfield_mission'])){
@@ -57,6 +53,30 @@ ob_start();
                     $star_type_two = !empty($this_battle->battle_field_base['field_type2']) ? $this_battle->battle_field_base['field_type2'] : false;
                     if (empty($temp_remaining_stars_types[$star_type_one])){ $star_type_one = false; }
                     if (empty($temp_remaining_stars_types[$star_type_two])){ $star_type_two = false; }
+                    $next_action = !empty($star_type_one) || !empty($star_type_two) ? 'next_same-star' : 'next_any-star';
+                    if (empty($temp_remaining_stars)){ $next_action = 'prototype'; }
+
+                    ?><a class="button action_ability" data-action="<?= $next_action ?>" type="button" data-order="1"><label><i class="fa fas fa-star"></i> Mission Complete!</label></a><?
+
+                }
+                // Else if this is any other mission type, display normal menu options
+                elseif (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){
+
+                    ?><a class="button action_ability" data-action="prototype" type="button" data-order="1"><label><i class="fa fas fa-wave-square"></i> Mission Complete!</label></a><?
+
+                }
+                // Else if this is any other mission type, display normal menu options
+                else {
+
+                    ?><a class="button action_ability" data-action="prototype" type="button" data-order="1"><label><i class="fa fas fa-home"></i> Mission Complete!</label></a><?
+
+                }
+            ?></div><?
+            // Display the available sub options
+            ?><div class="sub_actions"><?
+
+                // If this is a STAR FIELD mission, display customized menu options
+                if (!empty($this_battle->flags['starfield_mission'])){
 
                     ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
                     if (!empty($star_type_one)){ ?><a class="button action_item ability_type type_<?= $star_type_one ?>" data-action="next_<?= $star_type_one ?>-star" type="button" data-order="3"><label style="font-size: 80%;">Next <?= ucfirst($star_type_one) ?> Star</label></a><? }
@@ -91,7 +111,7 @@ ob_start();
         if (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){
             // Display available main actions
             ?><div class="main_actions"><?
-            ?><a class="button action_ability button_disabled" type="button"><label>Wave Failure&hellip;</label></a><?
+            ?><a class="button action_ability button_disabled" type="button"><label><i class="fa fas fa-skull"></i> Wave Failure&hellip;</label></a><?
             ?></div><?
             // Display the available sub options
             ?><div class="sub_actions"><?
@@ -105,7 +125,7 @@ ob_start();
         else {
             // Display available main actions
             ?><div class="main_actions"><?
-            ?><a class="button action_ability button_disabled" type="button"><label>Mission Failure&hellip;</label></a><?
+            ?><a class="button action_ability button_disabled" type="button"><label><i class="fa fas fa-skull"></i> Mission Failure&hellip;</label></a><?
             ?></div><?
             // Display the available sub options
             ?><div class="sub_actions"><?
