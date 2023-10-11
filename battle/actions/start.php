@@ -65,6 +65,7 @@ if (!empty($_SESSION['BATTLES_CHAIN'])){
 }
 
 // Check for any robot details preloaded into session from a prev mission
+//error_log('loading ROBOTS_PRELOAD: '.print_r($_SESSION['ROBOTS_PRELOAD'], true));
 if (!empty($_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_token])){
     //$this_battle->events_create(false, false, 'debug', ('$_SESSION[\'ROBOTS_PRELOAD\'] = '.preg_replace('/\s+/', ' ', print_r($_SESSION['ROBOTS_PRELOAD'], true)).'<br />'));
 

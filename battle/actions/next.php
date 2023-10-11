@@ -142,8 +142,7 @@ if (!empty($this_battle->flags['starfield_mission'])
 
     // Update the redirect token to that of the new star field mission
     $battle_complete_redirect_token = $temp_battle_omega['battle_token'];
-
-    //exit();
+    //error_log('next//$battle_complete_redirect_token: '.print_r($battle_complete_redirect_token, true));
 
 }
 
@@ -166,7 +165,7 @@ $_SESSION['BATTLES_CHAIN'][] = $this_chain_record;
 // Pre-generate active robots string and save any buffs/debuffs/etc.
 $active_robot_array = array();
 $active_robot_array_first = array();
-$_SESSION['ROBOTS_PRELOAD'] = array();
+if (!isset($_SESSION['ROBOTS_PRELOAD'])){ $_SESSION['ROBOTS_PRELOAD'] = array(); }
 $temp_player_active_robots = $this_player->values['robots_active'];
 usort($temp_player_active_robots, function($r1, $r2){
     if ($r1['robot_position'] == 'active'){ return -1; }
@@ -210,7 +209,7 @@ foreach ($temp_player_active_robots AS $key => $robot){
     }
 
     // Save this robot's current energy, weapons, attack/defense/speed mods, etc. to the session
-    $_SESSION['ROBOTS_PRELOAD'][$battle_complete_redirect_token][$robot_string] = array(
+    $robot_preload_array = array(
         'robot_energy' => $robot['robot_energy'],
         'robot_weapons' => $new_weapon_energy,
         'robot_attack_mods' => $new_mod_values['attack_mods'],
@@ -220,6 +219,8 @@ foreach ($temp_player_active_robots AS $key => $robot){
         'robot_item' => $robot['robot_item'],
         'robot_attachments' => $new_robot_attachments
         );
+    $_SESSION['ROBOTS_PRELOAD'][$battle_complete_redirect_token][$robot_string] = $robot_preload_array;
+    //error_log('saving to ROBOTS_PRELOAD: '.$robot_string.' = '.print_r($robot_preload_array, true));
 
 }
 $active_robot_string = implode(',', $active_robot_array);

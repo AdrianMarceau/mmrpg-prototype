@@ -4333,8 +4333,8 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
                 && !empty($challenge_mode_savestate['ROBOTS_PRELOAD'])
                 && !empty($challenge_mode_savestate['NEXT_MISSION'])){
                 // Load the saved battle chain and robot preload data into session
-                $_SESSION['BATTLES_CHAIN'] = $challenge_mode_savestate['BATTLES_CHAIN'];
-                $_SESSION['ROBOTS_PRELOAD'] = $challenge_mode_savestate['ROBOTS_PRELOAD'];
+                $_SESSION['BATTLES_CHAIN'] = array_merge($_SESSION['BATTLES_CHAIN'], $challenge_mode_savestate['BATTLES_CHAIN']);
+                $_SESSION['ROBOTS_PRELOAD'] = array_merge($_SESSION['ROBOTS_PRELOAD'], $challenge_mode_savestate['ROBOTS_PRELOAD']);
                 // Generate the URL for the next mission with saved data and redirect
                 $next_mission_data = $challenge_mode_savestate['NEXT_MISSION'];
                 $next_mission_href = 'battle.php?wap='.($flag_wap ? 'true' : 'false');
