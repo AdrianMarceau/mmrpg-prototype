@@ -307,6 +307,7 @@ if (empty($this_robot)){
 }
 
 // If the target's was a switch action, also queue up an ability
+$target_robot_has_attacked = false;
 if ($target_action == 'switch'){
 
     // Now execute the stored actions
@@ -357,6 +358,7 @@ if ($target_action == 'switch'){
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
             $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+            $target_robot_has_attacked = true;
         }
 
     }
@@ -366,6 +368,7 @@ if ($target_action == 'switch'){
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
             $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+            $target_robot_has_attacked = true;
         }
 
     }
@@ -375,6 +378,7 @@ if ($target_action == 'switch'){
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($target_robot->robot_status != 'disabled' && $target_robot->robot_position != 'bench'){
             $this_battle->actions_append($target_player, $target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+            $target_robot_has_attacked = true;
         }
 
     }
@@ -445,7 +449,8 @@ if (empty($this_robot)){
 }
 
 // If the target's was a switch action, also queue up an ability
-if ($target_action == 'switch'){
+if ($target_action == 'switch'
+    && !$target_robot_has_attacked){
 
     // Now execute the stored actions
     $this_battle->actions_execute();
