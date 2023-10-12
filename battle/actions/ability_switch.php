@@ -13,6 +13,9 @@ if (empty($this_battle->flags['player_battle'])
     $_SESSION['GAME']['counters']['battle_turns_total'] += 1;
 }
 
+// Require the common turn-start action file
+require(MMRPG_CONFIG_ROOTDIR.'battle/actions/action_turnstart.php');
+
 
 // -- This Switch Action -- //
 
