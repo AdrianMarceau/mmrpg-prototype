@@ -391,10 +391,10 @@ ob_start();
                     $temp_ability_sprite['image_size_zoom_text'] = $temp_ability_sprite['image_size'].'x'.$temp_ability_sprite['image_size'];
                     $temp_ability_sprite['url'] = 'images/robots/'.$temp_ability_sprite['image'].'/mug_'.$robot_direction.'_'.$temp_ability_sprite['image_size_text'].'.png';
                     $temp_ability_sprite['class'] = 'sprite sprite_'.$temp_ability_sprite['image_size_text'].' sprite_'.$temp_ability_sprite['image_size_text'].'_base ';
-                    $temp_ability_sprite['style'] = 'background-image: url('.$temp_ability_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.'); top: 7px; left: 5px; height: 43px; background-position: center center !important; background-size: 50% 50% !important; ';
+                    $temp_ability_sprite['style'] = 'background-image: url('.$temp_ability_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.'); top: 7px; left: 5px; height: 43px; background-position: center center !important; background-size: auto !important; ';
                     $temp_ability_sprite['markup'] = '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_ability" style="'.$temp_ability_sprite['style'].'">'.$temp_ability_sprite['name'].'</span>';
                     if (!empty($temp_ability->ability_image2)){ $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite2  sprite_40x40_ability" style="'.str_replace('/'.$temp_ability->ability_image.'/', '/'.$temp_ability->ability_image2.'/', $temp_ability_sprite['style']).'"></span>'; }
-                    $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_cost" style="'.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>';
+                    if ($temp_ability_energy > 0){ $temp_ability_sprite['markup'] .= '<span class="'.$temp_ability_sprite['class'].' sprite_40x40_cost" style="'.($temp_ability_energy == $temp_ability_energy_base ? '' : ($temp_ability_energy_mods <= 1 ? 'color: #80A280; ' : 'color: #68B968; ')).'">'.$temp_ability_energy.' WE</span>'; }
 
                 }
 
