@@ -341,6 +341,7 @@ class rpg_skill_damage extends rpg_damage {
 
         // If the success rate was not provided, auto-calculate
         if ($this_skill->damage_options['success_rate'] == 'auto'){
+
             // If this robot is targetting itself, default to skill accuracy
             if ($this_robot->robot_id == $target_robot->robot_id){
                 // Update the success rate to the skill accuracy value
@@ -373,6 +374,50 @@ class rpg_skill_damage extends rpg_damage {
                 $this_skill->damage_options['success_rate'] = $this_skill_accuracy;
                 //$this_skill->skill_results['this_text'] .= '';
             }
+
+            // Check to see if affection values play into this at all (infatuation makes moves more likely to hit successfully)
+            if (!empty($this_robot->counters['affection'][$target_robot->robot_token])
+                || !empty($target_robot->counters['affection'][$this_robot->robot_token])){
+                //error_log('this robot ('.$this_robot->robot_string.') is being damaged by the target robot ('.$target_robot->robot_string.')');
+                //error_log('$this_skill->damage_options[success_rate](base) = '.$this_skill->damage_options['success_rate']);
+
+                // (does this robot like the target robot?)
+                if (!empty($this_robot->counters['affection'][$target_robot->robot_token])
+                    && $this_skill->damage_options['success_rate'] < 100){
+                    //error_log('this robot ('.$this_robot->robot_string.') likes the target robot ('.$target_robot->robot_string.')');
+                    $this_affection_value = $this_robot->counters['affection'][$target_robot->robot_token];
+                    if ($this_robot->robot_class === 'mecha'){ $this_affection_value = $this_affection_value / 2; }
+                    elseif ($this_robot->robot_class === 'master'){ $this_affection_value = $this_affection_value / 3; }
+                    elseif ($this_robot->robot_class === 'boss'){ $this_affection_value = $this_affection_value / 4; }
+                    $this_affection_value = min($this_affection_value, 25);
+                    //error_log('$this_affection_value = '.$this_affection_value);
+                    // this robot is being hit by the target, but they're infatuated, so it increase the success relative to their affection
+                    $this_modifier = ceil($this_skill->damage_options['success_rate'] * ($this_affection_value / 10));
+                    $this_skill->damage_options['success_rate'] += $this_modifier;
+                    if ($this_skill->damage_options['success_rate'] >= 100){ $this_skill->damage_options['success_rate'] = 99; }
+                    //error_log('$this_modifier = '.$this_modifier);
+                    //error_log('$this_skill->damage_options[success_rate] = '.$this_skill->damage_options['success_rate']);
+                }
+                // (or does the target robot like this one?)
+                elseif (!empty($target_robot->counters['affection'][$this_robot->robot_token])
+                    && $this_skill->damage_options['success_rate'] > 0){
+                    //error_log('target robot ('.$target_robot->robot_string.') likes this robot ('.$this_robot->robot_string.')');
+                    $target_affection_value = $target_robot->counters['affection'][$this_robot->robot_token];
+                    if ($target_robot->robot_class === 'mecha'){ $target_affection_value = $target_affection_value / 2; }
+                    elseif ($target_robot->robot_class === 'master'){ $target_affection_value = $target_affection_value / 3; }
+                    elseif ($target_robot->robot_class === 'boss'){ $target_affection_value = $target_affection_value / 4; }
+                    $target_affection_value = min($target_affection_value, 25);
+                    //error_log('$target_affection_value = '.$target_affection_value);
+                    // the target is trying to hit this robot, but they like it too much, so it reduces their success relative to their affection
+                    $this_modifier = ceil($this_skill->damage_options['success_rate'] * ($target_affection_value / 10));
+                    $this_skill->damage_options['success_rate'] -= $this_modifier;
+                    if ($this_skill->damage_options['success_rate'] <= 0){ $this_skill->damage_options['success_rate'] = 1; }
+                    //error_log('$this_modifier = '.$this_modifier);
+                    //error_log('$this_skill->damage_options[success_rate] = '.$this_skill->damage_options['success_rate']);
+                }
+
+            }
+
         }
 
         // If the failure rate was not provided, auto-calculate
@@ -1024,6 +1069,26 @@ class rpg_skill_damage extends rpg_damage {
                     }
                     // Break from the ENERGY case
                     break;
+                }
+
+            }
+
+            // Check to see if affection values play into this at all (being hit knocks some of the infatuations out of the robot)
+            if (!empty($this_robot->counters['affection'][$target_robot->robot_token])
+                || !empty($target_robot->counters['affection'][$this_robot->robot_token])){
+                //error_log('this robot ('.$this_robot->robot_string.') is being damaged by the target robot ('.$target_robot->robot_string.')');
+
+                // (does this robot like the target robot? NOT ANYMORE!)
+                if (!empty($this_robot->counters['affection'][$target_robot->robot_token])){
+                    //error_log('this robot ('.$this_robot->robot_string.') used to like the target robot ('.$target_robot->robot_string.')');
+                    $old_affection_value = $this_robot->counters['affection'][$target_robot->robot_token];
+                    //error_log('$old_affection_value = '.$old_affection_value);
+                    // this robot is being hit by the target, which decreases the affection value toward them
+                    $new_affection_value = $old_affection_value - $this_skill->skill_results['this_amount'];
+                    //error_log('$new_affection_value = '.$new_affection_value);
+                    if ($new_affection_value > 0){ $this_robot->counters['affection'][$target_robot->robot_token] = $new_affection_value; }
+                    else { unset($this_robot->counters['affection'][$target_robot->robot_token]); }
+                    //error_log('affection '.(isset($this_robot->counters['affection'][$target_robot->robot_token]) ? 'persists' : 'removed'));
                 }
 
             }
