@@ -113,6 +113,7 @@ class rpg_robot extends rpg_object {
         $this->robot_field = isset($this_robotinfo['robot_field']) ? $this_robotinfo['robot_field'] : 'field';
         $this->robot_field2 = isset($this_robotinfo['robot_field2']) ? $this_robotinfo['robot_field2'] : 'field';
         $this->robot_support = isset($this_robotinfo['robot_support']) ? $this_robotinfo['robot_support'] : '';
+        $this->robot_support_image = isset($this_robotinfo['robot_support_image']) ? $this_robotinfo['robot_support_image'] : '';
         $this->robot_class = isset($this_robotinfo['robot_class']) ? $this_robotinfo['robot_class'] : 'master';
         $this->robot_gender = isset($this_robotinfo['robot_gender']) ? $this_robotinfo['robot_gender'] : 'none';
         $this->robot_image = isset($this_robotinfo['robot_image']) ? $this_robotinfo['robot_image'] : $this->robot_token;
@@ -267,12 +268,20 @@ class rpg_robot extends rpg_object {
 
             // Collect the abilities for this robot from the session
             $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token);
+            //error_log('$temp_robot_settings('.$this->player_token.'/'.$this->robot_token.') = '.print_r($temp_robot_settings, true));
 
             // If this is a player-controlled robot, load abilities from session
             if (!empty($temp_robot_settings['robot_abilities'])){
                 $temp_robot_abilities = $temp_robot_settings['robot_abilities'];
                 $this->robot_abilities = array();
                 foreach ($temp_robot_abilities AS $token => $info){ $this->robot_abilities[] = $token; }
+            }
+
+            // If there is an alternate image set, apply it
+            if (!empty($temp_robot_settings['robot_support'])){
+                $this->robot_support = $temp_robot_settings['robot_support'];
+                $this->robot_support_image = !empty($temp_robot_settings['robot_support_image']) ? $temp_robot_settings['robot_support_image'] : '';
+                //error_log('$temp_robot_settings('.$this->player_token.'/'.$this->robot_token.') = '.print_r($this->robot_support, true));
             }
 
             // If there is an alternate image set, apply it
@@ -1010,6 +1019,11 @@ class rpg_robot extends rpg_object {
     public function get_original_player(){ return $this->get_info('robot_original_player'); }
     public function set_original_player($value){ $this->set_info('robot_original_player', $value); }
 
+    public function get_support(){ return $this->get_info('robot_support'); }
+    public function set_support($value){ $this->set_info('robot_support', $value); }
+    public function get_support_image(){ return $this->get_info('robot_support_image'); }
+    public function set_support_image($value){ $this->set_info('robot_support_image', $value); }
+
     public function get_string(){ return $this->get_info('robot_string'); }
     public function set_string($value){ $this->set_info('robot_string', $value); }
 
@@ -1561,6 +1575,18 @@ class rpg_robot extends rpg_object {
             //$debug_fragment .= 'has-playeronly '; // DEBUG
             $temp_compatible = true;
         }
+
+        // SPECIAL EXCEPTIONS
+        // If this is a mecha trying to use an ability that is not compatible with mechas
+        if ($temp_compatible
+            && $robot_info['robot_class'] == 'mecha'){
+            //$debug_fragment .= 'is-mecha '; // DEBUG
+            if (in_array($ability_info['ability_token'], array('mecha-support', 'friend-share'))){
+                //$debug_fragment .= 'is-mecha-incompatible '; // DEBUG
+                $temp_compatible = false;
+            }
+        }
+
 
         //$robot_info['robot_abilities']
         // DEBUG
@@ -3402,6 +3428,7 @@ class rpg_robot extends rpg_object {
             'robot_field' => $this->robot_field,
             'robot_field2' => $this->robot_field2,
             'robot_support' => $this->robot_support,
+            'robot_support_image' => $this->robot_support_image,
             'robot_class' => $this->robot_class,
             'robot_gender' => $this->robot_gender,
             'robot_item' => $this->robot_item,
