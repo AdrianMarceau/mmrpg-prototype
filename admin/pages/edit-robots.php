@@ -1406,7 +1406,7 @@
                                     }
                                     ?>
 
-                                    <? if ($this_robot_class !== 'mecha'){
+                                    <? if (true){
                                         ?>
 
                                         <hr />
