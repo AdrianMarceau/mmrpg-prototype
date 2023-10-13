@@ -2024,6 +2024,28 @@ class rpg_battle extends rpg_object {
                         $old_robot->set_flag('hidden', true);
                     }
 
+                    // Check if the old robot has a custom hook for onswitch and run it if true
+                    $temp_switch_function = $old_robot->robot_function_onswitch;
+                    $temp_result = $temp_switch_function(array(
+                        'this_battle' => $old_robot->player->battle,
+                        'this_field' => $old_robot->player->battle->battle_field,
+                        'this_player' => $old_robot->player,
+                        'this_robot' => $old_robot,
+                        'target_player' => $target_player,
+                        'target_robot' => $target_robot
+                        ));
+
+                    // Check if the new robot has a custom hook for onswitch and run it if true
+                    $temp_switch_function = $temp_new_robot->robot_function_onswitch;
+                    $temp_result = $temp_switch_function(array(
+                        'this_battle' => $temp_new_robot->player->battle,
+                        'this_field' => $temp_new_robot->player->battle->battle_field,
+                        'this_player' => $temp_new_robot->player,
+                        'this_robot' => $temp_new_robot,
+                        'target_player' => $target_player,
+                        'target_robot' => $target_robot
+                        ));
+
                     // Define the horizontal shift amount for the benched robot switch animation
                     $temp_shift_amount = $this_player->player_side == 'left' ? 50 : -50;
 
@@ -2131,6 +2153,28 @@ class rpg_battle extends rpg_object {
 
                     // Update the owning player's session variables with the change
                     $this_player->update_variables();
+
+                    // Check if the old robot has a custom hook for onswitchout and run it if true
+                    $temp_switchout_function = $old_robot->robot_function_onswitchout;
+                    $temp_result = $temp_switchout_function(array(
+                        'this_battle' => $old_robot->player->battle,
+                        'this_field' => $old_robot->player->battle->battle_field,
+                        'this_player' => $old_robot->player,
+                        'this_robot' => $old_robot,
+                        'target_player' => $target_player,
+                        'target_robot' => $target_robot
+                        ));
+
+                    // Check if the new robot has a custom hook for onswitchin and run it if true
+                    $temp_switchin_function = $temp_new_robot->robot_function_onswitchin;
+                    $temp_result = $temp_switchin_function(array(
+                        'this_battle' => $temp_new_robot->player->battle,
+                        'this_field' => $temp_new_robot->player->battle->battle_field,
+                        'this_player' => $temp_new_robot->player,
+                        'this_robot' => $temp_new_robot,
+                        'target_player' => $target_player,
+                        'target_robot' => $target_robot
+                        ));
 
                     // Return the new robot we've switched to
                     return $temp_new_robot;

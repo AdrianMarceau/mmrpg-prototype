@@ -228,6 +228,9 @@ class rpg_robot extends rpg_object {
             $this->robot_function_ondamage = isset($functions['robot_function_ondamage']) ? $functions['robot_function_ondamage'] : function(){};
             $this->robot_function_onrecovery = isset($functions['robot_function_onrecovery']) ? $functions['robot_function_onrecovery'] : function(){};
             $this->robot_function_ondisabled = isset($functions['robot_function_ondisabled']) ? $functions['robot_function_ondisabled'] : function(){};
+            $this->robot_function_onswitch = isset($functions['robot_function_onswitch']) ? $functions['robot_function_onswitch'] : function(){};
+            $this->robot_function_onswitchout = isset($functions['robot_function_onswitchout']) ? $functions['robot_function_onswitchout'] : function(){};
+            $this->robot_function_onswitchin = isset($functions['robot_function_onswitchin']) ? $functions['robot_function_onswitchin'] : function(){};
             $this->robot_functions_custom = array();
             foreach ($functions AS $name => $function){
                 if (strpos($name, 'robot_function_') === 0){ continue; }
