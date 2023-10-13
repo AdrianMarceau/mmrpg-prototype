@@ -437,14 +437,12 @@ class rpg_ability_damage extends rpg_damage {
                 if ($target_robot_stats['robot_speed'] > $this_robot->robot_speed
                     || $target_robot_stats['robot_speed'] < $this_robot->robot_speed){
                     $this_modifier = $target_robot_stats['robot_speed'] / $this_robot->robot_speed;
-                    //$this_ability_accuracy = ceil($this_ability_accuracy * $this_modifier);
                     $this_ability_accuracy = ceil($this_ability_accuracy * 0.95) + ceil(($this_ability_accuracy * 0.05) * $this_modifier);
                     if ($this_ability_accuracy > 100){ $this_ability_accuracy = 100; }
                     elseif ($this_ability_accuracy < 0){ $this_ability_accuracy = 0; }
                 }
                 // Update the success rate to the ability accuracy value
                 $this_ability->damage_options['success_rate'] = $this_ability_accuracy;
-                //$this_ability->ability_results['this_text'] .= '';
             }
 
             // Check to see if affection values play into this at all (infatuation makes moves more likely to hit successfully)
