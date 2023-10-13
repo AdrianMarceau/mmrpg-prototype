@@ -1848,11 +1848,14 @@ class rpg_robot extends rpg_object {
             elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy * 0.75)){ $weights[] = 6 * $support_multiplier;  }
             else { $weights[] = 0;  }
         }
-        if ($this_robot->has_ability('repair-mode')){
-            $options[] = 'repair-mode';
-            if ($this_robot->robot_energy < ($this_robot->robot_base_energy * 0.5)){ $weights[] = 9 * $support_multiplier;  }
-            elseif ($this_robot->robot_energy < ($this_robot->robot_base_energy * 0.75)){ $weights[] = 6 * $support_multiplier;  }
-            else { $weights[] = 0;  }
+
+        // Make the frequency of all deprecated moves zero
+        $deprecated_abilities = rpg_ability::get_global_deprecated_abilities();
+        foreach ($deprecated_abilities AS $ability_token){
+            if ($this_robot->has_ability($ability_token)){
+                $options[] = $ability_token;
+                $weights[$ability_token] = 0;
+            }
         }
 
         // Define the frequency of the attack, defense, and speed mode abilities if set

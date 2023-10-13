@@ -17,7 +17,22 @@ $session_token = mmrpg_game_token();
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
+
+// Collect the abilities array from the database so we can control its contents
+$deprecated_abilities = rpg_ability::get_global_deprecated_abilities();
+$mmrpg_database_abilities = rpg_ability::get_index(true, false, 'master');
+$mmrpg_database_abilities = array_filter($mmrpg_database_abilities, function($ability_info) use($deprecated_abilities){
+    if (in_array($ability_info['ability_token'], $deprecated_abilities)){ return false; }
+    return true;
+    });
+$mmrpg_database_abilities_count = count($mmrpg_database_abilities);
+foreach ($mmrpg_database_abilities AS $ability_token => $ability_info){
+    if (!empty($ability_info['ability_flag_hidden'])
+        && !mmrpg_prototype_ability_unlocked('', '', $ability_token)){
+        $mmrpg_database_abilities_count--;
+        unset($mmrpg_database_abilities[$ability_token]);
+    }
+}
 
 // Collect the editor flag if set
 $global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;

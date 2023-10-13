@@ -28,6 +28,23 @@ $global_unlocked_robots_cores = array();
 $global_unlocked_abilities_types = array();
 $global_unlocked_items_tokens = !empty($global_unlocked_items) ? array_keys($global_unlocked_items) : 0;
 
+// -- DEFINE SHOP INDEXES -- //
+
+// Collect an item index for reference
+$mmrpg_items = rpg_item::get_index();
+
+// Collect the abilities array from the database so we can control its contents
+$deprecated_abilities = rpg_ability::get_global_deprecated_abilities();
+$mmrpg_database_abilities = rpg_ability::get_index(true, false, 'master');
+$mmrpg_database_abilities = array_filter($mmrpg_database_abilities, function($ability_info) use($deprecated_abilities){
+    if (in_array($ability_info['ability_token'], $deprecated_abilities)){ return false; }
+    return true;
+    });
+$mmrpg_database_abilities_count = count($mmrpg_database_abilities);
+
+
+// -- COUNT/CATALOGUE SHOP INDEXES -- //
+
 // Create type counters for each element
 if (!empty($mmrpg_database_types)){
     foreach ($mmrpg_database_types AS $type => $info){
@@ -72,10 +89,6 @@ die('<hr />'.
 
 // -- DEFINE SHOP INDEXES -- //
 
-// Collect an item and ability index for reference
-$mmrpg_items = rpg_item::get_index();
-$mmrpg_abilities = rpg_ability::get_index();
-
 // Define a function for collecting an array or items with prices given tokens
 function get_items_with_prices(){
     $item_tokens = func_get_args();
@@ -114,11 +127,11 @@ function get_items_with_values(){
 function get_abilities_with_prices(){
     $ability_tokens = func_get_args();
     if (empty($ability_tokens)){ return array(); }
-    global $mmrpg_abilities;
+    global $mmrpg_database_abilities;
     $ability_prices = array();
     foreach ($ability_tokens AS $ability_token){
-        if (!isset($mmrpg_abilities[$ability_token])){ continue; }
-        $ability_info = $mmrpg_abilities[$ability_token];
+        if (!isset($mmrpg_database_abilities[$ability_token])){ continue; }
+        $ability_info = $mmrpg_database_abilities[$ability_token];
         $ability_price = 0;
         if (!empty($ability_info['ability_energy'])){ $ability_price = ceil($ability_info['ability_energy'] * MMRPG_SETTINGS_SHOP_ABILITY_PRICE); }
         else { $ability_price = MMRPG_SETTINGS_SHOP_ABILITY_PRICE; }

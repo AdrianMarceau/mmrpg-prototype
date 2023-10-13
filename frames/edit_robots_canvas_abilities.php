@@ -3,13 +3,20 @@
 // CANVAS MARKUP : ABILITIES
 
 // Collect the players index if not already populated
-if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){
-    $mmrpg_index_players = rpg_player::get_index(true, false, '', array('player'));
-}
+$mmrpg_index_players = rpg_player::get_index(true, false, '', array('player'));
 
 // Include the necessary database files
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
+
+// Collect the abilities array from the database so we can control its contents
+$deprecated_abilities = rpg_ability::get_global_deprecated_abilities();
+$mmrpg_database_abilities = rpg_ability::get_index(true, false, 'master');
+$mmrpg_database_abilities = array_filter($mmrpg_database_abilities, function($ability_info) use($deprecated_abilities){
+    if (in_array($ability_info['ability_token'], $deprecated_abilities)){ return false; }
+    return true;
+    });
+$mmrpg_database_abilities_count = count($mmrpg_database_abilities);
 
 // Start the output buffer
 ob_start();
