@@ -3593,6 +3593,17 @@ class rpg_ability extends rpg_object {
         return $temp_global_support_abilities;
     }
 
+    // Define a static function that returns a list of globally deprecated abilities we begrudgingly support
+    public static function get_global_deprecated_abilities(){
+        // Define the list of global deprecated abilities
+        $temp_global_deprecated_abilities = array(
+            'energy-shuffle', 'attack-shuffle', 'defense-shuffle', 'speed-shuffle',
+            'repair-mode',
+            );
+        // Return the list of global deprecated abilities
+        return $temp_global_deprecated_abilities;
+    }
+
     // Define a static function that returns a list of all T1 abilities (for the purposes of auto-generation)
     public static function get_tier_one_abilities(){
         global $db;
