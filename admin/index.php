@@ -369,6 +369,10 @@ unset($db);
 <title><?= $this_page_tabtitle ?> | Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
+<?= defined('IS_DARK_READER_COMPATIBLE')
+    && IS_DARK_READER_COMPATIBLE === true
+    ? '<meta name="darkreader-lock" content="already-dark-mode" />'
+    : '' ?>
 <meta name="format-detection" content="telephone=no" />
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
 <meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=1.0">

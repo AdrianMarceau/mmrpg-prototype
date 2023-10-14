@@ -10,6 +10,9 @@
     // Update the tab name with the page name
     $this_page_tabtitle = 'Sound Test | '.$this_page_tabtitle;
 
+    // This page is already dark to make is dark reader compatible
+    define('IS_DARK_READER_COMPATIBLE', true);
+
     // Require howler scripts and styles for this page
     $admin_include_common_styles[] = 'howler';
     $admin_include_common_scripts[] = 'howler';
@@ -174,10 +177,12 @@
             width: 3em;
             text-align: center;
             background-color: rgba(255, 255, 255, 0.1);
-            transition: background-color 0.2s ease-in-out;
+            transform: scale(1);
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
         }
         #mmrpg .sound-test .sound-button:hover {
             background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
         }
 
 
