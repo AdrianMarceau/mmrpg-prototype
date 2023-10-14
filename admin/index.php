@@ -319,6 +319,7 @@ $actionMap = [
     'edit-pages' => 'edit-pages.php',
     'edit-music' => 'edit-music.php',
     'watch-error-log' => 'error-log.php',
+    'sound-test' => 'sound-test.php',
     'view-sprites' => 'view-sprites.php',
     'view-banners' => 'view-banners.php',
     'generate-prompts' => 'generate-prompts.php',

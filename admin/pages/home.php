@@ -679,6 +679,7 @@
                 $this_group_options[] = $this_option;
             }
 
+            // Add a new menu item for the music editor if the user has explicit permission and the CDN is available
             if (rpg_user::current_user_has_permission('edit-music')
                 && defined('MMRPG_CONFIG_CDN_ROOTDIR')
                 && file_exists(MMRPG_CONFIG_CDN_ROOTDIR)){
@@ -689,6 +690,23 @@
                 $this_group_options[] = $this_option;
             }
 
+            // Add a new menu item for the sound test if any other relevant links are allowed too
+            if (
+                rpg_user::current_user_has_permission('edit-music')
+                || rpg_user::current_user_has_permission('edit-players')
+                || rpg_user::current_user_has_permission('edit-robots')
+                || rpg_user::current_user_has_permission('edit-abilities')
+                || rpg_user::current_user_has_permission('edit-items')
+                || rpg_user::current_user_has_permission('edit-fields')
+                ){
+                $this_option = array(
+                    'link' => array('url' => 'admin/sound-test/', 'text' => 'Sound Test', 'target' => '_blank', 'bullet' => 'volume-up'),
+                    'desc' => 'Listen to in-game sound effects for reference and testing',
+                    );
+                $this_group_options[] = $this_option;
+            }
+
+            // Add a new menu item for sprite viewer if any other relevant links are allowed too
             if (
                 rpg_user::current_user_has_permission('edit-players')
                 || rpg_user::current_user_has_permission('edit-robots')
@@ -698,11 +716,12 @@
                 ){
                 $this_option = array(
                     'link' => array('url' => 'admin/view-sprites/', 'text' => 'Game Sprites', 'target' => '_blank', 'bullet' => 'running'),
-                    'desc' => 'Quickly view game sprites all together in bulk',
+                    'desc' => 'View game sprites together quickly in bulk',
                     );
                 $this_group_options[] = $this_option;
             }
 
+            // Add a new menu item for the event banners if any other relevant links are allowed too
             if (
                 rpg_user::current_user_has_permission('edit-players')
                 || rpg_user::current_user_has_permission('edit-robots')
@@ -712,21 +731,24 @@
                 ){
                 $this_option = array(
                     'link' => array('url' => 'admin/view-banners/?kind=events&refresh=false', 'text' => 'Event Banners', 'target' => '_blank', 'bullet' => 'rectangle-wide'),
-                    'desc' => 'Quickly review all in-game event banners at once',
+                    'desc' => 'Review all in-game event banners at once',
                     );
                 $this_group_options[] = $this_option;
             }
 
+            // Add a new menu item for the challenge banners if any other relevant links are allowed too
             if (
                 rpg_user::current_user_has_permission('edit-players')
                 || rpg_user::current_user_has_permission('edit-robots')
                 || rpg_user::current_user_has_permission('edit-abilities')
                 || rpg_user::current_user_has_permission('edit-items')
                 || rpg_user::current_user_has_permission('edit-fields')
+                || rpg_user::current_user_has_permission('edit-event-challenges')
+                || rpg_user::current_user_has_permission('edit-user-challenges')
                 ){
                 $this_option = array(
                     'link' => array('url' => 'admin/view-banners/?kind=challenges&refresh=false&max=10&page=1', 'text' => 'Challenge Banners', 'target' => '_blank', 'bullet' => 'rectangle-wide'),
-                    'desc' => 'Quickly review challenge mission banners at once',
+                    'desc' => 'Review challenge mission banners at once',
                     );
                 $this_group_options[] = $this_option;
             }
