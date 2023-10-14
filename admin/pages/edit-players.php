@@ -1519,7 +1519,7 @@
                                         //echo('<pre>$temp_alts_array = '.(!empty($temp_alts_array) ? htmlentities(print_r($temp_alts_array, true), ENT_QUOTES, 'UTF-8', true) : '&hellip;').'</pre>');
 
                                         // Only if we're allowed to create new alts for this player
-                                        if (false && $allow_new_alt_creation){
+                                        if ($allow_new_alt_creation){
                                             echo('<hr />'.PHP_EOL);
 
                                             ?>
@@ -1542,16 +1542,7 @@
                                                         ?>
                                                         <option value="<?= $alt_token ?>"<?= in_array($alt_token, $player_image_alts_tokens) ? ' disabled="disabled"' : '' ?>>
                                                             <?= $player_data['player_name'] ?>
-                                                            (<?= ucfirst($alt_token) ?> / <?
-                                                                if ($i == 9){
-                                                                    echo('Darkness');
-                                                                } elseif ($i == 3){
-                                                                    echo('Weapon');
-                                                                } elseif ($i < 9){
-                                                                    echo('Standard');
-                                                                } elseif ($i > 9){
-                                                                    echo('Custom');
-                                                                } ?>)
+                                                            (<?= ucfirst($alt_token) ?> / ???)
                                                         </option>
                                                     <? } ?>
                                                 </select><span></span>
