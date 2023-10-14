@@ -1849,15 +1849,6 @@ class rpg_robot extends rpg_object {
             else { $weights[] = 0;  }
         }
 
-        // Make the frequency of all deprecated moves zero
-        $deprecated_abilities = rpg_ability::get_global_deprecated_abilities();
-        foreach ($deprecated_abilities AS $ability_token){
-            if ($this_robot->has_ability($ability_token)){
-                $options[] = $ability_token;
-                $weights[$ability_token] = 0;
-            }
-        }
-
         // Define the frequency of the attack, defense, and speed mode abilities if set
         if ($this_robot->has_ability('attack-mode')){
             $options[] = 'attack-mode';
@@ -1896,6 +1887,15 @@ class rpg_robot extends rpg_object {
             if ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 3)){ $weights[] = 10;  }
             elseif ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 2)){ $weights[] = 5;  }
             else { $weights[] = 0;  }
+        }
+
+        // Make the frequency of all deprecated moves zero
+        $deprecated_abilities = rpg_ability::get_global_deprecated_abilities();
+        foreach ($deprecated_abilities AS $ability_token){
+            if ($this_robot->has_ability($ability_token)){
+                $options[] = $ability_token;
+                $weights[$ability_token] = 0;
+            }
         }
 
         // If the user has any of the element overdrives loop through and check 'em
