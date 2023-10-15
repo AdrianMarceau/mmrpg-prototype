@@ -202,6 +202,37 @@ $(document).ready(function(){
     }
 
 
+    // -- PLAYER SETTINGS -- //
+
+    // Process complex player setting updates and pass them to the parent window
+    var $playerSettings = $('.player-settings', $thisSettings);
+    if ($playerSettings.length){
+        //console.log('we have player settings specifically');
+
+        // Collect a reference to the player avatar field so we can add events
+        var $playerAvatarField = $('.field.player-avatar', $playerSettings);
+        var $playerAvatarSelect = $('select', $playerAvatarField);
+        var $playerAvatarPreview = $('.preview', $playerAvatarField);
+        //console.log('$playerAvatarField =', $playerAvatarField.length, $playerAvatarField);
+        //console.log('$playerAvatarSelect =', $playerAvatarSelect.length, $playerAvatarSelect);
+        //console.log('$playerAvatarPreview =', $playerAvatarPreview.length, $playerAvatarPreview);
+
+        // Define a function for uploading the player avatar preview
+        function updatePlayerAvatarPreview(){
+            var avatarName = $playerAvatarSelect.val();
+            if (!avatarName || !avatarName.length){ avatarName = 'player'; }
+            var avatarURL = 'images/players/'+avatarName+'/sprite_left_40x40.png?'+gameSettings.cacheTime;
+            $playerAvatarPreview.find('.sprite').css({backgroundImage: 'url('+avatarURL+')'});
+            }
+
+        // Define onchange events for whenever the select changes
+        $playerAvatarSelect.bind('change', function(e){
+            updatePlayerAvatarPreview();
+            });
+
+        }
+
+
     // -- GAME SETTINGS -- //
 
     // Process complex game setting updates and pass them to the parent window

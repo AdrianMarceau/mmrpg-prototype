@@ -31,9 +31,9 @@ $current_user_id = rpg_user::get_current_userid();
 $current_user_info = $db->get_array("SELECT
     {$temp_user_fields},
     {$temp_user_role_fields}
-    FROM mmrpg_users AS users
-    LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
-    WHERE user_id = {$current_user_id}
+    FROM `mmrpg_users` AS `users`
+    LEFT JOIN `mmrpg_roles` AS `roles` ON `roles`.`role_id` = `users`.`role_id`
+    WHERE `user_id` = {$current_user_id}
     ;");
 
 
@@ -41,6 +41,54 @@ $current_user_info = $db->get_array("SELECT
 $profile_avatar_options_markup = mmrpg_prototype_get_profile_avatar_options($current_user_info, $allowed_avatar_options);
 $profile_colour_options_markup = mmrpg_prototype_get_profile_colour_options($current_user_info, $allowed_colour_options);
 $profile_background_options_markup = mmrpg_prototype_get_profile_background_options($current_user_info, $allowed_background_options);
+
+// If the option has been unlocked, collect the proxy options as well
+$current_proxy_info = array();
+if (mmrpg_prototype_item_unlocked('light-program')){
+
+    // Collect available proxy options given this user's current data and progress
+    $proxy_image_options_markup = mmrpg_prototype_get_proxy_image_options($current_user_info, $allowed_proxy_image_options);
+    $proxy_bonus_options_markup = mmrpg_prototype_get_proxy_bonus_options($current_user_info, $allowed_proxy_bonus_options);
+    $proxy_field_options_markup = mmrpg_prototype_get_proxy_field_options($current_user_info, $allowed_proxy_field_options);
+    $proxy_robot_options_markup = mmrpg_prototype_get_proxy_robot_options($current_user_info, $allowed_proxy_robot_options);
+
+    // Collect the current proxy info from the database if it exists
+    $current_proxy_info = $db->get_array("SELECT
+        `proxies`.`proxy_id`,
+        `proxies`.`user_id`,
+        `proxies`.`proxy_player`,
+        `proxies`.`proxy_image`,
+        `proxies`.`proxy_bonus`,
+        `proxies`.`proxy_fields`,
+        `proxies`.`proxy_robots`,
+        `proxies`.`proxy_date_created`,
+        `proxies`.`proxy_date_modified`,
+        `proxies`.`proxy_flag_enabled`
+        FROM `mmrpg_users_proxies` AS `proxies`
+        WHERE `user_id` = {$current_user_id}
+        ;");
+
+    // If a proxy for this user doesn't exist yet, create a template array
+    if (empty($current_proxy_info)){
+        $current_proxy_info = array(
+            'proxy_id' => 0,
+            'user_id' => $current_user_id,
+            'proxy_player' => 'player',
+            'proxy_image' => 'player',
+            'proxy_bonus' => '',
+            'proxy_fields' => '',
+            'proxy_robots' => '',
+            'proxy_date_created' => time(),
+            'proxy_date_modified' => 0,
+            'proxy_flag_enabled' => 0,
+            );
+    }
+
+    // Break apart any json-encoded proxy fields
+    $current_proxy_info['proxy_fields'] = !empty($current_proxy_info['proxy_fields']) ? json_decode($current_proxy_info['proxy_fields']) : array();
+    $current_proxy_info['proxy_robots'] = !empty($current_proxy_info['proxy_robots']) ? json_decode($current_proxy_info['proxy_robots']) : array();
+
+}
 
 
 // -- PROCESS FORM ACTIONS -- //
@@ -288,6 +336,55 @@ if (!empty($form_actions)){
         $_SESSION[$session_token]['battle_settings']['battleButtonMode'] = $battleButtonMode;
 
         //error_log('(A) $_SESSION[$session_token][\'battle_settings\'][\'audioBalanceConfig\'] = '.print_r($_SESSION[$session_token]['battle_settings']['audioBalanceConfig'], true));
+
+        return true;
+
+        };
+
+    // Define an update function for the "Player Settings" tab
+    $update_functions['player_settings'] = function() use (&$updated_tabs, &$form_messages, &$form_data, &$current_proxy_info){
+        global $db, $current_user_id, $current_user_info;
+
+        $form_data = array();
+
+        $form_data['proxy_image'] = !empty($_POST['user_proxy_image']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['user_proxy_image']) ? trim(strtolower($_POST['user_proxy_image'])) : '';
+        $form_data['proxy_bonus'] = !empty($_POST['user_proxy_bonus']) && preg_match('/^[-_a-z0-9]+$/i', $_POST['user_proxy_bonus']) ? trim(strtolower($_POST['user_proxy_bonus'])) : '';
+        $form_data['proxy_fields'] = !empty($_POST['user_proxy_fields']) && is_array($_POST['user_proxy_fields']) ? $_POST['user_proxy_fields'] : array();
+        $form_data['proxy_robots'] = !empty($_POST['user_proxy_robots']) && is_array($_POST['user_proxy_robots']) ? $_POST['user_proxy_robots'] : array();
+
+        $form_data['proxy_fields'] = array_unique(array_filter($form_data['proxy_fields']));
+        $form_data['proxy_robots'] = array_unique(array_filter($form_data['proxy_robots']));
+
+        //error_log('$form_data = '.print_r($form_data, true));
+
+        if (!empty($form_data['proxy_robots'])){
+            $form_data['proxy_robots'] = array_filter($form_data['proxy_robots'], function($robot_token){
+                global $allowed_proxy_robot_options;
+                return in_array($robot_token, $allowed_proxy_robot_options);
+                });
+            if (empty($form_data['proxy_robots'])){
+                $form_messages[] = array('warning', 'Some of the selected robots were invalid and have been removed');
+            }
+        }
+
+        if (empty($form_data)){ return false; }
+
+        $form_data['proxy_image'] = preg_replace('/_base$/i', '', $form_data['proxy_image']);
+        $form_data['proxy_fields'] = json_encode($form_data['proxy_fields']);
+        $form_data['proxy_robots'] = json_encode($form_data['proxy_robots']);
+
+        if (!empty($current_proxy_info['proxy_id'])){
+            $update_results = $db->update('mmrpg_users_proxies',
+                array_merge($form_data, array('proxy_date_modified' => time())),
+                array('user_id' => $current_user_id)
+                );
+        } else {
+            $form_data['user_id'] = $current_user_id;
+            $form_data['proxy_date_created'] = time();
+            $form_data['proxy_date_modified'] = time();
+            $form_data['proxy_flag_enabled'] = 1;
+            $update_results = $db->insert('mmrpg_users_proxies', $form_data);
+        }
 
         return true;
 
@@ -638,6 +735,109 @@ if (true){
         );
     }
 
+}
+
+// Generate markup for PLAYER SETTINGS if applicable
+if (mmrpg_prototype_item_unlocked('light-program')){
+
+    // Define the markup for this section
+    $tab_token = 'player_settings';
+    $tab_name = 'Player Settings';
+    ob_start();
+    ?>
+
+        <div class="player-settings">
+
+            <p class="description">
+                Your <strong>Player Settings</strong> are used whenever another user challenges your ghost data to a Player Battle.
+                Use the fields below to customize how your proxy behaves, or leave the dropdowns blank to let the system automatically
+                decide for you.  Have fun!
+            </p>
+
+            <div class="subwrap">
+
+                <div class="field player-avatar">
+                    <strong class="label">Player Avatar</strong>
+                    <select class="select" name="user_proxy_image">
+                        <?= str_replace(
+                            'value="'.$current_proxy_info['proxy_image'].'"',
+                            'value="'.$current_proxy_info['proxy_image'].'" selected="selected"',
+                            $proxy_image_options_markup
+                            ) ?>
+                    </select>
+                    <div class="preview">
+                        <?
+                        $existing_player_image = $current_proxy_info['proxy_image'];
+                        if (empty($existing_player_image)){ $existing_player_image = 'player'; }
+                        $player_sprite_path = 'images/players/'.$existing_player_image.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+                        $preview_sprite_class = 'sprite sprite_40x40 sprite_40x40_base';
+                        $preview_sprite_styles = 'background-image: url('.$player_sprite_path.'); ';
+                        echo('<div class="'.$preview_sprite_class.'" style="'.$preview_sprite_styles.'"></div>');
+                        ?>
+                    </div>
+                </div>
+
+                <div class="field player-bonus">
+                    <strong class="label">Player Bonus</strong>
+                    <select class="select" name="user_proxy_bonus">
+                        <?= str_replace(
+                            'value="'.$current_proxy_info['proxy_bonus'].'"',
+                            'value="'.$current_proxy_info['proxy_bonus'].'" selected="selected"',
+                            $proxy_bonus_options_markup
+                            ) ?>
+                    </select>
+                </div>
+
+                <div class="field player-field">
+                    <strong class="label">Battle Field Base <em>background</em></strong>
+                    <select class="select" name="user_proxy_fields[]">
+                        <?= !empty($current_proxy_info['proxy_fields'][0]) ? str_replace(
+                            'value="'.$current_proxy_info['proxy_fields'][0].'"',
+                            'value="'.$current_proxy_info['proxy_fields'][0].'" selected="selected"',
+                            $proxy_field_options_markup
+                            ) : $proxy_field_options_markup ?>
+                    </select>
+                </div>
+
+                <div class="field player-field">
+                    <strong class="label">Battle Field Fusion <em>foreground</em></strong>
+                    <select class="select" name="user_proxy_fields[]">
+                        <?= !empty($current_proxy_info['proxy_fields'][1]) ? str_replace(
+                            'value="'.$current_proxy_info['proxy_fields'][1].'"',
+                            'value="'.$current_proxy_info['proxy_fields'][1].'" selected="selected"',
+                            $proxy_field_options_markup
+                            ) : $proxy_field_options_markup ?>
+                    </select>
+                </div>
+
+                <div class="field fullsize player-robots">
+                    <strong class="label">Robot Team Roster <em>stats, items, alts, and abilities are automatically pulled from your save</em></strong>
+                    <div class="subfield" style="padding-right: 0;">
+                        <? for ($i = 0; $i < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX; $i++){ ?>
+                            <div style="float: left; margin: 0 10px 5px 0; width: calc(25% - 10px);"><select class="select" name="user_proxy_robots[]">
+                                <?= !empty($current_proxy_info['proxy_robots'][$i]) ? str_replace(
+                                    'value="'.$current_proxy_info['proxy_robots'][$i].'"',
+                                    'value="'.$current_proxy_info['proxy_robots'][$i].'" selected="selected"',
+                                    $proxy_robot_options_markup
+                                    ) : $proxy_robot_options_markup ?>
+                            </select></div>
+                        <? } ?>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    <?
+    $tab_markup = trim(ob_get_clean());
+    if (!empty($tab_markup)){
+        $settings_tabs[] = array(
+        'token' => $tab_token,
+        'name' => $tab_name,
+        'markup' => $tab_markup
+        );
+    }
 }
 
 // Generate markup for ADVANCED SETTINGS if applicable

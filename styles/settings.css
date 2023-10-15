@@ -387,6 +387,9 @@ body.windowFlag_landscapeMode #prototype {
     min-height: 50px;
     position: relative;
 }
+#settings .tab_sections.ps-container .section .field {
+    width: calc(50% - 10px);
+}
 #settings .tab_sections .section .field:nth-child(odd) {
     clear: left;
 }
@@ -661,6 +664,42 @@ input::-webkit-calendar-picker-indicator {
     text-align: left;
 }
 
+
+#settings .player-settings {
+    display: block;
+
+}
+
+#settings .player-settings .player-avatar {
+    display: block;
+    position: relative;
+}
+#settings .player-settings .player-avatar .select {
+    width: calc(98% - 40px) !important;
+}
+#settings .player-settings .player-avatar .preview {
+    display: block;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    background-color: transparent;
+}
+@keyframes player-avatar-preview-bounce {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(0, -1px); }
+}
+#settings .player-settings .player-avatar .preview .sprite {
+    transform: translate(0, 0);
+    animation: player-avatar-preview-bounce 1s infinite steps(1);
+}
+#settings .player-settings .player-avatar .preview .sprite_40x40 {
+    background-position: 0 0;
+}
+#settings .player-settings .player-avatar .preview .sprite_40x40:hover {
+    background-position: -80px 0;
+}
 
 
 /*

@@ -4018,6 +4018,251 @@ function mmrpg_prototype_get_profile_background_options($this_userinfo, &$allowe
 
 }
 
+
+
+// Define a function for collecting a list of allowed avatar options for a given player proxy
+function mmrpg_prototype_get_proxy_image_options($this_userinfo, &$allowed_proxy_image_options = array()){
+
+    // Collect session token for later
+    $session_token = rpg_game::session_token();
+
+    // Collect a list of players for use later in the script
+    $mmrpg_database_players = rpg_player::get_index(true);
+
+    // Define an array to hold all the allowed avatar options
+    $allowed_player_tokens = array('proxy');
+    if (mmrpg_prototype_player_unlocked('dr-light')){ $allowed_player_tokens[] = 'dr-light'; }
+    if (mmrpg_prototype_player_unlocked('dr-wily')){ $allowed_player_tokens[] = 'dr-wily'; }
+    if (mmrpg_prototype_player_unlocked('dr-cossack')){ $allowed_player_tokens[] = 'dr-cossack'; }
+    if (mmrpg_prototype_item_unlocked('kalinka-link')){ $allowed_player_tokens[] = 'kalinka'; }
+    $allowed_proxy_image_options = array();
+    foreach ($mmrpg_database_players AS $player_token => $player_info){
+        if (!in_array($player_token, $allowed_player_tokens)){ continue; }
+        $player_image_alts = array();
+        $player_image_alts[] = array('token' => 'base', 'name' => $player_info['player_name'], 'summons' => 0);
+        if (!empty($player_info['player_image_alts'])){
+            $player_image_alts = array_merge($player_image_alts, $player_info['player_image_alts']);
+        }
+        $allowed_proxy_image_options[$player_token] = $player_image_alts;
+    }
+    if (isset($allowed_proxy_image_options['proxy'])){
+        $proxy = $allowed_proxy_image_options['proxy'];
+        unset($allowed_proxy_image_options['proxy']);
+        $allowed_proxy_image_options['proxy'] = $proxy;
+    }
+
+    //error_log('$mmrpg_database_players: '.print_r($mmrpg_database_players, true));
+    //error_log('$allowed_proxy_image_options: '.print_r($allowed_proxy_image_options, true));
+
+    // Define an array to hold all the HTML avatar options
+    $html_avatar_options = array();
+    $html_avatar_options[] = '<option value="">-</option>';
+
+    // Add all the robot avatars to the list
+    $last_group_token = false;
+    foreach ($allowed_proxy_image_options AS $player_token => $image_options){
+        $player_info = $mmrpg_database_players[$player_token];
+        if ($player_token != $last_group_token){
+            if (!empty($last_group_token)){ $html_avatar_options[] = '</optgroup>'; }
+            $group_label = $player_token !== 'proxy' ? $player_info['player_name'] : 'Other';
+            $html_avatar_options[] = '<optgroup label="'.$group_label.'">';
+            $last_group_token = $player_token;
+        }
+        foreach ($image_options AS $key => $alt_info){
+            if ($player_token === 'proxy'
+                && ($alt_info['token'] === 'base' || $alt_info['token'] === 'alt')){
+                continue; // for now, don't show proxy's true form
+                }
+            $image = $player_info['player_token'].($alt_info['token'] !== 'base' ? '_'.$alt_info['token'] : '');
+            $label = $alt_info['name'];
+            if ($player_token === 'proxy'
+                && preg_match('/^(.+)\s\((.+)\)$/', $label, $matches)){
+                $label = $matches[2];
+                }
+            $html_avatar_options[] = '<option value="'.$image.'">'.$label.'</option>';
+        }
+    }
+    if (!empty($last_group_token)){ $html_avatar_options[] = '</optgroup>'; }
+
+    // Add the optgroup closing tag
+    $html_avatar_options[] = '</optgroup>';
+
+    // Return the generated options
+    return implode(PHP_EOL, $html_avatar_options);
+
+}
+
+// Define a function for collecting a list of allowed stat bonys options for a given player proxy
+function mmrpg_prototype_get_proxy_bonus_options($this_userinfo, &$allowed_proxy_bonus_options = array()){
+
+    // Define an array to hold all the allowed bonus options
+    $allowed_proxy_bonus_options = array(
+        'energy' => 'Energy',
+        'attack' => 'Attack',
+        'defense' => 'Defense',
+        'speed' => 'Speed'
+        );
+
+    // Add an array to hold all the HTML bonus options
+    $html_bonus_options = array();
+    $html_bonus_options[] = '<option value="">-</option>';
+
+    // Add all the bonus options to the list
+    $bonus_amount = 25;
+    foreach ($allowed_proxy_bonus_options AS $token => $name){
+        $html_bonus_options[] = '<option value="'.$token.'">'.$name.' +'.$bonus_amount.'%</option>';
+    }
+
+    // Return the generated options
+    return implode(PHP_EOL, $html_bonus_options);
+
+}
+
+// Define a function for collecting a list of allowed field options for a given player proxy
+function mmrpg_prototype_get_proxy_field_options($this_userinfo, &$allowed_proxy_field_options = array()){
+
+    // Collect a list of fields for use later in the script
+    $mmrpg_database_fields = rpg_field::get_index(true);
+
+    // Collect the list of intro fields for sorting purposes
+    $intro_fields = rpg_player::get_intro_fields();
+    $homebase_fields = rpg_player::get_homebase_fields();
+    unset($intro_fields['default'], $homebase_fields['default']);
+
+    //error_log('$allowed_proxy_field_options: '.print_r($allowed_proxy_field_options, true));
+
+    // Define the list of game tokens we're allowed to unlock
+    $allowed_game_tokens = array();
+    if (mmrpg_prototype_complete('dr-light')){ $allowed_game_tokens[] = 'MM1'; }
+    if (mmrpg_prototype_complete('dr-wily')){ $allowed_game_tokens[] = 'MM2'; }
+    if (mmrpg_prototype_complete('dr-cossack')){ $allowed_game_tokens[] = 'MM4'; }
+    if (mmrpg_prototype_complete() >= 3){ $allowed_game_tokens[] = 'MM3'; }
+
+    // Define an array to hold all the allowed field options
+    $allowed_proxy_field_options = array();
+    if (mmrpg_prototype_player_unlocked('dr-light')){
+        $allowed_proxy_field_options[] = $intro_fields['dr-light'];
+        $allowed_proxy_field_options[] = $homebase_fields['dr-light'];
+    }
+    if (mmrpg_prototype_player_unlocked('dr-wily')){
+        $allowed_proxy_field_options[] = $intro_fields['dr-wily'];
+        $allowed_proxy_field_options[] = $homebase_fields['dr-wily'];
+    }
+    if (mmrpg_prototype_player_unlocked('dr-cossack')){
+        $allowed_proxy_field_options[] = $intro_fields['dr-cossack'];
+        $allowed_proxy_field_options[] = $homebase_fields['dr-cossack'];
+    }
+    foreach ($mmrpg_database_fields AS $token => $info){
+        if ($info['field_class'] === 'master'
+            && $info['field_flag_hidden'] === 0
+            && in_array($info['field_game'], $allowed_game_tokens)){
+            $allowed_proxy_field_options[] = $token;
+        }
+    }
+    $allowed_proxy_field_options = array_unique($allowed_proxy_field_options);
+
+    //error_log('$allowed_proxy_field_options: '.print_r($allowed_proxy_field_options, true));
+
+    // Add an array to hold all the HTML field options
+    $html_field_options = array();
+    $html_field_options[] = '<option value="">-</option>';
+
+    // Add all the field options to the list
+    $last_group_token = false;
+    foreach ($mmrpg_database_fields AS $field_token => $field_info){
+        if (!in_array($field_token, $allowed_proxy_field_options)){ continue; }
+        if (in_array($field_token, $intro_fields)){ $field_info['field_game'] = 'INTRO'; }
+        elseif (in_array($field_token, $homebase_fields)){ $field_info['field_game'] = 'HOME'; }
+        if ($field_info['field_game'] != $last_group_token){
+            if (!empty($last_group_token)){ $html_field_options[] = '</optgroup>'; }
+            $group_label = $field_info['field_game'].' Fields';
+            $html_field_options[] = '<optgroup label="'.$group_label.'">';
+            $last_group_token = $field_info['field_game'];
+        }
+        $label = $field_info['field_name'];
+        $label .= ' ('.(!empty($field_info['field_type']) ? ucfirst($field_info['field_type']) : 'Neutral').')';
+        $field_multipliers = !empty($field_info['field_multipliers']) ? $field_info['field_multipliers'] : array();
+        unset($field_multipliers['experience']);
+        if (!empty($field_multipliers)){ foreach ($field_multipliers AS $type => $value){ $label .= ' | '.ucfirst($type).' &times;'.$value; } }
+        $html_field_options[] = '<option value="'.$field_token.'">'.$label.'</option>';
+    }
+    if (!empty($last_group_token)){ $html_field_options[] = '</optgroup>'; }
+
+    // Return the generated options
+    return implode(PHP_EOL, $html_field_options);
+
+}
+
+// Define a function for collecting a list of allowed robot options for a given player proxy
+function mmrpg_prototype_get_proxy_robot_options($this_userinfo, &$allowed_proxy_robot_options = array()){
+
+    // Define the game session helper var
+    $session_token = rpg_game::session_token();
+
+    // Collect a list of robots for use later in the script
+    $mmrpg_database_robots = rpg_robot::get_index(true);
+
+    // Loop through relevant sessions keys and collect plus merge any robot data
+    $session_battle_keys = array('battle_settings', 'battle_rewards');
+    $unlocked_player_robots = array();
+    foreach ($session_battle_keys AS $session_battle_key){
+        if (!empty($_SESSION[$session_token]['values'][$session_battle_key])){
+            foreach ($_SESSION[$session_token]['values'][$session_battle_key] AS $player_token => $player_array){
+                if (!empty($player_array['player_robots'])){
+                    foreach ($player_array['player_robots'] AS $robot_token => $robot_array){
+                        $robot_array['current_player'] = $player_token;
+                        if (!isset($unlocked_player_robots[$robot_token])){ $unlocked_player_robots[$robot_token] = $robot_array; }
+                        else { $unlocked_player_robots[$robot_token] = array_merge($unlocked_player_robots[$robot_token], $robot_array); }
+                        $robot_info = $mmrpg_database_robots[$robot_token];
+                        if (empty($robot_info['robot_flag_published'])
+                            || empty($robot_info['robot_flag_complete'])
+                            || $robot_info['robot_class'] !== 'master'){
+                            unset($unlocked_player_robots[$robot_token]);
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //error_log('$unlocked_player_robots: '.print_r($unlocked_player_robots, true));
+    //return '';
+
+    // Define an array to hold all the allowed robot options
+    $allowed_proxy_robot_options = array();
+    foreach ($unlocked_player_robots AS $robot_token => $robot_info_custom){
+        $allowed_proxy_robot_options[] = $robot_token;
+    }
+
+    // Add an array to hold all the HTML robot options
+    $html_robot_options = array();
+    $html_robot_options[] = '<option value="">-</option>';
+
+    // Add all the robot options to the list
+    $last_group_token = false;
+    foreach ($mmrpg_database_robots AS $robot_token => $robot_info){
+        if (!in_array($robot_token, $allowed_proxy_robot_options)){ continue; }
+        if (in_array($robot_token, array('mega-man', 'bass', 'proto-man'))){ $robot_info['robot_game'] = 'HERO'; }
+        elseif (in_array($robot_token, array('roll', 'disco', 'rhythm'))){ $robot_info['robot_game'] = 'SUPPORT'; }
+        if ($robot_info['robot_game'] != $last_group_token){
+            if (!empty($last_group_token)){ $html_robot_options[] = '</optgroup>'; }
+            $group_label = $robot_info['robot_game'].' Robots';
+            $html_robot_options[] = '<optgroup label="'.$group_label.'">';
+            $last_group_token = $robot_info['robot_game'];
+        }
+        $label = $robot_info['robot_name'];
+        $label .= ' ('.(!empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral').')';
+        $html_robot_options[] = '<option value="'.$robot_token.'">'.$label.'</option>';
+    }
+    if (!empty($last_group_token)){ $html_robot_options[] = '</optgroup>'; }
+
+    // Return the generated options
+    return implode(PHP_EOL, $html_robot_options);
+
+}
+
+
 // Define a function for formatting user data into session-format for later reference
 function mmrpg_prototype_format_user_data_for_session($this_userinfo){
     $session_user = array();
