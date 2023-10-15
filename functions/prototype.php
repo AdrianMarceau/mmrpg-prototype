@@ -3347,33 +3347,40 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
 
         // Define the array for pulling all the leaderboard data
         $temp_leaderboard_query = 'SELECT
-                mmrpg_leaderboard.user_id,
-                mmrpg_leaderboard.board_points,
-                mmrpg_users.user_name,
-                mmrpg_users.user_name_clean,
-                mmrpg_users.user_name_public,
-                mmrpg_users.user_colour_token,
-                mmrpg_users.user_colour_token2,
-                mmrpg_users.user_gender,
-                mmrpg_saves.save_values_battle_rewards AS player_rewards,
-                mmrpg_saves.save_values_battle_settings AS player_settings,
-                mmrpg_saves.save_values_battle_items AS player_items,
-                mmrpg_saves.save_values AS player_values,
-                mmrpg_saves.save_counters AS player_counters
-                FROM mmrpg_leaderboard
-                LEFT JOIN mmrpg_users ON mmrpg_users.user_id = mmrpg_leaderboard.user_id
-                LEFT JOIN mmrpg_saves ON mmrpg_users.user_id = mmrpg_saves.user_id
+                `board`.`user_id`,
+                `board`.`board_points`,
+                `users`.`user_name`,
+                `users`.`user_name_clean`,
+                `users`.`user_name_public`,
+                `users`.`user_colour_token`,
+                `users`.`user_colour_token2`,
+                `users`.`user_gender`,
+                `saves`.`save_values_battle_rewards` AS `player_rewards`,
+                `saves`.`save_values_battle_settings` AS `player_settings`,
+                `saves`.`save_values_battle_items` AS `player_items`,
+                `saves`.`save_values` AS `player_values`,
+                `saves`.`save_counters` AS `player_counters`,
+                `proxies`.`proxy_player`,
+                `proxies`.`proxy_image`,
+                `proxies`.`proxy_bonus`,
+                `proxies`.`proxy_fields`,
+                `proxies`.`proxy_robots`,
+                `proxies`.`proxy_flag_enabled`
+                FROM `mmrpg_leaderboard` AS `board`
+                LEFT JOIN `mmrpg_users` AS `users` ON `users`.`user_id` = `board`.`user_id`
+                LEFT JOIN `mmrpg_saves` AS `saves` ON `saves`.`user_id` = `users`.`user_id`
+                LEFT JOIN `mmrpg_users_proxies` AS `proxies` ON `proxies`.`user_id` = `users`.`user_id`
                 WHERE
-                1 = 1
-                AND board_points <= '.$this_player_points_max.'
-                AND mmrpg_leaderboard.user_id != '.$this_userid.'
-                AND mmrpg_users.user_flag_approved = 1
-                '.(!empty($temp_exclude_usernames_string) ? 'AND user_name_clean NOT IN ('.$temp_exclude_usernames_string.') ' : '').'
+                (1 = 1 OR `users`.`user_id` = 412)
+                AND `board`.`board_points` <= '.$this_player_points_max.'
+                AND `board`.`user_id` != '.$this_userid.'
+                AND `users`.`user_flag_approved` = 1
+                '.(!empty($temp_exclude_usernames_string) ? 'AND `users`.`user_name_clean` NOT IN ('.$temp_exclude_usernames_string.') ' : '').'
                 ORDER BY
-                '.(!empty($temp_include_usernames_string) ? ' FIELD(user_name_clean, '.$temp_include_usernames_string.') DESC, ' : '').'
-                '.(!empty($temp_exclude_usernames_string) ? ' FIELD(user_name_clean, '.$temp_exclude_usernames_string.') ASC, ' : '').'
-                board_points DESC,
-                mmrpg_saves.save_date_modified DESC
+                '.(!empty($temp_include_usernames_string) ? ' FIELD(`users`.`user_name_clean`, '.$temp_include_usernames_string.') DESC, ' : '').'
+                '.(!empty($temp_exclude_usernames_string) ? ' FIELD(`users`.`user_name_clean`, '.$temp_exclude_usernames_string.') ASC, ' : '').'
+                `board`.`board_points` DESC,
+                `saves`.`save_date_modified` DESC
                 LIMIT 12
             ';
 
@@ -3403,6 +3410,9 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 unset($player['values']['battle_shops'], $player['values']['prototype_awards']);
                 unset($player['values']['player_this-item-omega_prototype'], $player['values']['dr-light_this-item-omega_prototype'], $player['values']['dr-wily_this-item-omega_prototype'], $player['values']['dr-cossack_this-item-omega_prototype']);
                 unset($player['values']['player_target-robot-omega_prototype'], $player['values']['dr-light_target-robot-omega_prototype'], $player['values']['dr-wily_target-robot-omega_prototype'], $player['values']['dr-cossack_target-robot-omega_prototype']);
+
+                $player['proxy_fields'] = !empty($player['proxy_fields']) ? json_decode($player['proxy_fields'], true) : array();
+                $player['proxy_robots'] = !empty($player['proxy_robots']) ? json_decode($player['proxy_robots'], true) : array();
 
                 $this_leaderboard_target_players[$key] = $player;
 
