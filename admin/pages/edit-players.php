@@ -1532,7 +1532,7 @@
                                                     <option value="">-</option>
                                                     <?
                                                     $alt_limit = 10;
-                                                    if ($alt_limit < count($player_image_alts)){ $alt_limit = count($player_image_alts) + 1; }
+                                                    if ($alt_limit < count($player_image_alts) + 1){ $alt_limit = count($player_image_alts) + 1; }
                                                     foreach ($player_image_alts AS $info){ if (!empty($info['token'])){
                                                         $num = (int)(str_replace('alt', '', $info['token']));
                                                         if ($alt_limit < $num){ $alt_limit = $num + 1; }
