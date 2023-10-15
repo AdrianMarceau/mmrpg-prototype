@@ -4085,10 +4085,12 @@ function mmrpg_prototype_get_proxy_image_options($this_userinfo, &$allowed_proxy
                 }
             $image = $player_info['player_token'].($alt_info['token'] !== 'base' ? '_'.$alt_info['token'] : '');
             $label = $alt_info['name'];
-            if ($player_token === 'proxy'
-                && preg_match('/^(.+)\s\((.+)\)$/', $label, $matches)){
-                $label = $matches[2];
-                }
+            if ($player_token === 'proxy'){
+                //error_log('$label (old) = '.$label);
+                $label = preg_replace('/^\s?proxy\s+/i', '', $label);
+                $label = trim(trim($label), '()');
+                //error_log('$label (new) = '.$label);
+            }
             $html_avatar_options[] = '<option value="'.$image.'">'.$label.'</option>';
         }
     }
