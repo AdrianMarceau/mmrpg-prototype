@@ -1510,6 +1510,9 @@ class rpg_player extends rpg_object {
             $this_quote_text = str_replace($this_find, $this_replace, $this_player_quotes[$quote_type]);
             // Collect the text colour for this player
             $this_type_token = str_replace('dr-', '', $this->player_token);
+            if (!isset($mmrpg_index_types[$this_type_token])){
+                if (!empty($this->player_type)){ $this_type_token = $this->player_type; }
+            }
             $this_text_colour = !empty($mmrpg_index_types[$this_type_token]) ? $mmrpg_index_types[$this_type_token]['type_colour_light'] : array(200, 200, 200);
             foreach ($this_text_colour AS $key => $val){ $this_text_colour[$key] += 20; }
             // Generate the quote text markup with the appropriate RGB values
