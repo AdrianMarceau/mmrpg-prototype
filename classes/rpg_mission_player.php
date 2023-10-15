@@ -345,7 +345,7 @@ class rpg_mission_player extends rpg_mission {
             rpg_battle::random_positive_word().' I\'ve got {robots} so far, but I\'m not done yet!',
             rpg_battle::random_positive_word().' I\'m ready to battle! Are you ready to lose?',
             rpg_battle::random_positive_word().' Once I beat you, I\'ll get your Player Token!',
-            rpg_battle::random_positive_word().' I\'m getting stronger every day! Are you ready!',
+            rpg_battle::random_positive_word().' I\'m getting stronger every day! Are you ready?',
             rpg_battle::random_positive_word().' The name\'s {name}... You\'d best remember it!',
             rpg_battle::random_positive_word().' Next up is you! I\'m not afraid of you!',
             );
