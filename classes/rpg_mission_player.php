@@ -305,12 +305,6 @@ class rpg_mission_player extends rpg_mission {
         //error_log('$this_user_robots = '.print_r($this_user_robots, true));
         //error_log('$this_user_robots_unlocked = '.print_r($this_user_robots_unlocked, true));
 
-        // Ensure at least basic proxy details have been set
-        if (empty($this_user_info['proxy_image'])
-            && empty($this_user_info['proxy_bonus'])){
-            return;
-        }
-
         // Collect indexes for reference
         $this_robot_index = rpg_robot::get_index(true);
 
