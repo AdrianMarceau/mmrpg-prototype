@@ -254,6 +254,9 @@ elseif ($this_action == 'start'){
     if (!empty($this_battle->battle_target_player['player_name'])){
         $target_playerinfo['player_name'] = $this_battle->battle_target_player['player_name'];
     }
+    if (!empty($this_battle->battle_target_player['player_type'])){
+        $target_playerinfo['player_type'] = $this_battle->battle_target_player['player_type'];
+    }
     if (!empty($this_battle->battle_target_player['player_image'])){
         $target_playerinfo['player_image'] = $this_battle->battle_target_player['player_image'];
     }
