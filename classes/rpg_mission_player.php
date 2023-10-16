@@ -354,8 +354,8 @@ class rpg_mission_player extends rpg_mission {
         $random_intro_quote = str_replace('{robots}', $human_robots_unlocked_text, $random_intro_quote);
         $battle_target_player['player_quotes']['battle_start'] = $random_intro_quote;
         $battle_target_player['player_quotes']['battle_taunt'] = 'I\'ve already collected '.$human_robots_unlocked_text.'! How about you?';
-        $battle_target_player['player_quotes']['battle_victory'] = rpg_battle::random_positive_word().' I can\'t believe I won! '.$first_robot_info['robot_name'].' and I make a great team!';
-        $battle_target_player['player_quotes']['battle_defeat'] = rpg_battle::random_negative_word().' I can\'t believe you beat me... '.$first_robot_info['robot_name'].' and I will get you next time!';
+        $battle_target_player['player_quotes']['battle_victory'] = rpg_battle::random_positive_word().' I can\'t believe I won! {this_robot} and I make a great team!';
+        $battle_target_player['player_quotes']['battle_defeat'] = rpg_battle::random_negative_word().' I can\'t believe you beat me... {this_robot} and I will get you next time!';
         //error_log('$this_battle_omega[\'battle_target_player\']: '.print_r($battle_target_player, true));
 
         // Return the generated target player info
