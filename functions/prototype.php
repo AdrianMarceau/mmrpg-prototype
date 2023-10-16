@@ -3376,7 +3376,6 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                     `users`.`user_flag_approved` = 1
                     AND `board`.`board_points` <= '.$this_player_points_max.'
                     '.(!empty($temp_exclude_usernames_string) ? 'AND `users`.`user_name_clean` NOT IN ('.$temp_exclude_usernames_string.') ' : '').'
-                    '.(!empty($temp_include_usernames_string) ? 'AND `users`.`user_name_clean` IN ('.$temp_include_usernames_string.') ' : '').'
                     )
                 ORDER BY
                 FIELD(`board`.`user_id`, '.$this_userid.') DESC,
