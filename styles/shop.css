@@ -258,29 +258,22 @@
     cursor: pointer;
 }
 
+@keyframes sprite-bounce-animation {
+  from { transform: translate(0, 0); }
+  to { transform: translate(0, -1px); }
+}
 #shop #console .sprite_player {
-    animation: loop steps(2) 1s infinite;
+    transform: translate(0, 0);
+    animation: sprite-bounce-animation steps(2) 1s infinite;
 }
 #shop #console .event[data-token="auto"] .sprite_player {
-    animation: loop steps(2) 1s infinite;
+    animation: sprite-bounce-animation steps(2) 1.0s infinite;
 }
 #shop #console .event[data-token="reggae"] .sprite_player {
-    animation: loop steps(2) 0.5s infinite;
+    animation: sprite-bounce-animation steps(2) 0.5s infinite;
 }
 #shop #console .event[data-token="kalinka"] .sprite_player {
-    animation: loop steps(2) 2s infinite;
-}
-@-moz-keyframes loop {
-  from { background-position: 0 0; }
-  to { background-position: -80px 0; }
-}
-@-webkit-keyframes loop {
-  from { background-position: 0 0; }
-  to { background-position: -80px 0; }
-}
-@keyframes loop {
-  from { background-position: 0 0; }
-  to { background-position: -80px 0; }
+    animation: sprite-bounce-animation steps(2) 2.0s infinite;
 }
 
 
@@ -446,12 +439,47 @@
     font-size: 13px;
     line-height: 13px;
 }
+#shop #console .event .this_sprite {
+    top: 4px;
+    left: 4px;
+    width: 36px;
+    height: 36px;
+    background-image: none;
+    background-position: center center;
+    border: 1px solid #1A1A1A;
+}
 #shop #console .event .this_sprite .sprite {
+    margin-top: -4px;
+    margin-left: -2px;
     background-position: 0 0;
 }
-#shop #console .event .this_sprite:hover .sprite,
-#shop #console .event .this_sprite .sprite:hover {
+#shop #console .event .this_sprite .sprite_40x40 {
+    margin-top: -4px;
+    margin-left: -2px;
+}
+#shop #console .event .this_sprite .sprite_80x80 {
+    margin-top: -44px;
+    margin-left: -22px;
+}
+#shop #console .event .this_sprite:hover .sprite_40x40,
+#shop #console .event .this_sprite .sprite_40x40:hover {
     background-position: -40px 0;
+}
+#shop #console .event .this_sprite:hover .sprite_80x80,
+#shop #console .event .this_sprite .sprite_80x80:hover {
+    background-position: -80px 0;
+}
+#shop #console .event .this_sprite.pending .sprite_40x40 {
+    background-position: -40px 0;
+}
+#shop #console .event .this_sprite.pending .sprite_80x80 {
+    background-position: -80px 0;
+}
+#shop #console .event .this_sprite.success .sprite_40x40 {
+    background-position: -80px 0;
+}
+#shop #console .event .this_sprite.success .sprite_80x80 {
+    background-position: -160px 0;
 }
 #shop #console .event .item_name,
 #shop #console .event .ability_name,
@@ -668,7 +696,7 @@
     position: relative;
     top: -1px;
     left: -7px;
-    background-image: url(../images/shops/quantity-arrows.png?20190224);
+    background-image: url(../images/assets/shop-quantity-arrows.png?20190224);
     background-position: 0 0;
     background-repeat: no-repeat;
     background-size: auto;

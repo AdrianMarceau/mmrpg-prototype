@@ -147,6 +147,7 @@ $this_shop_index = array();
 // AUTO'S SHOP
 $this_shop_index['auto'] = array(
     'shop_token' => 'auto',
+    'shop_source' => 'robots',
     'shop_name' => 'Auto\'s Shop',
     'shop_owner' => 'Auto',
     'shop_unlock' => 'Complete the first chapter as Dr. Light.',
@@ -174,6 +175,7 @@ $this_shop_index['auto'] = array(
 // REGGAE'S SHOP
 $this_shop_index['reggae'] = array(
     'shop_token' => 'reggae',
+    'shop_source' => 'robots',
     'shop_name' => 'Reggae\'s Shop',
     'shop_owner' => 'Reggae',
     'shop_unlock' => 'Complete the first chapter as Dr. Wily.',
@@ -211,6 +213,7 @@ $this_shop_index['reggae'] = array(
 // KALINKA'S SHOP
 $this_shop_index['kalinka'] = array(
     'shop_token' => 'kalinka',
+    'shop_source' => 'players',
     'shop_name' => 'Kalinka\'s Shop',
     'shop_owner' => 'Kalinka',
     'shop_unlock' => 'Complete the prototype as any of the three playable characters.',

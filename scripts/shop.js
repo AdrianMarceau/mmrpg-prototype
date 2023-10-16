@@ -447,10 +447,16 @@ $(document).ready(function(){
         var thisItemCell = $('.item_cell[data-token='+thisToken+']', thisTab);
         //console.log('confirm_button: click / '+thisKeeper+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+thisQuantity+' / '+thisPrice+'z / '+thisPlayer+'');
 
+        var $shopDiv = thisTab.closest('.event[data-token="'+thisKeeper+'"]');
+        var $shopSprite = $('> .this_sprite', $shopDiv);
+        //console.log('$shopDiv = ', $shopDiv.length, $shopDiv);
+        //console.log('$shopSprite = ', $shopSprite.length, $shopSprite);
+
         // Define the post options for the ajax call
         var postData = {shop:thisKeeper,kind:thisKind,action:thisAction,token:thisToken,quantity:thisQuantity,price:thisPrice,player:thisPlayer};
         thisConfirmCell.css({opacity:0.3});
         thisShopData.allowEdit = false;
+        $shopSprite.addClass('pending');
 
         // Post the sort request to the server
         $.ajax({
@@ -530,6 +536,7 @@ $(document).ready(function(){
 
                     updateItemCells();
 
+                    // If we're allowed to, play a sound effect
                     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
                         playSoundEffect('shop-success', {volume: 1.0});
                         playSoundEffect('zenny-spent', {volume: 1.0});
@@ -540,6 +547,12 @@ $(document).ready(function(){
                                 }, 100 + (100 * i));
                             }
                         }
+
+                    // Animate the shopkeeper briefly by putting them into their victory frames
+                    $shopSprite.removeClass('pending').addClass('success');
+                    setTimeout(function(){
+                        $shopSprite.removeClass('success');
+                        }, 1000);
 
                     // Animate the cell to show that an action has been completed
                     thisConfirmCell.stop().animate({opacity:1.0},300,'swing',function(){

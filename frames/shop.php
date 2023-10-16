@@ -88,10 +88,23 @@ if (true){
         $shop_key = $key_counter;
         $shop_info['shop_image'] = $shop_info['shop_token'];
         $shop_info['shop_image_size'] = 80;
-        $shop_image_offset = 0;
+        $shop_info['shop_image_path'] = 'images/shops/'.(!empty($shop_info['shop_image']) ? $shop_info['shop_image'] : $shop_info['shop_token']).'/';
+        if (!empty($shop_info['shop_source'])){
+            if ($shop_info['shop_source'] === 'players'){
+                $shop_info['shop_image_path'] = str_replace('images/shops/', 'images/players/', $shop_info['shop_image_path']);
+                $temp_player_info = rpg_player::get_index_info($shop_info['shop_token']);
+                $shop_info['shop_image_size'] = $temp_player_info['player_image_size'] * 2;
+            } elseif ($shop_info['shop_source'] === 'robots'){
+                $shop_info['shop_image_path'] = str_replace('images/shops/', 'images/robots/', $shop_info['shop_image_path']);
+                $temp_robot_info = rpg_robot::get_index_info($shop_info['shop_token']);
+                $shop_info['shop_image_size'] = $temp_robot_info['robot_image_size'] * 2;
+            }
+        }
+        $shop_image_file_path = $shop_info['shop_image_path'].'mug_right_'.($shop_info['shop_image_size'].'x'.$shop_info['shop_image_size']).'.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $shop_image_offset = ($shop_info['shop_image_size'] - 80) / 2;
         $shop_image_offset_x = -14 - $shop_image_offset;
         $shop_image_offset_y = -14 - $shop_image_offset;
-        echo '<a data-token="'.$shop_info['shop_token'].'" data-shop="'.$shop_info['shop_token'].'" style="background-image: url(images/shops/'.(!empty($shop_info['shop_image']) ? $shop_info['shop_image'] : $shop_info['shop_token']).'/mug_right_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: '.$shop_image_offset_x.'px '.$shop_image_offset_y.'px;" class="sprite sprite_player sprite_shop_'.$shop_token.' sprite_shop_sprite sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].' sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].'_mugshot shop_status_active shop_position_active '.($shop_key == 0 ? 'sprite_shop_current ' : '').' player_type player_type_'.(!empty($shop_info['shop_colour']) ? $shop_info['shop_colour'] : 'none').'">'.$shop_info['shop_name'].'</a>'."\n";
+        echo '<a data-token="'.$shop_info['shop_token'].'" data-shop="'.$shop_info['shop_token'].'" style="background-image: url('.$shop_image_file_path.'); background-position: '.$shop_image_offset_x.'px '.$shop_image_offset_y.'px;" class="sprite sprite_player sprite_shop_'.$shop_token.' sprite_shop_sprite sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].' sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].'_mugshot shop_status_active shop_position_active '.($shop_key == 0 ? 'sprite_shop_current ' : '').' player_type player_type_'.(!empty($shop_info['shop_colour']) ? $shop_info['shop_colour'] : 'none').'">'.$shop_info['shop_name'].'</a>'."\n";
         $key_counter++;
         //echo '<a class="sort" data-shop="'.$shop_info['shop_token'].'">sort</a>';
         echo '</div>'."\n";
@@ -121,6 +134,19 @@ if (true){
         $shop_key = $key_counter;
         $shop_info['shop_image'] = $shop_info['shop_token'];
         $shop_info['shop_image_size'] = 40;
+        $shop_info['shop_image_path'] = 'images/shops/'.(!empty($shop_info['shop_image']) ? $shop_info['shop_image'] : $shop_info['shop_token']).'/';
+        if (!empty($shop_info['shop_source'])){
+            if ($shop_info['shop_source'] === 'players'){
+                $shop_info['shop_image_path'] = str_replace('images/shops/', 'images/players/', $shop_info['shop_image_path']);
+                $temp_player_info = rpg_player::get_index_info($shop_info['shop_token']);
+                $shop_info['shop_image_size'] = $temp_player_info['player_image_size'];
+            } elseif ($shop_info['shop_source'] === 'robots'){
+                $shop_info['shop_image_path'] = str_replace('images/shops/', 'images/robots/', $shop_info['shop_image_path']);
+                $temp_robot_info = rpg_robot::get_index_info($shop_info['shop_token']);
+                $shop_info['shop_image_size'] = $temp_robot_info['robot_image_size'];
+            }
+        }
+        $shop_image_file_path = $shop_info['shop_image_path'].'sprite_right_'.($shop_info['shop_image_size'].'x'.$shop_info['shop_image_size']).'.png?'.MMRPG_CONFIG_CACHE_DATE;
 
         // Collect a temp robot object for printing items
         $player_info = $mmrpg_database_players[$shop_info['shop_player']];
@@ -134,8 +160,8 @@ if (true){
 
             <div class="event event_double event_<?= $shop_key == 0 ? 'visible' : 'hidden' ?>" data-token="<?= $shop_info['shop_token']?>">
 
-                <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/<?= $shop_info['shop_field']?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
-                    <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/shops/<?= !empty($shop_info['shop_image']) ? $shop_info['shop_image'] : $shop_info['shop_token'] ?>/sprite_right_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); "><?= $shop_info['shop_name']?></div>
+                <div class="this_sprite sprite_left" style="background-image: url(images/fields/<?= $shop_info['shop_field']?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
+                    <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00" style="background-image: url(<?= $shop_image_file_path ?>); "><?= $shop_info['shop_name']?></div>
                 </div>
 
                 <?
