@@ -2243,6 +2243,76 @@ body[data-source="website"] #prototype .menu {
     display: none;
 }
 
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-proxy-battle"],
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-proxy-battle"],
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-proxy-battle"],
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"] {
+    display: block;
+    position: absolute;
+    box-sizing: border-box;
+    top: 22px;
+    right: 0px;
+    width: 32px;
+    height: 28px;
+    z-index: 10;
+    border-width: 1px;
+}
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-proxy-battle"]:before,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-proxy-battle"]:before,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-proxy-battle"]:before,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"]:before {
+    content: "\00233e";
+    display: block;
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+    background-color: rgb(38, 38, 38);
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid #090909;
+    margin: 2px 4px 0;
+    border-radius: 4px;
+    font-size: 22px;
+    line-height: 17px;
+    height: 20px;
+    padding-left: 2px;
+    box-sizing: border-box;
+    color: #dedede;
+    position: relative;
+    z-index: 1;
+}
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"]:after {
+    content: "\0020e0";
+    display: block;
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+    background-color: rgb(38, 38, 38);
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid #090909;
+    margin: 2px 4px 0;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 15px;
+    height: 20px;
+    padding-left: 2px;
+    box-sizing: border-box;
+    color: #dedede;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    width: 22px;
+}
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-proxy-battle"]:hover:before,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-proxy-battle"]:hover:before,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-proxy-battle"]:hover:before,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"]:hover:before {
+    color: #ffffff;
+}
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-proxy-battle"] .platform,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-proxy-battle"] .platform,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-proxy-battle"] .platform,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"] .platform {
+    display: none;
+}
+
 #prototype .option_1x1 .platform,
 #prototype .option_1x2 .platform,
 #prototype .option_1x3 .platform,

@@ -3262,7 +3262,7 @@ function mmrpg_prototype_leaderboard_online(){
 }
 
 // Define a function for pulling the leaderboard targets
-function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = '', &$this_leaderboard_defeated_players = array()){
+function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = '', &$this_leaderboard_defeated_players = array(), &$personal_leaderboard_target_player = array()){
     global $db;
     // Check to see if the leaderboard targets have already been pulled or not
     if (!empty($db->INDEX['LEADERBOARD']['targets'])){
@@ -3371,21 +3371,26 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
                 LEFT JOIN `mmrpg_saves` AS `saves` ON `saves`.`user_id` = `users`.`user_id`
                 LEFT JOIN `mmrpg_users_proxies` AS `proxies` ON `proxies`.`user_id` = `users`.`user_id`
                 WHERE
-                (1 = 1 OR `users`.`user_id` = 412)
-                AND `board`.`board_points` <= '.$this_player_points_max.'
-                AND `board`.`user_id` != '.$this_userid.'
-                AND `users`.`user_flag_approved` = 1
-                '.(!empty($temp_exclude_usernames_string) ? 'AND `users`.`user_name_clean` NOT IN ('.$temp_exclude_usernames_string.') ' : '').'
+                `board`.`user_id` = '.$this_userid.'
+                OR (
+                    `users`.`user_flag_approved` = 1
+                    AND `board`.`board_points` <= '.$this_player_points_max.'
+                    '.(!empty($temp_exclude_usernames_string) ? 'AND `users`.`user_name_clean` NOT IN ('.$temp_exclude_usernames_string.') ' : '').'
+                    '.(!empty($temp_include_usernames_string) ? 'AND `users`.`user_name_clean` IN ('.$temp_include_usernames_string.') ' : '').'
+                    )
                 ORDER BY
+                FIELD(`board`.`user_id`, '.$this_userid.') DESC,
                 '.(!empty($temp_include_usernames_string) ? ' FIELD(`users`.`user_name_clean`, '.$temp_include_usernames_string.') DESC, ' : '').'
                 '.(!empty($temp_exclude_usernames_string) ? ' FIELD(`users`.`user_name_clean`, '.$temp_exclude_usernames_string.') ASC, ' : '').'
                 `board`.`board_points` DESC,
                 `saves`.`save_date_modified` DESC
-                LIMIT 12
+                LIMIT 13
             ';
 
         // Query the database and collect the array list of all online players
+        //error_log('$temp_leaderboard_query = '.$temp_leaderboard_query);
         $this_leaderboard_target_players = $db->get_array_list($temp_leaderboard_query);
+        //error_log('$this_leaderboard_target_players = '.print_r($this_leaderboard_target_players, true));
 
         // Loop through and decode any fields that require it
         if (!empty($this_leaderboard_target_players)){
@@ -3424,6 +3429,11 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         $db->INDEX['LEADERBOARD']['targets'] = json_encode($this_leaderboard_target_players);
         //die($temp_leaderboard_query);
     }
+
+    // Pull out the personal leaderboard target player in case someone wants it
+    $personal_leaderboard_target_player = array_shift($this_leaderboard_target_players);
+    //error_log('$personal_leaderboard_target_player = '.print_r($personal_leaderboard_target_player, true));
+
     // Return the collected online players if any
     //die('<pre>$this_leaderboard_target_players : '.print_r($this_leaderboard_target_players, true).'</pre>');
     //if (MMRPG_CONFIG_DEBUG_MODE){ mmrpg_debug_checkpoint(__FILE__, __LINE__, '$this_leaderboard_target_players : '.print_r($this_leaderboard_target_players, true).'');  }
