@@ -750,8 +750,8 @@ if (mmrpg_prototype_item_unlocked('light-program')){
 
             <p class="description">
                 Your <strong>Player Settings</strong> are used whenever another user challenges your ghost data to a Player Battle.
-                Use the fields below to customize how your proxy behaves, or leave the dropdowns blank to let the system automatically
-                decide for you.  Have fun!
+                Use the fields below to customize how your proxy behaves, or leave the dropdowns blank to let the system bots
+                automatically decide for you.  Have fun!
             </p>
 
             <div class="subwrap">
