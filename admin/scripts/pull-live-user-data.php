@@ -39,6 +39,7 @@ $copy_db_tables = array(
     'mmrpg_challenges_waveboard',
     'mmrpg_users_challenges',
     'mmrpg_users_challenges_leaderboard',
+    'mmrpg_users_proxies',
     // game records tables
     'mmrpg_records_abilities',
     'mmrpg_records_robots'
