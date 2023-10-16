@@ -54,14 +54,21 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
 }
 
 // Check for any robot details preloaded into session from a prev mission
-if (!empty($_SESSION['BATTLES_CHAIN'])){
+$allow_chain_bonuses = false;
+if (!empty($this_battle->flags['starfield_mission'])){ $allow_chain_bonuses = true; }
+if (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){ $allow_chain_bonuses = true; }
+if ($allow_chain_bonuses
+    && !empty($_SESSION['BATTLES_CHAIN'])){
     //$this_battle->events_create(false, false, 'debug', ('$_SESSION[\'BATTLES_CHAIN\'] = '.preg_replace('/\s+/', ' ', print_r($_SESSION['BATTLES_CHAIN'], true)).'<br />'));
+    //error_log('$_SESSION[\'BATTLES_CHAIN\'] ='.print_r($_SESSION['BATTLES_CHAIN'], true));
 
     // Increase the zenny reward based on the current wave
     $base_zenny = $this_battle->battle_zenny;
     $current_chain = count($_SESSION['BATTLES_CHAIN']) + 1;
     $this_battle->battle_zenny = $current_chain * $base_zenny;
 
+} elseif (!$allow_chain_bonuses){
+    $_SESSION['BATTLES_CHAIN'] = array();
 }
 
 // Check for any robot details preloaded into session from a prev mission
