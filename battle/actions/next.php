@@ -180,8 +180,8 @@ if (!empty($this_battle->flags['starfield_mission'])
 
 // Create the battle chain array if not exists
 $is_first_mission = false;
-if (!isset($_SESSION['BATTLES_CHAIN'])){ $_SESSION['BATTLES_CHAIN'] = array(); }
-if (empty($_SESSION['BATTLES_CHAIN'])){ $is_first_mission = true; }
+$this_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] : array();
+if (empty($this_battle_chain)){ $is_first_mission = true; }
 $this_chain_record = array(
     'battle_token' => $this_battle->battle_token,
     'battle_turns_used' => $this_battle->counters['battle_turn'],
@@ -192,7 +192,8 @@ if ($is_first_mission){
     $this_team_config = $this_player->player_token.'::'.implode(',', $this_player->values['robots_start_team']);
     $this_chain_record['battle_team_config'] = $this_team_config;
 }
-$_SESSION['BATTLES_CHAIN'][] = $this_chain_record;
+$this_battle_chain[] = $this_chain_record;
+$_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] = $this_battle_chain;
 
 // Pre-generate active robots string and save any buffs/debuffs/etc.
 $active_robot_array = array();
@@ -281,7 +282,7 @@ if (!empty($this_battle->flags['challenge_battle'])
     && !empty($this_battle->flags['endless_battle'])){
 
     // Generate the first ENDLESS ATTACK MODE mission and append it to the list
-    $this_mission_number = count($_SESSION['BATTLES_CHAIN']);
+    $this_mission_number = count($this_battle_chain);
     $next_mission_number = $this_mission_number + 1;
     $this_prototype_data = array();
     $this_prototype_data['this_player_token'] = $this_player->player_token;
@@ -292,7 +293,7 @@ if (!empty($this_battle->flags['challenge_battle'])
 
     // We should also save this data in the DB in case we need to restore later
     $save_state = array(
-        'BATTLES_CHAIN' => $_SESSION['BATTLES_CHAIN'],
+        'BATTLES_CHAIN' => $this_battle_chain,
         'ROBOTS_PRELOAD' => $_SESSION['ROBOTS_PRELOAD'],
         'NEXT_MISSION' => array(
             'this_battle_id' => $next_battle_id,

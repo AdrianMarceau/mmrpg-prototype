@@ -55,21 +55,18 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
 
 // Check for any robot details preloaded into session from a prev mission
 $allow_chain_bonuses = false;
+$this_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] : array();
 if (!empty($this_battle->flags['starfield_mission'])){ $allow_chain_bonuses = true; }
 if (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){ $allow_chain_bonuses = true; }
-if ($allow_chain_bonuses
-    && !empty($_SESSION['BATTLES_CHAIN'])){
-    //$this_battle->events_create(false, false, 'debug', ('$_SESSION[\'BATTLES_CHAIN\'] = '.preg_replace('/\s+/', ' ', print_r($_SESSION['BATTLES_CHAIN'], true)).'<br />'));
-    //error_log('$_SESSION[\'BATTLES_CHAIN\'] ='.print_r($_SESSION['BATTLES_CHAIN'], true));
-
+if ($allow_chain_bonuses && !empty($this_battle_chain)){
     // Increase the zenny reward based on the current wave
     $base_zenny = $this_battle->battle_zenny;
-    $current_chain = count($_SESSION['BATTLES_CHAIN']) + 1;
+    $current_chain = count($this_battle_chain) + 1;
     $this_battle->battle_zenny = $current_chain * $base_zenny;
-
 } elseif (!$allow_chain_bonuses){
-    $_SESSION['BATTLES_CHAIN'] = array();
+    $this_battle_chain = array();
 }
+$_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] = $this_battle_chain;
 
 // Check for any robot details preloaded into session from a prev mission
 //error_log('loading ROBOTS_PRELOAD: '.print_r($_SESSION['ROBOTS_PRELOAD'], true));
@@ -121,7 +118,7 @@ if (!empty($this_battle->flags['challenge_battle'])
 
     // Generate the first ENDLESS ATTACK MODE mission and append it to the list
     $this_loop_size = 18;
-    $this_mission_number = count($_SESSION['BATTLES_CHAIN']) + 1;
+    $this_mission_number = count($this_battle_chain) + 1;
     $this_phase_number = $this_mission_number > $this_loop_size ? ceil($this_mission_number / $this_loop_size) : 1;
     $this_battle_number = $this_mission_number > $this_loop_size ? ($this_mission_number % $this_loop_size) : $this_mission_number;
     //$first_event_body .= 'Wave : '.number_format($this_mission_number, 0, '.', ',').' ';

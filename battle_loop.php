@@ -1015,8 +1015,9 @@ if (!empty($this_battle->flags['challenge_battle'])
         if ($this_battle->battle_result == 'victory'){
 
             // Collect the current mission number so we now where we are
+            $this_battle_chain = isset($_SESSION['BATTLES_CHAIN'][$this_battle->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] : array();
             $this_loop_size = 18;
-            $this_mission_number = count($_SESSION['BATTLES_CHAIN']) + 1;
+            $this_mission_number = (!empty($this_battle_chain) ? count($this_battle_chain) : 0) + 1;
             $this_phase_number = floor($this_mission_number / $this_loop_size) + 1;
             $this_battle_number = $this_mission_number > $this_loop_size ? ($this_mission_number % $this_loop_size) : $this_mission_number;
 
@@ -1024,15 +1025,18 @@ if (!empty($this_battle->flags['challenge_battle'])
             $this_robot_used = 0;
             $this_turns_used = 0;
             $this_team_config = '';
-            if (!empty($_SESSION['BATTLES_CHAIN'])){
-                $this_robot_used = $_SESSION['BATTLES_CHAIN'][0]['battle_robots_used'];
-                $this_team_config = $_SESSION['BATTLES_CHAIN'][0]['battle_team_config'];
+            if (!empty($this_battle_chain)){
+                $this_robot_used = $this_battle_chain[0]['battle_robots_used'];
+                $this_team_config = $this_battle_chain[0]['battle_team_config'];
             } elseif (!empty($this_player->counters['robots_start_total'])){
                 $this_robot_used = $this_player->counters['robots_start_total'];
                 $this_team_config = $this_player->player_token.'::'.implode(',', $this_player->values['robots_start_team']);
             }
-            if (!empty($_SESSION['BATTLES_CHAIN'])){ foreach ($_SESSION['BATTLES_CHAIN'] AS $key => $record){ $this_turns_used += $record['battle_turns_used']; } }
+            if (!empty($this_battle_chain)){ foreach ($this_battle_chain AS $key => $record){ $this_turns_used += $record['battle_turns_used']; } }
             if (!empty($this_battle->counters['battle_turn'])){ $this_turns_used += $this_battle->counters['battle_turn']; }
+
+            // Update the session with the new battle chain results
+            $_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] = $this_battle_chain;
 
             // Check to see if there's an existing record for this user and this challenge
             $current_user_id = rpg_user::get_current_userid();

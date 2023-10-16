@@ -4598,9 +4598,39 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
             if (!empty($challenge_mode_savestate['BATTLES_CHAIN'])
                 && !empty($challenge_mode_savestate['ROBOTS_PRELOAD'])
                 && !empty($challenge_mode_savestate['NEXT_MISSION'])){
-                // Load the saved battle chain and robot preload data into session
-                $_SESSION['BATTLES_CHAIN'] = array_merge($_SESSION['BATTLES_CHAIN'], $challenge_mode_savestate['BATTLES_CHAIN']);
+
+                // Check if we're pulling battle chains in legacy mode or new mode
+                $this_endless_token = false;
+                $this_endless_chain = array();
+                if (isset($challenge_mode_savestate['BATTLES_CHAIN'][0])){
+                    // LEGACY MODE has everything in the root, let's fix that
+                    foreach ($challenge_mode_savestate['BATTLES_CHAIN'] AS $key => $chain){
+                        if (!isset($chain['battle_token'])){ continue; }
+                        elseif (!strstr($chain['battle_token'], '-endless-mission')){ continue; }
+                        $this_endless_token = $chain['battle_token'];
+                        $this_endless_chain[] = $chain;
+                    }
+                } else {
+                    // MODERN MODE nests the chain into the array via battle-token
+                    foreach ($challenge_mode_savestate['BATTLES_CHAIN'] AS $battle => $chains){
+                        if (!strstr($battle, '-endless-mission')){ continue; }
+                        foreach ($chains AS $key => $chain){
+                            if (!isset($chain['battle_token'])){ continue; }
+                            elseif (!strstr($chain['battle_token'], '-endless-mission')){ continue; }
+                            $this_endless_token = $chain['battle_token'];
+                            $this_endless_chain[] = $chain;
+                        }
+                        break; // only one endless run is possible at a time
+                    }
+                }
+                //error_log('$this_endless_token = '.print_r($this_endless_token, true));
+                //error_log('$this_endless_chain = '.print_r($this_endless_chain, true));
+                //error_log('$_SESSION[\'BATTLES_CHAIN\'] = '.print_r($_SESSION['BATTLES_CHAIN'], true));
+
+                // Load any of the saved robot preload data into session as well as the collected chain
                 $_SESSION['ROBOTS_PRELOAD'] = array_merge($_SESSION['ROBOTS_PRELOAD'], $challenge_mode_savestate['ROBOTS_PRELOAD']);
+                $_SESSION['BATTLES_CHAIN'][$this_endless_token] = $this_endless_chain;
+
                 // Generate the URL for the next mission with saved data and redirect
                 $next_mission_data = $challenge_mode_savestate['NEXT_MISSION'];
                 $next_mission_href = 'battle.php?wap='.($flag_wap ? 'true' : 'false');
@@ -4615,7 +4645,7 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
                 $next_mission_player = $next_mission_data['this_player_token'];
                 $next_mission_robots = $next_mission_data['this_player_robots'];
                 $next_mission_robots = !empty($next_mission_robots) ? array_map(function($s){ list($i, $r) = explode('_', $s); return $r; }, explode(',', $next_mission_robots)) : array();
-                $next_mission_number = count($_SESSION['BATTLES_CHAIN']) + 1;
+                $next_mission_number = count($this_endless_chain) + 1;
                 $this_prototype_data = array();
                 $this_prototype_data['this_player_token'] = $next_mission_player;
                 $this_prototype_data['this_current_chapter'] = '8';
@@ -4626,6 +4656,7 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
                 // Redirect to the mission URL now that everything is loaded and set up
                 //header('Location: '.$next_mission_href);
                 //exit();
+
 
                 //error_log('Collecting ENDLESS ATTACK MODE next mission href: '.$next_mission_href);
                 //error_log('$next_mission_player = '.print_r($next_mission_player, true));
@@ -4641,6 +4672,7 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
                 //error_log('$temp_preload_robots = '.print_r($temp_preload_robots, true));
                 //error_log('$temp_locked_robots = '.print_r($temp_locked_robots, true));
                 */
+
                 // Store the next mission URL in the session for later
                 $_SESSION['PROTOTYPE_TEMP']['ENDLESS_MODE_SAVEDATA'][$next_mission_player] = array(
                     'redirect' => $next_mission_href,

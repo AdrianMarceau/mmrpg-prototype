@@ -1190,7 +1190,8 @@ class rpg_battle extends rpg_object {
         } elseif ($this->battle_result == 'defeat'){
             // If this is an ENDLESS ATTACK MODE battle, show a special more positive message
             if (!empty($this->flags['challenge_battle']) && !empty($this->flags['endless_battle'])){
-                $temp_current_wave = !empty($_SESSION['BATTLES_CHAIN']) ? (count($_SESSION['BATTLES_CHAIN']) + 1) : 1;
+                $temp_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this->battle_token] : array();
+                $temp_current_wave = count($temp_battle_chain) + 1;
                 $first_event_body_head = 'Wave failure.  Mission #'.$temp_current_wave.' not completed.  Maybe try again? ';
             }
             // Otherwise if this is a normal battle, defeat is a little bit more netaive
@@ -1348,7 +1349,8 @@ class rpg_battle extends rpg_object {
 
                 // Collect the current mission number so we now where we are
                 $this_loop_size = 18;
-                $this_mission_number = count($_SESSION['BATTLES_CHAIN']) + 1;
+                $this_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this->battle_token] : array();
+                $this_mission_number = count($this_battle_chain) + 1;
                 $this_phase_number = floor($this_mission_number / $this_loop_size) + 1;
                 $this_battle_number = $this_mission_number > $this_loop_size ? ($this_mission_number % $this_loop_size) : $this_mission_number;
 
@@ -1392,7 +1394,8 @@ class rpg_battle extends rpg_object {
             if (!empty($this->flags['challenge_battle'])
                 && !empty($this->flags['endless_battle'])){
                 $temp_zenny_value = 0;
-                if (!empty($_SESSION['BATTLES_CHAIN'])){ foreach ($_SESSION['BATTLES_CHAIN'] AS $key => $info){ $temp_zenny_value += $info['battle_zenny_earned']; } }
+                $temp_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this->battle_token] : array();
+                foreach ($temp_battle_chain AS $key => $info){ $temp_zenny_value += $info['battle_zenny_earned']; }
                 $first_event_body_foot = 'Final Reward : '.number_format($temp_zenny_value, 0, '.', ',').'&#438;';
             }
             // Otherwise if normal battle, show the values of THIS battle as the final zenny reward

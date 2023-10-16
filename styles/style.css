@@ -3413,6 +3413,9 @@ body.index #header {
     -moz-border-radius: 0 0 0.5em 0.5em;
     -webkit-border-radius: 0 0 0.5em 0.5em;
 }
+#console .event.event_special .body {
+    font-size: 11px;
+}
 #console .field_type_event .header {
     background-color: rgba(0, 0, 0, 0.45);
 }
