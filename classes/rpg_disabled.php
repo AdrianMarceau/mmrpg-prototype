@@ -55,6 +55,16 @@ class rpg_disabled {
         // Update the target player's session
         $this_player->update_session();
 
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $options->disabled_target = $this_robot;
+        $options->disabled_initiator = $target_robot;
+        $extra_objects = array('options' => $options);
+
+        // Trigger this and target robot's item functions if they have been defined for this context
+        $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_before', $extra_objects);
+        $target_robot->trigger_custom_function('rpg-robot_trigger-disabled_before', $extra_objects);
+
         // Check to see if this was a friendly robot that we need to avoid showing disabled messages for
         $is_friendly_target = false;
         $skip_knockout_messages = false;
@@ -1416,6 +1426,16 @@ class rpg_disabled {
 
 
         }
+
+        // Create an options object for this function and populate
+        $options = rpg_game::new_options_object();
+        $options->disabled_target = $this_robot;
+        $options->disabled_initiator = $target_robot;
+        $extra_objects = array('options' => $options);
+
+        // Trigger this and target robot's item functions if they have been defined for this context
+        $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_after', $extra_objects);
+        $target_robot->trigger_custom_function('rpg-robot_trigger-disabled_after', $extra_objects);
 
         // Return true on success
         return true;
