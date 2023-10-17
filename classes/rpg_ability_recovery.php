@@ -738,6 +738,7 @@ class rpg_ability_recovery extends rpg_recovery {
                     // Loop through the target robot's attachments one-by-one and apply their modifiers
                     foreach ($target_robot_attachments AS $temp_token => $temp_info){
                         $temp_token_debug = str_replace('ability_', 'attachment_', $temp_token);
+                        if (!empty($temp_info['attachment_supressed'])){ continue; }
 
                         // First check to see if any basic breakers or boosters have been created for this robot
                         if (true){
@@ -862,6 +863,7 @@ class rpg_ability_recovery extends rpg_recovery {
                     // Loop through this robot's attachments one-by-one and apply their modifiers
                     foreach ($this_robot_attachments AS $temp_token => $temp_info){
                         $temp_token_debug = str_replace('ability_', 'attachment_', $temp_token);
+                        if (!empty($temp_info['attachment_supressed'])){ continue; }
 
                         // First check to see if any basic breakers or boosters have been created for this robot
                         if (true){
