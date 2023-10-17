@@ -29,9 +29,24 @@ $global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'protot
 // -- GENERATE EDITOR MARKUP
 
 // Define which items we're allowed to see
+$shopkeeper_unlocked = mmrpg_prototype_item_unlocked('auto-link') ? true : false;
 $global_battle_items = !empty($_SESSION[$session_token]['values']['battle_items']) ? $_SESSION[$session_token]['values']['battle_items'] : array();
 $global_battle_item_categories = array();
-$global_battle_item_categories['all'] = array('category_name' => 'All Items', 'category_quote' => 'The prototype is home to many different items.  Which ones have you collected so far?');
+if ($shopkeeper_unlocked){
+    $global_battle_item_categories['all'] = array(
+    'category_name' => 'All Items',
+        'category_quote' => 'The prototype is home to many different items.  Which ones have you collected so far?',
+        'category_image' => 'robots/auto',
+        'category_image_size' => 80
+        );
+} else {
+    $global_battle_item_categories['all'] = array(
+    'category_name' => 'All Items',
+        'category_quote' => '▪▪▪▪▪ ▪▪ ▪▪▪▪? ▪▪ ▪▪▪ ▪▪▪▪...', // where is auto? im not sure...
+        'category_image' => 'robots/met',
+        'category_image_size' => 40
+        );
+}
 
 // Filter out items that are not complete or otherwise attainable yet
 $mmrpg_database_items = array_filter($mmrpg_database_items, function($item_info){
@@ -86,13 +101,20 @@ if (true){
         // Collect a temp robot object for printing items
         $player_info = $mmrpg_database_players['dr-light'];
         $robot_info = $mmrpg_database_robots['mega-man'];
+
+        // Collect the category details for printing this tab
+        $category_info = $global_battle_item_categories['all'];
+        $category_image_size = $category_info['category_image_size'];
+        $category_image_sizex = $category_image_size.'x'.$category_image_size;
+        $category_image_class = 'sprite sprite_player sprite_player_sprite sprite_'.$category_image_sizex.' sprite_'.$category_image_sizex.'_00';
+        $category_image_path = 'images/'.$category_info['category_image'].'/sprite_right_'.$category_image_sizex.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+
         // Collect and print the editor markup for this player
         ?>
         <div class="event event_double event_visible">
 
             <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/prototype-complete/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
-                <? $items_sprite_path = mmrpg_prototype_item_unlocked('auto-link') ? 'shops/auto' : 'robots/met'; ?>
-                <div class="sprite sprite_player sprite_player_sprite sprite_40x40 sprite_40x40_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/<?= $items_sprite_path ?>/sprite_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>); "></div>
+                <div class="<?= $category_image_class ?>" style="background-image: url(<?= $category_image_path ?>); "></div>
             </div>
             <div class="header header_left item_type item_type_none" style="margin-right: 0;">
                 Item Inventory

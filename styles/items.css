@@ -334,13 +334,39 @@ body.windowFlag_landscapeMode #prototype {
     font-size: 13px;
     line-height: 13px;
 }
+
 #item #console .event .this_sprite .sprite {
+    margin-top: 0;
+    margin-left: 0;
     background-position: 0 0;
 }
-#item #console .event .this_sprite:hover .sprite,
-#item #console .event .this_sprite .sprite:hover {
+#item #console .event .this_sprite .sprite_40x40 {
+    margin-top: -4px;
+    margin-left: -2px;
+}
+#item #console .event .this_sprite .sprite_80x80 {
+    margin-top: -44px;
+    margin-left: -22px;
+}
+
+#item #console .event .this_sprite:hover .sprite_40x40,
+#item #console .event .this_sprite .sprite_40x40:hover {
     background-position: -40px 0;
 }
+#item #console .event .this_sprite:hover .sprite_80x80,
+#item #console .event .this_sprite .sprite_80x80:hover {
+    background-position: -80px 0;
+}
+
+@keyframes sprite-bounce-animation {
+  from { transform: translate(0, 0); }
+  to { transform: translate(0, -1px); }
+}
+#item #console .event .this_sprite .sprite {
+    transform: translate(0, 0);
+    animation: sprite-bounce-animation steps(2) 1s infinite;
+}
+
 #item #console .event .item_number,
 #item #console .event .item_name,
 #item #console .event .ability_name,

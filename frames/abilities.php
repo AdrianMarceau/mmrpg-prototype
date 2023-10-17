@@ -43,9 +43,25 @@ $global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'protot
 // -- GENERATE EDITOR MARKUP
 
 // Define which abilities we're allowed to see
+$shopkeeper_unlocked = mmrpg_prototype_item_unlocked('reggae-link') ? true : false;
 $global_battle_abilities = !empty($_SESSION[$session_token]['values']['battle_abilities']) ? $_SESSION[$session_token]['values']['battle_abilities'] : array();
 $global_battle_ability_categories = array();
-$global_battle_ability_categories['all'] = array('category_name' => 'All Abilities', 'category_quote' => 'Many different abilities! Squawk! How many have you unlocked so far? Squaaaawk!');
+if ($shopkeeper_unlocked){
+    $global_battle_ability_categories['all'] = array(
+        'category_name' => 'All Abilities',
+        'category_quote' => 'Many different abilities! Squawk! How many have you unlocked so far? Squaaaawk!',
+        'category_image' => 'robots/reggae',
+        'category_image_size' => 40
+        );
+} else {
+    $global_battle_ability_categories['all'] = array(
+        'category_name' => 'All Abilities',
+        'category_quote' => 'Those are some nice abilities ya got there! A little bird told me there\'s a way to get more though...',
+        'category_image' => 'robots/sniper-joe',
+        'category_image_size' => 40
+        );
+}
+
 
 // Filter out abilities that are not complete or otherwise attainable yet
 $mmrpg_database_abilities = array_filter($mmrpg_database_abilities, function($ability_info){
@@ -94,13 +110,20 @@ if (true){
         // Collect a temp robot object for printing abilities
         $player_info = $mmrpg_database_players['dr-light'];
         $robot_info = $mmrpg_database_robots['mega-man'];
-        // Collect and print the editor markup for this player
+
+        // Collect the category details for printing this tab
+        $category_info = $global_battle_ability_categories['all'];
+        $category_image_size = $category_info['category_image_size'];
+        $category_image_sizex = $category_image_size.'x'.$category_image_size;
+        $category_image_class = 'sprite sprite_player sprite_player_sprite sprite_'.$category_image_sizex.' sprite_'.$category_image_sizex.'_00';
+        $category_image_path = 'images/'.$category_info['category_image'].'/sprite_right_'.$category_image_sizex.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+
+        // Collect and print the editor markup for this ability tab
         ?>
         <div class="event event_double event_visible">
 
             <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/prototype-complete/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
-                <? $ability_sprite_path = mmrpg_prototype_item_unlocked('reggae-link') ? 'shops/reggae' : 'robots/met'; ?>
-                <div class="sprite sprite_player sprite_player_sprite sprite_40x40 sprite_40x40_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/<?= $ability_sprite_path ?>/sprite_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>); "></div>
+                <div class="<?= $category_image_class ?>" style="background-image: url(<?= $category_image_path ?>); "></div>
             </div>
             <div class="header header_left ability_type ability_type_none" style="margin-right: 0;">
                 Ability Arsenal
