@@ -324,11 +324,21 @@ if (empty($this_robot)){
     die('<pre>$target_robot is empty on line '.__LINE__.'! :'.print_r($target_robot, true).'</pre>');
 }
 
+// Pre-collect the ability speeds in case we need to compare them
+$temp_thisability_ability_speed2 = $temp_thisability->ability_speed2;
+$temp_targetability_ability_speed2 = $temp_targetability->ability_speed2;
+$temp_thisplayer_metronome_robots = $this_player->get_value('metronome_robots');
+$temp_targetplayer_metronome_robots = $target_player->get_value('metronome_robots');
+if (!empty($temp_thisplayer_metronome_robots)
+    || !empty($temp_targetplayer_metronome_robots)){
+    if ($temp_thisability->ability_speed === $temp_thisability->ability_speed2){ $temp_thisability_ability_speed2 = 1; }
+    if ($temp_targetability->ability_speed === $temp_targetability->ability_speed2){ $temp_targetability_ability_speed2 = 1; }
+}
 
 // If this robot is faster than the target
 if ($target_action != 'switch' && (
-    ($this_robot->robot_speed >= $active_target_robot->robot_speed && $temp_targetability->ability_speed2 <= $temp_thisability->ability_speed2) ||
-    ($temp_thisability->ability_speed2 > $temp_targetability->ability_speed2)
+    ($this_robot->robot_speed >= $active_target_robot->robot_speed && $temp_targetability_ability_speed2 <= $temp_thisability_ability_speed2)
+    || ($temp_thisability_ability_speed2 > $temp_targetability_ability_speed2)
     )){
 
     // Queue up an this robot's action first, because it's faster
