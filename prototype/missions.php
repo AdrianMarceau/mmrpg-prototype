@@ -123,7 +123,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Intro Battle II (Vs. SNIPER/CRYSTAL/SKELETON-JOE)
         // Only continue if the player has defeated the first 1 battles
         $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
-        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 1){
+        if ($group_option_locks_completed >= 1){
 
             // Generate the battle option with the starter data
             $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'b';
@@ -153,7 +153,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Intro Battle III (Vs. TRILL [SPEED/DEFENSE/ATTACK])
         // Only continue if the player has defeated the first 2 battles
         $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
-        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 2){
+        if ($group_option_locks_completed >= 2){
 
             // Generate the battle option with the starter data
             $temp_session_token = $this_prototype_data['this_player_token'].'_battle_'.$this_prototype_data['this_current_chapter'].'c';
@@ -259,7 +259,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $group_option_locks = $get_battle_options_group_locks($this_group_name);
         $group_options_total = count($group_option_locks);
         $group_options_complete_total = array_sum($group_option_locks);
-        if ($this_prototype_data['prototype_complete'] || $group_options_complete_total >= $group_options_total){
+        if ($group_options_complete_total >= $group_options_total){
             $temp_battle_config = array();
             $temp_battle_config['battle_size'] = '1x4';
             $temp_target_robots = array();
@@ -374,7 +374,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // GENERATE THE HUNTER COMPOUND BATTLE VS MEGAMAN KILLER
         // Ensure the player has completed an appropriate number of pre-battles before unlocking this one
         $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
-        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 1){
+        if ($group_option_locks_completed >= 1){
             $temp_battle_config = array();
             $temp_battle_config['battle_size'] = '1x4';
             $temp_battle_config['auto_hide_mechas'] = true;
@@ -487,7 +487,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // GENERATE THE HUNTER COMPOUND BATTLE VS CONTROLLED KING
         // Ensure the player has completed an appropriate number of pre-battles before unlocking this one
         $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
-        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 2){
+        if ($group_option_locks_completed >= 2){
             $temp_battle_config = array();
             $temp_battle_config['battle_size'] = '1x4';
             $temp_target_robots = array();
@@ -617,7 +617,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $group_option_locks = $get_battle_options_group_locks($this_group_name);
         $group_options_total = count($group_option_locks);
         $group_options_complete_total = array_sum($group_option_locks);
-        if ($this_prototype_data['prototype_complete'] || $group_options_complete_total >= $group_options_total){
+        if ($group_options_complete_total >= $group_options_total){
             $temp_battle_config = array();
             $temp_battle_config['battle_size'] = '1x4';
             $temp_target_robots = array();
@@ -746,7 +746,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Final Destination II (MEGA-DS/BASS-DS/PROTO-DS)
         // Only continue if the player has defeated the first final destination battle
         $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
-        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 1){
+        if ($group_option_locks_completed >= 1){
 
             // Unlock the first of the final destination battles
             $temp_final_option_token = $this_prototype_data['this_player_token'].'-fortress-iii';
@@ -771,7 +771,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Final Destination III (SLUR w/ TRILL SUPPORT)
         // Only continue if the player has defeated the first and second final destination battles
         $group_option_locks_completed = array_sum($get_battle_options_group_locks($this_group_name));
-        if ($this_prototype_data['prototype_complete'] || $group_option_locks_completed >= 2){
+        if ($group_option_locks_completed >= 2){
 
             // Insert Slur w/ Trill battle here
             // "Defeat the alien robot Slur in this daunting/desperate/decisive final battle!"
