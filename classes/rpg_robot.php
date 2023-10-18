@@ -537,7 +537,7 @@ class rpg_robot extends rpg_object {
 
         // Collect and cache an skill index for reference
         static $mmrpg_index_skills;
-        if (empty($mmrpg_index_skills)){ $mmrpg_index_skills = rpg_skill::get_index(); }
+        if (empty($mmrpg_index_skills)){ $mmrpg_index_skills = rpg_skill::get_index(true); }
 
         // Check to make sure this robot has a skill, else return now
         $skill_token = empty($this->counters['skill_disabled']) ? $this->robot_skill : '';
