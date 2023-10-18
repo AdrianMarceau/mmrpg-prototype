@@ -614,14 +614,16 @@ body.index #header {
 }
 
 #mmrpg .robot_details_left {
-    background-image: url(../images/assets/battle-scene_robot-details-2k23.png?20231016-1);
+    background-image: url(../images/assets/battle-scene_robot-details-2k23.png?20231016-2);
+    background-size: 542px 200px;
     background-position: 0 0;
     text-align: left;
     top: 4px;
     left: 4px;
 }
 #mmrpg .robot_details_right {
-    background-image: url(../images/assets/battle-scene_robot-details-2k23.png?20231016-1);
+    background-image: url(../images/assets/battle-scene_robot-details-2k23.png?20231016-2);
+    background-size: 542px 200px;
     background-position: -271px 0;
     text-align: right;
     top: 4px;
@@ -840,7 +842,7 @@ body.index #header {
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
 }
 #mmrpg .robot_details .robot_level {
-    top: 2px;
+    top: 0;
     font-size: 8px;
     height: 12px;
     line-height: 12px;
@@ -874,6 +876,7 @@ body.index #header {
     color: transparent;
     border: 0 none transparent;
     background: transparent url(../images/assets/battle-scene_robot-details-2k23_item.png?20231016-1) scroll no-repeat 0 0;
+    background-size: 49px 43px;
 }
 #mmrpg .robot_details .robot_item .wrap {
     display: block;
@@ -952,7 +955,7 @@ body.index #header {
     left: 62px;
 }
 #mmrpg .robot_details_left .robot_level {
-    left: 144px;
+    left: 175px;
 }
 #mmrpg .robot_details_left .robot_attack,
 #mmrpg .robot_details_left .robot_defense,
@@ -964,7 +967,7 @@ body.index #header {
     right: 60px;
 }
 #mmrpg .robot_details_right .robot_level {
-    right: 144px;
+    right: 175px;
 }
 #mmrpg .robot_details_right .robot_attack,
 #mmrpg .robot_details_right .robot_defense,
