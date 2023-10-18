@@ -633,7 +633,7 @@ if (mmrpg_prototype_item_unlocked('auto-link')
 }
 // Unlock the EQUIP CODES after Dr. Light has completed at least half of Chapter Two
 $required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
-$required_missions += round(MMRPG_SETTINGS_CHAPTER2_MISSIONS / 2);
+$required_missions += round((MMRPG_SETTINGS_CHAPTER2_MISSIONS - 1) / 2);
 if (!mmrpg_prototype_item_unlocked('equip-codes')
     && mmrpg_prototype_battles_complete('dr-light') >= $required_missions
     ){
@@ -707,7 +707,7 @@ if (mmrpg_prototype_item_unlocked('reggae-link')
 }
 // Unlock the WEAPON CODES after Dr. Wily has completed at least half of Chapter Two
 $required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
-$required_missions += round(MMRPG_SETTINGS_CHAPTER2_MISSIONS / 2);
+$required_missions += round((MMRPG_SETTINGS_CHAPTER2_MISSIONS - 1) / 2);
 if (!mmrpg_prototype_item_unlocked('weapon-codes')
     && mmrpg_prototype_battles_complete('dr-wily') >= $required_missions
     ){
@@ -781,7 +781,7 @@ if (mmrpg_prototype_item_unlocked('kalinka-link')
 }
 // Unlock the DRESS CODES after Dr. Cossack has completed at least half of Chapter Two
 $required_missions = MMRPG_SETTINGS_CHAPTER1_MISSIONS;
-$required_missions += round(MMRPG_SETTINGS_CHAPTER2_MISSIONS / 2);
+$required_missions += round((MMRPG_SETTINGS_CHAPTER2_MISSIONS - 1) / 2);
 if (!mmrpg_prototype_item_unlocked('dress-codes')
     && mmrpg_prototype_battles_complete('dr-cossack') >= $required_missions
     ){
