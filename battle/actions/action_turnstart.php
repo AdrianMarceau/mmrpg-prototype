@@ -11,8 +11,8 @@ $this_robot_keys_active = array();
 
 // Loop through this player's robots and apply end-turn checks
 foreach ($this_robots_active AS $key => $active_robot){
-    $temp_endofturn_function = $active_robot->robot_function_onturnstart;
-    $temp_result = $temp_endofturn_function(array(
+    $temp_turnstart_function = $active_robot->robot_function_onturnstart;
+    $temp_result = $temp_turnstart_function(array(
         'this_battle' => $active_robot->player->battle,
         'this_field' => $active_robot->player->battle->battle_field,
         'this_player' => $active_robot->player,
@@ -27,8 +27,8 @@ foreach ($this_robots_active AS $key => $active_robot){
 
 // Loop through the target player's robots and apply end-turn checks
 foreach ($target_robots_active AS $key => $active_robot){
-    $temp_endofturn_function = $active_robot->robot_function_onturnstart;
-    $temp_result = $temp_endofturn_function(array(
+    $temp_turnstart_function = $active_robot->robot_function_onturnstart;
+    $temp_result = $temp_turnstart_function(array(
         'this_battle' => $active_robot->player->battle,
         'this_field' => $active_robot->player->battle->battle_field,
         'this_player' => $active_robot->player,
@@ -39,6 +39,20 @@ foreach ($target_robots_active AS $key => $active_robot){
     $this_robot_keys_active[] = 'right_'.$active_robot->robot_key;
     if ($active_robot->robot_position == 'active'){ $this_robot_keys_active[] = 'right_-1'; }
     if ($active_robot->robot_id === $target_robot->robot_id){ $target_robot->robot_reload(); }
+}
+
+// -- SECONDARY TURN-START CHECKS -- //
+
+// Loop through this player's robots and apply end-turn checks
+foreach ($this_robots_active AS $key => $active_robot){
+    $active_robot->check_skills($target_player, $target_robot, 'turn-start');
+    $active_robot->check_items($target_player, $target_robot, 'turn-start');
+}
+
+// Loop through the target player's robots and apply end-turn checks
+foreach ($target_robots_active AS $key => $active_robot){
+    $active_robot->check_skills($this_player, $this_robot, 'turn-start');
+    $active_robot->check_items($this_player, $this_robot, 'turn-start');
 }
 
 ?>
