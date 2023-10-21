@@ -1,6 +1,6 @@
 <? $footer_context = isset($footer_context) ? $footer_context : ''; ?>
 <div id="credits">
-        <strong>MMRPG Prototype</strong> by <a href="http://plutolighthouse.net/" target="_blank"><strong>Ageman20XX</strong></a>
+        <strong>MMRPG Prototype</strong> v<?= MMRPG_VERSION ?> by <a href="http://plutolighthouse.net/" target="_blank"><strong>Ageman20XX</strong></a>
         | <strong>Mega Man</strong> Trademarks &amp Characters
             &copy; <a href="http://www.capcom.com/" target="_blank" rel="nofollow"><strong>Capcom</strong></a> 1986 - <?= date('Y') ?>
     <br />
