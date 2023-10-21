@@ -1552,10 +1552,14 @@ button {
 #window .page .body .subbody_databaselinks[data-class="bosses"] .group:hover .float.link[data-anchor]:not(.fightable) {
     opacity: 1.0;
 }
-#window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor].has-skill {
+#window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor].has-skill,
+#window .page .body .subbody_databaselinks[data-class="bosses"] .float.link[data-anchor].has-skill,
+#window .page .body .subbody_databaselinks[data-class="mechas"] .float.link[data-anchor].has-skill {
     position: relative;
 }
-#window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor].has-skill i.skill {
+#window .page .body .subbody_databaselinks[data-class="robots"] .float.link[data-anchor].has-skill i.skill,
+#window .page .body .subbody_databaselinks[data-class="bosses"] .float.link[data-anchor].has-skill i.skill,
+#window .page .body .subbody_databaselinks[data-class="mechas"] .float.link[data-anchor].has-skill i.skill {
     display: block;
     position: absolute;
     bottom: -2px;

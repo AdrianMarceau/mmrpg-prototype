@@ -39,7 +39,7 @@ if (isset($mmrpg_database_robots_filter)){
 }
 
 // Collect the database fields
-$mmrpg_database_skills = rpg_skill::get_index();
+$mmrpg_database_skills = rpg_skill::get_index(true);
 $mmrpg_database_fields = rpg_field::get_index(true, false);
 
 // Collect the database robots

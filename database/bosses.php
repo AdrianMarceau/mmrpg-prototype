@@ -34,6 +34,7 @@ if (isset($mmrpg_database_bosses_filter)){
 }
 
 // Collect the database fields
+$mmrpg_database_skills = rpg_skill::get_index(true);
 $mmrpg_database_fields = rpg_field::get_index(true, false);
 
 // Collect the database bosses
@@ -183,6 +184,11 @@ if (!empty($mmrpg_database_bosses)){
         // Check if this is a boss and prepare extra text
         $boss_info['robot_name_append'] = '';
 
+        // Collect skill info for this boss if applicable
+        $boss_flag_has_skill = !empty($boss_info['robot_skill']) ? true : false;
+        $boss_skill_info = $boss_flag_has_skill ? rpg_robot::get_robot_skill_info($boss_info['robot_skill'], $boss_info) : false;
+        $boss_skill_display_type = $boss_flag_has_skill ? (!empty($boss_skill_info['skill_display_type']) ? $boss_skill_info['skill_display_type'] : 'none') : false;
+
         // Collect the boss sprite dimensions
         $boss_flag_complete = !empty($boss_info['robot_flag_complete']) ? true : false;
         $boss_flag_fightable = !empty($boss_info['robot_flag_fightable']) ? true : false;
@@ -196,6 +202,7 @@ if (!empty($mmrpg_database_bosses)){
         $boss_is_active = !empty($this_current_token) && $this_current_token == $boss_info['robot_token'] ? true : false;
         $boss_title_text = $boss_info['robot_name'].$boss_info['robot_name_append'].' | '.$boss_info['robot_number'].' | '.(!empty($boss_info['robot_core']) ? ucwords($boss_info['robot_core'].(!empty($boss_info['robot_core2']) ? ' / '.$boss_info['robot_core2'] : '')) : 'Neutral').' Type';
         $boss_title_text .= '|| [[E:'.$boss_info['robot_energy'].' | W:'.$boss_info['robot_weapons'].' | A:'.$boss_info['robot_attack'].' | D:'.$boss_info['robot_defense'].' | S:'.$boss_info['robot_speed'].']]';
+        if ($boss_flag_has_skill){ $boss_title_text .= '|| [[Passive Skill : '.$boss_skill_info['skill_name'].']] '; }
         $boss_image_path = 'images/robots/'.$boss_image_token.'/mug_right_'.$boss_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
         $boss_stat_max = $boss_info['robot_energy'] + $boss_info['robot_attack'] + $boss_info['robot_defense'] + $boss_info['robot_speed'];
         if ($boss_stat_max > $mmrpg_stat_base_max_value['boss']){ $mmrpg_stat_base_max_value['boss'] = $boss_stat_max; }
@@ -206,7 +213,8 @@ if (!empty($mmrpg_database_bosses)){
         <div title="<?= $boss_title_text ?>" data-token="<?= $boss_info['robot_token'] ?>" class="float left link type <?=
             ($boss_core_class.' ').
             ($boss_image_incomplete  ? 'inactive ' : '').
-            ($boss_flag_fightable ? 'fightable ' : '')
+            ($boss_flag_fightable ? 'fightable ' : '').
+            ($boss_flag_has_skill ? 'has-skill ' : '')
             ?>">
             <a class="sprite robot link mugshot size<?= $boss_image_size.($boss_key == $first_boss_token ? ' current' : '') ?>" href="<?= 'database/bosses/'.$boss_info['robot_token']?>/" rel="<?= $boss_image_incomplete ? 'nofollow' : 'follow' ?>">
                 <?php if($boss_image_token != 'boss'): ?>
@@ -215,6 +223,7 @@ if (!empty($mmrpg_database_bosses)){
                     <span><?= $boss_info['robot_name'].$boss_info['robot_name_append'] ?></span>
                 <?php endif; ?>
             </a>
+            <?= $boss_flag_has_skill ? '<i class="skill type '.$boss_skill_display_type.'"></i>' : '' ?>
         </div>
         <?php
         if ($boss_flag_complete){ $mmrpg_database_bosses_count_complete++; }
