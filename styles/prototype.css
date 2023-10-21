@@ -1536,6 +1536,10 @@ body[data-source="website"] #prototype .menu {
         display: block;
         visibility: hidden;
         position: absolute;
+        width: 0;
+        height: 0;
+        top: -9999px;
+        left: -9999px;
     }
 }
 #prototype .block_2,
