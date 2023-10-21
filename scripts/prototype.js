@@ -430,6 +430,7 @@ $(document).ready(function(){
                 }
             };
 
+        /*
         // Define the event for the password prompt's click unlock sequence
         $('.banner .sprite_player', thisPrototype).live('click', function(){
             gameSettings.passwordUnlocked++;
@@ -455,6 +456,7 @@ $(document).ready(function(){
                     }
                 }
             });
+        */
 
         // Define the live Rogue Star ticker functionality if present
         var $rogueStar = $('.banner .rogue_star', thisPrototype);

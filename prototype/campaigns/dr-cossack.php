@@ -82,8 +82,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') && empty($this_prototype_data['robots_unloc
     exit();
 }
 
-// Require the PASSWORDS file for this player
-if (!defined('MMRPG_SCRIPT_REQUEST')){ require_once(MMRPG_CONFIG_ROOTDIR.'prototype/passwords/'.$this_prototype_data['this_player_token'].'.php'); }
+// Require the PASSWORDS file for this player (disabled as of 2k23)
+//if (!defined('MMRPG_SCRIPT_REQUEST')){ require_once(MMRPG_CONFIG_ROOTDIR.'prototype/passwords/'.$this_prototype_data['this_player_token'].'.php'); }
 
 // Check to see if we have reason to load mission and robot markup
 $load_missions_and_robots = false;
