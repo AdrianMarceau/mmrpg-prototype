@@ -580,7 +580,7 @@ while ($this_action == 'load'){
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Mega Man RPG Prototype | Game File | Last Updated <?= mmrpg_print_cache_date() ?></title>
+<title>File Menu | Prototype | Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="darkreader-lock" content="already-dark-mode" />

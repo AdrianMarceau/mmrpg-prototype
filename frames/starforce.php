@@ -149,7 +149,7 @@ function temp_combination_number($k,$n){
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Mega Man RPG Prototype | Rulebook | Last Updated <?= mmrpg_print_cache_date() ?></title>
+<title>View Stars | Prototype | Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="darkreader-lock" content="already-dark-mode" />
