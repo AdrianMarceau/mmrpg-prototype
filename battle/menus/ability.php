@@ -30,6 +30,10 @@ ob_start();
         }
     }
 
+    // Pre-collect the bulwark robots from the players to see if the bench is protected
+    $temp_thisplayer_bulwark_robots = $this_player->get_value('bulwark_robots');
+    $temp_targetplayer_bulwark_robots = $target_player->get_value('bulwark_robots');
+
     // Display container for the main actions
     echo('<div class="main_actions main_actions_hastitle">');
 
@@ -159,9 +163,12 @@ ob_start();
                 $temp_kind = !empty($temp_damage) && empty($temp_recovery) ? 'damage' : (!empty($temp_recovery) && empty($temp_damage) ? 'recovery' : (!empty($temp_damage) && !empty($temp_recovery) ? 'multi' : ''));
                 $temp_target = 'auto';
                 $temp_target_text = '';
-                if ($temp_ability->ability_target == 'select_target' && $target_player->counters['robots_active'] > 1){ $temp_target = 'select_target'; $temp_target_text = 'Select Target'; }
-                elseif ($temp_ability->ability_target == 'select_this'){ $temp_target = 'select_this'; $temp_target_text = 'Select Target'; }
-                elseif ($temp_ability->ability_target == 'select_this_ally'){ $temp_target = 'select_this_ally'; $temp_target_text = 'Select Target'; }
+                $temp_target_target = $temp_ability->ability_target;
+                if ($temp_target_target == 'select_target' && !empty($temp_targetplayer_bulwark_robots)){ $temp_target_target = 'auto'; }
+                elseif ($temp_target_target == 'select_target' && $target_player->counters['robots_active'] === 1){ $temp_target_target = 'auto'; }
+                if ($temp_target_target == 'select_target'){ $temp_target = 'select_target'; $temp_target_text = 'Select Target'; }
+                elseif ($temp_target_target == 'select_this'){ $temp_target = 'select_this'; $temp_target_text = 'Select Target'; }
+                elseif ($temp_target_target == 'select_this_ally'){ $temp_target = 'select_this_ally'; $temp_target_text = 'Select Target'; }
 
                 $temp_multiplier = 1;
                 if (!empty($temp_damage) || !empty($temp_recovery)){
@@ -328,7 +335,7 @@ ob_start();
                         else { $temp_ability_label .= ($temp_kind == 'damage' ? 'Damage' : ($temp_kind == 'recovery' ? 'Recovery' : ($temp_kind == 'multi' ? 'Effects' : 'Special'))); }
                     $temp_ability_label .= '</span>';
                     $temp_ability_label .= '<span class="subtext">';
-                        $icon = strstr($temp_ability->ability_target, 'select_') ? 'crosshairs' : 'bullseye';
+                        $icon = strstr($temp_target_target, 'select_') ? 'crosshairs' : 'bullseye';
                         $temp_ability_label .= '<span class="accuracy"><i class="fa fas fa-'.$icon.'"></i> '.$temp_accuracy.'%</span> ';
                         if ($flag_is_stat_ability && ($flag_is_boost_ability || $flag_is_break_ability)){
                             // If this is a stat ability, show the stat change from the hidden value

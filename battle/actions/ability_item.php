@@ -236,6 +236,10 @@ if (empty($this_robot)){
     die('<pre>$target_robot is empty on line '.__LINE__.'! :'.print_r($target_robot, true).'</pre>');
 }
 
+// Pre-collect the bulwark robots from the players to see if the bench is protected
+$temp_thisplayer_bulwark_robots = $this_player->get_value('bulwark_robots');
+$temp_targetplayer_bulwark_robots = $target_player->get_value('bulwark_robots');
+
 // Create the temporary ability object for the target player's robot
 $temp_ability_info = array();
 list($temp_ability_info['ability_id'], $temp_ability_info['ability_token']) = explode('_', $target_action_token);
@@ -243,8 +247,13 @@ $temp_index_info = rpg_ability::get_index_info($temp_ability_info['ability_token
 $temp_ability_info = array_merge($temp_index_info, $temp_ability_info);
 $temp_targetability = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $temp_ability_info);
 
+// Pre-collect the ability target so we can change if necessary, then do so if bulwarks exist
+$temp_targetability_abilitytarget = $temp_targetability->ability_target;
+if (!empty($temp_thisplayer_bulwark_robots)){ $temp_targetability_abilitytarget = 'auto'; }
+elseif ($this_player->counters['robots_active'] === 1){ $temp_targetability_abilitytarget = 'auto'; }
+
 // If the target player's temporary ability allows target selection
-if ($temp_targetability->ability_target == 'select_target'){
+if ($temp_targetability_abilitytarget == 'select_target'){
 
     // Select a random active robot on this player's side of the field
     $temp_activerobots = $this_player->values['robots_active'];
@@ -258,7 +267,7 @@ if ($temp_targetability->ability_target == 'select_target'){
         $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $this_player, $temp_targetability_targetinfo);
     }
 
-} elseif ($temp_targetability->ability_target == 'select_this'){
+} elseif ($temp_targetability_abilitytarget == 'select_this'){
 
     // Select a random active robot on this player's side of the field
     $temp_activerobots = $target_player->values['robots_active'];

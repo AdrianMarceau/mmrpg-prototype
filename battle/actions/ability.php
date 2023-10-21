@@ -208,6 +208,10 @@ if (empty($this_robot)){
     die('<pre>$target_robot is empty on line '.__LINE__.'! :'.print_r($target_robot, true).'</pre>');
 }
 
+// Pre-collect the bulwark robots from the players to see if the bench is protected
+$temp_thisplayer_bulwark_robots = $this_player->get_value('bulwark_robots');
+$temp_targetplayer_bulwark_robots = $target_player->get_value('bulwark_robots');
+
 // Create the temporary ability object for the target player's robot
 $temp_abilityinfo = array();
 list($temp_abilityinfo['ability_id'], $temp_abilityinfo['ability_token']) = explode('_', $target_action_token);
@@ -215,9 +219,14 @@ $temp_indexinfo = rpg_ability::get_index_info($temp_abilityinfo['ability_token']
 $temp_abilityinfo = array_merge($temp_indexinfo, $temp_abilityinfo);
 $temp_targetability = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $temp_abilityinfo);
 
+// Pre-collect the ability target so we can change if necessary, then do so if bulwarks exist
+$temp_targetability_abilitytarget = $temp_targetability->ability_target;
+if (!empty($temp_thisplayer_bulwark_robots)){ $temp_targetability_abilitytarget = 'auto'; }
+elseif ($this_player->counters['robots_active'] === 1){ $temp_targetability_abilitytarget = 'auto'; }
+
 // If the target player's temporary ability allows target selection
-if ($temp_targetability->ability_target == 'select_target'){
-    //error_log('$temp_targetability->ability_target == select_target');
+if ($temp_targetability_abilitytarget == 'select_target'){
+    //error_log('$temp_targetability_abilitytarget == select_target');
 
     // If the target has focused attention, only select active
     $temp_select_focus = 'auto';
@@ -265,8 +274,8 @@ if ($temp_targetability->ability_target == 'select_target'){
 
     //error_log('$temp_targetability_targetrobot->robot_string == '.$temp_targetability_targetrobot->robot_string);
 
-} elseif ($temp_targetability->ability_target == 'select_this'){
-    //error_log('$temp_targetability->ability_target == select_this');
+} elseif ($temp_targetability_abilitytarget == 'select_this'){
+    //error_log('$temp_targetability_abilitytarget == select_this');
 
     // Select a random active robot on this player's side of the field
     $temp_activerobots = $target_player->values['robots_active'];
@@ -283,8 +292,8 @@ if ($temp_targetability->ability_target == 'select_target'){
 
     //error_log('$temp_targetability_targetrobot->robot_string == '.$temp_targetability_targetrobot->robot_string);
 
-} elseif ($temp_targetability->ability_target == 'select_this_ally'){
-    //error_log('$temp_targetability->ability_target == select_this_ally');
+} elseif ($temp_targetability_abilitytarget == 'select_this_ally'){
+    //error_log('$temp_targetability_abilitytarget == select_this_ally');
 
     // Select a random active robot on this player's side of the field
     $temp_activerobots = $target_player->values['robots_active'];
@@ -308,7 +317,7 @@ if ($temp_targetability->ability_target == 'select_target'){
     //error_log('$temp_targetability_targetrobot->robot_string == '.$temp_targetability_targetrobot->robot_string);
 
 } else {
-    //error_log('$temp_targetability->ability_target == other');
+    //error_log('$temp_targetability_abilitytarget == other');
 
     $temp_targetability_targetplayer = $this_player;
     $temp_targetability_targetrobot = $this_robot;
