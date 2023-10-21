@@ -486,13 +486,13 @@ button {
     100% { filter: brightness(0.0) opacity(0); transform: scale(0.5); }
 }
 @keyframes website-banner-logo-idle-fade {
-    0% { filter: brightness(1.0) blur(0); top: 0; }
-    20% { filter: brightness(1.0) blur(0); top: 0; }
-    30% { filter: brightness(0.2) blur(0.5px); top: 50px; }
+    0% { filter: brightness(1.0); top: 0; }
+    20% { filter: brightness(1.0); top: 0; }
+    30% { filter: brightness(0.2); top: 50px; }
 
-    70% { filter: brightness(0.2) blur(0.5px); top: 50px; }
-    80% { filter: brightness(1.0) blur(0); top: 0; }
-    100% { filter: brightness(1.0) blur(0); top: 0; }
+    70% { filter: brightness(0.2); top: 50px; }
+    80% { filter: brightness(1.0); top: 0; }
+    100% { filter: brightness(1.0); top: 0; }
 }
 #window .banner .banner_background {
     filter: brightness(0.8) blur(0);
