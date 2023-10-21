@@ -970,6 +970,13 @@ if (!empty($this_battle_data)){
 </script>
 <?
 // Require the remote bottom in case we're in viewer mode
+$gtag_battle_token = $this_battle_data['battle_token'];
+$gtag_player_robots = array_map(function($r){ return $r['robot_token']; }, $this_player_data['player_robots']);
+$include_gtag_events = array();
+$include_gtag_events['battle_start'] = array(
+    'battle_token' => $gtag_battle_token,
+    'player_robots' => implode(',', $gtag_player_robots)
+    );
 require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php');
 // Unset the database variable
 unset($db);
