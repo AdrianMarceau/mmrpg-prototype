@@ -1408,8 +1408,19 @@ function prototype_menu_click_back(thisContext, thisLink){
 }
 
 // Create a function for switching to a specific menu step
+var menuSwitchTimeout = false;
 function prototype_menu_switch(switchOptions){
     //console.log('prototype_menu_switch(switchOptions:', switchOptions, ')');
+
+    // Clear any existing timeout and then set a new one a little bit in the future
+    if (menuSwitchTimeout){ clearTimeout(menuSwitchTimeout); }
+    menuSwitchTimeout = setTimeout(function(){ return prototype_menu_switch_action(switchOptions); }, 1000);
+
+}
+
+// Create a function for switching to a specific menu step
+function prototype_menu_switch_action(switchOptions){
+    //console.log('prototype_menu_switch_action(switchOptions:', switchOptions, ')');
 
     // Redefine the options array populating defaults
     switchOptions = {
