@@ -3468,6 +3468,7 @@ class rpg_robot extends rpg_object {
             'robot_rewards' => $this->robot_rewards,
             'robot_base_name' => $this->robot_base_name,
             'robot_base_token' => $this->robot_base_token,
+            'robot_base_item' => $this->robot_base_item,
             'robot_base_image' => $this->robot_base_image,
             'robot_base_image_size' => $this->robot_base_image_size,
             'robot_base_image_overlay' => $this->robot_base_image_overlay,
@@ -6390,6 +6391,26 @@ class rpg_robot extends rpg_object {
             $rtoken = $this->robot_token;
             if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
                 $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+            }
+        }
+
+    }
+
+    // Define a function for triggering a robot to "equip" a new held item, which is to say add it in the right context
+    public function equip_held_item($new_item_token){
+
+        // First, set this robot's current item to the new token
+        $this->set_item($new_item_token);
+
+        // Also remove this robot's item from the session, we're done with it, if human character and appropriate to do so
+        $session_token = rpg_game::session_token();
+        if ($this->player->player_side == 'left'
+            && empty($this->battle->flags['player_battle'])
+            && empty($this->battle->flags['challenge_battle'])){
+            $ptoken = $this->player->player_token;
+            $rtoken = $this->robot_token;
+            if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
+                $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = $new_item_token;
             }
         }
 
