@@ -6131,7 +6131,8 @@ class rpg_robot extends rpg_object {
 
         // If this robot has an item disabled counter, decrement it
         $item_disabled_ended = false;
-        if (isset($this->counters['item_disabled'])){
+        if (isset($this->counters['item_disabled'])
+            && $phase === 'end-of-turn'){
 
             // If the counter has exactly one left, we can display the robot looking for the item
             if ($this->counters['item_disabled'] === 1){
