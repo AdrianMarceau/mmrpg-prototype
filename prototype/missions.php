@@ -863,11 +863,11 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_description_key = $this_prototype_player_data['player_number'] - 1;
                 $temp_final_option['battle_description'] = 'Defeat the alien robot '.$final_boss_index_info['robot_name'].' in this '.$temp_description_options[$temp_description_key].' final battle!';
 
-                // If this is NOT the final battle, make sure it doesn't count towards completion
-                if ($this_prototype_player_data['player_token'] === 'dr-wily'
-                    || $this_prototype_player_data['player_token'] === 'dr-cossack'){
-                    $temp_final_option['battle_counts'] = false;
-                }
+                // Check to see if this is the actual final battle for this chapter and should count for completion
+                if ($this_prototype_player_data['player_token'] === 'dr-light'){ $temp_final_option['battle_counts'] = true; }
+                elseif ($this_prototype_player_data['player_token'] === 'dr-wily'){ $temp_final_option['battle_counts'] = true; }
+                elseif ($this_prototype_player_data['player_token'] === 'dr-cossack'){ $temp_final_option['battle_counts'] = false; }
+                //error_log($temp_final_option['battle_token'].' // battle_counts = '.($temp_final_option['battle_counts'] ? 'true' : 'false'));
 
                 // Now that everything is as we want it, we can prepare the battle and update the index
                 rpg_mission_fortress::prepare($temp_final_option, $this_prototype_data);
@@ -957,8 +957,9 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     $temp_before_final_option['battle_field_base']['field_mechas'] = $temp_support_mechas;
                     shuffle($temp_before_final_option['battle_target_player']['player_robots']);
 
-                    // This is NOT the final battle, so make sure it doesn't count towards completion
-                    if ($this_prototype_player_data['player_number'] >= 3){ $temp_before_final_option['battle_counts'] = false; }
+                    // Check to see if this is the actual final battle for this chapter and should count for completion
+                    $temp_before_final_option['battle_counts'] = false; // this is a before battle, it should never count
+                    //error_log($temp_before_final_option['battle_token'].' // battle_counts = '.($temp_before_final_option['battle_counts'] ? 'true' : 'false'));
 
                     // Prepare the final battle details, add it to the index and/or buttons, and then queue it up
                     rpg_mission_fortress::prepare($temp_before_final_option, $this_prototype_data);
@@ -1041,6 +1042,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                         for ($i = 0; $i < $final_boss_support_count; $i++){
                             $temp_after_final_option['battle_target_player']['player_robots'][] = $final_boss_support_info;
                             }
+
+                        // Check to see if this is the actual final battle for this chapter and should count for completion
+                        $temp_after_final_option['battle_counts'] = true; // this is only ever a final battle, it should always count
+                        //error_log($temp_after_final_option['battle_token'].' // battle_counts = '.($temp_after_final_option['battle_counts'] ? 'true' : 'false'));
 
                         // Prepare the final battle details, add it to the index and/or buttons, and then queue it up
                         rpg_mission_fortress::prepare($temp_after_final_option, $this_prototype_data);
