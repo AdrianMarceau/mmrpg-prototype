@@ -958,7 +958,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     shuffle($temp_before_final_option['battle_target_player']['player_robots']);
 
                     // This is NOT the final battle, so make sure it doesn't count towards completion
-                    $temp_before_final_option['battle_counts'] = false;
+                    if ($this_prototype_player_data['player_number'] >= 3){ $temp_before_final_option['battle_counts'] = false; }
 
                     // Prepare the final battle details, add it to the index and/or buttons, and then queue it up
                     rpg_mission_fortress::prepare($temp_before_final_option, $this_prototype_data);
