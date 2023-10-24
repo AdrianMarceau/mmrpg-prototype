@@ -1405,9 +1405,9 @@ class rpg_disabled {
                         $event_options['event_flag_sound_effects'] = array(
                             array('name' => 'get-big-item', 'volume' => 1.0)
                             );
-                        $temp_unlocked_robot->robot_frame = 'base';
-                        $temp_unlocked_robot->update_session();
+                        $temp_unlocked_robot->set_frame('base');
                         $this_battle->events_create($temp_unlocked_robot, false, $event_header, $event_body, $event_options);
+                        $temp_unlocked_robot->set_status('disabled');
                         unset($temp_unlocked_robot);
                     }
 
