@@ -86,6 +86,9 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
     $skip_swap_abilities = in_array('skip_swap_abilities_on_generate', $flags) ? true : false;
     $skip_mode_abilities = in_array('skip_mode_abilities_on_generate', $flags) ? true : false;
 
+    // If the robot has a reverse module, skip any boost abilities that would suck forit
+    if (!empty($robot_item) && $robot_item === 'reverse-module'){ $skip_boost_abilities = true; }
+
     // Define the array for holding all of this robot's abilities
     $this_robot_abilities = array();
 
