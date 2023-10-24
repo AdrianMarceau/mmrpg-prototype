@@ -40,6 +40,27 @@ ob_start();
             ? 'main_actions_title_disabled'
             : '' ?>">
             <?
+            // Define the markup for the unequip button for if it's been unlocked
+            $unequip_button_markup = '';
+            if ($allow_inventory_access && !empty($this_robot->robot_item)){
+                $temp_iteminfo = $mmrpg_database_items[$this_robot->robot_item];
+                $temp_owned = !empty($_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item]) ? $_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item] : 0;
+                $temp_allowed = $temp_owned < MMRPG_SETTINGS_ITEMS_MAXQUANTITY ? true : false;
+                ob_start();
+                echo '<a class="button'.(!$temp_allowed ? ' button_disabled' : '').'" data-action="ability_11_action-unequipitem">';
+                    echo '<i class="fa fas fa-download"></i> ';
+                    echo '<span class="sprite sprite_40x40 sprite_40x40_base sprite_40x40_item" style="background-image: url(images/items/'.$this_robot->robot_item.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
+                    if ($temp_allowed){ echo 'Unequip Item'; }
+                    else { echo '<del>Unequip Item</del>'; }
+                    echo ' ('.$temp_owned.' &rsaquo; '.($temp_owned + 1).')';
+                    echo '<span class="info color" data-click-tooltip="Unequip the '.$temp_iteminfo['item_name'].' and return it to the inventory?" data-tooltip-type="empty">';
+                        echo '<i class="fa fas fa-info-circle color empty"></i>';
+                    echo '</span>';
+                    //echo 'Send to Inventory?';
+                echo '</a>';
+                $unequip_button_markup = trim(ob_get_clean());
+            }
+
             // If there were more than eight items, print the page numbers
             if ($current_player_items_count > 8){
                 $temp_selected_page = 1; //!empty($_SESSION['GAME']['battle_settings']['action_item_page_num']) ? $_SESSION['GAME']['battle_settings']['action_item_page_num'] : 1;
@@ -47,27 +68,15 @@ ob_start();
                 echo '<span class="float_links">';
                     echo '<span class="page">Page</span>';
                     for ($i = 1; $i <= $current_player_items_pages; $i++){ echo '<a class="button num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
-                    if ($allow_inventory_access && !empty($this_robot->robot_item)){
-                        $temp_iteminfo = $mmrpg_database_items[$this_robot->robot_item];
-                        $temp_owned = !empty($_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item]) ? $_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item] : 0;
-                        $temp_allowed = $temp_owned < MMRPG_SETTINGS_ITEMS_MAXQUANTITY ? true : false;
-                        echo '<a class="button'.(!$temp_allowed ? ' button_disabled' : '').'" data-action="ability_11_action-unequipitem">';
-                            echo '<i class="fa fas fa-download"></i> ';
-                            echo '<span class="sprite sprite_40x40 sprite_40x40_base sprite_40x40_item" style="background-image: url(images/items/'.$this_robot->robot_item.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
-                            if ($temp_allowed){ echo 'Unequip Item'; }
-                            else { echo '<del>Unequip Item</del>'; }
-                            echo ' ('.$temp_owned.' &rsaquo; '.($temp_owned + 1).')';
-                            echo '<span class="info color" data-click-tooltip="Unequip the '.$temp_iteminfo['item_name'].' and return it to the inventory?" data-tooltip-type="empty">';
-                                echo '<i class="fa fas fa-info-circle color empty"></i>';
-                            echo '</span>';
-                            //echo 'Send to Inventory?';
-                        echo '</a>';
-                    }
+                    echo $unequip_button_markup;
                 echo '</span> ';
             }
             // Otherwise, simply print the item select text label
             else {
-                echo 'Select Item';
+                echo '<span class="float_title">Select Item</span> ';
+                echo '<span class="float_links">';
+                    echo $unequip_button_markup;
+                echo '</span> ';
             }
             ?>
         </span>
