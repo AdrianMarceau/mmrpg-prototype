@@ -78,6 +78,7 @@
         $search_data['user_flag_approved'] = isset($_GET['user_flag_approved']) && $_GET['user_flag_approved'] !== '' ? (!empty($_GET['user_flag_approved']) ? 1 : 0) : '';
         $search_data['user_flag_postpublic'] = isset($_GET['user_flag_postpublic']) && $_GET['user_flag_postpublic'] !== '' ? (!empty($_GET['user_flag_postpublic']) ? 1 : 0) : '';
         $search_data['user_flag_postprivate'] = isset($_GET['user_flag_postprivate']) && $_GET['user_flag_postprivate'] !== '' ? (!empty($_GET['user_flag_postprivate']) ? 1 : 0) : '';
+        $search_data['user_flag_hasprogress'] = isset($_GET['user_flag_hasprogress']) && $_GET['user_flag_hasprogress'] !== '' ? (!empty($_GET['user_flag_hasprogress']) ? 1 : 0) : '';
 
         $search_data['user_date_created'] = array();
         if (!empty($_GET['user_date_created']) && is_array($_GET['user_date_created'])){ $search_data['user_date_created'] = array_filter($_GET['user_date_created']); }
@@ -108,14 +109,14 @@
             roles.role_name,
             roles.role_level,
             roles.role_colour,
-            leaderboard.board_points
+            leaderboard.board_points,
+            (CASE WHEN leaderboard.board_points > 0 THEN 1 ELSE 0 END) AS user_flag_hasprogress
             FROM mmrpg_users AS users
             LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id
             LEFT JOIN mmrpg_leaderboard AS leaderboard ON leaderboard.user_id = users.user_id
             WHERE 1=1
             AND users.user_id <> {$exclude_guest_id}
             AND users.user_name_clean <> 'guest'
-            AND leaderboard.board_points > 0
             ";
 
         // If the user ID was provided, we can search by exact match
@@ -190,6 +191,15 @@
         if ($search_data['user_flag_postprivate'] !== ''){
             $search_query .= "AND users.user_flag_postprivate = {$search_data['user_flag_postprivate']} ";
             $search_results_limit = false;
+        }
+
+        // If the user has progress flag was provided
+        if ($search_data['user_flag_hasprogress'] !== ''){
+            if (!empty($search_data['user_flag_hasprogress'])){ $search_query .= "AND leaderboard.board_points > 0 "; }
+            else { $search_query .= "AND (leaderboard.board_points = 0 OR leaderboard.board_points IS NULL) "; }
+            $search_results_limit = false;
+        } else {
+            $search_query .= "AND leaderboard.board_points > 0 ";
         }
 
         // Define a quick function for parsing a given date range string
@@ -277,6 +287,7 @@
         $search_query .= ";";
 
         // Collect search results from the database
+        //error_log('$search_query = '.$search_query);
         $search_results = $db->get_array_list($search_query);
         $search_results_count = is_array($search_results) ? count($search_results) : 0;
 
@@ -700,10 +711,11 @@
                         <input class="textbox" type="text" name="user_admin_text" value="<?= !empty($search_data['user_admin_text']) ? htmlentities($search_data['user_admin_text'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
-                    <div class="field halfsize has3cols flags">
+                    <div class="field halfsize has4cols flags">
                     <?
                     $flag_names = array(
                         'approved' => array('icon' => 'fas fa-check-square', 'yes' => 'Approved', 'no' => 'Not Approved'),
+                        'hasprogress' => array('icon' => 'fas fa-tasks', 'yes' => 'Has Progress', 'no' => 'No Progress', 'label' => 'Game Progress'),
                         'postpublic' => array('icon' => 'fas fa-comment', 'yes' => 'Allowed', 'no' => 'Not Allowed', 'label' => 'Public Posts'),
                         'postprivate' => array('icon' => 'fas fa-envelope', 'yes' => 'Allowed', 'no' => 'Not Allowed', 'label' => 'Private Messages')
                         );
