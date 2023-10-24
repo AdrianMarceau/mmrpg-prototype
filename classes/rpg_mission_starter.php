@@ -320,6 +320,7 @@ class rpg_mission_starter extends rpg_mission {
         if (!empty($this_robot_alt)){
             if ($this_robot_token === 'trill'){
                 $temp_boss_image = $this_robot_token;
+                $temp_boss_item = 'space-shard';
                 //$temp_boss_abilities = array('space-shot', 'space-buster', 'space-overdrive', 'energy-boost');
                 $temp_boss_abilities = array('energy-boost');
                 if ($this_player_data['player_number'] >= 1){ $temp_boss_abilities[] = 'space-overdrive'; }
@@ -338,6 +339,7 @@ class rpg_mission_starter extends rpg_mission {
                     );
                 $temp_boss_robot['counters'][$temp_stat_priority[0]] = 1;
                 $temp_boss_robot['robot_image'] = $temp_boss_image;
+                $temp_boss_robot['robot_item'] = $temp_boss_item;
                 $temp_boss_robot['robot_abilities'] = $temp_boss_abilities;
             } else {
                 $temp_boss_image = $this_robot_token.'_'.$this_robot_alt;
