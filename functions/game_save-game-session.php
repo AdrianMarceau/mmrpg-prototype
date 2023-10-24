@@ -406,8 +406,13 @@ function mmrpg_save_game_session(){
         //error_log('<pre>$this_board_array : '.print_r($this_board_array, true).'</pre>');
         $db->update('mmrpg_leaderboard', $this_board_array, 'user_id = '.$this_user['userid']);
 
-        // Clear any leaderboard data that exists in the session, forcing it to recache
-        if (isset($_SESSION[$session_token]['BOARD']['boardrank'])){ unset($_SESSION[$session_token]['BOARD']['boardrank']); }
+        // Update the session points to the new value if set
+        if (!empty($battle_points_index['total_battle_points'])){
+            $session_battle_points = $battle_points_index['total_battle_points'];
+            $session_board_rank = mmrpg_prototype_leaderboard_rank($this_user['userid']);
+            $_SESSION[$session_token]['counters']['battle_points'] = $session_battle_points;
+            $_SESSION[$session_token]['BOARD']['boardrank'] = $session_board_rank;
+        }
 
     }
 

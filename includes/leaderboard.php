@@ -185,7 +185,6 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
         && $this_user_id == $_SESSION['GAME']['USER']['userid']
         && $this_leaderboard_metric === MMRPG_SETTINGS_DEFAULT_LEADERBOARD_METRIC){
         $this_boardinfo['board_rank'] = $place_counter;
-        $_SESSION['GAME']['BOARD']['boardrank'] = $this_boardinfo['board_rank'];
     }
 
     // Only continue if markup is special constants have not been defined
@@ -482,7 +481,6 @@ if ($this_current_page == 'home'){
 if (!empty($this_leaderboard_index)){
     $this_time = time();
     $last_points = 0;
-    $place_counter = 0;
 
     // Loop through the leaderboard array and print out any markup
     foreach ($this_leaderboard_index AS $key => $board){
@@ -491,10 +489,10 @@ if (!empty($this_leaderboard_index)){
         // Collect the points and increment the place counter if necessary
         //$this_points = $board['board_points'];
         $this_points = $board[$this_leaderboard_metric_info['key']];
-        if ($this_points != $last_points){
-            $last_points = $this_points;
-            $place_counter += 1;
-        }
+        if ($this_points != $last_points){ $last_points = $this_points; }
+
+        // Always collect the place counter (the rank) from the index so it's consistent
+        $place_counter = mmrpg_prototype_leaderboard_rank($board['user_id'], $this_leaderboard_metric);
 
         // Define the variable for this leaderboard markup
         $this_markup = '';

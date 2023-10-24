@@ -281,7 +281,7 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
         $battle_points_count = isset($_SESSION[$session_token]['counters']['battle_points']) ? $_SESSION[$session_token]['counters']['battle_points'] : 0;
         $battle_zenny_count = isset($_SESSION[$session_token]['counters']['battle_zenny']) ? $_SESSION[$session_token]['counters']['battle_zenny'] : 0;
         $battle_stars_count = isset($_SESSION[$session_token]['values']['battle_stars']) ? count($_SESSION[$session_token]['values']['battle_stars']) : 0;
-        $battle_points_rank = !empty($this_boardinfo['board_rank']) ? $this_boardinfo['board_rank'] : 0;
+        $battle_points_rank = !empty($_SESSION[$session_token]['BOARD']['boardrank']) ? $_SESSION[$session_token]['BOARD']['boardrank'] : 0;
         $has_points_overflow = $battle_points_count >= 999999999999 ? true : false;
         $has_zenny_overflow = $battle_zenny_count >= 999999999 ? true : false;
         // If the user has collected any points, turn the points counter into a leaderboard link
@@ -301,9 +301,9 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
                 <label class="label">Battle Points</label>
                 <span class="amount">
                     <span class="value"><?= number_format($battle_points_count, 0, '.', ',') ?></span>
-                    <? if(!empty($this_boardinfo['board_rank'])): ?>
+                    <? if(!empty($battle_points_rank)): ?>
                         <span class="pipe">|</span>
-                        <span class="place"><?= mmrpg_number_suffix($this_boardinfo['board_rank']) ?></span>
+                        <span class="place"><?= mmrpg_number_suffix($battle_points_rank) ?></span>
                     <? endif; ?>
                 </span>
             </div>
