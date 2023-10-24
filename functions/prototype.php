@@ -3103,7 +3103,7 @@ function mmrpg_prototype_leaderboard_index($board_metric = ''){
 
     // Check to see if the leaderboard index has already been pulled or not
     if (!empty($db->INDEX['LEADERBOARD']['index'])){
-        $this_leaderboard_index = json_decode($db->INDEX['LEADERBOARD']['index'], true);
+        $this_leaderboard_index = $db->INDEX['LEADERBOARD']['index']; //json_decode($db->INDEX['LEADERBOARD']['index'], true);
     } else {
         // Define the array for pulling all the leaderboard data
         $temp_leaderboard_query = 'SELECT
@@ -3121,7 +3121,7 @@ function mmrpg_prototype_leaderboard_index($board_metric = ''){
         // Query the database and collect the array list of all online players
         $this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
         // Update the database index cache
-        $db->INDEX['LEADERBOARD']['index'] = json_encode($this_leaderboard_index);
+        $db->INDEX['LEADERBOARD']['index'] = $this_leaderboard_index; //json_encode($this_leaderboard_index);
     }
 
     // Return the collected leaderboard index

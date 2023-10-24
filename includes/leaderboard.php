@@ -482,6 +482,9 @@ if (!empty($this_leaderboard_index)){
     $this_time = time();
     $last_points = 0;
 
+    // Collect a rank index from which to reference in the next step
+    $leaderboard_rank_index = mmrpg_prototype_leaderboard_rank_index($this_leaderboard_metric);
+
     // Loop through the leaderboard array and print out any markup
     foreach ($this_leaderboard_index AS $key => $board){
         //echo("\n\n<!-- \$this_leaderboard_index[{$key}] -->\n");
@@ -492,7 +495,7 @@ if (!empty($this_leaderboard_index)){
         if ($this_points != $last_points){ $last_points = $this_points; }
 
         // Always collect the place counter (the rank) from the index so it's consistent
-        $place_counter = mmrpg_prototype_leaderboard_rank($board['user_id'], $this_leaderboard_metric);
+        $place_counter = isset($leaderboard_rank_index[$board['user_id']]) ? $leaderboard_rank_index[$board['user_id']] : count($leaderboard_rank_index) + 1;
 
         // Define the variable for this leaderboard markup
         $this_markup = '';
