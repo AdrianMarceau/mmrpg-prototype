@@ -61,6 +61,7 @@ function mmrpg_prototype_complete($player_token = ''){
 // Define a BETTER function to calculating a player's current battle points
 function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index = array()){
     //debug_profiler_checkpoint('func/calc-battle-points-2k19/before/');
+    //error_log('mmrpg_prototype_calculate_battle_points_2k19($user_id: '.$user_id.')');
 
     // Return early if arguments provided are invalid
     if (empty($user_id) || !is_numeric($user_id)){ return false; }
@@ -477,6 +478,8 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
 
     // Return calculated battle points
     $points_index['total_battle_points'] = $total_battle_points;
+    //error_log('$points_index = '.print_r(array_keys($points_index), true));
+    //error_log('$total_battle_points = '.print_r($total_battle_points, true));
     return $total_battle_points;
 
     //debug_profiler_checkpoint('func/calc-battle-points-2k19/after/');

@@ -274,6 +274,22 @@ function mmrpg_save_game_session(){
         // DEBUG
         $DEBUG = '';
 
+        // Collect user IDs from the various tables to ensure/check they exist
+        $check_tables = $db->get_array("SELECT
+            `users`.`user_id`,
+            `saves`.`user_id` AS `save_user_id`,
+            `board`.`user_id` AS `board_user_id`,
+            (CASE WHEN `users`.`user_id` IS NOT NULL THEN 1 ELSE 0 END) AS `has_user`,
+            (CASE WHEN `saves`.`user_id` IS NOT NULL THEN 1 ELSE 0 END) AS `has_save`,
+            (CASE WHEN `board`.`user_id` IS NOT NULL THEN 1 ELSE 0 END) AS `has_board`
+            FROM `mmrpg_users` AS `users`
+            LEFT JOIN `mmrpg_saves` AS `saves` ON `saves`.`user_id` = `users`.`user_id`
+            LEFT JOIN `mmrpg_leaderboard` AS `board` ON `board`.`user_id` = `users`.`user_id`
+            WHERE
+            `users`.`user_id` = {$this_user['userid']}
+            ;");
+        //error_log('$check_tables = '.print_r($check_tables, true));
+
         // Update the user modified and accessed date (everything else is saved via profile settings pages)
         $db->update('mmrpg_users', array(
             'user_date_modified' => time(),
@@ -404,7 +420,12 @@ function mmrpg_save_game_session(){
 
         // Update this board's info in the database
         //error_log('<pre>$this_board_array : '.print_r($this_board_array, true).'</pre>');
-        $db->update('mmrpg_leaderboard', $this_board_array, 'user_id = '.$this_user['userid']);
+        if (!empty($check_tables['has_board'])){
+            $db->update('mmrpg_leaderboard', $this_board_array, 'user_id = '.$this_user['userid']);
+        } else {
+            $this_board_array['user_id'] = $this_user['userid'];
+            $db->insert('mmrpg_leaderboard', $this_board_array);
+        }
 
         // Update the session points to the new value if set
         if (!empty($battle_points_index['total_battle_points'])){
