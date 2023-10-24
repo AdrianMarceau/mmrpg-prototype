@@ -353,6 +353,7 @@
             $form_data['player_image_size'] = !empty($_POST['player_image_size']) && is_numeric($_POST['player_image_size']) ? (int)(trim($_POST['player_image_size'])) : 0;
             $form_data['player_image_editor'] = !empty($_POST['player_image_editor']) && is_numeric($_POST['player_image_editor']) ? (int)(trim($_POST['player_image_editor'])) : 0;
             $form_data['player_image_editor2'] = !empty($_POST['player_image_editor2']) && is_numeric($_POST['player_image_editor2']) ? (int)(trim($_POST['player_image_editor2'])) : 0;
+            $form_data['player_image_editor3'] = !empty($_POST['player_image_editor3']) && is_string($_POST['player_image_editor3']) ? (trim($_POST['player_image_editor3'])) : '';
 
             $form_data['player_flag_published'] = isset($_POST['player_flag_published']) && is_numeric($_POST['player_flag_published']) ? (int)(trim($_POST['player_flag_published'])) : 0;
             $form_data['player_flag_complete'] = isset($_POST['player_flag_complete']) && is_numeric($_POST['player_flag_complete']) ? (int)(trim($_POST['player_flag_complete'])) : 0;
@@ -1248,6 +1249,19 @@
                                         <? } else { ?>
                                             <input type="hidden" name="player_image_editor2" value="<?= $player_data['player_image_editor2'] ?>" />
                                             <input class="textbox" type="text" name="player_image_editor2" value="-" disabled="disabled" />
+                                        <? } ?>
+                                    </div>
+
+                                    <div class="field fullsize">
+                                        <div class="label">
+                                            <strong>Sprite Editor #3</strong>
+                                            <em>comma-separated, please only use when artist not available or too many contributors</em>
+                                        </div>
+                                        <? if ($player_data['player_image'] != $placeholder_folder){ ?>
+                                            <input class="textbox" type="text" name="player_image_editor3" value="<?= $player_data['player_image_editor3'] ?>" maxlength="256" />
+                                        <? } else { ?>
+                                            <input type="hidden" name="player_image_editor3" value="<?= $player_data['player_image_editor3'] ?>" />
+                                            <input class="textbox" type="text" name="player_image_editor3" value="-" disabled="disabled" />
                                         <? } ?>
                                     </div>
 

@@ -329,6 +329,7 @@
             $form_data['item_image_editor'] = !empty($_POST['item_image_editor']) && is_numeric($_POST['item_image_editor']) ? (int)(trim($_POST['item_image_editor'])) : 0;
             $form_data['item_image_editor2'] = !empty($_POST['item_image_editor2']) && is_numeric($_POST['item_image_editor2']) ? (int)(trim($_POST['item_image_editor2'])) : 0;
             $form_data['item_image_sheets'] = !empty($_POST['item_image_sheets']) && is_numeric($_POST['item_image_sheets']) ? (int)(trim($_POST['item_image_sheets'])) : 0;
+            $form_data['item_image_editor3'] = !empty($_POST['item_image_editor3']) && is_string($_POST['item_image_editor3']) ? (trim($_POST['item_image_editor3'])) : '';
 
             $form_data['item_flag_published'] = isset($_POST['item_flag_published']) && is_numeric($_POST['item_flag_published']) ? (int)(trim($_POST['item_flag_published'])) : 0;
             $form_data['item_flag_complete'] = isset($_POST['item_flag_complete']) && is_numeric($_POST['item_flag_complete']) ? (int)(trim($_POST['item_flag_complete'])) : 0;
@@ -1028,7 +1029,7 @@
                                     <div class="field fullsize" style="padding-bottom: 0;">
                                         <div class="label">
                                             <strong>&quot;Hold&quot; Description</strong>
-                                            <em>appended to item description in database or when viewed from the robot editor</em>
+                                            <em>appended to item description in database or when viewed from the item editor</em>
                                         </div>
                                         <textarea class="textarea" name="item_description_hold" rows="2"><?= htmlentities($item_data['item_description_hold'], ENT_QUOTES, 'UTF-8', true) ?></textarea>
                                     </div>
@@ -1076,7 +1077,7 @@
                                         <strong class="label">Source Game</strong>
                                         <select class="select" name="item_game">
                                             <?
-                                            $item_games_tokens = $db->get_array_list("SELECT DISTINCT (robot_game) AS game_token FROM mmrpg_index_robots WHERE robot_game <> '' ORDER BY robot_game ASC;", 'game_token');
+                                            $item_games_tokens = $db->get_array_list("SELECT DISTINCT (item_game) AS game_token FROM mmrpg_index_items WHERE item_game <> '' ORDER BY item_game ASC;", 'game_token');
                                             echo('<option value=""'.(empty($item_data['item_game']) ? 'selected="selected"' : '').'>- none -</option>');
                                             foreach ($item_games_tokens AS $game_token => $game_data){
                                                 $label = $game_token;
@@ -1167,6 +1168,19 @@
                                         <? } else { ?>
                                             <input type="hidden" name="item_image_editor2" value="<?= $item_data['item_image_editor2'] ?>" />
                                             <input class="textbox" type="text" name="item_image_editor2" value="-" disabled="disabled" />
+                                        <? } ?>
+                                    </div>
+
+                                    <div class="field fullsize">
+                                        <div class="label">
+                                            <strong>Sprite Editor #3</strong>
+                                            <em>comma-separated, please only use when artist not available or too many contributors</em>
+                                        </div>
+                                        <? if ($item_data['item_image'] != $placeholder_folder){ ?>
+                                            <input class="textbox" type="text" name="item_image_editor3" value="<?= $item_data['item_image_editor3'] ?>" maxlength="256" />
+                                        <? } else { ?>
+                                            <input type="hidden" name="item_image_editor3" value="<?= $item_data['item_image_editor3'] ?>" />
+                                            <input class="textbox" type="text" name="item_image_editor3" value="-" disabled="disabled" />
                                         <? } ?>
                                     </div>
 
@@ -1358,10 +1372,10 @@
                                             <code style="color: #05a;">$target_player</code>
                                             &nbsp;&nbsp;<a title="player data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_PLAYERS_CONTENT_PATH).'.player/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
                                             <br />
-                                            <code style="color: #05a;">$this_robot</code>
+                                            <code style="color: #05a;">$this_item</code>
                                             &nbsp;/&nbsp;
-                                            <code style="color: #05a;">$target_robot</code>
-                                            &nbsp;&nbsp;<a title="robot data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_ROBOTS_CONTENT_PATH).'.robot/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
+                                            <code style="color: #05a;">$target_item</code>
+                                            &nbsp;&nbsp;<a title="item data reference" href="<?= str_replace(MMRPG_CONFIG_ROOTDIR, MMRPG_CONFIG_ROOTURL, MMRPG_CONFIG_ROBOTS_CONTENT_PATH).'.item/data.json' ?>" target="_blank"><i class="fas fa-external-link-square-alt"></i></a>
                                             <br />
                                             <code style="color: #05a;">$this_item</code>
                                             &nbsp;/&nbsp;

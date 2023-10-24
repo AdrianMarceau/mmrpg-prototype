@@ -942,6 +942,7 @@ class rpg_ability extends rpg_object {
             'ability_image_size',
             'ability_image_editor',
             'ability_image_editor2',
+            'ability_image_editor3',
             'ability_type',
             'ability_type2',
             'ability_description',
@@ -2185,6 +2186,7 @@ class rpg_ability extends rpg_object {
                         <?= $this_sprite_markup ?>
                         <?
                         // Define the editor title based on ID
+                        $temp_editor_titles = array();
                         $temp_editor_title = 'Undefined';
                         $temp_final_divider = '<span class="pipe"> | </span>';
                         $editor_ids = array();
@@ -2207,7 +2209,6 @@ class rpg_ability extends rpg_object {
                                     ORDER BY FIELD(contributor_id, {$editor_ids_string})
                                     ;", 'user_name_clean');
                             }
-                            $temp_editor_titles = array();
                             foreach ($temp_editor_details AS $editor_url => $editor_info){
                                 $editor_name = !empty($editor_info['user_name_public']) ? $editor_info['user_name_public'] : $editor_info['user_name'];
                                 if (!empty($editor_info['user_name_public'])
@@ -2217,6 +2218,12 @@ class rpg_ability extends rpg_object {
                                 }
                                 $temp_editor_titles[] = '<strong><a href="leaderboard/'.$editor_url.'/">'.$editor_name.'</a></strong>';
                             }
+                        }
+                        if (!empty($ability_info['ability_image_editor3'])){
+                            $extra_editors = strstr($ability_info['ability_image_editor3'], ',') ? explode(',', $ability_info['ability_image_editor3']) : array($ability_info['ability_image_editor3']);
+                            foreach ($extra_editors AS $custom_name){ $temp_editor_titles[] = '<strong>'.trim($custom_name).'</strong>'; }
+                        }
+                        if (!empty($temp_editor_titles)){
                             $temp_editor_title = implode(' and ', $temp_editor_titles);
                         }
                         $temp_is_capcom = true;

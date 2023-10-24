@@ -386,6 +386,7 @@
             $form_data['ability_image_editor'] = !empty($_POST['ability_image_editor']) && is_numeric($_POST['ability_image_editor']) ? (int)(trim($_POST['ability_image_editor'])) : 0;
             $form_data['ability_image_editor2'] = !empty($_POST['ability_image_editor2']) && is_numeric($_POST['ability_image_editor2']) ? (int)(trim($_POST['ability_image_editor2'])) : 0;
             $form_data['ability_image_sheets'] = !empty($_POST['ability_image_sheets']) && is_numeric($_POST['ability_image_sheets']) ? (int)(trim($_POST['ability_image_sheets'])) : 0;
+            $form_data['ability_image_editor3'] = !empty($_POST['ability_image_editor3']) && is_string($_POST['ability_image_editor3']) ? (trim($_POST['ability_image_editor3'])) : '';
 
             $form_data['ability_flag_published'] = isset($_POST['ability_flag_published']) && is_numeric($_POST['ability_flag_published']) ? (int)(trim($_POST['ability_flag_published'])) : 0;
             $form_data['ability_flag_complete'] = isset($_POST['ability_flag_complete']) && is_numeric($_POST['ability_flag_complete']) ? (int)(trim($_POST['ability_flag_complete'])) : 0;
@@ -1272,6 +1273,19 @@
                                         <? } else { ?>
                                             <input type="hidden" name="ability_image_editor2" value="<?= $ability_data['ability_image_editor2'] ?>" />
                                             <input class="textbox" type="text" name="ability_image_editor2" value="-" disabled="disabled" />
+                                        <? } ?>
+                                    </div>
+
+                                    <div class="field fullsize">
+                                        <div class="label">
+                                            <strong>Sprite Editor #3</strong>
+                                            <em>comma-separated, please only use when artist not available or too many contributors</em>
+                                        </div>
+                                        <? if ($ability_data['ability_image'] != $placeholder_folder){ ?>
+                                            <input class="textbox" type="text" name="ability_image_editor3" value="<?= $ability_data['ability_image_editor3'] ?>" maxlength="256" />
+                                        <? } else { ?>
+                                            <input type="hidden" name="ability_image_editor3" value="<?= $ability_data['ability_image_editor3'] ?>" />
+                                            <input class="textbox" type="text" name="ability_image_editor3" value="-" disabled="disabled" />
                                         <? } ?>
                                     </div>
 
