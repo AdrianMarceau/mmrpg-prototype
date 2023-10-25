@@ -71,6 +71,11 @@ class rpg_skill extends rpg_object {
         if (in_array($this_skillinfo['skill_token'], $temp_system_skills)){
             $this_skillinfo['skill_id'] = $this->player_id.'000';
         }
+        // Otherwise if the ID appears to have already been set
+        elseif (!empty($this_skillinfo['skill_id'])
+            && strstr($this_skillinfo['skill_id'], $this->robot_id)){
+            $skill_id = $this_skillinfo['skill_id'];
+        }
         // Otherwise base the ID off of the robot
         else {
             //$skill_id = $this->robot_id.str_pad($this_indexinfo['skill_id'], 3, '0', STR_PAD_LEFT);

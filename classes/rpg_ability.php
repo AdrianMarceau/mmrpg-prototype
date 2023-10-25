@@ -71,6 +71,11 @@ class rpg_ability extends rpg_object {
         if (in_array($this_abilityinfo['ability_token'], $temp_system_abilities)){
             $this_abilityinfo['ability_id'] = $this->player_id.'000';
         }
+        // Otherwise if the ID appears to have already been set
+        elseif (!empty($this_abilityinfo['ability_id'])
+            && strstr($this_abilityinfo['ability_id'], $this->robot_id)){
+            $ability_id = $this_abilityinfo['ability_id'];
+        }
         // Otherwise base the ID off of the robot
         else {
             //$ability_id = $this->robot_id.str_pad($this_indexinfo['ability_id'], 3, '0', STR_PAD_LEFT);
