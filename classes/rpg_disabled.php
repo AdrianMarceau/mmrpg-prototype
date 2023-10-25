@@ -692,7 +692,7 @@ class rpg_disabled {
                     if ($temp_robot_token == 'robot'){ continue; }
                     $temp_robot_experience = mmrpg_prototype_robot_experience($target_player->player_token, $temp_info['robot_token']);
                     $temp_robot_rewards = !empty($temp_info['robot_rewards']) ? $temp_info['robot_rewards'] : array();
-                    if (empty($temp_target_robots_active_num2)){ break; }
+                    // if (empty($temp_target_robots_active_num2)){ break; } // disabled so that level 100s can learn new abilities
                     $options->disabled_beneficiary = $temp_target_robot;
 
                     // Reset the robot experience points to zero
@@ -869,7 +869,7 @@ class rpg_disabled {
                     }
 
                     // If for whatever reason the earned experience is now zero, continue to next robot
-                    if (empty($options->earned_experience)){ continue; }
+                    //if (empty($options->earned_experience)){ continue; } // disabled so that level 100s can learn new abilities
 
                     // Define the event options
                     $event_options = array();
@@ -891,8 +891,10 @@ class rpg_disabled {
                     $temp_target_robot->update_session();
                     $target_player->update_session();
 
-                    // Only display the event if the player is under level 100
-                    if ($temp_target_robot->robot_level < 100 && $temp_target_robot->robot_class == 'master'){
+                    // Only display the EXP EARNED experience points event if the player is under level 100
+                    if (!empty($options->earned_experience)
+                        && $temp_target_robot->robot_level < 100
+                        && $temp_target_robot->robot_class == 'master'){
                         // Display the win message for this robot with battle points
                         $temp_target_robot->set_frame('taunt');
                         $temp_target_robot->set_level($temp_new_level);
@@ -923,10 +925,14 @@ class rpg_disabled {
                     // Floor the robot's experience with or without the event
                     $target_player->set_frame('victory');
                     $temp_target_robot->set_frame('base');
-                    if ($temp_start_level != $temp_new_level){ $temp_target_robot->set_experience(0); }
+                    if (!empty($options->earned_experience) &&
+                        $temp_start_level != $temp_new_level){
+                        $temp_target_robot->set_experience(0);
+                    }
 
-                    // If the level has been boosted, display the stat increases
-                    if ($temp_start_level != $temp_new_level){
+                    // Only display LEVEL UP related stat increases if the level has actually changed
+                    if (!empty($options->earned_experience)
+                        && $temp_start_level != $temp_new_level){
 
                         // Check to see if this robot finally hit level 100
                         $temp_is_max_level = $temp_new_level >= 100 ? true : false;
@@ -1130,10 +1136,17 @@ class rpg_disabled {
                     $index_robot_rewards = $temp_robot_info['robot_rewards'];
                     //$event_body = preg_replace('/\s+/', ' ', '<pre>'.print_r($index_robot_rewards, true).'</pre>');
                     //$this_battle->events_create(false, false, 'DEBUG', $event_body);
+                    //error_log('$temp_target_robot->robot_string = '.print_r($temp_target_robot->robot_string, true));
+                    //error_log('$index_robot_rewards = '.print_r($index_robot_rewards, true));
 
-                    // Loop through the ability rewards for this robot if set
-                    if ($temp_target_robot->robot_class != 'mecha' && ($temp_start_level == 100 || ($temp_start_level != $temp_new_level && !empty($index_robot_rewards['abilities'])))){
-                        $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                    // Process the LEVEL-UP ABILITIES by looping through the ability rewards for this robot if set
+                    if ($temp_target_robot->robot_class == 'master'
+                        && ($temp_start_level == 100
+                            || ($temp_start_level != $temp_new_level && !empty($index_robot_rewards['abilities']))
+                            )
+                        ){
+
+                        $temp_abilities_index = rpg_ability::get_index(true);
                         foreach ($index_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
 
                             // If this ability is already unlocked, continue
@@ -1145,7 +1158,7 @@ class rpg_disabled {
                             if ($temp_new_level >= $ability_reward_info['level']){
 
                                 // Collect the ability info from the index
-                                $ability_info = rpg_ability::parse_index_info($temp_abilities_index[$ability_reward_info['token']]);
+                                $ability_info = $temp_abilities_index[$ability_reward_info['token']];
                                 // Create the temporary ability object for event creation
                                 $temp_ability = rpg_game::get_ability($this_robot->battle, $target_player, $temp_target_robot, $ability_info);
 
@@ -1191,9 +1204,8 @@ class rpg_disabled {
                             }
 
                         }
+
                     }
-
-
 
 
                 }
