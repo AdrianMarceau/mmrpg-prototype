@@ -818,6 +818,8 @@ class rpg_disabled {
                             //error_log('|| delayed_experience_points: '.$temp_target_robot->values['delayed_experience_points'].'');
                             $temp_target_robot->update_session();
                             $options->earned_experience = 0;
+                            $temp_new_experience = $temp_start_experience;
+                            $temp_new_level = $temp_start_level;
 
                         }
                         // Otherwise, we can proceed as normal and simply add any delayed experience points if they exist
