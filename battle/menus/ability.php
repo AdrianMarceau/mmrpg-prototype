@@ -168,6 +168,7 @@ ob_start();
                 elseif ($temp_target_target == 'select_target' && $target_player->counters['robots_active'] === 1){ $temp_target_target = 'auto'; }
                 if ($temp_target_target == 'select_target'){ $temp_target = 'select_target'; $temp_target_text = 'Select Target'; }
                 elseif ($temp_target_target == 'select_this'){ $temp_target = 'select_this'; $temp_target_text = 'Select Target'; }
+                elseif ($temp_target_target == 'select_this_disabled'){ $temp_target = 'select_this_disabled'; $temp_target_text = 'Select Target'; }
                 elseif ($temp_target_target == 'select_this_ally'){ $temp_target = 'select_this_ally'; $temp_target_text = 'Select Target'; }
 
                 $temp_multiplier = 1;
