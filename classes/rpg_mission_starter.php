@@ -90,10 +90,11 @@ class rpg_mission_starter extends rpg_mission {
         $rescue_robot_unlockable = false;
 
         // Allow unlocking of the mecha support ability if the player has reached max targets
-        if ($temp_target_count > 3){
+        if ($temp_target_count > 1){
             // Add the Mecha Support ability as an unlockable move if not already unlocked
             $temp_battle_omega['battle_rewards']['abilities'] = array();
             if ($temp_target_count >= 8
+                && $this_prototype_data['this_player_token'] == 'dr-light'
                 && !mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'mecha-support')){
                 // Add the ability as a reward for the battle
                 $temp_battle_omega['battle_rewards']['abilities'][] = array('token' => 'mecha-support');
@@ -101,14 +102,21 @@ class rpg_mission_starter extends rpg_mission {
                 $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' secret mecha data! &#10023; ';
             }
             elseif ($temp_target_count >= 8
+                && $this_prototype_data['this_player_token'] == 'dr-wily'
                 && !mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'field-support')){
                 // Add the ability as a reward for the battle
                 $temp_battle_omega['battle_rewards']['abilities'][] = array('token' => 'field-support');
                 // Update the description text for the battle
                 $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' secret field data! &#10022; ';
+            }
+            elseif ($temp_target_count >= 8
+                && $this_prototype_data['this_player_token'] == 'dr-cossack'
+                && !mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'friend-share')){
+                // Add the ability as a reward for the battle
+                $temp_battle_omega['battle_rewards']['abilities'][] = array('token' => 'friend-share');
+                // Update the description text for the battle
+                $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' secret friend data! &#10022; ';
             } else {
-                // Add an item as a reward for the battle (doesn't work yet but will someday!)
-                $temp_battle_omega['battle_rewards']['items'][] = array('token' => ($temp_battle_omega_complete['battle_count'] % 2 === 0 ? 'energy-tank' : 'weapon-tank'));
                 // Update the description text for the battle
                 $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's that are currently attacking' : ' that has suddenly attacked').'!';
             }
@@ -126,9 +134,10 @@ class rpg_mission_starter extends rpg_mission {
         }
 
         // Add some random item drops to the starter battle
-        if ($temp_target_count > 1){
+        if ($temp_target_count > 8){
             $temp_battle_omega['battle_rewards']['items'] = array(
-                // Nothing if fought more than once FOR NOW
+                // Add an item as a reward for the battle (doesn't work yet but will someday!)
+                array('token' => ($temp_battle_omega_complete['battle_count'] % 2 === 0 ? 'energy-tank' : 'weapon-tank'))
                 );
         } else {
             $temp_battle_omega['battle_rewards']['items'] = array(
