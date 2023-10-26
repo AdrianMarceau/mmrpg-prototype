@@ -3880,7 +3880,7 @@ function mmrpg_prototype_get_profile_avatar_options($this_userinfo, &$allowed_av
         // If this is a copy core, add it's type alts
         if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
             foreach ($mmrpg_database_types AS $type_token => $type_info){
-                if ($type_token == 'none' || $type_token == 'copy' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
+                if ($type_token == 'none' || (isset($type_info['type_class']) && $type_info['type_class'] == 'special')){ continue; }
                 if (!isset($_SESSION[$session_token]['values']['battle_items'][$type_token.'-core']) && $this_userinfo['role_id'] != 1){ continue; }
                 $html_avatar_options[] = '<option value="robots/'.$token.'_'.$type_token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].' ('.$type_info['type_name'].' Core)</option>';
                 $allowed_avatar_options[] = 'robots/'.$token.'_'.$type_token.'/'.$size;
