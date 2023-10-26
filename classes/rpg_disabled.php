@@ -729,7 +729,7 @@ class rpg_disabled {
 
                         $debug_text = 'ACTIVE ROBOT DIVISION | ';
                         $debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
-                        $options->divided_experience = ceil($options->start_experience / $temp_target_robots_active_num2);
+                        $options->divided_experience = !empty($temp_target_robots_active_num2) ? ceil($options->start_experience / $temp_target_robots_active_num2) : 0;
                         if ($options->divided_experience > MMRPG_SETTINGS_STATS_MAX){ $options->divided_experience = MMRPG_SETTINGS_STATS_MAX; }
                         $options->earned_experience += $options->divided_experience;
                         $debug_text .= 'growing_active_robots = '.$temp_target_robots_active_num2.' | ';
