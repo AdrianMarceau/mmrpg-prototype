@@ -2,7 +2,7 @@
 
 // Include mandatory config files
 define('MMRPG_BUILD', 'mmrpg2k23');
-define('MMRPG_VERSION', '3.0.21');
+define('MMRPG_VERSION', '3.0.33');
 require('includes/config.php');
 
 // Update the timezone before starting the session
