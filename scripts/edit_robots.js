@@ -545,11 +545,21 @@ $(document).ready(function(){
                 robotKey1 = parseInt($(a).attr('data-key'));
                 robotKey2 = parseInt($(b).attr('data-key'));
 
+                } else if (thisSortToken == 'cost'){
+
+                // sort abilities by COST if cost clicked
+                robotKey1 = parseInt($(a).attr('data-cost'));
+                robotKey2 = parseInt($(b).attr('data-cost'));
+                robotKey1B = parseInt($(a).attr('data-key'));
+                robotKey2B = parseInt($(b).attr('data-key'));
+
                 } else if (thisSortToken == 'power'){
 
                 // sort abilities by POWER if power clicked
                 robotKey1 = parseInt($(a).attr('data-power'));
                 robotKey2 = parseInt($(b).attr('data-power'));
+                robotKey1B = parseInt($(a).attr('data-key'));
+                robotKey2B = parseInt($(b).attr('data-key'));
 
                 } else if (thisSortToken == 'type'){
 

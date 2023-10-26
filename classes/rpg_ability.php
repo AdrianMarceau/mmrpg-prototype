@@ -1493,12 +1493,23 @@ class rpg_ability extends rpg_object {
             //if (!empty($type2_or_false)){ $btn_info_circle .= '<i class="fa fas fa-info-circle color '.$type2_or_false.'"></i>'; }
         $btn_info_circle .= '</span>';
 
+        $cost_info_pips = '';
+        if (!empty($ability_info_energy)){
+            $cost_info_pips .= '<span class="cost">';
+                $cost_info_pips .= str_repeat('&bull;', ceil($ability_info_energy / 4));
+            $cost_info_pips .= '</span>';
+        }
+
+        //'style="border-left-width: '.(1 + $ability_info_energy).'px;" '.
+
         $ability_info_title_html = '';
         $ability_info_title_html .= '<label style="background-image: url(images/abilities/'.$ability_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">';
             $ability_info_title_html .= str_replace(' ', '&nbsp;', $ability_info_name);
             $ability_info_title_html .= '<span class="arrow"><i class="fa fas fa-angle-double-down"></i></span>';
         $ability_info_title_html .= '</label>';
+
         $ability_info_title_html .= $btn_info_circle;
+        $ability_info_title_html .= $cost_info_pips;
 
         $this_select_markup = '<a '.
             'class="ability_name type type_'.$ability_info_class_type.'" '.
@@ -1509,6 +1520,7 @@ class rpg_ability extends rpg_object {
             'data-ability="'.$ability_info_token.'" '.
             'data-type="'.(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').'" '.
             'data-type2="'.(!empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : '').'" '.
+            'data-cost="'.$ability_info_energy.'" '.
             'data-power="'.$ability_power.'" '.
             //'title="'.$ability_info_title_plain.'" '.
             //'data-tooltip="'.$ability_info_title_tooltip.'"'.
