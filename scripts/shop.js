@@ -541,6 +541,7 @@ $(document).ready(function(){
                         playSoundEffect('shop-success', {volume: 1.0});
                         playSoundEffect('zenny-spent', {volume: 1.0});
                         var loops = Math.ceil(zennyDifference / 1000);
+                        if (loops > 6){ loops = 6; }
                         for (var i = 0; i < loops; i++){
                             setTimeout(function(){
                                 playSoundEffect('zenny-spent', {volume: 1.0});
