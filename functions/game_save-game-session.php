@@ -2,6 +2,7 @@
 // Define a function for saving the game session
 function mmrpg_save_game_session(){
     //debug_profiler_checkpoint('func/save-game-session/before/');
+    //error_log('mmrpg_save_game_session()');
 
     // Reference global variables
     global $db;
@@ -22,6 +23,7 @@ function mmrpg_save_game_session(){
     // Collect the save info
     $save = $_SESSION[$session_token];
     $this_user = $save['USER'];
+    //error_log('$this_user = '.print_r($this_user, true));
 
     // -- DEMO MODE SAVE -- //
     if (!empty($_SESSION[$session_token]['DEMO'])){
@@ -271,12 +273,21 @@ function mmrpg_save_game_session(){
             }
         }
 
+        // If the user ID has not been set we cannot save
+        if (empty($this_user['userid'])){
+            error_log('mmrpg_save_game_session() failure!');
+            error_log('ERROR: User ID not set for saving game session.');
+            error_log('$this_user = '.print_r($this_user, true));
+            return false;
+        }
+
         // DEBUG
         $DEBUG = '';
 
         // Collect user IDs from the various tables to ensure/check they exist
         $check_tables = $db->get_array("SELECT
             `users`.`user_id`,
+            `saves`.`save_id`,
             `saves`.`user_id` AS `save_user_id`,
             `board`.`user_id` AS `board_user_id`,
             (CASE WHEN `users`.`user_id` IS NOT NULL THEN 1 ELSE 0 END) AS `has_user`,
@@ -423,7 +434,8 @@ function mmrpg_save_game_session(){
         if (!empty($check_tables['has_board'])){
             $db->update('mmrpg_leaderboard', $this_board_array, 'user_id = '.$this_user['userid']);
         } else {
-            $this_board_array['user_id'] = $this_user['userid'];
+            $this_board_array['user_id'] = $check_tables['user_id'];
+            $this_board_array['save_id'] = $check_tables['save_id'];
             $db->insert('mmrpg_leaderboard', $this_board_array);
         }
 
