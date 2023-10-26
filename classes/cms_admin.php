@@ -1598,10 +1598,13 @@ class cms_admin {
 
         // Loop through provided groups and insert data in database tables
         foreach ($object_groups AS $group_class => $group_list){
+            $group_order = 0;
             foreach ($group_list AS $group_key => $group_data){
                 if ($group_key === 'Unsorted'){ continue; }
                 $group_child_tokens = !empty($group_data['group_child_tokens']) ? $group_data['group_child_tokens'] : array();
                 unset($group_data['group_child_tokens']);
+                $group_order++;
+                $group_data['group_order'] = $group_order;
                 $db->insert('mmrpg_index_'.$xkind.'_groups', $group_data);
                 foreach ($group_child_tokens AS $child_key => $child_token){
                     $token_data = array();
