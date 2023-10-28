@@ -1,6 +1,7 @@
 <?
 
 // -- ABILITY-ITEM BATTLE ACTION -- //
+//error_log('battle/actions/ability_item.php');
 
 // Increment the battle's turn counter by 1
 $this_battle->counters['battle_turn'] += 1;
@@ -55,6 +56,9 @@ $this_battle->actions_execute();
 
 
 // -- Target Ability Actions -- //
+
+// Define a flag to track if the target robot has attacked yet
+$target_robot_has_attacked = false;
 
 // Backup the data for the this robot for later reference
 $backup_this_robot_id = $this_robot->robot_id;
@@ -292,6 +296,7 @@ if ($temp_targetability_abilitytarget == 'select_target'){
 // Queue up an the target robot's action now that we're done deciding what it is
 if ($target_action == 'switch'){ $target_action_token = ''; }
 $this_battle->actions_append($target_player, $active_target_robot, $temp_targetability_targetplayer, $temp_targetability_targetrobot, $target_action, $target_action_token);
+if ($target_action === 'ability'){ $target_robot_has_attacked = true; }
 
 // Refresh the backed up target robot
 $target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
@@ -319,8 +324,8 @@ if (empty($this_robot)){
 }
 
 // If the target's was a switch action, also queue up an ability
-$target_robot_has_attacked = false;
-if ($target_action == 'switch'){
+if ($target_action == 'switch'
+    && !$target_robot_has_attacked){
 
     // Now execute the stored actions
     $this_battle->actions_execute();
@@ -406,6 +411,9 @@ if (!empty($active_target_robot)
     && ($active_target_robot->robot_status == 'disabled'
         || $active_target_robot->robot_energy == 0)){
 
+    // Remove previous actions for this robot so it doesn't attack twice
+    $this_battle->actions_extract(array('robot_id' => $active_target_robot->robot_id));
+
     // Prepend a switch action for the target robot
     $this_battle->actions_append(
         $target_player,
@@ -418,6 +426,10 @@ if (!empty($active_target_robot)
 
     // Now execute the stored actions
     $this_battle->actions_execute();
+
+    // The target was legit disabled, that means the next robot should NOT be able to attack
+    // So let's set the flag to prevent that by saying the target already had their chance
+    $target_robot_has_attacked = true;
 
 }
 
@@ -505,16 +517,19 @@ if ($target_action == 'switch'
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
             $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+            $target_robot_has_attacked = true;
         }
 
     }
     // Else if this robot was tartetting a team mate
     elseif ($temp_ability_info['ability_target'] == 'select_this'
-        || $temp_ability_info['ability_target'] == 'select_this_ally'){
+        || $temp_ability_info['ability_target'] == 'select_this_ally'
+        || $temp_ability_info['ability_target'] == 'select_this_disabled'){
 
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
             $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+            $target_robot_has_attacked = true;
         }
 
     }
@@ -524,6 +539,7 @@ if ($target_action == 'switch'
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($target_robot->robot_status != 'disabled' && $target_robot->robot_position != 'bench'){
             $this_battle->actions_append($target_player, $target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+            $target_robot_has_attacked = true;
         }
 
     }

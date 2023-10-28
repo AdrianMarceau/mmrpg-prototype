@@ -1,6 +1,7 @@
 <?
 
 // -- SWITCH BATTLE ACTION -- //
+//error_log('battle/actions/ability_switch.php');
 
 // Increment the battle's turn counter by 1
 $this_battle->counters['battle_turn'] += 1;
@@ -346,6 +347,30 @@ if ($temp_targetability_abilitytarget == 'select_target'){
     $temp_targetability_targetinfo = array();
     if (!empty($temp_activerobots)){
         foreach ($temp_activerobots AS $key => $info){
+            if ($info['robot_id'] == $active_target_robot->robot_id){ continue; }
+            $temp_targetability_targetinfo = $info;
+            break;
+        }
+    }
+    $temp_targetability_targetplayer = $target_player;
+    if (MMRPG_CONFIG_DEBUG_MODE){ $_SESSION['DEBUG']['checkpoint_queries'][] = "\$temp_targetability_targetrobot = rpg_game::get_robot(\$this_battle, \$target_player, \$temp_targetability_targetinfo); on line ".__LINE__." {$temp_targetability_targetinfo['robot_token']} ";  }
+    if (!empty($temp_targetability_targetinfo)){
+        $temp_targetability_targetrobot = rpg_game::get_robot($this_battle, $target_player, $temp_targetability_targetinfo);
+    } else {
+        $temp_targetability_targetrobot = $active_target_robot;
+    }
+
+    //error_log('$temp_targetability_targetrobot->robot_string == '.$temp_targetability_targetrobot->robot_string);
+
+} elseif ($temp_targetability_abilitytarget == 'select_this_disabled'){
+    //error_log('$temp_targetability_abilitytarget == select_this_disabled');
+
+    // Select a random disabled robot on this player's side of the field
+    $temp_disabledrobots = $target_player->get_value('robots_disabled');
+    shuffle($temp_disabledrobots);
+    $temp_targetability_targetinfo = array();
+    if (!empty($temp_disabledrobots)){
+        foreach ($temp_disabledrobots AS $key => $info){
             if ($info['robot_id'] == $active_target_robot->robot_id){ continue; }
             $temp_targetability_targetinfo = $info;
             break;
