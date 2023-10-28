@@ -1494,6 +1494,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             //error_log('$temp_endless_saveinfo: '.print_r(array_keys($temp_endless_saveinfo), true));
             $temp_battle_sigma = $temp_endless_saveinfo['battle'];
             $temp_battle_sigma['option_target_href'] = $temp_endless_saveinfo['redirect'];
+            rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
             $this_prototype_data['battle_options'][] = $temp_battle_sigma;
 
 
