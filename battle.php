@@ -54,6 +54,9 @@ else {
     $this_battle_id = 0;
     $this_battle_token = '';
     $this_battle_data = array();
+    $this_redirect = 'prototype.php?'.($flag_wap ? 'wap=true' : '');
+    header('Location: '.MMRPG_CONFIG_ROOTURL.$this_redirect);
+    exit();
 }
 
 // Collect the field index if available
