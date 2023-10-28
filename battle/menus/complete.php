@@ -10,8 +10,12 @@ ob_start();
             || !empty($this_battle->batle_complete_redirect_seed)){
 
             // Display available main actions
+            $prefix_icon = '';
+            $continue_icon = '<i class="fas fa-chevron-circle-right"></i>';
+            if (!empty($this_battle->flags['starfield_mission'])){ $prefix_icon = '<i class="fa fas fa-star"></i>'; }
+            if (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){ $prefix_icon = '<i class="fa fas fa-infinity"></i>'; }
             ?><div class="main_actions"><?
-                ?><a class="button action_ability" data-action="next" type="button" data-order="1"><label>Continue <i class="fas fa-chevron-circle-right"></i></label></a><?
+                ?><a class="button action_ability" data-action="next" type="button" data-order="1"><label><?= $prefix_icon ?> Continue <?= $continue_icon ?></label></a><?
             ?></div><?
             // Display the available sub options
             ?><div class="sub_actions"><?
@@ -56,13 +60,13 @@ ob_start();
                     $next_action = !empty($star_type_one) || !empty($star_type_two) ? 'next_same-star' : 'next_any-star';
                     if (empty($temp_remaining_stars)){ $next_action = 'prototype'; }
 
-                    ?><a class="button action_ability" data-action="<?= $next_action ?>" type="button" data-order="1"><label><i class="fa fas fa-star"></i> Mission Complete!</label></a><?
+                    ?><a class="button action_ability" data-action="<?= $next_action ?>" type="button" data-order="1"><label><i class="fa fas fa-star"></i> Continue <i class="fas fa-chevron-circle-right"></i></label></a><?
 
                 }
                 // Else if this is any other mission type, display normal menu options
                 elseif (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){
 
-                    ?><a class="button action_ability" data-action="prototype" type="button" data-order="1"><label><i class="fa fas fa-wave-square"></i> Mission Complete!</label></a><?
+                    ?><a class="button action_ability" data-action="prototype" type="button" data-order="1"><label><i class="fa fas fa-infinity"></i> Continue<i class="fas fa-chevron-circle-right"></i></label></a><?
 
                 }
                 // Else if this is any other mission type, display normal menu options
@@ -78,12 +82,13 @@ ob_start();
                 // If this is a STAR FIELD mission, display customized menu options
                 if (!empty($this_battle->flags['starfield_mission'])){
 
-                    ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
-                    if (!empty($star_type_one)){ ?><a class="button action_item ability_type type_<?= $star_type_one ?>" data-action="next_<?= $star_type_one ?>-star" type="button" data-order="3"><label style="font-size: 80%;">Next <?= ucfirst($star_type_one) ?> Star</label></a><? }
-                    else { ?><a class="button action_item button_disabled" type="button">&nbsp;</a><? }
-                    if (!empty($star_type_two)){ ?><a class="button action_option ability_type type_<?= $star_type_two ?>" data-action="next_<?= $star_type_two ?>-star" type="button" data-order="3"><label style="font-size: 80%;">Next <?= ucfirst($star_type_two) ?> Star</label></a><? }
-                    else { ?><a class="button action_option button_disabled" type="button">&nbsp;</a><? }
-                    ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
+                    if (!empty($star_type_one)){ ?><a class="button action_scan ability_type type_<?= $star_type_one ?>" data-action="next_<?= $star_type_one ?>-star" type="button" data-order="3"><label style="font-size: 80%;">Next <?= ucfirst($star_type_one) ?> Star</label></a><? }
+                    else { ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><? }
+
+                    ?><a class="button action_item colspan2" data-action="prototype" type="button" data-order="1"><label>Exit Star Fields</label></a><?
+
+                    if (!empty($star_type_two)){ ?><a class="button action_switch ability_type type_<?= $star_type_two ?>" data-action="next_<?= $star_type_two ?>-star" type="button" data-order="3"><label style="font-size: 80%;">Next <?= ucfirst($star_type_two) ?> Star</label></a><? }
+                    else { ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><? }
 
                 }
                 // Else if this is a PLAYER BATTLE mission, display customized menu options
