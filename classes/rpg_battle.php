@@ -59,6 +59,13 @@ class rpg_battle extends rpg_object {
         global $this_prototype_data;
         if (!empty($this_prototype_data)){
             rpg_mission::insert_context($battle_info, $this_prototype_data);
+        } else {
+            rpg_mission::insert_context($battle_info, array(
+                'this_player_token' => 'player',
+                'this_current_chapter' => 1,
+                'battle_phase' => 1,
+                'battle_round' => 1
+                ));
         }
 
         // Update and/or overwrite the current info in the index
@@ -253,6 +260,16 @@ class rpg_battle extends rpg_object {
         $this->battle_function = isset($functions['battle_function']) ? $functions['battle_function'] : function(){};
         $this->battle_function_onload = isset($functions['battle_function_onload']) ? $functions['battle_function_onload'] : function(){};
         unset($functions);
+
+        // Ensure values exist for necessary battle properties
+        if (!isset($this->values['context'])){
+            $this->values['context'] = array(
+                'player' => 'player',
+                'chapter' => 1,
+                'phase' => 1,
+                'round' => 1
+                );
+        }
 
         // Trigger the onload function if it exists
         $this->trigger_onload();
