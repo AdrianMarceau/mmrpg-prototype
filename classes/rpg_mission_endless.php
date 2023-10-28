@@ -161,11 +161,7 @@ class rpg_mission_endless extends rpg_mission {
                     array_push($target_robot_options, array_shift($target_robot_options));
                 }
             }
-            if ($mission_is_double){
-                $target_token = select_from_array_with_rollover($target_robot_options, (ceil($target_num / 2) + ($target_num % 2 == 0 ? 1 : $mission_phase)));
-            } else {
-                $target_token = select_from_array_with_rollover($target_robot_options, $target_num);
-            }
+            $target_token = select_from_array_with_rollover($target_robot_options, $target_num);
             $target_string .= $target_token;
 
             // Select a random item kind and then select a random item from that list

@@ -50,6 +50,17 @@ $this_graph_data['description'] = 'An experimental endless mode mission/path gen
     //echo('<pre>$mmrpg_robots_index = '.print_r(array_keys($mmrpg_robots_index), true).'</pre>');
     //echo('<pre style="max-height: none;">$mmrpg_robots_index = '.print_r($mmrpg_robots_index, true).'</pre>');
 
+    /*
+    $error_log = '';
+    foreach ($mmrpg_endless_playlist AS $mission_number => $mission_info){
+        $mission_info = json_decode($mission_info, true);
+        if ($mission_info['types'][0] === 'water'){
+            $error_log .= ('mission #'.$mission_number.PHP_EOL.' vs '.implode(', ', $mission_info['targets'])).PHP_EOL;
+        }
+    }
+    error_log($error_log);
+    */
+
     ?>
 
 </div>
