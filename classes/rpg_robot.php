@@ -1876,9 +1876,24 @@ class rpg_robot extends rpg_object {
         // Define the frequency of the mecha support ability based benched robot count
         if ($this_robot->has_ability('mecha-support')){
             $options[] = 'mecha-support';
-            if ($target_player->counters['robots_total'] == 1){ $weights[] = 50; }
-            elseif ($target_player->counters['robots_total'] < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){ $weights[] = 10; }
+            if ($this_player->counters['robots_total'] == 1){ $weights[] = 50; }
+            elseif ($this_player->counters['robots_total'] < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){ $weights[] = 10; }
             else { $weights[] = 0; }
+        }
+
+        // Define the frequency of the revive abilities based benched robot count
+        $revive_chance = 0;
+        $has_revive_energy = $this_robot->robot_weapons > ($this_robot->robot_base_weapons / 2) ? true : false;
+        if (!empty($this_player->counters['robots_disabled'])){
+            $revive_chance = 40 * $this_player->counters['robots_disabled'];
+        }
+        if ($this_robot->has_ability('spark-life')){
+            $options[] = 'spark-life';
+            $weights[] = $has_revive_energy ? $revive_chance : 0;
+        }
+        if ($this_robot->has_ability('skull-sacrifice')){
+            $options[] = 'skull-sacrifice';
+            $weights[] = $has_revive_energy ? $revive_chance : 0;
         }
 
         // Define the frequency of the buster charge ability if set
@@ -2058,7 +2073,7 @@ class rpg_robot extends rpg_object {
         // Pull a specific ability given waited chance
         //error_log('weighted options (after) = '.print_r(array_combine($options, $weights), true));
         $ability_token = $this_battle->weighted_chance($options, $weights);
-        //error_log('$ability_token = '.print_r($ability_token, true));
+        //error_log('selected $ability_token = '.print_r($ability_token, true));
 
         // Return an ability based on a weighted chance
         return $ability_token;
