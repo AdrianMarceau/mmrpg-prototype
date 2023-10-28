@@ -4653,6 +4653,7 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
                 $this_prototype_data['this_player_token'] = $next_mission_player;
                 $this_prototype_data['this_current_chapter'] = '8';
                 $this_prototype_data['battle_phase'] = 4;
+                $this_prototype_data['battle_round'] = $next_mission_number;
                 $temp_battle_sigma = rpg_mission_endless::generate_endless_mission($this_prototype_data, $next_mission_number);
                 rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
                 //echo('<pre>$temp_battle_sigma = '.print_r($temp_battle_sigma, true).'</pre>'.PHP_EOL.PHP_EOL);
