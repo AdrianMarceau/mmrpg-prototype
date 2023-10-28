@@ -2,6 +2,10 @@
 // Generate the markup for the action option panel
 ob_start();
 
+	// Check for specific battle flags so we know what options to present
+	$is_starfield_mission = !empty($this_battle->flags['starfield_mission']) ? true : false;
+	$is_endless_battle = !empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle']) ? true : false;
+
 	// Define the markup for the option buttons
 
 	$temp_options = array();
@@ -21,7 +25,13 @@ ob_start();
 
 	// Display the option for RETURN TO MAIN MENU
 	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu</span></label></a>';
+	$prefix_text = '';
+	$after_icon = '';
+	if ($is_endless_battle){
+		$prefix_text = 'Save&nbsp;&amp;&nbsp;';
+		$after_icon = '<i class="fa fas fa-save" style="position: absolute; top: -5px; right: -5px;"></i>';
+	}
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="prototype"><label><span class="multi">'.$prefix_text.'Return&nbsp;To<br />Main&nbsp;Menu'.$after_icon.'</span></label></a>';
 
     // Display the option for TOGGLE OVERLAYS
     $block_num++;
@@ -36,16 +46,17 @@ ob_start();
     $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_animationEffects"><label><span class="multi">Animation<br />Settings</span></label></a>';
 
     // If we're in ENDLESS MODE, display the quit button here
-    if (!empty($this_battle->flags['challenge_battle'])
-        && !empty($this_battle->flags['endless_battle'])){
+    if ($is_endless_battle){
 
 		// Display the option for GIVE UP ON ENDLESS
 		$block_num++;
-		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="withdraw"><label><span class="multi">Give&nbsp;Up<br />On&nbsp;Endless</span></label></a>';
+		$prefix_text = 'Quit&nbsp;&amp;&nbsp;';
+		$after_icon = '<i class="fa fas fa-skull" style="position: absolute; top: -5px; right: -5px;"></i>';
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="withdraw"><label><span class="multi">'.$prefix_text.'Give&nbsp;Up<br />On&nbsp;Endless'.$after_icon.'</span></label></a>';
 
     }
 	// Else if we're in a STARFIELD MISSION, display the next button here
-    if (!empty($this_battle->flags['starfield_mission'])){
+    if ($is_starfield_mission){
 
 		// Display the option for FIND ANOTHER STAR FIELD
 		$block_num++;
