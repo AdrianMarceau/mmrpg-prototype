@@ -1066,11 +1066,10 @@ if (!empty($this_battle->flags['challenge_battle'])
                 $old_waves_completed = (int)($old_wave_record['challenge_waves_completed']);
                 $old_robots_used = (int)($old_wave_record['challenge_robots_used']);
                 $old_turns_used = (int)($old_wave_record['challenge_turns_used']);
-                $old_wave_score = $this_mission_number / $old_robots_used / $old_turns_used;
+                $old_wave_score = $old_waves_completed / $old_robots_used / $old_turns_used;
                 $new_wave_score = $this_mission_number / $this_robot_used / $this_turns_used;
-                if ($this_mission_number > $old_waves_completed
-                    || ($this_mission_number == $old_waves_completed
-                        && $new_wave_score > $old_wave_score)){
+                if ($this_mission_number >= $old_waves_completed
+                    && $new_wave_score > $old_wave_score){
                     $this_required_action = 'update';
                 }
             }
