@@ -412,7 +412,7 @@ if (!empty($active_target_robot)
         || $active_target_robot->robot_energy == 0)){
 
     // Remove previous actions for this robot so it doesn't attack twice
-    $this_battle->actions_extract(array('robot_id' => $active_target_robot->robot_id));
+    $this_battle->actions_extract(array('player_id' => $target_player->player_id));
 
     // Prepend a switch action for the target robot
     $this_battle->actions_append(
