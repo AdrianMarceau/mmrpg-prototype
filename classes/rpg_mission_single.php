@@ -6,7 +6,7 @@
 class rpg_mission_single extends rpg_mission {
 
     // Define a function for generating the SINGLES missions
-    public static function generate($this_prototype_data, $this_robot_token, $this_field_token, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true, $starfield_mission = false){
+    public static function generate($this_prototype_data, $this_robot_token, $this_field_token, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true){
 
         // Collect the session token
         $session_token = mmrpg_game_token();
@@ -44,7 +44,7 @@ class rpg_mission_single extends rpg_mission {
         $temp_battle_omega['battle_counts'] = true;
         $temp_battle_omega['battle_size'] = '1x1';
         $temp_battle_omega['battle_name'] = 'Chapter Two Master Battle';
-        $temp_battle_omega['battle_token'] = ($starfield_mission ? 'starfield' : $this_prototype_data['phase_battle_token']).'-'.$this_robot_token;
+        $temp_battle_omega['battle_token'] = $this_prototype_data['phase_battle_token'].'-'.$this_robot_token;
         $temp_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
         $temp_battle_omega['battle_field_base']['field_id'] = 100;
         $temp_battle_omega['battle_field_base']['field_token'] = $temp_option_field['field_token'];
@@ -53,32 +53,18 @@ class rpg_mission_single extends rpg_mission {
         $temp_battle_omega['battle_target_player']['player_token'] = 'player';
         $temp_battle_omega['battle_target_player']['player_robots'] = array();
         $temp_robot_master_tokens = array();
-        if (!$starfield_mission){
-            $temp_battle_omega['battle_target_player']['player_robots'][0]['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $temp_option_robot['robot_id'], 1);
-            $temp_battle_omega['battle_target_player']['player_robots'][0]['robot_token'] = $this_robot_token;
-            $temp_robot_master_tokens[] = $this_robot_token;
-        }
+        $temp_battle_omega['battle_target_player']['player_robots'][0]['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $temp_option_robot['robot_id'], 1);
+        $temp_battle_omega['battle_target_player']['player_robots'][0]['robot_token'] = $this_robot_token;
+        $temp_robot_master_tokens[] = $this_robot_token;
         $temp_option_completed = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_omega['battle_token']);
         if (!empty($temp_option_completed)){ $temp_battle_omega['battle_complete'] = $temp_option_completed; }
-
-        // If this is a starfield mission, adjust for the new conditions
-        if ($starfield_mission){
-            $temp_battle_omega['battle_name'] = 'Bonus Chapter Star Field Battle';
-            $temp_battle_omega['battle_counts'] = false;
-            $temp_battle_omega['flags']['hide_robots_from_mission_select'] = true;
-            $temp_battle_omega['flags']['starfield_mission'] = true;
-            $temp_battle_omega['battle_size'] = '1x1';
-        }
 
         // Determine the amount of targets and their ability counts
         $temp_target_count = 1;
         $temp_ability_count = !empty($this_prototype_data['this_player_number']) ? $this_prototype_data['this_player_number'] : 1;
         $temp_limit_count = 4;
         $temp_battle_count = 0;
-        if ($starfield_mission){
-            $temp_target_count = 4;
-            $temp_ability_count = 4;
-        } elseif (!empty($temp_battle_omega['battle_complete']['battle_count'])){
+        if (!empty($temp_battle_omega['battle_complete']['battle_count'])){
             $temp_battle_count = $temp_battle_omega['battle_complete']['battle_count'];
             if ($temp_battle_count <= $temp_limit_count){
                 $temp_target_count += $temp_battle_count;
@@ -89,104 +75,13 @@ class rpg_mission_single extends rpg_mission {
             }
         }
 
-        // Define the fusion star token in case we need to test for it
-        $temp_field_star_token = $temp_option_field['field_token'];
-        $temp_field_star_present = $starfield_mission && empty($_SESSION['GAME']['values']['battle_stars'][$temp_field_star_token]) ? true : false;
-
-        // If a field star is present on the field, fill the empty spots with like-typed robots
-        if ($starfield_mission
-            || $temp_field_star_present){
-            $temp_battle_omega['battle_target_player']['player_switch'] = 1.5;
-
-            // Collect factors based on player
-            if ($this_prototype_data['this_player_token'] == 'dr-light'){
-                $temp_factors_list = array($this_omega_factors_one, array_merge(
-                    $this_omega_factors_two,
-                    $this_omega_factors_three,
-                    $this_omega_factors_four,
-                    $this_omega_factors_five,
-                    $this_omega_factors_six,
-                    $this_omega_factors_seven,
-                    $this_omega_factors_eight,
-                    $this_omega_factors_eight_two,
-                    $this_omega_factors_nine,
-                    $this_omega_factors_ten,
-                    $this_omega_factors_eleven
-                    ));
-            } elseif ($this_prototype_data['this_player_token'] == 'dr-wily'){
-                $temp_factors_list = array($this_omega_factors_two, array_merge(
-                    $this_omega_factors_three,
-                    $this_omega_factors_four,
-                    $this_omega_factors_five,
-                    $this_omega_factors_six,
-                    $this_omega_factors_seven,
-                    $this_omega_factors_eight,
-                    $this_omega_factors_eight_two,
-                    $this_omega_factors_nine,
-                    $this_omega_factors_ten,
-                    $this_omega_factors_eleven,
-                    $this_omega_factors_one
-                    ));
-            } elseif ($this_prototype_data['this_player_token'] == 'dr-cossack'){
-                $temp_factors_list = array($this_omega_factors_three, array_merge(
-                    $this_omega_factors_four,
-                    $this_omega_factors_five,
-                    $this_omega_factors_six,
-                    $this_omega_factors_seven,
-                    $this_omega_factors_eight,
-                    $this_omega_factors_eight_two,
-                    $this_omega_factors_nine,
-                    $this_omega_factors_ten,
-                    $this_omega_factors_eleven,
-                    $this_omega_factors_one,
-                    $this_omega_factors_two
-                    ));
-            }
-            // Shuffle the bonus robots section of the list
-            shuffle($temp_factors_list[1]);
-            //$debug_backup = 'initial:count = '.count($temp_battle_omega['battle_target_player']['player_robots']).' // ';
-            // Loop through and add the robots
-            $temp_counter = 0;
-            foreach ($temp_factors_list AS $this_list){
-                shuffle($this_list);
-                foreach ($this_list AS $this_factor){
-                    //$debug_backup .= 'factor = '.implode(',', array_values($this_factor)).' // ';
-                    if (empty($this_factor['robot'])){ continue; }
-                    $bonus_robot_info = $this_robot_index[$this_factor['robot']];
-                    if (!empty($bonus_robot_info['robot_flag_exclusive'])){ continue; }
-                    if (!isset($bonus_robot_info['robot_core'])){ $bonus_robot_info['robot_core'] = ''; }
-                    if ($bonus_robot_info['robot_core'] == $temp_option_field['field_type']){
-                        if (!in_array($bonus_robot_info['robot_token'], $temp_robot_master_tokens)){
-                            $bonus_robot_info['flags']['hide_from_mission_select'] = true;
-                            $temp_battle_omega['battle_target_player']['player_robots'][] = $bonus_robot_info;
-                            $temp_robot_master_tokens[] = $bonus_robot_info['robot_token'];
-                        }
-                    }
-                }
-            }
-            //$debug_backup .= 'before:count = '.count($temp_battle_omega['battle_target_player']['player_robots']).' // ';
-            $temp_slice_limit = 2; //1 + $temp_battle_omega['battle_complete']['battle_count'];
-            //if ($temp_slice_limit >= (MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX / 4)){ $temp_slice_limit = (MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX / 4); }
-            //elseif ($temp_slice_limit >= MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){ $temp_slice_limit = 8; }
-            $temp_battle_omega['battle_target_player']['player_robots'] = array_slice($temp_battle_omega['battle_target_player']['player_robots'], 0, $temp_slice_limit);
-            shuffle($temp_battle_omega['battle_target_player']['player_robots']);
-            //$debug_backup .= 'after:count = '.count($temp_battle_omega['battle_target_player']['player_robots']).' // ';
-
-        }
-
-
         // Define the omega variables for level, zenny, turns, and random encounter rate
-        if ($starfield_mission){
-            $omega_robot_level_max = $this_start_level;
-            $omega_robot_level = $this_start_level;
-        } else {
-            $omega_robot_level_max = $this_start_level + 7;
-            if ($omega_robot_level_max >= 100){ $omega_robot_level_max = 100; }
-            $omega_robot_level = $this_start_level;
-            if (!empty($temp_option_completed) && !empty($temp_option_completed['battle_count'])){ $omega_robot_level += $temp_option_completed['battle_count']; }
-            if ($omega_robot_level >= $omega_robot_level_max){ $omega_robot_level = $omega_robot_level_max; }
-            if ($omega_robot_level >= 100){ $omega_robot_level = 100; }
-        }
+        $omega_robot_level_max = $this_start_level + 7;
+        if ($omega_robot_level_max >= 100){ $omega_robot_level_max = 100; }
+        $omega_robot_level = $this_start_level;
+        if (!empty($temp_option_completed) && !empty($temp_option_completed['battle_count'])){ $omega_robot_level += $temp_option_completed['battle_count']; }
+        if ($omega_robot_level >= $omega_robot_level_max){ $omega_robot_level = $omega_robot_level_max; }
+        if ($omega_robot_level >= 100){ $omega_robot_level = 100; }
 
         // Define the battle rewards based on above data
         $temp_battle_omega['battle_rewards']['abilities'] = array();
@@ -199,7 +94,7 @@ class rpg_mission_single extends rpg_mission {
         }
 
         // Fill the empty spots with minor enemy robots
-        if (!$starfield_mission){
+        if (true){
             $temp_battle_omega['battle_target_player']['player_switch'] = 1.5;
             $bonus_robot_count = 0;
             //if ($this_prototype_data['this_player_token'] == 'dr-light'){ $bonus_robot_count += 1; }
@@ -321,8 +216,7 @@ class rpg_mission_single extends rpg_mission {
             // Randomly assign this robot a hold item if applicable
             $temp_item = '';
             if ($robot_info['robot_class'] == 'master'){
-                if ($starfield_mission
-                    || $temp_field_star_present){
+                if (false){
                     $rand = mt_rand(1, 3);
                     if ($rand == 1
                         || $rand == 2){
@@ -356,10 +250,6 @@ class rpg_mission_single extends rpg_mission {
         // Reduce the zenny earned from this mission each time it is completed
         if ($temp_complete_count > 0){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * (2 / (2 + $temp_complete_count))); }
 
-        // If this is a starfield mission, it will give slightly less zenny than usual
-        if ($starfield_mission){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.1); }
-        if ($starfield_mission && !$temp_field_star_present){ $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.1); }
-
         // Reverse the order of the robots in battle
         $temp_battle_omega['battle_target_player']['player_robots'] = array_reverse($temp_battle_omega['battle_target_player']['player_robots']);
         $temp_first_robot = array_shift($temp_battle_omega['battle_target_player']['player_robots']);
@@ -389,8 +279,7 @@ class rpg_mission_single extends rpg_mission {
 
         // Review the unlockable RMs for this field and grey-out any that are already unlocked
         if (!empty($temp_battle_omega['values']['single_battle_masters'])
-            && $temp_battle_omega['battle_complete']
-            && !$starfield_mission){
+            && $temp_battle_omega['battle_complete']){
             foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
                 if (!in_array($robot['robot_token'], $temp_battle_omega['values']['single_battle_masters'])){ continue; }
                 if (mmrpg_prototype_robot_unlocked(false, $robot['robot_token'])){
@@ -409,90 +298,9 @@ class rpg_mission_single extends rpg_mission {
             }
         }
 
-        // Check to see if we should be adding a field star to this battle
-        if ($temp_field_star_present){
-
-            // Collect Rogue Star info if there is one
-            static $this_rogue_star;
-            if (empty($this_rogue_star)
-                && $this_rogue_star !== false){
-                $this_rogue_star = mmrpg_prototype_get_current_rogue_star();
-            }
-
-            // Generate the necessary field star variables and add them to the battle data
-            $temp_field_star = array();
-            $temp_field_star['star_name'] = $temp_option_field['field_name'];
-            $temp_field_star['star_token'] = $temp_field_star_token;
-            $temp_field_star['star_kind'] = 'field';
-            $temp_field_star['star_type'] = !empty($temp_option_field['field_type']) ? $temp_option_field['field_type'] : '';
-            $temp_field_star['star_type2'] = !empty($temp_option_field['field_type2']) ? $temp_option_field['field_type2'] : '';
-            $temp_field_star['star_field'] = $temp_option_field['field_token'];
-            $temp_field_star['star_field2'] = '';
-            $temp_field_star['star_player'] = $this_prototype_data['this_player_token'];
-            $temp_field_star['star_date'] = time();
-            $temp_battle_omega['values']['field_star'] = $temp_field_star;
-            $temp_battle_omega['battle_target_player']['player_starforce'] = array();
-            if (!isset($temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']])){ $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']] = 0; }
-            $temp_battle_omega['battle_target_player']['player_starforce'][$temp_field_star['star_type']] += 1;
-
-            // If the player has collected any starforce, increase stat bonuses for target robots by a percentage of base
-            if ($this_prototype_data['current_starforce_total'] > 0){
-                $stat_boost_percent = $this_prototype_data['current_starforce_total'] / $this_prototype_data['max_starforce_total'];
-                foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
-                    if (!isset($this_robot_index[$robot['robot_token']])){ continue; }
-                    $rindex = $this_robot_index[$robot['robot_token']];
-                    $temp_battle_omega['battle_target_player']['player_robots'][$key]['values']['robot_rewards'] = array(
-                        'robot_attack' => round($rindex['robot_attack'] * $stat_boost_percent),
-                        'robot_defense' => round($rindex['robot_defense'] * $stat_boost_percent),
-                        'robot_speed' => round($rindex['robot_speed'] * $stat_boost_percent)
-                        );
-                }
-            }
-
-        }
-
-        // If this is a starfield mission, SORT the robots by number of encounters
-        if ($starfield_mission){
-            $user_robot_database = !empty($_SESSION['GAME']['values']['robot_database']) ? $_SESSION['GAME']['values']['robot_database'] : array();
-            $temp_encounter_index = array();
-            foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot){
-                $token = $robot['robot_token'];
-                $count = 0;
-                if (!empty($user_robot_database[$token])){ $count += 1; }
-                if (!empty($user_robot_database[$token]['robot_summoned'])){ $count += $user_robot_database[$token]['robot_summoned']; }
-                if (!empty($user_robot_database[$token]['robot_encountered'])){ $count += $user_robot_database[$token]['robot_encountered']; }
-                if (!empty($user_robot_database[$token]['robot_unlocked'])){ $count += $count; }
-                $temp_encounter_index[$token] = $count;
-            }
-            usort($temp_battle_omega['battle_target_player']['player_robots'], function($r1, $r2) use($this_robot_index, $temp_encounter_index){
-                $r1_token = $r1['robot_token'];
-                $r2_token = $r2['robot_token'];
-                $r1_count = isset($temp_encounter_index[$r1_token]) ? $temp_encounter_index[$r1_token] : 0;
-                $r2_count = isset($temp_encounter_index[$r2_token]) ? $temp_encounter_index[$r2_token] : 0;
-                $r1_unlockable = !empty($this_robot_index[$r1_token]['robot_flag_unlockable']) && empty($temp_encounter_index[$r1_token]['robot_unlocked']) ? 1 : 0;
-                $r2_unlockable = !empty($this_robot_index[$r2_token]['robot_flag_unlockable']) && empty($temp_encounter_index[$r2_token]['robot_unlocked']) ? 1 : 0;
-                if ($r1_unlockable && !$r2_unlockable){ return -1; }
-                elseif (!$r1_unlockable && $r2_unlockable){ return 1; }
-                elseif ($r1_count < $r2_count){ return -1; }
-                elseif ($r1_count > $r2_count){ return 1; }
-                else { return 0; }
-            });
-        }
-
         // Update the battle description based on what we've calculated
         $temp_robot_pronoun_possessive = rpg_robot::get_robot_pronoun($temp_option_robot['robot_class'], $temp_option_robot['robot_gender'], 'possessive');
-        if ($starfield_mission){
-            if ($temp_field_star_present){
-                $temp_battle_omega['battle_description'] = 'Defeat the robot masters guarding this Field Star to liberate it! ';
-                $temp_battle_omega['battle_description2'] = 'Collecting stars increases our Starforce and makes us stronger in battle! ';
-            } else {
-                $temp_battle_omega['battle_description'] = 'Defeat the regenerated robot masters and support mechas! ';
-                $temp_battle_omega['battle_description2'] = 'The Field Star for this area has already been liberated, but we can go back as many times as we need to. ';
-            }
-        } elseif (!empty($temp_battle_omega['values']['field_star'])){
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].' and collect '.$temp_robot_pronoun_possessive.' Field Star! ';
-            $temp_battle_omega['battle_description2'] = 'The star\'s energy appears to have attracted another robot master to the field...';
-        } else if (!empty($this_unlock_abilities_count)){
+        if (!empty($this_unlock_abilities_count)){
             $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].' and download '.$temp_robot_pronoun_possessive.' special weapon!';
             $temp_battle_omega['battle_description2'] = 'Once we\'ve acquired it, we may be able to equip the ability to other robots...';
         } elseif (!empty($this_unlock_robots_count)){
@@ -500,15 +308,6 @@ class rpg_mission_single extends rpg_mission {
             $temp_battle_omega['battle_description2'] = 'If we use only Neutral type abilities on the target we may be able to save it...';
         } else {
             $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].'!';
-        }
-
-        // If this is a starfield mission, we might be able to CUSTOMIZE THE MUSIC
-        if ($starfield_mission){
-            $trobots = array_values($temp_battle_omega['battle_target_player']['player_robots']);
-            if (!empty($trobots)){
-                $custom_music = rpg_robot::get_custom_music_path($trobots[0]['robot_token']);
-                if (!empty($custom_music)){ $temp_battle_omega['battle_field_base']['field_music'] = $custom_music; }
-            }
         }
 
         // Return the generated battle data
