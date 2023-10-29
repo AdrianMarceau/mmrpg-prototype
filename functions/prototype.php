@@ -3094,38 +3094,246 @@ function mmrpg_prototype_star_image($type){
     return $temp_array;
 }
 
+// Define a function for getting the leaderboard metric index
+function mmrpg_prototype_leaderboard_metric_index(){
+
+    // Define the leaderboard metric index in order of sorting priority
+    $leaderboard_metric_index = array();
+    $leaderboard_metric_index['battle_points'] = array(
+        'name' => 'Battle Points',
+        'shortname' => 'Points',
+        'text' => 'Players earn battle points throughout the course of the game by completing certain events, collecting items, unlocking new robots or abilities, and by doing or collecting lots of other things as well.',
+        'url' => 'points',
+        'key' => 'board_points',
+        'col' => 'board.board_points',
+        'icon' => 'fa-trophy',
+        'unit' => 'BP'
+        );
+    $leaderboard_metric_index['battle_zenny'] = array(
+        'name' => 'Zenny',
+        'shortname' => 'Zenny',
+        'text' => 'Players earn zenny throughout the course of the game by completing missions, selling items, or other miscellaneous tasks.',
+        'url' => 'zenny',
+        'key' => 'board_zenny',
+        'col' => 'board.board_zenny',
+        'icon' => 'fa-dollar-sign',
+        'unit' => '&#438;',
+        'unit_plain' => 'z'
+        );
+    $leaderboard_metric_index['robots_unlocked'] = array(
+        'name' => 'Robots Unlocked',
+        'shortname' => 'Robots',
+        'text' => 'Players unlock new robots throughout the course of the game by completing missions, buying blueprints in the shop, or other secret methods.',
+        'url' => 'robots',
+        'key' => 'board_robots_count',
+        'col' => 'board.board_robots_count',
+        'icon' => 'fa-robot',
+        'label' => 'Robot/Robots'
+        );
+    $leaderboard_metric_index['abilities_unlocked'] = array(
+        'name' => 'Abilities Unlocked',
+        'shortname' => 'Abilities',
+        'text' => 'Players unlock new abilities throughout the course of the game by completing missions, unlocking new robots, buying them in the shop, and even other more elusive methods.',
+        'url' => 'abilities',
+        'key' => 'board_abilities',
+        'col' => 'board.board_abilities',
+        'icon' => 'fa-fire-alt',
+        'label' => 'Ability/Abilities'
+        );
+    $leaderboard_metric_index['items_cataloged'] = array(
+        'name' => 'Items Cataloged',
+        'shortname' => 'Items',
+        'text' => 'Players discover new items throughout the course of the game by completing missions, completing quests, buying them in the shop, stealing them from targets, and even other methods.',
+        'url' => 'items',
+        'key' => 'board_items',
+        'col' => 'board.board_items',
+        'icon' => 'fa-briefcase',
+        'label' => 'Item/Items'
+        );
+    $leaderboard_metric_index['stars_collected'] = array(
+        'name' => 'Stars Collected',
+        'shortname' => 'Stars',
+        'text' => 'Players collect elemental field stars and fusion stars in special post-game "Star Field" missions, battles against powerful hordes of robots enemies controlled by the alien energy known as "star force".',
+        'url' => 'stars',
+        'key' => 'board_stars',
+        'col' => 'board.board_stars',
+        'icon' => 'fa-star',
+        'label' => 'Star/Stars'
+        );
+    $leaderboard_metric_index['player_tokens'] = array(
+        'name' => 'Player Tokens',
+        'shortname' => 'Players',
+        'text' => 'Players can acquire player tokens by claiming victory in special post-game "Player Battle" missions, battles against the ghost-data of other human players and their customized robots.',
+        'url' => 'tokens',
+        'key' => 'board_tokens_count',
+        'col' => 'battles.player_tokens_collected',
+        'icon' => 'fa-stop-circle',
+        'label' => 'Token/Tokens'
+        );
+    $leaderboard_metric_index['challenges_medals'] = array(
+        'name' => 'Challenge Medals',
+        'shortname' => 'Challenges',
+        'text' => 'Players can earn challenge medals by claiming victory in special post-game "Challenge Missions", battles designed by the developers to be as difficult as possible.',
+        'url' => 'medals',
+        'key' => 'board_medals_count',
+        'col' => 'challenges.challenge_medals_collected',
+        'icon' => 'fa-skull',
+        'label' => 'Medal/Medals'
+        );
+    $leaderboard_metric_index['endless_waves'] = array(
+        'name' => 'Endless Waves',
+        'shortname' => 'Waves',
+        'text' => 'Players can fight their way through an infinite number of waves in a special post-game "Endless Attack Mode", battles with targets that get more powerful with every round.',
+        'url' => 'waves',
+        'key' => 'board_waves_count',
+        'col' => 'endless.challenge_waves_completed',
+        'icon' => 'fa-infinity',
+        'label' => 'Wave/Waves'
+        );
+
+    // Return the leaderboard metric index
+    return $leaderboard_metric_index;
+
+}
+
 // Define a function for pulling the leaderboard players index
-function mmrpg_prototype_leaderboard_index($board_metric = ''){
-    global $db;
+function mmrpg_prototype_leaderboard_index_query($board_metric = '', $display_limit = false){
 
     // Collect the current leaderboard metric in case we need it
     if (empty($board_metric)){ $board_metric = MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC; }
-    $rank_field = 'board_points';
-    if ($board_metric === 'battle_points'){ $rank_field = 'board_points'; }
-    elseif ($board_metric === 'battle_zenny'){ $rank_field = 'board_zenny'; }
+    $leaderboard_metric_index = mmrpg_prototype_leaderboard_metric_index();
+    $this_leaderboard_metric_info = $leaderboard_metric_index[$board_metric];
+
+    // Define the array for pulling all the leaderboard data
+    $this_limit_query = '';
+    if (!empty($display_limit)){ $this_limit_query = "LIMIT {$display_limit} "; }
+    $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
+    $this_sort_field = $this_leaderboard_metric_info['col'];
+    $this_sort_field2 = 'board.board_points';
+    $temp_leaderboard_query = "SELECT
+        users.user_id,
+        users.user_name,
+        users.user_name_clean,
+        users.user_name_public,
+        users.user_colour_token,
+        users.user_colour_token2,
+        users.user_image_path,
+        users.user_background_path,
+        users.user_date_accessed,
+        -- users.user_flag_postpublic,
+        (users.user_date_accessed > 0 AND ((UNIX_TIMESTAMP() - users.user_date_accessed) <= {$this_online_timeout})) AS user_is_online,
+        board.board_id,
+        board.board_points,
+        -- board.board_points_dr_light,
+        -- board.board_points_dr_wily,
+        -- board.board_points_dr_cossack,
+        board.board_items,
+        board.board_robots,
+        -- board.board_robots_dr_light,
+        -- board.board_robots_dr_wily,
+        -- board.board_robots_dr_cossack,
+        board.board_robots_count,
+        board.board_battles,
+        -- board.board_battles_dr_light,
+        -- board.board_battles_dr_wily,
+        -- board.board_battles_dr_cossack,
+        board.board_stars,
+        -- board.board_stars_dr_light,
+        -- board.board_stars_dr_wily,
+        -- board.board_stars_dr_cossack,
+        IF(battles.player_tokens_collected IS NOT NULL, battles.player_tokens_collected, 0) AS board_tokens_count,
+        IF(challenges.challenge_medals_collected IS NOT NULL, challenges.challenge_medals_collected, 0) AS board_medals_count,
+        IF(endless.challenge_waves_completed IS NOT NULL, endless.challenge_waves_completed, 0) AS board_waves_count,
+        board.board_abilities,
+        -- board.board_abilities_dr_light,
+        -- board.board_abilities_dr_wily,
+        -- board.board_abilities_dr_cossack,
+        board.board_missions,
+        -- board.board_missions_dr_light,
+        -- board.board_missions_dr_wily,
+        -- board.board_missions_dr_cossack,
+        board.board_awards,
+        board.board_zenny,
+        board.board_date_created,
+        board.board_date_modified
+        FROM mmrpg_users AS users
+        LEFT JOIN mmrpg_leaderboard AS board ON users.user_id = board.user_id
+        LEFT JOIN mmrpg_saves AS saves ON saves.user_id = board.user_id
+        LEFT JOIN (
+            SELECT
+                battles.this_user_id AS user_id,
+                COUNT(DISTINCT(battles.target_user_id)) AS player_tokens_collected
+            FROM mmrpg_battles AS battles
+            LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
+            WHERE
+                battles.this_player_result = 'victory'
+                AND users.user_flag_approved = 1
+            GROUP BY battles.this_user_id
+            ) AS battles ON battles.user_id = board.user_id
+        LEFT JOIN (
+            SELECT
+                scores.user_id AS user_id,
+                COUNT(DISTINCT(scores.challenge_id)) AS challenge_medals_collected
+            FROM mmrpg_challenges_leaderboard AS scores
+            LEFT JOIN mmrpg_users AS users ON users.user_id = scores.user_id
+            LEFT JOIN mmrpg_challenges AS challenges ON challenges.challenge_id = scores.challenge_id
+            WHERE
+                challenges.challenge_kind = 'event'
+                AND scores.challenge_result = 'victory'
+                AND users.user_flag_approved = 1
+            GROUP BY scores.user_id
+            ) AS challenges ON challenges.user_id = board.user_id
+        LEFT JOIN mmrpg_challenges_waveboard
+            AS endless ON endless.user_id = board.user_id
+        WHERE
+        {$this_sort_field2} > 0
+        ORDER BY
+        {$this_sort_field} DESC,
+        {$this_sort_field2} DESC,
+        saves.save_date_modified DESC
+        {$this_limit_query}
+        ;";
+
+    //error_log('$board_metric = '.$board_metric);
+    //error_log('$this_sort_field = '.$this_sort_field);
+    //error_log('$this_sort_field2 = '.$this_sort_field2);
+    //error_log('$temp_leaderboard_query = '.$temp_leaderboard_query);
+
+    // Return the generated query string
+    return $temp_leaderboard_query;
+
+}
+
+// Define a function for pulling the leaderboard players index
+function mmrpg_prototype_leaderboard_index($board_metric = ''){
+
+    // Collect the current leaderboard metric in case we need it
+    if (empty($board_metric)){ $board_metric = MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC; }
+    $leaderboard_metric_index = mmrpg_prototype_leaderboard_metric_index();
+    $this_leaderboard_metric_info = $leaderboard_metric_index[$board_metric];
 
     // Check to see if the leaderboard index has already been pulled or not
-    if (!empty($db->INDEX['LEADERBOARD']['index'])){
-        $this_leaderboard_index = $db->INDEX['LEADERBOARD']['index']; //json_decode($db->INDEX['LEADERBOARD']['index'], true);
+    global $db;
+    if (empty($db->INDEX['LEADERBOARD']['index'])
+        || !is_array($db->INDEX['LEADERBOARD']['index'])){
+        $db->INDEX['LEADERBOARD']['index'] = array();
+    }
+    if (!empty($db->INDEX['LEADERBOARD']['index'][$board_metric])){
+        //error_log('index for '.$board_metric.' already exists');
+        //error_log('collecting existing index for '.$board_metric);
+        $this_leaderboard_index = $db->INDEX['LEADERBOARD']['index'][$board_metric]; //json_decode($db->INDEX['LEADERBOARD']['index'], true);
     } else {
-        // Define the array for pulling all the leaderboard data
-        $temp_leaderboard_query = 'SELECT
-            mmrpg_users.user_id,
-            mmrpg_users.user_name,
-            mmrpg_users.user_name_clean,
-            mmrpg_users.user_name_public,
-            mmrpg_users.user_date_accessed,
-            mmrpg_leaderboard.board_points,
-            mmrpg_leaderboard.board_zenny
-            FROM mmrpg_users
-            LEFT JOIN mmrpg_leaderboard ON mmrpg_users.user_id = mmrpg_leaderboard.user_id
-            WHERE mmrpg_leaderboard.'.$rank_field.' > 0 ORDER BY mmrpg_leaderboard.'.$rank_field.' DESC
-            ';
+        //error_log('index for '.$board_metric.' does not exist in '.print_r(array_keys($db->INDEX['LEADERBOARD']['index']), true));
+        // Collect the array for pulling all the leaderboard data
+        $temp_leaderboard_query = mmrpg_prototype_leaderboard_index_query($board_metric);
         // Query the database and collect the array list of all online players
         $this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
         // Update the database index cache
-        $db->INDEX['LEADERBOARD']['index'] = $this_leaderboard_index; //json_encode($this_leaderboard_index);
+        //error_log('adding new index for '.$board_metric);
+        $db->INDEX['LEADERBOARD']['index'][$board_metric] = $this_leaderboard_index; //json_encode($this_leaderboard_index);
     }
+
+    //error_log('we now have the following indexes cached: '.print_r(array_keys($db->INDEX['LEADERBOARD']['index']), true));
 
     // Return the collected leaderboard index
     return $this_leaderboard_index;
@@ -3133,38 +3341,45 @@ function mmrpg_prototype_leaderboard_index($board_metric = ''){
 
 // Define a function for collecting the leaderboard ranking index
 function mmrpg_prototype_leaderboard_rank_index($board_metric = ''){
-    static $this_rank_index;
-    if (empty($this_rank_index)){
+    //error_log('mmrpg_prototype_leaderboard_rank_index($board_metric: '.print_r($board_metric, true).')');
 
-        // Collect the current leaderboard metric in case we need it
-        if (empty($board_metric)){ $board_metric = MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC; }
-        $rank_field = 'board_points';
-        if ($board_metric === 'battle_points'){ $rank_field = 'board_points'; }
-        elseif ($board_metric === 'battle_zenny'){ $rank_field = 'board_zenny'; }
+    // Collect the current leaderboard metric in case we need it
+    if (empty($board_metric)){ $board_metric = MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC; }
+    $leaderboard_metric_index = mmrpg_prototype_leaderboard_metric_index();
+    $this_leaderboard_metric_info = $leaderboard_metric_index[$board_metric];
+
+    static $this_rank_index;
+    if (empty($this_rank_index)
+        || !is_array($this_rank_index)){
+        $this_rank_index = array();
+    }
+    if (empty($this_rank_index[$board_metric])){
 
         // Collect the leaderboard index for ranking
-        $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
+        $this_leaderboard_index = mmrpg_prototype_leaderboard_index($board_metric);
 
         // Generate the points index and then break it down to unique for ranks
+        $key_field = $this_leaderboard_metric_info['key'];
         $this_points_index = array();
         if (!empty($this_leaderboard_index)){
-            foreach ($this_leaderboard_index AS $info){
-                $this_points_index[] = $info[$rank_field];
+            foreach ($this_leaderboard_index AS $key => $board_info){
+                $this_points_index[] = $board_info[$key_field];
             }
         }
         $this_points_index = array_unique($this_points_index);
 
         // Loop through all the players and generate a rank index
-        $this_rank_index = array();
+        $this_rank_index[$board_metric] = array();
         foreach ($this_leaderboard_index AS $key => $board_info){
-            $temp_rank = array_search($board_info[$rank_field], $this_points_index) + 1;
-            $this_rank_index[$board_info['user_id']] = $temp_rank;
+            $temp_rank = array_search($board_info[$key_field], $this_points_index) + 1;
+            $this_rank_index[$board_metric][$board_info['user_id']] = $temp_rank;
         }
 
-
     }
-    return $this_rank_index;
+    //error_log('$this_rank_index = '.print_r(array_keys($this_rank_index), true));
+    //error_log('$this_rank_index = '.print_r($this_rank_index, true));
 
+    return $this_rank_index[$board_metric];
 }
 
 // Define a function for collecting the requested player's board ranking
