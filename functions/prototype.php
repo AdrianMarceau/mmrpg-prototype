@@ -3220,7 +3220,7 @@ function mmrpg_prototype_leaderboard_index_query($board_metric = '', $display_li
         users.user_image_path,
         users.user_background_path,
         users.user_date_accessed,
-        -- users.user_flag_postpublic,
+        users.user_flag_postpublic,
         (users.user_date_accessed > 0 AND ((UNIX_TIMESTAMP() - users.user_date_accessed) <= {$this_online_timeout})) AS user_is_online,
         board.board_id,
         board.board_points,

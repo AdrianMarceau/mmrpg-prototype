@@ -269,6 +269,9 @@ function mmrpg_leaderboard_parse_index($key, $board, $place_counter){
 }
 
 // Query the database and collect the array list of all non-bogus players
+$this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
+$this_sort_field = $this_leaderboard_metric_info['col'];
+$this_sort_field2 = 'board.board_points';
 //if ($this_current_page == 'home'){ $temp_leaderboard_query = mmrpg_prototype_leaderboard_index_query($this_leaderboard_metric, $this_display_limit_default); }
 //else { $temp_leaderboard_query = mmrpg_prototype_leaderboard_index_query($this_leaderboard_metric); }
 $this_leaderboard_index = mmrpg_prototype_leaderboard_index($this_leaderboard_metric); //$db->get_array_list($temp_leaderboard_query);
