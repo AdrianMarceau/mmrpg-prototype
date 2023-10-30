@@ -5,6 +5,7 @@ ob_start();
 	// Check for specific battle flags so we know what options to present
 	$is_starfield_mission = !empty($this_battle->flags['starfield_mission']) ? true : false;
 	$is_endless_battle = !empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle']) ? true : false;
+	$has_endless_progress = $is_endless_battle && !empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_token]) ? true : false;
 
 	// Define the markup for the option buttons
 
@@ -23,15 +24,26 @@ ob_start();
 	$block_num++;
 	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_shield" type="button" data-action="restart"><label><span class="multi">Restart<br />Battle</span></label></a>';
 
-	// Display the option for RETURN TO MAIN MENU
-	$block_num++;
-	$prefix_text = '';
-	$after_icon = '';
-	if ($is_endless_battle){
-		$prefix_text = 'Save&nbsp;&amp;&nbsp;';
+
+    // If we're in ENDLESS MODE, display the SAVE button here
+    if ($is_endless_battle
+		&& $has_endless_progress){
+
+		// Display the option for SAVE & KEEP PLAYER HERE
+		$block_num++;
 		$after_icon = '<i class="fa fas fa-save" style="position: absolute; top: -5px; right: -5px;"></i>';
-	}
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="prototype"><label><span class="multi">'.$prefix_text.'Return&nbsp;To<br />Main&nbsp;Menu'.$after_icon.'</span></label></a>';
+		$player_name = $this_player->player_token !== 'player' ? str_replace(' ', '&nbsp;', $this_player->player_name) : 'Player';
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_nature" type="button" data-action="prototype"><label><span class="multi">Save&nbsp;&amp;&nbsp;Keep<br />'.$player_name.'&nbsp;Here'.$after_icon.'</span></label></a>';
+
+    }
+    // Otherwise we can display the normal RETURN button instead
+    else {
+
+		// Display the option for RETURN TO MAIN MENU
+		$block_num++;
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu</span></label></a>';
+
+    }
 
     // Display the option for TOGGLE OVERLAYS
     $block_num++;
@@ -45,18 +57,19 @@ ob_start();
     $block_num++;
     $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_animationEffects"><label><span class="multi">Animation<br />Settings</span></label></a>';
 
-    // If we're in ENDLESS MODE, display the quit button here
-    if ($is_endless_battle){
+    // If we're in ENDLESS MODE, display the QUIT button here
+    if ($is_endless_battle
+		&& $has_endless_progress){
 
-		// Display the option for GIVE UP ON ENDLESS
+		// Display the option for QUIT & TAKE PLAYER HOME
 		$block_num++;
-		$prefix_text = 'Quit&nbsp;&amp;&nbsp;';
-		$after_icon = '<i class="fa fas fa-skull" style="position: absolute; top: -5px; right: -5px;"></i>';
-		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="withdraw"><label><span class="multi">'.$prefix_text.'Give&nbsp;Up<br />On&nbsp;Endless'.$after_icon.'</span></label></a>';
+		$after_icon = '<i class="fa fas fa-running" style="position: absolute; top: -5px; right: -5px;"></i>';
+		$player_name = $this_player->player_token !== 'player' ? str_replace(' ', '&nbsp;', $this_player->player_name) : 'Player';
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_flame" type="button" data-action="withdraw"><label><span class="multi">Quit&nbsp;&amp;&nbsp;Take<br />'.$player_name.'&nbsp;Home'.$after_icon.'</span></label></a>';
 
     }
 	// Else if we're in a STARFIELD MISSION, display the next button here
-    if ($is_starfield_mission){
+    elseif ($is_starfield_mission){
 
 		// Display the option for FIND ANOTHER STAR FIELD
 		$block_num++;
