@@ -4,6 +4,129 @@
  * PROTOTYPE FUNCTIONS
  */
 
+// Define a global function we can use for applying and save-date patched on first game load
+function mmrpg_prototype_apply_patches(){
+    if (!empty($_SESSION['PATCHES'])){ return true; }
+    //error_log('mmrpg_prototype_apply_patches()');
+    $session_token = mmrpg_game_token();
+    $SESSION_GAME = $_SESSION[$session_token];
+    if (empty($SESSION_GAME)){ return false; }
+    //error_log('$SESSION_GAME object exists');
+
+    // Reformat battle_complete on pull to ensure in 2k23 format
+    if (!empty($SESSION_GAME['values']['battle_complete'])){
+        $reformat_required = false;
+        $first_player = reset($SESSION_GAME['values']['battle_complete']);
+        $first_battle = reset($first_player);
+        if (isset($first_battle['battle_count'])){ $reformat_required = true; }
+        //error_log('check if reformat for battle_complete required ...');
+        //error_log('$first_battle = '.print_r($first_battle, true));
+        if ($reformat_required){
+            //error_log('reformatting battle_complete data ...');
+            $new_battles_complete = $SESSION_GAME['values']['battle_complete'];
+            foreach ($new_battles_complete AS $player => $battles){
+                $battles = array_map(function($info){
+                    if (is_array($info) && isset($info['battle_count'])){ return $info['battle_count']; }
+                    elseif (is_numeric($info)){ return $info; }
+                    else { return 0; }
+                    }, $battles);
+                $new_battles_complete[$player] = $battles;
+                //error_log('counted '.count($battles).' battle_complete for '.$player);
+            }
+            //error_log('new battle_complete data = '.print_r($new_battles_complete, true));
+            $SESSION_GAME['values']['battle_complete'] = $new_battles_complete;
+        }
+    }
+
+    // Reformat battle_failure on pull to ensure in 2k23 format
+    if (!empty($SESSION_GAME['values']['battle_failure'])){
+        $reformat_required = false;
+        $first_player = reset($SESSION_GAME['values']['battle_failure']);
+        $first_battle = reset($first_player);
+        if (isset($first_battle['battle_count'])){ $reformat_required = true; }
+        //error_log('check if reformat for battle_failure required ...');
+        //error_log('$first_battle = '.print_r($first_battle, true));
+        if ($reformat_required){
+            //error_log('reformatting battle_failure data ...');
+            $new_battles_failure = $SESSION_GAME['values']['battle_failure'];
+            foreach ($new_battles_failure AS $player => $battles){
+                $battles = array_map(function($info){
+                    if (is_array($info) && isset($info['battle_count'])){ return $info['battle_count']; }
+                    elseif (is_numeric($info)){ return $info; }
+                    else { return 0; }
+                    }, $battles);
+                $new_battles_failure[$player] = $battles;
+                //error_log('counted '.count($battles).' battle_failure for '.$player);
+            }
+            //error_log('new battle_failure data = '.print_r($new_battles_failure, true));
+            $SESSION_GAME['values']['battle_failure'] = $new_battles_failure;
+        }
+    }
+
+    // Remove any legacy item arrays that aren't used anymore as of 2k23
+    unset($SESSION_GAME['values']['player_this-item-omega_prototype']);
+    unset($SESSION_GAME['values']['dr-light_this-item-omega_prototype']);
+    unset($SESSION_GAME['values']['dr-wily_this-item-omega_prototype']);
+    unset($SESSION_GAME['values']['dr-cossack_this-item-omega_prototype']);
+
+    // Merge any legacy "alt" purchases from Auto's shop into their new home in Kalinka's
+    if (!empty($SESSION_GAME['values']['battle_shops'])
+        && !empty($SESSION_GAME['values']['battle_shops']['auto'])){
+        $reformat_required = false;
+        $battle_shops = $SESSION_GAME['values']['battle_shops'];
+        $auto_shop = !empty($battle_shops['auto']) ? $battle_shops['auto'] : array();
+        $kalinka_shop = !empty($battle_shops['kalinka']) ? $battle_shops['kalinka'] : array();
+        if (!empty($auto_shop['alts_sold'])){ $reformat_required = true; }
+        //error_log('check if auto\'s shop has erroneous alt sales ...');
+        //error_log('$auto_shop = '.print_r(array_keys($auto_shop), true));
+        if ($reformat_required){
+            //error_log('extracting alt sales from auto shop data ...');
+            $alts_sold = $auto_shop['alts_sold'];
+            unset($auto_shop['alts_sold']);
+            unset($battle_shops['auto']['alts_sold']);
+            if (!empty($kalinka_shop['alts_sold'])){
+                //error_log('merging alt sales from auto shop into kalinka shop ...');
+                foreach ($alts_sold AS $alt_token => $alt_quantity){
+                    $kalinka_shop['alts_sold'][$alt_token] = $alt_quantity;
+                }
+            }
+            $SESSION_GAME['values']['battle_shops'] = $battle_shops;
+        }
+    }
+
+    // Now do the reverse and merge any "item" purchases from Kalinka's shop into their new home in Auto's
+    if (!empty($SESSION_GAME['values']['battle_shops'])
+        && !empty($SESSION_GAME['values']['battle_shops']['kalinka'])){
+        $reformat_required = false;
+        $battle_shops = $SESSION_GAME['values']['battle_shops'];
+        $kalinka_shop = !empty($battle_shops['kalinka']) ? $battle_shops['kalinka'] : array();
+        $auto_shop = !empty($battle_shops['auto']) ? $battle_shops['auto'] : array();
+        if (!empty($kalinka_shop['items_sold'])){ $reformat_required = true; }
+        //error_log('check if kalinka\'s shop has erroneous item sales ...');
+        //error_log('$kalinka_shop = '.print_r(array_keys($kalinka_shop), true));
+        if ($reformat_required){
+            //error_log('extracting item sales from kalinka shop data ...');
+            $items_sold = $kalinka_shop['items_sold'];
+            unset($kalinka_shop['items_sold']);
+            unset($battle_shops['kalinka']['items_sold']);
+            if (!empty($auto_shop['items_sold'])){
+                //error_log('merging item sales from kalinka shop into auto shop ...');
+                foreach ($items_sold AS $item_token => $item_quantity){
+                    if (!isset($auto_shop['items_sold'][$item_token])){ $auto_shop['items_sold'][$item_token] = 0; }
+                    $auto_shop['items_sold'][$item_token] += $item_quantity;
+                }
+            }
+            $SESSION_GAME['values']['battle_shops'] = $battle_shops;
+        }
+    }
+
+    // Update the session with any changes and then set the flag so this only happens once per session
+    $_SESSION[$session_token] = $SESSION_GAME;
+    $_SESSION['PATCHES'] = true;
+    return true;
+
+}
+
 // Define a function for calculating required experience points to the next level
 function mmrpg_prototype_calculate_shop_experience_required($this_level, $max_level = 100, $min_experience = 1000){
 
