@@ -73,73 +73,11 @@ class rpg_prototype {
         else { return 0; }
     }
 
-    // Define a function for checking if a prototype battle has been completed
-    public static function battle_complete($player_token, $battle_token){
-        // Check if this battle has been completed and return true is it was
-        $session_token = rpg_game::session_token();
-        if (!empty($player_token)){
-            return isset($_SESSION[$session_token]['values']['battle_complete'][$player_token][$battle_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token][$battle_token] : false;
-        } elseif (!empty($_SESSION[$session_token]['values']['battle_complete'])){
-            foreach ($_SESSION[$session_token]['values']['battle_complete'] AS $player_token => $player_batles){
-                if (isset($player_batles[$battle_token])){ return $player_batles[$battle_token]; }
-                else { continue; }
-            }
-            return false;
-        } else {
-            return false;
-        }
-    }
-
     // Define a function for checking if a prototype battle has been failured
     public static function battle_failure($player_token, $battle_token){
         // Check if this battle has been failured and return true is it was
         $session_token = rpg_game::session_token();
         return isset($_SESSION[$session_token]['values']['battle_failure'][$player_token][$battle_token]) ? $_SESSION[$session_token]['values']['battle_failure'][$player_token][$battle_token] : false;
-    }
-
-    // Define a function for counting the number of completed prototype battles
-    public static function battles_complete($player_token = '', $unique = true){
-        // Define the game session helper var
-        $session_token = rpg_game::session_token();
-        // Collect the battle complete count from the session if set
-        if (!empty($player_token)){
-            $temp_battles_complete = isset($_SESSION[$session_token]['values']['battle_complete'][$player_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token] : array();
-        } else {
-            $temp_battles_complete = array();
-            if (isset($_SESSION[$session_token]['values']['battle_complete'])){
-                foreach ($_SESSION[$session_token]['values']['battle_complete'] AS $player_token => $battle_array){
-                    $temp_battles_complete = array_merge($temp_battles_complete, $battle_array);
-                }
-            }
-            $player_token = '';
-        }
-        //if (empty($player_token)){ die('$player_token = '.$player_token.', $unique = '.($unique ? 1 : 0).',  $count = '.count($temp_battles_complete).'<br />'.print_r($temp_battles_complete, true)); }
-        // Check if only unique battles were requested or ALL battles
-        if ($unique == true){
-         $temp_count = count($temp_battles_complete);
-         return $temp_count;
-        } else {
-         $temp_count = 0;
-         foreach ($temp_battles_complete AS $info){ $temp_count += !empty($info['battle_count']) ? $info['battle_count'] : 1; }
-         return $temp_count;
-        }
-    }
-
-    // Define a function for counting the number of failured prototype battles
-    public static function battles_failure($player_token, $unique = true){
-        // Define the game session helper var
-        $session_token = rpg_game::session_token();
-        // Collect the battle failure count from the session if set
-        $temp_battle_failures = isset($_SESSION[$session_token]['values']['battle_failure'][$player_token]) ? $_SESSION[$session_token]['values']['battle_failure'][$player_token] : array();
-        // Check if only unique battles were requested or ALL battles
-        if (!empty($unique)){
-         $temp_count = count($temp_battle_failures);
-         return $temp_count;
-        } else {
-         $temp_count = 0;
-         foreach ($temp_battle_failures AS $info){ $temp_count += !empty($info['battle_count']) ? $info['battle_count'] : 1; }
-         return $temp_count;
-        }
     }
 
     // Define the field star image function for use in other parts of the game
