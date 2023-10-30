@@ -270,8 +270,6 @@ class rpg_mission_starfield extends rpg_mission {
         $temp_complete_count = 0;
         if (!empty($temp_battle_omega['battle_complete'])){
             $temp_complete_level = $temp_omega_robot_level;
-            //if (!empty($temp_battle_omega['battle_complete']['battle_min_level'])){ $temp_complete_level = $temp_battle_omega['battle_complete']['battle_min_level']; }
-            //else { $temp_complete_level = $temp_omega_robot_level; }
             if (!empty($temp_battle_omega['battle_complete']['battle_count'])){ $temp_complete_count = $temp_battle_omega['battle_complete']['battle_count']; }
             else { $temp_complete_count = 1; }
             //$temp_omega_robot_level = $temp_complete_level + $temp_complete_count - 1;
@@ -798,8 +796,6 @@ class rpg_mission_starfield extends rpg_mission {
         $temp_complete_count = 0;
         if (!empty($temp_battle_omega['battle_complete'])){
             $temp_complete_level = $temp_omega_robot_level;
-            //if (!empty($temp_battle_omega['battle_complete']['battle_min_level'])){ $temp_complete_level = $temp_battle_omega['battle_complete']['battle_min_level']; }
-            //else { $temp_complete_level = $temp_omega_robot_level; }
             if (!empty($temp_battle_omega['battle_complete']['battle_count'])){ $temp_complete_count = $temp_battle_omega['battle_complete']['battle_count']; }
             else { $temp_complete_count = 1; }
             //$temp_omega_robot_level = $temp_complete_level + $temp_complete_count - 1;
