@@ -603,7 +603,16 @@ $(document).ready(function(){
             var thisPanel = $(this).closest('.wrapper').attr('id');
             thisPanel = thisPanel.replace(/^actions_/i, '');
             //alert(thisPanel);
+            // If this is a destructive action, make sure we confirm first
+            if (thisAction === 'withdraw'
+                && !confirm('Are you sure you want to withdraw from this mission?\n'
+                    + 'Unsaved progress will be lost and you will have to start over.\n'
+                    + 'Clear progress and withdraw from the mission anyway?'
+                    )){
+                return false;
+                }
             // Trigger the requested action and return the result
+            //console.log('triggering action '+thisAction+' with preload '+thisPreload+' and target '+thisTarget+' from panel '+thisPanel);
             return mmrpg_action_trigger(thisAction, thisPreload, thisTarget, thisPanel);
             });
 
