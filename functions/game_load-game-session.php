@@ -9,6 +9,9 @@ function mmrpg_load_game_session(){
     // Do NOT load, save, or otherwise alter the game file while viewing remote
     if (defined('MMRPG_REMOTE_GAME')){ return true; }
 
+    // Ensure we attempt patches at least once
+    unset($_SESSION['PATCHES']);
+
     // Clear the community thread tracker
     $_SESSION['COMMUNITY']['threads_viewed'] = array();
 
