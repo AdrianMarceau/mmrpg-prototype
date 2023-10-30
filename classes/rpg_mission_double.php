@@ -7,6 +7,7 @@ class rpg_mission_double extends rpg_mission {
 
     // Define a function for generating the DOUBLES missions
     public static function generate($this_prototype_data, $this_robot_tokens, $this_field_tokens, $this_start_level = 1, $this_unlock_robots = true, $this_unlock_abilities = true){
+        //error_log("rpg_mission_double::generate(\$this_prototype_data, '".implode(',', $this_robot_tokens)."', '".implode(',', $this_field_tokens)."', {$this_start_level}, {$this_unlock_robots}, {$this_unlock_abilities})");
 
         // Collect the session token
         $session_token = mmrpg_game_token();
@@ -25,6 +26,37 @@ class rpg_mission_double extends rpg_mission {
         global $this_omega_factors_nine;
         global $this_omega_factors_ten;
         global $this_omega_factors_eleven;
+
+        // Collect a list of completed battles for this player so we can see our phase1 level
+        $phase_level_boost = 0;
+        $battles_complete_list = array();
+        $battles_complete_count = mmrpg_prototype_battles_complete($this_prototype_data['this_player_token'], true, $battles_complete_list);
+        $battles_complete_tokens = !empty($battles_complete_list) ? array_keys($battles_complete_list) : array();
+        $battles_complete_targets = !empty($this_prototype_data['target_robot_omega']) ? array_map(function($r){ return $r['robot']; }, $this_prototype_data['target_robot_omega']) : array();
+        //error_log('$this_prototype_data[\'target_robot_omega\'] = '.print_r($this_prototype_data['target_robot_omega'], true));
+        //error_log('$battles_complete_targets = '.print_r($battles_complete_targets, true));
+        //error_log('$battles_complete_count = '.print_r($battles_complete_count, true));
+        //error_log('$battles_complete_tokens = '.print_r($battles_complete_tokens, true));
+        //error_log('$battles_complete_list = '.print_r($battles_complete_list, true));
+        if (!empty($battles_complete_tokens)
+            && !empty($battles_complete_targets)){
+            $battles_complete_fusion_targets = array();
+            $fusion = array();
+            foreach ($battles_complete_targets AS $key => $rtoken){
+                $rtoken_clean = str_replace('-man', '', $rtoken);
+                $fusion[] = $rtoken_clean;
+                if (count($fusion) === 2){
+                    $battles_complete_fusion_targets[] = implode('-', $fusion);
+                    $fusion = array();
+                }
+            }
+            //error_log('$battles_complete_fusion_targets = '.print_r($battles_complete_fusion_targets, true));
+            foreach ($battles_complete_fusion_targets AS $key => $rtoken_rtoken){
+                $btoken = $this_prototype_data['this_player_token'].'-phase2-'.$rtoken_rtoken;
+                if (in_array($btoken, $battles_complete_tokens)){ $phase_level_boost += 1; }
+            }
+        }
+        //error_log('$phase_level_boost = '.print_r($phase_level_boost, true));
 
         // Collect the robot index for calculation purposes
         //$db_robot_fields = rpg_robot::get_index_fields(true);
@@ -237,10 +269,11 @@ class rpg_mission_double extends rpg_mission {
         }
 
         // Define the omega variables for level, zenny, turns, and random encounter rate
-        $omega_robot_level_max = $this_start_level + 7;
+        $omega_robot_level_max = $this_start_level + 4;
         if ($omega_robot_level_max >= 100){ $omega_robot_level_max = 100; }
         $omega_robot_level = $this_start_level;
         if (!empty($temp_option_completed) && !empty($temp_option_completed['battle_count'])){ $omega_robot_level += $temp_option_completed['battle_count']; }
+        if (!empty($phase_level_boost)){ $omega_robot_level += $phase_level_boost; }
         if ($omega_robot_level >= $omega_robot_level_max){ $omega_robot_level = $omega_robot_level_max; }
         if ($omega_robot_level >= 100){ $omega_robot_level = 100; }
 

@@ -944,7 +944,7 @@ function mmrpg_prototype_altimage_unlocked($robot_token, $alt_token = ''){
 }
 
 // Define a function for counting the number of completed prototype battles
-function mmrpg_prototype_battles_complete($player_token, $unique = true){
+function mmrpg_prototype_battles_complete($player_token, $unique = true, &$battles_complete = array()){
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
@@ -964,17 +964,17 @@ function mmrpg_prototype_battles_complete($player_token, $unique = true){
         if (!empty($requested_player_token) && $requested_player_token != $player_token){ continue; }
 
         // Collect the battle complete count from the session if set
-        $temp_battle_completes = isset($_SESSION[$session_token]['values']['battle_complete'][$player_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token] : array();
-        //error_log('$temp_battle_completes = '.count($temp_battle_completes).' = '.print_r($temp_battle_completes, true));
+        $battles_complete = isset($_SESSION[$session_token]['values']['battle_complete'][$player_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token] : array();
+        //error_log('$battles_complete = '.count($battles_complete).' = '.print_r($battles_complete, true));
 
         // Check if only unique battles were requested or ALL battles
         if (!empty($unique)){
-            $temp_unique_count = count($temp_battle_completes);
+            $temp_unique_count = count($battles_complete);
             //error_log('$temp_unique_count = '.print_r($temp_unique_count, true));
             $temp_count_total += $temp_unique_count;
         } else {
             $temp_all_count = 0;
-            foreach ($temp_battle_completes AS $info){ $temp_all_count += !empty($info['battle_count']) ? $info['battle_count'] : 1; }
+            foreach ($battles_complete AS $info){ $temp_all_count += !empty($info['battle_count']) ? $info['battle_count'] : 1; }
             //error_log('$temp_all_count = '.print_r($temp_all_count, true));
             $temp_count_total += $temp_all_count;
         }
