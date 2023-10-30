@@ -124,9 +124,9 @@ if (!empty($this_battle->flags['challenge_battle'])
     //$first_event_body .= 'Wave : '.number_format($this_mission_number, 0, '.', ',').' ';
     //$first_event_body .= '('.number_format($this_phase_number, 0, '.', ',').'-'.number_format($this_battle_number, 0, '.', ',').') ';
     //$first_event_body .= '<span style="opacity:0.25;">|</span> ';
-    $first_event_body .= 'Mission : '.number_format($this_mission_number, 0, '.', ',').' ';
+    $first_event_body .= 'Wave : '.number_format($this_mission_number, 0, '.', ',').' ';
     $first_event_body .= '<span style="opacity:0.25;">|</span> ';
-    $first_event_body .= 'Wave : '.number_format($this_phase_number, 0, '.', ',').'-'.number_format($this_battle_number, 0, '.', ',').' ';
+    $first_event_body .= 'Phase : '.number_format($this_phase_number, 0, '.', ',').'-'.number_format($this_battle_number, 0, '.', ',').' ';
     $first_event_body .= '<span style="opacity:0.25;">|</span> ';
     //$first_event_body .= 'Phase : '.number_format($this_phase_number, 0, '.', ',').' ';
     //$first_event_body .= '<span style="opacity:0.25;">|</span> ';
