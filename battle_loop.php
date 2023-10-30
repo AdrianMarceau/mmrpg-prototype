@@ -1193,6 +1193,10 @@ if (window != window.top){
     <?endif;?>
 }
 <?
+
+// Unset the database variable
+unset($db);
+
 // DEBUG
 // If output buffer content was created, alert the webmaster of its content
 if (!empty($output_buffer_contents) && (!MMRPG_CONFIG_IS_LIVE && MMRPG_CONFIG_ADMIN_MODE)){
@@ -1204,24 +1208,19 @@ if (!empty($output_buffer_contents) && (!MMRPG_CONFIG_IS_LIVE && MMRPG_CONFIG_AD
     $output_buffer_contents = addslashes($output_buffer_contents);
     echo "alert('".$output_buffer_contents."');";
 }
-?>
-<?
-/*
+
 // TEMP DEBUG
 if (!MMRPG_CONFIG_IS_LIVE || MMRPG_CONFIG_ADMIN_MODE){
-    echo "console.log('memory_limit() = ".ini_get('memory_limit')."');\n";
-    echo "console.log('memory_get_usage() = ".round(((memory_get_usage() / 1024) / 1024), 2)."M');\n";
-    echo "console.log('memory_get_peak_usage() = ".round((memory_get_peak_usage() / 1024) / 1024, 2)."M');\n";
-    //echo 'memory_get_peak_usage_peak() = '.memory_get_peak_usage_peak().'<br />';
+    //error_log("memory_limit() = ".ini_get('memory_limit')."");
+    //error_log("memory_get_usage() = ".round(((memory_get_usage() / 1024) / 1024), 2)."M");
+    //error_log("memory_get_peak_usage() = ".round((memory_get_peak_usage() / 1024) / 1024, 2)."M");
+    //error_log('memory_get_peak_usage_peak() = '.memory_get_peak_usage_peak());
 }
-*/
+
 ?>
 </script>
 </head>
 <body>
-<?
-// Unset the database variable
-unset($db);
-?>
+    <!-- This page intentionally left blank -->
 </body>
 </html>
