@@ -45,7 +45,7 @@ class rpg_mission_starter extends rpg_mission {
         $temp_battle_omega['battle_token'] = $temp_battle_token;
         $temp_battle_omega['battle_size'] = '1x4';
         $temp_battle_omega_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_battle_omega['battle_token']);
-        //if (!empty($temp_battle_omega_complete['battle_count'])){ $temp_target_count = 1 + $temp_battle_omega_complete['battle_count']; }
+        //if (!empty($temp_battle_omega_complete)){ $temp_target_count = 1 + $temp_battle_omega_complete; }
         if ($temp_player_robots_unlocked > 2){ $temp_target_count = 1 + ($temp_player_robots_unlocked - 2); }
         if ($temp_target_count > 8){ $temp_target_count = 8; }
         $temp_battle_omega['battle_level'] = $this_start_level;
@@ -137,7 +137,7 @@ class rpg_mission_starter extends rpg_mission {
         if ($temp_target_count > 8){
             $temp_battle_omega['battle_rewards']['items'] = array(
                 // Add an item as a reward for the battle (doesn't work yet but will someday!)
-                array('token' => ($temp_battle_omega_complete['battle_count'] % 2 === 0 ? 'energy-tank' : 'weapon-tank'))
+                array('token' => ($temp_battle_omega_complete % 2 === 0 ? 'energy-tank' : 'weapon-tank'))
                 );
         } else {
             $temp_battle_omega['battle_rewards']['items'] = array(

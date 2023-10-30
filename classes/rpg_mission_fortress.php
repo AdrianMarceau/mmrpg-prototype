@@ -125,8 +125,8 @@ class rpg_mission_fortress extends rpg_mission {
         $temp_ability_count = 8;
         $temp_limit_count = 8;
         $temp_battle_count = 0;
-        if (!empty($temp_battle_omega['battle_complete']['battle_count'])){
-            $temp_battle_count = $temp_battle_omega['battle_complete']['battle_count'];
+        if (!empty($temp_battle_omega['battle_complete'])){
+            $temp_battle_count = $temp_battle_omega['battle_complete'];
             if ($temp_battle_count <= $temp_limit_count){
                 $temp_target_count += $temp_battle_count;
                 $temp_ability_count += $temp_battle_count;
@@ -191,7 +191,7 @@ class rpg_mission_fortress extends rpg_mission {
         $omega_robot_level_max = $this_start_level; //$this_start_level + 5;
         if ($omega_robot_level_max >= 100){ $omega_robot_level_max = 100; }
         $omega_robot_level = $this_start_level;
-        if (!empty($temp_option_completed) && !empty($temp_option_completed['battle_count'])){ $omega_robot_level += $temp_option_completed['battle_count']; }
+        if (!empty($temp_option_completed) && !empty($temp_option_completed)){ $omega_robot_level += $temp_option_completed; }
         if ($omega_robot_level >= $omega_robot_level_max){ $omega_robot_level = $omega_robot_level_max; }
         if ($omega_robot_level >= 100){ $omega_robot_level = 100; }
 
@@ -237,7 +237,7 @@ class rpg_mission_fortress extends rpg_mission {
         $temp_complete_count = 0;
         if (!empty($temp_battle_omega['battle_complete'])){
             $temp_complete_level = $temp_omega_robot_level;
-            if (!empty($temp_battle_omega['battle_complete']['battle_count'])){ $temp_complete_count = $temp_battle_omega['battle_complete']['battle_count']; }
+            if (!empty($temp_battle_omega['battle_complete'])){ $temp_complete_count = $temp_battle_omega['battle_complete']; }
             else { $temp_complete_count = 1; }
         }
 

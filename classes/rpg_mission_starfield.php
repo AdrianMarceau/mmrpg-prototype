@@ -77,8 +77,8 @@ class rpg_mission_starfield extends rpg_mission {
         if ($starfield_mission){
             $temp_target_count = 4;
             $temp_ability_count = 4;
-        } elseif (!empty($temp_battle_omega['battle_complete']['battle_count'])){
-            $temp_battle_count = $temp_battle_omega['battle_complete']['battle_count'];
+        } elseif (!empty($temp_battle_omega['battle_complete'])){
+            $temp_battle_count = $temp_battle_omega['battle_complete'];
             if ($temp_battle_count <= $temp_limit_count){
                 $temp_target_count += $temp_battle_count;
                 $temp_ability_count += $temp_battle_count;
@@ -164,7 +164,7 @@ class rpg_mission_starfield extends rpg_mission {
                 }
             }
             //$debug_backup .= 'before:count = '.count($temp_battle_omega['battle_target_player']['player_robots']).' // ';
-            $temp_slice_limit = 2; //1 + $temp_battle_omega['battle_complete']['battle_count'];
+            $temp_slice_limit = 2; //1 + $temp_battle_omega['battle_complete'];
             //if ($temp_slice_limit >= (MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX / 4)){ $temp_slice_limit = (MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX / 4); }
             //elseif ($temp_slice_limit >= MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){ $temp_slice_limit = 8; }
             $temp_battle_omega['battle_target_player']['player_robots'] = array_slice($temp_battle_omega['battle_target_player']['player_robots'], 0, $temp_slice_limit);
@@ -270,13 +270,13 @@ class rpg_mission_starfield extends rpg_mission {
         $temp_complete_count = 0;
         if (!empty($temp_battle_omega['battle_complete'])){
             $temp_complete_level = $temp_omega_robot_level;
-            if (!empty($temp_battle_omega['battle_complete']['battle_count'])){ $temp_complete_count = $temp_battle_omega['battle_complete']['battle_count']; }
+            if (!empty($temp_battle_omega['battle_complete'])){ $temp_complete_count = $temp_battle_omega['battle_complete']; }
             else { $temp_complete_count = 1; }
             //$temp_omega_robot_level = $temp_complete_level + $temp_complete_count - 1;
             $temp_omega_robot_level = $temp_complete_level + $temp_complete_count;
             if ($temp_omega_robot_level > 100){ $temp_omega_robot_level = 100; }
             // DEBUG
-            //echo('battle is complete '.$temp_battle_omega['battle_token'].' | omega robot level'.$temp_omega_robot_level.' | battle_level '.$temp_battle_omega['battle_complete']['battle_level'].' | battle_count '.$temp_battle_omega['battle_complete']['battle_count'].'<br />');
+            //echo('battle is complete '.$temp_battle_omega['battle_token'].' | omega robot level'.$temp_omega_robot_level.' | battle_level '.$temp_battle_omega['battle_complete']['battle_level'].' | battle_count '.$temp_battle_omega['battle_complete'].'<br />');
         } else {
 
         }
@@ -592,8 +592,8 @@ class rpg_mission_starfield extends rpg_mission {
         if ($starfield_mission){
             $temp_target_count = 6;
             $temp_ability_count = 6;
-        } elseif (!empty($temp_battle_omega['battle_complete']['battle_count'])){
-            $temp_battle_count = $temp_battle_omega['battle_complete']['battle_count'];
+        } elseif (!empty($temp_battle_omega['battle_complete'])){
+            $temp_battle_count = $temp_battle_omega['battle_complete'];
             if ($temp_battle_count <= $temp_limit_count){
                 $temp_target_count += $temp_battle_count;
                 $temp_ability_count += $temp_battle_count;
@@ -711,7 +711,7 @@ class rpg_mission_starfield extends rpg_mission {
                 }
             }
             //$debug_backup .= 'before:count = '.count($temp_option_battle['battle_target_player']['player_robots']).' // ';
-            $temp_slice_limit = 4; //2 + $temp_option_battle['battle_complete']['battle_count'];
+            $temp_slice_limit = 4; //2 + $temp_option_battle['battle_complete'];
             //if ($temp_slice_limit >= (MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX / 2)){ $temp_slice_limit = (MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX / 2); }
             //elseif ($temp_slice_limit >= MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){ $temp_slice_limit = 8; }
             $temp_option_battle['battle_target_player']['player_robots'] = array_slice($temp_option_battle['battle_target_player']['player_robots'], 0, $temp_slice_limit);
@@ -796,13 +796,13 @@ class rpg_mission_starfield extends rpg_mission {
         $temp_complete_count = 0;
         if (!empty($temp_battle_omega['battle_complete'])){
             $temp_complete_level = $temp_omega_robot_level;
-            if (!empty($temp_battle_omega['battle_complete']['battle_count'])){ $temp_complete_count = $temp_battle_omega['battle_complete']['battle_count']; }
+            if (!empty($temp_battle_omega['battle_complete'])){ $temp_complete_count = $temp_battle_omega['battle_complete']; }
             else { $temp_complete_count = 1; }
             //$temp_omega_robot_level = $temp_complete_level + $temp_complete_count - 1;
             $temp_omega_robot_level = $temp_complete_level + $temp_complete_count;
             if ($temp_omega_robot_level > 100){ $temp_omega_robot_level = 100; }
             // DEBUG
-            //echo('battle is complete '.$temp_battle_omega['battle_token'].' | omega robot level'.$temp_omega_robot_level.' | battle_level '.$temp_battle_omega['battle_complete']['battle_level'].' | battle_count '.$temp_battle_omega['battle_complete']['battle_count'].'<br />');
+            //echo('battle is complete '.$temp_battle_omega['battle_token'].' | omega robot level'.$temp_omega_robot_level.' | battle_level '.$temp_battle_omega['battle_complete']['battle_level'].' | battle_count '.$temp_battle_omega['battle_complete'].'<br />');
         }
 
         // Define the battle difficulty level (0 - 8) based on level and completed count

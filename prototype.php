@@ -18,8 +18,11 @@ $session_token = mmrpg_game_token();
 // Pull in necessary indexes in case we need them later
 if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
+// Apply any patches that need to be applied on start (should only need to run once)
+mmrpg_prototype_apply_patches();
+
 // Restore any dropped items to their owners if able to
-mmrpg_prototype_restore_dropped_items();
+//mmrpg_prototype_restore_dropped_items();
 //debug_profiler_checkpoint('after-restore-items');
 
 // Automatically empty all temporary battle variables

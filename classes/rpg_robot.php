@@ -4658,7 +4658,7 @@ class rpg_robot extends rpg_object {
 
             // Check how many robots this player has and see if they should be able to transfer
             $counter_player_robots = !empty($player_info['player_robots']) ? count($player_info['player_robots']) : false;
-            $counter_player_missions = rpg_prototype::battles_complete($player_info['player_token']);
+            $counter_player_missions = mmrpg_prototype_battles_complete($player_info['player_token']);
             $allow_player_selector = $allowed_edit_player_count > 1 ? true : false;
 
             // Collect starforce values for the current player

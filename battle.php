@@ -341,11 +341,11 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                                 if (!isset($this_robot_index[$this_token])){ $this_robot_index[$this_token] = rpg_robot::get_index_info($this_token); }
                                 $this_index = $this_robot_index[$this_token];
                                 $this_image = $this_token;
-                                if (!empty($this_battle_data['battle_complete']['battle_count'])
+                                if (!empty($this_battle_data['battle_complete'])
                                     && !empty($this_index['robot_image_alts'])){
                                     $images = array($this_token);
                                     foreach ($this_index['robot_image_alts'] AS $alt){
-                                        if (count($images) > $this_battle_data['battle_complete']['battle_count']){ break; }
+                                        if (count($images) > $this_battle_data['battle_complete']){ break; }
                                         $images[] = $this_token.'_'.$alt['token'];
                                     }
                                     shuffle($images);
@@ -553,11 +553,11 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                                     if (!isset($this_robot_index[$this_token])){ $this_robot_index[$this_token] = rpg_robot::get_index_info($this_token); }
                                     $this_index = $this_robot_index[$this_token];
                                     $this_image = $this_token;
-                                    if (!empty($this_battle_data['battle_complete']['battle_count'])
+                                    if (!empty($this_battle_data['battle_complete'])
                                         && !empty($this_index['robot_image_alts'])){
                                         $images = array($this_token);
                                         foreach ($this_index['robot_image_alts'] AS $alt){
-                                            if (count($images) > $this_battle_data['battle_complete']['battle_count']){ break; }
+                                            if (count($images) > $this_battle_data['battle_complete']){ break; }
                                             $images[] = $this_token.'_'.$alt['token'];
                                         }
                                         shuffle($images);

@@ -608,8 +608,8 @@ class rpg_battle extends rpg_object {
         $temp_human_token = $target_player->player_side == 'left' ? $target_player->player_token : $this_player->player_token;
         $temp_human_rewards = array();
         $temp_human_rewards['battle_zenny'] = 0;
-        $temp_human_rewards['battle_complete'] = isset($_SESSION['GAME']['values']['battle_complete'][$temp_human_token][$this->battle_token]['battle_count']) ? $_SESSION['GAME']['values']['battle_complete'][$temp_human_token][$this->battle_token]['battle_count'] : 0;
-        $temp_human_rewards['battle_failure'] = isset($_SESSION['GAME']['values']['battle_failure'][$temp_human_token][$this->battle_token]['battle_count']) ? $_SESSION['GAME']['values']['battle_failure'][$temp_human_token][$this->battle_token]['battle_count'] : 0;
+        $temp_human_rewards['battle_complete'] = mmrpg_prototype_battle_complete($temp_human_token, $this->battle_token);
+        $temp_human_rewards['battle_failure'] = mmrpg_prototype_battle_failure($temp_human_token, $this->battle_token);
         $temp_human_rewards['checkpoint'] = 'start: ';
 
         // Check to see if this is a player battle
@@ -648,16 +648,22 @@ class rpg_battle extends rpg_object {
 
             // Update the GAME session variable with the failed battle token
             if ($this->battle_counts){
-                // DEBUG
-                //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
-                $bak_session_array = isset($_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token]) ? $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token] : array();
-                $new_session_array = array('battle_token' => $this->battle_token, 'battle_count' => 0, 'battle_level' => 0);
-                if (!empty($bak_session_array['battle_count'])){ $new_session_array['battle_count'] = $bak_session_array['battle_count']; }
-                if (!empty($bak_session_array['battle_level'])){ $new_session_array['battle_level'] = $bak_session_array['battle_level']; }
-                $new_session_array['battle_level'] = $this->battle_level;
-                $new_session_array['battle_count']++;
-                $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token] = $new_session_array;
-                $temp_human_rewards['battle_failure'] = $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token]['battle_count'];
+
+                // Create the new session array from scratch to ensure all values exist
+                $new_failure_count = 0;
+
+                // Back up the current session array for this battle failure counter
+                $old_failure_count = isset($_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token]) ? $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token] : 0;
+                if (is_array($old_failure_count) && isset($old_failure_count['battle_count'])){ $old_failure_count = $old_failure_count['battle_count']; }
+                elseif (!is_numeric($old_failure_count)){ $old_failure_count = 0; }
+                if (!empty($old_failure_count)){ $new_failure_count = $old_failure_count; }
+
+                // Update and/or increment the appropriate battle variables in the new array
+                $new_failure_count++;
+
+                // Update the session variable for this player with the updated battle values
+                $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token] = $new_failure_count;
+                $temp_human_rewards['battle_failure'] = $_SESSION['GAME']['values']['battle_failure'][$target_player->player_token][$this->battle_token];
             }
 
             // Recalculate the overall battle points total with new values
@@ -1004,24 +1010,21 @@ class rpg_battle extends rpg_object {
                 // DEBUG
                 //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
 
-                // Back up the current session array for this battle complete counter
-                $bak_session_array = isset($_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token]) ? $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token] : array();
-
                 // Create the new session array from scratch to ensure all values exist
-                $new_session_array = array(
-                    'battle_token' => $this->battle_token,
-                    'battle_count' => 0
-                    );
+                $new_complete_count = 0;
 
-                // Recollect applicable battle values from the backup session array
-                if (!empty($bak_session_array['battle_count'])){ $new_session_array['battle_count'] = $bak_session_array['battle_count']; }
+                // Back up the current session array for this battle complete counter
+                $old_complete_count = isset($_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token]) ? $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token] : 0;
+                if (is_array($old_complete_count) && isset($old_complete_count['battle_count'])){ $old_complete_count = $old_complete_count['battle_count']; }
+                elseif (!is_numeric($old_complete_count)){ $old_complete_count = 0; }
+                if (!empty($old_complete_count)){ $new_complete_count = $old_complete_count; }
 
                 // Update and/or increment the appropriate battle variables in the new array
-                $new_session_array['battle_count']++;
+                $new_complete_count++;
 
                 // Update the session variable for this player with the updated battle values
-                $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token] = $new_session_array;
-                $temp_human_rewards['battle_complete'] = $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token]['battle_count'];
+                $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token] = $new_complete_count;
+                $temp_human_rewards['battle_complete'] = $_SESSION['GAME']['values']['battle_complete'][$this_player->player_token][$this->battle_token];
 
                 // Recalculate the overall battle points total with new values
                 mmrpg_prototype_calculate_battle_points(true);

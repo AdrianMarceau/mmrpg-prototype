@@ -41,7 +41,7 @@ class rpg_mission {
         }
 
         // Reduce the zenny earned from this mission each time it is completed
-        if ($temp_battle_complete['battle_count'] > 0){ $this_battle_omega['battle_zenny'] = ceil($this_battle_omega['battle_zenny'] * (2 / (2 + $temp_battle_complete['battle_count']))); }
+        if ($temp_battle_complete > 0){ $this_battle_omega['battle_zenny'] = ceil($this_battle_omega['battle_zenny'] * (2 / (2 + $temp_battle_complete))); }
 
     }
 
