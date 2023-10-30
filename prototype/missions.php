@@ -343,12 +343,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_rival_option['battle_target_player']['player_token'] = 'player';
                 $temp_rival_option['battle_description'] = preg_replace('/^Defeat (Dr. (Wily|Light|Cossack)\'s)/i', 'Defeat', $temp_rival_option['battle_description']);
                 // Also make sure any unlocked robots appear in greyscale on the button
+                $temp_target_level = $this_prototype_data['this_chapter_levels'][2];
                 foreach ($temp_rival_option['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
+                    $rm_robot['robot_level'] = $temp_target_level;
                     if (mmrpg_prototype_robot_unlocked(false, $rm_robot['robot_token'])){
                         //$rm_robot['flags']['hide_from_mission_select'] = true;
                         $rm_robot['flags']['shadow_on_mission_select'] = true;
-                        $temp_rival_option['battle_target_player']['player_robots'][$rm_key] = $rm_robot;
                     }
+                    $temp_rival_option['battle_target_player']['player_robots'][$rm_key] = $rm_robot;
                 }
             }
 
