@@ -269,7 +269,7 @@ class rpg_mission_double extends rpg_mission {
         }
 
         // Define the omega variables for level, zenny, turns, and random encounter rate
-        $omega_robot_level_max = $this_start_level + 5;
+        $omega_robot_level_max = $this_start_level + 4;
         if ($omega_robot_level_max >= 100){ $omega_robot_level_max = 100; }
         $omega_robot_level = $this_start_level;
         if (!empty($temp_option_completed) && !empty($temp_option_completed)){ $omega_robot_level += $temp_option_completed; }
