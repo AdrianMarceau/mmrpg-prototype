@@ -774,8 +774,11 @@ function mmrpg_website_session_update($session_href){
 function mmrpg_website_community_index(){
     global $db;
     // Check to see if the community category has already been pulled or not
-    if (false && !empty($_SESSION['COMMUNITY']['categories'])){
-        $this_categories_index = json_decode($_SESSION['COMMUNITY']['categories'], true);
+    $cache_token = md5(MMRPG_BUILD);
+    $cached_index = rpg_object::load_cached_index('community.categories', $cache_token);
+    if (!empty($cached_index)){
+        $this_categories_index = $cached_index;
+        unset($cached_index);
     } else {
         // Collect the community catetories from the database
         // Collect all the categories from the index
@@ -790,8 +793,7 @@ function mmrpg_website_community_index(){
             categories.category_order ASC
             ;";
         $this_categories_index = $db->get_array_list($this_categories_query, 'category_token');
-        // Update the database index cache
-        $_SESSION['COMMUNITY']['categories'] = json_encode($this_categories_index);
+        rpg_object::save_cached_index('community.categories', $cache_token, $this_categories_index);
     }
     // Return the collected community categories
     return $this_categories_index;
