@@ -1368,26 +1368,27 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $this_group_name = $new_group_name();
         $new_battle_options_group($this_group_name);
 
-        // Generate the bonus battle and using the prototype data
-        $temp_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 8, 'mecha');
-        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-        // Add the omega battle to the options, index, and session
-        $this_prototype_data['battle_options'][] = $temp_battle_omega;
-        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+        // Generate the mecha bonus battle and using the prototype data
+        $mecha_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 8, 'mecha');
+        $mecha_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
 
-        // Generate the bonus battle and using the prototype data
-        $temp_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 7, 'master');
-        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-        // Add the omega battle to the options, index, and session
-        $this_prototype_data['battle_options'][] = $temp_battle_omega;
-        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+        // Generate the master bonus battle and using the prototype data
+        $master_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 7, 'master');
+        $master_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
 
-        // Generate the bonus battle and using the prototype data
-        $temp_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 6, 'boss');
-        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-        // Add the omega battle to the options, index, and session
-        $this_prototype_data['battle_options'][] = $temp_battle_omega;
-        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+        // Generate the boss bonus battle and using the prototype data
+        $boss_battle_omega = rpg_mission_bonus::generate($this_prototype_data, 6, 'boss');
+        $boss_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+
+        // Add the omega battles to the options, index, and session
+        $this_prototype_data['battle_options'][] = $mecha_battle_omega;
+        $this_prototype_data['battle_options'][] = $master_battle_omega;
+        $this_prototype_data['battle_options'][] = $boss_battle_omega;
+        rpg_battle::update_index_info($mecha_battle_omega['battle_token'], $mecha_battle_omega);
+        rpg_battle::update_index_info($master_battle_omega['battle_token'], $master_battle_omega);
+        rpg_battle::update_index_info($boss_battle_omega['battle_token'], $boss_battle_omega);
+
+        //$base_battle_omega['battle_complete_redirect_token'] = $append_battle_omega['battle_token'];
 
         // Check to see if we can add a superboss battle after the final one
         $hunter_encounter_data = mmrpg_prototype_hunter_encounter_data();
@@ -1395,8 +1396,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $required_target_tokens = $hunter_encounter_data['required_target_tokens'];
         $required_targets_total = count($required_target_tokens);
         $required_targets_visible = 0;
-        if (!empty($temp_battle_omega['battle_target_player']['player_robots'])){
-            foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $robot_info){
+        if (!empty($boss_battle_omega['battle_target_player']['player_robots'])){
+            foreach ($boss_battle_omega['battle_target_player']['player_robots'] AS $robot_info){
                 if (in_array($robot_info['robot_token'], $required_target_tokens)){ $required_targets_visible++; }
             }
             if ($required_targets_visible >= $required_targets_total){
@@ -1407,7 +1408,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // SUPERBOSS QUINT : RANDOM ENCOUNTER
         // If the superboss enounter has been unlocked, we can add it after the last battle
         if ($superboss_battle_unlocked){
-            $random_encounter_added = mmrpg_prototype_append_hunter_encounter_data($this_prototype_data, $temp_battle_omega);
+            $random_encounter_added = mmrpg_prototype_append_hunter_encounter_data($this_prototype_data, $boss_battle_omega);
         }
 
     }
