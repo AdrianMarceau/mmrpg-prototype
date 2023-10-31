@@ -18,6 +18,8 @@ class cms_database {
     public $DEBUG;
     // DEfine the public settings
     public $log_queries = false;
+    public $log_num_queries = false;
+    public $num_queries = 0;
 
 
     /*
@@ -58,6 +60,11 @@ class cms_database {
         $this->clear();
         // Close the database connection
         $this->db_close();
+        // If logging was enabled make sure we print stuff
+        if ($this->log_queries
+            || $this->log_num_queries){
+            error_log('FINAL NUM QUERIES: '.$this->num_queries);
+        }
     }
 
     /**
@@ -183,6 +190,8 @@ class cms_database {
         // Execute the query against the database
         $this->MYSQL_RESULT = mysqli_query($this->LINK, $query_string);
         if ($this->log_queries){ error_log('QUERY:'.PHP_EOL.$query_string); }
+        $this->num_queries++;
+        if ($this->log_queries){ error_log('NUM QUERIES: '.$this->num_queries); }
 
         // If a result was not found, produce an error message and return false
         if ($this->MYSQL_RESULT === false){
