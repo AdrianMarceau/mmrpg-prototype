@@ -718,8 +718,8 @@ function refreshDatabaseEvents(thisDatabase){
         thisSpritesBodies.each(function(){
             var thisSpritesBody = $(this);
             var thisSpritesHeader = thisSpritesBody.prev('.sprites_header');
-            console.log('thisSpritesBody =', thisSpritesBody.length, thisSpritesBody);
-            console.log('thisSpritesHeader =', thisSpritesHeader.length, thisSpritesHeader);
+            //console.log('thisSpritesBody =', thisSpritesBody.length, thisSpritesBody);
+            //console.log('thisSpritesHeader =', thisSpritesHeader.length, thisSpritesHeader);
             // Collect a reference to the link container if it exists
             var thisLinkContainer = $('.image_link_container', thisSpritesHeader);
             if (thisLinkContainer.length){
