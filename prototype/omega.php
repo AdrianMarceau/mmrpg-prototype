@@ -27,31 +27,40 @@ $omega_game_index = array(
     );
 
 // Collect a list of all "omega" field robots (basically everyone from MM1-MM11) and format them
-if (!isset($db)){ global $db; }
-$raw_game_string = "'".implode("', '", array_keys($omega_game_index))."'";
-$raw_game_string .= ", 'MMPU'";
-$raw_omega_factors = $db->get_array_list("SELECT
-    robots.robot_token AS `robot`,
-    robots.robot_field AS `field`,
-    robots.robot_core AS `type`,
-    (CASE WHEN robots.robot_game = 'MMPU' THEN 'MM1' ELSE robots.robot_game END) AS `game`
-    FROM
-    mmrpg_index_robots AS robots
-    LEFT JOIN mmrpg_index_players AS players1 ON players1.player_robot_hero = robots.robot_token
-    LEFT JOIN mmrpg_index_players AS players2 ON players2.player_robot_support = robots.robot_token
-    LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
-    LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
-    WHERE
-    robots.robot_game IN ({$raw_game_string})
-    AND robots.robot_class = 'master'
-    AND robots.robot_flag_complete = 1
-    AND players1.player_robot_hero IS NULL
-    AND players2.player_robot_support IS NULL
-    ORDER BY
-    robots.robot_game ASC,
-    groups.group_order ASC,
-    tokens.token_order ASC
-    ;");
+$cache_token = md5(implode(',', array_keys($omega_game_index)));
+$cached_index = rpg_object::load_cached_index('omega', $cache_token);
+if (!empty($cached_index)){
+    $raw_omega_factors = $cached_index;
+    unset($cached_index);
+} else {
+    if (!isset($db)){ global $db; }
+    $raw_game_string = "'".implode("', '", array_keys($omega_game_index))."'";
+    $raw_game_string .= ", 'MMPU'";
+    $raw_omega_factors = $db->get_array_list("SELECT
+        robots.robot_token AS `robot`,
+        robots.robot_field AS `field`,
+        robots.robot_core AS `type`,
+        (CASE WHEN robots.robot_game = 'MMPU' THEN 'MM1' ELSE robots.robot_game END) AS `game`
+        FROM
+        mmrpg_index_robots AS robots
+        LEFT JOIN mmrpg_index_players AS players1 ON players1.player_robot_hero = robots.robot_token
+        LEFT JOIN mmrpg_index_players AS players2 ON players2.player_robot_support = robots.robot_token
+        LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
+        LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+        WHERE
+        robots.robot_game IN ({$raw_game_string})
+        AND robots.robot_class = 'master'
+        AND robots.robot_flag_complete = 1
+        AND robots.robot_flag_hidden = 0
+        AND players1.player_robot_hero IS NULL
+        AND players2.player_robot_support IS NULL
+        ORDER BY
+        robots.robot_game ASC,
+        groups.group_order ASC,
+        tokens.token_order ASC
+        ;");
+    rpg_object::save_cached_index('omega', $cache_token, $raw_omega_factors);
+}
 if (!empty($raw_omega_factors)){
     foreach ($raw_omega_factors AS $key => $omega){
         $factor_varname = $omega_game_index[$omega['game']];
