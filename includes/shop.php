@@ -332,8 +332,9 @@ if (!empty($this_shop_index['auto'])){
     $auto_items_buying = $base_items_buying;
 
     // Collect the list of items Auto is selling based on his level
-    $unlocked_items = $db->get_array_list("SELECT
-        items.item_token
+    $unlocked_items_query = "SELECT
+        items.item_token,
+        items.item_shop_level
         FROM mmrpg_index_items AS items
         LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
         LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_class = 'item' AND groups.group_token = tokens.group_token
@@ -342,13 +343,27 @@ if (!empty($this_shop_index['auto'])){
         AND items.item_flag_complete = 1
         AND items.item_flag_unlockable = 1
         AND items.item_shop_tab = 'auto/items'
-        AND items.item_shop_level <= {$this_shop_index['auto']['shop_level']}
         AND items.item_price > 0
         ORDER BY
         groups.group_order ASC,
         tokens.token_order ASC,
         items.item_token ASC
-        ;", 'item_token');
+        ;";
+    $cache_token = md5($unlocked_items_query);
+    $cached_index = rpg_object::load_cached_index('shop.auto', $cache_token);
+    if (!empty($cached_index)){
+        $unlocked_items = $cached_index;
+        unset($cached_index);
+    } else {
+        $unlocked_items = $db->get_array_list($unlocked_items_query, 'item_token');
+        rpg_object::save_cached_index('shop.auto', $cache_token, $unlocked_items);
+    }
+    $level = $this_shop_index['auto']['shop_level'];
+    $unlocked_items = !empty($unlocked_items) ? array_filter($unlocked_items, function($info) use ($level){
+        if (empty($info['item_shop_level'])){ return true; }
+        elseif ($level >= $info['item_shop_level']){ return true; }
+        return false;
+        }) : array();
 
     // Use the pulled list of unlocked items to expand Auto's shop
     if (!empty($unlocked_items)){
@@ -374,8 +389,9 @@ if (!empty($this_shop_index['auto'])){
         $auto_parts_selling = $base_parts_selling;
 
         // Collect the list of items Auto is selling based on his level
-        $unlocked_parts = $db->get_array_list("SELECT
-            items.item_token
+        $unlocked_parts_query = "SELECT
+            items.item_token,
+            items.item_shop_level
             FROM mmrpg_index_items AS items
             LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
             LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_class = 'item' AND groups.group_token = tokens.group_token
@@ -384,13 +400,27 @@ if (!empty($this_shop_index['auto'])){
             AND items.item_flag_complete = 1
             AND items.item_flag_unlockable = 1
             AND items.item_shop_tab = 'auto/parts'
-            AND items.item_shop_level <= {$this_shop_index['auto']['shop_level']}
             AND items.item_price > 0
             ORDER BY
             groups.group_order ASC,
             tokens.token_order ASC,
             items.item_token ASC
-            ;", 'item_token');
+            ;";
+        $cache_token = md5($unlocked_parts_query);
+        $cached_index = rpg_object::load_cached_index('shop.auto', $cache_token);
+        if (!empty($cached_index)){
+            $unlocked_parts = $cached_index;
+            unset($cached_index);
+        } else {
+            $unlocked_parts = $db->get_array_list($unlocked_parts_query, 'item_token');
+            rpg_object::save_cached_index('shop.auto', $cache_token, $unlocked_parts);
+        }
+        $level = $this_shop_index['auto']['shop_level'];
+        $unlocked_parts = !empty($unlocked_parts) ? array_filter($unlocked_parts, function($info) use ($level){
+            if (empty($info['item_shop_level'])){ return true; }
+            elseif ($level >= $info['item_shop_level']){ return true; }
+            return false;
+            }) : array();
 
         // Use the pulled list of unlocked items to expand Auto's shop
         if (!empty($unlocked_parts)){
@@ -449,8 +479,11 @@ if (!empty($this_shop_index['reggae'])){
     $unlocked_ability_tokens = rpg_game::ability_tokens_unlocked();
 
     // Collect the list of abilities Reggae is selling based on his level
-    $unlocked_abilities = $db->get_array_list("SELECT
-        abilities.ability_token
+    $unlocked_abilities_query = "SELECT
+        abilities.ability_token,
+        abilities.ability_type,
+        abilities.ability_type2,
+        abilities.ability_shop_level
         FROM mmrpg_index_abilities AS abilities
         LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
         LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_class = 'master' AND groups.group_token = tokens.group_token
@@ -459,13 +492,27 @@ if (!empty($this_shop_index['reggae'])){
         AND abilities.ability_flag_complete = 1
         AND abilities.ability_flag_unlockable = 1
         AND abilities.ability_shop_tab = 'reggae/abilities'
-        AND abilities.ability_shop_level <= {$this_shop_index['reggae']['shop_level']}
         AND abilities.ability_price > 0
         ORDER BY
         groups.group_order ASC,
         tokens.token_order ASC,
         abilities.ability_token ASC
-        ;", 'ability_token');
+        ;";
+    $cache_token = md5($unlocked_abilities_query);
+    $cached_index = rpg_object::load_cached_index('shop.reggae', $cache_token);
+    if (!empty($cached_index)){
+        $unlocked_abilities = $cached_index;
+        unset($cached_index);
+    } else {
+        $unlocked_abilities = $db->get_array_list($unlocked_abilities_query, 'ability_token');
+        rpg_object::save_cached_index('shop.reggae', $cache_token, $unlocked_abilities);
+    }
+    $level = $this_shop_index['reggae']['shop_level'];
+    $unlocked_abilities = !empty($unlocked_abilities) ? array_filter($unlocked_abilities, function($info) use ($level){
+        if (empty($info['ability_shop_level'])){ return true; }
+        elseif ($level >= $info['ability_shop_level']){ return true; }
+        return false;
+        }) : array();
 
     // Update the actual shop index with our finalized abilities we're selling
     $reggae_abilities_selling = array_keys($unlocked_abilities);
@@ -509,17 +556,10 @@ if (!empty($this_shop_index['reggae'])){
         }
 
         // Collect the list of weapons Reggae is selling based on his level
-        $conditions = array();
-        foreach ($core_level_index AS $type_token => $core_level){
-            if ($type_token === 'none'){ $type_token = ''; }
-            $conditions[] = "(abilities.ability_type = '{$type_token}' AND abilities.ability_shop_level <= {$core_level})";
-        }
-        $conditions = implode(PHP_EOL.'OR ', $conditions);
-        $unlocked_weapons = $db->get_array_list("SELECT
+        $unlocked_weapons_query = "SELECT
             abilities.ability_token,
             abilities.ability_type,
             abilities.ability_type2,
-            abilities.ability_shop_tab,
             abilities.ability_shop_level
             FROM mmrpg_index_abilities AS abilities
             LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
@@ -531,9 +571,6 @@ if (!empty($this_shop_index['reggae'])){
             AND abilities.ability_flag_complete = 1
             AND abilities.ability_flag_unlockable = 1
             AND abilities.ability_shop_tab = 'reggae/weapons'
-            AND (
-                {$conditions}
-                )
             AND abilities.ability_price > 0
             ORDER BY
             types.type_order ASC,
@@ -544,7 +581,26 @@ if (!empty($this_shop_index['reggae'])){
             groups.group_order ASC,
             tokens.token_order ASC,
             abilities.ability_token ASC
-            ;", 'ability_token');
+            ;";
+        $cache_token = md5($unlocked_weapons_query);
+        $cached_index = rpg_object::load_cached_index('shop.reggae', $cache_token);
+        if (!empty($cached_index)){
+            $unlocked_weapons = $cached_index;
+            unset($cached_index);
+        } else {
+            $unlocked_weapons = $db->get_array_list($unlocked_weapons_query, 'ability_token');
+            rpg_object::save_cached_index('shop.reggae', $cache_token, $unlocked_weapons);
+        }
+        $level = $this_shop_index['reggae']['shop_level'];
+        $levels = $core_level_index;
+        $unlocked_weapons = !empty($unlocked_weapons) ? array_filter($unlocked_weapons, function($info) use ($level, $levels){
+            $type = !empty($info['ability_type']) ? $info['ability_type'] : '';
+            $required = !empty($info['ability_shop_level']) ? $info['ability_shop_level'] : 0;
+            $current = !empty($levels[$type]) ? $levels[$type] : 0;
+            if (empty($required)){ return true; }
+            elseif ($current >= $required){ return true; }
+            return false;
+            }) : array();
 
         // Update the actual shop index with our finalized weapons we're selling
         $reggae_weapons_selling = !empty($unlocked_weapons) ? array_keys($unlocked_weapons) : array();
@@ -639,7 +695,7 @@ if (!empty($this_shop_index['kalinka'])){
         $unlocked_robot_records = rpg_game::robot_database();
 
         // Collect a list of robot masters that we're allowed to sell
-        $buyable_robots = $db->get_array_list("SELECT
+        $buyable_robots_query = "SELECT
             robots.robot_token
             FROM mmrpg_index_robots AS robots
             LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
@@ -658,7 +714,16 @@ if (!empty($this_shop_index['kalinka'])){
             FIELD(robots.robot_class, 'master', 'mecha', 'boss'),
             groups.group_order ASC,
             tokens.token_order ASC
-            ;", 'robot_token');
+            ;";
+        $cache_token = md5($buyable_robots_query);
+        $cached_index = rpg_object::load_cached_index('shop.kalinka', $cache_token);
+        if (!empty($cached_index)){
+            $buyable_robots = $cached_index;
+            unset($cached_index);
+        } else {
+            $buyable_robots = $db->get_array_list($buyable_robots_query, 'robot_token');
+            rpg_object::save_cached_index('shop.kalinka', $cache_token, $buyable_robots);
+        }
 
         // Ensure there are robots to see before showing them
         if (!empty($buyable_robots)){
@@ -743,8 +808,7 @@ if (!empty($this_shop_index['kalinka'])){
         if (!empty($allowed_tokens)){
 
             // Generate the allowed token string and pull alt data from the database
-            $allowed_tokens_string = "'".implode("', '", $allowed_tokens)."'";
-            $unlocked_robot_data = $db->get_array_list("SELECT
+            $unlocked_robot_data_query = "SELECT
                 robots.robot_token,
                 robots.robot_image_alts
                 FROM mmrpg_index_robots AS robots
@@ -757,12 +821,25 @@ if (!empty($this_shop_index['kalinka'])){
                 AND robots.robot_class = 'master'
                 AND robots.robot_image_alts <> ''
                 AND robots.robot_image_alts <> '[]'
-                AND robots.robot_token IN ({$allowed_tokens_string})
                 ORDER BY
                 groups.group_order ASC,
                 tokens.token_order ASC,
                 robots.robot_order ASC
-                ;");
+                ;";
+            $cache_token = md5($unlocked_robot_data_query);
+            $cached_index = rpg_object::load_cached_index('shop.kalinka', $cache_token);
+            if (!empty($cached_index)){
+                $unlocked_robot_data = $cached_index;
+                unset($cached_index);
+            } else {
+                $unlocked_robot_data = $db->get_array_list($unlocked_robot_data_query, 'robot_token');
+                foreach ($unlocked_robot_data AS $key => $info){ $unlocked_robot_data[$key]['robot_image_alts'] = json_decode($info['robot_image_alts'], true); }
+                rpg_object::save_cached_index('shop.kalinka', $cache_token, $unlocked_robot_data);
+            }
+            $unlocked_robot_data = array_filter($unlocked_robot_data, function($info) use ($allowed_tokens){
+                if (in_array($info['robot_token'], $allowed_tokens)){ return true; }
+                return false;
+                });
 
             // If alts were found, loop through and collect their details
             $unlocked_alts_index = array();
@@ -770,7 +847,7 @@ if (!empty($this_shop_index['kalinka'])){
                 foreach ($unlocked_robot_data AS $key => $robot_info){
                     // Collect the alt data and decompress its fields
                     $robot_token = $robot_info['robot_token'];
-                    $alt_array = json_decode($robot_info['robot_image_alts'], true);
+                    $alt_array = $robot_info['robot_image_alts'];
                     $alt_array_indexed = array();
                     foreach ($alt_array AS $k => $alt){ $alt_array_indexed[$alt['token']] = $alt; }
                     $unlocked_alts_index[$robot_token] = $alt_array_indexed;
