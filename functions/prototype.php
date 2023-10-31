@@ -4780,91 +4780,104 @@ function mmrpg_get_robot_database_records($record_filters = array(), &$record_ca
     // Define the common limit string if one has been provided
     $record_limit_string = !empty($record_filters['record_limit']) ? "LIMIT {$record_filters['record_limit']}" : '';
 
-    // Collect global records for the robot masters
-    foreach ($record_categories AS $record_category){
+    // Collect the records from the global cache if we're able to, else generate anew
+    $cache_token = md5($record_query_conditions.$record_limit_string);
+    $cached_index = rpg_object::load_cached_index('records.robots', $cache_token, MMRPG_CONFIG_LAST_SAVE_DATE);
+    if (!empty($cached_index)){
+        $global_robot_records = $cached_index;
+        unset($cached_index);
+    } else {
 
-        // Avatar records have to be collected in a special way
-        if ($record_category === 'robot_avatars'){
+        // Collect global records for the robot masters
+        foreach ($record_categories AS $record_category){
 
-            $allowed_robot_tokens = $db->get_array_list("
-                SELECT robots.robot_token
-                FROM mmrpg_index_robots AS robots
-                WHERE
-                robots.robot_flag_published = 1
-                AND robots.robot_flag_complete = 1
-                {$record_query_conditions}
-                ;", 'robot_token');
-            $allowed_robot_tokens = !empty($allowed_robot_tokens) ? array_keys($allowed_robot_tokens) : array();
-            if (empty($allowed_robot_tokens)){ continue; }
+            // Avatar records have to be collected in a special way
+            if ($record_category === 'robot_avatars'){
 
-            $user_image_paths = $db->get_array_list("SELECT
-                user_image_path,
-                COUNT(*) AS robot_avatars_total
-                FROM mmrpg_users AS users
-                WHERE user_image_path <> ''
-                GROUP BY user_image_path
-                ORDER BY robot_avatars_total DESC
-                ;");
-            if (empty($user_image_paths)){ continue; }
+                $allowed_robot_tokens = $db->get_array_list("
+                    SELECT robots.robot_token
+                    FROM mmrpg_index_robots AS robots
+                    WHERE
+                    robots.robot_flag_published = 1
+                    AND robots.robot_flag_complete = 1
+                    {$record_query_conditions}
+                    ;", 'robot_token');
+                $allowed_robot_tokens = !empty($allowed_robot_tokens) ? array_keys($allowed_robot_tokens) : array();
+                if (empty($allowed_robot_tokens)){ continue; }
 
-            $record_array = array();
-            if (!empty($user_image_paths)){
-                $regex = '/^(?:[^\/]+)\/([-a-z0-9]+)(?:[^\/]+)?\/(?:[0-9]+)$/i';
-                foreach ($user_image_paths AS $key => $data){
-                    $robot_token = preg_replace($regex, '$1', $data['user_image_path']);
-                    if (!in_array($robot_token, $allowed_robot_tokens)){ continue; }
-                    $avatar_count = $data['robot_avatars_total'];
-                    if (!isset($record_array[$robot_token])){ $record_array[$robot_token] = 0; }
-                    $record_array[$robot_token] += $avatar_count;
+                $user_image_paths = $db->get_array_list("SELECT
+                    user_image_path,
+                    COUNT(*) AS robot_avatars_total
+                    FROM mmrpg_users AS users
+                    WHERE user_image_path <> ''
+                    GROUP BY user_image_path
+                    ORDER BY robot_avatars_total DESC
+                    ;");
+                if (empty($user_image_paths)){ continue; }
+
+                $record_array = array();
+                if (!empty($user_image_paths)){
+                    $regex = '/^(?:[^\/]+)\/([-a-z0-9]+)(?:[^\/]+)?\/(?:[0-9]+)$/i';
+                    foreach ($user_image_paths AS $key => $data){
+                        $robot_token = preg_replace($regex, '$1', $data['user_image_path']);
+                        if (!in_array($robot_token, $allowed_robot_tokens)){ continue; }
+                        $avatar_count = $data['robot_avatars_total'];
+                        if (!isset($record_array[$robot_token])){ $record_array[$robot_token] = 0; }
+                        $record_array[$robot_token] += $avatar_count;
+                    }
+                    asort($record_array);
+                    $record_array = array_reverse($record_array);
                 }
-                asort($record_array);
-                $record_array = array_reverse($record_array);
+                $record_array = array_filter($record_array);
+                if (empty($record_array)){ continue; }
+                if (!empty($record_filters['record_limit'])){ $record_array = array_slice($record_array, 0, $record_filters['record_limit']); }
+
             }
-            $record_array = array_filter($record_array);
-            if (empty($record_array)){ continue; }
-            if (!empty($record_filters['record_limit'])){ $record_array = array_slice($record_array, 0, $record_filters['record_limit']); }
+            // Otherwise, all other record types can be pulled normally
+            else {
 
-        }
-        // Otherwise, all other record types can be pulled normally
-        else {
+                $record_array = $db->get_array_list("SELECT
+                    records.robot_token,
+                    SUM(records.{$record_category}) AS {$record_category}_total
+                    FROM mmrpg_users_robots_records AS records
+                    LEFT JOIN mmrpg_index_robots AS robots ON robots.robot_token = records.robot_token
+                    WHERE
+                    robots.robot_flag_published = 1
+                    AND robots.robot_flag_complete = 1
+                    {$record_query_conditions}
+                    GROUP BY
+                    records.robot_token
+                    ORDER BY
+                    {$record_category}_total DESC
+                    {$record_limit_string}
+                    ;", 'robot_token');
+                if (empty($record_array)){ continue; }
+                $record_array = array_filter(array_map(function($a) use($record_category){
+                    return isset($a[$record_category.'_total']) ? $a[$record_category.'_total'] : 0;
+                    }, $record_array));
 
-            $record_array = $db->get_array_list("SELECT
-                records.robot_token,
-                SUM(records.{$record_category}) AS {$record_category}_total
-                FROM mmrpg_users_robots_records AS records
-                LEFT JOIN mmrpg_index_robots AS robots ON robots.robot_token = records.robot_token
-                WHERE
-                robots.robot_flag_published = 1
-                AND robots.robot_flag_complete = 1
-                {$record_query_conditions}
-                GROUP BY
-                records.robot_token
-                ORDER BY
-                {$record_category}_total DESC
-                {$record_limit_string}
-                ;", 'robot_token');
-            if (empty($record_array)){ continue; }
-            $record_array = array_filter(array_map(function($a) use($record_category){
-                return isset($a[$record_category.'_total']) ? $a[$record_category.'_total'] : 0;
-                }, $record_array));
+            }
 
-        }
-
-        // Format the totals with proper number formatting
-        $record_array = array_map(function($value){
-            return number_format($value, 0, '.', ',');
-            }, $record_array);
-
-        // If allowed, append each of the records with an appropriate label
-        if (!empty($record_filters['record_labels'])){
-            $label_kind = is_string($record_filters['record_labels']) ? $record_filters['record_labels'] : 'noun';
-            $record_array = array_map(function($value) use($record_categories_label, $record_category, $label_kind){
-                return $value.' '.ucwords($record_categories_label($record_category, (number_is_plural($value) ? 'x' : '').$label_kind));
+            // Format the totals with proper number formatting
+            $record_array = array_map(function($value){
+                return number_format($value, 0, '.', ',');
                 }, $record_array);
+
+            // If allowed, append each of the records with an appropriate label
+            if (!empty($record_filters['record_labels'])){
+                $label_kind = is_string($record_filters['record_labels']) ? $record_filters['record_labels'] : 'noun';
+                $record_array = array_map(function($value) use($record_categories_label, $record_category, $label_kind){
+                    return $value.' '.ucwords($record_categories_label($record_category, (number_is_plural($value) ? 'x' : '').$label_kind));
+                    }, $record_array);
+            }
+
+            // Add the final record array to the global list
+            $global_robot_records[$record_category] = $record_array;
+
         }
 
-        // Add the final record array to the global list
-        $global_robot_records[$record_category] = $record_array;
+        // Update the cache with the collected records
+        rpg_object::save_cached_index('records.robots', $cache_token, $global_robot_records);
 
     }
 
