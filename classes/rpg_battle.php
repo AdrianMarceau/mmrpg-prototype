@@ -580,6 +580,7 @@ class rpg_battle extends rpg_object {
 
     // Define a public function for triggering battle actions
     public function battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, $this_action = '', $this_token = ''){
+        //error_log('rpg_battle::battle_complete_trigger()');
 
         global $db;
         // DEBUG
@@ -1184,6 +1185,106 @@ class rpg_battle extends rpg_object {
 
         }
 
+        // If this was an ENDLESS ATTACK BATTLE we should pre-collect certain personal and global records
+        $is_endless_battle = false;
+        $current_user_id = rpg_user::get_current_userid();
+        $wave_value = MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE;
+        $old_wave_record = array();
+        $new_wave_record = array();
+        $global_wave_record = array();
+        $current_wave_number = 0;
+        $current_robots_used = 0;
+        $current_turns_used = 0;
+        $current_team_config = '';
+        if (!empty($this->flags['challenge_battle'])
+            && !empty($this->flags['endless_battle'])){
+            $is_endless_battle = true;
+
+            // Collect the endless mission wave number for reference
+            $this_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this->battle_token] : array();
+            $current_wave_number = !empty($this_battle_chain) ? (count($this_battle_chain) + 1) : 1;
+            if (!empty($this_battle_chain)){
+                $current_robots_used = $this_battle_chain[0]['battle_robots_used'];
+                $current_team_config = $this_battle_chain[0]['battle_team_config'];
+            } elseif (!empty($this_player->counters['robots_start_total'])
+                && !empty($this_player->values['robots_start_team'])){
+                $current_robots_used = $this_player->counters['robots_start_total'];
+                $current_team_config = $this_player->player_token.'::'.implode(',', $this_player->values['robots_start_team']);
+            }
+            if (!empty($this_battle_chain)){ foreach ($this_battle_chain AS $key => $record){ $current_turns_used += $record['battle_turns_used']; } }
+            if (!empty($this->counters['battle_turn'])){ $current_turns_used += $this->counters['battle_turn']; }
+
+            // Collect the global wave record for reference
+            $global_wave_record = $db->get_array("SELECT
+                board1.challenge_waves_completed AS max_waves_completed,
+                board1.user_id,
+                board1.challenge_result,
+                board1.challenge_robots_used,
+                board1.challenge_turns_used,
+                board1.challenge_team_config,
+                board1.challenge_date_firstclear,
+                board1.challenge_date_lastclear,
+                @base_points := (board1.challenge_waves_completed * {$wave_value}) AS challenge_points_base,
+                @robot_points := CEIL(@base_points / board1.challenge_robots_used) AS challenge_points_robot_bonus,
+                @turn_points := CEIL(@base_points / (board1.challenge_turns_used / board1.challenge_waves_completed)) AS challenge_points_turn_bonus,
+                CEIL(@base_points + @robot_points + @turn_points) AS challenge_points_total
+                FROM
+                    mmrpg_challenges_waveboard AS board1
+                INNER JOIN (
+                    SELECT MAX(challenge_waves_completed) AS max_waves_completed
+                    FROM mmrpg_challenges_waveboard
+                    WHERE challenge_result = 'victory'
+                ) AS board2
+                ON board1.challenge_waves_completed = board2.max_waves_completed
+                WHERE board1.challenge_result = 'victory'
+                LIMIT 1
+                ;");
+            //error_log('$global_wave_record = '.print_r($global_wave_record, true));
+
+            // Check to see if there's an existing record for this user and this challenge
+            $old_wave_record = $db->get_array("SELECT
+                `board`.`board_id`,
+                `board`.`user_id`,
+                `board`.`challenge_result`,
+                `board`.`challenge_waves_completed`,
+                `board`.`challenge_robots_used`,
+                `board`.`challenge_turns_used`,
+                `board`.`challenge_team_config`,
+                `board`.`challenge_date_firstclear`,
+                `board`.`challenge_date_lastclear`,
+                @base_points := (`board`.`challenge_waves_completed` * {$wave_value}) AS `challenge_points_base`,
+                @robot_points := CEIL(@base_points / `board`.`challenge_robots_used`) AS `challenge_points_robot_bonus`,
+                @turn_points := CEIL(@base_points / (`board`.`challenge_turns_used` / `board`.`challenge_waves_completed`)) AS `challenge_points_turn_bonus`,
+                CEIL(@base_points + @robot_points + @turn_points) AS `challenge_points_total`
+                FROM `mmrpg_challenges_waveboard` AS `board`
+                WHERE
+                `user_id` = {$current_user_id}
+                ;");
+            //error_log('$old_wave_record = '.print_r($old_wave_record, true));
+
+            // Manually create an array representing the new wave record with current values
+            $new_wave_record = array(
+                'user_id' => $current_user_id,
+                'challenge_result' => 'victory',
+                'challenge_waves_completed' => $current_wave_number,
+                'challenge_robots_used' => $current_robots_used,
+                'challenge_turns_used' => $current_turns_used,
+                'challenge_team_config' => $current_team_config,
+                'challenge_date_firstclear' => date('Y-m-d H:i:s'),
+                'challenge_date_lastclear' => date('Y-m-d H:i:s'),
+                'challenge_points_base' => 0,
+                'challenge_points_robot_bonus' => 0,
+                'challenge_points_turn_bonus' => 0,
+                'challenge_points_total' => 0
+                );
+            $new_wave_record['challenge_points_base'] = $current_wave_number * $wave_value;
+            $new_wave_record['challenge_points_robot_bonus'] = ceil($new_wave_record['challenge_points_base'] / $current_robots_used);
+            $new_wave_record['challenge_points_turn_bonus'] = ceil($new_wave_record['challenge_points_base'] / ($current_turns_used / $current_wave_number));
+            $new_wave_record['challenge_points_total'] = ceil($new_wave_record['challenge_points_base'] + $new_wave_record['challenge_points_robot_bonus'] + $new_wave_record['challenge_points_turn_bonus']);
+            if ($this->battle_result !== 'victory'){ $new_wave_record['challenge_points_total'] = 0; }
+            //error_log('$new_wave_record = '.print_r($new_wave_record, true));
+
+        }
 
         // Define the first event body markup, regardless of player type
         $first_event_header = $this->battle_name.($this->battle_result == 'victory' ? ' Complete' : ' Failure').' <span style="opacity:0.25;">|</span> '.$this->battle_field->field_name;
@@ -1210,9 +1311,7 @@ class rpg_battle extends rpg_object {
         } elseif ($this->battle_result == 'defeat'){
             // If this is an ENDLESS ATTACK MODE battle, show a special more positive message
             if (!empty($this->flags['challenge_battle']) && !empty($this->flags['endless_battle'])){
-                $temp_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this->battle_token] : array();
-                $temp_current_wave = count($temp_battle_chain) + 1;
-                $first_event_body_head = 'Wave failure.  Mission #'.$temp_current_wave.' not completed.  Maybe try again? ';
+                $first_event_body_head = 'Mission failure.  Wave #'.$current_wave_number.' not completed.  Maybe try again? ';
             }
             // Otherwise if this is a normal battle, defeat is a little bit more netaive
             else {
@@ -1224,17 +1323,85 @@ class rpg_battle extends rpg_object {
         //$first_event_body .= '<br />';
 
         // If this is an ENDLESS ATTACK MODE battle, show the current record
-        if (!empty($this->flags['challenge_battle'])
-            && !empty($this->flags['endless_battle'])){
-            $current_user_id = rpg_user::get_current_userid();
-            $old_waves_completed = (int)($db->get_value("SELECT challenge_waves_completed FROM mmrpg_challenges_waveboard WHERE user_id = {$current_user_id} AND challenge_result = 'victory';", 'challenge_waves_completed'));
-            if (!empty($old_waves_completed)){ $personal_wave_record = $old_waves_completed; }
-            else { $personal_wave_record = 0; }
-            $global_waves_completed = (int)($db->get_value("SELECT MAX(challenge_waves_completed) AS max_waves_completed FROM mmrpg_challenges_waveboard WHERE challenge_result = 'victory';", 'max_waves_completed'));
-            if (!empty($global_waves_completed)){ $global_wave_record = $global_waves_completed; }
-            else { $global_wave_record = 0; }
-            $first_event_body_details = 'Your Record: '.number_format($personal_wave_record, 0, '.', ',').' ';
-            $first_event_body_details .= '| Global Record: '.number_format($global_waves_completed, 0, '.', ',').' ';
+        if ($is_endless_battle){
+            $base_value = number_format($wave_value, 0, '.', ',');
+            $endless_record_details = array();
+            if (!empty($global_wave_record)){
+                $wave = number_format($global_wave_record['max_waves_completed'], 0, '.', ',');
+                $robots = number_format($global_wave_record['challenge_robots_used'], 0, '.', ',');
+                $turns = number_format($global_wave_record['challenge_turns_used'], 0, '.', ',');
+                $points = number_format($global_wave_record['challenge_points_total'], 0, '.', ',');
+                $endless_record_details[] = '<td class="left">Global Record:</td>'.
+                    '<td>Waves ('.$wave.')</td>'.
+                    //'<td>&times;</td>'.
+                    //'<td>BP ('.$base_value.')</td>'.
+                    '<td>&bull;</td>'.
+                    '<td>Robots ('.$robots.')</td>'.
+                    '<td>&bull;</td>'.
+                    '<td>Turns ('.$turns.')</td>'.
+                    '<td>=</td>'.
+                    '<td class="right">'.$points.' BP</td>'
+                    ;
+            }
+            if (!empty($old_wave_record)){
+                $wave = number_format($old_wave_record['challenge_waves_completed'], 0, '.', ',');
+                $robots = number_format($old_wave_record['challenge_robots_used'], 0, '.', ',');
+                $turns = number_format($old_wave_record['challenge_turns_used'], 0, '.', ',');
+                $points = number_format($old_wave_record['challenge_points_total'], 0, '.', ',');
+                if (!empty($new_wave_record['challenge_points_total'])
+                    && $old_wave_record['challenge_points_total'] > $new_wave_record['challenge_points_total']){
+                    $points = '<strong>'.$points.'</strong>';
+                }
+                $endless_record_details[] = '<td class="left">Your Record:</td>'.
+                    '<td>Waves ('.$wave.')</td>'.
+                    //'<td>&times;</td>'.
+                    //'<td>BP ('.$base_value.')</td>'.
+                    '<td>&bull;</td>'.
+                    '<td>Robots ('.$robots.')</td>'.
+                    '<td>&bull;</td>'.
+                    '<td>Turns ('.$turns.')</td>'.
+                    '<td>=</td>'.
+                    '<td class="right">'.$points.' BP</td>'
+                    ;
+            } else {
+                $endless_record_details[] = '<td class="left">Your Record:</td>'.
+                    '<td>-</td>'.
+                    //'<td>&times;</td>'.
+                    //'<td>BP ('.$base_value.')</td>'.
+                    '<td>&bull;</td>'.
+                    '<td>-</td>'.
+                    '<td>&bull;</td>'.
+                    '<td>-</td>'.
+                    '<td>=</td>'.
+                    '<td class="right">-</td>'
+                    ;
+
+            }
+            if (!empty($new_wave_record)){
+                $wave = number_format($new_wave_record['challenge_waves_completed'], 0, '.', ',');
+                $robots = number_format($new_wave_record['challenge_robots_used'], 0, '.', ',');
+                $turns = number_format($new_wave_record['challenge_turns_used'], 0, '.', ',');
+                $points = number_format($new_wave_record['challenge_points_total'], 0, '.', ',');
+                if (!empty($old_wave_record['challenge_points_total'])
+                    && $new_wave_record['challenge_points_total'] > $old_wave_record['challenge_points_total']){
+                    $points = '<strong>'.$points.'</strong>';
+                }
+                $endless_record_details[] = '<td class="left">Current Run:</td>'.
+                    '<td>Waves ('.$wave.')</td>'.
+                    //'<td>&times;</td>'.
+                    //'<td>BP ('.$base_value.')</td>'.
+                    '<td>&bull;</td>'.
+                    '<td>Robots ('.$robots.')</td>'.
+                    '<td>&bull;</td>'.
+                    '<td>Turns ('.$turns.')</td>'.
+                    '<td>=</td>'.
+                    '<td class="right">'.$points.' BP</td>'
+                    ;
+            }
+            $first_event_body_details = '';
+            $first_event_body_details .= '<table style="width: 100%;"><tbody><tr>';
+            $first_event_body_details .= implode('</tr><tr>', $endless_record_details);
+            $first_event_body_details .= '</tr></tbody></table>';
         }
         // Otherwise print out the base reward amount
         else {
@@ -1254,8 +1421,10 @@ class rpg_battle extends rpg_object {
             if (!empty($this_player->counters['overkill_bonus'])){
                 $temp_overkill_bonus = ceil($this_player->counters['overkill_bonus'] / 10);
                 $total_zenny_rewards += $temp_overkill_bonus;
-                $first_event_body_details .= ' <span style="opacity:0.25;">|</span> Overkill Bonus: +'.number_format($temp_overkill_bonus, 0, '.', ',').'&#438;';
                 $this_star_rating += 1;
+                if (!$is_endless_battle){
+                    $first_event_body_details .= ' <span style="opacity:0.25;">|</span> Overkill Bonus: +'.number_format($temp_overkill_bonus, 0, '.', ',').'&#438;';
+                }
             }
 
             // Create an options object for this function and populate
@@ -1272,7 +1441,8 @@ class rpg_battle extends rpg_object {
             }
 
             // If there were any item bonuses, loop through and display their details now
-            if (!empty($options->item_bonuses)){
+            if (!$is_endless_battle
+                && !empty($options->item_bonuses)){
                 foreach ($options->item_bonuses AS $kind => $info){
                     if (!empty($info['count']) && !empty($info['amount'])){
                         $label = ucfirst($kind).' Bonus'.($info['count'] > 1 ? 'es' : '');
@@ -1293,7 +1463,8 @@ class rpg_battle extends rpg_object {
             } else {
                 $reward_mod_strings[] = 'Turn Bonus: ---';
             }
-            if (!empty($reward_mod_strings)){
+            if (!$is_endless_battle
+                && !empty($reward_mod_strings)){
                 $first_event_body_details .= '<br /> ';
                 $first_event_body_details .= implode(' <span style="opacity:0.25;">|</span> ', $reward_mod_strings);
             }
@@ -1312,7 +1483,8 @@ class rpg_battle extends rpg_object {
                 if ($temp_target_robot_limit == 1 && $this_player->counters['robots_start_total'] == 1){ $this_star_rating += 1; }
                 $reward_mod_strings[] = 'Team Bonus: ---';
             }
-            if (!empty($reward_mod_strings)){
+            if (!$is_endless_battle
+                && !empty($reward_mod_strings)){
                 $first_event_body_details .= '<br /> ';
                 $first_event_body_details .= implode(' <span style="opacity:0.25;">|</span> ', $reward_mod_strings);
             }
@@ -1339,7 +1511,8 @@ class rpg_battle extends rpg_object {
 
             // Print out the final zenny reward amounts after mods (if not empty)
             $first_event_body_foot = '';
-            $first_event_body_foot .= 'Final Reward: '.number_format($total_zenny_rewards, 0, '.', ',').'&#438;';
+            if ($is_endless_battle){ $first_event_body_head .= '<span style="opacity:0.25;">|</span> Reward: '.number_format($total_zenny_rewards, 0, '.', ',').'&#438;'; }
+            else { $first_event_body_foot .= 'Final Reward: '.number_format($total_zenny_rewards, 0, '.', ',').'&#438;'; }
             if (!isset($_SESSION['GAME']['counters']['battle_zenny'])){ $_SESSION['GAME']['counters']['battle_zenny'] = 0; }
             $_SESSION['GAME']['counters']['battle_zenny'] += $total_zenny_rewards;
             $this->counters['final_zenny_reward'] = $total_zenny_rewards;
@@ -1348,7 +1521,7 @@ class rpg_battle extends rpg_object {
             if (empty($this->flags['challenge_battle'])){
                 if ($this_star_rating < 1){ $this_star_rating = 1; }
                 elseif ($this_star_rating > 5){ $this_star_rating = 5; }
-                $first_event_body_foot .= ' <span style="opacity:0.25;">|</span> ';
+                if (!empty($first_event_body_foot)){ $first_event_body_foot .= ' <span style="opacity:0.25;">|</span> '; }
                 for ($i = 0; $i < $this_star_rating; $i++){ $first_event_body_foot .= '<span>&#9733;</span>'; }
                 for ($i = 0; $i < (5 - $this_star_rating); $i++){ $first_event_body_foot .= '<span style="opacity:0.25;">&#9734;</span>'; }
             }
@@ -1364,8 +1537,8 @@ class rpg_battle extends rpg_object {
 
             }
             // Otherwise, if this is an ENDLESS ATTACK MODE, display the total victory count
-            elseif (!empty($this->flags['challenge_battle'])
-                && !empty($this->flags['endless_battle'])){
+            elseif ($is_endless_battle){
+                //error_log('endless battle has ended, check stats');
 
                 // Collect the current mission number so we now where we are
                 $this_loop_size = 18;
@@ -1374,30 +1547,29 @@ class rpg_battle extends rpg_object {
                 $this_phase_number = floor($this_mission_number / $this_loop_size) + 1;
                 $this_battle_number = $this_mission_number > $this_loop_size ? ($this_mission_number % $this_loop_size) : $this_mission_number;
 
+                // Pre-collect some of the points totals for reference
+                $global_points_record = !empty($global_wave_record['challenge_points_total']) ? $global_wave_record['challenge_points_total'] : 0;
+                $personal_points_record = !empty($old_wave_record['challenge_points_total']) ? $old_wave_record['challenge_points_total'] : 0;
+                $current_points_total = $new_wave_record['challenge_points_total'];
+
                 // Print out the percent (for the zenny) and then the completed mission number
-                $first_event_body_foot .= ' ('.$victory_percent.'%)';
-                $first_event_body_foot .= ' <span style="opacity:0.25;">|</span> ';
-                $first_event_body_foot .= ' <span>Mission #'.$this_mission_number.' Clear! </span>';
+                //$first_event_body_foot .= ' ('.$victory_percent.'%)';
+                if (!empty($first_event_body_foot)){ $first_event_body_foot .= ' <span style="opacity:0.25;">|</span> '; }
+                $first_event_body_foot .= ' <span>Wave #'.$this_mission_number.' Clear! </span>';
+                if (!empty($first_event_body_foot)){ $first_event_body_foot .= ' <span style="opacity:0.25;">|</span> '; }
+                $first_event_body_foot .= ' <span>Current Score: '.number_format($current_points_total, 0, '.', ',').' BP</span>';
 
                 // Check to see if there's an existing record and print high score if we're better
-                $current_user_id = rpg_user::get_current_userid();
-                $old_waves_completed = (int)($db->get_value("SELECT challenge_waves_completed FROM mmrpg_challenges_waveboard WHERE user_id = {$current_user_id} AND challenge_result = 'victory';", 'challenge_waves_completed'));
-                $global_waves_completed = (int)($db->get_value("SELECT MAX(challenge_waves_completed) AS max_waves_completed FROM mmrpg_challenges_waveboard WHERE user_id <> {$current_user_id} AND challenge_result = 'victory';", 'max_waves_completed'));
-                //$first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
-                //$first_event_body_foot .= ' <span>$old_waves_completed = '.$old_waves_completed.'</span>';
-                //$first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
-                //$first_event_body_foot .= ' <span>$global_waves_completed = '.$global_waves_completed.'</span>';
-                if ($this_mission_number >= $old_waves_completed
-                    && $this_mission_number > $global_waves_completed){
+                if ($current_points_total > $global_points_record){
                     $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
-                    $first_event_body_foot .= ' <span data-click-tooltip="Previous Record: '.$global_waves_completed.' Missions">'.rpg_type::print_span('electric_water', 'New Global Record!').'</span>';
-                } elseif (!empty($old_waves_completed)){
-                    if ($this_mission_number >= $old_waves_completed){
+                    $first_event_body_foot .= ' <span data-click-tooltip="Previous Record: '.number_format($global_points_record, 0, '.', ',').' BP">'.rpg_type::print_span('electric_water', 'New Global Record!').'</span>';
+                } elseif (!empty($old_wave_record)){
+                    if ($current_points_total > $personal_points_record){
                         $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
-                        $first_event_body_foot .= ' <span data-click-tooltip="Previous Record: '.$old_waves_completed.' Missions">'.rpg_type::print_span('electric', 'New Personal Record!').'</span>';
+                        $first_event_body_foot .= ' <span data-click-tooltip="Previous Record: '.number_format($personal_points_record, 0, '.', ',').' BP">'.rpg_type::print_span('electric', 'New Personal Record!').'</span>';
                     } else {
                         $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
-                        $first_event_body_foot .= ' <span>Personal Record: '.$old_waves_completed.'</span>';
+                        $first_event_body_foot .= ' <span>Personal Record: '.number_format($personal_points_record, 0, '.', ',').' BP</span>';
                     }
                 } else {
                     $first_event_body_foot .= ' <span style="opacity:0.25;">|</span>';
@@ -1413,14 +1585,15 @@ class rpg_battle extends rpg_object {
             // If this is an ENDLESS ATTACK MODE battle, show the sum of ALL battles as the final zenny reward
             if (!empty($this->flags['challenge_battle'])
                 && !empty($this->flags['endless_battle'])){
-                $temp_zenny_value = 0;
-                $temp_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this->battle_token] : array();
-                foreach ($temp_battle_chain AS $key => $info){ $temp_zenny_value += $info['battle_zenny_earned']; }
-                $first_event_body_foot = 'Final Reward : '.number_format($temp_zenny_value, 0, '.', ',').'&#438;';
+                //$temp_zenny_value = 0;
+                //$temp_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this->battle_token] : array();
+                //foreach ($temp_battle_chain AS $key => $info){ $temp_zenny_value += $info['battle_zenny_earned']; }
+                //$first_event_body_foot = 'At Least You Earned : '.number_format($temp_zenny_value, 0, '.', ',').'&#438;';
+                $first_event_body_foot = '<i class="fa fas fa-infinity"></i>';
             }
             // Otherwise if normal battle, show the values of THIS battle as the final zenny reward
             else {
-                $first_event_body_foot = 'Final Reward : 0&#438;';
+                $first_event_body_foot = 'Final Reward: 0&#438;';
             }
 
         }

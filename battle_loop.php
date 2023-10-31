@@ -1059,18 +1059,40 @@ if (!empty($this_battle->flags['challenge_battle'])
             $this_required_action = false;
 
             // Only bother updating the db if this run is better in some way or new
+            //error_log('Check if old wave exists...');
             if (empty($old_wave_record)){
+                //error_log('Old wave NOT exists so we can insert new!');
                 $this_required_action = 'insert';
             } elseif (!empty($old_wave_record)){
+                //error_log('Old wave EXISTS so we might need to...');
                 //$this_battle->events_create(false, false, 'DEBUG', '$old_wave_record = '.print_r($old_wave_record, true).'');
-                $old_waves_completed = (int)($old_wave_record['challenge_waves_completed']);
+                $old_missions_completed = (int)($old_wave_record['challenge_waves_completed']);
                 $old_robots_used = (int)($old_wave_record['challenge_robots_used']);
                 $old_turns_used = (int)($old_wave_record['challenge_turns_used']);
-                $old_wave_score = $old_waves_completed / $old_robots_used / $old_turns_used;
-                $new_wave_score = $this_mission_number / $this_robot_used / $this_turns_used;
-                if ($this_mission_number >= $old_waves_completed
+                //$old_wave_score = $old_missions_completed / $old_robots_used / $old_turns_used;
+                //$new_wave_score = $this_mission_number / $this_robot_used / $this_turns_used;
+                $old_base_score = $old_missions_completed * MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE;
+                $old_wave_score = $old_base_score;
+                $old_wave_score += ceil($old_base_score / $old_robots_used);
+                $old_wave_score += ceil($old_base_score / ($old_robots_used / $old_turns_used));
+                $new_base_score = $this_mission_number * MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE;
+                $new_wave_score = $new_base_score;
+                $new_wave_score += ceil($new_base_score / $this_robot_used);
+                $new_wave_score += ceil($new_base_score / ($this_robot_used / $this_turns_used));
+                //error_log('...old_missions_completed = '.$old_missions_completed);
+                //error_log('...old_robots_used = '.$old_robots_used);
+                //error_log('...old_turns_used = '.$old_turns_used);
+                //error_log('...old_wave_score = '.number_format($old_wave_score, 0, '.', ','));
+                //error_log('...this_mission_number = '.$this_mission_number);
+                //error_log('...this_robot_used = '.$this_robot_used);
+                //error_log('...this_turns_used = '.$this_turns_used);
+                //error_log('...new_wave_score = '.number_format($new_wave_score, 0, '.', ','));
+                if ($this_mission_number >= $old_missions_completed
                     && $new_wave_score > $old_wave_score){
                     $this_required_action = 'update';
+                    //error_log('Update!');
+                } else {
+                    //error_log('Nevermind!');
                 }
             }
 
@@ -1083,6 +1105,7 @@ if (!empty($this_battle->flags['challenge_battle'])
 
             // Insert a new record if this is the first time clearing
             if ($this_required_action == 'insert'){
+                //error_log('Insert the new record');
 
                 // Define the insert fields for this row
                 $db_insert_fields = $db_common_fields;
@@ -1096,12 +1119,20 @@ if (!empty($this_battle->flags['challenge_battle'])
             }
             // Otherwise update the existing record with the new score
             elseif ($this_required_action == 'update'){
+                //error_log('Update the existing record');
 
                 // Define the update fields for this row
                 $db_update_fields = $db_common_fields;
                 $db_update_fields['challenge_date_lastclear'] = time();
                 $db->update('mmrpg_challenges_waveboard', $db_update_fields, array('user_id' => $current_user_id));
                 //$this_battle->events_create(false, false, 'DEBUG', 'NEW $db_update_fields = '.print_r($db_update_fields, true).'');
+
+            }
+            // Otherwise do nothing
+            else {
+                //error_log('Do nothing!');
+
+                // ...
 
             }
 
