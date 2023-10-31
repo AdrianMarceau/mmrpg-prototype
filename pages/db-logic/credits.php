@@ -1,123 +1,13 @@
 <?
 
 // Collect user data for all contributors in the database
-$contributor_fields = rpg_user::get_contributor_index_fields(true, 'contributors');
-$user_roles_fields = rpg_user_role::get_index_fields(true, 'uroles');
-$contributor_index = $db->get_array_list("SELECT
-    {$contributor_fields},
-    {$user_roles_fields},
-    users.user_id,
-    (CASE
-        WHEN contributors.user_date_created <> 0
-        THEN contributors.user_date_created
-        ELSE users.user_date_created
-        END) AS user_date_created,
-    users.user_last_login
-    FROM mmrpg_users_contributors AS contributors
-    LEFT JOIN mmrpg_roles AS uroles ON contributors.role_id = uroles.role_id
-    LEFT JOIN mmrpg_users AS users ON contributors.contributor_id = users.contributor_id
-    WHERE contributors.contributor_flag_showcredits = 1
-    ;", 'contributor_id');
-//die('<pre>'.print_r($contributor_index, true).'</pre>');
-if (empty($contributor_index)){ $contributor_index = array(); }
-function temp_sort_by_date($u1, $u2){
-    global $contributor_ids;
-    if ($u1['role_level'] > $u2['role_level']){ return -1; }
-    elseif ($u1['role_level'] < $u2['role_level']){ return 1; }
-    elseif ($u1['user_date_created'] < $u2['user_date_created']){ return -1; }
-    elseif ($u1['user_date_created'] > $u2['user_date_created']){ return 1; }
-    else { return 0; }
-}
-uasort($contributor_index, 'temp_sort_by_date');
+$contributor_index = mmrpg_prototype_contributor_index();
+$contributor_index = array_filter($contributor_index, function($info){ return !empty($info['contributor_flag_showcredits']); });
 $contributor_ids = array_keys($contributor_index);
 
 // Additionally collect an index of sprite counts for each contributor
-$join_id_field = MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD === 'contributor_id' ? 'contributors.contributor_id' : 'users.user_id';
-$contributor_sprites_index = $db->get_array_list("
-    SELECT
-        contributor_id,
-        user_id,
-        user_player_image_count,
-        user_robot_image_count,
-        user_ability_image_count,
-        user_item_image_count,
-        user_field_image_count,
-        (user_player_image_count
-            + user_robot_image_count
-            + user_ability_image_count
-            + user_item_image_count
-            + user_field_image_count) AS user_total_image_count
-    FROM (
-        SELECT
-        contributors.contributor_id,
-        users.user_id AS user_id,
-        (CASE WHEN player_editors.player_image_count IS NOT NULL THEN player_editors.player_image_count ELSE 0 END)
-            + (CASE WHEN player_editors2.player_image_count2 IS NOT NULL THEN player_editors2.player_image_count2 ELSE 0 END) AS user_player_image_count,
-        (CASE WHEN robot_editors.robot_image_count IS NOT NULL THEN robot_editors.robot_image_count ELSE 0 END)
-            + (CASE WHEN robot_editors2.robot_image_count2 IS NOT NULL THEN robot_editors2.robot_image_count2 ELSE 0 END) AS user_robot_image_count,
-        (CASE WHEN ability_editors.ability_image_count IS NOT NULL THEN ability_editors.ability_image_count ELSE 0 END) AS user_ability_image_count,
-        (CASE WHEN item_editors.item_image_count IS NOT NULL THEN item_editors.item_image_count ELSE 0 END) AS user_item_image_count,
-        (CASE WHEN field_editors.field_image_count IS NOT NULL THEN field_editors.field_image_count ELSE 0 END) AS user_field_image_count
-        FROM
-        mmrpg_users_contributors AS contributors
-        LEFT JOIN mmrpg_users AS users ON users.contributor_id = contributors.contributor_id
-        LEFT JOIN mmrpg_roles AS uroles ON uroles.role_id = users.role_id
-        -- JOIN PLAYER IMAGES
-        LEFT JOIN (SELECT
-            player_image_editor AS player_editor_id,
-            COUNT(player_image_editor) AS player_image_count
-            FROM mmrpg_index_players
-            GROUP BY player_image_editor) AS player_editors ON player_editors.player_editor_id = {$join_id_field}
-        LEFT JOIN (SELECT
-            player_image_editor2 AS player_editor_id,
-            COUNT(player_image_editor2) AS player_image_count2
-            FROM mmrpg_index_players
-            GROUP BY player_image_editor2) AS player_editors2 ON player_editors2.player_editor_id = {$join_id_field}
-        -- JOIN ROBOT IMAGES
-        LEFT JOIN (SELECT
-            robot_image_editor AS robot_editor_id,
-            COUNT(robot_image_editor) AS robot_image_count
-            FROM mmrpg_index_robots
-            GROUP BY robot_image_editor) AS robot_editors ON robot_editors.robot_editor_id = {$join_id_field}
-        LEFT JOIN (SELECT
-            robot_image_editor2 AS robot_editor_id,
-            COUNT(robot_image_editor2) AS robot_image_count2
-            FROM mmrpg_index_robots
-            GROUP BY robot_image_editor2) AS robot_editors2 ON robot_editors2.robot_editor_id = {$join_id_field}
-        -- JOIN ABILITY IMAGES
-        LEFT JOIN (SELECT
-            ability_image_editor AS ability_editor_id,
-            COUNT(ability_image_editor) AS ability_image_count
-            FROM mmrpg_index_abilities
-            GROUP BY ability_image_editor) AS ability_editors ON ability_editors.ability_editor_id = {$join_id_field}
-        -- JOIN ITEM IMAGES
-        LEFT JOIN (SELECT
-            item_image_editor AS item_editor_id,
-            COUNT(item_image_editor) AS item_image_count
-            FROM mmrpg_index_items
-            GROUP BY item_image_editor) AS item_editors ON item_editors.item_editor_id = {$join_id_field}
-        -- JOIN FIELD IMAGES
-        LEFT JOIN (SELECT
-            field_image_editor AS field_editor_id,
-            COUNT(field_image_editor) AS field_image_count
-            FROM mmrpg_index_fields
-            GROUP BY field_image_editor) AS field_editors ON field_editors.field_editor_id = {$join_id_field}
-        WHERE
-        contributors.contributor_flag_showcredits = 1
-        AND (1 = 0
-            OR player_editors.player_image_count IS NOT NULL
-            OR player_editors2.player_image_count2 IS NOT NULL
-            OR robot_editors.robot_image_count IS NOT NULL
-            OR robot_editors2.robot_image_count2 IS NOT NULL
-            OR ability_editors.ability_image_count IS NOT NULL
-            OR item_editors.item_image_count IS NOT NULL
-            OR field_editors.field_image_count IS NOT NULL
-            )
-        ORDER BY
-        uroles.role_level DESC,
-        contributors.user_name_clean ASC
-    ) AS contributors
-    ;", MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD);
+$contributor_sprites_index = mmrpg_prototype_contributor_sprites_index();
+$contributor_sprites_index = array_filter($contributor_sprites_index, function($info){ return !empty($info['contributor_flag_showcredits']); });
 
 // Collect the elemental types index
 $mmrpg_types_index = rpg_type::get_index(true);
