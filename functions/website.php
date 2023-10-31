@@ -604,6 +604,12 @@ function mmrpg_formatting_encode($string){
 
 // Define a function for printing out the formatting options in text
 function mmrpg_formatting_help_markup(){
+    //error_log('mmrpg_formatting_help_markup()');
+
+    // Attempt to pull this markup from the cache first
+    $cache_token = 'formatting-help';
+    $cached_markup = cms_website::load_cached_markup('community', $cache_token);
+    if (!empty($cached_markup)){ return $cached_markup; }
 
     // Start the output buffer and prepare to collect contents
     ob_start();
@@ -628,6 +634,7 @@ function mmrpg_formatting_help_markup(){
     <?
     // Collect the output buffer contents into a variable
     $this_markup = ob_get_clean();
+    cms_website::save_cached_markup('community', $cache_token, $this_markup);
 
     // Return the collected output buffer contents
     return $this_markup;
