@@ -1,5 +1,6 @@
 <?php
 // Define the cms_database() class
+//error_log('--- '.$_SERVER['REQUEST_URI'].' ---');
 class cms_database {
 
     // Define the private variables
@@ -573,16 +574,27 @@ class cms_database {
     // Define a function for pulling the list of database tables
     public function table_list(){
         // Assuming we're successfull, immediately get a list of valid tables in this database
-        $raw_table_names = $this->get_array_list("SELECT table_name FROM information_schema.tables WHERE table_schema = '{$this->DBNAME}';");
-        if (!empty($raw_table_names)){ $this->TABLES = array_map(function($a){ return $a['table_name']; }, $raw_table_names); }
+        if (!empty($_SESSION['CACHE']['CMS_TABLE_LIST'])){
+            $this->TABLES = $_SESSION['CACHE']['CMS_TABLE_LIST'];
+        } else {
+            $raw_table_names = $this->get_array_list("SELECT table_name FROM information_schema.tables WHERE table_schema = '{$this->DBNAME}';");
+            if (!empty($raw_table_names)){ $this->TABLES = array_map(function($a){ return $a['table_name']; }, $raw_table_names); }
+            $_SESSION['CACHE']['CMS_TABLE_LIST'] = $this->TABLES;
+        }
         // Return the list of cached table names
         return $this->TABLES;
     }
 
     // Define a function for pulling a list of columns for a given database table
     public function table_column_list($table_name){
-        $raw_column_names = $this->get_array_list("SELECT column_name FROM information_schema.columns WHERE table_schema = '{$this->DBNAME}' AND table_name = '{$table_name}';", 'column_name');
-        return !empty($raw_column_names) ? array_keys($raw_column_names) : array();
+        if (!empty($_SESSION['CACHE']['CMS_TABLE_COLUMN_LIST'][$table_name])){
+            $column_names = $_SESSION['CACHE']['CMS_TABLE_COLUMN_LIST'][$table_name];
+        } else {
+            $raw_column_names = $this->get_array_list("SELECT column_name FROM information_schema.columns WHERE table_schema = '{$this->DBNAME}' AND table_name = '{$table_name}';", 'column_name');
+            $column_names = !empty($raw_column_names) ? array_keys($raw_column_names) : array();
+            $_SESSION['CACHE']['CMS_TABLE_COLUMN_LIST'][$table_name] = $column_names;
+        }
+        return $column_names;
     }
 
     // Define a function for checking if a database table exists
