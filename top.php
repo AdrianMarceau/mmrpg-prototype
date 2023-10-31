@@ -62,6 +62,9 @@ if (!defined('MMRPG_INDEX_SESSION')){
     }
 }
 
+// If not exists, create the session cache array for later
+if (!isset($_SESSION['CACHE'])){ $_SESSION['CACHE'] = array(); }
+
 // Now we can require the general settings file
 require('includes/settings.php');
 

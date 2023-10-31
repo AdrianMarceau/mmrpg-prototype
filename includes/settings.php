@@ -9,6 +9,12 @@ if (!defined('MMRPG_CONFIG_CACHE_DATE')){
     else { define('MMRPG_CONFIG_CACHE_DATE', date('Ymd').'-0000'); }
     //echo('MMRPG_CONFIG_CACHE_DATE = '. MMRPG_CONFIG_CACHE_DATE);
     //exit();
+    if (empty($_SESSION['CACHE'])
+        || empty($_SESSION['CACHE']['DATE'])
+        || $_SESSION['CACHE']['DATE'] !== MMRPG_CONFIG_CACHE_DATE){
+        $_SESSION['CACHE'] = array();
+        $_SESSION['CACHE']['DATE'] = MMRPG_CONFIG_CACHE_DATE;
+    }
 }
 
 // Define the core domain, locale, timezone, error reporting and cache settings
@@ -234,7 +240,12 @@ if (!defined('MMRPG_CONFIG_LAST_SAVE_DATE')){
 
 // Define the meaning of image editor IDs (changes from 'user_id' to 'contributor_id' post 2020 migration)
 if (!defined('MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD')){
-    $editor_id_meaning = $db->table_exists('mmrpg_config') ? $db->get_value("SELECT config_value FROM mmrpg_config WHERE config_group = 'global' && config_name = 'image_editor_id_field';", 'config_value') : false;
+    if (!empty($_SESSION['CACHE']['MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD'])){
+        $editor_id_meaning = $_SESSION['CACHE']['MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD'];
+    } else {
+        $editor_id_meaning = $db->table_exists('mmrpg_config') ? $db->get_value("SELECT config_value FROM mmrpg_config WHERE config_group = 'global' && config_name = 'image_editor_id_field';", 'config_value') : false;
+        $_SESSION['CACHE']['MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD'] = $editor_id_meaning;
+    }
     if (!empty($editor_id_meaning)){ define('MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD', $editor_id_meaning); }
     else { define('MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD', 'user_id'); }
 }
