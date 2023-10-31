@@ -72,20 +72,21 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
 // Collect an index of valid pages if available
 $mmrpg_page_index = array();
 if (!defined('MMRPG_CRITICAL_ERROR')){
-    $cache_token = 'by-page-url';
-    $cached_index = rpg_object::load_cached_index('pages', $cache_token);
-    if (!empty($cached_index)){
-        $mmrpg_page_index = $cached_index;
-        unset($cached_index);
-    } else {
-        $temp_page_fields = cms_website_page::get_index_fields(true);
-        $mmrpg_page_index = $db->get_array_list("SELECT
+    $temp_page_fields = cms_website_page::get_index_fields(true);
+    $mmrpg_page_index_query = "SELECT
             {$temp_page_fields}
             FROM mmrpg_website_pages
             WHERE page_flag_published = 1
             ORDER BY page_order ASC
-            ;", 'page_url');
-        rpg_object::save_cached_index('pages', $cache_token, $mmrpg_page_index);
+            ;";
+    $cache_token = md5($mmrpg_page_index_query);
+    $cached_index = rpg_object::load_cached_index('website.pages', $cache_token);
+    if (!empty($cached_index)){
+        $mmrpg_page_index = $cached_index;
+        unset($cached_index);
+    } else {
+        $mmrpg_page_index = $db->get_array_list($mmrpg_page_index_query, 'page_url');
+        rpg_object::save_cached_index('website.pages', $cache_token, $mmrpg_page_index);
     }
     //die('<pre>$mmrpg_page_index = '.print_r($mmrpg_page_index, true).'</pre>');
 }

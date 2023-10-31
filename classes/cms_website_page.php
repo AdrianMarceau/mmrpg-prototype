@@ -262,7 +262,7 @@ class cms_website_page {
         global $db;
 
         // Collect an array of published, non-hidden pages for the navbar
-        $raw_pages_array = $db->get_array_list("SELECT
+        $raw_pages_array_query = "SELECT
             pages.parent_id,
             pages.page_id,
             pages.page_token,
@@ -283,7 +283,16 @@ class cms_website_page {
             AND pages.page_flag_published = 1
             AND pages.page_flag_hidden = 0
             ORDER BY page_rel_order ASC
-            ", 'page_id');
+            ;";
+        $cache_token = md5($raw_pages_array_query);
+        $cached_index = rpg_object::load_cached_index('website.pages.links', $cache_token);
+        if (!empty($cached_index)){
+            $raw_pages_array = $cached_index;
+            unset($cached_index);
+        } else {
+            $raw_pages_array = $db->get_array_list($raw_pages_array_query, 'page_id');
+            rpg_object::save_cached_index('website.pages.links', $cache_token, $raw_pages_array);
+        }
 
         // Loop through above pages and sort into a more structured array
         $main_menu_links = array();
