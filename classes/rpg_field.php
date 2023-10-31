@@ -1390,24 +1390,10 @@ class rpg_field extends rpg_object {
                         if (!empty($field_info['field_image_editor'])){ $editor_ids[] = $field_info['field_image_editor']; }
                         if (!empty($field_info['field_image_editor2'])){ $editor_ids[] = $field_info['field_image_editor2']; }
                         if (!empty($editor_ids)){
-                            $editor_ids_string = implode(', ', $editor_ids);
-                            if (MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD === 'user_id'){
-                                $temp_editor_details = $db->get_array_list("SELECT
-                                    user_name, user_name_public, user_name_clean
-                                    FROM mmrpg_users
-                                    WHERE user_id IN ({$editor_ids_string})
-                                    ORDER BY FIELD(user_id, {$editor_ids_string})
-                                    ;", 'user_name_clean');
-                            } elseif (MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD === 'contributor_id'){
-                                $temp_editor_details = $db->get_array_list("SELECT
-                                    user_name, user_name_public, user_name_clean
-                                    FROM mmrpg_users_contributors
-                                    WHERE contributor_id IN ({$editor_ids_string})
-                                    ORDER BY FIELD(contributor_id, {$editor_ids_string})
-                                    ;", 'user_name_clean');
-                            }
-                            $temp_editor_titles = array();
-                            foreach ($temp_editor_details AS $editor_url => $editor_info){
+                            $temp_editor_index = mmrpg_prototype_contributor_index();
+                            foreach ($temp_editor_index AS $editor_id => $editor_info){
+                                $editor_url = $editor_info['user_name_clean'];
+                                if (!in_array($editor_info[MMRPG_CONFIG_IMAGE_EDITOR_ID_FIELD], $editor_ids)){ continue; }
                                 $editor_name = !empty($editor_info['user_name_public']) ? $editor_info['user_name_public'] : $editor_info['user_name'];
                                 if (!empty($editor_info['user_name_public'])
                                     && trim(str_replace(' ', '', $editor_info['user_name_public'])) !== trim(str_replace(' ', '', $editor_info['user_name']))
@@ -1416,15 +1402,21 @@ class rpg_field extends rpg_object {
                                 }
                                 $temp_editor_titles[] = '<strong><a href="leaderboard/'.$editor_url.'/">'.$editor_name.'</a></strong>';
                             }
+                        }
+                        if (!empty($field_info['field_image_editor3'])){
+                            $extra_editors = strstr($field_info['field_image_editor3'], ',') ? explode(',', $field_info['field_image_editor3']) : array($field_info['field_image_editor3']);
+                            foreach ($extra_editors AS $custom_name){ $temp_editor_titles[] = '<strong>'.trim($custom_name).'</strong>'; }
+                        }
+                        if (!empty($temp_editor_titles)){
                             $temp_editor_title = implode(' and ', $temp_editor_titles);
                         }
                         $temp_is_capcom = true;
-                        $temp_is_original = array('disco', 'rhythm', 'flutter-fly', 'flutter-fly-2', 'flutter-fly-3');
+                        $temp_is_original = array('xxxxxxx');
                         if (in_array($field_info['field_token'], $temp_is_original)){ $temp_is_capcom = false; }
                         if ($temp_is_capcom){
-                            echo '<p class="text text_editor">Image Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Artwork by <strong>Capcom</strong></p>'."\n";
+                            echo '<p class="text text_editor">Sprite Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Artwork by <strong>Capcom</strong></p>'."\n";
                         } else {
-                            echo '<p class="text text_editor">Image Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Location by <strong>Adrian Marceau</strong></p>'."\n";
+                            echo '<p class="text text_editor">Sprite Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Item by <strong>Adrian Marceau</strong></p>'."\n";
                         }
                         ?>
                     </div>
