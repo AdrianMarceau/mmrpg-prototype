@@ -70,6 +70,7 @@ class rpg_type {
      * @return array
      */
     public static function get_index($include_hidden = false, $include_unpublished = false, $include_special = true, $include_pseudo_special = true){
+        //error_log('rpg_type::get_index()');
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -82,7 +83,24 @@ class rpg_type {
         if (!$include_pseudo_special){ $temp_where .= 'AND type_token <> \'none\' AND type_token <> \'copy\' '; }
         elseif ($include_pseudo_special === true){ $temp_where .= "OR type_token IN ('none','copy') "; }
 
+        // Define a static array for cached queries
+        static $index_cache = array();
+
+        // Define the static token for this query
+        $cache_token = md5($temp_where);
+
+        // If already found, return the collected index directly, else collect from DB
+        if (!empty($index_cache[$cache_token])){ return $index_cache[$cache_token]; }
+
+        // Otherwise attempt to collect the index from the cache
+        $cached_index = rpg_object::load_cached_index('types', $cache_token);
+        if (!empty($cached_index)){
+            $index_cache[$cache_token] = $cached_index;
+            return $index_cache[$cache_token];
+        }
+
         // Collect every type's info from the database index
+        error_log('(!) generating a new types index array');
         $type_fields = self::get_index_fields(true);
         $type_index = $db->get_array_list("SELECT
             {$type_fields}
@@ -96,12 +114,13 @@ class rpg_type {
             ;", 'type_token');
 
         // Parse and return the data if not empty, else nothing
-        if (!empty($type_index)){
-            $type_index = self::parse_index($type_index);
-            return $type_index;
-        } else {
-            return array();
-        }
+        if (!empty($type_index)){ $type_index = self::parse_index($type_index); }
+        else { $type_index = array(); }
+
+        // Return the cached index array
+        rpg_object::save_cached_index('types', $cache_token, $type_index);
+        $index_cache[$cache_token] = $type_index;
+        return $index_cache[$cache_token];
 
     }
 

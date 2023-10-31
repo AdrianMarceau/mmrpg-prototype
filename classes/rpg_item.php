@@ -1021,6 +1021,7 @@ class rpg_item extends rpg_object {
      * @return array
      */
     public static function get_index($include_hidden = false, $include_unpublished = false, $filter_subclasses = '', $include_tokens = array()){
+        //error_log('rpg_item::get_index()');
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -1048,14 +1049,17 @@ class rpg_item extends rpg_object {
         $cache_token = md5($temp_where);
 
         // If already found, return the collected index directly, else collect from DB
-        if (!empty($index_cache[$cache_token])){
+        if (!empty($index_cache[$cache_token])){ return $index_cache[$cache_token]; }
 
-            // Return the cached index array
+        // Otherwise attempt to collect the index from the cache
+        $cached_index = rpg_object::load_cached_index('items', $cache_token);
+        if (!empty($cached_index)){
+            $index_cache[$cache_token] = $cached_index;
             return $index_cache[$cache_token];
-
         }
 
         // Collect every type's info from the database index
+        error_log('(!) generating a new items index array');
         $item_fields = rpg_item::get_index_fields(true, 'items');
         $item_index = $db->get_array_list("SELECT
             {$item_fields},
@@ -1075,6 +1079,7 @@ class rpg_item extends rpg_object {
         else { $item_index = array(); }
 
         // Return the cached index array
+        rpg_object::save_cached_index('items', $cache_token, $item_index);
         $index_cache[$cache_token] = $item_index;
         return $index_cache[$cache_token];
 

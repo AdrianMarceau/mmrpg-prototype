@@ -3004,6 +3004,7 @@ class rpg_robot extends rpg_object {
      * @return array
      */
     public static function get_index($include_hidden = false, $include_unpublished = false, $filter_class = '', $include_tokens = array()){
+        //error_log('rpg_robot::get_index()');
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -3027,14 +3028,17 @@ class rpg_robot extends rpg_object {
         $cache_token = md5($temp_where);
 
         // If already found, return the collected index directly, else collect from DB
-        if (!empty($index_cache[$cache_token])){
+        if (!empty($index_cache[$cache_token])){ return $index_cache[$cache_token]; }
 
-            // Return the cached index array
+        // Otherwise attempt to collect the index from the cache
+        $cached_index = rpg_object::load_cached_index('robots', $cache_token);
+        if (!empty($cached_index)){
+            $index_cache[$cache_token] = $cached_index;
             return $index_cache[$cache_token];
-
         }
 
         // Collect every robot's info from the database index
+        error_log('(!) generating a new robots index array');
         $robot_fields = rpg_robot::get_index_fields(true, 'robots');
         $robot_index = $db->get_array_list("SELECT
             {$robot_fields},
@@ -3055,6 +3059,7 @@ class rpg_robot extends rpg_object {
         else { $robot_index = array(); }
 
         // Return the cached index array
+        rpg_object::save_cached_index('robots', $cache_token, $robot_index);
         $index_cache[$cache_token] = $robot_index;
         return $index_cache[$cache_token];
 

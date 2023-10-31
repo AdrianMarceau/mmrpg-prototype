@@ -774,6 +774,7 @@ class rpg_skill extends rpg_object {
      * @return array
      */
     public static function get_index($include_hidden = false, $include_unpublished = false, $filter_class = '', $include_tokens = array()){
+        //error_log('rpg_skill::get_index()');
 
         // Pull in global variables
         $db = cms_database::get_database();
@@ -797,14 +798,17 @@ class rpg_skill extends rpg_object {
         $cache_token = md5($temp_where);
 
         // If already found, return the collected index directly, else collect from DB
-        if (!empty($index_cache[$cache_token])){
+        if (!empty($index_cache[$cache_token])){ return $index_cache[$cache_token]; }
 
-            // Return the cached index array
+        // Otherwise attempt to collect the index from the cache
+        $cached_index = rpg_object::load_cached_index('skills', $cache_token);
+        if (!empty($cached_index)){
+            $index_cache[$cache_token] = $cached_index;
             return $index_cache[$cache_token];
-
         }
 
         // Collect every type's info from the database index
+        error_log('(!) generating a new skills index array');
         $skill_fields = rpg_skill::get_index_fields(true, 'skills');
         $skill_index = $db->get_array_list("SELECT
             {$skill_fields},
@@ -824,6 +828,7 @@ class rpg_skill extends rpg_object {
         else { $skill_index = array(); }
 
         // Return the cached index array
+        rpg_object::save_cached_index('skills', $cache_token, $skill_index);
         $index_cache[$cache_token] = $skill_index;
         return $index_cache[$cache_token];
 
