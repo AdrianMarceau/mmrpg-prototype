@@ -56,6 +56,9 @@ class cms_website {
     // Define a function for saving a given markup cache into a file so that we can load it later
     public static function save_cached_markup($markup_kind, $cache_token, $markup_content){
 
+        // If there's nothing to save, don't bother
+        if (empty($markup_content)){ return false; }
+
         // If we're not supposed to be caching markup then don't save them
         if (!MMRPG_CONFIG_CACHE_INDEXES){ return false; }
 

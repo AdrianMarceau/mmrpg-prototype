@@ -913,7 +913,6 @@ class rpg_object {
     }
     */
 
-
     // Define a function to pulling a given index cache file if it exists and it's too old
     public static function load_cached_index($index_kind, $cache_token, $cache_time = null){
 
@@ -962,6 +961,9 @@ class rpg_object {
 
     // Define a function for saving a given index cache into a file so that we can load it later
     public static function save_cached_index($index_kind, $cache_token, $index_data){
+
+        // If there's nothing to save, don't bother
+        if (empty($index_data)){ return false; }
 
         // If we're not supposed to be caching indexes then don't save them
         if (!MMRPG_CONFIG_CACHE_INDEXES){ return false; }
