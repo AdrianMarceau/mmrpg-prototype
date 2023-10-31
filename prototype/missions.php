@@ -1238,11 +1238,11 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             //error_log('$temp_self_data = '.print_r($temp_self_data, true));
 
             // If player data was actuall pulled, continue
+            $max_battle_count = 6;
+            $max_target_count = 6;
             if (!empty($temp_player_list)){
 
                 // Shuffle the player list
-                $max_battle_count = 6;
-                $max_target_count = 6;
                 uasort($temp_player_list, 'mmrpg_prototype_leaderboard_targets_sort');
                 $temp_player_list = array_slice($temp_player_list, 0, 9);
                 shuffle($temp_player_list);
@@ -1314,28 +1314,28 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
                 }
 
-                // If data for the current player was successfully pulled, add a button
-                if (!empty($temp_self_data)){
+            }
 
-                    // Pull and random player from the list and collect their full data
-                    $temp_player_array = $temp_self_data;
-                    $temp_battle_omega = rpg_mission_player::generate($this_prototype_data, $temp_player_array, $max_target_count, 100, $temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three);
-                    if (!empty($temp_battle_omega)
-                        && !empty($temp_battle_omega['battle_token'])){
+            // If data for the current player was successfully pulled, add a button
+            if (!empty($temp_self_data)){
 
-                        // Update the option chapter to the current
-                        $temp_battle_omega['battle_token'] = $this_prototype_data['this_player_token'].'-proxy-battle';
-                        $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-                        $temp_battle_omega['battle_button'] .= ' (?)';
-                        $temp_battle_omega['battle_description2'] .= 'Wait a minute… that\'s you!  Who is this imposter and what do they want with our heroes? Let\'s jump in and find out!';
-                        $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.10);
+                // Pull and random player from the list and collect their full data
+                $temp_player_array = $temp_self_data;
+                $temp_battle_omega = rpg_mission_player::generate($this_prototype_data, $temp_player_array, $max_target_count, 100, $temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three);
+                if (!empty($temp_battle_omega)
+                    && !empty($temp_battle_omega['battle_token'])){
 
-                        // Add the omega battle to the options, index, and session
-                        $this_prototype_data['battle_options'][] = $temp_battle_omega;
-                        rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
-                        unset($temp_battle_omega);
+                    // Update the option chapter to the current
+                    $temp_battle_omega['battle_token'] = $this_prototype_data['this_player_token'].'-proxy-battle';
+                    $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+                    $temp_battle_omega['battle_button'] .= ' (?)';
+                    $temp_battle_omega['battle_description2'] .= 'Wait a minute… that\'s you!  Who is this imposter and what do they want with our heroes? Let\'s jump in and find out!';
+                    $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.10);
 
-                    }
+                    // Add the omega battle to the options, index, and session
+                    $this_prototype_data['battle_options'][] = $temp_battle_omega;
+                    rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
+                    unset($temp_battle_omega);
 
                 }
 
