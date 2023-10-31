@@ -3185,10 +3185,10 @@ class rpg_player extends rpg_object {
                                             $ability_method_key = 0;
                                             $ability_method = '';
                                             $temp_robot_info = rpg_robot::get_index_info('mega-man');
-                                            $temp_abilities_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+                                            $temp_abilities_index = rpg_ability::get_index(true);
                                             foreach ($player_ability_rewards AS $this_info){
                                                 $this_points = $this_info['points'];
-                                                $this_ability = rpg_ability::parse_index_info($temp_abilities_index[$this_info['token']]);
+                                                $this_ability = $temp_abilities_index[$this_info['token']];
                                                 $this_ability_token = $this_ability['ability_token'];
                                                 $this_ability_name = $this_ability['ability_name'];
                                                 $this_ability_image = !empty($this_ability['ability_image']) ? $this_ability['ability_image']: $this_ability['ability_token'];

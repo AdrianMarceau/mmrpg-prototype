@@ -94,18 +94,9 @@ function mmrpg_formatting_decode($string){
         // Collect the robot and ability index from the database
         global $db;
         static $temp_robots_index, $temp_abilities_index, $temp_types_index;
-        if (empty($temp_robots_index)){
-            $db_robot_fields = rpg_robot::get_index_fields(true);
-            $temp_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
-        }
-        if (empty($temp_abilities_index)){
-            $db_ability_fields = rpg_ability::get_index_fields(true);
-            $temp_abilities_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
-        }
-        if (empty($temp_types_index)){
-            $db_types_fields = rpg_type::get_index_fields(true);
-            $temp_types_index = $db->get_array_list("SELECT {$db_types_fields} FROM mmrpg_index_types WHERE 1 = 1;", 'type_token');
-        }
+        if (empty($temp_robots_index)){ $temp_robots_index = rpg_robot::get_index(true); }
+        if (empty($temp_abilities_index)){ $temp_abilities_index = rpg_ability::get_index(true); }
+        if (empty($temp_types_index)){ $temp_types_index = rpg_type::get_index(true, false, true); }
 
         // Define the array to hold the images of larger size than default
         $mmrpg_large_robot_images = array();

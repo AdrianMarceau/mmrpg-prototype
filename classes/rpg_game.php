@@ -716,12 +716,12 @@ class rpg_game {
         // Loop through the ability rewards for this player if set
         if ($unlock_abilities && !empty($this_player_rewards['abilities'])){
             // Collect the ability index for calculation purposes
-            $this_ability_index = $db->get_array_list("SELECT * FROM mmrpg_index_abilities WHERE ability_flag_complete = 1;", 'ability_token');
+            $this_ability_index = rpg_ability::get_index(true);
             foreach ($this_player_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
                 // Check if the required amount of points have been met by this player
                 if ($this_player_points >= $ability_reward_info['points']){
                     // Unlock this ability
-                    $this_ability_info = rpg_ability::parse_index_info($this_ability_index[$ability_reward_info['token']]);
+                    $this_ability_info = $this_ability_index[$ability_reward_info['token']];
                     $show_event = !self::ability_unlocked('', '', $ability_reward_info['token']) ? true : false;
                     self::unlock_ability($player_info, false, $this_ability_info);
                 }
