@@ -144,7 +144,7 @@ ob_start();
                     if (!empty($temp_thread_id)){
                         $temp_thread_info = $db->get_array("SELECT * FROM mmrpg_threads WHERE thread_id = {$temp_thread_id}");
                         $temp_user_id = !empty($temp_thread_info['user_id']) ? $temp_thread_info['user_id'] : $this_userinfo['user_id'];
-                        $temp_user_info = $db->get_array("SELECT * FROM mmrpg_users WHERE user_id = {$temp_user_id}");
+                        $temp_user_info = $db->get_array("SELECT user_image_path FROM mmrpg_users WHERE user_id = {$temp_user_id}");
                         $temp_thread_name = !empty($temp_thread_info['thread_name']) ? htmlentities($temp_thread_info['thread_name'], ENT_QUOTES, 'UTF-8', true) : '';
                         $temp_thread_body = !empty($temp_thread_info['thread_body']) ? htmlentities($temp_thread_info['thread_body'], ENT_QUOTES, 'UTF-8', true) : '';
                         $temp_avatar_frame = !empty($temp_thread_info['thread_frame']) ? $temp_thread_info['thread_frame'] : $temp_avatar_frame;
