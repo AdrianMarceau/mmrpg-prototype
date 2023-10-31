@@ -4020,31 +4020,36 @@ function mmrpg_prototype_get_player_boss_music($player_token, $session_token = '
 
 // Define a function for determining a player's boss music
 function mmrpg_prototype_get_current_rogue_star(){
-    $prototype_campaigns_required = 3;
-    $prototype_campaigns_complete = mmrpg_prototype_complete();
-    if ($prototype_campaigns_complete < $prototype_campaigns_required){ return false; }
-    global $db;
-    $this_date_string = date('Y-m-d');
-    $this_time_string = date('H:i:s');
-    $this_rogue_star = $db->get_array("SELECT
-        stars.star_id,
-        stars.star_type,
-        stars.star_from_date,
-        stars.star_from_date_time,
-        stars.star_to_date,
-        stars.star_to_date_time,
-        stars.star_power
-        FROM mmrpg_rogue_stars AS stars
-        WHERE
-        stars.star_type <> ''
-        AND stars.star_flag_enabled = 1
-        AND stars.star_from_date <= '{$this_date_string}'
-            AND stars.star_from_date_time <= '{$this_time_string}'
-        AND stars.star_to_date >= '{$this_date_string}'
-            AND stars.star_to_date_time >= '{$this_time_string}'
-        ORDER BY stars.star_id ASC
-        LIMIT 1
-        ;");
+    static $star_searched;
+    static $this_rogue_star;
+    if (empty($star_searched)){
+        global $db;
+        $prototype_campaigns_required = 3;
+        $prototype_campaigns_complete = mmrpg_prototype_complete();
+        if ($prototype_campaigns_complete < $prototype_campaigns_required){ return false; }
+        $this_date_string = date('Y-m-d');
+        $this_time_string = date('H:i:s');
+        $this_rogue_star = $db->get_array("SELECT
+            stars.star_id,
+            stars.star_type,
+            stars.star_from_date,
+            stars.star_from_date_time,
+            stars.star_to_date,
+            stars.star_to_date_time,
+            stars.star_power
+            FROM mmrpg_rogue_stars AS stars
+            WHERE
+            stars.star_type <> ''
+            AND stars.star_flag_enabled = 1
+            AND stars.star_from_date <= '{$this_date_string}'
+                AND stars.star_from_date_time <= '{$this_time_string}'
+            AND stars.star_to_date >= '{$this_date_string}'
+                AND stars.star_to_date_time >= '{$this_time_string}'
+            ORDER BY stars.star_id ASC
+            LIMIT 1
+            ;");
+        $star_searched = true;
+    }
     return $this_rogue_star;
 }
 
