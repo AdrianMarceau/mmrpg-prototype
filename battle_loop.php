@@ -284,18 +284,15 @@ elseif ($this_action == 'start'){
 //exit();
 
 // Collect an index of all players so we can use later
-$db_player_fields = rpg_player::get_index_fields(true);
-$battle_players_index = $db->get_array_list("SELECT {$db_player_fields} FROM mmrpg_index_players WHERE player_flag_complete = 1;", 'player_token');
+$battle_players_index = rpg_player::get_index(true);
 $mmrpg_index_players = &$battle_players_index;
 
 // Collect an index of all types so we can user later
-$db_type_fields = rpg_type::get_index_fields(true);
-$battle_types_index = $db->get_array_list("SELECT {$db_type_fields} FROM mmrpg_index_types WHERE type_class <> 'systen';", 'type_token');
+$battle_types_index = rpg_type::get_index(true, false, true);
 $mmrpg_index_types = &$battle_types_index;
 
 // Collect an index of all complete robots so we can use later
-$db_robot_fields = rpg_robot::get_index_fields(true);
-$battle_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+$battle_robots_index = rpg_robot::get_index(true);
 $mmrpg_index_robots = &$battle_robots_index;
 
 // If this is the START action, update objects with preset battle data fields

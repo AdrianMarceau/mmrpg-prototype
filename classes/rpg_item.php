@@ -1059,7 +1059,7 @@ class rpg_item extends rpg_object {
         }
 
         // Collect every type's info from the database index
-        error_log('(!) generating a new items index array');
+        error_log('(!) generating a new items index array for '.MMRPG_CONFIG_CACHE_DATE);
         $item_fields = rpg_item::get_index_fields(true, 'items');
         $item_index = $db->get_array_list("SELECT
             {$item_fields},

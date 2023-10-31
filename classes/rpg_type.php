@@ -100,7 +100,7 @@ class rpg_type {
         }
 
         // Collect every type's info from the database index
-        error_log('(!) generating a new types index array');
+        error_log('(!) generating a new types index array for '.MMRPG_CONFIG_CACHE_DATE);
         $type_fields = self::get_index_fields(true);
         $type_index = $db->get_array_list("SELECT
             {$type_fields}

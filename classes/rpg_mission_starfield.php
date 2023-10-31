@@ -27,15 +27,14 @@ class rpg_mission_starfield extends rpg_mission {
         global $this_omega_factors_eleven;
 
         // Collect the robot index for calculation purposes
-        $db_robot_fields = rpg_robot::get_index_fields(true);
-        $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $this_robot_index = rpg_robot::get_index(true);
         $this_field_index = rpg_field::get_index();
 
         // Define the array to hold this omega battle and populate with base varaibles
         $temp_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
         $temp_player_id = rpg_game::unique_player_id($temp_user_id, 0);
-        $temp_option_robot = is_array($this_robot_token) ? $this_robot_token : rpg_robot::parse_index_info($this_robot_index[$this_robot_token]);
-        $temp_option_field = rpg_field::parse_index_info($this_field_index[$this_field_token]);
+        $temp_option_robot = is_array($this_robot_token) ? $this_robot_token : $this_robot_index[$this_robot_token];
+        $temp_option_field = $this_field_index[$this_field_token];
         $temp_battle_omega = array();
         $temp_battle_omega['flags']['single_battle'] = true;
         $temp_battle_omega['values']['single_battle_masters'] = array($this_robot_token);
@@ -151,7 +150,7 @@ class rpg_mission_starfield extends rpg_mission {
                 foreach ($this_list AS $this_factor){
                     //$debug_backup .= 'factor = '.implode(',', array_values($this_factor)).' // ';
                     if (empty($this_factor['robot'])){ continue; }
-                    $bonus_robot_info = rpg_robot::parse_index_info($this_robot_index[$this_factor['robot']]);
+                    $bonus_robot_info = $this_robot_index[$this_factor['robot']];
                     if (!empty($bonus_robot_info['robot_flag_exclusive'])){ continue; }
                     if (!isset($bonus_robot_info['robot_core'])){ $bonus_robot_info['robot_core'] = ''; }
                     if ($bonus_robot_info['robot_core'] == $temp_option_field['field_type']){
@@ -219,7 +218,7 @@ class rpg_mission_starfield extends rpg_mission {
                 if (count($temp_battle_omega['battle_target_player']['player_robots']) >= MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){ break; }
                 shuffle($temp_mook_options);
                 $temp_mook_token = $temp_mook_options[array_rand($temp_mook_options)];
-                $temp_mook_info = rpg_robot::parse_index_info($this_robot_index[$temp_mook_token]);
+                $temp_mook_info = $this_robot_index[$temp_mook_token];
                 $bonus_robot_info = array('robot_token' => $temp_mook_token, 'robot_id' => 1, 'robot_level' => 1);
                 $bonus_robot_info['robot_abilities'] = $temp_mook_info['robot_abilities'];
                 $bonus_robot_info['robot_class'] = !empty($temp_mook_info['robot_class']) ? $temp_mook_info['robot_class'] : 'master';
@@ -298,7 +297,7 @@ class rpg_mission_starfield extends rpg_mission {
         foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key2 => $robot_data){
 
             // Ensure this robot's token exists in the index, else continue
-            if (isset($this_robot_index[$robot_data['robot_token']])){ $robot_info = rpg_robot::parse_index_info($this_robot_index[$robot_data['robot_token']]); }
+            if (isset($this_robot_index[$robot_data['robot_token']])){ $robot_info = $this_robot_index[$robot_data['robot_token']]; }
             else { continue; }
 
             // Update the robot level and battle zenny plus turns
@@ -371,7 +370,7 @@ class rpg_mission_starfield extends rpg_mission {
         $temp_battle_omega['battle_rewards']['robots'] = array();
         if ($this_unlock_robots){
             foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $robot_info){
-                $index_info = rpg_robot::parse_index_info($this_robot_index[$robot_info['robot_token']]);
+                $index_info = $this_robot_index[$robot_info['robot_token']];
                 if ($index_info['robot_class'] == 'master'
                     && $index_info['robot_flag_unlockable']
                     && !$index_info['robot_flag_exclusive']

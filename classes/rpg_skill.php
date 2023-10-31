@@ -808,7 +808,7 @@ class rpg_skill extends rpg_object {
         }
 
         // Collect every type's info from the database index
-        error_log('(!) generating a new skills index array');
+        error_log('(!) generating a new skills index array for '.MMRPG_CONFIG_CACHE_DATE);
         $skill_fields = rpg_skill::get_index_fields(true, 'skills');
         $skill_index = $db->get_array_list("SELECT
             {$skill_fields},

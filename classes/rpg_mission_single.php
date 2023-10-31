@@ -48,8 +48,6 @@ class rpg_mission_single extends rpg_mission {
         //error_log('$phase_level_boost = '.print_r($phase_level_boost, true));
 
         // Collect the robot index for calculation purposes
-        //$db_robot_fields = rpg_robot::get_index_fields(true);
-        //$this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
         $this_robot_index = rpg_robot::get_index(true);
         $this_field_index = rpg_field::get_index();
 

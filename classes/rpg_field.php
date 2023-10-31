@@ -304,7 +304,7 @@ class rpg_field extends rpg_object {
         }
 
         // Collect every field's info from the database index
-        error_log('(!) generating a new fields index array');
+        error_log('(!) generating a new fields index array for '.MMRPG_CONFIG_CACHE_DATE);
         $field_fields = rpg_field::get_index_fields(true, 'fields');
         $field_index = $db->get_array_list("SELECT
             {$field_fields},
@@ -1483,13 +1483,10 @@ class rpg_field extends rpg_object {
     // Define a static function for printing out the field's title markup
     public static function print_editor_title_markup($player_info, $field_info){
         // Pull in global variables
-        global $db;
-        global $mmrpg_index_types, $mmrpg_index_players;
-        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(); }
-        if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(); }
-        // Collect the approriate database indexes
-        $db_robot_fields = rpg_robot::get_index_fields(true);
-        $mmrpg_database_robots = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        static $mmrpg_index_types, $mmrpg_index_players, $mmrpg_database_robots;
+        if (empty($mmrpg_index_types)){ $mmrpg_index_types = rpg_type::get_index(true, false, true); }
+        if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+        if (empty($mmrpg_database_robots)){ $mmrpg_database_robots = rpg_robot::get_index(true); }
         // Generate the field option markup
         $temp_player_token = $player_info['player_token'];
         if (!isset($mmrpg_index_players[$temp_player_token])){ return false; }
@@ -1500,10 +1497,10 @@ class rpg_field extends rpg_object {
         $player_flag_copycore = !empty($player_info['player_core']) && $player_info['player_core'] == 'copy' ? true : false;
         $temp_field_type = !empty($field_info['field_type']) ? $mmrpg_index_types[$field_info['field_type']] : false;
         $temp_field_type2 = !empty($field_info['field_type2']) ? $mmrpg_index_types[$field_info['field_type2']] : false;
-        $temp_field_master = !empty($field_info['field_master']) ? rpg_robot::parse_index_info($mmrpg_database_robots[$field_info['field_master']]) : false;
+        $temp_field_master = !empty($field_info['field_master']) ? $mmrpg_database_robots[$field_info['field_master']] : false;
         $temp_field_mechas = !empty($field_info['field_mechas']) ? $field_info['field_mechas'] : array();
         foreach ($temp_field_mechas AS $key => $token){
-            $temp_mecha = rpg_robot::parse_index_info($mmrpg_database_robots[$token]);
+            $temp_mecha = $mmrpg_database_robots[$token];
             if (!empty($temp_mecha)){ $temp_field_mechas[$key] = $temp_mecha['robot_name'];  }
             else { unset($temp_field_mechas[$key]); }
         }

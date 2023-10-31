@@ -87,13 +87,12 @@ function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_a
     }
     // Loop through the robot rewards for this player if set
     if ($unlock_robots && !empty($this_player_rewards['robots'])){
-        $db_robot_fields = rpg_robot::get_index_fields(true);
-        $temp_robots_index = $db->get_array_list("SELECT {$db_robot_fields} FROM mmrpg_index_robots WHERE robot_flag_complete = 1;", 'robot_token');
+        $temp_robots_index = rpg_robot::get_index(true);
         foreach ($this_player_rewards['robots'] AS $robot_reward_key => $robot_reward_info){
             // Check if the required amount of points have been met by this player
             if ($this_player_points >= $robot_reward_info['points']){
                 // Unlock this robot and all abilities
-                $this_robot_info = rpg_robot::parse_index_info($temp_robots_index[$robot_reward_info['token']]);
+                $this_robot_info = $temp_robots_index[$robot_reward_info['token']];
                 $this_robot_info['robot_level'] = !empty($robot_reward_info['level']) ? $robot_reward_info['level'] : 1;
                 $this_robot_info['robot_experience'] = !empty($robot_reward_info['experience']) ? $robot_reward_info['experience'] : 0;
                 mmrpg_game_unlock_robot($player_info, $this_robot_info, true, false);
