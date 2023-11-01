@@ -2,7 +2,7 @@
 
 // ABILITY DATABASE
 
-// Define the index of counters for robot types
+// Define the index of counters for ability types
 $mmrpg_database_abilities_types = array();
 foreach ($mmrpg_database_types AS $token => $info){
     $mmrpg_database_abilities_types[$token] = 0;
@@ -12,108 +12,138 @@ foreach ($mmrpg_database_types AS $token => $info){
 $hidden_database_abilities = array();
 $hidden_database_abilities_count = !empty($hidden_database_abilities) ? count($hidden_database_abilities) : 0;
 
-// Define the hidden ability query condition
-$temp_condition = '';
-$temp_condition .= "AND abilities.ability_class <> 'system' ";
-if (!defined('DATA_DATABASE_SHOW_MECHAS')){
-    $temp_condition .= "AND abilities.ability_class <> 'mecha' ";
-}
-if (!defined('DATA_DATABASE_SHOW_BOSSES')){
-    $temp_condition .= "AND abilities.ability_class <> 'boss' ";
-}
-if (!empty($hidden_database_abilities)){
-    $temp_tokens = array();
-    foreach ($hidden_database_abilities AS $token){ $temp_tokens[] = "'".$token."'"; }
-    $temp_condition .= 'AND abilities.ability_token NOT IN ('.implode(',', $temp_tokens).') ';
-}
-// If additional database filters were provided
-$temp_condition_unfiltered = $temp_condition;
-if (isset($mmrpg_database_abilities_filter)){
-    if (!preg_match('/^\s?(AND|OR)\s+/i', $mmrpg_database_abilities_filter)){ $temp_condition .= 'AND ';  }
-    $temp_condition .= $mmrpg_database_abilities_filter;
-}
+// Collect the ability database files from the cache or manually
+$cache_token = md5('database/abilities/website');
+$cached_index = rpg_object::load_cached_index('database.abilities', $cache_token);
+if (!empty($cached_index)){
 
-// Collect the database abilities
-$ability_fields = rpg_ability::get_index_fields(true, 'abilities');
-$mmrpg_database_abilities = $db->get_array_list("SELECT
-    {$ability_fields},
-    groups.group_token AS ability_group,
-    tokens.token_order AS ability_order
-    FROM mmrpg_index_abilities AS abilities
-    LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
-    LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
-    WHERE abilities.ability_token <> 'ability'
-    AND abilities.ability_flag_published = 1 AND (abilities.ability_flag_hidden = 0 OR abilities.ability_token = '{$this_current_token}')  {$temp_condition}
-    ORDER BY
-    FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
-    groups.group_order ASC,
-    tokens.token_order ASC
-    ;", 'ability_token');
+    // Collect the cached data for abilities, ability count, and ability numbers
+    $mmrpg_database_abilities = $cached_index['mmrpg_database_abilities'];
+    $mmrpg_database_abilities_count = $cached_index['mmrpg_database_abilities_count'];
+    $mmrpg_database_abilities_numbers = $cached_index['mmrpg_database_abilities_numbers'];
+    unset($cached_index);
 
-// Count the database abilities in total (without filters)
-$mmrpg_database_abilities_count = $db->get_value("SELECT
-    COUNT(abilities.ability_id) AS ability_count
-    FROM mmrpg_index_abilities AS abilities
-    WHERE abilities.ability_flag_published = 1 AND abilities.ability_flag_hidden = 0 {$temp_condition_unfiltered}
-    ;", 'ability_count');
+} else {
 
-// Select an ordered list of all abilities and then assign row numbers to them
-$mmrpg_database_abilities_numbers = $db->get_array_list("SELECT
-    abilities.ability_token,
-    0 AS ability_key
-    FROM mmrpg_index_abilities AS abilities
-    LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
-    LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
-    WHERE abilities.ability_token <> 'ability'
-    AND abilities.ability_flag_published = 1 AND (abilities.ability_flag_hidden = 0 OR abilities.ability_token = '{$this_current_token}')  {$temp_condition}
-    ORDER BY
-    FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
-    groups.group_order ASC,
-    tokens.token_order ASC
-    ;", 'ability_token');
-$ability_key = 1;
-foreach ($mmrpg_database_abilities_numbers AS $token => $info){
-    $mmrpg_database_abilities_numbers[$token]['ability_key'] = $ability_key++;
-}
+    // Collect the database abilities
+    $ability_fields = rpg_ability::get_index_fields(true, 'abilities');
+    $mmrpg_database_abilities = $db->get_array_list("SELECT
+        {$ability_fields},
+        groups.group_token AS ability_group,
+        tokens.token_order AS ability_order
+        FROM mmrpg_index_abilities AS abilities
+        LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
+        LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
+        WHERE abilities.ability_token <> 'ability'
+        AND abilities.ability_class <> 'system'
+        AND abilities.ability_flag_published = 1
+        ORDER BY
+        FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
+        groups.group_order ASC,
+        tokens.token_order ASC
+        ;", 'ability_token');
 
-// Remove unallowed abilities from the database, and increment counters
-if (!empty($mmrpg_database_abilities)){
-    foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
+    // Count the database abilities in total (without filters)
+    $mmrpg_database_abilities_count = $db->get_value("SELECT
+        COUNT(abilities.ability_id) AS ability_count
+        FROM mmrpg_index_abilities AS abilities
+        WHERE abilities.ability_token <> 'ability'
+        AND abilities.ability_class <> 'system'
+        AND abilities.ability_flag_published = 1
+        AND abilities.ability_flag_hidden = 0
+        ;", 'ability_count');
 
-        // Define first ability token if not set
-        if (!isset($first_ability_token)){ $first_ability_token = $temp_token; }
+    // Select an ordered list of all abilities and then assign row numbers to them
+    $mmrpg_database_abilities_numbers = $db->get_array_list("SELECT
+        abilities.ability_token,
+        0 AS ability_key
+        FROM mmrpg_index_abilities AS abilities
+        LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
+        LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
+        WHERE abilities.ability_token <> 'ability'
+        AND abilities.ability_class <> 'system'
+        AND abilities.ability_flag_published = 1
+        ORDER BY
+        FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
+        groups.group_order ASC,
+        tokens.token_order ASC
+        ;", 'ability_token');
+    $ability_key = 1;
+    foreach ($mmrpg_database_abilities_numbers AS $token => $info){
+        $mmrpg_database_abilities_numbers[$token]['ability_key'] = $ability_key++;
+    }
 
-        // Send this data through the ability index parser
-        $temp_info = rpg_ability::parse_index_info($temp_info);
+    // Remove unallowed abilities from the database, and increment counters
+    if (!empty($mmrpg_database_abilities)){
+        foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
 
-        // Collect this ability's key in the index
-        $temp_info['ability_key'] = $mmrpg_database_abilities_numbers[$temp_token]['ability_key'];
+            // Send this data through the ability index parser
+            $temp_info = rpg_ability::parse_index_info($temp_info);
 
-        // Ensure this ability's image exists, else default to the placeholder
-        $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;
-        if ($temp_info['ability_flag_complete']){ $temp_info['ability_image'] = $temp_image_token; }
-        else { $temp_info['ability_image'] = 'ability'; }
-        $temp_info['ability_speed'] = isset($temp_info['ability_speed']) ? (int)($temp_info['ability_speed']) : 1;
-        $temp_info['ability_energy'] = isset($temp_info['ability_energy']) ? (int)($temp_info['ability_energy']) : 0;
+            // Collect this ability's key in the index
+            $temp_info['ability_key'] = $mmrpg_database_abilities_numbers[$temp_token]['ability_key'];
 
-        // Increment the corresponding type counter for this ability else the empty counter
-        if (!empty($temp_info['ability_type'])){
-            if (!isset($mmrpg_database_abilities_types[$temp_info['ability_type']])){ $mmrpg_database_abilities_types[$temp_info['ability_type']] = 0; }
-            $mmrpg_database_abilities_types[$temp_info['ability_type']]++;
+            // Ensure this ability's image exists, else default to the placeholder
+            $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;
+            if ($temp_info['ability_flag_complete']){ $temp_info['ability_image'] = $temp_image_token; }
+            else { $temp_info['ability_image'] = 'ability'; }
+            $temp_info['ability_speed'] = isset($temp_info['ability_speed']) ? (int)($temp_info['ability_speed']) : 1;
+            $temp_info['ability_energy'] = isset($temp_info['ability_energy']) ? (int)($temp_info['ability_energy']) : 0;
 
-            // Increment the corresponding type2 counter for this ability if not empty
-            if (!empty($temp_info['ability_type2'])){
-                if (!isset($mmrpg_database_abilities_types[$temp_info['ability_type2']])){ $mmrpg_database_abilities_types[$temp_info['ability_type2']] = 0; }
-                $mmrpg_database_abilities_types[$temp_info['ability_type2']]++;
+            // Increment the corresponding type counter for this ability else the empty counter
+            if (!empty($temp_info['ability_type'])){
+                if (!isset($mmrpg_database_abilities_types[$temp_info['ability_type']])){ $mmrpg_database_abilities_types[$temp_info['ability_type']] = 0; }
+                $mmrpg_database_abilities_types[$temp_info['ability_type']]++;
+
+                // Increment the corresponding type2 counter for this ability if not empty
+                if (!empty($temp_info['ability_type2'])){
+                    if (!isset($mmrpg_database_abilities_types[$temp_info['ability_type2']])){ $mmrpg_database_abilities_types[$temp_info['ability_type2']] = 0; }
+                    $mmrpg_database_abilities_types[$temp_info['ability_type2']]++;
+                }
+
+            } else {
+                $mmrpg_database_abilities_types['none']++;
             }
 
-        } else {
-            $mmrpg_database_abilities_types['none']++;
+            // Update the main database array with the changes
+            $mmrpg_database_abilities[$temp_token] = $temp_info;
+
         }
+    }
 
-        // Update the main database array with the changes
-        $mmrpg_database_abilities[$temp_token] = $temp_info;
+    // Save the cached data for abilities, ability count, and ability numbers
+    rpg_object::save_cached_index('database.abilities', $cache_token, array(
+        'mmrpg_database_abilities' => $mmrpg_database_abilities,
+        'mmrpg_database_abilities_count' => $mmrpg_database_abilities_count,
+        'mmrpg_database_abilities_numbers' => $mmrpg_database_abilities_numbers
+        ));
+}
 
+// If a filter function has been provided for this context, run it now
+if (isset($filter_mmrpg_database_abilities)
+    && is_callable($filter_mmrpg_database_abilities)){
+    $mmrpg_database_abilities = array_filter($mmrpg_database_abilities, $filter_mmrpg_database_abilities);
+}
+
+// If an update function gas been provided for this context, run it now
+if (isset($update_mmrpg_database_abilities)
+    && is_callable($update_mmrpg_database_abilities)){
+    $mmrpg_database_abilities = array_map($update_mmrpg_database_abilities, $mmrpg_database_abilities);
+}
+
+// Loop through and remove hidden abilities unless they're being viewed explicitly
+if (!empty($mmrpg_database_abilities)){
+    foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
+        if (!empty($temp_info['ability_flag_hidden'])
+            && $temp_info['ability_token'] !== $this_current_token){
+            unset($mmrpg_database_abilities[$temp_token]);
+        } elseif (!defined('DATA_DATABASE_SHOW_MECHAS')
+            && $temp_info['ability_class'] === 'mecha'){
+            unset($mmrpg_database_abilities[$temp_token]);
+        } elseif (!defined('DATA_DATABASE_SHOW_BOSSES')
+            && $temp_info['ability_class'] === 'boss'){
+            unset($mmrpg_database_abilities[$temp_token]);
+        }
     }
 }
 
@@ -128,6 +158,7 @@ $mmrpg_database_abilities_count_complete = 0;
 // Loop through the results and generate the links for these abilities
 if (!empty($mmrpg_database_abilities)){
     foreach ($mmrpg_database_abilities AS $ability_key => $ability_info){
+        if (!isset($first_ability_key)){ $first_ability_key = $ability_key; }
 
         // Do not show incomplete abilities in the link list
         $show_in_link_list = true;
@@ -173,7 +204,7 @@ if (!empty($mmrpg_database_abilities)){
         ob_start();
         ?>
         <div title="<?= $ability_title_text ?>" data-token="<?= $ability_info['ability_token'] ?>" class="float left link type <?= ($ability_image_incomplete ? 'inactive ' : '').(!empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none').(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : '') ?>">
-            <a class="sprite ability link mugshot size<?= $ability_image_size.($ability_key == $first_ability_token ? ' current' : '') ?>" href="<?= 'database/abilities/'.$ability_info['ability_token']?>/" rel="<?= $ability_image_incomplete ? 'nofollow' : 'follow' ?>">
+            <a class="sprite ability link mugshot size<?= $ability_image_size.($ability_key == $first_ability_key ? ' current' : '') ?>" href="<?= 'database/abilities/'.$ability_info['ability_token']?>/" rel="<?= $ability_image_incomplete ? 'nofollow' : 'follow' ?>">
                 <?php if($ability_image_token != 'ability'): ?>
                     <img src="<?= $ability_image_path ?>" width="<?= $ability_image_size ?>" height="<?= $ability_image_size ?>" alt="<?= $ability_title_text ?>" />
                 <?php else: ?>

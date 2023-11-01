@@ -11,184 +11,210 @@ $allow_class = array('all', 'master', 'mecha', 'boss');
 $filter_incomplete = isset($_GET['incomplete']) && $_GET['incomplete'] == 'include' ? false : true;
 $filter_class = !empty($_GET['class']) && in_array($_GET['class'], $allow_class) ? $_GET['class'] : 'all';
 
-// Generate filter strings for the robot queries
-$robot_filters = '';
-if ($filter_incomplete){ $robot_filters .= "AND robot_flag_complete = 1 "; }
-if ($filter_class != 'all'){ $robot_filters .= "AND robot_class = '{$filter_class}' "; }
+// Collect the type database files from the cache or manually
+$cache_kind = 'database.types.'.$filter_class;
+$cache_token = md5('database/types/website'.($filter_incomplete ? '/complete' : ''));
+$cached_index = rpg_object::load_cached_index($cache_kind, $cache_token);
+if (!empty($cached_index)){
 
-// Generate filter strings for the ability queries
-$ability_filters = '';
-if ($filter_incomplete){ $ability_filters .= "AND ability_flag_complete = 1 "; }
-if ($filter_class != 'all'){ $ability_filters .= "AND ability_class = '{$filter_class}' "; }
+    // Collect the cached data for types, type stats, and type totals
+    $filtered_type_stats = $cached_index['filtered_type_stats'];
+    $filtered_robot_total = $cached_index['filtered_robot_total'];
+    $filtered_ability_total = $cached_index['filtered_ability_total'];
+    unset($cached_index);
 
-// Collect an array of type statistics for distribution of robot cores, ability types, weaknesses, etc.
-$filtered_type_stats = $db->get_array_list("SELECT
-    types.type_id,
-    (CASE WHEN types.type_name = 'None' THEN 'Neutral' ELSE types.type_name END) AS type_name,
-    types.type_token,
-    types.type_colour_light,
-    types.type_colour_dark,
+} else {
 
-    -- Robot Cores
-    -- IFNULL(robots.robot_count, 0) AS robot_count,
-    -- IFNULL(robots2.robot_count, 0) AS robot_count2,
-    @robot_count := (IFNULL(robots.robot_count, 0) + IFNULL(robots2.robot_count, 0)) AS robot_count,
-    ROUND((((@robot_count) / robots3.robot_total) * 100), 1) AS robot_percent,
+    // Generate filter strings for the robot queries
+    $robot_filters = '';
+    if ($filter_incomplete){ $robot_filters .= "AND robot_flag_complete = 1 "; }
+    if ($filter_class != 'all'){ $robot_filters .= "AND robot_class = '{$filter_class}' "; }
 
-    -- Ability Types
-    -- IFNULL(abilities.ability_count, 0) AS ability_count,
-    -- IFNULL(abilities2.ability_count, 0) AS ability_count2,
-    @ability_count := (IFNULL(abilities.ability_count, 0) + IFNULL(abilities2.ability_count, 0)) AS ability_count,
-    ROUND((((@ability_count) / abilities3.ability_total) * 100), 1) AS ability_percent,
+    // Generate filter strings for the ability queries
+    $ability_filters = '';
+    if ($filter_incomplete){ $ability_filters .= "AND ability_flag_complete = 1 "; }
+    if ($filter_class != 'all'){ $ability_filters .= "AND ability_class = '{$filter_class}' "; }
 
-    -- Robot Weaknesses
-    @weakness_count := (SELECT
+    // Collect an array of type statistics for distribution of robot cores, ability types, weaknesses, etc.
+    $filtered_type_stats_query = "SELECT
+        types.type_id,
+        (CASE WHEN types.type_name = 'None' THEN 'Neutral' ELSE types.type_name END) AS type_name,
+        types.type_token,
+        types.type_colour_light,
+        types.type_colour_dark,
+
+        -- Robot Cores
+        -- IFNULL(robots.robot_count, 0) AS robot_count,
+        -- IFNULL(robots2.robot_count, 0) AS robot_count2,
+        @robot_count := (IFNULL(robots.robot_count, 0) + IFNULL(robots2.robot_count, 0)) AS robot_count,
+        ROUND((((@robot_count) / robots3.robot_total) * 100), 1) AS robot_percent,
+
+        -- Ability Types
+        -- IFNULL(abilities.ability_count, 0) AS ability_count,
+        -- IFNULL(abilities2.ability_count, 0) AS ability_count2,
+        @ability_count := (IFNULL(abilities.ability_count, 0) + IFNULL(abilities2.ability_count, 0)) AS ability_count,
+        ROUND((((@ability_count) / abilities3.ability_total) * 100), 1) AS ability_percent,
+
+        -- Robot Weaknesses
+        @weakness_count := (SELECT
+            COUNT(*) AS robot_count
+            FROM mmrpg_index_robots AS robots
+            WHERE
+            robot_id > 0
+            {$robot_filters}
+            AND robot_weaknesses LIKE CONCAT('%\"', types.type_token, '\"%')
+            ) AS weakness_count,
+        ROUND((((@weakness_count) / robots3.robot_total) * 100), 1) AS weakness_percent,
+
+        -- Robot Resistances
+        @resistance_count := (SELECT
+            COUNT(*) AS robot_count
+            FROM mmrpg_index_robots AS robots
+            WHERE
+            robot_id > 0
+            {$robot_filters}
+            AND robot_resistances LIKE CONCAT('%\"', types.type_token, '\"%')
+            ) AS resistance_count,
+        ROUND((((@resistance_count) / robots3.robot_total) * 100), 1) AS resistance_percent,
+
+        -- Robot Affinities
+        @affinity_count := (SELECT
+            COUNT(*) AS robot_count
+            FROM mmrpg_index_robots AS robots
+            WHERE
+            robot_id > 0
+            {$robot_filters}
+            AND robot_affinities LIKE CONCAT('%\"', types.type_token, '\"%')
+            ) AS affinity_count,
+        ROUND((((@affinity_count) / robots3.robot_total) * 100), 1) AS affinity_percent,
+
+        -- Robot Immunities
+        @immunity_count := (SELECT
+            COUNT(*) AS robot_count
+            FROM mmrpg_index_robots AS robots
+            WHERE
+            robot_id > 0
+            {$robot_filters}
+            AND robot_immunities LIKE CONCAT('%\"', types.type_token, '\"%')
+            ) AS immunity_count,
+        ROUND((((@immunity_count) / robots3.robot_total) * 100), 1) AS immunity_percent,
+
+        types.type_class
+
+        FROM mmrpg_index_types AS types
+
+        -- Robot Cores
+        LEFT JOIN (
+            SELECT
+            DISTINCT robot_core,
+            COUNT(*) AS robot_count
+            FROM mmrpg_index_robots AS robots
+            WHERE
+            robot_id > 0
+            {$robot_filters}
+            GROUP BY robot_core
+            ORDER BY robot_core
+            ) AS robots ON (
+                robots.robot_core = types.type_token
+                OR robots.robot_core = '' AND types.type_token = 'none'
+                )
+        LEFT JOIN (
+            SELECT
+            DISTINCT robot_core2,
+            COUNT(*) AS robot_count
+            FROM mmrpg_index_robots AS robots
+            WHERE
+            robot_id > 0
+            {$robot_filters}
+            AND robot_core2 <> ''
+            GROUP BY robot_core2
+            ORDER BY robot_core2
+            ) AS robots2 ON robots2.robot_core2 = types.type_token
+        CROSS JOIN (
+            SELECT
+            COUNT(*) AS robot_total
+            FROM mmrpg_index_robots AS robots
+            WHERE
+            robot_id > 0
+            {$robot_filters}
+            ) AS robots3
+
+        -- Ability Types
+        LEFT JOIN (
+            SELECT
+            DISTINCT ability_type,
+            COUNT(*) AS ability_count
+            FROM mmrpg_index_abilities AS abilities
+            WHERE
+            ability_id > 0
+            {$ability_filters}
+            GROUP BY ability_type
+            ORDER BY ability_type
+            ) AS abilities ON (
+                abilities.ability_type = types.type_token
+                OR abilities.ability_type = '' AND types.type_token = 'none'
+                )
+        LEFT JOIN (
+            SELECT
+            DISTINCT ability_type2,
+            COUNT(*) AS ability_count
+            FROM mmrpg_index_abilities AS abilities
+            WHERE
+            ability_id > 0
+            {$ability_filters}
+            AND ability_type <> ''
+            AND ability_type2 <> ''
+            GROUP BY ability_type2
+            ORDER BY ability_type2
+            ) AS abilities2 ON abilities2.ability_type2 = types.type_token
+        CROSS JOIN (
+            SELECT
+            COUNT(*) AS ability_total
+            FROM mmrpg_index_abilities AS abilities
+            WHERE
+            ability_id > 0
+            {$ability_filters}
+            ) AS abilities3
+
+        WHERE
+        type_id > 0
+        AND (types.type_class = 'normal' OR types.type_token = 'none')
+        ORDER BY
+        types.type_order ASC
+        ;";
+    $filtered_type_stats = $db->get_array_list($filtered_type_stats_query, 'type_token');
+
+    // Count the total number of filtered robots represented
+    $filtered_robot_total_query = "SELECT
         COUNT(*) AS robot_count
         FROM mmrpg_index_robots AS robots
         WHERE
         robot_id > 0
         {$robot_filters}
-        AND robot_weaknesses LIKE CONCAT('%\"', types.type_token, '\"%')
-        ) AS weakness_count,
-    ROUND((((@weakness_count) / robots3.robot_total) * 100), 1) AS weakness_percent,
+        ;";
+    $filtered_robot_total = $db->get_value($filtered_robot_total_query, 'robot_count');
 
-    -- Robot Resistances
-    @resistance_count := (SELECT
-        COUNT(*) AS robot_count
-        FROM mmrpg_index_robots AS robots
-        WHERE
-        robot_id > 0
-        {$robot_filters}
-        AND robot_resistances LIKE CONCAT('%\"', types.type_token, '\"%')
-        ) AS resistance_count,
-    ROUND((((@resistance_count) / robots3.robot_total) * 100), 1) AS resistance_percent,
-
-    -- Robot Affinities
-    @affinity_count := (SELECT
-        COUNT(*) AS robot_count
-        FROM mmrpg_index_robots AS robots
-        WHERE
-        robot_id > 0
-        {$robot_filters}
-        AND robot_affinities LIKE CONCAT('%\"', types.type_token, '\"%')
-        ) AS affinity_count,
-    ROUND((((@affinity_count) / robots3.robot_total) * 100), 1) AS affinity_percent,
-
-    -- Robot Immunities
-    @immunity_count := (SELECT
-        COUNT(*) AS robot_count
-        FROM mmrpg_index_robots AS robots
-        WHERE
-        robot_id > 0
-        {$robot_filters}
-        AND robot_immunities LIKE CONCAT('%\"', types.type_token, '\"%')
-        ) AS immunity_count,
-    ROUND((((@immunity_count) / robots3.robot_total) * 100), 1) AS immunity_percent,
-
-    types.type_class
-
-    FROM mmrpg_index_types AS types
-
-    -- Robot Cores
-    LEFT JOIN (
-        SELECT
-        DISTINCT robot_core,
-        COUNT(*) AS robot_count
-        FROM mmrpg_index_robots AS robots
-        WHERE
-        robot_id > 0
-        {$robot_filters}
-        GROUP BY robot_core
-        ORDER BY robot_core
-        ) AS robots ON (
-            robots.robot_core = types.type_token
-            OR robots.robot_core = '' AND types.type_token = 'none'
-            )
-    LEFT JOIN (
-        SELECT
-        DISTINCT robot_core2,
-        COUNT(*) AS robot_count
-        FROM mmrpg_index_robots AS robots
-        WHERE
-        robot_id > 0
-        {$robot_filters}
-        AND robot_core2 <> ''
-        GROUP BY robot_core2
-        ORDER BY robot_core2
-        ) AS robots2 ON robots2.robot_core2 = types.type_token
-    CROSS JOIN (
-        SELECT
-        COUNT(*) AS robot_total
-        FROM mmrpg_index_robots AS robots
-        WHERE
-        robot_id > 0
-        {$robot_filters}
-        ) AS robots3
-
-    -- Ability Types
-    LEFT JOIN (
-        SELECT
-        DISTINCT ability_type,
+    // Count the total number of abilities represented
+    $filtered_ability_total_query = "SELECT
         COUNT(*) AS ability_count
         FROM mmrpg_index_abilities AS abilities
         WHERE
         ability_id > 0
         {$ability_filters}
-        GROUP BY ability_type
-        ORDER BY ability_type
-        ) AS abilities ON (
-            abilities.ability_type = types.type_token
-            OR abilities.ability_type = '' AND types.type_token = 'none'
-            )
-    LEFT JOIN (
-        SELECT
-        DISTINCT ability_type2,
-        COUNT(*) AS ability_count
-        FROM mmrpg_index_abilities AS abilities
-        WHERE
-        ability_id > 0
-        {$ability_filters}
-        AND ability_type <> ''
-        AND ability_type2 <> ''
-        GROUP BY ability_type2
-        ORDER BY ability_type2
-        ) AS abilities2 ON abilities2.ability_type2 = types.type_token
-    CROSS JOIN (
-        SELECT
-        COUNT(*) AS ability_total
-        FROM mmrpg_index_abilities AS abilities
-        WHERE
-        ability_id > 0
-        {$ability_filters}
-        ) AS abilities3
+        ;";
+    $filtered_ability_total = $db->get_value($filtered_ability_total_query, 'ability_count');
 
-    WHERE
-    type_id > 0
-    AND (types.type_class = 'normal' OR types.type_token = 'none')
-    ORDER BY
-    types.type_order ASC
-    ;", 'type_token');
-
-// Count the total number of filtered robots represented
-$filtered_robot_total = $db->get_value("SELECT
-    COUNT(*) AS robot_count
-    FROM mmrpg_index_robots AS robots
-    WHERE
-    robot_id > 0
-    {$robot_filters}
-    ;", 'robot_count');
-
-// Count the total number of abilities represented
-$filtered_ability_total = $db->get_value("SELECT
-    COUNT(*) AS ability_count
-    FROM mmrpg_index_abilities AS abilities
-    WHERE
-    ability_id > 0
-    {$ability_filters}
-    ;", 'ability_count');
+    // Save the cached data for fields, field count, and field numbers
+    rpg_object::save_cached_index($cache_kind, $cache_token, array(
+        'filtered_type_stats' => $filtered_type_stats,
+        'filtered_robot_total' => $filtered_robot_total,
+        'filtered_ability_total' => $filtered_ability_total
+        ));
+}
 
 // Define the stat types we should be tracking
 $stat_categories = array('robot', 'ability', 'weakness', 'resistance', 'affinity', 'immunity');
+
 // Loop through collected type stats and break down into categories
 $type_stats_index = array();
 if (!empty($filtered_type_stats)){

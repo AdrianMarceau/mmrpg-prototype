@@ -3,45 +3,87 @@
 // Define ROBOT preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'robots'){
     // If we're not on the full robot index, only show preview robots
-    $mmrpg_database_robots_filter = "AND ((robots.robot_token IN ('mega-man', 'bass', 'proto-man') OR robots.robot_game IN ('MM1', 'MMPU')) AND robots.robot_core <> '') ";
+    $filter_mmrpg_database_robots = function($robot){
+        if (in_array($robot['robot_token'], array('mega-man', 'bass', 'proto-man'))){ return true; }
+        elseif (in_array($robot['robot_token'], array('roll', 'disco', 'rhythm'))){ return true; }
+        elseif (in_array($robot['robot_game'], array('MM1', 'MMPU'))){ return true; }
+        return false;
+        };
 }
 
 // Define MECHA preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'mechas'){
     // If we're not on the full mecha index, only show preview mechas
-    $mmrpg_database_mechas_filter = "AND (robots.robot_token IN ('met') OR (fields.field_type <> '' AND fields.field_game IN ('MM1'))) ";
+    $filter_mmrpg_database_mechas = function($robot){
+        if ($robot['robot_token'] == 'met'){ return true; }
+        elseif (in_array($robot['robot_group'], array('MM01'))){ return true; }
+        return false;
+        };
 }
 
 // Define BOSS preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'bosses'){
     // If we're not on the full boss index, only show preview bosses
-    $mmrpg_database_bosses_filter = "AND (robots.robot_game IN ('MMI', 'MMII', 'MMIII', 'MMIV', 'MMRPGP') AND robots.robot_token NOT IN ('trill', 'slur')) ";
+    $filter_mmrpg_database_bosses = function($robot){
+        if (in_array($robot['robot_token'], array('trill', 'slur', 'doc-robot', 'enker', 'punk', 'ballade'))){ return true; }
+        return false;
+        };
 }
 
 // Define ABILITY preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'abilities'){
     // If we're not on the full ability index, only show preview abilities
-    $mmrpg_database_abilities_filter = "AND (abilities.ability_token IN ('buster-shot') OR (
-        (abilities.ability_master IN ('mega-man', 'bass', 'proto-man') AND abilities.ability_energy = 2) OR
-        (abilities.ability_game = 'MM1' AND abilities.ability_energy = 4)
-        )) ";
+    $filter_mmrpg_database_abilities = function($ability){
+        if ($ability['ability_token'] == 'buster-shot'){ return true; }
+        elseif ($ability['ability_energy'] == 2 && in_array($ability['ability_master'], array('mega-man', 'bass', 'proto-man'))){ return true; }
+        elseif ($ability['ability_energy'] == 4 && $ability['ability_game'] == 'MM1'){ return true; }
+        return false;
+        };
+    $update_mmrpg_database_abilities = function($ability){
+        if ($ability['ability_game'] == 'MM1'){ $ability['ability_group'] = 'MM01'; }
+        return $ability;
+        };
 }
 
 // Define ITEM preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'items'){
     // If we're not on the full item index, only show preview items
-    $mmrpg_database_items_filter = "AND items.item_token IN (
-        'small-screw', 'large-screw',
-        'energy-pellet', 'energy-capsule',
-        'weapon-pellet', 'weapon-capsule',
-        'energy-tank', 'weapon-tank'
-        ) ";
+    $filter_mmrpg_database_items = function($item){
+        if (in_array($item['item_token'], array(
+            'small-screw', 'large-screw',
+            'energy-pellet', 'energy-capsule',
+            'weapon-pellet', 'weapon-capsule',
+            'energy-tank', 'weapon-tank'
+            ))){ return true; }
+        return false;
+        };
+    $update_mmrpg_database_items = function($item){
+        if (in_array($item['item_token'], array(
+            'small-screw', 'large-screw'
+            ))){ $item['item_group'] = 'MM01A'; }
+        elseif (in_array($item['item_token'], array(
+            'energy-pellet', 'energy-capsule',
+            'weapon-pellet', 'weapon-capsule',
+            'energy-tank', 'weapon-tank'
+            ))){ $item['item_group'] = 'MM01B'; }
+        return $item;
+        };
+
 }
 
 // Define FIELD preview fields if we're not in a specific sub-index
 if ($this_current_sub != 'fields'){
     // If we're not on the full field index, only show preview fields
-    $mmrpg_database_fields_filter = "AND (fields.field_token IN ('gentle-countryside') OR (fields.field_game IN ('MM1') AND fields.field_type <> '')) ";
+    $filter_mmrpg_database_fields = function($field){
+        if (in_array($field['field_token'], array('gentle-countryside', 'maniacal-hideaway', 'wintry-forefront'))){ return true; }
+        elseif ($field['field_game'] == 'MM1' && !empty($field['field_type'])){ return true; }
+        return false;
+        };
+    $update_mmrpg_database_fields = function($field){
+        if (in_array($field['field_token'], array('gentle-countryside', 'maniacal-hideaway', 'wintry-forefront'))){ $field['field_group'] = 'MM00'; }
+        elseif ($field['field_game'] == 'MM1'){ $field['field_group'] = 'MM01'; }
+        return $field;
+        };
 }
 
 

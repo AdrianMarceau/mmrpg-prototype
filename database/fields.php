@@ -6,86 +6,116 @@
 $hidden_database_fields = array();
 $hidden_database_fields_count = !empty($hidden_database_fields) ? count($hidden_database_fields) : 0;
 
-// Define the hidden field query condition
-$temp_condition = '';
-$temp_condition .= "AND fields.field_class <> 'system' ";
-if (!empty($hidden_database_fields)){
-    $temp_tokens = array();
-    foreach ($hidden_database_fields AS $token){ $temp_tokens[] = "'".$token."'"; }
-    $temp_condition .= 'AND fields.field_token NOT IN ('.implode(',', $temp_tokens).') ';
+// Collect the field database files from the cache or manually
+$cache_token = md5('database/fields/website');
+$cached_index = rpg_object::load_cached_index('database.fields', $cache_token);
+if (!empty($cached_index)){
+
+    // Collect the cached data for fields, field count, and field numbers
+    $mmrpg_database_fields = $cached_index['mmrpg_database_fields'];
+    $mmrpg_database_fields_count = $cached_index['mmrpg_database_fields_count'];
+    $mmrpg_database_fields_numbers = $cached_index['mmrpg_database_fields_numbers'];
+    unset($cached_index);
+
+} else {
+
+    // Collect the database fields
+    $field_fields = rpg_field::get_index_fields(true, 'fields');
+    $mmrpg_database_fields = $db->get_array_list("SELECT
+        {$field_fields},
+        groups.group_token AS field_group,
+        tokens.token_order AS field_order
+        FROM mmrpg_index_fields AS fields
+        LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
+        LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
+        WHERE fields.field_token <> 'field'
+        AND fields.field_class <> 'system'
+        AND fields.field_flag_published = 1
+        ORDER BY
+        groups.group_order ASC,
+        tokens.token_order ASC
+        ;", 'field_token');
+
+    // Count the database fields in total (without filters)
+    $mmrpg_database_fields_count = $db->get_value("SELECT
+        COUNT(fields.field_id) AS field_count
+        FROM mmrpg_index_fields AS fields
+        WHERE fields.field_token <> 'field'
+        AND fields.field_class <> 'system'
+        AND fields.field_flag_published = 1
+        AND fields.field_flag_hidden = 0
+        ;", 'field_count');
+
+    // Select an ordered list of all fields and then assign row numbers to them
+    $mmrpg_database_fields_numbers = $db->get_array_list("SELECT
+        fields.field_token,
+        0 AS field_key
+        FROM mmrpg_index_fields AS fields
+        LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
+        LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
+        WHERE fields.field_token <> 'field'
+        AND fields.field_class <> 'system'
+        AND fields.field_flag_published = 1
+        ORDER BY
+        groups.group_order ASC,
+        tokens.token_order ASC
+        ;", 'field_token');
+    $field_key = 1;
+    foreach ($mmrpg_database_fields_numbers AS $token => $info){
+        $mmrpg_database_fields_numbers[$token]['field_key'] = $field_key++;
+    }
+
+    // Remove unallowed fields from the database
+    if (!empty($mmrpg_database_fields)){
+        foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
+
+            // Send this data through the field index parser
+            $temp_info = rpg_field::parse_index_info($temp_info);
+
+            // Collect this field's key in the index
+            $temp_info['field_key'] = $mmrpg_database_fields_numbers[$temp_token]['field_key'];
+
+            if (in_array($temp_token, $hidden_database_fields)){
+                unset($mmrpg_database_fields[$temp_token]);
+            } else {
+                // Ensure this field's image exists, else default to the placeholder
+                if ($temp_info['field_flag_complete']){ $temp_info['field_image'] = $temp_token; }
+                else { $temp_info['field_image'] = 'field'; }
+            }
+
+            // Update the data in the fields index array
+            $mmrpg_database_fields[$temp_token] = $temp_info;
+
+        }
+    }
+
+    // Save the cached data for fields, field count, and field numbers
+    rpg_object::save_cached_index('database.fields', $cache_token, array(
+        'mmrpg_database_fields' => $mmrpg_database_fields,
+        'mmrpg_database_fields_count' => $mmrpg_database_fields_count,
+        'mmrpg_database_fields_numbers' => $mmrpg_database_fields_numbers
+        ));
 }
-// If additional database filters were provided
-$temp_condition_unfiltered = $temp_condition;
-if (isset($mmrpg_database_fields_filter)){
-    if (!preg_match('/^\s?(AND|OR)\s+/i', $mmrpg_database_fields_filter)){ $temp_condition .= 'AND ';  }
-    $temp_condition .= $mmrpg_database_fields_filter;
+
+// If a filter function has been provided for this context, run it now
+if (isset($filter_mmrpg_database_fields)
+    && is_callable($filter_mmrpg_database_fields)){
+    $mmrpg_database_fields = array_filter($mmrpg_database_fields, $filter_mmrpg_database_fields);
 }
 
-// Collect the database fields
-$field_fields = rpg_field::get_index_fields(true, 'fields');
-$mmrpg_database_fields = $db->get_array_list("SELECT
-    {$field_fields},
-    groups.group_token AS field_group,
-    tokens.token_order AS field_order
-    FROM mmrpg_index_fields AS fields
-    LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
-    LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
-    WHERE fields.field_id <> 0 AND fields.field_token <> 'field' AND fields.field_class <> 'system'
-    AND fields.field_flag_published = 1 AND (fields.field_flag_hidden = 0 OR fields.field_token = '{$this_current_token}') {$temp_condition}
-    ORDER BY
-    groups.group_order ASC,
-    tokens.token_order ASC
-    ;", 'field_token');
-
-// Count the database fields in total (without filters)
-$mmrpg_database_fields_count = $db->get_value("SELECT
-    COUNT(fields.field_id) AS field_count
-    FROM mmrpg_index_fields AS fields
-    WHERE fields.field_flag_published = 1 AND fields.field_flag_hidden = 0 {$temp_condition_unfiltered}
-    ;", 'field_count');
-
-// Select an ordered list of all fields and then assign row numbers to them
-$mmrpg_database_fields_numbers = $db->get_array_list("SELECT
-    fields.field_token,
-    0 AS field_key
-    FROM mmrpg_index_fields AS fields
-    LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
-    LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
-    WHERE fields.field_id <> 0 AND fields.field_token <> 'field' AND fields.field_class <> 'system'
-    AND fields.field_flag_published = 1 {$temp_condition_unfiltered}
-    ORDER BY
-    groups.group_order ASC,
-    tokens.token_order ASC
-    ;", 'field_token');
-$field_key = 1;
-foreach ($mmrpg_database_fields_numbers AS $token => $info){
-    $mmrpg_database_fields_numbers[$token]['field_key'] = $field_key++;
+// If an update function gas been provided for this context, run it now
+if (isset($update_mmrpg_database_fields)
+    && is_callable($update_mmrpg_database_fields)){
+    $mmrpg_database_fields = array_map($update_mmrpg_database_fields, $mmrpg_database_fields);
 }
 
-// Remove unallowed fields from the database
+// Loop through and remove hidden fields unless they're being viewed explicitly
 if (!empty($mmrpg_database_fields)){
     foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
-
-        // Define first field token if not set
-        if (!isset($first_field_token)){ $first_field_token = $temp_token; }
-
-        // Send this data through the field index parser
-        $temp_info = rpg_field::parse_index_info($temp_info);
-
-        // Collect this field's key in the index
-        $temp_info['field_key'] = $mmrpg_database_fields_numbers[$temp_token]['field_key'];
-
-        if (in_array($temp_token, $hidden_database_fields)){
+        if (!empty($temp_info['field_flag_hidden'])
+            && $temp_info['field_token'] !== $this_current_token){
             unset($mmrpg_database_fields[$temp_token]);
-        } else {
-            // Ensure this field's image exists, else default to the placeholder
-            if ($temp_info['field_flag_complete']){ $temp_info['field_image'] = $temp_token; }
-            else { $temp_info['field_image'] = 'field'; }
         }
-
-        // Update the data in the fields index array
-        $mmrpg_database_fields[$temp_token] = $temp_info;
-
     }
 }
 
@@ -100,6 +130,7 @@ $mmrpg_database_fields_count_complete = 0;
 // Loop through the results and generate the links for these fields
 if (!empty($mmrpg_database_fields)){
     foreach ($mmrpg_database_fields AS $field_key => $field_info){
+        if (!isset($first_field_key)){ $first_field_key = $field_key; }
 
         // Do not show incomplete fields in the link list
         $show_in_link_list = true;
@@ -135,7 +166,7 @@ if (!empty($mmrpg_database_fields)){
         ob_start();
         ?>
         <div title="<?= $field_title_text ?>" data-token="<?= $field_info['field_token'] ?>" class="float left link type <?= ($field_image_incomplete  ? 'inactive ' : '').($field_type_token) ?>">
-            <a class="sprite field link mugshot size40 <?= ($field_key == $first_field_token ? ' current' : '') ?>" href="<?= 'database/fields/'.$field_info['field_token'].'/'?>" rel="<?= $field_image_incomplete ? 'nofollow' : 'follow' ?>">
+            <a class="sprite field link mugshot size40 <?= ($field_key == $first_field_key ? ' current' : '') ?>" href="<?= 'database/fields/'.$field_info['field_token'].'/'?>" rel="<?= $field_image_incomplete ? 'nofollow' : 'follow' ?>">
                 <?php if($field_image_token != 'field'): ?>
                     <img src="<?= $field_image_path ?>" width="<?= $field_image_size ?>" height="<?= $field_image_size ?>" alt="<?= $field_title_text ?>" />
                 <?php else: ?>
