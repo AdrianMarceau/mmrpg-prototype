@@ -3494,7 +3494,16 @@ function mmrpg_prototype_leaderboard_index($board_metric = ''){
         // Collect the array for pulling all the leaderboard data
         $temp_leaderboard_query = mmrpg_prototype_leaderboard_index_query($board_metric);
         // Query the database and collect the array list of all online players
-        $this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
+        $cache_kind = 'leaderboard.'.$board_metric;
+        $cache_token = md5($temp_leaderboard_query);
+        $cached_index = rpg_object::load_cached_index($cache_kind, $cache_token, MMRPG_CONFIG_LAST_SAVE_DATE);
+        if (!empty($cached_index)){
+            $this_leaderboard_index = $cached_index;
+            unset($cached_index);
+        } else {
+            $this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
+            rpg_object::save_cached_index($cache_kind, $cache_token, $this_leaderboard_index);
+        }
         // Update the database index cache
         //error_log('adding new index for '.$board_metric);
         $db->INDEX['LEADERBOARD']['index'][$board_metric] = $this_leaderboard_index; //json_encode($this_leaderboard_index);
