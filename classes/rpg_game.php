@@ -1555,27 +1555,35 @@ class rpg_game {
 
     // Define a function for getting a game name given a source code for that game
     public static function get_source_index(){
-        global $db;
         static $source_index;
         if (empty($source_index)){
-            $source_index = $db->get_array_list("SELECT
-                source_token,
-                source_kind,
-                source_name,
-                source_name_aka,
-                source_series,
-                source_subseries,
-                source_systems,
-                source_year,
-                source_flag_published,
-                source_flag_hidden,
-                source_flag_canon,
-                source_flag_fanon,
-                source_order
-                FROM mmrpg_index_sources
-                WHERE source_flag_published = 1
-                ORDER BY source_order
-                ;", 'source_token');
+            $cache_token = md5(MMRPG_BUILD);
+            $cached_index = rpg_object::load_cached_index('game.sources', $cache_token);
+            if (!empty($cached_index)){
+                $source_index = $cached_index;
+                unset($cached_index);
+            } else {
+                global $db;
+                $source_index = $db->get_array_list("SELECT
+                    source_token,
+                    source_kind,
+                    source_name,
+                    source_name_aka,
+                    source_series,
+                    source_subseries,
+                    source_systems,
+                    source_year,
+                    source_flag_published,
+                    source_flag_hidden,
+                    source_flag_canon,
+                    source_flag_fanon,
+                    source_order
+                    FROM mmrpg_index_sources
+                    WHERE source_flag_published = 1
+                    ORDER BY source_order
+                    ;", 'source_token');
+                rpg_object::save_cached_index('game.sources', $cache_token, $source_index);
+            }
         }
         return $source_index;
     }
