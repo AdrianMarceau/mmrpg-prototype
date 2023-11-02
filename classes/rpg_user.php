@@ -496,14 +496,14 @@ class rpg_user {
         static $full_permissions_index;
         static $user_permissions_index = array();
         // Populate the default permissions for guests and members if not already done
-        if ($full_permissions_index){
+        if (empty($full_permissions_index)){
             $cache_token = md5(MMRPG_BUILD);
             $cached_index = rpg_object::load_cached_index('users.permissions', $cache_token);
             if (!empty($cached_index)){
                $full_permissions_index = $cached_index;
                unset($cached_index);
             } else {
-                $full_permissions_index = $db->get_array("SELECT * FROM mmrpg_users_permissions;");
+                $full_permissions_index = $db->get_array_list("SELECT * FROM mmrpg_users_permissions;", 'user_id');
                 rpg_object::save_cached_index('users.permissions', $cache_token, $full_permissions_index);
             }
         }
