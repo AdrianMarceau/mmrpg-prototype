@@ -187,7 +187,7 @@ class rpg_mission_double extends rpg_mission {
                 if (empty($temp_possible_visitors)){
                     //error_log('$temp_possible_visitors = '.print_r($temp_possible_visitors, true));
                     $temp_possible_visitors = array();
-                    $temp_possible_visitors_raw = $db->get_array_list("SELECT
+                    $temp_possible_visitors_query = "SELECT
                         `robots`.`robot_token`,
                         `robots`.`robot_core`
                         FROM `mmrpg_index_robots` AS `robots`
@@ -206,7 +206,16 @@ class rpg_mission_double extends rpg_mission {
                         ORDER BY
                         `groups`.`group_order` ASC,
                         `tokens`.`token_order` ASC
-                        ;");
+                        ;";
+                    $cache_token = md5($temp_possible_visitors_query);
+                    $cached_index = rpg_object::load_cached_index('missions.double.visitors', $cache_token);
+                    if (!empty($cached_index)){
+                        $temp_possible_visitors_raw = $cached_index;
+                        unset($cached_index);
+                    } else {
+                        $temp_possible_visitors_raw = $db->get_array_list($temp_possible_visitors_query);
+                        rpg_object::save_cached_index('missions.double.visitors', $cache_token, $temp_possible_visitors_raw);
+                    }
                     //error_log('$temp_possible_visitors_raw = '.print_r($temp_possible_visitors_raw, true));
                     if (!empty($temp_possible_visitors_raw)){
                         foreach($temp_possible_visitors_raw AS $key => $info){
