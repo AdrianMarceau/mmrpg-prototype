@@ -3087,18 +3087,6 @@ class rpg_robot extends rpg_object {
         // If empty, return nothing
         if (empty($robot_token)){ return false; };
 
-        // If the template robot was requested
-        if ($robot_token === 'robot'){
-            static $template_robot_info;
-            if (empty($template_robot_info)){
-                global $db;
-                $fields = self::get_index_fields(true);
-                $template_robot_info = $db->get_array("SELECT {$fields} FROM mmrpg_index_robots WHERE robot_token = 'robot';");
-                $template_robot_info = self::parse_index_info($template_robot_info);
-            }
-            return $template_robot_info;
-        }
-
         // Collect a local copy of the robot index
         static $robot_index = false;
         static $robot_index_byid = false;
