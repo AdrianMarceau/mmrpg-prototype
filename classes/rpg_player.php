@@ -2351,18 +2351,6 @@ class rpg_player extends rpg_object {
         // If empty, return nothing
         if (empty($player_token)){ return false; };
 
-        // If the template player was requested
-        if ($player_token === 'player'){
-            static $template_player_info;
-            if (empty($template_player_info)){
-                global $db;
-                $fields = self::get_index_fields(true);
-                $template_player_info = $db->get_array("SELECT {$fields} FROM mmrpg_index_players WHERE player_token = 'player';");
-                $template_player_info = self::parse_index_info($template_player_info);
-            }
-            return $template_player_info;
-        }
-
         // Collect a local copy of the player index
         static $player_index = false;
         static $player_index_byid = false;
