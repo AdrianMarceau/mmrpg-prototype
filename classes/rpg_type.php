@@ -124,79 +124,29 @@ class rpg_type {
 
     }
 
-    /**
-     * Get the tokens for all types in the global index
-     * @return array
-     */
+    // Define a function for pulling only the tokens for a given index request
     public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $include_special = true, $include_pseudo_special = true){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Define the query condition based on args
-        $temp_where = '';
-        if (!$include_hidden){ $temp_where .= 'AND type_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND type_flag_published = 1 '; }
-        if (!$include_special){ $temp_where .= 'AND type_class <> \'special\' '; }
-        if (!$include_pseudo_special){ $temp_where .= 'AND type_token <> \'none\' AND type_token <> \'copy\' '; }
-        elseif ($include_pseudo_special === true){ $temp_where .= "OR type_token IN ('none','copy') "; }
-
-        // Collect an array of type tokens from the database
-        $type_index = $db->get_array_list("SELECT type_token FROM mmrpg_index_types WHERE type_id <> 0 {$temp_where};", 'type_token');
-
-        // Return the tokens if not empty, else nothing
-        if (!empty($type_index)){
-            $type_tokens = array_keys($type_index);
-            return $type_tokens;
-        } else {
-            return array();
-        }
-
+        $index = self::get_index($include_hidden, $include_unpublished, $include_special, $include_pseudo_special);
+        return array_keys($index);
     }
 
-    // Define a function for pulling a custom type index
-    public static function get_index_custom($type_tokens = array()){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Generate a token string for the database query
-        $type_tokens_string = array();
-        foreach ($type_tokens AS $type_token){ $type_tokens_string[] = "'{$type_token}'"; }
-        $type_tokens_string = implode(', ', $type_tokens_string);
-
-        // Collect the requested type's info from the database index
-        $type_fields = self::get_index_fields(true);
-        $type_index = $db->get_array_list("SELECT {$type_fields} FROM mmrpg_index_types WHERE type_token IN ({$type_tokens_string});", 'type_token');
-
-        // Parse and return the data if not empty, else nothing
-        if (!empty($type_index)){
-            $type_index = self::parse_index($type_index);
-            return $type_index;
-        } else {
-            return array();
+    // Define a function for pulling a custom index given a list of tokens
+    public static function get_index_custom($tokens = array()){
+        if (empty($tokens)){ return array(); }
+        $index = self::get_index();
+        foreach ($index AS $token => $info){
+            if (!in_array($token, $tokens)){
+                unset($index[$token]);
+            }
         }
-
+        return $index;
     }
 
     // Define a public function for collecting index data from the database
     public static function get_index_info($type_token){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Collect this type's info from the database index
-        $type_fields = self::get_index_fields(true);
-        $type_index = $db->get_array("SELECT {$type_fields} FROM mmrpg_index_types WHERE type_token = '{$type_token}';", 'type_token');
-
-        // Parse and return the data if not empty, else nothing
-        if (!empty($type_index)){
-            $type_index = self::parse_index_info($type_index);
-            return $type_index;
-        } else {
-            return array();
-        }
-
+        static $type_index;
+        if (empty($type_index)){ $type_index = self::get_index(true, false, true); }
+        return isset($type_index[$type_token]) ? $type_index[$type_token] : array();
     }
 
     // Define a public function for parsing a type index array in bulk
