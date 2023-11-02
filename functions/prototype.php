@@ -1641,16 +1641,13 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     global $star_shake_delay;
     if (empty($star_shake_delay)){ $star_shake_delay = array(); }
     if (empty($star_shake_delay[$player_token])){ $star_shake_delay[$player_token] = 0; }
-    static $mmrpg_index_fields, $mmrpg_index_players;
+    static $mmrpg_index_fields, $mmrpg_index_players, $mmrpg_index_robots;
     if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(true); }
     if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true, false, '', array('player')); }
+    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
 
     // Define the variable to collect option markup
     $this_markup = '';
-
-    // Collect the robot index for calculation purposes
-    $db_robot_fields = rpg_robot::get_index_fields(true);
-    $this_robot_index = $db->get_array_list("SELECT {$db_robot_fields} FROM `mmrpg_index_robots` WHERE `robot_flag_complete` = 1;", 'robot_token');
 
     // Count the number of completed battle options for this group and update the variable
     $battle_options_reversed = $battle_options; //array_reverse($battle_options);
@@ -1846,7 +1843,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 foreach ($this_targetinfo['player_robots'] AS $robo_key => $this_robotinfo){
                     //if (empty($this_robotinfo['robot_token'])){ die('<pre>'.$this_battleinfo['battle_token'].print_r($this_robotinfo, true).'</pre>'); }
                     if ($this_robotinfo['robot_token'] == 'robot'){ unset($this_targetinfo['player_robots'][$robo_key]); continue; }
-                    if (isset($this_robot_index[$this_robotinfo['robot_token']])){ $this_robotindex = rpg_robot::parse_index_info($this_robot_index[$this_robotinfo['robot_token']]); }
+                    if (isset($mmrpg_index_robots[$this_robotinfo['robot_token']])){ $this_robotindex = $mmrpg_index_robots[$this_robotinfo['robot_token']]; }
                     else { continue; }
                     $temp_robot_tokens[] = $this_robotinfo['robot_token'];
                     $this_robotinfo = array_merge($this_robotindex, $this_robotinfo);
