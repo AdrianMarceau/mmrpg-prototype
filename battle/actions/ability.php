@@ -3,6 +3,10 @@
 // -- ABILITY BATTLE ACTION -- //
 //error_log('battle/actions/ability.php');
 
+// Pre-collect the ability and item indexes so we have a reference
+$mmrpg_index_abilities = rpg_ability::get_index(true);
+//$mmrpg_index_items = rpg_item::get_index(true);
+
 // Increment the battle's turn counter by 1
 $this_battle->counters['battle_turn'] += 1;
 $this_battle->update_session();
@@ -147,7 +151,7 @@ else {
 
 // Create the temporary ability object for this player's robot
 list($temp_id, $temp_token) = explode('_', $this_action_token); //array('ability_token' => $this_action_token);
-$temp_abilityinfo = rpg_ability::get_index_info($temp_token);
+$temp_abilityinfo = $mmrpg_index_abilities[$temp_token];
 $temp_abilityinfo['ability_id'] = $temp_id;
 $temp_thisability = rpg_game::get_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
 
@@ -162,12 +166,9 @@ if (empty($this_robot)){
 $temp_active_target_robot_abilities = $active_target_robot->robot_abilities;
 
 // Loop through the target robot's current abilities and check weapon energy
-$db_ability_fields = rpg_ability::get_index_fields(true);
-$temp_ability_tokens = "'".implode("', '", array_values($active_target_robot->robot_abilities))."'";
-$temp_abilities_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
 foreach ($active_target_robot->robot_abilities AS $key => $token){
     // Collect the data for this ability from the index
-    $info = rpg_ability::parse_index_info($temp_abilities_index[$token]);
+    $info = $mmrpg_index_abilities[$token];
     if (empty($info)){ unset($active_target_robot->robot_abilities[$key]); continue; }
     $temp_ability = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $info);
     // Determine how much weapon energy this should take
@@ -216,7 +217,7 @@ $temp_targetplayer_bulwark_robots = $target_player->get_value('bulwark_robots');
 // Create the temporary ability object for the target player's robot
 $temp_abilityinfo = array();
 list($temp_abilityinfo['ability_id'], $temp_abilityinfo['ability_token']) = explode('_', $target_action_token);
-$temp_indexinfo = rpg_ability::get_index_info($temp_abilityinfo['ability_token']);
+$temp_indexinfo = $mmrpg_index_abilities[$temp_abilityinfo['ability_token']];
 $temp_abilityinfo = array_merge($temp_indexinfo, $temp_abilityinfo);
 $temp_targetability = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $temp_abilityinfo);
 
