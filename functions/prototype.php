@@ -3392,12 +3392,12 @@ function mmrpg_prototype_leaderboard_index_query($board_metric = '', $display_li
         -- board.board_points_dr_wily,
         -- board.board_points_dr_cossack,
         board.board_items,
-        board.board_robots,
+        '' AS board_robots, -- board.board_robots,
         -- board.board_robots_dr_light,
         -- board.board_robots_dr_wily,
         -- board.board_robots_dr_cossack,
         board.board_robots_count,
-        board.board_battles,
+        '' AS board_battles, -- board.board_battles,
         -- board.board_battles_dr_light,
         -- board.board_battles_dr_wily,
         -- board.board_battles_dr_cossack,
@@ -4053,25 +4053,52 @@ function mmrpg_prototype_get_current_rogue_star($force_refresh = false){
             ORDER BY stars.star_id ASC
             LIMIT 1
             ;");
-        $star_searched = true;
+        $_SESSION['STARS']['ROGUE_STAR'] = $this_rogue_star;
+    } else {
+        $this_rogue_star = $_SESSION['STARS']['ROGUE_STAR'];
     }
     return $this_rogue_star;
 }
 
-// Define a function for checking the battle's prototype points total
-function mmrpg_prototype_database_summoned($robot_token = ''){
+// Define a function for a given database record a given robot, assuming it has that data
+function mmrpg_prototype_database_records($robot_token = ''){
+    // Return the current point total for thisgame
+    $session_token = mmrpg_game_token();
+    // If the robot token was not defined, we can return the whole database
+    if (empty($robot_token)){
+        if (!empty($_SESSION[$session_token]['values'])
+            && !empty($_SESSION[$session_token]['values']['robot_database'])){
+            return $_SESSION[$session_token]['values']['robot_database'];
+        } else {
+            return array();
+        }
+    }
+    // Else we need to return the specific record for the given robot
+    else {
+        if (!empty($_SESSION[$session_token]['values'])
+            && !empty($_SESSION[$session_token]['values']['robot_database'])
+            && !empty($_SESSION[$session_token]['values']['robot_database'][$robot_token])){
+            return $_SESSION[$session_token]['values']['robot_database'][$robot_token];
+        } else {
+            return array();
+        }
+    }
+}
+
+// Define a function for a given database record a given robot, assuming it has that data
+function mmrpg_prototype_database_record($record_key, $robot_token = ''){
     // Define static variables amd populate if necessary
     static $this_count_array;
     // Return the current point total for thisgame
     $session_token = mmrpg_game_token();
     // Check if the array is empty and populate if not
     if (empty($this_count_array)){
-        // Define the array to hold all the summon counts
+        // Define the array to hold all the record counts
         $this_count_array = array();
         // If the robot database array is not empty, loop through it
         if (!empty($_SESSION[$session_token]['values']['robot_database'])){
             foreach ($_SESSION[$session_token]['values']['robot_database'] AS $token => $info){
-                if (!empty($info['robot_summoned'])){ $this_count_array[$token] = $info['robot_summoned']; }
+                if (!empty($info[$record_key])){ $this_count_array[$token] = $info[$record_key]; }
             }
         }
     }
@@ -4087,6 +4114,21 @@ function mmrpg_prototype_database_summoned($robot_token = ''){
         // Return the count array
         return $this_count_array;
     }
+}
+
+// Define a function for collecting the summon count for a given robot, assuming it has been summoned at least once
+function mmrpg_prototype_database_summoned($robot_token = ''){
+    return mmrpg_prototype_database_record('robot_summoned', $robot_token);
+}
+
+// Define a function for collecting the defeat count for a given robot, assuming it has been defeated at least once
+function mmrpg_prototype_database_defeated($robot_token = ''){
+    return mmrpg_prototype_database_record('robot_defeated', $robot_token);
+}
+
+// Define a function for collecting the encounter count for a given robot, assuming it has been encountered at least once
+function mmrpg_prototype_database_encountered($robot_token = ''){
+    return mmrpg_prototype_database_record('robot_encountered', $robot_token);
 }
 
 // Define a function for collecting robot sprite markup
@@ -5124,9 +5166,9 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
 
     // If the variable has already been set, then just return it as-is
     if (!$force_refresh
-        && isset($_SESSION['PROTOTYPE_TEMP']['ENDLESS_MODE_SAVEDATA'])){
+        && isset($_SESSION['ENDLESS']['ENDLESS_MODE_SAVEDATA'])){
         // Return any generated ENDLESS ATTACK MODE savedata
-        $endless_mode_savedata = $_SESSION['PROTOTYPE_TEMP']['ENDLESS_MODE_SAVEDATA'];
+        $endless_mode_savedata = $_SESSION['ENDLESS']['ENDLESS_MODE_SAVEDATA'];
         //error_log('(A) requested player_token = '.$player_token.' | endless_mode_savedata = '.print_r(array_keys($endless_mode_savedata), true));
         if (!empty($player_token)){ $endless_mode_savedata = isset($endless_mode_savedata[$player_token]) ? $endless_mode_savedata[$player_token] : array(); }
         //error_log('(B) requested player_token = '.$player_token.' | endless_mode_savedata = '.print_r(array_keys($endless_mode_savedata), true));
@@ -5134,7 +5176,7 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
     }
 
     // Ensure the variable to hold ENDLESS ATTACK MODE savedata exists across all doctors
-    $_SESSION['PROTOTYPE_TEMP']['ENDLESS_MODE_SAVEDATA'] = array();
+    $_SESSION['ENDLESS']['ENDLESS_MODE_SAVEDATA'] = array();
 
     // Check if we're allowed and there is an ENDLESS ATTACK MODE savestate in the waveboard to load now
     if (mmrpg_prototype_item_unlocked('wily-program')){
@@ -5231,7 +5273,7 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
                 */
 
                 // Store the next mission URL in the session for later
-                $_SESSION['PROTOTYPE_TEMP']['ENDLESS_MODE_SAVEDATA'][$next_mission_player] = array(
+                $_SESSION['ENDLESS']['ENDLESS_MODE_SAVEDATA'][$next_mission_player] = array(
                     'redirect' => $next_mission_href,
                     'battle' => $temp_battle_sigma,
                     'player' => $next_mission_player,
@@ -5243,7 +5285,7 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
     }
 
     // Return any generated ENDLESS ATTACK MODE savedata
-    $endless_mode_savedata = $_SESSION['PROTOTYPE_TEMP']['ENDLESS_MODE_SAVEDATA'];
+    $endless_mode_savedata = $_SESSION['ENDLESS']['ENDLESS_MODE_SAVEDATA'];
     //error_log('(C) requested player_token = '.$player_token.' | endless_mode_savedata = '.print_r(array_keys($endless_mode_savedata), true));
     if (!empty($player_token)){ $endless_mode_savedata = isset($endless_mode_savedata[$player_token]) ? $endless_mode_savedata[$player_token] : array(); }
     //error_log('(D) requested player_token = '.$player_token.' | endless_mode_savedata = '.print_r(array_keys($endless_mode_savedata), true));
