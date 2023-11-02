@@ -439,20 +439,28 @@ class rpg_user {
         global $db;
         static $permissions_table;
         if (empty($permissions_table)){
-            $db_name = MMRPG_CONFIG_DBNAME;
-            $tbl_name = 'mmrpg_users_permissions';
-            $table_columns = $db->get_array_list("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-                WHERE TABLE_SCHEMA = '{$db_name}' AND TABLE_NAME = '{$tbl_name}'
-                ;", 'COLUMN_NAME');
-            if (isset($table_columns['user_id'])){ unset($table_columns['user_id']); }
-            $table_columns = !empty($table_columns) ? array_keys($table_columns) : array();
-            if (empty($table_columns)){ return false; }
-            $permissions_table = array();
-            foreach ($table_columns AS $column_name){
-                $temp_table = array();
-                $parts = explode('_', preg_replace('/^allow_/i', '', $column_name));
-                while ($bottom = array_pop($parts)){ $temp_table = array($bottom => $temp_table); }
-                $permissions_table = array_merge_recursive($permissions_table, $temp_table);
+            $cache_token = md5(MMRPG_BUILD);
+            $cached_index = rpg_object::load_cached_index('users.permissions', $cache_token);
+            if (!empty($cached_index)){
+               $permissions_table = $cached_index;
+               unset($cached_index);
+            } else {
+                $db_name = MMRPG_CONFIG_DBNAME;
+                $tbl_name = 'mmrpg_users_permissions';
+                $table_columns = $db->get_array_list("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_SCHEMA = '{$db_name}' AND TABLE_NAME = '{$tbl_name}'
+                    ;", 'COLUMN_NAME');
+                if (isset($table_columns['user_id'])){ unset($table_columns['user_id']); }
+                $table_columns = !empty($table_columns) ? array_keys($table_columns) : array();
+                if (empty($table_columns)){ return false; }
+                $permissions_table = array();
+                foreach ($table_columns AS $column_name){
+                    $temp_table = array();
+                    $parts = explode('_', preg_replace('/^allow_/i', '', $column_name));
+                    while ($bottom = array_pop($parts)){ $temp_table = array($bottom => $temp_table); }
+                    $permissions_table = array_merge_recursive($permissions_table, $temp_table);
+                }
+                rpg_object::save_cached_index('users.permissions', $cache_token, $permissions_table);
             }
         }
         return $permissions_table;
