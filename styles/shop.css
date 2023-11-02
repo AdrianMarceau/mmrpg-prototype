@@ -843,12 +843,13 @@
     display: inline-block;
     margin-left: 4px;
     box-sizing: border-box;
-    width: 14px;
-    height: 14px;
+    width: 26px;
+    height: 16px;
     font-size: 10px;
-    line-height: 10px;
+    line-height: 13px;
+    text-align: center;
     direction: ltr;
-    padding: 1px 0 0px 2px;
+    padding: 1px 0 0px 0px;
     font-weight: normal;
     font-family: 'Zapf Dingbats';
     border-radius: 7px;
