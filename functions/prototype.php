@@ -4025,10 +4025,9 @@ function mmrpg_prototype_get_player_boss_music($player_token, $session_token = '
 }
 
 // Define a function for determining a player's boss music
-function mmrpg_prototype_get_current_rogue_star(){
-    static $star_searched;
-    static $this_rogue_star;
-    if (empty($star_searched)){
+function mmrpg_prototype_get_current_rogue_star($force_refresh = false){
+    if ($force_refresh
+        || !isset($_SESSION['STARS']['ROGUE_STAR'])){
         global $db;
         $prototype_campaigns_required = 3;
         $prototype_campaigns_complete = mmrpg_prototype_complete();
