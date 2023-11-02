@@ -192,6 +192,11 @@ if (true){
     function temp_process_robots(&$mmrpg_database_robots, &$database_game_counters, &$database_page_groups, &$global_robots_counters, $session_token){
 
         // Loop through all of the robots, one by one, formatting their info
+        static $confirmed_unlocked_robots;
+        if (empty($confirmed_unlocked_robots)){
+            $confirmed_unlocked_robots = array_keys(mmrpg_prototype_robots_unlocked_index());
+            //error_log('$confirmed_unlocked_robots = '.print_r($confirmed_unlocked_robots, true));
+            }
         foreach($mmrpg_database_robots AS $robot_key => &$robot_info){
 
             // Update the global game counters
@@ -201,6 +206,8 @@ if (true){
 
             // Update and/or define the encountered, scanned, summoned, and unlocked flags
             //die('dance <pre>'.print_r($_SESSION[$session_token]['values']['robot_database'], true).'</pre>');
+            $robot_is_unlocked = $robot_info['robot_class'] === 'master' && in_array($robot_token, $confirmed_unlocked_robots) ? true : false;
+            if ($robot_is_unlocked){ $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_unlocked'] = true; }
             if (!isset($robot_info['robot_visible'])){ $robot_info['robot_visible'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]) ? true : false; }
             if (!isset($robot_info['robot_encountered'])){ $robot_info['robot_encountered'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_encountered']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_encountered'] : 0; }
             if (!isset($robot_info['robot_scanned'])){ $robot_info['robot_scanned'] = !empty($_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_scanned']) ? $_SESSION[$session_token]['values']['robot_database'][$robot_info['robot_token']]['robot_scanned'] : 0; }
