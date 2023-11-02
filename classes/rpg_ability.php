@@ -3587,10 +3587,11 @@ class rpg_ability extends rpg_object {
 
     // Define a static function that returns a list of all T1 abilities (for the purposes of auto-generation)
     public static function get_tier_one_abilities(){
-        global $db;
+        static $tier_one_abilities;
+        if (!empty($tier_one_abilities)){ return $tier_one_abilities; }
 
         // Collect a list of relevant abilities from the database
-        $temp_tier_one_abilities = $db->get_array_list("SELECT
+        $tier_one_abilities_query = "SELECT
             abilities.ability_token
             -- , abilities.ability_energy
             -- , abilities.*
@@ -3615,19 +3616,31 @@ class rpg_ability extends rpg_object {
             AND abilities.ability_class = 'master'
             ORDER BY
             abilities.ability_token ASC
-            ;", 'ability_token');
+            ;";
+        $cache_token = md5($tier_one_abilities_query);
+        $cached_index = rpg_object::load_cached_index('abilities.t1', $cache_token);
+        if (!empty($cached_index)){
+            $tier_one_abilities = $cached_index;
+            unset($cached_index);
+        } else {
+            global $db;
+            $temp_tier_one_abilities = $db->get_array_list($tier_one_abilities_query, 'ability_token');
+            $tier_one_abilities = !empty($temp_tier_one_abilities) ? array_keys($temp_tier_one_abilities) : array();
+            rpg_object::save_cached_index('abilities.t1', $cache_token, $tier_one_abilities);
+        }
 
         // Return the keys for the requested abilities
-        return !empty($temp_tier_one_abilities) ? array_keys($temp_tier_one_abilities) : array();
+        return $tier_one_abilities;
 
     }
 
     // Define a static function that returns a list of all T2 abilities (for the purposes of auto-generation)
     public static function get_tier_two_abilities(){
-        global $db;
+        static $tier_two_abilities;
+        if (!empty($tier_two_abilities)){ return $tier_two_abilities; }
 
         // Collect a list of relevant abilities from the database
-        $temp_tier_two_abilities = $db->get_array_list("SELECT
+        $tier_two_abilities_query = "SELECT
             abilities.ability_token
             -- , abilities.ability_energy
             -- , abilities.*
@@ -3649,19 +3662,31 @@ class rpg_ability extends rpg_object {
             AND abilities.ability_class = 'master'
             ORDER BY
             abilities.ability_token ASC
-            ;", 'ability_token');
+            ;";
+        $cache_token = md5($tier_two_abilities_query);
+        $cached_index = rpg_object::load_cached_index('abilities.t2', $cache_token);
+        if (!empty($cached_index)){
+            $tier_two_abilities = $cached_index;
+            unset($cached_index);
+        } else {
+            global $db;
+            $temp_tier_two_abilities = $db->get_array_list($tier_two_abilities_query, 'ability_token');
+            $tier_two_abilities = !empty($temp_tier_two_abilities) ? array_keys($temp_tier_two_abilities) : array();
+            rpg_object::save_cached_index('abilities.t2', $cache_token, $tier_two_abilities);
+        }
 
         // Return the keys for the requested abilities
-        return !empty($temp_tier_two_abilities) ? array_keys($temp_tier_two_abilities) : array();
+        return $tier_two_abilities;
 
     }
 
     // Define a static function that returns a list of all T3 abilities (for the purposes of auto-generation)
     public static function get_tier_three_abilities(){
-        global $db;
+        static $tier_three_abilities;
+        if (!empty($tier_three_abilities)){ return $tier_three_abilities; }
 
         // Collect a list of relevant abilities from the database
-        $temp_tier_three_abilities = $db->get_array_list("SELECT
+        $tier_three_abilities_query = "SELECT
             abilities.ability_token
             -- , abilities.ability_energy
             -- , abilities.*
@@ -3679,10 +3704,21 @@ class rpg_ability extends rpg_object {
             AND abilities.ability_class = 'master'
             ORDER BY
             abilities.ability_token ASC
-            ;", 'ability_token');
+            ;";
+        $cache_token = md5($tier_three_abilities_query);
+        $cached_index = rpg_object::load_cached_index('abilities.t3', $cache_token);
+        if (!empty($cached_index)){
+            $tier_three_abilities = $cached_index;
+            unset($cached_index);
+        } else {
+            global $db;
+            $temp_tier_three_abilities = $db->get_array_list($tier_three_abilities_query, 'ability_token');
+            $tier_three_abilities = !empty($temp_tier_three_abilities) ? array_keys($temp_tier_three_abilities) : array();
+            rpg_object::save_cached_index('abilities.t3', $cache_token, $tier_three_abilities);
+        }
 
         // Return the keys for the requested abilities
-        return !empty($temp_tier_three_abilities) ? array_keys($temp_tier_three_abilities) : array();
+        return $tier_three_abilities;
 
     }
 
