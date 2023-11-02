@@ -36,6 +36,8 @@ $_SESSION['ABILITIES'] = array();
 $_SESSION['ITEMS'] = array();
 $_SESSION['ITEMS_DROPPED'] = array();
 $_SESSION['SKILLS'] = array();
+$_SESSION['ENDLESS'] = array();
+$_SESSION['STARS'] = array();
 $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Collect the prototype start link if provided
