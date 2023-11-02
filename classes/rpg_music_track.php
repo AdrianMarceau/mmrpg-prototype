@@ -116,7 +116,15 @@ class rpg_music_track {
             `sources`.`source_order` ASC,
             `music`.`music_order` ASC
             ;";
-        $music_index = $db->get_array_list($music_query, $index_field);
+        $cache_token = md5($music_query.$index_field);
+        $cached_index = rpg_object::load_cached_index('music', $cache_token);
+        if (!empty($cached_index)){
+            $music_index = $cached_index;
+            unset($cached_index);
+        } else {
+            $music_index = $db->get_array_list($music_query, $index_field);
+            rpg_object::save_cached_index('music', $cache_token, $music_index);
+        }
 
         // If the index field has multiple fields, we're parse that
         if (!empty($composite_field)){
