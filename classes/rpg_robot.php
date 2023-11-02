@@ -1959,15 +1959,14 @@ class rpg_robot extends rpg_object {
         }
 
         // Loop through any leftover abilities and add them to the weighted ability options
-        $db_ability_fields = rpg_ability::get_index_fields(true);
-        $temp_ability_tokens = "'".implode("','", array_values($this_robot->robot_abilities))."'";
-        $temp_ability_index = $db->get_array_list("SELECT {$db_ability_fields} FROM mmrpg_index_abilities WHERE ability_flag_complete = 1 AND ability_token IN ({$temp_ability_tokens});", 'ability_token');
+        static $temp_abilities_index;
+        if ($temp_abilities_index){ $temp_abilities_index = rpg_ability::get_index(true); }
         foreach ($this_robot->robot_abilities AS $key => $token){
             //error_log('checking ability['.$key.'] '.$token);
             if (!in_array($token, $options)){
 
                 // Collect ability info and define base chance
-                $info = rpg_ability::parse_index_info($temp_ability_index[$token]);
+                $info = $temp_abilities_index[$token];
                 $value = 3;
 
                 // If this is their first ability and it's the first turn, very high chance
@@ -2158,8 +2157,7 @@ class rpg_robot extends rpg_object {
         $static_attachment_key = $this->get_static_attachment_key();
         if (!empty($this_attachments)){
             //$this->battle->events_create(false, false, 'DEBUG_'.__LINE__, 'checkpoint has attachments');
-            $db_ability_fields = rpg_ability::get_index_fields(true);
-            $temp_attachments_index = $db->get_array_list("SELECT {$db_ability_fields} FROM `mmrpg_index_abilities` WHERE `ability_flag_complete` = 1;", 'ability_token');
+            $temp_attachments_index = rpg_ability::get_index(true);
             foreach ($this_attachments AS $attachment_token => $attachment_info){
 
                 // Ensure this ability has a type before checking weaknesses, resistances, etc.
@@ -2181,7 +2179,7 @@ class rpg_robot extends rpg_object {
                         $this->battle->update_session();
                         $attachment_destroy_info = isset($attachment_info['attachment_destroy_via_weaknesses']) ? $attachment_info['attachment_destroy_via_weaknesses'] : $attachment_info['attachment_destroy'];
                         if ($attachment_destroy_info !== false){
-                            $temp_ability = rpg_ability::parse_index_info($temp_attachments_index[$attachment_info['ability_token']]);
+                            $temp_ability = $temp_attachments_index[$attachment_info['ability_token']];
                             $attachment_info = array_merge($temp_ability, $attachment_info);
                             $temp_attachment = rpg_game::get_ability($this->battle, $this->player, $this, $attachment_info);
                             $temp_trigger_type = !empty($attachment_destroy_info['trigger']) ? $attachment_destroy_info['trigger'] : 'damage';
@@ -2334,7 +2332,7 @@ class rpg_robot extends rpg_object {
                         $this->battle->update_session();
                         $attachment_destroy_info = isset($attachment_info['attachment_destroy_via_weaknesses']) ? $attachment_info['attachment_destroy_via_weaknesses'] : $attachment_info['attachment_destroy'];
                         if ($attachment_destroy_info !== false){
-                            $temp_item = rpg_item::parse_index_info($temp_attachments_index[$attachment_info['item_token']]);
+                            $temp_item = $temp_attachments_index[$attachment_info['item_token']];
                             $attachment_info = array_merge($temp_item, $attachment_info);
                             $temp_attachment = rpg_game::get_item($this->battle, $this->player, $this, $attachment_info);
                             $temp_trigger_type = !empty($attachment_destroy_info['trigger']) ? $attachment_destroy_info['trigger'] : 'damage';
@@ -3081,15 +3079,19 @@ class rpg_robot extends rpg_object {
         if (!empty($filter_class)){ $temp_where .= "AND robot_class = '{$filter_class}' "; }
 
         // Collect an array of robot tokens from the database
-        $robot_index = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_id <> 0 {$temp_where};", 'robot_token');
+        $cache_token = md5($temp_where);
+        $cached_index = rpg_object::load_cached_index('robots.tokens', $cache_token);
+        if (!empty($cached_index)){
+            $robot_tokens = $cached_index;
+            unset($cached_index);
+        } else {
+            $robot_index = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_id <> 0 {$temp_where};", 'robot_token');
+            $robot_tokens = !empty($robot_index) ? array_keys($robot_index) : array();
+            rpg_object::save_cached_index('robots.tokens', $cache_token, $robot_tokens);
+        }
 
         // Return the tokens if not empty, else nothing
-        if (!empty($robot_index)){
-            $robot_tokens = array_keys($robot_index);
-            return $robot_tokens;
-        } else {
-            return array();
-        }
+        return $robot_tokens;
 
     }
 
@@ -3546,13 +3548,10 @@ class rpg_robot extends rpg_object {
 
         // Define the global variables
         global $this_current_uri, $this_current_url, $db;
-        global $mmrpg_database_players, $mmrpg_database_items, $mmrpg_database_types;
         global $mmrpg_stat_base_max_value;
 
-        // Define any local static variables
-        static $mmrpg_database_fields;
-
-        // Collect the approriate database indexes
+        // Define and collect any local static index variables
+        static $mmrpg_database_players, $mmrpg_database_items, $mmrpg_database_fields, $mmrpg_database_types;
         if (empty($mmrpg_database_players)){ $mmrpg_database_players = rpg_player::get_index(true); }
         if (empty($mmrpg_database_items)){ $mmrpg_database_items = rpg_item::get_index(true); }
         if (empty($mmrpg_database_fields)){ $mmrpg_database_fields = rpg_field::get_index(true); }
