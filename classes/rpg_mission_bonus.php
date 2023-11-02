@@ -27,6 +27,7 @@ class rpg_mission_bonus extends rpg_mission {
         global $this_omega_factors_eleven;
 
         // Collect the types index for calculation purposes
+        $mmrpg_index_robots = rpg_robot::get_index(true);
         $mmrpg_index_types = rpg_type::get_index();
 
         // Collect the robot index for calculation purposes
@@ -60,7 +61,16 @@ class rpg_mission_bonus extends rpg_mission {
         $robot_index_query .= "AND robot_flag_exclusive = 0 ";
         $robot_index_query .= "ORDER BY robot_id ASC ";
         //error_log($robot_index_query);
-        $this_robot_index = $db->get_array_list($robot_index_query, 'robot_token');
+        $cache_token = md5($robot_index_query);
+        $cached_index = rpg_object::load_cached_index('mission.bonus.targets', $cache_token);
+        if (!empty($cached_index)){
+            $bonus_robot_tokens = $cached_index;
+            unset($cached_index);
+        } else {
+            $bonus_robots_raw = $db->get_array_list($robot_index_query, 'robot_token');
+            $bonus_robot_tokens = array_keys($bonus_robots_raw);
+            rpg_object::save_cached_index('mission.bonus.targets', $cache_token, $bonus_robot_tokens);
+        }
 
         // Populate the battle options with the starter battle option
         $temp_rand_num = $this_robot_count;
@@ -98,7 +108,8 @@ class rpg_mission_bonus extends rpg_mission {
         $temp_battle_omega['battle_target_player']['player_id'] = $temp_player_id;
         $temp_battle_omega['battle_target_player']['player_robots'] = array();
         $temp_counter = 0;
-        foreach ($this_robot_index AS $token => $info){
+        foreach ($bonus_robot_tokens AS $key => $token){
+            $info = $mmrpg_index_robots[$token];
             if (empty($info['robot_flag_complete']) || $info['robot_class'] != $this_robot_class){ continue; }
             if (!isset($session_robot_database[$token]) || empty($session_robot_database[$token]['robot_encountered'])){ continue; }
             $temp_counter++;
@@ -154,7 +165,7 @@ class rpg_mission_bonus extends rpg_mission {
         $temp_battle_omega['battle_turns'] = 0;
         foreach ($temp_battle_omega['battle_target_player']['player_robots'] AS $key => $info){
             $info['robot_level'] = mt_rand($temp_bonus_level_min, $temp_bonus_level_max);
-            $index = rpg_robot::parse_index_info($this_robot_index[$info['robot_token']]);
+            $index = $mmrpg_index_robots[$info['robot_token']];
             // Keep track of which game this robot/mecha/etc. is from
             if (!isset($temp_games_counter[$index['robot_game']])){ $temp_games_counter[$index['robot_game']] = 0; }
             $temp_games_counter[$index['robot_game']] += 1;
