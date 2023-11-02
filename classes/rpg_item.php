@@ -1085,56 +1085,22 @@ class rpg_item extends rpg_object {
 
     }
 
-    /**
-     * Get the tokens for all items in the global index
-     * @return array
-     */
-    public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Define the query condition based on args
-        $temp_where = '';
-        if (!$include_hidden){ $temp_where .= 'AND item_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND item_flag_published = 1 '; }
-
-        // Collect an array of item tokens from the database
-        $item_index = $db->get_array_list("SELECT item_token FROM mmrpg_index_items WHERE item_id <> 0 {$temp_where};", 'item_token');
-
-        // Return the tokens if not empty, else nothing
-        if (!empty($item_index)){
-            $item_tokens = array_keys($item_index);
-            return $item_tokens;
-        } else {
-            return array();
-        }
-
+    // Define a function for pulling only the tokens for a given index request
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $filter_class = ''){
+        $index = self::get_index($include_hidden, $include_unpublished, $filter_class);
+        return array_keys($index);
     }
 
-    // Define a function for pulling a custom item index
-    public static function get_index_custom($item_tokens = array()){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Generate a token string for the database query
-        $item_tokens_string = array();
-        foreach ($item_tokens AS $item_token){ $item_tokens_string[] = "'{$item_token}'"; }
-        $item_tokens_string = implode(', ', $item_tokens_string);
-
-        // Collect the requested item's info from the database index
-        $item_fields = self::get_index_fields(true);
-        $item_index = $db->get_array_list("SELECT {$item_fields} FROM mmrpg_index_items WHERE item_token IN ({$item_tokens_string});", 'item_token');
-
-        // Parse and return the data if not empty, else nothing
-        if (!empty($item_index)){
-            $item_index = self::parse_index($item_index);
-            return $item_index;
-        } else {
-            return array();
+    // Define a function for pulling a custom index given a list of tokens
+    public static function get_index_custom($tokens = array()){
+        if (empty($tokens)){ return array(); }
+        $index = self::get_index();
+        foreach ($index AS $token => $info){
+            if (!in_array($token, $tokens)){
+                unset($index[$token]);
+            }
         }
-
+        return $index;
     }
 
     // Define a public function for collecting index data from the database

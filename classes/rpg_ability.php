@@ -1135,57 +1135,22 @@ class rpg_ability extends rpg_object {
 
     }
 
-
-    /**
-     * Get the tokens for all abilities in the global index
-     * @return array
-     */
-    public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Define the query condition based on args
-        $temp_where = '';
-        if (!$include_hidden){ $temp_where .= 'AND ability_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND ability_flag_published = 1 '; }
-
-        // Collect an array of ability tokens from the database
-        $ability_index = $db->get_array_list("SELECT ability_token FROM mmrpg_index_abilities WHERE ability_id <> 0 {$temp_where};", 'ability_token');
-
-        // Return the tokens if not empty, else nothing
-        if (!empty($ability_index)){
-            $ability_tokens = array_keys($ability_index);
-            return $ability_tokens;
-        } else {
-            return array();
-        }
-
+    // Define a function for pulling only the tokens for a given index request
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $filter_class = ''){
+        $index = self::get_index($include_hidden, $include_unpublished, $filter_class);
+        return array_keys($index);
     }
 
-    // Define a function for pulling a custom ability index
-    public static function get_index_custom($ability_tokens = array()){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Generate a token string for the database query
-        $ability_tokens_string = array();
-        foreach ($ability_tokens AS $ability_token){ $ability_tokens_string[] = "'{$ability_token}'"; }
-        $ability_tokens_string = implode(', ', $ability_tokens_string);
-
-        // Collect the requested ability's info from the database index
-        $ability_fields = self::get_index_fields(true);
-        $ability_index = $db->get_array_list("SELECT {$ability_fields} FROM mmrpg_index_abilities WHERE ability_token IN ({$ability_tokens_string});", 'ability_token');
-
-        // Parse and return the data if not empty, else nothing
-        if (!empty($ability_index)){
-            $ability_index = self::parse_index($ability_index);
-            return $ability_index;
-        } else {
-            return array();
+    // Define a function for pulling a custom index given a list of tokens
+    public static function get_index_custom($tokens = array()){
+        if (empty($tokens)){ return array(); }
+        $index = self::get_index();
+        foreach ($index AS $token => $info){
+            if (!in_array($token, $tokens)){
+                unset($index[$token]);
+            }
         }
-
+        return $index;
     }
 
     // Define a public function for collecting index data from the database

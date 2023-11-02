@@ -834,57 +834,22 @@ class rpg_skill extends rpg_object {
 
     }
 
-
-    /**
-     * Get the tokens for all skills in the global index
-     * @return array
-     */
-    public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Define the query condition based on args
-        $temp_where = '';
-        if (!$include_hidden){ $temp_where .= 'AND skill_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND skill_flag_published = 1 '; }
-
-        // Collect an array of skill tokens from the database
-        $skill_index = $db->get_array_list("SELECT skill_token FROM mmrpg_index_skills WHERE skill_id <> 0 {$temp_where};", 'skill_token');
-
-        // Return the tokens if not empty, else nothing
-        if (!empty($skill_index)){
-            $skill_tokens = array_keys($skill_index);
-            return $skill_tokens;
-        } else {
-            return array();
-        }
-
+    // Define a function for pulling only the tokens for a given index request
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $filter_class = ''){
+        $index = self::get_index($include_hidden, $include_unpublished, $filter_class);
+        return array_keys($index);
     }
 
-    // Define a function for pulling a custom skill index
-    public static function get_index_custom($skill_tokens = array()){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Generate a token string for the database query
-        $skill_tokens_string = array();
-        foreach ($skill_tokens AS $skill_token){ $skill_tokens_string[] = "'{$skill_token}'"; }
-        $skill_tokens_string = implode(', ', $skill_tokens_string);
-
-        // Collect the requested skill's info from the database index
-        $skill_fields = self::get_index_fields(true);
-        $skill_index = $db->get_array_list("SELECT {$skill_fields} FROM mmrpg_index_skills WHERE skill_token IN ({$skill_tokens_string});", 'skill_token');
-
-        // Parse and return the data if not empty, else nothing
-        if (!empty($skill_index)){
-            $skill_index = self::parse_index($skill_index);
-            return $skill_index;
-        } else {
-            return array();
+    // Define a function for pulling a custom index given a list of tokens
+    public static function get_index_custom($tokens = array()){
+        if (empty($tokens)){ return array(); }
+        $index = self::get_index();
+        foreach ($index AS $token => $info){
+            if (!in_array($token, $tokens)){
+                unset($index[$token]);
+            }
         }
-
+        return $index;
     }
 
     // Define a public function for collecting index data from the database

@@ -330,57 +330,22 @@ class rpg_field extends rpg_object {
 
     }
 
-    /**
-     * Get the tokens for all fields in the global index
-     * @return array
-     */
-    public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $include_incomplete = false){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Define the query condition based on args
-        $temp_where = '';
-        if (!$include_hidden){ $temp_where .= 'AND field_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND field_flag_published = 1 '; }
-        if (!$include_incomplete){ $temp_where .= 'AND field_flag_complete = 1 '; }
-
-        // Collect an array of field tokens from the database
-        $field_index = $db->get_array_list("SELECT field_token FROM mmrpg_index_fields WHERE field_id <> 0 {$temp_where};", 'field_token');
-
-        // Return the tokens if not empty, else nothing
-        if (!empty($field_index)){
-            $field_tokens = array_keys($field_index);
-            return $field_tokens;
-        } else {
-            return array();
-        }
-
+    // Define a function for pulling only the tokens for a given index request
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $filter_class = ''){
+        $index = self::get_index($include_hidden, $include_unpublished, $filter_class);
+        return array_keys($index);
     }
 
-    // Define a function for pulling a custom field index
-    public static function get_index_custom($field_tokens = array()){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Generate a token string for the database query
-        $field_tokens_string = array();
-        foreach ($field_tokens AS $field_token){ $field_tokens_string[] = "'{$field_token}'"; }
-        $field_tokens_string = implode(', ', $field_tokens_string);
-
-        // Collect the requested field's info from the database index
-        $field_fields = self::get_index_fields(true);
-        $field_index = $db->get_array_list("SELECT {$field_fields} FROM mmrpg_index_fields WHERE field_token IN ({$field_tokens_string});", 'field_token');
-
-        // Parse and return the data if not empty, else nothing
-        if (!empty($field_index)){
-            $field_index = self::parse_index($field_index);
-            return $field_index;
-        } else {
-            return array();
+    // Define a function for pulling a custom index given a list of tokens
+    public static function get_index_custom($tokens = array()){
+        if (empty($tokens)){ return array(); }
+        $index = self::get_index();
+        foreach ($index AS $token => $info){
+            if (!in_array($token, $tokens)){
+                unset($index[$token]);
+            }
         }
-
+        return $index;
     }
 
     // Define a public function for collecting index data from the database

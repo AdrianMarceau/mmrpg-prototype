@@ -3063,64 +3063,22 @@ class rpg_robot extends rpg_object {
 
     }
 
-    /**
-     * Get the tokens for all robots in the global index
-     * @return array
-     */
+    // Define a function for pulling only the tokens for a given index request
     public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $filter_class = ''){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Define the query condition based on args
-        $temp_where = '';
-        if (!$include_hidden){ $temp_where .= 'AND robot_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND robot_flag_published = 1 '; }
-        if (!empty($filter_class)){ $temp_where .= "AND robot_class = '{$filter_class}' "; }
-
-        // Collect an array of robot tokens from the database
-        $cache_token = md5($temp_where);
-        $cached_index = rpg_object::load_cached_index('robots.tokens', $cache_token);
-        if (!empty($cached_index)){
-            $robot_tokens = $cached_index;
-            unset($cached_index);
-        } else {
-            $robot_index = $db->get_array_list("SELECT robot_token FROM mmrpg_index_robots WHERE robot_id <> 0 {$temp_where};", 'robot_token');
-            $robot_tokens = !empty($robot_index) ? array_keys($robot_index) : array();
-            rpg_object::save_cached_index('robots.tokens', $cache_token, $robot_tokens);
-        }
-
-        // Return the tokens if not empty, else nothing
-        return $robot_tokens;
-
+        $index = self::get_index($include_hidden, $include_unpublished, $filter_class);
+        return array_keys($index);
     }
 
-    // Define a function for pulling a custom robot index
-    public static function get_index_custom($robot_tokens = array()){
-
-        // If the robot tokens were empty, return nothing
-        if (empty($robot_tokens)){ return array(); }
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Generate a token string for the database query
-        $robot_tokens_string = array();
-        foreach ($robot_tokens AS $robot_token){ $robot_tokens_string[] = "'{$robot_token}'"; }
-        $robot_tokens_string = implode(', ', $robot_tokens_string);
-
-        // Collect the requested robot's info from the database index
-        $robot_fields = self::get_index_fields(true);
-        $robot_index = $db->get_array_list("SELECT {$robot_fields} FROM mmrpg_index_robots WHERE robot_token IN ({$robot_tokens_string});", 'robot_token');
-
-        // Parse and return the data if not empty, else nothing
-        if (!empty($robot_index)){
-            $robot_index = self::parse_index($robot_index);
-            return $robot_index;
-        } else {
-            return array();
+    // Define a function for pulling a custom index given a list of tokens
+    public static function get_index_custom($tokens = array()){
+        if (empty($tokens)){ return array(); }
+        $index = self::get_index();
+        foreach ($index AS $token => $info){
+            if (!in_array($token, $tokens)){
+                unset($index[$token]);
+            }
         }
-
+        return $index;
     }
 
     // Define a public function for collecting index data from the database

@@ -2327,56 +2327,22 @@ class rpg_player extends rpg_object {
 
     }
 
-    /**
-     * Get the tokens for all players in the global index
-     * @return array
-     */
-    public static function get_index_tokens($include_hidden = false, $include_unpublished = false){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Define the query condition based on args
-        $temp_where = '';
-        if (!$include_hidden){ $temp_where .= 'AND player_flag_hidden = 0 '; }
-        if (!$include_unpublished){ $temp_where .= 'AND player_flag_published = 1 '; }
-
-        // Collect an array of player tokens from the database
-        $player_index = $db->get_array_list("SELECT player_token FROM mmrpg_index_players WHERE player_id <> 0 {$temp_where};", 'player_token');
-
-        // Return the tokens if not empty, else nothing
-        if (!empty($player_index)){
-            $player_tokens = array_keys($player_index);
-            return $player_tokens;
-        } else {
-            return array();
-        }
-
+    // Define a function for pulling only the tokens for a given index request
+    public static function get_index_tokens($include_hidden = false, $include_unpublished = false, $filter_class = ''){
+        $index = self::get_index($include_hidden, $include_unpublished, $filter_class);
+        return array_keys($index);
     }
 
-    // Define a function for pulling a custom player index
-    public static function get_index_custom($player_tokens = array()){
-
-        // Pull in global variables
-        $db = cms_database::get_database();
-
-        // Generate a token string for the database query
-        $player_tokens_string = array();
-        foreach ($player_tokens AS $player_token){ $player_tokens_string[] = "'{$player_token}'"; }
-        $player_tokens_string = implode(', ', $player_tokens_string);
-
-        // Collect the requested player's info from the database index
-        $player_fields = self::get_index_fields(true);
-        $player_index = $db->get_array_list("SELECT {$player_fields} FROM mmrpg_index_players WHERE player_token IN ({$player_tokens_string});", 'player_token');
-
-        // Parse and return the data if not empty, else nothing
-        if (!empty($player_index)){
-            $player_index = self::parse_index($player_index);
-            return $player_index;
-        } else {
-            return array();
+    // Define a function for pulling a custom index given a list of tokens
+    public static function get_index_custom($tokens = array()){
+        if (empty($tokens)){ return array(); }
+        $index = self::get_index();
+        foreach ($index AS $token => $info){
+            if (!in_array($token, $tokens)){
+                unset($index[$token]);
+            }
         }
-
+        return $index;
     }
 
     // Define a public function for collecting index data from the database
