@@ -4419,8 +4419,10 @@ function mmrpg_prototype_get_profile_background_options($this_userinfo, &$allowe
     $temp_omega_factor_options['MM4'] = $this_omega_factors_three;
     $temp_omega_factor_options['MM3'] = $this_omega_factors_four;
 
+    // Collect this player's robot database for reference
+    $session_robot_database = mmrpg_prototype_database_records();
+
     // Loop through and remove any fields who's robots haven't been encountered yet
-    $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
     foreach($temp_omega_factor_options AS $game => $options){
         foreach($options AS $key => $option){
             $rtoken = $option['robot'];
@@ -4433,28 +4435,65 @@ function mmrpg_prototype_get_profile_background_options($this_userinfo, &$allowe
     ksort($temp_omega_factor_options);
 
     // Generate allowed background options and their select markup
-    $temp_optgroup_token = 'MMRPG';
+    $temp_optgroup_token = '';
     $allowed_background_options = array();
     $html_background_options = array();
     $html_background_options[] = '<option value="">- Select Field -</option>';
-    $html_background_options[] = '<optgroup label="Intro Fields">';
-    $html_background_options[] = '<option value="fields/gentle-countryside">Gentle Countryside (Neutral Type)</option>';
-    $html_background_options[] = '<option value="fields/maniacal-hideaway">Maniacal Hideaway (Neutral Type)</option>';
-    $html_background_options[] = '<option value="fields/wintry-forefront">Wintry Forefront (Neutral Type)</option>';
-    if (mmrpg_prototype_player_unlocked('dr-light')){ $allowed_background_options[] = 'fields/gentle-countryside'; }
-    if (mmrpg_prototype_player_unlocked('dr-wily')){ $allowed_background_options[] = 'fields/maniacal-hideaway'; }
-    if (mmrpg_prototype_player_unlocked('dr-cossack')){ $allowed_background_options[] = 'fields/wintry-forefront'; }
+
+    // Preload certain fields based on progress in the game
+    $intro_fields = array();
+    $homebase_fields = array();
+    $event_fields = array();
+    if (mmrpg_prototype_player_unlocked('dr-light')){
+        $intro_fields[] = 'gentle-countryside';
+        if (!empty($session_robot_database['sniper-joe']['robot_defeated'])){ $homebase_fields[] = 'light-laboratory'; }
+    }
+    if (mmrpg_prototype_player_unlocked('dr-wily')){
+        $intro_fields[] = 'maniacal-hideaway';
+        if (!empty($session_robot_database['skeleton-joe']['robot_defeated'])){ $homebase_fields[] = 'wily-castle'; }
+    }
+    if (mmrpg_prototype_player_unlocked('dr-cossack')){
+        $intro_fields[] = 'wintry-forefront';
+        if (!empty($session_robot_database['crystal-joe']['robot_defeated'])){ $homebase_fields[] = 'cossack-citadel'; }
+    }
+    if (!empty($session_robot_database['trill']['robot_defeated'])){ $event_fields[] = 'prototype-subspace'; }
+    if (!empty($session_robot_database['doc-robot']['robot_defeated'])){ $event_fields[] = 'robot-museum'; }
+    if (!empty($session_robot_database['enker']['robot_defeated'])
+        || !empty($session_robot_database['punk']['robot_defeated'])
+        || !empty($session_robot_database['ballade']['robot_defeated'])){ $event_fields[] = 'hunter-compound'; }
+    if (!empty($session_robot_database['king']['robot_defeated'])){ $event_fields[] = 'royal-palace'; }
+    if (!empty($session_robot_database['buster-rod-g']['robot_defeated'])
+        || !empty($session_robot_database['mega-water-s']['robot_defeated'])
+        || !empty($session_robot_database['hyper-storm-h']['robot_defeated'])){ $event_fields[] = 'genesis-tower'; }
+
+    // Add preloaded fields to the list of options with specific labels
+    $preload_field_options = array();
+    $preload_field_options[] = array('Intro Fields', $intro_fields);
+    $preload_field_options[] = array('Homebase Fields', $homebase_fields);
+    $preload_field_options[] = array('Event Fields', $event_fields);
+    foreach ($preload_field_options AS $preload_key => $preload_option){
+        list($option_label, $option_fields) = $preload_option;
+        if (empty($option_fields)){ continue; }
+        $html_background_options[] = '<optgroup label="'.$option_label.'">';
+        foreach ($option_fields AS $field_token){
+            $field_info = $this_fields_index[$field_token];
+            $field_type = ucfirst(!empty($field_info['field_type']) ? $field_info['field_type'] : 'neutral');
+            $html_background_options[] = '<option value="fields/'.$field_info['field_token'].'">'.$field_info['field_name'].' ('.$field_type.' Type)</option>';
+            $allowed_background_options[] = 'fields/'.$field_info['field_token'];
+        }
+        $html_background_options[] = '</optgroup>';
+    }
 
     // Add all the robot avatars to the list
     //die('<pre>'.print_r($temp_omega_factor_options, true).'</pre>');
     foreach ($temp_omega_factor_options AS $omega_game => $omega_array){
         // If the game has changed print the new optgroup
         if ($omega_game != $temp_optgroup_token){
-            $temp_optgroup_token = $omega_game;
-            if (preg_match('/^MM([0-9]+)$/', $temp_optgroup_token)){ $temp_optgroup_name = 'Mega Man '.ltrim(str_replace('MM', '', $temp_optgroup_token), '01').' Fields'; }
-            else { $temp_optgroup_name = 'Mega Man '.str_replace('MM', '', $temp_optgroup_token).' Fields'; }
-            $html_background_options[] = '</optgroup>';
+            if (preg_match('/^MM([0-9]+)$/', $omega_game)){ $temp_optgroup_name = 'Mega Man '.ltrim(str_replace('MM', '', $omega_game), '01').' Fields'; }
+            else { $temp_optgroup_name = 'Mega Man '.str_replace('MM', '', $omega_game).' Fields'; }
+            if (!empty($temp_optgroup_token)){ $html_background_options[] = '</optgroup>'; }
             $html_background_options[] = '<optgroup label="'.$temp_optgroup_name.'">';
+            $temp_optgroup_token = $omega_game;
         }
         foreach ($omega_array AS $omega_key => $omega_info){
             if (empty($this_fields_index[$omega_info['field']])){ continue; }
