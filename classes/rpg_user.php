@@ -440,7 +440,7 @@ class rpg_user {
         static $permissions_table;
         if (empty($permissions_table)){
             $cache_token = md5(MMRPG_BUILD);
-            $cached_index = rpg_object::load_cached_index('users.permissions', $cache_token);
+            $cached_index = rpg_object::load_cached_index('users.permissions.table', $cache_token);
             if (!empty($cached_index)){
                $permissions_table = $cached_index;
                unset($cached_index);
@@ -460,7 +460,7 @@ class rpg_user {
                     while ($bottom = array_pop($parts)){ $temp_table = array($bottom => $temp_table); }
                     $permissions_table = array_merge_recursive($permissions_table, $temp_table);
                 }
-                rpg_object::save_cached_index('users.permissions', $cache_token, $permissions_table);
+                rpg_object::save_cached_index('users.permissions.table', $cache_token, $permissions_table);
             }
         }
         return $permissions_table;
@@ -493,11 +493,24 @@ class rpg_user {
     private static $default_member_permissions = array();
     public static function get_user_permission_tokens($user_id, $refresh = false){
         global $db;
+        static $full_permissions_index;
         static $user_permissions_index = array();
+        // Populate the default permissions for guests and members if not already done
+        if ($full_permissions_index){
+            $cache_token = md5(MMRPG_BUILD);
+            $cached_index = rpg_object::load_cached_index('users.permissions', $cache_token);
+            if (!empty($cached_index)){
+               $full_permissions_index = $cached_index;
+               unset($cached_index);
+            } else {
+                $full_permissions_index = $db->get_array("SELECT * FROM mmrpg_users_permissions;");
+                rpg_object::save_cached_index('users.permissions', $cache_token, $full_permissions_index);
+            }
+        }
         // Check to see if we need to (re)generate now of if there's already a cached version
         if (empty($user_permissions_index[$user_id]) || $refresh){
             // Pull raw permission if available, else assign default based on member vs guest
-            $raw_user_permissions = $db->get_array("SELECT * FROM mmrpg_users_permissions WHERE user_id = {$user_id};");
+            $raw_user_permissions = $full_permissions_index[$user_id];
             //error_log('$raw_user_permissions('.$user_id.') = '.print_r($raw_user_permissions, true));
             if (!empty($raw_user_permissions)){
                 unset($raw_user_permissions['user_id']);
