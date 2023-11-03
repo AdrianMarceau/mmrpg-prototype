@@ -1107,7 +1107,7 @@ class rpg_ability extends rpg_object {
         }
 
         // Collect every type's info from the database index
-        error_log('(!) generating a new abilities index array for '.MMRPG_CONFIG_CACHE_DATE);
+        //error_log('(!) generating a new abilities index array for '.MMRPG_CONFIG_CACHE_DATE);
         $ability_fields = rpg_ability::get_index_fields(true, 'abilities');
         $ability_index = $db->get_array_list("
             SELECT

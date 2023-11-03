@@ -304,7 +304,7 @@ class rpg_field extends rpg_object {
         }
 
         // Collect every field's info from the database index
-        error_log('(!) generating a new fields index array for '.MMRPG_CONFIG_CACHE_DATE);
+        //error_log('(!) generating a new fields index array for '.MMRPG_CONFIG_CACHE_DATE);
         $field_fields = rpg_field::get_index_fields(true, 'fields');
         $field_index = $db->get_array_list("SELECT
             {$field_fields},

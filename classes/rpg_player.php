@@ -2300,7 +2300,7 @@ class rpg_player extends rpg_object {
         }
 
         // Collect every player's info from the database index
-        error_log('(!) generating a new players index array for '.MMRPG_CONFIG_CACHE_DATE);
+        //error_log('(!) generating a new players index array for '.MMRPG_CONFIG_CACHE_DATE);
         $player_fields = rpg_player::get_index_fields(true, 'players');
         $player_index = $db->get_array_list("SELECT
             {$player_fields},

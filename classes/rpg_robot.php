@@ -3036,7 +3036,7 @@ class rpg_robot extends rpg_object {
         }
 
         // Collect every robot's info from the database index
-        error_log('(!) generating a new robots index array for '.MMRPG_CONFIG_CACHE_DATE);
+        //error_log('(!) generating a new robots index array for '.MMRPG_CONFIG_CACHE_DATE);
         $robot_fields = rpg_robot::get_index_fields(true, 'robots');
         $robot_index = $db->get_array_list("SELECT
             {$robot_fields},
