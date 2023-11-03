@@ -49,6 +49,9 @@ class rpg_skill_damage extends rpg_damage {
             }
         }
 
+        // Make sure this skill has all the required result variables
+        $this_skill->skill_results_init();
+
         // Backup this and the target robot's frames to revert later
         $this_robot_backup_frame = $this_robot->robot_frame;
         $this_player_backup_frame = $this_robot->player->player_frame;
@@ -488,7 +491,7 @@ class rpg_skill_damage extends rpg_damage {
         }
 
         // If this robot has immunity to the skill, hard-code a failure result
-        if ($this_skill->skill_results['flag_immunity']){
+        if (!empty($this_skill->skill_results['flag_immunity'])){
             $this_skill->skill_results['this_result'] = 'failure';
             $this_robot->flags['triggered_immunity'] = true;
             // Generate the status text based on flags
