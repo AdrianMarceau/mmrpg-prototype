@@ -553,7 +553,7 @@ class rpg_battle extends rpg_object {
                 }
                 if (!empty($current_action['target_robot'])){
                     $current_action['target_robot']->robot_frame = 'base';
-                    $current_action['target_player']->player_frame = 'defeat';
+                    $current_action['target_player']->player_frame = 'base';
                     if ($current_action['target_robot']->robot_status === 'disabled'
                         && empty($current_action['target_robot']->flags['is_recruited'])){
                         $current_action['target_robot']->robot_frame = 'defeat';
@@ -565,6 +565,12 @@ class rpg_battle extends rpg_object {
                 }
                 if (!empty($battle_action) && $battle_action != 'start'){
                     $this->events_create(false, false, '', '');
+                }
+                if (!empty($current_action['this_player'])){
+                    $current_action['this_player']->reset_frame();
+                }
+                if (!empty($current_action['target_player'])){
+                    $current_action['target_player']->reset_frame();
                 }
             }
 
@@ -3369,6 +3375,29 @@ class rpg_battle extends rpg_object {
 
         // Return false if nothing was found
         return false;
+    }
+
+    // Define a function for checking to see if there are any robots in a specific skill group on the field
+    public function check_for_skill_group_robots($group_token){
+        //error_log('check_for_skill_group_robots('.$group_token.')');
+        $skill_group_robots = array();
+        if (empty($group_token)){ return $skill_group_robots; }
+        if (substr($group_token, -7) !== '_robots'){ $group_token .= '_robots'; }
+        //error_log('checking players for '.$group_token);
+        $player_sides = array('left', 'right');
+        foreach ($player_sides AS $player_side){
+            $player_object = $this->find_target_player($player_side);
+            if (isset($player_object)){
+                $raw_skill_group_robots = $player_object->get_value($group_token);
+                if (!empty($raw_skill_group_robots)){
+                    //error_log($group_token.' found for this player!');
+                    //error_log('$raw_skill_group_robots = '.print_r($raw_skill_group_robots, true));
+                    foreach ($raw_skill_group_robots AS $key => $id){ $skill_group_robots[$id] = $player_side; }
+                }
+            }
+        }
+        //error_log('$skill_group_robots = '.print_r($skill_group_robots, true));
+        return $skill_group_robots;
     }
 
     // Define a function for checking if inventory access is allowed in this battle
