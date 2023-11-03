@@ -1014,9 +1014,10 @@ if (!empty($this_battle->flags['challenge_battle'])
             // Collect the current mission number so we now where we are
             $this_battle_chain = isset($_SESSION['BATTLES_CHAIN'][$this_battle->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] : array();
             $this_loop_size = 18;
-            $this_mission_number = (!empty($this_battle_chain) ? count($this_battle_chain) : 0) + 1;
-            $this_phase_number = floor($this_mission_number / $this_loop_size) + 1;
-            $this_battle_number = $this_mission_number > $this_loop_size ? ($this_mission_number % $this_loop_size) : $this_mission_number;
+            $wave_value = MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE;
+            $this_wave_number = (!empty($this_battle_chain) ? count($this_battle_chain) : 0) + 1;
+            $this_phase_number = floor($this_wave_number / $this_loop_size) + 1;
+            $this_battle_number = $this_wave_number > $this_loop_size ? ($this_wave_number % $this_loop_size) : $this_wave_number;
 
             // Collect the start robot count and then tally the total turns taken
             $this_robot_used = 0;
@@ -1063,29 +1064,26 @@ if (!empty($this_battle->flags['challenge_battle'])
             } elseif (!empty($old_wave_record)){
                 //error_log('Old wave EXISTS so we might need to...');
                 //$this_battle->events_create(false, false, 'DEBUG', '$old_wave_record = '.print_r($old_wave_record, true).'');
-                $old_missions_completed = (int)($old_wave_record['challenge_waves_completed']);
+                // Collect the meta info for the old wave record
+                $old_wave_number = (int)($old_wave_record['challenge_waves_completed']);
                 $old_robots_used = (int)($old_wave_record['challenge_robots_used']);
                 $old_turns_used = (int)($old_wave_record['challenge_turns_used']);
-                //$old_wave_score = $old_missions_completed / $old_robots_used / $old_turns_used;
-                //$new_wave_score = $this_mission_number / $this_robot_used / $this_turns_used;
-                $old_base_score = $old_missions_completed * MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE;
-                $old_wave_score = $old_base_score;
-                $old_wave_score += ceil($old_base_score / $old_robots_used);
-                $old_wave_score += ceil($old_base_score / ($old_robots_used / $old_turns_used));
-                $new_base_score = $this_mission_number * MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE;
-                $new_wave_score = $new_base_score;
-                $new_wave_score += ceil($new_base_score / $this_robot_used);
-                $new_wave_score += ceil($new_base_score / ($this_robot_used / $this_turns_used));
-                //error_log('...old_missions_completed = '.$old_missions_completed);
-                //error_log('...old_robots_used = '.$old_robots_used);
-                //error_log('...old_turns_used = '.$old_turns_used);
-                //error_log('...old_wave_score = '.number_format($old_wave_score, 0, '.', ','));
-                //error_log('...this_mission_number = '.$this_mission_number);
-                //error_log('...this_robot_used = '.$this_robot_used);
-                //error_log('...this_turns_used = '.$this_turns_used);
-                //error_log('...new_wave_score = '.number_format($new_wave_score, 0, '.', ','));
-                if ($this_mission_number >= $old_missions_completed
-                    && $new_wave_score > $old_wave_score){
+                // Calculate points given the old wave record
+                $old_wave_record = array();
+                $old_wave_record['challenge_points_base'] = $old_wave_number * $wave_value;
+                $old_wave_record['challenge_points_robot_bonus'] = ceil($old_wave_record['challenge_points_base'] / $old_robots_used);
+                $old_wave_record['challenge_points_turn_bonus'] = ceil($old_wave_record['challenge_points_base'] / ($old_turns_used / $old_wave_number));
+                $old_wave_record['challenge_points_total'] = ceil($old_wave_record['challenge_points_base'] + $old_wave_record['challenge_points_robot_bonus'] + $old_wave_record['challenge_points_turn_bonus']);
+                // Calculate points given the new wave record
+                $new_wave_record = array();
+                $new_wave_record['challenge_points_base'] = $this_wave_number * $wave_value;
+                $new_wave_record['challenge_points_robot_bonus'] = ceil($new_wave_record['challenge_points_base'] / $this_robot_used);
+                $new_wave_record['challenge_points_turn_bonus'] = ceil($new_wave_record['challenge_points_base'] / ($this_turns_used / $this_wave_number));
+                $new_wave_record['challenge_points_total'] = ceil($new_wave_record['challenge_points_base'] + $new_wave_record['challenge_points_robot_bonus'] + $new_wave_record['challenge_points_turn_bonus']);
+                //error_log('...$old_wave_record = '.print_r(array_map(function($n){ return number_format($n, 0, '.', ','); }, $old_wave_record), true));
+                //error_log('...$new_wave_record = '.print_r(array_map(function($n){ return number_format($n, 0, '.', ','); }, $new_wave_record), true));
+                // If the new points are higher than the old ones, we update
+                if ($new_wave_record['challenge_points_total'] > $old_wave_record['challenge_points_total']){
                     $this_required_action = 'update';
                     //error_log('Update!');
                 } else {
@@ -1095,7 +1093,7 @@ if (!empty($this_battle->flags['challenge_battle'])
 
             // Predefine the comments fields for insert or update
             $db_common_fields = array();
-            $db_common_fields['challenge_waves_completed'] = $this_mission_number;
+            $db_common_fields['challenge_waves_completed'] = $this_wave_number;
             $db_common_fields['challenge_robots_used'] = $this_robot_used;
             $db_common_fields['challenge_turns_used'] = $this_turns_used;
             $db_common_fields['challenge_team_config'] = $this_team_config;
