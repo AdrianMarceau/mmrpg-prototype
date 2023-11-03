@@ -510,7 +510,7 @@ class rpg_user {
         // Check to see if we need to (re)generate now of if there's already a cached version
         if (empty($user_permissions_index[$user_id]) || $refresh){
             // Pull raw permission if available, else assign default based on member vs guest
-            $raw_user_permissions = $full_permissions_index[$user_id];
+            $raw_user_permissions = isset($full_permissions_index[$user_id]) ? $full_permissions_index[$user_id] : array();
             //error_log('$raw_user_permissions('.$user_id.') = '.print_r($raw_user_permissions, true));
             if (!empty($raw_user_permissions)){
                 unset($raw_user_permissions['user_id']);
