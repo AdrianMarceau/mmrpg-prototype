@@ -363,10 +363,10 @@ if (empty($this_robot)){
 // Pre-collect the ability speeds in case we need to compare them
 $temp_thisability_ability_speed2 = $temp_thisability->ability_speed2;
 $temp_targetability_ability_speed2 = $temp_targetability->ability_speed2;
-$temp_thisplayer_metronome_robots = $this_player->get_value('metronome_robots');
-$temp_targetplayer_metronome_robots = $target_player->get_value('metronome_robots');
-if (!empty($temp_thisplayer_metronome_robots)
-    || !empty($temp_targetplayer_metronome_robots)){
+$temp_thisplayer_anti_priority_robots = $this_player->get_value('anti_priority_robots');
+$temp_targetplayer_anti_priority_robots = $target_player->get_value('anti_priority_robots');
+if (!empty($temp_thisplayer_anti_priority_robots)
+    || !empty($temp_targetplayer_anti_priority_robots)){
     if ($temp_thisability->ability_speed === $temp_thisability->ability_speed2){ $temp_thisability_ability_speed2 = 1; }
     if ($temp_targetability->ability_speed === $temp_targetability->ability_speed2){ $temp_targetability_ability_speed2 = 1; }
 }
