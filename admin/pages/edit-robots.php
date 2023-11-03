@@ -1117,6 +1117,7 @@
                 $levelup_compatible = false;
                 if ($robot_data['robot_class'] === 'boss' && $ability_info['ability_class'] !== 'mecha'){ $levelup_compatible = true; }
                 elseif ($ability_info['ability_class'] === $robot_data['robot_class']){ $levelup_compatible = true; }
+                elseif (in_array($ability_token, $global_ability_tokens)){ $levelup_compatible = true; }
                 if ($levelup_compatible){
                     if ($levelup_last_option_group !== $option_group){
                         if (!empty($levelup_last_option_group)){ $levelup_ability_options_markup[] = '</optgroup>'; }
@@ -1525,7 +1526,7 @@
                                     <div class="field fullsize multirow">
                                         <strong class="label">
                                             Level-Up Abilities
-                                            <em>Only hero and support robots require level-up, others should unlock all at start</em>
+                                            <em>Only hero and support robots require leveling-up to get abilities - others should unlock all at start</em>
                                         </strong>
                                         <?
                                         $current_ability_list = !empty($robot_data['robot_abilities_rewards']) ? json_decode($robot_data['robot_abilities_rewards'], true) : array();
