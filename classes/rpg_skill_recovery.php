@@ -8,6 +8,7 @@ class rpg_skill_recovery extends rpg_recovery {
     // Define a trigger for inflicting all types of recovery on this robot
     public static function trigger_robot_recovery($this_robot, $target_robot, $this_skill, $recovery_amount, $trigger_disabled = true, $trigger_options = array()){
         global $db;
+        error_log('rpg_skill_recovery::trigger_robot_recovery() from '.(!empty($this_skill) ? $this_skill->skill_token : 'unknown'));
 
         // DEBUG
         $debug = '';
@@ -94,6 +95,32 @@ class rpg_skill_recovery extends rpg_recovery {
         // Collect the recovery amount argument from the function
         $this_skill->skill_results['this_amount'] = $options->recovery_amount;
         $this_battle->events_debug(__FILE__, __LINE__, $this_skill->skill_token.' | to('.$this_robot->robot_id.':'.$this_robot->robot_token.') vs from('.$target_robot->robot_id.':'.$target_robot->robot_token.') | recovery_start_amount |<br /> '.'amount:'.$this_skill->skill_results['this_amount'].' | '.'percent:'.($this_skill->recovery_options['recovery_percent'] ? 'true' : 'false').' | '.'kind:'.$this_skill->recovery_options['recovery_kind'].' | type1:'.(!empty($this_skill->recovery_options['recovery_type']) ? $this_skill->recovery_options['recovery_type'] : 'none').' | type2:'.(!empty($this_skill->recovery_options['recovery_type2']) ? $this_skill->recovery_options['recovery_type2'] : 'none').'');
+
+        // Check to see if recovery has been blocked or disabled all-together by any anti_recovery_robots
+        //error_log('checking for anti_recovery_robots');
+        $anti_recovery_robots = $this_battle->check_for_skill_group_robots('anti_recovery');
+        //error_log('$anti_recovery_robots = '.print_r($anti_recovery_robots, true));
+        static $block_count = 0;
+        if (!empty($anti_recovery_robots)){
+            $block_count++;
+            if ($block_count === 1){ $block_text = 'External forces exert their pressure!'; }
+            elseif ($block_count === 2){ $block_text = 'External forces continue to exert pressure!'; }
+            elseif ($block_count === 3){ $block_text = 'External forces are still exerting their pressure!'; }
+            else { $block_text = rpg_battle::random_negative_word().' External forces! '.rpg_battle::random_negative_word(); }
+            //error_log('anti_recovery_robots prevent healing!!!');
+            $this_battle->queue_sound_effect('small-debuff-received');
+            $this_robot->set_frame('defend');
+            $this_battle->events_create(
+                $this_robot,
+                false,
+                $this_skill->recovery_options['recovery_header'],
+                $this_robot->print_name_s().' recovery was blocked!'.
+                    (!empty($block_text) ? ' <br />'.$block_text : ''),
+                $event_options
+                );
+            $this_robot->reset_frame();
+            return false;
+        }
 
         // Trigger this robot's skill function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-skill_trigger-recovery_before', $extra_objects);
@@ -1198,7 +1225,9 @@ class rpg_skill_recovery extends rpg_recovery {
             // -- CHECK ATTACHMENTS -- //
 
             // Ensure the skill was a success before checking attachments
-            if ($this_skill->skill_results['this_result'] == 'success'){
+            if ($this_skill->skill_results['this_result'] == 'success'
+                && false // NO we should not be triggering attachment weaknesses when heals kick-in
+                ){
                 // If this robot has any attachments, loop through them
                 $static_attachment_key = $this_robot->get_static_attachment_key();
                 $this_robot_attachments = $this_robot->get_current_attachments();
@@ -1229,7 +1258,7 @@ class rpg_skill_recovery extends rpg_recovery {
                                 if ($attachment_destroy_info !== false){
                                     $attachment_info['flags']['is_attachment'] = true;
                                     if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
-                                    if (isset($attachment_info['ability_token'])){ $temp_attachment = rpg_game::get_ability($this_robot->battle, $this_robot->player, $this_robot, array('ability_token' => $attachment_info['ability_token'])); }
+                                    if (isset($attachment_info['skill_token'])){ $temp_attachment = rpg_game::get_skill($this_robot->battle, $this_robot->player, $this_robot, array('skill_token' => $attachment_info['skill_token'])); }
                                     elseif (isset($attachment_info['item_token'])){ $temp_attachment = rpg_game::get_item($this_robot->battle, $this_robot->player, $this_robot, array('item_token' => $attachment_info['item_token'])); }
                                     elseif (isset($attachment_info['skill_token'])){ $temp_attachment = rpg_game::get_skill($this_robot->battle, $this_robot->player, $this_robot, array('skill_token' => $attachment_info['skill_token'])); }
                                     else { continue; }
