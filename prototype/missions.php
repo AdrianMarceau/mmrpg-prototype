@@ -260,16 +260,20 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $group_options_total = count($group_option_locks);
         $group_options_complete_total = array_sum($group_option_locks);
         if ($group_options_complete_total >= $group_options_total){
+            $temp_target_level = $this_prototype_data['this_chapter_levels'][1] + 8;
             $temp_battle_config = array();
             $temp_battle_config['battle_size'] = '1x4';
             $temp_target_robots = array();
             $temp_boss_robot = array('robot_token' => 'doc-robot', 'robot_item' => 'weapon-upgrade');
+            $temp_mecha_robot = array('robot_token' => 'heel-bot', 'robot_item' => 'energy-upgrade', 'robot_level' => ceil($temp_target_level / 2));
             $temp_target_field = array('field_token' => 'robot-museum');
             if ($this_prototype_data['this_player_token'] === 'dr-light'){
                 $temp_target_field['field_mechas'] = array('sniper-joe');
                 $temp_target_field['field_background_variant'] = 'mm1';
                 $temp_boss_robot['robot_item'] = 'defense-capsule';
                 $temp_boss_robot['robot_abilities'] = array('rolling-cutter', 'super-arm', 'ice-breath', 'hyper-bomb', 'fire-storm', 'thunder-strike', 'time-arrow', 'oil-shooter');
+                $temp_mecha_robot['robot_item'] = 'attack-pellet';
+                $temp_mecha_robot['robot_abilities'] = array('attack-support', 'energy-break', 'defense-break');
                 $temp_battle_config['ability_rewards'] = array(array('token' => 'copy-shot', 'level' => 0));
             }
             elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){
@@ -277,6 +281,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_target_field['field_background_variant'] = 'mm2';
                 $temp_boss_robot['robot_item'] = 'attack-capsule';
                 $temp_boss_robot['robot_abilities'] = array('metal-blade', 'air-shooter', 'bubble-spray', 'quick-strike', 'crash-bomber', 'flash-pulse', 'atomic-fire', 'leaf-fall');
+                $temp_mecha_robot['robot_item'] = 'speed-pellet';
+                $temp_mecha_robot['robot_abilities'] = array('speed-support', 'energy-break', 'attack-break');
                 $temp_battle_config['ability_rewards'] = array(array('token' => 'copy-soul', 'level' => 0));
             }
             elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){
@@ -284,11 +290,16 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_target_field['field_background_variant'] = 'mm4';
                 $temp_boss_robot['robot_item'] = 'speed-capsule';
                 $temp_boss_robot['robot_abilities'] = array('bright-burst', 'rain-flush', 'drill-blitz', 'ring-boomerang', 'dust-crusher', 'skull-barrier', 'pharaoh-shot', 'dive-torpedo');
+                $temp_mecha_robot['robot_item'] = 'defense-pellet';
+                $temp_mecha_robot['robot_abilities'] = array('defense-support', 'energy-break', 'speed-break');
                 //$temp_battle_config['ability_rewards'] = array(array('token' => 'copy-style', 'level' => 0));
             }
             $temp_target_robots[] = $temp_boss_robot;
-            $temp_target_level = $this_prototype_data['this_chapter_levels'][1] + 8;
+            $temp_target_robots[] = $temp_mecha_robot;
+            $temp_target_robots[] = $temp_mecha_robot;
             $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
+            $temp_battle_omega['battle_description'] = 'Defeat Doc Robot and his team of Heel-Bots!';
+            $temp_battle_omega['battle_description2'] = empty($this_prototype_data['this_chapter_unlocked']['2']) ? 'Reclaim the Robot Museum to progress to the next chapter!' : '';
             $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
             rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
