@@ -6228,6 +6228,10 @@ class rpg_robot extends rpg_object {
         $this->trigger_custom_function('rpg-robot_check-weapons_before', $extra_objects);
         if ($options->return_early){ return $options->return_value; }
 
+        // Check to see if any anti-recovery robots are preventing this action
+        $anti_recovery_robots = $this_battle->check_for_skill_group_robots('anti_recovery');
+        if (!empty($anti_recovery_robots)){ $options->recover_weapons = false; }
+
         // If this robot is not at full weapon energy, increase it by one
         if ($options->recover_weapons){
             $temp_weapons = $this_robot->get_weapons();
