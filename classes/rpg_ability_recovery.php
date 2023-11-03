@@ -8,7 +8,7 @@ class rpg_ability_recovery extends rpg_recovery {
     // Define a trigger for inflicting all types of recovery on this robot
     public static function trigger_robot_recovery($this_robot, $target_robot, $this_ability, $recovery_amount, $trigger_disabled = true, $trigger_options = array()){
         global $db;
-        error_log('rpg_ability_recovery::trigger_robot_recovery() from '.(!empty($this_ability) ? $this_ability->ability_token : 'unknown'));
+        //error_log('rpg_ability_recovery::trigger_robot_recovery() from '.(!empty($this_ability) ? $this_ability->ability_token : 'unknown'));
 
         // DEBUG
         $debug = '';
