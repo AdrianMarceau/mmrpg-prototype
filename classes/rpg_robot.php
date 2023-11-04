@@ -1585,7 +1585,7 @@ class rpg_robot extends rpg_object {
         if ($temp_compatible
             && $robot_info['robot_class'] == 'mecha'){
             //$debug_fragment .= 'is-mecha '; // DEBUG
-            if (in_array($ability_info['ability_token'], array('mecha-support', 'friend-share'))){
+            if (in_array($ability_info['ability_token'], array('mecha-support', 'mecha-party', 'friend-share'))){
                 //$debug_fragment .= 'is-mecha-incompatible '; // DEBUG
                 $temp_compatible = false;
             }
@@ -1878,6 +1878,13 @@ class rpg_robot extends rpg_object {
             $options[] = 'mecha-support';
             if ($this_player->counters['robots_total'] == 1){ $weights[] = 50; }
             elseif ($this_player->counters['robots_total'] < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){ $weights[] = 10; }
+            else { $weights[] = 0; }
+        }
+
+        // Define the frequency of the mecha party ability based benched robot count
+        if ($this_robot->has_ability('mecha-party')){
+            $options[] = 'mecha-party';
+            if ($this_player->counters['robots_total'] == 1){ $weights[] = 50; }
             else { $weights[] = 0; }
         }
 
