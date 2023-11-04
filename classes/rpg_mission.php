@@ -16,7 +16,7 @@ class rpg_mission {
     public static function calculate_mission_zenny_and_turns(&$this_battle_omega, $this_prototype_data, $this_start_level = 1, $mmrpg_robots_index = array()){
 
         // Collect the base battle index and completion records for reference
-        if (empty($mmrpg_robots_index) || !is_array($mmrpg_robots_index)){ $mmrpg_robots_index = rpg_robot::get_index(); }
+        if (empty($mmrpg_robots_index) || !is_array($mmrpg_robots_index)){ $mmrpg_robots_index = rpg_robot::get_index(true); }
         $temp_index_battle = rpg_battle::get_index_info($this_battle_omega['battle_token']);
         $temp_battle_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $this_battle_omega['battle_token']);
 
