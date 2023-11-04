@@ -319,15 +319,17 @@ class rpg_mission_single extends rpg_mission {
         }
 
         // Update the battle description based on what we've calculated
-        $temp_robot_pronoun_possessive = rpg_robot::get_robot_pronoun($temp_option_robot['robot_class'], $temp_option_robot['robot_gender'], 'possessive');
-        if (!empty($this_unlock_abilities_count)){
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].' and download '.$temp_robot_pronoun_possessive.' special weapon!';
-            $temp_battle_omega['battle_description2'] = 'Once we\'ve acquired it, we may be able to equip the ability to other robots...';
-        } elseif (!empty($this_unlock_robots_count)){
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].' and download '.$temp_robot_pronoun_possessive.' robot data!';
-            $temp_battle_omega['battle_description2'] = 'If we use only Neutral type abilities on the target we may be able to save it...';
-        } else {
-            $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].'!';
+        $temp_battle_omega['battle_description'] = 'Defeat '.$temp_option_robot['robot_name'].' and liberate the '.$temp_option_field['field_name'].'!';
+        $temp_battle_omega['battle_description2'] = '';
+        if ($this_unlock_abilities_count > 0){
+            $temp_robot_pronoun_possessive = rpg_robot::get_robot_pronoun($temp_option_robot['robot_class'], $temp_option_robot['robot_gender'], 'possessive');
+            $temp_battle_omega['battle_description2'] = 'Once we\'ve acquired '.$temp_robot_pronoun_possessive.' special weapon, we may be able to equip it to other robots!';
+        } elseif ($this_unlock_robots_count > 0){
+            $temp_robot_pronoun_object = rpg_robot::get_robot_pronoun($temp_option_robot['robot_class'], $temp_option_robot['robot_gender'], 'object');
+            $temp_robot_pronoun_possessive = rpg_robot::get_robot_pronoun($temp_option_robot['robot_class'], $temp_option_robot['robot_gender'], 'possessive');
+            $temp_battle_omega['battle_description2'] = 'If we use only Neutral-type abilities on '.$temp_robot_pronoun_object.', we may be able to save '.$temp_robot_pronoun_possessive.' data!';
+        } elseif ($temp_option_completed){
+            $temp_battle_omega['battle_description'] = str_replace('liberate', 'secure', $temp_battle_omega['battle_description']);
         }
 
         // Return the generated battle data
