@@ -3102,9 +3102,13 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
     $atokens = array_unique($atokens);
 
     // Collect the robot, ability, and item indexes for display purposes
-    $this_robot_index = rpg_robot::get_index_custom($rtokens);
-    $this_ability_index = rpg_ability::get_index_custom($atokens);
-    $this_item_index = rpg_item::get_index();
+    $this_robot_index = rpg_robot::get_index(true);
+    $this_ability_index = rpg_ability::get_index(true);
+    $this_item_index = rpg_item::get_index(true);
+    $mecha_support_index = mmrpg_prototype_mecha_support_index(true);
+
+    // Collect starforce values for the current player
+    $player_starforce = rpg_game::starforce_unlocked();
 
     // Loop through and display the available robot options for this player
     $temp_robot_option_count = count($this_prototype_data['robot_options']);
@@ -3131,6 +3135,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_experience = mmrpg_prototype_robot_experience($this_prototype_data['this_player_token'], $info['robot_token']);
         $this_robot_level = mmrpg_prototype_robot_level($this_prototype_data['this_player_token'], $info['robot_token']);
         $this_robot_abilities = mmrpg_prototype_abilities_unlocked($this_prototype_data['this_player_token'], $info['robot_token']);
+        $this_robot_abilities_current = !empty($info['robot_abilities']) ? array_keys($info['robot_abilities']) : array('buster-shot');
         $text_robot_special = $this_robot_level >= 100 || !empty($this_robot_rewards['flags']['reached_max_level']) ? true : false;
         $this_robot_experience = $this_robot_level >= 100 ? '<span style="position: relative; bottom: 0; font-size: 120%;">&#8734;</span>' : $this_robot_experience;
         $this_robot_experience_title = $this_robot_level >= 100 ? '&#8734;' : $this_robot_experience;
@@ -3141,9 +3146,6 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
 
         $this_robot_favourite = in_array($info['robot_token'], $temp_player_favourites) ? true : false;
         //$this_robot_name .= $this_robot_favourite ? ' <span class="icons favs"><i class="fa fas fa-thumbtack"></i></span>' : '';
-
-        // Collect starforce values for the current player
-        $player_starforce = rpg_game::starforce_unlocked();
 
         // Calculate this robot's current and max stat values
         $this_robot_stats = rpg_robot::calculate_stat_values($this_robot_level, $info, $this_robot_rewards, true, $this_robot_core, $player_starforce);
@@ -3171,6 +3173,26 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         // Collect info about the robot's item if it exists
         $this_robot_item_info = !empty($this_robot_item) && isset($this_item_index[$this_robot_item]) ? $this_item_index[$this_robot_item] : array();
 
+        // Collect info about the robot's assigned support unit if it exists and the player has a use for that information
+        $this_robot_support_info = array();
+        if (in_array('mecha-support', $this_robot_abilities_current)
+            || in_array('mecha-party', $this_robot_abilities_current)
+            || in_array('friend-share', $this_robot_abilities_current)){
+            $this_mecha_support_info = !empty($mecha_support_index[$info['robot_token']]) ? $mecha_support_index[$info['robot_token']] : array();
+            if (!empty($this_mecha_support_info['custom'])){
+                $this_robot_support_token = $this_mecha_support_info['custom']['token'];
+                $this_robot_support_image = $this_mecha_support_info['custom']['image'];
+            } elseif (!empty($this_mecha_support_info['default'])
+                && $this_mecha_support_info['default'] !== 'local'){
+                $this_robot_support_token = $this_mecha_support_info['default'];
+                $this_robot_support_image = '';
+            } else {
+                $this_robot_support_token = 'met';
+                $this_robot_support_image = '';
+            }
+            $this_robot_support_info = !empty($this_robot_support_token) ? array('token' => $this_robot_support_token, 'image' => $this_robot_support_image) : array();
+        }
+
         $starcount = 0;
         $bullcount = 0;
         $namestring = '';
@@ -3188,7 +3210,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         if (!empty($this_player_info['player_defense'])){ $this_robot_defense += ceil(($this_player_info['player_defense'] / 100) * $this_robot_defense); }
         if (!empty($this_player_info['player_speed'])){ $this_robot_speed += ceil(($this_player_info['player_speed'] / 100) * $this_robot_speed); }
 
-        $this_robot_abilities_current = !empty($info['robot_abilities']) ? array_keys($info['robot_abilities']) : array('buster-shot');
+
         $this_option_title = ''; //-- Basics -------------------------------  <br />';
         $this_option_title .= $info['robot_name']; //''.$info['robot_number'].' '.$info['robot_name'];
         $this_option_title .= ' ('.(!empty($info['robot_core']) ? ucfirst($info['robot_core']).' Core' : 'Neutral Core').')';
@@ -3240,10 +3262,24 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
             $robot_item_sprite_markup = '<span class="sprite sprite_item sprite_40x40 sprite_40x40_00" style="background-image: url('.$item_sprite_url.');"></span>';
         }
 
+        $robot_support_sprite_markup = '';
+        //error_log($this_robot_support_info['token'].' // $this_robot_settings = '.print_r($this_robot_settings, true));
+        if (!empty($this_robot_support_info)){
+            //error_log($this_robot_support_info['token'].' // $this_robot_support_info = '.print_r($this_robot_support_info, true));
+            $support_sprite_image = !empty($this_robot_support_info['image']) ? $this_robot_support_info['image'] : $this_robot_support_info['token'];
+            $support_sprite_size = $this_robot_index[$this_robot_support_info['token']]['robot_image_size'];
+            $support_sprite_xsize = $support_sprite_size.'x'.$support_sprite_size;
+            $support_sprite_url = 'images/robots/'.$support_sprite_image.'/sprite_right_'.$support_sprite_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+            $robot_support_sprite_markup .= '<span class="sprite sprite_support sprite_40x40 sprite_40x40_00">';
+                $robot_support_sprite_markup .= '<span class="sprite sprite_'.$support_sprite_xsize.' sprite_'.$support_sprite_xsize.'_00" style="background-image: url('.$support_sprite_url.');"></span>';
+            $robot_support_sprite_markup .= '</span>';
+        }
+
         $this_option_label = '';
         $this_option_label .= $robot_sprite_markup;
         //$this_option_label .= '<span class="battle_sprites">'.$robot_sprite_markup.'</span>';
         if (!empty($robot_item_sprite_markup)){ $this_option_label .= $robot_item_sprite_markup; }
+        if (!empty($robot_support_sprite_markup)){ $this_option_label .= $robot_support_sprite_markup; }
         $this_option_label .= '<span class="multi">';
             $this_option_label .= $info_tooltip_icons;
             $this_option_label .= $pinned_fav_icons;

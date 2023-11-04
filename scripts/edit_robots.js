@@ -874,8 +874,19 @@ $(document).ready(function(){
                     // If the new ability list is completely empty (somehow), add Buster Shot
                     if (!newAbilityList.length){ newAbilityList.push('buster-shot'); }
 
-                    // Loop through all the ability slots and update them with relevant abilities
+                    // Collect references to the parent containers
                     var $parentAbilityContainer = targetAbilityLink.closest('.ability_container');
+                    var $parentRobotContainer = targetAbilityLink.closest('.event[data-player][data-robot][data-token]');
+
+                    // Check to see if this robot has need for the mecha support info span
+                    var mechaSupportActive = false;
+                    if (newAbilityList.indexOf('mecha-support') != -1){ mechaSupportActive = true; }
+                    if (newAbilityList.indexOf('mecha-party') != -1){ mechaSupportActive = true; }
+                    if (newAbilityList.indexOf('friend-share') != -1){ mechaSupportActive = true; }
+                    if (mechaSupportActive){ $parentRobotContainer.find('.robot_support_subtitle').removeClass('inactive'); }
+                    else { $parentRobotContainer.find('.robot_support_subtitle').addClass('inactive'); }
+
+                    // Loop through all the ability slots and update them with relevant abilities
                     var $targetAbilityLinks = $parentAbilityContainer.find('a.ability_name[data-key]');
                     var $refAbilityLinks = $('a.ability_name[data-ability]', thisAbilityCanvas);
                     //console.log('$parentAbilityContainer.length =', $parentAbilityContainer.length);
@@ -888,10 +899,12 @@ $(document).ready(function(){
                         //console.log('newAbilityToken =', newAbilityToken);
 
                         var $targetAbilityLink = $(this);
-                        var $refAbilityLink = false;
-                        if (newAbilityToken.length){ $refAbilityLink = $refAbilityLinks.filter('[data-ability="'+newAbilityToken+'"]'); }
                         //console.log('$targetAbilityLink.length =', $targetAbilityLink.length);
-                        //console.log('$refAbilityLink.length =', $refAbilityLink.length);
+                        var $refAbilityLink = false;
+                        if (newAbilityToken.length){
+                            $refAbilityLink = $refAbilityLinks.filter('[data-ability="'+newAbilityToken+'"]');
+                            //console.log('$refAbilityLink.length =', $refAbilityLink.length);
+                        }
 
                         // If a non-empty ability token was provided, normal equip
                         if (newAbilityToken.length

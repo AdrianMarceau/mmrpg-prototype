@@ -448,9 +448,14 @@ body.windowFlag_landscapeMode #prototype {
     min-height: 230px;
 }
 #edit td.console {
-    overflow: hidden;
+    overflow: visible;
     height: auto;
     min-height: 0;
+}
+#edit td.console:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 #edit #console .event {
     margin: 0;
@@ -1070,17 +1075,29 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
 }
 #edit #console .header .title,
 #edit #console .header .core {
-    position: absolute;
-    top: 2px;
-    right: 2px;
     padding: 2px 6px;
     background-color: rgba(0, 0, 0, 0.25) !important;
     border-color: rgba(0, 0, 0, 0.25) !important;
     line-height: 12px;
 }
 #edit #console .header .title {
-    position: static;
+    position: relative;
+}
+#edit #console .header .core {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+}
+#edit #console .header .title {
     font-size: 11px;
+}
+#edit #console .header .title.subtitle {
+    font-size: 9px;
+    margin-left: 4px;
+    bottom: 1px;
+}
+#edit #console .header .title.subtitle.has_sprite {
+    padding-right: 40px;
 }
 #edit #console .header .robot_type .wrap {
     padding-right: 18px;
@@ -1117,6 +1134,30 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
 }
 #edit #console .omega.robot_type:before {
     content: "\03a9";
+}
+
+
+#edit #console .header .title.robot_support_subtitle {
+
+}
+#edit #console .header .title.robot_support_subtitle.inactive {
+    display: none;
+}
+#edit #console .sprite.sprite_support {
+    position: absolute;
+    right: 0;
+    bottom: -8px;
+    display: inline-block;
+    margin-left: 4px;
+    box-sizing: border-box;
+    box-shadow: none;
+    border: 0 none transparent;
+}
+#edit #console .sprite.sprite_support .sprite {
+    filter: brightness(0.8);
+}
+#edit #console .omega.robot_type + .sprite.sprite_support {
+    left: 40px;
 }
 
 

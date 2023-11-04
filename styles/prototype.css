@@ -1753,15 +1753,26 @@ body[data-source="website"] #prototype .menu {
     z-index: 2;
 }
 
+#mmrpg #prototype .option_this-robot-select .has_image .sprite_item,
+#mmrpg #prototype .option_this-robot-select .has_image .sprite_support {
+    background-color: transparent;
+}
 #mmrpg #prototype .option_this-robot-select .has_image .sprite_item {
     left: -8px;
     bottom: -5px;
     z-index: 3;
-    background-color: rgba(255, 0, 0, 0);
+}
+#mmrpg #prototype .option_this-robot-select .has_image .sprite_support {
+    left: 20px;
+    bottom: 20px;
+    z-index: 1;
+    filter: brightness(0.6);
 }
 #mmrpg #prototype .option_this-robot-select .has_image.has_rewards .sprite_item {
     bottom: 2px;
-    background-color: rgba(0, 255, 0, 0);
+}
+#mmrpg #prototype .option_this-robot-select .has_image.has_rewards .sprite_support {
+    bottom: 27px;
 }
 #mmrpg #prototype .option_this-robot-select .icons.stats,
 #mmrpg #prototype .option_this-robot-select .icons.favs,
@@ -1964,9 +1975,13 @@ body[data-source="website"] #prototype .menu {
     75% { transform: translateY(-1px); background-position: -360px 0px; }
     100% { transform: translateY(0px); background-position: 0px 0px; }
 }
-#mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_robot .sprite  {
+#mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_robot .sprite,
+#mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_support .sprite {
     transform: translateY(0px);
     animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
+}
+#mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_support .sprite {
+    animation-delay: 0.3s;
 }
 #mmrpg #prototype .option_this-battle-select:not(.option_complete) .sprite_robot .sprite  {
     transform: translateY(0px);
