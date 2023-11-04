@@ -353,6 +353,10 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             if ($temp_battle_complete){
                 $temp_rival_option['battle_target_player']['player_token'] = 'player';
                 $temp_rival_option['battle_description'] = preg_replace('/^Defeat (Dr. (Wily|Light|Cossack)\'s)/i', 'Defeat', $temp_rival_option['battle_description']);
+                if (!empty($temp_rival_option['battle_field_base']['field_token'])){
+                    $temp_field_base = rpg_field::get_index_info($temp_rival_option['battle_field_base']['field_token']);
+                    $temp_rival_option['battle_description'] = substr(trim($temp_rival_option['battle_description']), 0, -1).' at '.$temp_field_base['field_name'].'!';
+                }
                 // Also make sure any unlocked robots appear in greyscale on the button
                 $temp_target_level = $this_prototype_data['this_chapter_levels'][2];
                 foreach ($temp_rival_option['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
@@ -476,6 +480,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_target_level = $this_prototype_data['this_chapter_levels'][2] + 1;
             $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
             $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $temp_battle_omega['battle_description'] = 'Defeat '.ucfirst($hunter_token).' and his Dark Man at the Hunter Compound!';
             rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
@@ -533,6 +538,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_target_level = $this_prototype_data['this_chapter_levels'][2] + 2;
             $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
             $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
+            $temp_battle_omega['battle_description'] = 'Defeat the corrupted '.ucfirst($temp_boss_robot['robot_token']).' and his Trill handlers at the Royal Palace!';
             rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
