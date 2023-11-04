@@ -5386,6 +5386,64 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
 
 }
 
+// Define a function for pulling the index of mecha support options for robot masters
+function mmrpg_prototype_mecha_support_index($include_custom = true){
+    //error_log('mmrpg_prototype_mecha_support_index($include_custom: '.($include_custom ? 'true' : 'false').')');
+    static $mecha_support_index;
+    if (empty($mecha_support_index)){
+        $mmrpg_robot_index = rpg_robot::get_index(true);
+        $mmrpg_field_index = rpg_field::get_index(true);
+        $user_robot_settings = mmrpg_prototype_robots_settings();
+        //error_log('$user_robot_settings = '.print_r($user_robot_settings, true));
+        $cache_token = md5(MMRPG_BUILD);
+        $cached_index = rpg_object::load_cached_index('robots.support', $cache_token);
+        if (!empty($cached_index)){
+            $mecha_support_index = $cached_index;
+            unset($cached_index);
+        } else {
+            foreach ($mmrpg_robot_index AS $robot_token => $robot_info){
+                if ($robot_info['robot_class'] === 'mecha'){ continue; }
+                $default_mecha_token = !empty($robot_info['robot_support']) ? $robot_info['robot_support'] : '';
+                if (empty($default_mecha_token)){
+                    if (empty($robot_info['robot_core'])){
+                        $default_mecha_token = 'met';
+                    } elseif ($robot_info['robot_core'] === 'copy'){
+                        $default_mecha_token = 'local';
+                    } else {
+                        $robot_home_field = false;
+                        if (!empty($robot_info['robot_field'])){ $robot_home_field = $robot_info['robot_field']; }
+                        elseif (!empty($robot_info['robot_field2'])){ $robot_home_field = $robot_info['robot_field2']; }
+                        if (!empty($robot_home_field)
+                            && !empty($mmrpg_field_index[$robot_home_field])
+                            && !empty($mmrpg_field_index[$robot_home_field]['field_mechas'])){
+                            $field_mechas = $mmrpg_field_index[$robot_home_field]['field_mechas'];
+                            $default_mecha_token = $field_mechas[0];
+                        }
+                    }
+                }
+                if (empty($default_mecha_token)){
+                    $default_mecha_token = 'met';
+                }
+                $mecha_support_index[$robot_token] = array('default' => $default_mecha_token);
+            }
+            rpg_object::save_cached_index('robots.support', $cache_token, $mecha_support_index);
+        }
+        if ($include_custom
+            && !empty($mecha_support_index)){
+            foreach ($mecha_support_index AS $robot_token => $mecha_info){
+                $robot_info = $mmrpg_robot_index[$robot_token];
+                $robot_settings = !empty($user_robot_settings[$robot_token]) ? $user_robot_settings[$robot_token] : array();
+                $custom_mecha_token = !empty($robot_settings['robot_support']) ? $robot_settings['robot_support'] : '';
+                $custom_mecha_image = !empty($robot_settings['robot_support_image']) ? $robot_settings['robot_support_image'] : '';
+                $custom_mecha_info = !empty($custom_mecha_token) ? array('token' => $custom_mecha_token, 'image' => $custom_mecha_image) : false;
+                $mecha_support_index[$robot_token]['custom'] = $custom_mecha_info;
+            }
+        }
+    }
+    //error_log('$mecha_support_index = '.print_r($mecha_support_index, true));
+    return $mecha_support_index;
+}
+
 
 
 ?>
