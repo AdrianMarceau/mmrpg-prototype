@@ -62,8 +62,29 @@ $request_robot_info = $mmrpg_index_robots[$request_robot];
 $request_robot_abilities = array();
 foreach ($request_robot_settings['robot_abilities'] AS $temp_info){ $request_robot_abilities[] = $temp_info['ability_token']; }
 
+// Loop through and make sure none of these abilities shouldn't be here beforehand
+foreach ($request_robot_abilities AS $temp_key => $temp_token){
+    if (!isset($mmrpg_index_abilities[$temp_token])){
+        unset($request_robot_abilities[$temp_key]);
+        continue;
+    } else {
+        $allowed = true;
+        $temp_info = $mmrpg_index_abilities[$temp_token];
+        if (empty($temp_info['ability_flag_published'])){ $allowed = false; }
+        if (!$allowed){
+            unset($request_robot_abilities[$temp_key]);
+            continue;
+        }
+    }
+}
+
 // Crop the ability settings if they've somehow exceeded the eight limit
-if (count($request_robot_abilities) > 8){ $request_robot_abilities = array_slice($request_robot_abilities, 0, 8, true); }
+if (count($request_robot_abilities) > 8){
+    $request_robot_abilities = array_slice($request_robot_abilities, 0, 8, true);
+}
+
+// Re-key the current ability list just in case there were changes
+$request_robot_abilities = array_values($request_robot_abilities);
 
 // Collect some key details about this particular player robot
 $request_robot_token = $request_robot_info['robot_token'];
