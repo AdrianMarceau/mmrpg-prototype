@@ -265,34 +265,37 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_battle_config['battle_size'] = '1x4';
             $temp_target_robots = array();
             $temp_boss_robot = array('robot_token' => 'doc-robot', 'robot_item' => 'weapon-upgrade');
-            $temp_mecha_robot = array('robot_token' => 'heel-bot', 'robot_item' => 'energy-upgrade', 'robot_level' => ceil($temp_target_level / 2));
+            $temp_mecha_robot = array('robot_token' => 'met', 'robot_item' => 'energy-upgrade', 'robot_level' => ceil($temp_target_level / 2));
             $temp_target_field = array('field_token' => 'robot-museum');
             if ($this_prototype_data['this_player_token'] === 'dr-light'){
-                $temp_target_field['field_mechas'] = array('sniper-joe');
+                $temp_target_field['field_mechas'] = array('skeleton-joe');
                 $temp_target_field['field_background_variant'] = 'mm1';
                 $temp_boss_robot['robot_item'] = 'defense-capsule';
                 $temp_boss_robot['robot_abilities'] = array('rolling-cutter', 'super-arm', 'ice-breath', 'hyper-bomb', 'fire-storm', 'thunder-strike', 'time-arrow', 'oil-shooter');
+                $temp_mecha_robot['robot_token'] = $temp_target_field['field_mechas'][0];
                 $temp_mecha_robot['robot_item'] = 'attack-pellet';
-                $temp_mecha_robot['robot_abilities'] = array('attack-support', 'energy-break', 'defense-break');
+                //$temp_mecha_robot['robot_abilities'] = array('attack-support', 'energy-break', 'defense-break');
                 $temp_battle_config['ability_rewards'] = array(array('token' => 'copy-shot', 'level' => 0));
             }
             elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){
-                $temp_target_field['field_mechas'] = array('skeleton-joe');
+                $temp_target_field['field_mechas'] = array('crystal-joe');
                 $temp_target_field['field_background_variant'] = 'mm2';
                 $temp_boss_robot['robot_item'] = 'attack-capsule';
                 $temp_boss_robot['robot_abilities'] = array('metal-blade', 'air-shooter', 'bubble-spray', 'quick-strike', 'crash-bomber', 'flash-pulse', 'atomic-fire', 'leaf-fall');
+                $temp_mecha_robot['robot_token'] = $temp_target_field['field_mechas'][0];
                 $temp_mecha_robot['robot_item'] = 'speed-pellet';
-                $temp_mecha_robot['robot_abilities'] = array('speed-support', 'energy-break', 'attack-break');
+                //$temp_mecha_robot['robot_abilities'] = array('speed-support', 'energy-break', 'attack-break');
                 $temp_battle_config['ability_rewards'] = array(array('token' => 'copy-soul', 'level' => 0));
             }
             elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){
-                $temp_target_field['field_mechas'] = array('crystal-joe');
+                $temp_target_field['field_mechas'] = array('sniper-joe');
                 $temp_target_field['field_background_variant'] = 'mm4';
                 $temp_boss_robot['robot_item'] = 'speed-capsule';
                 $temp_boss_robot['robot_abilities'] = array('bright-burst', 'rain-flush', 'drill-blitz', 'ring-boomerang', 'dust-crusher', 'skull-barrier', 'pharaoh-shot', 'dive-torpedo');
+                $temp_mecha_robot['robot_token'] = $temp_target_field['field_mechas'][0];
                 $temp_mecha_robot['robot_item'] = 'defense-pellet';
-                $temp_mecha_robot['robot_abilities'] = array('defense-support', 'energy-break', 'speed-break');
-                //$temp_battle_config['ability_rewards'] = array(array('token' => 'copy-style', 'level' => 0));
+                //$temp_mecha_robot['robot_abilities'] = array('defense-support', 'energy-break', 'speed-break');
+                //...notyet...$temp_battle_config['ability_rewards'] = array(array('token' => 'copy-style', 'level' => 0));
             }
             $temp_target_robots[] = $temp_boss_robot;
             $temp_target_robots[] = $temp_mecha_robot;
@@ -342,14 +345,30 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         if (true){
 
             // Unlock the first fortress battle
+            $temp_target_level = $this_prototype_data['this_chapter_levels'][2];
             $temp_rival_option_token = $this_prototype_data['this_player_token'].'-fortress-i';
+            $temp_battle_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_rival_option_token);
             $temp_rival_option = rpg_battle::get_index_info($temp_rival_option_token, true);
             $temp_rival_option['battle_phase'] = $this_prototype_data['battle_phase'];
             $temp_rival_option['battle_level'] = $this_prototype_data['this_chapter_levels'][2];
             $temp_rival_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
-
+            // Always add a support mecha to this battle for healing
+            $temp_mecha_token = false;
+            $temp_mecha_abilities = array();
+            $temp_mecha_level = ceil($temp_target_level / 2);
+            if ($this_prototype_data['this_player_token'] === 'dr-light'){ $temp_mecha_token = 'heel-bot'; } // evil heel w/ bass & disco
+            elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){ $temp_mecha_token = 'heal-bot'; } // nice heal w/ proto and rhythm
+            elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){ $temp_mecha_token = 'dark-frag'; } // a little bit of future content
+            if (!empty($temp_mecha_token)){
+                if (strstr($temp_mecha_token, '-bot')){ $temp_mecha_abilities = array('energy-boost', 'attack-boost', 'defense-boost', 'speed-boost'); }
+                elseif (strstr($temp_mecha_token, '-frag')){ $temp_mecha_abilities = array('dark-break', 'dark-boost', 'dark-drain'); }
+                $temp_rival_option['battle_target_player']['player_robots'][] = array(
+                    'robot_token' => $temp_mecha_token,
+                    'robot_level' => $temp_mecha_level,
+                    'robot_abilities' => $temp_mecha_abilities
+                    );
+            }
             // If the battle is complete, remove the player from the description
-            $temp_battle_complete = mmrpg_prototype_battle_complete($this_prototype_data['this_player_token'], $temp_rival_option_token);
             if ($temp_battle_complete){
                 $temp_rival_option['battle_target_player']['player_token'] = 'player';
                 $temp_rival_option['battle_description'] = preg_replace('/^Defeat (Dr. (Wily|Light|Cossack)\'s)/i', 'Defeat', $temp_rival_option['battle_description']);
@@ -358,7 +377,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     $temp_rival_option['battle_description'] = substr(trim($temp_rival_option['battle_description']), 0, -1).' at '.$temp_field_base['field_name'].'!';
                 }
                 // Also make sure any unlocked robots appear in greyscale on the button
-                $temp_target_level = $this_prototype_data['this_chapter_levels'][2];
                 foreach ($temp_rival_option['battle_target_player']['player_robots'] AS $rm_key => $rm_robot){
                     $rm_robot['robot_level'] = $temp_target_level;
                     if (mmrpg_prototype_robot_unlocked(false, $rm_robot['robot_token'])){
@@ -538,7 +556,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_target_level = $this_prototype_data['this_chapter_levels'][2] + 2;
             $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
             $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
-            $temp_battle_omega['battle_description'] = 'Defeat the corrupted '.ucfirst($temp_boss_robot['robot_token']).' and his Trill handlers at the Royal Palace!';
+            $temp_battle_omega['battle_description'] = 'Defeat the '.ucfirst($temp_boss_robot['robot_token']).' and his '.ucfirst($temp_support_robot1['robot_token']).' handlers at the Royal Palace!';
             rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
 
