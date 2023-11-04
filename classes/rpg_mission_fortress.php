@@ -47,6 +47,7 @@ class rpg_mission_fortress extends rpg_mission {
 
         // Collect the robot index for calculation purposes
         $mmrpg_robots_index = rpg_robot::get_index(true);
+        $mmrpg_abilities_index = rpg_ability::get_index(true);
         $mmrpg_fields_index = rpg_field::get_index();
 
         // Predefine some battle config defaults if not already set
@@ -310,6 +311,22 @@ class rpg_mission_fortress extends rpg_mission {
                 $robot_info_data = array_merge($robot_info, $robot_data);
                 $temp_abilities = mmrpg_prototype_generate_abilities($robot_info_data, $omega_robot_level, $ability_count, $temp_item);
                 $new_robot_data['robot_abilities'] = $temp_abilities;
+                if ($robot_info['robot_class'] == 'mecha'){
+                    $temp_native_abilities = array();
+                    if (!empty($robot_index_info['robot_rewards']['abilities'])){
+                        foreach ($robot_index_info['robot_rewards']['abilities'] AS $info){
+                            if (!isset($mmrpg_abilities_index[$info['token']])){ continue; }
+                            elseif (!$mmrpg_abilities_index[$info['token']]['ability_flag_complete']){ continue; }
+                            $temp_native_abilities[] = $info['token'];
+                        }
+                    }
+                    if (!empty($temp_native_abilities)){
+                        $new_robot_data['robot_abilities'] = array_merge($temp_native_abilities, $temp_abilities);
+                        $new_robot_data['robot_abilities'] = array_unique($new_robot_data['robot_abilities']);
+                        $new_robot_data['robot_abilities'] = array_slice($new_robot_data['robot_abilities'], 8);
+                    }
+                }
+                //error_log('$new_robot_data[\'robot_abilities\'] = '.print_r($new_robot_data['robot_abilities'], true));
             }
 
             // This was a mecha and we're supposed to be hiding them, let's do that
