@@ -240,7 +240,9 @@ class rpg_mission_starter extends rpg_mission {
         }
 
         // Update the description text for the battle
-        $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.' guarding the '.explode(' ', strtolower($midboss_field_data['field_name']))[1].'\'s entrance!';
+        $temp_building_name = explode(' ', strtolower($midboss_field_data['field_name']))[1];
+        if ($temp_building_name === 'laboratory'){ $temp_building_name = 'lab'; }
+        $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.' guarding the '.$temp_building_name.'\'s entrance!';
 
         // If the rescue robot is here, add some ambiguous text to the description
         if ($rescue_robot_unlockable){
