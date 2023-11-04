@@ -1354,7 +1354,7 @@ class rpg_robot extends rpg_object {
     public function print_abilities($implode = true){
         $this_markup = array();
         if (empty($this->robot_abilities)){ return false; }
-        $ability_index = rpg_ability::get_index_custom($this->robot_abilities);
+        $ability_index = rpg_ability::get_index(true);
         foreach ($this->robot_abilities AS $ability_token){
             $ability_info = $ability_index[$ability_token];
             $ability_type = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : '';
