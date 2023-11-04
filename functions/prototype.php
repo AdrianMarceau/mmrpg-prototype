@@ -813,6 +813,60 @@ function mmrpg_prototype_robot_original_player($player_token, $robot_token){
     else { return $player_token; }
 }
 
+// Define a function for checking all robot prototype reward arrays without player segregation
+function mmrpg_prototype_robots_rewards(){
+    // Define the game session helper var
+    $session_token = mmrpg_game_token();
+    // Initialize the array to hold all robot rewards
+    $all_robot_rewards = array();
+    // Check and return rewards for all robots
+    if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
+        foreach ($_SESSION[$session_token]['values']['battle_rewards'] as $player_token => $player_info){
+            if (!empty($player_info['player_robots'])){
+                foreach ($player_info['player_robots'] as $robot_token => $robot_info){
+                    // Add the current player token to the robot info
+                    $robot_info['current_player'] = $player_token;
+                    // If the robot already exists, merge the rewards
+                    if (isset($all_robot_rewards[$robot_token])){
+                        $all_robot_rewards[$robot_token] = array_merge($all_robot_rewards[$robot_token], $robot_info);
+                    } else {
+                        $all_robot_rewards[$robot_token] = $robot_info;
+                    }
+                }
+            }
+        }
+    }
+    return $all_robot_rewards;
+}
+
+// Define a function for checking all robot prototype settings arrays without player segregation
+function mmrpg_prototype_robots_settings(){
+    // Define the game session helper var
+    $session_token = mmrpg_game_token();
+    // Initialize the array to hold all robot settings
+    $all_robot_settings = array();
+    // Check and return settings for all robots
+    if (!empty($_SESSION[$session_token]['values']['battle_settings'])){
+        foreach ($_SESSION[$session_token]['values']['battle_settings'] as $player_token => $player_info){
+            if (!empty($player_info['player_robots'])){
+                foreach ($player_info['player_robots'] as $robot_token => $robot_info){
+                    // Add the current player token to the robot info
+                    $robot_info['current_player'] = $player_token;
+                    // If the robot already exists, merge the settings
+                    if (isset($all_robot_settings[$robot_token])){
+                        $all_robot_settings[$robot_token] = array_merge($all_robot_settings[$robot_token], $robot_info);
+                    } else {
+                        $all_robot_settings[$robot_token] = $robot_info;
+                    }
+                }
+            }
+        }
+    }
+    return $all_robot_settings;
+}
+
+
+
 // Define a function for checking a robot's prototype reward array
 function mmrpg_prototype_robot_rewards($player_token = '', $robot_token){
     // Define the game session helper var
