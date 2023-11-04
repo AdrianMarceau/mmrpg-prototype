@@ -266,8 +266,12 @@ class rpg_mission_fortress extends rpg_mission {
             // Update the robot level and battle zenny plus turns
             //$temp_robot_level = $robot_info['robot_class'] !== 'mecha' ? $temp_omega_robot_level : floor($temp_omega_robot_level / 2);
             //if ($temp_robot_level < 1){ $temp_robot_level = 1; }
-            $temp_robot_level = $temp_omega_robot_level;
-            $new_robot_data['robot_level'] = $temp_robot_level;
+            if (!empty($new_robot_data['robot_level'])){
+                $temp_robot_level = $new_robot_data['robot_level'];
+            } else {
+                $temp_robot_level = $temp_omega_robot_level;
+                $new_robot_data['robot_level'] = $temp_robot_level;
+            }
             if ($robot_info['robot_class'] == 'boss'){
                 $temp_battle_omega['battle_zenny'] += ceil(MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL0 * MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER * $temp_robot_level);
                 $temp_battle_omega['battle_turns'] += MMRPG_SETTINGS_BATTLETURNS_PERBOSS;
