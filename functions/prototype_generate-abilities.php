@@ -43,7 +43,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 'attack-assault', 'defense-assault', 'speed-assault', 'energy-assault',
                 ),
             array(
-                'mecha-support', 'field-support'
+                'mecha-support', 'mecha-party', 'field-support'
                 ),
             array(
                 'recovery-booster', 'damage-booster',

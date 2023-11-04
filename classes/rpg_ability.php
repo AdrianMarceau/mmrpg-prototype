@@ -3551,7 +3551,7 @@ class rpg_ability extends rpg_object {
             'energy-break', 'attack-break', 'defense-break', 'speed-break',
             'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
             'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
-            'field-support', 'mecha-support', 'friend-share',
+            'field-support', 'mecha-support', 'mecha-party', 'friend-share',
             'core-shield', 'core-laser', 'omega-pulse', 'omega-wave'
             );
         // Return the list of global abilities
@@ -3742,7 +3742,7 @@ class rpg_ability extends rpg_object {
             // ensure specific incompatible abilities are also blocked
             && !in_array($ability_token, array(
                 // causes user or the target to switch which could be messy
-                'mecha-support', 'flash-pulse', 'super-throw',
+                'mecha-support', 'mecha-party', 'flash-pulse', 'super-throw',
                 // self-attached charge/shield/booster with no repeat-use benefit
                 'proto-shield', 'rhythm-satellite', 'acid-barrier', 'core-shield',
                 // target attachment/breaker with no repeat-use benefit for user
@@ -3755,6 +3755,7 @@ class rpg_ability extends rpg_object {
                 'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
                 // just doesn't make sense to use twice for one reason or another
                 'buster-charge', 'buster-relay', 'copy-shot', 'copy-soul', 'jewel-polish',
+                'friend-share', 'core-shield',
                 // [deprecated] abilities should not double-up
                 'repair-mode', 'energy-shuffle', 'attack-shuffle', 'defense-shuffle', 'speed-shuffle',
                 // [action/system] abilities should never be doubled-up
