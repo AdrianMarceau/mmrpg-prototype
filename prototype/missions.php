@@ -298,8 +298,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_target_robots[] = $temp_mecha_robot;
             $temp_target_robots[] = $temp_mecha_robot;
             $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
-            $temp_battle_omega['battle_description'] = 'Defeat Doc Robot and his team of Heel-Bots!';
-            $temp_battle_omega['battle_description2'] = empty($this_prototype_data['this_chapter_unlocked']['2']) ? 'Reclaim the Robot Museum to progress to the next chapter!' : '';
+            $temp_battle_omega['battle_description'] = 'Defeat Doc Robot and '.(empty($temp_battle_omega['battle_description']) ? 'liberate' : 'secure').' the Robot Museum!';
+            $temp_battle_omega['battle_description2'] = '';
             $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
             rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
             $this_prototype_data['battle_options'][] = $temp_battle_omega;
