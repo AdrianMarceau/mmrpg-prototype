@@ -657,6 +657,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         if ($group_options_complete_total >= $group_options_total){
             $temp_battle_config = array();
             $temp_battle_config['battle_size'] = '1x4';
+            $temp_battle_config['ability_rewards'] = array(array('token' => 'field-support', 'level' => 0));
             $temp_target_robots = array();
             $temp_target_robots[] = array(
                 'robot_token' => 'buster-rod-g',
@@ -715,7 +716,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_target_robots[] = $first;
             }
             $temp_target_field = array('field_token' => 'genesis-tower');
-            $temp_target_level = $this_prototype_data['this_chapter_levels'][3] + 4;;
+            $temp_target_level = $this_prototype_data['this_chapter_levels'][3] + 4;
             $temp_battle_omega = rpg_mission_fortress::generate($this_prototype_data, $temp_battle_config, $temp_target_robots, $temp_target_field, $temp_target_level);
             $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
             rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
