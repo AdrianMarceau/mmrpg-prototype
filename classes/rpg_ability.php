@@ -1227,7 +1227,7 @@ class rpg_ability extends rpg_object {
         $session_token = rpg_game::session_token();
 
         // Collect the types index for reference
-        $mmrpg_types = rpg_type::get_index();
+        $mmrpg_types = rpg_type::get_index(true, false, true);
 
         // Require the function file
         $temp_ability_title = '';
