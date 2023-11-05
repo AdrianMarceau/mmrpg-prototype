@@ -10,6 +10,14 @@ $restart_player_token = $this_player->player_token;
 // Redefine the player's robots string
 $this_player_robots = !empty($_REQUEST['this_player_robots']) ? $_REQUEST['this_player_robots'] : '00_robot';
 
+// If rotation was requested, we should break apart the csv player robots and rotate positions first
+if ($this_action == 'restart_with-rotate'){
+    $list_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
+    $first_robot = array_shift($list_robots);
+    $list_robots[] = $first_robot;
+    $this_player_robots = implode(',', $list_robots);
+}
+
 // Redirect the user back to the prototype screen
 $this_redirect = 'battle.php?'.
     ($flag_wap ? 'wap=true' : 'wap=false').

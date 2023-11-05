@@ -520,7 +520,8 @@ elseif ($this_action == 'withdraw'){
 
 }
 // Else if the player is has requested to restart the battle
-elseif ($this_action == 'restart'){
+elseif ($this_action == 'restart'
+    || $this_action == 'restart_with-rotate'){
 
     // Require the restart action file
     require_once('battle/actions/restart.php');
