@@ -124,6 +124,7 @@ function mmrpg_save_game_session(){
                 if (!empty($this_values['battle_rewards'])){
                     foreach ($mmrpg_index_players AS $player_token => $player_array){
                         if ($player_token == 'player'){ continue; }
+                        elseif ($player_token == 'proxy'){ continue; }
                         $player_reward_array = !empty($this_values['battle_rewards'][$player_token]) ? $this_values['battle_rewards'][$player_token] : array();
                         $player_battles_array = !empty($this_values['battle_complete'][$player_token]) ? $this_values['battle_complete'][$player_token] : array();
                         $player_database_token = str_replace('-', '_', $player_token);
