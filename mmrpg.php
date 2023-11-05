@@ -216,6 +216,7 @@ if (!defined('MMRPG_CRITICAL_ERROR') && !defined('MMRPG_INDEX_SESSION') && !defi
 
         if (!defined('MMRPG_SCRIPT_REQUEST')){
             if (empty($_SESSION['GAME']['BOARD']['boardinfo'])
+                || empty($_SESSION['GAME']['BOARD']['boardinfo']['board_id'])
                 || empty($_SESSION['GAME']['BOARD']['boardrank'])
                 || empty($_SESSION['GAME']['BOARD']['boardtime'])
                 || $_SESSION['GAME']['BOARD']['boardtime'] < $this_userinfo['user_date_modified']){
