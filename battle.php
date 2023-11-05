@@ -760,33 +760,28 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                 // Predefine a block number counter for later
                 $block_num = 0;
 
-                // Manually add buttons for sub-menus related to animation
+                // Manually add buttons for sub-menus related to overlays
                 if (true){
 
-                    // Add a button for the GAME SPEED submenu
+                    // Add a button for the TOGGLE OVERLAYS submenu
                     $block_num++;
-                    $setting_name = 'Game Speed';
-                    $setting_token = 'eventTimeout';
-                    $default_value = 'normal';
-                    $current_value = $default_value;
-                    if (isset($_SESSION['GAME']['battle_settings'][$setting_token])){
-                        $value = $_SESSION['GAME']['battle_settings'][$setting_token];
-                        if (empty($value) || $value === 'false'){ $value = false; }
-                        elseif (!empty($value) && $value === 'true'){ $value = true; }
-                        $current_value = $value;
-                    }
-                    $current_value_title = $current_value;
-                    if (isset($game_speeds_index[$current_value]['name'])){ $current_value_title = $game_speeds_index[$current_value]['name']; }
-                    echo('<a data-order="'.$block_num.'" class="button action_option action_setting block_'.$block_num.'" type="button" data-panel="settings_'.$setting_token.'">');
+                    $setting_name = 'Info Overlay (HUD)';
+                    $setting_token = 'screenshotMode'; // inverted logic abound!!!!!!
+                    $default_value = false;
+                    $current_value = false;
+                    $next_value = !$current_value ? true : false;
+                    $data_attrs = '';
+                    $data_attrs .= 'data-order="'.$block_num.'" ';
+                    $data_attrs .= 'onclick="mmrpg_toggle_screenshot_mode(\'toggle\', this);"  data-setting-token="'.$setting_token.'" data-setting-value="'.($current_value ? 1 : 0).'" ';
+                    echo('<a class="button action_option action_setting block_'.$block_num.'" type="button" '.$data_attrs.'>');
                         echo('<label><span class="multi">');
                             echo('<span class="title">'.$setting_name.'</span>');
                             echo('<br />');
-                            echo('<span class="value type type_time">');
-                                echo($current_value_title);
+                            echo('<span class="value type type_'.(!$current_value ? 'nature' : 'flame').'">');
+                                echo(!$current_value ? 'ON' : 'OFF');
                             echo('</span>');
                         echo('</span></label>');
                     echo('</a>');
-
 
                 }
 
@@ -816,6 +811,42 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             echo('</span>');
                         echo('</span></label>');
                     echo('</a>');
+                }
+
+                // If there were less than eight buttons, we should print spacers
+                while ($block_num < 4){
+                    $block_num++;
+                    echo('<a class="button action_setting button_disabled block_'.$block_num.'" type="button">&nbsp;</a>');
+                }
+
+                // Manually add buttons for sub-menus related to animation
+                if (true){
+
+                    // Add a button for the GAME SPEED submenu
+                    $block_num++;
+                    $setting_name = 'Game Speed';
+                    $setting_token = 'eventTimeout';
+                    $default_value = 'normal';
+                    $current_value = $default_value;
+                    if (isset($_SESSION['GAME']['battle_settings'][$setting_token])){
+                        $value = $_SESSION['GAME']['battle_settings'][$setting_token];
+                        if (empty($value) || $value === 'false'){ $value = false; }
+                        elseif (!empty($value) && $value === 'true'){ $value = true; }
+                        $current_value = $value;
+                    }
+                    $current_value_title = $current_value;
+                    if (isset($game_speeds_index[$current_value]['name'])){ $current_value_title = $game_speeds_index[$current_value]['name']; }
+                    echo('<a data-order="'.$block_num.'" class="button action_option action_setting block_'.$block_num.'" type="button" data-panel="settings_'.$setting_token.'">');
+                        echo('<label><span class="multi">');
+                            echo('<span class="title">'.$setting_name.'</span>');
+                            echo('<br />');
+                            echo('<span class="value type type_time">');
+                                echo($current_value_title);
+                            echo('</span>');
+                        echo('</span></label>');
+                    echo('</a>');
+
+
                 }
 
                 // Manually add buttons for sub-menus related to animation

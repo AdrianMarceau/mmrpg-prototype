@@ -2313,10 +2313,15 @@ function mmrpg_console_event(thisMarkup, eventFlags){ //, flagsMarkup
 
 // Define a function for toggling the canvas animation
 gameSettings.screenshotMode = false;
-function mmrpg_toggle_screenshot_mode(screenshotMode){
+function mmrpg_toggle_screenshot_mode(screenshotMode, element){
     //console.log('mmrpg_toggle_screenshot_mode(screenshotMode:', typeof screenshotMode, screenshotMode, ')');
-    if (typeof screenshotMode === 'undefined'){ screenshotMode = !gameSettings.screenshotMode ? true : false; }
+    if (typeof screenshotMode === 'undefined'
+        || screenshotMode === 'toggle'){
+        screenshotMode = !gameSettings.screenshotMode ? true : false;
+        }
     gameSettings.screenshotMode = screenshotMode;
+    //console.log('screenshotMode:', screenshotMode);
+    //console.log('gameSettings.screenshotMode:', gameSettings.screenshotMode);
     if (gameCanvas.length){
         if (gameSettings.screenshotMode){ gameCanvas.addClass('screenshot-mode'); }
         else { gameCanvas.removeClass('screenshot-mode'); }
@@ -2328,6 +2333,20 @@ function mmrpg_toggle_screenshot_mode(screenshotMode){
     if (window.self !== window.top
         && typeof window.top.mmrpg_toggle_screenshot_mode !== 'undefined'){
         window.top.mmrpg_toggle_screenshot_mode(screenshotMode);
+    }
+    if (typeof element !== 'undefined'
+        && element !== false){
+        // Collect the object references to the button and internal label
+        var thisButton = $(element);
+        var thisLabel = $('.multi', thisButton);
+        // Pull the current value and use it to calculate new ones
+        //console.log('thisButton.attr("data-setting-value"):', thisButton.attr('data-setting-value'));
+        var newValue = gameSettings.screenshotMode ? 1 : 0;
+        var newValueText = !gameSettings.screenshotMode ? 'ON' : 'OFF';
+        var newValueClass = 'value type type_' + (!gameSettings.screenshotMode ? 'nature' : 'flame');
+        // Update the button value and label text/colour
+        thisButton.attr('data-setting-value', newValue);
+        thisLabel.find('.value').html(newValueText).removeClass().addClass(newValueClass);
     }
 }
 

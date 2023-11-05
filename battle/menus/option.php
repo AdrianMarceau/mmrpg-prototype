@@ -4,58 +4,67 @@ ob_start();
 
 	// Check for specific battle flags so we know what options to present
 	$is_starfield_mission = !empty($this_battle->flags['starfield_mission']) ? true : false;
+	$is_challenge_battle = !empty($this_battle->flags['challenge_battle']) ? true : false;
 	$is_endless_battle = !empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle']) ? true : false;
 	$has_endless_progress = $is_endless_battle && !empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_token]) ? true : false;
 
 	// Define the markup for the option buttons
-
 	$temp_options = array();
 	$block_num = 0;
 
-	// Display the option for SKIP TURN
+	// Display the option for RESTART BATTLE (w/ SAME TEAM)
 	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_speed" type="button" data-action="ability_8_action-noweapons"><label><span class="multi">Skip<br />Turn</span></label></a>';
+	$battle_alias = $is_challenge_battle && !$is_endless_battle ? 'Challenge' : 'Battle';
+	$after_icon = '<i class="after fa fas fa-undo" style="position: absolute; top: -5px; right: -5px;"></i>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_shield" type="button" data-action="restart"><label><span class="multi">Restart&nbsp;'.$battle_alias.'<br /><i style="font-size: 9px;">(Same&nbsp;Team)</i>'.$after_icon.'</span></label></a>';
+
+	// Display the option for RESTART BATTLE (w/ TEAM ROTATE)
+	$block_num++;
+	$battle_alias = $is_challenge_battle && !$is_endless_battle ? 'Challenge' : 'Battle';
+	$after_icon = '<i class="after fa fas fa-sync" style="position: absolute; top: -5px; right: -5px; transform: scaleX(-1);"></i>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_shield" type="button" data-action="restart_with-rotate"><label><span class="multi">Restart&nbsp;'.$battle_alias.'<br /><i style="font-size: 9px;">(Rotate&nbsp;Order)</i>'.$after_icon.'</span></label></a>';
 
 	// Display the option for CHARGE WEAPONS
 	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_defense" type="button" data-action="ability_9_action-chargeweapons"><label><span class="multi">Manual<br />Recharge</span></label></a>';
+	$after_icon = '<i class="after fa fas fa-battery-half" style="position: absolute; top: -5px; right: -5px;"></i>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_defense" type="button" data-action="ability_9_action-chargeweapons"><label><span class="multi">Manual<br />Recharge'.$after_icon.'</span></label></a>';
 
-	// Display the option for RESTART BATTLE
+	// Display the option for SKIP TURN
 	$block_num++;
-	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_shield" type="button" data-action="restart"><label><span class="multi">Restart<br />Battle</span></label></a>';
+	$after_icon = '<i class="after fa fas fa-forward" style="position: absolute; top: -5px; right: -5px;"></i>';
+	$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_speed" type="button" data-action="ability_8_action-noweapons"><label><span class="multi">Skip<br />Turn'.$after_icon.'</span></label></a>';
 
+    // Otherwise in NORMAL MODE we can display the normal RETURN button instead
+    if (!$is_endless_battle
+		|| !$has_endless_progress){
 
+		// Display the option for RETURN TO MAIN MENU
+		$block_num++;
+		$after_icon = '<i class="after fa fas fa-home" style="position: absolute; top: -5px; right: -5px;"></i>';
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu'.$after_icon.'</span></label></a>';
+
+    }
     // If we're in ENDLESS MODE, display the SAVE button here
     if ($is_endless_battle
 		&& $has_endless_progress){
 
 		// Display the option for SAVE & KEEP PLAYER HERE
 		$block_num++;
-		$after_icon = '<i class="fa fas fa-save" style="position: absolute; top: -5px; right: -5px;"></i>';
+		$after_icon = '<i class="after fa fas fa-save" style="position: absolute; top: -5px; right: -5px;"></i>';
 		$player_name = $this_player->player_token !== 'player' ? str_replace(' ', '&nbsp;', $this_player->player_name) : 'Player';
 		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_nature" type="button" data-action="prototype"><label><span class="multi">Save&nbsp;&amp;&nbsp;Keep<br />'.$player_name.'&nbsp;Here'.$after_icon.'</span></label></a>';
 
     }
-    // Otherwise we can display the normal RETURN button instead
-    else {
-
-		// Display the option for RETURN TO MAIN MENU
-		$block_num++;
-		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu</span></label></a>';
-
-    }
-
-    // Display the option for TOGGLE OVERLAYS
-    $block_num++;
-    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="window.mmrpg_toggle_screenshot_mode();"><label><span class="multi">Toggle<br />Overlay</span></label></a>';
-
-    // Display the option for RESTART MUSIC
-    $block_num++;
-    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="parent.mmrpg_music_load(\''.(!strstr($this_field->field_music, '/') ? 'fields/'.$this_field->field_music : $this_field->field_music).'\', true);"><label><span class="multi">Restart<br />Music</span></label></a>';
 
     // Display the option for ANIMATION SETTINGS
     $block_num++;
-    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-panel="settings_animationEffects"><label><span class="multi">Animation<br />Settings</span></label></a>';
+	$after_icon = '<i class="after fa fas fa-image" style="position: absolute; top: -5px; right: -5px;"></i>';
+    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_shadow" type="button" data-panel="settings_animationEffects"><label><span class="multi">Animation<br />Settings'.$after_icon.'</span></label></a>';
+
+    // Display the option for RESTART MUSIC
+    $block_num++;
+	$after_icon = '<i class="after fa fas fa-music" style="position: absolute; top: -5px; right: -5px;"></i>';
+    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_shadow" type="button" onclick="parent.mmrpg_music_load(\''.(!strstr($this_field->field_music, '/') ? 'fields/'.$this_field->field_music : $this_field->field_music).'\', true);"><label><span class="multi">Restart<br />Music'.$after_icon.'</span></label></a>';
 
     // If we're in ENDLESS MODE, display the QUIT button here
     if ($is_endless_battle
@@ -63,17 +72,18 @@ ob_start();
 
 		// Display the option for QUIT & TAKE PLAYER HOME
 		$block_num++;
-		$after_icon = '<i class="fa fas fa-running" style="position: absolute; top: -5px; right: -5px;"></i>';
+		$after_icon = '<i class="after fa fas fa-running" style="position: absolute; top: -5px; right: -5px;"></i>';
 		$player_name = $this_player->player_token !== 'player' ? str_replace(' ', '&nbsp;', $this_player->player_name) : 'Player';
 		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_flame" type="button" data-action="withdraw"><label><span class="multi">Quit&nbsp;&amp;&nbsp;Take<br />'.$player_name.'&nbsp;Home'.$after_icon.'</span></label></a>';
 
     }
 	// Else if we're in a STARFIELD MISSION, display the next button here
-    elseif ($is_starfield_mission){
+    if ($is_starfield_mission){
 
 		// Display the option for FIND ANOTHER STAR FIELD
 		$block_num++;
-		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="next_same-star"><label><span class="multi">Skip&nbsp;To<br />Next&nbsp;Starfield</span></label></a>';
+		$after_icon = '<i class="after fa fas fa-star" style="position: absolute; top: -5px; right: -5px;"></i>';
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="next_same-star"><label><span class="multi">Skip&nbsp;To<br />Next&nbsp;Starfield'.$after_icon.'</span></label></a>';
 
     }
     else {
@@ -83,6 +93,7 @@ ob_start();
 	    $temp_options[] = '<a data-order="'.$block_num.'" class="button action_option button_disabled block_'.$block_num.'" type="button">&nbsp;</a>';
 
     }
+
 
     // Display a SPACER in this slot
     //$block_num++;
@@ -101,11 +112,11 @@ ob_start();
 		// Display the option for DEBUG MODE
 		$block_num++;
 		$current_debug_value = !empty($_SESSION['GAME']['debug_mode']) ? 1 : 0;
-		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" onclick="mmrpg_toggle_debug_mode(this);" data-value="'.$current_debug_value.'"><label><span class="multi"><span class="title">Debug Mode</span><br /><span class="value type type_'.($current_debug_value ? 'nature' : 'flame').'">'.($current_debug_value ? 'ON' : 'OFF').'</span></span></label></a>';
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_shadow" type="button" onclick="mmrpg_toggle_debug_mode(this);" data-value="'.$current_debug_value.'"><label><span class="multi"><span class="title">Debug Mode</span><br /><span class="value type type_'.($current_debug_value ? 'nature' : 'flame').'">'.($current_debug_value ? 'ON' : 'OFF').'</span></span></label></a>';
 
 		// Display the DEVPOWER option for CLEAR MISSION
 		$block_num++;
-		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_space" type="button" data-action="ability_10_action-devpower-clearmission"><label><span class="multi"><span class="title">Dev Power</span><br /><span class="value type type_shield">Clear Mission</span></span></label></a>';
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_shadow" type="button" data-action="ability_10_action-devpower-clearmission"><label><span class="multi"><span class="title">Dev Power</span><br /><span class="value type type_shield">Clear Mission</span></span></label></a>';
 
 	}
 

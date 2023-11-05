@@ -4505,6 +4505,22 @@ body.index #header {
     line-height: 14px;
     margin-top: 13px;
 }
+
+#actions .actions_option .action_option label .multi > i.after,
+#actions .actions_settings .action_setting label .multi > i.after,
+#actions .actions_settings_eventTimeout .action_setting label .multi > i.after,
+#actions .actions_settings_volumeControl .action_setting label .multi > i.after,
+#actions .actions_settings_autoScan .action_setting label .multi > i.after,
+#actions .actions_switch .action_switch label .multi > i.after,
+#actions .actions_scan .action_scan label .multi > i.after,
+#actions .actions_target .action_target label .multi > i.after,
+#actions .actions_ability .action_ability label .multi > i.after,
+#actions .actions_item .action_item label .multi > i.after {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+}
+
 #actions .actions_option .action_option label .multi .type,
 #actions .actions_settings .action_setting label .multi .type {
     display: inline-block;
