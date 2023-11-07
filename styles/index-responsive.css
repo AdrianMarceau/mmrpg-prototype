@@ -683,6 +683,9 @@ body:before {
         white-space: normal;
         word-break: break-word;
     }
+    #window .page_leaderboard .online-players .event.text a {
+        white-space: nowrap;
+    }
 
     #window .page_credits .body .creditblock .text .details .website .link_inline {
         word-break: break-all;
