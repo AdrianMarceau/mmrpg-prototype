@@ -22,6 +22,7 @@ gameSettings.wapFlag = false; // whether or not this game is running in mobile m
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
 gameSettings.eventTimeout = 800; // default animation frame base internal
+gameSettings.eventTimeoutDefault = 800; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
@@ -497,7 +498,13 @@ $(document).ready(function(){
                 var newValueTitle = '(1f/'+newValue+'ms)';
                 if (typeof gameSettings.customIndex.gameSpeeds !== 'undefined'){
                     var gameSpeedIndex = gameSettings.customIndex.gameSpeeds;
-                    newValueTitle = gameSpeedIndex[newValue]['name'];
+                    var defaultGameSpeed = gameSettings.eventTimeoutDefault;
+                    if (typeof gameSpeedIndex[newValue] !== 'undefined'){
+                        newValueTitle = gameSpeedIndex[newValue]['name'];
+                        } else {
+                        newValueTitle = gameSpeedIndex[defaultGameSpeed]['name'];
+                        gameSettings.eventTimeout = defaultGameSpeed;
+                        }
                     }
                 $actionButton.find('.value').html(newValueTitle);
                 }
