@@ -685,6 +685,7 @@ body:before {
     }
     #window .page_leaderboard .online-players .event.text a {
         white-space: nowrap;
+        word-break: normal;
     }
 
     #window .page_credits .body .creditblock .text .details .website .link_inline {

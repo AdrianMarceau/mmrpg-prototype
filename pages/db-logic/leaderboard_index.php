@@ -105,7 +105,7 @@ if (strstr($page_content_parsed, $find)){
                     list($path, $token, $size) = explode('/', $info['image']);
                     $frame = $info['placeint'] <= 3 ? 'victory' : 'base';
                     $colour = $info['colour'].(!empty($info['colour']) && !empty($info['colour2']) ? '_'.$info['colour2'] : '');
-                    if ($key > 0 && $key % 5 == 0){ echo '<br />'; }
+                    //if ($key > 0 && $key % 5 == 0){ echo '<br />'; }
                     echo('<a data-playerid="'.$info['id'].'" class="player_type player_type_'.$colour.'" href="'.$current_leaderboard_url.$info['token'].'/">');
                         echo('<span class="sprite-wrap"><span class="sprite sprite_'.$size.'x'.$size.' sprite_'.$size.'x'.$size.'_'.$frame.'" style="left: '.($size == 40 ? -4 : -26).'px; background-image: url(images/'.$path.'/'.$token.'/sprite_left_'.$size.'x'.$size.'.png?'.MMRPG_CONFIG_CACHE_DATE.');">&nbsp;</span></span>');
                         echo('<span class="name-wrap">'.strip_tags($info['place']).' : '.$info['name'].'</span>');
