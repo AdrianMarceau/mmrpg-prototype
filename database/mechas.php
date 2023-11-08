@@ -30,6 +30,7 @@ if (!empty($cached_index)){
 } else {
 
     // Collect the database fields
+    $mmrpg_database_skills = rpg_skill::get_index(true);
     $mmrpg_database_fields = rpg_field::get_index(true, false);
 
     // Collect the database mecha
@@ -211,6 +212,11 @@ if (!empty($mmrpg_database_mechas)){
         // Check if this is a mecha and prepare extra text
         $mecha_info['robot_name_append'] = '';
 
+        // Collect skill info for this mecha if applicable
+        $mecha_flag_has_skill = !empty($mecha_info['robot_skill']) ? true : false;
+        $mecha_skill_info = $mecha_flag_has_skill ? rpg_robot::get_robot_skill_info($mecha_info['robot_skill'], $mecha_info) : false;
+        $mecha_skill_display_type = $mecha_flag_has_skill ? (!empty($mecha_skill_info['skill_display_type']) ? $mecha_skill_info['skill_display_type'] : 'none') : false;
+
         // Collect the mecha sprite dimensions
         $mecha_flag_complete = !empty($mecha_info['robot_flag_complete']) ? true : false;
         $mecha_flag_fightable = !empty($mecha_info['robot_flag_fightable']) ? true : false;
@@ -225,6 +231,7 @@ if (!empty($mmrpg_database_mechas)){
         $mecha_title_text = $mecha_info['robot_name'].$mecha_info['robot_name_append'].' | '.$mecha_info['robot_number'].' | '.(!empty($mecha_info['robot_core']) ? ucwords($mecha_info['robot_core'].(!empty($mecha_info['robot_core2']) ? ' / '.$mecha_info['robot_core2'] : '')) : 'Neutral').' Type';
         $mecha_title_text .= '|| [[E:'.$mecha_info['robot_energy'].' | W:'.$mecha_info['robot_weapons'].' | A:'.$mecha_info['robot_attack'].' | D:'.$mecha_info['robot_defense'].' | S:'.$mecha_info['robot_speed'].']]';
         $mecha_title_text .= '|| ' . $game_code;
+        if ($mecha_flag_has_skill){ $mecha_title_text .= '|| [[Passive Skill : '.$mecha_skill_info['skill_name'].']] '; }
         $mecha_image_path = 'images/robots/'.$mecha_image_token.'/mug_right_'.$mecha_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE;
         $mecha_stat_max = $mecha_info['robot_energy'] + $mecha_info['robot_attack'] + $mecha_info['robot_defense'] + $mecha_info['robot_speed'];
         if ($mecha_stat_max > $mmrpg_stat_base_max_value['mecha']){ $mmrpg_stat_base_max_value['mecha'] = $mecha_stat_max; }
@@ -235,7 +242,8 @@ if (!empty($mmrpg_database_mechas)){
         <div title="<?= $mecha_title_text ?>" data-token="<?= $mecha_info['robot_token'] ?>" class="float left link type <?=
             ($mecha_core_class.' ').
             ($mecha_image_incomplete  ? 'inactive ' : '').
-            ($mecha_flag_fightable ? 'fightable ' : '')
+            ($mecha_flag_fightable ? 'fightable ' : '').
+            ($mecha_flag_has_skill ? 'has-skill ' : '')
             ?>">
             <a class="sprite robot link mugshot size<?= $mecha_image_size.($mecha_key == $first_mecha_key ? ' current' : '') ?>" href="<?= 'database/mechas/'.$mecha_info['robot_token']?>/" rel="<?= $mecha_image_incomplete ? 'nofollow' : 'follow' ?>">
                 <?php if($mecha_image_token != 'mecha'): ?>
@@ -244,6 +252,7 @@ if (!empty($mmrpg_database_mechas)){
                     <span><?= $mecha_info['robot_name'].$mecha_info['robot_name_append'] ?></span>
                 <?php endif; ?>
             </a>
+            <?= $mecha_flag_has_skill ? '<i class="skill type '.$mecha_skill_display_type.'"></i>' : '' ?>
         </div>
         <?php
         if ($mecha_flag_complete){ $mmrpg_database_mechas_count_complete++; }
