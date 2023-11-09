@@ -31,7 +31,7 @@ ob_start();
             // Display available main actions
             ?><div class="main_actions"><?
 
-                // If this is a STAR FIELD mission, display customized menu options
+                // If this is a STAR FIELD mission, display customized continue to next star button
                 if (!empty($this_battle->flags['starfield_mission'])){
 
                     // Collect a list of available stars still left for the player to encounter
@@ -63,13 +63,13 @@ ob_start();
                     ?><a class="button action_ability" data-action="<?= $next_action ?>" type="button" data-order="1"><label><i class="fa fas fa-star"></i> Continue <i class="fas fa-chevron-circle-right"></i></label></a><?
 
                 }
-                // Else if this is any other mission type, display normal menu options
+                // Else if this is an ENDLESS BATTLE, display the continue to next wave button
                 elseif (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){
 
                     ?><a class="button action_ability" data-action="prototype" type="button" data-order="1"><label><i class="fa fas fa-infinity"></i> Continue<i class="fas fa-chevron-circle-right"></i></label></a><?
 
                 }
-                // Else if this is any other mission type, display normal menu options
+                // Else if this is any other mission type, display standard return to home button
                 else {
 
                     ?><a class="button action_ability" data-action="prototype" type="button" data-order="1"><label><i class="fa fas fa-home"></i> Mission Complete!</label></a><?
@@ -101,8 +101,8 @@ ob_start();
                 // Else if this is any other kind of mission, display the normal menu options
                 else {
                     ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
-                    ?><a class="button action_item button_disabled" type="button">&nbsp;</a><?
-                    ?><a class="button action_option button_disabled" type="button">&nbsp;</a><?
+                    ?><a class="button action_item" data-action="prototype" type="button" data-order="2"><label>Exit Mission</label></a><?
+                    ?><a class="button action_option" data-action="restart" type="button" data-order="3"><label>Restart Mission</label></a><?
                     ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
                 }
             ?></div><?
