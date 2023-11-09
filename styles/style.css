@@ -4373,6 +4373,11 @@ body.index #header {
 #actions .actions_battle .action_target.colspan2 {
     width: 372px;
 }
+#actions .sub_actions .button.colspan2 + .colspan2,
+#actions .actions_battle .action_target.colspan2 + .colspan2 {
+    width: 366px;
+    margin-left: 3px;
+}
 #actions .sub_actions .button label,
 #actions .actions_battle .action_target label {
     width: auto;
