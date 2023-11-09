@@ -17,14 +17,34 @@ ob_start();
             ?><div class="main_actions"><?
                 ?><a class="button action_ability" data-action="next" type="button" data-order="1"><label><?= $prefix_icon ?> Continue <?= $continue_icon ?></label></a><?
             ?></div><?
+
+
             // Display the available sub options
             ?><div class="sub_actions"><?
-                ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
-                ?><a class="button action_item button_disabled" type="button">&nbsp;</a><?
-                ?><a class="button action_option button_disabled" type="button">&nbsp;</a><?
-                ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
-            ?></div><?
+                if (!empty($this_battle->flags['starfield_mission'])){
 
+                    // This is a STAR FIELD battle so we can't have any fancy replays (already got star)
+                    ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
+                    ?><a class="button action_item button_disabled" type="button">&nbsp;</a><?
+                    ?><a class="button action_option button_disabled" type="button">&nbsp;</a><?
+                    ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
+
+                } elseif (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){
+
+                    // This is an ENDLESS ATTACK MODE battle so we can only restart current battle
+                    ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
+                    ?><a class="button action_item colspan2" data-action="restart" type="button" data-order="2"><label>Restart Battle</label></a><?
+                    ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
+
+                } else {
+
+                    // This is a STANDARD battle so we can restart or continue to next battle
+                    ?><a class="button action_scan" data-action="prototype" type="button" data-order="2"><label>Exit Mission</label></a><?
+                    ?><a class="button action_item colspan2" data-action="restart" type="button" data-order="3"><label>Restart Battle</label></a><?
+                    ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
+
+                }
+            ?></div><?
 
         } else {
 
@@ -100,10 +120,26 @@ ob_start();
                 }
                 // Else if this is any other kind of mission, display the normal menu options
                 else {
-                    ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
-                    ?><a class="button action_item" data-action="prototype" type="button" data-order="2"><label>Exit Mission</label></a><?
-                    ?><a class="button action_option" data-action="restart" type="button" data-order="3"><label>Restart Mission</label></a><?
-                    ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
+
+                    // Check to see if this mission has an alpha battle to go back to
+                    $battle_index = !empty($_SESSION['GAME']['values']['battle_index']) ? $_SESSION['GAME']['values']['battle_index'] : array();
+                    $alpha_battle_token = $this_battle->battle_token.'-alpha';
+                    if (isset($battle_index[$alpha_battle_token])){
+
+                        // Collect information about the alpha battle so we can display both options
+                        ?><a class="button action_scan" data-action="prototype" type="button" data-order="2"><label>Exit Mission</label></a><?
+                        ?><a class="button action_option colspan2" data-action="restart" type="button" data-order="3"><label>Restart Battle</label></a><?
+                        ?><a class="button action_switch" data-action="restart_whole-mission" type="button" data-order="3"><label>Restart Mission</label></a><?
+
+                    } else {
+
+                        // This is the only battle in its set so just display normal options
+                        ?><a class="button action_scan" data-action="prototype" type="button" data-order="2"><label>Exit Mission</label></a><?
+                        ?><a class="button action_option colspan2" data-action="restart" type="button" data-order="3"><label>Restart Battle</label></a><?
+                        ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
+
+                    }
+
                 }
             ?></div><?
 
@@ -120,9 +156,8 @@ ob_start();
             ?></div><?
             // Display the available sub options
             ?><div class="sub_actions"><?
-            ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
-            ?><a class="button action_item" data-action="prototype" type="button" data-order="1"><label>Exit Mission</label></a><?
-            ?><a class="button action_option" data-action="restart" type="button" data-order="2"><label>Retry Wave</label></a><?
+            ?><a class="button action_scan" data-action="prototype" type="button" data-order="1"><label>Exit Mission</label></a><?
+            ?><a class="button action_item colspan2" data-action="restart" type="button" data-order="2"><label>Retry Wave</label></a><?
             ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
             ?></div><?
         }
@@ -134,9 +169,8 @@ ob_start();
             ?></div><?
             // Display the available sub options
             ?><div class="sub_actions"><?
-            ?><a class="button action_scan button_disabled" type="button">&nbsp;</a><?
-            ?><a class="button action_item" data-action="prototype" type="button" data-order="1"><label>Exit Mission</label></a><?
-            ?><a class="button action_option" data-action="restart" type="button" data-order="2"><label>Retry Battle</label></a><?
+            ?><a class="button action_scan" data-action="prototype" type="button" data-order="1"><label>Exit Mission</label></a><?
+            ?><a class="button action_item colspan2" data-action="restart" type="button" data-order="2"><label>Retry Battle</label></a><?
             ?><a class="button action_switch button_disabled" type="button">&nbsp;</a><?
             ?></div><?
         }
