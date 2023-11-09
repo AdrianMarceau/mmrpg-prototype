@@ -131,6 +131,11 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
             $item_class = 'item '.($active ? 'item_active ' : '');
             $link_class = 'link '.($active ? 'link_active field_type_empty' : '');
 
+            // If this the PROTOTYPE link, make sure we prefix the "play" text as requested
+            if ($parent_token == 'prototype'){
+                $name = '<i class="fa fas fa-gamepad"></i> Play Prototype';
+            }
+
             // If this the COMMUNITY link, dynamically collect update counts
             if ($parent_token == 'community'){
                 // Generate update count markup for this page's after string
