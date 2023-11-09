@@ -1814,6 +1814,13 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 $this_has_field_star = false;
             }
 
+            // Fix non-standard variable values for success/failure counts
+            //error_log('$this_option_failure = '.print_r($this_option_failure, true));
+            if (is_array($this_option_complete)){ $this_option_complete = count($this_option_complete); }
+            elseif (!is_numeric($this_option_complete)){ $this_option_complete = $this_option_complete ? 1 : 0; }
+            if (is_array($this_option_failure)){ $this_option_failure = count($this_option_failure); }
+            elseif (!is_numeric($this_option_failure)){ $this_option_failure = $this_option_failure ? 1 : 0; }
+
             //$this_option_class = 'option option_fieldback option_this-battle-select option_this-'.$player_token.'-battle-select option_'.$this_battleinfo['battle_size'].' option_'.$this_battleinfo['battle_token'].' option_'.$this_option_status.' block_'.($this_key + 1).' '.($this_option_complete && !$this_has_field_star ? 'option_complete ' : '').($this_option_disabled ? 'option_disabled '.($this_option_encore ? 'option_disabled_clickable ' : '') : '');
             $this_option_class = 'option option_fieldback option_this-battle-select option_this-'.$player_token.'-battle-select option_'.$this_battleinfo['battle_size'].' option_'.$this_option_status.' block_'.($this_key + 1).' '.($this_option_complete && !$this_has_field_star ? 'option_complete ' : '').($this_option_disabled ? 'option_disabled '.($this_option_encore ? 'option_disabled_clickable ' : '') : '');
             $this_option_style = 'background-position: -'.mt_rand(5, 50).'px -'.mt_rand(5, 50).'px; ';
