@@ -2829,12 +2829,20 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
         }
 
     // Replace the effect name if we're using an alias at the moment
-    if (typeof gameSettings.customIndex.soundsAliasesIndex[effectName] !== 'undefined'){
-        effectName = gameSettings.customIndex.soundsAliasesIndex[effectName];
+    // TODO:  Make sure this effectName actually exists in the index of sound effect sprites
+    if (typeof gameSettings.customIndex.soundsAliasesIndex !== 'undefined'
+        && typeof gameSettings.customIndex.soundsAliasesIndex[effectName] !== 'undefined'){
         //console.log('alias triggered // new effectName =', effectName);
-        } else {
+        // Pull the actual effect name from the index based on the alias provided
+        effectName = gameSettings.customIndex.soundsAliasesIndex[effectName];
+        } else if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
+        && typeof gameSettings.customIndex.soundsIndex.sprite[effectName] !== 'undefined'){
         //console.log('using RAW name // effectName =', effectName);
-        // TODO:  Make sure this effectName actually exists in the index of sound effect sprites
+        // We should be using aliases but the effect name is technically fine as-is
+        } else {
+        //console.log('using UNKNOWN name // effectName =', effectName);
+        // Immediately return as this isn't real and might cause audio bugs
+        return false;
         }
 
     //console.log('sound =', sound);
