@@ -377,7 +377,7 @@ if (true){
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>View Items | Prototype | Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></title>
+<title>Items | Prototype | Mega Man RPG Prototype</title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="items" content="noindex,nofollow" />
 <meta name="darkreader-lock" content="already-dark-mode" />

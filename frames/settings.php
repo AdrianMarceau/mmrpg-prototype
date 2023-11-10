@@ -973,7 +973,7 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Game Settings | Prototype | Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></title>
+<title>Settings | Prototype | Mega Man RPG Prototype</title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="items" content="noindex,nofollow" />
 <meta name="darkreader-lock" content="already-dark-mode" />

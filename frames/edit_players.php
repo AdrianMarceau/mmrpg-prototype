@@ -510,7 +510,7 @@ if (true){
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Edit Players | Prototype | Mega Man RPG Prototype | Data Library | Last Updated <?= mmrpg_print_cache_date() ?></title>
+<title>Players | Prototype | Mega Man RPG Prototype</title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="players" content="noindex,nofollow" />
 <meta name="darkreader-lock" content="already-dark-mode" />

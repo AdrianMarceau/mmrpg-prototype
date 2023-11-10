@@ -173,7 +173,7 @@ foreach ($this_menu_tooltips AS $token => $text){
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Main Menu | Prototype | Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></title>
+<title>Main Menu | Prototype | Mega Man RPG Prototype</title>
 
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 

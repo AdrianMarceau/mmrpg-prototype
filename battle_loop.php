@@ -1153,7 +1153,7 @@ $output_buffer_contents = trim(ob_get_clean());
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Mega Man RPG Prototype | Data API | Last Updated <?= mmrpg_print_cache_date() ?></title>
+<title>Battle Loop | Prototype | Mega Man RPG Prototype</title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <style type="text/css">
 </style>

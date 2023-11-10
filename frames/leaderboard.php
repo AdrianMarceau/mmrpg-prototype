@@ -14,7 +14,7 @@ $session_token = mmrpg_game_token();
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>View Leaderboard | Prototype | Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></title>
+<title>Leaderboard | Prototype | Mega Man RPG Prototype</title>
 <base href="<?=MMRPG_CONFIG_ROOTURL?>" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="darkreader-lock" content="already-dark-mode" />
