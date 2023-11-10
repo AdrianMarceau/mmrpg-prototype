@@ -4474,6 +4474,8 @@ body.mobileFlag_landscapeMode #window .page .event .option_this-team-select .chr
     background-size: 100% auto;
     background-size: cover;
     background-repeat: no-repeat;
+    background-size: auto calc(100% + 20px);
+    background-position: center -10px;
 }
 
 #window .page .gallery .screenshot img {
