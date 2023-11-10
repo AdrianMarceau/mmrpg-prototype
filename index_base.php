@@ -43,9 +43,9 @@ $_SESSION['PROTOTYPE_TEMP'] = array();
 
 // Define the default SEO and markup variables
 $this_seo_robots = 'index,follow';
-$this_seo_title = 'Mega Man RPG Prototype | Last Updated '.mmrpg_print_cache_date();
+$this_seo_title = 'Mega Man RPG Prototype';
 $this_seo_keywords = 'megaman,mega man,protoman,proto man,bass,rpg,prototype,dr.light,dr.wily,dr.cossack,battle,browser,pbbg,ipad,firefox,chrome,safari';
-$this_seo_description = 'Battle through more than thirty robot masters in classic RPG style with either Dr. Light and Mega Man, Dr. Wily and Bass, or Dr. Cossack and Proto Man!  The Mega Man RPG Prototype is a browser-based fangame that combines the mechanics of both the Pokémon and Mega Man series of video games into one strange and wonderful little time waster.';
+$this_seo_description = 'Battle through more than 100 robot masters in classic RPG style with either Dr. Light and Mega Man, Dr. Wily and Bass, or Dr. Cossack and Proto Man!  The Mega Man RPG Prototype is a browser-based fangame that combines the mechanics of both the Pokémon and Mega Man series of video games into one strange and wonderful little time waster. Last updated '.mmrpg_print_cache_date().'.';
 $this_markup_header = '';
 $this_markup_counter = '';
 $this_markup_body = '';
