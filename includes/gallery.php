@@ -88,11 +88,15 @@ foreach ($raw_gallery_paths AS $key => $rel_path){
     $this_title = preg_replace('/.(png|jpg|gif)/i', '', $this_title);
     $this_title = preg_replace('/^([0-9]+)-/i', '', $this_title);
     $this_title = str_replace('dr', 'dr.', $this_title);
+    $this_title = str_replace('mmrpg', 'MMRPG', $this_title);
     $this_title = trim($this_title, '-');
     $this_title = ucwords(str_replace('-', ' ', $this_title));
     // Re-order some title words so they make more sense
     $this_title = preg_replace('/^Mission\s(.*)$/i', '$1 Mission', $this_title);
     $this_title = preg_replace('/^(.*)\sMobile$/i', '$1 (Mobile)', $this_title);
+    // Re-order more title words so they make more sense
+    $this_title = preg_replace('/^(MMRPG\s2k[0-9]+)\s(.*)$/i', '$2 ($1)', $this_title);
+    $this_title = preg_replace('/^(.*)\s(MMRPG\s2k[0-9]+)$/i', '$1 ($2)', $this_title);
 
     // Create an entry in the index for this date if not exists
     if (!isset($mmrpg_gallery_index[$file_date])){ $mmrpg_gallery_index[$file_date] = array(); }
@@ -102,7 +106,8 @@ foreach ($raw_gallery_paths AS $key => $rel_path){
         'name' => $file_name,
         'title' => $this_title,
         'href' => $file_href,
-        'thumb' => $file_thumb
+        'thumb' => $file_thumb,
+        'date' => $file_date,
         );
 
     // Now add this file to the index with its name and other details
