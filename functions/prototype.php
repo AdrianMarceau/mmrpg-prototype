@@ -4384,10 +4384,20 @@ function mmrpg_prototype_get_profile_avatar_options($this_userinfo, &$allowed_av
 
         if ($token == 'robot' || strstr($token, 'copy')){ continue; }
         elseif (isset($info['robot_image']) && $info['robot_image'] == 'robot'){ continue; }
-        elseif (isset($info['robot_class']) && $info['robot_class'] == 'mecha'){ continue; }
         elseif (preg_match('/^(DLM)/i', $info['robot_number'])){ continue; }
         elseif (!rpg_game::sprite_exists(MMRPG_CONFIG_ROOTDIR.'images/robots/'.$token.'/')){ continue; }
-        if (!mmrpg_prototype_robot_unlocked(false, $token) && $this_userinfo['role_id'] != 1){ continue; }
+
+        // Collect the summon count for this robot and unlocked alts
+        $temp_summon_count = mmrpg_prototype_database_summoned($token);
+        $temp_alts_unlocked = mmrpg_prototype_altimage_unlocked($token);
+
+        // Skip if this robot master hasn't been unlocked or mecha summoned
+        if ($this_userinfo['role_id'] !== 1){
+            //error_log('robot_class: '.$info['robot_class'].' w/ summon_count: '.$temp_summon_count);
+            if ($info['robot_class'] == 'master' && !mmrpg_prototype_robot_unlocked(false, $token)){ continue; }
+            elseif ($info['robot_class'] == 'mecha' && empty($temp_summon_count)){ continue; }
+            elseif ($info['robot_class'] == 'boss' && empty($temp_summon_count)){ continue; }
+        }
 
         // If the game has changed print the new optgroup
         $robot_game_token = $info['robot_game'];
@@ -4404,10 +4414,6 @@ function mmrpg_prototype_get_profile_avatar_options($this_userinfo, &$allowed_av
         $html_avatar_options[] = '<option value="robots/'.$token.'/'.$size.'">'.$info['robot_number'].' : '.$info['robot_name'].'</option>';
         $allowed_avatar_options[] = 'robots/'.$token.'/'.$size;
 
-        // Collect the summon count for this robot and unlocked alts
-        $temp_summon_count = mmrpg_prototype_database_summoned($token);
-        $temp_alts_unlocked = mmrpg_prototype_altimage_unlocked($token);
-
         // If this is a copy core, add it's type alts
         if (isset($info['robot_core']) && $info['robot_core'] == 'copy'){
             foreach ($mmrpg_database_types AS $type_token => $type_info){
@@ -4423,8 +4429,11 @@ function mmrpg_prototype_get_profile_avatar_options($this_userinfo, &$allowed_av
             foreach ($info['robot_image_alts'] AS $key => $this_altinfo){
                 // Define the unlocked flag as false to start
                 $alt_unlocked = false;
+                $required_summons = !empty($this_altinfo['summons']) ? $this_altinfo['summons'] : 0;
+                if ($info['robot_class'] == 'mecha'){ $required_summons = ceil($required_summons / 10); }
+                elseif ($info['robot_class'] == 'boss'){ $required_summons = ceil($required_summons * 10); }
                 // If this alt is unlocked via summon and we have enough
-                if (!empty($this_altinfo['summons']) && $temp_summon_count >= $this_altinfo['summons']){ $alt_unlocked = true; }
+                if (!empty($required_summons) && $temp_summon_count >= $required_summons){ $alt_unlocked = true; }
                 // Else if this alt is unlocked via the shop and has been purchased
                 elseif (in_array($this_altinfo['token'], $temp_alts_unlocked)){ $alt_unlocked = true; }
                 // Print the alt option markup if unlocked
