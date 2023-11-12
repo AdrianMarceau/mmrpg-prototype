@@ -351,14 +351,27 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_rival_option = rpg_battle::get_index_info($temp_rival_option_token, true);
             $temp_rival_option['battle_phase'] = $this_prototype_data['battle_phase'];
             $temp_rival_option['battle_level'] = $this_prototype_data['this_chapter_levels'][2];
+            $temp_rival_option['battle_rewards']['abilities'] = array();
             $temp_rival_option['option_chapter'] = $this_prototype_data['this_current_chapter'];
             // Always add a support mecha to this battle for healing
             $temp_mecha_token = false;
             $temp_mecha_abilities = array();
             $temp_mecha_level = ceil($temp_target_level / 2);
-            if ($this_prototype_data['this_player_token'] === 'dr-light'){ $temp_mecha_token = 'heel-bot'; } // evil heel w/ bass & disco
-            elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){ $temp_mecha_token = 'heal-bot'; } // nice heal w/ proto and rhythm
-            elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){ $temp_mecha_token = 'dark-frag'; } // a little bit of future content
+            if ($this_prototype_data['this_player_token'] === 'dr-light'){
+                // evil heel w/ bass & disco
+                $temp_mecha_token = 'heel-bot';
+                $temp_rival_option['battle_rewards']['abilities'][] = array('token' => 'mecha-support', 'level' => 0);
+                }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-wily'){
+                // nice heal w/ proto and rhythm
+                $temp_mecha_token = 'heal-bot';
+                $temp_rival_option['battle_rewards']['abilities'][] = array('token' => 'friend-share', 'level' => 0);
+                }
+            elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){
+                // a little bit of future content
+                $temp_mecha_token = 'dark-frag';
+                $temp_rival_option['battle_rewards']['abilities'][] = array('token' => 'mecha-party', 'level' => 0);
+                }
             if (!empty($temp_mecha_token)){
                 if (strstr($temp_mecha_token, '-bot')){ $temp_mecha_abilities = array('energy-boost', 'attack-boost', 'defense-boost', 'speed-boost'); }
                 elseif (strstr($temp_mecha_token, '-frag')){ $temp_mecha_abilities = array('dark-break', 'dark-boost', 'dark-drain'); }
