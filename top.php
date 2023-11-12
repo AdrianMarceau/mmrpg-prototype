@@ -2,9 +2,8 @@
 
 // Include mandatory config files
 define('MMRPG_BUILD', 'mmrpg2k23');
-define('MMRPG_VERSION', '3.3.80');
+define('MMRPG_VERSION', '3.3.86');
 require('includes/config.php');
-// 3.2.46 + (7 core / 46 robots / 12 abilities / 15 skills) = 3.3.80
 
 // Update the timezone before starting the session
 @date_default_timezone_set('Canada/Eastern');
