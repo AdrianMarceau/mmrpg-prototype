@@ -594,7 +594,7 @@ if (!empty($this_shop_index['reggae'])){
         $level = $this_shop_index['reggae']['shop_level'];
         $levels = $core_level_index;
         $unlocked_weapons = !empty($unlocked_weapons) ? array_filter($unlocked_weapons, function($info) use ($level, $levels){
-            $type = !empty($info['ability_type']) ? $info['ability_type'] : '';
+            $type = !empty($info['ability_type']) ? $info['ability_type'] : 'none';
             $required = !empty($info['ability_shop_level']) ? $info['ability_shop_level'] : 0;
             $current = !empty($levels[$type]) ? $levels[$type] : 0;
             if (empty($required)){ return true; }
