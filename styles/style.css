@@ -1842,7 +1842,8 @@ body.index #header {
 #mmrpg .canvas_overlay_footer .field_multiplier .cross {
     position: relative;
     bottom: 1px;
-    font-size: 10px;
+    /* font-size: 10px;  */
+    font-size: 110%;
     padding: 0;
 }
 /*
@@ -1881,6 +1882,13 @@ body.index #header {
 #mmrpg .canvas_overlay_footer .overlay_multiplier_count_13 .field_multiplier,
 #mmrpg .canvas_overlay_footer .overlay_multiplier_count_14 .field_multiplier {
     margin: 0 1px !important;
+}
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_11 .field_multiplier,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_12 .field_multiplier,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_13 .field_multiplier,
+#mmrpg .canvas_overlay_footer .overlay_multiplier_count_14 .field_multiplier {
+    font-size: 7px;
+    bottom: 1px;
 }
 
 #mmrpg .canvas_battle_results,
