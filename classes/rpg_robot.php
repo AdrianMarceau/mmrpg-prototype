@@ -2004,6 +2004,16 @@ class rpg_robot extends rpg_object {
                         if (in_array($type, $target_core_shields)){ $value *= (0.5 - ($intelligence_mod * 0.1)); }
                     }
 
+                    // If the target robot has the elemental-subshield skill, make sure we reduce likelihood
+                    if ($target_robot->has_skill('elemental-subshield')){ $value *= (0.5 - ($intelligence_mod * 0.1)); }
+
+                }
+                // If this ability has no type (Neutral) add special considerations for neutral-subshield skill
+                else {
+
+                    // If the target robot has the neutral-subshield skill, make sure we reduce likelihood
+                    if ($target_robot->has_skill('neutral-subshield')){ $value *= (0.5 - ($intelligence_mod * 0.1)); }
+
                 }
 
                 // If this is their first ability and after the first turn, higher chance
