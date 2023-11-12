@@ -987,13 +987,33 @@ class rpg_skill extends rpg_object {
             $skill_info[$key] = $value;
         }
         $skill_info['skill_parameters'] = $custom_parameters;
-        if (isset($skill_info['skill_parameters']['type'])){ $skill_info['skill_display_type'] = $skill_info['skill_parameters']['type']; }
-        elseif (strstr($skill_info['skill_token'], '-subcore')){ $skill_info['skill_display_type'] = str_replace('-subcore', '', $skill_info['skill_token']); }
+        //error_log('skill_token = '.print_r($skill_info['skill_token'], true));
+        //error_log('$skill_info = '.print_r($skill_info, true));
+        if (isset($skill_info['skill_parameters']['type'])){
+            $skill_info['skill_display_type'] = $skill_info['skill_parameters']['type'];
+        }
+        elseif (strstr($skill_info['skill_token'], '-subcore')){
+            $skill_info['skill_display_type'] = str_replace('-subcore', '', $skill_info['skill_token']);
+        }
+        elseif (preg_match('/(?:^|-)?(attack|defense|speed)(?:$|-)?/i', $skill_info['skill_token'], $matches)){
+            //error_log('$matches = '.print_r($matches, true));
+            $skill_info['skill_display_type'] = $matches[1];
+            //error_log('skill_display_type = '.print_r($skill_info['skill_display_type'], true));
+        }
         elseif (isset($skill_info['skill_parameters']['condition'])){
             if (preg_match('/^field-type\s?(?:[\<\>\=\!\%]+)\s?([a-z]+)$/', $skill_info['skill_parameters']['condition'], $matches)){
                 $skill_info['skill_display_type'] = $matches[1];
             } elseif (preg_match('/^field-multiplier-([a-z]+)/', $skill_info['skill_parameters']['condition'], $matches)){
                 $skill_info['skill_display_type'] = $matches[1];
+            }
+        }
+        else {
+            switch ($skill_info['skill_token']){
+                case 'boost-submodule':
+                case 'break-submodule': { $skill_info['skill_display_type'] = 'none'; break; }
+                case 'medic-submodule': { $skill_info['skill_display_type'] = 'recovery'; break; }
+                case 'saboteur-submodule': { $skill_info['skill_display_type'] = 'damage'; break; }
+                case 'armorer-submodule': { $skill_info['skill_display_type'] = 'weapons'; break; }
             }
         }
     }
