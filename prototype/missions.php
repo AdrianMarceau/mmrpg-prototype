@@ -373,13 +373,52 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_rival_option['battle_rewards']['abilities'][] = array('token' => 'mecha-party', 'level' => 0);
                 }
             if (!empty($temp_mecha_token)){
-                if (strstr($temp_mecha_token, '-bot')){ $temp_mecha_abilities = array('energy-boost', 'attack-boost', 'defense-boost', 'speed-boost'); }
-                elseif (strstr($temp_mecha_token, '-frag')){ $temp_mecha_abilities = array('dark-break', 'dark-boost', 'dark-drain'); }
-                $temp_rival_option['battle_target_player']['player_robots'][] = array(
-                    'robot_token' => $temp_mecha_token,
-                    'robot_level' => $temp_mecha_level,
-                    'robot_abilities' => $temp_mecha_abilities
-                    );
+                if (strstr($temp_mecha_token, '-bot')){
+
+                    // If this is a Heal-Bot or a Heel-Bot, we should give them stat-related boost or break abilities
+                    $stat_mod_kind = (strstr($temp_mecha_token, 'heal') ? 'boost' : 'break');
+                    $temp_mecha_abilities = array(
+                        'energy-'.$stat_mod_kind,
+                        'attack-'.$stat_mod_kind,
+                        'defense-'.$stat_mod_kind,
+                        'speed-'.$stat_mod_kind
+                        );
+                    $temp_mecha_info = array(
+                        'robot_token' => $temp_mecha_token,
+                        'robot_level' => $temp_mecha_level,
+                        'robot_abilities' => $temp_mecha_abilities
+                        );
+
+                    // Simply append this robot onto the end of the hero + support team
+                    $new_player_robots = array();
+                    $new_player_robots = array_merge($new_player_robots, $temp_rival_option['battle_target_player']['player_robots']);
+                    $new_player_robots[] = $temp_mecha_info;
+                    $temp_rival_option['battle_target_player']['player_robots'] = $new_player_robots;
+
+                } elseif ($temp_mecha_token === 'dark-frag'){
+
+                    // If this is a Dark-Frag, we should give them some Dark-type abilities
+                    $temp_mecha_abilities = array(
+                        'dark-break',
+                        'dark-boost',
+                        'dark-drain'
+                        );
+                    $temp_mecha_info = array(
+                        'robot_token' => $temp_mecha_token,
+                        'robot_level' => $temp_mecha_level,
+                        'robot_abilities' => $temp_mecha_abilities
+                        );
+
+                    // Prepend this mecha to the roster so it shows up first, then sendwhich the rest in two more
+                    $new_player_robots = array();
+                    $new_player_robots[] = $temp_mecha_info;
+                    $new_player_robots[] = $temp_mecha_info;
+                    $new_player_robots = array_merge($new_player_robots, $temp_rival_option['battle_target_player']['player_robots']);
+                    $new_player_robots[] = $temp_mecha_info;
+                    $temp_rival_option['battle_target_player']['player_robots'] = $new_player_robots;
+
+
+                }
             }
             // If the battle is complete, remove the player from the description
             if ($temp_battle_complete){
