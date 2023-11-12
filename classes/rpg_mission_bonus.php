@@ -46,6 +46,7 @@ class rpg_mission_bonus extends rpg_mission {
             $robot_index_query .= "AND robot_class = 'mecha' ";
             $robot_index_query .= "AND base_total <= 400 ";
             $robot_index_query .= "AND robot_token NOT IN ('rush', 'beat', 'tango', 'mariachi', 'reggae', 'treble') ";
+            $robot_index_query .= "AND robot_token NOT IN ('dark-frag') ";
         } elseif ($this_robot_class == 'boss'){
             $robot_index_query .= "AND robot_class = 'boss' ";
             $robot_index_query .= "AND base_total >= 400 ";
