@@ -2226,6 +2226,16 @@ class rpg_battle extends rpg_object {
                         $old_robot->set_flag('hidden', true);
                     }
 
+                    // Create an options object for this function and populate
+                    $options = rpg_game::new_options_object();
+                    $extra_objects = array('options' => $options);
+                    $extra_objects['switchout_robot'] = $old_robot;
+                    $extra_objects['switchin_robot'] = $temp_new_robot;
+
+                    // Trigger this and/or the target robot's custom function if one has been defined for this context
+                    $old_robot->trigger_custom_function('rpg-battle_switch-out_before', $extra_objects);
+                    $temp_new_robot->trigger_custom_function('rpg-battle_switch-in_before', $extra_objects);
+
                     // Check if the old robot has a custom hook for onswitch and run it if true
                     $temp_switch_function = $old_robot->robot_function_onswitch;
                     $temp_result = $temp_switch_function(array(
@@ -2377,6 +2387,10 @@ class rpg_battle extends rpg_object {
                         'target_player' => $target_player,
                         'target_robot' => $target_robot
                         ));
+
+                    // Trigger this and/or the target robot's custom function if one has been defined for this context
+                    $old_robot->trigger_custom_function('rpg-battle_switch-out_after', $extra_objects);
+                    $temp_new_robot->trigger_custom_function('rpg-battle_switch-in_after', $extra_objects);
 
                     // Return the new robot we've switched to
                     return $temp_new_robot;
