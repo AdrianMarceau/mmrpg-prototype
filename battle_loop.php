@@ -1053,6 +1053,9 @@ if (!empty($this_battle->flags['challenge_battle'])
                 FROM mmrpg_challenges_waveboard
                 WHERE
                 user_id = {$current_user_id}
+                AND challenge_waves_completed > 0
+                AND challenge_robots_used > 0
+                AND challenge_turns_used > 0
                 ;");
 
             // Define a variable to hold required action

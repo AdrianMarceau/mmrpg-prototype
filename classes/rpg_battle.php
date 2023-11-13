@@ -1265,6 +1265,9 @@ class rpg_battle extends rpg_object {
                 FROM `mmrpg_challenges_waveboard` AS `board`
                 WHERE
                 `user_id` = {$current_user_id}
+                AND `board`.`challenge_waves_completed` > 0
+                AND `board`.`challenge_robots_used` > 0
+                AND `board`.`challenge_turns_used` > 0
                 ;");
             //error_log('$old_wave_record = '.print_r($old_wave_record, true));
 
