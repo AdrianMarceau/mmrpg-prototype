@@ -3073,6 +3073,7 @@ class rpg_ability extends rpg_object {
         $options->num_buster_shots = 1;
         if ($this_robot->robot_speed > $target_robot->robot_speed){
             $options->num_buster_shots = floor($this_robot->robot_speed / $target_robot->robot_speed);
+            if ($options->num_buster_shots > $this_robot->robot_level){ $options->num_buster_shots = $this_robot->robot_level; }
         }
 
         // Trigger this robot's custom function if one has been defined for this context
@@ -3121,6 +3122,9 @@ class rpg_ability extends rpg_object {
 
             // Break early if the target has been disabled
             if ($target_robot->robot_energy < 1 || $target_robot->robot_status === 'disabled'){ break; }
+
+            // Break early if the move did literally zero damage
+            if (empty($this_ability->ability_results['this_amount'])){ break; }
 
         }
 
