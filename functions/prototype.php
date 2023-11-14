@@ -3580,31 +3580,58 @@ function mmrpg_prototype_leaderboard_index($board_metric = ''){
         || !is_array($db->INDEX['LEADERBOARD']['index'])){
         $db->INDEX['LEADERBOARD']['index'] = array();
     }
-    if (!empty($db->INDEX['LEADERBOARD']['index'][$board_metric])){
-        //error_log('index for '.$board_metric.' already exists');
-        //error_log('collecting existing index for '.$board_metric);
-        $this_leaderboard_index = $db->INDEX['LEADERBOARD']['index'][$board_metric]; //json_decode($db->INDEX['LEADERBOARD']['index'], true);
-    } else {
-        //error_log('index for '.$board_metric.' does not exist in '.print_r(array_keys($db->INDEX['LEADERBOARD']['index']), true));
-        // Collect the array for pulling all the leaderboard data
-        $temp_leaderboard_query = mmrpg_prototype_leaderboard_index_query($board_metric);
-        // Query the database and collect the array list of all online players
-        $cache_kind = 'leaderboard.'.$board_metric;
-        $cache_token = md5($temp_leaderboard_query);
-        $cached_index = rpg_object::load_cached_index($cache_kind, $cache_token, MMRPG_CONFIG_LAST_SAVE_DATE);
-        if (!empty($cached_index)){
-            $this_leaderboard_index = $cached_index;
-            unset($cached_index);
-        } else {
-            $this_leaderboard_index = $db->get_array_list($temp_leaderboard_query);
-            rpg_object::save_cached_index($cache_kind, $cache_token, $this_leaderboard_index);
+    if (empty($db->INDEX['LEADERBOARD']['index']['base'])
+        || empty($db->INDEX['LEADERBOARD']['index'][$board_metric])){
+        // If the base hasn't been collected yet, do so now
+        if (empty($db->INDEX['LEADERBOARD']['index']['base'])){
+            //error_log('index for base does not exist');
+            //error_log('collecting new index for base');
+            $base_leaderboard_query = mmrpg_prototype_leaderboard_index_query(MMRPG_SETTINGS_DEFAULT_LEADERBOARD_METRIC);
+            $cache_kind = 'leaderboard.base';
+            $cache_token = md5($base_leaderboard_query);
+            $cached_index = rpg_object::load_cached_index($cache_kind, $cache_token, MMRPG_CONFIG_LAST_SAVE_DATE);
+            if (!empty($cached_index)){
+                $base_leaderboard_index = $cached_index;
+                unset($cached_index);
+            } else {
+                $base_leaderboard_index = $db->get_array_list($base_leaderboard_query, 'user_id');
+                rpg_object::save_cached_index($cache_kind, $cache_token, $base_leaderboard_index);
+            }
+            $db->INDEX['LEADERBOARD']['index']['base'] = $base_leaderboard_index;
         }
-        // Update the database index cache
-        //error_log('adding new index for '.$board_metric);
-        $db->INDEX['LEADERBOARD']['index'][$board_metric] = $this_leaderboard_index; //json_encode($this_leaderboard_index);
+        // If this specific metric hasn't been collected yet, do so now
+        if (empty($db->INDEX['LEADERBOARD']['index'][$board_metric])){
+            //error_log('index for '.$board_metric.' does not exist');
+            //error_log('collecting new index for '.$board_metric);
+            $ranked_leaderboard_query = mmrpg_prototype_leaderboard_index_query($board_metric);
+            $cache_kind = 'leaderboard.'.str_replace('_', '-', $board_metric);
+            $cache_token = md5($ranked_leaderboard_query);
+            $cached_index = rpg_object::load_cached_index($cache_kind, $cache_token, MMRPG_CONFIG_LAST_SAVE_DATE);
+            if (!empty($cached_index)){
+                $ranked_leaderboard_index = $cached_index;
+                unset($cached_index);
+            } else {
+                $ranked_leaderboard_index = $db->get_array_list($ranked_leaderboard_query);
+                $ranked_leaderboard_index = array_map(function($user){ return $user['user_id']; }, $ranked_leaderboard_index);
+                rpg_object::save_cached_index($cache_kind, $cache_token, $ranked_leaderboard_index);
+            }
+            $db->INDEX['LEADERBOARD']['index'][$board_metric] = $ranked_leaderboard_index;
+        }
+    }
+
+    // Now that we've generated and/or collected everthing, let's put the two together for a ranking
+    $this_leaderboard_index = array();
+    $base_leaderboard_index = $db->INDEX['LEADERBOARD']['index']['base'];
+    $ranked_leaderboard_index = $db->INDEX['LEADERBOARD']['index'][$board_metric];
+    //error_log('$ranked_leaderboard_index = '.print_r($ranked_leaderboard_index, true));
+    //error_log('$base_leaderboard_index = '.print_r($base_leaderboard_index, true));
+    foreach ($ranked_leaderboard_index AS $key => $user_id){
+        if (!isset($base_leaderboard_index[$user_id])){ continue; }
+        $this_leaderboard_index[] = $base_leaderboard_index[$user_id];
     }
 
     //error_log('we now have the following indexes cached: '.print_r(array_keys($db->INDEX['LEADERBOARD']['index']), true));
+    //exit;
 
     // Return the collected leaderboard index
     return $this_leaderboard_index;
