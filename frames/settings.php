@@ -85,8 +85,10 @@ if (mmrpg_prototype_item_unlocked('light-program')){
     }
 
     // Break apart any json-encoded proxy fields
-    $current_proxy_info['proxy_fields'] = !empty($current_proxy_info['proxy_fields']) ? json_decode($current_proxy_info['proxy_fields']) : array();
-    $current_proxy_info['proxy_robots'] = !empty($current_proxy_info['proxy_robots']) ? json_decode($current_proxy_info['proxy_robots']) : array();
+    $current_proxy_info['proxy_fields'] = !empty($current_proxy_info['proxy_fields']) ? json_decode($current_proxy_info['proxy_fields'], true) : array();
+    $current_proxy_info['proxy_robots'] = !empty($current_proxy_info['proxy_robots']) ? json_decode($current_proxy_info['proxy_robots'], true) : array();
+    $current_proxy_info['proxy_fields'] = array_values($current_proxy_info['proxy_fields']);
+    $current_proxy_info['proxy_robots'] = array_values($current_proxy_info['proxy_robots']);
 
 }
 
@@ -741,6 +743,7 @@ if (true){
 if (mmrpg_prototype_item_unlocked('light-program')){
 
     // Define the markup for this section
+    //error_log('$current_proxy_info = '.print_r($current_proxy_info, true));
     $tab_token = 'player_settings';
     $tab_name = 'Player Settings';
     ob_start();
