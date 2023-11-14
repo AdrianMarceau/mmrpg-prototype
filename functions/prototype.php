@@ -3183,6 +3183,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         // Collect info about the robot's assigned support unit if it exists and the player has a use for that information
         $this_robot_support_info = array();
         if (in_array('mecha-support', $this_robot_abilities_current)
+            || in_array('mecha-assault', $this_robot_abilities_current)
             || in_array('mecha-party', $this_robot_abilities_current)
             || in_array('friend-share', $this_robot_abilities_current)){
             $this_mecha_support_info = !empty($mecha_support_index[$info['robot_token']]) ? $mecha_support_index[$info['robot_token']] : array();

@@ -1473,7 +1473,7 @@ class rpg_ability extends rpg_object {
         //'style="border-left-width: '.(1 + $ability_info_energy).'px;" '.
 
         $ability_info_title_html = '';
-        $ability_info_title_html .= '<label style="background-image: url(images/abilities/'.$ability_info_token.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">';
+        $ability_info_title_html .= '<label style="background-image: url(images/abilities/'.$ability_info_token.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');">';
             $ability_info_title_html .= str_replace(' ', '&nbsp;', $ability_info_name);
             $ability_info_title_html .= '<span class="arrow"><i class="fa fas fa-angle-double-down"></i></span>';
         $ability_info_title_html .= '</label>';
@@ -3551,8 +3551,9 @@ class rpg_ability extends rpg_object {
             'energy-break', 'attack-break', 'defense-break', 'speed-break',
             'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
             'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
-            'field-support', 'mecha-support', 'mecha-party', 'friend-share',
-            'core-shield', 'core-laser', 'omega-pulse', 'omega-wave'
+            'mecha-support', 'mecha-assault', 'mecha-party', 'friend-share',
+            'core-shield', 'core-laser', 'omega-pulse', 'omega-wave',
+            'field-support',
             );
         // Return the list of global abilities
         return $temp_global_abilities;
@@ -3567,7 +3568,7 @@ class rpg_ability extends rpg_object {
             'energy-break', 'attack-break', 'defense-break', 'speed-break',
             'energy-swap', 'attack-swap', 'defense-swap', 'speed-swap',
             'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
-            'field-support',
+            'field-support', 'mecha-support',
             'core-shield',
             );
         // Return the list of global support abilities
@@ -3742,7 +3743,7 @@ class rpg_ability extends rpg_object {
             // ensure specific incompatible abilities are also blocked
             && !in_array($ability_token, array(
                 // causes user or the target to switch which could be messy
-                'mecha-support', 'mecha-party', 'flash-pulse', 'super-throw',
+                'mecha-support', 'mecha-assault', 'mecha-party', 'flash-pulse', 'super-throw',
                 // self-attached charge/shield/booster with no repeat-use benefit
                 'proto-shield', 'rhythm-satellite', 'acid-barrier', 'core-shield',
                 // target attachment/breaker with no repeat-use benefit for user

@@ -91,28 +91,11 @@ class rpg_mission_starter extends rpg_mission {
             // Add the Mecha Support ability as an unlockable move if not already unlocked
             $temp_battle_omega['battle_rewards']['abilities'] = array();
             if ($temp_target_count >= 8
-                && $this_prototype_data['this_player_token'] == 'dr-light'
-                && !mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'mecha-support')){
-                // Add the ability as a reward for the battle
-                $temp_battle_omega['battle_rewards']['abilities'][] = array('token' => 'mecha-support');
-                // Update the description text for the battle
-                $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' secret mecha data! &#10023; ';
-            }
-            elseif ($temp_target_count >= 8
-                && $this_prototype_data['this_player_token'] == 'dr-wily'
-                && !mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'field-support')){
-                // Add the ability as a reward for the battle
-                $temp_battle_omega['battle_rewards']['abilities'][] = array('token' => 'friend-share');
-                // Update the description text for the battle
-                $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' secret field data! &#10022; ';
-            }
-            elseif ($temp_target_count >= 8
-                && $this_prototype_data['this_player_token'] == 'dr-cossack'
-                && !mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'friend-share')){
+                && !mmrpg_prototype_ability_unlocked($this_prototype_data['this_player_token'], false, 'mecha-party')){
                 // Add the ability as a reward for the battle
                 $temp_battle_omega['battle_rewards']['abilities'][] = array('token' => 'mecha-party');
                 // Update the description text for the battle
-                $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' secret friend data! &#10022; ';
+                $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's' : '').' and download '.($temp_target_count > 1 ? 'their' : 'its').' secret mecha data! &#10023; ';
             } else {
                 // Update the description text for the battle
                 $temp_battle_omega['battle_description'] = 'Defeat the '.$this_robot_name.($temp_target_count > 1 ? 's that are currently attacking' : ' that has suddenly attacked').'!';

@@ -370,7 +370,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){
                 // a little bit of future content
                 $temp_mecha_token = 'dark-frag';
-                $temp_rival_option['battle_rewards']['abilities'][] = array('token' => 'mecha-party', 'level' => 0);
+                $temp_rival_option['battle_rewards']['abilities'][] = array('token' => 'mecha-assault', 'level' => 0);
                 }
             if (!empty($temp_mecha_token)){
                 if (strstr($temp_mecha_token, '-bot')){
@@ -471,18 +471,18 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $hunter_token = 'enker';
                 $hunter_abilities = array(
                     "shield-buster",
-                    "shield-shot",
+                    //"shield-shot",
                     "shield-overdrive",
                     //"buster-shot",
                     "buster-charge",
                     "energy-boost",
-                    "attack-boost",
-                    "defense-boost",
-                    "speed-boost",
+                    //"attack-boost",
+                    //"defense-boost",
+                    //"speed-boost",
                     "mega-slide",
                     "bass-baroque",
                     "proto-strike",
-                    "mecha-support"
+                    "mecha-assault"
                     );
                 $temp_target_field['field_multipliers'] = array('experience' => 2, 'shield' => 1.6, 'shadow' => 1.4);
                 $temp_target_field['field_music'] = 'sega-remix/special-stage-1-mm10';
@@ -496,21 +496,21 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $hunter_token = 'punk';
                 $hunter_abilities = array(
                     "cutter-buster",
-                    "cutter-shot",
+                    //"cutter-shot",
                     "cutter-overdrive",
                     //"buster-shot",
                     "buster-charge",
                     "energy-break",
-                    "attack-break",
-                    "defense-break",
-                    "speed-break",
+                    //"attack-break",
+                    //"defense-break",
+                    //"speed-break",
                     "rising-cutter",
                     "shadow-blade",
-                    "hard-knuckle",
-                    "spark-shock",
-                    "bright-burst",
+                    //"hard-knuckle",
+                    //"spark-shock",
+                    //"bright-burst",
                     "metal-press",
-                    "mecha-support"
+                    "mecha-assault"
                     );
                 $temp_target_field['field_multipliers'] = array('experience' => 2, 'cutter' => 1.6, 'shadow' => 1.4);
                 $temp_target_field['field_music'] = 'sega-remix/special-stage-2-mm10';
@@ -523,21 +523,21 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             elseif ($this_prototype_data['this_player_token'] === 'dr-cossack'){
                 $hunter_token = 'ballade';
                 $hunter_abilities = array(
-                    "laser-buster",
-                    "laser-shot",
-                    "laser-overdrive",
+                    "explode-buster",
+                    //"explode-shot",
+                    "explode-overdrive",
                     //"buster-shot",
                     "buster-charge",
                     "energy-assault",
-                    "attack-assault",
-                    "defense-assault",
-                    "speed-assault",
-                    "hyper-bomb",
+                    //"attack-assault",
+                    //"defense-assault",
+                    //"speed-assault",
+                    //"hyper-bomb",
                     "crash-avenger",
-                    "quick-boomerang",
-                    "gemini-laser",
-                    "core-laser",
-                    "mecha-support"
+                    "danger-bomb",
+                    "flash-bomb",
+                    //"core-laser",
+                    "mecha-party"
                     );
                 $temp_target_field['field_multipliers'] = array('experience' => 2, 'explode' => 1.6, 'shadow' => 1.4);
                 $temp_target_field['field_music'] = 'sega-remix/special-stage-3-mm10';

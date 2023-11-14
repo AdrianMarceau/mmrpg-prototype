@@ -881,6 +881,7 @@ $(document).ready(function(){
                     // Check to see if this robot has need for the mecha support info span
                     var mechaSupportActive = false;
                     if (newAbilityList.indexOf('mecha-support') != -1){ mechaSupportActive = true; }
+                    if (newAbilityList.indexOf('mecha-assault') != -1){ mechaSupportActive = true; }
                     if (newAbilityList.indexOf('mecha-party') != -1){ mechaSupportActive = true; }
                     if (newAbilityList.indexOf('friend-share') != -1){ mechaSupportActive = true; }
                     if (mechaSupportActive){ $parentRobotContainer.find('.robot_support_subtitle').removeClass('inactive'); }

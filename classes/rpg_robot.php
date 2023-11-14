@@ -1585,7 +1585,9 @@ class rpg_robot extends rpg_object {
         if ($temp_compatible
             && $robot_info['robot_class'] == 'mecha'){
             //$debug_fragment .= 'is-mecha '; // DEBUG
-            if (in_array($ability_info['ability_token'], array('mecha-support', 'mecha-party', 'friend-share'))){
+            if (in_array($ability_info['ability_token'], array(
+                'mecha-support', 'mecha-assault', 'mecha-party', 'friend-share'
+                ))){
                 //$debug_fragment .= 'is-mecha-incompatible '; // DEBUG
                 $temp_compatible = false;
             }
@@ -1876,6 +1878,14 @@ class rpg_robot extends rpg_object {
         // Define the frequency of the mecha support ability based benched robot count
         if ($this_robot->has_ability('mecha-support')){
             $options[] = 'mecha-support';
+            if ($this_player->counters['robots_total'] == 1){ $weights[] = 50; }
+            elseif ($this_player->counters['robots_total'] < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){ $weights[] = 10; }
+            else { $weights[] = 0; }
+        }
+
+        // Define the frequency of the mecha assault ability based benched robot count
+        if ($this_robot->has_ability('mecha-assault')){
+            $options[] = 'mecha-assault';
             if ($this_player->counters['robots_total'] == 1){ $weights[] = 50; }
             elseif ($this_player->counters['robots_total'] < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX){ $weights[] = 10; }
             else { $weights[] = 0; }
@@ -5285,7 +5295,9 @@ class rpg_robot extends rpg_object {
 
                     // Only show mecha partners if the Mecha Support or Mecha Party have been unlocked
                     if (mmrpg_prototype_ability_unlocked(false, false, 'mecha-support')
-                        || mmrpg_prototype_ability_unlocked(false, false, 'mecha-party')){
+                        || mmrpg_prototype_ability_unlocked(false, false, 'mecha-assault')
+                        || mmrpg_prototype_ability_unlocked(false, false, 'mecha-party')
+                        || mmrpg_prototype_ability_unlocked(false, false, 'friend-share')){
 
                         // Collect the mecha support index for reference
                         static $mecha_support_index;
@@ -5316,6 +5328,7 @@ class rpg_robot extends rpg_object {
                         if (!empty($robot_info['robot_abilities'])){
                             $temp_ability_keys = array_keys($robot_info['robot_abilities']);
                             if (in_array('mecha-support', $temp_ability_keys)){ $mecha_support_active = true; }
+                            if (in_array('mecha-assault', $temp_ability_keys)){ $mecha_support_active = true; }
                             if (in_array('mecha-party', $temp_ability_keys)){ $mecha_support_active = true; }
                             if (in_array('friend-share', $temp_ability_keys)){ $mecha_support_active = true; }
                         }
