@@ -816,8 +816,8 @@ if (mmrpg_prototype_item_unlocked('light-program')){
                 <div class="field fullsize player-robots">
                     <strong class="label">Robot Team Roster <em>stats, items, alts, and abilities are automatically pulled from your save</em></strong>
                     <div class="subfield" style="padding-right: 0;">
-                        <? for ($i = 0; $i < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX; $i++){ ?>
-                            <div style="float: left; margin: 0 10px 5px 0; width: calc(25% - 10px);"><select class="select" name="user_proxy_robots[]">
+                        <? for ($i = 0; $i < 6; $i++){ ?>
+                            <div style="float: left; margin: 0 10px 5px 0; width: calc(33% - 10px);"><select class="select" name="user_proxy_robots[]">
                                 <?= !empty($current_proxy_info['proxy_robots'][$i]) ? str_replace(
                                     'value="'.$current_proxy_info['proxy_robots'][$i].'"',
                                     'value="'.$current_proxy_info['proxy_robots'][$i].'" selected="selected"',
