@@ -1176,6 +1176,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['7']){
 
         // EVENT MESSAGE : BONUS CHAPTER
+        $next_key = count($this_prototype_data['battle_options']);
         $this_prototype_data['battle_options'][] = array(
             'option_type' => 'message',
             'option_chapter' => $this_prototype_data['this_current_chapter'],
@@ -1216,6 +1217,12 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         // Collect a list of all stars that have not been claimed yet
         $remaining_stars = mmrpg_prototype_remaining_stars(true, $possible_star_list);
         $num_remaining_stars = count($remaining_stars);
+
+        // If we have a stars remaining to collect, append it to the maintext
+        if (!empty($num_remaining_stars)){
+            $append_remaining = ''.$num_remaining_stars.' <i class="fa fa-fw fa-star"></i>';
+            $this_prototype_data['battle_options'][$next_key]['option_maintext'] .= (!empty($num_remaining_stars) ? ' <em>'.$append_remaining.'</em>' : '');
+        }
 
         // Calculate the current starforce total vs max starforce total for mission gen
         $current_starforce = !empty($_SESSION[$session_token]['values']['star_force']) ? $_SESSION[$session_token]['values']['star_force'] : array();

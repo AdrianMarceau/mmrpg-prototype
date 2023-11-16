@@ -310,6 +310,7 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
                     AND users.user_flag_approved = 1
                     AND board.board_points > 0
                 ;", 'players_defeated');
+            if ($battle_tokens_count > 0){ $has_zenny_overflow = true; }
         }
 
         // If the user has collected any points, turn the points counter into a leaderboard link
