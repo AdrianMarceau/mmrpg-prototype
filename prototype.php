@@ -6,7 +6,7 @@
 require_once('top.php');
 //debug_profiler_checkpoint('after-top');
 
-// For this script, and this script only, we increase the memory limit
+// For this script, because it's high priority, we increase the memory limit
 ini_set('memory_limit', '256M');
 
 // If the user is not logged in, don't allow them here

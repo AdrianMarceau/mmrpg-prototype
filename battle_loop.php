@@ -2,6 +2,9 @@
 // Include the TOP file
 require_once('top.php');
 
+// For this script, because it's high priority, we increase the memory limit
+ini_set('memory_limit', '256M');
+
 // Never try to display errors during the battle loop, always log to file instead
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
