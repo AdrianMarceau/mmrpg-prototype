@@ -3526,7 +3526,8 @@ function mmrpg_prototype_leaderboard_index_query($board_metric = '', $display_li
                 LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
                 LEFT JOIN mmrpg_leaderboard AS board ON battles.target_user_id = board.user_id
                 WHERE
-                    battles.this_player_result = 'victory'
+                    battles.this_user_id <> battles.target_user_id
+                    AND battles.this_player_result = 'victory'
                     AND battles.battle_flag_legacy = 0
                     AND users.user_flag_approved = 1
                     AND board.board_points > 0

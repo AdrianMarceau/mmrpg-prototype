@@ -909,7 +909,7 @@ class rpg_battle extends rpg_object {
             // If this was a PLAYER BATTLE and the human user won against them (this/human/victory | target/computer/defeat)
             $target_user_id = $target_player->player_id;
             if (strstr($target_user_id, 'x')){ list($target_user_id) = explode('x', $target_user_id); }
-            if ($target_user_id != MMRPG_SETTINGS_TARGET_PLAYERID && $this_player->player_side == 'left'){
+            if ($target_user_id !== MMRPG_SETTINGS_TARGET_PLAYERID && $this_player->player_side == 'left'){
 
                 // DEBUG
                 //$temp_human_rewards['checkpoint'] .= '; '.__LINE__;
@@ -917,116 +917,121 @@ class rpg_battle extends rpg_object {
                 // Ensure the system knows to reward zenny instead of zenny
                 $force_zenny_rewards = true;
 
-                // Create the temp robot sprites for the database
-                $temp_this_player_robots = array();
-                $temp_target_player_robots = array();
-                foreach ($this_player->player_robots AS $key => $info){ $temp_this_player_robots[] = '['.$info['robot_token'].':'.$info['robot_level'].']'; }
-                foreach ($target_player->player_robots AS $key => $info){ $temp_target_player_robots[] = '['.$info['robot_token'].':'.$info['robot_level'].']'; }
-                $temp_this_player_robots = !empty($temp_this_player_robots) ? implode(',', $temp_this_player_robots) : '';
-                $temp_target_player_robots = !empty($temp_target_player_robots) ? implode(',', $temp_target_player_robots) : '';
-                // Collect the userinfo for the target player
-                $target_player_userinfo = $db->get_array("SELECT user_name, user_name_clean, user_name_public FROM mmrpg_users WHERE user_id = {$target_user_id};");
-                if (!isset($_SESSION['LEADERBOARD']['player_targets_defeated'])){ $_SESSION['LEADERBOARD']['player_targets_defeated'] = array(); }
-                $_SESSION['LEADERBOARD']['player_targets_defeated'][] = $target_player_userinfo['user_name_clean'];
+                // Only run leaderboard and battle record operations if NOT facing yourself
+                if ($this_player->player_id !== $target_player->player_id){
 
-                // Pre-collect this and the target player's battle points beforehand for comparrison
-                $matchup_array_query = "SELECT
-                    `board`.`user_id` AS `user_id`,
-                    `board`.`board_points` AS `battle_points`,
-                    `victories`.`max_battle_id` AS `battle_victory_id`,
-                    `defeats`.`max_battle_id` AS `battle_defeat_id`
-                    FROM `mmrpg_leaderboard` AS `board`
-                    LEFT JOIN (SELECT
-                        MAX(`battles`.`battle_id`) AS `max_battle_id`,
-                        `battles`.`this_user_id`,
-                        `battles`.`target_user_id`,
-                        `battles`.`this_player_result`,
-                        `battles`.`target_player_result`
-                        FROM `mmrpg_battles` AS `battles`
+                    // Create the temp robot sprites for the database
+                    $temp_this_player_robots = array();
+                    $temp_target_player_robots = array();
+                    foreach ($this_player->player_robots AS $key => $info){ $temp_this_player_robots[] = '['.$info['robot_token'].':'.$info['robot_level'].']'; }
+                    foreach ($target_player->player_robots AS $key => $info){ $temp_target_player_robots[] = '['.$info['robot_token'].':'.$info['robot_level'].']'; }
+                    $temp_this_player_robots = !empty($temp_this_player_robots) ? implode(',', $temp_this_player_robots) : '';
+                    $temp_target_player_robots = !empty($temp_target_player_robots) ? implode(',', $temp_target_player_robots) : '';
+                    // Collect the userinfo for the target player
+                    $target_player_userinfo = $db->get_array("SELECT user_name, user_name_clean, user_name_public FROM mmrpg_users WHERE user_id = {$target_user_id};");
+                    if (!isset($_SESSION['LEADERBOARD']['player_targets_defeated'])){ $_SESSION['LEADERBOARD']['player_targets_defeated'] = array(); }
+                    $_SESSION['LEADERBOARD']['player_targets_defeated'][] = $target_player_userinfo['user_name_clean'];
+
+                    // Pre-collect this and the target player's battle points beforehand for comparrison
+                    $matchup_array_query = "SELECT
+                        `board`.`user_id` AS `user_id`,
+                        `board`.`board_points` AS `battle_points`,
+                        `victories`.`max_battle_id` AS `battle_victory_id`,
+                        `defeats`.`max_battle_id` AS `battle_defeat_id`
+                        FROM `mmrpg_leaderboard` AS `board`
+                        LEFT JOIN (SELECT
+                            MAX(`battles`.`battle_id`) AS `max_battle_id`,
+                            `battles`.`this_user_id`,
+                            `battles`.`target_user_id`,
+                            `battles`.`this_player_result`,
+                            `battles`.`target_player_result`
+                            FROM `mmrpg_battles` AS `battles`
+                            WHERE
+                            `battles`.`this_user_id` = {$this_user_id}
+                            AND `battles`.`target_user_id` = {$target_user_id}
+                            AND `battles`.`this_player_result` = 'victory'
+                            AND `battles`.`battle_flag_legacy` = 0
+                            ) AS `victories` ON `victories`.`this_user_id` = `board`.`user_id`
+                        LEFT JOIN (SELECT
+                            MAX(`battles`.`battle_id`) AS `max_battle_id`,
+                            `battles`.`this_user_id`,
+                            `battles`.`target_user_id`,
+                            `battles`.`this_player_result`,
+                            `battles`.`target_player_result`
+                            FROM `mmrpg_battles` AS `battles`
+                            WHERE
+                            `battles`.`this_user_id` = {$target_user_id}
+                            AND `battles`.`target_user_id` = {$this_user_id}
+                            AND `battles`.`this_player_result` = 'victory'
+                            AND `battles`.`battle_flag_legacy` = 0
+                            ) AS `defeats` ON `defeats`.`this_user_id` = `board`.`user_id`
                         WHERE
-                        `battles`.`this_user_id` = {$this_user_id}
-                        AND `battles`.`target_user_id` = {$target_user_id}
-                        AND `battles`.`this_player_result` = 'victory'
-                        AND `battles`.`battle_flag_legacy` = 0
-                        ) AS `victories` ON `victories`.`this_user_id` = `board`.`user_id`
-                    LEFT JOIN (SELECT
-                        MAX(`battles`.`battle_id`) AS `max_battle_id`,
-                        `battles`.`this_user_id`,
-                        `battles`.`target_user_id`,
-                        `battles`.`this_player_result`,
-                        `battles`.`target_player_result`
-                        FROM `mmrpg_battles` AS `battles`
-                        WHERE
-                        `battles`.`this_user_id` = {$target_user_id}
-                        AND `battles`.`target_user_id` = {$this_user_id}
-                        AND `battles`.`this_player_result` = 'victory'
-                        AND `battles`.`battle_flag_legacy` = 0
-                        ) AS `defeats` ON `defeats`.`this_user_id` = `board`.`user_id`
-                    WHERE
-                    `board`.`user_id` IN ({$this_user_id}, {$target_user_id})
-                    ;";
-                //error_log('$matchup_array_query = '.print_r($matchup_array_query, true));
-                $matchup_array_index = $db->get_array_list($matchup_array_query, 'user_id');
-                //error_log('$matchup_array_index = '.print_r($matchup_array_index, true));
-                $this_user_matchup = !empty($matchup_array_index[$this_user_id]) ? $matchup_array_index[$this_user_id] : array();
-                $target_user_matchup = !empty($matchup_array_index[$target_user_id]) ? $matchup_array_index[$target_user_id] : array();
-                //error_log('$this_user_matchup = '.print_r($this_user_matchup, true));
-                //error_log('$target_user_matchup = '.print_r($target_user_matchup, true));
+                        `board`.`user_id` IN ({$this_user_id}, {$target_user_id})
+                        ;";
+                    //error_log('$matchup_array_query = '.print_r($matchup_array_query, true));
+                    $matchup_array_index = $db->get_array_list($matchup_array_query, 'user_id');
+                    //error_log('$matchup_array_index = '.print_r($matchup_array_index, true));
+                    $this_user_matchup = !empty($matchup_array_index[$this_user_id]) ? $matchup_array_index[$this_user_id] : array();
+                    $target_user_matchup = !empty($matchup_array_index[$target_user_id]) ? $matchup_array_index[$target_user_id] : array();
+                    //error_log('$this_user_matchup = '.print_r($this_user_matchup, true));
+                    //error_log('$target_user_matchup = '.print_r($target_user_matchup, true));
 
-                // Check to see if this battle is going to increase our score at all, given context
-                $this_user_has_victory_already = !empty($this_user_matchup['battle_victory_id']) ? true : false;
-                $target_user_has_victory_already = !empty($target_user_matchup['battle_victory_id']) ? true : false;
-                $update_this_user_score = !$this_user_has_victory_already ? true : false;
-                $update_target_user_score = $target_user_has_victory_already ? true : false;
-                //error_log('$this_user_has_victory_already = '.print_r($this_user_has_victory_already, true));
-                //error_log('$target_user_has_victory_already = '.print_r($target_user_has_victory_already, true));
-                //error_log('$update_this_user_score = '.print_r($update_this_user_score, true));
-                //error_log('$update_target_user_score = '.print_r($update_target_user_score, true));
+                    // Check to see if this battle is going to increase our score at all, given context
+                    $this_user_has_victory_already = !empty($this_user_matchup['battle_victory_id']) ? true : false;
+                    $target_user_has_victory_already = !empty($target_user_matchup['battle_victory_id']) ? true : false;
+                    $update_this_user_score = !$this_user_has_victory_already ? true : false;
+                    $update_target_user_score = $target_user_has_victory_already ? true : false;
+                    //error_log('$this_user_has_victory_already = '.print_r($this_user_has_victory_already, true));
+                    //error_log('$target_user_has_victory_already = '.print_r($target_user_has_victory_already, true));
+                    //error_log('$update_this_user_score = '.print_r($update_this_user_score, true));
+                    //error_log('$update_target_user_score = '.print_r($update_target_user_score, true));
 
-                // Make sure we set any previous battles against this user as legacy so they don't count anymore
-                $db->update('mmrpg_battles', array('battle_flag_legacy' => 1),
-                    "battle_flag_legacy = 0 AND (
-                        (this_user_id = {$this_user_id} AND target_user_id = {$target_user_id})
-                        OR (this_user_id = {$target_user_id} AND target_user_id = {$this_user_id})
-                        )"
-                    );
+                    // Make sure we set any previous battles against this user as legacy so they don't count anymore
+                    $db->update('mmrpg_battles', array('battle_flag_legacy' => 1),
+                        "battle_flag_legacy = 0 AND (
+                            (this_user_id = {$this_user_id} AND target_user_id = {$target_user_id})
+                            OR (this_user_id = {$target_user_id} AND target_user_id = {$this_user_id})
+                            )"
+                        );
 
-                // Update the database with these pending rewards for each player
-                global $db;
-                $player_battle_victory_record = array(
-                    'battle_field_name' => $this->battle_field->field_name,
-                    'battle_field_background' => $this->battle_field->field_background,
-                    'battle_field_foreground' => $this->battle_field->field_foreground,
-                    'battle_turns' => $this->counters['battle_turn'],
-                    'this_user_id' => $this_user_id,
-                    'this_player_token' => $this_player->player_token,
-                    'this_player_robots' => $temp_this_player_robots,
-                    'this_player_zenny' => $this_player_zenny,
-                    'this_player_result' => 'victory',
-                    'this_reward_pending' => 0,
-                    'target_user_id' => $target_user_id,
-                    'target_player_token' => $target_player->player_token,
-                    'target_player_robots' => $temp_target_player_robots,
-                    'target_player_zenny' => $target_battle_zenny,
-                    'target_player_result' => 'defeat',
-                    'target_reward_pending' => 1
-                    );
-                //error_log('inserting on line '.__LINE__.' $player_battle_victory_record: '.print_r($player_battle_victory_record, true));
-                $db->insert('mmrpg_battles', $player_battle_victory_record);
+                    // Update the database with these pending rewards for each player
+                    global $db;
+                    $player_battle_victory_record = array(
+                        'battle_field_name' => $this->battle_field->field_name,
+                        'battle_field_background' => $this->battle_field->field_background,
+                        'battle_field_foreground' => $this->battle_field->field_foreground,
+                        'battle_turns' => $this->counters['battle_turn'],
+                        'this_user_id' => $this_user_id,
+                        'this_player_token' => $this_player->player_token,
+                        'this_player_robots' => $temp_this_player_robots,
+                        'this_player_zenny' => $this_player_zenny,
+                        'this_player_result' => 'victory',
+                        'this_reward_pending' => 0,
+                        'target_user_id' => $target_user_id,
+                        'target_player_token' => $target_player->player_token,
+                        'target_player_robots' => $temp_target_player_robots,
+                        'target_player_zenny' => $target_battle_zenny,
+                        'target_player_result' => 'defeat',
+                        'target_reward_pending' => 1
+                        );
+                    //error_log('inserting on line '.__LINE__.' $player_battle_victory_record: '.print_r($player_battle_victory_record, true));
+                    $db->insert('mmrpg_battles', $player_battle_victory_record);
 
-                // If we're supposed to be updating the user's score, simply increase it by the required amount
-                if ($update_this_user_score
-                    && !empty($this_user_matchup['battle_points'])){
-                    $new_user_points = $this_user_matchup['battle_points'] + MMRPG_SETTINGS_BATTLEPOINTS_PERPLAYER;
-                    $db->update('mmrpg_leaderboard', array('board_points' => $new_user_points), "user_id = {$this_user_id}");
-                }
+                    // If we're supposed to be updating the user's score, simply increase it by the required amount
+                    if ($update_this_user_score
+                        && !empty($this_user_matchup['battle_points'])){
+                        $new_user_points = $this_user_matchup['battle_points'] + MMRPG_SETTINGS_BATTLEPOINTS_PERPLAYER;
+                        $db->update('mmrpg_leaderboard', array('board_points' => $new_user_points), "user_id = {$this_user_id}");
+                    }
 
-                // If we're supposed to be updating the target's score, simply decrease it by the required amount
-                if ($update_target_user_score
-                    && !empty($target_user_matchup['battle_points'])){
-                    $new_user_points = $target_user_matchup['battle_points'] - MMRPG_SETTINGS_BATTLEPOINTS_PERPLAYER;
-                    if ($new_user_points < 0){ $new_user_points = 0; }
-                    $db->update('mmrpg_leaderboard', array('board_points' => $new_user_points), "user_id = {$target_user_id}");
+                    // If we're supposed to be updating the target's score, simply decrease it by the required amount
+                    if ($update_target_user_score
+                        && !empty($target_user_matchup['battle_points'])){
+                        $new_user_points = $target_user_matchup['battle_points'] - MMRPG_SETTINGS_BATTLEPOINTS_PERPLAYER;
+                        if ($new_user_points < 0){ $new_user_points = 0; }
+                        $db->update('mmrpg_leaderboard', array('board_points' => $new_user_points), "user_id = {$target_user_id}");
+                    }
+
                 }
 
 
