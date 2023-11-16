@@ -1384,6 +1384,22 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
 #prototype .option_message * {
     /*cursor: default !important;*/
 }
+#prototype .option_message .inset .multi .maintext i {
+
+}
+#prototype .option_message .inset .multi .maintext em {
+    display: inline-block;
+    font-style: normal;
+    margin-left: 4px;
+    font-size: 9px;
+    line-height: 11px;
+    position: relative;
+    bottom: 0px;
+    background-color: #000000;
+    border-radius: 3px;
+    padding: 1px 6px;
+    border: 1px solid #1A1A1A;
+}
 
 #prototype .option_message[data-chapter] {
     margin: 0 auto 5px;
