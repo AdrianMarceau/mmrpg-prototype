@@ -1335,6 +1335,14 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $this_prototype_data['battle_options'][$next_key]['option_maintext'] .= (!empty($player_targets_remaining) ? ' <em>'.$append_remaining.'</em>' : '');
             }
 
+            // If we have a leaderboard target count, append it to the maintext
+            $player_rematches_remaining = 0;
+            if (!empty($_SESSION['LEADERBOARD']['player_rematches_remaining'])){
+                $player_rematches_remaining = $_SESSION['LEADERBOARD']['player_rematches_remaining'];
+                $append_remaining = ''.$player_rematches_remaining.' <i class="fas fa-history"></i>';
+                $this_prototype_data['battle_options'][$next_key]['option_maintext'] .= (!empty($player_rematches_remaining) ? ' <em>'.$append_remaining.'</em>' : '');
+            }
+
             // If player data was actuall pulled, continue
             $max_battle_count = 6;
             $max_target_count = 6;
@@ -1395,10 +1403,11 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     }
 
                     // If this user is defeated, update the battle button with details
+                    $victory_token_colour = !empty($temp_player_array['values']['colour_token']) ? $temp_player_array['values']['colour_token'] : 'none';
+                    if (!empty($temp_player_array['values']['colour_token2'])){ $victory_token_colour .= '_'.$temp_player_array['values']['colour_token2']; }
                     if (!empty($temp_player_array['values']['flag_defeated'])){
-                        $victory_token_colour = !empty($temp_player_array['values']['colour_token']) ? $temp_player_array['values']['colour_token'] : 'none';
-                        if (!empty($temp_player_array['values']['colour_token2'])){ $victory_token_colour .= $temp_player_array['values']['colour_token2']; }
-                        $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="special_type player_type player_type_'.$victory_token_colour.'"><i class="fa fas fa-flag" style="font-size: 80%;"></i></sup>';
+                        $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="special_type player_type player_type_'.$victory_token_colour.'"><i class="fa fas fa-history"></i></sup>';
+                        $temp_battle_omega['battle_description'] = 'Rematch! '.$temp_battle_omega['battle_description'];
                         $temp_battle_omega['battle_description2'] .= 'This player\'s victory token has already been collected, but they have yours too!  Defeat them again to take it back and show them who\'s boss.';
                         $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.10);
                     } else {

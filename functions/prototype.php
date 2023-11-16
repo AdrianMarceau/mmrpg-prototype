@@ -3970,6 +3970,7 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         $this_leaderboard_target_count = $db->get_value($temp_leaderboard_count_query, 'num_targets');
         if (!empty($rematch_player_ids)){ $this_leaderboard_target_count -= count($rematch_player_ids); }
         $_SESSION['LEADERBOARD']['player_targets_remaining'] = $this_leaderboard_target_count;
+        $_SESSION['LEADERBOARD']['player_rematches_remaining'] = !empty($rematch_player_ids) ? count($rematch_player_ids) : 0;
 
         // Define the array for pulling all the leaderboard data
         $temp_leaderboard_query = 'SELECT
