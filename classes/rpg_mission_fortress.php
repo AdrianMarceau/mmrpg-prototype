@@ -8,9 +8,8 @@ class rpg_mission_fortress extends rpg_mission {
     public static function prepare(&$this_fortress_battle, $this_prototype_data){
 
         // Pull in required object indexes
-        static $mmrpg_players_index, $mmrpg_robots_index;
-        if (empty($mmrpg_players_index)){ $mmrpg_players_index = rpg_player::get_index(true); }
-        if (empty($mmrpg_robots_index)){ $mmrpg_robots_index = rpg_robot::get_index(true); }
+        $mmrpg_players_index = rpg_player::get_index(true);
+        $mmrpg_robots_index = rpg_robot::get_index(true);
 
         // Update the target user ID, player ID, and robot IDs
         $temp_target_user_id = MMRPG_SETTINGS_TARGET_PLAYERID;
