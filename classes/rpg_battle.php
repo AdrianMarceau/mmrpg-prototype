@@ -812,26 +812,9 @@ class rpg_battle extends rpg_object {
                 //$target_player_userinfo = $db->get_array("SELECT user_name, user_name_clean, user_name_public FROM mmrpg_users WHERE user_id = {$target_player->player_id};");
                 //if (!isset($_SESSION['PROTOTYPE_TEMP']['player_targets_defeated'])){ $_SESSION['PROTOTYPE_TEMP']['player_targets_defeated'] = array(); }
                 //$_SESSION['PROTOTYPE_TEMP']['player_targets_defeated'][] = $target_player_userinfo['user_name_clean'];
-                // Update the database with these pending rewards for each player
-                global $db;
-                $db->insert('mmrpg_battles', array(
-                    'battle_field_name' => $this->battle_field->field_name,
-                    'battle_field_background' => $this->battle_field->field_background,
-                    'battle_field_foreground' => $this->battle_field->field_foreground,
-                    'battle_turns' => $this->counters['battle_turn'],
-                    'this_user_id' => $target_user_id,
-                    'this_player_token' => $target_player->player_token,
-                    'this_player_robots' => $temp_this_player_robots,
-                    'this_player_zenny' => $target_battle_zenny,
-                    'this_player_result' => 'defeat',
-                    'this_reward_pending' => 0,
-                    'target_user_id' => $this_user_id,
-                    'target_player_token' => $this_player->player_token,
-                    'target_player_robots' => $temp_target_player_robots,
-                    'target_player_zenny' => $other_battle_zenny_modded,
-                    'target_player_result' => 'victory',
-                    'target_reward_pending' => 1
-                    ));
+
+                // 2023/11/14: There is no reason why we should still be saving defeats to the database in 2023
+                // It's not used for anything and it's just wasting space in the database.  Removed going forward.
 
             }
 
