@@ -285,6 +285,7 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
         ?>
 
         <?
+
         // Collect the current points, zenny, and star counts to determine if overflow is needed
         $battle_points_count = isset($_SESSION[$session_token]['counters']['battle_points']) ? $_SESSION[$session_token]['counters']['battle_points'] : 0;
         $battle_zenny_count = isset($_SESSION[$session_token]['counters']['battle_zenny']) ? $_SESSION[$session_token]['counters']['battle_zenny'] : 0;
@@ -292,6 +293,25 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
         $battle_points_rank = !empty($_SESSION[$session_token]['BOARD']['boardrank']) ? $_SESSION[$session_token]['BOARD']['boardrank'] : 0;
         $has_points_overflow = $battle_points_count >= 999999999999 ? true : false;
         $has_zenny_overflow = $battle_zenny_count >= 999999999 ? true : false;
+
+        // If player battles have been unlocked (via the Light Program), make sure we collect the token count
+        $battle_tokens_count = 0;
+        if (mmrpg_prototype_item_unlocked('light-program')){
+            $battle_tokens_count = $db->get_value("SELECT
+                COUNT(battles.target_user_id) AS players_defeated
+                FROM mmrpg_battles AS battles
+                INNER JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
+                INNER JOIN mmrpg_leaderboard AS board ON battles.target_user_id = board.user_id
+                WHERE
+                    battles.this_user_id = {$this_userid}
+                    AND battles.target_user_id <> {$this_userid}
+                    AND battles.this_player_result = 'victory'
+                    AND battles.battle_flag_legacy = 0
+                    AND users.user_flag_approved = 1
+                    AND board.board_points > 0
+                ;", 'players_defeated');
+        }
+
         // If the user has collected any points, turn the points counter into a leaderboard link
         $battle_points_container_attrs = array();
         if ($battle_points_count > 0 && $battle_points_rank > 0){
@@ -303,6 +323,7 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
             $battle_points_container_attrs[] = 'data-tooltip-type="field_type field_type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE.'"';
         }
         $battle_points_container_attrs = implode(' ', $battle_points_container_attrs);
+
         ?>
         <div class="points field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?> <?= $has_points_overflow || $has_zenny_overflow ? 'overflow' : '' ?>" <?= $battle_points_container_attrs ?>>
             <div class="wrapper">
@@ -321,6 +342,13 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
                 <span class="amount zenny">
                     <?= (!empty($battle_zenny_count) ? number_format($battle_zenny_count, 0, '.', ',') : 0).'&#438;' ?>
                 </span>
+                <? if (!empty($battle_tokens_count)){ ?>
+                    <span class="pipe">|</span>
+                    <span class="amount tokens"><?=
+                        '<span class="num">'.number_format($battle_tokens_count, 0, '.', ',').'</span>'.
+                        '<i class="fa fa-fw fa-stop-circle"></i>'
+                        ?></span>
+                <? } ?>
                 <? if (!empty($_SESSION[$session_token]['values']['battle_stars'])){ ?>
                     <span class="pipe">|</span>
                     <span class="amount stars"><?=
