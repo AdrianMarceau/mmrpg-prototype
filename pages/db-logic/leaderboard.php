@@ -59,8 +59,8 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     mmrpg_saves.save_settings,
     (SELECT COUNT(thread_id) FROM mmrpg_threads WHERE mmrpg_threads.user_id = mmrpg_users.user_id AND thread_published = 1) AS thread_count,
     (SELECT COUNT(post_id) FROM mmrpg_posts WHERE mmrpg_posts.user_id = mmrpg_users.user_id AND post_deleted = 0) AS post_count,
-    (SELECT COUNT(battle_id) FROM mmrpg_battles WHERE (mmrpg_battles.this_user_id = mmrpg_users.user_id AND mmrpg_battles.this_player_result = \'victory\') OR (mmrpg_battles.target_user_id = mmrpg_users.user_id AND mmrpg_battles.target_player_result = \'victory\')) AS victory_count,
-    (SELECT COUNT(battle_id) FROM mmrpg_battles WHERE (mmrpg_battles.this_user_id = mmrpg_users.user_id AND mmrpg_battles.this_player_result = \'defeat\') OR (mmrpg_battles.target_user_id = mmrpg_users.user_id AND mmrpg_battles.target_player_result = \'defeat\')) AS defeat_count,
+    (SELECT COUNT(battle_id) FROM mmrpg_battles WHERE (mmrpg_battles.this_user_id = mmrpg_users.user_id AND mmrpg_battles.this_player_result = \'victory\' AND mmrpg_battles.battle_flag_legacy = 0) OR (mmrpg_battles.target_user_id = mmrpg_users.user_id AND mmrpg_battles.target_player_result = \'victory\' AND mmrpg_battles.battle_flag_legacy = 0)) AS victory_count,
+    (SELECT COUNT(battle_id) FROM mmrpg_battles WHERE (mmrpg_battles.this_user_id = mmrpg_users.user_id AND mmrpg_battles.this_player_result = \'defeat\' AND mmrpg_battles.battle_flag_legacy = 0) OR (mmrpg_battles.target_user_id = mmrpg_users.user_id AND mmrpg_battles.target_player_result = \'defeat\' AND mmrpg_battles.battle_flag_legacy = 0)) AS defeat_count,
     0 AS like_count
     FROM mmrpg_users
     LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_users.user_id
