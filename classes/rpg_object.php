@@ -978,7 +978,8 @@ class rpg_object {
         //error_log('cache_filename = '.print_r($cache_filename, true));
 
         // Save the index data to a file
-        $index_data = json_encode($index_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+        //$index_data = json_encode($index_data, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+        $index_data = json_encode($index_data, JSON_NUMERIC_CHECK);
         file_put_contents($cache_base_path.$cache_filename, $index_data);
         //error_log('Saving cache file: '.$cache_filename);
 
