@@ -3455,7 +3455,7 @@ function mmrpg_prototype_leaderboard_metric_index(){
 }
 
 // Define a function for pulling the leaderboard players index
-function mmrpg_prototype_leaderboard_index_query($board_metric = '', $display_limit = false){
+function mmrpg_prototype_leaderboard_index_query($board_metric = '', $display_limit = false, $rank_only = false){
 
     // Collect the current leaderboard metric in case we need it
     if (empty($board_metric)){ $board_metric = MMRPG_SETTINGS_CURRENT_LEADERBOARD_METRIC; }
@@ -3468,89 +3468,140 @@ function mmrpg_prototype_leaderboard_index_query($board_metric = '', $display_li
     $this_online_timeout = MMRPG_SETTINGS_ONLINE_TIMEOUT;
     $this_sort_field = $this_leaderboard_metric_info['col'];
     $this_sort_field2 = 'board.board_points';
-    $temp_leaderboard_query = "SELECT
-        users.user_id,
-        users.user_name,
-        users.user_name_clean,
-        users.user_name_public,
-        users.user_colour_token,
-        users.user_colour_token2,
-        users.user_image_path,
-        users.user_background_path,
-        users.user_date_accessed,
-        users.user_flag_postpublic,
-        (users.user_date_accessed > 0 AND ((UNIX_TIMESTAMP() - users.user_date_accessed) <= {$this_online_timeout})) AS user_is_online,
-        board.board_id,
-        board.board_points,
-        -- board.board_points_dr_light,
-        -- board.board_points_dr_wily,
-        -- board.board_points_dr_cossack,
-        board.board_items,
-        '' AS board_robots, -- board.board_robots,
-        -- board.board_robots_dr_light,
-        -- board.board_robots_dr_wily,
-        -- board.board_robots_dr_cossack,
-        board.board_robots_count,
-        '' AS board_battles, -- board.board_battles,
-        -- board.board_battles_dr_light,
-        -- board.board_battles_dr_wily,
-        -- board.board_battles_dr_cossack,
-        board.board_stars,
-        -- board.board_stars_dr_light,
-        -- board.board_stars_dr_wily,
-        -- board.board_stars_dr_cossack,
-        IF(battles.player_tokens_collected IS NOT NULL, battles.player_tokens_collected, 0) AS board_tokens_count,
-        IF(challenges.challenge_medals_collected IS NOT NULL, challenges.challenge_medals_collected, 0) AS board_medals_count,
-        IF(endless.challenge_waves_completed IS NOT NULL, endless.challenge_waves_completed, 0) AS board_waves_count,
-        board.board_abilities,
-        -- board.board_abilities_dr_light,
-        -- board.board_abilities_dr_wily,
-        -- board.board_abilities_dr_cossack,
-        board.board_missions,
-        -- board.board_missions_dr_light,
-        -- board.board_missions_dr_wily,
-        -- board.board_missions_dr_cossack,
-        board.board_awards,
-        board.board_zenny,
-        board.board_date_created,
-        board.board_date_modified
-        FROM mmrpg_users AS users
-        LEFT JOIN mmrpg_leaderboard AS board ON users.user_id = board.user_id
-        LEFT JOIN mmrpg_saves AS saves ON saves.user_id = board.user_id
-        LEFT JOIN (
-            SELECT
-                battles.this_user_id AS user_id,
-                COUNT(DISTINCT(battles.target_user_id)) AS player_tokens_collected
-            FROM mmrpg_battles AS battles
-            LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
+    if (!$rank_only){
+        $temp_leaderboard_query = "SELECT
+            users.user_id,
+            users.user_name,
+            users.user_name_clean,
+            users.user_name_public,
+            users.user_colour_token,
+            users.user_colour_token2,
+            users.user_image_path,
+            users.user_background_path,
+            users.user_date_accessed,
+            users.user_flag_postpublic,
+            (users.user_date_accessed > 0 AND ((UNIX_TIMESTAMP() - users.user_date_accessed) <= {$this_online_timeout})) AS user_is_online,
+            board.board_id,
+            board.board_points,
+            -- board.board_points_dr_light,
+            -- board.board_points_dr_wily,
+            -- board.board_points_dr_cossack,
+            board.board_items,
+            '' AS board_robots, -- board.board_robots,
+            -- board.board_robots_dr_light,
+            -- board.board_robots_dr_wily,
+            -- board.board_robots_dr_cossack,
+            board.board_robots_count,
+            '' AS board_battles, -- board.board_battles,
+            -- board.board_battles_dr_light,
+            -- board.board_battles_dr_wily,
+            -- board.board_battles_dr_cossack,
+            board.board_stars,
+            -- board.board_stars_dr_light,
+            -- board.board_stars_dr_wily,
+            -- board.board_stars_dr_cossack,
+            IF(battles.player_tokens_collected IS NOT NULL, battles.player_tokens_collected, 0) AS board_tokens_count,
+            IF(challenges.challenge_medals_collected IS NOT NULL, challenges.challenge_medals_collected, 0) AS board_medals_count,
+            IF(endless.challenge_waves_completed IS NOT NULL, endless.challenge_waves_completed, 0) AS board_waves_count,
+            board.board_abilities,
+            -- board.board_abilities_dr_light,
+            -- board.board_abilities_dr_wily,
+            -- board.board_abilities_dr_cossack,
+            board.board_missions,
+            -- board.board_missions_dr_light,
+            -- board.board_missions_dr_wily,
+            -- board.board_missions_dr_cossack,
+            board.board_awards,
+            board.board_zenny,
+            board.board_date_created,
+            board.board_date_modified
+            FROM mmrpg_users AS users
+            LEFT JOIN mmrpg_leaderboard AS board ON users.user_id = board.user_id
+            LEFT JOIN mmrpg_saves AS saves ON saves.user_id = board.user_id
+            LEFT JOIN (
+                SELECT
+                    battles.this_user_id AS user_id,
+                    COUNT(DISTINCT(battles.target_user_id)) AS player_tokens_collected
+                FROM mmrpg_battles AS battles
+                LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
+                LEFT JOIN mmrpg_leaderboard AS board ON battles.target_user_id = board.user_id
+                WHERE
+                    battles.this_player_result = 'victory'
+                    AND battles.battle_flag_legacy = 0
+                    AND users.user_flag_approved = 1
+                    AND board.board_points > 0
+                GROUP BY battles.this_user_id
+                ) AS battles ON battles.user_id = board.user_id
+            LEFT JOIN (
+                SELECT
+                    scores.user_id AS user_id,
+                    COUNT(DISTINCT(scores.challenge_id)) AS challenge_medals_collected
+                FROM mmrpg_challenges_leaderboard AS scores
+                LEFT JOIN mmrpg_users AS users ON users.user_id = scores.user_id
+                LEFT JOIN mmrpg_challenges AS challenges ON challenges.challenge_id = scores.challenge_id
+                WHERE
+                    challenges.challenge_kind = 'event'
+                    AND scores.challenge_result = 'victory'
+                    AND users.user_flag_approved = 1
+                GROUP BY scores.user_id
+                ) AS challenges ON challenges.user_id = board.user_id
+            LEFT JOIN mmrpg_challenges_waveboard
+                AS endless ON endless.user_id = board.user_id
             WHERE
-                battles.this_player_result = 'victory'
-                AND users.user_flag_approved = 1
-            GROUP BY battles.this_user_id
-            ) AS battles ON battles.user_id = board.user_id
-        LEFT JOIN (
-            SELECT
-                scores.user_id AS user_id,
-                COUNT(DISTINCT(scores.challenge_id)) AS challenge_medals_collected
-            FROM mmrpg_challenges_leaderboard AS scores
-            LEFT JOIN mmrpg_users AS users ON users.user_id = scores.user_id
-            LEFT JOIN mmrpg_challenges AS challenges ON challenges.challenge_id = scores.challenge_id
+            users.user_flag_approved = 1
+            AND {$this_sort_field2} > 0
+            AND board.board_points > 0
+            ORDER BY
+            {$this_sort_field} DESC,
+            {$this_sort_field2} DESC,
+            saves.save_date_modified DESC
+            {$this_limit_query}
+            ;";
+    } else {
+        $temp_leaderboard_query = "SELECT
+            users.user_id
+            FROM mmrpg_users AS users
+            LEFT JOIN mmrpg_leaderboard AS board ON users.user_id = board.user_id
+            LEFT JOIN mmrpg_saves AS saves ON saves.user_id = board.user_id
+            LEFT JOIN (
+                SELECT
+                    battles.this_user_id AS user_id,
+                    COUNT(DISTINCT(battles.target_user_id)) AS player_tokens_collected
+                FROM mmrpg_battles AS battles
+                LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
+                LEFT JOIN mmrpg_leaderboard AS board ON battles.target_user_id = board.user_id
+                WHERE
+                    battles.this_player_result = 'victory'
+                    AND battles.battle_flag_legacy = 0
+                    AND users.user_flag_approved = 1
+                    AND board.board_points > 0
+                GROUP BY battles.this_user_id
+                ) AS battles ON battles.user_id = board.user_id
+            LEFT JOIN (
+                SELECT
+                    scores.user_id AS user_id,
+                    COUNT(DISTINCT(scores.challenge_id)) AS challenge_medals_collected
+                FROM mmrpg_challenges_leaderboard AS scores
+                LEFT JOIN mmrpg_users AS users ON users.user_id = scores.user_id
+                LEFT JOIN mmrpg_challenges AS challenges ON challenges.challenge_id = scores.challenge_id
+                WHERE
+                    challenges.challenge_kind = 'event'
+                    AND scores.challenge_result = 'victory'
+                    AND users.user_flag_approved = 1
+                GROUP BY scores.user_id
+                ) AS challenges ON challenges.user_id = board.user_id
+            LEFT JOIN mmrpg_challenges_waveboard
+                AS endless ON endless.user_id = board.user_id
             WHERE
-                challenges.challenge_kind = 'event'
-                AND scores.challenge_result = 'victory'
-                AND users.user_flag_approved = 1
-            GROUP BY scores.user_id
-            ) AS challenges ON challenges.user_id = board.user_id
-        LEFT JOIN mmrpg_challenges_waveboard
-            AS endless ON endless.user_id = board.user_id
-        WHERE
-        {$this_sort_field2} > 0
-        ORDER BY
-        {$this_sort_field} DESC,
-        {$this_sort_field2} DESC,
-        saves.save_date_modified DESC
-        {$this_limit_query}
-        ;";
+            {$this_sort_field2} > 0
+            AND board.board_points > 0
+            ORDER BY
+            {$this_sort_field} DESC,
+            {$this_sort_field2} DESC,
+            saves.save_date_modified DESC
+            {$this_limit_query}
+            ;";
+    }
 
     //error_log('$board_metric = '.$board_metric);
     //error_log('$this_sort_field = '.$this_sort_field);
@@ -3599,7 +3650,7 @@ function mmrpg_prototype_leaderboard_index($board_metric = ''){
         if (empty($db->INDEX['LEADERBOARD']['index'][$board_metric])){
             //error_log('index for '.$board_metric.' does not exist');
             //error_log('collecting new index for '.$board_metric);
-            $ranked_leaderboard_query = mmrpg_prototype_leaderboard_index_query($board_metric);
+            $ranked_leaderboard_query = mmrpg_prototype_leaderboard_index_query($board_metric, false, true);
             $cache_kind = 'leaderboard.'.str_replace('_', '-', $board_metric);
             $cache_token = md5($ranked_leaderboard_query);
             $cached_index = rpg_object::load_cached_index($cache_kind, $cache_token, MMRPG_CONFIG_LAST_SAVE_DATE);
@@ -3607,6 +3658,7 @@ function mmrpg_prototype_leaderboard_index($board_metric = ''){
                 $ranked_leaderboard_index = $cached_index;
                 unset($cached_index);
             } else {
+                //error_log('$ranked_leaderboard_query = '.print_r($ranked_leaderboard_query, true));
                 $ranked_leaderboard_index = $db->get_array_list($ranked_leaderboard_query);
                 $ranked_leaderboard_index = array_map(function($user){ return $user['user_id']; }, $ranked_leaderboard_index);
                 rpg_object::save_cached_index($cache_kind, $cache_token, $ranked_leaderboard_index);
@@ -3678,7 +3730,6 @@ function mmrpg_prototype_leaderboard_rank_index($board_metric = ''){
 
 // Define a function for collecting the requested player's board ranking
 function mmrpg_prototype_leaderboard_rank($user_id, $board_metric = ''){
-    global $db;
 
     // Collect the rank index to start
     $this_rank_index = mmrpg_prototype_leaderboard_rank_index($board_metric);
@@ -3786,25 +3837,54 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         $this_leaderboard_online_players = mmrpg_prototype_leaderboard_online();
 
         // Collect a list of user IDs that have already been defeated if not already provided
+        $defeated_player_ids = array();
+        $rematch_player_ids = array();
         if (empty($this_leaderboard_defeated_players)){
-            $defeated_leaderboard_players_index =  $db->get_array_list("SELECT
+            $defeated_leaderboard_players_index_query = "SELECT
                 battles.target_user_id AS target_user_id,
                 users.user_name_clean AS target_user_name,
                 users.user_colour_token As target_user_colour,
-                users.user_colour_token2 As target_user_colour2
+                users.user_colour_token2 As target_user_colour2,
+                open.this_user_id AS has_open_invitation
                 FROM mmrpg_battles AS battles
-                INNER JOIN (
-                    SELECT this_user_id, target_user_id, MAX(battle_id) AS max_battle_id
-                    FROM mmrpg_battles
-                    WHERE (this_user_id = {$this_userid} OR target_user_id = {$this_userid})
-                    GROUP BY this_user_id, target_user_id
-                ) AS latest_battles ON battles.battle_id = latest_battles.max_battle_id
                 LEFT JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
+                LEFT JOIN mmrpg_leaderboard AS board ON battles.target_user_id = board.user_id
+                LEFT JOIN (SELECT
+                    battles.this_user_id,
+                    battles.target_user_id
+                    FROM mmrpg_battles AS battles
+                    INNER JOIN mmrpg_users AS users ON battles.this_user_id = users.user_id
+                    INNER JOIN mmrpg_leaderboard AS board ON battles.this_user_id = board.user_id
+                    WHERE
+                        battles.target_user_id = {$this_userid}
+                        AND battles.this_user_id <> {$this_userid}
+                        AND battles.target_player_result = 'defeat'
+                        AND battles.battle_flag_legacy = 0
+                        AND users.user_flag_approved = 1
+                        AND board.board_points > 0
+                    GROUP BY battles.this_user_id
+                    ) AS open ON open.this_user_id = battles.target_user_id
                 WHERE
                 battles.this_user_id = {$this_userid}
+                AND battles.target_user_id <> {$this_userid}
                 AND battles.this_player_result = 'victory'
+                AND battles.battle_flag_legacy = 0
                 AND users.user_flag_approved = 1
-                ;", 'target_user_name');
+                AND board.board_points > 0
+                ORDER BY battles.target_user_id ASC
+                ;";
+            //error_log('$rematch_player_ids = '.print_r($defeated_leaderboard_players_index_query, true));
+            $defeated_leaderboard_players_index =  $db->get_array_list($defeated_leaderboard_players_index_query, 'target_user_name');
+            if (!empty($defeated_leaderboard_players_index)){
+                $defeated_player_ids = array_values(array_map(function($target){
+                    return $target['target_user_id'];
+                    }, $defeated_leaderboard_players_index));
+                //error_log('$defeated_player_ids = '.print_r($defeated_player_ids, true));
+                $rematch_player_ids = array_filter(array_values(array_map(function($target){
+                    return $target['has_open_invitation'];
+                    }, $defeated_leaderboard_players_index)));
+                //error_log('$rematch_player_ids = '.print_r($rematch_player_ids, true));
+            }
         }
 
         // Collapse the defeated players into a string of just their usernames

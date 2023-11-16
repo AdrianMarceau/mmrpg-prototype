@@ -287,18 +287,21 @@ $this_leaderboard_markup = array();
 
 // If we're on the home page, we need to collect count independantly
 if ($this_current_page == 'home'){
-    $this_leaderboard_count = $db->get_value("SELECT
-    COUNT(*) AS num_players
-    FROM mmrpg_users AS users
-    LEFT JOIN mmrpg_leaderboard AS board ON users.user_id = board.user_id
-    LEFT JOIN mmrpg_saves AS saves ON saves.user_id = board.user_id
-    WHERE
-    {$this_sort_field2} > 0
-    ORDER BY
-    {$this_sort_field} DESC,
-    {$this_sort_field2} DESC,
-    saves.save_date_modified DESC
-    ;", 'num_players');
+    $this_leaderboard_count_query = "SELECT
+        COUNT(*) AS num_players
+        FROM mmrpg_users AS users
+        LEFT JOIN mmrpg_leaderboard AS board ON users.user_id = board.user_id
+        LEFT JOIN mmrpg_saves AS saves ON saves.user_id = board.user_id
+        WHERE
+        users.user_flag_approved = 1
+        AND {$this_sort_field2} > 0
+        ORDER BY
+        {$this_sort_field} DESC,
+        {$this_sort_field2} DESC,
+        saves.save_date_modified DESC
+        ;";
+    //error_log('$this_leaderboard_count_query = '.print_r($this_leaderboard_count_query, true));
+    $this_leaderboard_count = $db->get_value($this_leaderboard_count_query, 'num_players');
 }
 
 // Ensure the leaderboard array is not empty before continuing
