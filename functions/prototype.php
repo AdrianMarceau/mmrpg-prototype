@@ -548,30 +548,30 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
     // Grant the user points for each unique player they've defeated in a player battle
     //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-player-battle-points');
     if (true){
-        $defeated_players = $db->get_array_list("SELECT
-            battles.target_user_id AS target_user_id,
-            (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS target_user_name,
-            users.user_name_clean AS target_user_token,
-            users.user_colour_token AS target_user_colour,
-            users.user_colour_token2 AS target_user_colour2
-        FROM mmrpg_battles AS battles
-        INNER JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
-        LEFT JOIN (
-            SELECT this_user_id, MAX(battle_id) as max_battle_id
-            FROM mmrpg_battles
-            WHERE this_player_result = 'victory'
-            GROUP BY this_user_id
-        ) AS opponent_battles ON battles.target_user_id = opponent_battles.this_user_id
-        WHERE
-            battles.this_user_id = {$user_id}
-            AND battles.this_player_result = 'victory'
-            AND users.user_flag_approved = 1
-            AND battles.battle_id > COALESCE(opponent_battles.max_battle_id, 0)
-        GROUP BY battles.target_user_id
-        ORDER BY target_user_name
-        ;", 'target_user_name');
+        $defeated_players_query = "SELECT
+                DISTINCT(battles.target_user_id) AS target_user_id,
+                (CASE WHEN users.user_name_public <> '' THEN users.user_name_public ELSE users.user_name END) AS target_user_name,
+                users.user_name_clean AS target_user_token,
+                users.user_colour_token AS target_user_colour,
+                users.user_colour_token2 AS target_user_colour2
+            FROM mmrpg_battles AS battles
+            INNER JOIN mmrpg_users AS users ON battles.target_user_id = users.user_id
+            INNER JOIN mmrpg_leaderboard AS board ON battles.target_user_id = board.user_id
+            WHERE
+                battles.this_user_id = {$user_id}
+                AND battles.target_user_id <> {$user_id}
+                AND battles.this_player_result = 'victory'
+                AND battles.battle_flag_legacy = 0
+                AND users.user_flag_approved = 1
+                AND board.board_points > 0
+            GROUP BY battles.target_user_id
+            ORDER BY target_user_name
+            ;";
+        $defeated_players = $db->get_array_list($defeated_players_query, 'target_user_id');
+        //error_log('$defeated_players_query = '.print_r($defeated_players_query, true));
+        //error_log('$defeated_players ('.count($defeated_players).') = '.print_r($defeated_players, true));
         $points_index['players_defeated'] = !empty($defeated_players) ? $defeated_players : array();
-        $points_index['players_defeated_points'] = !empty($defeated_players) ? (count($defeated_players) * 10000) : 0;
+        $points_index['players_defeated_points'] = !empty($defeated_players) ? (count($defeated_players) * MMRPG_SETTINGS_BATTLEPOINTS_PERPLAYER) : 0;
         $total_battle_points += $points_index['players_defeated_points'];
         unset($defeated_players);
     }
