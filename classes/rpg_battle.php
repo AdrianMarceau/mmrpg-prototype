@@ -1718,7 +1718,8 @@ class rpg_battle extends rpg_object {
                             $event_body .= $this_robot->print_quote('battle_start', $this_find, $this_replace);
                         }
                         $event_options = array();
-                        $event_options['this_header_float'] = $event_options['this_body_float'] = 'left';
+                        $event_options['this_header_float'] = $this_player->player_side;
+                        $event_options['this_body_float'] = $this_player->player_side;
                         $event_options['canvas_show_this'] = true;
                         $event_options['canvas_show_target'] = $event_options['console_show_target'] = false;
                         $event_options['console_show_this_robot'] = true;
