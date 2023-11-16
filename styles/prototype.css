@@ -2199,6 +2199,7 @@ body[data-source="website"] #prototype .menu {
     -o-animation: none;
     -webkit-animation: none;
     animation: none;
+    text-transform: none;
 }
 #mmrpg #prototype .banner .option_this-player-select[data-token] {
     background-position: 0 0;
