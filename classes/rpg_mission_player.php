@@ -207,7 +207,7 @@ class rpg_mission_player extends rpg_mission {
             $this_battle_omega['battle_counts'] = false;
             $this_battle_omega['battle_phase'] = $this_prototype_data['battle_phase'];
             $this_battle_omega['battle_name'] = 'Player Battle vs '.$temp_battle_username;
-            $this_battle_omega['battle_description'] = 'Defeat '.ucfirst($temp_battle_username).'&#39;'.(!preg_match('/s$/i', $temp_battle_username) ? 's' : '').' player data in a '.$temp_challenge_type.' battle!';
+            $this_battle_omega['battle_description'] = 'Defeat '.$temp_battle_username.'&#39;'.(!preg_match('/s$/i', $temp_battle_username) ? 's' : '').' player data in a '.$temp_challenge_type.' battle!';
             $this_battle_omega['battle_description2'] = '';
             $this_battle_omega['battle_robot_limit'] = $this_max_robots;
             $this_battle_omega['battle_zenny'] = 0;
@@ -224,7 +224,7 @@ class rpg_mission_player extends rpg_mission {
             }
 
             // Define the fusion field properties
-            $this_battle_omega['battle_button'] = 'Vs. '.ucfirst($temp_battle_username);
+            $this_battle_omega['battle_button'] = 'Vs. '.$temp_battle_username;
             $temp_field_info_options = array_keys($temp_player_field_settings);
             $temp_rand_int = mt_rand(1, 4);
             $temp_rand_start = ($temp_rand_int - 1) * 2;
@@ -271,7 +271,7 @@ class rpg_mission_player extends rpg_mission {
             $this_battle_omega['battle_target_player']['user_id'] = $temp_user_id;
             $this_battle_omega['battle_target_player']['player_id'] = $temp_player_id;
             $this_battle_omega['battle_target_player']['player_token'] = $target_player_token_backup;
-            $this_battle_omega['battle_target_player']['player_name'] = ucfirst($temp_battle_username);
+            $this_battle_omega['battle_target_player']['player_name'] = $temp_battle_username;
             //$this_battle_omega['battle_target_player']['player_image'] = 'custom_***';
             $this_battle_omega['battle_target_player']['player_robots'] = $this_battle_omega_robots;
             $this_battle_omega['battle_target_player']['player_starforce'] = $temp_player_starforce;
