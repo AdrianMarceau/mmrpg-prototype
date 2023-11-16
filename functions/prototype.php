@@ -1652,9 +1652,8 @@ function mmrpg_prototype_remaining_stars($return_arrays = false, $possible_star_
 function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '', &$ability_tokens = array()){
 
     // Pull in global variables
-    static $mmrpg_index_players, $mmrpg_index_abilities;
-    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
-    if (empty($mmrpg_index_abilities)){ $mmrpg_index_abilities = rpg_ability::get_index(true); }
+    $mmrpg_index_players = rpg_player::get_index(true);
+    $mmrpg_index_abilities = rpg_ability::get_index(true);
     $session_token = mmrpg_game_token();
 
     // If a specific robot token was provided
@@ -1695,10 +1694,9 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
     global $star_shake_delay;
     if (empty($star_shake_delay)){ $star_shake_delay = array(); }
     if (empty($star_shake_delay[$player_token])){ $star_shake_delay[$player_token] = 0; }
-    static $mmrpg_index_fields, $mmrpg_index_players, $mmrpg_index_robots;
-    if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(true); }
-    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true, false, '', array('player')); }
-    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
+    $mmrpg_index_fields = rpg_field::get_index(true);
+    $mmrpg_index_players = rpg_player::get_index(true, false, '', array('player'));
+    $mmrpg_index_robots = rpg_robot::get_index(true);
 
     // Define the variable to collect option markup
     $this_markup = '';
@@ -2323,9 +2321,8 @@ function mmrpg_prototype_option_message_markup($player_token, $subject, $lineone
 function mmrpg_prototype_extract_alpha_battle(&$temp_battle_omega, $this_prototype_data){
 
     // Collect a temporary object indexes for reference
-    static $mmrpg_index_robots, $mmrpg_index_fields;
-    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
-    if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(); }
+    $mmrpg_index_robots = rpg_robot::get_index(true);
+    $mmrpg_index_fields = rpg_field::get_index();
 
     // DEBUG DEBUG DEBUG
     //$temp_battle_omega['values']['debug']['target_robots_backup'] = json_encode($temp_battle_omega['battle_target_player']['player_robots']);
@@ -2607,10 +2604,9 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
     if (empty($target_robots) || !is_array($target_robots)){ $target_robots = array(); }
 
     // Collect a temporary object indexes for reference
-    static $mmrpg_index_players, $mmrpg_index_robots, $mmrpg_index_fields;
-    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
-    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
-    if (empty($mmrpg_index_fields)){ $mmrpg_index_fields = rpg_field::get_index(true); }
+    $mmrpg_index_players = rpg_player::get_index(true);
+    $mmrpg_index_robots = rpg_robot::get_index(true);
+    $mmrpg_index_fields = rpg_field::get_index(true);
 
     // Pre-count the number of target robots
     $num_target_robots = count($target_robots);
