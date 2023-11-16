@@ -1405,7 +1405,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     // If this user is online, update the battle button with details
                     if (!empty($temp_player_array['values']['flag_online'])){
                         $temp_battle_omega['option_style'] = 'border-color: green !important; ';
-                        $temp_battle_omega['battle_description2'] .= 'This player was recently online!';
+                        $temp_battle_omega['battle_description2'] .= 'This player was recently online! ';
                         $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="online_type player_type player_type_nature">Online</sup>';
                     }
 
@@ -1415,7 +1415,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     if (!empty($temp_player_array['values']['flag_defeated'])){
                         $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="special_type player_type player_type_'.$victory_token_colour.'"><i class="fa fas fa-history"></i></sup>';
                         $temp_battle_omega['battle_description'] = 'Rematch! '.$temp_battle_omega['battle_description'];
-                        $temp_battle_omega['battle_description2'] .= 'This player\'s victory token has already been collected, but they have yours too!  Defeat them again to take it back and show them who\'s boss.';
+                        $temp_battle_omega['battle_description2'] .= 'This player\'s victory token has already been collected, but they have yours too!  Defeat them again to take it back and show them who\'s boss. ';
                         $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.10);
                     } else {
                         $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="special_type player_type player_type_'.$victory_token_colour.'"><i class="fa fa-fw fa-stop-circle"></i></sup>';
