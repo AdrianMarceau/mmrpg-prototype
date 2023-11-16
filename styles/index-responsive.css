@@ -90,6 +90,10 @@ body:before {
         -moz-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
         box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     }
+    #window .page .subbody .float_link .sprite.mugshot.field,
+    #window .page .subbody .float.link .sprite.mugshot.field {
+        width: 32px;
+    }
     #window .page .subbody .float_link .sprite_size_40x40 span,
     #window .page .subbody .float_link .sprite_size_40x40 img,
     #window .page .subbody .float.link .sprite_size_40x40 span,
@@ -228,6 +232,11 @@ body:before {
     #window .page .body .subbody.home_description .text.subtext br {
         display: none;
     }
+    #window .page .subbody .float_link .sprite.mugshot.field,
+    #window .page .subbody .float.link .sprite.mugshot.field {
+        width: 30px;
+    }
+
 
 }
 
@@ -1194,11 +1203,16 @@ body:before {
     }
 
     #window .page .subbody[data-class="items"] .float.link.group[data-game^="MMRPG/Items/"] .sprite {
-        width: 18px;
+        width: 20px;
     }
     #window .page .subbody[data-class="items"] .float.link.group[data-game^="MMRPG/Items/"] .sprite.size40 span,
     #window .page .subbody[data-class="items"] .float.link.group[data-game^="MMRPG/Items/"] .sprite.size40 img {
-        margin-left: -11px;
+        margin-left: -10px;
+    }
+
+    #window .page .body .subbody[data-class="fields"] .float_link_group[data-game="MMRPG/Events"],
+    #window .page .body .subbody[data-class="fields"] .float.link.group[data-game="MMRPG/Events"] {
+        clear: left;
     }
 
     #window .page .body .subbody_databaselinks[data-class="items"] .iconwrap {
@@ -1217,11 +1231,11 @@ body:before {
 
     #window .page .subbody .float_link_group[data-game^="MMRPG/Weapons/"] .float.link .sprite,
     #window .page .subbody .float_link_group[data-game^="MMRPG/Support/"] .float.link .sprite {
-        width: 19px;
+        width: 20px;
     }
     #window .page .subbody .float_link_group[data-game^="MMRPG/Weapons/"] .float.link .sprite img,
     #window .page .subbody .float_link_group[data-game^="MMRPG/Support/"] .float.link .sprite img {
-        margin-left: -11px;
+        margin-left: -10px;
     }
 
     #window .page .subbody .float_link_group[data-game="MMAZ/T2/Weapons/MM30"] .float.link .sprite {

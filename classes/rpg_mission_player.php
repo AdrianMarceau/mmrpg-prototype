@@ -23,10 +23,10 @@ class rpg_mission_player extends rpg_mission {
         global $this_omega_factors_ten;
         global $this_omega_factors_eleven;
 
-        static $this_field_index, $this_player_index, $this_robot_index;
-        if (empty($this_field_index)){ $this_field_index = rpg_field::get_index(true); }
-        if (empty($this_player_index)){ $this_player_index = rpg_player::get_index(true); }
-        if (empty($this_robot_index)){ $this_robot_index = rpg_robot::get_index(true); }
+        // Pull in required indexes for this function
+        $this_field_index = rpg_field::get_index(true);
+        $this_player_index = rpg_player::get_index(true);
+        $this_robot_index = rpg_robot::get_index(true);
 
         // Define the omega battle and default to empty
         $this_battle_omega = array();
