@@ -7,9 +7,8 @@ function mmrpg_save_game_session(){
     // Reference global variables
     global $db;
     $session_token = mmrpg_game_token();
-    static $mmrpg_index_players, $mmrpg_index_robots;
-    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
-    if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = rpg_robot::get_index(true); }
+    $mmrpg_index_players = rpg_player::get_index(true);
+    $mmrpg_index_robots = rpg_robot::get_index(true);
 
     // Do NOT load, save, or otherwise alter the game file while viewing remote
     if (defined('MMRPG_REMOTE_GAME')){ return true; }
@@ -260,6 +259,7 @@ function mmrpg_save_game_session(){
                 $this_user_array_return = $db->insert('mmrpg_users', $this_user_array);
                 $this_save_array_return = $db->insert('mmrpg_saves', $this_save_array);
                 $this_board_array_return = $db->insert('mmrpg_leaderboard', $this_board_array);
+                unset($this_user_array, $this_save_array, $this_board_array);
 
                 // Make sure relevant user-tables in the database are updated with any unlocks
                 mmrpg_save_game_session_user_tables($session_token, $temp_user_id);
@@ -395,6 +395,7 @@ function mmrpg_save_game_session(){
         //echo('<hr /><pre>FINAL DB SAVES UPDATE (user_id = '.$this_user['userid'].')</pre>');
         //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
         $db->update('mmrpg_saves', $this_save_array, 'user_id = '.$this_user['userid']);
+        unset($this_save_array);
 
         // Make sure relevant user-tables in the database are updated with any unlocks
         mmrpg_save_game_session_user_tables($session_token, $this_user['userid']);
@@ -434,10 +435,12 @@ function mmrpg_save_game_session(){
         //error_log('<pre>$this_board_array : '.print_r($this_board_array, true).'</pre>');
         if (!empty($check_tables['has_board'])){
             $db->update('mmrpg_leaderboard', $this_board_array, 'user_id = '.$this_user['userid']);
+            unset($this_board_array);
         } else {
             $this_board_array['user_id'] = $check_tables['user_id'];
             $this_board_array['save_id'] = $check_tables['save_id'];
             $db->insert('mmrpg_leaderboard', $this_board_array);
+            unset($this_board_array);
         }
 
         // Update the session points to the new value if set
