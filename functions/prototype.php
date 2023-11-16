@@ -3911,21 +3911,26 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         } else {
             $temp_include_usernames_string = '';
         }
-        // Generate the online username tokens for adding to the condition list
-        $temp_exclude_usernames = array();
-        $temp_exclude_usernames_count = 0;
-        $temp_exclude_usernames_string = array();
-        if (!empty($this_leaderboard_defeated_players)){
-            $temp_exclude_usernames = $this_leaderboard_defeated_players;
-            $temp_exclude_usernames_count = count($temp_exclude_usernames);
-            if (!empty($temp_exclude_usernames)){
-                foreach ($temp_exclude_usernames AS $token){ $temp_exclude_usernames_string[] = "'{$token}'"; }
-                $temp_exclude_usernames_string = implode(',', $temp_exclude_usernames_string);
+
+        // Generate the online username IDs for adding to the condition list
+        $temp_exclude_userids = array();
+        $temp_exclude_userids_count = 0;
+        $temp_exclude_userids_string = array();
+        if (!empty($defeated_player_ids)){
+            $temp_exclude_userids = $defeated_player_ids;
+            // remove any that are in the $rematch_player_ids
+            if (!empty($rematch_player_ids)){
+                $temp_exclude_userids = array_diff($temp_exclude_userids, $rematch_player_ids);
+                }
+            $temp_exclude_userids_count = count($temp_exclude_userids);
+            if (!empty($temp_exclude_userids)){
+                foreach ($temp_exclude_userids AS $id){ $temp_exclude_userids_string[] = $id; }
+                $temp_exclude_userids_string = implode(',', $temp_exclude_userids_string);
             } else {
-                $temp_exclude_usernames_string = '';
+                $temp_exclude_userids_string = '';
             }
         } else {
-            $temp_exclude_usernames_string = '';
+            $temp_exclude_userids_string = '';
         }
 
         // Generate the points index and then break it down to unique for ranks
@@ -3938,49 +3943,81 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         $this_player_points_max = ceil($this_player_points * 10.0);
 
         // Define the array for pulling all the leaderboard data
+        $temp_leaderboard_count_query = 'SELECT
+            COUNT(`board`.`user_id`) AS `num_targets`
+            FROM `mmrpg_leaderboard` AS `board`
+            LEFT JOIN `mmrpg_users` AS `users` ON `users`.`user_id` = `board`.`user_id`
+            LEFT JOIN `mmrpg_saves` AS `saves` ON `saves`.`user_id` = `users`.`user_id`
+            LEFT JOIN `mmrpg_users_proxies` AS `proxies` ON `proxies`.`user_id` = `users`.`user_id`
+            WHERE
+            `board`.`user_id` <> '.$this_userid.'
+            AND (
+                `users`.`user_flag_approved` = 1
+                AND `board`.`board_points` > 0
+                AND `board`.`board_points` <= '.$this_player_points_max.'
+                '.(!empty($temp_exclude_userids_string) ? 'AND `users`.`user_id` NOT IN ('.$temp_exclude_userids_string.') ' : '').'
+                )
+            ORDER BY
+            FIELD(`board`.`user_id`, '.$this_userid.') DESC,
+            '.(!empty($temp_include_usernames_string) ? ' FIELD(`users`.`user_name_clean`, '.$temp_include_usernames_string.') DESC, ' : '').'
+            '.(!empty($temp_exclude_userids_string) ? ' FIELD(`users`.`user_id`, '.$temp_exclude_userids_string.') ASC, ' : '').'
+            `board`.`board_points` DESC,
+            `saves`.`save_date_modified` DESC
+            ';
+
+        // Query the database and collect the array list of all online players
+        //error_log('$temp_leaderboard_count_query = '.$temp_leaderboard_count_query);
+        $this_leaderboard_target_count = $db->get_value($temp_leaderboard_count_query, 'num_targets');
+        if (!empty($rematch_player_ids)){ $this_leaderboard_target_count -= count($rematch_player_ids); }
+        $_SESSION['LEADERBOARD']['player_targets_remaining'] = $this_leaderboard_target_count;
+
+        // Define the array for pulling all the leaderboard data
         $temp_leaderboard_query = 'SELECT
-                `board`.`user_id`,
-                `board`.`board_points`,
-                `users`.`user_name`,
-                `users`.`user_name_clean`,
-                `users`.`user_name_public`,
-                `users`.`user_colour_token`,
-                `users`.`user_colour_token2`,
-                `users`.`user_gender`,
-                `saves`.`save_values_battle_rewards` AS `player_rewards`,
-                `saves`.`save_values_battle_settings` AS `player_settings`,
-                `saves`.`save_values_battle_items` AS `player_items`,
-                `saves`.`save_values` AS `player_values`,
-                `saves`.`save_counters` AS `player_counters`,
-                `proxies`.`proxy_player`,
-                `proxies`.`proxy_image`,
-                `proxies`.`proxy_bonus`,
-                `proxies`.`proxy_fields`,
-                `proxies`.`proxy_robots`,
-                `proxies`.`proxy_flag_enabled`
-                FROM `mmrpg_leaderboard` AS `board`
-                LEFT JOIN `mmrpg_users` AS `users` ON `users`.`user_id` = `board`.`user_id`
-                LEFT JOIN `mmrpg_saves` AS `saves` ON `saves`.`user_id` = `users`.`user_id`
-                LEFT JOIN `mmrpg_users_proxies` AS `proxies` ON `proxies`.`user_id` = `users`.`user_id`
-                WHERE
-                `board`.`user_id` = '.$this_userid.'
-                OR (
-                    `users`.`user_flag_approved` = 1
-                    AND `board`.`board_points` <= '.$this_player_points_max.'
-                    '.(!empty($temp_exclude_usernames_string) ? 'AND `users`.`user_name_clean` NOT IN ('.$temp_exclude_usernames_string.') ' : '').'
-                    )
-                ORDER BY
-                FIELD(`board`.`user_id`, '.$this_userid.') DESC,
-                '.(!empty($temp_include_usernames_string) ? ' FIELD(`users`.`user_name_clean`, '.$temp_include_usernames_string.') DESC, ' : '').'
-                '.(!empty($temp_exclude_usernames_string) ? ' FIELD(`users`.`user_name_clean`, '.$temp_exclude_usernames_string.') ASC, ' : '').'
-                `board`.`board_points` DESC,
-                `saves`.`save_date_modified` DESC
-                LIMIT 13
+            `board`.`user_id`,
+            `board`.`board_points`,
+            `users`.`user_name`,
+            `users`.`user_name_clean`,
+            `users`.`user_name_public`,
+            `users`.`user_colour_token`,
+            `users`.`user_colour_token2`,
+            `users`.`user_gender`,
+            `saves`.`save_values_battle_rewards` AS `player_rewards`,
+            `saves`.`save_values_battle_settings` AS `player_settings`,
+            `saves`.`save_values_battle_items` AS `player_items`,
+            `saves`.`save_values` AS `player_values`,
+            `saves`.`save_counters` AS `player_counters`,
+            `proxies`.`proxy_player`,
+            `proxies`.`proxy_image`,
+            `proxies`.`proxy_bonus`,
+            `proxies`.`proxy_fields`,
+            `proxies`.`proxy_robots`,
+            `proxies`.`proxy_flag_enabled`
+            FROM `mmrpg_leaderboard` AS `board`
+            LEFT JOIN `mmrpg_users` AS `users` ON `users`.`user_id` = `board`.`user_id`
+            LEFT JOIN `mmrpg_saves` AS `saves` ON `saves`.`user_id` = `users`.`user_id`
+            LEFT JOIN `mmrpg_users_proxies` AS `proxies` ON `proxies`.`user_id` = `users`.`user_id`
+            WHERE
+            `board`.`user_id` = '.$this_userid.'
+            OR (
+                `users`.`user_flag_approved` = 1
+                AND `board`.`board_points` > 0
+                AND `board`.`board_points` <= '.$this_player_points_max.'
+                '.(!empty($temp_exclude_userids_string) ? 'AND `users`.`user_id` NOT IN ('.$temp_exclude_userids_string.') ' : '').'
+                )
+            ORDER BY
+            FIELD(`board`.`user_id`, '.$this_userid.') DESC,
+            '.(!empty($temp_include_usernames_string) ? ' FIELD(`users`.`user_name_clean`, '.$temp_include_usernames_string.') DESC, ' : '').'
+            '.(!empty($temp_exclude_userids_string) ? ' FIELD(`users`.`user_id`, '.$temp_exclude_userids_string.') ASC, ' : '').'
+            `board`.`board_points` DESC,
+            `saves`.`save_date_modified` DESC
+            LIMIT 13
             ';
 
         // Query the database and collect the array list of all online players
         //error_log('$temp_leaderboard_query = '.$temp_leaderboard_query);
         $this_leaderboard_target_players = $db->get_array_list($temp_leaderboard_query);
+        //error_log('$this_leaderboard_target_count = '.print_r($this_leaderboard_target_count, true));
+        //error_log('$this_leaderboard_target_players (count) = '.print_r(count($this_leaderboard_target_players), true));
         //error_log('$this_leaderboard_target_players = '.print_r($this_leaderboard_target_players, true));
 
         // Loop through and decode any fields that require it
