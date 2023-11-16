@@ -1302,6 +1302,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         if (true){
 
             // EVENT MESSAGE : BONUS CHAPTER
+            $next_key = count($this_prototype_data['battle_options']);
             $this_prototype_data['battle_options'][] = array(
                 'option_type' => 'message',
                 'option_chapter' => $this_prototype_data['this_current_chapter'],
@@ -1324,6 +1325,15 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_player_list = mmrpg_prototype_leaderboard_targets($this_userid, $this_prototype_data['target_player_token'], $defeated, $temp_self_data);
             if (empty($temp_player_list)){ $temp_player_list = mmrpg_prototype_leaderboard_targets($this_userid, $this_prototype_data['this_player_token'], $defeated, $temp_self_data); }
             //error_log('$temp_self_data = '.print_r($temp_self_data, true));
+            //error_log('$temp_player_list (count) = '.print_r(count($temp_player_list), true));
+
+            // If we have a leaderboard target count, append it to the maintext
+            $player_targets_remaining = 0;
+            if (!empty($_SESSION['LEADERBOARD']['player_targets_remaining'])){
+                $player_targets_remaining = $_SESSION['LEADERBOARD']['player_targets_remaining'];
+                $append_remaining = ''.$player_targets_remaining.' <i class="fa fa-fw fa-stop-circle"></i>';
+                $this_prototype_data['battle_options'][$next_key]['option_maintext'] .= (!empty($player_targets_remaining) ? ' <em>'.$append_remaining.'</em>' : '');
+            }
 
             // If player data was actuall pulled, continue
             $max_battle_count = 6;
