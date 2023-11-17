@@ -2590,6 +2590,12 @@ class rpg_robot extends rpg_object {
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
 
+            // Pre-collect the bulwark robots from the players to see if the bench is protected
+            if (!empty($target_robot) && $target_robot->robot_id !== $this->robot_id){
+                $temp_thisplayer_bulwark_robots = $this->player->get_value('bulwark_robots');
+                if ($this->robot_position === 'bench' && !empty($temp_thisplayer_bulwark_robots)){ return false; }
+            }
+
             // This was an ability so delegate to the ability class function
             //error_log('trigger_damage('.$this_object->ability_token.') on '.$this->robot_token.'/'.$target_robot->robot_position.'/'.$target_robot->robot_key);
             $trigger_return = rpg_ability_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
@@ -2641,6 +2647,12 @@ class rpg_robot extends rpg_object {
 
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
+
+            // Pre-collect the bulwark robots from the players to see if the bench is protected
+            if (!empty($target_robot) && $target_robot->robot_id !== $this->robot_id){
+                $temp_thisplayer_bulwark_robots = $this->player->get_value('bulwark_robots');
+                if ($this->robot_position === 'bench' && !empty($temp_thisplayer_bulwark_robots)){ return false; }
+            }
 
             // This was an ability so delegate to the ability class function
             //error_log('trigger_recovery('.$this_object->ability_token.') on '.$this->robot_token.'/'.$target_robot->robot_position.'/'.$target_robot->robot_key);
