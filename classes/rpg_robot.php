@@ -4150,7 +4150,7 @@ class rpg_robot extends rpg_object {
                                         //if ($robot_info['robot_core'] == 'copy' && $alt_key == 0){ $alt_type = 'robot_type type_empty '; }
                                     }
 
-                                    echo '<a href="#" data-maybe-tooltip="'.$alt_title.'" data-tooltip-type="'.$alt_title_type.'" class="link link_image '.($alt_key == 0 ? 'link_active ' : '').'" data-image="'.$alt_info['image'].'">';
+                                    echo '<a href="#" data-tooltip="'.$alt_title.'" data-tooltip-type="'.$alt_title_type.'" class="link link_image '.($alt_key == 0 ? 'link_active ' : '').'" data-image="'.$alt_info['image'].'">';
                                         echo '<span class="'.$alt_type.'" style="'.$alt_style.'">'.$alt_name.'</span>';
                                     echo '</a>';
                                 }
@@ -4159,7 +4159,7 @@ class rpg_robot extends rpg_object {
                             <span class="directions"><?
                                 // Loop though and print links for the alts
                                 foreach (array('right', 'left') AS $temp_key => $temp_direction){
-                                    echo '<a href="#" data-maybe-tooltip="'.ucfirst($temp_direction).' Facing Sprites" data-tooltip-type="'.$alt_type_base.'" class="link link_direction '.($temp_key == 0 ? 'link_active' : '').'" data-direction="'.$temp_direction.'">';
+                                    echo '<a href="#" data-tooltip="'.ucfirst($temp_direction).' Facing Sprites" data-tooltip-type="'.$alt_type_base.'" class="link link_direction '.($temp_key == 0 ? 'link_active' : '').'" data-direction="'.$temp_direction.'">';
                                         echo '<span class="ability_type ability_type_empty" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important; ">'.ucfirst($temp_direction).'</span>';
                                     echo '</a>';
                                 }
@@ -4896,7 +4896,7 @@ class rpg_robot extends rpg_object {
 
                 <div class="this_sprite sprite_left event_robot_images" style="">
                     <? if($global_allow_editing && !empty($robot_alt_options)): ?>
-                        <a class="robot_image_alts" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-alt-index="base<?= !empty($robot_alt_options) ? ','.implode(',', $robot_alt_options) : '' ?>" data-alt-current="<?= $robot_image_unlock_current ?>" data-maybe-tooltip="<?= $temp_image_alt_title ?>">
+                        <a class="robot_image_alts" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-alt-index="base<?= !empty($robot_alt_options) ? ','.implode(',', $robot_alt_options) : '' ?>" data-alt-current="<?= $robot_image_unlock_current ?>" data-tooltip="<?= $temp_image_alt_title ?>">
                             <? $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
                             <span class="sprite_wrapper" style="">
                                 <?= $robot_image_unlock_tokens ?>
@@ -4904,7 +4904,7 @@ class rpg_robot extends rpg_object {
                             </span>
                         </a>
                     <? else: ?>
-                        <span class="robot_image_alts" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-alt-index="base<?= !empty($robot_alt_options) ? ','.implode(',', $robot_alt_options) : '' ?>" data-alt-current="<?= $robot_image_unlock_current ?>" data-maybe-tooltip="<?= $temp_image_alt_title ?>">
+                        <span class="robot_image_alts" data-player="<?= $player_token ?>" data-robot="<?= $robot_token ?>" data-alt-index="base<?= !empty($robot_alt_options) ? ','.implode(',', $robot_alt_options) : '' ?>" data-alt-current="<?= $robot_image_unlock_current ?>" data-tooltip="<?= $temp_image_alt_title ?>">
                             <? $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
                             <span class="sprite_wrapper" style="">
                                 <?= $robot_image_unlock_tokens ?>

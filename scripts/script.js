@@ -168,6 +168,7 @@ $(document).ready(function(){
         //if (!gameSettings.wapFlag && !gameSettings.wapFlagIphone && !gameSettings.wapFlagIpad){
         // Attempt to attach tooltips regardless of device
         if (true){
+            //console.log('deciding to attach tooltips');
 
             var tooltipDelay = 1200; //600;
             var tooltipTimeout = false;
@@ -243,53 +244,62 @@ $(document).ready(function(){
 
                 };
 
-            /*
-            // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
-            var tooltipSelector = '*[title],*[data-backup-title]:not([data-click-tooltip]),*[data-tooltip]';
-            $(tooltipSelector, mmrpgBody).live('mouseenter', function(e){
-                e.preventDefault();
-                if (tooltipTimeout == false){
-                    var thisObject = this;
-                    tooltipInitiator = thisObject;
-                    requestAnimationFrame(function(){
-                        tooltipTimeout = setTimeout(function(){
-                            tooltipShowing = true;
-                            showTooltipFunction.call(thisObject, e);
-                            }, tooltipDelay);
-                        });
-                    var thisElement = $(this);
-                    if (thisElement.attr('title')){
-                        thisElement.attr('data-backup-title', thisElement.attr('title'));
-                        thisElement.removeAttr('title');
-                        }
-                    }
-                });
-            */
+            // If we're on the main website, we can use the standard hover events
+            if (mmrpgBody.is('.index')){
+                //console.log('we are on the website');
 
-            // Define the live CLICK events for any elements with a click-title tag (which should be a few)
-            var tooltipSelector = '*[data-click-tooltip]';
-            $(tooltipSelector, mmrpgBody).live('click', function(e){
-                e.preventDefault();
-                e.stopPropagation();
-                if (tooltipShowing){
-                    $('.tooltip', mmrpgBody).empty();
-                    clearTimeout(tooltipTimeout);
-                    tooltipTimeout = false;
-                    tooltipShowing = false;
-                    } else {
+                // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
+                var tooltipSelector = '*[title],*[data-backup-title]:not([data-click-tooltip]),*[data-tooltip]';
+                $(tooltipSelector, mmrpgBody).live('mouseenter', function(e){
+                    e.preventDefault();
                     if (tooltipTimeout == false){
                         var thisObject = this;
                         tooltipInitiator = thisObject;
                         requestAnimationFrame(function(){
-                            tooltipShowing = true;
-                            showTooltipFunction.call(thisObject, e);
-                            if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
-                                top.mmrpg_play_sound_effect('tooltip-open');
-                                }
+                            tooltipTimeout = setTimeout(function(){
+                                tooltipShowing = true;
+                                showTooltipFunction.call(thisObject, e);
+                                }, tooltipDelay);
                             });
+                        var thisElement = $(this);
+                        if (thisElement.attr('title')){
+                            thisElement.attr('data-backup-title', thisElement.attr('title'));
+                            thisElement.removeAttr('title');
+                            }
                         }
-                    }
-                });
+                    });
+
+            }
+            // Otherwise, we should only use click events as those are more accessible
+            else {
+                //console.log('we are in the game somewhere');
+
+                // Define the live CLICK events for any elements with a click-title tag (which should be a few)
+                var tooltipSelector = '*[data-click-tooltip]';
+                $(tooltipSelector, mmrpgBody).live('click', function(e){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (tooltipShowing){
+                        $('.tooltip', mmrpgBody).empty();
+                        clearTimeout(tooltipTimeout);
+                        tooltipTimeout = false;
+                        tooltipShowing = false;
+                        } else {
+                        if (tooltipTimeout == false){
+                            var thisObject = this;
+                            tooltipInitiator = thisObject;
+                            requestAnimationFrame(function(){
+                                tooltipShowing = true;
+                                showTooltipFunction.call(thisObject, e);
+                                if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+                                    top.mmrpg_play_sound_effect('tooltip-open');
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+            }
 
             // Define the live MOUSEMOVE events for any elements with a title tag (which should be many)
             $(tooltipSelector, mmrpgBody).live('mousemove', function(e){
