@@ -548,7 +548,8 @@ if (empty($this_robot)){
 }
 
 // If the target's was a switch action, also queue up an ability
-if ($target_action == 'switch'){
+if ($target_action == 'switch'
+    && empty($this_player->flags['switch_used_this_turn'])){
 
     // Now execute the stored actions
     $this_battle->actions_execute();
