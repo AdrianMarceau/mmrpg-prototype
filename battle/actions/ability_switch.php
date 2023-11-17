@@ -24,6 +24,23 @@ require(MMRPG_CONFIG_ROOTDIR.'battle/actions/action_turnstart.php');
 
 // -- This Switch Action -- //
 
+// Pre-collect the transport robots from the players to see if this switch is free
+$temp_thisplayer_transport_robots = $this_player->get_value('transport_robots');
+if (!empty($temp_thisplayer_transport_robots)){
+    //error_log('before-switch // $temp_thisplayer_transport_robots = '.print_r($temp_thisplayer_transport_robots, true));
+    // Apply a frame and style to the transport robot(s)
+    $update_transports = function() use ($this_battle, $this_player, $temp_thisplayer_transport_robots, $this_action_token){
+        foreach ($temp_thisplayer_transport_robots AS $transport_id){
+            if (strstr($this_action_token, $transport_id)){ continue; }
+            $transport_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $transport_id));
+            $transport_robot->set_frame('slide');
+            $transport_robot->set_frame_offset(array('x' => 40, 'y' => 0, 'z' => 0));
+            }
+        };
+    $update_transports();
+    $this_battle->events_create(false, false, '', '');
+}
+
 // Switching should not take a turn if we're replacing a robot
 $skip_target_turn = false;
 if (true){
@@ -69,6 +86,24 @@ $this_player->update_session();
 
 // Now execute the stored actions (and any created in the process of executing them!)
 $this_battle->actions_execute();
+
+// Return early if this player had a valid transport bot to give free switches
+$temp_thisplayer_transport_robots = $this_player->get_value('transport_robots');
+if (!empty($temp_thisplayer_transport_robots)){
+    //error_log('after-switch // $temp_thisplayer_transport_robots = '.print_r($temp_thisplayer_transport_robots, true));
+    // Reset any frames or styles applied to the transport robot(s)
+    $update_transports = function() use ($this_battle, $this_player, $temp_thisplayer_transport_robots){
+        foreach ($temp_thisplayer_transport_robots AS $transport_id){
+            $transport_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $transport_id));
+            $transport_robot->reset_frame();
+            $transport_robot->reset_frame_offset();
+            }
+        };
+    $update_transports();
+    $this_battle->events_create(false, false, '', '');
+    // Return early as this was a free switch
+    return;
+}
 
 // If we're skipping the target's turn, return now
 if ($skip_target_turn){ return; }
@@ -511,7 +546,10 @@ if (!empty($active_target_robot)
         || $active_target_robot->robot_energy == 0)){
 
     // Remove previous actions for this robot so it doesn't attack twice
-    $this_battle->actions_extract(array('player_id' => $target_player->player_id));
+    $this_battle->actions_extract(array(
+        'this_player_id' => $target_player->player_id,
+        'this_robot_id' => $active_target_robot->robot_id
+        ));
 
     // Prepend a switch action for the target robot
     $this_battle->actions_append(
@@ -567,11 +605,64 @@ if (empty($this_robot)){
     die('<pre>$target_robot is empty on line '.__LINE__.'! :'.print_r($target_robot, true).'</pre>');
 }
 
-// If the target's was a switch action, also queue up an ability
-if ($target_action == 'switch'){
+// Pre-collect the transport robots from the players to see if this switch is free
+//error_log('CHECK if free-switch allowed');
+$queue_target_ability_post_switch = false;
+if ($target_action == 'switch'
+    && !$target_robot_was_disabled){
+    $temp_targetplayer_transport_robots = $target_player->get_value('transport_robots');
+    if (!empty($temp_targetplayer_transport_robots)){
+        //error_log('before-switch // $temp_targetplayer_transport_robots = '.print_r($temp_targetplayer_transport_robots, true));
+        // Apply a frame and style to the transport robot(s)
+        $update_transports = function() use ($this_battle, $target_player, $temp_targetplayer_transport_robots, $this_action_token){
+            foreach ($temp_targetplayer_transport_robots AS $transport_id){
+                if (strstr($this_action_token, $transport_id)){ continue; }
+                $transport_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $transport_id));
+                $transport_robot->set_frame('slide');
+                $transport_robot->set_frame_offset(array('x' => 40, 'y' => 0, 'z' => 0));
+                }
+            };
+        $update_transports();
+        $this_battle->events_create(false, false, '', '');
+        $queue_target_ability_post_switch = true;
+    }
+}
+//error_log('$queue_target_ability_post_switch == '.($queue_target_ability_post_switch ? 'true' : 'false'));
+
+// Check to see if the target should be allowed to use an ability post-switch (most times it's a no)
+//error_log('CHECK if switch used');
+//error_log('$target_action == '.$target_action);
+//error_log('$target_robot_was_disabled == '.($target_robot_was_disabled ? 'true' : 'false'));
+//error_log('$this_player->flags[switch_used_this_turn] == '.(!empty($this_player->flags['switch_used_this_turn']) ? 'true' : 'false'));
+if ($target_action == 'switch'
+    && !$target_robot_was_disabled
+    && empty($this_player->flags['switch_used_this_turn'])){
+    //error_log('YES switch used so actions_execute()');
 
     // Now execute the stored actions
     $this_battle->actions_execute();
+
+}
+
+// Return early if this player had a valid transport bot to give free switches
+$temp_targetplayer_transport_robots = $target_player->get_value('transport_robots');
+if (!empty($temp_targetplayer_transport_robots)){
+    //error_log('after-switch // $temp_targetplayer_transport_robots = '.print_r($temp_targetplayer_transport_robots, true));
+    // Reset any frames or styles applied to the transport robot(s)
+    $update_transports = function() use ($this_battle, $target_player, $temp_targetplayer_transport_robots){
+        foreach ($temp_targetplayer_transport_robots AS $transport_id){
+            $transport_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $transport_id));
+            $transport_robot->reset_frame();
+            $transport_robot->reset_frame_offset();
+            }
+        };
+    $update_transports();
+    $this_battle->events_create(false, false, '', '');
+}
+
+// If we're allowed to queue up a new ability after switching, do it now
+if ($queue_target_ability_post_switch){
+    //error_log('YES free-switch allowed so we can queue up another ability');
 
     // Update the active robot reference just in case it has changed
     foreach ($target_player->player_robots AS $temp_robotinfo){
@@ -628,8 +719,8 @@ if ($target_action == 'switch'){
     else {
 
         // And when the switch is done, queue up an ability for this new target robot to use
-        if ($target_robot->robot_status != 'disabled' && $target_robot->robot_position != 'bench'){
-            $this_battle->actions_append($target_player, $target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+        if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
+            $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
         }
 
     }
