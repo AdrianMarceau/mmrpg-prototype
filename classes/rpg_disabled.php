@@ -63,7 +63,11 @@ class rpg_disabled {
 
         // Trigger this and target robot's item functions if they have been defined for this context
         $this_robot->trigger_custom_function('rpg-robot_trigger-disabled_before', $extra_objects);
+        //error_log('after custom functions | $options->return_early = '.($options->return_early ? 'true' : 'false'));
+        if ($options->return_early){ return $options->return_value; }
         $target_robot->trigger_custom_function('rpg-robot_trigger-disabled_before', $extra_objects);
+        //error_log('after custom functions | $options->return_early = '.($options->return_early ? 'true' : 'false'));
+        if ($options->return_early){ return $options->return_value; }
 
         // Check to see if this was a friendly robot that we need to avoid showing disabled messages for
         $is_friendly_target = false;
