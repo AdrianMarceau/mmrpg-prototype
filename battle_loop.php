@@ -313,6 +313,32 @@ if ($this_action == 'start'){
         $this_field->update_session();
     }
 
+    // Check to see if experience points are relevant for this battle
+    $allow_experience_multipliers = true;
+    if (!empty($this_battle->flags['challenge_battle'])
+        || !empty($this_battle->flags['endless_battle'])
+        || !empty($this_battle->flags['player_battle'])){
+        $allow_experience_multipliers = false;
+    }
+    //error_log('$allow_experience_multipliers = '.($allow_experience_multipliers ? 'true' : 'false'));
+
+    // If this battle has chain power, make sure we apply it to the field multipliers
+    if (!empty($this_battle->battle_chain_power)){
+        //error_log('starting a battle with CHAIN POWER!');
+
+        // Give an upfront experience boost based on chain power (if allowed)
+        if ($allow_experience_multipliers){
+            $base_experience_multiplier = $this_field->get_multiplier('experience');
+            //error_log('$base_experience_multiplier = '.$base_experience_multiplier);
+            $new_experience_multiplier = $base_experience_multiplier + ($this_battle->battle_chain_power / 10);
+            if ($new_experience_multiplier > MMRPG_SETTINGS_MULTIPLIER_MAX){ $new_experience_multiplier = MMRPG_SETTINGS_MULTIPLIER_MAX; }
+            //error_log('$new_experience_multiplier = '.$new_experience_multiplier);
+            $this_field->set_multiplier('experience', $new_experience_multiplier);
+            $this_field->set_base_multiplier('experience', $new_experience_multiplier);
+        }
+
+    }
+
     // Ensure the player's robot string was provided
     if (!empty($this_player_robots)){
 
