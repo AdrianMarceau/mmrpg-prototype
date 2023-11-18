@@ -6,6 +6,24 @@
 if (!empty($this_battle->battle_complete_redirect_token)){ $battle_complete_redirect_token = $this_battle->battle_complete_redirect_token; }
 else { $battle_complete_redirect_token = $this_battle->battle_token; }
 
+// Create the battle chain array if not exists
+$is_first_mission = false;
+$this_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token]) ? $_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token] : array();
+if (empty($this_battle_chain)){ $is_first_mission = true; }
+$this_chain_record = array(
+    'battle_token' => $this_battle->battle_token,
+    'battle_turns_used' => $this_battle->counters['battle_turn'],
+    'battle_robots_used' => (!empty($this_player->counters['robots_start_total']) ? $this_player->counters['robots_start_total'] : 0),
+    'battle_zenny_earned' => (!empty($this_battle->counters['final_zenny_reward']) ? $this_battle->counters['final_zenny_reward'] : 0)
+    );
+if ($is_first_mission){
+    $this_team_config = $this_player->player_token.'::'.implode(',', $this_player->values['robots_start_team']);
+    $this_chain_record['battle_team_config'] = $this_team_config;
+}
+$this_battle_chain[] = $this_chain_record;
+$_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token] = $this_battle_chain;
+//error_log('$_SESSION[\'BATTLES_CHAIN\']['.$this_battle->battle_chain_token.'] = '.print_r($_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token], true));
+
 // If this is a STAR FIELD battle, break apart the next action
 if (!empty($this_battle->flags['starfield_mission'])
     && empty($this_battle->battle_complete_redirect_token)){
@@ -177,23 +195,6 @@ if (!empty($this_battle->flags['starfield_mission'])
     //error_log('next//$battle_complete_redirect_token: '.print_r($battle_complete_redirect_token, true));
 
 }
-
-// Create the battle chain array if not exists
-$is_first_mission = false;
-$this_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] : array();
-if (empty($this_battle_chain)){ $is_first_mission = true; }
-$this_chain_record = array(
-    'battle_token' => $this_battle->battle_token,
-    'battle_turns_used' => $this_battle->counters['battle_turn'],
-    'battle_robots_used' => (!empty($this_player->counters['robots_start_total']) ? $this_player->counters['robots_start_total'] : 0),
-    'battle_zenny_earned' => (!empty($this_battle->counters['final_zenny_reward']) ? $this_battle->counters['final_zenny_reward'] : 0)
-    );
-if ($is_first_mission){
-    $this_team_config = $this_player->player_token.'::'.implode(',', $this_player->values['robots_start_team']);
-    $this_chain_record['battle_team_config'] = $this_team_config;
-}
-$this_battle_chain[] = $this_chain_record;
-$_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] = $this_battle_chain;
 
 // Pre-generate active robots string and save any buffs/debuffs/etc.
 $active_robot_array = array();

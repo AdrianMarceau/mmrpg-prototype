@@ -1017,7 +1017,7 @@ if (!empty($this_battle->flags['challenge_battle'])
         if ($this_battle->battle_result == 'victory'){
 
             // Collect the current mission number so we now where we are
-            $this_battle_chain = isset($_SESSION['BATTLES_CHAIN'][$this_battle->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] : array();
+            $this_battle_chain = isset($_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token]) ? $_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token] : array();
             $this_loop_size = 18;
             $wave_value = MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE;
             $this_wave_number = (!empty($this_battle_chain) ? count($this_battle_chain) : 0) + 1;
@@ -1039,7 +1039,7 @@ if (!empty($this_battle->flags['challenge_battle'])
             if (!empty($this_battle->counters['battle_turn'])){ $this_turns_used += $this_battle->counters['battle_turn']; }
 
             // Update the session with the new battle chain results
-            $_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] = $this_battle_chain;
+            $_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token] = $this_battle_chain;
 
             // Check to see if there's an existing record for this user and this challenge
             $current_user_id = rpg_user::get_current_userid();

@@ -6,7 +6,7 @@ ob_start();
 	$is_starfield_mission = !empty($this_battle->flags['starfield_mission']) ? true : false;
 	$is_challenge_battle = !empty($this_battle->flags['challenge_battle']) ? true : false;
 	$is_endless_battle = !empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle']) ? true : false;
-	$has_endless_progress = $is_endless_battle && !empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_token]) ? true : false;
+	$has_endless_progress = $is_endless_battle && !empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token]) ? true : false;
 
 	// Define the markup for the option buttons
 	$temp_options = array();

@@ -55,7 +55,7 @@ if (!empty($this_battle->battle_field_base['values']['hazards'])){
 
 // Check for any robot details preloaded into session from a prev mission
 $allow_chain_bonuses = false;
-$this_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_token]) ? $_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] : array();
+$this_battle_chain = !empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token]) ? $_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token] : array();
 if (!empty($this_battle->flags['starfield_mission'])){ $allow_chain_bonuses = true; }
 if (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){ $allow_chain_bonuses = true; }
 if ($allow_chain_bonuses && !empty($this_battle_chain)){
@@ -66,7 +66,7 @@ if ($allow_chain_bonuses && !empty($this_battle_chain)){
 } elseif (!$allow_chain_bonuses){
     $this_battle_chain = array();
 }
-$_SESSION['BATTLES_CHAIN'][$this_battle->battle_token] = $this_battle_chain;
+$_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token] = $this_battle_chain;
 
 // Check for any robot details preloaded into session from a prev mission
 //error_log('loading ROBOTS_PRELOAD: '.print_r($_SESSION['ROBOTS_PRELOAD'], true));

@@ -253,6 +253,19 @@ class rpg_battle extends rpg_object {
         $this->battle_complete_redirect_token = !empty($this_battleinfo['battle_complete_redirect_token']) ? $this_battleinfo['battle_complete_redirect_token'] : '';
         $this->battle_complete_redirect_seed = !empty($this_battleinfo['battle_complete_redirect_seed']) ? $this_battleinfo['battle_complete_redirect_seed'] : array();
 
+        // If the chain token hasn't been defined yet, we should do so now
+        $this->battle_chain_token = isset($this_battleinfo['battle_chain_token']) ? $this_battleinfo['battle_chain_token'] : '';
+        $this->battle_chain_power = isset($this_battleinfo['battle_chain_power']) ? $this_battleinfo['battle_chain_power'] : 0;
+        if (empty($this->battle_chain_token)){
+            $current_player_token = isset($_REQUEST['this_player_token']) ? $_REQUEST['this_player_token'] : 'player';
+            if (preg_match('/^starfield-/i', $this->battle_token)){ $this->battle_chain_token = $current_player_token.'-starfield-mission'; }
+            else { $this->battle_chain_token = $this->battle_token; }
+            $current_battle_chain = isset($_SESSION['BATTLES_CHAIN'][$this->battle_chain_token]) ? $_SESSION['BATTLES_CHAIN'][$this->battle_chain_token] : array();
+            $this->battle_chain_power = !empty($current_battle_chain) ? count($current_battle_chain) : 0;
+        }
+        //error_log('$this->battle_chain_token = '.$this->battle_chain_token);
+        //error_log('$this->battle_chain_power = '.$this->battle_chain_power);
+
         // Collect any functions associated with this battle
         $temp_functions_path = MMRPG_CONFIG_BATTLES_CONTENT_PATH.$this->battle_token.'/functions.php';
         if (file_exists($temp_functions_path)){ require($temp_functions_path); }
@@ -3595,6 +3608,8 @@ class rpg_battle extends rpg_object {
             'battle_zenny' => $this->battle_zenny,
             'battle_level' => $this->battle_level,
             'battle_attachments' => $this->battle_attachments,
+            'battle_chain_token' => $this->battle_chain_token,
+            'battle_chain_power' => $this->battle_chain_power,
             'battle_base_name' => $this->battle_base_name,
             'battle_base_token' => $this->battle_base_token,
             'battle_base_description' => $this->battle_base_description,
