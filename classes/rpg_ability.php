@@ -2506,6 +2506,7 @@ class rpg_ability extends rpg_object {
         $allow_custom_effects = isset($trigger_options['allow_custom_effects']) ? $trigger_options['allow_custom_effects'] : true;
         $is_fixed_amount = isset($trigger_options['is_fixed_amount']) ? $trigger_options['is_fixed_amount'] : false;
         $skip_canvas_header = isset($trigger_options['skip_canvas_header']) ? $trigger_options['skip_canvas_header'] : false;
+        $skip_failure_events = isset($trigger_options['skip_failure_events']) ? $trigger_options['skip_failure_events'] : false;
 
         // Exit or redirect if amount doesn't make sense here
         if (empty($boost_amount)){
@@ -2643,25 +2644,25 @@ class rpg_ability extends rpg_object {
 
         } else {
 
-            // Define the sound effect variables for this failed stat boost
-            $boost_sounds = array();
-            $boost_sounds[] = array('name' => 'no-effect', 'volume' => 1.0);
-
             // Target this robot's self to show the failure message
-            $amount_text = ''; //' ('.($target_robot->counters[$mods_token] > 0 ? '+'.$target_robot->counters[$mods_token] : $target_robot->counters[$mods_token]).')';
-            $target_options = array('frame' => 'defend', 'success' => array($options->failure_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' won\'t go any higher'.$amount_text.'&hellip;'));
-            $trigger_options = array();
-            if (!empty($boost_sounds)){ $trigger_options['event_flag_sound_effects'] = $boost_sounds; }
-            if ($trigger_item || $trigger_skill){
-                $trigger_object->set_flag('skip_canvas_header', true);
-                $trigger_object->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
-                $trigger_object->unset_flag('skip_canvas_header');
-            } else {
-                $trigger_ability->set_flag('skip_canvas_header', true);
-                $trigger_ability->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_ability, $trigger_options);
-                $trigger_ability->unset_flag('skip_canvas_header');
+            if (!$skip_failure_events){
+                $boost_sounds = array();
+                $boost_sounds[] = array('name' => 'no-effect', 'volume' => 1.0);
+                $amount_text = ''; //' ('.($target_robot->counters[$mods_token] > 0 ? '+'.$target_robot->counters[$mods_token] : $target_robot->counters[$mods_token]).')';
+                $target_options = array('frame' => 'defend', 'success' => array($options->failure_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' won\'t go any higher'.$amount_text.'&hellip;'));
+                $trigger_options = array();
+                if (!empty($boost_sounds)){ $trigger_options['event_flag_sound_effects'] = $boost_sounds; }
+                if ($trigger_item || $trigger_skill){
+                    $trigger_object->set_flag('skip_canvas_header', true);
+                    $trigger_object->target_options_update($target_options);
+                    $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
+                    $trigger_object->unset_flag('skip_canvas_header');
+                } else {
+                    $trigger_ability->set_flag('skip_canvas_header', true);
+                    $trigger_ability->target_options_update($target_options);
+                    $target_robot->trigger_target($target_robot, $trigger_ability, $trigger_options);
+                    $trigger_ability->unset_flag('skip_canvas_header');
+                }
             }
             $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MAX;
             $target_robot->update_session();
@@ -2689,6 +2690,7 @@ class rpg_ability extends rpg_object {
         $allow_custom_effects = isset($trigger_options['allow_custom_effects']) ? $trigger_options['allow_custom_effects'] : true;
         $is_fixed_amount = isset($trigger_options['is_fixed_amount']) ? $trigger_options['is_fixed_amount'] : false;
         $skip_canvas_header = isset($trigger_options['skip_canvas_header']) ? $trigger_options['skip_canvas_header'] : false;
+        $skip_failure_events = isset($trigger_options['skip_failure_events']) ? $trigger_options['skip_failure_events'] : false;
 
         // Exit or redirect if amount doesn't make sense here
         if (empty($break_amount)){
@@ -2828,25 +2830,25 @@ class rpg_ability extends rpg_object {
 
         } else {
 
-            // Define the sound effect variables for this failed stat break
-            $break_sounds = array();
-            $break_sounds[] = array('name' => 'no-effect', 'volume' => 1.0);
-
             // Target this robot's self to show the failure message
-            $amount_text = ''; //' ('.($target_robot->counters[$mods_token] > 0 ? '+'.$target_robot->counters[$mods_token] : $target_robot->counters[$mods_token]).')';
-            $target_options = array('frame' => 'base', 'success' => array($options->failure_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' won\'t go any lower'.$amount_text.'&hellip;'));
-            $trigger_options = array();
-            if (!empty($boost_sounds)){ $trigger_options['event_flag_sound_effects'] = $boost_sounds; }
-            if ($trigger_item || $trigger_skill){
-                $trigger_object->set_flag('skip_canvas_header', true);
-                $trigger_object->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
-                $trigger_object->unset_flag('skip_canvas_header');
-            } else {
-                $trigger_ability->set_flag('skip_canvas_header', true);
-                $trigger_ability->target_options_update($target_options);
-                $target_robot->trigger_target($target_robot, $trigger_ability, $trigger_options);
-                $trigger_ability->unset_flag('skip_canvas_header');
+            if (!$skip_failure_events){
+                $break_sounds = array();
+                $break_sounds[] = array('name' => 'no-effect', 'volume' => 1.0);
+                $amount_text = ''; //' ('.($target_robot->counters[$mods_token] > 0 ? '+'.$target_robot->counters[$mods_token] : $target_robot->counters[$mods_token]).')';
+                $target_options = array('frame' => 'base', 'success' => array($options->failure_frame, -2, 0, -10, $options->extra_text.$target_robot->print_name().'&#39;s '.$options->stat_type.' won\'t go any lower'.$amount_text.'&hellip;'));
+                $trigger_options = array();
+                if (!empty($boost_sounds)){ $trigger_options['event_flag_sound_effects'] = $boost_sounds; }
+                if ($trigger_item || $trigger_skill){
+                    $trigger_object->set_flag('skip_canvas_header', true);
+                    $trigger_object->target_options_update($target_options);
+                    $target_robot->trigger_target($target_robot, $trigger_object, $trigger_options);
+                    $trigger_object->unset_flag('skip_canvas_header');
+                } else {
+                    $trigger_ability->set_flag('skip_canvas_header', true);
+                    $trigger_ability->target_options_update($target_options);
+                    $target_robot->trigger_target($target_robot, $trigger_ability, $trigger_options);
+                    $trigger_ability->unset_flag('skip_canvas_header');
+                }
             }
             $target_robot->counters[$mods_token] = MMRPG_SETTINGS_STATS_MOD_MIN;
             $target_robot->update_session();
