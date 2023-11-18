@@ -281,6 +281,7 @@ class rpg_mission_endless extends rpg_mission {
             );
 
         // Generate the list of target robots given the seed data
+        $robot_tokens = array();
         $target_robots = array();
         //$statmods = min(5, ($temp_battle_seed['phase'] - 1));
         //$statmods = $mission_number > 1 ? mt_rand(0, min(5, $mission_number)) : 0;
@@ -289,8 +290,18 @@ class rpg_mission_endless extends rpg_mission {
         $statrewards = floor((9999) * $rel_multiplier);
         foreach ($temp_battle_seed['targets'] AS $key => $target){
             list($robot, $item) = explode('@', $target);
+            $image = $robot;
+            if (!isset($robot_tokens[$robot])){ $robot_tokens[$robot] = 0; }
+            $robot_tokens[$robot]++;
+            if ($robot_tokens[$robot] > 1){
+                $alt_num = $robot_tokens[$robot] - 1;
+                if ($alt_num === 1){ $image .= '_alt'; }
+                elseif ($alt_num === 2){ $image .= '_alt2'; }
+                elseif ($alt_num >= 3) { $image .= '_alt9'; }
+            }
             $target_robots[] = array(
                 'robot_token' => $robot,
+                'robot_image' => $image,
                 'robot_item' => $item,
                 'counters' => array(
                     'attack_mods' => mt_rand(0, $statmodmax),
