@@ -36,6 +36,7 @@ if (!empty($cached_index)){
         LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
         WHERE abilities.ability_token <> 'ability'
         AND abilities.ability_class <> 'system'
+        AND abilities.ability_class = 'master'
         AND abilities.ability_flag_published = 1
         ORDER BY
         FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
@@ -49,6 +50,7 @@ if (!empty($cached_index)){
         FROM mmrpg_index_abilities AS abilities
         WHERE abilities.ability_token <> 'ability'
         AND abilities.ability_class <> 'system'
+        AND abilities.ability_class = 'master'
         AND abilities.ability_flag_published = 1
         AND abilities.ability_flag_hidden = 0
         ;", 'ability_count');
