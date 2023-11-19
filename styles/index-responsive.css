@@ -395,6 +395,15 @@ body:before {
         text-decoration: line-through;
     }
 
+    #window .page .database_container .subbody.has_sprite_showcase .body table.full.basic,
+    #window .page .database_container .subbody.has_sprite_showcase .body table.full.stats,
+    #window .page .database_container .subbody.has_sprite_showcase .body table.full.extras,
+    #window .page .database_container .subbody.has_sprite_showcase .body table.full.types,
+    #window .page .database_container .subbody.has_sprite_showcase .body table.full.multipliers {
+        float: none;
+        width: 100%;
+    }
+
 }
 
 /* -- Even More Less than Portrait Mode -- */
@@ -1379,6 +1388,48 @@ body:before {
         margin-left: 0;
     }
 
+    #window .page .database_container .event.has_sprite_showcase {
+
+    }
+    #window .page .database_container .event.has_sprite_showcase .body.basics {
+        max-width: none;
+        clear: both;
+        margin: 0 auto;
+        border-radius: 0.5em;
+    }
+    #window .page .database_container .event.has_sprite_showcase .sprite_showcase {
+
+    }
+    #window .page .database_container .event.has_sprite_showcase .sprite_showcase .sprite_robot {
+        left: calc(50% - 40px);
+        bottom: 50px;
+    }
+    #window .page .database_container .event.has_sprite_showcase .sprite_showcase {
+        position: relative;
+        z-index: 1;
+        top: auto;
+        right: auto;
+        float: left;
+        margin: 0 auto 10px 0;
+        width: 100%;
+        height: 170px;
+    }
+    #window .page .database_container .event.has_sprite_showcase .sprite_showcase .wrapper:after {
+        height: 80px;
+    }
+    #window .page .database_container .event.has_sprite_showcase .sprite_showcase_buttons {
+        position: absolute;
+        z-index: 2;
+        top: 204px;
+        right: 13px;
+        left: 13px;
+        width: auto;
+        height: 29px;
+    }
+    #window .page .database_container .event.has_sprite_showcase .sprite_showcase_buttons .frame {
+        width: calc((100% / 10) - 2px);
+    }
+
     #window .page .body .type_chart_filters .classes,
     #window .page .body .type_chart_filters .flags {
         margin: 0 auto 6px;
@@ -1855,7 +1906,9 @@ body:before {
         width: calc((100% / 5) - 5px);
     }
 
+    #window .page .database_container .event.has_sprite_showcase .sprite_showcase_buttons {
 
+    }
 
 }
 

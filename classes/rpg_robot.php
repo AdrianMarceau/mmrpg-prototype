@@ -3672,6 +3672,15 @@ class rpg_robot extends rpg_object {
         elseif ($robot_info['robot_class'] == 'mecha'){ $stat_base_max_value = 400; }
         elseif ($robot_info['robot_class'] == 'boss'){ $stat_base_max_value = 2000; }
 
+        // Decide whether or not we should show the supersized sprite on the side
+        $show_sprite_showcase = false;
+        if ($print_options['layout_style'] == 'website'
+            || $print_options['layout_style'] == 'website_compact'){
+            if (!in_array($robot_image_token, $default_robot_class_tokens)){
+                $show_sprite_showcase = true;
+            }
+        }
+
 
         // Define the variable to hold compact footer link markup
         $compact_footer_link_markup = array();
@@ -3686,7 +3695,7 @@ class rpg_robot extends rpg_object {
                 <a class="anchor" id="<?= $robot_info['robot_token'] ?>"></a>
             <? endif; ?>
 
-            <div class="subbody event event_triple event_visible" data-token="<?= $robot_info['robot_token']?>">
+            <div class="subbody event event_triple event_visible<?= ($show_sprite_showcase ? ' has_sprite_showcase' : '') ?>" data-token="<?= $robot_info['robot_token']?>">
 
                 <? if($print_options['show_mugshot']): ?>
 
@@ -3707,7 +3716,7 @@ class rpg_robot extends rpg_object {
 
                 <? if($print_options['show_basics']): ?>
 
-                    <h2 class="header header_left <?= $robot_header_types ?> <?= (!$print_options['show_mugshot']) ? 'nomug' : '' ?>" style="<?= (!$print_options['show_mugshot']) ? 'margin-left: 0;' : '' ?>">
+                    <h2 class="header basics header_left <?= $robot_header_types ?> <?= (!$print_options['show_mugshot']) ? 'nomug' : '' ?>" style="<?= (!$print_options['show_mugshot']) ? 'margin-left: 0;' : '' ?>">
                         <? if ($print_options['layout_style'] == 'website_compact'){ ?>
                             <a href="<?= $database_category_robot_url ?>"><?= $robot_info['robot_name'].$robot_info['robot_name_append'] ?></a>
                         <? } else { ?>
@@ -3721,7 +3730,59 @@ class rpg_robot extends rpg_object {
                         <div class="header_core robot_type"><?= !empty($robot_info['robot_core']) ? ucwords($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' / '.$robot_info['robot_core2'] : '')) : 'Neutral' ?><?= $robot_info['robot_class'] == 'mecha' ? ' Type' : ' Core' ?></div>
                     </h2>
 
-                    <div class="body body_left <?= !$print_options['show_mugshot'] ? 'fullsize' : '' ?>">
+                    <? if ($show_sprite_showcase){ ?>
+                        <?
+                        $showcase_sprite_markup = '';
+                        $showcase_shadow_markup = '';
+                        $sprite_animation_duration = 1;
+                        if (true){
+                            $sprite_base_image = $robot_image_token;
+                            $sprite_base_size = $robot_image_size;
+                            $sprite_showcase_size = $robot_image_size * 2;
+                            $sprite_showcase_size_token = $sprite_showcase_size.'x'.$sprite_showcase_size;
+                            $sprite_showcase_image = 'images/robots/'.$robot_image_token.'/sprite_left_'.$sprite_showcase_size_token.'.png';
+                            $sprite_animation_duration = rpg_robot::get_css_animation_duration($robot_info);
+                            $class = 'sprite  ';
+                            $class .= 'sprite_'.$sprite_showcase_size_token.' ';
+                            $class .= 'sprite_'.$sprite_showcase_size_token.'_base ';
+                            $class .= 'sprite_size_'.$sprite_showcase_size_token.' ';
+                            $class .= 'sprite_size_'.$sprite_showcase_size_token.'_base ';
+                            $class .= 'robot_status_active robot_position_active ';
+                            $style = 'background-image: url('.$sprite_showcase_image.'?'.MMRPG_CONFIG_CACHE_DATE.'); ';
+                            $showcase_sprite_markup = '<div class="'.$class.'" style="'.$style.'" data-image="'.$sprite_base_image.'" data-image-size="'.$sprite_showcase_size.'"></div>';
+                            $showcase_shadow_markup = $showcase_sprite_markup;
+                        }
+                        $sprite_animation_styles = 'animation-duration: '.$sprite_animation_duration.'s;';
+                        ?>
+                        <div class="sprite_showcase" data-image="<?= $sprite_base_image ?>" data-image-size="<?= $sprite_showcase_size ?>">
+                            <div class="wrapper">
+                                <div class="sprite sprite_robot sprite_80x80" style="<?= $sprite_animation_styles ?>">
+                                    <?= $showcase_sprite_markup ?>
+                                </div>
+                                <? if (!empty($showcase_shadow_markup)){ ?>
+                                    <div class="sprite sprite_robot sprite_80x80 is_shadow" style="<?= $sprite_animation_styles ?>">
+                                        <?= $showcase_sprite_markup ?>
+                                    </div>
+                                <? } ?>
+                            </div>
+                        </div>
+                        <div class="sprite_showcase_buttons">
+                            <div class="wrapper">
+                                <?
+                                // Collect the frame index for robots then loop through and display buttons
+                                $frame_index = explode('/', MMRPG_SETTINGS_ROBOT_FRAMEINDEX);
+                                foreach ($frame_index AS $frame_key => $frame_token){
+                                    $frame_title = ucfirst($frame_token).' Sprite';
+                                    echo('<a class="frame robot_type '.$robot_header_types.'" data-frame="'.$frame_token.'" data-frame-key="'.$frame_key.'" data-click-title="'.$frame_title.'">'.
+                                        '<span class="wrap">'.$frame_key.'</span>'.
+                                        '</a>'.PHP_EOL);
+                                }
+                                ?>
+                            </div>
+                        </div>
+                    <? } ?>
+
+                    <div class="body basics body_left <?= !$print_options['show_mugshot'] ? 'fullsize' : '' ?>">
 
                         <table class="full basic">
                             <tbody>
@@ -3971,7 +4032,7 @@ class rpg_robot extends rpg_object {
 
                     <? if($print_options['layout_style'] != 'event' && !empty($robot_info['robot_skill'])): ?>
                         <? $skill_info = self::get_robot_skill_info($robot_info['robot_skill'], $robot_info); ?>
-                        <div class="body body_left <?= !$print_options['show_mugshot'] ? 'fullsize' : '' ?> body_onerow skill_bubble">
+                        <div class="body basics body_left <?= !$print_options['show_mugshot'] ? 'fullsize' : '' ?> body_onerow skill_bubble">
                             <table class="full skill">
                                 <tbody>
                                     <tr>
@@ -4052,7 +4113,7 @@ class rpg_robot extends rpg_object {
                         $base_size = $robot_image_size;
                         $zoom_size = $robot_image_size * 2;
                         $show_sizes[$base_size] = $base_size.'x'.$base_size;
-                        $show_sizes[$zoom_size] = $zoom_size.'x'.$zoom_size;
+                        //$show_sizes[$zoom_size] = $zoom_size.'x'.$zoom_size;
                         $size_key = -1;
                         foreach ($show_sizes AS $size_value => $sprite_size_text){
                             $size_key++;

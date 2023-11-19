@@ -204,22 +204,112 @@ $(document).ready(function(){
 
             });
 
-            // -- DATABASE TYPE CHARTS -- //
+        // -- DATABASE SPRITE SHOWCASE -- //
 
-            // Create a reference to the type chart page
-            var typeChart = $('.type_chart', thisDatabase);
-            if (typeChart.length && typeof typeChartData != undefined){
+        // Create a reference to all the sprite showcase containers
+        var $spriteShowcases = $('.sprite_showcase', thisDatabase);
+        if ($spriteShowcases.length){
+            //console.log('found '+$spriteShowcases.length+' sprite showcases!');
 
-                var chartCanvases = $(".chart_canvas");
-                chartCanvases.each(function(){
-                    var thisCanvas = $(this);
-                    var thisCanvasKind = thisCanvas.attr('data-kind');
-                    var thisCanvasData = typeChartData[thisCanvasKind];
-                    if (typeof thisCanvasData == undefined){ return true; }
-                    var thisChart = new Chart(thisCanvas, thisCanvasData);
+            // Define a function to call when we want to update a sprite showcase's frame (background offset)
+            var updateSpriteFrame = function($showcase, frameKey){
+                var $showcaseParent = $showcase.closest('.event.has_sprite_showcase');
+                var $showcaseButtons = $('.sprite_showcase_buttons', $showcaseParent);
+                var $showcaseSprites = $('.sprite .sprite', $showcase);
+                var dataToken = $showcaseParent.attr('data-token');
+                var dataFrame = $('.frame[data-frame-key='+frameKey+']', $showcaseButtons).attr('data-frame');
+                var dataImageSize = parseInt($showcase.attr('data-image-size'));
+                var backgroundOffset = (frameKey * dataImageSize) * -1;
+                var backgroundPosition = backgroundOffset+'px 0';
+                $showcaseSprites.css({backgroundPosition:backgroundPosition});
+                $('.frame', $showcaseButtons).removeClass('active');
+                $('.frame[data-frame-key='+frameKey+']', $showcaseButtons).addClass('active');
+                };
+
+            // Define a function to call when we want to update a sprite showcase's alt (background image)
+            var updateSpriteAlt = function($showcase, newImageToken){
+                var $showcaseParent = $showcase.closest('.event.has_sprite_showcase');
+                var $showcaseButtons = $('.sprite_showcase_buttons', $showcaseParent);
+                var $showcaseSprites = $('.sprite .sprite', $showcase);
+                var dataToken = $showcaseParent.attr('data-token');
+                var dataImage = $showcase.attr('data-image');
+                var dataBaseImage = $showcase.attr('data-base-image') || dataImage;
+                if (!$showcase.is('[data-base-image]')){ $showcase.attr('data-base-image', dataBaseImage); }
+                var dataImageSize = parseInt($showcase.attr('data-image-size'));
+                var dataImageSizeToken = dataImageSize+'x'+dataImageSize;
+                //var oldBackgroundImage = $showcaseSprites.css('backgroundImage');
+                //var newBackgroundImage = oldBackgroundImage.replace(dataImage, newImageToken);
+                //console.log({oldBackgroundImage:oldBackgroundImage,newBackgroundImage:newBackgroundImage});
+                var newBackgroundImage = 'images/robots/'+newImageToken+'/sprite_left_'+dataImageSizeToken+'.png?'+gameSettings.cacheTime;
+                //console.log({newBackgroundImage:newBackgroundImage});
+                $showcase.attr('data-image', newImageToken);
+                $showcaseSprites.css({backgroundImage:'url('+newBackgroundImage+')'});
+                };
+
+            // Loop through each showcase and assign events
+            $spriteShowcases.each(function(){
+                var $showcase = $(this);
+                var $showcaseParent = $showcase.closest('.event.has_sprite_showcase');
+                var $showcaseButtons = $('.sprite_showcase_buttons', $showcaseParent);
+                var $showcaseSprites = $('.sprite .sprite', $showcase);
+                //console.log({$showcase:$showcase,$showcaseParent:$showcaseParent,$showcaseButtons:$showcaseButtons});
+                var dataToken = $showcaseParent.attr('data-token');
+                //console.log('assigning events for '+dataToken+'!');
+                $('.frame', $showcaseButtons).bind('mouseenter click', function(e){
+                    var dataFrame = $(this).attr('data-frame');
+                    var dataFrameKey = parseInt($(this).attr('data-frame-key'));
+                    //console.log('mouseenter/click for '+dataToken+'! dataFrame = '+dataFrame+'; dataFrameKey = '+dataFrameKey+';');
+                    updateSpriteFrame($showcase, dataFrameKey);
+                    e.stopPropagation();
                     });
+                $showcaseButtons.bind('mouseleave', function(e){
+                    //console.log('mouseleave for '+dataToken+'!');
+                    var dataFrame = 'base';
+                    var dataFrameKey = 0;
+                    updateSpriteFrame($showcase, dataFrameKey);
+                    e.stopPropagation();
+                    });
+                });
 
+            // Make sure we update the showcase images whenever a new alt is selected
+            if ($spriteShowcases.length === 1){
+                var $showcase = $spriteShowcases.first();
+                var $showcaseParent = $showcase.closest('.event.has_sprite_showcase');
+                var $spriteHeader = $('.header#sprites', $showcaseParent);
+                var $spriteImageOptions = $spriteHeader.length ? $('.images a[data-image]', $spriteHeader) : [];
+                if ($spriteImageOptions.length){
+                    //console.log('found '+$spriteHeader.length+' sprite headers!');
+                    //console.log('found '+$spriteImageOptions.length+' sprite header images!');
+                    $spriteImageOptions.each(function(){
+                        var $option = $(this);
+                        var dataImage = $option.attr('data-image');
+                        $option.click(function(e){
+                            e.preventDefault();
+                            updateSpriteAlt($showcase, dataImage);
+                            });
+                        });
+                    }
                 }
+
+            }
+
+
+        // -- DATABASE TYPE CHARTS -- //
+
+        // Create a reference to the type chart page
+        var typeChart = $('.type_chart', thisDatabase);
+        if (typeChart.length && typeof typeChartData != undefined){
+
+            var chartCanvases = $(".chart_canvas");
+            chartCanvases.each(function(){
+                var thisCanvas = $(this);
+                var thisCanvasKind = thisCanvas.attr('data-kind');
+                var thisCanvasData = typeChartData[thisCanvasKind];
+                if (typeof thisCanvasData == undefined){ return true; }
+                var thisChart = new Chart(thisCanvas, thisCanvasData);
+                });
+
+            }
 
         }
 

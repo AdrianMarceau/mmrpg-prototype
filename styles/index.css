@@ -2474,6 +2474,222 @@ button {
 }
 
 
+#window .page .database_container .event.has_sprite_showcase {
+    position: relative;
+    min-height: 270px;
+    padding-bottom: 10px;
+}
+#window .page .database_container .event.has_sprite_showcase .link_wrapper {
+    position: absolute;
+    bottom: 6px;
+    right: 12px;
+    margin: 0;
+}
+/*
+#window .page .database_container .event.has_sprite_showcase .header.basics {
+    margin: 0 auto 0 47px;
+    box-sizing: border-box;
+    max-width: calc(100% - 210px);
+}
+*/
+#window .page .database_container .event.has_sprite_showcase .body.basics {
+    margin: 0 auto 0 47px;
+    box-sizing: border-box;
+    max-width: calc(100% - 215px);
+}
+#window .page .database_container .event.has_sprite_showcase .body.basics + .body.basics {
+    margin-top: 10px;
+}
+
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase {
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    top: 35px;
+    right: 10px;
+    background-color: #282828;
+    border: 1px solid #181818;
+    border-radius: 9px;
+    width: 160px;
+    height: 160px;
+    overflow: hidden;
+}
+/* make a keyframe animation that scrolls the sprite grid background slowly 80px left and repeat */
+@keyframes pan-sprite-grid {
+    from { background-position: 0 0; }
+    to { background-position: 80px 0; }
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .wrapper {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: transparent;
+    background-image: url("../images/sprite-grid.gif");
+    background-repeat: repeat;
+    background-position: 0 0;
+    border-radius: 6px;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .wrapper:before {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 86px;
+    border-top: 0 none transparent;
+    background-image: url("../images/sprite-grid.gif");
+    background-repeat: repeat;
+    background-position: 0 0;
+    filter: brightness(0.6);
+    box-shadow: inset 0 -2px 10px rgba(0, 0, 0, 0.3);
+    animation: pan-sprite-grid 16s linear infinite;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .wrapper:after {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 70px;
+    border-top: 2px solid #1e1e1e;
+    background-image: url("../images/sprite-grid.gif");
+    background-repeat: repeat;
+    background-position: 0 -9px;
+    filter: brightness(0.8);
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .sprite_robot {
+    display: block;
+    margin: 0 auto;
+    position: absolute;
+    z-index: 4;
+    left: 40px;
+    bottom: 40px;
+    /* transform-origin: bottom center; */
+    /* transform: scale(2); */
+    /* background-color: magenta;  */
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow {
+    z-index: 2;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .sprite_robot .sprite {
+    position: absolute;
+    z-index: 2;
+    margin: 0;
+    top: 0;
+    left: 0;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow .sprite {
+    z-index: 2;
+    filter: grayscale(1) brightness(0) opacity(0.4);
+    transform: skew(-45deg, 0deg) scaleY(0.5) translate(30px, 30px);
+    top: 4px;
+    left: 4px;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .sprite_robot .sprite_80x80 {
+
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .sprite_robot .sprite_160x160 {
+    top: -80px;
+    left: -40px;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow .sprite_160x160 {
+    top: -76px;
+    left: -36px;
+    transform: skew(-45deg, 0deg) scaleY(0.5) translate(72px, 72px);
+}
+@keyframes database-robot-sprite-showcase-bounce {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-2px); }
+    100% { transform: translateY(0px); }
+}
+@keyframes database-robot-shadow-sprite-showcase-bounce {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-1px); }
+    100% { transform: translateY(0px); }
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .sprite_robot {
+    transform: translateY(0);
+    animation: database-robot-sprite-showcase-bounce 1s linear infinite;
+    animation-timing-function: steps(2);
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow {
+    animation-name: database-robot-shadow-sprite-showcase-bounce;
+    animation-timing-function: steps(2);
+}
+
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase_buttons {
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    top: 200px;
+    right: 10px;
+    background-color: #282828;
+    border: 0 none transparent;
+    border-radius: 9px;
+    width: 160px;
+    height: 50px;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase_buttons .wrapper {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: transparent;
+    padding: 6px 9px;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase_buttons .wrapper:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase_buttons .frame {
+    display: block;
+    box-sizing: border-box;
+    margin: 0 2px 2px 0;
+    padding: 0;
+    width: auto;
+    width: calc((100% / 5) - 2px);
+    float: left;
+    overflow: hidden;
+    border: 1px solid #1e1e1e;
+    background-color: #282828;
+    border-radius: 4px;
+    font-size: 9px;
+    line-height: 13px;
+    text-align: center;
+    cursor: pointer;
+    transform: scale(1);
+    transition: opacity 0.1s, transform 0.2s;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase_buttons .frame:hover {
+    transform: scale(1.1);
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase_buttons .frame[data-frame-key="0"] {
+    display: none;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase_buttons .frame .wrap {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: transparent;
+    padding: 1px 3px;
+    pointer-events: none;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: background-color 0.1s;
+}
+#window .page .database_container .event.has_sprite_showcase .sprite_showcase_buttons .frame:hover .wrap {
+    background-color: rgba(0, 0, 0, 0.0);
+}
+
 #window .page .event .robot_core,
 #window .page .event .mecha_shard,
 #window .page .event .field_name,
@@ -5195,6 +5411,9 @@ body.windowFlag_landscapeMode #window .page .type_block {
     display: none;
 }
 
+#window .page .event.has_sprite_showcase .section_tabs {
+    padding-top: 22px;
+}
 
 
 
