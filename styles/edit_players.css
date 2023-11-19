@@ -383,9 +383,7 @@ body.windowFlag_landscapeMode #prototype {
     cursor: pointer;
 }
 
-
-
-/* animate robot sprites appearing in option buttons appropriately */
+/* animate player sprites appearing in option buttons appropriately */
 
 @keyframes option-player-sprite-bounce {
     0% { transform: translateY(0px); }
@@ -405,7 +403,6 @@ body.windowFlag_landscapeMode #prototype {
 #edit #console .event[data-token="dr-cossack"] .event_player_images .sprite_player {
     animation-duration: 0.6s;
 }
-
 
 #edit #console .event .statboost_player {
     color: rgb(213, 255, 202) !important;

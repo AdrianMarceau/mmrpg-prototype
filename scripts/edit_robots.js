@@ -1878,65 +1878,65 @@ function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
 
     // Define a function for when all the background sprites have been updated
     var afterBackgroundUpdateComplete = function(nextGroup){
-     //console.log('backgrounds have finished switching');
-     if (nextGroup != undefined){
+        //console.log('backgrounds have finished switching');
+        if (nextGroup != undefined){
 
-         // We still have to update the mugshot images and tokens
-         //console.log('nextGroup provided, updating tokens and then mugshot background images');
-         if (newImageIndex != -1){
-             $('.token', thisLink).removeClass('token_active');
-             $('.token', thisLink).eq(newImageIndex).addClass('token_active');
-             }
-         nextGroup.each(function(){ updateBackgroundImageFunction($(this)); });
-         } else {
-         //console.log('nextGroup undefined, updating server with new choice');
+            // We still have to update the mugshot images and tokens
+            //console.log('nextGroup provided, updating tokens and then mugshot background images');
+            if (newImageIndex != -1){
+                $('.token', thisLink).removeClass('token_active');
+                $('.token', thisLink).eq(newImageIndex).addClass('token_active');
+                }
+            nextGroup.each(function(){ updateBackgroundImageFunction($(this)); });
 
-         // Post this change back to the server
-         var postData = {action:'altimage',robot:thisRobotToken,player:thisPlayerToken,image:newImageToken};
-         $.ajax({
-             type: 'POST',
-             url: 'frames/edit_robots.php',
-             data: postData,
-             success: function(data, status){
+            } else {
+            //console.log('nextGroup undefined, updating server with new choice');
 
-                // If the `data` is multi-line, immediately break off anything after the first for later into a `dataExtra` var
-                //console.log('data =', data);
-                var newlineIndex = data.indexOf("\n");
-                var dataExtra = newlineIndex !== -1 ? data.substr(newlineIndex + 1) : false;
-                data = newlineIndex !== -1 ? data.substr(0, newlineIndex) : data;
-                //console.log('data (after) =', data);
-                //console.log('dataExtra =', dataExtra);
+            // Post this change back to the server
+            var postData = {action:'altimage',robot:thisRobotToken,player:thisPlayerToken,image:newImageToken};
+            $.ajax({
+                type: 'POST',
+                url: 'frames/edit_robots.php',
+                data: postData,
+                success: function(data, status){
 
-                 // DEBUG
-                 //alert(data);
-                 // Break apart the response into parts
-                 var data = data.split('|');
-                 var dataStatus = data[0] != undefined ? data[0] : false;
-                 var dataMessage = data[1] != undefined ? data[1] : false;
-                 var dataContent = data[2] != undefined ? data[2] : false;
-                 // DEBUG
-                 //console.log('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+',\n dataContent = '+dataContent+'; ');
-                 //console.log( data);
-                 //console.log('dataStatus:'+dataStatus);
-                 //console.log('dataMessage:'+dataMessage);
-                 //console.log('dataContent:'+dataContent);
+                    // If the `data` is multi-line, immediately break off anything after the first for later into a `dataExtra` var
+                    //console.log('data =', data);
+                    var newlineIndex = data.indexOf("\n");
+                    var dataExtra = newlineIndex !== -1 ? data.substr(newlineIndex + 1) : false;
+                    data = newlineIndex !== -1 ? data.substr(0, newlineIndex) : data;
+                    //console.log('data (after) =', data);
+                    //console.log('dataExtra =', dataExtra);
 
-                 // If the alt change was a success, flash the box green
-                 if (dataStatus == 'success'){
-                     //console.log('success! this robot alt image has been updated');
-                     //console.log(data);
-                     return true;
-                     }
+                    // DEBUG
+                    //alert(data);
+                    // Break apart the response into parts
+                    var data = data.split('|');
+                    var dataStatus = data[0] != undefined ? data[0] : false;
+                    var dataMessage = data[1] != undefined ? data[1] : false;
+                    var dataContent = data[2] != undefined ? data[2] : false;
+                    // DEBUG
+                    //console.log('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+',\n dataContent = '+dataContent+'; ');
+                    //console.log( data);
+                    //console.log('dataStatus:'+dataStatus);
+                    //console.log('dataMessage:'+dataMessage);
+                    //console.log('dataContent:'+dataContent);
 
-
-                 // Hide the overlay to allow using the robot again
-                 return true;
-
-                 }
-             });
+                    // If the alt change was a success, flash the box green
+                    if (dataStatus == 'success'){
+                        //console.log('success! this robot alt image has been updated');
+                        //console.log(data);
+                        return true;
+                        }
 
 
-         }
+                    // Hide the overlay to allow using the robot again
+                    return true;
+
+                    }
+                });
+
+            }
      };
 
     // Define a function for updating the backgrounds images of all relevant sprites
