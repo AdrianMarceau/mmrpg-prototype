@@ -3262,8 +3262,10 @@ class rpg_player extends rpg_object {
         $player_info['player_fusion_stars'] = mmrpg_prototype_stars_unlocked($player_token, 'fusion');
         $player_info['player_screw_counter'] = 0;
         $player_info['player_heart_counter'] = 0;
+
         // Define the player's experience points total
         $player_info['player_experience'] = 0;
+
         // Collect this player's current defined omega item list
         if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
             //$debug_experience_sum = $player_token.' : ';
@@ -3356,8 +3358,91 @@ class rpg_player extends rpg_object {
         // Start the output buffer
         ob_start();
 
-        // DEBUG
-        //echo(print_r($player_field_rewards, true));
+            // DEBUG
+            //echo(print_r($player_field_rewards, true));
+
+            // Collect or define the image size
+            $player_info['player_image_size'] = !empty($player_info['player_image_size']) ? $player_info['player_image_size'] : 40;
+            $player_image_offset = $player_info['player_image_size'] > 40 ? ceil(($player_info['player_image_size'] - 40) * 0.5) : 0;
+            $player_image_size_text = $player_info['player_image_size'].'x'.$player_info['player_image_size'];
+            $player_image_offset_top = -1 * $player_image_offset;
+
+            // Collect the rewards for this player
+            $player_rewards = rpg_game::player_rewards($player_token);
+
+            // Collect the settings for this player
+            $player_settings = rpg_game::player_settings($player_token);
+
+            // Collect the summon count from the session if it exists
+            $player_info['player_summoned'] = 0;
+            if (!empty($player_info['player_battles_complete_total'])){ $player_info['player_summoned'] += $player_info['player_battles_complete_total']; }
+            if (!empty($player_info['player_battles_failure_total'])){ $player_info['player_summoned'] += $player_info['player_battles_failure_total']; }
+
+            // Collect any manually unlocked alts from the session if exists
+            $player_info['player_altimages'] = mmrpg_prototype_player_altimage_unlocked($player_token);
+
+            // Collect the alt images if there are any that are unlocked
+            $player_alt_count = 1 + (!empty($player_info['player_image_alts']) ? count($player_info['player_image_alts']) : 0);
+            $player_alt_options = array();
+            if (!empty($player_info['player_image_alts'])){
+                foreach ($player_info['player_image_alts'] AS $alt_key => $alt_info){
+                    $is_unlocked = false;
+                    if (in_array($alt_info['token'], $player_info['player_altimages'])){ $is_unlocked = true; }
+                    elseif ($player_info['player_summoned'] >= $alt_info['summons']){ $is_unlocked = true; $player_info['player_altimages'][] = $alt_info['token']; }
+                    if (!$is_unlocked){ continue; }
+                    $player_alt_options[] = $alt_info['token'];
+                }
+            }
+
+            // Collect the current unlock image token for this player
+            $player_image_unlock_current = 'base';
+            if (!empty($player_settings['player_image']) && strstr($player_settings['player_image'], '_')){
+                list($token, $player_image_unlock_current) = explode('_', $player_settings['player_image']);
+            }
+
+            // Define the offsets for the image tokens based on count
+            $token_first_offset = 2;
+            $token_other_offset = 6;
+            if ($player_alt_count == 1){ $token_first_offset = 17; }
+            elseif ($player_alt_count == 3){ $token_first_offset = 10; }
+
+            // Loop through and generate the player image display token markup
+            $player_image_unlock_tokens = '';
+            $temp_total_alts_count = 0;
+            $max_alt_slots = 12;
+            $break_after_slot = 6;
+            for ($i = 0; $i < $max_alt_slots; $i++){
+                $temp_enabled = true;
+                $temp_active = false;
+                if ($i + 1 > $player_alt_count){ break; }
+                if ($i > 0 && !isset($player_alt_options[$i - 1])){ $temp_enabled = false; }
+                if ($temp_enabled && $i == 0 && $player_image_unlock_current == 'base'){ $temp_active = true; }
+                elseif ($temp_enabled && $i >= 1 && $player_image_unlock_current == $player_alt_options[$i - 1]){ $temp_active = true; }
+                $rel_i = ($i >= $break_after_slot) ? ($i - $break_after_slot) : $i;
+                $left_offset = ($token_first_offset + ($rel_i * $token_other_offset));
+                $bottom_offset = ($i >= $break_after_slot) ? -17 : -12;
+                $player_image_unlock_tokens .= '<span class="token token_'.($temp_enabled ? 'enabled' : 'disabled').' '.($temp_active ? 'token_active' : '').'" style="left: '.$left_offset.'px; bottom: '.$bottom_offset.'px;">&bull;</span>';
+                $temp_total_alts_count += 1;
+            }
+            $temp_unlocked_alts_count = count($player_alt_options) + 1;
+            $temp_image_alt_title = '';
+            if ($temp_total_alts_count > 1){
+                $temp_image_alt_title = '<strong>'.$temp_unlocked_alts_count.' / '.$player_alt_count.' Outfits Unlocked</strong><br />';
+                //$temp_image_alt_title .= '<span style="font-size: 90%;">';
+                    $temp_image_alt_title .= '&#8226; <span style="font-size: 90%;">'.$player_info['player_name'].'</span><br />';
+                    foreach ($player_info['player_image_alts'] AS $alt_key => $alt_info){
+                        if (
+                            ($player_info['player_summoned'] >= $alt_info['summons']) ||
+                            (in_array($alt_info['token'], $player_info['player_altimages']))
+                            ){
+                            $temp_image_alt_title .= '&#8226; <span style="font-size: 90%;">'.$alt_info['name'].'</span><br />';
+                        } else {
+                            $temp_image_alt_title .= '&#9702; <span style="font-size: 90%;">???</span><br />';
+                        }
+                    }
+                //$temp_image_alt_title .= '</span>';
+                $temp_image_alt_title = htmlentities($temp_image_alt_title, ENT_QUOTES, 'UTF-8', true);
+            }
 
             // Check to see which size this player container should be based on unlocks
             $event_container_size = 1;
@@ -3365,11 +3450,41 @@ class rpg_player extends rpg_object {
             if (mmrpg_prototype_item_unlocked('cossack-program')){ $event_container_size++; }
 
             ?>
-            <div class="event event_double event_<?= $player_key == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token'].'_'.$player_info['player_token']?>" data-size="<?= $event_container_size ?>">
+            <div class="event event_double event_<?= $player_key == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token']?>" data-size="<?= $event_container_size ?>">
 
+                <? /*
                 <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/<?= $player_info['player_field'] ?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
                     <? $temp_margin = -1 * ceil(($player_info['player_image_size'] - 40) * 0.5); ?>
                     <div class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_00" style="margin-top: -4px; margin-left: -2px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/sprite_right_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); "><?= $player_info['player_name']?></div>
+                </div>
+                */ ?>
+
+                <div class="this_sprite sprite_left event_player_mugshot">
+                    <? $temp_offset = $player_info['player_image_size'] == 80 ? '-20px' : '0'; ?>
+                    <div class="sprite_wrapper player_type player_type_<?= !empty($player_info['player_stat_type']) ? $player_info['player_stat_type'] : 'none' ?>" style="width: 33px;">
+                        <div class="sprite_wrapper player_type player_type_empty" style="position: absolute; width: 27px; height: 34px; left: 2px; top: 2px; background-image: url(images/fields/<?= $player_info['player_field'] ?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; background-size: 50px 50px;"></div>
+                        <? /* <div style="left: <?= $temp_offset ?>; bottom: <?= $temp_offset ?>; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/mug_right_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_mug player_status_active player_position_active"><?= $player_info['player_name']?></div> */ ?>
+                    </div>
+                </div>
+
+                <div class="this_sprite sprite_left event_player_images" style="">
+                    <? if($global_allow_editing && !empty($player_alt_options)): ?>
+                        <a class="player_image_alts" data-player="<?= $player_token ?>" data-player="<?= $player_token ?>" data-alt-index="base<?= !empty($player_alt_options) ? ','.implode(',', $player_alt_options) : '' ?>" data-alt-current="<?= $player_image_unlock_current ?>" data-tooltip="<?= $temp_image_alt_title ?>">
+                            <? $temp_offset = $player_info['player_image_size'] == 80 ? '-20px' : '0'; ?>
+                            <span class="sprite_wrapper" style="">
+                                <?= $player_image_unlock_tokens ?>
+                                <div style="left: <?= $temp_offset ?>; bottom: 14px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/sprite_right_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_base player_status_active player_position_active"><?= $player_info['player_name']?></div>
+                            </span>
+                        </a>
+                    <? else: ?>
+                        <span class="player_image_alts" data-player="<?= $player_token ?>" data-player="<?= $player_token ?>" data-alt-index="base<?= !empty($player_alt_options) ? ','.implode(',', $player_alt_options) : '' ?>" data-alt-current="<?= $player_image_unlock_current ?>" data-tooltip="<?= $temp_image_alt_title ?>">
+                            <? $temp_offset = $player_info['player_image_size'] == 80 ? '-20px' : '0'; ?>
+                            <span class="sprite_wrapper" style="">
+                                <?= $player_image_unlock_tokens ?>
+                                <div style="left: <?= $temp_offset ?>; bottom: 14px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/sprite_right_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_base player_status_active player_position_active"><?= $player_info['player_name']?></div>
+                            </span>
+                        </span>
+                    <? endif; ?>
                 </div>
 
                 <div class="header header_left player_type player_type_<?= !empty($player_info['player_stat_type']) ? $player_info['player_stat_type'] : 'none' ?>" style="margin-right: 0;">

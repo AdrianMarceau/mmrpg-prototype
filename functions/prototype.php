@@ -1107,18 +1107,86 @@ function mmrpg_prototype_altimage_unlocked($robot_token, $alt_token = ''){
     // If robot token not provided return false
     if (empty($robot_token)){ return false; }
 
+    // Pre-collect the robot alts array before we manually add to it
+    if (!isset($_SESSION[$session_token]['values']['robot_alts'][$robot_token])){ $_SESSION[$session_token]['values']['robot_alts'][$robot_token] = array(); }
+    $unlocked_alts_array = $_SESSION[$session_token]['values']['robot_alts'][$robot_token];
+    //error_log('$unlocked_alts_array (robots) = '.print_r($unlocked_alts_array, true));
+
     // If a specific robot token was provided
     if (!empty($robot_token) && !empty($alt_token)){
 
         // Check if this alt has been unlocked by the specified robot and return true if it was
-        if (!isset($_SESSION[$session_token]['values']['robot_alts'][$robot_token])){ return false; }
-        return in_array($alt_token, $_SESSION[$session_token]['values']['robot_alts'][$robot_token]) ? true : false;
+        if (empty($unlocked_alts_array)){ return false; }
+        return in_array($alt_token, $unlocked_alts_array) ? true : false;
 
     } elseif (!empty($robot_token)){
 
         // Return all the alt tokens unlocked by this robot
-        if (!isset($_SESSION[$session_token]['values']['robot_alts'][$robot_token])){ return array(); }
-        return $_SESSION[$session_token]['values']['robot_alts'][$robot_token];
+        if (empty($unlocked_alts_array)){ return array(); }
+        return $unlocked_alts_array;
+
+    } else {
+
+        // Definitely not unlocked
+        return false;
+    }
+
+}
+
+// Define a function for checking if a prototype alt image has been unlocked
+function mmrpg_prototype_player_altimage_unlocked($player_token, $alt_token = ''){
+
+    // Define the game session helper var
+    $session_token = mmrpg_game_token();
+
+    // If player token not provided return false
+    if (empty($player_token)){ return false; }
+
+    // Pre-collect the player alts array before we manually add to it
+    if (!isset($_SESSION[$session_token]['values']['player_alts'][$player_token])){ $_SESSION[$session_token]['values']['player_alts'][$player_token] = array(); }
+    $unlocked_alts_array = $_SESSION[$session_token]['values']['player_alts'][$player_token];
+    //error_log('$unlocked_alts_array (players) = '.print_r($unlocked_alts_array, true));
+
+    // Pull this player's account created data from their user data
+    $prototype_account_created = time();
+    if (!empty($_SESSION[$session_token]['USER'])
+        && !empty($_SESSION[$session_token]['USER']['userinfo'])
+        && !empty($_SESSION[$session_token]['USER']['userinfo']['user_date_created'])){
+        $prototype_account_created = $_SESSION[$session_token]['USER']['userinfo']['user_date_created'];
+    }
+    //error_log('$prototype_account_created = '.print_r($prototype_account_created, true).' ('.date('F jS, Y', $prototype_account_created).')');
+
+    // Define which alt tokens are tied to specific holidays, and the months associated with them
+    $holiday_alts_index = array();
+    $holiday_alts_index[] = array('token' => 'alt', 'theme' => 'christmas', 'month' => 'december');
+    $holiday_alts_index[] = array('token' => 'alt2', 'theme' => 'halloween', 'month' => 'october');
+
+    // Loop through each holiday alt index and check if the player's account was created before the most recent holiday
+    foreach ($holiday_alts_index as $alt_info) {
+        // Calculate the timestamp for the first day of the alt's month in the current year
+        $first_day_of_alt_month_this_year = strtotime("first day of ".$alt_info['month']." ".date('Y'));
+        // Calculate the timestamp for the first day of the alt's month in the previous year
+        $first_day_of_alt_month_last_year = strtotime("first day of ".$alt_info['month']." last year");
+        // Check if the account was created before this year's holiday or last year's holiday
+        if ($prototype_account_created <= $first_day_of_alt_month_this_year || $prototype_account_created <= $first_day_of_alt_month_last_year) {
+            // Add the alt to the unlocked alts array
+            $unlocked_alts_array[] = $alt_info['token'];
+        }
+    }
+    //error_log('(final) $unlocked_alts_array = '.print_r($unlocked_alts_array, true));
+
+    // If a specific player token was provided
+    if (!empty($player_token) && !empty($alt_token)){
+
+        // Check if this alt has been unlocked by the specified player and return true if it was
+        if (empty($unlocked_alts_array)){ return false; }
+        return in_array($alt_token, $unlocked_alts_array) ? true : false;
+
+    } elseif (!empty($player_token)){
+
+        // Return all the alt tokens unlocked by this player
+        if (empty($unlocked_alts_array)){ return array(); }
+        return $unlocked_alts_array;
 
     } else {
 

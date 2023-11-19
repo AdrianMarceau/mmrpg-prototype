@@ -40,6 +40,19 @@ $(document).ready(function(){
             playSoundEffect.call(this, 'link-click', {volume: 1.0});
             });
 
+        // PLAYER PANEL BUTTONS
+
+        // Add hover and click sounds to the player alt image sprite in the editor panel
+        $('#console .event .event_player_images a.player_image_alts', thisContext).live('mouseenter', function(){
+            if ($(this).is('[data-alt-index="base"]')){ return; }
+            playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
+            });
+        $('#console .event .event_player_images a.player_image_alts', thisContext).live('click', function(){
+            if ($(this).is('[data-alt-index="base"]')){ return; }
+            playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+            setTimeout(function(){ playSoundEffect.call(this, 'link-click-action', {volume: 1.0}); }, 800);
+            });
+
         // CHALLENGE BOARD LINKS
 
         // Add hover and click sounds to the buttons in the main menu
@@ -98,6 +111,9 @@ $(document).ready(function(){
     /*
      * FIELD EVENTS
      */
+
+
+    // PROCESS FIELD CHANGE ACTIONS
 
     // Define events for the toolbar actions (shuffle, randomize, etc.)
     $('.tool[data-tool]', gameConsole).live('click', function(e){
@@ -520,6 +536,9 @@ $(document).ready(function(){
 
         });
 
+
+    // PROCESS CHALLENGE CHANGE ACTIONS
+
     // Create the change event for the mission selectors
     $('.challenge_container select.challenge_name', gameConsole).live('change', function(e){
         // Prevent the default action
@@ -737,6 +756,61 @@ $(document).ready(function(){
         });
 
 
+    // PROCESS ALT CHANGE ACTION
+
+    // Collect the base href from the header
+    var thisBaseHref = $('head base').attr('href');
+
+    // Define a function for hovering over the image alt link
+    $('.player_image_alts', gameConsole).live({
+        mouseenter: function (){
+            //console.log('mousein player image alt');
+            var altSprite = $(this).find('.sprite_player');
+            if (altSprite.is(':animated')){ return false; }
+            var altFrame = $(this).is('a') ? 'taunt' : 'defend';
+            updateSpriteFrame(altSprite, altFrame);
+            return true;
+            },
+        mouseleave: function (){
+            //console.log('mousein player image alt');
+            var altSprite = $(this).find('.sprite_player');
+            if (altSprite.is(':animated')){ return false; }
+            updateSpriteFrame(altSprite, 'base');
+            return true;
+            }
+        });
+
+    // Attach a click event to the sprite image switcher
+    $('a.player_image_alts', gameConsole).live('click', function(e){
+        e.preventDefault();
+        if (thisBody.hasClass('loading')){ return false; }
+        if (!gameSettings.allowEditing){ return false; }
+
+        // Collect references to the editor objects and player/player tokens
+        var thisLink = $(this);
+        var thisSprite = thisLink.find('.sprite_player');
+        var thisPlayerToken = thisLink.attr('data-player');
+        var thisPlayerToken = thisLink.attr('data-player');
+
+        // If we're already animating, return false
+        if (thisSprite.is(':animated')){ return false; }
+
+        // Collect the alternate skin/image index for this player, break it down, and find our positions
+        var playerImageIndex = thisLink.attr('data-alt-index') != undefined ? thisLink.attr('data-alt-index') : 'base';
+        playerImageIndex = playerImageIndex.match(',') ? playerImageIndex.split(',') : [playerImageIndex];
+        var thisCurrentImageToken = thisLink.attr('data-alt-current') != undefined ? thisLink.attr('data-alt-current') : 'base';
+        var thisCurrentImageIndex = playerImageIndex.indexOf(thisCurrentImageToken);
+
+        // Generate the index key and file path for the skin/image we'll be switching to
+        var newImageIndex = thisCurrentImageIndex + 1;
+        if (newImageIndex >= playerImageIndex.length){ newImageIndex = 0; }
+        var newImageToken = playerImageIndex[newImageIndex];
+
+        return updatePlayerImageAlt(thisPlayerToken, thisPlayerToken, newImageToken);
+
+        });
+
+
     /*
      * OTHER STUFF
      */
@@ -762,6 +836,202 @@ $(document).ready(function(){
         }, false, true);
 
 });
+
+
+//Define a function for changing a player's image (to an alt, for example)
+var updatePlayerImageAltTimeout = false;
+function updatePlayerImageAlt(thisPlayerToken, thisPlayerToken, newImageToken){
+    //console.log('updatePlayerImageAlt('+thisPlayerToken+', '+thisPlayerToken+', '+newImageToken+');');
+
+    // Collect references to the editor objects and player/player tokens
+    var thisLink = $('.player_image_alts[data-player='+thisPlayerToken+'][data-player='+thisPlayerToken+']', gameConsole);
+    var thisSprite = thisLink.find('.sprite_player');
+
+    // If we're already animating, return false
+    if (thisSprite.is(':animated')){ return false; }
+
+    // Collect all relevant sprites based on the above info from both the console and canvas areas
+    var thisConsoleSprites = $('.event_visible[data-token='+thisPlayerToken+'] .sprite_player', gameConsole);
+    var thisCanvasSprites = $('#links .sprite_player[data-token='+thisPlayerToken+']', gameCanvas);
+    //console.log('thisCanvasSprites = ', thisCanvasSprites.length, thisCanvasSprites);
+
+    // DEBUG
+    //console.log('player image alt switch!  :D');
+
+    // Collect the size of the clicked player sprite and use it to generate classes
+    var playerSize = thisSprite.hasClass('.sprite_80x80') ? 80 : 40;
+    var playerSizeText = playerSize+'x'+playerSize;
+    var playerSizeClass = '.sprite_'+playerSizeText;
+
+    // Collect the alternate skin/image index for this player, break it down, and find our positions
+    var playerImageIndex = thisLink.attr('data-alt-index') != undefined ? thisLink.attr('data-alt-index') : 'base';
+    playerImageIndex = playerImageIndex.match(',') ? playerImageIndex.split(',') : [playerImageIndex];
+    var thisCurrentImageToken = thisLink.attr('data-alt-current') != undefined ? thisLink.attr('data-alt-current') : 'base';
+    var thisCurrentImageIndex = playerImageIndex.indexOf(thisCurrentImageToken);
+    var thisCurrentFilePath = '/'+thisPlayerToken+(thisCurrentImageToken != 'base' ? '_'+thisCurrentImageToken : '')+'/';
+
+    // Generate the index key and file path for the skin/image we'll be switching to
+    var newImageIndex = playerImageIndex.indexOf(newImageToken);
+    var newFilePath = '/'+thisPlayerToken+(newImageToken != 'base' ? '_'+newImageToken : '')+'/';
+
+    // Collect the background image for this sprite and generate the new path
+    var thisCurrentBackgroundImage = thisSprite.css('background-image');
+    var newBackgroundImage = thisCurrentBackgroundImage.replace(thisCurrentFilePath, newFilePath);
+    // Start preloading the new sprite sheet and mugshot images
+    var preloadImages = {sprite:false,mugshot:false};
+    var newSpritePath = newBackgroundImage.replace(/^url\("?([^\)\(]+)"?\)$/i, '$1');
+    preloadImages.sprite = new Image();
+    preloadImages.sprite.src = newSpritePath;
+    var newMugPath = newSpritePath.replace('sprite_', 'mug_');
+    preloadImages.mugshot = new Image();
+    preloadImages.mugshot.src = newMugPath;
+
+    // Update this player to its victory frame so it's ready for switching
+    updateSpriteFrame(thisSprite, 'victory');
+
+    // We should also update the image in the ready room so it looks nice for the player
+    if (typeof window.parent.mmrpgReadyRoom !== 'undefined'
+        && typeof window.parent.mmrpgReadyRoom.updatePlayer !== 'undefined'){
+        // If the extra data in dataExtra was not empty and is JSON, parse it into playerInfo
+        if (updatePlayerImageAltTimeout !== false){ clearTimeout(updatePlayerImageAltTimeout); }
+        var readyRoom = window.parent.mmrpgReadyRoom;
+        var newPlayerToken = thisPlayerToken;
+        var newPlayerInfo = {frame: 'base2'};
+        readyRoom.updatePlayer(newPlayerToken, newPlayerInfo, 10);
+        updatePlayerImageAltTimeout = setTimeout(function(){
+            clearTimeout(updatePlayerImageAltTimeout);
+            newPlayerInfo = {frame: 'victory', image: thisPlayerToken+(newImageToken !== 'base' ? '_'+newImageToken : '')};
+            readyRoom.updatePlayer(newPlayerToken, newPlayerInfo, 10);
+            updatePlayerImageAltTimeout = setTimeout(function(){
+                clearTimeout(updatePlayerImageAltTimeout);
+                newPlayerInfo = {frame: 'base'};
+                readyRoom.updatePlayer(newPlayerToken, newPlayerInfo, 1);
+                }, 900);
+            }, 900);
+        }
+
+
+    // DEBUG
+    //console.log( {playerSize:playerSize,playerSizeText:playerSizeText,playerSizeClass:playerSizeClass});
+    //console.log( {playerImageIndex:playerImageIndex,thisCurrentImageToken:thisCurrentImageToken,thisCurrentImageIndex:thisCurrentImageIndex,thisCurrentFilePath:thisCurrentFilePath});
+    //console.log( {newImageIndex:newImageIndex,newImageToken:newImageToken,newFilePath:newFilePath});
+    //console.log( {thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});
+
+    // Define a function for when all the background sprites have been updated
+    var afterBackgroundUpdateComplete = function(nextGroup){
+        //console.log('backgrounds have finished switching');
+        if (typeof nextGroup !== 'undefined'){
+
+            // We still have to update the mugshot images and tokens
+            //console.log('nextGroup provided,', nextGroup, ', updating tokens and then mugshot background images');
+            if (newImageIndex != -1){
+                $('.token', thisLink).removeClass('token_active');
+                $('.token', thisLink).eq(newImageIndex).addClass('token_active');
+                }
+            nextGroup.each(function(){ updateBackgroundImageFunction($(this)); });
+
+            } else {
+            //console.log('nextGroup undefined, updating server with new choice');
+
+            // Post this change back to the server
+            var postData = {action:'altimage',player:thisPlayerToken,player:thisPlayerToken,image:newImageToken};
+            $.ajax({
+                type: 'POST',
+                url: 'frames/edit_players.php',
+                data: postData,
+                success: function(data, status){
+
+                    // If the `data` is multi-line, immediately break off anything after the first for later into a `dataExtra` var
+                    //console.log('data =', data);
+                    var newlineIndex = data.indexOf("\n");
+                    var dataExtra = newlineIndex !== -1 ? data.substr(newlineIndex + 1) : false;
+                    data = newlineIndex !== -1 ? data.substr(0, newlineIndex) : data;
+                    //console.log('data (after) =', data);
+                    //console.log('dataExtra =', dataExtra);
+
+                    // DEBUG
+                    //alert(data);
+                    // Break apart the response into parts
+                    var data = data.split('|');
+                    var dataStatus = data[0] != undefined ? data[0] : false;
+                    var dataMessage = data[1] != undefined ? data[1] : false;
+                    var dataContent = data[2] != undefined ? data[2] : false;
+                    // DEBUG
+                    //console.log('dataStatus = '+dataStatus+', dataMessage = '+dataMessage+',\n dataContent = '+dataContent+'; ');
+                    //console.log( data);
+                    //console.log('dataStatus:'+dataStatus);
+                    //console.log('dataMessage:'+dataMessage);
+                    //console.log('dataContent:'+dataContent);
+
+                    // If the alt change was a success, flash the box green
+                    if (dataStatus == 'success'){
+                        //console.log('success! this player alt image has been updated');
+                        //console.log(data);
+                        return true;
+                        }
+
+
+                    // Hide the overlay to allow using the player again
+                    return true;
+
+                    }
+                });
+
+            }
+
+        };
+
+    // Define a function for updating the backgrounds images of all relevant sprites
+    var updateBackgroundTimeout = false;
+    var updateBackgroundImageFunction = function(thisSprite, nextGroup){
+        var thisParent = thisSprite.parent();
+        var thisCurrentBackgroundImage = thisSprite.css('background-image');
+        var newBackgroundImage = thisCurrentBackgroundImage.replace(thisCurrentFilePath, newFilePath);
+        //console.log( {thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});
+
+        // If this sprite's parent element was a wrapper
+        if (thisParent.is('.sprite_wrapper')){
+            //console.log('parent wrapper was a sprite link');
+            thisSprite.css({zIndex:1});
+            var cloneSprite = thisSprite.clone();
+            cloneSprite.css({backgroundImage:newBackgroundImage,opacity:0,zIndex:100});
+            cloneSprite.appendTo(thisParent);
+            cloneSprite.animate({opacity:1},{duration:1000,easing:'swing',queue:false,complete:function(){
+                //console.log('animation complete');
+                thisSprite.remove();
+                updateSpriteFrame(cloneSprite, 'base');
+                }});
+        }
+        // Otherwise, just swap the image
+        else {
+            //console.log('parent wrapper was something else '+thisParent.attr('class'));
+            thisSprite.css({backgroundImage:newBackgroundImage});
+            updateSpriteFrame(thisSprite);
+        }
+
+        clearTimeout(updateBackgroundTimeout);
+        updateBackgroundTimeout = setTimeout(function(){ afterBackgroundUpdateComplete(nextGroup); }, 1100);
+
+
+        };
+
+    thisLink.attr('data-alt-current', newImageToken);
+    thisConsoleSprites.each(function(){ return updateBackgroundImageFunction($(this), thisCanvasSprites); });
+
+    return true;
+
+}
+
+//Define a function for swapping the frame of a sprite
+function updateSpriteFrame(thisSprite, newFrame){
+    //console.log('updateSpriteFrame(thisSprite, '+newFrame+')');
+    thisSprite.attr('class', function(index,classes){
+     //console.log('thisSprite.attr(class, function('+index+','+classes+')');
+     var newClasses = classes.replace(/(^|\s)(sprite_[0-9]+x[0-9]+_)([a-z0-9]+)(\s|$)/i, '$1$2'+newFrame+'$4');
+     //console.log('classes.replace($1$2'+newFrame+'$4) | newClasses =  '+newClasses);
+     return newClasses;
+     });
+}
 
 // Create the windowResize event for this page
 function windowResizeFrame(){

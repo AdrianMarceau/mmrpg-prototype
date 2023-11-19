@@ -323,6 +323,14 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'challenge'){
 }
 
 
+// -- PROCESS ALTIMAGE ACTION -- //
+
+// Check if an action request has been sent with an player type
+if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'altimage'){
+    require('edit_players_action_altimage.php');
+}
+
+
 // -- RECOLLECT SETTINGS DATA -- //
 
 // Define the index of allowable players to appear in the edit
@@ -359,10 +367,27 @@ if (true){
             echo '<div class="wrapper_header" title="'.$player_info['player_name'].'">'.$player_info['player_name'].'</div>';
                 $player_key = $key_counter;
                 $player_info['player_image_size'] = !empty($player_info['player_image_size']) ? $player_info['player_image_size'] * 2 : 80;
+                $player_image = !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'];
                 $player_image_offset = $player_info['player_image_size'] > 80 ? ceil(($player_info['player_image_size'] - 80) * 0.5) : 0;
+                $player_image_size_text = $player_info['player_image_size'].'x'.$player_info['player_image_size'];
                 $player_image_offset_x = -14 - $player_image_offset;
                 $player_image_offset_y = -14 - $player_image_offset;
-                echo '<a data-number="'.$player_info['player_number'].'" data-token="'.$player_info['player_token'].'_'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" style="background-image: url(images/players/'.(!empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token']).'/mug_right_'.$player_info['player_image_size'].'x'.$player_info['player_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: '.$player_image_offset_x.'px '.$player_image_offset_y.'px;" class="sprite sprite_player sprite_player_'.$player_token.' sprite_player_sprite sprite_'.$player_info['player_image_size'].'x'.$player_info['player_image_size'].' sprite_'.$player_info['player_image_size'].'x'.$player_info['player_image_size'].'_mugshot player_status_active player_position_active '.($player_key == $first_player_key ? 'sprite_player_current sprite_player_'.$player_token.'_current ' : '').'">'.$player_info['player_name'].'</a>'."\n";
+                echo '<a data-number="'.$player_info['player_number'].'" '.
+                    'data-token="'.$player_info['player_token'].'" '.
+                    'data-player="'.$player_info['player_token'].'" '.
+                    'data-player="'.$player_info['player_token'].'" '.
+                    'style="'.
+                        'background-image: url(images/players/'.$player_image.'/sprite_right_'.$player_image_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.
+                        'background-position: '.$player_image_offset_x.'px '.$player_image_offset_y.'px; '.
+                        '" '.
+                    'class="'.
+                        'sprite sprite_player sprite_player_sprite '.
+                        'sprite_player_'.$player_token.' sprite_'.$player_image_size_text.' sprite_'.$player_image_size_text.'_mugshot '.
+                        'player_status_active player_position_active '.
+                        ($player_key == $first_player_key ? 'sprite_player_current sprite_player_'.$player_token.'_current ' : '').
+                        '" '.
+                    '>'.$player_info['player_name'].'</a>'.
+                    "\n";
                 $key_counter++;
             //echo '<a class="sort" data-player="'.$player_info['player_token'].'">sort</a>';
             echo '</div>'."\n";

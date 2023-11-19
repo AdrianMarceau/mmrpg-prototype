@@ -161,6 +161,7 @@ body.windowFlag_landscapeMode #prototype {
     height: 50px;
     width: 50px;
     background-color: #000000;
+    background-color: rgba(0, 0, 0, 0.5);;
     border: 2px solid rgb(70, 70, 70);
     border-radius: 0.25em;
     -moz-border-radius: 0.25em;
@@ -383,30 +384,26 @@ body.windowFlag_landscapeMode #prototype {
 }
 
 
-#edit #console .sprite_player {
-    animation: loop steps(2) 3s infinite;
-}
-#edit #console .event[data-token="dr-light"] .sprite_player {
-    animation: loop steps(3) 6s infinite;
-}
-#edit #console .event[data-token="dr-wily"] .sprite_player {
-    animation: loop steps(3) 5s infinite;
-}
-#edit #console .event[data-token="dr-cossack"] .sprite_player {
-    animation: loop steps(3) 4s infinite;
-}
 
-@-moz-keyframes loop {
-  0% { background-position: 0 0; }
-  100% { background-position: -80px 0; }
+/* animate robot sprites appearing in option buttons appropriately */
+
+@keyframes option-player-sprite-bounce {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-1px); }
+    100% { transform: translateY(0px); }
 }
-@-webkit-keyframes loop {
-  0% { background-position: 0 0; }
-  100% { background-position: -80px 0; }
+#edit #console .event_player_images .sprite_player {
+    transform: translateY(0px);
+    animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
 }
-@keyframes loop {
-  0% { background-position: 0 0; }
-  100% { background-position: -80px 0; }
+#edit #console .event[data-token="dr-light"] .event_player_images .sprite_player {
+    animation-duration: 1.0s;
+}
+#edit #console .event[data-token="dr-wily"] .event_player_images .sprite_player {
+    animation-duration: 0.8s;
+}
+#edit #console .event[data-token="dr-cossack"] .event_player_images .sprite_player {
+    animation-duration: 0.6s;
 }
 
 
@@ -649,6 +646,145 @@ body.windowFlag_landscapeMode #edit #console .event a.ability_name {
 }
 #edit #console .header .player_type .text {
 
+}
+
+#edit #console .event .event_player_mugshot,
+#edit #console .event .event_player_images,
+#edit #console .event .event_player_favourite,
+#edit #console .event .event_player_type,
+#edit #console .event .event_player_type2,
+#edit #console .event .event_player_summons {
+
+}
+#edit #console .event .event_player_mugshot {
+    height: 40px;
+}
+#edit #console .event .event_player_type {
+    margin-top: 46px;
+    height: 14px;
+    z-index: 100;
+    overflow: hidden;
+}
+#edit #console .event .event_player_type2 {
+    margin-top: 68px;
+    height: 12px;
+    z-index: 95;
+    overflow: hidden;
+}
+
+#edit #console .event .event_player_images {
+    margin-top: 48px;
+    height: 10px;
+    z-index: 90;
+}
+#edit #console .event .event_player_summons {
+    margin-top: 108px;
+    height: 21px;
+    text-align: center;
+    line-height: 10px;
+    z-index: 80;
+}
+#edit #console .event .event_player_summons .summons_count {
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 12px;
+    color: #DEDEDE;
+}
+#edit #console .event .event_player_summons .summons_label {
+    font-size: 8px;
+    line-height: 8px;
+    color: #CECECE;
+}
+#edit #console .event .event_player_favourite {
+    margin-top: 137px;
+    height: 14px;
+    z-index: 70;
+}
+
+
+#edit #console .event_has_subcore .event_player_images {
+    margin-top: 88px;
+}
+#edit #console .event_has_subcore .event_player_summons {
+    margin-top: 144px;
+}
+#edit #console .event_has_subcore .event_player_favourite {
+    margin-top: 173px;
+}
+
+#edit #console .event .event_player_mugshot .sprite_wrapper,
+#edit #console .event .event_player_images .sprite_wrapper,
+#edit #console .event .event_player_favourite .sprite_wrapper,
+#edit #console .event .event_player_type .sprite_wrapper,
+#edit #console .event .event_player_type2 .sprite_wrapper {
+    margin: 0;
+    width: 40px;
+    height: 40px;
+    position: relative;
+    display: block;
+}
+#edit #console .event .event_player_mugshot .sprite_wrapper .sprite,
+#edit #console .event .event_player_images .sprite_wrapper .sprite {
+    margin: 0;
+    position: absolute;
+}
+
+
+#edit #console .event .event_player_images span.player_image_alts,
+#edit #console .event .event_player_images a.player_image_alts {
+    position: relative;
+    top: -40px;
+}
+#edit #console .event .event_player_images span.player_image_alts {
+    cursor: default;
+    display: block;
+}
+#edit #console .event .event_player_images a.player_image_alts {
+    cursor: pointer;
+    display: block;
+}
+
+#edit #console .event .event_player_images .sprite_wrapper .token {
+    position: absolute;
+    bottom: -12px;
+    left: 2px;
+    color: #606060;
+    font-size: 14px;
+    line-height: 14px;
+    height: 14px;
+    width: 14px;
+}
+#edit #console .event .event_player_images .sprite_wrapper .token_enabled {
+    color: #606060;
+}
+#edit #console .event .event_player_images .sprite_wrapper .token_disabled {
+    color: #202020;
+}
+#edit #console .event .event_player_images .sprite_wrapper .token_active {
+    color: #B0B0B0;
+}
+
+#edit #console .event .event_player_type .player_type,
+#edit #console .event .event_player_type2 .player_type2 {
+    display: block;
+    font-size: 20px;
+    line-height: 20px;
+    margin: -11px auto 0;
+    text-align: center;
+    text-decoration: none;
+    color: #2A2A2A;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    background-position: center top;
+    padding: 0;
+}
+#edit #console .event .event_player_type a.player_type,
+#edit #console .event .event_player_type2 .player_type2 {
+    cursor: pointer;
+}
+#edit #console .event .event_player_type2 .player_type2 .sprite {
+    background-position: center 4px;
+    background-size: 70%;
 }
 
 #edit #console .omega.player_type {
