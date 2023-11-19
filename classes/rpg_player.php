@@ -187,6 +187,24 @@ class rpg_player extends rpg_object {
             }
         }
 
+        // If this is a player-controlled player, load settings from session
+        if ($this->player_side == 'left' && empty($this->flags['apply_session_settings'])){
+
+            // Collect the abilities for this player from the session
+            $temp_player_settings = mmrpg_prototype_player_settings($this->player_token);
+            //error_log('$temp_player_settings('.$this->player_token.'/'.$this->player_token.') = '.print_r($temp_player_settings, true));
+
+            // If there is an alternate image set, apply it
+            if (!empty($temp_player_settings['player_image'])){
+                $this->player_image = $temp_player_settings['player_image'];
+                $this->player_base_image = $this->player_image;
+            }
+
+            // Set the session settings flag to true
+            $this->flags['apply_session_settings'] = true;
+
+        }
+
         // If the user token is empty, collect from data
         if (empty($this->user_token)){
 
