@@ -5,6 +5,7 @@ var thisWindow = false;
 var thisEditor = false;
 var thisEditorData = {playerTotal:0,playerTotal:0};
 var resizePlayerWrapper = function(){};
+var showPlayerInReadyRoom = function(){};
 $(document).ready(function(){
 
     // Update global reference variables
@@ -83,6 +84,21 @@ $(document).ready(function(){
 
     // -- PRIMARY SCRIPT FUNCTIONALITY -- //
 
+    // Define a function for showing/highlighting a player in the above ready room when possible
+    showPlayerInReadyRoom = function(playerToken){
+        //console.log('showPlayerInReadyRoom(playerToken:', playerToken, ')');
+        // We should add the new player to the parent ready room
+        if (typeof window.parent.mmrpgReadyRoom !== 'undefined'
+            && typeof window.parent.mmrpgReadyRoom.updatePlayer !== 'undefined'){
+            // If the extra data in dataExtra was not empty and is JSON, parse it into playerInfo
+            var readyRoom = window.parent.mmrpgReadyRoom;
+            var spriteBounces = readyRoom.config.spriteBounds;
+            readyRoom.updatePlayer('all', {frame: 'base', position: [null, (spriteBounces.maxY - 2)]});
+            readyRoom.updateRobot('all', {frame: 'base', position: [null, '>=20']});
+            readyRoom.updatePlayer(playerToken, {frame: 'victory', direction: 'right', position: [44, (spriteBounces.minY - 2)]});
+            }
+        };
+
     // Create the click event for canvas sprites
     $('.sprite[data-token]', gameCanvas).live('click', function(e){
         e.preventDefault();
@@ -100,17 +116,13 @@ $(document).ready(function(){
             $(dataSelectorCurrent, gameConsole).stop().animate({opacity:0},250,'swing',function(){
                 $(this).removeClass('event_visible').addClass('event_hidden').css({opacity:1});
                 $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
+                showPlayerInReadyRoom(dataPlayer);
                 });
             } else {
                 $(dataSelectorNext, gameConsole).css({opacity:0}).removeClass('event_hidden').addClass('event_visible').animate({opacity:1.0},250,'swing');
+                showPlayerInReadyRoom(dataPlayer);
             }
-
         });
-
-
-    /*
-     * FIELD EVENTS
-     */
 
 
     // PROCESS FIELD CHANGE ACTIONS

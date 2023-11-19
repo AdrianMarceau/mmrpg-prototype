@@ -577,6 +577,15 @@ $(document).ready(function(){
     // Update the player and player count by counting elements
     thisEditorData.playerTotal = $('#canvas .wrapper[data-player]', thisEditor).length;
     thisEditorData.playerTotal = $('#canvas .sprite[data-player]', thisEditor).length;
+    // Find the first player and make sure we automaticallu show them in the ready-room onload
+    if (typeof gameCanvas !== 'undefined'
+        && typeof showPlayerInReadyRoom !== 'undefined'){
+        var $firstPlayer = $('.sprite[data-token]', gameCanvas).first();
+        if ($firstPlayer.length){
+            var firstPlayerToken = $firstPlayer.attr('data-player');
+            showPlayerInReadyRoom(firstPlayerToken);
+            }
+        }
 });
 </script>
 <?
