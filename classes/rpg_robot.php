@@ -4878,9 +4878,79 @@ class rpg_robot extends rpg_object {
                 $temp_image_alt_title = htmlentities($temp_image_alt_title, ENT_QUOTES, 'UTF-8', true);
             }
 
+            // Only show mecha partners if the Mecha Support or Mecha Party have been unlocked
+            $robot_support_info = false;
+            $robot_support_header = '';
+            if (mmrpg_prototype_ability_unlocked(false, false, 'mecha-support')
+                || mmrpg_prototype_ability_unlocked(false, false, 'mecha-assault')
+                || mmrpg_prototype_ability_unlocked(false, false, 'mecha-party')
+                || mmrpg_prototype_ability_unlocked(false, false, 'friend-share')){
+
+                // Collect the mecha support index for reference
+                static $mecha_support_index;
+                if (empty($mecha_support_index)){
+                    $mecha_support_index = mmrpg_prototype_mecha_support_index(true);
+                }
+
+                // Collect info about the robot's assigned support unit if it exists so we can display it in the editor
+                $this_robot_support_info = array();
+                $this_mecha_support_info = !empty($mecha_support_index[$robot_info['robot_token']]) ? $mecha_support_index[$robot_info['robot_token']] : array();
+                if (!empty($this_mecha_support_info['custom'])){
+                    $this_robot_support_token = $this_mecha_support_info['custom']['token'];
+                    $this_robot_support_image = $this_mecha_support_info['custom']['image'];
+                } elseif (!empty($this_mecha_support_info['default'])
+                    && $this_mecha_support_info['default'] !== 'local'){
+                    $this_robot_support_token = $this_mecha_support_info['default'];
+                    $this_robot_support_image = '';
+                } else {
+                    $this_robot_support_token = 'met';
+                    $this_robot_support_image = '';
+                }
+                $this_robot_support_info = !empty($this_robot_support_token) ? array('token' => $this_robot_support_token, 'image' => $this_robot_support_image) : array();
+                //error_log($robot_info['robot_token'].' // $this_robot_support_info = '.print_r($this_robot_support_info, true));
+                //error_log($robot_info['robot_token'].' // $robot_info[\'robot_abilities\'] = '.print_r($robot_info['robot_abilities'], true));
+
+                // Check to see if the support subtitle is currently needed/active based on assigned abilities
+                $mecha_support_active = false;
+                if (!empty($robot_info['robot_abilities'])){
+                    $temp_ability_keys = array_keys($robot_info['robot_abilities']);
+                    if (in_array('mecha-support', $temp_ability_keys)){ $mecha_support_active = true; }
+                    if (in_array('mecha-assault', $temp_ability_keys)){ $mecha_support_active = true; }
+                    if (in_array('mecha-party', $temp_ability_keys)){ $mecha_support_active = true; }
+                    if (in_array('friend-share', $temp_ability_keys)){ $mecha_support_active = true; }
+                }
+
+                // Print out the span with the assigned mecha support for reference
+                if (!empty($this_robot_support_info)){
+                    //error_log($this_robot_support_info['token'].' // $this_robot_support_info = '.print_r($this_robot_support_info, true));
+                    $support_mecha_info = rpg_robot::get_index_info($this_robot_support_info['token']);
+                    $support_sprite_image = !empty($this_robot_support_info['image']) ? $this_robot_support_info['image'] : $this_robot_support_info['token'];
+                    $support_sprite_size = $support_mecha_info['robot_image_size'];
+                    $support_sprite_xsize = $support_sprite_size.'x'.$support_sprite_size;
+                    $support_sprite_url = 'images/robots/'.$support_sprite_image.'/sprite_right_'.$support_sprite_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+                    $support_animation_duration = rpg_robot::get_css_animation_duration($this_robot_support_info);
+                    $robot_support_sprite_markup = '';
+                    $robot_support_sprite_markup .= '<span class="sprite sprite_support sprite_40x40 sprite_40x40_00">';
+                        $robot_support_sprite_markup .= '<span class="sprite sprite_'.$support_sprite_xsize.' sprite_'.$support_sprite_xsize.'_00" style="background-image: url('.$support_sprite_url.'); animation-duration: '.$support_animation_duration.'s;"></span>';
+                    $robot_support_sprite_markup .= '</span>';
+                    ob_start();
+                    ?>
+                    <span class="title subtitle has_sprite robot_type robot_support_subtitle <?= !$mecha_support_active ? 'inactive' : '' ?>">
+                        &amp; <?= $support_mecha_info['robot_name'] ?>
+                        <?= $robot_support_sprite_markup ?>
+                    </span>
+                    <?
+                    $robot_support_header = ob_get_clean();
+                    $robot_support_info = $this_robot_support_info;
+                }
+
+            }
+
+            // Collect this robot's animation duration so it moves appropriately in the UI
+            $temp_robot_animation_duration = rpg_robot::get_css_animation_duration($robot_info);
+
             // Define whether or not this robot has coreswap enabled
             $temp_allow_coreswap = $robot_info['robot_level'] >= 100 ? true : false;
-
             //echo $robot_info['robot_token'].' robot_image_unlock_current = '.$robot_image_unlock_current.' | robot_alt_options = '.implode(',',array_keys($robot_alt_options)).'<br />';
 
             ?>
@@ -4900,7 +4970,7 @@ class rpg_robot extends rpg_object {
                             <? $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
                             <span class="sprite_wrapper" style="">
                                 <?= $robot_image_unlock_tokens ?>
-                                <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active"><?= $robot_info['robot_name']?></div>
+                                <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); animation-duration: <?= $temp_robot_animation_duration ?>s; " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active"><?= $robot_info['robot_name']?></div>
                             </span>
                         </a>
                     <? else: ?>
@@ -4908,7 +4978,7 @@ class rpg_robot extends rpg_object {
                             <? $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
                             <span class="sprite_wrapper" style="">
                                 <?= $robot_image_unlock_tokens ?>
-                                <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active"><?= $robot_info['robot_name']?></div>
+                                <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); animation-duration: <?= $temp_robot_animation_duration ?>s; " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active"><?= $robot_info['robot_name']?></div>
                             </span>
                         </span>
                     <? endif; ?>
@@ -5306,65 +5376,9 @@ class rpg_robot extends rpg_object {
                     <?
 
                     // Only show mecha partners if the Mecha Support or Mecha Party have been unlocked
-                    if (mmrpg_prototype_ability_unlocked(false, false, 'mecha-support')
-                        || mmrpg_prototype_ability_unlocked(false, false, 'mecha-assault')
-                        || mmrpg_prototype_ability_unlocked(false, false, 'mecha-party')
-                        || mmrpg_prototype_ability_unlocked(false, false, 'friend-share')){
-
-                        // Collect the mecha support index for reference
-                        static $mecha_support_index;
-                        if (empty($mecha_support_index)){
-                            $mecha_support_index = mmrpg_prototype_mecha_support_index(true);
-                        }
-
-                        // Collect info about the robot's assigned support unit if it exists so we can display it in the editor
-                        $this_robot_support_info = array();
-                        $this_mecha_support_info = !empty($mecha_support_index[$robot_info['robot_token']]) ? $mecha_support_index[$robot_info['robot_token']] : array();
-                        if (!empty($this_mecha_support_info['custom'])){
-                            $this_robot_support_token = $this_mecha_support_info['custom']['token'];
-                            $this_robot_support_image = $this_mecha_support_info['custom']['image'];
-                        } elseif (!empty($this_mecha_support_info['default'])
-                            && $this_mecha_support_info['default'] !== 'local'){
-                            $this_robot_support_token = $this_mecha_support_info['default'];
-                            $this_robot_support_image = '';
-                        } else {
-                            $this_robot_support_token = 'met';
-                            $this_robot_support_image = '';
-                        }
-                        $this_robot_support_info = !empty($this_robot_support_token) ? array('token' => $this_robot_support_token, 'image' => $this_robot_support_image) : array();
-                        //error_log($robot_info['robot_token'].' // $this_robot_support_info = '.print_r($this_robot_support_info, true));
-                        //error_log($robot_info['robot_token'].' // $robot_info[\'robot_abilities\'] = '.print_r($robot_info['robot_abilities'], true));
-
-                        // Check to see if the support subtitle is currently needed/active based on assigned abilities
-                        $mecha_support_active = false;
-                        if (!empty($robot_info['robot_abilities'])){
-                            $temp_ability_keys = array_keys($robot_info['robot_abilities']);
-                            if (in_array('mecha-support', $temp_ability_keys)){ $mecha_support_active = true; }
-                            if (in_array('mecha-assault', $temp_ability_keys)){ $mecha_support_active = true; }
-                            if (in_array('mecha-party', $temp_ability_keys)){ $mecha_support_active = true; }
-                            if (in_array('friend-share', $temp_ability_keys)){ $mecha_support_active = true; }
-                        }
-
-                        // Print out the span with the assigned mecha support for reference
-                        if (!empty($this_robot_support_info)){
-                            //error_log($this_robot_support_info['token'].' // $this_robot_support_info = '.print_r($this_robot_support_info, true));
-                            $support_mecha_info = rpg_robot::get_index_info($this_robot_support_info['token']);
-                            $support_sprite_image = !empty($this_robot_support_info['image']) ? $this_robot_support_info['image'] : $this_robot_support_info['token'];
-                            $support_sprite_size = $support_mecha_info['robot_image_size'];
-                            $support_sprite_xsize = $support_sprite_size.'x'.$support_sprite_size;
-                            $support_sprite_url = 'images/robots/'.$support_sprite_image.'/sprite_right_'.$support_sprite_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE;
-                            $robot_support_sprite_markup = '';
-                            $robot_support_sprite_markup .= '<span class="sprite sprite_support sprite_40x40 sprite_40x40_00">';
-                                $robot_support_sprite_markup .= '<span class="sprite sprite_'.$support_sprite_xsize.' sprite_'.$support_sprite_xsize.'_00" style="background-image: url('.$support_sprite_url.');"></span>';
-                            $robot_support_sprite_markup .= '</span>';
-                            ?>
-                            <span class="title subtitle has_sprite robot_type robot_support_subtitle <?= !$mecha_support_active ? 'inactive' : '' ?>">
-                                &amp; <?= $support_mecha_info['robot_name'] ?>
-                                <?= $robot_support_sprite_markup ?>
-                            </span>
-                            <?
-                        }
-
+                    // If a robot support header was generated, we should show it now
+                    if (!empty($robot_support_header)){
+                        echo($robot_support_header.PHP_EOL);
                     }
 
                     // Only show omega indicators if the the Omega Seed has been unlocked

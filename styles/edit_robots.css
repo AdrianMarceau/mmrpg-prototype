@@ -803,6 +803,19 @@ body[data-mode="viewer"] #edit #console .event a.item_name label .arrow {
     cursor: pointer;
 }
 
+/* animate player sprites appearing in option buttons appropriately */
+
+@keyframes option-robot-sprite-bounce {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-1px); }
+    100% { transform: translateY(0px); }
+}
+#edit #console .event_robot_images .sprite_robot,
+#edit #console .header .sprite.sprite_support .sprite {
+    transform: translateY(0px);
+    animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
+}
+
 
 #edit #console .event .robot_stat {
 
