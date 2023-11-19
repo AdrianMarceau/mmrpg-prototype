@@ -60,7 +60,9 @@ else {
         $doctor_token = 'dr-light';
         $doctor_info = $mmrpg_player_index[$doctor_token];
         $doctor_is_away = isset($endless_attack_savedata[$doctor_token]) ? true : false;
-        $doctor_sprite_path = 'images/players/'.$doctor_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $doctor_settings = mmrpg_prototype_player_settings($doctor_token);
+        $doctor_image = !empty($doctor_settings['player_image']) ? $doctor_settings['player_image'] : $doctor_token;
+        $doctor_sprite_path = 'images/players/'.$doctor_image.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
         $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
         $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
@@ -90,7 +92,9 @@ else {
         $doctor_token = 'dr-wily';
         $doctor_info = $mmrpg_player_index[$doctor_token];
         $doctor_is_away = isset($endless_attack_savedata[$doctor_token]) ? true : false;
-        $doctor_sprite_path = 'images/players/'.$doctor_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $doctor_settings = mmrpg_prototype_player_settings($doctor_token);
+        $doctor_image = !empty($doctor_settings['player_image']) ? $doctor_settings['player_image'] : $doctor_token;
+        $doctor_sprite_path = 'images/players/'.$doctor_image.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
         $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
         $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
@@ -120,7 +124,9 @@ else {
         $doctor_token = 'dr-cossack';
         $doctor_info = $mmrpg_player_index[$doctor_token];
         $doctor_is_away = isset($endless_attack_savedata[$doctor_token]) ? true : false;
-        $doctor_sprite_path = 'images/players/'.$doctor_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $doctor_settings = mmrpg_prototype_player_settings($doctor_token);
+        $doctor_image = !empty($doctor_settings['player_image']) ? $doctor_settings['player_image'] : $doctor_token;
+        $doctor_sprite_path = 'images/players/'.$doctor_image.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
         $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
         $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
