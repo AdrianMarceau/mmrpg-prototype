@@ -1382,10 +1382,6 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     list($temp_field_factors_one, $temp_field_factors_two, $temp_field_factors_three) = $_SESSION['PROTOTYPE_TEMP'][$this_prototype_data['this_player_token'].'_player_battle_factors'];
                 }
 
-                if ($this_prototype_data['robots_unlocked'] < $max_target_count){
-                    $max_target_count = $this_prototype_data['robots_unlocked'];
-                }
-
                 // Loop through and generate mission buttons for at least the first X players in the list
                 for ($i = 0; $i < $max_battle_count; $i++){
 
