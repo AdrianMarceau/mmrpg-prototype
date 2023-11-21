@@ -2223,11 +2223,10 @@ body[data-source="website"] #prototype .menu {
     z-index: 10;
     border-width: 1px;
 }
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"]:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-endless-mission"]:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"]:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"]:before {
-    content: "\0221e";
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"] .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-endless-mission"] .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"] .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"] .after {
     display: block;
     text-align: center;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
@@ -2245,31 +2244,30 @@ body[data-source="website"] #prototype .menu {
     position: relative;
     z-index: 1;
 }
-#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"]:after {
-    content: "\0020e0";
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"] .after > i,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-endless-mission"] .after > i,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"] .after > i,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"] .after > i {
     display: block;
     text-align: center;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
-    background-color: rgb(38, 38, 38);
-    background-color: rgba(0, 0, 0, 0.8);
-    border: 1px solid #090909;
-    margin: 2px 4px 0;
-    border-radius: 4px;
+    font-size: 12px;
+    line-height: 20px;
+    position: relative;
+    top: -1px;
+}
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"] .after {
     font-size: 13px;
     line-height: 15px;
     height: 20px;
-    padding-left: 2px;
-    box-sizing: border-box;
-    color: #dedede;
     position: absolute;
     z-index: 2;
     top: 0;
     width: 22px;
 }
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"]:hover:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-endless-mission"]:hover:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"]:hover:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"]:hover:before {
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"]:hover .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-endless-mission"]:hover .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-endless-mission"]:hover .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="endless-mission-placeholder"]:hover .after {
     color: #ffffff;
 }
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-endless-mission"] .platform,
@@ -2293,11 +2291,10 @@ body[data-source="website"] #prototype .menu {
     z-index: 10;
     border-width: 1px;
 }
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-proxy-battle"]:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-proxy-battle"]:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-proxy-battle"]:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"]:before {
-    content: "\00233e";
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-proxy-battle"] .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-proxy-battle"] .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-proxy-battle"] .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"] .after {
     display: block;
     text-align: center;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
@@ -2311,35 +2308,34 @@ body[data-source="website"] #prototype .menu {
     height: 20px;
     padding-left: 2px;
     box-sizing: border-box;
-    color: #dedede;
+    color: #a2a2a2;
     position: relative;
     z-index: 1;
 }
-#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"]:after {
-    content: "\0020e0";
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-proxy-battle"] .after > i,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-proxy-battle"] .after > i,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-proxy-battle"] .after > i,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"] .after > i {
     display: block;
     text-align: center;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
-    background-color: rgb(38, 38, 38);
-    background-color: rgba(0, 0, 0, 0.8);
-    border: 1px solid #090909;
-    margin: 2px 4px 0;
-    border-radius: 4px;
+    font-size: 12px;
+    line-height: 20px;
+    position: relative;
+    top: -1px;
+}
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"] .after {
     font-size: 13px;
     line-height: 15px;
     height: 20px;
-    padding-left: 2px;
-    box-sizing: border-box;
-    color: #dedede;
     position: absolute;
     z-index: 2;
     top: 0;
     width: 22px;
 }
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-proxy-battle"]:hover:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-proxy-battle"]:hover:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-proxy-battle"]:hover:before,
-#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"]:hover:before {
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-proxy-battle"]:hover .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-wily-proxy-battle"]:hover .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-token="dr-cossack-proxy-battle"]:hover .after,
+#mmrpg #prototype .option_wrapper_missions .option[data-pseudo-token="proxy-battle-placeholder"]:hover .after {
     color: #ffffff;
 }
 #mmrpg #prototype .option_wrapper_missions .option[data-token="dr-light-proxy-battle"] .platform,
@@ -2654,6 +2650,13 @@ body[data-source="website"] #prototype .menu {
     border-radius: 6px;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
+}
+#prototype .option_1x1 div label .multi .special_type > i,
+#prototype .option_1x2 div label .multi .special_type > i,
+#prototype .option_1x3 div label .multi .special_type > i,
+#prototype .option_1x4 div label .multi .special_type > i {
+    position: relative;
+    left: 1px;
 }
 #prototype .option_1x1 div label .maintext,
 #prototype .option_1x2 div label .maintext,

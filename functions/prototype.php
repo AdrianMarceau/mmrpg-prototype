@@ -1825,6 +1825,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 (!empty($this_info['option_click_tooltip']) ? 'data-click-tooltip="'.$this_info['option_click_tooltip'].'" ' : '').
                 'style="'.(!empty($this_info['option_style']) ? $this_info['option_style'] : '').'" '.
                 '>';
+                if (!empty($this_info['battle_button_prepend'])){ $this_markup .= '<span class="before">'.$this_info['battle_button_prepend'].'</span>'; }
                 $this_markup .= '<div class="platform">';
                     $this_markup .= '<div class="chrome">';
                         $this_markup .= '<div class="inset">';
@@ -1832,6 +1833,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         $this_markup .= '</div>';
                     $this_markup .= '</div>';
                 $this_markup .= '</div>';
+                if (!empty($this_info['battle_button_append'])){ $this_markup .= '<span class="after">'.$this_info['battle_button_append'].'</span>'; }
             $this_markup .= '</a>'."\n";
 
         }
@@ -2357,6 +2359,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 (!empty($this_fieldinfo['field_foreground_variant']) ? 'data-foreground-variant="'.$this_fieldinfo['field_foreground_variant'].'" ' : '').
                 'style="'.$this_option_style.(!empty($this_info['option_style']) ? ' '.$this_info['option_style'] : '').'" '.
                 '>';
+                if (!empty($this_battleinfo['battle_button_prepend'])){ $this_markup .= '<span class="before">'.$this_battleinfo['battle_button_prepend'].'</span>'; }
                 $this_markup .= '<div class="platform" style="'.$this_option_platform_style.'">';
                     $this_markup .= '<div class="chrome">';
                         $this_markup .= '<div class="inset">';
@@ -2366,6 +2369,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         $this_markup .= '</div>';
                     $this_markup .= '</div>';
                 $this_markup .= '</div>';
+                if (!empty($this_battleinfo['battle_button_append'])){ $this_markup .= '<span class="after">'.$this_battleinfo['battle_button_append'].'</span>'; }
             $this_markup .= '</a>';
             $this_markup .= "\r\n";
             // Update the main battle option array with recent changes

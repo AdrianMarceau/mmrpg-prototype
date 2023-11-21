@@ -1440,6 +1440,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                     $temp_battle_omega['battle_token'] = $this_prototype_data['this_player_token'].'-proxy-battle';
                     $temp_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
                     $temp_battle_omega['battle_button'] .= ' (?)';
+                    $temp_battle_omega['battle_button_append'] = '<i class="fa fas fa-mask"></i>';
                     $temp_battle_omega['battle_description2'] .= 'Wait a minute… that\'s you!  Who is this imposter and what do they want with our heroes? Let\'s jump in and find out!';
                     $temp_battle_omega['battle_zenny'] = ceil($temp_battle_omega['battle_zenny'] * 0.10);
 
@@ -1609,6 +1610,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_battle_sigma = $temp_endless_saveinfo['battle'];
             $temp_battle_sigma['option_target_href'] = $temp_endless_saveinfo['redirect'];
             rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
+            $temp_battle_sigma['battle_button_append'] = '<i class="fa fas fa-infinity"></i>';
             $this_prototype_data['battle_options'][] = $temp_battle_sigma;
 
 
@@ -1628,6 +1630,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             $temp_placeholder['option_click_tooltip'] = '&laquo; Endless Attack Mode &raquo; ';
             $temp_placeholder['option_click_tooltip'] .= '|| '.$other_player_info['player_name'].' is currently exploring this area! ';
             $temp_placeholder['option_click_tooltip'] .= '|| Bring him home if you want to start a new run with '.$this_player_info['player_name'].'!';
+            $temp_placeholder['battle_button_append'] = '<i class="fa fas fa-ban"></i>';
             $this_prototype_data['battle_options'][] = $temp_placeholder;
             $append_faux_battle_option_to_group($this_group_name);
 
@@ -1638,6 +1641,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             //error_log('We can generate NEW endless savedata for '.$player_token);
             $temp_battle_sigma = rpg_mission_endless::generate_endless_mission($this_prototype_data, 1);
             rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
+            $temp_battle_sigma['battle_button_append'] = '<i class="fa fas fa-infinity"></i>';
             $this_prototype_data['battle_options'][] = $temp_battle_sigma;
 
         }
