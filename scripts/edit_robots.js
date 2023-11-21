@@ -1013,12 +1013,24 @@ $(document).ready(function(){
                         // If the new ability list is completely empty (somehow), add Buster Shot
                         if (!newAbilityList.length){ newAbilityList.push('buster-shot'); }
 
-                        // Loop through all the ability slots and update them with relevant abilities
+                        // Collect references to the parent containers
                         var $parentAbilityContainer = $thisLink.closest('.ability_container');
+                        var $parentRobotContainer = $thisLink.closest('.event[data-player][data-robot][data-token]');
                         var $targetAbilityLinks = $parentAbilityContainer.find('a.ability_name[data-key]');
                         var $refAbilityLinks = $('a.ability_name[data-ability]', thisAbilityCanvas);
                         //console.log('$parentAbilityContainer.length =', $parentAbilityContainer.length);
                         //console.log('$targetAbilityLinks.length =', $targetAbilityLinks.length);
+
+                        // Check to see if this robot has need for the mecha support info span
+                        var mechaSupportActive = false;
+                        if (newAbilityList.indexOf('mecha-support') != -1){ mechaSupportActive = true; }
+                        if (newAbilityList.indexOf('mecha-assault') != -1){ mechaSupportActive = true; }
+                        if (newAbilityList.indexOf('mecha-party') != -1){ mechaSupportActive = true; }
+                        if (newAbilityList.indexOf('friend-share') != -1){ mechaSupportActive = true; }
+                        if (mechaSupportActive){ $parentRobotContainer.find('.robot_support_subtitle').removeClass('inactive'); }
+                        else { $parentRobotContainer.find('.robot_support_subtitle').addClass('inactive'); }
+
+                        // Loop through all the ability slots and update them with relevant abilities
                         $targetAbilityLinks.each(function(index){
 
                             var slotKey = index;
@@ -1812,7 +1824,7 @@ function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
 
     // Collect all relevant sprites based on the above info from both the console and canvas areas
     var thisConsoleSprites = $('.event_visible[data-token='+thisPlayerToken+'_'+thisRobotToken+'] .sprite_robot', gameConsole);
-    var thisCanvasSprites = $('.robot_canvas .sprite_robot[data-token='+thisPlayerToken+'_'+thisRobotToken+']', gameCanvas);
+    var thisCanvasSprites = $('.robot_canvas .sprite_robot[data-token='+thisPlayerToken+'_'+thisRobotToken+'] .sprite', gameCanvas);
 
     // DEBUG
     //console.log('robot image alt switch!  :D');
@@ -1942,36 +1954,36 @@ function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
     // Define a function for updating the backgrounds images of all relevant sprites
     var updateBackgroundTimeout = false;
     var updateBackgroundImageFunction = function(thisSprite, nextGroup){
-     var thisParent = thisSprite.parent();
-     var thisCurrentBackgroundImage = thisSprite.css('background-image');
-     var newBackgroundImage = thisCurrentBackgroundImage.replace(thisCurrentFilePath, newFilePath);
-     //console.log( {thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});
+        var thisParent = thisSprite.parent();
+        var thisCurrentBackgroundImage = thisSprite.css('background-image');
+        var newBackgroundImage = thisCurrentBackgroundImage.replace(thisCurrentFilePath, newFilePath);
+        //console.log( {thisCurrentBackgroundImage:thisCurrentBackgroundImage,newBackgroundImage:newBackgroundImage});
 
-     // If this sprite's parent element was a wrapper
-     if (thisParent.is('.sprite_wrapper')){
-         //console.log('parent wrapper was a sprite link');
-         thisSprite.css({zIndex:1});
-         var cloneSprite = thisSprite.clone();
-         cloneSprite.css({backgroundImage:newBackgroundImage,opacity:0,zIndex:100});
-         cloneSprite.appendTo(thisParent);
-         cloneSprite.animate({opacity:1},{duration:1000,easing:'swing',queue:false,complete:function(){
-             //console.log('animation complete');
-             thisSprite.remove();
-             updateSpriteFrame(cloneSprite, 'base');
-             }});
-         }
-     // Otherwise, just swap the image
-     else {
-         //console.log('parent wrapper was something else '+thisParent.attr('class'));
-         thisSprite.css({backgroundImage:newBackgroundImage});
-         updateSpriteFrame(thisSprite);
-         }
+        // If this sprite's parent element was a wrapper
+        if (thisParent.is('.sprite_wrapper')){
+            //console.log('parent wrapper was a sprite link');
+            thisSprite.css({zIndex:1});
+            var cloneSprite = thisSprite.clone();
+            cloneSprite.css({backgroundImage:newBackgroundImage,opacity:0,zIndex:100});
+            cloneSprite.appendTo(thisParent);
+            cloneSprite.animate({opacity:1},{duration:1000,easing:'swing',queue:false,complete:function(){
+                //console.log('animation complete');
+                thisSprite.remove();
+                updateSpriteFrame(cloneSprite, 'base');
+                }});
+            }
+        // Otherwise, just swap the image
+        else {
+            //console.log('parent wrapper was something else '+thisParent.attr('class'));
+            thisSprite.css({backgroundImage:newBackgroundImage});
+            updateSpriteFrame(thisSprite);
+            }
 
-     clearTimeout(updateBackgroundTimeout);
-     updateBackgroundTimeout = setTimeout(function(){ afterBackgroundUpdateComplete(nextGroup); }, 1100);
+        clearTimeout(updateBackgroundTimeout);
+        updateBackgroundTimeout = setTimeout(function(){ afterBackgroundUpdateComplete(nextGroup); }, 1100);
 
 
-     };
+        };
 
     thisLink.attr('data-alt-current', newImageToken);
     thisConsoleSprites.each(function(){ return updateBackgroundImageFunction($(this), thisCanvasSprites); });
