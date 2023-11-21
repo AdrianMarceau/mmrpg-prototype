@@ -355,9 +355,8 @@ if (true || strstr($page_content_parsed, $find)){
                             <a class="link_button message field_type field_type_<?= $temp_subheader_colour_token ?>" href="community/personal/0/new/<?= $this_playerinfo['user_name_clean'] ?>/">Send Message</a>
                         <? endif; ?>
 
-                        <? if (!empty($this_playerinfo['user_website_address']) && preg_match('/^([^@]+)@([^@]+)$/i', $this_playerinfo['user_website_address'])): ?>
-                            <a class="link_button website field_type field_type_<?= $temp_subheader_colour_token ?>" href="mailto:<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Send Email</a>
-                        <? elseif (!empty($this_playerinfo['user_website_address'])): ?>
+                         <? if (!empty($this_playerinfo['user_website_address'])
+                            && preg_match('/^https?\:\/\//i', $this_playerinfo['user_website_address'])): ?>
                             <a class="link_button field_type field_type_<?= $temp_subheader_colour_token ?>" href="<?= $this_playerinfo['user_website_address'] ?>" target="_blank">Visit Website <i class="fas fa fa-external-link-alt"></i></a>
                         <? endif; ?>
 
