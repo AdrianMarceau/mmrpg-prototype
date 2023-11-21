@@ -1007,6 +1007,11 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
         $shop_token = !empty($print_options['shop_token']) ? $print_options['shop_token'] : 'shop';
         $shop_info = array('shop_token' => $shop_token, 'shop_name' => ucfirst($shop_token));
         $is_shop_item = $shop_token !== 'shop' ? true : false;
+        $get_shop_index_info = function($shop_token){
+            require_once(MMRPG_CONFIG_ROOTDIR.'includes/shops.php');
+            if (!empty($this_shop_index[$shop_token])){ return $this_shop_index[$shop_token]; }
+            else { return array('shop_token' => $shop_token, 'shop_name' => ucfirst($shop_token)); }
+            };
 
         // Define basic details about the intro field background
         $this_field_background = !empty($print_options['field_background']) ? rpg_field::get_index_info($print_options['field_background']) : '';
@@ -1038,15 +1043,38 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
 
         // Append the shop image to the canvas markup if allowed
         if (in_array('shop', $print_options['show_images'])){
-            $offset = $display_image_count > 1 ? 325 : 220;
+            $frame = '00';
+            $offset = $display_image_count > 1 ? 315 : 220;
             $direction = $display_image_count > 1 ? 'left' : 'right';
-            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/shops/'.$shop_token.'/sprite_'.$direction.'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: '.$offset.'px; z-index: 12; filter: brightness(0.95);">'.ucfirst($shop_token).'</div>';
+            //$temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_00" style="background-image: url(images/shops/'.$shop_token.'/sprite_'.$direction.'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: '.$offset.'px; z-index: 12; filter: brightness(0.95);">'.ucfirst($shop_token).'</div>';
+            $shop_info = $get_shop_index_info($shop_token);
+            $shop_info['shop_image'] = $shop_info['shop_token'];
+            $shop_info['shop_image_size'] = 80;
+            $shop_info['shop_image_path'] = 'images/shops/'.(!empty($shop_info['shop_image']) ? $shop_info['shop_image'] : $shop_info['shop_token']).'/';
+            if (!empty($shop_info['shop_source'])){
+                if ($shop_info['shop_source'] === 'players'){
+                    $shop_info['shop_image_path'] = str_replace('images/shops/', 'images/players/', $shop_info['shop_image_path']);
+                    $temp_player_info = rpg_player::get_index_info($shop_info['shop_token']);
+                    $shop_info['shop_image_size'] = $temp_player_info['player_image_size'] * 2;
+                    $frame = 'victory';
+                } elseif ($shop_info['shop_source'] === 'robots'){
+                    $shop_info['shop_image_path'] = str_replace('images/shops/', 'images/robots/', $shop_info['shop_image_path']);
+                    $temp_robot_info = rpg_robot::get_index_info($shop_info['shop_token']);
+                    $shop_info['shop_image_size'] = $temp_robot_info['robot_image_size'] * 2;
+                    $frame = 'victory';
+                }
+            }
+            //error_log('$shop_info = '.print_r($shop_info, true));
+            $shop_image_file_path = $shop_info['shop_image_path'].'sprite_'.$direction.'_'.($shop_info['shop_image_size'].'x'.$shop_info['shop_image_size']).'.png?'.MMRPG_CONFIG_CACHE_DATE;
+            $shop_image_offset = ($shop_info['shop_image_size'] - 80) / 2;
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_'.$frame.'" style="background-image: url('.$shop_image_file_path.'); bottom: 40px; left: '.$offset.'px; z-index: 12; filter: brightness(0.95);">'.ucfirst($shop_token).'</div>';
         }
 
         // Wrap all of this in a sprite wrapper for animation and stuff
         if (true){
 
             // Calculate the offset based on number of images to be displayed
+            $offset = 250;
             if ($player_token != 'player'){
                 if ($display_image_count == 0){ $offset = 248; }
                 elseif ($display_image_count == 1){ $offset = 200; }
