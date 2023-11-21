@@ -47,11 +47,10 @@ class rpg_target {
         // If the target player is on the bench, alter the ability scale
         $temp_ability_styles_backup = $this_ability->ability_frame_styles;
         if ($target_robot->robot_position == 'bench' && $event_options['this_ability_target'] != $this_robot->robot_id.'_'.$this_robot->robot_token){
-            $temp_scale = 1 - ($target_robot->robot_key * 0.06);
-            $temp_translate = 20 + ($target_robot->robot_key * 20);
-            $temp_translate2 = ceil($temp_translate / 10) * -1;
-            $temp_translate = $temp_translate * ($target_robot->player->player_side == 'left' ? -1 : 1);
-            $this_ability->ability_frame_styles .= 'transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -webkit-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); -moz-transform: scale('.$temp_scale.', '.$temp_scale.') translate('.$temp_translate.'px, '.$temp_translate2.'px); ';
+            $temp_translate_x = 5 + ($target_robot->robot_key * 5);
+            $temp_translate_x = $temp_translate_x * ($target_robot->player->player_side == 'left' ? -1 : 1);
+            $temp_translate_y = ($target_robot->robot_key * 1) * -1;
+            $this_ability->ability_frame_styles .= 'transform: translate('.$temp_translate_x.'px, '.$temp_translate_y.'px); ';
         }
 
         // Create a message to show the initial targeting action
