@@ -81,6 +81,7 @@ class rpg_ability_recovery extends rpg_recovery {
         $event_options = array();
         $event_options['console_container_height'] = 1;
         $event_options['this_ability'] = $this_ability;
+        $event_options['this_ability_trigger'] = 'recovery';
         $event_options['this_ability_results'] = array();
 
         // Apply appropriate camera action flags to the event options

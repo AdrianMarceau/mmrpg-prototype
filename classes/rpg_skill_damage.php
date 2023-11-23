@@ -74,6 +74,7 @@ class rpg_skill_damage extends rpg_damage {
         $event_options = array();
         $event_options['console_container_height'] = 1;
         $event_options['this_other_skill'] = $this_skill;
+        $event_options['this_skill_trigger'] = 'damage';
         $event_options['this_skill_results'] = array();
 
         // Apply appropriate camera action flags to the event options

@@ -68,6 +68,7 @@ class rpg_item_damage extends rpg_damage {
         $event_options = array();
         $event_options['console_container_height'] = 1;
         $event_options['this_other_item'] = $this_item;
+        $event_options['this_item_trigger'] = 'damage';
         $event_options['this_item_results'] = array();
 
         // Apply appropriate camera action flags to the event options
