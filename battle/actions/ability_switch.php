@@ -465,113 +465,6 @@ if (empty($this_robot)){
     die('<pre>$target_robot is empty on line '.__LINE__.'! :'.print_r($target_robot, true).'</pre>');
 }
 
-// If the target's was a switch action, also queue up an ability
-if ($target_action == 'switch'
-    && !$target_robot_has_attacked){
-
-    // Now execute the stored actions
-    $this_battle->actions_execute();
-
-    // Update the active robot reference just in case it has changed
-    foreach ($target_player->player_robots AS $temp_robotinfo){
-        if ($temp_robotinfo['robot_position'] == 'active'){
-            $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
-            $active_target_robot->robot_position = 'active';
-            $active_target_robot->update_session();
-        } else {
-            $temp_robot = rpg_game::get_robot($this_battle, $target_player, $temp_robotinfo);
-            $temp_robot->robot_position = 'bench';
-            $temp_robot->update_session();
-        }
-    }
-
-    // Use the first target robot as active if one could not be found
-    if (empty($active_target_robot)){
-        $active_target_robot = rpg_game::get_robot($this_battle, $target_player, $target_player->player_robots[0]);
-        $active_target_robot->robot_position = 'active';
-        $active_target_robot->update_session();
-    }
-
-    // Collect the ability choice from the robot
-    $temp_token = rpg_robot::robot_choices_abilities(array(
-        'this_battle' => $this_battle,
-        'this_field' => $this_field,
-        'this_player' => $target_player,
-        'this_robot' => $active_target_robot,
-        'target_player' => $this_player,
-        'target_robot' => $this_robot
-        ));
-    $temp_id = array_search($temp_token, $active_target_robot->robot_abilities);
-    $target_action_token = $temp_id.'_'.$temp_token;
-
-    // Pre-collect the target ability's info so can check who which player and robot target it hits
-    $temp_target_ability_info = array('ability_id' => $temp_id, 'ability_token' => $temp_token);
-    $temp_target_ability_object = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $temp_target_ability_info);
-    $temp_target_ability_info = $temp_target_ability_object->export_array();
-    $temp_target_ability_target_player = $this_player;
-    $temp_target_ability_target_robot = $this_robot;
-    if ($temp_target_ability_info['ability_target'] == 'select_target'){
-        // maybe pick a benched teammate sometimes if available
-    } elseif ($temp_target_ability_info['ability_target'] == 'select_this'
-        || $temp_target_ability_info['ability_target'] == 'select_this_ally'
-        || $temp_target_ability_info['ability_target'] == 'select_this_disabled'){
-        // select from robots on the target robot's own team
-        $temp_target_ability_target_player = $target_player;
-        $temp_target_ability_target_robots_active = $target_player->get_value('robots_active');
-        if (count($temp_target_ability_target_robots_active) === 1){
-            $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_ability_target_robots_active[0]);
-        } elseif ($temp_target_ability_info['ability_target'] == 'select_this'){
-            // select any robot on the target robot's team
-            $rand_key = mt_rand(0, count($temp_target_ability_target_robots_active) - 1);
-            $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_ability_target_robots_active[$rand_key]);
-        } elseif ($temp_target_ability_info['ability_target'] == 'select_this_ally'){
-            // select any ally robot on the field (but not this one)
-            foreach ($temp_target_ability_target_robots_active AS $key => $info){
-                if ($info['robot_id'] == $active_target_robot->robot_id){ continue; }
-                $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
-                break;
-            }
-        } elseif ($temp_target_ability_info['ability_target'] == 'select_this_disabled'){
-            // select any disabled robot on the target robot's team
-            foreach ($temp_target_ability_target_robots_active AS $key => $info){
-                if ($info['robot_status'] !== 'disabled'){ continue; }
-                $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
-                break;
-            }
-        }
-    }
-
-    // If this robot was targetting itself
-    if ($this_robot->robot_id == $target_robot->robot_id){
-
-        // And when the switch is done, queue up an ability for this new target robot to use
-        if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
-            $this_battle->actions_append($target_player, $active_target_robot, $temp_target_ability_target_player, $temp_target_ability_target_robot, 'ability', $target_action_token);
-        }
-
-    }
-    // Else if this robot was tartetting a team mate
-    elseif ($temp_ability_info['ability_target'] == 'select_this'
-        || $temp_ability_info['ability_target'] == 'select_this_ally'){
-
-        // And when the switch is done, queue up an ability for this new target robot to use
-        if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
-            $this_battle->actions_append($target_player, $active_target_robot, $temp_target_ability_target_player, $temp_target_ability_target_robot, 'ability', $target_action_token);
-        }
-
-    }
-    // Otherwise if this was a normal switch by the target
-    else {
-
-        // And when the switch is done, queue up an ability for this new target robot to use
-        if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
-            $this_battle->actions_append($target_player, $active_target_robot, $temp_target_ability_target_player, $temp_target_ability_target_robot, 'ability', $target_action_token);
-        }
-
-    }
-
-}
-
 // Now execute the stored actions
 $this_battle->actions_execute();
 
@@ -738,12 +631,49 @@ if ($queue_target_ability_post_switch){
     $temp_id = array_search($temp_token, $active_target_robot->robot_abilities);
     $target_action_token = $temp_id.'_'.$temp_token;
 
+    // Pre-collect the target ability's info so can check who which player and robot target it hits
+    $temp_target_ability_info = array('ability_id' => $temp_id, 'ability_token' => $temp_token);
+    $temp_target_ability_object = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $temp_target_ability_info);
+    $temp_target_ability_info = $temp_target_ability_object->export_array();
+    $temp_target_ability_target_player = $this_player;
+    $temp_target_ability_target_robot = $this_robot;
+    if ($temp_target_ability_info['ability_target'] == 'select_target'){
+        // maybe pick a benched teammate sometimes if available
+    } elseif ($temp_target_ability_info['ability_target'] == 'select_this'
+        || $temp_target_ability_info['ability_target'] == 'select_this_ally'
+        || $temp_target_ability_info['ability_target'] == 'select_this_disabled'){
+        // select from robots on the target robot's own team
+        $temp_target_ability_target_player = $target_player;
+        $temp_target_ability_target_robots_active = $target_player->get_value('robots_active');
+        if (count($temp_target_ability_target_robots_active) === 1){
+            $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_ability_target_robots_active[0]);
+        } elseif ($temp_target_ability_info['ability_target'] == 'select_this'){
+            // select any robot on the target robot's team
+            $rand_key = mt_rand(0, count($temp_target_ability_target_robots_active) - 1);
+            $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_ability_target_robots_active[$rand_key]);
+        } elseif ($temp_target_ability_info['ability_target'] == 'select_this_ally'){
+            // select any ally robot on the field (but not this one)
+            foreach ($temp_target_ability_target_robots_active AS $key => $info){
+                if ($info['robot_id'] == $active_target_robot->robot_id){ continue; }
+                $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
+                break;
+            }
+        } elseif ($temp_target_ability_info['ability_target'] == 'select_this_disabled'){
+            // select any disabled robot on the target robot's team
+            foreach ($temp_target_ability_target_robots_active AS $key => $info){
+                if ($info['robot_status'] !== 'disabled'){ continue; }
+                $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
+                break;
+            }
+        }
+    }
+
     // If this robot was targetting itself
     if ($this_robot->robot_id == $target_robot->robot_id){
 
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
-            $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+            $this_battle->actions_append($target_player, $active_target_robot, $temp_target_ability_target_player, $temp_target_ability_target_robot, 'ability', $target_action_token);
         }
 
     }
@@ -753,7 +683,7 @@ if ($queue_target_ability_post_switch){
 
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
-            $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+            $this_battle->actions_append($target_player, $active_target_robot, $temp_target_ability_target_player, $temp_target_ability_target_robot, 'ability', $target_action_token);
         }
 
     }
@@ -762,7 +692,7 @@ if ($queue_target_ability_post_switch){
 
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
-            $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
+            $this_battle->actions_append($target_player, $active_target_robot, $temp_target_ability_target_player, $temp_target_ability_target_robot, 'ability', $target_action_token);
         }
 
     }
