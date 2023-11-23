@@ -363,30 +363,59 @@ if ($target_action == 'switch'
     $temp_id = array_search($temp_token, $active_target_robot->robot_abilities);
     $target_action_token = $temp_id.'_'.$temp_token;
 
-    // Create the temporary ability object for the target player's robot
-    $temp_ability_info = array();
-    list($temp_ability_info['ability_id'], $temp_ability_info['ability_token']) = explode('_', $target_action_token);
-    $temp_index_info = $mmrpg_index_abilities[$temp_ability_info['ability_token']];
-    $temp_ability_info = array_merge($temp_index_info, $temp_ability_info);
-    $temp_targetability = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $temp_ability_info);
+    // Pre-collect the target ability's info so can check who which player and robot target it hits
+    $temp_target_ability_info = array('ability_id' => $temp_id, 'ability_token' => $temp_token);
+    $temp_target_ability_object = rpg_game::get_ability($this_battle, $target_player, $active_target_robot, $temp_target_ability_info);
+    $temp_target_ability_info = $temp_target_ability_object->export_array();
+    $temp_target_ability_target_player = $this_player;
+    $temp_target_ability_target_robot = $this_robot;
+    if ($temp_target_ability_info['ability_target'] == 'select_target'){
+        // maybe pick a benched teammate sometimes if available
+    } elseif ($temp_target_ability_info['ability_target'] == 'select_this'
+        || $temp_target_ability_info['ability_target'] == 'select_this_ally'
+        || $temp_target_ability_info['ability_target'] == 'select_this_disabled'){
+        // select from robots on the target robot's own team
+        $temp_target_ability_target_player = $target_player;
+        $temp_target_ability_target_robots_active = $target_player->get_value('robots_active');
+        if (count($temp_target_ability_target_robots_active) === 1){
+            $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_ability_target_robots_active[0]);
+        } elseif ($temp_target_ability_info['ability_target'] == 'select_this'){
+            // select any robot on the target robot's team
+            $rand_key = mt_rand(0, count($temp_target_ability_target_robots_active) - 1);
+            $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_ability_target_robots_active[$rand_key]);
+        } elseif ($temp_target_ability_info['ability_target'] == 'select_this_ally'){
+            // select any ally robot on the field (but not this one)
+            foreach ($temp_target_ability_target_robots_active AS $key => $info){
+                if ($info['robot_id'] == $active_target_robot->robot_id){ continue; }
+                $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
+                break;
+            }
+        } elseif ($temp_target_ability_info['ability_target'] == 'select_this_disabled'){
+            // select any disabled robot on the target robot's team
+            foreach ($temp_target_ability_target_robots_active AS $key => $info){
+                if ($info['robot_status'] !== 'disabled'){ continue; }
+                $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
+                break;
+            }
+        }
+    }
 
     // If this robot was targetting itself
     if ($this_robot->robot_id == $target_robot->robot_id){
 
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
-            $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
-            $target_robot_has_attacked = true;
+            $this_battle->actions_append($target_player, $active_target_robot, $temp_target_ability_target_player, $temp_target_ability_target_robot, 'ability', $target_action_token);
         }
 
     }
     // Else if this robot was tartetting a team mate
-    elseif ($temp_ability_info['ability_target'] == 'select_this'){
+    elseif ($temp_ability_info['ability_target'] == 'select_this'
+        || $temp_ability_info['ability_target'] == 'select_this_ally'){
 
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
-            $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
-            $target_robot_has_attacked = true;
+            $this_battle->actions_append($target_player, $active_target_robot, $temp_target_ability_target_player, $temp_target_ability_target_robot, 'ability', $target_action_token);
         }
 
     }
@@ -395,8 +424,7 @@ if ($target_action == 'switch'
 
         // And when the switch is done, queue up an ability for this new target robot to use
         if ($active_target_robot->robot_status != 'disabled' && $active_target_robot->robot_position != 'bench'){
-            $this_battle->actions_append($target_player, $active_target_robot, $this_player, $this_robot, 'ability', $target_action_token);
-            $target_robot_has_attacked = true;
+            $this_battle->actions_append($target_player, $active_target_robot, $temp_target_ability_target_player, $temp_target_ability_target_robot, 'ability', $target_action_token);
         }
 
     }
@@ -407,6 +435,7 @@ if ($target_action == 'switch'
 $this_battle->actions_execute();
 
 // If the target has been disabled but for some reason hasn't switched
+$target_robot_was_disabled = false;
 $active_target_robot = $target_player->get_active_robot();
 if (!empty($active_target_robot)
     && ($active_target_robot->robot_status == 'disabled'
@@ -433,6 +462,7 @@ if (!empty($active_target_robot)
 
     // The target was legit disabled, that means the next robot should NOT be able to attack
     // So let's set the flag to prevent that by saying the target already had their chance
+    $target_robot_was_disabled = true;
     $target_robot_has_attacked = true;
 
 }
