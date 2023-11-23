@@ -2593,7 +2593,11 @@ class rpg_robot extends rpg_object {
             // Pre-collect the bulwark robots from the players to see if the bench is protected
             if (!empty($target_robot) && $target_robot->robot_id !== $this->robot_id){
                 $temp_thisplayer_bulwark_robots = $this->player->get_value('bulwark_robots');
-                if ($this->robot_position === 'bench' && !empty($temp_thisplayer_bulwark_robots)){ return false; }
+                if ($this->robot_position === 'bench' && !empty($temp_thisplayer_bulwark_robots)){
+                    $this_object->ability_results['this_amount'] = 0;
+                    $this_object->ability_results['this_result'] = 'failure';
+                    return false;
+                }
             }
 
             // This was an ability so delegate to the ability class function
@@ -2651,7 +2655,11 @@ class rpg_robot extends rpg_object {
             // Pre-collect the bulwark robots from the players to see if the bench is protected
             if (!empty($target_robot) && $target_robot->robot_id !== $this->robot_id){
                 $temp_thisplayer_bulwark_robots = $this->player->get_value('bulwark_robots');
-                if ($this->robot_position === 'bench' && !empty($temp_thisplayer_bulwark_robots)){ return false; }
+                if ($this->robot_position === 'bench' && !empty($temp_thisplayer_bulwark_robots)){
+                    $this_object->ability_results['this_amount'] = 0;
+                    $this_object->ability_results['this_result'] = 'failure';
+                    return false;
+                }
             }
 
             // This was an ability so delegate to the ability class function
