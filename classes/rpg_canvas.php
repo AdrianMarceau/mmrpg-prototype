@@ -836,6 +836,12 @@ class rpg_canvas {
         $this_data['ability_image_width'] = ceil($this_data['ability_scale'] * $zoom_size * 10);
         $this_data['ability_image_height'] = ceil($this_data['ability_scale'] * $zoom_size);
 
+        // Collect the ability trigger if set and overwrite any relevant data
+        $trigger = isset($options['this_ability_trigger']) ? $options['this_ability_trigger'] : 'unknown';
+        if ($trigger === 'damage' && !empty($this_ability->damage_options['damage_sticky'])){ $this_data['data_sticky'] = true; }
+        elseif ($trigger === 'recovery' && !empty($this_ability->recovery_options['recovery_sticky'])){ $this_data['data_sticky'] = true; }
+        elseif ($trigger === 'target' && !empty($this_ability->target_options['target_sticky'])){ $this_data['data_sticky'] = true; }
+
         // Calculate the canvas offset variables for this ability
         //error_log(PHP_EOL.'ability:'.$this_data['ability_token'].' needs canvas_markup_offset()');
         $canvas_offset_data = $this_ability->battle->canvas_markup_offset($robot_data['robot_key'], $robot_data['robot_position'], $robot_data['robot_size'], $this_ability->player->counters['robots_total']);
@@ -851,24 +857,24 @@ class rpg_canvas {
         if ($robot_data['robot_sprite_size'] != $this_data['ability_sprite_size']){ $temp_size_diff = ceil(($robot_data['robot_sprite_size'] - $this_data['ability_sprite_size']) / 2) ; }
         //$temp_size_diff = floor(($temp_size_diff * 2) + ($temp_size_diff * $robot_data['robot_scale']));
 
-        // If this is a STICKY attachedment, make sure it doesn't move with the robot
-        if ($this_data['data_sticky'] != false){
+        // If this is a STICKY attachment, make sure it doesn't move with the robot
+        if (!empty($this_data['data_sticky'])){
 
             // Calculate the canvas X offsets using the robot's offset as base
             $ability_frame_offset_x = isset($this_data['ability_frame_offset']['x']) ? $this_data['ability_frame_offset']['x'] : 0;
-            if ($ability_frame_offset_x > 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_base_offset_x'] + ($this_data['ability_sprite_size'] * ($ability_frame_offset_x/100))) + $temp_size_diff; }
-            elseif ($ability_frame_offset_x < 0){ $this_data['canvas_offset_x'] = ceil($robot_data['canvas_base_offset_x'] - ($this_data['ability_sprite_size'] * (($ability_frame_offset_x * -1)/100))) + $temp_size_diff; }
-            else { $this_data['canvas_offset_x'] = $robot_data['canvas_base_offset_x'] + $temp_size_diff; }
+            if ($ability_frame_offset_x > 0){ $this_data['canvas_offset_x'] = ceil($canvas_offset_data['canvas_offset_x'] + ($this_data['ability_sprite_size'] * ($ability_frame_offset_x/100))) + $temp_size_diff; }
+            elseif ($ability_frame_offset_x < 0){ $this_data['canvas_offset_x'] = ceil($canvas_offset_data['canvas_offset_x'] - ($this_data['ability_sprite_size'] * (($ability_frame_offset_x * -1)/100))) + $temp_size_diff; }
+            else { $this_data['canvas_offset_x'] = $canvas_offset_data['canvas_offset_x'] + $temp_size_diff; }
             // Calculate the canvas Y offsets using the robot's offset as base
             $ability_frame_offset_y = isset($this_data['ability_frame_offset']['y']) ? $this_data['ability_frame_offset']['y'] : 0;
-            if ($ability_frame_offset_y > 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_base_offset_y'] + ($this_data['ability_sprite_size'] * ($ability_frame_offset_y/100))); }
-            elseif ($ability_frame_offset_y < 0){ $this_data['canvas_offset_y'] = ceil($robot_data['canvas_base_offset_y'] - ($this_data['ability_sprite_size'] * (($ability_frame_offset_y * -1)/100))); }
-            else { $this_data['canvas_offset_y'] = $robot_data['canvas_base_offset_y'];  }
+            if ($ability_frame_offset_y > 0){ $this_data['canvas_offset_y'] = ceil($canvas_offset_data['canvas_offset_y'] + ($this_data['ability_sprite_size'] * ($ability_frame_offset_y/100))); }
+            elseif ($ability_frame_offset_y < 0){ $this_data['canvas_offset_y'] = ceil($canvas_offset_data['canvas_offset_y'] - ($this_data['ability_sprite_size'] * (($ability_frame_offset_y * -1)/100))); }
+            else { $this_data['canvas_offset_y'] = $canvas_offset_data['canvas_offset_y'];  }
             // Calculate the canvas Z offsets using the robot's offset as base
             $ability_frame_offset_z = isset($this_data['ability_frame_offset']['z']) ? $this_data['ability_frame_offset']['z'] : 0;
-            if ($ability_frame_offset_z > 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_base_offset_z'] + $ability_frame_offset_z); }
-            elseif ($ability_frame_offset_z < 0){ $this_data['canvas_offset_z'] = ceil($robot_data['canvas_base_offset_z'] - ($ability_frame_offset_z * -1)); }
-            else { $this_data['canvas_offset_z'] = $robot_data['canvas_base_offset_z'];  }
+            if ($ability_frame_offset_z > 0){ $this_data['canvas_offset_z'] = ceil($canvas_offset_data['canvas_offset_z'] + $ability_frame_offset_z); }
+            elseif ($ability_frame_offset_z < 0){ $this_data['canvas_offset_z'] = ceil($canvas_offset_data['canvas_offset_z'] - ($ability_frame_offset_z * -1)); }
+            else { $this_data['canvas_offset_z'] = $canvas_offset_data['canvas_offset_z'];  }
 
         }
         // Else if this is a normal attachment, it moves with the robot
