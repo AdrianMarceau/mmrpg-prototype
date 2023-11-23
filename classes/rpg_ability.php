@@ -635,6 +635,7 @@ class rpg_ability extends rpg_object {
         // Populate the array with defaults
         $this->target_options['target_kind'] = 'energy';
         $this->target_options['target_frame'] = 'shoot';
+        $this->target_options['target_sticky'] = false;
         $this->target_options['ability_success_frame'] = 1;
         $this->target_options['ability_success_frame_span'] = 1;
         $this->target_options['ability_success_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
@@ -656,8 +657,9 @@ class rpg_ability extends rpg_object {
         // Update internal variables with basic target options, if set
         if (isset($target_options['header'])){ $this->target_options['target_header'] = $target_options['header'];  }
         if (isset($target_options['text'])){ $this->target_options['target_text'] = $target_options['text'];  }
-        if (isset($target_options['frame'])){ $this->target_options['target_frame'] = $target_options['frame'];  }
         if (isset($target_options['kind'])){ $this->target_options['target_kind'] = $target_options['kind'];  }
+        if (isset($target_options['frame'])){ $this->target_options['target_frame'] = $target_options['frame'];  }
+        if (isset($target_options['sticky'])){ $this->target_options['target_sticky'] = $target_options['sticky'];  }
         // Update internal variables with kickback options, if set
         if (isset($target_options['kickback'])){
             $this->target_options['target_kickback']['x'] = $target_options['kickback'][0];
@@ -693,14 +695,15 @@ class rpg_ability extends rpg_object {
         // Populate the array with defaults
         $this->damage_options = array();
         $this->damage_options['damage_header'] = $this->robot->robot_name.'&#39;s '.$this->ability_name;
+        $this->damage_options['damage_kind'] = 'energy';
         $this->damage_options['damage_frame'] = 'damage';
+        $this->damage_options['damage_sticky'] = false;
         $this->damage_options['ability_success_frame'] = 1;
         $this->damage_options['ability_success_frame_span'] = 1;
         $this->damage_options['ability_success_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
         $this->damage_options['ability_failure_frame'] = 1;
         $this->damage_options['ability_failure_frame_span'] = 1;
         $this->damage_options['ability_failure_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
-        $this->damage_options['damage_kind'] = 'energy';
         $this->damage_options['damage_type'] = $this->ability_type;
         $this->damage_options['damage_type2'] = $this->ability_type2;
         $this->damage_options['damage_amount'] = $this->ability_damage;
@@ -735,8 +738,9 @@ class rpg_ability extends rpg_object {
     public function damage_options_update($damage_options = array(), $update_session = false){
         // Update internal variables with basic damage options, if set
         if (isset($damage_options['header'])){ $this->damage_options['damage_header'] = $damage_options['header'];  }
-        if (isset($damage_options['frame'])){ $this->damage_options['damage_frame'] = $damage_options['frame'];  }
         if (isset($damage_options['kind'])){ $this->damage_options['damage_kind'] = $damage_options['kind'];  }
+        if (isset($damage_options['frame'])){ $this->damage_options['damage_frame'] = $damage_options['frame'];  }
+        if (isset($damage_options['sticky'])){ $this->damage_options['damage_sticky'] = $damage_options['sticky'];  }
         if (isset($damage_options['type'])){ $this->damage_options['damage_type'] = $damage_options['type'];  }
         if (isset($damage_options['type2'])){ $this->damage_options['damage_type2'] = $damage_options['type2'];  }
         if (isset($damage_options['amount'])){ $this->damage_options['damage_amount'] = $damage_options['amount'];  }
@@ -792,14 +796,15 @@ class rpg_ability extends rpg_object {
         // Populate the array with defaults
         $this->recovery_options = array();
         $this->recovery_options['recovery_header'] = $this->robot->robot_name.'&#39;s '.$this->ability_name;
+        $this->recovery_options['recovery_kind'] = 'energy';
         $this->recovery_options['recovery_frame'] = 'defend';
+        $this->recovery_options['recovery_sticky'] = false;
         $this->recovery_options['ability_success_frame'] = 1;
         $this->recovery_options['ability_success_frame_span'] = 1;
         $this->recovery_options['ability_success_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
         $this->recovery_options['ability_failure_frame'] = 1;
         $this->recovery_options['ability_failure_frame_span'] = 1;
         $this->recovery_options['ability_failure_frame_offset'] = array('x' => 0, 'y' => 0, 'z' => 1);
-        $this->recovery_options['recovery_kind'] = 'energy';
         $this->recovery_options['recovery_type'] = $this->ability_type;
         $this->recovery_options['recovery_type2'] = $this->ability_type2;
         $this->recovery_options['recovery_amount'] = $this->ability_recovery;
@@ -836,8 +841,9 @@ class rpg_ability extends rpg_object {
     public function recovery_options_update($recovery_options = array(), $update_session = false){
         // Update internal variables with basic recovery options, if set
         if (isset($recovery_options['header'])){ $this->recovery_options['recovery_header'] = $recovery_options['header'];  }
-        if (isset($recovery_options['frame'])){ $this->recovery_options['recovery_frame'] = $recovery_options['frame'];  }
         if (isset($recovery_options['kind'])){ $this->recovery_options['recovery_kind'] = $recovery_options['kind'];  }
+        if (isset($recovery_options['frame'])){ $this->recovery_options['recovery_frame'] = $recovery_options['frame'];  }
+        if (isset($recovery_options['sticky'])){ $this->recovery_options['recovery_sticky'] = $recovery_options['sticky'];  }
         if (isset($recovery_options['type'])){ $this->recovery_options['recovery_type'] = $recovery_options['type'];  }
         if (isset($recovery_options['type2'])){ $this->recovery_options['recovery_type2'] = $recovery_options['type2'];  }
         if (isset($recovery_options['amount'])){ $this->recovery_options['recovery_amount'] = $recovery_options['amount'];  }
