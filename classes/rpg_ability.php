@@ -3859,7 +3859,7 @@ class rpg_ability extends rpg_object {
         elseif (empty($attachment_token) || !is_string($attachment_token)){ $ability_token = 'attachment'; }
 
         // If the attachment key was not provided, just set it to zero
-        if (!is_numeric($attachment_key)){ $attachment_key = 0; }
+        if (empty($attachment_key)){ $attachment_key = 0; }
 
         // Generate and return the attachment token
         $static_attachment_token = 'ability_'.$ability_token.'_'.$attachment_token.'_'.$attachment_key;
