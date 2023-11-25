@@ -550,6 +550,7 @@ class rpg_robot extends rpg_object {
 
     // Define a public function for getting this robot's skill object, if any
     public function get_robot_skill_object($extra_skill_info = array()){
+        //error_log($this->robot_token.'::get_robot_skill_object() w/ $extra_skill_info = '.print_r($extra_skill_info, true));
 
         // Collect and cache an skill index for reference
         static $mmrpg_index_skills;
@@ -565,6 +566,7 @@ class rpg_robot extends rpg_object {
         $skill_id = rpg_game::unique_skill_id($this->robot_id, $skill_index_info['skill_id']);
         $skill_info = array_merge($this->get_skill_info($skill_token), array('skill_id' => $skill_id));
         if (!empty($extra_skill_info)){ $skill_info = array_merge($skill_info, $extra_skill_info); }
+        //error_log($this->robot_token.'::get_robot_skill_object() gets/ $skill_info = '.print_r($skill_info, true));
 
         // Collect this skill's object from the game class
         $this_skill = rpg_game::get_skill($this->battle, $this->player, $this, $skill_info);
@@ -625,7 +627,7 @@ class rpg_robot extends rpg_object {
 
         // Check to make sure this skill has the given function defined, else return now
         if (!isset($this_skill->skill_functions_custom[$function])){ return; }
-        //error_log('triggering '.$this->robot_token.' '.$this->robot_skill.' via '.$function);
+        //error_log('triggering '.$this->robot_token.' '.$this->robot_skill.'/'.$this_skill->skill_token.'/'.$this_skill->skill_name.' via '.$function);
 
         // Merge in any additional object refs into the array
         if (!is_array($extra_objects)){ $extra_objects = array(); }
@@ -823,6 +825,9 @@ class rpg_robot extends rpg_object {
     public function set_immunities($value){ $this->set_info('robot_immunities', $value); }
     public function get_base_immunities(){ return $this->get_info('robot_base_immunities'); }
     public function set_base_immunities($value){ $this->set_info('robot_base_immunities', $value); }
+
+    public function get_game(){ return $this->get_info('robot_game'); }
+    public function set_game($value){ $this->set_info('robot_game', $value); }
 
     public function get_item(){ return $this->get_info('robot_item'); }
     public function set_item($value){ $this->set_info('robot_item', $value); }
