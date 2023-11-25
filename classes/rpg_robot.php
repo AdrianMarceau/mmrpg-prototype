@@ -93,10 +93,12 @@ class rpg_robot extends rpg_object {
             $this_robotinfo_indexed = rpg_robot::get_index_info('robot');
         }
 
-        // Collect current robot data from the session if available
+        // Collect current robot data from the session if available, otherwise it's just index info
         $this_robotinfo_backup = $this_robotinfo;
+        $this_robotinfo = array_replace($this_robotinfo_indexed, $this_robotinfo_backup);
         if (isset($_SESSION['ROBOTS'][$this_robotinfo['robot_id']])){
-            $this_robotinfo = $_SESSION['ROBOTS'][$this_robotinfo['robot_id']];
+            $session_robotinfo = $_SESSION['ROBOTS'][$this_robotinfo['robot_id']];
+            $this_robotinfo = array_replace($this_robotinfo, $session_robotinfo);
         }
         // Otherwise, collect robot data from the index
         else {
