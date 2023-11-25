@@ -130,6 +130,8 @@ class rpg_robot extends rpg_object {
         $this->robot_field2 = isset($this_robotinfo['robot_field2']) ? $this_robotinfo['robot_field2'] : 'field';
         $this->robot_support = isset($this_robotinfo['robot_support']) ? $this_robotinfo['robot_support'] : '';
         $this->robot_support_image = isset($this_robotinfo['robot_support_image']) ? $this_robotinfo['robot_support_image'] : '';
+        $this->robot_persona = isset($this_robotinfo['robot_persona']) ? $this_robotinfo['robot_persona'] : '';
+        $this->robot_persona_image = isset($this_robotinfo['robot_persona_image']) ? $this_robotinfo['robot_persona_image'] : '';
         $this->robot_class = isset($this_robotinfo['robot_class']) ? $this_robotinfo['robot_class'] : 'master';
         $this->robot_gender = isset($this_robotinfo['robot_gender']) ? $this_robotinfo['robot_gender'] : 'none';
         $this->robot_image = isset($this_robotinfo['robot_image']) ? $this_robotinfo['robot_image'] : $this->robot_token;
@@ -1048,6 +1050,11 @@ class rpg_robot extends rpg_object {
     public function set_support($value){ $this->set_info('robot_support', $value); }
     public function get_support_image(){ return $this->get_info('robot_support_image'); }
     public function set_support_image($value){ $this->set_info('robot_support_image', $value); }
+
+    public function get_persona(){ return $this->get_info('robot_persona'); }
+    public function set_persona($value){ $this->set_info('robot_persona', $value); }
+    public function get_persona_image(){ return $this->get_info('robot_persona_image'); }
+    public function set_persona_image($value){ $this->set_info('robot_persona_image', $value); }
 
     public function get_string(){ return $this->get_info('robot_string'); }
     public function set_string($value){ $this->set_info('robot_string', $value); }
@@ -3475,6 +3482,8 @@ class rpg_robot extends rpg_object {
             'robot_field2' => $this->robot_field2,
             'robot_support' => $this->robot_support,
             'robot_support_image' => $this->robot_support_image,
+            'robot_persona' => $this->robot_persona,
+            'robot_persona_image' => $this->robot_persona_image,
             'robot_class' => $this->robot_class,
             'robot_gender' => $this->robot_gender,
             'robot_item' => $this->robot_item,
