@@ -365,8 +365,12 @@ ob_start();
 
                 // If the ability is not actually compatible with this robot, disable it
                 //$temp_robot_array = $this_robot->export_array();
+                //error_log('$temp_abilityinfo = '.print_r($temp_abilityinfo, true));
+                //error_log($this_robot->robot_token.' // $this_robot->robot_persona = '.print_r($this_robot->robot_persona, true));
+                //error_log($this_robot->robot_token.' // $ability_token = '.print_r($ability_token, true));
                 $temp_ability_array = $temp_ability->export_array();
                 $temp_button_compatible = rpg_robot::has_ability_compatibility($temp_robotinfo, $temp_abilityinfo, $current_robot_item);
+                if (!empty($this_robot->robot_persona) && $ability_token === 'copy-style'){ $temp_button_compatible = true; }
                 if (!$temp_button_compatible){ $allow_button = false; }
 
                 // If this button is enabled, add it to the global ability options array
