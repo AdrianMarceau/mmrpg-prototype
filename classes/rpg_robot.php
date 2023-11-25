@@ -110,19 +110,11 @@ class rpg_robot extends rpg_object {
                     error_log('$this_robotinfo is not an array! robot token was: '.$token.' (from '.__FILE__.' on line '.__LINE__.')');
                     $this_robotinfo = rpg_robot::get_index_info('robot');
                 }
-                $this_robotinfo = array_replace($this_robotinfo, $this_robotinfo_backup);
             }
+
         }
 
-        // DEBUG
-        /*
-        if (false && $this_robotinfo['robot_token'] == 'mega-man'){
-            die(__LINE__.
-                ':: <pre>$this_robotinfo_backup:'.print_r($this_robotinfo_backup, true).'</pre>'.
-                ':: <pre>$this_robotinfo:'.print_r($this_robotinfo, true).'</pre>');
-        }
-        */
-
+        // -- LOAD ROBOT INFO FROM INDEX OR SESSION -- //
 
         // Define the internal robot values using the provided array
         $this->flags = isset($this_robotinfo['flags']) ? $this_robotinfo['flags'] : array();
@@ -305,7 +297,7 @@ class rpg_robot extends rpg_object {
                 foreach ($temp_robot_abilities AS $token => $info){ $this->robot_abilities[] = $token; }
             }
 
-            // If there is an alternate image set, apply it
+            // If there is an alternate support robot set, apply it
             if (!empty($temp_robot_settings['robot_support'])){
                 $this->robot_support = $temp_robot_settings['robot_support'];
                 $this->robot_support_image = !empty($temp_robot_settings['robot_support_image']) ? $temp_robot_settings['robot_support_image'] : '';
@@ -315,13 +307,13 @@ class rpg_robot extends rpg_object {
             // If there is an alternate image set, apply it
             if (!empty($temp_robot_settings['robot_image'])){
                 $this->robot_image = $temp_robot_settings['robot_image'];
-                $this->robot_base_image = $this->robot_image;
+                $this->robot_base_image = $temp_robot_settings['robot_image'];
             }
 
             // If there is a held item set, apply it
             if (!empty($temp_robot_settings['robot_item'])){
                 $this->robot_item = $temp_robot_settings['robot_item'];
-                $this->robot_base_item = $this->robot_item;
+                $this->robot_base_item = $temp_robot_settings['robot_item'];
             }
 
             // Set the session settings flag to true
