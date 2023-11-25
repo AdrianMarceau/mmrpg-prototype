@@ -1328,7 +1328,9 @@ class rpg_robot extends rpg_object {
     public function get_skill_info($robot_skill = ''){
         if (empty($robot_skill)){ $robot_skill = $this->robot_skill; }
         if (empty($robot_skill)){ return false; }
-        $robot_info = self::get_index_info($this->robot_token);
+        $robot_index_info = self::get_index_info($this->robot_token);
+        $robot_current_info = $this->export_array();
+        $robot_info = array_merge($robot_index_info, $robot_current_info);
         return self::get_robot_skill_info($robot_skill, $robot_info);
     }
 
