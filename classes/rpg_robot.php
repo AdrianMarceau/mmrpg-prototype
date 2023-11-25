@@ -65,11 +65,33 @@ class rpg_robot extends rpg_object {
     public function robot_load($this_robotinfo){
 
         // If the robot info was not an array, return false
-        if (!is_array($this_robotinfo)){ die("robot info must be an array!\n\$this_robotinfo\n".print_r($this_robotinfo, true)); return false; }
+        if (!is_array($this_robotinfo)){
+            $msg = ("robot info must be an array!\n\$this_robotinfo\n".print_r($this_robotinfo, true));
+            error_log($msg);
+            die($msg);
+            return false;
+        }
         // If the robot ID was not provided, return false
-        if (!isset($this_robotinfo['robot_id'])){ die("robot id must be set!\n\$this_robotinfo\n".print_r($this_robotinfo, true)); return false; }
+        if (!isset($this_robotinfo['robot_id'])){
+            $msg = ("robot id must be set!\n\$this_robotinfo\n".print_r($this_robotinfo, true));
+            error_log($msg);
+            die($msg);
+            return false;
+        }
         // If the robot token was not provided, return false
-        if (!isset($this_robotinfo['robot_token'])){ die("robot token must be set!\n\$this_robotinfo\n".print_r($this_robotinfo, true)); return false; }
+        if (!isset($this_robotinfo['robot_token'])){
+            $msg = ("robot token must be set!\n\$this_robotinfo\n".print_r($this_robotinfo, true));
+            error_log($msg);
+            die($msg);
+            return false;
+        }
+
+        // Collect indexed info for this robot if available, else use a template
+        $this_robotinfo_indexed = rpg_robot::get_index_info($this_robotinfo['robot_token']);
+        if (!is_array($this_robotinfo_indexed)){
+            error_log('$this_robotinfo_indexed is not an array! robot token was: '.$this_robotinfo['robot_token'].' (from '.__FILE__.' on line '.__LINE__.')');
+            $this_robotinfo_indexed = rpg_robot::get_index_info('robot');
+        }
 
         // Collect current robot data from the session if available
         $this_robotinfo_backup = $this_robotinfo;
