@@ -4512,13 +4512,28 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
         if (!isset($mmrpg_index_robots[$token])){ continue; }
         //if (in_array($token, $player_robots_locked)){ continue; }
         $info = array();
-        if (isset($temp_player_robots_rewards[$token])){ $info = array_merge($info, $temp_player_robots_rewards[$token]); }
-        if (isset($temp_player_robots_settings[$token])){ $info = array_merge($info, $temp_player_robots_settings[$token]); }
+        $rewards = array();
+        $settings = array();
+        if (isset($temp_player_robots_rewards[$token])){ $rewards = $temp_player_robots_rewards[$token]; }
+        if (isset($temp_player_robots_settings[$token])){ $settings = $temp_player_robots_settings[$token]; }
+        $info = array_merge($info, $rewards);
+        $info = array_merge($info, $settings);
         //error_log('$info['.$token.']: '.print_r($info, true));
         //error_log('$info['.$token.']: '.print_r(json_encode($info), true));
         $index = $mmrpg_index_robots[$token];
         $info = array_merge($index, $info);
         if (mmrpg_prototype_robot_unlocked($player_token, $token)){
+            $has_persona_applied = false;
+            if (!empty($settings['robot_persona'])
+                && !empty($settings['robot_abilities']['copy-style'])){
+                error_log($info['robot_token'].' has a persona: '.$settings['robot_persona']);
+                $persona_token = $settings['robot_persona'];
+                $persona_image_token = !empty($settings['robot_persona_image']) ? $settings['robot_persona_image'] : $settings['robot_persona'];
+                $persona_index_info = $mmrpg_index_robots[$persona_token];
+                rpg_robot::apply_persona_info($info, $persona_index_info, $settings);
+                //error_log('new $info = '.print_r($info, true));
+                $has_persona_applied = true;
+            }
             $temp_size = !empty($info['robot_image_size']) ? $info['robot_image_size'] : 40;
             $temp_size_text = $temp_size.'x'.$temp_size;
             $temp_offset_x += 20;
