@@ -3194,6 +3194,23 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $temp_robot_option_count_shown++;
         $info = array_merge($this_robot_index[$info['robot_token']], $info);
         if (!isset($info['original_player'])){ $info['original_player'] = $this_prototype_data['this_player_token']; }
+        $this_robot_rewards = mmrpg_prototype_robot_rewards($this_prototype_data['this_player_token'], $info['robot_token']);
+        $this_robot_settings = mmrpg_prototype_robot_settings($this_prototype_data['this_player_token'], $info['robot_token']);
+        $this_robot_experience = mmrpg_prototype_robot_experience($this_prototype_data['this_player_token'], $info['robot_token']);
+        $this_robot_level = mmrpg_prototype_robot_level($this_prototype_data['this_player_token'], $info['robot_token']);
+        $this_robot_abilities = mmrpg_prototype_abilities_unlocked($this_prototype_data['this_player_token'], $info['robot_token']);
+        $this_robot_abilities_current = !empty($info['robot_abilities']) ? array_keys($info['robot_abilities']) : array('buster-shot');
+        $has_persona_applied = false;
+        if (!empty($this_robot_settings['robot_persona'])
+            && !empty($this_robot_settings['robot_abilities']['copy-style'])){
+            //error_log($info['robot_token'].' has a persona: '.$this_robot_settings['robot_persona']);
+            $persona_token = $this_robot_settings['robot_persona'];
+            $persona_image_token = !empty($this_robot_settings['robot_persona_image']) ? $this_robot_settings['robot_persona_image'] : $this_robot_settings['robot_persona'];
+            $persona_index_info = $this_robot_index[$persona_token];
+            rpg_robot::apply_persona_info($info, $persona_index_info, $this_robot_settings);
+            //error_log('new $info = '.print_r($info, true));
+            $has_persona_applied = true;
+        }
         $this_option_class = 'option option_this-robot-select option_this-'.$info['original_player'].'-robot-select option_'.($this_prototype_data['robots_unlocked'] === 1 ? '1x4' : ($this_prototype_data['robots_unlocked'] <= 2 ? '1x2' : '1x1')).' option_'.$info['robot_token'].' block_'.($key + 1);
         $this_option_style = '';
         $this_option_token = $info['robot_id'].'_'.$info['robot_token'];
@@ -3205,12 +3222,6 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $temp_right_inc = $temp_size > 40 ? ceil(($temp_size * 0.5) - 60) : 0;
         $temp_right = 15 + $temp_right_inc;
         $this_robot_name = $info['robot_name'];
-        $this_robot_rewards = mmrpg_prototype_robot_rewards($this_prototype_data['this_player_token'], $info['robot_token']);
-        $this_robot_settings = mmrpg_prototype_robot_settings($this_prototype_data['this_player_token'], $info['robot_token']);
-        $this_robot_experience = mmrpg_prototype_robot_experience($this_prototype_data['this_player_token'], $info['robot_token']);
-        $this_robot_level = mmrpg_prototype_robot_level($this_prototype_data['this_player_token'], $info['robot_token']);
-        $this_robot_abilities = mmrpg_prototype_abilities_unlocked($this_prototype_data['this_player_token'], $info['robot_token']);
-        $this_robot_abilities_current = !empty($info['robot_abilities']) ? array_keys($info['robot_abilities']) : array('buster-shot');
         $text_robot_special = $this_robot_level >= 100 || !empty($this_robot_rewards['flags']['reached_max_level']) ? true : false;
         $this_robot_experience = $this_robot_level >= 100 ? '<span style="position: relative; bottom: 0; font-size: 120%;">&#8734;</span>' : $this_robot_experience;
         $this_robot_experience_title = $this_robot_level >= 100 ? '&#8734;' : $this_robot_experience;
@@ -3230,7 +3241,8 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_speed = $this_robot_stats['speed']['current'];
 
         // Update the robot's image if in the settings
-        if (isset($this_robot_settings['robot_image'])){
+        if (!$has_persona_applied
+            && isset($this_robot_settings['robot_image'])){
             $this_option_image = $this_robot_settings['robot_image'];
         }
         // Update the robot's item if in the settings
@@ -3303,7 +3315,8 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
             foreach ($this_robot_abilities_current AS $token){
                 if (empty($token) || !isset($this_ability_index[$token])){ continue; }
                 $temp_info = rpg_ability::parse_index_info($this_ability_index[$token]);
-                $this_option_title .= $temp_info['ability_name'];
+                $temp_name = $temp_info['ability_name'];
+                $this_option_title .= $temp_name;
                 if ($temp_counter % 4 == 0){ $this_option_title .= ' <br />'; }
                 elseif ($temp_counter < count($this_robot_abilities_current)){ $this_option_title .= ' | '; }
                 $temp_counter++;
