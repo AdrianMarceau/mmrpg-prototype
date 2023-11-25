@@ -2998,6 +2998,74 @@ class rpg_robot extends rpg_object {
 
     }
 
+    // Define a function that takes a base robot info array as well as a persona array and then applies it over top of the base
+    public static function apply_persona_info(&$this_robotinfo, $persona_robotinfo, $extra_settings = array()){
+        if (empty($this_robotinfo)){ return false; }
+        if (empty($persona_robotinfo)){ return false; }
+        if (!is_array($extra_settings)){ $extra_settings = array(); }
+        //error_log('applying $persona_robotinfo from '.$persona_robotinfo['robot_token'].' to '.$this_robotinfo['robot_token']);
+
+        // Update the robotinfo with the persona token and image if applicable
+        $this_robotinfo['robot_persona'] = $extra_settings['robot_persona'];
+        $this_robotinfo['robot_persona_image'] = !empty($extra_settings['robot_persona_image']) ? $extra_settings['robot_persona_image'] : '';
+
+        // Define a new name for this persona so it's clear that it's a transformation
+        //$persona_presets = array('mega-man' => 'R', 'bass' => 'F', 'proto-man' => 'B', 'doc-robot' => 'D');
+        //if (isset($persona_presets[$this_robotinfo['robot_token']])){ $cross_letter = $persona_presets[$this_robotinfo['robot_token']]; }
+        //else { $cross_letter = ucfirst(substr($this_robotinfo['robot_token'], 0, 1)); }
+        $cross_letter = ucfirst(substr($this_robotinfo['robot_token'], 0, 1));
+        $persona_name = $persona_robotinfo['robot_name'].' '.$cross_letter.'✗';
+        $this_robotinfo['robot_name'] = $persona_name;
+
+        // List out the fields we want to copy verbaitm
+        $clone_fields = array(
+            'robot_number', 'robot_game', 'robot_gender',
+            'robot_core', 'robot_core2', 'robot_field', 'robot_field2',
+            'robot_image', 'robot_image_size',
+            'robot_description', 'robot_description2', 'robot_quotes',
+            'robot_weaknesses', 'robot_resistances', 'robot_affinities', 'robot_immunities',
+            'robot_skill', 'robot_skill_name', 'robot_skill_description', 'robot_skill_description2', 'robot_skill_parameters',
+            );
+        // Loop through and simply copy over the easy ones to the current robotinfo array
+        foreach ($clone_fields AS $clone_field){
+            if (!empty($persona_robotinfo[$clone_field])){
+                $this_robotinfo[$clone_field] = $persona_robotinfo[$clone_field];
+            }
+        }
+
+        // Now let's overwrite the persona image if a specific one has been supplied
+        if (!empty($extra_settings['robot_persona_image'])){
+            $this_robotinfo['robot_image'] = $extra_settings['robot_persona_image'];
+        }
+
+        // Now let's copy over the stats either directly or relatively depending on class
+        $stats_to_copy = array('energy', 'weapons', 'attack', 'defense', 'speed');
+        if ($this_robotinfo['robot_class'] === $persona_robotinfo['robot_class']){
+            // Copy the stats over 1-to-1 because the persona is of the same class
+            foreach ($stats_to_copy AS $stat_to_copy){
+                if (empty($persona_robotinfo['robot_'.$stat_to_copy])){ continue; }
+                $this_robotinfo['robot_'.$stat_to_copy] = $persona_robotinfo['robot_'.$stat_to_copy];
+            }
+        } else {
+            // The persona is of a different class, so calculate base-stat-total
+            // for current and then use that to pull relative values from the target persona
+            $base_stat_total = 0;
+            foreach ($stats_to_copy AS $stat_to_copy){
+                if (empty($this_robotinfo['robot_'.$stat_to_copy])){ continue; }
+                $base_stat_total += $this_robotinfo['robot_'.$stat_to_copy];
+            }
+            foreach ($stats_to_copy AS $stat_to_copy){
+                if (empty($persona_robotinfo['robot_'.$stat_to_copy])){ continue; }
+                $this_robotinfo['robot_'.$stat_to_copy] = round($base_stat_total * ($persona_robotinfo['robot_'.$stat_to_copy] / 100));
+            }
+        }
+        //error_log('new $this_robotinfo = '.print_r($this_robotinfo, true));
+
+        // Return true on success
+        return true;
+
+    }
+
     // Define a function for generating robot canvas variables
     public function canvas_markup($options, $player_data){
 
