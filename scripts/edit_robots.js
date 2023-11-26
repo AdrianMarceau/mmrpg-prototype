@@ -1812,8 +1812,9 @@ function robotEditorCanvasInit(){
 
 //Define a function for changing a robot's image (to an alt, for example)
 var updateRobotImageAltTimeout = false;
-function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
-    //console.log('updateRobotImageAlt('+thisPlayerToken+', '+thisRobotToken+', '+newImageToken+');');
+function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken, updateSession){
+    //console.log('updateRobotImageAlt(player:'+thisPlayerToken+', robot:'+thisRobotToken+', image:'+newImageToken+', update:'+updateSession+');');
+    if (typeof updateSession !== 'boolean'){ updateSession = true; }
 
     // Collect references to the editor objects and player/robot tokens
     var thisLink = $('.robot_image_alts[data-player='+thisPlayerToken+'][data-robot='+thisRobotToken+']', gameConsole);
@@ -1903,6 +1904,9 @@ function updateRobotImageAlt(thisPlayerToken, thisRobotToken, newImageToken){
 
             } else {
             //console.log('nextGroup undefined, updating server with new choice');
+
+            // If we're not updating the session, we're done
+            if (!updateSession){ return true; }
 
             // Post this change back to the server
             var postData = {action:'altimage',robot:thisRobotToken,player:thisPlayerToken,image:newImageToken};
@@ -2281,7 +2285,7 @@ function transferRobotToPlayer(thisRobotToken, currentPlayerToken, newPlayerToke
 
 }
 
-//Define a function for triggering a reload on robot console markup
+// Define a function for triggering a reload on robot console markup
 function reloadConsoleRobotMarkup(playerToken, robotToken, onComplete){
     //console.log('reloadConsoleRobotMarkup('+playerToken+', '+robotToken+', onComplete)');
 
@@ -2292,9 +2296,20 @@ function reloadConsoleRobotMarkup(playerToken, robotToken, onComplete){
     var thisRobot = $('.sprite[data-robot='+robotToken+'][data-player='+playerToken+']', thisRobotCanvas);
     var thisRobotIndex = thisRobot.index();
 
-    //console.log('.sprite[data-robot='+robotToken+'][data-player='+playerToken+'] = ', thisRobot);
+    var $existingConsoleRobot = $('.event[data-token='+playerToken+'_'+robotToken+']', gameConsole);
+    var newOnComplete = onComplete;
+    if ($existingConsoleRobot.length){
+        $existingConsoleRobot.addClass('event_reloading');
+        var newOnComplete = function(){
+            $existingConsoleRobot.stop().remove();
+            var $newConsoleRobot = $('.event[data-token='+playerToken+'_'+robotToken+']', gameConsole);
+            $newConsoleRobot.removeClass('event_hidden').addClass('event_visible');
+            return onComplete();
+            };
+        }
 
-    return loadConsoleRobotMarkup(thisRobot, thisRobotIndex, onComplete);
+    //console.log('calling loadConsoleRobotMarkup from checkpoint C');
+    return loadConsoleRobotMarkup(thisRobot, thisRobotIndex, newOnComplete);
 
 }
 
