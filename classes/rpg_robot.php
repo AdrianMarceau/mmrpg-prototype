@@ -112,8 +112,11 @@ class rpg_robot extends rpg_object {
             $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this_robotinfo['robot_token']);
             //error_log('$temp_robot_settings('.$this->player_token.'/'.$this->robot_token.') = '.print_r($temp_robot_settings, true));
             // If there is an alternate persona set, apply it
-            if (!empty($temp_robot_settings['robot_persona'])){
+            if (!empty($temp_robot_settings['robot_persona'])
+                && !empty($temp_robot_settings['robot_abilities']['copy-style'])){
                 //error_log($this_robotinfo['robot_token'].' has a persona to apply ('.$temp_robot_settings['robot_persona'].')!');
+                //error_log($this_robotinfo['robot_token'].' $temp_robot_settings = '.print_r($temp_robot_settings, true));
+
                 // Attempt to pull index information about this persona
                 $persona_robotinfo = rpg_robot::get_index_info($temp_robot_settings['robot_persona']);
                 //error_log('$persona_robotinfo = '.print_r($persona_robotinfo, true));
