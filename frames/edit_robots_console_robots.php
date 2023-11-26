@@ -8,6 +8,7 @@ ob_start();
 // Include the necessary database files
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
+$mmrpg_database_robots = rpg_robot::get_index(true, false);
 
 // Predefine the player options markup
 $player_options_markup = '';
@@ -122,7 +123,30 @@ foreach($allowed_edit_data AS $player_token => $player_info){
             !empty($_REQUEST['robot']) && $_REQUEST['robot'] == $robot_info['robot_token']
             ){
 
-            $temp_editor_markup = rpg_robot::print_editor_markup($player_info, $robot_info);
+            // Collect rewards and settings for this robot form the session
+            $temp_robot_rewards = array();
+            $temp_robot_settings = array();
+            if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])){
+                $temp_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token];
+            }
+            if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
+                $temp_robot_settings = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token];
+            }
+
+            // If this has a persona right now, make sure we apply it
+            $has_persona_applied = false;
+            if (!empty($temp_robot_settings['robot_persona'])
+                && !empty($temp_robot_settings['robot_abilities']['copy-style'])){
+                //error_log($robot_info['robot_token'].' has a persona: '.$temp_robot_settings['robot_persona']);
+                $persona_token = $temp_robot_settings['robot_persona'];
+                $persona_image_token = !empty($temp_robot_settings['robot_persona_image']) ? $temp_robot_settings['robot_persona_image'] : $temp_robot_settings['robot_persona'];
+                $persona_index_info = $mmrpg_database_robots[$persona_token];
+                rpg_robot::apply_persona_info($robot_info, $persona_index_info, $temp_robot_settings);
+                //error_log('new $robot_info = '.print_r($robot_info, true));
+                $has_persona_applied = true;
+            }
+
+            $temp_editor_markup = rpg_robot::print_editor_markup($player_info, $robot_info, $has_persona_applied);
             echo $temp_editor_markup;
 
             // Collect the array of unseen menu frame robots if there is one, then clear it
