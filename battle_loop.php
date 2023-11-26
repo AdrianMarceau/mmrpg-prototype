@@ -342,6 +342,11 @@ if ($this_action == 'start'){
     // Ensure the player's robot string was provided
     if (!empty($this_player_robots)){
 
+        // Pre-collect any preload data we have access to
+        $temp_robots_preload = array();
+        if (!empty($_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_token])){ $temp_robots_preload = $_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_token]; }
+        //error_log('$temp_robots_preload = '.print_r($temp_robots_preload, true));
+
         // Precreate the player object using the newly defined details
         $backup_this_playerinfo = $this_playerinfo;
         $backup_this_playerinfo['player_robots'] = array();
@@ -362,9 +367,14 @@ if ($this_action == 'start'){
             else { $temp_this_player_robots_ids[] = $this_data['robot_id']; }
             $this_token = $this_data['robot_id'].'_'.$this_data['robot_token'];
             $this_position = array_search($this_token, $temp_this_player_robots);
+            $this_preload = !empty($temp_robots_preload[$this_token]) ? $temp_robots_preload[$this_token] : array();
             $this_data['robot_key'] = $this_key_counter;
             $this_data['robot_experience'] = mmrpg_prototype_robot_experience($this_playerinfo['player_token'], $this_data['robot_token']);
             $this_data['robot_level'] = mmrpg_prototype_robot_level($this_playerinfo['player_token'], $this_data['robot_token']);
+            if (!empty($this_preload['robot_persona'])){
+                $this_data['robot_persona'] = $this_preload['robot_persona'];
+                $this_data['robot_persona_image'] = !empty($this_preload['robot_persona_image']) ? $this_preload['robot_persona_image'] : $this_preload['robot_persona'];
+            }
             // Only allow this robot if it exists in the robot string
             if ($this_position !== false){
                 // Create the temporary robot object to load data
