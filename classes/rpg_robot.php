@@ -1634,7 +1634,8 @@ class rpg_robot extends rpg_object {
             && $robot_info['robot_class'] == 'mecha'){
             //$debug_fragment .= 'is-mecha '; // DEBUG
             if (in_array($ability_info['ability_token'], array(
-                'mecha-support', 'mecha-assault', 'mecha-party', 'friend-share'
+                'mecha-support', 'mecha-assault', 'mecha-party', 'friend-share',
+                'copy-shot', 'copy-soul', 'copy-style',
                 ))){
                 //$debug_fragment .= 'is-mecha-incompatible '; // DEBUG
                 $temp_compatible = false;

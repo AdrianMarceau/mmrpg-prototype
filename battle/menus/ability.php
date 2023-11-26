@@ -368,8 +368,14 @@ ob_start();
                 //error_log('$temp_abilityinfo = '.print_r($temp_abilityinfo, true));
                 //error_log($this_robot->robot_token.' // $this_robot->robot_persona = '.print_r($this_robot->robot_persona, true));
                 //error_log($this_robot->robot_token.' // $ability_token = '.print_r($ability_token, true));
+                //error_log('$temp_robotinfo = '.print_r($temp_robotinfo, true));
+                $temp_base_abilities = !empty($temp_robotinfo['robot_rewards']['abilities']) ? $temp_robotinfo['robot_rewards']['abilities'] : array();
+                $temp_base_abilities = !empty($temp_base_abilities) ? array_map(function($a){ return $a['token']; }, $temp_base_abilities) : array();
+                //error_log('$temp_robotinfo = '.print_r($temp_robotinfo, true));
                 $temp_ability_array = $temp_ability->export_array();
-                $temp_button_compatible = rpg_robot::has_ability_compatibility($temp_robotinfo, $temp_abilityinfo, $current_robot_item);
+                $temp_ref_robotinfo = !empty($this_robot->robot_persona) ? $mmrpg_robots_index[$this_robot->robot_persona] : $temp_robotinfo;
+                $temp_button_compatible = rpg_robot::has_ability_compatibility($temp_ref_robotinfo, $temp_abilityinfo, $current_robot_item);
+                if (!empty($this_robot->robot_persona) && in_array($ability_token, $temp_base_abilities)){ $temp_button_compatible = true; }
                 if (!empty($this_robot->robot_persona) && $ability_token === 'copy-style'){ $temp_button_compatible = true; }
                 if (!$temp_button_compatible){ $allow_button = false; }
 
