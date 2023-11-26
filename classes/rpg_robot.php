@@ -5166,7 +5166,16 @@ class rpg_robot extends rpg_object {
             //echo $robot_info['robot_token'].' robot_image_unlock_current = '.$robot_image_unlock_current.' | robot_alt_options = '.implode(',',array_keys($robot_alt_options)).'<br />';
 
             ?>
-            <div class="event event_double event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?> <?= false && $robot_info['robot_level'] >= 100 && $robot_info['robot_core'] != 'copy' ? 'event_has_subcore' : '' ?>" data-token="<?= $player_info['player_token'].'_'.$robot_info['robot_token']?>" data-player="<?= $player_info['player_token'] ?>" data-robot="<?= $robot_info['robot_token'] ?>" data-types="<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? '_'.$robot_info['robot_core2'] : '') : 'none' ?>">
+            <div
+                class="event event_double event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?> <?= false && $robot_info['robot_level'] >= 100 && $robot_info['robot_core'] != 'copy' ? 'event_has_subcore' : '' ?>"
+                data-token="<?= $player_info['player_token'].'_'.$robot_info['robot_token']?>"
+                data-player="<?= $player_info['player_token'] ?>"
+                data-robot="<?= $robot_info['robot_token'] ?>"
+                data-name="<?= $robot_info['robot_name'] ?>"
+                data-image="<?= $robot_info['robot_image'] ?>"
+                data-image-size="<?= $robot_info['robot_image_size'] ?>"
+                data-types="<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? '_'.$robot_info['robot_core2'] : '') : 'none' ?>"
+                >
 
                 <div class="this_sprite sprite_left event_robot_mugshot" style="">
                     <? $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
