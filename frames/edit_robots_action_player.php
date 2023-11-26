@@ -2,6 +2,9 @@
 
 // ROBOT ACTION : CHANGE PLAYER
 
+// Include the necessary database files or arrays
+$mmrpg_database_robots = rpg_robot::get_index(true, false);
+
 // Collect the player variables from the request header, if they exist
 $temp_robot = !empty($_REQUEST['robot']) ? $_REQUEST['robot'] : '';
 $temp_current_player = !empty($_REQUEST['player1']) ? $_REQUEST['player1'] : '';
@@ -77,13 +80,30 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_current_
 
     foreach($allowed_edit_data AS $temp_player_token => $temp_player_info){
         if ($temp_player_token == $temp_new_player){
+
             // Collect player rewards and settings then print editor markup
             $player_rewards = mmrpg_prototype_player_rewards($temp_player_token);
             $temp_robot_info = $temp_player_info['player_robots'][$temp_robot];
             $temp_robot_info['robot_settings'] = $temp_robot_settings;
             $temp_robot_info['robot_rewards'] = $temp_robot_rewards;
             $first_robot_token = $temp_robot_info['robot_token'];
-            exit('success|player-swapped|'.rpg_robot::print_editor_markup($temp_player_info, $temp_robot_info));
+
+            // If this has a persona right now, make sure we apply it
+            $has_persona_applied = false;
+            if (!empty($temp_robot_settings['robot_persona'])
+                && !empty($temp_robot_settings['robot_abilities']['copy-style'])){
+                //error_log($temp_robot_info['robot_token'].' has a persona: '.$temp_robot_settings['robot_persona']);
+                $persona_token = $temp_robot_settings['robot_persona'];
+                $persona_image_token = !empty($temp_robot_settings['robot_persona_image']) ? $temp_robot_settings['robot_persona_image'] : $temp_robot_settings['robot_persona'];
+                $persona_index_info = $mmrpg_database_robots[$persona_token];
+                rpg_robot::apply_persona_info($temp_robot_info, $persona_index_info, $temp_robot_settings);
+                //error_log('new $temp_robot_info = '.print_r($temp_robot_info, true));
+                $has_persona_applied = true;
+            }
+
+            // Collect the robot abilities and print the editor markup
+            exit('success|player-swapped|'.rpg_robot::print_editor_markup($temp_player_info, $temp_robot_info, $has_persona_applied));
+
         }
     }
 
