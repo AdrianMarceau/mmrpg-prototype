@@ -467,6 +467,11 @@ body.windowFlag_landscapeMode #prototype {
 #edit #console .event_visible {
 
 }
+#edit #console .event_reloading {
+    filter: brightness(0.6);
+    pointer-events: none;
+    opacity: 0.9;
+}
 #edit #console .event table td.right {
     line-height: 21px;
 }
