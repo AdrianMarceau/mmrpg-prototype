@@ -2956,7 +2956,8 @@ class rpg_robot extends rpg_object {
         //if (isset($persona_presets[$this_robotinfo['robot_token']])){ $cross_letter = $persona_presets[$this_robotinfo['robot_token']]; }
         //else { $cross_letter = ucfirst(substr($this_robotinfo['robot_token'], 0, 1)); }
         $cross_letter = ucfirst(substr($this_robotinfo['robot_token'], 0, 1));
-        $persona_name = $persona_robotinfo['robot_name'].' '.$cross_letter.'✗';
+        //$persona_name = $persona_robotinfo['robot_name'].' '.$cross_letter.'✗';
+        $persona_name = $persona_robotinfo['robot_name'].' '.$cross_letter.'X';
         $this_robotinfo['robot_name'] = $persona_name;
 
         // List out the fields we want to copy verbaitm
