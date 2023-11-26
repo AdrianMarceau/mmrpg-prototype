@@ -1412,12 +1412,15 @@ function mmrpg_prototype_robots_unlocked_index($include_extra = array()){
 
     // Loop through relevant sessions keys and collect plus merge any robot data
     $session_battle_keys = array('battle_settings', 'battle_rewards');
+    $session_battle_values = array();
     foreach ($session_battle_keys AS $session_battle_key){
         if (!empty($_SESSION[$session_token]['values'][$session_battle_key])){
             foreach ($_SESSION[$session_token]['values'][$session_battle_key] AS $player_token => $player_array){
                 if (!empty($player_array['player_robots'])){
                     foreach ($player_array['player_robots'] AS $robot_token => $robot_array){
                         $robot_array['current_player'] = $player_token;
+                        if (!isset($session_battle_values[$robot_token])){ $session_battle_values[$robot_token] = array(); }
+                        $session_battle_values[$robot_token][$session_battle_key] = $robot_array;
                         if (!isset($this_unlocked_robots_index[$robot_token])){ $this_unlocked_robots_index[$robot_token] = $robot_array; }
                         else { $this_unlocked_robots_index[$robot_token] = array_merge($this_unlocked_robots_index[$robot_token], $robot_array); }
                         $robot_info = $mmrpg_robots_index[$robot_token];
@@ -1452,12 +1455,39 @@ function mmrpg_prototype_robots_unlocked_index($include_extra = array()){
                 unset($this_unlocked_robots_index[$robot_token]);
                 continue;
             }
+
+            // Pull the base index info for this robot
             $robot_info = $mmrpg_robots_index[$robot_token];
+            $robot_settings = !empty($session_battle_values[$robot_token]['battle_settings']) ? $session_battle_values[$robot_token]['battle_settings'] : array();
+            $robot_rewards = !empty($session_battle_values[$robot_token]['battle_rewards']) ? $session_battle_values[$robot_token]['battle_rewards'] : array();
+
+            // Pull robot image info if not already applied
+            if (!isset($robot_array['robot_image'])){ $robot_array['robot_image'] = $robot_info['robot_image']; }
+            if (!isset($robot_array['robot_image_size'])){ $robot_array['robot_image_size'] = $robot_info['robot_image_size']; }
+
+            // If the robot is currently using a persona, make sure we apply it
+            //error_log('check '.$robot_token.' for a persona | $robot_settings = '.print_r($robot_settings, true));
+            if (!empty($robot_settings['robot_persona'])
+                && !empty($robot_settings['robot_abilities']['copy-style'])){
+                //error_log($robot_info['robot_token'].' has a persona to apply ('.$robot_settings['robot_persona'].')!');
+                //error_log($robot_info['robot_token'].' $robot_settings = '.print_r($robot_settings, true));
+                // Attempt to pull index information about this persona
+                $persona_robotinfo = rpg_robot::get_index_info($robot_settings['robot_persona']);
+                //error_log('$persona_robotinfo = '.print_r($persona_robotinfo, true));
+                // Assuming we pulled a personal, let's overwrite relevant details about the current robot
+                if (!empty($persona_robotinfo)){
+                    //error_log('applying $persona_robotinfo from '.$persona_robotinfo['robot_token'].' to $robot_info');
+                    rpg_robot::apply_persona_info($robot_info, $persona_robotinfo, $robot_settings);
+                    $robot_array['robot_image'] = $robot_info['robot_image'];
+                    $robot_array['robot_image_size'] = $robot_info['robot_image_size'];
+                }
+            }
+
+            // Format the unlocked robot array a bit more
             if (isset($robot_array['flags'])){ $robot_array['flags'] = array_keys($robot_array['flags']); }
             else { $robot_array['flags'] = array(); }
             if (isset($robot_array['robot_abilities'])){ $robot_array['robot_abilities'] = array_keys($robot_array['robot_abilities']); }
             else { $robot_array['robot_abilities'] = array(); }
-            $robot_array['robot_image_size'] = $robot_info['robot_image_size'];
             $robot_array['robot_energy_base'] = $robot_info['robot_energy'];
             $robot_array['robot_weapons_base'] = $robot_info['robot_weapons'];
             $robot_array['robot_attack_base'] = $robot_info['robot_attack'];
@@ -1474,7 +1504,10 @@ function mmrpg_prototype_robots_unlocked_index($include_extra = array()){
                 $relationships = $preset_character_relationships[$robot_token];
                 $robot_array['robot_relationships'] = $relationships;
             }
+
+            // Add the robot to the unlocked robots index
             $this_unlocked_robots_index[$robot_token] = $robot_array;
+
         }
     }
 
