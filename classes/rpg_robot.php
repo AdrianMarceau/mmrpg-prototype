@@ -110,13 +110,14 @@ class rpg_robot extends rpg_object {
             if (!isset($this_robotinfo['flags'])){ $this_robotinfo['flags'] = array(); }
             $this_robotinfo['flags']['apply_session_persona_settings'] = true;
             $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this_robotinfo['robot_token']);
-            //error_log('$temp_robot_settings('.$this->player_token.'/'.$this->robot_token.') = '.print_r($temp_robot_settings, true));
+            //error_log('$temp_robot_settings('.$this->player_token.'/'.$this_robotinfo['robot_token'].') = '.print_r($temp_robot_settings, true));
             // If there is an alternate persona set, apply it
             if (!empty($temp_robot_settings['robot_persona'])
                 && !empty($temp_robot_settings['robot_abilities']['copy-style'])){
+                if (!empty($this_robotinfo['robot_persona'])){ $temp_robot_settings['robot_persona'] = $this_robotinfo['robot_persona']; }
+                if (!empty($this_robotinfo['robot_persona_image'])){ $temp_robot_settings['robot_persona_image'] = $this_robotinfo['robot_persona_image']; }
                 //error_log($this_robotinfo['robot_token'].' has a persona to apply ('.$temp_robot_settings['robot_persona'].')!');
                 //error_log($this_robotinfo['robot_token'].' $temp_robot_settings = '.print_r($temp_robot_settings, true));
-
                 // Attempt to pull index information about this persona
                 $persona_robotinfo = rpg_robot::get_index_info($temp_robot_settings['robot_persona']);
                 //error_log('$persona_robotinfo = '.print_r($persona_robotinfo, true));
@@ -2979,6 +2980,8 @@ class rpg_robot extends rpg_object {
         // Now let's overwrite the persona image if a specific one has been supplied
         if (!empty($extra_settings['robot_persona_image'])){
             $this_robotinfo['robot_image'] = $extra_settings['robot_persona_image'];
+        } elseif (!empty($persona_robotinfo['robot_image'])){
+            $this_robotinfo['robot_image'] = $persona_robotinfo['robot_image'];
         }
 
         // Now let's copy over the stats either directly or relatively depending on class
