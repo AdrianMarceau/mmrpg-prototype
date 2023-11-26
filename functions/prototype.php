@@ -3234,7 +3234,8 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         //$this_robot_name .= $this_robot_favourite ? ' <span class="icons favs"><i class="fa fas fa-thumbtack"></i></span>' : '';
 
         // Calculate this robot's current and max stat values
-        $this_robot_stats = rpg_robot::calculate_stat_values($this_robot_level, $info, $this_robot_rewards, true, $this_robot_core, $player_starforce);
+        $base_stats_ref = $has_persona_applied ? array_merge($info, array('robot_token' => $this_robot_settings['robot_persona'])) : $info;
+        $this_robot_stats = rpg_robot::calculate_stat_values($this_robot_level, $base_stats_ref, $this_robot_rewards, true, $this_robot_core, $player_starforce);
         $this_robot_energy = $this_robot_stats['energy']['current'];
         $this_robot_attack = $this_robot_stats['attack']['current'];
         $this_robot_defense = $this_robot_stats['defense']['current'];
@@ -4526,7 +4527,7 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
             $has_persona_applied = false;
             if (!empty($settings['robot_persona'])
                 && !empty($settings['robot_abilities']['copy-style'])){
-                error_log($info['robot_token'].' has a persona: '.$settings['robot_persona']);
+                //error_log($info['robot_token'].' has a persona: '.$settings['robot_persona']);
                 $persona_token = $settings['robot_persona'];
                 $persona_image_token = !empty($settings['robot_persona_image']) ? $settings['robot_persona_image'] : $settings['robot_persona'];
                 $persona_index_info = $mmrpg_index_robots[$persona_token];
