@@ -114,8 +114,8 @@ class rpg_robot extends rpg_object {
             // If there is an alternate persona set, apply it
             if (!empty($temp_robot_settings['robot_persona'])
                 && !empty($temp_robot_settings['robot_abilities']['copy-style'])){
-                if (!empty($this_robotinfo['robot_persona'])){ $temp_robot_settings['robot_persona'] = $this_robotinfo['robot_persona']; }
-                if (!empty($this_robotinfo['robot_persona_image'])){ $temp_robot_settings['robot_persona_image'] = $this_robotinfo['robot_persona_image']; }
+                if (isset($this_robotinfo['robot_persona'])){ $temp_robot_settings['robot_persona'] = $this_robotinfo['robot_persona']; }
+                if (isset($this_robotinfo['robot_persona_image'])){ $temp_robot_settings['robot_persona_image'] = $this_robotinfo['robot_persona_image']; }
                 //error_log($this_robotinfo['robot_token'].' has a persona to apply ('.$temp_robot_settings['robot_persona'].')!');
                 //error_log($this_robotinfo['robot_token'].' $temp_robot_settings = '.print_r($temp_robot_settings, true));
                 // Attempt to pull index information about this persona

@@ -253,10 +253,10 @@ foreach ($temp_player_active_robots AS $key => $robot){
         'robot_item' => $robot['robot_item'],
         'robot_attachments' => $new_robot_attachments
         );
-    if (!empty($robot['robot_persona'])){ $robot_preload_array['robot_persona'] = $robot['robot_persona']; }
-    if (!empty($robot['robot_persona_image'])){ $robot_preload_array['robot_persona_image'] = $robot['robot_persona_image']; }
-    if (!empty($robot['robot_support'])){ $robot_preload_array['robot_support'] = $robot['robot_support']; }
-    if (!empty($robot['robot_support_image'])){ $robot_preload_array['robot_support_image'] = $robot['robot_support_image']; }
+    if (isset($robot['robot_persona'])){ $robot_preload_array['robot_persona'] = $robot['robot_persona']; }
+    if (isset($robot['robot_persona_image'])){ $robot_preload_array['robot_persona_image'] = $robot['robot_persona_image']; }
+    if (isset($robot['robot_support'])){ $robot_preload_array['robot_support'] = $robot['robot_support']; }
+    if (isset($robot['robot_support_image'])){ $robot_preload_array['robot_support_image'] = $robot['robot_support_image']; }
     $_SESSION['ROBOTS_PRELOAD'][$battle_complete_redirect_token][$robot_string] = $robot_preload_array;
     //error_log('saving to ROBOTS_PRELOAD: '.$robot_string.' = '.print_r($robot_preload_array, true));
 

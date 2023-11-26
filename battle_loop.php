@@ -371,7 +371,7 @@ if ($this_action == 'start'){
             $this_data['robot_key'] = $this_key_counter;
             $this_data['robot_experience'] = mmrpg_prototype_robot_experience($this_playerinfo['player_token'], $this_data['robot_token']);
             $this_data['robot_level'] = mmrpg_prototype_robot_level($this_playerinfo['player_token'], $this_data['robot_token']);
-            if (!empty($this_preload['robot_persona'])){
+            if (isset($this_preload['robot_persona'])){
                 $this_data['robot_persona'] = $this_preload['robot_persona'];
                 $this_data['robot_persona_image'] = !empty($this_preload['robot_persona_image']) ? $this_preload['robot_persona_image'] : $this_preload['robot_persona'];
             }
