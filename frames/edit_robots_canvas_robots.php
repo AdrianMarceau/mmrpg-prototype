@@ -59,28 +59,59 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                     $robot_key = $key_counter;
                     if (!isset($mmrpg_database_robots[$robot_token])){ continue; }
                     //if (in_array($robot_token, $player_robots_locked)){ continue; }
-                    $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
-                    $temp_robot_rewards = array();
 
+                    // Collect rewards and settings for this robot form the session
+                    $temp_robot_rewards = array();
+                    $temp_robot_settings = array();
                     if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])){
                         $temp_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token];
                     }
+                    if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
+                        $temp_robot_settings = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token];
+                    }
 
+                    // Merge in stray-data from other players if it's there
                     foreach ($player_keys AS $this_player_key){
                         if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$this_player_key]['player_robots'][$robot_token])){
                             $temp_array = $_SESSION[$session_token]['values']['battle_rewards'][$this_player_key]['player_robots'][$robot_token];
                             $temp_robot_rewards = array_merge($temp_robot_rewards, $temp_array);
                         }
+                        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$this_player_key]['player_robots'][$robot_token])){
+                            $temp_array = $_SESSION[$session_token]['values']['battle_settings'][$this_player_key]['player_robots'][$robot_token];
+                            $temp_robot_settings = array_merge($temp_robot_settings, $temp_array);
+                        }
                     }
 
+                    // Update the session values with the merged data if allowed
                     if (!empty($temp_robot_rewards) && $global_allow_editing){
                         $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token] = $temp_robot_rewards;
+                    }
+                    if (!empty($temp_robot_settings) && $global_allow_editing){
+                        $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token] = $temp_robot_settings;
+                    }
+
+                    //error_log('$temp_robot_rewards = '.print_r($temp_robot_rewards, true));
+                    //error_log('$temp_robot_settings = '.print_r($temp_robot_settings, true));
+
+                    // If this has a persona right now, make sure we apply it
+                    $has_persona_applied = false;
+                    if (!empty($temp_robot_settings['robot_persona'])
+                        && !empty($temp_robot_settings['robot_abilities']['copy-style'])){
+                        //error_log($robot_info['robot_token'].' has a persona: '.$temp_robot_settings['robot_persona']);
+                        $persona_token = $temp_robot_settings['robot_persona'];
+                        $persona_image_token = !empty($temp_robot_settings['robot_persona_image']) ? $temp_robot_settings['robot_persona_image'] : $temp_robot_settings['robot_persona'];
+                        $persona_index_info = $mmrpg_database_robots[$persona_token];
+                        rpg_robot::apply_persona_info($robot_info, $persona_index_info, $temp_robot_settings);
+                        //error_log('new $robot_info = '.print_r($robot_info, true));
+                        $has_persona_applied = true;
                     }
 
                     //$temp_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token];
                     $robot_info['robot_level'] = !empty($temp_robot_rewards['robot_level']) ? $temp_robot_rewards['robot_level'] : 1;
                     $robot_info['robot_experience'] = !empty($temp_robot_rewards['robot_experience']) ? $temp_robot_rewards['robot_experience'] : 0;
                     if ($robot_info['robot_level'] >= 100){ $robot_info['robot_experience'] = '&#8734;'; }
+
+                    $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
                     $robot_image_offset = $robot_info['robot_image_size'] > 40 ? ceil(($robot_info['robot_image_size'] - 40) * 0.5) : 0;
                     $robot_image_offset_x = -5 - $robot_image_offset;
                     $robot_image_offset_y = -10 - $robot_image_offset;
