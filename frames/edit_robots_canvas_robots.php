@@ -42,6 +42,21 @@ foreach($allowed_edit_data AS $player_token => $player_info){
         $player_robots_locked = array_merge($player_robots_locked, $player_robots_endless);
         $player_robots_locked = array_unique($player_robots_locked);
     }
+    //error_log('$player_robots_endless = '.print_r($player_robots_endless, true));
+
+    // Collect any robot preload data from the session and make sure we re-index by token only
+    $player_robots_preload = array();
+    $player_robots_preload_by_token = array();
+    if (!empty($_SESSION['ROBOTS_PRELOAD'][$player_token.'-endless-mission'])){
+        $player_robots_preload = $_SESSION['ROBOTS_PRELOAD'][$player_token.'-endless-mission'];
+        foreach ($player_robots_preload AS $robot_string => $robot_data){
+            $robot_token = explode('_', $robot_string);
+            $robot_token = $robot_token[1];
+            $player_robots_preload_by_token[$robot_token] = $robot_data;
+        }
+    }
+    //error_log('$player_robots_preload = '.print_r($player_robots_preload, true));
+    //error_log('$player_robots_preload_by_token = '.print_r($player_robots_preload_by_token, true));
 
     //echo '<td style="width: '.floor(100 / $allowed_edit_player_count).'%;">'."\n";
         echo '<div class="wrapper wrapper_'.($player_counter % 2 != 0 ? 'left' : 'right').' wrapper_'.$player_token.'" data-select="robots" data-player="'.$player_info['player_token'].'" style="width: '.(floor(100 / $allowed_edit_player_count) - ($allowed_edit_player_count)).'%; margin-right: 0.5%;">'."\n";
@@ -69,6 +84,13 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                     if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
                         $temp_robot_settings = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token];
                     }
+
+                    // Collect any preloaded data for this robot from the session
+                    $temp_robot_preload = array();
+                    if (!empty($player_robots_preload_by_token[$robot_token])){
+                        $temp_robot_preload = $player_robots_preload_by_token[$robot_token];
+                    }
+                    //error_log($robot_token.' // $temp_robot_preload = '.print_r($temp_robot_preload, true));
 
                     // Merge in stray-data from other players if it's there
                     foreach ($player_keys AS $this_player_key){
@@ -98,6 +120,10 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                     if (!empty($temp_robot_settings['robot_persona'])
                         && !empty($temp_robot_settings['robot_abilities']['copy-style'])){
                         //error_log($robot_info['robot_token'].' has a persona: '.$temp_robot_settings['robot_persona']);
+                        if (!empty($temp_robot_preload['robot_persona'])){
+                            $temp_robot_settings['robot_persona'] = $temp_robot_preload['robot_persona'];
+                            $temp_robot_settings['robot_persona_image'] = !empty($temp_robot_preload['robot_persona_image']) ? $temp_robot_preload['robot_persona_image'] : $temp_robot_preload['robot_persona'];
+                        }
                         $persona_token = $temp_robot_settings['robot_persona'];
                         $persona_image_token = !empty($temp_robot_settings['robot_persona_image']) ? $temp_robot_settings['robot_persona_image'] : $temp_robot_settings['robot_persona'];
                         $persona_index_info = $mmrpg_database_robots[$persona_token];
