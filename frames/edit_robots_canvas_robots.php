@@ -117,13 +117,13 @@ foreach($allowed_edit_data AS $player_token => $player_info){
 
                     // If this has a persona right now, make sure we apply it
                     $has_persona_applied = false;
+                    if (isset($temp_robot_preload['robot_persona'])){
+                        $temp_robot_settings['robot_persona'] = $temp_robot_preload['robot_persona'];
+                        $temp_robot_settings['robot_persona_image'] = !empty($temp_robot_preload['robot_persona_image']) ? $temp_robot_preload['robot_persona_image'] : $temp_robot_preload['robot_persona'];
+                    }
                     if (!empty($temp_robot_settings['robot_persona'])
                         && !empty($temp_robot_settings['robot_abilities']['copy-style'])){
                         //error_log($robot_info['robot_token'].' has a persona: '.$temp_robot_settings['robot_persona']);
-                        if (!empty($temp_robot_preload['robot_persona'])){
-                            $temp_robot_settings['robot_persona'] = $temp_robot_preload['robot_persona'];
-                            $temp_robot_settings['robot_persona_image'] = !empty($temp_robot_preload['robot_persona_image']) ? $temp_robot_preload['robot_persona_image'] : $temp_robot_preload['robot_persona'];
-                        }
                         $persona_token = $temp_robot_settings['robot_persona'];
                         $persona_image_token = !empty($temp_robot_settings['robot_persona_image']) ? $temp_robot_settings['robot_persona_image'] : $temp_robot_settings['robot_persona'];
                         $persona_index_info = $mmrpg_database_robots[$persona_token];

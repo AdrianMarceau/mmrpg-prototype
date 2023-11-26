@@ -125,6 +125,7 @@ class rpg_robot extends rpg_object {
                 if (!empty($persona_robotinfo)){
                     //error_log('applying $persona_robotinfo from '.$persona_robotinfo['robot_token'].' to $this_robotinfo');
                     rpg_robot::apply_persona_info($this_robotinfo, $persona_robotinfo, $temp_robot_settings);
+                    //error_log($this_robotinfo['robot_token'].' new $this_robotinfo = '.print_r($this_robotinfo, true));
                 }
             }
         }
@@ -2972,7 +2973,7 @@ class rpg_robot extends rpg_object {
             );
         // Loop through and simply copy over the easy ones to the current robotinfo array
         foreach ($clone_fields AS $clone_field){
-            if (!empty($persona_robotinfo[$clone_field])){
+            if (isset($persona_robotinfo[$clone_field])){
                 $this_robotinfo[$clone_field] = $persona_robotinfo[$clone_field];
             }
         }
