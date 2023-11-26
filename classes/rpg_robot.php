@@ -1227,8 +1227,8 @@ class rpg_robot extends rpg_object {
         if ($this->robot_base_level > $robot_level_max){ $this->robot_base_level = $robot_level_max;  }
 
         // Collect this robot's stat values for later reference
-        $this_index_info = self::get_index_info($this->robot_token);
-        $this_robot_stats = self::calculate_stat_values($this->robot_level, $this_index_info, $this_rewards, true, array($this->robot_core, $this->robot_core2), $this->player->player_starforce);
+        $base_stats_ref = !empty($this->robot_persona) ? self::get_index_info($this->robot_persona) : self::get_index_info($this->robot_token);
+        $this_robot_stats = self::calculate_stat_values($this->robot_level, $base_stats_ref, $this_rewards, true, array($this->robot_core, $this->robot_core2), $this->player->player_starforce);
 
         // Update the robot's stat values with calculated totals
         $stat_tokens = array('energy', 'weapons', 'attack', 'defense', 'speed');
@@ -2984,6 +2984,7 @@ class rpg_robot extends rpg_object {
         $stats_to_copy = array('energy', 'weapons', 'attack', 'defense', 'speed');
         if ($this_robotinfo['robot_class'] === $persona_robotinfo['robot_class']){
             // Copy the stats over 1-to-1 because the persona is of the same class
+            //error_log('copy stats 1-to-1');
             foreach ($stats_to_copy AS $stat_to_copy){
                 if (empty($persona_robotinfo['robot_'.$stat_to_copy])){ continue; }
                 $this_robotinfo['robot_'.$stat_to_copy] = $persona_robotinfo['robot_'.$stat_to_copy];
@@ -2991,15 +2992,39 @@ class rpg_robot extends rpg_object {
         } else {
             // The persona is of a different class, so calculate base-stat-total
             // for current and then use that to pull relative values from the target persona
-            $base_stat_total = 0;
-            foreach ($stats_to_copy AS $stat_to_copy){
-                if (empty($this_robotinfo['robot_'.$stat_to_copy])){ continue; }
-                $base_stat_total += $this_robotinfo['robot_'.$stat_to_copy];
+            //error_log('copy stats relatively');
+
+            // Calculate the relative difference between the two robot's BSTs
+            $old_base_stat_total = 0;
+            $persona_base_stat_total = 0;
+            foreach ($stats_to_copy AS $stat_to_copy){ $old_base_stat_total += $this_robotinfo['robot_'.$stat_to_copy]; }
+            foreach ($stats_to_copy AS $stat_to_copy){ $persona_base_stat_total += $persona_robotinfo['robot_'.$stat_to_copy]; }
+            //error_log('$old_base_stat_total = '.print_r($old_base_stat_total, true));
+            //error_log('$persona_base_stat_total = '.print_r($persona_base_stat_total, true));
+
+            // Cache the old stat spreads for later reference
+            $old_stat_spread = array();
+            $persona_stat_spead = array();
+            foreach ($stats_to_copy AS $stat_to_copy){ $old_stat_spread[$stat_to_copy] = $this_robotinfo['robot_'.$stat_to_copy]; }
+            foreach ($stats_to_copy AS $stat_to_copy){ $persona_stat_spead[$stat_to_copy] = $persona_robotinfo['robot_'.$stat_to_copy]; }
+
+            // Calculate stat ratios for the new robot then apply them to the old BST
+            $persona_stat_ratios = array();
+            foreach ($stats_to_copy as $stat_to_copy){ $persona_stat_ratios[$stat_to_copy] = $persona_robotinfo['robot_' . $stat_to_copy] / $persona_base_stat_total; }
+            foreach ($stats_to_copy as $stat_to_copy){
+                $this_robotinfo['robot_' . $stat_to_copy] = ($old_base_stat_total * $persona_stat_ratios[$stat_to_copy]);
+                if ($stat_to_copy === 'energy'){ $this_robotinfo['robot_' . $stat_to_copy] = ceil($this_robotinfo['robot_' . $stat_to_copy]); }
+                else { $this_robotinfo['robot_' . $stat_to_copy] = round($this_robotinfo['robot_' . $stat_to_copy]); }
             }
-            foreach ($stats_to_copy AS $stat_to_copy){
-                if (empty($persona_robotinfo['robot_'.$stat_to_copy])){ continue; }
-                $this_robotinfo['robot_'.$stat_to_copy] = round($base_stat_total * ($persona_robotinfo['robot_'.$stat_to_copy] / 100));
-            }
+
+            // Collect the new stat spread for later reference
+            $new_stat_spread = array();
+            foreach ($stats_to_copy AS $stat_to_copy){ $new_stat_spread[$stat_to_copy] = $this_robotinfo['robot_'.$stat_to_copy]; }
+
+            //error_log('$old_stat_spread = '.implode('/', $old_stat_spread).' = '.array_sum($old_stat_spread));
+            //error_log('$persona_stat_spead = '.implode('/', $persona_stat_spead).' = '.array_sum($persona_stat_spead));
+            //error_log('$new_stat_spread = '.implode('/', $new_stat_spread).' = '.array_sum($new_stat_spread));
+
         }
         //error_log('new $this_robotinfo = '.print_r($this_robotinfo, true));
 
@@ -4785,14 +4810,13 @@ class rpg_robot extends rpg_object {
     }
 
     // Define a static function for printing out the robot's editor markup
-    public static function print_editor_markup($player_info, $robot_info, $mmrpg_database_abilities = array()){
+    public static function print_editor_markup($player_info, $robot_info, $has_persona_applied = false){
 
         // Define the global variables
         global $this_current_uri, $this_current_url, $db;
         global $allowed_edit_players, $allowed_edit_robots, $allowed_edit_abilities;
         global $allowed_edit_data_count, $allowed_edit_player_count, $allowed_edit_robot_count, $first_robot_token, $global_allow_editing;
         global $key_counter, $player_counter, $player_rewards, $player_ability_rewards, $player_robot_favourites, $player_robot_database, $temp_robot_totals, $player_options_markup;
-        global $mmrpg_database_abilities;
         global $session_token;
 
         // Collect values for potentially missing global variables
@@ -4804,6 +4828,7 @@ class rpg_robot extends rpg_object {
 
         // Collect the approriate database indexes
         if (empty($mmrpg_database_players)){ $mmrpg_database_players = rpg_player::get_index(true); }
+        if (empty($mmrpg_database_robots)){ $mmrpg_database_robots = rpg_robot::get_index(true); }
         if (empty($mmrpg_database_abilities)){ $mmrpg_database_abilities = rpg_ability::get_index(true); }
         if (empty($mmrpg_database_items)){ $mmrpg_database_items = rpg_item::get_index(true); }
         if (empty($mmrpg_database_fields)){ $mmrpg_database_fields = rpg_field::get_index(true); }
@@ -4848,8 +4873,9 @@ class rpg_robot extends rpg_object {
             $robot_database = !empty($player_robot_database[$robot_token]) ? $player_robot_database[$robot_token] : array(); //rpg_game::robot_database($robot_token);
             // Collect the robot ability core if it exists
             $robot_ability_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
-            // Collect the stat details for this robot
-            $robot_stats = rpg_robot::calculate_stat_values($robot_info['robot_level'], $robot_info, $robot_rewards, true, $robot_ability_core, $player_starforce);
+            // Collect the stat details for this robot w/ special considerations for personas
+            $base_stats_ref = $has_persona_applied ? array_merge($robot_info, array('robot_token' => $robot_info['robot_persona'])) : $robot_info;
+            $robot_stats = rpg_robot::calculate_stat_values($robot_info['robot_level'], $base_stats_ref, $robot_rewards, true, $robot_ability_core, $player_starforce);
             // Check if this robot has the copy shot ability
             $robot_flag_copycore = $robot_ability_core == 'copy' ? true : false;
 
