@@ -251,8 +251,10 @@ foreach ($temp_player_active_robots AS $key => $robot){
         'robot_speed_mods' => $new_mod_values['speed_mods'],
         'robot_image' => $robot['robot_image'],
         'robot_item' => $robot['robot_item'],
+        'robot_abilities' => $robot['robot_abilities'],
         'robot_attachments' => $new_robot_attachments
         );
+    if (!empty($robot['robot_persona'])){ unset($robot_preload_array['robot_image']); }
     if (isset($robot['robot_persona'])){ $robot_preload_array['robot_persona'] = $robot['robot_persona']; }
     if (isset($robot['robot_persona_image'])){ $robot_preload_array['robot_persona_image'] = $robot['robot_persona_image']; }
     if (isset($robot['robot_support'])){ $robot_preload_array['robot_support'] = $robot['robot_support']; }
