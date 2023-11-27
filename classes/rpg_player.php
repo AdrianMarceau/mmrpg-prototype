@@ -74,10 +74,12 @@ class rpg_player extends rpg_object {
         $this->player_image_size = isset($this_playerinfo['player_image_size']) ? $this_playerinfo['player_image_size'] : 40;
         $this->player_description = isset($this_playerinfo['player_description']) ? $this_playerinfo['player_description'] : '';
         $this->player_energy = isset($this_playerinfo['player_energy']) ? $this_playerinfo['player_energy'] : 0;
+        $this->player_weapons = isset($this_playerinfo['player_weapons']) ? $this_playerinfo['player_weapons'] : 0;
         $this->player_attack = isset($this_playerinfo['player_attack']) ? $this_playerinfo['player_attack'] : 0;
         $this->player_defense = isset($this_playerinfo['player_defense']) ? $this_playerinfo['player_defense'] : 0;
         $this->player_speed = isset($this_playerinfo['player_speed']) ? $this_playerinfo['player_speed'] : 0;
         $this->player_base_energy = isset($this_playerinfo['player_base_energy']) ? $this_playerinfo['player_base_energy'] : $this->player_energy;
+        $this->player_base_weapons = isset($this_playerinfo['player_base_weapons']) ? $this_playerinfo['player_base_weapons'] : $this->player_weapons;
         $this->player_base_attack = isset($this_playerinfo['player_base_attack']) ? $this_playerinfo['player_base_attack'] : $this->player_attack;
         $this->player_base_defense = isset($this_playerinfo['player_base_defense']) ? $this_playerinfo['player_base_defense'] : $this->player_defense;
         $this->player_base_speed = isset($this_playerinfo['player_base_speed']) ? $this_playerinfo['player_base_speed'] : $this->player_speed;
@@ -2618,10 +2620,12 @@ class rpg_player extends rpg_object {
             'player_image_size' => $this->player_image_size,
             'player_description' => $this->player_description,
             'player_energy' => $this->player_energy,
+            'player_weapons' => $this->player_weapons,
             'player_attack' => $this->player_attack,
             'player_defense' => $this->player_defense,
-            'player_base_speed' => $this->player_base_speed,
+            'player_speed' => $this->player_speed,
             'player_base_energy' => $this->player_base_energy,
+            'player_base_weapons' => $this->player_base_weapons,
             'player_base_attack' => $this->player_base_attack,
             'player_base_defense' => $this->player_base_defense,
             'player_base_speed' => $this->player_base_speed,
