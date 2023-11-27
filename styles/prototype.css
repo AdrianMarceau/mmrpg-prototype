@@ -1853,6 +1853,9 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype .option_this-robot-select .multi .subtext2 {
     width: auto;
 }
+#mmrpg #prototype .option_this-robot-select .multi .maintext {
+    max-width: 100px;
+}
 #mmrpg #prototype .option_this-robot-select.option_disabled {
     cursor: not-allowed;
     filter: brightness(0.8) saturate(0.8);
