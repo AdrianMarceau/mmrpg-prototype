@@ -126,6 +126,11 @@ class rpg_robot extends rpg_object {
                     //error_log('applying $persona_robotinfo from '.$persona_robotinfo['robot_token'].' to $this_robotinfo');
                     rpg_robot::apply_persona_info($this_robotinfo, $persona_robotinfo, $temp_robot_settings);
                     //error_log($this_robotinfo['robot_token'].' new $this_robotinfo = '.print_r($this_robotinfo, true));
+                    /* $debug_stat_spread = array(
+                        $this_robotinfo['robot_energy'], $this_robotinfo['robot_attack'], $this_robotinfo['robot_defense'], $this_robotinfo['robot_speed'],
+                        ($this_robotinfo['robot_energy'] + $this_robotinfo['robot_attack'] + $this_robotinfo['robot_defense'] + $this_robotinfo['robot_speed'])
+                        ); */
+                    //error_log($this_robotinfo['robot_token'].' stat spread = '.print_r(implode('/', $debug_stat_spread), true));
                 }
             }
         }
@@ -1229,7 +1234,16 @@ class rpg_robot extends rpg_object {
         if ($this->robot_base_level > $robot_level_max){ $this->robot_base_level = $robot_level_max;  }
 
         // Collect this robot's stat values for later reference
-        $base_stats_ref = !empty($this->robot_persona) ? self::get_index_info($this->robot_persona) : self::get_index_info($this->robot_token);
+        $base_stats_ref = array(
+            'robot_token' => (!empty($this->robot_persona) ? $this->robot_persona: $this->robot_token),
+            'robot_core' => $this->robot_core,
+            'robot_core2' => $this->robot_core2,
+            'robot_energy' => $this->robot_energy,
+            'robot_weapons' => $this->robot_weapons,
+            'robot_attack' => $this->robot_attack,
+            'robot_defense' => $this->robot_defense,
+            'robot_speed' => $this->robot_speed
+            );
         $this_robot_stats = self::calculate_stat_values($this->robot_level, $base_stats_ref, $this_rewards, true, array($this->robot_core, $this->robot_core2), $this->player->player_starforce);
 
         // Update the robot's stat values with calculated totals
@@ -1250,6 +1264,9 @@ class rpg_robot extends rpg_object {
                 $temp_boost = ceil($this->$prop_stat * ($this->player->$prop_player_stat / 100));
                 $this->$prop_stat += $temp_boost;
                 $this->$prop_stat_base += $temp_boost;
+                //error_log('Player '.$this->player->player_token.' has a '.$stat.' bonus of '.$this->player->$prop_player_stat.'% for '.$this->robot_token.'.');
+            } else {
+                //error_log('Player '.$this->player->player_token.' has no '.$stat.' bonus for '.$this->robot_token.'.');
             }
             // Also create a variable for mods if applicable
             if ($stat !== 'energy'
@@ -2825,6 +2842,11 @@ class rpg_robot extends rpg_object {
             $robot_info['robot_item'] = empty($this->counters['item_disabled']) ? $this->robot_item : '';
             $robot_info['robot_skill'] = empty($this->counters['skill_disabled']) ? $this->robot_skill : '';
             $robot_info['robot_rewards'] = $this->robot_rewards;
+            if (!empty($this->robot_persona)){
+                $persona_info = rpg_robot::get_index_info($this->robot_persona);
+                $robot_info['robot_token'] = $persona_info['robot_token'];
+                $robot_info['robot_class'] = $persona_info['robot_class'];
+            }
 
             // If this was the noweapons/chargeweapons action, everything is zero
             if (in_array($this_ability->ability_token, array('action-noweapons', 'action-chargeweapons', 'action-devpower-clearmission'))){
@@ -2850,6 +2872,7 @@ class rpg_robot extends rpg_object {
 
     // Define a function for calculating required weapon energy without using objects
     static function calculate_weapon_energy_static($this_robot, $this_ability, &$energy_base = 0, &$energy_mods = 0){
+        //error_log('calculate_weapon_energy_static(robot:'.$this_robot['robot_token'].', ability:'.$this_ability['ability_token'].', energy_base:'.$energy_base.', energy_mods:'.$energy_mods.')');
 
         // Determine how much weapon energy this should take
         $energy_new = isset($this_ability['ability_energy']) ? $this_ability['ability_energy'] : 0;
@@ -2922,8 +2945,10 @@ class rpg_robot extends rpg_object {
         }
 
         // Check if the user is a MECHA class robot for lower WE requirements
+        //error_log('$this_robot = '.print_r($this_robot, true));
         if (isset($this_robot['robot_class'])
             && $this_robot['robot_class'] === 'mecha'){
+            //error_log('mecha class robot detected');
             $energy_new = ceil($energy_new * MMRPG_SETTINGS_MECHABONUS_MULTIPLIER);
             $energy_mods++;
         }
@@ -2960,7 +2985,7 @@ class rpg_robot extends rpg_object {
         //else { $cross_letter = ucfirst(substr($this_robotinfo['robot_token'], 0, 1)); }
         $cross_letter = ucfirst(substr($this_robotinfo['robot_token'], 0, 1));
         //$persona_name = $persona_robotinfo['robot_name'].' '.$cross_letter.'✗';
-        $persona_name = $persona_robotinfo['robot_name'].' '.$cross_letter.'X';
+        $persona_name = $cross_letter.'× '.$persona_robotinfo['robot_name'];
         $this_robotinfo['robot_name'] = $persona_name;
 
         // List out the fields we want to copy verbaitm
@@ -2986,8 +3011,8 @@ class rpg_robot extends rpg_object {
             $this_robotinfo['robot_image'] = $persona_robotinfo['robot_image'];
         }
 
-        // Now let's copy over the stats either directly or relatively depending on class
-        $stats_to_copy = array('energy', 'weapons', 'attack', 'defense', 'speed');
+        // Now let's copy over the other stats either directly or relatively depending on class
+        $stats_to_copy = array('energy', 'attack', 'defense', 'speed');
         if ($this_robotinfo['robot_class'] === $persona_robotinfo['robot_class']){
             // Copy the stats over 1-to-1 because the persona is of the same class
             //error_log('copy stats 1-to-1');
