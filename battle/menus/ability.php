@@ -79,9 +79,17 @@ ob_start();
 
         $this_robot_settings = rpg_game::robot_settings($this_player->player_token, $this_robot->robot_token);
 
-        if (!empty($this_robot_settings['robot_abilities'])){ $current_robot_abilities = $this_robot_settings['robot_abilities']; }
-        //elseif (!empty($this_robot->robot_abilities)){ $current_robot_abilities = $this_robot->robot_abilities; }
-        else { $current_robot_abilities = array(); }
+        if (!empty($this_robot->robot_abilities)){
+            $formatted_abilities = array();
+            $raw_abilities = array_slice($this_robot->robot_abilities, 0, 8);
+            foreach ($raw_abilities AS $key => $token){ $formatted_abilities[$token] = array('ability_token' => $token); }
+            $current_robot_abilities = $formatted_abilities;
+        } elseif (!empty($this_robot_settings['robot_abilities'])){
+            $current_robot_abilities = $this_robot_settings['robot_abilities'];
+        } else {
+            $current_robot_abilities = array();
+        }
+        //error_log('$current_robot_abilities = '.print_r($current_robot_abilities, true));
 
         // If this robot has more than eight abilities, slice to only eight
         if (count($current_robot_abilities) > 8){
