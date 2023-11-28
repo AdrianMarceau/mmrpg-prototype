@@ -104,27 +104,48 @@ class rpg_robot extends rpg_object {
 
         // -- PRELOAD PERSONA INFO IF APPLICABLE -- //
 
-        // If this is a player-controlled robot, check to see if they have a persona to apply
-        if ($this->player->player_side == 'left'
-            && empty($this_robotinfo['flags']['apply_session_persona_settings'])){
+        // Check to see if this robot has persona settings to apply from the request or the session
+        if (empty($this_robotinfo['flags']['apply_session_persona_settings'])){
             if (!isset($this_robotinfo['flags'])){ $this_robotinfo['flags'] = array(); }
             $this_robotinfo['flags']['apply_session_persona_settings'] = true;
-            $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this_robotinfo['robot_token']);
-            //error_log('$temp_robot_settings('.$this->player_token.'/'.$this_robotinfo['robot_token'].') = '.print_r($temp_robot_settings, true));
-            // If there is an alternate persona set, apply it
-            if (!empty($temp_robot_settings['robot_persona'])
-                && !empty($temp_robot_settings['robot_abilities']['copy-style'])){
-                if (isset($this_robotinfo['robot_persona'])){ $temp_robot_settings['robot_persona'] = $this_robotinfo['robot_persona']; }
-                if (isset($this_robotinfo['robot_persona_image'])){ $temp_robot_settings['robot_persona_image'] = $this_robotinfo['robot_persona_image']; }
-                //error_log($this_robotinfo['robot_token'].' has a persona to apply ('.$temp_robot_settings['robot_persona'].')!');
+            //error_log('checking persona for '.$this_robotinfo['robot_token']);
+
+            // Collect persona settings from the robotinfo if provided, else check the settings
+            $temp_robot_settings = array();
+            $temp_persona_settings = array('robot_persona' => '', 'robot_persona_image' => '');
+            $temp_copy_style_equipped = false;
+            if ($this->player->player_side == 'left'){
+                $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this_robotinfo['robot_token']);
                 //error_log($this_robotinfo['robot_token'].' $temp_robot_settings = '.print_r($temp_robot_settings, true));
+            }
+            if (isset($this_robotinfo['robot_abilities'])){
+                //error_log($this_robotinfo['robot_token'].' $this_robotinfo[\'robot_abilities\'] = '.print_r($this_robotinfo['robot_abilities'], true));
+                if (in_array('copy-style', $this_robotinfo['robot_abilities'])){ $temp_copy_style_equipped = true; }
+            } else {
+                //error_log($this_robotinfo['robot_token'].' $temp_robot_settings[\'robot_abilities\'] = '.print_r($temp_robot_settings['robot_abilities'], true));
+                if (!empty($temp_robot_settings['robot_abilities']['copy-style'])){ $temp_copy_style_equipped = true; }
+            }
+            if (isset($this_robotinfo['robot_persona'])){
+                $temp_persona_settings['robot_persona'] = $this_robotinfo['robot_persona'];
+                if (isset($this_robotinfo['robot_persona_image'])){ $temp_persona_settings['robot_persona_image'] = $this_robotinfo['robot_persona_image']; }
+            } elseif ($this->player->player_side == 'left'){
+                if (isset($temp_robot_settings['robot_persona'])){ $temp_persona_settings['robot_persona'] = $temp_robot_settings['robot_persona']; }
+                if (isset($temp_robot_settings['robot_persona_image'])){ $temp_persona_settings['robot_persona_image'] = $temp_robot_settings['robot_persona_image']; }
+            }
+
+            // If there is an alternate persona set, apply it
+            //error_log($this_robotinfo['robot_token'].' $temp_persona_settings = '.print_r($temp_persona_settings, true));
+            if (!empty($temp_persona_settings['robot_persona'])
+                && !empty($temp_copy_style_equipped)){
+                //error_log($this_robotinfo['robot_token'].' has a persona to apply ('.$temp_persona_settings['robot_persona'].')!');
+                //error_log($this_robotinfo['robot_token'].' $temp_persona_settings = '.print_r($temp_persona_settings, true));
                 // Attempt to pull index information about this persona
-                $persona_robotinfo = rpg_robot::get_index_info($temp_robot_settings['robot_persona']);
+                $persona_robotinfo = rpg_robot::get_index_info($temp_persona_settings['robot_persona']);
                 //error_log('$persona_robotinfo = '.print_r($persona_robotinfo, true));
                 // Assuming we pulled a personal, let's overwrite relevant details about the current robot
                 if (!empty($persona_robotinfo)){
                     //error_log('applying $persona_robotinfo from '.$persona_robotinfo['robot_token'].' to $this_robotinfo');
-                    rpg_robot::apply_persona_info($this_robotinfo, $persona_robotinfo, $temp_robot_settings);
+                    rpg_robot::apply_persona_info($this_robotinfo, $persona_robotinfo, $temp_persona_settings);
                     //error_log($this_robotinfo['robot_token'].' new $this_robotinfo = '.print_r($this_robotinfo, true));
                     /* $debug_stat_spread = array(
                         $this_robotinfo['robot_energy'], $this_robotinfo['robot_attack'], $this_robotinfo['robot_defense'], $this_robotinfo['robot_speed'],

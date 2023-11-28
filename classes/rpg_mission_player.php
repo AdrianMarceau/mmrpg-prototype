@@ -145,6 +145,8 @@ class rpg_mission_player extends rpg_mission {
                 $temp_robot_item = !empty($temp_settings_array['robot_item']) ? $temp_settings_array['robot_item'] : '';
                 $temp_robot_support = !empty($temp_settings_array['robot_support']) ? $temp_settings_array['robot_support'] : '';
                 $temp_robot_support_image = !empty($temp_settings_array['robot_support_image']) ? $temp_settings_array['robot_support_image'] : '';
+                $temp_robot_persona = !empty($temp_settings_array['robot_persona']) ? $temp_settings_array['robot_persona'] : '';
+                $temp_robot_persona_image = !empty($temp_settings_array['robot_persona_image']) ? $temp_settings_array['robot_persona_image'] : '';
                 //$temp_robot_rewards = $temp_player_rewards[$target_player_token];
                 $temp_robot_rewards = $temp_rewards_array;
                 // Collect this robot's abilities, format them, and crop if necessary
@@ -168,6 +170,8 @@ class rpg_mission_player extends rpg_mission {
                     'robot_item' => $temp_robot_item,
                     'robot_support' => $temp_robot_support,
                     'robot_support_image' => $temp_robot_support_image,
+                    'robot_persona' => $temp_robot_persona,
+                    'robot_persona_image' => $temp_robot_persona_image,
                     'robot_abilities' => $temp_robot_abilities
                     );
                 // Add this robot to the omega array and increment the counter
