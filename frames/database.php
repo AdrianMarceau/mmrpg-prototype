@@ -424,8 +424,8 @@ if (true){
                                         </span>
                                     <? } ?>
                                     <?
-                                    if ($robot_info['robot_class'] == 'master' && $robot_info['robot_unlocked']){ echo '<span class="this_complete" '.$data_tooltip_type.' data-click-tooltip="Database Entry Complete!"><i class="fa fas fa-compact-disc"></i></span>'; }
-                                    elseif ($robot_info['robot_class'] == 'mecha' && $robot_info['robot_summoned']){ echo '<span class="this_complete" '.$data_tooltip_type.' data-click-tooltip="Database Entry Complete!"><i class="fa fas fa-compact-disc"></i></span>'; }
+                                    if ($robot_info['robot_class'] === 'master' && $robot_info['robot_unlocked']){ echo '<span class="this_complete" '.$data_tooltip_type.' data-click-tooltip="Database Entry Complete!"><i class="fa fas fa-compact-disc"></i></span>'; }
+                                    elseif ($robot_info['robot_class'] !== 'master' && $robot_info['robot_summoned']){ echo '<span class="this_complete" '.$data_tooltip_type.' data-click-tooltip="Database Entry Complete!"><i class="fa fas fa-compact-disc"></i></span>'; }
                                     ?>
                                     <? if(!empty($robot_info['robot_core'])): ?>
                                         <span class="robot_type robot_core"><?= ucfirst($robot_info['robot_core']) ?> Core</span>
@@ -598,7 +598,7 @@ if (true){
                                     $temp_robot_field = '';
                                     $temp_show_robot_field = false;
                                     if (!empty($robot_info['robot_field']) && $robot_info['robot_field'] != 'field'){ $temp_robot_field = $robot_info['robot_field']; $temp_show_robot_field = true; }
-                                    elseif (!empty($robot_info['robot_field2']) && $robot_info['robot_field2'] != 'field'){ $temp_robot_field = $robot_info['robot_field2']; }
+                                    elseif (!empty($robot_info['robot_field2']) && $robot_info['robot_field2'] != 'field'){ $temp_robot_field = $robot_info['robot_field2']; $temp_show_robot_field = true; }
                                     if (!empty($temp_robot_field)){
                                         //echo $robot_info['robot_field'];
                                         $temp_robot_field = !empty($mmrpg_database_fields[$temp_robot_field]) ? $mmrpg_database_fields[$temp_robot_field] : array();
@@ -682,8 +682,8 @@ if (true){
                                                     $robot_ability_rewards = $robot_info['robot_rewards']['abilities'];
                                                     if (
                                                         !empty($robot_ability_rewards) &&
-                                                        (($robot_info['robot_class'] == 'master' && $robot_info['robot_unlocked'])
-                                                        || ($robot_info['robot_class'] == 'mecha' && $robot_info['robot_summoned']))
+                                                        (($robot_info['robot_class'] === 'master' && $robot_info['robot_unlocked'])
+                                                        || ($robot_info['robot_class'] !== 'master' && $robot_info['robot_summoned']))
                                                         ){
                                                         $temp_string = array();
                                                         $ability_key = 0;
