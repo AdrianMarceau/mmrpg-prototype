@@ -423,24 +423,35 @@ if (true){
                             $robot_is_unlockable = $robot_info['robot_class'] == 'master' && $robot_info['robot_flag_unlockable'] ? true : false;
                             $robot_is_unlocked = !empty($robot_info['robot_unlocked']);
 
+                            $robot_image_token = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
+                            $robot_image_size = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
+                            $robot_image_size_token = $robot_image_size.'x'.$robot_image_size;
+                            $robot_image_path = 'images/robots/'.$robot_image_token.'/mug_right_'.$robot_image_size_token.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+
+                            $show_sprite_showcase = !empty($robot_info['robot_unlocked']) || !empty($robot_info['robot_encountered']) ? true : false;
+
                             ?>
-                            <div class="event event_triple event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?> <?= $robot_is_unlockable ? 'robot_is_unlockable' : '' ?>" data-token="<?=$robot_info['robot_token']?>">
+                            <div class="event event_triple event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?> <?= $robot_is_unlockable ? 'robot_is_unlockable' : '' ?><?= $show_sprite_showcase ? ' has_sprite_showcase' : '' ?>" data-token="<?=$robot_info['robot_token']?>">
                                 <div class="this_sprite sprite_left mugshot sx<?= $robot_info['robot_image_size'] ?> robot_type robot_type_<?= $core_type_class ?>">
                                     <div class="wrap">
-                                        <div style="background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/mug_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?=MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_mug robot_status_active robot_position_active"><?=$robot_info['robot_name']?></div>
+                                        <div style="background-image: url(<?= $robot_image_path ?>); " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_image_size_token ?> sprite_<?= $robot_image_size_token ?>_mug robot_status_active robot_position_active"><?=$robot_info['robot_name']?></div>
                                     </div>
                                 </div>
                                 <div class="header header_left robot_type robot_type_<?= $core_type_class ?>">
-                                    <?=$robot_info['robot_name']?>&#39;s Data
+                                    <strong class="title"><?=$robot_info['robot_name']?>&#39;s Data</strong>
+                                    <?
+                                    if ($robot_info['robot_class'] === 'master' && $robot_info['robot_unlocked']){ echo '<span class="this_icon this_complete" '.$data_tooltip_type.' data-click-tooltip="Database Entry Complete!"><i class="fa fas fa-compact-disc"></i></span>'; }
+                                    elseif ($robot_info['robot_class'] !== 'master' && $robot_info['robot_summoned']){ echo '<span class="this_icon this_complete" '.$data_tooltip_type.' data-click-tooltip="Database Entry Complete!"><i class="fa fas fa-compact-disc"></i></span>'; }
+                                    ?>
                                     <? if ($robot_is_unlockable){ ?>
-                                        <span class="this_unlockable" <?= $data_tooltip_type ?> data-click-tooltip="<?= $robot_is_unlocked ? 'Robot Master Unlocked!' : 'Robot Is Unlockable' ?>">
+                                        <span class="this_icon this_unlockable" <?= $data_tooltip_type ?> data-click-tooltip="<?= $robot_is_unlocked ? 'Robot Master Unlocked!' : 'Robot Is Unlockable' ?>">
                                             <i class="unlocked fa fas <?= $robot_is_unlocked ? 'fa-robot' : 'fa-exclamation-circle' ?>"></i>
                                         </span>
+                                    <? } elseif (!empty($robot_info['robot_summoned'])){ ?>
+                                        <span class="this_icon this_summoned" <?= $data_tooltip_type ?> data-click-tooltip="<?= $robot_info['robot_class'] === 'mecha' ? 'Support Mecha Summoned!' : 'Fortress Boss Summoned!' ?>">
+                                            <i class="summoned fa fas <?= $robot_info['robot_class'] === 'mecha' ? 'fa-ghost' : 'fa-skull' ?>"></i>
+                                        </span>
                                     <? } ?>
-                                    <?
-                                    if ($robot_info['robot_class'] === 'master' && $robot_info['robot_unlocked']){ echo '<span class="this_complete" '.$data_tooltip_type.' data-click-tooltip="Database Entry Complete!"><i class="fa fas fa-compact-disc"></i></span>'; }
-                                    elseif ($robot_info['robot_class'] !== 'master' && $robot_info['robot_summoned']){ echo '<span class="this_complete" '.$data_tooltip_type.' data-click-tooltip="Database Entry Complete!"><i class="fa fas fa-compact-disc"></i></span>'; }
-                                    ?>
                                     <? if(!empty($robot_info['robot_core'])): ?>
                                         <span class="robot_type robot_core"><?= ucfirst($robot_info['robot_core']) ?> Core</span>
                                     <? else: ?>
@@ -802,6 +813,57 @@ if (true){
                                     </table>
 
                                 </div>
+                                <? if ($show_sprite_showcase){ ?>
+                                    <?
+                                    $showcase_sprite_markup = '';
+                                    $showcase_shadow_markup = '';
+                                    $sprite_animation_duration = 1;
+                                    if (true){
+                                        $sprite_base_image = $robot_image_token;
+                                        $sprite_base_size = $robot_image_size;
+                                        $sprite_showcase_size = $robot_image_size; // * 2;
+                                        $sprite_showcase_size_token = $sprite_showcase_size.'x'.$sprite_showcase_size;
+                                        $sprite_showcase_image = 'images/robots/'.$robot_image_token.'/sprite_left_'.$sprite_showcase_size_token.'.png';
+                                        $sprite_animation_duration = rpg_robot::get_css_animation_duration($robot_info);
+                                        $class = 'sprite  ';
+                                        $class .= 'sprite_'.$sprite_showcase_size_token.' ';
+                                        $class .= 'sprite_'.$sprite_showcase_size_token.'_base ';
+                                        $class .= 'sprite_size_'.$sprite_showcase_size_token.' ';
+                                        $class .= 'sprite_size_'.$sprite_showcase_size_token.'_base ';
+                                        $class .= 'robot_status_active robot_position_active ';
+                                        $style = 'background-image: url('.$sprite_showcase_image.'?'.MMRPG_CONFIG_CACHE_DATE.'); ';
+                                        $showcase_sprite_markup = '<div class="'.$class.'" style="'.$style.'" data-image="'.$sprite_base_image.'" data-image-size="'.$sprite_showcase_size.'"></div>';
+                                        $showcase_shadow_markup = $showcase_sprite_markup;
+                                    }
+                                    $sprite_animation_styles = 'animation-duration: '.$sprite_animation_duration.'s;';
+                                    ?>
+                                    <div class="sprite_showcase" data-image="<?= $sprite_base_image ?>" data-image-size="<?= $sprite_showcase_size ?>">
+                                        <div class="wrapper">
+                                            <div class="sprite sprite_robot sprite_40x40" style="<?= $sprite_animation_styles ?>">
+                                                <?= $showcase_sprite_markup ?>
+                                            </div>
+                                            <? if (!empty($showcase_shadow_markup)){ ?>
+                                                <div class="sprite sprite_robot sprite_40x40 is_shadow" style="<?= $sprite_animation_styles ?>">
+                                                    <?= $showcase_sprite_markup ?>
+                                                </div>
+                                            <? } ?>
+                                        </div>
+                                    </div>
+                                    <div class="sprite_showcase_buttons">
+                                        <div class="wrapper">
+                                            <?
+                                            // Collect the frame index for robots then loop through and display buttons
+                                            $frame_index = explode('/', MMRPG_SETTINGS_ROBOT_FRAMEINDEX);
+                                            foreach ($frame_index AS $frame_key => $frame_token){
+                                                $frame_title = ucfirst($frame_token).' Sprite';
+                                                echo('<a class="frame robot_type type '.$core_type_class.'" data-frame="'.$frame_token.'" data-frame-key="'.$frame_key.'" data-click-title="'.$frame_title.'">'.
+                                                    '<span class="wrap">'.$frame_key.'</span>'.
+                                                    '</a>'.PHP_EOL);
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
+                                <? } ?>
                             </div>
                             <?$key_counter++;?>
                         <? } ?>
@@ -1047,6 +1109,95 @@ $(document).ready(function(){
     var htmlHeight = $('html').height();
     var htmlScroll = $('html').scrollTop();
     //alert('windowHeight = '+windowHeight+'; htmlHeight = '+htmlHeight+'; htmlScroll = '+htmlScroll+'; ');
+
+    // -- DATABASE SPRITE SHOWCASE -- //
+
+    // Create a reference to all the sprite showcase containers
+    var $spriteShowcases = $('.sprite_showcase', gameConsole);
+    if ($spriteShowcases.length){
+        //console.log('found '+$spriteShowcases.length+' sprite showcases!');
+
+        // Define a function to call when we want to update a sprite showcase's frame (background offset)
+        var updateSpriteFrame = function($showcase, frameKey){
+            var $showcaseParent = $showcase.closest('.event.has_sprite_showcase');
+            var $showcaseButtons = $('.sprite_showcase_buttons', $showcaseParent);
+            var $showcaseSprites = $('.sprite .sprite', $showcase);
+            var dataToken = $showcaseParent.attr('data-token');
+            var dataFrame = $('.frame[data-frame-key='+frameKey+']', $showcaseButtons).attr('data-frame');
+            var dataImageSize = parseInt($showcase.attr('data-image-size'));
+            var backgroundOffset = (frameKey * dataImageSize) * -1;
+            var backgroundPosition = backgroundOffset+'px 0';
+            $showcaseSprites.css({backgroundPosition:backgroundPosition});
+            $('.frame', $showcaseButtons).removeClass('active');
+            $('.frame[data-frame-key='+frameKey+']', $showcaseButtons).addClass('active');
+            };
+
+        // Define a function to call when we want to update a sprite showcase's alt (background image)
+        var updateSpriteAlt = function($showcase, newImageToken){
+            var $showcaseParent = $showcase.closest('.event.has_sprite_showcase');
+            var $showcaseButtons = $('.sprite_showcase_buttons', $showcaseParent);
+            var $showcaseSprites = $('.sprite .sprite', $showcase);
+            var dataToken = $showcaseParent.attr('data-token');
+            var dataImage = $showcase.attr('data-image');
+            var dataBaseImage = $showcase.attr('data-base-image') || dataImage;
+            if (!$showcase.is('[data-base-image]')){ $showcase.attr('data-base-image', dataBaseImage); }
+            var dataImageSize = parseInt($showcase.attr('data-image-size'));
+            var dataImageSizeToken = dataImageSize+'x'+dataImageSize;
+            //var oldBackgroundImage = $showcaseSprites.css('backgroundImage');
+            //var newBackgroundImage = oldBackgroundImage.replace(dataImage, newImageToken);
+            //console.log({oldBackgroundImage:oldBackgroundImage,newBackgroundImage:newBackgroundImage});
+            var newBackgroundImage = 'images/robots/'+newImageToken+'/sprite_left_'+dataImageSizeToken+'.png?'+gameSettings.cacheTime;
+            //console.log({newBackgroundImage:newBackgroundImage});
+            $showcase.attr('data-image', newImageToken);
+            $showcaseSprites.css({backgroundImage:'url('+newBackgroundImage+')'});
+            };
+
+        // Loop through each showcase and assign events
+        $spriteShowcases.each(function(){
+            var $showcase = $(this);
+            var $showcaseParent = $showcase.closest('.event.has_sprite_showcase');
+            var $showcaseButtons = $('.sprite_showcase_buttons', $showcaseParent);
+            var $showcaseSprites = $('.sprite .sprite', $showcase);
+            //console.log({$showcase:$showcase,$showcaseParent:$showcaseParent,$showcaseButtons:$showcaseButtons});
+            var dataToken = $showcaseParent.attr('data-token');
+            //console.log('assigning events for '+dataToken+'!');
+            $('.frame', $showcaseButtons).bind('mouseenter click', function(e){
+                var dataFrame = $(this).attr('data-frame');
+                var dataFrameKey = parseInt($(this).attr('data-frame-key'));
+                //console.log('mouseenter/click for '+dataToken+'! dataFrame = '+dataFrame+'; dataFrameKey = '+dataFrameKey+';');
+                updateSpriteFrame($showcase, dataFrameKey);
+                e.stopPropagation();
+                });
+            $showcaseButtons.bind('mouseleave', function(e){
+                //console.log('mouseleave for '+dataToken+'!');
+                var dataFrame = 'base';
+                var dataFrameKey = 0;
+                updateSpriteFrame($showcase, dataFrameKey);
+                e.stopPropagation();
+                });
+            });
+
+        // Make sure we update the showcase images whenever a new alt is selected
+        if ($spriteShowcases.length === 1){
+            var $showcase = $spriteShowcases.first();
+            var $showcaseParent = $showcase.closest('.event.has_sprite_showcase');
+            var $spriteHeader = $('.header#sprites', $showcaseParent);
+            var $spriteImageOptions = $spriteHeader.length ? $('.images a[data-image]', $spriteHeader) : [];
+            if ($spriteImageOptions.length){
+                //console.log('found '+$spriteHeader.length+' sprite headers!');
+                //console.log('found '+$spriteImageOptions.length+' sprite header images!');
+                $spriteImageOptions.each(function(){
+                    var $option = $(this);
+                    var dataImage = $option.attr('data-image');
+                    $option.click(function(e){
+                        e.preventDefault();
+                        updateSpriteAlt($showcase, dataImage);
+                        });
+                    });
+                }
+            }
+
+        }
 
 
 });

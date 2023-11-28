@@ -426,6 +426,7 @@
 
 
 #database #console .event .this_complete,
+#database #console .event .this_summoned,
 #database #console .event .this_unlockable {
     display: inline-block;
     margin-left: 4px;
@@ -436,6 +437,7 @@
     text-shadow: none;
 }
 #database #console .event .this_complete:hover,
+#database #console .event .this_summoned:hover,
 #database #console .event .this_unlockable:hover {
     transform: scale(1.2);
 }
@@ -584,7 +586,7 @@
 
 #database #console .header {
     margin: 0 auto;
-    padding-right: 40px;
+    padding: 2px 40px 2px 6px;
     height: auto;
     width: auto;
     float: none;
@@ -631,4 +633,214 @@
 #console .event .body.body_left table .has4 .robot_affinity,
 #console .event .body.body_left table .has4 .robot_immunity {
     font-size: 60%;
+}
+
+#console .event.has_sprite_showcase .body.body_left table:first-child {
+    width: calc(100% - 86px);
+}
+
+#database #console .event.has_sprite_showcase .this_icon {
+    margin: 0 auto;
+    position: absolute;
+    top: 23px;
+    right: 42px;
+}
+#database #console .event.has_sprite_showcase .this_unlockable {
+    top: 22px;
+}
+#database #console .event.has_sprite_showcase .this_summoned {
+    font-size: 110%;
+}
+#database #console .event.has_sprite_showcase .this_icon + .this_icon {
+    right: 58px;
+}
+
+#console .event.has_sprite_showcase .sprite_showcase {
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    top: 48px;
+    right: 8px;
+    background-color: #282828;
+    border: 1px solid #181818;
+    border-radius: 9px;
+    width: 80px;
+    height: 80px;
+    overflow: hidden;
+}
+@keyframes pan-sprite-grid {
+    from { background-position: 0 0; }
+    to { background-position: 80px 0; }
+}
+#console .event.has_sprite_showcase .sprite_showcase .wrapper {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: transparent;
+    background-image: url("../images/sprite-grid.gif");
+    background-repeat: repeat;
+    background-position: 0 0;
+    border-radius: 6px;
+}
+#console .event.has_sprite_showcase .sprite_showcase .wrapper:before {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 41px;
+    border-top: 0 none transparent;
+    background-image: url("../images/sprite-grid.gif");
+    background-repeat: repeat;
+    background-position: 0 0;
+    filter: brightness(0.6);
+    box-shadow: inset 0 -2px 10px rgba(0, 0, 0, 0.3);
+    animation: pan-sprite-grid 16s linear infinite;
+}
+#console .event.has_sprite_showcase .sprite_showcase .wrapper:after {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 35px;
+    border-top: 3px solid #1e1e1e;
+    background-image: url("../images/sprite-grid.gif");
+    background-repeat: repeat;
+    background-position: 0 -9px;
+    filter: brightness(0.8);
+}
+#console .event.has_sprite_showcase .sprite_showcase .sprite_robot {
+    display: block;
+    margin: 0 auto;
+    position: absolute;
+    z-index: 4;
+    left: 20px;
+    bottom: 20px;
+    /* transform-origin: bottom center; */
+    /* transform: scale(2); */
+    /* background-color: magenta;  */
+}
+#console .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow {
+    z-index: 2;
+}
+#console .event.has_sprite_showcase .sprite_showcase .sprite_robot .sprite {
+    position: absolute;
+    z-index: 2;
+    margin: 0;
+    top: 0;
+    left: 0;
+}
+#console .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow .sprite {
+    z-index: 2;
+    filter: grayscale(1) brightness(0) opacity(0.4);
+    transform: skew(-45deg, 0deg) scaleY(0.5) translate(10px, 10px);
+    top: 4px;
+    left: 4px;
+}
+#console .event.has_sprite_showcase .sprite_showcase .sprite_robot .sprite_40x40 {
+
+}
+#console .event.has_sprite_showcase .sprite_showcase .sprite_robot .sprite_80x80 {
+    top: -40px;
+    left: -20px;
+}
+#console .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow .sprite_80x80 {
+    top: -38px;
+    left: -18px;
+    transform: skew(-45deg, 0deg) scaleY(0.5) translate(36px, 36px);
+}
+@keyframes database-robot-sprite-showcase-bounce {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-2px); }
+    100% { transform: translateY(0px); }
+}
+@keyframes database-robot-shadow-sprite-showcase-bounce {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-1px); }
+    100% { transform: translateY(0px); }
+}
+#console .event.has_sprite_showcase .sprite_showcase .sprite_robot {
+    transform: translateY(0);
+    animation: database-robot-sprite-showcase-bounce 1s linear infinite;
+    animation-timing-function: steps(2);
+}
+#console .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow {
+    animation-name: database-robot-shadow-sprite-showcase-bounce;
+    animation-timing-function: steps(2);
+}
+
+#console .event.has_sprite_showcase .sprite_showcase_buttons {
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    top: 130px;
+    right: 8px;
+    background-color: #202020;
+    border: 1px solid #191919;
+    border-radius: 6px;
+    width: 80px;
+    height: 26px;
+}
+#console .event.has_sprite_showcase .sprite_showcase_buttons .wrapper {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: transparent;
+    padding: 2px 4px;
+}
+#console .event.has_sprite_showcase .sprite_showcase_buttons .wrapper:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#console .event.has_sprite_showcase .sprite_showcase_buttons .frame {
+    display: block;
+    box-sizing: border-box;
+    margin: 0 2px 2px 0;
+    padding: 0;
+    width: auto;
+    width: calc((100% / 5) - 2px);
+    float: left;
+    overflow: hidden;
+    border: 1px solid #1e1e1e;
+    background-color: #282828;
+    border-radius: 4px;
+    font-size: 5px;
+    line-height: 5px;
+    text-align: center;
+    cursor: pointer;
+    transform: scale(1);
+    transition: opacity 0.1s, transform 0.2s;
+    direction: ltr;
+    text-indent: -9999px;
+}
+#console .event.has_sprite_showcase .sprite_showcase_buttons .frame:hover {
+    transform: scale(1.1);
+}
+#console .event.has_sprite_showcase .sprite_showcase_buttons .frame[data-frame-key="0"] {
+    display: none;
+}
+#console .event.has_sprite_showcase .sprite_showcase_buttons .frame .wrap {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: transparent;
+    padding: 1px 3px;
+    pointer-events: none;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: background-color 0.1s;
+}
+#console .event.has_sprite_showcase .sprite_showcase_buttons .frame:hover .wrap {
+    background-color: rgba(0, 0, 0, 0.0);
 }
