@@ -109,7 +109,7 @@
 }
 #database #canvas .wrapper_robots {
     position: static;
-    min-height: 82px;
+    min-height: 38px;
     margin: 0 2px 4px;
     padding: 5px 0 0 5px;
     overflow: hidden;
@@ -122,6 +122,9 @@
     border-radius: 0 0 0.3em 0.3em;
     -moz-border-radius: 0 0 0.3em 0.3em;
     -webkit-border-radius: 0 0 0.3em 0.3em;
+}
+#database #canvas .wrapper_robots_masters {
+    min-height: 82px;
 }
 #database #canvas .wrapper .event {
     width: 100%;
@@ -176,21 +179,24 @@
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
     -moz-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
     -webkit-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-    opacity: 0.30;
+    transition: border-color 0.3s;
 }
 #database #canvas .sprite_robot:hover {
     border-color: #414141;
-    opacity: 1.0;
 }
 #database #canvas .sprite_robot_current,
 #database #canvas .sprite_robot_current:hover {
     border-color: #595959;
-    opacity: 1.0;
+}
+#database #canvas .sprite_robot:not(.sprite_robot_current) {
+    background-color: #262626 !important;
 }
 #database #canvas .sprite_robot_hidden {
     display: none !important;
 }
-#database #canvas .wrapper_robots_masters .sprite_robot {
+#database #canvas .wrapper_robots_masters .sprite_robot,
+#database #canvas .wrapper_robots_mechas .sprite_robot,
+#database #canvas .wrapper_robots_bosses .sprite_robot {
     position: relative;
 }
 #database #canvas .wrapper_robots_smaller {
@@ -199,10 +205,31 @@
 #database #canvas .wrapper_robots_smaller .sprite_robot {
     position: relative;
 }
+#database #canvas .wrapper_robots .sprite_robot .sprite {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    display: block;
+    width: auto;
+    height: auto;
+    background-position: center center;
+    background-repeat: no-repeat;
+    border-radius: 6px;
+    opacity: 0.6;
+    filter: brightness(0.6);
+    transition: opacity 0.3s, filter 0.3s;
+}
+#database #canvas .wrapper_robots .sprite_robot:hover .sprite,
+#database #canvas .wrapper_robots .sprite_robot_current .sprite {
+    opacity: 1.0;
+    filter: brightness(1.0);
+}
 #database #canvas .wrapper_robots .sprite_robot .complete {
     position: absolute;
-    right: -4px;
-    top: -4px;
+    top: -5px;
+    left: -5px;
     width: 6px;
     height: 6px;
     font-size: 6px;
@@ -211,13 +238,25 @@
     color: #FFFFFF;
     text-shadow: 1px 1px 1px #000000;
     box-shadow: 1px 1px 1px #000000;
-    background-color: #FFFFFF !important;
-    /*background-color: rgba(255, 255, 255, 0.8);*/
-    border: 2px solid #000000;
-    /*border-color: rgba(0, 0, 0, 0.6);*/
+    background-color: inherit !important;
+    border: 1px solid #000000;
+    transition: background-color 0.6s;
+}
+#database #canvas .wrapper_robots .sprite_robot_current .complete {
+    background-color: #ffffff !important;
+}
+#database #canvas .wrapper_robots_masters .sprite_robot .complete {
+    width: 7px;
+    height: 7px;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
+}
+#database #canvas .wrapper_robots_mechas .sprite_robot .complete,
+#database #canvas .wrapper_robots_bosses .sprite_robot .complete {
+    width: 5px;
+    height: 5px;
+    transform: rotate(45deg);
 }
 #database #canvas .wrapper_robots_smaller .sprite_robot .complete {
     top: auto;
@@ -340,7 +379,8 @@
     box-sizing: border-box;
     padding: 1px;
     top: 4px;
-    left: 4px;
+    left: auto;
+    right: 4px;
 }
 #database #console .event .this_sprite.mugshot .wrap {
     box-sizing: border-box;
@@ -364,8 +404,7 @@
     bottom: 0;
     z-index: 1;
     border-style: solid;
-    border-color: #1A1A1A;
-    border-color: rgba(0, 0, 0, 0.4);
+    border-color: #2a2a2a;
     border-width: 2px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
@@ -421,7 +460,7 @@
 #database #console .event table td.right {
     line-height: 21px;
 }
-
+#database #console .event table td.right.has2cols > .wrap,
 #database #console .event table td.right.has3cols > .wrap {
     display: block;
     float: left;
@@ -429,10 +468,17 @@
     padding: 0;
     margin-right: 10px;
     margin-bottom: 0;
-    width: 33%;
-    width: calc((100% / 3) - 10px);
+    width: auto;
     text-align: left;
     overflow: hidden;
+}
+#database #console .event table td.right.has2cols > .wrap {
+    width: 50%;
+    width: calc((100% / 2) - 10px);
+}
+#database #console .event table td.right.has3cols > .wrap {
+    width: 33%;
+    width: calc((100% / 3) - 10px);
 }
 
 #database #console .event .field_container,
@@ -475,6 +521,10 @@
     white-space: nowrap;
     line-height: 1.3;
     font-size: 90%;
+}
+#database #console .event .ability_name {
+    margin-bottom: 12px;
+    overflow: visible;
 }
 #database #console .event .field_name,
 #database #console .event .skill_name {
@@ -519,11 +569,22 @@
     display: block;
 }
 #database #console .event .ability_name .level {
-    font-size: 9px;
+    font-size: 8px;
     opacity: 0.8;
+    position: absolute;
+    top: -12px;
+    right: 0px;
+}
+#database #console .event .ability_name .name {
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #database #console .header {
+    margin: 0 auto;
+    padding-right: 40px;
     height: auto;
     width: auto;
     float: none;
@@ -547,4 +608,27 @@
     -webkit-border-radius: 0.3em;
     border-color: rgba(0, 0, 0, 0.40) !important;
     background-color: rgba(0, 0, 0, 0.20) !important;
+}
+
+#console .event .body.body_left {
+    margin: 0 auto;
+    padding: 2px 3px;
+    height: auto;
+    width: auto;
+    float: none;
+}
+#console .event .body.body_left table:first-child {
+    width: calc(100% - 40px);
+}
+#console .event .body.body_left table .has3 .robot_weakness,
+#console .event .body.body_left table .has3 .robot_resistance,
+#console .event .body.body_left table .has3 .robot_affinity,
+#console .event .body.body_left table .has3 .robot_immunity {
+    font-size: 80%;
+}
+#console .event .body.body_left table .has4 .robot_weakness,
+#console .event .body.body_left table .has4 .robot_resistance,
+#console .event .body.body_left table .has4 .robot_affinity,
+#console .event .body.body_left table .has4 .robot_immunity {
+    font-size: 60%;
 }

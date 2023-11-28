@@ -308,46 +308,24 @@ if (true){
                         $key_counter = 0;
                         foreach($mmrpg_database_robots AS $robot_key => $robot_info){
                             // Skip if not the correct robot class
-                            if ($robot_info['robot_class'] != 'master'){ continue; }
-                            $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
-                            $temp_robot_type_class = 'robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none');
+                            if ($robot_info['robot_class'] !== 'master'){ continue; }
                             $temp_robot_name_span = '<span>'.$robot_info['robot_name'].'</span>';
+                            $temp_robot_type_class = 'robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none');
+                            $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
+                            $temp_robot_image_path = 'images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
+                            $temp_robot_mug_sprite = '<span class="sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot" style="background-image: url('.$temp_robot_image_path.');"></span>';
                             // If this robot is visible, display normally
                             if ($robot_info['robot_visible'] && in_array($robot_info['robot_token'], $visible_database_robots)){
-                                $temp_robot_image_path = 'images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
                                 $temp_robot_link_class = 'sprite sprite_robot sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == $first_robot_token ? 'sprite_robot_current ' : '').' '.$temp_robot_type_class;
                                 if (empty($robot_info['robot_flag_unlockable'])){ $temp_robot_link_class .= ' not-unlockable'; }
-                                $robot_complete_markup = $robot_info['robot_unlocked'] ? '<span class="complete '.$temp_robot_type_class.'">&#10022;</span>' : '';
-                                echo '<a data-token="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" data-maybe-title="'.$robot_info['robot_number'].' '.$robot_info['robot_name'].'" style="background-image: url('.$temp_robot_image_path.');" class="'.$temp_robot_link_class.'">'.$temp_robot_name_span.$robot_complete_markup.'</a>';
+                                $robot_complete_markup = '';
+                                if ($robot_info['robot_unlocked']){ $robot_complete_markup .= '<span class="complete '.$temp_robot_type_class.'">&#10022;</span>'; }
+                                echo '<a data-token="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" data-maybe-title="'.$robot_info['robot_number'].' '.$robot_info['robot_name'].'" class="'.$temp_robot_link_class.'">'.$temp_robot_mug_sprite.$temp_robot_name_span.$robot_complete_markup.'</a>';
                             }
                             // Otherwise, show a placeholder box for later
                             else {
                                 $temp_robot_link_class = 'sprite sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot robot_status_active robot_position_active';
                                 echo '<a data-token-locked="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" data-click-tooltip="'.$robot_info['robot_number'].' ???" class="'.$temp_robot_link_class.'">???</a>';
-                            }
-                            // Increment the key counter
-                            $key_counter++;
-                        }
-                        ?>
-                    </div>
-                    <strong class="wrapper_header wrapper_header_mechas">Mecha Support</strong>
-                    <div class="wrapper wrapper_robots wrapper_robots_mechas" data-select="robots" data-kind="mechas">
-                        <?
-                        // Loop through all of the robots, one by one, displaying their buttons
-                        //$key_counter = 0;
-                        foreach($mmrpg_database_robots AS $robot_key => $robot_info){
-                            // Skip if not the correct robot class
-                            if ($robot_info['robot_class'] != 'mecha'){ continue; }
-                            $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
-                            $temp_robot_type_class = 'robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none');
-                            $robot_info['robot_name'] .= preg_match('/^([-a-z0-9]+)-(2|3)$/i', $robot_info['robot_token']) ? ' '.preg_replace('/^([-a-z0-9]+)-(2|3)$/i', '$2', $robot_info['robot_token']) : '';
-                            // If this robot is visible, display normally
-                            if ($robot_info['robot_visible'] && in_array($robot_info['robot_token'], $visible_database_robots)){
-                                echo '<a data-token="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" data-maybe-title="'.$robot_info['robot_number'].' '.$robot_info['robot_name'].'" style="background-image: url(images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.');" class="sprite scaled sprite_robot sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == $first_robot_token ? 'sprite_robot_current ' : '').' '.$temp_robot_type_class.'">'.$robot_info['robot_name'].'</a>';
-                            }
-                            // Otherwise, show a placeholder box for later
-                            else {
-                                echo '<a data-token-locked="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" data-click-tooltip="'.$robot_info['robot_number'].' ???" class="sprite scaled sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot robot_status_active robot_position_active">???</a>';
                             }
                             // Increment the key counter
                             $key_counter++;
@@ -362,16 +340,52 @@ if (true){
                         foreach($mmrpg_database_robots AS $robot_key => $robot_info){
                             // Skip if not the correct robot class
                             if ($robot_info['robot_class'] != 'boss'){ continue; }
-                            $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
+                            $temp_robot_name_span = '<span>'.$robot_info['robot_name'].'</span>';
                             $temp_robot_type_class = 'robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none');
-                            $robot_info['robot_name'] .= preg_match('/^([-a-z0-9]+)-(2|3)$/i', $robot_info['robot_token']) ? ' '.preg_replace('/^([-a-z0-9]+)-(2|3)$/i', '$2', $robot_info['robot_token']) : '';
+                            $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
+                            $temp_robot_image_path = 'images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
+                            $temp_robot_mug_sprite = '<span class="sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot" style="background-image: url('.$temp_robot_image_path.');"></span>';
                             // If this robot is visible, display normally
                             if ($robot_info['robot_visible'] && in_array($robot_info['robot_token'], $visible_database_robots)){
-                                echo '<a data-token="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" data-maybe-title="'.$robot_info['robot_number'].' '.$robot_info['robot_name'].'" style="background-image: url(images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.');" class="sprite sprite_robot sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == $first_robot_token ? 'sprite_robot_current ' : '').' '.$temp_robot_type_class.'">'.$robot_info['robot_name'].'</a>';
+                                $temp_robot_link_class = 'sprite sprite_robot sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == $first_robot_token ? 'sprite_robot_current ' : '').' '.$temp_robot_type_class;
+                                if (empty($robot_info['robot_flag_unlockable'])){ $temp_robot_link_class .= ' not-unlockable'; }
+                                $robot_complete_markup = '';
+                                if ($robot_info['robot_summoned']){ $robot_complete_markup .= '<span class="complete '.$temp_robot_type_class.'">&#10022;</span>'; }
+                                echo '<a data-token="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" data-maybe-title="'.$robot_info['robot_number'].' '.$robot_info['robot_name'].'" class="'.$temp_robot_link_class.'">'.$temp_robot_mug_sprite.$temp_robot_name_span.$robot_complete_markup.'</a>';
                             }
                             // Otherwise, show a placeholder box for later
                             else {
                                 echo '<a data-token-locked="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" data-click-tooltip="'.$robot_info['robot_number'].' ???" class="sprite sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot robot_status_active robot_position_active">???</a>';
+                            }
+                            // Increment the key counter
+                            $key_counter++;
+                        }
+                        ?>
+                    </div>
+                    <strong class="wrapper_header wrapper_header_mechas">Mecha Support</strong>
+                    <div class="wrapper wrapper_robots wrapper_robots_mechas" data-select="robots" data-kind="mechas">
+                        <?
+                        // Loop through all of the robots, one by one, displaying their buttons
+                        //$key_counter = 0;
+                        foreach($mmrpg_database_robots AS $robot_key => $robot_info){
+                            // Skip if not the correct robot class
+                            if ($robot_info['robot_class'] !== 'mecha'){ continue; }
+                            $temp_robot_name_span = '<span>'.$robot_info['robot_name'].'</span>';
+                            $temp_robot_type_class = 'robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none');
+                            $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
+                            $temp_robot_image_path = 'images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE;
+                            $temp_robot_mug_sprite = '<span class="sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot" style="background-image: url('.$temp_robot_image_path.');"></span>';
+                            // If this robot is visible, display normally
+                            if ($robot_info['robot_visible'] && in_array($robot_info['robot_token'], $visible_database_robots)){
+                                $temp_robot_link_class = 'sprite sprite_robot sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == $first_robot_token ? 'sprite_robot_current ' : '').' '.$temp_robot_type_class;
+                                if (empty($robot_info['robot_flag_unlockable'])){ $temp_robot_link_class .= ' not-unlockable'; }
+                                $robot_complete_markup = '';
+                                if ($robot_info['robot_summoned']){ $robot_complete_markup .= '<span class="complete '.$temp_robot_type_class.'">&#10022;</span>'; }
+                                echo '<a data-token="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" data-maybe-title="'.$robot_info['robot_number'].' '.$robot_info['robot_name'].'" class="'.$temp_robot_link_class.'">'.$temp_robot_mug_sprite.$temp_robot_name_span.$robot_complete_markup.'</a>';
+                            }
+                            // Otherwise, show a placeholder box for later
+                            else {
+                                echo '<a data-token-locked="'.$robot_info['robot_token'].'" data-kind="'.$robot_info['robot_class'].'" data-game="'.$robot_info['robot_page_token'].'" data-size="'.$robot_info['robot_image_size'].'" data-click-tooltip="'.$robot_info['robot_number'].' ???" class="sprite scaled sprite_robot sprite_robot_sprite sprite_40x40 sprite_40x40_mugshot robot_status_active robot_position_active">???</a>';
                             }
                             // Increment the key counter
                             $key_counter++;
@@ -416,7 +430,7 @@ if (true){
                                         <div style="background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/mug_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?=MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_mug robot_status_active robot_position_active"><?=$robot_info['robot_name']?></div>
                                     </div>
                                 </div>
-                                <div class="header header_left robot_type robot_type_<?= $core_type_class ?>" style="margin-right: 0;">
+                                <div class="header header_left robot_type robot_type_<?= $core_type_class ?>">
                                     <?=$robot_info['robot_name']?>&#39;s Data
                                     <? if ($robot_is_unlockable){ ?>
                                         <span class="this_unlockable" <?= $data_tooltip_type ?> data-click-tooltip="<?= $robot_is_unlocked ? 'Robot Master Unlocked!' : 'Robot Is Unlockable' ?>">
@@ -433,12 +447,12 @@ if (true){
                                         <span class="robot_type robot_core">Neutral Core</span>
                                     <? endif; ?>
                                 </div>
-                                <div class="body body_left" style="margin-right: 0; padding: 2px 3px;">
+                                <div class="body body_left">
                                     <table class="full" style="margin-bottom: 5px;">
                                         <colgroup>
-                                            <col width="35%" />
-                                            <col width="1%" />
-                                            <col width="64%" />
+                                            <col width="185" />
+                                            <col width="5" />
+                                            <col width="" />
                                         </colgroup>
                                         <tbody>
                                             <tr>
@@ -479,14 +493,17 @@ if (true){
                                                     <? endif; ?>
                                                 </td>
                                                 <td class="center">&nbsp;</td>
-                                                <td class="right">
+                                                <td class="right<?= !empty($robot_info['robot_weaknesses']) ? ' has'.count($robot_info['robot_weaknesses']) : '' ?>">
                                                     <label style="display: block; float: left;">Weaknesses :</label>
                                                     <?
                                                     if ($robot_info['robot_scanned'] || $robot_info['robot_unlocked'] || $robot_info['robot_summoned']){
                                                         if (!empty($robot_info['robot_weaknesses'])){
                                                             $temp_string = array();
                                                             foreach ($robot_info['robot_weaknesses'] AS $robot_weakness){
-                                                                $temp_string[] = '<span class="robot_weakness robot_type robot_type_'.$robot_weakness.'">'.$mmrpg_database_types[$robot_weakness]['type_name'].'</span>';
+                                                                $type_info = $mmrpg_database_types[$robot_weakness];
+                                                                $type_name = $type_info['type_name'];
+                                                                $type_name_responsive = '<span>'.substr($type_info['type_name'], 0, 2).'</span><span>'.substr($type_info['type_name'], 2).'</span>';
+                                                                $temp_string[] = '<span class="robot_weakness robot_type robot_type_'.$robot_weakness.'">'.$type_name_responsive.'</span>';
                                                             }
                                                             echo implode(' ', $temp_string);
                                                         } else {
@@ -497,7 +514,6 @@ if (true){
                                                     }
                                                     ?>
                                                 </td>
-
                                             </tr>
                                             <tr>
                                                 <td  class="right">
@@ -509,14 +525,17 @@ if (true){
                                                     <? endif; ?>
                                                 </td>
                                                 <td class="center">&nbsp;</td>
-                                                <td class="right">
+                                                <td class="right<?= !empty($robot_info['robot_resistances']) ? ' has'.count($robot_info['robot_resistances']) : '' ?>">
                                                     <label style="display: block; float: left;">Resistances :</label>
                                                     <?
                                                     if ($robot_info['robot_scanned'] || $robot_info['robot_unlocked'] || $robot_info['robot_summoned']){
                                                         if (!empty($robot_info['robot_resistances'])){
                                                             $temp_string = array();
                                                             foreach ($robot_info['robot_resistances'] AS $robot_resistance){
-                                                                $temp_string[] = '<span class="robot_resistance robot_type robot_type_'.$robot_resistance.'">'.$mmrpg_database_types[$robot_resistance]['type_name'].'</span>';
+                                                                $type_info = $mmrpg_database_types[$robot_resistance];
+                                                                $type_name = $type_info['type_name'];
+                                                                $type_name_responsive = '<span>'.substr($type_info['type_name'], 0, 2).'</span><span>'.substr($type_info['type_name'], 2).'</span>';
+                                                                $temp_string[] = '<span class="robot_resistance robot_type robot_type_'.$robot_resistance.'">'.$type_name_responsive.'</span>';
                                                             }
                                                             echo implode(' ', $temp_string);
                                                         } else {
@@ -538,14 +557,17 @@ if (true){
                                                     <? endif; ?>
                                                 </td>
                                                 <td class="center">&nbsp;</td>
-                                                <td class="right">
+                                                <td class="right<?= !empty($robot_info['robot_affinities']) ? ' has'.count($robot_info['robot_affinities']) : '' ?>">
                                                     <label style="display: block; float: left;">Affinities :</label>
                                                     <?
                                                     if ($robot_info['robot_scanned'] || $robot_info['robot_unlocked'] || $robot_info['robot_summoned']){
                                                         if (!empty($robot_info['robot_affinities'])){
                                                             $temp_string = array();
                                                             foreach ($robot_info['robot_affinities'] AS $robot_affinity){
-                                                                $temp_string[] = '<span class="robot_affinity robot_type robot_type_'.$robot_affinity.'">'.$mmrpg_database_types[$robot_affinity]['type_name'].'</span>';
+                                                                $type_info = $mmrpg_database_types[$robot_affinity];
+                                                                $type_name = $type_info['type_name'];
+                                                                $type_name_responsive = '<span>'.substr($type_info['type_name'], 0, 2).'</span><span>'.substr($type_info['type_name'], 2).'</span>';
+                                                                $temp_string[] = '<span class="robot_affinity robot_type robot_type_'.$robot_affinity.'">'.$type_name_responsive.'</span>';
                                                             }
                                                             echo implode(' ', $temp_string);
                                                         } else {
@@ -567,14 +589,17 @@ if (true){
                                                     <? endif; ?>
                                                 </td>
                                                 <td class="center">&nbsp;</td>
-                                                <td class="right">
+                                                <td class="right<?= !empty($robot_info['robot_immunities']) ? ' has'.count($robot_info['robot_immunities']) : '' ?>">
                                                     <label style="display: block; float: left;">Immunities :</label>
                                                     <?
                                                     if ($robot_info['robot_scanned'] || $robot_info['robot_unlocked'] || $robot_info['robot_summoned']){
                                                         if (!empty($robot_info['robot_immunities'])){
                                                             $temp_string = array();
                                                             foreach ($robot_info['robot_immunities'] AS $robot_immunity){
-                                                                $temp_string[] = '<span class="robot_immunity robot_type robot_type_'.$robot_immunity.'">'.$mmrpg_database_types[$robot_immunity]['type_name'].'</span>';
+                                                                $type_info = $mmrpg_database_types[$robot_immunity];
+                                                                $type_name = $type_info['type_name'];
+                                                                $type_name_responsive = '<span>'.substr($type_info['type_name'], 0, 2).'</span><span>'.substr($type_info['type_name'], 2).'</span>';
+                                                                $temp_string[] = '<span class="robot_immunity robot_type robot_type_'.$robot_immunity.'">'.$type_name_responsive.'</span>';
                                                             }
                                                             echo implode(' ', $temp_string);
                                                         } else {
@@ -623,9 +648,13 @@ if (true){
                                         <div class="wrap">
                                             <label style="display: block; float: left;">Skill :</label>
                                             <div class="skill_container">
-                                                <span class="skill_name type type_<?= $skill_info_type ?>" data-click-tooltip="<?= htmlentities($skill_info['skill_description'], ENT_QUOTES, 'UTF-8', true) ?>">
-                                                    <?= $skill_info['skill_name'] ?>
-                                                </span>
+                                                <? if(($robot_info['robot_unlocked'] || $robot_info['robot_summoned'] || $robot_info['robot_scanned'])): ?>
+                                                    <span class="skill_name type type_<?= $skill_info_type ?>" data-click-tooltip="<?= htmlentities($skill_info['skill_description'], ENT_QUOTES, 'UTF-8', true) ?>">
+                                                        <?= $skill_info['skill_name'] ?>
+                                                    </span>
+                                                <? else: ?>
+                                                    <span class="skill_name type type_empty field_name">???</span>
+                                                <? endif; ?>
                                             </div>
                                         </div>
                                         <?
@@ -637,7 +666,7 @@ if (true){
                                         <div class="wrap">
                                             <label style="display: block; float: left;">Field :</label>
                                             <div class="field_container">
-                                                <? if($temp_show_robot_field && ($robot_info['robot_unlocked'] || $robot_info['robot_summoned'])): ?>
+                                                <? if($temp_show_robot_field && ($robot_info['robot_unlocked'] || $robot_info['robot_summoned'] || $robot_info['robot_encountered'])): ?>
                                                     <span class="ability_name ability_type ability_type_<?= !empty($temp_robot_field['field_type']) ? $temp_robot_field['field_type'] : 'none' ?> field_name" data-click-tooltip="<?= $temp_field_title ?>"><?= $temp_robot_field['field_name'] ?></span>
                                                 <? else: ?>
                                                     <span class="ability_name ability_type ability_type_empty field_name">???</span>
@@ -657,7 +686,7 @@ if (true){
                                             </colgroup>
                                             <tbody>
                                                 <tr>
-                                                    <td class="right has3cols">
+                                                    <td class="right has2cols">
                                                         <? foreach ($table_data AS $key => $data){
                                                             echo(trim($data).PHP_EOL);
                                                         } ?>
@@ -680,17 +709,22 @@ if (true){
                                                     <div class="ability_container">
                                                     <?
                                                     $robot_ability_rewards = $robot_info['robot_rewards']['abilities'];
-                                                    if (
-                                                        !empty($robot_ability_rewards) &&
-                                                        (($robot_info['robot_class'] === 'master' && $robot_info['robot_unlocked'])
-                                                        || ($robot_info['robot_class'] !== 'master' && $robot_info['robot_summoned']))
-                                                        ){
+                                                    foreach ($robot_ability_rewards AS $key => $this_info){
+                                                        if ($this_info['token'] === 'buster-shot'){
+                                                            unset($robot_ability_rewards[$key]);
+                                                        }
+                                                    }
+                                                    $robot_database_complete = false;
+                                                    if ((($robot_info['robot_class'] === 'master' && $robot_info['robot_unlocked'])
+                                                        || ($robot_info['robot_class'] !== 'master' && $robot_info['robot_summoned']))){
+                                                        $robot_database_complete = true;
+                                                    }
+                                                    if (!empty($robot_ability_rewards) && $robot_database_complete){
                                                         $temp_string = array();
                                                         $ability_key = 0;
-
-                                                        foreach ($robot_ability_rewards AS $this_info){
+                                                        foreach ($robot_ability_rewards AS $key => $this_info){
                                                             $this_level = $this_info['level'];
-                                                            $this_ability = rpg_ability::parse_index_info($mmrpg_database_abilities[$this_info['token']]);
+                                                            $this_ability = $mmrpg_database_abilities[$this_info['token']];
                                                             $this_ability_token = $this_ability['ability_token'];
                                                             $this_ability_name = $this_ability['ability_name'];
                                                             $this_ability_type = !empty($this_ability['ability_type']) ? $this_ability['ability_type'] : false;
@@ -707,7 +741,7 @@ if (true){
                                                             //if (!empty($this_ability_accuracy)){ $this_ability_title_plain .= ' | '.$this_ability_accuracy.'% Accuracy'; }
                                                             //if (!empty($this_ability_description)){ $this_ability_title_plain .= ' | '.$this_ability_description; }
                                                             $this_ability_title_html = str_replace(' ', '&nbsp;', $this_ability_name);
-                                                            $this_ability_title_html = '<span class="level">'.($this_level > 1 ? 'Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT) : 'Start').'</span> <span class="name">'.$this_ability_title_html.'</span>';
+                                                            $this_ability_title_html = '<span class="level">'.($this_level > 1 ? 'Lv '.$this_level : 'Start').'</span> <span class="name">'.$this_ability_title_html.'</span>';
                                                             $this_ability_title = rpg_ability::print_editor_title_markup($robot_info, $this_ability);
                                                             $this_ability_title_plain = strip_tags(str_replace('<br />', '&#10;', $this_ability_title));
                                                             $this_ability_title_tooltip = htmlentities($this_ability_title, ENT_QUOTES, 'UTF-8');
@@ -715,7 +749,7 @@ if (true){
                                                             $ability_key++;
                                                         }
                                                         echo implode(' ', $temp_string);
-                                                    } elseif (!$robot_info['robot_unlocked']){
+                                                    } elseif (!empty($robot_ability_rewards)){
                                                         echo '<span class="ability_name ability_type ability_type_empty">???</span>';
                                                     } else {
                                                         echo '<span class="robot_ability robot_type_none">None</span>';
@@ -911,7 +945,7 @@ $(document).ready(function(){
     gameConsole.append('<?= str_replace("'", "\\'", $database_console_markup) ?>');
 
     // Create the click event for canvas sprites
-    $('.sprite[data-token]', gameCanvas).live('click', function(){
+    $('.sprite_robot[data-token]', gameCanvas).live('click', function(){
 
         var dataSprite = $(this);
         var dataParent = dataSprite.closest('.wrapper');
@@ -949,7 +983,7 @@ $(document).ready(function(){
 
         });
     // Trigger a click on the first robot
-    //$('.sprite[data-token]:first-child', gameCanvas).trigger('click');
+    //$('.sprite_robot[data-token]:first-child', gameCanvas).trigger('click');
 
     // Create the click event for canvas game links
     $('.game_link[data-game]', gameCanvas).live('click', function(e){
@@ -961,14 +995,14 @@ $(document).ready(function(){
         $('.game_link[data-game!='+dataGame+']', gameCanvas).removeClass('game_link_active');
         $('.game_link[data-game='+dataGame+']', gameCanvas).addClass('game_link_active');
         // Hide all robot links that are not from the selected game and show the ones that are
-        $('.sprite[data-game!='+dataGame+']', gameCanvas).addClass('sprite_robot_hidden');
-        $('.sprite[data-game='+dataGame+']', gameCanvas).removeClass('sprite_robot_hidden');
+        $('.sprite_robot[data-game!='+dataGame+']', gameCanvas).addClass('sprite_robot_hidden');
+        $('.sprite_robot[data-game='+dataGame+']', gameCanvas).removeClass('sprite_robot_hidden');
         // Count the number of master and mecha robots currently visible
         var visibleRobots = $('.sprite', gameCanvas).not('.sprite_robot_hidden');
         var visibleRobotsCount = visibleRobots.length;
-        var visibleRobotMasters = visibleRobots.filter('.sprite[data-kind=master]').length;
-        var visibleRobotMechas = visibleRobots.filter('.sprite[data-kind=mecha]').length;
-        var visibleRobotBosses = visibleRobots.filter('.sprite[data-kind=boss]').length;
+        var visibleRobotMasters = visibleRobots.filter('.sprite_robot[data-kind=master]').length;
+        var visibleRobotMechas = visibleRobots.filter('.sprite_robot[data-kind=mecha]').length;
+        var visibleRobotBosses = visibleRobots.filter('.sprite_robot[data-kind=boss]').length;
         //console.log('Switched to '+dataGame+'! Total = '+visibleRobotsCount+'; Robot Masters = '+visibleRobotMasters+'; Mecha Support = '+visibleRobotMechas);
         // Hide or show the robot master container based on count
         if (visibleRobotMasters > 0){ $('.wrapper_header_masters, .wrapper_robots_masters', gameCanvas).css({display:'block'}); }
@@ -981,10 +1015,10 @@ $(document).ready(function(){
         else { $('.wrapper_header_bosses, .wrapper_robots_bosses', gameCanvas).css({display:'none'}); }
         // Auto-click the first visible robot sprite in the canvas
         if (gameSettings.firstRobot !== false){
-            var firstVisibleSprite = $('.sprite[data-token='+gameSettings.firstRobot+']', gameCanvas);
+            var firstVisibleSprite = $('.sprite_robot[data-token='+gameSettings.firstRobot+']', gameCanvas);
             gameSettings.firstRobot = false;
             } else {
-            var firstVisibleSprite = $('.sprite[data-token][data-game='+dataGame+']', gameCanvas).first();
+            var firstVisibleSprite = $('.sprite_robot[data-token][data-game='+dataGame+']', gameCanvas).first();
             }
         //console.log(firstVisibleSprite.text());
         firstVisibleSprite.triggerSilentClick();
