@@ -701,7 +701,28 @@ if (strstr($page_content_parsed, $find)){
 
         // Define an inline function for pulling relevant user details from the index
         $get_user_data_from_index = function($user_id, $prefix = '') use ($user_index_array) {
-            $temp_user = $user_index_array[$user_id];
+            if (!empty($user_index_array[$user_id])){
+                // pull from index
+                $temp_user = $user_index_array[$user_id];
+                } else {
+                // fake it
+                $temp_user = array(
+                    'user_id' => 0,
+                    'user_name' => 'Unknown User',
+                    'user_name_public' => '',
+                    'user_name_clean' => 'guest',
+                    'user_colour_token' => 'empty',
+                    'user_image_path' => '',
+                    'user_background_path' => '',
+                    'user_backup_login' => 0,
+                    'user_date_modified' => 0,
+                    'user_flag_postpublic' => 0,
+                    'user_flag_postprivate' => 0,
+                    'user_board_points' => 0,
+                    'user_thread_count' => 0,
+                    'user_post_count' => 0,
+                    );
+                }
             $return_data = array();
             $return_data[$prefix.'user_id'] = $temp_user['user_id'];
             $return_data[$prefix.'user_name'] = $temp_user['user_name'];
@@ -723,6 +744,8 @@ if (strstr($page_content_parsed, $find)){
         // Define a function for pulling pulling extended info for a given thread given it's base data
         $get_full_thread_info = function($this_thread_info) use ($thread_categories_index, $user_roles_index, $get_user_data_from_index) {
                 $full_thread_info = $this_thread_info;
+                if (empty($this_thread_info['category_id'])){ return false; }
+                elseif (!isset($thread_categories_index[$this_thread_info['category_id']])){ return false; }
                 $full_thread_info = array_merge($full_thread_info, $thread_categories_index[$this_thread_info['category_id']]);
                 if (!empty($this_thread_info['user_id'])){
                     $temp_user_info = $get_user_data_from_index($this_thread_info['user_id']);
@@ -772,6 +795,10 @@ if (strstr($page_content_parsed, $find)){
             // Loop through the thread array and display its contents
             if (!empty($this_threads_array)){
                 foreach ($this_threads_array AS $this_thread_key => $this_thread_info){
+
+                    // Don't display threads that are not published or are in the personal category
+                    if (empty($this_thread_info['category_id'])){ continue; }
+                    elseif (!isset($thread_categories_index[$this_thread_info['category_id']])){ continue; }
 
                     // Check the key to see if we should display this result
                     if ($this_thread_key < $search_page_result_key_start){ continue; }
