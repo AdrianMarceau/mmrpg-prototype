@@ -295,7 +295,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $temp_mecha_robot['robot_token'] = $temp_target_field['field_mechas'][0];
                 $temp_mecha_robot['robot_item'] = 'defense-pellet';
                 //$temp_mecha_robot['robot_abilities'] = array('defense-support', 'energy-break', 'speed-break');
-                //...notyet...$temp_battle_config['ability_rewards'] = array(array('token' => 'copy-style', 'level' => 0));
+                $temp_battle_config['ability_rewards'] = array(array('token' => 'copy-style', 'level' => 0));
             }
             $temp_target_robots[] = $temp_boss_robot;
             $temp_target_robots[] = $temp_mecha_robot;
