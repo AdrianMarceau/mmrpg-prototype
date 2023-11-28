@@ -218,6 +218,9 @@ if ($target_player->player_token == 'player'){
 $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
 //$this_battle->events_create(false, false, '', '');
 
+// Require the common battle-start action file
+require(MMRPG_CONFIG_ROOTDIR.'battle/actions/action_battlestart.php');
+
 // Queue up an the target robot's startup action
 $this_battle->actions_append($target_player, $target_robot, $this_player, $this_robot, 'start', '');
 // Execute the battle actions
@@ -242,7 +245,7 @@ foreach ($this_player->values['robots_active'] AS $key => $info){
 }
 
 // Require the common battle-start action file
-require(MMRPG_CONFIG_ROOTDIR.'battle/actions/action_battlestart.php');
+//require(MMRPG_CONFIG_ROOTDIR.'battle/actions/action_battlestart.php');
 
 // Create a final frame before giving control to the user
 $sfx_delay = 600;
