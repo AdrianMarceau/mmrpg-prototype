@@ -158,16 +158,20 @@ $first_event_body .= '<br />';
 
 // Update the summon counts for all this player's robots
 foreach ($this_player->values['robots_active'] AS $key => $info){
-    if (!isset($_SESSION['GAME']['values']['robot_database'][$info['robot_token']])){ $_SESSION['GAME']['values']['robot_database'][$info['robot_token']] = array('robot_token' => $info['robot_token']); }
-    if (!isset($_SESSION['GAME']['values']['robot_database'][$info['robot_token']]['robot_summoned'])){ $_SESSION['GAME']['values']['robot_database'][$info['robot_token']]['robot_summoned'] = 0; }
-    $_SESSION['GAME']['values']['robot_database'][$info['robot_token']]['robot_summoned'] += 1;
+    $token = $info['robot_pseudo_token'];
+    //error_log('this robot_token = '.$info['robot_token'].' vs $token = '.$token);
+    if (!isset($_SESSION['GAME']['values']['robot_database'][$token])){ $_SESSION['GAME']['values']['robot_database'][$token] = array('robot_token' => $token); }
+    if (!isset($_SESSION['GAME']['values']['robot_database'][$token]['robot_summoned'])){ $_SESSION['GAME']['values']['robot_database'][$token]['robot_summoned'] = 0; }
+    $_SESSION['GAME']['values']['robot_database'][$token]['robot_summoned'] += 1;
 }
 
 // Update the encounter counts for all target player's robots
 foreach ($target_player->values['robots_active'] AS $key => $info){
-    if (!isset($_SESSION['GAME']['values']['robot_database'][$info['robot_token']])){ $_SESSION['GAME']['values']['robot_database'][$info['robot_token']] = array('robot_token' => $info['robot_token']); }
-    if (!isset($_SESSION['GAME']['values']['robot_database'][$info['robot_token']]['robot_encountered'])){ $_SESSION['GAME']['values']['robot_database'][$info['robot_token']]['robot_encountered'] = 0; }
-    $_SESSION['GAME']['values']['robot_database'][$info['robot_token']]['robot_encountered'] += 1;
+    $token = $info['robot_pseudo_token'];
+    //error_log('target robot_token = '.$info['robot_token'].' vs $token = '.$token);
+    if (!isset($_SESSION['GAME']['values']['robot_database'][$token])){ $_SESSION['GAME']['values']['robot_database'][$token] = array('robot_token' => $token); }
+    if (!isset($_SESSION['GAME']['values']['robot_database'][$token]['robot_encountered'])){ $_SESSION['GAME']['values']['robot_database'][$token]['robot_encountered'] = 0; }
+    $_SESSION['GAME']['values']['robot_database'][$token]['robot_encountered'] += 1;
 }
 
 // Hide all this player's robots by default
