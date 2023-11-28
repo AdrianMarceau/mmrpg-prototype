@@ -476,11 +476,14 @@ if ($this_action == 'start'){
         $target_player->update_session();
     }
 
-    // Make sure the two players reference each other internally
-    $this_player->other_player = isset($target_player) ? $target_player : false;
-    $target_player->other_player = isset($this_player) ? $this_player : false;
-
 }
+
+// Make sure the two players reference each other internally (always, every reload)
+$this_player->other_player = isset($target_player) ? $target_player : false;
+$target_player->other_player = isset($this_player) ? $this_player : false;
+//error_log('just set the other player variables');
+//error_log('$this_player->other_player = '.print_r($this_player->other_player->player_token, true));
+//error_log('$target_player->other_player = '.print_r($target_player->other_player->player_token, true));
 
 // Ensure this player has robots to start with
 if (!empty($this_player->player_robots)){
