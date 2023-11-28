@@ -194,6 +194,9 @@ class rpg_robot extends rpg_object {
         $this->robot_original_player = isset($this_robotinfo['robot_original_player']) ? $this_robotinfo['robot_original_player'] : $this->player_token;
         $this->robot_string = isset($this_robotinfo['robot_string']) ? $this_robotinfo['robot_string'] : $this->robot_id.'_'.$this->robot_token;
 
+        // Define the robot's pseudo-token for external reference in case they've changed into a persona
+        $this->robot_pseudo_token = !empty($this->robot_persona) ? $this->robot_persona : $this->robot_token;
+
         // Define the internal robot base values using the robots index array
         $this->robot_base_name = isset($this_robotinfo['robot_base_name']) ? $this_robotinfo['robot_base_name'] : $this->robot_name;
         $this->robot_base_token = isset($this_robotinfo['robot_base_token']) ? $this_robotinfo['robot_base_token'] : $this->robot_token;
@@ -255,7 +258,7 @@ class rpg_robot extends rpg_object {
 
         // Collect any functions associated with this robot
         if (!isset($this->robot_function)){
-            $temp_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$this->robot_token.'/functions.php';
+            $temp_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$this->robot_pseudo_token.'/functions.php';
             if (file_exists($temp_functions_path)){ require($temp_functions_path); }
             else { $functions = array(); }
             $this->robot_function = isset($functions['robot_function']) ? $functions['robot_function'] : function(){};
@@ -3440,7 +3443,7 @@ class rpg_robot extends rpg_object {
         // If this is a Copy Core robot, make sure their colour is synced to abilities and held items
         $sync_to_elemental_energy = false;
         if ($this->robot_base_core === 'copy'
-            && $this->robot_base_image === $this->robot_token){
+            && $this->robot_base_image === $this->robot_pseudo_token){
             $sync_to_elemental_energy = true;
         }
 
