@@ -414,6 +414,7 @@
     position: absolute;
     z-index: 2;
     margin: 0;
+    pointer-events: none;
 }
 #database #console .event .this_sprite.mugshot.sx40 .sprite {
     top: -2px;
@@ -758,7 +759,7 @@
 }
 @keyframes database-robot-sprite-showcase-bounce {
     0% { transform: translateY(0px); }
-    50% { transform: translateY(-2px); }
+    50% { transform: translateY(-1px); }
     100% { transform: translateY(0px); }
 }
 @keyframes database-robot-shadow-sprite-showcase-bounce {
@@ -769,11 +770,11 @@
 #console .event.has_sprite_showcase .sprite_showcase .sprite_robot {
     transform: translateY(0);
     animation: database-robot-sprite-showcase-bounce 1s linear infinite;
-    animation-timing-function: steps(2);
+    animation-timing-function: steps(1);
 }
 #console .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow {
     animation-name: database-robot-shadow-sprite-showcase-bounce;
-    animation-timing-function: steps(2);
+    animation-timing-function: steps(1);
 }
 
 #console .event.has_sprite_showcase .sprite_showcase_buttons {
