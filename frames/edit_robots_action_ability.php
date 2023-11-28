@@ -71,6 +71,8 @@ foreach ($request_robot_abilities AS $temp_key => $temp_token){
         $allowed = true;
         $temp_info = $mmrpg_index_abilities[$temp_token];
         if (empty($temp_info['ability_flag_published'])){ $allowed = false; }
+        if (empty($temp_info['ability_flag_complete'])){ $allowed = false; }
+        if (empty($temp_info['ability_flag_unlockable'])){ $allowed = false; }
         if (!$allowed){
             unset($request_robot_abilities[$temp_key]);
             continue;
