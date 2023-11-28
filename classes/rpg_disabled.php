@@ -87,6 +87,8 @@ class rpg_disabled {
         $disabled_message_flag = 'disabled_on_'.$this_battle->counters['battle_turn'];
         if (!$skip_knockout_messages
             && !isset($this_robot->flags[$disabled_message_flag])){
+
+            // Show the target robot being disabled
             $this_robot->flags[$disabled_message_flag] = true;
             $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
             $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The target ').' '.$this_robot->print_name().' was disabled!<br />';
@@ -110,6 +112,22 @@ class rpg_disabled {
             $event_options['canvas_show_disabled_bench'] = $this_robot->robot_id.'_'.$this_robot->robot_token;
             rpg_canvas::apply_camera_action_flags($event_options, $this_robot);
             $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
+
+            // Show the target robot proud of themselves saying a victory quote (only after level 100, before they they say during experience)
+            if ($target_robot->robot_level >= 100){
+                $event_header = ($target_player->player_token != 'player' ? $target_player->player_name.'&#39;s ' : '').$target_robot->robot_name;
+                $event_body = ($target_player->player_token != 'player' ? $target_player->print_name().'&#39;s ' : 'The target ').' '.$target_robot->print_name().' is proud of '.$target_robot->get_pronoun('reflexive').'!<br />';
+                if (isset($target_robot->robot_quotes['battle_victory'])){
+                    $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
+                    $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                    $event_body .= $target_robot->print_quote('battle_victory', $this_find, $this_replace);
+                }
+                $target_robot->robot_frame = 'taunt';
+                $target_robot->update_session();
+                $this_battle->events_create($target_robot, $this_robot, $event_header, $event_body, $event_options);
+            }
+
+
         }
 
         // Check to see if this robot is holding an Extra Life before disabling
