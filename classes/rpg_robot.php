@@ -284,6 +284,7 @@ class rpg_robot extends rpg_object {
             else { $functions = array(); }
             $this->robot_function = isset($functions['robot_function']) ? $functions['robot_function'] : function(){};
             $this->robot_function_onload = isset($functions['robot_function_onload']) ? $functions['robot_function_onload'] : function(){};
+            $this->robot_function_onbattlesetup = isset($functions['robot_function_onbattlesetup']) ? $functions['robot_function_onbattlesetup'] : function(){};
             $this->robot_function_onbattlestart = isset($functions['robot_function_onbattlestart']) ? $functions['robot_function_onbattlestart'] : function(){};
             $this->robot_function_onability = isset($functions['robot_function_onability']) ? $functions['robot_function_onability'] : function(){};
             $this->robot_function_onturnstart = isset($functions['robot_function_onturnstart']) ? $functions['robot_function_onturnstart'] : function(){};
