@@ -3700,6 +3700,7 @@ class rpg_robot extends rpg_object {
             'robot_frame_styles' => $this->robot_frame_styles,
             'robot_detail_styles' => $this->robot_detail_styles,
             'robot_original_player' => $this->robot_original_player,
+            'robot_pseudo_token' => $this->robot_pseudo_token,
             'robot_string' => $this->robot_string,
             'flags' => $this->flags,
             'counters' => $this->counters,
