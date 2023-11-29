@@ -960,6 +960,12 @@ $(document).ready(function(){
                             $existingCanvasRobot.append($newCanvasRobotSprite);
                             $existingCanvasRobotSprite.remove();
 
+                            var copyStyleActive = false;
+                            if (newRobotImage.indexOf(targetRobotToken) === -1){ copyStyleActive = true; }
+                            //console.log('copyStyleActive =', copyStyleActive);
+                            $existingCanvasRobot.find('i.persona').remove();
+                            if (copyStyleActive){ $existingCanvasRobot.append('<i class="persona type copy"></i>'); }
+
                             });
 
                         }
@@ -1182,6 +1188,12 @@ $(document).ready(function(){
                                 });
                             $existingCanvasRobot.append($newCanvasRobotSprite);
                             $existingCanvasRobotSprite.remove();
+
+                            var copyStyleActive = false;
+                            if (newRobotImage.indexOf(dataRobot) === -1){ copyStyleActive = true; }
+                            //console.log('copyStyleActive =', copyStyleActive);
+                            $existingCanvasRobot.find('i.persona').remove();
+                            if (copyStyleActive){ $existingCanvasRobot.append('<i class="persona type copy"></i>'); }
 
                             });
 
