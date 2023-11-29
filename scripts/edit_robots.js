@@ -1048,6 +1048,8 @@ $(document).ready(function(){
         var $thisContainer = $thisLink.parent().parent();
         var thisContainerStatus = $thisContainer.attr('data-status') != undefined ? $thisContainer.attr('data-status') : 'enabled';
         var $thisSelect = $('select.ability_name', $thisContainer).eq(0);
+        var $parentAbilityContainer = $thisLink.closest('.ability_container');
+        var $parentRobotContainer = $thisLink.closest('.event[data-player][data-robot][data-token]');
         var thisLabel = 'presets';
         var dataKey = 0;
         var dataPlayer = $thisLink.attr('data-player');
@@ -1067,6 +1069,14 @@ $(document).ready(function(){
             $('select.ability_name', $thisContainer).each(function(key, value){
                 $(this).attr('disabled', 'disabled').prop('disabled', true);
                 });
+
+            // Collect a list of this robot's current abilities so we can reference later
+            var oldAbilityList = [];
+            $('.ability_name[data-ability]', $parentRobotContainer).each(function(index,element){
+                var thisAbility = $(this).attr('data-ability');
+                oldAbilityList.push(thisAbility);
+                });
+            //console.log('oldAbilityList =', oldAbilityList);
 
             // Post this change back to the server
             $.ajax({
@@ -1095,8 +1105,6 @@ $(document).ready(function(){
                         if (!newAbilityList.length){ newAbilityList.push('buster-shot'); }
 
                         // Collect references to the parent containers
-                        var $parentAbilityContainer = $thisLink.closest('.ability_container');
-                        var $parentRobotContainer = $thisLink.closest('.event[data-player][data-robot][data-token]');
                         var $targetAbilityLinks = $parentAbilityContainer.find('a.ability_name[data-key]');
                         var $refAbilityLinks = $('a.ability_name[data-ability]', thisAbilityCanvas);
                         //console.log('$parentAbilityContainer.length =', $parentAbilityContainer.length);
@@ -1111,53 +1119,125 @@ $(document).ready(function(){
                         if (mechaSupportActive){ $parentRobotContainer.find('.robot_support_subtitle').removeClass('inactive'); }
                         else { $parentRobotContainer.find('.robot_support_subtitle').addClass('inactive'); }
 
-                        // Loop through all the ability slots and update them with relevant abilities
-                        $targetAbilityLinks.each(function(index){
+                        // Check to see if this robot has need for the copy style info loading
+                        var copyStyleShifted = false;
+                        var hadCopyStyle = false;
+                        var hasCopyStyle = false;
+                        if (oldAbilityList.indexOf('copy-style') != -1){ hadCopyStyle = true; }
+                        if (newAbilityList.indexOf('copy-style') != -1){ hasCopyStyle = true; }
+                        if (hadCopyStyle && !hasCopyStyle){ copyStyleShifted = true; }
+                        else if (hasCopyStyle && !hadCopyStyle){ copyStyleShifted = true; }
 
-                            var slotKey = index;
-                            var newAbilityToken = typeof newAbilityList[slotKey] !== 'undefined' ? newAbilityList[slotKey] : '';
-                            //console.log('slotKey =', slotKey);
-                            //console.log('newAbilityToken =', newAbilityToken);
+                    // If copy style is active, we're going to need to reload the entire ability window
+                    if (copyStyleShifted){
 
-                            var $targetAbilityLink = $(this);
-                            var $refAbilityLink = false;
-                            if (newAbilityToken.length){ $refAbilityLink = $refAbilityLinks.filter('[data-ability="'+newAbilityToken+'"]'); }
-                            //console.log('$targetAbilityLink.length =', $targetAbilityLink.length);
-                            //console.log('$refAbilityLink.length =', $refAbilityLink.length);
+                        // Reload the console robot as their type, stats, and image may have changed dramatically
+                        reloadConsoleRobotMarkup(dataPlayer, dataRobot, function(){
 
-                            // If a non-empty ability token was provided, normal equip
-                            if (newAbilityToken.length
-                                && $refAbilityLink.length){
+                            var $newConsoleRobot = $('.event[data-token='+dataPlayer+'_'+dataRobot+']', gameConsole);
+                            var $existingCanvasRobot = $('.robot_canvas .sprite[data-token='+dataPlayer+'_'+dataRobot+']', gameCanvas);
+                            var $existingCanvasRobotSprite = $('.sprite', $existingCanvasRobot);
 
-                                // Update the target ability link with new data
-                                $targetAbilityLink.attr('class', $refAbilityLink.attr('class'));
-                                $targetAbilityLink.attr('data-id', $refAbilityLink.attr('data-id'));
-                                $targetAbilityLink.attr('data-ability', $refAbilityLink.attr('data-ability'));
-                                $targetAbilityLink.attr('data-type', $refAbilityLink.attr('data-type'));
-                                $targetAbilityLink.attr('data-type2', $refAbilityLink.attr('data-type2'));
-                                $targetAbilityLink.attr('data-tooltip', $refAbilityLink.attr('data-tooltip'));
-                                // Clone the inner html into the target ability link
-                                $targetAbilityLink.html($refAbilityLink.html());
-                                $targetAbilityLink.css({opacity:''});
-
+                            var newRobotName = $newConsoleRobot.attr('data-name');
+                            var newRobotTypes = $newConsoleRobot.attr('data-types');
+                            var newRobotImage = $newConsoleRobot.attr('data-image');
+                            var newRobotImageSize = $newConsoleRobot.attr('data-image-size');
+                            newRobotTypes = newRobotTypes.indexOf(',') != -1 ? newRobotTypes.split(',') : [newRobotTypes];
+                            newRobotImageSize = parseInt(newRobotImageSize) > 0 ? parseInt(newRobotImageSize) : 40;
+                            var newRobotImageSizeToken = newRobotImageSize+'x'+newRobotImageSize;
+                            var newRobotImagePath = 'images/robots/'+newRobotImage+'/';
+                            newRobotImagePath += 'mug_right_'+newRobotImageSizeToken+'.png?'+gameSettings.cacheTime;
+                            var backgroundOffset = [-5, -10];
+                            if (newRobotImageSize > 40){
+                                var shiftVal = (newRobotImageSize - 40) / 40;
+                                backgroundOffset[0] -= (20 * shiftVal);
+                                backgroundOffset[1] -= (20 * shiftVal);
                                 }
-                            // Otherwise if this was an ability remove option, clear stuff
-                            else {
+                            var backgroundPosition = backgroundOffset[0]+'px '+backgroundOffset[1]+'px';
+                            //console.log('Robot "'+dataRobot+'" has style changed!');
+                            //console.log('newRobotName =', newRobotName);
+                            //console.log('newRobotTypes =', newRobotTypes);
+                            //console.log('newRobotImage =', newRobotImage);
+                            //console.log('newRobotImageSize =', newRobotImageSize);
+                            //console.log('newRobotImageSizeToken =', newRobotImageSizeToken);
+                            //console.log('newRobotImagePath =', newRobotImagePath);
+                            //console.log('backgroundOffset =', backgroundOffset);
+                            //console.log('backgroundPosition =', backgroundPosition);
 
-                                // Update the target ability link with empty data
-                                $targetAbilityLink.attr('class', 'ability_name');
-                                $targetAbilityLink.attr('data-id', '0');
-                                $targetAbilityLink.attr('data-ability', '');
-                                $targetAbilityLink.attr('data-type', '');
-                                $targetAbilityLink.attr('data-type2', '');
-                                $targetAbilityLink.attr('data-tooltip', '');
-                                // Remove the label text and replace with empty hyphen
-                                $targetAbilityLink.find('label').attr('style', '').html('-');
-                                $targetAbilityLink.find('.info').remove();
-
+                            $existingCanvasRobot.attr('title', newRobotName);
+                            var robotTypeClasses = $existingCanvasRobot.attr('class').split(' ').filter(function(c) {
+                                return c.lastIndexOf('robot_type_', 0) !== 0;
+                                }).join(' ');
+                            for (var i=0; i<newRobotTypes.length; i++){
+                                robotTypeClasses += ' robot_type_'+newRobotTypes[i];
                                 }
+                            $existingCanvasRobot.attr('class', robotTypeClasses);
+
+                            var $newCanvasRobotSprite = $('<span class="sprite"></span>');
+                            $newCanvasRobotSprite.addClass('sprite_'+newRobotImageSizeToken);
+                            $newCanvasRobotSprite.addClass('sprite_'+newRobotImageSizeToken+'_mugshot');
+                            $newCanvasRobotSprite.css({
+                                'background-image': 'url('+newRobotImagePath+')',
+                                'background-position': backgroundPosition
+                                });
+                            $existingCanvasRobot.append($newCanvasRobotSprite);
+                            $existingCanvasRobotSprite.remove();
 
                             });
+
+                        }
+                    // Otherwise we can loop through and manually update ability slots
+                    else {
+
+                            // Loop through all the ability slots and update them with relevant abilities
+                            $targetAbilityLinks.each(function(index){
+
+                                var slotKey = index;
+                                var newAbilityToken = typeof newAbilityList[slotKey] !== 'undefined' ? newAbilityList[slotKey] : '';
+                                //console.log('slotKey =', slotKey);
+                                //console.log('newAbilityToken =', newAbilityToken);
+
+                                var $targetAbilityLink = $(this);
+                                var $refAbilityLink = false;
+                                if (newAbilityToken.length){ $refAbilityLink = $refAbilityLinks.filter('[data-ability="'+newAbilityToken+'"]'); }
+                                //console.log('$targetAbilityLink.length =', $targetAbilityLink.length);
+                                //console.log('$refAbilityLink.length =', $refAbilityLink.length);
+
+                                // If a non-empty ability token was provided, normal equip
+                                if (newAbilityToken.length
+                                    && $refAbilityLink.length){
+
+                                    // Update the target ability link with new data
+                                    $targetAbilityLink.attr('class', $refAbilityLink.attr('class'));
+                                    $targetAbilityLink.attr('data-id', $refAbilityLink.attr('data-id'));
+                                    $targetAbilityLink.attr('data-ability', $refAbilityLink.attr('data-ability'));
+                                    $targetAbilityLink.attr('data-type', $refAbilityLink.attr('data-type'));
+                                    $targetAbilityLink.attr('data-type2', $refAbilityLink.attr('data-type2'));
+                                    $targetAbilityLink.attr('data-tooltip', $refAbilityLink.attr('data-tooltip'));
+                                    // Clone the inner html into the target ability link
+                                    $targetAbilityLink.html($refAbilityLink.html());
+                                    $targetAbilityLink.css({opacity:''});
+
+                                    }
+                                // Otherwise if this was an ability remove option, clear stuff
+                                else {
+
+                                    // Update the target ability link with empty data
+                                    $targetAbilityLink.attr('class', 'ability_name');
+                                    $targetAbilityLink.attr('data-id', '0');
+                                    $targetAbilityLink.attr('data-ability', '');
+                                    $targetAbilityLink.attr('data-type', '');
+                                    $targetAbilityLink.attr('data-type2', '');
+                                    $targetAbilityLink.attr('data-tooltip', '');
+                                    // Remove the label text and replace with empty hyphen
+                                    $targetAbilityLink.find('label').attr('style', '').html('-');
+                                    $targetAbilityLink.find('.info').remove();
+
+                                    }
+
+                                });
+
+                        }
 
                         if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
                             playSoundEffect('link-click-action', {volume: 1.0});
