@@ -3772,8 +3772,9 @@ class rpg_ability extends rpg_object {
                 // mode abilities already max things so repeat-use not needed
                 'energy-mode', 'attack-mode', 'defense-mode', 'speed-mode',
                 // just doesn't make sense to use twice for one reason or another
-                'buster-charge', 'buster-relay', 'copy-shot', 'copy-soul', 'jewel-polish',
+                'buster-charge', 'buster-relay', 'copy-shot', 'copy-soul', 'copy-style',
                 'friend-share', 'core-shield',
+                'jewel-polish',
                 // [deprecated] abilities should not double-up
                 'repair-mode', 'energy-shuffle', 'attack-shuffle', 'defense-shuffle', 'speed-shuffle',
                 // [action/system] abilities should never be doubled-up
