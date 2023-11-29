@@ -224,6 +224,39 @@ class cms_image {
         return $dst_value;
     }
 
+    // Define a function for converting an RGB array to an HSL array
+    public static function colour_rgb2hsl($src_value){
+        return self::color_rgb2hsl($src_value);
+    }
+    public static function color_rgb2hsl($src_value){
+        if (!is_array($src_value)) {error_log("[[cms_image::color_rgb2hsl]] : Source value is not an array.", CMS_IMAGE_ERROR); return false; }
+        if (count($src_value) < 3) {error_log("[[cms_image::color_rgb2hsl]] : Source value contains an invalid number of arguments.", CMS_IMAGE_ERROR); return false; }
+
+        $r = isset($src_value[0]) ? $src_value[0] / 255 : 0;
+        $g = isset($src_value[1]) ? $src_value[1] / 255 : 0;
+        $b = isset($src_value[2]) ? $src_value[2] / 255 : 0;
+
+        $max = max($r, $g, $b);
+        $min = min($r, $g, $b);
+        $l = ($max + $min) / 2;
+        $d = $max - $min;
+
+        if ($d == 0){
+            $h = $s = 0; // achromatic
+        } else {
+            $s = $l > 0.5 ? $d / (2 - $max - $min) : $d / ($max + $min);
+            switch($max){
+                case $r: $h = ($g - $b) / $d + ($g < $b ? 6 : 0); break;
+                case $g: $h = ($b - $r) / $d + 2; break;
+                case $b: $h = ($r - $g) / $d + 4; break;
+            }
+            $h /= 6;
+        }
+
+        return array('h' => round($h * 360, 2), 's' => round($s * 100, 2), 'l' => round($l * 100, 2));
+    }
+
+
     // Define a function for lightening the perceived brightness of a colour (HEX or RGB)
     public function colour_lighten($colour, $percent){
         return $this->color_lighten($colour, $percent);
