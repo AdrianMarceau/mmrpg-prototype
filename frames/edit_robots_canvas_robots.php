@@ -144,6 +144,8 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                     $robot_tooltip_text = $robot_info['robot_name'].' ('.(!empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']).' Core' : 'Neutral Core').') &lt;br /&gt;Lv '.$robot_info['robot_level'].' | '.$robot_info['robot_experience'].' Exp';
                     $robot_is_new = in_array($robot_token, $menu_frame_content_unseen) ? true : false;
 
+                    $robot_is_persona = !empty($robot_info['robot_persona']) ? true : false;
+
                     $robot_link_styles = 'background-image: none;';
                     $robot_link_classes = 'sprite sprite_robot sprite_robot_'.$player_token.' sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == 0 ? 'sprite_robot_current sprite_robot_'.$player_token.'_current ' : '').' robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').' ';
 
@@ -166,6 +168,7 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                         '<span class="'.$robot_sprite_classes.'" style="'.$robot_sprite_styles.'"></span>'.
                         '<span class="name">'.$robot_info['robot_name'].'</span>'.
                         ($robot_is_new ? '<i class="new type electric"></i>' : '').
+                        ($robot_is_persona ? '<i class="persona type copy"></i>' : '').
                         ($robot_is_endless ? '<span class="endless"><i class="fa fas fa-infinity"></i></span>' : '').
                         '</a>'."\n";
                     $key_counter++;
