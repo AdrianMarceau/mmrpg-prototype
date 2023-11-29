@@ -119,7 +119,7 @@ class rpg_disabled {
                 $event_body = ($target_player->player_token != 'player' ? $target_player->print_name().'&#39;s ' : 'The target ').' '.$target_robot->print_name().' is proud of '.$target_robot->get_pronoun('reflexive').'!<br />';
                 if (isset($target_robot->robot_quotes['battle_victory'])){
                     $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
-                    $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
+                    $this_replace = array($this_player->player_name, $this_robot->robot_name, $target_player->player_name, $target_robot->robot_name);
                     $event_body .= $target_robot->print_quote('battle_victory', $this_find, $this_replace);
                 }
                 $target_robot->robot_frame = 'taunt';
