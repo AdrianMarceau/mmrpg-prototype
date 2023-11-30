@@ -147,13 +147,22 @@ class rpg_robot extends rpg_object {
                     //error_log('applying $persona_robotinfo from '.$persona_robotinfo['robot_token'].' to $this_robotinfo');
                     rpg_robot::apply_persona_info($this_robotinfo, $persona_robotinfo, $temp_persona_settings);
                     //error_log($this_robotinfo['robot_token'].' new $this_robotinfo = '.print_r($this_robotinfo, true));
-                    /* $debug_stat_spread = array(
+                    /*
+                    $debug_stat_spread = array(
                         $this_robotinfo['robot_energy'], $this_robotinfo['robot_attack'], $this_robotinfo['robot_defense'], $this_robotinfo['robot_speed'],
                         ($this_robotinfo['robot_energy'] + $this_robotinfo['robot_attack'] + $this_robotinfo['robot_defense'] + $this_robotinfo['robot_speed'])
-                        ); */
+                        );
                     //error_log($this_robotinfo['robot_token'].' stat spread = '.print_r(implode('/', $debug_stat_spread), true));
+                    */
                 }
             }
+            /*
+            $debug_stat_spread = array(
+                $this_robotinfo['robot_energy'], $this_robotinfo['robot_weapons'], $this_robotinfo['robot_attack'], $this_robotinfo['robot_defense'], $this_robotinfo['robot_speed'],
+                ($this_robotinfo['robot_energy'] + $this_robotinfo['robot_weapons'] + $this_robotinfo['robot_attack'] + $this_robotinfo['robot_defense'] + $this_robotinfo['robot_speed'])
+                );
+            error_log($this_robotinfo['robot_token'].' stat spread = '.print_r(implode('/', $debug_stat_spread), true));
+            */
         }
 
         // -- LOAD ROBOT INFO FROM INDEX OR SESSION -- //
@@ -1191,10 +1200,10 @@ class rpg_robot extends rpg_object {
     }
 
     // Define a public function for applying robot stat bonuses
-    public function apply_stat_bonuses(){
+    public function apply_stat_bonuses($force = false, $base_stats_ref = array()){
 
         // Only continue if this hasn't been done already
-        if (!empty($this->flags['apply_stat_bonuses'])){ return false; }
+        if (!empty($this->flags['apply_stat_bonuses']) && !$force){ return false; }
         //error_log('apply_stat_bonuses() to '.$this->robot_name);
 
         /*
@@ -1259,16 +1268,18 @@ class rpg_robot extends rpg_object {
         if ($this->robot_base_level > $robot_level_max){ $this->robot_base_level = $robot_level_max;  }
 
         // Collect this robot's stat values for later reference
-        $base_stats_ref = array(
-            'robot_token' => (!empty($this->robot_persona) ? $this->robot_persona: $this->robot_token),
-            'robot_core' => $this->robot_core,
-            'robot_core2' => $this->robot_core2,
-            'robot_energy' => $this->robot_energy,
-            'robot_weapons' => $this->robot_weapons,
-            'robot_attack' => $this->robot_attack,
-            'robot_defense' => $this->robot_defense,
-            'robot_speed' => $this->robot_speed
-            );
+        if (empty($base_stats_ref)){
+            $base_stats_ref = array(
+                'robot_token' => $this->robot_pseudo_token,
+                'robot_core' => $this->robot_core,
+                'robot_core2' => $this->robot_core2,
+                'robot_energy' => $this->robot_base_energy,
+                'robot_weapons' => $this->robot_base_weapons,
+                'robot_attack' => $this->robot_base_attack,
+                'robot_defense' => $this->robot_base_defense,
+                'robot_speed' => $this->robot_base_speed
+                );
+        }
         $this_robot_stats = self::calculate_stat_values($this->robot_level, $base_stats_ref, $this_rewards, true, array($this->robot_core, $this->robot_core2), $this->player->player_starforce);
 
         // Update the robot's stat values with calculated totals
