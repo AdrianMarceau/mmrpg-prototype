@@ -2914,7 +2914,7 @@ function mmrpg_prototype_stardroid_encounter_data(){
     //error_log('$stardroid_appearance_rates: '.print_r($stardroid_appearance_rates, true));
     //error_log('$selected_stardroid_token: '.print_r($selected_stardroid_token, true));
     //error_log('$selected_stardroid_triggers: '.print_r($selected_stardroid_triggers, true));
-    //error_log('$possible_star_list: '.print_r($possible_star_list, true));
+    //error_log('$temp_allowed_stars: '.print_r($temp_allowed_stars, true));
     //error_log('$stardroid_robots_defeated: '.print_r($stardroid_robots_defeated, true));
 
     // Return the collect information about this stardroid, if any

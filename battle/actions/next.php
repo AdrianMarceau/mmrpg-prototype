@@ -21,7 +21,10 @@ if ($is_first_mission){
     $this_chain_record['battle_team_config'] = $this_team_config;
 }
 $this_battle_chain[] = $this_chain_record;
-$_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token] = $this_battle_chain;
+if ($this_battle->battle_status === 'complete'
+    && $this_battle->battle_result == 'victory'){
+    $_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token] = $this_battle_chain;
+}
 //error_log('$_SESSION[\'BATTLES_CHAIN\']['.$this_battle->battle_chain_token.'] = '.print_r($_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token], true));
 
 // If this is a STAR FIELD battle, break apart the next action
@@ -66,18 +69,38 @@ if (!empty($this_battle->flags['starfield_mission'])
 
     // Collect a list of available stars still left for the player to encounter
     $temp_remaining_stars = mmrpg_prototype_remaining_stars(true);
-    $temp_remaining_stars_types = array();
+
+    // If the user has stars remaining, we should pick from them
+    $temp_allowed_stars = array();
+    $temp_allowed_star_types = array();
     if (!empty($temp_remaining_stars)){
-        foreach ($temp_remaining_stars AS $token => $details){
+        //error_log('pull from $temp_remaining_stars');
+
+        // Catalogue the remaining star types so that we can prioritize them
+        $temp_allowed_stars = $temp_remaining_stars;
+
+    }
+    // Otherwise we should simply send them to a new empty field
+    else {
+        //error_log('pull from $possible_star_list');
+
+        // Catalogue the allowed star types so that we can shuffle them
+        $temp_allowed_stars = $possible_star_list;
+
+    }
+
+    // Catalogue the remaining star types so that we can prioritize them
+    if (!empty($temp_allowed_stars)){
+        foreach ($temp_allowed_stars AS $token => $details){
             if (!empty($details['info1']['type'])){
                 $type1 = $details['info1']['type'];
-                if (!isset($temp_remaining_stars_types[$type1])){ $temp_remaining_stars_types[$type1] = array(); }
-                $temp_remaining_stars_types[$type1][] = $token;
+                if (!isset($temp_allowed_star_types[$type1])){ $temp_allowed_star_types[$type1] = array(); }
+                $temp_allowed_star_types[$type1][] = $token;
             }
             if (!empty($details['info2']['type'])){
                 $type2 = $details['info2']['type'];
-                if (!isset($temp_remaining_stars_types[$type2])){ $temp_remaining_stars_types[$type2] = array(); }
-                $temp_remaining_stars_types[$type2][] = $token;
+                if (!isset($temp_allowed_star_types[$type2])){ $temp_allowed_star_types[$type2] = array(); }
+                $temp_allowed_star_types[$type2][] = $token;
             }
         }
     }
@@ -85,23 +108,24 @@ if (!empty($this_battle->flags['starfield_mission'])
     // If the user has requested an auto-selected type, selected it now
     if ($next_star_type === 'same'
         || $next_star_type === 'any'){
-        //error_log('next//$temp_remaining_stars_types: '.print_r($temp_remaining_stars_types, true));
+        //error_log('next//$temp_allowed_star_types: '.print_r($temp_allowed_star_types, true));
+        //error_log('next//$temp_allowed_star_types(keys): '.print_r(array_keys($temp_allowed_star_types), true));
         $possible_types = array();
         // If the user has requested the same star type, pick one at random from the remaining
         if ($next_star_type === 'same'){
             if (!empty($this_battle->battle_field_base['field_type'])
-                && !empty($temp_remaining_stars_types[$this_battle->battle_field_base['field_type']])){
+                && !empty($temp_allowed_star_types[$this_battle->battle_field_base['field_type']])){
                 $possible_types[] = $this_battle->battle_field_base['field_type'];
             }
             if (!empty($this_battle->battle_field_base['field_type2'])
-                && !empty($temp_remaining_stars_types[$this_battle->battle_field_base['field_type2']])){
+                && !empty($temp_allowed_star_types[$this_battle->battle_field_base['field_type2']])){
                 $possible_types[] = $this_battle->battle_field_base['field_type2'];
             }
             //error_log('next//same//$possible_types: '.print_r($possible_types, true));
         }
         // Else if the user has requested any star type, pick one at random from the remaining
         elseif ($next_star_type === 'any'){
-            $possible_types = array_keys(array_filter($temp_remaining_stars_types));
+            $possible_types = array_keys(array_filter($temp_allowed_star_types));
             //error_log('next//any//$possible_types: '.print_r($possible_types, true));
         }
         if (!empty($possible_types)){
@@ -126,16 +150,17 @@ if (!empty($this_battle->flags['starfield_mission'])
             }
         }
     }
+    //error_log('next//$star_count: '.print_r($star_count, true));
+    //error_log('next//MMRPG_SETTINGS_STARFORCE_STARTOTAL: '.print_r(MMRPG_SETTINGS_STARFORCE_STARTOTAL, true));
     //error_log('next//$random_encounter_chance: '.print_r($random_encounter_chance ? 'true' : 'false', true));
 
     // Ensure there is a star for the requested type, else return to home if we can't
-    if (empty($temp_remaining_stars_types[$next_star_type])){ $this_redirect = 'prototype.php?'.($flag_wap ? 'wap=true' : ''); return; }
-    $next_star_options = $temp_remaining_stars_types[$next_star_type];
+    if (empty($temp_allowed_star_types[$next_star_type])){ $this_redirect = 'prototype.php?'.($flag_wap ? 'wap=true' : ''); return; }
+    $next_star_options = $temp_allowed_star_types[$next_star_type];
     $next_star_token = $next_star_options[mt_rand(0, (count($next_star_options) - 1))];
-    $next_star_info = $temp_remaining_stars[$next_star_token];
-
-    //echo('$next_star_token = '.print_r($next_star_token, true).PHP_EOL);
-    //echo('$next_star_info = '.print_r($next_star_info, true).PHP_EOL.PHP_EOL);
+    $next_star_info = $temp_allowed_stars[$next_star_token];
+    //error_log('$next_star_token = '.print_r($next_star_token, true));
+    //error_log('$next_star_info = '.print_r($next_star_info, true));
 
     // Collect basic star variables necessary to generating next battle
     $info = $next_star_info['info1'];

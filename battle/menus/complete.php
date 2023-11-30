@@ -76,7 +76,7 @@ ob_start();
                     if (empty($temp_remaining_stars_types[$star_type_one])){ $star_type_one = false; }
                     if (empty($temp_remaining_stars_types[$star_type_two])){ $star_type_two = false; }
                     $next_action = !empty($star_type_one) || !empty($star_type_two) ? 'next_same-star' : 'next_any-star';
-                    if (empty($temp_remaining_stars)){ $next_action = 'prototype'; }
+                    //if (empty($temp_remaining_stars)){ $next_action = 'prototype'; }
 
                     ?><a class="button action_ability" data-action="<?= $next_action ?>" type="button" data-order="1"><label><i class="fa fas fa-star"></i> Continue <i class="fas fa-chevron-circle-right"></i></label></a><?
 
