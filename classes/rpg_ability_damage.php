@@ -97,7 +97,12 @@ class rpg_ability_damage extends rpg_damage {
         $options->damage_amount = $damage_amount;
         $options->trigger_options = &$trigger_options;
         $options->event_options = &$event_options;
-        $extra_objects = array('this_ability' => $this_ability, 'options' => $options);
+        $extra_objects = array(
+            'this_robot' => $this_robot,
+            'target_robot' => $target_robot,
+            'this_ability' => $this_ability,
+            'options' => $options
+            );
 
         // Empty any text from the previous ability result
         $this_ability->ability_results['this_text'] = '';
@@ -1041,6 +1046,11 @@ class rpg_ability_damage extends rpg_damage {
                 $this_ability->ability_results['this_amount'] = $temp_new_amount;
 
             }
+
+            // Trigger this robot's custom function if one has been defined for this context
+            $this_robot->trigger_custom_function('rpg-ability_trigger-damage_pre-damage', $extra_objects);
+            $target_robot->trigger_custom_function('rpg-ability_trigger-damage_pre-damage', $extra_objects);
+            if ($options->return_early){ return $options->return_value; }
 
             // Generate the flag string for easier parsing
             $this_flag_string = array();
