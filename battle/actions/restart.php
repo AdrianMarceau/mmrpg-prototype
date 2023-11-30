@@ -43,7 +43,8 @@ $this_redirect = 'battle.php?'.
     //'&this_field_token='.$this_field->field_token.
     //'&target_player_id='.$target_player->player_id.
     //'&target_player_token='.$target_player->player_token.
-    (!empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token]) ? '&flag_skip_fadein=true' : '').
+    //(!empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token]) ? '&flag_skip_fadein=true' : '').
+    '&flag_skip_fadein=true'.
     '';
 
 ?>
