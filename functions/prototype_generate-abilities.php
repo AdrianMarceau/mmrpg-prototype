@@ -84,6 +84,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
     $skip_swap_abilities = in_array('skip_swap_abilities_on_generate', $flags) ? true : false;
     $skip_mode_abilities = in_array('skip_mode_abilities_on_generate', $flags) ? true : false;
     $skip_revive_abilities = in_array('skip_revive_abilities_on_generate', $flags) ? true : false;
+    $skip_mecha_abilities = in_array('skip_mecha_abilities_on_generate', $flags) ? true : false;
 
     // If the robot has a reverse module, skip any boost abilities that would suck forit
     if (!empty($robot_item) && $robot_item === 'reverse-module'){ $skip_boost_abilities = true; }
@@ -156,6 +157,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 foreach ($group_abilities AS $ability_key => $ability_token){
                     if (in_array($ability_token, $this_robot_abilities)){ continue; }
                     if ($skip_revive_abilities && preg_match('/^(spark-life|skull-sacrifice)$/i', $ability_token)){ continue; }
+                    if ($skip_mecha_abilities && preg_match('/^mecha-/i', $ability_token)){ continue; }
                     $ability_info = $this_ability_index[$ability_token];
                     if ($skip_neutral_abilities && empty($ability_info['ability_type'])){ continue; }
                     $is_compatible = false;
@@ -202,7 +204,9 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                         if ($skip_swap_abilities && preg_match('/-swap$/i', $ability_token)){ continue; }
                         if ($skip_mode_abilities && preg_match('/-mode$/i', $ability_token)){ continue; }
                         if ($skip_revive_abilities && preg_match('/^(spark-life|skull-sacrifice)$/i', $ability_token)){ continue; }
+                        if ($skip_mecha_abilities && preg_match('/^mecha-/i', $ability_token)){ continue; }
                         $ability_info = $this_ability_index[$ability_token];
+                        if ($skip_neutral_abilities && empty($ability_info['ability_type'])){ continue; }
                         $is_compatible = false;
                         if (!$is_compatible
                             && (in_array($ability_token, $robot_index_info['robot_abilities'])
@@ -245,6 +249,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                         if ($skip_swap_abilities && preg_match('/-swap$/i', $ability_token)){ continue; }
                         if ($skip_mode_abilities && preg_match('/-mode$/i', $ability_token)){ continue; }
                         $ability_info = $this_ability_index[$ability_token];
+                        if ($skip_neutral_abilities && empty($ability_info['ability_type'])){ continue; }
                         $is_compatible = false;
                         if (!$is_compatible && (in_array($ability_token, $robot_index_info['robot_abilities']) || in_array($ability_token, $temp_global_abilities))){
                             $is_compatible = true;
