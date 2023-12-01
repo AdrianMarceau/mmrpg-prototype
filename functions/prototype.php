@@ -2764,7 +2764,11 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
             if ($num_abilities < 1){ $num_abilities = 1; } elseif ($num_abilities > 8){ $num_abilities = 8; }
             $num_abilities = 8;
             $robot_index_plus_info = array_merge($index_info, $robot_info);
+            if (!empty($temp_battle_omega['flags']['miniboss_battle']) && $index_info['robot_class'] == 'mecha'){ $robot_index_plus_info['robot_class'] = 'master'; }
+            elseif (!empty($temp_battle_omega['flags']['superboss_battle']) && $index_info['robot_class'] == 'master'){ $robot_index_plus_info['robot_class'] = 'boss'; }
+            if (!empty($robot_info['robot_autogen_core'])){ $robot_index_plus_info['robot_core'] = $robot_info['robot_autogen_core']; }
             $robot_info['robot_abilities'] = mmrpg_prototype_generate_abilities($robot_index_plus_info, $robot_info['robot_level'], $num_abilities, $robot_info['robot_item']);
+            unset($robot_info['robot_autogen_core']);
         }
         if ($robot_info['robot_level'] > 100){
             if (!isset($robot_info['values'])){ $robot_info['values'] = array(); }
@@ -2797,6 +2801,78 @@ function mmrpg_prototype_hunter_encounter_data(){
 
 }
 
+// Define a function for appending the encounter data for the MINIBOSS WEAPON ACTIVIST to a given battle omega
+function mmrpg_prototype_append_archivist_encounter_data(&$this_prototype_data, &$temp_battle_omega, $field_info = array(), $field_info2 = array()){
+    //error_log('mmrpg_prototype_append_archivist_encounter_data()');
+
+    // Add a subtle indicator to the battle name
+    $temp_option_key = count($this_prototype_data['battle_options']) - 1;
+    $this_prototype_data['battle_options'][$temp_option_key]['battle_description2'] = rtrim($this_prototype_data['battle_options'][$temp_option_key]['battle_description2']).' Let\'s go!';
+
+    // Collect current starforce so we can level-scale the fight kinda
+    $session_token = mmrpg_game_token();
+    $current_starforce = !empty($_SESSION[$session_token]['values']['star_force']) ? $_SESSION[$session_token]['values']['star_force'] : array();
+
+    // Calculate which core types we should focus on this fight
+    $temp_types_required = 3;
+    $temp_core_types = array();
+    if (!empty($temp_battle_omega['battle_field_base']['field_multipliers'])){
+        $field_multipliers = $temp_battle_omega['battle_field_base']['field_multipliers'];
+        asort($field_multipliers); $field_multipliers = array_reverse($field_multipliers);
+        //error_log('$field_multipliers = '.print_r($field_multipliers, true));
+        foreach ($field_multipliers AS $type => $value){
+            if ($type === 'copy'){ continue; }
+            $temp_core_types[] = $type;
+            if (count($temp_core_types) >= $temp_types_required){ break; }
+        }
+    }
+
+    // Generate a random encounter mission for the star fields
+    $common_counters = array(
+        'attack_mods' => 5,
+        'defense_mods' => 5,
+        'speed_mods' => 5
+        );
+    $common_flags = array(
+        'skip_mecha_abilities_on_generate' => true,
+        'skip_neutral_abilities_on_generate' => true
+        );
+    $random_encounter_added = true;
+    $temp_battle_sigma = mmrpg_prototype_generate_mission($this_prototype_data,
+        $temp_battle_omega['battle_token'].'-archivist-miniboss-encounter', array(
+            'battle_name' => 'Challengers of the Weapons Archive!',
+            'battle_level' => 100,
+            'battle_description' => 'A trio of strong challengers has appeared! Can you defeat them in battle?',
+            'battle_counts' => false,
+            'flags' => array(
+                'archivist_battle' => true,
+                'miniboss_battle' => true,
+                'star_support_allowed' => false
+                )
+            ), array_merge($temp_battle_omega['battle_field_base'], array(
+                'field_background' => 'robot-museum',
+                'field_background_attachments' => array(),
+                'field_music' => 'sega-remix/boss-theme-mm10',
+                //'values' => array('hazards' => array('super_blocks' => 'right'))
+                )
+            ), array(
+            'player_token' => 'player',
+            'player_starforce' => $current_starforce,
+            //'player_starforce' => $this_prototype_data['max_starforce'],
+            //'player_starforce' => $this_prototype_data['max_starforce']
+            ), array(
+            array('robot_token' => 'weapon-archivist', 'robot_item' => $temp_core_types[0].'-core', 'robot_autogen_core' => $temp_core_types[0], 'counters' => $common_counters, 'flags' => $common_flags),
+            array('robot_token' => 'weapon-archivist', 'robot_item' => $temp_core_types[1].'-core', 'robot_autogen_core' => $temp_core_types[1], 'counters' => $common_counters, 'flags' => $common_flags),
+            array('robot_token' => 'weapon-archivist', 'robot_item' => $temp_core_types[2].'-core', 'robot_autogen_core' => $temp_core_types[2], 'counters' => $common_counters, 'flags' => $common_flags),
+            ), true);
+    rpg_battle::update_index_info($temp_battle_sigma['battle_token'], $temp_battle_sigma);
+    //error_log('$temp_battle_sigma = '.print_r($temp_battle_sigma, true));
+    mmrpg_prototype_mission_autoplay_append($temp_battle_omega, $temp_battle_sigma, $this_prototype_data, true);
+    //$this_prototype_data['battle_options'][] = $temp_battle_sigma;
+    return $random_encounter_added;
+
+}
+
 // Define a function for appending the encounter data for the SUPERBOSS QUINT to a given battle omega
 function mmrpg_prototype_append_hunter_encounter_data(&$this_prototype_data, &$temp_battle_omega, $field_info = array(), $field_info2 = array()){
     //error_log('mmrpg_prototype_append_hunter_encounter_data()');
@@ -2819,7 +2895,7 @@ function mmrpg_prototype_append_hunter_encounter_data(&$this_prototype_data, &$t
                 'star_support_allowed' => false
                 )
             ), array_merge($temp_battle_omega['battle_field_base'], array(
-                'field_background' => 'prototype-complete',
+                'field_background' => 'hunter-compound',
                 'field_background_attachments' => array(),
                 'field_music' => 'sega-remix/boss-theme-mm10',
                 'values' => array('hazards' => array('super_blocks' => 'right'))
