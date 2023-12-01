@@ -252,7 +252,7 @@ class rpg_mission_double extends rpg_mission {
                     $temp_robot_info['flags']['hide_from_mission_select'] = true;
                     $temp_robot_info['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $temp_option_robot['robot_id'], $temp_robot_key++);
                     $temp_robot_info['robot_token'] = $temp_robot_token;
-                    $temp_robot_info['robot_item'] = 'super-pellet';
+                    $temp_robot_info['robot_item'] = 'super-capsule';
                     $temp_robot_master_tokens[] = $temp_robot_token;
                     $temp_option_battle['battle_target_player']['player_robots'][] = $temp_robot_info;
                     //error_log('adding '.$temp_robot_token.' to a '.$this_prototype_data['this_player_token'].' fusion field battle $temp_robot_info = '.print_r($temp_robot_info, true));
