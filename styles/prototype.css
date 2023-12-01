@@ -1792,6 +1792,7 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .option_this-robot-select .icons.stats,
 #mmrpg #prototype .option_this-robot-select .icons.favs,
+#mmrpg #prototype .option_this-robot-select .icons.persona,
 #mmrpg #prototype .option_this-robot-select .icons.info {
     position: absolute;
     text-align: center;
@@ -1832,6 +1833,46 @@ body[data-source="website"] #prototype .menu {
     right: -13px;
     left: auto;
     bottom: auto;
+}
+
+#mmrpg #prototype .option_this-robot-select .icons.persona {
+    position: absolute;
+    z-index: 7;
+    top: 6px;
+    left: 6px;
+}
+#mmrpg #prototype .option_this-robot-select .icons.persona i {
+    display: inline-block;
+    box-sizing: border-box;
+    font-size: 90%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0 0 0 2px;
+    line-height: 1.2;
+    width: 8px;
+    height: 8px;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    pointer-events: none;
+    direction: ltr;
+    text-indent: -9999px;
+}
+#mmrpg #prototype .option_this-robot-select .icons.persona i {
+    width: 12px;
+    height: 12px;
+    background-image: url('../images/abilities/copy-style-2/sprite_left_40x40.png') !important;
+    background-position: -15px -15px !important;
+}
+#mmrpg #prototype .option_this-robot-select[data-token*="mega-man"] .icons.persona i {
+    background-position: -15px -15px !important;
+}
+#mmrpg #prototype .option_this-robot-select[data-token*="bass"] .icons.persona i {
+    background-position: -135px -15px !important;
+}
+#mmrpg #prototype .option_this-robot-select[data-token*="proto-man"] .icons.persona i {
+    background-position: -255px -15px !important;
 }
 
 #mmrpg #prototype .option_this-robot-select .multi {

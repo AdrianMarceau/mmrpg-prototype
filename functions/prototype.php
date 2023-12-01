@@ -3341,6 +3341,8 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_favourite = in_array($info['robot_token'], $temp_player_favourites) ? true : false;
         //$this_robot_name .= $this_robot_favourite ? ' <span class="icons favs"><i class="fa fas fa-thumbtack"></i></span>' : '';
 
+        $this_robot_persona = !empty($info['robot_persona']) ? $info['robot_persona'] : '';
+
         // Calculate this robot's current and max stat values
         $base_stats_ref = $has_persona_applied ? array_merge($info, array('robot_token' => $this_robot_settings['robot_persona'])) : $info;
         $this_robot_stats = rpg_robot::calculate_stat_values($this_robot_level, $base_stats_ref, $this_robot_rewards, true, $this_robot_core, $player_starforce);
@@ -3437,7 +3439,10 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
 
         $stat_reward_icons = !empty($namestring) ? ' <span class="icons stats">'.$namestring.'</span>' : '';
         if (empty($stat_reward_icons)){ $temp_sprite_top += 6; }
+
         $pinned_fav_icons = $this_robot_favourite ? ' <span class="icons favs"><i class="fa fas fa-thumbtack"></i></span>' : '';
+
+        $copy_style_icons = !empty($this_robot_persona) ? ' <span class="icons persona has_pixels"><i class="type copy fa fas fa-mask"></i></span>' : '';
 
         $info_tooltip_icons = ' <span class="icons info color '.$this_robot_core_or_none.'" data-click-tooltip="'.$this_option_title_tooltip.'" data-tooltip-type="'.$this_option_type_token.'"><i class="fa fas fa-info-circle"></i></span>';
 
@@ -3481,6 +3486,7 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_option_label .= '<span class="multi">';
             $this_option_label .= $info_tooltip_icons;
             $this_option_label .= $pinned_fav_icons;
+            $this_option_label .= $copy_style_icons;
             $this_option_label .= $stat_reward_icons;
             $this_option_label .= '<span class="maintext">'.$this_robot_name.'</span>';
             $this_option_label .= '<span class="subtext">Level '.$this_robot_level.'</span>';
