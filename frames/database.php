@@ -734,6 +734,7 @@ if (true){
                                                         $temp_string = array();
                                                         $ability_key = 0;
                                                         foreach ($robot_ability_rewards AS $key => $this_info){
+                                                            if (!isset($mmrpg_database_abilities[$this_info['token']])){ continue; }
                                                             $this_level = $this_info['level'];
                                                             $this_ability = $mmrpg_database_abilities[$this_info['token']];
                                                             $this_ability_token = $this_ability['ability_token'];
