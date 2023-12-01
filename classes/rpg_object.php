@@ -11,6 +11,7 @@ class rpg_object {
     public $counters = array();
     public $values = array();
     public $history = array();
+    public $temp = array();
     public $session_key = '';
     public $session_token = '';
     public $session_id = '';
