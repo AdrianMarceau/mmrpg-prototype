@@ -175,6 +175,111 @@ class rpg_mission_single extends rpg_mission {
         //if (!empty($this_prototype_data['battles_complete'])){ die('<pre style="height: 600px; overflow: auto;">'.print_r($this_prototype_data['battles_complete'], true).'</pre>'); }
         //if (!empty($temp_battle_omega['battle_complete'])){ die('<pre style="height: 600px; overflow: auto;">'.print_r($temp_battle_omega['battle_complete'], true).'</pre>'); }
 
+        // Add an appropriate bonus robot IF this mission has not been completed yet
+        if ($temp_option_completed){
+            //error_log('VISITOR needed for = '.print_r($temp_battle_omega['battle_token'], true));
+
+            // Decide which robot should appear for this player
+            static $temp_possible_visitors;
+            if (empty($temp_possible_visitors)){
+                //error_log('$temp_possible_visitors = '.print_r($temp_possible_visitors, true));
+                $temp_possible_visitors = array();
+                $temp_possible_visitors_query = "SELECT
+                    `robots`.`robot_token`,
+                    `robots`.`robot_core`
+                    FROM `mmrpg_index_robots` AS `robots`
+                    LEFT JOIN `mmrpg_index_robots_groups_tokens` AS `tokens` ON `tokens`.`robot_token` = `robots`.`robot_token`
+                    LEFT JOIN `mmrpg_index_robots_groups` AS `groups` ON `groups`.`group_class` = `tokens`.`group_class` AND `groups`.`group_token` = `tokens`.`group_token`
+                    WHERE
+                    `robots`.`robot_flag_complete` = 1
+                    AND `robots`.`robot_flag_published` = 1
+                    AND `robots`.`robot_flag_hidden` = 0
+                    AND `robots`.`robot_flag_fightable` = 1
+                    -- AND `robots`.`robot_flag_unlockable` = 1
+                    AND `robots`.`robot_flag_exclusive` = 0
+                    AND `robots`.`robot_class` = 'mecha'
+                    -- AND `robots`.`robot_core` NOT IN ('', 'copy')
+                    AND `robots`.`robot_token` NOT IN ('heal-bot', 'heel-bot', 'trille-bot')
+                    AND `robots`.`robot_token` NOT IN ('weapons-archive')
+                    -- AND `robots`.`robot_game` NOT IN ('MM1', 'MMPU', 'MM2', 'MM4')
+                    ORDER BY
+                    `groups`.`group_order` ASC,
+                    `tokens`.`token_order` ASC
+                    ;";
+                $cache_token = md5($temp_possible_visitors_query);
+                $cached_index = rpg_object::load_cached_index('missions.single.visitors', $cache_token);
+                if (!empty($cached_index)){
+                    $temp_possible_visitors_raw = $cached_index;
+                    unset($cached_index);
+                } else {
+                    $temp_possible_visitors_raw = $db->get_array_list($temp_possible_visitors_query);
+                    rpg_object::save_cached_index('missions.single.visitors', $cache_token, $temp_possible_visitors_raw);
+                }
+                //error_log('$temp_possible_visitors_raw = '.print_r($temp_possible_visitors_raw, true));
+                if (!empty($temp_possible_visitors_raw)){
+                    $temp_robot_records = mmrpg_prototype_robot_database();
+                    $temp_robot_encounters = array_map(function($r){ return isset($r['robot_encountered']) ? $r['robot_encountered'] : 0; }, $temp_robot_records);
+                    asort($temp_robot_encounters);
+                    //error_log('$temp_robot_encounters = '.print_r($temp_robot_encounters, true));
+                    //error_log('$temp_robot_records = '.print_r($temp_robot_records, true));
+                    usort($temp_possible_visitors_raw, function($r1, $r2) use ($temp_robot_encounters){
+                        $r1token = $r1['robot_token'];
+                        $r2token = $r2['robot_token'];
+                        $r1encounters = isset($temp_robot_encounters[$r1token]) ? $temp_robot_encounters[$r1token] : 0;
+                        $r2encounters = isset($temp_robot_encounters[$r2token]) ? $temp_robot_encounters[$r2token] : 0;
+                        if ($r1encounters == $r2encounters){ return 0; }
+                        return ($r1encounters < $r2encounters) ? -1 : 1;
+                        });
+                    //error_log('$temp_possible_visitors_raw = '.print_r($temp_possible_visitors_raw, true));
+                    foreach($temp_possible_visitors_raw AS $key => $info){
+                        list($token, $core) = array_values($info);
+                        if (empty($core)){ $core = 'none'; }
+                        if (!isset($temp_possible_visitors[$core])){ $temp_possible_visitors[$core] = array(); }
+                        $temp_possible_visitors[$core][] = $token;
+                    }
+                    //error_log('$temp_possible_visitors_raw (tokens) = '.print_r(array_map(function($r){ return $r['robot_token']; }, $temp_possible_visitors_raw), true));
+                }
+            }
+            //error_log('$temp_possible_visitors = '.print_r($temp_possible_visitors, true));
+            $temp_visitor_token = '';
+            $temp_visitor_core = $temp_option_field['field_type'];
+            if (!empty($temp_possible_visitors['none'])){
+                if (empty($temp_possible_visitors[$temp_visitor_core])){ $temp_visitor_core = 'none'; }
+                elseif ($temp_battle_count % 7 === 0){ $temp_visitor_core = 'none'; }
+            }
+            //error_log($temp_battle_omega['battle_token'].' // $temp_visitor_core = '.$temp_visitor_core);
+            $temp_visitor_queue = array();
+            if (!empty($temp_possible_visitors[$temp_visitor_core])){
+                $temp_visitor_queue = array_merge($temp_visitor_queue, $temp_possible_visitors[$temp_visitor_core]);
+            }
+            if (!empty($temp_visitor_queue)){
+                //error_log('$temp_visitor_queue = '.print_r($temp_visitor_queue, true));
+                foreach ($temp_visitor_queue AS $key => $token){
+                    if (in_array($token, $temp_option_field['field_mechas'])){ continue; }
+                    $temp_visitor_token = $token;
+                    break;
+                }
+            }
+            //error_log('$temp_visitor_token = '.print_r($temp_visitor_token, true));
+            if (!empty($temp_visitor_token)){
+                $temp_robot_key = count($temp_battle_omega['battle_target_player']['player_robots']);
+                $temp_robot_token = $temp_visitor_token;
+                $temp_robot_index_info = $this_robot_index[$temp_robot_token];
+                $temp_robot_info = array();
+                $temp_robot_info['flags'] = array();
+                $temp_robot_info['flags']['robot_is_visitor'] = true;
+                $temp_robot_info['flags']['hide_from_mission_select'] = true;
+                $temp_robot_info['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $temp_option_robot['robot_id'], $temp_robot_key);
+                $temp_robot_info['robot_token'] = $temp_robot_token;
+                $temp_robot_info['robot_item'] = 'super-pellet';
+                $temp_robot_master_tokens[] = $temp_robot_token;
+                $temp_battle_omega['battle_target_player']['player_robots'][] = $temp_robot_info;
+                //error_log('adding '.$temp_robot_token.' to a '.$this_prototype_data['this_player_token'].' base field battle $temp_robot_info = '.print_r($temp_robot_info, true));
+            }
+
+        }
+
+        //error_log('$temp_battle_omega[\'battle_target_player\'][\'player_robots\'] = '.print_r($temp_battle_omega['battle_target_player']['player_robots'], true));
 
         // Skip the empty battle button or a different phase
         if (empty($temp_battle_omega['battle_token']) || $temp_battle_omega['battle_token'] == 'battle' || $temp_battle_omega['battle_phase'] != $this_prototype_data['battle_phase']){ return false; }
