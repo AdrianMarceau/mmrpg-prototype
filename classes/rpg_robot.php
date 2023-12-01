@@ -4331,7 +4331,7 @@ class rpg_robot extends rpg_object {
                         $base_size = $robot_image_size;
                         $zoom_size = $robot_image_size * 2;
                         $show_sizes[$base_size] = $base_size.'x'.$base_size;
-                        //$show_sizes[$zoom_size] = $zoom_size.'x'.$zoom_size;
+                        $show_sizes[$zoom_size] = $zoom_size.'x'.$zoom_size;
                         $size_key = -1;
                         foreach ($show_sizes AS $size_value => $sprite_size_text){
                             $size_key++;
