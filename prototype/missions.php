@@ -1502,6 +1502,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         //$base_battle_omega['battle_complete_redirect_token'] = $append_battle_omega['battle_token'];
 
+        // Check to see if we can add a miniboss battle after the master one
+        $miniboss_battle_unlocked = false;
+        if (!empty($mecha_battle_omega['battle_field_base']['field_multipliers'])){
+            $field_multipliers = $mecha_battle_omega['battle_field_base']['field_multipliers'];
+            if (!empty($field_multipliers['copy'])){ $miniboss_battle_unlocked = true; }
+        }
+
         // Check to see if we can add a superboss battle after the final one
         $hunter_encounter_data = mmrpg_prototype_hunter_encounter_data();
         $superboss_battle_unlocked = false;
@@ -1515,6 +1522,12 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             if ($required_targets_visible >= $required_targets_total){
                 $superboss_battle_unlocked = true;
             }
+        }
+
+        // MINIBOSS ARCHIVIST : RANDOM ENCOUNTER
+        // If the miniboss enounter has been unlocked, we can add it after the first battle
+        if ($miniboss_battle_unlocked){
+            $random_encounter_added = mmrpg_prototype_append_archivist_encounter_data($this_prototype_data, $mecha_battle_omega);
         }
 
         // SUPERBOSS QUINT : RANDOM ENCOUNTER
