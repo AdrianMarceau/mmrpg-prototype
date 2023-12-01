@@ -4313,7 +4313,7 @@ class rpg_robot extends rpg_object {
                             $temp_alts_array = array_merge($temp_alts_array, $robot_info['robot_image_alts']);
                         }
                         // Otherwise, if this is a copy robot, append based on all the types in the index
-                        elseif ($robot_info['robot_core'] == 'copy' && preg_match('/^(mega-man|proto-man|bass|doc-robot)$/i', $robot_info['robot_token'])){
+                        elseif ($robot_info['robot_core'] == 'copy' && preg_match('/^(mega-man|proto-man|bass|doc-robot|weapon-archivist)$/i', $robot_info['robot_token'])){
                             foreach ($mmrpg_database_types AS $type_token => $type_info){
                                 if (empty($type_token) || $type_token == 'none' || $type_token == 'copy'){ continue; }
                                 $temp_alts_array[] = array('token' => $type_token, 'name' => $robot_info['robot_name'].' ('.ucfirst($type_token).' Core)', 'summons' => 0);
