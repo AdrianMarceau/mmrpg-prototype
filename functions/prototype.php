@@ -2455,7 +2455,7 @@ function mmrpg_prototype_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     if (!empty($temp_battle_omega['flags']['starfield_mission'])){ $is_starfield_mission = true; }
 
     // Define the number of mechas + abilities to add based on player + phase
-    $num_support_mechas = $battle_phase > 1 ? 4 : 3;
+    $num_support_mechas = $battle_phase > 1 || !empty($temp_battle_omega['battle_complete']) ? 4 : 3;
     if ($player_token == 'dr-light'){
         //$num_support_mechas = $battle_phase > 1 ? 4 : 3;
         $num_mecha_abilities = $battle_phase > 1 ? 2 : 1;
@@ -2486,15 +2486,14 @@ function mmrpg_prototype_extract_alpha_battle(&$temp_battle_omega, $this_prototy
     foreach ($temp_player_robots AS $key => $robot_info){
         $robot_token = $robot_info['robot_token'];
         $index_info = $mmrpg_index_robots[$robot_token];
-        if ($index_info['robot_class'] == 'mecha'){
-            unset($temp_player_robots[$key]);
-            continue;
-        }
         if (!empty($robot_info['flags'])
             && !empty($robot_info['flags']['robot_is_visitor'])){
             //error_log('robot_is_visitor for '.$robot_token);
             $temp_added_alpha_robots[] = $robot_info;
             $temp_added_alpha_robots_tokens[] = $robot_token;
+            unset($temp_player_robots[$key]);
+            continue;
+        } elseif ($index_info['robot_class'] == 'mecha'){
             unset($temp_player_robots[$key]);
             continue;
         }
