@@ -2025,10 +2025,11 @@ class rpg_player extends rpg_object {
 
         // Display the robot reward message markup
         $event_header = $temp_item_name.' Item Drop';
+        $prefix = $this_robot->robot_status === 'disabled' ? 'The disabled ' : 'The ';
         if ($item_quantity_dropped > 1){
-            $event_body = rpg_battle::random_positive_word().' The disabled '.$this_robot->print_name().' dropped <strong>x'.$item_quantity_dropped.'</strong> '.' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.($item_quantity_dropped > 1 ? 's' : '').'</span>!<br />';
+            $event_body = rpg_battle::random_positive_word().' '.$prefix.$this_robot->print_name().' dropped <strong>x'.$item_quantity_dropped.'</strong> '.' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.($item_quantity_dropped > 1 ? 's' : '').'</span>!<br />';
         } else {
-            $event_body = rpg_battle::random_positive_word().' The disabled '.$this_robot->print_name().' dropped '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
+            $event_body = rpg_battle::random_positive_word().' '.$prefix.$this_robot->print_name().' dropped '.(preg_match('/^(a|e|i|o|u)/i', $temp_item_name) ? 'an' : 'a').' <span class="item_name item_type item_type_'.$temp_item_colour.'">'.$temp_item_name.'</span>!<br />';
         }
         $event_body .= $temp_body_addon;
         //$event_body .= ' ('.$temp_item_quantity_old.' &raquo; '.$temp_item_quantity_new.')';
