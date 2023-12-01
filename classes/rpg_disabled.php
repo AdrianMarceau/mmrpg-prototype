@@ -114,7 +114,9 @@ class rpg_disabled {
             $this_battle->events_create($this_robot, $target_robot, $event_header, $event_body, $event_options);
 
             // Show the target robot proud of themselves saying a victory quote (only after level 100, before that they they say it during experience gain)
-            if (($target_robot->robot_level >= 100 || $target_player->player_side !== 'left')){
+            if ($target_robot->robot_level >= 100
+                && $target_player->player_side === 'left'
+                && empty($target_robot->temp['victory_quotes_printed'])){
                 $is_repeat = !empty($target_robot->temp['victory_quotes_printed']) ? true : false;
                 $event_header = ($target_player->player_token != 'player' ? $target_player->player_name.'&#39;s ' : '').$target_robot->robot_name;
                 $event_body = $target_robot->print_name().(!$is_repeat ? ' is proud of '.$target_robot->get_pronoun('reflexive').'!' : ' defeated another target!').'<br />';
