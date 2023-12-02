@@ -81,7 +81,22 @@ class rpg_item_damage extends rpg_damage {
         $options->damage_amount = $damage_amount;
         $options->trigger_options = &$trigger_options;
         $options->event_options = &$event_options;
-        $extra_objects = array('this_item' => $this_item, 'options' => $options);
+        $extra_objects = array(
+            //'this_robot' => $this_robot,
+            //'target_robot' => $target_robot,
+            'this_item' => $this_item,
+            'options' => $options
+            );
+        $extra_objects_for_this_robot = $extra_objects;
+        $extra_objects_for_this_robot['this_player'] = $this_robot->player;
+        $extra_objects_for_this_robot['this_robot'] = $this_robot;
+        $extra_objects_for_this_robot['target_player'] = $target_robot->player;
+        $extra_objects_for_this_robot['target_robot'] = $target_robot;
+        $extra_objects_for_other_robot = $extra_objects;
+        $extra_objects_for_other_robot['this_player'] = $target_robot->player;
+        $extra_objects_for_other_robot['this_robot'] = $target_robot;
+        $extra_objects_for_other_robot['target_player'] = $this_robot->player;
+        $extra_objects_for_other_robot['target_robot'] = $this_robot;
 
         // Empty any text from the previous item result
         $this_item->item_results['this_text'] = '';
@@ -95,8 +110,8 @@ class rpg_item_damage extends rpg_damage {
         $this_battle->events_debug(__FILE__, __LINE__, $this_item->item_token.' | to('.$this_robot->robot_id.':'.$this_robot->robot_token.') vs from('.$target_robot->robot_id.':'.$target_robot->robot_token.') | damage_start_amount |<br /> '.'amount:'.$this_item->item_results['this_amount'].' | '.'percent:'.($this_item->damage_options['damage_percent'] ? 'true' : 'false').' | '.'kind:'.$this_item->damage_options['damage_kind'].' | type1:'.(!empty($this_item->damage_options['damage_type']) ? $this_item->damage_options['damage_type'] : 'none').' | type2:'.(!empty($this_item->damage_options['damage_type2']) ? $this_item->damage_options['damage_type2'] : 'none').'');
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_custom_function('rpg-item_trigger-damage_before', $extra_objects);
-        $target_robot->trigger_custom_function('rpg-item_trigger-damage_before', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-item_trigger-damage_before', $extra_objects_for_this_robot);
+        $target_robot->trigger_custom_function('rpg-item_trigger-damage_before', $extra_objects_for_other_robot);
         if ($options->return_early){ return $options->return_value; }
 
         // DEBUG
@@ -1224,8 +1239,8 @@ class rpg_item_damage extends rpg_damage {
         }
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_custom_function('rpg-item_trigger-damage_middle', $extra_objects);
-        $target_robot->trigger_custom_function('rpg-item_trigger-damage_middle', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-item_trigger-damage_middle', $extra_objects_for_this_robot);
+        $target_robot->trigger_custom_function('rpg-item_trigger-damage_middle', $extra_objects_for_other_robot);
         if ($options->return_early){ return $options->return_value; }
 
         // Define the sound effects for this damage event so it plays for the player
@@ -1406,8 +1421,8 @@ class rpg_item_damage extends rpg_damage {
             ));
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_custom_function('rpg-item_trigger-damage_after', $extra_objects);
-        $target_robot->trigger_custom_function('rpg-item_trigger-damage_after', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-item_trigger-damage_after', $extra_objects_for_this_robot);
+        $target_robot->trigger_custom_function('rpg-item_trigger-damage_after', $extra_objects_for_other_robot);
 
         // Return the final damage results
         return $this_item->item_results;

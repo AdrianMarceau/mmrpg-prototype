@@ -78,7 +78,22 @@ class rpg_item_recovery extends rpg_recovery {
         $options->recovery_amount = $recovery_amount;
         $options->trigger_options = &$trigger_options;
         $options->event_options = &$event_options;
-        $extra_objects = array('this_item' => $this_item, 'options' => $options);
+        $extra_objects = array(
+            //'this_robot' => $this_robot,
+            //'target_robot' => $target_robot,
+            'this_item' => $this_item,
+            'options' => $options
+            );
+        $extra_objects_for_this_robot = $extra_objects;
+        $extra_objects_for_this_robot['this_player'] = $this_robot->player;
+        $extra_objects_for_this_robot['this_robot'] = $this_robot;
+        $extra_objects_for_this_robot['target_player'] = $target_robot->player;
+        $extra_objects_for_this_robot['target_robot'] = $target_robot;
+        $extra_objects_for_other_robot = $extra_objects;
+        $extra_objects_for_other_robot['this_player'] = $target_robot->player;
+        $extra_objects_for_other_robot['this_robot'] = $target_robot;
+        $extra_objects_for_other_robot['target_player'] = $this_robot->player;
+        $extra_objects_for_other_robot['target_robot'] = $this_robot;
 
         // Empty any text from the previous item result
         $this_item->item_results['this_text'] = '';
@@ -118,8 +133,8 @@ class rpg_item_recovery extends rpg_recovery {
         }
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_custom_function('rpg-item_trigger-recovery_before', $extra_objects);
-        $target_robot->trigger_custom_function('rpg-item_trigger-recovery_before', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-item_trigger-recovery_before', $extra_objects_for_this_robot);
+        $target_robot->trigger_custom_function('rpg-item_trigger-recovery_before', $extra_objects_for_other_robot);
         if ($options->return_early){ return $options->return_value; }
 
         // DEBUG
@@ -1145,8 +1160,8 @@ class rpg_item_recovery extends rpg_recovery {
         $this_robot->player->update_session();
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_custom_function('rpg-item_trigger-recovery_middle', $extra_objects);
-        $target_robot->trigger_custom_function('rpg-item_trigger-recovery_middle', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-item_trigger-recovery_middle', $extra_objects_for_this_robot);
+        $target_robot->trigger_custom_function('rpg-item_trigger-recovery_middle', $extra_objects_for_other_robot);
         if ($options->return_early){ return $options->return_value; }
 
         // Define the sound effects for this recovery event so it plays for the player
@@ -1315,8 +1330,8 @@ class rpg_item_recovery extends rpg_recovery {
             ));
 
         // Trigger this robot's item function if one has been defined for this context
-        $this_robot->trigger_custom_function('rpg-item_trigger-recovery_after', $extra_objects);
-        $target_robot->trigger_custom_function('rpg-item_trigger-recovery_after', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-item_trigger-recovery_after', $extra_objects_for_this_robot);
+        $target_robot->trigger_custom_function('rpg-item_trigger-recovery_after', $extra_objects_for_other_robot);
 
         // Return the final recovery results
         return $this_item->item_results;

@@ -84,7 +84,22 @@ class rpg_skill_recovery extends rpg_recovery {
         $options->recovery_amount = $recovery_amount;
         $options->trigger_options = &$trigger_options;
         $options->event_options = &$event_options;
-        $extra_objects = array('this_skill' => $this_skill, 'options' => $options);
+        $extra_objects = array(
+            //'this_robot' => $this_robot,
+            //'target_robot' => $target_robot,
+            'this_skill' => $this_skill,
+            'options' => $options
+            );
+        $extra_objects_for_this_robot = $extra_objects;
+        $extra_objects_for_this_robot['this_player'] = $this_robot->player;
+        $extra_objects_for_this_robot['this_robot'] = $this_robot;
+        $extra_objects_for_this_robot['target_player'] = $target_robot->player;
+        $extra_objects_for_this_robot['target_robot'] = $target_robot;
+        $extra_objects_for_other_robot = $extra_objects;
+        $extra_objects_for_other_robot['this_player'] = $target_robot->player;
+        $extra_objects_for_other_robot['this_robot'] = $target_robot;
+        $extra_objects_for_other_robot['target_player'] = $this_robot->player;
+        $extra_objects_for_other_robot['target_robot'] = $this_robot;
 
         // Empty any text from the previous skill result
         $this_skill->skill_results['this_text'] = '';
@@ -124,8 +139,8 @@ class rpg_skill_recovery extends rpg_recovery {
         }
 
         // Trigger this robot's skill function if one has been defined for this context
-        $this_robot->trigger_custom_function('rpg-skill_trigger-recovery_before', $extra_objects);
-        $target_robot->trigger_custom_function('rpg-skill_trigger-recovery_before', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-skill_trigger-recovery_before', $extra_objects_for_this_robot);
+        $target_robot->trigger_custom_function('rpg-skill_trigger-recovery_before', $extra_objects_for_other_robot);
         if ($options->return_early){ return $options->return_value; }
 
         // DEBUG
@@ -1151,8 +1166,8 @@ class rpg_skill_recovery extends rpg_recovery {
         $this_robot->player->update_session();
 
         // Trigger this robot's skill function if one has been defined for this context
-        $this_robot->trigger_custom_function('rpg-skill_trigger-recovery_middle', $extra_objects);
-        $target_robot->trigger_custom_function('rpg-skill_trigger-recovery_middle', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-skill_trigger-recovery_middle', $extra_objects_for_this_robot);
+        $target_robot->trigger_custom_function('rpg-skill_trigger-recovery_middle', $extra_objects_for_other_robot);
         if ($options->return_early){ return $options->return_value; }
 
         // Define the sound effects for this recovery event so it plays for the player
@@ -1321,8 +1336,8 @@ class rpg_skill_recovery extends rpg_recovery {
             ));
 
         // Trigger this robot's skill function if one has been defined for this context
-        $this_robot->trigger_custom_function('rpg-skill_trigger-recovery_after', $extra_objects);
-        $target_robot->trigger_custom_function('rpg-skill_trigger-recovery_after', $extra_objects);
+        $this_robot->trigger_custom_function('rpg-skill_trigger-recovery_after', $extra_objects_for_this_robot);
+        $target_robot->trigger_custom_function('rpg-skill_trigger-recovery_after', $extra_objects_for_other_robot);
 
         // Return the final recovery results
         return $this_skill->skill_results;
