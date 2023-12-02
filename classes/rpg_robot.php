@@ -901,6 +901,10 @@ class rpg_robot extends rpg_object {
     public function set_item($value){ $this->set_info('robot_item', $value); }
     public function unset_item(){ $this->set_info('robot_item', ''); }
 
+    public function get_skill(){ return $this->get_info('robot_skill'); }
+    public function set_skill($value){ $this->set_info('robot_skill', $value); }
+    public function unset_skill(){ $this->set_info('robot_skill', ''); }
+
     /**
      * Check if this robot is holding an item, optionally checking for a specific one
      * @param string $item_token (optional)
@@ -934,7 +938,8 @@ class rpg_robot extends rpg_object {
      */
     public function has_skill(){
         $args = func_get_args();
-        $skill = $this->get_info('robot_skill');
+        $counter = $this->get_counter('skill_disabled');
+        $skill = empty($counter) ? $this->get_info('robot_skill') : '';
         if (!empty($args[0])){ return $skill == $args[0] ? true : false; }
         else { return !empty($skill) ? true : false; }
     }
