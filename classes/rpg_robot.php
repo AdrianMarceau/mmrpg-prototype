@@ -288,29 +288,7 @@ class rpg_robot extends rpg_object {
 
         // Collect any functions associated with this robot
         if (!isset($this->robot_function)){
-            $temp_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$this->robot_pseudo_token.'/functions.php';
-            if (file_exists($temp_functions_path)){ require($temp_functions_path); }
-            else { $functions = array(); }
-            $this->robot_function = isset($functions['robot_function']) ? $functions['robot_function'] : function(){};
-            $this->robot_function_onload = isset($functions['robot_function_onload']) ? $functions['robot_function_onload'] : function(){};
-            $this->robot_function_onbattlesetup = isset($functions['robot_function_onbattlesetup']) ? $functions['robot_function_onbattlesetup'] : function(){};
-            $this->robot_function_onbattlestart = isset($functions['robot_function_onbattlestart']) ? $functions['robot_function_onbattlestart'] : function(){};
-            $this->robot_function_onability = isset($functions['robot_function_onability']) ? $functions['robot_function_onability'] : function(){};
-            $this->robot_function_onturnstart = isset($functions['robot_function_onturnstart']) ? $functions['robot_function_onturnstart'] : function(){};
-            $this->robot_function_onendofturn = isset($functions['robot_function_onendofturn']) ? $functions['robot_function_onendofturn'] : function(){};
-            $this->robot_function_ondamage = isset($functions['robot_function_ondamage']) ? $functions['robot_function_ondamage'] : function(){};
-            $this->robot_function_onrecovery = isset($functions['robot_function_onrecovery']) ? $functions['robot_function_onrecovery'] : function(){};
-            $this->robot_function_ondisabled = isset($functions['robot_function_ondisabled']) ? $functions['robot_function_ondisabled'] : function(){};
-            $this->robot_function_onswitch = isset($functions['robot_function_onswitch']) ? $functions['robot_function_onswitch'] : function(){};
-            $this->robot_function_onswitchout = isset($functions['robot_function_onswitchout']) ? $functions['robot_function_onswitchout'] : function(){};
-            $this->robot_function_onswitchin = isset($functions['robot_function_onswitchin']) ? $functions['robot_function_onswitchin'] : function(){};
-            $this->robot_functions_custom = array();
-            foreach ($functions AS $name => $function){
-                if (strpos($name, 'robot_function_') === 0){ continue; }
-                elseif (!is_callable($function)){ continue; }
-                $this->robot_functions_custom[$name] = $function;
-            }
-            unset($functions);
+            $this->robot_reload_functions();
         }
 
         // If the omega settings have not been defined yet, do so now
@@ -438,12 +416,43 @@ class rpg_robot extends rpg_object {
 
     }
 
-    // Define a function for re-loreading the current robot from session
+    // Define a function for re-loading the current robot from session
     public function robot_reload(){
+        unset($this->robot_function);
         $this->robot_load(array(
             'robot_id' => $this->robot_id,
-            'robot_token' => $this->robot_token
+            'robot_token' => $this->robot_token,
+            'robot_pseudo_token' => !empty($this->robot_persona) ? $this->robot_persona : $this->robot_token
             ));
+    }
+
+    // Define a function for re-loading the current robot's functions
+    public function robot_reload_functions(){
+        // Collect any functions associated with this robot
+        $temp_functions_path = MMRPG_CONFIG_ROBOTS_CONTENT_PATH.$this->robot_pseudo_token.'/functions.php';
+        if (file_exists($temp_functions_path)){ require($temp_functions_path); }
+        else { $functions = array(); }
+        $this->robot_function = isset($functions['robot_function']) ? $functions['robot_function'] : function(){};
+        $this->robot_function_onload = isset($functions['robot_function_onload']) ? $functions['robot_function_onload'] : function(){};
+        $this->robot_function_onbattlesetup = isset($functions['robot_function_onbattlesetup']) ? $functions['robot_function_onbattlesetup'] : function(){};
+        $this->robot_function_onbattlestart = isset($functions['robot_function_onbattlestart']) ? $functions['robot_function_onbattlestart'] : function(){};
+        $this->robot_function_onability = isset($functions['robot_function_onability']) ? $functions['robot_function_onability'] : function(){};
+        $this->robot_function_onturnstart = isset($functions['robot_function_onturnstart']) ? $functions['robot_function_onturnstart'] : function(){};
+        $this->robot_function_onendofturn = isset($functions['robot_function_onendofturn']) ? $functions['robot_function_onendofturn'] : function(){};
+        $this->robot_function_ondamage = isset($functions['robot_function_ondamage']) ? $functions['robot_function_ondamage'] : function(){};
+        $this->robot_function_onrecovery = isset($functions['robot_function_onrecovery']) ? $functions['robot_function_onrecovery'] : function(){};
+        $this->robot_function_ondisabled = isset($functions['robot_function_ondisabled']) ? $functions['robot_function_ondisabled'] : function(){};
+        $this->robot_function_onswitch = isset($functions['robot_function_onswitch']) ? $functions['robot_function_onswitch'] : function(){};
+        $this->robot_function_onswitchout = isset($functions['robot_function_onswitchout']) ? $functions['robot_function_onswitchout'] : function(){};
+        $this->robot_function_onswitchin = isset($functions['robot_function_onswitchin']) ? $functions['robot_function_onswitchin'] : function(){};
+        $this->robot_functions_custom = array();
+        foreach ($functions AS $name => $function){
+            if (strpos($name, 'robot_function_') === 0){ continue; }
+            elseif (!is_callable($function)){ continue; }
+            $this->robot_functions_custom[$name] = $function;
+        }
+        unset($functions);
+        return true;
     }
 
     // Define a function for refreshing this robot and running onload actions
