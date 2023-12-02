@@ -130,6 +130,10 @@ if ($this_battle->battle_status != 'complete'){
         }
     }
 
+    // Now that all the various checks are done, let's remove any stray submodule-group robots that don't exist anymore
+    $this_player->check_robots_submodules_disabled();
+    $target_player->check_robots_submodules_disabled();
+
     // Update the battle session if anything has changed
     if ($battle_has_updated){ $this_battle->update_session(); }
 
