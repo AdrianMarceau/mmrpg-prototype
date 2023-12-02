@@ -2160,6 +2160,82 @@ class rpg_player extends rpg_object {
     }
 
 
+    // -- END-OF-TURN CHECK FUNCTIONS -- //
+
+    // Define a function for checking the current turn and updating history
+    public function check_robots_submodules_disabled(){
+
+        // Collect references to global objects
+        $db = cms_database::get_database();
+        $this_battle = rpg_battle::get_battle();
+        $this_field = rpg_field::get_field();
+
+        // Collect references to relative player and robot objects
+        $this_player = $this;
+
+        // If the battle has ended, don't do this
+        if ($this_battle->battle_status == 'complete'){ return false; }
+
+        // Define the various submodule groups and their associated submodules and/or items
+        static $supported_submodule_groups = array(
+            'anti_priority_robots' => array('skill' => 'metronome-submodule', 'item' => 'metronome-module', 'position' => 'any'),
+            'anti_recovery_robots' => array('skill' => 'saboteur-submodule', 'item' => 'saboteur-module', 'position' => 'any'),
+            'hyperscan_robots' => array('skill' => 'hyperscan-submodule', 'item' => 'hyperscan-module', 'position' => 'any'),
+            'bulwark_robots' => array('skill' => 'bulwark-submodule', 'item' => 'bulwark-module', 'position' => 'active'),
+            'transport_robots' => array('skill' => 'transport-submodule', 'item' => 'transport-module', 'position' => 'bench'),
+            );
+
+        // Loop through the supported submodule groups and remove any that are no longer active
+        foreach ($supported_submodule_groups AS $group_token => $skills_and_items){
+            //error_log('$parse_player_submodule_groups('.$this_player->player_token.', '.$group_token.', ['.implode(',', $skills_and_items).'])');
+            $temp_group_robots = $this_player->get_value($group_token);
+            $backup_group_robots = $temp_group_robots;
+            if (!empty($temp_group_robots)){
+                foreach ($temp_group_robots AS $key => $robot_id){
+                    //error_log('Checking robot with ID '.$robot_id);
+                    $temp_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $robot_id));
+                    if (empty($temp_robot)){
+                        //error_log('Removing '.$robot_id.' from '.$group_token.' because it no longer exists');
+                        unset($temp_group_robots[$key]);
+                        continue;
+                        }
+                    $temp_skill = $temp_robot->has_skill() ? $temp_robot->get_skill() : '';
+                    $temp_item = $temp_robot->has_item() ? $temp_robot->get_item() : '';
+                    $temp_position = $temp_robot->get_position();
+                    $required_skill = !empty($skills_and_items['skill']) ? $skills_and_items['skill'] : '';
+                    $required_item = !empty($skills_and_items['item']) ? $skills_and_items['item'] : '';
+                    $required_position = !empty($skills_and_items['position']) ? $skills_and_items['position'] : 'any';
+                    $has_required_skill = !empty($required_skill) && $temp_skill == $required_skill ? true : false;
+                    $has_required_item = !empty($required_item) && $temp_item == $required_item ? true : false;
+                    $has_required_position = $required_position === 'any' || $temp_position === $required_position ? true : false;
+                    //error_log('Reviewing skill: '.$temp_skill.' vs '.$required_skill.' ('.($has_required_skill ? 'true' : 'false').')');
+                    //error_log('Reviewing item: '.$temp_item.' vs '.$required_item.' ('.($has_required_item ? 'true' : 'false').')');
+                    //error_log('Reviewing position: '.$temp_position.' vs '.$required_position.' ('.($has_required_position ? 'true' : 'false').')');
+                    if (!$has_required_position || (!$has_required_skill && !$has_required_item)){
+                        //error_log('Removing '.$robot_id.' from '.$group_token);
+                        unset($temp_group_robots[$key]);
+                        continue;
+                        } else {
+                        //error_log('Keeping '.$temp_robot->robot_string.' in '.$group_token);
+                        }
+                }
+                $temp_group_robots = array_values($temp_group_robots);
+                // check to see if the backup and new group have different elements even if different order
+                if (array_diff($backup_group_robots, $temp_group_robots) || array_diff($temp_group_robots, $backup_group_robots)){
+                    //error_log('NEW array for '.$this_player->player_token.'\'s '.$group_token.' is ['.implode(',', $temp_group_robots).']');
+                    $this_player->set_value($group_token, $temp_group_robots);
+                } else {
+                    //error_log('OLD array for '.$this_player->player_token.'\'s '.$group_token.' is ['.implode(',', $temp_group_robots).']');
+                }
+            }
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+
     // -- INDEX FUNCTIONS -- //
 
     /**
