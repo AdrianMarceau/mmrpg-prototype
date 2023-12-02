@@ -1282,6 +1282,8 @@ class rpg_robot extends rpg_object {
         if ($this->robot_base_level > $robot_level_max){ $this->robot_base_level = $robot_level_max;  }
 
         // Collect this robot's stat values for later reference
+        $base_core_types = array($this->robot_core, $this->robot_core2);
+        if (!empty($this->robot_persona)){ $base_core_types = array('copy'); }
         if (empty($base_stats_ref)){
             $base_stats_ref = array(
                 'robot_token' => $this->robot_pseudo_token,
@@ -1294,7 +1296,7 @@ class rpg_robot extends rpg_object {
                 'robot_speed' => $this->robot_base_speed
                 );
         }
-        $this_robot_stats = self::calculate_stat_values($this->robot_level, $base_stats_ref, $this_rewards, true, array($this->robot_core, $this->robot_core2), $this->player->player_starforce);
+        $this_robot_stats = self::calculate_stat_values($this->robot_level, $base_stats_ref, $this_rewards, true, $base_core_types, $this->player->player_starforce);
 
         // Update the robot's stat values with calculated totals
         $stat_tokens = array('energy', 'weapons', 'attack', 'defense', 'speed');
@@ -4956,6 +4958,7 @@ class rpg_robot extends rpg_object {
             $robot_database = !empty($player_robot_database[$robot_token]) ? $player_robot_database[$robot_token] : array(); //rpg_game::robot_database($robot_token);
             // Collect the robot ability core if it exists
             $robot_ability_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
+            if ($has_persona_applied){ $robot_ability_core = 'copy'; }
             // Collect the stat details for this robot w/ special considerations for personas
             $base_stats_ref = $has_persona_applied ? array_merge($robot_info, array('robot_token' => $robot_info['robot_persona'])) : $robot_info;
             $robot_stats = rpg_robot::calculate_stat_values($robot_info['robot_level'], $base_stats_ref, $robot_rewards, true, $robot_ability_core, $player_starforce);

@@ -3344,8 +3344,9 @@ function mmrpg_prototype_robot_select_markup($this_prototype_data){
         $this_robot_persona = !empty($info['robot_persona']) ? $info['robot_persona'] : '';
 
         // Calculate this robot's current and max stat values
+        $base_core_type = $has_persona_applied ? 'copy' : $this_robot_core;
         $base_stats_ref = $has_persona_applied ? array_merge($info, array('robot_token' => $this_robot_settings['robot_persona'])) : $info;
-        $this_robot_stats = rpg_robot::calculate_stat_values($this_robot_level, $base_stats_ref, $this_robot_rewards, true, $this_robot_core, $player_starforce);
+        $this_robot_stats = rpg_robot::calculate_stat_values($this_robot_level, $base_stats_ref, $this_robot_rewards, true, $base_core_type, $player_starforce);
         $this_robot_energy = $this_robot_stats['energy']['current'];
         $this_robot_attack = $this_robot_stats['attack']['current'];
         $this_robot_defense = $this_robot_stats['defense']['current'];
