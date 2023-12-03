@@ -179,6 +179,8 @@ class rpg_mission_starter extends rpg_mission {
         $temp_battle_omega['battle_target_player']['player_id'] = $temp_player_id;
         $temp_battle_omega['battle_target_player']['player_token'] = 'player';
         $temp_battle_omega['battle_target_player']['player_robots'] = array();
+
+        // We always have at least the midboss
         $temp_midboss_level = $this_start_level;
         $temp_midboss_robot = array(
             'robot_token' => $this_robot_token,
@@ -187,6 +189,30 @@ class rpg_mission_starter extends rpg_mission {
             'robot_abilities' => !empty($this_robot_data['robot_rewards']['abilities']) ? array_map(function($a){ return $a['token']; }, $this_robot_data['robot_rewards']['abilities']) : array('buster-shot')
             );
         $temp_battle_omega['battle_target_player']['player_robots'][0] = $temp_midboss_robot;
+
+        // Determine the number of helper robots based on campaign
+        $temp_helper_robots = $this_prototype_data['this_player_number'] - 1;
+        if ($temp_helper_robots > 0){
+            $temp_helper_token = 'met';
+            $temp_helper_abilities = array('buster-shot');
+            $temp_helper_level = ceil($temp_midboss_level / 2);
+            if ($this_prototype_data['this_player_number'] === 1){ $temp_helper_token = 'met'; $temp_helper_abilities = array('buster-shot'); }
+            elseif ($this_prototype_data['this_player_number'] === 2){ $temp_helper_token = 'skullmet'; $temp_helper_abilities = array('shadow-shot', 'defense-break'); }
+            elseif ($this_prototype_data['this_player_number'] === 3){ $temp_helper_token = 'diaymon'; $temp_helper_abilities = array('crystal-shot', 'defense-boost'); }
+            $temp_robot_data = rpg_robot::get_index_info($temp_helper_token);
+            for ($i = 0; $i < $temp_helper_robots; $i++){
+                $rid = $temp_robot_data['robot_id'];
+                $num = count($temp_battle_omega['battle_target_player']['player_robots']) + 1;
+                $temp_helper_robot = array(
+                    'robot_token' => $temp_helper_token,
+                    'robot_id' => rpg_game::unique_robot_id($temp_player_id, $rid, $num),
+                    'robot_level' => $temp_helper_level,
+                    'robot_abilities' => $temp_helper_abilities,
+                    'flags' => array('hide_from_mission_select' => true)
+                    );
+                $temp_battle_omega['battle_target_player']['player_robots'][] = $temp_helper_robot;
+            }
+        }
 
         // If the rescure robot has not yet been unlocked as a playable character, show it in the background
         $rescue_robot_unlockable = false;
