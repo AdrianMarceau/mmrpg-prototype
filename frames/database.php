@@ -448,9 +448,19 @@ if (true){
                                             <i class="unlocked fa fas <?= $robot_is_unlocked ? 'fa-robot' : 'fa-exclamation-circle' ?>"></i>
                                         </span>
                                     <? } elseif (!empty($robot_info['robot_summoned'])){ ?>
-                                        <span class="this_icon this_summoned" <?= $data_tooltip_type ?> data-click-tooltip="<?= $robot_info['robot_class'] === 'mecha' ? 'Support Mecha Summoned!' : 'Fortress Boss Summoned!' ?>">
-                                            <i class="summoned fa fas <?= $robot_info['robot_class'] === 'mecha' ? 'fa-ghost' : 'fa-skull' ?>"></i>
-                                        </span>
+                                        <? if ($robot_info['robot_class'] === 'mecha'){ ?>
+                                            <span class="this_icon this_summoned" <?= $data_tooltip_type ?> data-click-tooltip="Support Mecha Summoned!">
+                                                <i class="summoned fa fas fa-ghost"></i>
+                                            </span>
+                                        <? } elseif ($robot_info['robot_class'] === 'master'){ ?>
+                                            <span class="this_icon this_summoned" <?= $data_tooltip_type ?> data-click-tooltip="Robot Master Summoned!">
+                                                <i class="summoned fa fas fa-mask"></i>
+                                            </span>
+                                        <? } elseif ($robot_info['robot_class'] === 'boss'){ ?>
+                                            <span class="this_icon this_summoned" <?= $data_tooltip_type ?> data-click-tooltip="Fortress Boss Summoned!">
+                                                <i class="summoned fa fas fa-skull"></i>
+                                            </span>
+                                        <? } ?>
                                     <? } ?>
                                     <? if(!empty($robot_info['robot_core'])): ?>
                                         <span class="robot_type robot_core"><?= ucfirst($robot_info['robot_core']) ?> Core</span>
