@@ -1142,9 +1142,22 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
     background-position: center center;
     top: -12px;
     left: -14px;
+    z-index: 3;
+    pointer-events: none;
 }
 #edit #console .header .robot_type .text {
 
+}
+#edit #console .header .robot_type .wrap .sprite + .sprite {
+    z-index: 2;
+}
+#edit #console .header .robot_type[data-count="2"] .wrap .sprite {
+    background-position: 0 0;
+    width: 20px;
+}
+#edit #console .header .robot_type[data-count="2"] .wrap .sprite + .sprite {
+    background-position: -20px 0;
+    left: 6px;
 }
 
 #edit #console .omega.robot_type {

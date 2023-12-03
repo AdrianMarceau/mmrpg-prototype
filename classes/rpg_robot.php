@@ -5692,7 +5692,7 @@ class rpg_robot extends rpg_object {
 
                 ?>
 
-                <div class="header header_left robot_type robot_type_<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>" style="margin-right: 0;">
+                <div class="header header_left robot_type robot_type_<?= (!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').(!empty($robot_info['robot_core2']) ? '_'.$robot_info['robot_core2'] : '') ?>" style="margin-right: 0;">
                     <span class="title robot_type">
                         <?= $robot_info['robot_name']?>
                         <?= $robot_info['robot_level'] >= 100 ? '<span>&#9733;</span>' : '' ?>
@@ -5721,11 +5721,25 @@ class rpg_robot extends rpg_object {
 
                     }
 
+                    // Print the markup for this robot's core type including the sprite and the text
+                    $core_types = array();
+                    $core_image = 'images/items/{core}-core/icon_left_40x40.png';
+                    if (!empty($robot_info['robot_core'])){ $core_types[] = $robot_info['robot_core']; }
+                    if (!empty($robot_info['robot_core2'])){ $core_types[] = $robot_info['robot_core2']; }
+                    echo('<span class="core robot_type" data-count="'.count($core_types).'">'.PHP_EOL);
+                        echo('<span class="wrap">'.PHP_EOL);
+                            for ($i = 0; $i < count($core_types); $i++){
+                                $temp_core_type = $core_types[$i];
+                                $temp_core_image = str_replace('{core}', $temp_core_type, $core_image);
+                                echo('<span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url('.$temp_core_image.');"></span>'.PHP_EOL);
+                            }
+                        echo('</span>'.PHP_EOL);
+                        echo('<span class="text">'.PHP_EOL);
+                            echo(ucfirst(implode(' / ', $core_types)).' Core'.PHP_EOL);
+                        echo('</span>'.PHP_EOL);
+                    echo('</span>'.PHP_EOL);
+
                     ?>
-                    <span class="core robot_type">
-                        <span class="wrap"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none' ?>-core/icon_left_40x40.png);"></span></span>
-                        <span class="text"><?= !empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']) : 'Neutral' ?> Core</span>
-                    </span>
                 </div>
 
                 <div class="body body_left" style="margin-right: 0; padding: 2px 3px; height: auto;">
