@@ -3602,6 +3602,22 @@ class rpg_ability extends rpg_object {
         return $temp_global_deprecated_abilities;
     }
 
+    // Define a static function that returns a list of globally compatible buster abilities
+    public static function get_global_buster_abilities(){
+        // Define the list of global buster abilities
+        static $temp_types = array();
+        if (empty($temp_types)){ $temp_types = rpg_type::get_index(false, false, false, false); }
+        $temp_abilities = array('shot', 'buster', 'overdrive');
+        $temp_global_buster_abilities = array();
+        foreach ($temp_types AS $type_token => $type_info){
+            foreach ($temp_abilities AS $ability_type){
+                $temp_global_buster_abilities[] = $type_token.'-'.$ability_type;
+            }
+        }
+        // Return the list of global buster abilities
+        return $temp_global_buster_abilities;
+    }
+
     // Define a static function that returns a list of all T1 abilities (for the purposes of auto-generation)
     public static function get_tier_one_abilities(){
         static $tier_one_abilities;
