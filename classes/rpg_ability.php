@@ -3775,6 +3775,8 @@ class rpg_ability extends rpg_object {
                 'buster-charge', 'buster-relay', 'copy-shot', 'copy-soul', 'copy-style',
                 'friend-share', 'core-shield',
                 'jewel-polish',
+                // [event] abilities should not double-up
+                'star-support',
                 // [deprecated] abilities should not double-up
                 'repair-mode', 'energy-shuffle', 'attack-shuffle', 'defense-shuffle', 'speed-shuffle',
                 // [action/system] abilities should never be doubled-up
