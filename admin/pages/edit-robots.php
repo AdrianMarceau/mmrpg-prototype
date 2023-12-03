@@ -1086,6 +1086,7 @@
 
             // Collect global abilities so we can skip them
             $global_ability_tokens = rpg_ability::get_global_abilities();
+            $global_buster_tokens = rpg_ability::get_global_buster_abilities();
 
             // Pre-generate a list of all abilities so we can re-use it over and over
             $last_option_group = false;
@@ -1118,6 +1119,7 @@
                 if ($robot_data['robot_class'] === 'boss' && $ability_info['ability_class'] !== 'mecha'){ $levelup_compatible = true; }
                 elseif ($ability_info['ability_class'] === $robot_data['robot_class']){ $levelup_compatible = true; }
                 elseif (in_array($ability_token, $global_ability_tokens)){ $levelup_compatible = true; }
+                elseif (in_array($ability_token, $global_buster_tokens)){ $levelup_compatible = true; }
                 if ($levelup_compatible){
                     if ($levelup_last_option_group !== $option_group){
                         if (!empty($levelup_last_option_group)){ $levelup_ability_options_markup[] = '</optgroup>'; }
