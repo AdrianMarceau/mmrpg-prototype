@@ -216,8 +216,8 @@ class rpg_mission_endless extends rpg_mission {
         // Precollect a static field list for reference
         static $mmrpg_fields_index = false;
         static $mmrpg_robots_index = false;
-        if ($mmrpg_fields_index === false){ $mmrpg_fields_index = rpg_field::get_index(); }
-        if ($mmrpg_robots_index === false){ $mmrpg_robots_index = rpg_robot::get_index(false, false, 'master'); }
+        if ($mmrpg_fields_index === false){ $mmrpg_fields_index = rpg_field::get_index(true); }
+        if ($mmrpg_robots_index === false){ $mmrpg_robots_index = rpg_robot::get_index(true); }
 
         // Collect the endless mission seed based on the mission number
         $temp_battle_seed = self::generate_endless_mission_seed($mission_number);
@@ -291,13 +291,19 @@ class rpg_mission_endless extends rpg_mission {
         foreach ($temp_battle_seed['targets'] AS $key => $target){
             list($robot, $item) = explode('@', $target);
             $image = $robot;
+            $info = $mmrpg_robots_index[$robot];
+            //error_log('$info = '.print_r($info, true));
             if (!isset($robot_tokens[$robot])){ $robot_tokens[$robot] = 0; }
             $robot_tokens[$robot]++;
-            if ($robot_tokens[$robot] > 1){
+            if ($robot_tokens[$robot] > 1
+                && $info['robot_core'] !== 'copy'
+                && !empty($info['robot_image_alts'])){
+                $alts = $info['robot_image_alts'];
                 $alt_num = $robot_tokens[$robot] - 1;
-                if ($alt_num === 1){ $image .= '_alt'; }
-                elseif ($alt_num === 2){ $image .= '_alt2'; }
-                elseif ($alt_num >= 3) { $image .= '_alt9'; }
+                $alt_key = $alt_num - 1;
+                if (!isset($alts[$alt_key])){ $alt_key = count($alts) - 1; }
+                $alt_info = $alts[$alt_key];
+                $image .= '_'.$alt_info['token'];
             }
             $target_robots[] = array(
                 'robot_token' => $robot,
