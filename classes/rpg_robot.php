@@ -1861,6 +1861,14 @@ class rpg_robot extends rpg_object {
             $weights[] = $this_robot->robot_token == 'met' ? 90 : 1;
         }
 
+        // Define the frequency of the buster charge ability if set
+        if ($this_robot->has_ability('buster-charge')){
+            $options[] = 'buster-charge';
+            if ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 3)){ $weights[] = 10;  }
+            elseif ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 2)){ $weights[] = 5;  }
+            else { $weights[] = 0;  }
+        }
+
         // Define the freency of the default buster ability if set
         if ($this_robot->has_ability('buster-relay')){
             $options[] = 'buster-relay';
@@ -1872,18 +1880,6 @@ class rpg_robot extends rpg_object {
             if (preg_match_all('/("ability_core-shield_(?:[a-z]+)")/i', $this_attachment_string, $matches)){ $temp_weight += count($matches[0]); }
             if ($num_this_robots_active > 1){ $weights[] = $temp_weight; }
             else { $weights[] = 0; }
-        }
-
-        // Define the freency of the omega pulse ability if set
-        if ($this_robot->has_ability('omega-pulse')){
-            $options[] = 'omega-pulse';
-            $weights[] = 24 * $support_multiplier;
-        }
-
-        // Define the freency of the omega wave ability if set
-        if ($this_robot->has_ability('omega-wave')){
-            $options[] = 'omega-wave';
-            $weights[] = 12 * $support_multiplier;
         }
 
         // Define the frequency of the energy boost ability if set
@@ -1994,6 +1990,21 @@ class rpg_robot extends rpg_object {
             else { $weights[] = 1; }
         }
 
+        // Define the frequency of the revive abilities based benched robot count
+        $revive_chance = 0;
+        $has_revive_energy = $this_robot->robot_weapons > ($this_robot->robot_base_weapons / 2) ? true : false;
+        if (!empty($this_player->counters['robots_disabled'])){
+            $revive_chance = 40 * $this_player->counters['robots_disabled'];
+        }
+        if ($this_robot->has_ability('spark-life')){
+            $options[] = 'spark-life';
+            $weights[] = $has_revive_energy ? $revive_chance : 0;
+        }
+        if ($this_robot->has_ability('skull-sacrifice')){
+            $options[] = 'skull-sacrifice';
+            $weights[] = $has_revive_energy ? $revive_chance : 0;
+        }
+
         // Define the frequency of the mecha support ability based benched robot count
         if ($this_robot->has_ability('mecha-support')){
             $options[] = 'mecha-support';
@@ -2017,27 +2028,34 @@ class rpg_robot extends rpg_object {
             else { $weights[] = 0; }
         }
 
-        // Define the frequency of the revive abilities based benched robot count
-        $revive_chance = 0;
-        $has_revive_energy = $this_robot->robot_weapons > ($this_robot->robot_base_weapons / 2) ? true : false;
-        if (!empty($this_player->counters['robots_disabled'])){
-            $revive_chance = 40 * $this_player->counters['robots_disabled'];
-        }
-        if ($this_robot->has_ability('spark-life')){
-            $options[] = 'spark-life';
-            $weights[] = $has_revive_energy ? $revive_chance : 0;
-        }
-        if ($this_robot->has_ability('skull-sacrifice')){
-            $options[] = 'skull-sacrifice';
-            $weights[] = $has_revive_energy ? $revive_chance : 0;
+        // Define the freency of the omega pulse ability if set
+        if ($this_robot->has_ability('omega-pulse')){
+            $options[] = 'omega-pulse';
+            $weights[] = 24 * $support_multiplier;
         }
 
-        // Define the frequency of the buster charge ability if set
-        if ($this_robot->has_ability('buster-charge')){
-            $options[] = 'buster-charge';
-            if ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 3)){ $weights[] = 10;  }
-            elseif ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 2)){ $weights[] = 5;  }
-            else { $weights[] = 0;  }
+        // Define the freency of the omega wave ability if set
+        if ($this_robot->has_ability('omega-wave')){
+            $options[] = 'omega-wave';
+            $weights[] = 12 * $support_multiplier;
+        }
+
+        // Define the freency of the copy shot ability if set
+        if ($this_robot->has_ability('copy-shot')){
+            $options[] = 'copy-shot';
+            $weights[] = 4;
+        }
+
+        // Define the freency of the copy soul ability if set
+        if ($this_robot->has_ability('copy-soul')){
+            $options[] = 'copy-soul';
+            $weights[] = 2;
+        }
+
+        // Define the freency of the copy style ability if set
+        if ($this_robot->has_ability('copy-style')){
+            $options[] = 'copy-style';
+            $weights[] = 0;
         }
 
         // Make the frequency of all deprecated moves zero
