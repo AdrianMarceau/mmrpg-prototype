@@ -2703,7 +2703,6 @@ class rpg_ability extends rpg_object {
             return false;
         } elseif ($break_amount < 0){
             return self::ability_function_stat_boost(
-                $this_robot,
                 $target_robot,
                 $stat_type,
                 ($break_amount * -1),
