@@ -4471,7 +4471,7 @@ class rpg_robot extends rpg_object {
                             <span class="pipe" style="<?= count($temp_alts_array) == 1 ? 'visibility: hidden;' : '' ?>">|</span>
                             <span class="directions"><?
                                 // Loop though and print links for the alts
-                                foreach (array('right', 'left') AS $temp_key => $temp_direction){
+                                foreach (array('left', 'right') AS $temp_key => $temp_direction){
                                     echo '<a href="#" data-tooltip="'.ucfirst($temp_direction).' Facing Sprites" data-tooltip-type="'.$alt_type_base.'" class="link link_direction '.($temp_key == 0 ? 'link_active' : '').'" data-direction="'.$temp_direction.'">';
                                         echo '<span class="ability_type ability_type_empty" style="border-color: rgba(0, 0, 0, 0.2) !important; background-color: rgba(0, 0, 0, 0.2) !important; ">'.ucfirst($temp_direction).'</span>';
                                     echo '</a>';
