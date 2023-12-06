@@ -247,12 +247,16 @@ ob_start();
                     }
 
                     // Apply any overall damage multipliers if applicable
-                    $temp_damage = ceil($temp_damage * $temp_multiplier);
-                    if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['damage'])){ $temp_damage = ceil($temp_damage * $this_battle->battle_field->field_multipliers['damage']); }
+                    if (empty($temp_ability->get_flag('damage_is_fixed'))){
+                        $temp_damage = ceil($temp_damage * $temp_multiplier);
+                        if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['damage'])){ $temp_damage = ceil($temp_damage * $this_battle->battle_field->field_multipliers['damage']); }
+                    }
 
                     // Apply any overall recovery multipliers if applicable
-                    $temp_recovery = ceil($temp_recovery * $temp_multiplier);
-                    if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['recovery'])){ $temp_recovery = ceil($temp_recovery * $this_battle->battle_field->field_multipliers['recovery']); }
+                    if (empty($temp_ability->get_flag('recovery_is_fixed'))){
+                        $temp_recovery = ceil($temp_recovery * $temp_multiplier);
+                        if (!preg_match('/-(booster|breaker)$/i', $ability_token) && !empty($this_battle->battle_field->field_multipliers['recovery'])){ $temp_recovery = ceil($temp_recovery * $this_battle->battle_field->field_multipliers['recovery']); }
+                    }
 
                 }
 
@@ -288,7 +292,12 @@ ob_start();
                 //$temp_ability_details .= ' | x'.$temp_multiplier.' '.$this_robot->robot_core.' '.count($this_battle->battle_field->field_multipliers);
 
                 // Define a quick function for printing a big digit given damage/recovery values
-                $get_big_digit_markup = function($temp_kind, $temp_type, $temp_damage, $temp_damage_unit, $temp_recovery, $temp_recovery_unit, $temp_multiplier = 1, $temp_times = 1){
+                $get_big_digit_markup = function(
+                        $temp_kind, $temp_type,
+                        $temp_damage, $temp_damage_unit,
+                        $temp_recovery, $temp_recovery_unit,
+                        $temp_multiplier = 1, $temp_times = 1
+                        ) use ($temp_ability) {
                         $temp_big_digit_markup = '';
                         if (!empty($temp_damage) || !empty($temp_recovery)){
                             $temp_big_digits = '';
@@ -300,8 +309,10 @@ ob_start();
                                         elseif (in_array($temp_type, array('attack', 'defense', 'speed'))) { { $icon = '<i class="fa fas fa-caret-square-down"></i>'; } }
                                         else { { $icon = '<i class="fa fas fa-fist-raised"></i>'; } }
                                         $mods = '';
-                                        if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
-                                        elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
+                                        if (empty($temp_ability->get_flag('damage_is_fixed'))){
+                                            if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
+                                            elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
+                                        }
                                         if ($temp_times > 1){ $mods .= ' <i class="fa fas fa-times"></i> '.$temp_times; }
                                         $temp_big_digits .= '<span class="amount damage">'.$icon.' '.$amount.$mods.'</span>';
                                     $temp_big_digits .= '</span>';
@@ -314,8 +325,10 @@ ob_start();
                                         elseif (in_array($temp_type, array('attack', 'defense', 'speed'))) { { $icon = '<i class="fa fas fa-caret-square-up"></i>'; } }
                                         else { { $icon = '<i class="fa fas fa-heart"></i>'; } }
                                         $mods = '';
-                                        if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
-                                        elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
+                                        if (empty($temp_ability->get_flag('recovery_is_fixed'))){
+                                            if ($temp_multiplier > 1){ $mods .= '<i class="fa fas fa-angle-double-up"></i>'; }
+                                            elseif ($temp_multiplier < 1){ $mods .= '<i class="fa fas fa-angle-double-down"></i>'; }
+                                        }
                                         if ($temp_times > 1){ $mods .= ' <i class="fa fas fa-times"></i> '.$temp_times; }
                                         $temp_big_digits .= '<span class="amount recovery">'.$icon.' '.$amount.$mods.'</span>';
                                     $temp_big_digits .= '</span>';
