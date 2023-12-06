@@ -2930,6 +2930,23 @@ class rpg_robot extends rpg_object {
             // Pass along variables to the static function and return
             $options->energy_new = self::calculate_weapon_energy_static($robot_info, $ability_info, $options->energy_base, $options->energy_mods);
 
+            // Check to see if a wellspring is in effect for this ability's elemental type(s) (unnecessary if WE if already zero)
+            if (!empty($options->energy_new)){
+                $types = array();
+                if (!empty($ability_info['ability_type'])){ $types[] = $ability_info['ability_type']; }
+                if (!empty($ability_info['ability_type2'])){ $types[] = $ability_info['ability_type2']; }
+                if (empty($types)){ $types[] = 'none'; }
+                //error_log('checking for wellspring on types: '.implode(', ', $types));
+                foreach ($types AS $type){
+                    $temp_wellspring_robots = $this->player->get_value($type.'_wellspring_robots');
+                    if (!empty($temp_wellspring_robots)){
+                        //error_log('found wellspring for type: '.$type);
+                        $options->energy_new = 1;
+                        $options->energy_mods++;
+                    }
+                }
+            }
+
             // Trigger this robot's custom function if one has been defined for this context
             $this->trigger_custom_function('rpg-robot_calculate-weapon-energy_after', $extra_objects);
             if ($options->return_early){ return $options->return_value; }
