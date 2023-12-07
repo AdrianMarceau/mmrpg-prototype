@@ -4553,7 +4553,12 @@ body.index #header {
 #actions .actions_scan .action_scan label .sprite_40x40,
 #actions .actions_target .action_target label .sprite_40x40,
 #actions .actions_ability .action_ability label .sprite_40x40,
-#actions .actions_item .action_item label .sprite_40x40 {
+#actions .actions_item .action_item label .sprite_40x40,
+#actions .actions_switch .action_switch label .sprite_container,
+#actions .actions_scan .action_scan label .sprite_container,
+#actions .actions_target .action_target label .sprite_container,
+#actions .actions_ability .action_ability label .sprite_container,
+#actions .actions_item .action_item label .sprite_container {
     background-color: #000000 !important;
     border: 1px solid #373737;
     width: 40px;
@@ -4569,6 +4574,77 @@ body.index #header {
 #actions .actions_item .action_item label .sprite_40x40 + .sprite2 {
     background-color: transparent !important;
     border-color: transparent;
+}
+#actions .actions_switch .action_switch label .sprite_container,
+#actions .actions_scan .action_scan label .sprite_container,
+#actions .actions_target .action_target label .sprite_container,
+#actions .actions_ability .action_ability label .sprite_container,
+#actions .actions_item .action_item label .sprite_container {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+#actions .actions_switch .action_switch label .sprite_container .sprite,
+#actions .actions_scan .action_scan label .sprite_container .sprite,
+#actions .actions_target .action_target label .sprite_container .sprite,
+#actions .actions_ability .action_ability label .sprite_container .sprite,
+#actions .actions_item .action_item label .sprite_container .sprite {
+    background-color: transparent !important;
+    background-position: 0 0;
+    border-color: transparent !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#actions .actions_switch .action_switch label .sprite_container .sprite.sprite_40x40,
+#actions .actions_scan .action_scan label .sprite_container .sprite.sprite_40x40,
+#actions .actions_target .action_target label .sprite_container .sprite.sprite_40x40,
+#actions .actions_ability .action_ability label .sprite_container .sprite.sprite_40x40,
+#actions .actions_item .action_item label .sprite_container .sprite.sprite_40x40 {
+    width: 40px;
+    height: 40px;
+    top: 0;
+    left: -2px;
+}
+#actions .actions_switch .action_switch label .sprite_container .sprite.sprite_80x80,
+#actions .actions_scan .action_scan label .sprite_container .sprite.sprite_80x80,
+#actions .actions_target .action_target label .sprite_container .sprite.sprite_80x80,
+#actions .actions_ability .action_ability label .sprite_container .sprite.sprite_80x80,
+#actions .actions_item .action_item label .sprite_container .sprite.sprite_80x80 {
+    width: 80px;
+    height: 80px;
+    top: -40px;
+    left: -20px;
+}
+#actions .actions_switch .action_switch label .sprite_container .sprite.sprite_robot,
+#actions .actions_scan .action_scan label .sprite_container .sprite.sprite_robot,
+#actions .actions_target .action_target label .sprite_container .sprite.sprite_robot,
+#actions .actions_ability .action_ability label .sprite_container .sprite.sprite_robot,
+#actions .actions_item .action_item label .sprite_container .sprite.sprite_robot {
+    z-index: 2;
+}
+#actions .actions_switch .action_switch label .sprite_container .sprite.sprite_item,
+#actions .actions_scan .action_scan label .sprite_container .sprite.sprite_item,
+#actions .actions_target .action_target label .sprite_container .sprite.sprite_item,
+#actions .actions_ability .action_ability label .sprite_container .sprite.sprite_item,
+#actions .actions_item .action_item label .sprite_container .sprite.sprite_item {
+    z-index: 3;
+    top: 18px;
+    left: 16px;
+}
+#actions .actions_switch .action_switch label .sprite_container.left .sprite.sprite_item,
+#actions .actions_scan .action_scan label .sprite_container.left .sprite.sprite_item,
+#actions .actions_target .action_target label .sprite_container.left .sprite.sprite_item,
+#actions .actions_ability .action_ability label .sprite_container.left .sprite.sprite_item,
+#actions .actions_item .action_item label .sprite_container.left .sprite.sprite_item {
+    left: -16px;
+}
+#actions .actions_switch .action_switch label .sprite_container.right .sprite.sprite_item,
+#actions .actions_scan .action_scan label .sprite_container.right .sprite.sprite_item,
+#actions .actions_target .action_target label .sprite_container.right .sprite.sprite_item,
+#actions .actions_ability .action_ability label .sprite_container.right .sprite.sprite_item,
+#actions .actions_item .action_item label .sprite_container.right .sprite.sprite_item {
+    left: 16px;
 }
 #actions .actions_ability .action_ability label .sprite_40x40_ability,
 #actions .actions_item .action_item label .sprite_40x40_item {

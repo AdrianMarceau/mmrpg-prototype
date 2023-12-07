@@ -355,11 +355,15 @@ class rpg_prototype {
         $robot_title .= ' <br />'.(!empty($robot->robot_core) ? ucfirst($robot->robot_core).' Core' : 'Neutral Core').' | '.ucfirst($robot->robot_position).' Position';
 
         // Display the robot's item if it exists
+        $robot_item_image = '';
+        $robot_item_sprite = '';
         if ($show_items
             && !empty($robot->robot_item)
             && empty($robot->counters['item_disabled'])
             && !empty($mmrpg_items_index[$robot->robot_item])){
             $robot_title .= ' | + '.$mmrpg_items_index[$robot->robot_item]['item_name'].' ';
+            $robot_item_image = 'images/items/'.$robot->robot_item.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+            $robot_item_sprite = '<span class="sprite sprite_item sprite_40x40" style="background-image: url('.$robot_item_image.');"></span>';
         }
 
         // Display the robot's life and weapon energy current and base
@@ -426,8 +430,8 @@ class rpg_prototype {
         $robot_sprite['image_size_zoom_text'] = $robot_sprite['image_size'].'x'.$robot_sprite['image_size'];
         $robot_sprite['url'] = 'images/robots/'.$robot->robot_image.'/sprite_'.$robot_direction.'_'.$robot_sprite['image_size_text'].'.png';
         $robot_sprite['preload'] = 'images/robots/'.$robot->robot_image.'/sprite_'.$robot_direction.'_'.$robot_sprite['image_size_zoom_text'].'.png';
-        $robot_sprite['class'] = 'sprite sprite_'.$robot_sprite['image_size_text'].' sprite_'.$robot_sprite['image_size_text'].'_'.($robot->robot_energy > 0 ? ($robot->robot_energy > ($robot->robot_base_energy/2) ? 'base' : 'defend') : 'defeat').' ';
-        $robot_sprite['style'] = 'background-image: url('.$robot_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.');  top: 5px; left: 5px; ';
+        $robot_sprite['class'] = 'sprite sprite_robot sprite_'.$robot_sprite['image_size_text'].' sprite_'.$robot_sprite['image_size_text'].'_'.($robot->robot_energy > 0 ? ($robot->robot_energy > ($robot->robot_base_energy/2) ? 'base' : 'defend') : 'defeat').' ';
+        $robot_sprite['style'] = 'background-image: url('.$robot_sprite['url'].'?'.MMRPG_CONFIG_CACHE_DATE.'); ';
         if ($robot->robot_position == 'active'){ $robot_sprite['style'] .= 'border-color: #ababab; '; }
         $robot_sprite['class'] .= 'sprite_'.$robot_sprite['image_size_text'].'_energy_'.$energy_class.' ';
         $robot_sprite['markup'] = '<span class="'.$robot_sprite['class'].'" style="'.$robot_sprite['style'].'">'.$robot_sprite['name'].'</span>';
@@ -470,7 +474,10 @@ class rpg_prototype {
             echo('<a type="button" class="'.$btn_class.'" data-action="'.$btn_action.'" data-preload="'.$robot_sprite['preload'].'" data-position="'.$robot->robot_position.'/'.$robot->robot_key.'" '.$order_button_markup.'>'.
                     '<label>'.
                         $btn_info_circle.
-                        $robot_sprite['markup'].
+                        '<span class="sprite_container '.$player_side.'">'.
+                            $robot_item_sprite.
+                            $robot_sprite['markup'].
+                        '</span>'.
                         $robot_label.
                     '</label>'.
                 '</a>');
@@ -479,7 +486,10 @@ class rpg_prototype {
             echo('<a type="button" class="'.$btn_class.'" data-position="'.$robot->robot_position.'/'.$robot->robot_key.'">'.
                     '<label>'.
                         $btn_info_circle.
-                        $robot_sprite['markup'].
+                        '<span class="sprite_container '.$player_side.'">'.
+                            $robot_item_sprite.
+                            $robot_sprite['markup'].
+                        '</span>'.
                         $robot_label.
                     '</label>'.
                 '</a>');
