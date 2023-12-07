@@ -336,7 +336,7 @@ class rpg_mission_starter extends rpg_mission {
                 $temp_boss_image = $this_robot_token;
                 $temp_boss_item = 'space-shard';
                 //$temp_boss_abilities = array('space-shot', 'space-buster', 'space-overdrive', 'energy-boost');
-                $temp_boss_abilities = array('energy-boost');
+                $temp_boss_abilities = array('buster-charge');
                 if ($this_player_data['player_number'] >= 1){ $temp_boss_abilities[] = 'space-overdrive'; }
                 if ($this_player_data['player_number'] >= 2){ $temp_boss_abilities[] = 'space-buster'; }
                 if ($this_player_data['player_number'] >= 3){ $temp_boss_abilities[] = 'space-shot'; }
@@ -348,7 +348,7 @@ class rpg_mission_starter extends rpg_mission {
                     $temp_stat_priority = array('speed', 'attack', 'defense');
                 }
                 $temp_boss_abilities = array_merge(
-                    array($temp_stat_priority[0].'-boost', $temp_stat_priority[0].'-break', $temp_stat_priority[0].'-mode', 'buster-charge'),
+                    array($temp_stat_priority[0].'-boost', $temp_stat_priority[0].'-break', $temp_stat_priority[0].'-mode'),
                     $temp_boss_abilities
                     );
                 $temp_boss_robot['counters'][$temp_stat_priority[0]] = 1;
