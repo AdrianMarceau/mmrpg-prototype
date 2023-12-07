@@ -2648,6 +2648,25 @@ class rpg_ability extends rpg_object {
             if (!isset($target_robot->counters[$options->stat_type.'_boosts_applied'])){ $target_robot->counters[$options->stat_type.'_boosts_applied'] = 0; }
             $target_robot->counters[$options->stat_type.'_boosts_applied'] += $rel_boost_amount;
 
+            // Only update triggered boost history if boost was actually dealt
+            if ($rel_boost_amount > 0){
+
+                // Update this robot's history with the triggered boost amount
+                $target_robot->history['triggered_boosts'][] = $rel_boost_amount;
+                $target_robot->history['triggered_boosts_by'][] = $trigger_ability->ability_token;
+
+                // Update the robot's history with the triggered boost types
+                if (!empty($trigger_ability->ability_type)){
+                    $temp_types = array();
+                    $temp_types[] = $trigger_ability->ability_type;
+                    if (!empty($trigger_ability->ability_type2)){ $temp_types[] = $trigger_ability->ability_type2; }
+                    $target_robot->history['triggered_boosts_types'][] = $temp_types;
+                } else {
+                    $target_robot->history['triggered_boosts_types'][] = null; //array();
+                }
+
+            }
+
         } else {
 
             // Target this robot's self to show the failure message
@@ -2832,6 +2851,25 @@ class rpg_ability extends rpg_object {
             if (!isset($target_robot->counters[$options->stat_type.'_breaks_applied'])){ $target_robot->counters[$options->stat_type.'_breaks_applied'] = 0; }
             $target_robot->counters[$options->stat_type.'_breaks_applied'] += $rel_break_amount;
             $target_robot->update_session();
+
+            // Only update triggered break history if break was actually dealt
+            if ($rel_break_amount > 0){
+
+                // Update this robot's history with the triggered break amount
+                $target_robot->history['triggered_breaks'][] = $rel_break_amount;
+                $target_robot->history['triggered_breaks_by'][] = $trigger_ability->ability_token;
+
+                // Update the robot's history with the triggered break types
+                if (!empty($trigger_ability->ability_type)){
+                    $temp_types = array();
+                    $temp_types[] = $trigger_ability->ability_type;
+                    if (!empty($trigger_ability->ability_type2)){ $temp_types[] = $trigger_ability->ability_type2; }
+                    $target_robot->history['triggered_breaks_types'][] = $temp_types;
+                } else {
+                    $target_robot->history['triggered_breaks_types'][] = null; //array();
+                }
+
+            }
 
         } else {
 
