@@ -2806,7 +2806,7 @@ function mmrpg_prototype_append_archivist_encounter_data(&$this_prototype_data, 
     //error_log('mmrpg_prototype_append_archivist_encounter_data()');
 
     // Add a subtle indicator to the battle name
-    $temp_option_key = count($this_prototype_data['battle_options']) - 1;
+    $temp_option_key = isset($temp_battle_omega['battle_option_key']) ? $temp_battle_omega['battle_option_key'] : count($this_prototype_data['battle_options']) - 1;
     $this_prototype_data['battle_options'][$temp_option_key]['battle_description2'] = rtrim($this_prototype_data['battle_options'][$temp_option_key]['battle_description2']).' Let\'s go!';
 
     // Collect current starforce so we can level-scale the fight kinda
@@ -2878,7 +2878,7 @@ function mmrpg_prototype_append_hunter_encounter_data(&$this_prototype_data, &$t
     //error_log('mmrpg_prototype_append_hunter_encounter_data()');
 
     // Add a subtle indicator to the battle name
-    $temp_option_key = count($this_prototype_data['battle_options']) - 1;
+    $temp_option_key = isset($temp_battle_omega['battle_option_key']) ? $temp_battle_omega['battle_option_key'] : count($this_prototype_data['battle_options']) - 1;
     $this_prototype_data['battle_options'][$temp_option_key]['battle_description2'] = rtrim($this_prototype_data['battle_options'][$temp_option_key]['battle_description2']).' Let\'s go!';
     // Generate a random encounter mission for the star fields
     //$player_starforce_levels = !empty($_SESSION[$session_token]['values']['star_force']) ? $_SESSION[$session_token]['values']['star_force'] : array();

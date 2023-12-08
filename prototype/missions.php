@@ -1493,6 +1493,9 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $boss_battle_omega['option_chapter'] = $this_prototype_data['this_current_chapter'];
 
         // Add the omega battles to the options, index, and session
+        $mecha_battle_omega['battle_option_key'] = count($this_prototype_data['battle_options']);
+        $master_battle_omega['battle_option_key'] = $mecha_battle_omega['battle_option_key'] + 1;
+        $boss_battle_omega['battle_option_key'] = $master_battle_omega['battle_option_key'] + 1;
         $this_prototype_data['battle_options'][] = $mecha_battle_omega;
         $this_prototype_data['battle_options'][] = $master_battle_omega;
         $this_prototype_data['battle_options'][] = $boss_battle_omega;
