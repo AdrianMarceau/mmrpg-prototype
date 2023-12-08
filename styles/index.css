@@ -5109,7 +5109,7 @@ body.mobileFlag_landscapeMode #window .page .event .option_this-team-select .chr
 #window .page .event .ability_container .ability_class_mecha,
 #window .page .event .ability_container .ability_class_boss {
     float: none;
-    width: auto !important;
+    width: calc(100% - 36px);
 }
 #window .page .event .ability_container .ability_class_mecha,
 #window .page .event .ability_container .ability_class_mecha *,

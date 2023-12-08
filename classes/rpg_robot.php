@@ -4654,7 +4654,11 @@ class rpg_robot extends rpg_object {
                                         $robot_ability_list = array_merge($robot_ability_list, $global_abilities);
 
                                         // Manually add any level-up abilities to this robot's list
-                                        foreach ($robot_ability_rewards AS $info){ $robot_ability_list[] = $info['token']; }
+                                        $level_up_abilities = array();
+                                        foreach ($robot_ability_rewards AS $info){
+                                            $level_up_abilities[] = $info['token'];
+                                            $robot_ability_list[] = $info['token'];
+                                        }
 
                                         // Make sure only unique abilities are included
                                         $robot_ability_list = array_unique($robot_ability_list);
@@ -4679,9 +4683,12 @@ class rpg_robot extends rpg_object {
                                         //if ($robot_copy_program){ $robot_ability_list = $temp_all_ability_tokens; }
                                         $robot_ability_core_list = array();
                                         $robot_ability_subcore_list = array();
-                                        if ((!empty($robot_ability_core) || !empty($robot_ability_core2))
-                                            && $robot_ability_class != 'mecha'){ // only robot masters can core match abilities
+                                        if ((!empty($robot_ability_core) || !empty($robot_ability_core2))){ // only robot masters can core match abilities
                                             foreach ($temp_abilities_index AS $token => $info){
+                                                if ($info['ability_class'] !== 'master'
+                                                    && !in_array($info['ability_token'], $level_up_abilities)){
+                                                    continue;
+                                                }
                                                 if (
                                                     (!empty($info['ability_type']) && ($robot_copy_program || $info['ability_type'] == $robot_ability_core || $info['ability_type'] == $robot_ability_core2)) ||
                                                     (!empty($info['ability_type2']) && ($info['ability_type2'] == $robot_ability_core || $info['ability_type2'] == $robot_ability_core2))
