@@ -4672,7 +4672,7 @@ class rpg_robot extends rpg_object {
                                         // Collect a FULL list of abilities for display
                                         $temp_required = array();
                                         foreach ($robot_ability_rewards AS $info){ $temp_required[] = $info['token']; }
-                                        $temp_abilities_index = rpg_ability::get_index(false, false, '', $temp_required);
+                                        $temp_abilities_index = rpg_ability::get_index(true);
 
                                         // Clone abilities into new array for filtering
                                         $new_ability_rewards = array();
@@ -4683,12 +4683,16 @@ class rpg_robot extends rpg_object {
                                         //if ($robot_copy_program){ $robot_ability_list = $temp_all_ability_tokens; }
                                         $robot_ability_core_list = array();
                                         $robot_ability_subcore_list = array();
-                                        if ((!empty($robot_ability_core) || !empty($robot_ability_core2))){ // only robot masters can core match abilities
+                                        if ((!empty($robot_ability_core) || !empty($robot_ability_core2))){
                                             foreach ($temp_abilities_index AS $token => $info){
+                                                if (!empty($info['ability_flag_hidden'])
+                                                    && !in_array($info['ability_token'], $level_up_abilities)){
+                                                    continue;
+                                                    }
                                                 if ($info['ability_class'] !== 'master'
                                                     && !in_array($info['ability_token'], $level_up_abilities)){
                                                     continue;
-                                                }
+                                                    }
                                                 if (
                                                     (!empty($info['ability_type']) && ($robot_copy_program || $info['ability_type'] == $robot_ability_core || $info['ability_type'] == $robot_ability_core2)) ||
                                                     (!empty($info['ability_type2']) && ($info['ability_type2'] == $robot_ability_core || $info['ability_type2'] == $robot_ability_core2))
@@ -4707,7 +4711,8 @@ class rpg_robot extends rpg_object {
                                         foreach ($robot_ability_list AS $this_token){
                                             if ($this_token == '*'){ continue; }
                                             if (!isset($new_ability_rewards[$this_token])){
-                                                if (in_array($this_token, $robot_ability_core_list)){ $new_ability_rewards[$this_token] = array('level' => 'Core', 'token' => $this_token); }
+                                                if (in_array($this_token, $global_abilities)){ $new_ability_rewards[$this_token] = array('level' => 'Global', 'token' => $this_token); }
+                                                elseif (in_array($this_token, $robot_ability_core_list)){ $new_ability_rewards[$this_token] = array('level' => 'Core', 'token' => $this_token); }
                                                 elseif (in_array($this_token, $robot_ability_subcore_list)){ $new_ability_rewards[$this_token] = array('level' => 'Subcore', 'token' => $this_token); }
                                                 else { $new_ability_rewards[$this_token] = array('level' => 'Player', 'token' => $this_token); }
 
@@ -4715,18 +4720,78 @@ class rpg_robot extends rpg_object {
                                         }
                                         $robot_ability_rewards = $new_ability_rewards;
 
+                                        // Now that all is said and done, collect the token order for abilities from the index
+                                        $temp_ability_type_order = array_keys($mmrpg_database_types);
+                                        $temp_custom_type_order = array_filter(array($robot_ability_core, $robot_ability_core2, $robot_ability_subcore));
+                                        if (empty($temp_custom_type_order)){ $temp_custom_type_order[] = 'none'; }
+                                        $temp_ability_index_order = array_keys($temp_abilities_index);
+                                        //error_log('<pre>$temp_ability_type_order = '.print_r($temp_ability_type_order, true).'</pre>');
+                                        //error_log('<pre>$temp_custom_type_order = '.print_r($temp_custom_type_order, true).'</pre>');
+                                        //error_log('<pre>$temp_ability_index_order = '.print_r($temp_ability_index_order, true).'</pre>');
+
+                                        // Define some inline sort functions that we can use later for display
+                                        $sort_abilities_by_index = function($a, $b) use ($temp_ability_index_order) {
+                                            $a_index = in_array($a['token'], $temp_ability_index_order) ? array_search($a['token'], $temp_ability_index_order) : 9999;
+                                            $b_index = in_array($b['token'], $temp_ability_index_order) ? array_search($b['token'], $temp_ability_index_order) : 9999;
+                                            if ($a_index === $b_index){ return 0; }
+                                            return ($a_index < $b_index) ? -1 : 1;
+                                            };
+                                        $sort_abilities_by_corematch = function($a, $b) use ($temp_custom_type_order, $temp_abilities_index, $temp_ability_index_order){
+                                            $a_type = !empty($temp_abilities_index[$a['token']]['ability_type']) ? $temp_abilities_index[$a['token']]['ability_type'] : 'none';
+                                            $a_type2 = !empty($temp_abilities_index[$a['token']]['ability_type2']) ? $temp_abilities_index[$a['token']]['ability_type2'] : $a_type;
+                                            $b_type = !empty($temp_abilities_index[$b['token']]['ability_type']) ? $temp_abilities_index[$b['token']]['ability_type'] : 'none';
+                                            $b_type2 = !empty($temp_abilities_index[$b['token']]['ability_type2']) ? $temp_abilities_index[$b['token']]['ability_type2'] : $b_type;
+                                            $a_type_pos = in_array($a_type, $temp_custom_type_order) ? array_search($a_type, $temp_custom_type_order) : 9999;
+                                            $b_type_pos = in_array($b_type, $temp_custom_type_order) ? array_search($b_type, $temp_custom_type_order) : 9999;
+                                            $a_type2_pos = in_array($a_type2, $temp_custom_type_order) ? array_search($a_type2, $temp_custom_type_order) : 9999;
+                                            $b_type2_pos = in_array($b_type2, $temp_custom_type_order) ? array_search($b_type2, $temp_custom_type_order) : 9999;
+                                            $a_index = in_array($a['token'], $temp_ability_index_order) ? array_search($a['token'], $temp_ability_index_order) : 9999;
+                                            $b_index = in_array($b['token'], $temp_ability_index_order) ? array_search($b['token'], $temp_ability_index_order) : 9999;
+                                            $a_order = in_array($a_type, $temp_custom_type_order) ? array_search($a_type, $temp_custom_type_order) : 9999;
+                                            $b_order = in_array($b_type, $temp_custom_type_order) ? array_search($b_type, $temp_custom_type_order) : 9999;
+                                            if ($a_order === $b_order){
+                                                if ($a_index === $b_index){ return 0; }
+                                                return ($a_index < $b_index) ? -1 : 1;
+                                                }
+                                            return ($a_order < $b_order) ? -1 : 1;
+                                            };
+
                                         //echo('<pre>$global_abilities = '.print_r($global_abilities, true).'</pre>');
                                         //error_log('<pre>$robot_ability_rewards = '.print_r($robot_ability_rewards, true).'</pre>');
                                         //exit();
 
+                                        // Use the above token order to re-sort the ability rewards associate array to match
+                                        uasort($robot_ability_rewards, $sort_abilities_by_index);
+
+                                        // If there are compatible abilities to print, we should list them out now
                                         if (!empty($robot_ability_rewards)){
+
                                             $temp_string = array();
                                             $ability_key = 0;
                                             $ability_method_key = 0;
                                             $ability_method = '';
-                                            $method_order = array('level', 'core', 'subcore', 'player');
+
+                                            // Define the different ability methods and their order
+                                            $method_order = array('level', 'core', 'subcore', 'global', 'player');
+
+                                            // Loop through the methods one at a time so we can display them
                                             foreach ($method_order AS $current_method){
-                                                foreach ($robot_ability_rewards AS $this_info){
+
+                                                // Collect only the rewards that match this current category
+                                                $robot_this_ability_rewards = array_filter($robot_ability_rewards, function($a) use ($current_method){
+                                                    $method = !is_numeric($a['level']) ? strtolower($a['level']) : 'level';
+                                                    return $method == $current_method;
+                                                    });
+
+                                                // If this is a "core" or "subcore" category, make sure we sort by type
+                                                if (in_array($current_method, array('core', 'subcore'))){
+                                                    uasort($robot_this_ability_rewards, $sort_abilities_by_corematch);
+                                                }
+
+                                                // Loop through the abilities for this category and print them out
+                                                $temp_num_ability_rewards = count($robot_this_ability_rewards);
+                                                foreach ($robot_this_ability_rewards AS $this_info){
+                                                    //error_log('checking ability: '.$this_info['token']);
                                                     if (!isset($temp_abilities_index[$this_info['token']])){ continue; }
                                                     $this_level = $this_info['level'];
                                                     $this_ability_method = !is_numeric($this_level) ? strtolower($this_level) : 'level';
@@ -4766,25 +4831,29 @@ class rpg_robot extends rpg_object {
                                                     $this_ability_method_text = 'Level Up';
                                                     $this_ability_title_html = '<strong class="name">'.$this_ability_name.'</strong>';
                                                     if ($this_ability_method == 'level'){
-                                                        $this_ability_method_text = 'Level Up';
-                                                        if ($this_level > 1){ $this_ability_title_html .= '<span class="level">Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT).'</span>'; }
-                                                        else { $this_ability_title_html .= '<span class="level">Start</span>'; }
+                                                        if ($temp_num_ability_rewards > 2){
+                                                            $this_ability_method_text = 'Level Up';
+                                                            if ($this_level > 1){ $this_ability_title_html .= '<span class="level">Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT).'</span>'; }
+                                                            else { $this_ability_title_html .= '<span class="level">Start</span>'; }
+                                                        } else {
+                                                            $this_ability_method_text = 'Start';
+                                                        }
+                                                    } elseif ($this_ability_method == 'global'){
+                                                        $this_ability_method_text = 'Global Abilities';
+                                                        $this_ability_title_html .= '<span class="level">&nbsp;</span>';
                                                     } elseif ($this_ability_method == 'player'){
                                                         $this_ability_method_text = 'Player Only';
                                                         $this_ability_title_html .= '<span class="level">&nbsp;</span>';
-
                                                     } elseif ($this_ability_method == 'core'){
                                                         $this_ability_method_text = 'Core Match';
                                                         $this_ability_title_html .= '<span class="level">&nbsp;</span>';
-
                                                     } elseif ($this_ability_method == 'subcore'){
                                                         $this_ability_method_text = 'Skill Match';
                                                         $this_ability_title_html .= '<span class="level">&nbsp;</span>';
-
                                                     }
 
                                                     // If this is a boss, don't bother showing player or core match abilities
-                                                    if ($this_ability_method != 'level' && $robot_info['robot_class'] == 'boss'){ continue; }
+                                                    //if ($this_ability_method != 'level' && $robot_info['robot_class'] == 'boss'){ continue; }
 
                                                     if (!empty($this_ability_type)){ $this_ability_title_html .= '<span class="type">'.$this_ability_type.'</span>'; }
                                                     if (!empty($this_ability_damage)){ $this_ability_title_html .= '<span class="damage">'.$this_ability_damage.(!empty($this_ability_damage_percent) ? '%' : '').' '.($this_ability_damage && $this_ability_recovery ? 'D' : 'Damage').'</span>'; }
@@ -4798,7 +4867,7 @@ class rpg_robot extends rpg_object {
                                                     //$this_ability_title_html = (is_numeric($this_level) && $this_level > 1 ? 'Lv '.str_pad($this_level, 2, '0', STR_PAD_LEFT).' : ' : $this_level.' : ').$this_ability_title_html;
 
                                                     // Show the ability method separator if necessary
-                                                    if ($ability_method != $this_ability_method && $robot_info['robot_class'] == 'master'){
+                                                    if ($ability_method != $this_ability_method){
                                                         $temp_separator = '<div class="ability_separator">'.$this_ability_method_text.'</div>';
                                                         $temp_string[] = $temp_separator;
                                                         $ability_method = $this_ability_method;
