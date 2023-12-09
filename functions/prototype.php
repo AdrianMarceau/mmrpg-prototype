@@ -4790,7 +4790,7 @@ function mmrpg_prototype_get_profile_avatar_options($this_userinfo, &$allowed_av
                 $alt_unlocked = false;
                 $required_summons = !empty($this_altinfo['summons']) ? $this_altinfo['summons'] : 0;
                 if ($info['robot_class'] == 'mecha'){ $required_summons = ceil($required_summons / 10); }
-                elseif ($info['robot_class'] == 'boss'){ $required_summons = ceil($required_summons * 10); }
+                elseif ($info['robot_class'] == 'boss'){ $required_summons = ceil($required_summons / 10); }
                 // If this alt is unlocked via summon and we have enough
                 if (!empty($required_summons) && $temp_summon_count >= $required_summons){ $alt_unlocked = true; }
                 // Else if this alt is unlocked via the shop and has been purchased
