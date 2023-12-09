@@ -395,6 +395,7 @@ ob_start();
                 //error_log('$temp_robotinfo = '.print_r($temp_robotinfo, true));
                 $temp_ability_array = $temp_ability->export_array();
                 $temp_ref_robotinfo = !empty($this_robot->robot_persona) ? $mmrpg_robots_index[$this_robot->robot_persona] : $temp_robotinfo;
+                if (!$this_robot->has_skill()){ $temp_ref_robotinfo['robot_skill'] = ''; }
                 $temp_button_compatible = rpg_robot::has_ability_compatibility($temp_ref_robotinfo, $temp_abilityinfo, $current_robot_item);
                 if (!empty($this_robot->robot_persona) && in_array($ability_token, $temp_base_abilities)){ $temp_button_compatible = true; }
                 if (!empty($this_robot->robot_persona) && $ability_token === 'copy-style'){ $temp_button_compatible = true; }

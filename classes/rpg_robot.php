@@ -6791,7 +6791,7 @@ class rpg_robot extends rpg_object {
                 $event_body = $this->print_name().' remembered '.$this->get_pronoun('possessive2').' forgotten skill!';
                 $event_body .= '<br /> The '.$temp_skill->print_name().' was restored!';
                 $this->set_frame('taunt');
-                $this_battle->queue_sound_effect('buff-received');
+                $this_battle->queue_sound_effect('small-buff-received');
                 $this_battle->events_create($this_robot, false, $event_head, $event_body, array(
                     'this_skill' => $temp_skill,
                     'this_skill_image' => false,
@@ -6807,7 +6807,7 @@ class rpg_robot extends rpg_object {
             }
 
             // Trigger this robot's skill function if one has been defined for this context
-            $this_battle->queue_sound_effect('recovery-stats');
+            //$this_battle->queue_sound_effect('recovery-stats');
             $function_name = 'rpg-robot_check-skills'.(!empty($phase) ? '_'.$phase : '');
             $this->trigger_custom_function($function_name, $extra_objects, $extra_skill_info);
 
