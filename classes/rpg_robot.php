@@ -4685,7 +4685,7 @@ class rpg_robot extends rpg_object {
                                         $robot_ability_subcore_list = array();
                                         if ((!empty($robot_ability_core) || !empty($robot_ability_core2))){
                                             foreach ($temp_abilities_index AS $token => $info){
-                                                if (!empty($info['ability_flag_hidden'])
+                                                if ((!empty($info['ability_flag_hidden']) || empty($info['ability_flag_complete']))
                                                     && !in_array($info['ability_token'], $level_up_abilities)){
                                                     continue;
                                                     }
