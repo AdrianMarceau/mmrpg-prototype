@@ -6740,6 +6740,79 @@ class rpg_robot extends rpg_object {
         $function_name = 'rpg-robot_check-skills'.(!empty($phase) ? '_'.$phase : '');
         $this->trigger_custom_function($function_name, $extra_objects, $extra_skill_info);
 
+        // Check if the skill has been disabled and if we should show the lost-and-found message
+        $show_lost_and_found = false;
+        if (isset($this->counters['skill_disabled'])){
+            $show_lost_and_found = true;
+            if (isset($this->flags['skill_disabled_not_dropped'])){
+                if (!empty($this->flags['skill_disabled_not_dropped'])){ $show_lost_and_found = false; }
+                unset($this->flags['skill_disabled_not_dropped']);
+            }
+        }
+
+        // If this robot has an skill disabled counter, decrement it
+        $skill_disabled_ended = false;
+        if (isset($this->counters['skill_disabled'])
+            && $phase === 'end-of-turn'){
+
+            // If the counter has exactly one left, we can display the robot looking for the skill
+            if ($this->counters['skill_disabled'] === 1){
+                // First show the robot turning around to pick up the skill
+                //$this_battle->queue_sound_effect('timer-sound');
+                $this->set_frame('defend');
+                if ($show_lost_and_found){ $this->set_frame_styles('transform: scaleX(-1); '); }
+                else { $this->set_frame_styles('transform: translateX(-5%); filter: brightness(0.9); '); }
+                $this_battle->events_create(false, false, '', '', array(
+                    'event_flag_camera_action' => true,
+                    'event_flag_camera_side' => $this->player->player_side,
+                    'event_flag_camera_focus' => $this->robot_position,
+                    'event_flag_camera_depth' => $this->robot_key
+                    ));
+                $this->reset_frame();
+                $this->reset_frame_styles();
+            }
+
+            // Now we should actually reduce the counter and remove it if it's at zero now
+            $this->decrease_counter('skill_disabled', 1);
+            if ($this->get_counter('skill_disabled') < 1){
+                $this->unset_counter('skill_disabled');
+                $skill_disabled_ended = true;
+            }
+
+        }
+
+        // If we restored an skill this turn, make sure we display it
+        if ($skill_disabled_ended){
+
+            // Now show the robot re-equipping the picked up skill
+            if ($show_lost_and_found){
+                $temp_skill = rpg_game::get_skill($this_battle, $this->player, $this, array('skill_token' => $this->robot_skill), false);
+                $event_head = $this->robot_name.'\'s '.$temp_skill->skill_name;
+                $event_body = $this->print_name().' remembered '.$this->get_pronoun('possessive2').' forgotten skill!';
+                $event_body .= '<br /> The '.$temp_skill->print_name().' was restored!';
+                $this->set_frame('taunt');
+                $this_battle->queue_sound_effect('buff-received');
+                $this_battle->events_create($this_robot, false, $event_head, $event_body, array(
+                    'this_skill' => $temp_skill,
+                    'this_skill_image' => false,
+                    'canvas_show_this_skill' => true,
+                    'event_flag_camera_action' => true,
+                    'event_flag_camera_side' => $this->player->player_side,
+                    'event_flag_camera_focus' => $this->robot_position,
+                    'event_flag_camera_depth' => $this->robot_key
+                    ));
+                $this->reset_frame();
+            } else {
+                $this->set_frame_styles('');
+            }
+
+            // Trigger this robot's skill function if one has been defined for this context
+            $this_battle->queue_sound_effect('recovery-stats');
+            $function_name = 'rpg-robot_check-skills'.(!empty($phase) ? '_'.$phase : '');
+            $this->trigger_custom_function($function_name, $extra_objects, $extra_skill_info);
+
+        }
+
     }
 
     // Define a function for checking weapons status
