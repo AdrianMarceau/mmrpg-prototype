@@ -4837,6 +4837,7 @@ class rpg_robot extends rpg_object {
                                                             else { $this_ability_title_html .= '<span class="level">Start</span>'; }
                                                         } else {
                                                             $this_ability_method_text = 'Start';
+                                                            $this_ability_title_html .= '<span class="level">&nbsp;</span>';
                                                         }
                                                     } elseif ($this_ability_method == 'global'){
                                                         $this_ability_method_text = 'Global Abilities';
