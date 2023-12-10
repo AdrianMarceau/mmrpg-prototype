@@ -4773,7 +4773,7 @@ class rpg_robot extends rpg_object {
                                             $ability_method = '';
 
                                             // Define the different ability methods and their order
-                                            $method_order = array('level', 'core', 'subcore', 'global', 'player');
+                                            $method_order = array('level', 'core', 'subcore', 'player', 'global');
 
                                             // Loop through the methods one at a time so we can display them
                                             foreach ($method_order AS $current_method){
@@ -4840,11 +4840,12 @@ class rpg_robot extends rpg_object {
                                                             $this_ability_method_text = 'Start';
                                                             $this_ability_title_html .= '<span class="level">&nbsp;</span>';
                                                         }
+                                                    } elseif ($this_ability_method == 'player'){
+                                                        //$this_ability_method_text = $robot_info['robot_class'] === 'master' ? 'Player Only' : 'Other Abilities';
+                                                        $this_ability_method_text = 'Special / Other';
+                                                        $this_ability_title_html .= '<span class="level">&nbsp;</span>';
                                                     } elseif ($this_ability_method == 'global'){
                                                         $this_ability_method_text = 'Global Abilities';
-                                                        $this_ability_title_html .= '<span class="level">&nbsp;</span>';
-                                                    } elseif ($this_ability_method == 'player'){
-                                                        $this_ability_method_text = 'Player Only';
                                                         $this_ability_title_html .= '<span class="level">&nbsp;</span>';
                                                     } elseif ($this_ability_method == 'core'){
                                                         $this_ability_method_text = 'Core Match';
