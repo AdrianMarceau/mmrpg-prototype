@@ -1,5 +1,8 @@
 <?php
 
+// For the game itself, because it's high priority, we increase the memory limit
+ini_set('memory_limit', '256M');
+
 /*
  * SESSION VARIABLES
  */
