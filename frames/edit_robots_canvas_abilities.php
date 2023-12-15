@@ -83,7 +83,7 @@ echo '<div class="wrapper">';
             <a class="sort sort_number" data-sort="number" data-order="asc">number</a>
             <a class="sort sort_cost" data-sort="cost" data-order="asc">cost</a>
             <a class="sort sort_power" data-sort="power" data-order="asc">power</a>
-            <a class="sort sort_type" data-sort="type" data-order="asc">type</a>
+            <a class="sort sort_type" data-sort="type" data-order="asc" data-default="true">type</a>
         </div>
         <?php
     }
