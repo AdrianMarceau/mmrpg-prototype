@@ -4,7 +4,9 @@
 
 // Include the necessary database files
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
+$mmrpg_database_robots = rpg_robot::get_index(true);
+
 //
 // Collect the ability variables from the request header, if they exist
 $temp_token = !empty($_REQUEST['token']) ? $_REQUEST['token'] : '';
@@ -43,9 +45,27 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
             }
         }
 
+        // Pre-collect the copy-style persona info for we can compare
+        $copy_style_personas = array();
+        if (!empty($temp_player_robots)){
+            foreach ($temp_player_robots AS $token => $info){
+                if (empty($info['robot_persona'])){ continue; }
+                if (empty($info['robot_abilities']['copy-style'])){ continue; }
+                if (empty($mmrpg_database_robots[$info['robot_persona']])){ continue; }
+                $persona_info = $mmrpg_database_robots[$info['robot_persona']];
+                $copy_style_personas[$token] = array(
+                    'robot_token' => $persona_info['robot_token'],
+                    'robot_core' => $persona_info['robot_core'],
+                    'robot_core2' => $persona_info['robot_core2'],
+                    );
+            }
+        }
+        //error_log('$copy_style_personas = '.print_r($copy_style_personas, true));
+
         // Define a temporarily function for sorting the robots
         $mmrpg_database_robots_keys = array_keys($mmrpg_database_robots);
         $mmrpg_database_types_keys = array_keys($mmrpg_database_types);
+        $mmrpg_database_types_keys = array_unique(array_merge(array('copy', 'none'), $mmrpg_database_types_keys));
 
         // If the sort token was by number and asc
         if ($temp_token_order == 'number_asc'){
@@ -122,10 +142,13 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
             function temp_player_robots_sort($r1, $r2){
                 global $temp_token_order, $mmrpg_database_types_keys, $mmrpg_database_robots_keys;
                 if (empty($r1) || empty($r2)){ return 0; }
-                $robot1_core = !empty($r1['robot_core']) ? $r1['robot_core'] : 'none';
-                $robot2_core = !empty($r2['robot_core']) ? $r2['robot_core'] : 'none';
+                global $copy_style_personas;
+                if (!empty($copy_style_personas[$r1['robot_token']])){ $r1 = $copy_style_personas[$r1['robot_token']]; }
+                if (!empty($copy_style_personas[$r2['robot_token']])){ $r2 = $copy_style_personas[$r2['robot_token']]; }
                 $robot1_token = !empty($r1['robot_token']) ? $r1['robot_token'] : 'robot';
                 $robot2_token = !empty($r2['robot_token']) ? $r2['robot_token'] : 'robot';
+                $robot1_core = !empty($r1['robot_core']) ? $r1['robot_core'] : 'none';
+                $robot2_core = !empty($r2['robot_core']) ? $r2['robot_core'] : 'none';
                 $robot1_core_position = array_search($robot1_core, $mmrpg_database_types_keys);
                 $robot2_core_position = array_search($robot2_core, $mmrpg_database_types_keys);
                 $robot1_number_position = array_search($robot1_token, $mmrpg_database_robots_keys);
@@ -149,10 +172,13 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
             function temp_player_robots_sort($r1, $r2){
                 global $temp_token_order, $mmrpg_database_types_keys, $mmrpg_database_robots_keys;
                 if (empty($r1) || empty($r2)){ return 0; }
-                $robot1_core = !empty($r1['robot_core']) ? $r1['robot_core'] : 'none';
-                $robot2_core = !empty($r2['robot_core']) ? $r2['robot_core'] : 'none';
+                global $copy_style_personas;
+                if (!empty($copy_style_personas[$r1['robot_token']])){ $r1 = $copy_style_personas[$r1['robot_token']]; }
+                if (!empty($copy_style_personas[$r2['robot_token']])){ $r2 = $copy_style_personas[$r2['robot_token']]; }
                 $robot1_token = !empty($r1['robot_token']) ? $r1['robot_token'] : 'robot';
                 $robot2_token = !empty($r2['robot_token']) ? $r2['robot_token'] : 'robot';
+                $robot1_core = !empty($r1['robot_core']) ? $r1['robot_core'] : 'none';
+                $robot2_core = !empty($r2['robot_core']) ? $r2['robot_core'] : 'none';
                 $robot1_core_position = array_search($robot1_core, $mmrpg_database_types_keys);
                 $robot2_core_position = array_search($robot2_core, $mmrpg_database_types_keys);
                 $robot1_number_position = array_search($robot1_token, $mmrpg_database_robots_keys);
@@ -199,6 +225,8 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
 
             }
         }
+
+
 
         // Sort the robots and maintain index association
         uasort($temp_player_robots, 'temp_player_robots_sort');
