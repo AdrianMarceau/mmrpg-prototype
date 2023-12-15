@@ -4883,6 +4883,12 @@ body.mobileFlag_landscapeMode #window .page .event .option_this-team-select .chr
     clear: both;
 }
 
+#window .page .subbody .this_sprite .sprite.sprite_player,
+#window .page .subbody .this_sprite .sprite.sprite_robot,
+#window .page .subbody .this_sprite .sprite.sprite_ability,
+#window .page .subbody .this_sprite .sprite.sprite_type {
+    margin: 0 0 15px 0;
+}
 #window .page .subbody .this_sprite .sprite_player_sprite,
 #window .page .subbody .this_sprite .sprite_robot_sprite,
 #window .page .subbody .this_sprite .sprite_ability_sprite,
