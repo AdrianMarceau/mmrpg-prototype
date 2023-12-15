@@ -20,7 +20,9 @@ $global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'protot
 
 // Collect the sorted type index for better sorting
 $mmrpg_database_types = rpg_type::get_index(true);
-
+$mmrpg_database_types_forsort = array_keys($mmrpg_database_types);
+$mmrpg_database_types_forsort = array_merge(array('copy'), array_slice($mmrpg_database_types_forsort, 1), array_slice($mmrpg_database_types_forsort, 0, 1));
+$mmrpg_database_types_forsort = array_unique($mmrpg_database_types_forsort);
 
 // -- COLLECT SETTINGS DATA -- //
 
@@ -184,7 +186,7 @@ $first_robot_token = $allowed_edit_robots[0];
                                 <td class="canvas">
                                     <div class="placeholder"><i>..........</i></div>
                                     <div id="canvas">
-                                        <div class="robot_canvas hidden" data-canvas="robots">
+                                        <div class="robot_canvas hidden" data-canvas="robots" data-size="<?= $allowed_edit_player_count ?>">
                                             <div class="links"></div>
                                         </div>
                                         <div class="player_canvas hidden" data-canvas="players">
@@ -220,6 +222,7 @@ gameSettings.shareProgramUnlocked = <?= mmrpg_prototype_item_unlocked('light-pro
 gameSettings.transferProgramUnlocked = <?= mmrpg_prototype_item_unlocked('wily-program') ? 'true' : 'false' ?>;
 gameSettings.searchProgramUnlocked = <?= mmrpg_prototype_item_unlocked('cossack-program') ? 'true' : 'false' ?>;
 gameSettings.mmrpgIndexTypes = [<?= "'".implode("','", array_keys($mmrpg_database_types))."'" ?>];
+gameSettings.mmrpgIndexTypesForSort = [<?= "'".implode("','", $mmrpg_database_types_forsort)."'" ?>];
 var countRobotLinks = false;
 var countRobotsTriggered = 0;
 var countRobotsLoaded = 0;
