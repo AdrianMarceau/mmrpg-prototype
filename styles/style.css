@@ -4616,6 +4616,7 @@ body.index #header {
     top: -40px;
     left: -20px;
 }
+
 #actions .actions_switch .action_switch label .sprite_container .sprite.sprite_robot,
 #actions .actions_scan .action_scan label .sprite_container .sprite.sprite_robot,
 #actions .actions_target .action_target label .sprite_container .sprite.sprite_robot,
@@ -4693,21 +4694,21 @@ body.index #header {
 #actions .actions_target .action_target label .sprite_40x40_base,
 #actions .actions_ability .action_ability label .sprite_40x40_base,
 #actions .actions_item .action_item label .sprite_40x40_base {
-    background-position: 0 1px;
+    background-position: 0 0 !important;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_defend,
 #actions .actions_scan .action_scan label .sprite_40x40_defend,
 #actions .actions_target .action_target label .sprite_40x40_defend,
 #actions .actions_ability .action_ability label .sprite_40x40_defend,
 #actions .actions_item .action_item label .sprite_40x40_defend {
-    background-position: -320px 1px;
+    background-position: -320px 0 !important;
 }
 #actions .actions_switch .action_switch label .sprite_40x40_defeat,
 #actions .actions_scan .action_scan label .sprite_40x40_defeat,
 #actions .actions_target .action_target label .sprite_40x40_defeat,
 #actions .actions_ability .action_ability label .sprite_40x40_defeat,
 #actions .actions_item .action_item label .sprite_40x40_defeat {
-    background-position: -120px 1px;
+    background-position: -120px 0 !important;
 }
 
 #actions .actions_switch .action_switch label .sprite_80x80,
@@ -4764,21 +4765,21 @@ body.index #header {
 #actions .actions_target .action_target label .sprite_80x80_base,
 #actions .actions_ability .action_ability label .sprite_80x80_base,
 #actions .actions_item .action_item label .sprite_80x80_base {
-    background-position: -19px -42px;
+    background-position: 0 0 !important;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_defend,
 #actions .actions_scan .action_scan label .sprite_80x80_defend,
 #actions .actions_target .action_target label .sprite_80x80_defend,
 #actions .actions_ability .action_ability label .sprite_80x80_defend,
 #actions .actions_item .action_item label .sprite_80x80_defend {
-    background-position: -658px -42px;
+    background-position: -640px 0 !important;
 }
 #actions .actions_switch .action_switch label .sprite_80x80_defeat,
 #actions .actions_scan .action_scan label .sprite_80x80_defeat,
 #actions .actions_target .action_target label .sprite_80x80_defeat,
 #actions .actions_ability .action_ability label .sprite_80x80_defeat,
 #actions .actions_item .action_item label .sprite_80x80_defeat {
-    background-position: -260px -42px;
+    background-position: -240px 0 !important;
 }
 
 #actions .actions_switch .action_switch label .sprite_160x160,
