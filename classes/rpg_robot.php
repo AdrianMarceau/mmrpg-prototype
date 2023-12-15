@@ -5358,7 +5358,7 @@ class rpg_robot extends rpg_object {
             }
 
             // Collect this robot's animation duration so it moves appropriately in the UI
-            $temp_robot_animation_duration = rpg_robot::get_css_animation_duration($robot_info);
+            $temp_robot_animation_duration = rpg_robot::get_css_animation_duration($mmrpg_database_robots[$robot_token]);
 
             // Define whether or not this robot has coreswap enabled
             $temp_allow_coreswap = $robot_info['robot_level'] >= 100 ? true : false;
@@ -5822,6 +5822,7 @@ class rpg_robot extends rpg_object {
                     $core_image = 'images/items/{core}-core/icon_left_40x40.png';
                     if (!empty($robot_info['robot_core'])){ $core_types[] = $robot_info['robot_core']; }
                     if (!empty($robot_info['robot_core2'])){ $core_types[] = $robot_info['robot_core2']; }
+                    if (empty($core_types)){ $core_types[] = 'none'; }
                     echo('<span class="core robot_type" data-count="'.count($core_types).'">'.PHP_EOL);
                         echo('<span class="wrap">'.PHP_EOL);
                             for ($i = 0; $i < count($core_types); $i++){
@@ -5831,7 +5832,8 @@ class rpg_robot extends rpg_object {
                             }
                         echo('</span>'.PHP_EOL);
                         echo('<span class="text">'.PHP_EOL);
-                            echo(ucfirst(implode(' / ', $core_types)).' Core'.PHP_EOL);
+                            $core_types_print = !empty($core_types) && $core_types[0] === 'none' ? array('neutral') : $core_types;
+                            echo(ucfirst(implode(' / ', $core_types_print)).' Core'.PHP_EOL);
                         echo('</span>'.PHP_EOL);
                     echo('</span>'.PHP_EOL);
 
