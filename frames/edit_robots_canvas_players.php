@@ -6,10 +6,17 @@
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 
+// Check to see which players have been unlocked so far
+if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
+    $unlocked_players = array_keys($_SESSION[$session_token]['values']['battle_rewards']);
+} else {
+    $unlocked_players = array('dr-light');
+}
+
 // Start the output buffer
 ob_start();
 
-echo '<div class="wrapper no_sort">';
+echo '<div class="wrapper no_sort" data-count="'.count($unlocked_players).'">';
     echo '<div class="wrapper_header player_type player_type_experience">Select Player</div>';
     echo '<div class="wrapper_overflow">';
 
@@ -20,8 +27,6 @@ echo '<div class="wrapper no_sort">';
             $column_count = ceil(count($mmrpg_database_players) / $row_count);
 
             // Collect unlocked players and add them to the dropdown
-            if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){ $unlocked_players = array_keys($_SESSION[$session_token]['values']['battle_rewards']); }
-            else { $unlocked_players = array('dr-light'); }
             foreach ($mmrpg_database_players AS $player_token => $player_info){
 
                 // Skip if this player isn't unlocked yet
