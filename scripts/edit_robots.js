@@ -8,7 +8,11 @@ var thisAbilityCanvas = false;
 var thisItemCanvas = false;
 var thisEditor = false;
 var thisEditorData = {playerTotal:0,robotTotal:0};
-var thisScrollbarSettings = {wheelSpeed:0.3};
+var thisScrollbarSettings = {
+    wheelSpeed:0.3,
+    useBothWheelAxes: false,
+    suppressScrollX: true
+    };
 var resizePlayerWrapper = function(){};
 var loadConsoleRobotMarkup = function(thisSprite, index, complete){};
 var loadCanvasAbilitiesMarkup = function(){};
@@ -412,7 +416,7 @@ $(document).ready(function(){
         });
 
     // Create the click event for robot canvas sort button
-    $('div[data-canvas=robots] .sort', gameCanvas).live('click', function(e){
+    $('div[data-canvas="robots"] .sort_wrapper:not(.fake) .sort', gameCanvas).live('click', function(e){
         e.preventDefault();
         if (thisBody.hasClass('loading')){ return false; }
         if (!gameSettings.allowEditing){ return false; }
@@ -430,9 +434,11 @@ $(document).ready(function(){
         // Define the post options for the ajax call
         var postData = {action:'sort',token:thisSortToken,order:thisSortOrder,player:thisSortPlayer};
         //console.log('postData', postData);
+
         // Reverse the sort direction for next click
         if (thisSortOrder == 'asc'){ thisSortButton.attr('data-order', 'desc'); }
         else if (thisSortOrder == 'desc'){ thisSortButton.attr('data-order', 'asc'); }
+
         // Post the sort request to the server
         thisBody.addClass('loading');
         $.ajax({
@@ -505,9 +511,9 @@ $(document).ready(function(){
         });
 
     // Create the click event for ability canvas sort button
-    $('div[data-canvas=abilities] .sort', gameCanvas).live('click', function(e){
+    $('div[data-canvas="abilities"] .sort', gameCanvas).live('click', function(e){
         e.preventDefault();
-        if (thisBody.hasClass('loading')){ return false; }
+        //if (thisBody.hasClass('loading')){ return false; }
         if (!gameSettings.allowEditing){ return false; }
 
         var thisSortButton = $(this);
@@ -519,6 +525,10 @@ $(document).ready(function(){
         thisAbilities.each(function(){ thisAbilitiesTokens.push($(this).attr('data-ability')); });
         thisAbilitiesTokens.join(',');
         //console.log('clicked sort; ability tokens = '+thisAbilitiesTokens);
+
+        // Remove the active class from other sorts and apply it to this one
+        $('.sort', thisAbilityWrapper).removeClass('active');
+        thisSortButton.addClass('active');
 
         // Reverse the sort direction for next click
         if (thisSortOrder == 'asc'){ thisSortButton.attr('data-order', 'desc'); }
@@ -565,10 +575,11 @@ $(document).ready(function(){
                 } else if (thisSortToken == 'type'){
 
                 // sort abilities by TYPE if type clicked
-                robotKey1 = gameSettings.mmrpgIndexTypes.indexOf($(a).attr('data-type'));
-                robotKey2 = gameSettings.mmrpgIndexTypes.indexOf($(b).attr('data-type'));
-                robotKey1B = gameSettings.mmrpgIndexTypes.indexOf($(a).attr('data-type2'));
-                robotKey2B = gameSettings.mmrpgIndexTypes.indexOf($(b).attr('data-type2'));
+                var indexTypesForSort = typeof gameSettings.mmrpgIndexTypesForSort !== 'undefined' ? gameSettings.mmrpgIndexTypesForSort : gameSettings.mmrpgIndexTypes;
+                robotKey1 = indexTypesForSort.indexOf($(a).attr('data-type'));
+                robotKey2 = indexTypesForSort.indexOf($(b).attr('data-type'));
+                robotKey1B = indexTypesForSort.indexOf($(a).attr('data-type2'));
+                robotKey2B = indexTypesForSort.indexOf($(b).attr('data-type2'));
 
                 }
 
@@ -605,7 +616,7 @@ $(document).ready(function(){
         });
 
     // Create the click event for item canvas sort button
-    $('div[data-canvas=items] .sort', gameCanvas).live('click', function(e){
+    $('div[data-canvas="items"] .sort', gameCanvas).live('click', function(e){
         e.preventDefault();
         if (thisBody.hasClass('loading')){ return false; }
         if (!gameSettings.allowEditing){ return false; }
@@ -613,12 +624,16 @@ $(document).ready(function(){
         var thisSortButton = $(this);
         var thisSortToken = thisSortButton.attr('data-sort');
         var thisSortOrder = thisSortButton.attr('data-order');
-        var thisAbilityWrapper = $('.item_canvas', gameCanvas);
-        var thisAbilities = $('.item_name[data-id!="0"]', thisAbilityWrapper);
+        var thisItemWrapper = $('.item_canvas', gameCanvas);
+        var thisAbilities = $('.item_name[data-id!="0"]', thisItemWrapper);
         var thisAbilitiesTokens = [];
         thisAbilities.each(function(){ thisAbilitiesTokens.push($(this).attr('data-item')); });
         thisAbilitiesTokens.join(',');
         //console.log('clicked sort; item tokens = '+thisAbilitiesTokens);
+
+        // Remove the active class from other sorts and apply it to this one
+        $('.sort', thisItemWrapper).removeClass('active');
+        thisSortButton.addClass('active');
 
         // Reverse the sort direction for next click
         if (thisSortOrder == 'asc'){ thisSortButton.attr('data-order', 'desc'); }
@@ -655,10 +670,11 @@ $(document).ready(function(){
                 } else if (thisSortToken == 'type'){
 
                 // sort items by TYPE if type clicked
-                robotKey1 = gameSettings.mmrpgIndexTypes.indexOf($(a).attr('data-type'));
-                robotKey2 = gameSettings.mmrpgIndexTypes.indexOf($(b).attr('data-type'));
-                robotKey1B = gameSettings.mmrpgIndexTypes.indexOf($(a).attr('data-type2'));
-                robotKey2B = gameSettings.mmrpgIndexTypes.indexOf($(b).attr('data-type2'));
+                var indexTypesForSort = typeof gameSettings.mmrpgIndexTypesForSort !== 'undefined' ? gameSettings.mmrpgIndexTypesForSort : gameSettings.mmrpgIndexTypes;
+                robotKey1 = indexTypesForSort.indexOf($(a).attr('data-type'));
+                robotKey2 = indexTypesForSort.indexOf($(b).attr('data-type'));
+                robotKey1B = indexTypesForSort.indexOf($(a).attr('data-type2'));
+                robotKey2B = indexTypesForSort.indexOf($(b).attr('data-type2'));
 
                 }
 
@@ -684,8 +700,8 @@ $(document).ready(function(){
             });
 
         // put sorted results back on page
-        thisAbilityWrapper.find('.item_name[data-id!="0"]').remove();
-        thisAbilityWrapper.find('.wrapper_overflow').append(myArray);
+        thisItemWrapper.find('.item_name[data-id!="0"]').remove();
+        thisItemWrapper.find('.wrapper_overflow').append(myArray);
         thisBody.removeClass('loading');
         if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
             playSoundEffect('icon-click-mini', {volume: 1.0});
@@ -923,14 +939,7 @@ $(document).ready(function(){
                             newRobotImageSize = parseInt(newRobotImageSize) > 0 ? parseInt(newRobotImageSize) : 40;
                             var newRobotImageSizeToken = newRobotImageSize+'x'+newRobotImageSize;
                             var newRobotImagePath = 'images/robots/'+newRobotImage+'/';
-                            newRobotImagePath += 'mug_right_'+newRobotImageSizeToken+'.png?'+gameSettings.cacheTime;
-                            var backgroundOffset = [-5, -10];
-                            if (newRobotImageSize > 40){
-                                var shiftVal = (newRobotImageSize - 40) / 40;
-                                backgroundOffset[0] -= (20 * shiftVal);
-                                backgroundOffset[1] -= (20 * shiftVal);
-                                }
-                            var backgroundPosition = backgroundOffset[0]+'px '+backgroundOffset[1]+'px';
+                            newRobotImagePath += 'sprite_right_'+newRobotImageSizeToken+'.png?'+gameSettings.cacheTime;
                             //console.log('Robot "'+targetRobotToken+'" has style changed!');
                             //console.log('newRobotName =', newRobotName);
                             //console.log('newRobotTypes =', newRobotTypes);
@@ -939,7 +948,6 @@ $(document).ready(function(){
                             //console.log('newRobotImageSizeToken =', newRobotImageSizeToken);
                             //console.log('newRobotImagePath =', newRobotImagePath);
                             //console.log('backgroundOffset =', backgroundOffset);
-                            //console.log('backgroundPosition =', backgroundPosition);
 
                             $existingCanvasRobot.attr('title', newRobotName);
                             var robotTypeClasses = $existingCanvasRobot.attr('class').split(' ').filter(function(c) {
@@ -954,8 +962,7 @@ $(document).ready(function(){
                             $newCanvasRobotSprite.addClass('sprite_'+newRobotImageSizeToken);
                             $newCanvasRobotSprite.addClass('sprite_'+newRobotImageSizeToken+'_mugshot');
                             $newCanvasRobotSprite.css({
-                                'background-image': 'url('+newRobotImagePath+')',
-                                'background-position': backgroundPosition
+                                'background-image': 'url('+newRobotImagePath+')'
                                 });
                             $existingCanvasRobot.append($newCanvasRobotSprite);
                             $existingCanvasRobotSprite.remove();
@@ -1152,14 +1159,7 @@ $(document).ready(function(){
                             newRobotImageSize = parseInt(newRobotImageSize) > 0 ? parseInt(newRobotImageSize) : 40;
                             var newRobotImageSizeToken = newRobotImageSize+'x'+newRobotImageSize;
                             var newRobotImagePath = 'images/robots/'+newRobotImage+'/';
-                            newRobotImagePath += 'mug_right_'+newRobotImageSizeToken+'.png?'+gameSettings.cacheTime;
-                            var backgroundOffset = [-5, -10];
-                            if (newRobotImageSize > 40){
-                                var shiftVal = (newRobotImageSize - 40) / 40;
-                                backgroundOffset[0] -= (20 * shiftVal);
-                                backgroundOffset[1] -= (20 * shiftVal);
-                                }
-                            var backgroundPosition = backgroundOffset[0]+'px '+backgroundOffset[1]+'px';
+                            newRobotImagePath += 'sprite_right_'+newRobotImageSizeToken+'.png?'+gameSettings.cacheTime;
                             //console.log('Robot "'+dataRobot+'" has style changed!');
                             //console.log('newRobotName =', newRobotName);
                             //console.log('newRobotTypes =', newRobotTypes);
@@ -1168,7 +1168,6 @@ $(document).ready(function(){
                             //console.log('newRobotImageSizeToken =', newRobotImageSizeToken);
                             //console.log('newRobotImagePath =', newRobotImagePath);
                             //console.log('backgroundOffset =', backgroundOffset);
-                            //console.log('backgroundPosition =', backgroundPosition);
 
                             $existingCanvasRobot.attr('title', newRobotName);
                             var robotTypeClasses = $existingCanvasRobot.attr('class').split(' ').filter(function(c) {
@@ -1183,8 +1182,7 @@ $(document).ready(function(){
                             $newCanvasRobotSprite.addClass('sprite_'+newRobotImageSizeToken);
                             $newCanvasRobotSprite.addClass('sprite_'+newRobotImageSizeToken+'_mugshot');
                             $newCanvasRobotSprite.css({
-                                'background-image': 'url('+newRobotImagePath+')',
-                                'background-position': backgroundPosition
+                                'background-image': 'url('+newRobotImagePath+')'
                                 });
                             $existingCanvasRobot.append($newCanvasRobotSprite);
                             $existingCanvasRobotSprite.remove();
@@ -1979,7 +1977,20 @@ function robotEditorCanvasInit(){
 
     // Load the ability canvas in the background
     thisAbilityCanvas.addClass('hidden');
-    loadCanvasAbilitiesMarkup();
+    loadCanvasAbilitiesMarkup(function(){
+
+        // Automatically sort the ability canvas by whatever is default
+        //console.log('autosort abilities (checkpoint 1)');
+        var thisAbilityCanvas = $('#canvas .ability_canvas');
+        //console.log('thisAbilityCanvas = ', thisAbilityCanvas);
+        var sortDefault = thisAbilityCanvas.find('.sort_wrapper .sort[data-sort][data-default]');
+        if (!sortDefault.length){ sortDefault = thisAbilityCanvas.find('.sort_wrapper .sort[data-sort]').first(); }
+        //console.log('sortDefault', sortDefault);
+        if (sortDefault.length){
+            //console.log('autosort abilities by '+sortDefault.attr('data-sort')+' (checkpoint 2)');
+            sortDefault.trigger('click');
+            }
+        });
 
 
     // Load the item canvas in the background
@@ -2190,12 +2201,13 @@ function updateSpriteFrame(thisSprite, newFrame){
 function startDragRobot(event, ui){
 
     //console.log('robot drag has started');
-
+    $('.robot_canvas', gameCanvas).addClass('dragging');
     $('.robot_canvas .wrapper_overflow', gameCanvas).each(function(){
         var overflowHeight = $(this).innerHeight();
         var overflowPlayer = $(this).parent().attr('data-player');
         //console.log('add hard-coded height of '+overflowHeight+' to '+overflowPlayer);
-        $(this).css({height:overflowHeight+'px',overflow:'visible'});
+        //$(this).css({height:overflowHeight+'px',overflow:'visible'});
+        $(this).css({overflow:'visible'});
         });
 
 
@@ -2205,11 +2217,12 @@ function startDragRobot(event, ui){
 function stopDragRobot(event, ui){
 
     //console.log('robot drag has stopped');
-
+    $('.robot_canvas', gameCanvas).removeClass('dragging');
     $('.robot_canvas .wrapper_overflow', gameCanvas).each(function(){
         var overflowPlayer = $(this).parent().attr('data-player');
         //console.log('remove hard-coded height from '+overflowPlayer);
-        $(this).css({height:'',overflow:''});
+        //$(this).css({height:'',overflow:''});
+        $(this).css({overflow:''});
         });
 
 }

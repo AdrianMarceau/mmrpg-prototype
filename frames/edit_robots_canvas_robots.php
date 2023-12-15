@@ -59,7 +59,7 @@ foreach($allowed_edit_data AS $player_token => $player_info){
     //error_log('$player_robots_preload_by_token = '.print_r($player_robots_preload_by_token, true));
 
     //echo '<td style="width: '.floor(100 / $allowed_edit_player_count).'%;">'."\n";
-        echo '<div class="wrapper wrapper_'.($player_counter % 2 != 0 ? 'left' : 'right').' wrapper_'.$player_token.'" data-select="robots" data-player="'.$player_info['player_token'].'" style="width: '.(floor(100 / $allowed_edit_player_count) - ($allowed_edit_player_count)).'%; margin-right: 0.5%;">'."\n";
+        echo '<div class="wrapper wrapper_'.($player_counter % 2 != 0 ? 'left' : 'right').' wrapper_'.$player_token.'" data-select="robots" data-player="'.$player_info['player_token'].'">'."\n";
             echo '<div class="wrapper_header player_type player_type_'.$player_colour.'">'.$player_info['player_name'].' <span class="count">'.count($player_info['player_robots']).'</span></div>';
             echo '<div class="wrapper_overflow">';
                 $player_canvas_robots = array();
@@ -138,22 +138,27 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                     if ($robot_info['robot_level'] >= 100){ $robot_info['robot_experience'] = '&#8734;'; }
 
                     $robot_info['robot_image_size'] = !empty($robot_info['robot_image_size']) ? $robot_info['robot_image_size'] : 40;
-                    $robot_image_offset = $robot_info['robot_image_size'] > 40 ? ceil(($robot_info['robot_image_size'] - 40) * 0.5) : 0;
-                    $robot_image_offset_x = -5 - $robot_image_offset;
-                    $robot_image_offset_y = -10 - $robot_image_offset;
-                    $robot_tooltip_text = $robot_info['robot_name'].' ('.(!empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']).' Core' : 'Neutral Core').') &lt;br /&gt;Lv '.$robot_info['robot_level'].' | '.$robot_info['robot_experience'].' Exp';
+                    $robot_image_size = $robot_info['robot_image_size'];
+                    $robot_image_xsize = $robot_image_size.'x'.$robot_image_size;
+
+
                     $robot_is_new = in_array($robot_token, $menu_frame_content_unseen) ? true : false;
-
-                    $robot_is_persona = !empty($robot_info['robot_persona']) ? true : false;
-
-                    $robot_link_styles = 'background-image: none;';
-                    $robot_link_classes = 'sprite sprite_robot sprite_robot_'.$player_token.' sprite_robot_sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot robot_status_active robot_position_active '.($robot_key == 0 ? 'sprite_robot_current sprite_robot_'.$player_token.'_current ' : '').' robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').' ';
-
-                    if (in_array($robot_token, $player_robots_locked)){ $robot_link_classes .= 'locked disabled '; }
+                    $robot_is_persona = !empty($robot_info['robot_persona']) && $has_persona_applied ? true : false;
                     $robot_is_endless = in_array($robot_token, $player_robots_endless) ? true : false;
 
-                    $robot_sprite_styles = 'background-image: url(images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/mug_right_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: '.$robot_image_offset_x.'px '.$robot_image_offset_y.'px;';
-                    $robot_sprite_classes = 'sprite sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].' sprite_'.$robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'].'_mugshot';
+                    $robot_link_styles = 'background-image: none;';
+                    $robot_link_classes = 'sprite sprite_robot sprite_robot_'.$player_token.' ';
+                    $robot_link_classes .= 'sprite_'.$robot_image_xsize.' sprite_'.$robot_image_xsize.'_mugshot ';
+                    $robot_link_classes .= 'robot_status_active robot_position_active '.($robot_key == 0 ? 'sprite_robot_current sprite_robot_'.$player_token.'_current ' : '').' ';
+                    $robot_link_classes .= 'robot_type robot_type_'.(!empty($robot_info['robot_core']) ? $robot_info['robot_core'] : 'none').(!empty($robot_info['robot_core2']) ? '_'.$robot_info['robot_core2'] : '').' ';
+                    if (in_array($robot_token, $player_robots_locked)){ $robot_link_classes .= 'locked disabled '; }
+
+                    $robot_animation_duration = rpg_robot::get_css_animation_duration($mmrpg_database_robots[$robot_token]);
+                    $robot_sprite_styles = 'background-image: url(images/robots/'.(!empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token']).'/sprite_right_'.$robot_image_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); ';
+                    $robot_sprite_styles .= 'animation-duration: '.$robot_animation_duration.'s; ';
+                    $robot_sprite_classes = 'sprite sprite_'.$robot_image_xsize.' sprite_'.$robot_image_xsize.'_mugshot';
+
+                    $robot_tooltip_text = $robot_info['robot_name'].' ('.(!empty($robot_info['robot_core']) ? ucfirst($robot_info['robot_core']).' Core' : 'Neutral Core').') &lt;br /&gt;Lv '.$robot_info['robot_level'].' | '.$robot_info['robot_experience'].' Exp';
 
                     echo '<a data-number="'.$robot_info['robot_number'].
                         '" data-level="'.$robot_info['robot_level'].
@@ -165,6 +170,7 @@ foreach($allowed_edit_data AS $player_token => $player_info){
                         '" style="'.$robot_link_styles.
                         '" class="'.$robot_link_classes
                         .'">'.
+                        '<span class="'.$robot_sprite_classes.' shadow" style="'.$robot_sprite_styles.'"></span>'.
                         '<span class="'.$robot_sprite_classes.'" style="'.$robot_sprite_styles.'"></span>'.
                         '<span class="name">'.$robot_info['robot_name'].'</span>'.
                         ($robot_is_new ? '<i class="new type electric"></i>' : '').
@@ -176,10 +182,16 @@ foreach($allowed_edit_data AS $player_token => $player_info){
             echo '</div>'."\n";
             if ($global_allow_editing){
                 ?>
-                <div class="sort_wrapper">
+                <div class="sort_wrapper fake">
                     <label class="label">sort</label>
-                    <a class="sort sort_level" data-sort="level" data-order="asc" data-player="<?= $player_info['player_token'] ?>">level</a>
                     <a class="sort sort_number" data-sort="number" data-order="asc" data-player="<?= $player_info['player_token'] ?>">number</a>
+                    <a class="sort sort_level" data-sort="level" data-order="asc" data-player="<?= $player_info['player_token'] ?>">level</a>
+                    <a class="sort sort_core" data-sort="core" data-order="asc" data-player="<?= $player_info['player_token'] ?>">core</a>
+                </div>
+                <div class="sort_wrapper real">
+                    <label class="label">sort</label>
+                    <a class="sort sort_number" data-sort="number" data-order="asc" data-player="<?= $player_info['player_token'] ?>">number</a>
+                    <a class="sort sort_level" data-sort="level" data-order="asc" data-player="<?= $player_info['player_token'] ?>">level</a>
                     <a class="sort sort_core" data-sort="core" data-order="asc" data-player="<?= $player_info['player_token'] ?>">core</a>
                 </div>
                 <?php

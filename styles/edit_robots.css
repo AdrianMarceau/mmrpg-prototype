@@ -92,6 +92,7 @@ body.windowFlag_landscapeMode #prototype {
 }
 #edit #canvas .wrapper {
     display: block;
+    box-sizing: border-box;
     float: left;
     position: relative;
     border: 1px solid #1A1A1A !important;
@@ -113,7 +114,7 @@ body.windowFlag_landscapeMode #prototype {
     background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%);
     background-size: 100% 100%;
     background-position: 0 0;
-    min-height: 54px;
+    min-height: 162px;
     min-width: 158px;
     width: auto;
     padding: 4px 4px 4px;
@@ -126,6 +127,11 @@ body.windowFlag_landscapeMode #prototype {
     -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
 }
+#edit #canvas .robot_canvas .wrapper {
+    height: 162px;
+    height: calc(100vh - 320px);
+    overflow: visible;
+}
 #edit #canvas .player_canvas .wrapper,
 #edit #canvas .ability_canvas .wrapper,
 #edit #canvas .item_canvas .wrapper {
@@ -134,21 +140,34 @@ body.windowFlag_landscapeMode #prototype {
 #edit #canvas .wrapper .wrapper_overflow {
     display: block;
     position: relative;
+    z-index: 10;
     /*max-height: 150px;*/
     max-height: 100px;
     overflow: hidden;
-    padding-bottom: 4px;
-    margin: 4px 2px 14px 2px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+#edit #canvas .wrapper .wrapper_overflow:before {
+    content: "";
+    display: block;
+    clear: both;
+    width: auto;
+    height: 2px;
 }
 #edit #canvas .robot_canvas .wrapper .wrapper_overflow {
-    max-height: 68px;
-    max-height: calc(100vh - 370px);
+    height: auto !important;
+    max-height: calc(100% - 22px) !important;
+    top: -12px;
+}
+#edit #canvas .robot_canvas .wrapper .wrapper_overflow:before {
+    height: 12px;
 }
 #edit #canvas .player_canvas .wrapper .wrapper_overflow,
 #edit #canvas .ability_canvas .wrapper .wrapper_overflow,
 #edit #canvas .item_canvas .wrapper .wrapper_overflow {
     max-height: 90px;
-    max-height: calc(100vh - 370px);
+    max-height: calc(100vh - 343px);
     padding-right: 8px;
 }
 #edit #canvas .ps-container:hover>.ps-scrollbar-y-rail:hover {
@@ -162,8 +181,9 @@ body.windowFlag_landscapeMode #prototype {
 }
 #edit #canvas .wrapper_header {
     display: block;
+    z-index: 2;
     clear: both;
-    margin: 0 auto 2px;
+    margin: 0 auto 14px;
     padding: 0 6px;
     font-size: 10px;
     line-height: 16px;
@@ -191,8 +211,9 @@ body.windowFlag_landscapeMode #prototype {
 #edit #canvas .wrapper .sort_wrapper {
     display: block;
     position: absolute;
-    bottom: 3px;
-    right: 3px;
+    z-index: 2;
+    top: 24px;
+    right: 23px;
     left: 3px;
     width: auto;
     height: 8px;
@@ -204,7 +225,7 @@ body.windowFlag_landscapeMode #prototype {
     letter-spacing: 1px;
     color: #FFFFFF;
     border: 0 none transparent;
-    background-color: #242424;
+    background-color: #1a1a1a;
     -webkit-border-radius: 0 0 5px 5px;
     -moz-border-radius: 0 0 5px 5px;
     border-radius: 0 0 5px 5px;
@@ -237,6 +258,10 @@ body.windowFlag_landscapeMode #prototype {
 #edit #canvas .wrapper .sort_wrapper .sort:hover {
     color: rgba(255, 255, 255, 0.90);
 }
+#edit #canvas .wrapper .sort_wrapper .sort.active {
+    color: rgba(255, 255, 255, 0.90);
+    text-decoration: underline;
+}
 #edit #canvas .wrapper_left {
     /*float: left;*/
 }
@@ -244,6 +269,37 @@ body.windowFlag_landscapeMode #prototype {
     /*float: left;
     margin-left: 2px;*/
 }
+
+#edit #canvas .robot_canvas .wrapper {
+    margin: 0 5px 5px 0;
+    width: calc(100% - 5px);
+}
+#edit #canvas .robot_canvas[data-size="1"] .wrapper {
+    width: calc(100% - 5px);
+}
+#edit #canvas .robot_canvas[data-size="2"] .wrapper {
+    width: calc((100% / 2) - 5px);
+}
+#edit #canvas .robot_canvas[data-size="3"] .wrapper {
+    width: calc((100% / 3) - 5px);
+}
+#edit #canvas .robot_canvas[data-size="4"] .wrapper {
+    width: calc((100% / 4) - 5px);
+}
+
+#edit #canvas .robot_canvas .sort_wrapper.fake {
+    z-index: 1;
+    pointer-events: none;
+    opacity: 1;
+}
+#edit #canvas .robot_canvas .sort_wrapper.real {
+    z-index: 20;
+    background-color: transparent;
+}
+#edit #canvas .robot_canvas .sort_wrapper.real .label {
+    opacity: 0;
+}
+
 #edit #edit_overlay {
     border-radius: 0.5em;
     -moz-border-radius: 0.5em;
@@ -263,49 +319,67 @@ body.windowFlag_landscapeMode #prototype {
 }
 #edit #canvas .sprite_robot {
     position: relative;
+    box-sizing: border-box;
     float: left;
-    height: 24px;
-    width: 22px;
+    height: 32px;
+    width: 32px;
     background-color: #000000;
-    border: 2px solid transparent;
+    border: 1px solid transparent;
     border-color: transparent !important;
     border-radius: 0.25em;
     -moz-border-radius: 0.25em;
     -webkit-border-radius: 0.25em;
-    margin: 3px;
-    background-position: -8px -12px;
+    margin: 4px 2px 0;
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
     -moz-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
     -webkit-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
     background-color: inherit;
     filter: brightness(1.0);
     transition: filter 0.3s;
+    overflow: hidden;
 }
 #edit #canvas .sprite_robot.notloaded {
-    background-color: transparent !important;
+    /* background-color: transparent !important; */
+    border-color: rgba(0, 0, 0, 0.25) !important;
     box-shadow: none !important;
 }
-/*
-#edit #canvas .sprite_robot.notloaded {
-    filter: brightness(0.15) !important;
-}
-#edit #canvas .sprite_robot:hover {
-    filter: brightness(0.90) !important;
-}
-#edit #canvas .sprite_robot_current,
-#edit #canvas .sprite_robot_current:hover {
-    filter: brightness(1.0);
-}
-*/
-#edit #canvas .sprite_robot .sprite {
+#edit #canvas .sprite_robot:before,
+#edit #canvas .sprite_robot:after {
+    content: "";
+    display: block;
     position: absolute;
     z-index: 1;
+    width: auto;
+    height: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: transparent;
+}
+#edit #canvas .sprite_robot:before {
+    z-index: 1;
+    top: 0;
+    background: linear-gradient(to bottom,  rgba(0,0,0,0.4) 0%,rgba(0,0,0,0.2) 100%);
+}
+#edit #canvas .sprite_robot:after {
+    z-index: 2;
+    top: 50%;
+    background: linear-gradient(to bottom,  rgba(255,255,255,0.1) 0%,rgba(0,0,0,0.1) 100%);
+}
+#edit #canvas .sprite_robot_current:before {
+    background: linear-gradient(to bottom,  rgba(0,0,0,0.2) 0%,rgba(0,0,0,0.1) 100%);
+}
+#edit #canvas .sprite_robot .sprite {
+    position: absolute;
+    z-index: 3;
     display: block;
-    top: -1px;
+    bottom: -1px;
     left: -1px;
-    width: 30px;
-    height: 26px;
-    border-radius: 3px;
+    width: 40px;
+    height: 40px;
+    border-radius: 0;
     overflow: hidden;
     background-position: 0 0;
     opacity: 1.0;
@@ -314,24 +388,68 @@ body.windowFlag_landscapeMode #prototype {
     pointer-events: none;
     cursor: pointer;
 }
+#edit #canvas .sprite_robot .sprite_40x40 {
+    bottom: -5px;
+    left: -5px;
+    width: 40px;
+    height: 40px;
+}
+#edit #canvas .sprite_robot .sprite_80x80 {
+    bottom: -5px;
+    left: -25px;
+    width: 80px;
+    height: 80px;
+}
+#edit #canvas .sprite_robot .sprite_40x40,
+#edit #canvas .sprite_robot .sprite_80x80 {
+    bottom: -5px;
+}
+#edit #canvas .sprite_robot:hover .sprite_40x40,
+#edit #canvas .sprite_robot:hover .sprite_80x80,
+#edit #canvas .sprite_robot_current .sprite_40x40,
+#edit #canvas .sprite_robot_current .sprite_80x80 {
+    bottom: 0px;
+}
 #edit #canvas .sprite_robot.notloaded .sprite {
-    filter: brightness(0.3) saturate(0.8) !important;
+    filter: brightness(0.4) saturate(1.2) !important;
 }
 #edit #canvas .sprite_robot:hover .sprite {
-    filter: brightness(0.9) saturate(1.0) !important;
+    filter: brightness(0.8) saturate(1.1) !important;
 }
 #edit #canvas .sprite_robot_current .sprite,
 #edit #canvas .sprite_robot_current:hover .sprite {
     filter: brightness(1.0) saturate(1.0);
 }
+#edit #canvas .sprite_robot .sprite.shadow,
+#edit #canvas .sprite_robot:hover .sprite.shadow {
+    filter: brightness(0) opacity(0.2) !important;
+    margin-left: -2px;
+}
+#edit #canvas .sprite_robot:hover {
+    overflow: visible;
+    z-index: 998;
+}
+#edit #canvas .sprite_robot_current,
+#edit #canvas .sprite_robot_current:hover {
+    overflow: visible;
+    z-index: 999;
+}
+
+#edit #canvas .sprite_robot:hover .sprite_40x40 {
+    background-position: -40px 0;
+}
+#edit #canvas .sprite_robot:hover .sprite_80x80 {
+    background-position: -80px 0;
+}
+
 #edit #canvas .sprite_robot i.new,
 #edit #canvas .sprite_robot i.persona {
     display: inline-block;
     box-sizing: border-box;
     position: absolute;
-    z-index: 2;
-    top: -4px;
-    left: -4px;
+    z-index: 4;
+    top: -2px;
+    left: -2px;
     font-size: 90%;
     border: 1px solid rgba(0, 0, 0, 0.2);
     background-color: rgba(255, 255, 255, 0.2);
@@ -344,12 +462,16 @@ body.windowFlag_landscapeMode #prototype {
     -webkit-border-radius: 50%;
     border-radius: 50%;
     pointer-events: none;
+    transition: top 0.3s, left 0.3s;
+}
+#edit #canvas .sprite_robot i.new {
+    filter: saturate(2) brightness(1.2);
 }
 #edit #canvas .sprite_robot .endless {
     display: inline-block;
     box-sizing: border-box;
     position: absolute;
-    z-index: 3;
+    z-index: 5;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -382,17 +504,6 @@ body.windowFlag_landscapeMode #prototype {
 #edit #canvas .sprite_robot[data-robot="proto-man"] i.persona {
     background-position: -255px -15px !important;
 }
-/*
-#edit #canvas .sprite_robot_dr-light_current {
-    border-color: rgb(80, 100, 255) !important;
-}
-#edit #canvas .sprite_robot_dr-wily_current {
-    border-color: rgb(255, 100, 100) !important;
-}
-#edit #canvas .sprite_robot_dr-cossack_current {
-    border-color: rgb(144, 61, 190) !important;
-}
-*/
 #edit #canvas .sprite_robot.disabled {
     pointer-events: none;
     cursor: not-allowed;
@@ -401,7 +512,7 @@ body.windowFlag_landscapeMode #prototype {
     pointer-events: none;
     cursor: default;
 }
-#edit #canvas .sprite_robot.locked .sprite {
+#edit #canvas .sprite_robot.locked .sprite:not(.shadow) {
     filter: brightness(0.1) saturate(0) !important;
 }
 
@@ -410,6 +521,17 @@ body.windowFlag_landscapeMode #prototype {
 }
 #edit #canvas .wrapper_right .sprite_robot {
 
+}
+
+
+#edit #canvas .robot_canvas.dragging {
+
+}
+#edit #canvas .robot_canvas.dragging .wrapper {
+    height: auto;
+}
+#edit #canvas .robot_canvas.dragging .sprite_robot {
+    height: 20px;
 }
 
 #edit #canvas .options {
@@ -832,7 +954,9 @@ body[data-mode="viewer"] #edit #console .event a.item_name label .arrow {
     100% { transform: translateY(0px); }
 }
 #edit #console .event_robot_images .sprite_robot,
-#edit #console .header .sprite.sprite_support .sprite {
+#edit #console .header .sprite.sprite_support .sprite,
+#edit #canvas .sprite_robot:hover .sprite,
+#edit #canvas .sprite_robot_current .sprite {
     transform: translateY(0px);
     animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
 }
@@ -1305,6 +1429,31 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
     transform: translate(-1px, -1px);
 }
 
+
+/*
+ * ROBOT-SPECIFIC UI TWEAKS
+ */
+
+/*
+#edit #canvas .sprite_robot[data-robot]:not(:hover):not(.sprite_robot_current) .sprite_40x40 {
+    top: -4px;
+}
+#edit #canvas .sprite_robot[data-robot]:not(:hover):not(.sprite_robot_current) .sprite_80x80 {
+    top: -38px;
+}
+#edit #canvas .sprite_robot[data-robot="bounce-man"]:not(:hover):not(.sprite_robot_current) .sprite_80x80 {
+    top: -30px;
+}
+#edit #canvas .sprite_robot[data-robot="astro-man"]:not(:hover):not(.sprite_robot_current) .sprite_80x80 {
+    top: -30px;
+}
+#edit #canvas .sprite_robot[data-robot="centaur-man"]:not(:hover):not(.sprite_robot_current) .sprite_80x80 {
+    top: -32px;
+}
+#edit #canvas .sprite_robot[data-robot="splash-woman"]:not(:hover):not(.sprite_robot_current) .sprite_80x80 {
+    top: -37px;
+}
+*/
 
 
 /*
