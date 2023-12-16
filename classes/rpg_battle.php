@@ -2971,21 +2971,41 @@ class rpg_battle extends rpg_object {
             //error_log('--> adjusted (A) '.$sprite_position.' $sprite position ('.$sprite_row.', '.$sprite_column.')');
         } elseif ($sprite_position == 'bench'){
             $sprite_column += 1;
-            $sprite_row += ($sprite_key - 1);
+            $sprite_row += ($sprite_key - 2);
+            //error_log('- (start) $sprite_row = '.$sprite_row);
             if ($team_size > 1){
                 $current_bench_size = $team_size - 1;
+                $bench_shift_amount = 0;
                 $extra_bench_slots = $current_bench_size < $max_bench_size ? ($max_bench_size - $current_bench_size) : 0;
-                $bench_shift_amount = $extra_bench_slots >= 2 ? floor($extra_bench_slots / 2) : 0;
+                if (($current_bench_size + $extra_bench_slots) > $max_team_size){ $extra_bench_slots = $max_team_size - $current_bench_size; }
+                // calculate the bench shift amount if there are extra bench slots
+                if ($extra_bench_slots > 1){
+                    $bench_shift_amount = $extra_bench_slots % 2 === 0 ? floor($extra_bench_slots / 2) : ceil($extra_bench_slots / 2);
+                } elseif ($extra_bench_slots === 1){
+                    $bench_shift_amount = 1;
+                }
                 // adjust position on non-odd numbered teams for centering purposes
-                if ($current_bench_size % 2 === 0 && $sprite_key > ($current_bench_size / 2)){
-                    //error_log('- shift position on non-odd numbered teams for centering purposes');
+                if ($bench_shift_amount > 0){
+                    if ($current_bench_size % 2 === 0){
+                        //error_log('- shift position on non-odd numbered teams for centering purposes');
+                        if ($sprite_key > ($current_bench_size / 2)){
+                            //error_log('-- $sprite_key > ($current_bench_size / 2)');
+                            $bench_shift_amount += 1;
+                        }
+                    } else {
+                        //error_log('- shift position on odd numbered teams for centering purposes');
+                        $bench_shift_amount += 1;
+                    }
+                } else {
                     $bench_shift_amount += 1;
                 }
                 //error_log('- $current_bench_size = '.$current_bench_size);
                 //error_log('- $extra_bench_slots = '.$extra_bench_slots);
                 //error_log('- $bench_shift_amount = '.$bench_shift_amount);
                 if ($bench_shift_amount){ $sprite_row += $bench_shift_amount; }
-                if ($sprite_row > $grid_rows){ $sprite_row = $grid_rows - $sprite_row; }
+
+                if ($sprite_row > $grid_rows){ $sprite_row = $grid_rows; }
+                //error_log('- (final) $sprite_row = '.$sprite_row);
                 //error_log('--> adjusted (B) '.$sprite_position.' $sprite position ('.$sprite_row.', '.$sprite_column.')');
             }
         }
