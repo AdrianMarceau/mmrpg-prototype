@@ -3878,6 +3878,7 @@ class rpg_ability extends rpg_object {
             $field_hazard_index = array(
                 // positive
                 array('token' => 'super_blocks', 'source' => 'super-arm', 'object' => 'super-block', 'noun' => 'super block', 'where' => 'in front of', 'frame' => 0, 'offset' => array('x' => 55, 'y' => 2, 'z' => -20)),
+                array('token' => 'ice_walls', 'source' => 'ice-wall', 'object' => 'ice-wall', 'noun' => 'ice wall', 'where' => 'in front of', 'frame' => 0, 'offset' => array('x' => 55, 'y' => 2, 'z' => -20)),
                 );
             }
         return $field_hazard_index;
@@ -3898,6 +3899,7 @@ class rpg_ability extends rpg_object {
                 array('token' => 'acid_globs', 'source' => 'acid-glob', 'object' => 'acid-glob', 'noun' => 'acid glob', 'where' => 'below', 'frame' => 2, 'offset' => array('x' => 5, 'y' => 0, 'z' => 10)),
                 array('token' => 'gravity_well', 'source' => 'gravity-hold', 'object' => 'gravity-well', 'noun' => 'gravity well', 'where' => 'below', 'frame' => 2, 'offset' => array('x' => 0, 'y' => 0, 'z' => -10)),
                 array('token' => 'remote_mine', 'source' => 'remote-mine', 'object' => 'remote-mine', 'noun' => 'remote mine', 'where' => 'in front of', 'frame' => 6, 'offset' => array('x' => 30, 'y' => -5, 'z' => 6)),
+                array('token' => 'frozen_spikes', 'source' => 'chill-spike', 'object' => 'frozen-spikes', 'noun' => 'frozen spikes', 'where' => 'below', 'frame' => 2, 'offset' => array('x' => 0, 'y' => -5, 'z' => 8)),
                 );
             }
         return $field_hazard_index;
