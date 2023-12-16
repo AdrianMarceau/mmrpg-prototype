@@ -1649,6 +1649,8 @@ class rpg_robot extends rpg_object {
 
         // If this ability is in the list of globally compatible
         if (in_array($ability_token, $global_abilities)){ $temp_compatible = true; }
+        // Else if this is an empty type ability and this is NOT a mecha, we can use it
+        elseif ($ability_info['ability_type'] === 'empty'){ $temp_compatible = true; }
         // Else if this ability has a type, check it against this robot
         elseif (!empty($ability_info['ability_type']) || !empty($ability_info['ability_type2'])){
             //$debug_fragment .= 'has-type '; // DEBUG
