@@ -7,6 +7,9 @@ $mmrpg_database_abilities_types = array();
 foreach ($mmrpg_database_types AS $token => $info){
     $mmrpg_database_abilities_types[$token] = 0;
 }
+$mmrpg_database_abilities_types['empty'] = 0;
+//error_log('$mmrpg_database_types = '.print_r($mmrpg_database_types, true));
+//error_log('$mmrpg_database_abilities_types = '.print_r($mmrpg_database_abilities_types, true));
 
 // Define the index of hidden abilities to not appear in the database
 $hidden_database_abilities = array();

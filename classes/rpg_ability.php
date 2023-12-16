@@ -1630,7 +1630,7 @@ class rpg_ability extends rpg_object {
         global $db;
 
         // Collect global indexes for easier search
-        $mmrpg_types = rpg_type::get_index();
+        $mmrpg_types = rpg_type::get_index(true);
 
         // Define the markup variable
         $this_markup = '';
