@@ -3835,7 +3835,9 @@ class rpg_ability extends rpg_object {
                 // [action/system] abilities should never be doubled-up
                 'action-chargeweapons', 'action-noweapons', 'action-unequipitem',
                 // prevent from using itself over again
-                'gemini-clone'
+                'gemini-clone',
+                // dark moves just don't make sense using twice in a row
+                'dark-boost', 'dark-break', 'dark-drain',
                 ))
             ? true
             : false;
