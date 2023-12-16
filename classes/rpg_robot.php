@@ -3554,6 +3554,7 @@ class rpg_robot extends rpg_object {
                 foreach ($triggered_abilities_types AS $key => $types){
                     if (empty($types)){ continue; }
                     $ability_type = $types[0];
+                    if ($ability_type === 'empty'){ $ability_type = ''; }
                     if (!empty($ability_type)){
                         $this->robot_core = $ability_type;
                         $this->robot_core2 = 'copy';
