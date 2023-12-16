@@ -721,8 +721,9 @@
                     <div class="field">
                         <strong class="label">By Type</strong>
                         <select class="select" name="ability_type"><option value=""></option><?
+                            $allow_special = array('none', 'empty');
                             foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                if ($type_info['type_class'] === 'special' && $type_token !== 'none'){ continue; }
+                                if ($type_info['type_class'] === 'special' && !in_array($type_token, $allow_special)){ continue; }
                                 ?><option value="<?= $type_token ?>"<?= !empty($search_data['ability_type']) && $search_data['ability_type'] === $type_token ? ' selected="selected"' : '' ?>><?= $type_token === 'none' ? 'Neutral' : ucfirst($type_token) ?></option><?
                                 } ?>
                         </select><span></span>
@@ -998,8 +999,9 @@
                                         <select class="select" name="ability_type">
                                             <option value=""<?= empty($ability_data['ability_type']) ? ' selected="selected"' : '' ?>>Neutral</option>
                                             <?
+                                            $allow_special = array('none', 'empty');
                                             foreach ($mmrpg_types_index AS $type_token => $type_info){
-                                                if ($type_info['type_class'] === 'special' && $type_info['type_token'] !== 'none' && $type_info['type_token'] !== 'empty'){ continue; }
+                                                if ($type_info['type_class'] === 'special' && !in_array($type_token, $allow_special)){ continue; }
                                                 $label = $type_info['type_name'];
                                                 if (!empty($ability_data['ability_type']) && $ability_data['ability_type'] === $type_token){ $selected = 'selected="selected"'; }
                                                 else { $selected = ''; }
