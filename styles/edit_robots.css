@@ -167,7 +167,7 @@ body.windowFlag_landscapeMode #prototype {
 #edit #canvas .ability_canvas .wrapper .wrapper_overflow,
 #edit #canvas .item_canvas .wrapper .wrapper_overflow {
     max-height: 90px;
-    max-height: calc(100vh - 343px);
+    max-height: calc(100vh - 363px);
     padding-right: 8px;
 }
 #edit #canvas .ps-container:hover>.ps-scrollbar-y-rail:hover {
