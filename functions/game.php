@@ -900,7 +900,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
                 $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto; position: relative;">';
                     $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; left: -15px;"></i> ';
                     $temp_span_style = 'text-shadow: none; ';
-                    if ($ability_type_or_none === 'shadow'){ $temp_span_style .= 'filter: brightness(3); '; }
+                    if ($ability_type_or_none === 'shadow' || $ability_type_or_none === 'empty'){ $temp_span_style .= 'filter: brightness(3); '; }
                     else { $temp_span_style .= 'filter: brightness(1.5); '; }
                     $temp_console_markup .= '<span class="color '.$ability_type_or_none.'" style="'.$temp_span_style.'">'.$this_description.'</span> ';
                     $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; right: -15px;"></i>';
