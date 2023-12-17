@@ -181,14 +181,17 @@ if (true){
                         //error_log('$composite_sprite_image_markup = '.print_r($composite_sprite_image_markup, true));
 
                         // Loop through all elements and display gauge's for relevant ones
-                        $core_max_levels = $db->get_array_list("SELECT
-                            (CASE WHEN ability_type = '' THEN 'none' ELSE ability_type END) AS core_type,
-                            MAX(ability_shop_level) AS core_max
-                            FROM mmrpg_index_abilities
-                            WHERE ability_flag_published = 1 AND ability_flag_complete = 1 AND ability_shop_tab = 'reggae/weapons'
-                            GROUP BY ability_type
-                            ORDER BY core_max DESC
-                            ;", 'core_type');
+                        if (empty($core_max_levels)){
+                            $core_max_levels = $db->get_array_list("SELECT
+                                (CASE WHEN ability_type = '' THEN 'none' ELSE ability_type END) AS core_type,
+                                MAX(ability_shop_level) AS core_max
+                                FROM mmrpg_index_abilities
+                                WHERE ability_flag_published = 1 AND ability_flag_complete = 1 AND ability_shop_tab = 'reggae/weapons'
+                                GROUP BY ability_type
+                                ORDER BY core_max DESC
+                                ;", 'core_type');
+                        }
+                        //error_log('$core_max_levels = '.(isset($core_max_levels) ? print_r($core_max_levels, true) : '---'));
                         $core_type_list = array_keys($mmrpg_database_types);
                         unset($core_type_list[array_search('copy', $core_type_list)]);
                         unset($core_type_list[array_search('none', $core_type_list)]);

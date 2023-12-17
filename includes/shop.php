@@ -519,6 +519,44 @@ if (!empty($this_shop_index['reggae'])){
         }
         $level = $this_shop_index['reggae']['shop_level'];
         $levels = $core_level_index;
+        //error_log('$unlocked_weapons = '.print_r($unlocked_weapons, true));
+        $core_max_levels = array();
+        if (!empty($unlocked_weapons)){
+            // Loop through unlockable weapons and increase unlock levels for those from robot masters
+            foreach ($unlocked_weapons AS $token => $info){
+                //error_log('$token = '.print_r($token, true));
+                $level = !empty($info['ability_shop_level']) ? $info['ability_shop_level'] : 0;
+                //error_log('(start) $level = '.print_r($level, true));
+                //error_log('$info = '.print_r($info, true));
+                $indexinfo = $mmrpg_database_abilities[$token];
+                $robotinfo = !empty($indexinfo['ability_master']) ? $mmrpg_database_robots[$indexinfo['ability_master']] : array();
+                if (!empty($robotinfo) && !empty($robotinfo['robot_game'])){
+                    //error_log('we may need to increase unlock level');
+                    //error_log('$indexinfo = '.print_r($indexinfo, true));
+                    //error_log('$robotinfo = '.print_r($robotinfo, true));
+                    $game_number = 0;
+                    $game_token = $robotinfo['robot_game'];
+                    if ($game_token === 'RnF'){ $game_number = 8; }
+                    elseif ($game_token === 'MMPU'){ $game_number = 1; }
+                    elseif (preg_match('/^MM(\d+)$/i', $game_token, $matches)){ $game_number = $matches[1]; }
+                    else { $game_number = 12; }
+                    //error_log('$game_token = '.$game_token);
+                    //error_log('$game_number = '.$game_number);
+                    $level_boost = $game_number * 3;
+                    $level += $level_boost;
+                    //error_log('$level_boost = '.$level_boost);
+                    //error_log('(final) $level = '.print_r($level, true));
+                    $unlocked_weapons[$token]['ability_shop_level'] = $level;
+                }
+                $type = !empty($info['ability_type']) ? $info['ability_type'] : 'none';
+                if (!isset($core_max_levels[$type])){ $core_max_levels[$type] = array('core_type' => $type, 'core_max' => 0); }
+                if (!in_array($token, $unlocked_ability_tokens)){
+                    if ($level > $core_max_levels[$type]['core_max']){
+                        $core_max_levels[$type]['core_max'] = $level;
+                        }
+                    }
+            }
+        }
         $unlocked_weapons = !empty($unlocked_weapons) ? array_filter($unlocked_weapons, function($info) use ($level, $levels){
             $type = !empty($info['ability_type']) ? $info['ability_type'] : 'none';
             $required = !empty($info['ability_shop_level']) ? $info['ability_shop_level'] : 0;
