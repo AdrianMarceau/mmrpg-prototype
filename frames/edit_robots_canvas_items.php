@@ -3,8 +3,10 @@
 // CANVAS MARKUP : ITEMS
 
 // Include the necessary database files
-require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
+$mmrpg_database_types = rpg_type::get_index(true);
+$mmrpg_database_items = rpg_item::get_index(true);
 
 // Start the output buffer
 ob_start();
