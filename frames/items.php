@@ -17,8 +17,9 @@ $session_token = mmrpg_game_token();
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
 //require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
+$mmrpg_database_items = rpg_item::get_index(true);
 
 // Collect the editor flag if set
 $global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
@@ -60,6 +61,18 @@ $global_battle_items = array_filter($global_battle_items, function($item_token) 
     return true;
     }, ARRAY_FILTER_USE_KEY);
 
+// Pre-loop through and check to see what the max item is that is NOT hidden or at least unlocked
+$tmp_counter = 0;
+$max_non_hidden_counter = 0;
+foreach ($mmrpg_database_items AS $item_token => $item_info){
+    $tmp_counter++;
+    if (!empty($item_info['item_flag_hidden'])
+        && !mmrpg_prototype_item_unlocked($item_token)){
+        continue;
+        }
+    $max_non_hidden_counter = $tmp_counter;
+}
+
 // If the user has collected any stars, make sure those contribute to the count
 //if (!empty($this_battle_stars_field_count)){ $global_battle_items['field-star'] = $this_battle_stars_field_count; }
 //if (!empty($this_battle_stars_fusion_count)){ $global_battle_items['fusion-star'] = $this_battle_stars_fusion_count; }
@@ -95,8 +108,8 @@ if (true){
 
         // Update the player key to the current counter
         $item_key = $key_counter;
-        $item_info['item_image'] = $item_info['item_token'];
-        $item_info['item_image_size'] = 40;
+        //$item_info['item_image'] = $item_info['item_token'];
+        //$item_info['item_image_size'] = 40;
 
         // Collect a temp robot object for printing items
         $player_info = $mmrpg_database_players['dr-light'];
@@ -198,7 +211,12 @@ if (true){
                                         $item_counter = 0;
                                         $item_counter_total = count($mmrpg_database_items);
                                         foreach ($mmrpg_database_items AS $item_token => $item_info){
+
                                             $item_counter++;
+                                            if ($max_non_hidden_counter > 0 && $item_counter > $max_non_hidden_counter){
+                                                $item_counter--;
+                                                break;
+                                            }
 
                                             // Define basic item slot details
                                             $item_info_token = $item_info['item_token'];
@@ -333,6 +351,8 @@ if (true){
     unset($temp_item_tokens);
 
     // Start generating the edit markup
+    $num_items_collected = count($global_battle_items);
+    $num_items_total = !empty($max_non_hidden_counter) ? $max_non_hidden_counter : count($mmrpg_database_items);
     ?>
 
     <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
@@ -340,8 +360,8 @@ if (true){
             <i class="fa fas fa-briefcase"></i>
             Item Inventory
             <span class="progress">(<span id="item_counter">
-                <?= number_format(count($global_battle_items), 0, '.', ',') ?> /
-                <?= number_format(count($mmrpg_database_items), 0, '.', ',') ?>
+                <?= number_format($num_items_collected, 0, '.', ',') ?> /
+                <?= number_format($num_items_total, 0, '.', ',') ?>
                 </span> Items)</span>
         </span>
     </span>
