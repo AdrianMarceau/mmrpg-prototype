@@ -584,7 +584,7 @@ class rpg_robot extends rpg_object {
 
         // Collect and cache an item index for reference
         static $mmrpg_index_items;
-        if (empty($mmrpg_index_items)){ $mmrpg_index_items = rpg_item::get_index(); }
+        if (empty($mmrpg_index_items)){ $mmrpg_index_items = rpg_item::get_index(true); }
 
         // Check to make sure this robot has a held item, else return now
         $item_token = empty($this->counters['item_disabled']) ? $this->robot_item : '';
@@ -3531,6 +3531,8 @@ class rpg_robot extends rpg_object {
         $sync_to_elemental_energy = false;
         if ($this->robot_base_core === 'copy'
             && $this->robot_base_image === $this->robot_pseudo_token){
+            //error_log('We must $sync_to_elemental_energy for '.$this->robot_token);
+            //error_log('$this->robot_image_alts = '.print_r($this->robot_image_alts, true));
             $sync_to_elemental_energy = true;
         }
 
@@ -3538,13 +3540,17 @@ class rpg_robot extends rpg_object {
         if ($sync_to_elemental_energy){
             //error_log('We must $sync_to_elemental_energy for '.$this->robot_token);
             //error_log('-> core types = '.implode(',', array($this->robot_core, $this->robot_core2)));
+            $is_hero_robot = in_array($this->robot_token, array('mega-man', 'bass', 'proto-man')) ? true : false;
+            $if_empty_token = $is_hero_robot ? 'alt9' : 'shadow';
             // If this robot is holding an elemental core, that takes priority
-            if (!empty($this->robot_item)
+            if ($this->has_item()
                 && substr($this->robot_item, -5, 5) === '-core'){
                 list($core_type) = explode('-', $this->robot_item);
+                if ($core_type !== 'empty'){ $new_image = $this->robot_base_image.'_'.$core_type; }
+                else { $new_image = $this->robot_base_image.'_'.$if_empty_token; }
                 $this->robot_core = $core_type;
                 $this->robot_core2 = 'copy';
-                $this->robot_image = $this->robot_base_image.'_'.$core_type;
+                $this->robot_image = $new_image;
                 //error_log('-> using held item '.$this->robot_item.' for new image '.$this->robot_image);
             }
             // Otherwise, if they've used any abilities, check the most recent one
@@ -3554,11 +3560,12 @@ class rpg_robot extends rpg_object {
                 foreach ($triggered_abilities_types AS $key => $types){
                     if (empty($types)){ continue; }
                     $ability_type = $types[0];
-                    if ($ability_type === 'empty'){ $ability_type = ''; }
                     if (!empty($ability_type)){
+                        if ($ability_type !== 'empty'){ $new_image = $this->robot_base_image.'_'.$ability_type; }
+                        else { $new_image = $this->robot_base_image.'_'.$if_empty_token; }
                         $this->robot_core = $ability_type;
                         $this->robot_core2 = 'copy';
-                        $this->robot_image = $this->robot_base_image.'_'.$ability_type;
+                        $this->robot_image = $new_image;
                     } else {
                         $this->robot_core = 'copy';
                         $this->robot_core2 = '';
