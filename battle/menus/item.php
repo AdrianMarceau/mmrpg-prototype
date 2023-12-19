@@ -4,8 +4,10 @@
 $current_player_items = !empty($_SESSION['GAME']['values']['battle_items']) ? $_SESSION['GAME']['values']['battle_items'] : array();
 
 // Require the item database page for sorting purposes
-require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
+$mmrpg_database_types = rpg_type::get_index(true);
+$mmrpg_database_items = rpg_item::get_index(true);
 
 // Filter out items that should not be shown
 foreach ($current_player_items AS $token => $quantity){
