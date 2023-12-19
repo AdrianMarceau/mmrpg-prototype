@@ -1702,6 +1702,11 @@ class rpg_ability extends rpg_object {
         if ($ability_info['ability_class'] != 'master'){
             $print_options['show_records'] = false;
         }
+        // If this is an empty type ability, don't show the robot's it can equip to
+        if ($ability_info['ability_type'] === 'empty'){
+            $print_options['show_robots'] = false;
+        }
+
 
         // Collect the database records for this ability
         if ($print_options['show_records']){
@@ -2225,7 +2230,7 @@ class rpg_ability extends rpg_object {
 
                 <? endif; ?>
 
-                <? if($print_options['show_robots']): ?>
+                <? if ($print_options['show_robots']): ?>
 
                     <h2 id="robots" class="header header_full <?= $ability_header_types ?>" style="margin: 10px 0 0; text-align: left;">
                         Robot Compatibility
@@ -2320,6 +2325,7 @@ class rpg_ability extends rpg_object {
                                             foreach ($ability_robot_rewards AS $this_info){
                                                 $this_level = $this_info['level'];
                                                 $this_robot = $temp_robots_index[$this_info['token']];
+                                                if (!empty($this_robot['robot_flag_hidden'])){ continue; }
                                                 $this_robot_token = $this_robot['robot_token'];
                                                 $this_robot_name = $this_robot['robot_name'];
                                                 $this_robot_image = !empty($this_robot['robot_image']) ? $this_robot['robot_image']: $this_robot['robot_token'];
