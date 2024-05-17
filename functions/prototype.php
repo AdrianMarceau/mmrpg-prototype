@@ -1197,7 +1197,7 @@ function mmrpg_prototype_player_altimage_unlocked($player_token, $alt_token = ''
 }
 
 // Define a function for counting the number of completed prototype battles
-function mmrpg_prototype_battles_complete($player_token, $unique = true, &$battles_complete = array()){
+function mmrpg_prototype_battles_complete($player_token = '', $unique = true, &$battles_complete = array()){
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
@@ -1245,7 +1245,7 @@ function mmrpg_prototype_battles_complete($player_token, $unique = true, &$battl
 }
 
 // Define a function for counting the number of failured prototype battles
-function mmrpg_prototype_battles_failure($player_token, $unique = true, &$battles_failure = array()){
+function mmrpg_prototype_battles_failure($player_token = '', $unique = true, &$battles_failure = array()){
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
@@ -1607,7 +1607,8 @@ function mmrpg_prototype_stars_unlocked($player_token = '', $star_kind = ''){
     }
 }
 // Define a function for checking how many limit hearts have been unlocked by a player
-function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0){
+function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0, &$extra_hearts = 0){
+    //error_log('mmrpg_prototype_limit_hearts_earned('.$player_token.')');
 
     // Define the number of hearts at zero and we'll go up from there
     $real_max_hearts = 8;
@@ -1621,18 +1622,23 @@ function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0){
     if ($player_chapters_unlocked['2']){ $num_hearts++; }
     if ($player_chapters_unlocked['3']){ $num_hearts++; }
     if ($player_chapters_unlocked['4a']){ $num_hearts++; }
-    if (mmrpg_prototype_complete($player_token)){ $num_hearts++; }
+    if ($player_chapters_unlocked['4z']){ $num_hearts++; }
 
     // Hide the last two hearts behind superboss battles, but don't show them until collected
     $max_hearts -= 2;
     $session_token = mmrpg_game_token();
     $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
-    if (isset($session_robot_database['quint']['robot_defeated'])){ $num_hearts++; }
-    if (isset($session_robot_database['sunstar']['robot_defeated'])){ $num_hearts++; }
+    if (!empty($session_robot_database['quint']['robot_defeated'])){ $num_hearts++; $max_hearts++; $extra_hearts++; }
+    if (!empty($session_robot_database['sunstar']['robot_defeated'])){ $num_hearts++; $max_hearts++; $extra_hearts++; }
     if ($num_hearts > $max_hearts){ $max_hearts = $num_hearts; }
 
     // Make sure we don't go over the max hearts
+    if ($max_hearts > $real_max_hearts){ $max_hearts = $real_max_hearts; }
     if ($num_hearts > $real_max_hearts){ $num_hearts = $real_max_hearts; }
+
+    //error_log('$num_hearts = '.$num_hearts);
+    //error_log('$max_hearts = '.$max_hearts);
+    //error_log('$extra_hearts = '.$extra_hearts);
 
     // Return the total number of hearts this player has earned
     return $num_hearts;
