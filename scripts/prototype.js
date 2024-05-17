@@ -544,7 +544,8 @@ $(document).ready(function(){
     // If we're on the actual prototype parent frame, load the ready room now
     if (!$('#mmrpg').hasClass('iframe')){
         // Only add the ready room to the banner after the player has unlocked their first homebase
-        if (gameSettings.readyRoomUnlocked){
+        if (thisReadyRoom !== false
+            && gameSettings.readyRoomUnlocked){
 
             // Initialize the ready room on prototype home page load
             var $thisPrototype = $('#prototype');
@@ -610,15 +611,15 @@ function mmrpg_trigger_reset(fullReset){
     var confirmText = 'Are you sure you want to reset your entire game?\nAll progress will be lost and cannot be restored including any and all unlocked missions, robots, and abilities. Continue?';
     var confirmText2 = 'Let me repeat that one more time.\nIf you reset your game ALL unlocks and progress with be lost. \nEverything. \nReset anyway?';
     // Attempt to confirm with the user of they want to reset
-    thisReadyRoom.updateRobot('all', {frame: 'damage'}); // damage
-    thisReadyRoom.stopAnimation();
+    if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'damage'}); }
+    if (thisReadyRoom){ thisReadyRoom.stopAnimation(); }
     if (confirm(confirmText) && confirm(confirmText2)){
         // Redirect the user to the prototype reset page
         var postURL = 'prototype.php?action=reset';
         if (fullReset){ postURL += '&full_reset=true'; }
         $.post(postURL, function(){
             //alert('reset complete!');
-            thisReadyRoom.updateRobot('all', {frame: 'defeat'}); // defeat
+            if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'defeat'}); }
             if (window.self != window.parent){
                 window.location = 'prototype.php';
                 } else {
@@ -727,7 +728,7 @@ function prototype_menu_loaded(){
                 else if (gameSettings.nextStepName === 'database'){ newRobotFrame = 'base2'; } // base2
                 else if (parseInt(gameSettings.nextStepName) > 0){ newRobotFrame = 'victory'; } // victory
                 else { newRobotFrame = 'defend'; } // defend
-                thisReadyRoom.updateRobot('most', {frame: newRobotFrame});
+                if (thisReadyRoom){ thisReadyRoom.updateRobot('most', {frame: newRobotFrame}); }
                 }
             gameSettings.nextStepName = false;
             gameSettings.nextSlideDirection = false;
@@ -1494,9 +1495,9 @@ function prototype_menu_switch_action(switchOptions){
     if (thisReadyRoom){
         if (dataStepName === 'home'
             && dataStepNumber === 2){
-            thisReadyRoom.updateSpriteBounds({minX: 20, maxX: 80});
+            if (thisReadyRoom){ thisReadyRoom.updateSpriteBounds({minX: 20, maxX: 80}); }
             } else {
-            thisReadyRoom.resetSpriteBounds();
+            if (thisReadyRoom){ thisReadyRoom.resetSpriteBounds(); }
             }
         }
 
@@ -1590,6 +1591,7 @@ function prototype_menu_switch_action(switchOptions){
         //console.log('hoenn');
         var tempReadyRoomFunction = function(loadState){
             //console.log('tempReadyRoomFunction(loadState:', typeof loadState, loadState, ')');
+            if (!thisReadyRoom){ return false; }
             if (typeof loadState === 'undefined'){ loadState = ''; }
 
             // Define some quick filter functions for dealing with player-specific robots
