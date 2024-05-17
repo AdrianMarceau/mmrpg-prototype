@@ -1228,6 +1228,13 @@ class rpg_disabled {
                                 else { mmrpg_game_unlock_ability(array('player_token' => $temp_robot_info['robot_original_player']), false, $this_reward, true); }
                                 //$_SESSION['GAME']['values']['battle_rewards'][$target_player_token]['player_robots'][$temp_robot_token]['robot_abilities'][$temp_ability_token] = $this_reward;
 
+                                // If there's room on this robot's ability roster, make sure we equip it
+                                if (count($temp_target_robot->robot_abilities) < MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX){
+                                    $abilities = $temp_target_robot->get_abilities();
+                                    $abilities[] = $temp_ability_token;
+                                    $temp_target_robot->set_abilities($abilities);
+                                }
+
                             }
 
                         }
