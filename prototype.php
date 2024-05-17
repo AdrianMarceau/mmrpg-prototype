@@ -62,12 +62,15 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !e
     // Require the appropriate reset file
     require(MMRPG_CONFIG_ROOTDIR.'prototype/reset-missions.php');
 
-    // Load the save file into memory and overwrite the session
-    mmrpg_save_game_session();
+}
+// Check if a new-game-plus request has been placed
+if (!empty($_REQUEST['action'])
+    && $_REQUEST['action'] == 'new-game-plus'
+    && !empty($_REQUEST['reset'])){
+    error_log('new-game-plus: '.var_export($_REQUEST, true));
 
-    //header('Location: prototype.php');
-    unset($db);
-    exit('success');
+    // Require the appropriate reset file
+    require(MMRPG_CONFIG_ROOTDIR.'prototype/reset-plus.php');
 
 }
 
