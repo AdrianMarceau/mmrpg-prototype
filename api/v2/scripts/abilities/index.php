@@ -5,9 +5,8 @@ $api_request_path = 'abilities/index';
 require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Include the database file for abilities and then parse necessary data
-$mmrpg_database_abilities_filter = "AND ability_flag_published = 1 ";
-if (!$api_include_hidden){ $mmrpg_database_abilities_filter = "AND ability_flag_hidden = 0 "; }
-if (!$api_include_incomplete){ $mmrpg_database_abilities_filter = "AND ability_flag_complete = 1 "; }
+define('FORCE_INCLUDE_HIDDEN_ABILITIES', $api_include_hidden);
+define('FORCE_INCLUDE_INCOMPLETE_ABILITIES', $api_include_incomplete);
 require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'database/abilities.php');
 if (empty($mmrpg_database_abilities)){ print_error_and_quit('The ability database could not be loaded'); }
