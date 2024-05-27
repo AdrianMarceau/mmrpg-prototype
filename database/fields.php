@@ -113,7 +113,8 @@ if (isset($update_mmrpg_database_fields)
 if (!empty($mmrpg_database_fields)){
     foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
         if (!empty($temp_info['field_flag_hidden'])
-            && $temp_info['field_token'] !== $this_current_token){
+            && $temp_info['field_token'] !== $this_current_token
+            && !defined('FORCE_INCLUDE_HIDDEN_FIELDS')){
             unset($mmrpg_database_fields[$temp_token]);
         }
     }

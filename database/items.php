@@ -122,7 +122,8 @@ if (isset($update_mmrpg_database_items)
 if (!empty($mmrpg_database_items)){
     foreach ($mmrpg_database_items AS $temp_token => $temp_info){
         if (!empty($temp_info['item_flag_hidden'])
-            && $temp_info['item_token'] !== $this_current_token){
+            && $temp_info['item_token'] !== $this_current_token
+            && !defined('FORCE_INCLUDE_HIDDEN_ITEMS')){
             unset($mmrpg_database_items[$temp_token]);
         }
     }

@@ -101,7 +101,8 @@ if (isset($filter_mmrpg_database_players)
 if (!empty($mmrpg_database_players)){
     foreach ($mmrpg_database_players AS $temp_token => $temp_info){
         if (!empty($temp_info['player_flag_hidden'])
-            && $temp_info['player_token'] !== $this_current_token){
+            && $temp_info['player_token'] !== $this_current_token
+            && !defined('FORCE_INCLUDE_HIDDEN_PLAYERS')){
             unset($mmrpg_database_players[$temp_token]);
         }
     }

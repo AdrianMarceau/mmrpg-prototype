@@ -140,7 +140,8 @@ if (isset($update_mmrpg_database_abilities)
 if (!empty($mmrpg_database_abilities)){
     foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
         if (!empty($temp_info['ability_flag_hidden'])
-            && $temp_info['ability_token'] !== $this_current_token){
+            && $temp_info['ability_token'] !== $this_current_token
+            && !defined('FORCE_INCLUDE_HIDDEN_ABILITIES')){
             unset($mmrpg_database_abilities[$temp_token]);
         } elseif (!defined('DATA_DATABASE_SHOW_MECHAS')
             && $temp_info['ability_class'] === 'mecha'){

@@ -164,7 +164,8 @@ if (isset($filter_mmrpg_database_robots)
 if (!empty($mmrpg_database_robots)){
     foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
         if (!empty($temp_info['robot_flag_hidden'])
-            && $temp_info['robot_token'] !== $this_current_token){
+            && $temp_info['robot_token'] !== $this_current_token
+            && !defined('FORCE_INCLUDE_HIDDEN_ROBOTS')){
             unset($mmrpg_database_robots[$temp_token]);
         }
     }
