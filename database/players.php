@@ -10,7 +10,7 @@ $hidden_database_players_count = !empty($hidden_database_players) ? count($hidde
 // Collect the player database files from the cache or manually
 $cache_token = md5('database/players/website');
 $cached_index = rpg_object::load_cached_index('database.players', $cache_token);
-if (!empty($cached_index)){
+if (!empty($cached_index) && empty($_GET['refresh'])){
 
     // Collect the cached data for players, player count, and player numbers
     $mmrpg_database_players = $cached_index['mmrpg_database_players'];
@@ -21,6 +21,8 @@ if (!empty($cached_index)){
 } else {
 
     // Collect the database players
+    $player_where = "players.player_token <> 'player' AND players.player_flag_published = 1";
+    if (defined('FORCE_INCLUDE_TEMPLATE_PLAYER')){ $player_where = "({$player_where}) OR players.player_token = 'player'"; }
     $player_fields = rpg_player::get_index_fields(true, 'players');
     $mmrpg_database_players = $db->get_array_list("SELECT
         {$player_fields},
@@ -29,10 +31,9 @@ if (!empty($cached_index)){
         FROM mmrpg_index_players AS players
         LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
         LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'player'
-        WHERE players.player_token <> 'player'
-        AND players.player_flag_published = 1
+        WHERE {$player_where}
         ORDER BY
-        players.player_class ASC,
+        players.player_class DESC,
         groups.group_order ASC,
         tokens.token_order ASC
         ;", 'player_token');
@@ -71,7 +72,8 @@ if (!empty($cached_index)){
             $temp_info = rpg_player::parse_index_info($temp_info);
 
             // Collect this player's key in the index
-            $temp_info['player_key'] = $mmrpg_database_players_numbers[$temp_token]['player_key'];
+            if (!isset($mmrpg_database_players_numbers[$temp_token])){ $temp_info['player_key'] = -1; }
+            else { $temp_info['player_key'] = $mmrpg_database_players_numbers[$temp_token]['player_key']; }
 
             // Ensure this player's image exists, else default to the placeholder
             $mmrpg_database_players[$temp_token]['player_image'] = $temp_token;

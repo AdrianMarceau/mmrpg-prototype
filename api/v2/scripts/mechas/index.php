@@ -5,6 +5,7 @@ $api_request_path = 'mechas/index';
 require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Include the database file for mechas and then parse necessary data
+define('FORCE_INCLUDE_TEMPLATE_MECHA', $api_include_templates);
 define('FORCE_INCLUDE_HIDDEN_MECHAS', $api_include_hidden);
 define('FORCE_INCLUDE_INCOMPLETE_MECHAS', $api_include_incomplete);
 require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');

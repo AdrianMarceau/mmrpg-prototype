@@ -20,7 +20,7 @@ $hidden_database_bosses_count = !empty($hidden_database_bosses) ? count($hidden_
 // Collect the robot database files from the cache or manually
 $cache_token = md5('database/bosses/website');
 $cached_index = rpg_object::load_cached_index('database.bosses', $cache_token);
-if (!empty($cached_index)){
+if (!empty($cached_index) && empty($_GET['refresh'])){
 
     // Collect the cached data for bosses, robot count, and robot numbers
     $mmrpg_database_bosses = $cached_index['mmrpg_database_bosses'];
@@ -35,22 +35,32 @@ if (!empty($cached_index)){
     $mmrpg_database_fields = rpg_field::get_index(true, false);
 
     // Collect the database bosses
-    $mecha_fields = rpg_robot::get_index_fields(true, 'robots');
+    $boss_where = "robots.robot_token <> 'robot' AND robots.robot_class = 'boss' AND robots.robot_flag_published = 1";
+    if (defined('FORCE_INCLUDE_TEMPLATE_BOSS')){ $boss_where = "({$boss_where}) OR robots.robot_token = 'robot' "; }
+    $boss_fields = rpg_robot::get_index_fields(true, 'robots');
     $mmrpg_database_bosses = $db->get_array_list("SELECT
-        {$mecha_fields},
+        {$boss_fields},
         groups.group_token AS robot_group,
         tokens.token_order AS robot_order
         FROM mmrpg_index_robots AS robots
         LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
         LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
         LEFT JOIN mmrpg_index_fields AS fields ON fields.field_token = robots.robot_field
-        WHERE robots.robot_token <> 'robot'
-        AND robots.robot_class = 'boss'
-        AND robots.robot_flag_published = 1
+        WHERE {$boss_where}
         ORDER BY
+        robots.robot_class DESC,
         groups.group_order ASC,
         tokens.token_order ASC
         ;", 'robot_token');
+    if (defined('FORCE_INCLUDE_TEMPLATE_BOSS')){
+        $template_boss = $mmrpg_database_bosses['robot'];
+        unset($mmrpg_database_bosses['robot']);
+        $template_boss['robot_token'] = 'boss';
+        $template_boss['robot_number'] = 'BOSS';
+        $template_boss['robot_name'] = 'Boss';
+        $template_boss['robot_description'] = 'The default boss object.';
+        $mmrpg_database_bosses = array_merge(array('boss' => $template_boss), $mmrpg_database_bosses);
+    }
 
     // Count the database bosses in total (without filters)
     $mmrpg_database_bosses_count = $db->get_value("SELECT
@@ -89,7 +99,8 @@ if (!empty($cached_index)){
             $temp_info = rpg_robot::parse_index_info($temp_info);
 
             // Collect this boss's key in the index
-            $temp_info['robot_key'] = $mmrpg_database_bosses_numbers[$temp_token]['robot_key'];
+            if (!isset($mmrpg_database_bosses_numbers[$temp_token])){ $temp_info['robot_key'] = -1; }
+            else { $temp_info['robot_key'] = $mmrpg_database_bosses_numbers[$temp_token]['robot_key']; }
 
             // Ensure this boss's image exists, else default to the placeholder
             if ($temp_info['robot_flag_complete']){ $temp_info['robot_image'] = $temp_token; }

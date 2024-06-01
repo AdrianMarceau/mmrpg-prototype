@@ -17,9 +17,11 @@ if (strstr($api_request_path, '{token}')){
 // Collect any common (but optional) flags for the scripts
 $api_include_hidden = !empty($_GET['include_hidden']) && $_GET['include_hidden'] === 'true' ? true : false;
 $api_include_incomplete = !empty($_GET['include_incomplete']) && $_GET['include_incomplete'] === 'true' ? true : false;
+$api_include_templates = !empty($_GET['include_templates']) && $_GET['include_templates'] === 'true' ? true : false;
 if (!empty($_GET['include_all']) && $_GET['include_all'] === 'true'){
     $api_include_hidden = true;
     $api_include_incomplete = true;
+    $api_include_templates = true;
     $api_request_path .= '/all';
 }
 

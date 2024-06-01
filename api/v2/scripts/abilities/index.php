@@ -5,6 +5,7 @@ $api_request_path = 'abilities/index';
 require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Include the database file for abilities and then parse necessary data
+define('FORCE_INCLUDE_TEMPLATE_ABILITY', $api_include_templates);
 define('FORCE_INCLUDE_HIDDEN_ABILITIES', $api_include_hidden);
 define('FORCE_INCLUDE_INCOMPLETE_ABILITIES', $api_include_incomplete);
 require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
