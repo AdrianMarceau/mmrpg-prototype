@@ -629,7 +629,7 @@ function mmrpg_trigger_reset(fullReset){
         return true;
         } else {
         // Return false
-        thisReadyRoom.startAnimation();
+        if (thisReadyRoom){ thisReadyRoom.startAnimation(); }
         return false;
         }
 }
