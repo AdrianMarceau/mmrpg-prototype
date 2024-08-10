@@ -634,24 +634,6 @@ function mmrpg_trigger_reset(fullReset){
         }
 }
 
-// Define a function to trigger when resetting player missions
-function mmrpg_trigger_reset_missions(playerToken, playerName){
-    // Define the confirmation text string
-    var confirmText = 'Are you sure you want to reset all mission progress in '+playerName+'\'s game file? Unlocked robots and abilities will be untouched, but all completed missions will be reset and cannot be undone. Continue?';
-    // Attempt to confirm with the user of they want to resey
-    if (navigator.userAgent.match(/Android/i) != null || confirm(confirmText)){
-        // Redirect the user to the prototype reset page
-        var postURL = 'prototype.php?action=reset-missions&player='+playerToken;
-        $.post(postURL, function(){
-            window.location = 'prototype.php';
-            });
-        return true;
-        } else {
-        // Return false
-        return false;
-        }
-}
-
 // Define a function to trigger when resetting player robots
 function mmrpg_trigger_reset_robots(playerToken, playerName){
     // Define the confirmation text string
