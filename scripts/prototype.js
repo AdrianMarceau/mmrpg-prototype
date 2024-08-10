@@ -634,24 +634,6 @@ function mmrpg_trigger_reset(fullReset){
         }
 }
 
-// Define a function to trigger when resetting player robots
-function mmrpg_trigger_reset_robots(playerToken, playerName){
-    // Define the confirmation text string
-    var confirmText = 'Are you sure you want to reset all unlocked robots in '+playerName+'\'s game file? All robots will be reset to level one and abilities reset to default. Continue?';
-    // Attempt to confirm with the user of they want to resey
-    if (navigator.userAgent.match(/Android/i) != null || confirm(confirmText)){
-        // Redirect the user to the prototype reset page
-        var postURL = 'prototype.php?action=reset-robots&player='+playerToken;
-        $.post(postURL, function(){
-            window.location = 'prototype.php';
-            });
-        return true;
-        } else {
-        // Return false
-        return false;
-        }
-}
-
 // Define a function for triggering the game's exit function
 function prototype_trigger_exit(thisContext, thisLink){
     // Define the object references
