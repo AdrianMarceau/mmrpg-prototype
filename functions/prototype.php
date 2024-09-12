@@ -158,6 +158,13 @@ function mmrpg_prototype_new_game_plus(){
 }
 
 // Define a function for checking a player has completed the prototype
+function mmrpg_prototype_allow_limit_break(){
+    $force_limit_break = false;
+    $has_new_game_plus = mmrpg_prototype_new_game_plus();
+    return $force_limit_break || $has_new_game_plus ? true : false;
+}
+
+// Define a function for checking a player has completed the prototype
 function mmrpg_prototype_complete($player_token = ''){
 
     // Pull in global variables
