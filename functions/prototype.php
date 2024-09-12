@@ -152,6 +152,12 @@ function mmrpg_prototype_calculate_shop_level_by_experience($this_experience, $m
 }
 
 // Define a function for checking a player has completed the prototype
+function mmrpg_prototype_new_game_plus(){
+    $session_token = mmrpg_game_token();
+    return !empty($_SESSION[$session_token]['flags']['prototype_events']['new_game_plus']);
+}
+
+// Define a function for checking a player has completed the prototype
 function mmrpg_prototype_complete($player_token = ''){
 
     // Pull in global variables
