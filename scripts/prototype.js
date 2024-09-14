@@ -691,6 +691,86 @@ function mmrpg_trigger_new_game_plus(buttonObject){
 
 }
 
+/*
+// Define a function to trigger when resetting data
+function mmrpg_trigger_reset_other(resetConfig, buttonObject){
+    console.log('mmrpg_trigger_reset_other(resetConfig) w/ ', resetConfig);
+
+    // Collect the reset config if provided, compensate for missing args
+    if (typeof resetConfig !== 'object'){ resetConfig = {}; } // missions, stars, robots, items
+    if (typeof resetConfig.missions !== 'boolean'){ resetConfig.missions = false; }
+    if (typeof resetConfig.database !== 'boolean'){ resetConfig.database = false; }
+    if (typeof resetConfig.abilities !== 'boolean'){ resetConfig.abilities = false; }
+    if (typeof resetConfig.items !== 'boolean'){ resetConfig.items = false; }
+    if (typeof resetConfig.stars !== 'boolean'){ resetConfig.stars = false; }
+    if (typeof resetConfig.robots !== 'boolean'){ resetConfig.robots = false; }
+    if (typeof resetConfig.extra !== 'string'){ resetConfig.extra = false; }
+    console.log('resetConfig = ', resetConfig);
+
+    // Count to make sure at least one thing has been requested
+    var numResets = 0;
+    var resetTokens = [];
+    if (resetConfig.missions){ numResets++; resetTokens.push('missions'); }
+    if (resetConfig.database){ numResets++; resetTokens.push('database'); }
+    if (resetConfig.stars){ numResets++; resetTokens.push('stars'); }
+    if (resetConfig.robots){ numResets++; resetTokens.push('robots'); }
+    if (resetConfig.items){ numResets++; resetTokens.push('items'); }
+    if (resetConfig.abilities){ numResets++; resetTokens.push('abilities'); }
+    var whatWillBeLost = 'your '+resetTokens.join(' AND ');
+    if (resetConfig.extra){
+        resetTokens.push(resetConfig.extra);
+        whatWillBeLost = '';
+        }
+    console.log('numResets = ', numResets);
+    console.log('resetTokens = ', resetTokens);
+
+    // If no resets were requested, alert the user and return false
+    if (numResets < 1){ return false; }
+
+    // Define the confirmation text string
+    var innerText = 'reset your '+(whatWillBeLost ? whatWillBeLost : 'progress')+'';
+    var innerText2 = 'relevant progress '+(whatWillBeLost ? 'for all '+whatWillBeLost : '')+' will be lost';
+    var innerText3 = 'relevant progress with be lost';
+    var confirmTitle = 'Confirm Reset';
+    if (typeof buttonObject !== 'undefined'){
+        $button = $(buttonObject);
+        if ($button.length && $button.is('[data-confirm]')){ innerText = $button.attr('data-confirm'); }
+        if ($button.length && $button.is('[data-confirm2]')){ innerText3 = $button.attr('data-confirm2'); }
+        if ($button.find('strong').length){ confirmTitle = 'Confirm '+$button.find('strong').first().text().trim(); }
+    }
+    confirmTitle = (confirmTitle).toUpperCase() + ' \n';
+    var confirmText = confirmTitle + 'Are you sure you want to '+innerText+'? All '+innerText2+' and cannot be restored. \n' + 'Continue?';
+    var confirmText2 = confirmTitle + 'Let me repeat that one more time. If you reset '+whatWillBeLost+' then ALL '+innerText3.toUpperCase()+'. \n' + 'Reset anyway?';
+    // Attempt to confirm with the user of they want to reset
+    if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'damage'}); }
+    if (thisReadyRoom){ thisReadyRoom.stopAnimation(); }
+    //console.log('test confirm text');
+    if (confirm(confirmText) && confirm(confirmText2)){
+        //console.log('confirmed');
+        // Redirect the user to the prototype new-game-plus page
+        var postURL = 'prototype.php?action=new-game-plus';
+        postURL += '&reset='+resetTokens.join(',');
+        console.log('postURL = ', postURL);
+        $.post(postURL, function(){
+            //alert('new-game-plus complete!');
+            if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'defeat'}); }
+            if (window.self != window.parent){
+                window.location = 'prototype.php';
+                } else {
+                window.location = window.location.href;
+                }
+            });
+        return true;
+        } else {
+        //console.log('not confirmed');
+        // Return false
+        if (thisReadyRoom){ thisReadyRoom.startAnimation(); }
+        return false;
+        }
+
+}
+*/
+
 // Define a function for triggering the game's exit function
 function prototype_trigger_exit(thisContext, thisLink){
     // Define the object references
