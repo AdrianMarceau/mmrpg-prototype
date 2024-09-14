@@ -214,6 +214,37 @@ function mmrpg_prototype_complete($player_token = ''){
     }
 }
 
+// Define a function for checking a player has completed the prototype
+function mmrpg_prototype_complete_plus($player_token = ''){
+
+    // Pull in global variables
+    global $mmrpg_index_players;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+
+    $session_token = mmrpg_game_token();
+
+    // If the player token was provided, do a quick check
+    if (!empty($player_token)){
+        // Return the prototype complete flag for this player
+        if (!empty($_SESSION[$session_token]['flags']['prototype_events'][$player_token]['prototype_complete_plus'])){ return 1; }
+        else { return 0; }
+    }
+    // Otherwise loop through all players and check each
+    else {
+        // Loop through unlocked robots and return true if any are found to be completed
+        $complete_count = 0;
+        foreach ($mmrpg_index_players AS $player_token => $player_info){
+            if (mmrpg_prototype_player_unlocked($player_token)){
+                if (!empty($_SESSION[$session_token]['flags']['prototype_events'][$player_token]['prototype_complete_plus'])){
+                    $complete_count += 1;
+                }
+            }
+        }
+        // Otherwise return false by default
+        return $complete_count;
+    }
+}
+
 // Define a BETTER function to calculating a player's current battle points
 function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index = array()){
     //debug_profiler_checkpoint('func/calc-battle-points-2k19/before/');
@@ -1250,7 +1281,7 @@ function mmrpg_prototype_battles_complete($player_token = '', $unique = true, &$
 
         // Collect the battle complete count from the session if set
         $battles_complete = isset($_SESSION[$session_token]['values']['battle_complete'][$player_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token] : array();
-        //error_log('$battles_complete = '.count($battles_complete).' = '.print_r($battles_complete, true));
+        //error_log($player_token.' | $battles_complete = '.count($battles_complete).' = '.print_r($battles_complete, true));
 
         // Check if only unique battles were requested or ALL battles
         if (!empty($unique)){
@@ -2788,6 +2819,7 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
     if (empty($target_robots)){ $target_robots[] = array('robot_token' => 'met'); }
     foreach ($target_robots AS $key => $robot_info){
         $index_info = $mmrpg_index_robots[$robot_info['robot_token']];
+        //error_log('checking '.$robot_info['robot_token'].' ...');
         $robot_info['robot_id'] = !empty($robot_info['robot_id']) ? $robot_info['robot_id'] : rpg_game::unique_robot_id($target_info['player_id'], $index_info['robot_id'], ($key + 1));
         $robot_info['robot_level'] = !empty($robot_info['robot_level']) ? $robot_info['robot_level'] : $temp_battle_omega['battle_level'];
         $robot_info['robot_item'] = !empty($robot_info['robot_item']) ? $robot_info['robot_item'] : '';
@@ -2811,6 +2843,7 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
         if ($robot_info['robot_level'] > 100){
             if (!isset($robot_info['values'])){ $robot_info['values'] = array(); }
             $robot_info['values']['robot_level_max'] = $robot_info['robot_level'];
+            //error_log('robot_level = '.$robot_info['robot_level'].' for $robot_info = '.print_r($robot_info, true));
         }
         $target_robots[$key] = $robot_info;
     }
