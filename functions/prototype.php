@@ -158,6 +158,25 @@ function mmrpg_prototype_new_game_plus(){
 }
 
 // Define a function for checking a player has completed the prototype
+function mmrpg_prototype_apply_new_game_plus(&$this_prototype_data){
+    //error_log('mmrpg_prototype_apply_new_game_plus() for '.strtoupper($this_prototype_data['this_player_token']).' w/ $this_prototype_data = '.print_r($this_prototype_data, true));
+
+    // Collect the session token in case we need it
+    $session_token = mmrpg_game_token();
+
+    // Update the chapter levels by boosting them a predefined amount
+    $chapter_levels = $this_prototype_data['this_chapter_levels'];
+    //error_log('$chapter_levels (base): '.print_r($chapter_levels, true));
+    foreach ($chapter_levels AS $chapter_key => $chapter_level){ $chapter_levels[$chapter_key] += MMRPG_SETTINGS_NEWGAMEPLUS_CHAPTER_LEVELBOOST; }
+    //error_log('$chapter_levels (boosted): '.print_r($chapter_levels, true));
+    $this_prototype_data['this_chapter_levels'] = $chapter_levels;
+
+    // Return true on success
+    return true;
+
+}
+
+// Define a function for checking a player has completed the prototype
 function mmrpg_prototype_allow_limit_break(){
     $force_limit_break = false;
     $has_new_game_plus = mmrpg_prototype_new_game_plus();
