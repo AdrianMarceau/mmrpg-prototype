@@ -607,9 +607,17 @@ function windowResizePrototype(){
 // Define a function to trigger when resetting data
 function mmrpg_trigger_reset(fullReset){
     // Define the confirmation text string
+    var confirmTitle = 'Confirm Reset Game';
+    confirmTitle = (confirmTitle).toUpperCase() + ' \n';
     var fullReset = typeof fullReset !== 'boolean' ? false : true;
-    var confirmText = 'Are you sure you want to reset your entire game?\nAll progress will be lost and cannot be restored including any and all unlocked missions, robots, and abilities. Continue?';
-    var confirmText2 = 'Let me repeat that one more time.\nIf you reset your game ALL unlocks and progress with be lost. \nEverything. \nReset anyway?';
+    var confirmText = confirmTitle + 'Are you sure you want to RESET your ENTIRE game? \n';
+    confirmText += 'ALL progress will be lost and CANNOT be restored, \n';
+    confirmText += 'including ALL missions, robots, abilities, items, etc. \n';
+    confirmText += 'Continue reset anyway?';
+    var confirmText2 = confirmTitle + 'Let me repeat that one more time. \n';
+    confirmText2 += 'If you reset your game ALL unlocks and progress with be lost. \n';
+    confirmText2 += 'Everything.  You will be starting from scratch. \n';
+    confirmText2 += 'Reset anyway?';
     // Attempt to confirm with the user of they want to reset
     if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'damage'}); }
     if (thisReadyRoom){ thisReadyRoom.stopAnimation(); }
