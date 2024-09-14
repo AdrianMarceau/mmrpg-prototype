@@ -64,9 +64,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !e
 
 }
 // Check if a new-game-plus request has been placed
-if (!empty($_REQUEST['action'])
-    && $_REQUEST['action'] == 'new-game-plus'
-    && !empty($_REQUEST['reset'])){
+if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'new-game-plus'){
     error_log('new-game-plus: '.var_export($_REQUEST, true));
 
     // Require the appropriate reset file
@@ -334,6 +332,13 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
                     <span class="pipe">|</span>
                     <span class="amount omega">
                         <i class="fa fas fa-greek-omega"></i>
+                    </span>
+                <? } ?>
+                <? if (mmrpg_prototype_new_game_plus()){ ?>
+                    <span class="pipe">|</span>
+                    <span class="amount plus">
+                        <em class="text">NG</em>
+                        <i class="fa fas fa-plus"></i>
                     </span>
                 <? } ?>
             </div>

@@ -409,6 +409,20 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     font-weight: 700;
     content: "\0003a9";
 }
+
+#prototype .banner .subpoints .amount.plus em {
+    font-size: 70%;
+    font-weight: bold;
+    position: relative;
+    bottom: 1px;
+    left: 0px;
+}
+#prototype .banner .subpoints .amount.plus i {
+    margin-left: -2px;
+    font-size: 90%;
+    position: relative;
+    bottom: 2px;
+}
 #prototype .banner .points .pipe,
 #prototype .banner .subpoints .pipe {
     padding: 0;
