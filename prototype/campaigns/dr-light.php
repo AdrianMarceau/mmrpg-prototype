@@ -33,6 +33,9 @@ $this_prototype_data['prototype_complete'] = $prototype_complete_flag_light;
 $this_prototype_data['prev_player_token'] = 'dr-cossack';
 $this_prototype_data['next_player_token'] = 'dr-wily';
 
+// If we're in New Game + territory, we should amp-up the level curve dramatically
+if (mmrpg_prototype_new_game_plus()){ mmrpg_prototype_apply_new_game_plus($this_prototype_data); }
+
 // Define the stage select music based on progression
 //$this_music_token = $this_prototype_data['battles_complete'] >= 10 ? $this_prototype_data['target_player_token'] : $this_prototype_data['this_player_token'];
 //$this_prototype_data['missions_music'] = 'misc/stage-select-'.$this_music_token;
