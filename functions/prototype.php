@@ -167,7 +167,9 @@ function mmrpg_prototype_apply_new_game_plus(&$this_prototype_data){
     // Update the chapter levels by boosting them a predefined amount
     $chapter_levels = $this_prototype_data['this_chapter_levels'];
     //error_log('$chapter_levels (base): '.print_r($chapter_levels, true));
-    foreach ($chapter_levels AS $chapter_key => $chapter_level){ $chapter_levels[$chapter_key] += MMRPG_SETTINGS_NEWGAMEPLUS_CHAPTER_LEVELBOOST; }
+    foreach ($chapter_levels AS $chapter_key => $chapter_level){
+        $chapter_levels[$chapter_key] += MMRPG_SETTINGS_NEWGAMEPLUS_LEVELBOOST_DEFAULT;
+    }
     //error_log('$chapter_levels (boosted): '.print_r($chapter_levels, true));
     $this_prototype_data['this_chapter_levels'] = $chapter_levels;
 
