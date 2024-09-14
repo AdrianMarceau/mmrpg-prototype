@@ -199,6 +199,108 @@ class rpg_reset {
         return true;
     }
 
+    // REGROUP ROBOTS
+    // Regroup robots by moving them back to their original owners
+    public function regroup_robots() {
+        //error_log('rpg_reset->regroup_robots() called');
+
+        // Pull necessary indexes for this action
+        $mmrpg_index_players = rpg_player::get_index(true);
+        $mmrpg_index_robots = rpg_robot::get_index(true);
+
+        // First we pull all robots into a single array
+        $session_robots = array();
+        if (!empty($this->session_data['values']['battle_rewards'])){
+            foreach ($mmrpg_index_players as $ptoken => $pinfo){
+                if (!empty($this->session_data['values']['battle_rewards'][$ptoken]['player_robots'])){
+                    foreach ($this->session_data['values']['battle_rewards'][$ptoken]['player_robots'] as $rtoken => $rewards){
+                        if (!isset($session_robots[$rtoken])){ $session_robots[$rtoken] = array(); }
+                        if (isset($session_robots[$rtoken]['rewards'])){ $rewards = array_merge($session_robots[$rtoken]['rewards'], $rewards); }
+                        $session_robots[$rtoken]['rewards'] = $rewards;
+                    }
+                }
+            }
+        }
+        if (!empty($this->session_data['values']['battle_settings'])){
+            foreach ($mmrpg_index_players as $ptoken => $pinfo){
+                if (!empty($this->session_data['values']['battle_settings'][$ptoken]['player_robots'])){
+                    foreach ($this->session_data['values']['battle_settings'][$ptoken]['player_robots'] as $rtoken => $settings){
+                        if (!isset($session_robots[$rtoken])){ $session_robots[$rtoken] = array(); }
+                        $original_player = '';
+                        if ($rtoken === 'mega-man' || $rtoken === 'roll') { $original_player = 'dr-light'; }
+                        elseif ($rtoken === 'bass' || $rtoken === 'disco') { $original_player = 'dr-wily'; }
+                        elseif ($rtoken === 'proto-man' || $rtoken === 'rhythm') { $original_player = 'dr-cossack'; }
+                        else { $original_player = !empty($settings['original_player']) ? $settings['original_player'] : $ptoken; }
+                        $settings['original_player'] = $original_player;
+                        if (isset($session_robots[$rtoken]['settings'])){ $settings = array_merge($session_robots[$rtoken]['settings'], $settings); }
+                        $session_robots[$rtoken]['settings'] = $settings;
+                    }
+                }
+            }
+        }
+        //error_log('$session_robots = '.print_r($session_robots, true));
+
+        // Start new rewards and settings arrays to populate from stored robots
+        $new_battle_rewards = $this->session_data['values']['battle_rewards'];
+        $new_battle_settings = $this->session_data['values']['battle_settings'];
+
+        // Clear the robots from the battle rewards and settings arrays
+        foreach ($mmrpg_index_players as $ptoken => $pinfo){
+            if (!empty($new_battle_rewards[$ptoken]['player_robots'])){
+                $new_battle_rewards[$ptoken]['player_robots'] = array();
+            }
+            if (!empty($new_battle_settings[$ptoken]['player_robots'])){
+                $new_battle_settings[$ptoken]['player_robots'] = array();
+            }
+        }
+
+        // Loop through master robots, in order, reassigning them to their original owners
+        foreach ($session_robots as $rtoken => $rdata){
+            if (!isset($rdata['settings']['original_player'])){ continue; }
+            else { $ptoken = $rdata['settings']['original_player']; }
+            $rewards = !empty($rdata['rewards']) ? $rdata['rewards'] : array();
+            $settings = !empty($rdata['settings']) ? $rdata['settings'] : array();
+            $new_battle_rewards[$ptoken]['player_robots'][$rtoken] = $rewards;
+            $new_battle_settings[$ptoken]['player_robots'][$rtoken] = $settings;
+        }
+
+        // Reassign the new rewards and settings arrays to the session data
+        $this->session_data['values']['battle_rewards'] = $new_battle_rewards;
+        $this->session_data['values']['battle_settings'] = $new_battle_settings;
+        //error_log('$new_battle_rewards = '.print_r($new_battle_rewards, true));
+        //error_log('$new_battle_settings = '.print_r($new_battle_settings, true));
+
+        // Define a quick, inline function that re-sorts a robot array given it's index position
+        $sort_robots_by_index = function($robots) use ($mmrpg_index_robots){
+            $new_robots = array();
+            foreach ($mmrpg_index_robots AS $token => $info){
+                if (!empty($robots[$token])){ $new_robots[$token] = $robots[$token]; }
+                }
+            return $new_robots;
+            };
+
+        // Loop through players again, but this time re-sort all robots by their index position
+        foreach ($mmrpg_index_players as $ptoken => $info) {
+            // Collect the current rewards and settings for this player
+            $rewards = !empty($this->session_data['values']['battle_rewards'][$ptoken]) ? $this->session_data['values']['battle_rewards'][$ptoken] : array();
+            $settings = !empty($this->session_data['values']['battle_settings'][$ptoken]) ? $this->session_data['values']['battle_settings'][$ptoken] : array();
+            // Loop through this player's robots and re-sort them by their index position
+            $probot_rewards = !empty($rewards['player_robots']) ? $rewards['player_robots'] : array();
+            $probot_settings = !empty($settings['player_robots']) ? $settings['player_robots'] : array();
+            if (empty($probot_rewards) && empty($probot_settings)) { continue; }
+            $probot_rewards = $sort_robots_by_index($probot_rewards);
+            $probot_settings = $sort_robots_by_index($probot_settings);
+            $this->session_data['values']['battle_rewards'][$ptoken]['player_robots'] = $probot_rewards;
+            $this->session_data['values']['battle_settings'][$ptoken]['player_robots'] = $probot_settings;
+        }
+
+        // Export changes to the session data
+        $this->export();
+
+        // Return true on success
+        return true;
+    }
+
 
 
 }
