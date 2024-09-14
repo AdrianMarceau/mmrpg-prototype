@@ -132,6 +132,11 @@ define('MMRPG_SETTINGS_SHOP_ABILITY_PRICE', 1500);  // use as (PRICE * ENERGY)
 define('MMRPG_SETTINGS_SHOP_ROBOT_PRICE', 32000);
 define('MMRPG_SETTINGS_SHOP_FIELD_PRICE', 48000);
 
+// Define the global values for New Game + related stuff
+define('MMRPG_SETTINGS_NEWGAMEPLUS_LEVELBOOST_MIN', 0); // min level added to each chapter mission in NG+
+define('MMRPG_SETTINGS_NEWGAMEPLUS_LEVELBOOST_MAX', 900); // max level added to each chapter mission in NG+
+define('MMRPG_SETTINGS_NEWGAMEPLUS_LEVELBOOST_DEFAULT', 100); // default level added to each chapter mission in NG+
+
 // Define the global comment size limit for characters
 define('MMRPG_SETTINGS_COMMENT_MINLENGTH', 10); // Prevent spam comments
 define('MMRPG_SETTINGS_COMMENT_MAXLENGTH', 5000); // Prevent wordy comments
