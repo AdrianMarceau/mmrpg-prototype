@@ -642,6 +642,55 @@ function mmrpg_trigger_reset(fullReset){
         }
 }
 
+// Define a function to trigger when resetting data
+function mmrpg_trigger_new_game_plus(buttonObject){
+    console.log('mmrpg_trigger_new_game_plus()');
+
+    // Define the confirmation text string
+    var confirmTitle = 'Confirm New Game Plus';
+    confirmTitle = (confirmTitle).toUpperCase() + ' \n';
+    var confirmText = confirmTitle;
+    confirmText += 'Are you sure you want to start a NEW GAME PLUS? \n';
+    confirmText += 'ALL robots will be reboot to level one and ALL mission-related progress will be cleared, BUT you\'ll get to keep everything else \n';
+    confirmText += 'including zenny, items, abilities, stars, etc. \n';
+    confirmText += 'Continue?';
+    var confirmText2 = confirmTitle + 'Let me repeat that one more time. \n';
+    confirmText2 += 'If you start a NEW GAME PLUS then ALL robots will be reboot to level one and ALL mission-related progress will be cleared. \n';
+    confirmText2 += 'Reset anyway?';
+    // Attempt to confirm with the user of they want to reset
+    if (thisReadyRoom){
+        thisReadyRoom.updateRobot('all', {frame: 'damage'});
+        thisReadyRoom.stopAnimation();
+        }
+    //console.log('test confirm text');
+    if (confirm(confirmText) && confirm(confirmText2)){
+        //console.log('confirmed');
+        // Redirect the user to the prototype new-game-plus page
+        var postURL = 'prototype.php?action=new-game-plus';
+        console.log('postURL = ', postURL);
+        $.post(postURL, function(){
+            //alert('new-game-plus complete!');
+            if (thisReadyRoom){
+                thisReadyRoom.updateRobot('all', {frame: 'defend'});
+                }
+            if (window.self != window.parent){
+                window.location = 'prototype.php';
+                } else {
+                window.location = window.location.href;
+                }
+            });
+        return true;
+        } else {
+        //console.log('not confirmed');
+        // Return false
+        if (thisReadyRoom){
+            thisReadyRoom.startAnimation();
+            }
+        return false;
+        }
+
+}
+
 // Define a function for triggering the game's exit function
 function prototype_trigger_exit(thisContext, thisLink){
     // Define the object references
