@@ -2238,8 +2238,10 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             elseif (!empty($this_fieldinfo['field_name'])){ $this_option_button_text = $this_fieldinfo['field_name']; }
             else { $this_option_button_text = 'Battle'; }
 
+
+            $option_level_limit_break = mmrpg_prototype_allow_limit_break() ? true : false;
             if ($this_option_min_level < 1){ $this_option_min_level = 1; }
-            if ($this_option_max_level > 100){ $this_option_max_level = 100; }
+            if ($this_option_max_level > 100 && !$option_level_limit_break){ $this_option_max_level = 100; }
             if ($this_option_min_level > $this_option_max_level){ $this_option_max_level = $this_option_min_level; }
             $this_option_level_range = $this_option_min_level == $this_option_max_level ? 'Level '.$this_option_min_level : 'Levels '.$this_option_min_level.'-'.$this_option_max_level;
 
