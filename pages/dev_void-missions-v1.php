@@ -17,12 +17,12 @@ $this_graph_data['title'] = 'Void Mission Generator V1';
 $this_graph_data['description'] = 'An experimental void mission generator for the MMRPG.';
 
 // Pre-collect the indexes once up here so we don't do it again
-$mmrpg_index_types = rpg_type::get_index();
-$mmrpg_index_players = rpg_player::get_index();
-$mmrpg_index_robots = rpg_robot::get_index();
-$mmrpg_index_abilities = rpg_ability::get_index();
-$mmrpg_index_items = rpg_item::get_index();
-$mmrpg_index_fields = rpg_field::get_index();
+$mmrpg_index_types = rpg_type::get_index(true);
+$mmrpg_index_players = rpg_player::get_index(true);
+$mmrpg_index_robots = rpg_robot::get_index(true);
+$mmrpg_index_abilities = rpg_ability::get_index(true);
+$mmrpg_index_items = rpg_item::get_index(true);
+$mmrpg_index_fields = rpg_field::get_index(true);
 
 ?>
 <div class="header">
@@ -63,6 +63,21 @@ $mmrpg_index_fields = rpg_field::get_index();
     // Start the output buffer to collect generated item markup
     ob_start();
 
+        // Pre-filter the list of items compatible with void recipes for later
+        $mmrpg_index_items_filtered = array();
+        foreach($mmrpg_index_items as $item_token => $item_info){
+            // Skip this item if it's an event item or a special token
+            if (empty($item_info['item_flag_published'])){ continue; }
+            elseif (empty($item_info['item_flag_complete'])){ continue; }
+            elseif (!empty($item_info['item_flag_hidden'])){ continue; }
+            elseif ($item_info['item_subclass'] === 'event'){ continue; }
+            elseif (substr($item_token, -6) === '-shard'){ continue; }
+            elseif (substr($item_token, -5) === '-star'){ continue; }
+            // Otherwise add it to the filtered list of items
+            $mmrpg_index_items_filtered[$item_token] = $item_info;
+        }
+        $mmrpg_index_items = $mmrpg_index_items_filtered;
+
         // TEMP TEMP TEMP (hyper-screw placeholder)
         if (true){
             $copy_from = 'large-screw';
@@ -99,10 +114,6 @@ $mmrpg_index_fields = rpg_field::get_index();
         // Loop through and display a list of all the items available to add to the void
         $elements_html_grouped = array();
         foreach($mmrpg_index_items as $item_token => $item_info){
-            // Skip this item if it's an event item or a special token
-            if ($item_info['item_subclass'] === 'event'){ continue; }
-            elseif (substr($item_token, -6) === '-shard'){ continue; }
-            elseif (substr($item_token, -5) === '-star'){ continue; }
             // Break apart the item token into individual words so we can better determine its group
             $item_tokens = strstr($item_token, '-') ? explode('-', $item_token) : array($item_token);
             if (!isset($item_tokens[1])){ $item_tokens[1] = '';  }
@@ -182,7 +193,70 @@ $mmrpg_index_fields = rpg_field::get_index();
         </div>
         <div class="creation">
             <div class="target-list">
-                <span class="loading">&hellip;</span>
+                <div class="target robot">
+                    <div class="image">
+                        <div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(/images/robots/mega-man/sprite_left_40x40.png);"></div>
+                    </div>
+                    <div class="label">
+                        <strong class="name">Mega Man</strong>
+                    </div>
+                </div>
+                <div class="target mecha">
+                    <div class="image">
+                        <div class="sprite sprite_40x40 sprite_40x40_01" style="background-image: url(/images/robots/met/sprite_left_40x40.png);"></div>
+                    </div>
+                    <div class="label">
+                        <strong class="name">Met</strong>
+                    </div>
+                </div>
+                <div class="target boss">
+                    <div class="image">
+                        <div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(/images/robots/enker/sprite_left_80x80.png);"></div>
+                    </div>
+                    <div class="label">
+                        <strong class="name">Enker</strong>
+                    </div>
+                </div>
+                <div class="target boss">
+                    <div class="image">
+                        <div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(/images/robots/hyper-storm-h/sprite_left_80x80.png);"></div>
+                    </div>
+                    <div class="label">
+                        <strong class="name">Hyper Storm H</strong>
+                    </div>
+                </div>
+                <div class="target frag">
+                    <div class="image">
+                        <div class="sprite sprite_40x40 sprite_40x40_04" style="background-image: url(/images/robots/dark-frag/sprite_left_40x40.png);"></div>
+                    </div>
+                    <div class="label">
+                        <strong class="name">Dark Frag</strong>
+                    </div>
+                </div>
+                <div class="target frag">
+                    <div class="image">
+                        <div class="sprite sprite_40x40 sprite_40x40_04" style="background-image: url(/images/robots/dark-frag/sprite_left_40x40.png);"></div>
+                    </div>
+                    <div class="label">
+                        <strong class="name">Dark Frag</strong>
+                    </div>
+                </div>
+                <div class="target frag">
+                    <div class="image">
+                        <div class="sprite sprite_40x40 sprite_40x40_04" style="background-image: url(/images/robots/dark-frag/sprite_left_40x40.png);"></div>
+                    </div>
+                    <div class="label">
+                        <strong class="name">Dark Frag</strong>
+                    </div>
+                </div>
+                <div class="target frag">
+                    <div class="image">
+                        <div class="sprite sprite_40x40 sprite_40x40_04" style="background-image: url(/images/robots/dark-frag/sprite_left_40x40.png);"></div>
+                    </div>
+                    <div class="label">
+                        <strong class="name">Dark Frag</strong>
+                    </div>
+                </div>
             </div>
             <div class="mission-details">
                 <span class="loading">&hellip;</span>
@@ -220,6 +294,7 @@ $mmrpg_index_fields = rpg_field::get_index();
 <? ob_start(); ?>
 <style type="text/css">
 
+    /* -- PARENT PAGE STYLES -- */
 
     #window .page .subbody .legend {
         display: block;
@@ -234,6 +309,8 @@ $mmrpg_index_fields = rpg_field::get_index();
         margin-bottom: 20px;
     }
 
+    /* -- VOID RECIPE CALCULATOR -- */
+
     #void-recipe {
         display: block;
         box-sizing: border-box;
@@ -246,6 +323,9 @@ $mmrpg_index_fields = rpg_field::get_index();
         margin: 0 auto;
         box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
     }
+
+    /* -- BASIC STRUCTURES -- */
+
     #void-recipe .title,
     #void-recipe .creation,
     #void-recipe .selection,
@@ -287,6 +367,7 @@ $mmrpg_index_fields = rpg_field::get_index();
     }
 
     #void-recipe .title {
+
     }
     #void-recipe .title strong {
         display: block;
@@ -301,6 +382,7 @@ $mmrpg_index_fields = rpg_field::get_index();
         line-height: 16px;
         text-align: center;
     }
+
     #void-recipe .creation:before,
     #void-recipe .selection:before,
     #void-recipe .palette:before {
@@ -348,6 +430,8 @@ $mmrpg_index_fields = rpg_field::get_index();
         top: 16px;
     }
 
+    /* -- ITEM LISTS -- */
+
     #void-recipe .item-list {
         display: block;
         margin: 0 auto;
@@ -381,6 +465,8 @@ $mmrpg_index_fields = rpg_field::get_index();
         height: 100%;
         padding: 6px;
     }
+
+    /* -- ITEM LIST || ITEMS -- */
 
     #void-recipe .item-list .item {
         display: block;
@@ -544,6 +630,8 @@ $mmrpg_index_fields = rpg_field::get_index();
         transform: translate(0, -2px);
     }
 
+    /* -- ITEM LIST || GROUPS -- */
+
     #void-recipe .item-list .group {
         display: block;
         width: auto;
@@ -634,6 +722,233 @@ $mmrpg_index_fields = rpg_field::get_index();
         width: calc(((54px) + 4px) * 5);
     }
 
+    /* -- SELECTION || ITEM LIST & BUTTONS -- */
+
+    #void-recipe .selection {
+
+    }
+    #void-recipe .selection .item-list {
+
+    }
+    #void-recipe .selection .item-list .item {
+        transform: translate(0, 0);
+    }
+    #void-recipe .selection .item-list .item .icon {
+        transform: translate(0, 0) scale(2.0);
+    }
+
+    #void-recipe .selection .item-list .item.recent {
+        transform: scale(1.0);
+        animation: void-recipe-item-recent 0.5s;
+    }
+    @keyframes void-recipe-item-recent {
+        0% { transform: scale(1.0); }
+        50% { transform: scale(1.4); }
+        100% { transform: scale(1.0); }
+    }
+
+    #void-recipe .selection .reset {
+        display: block;
+        position: absolute;
+        z-index: 30;
+        top: 0;
+        right: 0;
+        width: 24px;
+        height: 24px;
+        font-size: 18px;
+        line-height: 24px;
+        text-align: center;
+        vertical-align: middle;
+        color: #a1a1a1;
+        cursor: pointer;
+        transform: scale(1.0);
+        transition: transform 0.2s, color 0.2s;
+    }
+    #void-recipe .selection .reset:hover {
+        transform: scale(1.2);
+        color: #efefef;
+    }
+    #void-recipe .selection .reset > i {
+        display: block;
+        margin: 0;
+    }
+    #void-recipe .selection .reset:not(.visible) {
+        pointer-events: none;
+        display: none;
+    }
+
+    /* -- CREATION || TARGET LIST & MISSION DETAILS -- */
+
+    #void-recipe .creation {
+        border-radius: 6px;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+    }
+    #void-recipe .creation .target-list,
+    #void-recipe .creation .mission-details {
+        display: block;
+        margin: 0 auto;
+        width: auto;
+        height: auto;
+        min-width: 180px;
+        min-height: 50px;
+        position: relative;
+        overflow: visible;
+        border: 1px solid #1A1A1A;
+        border-radius: 6px;
+    }
+
+    #void-recipe .creation .target-list {
+        height: 80px;
+        border-radius: 6px 6px 0 0;
+        border-bottom: 0;
+        text-align: center;
+        vertical-align: middle;
+    }
+    #void-recipe .creation .target-list .target {
+        display: inline-block;
+        position: relative;
+        box-sizing: border-box;
+        text-align: center;
+        vertical-align: middle;
+        margin: 6px;
+        padding: 0;
+        width: 60px;
+        height: 60px;
+        width: calc((100% / 9) - 12px);
+        height: calc(100% - 12px);
+        border-radius: 3px;
+        text-align: center;
+        background-color: #2d2c39;
+        /* background-color: rgba(255, 0, 100, 0.1);  */
+    }
+    #void-recipe .creation .target-list .target .image {
+        display: block;
+        position: absolute;
+        z-index: 3;
+        width: 40px;
+        height: 40px;
+        bottom: 14px;
+        left: 50%;
+        transform: translate(-50%, 0);
+        /* background-color: rgba(100, 0, 255, 0.1);  */
+    }
+    #void-recipe .creation .target-list .target .label {
+        display: block;
+        position: absolute;
+        z-index: 1;
+        width: 100%;
+        height: auto;
+        bottom: 0;
+        left: 50%;
+        transform: translate(-50%, 0);
+        font-size: 9px;
+        line-height: 13px;
+        background-color: #22222b;
+        /* background-color: rgba(100, 100, 0, 0.1); */
+    }
+    #void-recipe .creation .target-list .target .label .name {
+        display: block;
+        margin: 0 auto;
+        width: 90%;
+        width: calc(100% - 8px);
+        font-size: inherit;
+        line-height: inherit;
+        font-weight: normal;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    #void-recipe .creation .target-list .target .image .sprite {
+        display: block;
+        position: relative;
+        margin: 0;
+        top: 0;
+        left: 0;
+        /* background-color: rgba(0, 200, 100, 0.1);  */
+    }
+    #void-recipe .creation .target-list .target .image .sprite_40x40 {
+        top: 0;
+        left: 0;
+    }
+    #void-recipe .creation .target-list .target .image .sprite_80x80 {
+        top: -40px;
+        left: -20px;
+    }
+    #void-recipe .creation .target-list .target .image .sprite_160x160 {
+        top: -80px;
+        left: -40px;
+    }
+
+    #void-recipe .creation .mission-details {
+        height: 60px;
+        border-radius: 0 0 6px 6px;
+        border-top: 0;
+    }
+    #void-recipe .creation .mission-details .powers-list {
+        display: block;
+        width: auto;
+    }
+    #void-recipe .creation .mission-details .powers-list ul {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+        padding: 3px;
+        font-size: 11px;
+        line-height: 13px;
+        color: #efefef;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li {
+        display: block;
+        box-sizing: border-box;
+        float: left;
+        width: calc(100% / 5);
+        text-align: center;
+        padding: 2px 3px 3px;
+    }
+    #void-recipe .creation .mission-details .powers-list ul:after,
+    #void-recipe .creation .mission-details .powers-list ul li:after {
+        content: "";
+        display: block;
+        clear: both;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.02);
+    }
+    #void-recipe .creation .mission-details .powers-list ul li .token,
+    #void-recipe .creation .mission-details .powers-list ul li .value {
+        display: inline-block;
+        margin: 0 4px;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li .token {
+        text-decoration: underline;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li .value {
+        font-weight: bold;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li .value .overflow {
+        display: inline-block;
+        margin-left: 4px;
+        opacity: 0.4;
+        font-weight: normal;
+    }
+
+    /* -- PANEL & GROUP COLORS -- */
+
+    #void-recipe .creation .target-list {
+        background-color: #292834;
+    }
+    #void-recipe .creation .mission-details {
+        background-color: #2d2c3a;
+    }
+    #void-recipe .selection .item-list {
+        background-color: #25232e;
+    }
+    #void-recipe .palette .item-list {
+        background-color: #353144;
+    }
+
     #void-recipe .item-list .group.screws {
         /* speed purple  */
         /* border-color: rgb(105, 87, 117);  */
@@ -701,132 +1016,6 @@ $mmrpg_index_fields = rpg_field::get_index();
         background-color: #883030; /* flame red  */
     }
 
-    #void-recipe .selection {
-
-    }
-    #void-recipe .selection .item-list {
-
-    }
-    #void-recipe .selection .item-list .item {
-        transform: translate(0, 0);
-    }
-    #void-recipe .selection .item-list .item .icon {
-        transform: translate(0, 0) scale(2.0);
-    }
-
-    #void-recipe .selection .item-list .item.recent {
-        transform: scale(1.0);
-        animation: void-recipe-item-recent 0.5s;
-    }
-    @keyframes void-recipe-item-recent {
-        0% { transform: scale(1.0); }
-        50% { transform: scale(1.4); }
-        100% { transform: scale(1.0); }
-    }
-
-    #void-recipe .selection .reset {
-        display: block;
-        position: absolute;
-        z-index: 30;
-        top: 0;
-        right: 0;
-        width: 24px;
-        height: 24px;
-        font-size: 18px;
-        line-height: 24px;
-        text-align: center;
-        vertical-align: middle;
-        color: #a1a1a1;
-        cursor: pointer;
-        transform: scale(1.0);
-        transition: transform 0.2s, color 0.2s;
-    }
-    #void-recipe .selection .reset:hover {
-        transform: scale(1.2);
-        color: #efefef;
-    }
-    #void-recipe .selection .reset > i {
-        display: block;
-        margin: 0;
-    }
-    #void-recipe .selection .reset:not(.visible) {
-        pointer-events: none;
-        display: none;
-    }
-
-
-    #void-recipe .creation {
-        border-radius: 6px;
-        box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
-    }
-    #void-recipe .creation .target-list,
-    #void-recipe .creation .mission-details {
-        display: block;
-        margin: 0 auto;
-        width: auto;
-        height: auto;
-        min-width: 180px;
-        min-height: 50px;
-        position: relative;
-        overflow: visible;
-        border: 1px solid #1A1A1A;
-        border-radius: 6px;
-    }
-    #void-recipe .creation .target-list {
-        height: 60px;
-        border-radius: 6px 6px 0 0;
-        border-bottom: 0;
-    }
-    #void-recipe .creation .mission-details {
-        height: 80px;
-        border-radius: 0 0 6px 6px;
-        border-top: 0;
-    }
-    #void-recipe .creation .mission-details .powers-list {
-        display: block;
-        width: auto;
-    }
-    #void-recipe .creation .mission-details .powers-list ul {
-        display: block;
-        box-sizing: border-box;
-        width: 100%;
-        height: 100%;
-        margin: 0 auto;
-        padding: 6px;
-        font-size: 11px;
-        line-height: 16px;
-        color: #efefef;
-    }
-    #void-recipe .creation .mission-details .powers-list ul:after {
-        content: "";
-        display: block;
-        clear: both;
-    }
-    #void-recipe .creation .mission-details .powers-list ul li {
-        display: block;
-        box-sizing: border-box;
-        float: left;
-        width: calc(100% / 5);
-        text-align: center;
-        padding: 0 4px 4px 0;
-    }
-    #void-recipe .creation .mission-details .powers-list ul li:nth-child(odd) {
-        background-color: rgba(255, 255, 255, 0.02);
-    }
-
-    #void-recipe .creation .target-list {
-        background-color: #292834;
-    }
-    #void-recipe .creation .mission-details {
-        background-color: #2d2c3a;
-    }
-    #void-recipe .selection .item-list {
-        background-color: #25232e;
-    }
-    #void-recipe .palette .item-list {
-        background-color: #353144;
-    }
-
 
 </style>
 <? $website_include_stylesheets .= ob_get_clean(); ?>
@@ -864,12 +1053,13 @@ $mmrpg_index_fields = rpg_field::get_index();
                 // Create a VOID RECIPE WIZARD so we can easily add/remove and recalculate on-the-stop
                 var voidRecipeWizard = {
                     init: function($container){
-                        console.log('voidRecipeWizard.init()');
+                        console.log('%c' + 'voidRecipeWizard.init()', 'color: magenta;');
                         //console.log('-> w/ $container:', typeof $container, $container.length, $container);
                         var _self = this;
                         _self.name = 'voidRecipeWizard';
                         _self.version = '1.0.0';
                         _self.maxItems = 10;
+                        _self.maxTargets = 8;
                         _self.reset(false);
                         _self.setup($container);
                         _self.recalculate();
@@ -879,7 +1069,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                         // end of voidRecipeWizard.init()
                         },
                     reset: function(refresh){
-                        console.log('voidRecipeWizard.reset()');
+                        console.log('%c' + 'voidRecipeWizard.reset()', 'color: magenta;');
                         if (typeof refresh === 'undefined'){ refresh = true; }
                         var _self = this;
                         _self.items = {};
@@ -893,7 +1083,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                         // end of voidRecipeWizard.reset()
                         },
                     setup: function($container){
-                        console.log('voidRecipeWizard.setup()');
+                        console.log('%c' + 'voidRecipeWizard.setup()', 'color: magenta;');
                         //console.log('-> w/ $container:', typeof $container, $container.length, $container);
 
                         // Backup a reference to the parent object
@@ -972,7 +1162,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                         // end of voidRecipeWizard.setup()
                         },
                     recalculate: function(){
-                        console.log('voidRecipeWizard.recalculate()');
+                        console.log('%c' + 'voidRecipeWizard.recalculate()', 'color: magenta;');
 
                         // Backup a reference to the parent object
                         var _self = this;
@@ -1010,6 +1200,18 @@ $mmrpg_index_fields = rpg_field::get_index();
                             //for (var j = 0; j < itemQuantity; j++){ }
                             }
 
+                        // Ensure the quanta is always at least zero if there are items present
+                        if (voidItemsTokens.length
+                            && voidPowers.powers.quanta < 0){
+                            voidPowers.powers.quanta = 0;
+                            }
+
+                        // Ensure the spread always within range when there are items present
+                        if (voidItemsTokens.length
+                            && voidPowers.powers.spread < 1){
+                            voidPowers.powers.spread = 1;
+                            }
+
                         //console.log('voidPowers have been updated!');
                         _self.powers = {};
                         var voidPowersList = voidPowers.getPowers();
@@ -1025,15 +1227,97 @@ $mmrpg_index_fields = rpg_field::get_index();
                         // end of voidRecipeWizard.recalculate()
                         },
                     regenerate: function(){
-                        console.log('voidRecipeWizard.regenerate()');
+                        console.log('%c' + 'voidRecipeWizard.regenerate()', 'color: magenta;');
 
                         // Backup a reference to the parent object
                         var _self = this;
 
+                        // Collect reference to the void powers so we can reference them
+                        var voidPowersList = _self.powers;
+                        var voidPowersKeys = Object.keys(voidPowersList);
+
+                        // If we don't have any powers, we can't generate anything
+                        if (!voidPowersKeys.length){
+                            //console.log('%c' + '-> no powers to generate from!', 'color: orange;');
+                            return;
+                            }
+
+                        // Collect the base amounts of quanta and spread for later reference
+                        var baseQuanta = voidPowersList['quanta'] || 0;
+                        var baseSpread = voidPowersList['spread'] || 0;
+                        console.log('-> baseQuanta:', baseQuanta, 'baseSpread:', baseSpread);
+
+                        // Likewise if we don't have any quanta material or a defined spread limit, we can't generate either
+                        if (baseQuanta < 1 || baseSpread < 1){
+                            if (baseQuanta < 1 && baseSpread < 1){
+                                console.log('%c' + '-> no quanta materia nor spread limit to generate from!', 'color: red;');
+                                } else if (baseQuanta < 1){
+                                console.log('%c' + '-> no quanta materia to generate with!', 'color: red;');
+                                } else if (baseSpread < 1){
+                                console.log('%c' + '-> no spread limit to generate within!', 'color: red;');
+                                }
+                            return;
+                            }
+
+                        // First we set-up the different target slots given quanta vs spread
+                        var numTargetSlots = baseSpread >= _self.maxTargets ? _self.maxTargets : (baseSpread < 1 ? 1 : Math.trunc(baseSpread));
+                        var maxQuantaPerTarget = Math.round(baseQuanta / numTargetSlots);
+                        var minQuantaRemaining = baseQuanta % numTargetSlots;
+                        console.log('-> numTargetSlots:', numTargetSlots, 'maxQuantaPerTarget:', maxQuantaPerTarget, 'minQuantaRemaining:', minQuantaRemaining);
+
+                        // Use calculated quanta-per-target to set-up the different target slots
+                        var missionTargets = [];
+                        var quantaUsedSoFar = 0;
+                        var quantaRemaining = baseQuanta;
+                        for (var slotKey = 0; slotKey < numTargetSlots; slotKey++){
+                            console.log('--> calculating slotKey:', slotKey);
+                            var targetRobot = {};
+                            var targetClass = '';
+                            var targetQuanta = maxQuantaPerTarget;
+                            if (targetQuanta >= 500){ targetClass = 'boss'; targetQuanta = 500; }
+                            else if (targetQuanta >= 50){ targetClass = 'master'; targetQuanta = 50; }
+                            else if (targetQuanta >= 25){ targetClass = 'mecha'; targetQuanta = 25; }
+                            targetRobot.token = '';
+                            targetRobot.class = targetClass;
+                            targetRobot.quanta = targetQuanta;
+                            targetRobot.level = 1;
+                            if (targetClass.length){
+                                // TEMP TEMP TEMP (placeholder robots)
+                                if (targetClass === 'mecha'){ targetRobot.token = 'met'; }
+                                if (targetClass === 'master'){ targetRobot.token = 'mega-man'; }
+                                if (targetClass === 'boss'){ targetRobot.token = 'enker'; }
+                                // TEMP TEMP TEMP (placeholder robots)
+                                } else {
+                                targetRobot.token = 'dark-frag';
+                                targetRobot.class = 'mecha';
+                                }
+
+                            // Add the target robot to the mission targets list
+                            missionTargets.push(targetRobot);
+
+                            quantaUsedSoFar += targetQuanta;
+                            quantaRemaining -= targetQuanta;
+                            console.log('--> quantaUsedSoFar:', quantaUsedSoFar);
+                            console.log('--> quantaRemaining:', quantaRemaining);
+                            }
+
+                        // DEBUG DEBUG DEBUG
+                        console.log('-> missionTargets:', missionTargets.length);
+                        for (var i = 0; i < missionTargets.length; i++){
+                            var targetRobot = missionTargets[i];
+                            console.log('--> missionTargets['+i+']:', targetRobot);
+                            }
+                        console.log('-> quantaRemaining:', quantaRemaining);
+                        // DEBUG DEBUG DEBUG
+
+                        // Update the mission details with the new targets
+                        _self.mission = {};
+                        _self.mission.targets = missionTargets;
+
                         // end of voidRecipeWizard.regenerate()
                         },
                     refresh: function(){
-                        console.log('voidRecipeWizard.refresh()');
+                        console.log('%c' + 'voidRecipeWizard.refresh()', 'color: magenta;');
 
                         // Backup a reference to the parent object
                         var _self = this;
@@ -1045,6 +1329,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                         var $itemsPalette = _self.xrefs.itemsPalette;
                         var $resetButton = _self.xrefs.resetButton;
                         var $missionDetails = _self.xrefs.missionDetails;
+                        var $targetList = _self.xrefs.missionTargets;
 
                         // Check to see which was the last item token added
                         var lastItemToken = '';
@@ -1135,9 +1420,35 @@ $mmrpg_index_fields = rpg_field::get_index();
                                 for (var i = 0; i < voidPowersKeys.length; i++){
                                     var powerToken = voidPowersKeys[i];
                                     var powerValue = voidPowers[powerToken];
+                                    if (powerToken === ''){ continue; }
+                                    if (powerValue === 0){ continue; }
+                                    // format the power value differently per kind
+                                    var powerValueText = '';
+                                    if (powerToken === 'delta'){
+                                        // unsigned, fine as-is
+                                        powerValueText = '' + powerValue;
+                                        }
+                                    else if (powerToken === 'quanta'){
+                                        // quantity so use the times symbol
+                                        powerValueText = '&times;' + powerValue;
+                                        }
+                                    else if (powerToken === 'spread'){
+                                        // unsigned, but must stay within limit, so truncate
+                                        // also make sure overflow is visible for the tooltip
+                                        var scopedValue = roundedValue = Math.trunc(powerValue), overflow = 0;
+                                        if (scopedValue > _self.maxTargets){ scopedValue = _self.maxTargets; }
+                                        if (roundedValue > scopedValue){ overflow = roundedValue - scopedValue; }
+                                        powerValueText = '&times;' + scopedValue + (overflow ? ' <span class="overflow">(&plus;' + overflow + ')</span>' : '');
+                                        }
+                                    else {
+                                        // signed, so display the correct one
+                                        var roundedValue = Math.round(powerValue);
+                                        powerValueText = (roundedValue > 0 ? '&plus;' : '&minus;') + Math.abs(roundedValue);
+                                        }
+                                    // add the power to the list
                                     powersListMarkup += '<li class="power">';
                                         powersListMarkup += '<span class="token">'+powerToken+'</span> ';
-                                        powersListMarkup += '<span class="value">'+(powerValue > 0 ? '+' : '')+(powerValue)+'</span>';
+                                        powersListMarkup += '<span class="value">'+powerValueText+'</span>';
                                     powersListMarkup += '</li>';
                                     }
                                 powersListMarkup += '</ul>';
@@ -1147,10 +1458,45 @@ $mmrpg_index_fields = rpg_field::get_index();
                             $missionDetails.append('<span class="loading">&hellip;</span>');
                             }
 
+                        // Update the list of target robots in the panel if any have been generated
+                        var missionInfo = _self.mission;
+                        var missionTargets = missionInfo.targets || [];
+                        $targetList.html('');
+                        if (missionTargets.length){
+                            console.log('updating mission target list!', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
+                            for (var i = 0; i < missionTargets.length; i++){
+                                var targetRobot = missionTargets[i];
+                                console.log('-> targetRobot:', targetRobot);
+                                var targetRobotToken = targetRobot.token;
+                                var targetRobotInfo = mmrpgIndex.robots[targetRobotToken] || false;
+                                if (!targetRobotInfo){ continue; }
+                                var targetRobotClass = targetRobot.class;
+                                var targetRobotQuanta = targetRobot.quanta;
+                                var targetRobotLevel = targetRobot.level;
+                                var targetRobotName = targetRobotInfo['robot_name'] || targetRobotToken;
+                                var targetRobotImage = targetRobotInfo['robot_image'] || targetRobotToken;
+                                var targetRobotImageSize = targetRobotInfo['robot_image_size'] || 40;
+                                var targetRobotImageSizeX = targetRobotImageSize + 'x' + targetRobotImageSize;
+                                var targetRobotSprite = '/images/robots/'+targetRobotImage+'/sprite_left_'+targetRobotImageSizeX+'.png?'+gameSettings.cacheTime;
+                                var targetRobotMarkup = '<div class="target">';
+                                    targetRobotMarkup += '<div class="image">';
+                                        targetRobotMarkup += '<div class="sprite sprite_'+targetRobotImageSizeX+' sprite_'+targetRobotImageSizeX+'_00" style="background-image: url('+targetRobotSprite+');">'+targetRobotName+'</div>';
+                                    targetRobotMarkup += '</div>';
+                                    targetRobotMarkup += '<div class="label">';
+                                        targetRobotMarkup += '<span class="name">'+targetRobotName+'</span>';
+                                    targetRobotMarkup += '</div>';
+                                targetRobotMarkup += '</div>';
+                                $targetList.append(targetRobotMarkup);
+                                }
+                            } else {
+                            $targetList.append('<span class="loading">&hellip;</span>');
+                            }
+
                         // end of voidRecipeWizard.refresh()
                         },
                     addItem: function(item){
-                        //console.log('voidRecipeWizard.addItem()', item);
+                        console.log('%c' + 'voidRecipeWizard.addItem()', 'color: magenta;');
+                        console.log('-> w/ item:', item);
                         var _self = this;
                         var token = item.token;
                         var existing = Object.keys(_self.items).length;
@@ -1165,12 +1511,14 @@ $mmrpg_index_fields = rpg_field::get_index();
                         // end of voidRecipeWizard.addItem()
                         },
                     removeItem: function(item){
-                        //console.log('voidRecipeWizard.removeItem()', item);
+                        console.log('%c' + 'voidRecipeWizard.removeItem()', 'color: magenta;');
+                        console.log('-> w/ item:', item);
                         var _self = this;
                         var token = item.token;
                         var exists = Object.keys(_self.items).indexOf(token) >= 0;
                         if (!exists){ return; }
                         _self.items[token] -= 1;
+                        if (_self.items[token] <= 0){ delete _self.items[token]; }
                         _self.history.push({ token: token, action: 'remove' });
                         _self.recalculate();
                         _self.regenerate();
@@ -1178,7 +1526,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                         // end of voidRecipeWizard.removeItem()
                         },
                     parseItem: function(item, quantity, powers){
-                        console.log('voidRecipeWizard.parseItem()');
+                        console.log('%c' + 'voidRecipeWizard.parseItem()', 'color: magenta;');
                         console.log('-> w/ item:', item, 'quantity:', quantity, 'powers:', powers);
 
                         // Backup a reference to the parent object
@@ -1221,33 +1569,42 @@ $mmrpg_index_fields = rpg_field::get_index();
                         // -- CYBER SCREWS w/ QUANTA + SPREAD
                         if (itemIsScrew){
                             var quanta = 0, spread = 0;
-                            if (itemIsSmall){ quanta = 1.0, spread = 0.25; }
-                            else if (itemIsLarge){ quanta = 10.0, spread = 0.50; }
-                            else if (itemIsHyper){ quanta = 100.0, spread = 0.75; }
+                            if (itemIsSmall){ quanta = 5.0, spread = 0.15; }
+                            else if (itemIsLarge){ quanta = 10.0, spread = 0.25; }
+                            else if (itemIsHyper){ quanta = 100.0, spread = 0.35; }
                             powers.incPower('quanta', quanta * quantity);
                             powers.incPower('spread', spread * quantity);
-                            }
-                        // -- ELEMENTAL CORES w/ ~QUANTA + ^SPREAD [+ TYPES]
-                        else if (itemIsCore){
-                            var typeToken = itemPrefix;
-                            var quanta = 0.1, spread = 1.0, typeValue = 5.0;
-                            powers.incPower('quanta', quanta * quantity);
-                            powers.incPower('spread', spread * quantity);
-                            powers.incPower(typeToken, typeValue * quantity);
                             }
                         // -- PELLETS & CAPSULES w/ ^QUANTA + ~SPREAD [+ STATS]
                         else if (itemIsPellet || itemIsCapsule){
                             var statToken = itemPrefix;
-                            var statTokens = !itemIsSuper ? [statToken] : ['attack', 'defense', 'speed'];
-                            var quanta = (!itemIsSuper ? (itemIsPellet ? 4.0 : 9.0) : (itemIsPellet ? 2.0 : 5.0));
-                            var spread = (!itemIsSuper ? (itemIsPellet ? 0.2 : 0.5) : (itemIsPellet ? 0.3 : 0.9));
+                            if (!itemIsSuper){
+                                var quanta = (itemIsPellet ? 4.0 : 0) + (itemIsCapsule ? 9.0 : 0);
+                                var spread = (itemIsPellet ? 0.1 : 0) + (itemIsCapsule ? 0.2 : 0);
+                                var statValue = (itemIsPellet ? 2.0 : 0) + (itemIsCapsule ? 5.0 : 0);
+                                powers.incPower('quanta', quanta * quantity);
+                                powers.incPower('spread', spread * quantity);
+                                powers.incPower(statToken, statValue * quantity);
+                                } else {
+                                var statTokens = !itemIsSuper ? [statToken] : ['attack', 'defense', 'speed'];
+                                var quanta = (itemIsPellet ? 5.0 : 0) + (itemIsCapsule ? 10.0 : 0);
+                                var spread = (itemIsPellet ? 0.2 : 0) + (itemIsCapsule ? 0.4 : 0);
+                                powers.incPower('quanta', quanta * quantity);
+                                powers.incPower('spread', spread * quantity);
+                                for (var j = 0; j < statTokens.length; j++){
+                                    var subStatToken = statTokens[j];
+                                    var subStatValue = (itemIsPellet ? 1.0 : 0) + (itemIsCapsule ? 2.5 : 0);
+                                    powers.incPower(subStatToken, subStatValue * quantity);
+                                    }
+                                }
+                            }
+                        // -- ELEMENTAL CORES w/ ~QUANTA + ^SPREAD [+ TYPES]
+                        else if (itemIsCore){
+                            var typeToken = itemPrefix;
+                            var quanta = 1.0, spread = 0.6, typeValue = 5.0;
                             powers.incPower('quanta', quanta * quantity);
                             powers.incPower('spread', spread * quantity);
-                            for (var j = 0; j < statTokens.length; j++){
-                                var subStatToken = statTokens[j];
-                                var subStatValue = (!itemIsSuper ? (itemIsPellet ? 2 : 5) : (itemIsPellet ? 1 : 3));
-                                powers.incPower(subStatToken, subStatValue * quantity);
-                                }
+                            powers.incPower(typeToken, typeValue * quantity);
                             }
 
                         // -- TANKS & UPGRADES & MYTHICS w/ LEVEL + FORTE [+ ~STATS]
@@ -1291,13 +1648,13 @@ $mmrpg_index_fields = rpg_field::get_index();
 
                         // -- MODULE ITEMS w/ SPECIAL EFFECTS
                         else if (itemIsModule){
-                            if (itemPrefix === 'target'){
-                                var spread = 1.0;
-                                powers.incPower('spread', spread * quantity);
-                                }
-                            else if (itemPrefix === 'charge'){
-                                var quanta = 50;
+                            if (itemPrefix === 'charge'){
+                                var quanta = powers.getPower('quanta') * 1.00;
                                 powers.incPower('quanta', quanta * quantity);
+                                }
+                            else if (itemPrefix === 'target'){
+                                var spread = 1.00;
+                                powers.decPower('spread', spread * quantity);
                                 }
                             else if (itemPrefix === 'growth'){
                                 var effort = 1;
@@ -1323,6 +1680,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                     };
 
                 // Initialize the void recipe calculator
+                console.log('%c' + 'Initializing the voidRecipeWizard()', 'color: green;');
                 voidRecipeWizard.init($voidRecipeWizard);
 
                 })();
