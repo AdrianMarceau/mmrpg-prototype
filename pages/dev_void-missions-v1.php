@@ -882,8 +882,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                         console.log('voidRecipeWizard.reset()');
                         if (typeof refresh === 'undefined'){ refresh = true; }
                         var _self = this;
-                        _self.items = [];
-                        _self.values = {};
+                        _self.items = {};
                         _self.powers = {};
                         _self.mission = {};
                         _self.history = [];
@@ -902,8 +901,8 @@ $mmrpg_index_fields = rpg_field::get_index();
 
                         // Predefine some parent variables for the class
                         _self.xrefs = {};
-                        _self.items = [];
-                        _self.values = {};
+                        _self.items = {};
+                        _self.powers = {};
                         _self.mission = {};
                         _self.history = [];
 
@@ -945,7 +944,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                             //console.log('item clicked:', $item);
                             //console.log('item details:', itemInfo);
                             if (itemQuantity <= 0){ return; }
-                            _self.add(itemInfo);
+                            _self.addItem(itemInfo);
                             });
 
                         // Bind REMOVE ITEM click events to the selection area's item list buttons
@@ -960,7 +959,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                             var itemInfo = {token: itemToken, group: itemGroup, quantity: itemQuantity, index: itemIndex};
                             //console.log('item clicked:', $item);
                             //console.log('item details:', itemInfo);
-                            _self.remove(itemInfo);
+                            _self.removeItem(itemInfo);
                             });
 
                         // Bind RESET ITEMS click events to the selection area's reset button
@@ -972,32 +971,6 @@ $mmrpg_index_fields = rpg_field::get_index();
 
                         // end of voidRecipeWizard.setup()
                         },
-                    add: function(item){
-                        //console.log('voidRecipeWizard.add()', item);
-                        var _self = this;
-                        var token = item.token;
-                        var exists = Object.keys(_self.values.added).indexOf(token) >= 0;
-                        var existing = Object.keys(_self.values.added).length;
-                        if (!exists && existing >= _self.maxItems){ return; }
-                        _self.items.push(token);
-                        _self.history.push({ token: token, action: 'add' });
-                        _self.recalculate();
-                        _self.regenerate();
-                        _self.refresh();
-                        // end of voidRecipeWizard.add()
-                        },
-                    remove: function(item){
-                        //console.log('voidRecipeWizard.remove()', item);
-                        var _self = this;
-                        var token = item.token;
-                        var index = this.items.lastIndexOf(token);
-                        _self.items.splice(index, 1);
-                        _self.history.push({ token: token, action: 'remove' });
-                        _self.recalculate();
-                        _self.regenerate();
-                        _self.refresh();
-                        // end of voidRecipeWizard.remove()
-                        },
                     recalculate: function(){
                         console.log('voidRecipeWizard.recalculate()');
 
@@ -1006,12 +979,6 @@ $mmrpg_index_fields = rpg_field::get_index();
 
                         // Collect a reference to the void values object and reset
                         var voidItems = _self.items;
-                        var voidValues = _self.values;
-                        voidValues.added = {};
-                        voidValues.classes = {};
-                        voidValues.types = {};
-                        voidValues.stats = {};
-                        voidValues.shift = 0;
 
                         // Define a variable to hold the calculated powers of all the items
                         var voidPowers = {};
@@ -1035,147 +1002,12 @@ $mmrpg_index_fields = rpg_field::get_index();
                         voidPowers.flags.extreme = false;
 
                         // Loop through all the items, one-by-one, and parse their intrinsic values
-                        for (var i = 0; i < voidItems.length; i++){
-
-                            // Collect the item token and then also break it apart for reference
-                            var itemToken = voidItems[i];
-                            var itemTokens = itemToken.split('-');
-                            var itemPrefix = itemTokens[0] || '';
-                            var itemSuffix = itemTokens[1] || '';
-                            var itemIsSmall = itemPrefix === 'small';
-                            var itemIsLarge = itemPrefix === 'large';
-                            var itemIsHyper = itemPrefix === 'hyper';
-                            var itemIsEnergy = itemPrefix === 'energy';
-                            var itemIsWeapons = itemPrefix === 'weapons';
-                            var itemIsAttack = itemPrefix === 'attack';
-                            var itemIsDefense = itemPrefix === 'defense';
-                            var itemIsSpeed = itemPrefix === 'speed';
-                            var itemIsSuper = itemPrefix === 'super';
-                            var itemIsScrew = itemSuffix === 'screw';
-                            var itemIsShard = itemSuffix === 'shard';
-                            var itemIsCore = itemSuffix === 'core';
-                            var itemIsPellet = itemSuffix === 'pellet';
-                            var itemIsCapsule = itemSuffix === 'capsule';
-                            var itemIsTank = itemSuffix === 'tank';
-                            var itemIsUpgrade = itemSuffix === 'upgrade';
-                            var itemIsBooster = itemSuffix === 'booster';
-                            var itemIsDiverter = itemSuffix === 'diverter';
-                            var itemIsModule = itemSuffix === 'module';
-                            var itemIsCircuit = itemSuffix === 'circuit';
-                            var itemIsMythic = false;
-                            if (itemToken === 'extra-life'){ itemIsEnergy = true; itemIsMythic = true; }
-                            if (itemToken === 'yashichi'){ itemIsWeapons = true; itemIsMythic = true; }
-
-                            // Always increment the added counter (just for reference)
-                            voidValues.added[itemToken] = voidValues.added[itemToken] || 0;
-                            voidValues.added[itemToken] += 1;
-
-                            // Increase the delta by one, always, for each item added
-                            voidPowers.incPower('delta', 1);
-
-                            // Check to see which group the item belongs to and then parse its values
-
-                            // -- CYBER SCREWS w/ QUANTA + SPREAD
-                            if (itemIsScrew){
-                                if (itemIsSmall){
-                                    voidPowers.incPower('quanta', 1);
-                                    voidPowers.incPower('spread', 0.25);
-                                    }
-                                else if (itemIsLarge){
-                                    voidPowers.incPower('quanta', 10);
-                                    voidPowers.incPower('spread', 0.50);
-                                    }
-                                else if (itemIsHyper){
-                                    voidPowers.incPower('quanta', 100);
-                                    voidPowers.incPower('spread', 0.75);
-                                    }
-                                }
-                            // -- ELEMENTAL CORES w/ ~QUANTA + ^SPREAD [+ TYPES]
-                            else if (itemIsCore){
-                                var typeToken = itemPrefix;
-                                voidPowers.incPower('quanta', 0.1); // low
-                                voidPowers.incPower('spread', 1.0); // high
-                                voidPowers.incPower(typeToken, 5);
-                                }
-                            // -- PELLETS & CAPSULES w/ ^QUANTA + ~SPREAD [+ STATS]
-                            else if (itemIsPellet || itemIsCapsule){
-                                var statToken = itemPrefix;
-                                var statTokens = !itemIsSuper ? [statToken] : ['attack', 'defense', 'speed'];
-                                var statValue = (!itemIsSuper ? (itemIsPellet ? 2 : 5) : (itemIsPellet ? 1 : 3));
-                                for (var j = 0; j < statTokens.length; j++){
-                                    var quanta = Math.round((statValue * 2) * 100) / 100;
-                                    var spread = Math.round((statValue / 10) * 100) / 100;
-                                    voidPowers.incPower('quanta', quanta); // high
-                                    voidPowers.incPower('spread', spread); // low
-                                    voidPowers.incPower(statTokens[j], statValue);
-                                    }
-                                }
-
-                            // -- TANKS & UPGRADES & MYTHICS w/ LEVEL + FORTE [+ ~STATS]
-                            else if (itemIsTank || itemIsUpgrade || itemIsMythic){
-                                var statToken = itemIsEnergy ? 'energy' : 'weapons';
-                                var statPower = (itemIsTank ? 10 : 0) + (itemIsUpgrade ? 20 : 0) + (itemIsMythic ? 50 : 0);
-                                var boostKind = itemIsEnergy ? 'level' : 'forte';
-                                var boostPower = itemPrefix === 'field' ? 1 : 10;
-                                voidPowers.incPower(statToken, statPower);
-                                voidPowers.incPower(boostKind, boostPower);
-                                }
-
-                            // -- BOOSTERS & DIVERTERS w/ STATS [+ STAT-MODS]
-                            else if (itemIsBooster){
-                                var boostKind = itemPrefix !== 'field' ? itemPrefix : 'field';
-                                var boostPower = itemPrefix !== 'field' ? 6 : 1;
-                                voidPowers.incPower(boostKind, boostPower);
-                                }
-                            else if (itemIsDiverter){
-                                var divertOrder = [];
-                                if (itemIsAttack){ divertOrder = ['attack', 'defense', 'speed']; }
-                                else if (itemIsDefense){ divertOrder = ['defense', 'attack', 'speed']; }
-                                else if (itemIsSpeed){ divertOrder = ['speed', 'attack', 'defense']; }
-                                voidPowers.decPower(divertOrder[0], 10);
-                                voidPowers.incPower(divertOrder[1], 5);
-                                voidPowers.incPower(divertOrder[2], 5);
-                                }
-
-                            // ELEMENTAL CIRCUITS w/ TYPES [+ TYPE-MODS]
-                            else if (itemIsCircuit){
-                                var opposingTypes = [];
-                                if (itemPrefix === 'battery'){ opposingTypes = ['electric', 'nature']; }
-                                else if (itemPrefix === 'sponge'){ opposingTypes = ['water', 'electric']; }
-                                else if (itemPrefix === 'forge'){ opposingTypes = ['flame', 'water']; }
-                                else if (itemPrefix === 'sapling'){ opposingTypes = ['nature', 'flame']; }
-                                else if (itemPrefix === 'chrono'){ opposingTypes = ['time', 'space']; }
-                                else if (itemPrefix === 'cosmo'){ opposingTypes = ['space', 'time']; }
-                                voidPowers.incPower(opposingTypes[0], 10);
-                                voidPowers.decPower(opposingTypes[1], 10);
-                                }
-
-                            // -- MODULE ITEMS w/ SPECIAL EFFECTS
-                            else if (itemIsModule){
-                                if (itemPrefix === 'target'){
-                                    voidPowers.incPower('spread', 1.0);
-                                    }
-                                else if (itemPrefix === 'charge'){
-                                    voidPowers.incPower('quanta', 50);
-                                    }
-                                else if (itemPrefix === 'growth'){
-                                    voidPowers.incPower('effort', 1);
-                                    }
-                                else if (itemPrefix === 'fortune'){
-                                    voidPowers.incPower('reward', 1);
-                                    }
-                                else if (itemPrefix === 'guard'){
-                                    voidPowers.flags.guard = true;
-                                    }
-                                else if (itemPrefix === 'reverse'){
-                                    voidPowers.flags.reverse = true;
-                                    }
-                                else if (itemPrefix === 'extreme'){
-                                    voidPowers.flags.extreme = true;
-                                    }
-                                }
-
-                            // end item loop
+                        var voidItemsTokens = Object.keys(voidItems);
+                        for (var i = 0; i < voidItemsTokens.length; i++){
+                            var itemToken = voidItemsTokens[i];
+                            var itemQuantity = voidItems[itemToken];
+                            _self.parseItem({token: itemToken}, itemQuantity, voidPowers);
+                            //for (var j = 0; j < itemQuantity; j++){ }
                             }
 
                         //console.log('voidPowers have been updated!');
@@ -1198,6 +1030,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                         // Backup a reference to the parent object
                         var _self = this;
 
+                        // end of voidRecipeWizard.regenerate()
                         },
                     refresh: function(){
                         console.log('voidRecipeWizard.refresh()');
@@ -1208,7 +1041,6 @@ $mmrpg_index_fields = rpg_field::get_index();
                         // Collect a reference to the void values
                         var voidItems = _self.items;
                         var voidHistory = _self.history;
-                        var voidValues = _self.values;
                         var $itemsSelected = _self.xrefs.itemsSelected;
                         var $itemsPalette = _self.xrefs.itemsPalette;
                         var $resetButton = _self.xrefs.resetButton;
@@ -1224,7 +1056,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                         var $selectedWrapper = $('.wrapper', $itemsSelected);
                         var $paletteWrappers = $('.wrapper', $itemsPalette);
                         var $paletteItems = $('.item[data-token]', $itemsPalette);
-                        var usedItemTokens = Object.keys(voidValues.added);
+                        var usedItemTokens = Object.keys(voidItems);
                         var numSlotsAvailable = _self.maxItems;
                         var numSlotsUsed = usedItemTokens.length;
                         $selectedWrapper.html('');
@@ -1236,7 +1068,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                                 var itemInfo = mmrpgIndex.items[itemToken];
                                 var itemName = itemInfo.item_name;
                                 var itemNameBr = itemName.replace(' ', '<br />');
-                                var itemQuantity = voidValues.added[itemToken];
+                                var itemQuantity = voidItems[itemToken] || 0;
                                 var itemImage = itemInfo.item_image || itemToken;
                                 var itemClass = 'item' + (itemToken === lastItemToken ? ' recent' : '');
                                 var itemIcon = '/images/items/'+itemImage+'/icon_right_40x40.png?'+gameSettings.cacheDate;
@@ -1280,7 +1112,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                                 var $paletteButton = $('.item[data-token="'+itemToken+'"]', $itemsPalette);
                                 var $selectButton = $('.item[data-token="'+itemToken+'"]', $itemsSelected);
                                 var baseQuantity = parseInt($paletteButton.attr('data-base-quantity'));
-                                var addedQuantity = voidValues.added[itemToken] || 0;
+                                var addedQuantity = voidItems[itemToken] || 0;
                                 var newQuantity = baseQuantity - addedQuantity;
                                 $paletteButton.attr('data-quantity', newQuantity);
                                 $paletteButton.find('.quantity').text(newQuantity);
@@ -1316,6 +1148,177 @@ $mmrpg_index_fields = rpg_field::get_index();
                             }
 
                         // end of voidRecipeWizard.refresh()
+                        },
+                    addItem: function(item){
+                        //console.log('voidRecipeWizard.addItem()', item);
+                        var _self = this;
+                        var token = item.token;
+                        var existing = Object.keys(_self.items).length;
+                        var exists = Object.keys(_self.items).indexOf(token) >= 0;
+                        if (!exists && existing >= _self.maxItems){ return; }
+                        if (!exists){ _self.items[token] = 0; }
+                        _self.items[token] += 1;
+                        _self.history.push({ token: token, action: 'add' });
+                        _self.recalculate();
+                        _self.regenerate();
+                        _self.refresh();
+                        // end of voidRecipeWizard.addItem()
+                        },
+                    removeItem: function(item){
+                        //console.log('voidRecipeWizard.removeItem()', item);
+                        var _self = this;
+                        var token = item.token;
+                        var exists = Object.keys(_self.items).indexOf(token) >= 0;
+                        if (!exists){ return; }
+                        _self.items[token] -= 1;
+                        _self.history.push({ token: token, action: 'remove' });
+                        _self.recalculate();
+                        _self.regenerate();
+                        _self.refresh();
+                        // end of voidRecipeWizard.removeItem()
+                        },
+                    parseItem: function(item, quantity, powers){
+                        console.log('voidRecipeWizard.parseItem()');
+                        console.log('-> w/ item:', item, 'quantity:', quantity, 'powers:', powers);
+
+                        // Backup a reference to the parent object
+                        var _self = this;
+
+                        // Collect the item token and then also break it apart for reference
+                        var itemToken = item.token;
+                        var itemTokens = itemToken.split('-');
+                        var itemPrefix = itemTokens[0] || '';
+                        var itemSuffix = itemTokens[1] || '';
+                        var itemIsSmall = itemPrefix === 'small';
+                        var itemIsLarge = itemPrefix === 'large';
+                        var itemIsHyper = itemPrefix === 'hyper';
+                        var itemIsEnergy = itemPrefix === 'energy';
+                        var itemIsWeapons = itemPrefix === 'weapons';
+                        var itemIsAttack = itemPrefix === 'attack';
+                        var itemIsDefense = itemPrefix === 'defense';
+                        var itemIsSpeed = itemPrefix === 'speed';
+                        var itemIsSuper = itemPrefix === 'super';
+                        var itemIsScrew = itemSuffix === 'screw';
+                        var itemIsShard = itemSuffix === 'shard';
+                        var itemIsCore = itemSuffix === 'core';
+                        var itemIsPellet = itemSuffix === 'pellet';
+                        var itemIsCapsule = itemSuffix === 'capsule';
+                        var itemIsTank = itemSuffix === 'tank';
+                        var itemIsUpgrade = itemSuffix === 'upgrade';
+                        var itemIsMythic = itemSuffix === 'mythic';
+                        var itemIsBooster = itemSuffix === 'booster';
+                        var itemIsDiverter = itemSuffix === 'diverter';
+                        var itemIsModule = itemSuffix === 'module';
+                        var itemIsCircuit = itemSuffix === 'circuit';
+                        if (itemToken === 'extra-life'){ itemIsEnergy = true; itemIsMythic = true; }
+                        if (itemToken === 'yashichi'){ itemIsWeapons = true; itemIsMythic = true; }
+
+                        // Increase the delta by one, always, for each item added
+                        powers.incPower('delta', 1);
+
+                        // Check to see which group the item belongs to and then parse its values
+
+                        // -- CYBER SCREWS w/ QUANTA + SPREAD
+                        if (itemIsScrew){
+                            var quanta = 0, spread = 0;
+                            if (itemIsSmall){ quanta = 1.0, spread = 0.25; }
+                            else if (itemIsLarge){ quanta = 10.0, spread = 0.50; }
+                            else if (itemIsHyper){ quanta = 100.0, spread = 0.75; }
+                            powers.incPower('quanta', quanta * quantity);
+                            powers.incPower('spread', spread * quantity);
+                            }
+                        // -- ELEMENTAL CORES w/ ~QUANTA + ^SPREAD [+ TYPES]
+                        else if (itemIsCore){
+                            var typeToken = itemPrefix;
+                            var quanta = 0.1, spread = 1.0, typeValue = 5.0;
+                            powers.incPower('quanta', quanta * quantity);
+                            powers.incPower('spread', spread * quantity);
+                            powers.incPower(typeToken, typeValue * quantity);
+                            }
+                        // -- PELLETS & CAPSULES w/ ^QUANTA + ~SPREAD [+ STATS]
+                        else if (itemIsPellet || itemIsCapsule){
+                            var statToken = itemPrefix;
+                            var statTokens = !itemIsSuper ? [statToken] : ['attack', 'defense', 'speed'];
+                            var quanta = (!itemIsSuper ? (itemIsPellet ? 4.0 : 9.0) : (itemIsPellet ? 2.0 : 5.0));
+                            var spread = (!itemIsSuper ? (itemIsPellet ? 0.2 : 0.5) : (itemIsPellet ? 0.3 : 0.9));
+                            powers.incPower('quanta', quanta * quantity);
+                            powers.incPower('spread', spread * quantity);
+                            for (var j = 0; j < statTokens.length; j++){
+                                var subStatToken = statTokens[j];
+                                var subStatValue = (!itemIsSuper ? (itemIsPellet ? 2 : 5) : (itemIsPellet ? 1 : 3));
+                                powers.incPower(subStatToken, subStatValue * quantity);
+                                }
+                            }
+
+                        // -- TANKS & UPGRADES & MYTHICS w/ LEVEL + FORTE [+ ~STATS]
+                        else if (itemIsTank || itemIsUpgrade || itemIsMythic){
+                            var statToken = itemIsEnergy ? 'energy' : 'weapons';
+                            var statPower = (itemIsTank ? 10 : 0) + (itemIsUpgrade ? 20 : 0) + (itemIsMythic ? 50 : 0);
+                            var boostKind = itemIsEnergy ? 'level' : 'forte';
+                            var boostPower = itemPrefix === 'field' ? 1 : 10;
+                            powers.incPower(statToken, statPower * quantity);
+                            powers.incPower(boostKind, boostPower * quantity);
+                            }
+
+                        // -- BOOSTERS & DIVERTERS w/ STATS [+ STAT-MODS]
+                        else if (itemIsBooster){
+                            var boostKind = itemPrefix !== 'field' ? itemPrefix : 'field';
+                            var boostPower = itemPrefix !== 'field' ? 6 : 1;
+                            powers.incPower(boostKind, boostPower * quantity);
+                            }
+                        else if (itemIsDiverter){
+                            var divertOrder = [], divertValues = [10, 5, 5];
+                            if (itemIsAttack){ divertOrder = ['attack', 'defense', 'speed']; }
+                            else if (itemIsDefense){ divertOrder = ['defense', 'attack', 'speed']; }
+                            else if (itemIsSpeed){ divertOrder = ['speed', 'attack', 'defense']; }
+                            powers.decPower(divertOrder[0], divertValues[0] * quantity);
+                            powers.incPower(divertOrder[1], divertValues[1] * quantity);
+                            powers.incPower(divertOrder[2], divertValues[2] * quantity);
+                            }
+
+                        // ELEMENTAL CIRCUITS w/ TYPES [+ TYPE-MODS]
+                        else if (itemIsCircuit){
+                            var opposingTypes = [], opposingValues = [10, 10];
+                            if (itemPrefix === 'battery'){ opposingTypes = ['electric', 'nature']; }
+                            else if (itemPrefix === 'sponge'){ opposingTypes = ['water', 'electric']; }
+                            else if (itemPrefix === 'forge'){ opposingTypes = ['flame', 'water']; }
+                            else if (itemPrefix === 'sapling'){ opposingTypes = ['nature', 'flame']; }
+                            else if (itemPrefix === 'chrono'){ opposingTypes = ['time', 'space']; }
+                            else if (itemPrefix === 'cosmo'){ opposingTypes = ['space', 'time']; }
+                            powers.incPower(opposingTypes[0], opposingValues[0] * quantity);
+                            powers.decPower(opposingTypes[1], opposingValues[1] * quantity);
+                            }
+
+                        // -- MODULE ITEMS w/ SPECIAL EFFECTS
+                        else if (itemIsModule){
+                            if (itemPrefix === 'target'){
+                                var spread = 1.0;
+                                powers.incPower('spread', spread * quantity);
+                                }
+                            else if (itemPrefix === 'charge'){
+                                var quanta = 50;
+                                powers.incPower('quanta', quanta * quantity);
+                                }
+                            else if (itemPrefix === 'growth'){
+                                var effort = 1;
+                                powers.incPower('effort', effort * quantity);
+                                }
+                            else if (itemPrefix === 'fortune'){
+                                var reward = 1;
+                                powers.incPower('reward', reward * quantity);
+                                }
+                            else if (itemPrefix === 'guard'){
+                                powers.flags.guard = true;
+                                }
+                            else if (itemPrefix === 'reverse'){
+                                powers.flags.reverse = true;
+                                }
+                            else if (itemPrefix === 'extreme'){
+                                powers.flags.extreme = true;
+                                }
+                            }
+
+                        // end of voidRecipeWizard.parseItem()
                         },
                     };
 
