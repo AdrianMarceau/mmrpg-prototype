@@ -78,6 +78,7 @@ $mmrpg_index_fields = rpg_field::get_index();
         array_rearrange_keys($mmrpg_index_items, array('none-core', 'cutter-core'));
         array_rearrange_keys($mmrpg_index_items, array('energy-tank', 'weapon-tank', 'energy-upgrade', 'weapon-upgrade', 'extra-life', 'yashichi'));
         array_rearrange_keys($mmrpg_index_items, array('field-booster', 'attack-booster', 'defense-booster', 'speed-booster'));
+        array_rearrange_keys($mmrpg_index_items, array('charge-module', 'target-module'));
 
         // Pre-define the order of the groups for display purposes
         $group_display_order = array(
@@ -109,7 +110,7 @@ $mmrpg_index_fields = rpg_field::get_index();
             $group_token = 'other';
             if ($item_tokens[1] === 'screw'){ $group_token = 'screws'; }
             elseif ($item_tokens[1] === 'core'){ $group_token = 'cores'; }
-            elseif (in_array($item_token, array('growth-module', 'fortune-module'))){ $group_token = 'special'; }
+            elseif (in_array($item_token, array('charge-module', 'target-module'))){ $group_token = 'special'; }
             elseif (in_array($item_token, array('energy-tank', 'weapon-tank', 'energy-upgrade', 'weapon-upgrade', 'extra-life', 'yashichi'))){ $group_token = 'energies'; }
             elseif (in_array($item_token, array('field-booster'))){ $group_token = 'fillers'; }
             elseif ($item_tokens[1] === 'pellet'){ $group_token = 'pellets'; }
@@ -196,7 +197,7 @@ $mmrpg_index_fields = rpg_field::get_index();
             <a class="reset"><i class="fa fas fa-undo"></i></a>
         </div>
         <div class="palette">
-            <div class="item-list" data-count="<?= $items_palette_count ?>">
+            <div class="item-list" data-count="<?= $items_palette_count ?>" data-select="*">
                 <?= $items_palette_markup ?>
             </div>
         </div>
@@ -425,6 +426,10 @@ $mmrpg_index_fields = rpg_field::get_index();
         bottom: 6px;
         background-color: #434343;
     }
+    #void-recipe .item-list .item.active {
+        filter: brightness(1.5);
+        outline: 2px solid rgba(255, 255, 255, 0.6);
+    }
     #void-recipe .item-list .item[data-quantity="0"] {
         filter: opacity(0.6) brightness(0.9);
         pointer-events: none;
@@ -432,6 +437,15 @@ $mmrpg_index_fields = rpg_field::get_index();
     }
     #void-recipe .item-list .item[data-quantity="0"][data-base-quantity="0"] .icon {
         filter: brightness(0);
+        opacity: 0.6;
+    }
+    #void-recipe .item-list[data-select="active"] .item:not(.active) {
+        filter: opacity(0.6) brightness(0.9);
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+    #void-recipe .item-list[data-select="active"] .item:not(.active) .icon {
+        filter: brightness(0.4);
         opacity: 0.6;
     }
 
@@ -621,33 +635,70 @@ $mmrpg_index_fields = rpg_field::get_index();
     }
 
     #void-recipe .item-list .group.screws {
-        background-color: #807c18;
-    }
-    #void-recipe .item-list .group.special {
-        background-color: #6b854b;
+        /* speed purple  */
+        /* border-color: rgb(105, 87, 117);  */
+        /* background-color: rgb(139, 115, 155);  */
+        /* modded speed purple  */
+        border-color: rgb(90, 49, 114);
+        background-color: rgb(116, 75, 139);
     }
     #void-recipe .item-list .group.pellets,
     #void-recipe .item-list .group.capsules {
-        background-color: #44795a;
-    }
-    #void-recipe .item-list .group.circuits {
-        background-color: #783078;
-    }
-    #void-recipe .item-list .group.energies {
-        background-color: #107981;
+        /* defense blue  */
+        border-color: rgb(62, 76, 105);
+        background-color: rgb(80, 99, 138);
     }
     #void-recipe .item-list .group.cores {
-        background-color: #58589b;
+        /* attack red  */
+        border-color: rgb(111, 54, 54);
+        background-color: rgb(146, 73, 73);
+    }
+    #void-recipe .item-list .group.special {
+        /* defense blue + attack red  */
+        border-color: rgb(62, 76, 105) !important;
+        background-color: rgb(80, 99, 138) !important;
+        background-image: -webkit-gradient(linear, left top, right top, color-stop(0, rgb(80, 99, 138)), color-stop(1, rgb(146, 73, 73))) !important;
+        background-image: -o-linear-gradient(right, rgb(80, 99, 138) 0%, rgb(146, 73, 73) 100%) !important;
+        background-image: -moz-linear-gradient(right, rgb(80, 99, 138) 0%, rgb(146, 73, 73) 100%) !important;
+        background-image: -webkit-linear-gradient(right, rgb(80, 99, 138) 0%, rgb(146, 73, 73) 100%) !important;
+        background-image: -ms-linear-gradient(right, rgb(80, 99, 138) 0%, rgb(146, 73, 73) 100%) !important;
+        background-image: linear-gradient(to right, rgb(80, 99, 138) 0%, rgb(146, 73, 73) 100%) !important;
+    }
+    #void-recipe .item-list .group.energies {
+        /* energy green */
+        border-color: rgb(68, 105, 59);
+        background-color: rgb(89, 138, 78);
+    }
+    #void-recipe .item-list .group.circuits {
+        /* nature green */
+        border-color: rgb(37, 155, 51);
+        background-color: rgb(28, 122, 39);
     }
     #void-recipe .item-list .group.boosters,
     #void-recipe .item-list .group.diverters {
-        background-color: #8d386e;
+        /* shield green  */
+        border-color: rgb(102, 146, 120);
+        background-color: rgb(95, 136, 112);
     }
     #void-recipe .item-list .group.modules {
-        background-color: #93521d;
+        /* electric yellow */
+        background-color: #807c18;
     }
     #void-recipe .item-list .group.fillers {
-        background-color: #883030;
+        /* cutter grey  */
+        border-color: rgb(109, 109, 109);
+        background-color: rgb(118, 120, 126);
+    }
+    .foo {
+        background-color: #807c18; /* electric yellow */
+        background-color: #6b854b; /* energy green */
+        background-color: #44795a; /* shield green */
+        background-color: #783078; /* time purple  */
+        background-color: #107981; /* freeze blue  */
+        background-color: #58589b; /* space purple  */
+        background-color: #8d386e; /* crystal pink  */
+        background-color: #93521d; /* explode orange  */
+        background-color: #883030; /* flame red  */
     }
 
     #void-recipe .selection {
@@ -722,14 +773,45 @@ $mmrpg_index_fields = rpg_field::get_index();
         border-radius: 6px;
     }
     #void-recipe .creation .target-list {
-        height: 90px;
+        height: 60px;
         border-radius: 6px 6px 0 0;
         border-bottom: 0;
     }
     #void-recipe .creation .mission-details {
-        height: 60px;
+        height: 80px;
         border-radius: 0 0 6px 6px;
         border-top: 0;
+    }
+    #void-recipe .creation .mission-details .powers-list {
+        display: block;
+        width: auto;
+    }
+    #void-recipe .creation .mission-details .powers-list ul {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+        padding: 6px;
+        font-size: 11px;
+        line-height: 16px;
+        color: #efefef;
+    }
+    #void-recipe .creation .mission-details .powers-list ul:after {
+        content: "";
+        display: block;
+        clear: both;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li {
+        display: block;
+        box-sizing: border-box;
+        float: left;
+        width: calc(100% / 5);
+        text-align: center;
+        padding: 0 4px 4px 0;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.02);
     }
 
     #void-recipe .creation .target-list {
@@ -783,12 +865,18 @@ $mmrpg_index_fields = rpg_field::get_index();
                 var voidRecipeWizard = {
                     init: function($container){
                         console.log('voidRecipeWizard.init()');
-                        console.log('-> w/ $container:', typeof $container, $container.length, $container);
+                        //console.log('-> w/ $container:', typeof $container, $container.length, $container);
                         var _self = this;
+                        _self.name = 'voidRecipeWizard';
+                        _self.version = '1.0.0';
+                        _self.maxItems = 10;
                         _self.reset(false);
                         _self.setup($container);
+                        _self.recalculate();
                         _self.regenerate();
                         _self.refresh();
+                        console.log('voidRecipeWizard is ' + ('%c' + 'ready'), 'color: lime;');
+                        // end of voidRecipeWizard.init()
                         },
                     reset: function(refresh){
                         console.log('voidRecipeWizard.reset()');
@@ -796,15 +884,18 @@ $mmrpg_index_fields = rpg_field::get_index();
                         var _self = this;
                         _self.items = [];
                         _self.values = {};
+                        _self.powers = {};
                         _self.mission = {};
                         _self.history = [];
                         if (!refresh){ return; }
+                        _self.recalculate();
                         _self.regenerate();
                         _self.refresh();
+                        // end of voidRecipeWizard.reset()
                         },
                     setup: function($container){
                         console.log('voidRecipeWizard.setup()');
-                        console.log('-> w/ $container:', typeof $container, $container.length, $container);
+                        //console.log('-> w/ $container:', typeof $container, $container.length, $container);
 
                         // Backup a reference to the parent object
                         var _self = this;
@@ -832,7 +923,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                         xrefs.itemsPalette = $itemsPalette;
                         xrefs.itemsSelected = $itemsSelected;
                         xrefs.resetButton = $resetButton;
-                        console.log('xrefs:', xrefs);
+                        //console.log('xrefs:', xrefs);
 
                         // Backup every item's base quantity so we can do dynamic calulations in realt-time
                         $('.item[data-quantity]:not([data-base-quantity])', $parentDiv).each(function(){
@@ -843,7 +934,7 @@ $mmrpg_index_fields = rpg_field::get_index();
 
                         // Bind ADD ITEM click events to the palette area's item list buttons
                         $('.item[data-token]', $itemsPalette).live('click', function(e){
-                            console.log('palette button clicked! add-item');
+                            console.log('palette button clicked! \n-> add-item:', $(this).attr('data-token'));
                             e.preventDefault();
                             var $item = $(this);
                             var itemToken = $item.attr('data-token');
@@ -859,7 +950,7 @@ $mmrpg_index_fields = rpg_field::get_index();
 
                         // Bind REMOVE ITEM click events to the selection area's item list buttons
                         $('.item[data-token]', $itemsSelected).live('click', function(e){
-                            console.log('section button clicked! remove-item');
+                            console.log('section button clicked! \n-> remove-item:', $(this).attr('data-token'));
                             e.preventDefault();
                             var $item = $(this);
                             var itemToken = $item.attr('data-token');
@@ -874,20 +965,26 @@ $mmrpg_index_fields = rpg_field::get_index();
 
                         // Bind RESET ITEMS click events to the selection area's reset button
                         $resetButton.live('click', function(e){
-                            console.log('reset button clicked! reset-items');
+                            console.log('reset button clicked! \n-> reset-items');
                             e.preventDefault();
                             _self.reset();
                             });
 
+                        // end of voidRecipeWizard.setup()
                         },
                     add: function(item){
                         //console.log('voidRecipeWizard.add()', item);
                         var _self = this;
                         var token = item.token;
+                        var exists = Object.keys(_self.values.added).indexOf(token) >= 0;
+                        var existing = Object.keys(_self.values.added).length;
+                        if (!exists && existing >= _self.maxItems){ return; }
                         _self.items.push(token);
                         _self.history.push({ token: token, action: 'add' });
+                        _self.recalculate();
                         _self.regenerate();
                         _self.refresh();
+                        // end of voidRecipeWizard.add()
                         },
                     remove: function(item){
                         //console.log('voidRecipeWizard.remove()', item);
@@ -896,11 +993,13 @@ $mmrpg_index_fields = rpg_field::get_index();
                         var index = this.items.lastIndexOf(token);
                         _self.items.splice(index, 1);
                         _self.history.push({ token: token, action: 'remove' });
+                        _self.recalculate();
                         _self.regenerate();
                         _self.refresh();
+                        // end of voidRecipeWizard.remove()
                         },
-                    regenerate: function(){
-                        console.log('voidRecipe.regenerate()');
+                    recalculate: function(){
+                        console.log('voidRecipeWizard.recalculate()');
 
                         // Backup a reference to the parent object
                         var _self = this;
@@ -914,97 +1013,194 @@ $mmrpg_index_fields = rpg_field::get_index();
                         voidValues.stats = {};
                         voidValues.shift = 0;
 
+                        // Define a variable to hold the calculated powers of all the items
+                        var voidPowers = {};
+                        voidPowers.powers = {};
+                        voidPowers.flags = {};
+                        voidPowers.getPowers = function(){ return voidPowers.powers; };
+                        voidPowers.getPower = function(token, fallback){ return voidPowers.powers[token] || fallback || 0; };
+                        voidPowers.setPower = function(token, value){ voidPowers.powers[token] = Math.round(value * 100) / 100; };
+                        voidPowers.incPower = function(token, value){ voidPowers.setPower(token, voidPowers.getPower(token) + value); };
+                        voidPowers.decPower = function(token, value){ voidPowers.setPower(token, voidPowers.getPower(token) - value); };
+                        voidPowers.modPower = function(token, value, fallback){ voidPowers.setPower(token, voidPowers.getPower(token, fallback) * value); };
+                        voidPowers.powers.delta = 0;
+                        voidPowers.powers.quanta = 0;
+                        voidPowers.powers.spread = 0;
+                        voidPowers.powers.effort = 0;
+                        voidPowers.powers.reward = 0;
+                        voidPowers.powers.level = 0;
+                        voidPowers.powers.forte = 0;
+                        voidPowers.flags.guard = false;
+                        voidPowers.flags.reverse = false;
+                        voidPowers.flags.extreme = false;
+
                         // Loop through all the items, one-by-one, and parse their intrinsic values
                         for (var i = 0; i < voidItems.length; i++){
 
                             // Collect the item token and then also break it apart for reference
                             var itemToken = voidItems[i];
                             var itemTokens = itemToken.split('-');
-                            if (typeof itemTokens[1] === 'undefined'){ itemTokens[1] = ''; }
+                            var itemPrefix = itemTokens[0] || '';
+                            var itemSuffix = itemTokens[1] || '';
+                            var itemIsSmall = itemPrefix === 'small';
+                            var itemIsLarge = itemPrefix === 'large';
+                            var itemIsHyper = itemPrefix === 'hyper';
+                            var itemIsEnergy = itemPrefix === 'energy';
+                            var itemIsWeapons = itemPrefix === 'weapons';
+                            var itemIsAttack = itemPrefix === 'attack';
+                            var itemIsDefense = itemPrefix === 'defense';
+                            var itemIsSpeed = itemPrefix === 'speed';
+                            var itemIsSuper = itemPrefix === 'super';
+                            var itemIsScrew = itemSuffix === 'screw';
+                            var itemIsShard = itemSuffix === 'shard';
+                            var itemIsCore = itemSuffix === 'core';
+                            var itemIsPellet = itemSuffix === 'pellet';
+                            var itemIsCapsule = itemSuffix === 'capsule';
+                            var itemIsTank = itemSuffix === 'tank';
+                            var itemIsUpgrade = itemSuffix === 'upgrade';
+                            var itemIsBooster = itemSuffix === 'booster';
+                            var itemIsDiverter = itemSuffix === 'diverter';
+                            var itemIsModule = itemSuffix === 'module';
+                            var itemIsCircuit = itemSuffix === 'circuit';
+                            var itemIsMythic = false;
+                            if (itemToken === 'extra-life'){ itemIsEnergy = true; itemIsMythic = true; }
+                            if (itemToken === 'yashichi'){ itemIsWeapons = true; itemIsMythic = true; }
 
                             // Always increment the added counter (just for reference)
                             voidValues.added[itemToken] = voidValues.added[itemToken] || 0;
                             voidValues.added[itemToken] += 1;
 
+                            // Increase the delta by one, always, for each item added
+                            voidPowers.incPower('delta', 1);
+
                             // Check to see which group the item belongs to and then parse its values
-                            if (itemTokens[1] === 'screw'){
-                                if (itemTokens[0] === 'small'){ var classToken = 'mecha'; }
-                                else if (itemTokens[0] === 'large'){ var classToken = 'master'; }
-                                else if (itemTokens[0] === 'hyper'){ var classToken = 'boss'; }
-                                voidValues.classes[classToken] = voidValues.classes[classToken] || 0;
-                                voidValues.classes[classToken] += 1;
-                                }
-                            else if (itemTokens[1] === 'core'){
-                                var typeToken = itemTokens[0];
-                                voidValues.types[typeToken] = voidValues.classes[typeToken] || 0;
-                                voidValues.types[typeToken] += 1;
-                                }
-                            else if (itemTokens[1] === 'pellet' || itemTokens[1] === 'capsule'){
-                                var statToken = itemTokens[0];
-                                var statTokens = !isSuper ? [statToken] : ['attack', 'defense', 'speed'];
-                                var isSuper = itemTokens[0] === 'super';
-                                var isPellet = itemTokens[1] === 'pellet';
-                                var isCapsule = itemTokens[1] === 'capsule';
-                                var statValue = (!isSuper ? (isPellet ? 2 : 5) : (isPellet ? 1 : 3));
-                                var shiftValue = (!isSuper ? (isPellet ? 1 : 3) : (isPellet ? 2 : 5));
-                                for (var j = 0; j < statTokens.length; j++){
-                                    var token = statTokens[j];
-                                    voidValues.stats[token] = voidValues.classes[token] || 0;
-                                    voidValues.stats[token] += statValue;
+
+                            // -- CYBER SCREWS w/ QUANTA + SPREAD
+                            if (itemIsScrew){
+                                if (itemIsSmall){
+                                    voidPowers.incPower('quanta', 1);
+                                    voidPowers.incPower('spread', 0.25);
                                     }
-                                voidValues.shift += shiftValue;
+                                else if (itemIsLarge){
+                                    voidPowers.incPower('quanta', 10);
+                                    voidPowers.incPower('spread', 0.50);
+                                    }
+                                else if (itemIsHyper){
+                                    voidPowers.incPower('quanta', 100);
+                                    voidPowers.incPower('spread', 0.75);
+                                    }
                                 }
-                        }
-
-                        //console.log('-> items:\n', voidItems.join(', '));
-                        //console.log('-> values:', voidValues);
-
-                        // Sort the stats object so we can easily calculate the target values
-                        var sortedStats = Object.keys(voidValues.stats).sort(function(a, b){
-                            return voidValues.stats[b] - voidValues.stats[a];
-                            });
-                        voidValues.stats = sortedStats;
-
-                        // Now that we have the values sorted out, let's calculate our target queue
-                        var targetQueue = [];
-
-                        // Define a sample of targets to use for this creation and the sort or filter as needed
-                        var targetTokenPool = [];
-                        if (voidItems.length){
-                            var allowedClasses = Object.keys(voidValues.classes) || [];
-                            var allowedTypes = Object.keys(voidValues.types) || [];
-                            var allowedStats = Object.keys(voidValues.stats) || [];
-                            for (var i = 0; i < mmrpgIndexRobotsTokens.length; i++){
-                                var robotToken = mmrpgIndexRobotsTokens[i];
-                                var robotInfo = mmrpgIndexRobots[robotToken];
-                                var robotClass = robotInfo['robot_class'];
-                                var robotTypes = [robotInfo['robot_core'], robotInfo['robot_core2']];
-                                if (allowedClasses.indexOf(robotClass) === -1){ continue; }
-                                if (allowedTypes.indexOf(robotTypes[0]) === -1 && allowedTypes.indexOf(robotTypes[1]) === -1){ continue; }
-                                targetTokenPool.push(robotToken);
+                            // -- ELEMENTAL CORES w/ ~QUANTA + ^SPREAD [+ TYPES]
+                            else if (itemIsCore){
+                                var typeToken = itemPrefix;
+                                voidPowers.incPower('quanta', 0.1); // low
+                                voidPowers.incPower('spread', 1.0); // high
+                                voidPowers.incPower(typeToken, 5);
                                 }
-                            if (!targetTokenPool.length){ targetTokenPool.push('dark-frag'); }
+                            // -- PELLETS & CAPSULES w/ ^QUANTA + ~SPREAD [+ STATS]
+                            else if (itemIsPellet || itemIsCapsule){
+                                var statToken = itemPrefix;
+                                var statTokens = !itemIsSuper ? [statToken] : ['attack', 'defense', 'speed'];
+                                var statValue = (!itemIsSuper ? (itemIsPellet ? 2 : 5) : (itemIsPellet ? 1 : 3));
+                                for (var j = 0; j < statTokens.length; j++){
+                                    var quanta = Math.round((statValue * 2) * 100) / 100;
+                                    var spread = Math.round((statValue / 10) * 100) / 100;
+                                    voidPowers.incPower('quanta', quanta); // high
+                                    voidPowers.incPower('spread', spread); // low
+                                    voidPowers.incPower(statTokens[j], statValue);
+                                    }
+                                }
+
+                            // -- TANKS & UPGRADES & MYTHICS w/ LEVEL + FORTE [+ ~STATS]
+                            else if (itemIsTank || itemIsUpgrade || itemIsMythic){
+                                var statToken = itemIsEnergy ? 'energy' : 'weapons';
+                                var statPower = (itemIsTank ? 10 : 0) + (itemIsUpgrade ? 20 : 0) + (itemIsMythic ? 50 : 0);
+                                var boostKind = itemIsEnergy ? 'level' : 'forte';
+                                var boostPower = itemPrefix === 'field' ? 1 : 10;
+                                voidPowers.incPower(statToken, statPower);
+                                voidPowers.incPower(boostKind, boostPower);
+                                }
+
+                            // -- BOOSTERS & DIVERTERS w/ STATS [+ STAT-MODS]
+                            else if (itemIsBooster){
+                                var boostKind = itemPrefix !== 'field' ? itemPrefix : 'field';
+                                var boostPower = itemPrefix !== 'field' ? 6 : 1;
+                                voidPowers.incPower(boostKind, boostPower);
+                                }
+                            else if (itemIsDiverter){
+                                var divertOrder = [];
+                                if (itemIsAttack){ divertOrder = ['attack', 'defense', 'speed']; }
+                                else if (itemIsDefense){ divertOrder = ['defense', 'attack', 'speed']; }
+                                else if (itemIsSpeed){ divertOrder = ['speed', 'attack', 'defense']; }
+                                voidPowers.decPower(divertOrder[0], 10);
+                                voidPowers.incPower(divertOrder[1], 5);
+                                voidPowers.incPower(divertOrder[2], 5);
+                                }
+
+                            // ELEMENTAL CIRCUITS w/ TYPES [+ TYPE-MODS]
+                            else if (itemIsCircuit){
+                                var opposingTypes = [];
+                                if (itemPrefix === 'battery'){ opposingTypes = ['electric', 'nature']; }
+                                else if (itemPrefix === 'sponge'){ opposingTypes = ['water', 'electric']; }
+                                else if (itemPrefix === 'forge'){ opposingTypes = ['flame', 'water']; }
+                                else if (itemPrefix === 'sapling'){ opposingTypes = ['nature', 'flame']; }
+                                else if (itemPrefix === 'chrono'){ opposingTypes = ['time', 'space']; }
+                                else if (itemPrefix === 'cosmo'){ opposingTypes = ['space', 'time']; }
+                                voidPowers.incPower(opposingTypes[0], 10);
+                                voidPowers.decPower(opposingTypes[1], 10);
+                                }
+
+                            // -- MODULE ITEMS w/ SPECIAL EFFECTS
+                            else if (itemIsModule){
+                                if (itemPrefix === 'target'){
+                                    voidPowers.incPower('spread', 1.0);
+                                    }
+                                else if (itemPrefix === 'charge'){
+                                    voidPowers.incPower('quanta', 50);
+                                    }
+                                else if (itemPrefix === 'growth'){
+                                    voidPowers.incPower('effort', 1);
+                                    }
+                                else if (itemPrefix === 'fortune'){
+                                    voidPowers.incPower('reward', 1);
+                                    }
+                                else if (itemPrefix === 'guard'){
+                                    voidPowers.flags.guard = true;
+                                    }
+                                else if (itemPrefix === 'reverse'){
+                                    voidPowers.flags.reverse = true;
+                                    }
+                                else if (itemPrefix === 'extreme'){
+                                    voidPowers.flags.extreme = true;
+                                    }
+                                }
+
+                            // end item loop
                             }
 
-                        // Loop through the available slots and attempt to fill them
-                        var slotClasses = Object.keys(voidValues.classes);
-                        for (var i = 0; i < slotClasses.length; i++){
-                            var slotClass = slotClasses[i];
-                            var slotValue = voidValues.classes[slotClass];
-                            for (var j = 0; j < slotValue; j++){
-                                targetData = '';
-                                targetData += '{'+slotClass+'}';
-                                targetQueue.push(targetData);
-                                }
+                        //console.log('voidPowers have been updated!');
+                        _self.powers = {};
+                        var voidPowersList = voidPowers.getPowers();
+                        var voidPowerKeys = Object.keys(voidPowersList);
+                        for (var i = 0; i < voidPowerKeys.length; i++){
+                            var powerToken = voidPowerKeys[i];
+                            var powerValue = voidPowersList[powerToken];
+                            if (powerValue === 0){ continue; }
+                            _self.powers[powerToken] = powerValue;
+                            //console.log('-> voidPowers.' + powerToken + ' =', powerValue);
                             }
-                        //console.log('-> targetQueue:\n', targetQueue);
-                        //console.log('-> targetTokenPool:\n', targetTokenPool);
 
-                        //console.log('-> mission:', _self.mission);
+                        // end of voidRecipeWizard.recalculate()
+                        },
+                    regenerate: function(){
+                        console.log('voidRecipeWizard.regenerate()');
+
+                        // Backup a reference to the parent object
+                        var _self = this;
 
                         },
                     refresh: function(){
-                        console.log('voidRecipe.refresh()');
+                        console.log('voidRecipeWizard.refresh()');
 
                         // Backup a reference to the parent object
                         var _self = this;
@@ -1016,6 +1212,7 @@ $mmrpg_index_fields = rpg_field::get_index();
                         var $itemsSelected = _self.xrefs.itemsSelected;
                         var $itemsPalette = _self.xrefs.itemsPalette;
                         var $resetButton = _self.xrefs.resetButton;
+                        var $missionDetails = _self.xrefs.missionDetails;
 
                         // Check to see which was the last item token added
                         var lastItemToken = '';
@@ -1025,12 +1222,16 @@ $mmrpg_index_fields = rpg_field::get_index();
 
                         // Clear the item selection area and then rebuild it with the new items
                         var $selectedWrapper = $('.wrapper', $itemsSelected);
-                        $selectedWrapper.html('');
+                        var $paletteWrappers = $('.wrapper', $itemsPalette);
+                        var $paletteItems = $('.item[data-token]', $itemsPalette);
                         var usedItemTokens = Object.keys(voidValues.added);
-                        var numSlotsAvailable = 10;
+                        var numSlotsAvailable = _self.maxItems;
                         var numSlotsUsed = usedItemTokens.length;
+                        $selectedWrapper.html('');
+                        $paletteItems.removeClass('active');
                         if (usedItemTokens.length > 0){
                             for (var i = 0; i < usedItemTokens.length; i++){
+                                // Generate the markup for the item then add to the selection area
                                 var itemToken = usedItemTokens[i];
                                 var itemInfo = mmrpgIndex.items[itemToken];
                                 var itemName = itemInfo.item_name;
@@ -1045,14 +1246,24 @@ $mmrpg_index_fields = rpg_field::get_index();
                                     itemMarkup += '<div class="quantity">'+itemQuantity+'</div>';
                                 itemMarkup += '</div>';
                                 $selectedWrapper.append(itemMarkup);
+                                // Update the parent button in the palette area to show that its active
+                                $paletteItems.filter('.item[data-token="'+itemToken+'"]').addClass('active');
                                 }
                             }
+
+                        // Fill empty slots with item-placeholder elements for visual clarity,
+                        // otherwise if all slots are full we should disable further selections
                         if (numSlotsUsed < numSlotsAvailable){
+                            //console.log('there are empty slots!', (numSlotsAvailable - numSlotsUsed));
+                            $itemsPalette.attr('data-select', '*');
                             var emptySlots = numSlotsAvailable - numSlotsUsed;
                             for (var i = 0; i < emptySlots; i++){
                                 var placeholderMarkup = '<div class="item placeholder"></div>';
                                 $selectedWrapper.append(placeholderMarkup);
                                 }
+                            } else {
+                            //console.log('all slots are full!');
+                            $itemsPalette.attr('data-select', 'active');
                             }
 
                         // Check and update the displayed quantities of any items that have been interacted with
@@ -1081,12 +1292,35 @@ $mmrpg_index_fields = rpg_field::get_index();
                         if (numSlotsUsed > 0){ $resetButton.addClass('visible'); }
                         else { $resetButton.removeClass('visible'); }
 
+                        // Let us also update the list of void powers to show any changes
+                        var voidPowers = _self.powers;
+                        var voidPowersKeys = Object.keys(voidPowers);
+                        $missionDetails.html('');
+                        if (voidPowersKeys.length){
+                            var powersListMarkup = '';
+                            powersListMarkup += '<div class="powers-list">';
+                                powersListMarkup += '<ul class="wrapper">';
+                                for (var i = 0; i < voidPowersKeys.length; i++){
+                                    var powerToken = voidPowersKeys[i];
+                                    var powerValue = voidPowers[powerToken];
+                                    powersListMarkup += '<li class="power">';
+                                        powersListMarkup += '<span class="token">'+powerToken+'</span> ';
+                                        powersListMarkup += '<span class="value">'+(powerValue > 0 ? '+' : '')+(powerValue)+'</span>';
+                                    powersListMarkup += '</li>';
+                                    }
+                                powersListMarkup += '</ul>';
+                            powersListMarkup += '</div>';
+                            $missionDetails.append(powersListMarkup);
+                            } else {
+                            $missionDetails.append('<span class="loading">&hellip;</span>');
+                            }
+
+                        // end of voidRecipeWizard.refresh()
                         },
                     };
 
                 // Initialize the void recipe calculator
                 voidRecipeWizard.init($voidRecipeWizard);
-
 
                 })();
             }
