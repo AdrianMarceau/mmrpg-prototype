@@ -193,70 +193,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
         </div>
         <div class="creation">
             <div class="target-list">
-                <div class="target robot">
-                    <div class="image">
-                        <div class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(/images/robots/mega-man/sprite_left_40x40.png);"></div>
-                    </div>
-                    <div class="label">
-                        <strong class="name">Mega Man</strong>
-                    </div>
-                </div>
-                <div class="target mecha">
-                    <div class="image">
-                        <div class="sprite sprite_40x40 sprite_40x40_01" style="background-image: url(/images/robots/met/sprite_left_40x40.png);"></div>
-                    </div>
-                    <div class="label">
-                        <strong class="name">Met</strong>
-                    </div>
-                </div>
-                <div class="target boss">
-                    <div class="image">
-                        <div class="sprite sprite_80x80 sprite_80x80_02" style="background-image: url(/images/robots/enker/sprite_left_80x80.png);"></div>
-                    </div>
-                    <div class="label">
-                        <strong class="name">Enker</strong>
-                    </div>
-                </div>
-                <div class="target boss">
-                    <div class="image">
-                        <div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(/images/robots/hyper-storm-h/sprite_left_80x80.png);"></div>
-                    </div>
-                    <div class="label">
-                        <strong class="name">Hyper Storm H</strong>
-                    </div>
-                </div>
-                <div class="target frag">
-                    <div class="image">
-                        <div class="sprite sprite_40x40 sprite_40x40_04" style="background-image: url(/images/robots/dark-frag/sprite_left_40x40.png);"></div>
-                    </div>
-                    <div class="label">
-                        <strong class="name">Dark Frag</strong>
-                    </div>
-                </div>
-                <div class="target frag">
-                    <div class="image">
-                        <div class="sprite sprite_40x40 sprite_40x40_04" style="background-image: url(/images/robots/dark-frag/sprite_left_40x40.png);"></div>
-                    </div>
-                    <div class="label">
-                        <strong class="name">Dark Frag</strong>
-                    </div>
-                </div>
-                <div class="target frag">
-                    <div class="image">
-                        <div class="sprite sprite_40x40 sprite_40x40_04" style="background-image: url(/images/robots/dark-frag/sprite_left_40x40.png);"></div>
-                    </div>
-                    <div class="label">
-                        <strong class="name">Dark Frag</strong>
-                    </div>
-                </div>
-                <div class="target frag">
-                    <div class="image">
-                        <div class="sprite sprite_40x40 sprite_40x40_04" style="background-image: url(/images/robots/dark-frag/sprite_left_40x40.png);"></div>
-                    </div>
-                    <div class="label">
-                        <strong class="name">Dark Frag</strong>
-                    </div>
-                </div>
+                <span class="loading">&hellip;</span>
             </div>
             <div class="mission-details">
                 <span class="loading">&hellip;</span>
@@ -1060,6 +997,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         _self.version = '1.0.0';
                         _self.maxItems = 10;
                         _self.maxTargets = 8;
+                        _self.minQuantaPerClass = {'mecha': 25, 'master': 50, 'boss': 500};
                         _self.reset(false);
                         _self.setup($container);
                         _self.recalculate();
@@ -1245,70 +1183,57 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         // Collect the base amounts of quanta and spread for later reference
                         var baseQuanta = voidPowersList['quanta'] || 0;
                         var baseSpread = voidPowersList['spread'] || 0;
-                        console.log('-> baseQuanta:', baseQuanta, 'baseSpread:', baseSpread);
+                        //console.log('-> baseQuanta:', baseQuanta, 'baseSpread:', baseSpread);
 
                         // Likewise if we don't have any quanta material or a defined spread limit, we can't generate either
                         if (baseQuanta < 1 || baseSpread < 1){
                             if (baseQuanta < 1 && baseSpread < 1){
-                                console.log('%c' + '-> no quanta materia nor spread limit to generate from!', 'color: red;');
+                                //console.log('%c' + '-> no quanta materia nor spread limit to generate from!', 'color: red;');
                                 } else if (baseQuanta < 1){
-                                console.log('%c' + '-> no quanta materia to generate with!', 'color: red;');
+                                //console.log('%c' + '-> no quanta materia to generate with!', 'color: red;');
                                 } else if (baseSpread < 1){
-                                console.log('%c' + '-> no spread limit to generate within!', 'color: red;');
+                                //console.log('%c' + '-> no spread limit to generate within!', 'color: red;');
                                 }
                             return;
                             }
 
                         // First we set-up the different target slots given quanta vs spread
-                        var numTargetSlots = baseSpread >= _self.maxTargets ? _self.maxTargets : (baseSpread < 1 ? 1 : Math.trunc(baseSpread));
-                        var maxQuantaPerTarget = Math.round(baseQuanta / numTargetSlots);
-                        var minQuantaRemaining = baseQuanta % numTargetSlots;
-                        console.log('-> numTargetSlots:', numTargetSlots, 'maxQuantaPerTarget:', maxQuantaPerTarget, 'minQuantaRemaining:', minQuantaRemaining);
+                        // using predefined thresholds to determine each target's class
+                        var effectiveSpread = baseSpread >= _self.maxTargets ? _self.maxTargets : (baseSpread < 1 ? 1 : Math.trunc(baseSpread));
+                        var distributedQuanta = _self.distributeQuanta(baseQuanta, effectiveSpread, true);
+                        //console.log('-> effectiveSpread:', effectiveSpread, 'distributedQuanta:', distributedQuanta);
 
                         // Use calculated quanta-per-target to set-up the different target slots
                         var missionTargets = [];
-                        var quantaUsedSoFar = 0;
-                        var quantaRemaining = baseQuanta;
+                        var numTargetSlots = distributedQuanta.length;
                         for (var slotKey = 0; slotKey < numTargetSlots; slotKey++){
-                            console.log('--> calculating slotKey:', slotKey);
+                            var slotTemplate = distributedQuanta[slotKey];
+                            //console.log('--> calculating slotKey:', slotKey, 'w/ slotTemplate:', slotTemplate);
                             var targetRobot = {};
-                            var targetClass = '';
-                            var targetQuanta = maxQuantaPerTarget;
-                            if (targetQuanta >= 500){ targetClass = 'boss'; targetQuanta = 500; }
-                            else if (targetQuanta >= 50){ targetClass = 'master'; targetQuanta = 50; }
-                            else if (targetQuanta >= 25){ targetClass = 'mecha'; targetQuanta = 25; }
+                            var targetTier = slotTemplate.tier;
+                            var targetClass = slotTemplate.class;
+                            var targetQuanta = slotTemplate.amount;
                             targetRobot.token = '';
                             targetRobot.class = targetClass;
                             targetRobot.quanta = targetQuanta;
                             targetRobot.level = 1;
-                            if (targetClass.length){
+                            if (targetTier.length){
                                 // TEMP TEMP TEMP (placeholder robots)
-                                if (targetClass === 'mecha'){ targetRobot.token = 'met'; }
-                                if (targetClass === 'master'){ targetRobot.token = 'mega-man'; }
-                                if (targetClass === 'boss'){ targetRobot.token = 'enker'; }
+                                if (targetTier === 'mecha'){ targetRobot.token = 'met'; }
+                                if (targetTier === 'master'){ targetRobot.token = 'mega-man'; }
+                                if (targetTier === 'boss'){ targetRobot.token = 'enker'; }
                                 // TEMP TEMP TEMP (placeholder robots)
                                 } else {
+                                // TEMP TEMP TEMP (placeholder frags)
                                 targetRobot.token = 'dark-frag';
-                                targetRobot.class = 'mecha';
+                                // TEMP TEMP TEMP (placeholder frags)
                                 }
 
                             // Add the target robot to the mission targets list
                             missionTargets.push(targetRobot);
+                            //console.log('--> pushed new target!', '\n-> targetRobot:', targetRobot);
 
-                            quantaUsedSoFar += targetQuanta;
-                            quantaRemaining -= targetQuanta;
-                            console.log('--> quantaUsedSoFar:', quantaUsedSoFar);
-                            console.log('--> quantaRemaining:', quantaRemaining);
                             }
-
-                        // DEBUG DEBUG DEBUG
-                        console.log('-> missionTargets:', missionTargets.length);
-                        for (var i = 0; i < missionTargets.length; i++){
-                            var targetRobot = missionTargets[i];
-                            console.log('--> missionTargets['+i+']:', targetRobot);
-                            }
-                        console.log('-> quantaRemaining:', quantaRemaining);
-                        // DEBUG DEBUG DEBUG
 
                         // Update the mission details with the new targets
                         _self.mission = {};
@@ -1463,10 +1388,10 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         var missionTargets = missionInfo.targets || [];
                         $targetList.html('');
                         if (missionTargets.length){
-                            console.log('updating mission target list!', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
+                            //console.log('updating mission target list!', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
                             for (var i = 0; i < missionTargets.length; i++){
                                 var targetRobot = missionTargets[i];
-                                console.log('-> targetRobot:', targetRobot);
+                                //console.log('-> targetRobot:', targetRobot);
                                 var targetRobotToken = targetRobot.token;
                                 var targetRobotInfo = mmrpgIndex.robots[targetRobotToken] || false;
                                 if (!targetRobotInfo){ continue; }
@@ -1677,6 +1602,79 @@ $mmrpg_index_fields = rpg_field::get_index(true);
 
                         // end of voidRecipeWizard.parseItem()
                         },
+                    distributeQuanta: function(quanta, spread, autofill) {
+                        autofill = typeof autofill !== 'undefined' ? autofill : true;
+                        console.log('%c' + 'voidRecipeWizard.distributeQuanta()', 'color: magenta;');
+                        console.log('-> w/ quanta:', quanta, 'spread:', spread, 'autofill:', autofill);
+
+                        // Define the main thresholds for primary slots
+                        const _self = this;
+                        const thresholds = { boss: 500, master: 50, mecha: 25 };
+                        const tierNames = ['boss', 'master', 'mecha'];
+                        const result = [];
+
+                        // Step 1: Calculate base quanta per slot to ensure each slot is filled
+                        let minQuantaPerSlot = Math.floor(quanta / spread);
+
+                        // Determine the minimum possible tier based on minQuantaPerSlot
+                        let baseTier = '', baseClass = '';
+                        if (minQuantaPerSlot >= thresholds.boss) {
+                            baseTier = baseClass = 'boss';
+                            minQuantaPerSlot = thresholds.boss;
+                            } else if (minQuantaPerSlot >= thresholds.master) {
+                            baseTier = baseClass = 'master';
+                            minQuantaPerSlot = thresholds.master;
+                            } else if (minQuantaPerSlot >= thresholds.mecha) {
+                            baseTier = baseClass = 'mecha';
+                            minQuantaPerSlot = thresholds.mecha;
+                            } else {
+                            baseTier = '';
+                            baseClass = 'mecha';
+                            minQuantaPerSlot = 0; // "frag" slots start at 0
+                            }
+
+                        // Deduct the base allocation from total quanta
+                        quanta -= minQuantaPerSlot * spread;
+
+                        // Step 2: Assign the base tier to each slot
+                        for (let i = 0; i < spread; i++) {
+                            result.push({
+                                tier: baseTier,
+                                class: baseClass,
+                                amount: minQuantaPerSlot
+                                });
+                            }
+
+                        // Step 3: Distribute remaining quanta to upgrade slots where possible
+                        for (let i = 0; i < spread && quanta > 0; i++) {
+                            let currentTierIndex = tierNames.indexOf(result[i].tier);
+                            let nextTier = tierNames[currentTierIndex - 1]; // Get the next higher tier
+                            if (nextTier && thresholds[nextTier] > result[i].amount) {
+                                let needed = thresholds[nextTier] - result[i].amount;
+                                if (quanta >= needed) {
+                                    quanta -= needed;
+                                    result[i] = { tier: nextTier, amount: thresholds[nextTier] };
+                                    }
+                                }
+                            }
+
+                        // Step 4: If there's leftover quanta, add a single "frag" slot
+                        if (autofill
+                            && quanta > 0
+                            && baseTier.length
+                            && result.length < _self.maxTargets){
+                            result.unshift({
+                                tier: '',
+                                class: 'mecha',
+                                amount: quanta
+                                });
+                            }
+
+                        return result;
+
+                        // end of voidRecipeWizard.distributeQuanta()
+                        }
+
                     };
 
                 // Initialize the void recipe calculator
