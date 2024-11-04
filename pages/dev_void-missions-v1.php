@@ -983,16 +983,12 @@ $mmrpg_index_fields = rpg_field::get_index(true);
 
                 //console.log('voidRecipeWizard:', $voidRecipeWizard);
 
-                // Pre-collect a list of robot tokens that we can use later
-                var mmrpgIndexRobots = mmrpgIndex.robots;
-                var mmrpgIndexRobotsTokens = Object.keys(mmrpgIndexRobots);
-
                 // Create a VOID RECIPE WIZARD so we can easily add/remove and recalculate on-the-stop
                 var voidRecipeWizard = {
                     init: function($container){
                         console.log('%c' + 'voidRecipeWizard.init()', 'color: magenta;');
                         //console.log('-> w/ $container:', typeof $container, $container.length, $container);
-                        var _self = this;
+                        const _self = this;
                         _self.name = 'voidRecipeWizard';
                         _self.version = '1.0.0';
                         _self.maxItems = 10;
@@ -1004,12 +1000,13 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         _self.regenerate();
                         _self.refresh();
                         console.log('voidRecipeWizard is ' + ('%c' + 'ready'), 'color: lime;');
+                        console.log('=> voidRecipeWizard:', _self);
                         // end of voidRecipeWizard.init()
                         },
                     reset: function(refresh){
                         console.log('%c' + 'voidRecipeWizard.reset()', 'color: magenta;');
                         if (typeof refresh === 'undefined'){ refresh = true; }
-                        var _self = this;
+                        const _self = this;
                         _self.items = {};
                         _self.powers = {};
                         _self.mission = {};
@@ -1025,7 +1022,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         //console.log('-> w/ $container:', typeof $container, $container.length, $container);
 
                         // Backup a reference to the parent object
-                        var _self = this;
+                        const _self = this;
 
                         // Predefine some parent variables for the class
                         _self.xrefs = {};
@@ -1033,6 +1030,57 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         _self.powers = {};
                         _self.mission = {};
                         _self.history = [];
+                        _self.indexes = {};
+
+                        // Pre-define a list of stat tokens we can use later
+                        var mmrpgStatTokens = ['energy', 'weapons', 'attack', 'defense', 'speed'];
+                        _self.indexes.statTokens = mmrpgStatTokens;
+                        //console.log('mmrpgStatTokens:', mmrpgStatTokens);
+
+                        // Pre-collect a list of type tokens we can use later
+                        const mmrpgIndexTypes = mmrpgIndex.types;
+                        var mmrpgTypeTokens = Object.keys(mmrpgIndexTypes);
+                        mmrpgTypeTokens = mmrpgTypeTokens.filter(function(token){
+                            var info = mmrpgIndexTypes[token];
+                            if (token === 'none'){ return true; }
+                            else if (info.type_class === 'normal'){ return true; }
+                            return false;
+                            });
+                        _self.indexes.typeTokens = mmrpgTypeTokens;
+                        //console.log('mmrpgTypeTokens:', mmrpgTypeTokens);
+
+                        // Pre-collect a list of robot tokens that we can use later
+                        const mmrpgIndexRobots = mmrpgIndex.robots;
+                        var mmrpgRobotTokens = Object.keys(mmrpgIndexRobots);
+                        mmrpgRobotTokens = mmrpgRobotTokens.filter(function(token){
+                            var info = mmrpgIndexRobots[token];
+                            //console.log('checking info for ', token, ' | info:', info);
+                            if (!info.robot_flag_published){ return false; }
+                            else if (!info.robot_flag_complete){ return false; }
+                            else if (info.robot_flag_hidden){ return false; }
+                            else if (info.robot_class === 'system'){ return false; }
+                            return true;
+                            });
+                        _self.indexes.robotTokens = mmrpgRobotTokens;
+                        //console.log('mmrpgRobotTokens:', mmrpgRobotTokens);
+
+                        // Create sub-lists of robot tokens for each class for later
+                        var filterToClass = function(tokens, className){
+                            return tokens.filter(function(token){
+                                var info = mmrpgIndexRobots[token];
+                                if (info.robot_class === className){ return true; }
+                                return false;
+                                });
+                            };
+                        var mmrpgRobotMechaTokens = filterToClass(mmrpgRobotTokens, 'mecha');
+                        var mmrpgRobotMasterTokens = filterToClass(mmrpgRobotTokens, 'master');
+                        var mmrpgRobotBossTokens = filterToClass(mmrpgRobotTokens, 'boss');
+                        _self.indexes.robotMechaTokens = mmrpgRobotMechaTokens;
+                        _self.indexes.robotMasterTokens = mmrpgRobotMasterTokens;
+                        _self.indexes.robotBossTokens = mmrpgRobotBossTokens;
+                        //console.log('mmrpgRobotMechaTokens:', mmrpgRobotMechaTokens);
+                        //console.log('mmrpgRobotMasterTokens:', mmrpgRobotMasterTokens);
+                        //console.log('mmrpgRobotBossTokens:', mmrpgRobotBossTokens);
 
                         // Collect references to key and parent elements on the page
                         var $parentDiv = $container;
@@ -1103,7 +1151,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         console.log('%c' + 'voidRecipeWizard.recalculate()', 'color: magenta;');
 
                         // Backup a reference to the parent object
-                        var _self = this;
+                        const _self = this;
 
                         // Collect a reference to the void values object and reset
                         var voidItems = _self.items;
@@ -1168,7 +1216,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         console.log('%c' + 'voidRecipeWizard.regenerate()', 'color: magenta;');
 
                         // Backup a reference to the parent object
-                        var _self = this;
+                        const _self = this;
 
                         // Collect reference to the void powers so we can reference them
                         var voidPowersList = _self.powers;
@@ -1203,6 +1251,21 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         var distributedQuanta = _self.distributeQuanta(baseQuanta, effectiveSpread, true);
                         //console.log('-> effectiveSpread:', effectiveSpread, 'distributedQuanta:', distributedQuanta);
 
+                        // Pull a filtered list of stat powers and type powers for easier looping
+                        var statPowersList = _self.filterStatPowers(voidPowersList);
+                        var typePowersList = _self.filterTypePowers(voidPowersList);
+                        console.log('-> statPowersList:', statPowersList);
+                        console.log('-> typePowersList:', typePowersList);
+
+                        // Generate a queue of mechas, masters, and bosses given the powers available
+                        var targetRobotQueue = {};
+                        targetRobotQueue['mecha'] = _self.generateTargetQueue((_self.indexes.robotMechaTokens || []), typePowersList, statPowersList);
+                        targetRobotQueue['master'] = _self.generateTargetQueue((_self.indexes.robotMasterTokens || []), typePowersList, statPowersList);
+                        targetRobotQueue['boss'] = _self.generateTargetQueue((_self.indexes.robotBossTokens || []), typePowersList, statPowersList);
+                        console.log('-> targetRobotQueue[mecha]:', targetRobotQueue['mecha']);
+                        console.log('-> targetRobotQueue[master]:', targetRobotQueue['master']);
+                        console.log('-> targetRobotQueue[boss]:', targetRobotQueue['boss']);
+
                         // Use calculated quanta-per-target to set-up the different target slots
                         var missionTargets = [];
                         var numTargetSlots = distributedQuanta.length;
@@ -1219,14 +1282,27 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             targetRobot.level = 1;
                             if (targetTier.length){
                                 // TEMP TEMP TEMP (placeholder robots)
-                                if (targetTier === 'mecha'){ targetRobot.token = 'met'; }
-                                if (targetTier === 'master'){ targetRobot.token = 'mega-man'; }
-                                if (targetTier === 'boss'){ targetRobot.token = 'enker'; }
+                                //if (targetTier === 'mecha'){ targetRobot.token = 'met'; }
+                                //if (targetTier === 'master'){ targetRobot.token = 'mega-man'; }
+                                //if (targetTier === 'boss'){ targetRobot.token = 'enker'; }
                                 // TEMP TEMP TEMP (placeholder robots)
-                                } else {
-                                // TEMP TEMP TEMP (placeholder frags)
+                                var queueOrder = [];
+                                if (targetTier === 'boss'){ queueOrder.push('boss', 'master', 'mecha'); }
+                                if (targetTier === 'master'){ queueOrder.push('master', 'mecha'); }
+                                if (targetTier === 'mecha'){ queueOrder.push('mecha'); }
+                                for (var i = 0; i < queueOrder.length; i++){
+                                    var queueToken = queueOrder[i];
+                                    if (targetRobotQueue[queueToken].length){
+                                        targetRobot.token = targetRobotQueue[queueToken].shift();
+                                        targetRobotQueue[queueToken].push(targetRobot.token);
+                                        break;
+                                        }
+                                    }
+                                }
+
+                            // If a token for this slot count not be found, default to a dark frag
+                            if (!targetRobot.token.length){
                                 targetRobot.token = 'dark-frag';
-                                // TEMP TEMP TEMP (placeholder frags)
                                 }
 
                             // Add the target robot to the mission targets list
@@ -1245,7 +1321,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         console.log('%c' + 'voidRecipeWizard.refresh()', 'color: magenta;');
 
                         // Backup a reference to the parent object
-                        var _self = this;
+                        const _self = this;
 
                         // Collect a reference to the void values
                         var voidItems = _self.items;
@@ -1272,10 +1348,11 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         $selectedWrapper.html('');
                         $paletteItems.removeClass('active');
                         if (usedItemTokens.length > 0){
+                            const mmrpgIndexItems = mmrpgIndex.items;
                             for (var i = 0; i < usedItemTokens.length; i++){
                                 // Generate the markup for the item then add to the selection area
                                 var itemToken = usedItemTokens[i];
-                                var itemInfo = mmrpgIndex.items[itemToken];
+                                var itemInfo = mmrpgIndexItems[itemToken];
                                 var itemName = itemInfo.item_name;
                                 var itemNameBr = itemName.replace(' ', '<br />');
                                 var itemQuantity = voidItems[itemToken] || 0;
@@ -1316,9 +1393,10 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             else { itemsWithHistory.push(itemToken); }
                             }
                         if (itemsWithHistory.length > 0){
+                            const mmrpgIndexItems = mmrpgIndex.items;
                             for (var i = 0; i < itemsWithHistory.length; i++){
                                 var itemToken = itemsWithHistory[i];
-                                var itemInfo = mmrpgIndex.items[itemToken];
+                                var itemInfo = mmrpgIndexItems[itemToken];
                                 var $paletteButton = $('.item[data-token="'+itemToken+'"]', $itemsPalette);
                                 var $selectButton = $('.item[data-token="'+itemToken+'"]', $itemsSelected);
                                 var baseQuantity = parseInt($paletteButton.attr('data-base-quantity'));
@@ -1389,11 +1467,12 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         $targetList.html('');
                         if (missionTargets.length){
                             //console.log('updating mission target list!', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
+                            const mmrpgIndexRobots = mmrpgIndex.robots;
                             for (var i = 0; i < missionTargets.length; i++){
                                 var targetRobot = missionTargets[i];
                                 //console.log('-> targetRobot:', targetRobot);
                                 var targetRobotToken = targetRobot.token;
-                                var targetRobotInfo = mmrpgIndex.robots[targetRobotToken] || false;
+                                var targetRobotInfo = mmrpgIndexRobots[targetRobotToken] || false;
                                 if (!targetRobotInfo){ continue; }
                                 var targetRobotClass = targetRobot.class;
                                 var targetRobotQuanta = targetRobot.quanta;
@@ -1422,7 +1501,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                     addItem: function(item){
                         console.log('%c' + 'voidRecipeWizard.addItem()', 'color: magenta;');
                         console.log('-> w/ item:', item);
-                        var _self = this;
+                        const _self = this;
                         var token = item.token;
                         var existing = Object.keys(_self.items).length;
                         var exists = Object.keys(_self.items).indexOf(token) >= 0;
@@ -1438,7 +1517,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                     removeItem: function(item){
                         console.log('%c' + 'voidRecipeWizard.removeItem()', 'color: magenta;');
                         console.log('-> w/ item:', item);
-                        var _self = this;
+                        const _self = this;
                         var token = item.token;
                         var exists = Object.keys(_self.items).indexOf(token) >= 0;
                         if (!exists){ return; }
@@ -1455,7 +1534,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         console.log('-> w/ item:', item, 'quantity:', quantity, 'powers:', powers);
 
                         // Backup a reference to the parent object
-                        var _self = this;
+                        const _self = this;
 
                         // Collect the item token and then also break it apart for reference
                         var itemToken = item.token;
@@ -1487,7 +1566,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         if (itemToken === 'yashichi'){ itemIsWeapons = true; itemIsMythic = true; }
 
                         // Increase the delta by one, always, for each item added
-                        powers.incPower('delta', 1);
+                        powers.incPower('delta', 1 * quantity);
 
                         // Check to see which group the item belongs to and then parse its values
 
@@ -1602,6 +1681,62 @@ $mmrpg_index_fields = rpg_field::get_index(true);
 
                         // end of voidRecipeWizard.parseItem()
                         },
+                    filterStatPowers: function(powers, sort){
+                        sort = typeof sort === 'undefined' ? true : sort;
+                        console.log('%c' + 'voidRecipeWizard.filterStatPowers()', 'color: magenta;');
+                        console.log('-> w/ powers:', powers, 'sort:', sort);
+                        // parse out powers that represent stats and then order them highest first
+                        const _self = this;
+                        var mmrpgStats = _self.indexes.statTokens;
+                        var statPowers = {};
+                        for (var i = 0; i < mmrpgStats.length; i++){
+                            var statToken = mmrpgStats[i];
+                            var statValue = powers[statToken] || 0;
+                            if (statValue > 0){ statPowers[statToken] = statValue; }
+                            }
+                        console.log('=> statPowers:', statPowers);
+                        if (!sort){ return statPowers; }
+                        // re-sort the stat powers based on their values w/ highest first
+                        var statPowersKeys = Object.keys(statPowers);
+                        statPowersKeys.sort(function(a, b){ return statPowers[b] - statPowers[a]; });
+                        var sortedStatPowers = {};
+                        for (var i = 0; i < statPowersKeys.length; i++){
+                            var statToken = statPowersKeys[i];
+                            var statValue = statPowers[statToken];
+                            sortedStatPowers[statToken] = statValue;
+                            }
+                        console.log('=> sortedStatPowers:', sortedStatPowers);
+                        return sortedStatPowers;
+                        // end of voidRecipeWizard.filterStatPowers()
+                        },
+                    filterTypePowers: function(powers, sort){
+                        sort = typeof sort === 'undefined' ? true : sort;
+                        console.log('%c' + 'voidRecipeWizard.filterTypePowers()', 'color: magenta;');
+                        console.log('-> w/ powers:', powers, 'sort:', sort);
+                        // parse out powers that represent types and then order them highest first
+                        const _self = this;
+                        var mmrpgTypes = _self.indexes.typeTokens;
+                        var typePowers = {};
+                        for (var i = 0; i < mmrpgTypes.length; i++){
+                            var typeToken = mmrpgTypes[i];
+                            var typeValue = powers[typeToken] || 0;
+                            if (typeValue > 0){ typePowers[typeToken] = typeValue; }
+                            }
+                        console.log('=> typePowers:', typePowers);
+                        if (!sort){ return typePowers; }
+                        // re-sort the type powers based on their values w/ highest first
+                        var typePowersKeys = Object.keys(typePowers);
+                        typePowersKeys.sort(function(a, b){ return typePowers[b] - typePowers[a]; });
+                        var sortedTypePowers = {};
+                        for (var i = 0; i < typePowersKeys.length; i++){
+                            var typeToken = typePowersKeys[i];
+                            var typeValue = typePowers[typeToken];
+                            sortedTypePowers[typeToken] = typeValue;
+                            }
+                        console.log('=> sortedTypePowers:', sortedTypePowers);
+                        return sortedTypePowers;
+                        // end of voidRecipeWizard.filterTypePowers()
+                        },
                     distributeQuanta: function(quanta, spread, autofill) {
                         autofill = typeof autofill !== 'undefined' ? autofill : true;
                         console.log('%c' + 'voidRecipeWizard.distributeQuanta()', 'color: magenta;');
@@ -1673,8 +1808,58 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         return result;
 
                         // end of voidRecipeWizard.distributeQuanta()
-                        }
-
+                        },
+                    generateTargetQueue: function(robots, types, stats){
+                        console.log('%c' + 'voidRecipeWizard.generateTargetQueue()', 'color: magenta;');
+                        //console.log('-> w/ robots:', robots, 'types:', types, 'stats:', stats);
+                        // Collect important refs and indexes for processing
+                        const _self = this;
+                        const mmrpgIndexRobots = mmrpgIndex.robots;
+                        var allowTypes = Object.keys(types);
+                        var sortByStats = Object.keys(stats);
+                        var sortByTypes = Object.keys(types);
+                        var targetQueue = robots;
+                        // First we filter-out any robots that don't have elemental energy
+                        targetQueue = targetQueue.filter(function(token){
+                            var types = [];
+                            var info = mmrpgIndexRobots[token];
+                            if (info.robot_core !== ''){ types.push(info.robot_core); }
+                            if (types.length && info.robot_core2 !== ''){ types.push(info.robot_core2); }
+                            if (!types.length){ types.push('none'); }
+                            return allowTypes.indexOf(types[0]) !== -1 || allowTypes.indexOf(types[1]) !== -1;
+                            });
+                        //console.log('=> targetQueue (filtered):', targetQueue);
+                        // First we sort the queue based on the ID just to make everything consistent
+                        targetQueue.sort(function(a, b){
+                            var robotA = mmrpgIndexRobots[a];
+                            var robotB = mmrpgIndexRobots[b];
+                            var idValueA = robotA.robot_id || 0;
+                            var idValueB = robotB.robot_id || 0;
+                            if (idValueA !== idValueB){ return idValueA - idValueB; }
+                            return 0;
+                            });
+                        // Last we re-sort the queue based on each robot's stats given stat-order priority
+                        targetQueue.sort(function(a, b){
+                            var robotA = mmrpgIndexRobots[a];
+                            var robotB = mmrpgIndexRobots[b];
+                            for (var i = 0; i < sortByStats.length; i++){
+                                var statToken = sortByStats[i];
+                                var statValueA = robotA['robot_' + statToken] || 0;
+                                var statValueB = robotB['robot_' + statToken] || 0;
+                                if (statValueA !== statValueB){ return statValueB - statValueA; }
+                                }
+                            /* for (var i = 0; i < sortByTypes.length; i++){
+                                var typeToken = sortByTypes[i];
+                                var typeValueA = robotA['robot_core'] === typeToken ? 1 : 0;
+                                var typeValueB = robotB['robot_core'] === typeToken ? 1 : 0;
+                                if (typeValueA !== typeValueB){ return typeValueB - typeValueA; }
+                                } */
+                            return 0;
+                            });
+                        //console.log('=> targetQueue (sorted):', targetQueue);
+                        return targetQueue;
+                        // end of voidRecipeWizard.generateTargetQueue()
+                        },
                     };
 
                 // Initialize the void recipe calculator
