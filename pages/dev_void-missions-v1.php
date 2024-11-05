@@ -31,7 +31,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
     </div>
 </div>
 <h2 class="subheader field_type_<?= !empty($this_field_info['field_type']) ? $this_field_info['field_type'] : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-    Experimental Proceedural Mission Generator
+    Experimental Procedural Mission Generator
 </h2>
 
 <div class="subbody">
@@ -49,11 +49,11 @@ $mmrpg_index_fields = rpg_field::get_index(true);
         </div>
         <div class="legend">
             <ul>
-                <li>SCREWS = QUANTITY/CLASS</li>
-                <li>COREES = ELEMENT(S)</li>
-                <li>EDIBLES = SORT/SOURCE</li>
-                <li>SPECIAL = LEVEL/STATS</li>
-                <li>PARTS = ITEMS/BUFFS/DEBUFFS</li>
+                <li>SCREWS = BALANCED QUANTA/SPREAD</li>
+                <li>CORES = TYPE-FILTERING + HIGH-SPREAD/LOW-QUANTA</li>
+                <li>EDIBLES = STAT-SORTING + HIGH-QUANTA/LOW-SPREAD</li>
+                <li>CIRCUITS = TYPE-FILTERING || BOOSTERS = STAT-SORTING</li>
+                <li>MYTHICS = LEVEL/FORTE || MODULES = MISC EFFECTS</li>
             </ul>
         </div>
     </div>
@@ -189,14 +189,19 @@ $mmrpg_index_fields = rpg_field::get_index(true);
 
     <div id="void-recipe">
         <div class="title">
-            <strong>The Void Cauldron: Proceedural Mission Generator</strong>
+            <strong>The Void Cauldron: Procedural Mission Generator</strong>
         </div>
         <div class="creation">
+            <div class="mission-details">
+                <span class="loading">&hellip;</span>
+            </div>
             <div class="target-list">
                 <span class="loading">&hellip;</span>
             </div>
-            <div class="mission-details">
-                <span class="loading">&hellip;</span>
+            <div class="battle-field">
+                <div class="sprite background"
+                    style="background-image: url(/images/fields/prototype-subspace/battle-field_preview.png?20241104-0121);"
+                    >&nbsp;</div>
             </div>
         </div>
         <div class="selection">
@@ -357,7 +362,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
         transform: translate(-50%, -50%);
         opacity: 0.6;
     }
-    #void-recipe .creation .target-list,
+    #void-recipe .creation .mission-details,
     #void-recipe .selection .item-list,
     #void-recipe .palette .item-list {
         padding-top: 16px;
@@ -720,24 +725,110 @@ $mmrpg_index_fields = rpg_field::get_index(true);
         border-radius: 6px;
         box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
     }
+    #void-recipe .creation .mission-details,
     #void-recipe .creation .target-list,
-    #void-recipe .creation .mission-details {
+    #void-recipe .creation .battle-field {
         display: block;
         margin: 0 auto;
         width: auto;
         height: auto;
         min-width: 180px;
         min-height: 50px;
-        position: relative;
         overflow: visible;
         border: 1px solid #1A1A1A;
         border-radius: 6px;
+        position: relative;
+        z-index: 3;
+    }
+
+    #void-recipe .creation .battle-field {
+        overflow: hidden;
+        border: 0 none transparent;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1;
+        pointer-events: none;
+    }
+    #void-recipe .creation .battle-field .sprite.background,
+    #void-recipe .creation .battle-field .sprite.foreground {
+        position: absolute;
+        margin: 0 auto;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+    }
+    #void-recipe .creation .battle-field .sprite.background {
+        background-repeat: repeat;
+        background-position: center center;
+    }
+    #void-recipe .creation .battle-field .sprite.foreground {
+        top: auto;
+        height: 20%;
+    }
+
+    #void-recipe .creation .mission-details {
+        height: 60px;
+        border-radius: 6px 6px 0 0;
+        border-bottom: 0;
+    }
+    #void-recipe .creation .mission-details .powers-list {
+        display: block;
+        width: auto;
+    }
+    #void-recipe .creation .mission-details .powers-list ul {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+        padding: 3px;
+        font-size: 11px;
+        line-height: 13px;
+        color: #efefef;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li {
+        display: block;
+        box-sizing: border-box;
+        float: left;
+        width: calc(100% / 5);
+        text-align: center;
+        padding: 2px 3px 3px;
+    }
+    #void-recipe .creation .mission-details .powers-list ul:after,
+    #void-recipe .creation .mission-details .powers-list ul li:after {
+        content: "";
+        display: block;
+        clear: both;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.02);
+    }
+    #void-recipe .creation .mission-details .powers-list ul li .token,
+    #void-recipe .creation .mission-details .powers-list ul li .value {
+        display: inline-block;
+        margin: 0 4px;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li .token {
+        text-decoration: underline;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li .value {
+        font-weight: bold;
+    }
+    #void-recipe .creation .mission-details .powers-list ul li .value .overflow {
+        display: inline-block;
+        margin-left: 4px;
+        opacity: 0.4;
+        font-weight: normal;
     }
 
     #void-recipe .creation .target-list {
         height: 80px;
-        border-radius: 6px 6px 0 0;
-        border-bottom: 0;
+        border-radius: 0 0 6px 6px;
+        border-top: 0;
         text-align: center;
         vertical-align: middle;
     }
@@ -816,68 +907,15 @@ $mmrpg_index_fields = rpg_field::get_index(true);
         left: -40px;
     }
 
-    #void-recipe .creation .mission-details {
-        height: 60px;
-        border-radius: 0 0 6px 6px;
-        border-top: 0;
-    }
-    #void-recipe .creation .mission-details .powers-list {
-        display: block;
-        width: auto;
-    }
-    #void-recipe .creation .mission-details .powers-list ul {
-        display: block;
-        box-sizing: border-box;
-        width: 100%;
-        height: 100%;
-        margin: 0 auto;
-        padding: 3px;
-        font-size: 11px;
-        line-height: 13px;
-        color: #efefef;
-    }
-    #void-recipe .creation .mission-details .powers-list ul li {
-        display: block;
-        box-sizing: border-box;
-        float: left;
-        width: calc(100% / 5);
-        text-align: center;
-        padding: 2px 3px 3px;
-    }
-    #void-recipe .creation .mission-details .powers-list ul:after,
-    #void-recipe .creation .mission-details .powers-list ul li:after {
-        content: "";
-        display: block;
-        clear: both;
-    }
-    #void-recipe .creation .mission-details .powers-list ul li:nth-child(odd) {
-        background-color: rgba(255, 255, 255, 0.02);
-    }
-    #void-recipe .creation .mission-details .powers-list ul li .token,
-    #void-recipe .creation .mission-details .powers-list ul li .value {
-        display: inline-block;
-        margin: 0 4px;
-    }
-    #void-recipe .creation .mission-details .powers-list ul li .token {
-        text-decoration: underline;
-    }
-    #void-recipe .creation .mission-details .powers-list ul li .value {
-        font-weight: bold;
-    }
-    #void-recipe .creation .mission-details .powers-list ul li .value .overflow {
-        display: inline-block;
-        margin-left: 4px;
-        opacity: 0.4;
-        font-weight: normal;
-    }
-
     /* -- PANEL & GROUP COLORS -- */
 
-    #void-recipe .creation .target-list {
-        background-color: #292834;
-    }
     #void-recipe .creation .mission-details {
         background-color: #2d2c3a;
+        background-color: rgb(45, 44, 58, 0.9);
+    }
+    #void-recipe .creation .target-list {
+        background-color: #292834;
+        background-color: rgb(41, 40, 52, 0.8);
     }
     #void-recipe .selection .item-list {
         background-color: #25232e;
@@ -1031,6 +1069,12 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         _self.mission = {};
                         _self.history = [];
                         _self.indexes = {};
+
+                        // Pre-define a list of item tokens we can use later
+                        const mmrpgIndexItems = mmrpgIndex.items;
+                        var mmrpgTypeTokens = Object.keys(mmrpgIndexItems);
+                        _self.indexes.itemTokens = mmrpgTypeTokens;
+                        //console.log('mmrpgTypeTokens:', mmrpgTypeTokens);
 
                         // Pre-define a list of stat tokens we can use later
                         var mmrpgStatTokens = ['energy', 'weapons', 'attack', 'defense', 'speed'];
@@ -1268,7 +1312,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
 
                         // Use calculated quanta-per-target to set-up the different target slots
                         var missionTargets = [];
-                        var numTargetSlots = distributedQuanta.length;
+                        var numTargetSlots = effectiveSpread; //distributedQuanta.length;
                         for (var slotKey = 0; slotKey < numTargetSlots; slotKey++){
                             var slotTemplate = distributedQuanta[slotKey];
                             //console.log('--> calculating slotKey:', slotKey, 'w/ slotTemplate:', slotTemplate);
@@ -1385,20 +1429,14 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             $itemsPalette.attr('data-select', 'active');
                             }
 
-                        // Check and update the displayed quantities of any items that have been interacted with
-                        var itemsWithHistory = [];
-                        for (var i = 0; i < voidHistory.length; i++){
-                            var itemToken = voidHistory[i].token;
-                            if (itemsWithHistory.indexOf(itemToken) !== -1){ continue; }
-                            else { itemsWithHistory.push(itemToken); }
-                            }
-                        if (itemsWithHistory.length > 0){
+                        // Check and update the displayed quantities of any items visible in the palette
+                        var itemsToUpdate = _self.indexes.itemTokens;
+                        if (itemsToUpdate.length > 0){
                             const mmrpgIndexItems = mmrpgIndex.items;
-                            for (var i = 0; i < itemsWithHistory.length; i++){
-                                var itemToken = itemsWithHistory[i];
+                            for (var i = 0; i < itemsToUpdate.length; i++){
+                                var itemToken = itemsToUpdate[i];
                                 var itemInfo = mmrpgIndexItems[itemToken];
                                 var $paletteButton = $('.item[data-token="'+itemToken+'"]', $itemsPalette);
-                                var $selectButton = $('.item[data-token="'+itemToken+'"]', $itemsSelected);
                                 var baseQuantity = parseInt($paletteButton.attr('data-base-quantity'));
                                 var addedQuantity = voidItems[itemToken] || 0;
                                 var newQuantity = baseQuantity - addedQuantity;
@@ -1798,7 +1836,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             && quanta > 0
                             && baseTier.length
                             && result.length < _self.maxTargets){
-                            result.unshift({
+                            result.push({
                                 tier: '',
                                 class: 'mecha',
                                 amount: quanta
