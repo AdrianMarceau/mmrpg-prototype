@@ -878,7 +878,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
         height: 40px;
         bottom: 14px;
         left: 50%;
-        transform: translate(-50%, 0);
+        transform: translate(-50%, -50%) scale(2.0);
         cursor: pointer
         /* background-color: rgba(100, 0, 255, 0.1);  */
     }
@@ -1343,19 +1343,21 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         //console.log('-> typePowersList:', typePowersList);
 
                         // Loop through and check to see which classes are represented
-                        var queuesRequired = [];
+                        var maxTierLevel = 0;
                         for (var i = 0; i < distributedQuanta.length; i++){
                             if (!distributedQuanta[i].tier){ continue; }
-                            if (queuesRequired.indexOf(distributedQuanta[i].tier) !== -1){ continue; }
-                            queuesRequired.push(distributedQuanta[i].tier);
+                            var tier = distributedQuanta[i].tier;
+                            if (tier === 'boss'){ maxTierLevel = Math.max(maxTierLevel, 3); }
+                            if (tier === 'master'){ maxTierLevel = Math.max(maxTierLevel, 2); }
+                            if (tier === 'mecha'){ maxTierLevel = Math.max(maxTierLevel, 1); }
                             }
-                        //console.log('-> queuesRequired:', queuesRequired);
+                        //console.log('-> maxTierLevel:', maxTierLevel);
 
                         // Generate a queue of mechas, masters, and bosses given the powers available
                         var targetRobotQueue = {};
-                        targetRobotQueue['mecha'] = queuesRequired.indexOf('mecha') !== -1 ? _self.generateTargetQueue((_self.indexes.robotMechaTokens || []), typePowersList, statPowersList) : [];
-                        targetRobotQueue['master'] = queuesRequired.indexOf('master') !== -1 ? _self.generateTargetQueue((_self.indexes.robotMasterTokens || []), typePowersList, statPowersList) : [];
-                        targetRobotQueue['boss'] = queuesRequired.indexOf('boss') !== -1 ? _self.generateTargetQueue((_self.indexes.robotBossTokens || []), typePowersList, statPowersList) : [];
+                        targetRobotQueue['mecha'] = maxTierLevel >= 1 ? _self.generateTargetQueue((_self.indexes.robotMechaTokens || []), typePowersList, statPowersList) : [];
+                        targetRobotQueue['master'] = maxTierLevel >= 2 ? _self.generateTargetQueue((_self.indexes.robotMasterTokens || []), typePowersList, statPowersList) : [];
+                        targetRobotQueue['boss'] = maxTierLevel >= 3 ? _self.generateTargetQueue((_self.indexes.robotBossTokens || []), typePowersList, statPowersList) : [];
                         //console.log('-> targetRobotQueue[mecha]:', targetRobotQueue['mecha']);
                         //console.log('-> targetRobotQueue[master]:', targetRobotQueue['master']);
                         //console.log('-> targetRobotQueue[boss]:', targetRobotQueue['boss']);
