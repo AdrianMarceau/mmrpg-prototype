@@ -1275,372 +1275,6 @@ if (!function_exists('array_rearrange_keys')){
 
                             // end of voidRecipeWizard.setup()
                             },
-                        calculatePowers: function(){
-                            console.log('%c' + 'voidRecipeWizard.calculatePowers()', 'color: magenta;');
-
-                            // Backup a reference to the parent object
-                            const _self = this;
-
-                            // Collect a reference to the void values object and reset
-                            var voidItems = _self.items;
-                            var voidItemsTokens = Object.keys(voidItems);
-
-                            // Define a variable to hold the calculated powers of all the items
-                            var voidPowers = {};
-                            voidPowers.powers = {};
-                            voidPowers.flags = {};
-                            voidPowers.getPowers = function(){ return voidPowers.powers; };
-                            voidPowers.getPower = function(token, fallback){ return voidPowers.powers[token] || fallback || 0; };
-                            voidPowers.setPower = function(token, value){ voidPowers.powers[token] = Math.round(value * 100) / 100; };
-                            voidPowers.incPower = function(token, value){ voidPowers.setPower(token, voidPowers.getPower(token) + value); };
-                            voidPowers.decPower = function(token, value){ voidPowers.setPower(token, voidPowers.getPower(token) - value); };
-                            voidPowers.modPower = function(token, value, fallback){ voidPowers.setPower(token, voidPowers.getPower(token, fallback) * value); };
-                            voidPowers.powers.delta = 0;
-                            voidPowers.powers.quanta = 0;
-                            voidPowers.powers.spread = 0;
-                            voidPowers.powers.level = 0;
-                            voidPowers.powers.forte = 0;
-                            voidPowers.powers.effort = 0;
-                            voidPowers.powers.reward = 0;
-                            voidPowers.flags.guard = false;
-                            voidPowers.flags.reverse = false;
-                            voidPowers.flags.extreme = false;
-
-                            // Loop through all the items, one-by-one, and parse their intrinsic values
-                            for (var i = 0; i < voidItemsTokens.length; i++){
-                                var itemToken = voidItemsTokens[i];
-                                var itemQuantity = voidItems[itemToken];
-                                _self.parseItem({token: itemToken}, itemQuantity, voidPowers);
-                                //for (var j = 0; j < itemQuantity; j++){ }
-                                }
-
-                            // As long as items are present, we should make keep certain values in scope
-                            if (voidItemsTokens.length){
-                                // Ensure the quanta is always at least zero if there are items present
-                                if (voidPowers.powers.quanta < 0){ voidPowers.powers.quanta = 0; }
-                                // Ensure the spread always within range when there are items present
-                                if (voidPowers.powers.spread < 1){ voidPowers.powers.spread = 1; }
-                                // Ensure the level is always at least one if there are items present
-                                if (voidPowers.powers.level < 1){ voidPowers.powers.level = 1; }
-                                }
-
-                            //console.log('voidPowers have been updated!');
-                            _self.powers = {};
-                            var voidPowersList = voidPowers.getPowers();
-                            var voidPowerKeys = Object.keys(voidPowersList);
-                            var voidPowersRequired = ['delta', 'quanta', 'spread', 'level', 'forte'];
-                            for (var i = 0; i < voidPowerKeys.length; i++){
-                                var powerToken = voidPowerKeys[i];
-                                var powerValue = voidPowersList[powerToken];
-                                if (powerValue === 0 && voidPowersRequired.indexOf(powerToken) === -1){ continue; }
-                                _self.powers[powerToken] = powerValue;
-                                //console.log('-> voidPowers.' + powerToken + ' =', powerValue);
-                                }
-
-                            // end of voidRecipeWizard.calculatePowers()
-                            },
-                        generateMission: function(){
-                            console.log('%c' + 'voidRecipeWizard.generateMission()', 'color: magenta;');
-
-                            // Backup a reference to the parent object
-                            const _self = this;
-
-                            // Collect reference to the void powers so we can reference them
-                            var voidPowersList = _self.powers;
-                            var voidPowersKeys = Object.keys(voidPowersList);
-
-                            // If we don't have any powers, we can't generate anything
-                            if (!voidPowersKeys.length){
-                                //console.log('%c' + '-> no powers to generate from!', 'color: orange;');
-                                return;
-                                }
-
-                            // Collect the base amounts of quanta and spread for later reference
-                            var baseQuanta = voidPowersList['quanta'] || 0;
-                            var baseSpread = voidPowersList['spread'] || 0;
-                            //console.log('-> baseQuanta:', baseQuanta, 'baseSpread:', baseSpread);
-
-                            // Likewise if we don't have any quanta material or a defined spread limit, we can't generate either
-                            if (baseQuanta < 1 || baseSpread < 1){
-                                if (baseQuanta < 1 && baseSpread < 1){
-                                    //console.log('%c' + '-> no quanta materia nor spread limit to generate from!', 'color: red;');
-                                    } else if (baseQuanta < 1){
-                                    //console.log('%c' + '-> no quanta materia to generate with!', 'color: red;');
-                                    } else if (baseSpread < 1){
-                                    //console.log('%c' + '-> no spread limit to generate within!', 'color: red;');
-                                    }
-                                return;
-                                }
-
-                            // First we set-up the different target slots given quanta vs spread
-                            // using predefined thresholds to determine each target's class
-                            var effectiveSpread = baseSpread >= _self.maxTargets ? _self.maxTargets : (baseSpread < 1 ? 1 : Math.trunc(baseSpread));
-                            var distributedQuanta = _self.distributeQuanta(baseQuanta, effectiveSpread, true);
-                            //console.log('-> effectiveSpread:', effectiveSpread, 'distributedQuanta:', distributedQuanta);
-
-                            // Pull a filtered list of stat powers and type powers for easier looping
-                            var statPowersList = _self.filterStatPowers(voidPowersList);
-                            var typePowersList = _self.filterTypePowers(voidPowersList);
-                            //console.log('-> statPowersList:', statPowersList);
-                            //console.log('-> typePowersList:', typePowersList);
-
-                            // Loop through and check to see which classes are represented
-                            var maxTierLevel = 0;
-                            for (var i = 0; i < distributedQuanta.length; i++){
-                                if (!distributedQuanta[i].tier){ continue; }
-                                var tier = distributedQuanta[i].tier;
-                                if (tier === 'boss'){ maxTierLevel = Math.max(maxTierLevel, 3); }
-                                if (tier === 'master'){ maxTierLevel = Math.max(maxTierLevel, 2); }
-                                if (tier === 'mecha'){ maxTierLevel = Math.max(maxTierLevel, 1); }
-                                }
-                            //console.log('-> maxTierLevel:', maxTierLevel);
-
-                            // Generate a queue of mechas, masters, and bosses given the powers available
-                            var targetRobotQueue = {};
-                            targetRobotQueue['mecha'] = maxTierLevel >= 1 ? _self.generateTargetQueue((_self.indexes.robotMechaTokens || []), typePowersList, statPowersList) : [];
-                            targetRobotQueue['master'] = maxTierLevel >= 2 ? _self.generateTargetQueue((_self.indexes.robotMasterTokens || []), typePowersList, statPowersList) : [];
-                            targetRobotQueue['boss'] = maxTierLevel >= 3 ? _self.generateTargetQueue((_self.indexes.robotBossTokens || []), typePowersList, statPowersList) : [];
-                            //console.log('-> targetRobotQueue[mecha]:', targetRobotQueue['mecha']);
-                            //console.log('-> targetRobotQueue[master]:', targetRobotQueue['master']);
-                            //console.log('-> targetRobotQueue[boss]:', targetRobotQueue['boss']);
-
-                            // Use calculated quanta-per-target to set-up the different target slots
-                            var missionTargets = [];
-                            var numTargetSlots = effectiveSpread; //distributedQuanta.length;
-                            for (var slotKey = 0; slotKey < numTargetSlots; slotKey++){
-                                var slotTemplate = distributedQuanta[slotKey];
-                                //console.log('--> calculating slotKey:', slotKey, 'w/ slotTemplate:', slotTemplate);
-                                var targetRobot = {};
-                                var targetTier = slotTemplate.tier;
-                                var targetClass = slotTemplate.class;
-                                var targetQuanta = slotTemplate.amount;
-                                targetRobot.token = '';
-                                targetRobot.class = targetClass;
-                                targetRobot.quanta = targetQuanta;
-                                targetRobot.level = 1;
-                                if (targetTier.length){
-                                    var queueOrder = [];
-                                    if (targetTier === 'boss'){ queueOrder.push('boss', 'master', 'mecha'); }
-                                    if (targetTier === 'master'){ queueOrder.push('master', 'mecha'); }
-                                    if (targetTier === 'mecha'){ queueOrder.push('mecha'); }
-                                    for (var i = 0; i < queueOrder.length; i++){
-                                        var queueToken = queueOrder[i];
-                                        if (targetRobotQueue[queueToken].length){
-                                            targetRobot.token = targetRobotQueue[queueToken].shift();
-                                            targetRobotQueue[queueToken].push(targetRobot.token);
-                                            break;
-                                            }
-                                        }
-                                    }
-
-                                // If a token for this slot count not be found, default to a dark frag
-                                if (!targetRobot.token.length){
-                                    targetRobot.token = 'dark-frag';
-                                    }
-
-                                // Add the target robot to the mission targets list
-                                missionTargets.push(targetRobot);
-                                //console.log('--> pushed new target!', '\n-> targetRobot:', targetRobot);
-
-                                }
-
-                            // Update the mission details with the new targets
-                            _self.mission = {};
-                            _self.mission.targets = missionTargets;
-
-                            // end of voidRecipeWizard.generateMission()
-                            },
-                        refreshUI: function(){
-                            console.log('%c' + 'voidRecipeWizard.refreshUI()', 'color: magenta;');
-
-                            // Backup a reference to the parent object
-                            const _self = this;
-
-                            // Collect a reference to the void values
-                            var voidItems = _self.items;
-                            var voidHistory = _self.history;
-                            var $itemsSelected = _self.xrefs.itemsSelected;
-                            var $itemsPalette = _self.xrefs.itemsPalette;
-                            var $resetButton = _self.xrefs.resetButton;
-                            var $missionDetails = _self.xrefs.missionDetails;
-                            var $targetList = _self.xrefs.missionTargets;
-
-                            // Check to see which was the last item token added
-                            var lastItemToken = '';
-                            if (voidHistory.length){
-                                lastItemToken = voidHistory[voidHistory.length - 1].token;
-                                }
-
-                            // Clear the item selection area and then rebuild it with the new items
-                            var $selectedWrapper = $('.wrapper', $itemsSelected);
-                            var $paletteWrappers = $('.wrapper', $itemsPalette);
-                            var $paletteItems = $('.item[data-token]', $itemsPalette);
-                            var usedItemTokens = Object.keys(voidItems);
-                            var numSlotsAvailable = _self.maxItems;
-                            var numSlotsUsed = usedItemTokens.length;
-                            $selectedWrapper.html('');
-                            $paletteItems.removeClass('active');
-                            if (usedItemTokens.length > 0){
-                                const mmrpgIndexItems = mmrpgIndex.items;
-                                for (var i = 0; i < usedItemTokens.length; i++){
-                                    // Generate the markup for the item then add to the selection area
-                                    var itemToken = usedItemTokens[i];
-                                    var itemInfo = mmrpgIndexItems[itemToken];
-                                    var itemName = itemInfo.item_name;
-                                    var itemNameBr = itemName.replace(' ', '<br />');
-                                    var itemQuantity = voidItems[itemToken] || 0;
-                                    var itemImage = itemInfo.item_image || itemToken;
-                                    var itemClass = 'item' + (itemToken === lastItemToken ? ' recent' : '');
-                                    var itemIcon = '/images/items/'+itemImage+'/icon_right_40x40.png?'+gameSettings.cacheDate;
-                                    var itemMarkup = '<div class="'+itemClass+'" data-token="'+itemToken+'" data-quantity="'+itemQuantity+'">';
-                                        itemMarkup += '<div class="icon"><img class="has_pixels" src="'+itemIcon+'" alt="'+itemName+'"></div>';
-                                        itemMarkup += '<div class="name">'+itemNameBr+'</div>';
-                                        itemMarkup += '<div class="quantity">'+itemQuantity+'</div>';
-                                    itemMarkup += '</div>';
-                                    $selectedWrapper.append(itemMarkup);
-                                    // Update the parent button in the palette area to show that its active
-                                    $paletteItems.filter('.item[data-token="'+itemToken+'"]').addClass('active');
-                                    }
-                                }
-
-                            // Fill empty slots with item-placeholder elements for visual clarity,
-                            // otherwise if all slots are full we should disable further selections
-                            if (numSlotsUsed < numSlotsAvailable){
-                                //console.log('there are empty slots!', (numSlotsAvailable - numSlotsUsed));
-                                $itemsPalette.attr('data-select', '*');
-                                var emptySlots = numSlotsAvailable - numSlotsUsed;
-                                for (var i = 0; i < emptySlots; i++){
-                                    var placeholderMarkup = '<div class="item placeholder"></div>';
-                                    $selectedWrapper.append(placeholderMarkup);
-                                    }
-                                } else {
-                                //console.log('all slots are full!');
-                                $itemsPalette.attr('data-select', 'active');
-                                }
-
-                            // Check and update the displayed quantities of any items visible in the palette
-                            var itemsToUpdate = _self.indexes.itemTokens;
-                            if (itemsToUpdate.length > 0){
-                                const mmrpgIndexItems = mmrpgIndex.items;
-                                for (var i = 0; i < itemsToUpdate.length; i++){
-                                    var itemToken = itemsToUpdate[i];
-                                    var itemInfo = mmrpgIndexItems[itemToken];
-                                    var $paletteButton = $('.item[data-token="'+itemToken+'"]', $itemsPalette);
-                                    var baseQuantity = parseInt($paletteButton.attr('data-base-quantity'));
-                                    var addedQuantity = voidItems[itemToken] || 0;
-                                    var newQuantity = baseQuantity - addedQuantity;
-                                    $paletteButton.attr('data-quantity', newQuantity);
-                                    $paletteButton.find('.quantity').text(newQuantity);
-                                    //console.log('updating', itemToken, 'button in palette w/', {baseQuantity: baseQuantity, addedQuantity: addedQuantity, newQuantity: newQuantity});
-                                    }
-                                }
-
-                            // Show or hide the reset button depending on whether or not there's a selection to reset
-                            if (numSlotsUsed > 0){ $resetButton.addClass('visible'); }
-                            else { $resetButton.removeClass('visible'); }
-
-                            // Let us also update the list of void powers to show any changes
-                            var voidPowers = _self.powers;
-                            var voidPowersKeys = Object.keys(voidPowers);
-                            //console.log('voidPowers:', voidPowers);
-                            //console.log('voidPowersKeys:', voidPowersKeys);
-                            $missionDetails.html('');
-                            if (voidPowersKeys.length){
-                                var powersListMarkup = '';
-                                powersListMarkup += '<div class="powers-list">';
-                                    powersListMarkup += '<ul class="wrapper">';
-                                    for (var i = 0; i < voidPowersKeys.length; i++){
-                                        var powerToken = voidPowersKeys[i];
-                                        var powerValue = voidPowers[powerToken];
-                                        if (powerToken === ''){ continue; }
-                                        // format the power value differently per kind
-                                        var powerValueText = '';
-                                        if (powerToken === 'delta'){
-                                            // unsigned, fine as-is
-                                            powerValueText = '' + powerValue;
-                                            }
-                                        else if (powerToken === 'quanta'){
-                                            // quantity so use the times symbol
-                                            powerValueText = '&times;' + powerValue;
-                                            }
-                                        else if (powerToken === 'spread'){
-                                            // unsigned, but must stay within limit, so truncate
-                                            // also make sure overflow is visible for the tooltip
-                                            var scopedValue = roundedValue = Math.trunc(powerValue), overflow = 0;
-                                            if (scopedValue > _self.maxTargets){ scopedValue = _self.maxTargets; }
-                                            if (roundedValue > scopedValue){ overflow = roundedValue - scopedValue; }
-                                            powerValueText = '&times;' + scopedValue + (overflow ? ' <span class="overflow">(&plus;' + overflow + ')</span>' : '');
-                                            }
-                                        else if (powerToken === 'level'){
-                                            // unsigned, fine as-is
-                                            powerValueText = '' + powerValue;
-                                            }
-                                        else {
-                                            // signed, so display the correct one
-                                            var roundedValue = Math.round(powerValue);
-                                            powerValueText = (roundedValue > 0 ? '&plus;' : (roundedValue < 0 ? '&minus;' : '')) + Math.abs(roundedValue);
-                                            }
-                                        // add the power to the list
-                                        powersListMarkup += '<li class="power">';
-                                            powersListMarkup += '<span class="token">'+powerToken+'</span> ';
-                                            powersListMarkup += '<span class="value">'+powerValueText+'</span>';
-                                        powersListMarkup += '</li>';
-                                        }
-                                    powersListMarkup += '</ul>';
-                                powersListMarkup += '</div>';
-                                $missionDetails.append(powersListMarkup);
-                                } else {
-                                $missionDetails.append('<span class="loading">&hellip;</span>');
-                                }
-
-                            // Update the list of target robots in the panel if any have been generated
-                            var missionInfo = _self.mission;
-                            var missionTargets = missionInfo.targets || [];
-                            $targetList.html('');
-                            if (missionTargets.length){
-                                //console.log('updating mission target list!', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
-                                const mmrpgIndexRobots = mmrpgIndex.robots;
-                                const frameTokenByKey = {0: 'base', 1: 'defense', 2: 'base2', 3: 'defend', 4: 'base', 5: 'defend', 6: 'base2', 7: 'defend'};
-                                for (var i = 0; i < missionTargets.length; i++){
-                                    var targetKey = i;
-                                    var targetRobot = missionTargets[i];
-                                    //console.log('-> targetRobot:', targetRobot);
-                                    var targetRobotToken = targetRobot.token;
-                                    var targetRobotInfo = mmrpgIndexRobots[targetRobotToken] || false;
-                                    if (!targetRobotInfo){ continue; }
-                                    var targetRobotClass = targetRobot.class;
-                                    var targetRobotQuanta = targetRobot.quanta;
-                                    var targetRobotLevel = targetRobot.level;
-                                    var targetRobotName = targetRobotInfo['robot_name'] || targetRobotToken;
-                                    var targetRobotImage = targetRobotInfo['robot_image'] || targetRobotToken;
-                                    var targetRobotTypes = targetRobotInfo['robot_core'] || 'none';
-                                    if (targetRobotInfo['robot_core'] && targetRobotInfo['robot_core2']){ targetRobotTypes += '_'+targetRobotInfo['robot_core2']; }
-                                    var targetRobotImageSize = targetRobotInfo['robot_image_size'] || 40;
-                                    var targetRobotImageSizeX = targetRobotImageSize + 'x' + targetRobotImageSize;
-                                    var targetRobotFrame = frameTokenByKey[targetKey] || '00';
-                                    var targetRobotSprite = '/images/robots/'+targetRobotImage+'/sprite_left_'+targetRobotImageSizeX+'.png?'+gameSettings.cacheTime;
-                                    var targetRobotMarkup = '<div class="target">';
-                                        targetRobotMarkup += '<div class="image">';
-                                            targetRobotMarkup += '<div '
-                                                + 'class="sprite sprite_'+targetRobotImageSizeX+' sprite_'+targetRobotImageSizeX+'_'+targetRobotFrame+'" '
-                                                + 'style="background-image: url('+targetRobotSprite+');" '
-                                                + 'data-size="'+targetRobotSprite+'" '
-                                                + 'data-frame="'+targetRobotFrame+'" '
-                                                + '>'+targetRobotName+'</div>';
-                                        targetRobotMarkup += '</div>';
-                                        targetRobotMarkup += '<div class="label">';
-                                            targetRobotMarkup += '<span class="name">'+targetRobotName+'</span>';
-                                        targetRobotMarkup += '</div>';
-                                        targetRobotMarkup += '<i class="type '+targetRobotTypes+'"></i>';
-                                    targetRobotMarkup += '</div>';
-                                    $targetList.append(targetRobotMarkup);
-                                    }
-                                } else {
-                                $targetList.append('<span class="loading">&hellip;</span>');
-                                }
-
-                            // end of voidRecipeWizard.refreshUI()
-                            },
                         addItem: function(item){
                             console.log('%c' + 'voidRecipeWizard.addItem() w/ ' + item.token, 'color: magenta;');
                             //console.log('-> w/ item:', item);
@@ -2042,6 +1676,372 @@ if (!function_exists('array_rearrange_keys')){
                                 }
                             return targetQueue;
                             // end of voidRecipeWizard.generateTargetQueue()
+                            },
+                        calculatePowers: function(){
+                            console.log('%c' + 'voidRecipeWizard.calculatePowers()', 'color: magenta;');
+
+                            // Backup a reference to the parent object
+                            const _self = this;
+
+                            // Collect a reference to the void values object and reset
+                            var voidItems = _self.items;
+                            var voidItemsTokens = Object.keys(voidItems);
+
+                            // Define a variable to hold the calculated powers of all the items
+                            var voidPowers = {};
+                            voidPowers.powers = {};
+                            voidPowers.flags = {};
+                            voidPowers.getPowers = function(){ return voidPowers.powers; };
+                            voidPowers.getPower = function(token, fallback){ return voidPowers.powers[token] || fallback || 0; };
+                            voidPowers.setPower = function(token, value){ voidPowers.powers[token] = Math.round(value * 100) / 100; };
+                            voidPowers.incPower = function(token, value){ voidPowers.setPower(token, voidPowers.getPower(token) + value); };
+                            voidPowers.decPower = function(token, value){ voidPowers.setPower(token, voidPowers.getPower(token) - value); };
+                            voidPowers.modPower = function(token, value, fallback){ voidPowers.setPower(token, voidPowers.getPower(token, fallback) * value); };
+                            voidPowers.powers.delta = 0;
+                            voidPowers.powers.quanta = 0;
+                            voidPowers.powers.spread = 0;
+                            voidPowers.powers.level = 0;
+                            voidPowers.powers.forte = 0;
+                            voidPowers.powers.effort = 0;
+                            voidPowers.powers.reward = 0;
+                            voidPowers.flags.guard = false;
+                            voidPowers.flags.reverse = false;
+                            voidPowers.flags.extreme = false;
+
+                            // Loop through all the items, one-by-one, and parse their intrinsic values
+                            for (var i = 0; i < voidItemsTokens.length; i++){
+                                var itemToken = voidItemsTokens[i];
+                                var itemQuantity = voidItems[itemToken];
+                                _self.parseItem({token: itemToken}, itemQuantity, voidPowers);
+                                //for (var j = 0; j < itemQuantity; j++){ }
+                                }
+
+                            // As long as items are present, we should make keep certain values in scope
+                            if (voidItemsTokens.length){
+                                // Ensure the quanta is always at least zero if there are items present
+                                if (voidPowers.powers.quanta < 0){ voidPowers.powers.quanta = 0; }
+                                // Ensure the spread always within range when there are items present
+                                if (voidPowers.powers.spread < 1){ voidPowers.powers.spread = 1; }
+                                // Ensure the level is always at least one if there are items present
+                                if (voidPowers.powers.level < 1){ voidPowers.powers.level = 1; }
+                                }
+
+                            //console.log('voidPowers have been updated!');
+                            _self.powers = {};
+                            var voidPowersList = voidPowers.getPowers();
+                            var voidPowerKeys = Object.keys(voidPowersList);
+                            var voidPowersRequired = ['delta', 'quanta', 'spread', 'level', 'forte'];
+                            for (var i = 0; i < voidPowerKeys.length; i++){
+                                var powerToken = voidPowerKeys[i];
+                                var powerValue = voidPowersList[powerToken];
+                                if (powerValue === 0 && voidPowersRequired.indexOf(powerToken) === -1){ continue; }
+                                _self.powers[powerToken] = powerValue;
+                                //console.log('-> voidPowers.' + powerToken + ' =', powerValue);
+                                }
+
+                            // end of voidRecipeWizard.calculatePowers()
+                            },
+                        generateMission: function(){
+                            console.log('%c' + 'voidRecipeWizard.generateMission()', 'color: magenta;');
+
+                            // Backup a reference to the parent object
+                            const _self = this;
+
+                            // Collect reference to the void powers so we can reference them
+                            var voidPowersList = _self.powers;
+                            var voidPowersKeys = Object.keys(voidPowersList);
+
+                            // If we don't have any powers, we can't generate anything
+                            if (!voidPowersKeys.length){
+                                //console.log('%c' + '-> no powers to generate from!', 'color: orange;');
+                                return;
+                                }
+
+                            // Collect the base amounts of quanta and spread for later reference
+                            var baseQuanta = voidPowersList['quanta'] || 0;
+                            var baseSpread = voidPowersList['spread'] || 0;
+                            //console.log('-> baseQuanta:', baseQuanta, 'baseSpread:', baseSpread);
+
+                            // Likewise if we don't have any quanta material or a defined spread limit, we can't generate either
+                            if (baseQuanta < 1 || baseSpread < 1){
+                                if (baseQuanta < 1 && baseSpread < 1){
+                                    //console.log('%c' + '-> no quanta materia nor spread limit to generate from!', 'color: red;');
+                                    } else if (baseQuanta < 1){
+                                    //console.log('%c' + '-> no quanta materia to generate with!', 'color: red;');
+                                    } else if (baseSpread < 1){
+                                    //console.log('%c' + '-> no spread limit to generate within!', 'color: red;');
+                                    }
+                                return;
+                                }
+
+                            // First we set-up the different target slots given quanta vs spread
+                            // using predefined thresholds to determine each target's class
+                            var effectiveSpread = baseSpread >= _self.maxTargets ? _self.maxTargets : (baseSpread < 1 ? 1 : Math.trunc(baseSpread));
+                            var distributedQuanta = _self.distributeQuanta(baseQuanta, effectiveSpread, true);
+                            //console.log('-> effectiveSpread:', effectiveSpread, 'distributedQuanta:', distributedQuanta);
+
+                            // Pull a filtered list of stat powers and type powers for easier looping
+                            var statPowersList = _self.filterStatPowers(voidPowersList);
+                            var typePowersList = _self.filterTypePowers(voidPowersList);
+                            //console.log('-> statPowersList:', statPowersList);
+                            //console.log('-> typePowersList:', typePowersList);
+
+                            // Loop through and check to see which classes are represented
+                            var maxTierLevel = 0;
+                            for (var i = 0; i < distributedQuanta.length; i++){
+                                if (!distributedQuanta[i].tier){ continue; }
+                                var tier = distributedQuanta[i].tier;
+                                if (tier === 'boss'){ maxTierLevel = Math.max(maxTierLevel, 3); }
+                                if (tier === 'master'){ maxTierLevel = Math.max(maxTierLevel, 2); }
+                                if (tier === 'mecha'){ maxTierLevel = Math.max(maxTierLevel, 1); }
+                                }
+                            //console.log('-> maxTierLevel:', maxTierLevel);
+
+                            // Generate a queue of mechas, masters, and bosses given the powers available
+                            var targetRobotQueue = {};
+                            targetRobotQueue['mecha'] = maxTierLevel >= 1 ? _self.generateTargetQueue((_self.indexes.robotMechaTokens || []), typePowersList, statPowersList) : [];
+                            targetRobotQueue['master'] = maxTierLevel >= 2 ? _self.generateTargetQueue((_self.indexes.robotMasterTokens || []), typePowersList, statPowersList) : [];
+                            targetRobotQueue['boss'] = maxTierLevel >= 3 ? _self.generateTargetQueue((_self.indexes.robotBossTokens || []), typePowersList, statPowersList) : [];
+                            //console.log('-> targetRobotQueue[mecha]:', targetRobotQueue['mecha']);
+                            //console.log('-> targetRobotQueue[master]:', targetRobotQueue['master']);
+                            //console.log('-> targetRobotQueue[boss]:', targetRobotQueue['boss']);
+
+                            // Use calculated quanta-per-target to set-up the different target slots
+                            var missionTargets = [];
+                            var numTargetSlots = effectiveSpread; //distributedQuanta.length;
+                            for (var slotKey = 0; slotKey < numTargetSlots; slotKey++){
+                                var slotTemplate = distributedQuanta[slotKey];
+                                //console.log('--> calculating slotKey:', slotKey, 'w/ slotTemplate:', slotTemplate);
+                                var targetRobot = {};
+                                var targetTier = slotTemplate.tier;
+                                var targetClass = slotTemplate.class;
+                                var targetQuanta = slotTemplate.amount;
+                                targetRobot.token = '';
+                                targetRobot.class = targetClass;
+                                targetRobot.quanta = targetQuanta;
+                                targetRobot.level = 1;
+                                if (targetTier.length){
+                                    var queueOrder = [];
+                                    if (targetTier === 'boss'){ queueOrder.push('boss', 'master', 'mecha'); }
+                                    if (targetTier === 'master'){ queueOrder.push('master', 'mecha'); }
+                                    if (targetTier === 'mecha'){ queueOrder.push('mecha'); }
+                                    for (var i = 0; i < queueOrder.length; i++){
+                                        var queueToken = queueOrder[i];
+                                        if (targetRobotQueue[queueToken].length){
+                                            targetRobot.token = targetRobotQueue[queueToken].shift();
+                                            targetRobotQueue[queueToken].push(targetRobot.token);
+                                            break;
+                                            }
+                                        }
+                                    }
+
+                                // If a token for this slot count not be found, default to a dark frag
+                                if (!targetRobot.token.length){
+                                    targetRobot.token = 'dark-frag';
+                                    }
+
+                                // Add the target robot to the mission targets list
+                                missionTargets.push(targetRobot);
+                                //console.log('--> pushed new target!', '\n-> targetRobot:', targetRobot);
+
+                                }
+
+                            // Update the mission details with the new targets
+                            _self.mission = {};
+                            _self.mission.targets = missionTargets;
+
+                            // end of voidRecipeWizard.generateMission()
+                            },
+                        refreshUI: function(){
+                            console.log('%c' + 'voidRecipeWizard.refreshUI()', 'color: magenta;');
+
+                            // Backup a reference to the parent object
+                            const _self = this;
+
+                            // Collect a reference to the void values
+                            var voidItems = _self.items;
+                            var voidHistory = _self.history;
+                            var $itemsSelected = _self.xrefs.itemsSelected;
+                            var $itemsPalette = _self.xrefs.itemsPalette;
+                            var $resetButton = _self.xrefs.resetButton;
+                            var $missionDetails = _self.xrefs.missionDetails;
+                            var $targetList = _self.xrefs.missionTargets;
+
+                            // Check to see which was the last item token added
+                            var lastItemToken = '';
+                            if (voidHistory.length){
+                                lastItemToken = voidHistory[voidHistory.length - 1].token;
+                                }
+
+                            // Clear the item selection area and then rebuild it with the new items
+                            var $selectedWrapper = $('.wrapper', $itemsSelected);
+                            var $paletteWrappers = $('.wrapper', $itemsPalette);
+                            var $paletteItems = $('.item[data-token]', $itemsPalette);
+                            var usedItemTokens = Object.keys(voidItems);
+                            var numSlotsAvailable = _self.maxItems;
+                            var numSlotsUsed = usedItemTokens.length;
+                            $selectedWrapper.html('');
+                            $paletteItems.removeClass('active');
+                            if (usedItemTokens.length > 0){
+                                const mmrpgIndexItems = mmrpgIndex.items;
+                                for (var i = 0; i < usedItemTokens.length; i++){
+                                    // Generate the markup for the item then add to the selection area
+                                    var itemToken = usedItemTokens[i];
+                                    var itemInfo = mmrpgIndexItems[itemToken];
+                                    var itemName = itemInfo.item_name;
+                                    var itemNameBr = itemName.replace(' ', '<br />');
+                                    var itemQuantity = voidItems[itemToken] || 0;
+                                    var itemImage = itemInfo.item_image || itemToken;
+                                    var itemClass = 'item' + (itemToken === lastItemToken ? ' recent' : '');
+                                    var itemIcon = '/images/items/'+itemImage+'/icon_right_40x40.png?'+gameSettings.cacheDate;
+                                    var itemMarkup = '<div class="'+itemClass+'" data-token="'+itemToken+'" data-quantity="'+itemQuantity+'">';
+                                        itemMarkup += '<div class="icon"><img class="has_pixels" src="'+itemIcon+'" alt="'+itemName+'"></div>';
+                                        itemMarkup += '<div class="name">'+itemNameBr+'</div>';
+                                        itemMarkup += '<div class="quantity">'+itemQuantity+'</div>';
+                                    itemMarkup += '</div>';
+                                    $selectedWrapper.append(itemMarkup);
+                                    // Update the parent button in the palette area to show that its active
+                                    $paletteItems.filter('.item[data-token="'+itemToken+'"]').addClass('active');
+                                    }
+                                }
+
+                            // Fill empty slots with item-placeholder elements for visual clarity,
+                            // otherwise if all slots are full we should disable further selections
+                            if (numSlotsUsed < numSlotsAvailable){
+                                //console.log('there are empty slots!', (numSlotsAvailable - numSlotsUsed));
+                                $itemsPalette.attr('data-select', '*');
+                                var emptySlots = numSlotsAvailable - numSlotsUsed;
+                                for (var i = 0; i < emptySlots; i++){
+                                    var placeholderMarkup = '<div class="item placeholder"></div>';
+                                    $selectedWrapper.append(placeholderMarkup);
+                                    }
+                                } else {
+                                //console.log('all slots are full!');
+                                $itemsPalette.attr('data-select', 'active');
+                                }
+
+                            // Check and update the displayed quantities of any items visible in the palette
+                            var itemsToUpdate = _self.indexes.itemTokens;
+                            if (itemsToUpdate.length > 0){
+                                const mmrpgIndexItems = mmrpgIndex.items;
+                                for (var i = 0; i < itemsToUpdate.length; i++){
+                                    var itemToken = itemsToUpdate[i];
+                                    var itemInfo = mmrpgIndexItems[itemToken];
+                                    var $paletteButton = $('.item[data-token="'+itemToken+'"]', $itemsPalette);
+                                    var baseQuantity = parseInt($paletteButton.attr('data-base-quantity'));
+                                    var addedQuantity = voidItems[itemToken] || 0;
+                                    var newQuantity = baseQuantity - addedQuantity;
+                                    $paletteButton.attr('data-quantity', newQuantity);
+                                    $paletteButton.find('.quantity').text(newQuantity);
+                                    //console.log('updating', itemToken, 'button in palette w/', {baseQuantity: baseQuantity, addedQuantity: addedQuantity, newQuantity: newQuantity});
+                                    }
+                                }
+
+                            // Show or hide the reset button depending on whether or not there's a selection to reset
+                            if (numSlotsUsed > 0){ $resetButton.addClass('visible'); }
+                            else { $resetButton.removeClass('visible'); }
+
+                            // Let us also update the list of void powers to show any changes
+                            var voidPowers = _self.powers;
+                            var voidPowersKeys = Object.keys(voidPowers);
+                            //console.log('voidPowers:', voidPowers);
+                            //console.log('voidPowersKeys:', voidPowersKeys);
+                            $missionDetails.html('');
+                            if (voidPowersKeys.length){
+                                var powersListMarkup = '';
+                                powersListMarkup += '<div class="powers-list">';
+                                    powersListMarkup += '<ul class="wrapper">';
+                                    for (var i = 0; i < voidPowersKeys.length; i++){
+                                        var powerToken = voidPowersKeys[i];
+                                        var powerValue = voidPowers[powerToken];
+                                        if (powerToken === ''){ continue; }
+                                        // format the power value differently per kind
+                                        var powerValueText = '';
+                                        if (powerToken === 'delta'){
+                                            // unsigned, fine as-is
+                                            powerValueText = '' + powerValue;
+                                            }
+                                        else if (powerToken === 'quanta'){
+                                            // quantity so use the times symbol
+                                            powerValueText = '&times;' + powerValue;
+                                            }
+                                        else if (powerToken === 'spread'){
+                                            // unsigned, but must stay within limit, so truncate
+                                            // also make sure overflow is visible for the tooltip
+                                            var scopedValue = roundedValue = Math.trunc(powerValue), overflow = 0;
+                                            if (scopedValue > _self.maxTargets){ scopedValue = _self.maxTargets; }
+                                            if (roundedValue > scopedValue){ overflow = roundedValue - scopedValue; }
+                                            powerValueText = '&times;' + scopedValue + (overflow ? ' <span class="overflow">(&plus;' + overflow + ')</span>' : '');
+                                            }
+                                        else if (powerToken === 'level'){
+                                            // unsigned, fine as-is
+                                            powerValueText = '' + powerValue;
+                                            }
+                                        else {
+                                            // signed, so display the correct one
+                                            var roundedValue = Math.round(powerValue);
+                                            powerValueText = (roundedValue > 0 ? '&plus;' : (roundedValue < 0 ? '&minus;' : '')) + Math.abs(roundedValue);
+                                            }
+                                        // add the power to the list
+                                        powersListMarkup += '<li class="power">';
+                                            powersListMarkup += '<span class="token">'+powerToken+'</span> ';
+                                            powersListMarkup += '<span class="value">'+powerValueText+'</span>';
+                                        powersListMarkup += '</li>';
+                                        }
+                                    powersListMarkup += '</ul>';
+                                powersListMarkup += '</div>';
+                                $missionDetails.append(powersListMarkup);
+                                } else {
+                                $missionDetails.append('<span class="loading">&hellip;</span>');
+                                }
+
+                            // Update the list of target robots in the panel if any have been generated
+                            var missionInfo = _self.mission;
+                            var missionTargets = missionInfo.targets || [];
+                            $targetList.html('');
+                            if (missionTargets.length){
+                                //console.log('updating mission target list!', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
+                                const mmrpgIndexRobots = mmrpgIndex.robots;
+                                const frameTokenByKey = {0: 'base', 1: 'defense', 2: 'base2', 3: 'defend', 4: 'base', 5: 'defend', 6: 'base2', 7: 'defend'};
+                                for (var i = 0; i < missionTargets.length; i++){
+                                    var targetKey = i;
+                                    var targetRobot = missionTargets[i];
+                                    //console.log('-> targetRobot:', targetRobot);
+                                    var targetRobotToken = targetRobot.token;
+                                    var targetRobotInfo = mmrpgIndexRobots[targetRobotToken] || false;
+                                    if (!targetRobotInfo){ continue; }
+                                    var targetRobotClass = targetRobot.class;
+                                    var targetRobotQuanta = targetRobot.quanta;
+                                    var targetRobotLevel = targetRobot.level;
+                                    var targetRobotName = targetRobotInfo['robot_name'] || targetRobotToken;
+                                    var targetRobotImage = targetRobotInfo['robot_image'] || targetRobotToken;
+                                    var targetRobotTypes = targetRobotInfo['robot_core'] || 'none';
+                                    if (targetRobotInfo['robot_core'] && targetRobotInfo['robot_core2']){ targetRobotTypes += '_'+targetRobotInfo['robot_core2']; }
+                                    var targetRobotImageSize = targetRobotInfo['robot_image_size'] || 40;
+                                    var targetRobotImageSizeX = targetRobotImageSize + 'x' + targetRobotImageSize;
+                                    var targetRobotFrame = frameTokenByKey[targetKey] || '00';
+                                    var targetRobotSprite = '/images/robots/'+targetRobotImage+'/sprite_left_'+targetRobotImageSizeX+'.png?'+gameSettings.cacheTime;
+                                    var targetRobotMarkup = '<div class="target">';
+                                        targetRobotMarkup += '<div class="image">';
+                                            targetRobotMarkup += '<div '
+                                                + 'class="sprite sprite_'+targetRobotImageSizeX+' sprite_'+targetRobotImageSizeX+'_'+targetRobotFrame+'" '
+                                                + 'style="background-image: url('+targetRobotSprite+');" '
+                                                + 'data-size="'+targetRobotSprite+'" '
+                                                + 'data-frame="'+targetRobotFrame+'" '
+                                                + '>'+targetRobotName+'</div>';
+                                        targetRobotMarkup += '</div>';
+                                        targetRobotMarkup += '<div class="label">';
+                                            targetRobotMarkup += '<span class="name">'+targetRobotName+'</span>';
+                                        targetRobotMarkup += '</div>';
+                                        targetRobotMarkup += '<i class="type '+targetRobotTypes+'"></i>';
+                                    targetRobotMarkup += '</div>';
+                                    $targetList.append(targetRobotMarkup);
+                                    }
+                                } else {
+                                $targetList.append('<span class="loading">&hellip;</span>');
+                                }
+
+                            // end of voidRecipeWizard.refreshUI()
                             },
                         };
 
