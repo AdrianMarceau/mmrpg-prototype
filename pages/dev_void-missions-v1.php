@@ -1137,6 +1137,7 @@ if (!function_exists('array_rearrange_keys')){
                             _self.calculatePowers();
                             _self.generateMission();
                             _self.refreshUI();
+                            _self.refreshHash();
                             // end of voidRecipeWizard.reset()
                             },
                         setup: function($container){
@@ -1156,9 +1157,9 @@ if (!function_exists('array_rearrange_keys')){
 
                             // Pre-define a list of item tokens we can use later
                             const mmrpgIndexItems = mmrpgIndex.items;
-                            var mmrpgTypeTokens = Object.keys(mmrpgIndexItems);
-                            _self.indexes.itemTokens = mmrpgTypeTokens;
-                            //console.log('mmrpgTypeTokens:', mmrpgTypeTokens);
+                            var mmrpgItemTokens = Object.keys(mmrpgIndexItems);
+                            _self.indexes.itemTokens = mmrpgItemTokens;
+                            //console.log('mmrpgItemTokens:', mmrpgItemTokens);
 
                             // Pre-define a list of stat tokens we can use later
                             var mmrpgStatTokens = ['energy', 'weapons', 'attack', 'defense', 'speed'];
@@ -1248,7 +1249,7 @@ if (!function_exists('array_rearrange_keys')){
                                 //console.log('item clicked:', $item);
                                 //console.log('item details:', itemInfo);
                                 if (itemQuantity <= 0){ return; }
-                                _self.addItem(itemInfo);
+                                _self.addItem({token: itemToken, quantity: 1});
                                 });
 
                             // Bind REMOVE ITEM click events to the selection area's item list buttons
@@ -1263,7 +1264,7 @@ if (!function_exists('array_rearrange_keys')){
                                 var itemInfo = {token: itemToken, group: itemGroup, quantity: itemQuantity, index: itemIndex};
                                 //console.log('item clicked:', $item);
                                 //console.log('item details:', itemInfo);
-                                _self.removeItem(itemInfo);
+                                _self.removeItem({token: itemToken, quantity: 1});
                                 });
 
                             // Bind RESET ITEMS click events to the selection area's reset button
@@ -1273,37 +1274,65 @@ if (!function_exists('array_rearrange_keys')){
                                 _self.reset();
                                 });
 
+                            // Check to see if there is already a recipe in the URL hash
+                            window.addEventListener('load', () => {
+                                if (_self.hashUpdatedByApp){ return; }
+                                console.log('%c' + 'window.load() triggered!', 'color: orange;');
+                                const params = _self.getHashParams();
+                                if (!Object.keys(params).length){ return; }
+                                if (!params.mix || !params.mix.length){ return; }
+                                //console.log('-> OnLoad || Mix parameters found:', params.mix);
+                                _self.parseItemMix(params.mix);
+                                });
+                            window.addEventListener('hashchange', () => {
+                                if (_self.hashUpdatedByApp){ return; }
+                                console.log('%c' + 'window.hashchange() triggered!', 'color: orange;');
+                                const params = _self.getHashParams();
+                                if (!Object.keys(params).length){ return; }
+                                if (!params.mix || !params.mix.length){ return; }
+                                //console.log('OnHashChange || Mix parameters found:', params.mix);
+                                _self.parseItemMix(params.mix);
+                                });
+
                             // end of voidRecipeWizard.setup()
                             },
-                        addItem: function(item){
+                        addItem: function(item, refresh){
                             console.log('%c' + 'voidRecipeWizard.addItem() w/ ' + item.token, 'color: magenta;');
                             //console.log('-> w/ item:', item);
                             const _self = this;
                             var token = item.token;
+                            var quantity = item.quantity || 1;
                             var existing = Object.keys(_self.items).length;
                             var exists = Object.keys(_self.items).indexOf(token) >= 0;
                             if (!exists && existing >= _self.maxItems){ return; }
                             if (!exists){ _self.items[token] = 0; }
-                            _self.items[token] += 1;
-                            _self.history.push({ token: token, action: 'add' });
+                            _self.items[token] += quantity;
+                            _self.history.push({ token: token, action: 'add', quantity: quantity });
+                            refresh = (typeof refresh === 'undefined') ? true : refresh;
+                            if (!refresh){ return; }
                             _self.calculatePowers();
                             _self.generateMission();
                             _self.refreshUI();
+                            _self.refreshHash();
                             // end of voidRecipeWizard.addItem()
                             },
-                        removeItem: function(item){
+                        removeItem: function(item, refresh){
                             console.log('%c' + 'voidRecipeWizard.removeItem() w/ ' + item.token, 'color: magenta;');
                             //console.log('-> w/ item:', item);
                             const _self = this;
                             var token = item.token;
+                            var quantity = item.quantity || 1;
                             var exists = Object.keys(_self.items).indexOf(token) >= 0;
                             if (!exists){ return; }
-                            _self.items[token] -= 1;
+                            _self.items[token] -= quantity;
                             if (_self.items[token] <= 0){ delete _self.items[token]; }
-                            _self.history.push({ token: token, action: 'remove' });
+                            _self.history.push({ token: token, action: 'remove', quantity: quantity });
+                            refresh = (typeof refresh === 'undefined') ? true : refresh;
+                            if (!refresh){ return; }
                             _self.calculatePowers();
                             _self.generateMission();
                             _self.refreshUI();
+                            _self.refreshHash();
                             // end of voidRecipeWizard.removeItem()
                             },
                         parseItem: function(item, quantity, powers){
@@ -1457,6 +1486,62 @@ if (!function_exists('array_rearrange_keys')){
                                 }
 
                             // end of voidRecipeWizard.parseItem()
+                            },
+                        parseItemMix: function(mix){
+                            console.log('%c' + 'voidRecipeWizard.parseItemMix() w/ ' + mix, 'color: magenta;');
+                            if (typeof mix !== 'string'){ console.warn('-> mix is not a string!'); return; }
+                            else if (!mix.length){ console.warn('-> mix is an empty string!'); return; }
+
+                            // Backup a reference to the parent object
+                            const _self = this;
+
+                            // Collect valid item tokens to prevent bugs
+                            const mmrpgItemTokens = _self.indexes.itemTokens;
+
+                            // Predefine some variables to hold the mix and then break it apart
+                            var mixItems = [];
+                            var mixString = mix.replace(',', '+').replace('|', '+');
+                            var mixTokens = mix.split('+');
+                            for (var i = 0; i < mixTokens.length; i++){
+                                var itemTokens = mixTokens[i].split(':');
+                                var itemToken = itemTokens[0];
+                                var itemQuantity = parseInt(itemTokens[1]);
+                                if (itemQuantity < 1 || mmrpgItemTokens.indexOf(itemToken) < 0){ continue; }
+                                mixItems.push({
+                                    token: itemToken,
+                                    quantity: itemQuantity
+                                    });
+                                }
+                            //console.log('-> mixString:', mixString);
+                            //console.log('-> mixTokens:', mixTokens);
+                            //console.log('-> mixItems:', mixItems.length, JSON.stringify(mixItems));
+
+                            // If the items list was not empty, we can apply it
+                            _self.reset(false);
+                            for (var i = 0; i < mixItems.length; i++){
+                                var item = mixItems[i];
+                                var itemToken = item.token;
+                                var itemQuantity = item.quantity;
+                                //console.log('-> adding item:', itemToken, 'x' + itemQuantity);
+                                _self.addItem({
+                                    token: itemToken,
+                                    quantity: itemQuantity
+                                    }, false);
+                                }
+                            _self.calculatePowers();
+                            _self.generateMission();
+                            _self.refreshUI();
+
+                            // end of voidRecipeWizard.parseItemMix()
+                            },
+                        getHashParams: function(){
+                            const hash = window.location.hash.substring(1); // Remove the leading #
+                            const params = {};
+                            hash.split('&').forEach(pair => {
+                                const [key, value] = pair.split('=');
+                                if (key) params[decodeURIComponent(key)] = decodeURIComponent(value || '');
+                                });
+                            return params;
                             },
                         filterStatPowers: function(powers, sort){
                             sort = typeof sort === 'undefined' ? true : sort;
@@ -1852,20 +1937,63 @@ if (!function_exists('array_rearrange_keys')){
 
                             // end of voidRecipeWizard.generateMission()
                             },
+                        refreshHash: function(){
+                            console.log('%c' + 'voidRecipeWizard.refreshHash()', 'color: magenta;');
+
+                            // Backup a reference to the parent object
+                            const _self = this;
+
+                            // Collect the updated list of added items to the recipe for looping
+                            var voidItems = _self.items;
+                            var voidItemsTokens = Object.keys(voidItems);
+                            //console.log('-> voidItems:', voidItems);
+                            //console.log('-> voidItemsTokens:', voidItemsTokens);
+
+                            // We should also update the mix string in the URL hash with any changes
+                            var mixItems = [];
+                            for (var i = 0; i < voidItemsTokens.length; i++){
+                                var itemToken = voidItemsTokens[i];
+                                var itemQuantity = voidItems[itemToken];
+                                if (itemQuantity < 1){ continue; }
+                                mixItems.push(itemToken + ':' + itemQuantity);
+                                }
+                            //console.log('-> mixItems:', mixItems);
+                            var hashMixString = _self.getHashParams().mix || '';
+                            var thisMixString = mixItems.length > 0 ? mixItems.join('+') : '';
+                            var currLocationHash = window.location.hash.replace(/^#/, '');
+                            var newLocationHash = thisMixString.length ? ('mix=' + thisMixString) : '';
+                            //console.log('-> currLocationHash (', currLocationHash, ') vs. newLocationHash (', newLocationHash, ')');
+                            if (currLocationHash !== newLocationHash){
+                                //console.log('-> currLocationHash !== newLocationHash');
+                                //console.log('-> adding/updating mix in URL:', newLocationHash);
+                                _self.hashUpdatedByApp = true;
+                                window.location.hash = newLocationHash;
+                                if (_self.hashUpdateTimeout){ clearTimeout(_self.hashUpdateTimeout); }
+                                _self.hashUpdateTimeout = setTimeout(function(){
+                                    _self.hashUpdatedByApp = false;
+                                    delete _self.hashUpdateTimeout;
+                                    }, 1000);
+                                }
+
+                            // end of voidRecipeWizard.refreshHash()
+                            },
                         refreshUI: function(){
                             console.log('%c' + 'voidRecipeWizard.refreshUI()', 'color: magenta;');
 
                             // Backup a reference to the parent object
                             const _self = this;
 
-                            // Collect a reference to the void values
-                            var voidItems = _self.items;
-                            var voidHistory = _self.history;
+                            // Collect reference to relevant void elements and values
                             var $itemsSelected = _self.xrefs.itemsSelected;
                             var $itemsPalette = _self.xrefs.itemsPalette;
                             var $resetButton = _self.xrefs.resetButton;
                             var $missionDetails = _self.xrefs.missionDetails;
                             var $targetList = _self.xrefs.missionTargets;
+
+                            // Collect the list of added items and any history
+                            var voidItems = _self.items;
+                            var voidItemsTokens = Object.keys(voidItems);
+                            var voidHistory = _self.history;
 
                             // Check to see which was the last item token added
                             var lastItemToken = '';
@@ -1877,16 +2005,15 @@ if (!function_exists('array_rearrange_keys')){
                             var $selectedWrapper = $('.wrapper', $itemsSelected);
                             var $paletteWrappers = $('.wrapper', $itemsPalette);
                             var $paletteItems = $('.item[data-token]', $itemsPalette);
-                            var usedItemTokens = Object.keys(voidItems);
                             var numSlotsAvailable = _self.maxItems;
-                            var numSlotsUsed = usedItemTokens.length;
+                            var numSlotsUsed = voidItemsTokens.length;
                             $selectedWrapper.html('');
                             $paletteItems.removeClass('active');
-                            if (usedItemTokens.length > 0){
+                            if (voidItemsTokens.length > 0){
                                 const mmrpgIndexItems = mmrpgIndex.items;
-                                for (var i = 0; i < usedItemTokens.length; i++){
+                                for (var i = 0; i < voidItemsTokens.length; i++){
                                     // Generate the markup for the item then add to the selection area
-                                    var itemToken = usedItemTokens[i];
+                                    var itemToken = voidItemsTokens[i];
                                     var itemInfo = mmrpgIndexItems[itemToken];
                                     var itemName = itemInfo.item_name;
                                     var itemNameBr = itemName.replace(' ', '<br />');
@@ -2046,7 +2173,7 @@ if (!function_exists('array_rearrange_keys')){
                         };
 
                     // Initialize the void recipe calculator
-                    //console.log('%c' + 'Initializing the voidRecipeWizard()', 'color: green;');
+                    console.log('%c' + 'Initializing the voidRecipeWizard()', 'color: orange;');
                     voidRecipeWizard.init($voidRecipeWizard);
 
                     })();
