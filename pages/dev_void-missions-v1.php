@@ -1118,9 +1118,9 @@ if (!function_exists('array_rearrange_keys')){
                             _self.minQuantaPerClass = {'mecha': 25, 'master': 50, 'boss': 500};
                             _self.reset(false);
                             _self.setup($container);
-                            _self.recalculate();
-                            _self.regenerate();
-                            _self.refresh();
+                            _self.calculatePowers();
+                            _self.generateMission();
+                            _self.refreshUI();
                             console.log('voidRecipeWizard is ' + ('%c' + 'ready'), 'color: lime;');
                             console.log('=> voidRecipeWizard:', _self);
                             // end of voidRecipeWizard.init()
@@ -1134,9 +1134,9 @@ if (!function_exists('array_rearrange_keys')){
                             _self.mission = {};
                             _self.history = [];
                             if (!refresh){ return; }
-                            _self.recalculate();
-                            _self.regenerate();
-                            _self.refresh();
+                            _self.calculatePowers();
+                            _self.generateMission();
+                            _self.refreshUI();
                             // end of voidRecipeWizard.reset()
                             },
                         setup: function($container){
@@ -1275,8 +1275,8 @@ if (!function_exists('array_rearrange_keys')){
 
                             // end of voidRecipeWizard.setup()
                             },
-                        recalculate: function(){
-                            console.log('%c' + 'voidRecipeWizard.recalculate()', 'color: magenta;');
+                        calculatePowers: function(){
+                            console.log('%c' + 'voidRecipeWizard.calculatePowers()', 'color: magenta;');
 
                             // Backup a reference to the parent object
                             const _self = this;
@@ -1337,10 +1337,10 @@ if (!function_exists('array_rearrange_keys')){
                                 //console.log('-> voidPowers.' + powerToken + ' =', powerValue);
                                 }
 
-                            // end of voidRecipeWizard.recalculate()
+                            // end of voidRecipeWizard.calculatePowers()
                             },
-                        regenerate: function(){
-                            console.log('%c' + 'voidRecipeWizard.regenerate()', 'color: magenta;');
+                        generateMission: function(){
+                            console.log('%c' + 'voidRecipeWizard.generateMission()', 'color: magenta;');
 
                             // Backup a reference to the parent object
                             const _self = this;
@@ -1448,10 +1448,10 @@ if (!function_exists('array_rearrange_keys')){
                             _self.mission = {};
                             _self.mission.targets = missionTargets;
 
-                            // end of voidRecipeWizard.regenerate()
+                            // end of voidRecipeWizard.generateMission()
                             },
-                        refresh: function(){
-                            console.log('%c' + 'voidRecipeWizard.refresh()', 'color: magenta;');
+                        refreshUI: function(){
+                            console.log('%c' + 'voidRecipeWizard.refreshUI()', 'color: magenta;');
 
                             // Backup a reference to the parent object
                             const _self = this;
@@ -1639,7 +1639,7 @@ if (!function_exists('array_rearrange_keys')){
                                 $targetList.append('<span class="loading">&hellip;</span>');
                                 }
 
-                            // end of voidRecipeWizard.refresh()
+                            // end of voidRecipeWizard.refreshUI()
                             },
                         addItem: function(item){
                             console.log('%c' + 'voidRecipeWizard.addItem() w/ ' + item.token, 'color: magenta;');
@@ -1652,9 +1652,9 @@ if (!function_exists('array_rearrange_keys')){
                             if (!exists){ _self.items[token] = 0; }
                             _self.items[token] += 1;
                             _self.history.push({ token: token, action: 'add' });
-                            _self.recalculate();
-                            _self.regenerate();
-                            _self.refresh();
+                            _self.calculatePowers();
+                            _self.generateMission();
+                            _self.refreshUI();
                             // end of voidRecipeWizard.addItem()
                             },
                         removeItem: function(item){
@@ -1667,9 +1667,9 @@ if (!function_exists('array_rearrange_keys')){
                             _self.items[token] -= 1;
                             if (_self.items[token] <= 0){ delete _self.items[token]; }
                             _self.history.push({ token: token, action: 'remove' });
-                            _self.recalculate();
-                            _self.regenerate();
-                            _self.refresh();
+                            _self.calculatePowers();
+                            _self.generateMission();
+                            _self.refreshUI();
                             // end of voidRecipeWizard.removeItem()
                             },
                         parseItem: function(item, quantity, powers){
