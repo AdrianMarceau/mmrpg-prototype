@@ -763,8 +763,11 @@ if (!function_exists('array_rearrange_keys')){
         /* -- CREATION || TARGET LIST & MISSION DETAILS -- */
 
         #void-recipe .creation {
+            height: 140px;
+            border: 1px solid #1a1a1a;
             border-radius: 6px;
             box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
         }
         #void-recipe .creation .mission-details,
         #void-recipe .creation .target-list,
@@ -778,8 +781,10 @@ if (!function_exists('array_rearrange_keys')){
             overflow: visible;
             border: 1px solid #1A1A1A;
             border-radius: 6px;
-            position: relative;
-            z-index: 3;
+            position: absolute;
+            left: 0;
+            right: 0;
+            z-index: 1;
         }
 
         #void-recipe .creation .battle-field {
@@ -787,11 +792,9 @@ if (!function_exists('array_rearrange_keys')){
             border: 0 none transparent;
             position: absolute;
             top: 0;
-            right: 0;
             bottom: 0;
-            left: 0;
-            z-index: 1;
             pointer-events: none;
+            z-index: 1;
         }
         #void-recipe .creation .battle-field .sprite.background,
         #void-recipe .creation .battle-field .sprite.foreground {
@@ -805,16 +808,32 @@ if (!function_exists('array_rearrange_keys')){
         #void-recipe .creation .battle-field .sprite.background {
             background-repeat: repeat;
             background-position: center center;
+            z-index: 1;
         }
         #void-recipe .creation .battle-field .sprite.foreground {
             top: auto;
             height: 20%;
+            z-index: 2;
+        }
+        #void-recipe .creation .battle-field:after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 4;
+            pointer-events: none;
+            background-color: #292929;
         }
 
         #void-recipe .creation .mission-details {
-            height: 60px;
+            height: auto;
+            min-height: 26px;
             border-radius: 6px 6px 0 0;
             border-bottom: 0;
+            z-index: 2;
         }
         #void-recipe .creation .mission-details .powers-list {
             display: block;
@@ -867,11 +886,13 @@ if (!function_exists('array_rearrange_keys')){
         }
 
         #void-recipe .creation .target-list {
+            bottom: 0;
             height: 80px;
             border-radius: 0 0 6px 6px;
             border-top: 0;
             text-align: center;
             vertical-align: middle;
+            z-index: 3;
         }
         #void-recipe .creation .target-list .target {
             display: inline-block;
@@ -996,7 +1017,7 @@ if (!function_exists('array_rearrange_keys')){
             background-color: #2d2c3a;
             background-color: rgb(45, 44, 58, 0.9);
         }
-        #void-recipe .creation .target-list {
+        #void-recipe .creation .battle-field:after {
             background-color: #292834;
             background-color: rgb(41, 40, 52, 0.8);
         }
@@ -1491,6 +1512,7 @@ if (!function_exists('array_rearrange_keys')){
                             console.log('%c' + 'voidRecipeWizard.parseItemMix() w/ ' + mix, 'color: magenta;');
                             if (typeof mix !== 'string'){ console.warn('-> mix is not a string!'); return; }
                             else if (!mix.length){ console.warn('-> mix is an empty string!'); return; }
+                            else if (mix === '-'){ return; }
 
                             // Backup a reference to the parent object
                             const _self = this;
@@ -1961,7 +1983,8 @@ if (!function_exists('array_rearrange_keys')){
                             var hashMixString = _self.getHashParams().mix || '';
                             var thisMixString = mixItems.length > 0 ? mixItems.join('+') : '';
                             var currLocationHash = window.location.hash.replace(/^#/, '');
-                            var newLocationHash = thisMixString.length ? ('mix=' + thisMixString) : '';
+                            //var newLocationHash = thisMixString.length ? ('mix=' + thisMixString) : '';
+                            var newLocationHash = 'mix=' + (thisMixString.length ? thisMixString : '-');
                             //console.log('-> currLocationHash (', currLocationHash, ') vs. newLocationHash (', newLocationHash, ')');
                             if (currLocationHash !== newLocationHash){
                                 //console.log('-> currLocationHash !== newLocationHash');
