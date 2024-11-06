@@ -846,24 +846,46 @@ $mmrpg_index_fields = rpg_field::get_index(true);
         height: calc(100% - 12px);
         border-radius: 3px;
         text-align: center;
-        background-color: #2d2c39;
+        background-color: transparent;
+        /* background-color: #2d2c39;  */
         /* background-color: rgba(255, 0, 100, 0.1);  */
+    }
+    #void-recipe .creation .target-list .target > .type {
+        display: block;
+        position: absolute;
+        z-index: 1;
+        width: auto;
+        height: auto;
+        bottom: 9px;
+        left: 50%;
+        transform: translate(-50%, 0);
+        width: 50px;
+        height: 50px;
+        border: 1px solid transparent;
+        border-radius: 50%;
+        filter: opacity(1.0) brightness(0.7) saturate(0.8);
+        pointer-events: none;
+    }
+    #void-recipe .creation .target-list .target > .type.empty {
+        filter: none;
+        border-color: #2e2e2e !important;
     }
     #void-recipe .creation .target-list .target .image {
         display: block;
         position: absolute;
-        z-index: 3;
+        z-index: 2;
         width: 40px;
         height: 40px;
         bottom: 14px;
         left: 50%;
         transform: translate(-50%, 0);
+        cursor: pointer
         /* background-color: rgba(100, 0, 255, 0.1);  */
     }
     #void-recipe .creation .target-list .target .label {
         display: block;
         position: absolute;
-        z-index: 1;
+        z-index: 3;
         width: 100%;
         height: auto;
         bottom: 0;
@@ -872,6 +894,9 @@ $mmrpg_index_fields = rpg_field::get_index(true);
         font-size: 9px;
         line-height: 13px;
         background-color: #22222b;
+        border: 1px solid #1d1d26;
+        border-radius: 2px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         /* background-color: rgba(100, 100, 0, 0.1); */
     }
     #void-recipe .creation .target-list .target .label .name {
@@ -888,11 +913,19 @@ $mmrpg_index_fields = rpg_field::get_index(true);
     }
     #void-recipe .creation .target-list .target .image .sprite {
         display: block;
+        pointer-events: none;
         position: relative;
         margin: 0;
         top: 0;
         left: 0;
+        transform: translateY(0px);
+        animation: void-target-sprite-bounce 0.6s steps(1) infinite;
         /* background-color: rgba(0, 200, 100, 0.1);  */
+    }
+    @keyframes void-target-sprite-bounce {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-1px); }
+        100% { transform: translateY(0px); }
     }
     #void-recipe .creation .target-list .target .image .sprite_40x40 {
         top: 0;
@@ -905,6 +938,15 @@ $mmrpg_index_fields = rpg_field::get_index(true);
     #void-recipe .creation .target-list .target .image .sprite_160x160 {
         top: -80px;
         left: -40px;
+    }
+    #void-recipe .creation .target-list .target .image:hover .sprite_40x40 {
+        background-position: -40px 0;
+    }
+    #void-recipe .creation .target-list .target .image:hover .sprite_80x80 {
+        background-position: -80px 0;
+    }
+    #void-recipe .creation .target-list .target .image:hover .sprite_160x160 {
+        background-position: -160px 0;
     }
 
     /* -- PANEL & GROUP COLORS -- */
@@ -1199,6 +1241,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
 
                         // Collect a reference to the void values object and reset
                         var voidItems = _self.items;
+                        var voidItemsTokens = Object.keys(voidItems);
 
                         // Define a variable to hold the calculated powers of all the items
                         var voidPowers = {};
@@ -1213,16 +1256,15 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         voidPowers.powers.delta = 0;
                         voidPowers.powers.quanta = 0;
                         voidPowers.powers.spread = 0;
-                        voidPowers.powers.effort = 0;
-                        voidPowers.powers.reward = 0;
                         voidPowers.powers.level = 0;
                         voidPowers.powers.forte = 0;
+                        voidPowers.powers.effort = 0;
+                        voidPowers.powers.reward = 0;
                         voidPowers.flags.guard = false;
                         voidPowers.flags.reverse = false;
                         voidPowers.flags.extreme = false;
 
                         // Loop through all the items, one-by-one, and parse their intrinsic values
-                        var voidItemsTokens = Object.keys(voidItems);
                         for (var i = 0; i < voidItemsTokens.length; i++){
                             var itemToken = voidItemsTokens[i];
                             var itemQuantity = voidItems[itemToken];
@@ -1230,26 +1272,25 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             //for (var j = 0; j < itemQuantity; j++){ }
                             }
 
-                        // Ensure the quanta is always at least zero if there are items present
-                        if (voidItemsTokens.length
-                            && voidPowers.powers.quanta < 0){
-                            voidPowers.powers.quanta = 0;
-                            }
-
-                        // Ensure the spread always within range when there are items present
-                        if (voidItemsTokens.length
-                            && voidPowers.powers.spread < 1){
-                            voidPowers.powers.spread = 1;
+                        // As long as items are present, we should make keep certain values in scope
+                        if (voidItemsTokens.length){
+                            // Ensure the quanta is always at least zero if there are items present
+                            if (voidPowers.powers.quanta < 0){ voidPowers.powers.quanta = 0; }
+                            // Ensure the spread always within range when there are items present
+                            if (voidPowers.powers.spread < 1){ voidPowers.powers.spread = 1; }
+                            // Ensure the level is always at least one if there are items present
+                            if (voidPowers.powers.level < 1){ voidPowers.powers.level = 1; }
                             }
 
                         //console.log('voidPowers have been updated!');
                         _self.powers = {};
                         var voidPowersList = voidPowers.getPowers();
                         var voidPowerKeys = Object.keys(voidPowersList);
+                        var voidPowersRequired = ['delta', 'quanta', 'spread', 'level', 'forte'];
                         for (var i = 0; i < voidPowerKeys.length; i++){
                             var powerToken = voidPowerKeys[i];
                             var powerValue = voidPowersList[powerToken];
-                            if (powerValue === 0){ continue; }
+                            if (powerValue === 0 && voidPowersRequired.indexOf(powerToken) === -1){ continue; }
                             _self.powers[powerToken] = powerValue;
                             //console.log('-> voidPowers.' + powerToken + ' =', powerValue);
                             }
@@ -1298,17 +1339,26 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         // Pull a filtered list of stat powers and type powers for easier looping
                         var statPowersList = _self.filterStatPowers(voidPowersList);
                         var typePowersList = _self.filterTypePowers(voidPowersList);
-                        console.log('-> statPowersList:', statPowersList);
-                        console.log('-> typePowersList:', typePowersList);
+                        //console.log('-> statPowersList:', statPowersList);
+                        //console.log('-> typePowersList:', typePowersList);
+
+                        // Loop through and check to see which classes are represented
+                        var queuesRequired = [];
+                        for (var i = 0; i < distributedQuanta.length; i++){
+                            if (!distributedQuanta[i].tier){ continue; }
+                            if (queuesRequired.indexOf(distributedQuanta[i].tier) !== -1){ continue; }
+                            queuesRequired.push(distributedQuanta[i].tier);
+                            }
+                        //console.log('-> queuesRequired:', queuesRequired);
 
                         // Generate a queue of mechas, masters, and bosses given the powers available
                         var targetRobotQueue = {};
-                        targetRobotQueue['mecha'] = _self.generateTargetQueue((_self.indexes.robotMechaTokens || []), typePowersList, statPowersList);
-                        targetRobotQueue['master'] = _self.generateTargetQueue((_self.indexes.robotMasterTokens || []), typePowersList, statPowersList);
-                        targetRobotQueue['boss'] = _self.generateTargetQueue((_self.indexes.robotBossTokens || []), typePowersList, statPowersList);
-                        console.log('-> targetRobotQueue[mecha]:', targetRobotQueue['mecha']);
-                        console.log('-> targetRobotQueue[master]:', targetRobotQueue['master']);
-                        console.log('-> targetRobotQueue[boss]:', targetRobotQueue['boss']);
+                        targetRobotQueue['mecha'] = queuesRequired.indexOf('mecha') !== -1 ? _self.generateTargetQueue((_self.indexes.robotMechaTokens || []), typePowersList, statPowersList) : [];
+                        targetRobotQueue['master'] = queuesRequired.indexOf('master') !== -1 ? _self.generateTargetQueue((_self.indexes.robotMasterTokens || []), typePowersList, statPowersList) : [];
+                        targetRobotQueue['boss'] = queuesRequired.indexOf('boss') !== -1 ? _self.generateTargetQueue((_self.indexes.robotBossTokens || []), typePowersList, statPowersList) : [];
+                        //console.log('-> targetRobotQueue[mecha]:', targetRobotQueue['mecha']);
+                        //console.log('-> targetRobotQueue[master]:', targetRobotQueue['master']);
+                        //console.log('-> targetRobotQueue[boss]:', targetRobotQueue['boss']);
 
                         // Use calculated quanta-per-target to set-up the different target slots
                         var missionTargets = [];
@@ -1325,11 +1375,6 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             targetRobot.quanta = targetQuanta;
                             targetRobot.level = 1;
                             if (targetTier.length){
-                                // TEMP TEMP TEMP (placeholder robots)
-                                //if (targetTier === 'mecha'){ targetRobot.token = 'met'; }
-                                //if (targetTier === 'master'){ targetRobot.token = 'mega-man'; }
-                                //if (targetTier === 'boss'){ targetRobot.token = 'enker'; }
-                                // TEMP TEMP TEMP (placeholder robots)
                                 var queueOrder = [];
                                 if (targetTier === 'boss'){ queueOrder.push('boss', 'master', 'mecha'); }
                                 if (targetTier === 'master'){ queueOrder.push('master', 'mecha'); }
@@ -1453,6 +1498,8 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         // Let us also update the list of void powers to show any changes
                         var voidPowers = _self.powers;
                         var voidPowersKeys = Object.keys(voidPowers);
+                        //console.log('voidPowers:', voidPowers);
+                        //console.log('voidPowersKeys:', voidPowersKeys);
                         $missionDetails.html('');
                         if (voidPowersKeys.length){
                             var powersListMarkup = '';
@@ -1462,7 +1509,6 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                                     var powerToken = voidPowersKeys[i];
                                     var powerValue = voidPowers[powerToken];
                                     if (powerToken === ''){ continue; }
-                                    if (powerValue === 0){ continue; }
                                     // format the power value differently per kind
                                     var powerValueText = '';
                                     if (powerToken === 'delta'){
@@ -1481,10 +1527,14 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                                         if (roundedValue > scopedValue){ overflow = roundedValue - scopedValue; }
                                         powerValueText = '&times;' + scopedValue + (overflow ? ' <span class="overflow">(&plus;' + overflow + ')</span>' : '');
                                         }
+                                    else if (powerToken === 'level'){
+                                        // unsigned, fine as-is
+                                        powerValueText = '' + powerValue;
+                                        }
                                     else {
                                         // signed, so display the correct one
                                         var roundedValue = Math.round(powerValue);
-                                        powerValueText = (roundedValue > 0 ? '&plus;' : '&minus;') + Math.abs(roundedValue);
+                                        powerValueText = (roundedValue > 0 ? '&plus;' : (roundedValue < 0 ? '&minus;' : '')) + Math.abs(roundedValue);
                                         }
                                     // add the power to the list
                                     powersListMarkup += '<li class="power">';
@@ -1506,7 +1556,9 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         if (missionTargets.length){
                             //console.log('updating mission target list!', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
                             const mmrpgIndexRobots = mmrpgIndex.robots;
+                            const frameTokenByKey = {0: 'base', 1: 'defense', 2: 'base2', 3: 'defend', 4: 'base', 5: 'defend', 6: 'base2', 7: 'defend'};
                             for (var i = 0; i < missionTargets.length; i++){
+                                var targetKey = i;
                                 var targetRobot = missionTargets[i];
                                 //console.log('-> targetRobot:', targetRobot);
                                 var targetRobotToken = targetRobot.token;
@@ -1517,16 +1569,25 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                                 var targetRobotLevel = targetRobot.level;
                                 var targetRobotName = targetRobotInfo['robot_name'] || targetRobotToken;
                                 var targetRobotImage = targetRobotInfo['robot_image'] || targetRobotToken;
+                                var targetRobotTypes = targetRobotInfo['robot_core'] || 'none';
+                                if (targetRobotInfo['robot_core'] && targetRobotInfo['robot_core2']){ targetRobotTypes += '_'+targetRobotInfo['robot_core2']; }
                                 var targetRobotImageSize = targetRobotInfo['robot_image_size'] || 40;
                                 var targetRobotImageSizeX = targetRobotImageSize + 'x' + targetRobotImageSize;
+                                var targetRobotFrame = frameTokenByKey[targetKey] || '00';
                                 var targetRobotSprite = '/images/robots/'+targetRobotImage+'/sprite_left_'+targetRobotImageSizeX+'.png?'+gameSettings.cacheTime;
                                 var targetRobotMarkup = '<div class="target">';
                                     targetRobotMarkup += '<div class="image">';
-                                        targetRobotMarkup += '<div class="sprite sprite_'+targetRobotImageSizeX+' sprite_'+targetRobotImageSizeX+'_00" style="background-image: url('+targetRobotSprite+');">'+targetRobotName+'</div>';
+                                        targetRobotMarkup += '<div '
+                                            + 'class="sprite sprite_'+targetRobotImageSizeX+' sprite_'+targetRobotImageSizeX+'_'+targetRobotFrame+'" '
+                                            + 'style="background-image: url('+targetRobotSprite+');" '
+                                            + 'data-size="'+targetRobotSprite+'" '
+                                            + 'data-frame="'+targetRobotFrame+'" '
+                                            + '>'+targetRobotName+'</div>';
                                     targetRobotMarkup += '</div>';
                                     targetRobotMarkup += '<div class="label">';
                                         targetRobotMarkup += '<span class="name">'+targetRobotName+'</span>';
                                     targetRobotMarkup += '</div>';
+                                    targetRobotMarkup += '<i class="type '+targetRobotTypes+'"></i>';
                                 targetRobotMarkup += '</div>';
                                 $targetList.append(targetRobotMarkup);
                                 }
@@ -1537,8 +1598,8 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         // end of voidRecipeWizard.refresh()
                         },
                     addItem: function(item){
-                        console.log('%c' + 'voidRecipeWizard.addItem()', 'color: magenta;');
-                        console.log('-> w/ item:', item);
+                        console.log('%c' + 'voidRecipeWizard.addItem() w/ ' + item.token, 'color: magenta;');
+                        //console.log('-> w/ item:', item);
                         const _self = this;
                         var token = item.token;
                         var existing = Object.keys(_self.items).length;
@@ -1553,8 +1614,8 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         // end of voidRecipeWizard.addItem()
                         },
                     removeItem: function(item){
-                        console.log('%c' + 'voidRecipeWizard.removeItem()', 'color: magenta;');
-                        console.log('-> w/ item:', item);
+                        console.log('%c' + 'voidRecipeWizard.removeItem() w/ ' + item.token, 'color: magenta;');
+                        //console.log('-> w/ item:', item);
                         const _self = this;
                         var token = item.token;
                         var exists = Object.keys(_self.items).indexOf(token) >= 0;
@@ -1568,8 +1629,8 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         // end of voidRecipeWizard.removeItem()
                         },
                     parseItem: function(item, quantity, powers){
-                        console.log('%c' + 'voidRecipeWizard.parseItem()', 'color: magenta;');
-                        console.log('-> w/ item:', item, 'quantity:', quantity, 'powers:', powers);
+                        console.log('%c' + 'voidRecipeWizard.parseItem() w/ ' + item.token + ' x' + quantity, 'color: magenta;');
+                        //console.log('-> w/ item:', item, 'quantity:', quantity, 'powers:', powers);
 
                         // Backup a reference to the parent object
                         const _self = this;
@@ -1654,7 +1715,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             var statToken = itemIsEnergy ? 'energy' : 'weapons';
                             var statPower = (itemIsTank ? 10 : 0) + (itemIsUpgrade ? 20 : 0) + (itemIsMythic ? 50 : 0);
                             var boostKind = itemIsEnergy ? 'level' : 'forte';
-                            var boostPower = itemPrefix === 'field' ? 1 : 10;
+                            var boostPower = itemPrefix === 'field' ? 1 : statPower;
                             powers.incPower(statToken, statPower * quantity);
                             powers.incPower(boostKind, boostPower * quantity);
                             }
@@ -1722,7 +1783,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                     filterStatPowers: function(powers, sort){
                         sort = typeof sort === 'undefined' ? true : sort;
                         console.log('%c' + 'voidRecipeWizard.filterStatPowers()', 'color: magenta;');
-                        console.log('-> w/ powers:', powers, 'sort:', sort);
+                        //console.log('-> w/ powers:', powers, 'sort:', sort);
                         // parse out powers that represent stats and then order them highest first
                         const _self = this;
                         var mmrpgStats = _self.indexes.statTokens;
@@ -1732,7 +1793,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             var statValue = powers[statToken] || 0;
                             if (statValue > 0){ statPowers[statToken] = statValue; }
                             }
-                        console.log('=> statPowers:', statPowers);
+                        //console.log('=> statPowers:', statPowers);
                         if (!sort){ return statPowers; }
                         // re-sort the stat powers based on their values w/ highest first
                         var statPowersKeys = Object.keys(statPowers);
@@ -1743,14 +1804,14 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             var statValue = statPowers[statToken];
                             sortedStatPowers[statToken] = statValue;
                             }
-                        console.log('=> sortedStatPowers:', sortedStatPowers);
+                        //console.log('=> sortedStatPowers:', sortedStatPowers);
                         return sortedStatPowers;
                         // end of voidRecipeWizard.filterStatPowers()
                         },
                     filterTypePowers: function(powers, sort){
                         sort = typeof sort === 'undefined' ? true : sort;
                         console.log('%c' + 'voidRecipeWizard.filterTypePowers()', 'color: magenta;');
-                        console.log('-> w/ powers:', powers, 'sort:', sort);
+                        //console.log('-> w/ powers:', powers, 'sort:', sort);
                         // parse out powers that represent types and then order them highest first
                         const _self = this;
                         var mmrpgTypes = _self.indexes.typeTokens;
@@ -1760,7 +1821,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             var typeValue = powers[typeToken] || 0;
                             if (typeValue > 0){ typePowers[typeToken] = typeValue; }
                             }
-                        console.log('=> typePowers:', typePowers);
+                        //console.log('=> typePowers:', typePowers);
                         if (!sort){ return typePowers; }
                         // re-sort the type powers based on their values w/ highest first
                         var typePowersKeys = Object.keys(typePowers);
@@ -1771,79 +1832,87 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             var typeValue = typePowers[typeToken];
                             sortedTypePowers[typeToken] = typeValue;
                             }
-                        console.log('=> sortedTypePowers:', sortedTypePowers);
+                        //console.log('=> sortedTypePowers:', sortedTypePowers);
                         return sortedTypePowers;
                         // end of voidRecipeWizard.filterTypePowers()
                         },
-                    distributeQuanta: function(quanta, spread, autofill) {
-                        autofill = typeof autofill !== 'undefined' ? autofill : true;
-                        console.log('%c' + 'voidRecipeWizard.distributeQuanta()', 'color: magenta;');
-                        console.log('-> w/ quanta:', quanta, 'spread:', spread, 'autofill:', autofill);
+                    distributeQuanta: function(quanta, spread) {
+                        console.log('%c' + 'voidRecipeWizard.distributeQuanta() w/ quanta: ' + quanta + ', spread: ' + spread, 'color: magenta;');
+                        //console.log('-> w/ quanta:', quanta, 'spread:', spread);
 
                         // Define the main thresholds for primary slots
                         const _self = this;
-                        const thresholds = { boss: 500, master: 50, mecha: 25 };
-                        const tierNames = ['boss', 'master', 'mecha'];
-                        const result = [];
+                        const thresholds = { mecha: 25, master: 100, boss: 500 };
+                        const tiers = Object.keys(thresholds);
+                        const targets = [];
 
-                        // Step 1: Calculate base quanta per slot to ensure each slot is filled
-                        let minQuantaPerSlot = Math.floor(quanta / spread);
+                        // Predefine variables to hold needed quanta and spread values
+                        var numTargetSlots = spread;
+                        var quantaAvailable = quanta;
+                        var quantaRemaining = quantaAvailable;
+                        //console.log('-> numTargetSlots:', numTargetSlots);
+                        //console.log('-> quantaAvailable:', quantaAvailable);
+                        //console.log('-> quantaRemaining:', quantaRemaining);
 
-                        // Determine the minimum possible tier based on minQuantaPerSlot
-                        let baseTier = '', baseClass = '';
-                        if (minQuantaPerSlot >= thresholds.boss) {
-                            baseTier = baseClass = 'boss';
-                            minQuantaPerSlot = thresholds.boss;
-                            } else if (minQuantaPerSlot >= thresholds.master) {
-                            baseTier = baseClass = 'master';
-                            minQuantaPerSlot = thresholds.master;
-                            } else if (minQuantaPerSlot >= thresholds.mecha) {
-                            baseTier = baseClass = 'mecha';
-                            minQuantaPerSlot = thresholds.mecha;
-                            } else {
-                            baseTier = '';
-                            baseClass = 'mecha';
-                            minQuantaPerSlot = 0; // "frag" slots start at 0
+                        // We know the spread, so let's pre-populate with empty slots
+                        //console.log('-> [step-1] populate targets array with placeholders!');
+                        for (let i = 0; i < numTargetSlots; i++) {
+                            targets.push({ tier: '', class: 'mecha', amount: 0 });
                             }
+                        //console.log('-> step-1 // targets:', JSON.stringify(targets));
+                        //console.log('-> step-1 // quantaAvailable:', quantaAvailable);
+                        //console.log('-> step-1 // quantaRemaining:', quantaRemaining);
 
-                        // Deduct the base allocation from total quanta
-                        quanta -= minQuantaPerSlot * spread;
-
-                        // Step 2: Assign the base tier to each slot
-                        for (let i = 0; i < spread; i++) {
-                            result.push({
-                                tier: baseTier,
-                                class: baseClass,
-                                amount: minQuantaPerSlot
-                                });
-                            }
-
-                        // Step 3: Distribute remaining quanta to upgrade slots where possible
-                        for (let i = 0; i < spread && quanta > 0; i++) {
-                            let currentTierIndex = tierNames.indexOf(result[i].tier);
-                            let nextTier = tierNames[currentTierIndex - 1]; // Get the next higher tier
-                            if (nextTier && thresholds[nextTier] > result[i].amount) {
-                                let needed = thresholds[nextTier] - result[i].amount;
-                                if (quanta >= needed) {
-                                    quanta -= needed;
-                                    result[i] = { tier: nextTier, amount: thresholds[nextTier] };
+                        // Now let's loop through each tier, in order, and try to upgrade each slot
+                        //console.log('-> [step-2] upgrade targets in array to upper tiers!');
+                        for (let i = 0; i < tiers.length; i++){
+                            let tier = tiers[i];
+                            let threshold = thresholds[tier];
+                            //console.log('-> processing tier:', tier, 'w/ threshold:', threshold);
+                            for (let j = 0; j < targets.length; j++){
+                                let target = targets[j];
+                                let currentTier = target.tier;
+                                let currentAmount = target.amount;
+                                let needed = threshold - currentAmount;
+                                //console.log('-> processing target:', target, 'w/ currentTier:', currentTier, 'currentAmount:', currentAmount);
+                                //console.log('-> checking needed:', needed, 'vs. quantaRemaining:', quantaRemaining);
+                                if (needed <= 0){ continue; }
+                                if (quantaRemaining >= needed){
+                                    //console.log('-> quantaRemaining >= needed!');
+                                    quantaRemaining -= needed;
+                                    targets[j] = { tier: tier, class: tier, amount: threshold };
+                                    //console.log('-> updated target to tier:', targets[j].tier, 'class:', targets[j].class, 'amount:', targets[j].amount);
                                     }
                                 }
                             }
+                        //console.log('-> step-2 // targets:', JSON.stringify(targets));
+                        //console.log('-> step-2 // quantaAvailable:', quantaAvailable);
+                        //console.log('-> step-2 // quantaRemaining:', quantaRemaining);
 
-                        // Step 4: If there's leftover quanta, add a single "frag" slot
-                        if (autofill
-                            && quanta > 0
-                            && baseTier.length
-                            && result.length < _self.maxTargets){
-                            result.push({
-                                tier: '',
-                                class: 'mecha',
-                                amount: quanta
-                                });
+                        // If there's any remaining quanta, distribute it evenly across the slots
+                        //console.log('-> [step-3] distribute remaining quanta evenly across slots!');
+                        if (quantaRemaining > 0){
+                            let quantaPerSlot = Math.floor(quantaRemaining / numTargetSlots);
+                            let quantaOverflow = quantaRemaining % numTargetSlots;
+                            //console.log('-> quantaPerSlot:', quantaPerSlot, 'quantaOverflow:', quantaOverflow);
+                            for (let i = 0; i < targets.length; i++){
+                                let target = targets[i];
+                                let currentAmount = target.amount;
+                                let newAmount = currentAmount + quantaPerSlot;
+                                if (quantaOverflow > 0){
+                                    newAmount += 1;
+                                    quantaOverflow -= 1;
+                                    }
+                                targets[i].amount = newAmount;
+                                //console.log('-> updated target:', targets[i]);
+                                }
                             }
+                        //console.log('-> step-3 // targets:', JSON.stringify(targets));
+                        //console.log('-> step-3 // quantaAvailable:', quantaAvailable);
+                        //console.log('-> step-3 // quantaRemaining:', quantaRemaining);
 
-                        return result;
+                        // Return the list of generated targets
+                        return targets;
 
                         // end of voidRecipeWizard.distributeQuanta()
                         },
@@ -1853,11 +1922,16 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                         // Collect important refs and indexes for processing
                         const _self = this;
                         const mmrpgIndexRobots = mmrpgIndex.robots;
+                        const mmrpgIndexRobotsTokens = Object.keys(mmrpgIndexRobots);
+                        var typePowers = types;
+                        var statPowers = stats;
                         var allowTypes = Object.keys(types);
                         var sortByStats = Object.keys(stats);
                         var sortByTypes = Object.keys(types);
-                        var targetQueue = robots;
+                        var targetQueue = Object.values(robots);
+                        //console.log('=> targetQueue (base):', targetQueue);
                         // First we filter-out any robots that don't have elemental energy
+                        //console.log('~> filtering targetQueue by core types....');
                         targetQueue = targetQueue.filter(function(token){
                             var types = [];
                             var info = mmrpgIndexRobots[token];
@@ -1867,41 +1941,68 @@ $mmrpg_index_fields = rpg_field::get_index(true);
                             return allowTypes.indexOf(types[0]) !== -1 || allowTypes.indexOf(types[1]) !== -1;
                             });
                         //console.log('=> targetQueue (filtered):', targetQueue);
-                        // First we sort the queue based on the ID just to make everything consistent
+                        // First we sort the queue based on database order just to make everything consistent
+                        //console.log('~> sorting targetQueue by database order....');
                         targetQueue.sort(function(a, b){
-                            var robotA = mmrpgIndexRobots[a];
-                            var robotB = mmrpgIndexRobots[b];
-                            var idValueA = robotA.robot_id || 0;
-                            var idValueB = robotB.robot_id || 0;
-                            if (idValueA !== idValueB){ return idValueA - idValueB; }
+                            var orderValueA = mmrpgIndexRobotsTokens.indexOf(a);
+                            var orderValueB = mmrpgIndexRobotsTokens.indexOf(b);
+                            //console.log('-> comparing', a, 'w/ order:', orderValueA, 'vs.', b, 'w/ order:', orderValueB);
+                            if (orderValueA !== orderValueB){ return orderValueA - orderValueB; }
                             return 0;
                             });
-                        // Last we re-sort the queue based on each robot's stats given stat-order priority
-                        targetQueue.sort(function(a, b){
-                            var robotA = mmrpgIndexRobots[a];
-                            var robotB = mmrpgIndexRobots[b];
-                            for (var i = 0; i < sortByStats.length; i++){
-                                var statToken = sortByStats[i];
-                                var statValueA = robotA['robot_' + statToken] || 0;
-                                var statValueB = robotB['robot_' + statToken] || 0;
-                                if (statValueA !== statValueB){ return statValueB - statValueA; }
-                                }
-                            /* for (var i = 0; i < sortByTypes.length; i++){
-                                var typeToken = sortByTypes[i];
-                                var typeValueA = robotA['robot_core'] === typeToken ? 1 : 0;
-                                var typeValueB = robotB['robot_core'] === typeToken ? 1 : 0;
-                                if (typeValueA !== typeValueB){ return typeValueB - typeValueA; }
-                                } */
-                            return 0;
-                            });
-                        //console.log('=> targetQueue (sorted):', targetQueue);
+                        //console.log('=> targetQueue (sorted-by-order):', targetQueue);
+                        // Last we re-sort the queue based on each robot's stats given stat-order priority w/ type-power bonuses
+                        if (sortByStats.length || sortByTypes.length){
+                            //console.log('~> sorting targetQueue by stats and/or types....');
+                            targetQueue.sort(function(a, b){
+                                //console.log('--> comparing', a, 'vs.', b, '...');
+                                var tokenA = a, robotA = mmrpgIndexRobots[a];
+                                var tokenB = b, robotB = mmrpgIndexRobots[b];
+                                var robotValueA = 100, robotValueB = 100;
+                                if (sortByStats.length){
+                                    //console.log('---> start-loop for sortByStats', sortByStats);
+                                    for (var i = 0; i < sortByStats.length; i++){
+                                        // Collect the stats for this robot so we can compare them
+                                        var statToken = sortByStats[i];
+                                        var statValueA = robotA['robot_' + statToken] || 0;
+                                        var statValueB = robotB['robot_' + statToken] || 0;
+                                        //console.log('----> comparing', tokenA, statToken, 'w/', statValueA, 'vs.', tokenB, statToken, 'w/', statValueB);
+                                        robotValueA += (robotValueA * (statValueA / 100));
+                                        robotValueB += (robotValueB * (statValueB / 100));
+                                        }
+                                    //console.log('---> after stat-compare', tokenA, 'robotValueA:', robotValueA, 'vs.', tokenB, 'robotValueB:', robotValueB);
+                                    }
+                                if (sortByTypes.length){
+                                    //console.log('---> start looping through sortByTypes', sortByTypes);
+                                    for (var i = 0; i < sortByTypes.length; i++){
+                                        // Then collect type value(s) for this robot so we can compare
+                                        var typeToken = sortByTypes[i];
+                                        var typeValue = typePowers[typeToken] || 0;
+                                        var robotA_Type1 = robotA['robot_core'] || 'none';
+                                        var robotA_Type2 = robotA['robot_core'] && robotA['robot_core2'] ? robotA['robot_core2'] : '';
+                                        var robotB_Type1 = robotB['robot_core'] || 'none';
+                                        var robotB_Type2 = robotB['robot_core'] && robotB['robot_core2'] ? robotB['robot_core2'] : '';
+                                        var robotA_TypeValue = (robotA_Type1 === typeToken ? typeValue : 0) + (robotA_Type2 === typeToken ? typeValue : 0);
+                                        var robotB_TypeValue = (robotB_Type1 === typeToken ? typeValue : 0) + (robotB_Type2 === typeToken ? typeValue : 0);
+                                        //console.log('----> comparing', tokenA, typeToken, 'w/', robotA_TypeValue, 'vs.', tokenB, typeToken, 'w/', robotB_TypeValue);
+                                        robotValueA += (robotValueA * (robotA_TypeValue / 100));
+                                        robotValueB += (robotValueB * (robotB_TypeValue / 100));
+                                        }
+                                    //console.log('---> after type-compare', tokenA, 'robotValueA:', robotValueA, 'vs.', tokenB, 'robotValueB:', robotValueB);
+                                    }
+                                //console.log('---> FINAL compare for ', tokenA, 'robotValueA:', robotValueA, 'vs.', tokenB, 'robotValueB:', robotValueB);
+                                if (robotValueA !== robotValueB){ return robotValueB - robotValueA; }
+                                return 0;
+                                });
+                            //console.log('=> targetQueue (sorted-by-stats)[+type]:', targetQueue);
+                            }
                         return targetQueue;
                         // end of voidRecipeWizard.generateTargetQueue()
                         },
                     };
 
                 // Initialize the void recipe calculator
-                console.log('%c' + 'Initializing the voidRecipeWizard()', 'color: green;');
+                //console.log('%c' + 'Initializing the voidRecipeWizard()', 'color: green;');
                 voidRecipeWizard.init($voidRecipeWizard);
 
                 })();
