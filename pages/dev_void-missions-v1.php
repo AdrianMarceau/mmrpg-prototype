@@ -24,6 +24,59 @@ $mmrpg_index_abilities = rpg_ability::get_index(true);
 $mmrpg_index_items = rpg_item::get_index(true);
 $mmrpg_index_fields = rpg_field::get_index(true);
 
+// Define a function that inserts a new element into an associative array after a given key position
+if (!function_exists('array_insert_after_key')){
+    function array_insert_after_key(&$parent_array, $parent_key, $child_array, $child_key) {
+        $new_array = [];
+        foreach ($parent_array as $key => $value) {
+            $new_array[$key] = $value;
+            if ($key === $parent_key){ $new_array[$child_key] = $child_array; }
+        }
+        $parent_array = $new_array;
+    }
+}
+
+// Define a function that inserts a new element into an associative array before a given key position
+if (!function_exists('array_insert_before_key')){
+    function array_insert_before_key(&$parent_array, $parent_key, $child_array, $child_key) {
+        $new_array = [];
+        foreach ($parent_array as $key => $value) {
+            if ($key === $parent_key) { $new_array[$child_key] = $child_array; }
+            $new_array[$key] = $value;
+        }
+        $parent_array = $new_array;
+    }
+}
+
+// Define a function that takes a parent array and they rearranges the provided keys in the order provided
+if (!function_exists('array_rearrange_keys')){
+    function array_rearrange_keys(&$parent_array, $ordered_keys) {
+        $new_array = [];
+        $ordered_items = [];
+        // Collect items by the specified order
+        foreach ($ordered_keys as $key) {
+            if (array_key_exists($key, $parent_array)) {
+                $ordered_items[$key] = $parent_array[$key];
+                unset($parent_array[$key]);
+            }
+        }
+        // Build the new array with ordered items in specified sequence
+        $keys_added = false;
+        foreach ($parent_array as $key => $value) {
+            if (!$keys_added && empty($new_array)) {
+                $new_array = array_merge($ordered_items, $new_array);
+                $keys_added = true;
+            }
+            $new_array[$key] = $value;
+        }
+        // If $ordered_keys appear later in $parent_array, append them to the end
+        if (!$keys_added) {
+            $new_array = array_merge($new_array, $ordered_items);
+        }
+        $parent_array = $new_array;
+    }
+}
+
 ?>
 <div class="header">
     <div class="header_wrapper">
@@ -218,18 +271,6 @@ $mmrpg_index_fields = rpg_field::get_index(true);
             </div>
         </div>
     </div>
-
-    <?
-
-    // Generate a mission index using the collected robot and hazard data
-    $mmrpg_void_mission = array();
-
-    echo('<pre style="font-size: 11px;">$mmrpg_void_mission = '.print_r($mmrpg_void_mission, true).'</pre>');
-    //echo('<pre>$mmrpg_robots_cores = '.print_r($mmrpg_robots_cores, true).'</pre>');
-
-    ?>
-
-    <
 
 </div>
 
