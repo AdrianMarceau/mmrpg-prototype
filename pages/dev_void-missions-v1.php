@@ -100,15 +100,6 @@ if (!function_exists('array_rearrange_keys')){
                 Each kinds and quantities have different effects on mission targets.
             </p>
         </div>
-        <div class="legend">
-            <ul>
-                <li>SCREWS = BALANCED QUANTA/SPREAD</li>
-                <li>CORES = TYPE-FILTERING + HIGH-SPREAD/LOW-QUANTA</li>
-                <li>EDIBLES = STAT-SORTING + HIGH-QUANTA/LOW-SPREAD</li>
-                <li>CIRCUITS = TYPE-FILTERING || BOOSTERS = STAT-SORTING</li>
-                <li>MYTHICS = LEVEL/FORTE || MODULES = MISC EFFECTS</li>
-            </ul>
-        </div>
     </div>
 
     <?
@@ -131,8 +122,10 @@ if (!function_exists('array_rearrange_keys')){
         }
         $mmrpg_index_items = $mmrpg_index_items_filtered;
 
+        /*
         // TEMP TEMP TEMP (hyper-screw placeholder)
-        if (true){
+        if (false){
+
             $copy_from = 'large-screw';
             $pseudo_item = array();
             $pseudo_item['item_token'] = 'hyper-screw';
@@ -141,59 +134,95 @@ if (!function_exists('array_rearrange_keys')){
             $pseudo_item = array_merge($mmrpg_index_items[$copy_from], $pseudo_item);
             $mmrpg_index_items['hyper-screw'] = $pseudo_item;
         }
-
-        // Re-arrange certain groups of keys to make them better-suited for display
-        array_rearrange_keys($mmrpg_index_items, array('none-core', 'cutter-core'));
-        array_rearrange_keys($mmrpg_index_items, array('energy-tank', 'weapon-tank', 'energy-upgrade', 'weapon-upgrade', 'extra-life', 'yashichi'));
-        array_rearrange_keys($mmrpg_index_items, array('field-booster', 'attack-booster', 'defense-booster', 'speed-booster'));
-        array_rearrange_keys($mmrpg_index_items, array('charge-module', 'target-module'));
+        */
 
         // Pre-define the order of the groups for display purposes
         $group_display_order = array(
             'left' => array(
-                'screws', 'special',
+                'screws', 'mythics',
                 'pellets',
                 'capsules',
-                'energies', 'circuits',
+                'statmods',
+                'levelup', 'forteup', 'rewardup',
+                'fieldmods',
                 ),
             'right' => array(
                 'cores',
-                'diverters', 'boosters',
-                'modules', 'fillers',
-                'other'
+                'circuits',
+                'modules',
+                ),
+            'other' => array(
+                'other',
                 )
             );
+
+        // Pre-define the group colours that should be used for display purposes
+        $custom_group_type_colors = array(
+            'screws' => 'cutter',
+
+            'mythics' => 'copy',
+            'modules' => 'copy',
+            'fieldmods' => 'copy',
+
+            'pellets' => 'water',
+            'capsules' => 'water',
+            'statmods' => 'water',
+            'levelup' => 'energy',
+            'forteup' => 'energy',
+            'rewardup' => 'copy',
+            'cores' => 'laser',
+            'circuits' => 'laser',
+            'other' => 'empty',
+            );
+
+        // Hard-code certain items into certain groups for display purposes
+        $custom_group_item_tokens = array(
+            'statmods' => array('attack-booster', 'defense-booster', 'speed-booster', 'attack-diverter', 'defense-diverter', 'speed-diverter'),
+            'levelup' => array('energy-tank', 'energy-upgrade'),
+            'forteup' => array('weapon-tank', 'weapon-upgrade'),
+            'rewardup' => array('growth-module', 'fortune-module'),
+            'mythics' => array('mecha-whistle', 'extra-life', 'yashichi'),
+            'fieldmods' => array('field-booster'),
+            );
+
+        // Re-arrange certain groups of keys to make them better-suited for display
+        array_rearrange_keys($mmrpg_index_items, array('none-core', 'cutter-core'));
+        //array_rearrange_keys($mmrpg_index_items, array('energy-tank', 'energy-upgrade', 'weapon-tank', 'weapon-upgrade'));
+        array_rearrange_keys($mmrpg_index_items, array('attack-booster', 'defense-booster', 'speed-booster'));
+        array_rearrange_keys($mmrpg_index_items, array('growth-module', 'fortune-module'));
+        array_rearrange_keys($mmrpg_index_items, array('charge-module', 'guard-module', 'target-module', 'spreader-module', 'reverse-module', 'xtreme-module'));
+
+        // Define a quick, reusable function to check which group a given item token should be part of
+        $get_group_by_item_token = function($token) use($custom_group_item_tokens){
+            // Break apart the item token into individual words so we can better determine its group
+            $tokens = strstr($token, '-') ? explode('-', $token) : array($token);
+            if (!isset($tokens[1])){ $tokens[1] = '';  }
+            // Check to see if this item is part of one of the custom groups
+            foreach ($custom_group_item_tokens AS $group => $items){ if (in_array($token, $items)){ return $group; } }
+            // Otherwise check to see if the item suffix indicates which group, with other as fallback
+            if ($tokens[1] === 'screw'){ return 'screws'; }
+            elseif ($tokens[1] === 'core'){ return 'cores'; }
+            elseif ($tokens[1] === 'pellet'){ return 'pellets'; }
+            elseif ($tokens[1] === 'capsule'){ return 'capsules'; }
+            elseif ($tokens[1] === 'module'){ return 'modules'; }
+            elseif ($tokens[1] === 'circuit'){ return 'circuits'; }
+            else { return 'other'; }
+            };
 
         // Loop through and display a list of all the items available to add to the void
         $elements_html_grouped = array();
         foreach($mmrpg_index_items as $item_token => $item_info){
-            // Break apart the item token into individual words so we can better determine its group
-            $item_tokens = strstr($item_token, '-') ? explode('-', $item_token) : array($item_token);
-            if (!isset($item_tokens[1])){ $item_tokens[1] = '';  }
-            // Default to the 'other' group but then check tokens to better categorize
-            $group_token = 'other';
-            if ($item_tokens[1] === 'screw'){ $group_token = 'screws'; }
-            elseif ($item_tokens[1] === 'core'){ $group_token = 'cores'; }
-            elseif (in_array($item_token, array('charge-module', 'target-module'))){ $group_token = 'special'; }
-            elseif (in_array($item_token, array('energy-tank', 'weapon-tank', 'energy-upgrade', 'weapon-upgrade', 'extra-life', 'yashichi'))){ $group_token = 'energies'; }
-            elseif (in_array($item_token, array('field-booster'))){ $group_token = 'fillers'; }
-            elseif ($item_tokens[1] === 'pellet'){ $group_token = 'pellets'; }
-            elseif ($item_tokens[1] === 'capsule'){ $group_token = 'capsules'; }
-            elseif ($item_tokens[1] === 'tank'){ $group_token = 'tanks'; }
-            elseif ($item_tokens[1] === 'upgrade'){ $group_token = 'upgrades'; }
-            elseif ($item_tokens[1] === 'booster'){ $group_token = 'boosters'; }
-            elseif ($item_tokens[1] === 'diverter'){ $group_token = 'diverters'; }
-            elseif ($item_tokens[1] === 'module'){ $group_token = 'modules'; }
-            elseif ($item_tokens[1] === 'circuit'){ $group_token = 'circuits'; }
+            // Check to see which group this item is part of then default to other if not found
+            $group_token = $get_group_by_item_token($item_token);
             // Collect the quantity and other details we need to display the button markup
-            $item_quantity = mt_rand(0, 99);
+            $item_quantity = mt_rand(33, 99); //mt_rand(0, 99);
             $item_name = $item_info['item_name'];
             $item_name_br = str_replace(' ', '<br />', $item_name);
             $item_is_oneline = !strstr($item_name, ' ');
             $item_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_token;
             $icon_url = '/images/items/'.$item_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
             // TEMP TEMP TEMP (hyper-screw placeholder)
-            if ($item_token === 'hyper-screw'){ $item_quantity = 0; }
+            //if ($item_token === 'hyper-screw'){ $item_quantity = 0; }
             // Generate the markup using all the collected data
             ob_start();
             echo('<div class="item" '.
@@ -215,10 +244,11 @@ if (!function_exists('array_rearrange_keys')){
         // Loop through the different groups and display their float wrappers and then their markup
         $num_items_total = 0;
         foreach ($group_display_order AS $group_align => $group_tokens){
-            echo('<div class="wrapper float-'.$group_align.'">'.PHP_EOL);
+            ob_start();
             foreach ($group_tokens AS $group_key => $group_token){
                 if (!isset($elements_html_grouped[$group_token])){ continue; }
                 $group_html = $elements_html_grouped[$group_token];
+                $group_color = !empty($custom_group_type_colors[$group_token]) ? $custom_group_type_colors[$group_token] : 'cutter';
                 $num_items = count($group_html);
                 foreach ($group_html as $item_index => $item_html){
                     $z_index = $num_items - $item_index;
@@ -226,12 +256,17 @@ if (!function_exists('array_rearrange_keys')){
                     $item_html = str_replace('z-index: 0;', 'z-index: '.$z_index.';', $item_html);
                     $group_html[$item_index] = $item_html;
                 }
-                echo('<div class="group '.$group_token.'" data-group="'.$group_token.'" data-count="'.$num_items.'">'.PHP_EOL);
+                echo('<div class="group '.$group_token.' type '.$group_color.'" data-group="'.$group_token.'" data-count="'.$num_items.'">'.PHP_EOL);
                     echo(implode(PHP_EOL, $group_html));
                 echo('</div>'.PHP_EOL);
                 $num_items_total += $num_items;
             }
-            echo('</div>'.PHP_EOL);
+            $group_items_markup = ob_get_clean();
+            if (!empty($group_items_markup)){
+                echo('<div class="wrapper float-'.$group_align.'">'.PHP_EOL);
+                    echo($group_items_markup.PHP_EOL);
+                echo('</div>'.PHP_EOL);
+            }
         }
 
     // Collect the generated markup for the item palette from the buffer and save it to a variable
@@ -253,6 +288,7 @@ if (!function_exists('array_rearrange_keys')){
             </div>
             <div class="battle-field">
                 <div class="sprite background"
+                    data-token="prototype-subspace"
                     style="background-image: url(/images/fields/prototype-subspace/battle-field_preview.png?20241104-0121);"
                     >&nbsp;</div>
             </div>
@@ -269,6 +305,18 @@ if (!function_exists('array_rearrange_keys')){
             <div class="item-list" data-count="<?= $items_palette_count ?>" data-select="*">
                 <?= $items_palette_markup ?>
             </div>
+        </div>
+    </div>
+
+    <div class="subbody">
+        <div class="legend">
+            <ul>
+                <li>SCREWS = BALANCED QUANTA/SPREAD</li>
+                <li>CORES = TYPE-FILTERING + HIGH-SPREAD/LOW-QUANTA</li>
+                <li>EDIBLES = STAT-SORTING + HIGH-QUANTA/LOW-SPREAD</li>
+                <li>CIRCUITS = TYPE-FILTERING || BOOSTERS = STAT-SORTING</li>
+                <li>MYTHICS = LEVEL/FORTE || MODULES = MISC EFFECTS</li>
+            </ul>
         </div>
     </div>
 
@@ -646,24 +694,22 @@ if (!function_exists('array_rearrange_keys')){
         }
 
         #void-recipe .item-list .group.pellets {
-            margin-bottom: 6px;
+
         }
         #void-recipe .item-list .group.cores {
-            margin-bottom: 18px;
+
         }
-        #void-recipe .item-list .group.boosters,
-        #void-recipe .item-list .group.diverters {
-            margin-bottom: 6px;
-        }
+
         #void-recipe .item-list .group.screws,
         #void-recipe .item-list .group.pellets,
         #void-recipe .item-list .group.capsules,
-        #void-recipe .item-list .group.energies {
+        #void-recipe .item-list .group.statmods,
+        #void-recipe .item-list .group.levelup,
+        #void-recipe .item-list .group.fieldmods {
             clear: left;
         }
         #void-recipe .item-list .group.cores,
-        #void-recipe .item-list .group.diverters,
-        #void-recipe .item-list .group.modules {
+        #void-recipe .item-list .group.circuits {
             clear: right;
         }
         #void-recipe .item-list .group.other {
@@ -673,18 +719,22 @@ if (!function_exists('array_rearrange_keys')){
         #void-recipe .item-list .group.screws {
             width: calc(((54px) + 4px) * 3);
         }
-        #void-recipe .item-list .group.special {
-            width: calc(((54px) + 4px) * 2);
+        #void-recipe .item-list .group.targetmods {
+            width: calc(((54px) + 4px) * 3);
         }
         #void-recipe .item-list .group.pellets,
         #void-recipe .item-list .group.capsules {
             width: calc(((54px) + 4px) * 6);
         }
-        #void-recipe .item-list .group.tanks {
+        #void-recipe .item-list .group.statmods {
+            width: calc(((54px) + 4px) * 6);
+        }
+        #void-recipe .item-list .group.levelup,
+        #void-recipe .item-list .group.forteup {
             width: calc(((54px) + 4px) * 2);
         }
-        #void-recipe .item-list .group.energies {
-            width: calc(((54px) + 4px) * 2);
+        #void-recipe .item-list .group.mythics {
+            width: calc(((54px) + 4px) * 3);
         }
         #void-recipe .item-list .group.circuits {
             width: calc(((54px) + 4px) * 2);
@@ -692,17 +742,11 @@ if (!function_exists('array_rearrange_keys')){
         #void-recipe .item-list .group.cores {
             width: calc(((54px) + 4px) * 5);
         }
-        #void-recipe .item-list .group.fillers {
+        #void-recipe .item-list .group.fieldmods {
             width: calc(((54px) + 4px) * 1);
         }
-        #void-recipe .item-list .group.boosters {
-            width: calc(((54px) + 4px) * 3);
-        }
-        #void-recipe .item-list .group.diverters {
-            width: calc(((54px) + 4px) * 3);
-        }
         #void-recipe .item-list .group.modules {
-            width: calc(((54px) + 4px) * 5);
+            width: calc(((54px) + 4px) * 2);
         }
 
         /* -- SELECTION || ITEM LIST & BUTTONS -- */
@@ -835,6 +879,9 @@ if (!function_exists('array_rearrange_keys')){
             border-bottom: 0;
             z-index: 2;
         }
+        #void-recipe .creation .mission-details:hover {
+            z-index: 9;
+        }
         #void-recipe .creation .mission-details .powers-list {
             display: block;
             width: auto;
@@ -884,6 +931,11 @@ if (!function_exists('array_rearrange_keys')){
             opacity: 0.4;
             font-weight: normal;
         }
+        #void-recipe .creation .mission-details .powers-list ul li .token.type {
+            text-decoration: none;
+            padding: 0 3px;
+            border-radius: 3px;
+        }
 
         #void-recipe .creation .target-list {
             bottom: 0;
@@ -909,8 +961,19 @@ if (!function_exists('array_rearrange_keys')){
             border-radius: 3px;
             text-align: center;
             background-color: transparent;
+            cursor: pointer
+            filter: opacity(1.0) brightness(1.0);
+            outline: 0 none transparent;
+            transition: filter 0.1s;
             /* background-color: #2d2c39;  */
             /* background-color: rgba(255, 0, 100, 0.1);  */
+        }
+        #void-recipe .creation .target-list .target > * {
+            pointer-events: none;
+        }
+        #void-recipe .creation .target-list .target:hover {
+            filter: brightness(1.1);
+            outline: 2px solid rgba(255, 255, 255, 0.6);
         }
         #void-recipe .creation .target-list .target > .type {
             display: block;
@@ -941,7 +1004,6 @@ if (!function_exists('array_rearrange_keys')){
             bottom: 14px;
             left: 50%;
             transform: translate(-50%, -50%) scale(2.0);
-            cursor: pointer
             /* background-color: rgba(100, 0, 255, 0.1);  */
         }
         #void-recipe .creation .target-list .target .label {
@@ -1001,13 +1063,13 @@ if (!function_exists('array_rearrange_keys')){
             top: -80px;
             left: -40px;
         }
-        #void-recipe .creation .target-list .target .image:hover .sprite_40x40 {
+        #void-recipe .creation .target-list .target:hover .image .sprite_40x40 {
             background-position: -40px 0;
         }
-        #void-recipe .creation .target-list .target .image:hover .sprite_80x80 {
+        #void-recipe .creation .target-list .target:hover .image .sprite_80x80 {
             background-position: -80px 0;
         }
-        #void-recipe .creation .target-list .target .image:hover .sprite_160x160 {
+        #void-recipe .creation .target-list .target:hover .image .sprite_160x160 {
             background-position: -160px 0;
         }
 
@@ -1027,74 +1089,6 @@ if (!function_exists('array_rearrange_keys')){
         #void-recipe .palette .item-list {
             background-color: #353144;
         }
-
-        #void-recipe .item-list .group.screws {
-            /* speed purple  */
-            /* border-color: rgb(105, 87, 117);  */
-            /* background-color: rgb(139, 115, 155);  */
-            /* modded speed purple  */
-            border-color: rgb(90, 49, 114);
-            background-color: rgb(116, 75, 139);
-        }
-        #void-recipe .item-list .group.pellets,
-        #void-recipe .item-list .group.capsules {
-            /* defense blue  */
-            border-color: rgb(62, 76, 105);
-            background-color: rgb(80, 99, 138);
-        }
-        #void-recipe .item-list .group.cores {
-            /* attack red  */
-            border-color: rgb(111, 54, 54);
-            background-color: rgb(146, 73, 73);
-        }
-        #void-recipe .item-list .group.special {
-            /* defense blue + attack red  */
-            border-color: rgb(62, 76, 105) !important;
-            background-color: rgb(80, 99, 138) !important;
-            background-image: -webkit-gradient(linear, left top, right top, color-stop(0, rgb(80, 99, 138)), color-stop(1, rgb(146, 73, 73))) !important;
-            background-image: -o-linear-gradient(right, rgb(80, 99, 138) 0%, rgb(146, 73, 73) 100%) !important;
-            background-image: -moz-linear-gradient(right, rgb(80, 99, 138) 0%, rgb(146, 73, 73) 100%) !important;
-            background-image: -webkit-linear-gradient(right, rgb(80, 99, 138) 0%, rgb(146, 73, 73) 100%) !important;
-            background-image: -ms-linear-gradient(right, rgb(80, 99, 138) 0%, rgb(146, 73, 73) 100%) !important;
-            background-image: linear-gradient(to right, rgb(80, 99, 138) 0%, rgb(146, 73, 73) 100%) !important;
-        }
-        #void-recipe .item-list .group.energies {
-            /* energy green */
-            border-color: rgb(68, 105, 59);
-            background-color: rgb(89, 138, 78);
-        }
-        #void-recipe .item-list .group.circuits {
-            /* nature green */
-            border-color: rgb(37, 155, 51);
-            background-color: rgb(28, 122, 39);
-        }
-        #void-recipe .item-list .group.boosters,
-        #void-recipe .item-list .group.diverters {
-            /* shield green  */
-            border-color: rgb(102, 146, 120);
-            background-color: rgb(95, 136, 112);
-        }
-        #void-recipe .item-list .group.modules {
-            /* electric yellow */
-            background-color: #807c18;
-        }
-        #void-recipe .item-list .group.fillers {
-            /* cutter grey  */
-            border-color: rgb(109, 109, 109);
-            background-color: rgb(118, 120, 126);
-        }
-        .foo {
-            background-color: #807c18; /* electric yellow */
-            background-color: #6b854b; /* energy green */
-            background-color: #44795a; /* shield green */
-            background-color: #783078; /* time purple  */
-            background-color: #107981; /* freeze blue  */
-            background-color: #58589b; /* space purple  */
-            background-color: #8d386e; /* crystal pink  */
-            background-color: #93521d; /* explode orange  */
-            background-color: #883030; /* flame red  */
-        }
-
 
 
     </style>
@@ -1137,6 +1131,7 @@ if (!function_exists('array_rearrange_keys')){
                             _self.maxItems = 10;
                             _self.maxTargets = 8;
                             _self.minQuantaPerClass = {'mecha': 25, 'master': 50, 'boss': 500};
+                            _self.voidPowersRequired = ['delta', 'quanta', 'spread', 'level', 'forte'];
                             _self.reset(false);
                             _self.setup($container);
                             _self.calculatePowers();
@@ -1236,6 +1231,7 @@ if (!function_exists('array_rearrange_keys')){
                             var $parentDiv = $container;
                             var $missionTargets = $('.creation .target-list', $parentDiv);
                             var $missionDetails = $('.creation .mission-details', $parentDiv);
+                            var $battleField = $('.creation .battle-field', $parentDiv);
                             var $itemsPalette = $('.palette .item-list', $parentDiv);
                             var $itemsSelected = $('.selection .item-list', $parentDiv);
                             var $resetButton = $('.selection .reset', $parentDiv);
@@ -1245,6 +1241,7 @@ if (!function_exists('array_rearrange_keys')){
                             xrefs.parentDiv = $parentDiv;
                             xrefs.missionTargets = $missionTargets;
                             xrefs.missionDetails = $missionDetails;
+                            xrefs.battleField = $battleField;
                             xrefs.itemsPalette = $itemsPalette;
                             xrefs.itemsSelected = $itemsSelected;
                             xrefs.resetButton = $resetButton;
@@ -1384,13 +1381,14 @@ if (!function_exists('array_rearrange_keys')){
                             var itemIsCapsule = itemSuffix === 'capsule';
                             var itemIsTank = itemSuffix === 'tank';
                             var itemIsUpgrade = itemSuffix === 'upgrade';
-                            var itemIsMythic = itemSuffix === 'mythic';
                             var itemIsBooster = itemSuffix === 'booster';
                             var itemIsDiverter = itemSuffix === 'diverter';
                             var itemIsModule = itemSuffix === 'module';
                             var itemIsCircuit = itemSuffix === 'circuit';
-                            if (itemToken === 'extra-life'){ itemIsEnergy = true; itemIsMythic = true; }
-                            if (itemToken === 'yashichi'){ itemIsWeapons = true; itemIsMythic = true; }
+                            var itemIsMythic = itemSuffix === 'mythic';
+                            if (itemToken === 'mecha-whistle'){ itemIsMythic = true; }
+                            if (itemToken === 'extra-life'){ itemIsMythic = true; }
+                            if (itemToken === 'yashichi'){ itemIsMythic = true; }
 
                             // Increase the delta by one, always, for each item added
                             powers.incPower('delta', 1 * quantity);
@@ -1439,20 +1437,28 @@ if (!function_exists('array_rearrange_keys')){
                                 }
 
                             // -- TANKS & UPGRADES & MYTHICS w/ LEVEL + FORTE [+ ~STATS]
-                            else if (itemIsTank || itemIsUpgrade || itemIsMythic){
-                                var statToken = itemIsEnergy ? 'energy' : 'weapons';
-                                var statPower = (itemIsTank ? 10 : 0) + (itemIsUpgrade ? 20 : 0) + (itemIsMythic ? 50 : 0);
+                            else if (itemIsTank || itemIsUpgrade){
                                 var boostKind = itemIsEnergy ? 'level' : 'forte';
-                                var boostPower = itemPrefix === 'field' ? 1 : statPower;
+                                var boostPower = (itemIsTank ? 10 : 0) + (itemIsUpgrade ? 100 : 0);
                                 powers.incPower(statToken, statPower * quantity);
                                 powers.incPower(boostKind, boostPower * quantity);
                                 }
 
                             // -- BOOSTERS & DIVERTERS w/ STATS [+ STAT-MODS]
                             else if (itemIsBooster){
-                                var boostKind = itemPrefix !== 'field' ? itemPrefix : 'field';
-                                var boostPower = itemPrefix !== 'field' ? 6 : 1;
-                                powers.incPower(boostKind, boostPower * quantity);
+                                if (itemPrefix === 'field'){
+                                    // field boost is special and also boosts shift power
+                                    var fieldPower = Math.floor(quantity / 10); //quantity > 0 ? (Math.floor(quantity / 10) + 1) : 0;
+                                    var shiftPower = quantity * 1;
+                                    powers.incPower('field', fieldPower);
+                                    powers.incPower('shift', shiftPower);
+                                    }
+                                else {
+                                    // otherwise, if normal booster, it simply adjusts stats
+                                    var boostKind = itemPrefix;
+                                    var boostPower = 6;
+                                    powers.incPower(boostKind, boostPower * quantity);
+                                    }
                                 }
                             else if (itemIsDiverter){
                                 var divertOrder = [], divertValues = [10, 5, 5];
@@ -1576,7 +1582,7 @@ if (!function_exists('array_rearrange_keys')){
                             for (var i = 0; i < mmrpgStats.length; i++){
                                 var statToken = mmrpgStats[i];
                                 var statValue = powers[statToken] || 0;
-                                if (statValue > 0){ statPowers[statToken] = statValue; }
+                                if (statValue !== 0){ statPowers[statToken] = statValue; }
                                 }
                             //console.log('=> statPowers:', statPowers);
                             if (!sort){ return statPowers; }
@@ -1604,7 +1610,7 @@ if (!function_exists('array_rearrange_keys')){
                             for (var i = 0; i < mmrpgTypes.length; i++){
                                 var typeToken = mmrpgTypes[i];
                                 var typeValue = powers[typeToken] || 0;
-                                if (typeValue > 0){ typePowers[typeToken] = typeValue; }
+                                if (typeValue !== 0){ typePowers[typeToken] = typeValue; }
                                 }
                             //console.log('=> typePowers:', typePowers);
                             if (!sort){ return typePowers; }
@@ -1743,39 +1749,41 @@ if (!function_exists('array_rearrange_keys')){
                                     //console.log('--> comparing', a, 'vs.', b, '...');
                                     var tokenA = a, robotA = mmrpgIndexRobots[a];
                                     var tokenB = b, robotB = mmrpgIndexRobots[b];
-                                    var robotValueA = 100, robotValueB = 100;
+                                    var robotValueA = 0, robotValueB = 0;
+                                    //console.log('%c' + '---> START sort-compare for ' + (tokenA+'('+robotValueA+')') + ' vs. ' + (tokenB+'('+robotValueB+')'), 'color: cyan;');
                                     if (sortByStats.length){
-                                        //console.log('---> start-loop for sortByStats', sortByStats);
+                                        var numSortByStats = sortByStats.length;
+                                        //console.log('----> start stat-compare w/ sortByStats:', sortByStats);
                                         for (var i = 0; i < sortByStats.length; i++){
                                             // Collect the stats for this robot so we can compare them
                                             var statToken = sortByStats[i];
-                                            var statValueA = robotA['robot_' + statToken] || 0;
-                                            var statValueB = robotB['robot_' + statToken] || 0;
-                                            //console.log('----> comparing', tokenA, statToken, 'w/', statValueA, 'vs.', tokenB, statToken, 'w/', statValueB);
-                                            robotValueA += (robotValueA * (statValueA / 100));
-                                            robotValueB += (robotValueB * (statValueB / 100));
+                                            var statValue = numSortByStats - i;
+                                            var robotA_statValue = robotA['robot_' + statToken] || 0;
+                                            var robotB_statValue = robotB['robot_' + statToken] || 0;
+                                            //console.log('----> comparing the '+statToken+'('+statValue+') for', tokenA, '('+robotA_statValue+')', 'vs.', tokenB, '('+robotB_statValue+')');
+                                            if (robotA_statValue > robotB_statValue){ robotValueA += statValue; }
+                                            else if (robotA_statValue < robotB_statValue){ robotValueB += statValue; }
                                             }
-                                        //console.log('---> after stat-compare', tokenA, 'robotValueA:', robotValueA, 'vs.', tokenB, 'robotValueB:', robotValueB);
+                                        //console.log('----> after stat-compare:', tokenA, '('+robotValueA+')', 'vs.', tokenB, '('+robotValueB+')');
                                         }
                                     if (sortByTypes.length){
-                                        //console.log('---> start looping through sortByTypes', sortByTypes);
+                                        var numSortByTypes = sortByTypes.length;
+                                        //console.log('----> start type-compare w/ sortByTypes', sortByTypes);
                                         for (var i = 0; i < sortByTypes.length; i++){
                                             // Then collect type value(s) for this robot so we can compare
                                             var typeToken = sortByTypes[i];
-                                            var typeValue = typePowers[typeToken] || 0;
-                                            var robotA_Type1 = robotA['robot_core'] || 'none';
-                                            var robotA_Type2 = robotA['robot_core'] && robotA['robot_core2'] ? robotA['robot_core2'] : '';
-                                            var robotB_Type1 = robotB['robot_core'] || 'none';
-                                            var robotB_Type2 = robotB['robot_core'] && robotB['robot_core2'] ? robotB['robot_core2'] : '';
-                                            var robotA_TypeValue = (robotA_Type1 === typeToken ? typeValue : 0) + (robotA_Type2 === typeToken ? typeValue : 0);
-                                            var robotB_TypeValue = (robotB_Type1 === typeToken ? typeValue : 0) + (robotB_Type2 === typeToken ? typeValue : 0);
-                                            //console.log('----> comparing', tokenA, typeToken, 'w/', robotA_TypeValue, 'vs.', tokenB, typeToken, 'w/', robotB_TypeValue);
-                                            robotValueA += (robotValueA * (robotA_TypeValue / 100));
-                                            robotValueB += (robotValueB * (robotB_TypeValue / 100));
+                                            var typeValue = numSortByTypes - i;
+                                            var robotA_type1 = robotA['robot_core'] || 'none';
+                                            var robotA_type2 = robotA['robot_core'] && robotA['robot_core2'] ? robotA['robot_core2'] : '';
+                                            var robotB_type1 = robotB['robot_core'] || 'none';
+                                            var robotB_type2 = robotB['robot_core'] && robotB['robot_core2'] ? robotB['robot_core2'] : '';
+                                            //console.log('----> checking for '+typeToken+'('+typeValue+') in', tokenA, '('+robotA_type1+'/'+robotA_type2+')', 'vs.', tokenB, '('+robotB_type1+'/'+robotB_type2+')');
+                                            if (robotA_type1 === typeToken || robotA_type2 === typeToken){ robotValueA += typeValue; }
+                                            if (robotB_type1 === typeToken || robotB_type2 === typeToken){ robotValueB += typeValue; }
                                             }
-                                        //console.log('---> after type-compare', tokenA, 'robotValueA:', robotValueA, 'vs.', tokenB, 'robotValueB:', robotValueB);
+                                        //console.log('----> after type-compare:', tokenA, '('+robotValueA+')', 'vs.', tokenB, '('+robotValueB+')');
                                         }
-                                    //console.log('---> FINAL compare for ', tokenA, 'robotValueA:', robotValueA, 'vs.', tokenB, 'robotValueB:', robotValueB);
+                                    //console.log('%c' + '---> END sort-compare for ' + (tokenA+'('+robotValueA+')') + ' vs. ' + (tokenB+'('+robotValueB+')'), 'color: lime;');
                                     if (robotValueA !== robotValueB){ return robotValueB - robotValueA; }
                                     return 0;
                                     });
@@ -1837,7 +1845,7 @@ if (!function_exists('array_rearrange_keys')){
                             _self.powers = {};
                             var voidPowersList = voidPowers.getPowers();
                             var voidPowerKeys = Object.keys(voidPowersList);
-                            var voidPowersRequired = ['delta', 'quanta', 'spread', 'level', 'forte'];
+                            var voidPowersRequired = _self.voidPowersRequired;
                             for (var i = 0; i < voidPowerKeys.length; i++){
                                 var powerToken = voidPowerKeys[i];
                                 var powerValue = voidPowersList[powerToken];
@@ -1913,6 +1921,67 @@ if (!function_exists('array_rearrange_keys')){
                             //console.log('-> targetRobotQueue[master]:', targetRobotQueue['master']);
                             //console.log('-> targetRobotQueue[boss]:', targetRobotQueue['boss']);
 
+                            // VERSION 3 - NEW ROTATION SYSTEM (1-9 for mechas, 11-19 for masters, 21-29 for bosses, then combos thereof)
+                            // If there's any amount of shift power, we should use it to abstractly rotate the queue(s)
+                            const shiftPower = voidPowersList.shift || 0;
+                            if (shiftPower !== 0){
+                                console.log('%c' + '-> shiftPower: ' + shiftPower, 'color: pink;');
+
+                                // If shiftPower is not a multiple of ten, the final digit can be used to rotate the queue(s)
+                                if (shiftPower % 10 !== 0){
+                                    // Get the last digit for determining shift amount (1-9)
+                                    var lastDigit = shiftPower % 10;
+                                    var shiftAmount = lastDigit; // No need to map 1-9 since we use them directly
+                                    // Determine which set of classes to rotate based on the group
+                                    var groupNumber = Math.floor(shiftPower / 10); // Determine the group (e.g., 0 for 1-9, 1 for 11-19, etc.)
+                                    var classCombinations = [
+                                        ['mecha', 'master', 'boss'], // Group 0: Rotate all
+                                        ['mecha'],         // Group 1: Rotate only 'mecha'
+                                        ['master'],        // Group 2: Rotate only 'master'
+                                        ['boss'],          // Group 3: Rotate only 'boss'
+                                        ['mecha', 'master'], // Group 4: Rotate 'mecha' and 'master'
+                                        ['master', 'boss'],  // Group 5: Rotate 'master' and 'boss'
+                                        ['boss', 'mecha'],   // Group 6: Rotate 'boss' and 'mecha'
+                                        ];
+                                    // Determine which combination to use
+                                    var shiftClasses = classCombinations[groupNumber % classCombinations.length];
+                                    console.log('-> lastDigit:', lastDigit, 'shiftAmount:', shiftAmount, 'groupNumber:', groupNumber, 'shiftClasses:', shiftClasses);
+                                    // Rotate the selected queues
+                                    if (shiftAmount > 0) {
+                                        shiftClasses.forEach(queueClass => {
+                                            for (var i = 0; i < shiftAmount; i++) {
+                                                targetRobotQueue[queueClass].push(targetRobotQueue[queueClass].shift());
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+
+                            // TEMP TEMP TEMP (new field token should be saved and UI should be refreshed in refreshUI()!)
+                            const fieldPower = voidPowersList.field;
+                            if (fieldPower){
+                                console.log('%c' + '-> fieldPower: ' + fieldPower, 'color: orange;');
+                                // If fieldPower is at least 1, we can upgrade the field to something other than default
+                                var xrefs = _self.xrefs;
+                                var $battleField = xrefs.battleField;
+                                var $battleFieldBackground = $battleField.find('.sprite.background');
+                                var currentFieldToken = $battleFieldBackground.attr('data-token') || '';
+                                var battleFieldToken = 'prototype-subspace';
+                                if (fieldPower >= 1){
+                                    console.log('-> fieldPower is >= 1 (', fieldPower, '), so we can upgrade the field!');
+                                    battleFieldToken = 'gentle-countryside';
+                                    }
+                                console.log('-> checking currentFieldToken:', currentFieldToken, 'vs.', 'battleFieldToken:', battleFieldToken);
+                                if (currentFieldToken !== battleFieldToken){
+                                    var newBackgroundImage = '/images/fields/'+battleFieldToken+'/battle-field_preview.png?20241104-0121';
+                                    console.log('-> updating background image to newBackgroundImage:', newBackgroundImage);
+                                    $battleFieldBackground.css('background-image', 'url(' + newBackgroundImage + ')');
+                                    $battleFieldBackground.attr('data-token', battleFieldToken);
+                                    }
+                                }
+                            // TEMP TEMP TEMP
+
+
                             // Use calculated quanta-per-target to set-up the different target slots
                             var missionTargets = [];
                             var numTargetSlots = effectiveSpread; //distributedQuanta.length;
@@ -1935,9 +2004,12 @@ if (!function_exists('array_rearrange_keys')){
                                     for (var i = 0; i < queueOrder.length; i++){
                                         var queueToken = queueOrder[i];
                                         if (targetRobotQueue[queueToken].length){
-                                            targetRobot.token = targetRobotQueue[queueToken].shift();
-                                            targetRobotQueue[queueToken].push(targetRobot.token);
-                                            break;
+                                            var nextToken = targetRobotQueue[queueToken].shift();
+                                            if (nextToken){
+                                                targetRobot.token = nextToken;
+                                                targetRobotQueue[queueToken].push(targetRobot.token);
+                                                break;
+                                                }
                                             }
                                         }
                                     }
@@ -2012,6 +2084,10 @@ if (!function_exists('array_rearrange_keys')){
                             var $resetButton = _self.xrefs.resetButton;
                             var $missionDetails = _self.xrefs.missionDetails;
                             var $targetList = _self.xrefs.missionTargets;
+
+                            // Collect a reference to the list of defined elemental types and stats
+                            var mmrpgStats = _self.indexes.statTokens;
+                            var mmrpgTypes = _self.indexes.typeTokens;
 
                             // Collect the list of added items and any history
                             var voidItems = _self.items;
@@ -2091,11 +2167,57 @@ if (!function_exists('array_rearrange_keys')){
                             if (numSlotsUsed > 0){ $resetButton.addClass('visible'); }
                             else { $resetButton.removeClass('visible'); }
 
-                            // Let us also update the list of void powers to show any changes
+                            // Collect the list of void powers and keys so we can re-sort in the next step
                             var voidPowers = _self.powers;
                             var voidPowersKeys = Object.keys(voidPowers);
-                            //console.log('voidPowers:', voidPowers);
-                            //console.log('voidPowersKeys:', voidPowersKeys);
+                            console.log('voidPowersKeys(raw):', '\n-> [' + voidPowersKeys.join(', ') + ']');
+
+                            // First, sort the power tokens by their values going highest to lowest,
+                            // then sort all the keys pertaining to stats first, all keys pertaining to
+                            // elemental types second, and anything else can come after that at the end
+                            voidPowersKeys.sort(function(a, b){
+                                var aPower = voidPowers[a] || 0;
+                                var bPower = voidPowers[b] || 0;
+                                if (aPower > bPower){ return -1; }
+                                if (aPower < bPower){ return 1; }
+                                return 0;
+                                });
+                            console.log('voidPowersKeys(power-sorted):', '\n-> [' + voidPowersKeys.join(', ') + ']');
+                            var statPowerTokens = mmrpgStats;
+                            var typePowerTokens = mmrpgTypes;
+                            voidPowersKeys.sort(function(pk1, pk2){
+                                var pk1StatIndex = statPowerTokens.indexOf(pk1);
+                                var pk1TypeIndex = typePowerTokens.indexOf(pk1);
+                                var pk1IsStat = pk1StatIndex !== -1;
+                                var pk1IsType = pk1TypeIndex !== -1;
+                                var pk2StatIndex = statPowerTokens.indexOf(pk2);
+                                var pk2TypeIndex = typePowerTokens.indexOf(pk2);
+                                var pk2IsStat = pk2StatIndex !== -1;
+                                var pk2IsType = pk2TypeIndex !== -1;
+                                if (pk1IsStat && !pk2IsStat){ return -1; }
+                                if (!pk1IsStat && pk2IsStat){ return 1; }
+                                if (pk1IsType && !pk2IsType){ return -1; }
+                                if (!pk1IsType && pk2IsType){ return 1; }
+                                return 0;
+                                });
+                            console.log('voidPowersKeys(stat-type-sorted):', '\n-> [' + voidPowersKeys.join(', ') + ']');
+
+                            // Then we can collect the ordered list of required power tokens and
+                            // use that to sort any required power tokens to the top of the list
+                            var voidPowersRequired = _self.voidPowersRequired;
+                            voidPowersKeys.sort(function(a, b){
+                                var aIndex = voidPowersRequired.indexOf(a);
+                                var bIndex = voidPowersRequired.indexOf(b);
+                                if (aIndex !== -1 && bIndex !== -1){ return aIndex - bIndex; }
+                                if (aIndex !== -1){ return -1; }
+                                if (bIndex !== -1){ return 1; }
+                                return 0;
+                                });
+                            console.log('voidPowersKeys(required-first):', '\n-> [' + voidPowersKeys.join(', ') + ']');
+
+                            // Now we update the list of void powers in the UI to show any changes
+                            console.log('voidPowers:', voidPowers);
+                            console.log('voidPowersKeys:', voidPowersKeys);
                             $missionDetails.html('');
                             if (voidPowersKeys.length){
                                 var powersListMarkup = '';
@@ -2133,8 +2255,10 @@ if (!function_exists('array_rearrange_keys')){
                                             powerValueText = (roundedValue > 0 ? '&plus;' : (roundedValue < 0 ? '&minus;' : '')) + Math.abs(roundedValue);
                                             }
                                         // add the power to the list
+                                        var spanClass = 'token';
+                                        if (mmrpgTypes.indexOf(powerToken) !== -1){ spanClass += ' type ' + powerToken; }
                                         powersListMarkup += '<li class="power">';
-                                            powersListMarkup += '<span class="token">'+powerToken+'</span> ';
+                                            powersListMarkup += '<span class="'+spanClass+'">'+powerToken+'</span> ';
                                             powersListMarkup += '<span class="value">'+powerValueText+'</span>';
                                         powersListMarkup += '</li>';
                                         }
