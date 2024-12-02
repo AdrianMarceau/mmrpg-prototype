@@ -24,6 +24,13 @@ $mmrpg_index_abilities = rpg_ability::get_index(true);
 $mmrpg_index_items = rpg_item::get_index(true);
 $mmrpg_index_fields = rpg_field::get_index(true);
 
+// Define a function for debugging this script, printing to error log w/ line number
+if (!function_exists('console_log')){
+    function console_log($line, $msg = 'checkpoint'){
+        error_log('('.(basename(dirname(__FILE__)).'/'.basename(__FILE__)).'::'.$line.') '.$msg);
+    }
+}
+
 // Define a function that inserts a new element into an associative array after a given key position
 if (!function_exists('array_insert_after_key')){
     function array_insert_after_key(&$parent_array, $parent_key, $child_array, $child_key) {
@@ -122,152 +129,290 @@ if (!function_exists('array_rearrange_keys')){
         }
         $mmrpg_index_items = $mmrpg_index_items_filtered;
 
-        /*
-        // TEMP TEMP TEMP (hyper-screw placeholder)
-        if (false){
-
-            $copy_from = 'large-screw';
-            $pseudo_item = array();
-            $pseudo_item['item_token'] = 'hyper-screw';
-            $pseudo_item['item_name'] = 'Hyper Screw';
-            $pseudo_item['item_image'] = $copy_from;
-            $pseudo_item = array_merge($mmrpg_index_items[$copy_from], $pseudo_item);
-            $mmrpg_index_items['hyper-screw'] = $pseudo_item;
-        }
-        */
-
-        // Pre-define the order of the groups for display purposes
-        $group_display_order = array(
-            'left' => array(
-                'screws', 'mythics',
-                'pellets',
-                'capsules',
-                'statmods',
-                'levelup', 'forteup', 'rewardup',
-                'fieldmods',
+        // Predefine the item groups to be used in the void cauldron item palette
+        $void_item_groups_index = array(
+            // -- STEP ONE -- //
+            1 => array(
+                'step' => 1,
+                'name' => 'Step 1',
+                'label' => 'Manifest (Data)',
+                'groups' => array(
+                    'quanta-screws' => array(
+                        'name' => 'Quanta Screws',
+                        'color' => 'water',
+                        'rowline' => 1,
+                        'colspan' => 3,
+                        'items' => array(
+                            'small-screw', 'large-screw', 'hyper-screw',
+                            )
+                        ),
+                    'spread-cores' => array(
+                        'name' => 'Spread Cores',
+                        'color' => 'laser',
+                        'rowline' => 2,
+                        'colspan' => 5,
+                        'items' => array(
+                            'cutter-core', 'impact-core', 'freeze-core', 'explode-core', 'flame-core',
+                            'electric-core', 'time-core', 'earth-core', 'wind-core', 'water-core',
+                            'swift-core', 'nature-core', 'missile-core', 'crystal-core', 'shadow-core',
+                            'space-core', 'shield-core', 'laser-core', 'copy-core', 'none-core',
+                            )
+                        ),
+                    'quanta-balancers' => array(
+                        'name' => 'Quanta Balancers',
+                        'color' => 'copy',
+                        'rowline' => 3,
+                        'colspan' => 1,
+                        'items' => array(
+                            'charge-module',
+                            )
+                        ),
+                    'spread-balancers' => array(
+                        'name' => 'Spread Balancers',
+                        'color' => 'copy',
+                        'rowline' => 3,
+                        'colspan' => 2,
+                        'items' => array(
+                            'spreader-module', 'target-module',
+                            )
+                        ),
+                    'view-mods' => array(
+                        'name' => 'View Mods',
+                        'color' => 'copy',
+                        'rowline' => 3,
+                        'colspan' => 1,
+                        'items' => array(
+                            'hyperscan-module',
+                            ),
+                        ),
+                    ),
                 ),
-            'right' => array(
-                'cores',
-                'circuits',
-                'modules',
+            // -- STEP TWO -- //
+            2 => array(
+                'step' => 2,
+                'name' => 'Step 2',
+                'label' => 'Redirect (Form)',
+                'groups' => array(
+                    'specstat-eats' => array(
+                        'name' => 'SpecStat Edibles',
+                        'color' => 'energy',
+                        'rowline' => 1,
+                        'colspan' => 2,
+                        'items' => array(
+                            'energy-upgrade',
+                            'weapon-upgrade',
+                            )
+                        ),
+                    'tristat-mods' => array(
+                        'name' => 'TriStat Mods',
+                        'color' => 'energy',
+                        'rowline' => 2,
+                        'colspan' => 3,
+                        'items' => array(
+                            'attack-booster', 'defense-booster', 'speed-booster',
+                            'attack-diverter', 'defense-diverter', 'speed-diverter',
+                            )
+                        ),
+                    'queue-rotators' => array(
+                        'name' => 'Queue Rotators',
+                        'color' => 'copy',
+                        'rowline' => 3,
+                        'colspan' => 3,
+                        'items' => array(
+                            'mecha-whistle', 'extra-life', 'yashichi',
+                            ),
+                        ),
+                    'queue-rotators2' => array(
+                        'name' => 'Queue Rotators 2',
+                        'color' => 'copy',
+                        'rowline' => 3,
+                        'colspan' => 1,
+                        'items' => array(
+                            'field-booster',
+                            )
+                        ),
+                    'queue-mods' => array(
+                        'name' => 'Queue Mods',
+                        'color' => 'copy',
+                        'rowline' => 4,
+                        'colspan' => 2,
+                        'items' => array(
+                            'copycat-module', 'reverse-module',
+                            ),
+                        ),
+                    ),
                 ),
-            'other' => array(
-                'other',
-                )
+            // -- STEP THREE -- //
+            3 => array(
+                'step' => 3,
+                'name' => 'Step 3',
+                'label' => 'Upgrade (Power)',
+                'groups' => array(
+                    'specstat-eats' => array(
+                        'name' => 'SpecStat Edibles',
+                        'color' => 'electric',
+                        'rowline' => 1,
+                        'colspan' => 3,
+                        'items' => array(
+                            'energy-pellet', 'energy-capsule', 'energy-tank',
+                            'weapon-pellet', 'weapon-capsule', 'weapon-tank',
+                            )
+                        ),
+                    'tristat-eats' => array(
+                        'name' => 'TriStat Edibles',
+                        'color' => 'electric',
+                        'rowline' => 2,
+                        'colspan' => 4,
+                        'items' => array(
+                            'attack-pellet', 'defense-pellet', 'speed-pellet', 'super-pellet',
+                            'attack-capsule', 'defense-capsule', 'speed-capsule', 'super-capsule',
+                            )
+                        ),
+                    'reward-mods' => array(
+                        'name' => 'Reward Mods',
+                        'color' => 'copy',
+                        'rowline' => 3,
+                        'colspan' => 3,
+                        'items' => array(
+                            'salvage-module', 'growth-module', 'fortune-module',
+                            )
+                        ),
+                    ),
+                ),
+            // -- STEP FOUR -- //
+            4 => array(
+                'step' => 4,
+                'name' => 'Step 4',
+                'label' => 'Distort (Hack)',
+                'groups' => array(
+                    'elemental-mods' => array(
+                        'name' => 'Elemental Mods',
+                        'color' => 'time',
+                        'rowline' => 1,
+                        'colspan' => 3,
+                        'items' => array(
+                            'battery-circuit', 'sponge-circuit', 'forge-circuit',
+                            'sapling-circuit', 'chrono-circuit', 'cosmo-circuit',
+                            )
+                        ),
+                    'power-balancers' => array(
+                        'name' => 'Power Balancers',
+                        'color' => 'copy',
+                        'rowline' => 2,
+                        'colspan' => 1,
+                        'items' => array(
+                            'uptick-module', 'siphon-module',
+                            )
+                        ),
+                    'field-mods' => array(
+                        'name' => 'Field Mods',
+                        'color' => 'copy',
+                        'rowline' => 2,
+                        'colspan' => 1,
+                        'items' => array(
+                            'repair-module', 'gambit-module',
+                            )
+                        ),
+                    'field-mods2' => array(
+                        'name' => 'Field Mods 2',
+                        'color' => 'copy',
+                        'rowline' => 2,
+                        'colspan' => 1,
+                        'items' => array(
+                            'alchemy-module', 'distill-module',
+                            )
+                        ),
+                    'junk' => array(
+                        'name' => 'Junk Items',
+                        'color' => 'empty',
+                        'rowline' => 3,
+                        'colspan' => 4,
+                        'items' => array(
+                            'guard-module', 'persist-module', 'xtreme-module', 'overkill-module',
+                            'hourglass-module', 'magnet-module', 'transport-module', 'bulwark-module',
+                            )
+                        ),
+                    ),
+                ),
             );
 
-        // Pre-define the group colours that should be used for display purposes
-        $custom_group_type_colors = array(
-            'screws' => 'cutter',
-
-            'mythics' => 'copy',
-            'modules' => 'copy',
-            'fieldmods' => 'copy',
-
-            'pellets' => 'water',
-            'capsules' => 'water',
-            'statmods' => 'water',
-            'levelup' => 'energy',
-            'forteup' => 'energy',
-            'rewardup' => 'copy',
-            'cores' => 'laser',
-            'circuits' => 'laser',
-            'other' => 'empty',
-            );
-
-        // Hard-code certain items into certain groups for display purposes
-        $custom_group_item_tokens = array(
-            'statmods' => array('attack-booster', 'defense-booster', 'speed-booster', 'attack-diverter', 'defense-diverter', 'speed-diverter'),
-            'levelup' => array('energy-tank', 'energy-upgrade'),
-            'forteup' => array('weapon-tank', 'weapon-upgrade'),
-            'rewardup' => array('growth-module', 'fortune-module'),
-            'mythics' => array('mecha-whistle', 'extra-life', 'yashichi'),
-            'fieldmods' => array('field-booster'),
-            );
-
-        // Re-arrange certain groups of keys to make them better-suited for display
-        array_rearrange_keys($mmrpg_index_items, array('none-core', 'cutter-core'));
-        //array_rearrange_keys($mmrpg_index_items, array('energy-tank', 'energy-upgrade', 'weapon-tank', 'weapon-upgrade'));
-        array_rearrange_keys($mmrpg_index_items, array('attack-booster', 'defense-booster', 'speed-booster'));
-        array_rearrange_keys($mmrpg_index_items, array('growth-module', 'fortune-module'));
-        array_rearrange_keys($mmrpg_index_items, array('charge-module', 'guard-module', 'target-module', 'spreader-module', 'reverse-module', 'xtreme-module'));
-
-        // Define a quick, reusable function to check which group a given item token should be part of
-        $get_group_by_item_token = function($token) use($custom_group_item_tokens){
-            // Break apart the item token into individual words so we can better determine its group
-            $tokens = strstr($token, '-') ? explode('-', $token) : array($token);
-            if (!isset($tokens[1])){ $tokens[1] = '';  }
-            // Check to see if this item is part of one of the custom groups
-            foreach ($custom_group_item_tokens AS $group => $items){ if (in_array($token, $items)){ return $group; } }
-            // Otherwise check to see if the item suffix indicates which group, with other as fallback
-            if ($tokens[1] === 'screw'){ return 'screws'; }
-            elseif ($tokens[1] === 'core'){ return 'cores'; }
-            elseif ($tokens[1] === 'pellet'){ return 'pellets'; }
-            elseif ($tokens[1] === 'capsule'){ return 'capsules'; }
-            elseif ($tokens[1] === 'module'){ return 'modules'; }
-            elseif ($tokens[1] === 'circuit'){ return 'circuits'; }
-            else { return 'other'; }
-            };
-
-        // Loop through and display a list of all the items available to add to the void
-        $elements_html_grouped = array();
-        foreach($mmrpg_index_items as $item_token => $item_info){
-            // Check to see which group this item is part of then default to other if not found
-            $group_token = $get_group_by_item_token($item_token);
-            // Collect the quantity and other details we need to display the button markup
-            $item_quantity = mt_rand(33, 99); //mt_rand(0, 99);
-            $item_name = $item_info['item_name'];
-            $item_name_br = str_replace(' ', '<br />', $item_name);
-            $item_is_oneline = !strstr($item_name, ' ');
-            $item_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_token;
-            $icon_url = '/images/items/'.$item_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
-            // TEMP TEMP TEMP (hyper-screw placeholder)
-            //if ($item_token === 'hyper-screw'){ $item_quantity = 0; }
-            // Generate the markup using all the collected data
-            ob_start();
-            echo('<div class="item" '.
-                'data-key="0" '.
-                'data-token="'.$item_token.'" '.
-                'data-group="'.$group_token.'" '.
-                'data-quantity="'.$item_quantity.'" '.
-                'style="z-index: 0;" '.
-                '>');
-                echo('<div class="icon"><img class="has_pixels" src="'.$icon_url.'" alt="'.$item_name.'"></div>');
-                echo('<div class="name '.($item_is_oneline ? 'one-line' : '').'">'.$item_name_br.'</div>');
-                echo('<div class="quantity">'.$item_quantity.'</div>');
-            echo('</div>');
-            $markup = ob_get_clean();
-            if (!isset($elements_html_grouped[$group_token])){ $elements_html_grouped[$group_token] = array(); }
-            $elements_html_grouped[$group_token][] = $markup;
-        }
-
-        // Loop through the different groups and display their float wrappers and then their markup
+        // NEW VERSION:
+        // Loop through each of the steps in the index (then each of the groups within those steps), to generate
+        // the markup for the item-pallet's wrappers, group containers, and item buttons that will be clicked on
         $num_items_total = 0;
-        foreach ($group_display_order AS $group_align => $group_tokens){
-            ob_start();
-            foreach ($group_tokens AS $group_key => $group_token){
-                if (!isset($elements_html_grouped[$group_token])){ continue; }
-                $group_html = $elements_html_grouped[$group_token];
-                $group_color = !empty($custom_group_type_colors[$group_token]) ? $custom_group_type_colors[$group_token] : 'cutter';
-                $num_items = count($group_html);
-                foreach ($group_html as $item_index => $item_html){
-                    $z_index = $num_items - $item_index;
-                    $item_html = str_replace('data-key="0"', 'data-key="'.$z_index.'"', $item_html);
-                    $item_html = str_replace('z-index: 0;', 'z-index: '.$z_index.';', $item_html);
-                    $group_html[$item_index] = $item_html;
+        $curr_item_rowline = 0;
+        $group_markup_by_step = array();
+        foreach ($void_item_groups_index AS $step => $step_info){
+            $step_name = $step_info['name'];
+            $step_label = $step_info['label'];
+            $step_groups = $step_info['groups'];
+            if (empty($step_groups)){ continue; }
+            $group_markup_by_step[$step] = array();
+            foreach ($step_groups AS $group_token => $group_info){
+                $group_name = $group_info['name'];
+                $group_color = $group_info['color'];
+                $group_items = $group_info['items'];
+                $group_rowline = $group_info['rowline'];
+                $group_colspan = $group_info['colspan'];
+                if (empty($group_items)){ continue; }
+                $group_items_markup = array();
+                foreach ($group_items AS $item_token){
+                    if (!isset($mmrpg_index_items[$item_token])){ continue; }
+                    $item_info = $mmrpg_index_items[$item_token];
+                    $item_name = $item_info['item_name'];
+                    $item_name_br = str_replace(' ', '<br />', $item_name);
+                    $item_is_oneline = !strstr($item_name, ' ');
+                    $item_quantity = mt_rand(33, 99); //mt_rand(0, 99);
+                    $item_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_token;
+                    $icon_url = '/images/items/'.$item_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+                    ob_start();
+                    echo('<div class="item" '.
+                        'data-key="0" '.
+                        'data-token="'.$item_token.'" '.
+                        'data-group="'.$group_token.'" '.
+                        'data-quantity="'.$item_quantity.'" '.
+                        'style="z-index: 0;" '.
+                        '>');
+                        echo('<div class="icon"><img class="has_pixels" src="'.$icon_url.'" alt="'.$item_name.'"></div>');
+                        echo('<div class="name '.($item_is_oneline ? 'one-line' : '').'">'.$item_name_br.'</div>');
+                        echo('<div class="quantity">'.$item_quantity.'</div>');
+                    echo('</div>');
+                    $group_items_markup[] = ob_get_clean();
                 }
-                echo('<div class="group '.$group_token.' type '.$group_color.'" data-group="'.$group_token.'" data-count="'.$num_items.'">'.PHP_EOL);
-                    echo(implode(PHP_EOL, $group_html));
-                echo('</div>'.PHP_EOL);
-                $num_items_total += $num_items;
+                if (empty($group_items_markup)){ continue; }
+                $added_so_far = count($group_markup_by_step[$step]);
+                $add_newline = $group_rowline !== $curr_item_rowline && $added_so_far >= 1 ? true : false;
+                $group_markup = implode(PHP_EOL, $group_items_markup);
+                $group_markup_class = 'group '.$group_token.' type '.$group_color;
+                $group_markup_attrs = 'data-group="'.$group_token.'" data-count="'.count($group_items).'"';
+                $group_markup_attrs .= ' data-rowline="'.$group_rowline.'" data-colspan="'.$group_colspan.'"';
+                $wrapped_group_markup = '<div class="'.$group_markup_class.'" '.$group_markup_attrs.'>'.PHP_EOL.$group_markup.PHP_EOL.'</div>';
+                if ($add_newline){ $wrapped_group_markup = '<div class="clear"></div>'.PHP_EOL.$wrapped_group_markup; }
+                $group_markup_by_step[$step][] = $wrapped_group_markup;
+                //console_log(__LINE__, 'adding wrapped group markup for '.$group_token.' to step '.$step);
+                $num_items_total += count($group_items);
+                $curr_item_rowline = $group_rowline;
             }
+        }
+        $z_index = count($group_markup_by_step) + 11;
+        foreach ($group_markup_by_step AS $group_step => $group_markup){
+            ob_start();
+            $step_info = $void_item_groups_index[$group_step];
+            $step_name = $step_info['name'];
+            $step_label = $step_info['label'];
+            $wrapper_class = 'wrapper'.($group_step === 1 ? ' active' : '');
+            $wrapper_attrs = 'data-step="'.$group_step.'"';
+            echo('<div class="'.$wrapper_class.'" '.$wrapper_attrs.'>'.PHP_EOL);
+                echo('<div class="label">'.$step_label.'</div>'.PHP_EOL);
+                echo(implode(PHP_EOL, $group_markup).PHP_EOL);
+            echo('</div>'.PHP_EOL);
             $group_items_markup = ob_get_clean();
             if (!empty($group_items_markup)){
-                echo('<div class="wrapper float-'.$group_align.'">'.PHP_EOL);
-                    echo($group_items_markup.PHP_EOL);
-                echo('</div>'.PHP_EOL);
+                echo($group_items_markup);
             }
         }
+        //console_log(__LINE__, '$void_item_groups_index = '.print_r($void_item_groups_index, true));
+        //console_log(__LINE__, '$group_markup_by_step = '.print_r($group_markup_by_step, true));
 
     // Collect the generated markup for the item palette from the buffer and save it to a variable
     $items_palette_markup = ob_get_clean();
@@ -302,7 +447,7 @@ if (!function_exists('array_rearrange_keys')){
             <a class="reset"><i class="fa fas fa-undo"></i></a>
         </div>
         <div class="palette">
-            <div class="item-list" data-count="<?= $items_palette_count ?>" data-select="*">
+            <div class="item-list" data-count="<?= $items_palette_count ?>" data-select="*" data-step="1">
                 <?= $items_palette_markup ?>
             </div>
         </div>
@@ -441,6 +586,7 @@ if (!function_exists('array_rearrange_keys')){
         }
         #void-recipe .palette:before {
             content: "Your Inventory";
+            display: none;
         }
         #void-recipe .creation .loading,
         #void-recipe .palette .loading,
@@ -484,17 +630,129 @@ if (!function_exists('array_rearrange_keys')){
         #void-recipe .palette .item-list {
             width: 680px;
             height: 282px;
-            box-shadow: inset -2px -4px 10px rgba(0, 0, 0, 0.3);
+            /* box-shadow: inset -2px -4px 12px rgba(0, 0, 0, 0.1); */
+            box-shadow: none;
         }
         #void-recipe .item-list .wrapper {
             display: block;
             position: absolute;
             box-sizing: border-box;
+            overflow: visible;
             top: 0;
+            bottom: 0;
+            right: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            height: 0;
+            width: auto;
             padding: 6px;
+        }
+        #void-recipe .palette .item-list .wrapper.float-left {
+            right: auto;
+            /* background-color: magenta; */
+        }
+        #void-recipe .palette .item-list .wrapper.float-right {
+            left: auto;
+            /* background-color: cyan; */
+        }
+
+        #void-recipe .palette .item-list .wrapper[data-step] {
+            z-index: 10;
+            top: 18px; /* top padding + margin */
+            left: 0;
+            bottom: 0;
+            right: auto;
+            width: auto;
+            height: auto;
+            min-height: 52px;
+            /* min-width: 72px; */
+            min-width: 40%;
+            padding: 12px 18px 6px;
+            white-space: nowrap;
+            line-height: 1;
+            border-radius: 3px;
+            border: 1px solid #1b1825;
+            background-color: #353144;
+            box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s, box-shadow 0.2s;
+        }
+        #void-recipe .palette .item-list .wrapper[data-step] .group {
+            display: inline-block;
+        }
+        #void-recipe .palette .item-list .wrapper[data-step].active {
+            box-shadow: 4px 0px 6px rgba(0, 0, 0, 0.4);
+        }
+        #void-recipe .palette .item-list .wrapper[data-step]:not(.active) {
+            box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.2);
+        }
+        #void-recipe .palette .item-list .wrapper[data-step] .group {
+            filter: brightness(1.0) saturate(1);
+            transition: filter 0.3s;
+        }
+        #void-recipe .palette .item-list .wrapper[data-step]:not(.active) .group {
+            filter: brightness(0.6) saturate(1.2);
+        }
+
+        #void-recipe .palette .item-list .wrapper[data-step="1"] {
+            left: 0;
+            right: auto;
+        }
+        #void-recipe .palette .item-list .wrapper[data-step="2"] {
+            left: 20%;
+            right: auto;
+        }
+        #void-recipe .palette .item-list .wrapper[data-step="3"] {
+            left: 40%;
+            right: auto;
+        }
+        #void-recipe .palette .item-list .wrapper[data-step="4"] {
+            left: 60%;
+            right: 0;
+        }
+
+        #void-recipe .palette .item-list[data-step="1"] .wrapper[data-step="1"] { z-index: 14; }
+        #void-recipe .palette .item-list[data-step="1"] .wrapper[data-step="2"] { z-index: 13; }
+        #void-recipe .palette .item-list[data-step="1"] .wrapper[data-step="3"] { z-index: 12; }
+        #void-recipe .palette .item-list[data-step="1"] .wrapper[data-step="4"] { z-index: 11; }
+
+        #void-recipe .palette .item-list[data-step="2"] .wrapper[data-step="1"] { z-index: 13; }
+        #void-recipe .palette .item-list[data-step="2"] .wrapper[data-step="2"] { z-index: 14; }
+        #void-recipe .palette .item-list[data-step="2"] .wrapper[data-step="3"] { z-index: 12; }
+        #void-recipe .palette .item-list[data-step="2"] .wrapper[data-step="4"] { z-index: 11; }
+
+        #void-recipe .palette .item-list[data-step="3"] .wrapper[data-step="1"] { z-index: 12; }
+        #void-recipe .palette .item-list[data-step="3"] .wrapper[data-step="2"] { z-index: 13; }
+        #void-recipe .palette .item-list[data-step="3"] .wrapper[data-step="3"] { z-index: 14; }
+        #void-recipe .palette .item-list[data-step="3"] .wrapper[data-step="4"] { z-index: 11; }
+
+        #void-recipe .palette .item-list[data-step="4"] .wrapper[data-step="1"] { z-index: 11; }
+        #void-recipe .palette .item-list[data-step="4"] .wrapper[data-step="2"] { z-index: 12; }
+        #void-recipe .palette .item-list[data-step="4"] .wrapper[data-step="3"] { z-index: 13; }
+        #void-recipe .palette .item-list[data-step="4"] .wrapper[data-step="4"] { z-index: 14; }
+
+        #void-recipe .palette .item-list .wrapper[data-step] > .label {
+            content: "";
+            display: block;
+            position: absolute;
+            left: 6px;
+            width: 100px;
+            top: -16px;
+            height: 12px;
+            line-height: 12px;
+            font-size: 9px;
+            padding: 2px 6px;
+            border: inherit;
+            background-color: inherit;
+            border-radius: 6px 6px 0 0;
+            border-bottom: 0 none transparent;
+            color: #efefef;
+            z-index: 5;
+            cursor: pointer;
+        }
+        #void-recipe .palette .item-list .wrapper[data-step] > .label:before,
+        #void-recipe .palette .item-list .wrapper[data-step] > .label:after {
+            content: "~";
+            padding: 0 3px;
+            color: #777194;
         }
 
         /* -- ITEM LIST || ITEMS -- */
@@ -665,12 +923,22 @@ if (!function_exists('array_rearrange_keys')){
 
         #void-recipe .item-list .group {
             display: block;
+            text-align: center;
+            vertical-align: middle;
             width: auto;
             padding: 4px 2px 2px 4px;
-            margin: 0 auto 6px;
+            margin: 6px auto 0;
             overflow: visible;
             background-color: rgba(77, 77, 77, 0.2);
             border-radius: 3px;
+            position: relative;
+            z-index: 10;
+        }
+        #void-recipe .item-list .group:empty {
+            display: none;
+        }
+        #void-recipe .item-list .group[data-rowline="1"] {
+            margin-top: 0;
         }
         #void-recipe .item-list .wrapper.float-left .group {
             float: left;
@@ -681,6 +949,11 @@ if (!function_exists('array_rearrange_keys')){
             float: right;
             margin-right: 0;
             margin-left: 6px;
+        }
+        #void-recipe .item-list .wrapper.float-other .group {
+            float: none;
+            margin: 0 6px;
+            display: none;
         }
         #void-recipe .item-list .group .item {
             transition: all 0.3s;
@@ -693,61 +966,22 @@ if (!function_exists('array_rearrange_keys')){
             color: #cacaca;
         }
 
-        #void-recipe .item-list .group.pellets {
 
-        }
-        #void-recipe .item-list .group.cores {
+        #void-recipe .item-list .float-left .group.clear { clear: left; }
+        #void-recipe .item-list .float-right .group.clear { clear: right; }
+        #void-recipe .item-list .wrapper .group + .clear { display: block; width: auto; clear: both; }
 
-        }
+        #void-recipe .item-list .group[data-colspan="1"] { width: calc(((54px) + 4px) * 1); }
+        #void-recipe .item-list .group[data-colspan="2"] { width: calc(((54px) + 4px) * 2); }
+        #void-recipe .item-list .group[data-colspan="3"] { width: calc(((54px) + 4px) * 3); }
+        #void-recipe .item-list .group[data-colspan="4"] { width: calc(((54px) + 4px) * 4); }
+        #void-recipe .item-list .group[data-colspan="5"] { width: calc(((54px) + 4px) * 5); }
+        #void-recipe .item-list .group[data-colspan="6"] { width: calc(((54px) + 4px) * 6); }
+        #void-recipe .item-list .group[data-colspan="7"] { width: calc(((54px) + 4px) * 7); }
+        #void-recipe .item-list .group[data-colspan="8"] { width: calc(((54px) + 4px) * 8); }
+        #void-recipe .item-list .group[data-colspan="9"] { width: calc(((54px) + 4px) * 9); }
+        #void-recipe .item-list .group[data-colspan="10"] { width: calc(((54px) + 4px) * 10); }
 
-        #void-recipe .item-list .group.screws,
-        #void-recipe .item-list .group.pellets,
-        #void-recipe .item-list .group.capsules,
-        #void-recipe .item-list .group.statmods,
-        #void-recipe .item-list .group.levelup,
-        #void-recipe .item-list .group.fieldmods {
-            clear: left;
-        }
-        #void-recipe .item-list .group.cores,
-        #void-recipe .item-list .group.circuits {
-            clear: right;
-        }
-        #void-recipe .item-list .group.other {
-            clear: both;
-        }
-
-        #void-recipe .item-list .group.screws {
-            width: calc(((54px) + 4px) * 3);
-        }
-        #void-recipe .item-list .group.targetmods {
-            width: calc(((54px) + 4px) * 3);
-        }
-        #void-recipe .item-list .group.pellets,
-        #void-recipe .item-list .group.capsules {
-            width: calc(((54px) + 4px) * 6);
-        }
-        #void-recipe .item-list .group.statmods {
-            width: calc(((54px) + 4px) * 6);
-        }
-        #void-recipe .item-list .group.levelup,
-        #void-recipe .item-list .group.forteup {
-            width: calc(((54px) + 4px) * 2);
-        }
-        #void-recipe .item-list .group.mythics {
-            width: calc(((54px) + 4px) * 3);
-        }
-        #void-recipe .item-list .group.circuits {
-            width: calc(((54px) + 4px) * 2);
-        }
-        #void-recipe .item-list .group.cores {
-            width: calc(((54px) + 4px) * 5);
-        }
-        #void-recipe .item-list .group.fieldmods {
-            width: calc(((54px) + 4px) * 1);
-        }
-        #void-recipe .item-list .group.modules {
-            width: calc(((54px) + 4px) * 2);
-        }
 
         /* -- SELECTION || ITEM LIST & BUTTONS -- */
 
@@ -1087,7 +1321,17 @@ if (!function_exists('array_rearrange_keys')){
             background-color: #25232e;
         }
         #void-recipe .palette .item-list {
-            background-color: #353144;
+            background-color: transparent;
+            border-color: transparent;
+        }
+        #void-recipe .palette .item-list .wrapper[data-step].active {
+            background-color: #2f2b40;
+        }
+        #void-recipe .palette .item-list .wrapper[data-step]:not(.active) {
+            background-color: #242032;
+        }
+        #void-recipe .palette .item-list .wrapper[data-step]:not(.active):hover {
+            background-color: #2d293d;
         }
 
 
@@ -1131,7 +1375,7 @@ if (!function_exists('array_rearrange_keys')){
                             _self.maxItems = 10;
                             _self.maxTargets = 8;
                             _self.minQuantaPerClass = {'mecha': 25, 'master': 50, 'boss': 500};
-                            _self.voidPowersRequired = ['delta', 'quanta', 'spread', 'level', 'forte'];
+                            _self.voidPowersRequired = ['delta', 'spread', 'quanta', 'level', 'forte'];
                             _self.reset(false);
                             _self.setup($container);
                             _self.calculatePowers();
@@ -1258,6 +1502,7 @@ if (!function_exists('array_rearrange_keys')){
                             $('.item[data-token]', $itemsPalette).live('click', function(e){
                                 console.log('palette button clicked! \n-> add-item:', $(this).attr('data-token'));
                                 e.preventDefault();
+                                //e.stopPropagation();
                                 var $item = $(this);
                                 var itemToken = $item.attr('data-token');
                                 var itemGroup = $item.attr('data-group');
@@ -1280,9 +1525,11 @@ if (!function_exists('array_rearrange_keys')){
                                 var itemQuantity = parseInt($item.attr('data-quantity'));
                                 var itemIndex = parseInt($item.attr('data-key'));
                                 var itemInfo = {token: itemToken, group: itemGroup, quantity: itemQuantity, index: itemIndex};
+                                var numItems = Object.keys(_self.items).length;
                                 //console.log('item clicked:', $item);
                                 //console.log('item details:', itemInfo);
                                 _self.removeItem({token: itemToken, quantity: 1});
+                                if (!numItems){ _self.reset(); }
                                 });
 
                             // Bind RESET ITEMS click events to the selection area's reset button
@@ -1290,6 +1537,19 @@ if (!function_exists('array_rearrange_keys')){
                                 console.log('reset button clicked! \n-> reset-items');
                                 e.preventDefault();
                                 _self.reset();
+                                });
+
+                            // Bind SELECT STEP click events to the group wrappers themselves
+                            $('.wrapper[data-step]', $itemsPalette).live('click', function(e){
+                                //console.log('step wrapper clicked! \n-> select-step:', $(this).attr('data-step'));
+                                e.preventDefault();
+                                var $wrapper = $(this);
+                                var $siblings = $wrapper.siblings('.wrapper[data-step]');
+                                var stepNum = parseInt($wrapper.attr('data-step'));
+                                //var numSteps = $siblings.length + 1;
+                                $itemsPalette.attr('data-step', stepNum);
+                                $siblings.removeClass('active');
+                                $wrapper.addClass('active');
                                 });
 
                             // Check to see if there is already a recipe in the URL hash
@@ -1385,41 +1645,45 @@ if (!function_exists('array_rearrange_keys')){
                             var itemIsDiverter = itemSuffix === 'diverter';
                             var itemIsModule = itemSuffix === 'module';
                             var itemIsCircuit = itemSuffix === 'circuit';
-                            var itemIsMythic = itemSuffix === 'mythic';
-                            if (itemToken === 'mecha-whistle'){ itemIsMythic = true; }
-                            if (itemToken === 'extra-life'){ itemIsMythic = true; }
-                            if (itemToken === 'yashichi'){ itemIsMythic = true; }
+                            var itemIsRotator = itemSuffix === 'rotator';
+                            if (itemToken === 'mecha-whistle'){ itemIsRotator = true; }
+                            if (itemToken === 'extra-life'){ itemIsRotator = true; }
+                            if (itemToken === 'yashichi'){ itemIsRotator = true; }
+                            if (itemToken === 'field-booster'){ itemIsRotator = true; }
 
                             // Increase the delta by one, always, for each item added
                             powers.incPower('delta', 1 * quantity);
 
                             // Check to see which group the item belongs to and then parse its values
 
-                            // -- CYBER SCREWS w/ QUANTA + SPREAD
-                            if (itemIsScrew){
-                                var quanta = 0, spread = 0;
-                                if (itemIsSmall){ quanta = 5.0, spread = 0.15; }
-                                else if (itemIsLarge){ quanta = 10.0, spread = 0.25; }
-                                else if (itemIsHyper){ quanta = 100.0, spread = 0.35; }
-                                powers.incPower('quanta', quanta * quantity);
-                                powers.incPower('spread', spread * quantity);
+                            // -- UNDEFINED SOMEHOW -----
+                            if (itemToken === ''){
+                                //return;
                                 }
-                            // -- PELLETS & CAPSULES w/ ^QUANTA + ~SPREAD [+ STATS]
+                            // -- ELEMENTAL CORES w/ +SPREAD [+ TYPES]
+                            else if (itemIsCore){
+                                var typeToken = itemPrefix;
+                                var spreadValue = 1.0, typeValue = 5.0;
+                                powers.incPower('spread', spreadValue * quantity);
+                                powers.incPower(typeToken, typeValue * quantity);
+                                }
+                            // -- CYBER SCREWS w/ +QUANTA [+ TIERS]
+                            else if (itemIsScrew){
+                                var quantaValue = 0, tierToken = '';
+                                if (itemIsSmall){ quantaValue = 5.0, tierToken = 'mecha'; }
+                                else if (itemIsLarge){ quantaValue = 10.0, tierToken = 'master'; }
+                                else if (itemIsHyper){ quantaValue = 100.0, tierToken = 'boss'; }
+                                powers.incPower('quanta', quantaValue * quantity);
+                                //powers.incPower('quanta_'+tierToken, 1 * quantity);
+                                }
+                            // -- PELLETS & CAPSULES w/ +STATS
                             else if (itemIsPellet || itemIsCapsule){
                                 var statToken = itemPrefix;
                                 if (!itemIsSuper){
-                                    var quanta = (itemIsPellet ? 4.0 : 0) + (itemIsCapsule ? 9.0 : 0);
-                                    var spread = (itemIsPellet ? 0.1 : 0) + (itemIsCapsule ? 0.2 : 0);
                                     var statValue = (itemIsPellet ? 2.0 : 0) + (itemIsCapsule ? 5.0 : 0);
-                                    powers.incPower('quanta', quanta * quantity);
-                                    powers.incPower('spread', spread * quantity);
                                     powers.incPower(statToken, statValue * quantity);
                                     } else {
                                     var statTokens = !itemIsSuper ? [statToken] : ['attack', 'defense', 'speed'];
-                                    var quanta = (itemIsPellet ? 5.0 : 0) + (itemIsCapsule ? 10.0 : 0);
-                                    var spread = (itemIsPellet ? 0.2 : 0) + (itemIsCapsule ? 0.4 : 0);
-                                    powers.incPower('quanta', quanta * quantity);
-                                    powers.incPower('spread', spread * quantity);
                                     for (var j = 0; j < statTokens.length; j++){
                                         var subStatToken = statTokens[j];
                                         var subStatValue = (itemIsPellet ? 1.0 : 0) + (itemIsCapsule ? 2.5 : 0);
@@ -1427,15 +1691,6 @@ if (!function_exists('array_rearrange_keys')){
                                         }
                                     }
                                 }
-                            // -- ELEMENTAL CORES w/ ~QUANTA + ^SPREAD [+ TYPES]
-                            else if (itemIsCore){
-                                var typeToken = itemPrefix;
-                                var quanta = 1.0, spread = 0.6, typeValue = 5.0;
-                                powers.incPower('quanta', quanta * quantity);
-                                powers.incPower('spread', spread * quantity);
-                                powers.incPower(typeToken, typeValue * quantity);
-                                }
-
                             // -- TANKS & UPGRADES & MYTHICS w/ LEVEL + FORTE [+ ~STATS]
                             else if (itemIsTank || itemIsUpgrade){
                                 var boostKind = itemIsEnergy ? 'level' : 'forte';
@@ -1443,22 +1698,12 @@ if (!function_exists('array_rearrange_keys')){
                                 powers.incPower(statToken, statPower * quantity);
                                 powers.incPower(boostKind, boostPower * quantity);
                                 }
-
                             // -- BOOSTERS & DIVERTERS w/ STATS [+ STAT-MODS]
-                            else if (itemIsBooster){
-                                if (itemPrefix === 'field'){
-                                    // field boost is special and also boosts shift power
-                                    var fieldPower = Math.floor(quantity / 10); //quantity > 0 ? (Math.floor(quantity / 10) + 1) : 0;
-                                    var shiftPower = quantity * 1;
-                                    powers.incPower('field', fieldPower);
-                                    powers.incPower('shift', shiftPower);
-                                    }
-                                else {
-                                    // otherwise, if normal booster, it simply adjusts stats
-                                    var boostKind = itemPrefix;
-                                    var boostPower = 6;
-                                    powers.incPower(boostKind, boostPower * quantity);
-                                    }
+                            else if (itemIsBooster && itemPrefix !== 'field'){
+                                // otherwise, if normal booster, it simply adjusts stats
+                                var boostKind = itemPrefix;
+                                var boostPower = 6;
+                                powers.incPower(boostKind, boostPower * quantity);
                                 }
                             else if (itemIsDiverter){
                                 var divertOrder = [], divertValues = [10, 5, 5];
@@ -1469,7 +1714,6 @@ if (!function_exists('array_rearrange_keys')){
                                 powers.incPower(divertOrder[1], divertValues[1] * quantity);
                                 powers.incPower(divertOrder[2], divertValues[2] * quantity);
                                 }
-
                             // ELEMENTAL CIRCUITS w/ TYPES [+ TYPE-MODS]
                             else if (itemIsCircuit){
                                 var opposingTypes = [], opposingValues = [10, 10];
@@ -1482,7 +1726,6 @@ if (!function_exists('array_rearrange_keys')){
                                 powers.incPower(opposingTypes[0], opposingValues[0] * quantity);
                                 powers.decPower(opposingTypes[1], opposingValues[1] * quantity);
                                 }
-
                             // -- MODULE ITEMS w/ SPECIAL EFFECTS
                             else if (itemIsModule){
                                 if (itemPrefix === 'charge'){
@@ -1492,6 +1735,10 @@ if (!function_exists('array_rearrange_keys')){
                                 else if (itemPrefix === 'target'){
                                     var spread = 1.00;
                                     powers.decPower('spread', spread * quantity);
+                                    }
+                                else if (itemPrefix === 'spreader'){
+                                    var spread = 1.00;
+                                    powers.incPower('spread', spread * quantity);
                                     }
                                 else if (itemPrefix === 'growth'){
                                     var effort = 1;
@@ -1507,9 +1754,37 @@ if (!function_exists('array_rearrange_keys')){
                                 else if (itemPrefix === 'reverse'){
                                     powers.flags.reverse = true;
                                     }
-                                else if (itemPrefix === 'extreme'){
+                                else if (itemPrefix === 'xtreme'){
                                     powers.flags.extreme = true;
                                     }
+                                }
+                            // -- MISC ROTATOR (SHIFT) ITEMS
+                            else if (itemIsRotator){
+                                if (itemToken === 'mecha-whistle'){
+                                    var shiftPower = quantity * 1;
+                                    powers.incPower('xmecha', shiftPower);
+                                    }
+                                else if (itemToken === 'extra-life'){
+                                    var shiftPower = quantity * 1;
+                                    powers.incPower('xmaster', shiftPower);
+                                    }
+                                else if (itemToken === 'yashichi'){
+                                    var shiftPower = quantity * 1;
+                                    powers.incPower('xboss', shiftPower);
+                                    }
+                                else if (itemToken === 'field-booster'){
+                                    var shiftPower = quantity * 1;
+                                    powers.incPower('xfield', shiftPower);
+                                    }
+                                /*
+                                else if (itemPrefix === 'field'){
+                                    // field boost is special and also boosts shift power
+                                    var fieldPower = Math.floor(quantity / 10); //quantity > 0 ? (Math.floor(quantity / 10) + 1) : 0;
+                                    var shiftPower = quantity * 1;
+                                    powers.incPower('field', fieldPower);
+                                    powers.incPower('shift', shiftPower);
+                                    }
+                                    */
                                 }
 
                             // end of voidRecipeWizard.parseItem()
@@ -1813,8 +2088,8 @@ if (!function_exists('array_rearrange_keys')){
                             voidPowers.decPower = function(token, value){ voidPowers.setPower(token, voidPowers.getPower(token) - value); };
                             voidPowers.modPower = function(token, value, fallback){ voidPowers.setPower(token, voidPowers.getPower(token, fallback) * value); };
                             voidPowers.powers.delta = 0;
-                            voidPowers.powers.quanta = 0;
                             voidPowers.powers.spread = 0;
+                            voidPowers.powers.quanta = 0;
                             voidPowers.powers.level = 0;
                             voidPowers.powers.forte = 0;
                             voidPowers.powers.effort = 0;
@@ -1836,7 +2111,7 @@ if (!function_exists('array_rearrange_keys')){
                                 // Ensure the quanta is always at least zero if there are items present
                                 if (voidPowers.powers.quanta < 0){ voidPowers.powers.quanta = 0; }
                                 // Ensure the spread always within range when there are items present
-                                if (voidPowers.powers.spread < 1){ voidPowers.powers.spread = 1; }
+                                if (voidPowers.powers.spread < 0){ voidPowers.powers.spread = 0; }
                                 // Ensure the level is always at least one if there are items present
                                 if (voidPowers.powers.level < 1){ voidPowers.powers.level = 1; }
                                 }
@@ -1862,13 +2137,17 @@ if (!function_exists('array_rearrange_keys')){
                             // Backup a reference to the parent object
                             const _self = this;
 
-                            // Collect reference to the void powers so we can reference them
+                            // Clear the existing mission if one is already there
+                            _self.mission = {};
+
+                            // Collect reference to the void items + powers so we can reference them
+                            var voidItemsTokens = Object.keys(_self.items);
                             var voidPowersList = _self.powers;
                             var voidPowersKeys = Object.keys(voidPowersList);
 
                             // If we don't have any powers, we can't generate anything
                             if (!voidPowersKeys.length){
-                                //console.log('%c' + '-> no powers to generate from!', 'color: orange;');
+                                console.log('%c' + '-> no powers to generate from!', 'color: orange;');
                                 return;
                                 }
 
@@ -1877,15 +2156,9 @@ if (!function_exists('array_rearrange_keys')){
                             var baseSpread = voidPowersList['spread'] || 0;
                             //console.log('-> baseQuanta:', baseQuanta, 'baseSpread:', baseSpread);
 
-                            // Likewise if we don't have any quanta material or a defined spread limit, we can't generate either
-                            if (baseQuanta < 1 || baseSpread < 1){
-                                if (baseQuanta < 1 && baseSpread < 1){
-                                    //console.log('%c' + '-> no quanta materia nor spread limit to generate from!', 'color: red;');
-                                    } else if (baseQuanta < 1){
-                                    //console.log('%c' + '-> no quanta materia to generate with!', 'color: red;');
-                                    } else if (baseSpread < 1){
-                                    //console.log('%c' + '-> no spread limit to generate within!', 'color: red;');
-                                    }
+                            // If we have neither quanta material nor a defined spread limit, we can't generate either
+                            if (baseQuanta < 1 && baseSpread < 1){
+                                //console.log('%c' + '-> no quanta materia nor spread limit to generate from!', 'color: red;');
                                 return;
                                 }
 
@@ -1921,54 +2194,18 @@ if (!function_exists('array_rearrange_keys')){
                             //console.log('-> targetRobotQueue[master]:', targetRobotQueue['master']);
                             //console.log('-> targetRobotQueue[boss]:', targetRobotQueue['boss']);
 
-                            // VERSION 3 - NEW ROTATION SYSTEM (1-9 for mechas, 11-19 for masters, 21-29 for bosses, then combos thereof)
-                            // If there's any amount of shift power, we should use it to abstractly rotate the queue(s)
-                            const shiftPower = voidPowersList.shift || 0;
-                            if (shiftPower !== 0){
-                                console.log('%c' + '-> shiftPower: ' + shiftPower, 'color: pink;');
-
-                                // If shiftPower is not a multiple of ten, the final digit can be used to rotate the queue(s)
-                                if (shiftPower % 10 !== 0){
-                                    // Get the last digit for determining shift amount (1-9)
-                                    var lastDigit = shiftPower % 10;
-                                    var shiftAmount = lastDigit; // No need to map 1-9 since we use them directly
-                                    // Determine which set of classes to rotate based on the group
-                                    var groupNumber = Math.floor(shiftPower / 10); // Determine the group (e.g., 0 for 1-9, 1 for 11-19, etc.)
-                                    var classCombinations = [
-                                        ['mecha', 'master', 'boss'], // Group 0: Rotate all
-                                        ['mecha'],         // Group 1: Rotate only 'mecha'
-                                        ['master'],        // Group 2: Rotate only 'master'
-                                        ['boss'],          // Group 3: Rotate only 'boss'
-                                        ['mecha', 'master'], // Group 4: Rotate 'mecha' and 'master'
-                                        ['master', 'boss'],  // Group 5: Rotate 'master' and 'boss'
-                                        ['boss', 'mecha'],   // Group 6: Rotate 'boss' and 'mecha'
-                                        ];
-                                    // Determine which combination to use
-                                    var shiftClasses = classCombinations[groupNumber % classCombinations.length];
-                                    console.log('-> lastDigit:', lastDigit, 'shiftAmount:', shiftAmount, 'groupNumber:', groupNumber, 'shiftClasses:', shiftClasses);
-                                    // Rotate the selected queues
-                                    if (shiftAmount > 0) {
-                                        shiftClasses.forEach(queueClass => {
-                                            for (var i = 0; i < shiftAmount; i++) {
-                                                targetRobotQueue[queueClass].push(targetRobotQueue[queueClass].shift());
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-
                             // TEMP TEMP TEMP (new field token should be saved and UI should be refreshed in refreshUI()!)
-                            const fieldPower = voidPowersList.field;
-                            if (fieldPower){
-                                console.log('%c' + '-> fieldPower: ' + fieldPower, 'color: orange;');
-                                // If fieldPower is at least 1, we can upgrade the field to something other than default
+                            var fieldShiftPower = voidPowersList.xfield || 0;
+                            if (fieldShiftPower){
+                                console.log('%c' + '-> fieldShiftPower: ' + fieldShiftPower, 'color: orange;');
+                                // If fieldShiftPower is at least 1, we can upgrade the field to something other than default
                                 var xrefs = _self.xrefs;
                                 var $battleField = xrefs.battleField;
                                 var $battleFieldBackground = $battleField.find('.sprite.background');
                                 var currentFieldToken = $battleFieldBackground.attr('data-token') || '';
                                 var battleFieldToken = 'prototype-subspace';
-                                if (fieldPower >= 1){
-                                    console.log('-> fieldPower is >= 1 (', fieldPower, '), so we can upgrade the field!');
+                                if (fieldShiftPower >= 1){
+                                    console.log('-> fieldShiftPower is >= 1 (', fieldShiftPower, '), so we can upgrade the field!');
                                     battleFieldToken = 'gentle-countryside';
                                     }
                                 console.log('-> checking currentFieldToken:', currentFieldToken, 'vs.', 'battleFieldToken:', battleFieldToken);
@@ -1981,10 +2218,49 @@ if (!function_exists('array_rearrange_keys')){
                                 }
                             // TEMP TEMP TEMP
 
+                            // Define which elemental types each slot should be
+                            var typePowerTokens = Object.keys(typePowersList);
+                            var typePowerTotal = (typePowerTokens.length ? typePowerTokens.reduce((acc, token) => acc + typePowersList[token], 0) : 0);
+                            var typePowerTokensSorted = typePowerTokens.slice().sort(function(a, b){
+                                var aIndex = voidItemsTokens.indexOf(a+'-core');
+                                var bIndex = voidItemsTokens.indexOf(b+'-core');
+                                console.log('-> comparing', a, 'w/ index:', aIndex, 'vs.', b, 'w/ index:', bIndex);
+                                return aIndex - bIndex;
+                                });
+                            var distributedTypes = {};
+                            var distributedTypeSlots = [];
+                            for (var i = 0; i < typePowerTokensSorted.length; i++){
+                                var typeToken = typePowerTokensSorted[i];
+                                var typeValue = typePowersList[typeToken];
+                                if (typeValue === 0){ continue; }
+                                var typeSlots = Math.round((typeValue / typePowerTotal) * effectiveSpread);
+                                distributedTypes[typeToken] = typeSlots;
+                                // add the token to the slots array as many times as their are slots for it
+                                for (var j = 0; j < typeSlots; j++){ distributedTypeSlots.push(typeToken); }
+                                }
+                            console.log('-> distributedTypes:', JSON.stringify(distributedTypes));
+                            console.log('-> distributedTypeSlots:', JSON.stringify(distributedTypeSlots));
+
+                            // Define a quick function for getting the first matching robot from a list and shifting it off
+                            const mmrpgIndexRobots = mmrpgIndex.robots;
+                            var firstMatchingType = function(queue, type, offset, rotate){
+                                offset = typeof offset === 'number' && offset > 0 ? offset : 0;
+                                rotate = typeof rotate !== 'undefined' ? (rotate ? true : false) : true;
+                                if (offset > 0){ for (var i = 0; i < offset; i++){ queue.push(queue.shift()); } }
+                                for (var i = 0; i < queue.length; i++){
+                                    var robotToken = queue[i];
+                                    var robotInfo = mmrpgIndexRobots[robotToken];
+                                    if (robotInfo.robot_core === type || robotInfo.robot_core2 === type){
+                                        if (rotate){ queue.push(queue.shift()); }
+                                        return robotToken;
+                                        }
+                                    }
+                                return '';
+                                };
 
                             // Use calculated quanta-per-target to set-up the different target slots
                             var missionTargets = [];
-                            var numTargetSlots = effectiveSpread; //distributedQuanta.length;
+                            var numTargetSlots = effectiveSpread;
                             for (var slotKey = 0; slotKey < numTargetSlots; slotKey++){
                                 var slotTemplate = distributedQuanta[slotKey];
                                 //console.log('--> calculating slotKey:', slotKey, 'w/ slotTemplate:', slotTemplate);
@@ -1996,15 +2272,22 @@ if (!function_exists('array_rearrange_keys')){
                                 targetRobot.class = targetClass;
                                 targetRobot.quanta = targetQuanta;
                                 targetRobot.level = 1;
+                                targetRobot.type = '';
                                 if (targetTier.length){
+                                    // decide which element this target will be
+                                    targetRobot.type = distributedTypeSlots.shift() || '';
+                                    distributedTypeSlots.push(targetRobot.type);
+                                    // decide which tier this target will be
                                     var queueOrder = [];
                                     if (targetTier === 'boss'){ queueOrder.push('boss', 'master', 'mecha'); }
                                     if (targetTier === 'master'){ queueOrder.push('master', 'mecha'); }
                                     if (targetTier === 'mecha'){ queueOrder.push('mecha'); }
+                                    // loop through and pull appropriate targets given above
                                     for (var i = 0; i < queueOrder.length; i++){
                                         var queueToken = queueOrder[i];
                                         if (targetRobotQueue[queueToken].length){
-                                            var nextToken = targetRobotQueue[queueToken].shift();
+                                            var offset = typeof voidPowersList['x'+queueToken] !== 'undefined' ? voidPowersList['x'+queueToken] : 0;
+                                            var nextToken = firstMatchingType(targetRobotQueue[queueToken], targetRobot.type, offset, true);
                                             if (nextToken){
                                                 targetRobot.token = nextToken;
                                                 targetRobotQueue[queueToken].push(targetRobot.token);
@@ -2013,21 +2296,18 @@ if (!function_exists('array_rearrange_keys')){
                                             }
                                         }
                                     }
-
                                 // If a token for this slot count not be found, default to a dark frag
                                 if (!targetRobot.token.length){
                                     targetRobot.token = 'dark-frag';
                                     }
-
                                 // Add the target robot to the mission targets list
                                 missionTargets.push(targetRobot);
                                 //console.log('--> pushed new target!', '\n-> targetRobot:', targetRobot);
-
                                 }
 
                             // Update the mission details with the new targets
-                            _self.mission = {};
                             _self.mission.targets = missionTargets;
+                            console.log('--> generated new mission w/', '\n-> missionTargets:', missionTargets);
 
                             // end of voidRecipeWizard.generateMission()
                             },
@@ -2256,6 +2536,7 @@ if (!function_exists('array_rearrange_keys')){
                                             }
                                         // add the power to the list
                                         var spanClass = 'token';
+                                        if (mmrpgStats.indexOf(powerToken) !== -1){ spanClass += ' type ' + powerToken; }
                                         if (mmrpgTypes.indexOf(powerToken) !== -1){ spanClass += ' type ' + powerToken; }
                                         powersListMarkup += '<li class="power">';
                                             powersListMarkup += '<span class="'+spanClass+'">'+powerToken+'</span> ';
