@@ -102,7 +102,7 @@ $mmrpg_index_items = $mmrpg_index_items_filtered;
 // Predefine the item groups to be used in the void cauldron item palette
 $void_item_groups_index = array(
 
-    // -- STEP ONE -- //
+    // -- STEP ONE (MANIFEST [DATA]) -- //
     1 => array(
         'step' => 1,
         'name' => 'Step 1',
@@ -159,15 +159,53 @@ $void_item_groups_index = array(
             ),
         ),
 
-    // -- STEP TWO -- //
+    // -- STEP TWO (UPGRADE [POWER]) -- //
     2 => array(
         'step' => 2,
         'name' => 'Step 2',
+        'label' => 'Upgrade (Power)',
+        'groups' => array(
+            'specstat-eats' => array(
+                'name' => 'SpecStat Edibles',
+                'color' => 'electric',
+                'rowline' => 1,
+                'colspan' => 3,
+                'items' => array(
+                    'energy-pellet', 'energy-capsule', 'energy-tank',
+                    'weapon-pellet', 'weapon-capsule', 'weapon-tank',
+                    )
+                ),
+            'tristat-eats' => array(
+                'name' => 'TriStat Edibles',
+                'color' => 'electric',
+                'rowline' => 2,
+                'colspan' => 4,
+                'items' => array(
+                    'attack-pellet', 'defense-pellet', 'speed-pellet', 'super-pellet',
+                    'attack-capsule', 'defense-capsule', 'speed-capsule', 'super-capsule',
+                    )
+                ),
+            'reward-mods' => array(
+                'name' => 'Reward Mods',
+                'color' => 'copy',
+                'rowline' => 3,
+                'colspan' => 3,
+                'items' => array(
+                    'salvage-module', 'growth-module', 'fortune-module',
+                    )
+                ),
+            ),
+        ),
+
+    // -- STEP THREE (REDIRECT [FORM]) -- //
+    3 => array(
+        'step' => 3,
+        'name' => 'Step 3',
         'label' => 'Redirect (Form)',
         'groups' => array(
             'specstat-eats' => array(
                 'name' => 'SpecStat Edibles',
-                'color' => 'energy',
+                'color' => 'cutter',
                 'rowline' => 1,
                 'colspan' => 2,
                 'items' => array(
@@ -177,7 +215,7 @@ $void_item_groups_index = array(
                 ),
             'tristat-mods' => array(
                 'name' => 'TriStat Mods',
-                'color' => 'energy',
+                'color' => 'cutter',
                 'rowline' => 2,
                 'colspan' => 3,
                 'items' => array(
@@ -215,45 +253,7 @@ $void_item_groups_index = array(
             ),
         ),
 
-    // -- STEP THREE -- //
-    3 => array(
-        'step' => 3,
-        'name' => 'Step 3',
-        'label' => 'Upgrade (Power)',
-        'groups' => array(
-            'specstat-eats' => array(
-                'name' => 'SpecStat Edibles',
-                'color' => 'electric',
-                'rowline' => 1,
-                'colspan' => 3,
-                'items' => array(
-                    'energy-pellet', 'energy-capsule', 'energy-tank',
-                    'weapon-pellet', 'weapon-capsule', 'weapon-tank',
-                    )
-                ),
-            'tristat-eats' => array(
-                'name' => 'TriStat Edibles',
-                'color' => 'electric',
-                'rowline' => 2,
-                'colspan' => 4,
-                'items' => array(
-                    'attack-pellet', 'defense-pellet', 'speed-pellet', 'super-pellet',
-                    'attack-capsule', 'defense-capsule', 'speed-capsule', 'super-capsule',
-                    )
-                ),
-            'reward-mods' => array(
-                'name' => 'Reward Mods',
-                'color' => 'copy',
-                'rowline' => 3,
-                'colspan' => 3,
-                'items' => array(
-                    'salvage-module', 'growth-module', 'fortune-module',
-                    )
-                ),
-            ),
-        ),
-
-    // -- STEP FOUR -- //
+    // -- STEP FOUR (DISTORT [HACK]) -- //
     4 => array(
         'step' => 4,
         'name' => 'Step 4',
@@ -427,7 +427,8 @@ $void_item_groups_index = array(
 
     <div id="void-recipe">
         <div class="title">
-            <strong>The Void Cauldron: Procedural Mission Generator</strong>
+            <strong class="main">Void Cauldron</strong>
+            <em class="sub">Procedural Mission Generator</em>
         </div>
         <div class="creation">
             <div class="mission-details">
@@ -437,9 +438,9 @@ $void_item_groups_index = array(
                 <span class="loading">&hellip;</span>
             </div>
             <div class="battle-field">
-                <div class="sprite background"
+                <div class="sprite background hazy-filter"
                     data-token="prototype-subspace"
-                    style="background-image: url(/images/fields/prototype-subspace/battle-field_preview.png?20241104-0121);"
+                    style="background-image: url(/images/fields/prototype-subspace/battle-field_background_base.gif?20241104-0121);"
                     >&nbsp;</div>
             </div>
         </div>

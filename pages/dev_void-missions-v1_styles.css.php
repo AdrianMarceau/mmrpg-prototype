@@ -19,14 +19,35 @@
 #void-recipe {
     display: block;
     box-sizing: border-box;
+    position: relative;
+    z-index: 1;
     width: 700px;
     height: auto;
     background-color: #262626;
     border: 1px solid #1A1A1A;
-    border-radius: 3px;
-    padding: 8px;
+    border-radius: 6px;
+    padding: 12px;
     margin: 0 auto;
+    font-size: 13px;
+    line-height: 16px;
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+}
+/*
+make a semi-transparent gradient over the void recipe panel, black on bottom white on top, but as an overlay
+*/
+#void-recipe:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+    border-radius: 6px;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.6), rgba(255, 255, 255, 0.0));
+    pointer-events: none;
+    opacity: 0.6;
 }
 
 /* -- BASIC STRUCTURES -- */
@@ -36,6 +57,7 @@
 #void-recipe .selection,
 #void-recipe .palette {
     display: block;
+    box-sizing: border-box;
     width: auto;
     height: auto;
     text-align: center;
@@ -72,20 +94,35 @@
 }
 
 #void-recipe .title {
-
-}
-#void-recipe .title strong {
     display: block;
     width: auto;
     margin: 0 auto;
-    padding: 6px 12px;
-    border: 1px solid #1A1A1A;
-    background-color: #1e1e1e;
-    border-radius: 3px;
-    color: #fefefe;
-    font-size: 12px;
-    line-height: 16px;
     text-align: center;
+    padding: 3px 12px;
+    border: 1px solid #1b1825;
+    border-radius: 3px;
+    color: #cfcdd5;
+    background-color: #1e1e1e;
+    text-shadow: 1px 1px 0 rgb(0 0 0);
+}
+#void-recipe .title .main {
+    display: block;
+    margin: 0 auto;
+    font-size: 14px;
+    line-height: 18px;
+    text-transform: uppercase;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #1b1825;
+}
+#void-recipe .title .sub {
+    display: block;
+    margin: 0 auto;
+    font-size: 11px;
+    line-height: 15px;
+    color: #777194;
+    font-style: normal;
+    padding-top: 1px;
+    border-top: 1px solid #2a2636;
 }
 
 #void-recipe .creation:before,
@@ -152,14 +189,22 @@
     border-radius: 6px;
 }
 #void-recipe .selection .item-list {
-    width: 680px;
-    height: 48px;
-    box-shadow: inset 2px 14px 10px rgba(0, 0, 0, 0.1);
+    width: auto;
+    height: auto;
+    /* box-shadow: inset 2px 14px 10px rgba(0, 0, 0, 0.1);  */
+    /* background-color: magenta; */
+    /* background-color: rgb(255 0 255 / 20%); */
+    background-color: transparent;
+    border: 0 none transparent;
+    box-shadow: none;
 }
 #void-recipe .palette .item-list {
-    width: 680px;
+    width: auto;
+    min-width: 380px;
     height: 282px;
     /* box-shadow: inset -2px -4px 12px rgba(0, 0, 0, 0.1); */
+    background-color: transparent;
+    border: 0 none transparent;
     box-shadow: none;
 }
 #void-recipe .item-list .wrapper {
@@ -175,6 +220,9 @@
     width: auto;
     padding: 6px;
 }
+
+/* -- PALETTE || ITEMS -- */
+
 #void-recipe .palette .item-list .wrapper.float-left {
     right: auto;
     /* background-color: magenta; */
@@ -209,6 +257,10 @@
 }
 #void-recipe .palette .item-list .wrapper[data-step].active {
     box-shadow: 4px 0px 6px rgba(0, 0, 0, 0.4);
+}
+#void-recipe .palette .item-list .wrapper[data-step="3"].active,
+#void-recipe .palette .item-list .wrapper[data-step="4"].active {
+    box-shadow: -4px 0px 6px rgba(0, 0, 0, 0.4);
 }
 #void-recipe .palette .item-list .wrapper[data-step]:not(.active) {
     box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.2);
@@ -264,11 +316,11 @@
     position: absolute;
     left: 6px;
     width: 100px;
-    top: -16px;
-    height: 12px;
-    line-height: 12px;
-    font-size: 9px;
-    padding: 2px 6px;
+    top: -22px;
+    font-size: 11px;
+    line-height: 15px;
+    height: 15px;
+    padding: 3px 12px;
     border: inherit;
     background-color: inherit;
     border-radius: 6px 6px 0 0;
@@ -511,14 +563,38 @@
 #void-recipe .item-list .group[data-colspan="9"] { width: calc(((54px) + 4px) * 9); }
 #void-recipe .item-list .group[data-colspan="10"] { width: calc(((54px) + 4px) * 10); }
 
+/* -- PALLET || MISC -- */
+
+#void-recipe .palette {
+    padding: 0 3px;
+}
+
 
 /* -- SELECTION || ITEM LIST & BUTTONS -- */
 
 #void-recipe .selection {
-
+    background-color: transparent;
+    margin: -64px 4px 12px;
+}
+#void-recipe .selection:before {
+    width: auto;
+    height: auto;
+    line-height: 1;
+    padding: 2px 12px;
+    border-radius: 3px;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto;
 }
 #void-recipe .selection .item-list {
-
+    min-height: 40px;
+    margin-bottom: 0;
+}
+#void-recipe .selection .item-list .wrapper {
+    top: 14px;
+    height: auto;
+    padding: 3px 6px;
 }
 #void-recipe .selection .item-list .item {
     transform: translate(0, 0);
@@ -536,16 +612,19 @@
     50% { transform: scale(1.4); }
     100% { transform: scale(1.0); }
 }
+#void-recipe .selection .item-list .item.placeholder {
+    filter: opacity(1.0) brightness(1.0);
+}
 
 #void-recipe .selection .reset {
     display: block;
     position: absolute;
     z-index: 30;
-    top: 0;
-    right: 0;
+    top: 5px;
+    right: -10px;
     width: 24px;
     height: 24px;
-    font-size: 18px;
+    font-size: 14px;
     line-height: 24px;
     text-align: center;
     vertical-align: middle;
@@ -570,11 +649,14 @@
 /* -- CREATION || TARGET LIST & MISSION DETAILS -- */
 
 #void-recipe .creation {
-    height: 140px;
+    height: 200px;
+    padding-bottom: 60px;
     border: 1px solid #1a1a1a;
-    border-radius: 6px;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+    border-radius: 9px;
+    box-shadow: none;
     overflow: hidden;
+    border-bottom-color: #333333;
+    border-right-color: #333333;
 }
 #void-recipe .creation .mission-details,
 #void-recipe .creation .target-list,
@@ -586,12 +668,26 @@
     min-width: 180px;
     min-height: 50px;
     overflow: visible;
-    border: 1px solid #1A1A1A;
+    border: 0 none transparent;
     border-radius: 6px;
     position: absolute;
     left: 0;
     right: 0;
     z-index: 1;
+}
+#void-recipe .creation:after {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 9;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border: 0 none transparent;
+    border-radius: 6px;
+    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
 }
 
 #void-recipe .creation .battle-field {
@@ -621,6 +717,9 @@
     top: auto;
     height: 20%;
     z-index: 2;
+}
+#void-recipe .creation .battle-field .sprite.hazy-filter {
+    filter: sepia(1) saturate(4) brightness(0.4) hue-rotate(260deg);
 }
 #void-recipe .creation .battle-field:after {
     content: "";
@@ -701,7 +800,7 @@
 }
 
 #void-recipe .creation .target-list {
-    bottom: 0;
+    top: 65px;
     height: 80px;
     border-radius: 0 0 6px 6px;
     border-top: 0;
@@ -838,6 +937,15 @@
 
 /* -- PANEL & GROUP COLORS -- */
 
+#void-recipe {
+    background-color: #3e2749;
+}
+#void-recipe .creation {
+    border-top-color: #1b1825;
+    border-left-color: #1b1825;
+    border-right-color: #413b54;
+    border-bottom-color: #413b54;
+}
 #void-recipe .creation .mission-details {
     background-color: #2d2c3a;
     background-color: rgb(45, 44, 58, 0.9);
@@ -847,7 +955,7 @@
     background-color: rgb(41, 40, 52, 0.8);
 }
 #void-recipe .selection .item-list {
-    background-color: #25232e;
+    /* background-color: #25232e;  */
 }
 #void-recipe .palette .item-list {
     background-color: transparent;
@@ -855,6 +963,7 @@
 }
 #void-recipe .palette .item-list .wrapper[data-step].active {
     background-color: #2f2b40;
+    border-color: #4a4360;
 }
 #void-recipe .palette .item-list .wrapper[data-step]:not(.active) {
     background-color: #242032;
