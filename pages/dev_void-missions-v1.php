@@ -103,10 +103,9 @@ $mmrpg_index_items = $mmrpg_index_items_filtered;
 $void_item_groups_index = array(
 
     // -- STEP ONE (MANIFEST [DATA]) -- //
-    1 => array(
-        'step' => 1,
-        'name' => 'Step 1',
-        'label' => 'Manifest (Data)',
+    array(
+        'name' => 'Manifest',
+        'label' => 'Data',
         'groups' => array(
             'quanta-screws' => array(
                 'name' => 'Quanta Screws',
@@ -159,53 +158,14 @@ $void_item_groups_index = array(
             ),
         ),
 
-    // -- STEP TWO (UPGRADE [POWER]) -- //
-    2 => array(
-        'step' => 2,
-        'name' => 'Step 2',
-        'label' => 'Upgrade (Power)',
+    // -- STEP TWO (REDIRECT [FORM]) -- //
+    array(
+        'name' => 'Redirect',
+        'label' => 'Form',
         'groups' => array(
-            'specstat-eats' => array(
-                'name' => 'SpecStat Edibles',
-                'color' => 'electric',
-                'rowline' => 1,
-                'colspan' => 3,
-                'items' => array(
-                    'energy-pellet', 'energy-capsule', 'energy-tank',
-                    'weapon-pellet', 'weapon-capsule', 'weapon-tank',
-                    )
-                ),
-            'tristat-eats' => array(
-                'name' => 'TriStat Edibles',
-                'color' => 'electric',
-                'rowline' => 2,
-                'colspan' => 4,
-                'items' => array(
-                    'attack-pellet', 'defense-pellet', 'speed-pellet', 'super-pellet',
-                    'attack-capsule', 'defense-capsule', 'speed-capsule', 'super-capsule',
-                    )
-                ),
-            'reward-mods' => array(
-                'name' => 'Reward Mods',
-                'color' => 'copy',
-                'rowline' => 3,
-                'colspan' => 3,
-                'items' => array(
-                    'salvage-module', 'growth-module', 'fortune-module',
-                    )
-                ),
-            ),
-        ),
-
-    // -- STEP THREE (REDIRECT [FORM]) -- //
-    3 => array(
-        'step' => 3,
-        'name' => 'Step 3',
-        'label' => 'Redirect (Form)',
-        'groups' => array(
-            'specstat-eats' => array(
-                'name' => 'SpecStat Edibles',
-                'color' => 'cutter',
+            'specstat-upgrades' => array(
+                'name' => 'SpecStat Upgrades',
+                'color' => 'defense_energy',
                 'rowline' => 1,
                 'colspan' => 2,
                 'items' => array(
@@ -215,7 +175,7 @@ $void_item_groups_index = array(
                 ),
             'tristat-mods' => array(
                 'name' => 'TriStat Mods',
-                'color' => 'cutter',
+                'color' => 'speed_attack',
                 'rowline' => 2,
                 'colspan' => 3,
                 'items' => array(
@@ -253,11 +213,47 @@ $void_item_groups_index = array(
             ),
         ),
 
-    // -- STEP FOUR (DISTORT [HACK]) -- //
-    4 => array(
-        'step' => 4,
-        'name' => 'Step 4',
-        'label' => 'Distort (Hack)',
+    // -- STEP THREE (UPGRADE [POWER]) -- //
+    array(
+        'name' => 'Upgrade',
+        'label' => 'Power',
+        'groups' => array(
+            'specstat-eats' => array(
+                'name' => 'SpecStat Edibles',
+                'color' => 'electric',
+                'rowline' => 1,
+                'colspan' => 3,
+                'items' => array(
+                    'energy-pellet', 'energy-capsule', 'energy-tank',
+                    'weapon-pellet', 'weapon-capsule', 'weapon-tank',
+                    )
+                ),
+            'tristat-eats' => array(
+                'name' => 'TriStat Edibles',
+                'color' => 'shield',
+                'rowline' => 2,
+                'colspan' => 4,
+                'items' => array(
+                    'attack-pellet', 'defense-pellet', 'speed-pellet', 'super-pellet',
+                    'attack-capsule', 'defense-capsule', 'speed-capsule', 'super-capsule',
+                    )
+                ),
+            'reward-mods' => array(
+                'name' => 'Reward Mods',
+                'color' => 'copy',
+                'rowline' => 3,
+                'colspan' => 3,
+                'items' => array(
+                    'salvage-module', 'growth-module', 'fortune-module',
+                    )
+                ),
+            ),
+        ),
+
+    // -- STEP FOUR (DISTORT [CONTEXT]) -- //
+    array(
+        'name' => 'Distort',
+        'label' => 'Context',
         'groups' => array(
             'elemental-mods' => array(
                 'name' => 'Elemental Mods',
@@ -269,10 +265,20 @@ $void_item_groups_index = array(
                     'sapling-circuit', 'chrono-circuit', 'cosmo-circuit',
                     )
                 ),
+            'junk' => array(
+                'name' => 'Junk Items',
+                'color' => 'time',
+                'rowline' => 2,
+                'colspan' => 4,
+                'items' => array(
+                    'guard-module', 'persist-module', 'xtreme-module', 'overkill-module',
+                    'hourglass-module', 'magnet-module', 'transport-module', 'bulwark-module',
+                    )
+                ),
             'power-balancers' => array(
                 'name' => 'Power Balancers',
                 'color' => 'copy',
-                'rowline' => 2,
+                'rowline' => 3,
                 'colspan' => 1,
                 'items' => array(
                     'uptick-module', 'siphon-module',
@@ -281,7 +287,7 @@ $void_item_groups_index = array(
             'field-mods' => array(
                 'name' => 'Field Mods',
                 'color' => 'copy',
-                'rowline' => 2,
+                'rowline' => 3,
                 'colspan' => 1,
                 'items' => array(
                     'repair-module', 'gambit-module',
@@ -290,20 +296,10 @@ $void_item_groups_index = array(
             'field-mods2' => array(
                 'name' => 'Field Mods 2',
                 'color' => 'copy',
-                'rowline' => 2,
+                'rowline' => 3,
                 'colspan' => 1,
                 'items' => array(
                     'alchemy-module', 'distill-module',
-                    )
-                ),
-            'junk' => array(
-                'name' => 'Junk Items',
-                'color' => 'empty',
-                'rowline' => 3,
-                'colspan' => 4,
-                'items' => array(
-                    'guard-module', 'persist-module', 'xtreme-module', 'overkill-module',
-                    'hourglass-module', 'magnet-module', 'transport-module', 'bulwark-module',
                     )
                 ),
             ),
@@ -347,12 +343,13 @@ $void_item_groups_index = array(
         $num_items_total = 0;
         $curr_item_rowline = 0;
         $group_markup_by_step = array();
-        foreach ($void_item_groups_index AS $step => $step_info){
+        foreach ($void_item_groups_index AS $step_key => $step_info){
+            $step_num = $step_key + 1;
             $step_name = $step_info['name'];
             $step_label = $step_info['label'];
             $step_groups = $step_info['groups'];
             if (empty($step_groups)){ continue; }
-            $group_markup_by_step[$step] = array();
+            $group_markup_by_step[$step_key] = array();
             foreach ($step_groups AS $group_token => $group_info){
                 $group_name = $group_info['name'];
                 $group_color = $group_info['color'];
@@ -361,7 +358,7 @@ $void_item_groups_index = array(
                 $group_colspan = $group_info['colspan'];
                 if (empty($group_items)){ continue; }
                 $group_items_markup = array();
-                foreach ($group_items AS $item_token){
+                foreach ($group_items AS $item_key => $item_token){
                     if (!isset($mmrpg_index_items[$item_token])){ continue; }
                     $item_info = $mmrpg_index_items[$item_token];
                     $item_name = $item_info['item_name'];
@@ -372,7 +369,7 @@ $void_item_groups_index = array(
                     $icon_url = '/images/items/'.$item_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
                     ob_start();
                     echo('<div class="item" '.
-                        'data-key="0" '.
+                        'data-key="'.$item_key.'" '.
                         'data-token="'.$item_token.'" '.
                         'data-group="'.$group_token.'" '.
                         'data-quantity="'.$item_quantity.'" '.
@@ -385,7 +382,7 @@ $void_item_groups_index = array(
                     $group_items_markup[] = ob_get_clean();
                 }
                 if (empty($group_items_markup)){ continue; }
-                $added_so_far = count($group_markup_by_step[$step]);
+                $added_so_far = count($group_markup_by_step[$step_key]);
                 $add_newline = $group_rowline !== $curr_item_rowline && $added_so_far >= 1 ? true : false;
                 $group_markup = implode(PHP_EOL, $group_items_markup);
                 $group_markup_class = 'group '.$group_token.' type '.$group_color;
@@ -393,23 +390,24 @@ $void_item_groups_index = array(
                 $group_markup_attrs .= ' data-rowline="'.$group_rowline.'" data-colspan="'.$group_colspan.'"';
                 $wrapped_group_markup = '<div class="'.$group_markup_class.'" '.$group_markup_attrs.'>'.PHP_EOL.$group_markup.PHP_EOL.'</div>';
                 if ($add_newline){ $wrapped_group_markup = '<div class="clear"></div>'.PHP_EOL.$wrapped_group_markup; }
-                $group_markup_by_step[$step][] = $wrapped_group_markup;
+                $group_markup_by_step[$step_key][] = $wrapped_group_markup;
                 //console_log(__LINE__, 'adding wrapped group markup for '.$group_token.' to step '.$step);
                 $num_items_total += count($group_items);
                 $curr_item_rowline = $group_rowline;
             }
         }
         $z_index = count($group_markup_by_step) + 11;
-        foreach ($group_markup_by_step AS $group_step => $group_markup){
+        foreach ($group_markup_by_step AS $step_key => $wrapped_group_markup){
             ob_start();
-            $step_info = $void_item_groups_index[$group_step];
+            $step_info = $void_item_groups_index[$step_key];
+            $step_num = $step_key + 1;
             $step_name = $step_info['name'];
             $step_label = $step_info['label'];
-            $wrapper_class = 'wrapper'.($group_step === 1 ? ' active' : '');
-            $wrapper_attrs = 'data-step="'.$group_step.'"';
+            $wrapper_class = 'wrapper'.($step_num === 1 ? ' active' : '');
+            $wrapper_attrs = 'data-step="'.$step_num.'"';
             echo('<div class="'.$wrapper_class.'" '.$wrapper_attrs.'>'.PHP_EOL);
-                echo('<div class="label">'.$step_label.'</div>'.PHP_EOL);
-                echo(implode(PHP_EOL, $group_markup).PHP_EOL);
+                echo('<div class="label">'.$step_name.' ('.$step_label.')</div>'.PHP_EOL);
+                echo(implode(PHP_EOL, $wrapped_group_markup).PHP_EOL);
             echo('</div>'.PHP_EOL);
             $group_items_markup = ob_get_clean();
             if (!empty($group_items_markup)){
@@ -438,10 +436,15 @@ $void_item_groups_index = array(
                 <span class="loading">&hellip;</span>
             </div>
             <div class="battle-field">
-                <div class="sprite background hazy-filter"
+                <div class="sprite background memory-filter"
                     data-token="prototype-subspace"
-                    style="background-image: url(/images/fields/prototype-subspace/battle-field_background_base.gif?20241104-0121);"
+                    style="background-image: url(/images/fields/gentle-countryside/battle-field_preview.png?20241104-0121);"
                     >&nbsp;</div>
+            </div>
+        </div>
+        <div class="palette">
+            <div class="item-list" data-count="<?= $items_palette_count ?>" data-select="*" data-step="1">
+                <?= $items_palette_markup ?>
             </div>
         </div>
         <div class="selection">
@@ -451,11 +454,6 @@ $void_item_groups_index = array(
                 </div>
             </div>
             <a class="reset"><i class="fa fas fa-undo"></i></a>
-        </div>
-        <div class="palette">
-            <div class="item-list" data-count="<?= $items_palette_count ?>" data-select="*" data-step="1">
-                <?= $items_palette_markup ?>
-            </div>
         </div>
     </div>
 

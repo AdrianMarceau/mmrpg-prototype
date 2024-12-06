@@ -32,9 +32,6 @@
     line-height: 16px;
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
 }
-/*
-make a semi-transparent gradient over the void recipe panel, black on bottom white on top, but as an overlay
-*/
 #void-recipe:before {
     content: "";
     display: block;
@@ -43,10 +40,29 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 0;
+    z-index: 1;
     border-radius: 6px;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.6), rgba(255, 255, 255, 0.0));
     pointer-events: none;
+    background-color: inherit;
+    /* background-image: url(/images/fields/prototype-subspace/battle-field_background_base.gif?20241104-0121); */
+    background-image: url(/images/fields/prototype-subspace/battle-field_preview.png?20241104-0121);
+    background-size: auto 124px;
+    background-blend-mode: overlay;
+    opacity: 0.3;
+}
+#void-recipe:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    border-radius: 6px;
+    pointer-events: none;
+    background-color: transparent;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.8), rgba(255, 255, 255, 0.1));
     opacity: 0.6;
 }
 
@@ -61,20 +77,21 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     width: auto;
     height: auto;
     text-align: center;
-    margin: 4px auto;
+    margin: 0 auto;
     position: relative;
 }
 #void-recipe .title {
     margin-top: 0;
+    z-index: 10;
 }
 #void-recipe .creation {
-    z-index: 1;
-}
-#void-recipe .selection {
-    z-index: 2;
+    z-index: 20;
 }
 #void-recipe .palette {
-    z-index: 3;
+    z-index: 30;
+}
+#void-recipe .selection {
+    z-index: 40;
 }
 
 #void-recipe .title:after,
@@ -87,7 +104,9 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
 #void-recipe .selection .item-list:after,
 #void-recipe .selection .item-list .wrapper:after,
 #void-recipe .creation .target-list:after,
-#void-recipe .creation .mission-details:after {
+#void-recipe .creation .mission-details:after,
+#void-recipe .creation .mission-details .rank-powers:after,
+#void-recipe .creation .mission-details .stat-powers:after {
     content: "";
     display: block;
     clear: both;
@@ -99,10 +118,10 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     margin: 0 auto;
     text-align: center;
     padding: 3px 12px;
-    border: 1px solid #1b1825;
+    border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 3px;
     color: #cfcdd5;
-    background-color: #1e1e1e;
+    background-color: #242033;
     text-shadow: 1px 1px 0 rgb(0 0 0);
 }
 #void-recipe .title .main {
@@ -125,10 +144,8 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     border-top: 1px solid #2a2636;
 }
 
-#void-recipe .creation:before,
-#void-recipe .selection:before,
-#void-recipe .palette:before {
-    content: "...";
+#void-recipe .creation:before {
+    content: "Mission Preview";
     display: block;
     position: absolute;
     z-index: 10;
@@ -137,22 +154,11 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     top: 0;
     font-size: 9px;
     line-height: 12px;
-    color: #bababa;
+    color: #cfcdd5;
     border-radius: 3px 3px 0 0;
     border: 0 none transparent;
-    background-color: #1a1a1a;
-    background-color: rgba(30, 30, 30, 0.8);
+    background-color: #242033;
     padding: 2px 6px;
-}
-#void-recipe .creation:before {
-    content: "Mission Preview";
-}
-#void-recipe .selection:before {
-    content: "Selected Items";
-}
-#void-recipe .palette:before {
-    content: "Your Inventory";
-    display: none;
 }
 #void-recipe .creation .loading,
 #void-recipe .palette .loading,
@@ -163,8 +169,6 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     transform: translate(-50%, -50%);
     opacity: 0.6;
 }
-#void-recipe .creation .mission-details,
-#void-recipe .selection .item-list,
 #void-recipe .palette .item-list {
     padding-top: 16px;
 }
@@ -187,16 +191,6 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     background-color: #2a2a2a;
     border: 1px solid #1a1a1a;
     border-radius: 6px;
-}
-#void-recipe .selection .item-list {
-    width: auto;
-    height: auto;
-    /* box-shadow: inset 2px 14px 10px rgba(0, 0, 0, 0.1);  */
-    /* background-color: magenta; */
-    /* background-color: rgb(255 0 255 / 20%); */
-    background-color: transparent;
-    border: 0 none transparent;
-    box-shadow: none;
 }
 #void-recipe .palette .item-list {
     width: auto;
@@ -324,7 +318,7 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     border: inherit;
     background-color: inherit;
     border-radius: 6px 6px 0 0;
-    border-bottom: 0 none transparent;
+    border-bottom: 1px solid transparent;
     color: #efefef;
     z-index: 5;
     cursor: pointer;
@@ -369,6 +363,26 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     display: block;
     position: absolute;
     z-index: 2;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 3px;
+    background-color: #262626;
+    transition: top 0.1s, right 0.1s, bottom 0.1s, left 0.1s, background-color 0.1s, opacity 0.1s;
+    /* add a linear gradient overtop as an 'overlay' from white to black at 0.6 opacity */
+    background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.2));
+    background-blend-mode: overlay;
+    opacity: 1.0;
+}
+#void-recipe .item-list .item:hover:before {
+    opacity: 0.0;
+}
+#void-recipe .item-list .item:after {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 2;
     top: 4px;
     left: 4px;
     right: 4px;
@@ -377,7 +391,7 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     border-radius: 3px;
     transition: top 0.1s, right 0.1s, bottom 0.1s, left 0.1s, background-color 0.1s;
 }
-#void-recipe .item-list .item:hover:before {
+#void-recipe .item-list .item:hover:after {
     top: 2px;
     bottom: 6px;
     background-color: #434343;
@@ -409,12 +423,15 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     filter: opacity(0.6) brightness(0.9);
     pointer-events: none;
     cursor: not-allowed;
-    border-color: transparent;
-    background-color: #202020;
-    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.6);
+    border-color: #1b1825;
+    background-color: #242131;
+    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 #void-recipe .item-list .item.placeholder:before {
-    background-color: #202020;
+    background-color: #242033;
+    display: none;
+}
+#void-recipe .item-list .item.placeholder:after {
     display: none;
 }
 #void-recipe .item-list .item.placeholder .icon {
@@ -566,6 +583,7 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
 /* -- PALLET || MISC -- */
 
 #void-recipe .palette {
+    margin-top: 12px;
     padding: 0 3px;
 }
 
@@ -574,33 +592,56 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
 
 #void-recipe .selection {
     background-color: transparent;
-    margin: -64px 4px 12px;
-}
-#void-recipe .selection:before {
+    margin: 0 auto;
+    position: absolute;
+    /* top: 85px;  */
+    top: 224px;
+    left: 13px;
+    right: 13px;
     width: auto;
     height: auto;
-    line-height: 1;
-    padding: 2px 12px;
-    border-radius: 3px;
-    top: 2px;
-    left: 50%;
-    transform: translateX(-50%);
-    right: auto;
+    background-color: rgba(36, 32, 51, 0.4);
+    /* border-bottom: 1px solid #242033;  */
+    border-top: 1px solid #242033;
+    box-shadow: none;
+
+    /* background-color: lime; */
 }
 #void-recipe .selection .item-list {
-    min-height: 40px;
-    margin-bottom: 0;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    background-color: transparent;
+    border: 0 none transparent;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+
+    /* background-color: cyan; */
 }
 #void-recipe .selection .item-list .wrapper {
-    top: 14px;
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
     height: auto;
     padding: 3px 6px;
+
+    /* background-color: magenta; */
 }
 #void-recipe .selection .item-list .item {
     transform: translate(0, 0);
+    margin: 0 4px 0 0;
+}
+#void-recipe .selection .item-list .item:last-child {
+    margin-right: 0;
 }
 #void-recipe .selection .item-list .item .icon {
     transform: translate(0, 0) scale(2.0);
+}
+#void-recipe .selection .item-list .item .icon img {
+    filter: saturate(1.2) drop-shadow(0px 0px 1px rgba(255, 255, 255, 0.1));
 }
 
 #void-recipe .selection .item-list .item.recent {
@@ -622,13 +663,13 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     z-index: 30;
     top: 5px;
     right: -10px;
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
     font-size: 14px;
     line-height: 24px;
     text-align: center;
     vertical-align: middle;
-    color: #a1a1a1;
+    color: #dedede;
     cursor: pointer;
     transform: scale(1.0);
     transition: transform 0.2s, color 0.2s;
@@ -649,6 +690,7 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
 /* -- CREATION || TARGET LIST & MISSION DETAILS -- */
 
 #void-recipe .creation {
+    margin-top: 9px;
     height: 200px;
     padding-bottom: 60px;
     border: 1px solid #1a1a1a;
@@ -719,7 +761,10 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     z-index: 2;
 }
 #void-recipe .creation .battle-field .sprite.hazy-filter {
-    filter: sepia(1) saturate(4) brightness(0.4) hue-rotate(260deg);
+    filter: sepia(1) saturate(4) brightness(0.3) hue-rotate(222deg);
+}
+#void-recipe .creation .battle-field .sprite.memory-filter {
+    filter: saturate(3) brightness(0.3) blur(2px);
 }
 #void-recipe .creation .battle-field:after {
     content: "";
@@ -735,78 +780,353 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
 }
 
 #void-recipe .creation .mission-details {
-    height: auto;
-    min-height: 26px;
-    border-radius: 6px 6px 0 0;
-    border-bottom: 0;
+    position: absolute;
+    width: auto;
+    /* height: 140px;  */
+    height: 0;
+    min-height: 0;
+    max-height: 140px;
+    /* top: 58px; */
+    top: 16px;
+    left: 0;
+    right: 0;
+    border-radius: 0;
     z-index: 2;
+
+    /* background-color: magenta; */
 }
 #void-recipe .creation .mission-details:hover {
-    z-index: 9;
+    z-index: 99;
 }
-#void-recipe .creation .mission-details .powers-list {
+
+
+/* -- VOID POWERS -- */
+
+#void-recipe .creation .mission-details .void-powers {
     display: block;
     width: auto;
+    height: auto;
+    position: absolute;
 }
-#void-recipe .creation .mission-details .powers-list ul {
+#void-recipe .creation .mission-details .void-powers .power {
     display: block;
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-    margin: 0 auto;
-    padding: 3px;
-    font-size: 11px;
-    line-height: 13px;
-    color: #efefef;
-}
-#void-recipe .creation .mission-details .powers-list ul li {
-    display: block;
-    box-sizing: border-box;
-    float: left;
-    width: calc(100% / 5);
+    white-space: nowrap;
+    vertical-align: top;
     text-align: center;
-    padding: 2px 3px 3px;
-}
-#void-recipe .creation .mission-details .powers-list ul:after,
-#void-recipe .creation .mission-details .powers-list ul li:after {
-    content: "";
-    display: block;
+    height: auto;
+    width: auto;
+    padding: 0;
+    margin: 0;
+    float: none;
     clear: both;
+    border: 0 none transparent;
+    background-color: transparent;
+    font-size: inherit;
+    line-height: 1;
+    color: #ffffff;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
-#void-recipe .creation .mission-details .powers-list ul li:nth-child(odd) {
-    background-color: rgba(255, 255, 255, 0.02);
-}
-#void-recipe .creation .mission-details .powers-list ul li .token,
-#void-recipe .creation .mission-details .powers-list ul li .value {
+#void-recipe .creation .mission-details .stat-powers .power > div  {
     display: inline-block;
-    margin: 0 4px;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0 auto;
 }
-#void-recipe .creation .mission-details .powers-list ul li .token {
-    text-decoration: underline;
+
+/* -- VOID POWERS // BASE POWERS (QUANTA + SPREAD) -- */
+
+#void-recipe .creation .mission-details .base-powers {
+    z-index: 10;
+    top: 6px;
+    left: 6px;
 }
-#void-recipe .creation .mission-details .powers-list ul li .value {
+#void-recipe .creation .mission-details .base-powers .power,
+#void-recipe .creation .mission-details .base-powers .power .name,
+#void-recipe .creation .mission-details .base-powers .power .code,
+#void-recipe .creation .mission-details .base-powers .power .value,
+#void-recipe .creation .mission-details .base-powers .power .icon,
+#void-recipe .creation .mission-details .base-powers .power .arrows {
+    display: block;
+    box-sizing: border-box;
+    vertical-align: middle;
+    margin: 0 auto;
+    padding: 0;
+}
+#void-recipe .creation .mission-details .base-powers .power {
+    float: left;
+    clear: none;
+    margin-left: 3px;
+    padding: 1px 6px 3px;
+    border: 1px solid #696969;
+    background-color: #2d2c3a;
+    border-radius: 3px;
+    font-size: 14px;
+    text-align: right;
+}
+#void-recipe .creation .mission-details .base-powers .power:first-child {
+    margin-top: 0;
+    margin-left: 0;
+}
+#void-recipe .creation .mission-details .base-powers .power:last-child {
+    margin-right: 0;
+    margin-bottom: 0;
+}
+#void-recipe .creation .mission-details .base-powers .power .name,
+#void-recipe .creation .mission-details .base-powers .power .code,
+#void-recipe .creation .mission-details .base-powers .power .value,
+#void-recipe .creation .mission-details .base-powers .power .icon,
+#void-recipe .creation .mission-details .base-powers .power .arrows {
+    display: inline-block;
+    margin: 0 0 0 auto;
+    vertical-align: middle;
+}
+#void-recipe .creation .mission-details .base-powers .power .name {
+    display: none;
+}
+#void-recipe .creation .mission-details .base-powers .power .icon {
+    height: auto;
+    width: auto;
+    margin: 0;
+    margin-right: 6px;
+    padding-right: 6px;
+    border: 0 none transparent;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    color: #ffffff;
+    font-size: 12px;
+    border-radius: 5px;
+    text-align: center;
+}
+#void-recipe .creation .mission-details .base-powers .power .value {
+    font-size: inherit;
     font-weight: bold;
 }
-#void-recipe .creation .mission-details .powers-list ul li .value .overflow {
-    display: inline-block;
-    margin-left: 4px;
-    opacity: 0.4;
+
+/* -- VOID POWERS // RANK POWERS (LEVEL + FORTE) -- */
+
+#void-recipe .creation .mission-details .rank-powers {
+    z-index: 10;
+    top: 6px;
+    right: 6px;
+}
+#void-recipe .creation .mission-details .rank-powers .power {
+    float: left;
+    clear: none;
+    margin-left: 3px;
+    padding: 1px 6px 3px;
+    border: 1px solid #696969;
+    background-color: #2d2c3a;
+    border-radius: 3px;
+    font-size: 14px;
+    text-align: right;
+}
+#void-recipe .creation .mission-details .rank-powers .power:first-child {
+    margin-left: 0;
+}
+#void-recipe .creation .mission-details .rank-powers .power .name,
+#void-recipe .creation .mission-details .rank-powers .power .value {
+    margin: 0 0 0 auto;
+}
+#void-recipe .creation .mission-details .rank-powers .power .name {
+    margin-right: 6px;
+    padding-right: 6px;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 0 6px 0 0;
+    font-size: 80%;
     font-weight: normal;
 }
-#void-recipe .creation .mission-details .powers-list ul li .token.type {
-    text-decoration: none;
-    padding: 0 3px;
+#void-recipe .creation .mission-details .rank-powers .power .value {
+    font-size: inherit;
+    font-weight: bold;
+}
+
+/* -- VOID POWERS // SORT POWERS -- */
+
+#void-recipe .creation .mission-details .sort-powers {
+    z-index: 10;
+    left: 6px;
+    max-width: 200px;
+    padding-left: 34px;
+}
+#void-recipe .creation .mission-details .sort-powers .label {
+    display: block;
+    position: absolute;
+    float: none;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 3px;
+    color: #ffffff;
+    min-width: 1em;
+    min-height: 1em;
+    font-size: 12px;
+    line-height: 12px;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px solid #696969;
+    background-color: #2d2c3a;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4);
+    /* box-shadow: 0 0 2px rgba(255, 255, 255, 0.3);  */
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+#void-recipe .creation .mission-details .sort-powers .label .icon {
+    display: inline-block;
+    height: auto;
+    width: auto;
+    margin: 0;
+    border: 0 none transparent;
+    background-color: transparent;
+}
+#void-recipe .creation .mission-details .sort-powers .label .icon + .icon {
+    margin-left: 3px;
+}
+#void-recipe .creation .mission-details .sort-powers .power {
+    float: left;
+    clear: none;
+    margin: 0 2px 2px 0;
+    padding: 2px 4px;
+    height: auto;
+    width: auto;
+    min-width: 1em;
+    min-height: 1em;
+    border-radius: 50%;
+    border: 1px solid #696969;
+    background-color: #2d2c3a;
+    color: #ffffff;
+    font-size: 9px;
+    line-height: 14px;
+    border-radius: 6px;
+    text-align: center;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+#void-recipe .creation .mission-details .sort-powers .power:nth-child(5n) + .power {
+    clear: left;
+}
+#void-recipe .creation .mission-details .sort-powers .stat:last-child {
+    margin-right: 0;
+}
+#void-recipe .creation .mission-details .sort-powers .power .name {
+    display: none;
+}
+#void-recipe .creation .mission-details .sort-powers .power .icon {
+    display: inline-block;
+    box-sizing: border-box;
+    height: auto;
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
+#void-recipe .creation .mission-details .sort-powers .power .value {
+    display: inline-block;
+    box-sizing: border-box;
+    height: auto;
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+#void-recipe .creation .mission-details .stat-sort-powers {
+    top: 36px;
+}
+#void-recipe .creation .mission-details .type-sort-powers {
+    top: 60px;
+}
+
+
+/* -- VOID POWERS // STAT POWERS -- */
+
+#void-recipe .creation .mission-details .stat-powers {
+    z-index: 10;
+    top: 34px;
+    right: 6px;
+}
+#void-recipe .creation .mission-details .stat-powers .power {
+    float: right;
+    margin: 0 auto 3px;
+    padding: 1px 6px;
+    border: 1px solid #696969;
+    background-color: #2d2c3a;
     border-radius: 3px;
+    font-size: 9px;
+    line-height: 13px;
+    text-align: right;
+}
+#void-recipe .creation .mission-details .stat-powers .power:last-child {
+    margin-bottom: 0;
+}
+#void-recipe .creation .mission-details .stat-powers .power .name,
+#void-recipe .creation .mission-details .stat-powers .power .code,
+#void-recipe .creation .mission-details .stat-powers .power .value,
+#void-recipe .creation .mission-details .stat-powers .power .arrow {
+    display: inline-block;
+    margin: 0 0 0 auto;
+    vertical-align: middle;
+}
+#void-recipe .creation .mission-details .stat-powers .power .name,
+#void-recipe .creation .mission-details .stat-powers .power .code {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: inherit;
+}
+#void-recipe .creation .mission-details .stat-powers .power .name {
+    display: none;
+}
+#void-recipe .creation .mission-details .stat-powers .power .code,
+#void-recipe .creation .mission-details .stat-powers .power .value {
+    padding-left: 6px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 0 0 0 6px;
+}
+#void-recipe .creation .mission-details .stat-powers .power .code:first-child,
+#void-recipe .creation .mission-details .stat-powers .power .value:first-child {
+    padding-left: 0;
+    border-left: 0 none transparent;
+    margin-left: 0;
+}
+#void-recipe .creation .mission-details .stat-powers .power .code {
+
+}
+#void-recipe .creation .mission-details .stat-powers .power .value {
+    max-width: 40px;
+    transition: max-width 0.2s, opacity 0.2s, padding 0.2s, margin 0.2s;
+}
+#void-recipe .creation .mission-details .stat-powers .power.has-arrows:not(:hover) .value {
+    max-width: 0;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
+}
+#void-recipe .creation .mission-details .stat-powers .power .arrow {
+    position: relative;
+    margin-left: 2px;
+}
+#void-recipe .creation .mission-details .stat-powers .power .arrow:before {
+    content: "";
+    width: 1em;
+    height: 1em;
+    display: block;
+}
+#void-recipe .creation .mission-details .stat-powers .power .arrow > i {
+    position: absolute;
+    bottom: -4px;
+    right: 0;
+    font-size: 18px;
+    line-height: 1;
 }
 
 #void-recipe .creation .target-list {
-    top: 65px;
+    bottom: 44px;
+    left: 50px;
+    right: 50px;
     height: 80px;
     border-radius: 0 0 6px 6px;
     border-top: 0;
     text-align: center;
     vertical-align: middle;
     z-index: 3;
+}
+#void-recipe .creation .target-list:hover {
+    z-index: 99;
 }
 #void-recipe .creation .target-list .target {
     display: inline-block;
@@ -818,7 +1138,7 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     padding: 0;
     width: 60px;
     height: 60px;
-    width: calc((100% / 9) - 12px);
+    width: calc((100% / 8) - 12px);
     height: calc(100% - 12px);
     border-radius: 3px;
     text-align: center;
@@ -850,7 +1170,7 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
     height: 50px;
     border: 1px solid transparent;
     border-radius: 50%;
-    filter: opacity(1.0) brightness(0.7) saturate(0.8);
+    filter: opacity(1.0) brightness(0.8) saturate(1.6);
     pointer-events: none;
 }
 #void-recipe .creation .target-list .target > .type.empty {
@@ -938,24 +1258,19 @@ make a semi-transparent gradient over the void recipe panel, black on bottom whi
 /* -- PANEL & GROUP COLORS -- */
 
 #void-recipe {
-    background-color: #3e2749;
+    /* background-color: #443c67;  */
+    background-color: #443c67;
 }
 #void-recipe .creation {
-    border-top-color: #1b1825;
-    border-left-color: #1b1825;
-    border-right-color: #413b54;
-    border-bottom-color: #413b54;
-}
-#void-recipe .creation .mission-details {
-    background-color: #2d2c3a;
-    background-color: rgb(45, 44, 58, 0.9);
+    background-color: inherit;
+    border-top-color: rgba(0, 0, 0, 0.5);
+    border-left-color: rgba(0, 0, 0, 0.5);
+    border-right-color: rgba(255, 255, 255, 0.01);
+    border-bottom-color: rgba(255, 255, 255, 0.01);
 }
 #void-recipe .creation .battle-field:after {
     background-color: #292834;
     background-color: rgb(41, 40, 52, 0.8);
-}
-#void-recipe .selection .item-list {
-    /* background-color: #25232e;  */
 }
 #void-recipe .palette .item-list {
     background-color: transparent;

@@ -931,10 +931,12 @@
                         targetRobot.quanta = targetQuanta;
                         targetRobot.level = 1;
                         targetRobot.type = '';
-                        if (targetTier.length){
+                        if (distributedTypeSlots.length){
                             // decide which element this target will be
                             targetRobot.type = distributedTypeSlots.shift() || '';
                             distributedTypeSlots.push(targetRobot.type);
+                            }
+                        if (targetTier.length){
                             // decide which tier this target will be
                             var queueOrder = [];
                             if (targetTier === 'boss'){ queueOrder.push('boss', 'master', 'mecha'); }
@@ -1158,54 +1160,130 @@
                     console.log('voidPowersKeys:', voidPowersKeys);
                     $missionDetails.html('');
                     if (voidPowersKeys.length){
-                        var powersListMarkup = '';
-                        powersListMarkup += '<div class="powers-list">';
-                            powersListMarkup += '<ul class="wrapper">';
-                            for (var i = 0; i < voidPowersKeys.length; i++){
-                                var powerToken = voidPowersKeys[i];
-                                var powerValue = voidPowers[powerToken];
-                                if (powerToken === ''){ continue; }
-                                // format the power value differently per kind
-                                var powerValueText = '';
-                                if (powerToken === 'delta'){
-                                    // unsigned, fine as-is
-                                    powerValueText = '' + powerValue;
-                                    }
-                                else if (powerToken === 'quanta'){
-                                    // quantity so use the times symbol
-                                    powerValueText = '&times;' + powerValue;
-                                    }
-                                else if (powerToken === 'spread'){
-                                    // unsigned, but must stay within limit, so truncate
-                                    // also make sure overflow is visible for the tooltip
-                                    var scopedValue = roundedValue = Math.trunc(powerValue), overflow = 0;
-                                    if (scopedValue > _self.maxTargets){ scopedValue = _self.maxTargets; }
-                                    if (roundedValue > scopedValue){ overflow = roundedValue - scopedValue; }
-                                    powerValueText = '&times;' + scopedValue + (overflow ? ' <span class="overflow">(&plus;' + overflow + ')</span>' : '');
-                                    }
-                                else if (powerToken === 'level'){
-                                    // unsigned, fine as-is
-                                    powerValueText = '' + powerValue;
-                                    }
-                                else {
-                                    // signed, so display the correct one
-                                    var roundedValue = Math.round(powerValue);
-                                    powerValueText = (roundedValue > 0 ? '&plus;' : (roundedValue < 0 ? '&minus;' : '')) + Math.abs(roundedValue);
-                                    }
-                                // add the power to the list
-                                var spanClass = 'token';
-                                if (mmrpgStats.indexOf(powerToken) !== -1){ spanClass += ' type ' + powerToken; }
-                                if (mmrpgTypes.indexOf(powerToken) !== -1){ spanClass += ' type ' + powerToken; }
-                                powersListMarkup += '<li class="power">';
-                                    powersListMarkup += '<span class="'+spanClass+'">'+powerToken+'</span> ';
-                                    powersListMarkup += '<span class="value">'+powerValueText+'</span>';
-                                powersListMarkup += '</li>';
+
+                        // TEMP TEMP TEMP: HARD CODED BASE POWERS!!!
+                        // Check the base powers (quanta and spread) to display the appropriate markup
+                        var basePowersMarkup = '';
+                        var basePowersValues = {quanta: 123, spread: 3};
+                        var basePowersTokens = Object.keys(basePowersValues);
+                        basePowersMarkup += '<div class="void-powers base-powers">';
+                            for (var i = 0; i < basePowersTokens.length; i++){
+                                var powerToken = basePowersTokens[i];
+                                var powerName = powerToken === 'quanta' ? 'Quanta' : 'Spread';
+                                var powerIcon = powerToken === 'quanta' ? 'atom' : 'cubes';
+                                var powerValue = basePowersValues[powerToken];
+                                var powerClass = 'power base type ' + (powerToken === 'quanta' ? 'water' : 'laser');
+                                var powerIconClass = 'icon';
+                                // TEMP TEMP TEMP MAX-VAL TESTING TEMP TEMP TEMP //
+                                powerValue = powerToken === 'quanta' ? 9999 : 8;
+                                // TEMP TEMP TEMP MAX-VAL TESTING TEMP TEMP TEMP //
+                                basePowersMarkup += '<div class="'+powerClass+'">';
+                                    basePowersMarkup += '<span class="'+powerIconClass+'"><i class="fa fas fa-'+powerIcon+'"></i></span>';
+                                    basePowersMarkup += '<span class="name">'+powerName+'</span>';
+                                    basePowersMarkup += '<span class="value">'+powerValue+'</span>';
+                                basePowersMarkup += '</div>';
                                 }
-                            powersListMarkup += '</ul>';
-                        powersListMarkup += '</div>';
-                        $missionDetails.append(powersListMarkup);
+                        basePowersMarkup += '</div>';
+                        $missionDetails.append(basePowersMarkup);
+
+                        // TEMP TEMP TEMP: HARD CODED STAT-SORT POWERS!!!
+                        // Check the stat-sort powers to display appropriate markup
+                        var sortPowersGrouped = {};
+                        sortPowersGrouped.stat = {energy: 47, weapons: -4, attack: 3, defense: -25, speed: 2};
+                        //sortPowersGrouped.type = {flame: 3, water: 1, electric: 28};
+                        sortPowersGrouped.type = {flame: 3, water: 1, electric: 28, cutter: 7, crystal: 38, time: -34, nature: 2};
+                        var sortPowersGroupedTokens = Object.keys(sortPowersGrouped);
+                        for (var i = 0; i < sortPowersGroupedTokens.length; i++){
+                            var groupToken = sortPowersGroupedTokens[i];
+                            var groupPowerIcon = 'circle';
+                            if (groupToken === 'stat'){ groupPowerIcon = 'bullseye'; }
+                            else if (groupToken === 'type'){ groupPowerIcon = 'fire-alt'; }
+                            else { groupPowerIcon = 'asterisk'; }
+                            var sortPowersMarkup = '';
+                            var sortPowersValues = sortPowersGrouped[groupToken];
+                            var sortPowersTokens = Object.keys(sortPowersValues);
+                            sortPowersMarkup += '<div class="void-powers sort-powers '+groupToken+'-sort-powers">';
+                                for (var j = 0; j < sortPowersTokens.length; j++){
+                                    var powerToken = sortPowersTokens[j];
+                                    var powerName = powerToken.charAt(0).toUpperCase() + powerToken.slice(1);
+                                    var powerValue = sortPowersValues[powerToken];
+                                    var powerClass = 'power sort type ' + powerToken;
+                                    var powerValueClass = 'value';
+                                    // TEMP TEMP TEMP MAX-VAL TESTING TEMP TEMP TEMP //
+                                    powerValue = 999;
+                                    // TEMP TEMP TEMP MAX-VAL TESTING TEMP TEMP TEMP //
+                                    var powerValueText = (powerValue !== 0 ? (powerValue > 0 ? '+' : '-') : '') + Math.abs(powerValue);
+                                    sortPowersMarkup += '<div class="'+powerClass+'">';
+                                        //sortPowersMarkup += '<span class="icon"><i>&nbsp;</i></span>';
+                                        sortPowersMarkup += '<span class="value">'+powerValueText+'</span>';
+                                    sortPowersMarkup += '</div>';
+                                }
+                                sortPowersMarkup += '<div class="label type space_empty">';
+                                    sortPowersMarkup += '<span class="icon"><i class="fa fas fa-'+groupPowerIcon+'"></i></span>';
+                                    sortPowersMarkup += '<span class="icon"><i class="fa fas fa-sort"></i></span>';
+                                sortPowersMarkup += '</div>';
+                            sortPowersMarkup += '</div>';
+                            $missionDetails.append(sortPowersMarkup);
+                            }
+
+
+                        // TEMP TEMP TEMP: HARD CODED RANK POWERS!!!
+                        // Check the rank powers (level and forte) to display appropriate markup
+                        var rankPowersMarkup = '';
+                        var rankPowersValues = {level: 45, forte: 89}; // level out of 999, forte out of 100%
+                        var rankPowersTokens = Object.keys(rankPowersValues);
+                        rankPowersMarkup += '<div class="void-powers rank-powers">';
+                            for (var i = 0; i < rankPowersTokens.length; i++){
+                                var powerToken = rankPowersTokens[i];
+                                var powerName = powerToken === 'level' ? 'Level' : 'Forte';
+                                var powerValue = rankPowersValues[powerToken];
+                                var powerClass = 'power rank type ' + (powerToken === 'level' ? 'level' : 'experience');
+                                rankPowersMarkup += '<div class="'+powerClass+'">';
+                                    rankPowersMarkup += '<span class="name">'+powerName+'</span>';
+                                    rankPowersMarkup += '<span class="value">'+powerValue+'</span>';
+                                rankPowersMarkup += '</div>';
+                                }
+                        rankPowersMarkup += '</div>';
+                        $missionDetails.append(rankPowersMarkup);
+
+                        // TEMP TEMP TEMP: HARD CODED STAT POWERS!!!
+                        // Check for relative stat levels and display appropriate markup
+                        var statPowersMarkup = '';
+                        var statPowersValues = {};
+                        statPowersValues.attack = {value: 567, boosts: 5, breaks: 0};
+                        statPowersValues.speed = {value: 325, boosts: 3, breaks: 0};
+                        statPowersValues.defense = {value: -125, boosts: 0, breaks: 1};
+                        var statPowersTokens = Object.keys(statPowersValues);
+                        statPowersMarkup += '<div class="void-powers stat-powers">';
+                            for (var i = 0; i < statPowersTokens.length; i++){
+                                var statToken = statPowersTokens[i];
+                                var statCode = statToken.substring(0, 2).toUpperCase();
+                                if (statToken === 'attack'){ statCode = 'AT'; }
+                                if (statToken === 'defense'){ statCode = 'DF'; }
+                                if (statToken === 'speed'){ statCode = 'SP'; }
+                                var statValues = statPowersValues[statToken] || false;
+                                if (statValues === false){ continue; }
+                                var statValue = statValues.value;
+                                var statBoosts = statValues.boosts;
+                                var statBreaks = statValues.breaks;
+                                var statHasArrows = statBoosts > 0 || statBreaks > 0 ? true : false;
+                                var statClass = 'power stat type ' + statToken + (statHasArrows ? ' has-arrows' : '');
+                                statPowersMarkup += '<div class="'+statClass+'">';
+                                    //statPowersMarkup += '<span class="name">'+statToken+'</span>';
+                                    if (statBoosts){ for (var j = 0; j < statBoosts; j++){ statPowersMarkup += '<span class="arrow boost"><i class="fas fa-caret-up"></i></span>'; } }
+                                    if (statBreaks){ for (var j = 0; j < statBreaks; j++){ statPowersMarkup += '<span class="arrow break"><i class="fas fa-caret-down"></i></span>'; } }
+                                    statPowersMarkup += '<span class="value">'+statValue+'</span>';
+                                    statPowersMarkup += '<span class="code">'+statCode+'</span>';
+                                statPowersMarkup += '</div>';
+                            }
+                        statPowersMarkup += '</div>';
+                        $missionDetails.append(statPowersMarkup);
+
                         } else {
+
+                        // Put the loading div back into the frame as nothing has been added
                         $missionDetails.append('<span class="loading">&hellip;</span>');
+
                         }
 
                     // Update the list of target robots in the panel if any have been generated
@@ -1213,7 +1291,7 @@
                     var missionTargets = missionInfo.targets || [];
                     $targetList.html('');
                     if (missionTargets.length){
-                        //console.log('updating mission target list!', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
+                        console.log('updating mission target list!', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
                         const mmrpgIndexRobots = mmrpgIndex.robots;
                         const frameTokenByKey = {0: 'base', 1: 'defense', 2: 'base2', 3: 'defend', 4: 'base', 5: 'defend', 6: 'base2', 7: 'defend'};
                         for (var i = 0; i < missionTargets.length; i++){
@@ -1221,6 +1299,7 @@
                             var targetRobot = missionTargets[i];
                             //console.log('-> targetRobot:', targetRobot);
                             var targetRobotToken = targetRobot.token;
+                            var targetRobotSlotType = targetRobot.type || 'empty';
                             var targetRobotInfo = mmrpgIndexRobots[targetRobotToken] || false;
                             if (!targetRobotInfo){ continue; }
                             var targetRobotClass = targetRobot.class;
@@ -1246,7 +1325,7 @@
                                 targetRobotMarkup += '<div class="label">';
                                     targetRobotMarkup += '<span class="name">'+targetRobotName+'</span>';
                                 targetRobotMarkup += '</div>';
-                                targetRobotMarkup += '<i class="type '+targetRobotTypes+'"></i>';
+                                targetRobotMarkup += '<i class="type '+targetRobotSlotType+'"></i>';
                             targetRobotMarkup += '</div>';
                             $targetList.append(targetRobotMarkup);
                             }
