@@ -802,13 +802,13 @@
 
 /* -- VOID POWERS -- */
 
-#void-recipe .creation .mission-details .void-powers {
+#void-recipe .mission-details .void-powers {
     display: block;
     width: auto;
     height: auto;
     position: absolute;
 }
-#void-recipe .creation .mission-details .void-powers .power {
+#void-recipe .mission-details .void-powers .power {
     display: block;
     white-space: nowrap;
     vertical-align: top;
@@ -827,11 +827,115 @@
     text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4);
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
-#void-recipe .creation .mission-details .stat-powers .power > div  {
+#void-recipe .mission-details .void-powers .power.type {
+    padding: 1px 6px 3px;
+    border: 1px solid #696969;
+    background-color: #2d2c3a;
+    border-radius: 3px;
+    font-size: 14px;
+    cursor: pointer;
+}
+#void-recipe .mission-details .void-powers .power:first-child {
+    margin-top: 0;
+    margin-left: 0;
+}
+#void-recipe .mission-details .void-powers .power:last-child {
+    margin-right: 0;
+    margin-bottom: 0;
+}
+#void-recipe .mission-details .void-powers.ltr .power,
+#void-recipe .mission-details .void-powers.rtl .power {
+    float: left;
+    clear: none;
+}
+#void-recipe .mission-details .void-powers.ltr .power {
+    margin-right: 3px;
+}
+#void-recipe .mission-details .void-powers.rtl .power {
+    margin-left: 3px;
+}
+#void-recipe .mission-details .void-powers .power > span  {
     display: inline-block;
     vertical-align: middle;
     text-align: center;
     margin: 0 auto;
+}
+#void-recipe .mission-details .void-powers .power,
+#void-recipe .mission-details .void-powers .power > span {
+    display: block;
+    box-sizing: border-box;
+    vertical-align: middle;
+    margin: 0 auto;
+    padding: 0;
+}
+#void-recipe .mission-details .void-powers .power > span {
+    display: inline-block;
+    margin: 0 0 0 auto;
+    vertical-align: middle;
+}
+#void-recipe .mission-details .void-powers .power > span {
+    height: auto;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    border: 0 none transparent;
+    color: #ffffff;
+    font-size: 12px;
+    border-radius: 0;
+    text-align: center;
+}
+#void-recipe .mission-details .void-powers.ltr .power > span {
+    margin-right: 6px;
+    padding-right: 6px;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+#void-recipe .mission-details .void-powers.rtl .power > span {
+    margin-left: 6px;
+    padding-left: 6px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+#void-recipe .mission-details .void-powers .power > span > strong {
+    font-weight: bold;
+}
+#void-recipe .mission-details .void-powers .power > span > code {
+    font-size: 10px;
+    font-weight: bold;
+    position: relative;
+    top: -1px;
+}
+#void-recipe .mission-details .void-powers.ltr .power > span:last-child,
+#void-recipe .mission-details .void-powers.rtl .power > span:first-child {
+    margin: 0;
+    padding: 0;
+    border: 0 none transparent;
+}
+#void-recipe .mission-details .void-powers .power > span.blur {
+    opacity: 1;
+    max-width: 100px;
+    overflow: visible;
+    text-overflow: ellipsis;
+    transition: max-width 0.6s, opacity 0.6s, margin 0.6s, padding 0.6s, border 0.6s;
+}
+#void-recipe .mission-details .void-powers .power > span.blur:before,
+#void-recipe .mission-details .void-powers .power > span.blur:after {
+    content: " ";
+    display: inline-block;
+    width: 2px;
+    margin: 0;
+}
+#void-recipe .mission-details .void-powers .power > span.blur > strong {
+    font-size: 10px;
+    font-weight: normal;
+    position: relative;
+    top: -1px;
+}
+#void-recipe .mission-details .void-powers .power:not(:hover) > span.blur {
+    opacity: 0;
+    max-width: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    border: 0 none transparent;
 }
 
 /* -- VOID POWERS // BASE POWERS (QUANTA + SPREAD) -- */
@@ -841,65 +945,8 @@
     top: 6px;
     left: 6px;
 }
-#void-recipe .creation .mission-details .base-powers .power,
-#void-recipe .creation .mission-details .base-powers .power .name,
-#void-recipe .creation .mission-details .base-powers .power .code,
-#void-recipe .creation .mission-details .base-powers .power .value,
-#void-recipe .creation .mission-details .base-powers .power .icon,
-#void-recipe .creation .mission-details .base-powers .power .arrows {
-    display: block;
-    box-sizing: border-box;
-    vertical-align: middle;
-    margin: 0 auto;
-    padding: 0;
-}
 #void-recipe .creation .mission-details .base-powers .power {
-    float: left;
-    clear: none;
-    margin-left: 3px;
-    padding: 1px 6px 3px;
-    border: 1px solid #696969;
-    background-color: #2d2c3a;
-    border-radius: 3px;
     font-size: 14px;
-    text-align: right;
-}
-#void-recipe .creation .mission-details .base-powers .power:first-child {
-    margin-top: 0;
-    margin-left: 0;
-}
-#void-recipe .creation .mission-details .base-powers .power:last-child {
-    margin-right: 0;
-    margin-bottom: 0;
-}
-#void-recipe .creation .mission-details .base-powers .power .name,
-#void-recipe .creation .mission-details .base-powers .power .code,
-#void-recipe .creation .mission-details .base-powers .power .value,
-#void-recipe .creation .mission-details .base-powers .power .icon,
-#void-recipe .creation .mission-details .base-powers .power .arrows {
-    display: inline-block;
-    margin: 0 0 0 auto;
-    vertical-align: middle;
-}
-#void-recipe .creation .mission-details .base-powers .power .name {
-    display: none;
-}
-#void-recipe .creation .mission-details .base-powers .power .icon {
-    height: auto;
-    width: auto;
-    margin: 0;
-    margin-right: 6px;
-    padding-right: 6px;
-    border: 0 none transparent;
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
-    color: #ffffff;
-    font-size: 12px;
-    border-radius: 5px;
-    text-align: center;
-}
-#void-recipe .creation .mission-details .base-powers .power .value {
-    font-size: inherit;
-    font-weight: bold;
 }
 
 /* -- VOID POWERS // RANK POWERS (LEVEL + FORTE) -- */
@@ -910,34 +957,7 @@
     right: 6px;
 }
 #void-recipe .creation .mission-details .rank-powers .power {
-    float: left;
-    clear: none;
-    margin-left: 3px;
-    padding: 1px 6px 3px;
-    border: 1px solid #696969;
-    background-color: #2d2c3a;
-    border-radius: 3px;
     font-size: 14px;
-    text-align: right;
-}
-#void-recipe .creation .mission-details .rank-powers .power:first-child {
-    margin-left: 0;
-}
-#void-recipe .creation .mission-details .rank-powers .power .name,
-#void-recipe .creation .mission-details .rank-powers .power .value {
-    margin: 0 0 0 auto;
-}
-#void-recipe .creation .mission-details .rank-powers .power .name {
-    margin-right: 6px;
-    padding-right: 6px;
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
-    margin: 0 6px 0 0;
-    font-size: 80%;
-    font-weight: normal;
-}
-#void-recipe .creation .mission-details .rank-powers .power .value {
-    font-size: inherit;
-    font-weight: bold;
 }
 
 /* -- VOID POWERS // SORT POWERS -- */
@@ -945,7 +965,7 @@
 #void-recipe .creation .mission-details .sort-powers {
     z-index: 10;
     left: 6px;
-    max-width: 200px;
+    /* max-width: 200px;  */
     padding-left: 34px;
 }
 #void-recipe .creation .mission-details .sort-powers .label {
@@ -966,7 +986,6 @@
     border: 1px solid #696969;
     background-color: #2d2c3a;
     text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4);
-    /* box-shadow: 0 0 2px rgba(255, 255, 255, 0.3);  */
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
 #void-recipe .creation .mission-details .sort-powers .label .icon {
@@ -981,49 +1000,36 @@
     margin-left: 3px;
 }
 #void-recipe .creation .mission-details .sort-powers .power {
-    float: left;
-    clear: none;
-    margin: 0 2px 2px 0;
-    padding: 2px 4px;
-    height: auto;
-    width: auto;
-    min-width: 1em;
-    min-height: 1em;
-    border-radius: 50%;
-    border: 1px solid #696969;
-    background-color: #2d2c3a;
-    color: #ffffff;
+    font-size: 13px;
+    padding: 2px 3px 5px;
+    margin-bottom: 3px;
+    border-width: 0;
+}
+#void-recipe .creation .mission-details .sort-powers .power > span {
     font-size: 9px;
-    line-height: 14px;
-    border-radius: 6px;
-    text-align: center;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
 #void-recipe .creation .mission-details .sort-powers .power:nth-child(5n) + .power {
     clear: left;
 }
-#void-recipe .creation .mission-details .sort-powers .stat:last-child {
-    margin-right: 0;
+#void-recipe .creation .mission-details .sort-powers .power > span.blur > strong {
+    font-size: inherit;
+    top: auto;
 }
-#void-recipe .creation .mission-details .sort-powers .power .name {
-    display: none;
-}
-#void-recipe .creation .mission-details .sort-powers .power .icon {
-    display: inline-block;
-    box-sizing: border-box;
-    height: auto;
-    width: auto;
-    margin: 0;
-    padding: 0;
-}
-#void-recipe .creation .mission-details .sort-powers .power .value {
-    display: inline-block;
-    box-sizing: border-box;
-    height: auto;
-    width: auto;
-    margin: 0;
-    padding: 0;
-}
+#void-recipe .creation .mission-details .sort-powers .power.ps0 { min-width: 10px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps1 { min-width: 11px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps2 { min-width: 12px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps3 { min-width: 13px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps4 { min-width: 14px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps5 { min-width: 15px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps6 { min-width: 16px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps7 { min-width: 17px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps8 { min-width: 18px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps9 { min-width: 19px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps10 { min-width: 20px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps11 { min-width: 21px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps12 { min-width: 22px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps13 { min-width: 23px; }
+#void-recipe .creation .mission-details .sort-powers .power.ps14 { min-width: 24px; }
 
 #void-recipe .creation .mission-details .stat-sort-powers {
     top: 36px;
@@ -1042,63 +1048,20 @@
 }
 #void-recipe .creation .mission-details .stat-powers .power {
     float: right;
-    margin: 0 auto 3px;
-    padding: 1px 6px;
-    border: 1px solid #696969;
-    background-color: #2d2c3a;
-    border-radius: 3px;
-    font-size: 9px;
-    line-height: 13px;
-    text-align: right;
+    clear: both;
+    margin-bottom: 3px;
 }
-#void-recipe .creation .mission-details .stat-powers .power:last-child {
-    margin-bottom: 0;
+#void-recipe .creation .mission-details .stat-powers .power .arrows {
+    margin: 0;
+    padding: 0;
+    border: 0 none transparent;
 }
-#void-recipe .creation .mission-details .stat-powers .power .name,
-#void-recipe .creation .mission-details .stat-powers .power .code,
-#void-recipe .creation .mission-details .stat-powers .power .value,
 #void-recipe .creation .mission-details .stat-powers .power .arrow {
     display: inline-block;
-    margin: 0 0 0 auto;
-    vertical-align: middle;
-}
-#void-recipe .creation .mission-details .stat-powers .power .name,
-#void-recipe .creation .mission-details .stat-powers .power .code {
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: inherit;
-}
-#void-recipe .creation .mission-details .stat-powers .power .name {
-    display: none;
-}
-#void-recipe .creation .mission-details .stat-powers .power .code,
-#void-recipe .creation .mission-details .stat-powers .power .value {
-    padding-left: 6px;
-    border-left: 1px solid rgba(0, 0, 0, 0.1);
-    margin: 0 0 0 6px;
-}
-#void-recipe .creation .mission-details .stat-powers .power .code:first-child,
-#void-recipe .creation .mission-details .stat-powers .power .value:first-child {
-    padding-left: 0;
-    border-left: 0 none transparent;
-    margin-left: 0;
-}
-#void-recipe .creation .mission-details .stat-powers .power .code {
-
-}
-#void-recipe .creation .mission-details .stat-powers .power .value {
-    max-width: 40px;
-    transition: max-width 0.2s, opacity 0.2s, padding 0.2s, margin 0.2s;
-}
-#void-recipe .creation .mission-details .stat-powers .power.has-arrows:not(:hover) .value {
-    max-width: 0;
-    opacity: 0;
-    padding: 0;
-    margin: 0;
-}
-#void-recipe .creation .mission-details .stat-powers .power .arrow {
     position: relative;
-    margin-left: 2px;
+    margin-left: 1px;
+    height: 1em;
+    width: auto;
 }
 #void-recipe .creation .mission-details .stat-powers .power .arrow:before {
     content: "";
@@ -1106,44 +1069,61 @@
     height: 1em;
     display: block;
 }
-#void-recipe .creation .mission-details .stat-powers .power .arrow > i {
+#void-recipe .creation .mission-details .stat-powers .power .arrow i {
     position: absolute;
     bottom: -4px;
     right: 0;
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1;
 }
 
+
+/* -- TARGET LIST -- */
+
 #void-recipe .creation .target-list {
     bottom: 44px;
-    left: 50px;
-    right: 50px;
-    height: 80px;
-    border-radius: 0 0 6px 6px;
+    width: auto;
+    left: 150px;
+    right: 150px;
+    height: 40px;
+    border-radius: 0;
     border-top: 0;
     text-align: center;
     vertical-align: middle;
     z-index: 3;
+    /* background-color: magenta; */
+}
+#void-recipe .creation .target-list > .wrapper {
+    display: block;
+    position: absolute;
+    height: 80px;
+    width: auto;
+    max-width: 580px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    /* background-color: cyan; */
 }
 #void-recipe .creation .target-list:hover {
     z-index: 99;
 }
 #void-recipe .creation .target-list .target {
     display: inline-block;
+    float: none;
     position: relative;
     box-sizing: border-box;
-    text-align: center;
-    vertical-align: middle;
     margin: 6px;
     padding: 0;
-    width: 60px;
-    height: 60px;
     width: calc((100% / 8) - 12px);
     height: calc(100% - 12px);
+    min-width: 60px;
+    min-height: 60px;
     border-radius: 3px;
     text-align: center;
+    vertical-align: middle;
     background-color: transparent;
-    cursor: pointer
+    cursor: pointer;
     filter: opacity(1.0) brightness(1.0);
     outline: 0 none transparent;
     transition: filter 0.1s;
