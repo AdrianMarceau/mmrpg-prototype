@@ -204,10 +204,23 @@
                         var $wrapper = $(this);
                         var $siblings = $wrapper.siblings('.wrapper[data-step]');
                         var stepNum = parseInt($wrapper.attr('data-step'));
-                        //var numSteps = $siblings.length + 1;
+                        var stepTotal = $siblings.length + $wrapper.length;
+                        var stepLayer = 1;
                         $itemsPalette.attr('data-step', stepNum);
-                        $siblings.removeClass('active');
-                        $wrapper.addClass('active');
+                        $siblings.removeClass('active').attr('data-layer', 0);
+                        $wrapper.addClass('active').attr('data-layer', stepLayer++);
+                        if (stepNum > 1){
+                            var prevNum = (stepNum - 1);
+                            for (var num = prevNum; num >= 1; num--){
+                                $siblings.filter('[data-step="'+num+'"]').attr('data-layer', stepLayer++);
+                                }
+                            }
+                        if (stepNum < stepTotal){
+                            var nextNum = (stepNum + 1);
+                            for (var num = nextNum; num <= stepTotal; num++){
+                                $siblings.filter('[data-step="'+num+'"]').attr('data-layer', stepLayer++);
+                                }
+                            }
                         });
 
                     // Check to see if there is already a recipe in the URL hash
@@ -1198,7 +1211,7 @@
                                 var powerValue = rankPowersValues[powerToken];
                                 var powerIsPercent = powerToken === 'forte' ? true : false;
                                 var powerNameBlurred = powerToken === 'level' ? false : true;
-                                var powerClass = 'power rank type ' + (powerToken === 'level' ? 'level' : 'experience');
+                                var powerClass = 'power rank type ' + (powerToken === 'level' ? 'electric' : 'shield');
                                 var powerIcon = powerToken === 'level' ? 'star' : 'fist-raised';
                                 rankPowersMarkup += '<div class="'+powerClass+'">';
                                     rankPowersMarkup += '<span class="icon"><i class="fa fas fa-'+powerIcon+'"></i></span>';

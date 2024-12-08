@@ -102,7 +102,7 @@ $mmrpg_index_items = $mmrpg_index_items_filtered;
 // Predefine the item groups to be used in the void cauldron item palette
 $void_item_groups_index = array(
 
-    // -- STEP ONE (MANIFEST [DATA]) -- //
+    // -- STEP (MANIFEST [DATA]) -- //
     array(
         'name' => 'Manifest',
         'label' => 'Data',
@@ -146,102 +146,54 @@ $void_item_groups_index = array(
                     'spreader-module', 'target-module',
                     )
                 ),
-            'view-mods' => array(
-                'name' => 'View Mods',
-                'color' => 'copy',
-                'rowline' => 3,
-                'colspan' => 1,
-                'items' => array(
-                    'hyperscan-module',
-                    ),
-                ),
             ),
         ),
 
-    // -- STEP TWO (REDIRECT [FORM]) -- //
-    array(
-        'name' => 'Redirect',
-        'label' => 'Form',
-        'groups' => array(
-            'specstat-upgrades' => array(
-                'name' => 'SpecStat Upgrades',
-                'color' => 'defense_energy',
-                'rowline' => 1,
-                'colspan' => 2,
-                'items' => array(
-                    'energy-upgrade',
-                    'weapon-upgrade',
-                    )
-                ),
-            'tristat-mods' => array(
-                'name' => 'TriStat Mods',
-                'color' => 'speed_attack',
-                'rowline' => 2,
-                'colspan' => 3,
-                'items' => array(
-                    'attack-booster', 'defense-booster', 'speed-booster',
-                    'attack-diverter', 'defense-diverter', 'speed-diverter',
-                    )
-                ),
-            'queue-rotators' => array(
-                'name' => 'Queue Rotators',
-                'color' => 'copy',
-                'rowline' => 3,
-                'colspan' => 3,
-                'items' => array(
-                    'mecha-whistle', 'extra-life', 'yashichi',
-                    ),
-                ),
-            'queue-rotators2' => array(
-                'name' => 'Queue Rotators 2',
-                'color' => 'copy',
-                'rowline' => 3,
-                'colspan' => 1,
-                'items' => array(
-                    'field-booster',
-                    )
-                ),
-            'queue-mods' => array(
-                'name' => 'Queue Mods',
-                'color' => 'copy',
-                'rowline' => 4,
-                'colspan' => 2,
-                'items' => array(
-                    'copycat-module', 'reverse-module',
-                    ),
-                ),
-            ),
-        ),
-
-    // -- STEP THREE (UPGRADE [POWER]) -- //
+    // -- STEP (UPGRADE [POWER]) -- //
     array(
         'name' => 'Upgrade',
         'label' => 'Power',
         'groups' => array(
-            'specstat-eats' => array(
-                'name' => 'SpecStat Edibles',
-                'color' => 'electric',
+            'level-boost' => array(
+                'name' => 'Level-Boost Edibles',
+                'color' => 'energy_electric',
                 'rowline' => 1,
                 'colspan' => 3,
                 'items' => array(
                     'energy-pellet', 'energy-capsule', 'energy-tank',
+                    )
+                ),
+            'max-level-boost' => array(
+                'name' => 'Max Level-Boost Redirects',
+                'color' => 'electric',
+                'rowline' => 1,
+                'colspan' => 1,
+                'items' => array(
+                    'energy-upgrade',
+                    )
+                ),
+            'forte-boost' => array(
+                'name' => 'Forte-Boost Edibles',
+                'color' => 'weapons_shield',
+                'rowline' => 2,
+                'colspan' => 3,
+                'items' => array(
                     'weapon-pellet', 'weapon-capsule', 'weapon-tank',
                     )
                 ),
-            'tristat-eats' => array(
-                'name' => 'TriStat Edibles',
+            'max-forte-boost' => array(
+                'name' => 'Max Level-Boost Redirects',
                 'color' => 'shield',
                 'rowline' => 2,
-                'colspan' => 4,
+                'colspan' => 1,
                 'items' => array(
-                    'attack-pellet', 'defense-pellet', 'speed-pellet', 'super-pellet',
-                    'attack-capsule', 'defense-capsule', 'speed-capsule', 'super-capsule',
+                    'weapon-upgrade',
                     )
                 ),
             'reward-mods' => array(
                 'name' => 'Reward Mods',
                 'color' => 'copy',
-                'rowline' => 3,
+                'rowline' => 5,
                 'colspan' => 3,
                 'items' => array(
                     'salvage-module', 'growth-module', 'fortune-module',
@@ -250,7 +202,104 @@ $void_item_groups_index = array(
             ),
         ),
 
-    // -- STEP FOUR (DISTORT [CONTEXT]) -- //
+    // -- STEP (BOOST [STATS]) -- //
+    array(
+        'name' => 'Boost',
+        'label' => 'Stats',
+        'groups' => array(
+            'attack-boost' => array(
+                'name' => 'Attack-Boost Edibles',
+                'color' => 'attack',
+                'rowline' => 1,
+                'colspan' => 3,
+                'items' => array(
+                    'attack-pellet', 'attack-capsule', 'attack-booster',
+                    )
+                ),
+            'defense-boost' => array(
+                'name' => 'Defense-Boost Edibles',
+                'color' => 'defense',
+                'rowline' => 2,
+                'colspan' => 3,
+                'items' => array(
+                    'defense-pellet',  'defense-capsule', 'defense-booster',
+                    )
+                ),
+            'speed-boost' => array(
+                'name' => 'Speed-Boost Edibles',
+                'color' => 'speed',
+                'rowline' => 3,
+                'colspan' => 3,
+                'items' => array(
+                    'speed-pellet', 'speed-capsule', 'speed-booster',
+                    )
+                ),
+            'super-boost' => array(
+                'name' => 'Omni-Boost Edibles',
+                'color' => 'shield',
+                'rowline' => 4,
+                'colspan' => 3,
+                'items' => array(
+                    'super-pellet', 'super-capsule', 'field-booster',
+                    )
+                ),
+            ),
+        ),
+
+    // -- STEP (REDIRECT [FORM]) -- //
+    array(
+        'name' => 'Redirect',
+        'label' => 'Form',
+        'groups' => array(
+            'attack-diverter' => array(
+                'name' => 'Attack Diverter',
+                'color' => 'defense_speed',
+                'rowline' => 1,
+                'colspan' => 1,
+                'items' => array(
+                    'attack-diverter',
+                    )
+                ),
+            'defense-diverter' => array(
+                'name' => 'Defense Diverter',
+                'color' => 'speed_attack',
+                'rowline' => 1,
+                'colspan' => 1,
+                'items' => array(
+                    'defense-diverter',
+                    )
+                ),
+            'speed-diverter' => array(
+                'name' => 'Speed Diverter',
+                'color' => 'attack_defense',
+                'rowline' => 1,
+                'colspan' => 1,
+                'items' => array(
+                    'speed-diverter',
+                    )
+                ),
+            'queue-rotators' => array(
+                'name' => 'Queue Rotators',
+                'color' => 'copy',
+                'rowline' => 2,
+                'colspan' => 3,
+                'items' => array(
+                    'mecha-whistle', 'extra-life', 'yashichi',
+                    ),
+                ),
+            'queue-mods' => array(
+                'name' => 'Queue Mods',
+                'color' => 'copy',
+                'rowline' => 3,
+                'colspan' => 3,
+                'items' => array(
+                    'hyperscan-module', 'copycat-module', 'reverse-module',
+                    ),
+                ),
+            ),
+        ),
+
+    // -- STEP (DISTORT [CONTEXT]) -- //
     array(
         'name' => 'Distort',
         'label' => 'Context',
@@ -343,6 +392,7 @@ $void_item_groups_index = array(
         $num_items_total = 0;
         $curr_item_rowline = 0;
         $group_markup_by_step = array();
+        $void_item_groups_count = count($void_item_groups_index);
         foreach ($void_item_groups_index AS $step_key => $step_info){
             $step_num = $step_key + 1;
             $step_name = $step_info['name'];
@@ -403,11 +453,19 @@ $void_item_groups_index = array(
             $step_num = $step_key + 1;
             $step_name = $step_info['name'];
             $step_label = $step_info['label'];
-            $wrapper_class = 'wrapper'.($step_num === 1 ? ' active' : '');
-            $wrapper_attrs = 'data-step="'.$step_num.'"';
+            $step_layer = $step_num; // changes dynamically
+            $step_side = 'middle';
+            if ($step_num < round($void_item_groups_count / 2)){ $step_side = 'left'; }
+            if ($step_num > round($void_item_groups_count / 2)){ $step_side = 'right'; }
+            $step_is_active = $step_num === 1 ? true : false;
+            $wrapper_attrs = '';
+            $wrapper_attrs .= 'data-step="'.$step_num.'"';
+            $wrapper_attrs .= 'data-side="'.$step_side.'"';
+            $wrapper_attrs .= 'data-layer="'.$step_layer.'"';
+            $wrapper_class = 'wrapper'.($step_is_active ? ' active' : '');
             echo('<div class="'.$wrapper_class.'" '.$wrapper_attrs.'>'.PHP_EOL);
                 echo('<div class="label">'.$step_name.' ('.$step_label.')</div>'.PHP_EOL);
-                echo(implode(PHP_EOL, $wrapped_group_markup).PHP_EOL);
+                echo('<div class="groups">'.implode(PHP_EOL, $wrapped_group_markup).'</div>'.PHP_EOL);
             echo('</div>'.PHP_EOL);
             $group_items_markup = ob_get_clean();
             if (!empty($group_items_markup)){
@@ -441,6 +499,12 @@ $void_item_groups_index = array(
                     style="background-image: url(/images/fields/gentle-countryside/battle-field_preview.png?20241104-0121);"
                     >&nbsp;</div>
             </div>
+            <div class="black-hole">
+                <div class="layer first"></div>
+                <div class="layer second"></div>
+                <div class="layer third"></div>
+                <div class="layer fourth"></div>
+            </div>
         </div>
         <div class="palette">
             <div class="item-list" data-count="<?= $items_palette_count ?>" data-select="*" data-step="1">
@@ -460,11 +524,9 @@ $void_item_groups_index = array(
     <div class="subbody">
         <div class="legend">
             <ul>
-                <li>SCREWS = BALANCED QUANTA/SPREAD</li>
-                <li>CORES = TYPE-FILTERING + HIGH-SPREAD/LOW-QUANTA</li>
-                <li>EDIBLES = STAT-SORTING + HIGH-QUANTA/LOW-SPREAD</li>
-                <li>CIRCUITS = TYPE-FILTERING || BOOSTERS = STAT-SORTING</li>
-                <li>MYTHICS = LEVEL/FORTE || MODULES = MISC EFFECTS</li>
+                <li>SCREWS = QUANTA</li>
+                <li>CORES = SPREAD (+TYPE)</li>
+                <li>OTHERS = ???</li>
             </ul>
         </div>
     </div>
