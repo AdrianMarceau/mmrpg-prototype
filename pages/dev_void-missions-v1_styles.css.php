@@ -611,7 +611,7 @@
     margin: 0 auto;
     position: absolute;
     /* top: 85px;  */
-    top: 224px;
+    top: 222px;
     left: 13px;
     right: 13px;
     width: auto;
@@ -620,6 +620,7 @@
     /* border-bottom: 1px solid #242033;  */
     border-top: 1px solid #242033;
     box-shadow: none;
+    border-radius: 0 0 9px 9px;
 
     /* background-color: lime; */
 }
@@ -642,7 +643,7 @@
     right: auto;
     bottom: auto;
     height: auto;
-    padding: 3px 6px;
+    padding: 4px 6px;
 
     /* background-color: magenta; */
 }
@@ -888,8 +889,6 @@
     display: inline-block;
     margin: 0 0 0 auto;
     vertical-align: middle;
-}
-#void-recipe .mission-details .void-powers .power > span {
     height: auto;
     width: auto;
     margin: 0;
@@ -899,6 +898,12 @@
     font-size: 12px;
     border-radius: 0;
     text-align: center;
+}
+#void-recipe .mission-details .void-powers .power > span > data + sub {
+    font-size: 10px;
+    margin-left: 4px;
+    color: rgba(255, 255, 255, 0.6);
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
 }
 #void-recipe .mission-details .void-powers.ltr .power > span {
     margin-right: 6px;

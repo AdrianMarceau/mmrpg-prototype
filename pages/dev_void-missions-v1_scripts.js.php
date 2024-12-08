@@ -1202,13 +1202,15 @@
                         // TEMP TEMP TEMP: HARD CODED RANK POWERS!!!
                         // Check the rank powers (level and forte) to display appropriate markup
                         var rankPowersMarkup = '';
-                        var rankPowersValues = {level: 45, forte: 89}; // level out of 999, forte out of 100%
+                        var rankPowersValues = {level: 123, forte: 45};
+                        var rankPowersValuesMax = {level: 999, forte: 99};
                         var rankPowersTokens = Object.keys(rankPowersValues);
                         rankPowersMarkup += '<div class="void-powers rtl bgo rank-powers">';
                             for (var i = 0; i < rankPowersTokens.length; i++){
                                 var powerToken = rankPowersTokens[i];
                                 var powerName = powerToken === 'level' ? 'Level' : 'Forte';
-                                var powerValue = rankPowersValues[powerToken];
+                                var powerValue = rankPowersValues[powerToken] || 0;
+                                var powerValueMax = rankPowersValuesMax[powerToken] || 0;
                                 var powerIsPercent = powerToken === 'forte' ? true : false;
                                 var powerNameBlurred = powerToken === 'level' ? false : true;
                                 var powerClass = 'power rank type ' + (powerToken === 'level' ? 'electric' : 'shield');
@@ -1216,7 +1218,10 @@
                                 rankPowersMarkup += '<div class="'+powerClass+'">';
                                     rankPowersMarkup += '<span class="icon"><i class="fa fas fa-'+powerIcon+'"></i></span>';
                                     rankPowersMarkup += '<span class="name'+(powerNameBlurred ? ' blur' : '')+'"><strong>'+powerName+'</strong></span>';
-                                    rankPowersMarkup += '<span class="value"><data>'+(powerValue + (powerIsPercent ? '%' : ''))+'</data></span>';
+                                    rankPowersMarkup += '<span class="value">';
+                                        rankPowersMarkup += '<data>'+powerValue+'</data>';
+                                        rankPowersMarkup += '<sub>/ '+powerValueMax+'</sub>';
+                                    rankPowersMarkup += '</span>';
                                 rankPowersMarkup += '</div>';
                                 }
                         rankPowersMarkup += '</div>';
