@@ -304,24 +304,24 @@ $void_item_groups_index = array(
         'name' => 'Distort',
         'label' => 'Context',
         'groups' => array(
-            'elemental-mods' => array(
-                'name' => 'Elemental Mods',
-                'color' => 'time',
-                'rowline' => 1,
-                'colspan' => 3,
-                'items' => array(
-                    'battery-circuit', 'sponge-circuit', 'forge-circuit',
-                    'sapling-circuit', 'chrono-circuit', 'cosmo-circuit',
-                    )
-                ),
             'junk' => array(
                 'name' => 'Junk Items',
                 'color' => 'time',
-                'rowline' => 2,
+                'rowline' => 1,
                 'colspan' => 4,
                 'items' => array(
                     'guard-module', 'persist-module', 'xtreme-module', 'overkill-module',
                     'hourglass-module', 'magnet-module', 'transport-module', 'bulwark-module',
+                    )
+                ),
+            'elemental-mods' => array(
+                'name' => 'Elemental Mods',
+                'color' => 'time',
+                'rowline' => 2,
+                'colspan' => 3,
+                'items' => array(
+                    'battery-circuit', 'sponge-circuit', 'forge-circuit',
+                    'sapling-circuit', 'chrono-circuit', 'cosmo-circuit',
                     )
                 ),
             'power-balancers' => array(
@@ -464,7 +464,7 @@ $void_item_groups_index = array(
             $wrapper_attrs .= 'data-layer="'.$step_layer.'"';
             $wrapper_class = 'wrapper'.($step_is_active ? ' active' : '');
             echo('<div class="'.$wrapper_class.'" '.$wrapper_attrs.'>'.PHP_EOL);
-                echo('<div class="label">'.$step_name.' ('.$step_label.')</div>'.PHP_EOL);
+                echo('<div class="label"><strong>'.$step_name.' ('.$step_label.')</strong></div>'.PHP_EOL);
                 echo('<div class="groups">'.implode(PHP_EOL, $wrapped_group_markup).'</div>'.PHP_EOL);
             echo('</div>'.PHP_EOL);
             $group_items_markup = ob_get_clean();
@@ -517,7 +517,8 @@ $void_item_groups_index = array(
                     <span class="loading">&hellip;</span>
                 </div>
             </div>
-            <a class="reset"><i class="fa fas fa-undo"></i></a>
+            <a class="button reset"><i class="fa fas fa-undo"></i></a>
+            <a class="button code"><i class="fa fas fa-code"></i></a>
         </div>
     </div>
 

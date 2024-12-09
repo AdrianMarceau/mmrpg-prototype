@@ -136,7 +136,8 @@
                     var $battleField = $('.creation .battle-field', $parentDiv);
                     var $itemsPalette = $('.palette .item-list', $parentDiv);
                     var $itemsSelected = $('.selection .item-list', $parentDiv);
-                    var $resetButton = $('.selection .reset', $parentDiv);
+                    var $resetButton = $('.selection .button.reset', $parentDiv);
+                    var $codeButton = $('.selection .button.code', $parentDiv);
 
                     // Save the references to the object for later use
                     var xrefs = _self.xrefs;
@@ -147,6 +148,7 @@
                     xrefs.itemsPalette = $itemsPalette;
                     xrefs.itemsSelected = $itemsSelected;
                     xrefs.resetButton = $resetButton;
+                    xrefs.codeButton = $codeButton;
                     //console.log('xrefs:', xrefs);
 
                     // Backup every item's base quantity so we can do dynamic calulations in realt-time
@@ -195,6 +197,19 @@
                         console.log('reset button clicked! \n-> reset-items');
                         e.preventDefault();
                         _self.reset();
+                        });
+
+                    // Bind ITEM MIX ENTRY click events to the selection area's code button
+                    $codeButton.live('click', function(e){
+                        console.log('code button clicked! \n-> parse-item-mix');
+                        e.preventDefault();
+                        var thisMixString = '';
+                        // If there's already items, return a mix string to optionally copy/paste
+                        if (Object.keys(_self.items).length){ thisMixString = _self.getMixString(); }
+                        var rawMix = prompt('Please enter an item mix string:', thisMixString);
+                        if (!rawMix){ return; }
+                        if (!_self.parseItemMix(rawMix)){ return; }
+                        return _self.refreshHash();
                         });
 
                     // Bind SELECT STEP click events to the group wrappers themselves
@@ -505,6 +520,9 @@
                     _self.calculatePowers();
                     _self.generateMission();
                     _self.refreshUI();
+
+                    // Return true on success
+                    return true;
 
                     // end of voidRecipeWizard.parseItemMix()
                     },
@@ -984,6 +1002,34 @@
 
                     // end of voidRecipeWizard.generateMission()
                     },
+                getMixString: function(){
+                    console.log('%c' + 'voidRecipeWizard.getMixString()', 'color: magenta;');
+
+                    // Backup a reference to the parent object
+                    const _self = this;
+
+                    // Collect the updated list of added items to the recipe for looping
+                    var voidItems = _self.items;
+                    var voidItemsTokens = Object.keys(voidItems);
+                    //console.log('-> voidItems:', voidItems);
+                    //console.log('-> voidItemsTokens:', voidItemsTokens);
+
+                    // Generate a mix string based on the current list of items
+                    var mixItems = [];
+                    for (var i = 0; i < voidItemsTokens.length; i++){
+                        var itemToken = voidItemsTokens[i];
+                        var itemQuantity = voidItems[itemToken];
+                        if (itemQuantity < 1){ continue; }
+                        mixItems.push(itemToken + ':' + itemQuantity);
+                        }
+                    //console.log('-> mixItems:', mixItems);
+                    var thisMixString = mixItems.length > 0 ? mixItems.join('+') : '';
+
+                    // Return the generated mix string
+                    return thisMixString;
+
+                    // end of voidRecipeWizard.getMixString()
+                    },
                 refreshHash: function(){
                     console.log('%c' + 'voidRecipeWizard.refreshHash()', 'color: magenta;');
 
@@ -997,18 +1043,8 @@
                     //console.log('-> voidItemsTokens:', voidItemsTokens);
 
                     // We should also update the mix string in the URL hash with any changes
-                    var mixItems = [];
-                    for (var i = 0; i < voidItemsTokens.length; i++){
-                        var itemToken = voidItemsTokens[i];
-                        var itemQuantity = voidItems[itemToken];
-                        if (itemQuantity < 1){ continue; }
-                        mixItems.push(itemToken + ':' + itemQuantity);
-                        }
-                    //console.log('-> mixItems:', mixItems);
-                    var hashMixString = _self.getHashParams().mix || '';
-                    var thisMixString = mixItems.length > 0 ? mixItems.join('+') : '';
+                    var thisMixString = _self.getMixString();
                     var currLocationHash = window.location.hash.replace(/^#/, '');
-                    //var newLocationHash = thisMixString.length ? ('mix=' + thisMixString) : '';
                     var newLocationHash = 'mix=' + (thisMixString.length ? thisMixString : '-');
                     //console.log('-> currLocationHash (', currLocationHash, ') vs. newLocationHash (', newLocationHash, ')');
                     if (currLocationHash !== newLocationHash){
@@ -1035,6 +1071,7 @@
                     var $itemsSelected = _self.xrefs.itemsSelected;
                     var $itemsPalette = _self.xrefs.itemsPalette;
                     var $resetButton = _self.xrefs.resetButton;
+                    var $codeButton = _self.xrefs.codeButton;
                     var $missionDetails = _self.xrefs.missionDetails;
                     var $targetList = _self.xrefs.missionTargets;
 
@@ -1115,6 +1152,9 @@
                             //console.log('updating', itemToken, 'button in palette w/', {baseQuantity: baseQuantity, addedQuantity: addedQuantity, newQuantity: newQuantity});
                             }
                         }
+
+                    // Always show the code mix button as there doesn't seem to be a reason not-to
+                    $codeButton.addClass('visible');
 
                     // Show or hide the reset button depending on whether or not there's a selection to reset
                     if (numSlotsUsed > 0){ $resetButton.addClass('visible'); }

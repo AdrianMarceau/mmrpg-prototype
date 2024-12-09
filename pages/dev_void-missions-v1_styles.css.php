@@ -21,9 +21,12 @@
     box-sizing: border-box;
     position: relative;
     z-index: 1;
-    width: 700px;
+    width: 680px;
     height: auto;
-    background-color: #262626;
+    /* background-color: #443c67; */
+    /* background-color: #532556;  */
+    /* background-color: #394c82;  */
+    background-color: #2f2b41;
     border: 1px solid #1A1A1A;
     border-radius: 6px;
     padding: 12px;
@@ -119,9 +122,10 @@
     text-align: center;
     padding: 3px 12px;
     border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 3px;
+    border-radius: 3px 3px 0 0;
     color: #cfcdd5;
-    background-color: #242033;
+    /* background-color: #242033;  */
+    background-color: #27213b;
     text-shadow: 1px 1px 0 rgb(0 0 0);
 }
 #void-recipe .title .main {
@@ -144,22 +148,6 @@
     border-top: 1px solid #2a2636;
 }
 
-#void-recipe .creation:before {
-    content: "Mission Preview";
-    display: block;
-    position: absolute;
-    z-index: 10;
-    left: 0;
-    right: 0;
-    top: 0;
-    font-size: 9px;
-    line-height: 12px;
-    color: #cfcdd5;
-    border-radius: 3px 3px 0 0;
-    border: 0 none transparent;
-    background-color: #242033;
-    padding: 2px 6px;
-}
 #void-recipe .creation .loading,
 #void-recipe .palette .loading,
 #void-recipe .selection .loading {
@@ -188,9 +176,7 @@
 #void-recipe .palette .item-list {
     width: auto;
     min-width: 380px;
-    height: 310px;
-    /* height: 282px;  */
-    /* box-shadow: inset -2px -4px 12px rgba(0, 0, 0, 0.1); */
+    height: 300px;
     background-color: transparent;
     border: 0 none transparent;
     box-shadow: none;
@@ -229,7 +215,8 @@
     width: auto;
     height: auto;
     min-height: 52px;
-    min-width: 360px;
+    /* min-width: 360px;  */
+    min-width: 320px;
     padding: 12px 18px 6px;
     white-space: nowrap;
     line-height: 1;
@@ -257,15 +244,17 @@
 #void-recipe .palette .item-list .wrapper[data-step] > .label {
     content: "";
     display: block;
+    box-sizing: border-box;
     position: absolute;
     left: auto;
     right: auto;
-    width: 100px;
+    width: auto;
+    min-width: 130px;
     top: -22px;
     font-size: 11px;
     line-height: 15px;
-    height: 15px;
-    padding: 3px 12px;
+    height: 24px;
+    padding: 3px 6px;
     border: inherit;
     background-color: inherit;
     border-radius: 6px 6px 0 0;
@@ -279,6 +268,9 @@
     content: "~";
     padding: 0 3px;
     color: #777194;
+}
+#void-recipe .palette .item-list .wrapper[data-step] > .label > strong {
+    font-weight: normal;
 }
 #void-recipe .palette .item-list .wrapper[data-step] > .groups {
     display: block;
@@ -304,6 +296,9 @@
 #void-recipe .palette .item-list .wrapper[data-step]:not(.active) {
     box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.2);
 }
+#void-recipe .palette .item-list .wrapper[data-step]:not(.active):hover {
+    background-color: #2d293d;
+}
 #void-recipe .palette .item-list .wrapper[data-step] .group {
     filter: brightness(1.0) saturate(1);
     transition: filter 0.3s;
@@ -311,13 +306,36 @@
 #void-recipe .palette .item-list .wrapper[data-step]:not(.active) .group {
     filter: brightness(0.6) saturate(1.2);
 }
+#void-recipe .palette .item-list .wrapper[data-step].active {
+    background-color: #2f2b40;
+    border-color: #4a4360;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+#void-recipe .palette .item-list .wrapper[data-step]:not(.active) {
+    background-color: #242032;
+}
 
+
+#void-recipe .palette .item-list .wrapper[data-step="1"].active { background-color: #2f2b40; }
+#void-recipe .palette .item-list .wrapper[data-step="1"]:not(.active) { background-color: #242032; }
+
+#void-recipe .palette .item-list .wrapper[data-step="2"].active { background-color: #2f2b40; }
+#void-recipe .palette .item-list .wrapper[data-step="2"]:not(.active) { background-color: #2a2032; }
+
+#void-recipe .palette .item-list .wrapper[data-step="3"].active { background-color: #2f2b40; }
+#void-recipe .palette .item-list .wrapper[data-step="3"]:not(.active) { background-color: #302032; }
+
+#void-recipe .palette .item-list .wrapper[data-step="4"].active { background-color: #2f2b40; }
+#void-recipe .palette .item-list .wrapper[data-step="4"]:not(.active) { background-color: #32202e; }
+
+#void-recipe .palette .item-list .wrapper[data-step="5"].active { background-color: #2f2b40; }
+#void-recipe .palette .item-list .wrapper[data-step="5"]:not(.active) { background-color: #322028; }
 
 #void-recipe .palette .item-list .wrapper[data-step="1"] { left: 0; }
-#void-recipe .palette .item-list .wrapper[data-step="2"] { left: calc((100% - 360px) * 0.25);  }
-#void-recipe .palette .item-list .wrapper[data-step="3"] { left: calc((100% - 360px) * 0.50);  }
-#void-recipe .palette .item-list .wrapper[data-step="4"] { left: calc((100% - 360px) * 0.75);  }
-#void-recipe .palette .item-list .wrapper[data-step="5"] { left: calc((100% - 360px) * 1.00); }
+#void-recipe .palette .item-list .wrapper[data-step="2"] { left: calc((100% - 320px) * 0.25);  }
+#void-recipe .palette .item-list .wrapper[data-step="3"] { left: calc((100% - 320px) * 0.50);  }
+#void-recipe .palette .item-list .wrapper[data-step="4"] { left: calc((100% - 320px) * 0.75);  }
+#void-recipe .palette .item-list .wrapper[data-step="5"] { left: calc((100% - 320px) * 1.00); }
 
 #void-recipe .palette .item-list .wrapper[data-layer="0"] { z-index: 0;  }
 
@@ -340,16 +358,36 @@
 #void-recipe .palette .item-list .wrapper[data-layer="1"][data-side="right"]:last-child { box-shadow: -4px 0px 6px rgba(0, 0, 0, 0.4); }
 
 #void-recipe .palette .item-list .wrapper[data-side="left"]:first-child > .label { left: 6px; }
-#void-recipe .palette .item-list .wrapper[data-side="left"] > .label { left: 61.5px; }
+#void-recipe .palette .item-list .wrapper[data-side="left"] > .label { left: 50px; }
 #void-recipe .palette .item-list .wrapper[data-side="middle"] > .label { left: 50%; transform: translateX(-50%); }
-#void-recipe .palette .item-list .wrapper[data-side="right"] > .label { right: 61.5px; }
+#void-recipe .palette .item-list .wrapper[data-side="right"] > .label { right: 50px; }
 #void-recipe .palette .item-list .wrapper[data-side="right"]:last-child > .label { right: 6px; }
 
+#void-recipe .palette .item-list .wrapper[data-step].disabled {
+
+}
+
+
+#void-recipe .palette .item-list .wrapper[data-step].locked {
+    pointer-events: none;
+    filter: saturate(0.6) brightness(0.8);
+}
+#void-recipe .palette .item-list .wrapper[data-step].locked .group {
+    filter: brightness(0.0);
+}
+#void-recipe .palette .item-list .wrapper[data-step].locked > .label strong,
+#void-recipe .palette .item-list .wrapper[data-step].locked > .label:after {
+    display: none;
+}
+#void-recipe .palette .item-list .wrapper[data-step].locked > .label:before {
+    content: "~ ??? ~";
+}
 
 /* -- ITEM LIST || ITEMS -- */
 
 #void-recipe .item-list .item {
     display: block;
+    box-sizing: border-box;
     user-select: none;
     float: left;
     width: 54px;
@@ -363,11 +401,6 @@
     filter: opacity(1.0) brightness(1.0);
     box-shadow: 0 0 2px rgba(0, 0, 0, 0);
     transition: filter 0.3s, background-color 0.3s, box-shadow 0.3s, transform 0.3s;
-}
-#void-recipe .selection .item-list .item {
-    width: 62px;
-    width: calc((100% / 10) - 6px);
-    margin: 0 4px 4px 0;
 }
 #void-recipe .item-list .item:hover {
     background-color: #333333;
@@ -585,16 +618,16 @@
 #void-recipe .item-list .float-right .group.clear { clear: right; }
 #void-recipe .item-list .wrapper .group + .clear { display: block; width: auto; clear: both; }
 
-#void-recipe .item-list .group[data-colspan="1"] { width: calc(((54px) + 4px) * 1); }
-#void-recipe .item-list .group[data-colspan="2"] { width: calc(((54px) + 4px) * 2); }
-#void-recipe .item-list .group[data-colspan="3"] { width: calc(((54px) + 4px) * 3); }
-#void-recipe .item-list .group[data-colspan="4"] { width: calc(((54px) + 4px) * 4); }
-#void-recipe .item-list .group[data-colspan="5"] { width: calc(((54px) + 4px) * 5); }
-#void-recipe .item-list .group[data-colspan="6"] { width: calc(((54px) + 4px) * 6); }
-#void-recipe .item-list .group[data-colspan="7"] { width: calc(((54px) + 4px) * 7); }
-#void-recipe .item-list .group[data-colspan="8"] { width: calc(((54px) + 4px) * 8); }
-#void-recipe .item-list .group[data-colspan="9"] { width: calc(((54px) + 4px) * 9); }
-#void-recipe .item-list .group[data-colspan="10"] { width: calc(((54px) + 4px) * 10); }
+#void-recipe .item-list .group[data-colspan="1"] { width: calc((54px + 2px) * 1); }
+#void-recipe .item-list .group[data-colspan="2"] { width: calc((54px + 2px) * 2); }
+#void-recipe .item-list .group[data-colspan="3"] { width: calc((54px + 2px) * 3); }
+#void-recipe .item-list .group[data-colspan="4"] { width: calc((54px + 2px) * 4); }
+#void-recipe .item-list .group[data-colspan="5"] { width: calc((54px + 2px) * 5); }
+#void-recipe .item-list .group[data-colspan="6"] { width: calc((54px + 2px) * 6); }
+#void-recipe .item-list .group[data-colspan="7"] { width: calc((54px + 2px) * 7); }
+#void-recipe .item-list .group[data-colspan="8"] { width: calc((54px + 2px) * 8); }
+#void-recipe .item-list .group[data-colspan="9"] { width: calc((54px + 2px) * 9); }
+#void-recipe .item-list .group[data-colspan="10"] { width: calc((54px + 2px) * 10); }
 
 /* -- PALLET || MISC -- */
 
@@ -610,18 +643,15 @@
     background-color: transparent;
     margin: 0 auto;
     position: absolute;
-    /* top: 85px;  */
-    top: 222px;
+    top: 193px;
     left: 13px;
     right: 13px;
     width: auto;
     height: auto;
     background-color: rgba(36, 32, 51, 0.4);
-    /* border-bottom: 1px solid #242033;  */
     border-top: 1px solid #242033;
     box-shadow: none;
     border-radius: 0 0 9px 9px;
-
     /* background-color: lime; */
 }
 #void-recipe .selection .item-list {
@@ -633,7 +663,6 @@
     box-shadow: none;
     padding: 0;
     margin: 0;
-
     /* background-color: cyan; */
 }
 #void-recipe .selection .item-list .wrapper {
@@ -643,11 +672,13 @@
     right: auto;
     bottom: auto;
     height: auto;
-    padding: 4px 6px;
-
+    padding: 5px 6px;
+    padding-right: 26px;
     /* background-color: magenta; */
 }
 #void-recipe .selection .item-list .item {
+    width: 60px;
+    width: calc((100% / 10) - 4px);
     transform: translate(0, 0);
     margin: 0 4px 0 0;
 }
@@ -674,48 +705,67 @@
     filter: opacity(1.0) brightness(1.0);
 }
 
-#void-recipe .selection .reset {
+#void-recipe .selection .button {
     display: block;
     position: absolute;
     z-index: 30;
-    top: 5px;
-    right: -10px;
-    width: 16px;
-    height: 16px;
-    font-size: 14px;
-    line-height: 24px;
+    right: 6px;
+    width: 18px;
+    height: 18px;
+    font-size: 9px;
+    line-height: 1;
     text-align: center;
     vertical-align: middle;
     color: #dedede;
     cursor: pointer;
     transform: scale(1.0);
     transition: transform 0.2s, color 0.2s;
+    background-color: #242131;
+    border: 0 none transparent;
+    border-radius: 50%;
 }
-#void-recipe .selection .reset:hover {
+#void-recipe .selection .button:hover {
     transform: scale(1.2);
     color: #efefef;
 }
-#void-recipe .selection .reset > i {
+#void-recipe .selection .button > i {
     display: block;
     margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
-#void-recipe .selection .reset:not(.visible) {
+#void-recipe .selection .button:not(.visible) {
     pointer-events: none;
-    display: none;
+    filter: opacity(0.4) brightness(0.4);
+    cursor: not-allowed;
+}
+#void-recipe .selection .reset {
+    top: 3px;
+}
+#void-recipe .selection .code {
+    bottom: 3px;
 }
 
 /* -- CREATION || TARGET LIST & MISSION DETAILS -- */
 
 #void-recipe .creation {
-    margin-top: 9px;
-    height: 200px;
-    padding-bottom: 60px;
+    height: 180px;
+    padding-bottom: 45px;
     border: 1px solid #1a1a1a;
-    border-radius: 9px;
+    border-top: 0 none transparent;
+    border-radius: 0 0 9px 9px;
     box-shadow: none;
     overflow: hidden;
     border-bottom-color: #333333;
     border-right-color: #333333;
+    /* dynamic border colours */
+    background-color: inherit;
+    border-top-color: rgba(0, 0, 0, 0.5);
+    border-left-color: rgba(0, 0, 0, 0.5);
+    border-right-color: rgba(255, 255, 255, 0.01);
+    border-bottom-color: rgba(255, 255, 255, 0.01);
 }
 #void-recipe .creation .mission-details,
 #void-recipe .creation .target-list,
@@ -728,7 +778,6 @@
     min-height: 50px;
     overflow: visible;
     border: 0 none transparent;
-    border-radius: 6px;
     position: absolute;
     left: 0;
     right: 0;
@@ -744,7 +793,7 @@
     bottom: 0;
     left: 0;
     border: 0 none transparent;
-    border-radius: 6px;
+    border-radius: 0 0 6px 6px;
     box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.2);
     pointer-events: none;
 }
@@ -793,18 +842,17 @@
     left: 0;
     z-index: 4;
     pointer-events: none;
-    background-color: #292929;
+    background-color: #292834;
+    background-color: rgb(41, 40, 52, 0.8);
 }
 
 #void-recipe .creation .mission-details {
     position: absolute;
     width: auto;
-    /* height: 140px;  */
     height: 0;
     min-height: 0;
     max-height: 140px;
-    /* top: 58px; */
-    top: 16px;
+    top: 0;
     left: 0;
     right: 0;
     border-radius: 0;
@@ -1273,38 +1321,6 @@
 }
 #void-recipe .creation .target-list .target:hover .image .sprite_160x160 {
     background-position: -160px 0;
-}
-
-/* -- PANEL & GROUP COLORS -- */
-
-#void-recipe {
-    /* background-color: #443c67;  */
-    background-color: #443c67;
-}
-#void-recipe .creation {
-    background-color: inherit;
-    border-top-color: rgba(0, 0, 0, 0.5);
-    border-left-color: rgba(0, 0, 0, 0.5);
-    border-right-color: rgba(255, 255, 255, 0.01);
-    border-bottom-color: rgba(255, 255, 255, 0.01);
-}
-#void-recipe .creation .battle-field:after {
-    background-color: #292834;
-    background-color: rgb(41, 40, 52, 0.8);
-}
-#void-recipe .palette .item-list {
-    background-color: transparent;
-    border-color: transparent;
-}
-#void-recipe .palette .item-list .wrapper[data-step].active {
-    background-color: #2f2b40;
-    border-color: #4a4360;
-}
-#void-recipe .palette .item-list .wrapper[data-step]:not(.active) {
-    background-color: #242032;
-}
-#void-recipe .palette .item-list .wrapper[data-step]:not(.active):hover {
-    background-color: #2d293d;
 }
 
 
