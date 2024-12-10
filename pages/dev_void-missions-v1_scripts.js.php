@@ -34,11 +34,13 @@
                     _self.maxTargets = 8;
                     _self.minQuantaPerClass = {'mecha': 25, 'master': 50, 'boss': 500};
                     _self.voidPowersRequired = ['delta', 'spread', 'quanta', 'level', 'forte'];
+                    _self.isReady = false;
                     _self.reset(false);
                     _self.setup($container);
                     _self.calculatePowers();
                     _self.generateMission();
                     _self.refreshUI();
+                    _self.isReady = true;
                     console.log('voidRecipeWizard is ' + ('%c' + 'ready'), 'color: lime;');
                     console.log('=> voidRecipeWizard:', _self);
                     // end of voidRecipeWizard.init()
@@ -237,6 +239,25 @@
                                 }
                             }
                         });
+
+                    // TEMP TEMP TEMP
+                    // DEBUG DEBUG DEBUG
+                    // Make it so clicking the titlebar prints the current void powers to the console
+                    $('> .title', $parentDiv).live('click', function(){
+                        console.log('%c' + 'VOID POWERS:', 'background-color: #242131; color: #fff; font-weight: bold;');
+                        //console.log('_self.powers =', _self.powers);
+                        var powerDebug = '';
+                        var powerKeys = Object.keys(_self.powers);
+                        for (var i = 0; i < powerKeys.length; i++){
+                            var powerKey = powerKeys[i];
+                            var powerValue = _self.powers[powerKey];
+                            powerDebug += '-> ' + powerKey + ': ' + powerValue + '\n';
+                            }
+                        console.log('%c' + powerDebug, 'background-color: #242131; color: #fff; font-weight: bold;');
+                        console.log('via `_self.powers`:', _self.powers);
+                        });
+                    // DEBUG DEBUG DEBUG
+                    // TEMP TEMP TEMP
 
                     // Check to see if there is already a recipe in the URL hash
                     window.addEventListener('load', () => {
@@ -883,30 +904,6 @@
                     //console.log('-> targetRobotQueue[master]:', targetRobotQueue['master']);
                     //console.log('-> targetRobotQueue[boss]:', targetRobotQueue['boss']);
 
-                    // TEMP TEMP TEMP (new field token should be saved and UI should be refreshed in refreshUI()!)
-                    var fieldShiftPower = voidPowersList.xfield || 0;
-                    if (fieldShiftPower){
-                        console.log('%c' + '-> fieldShiftPower: ' + fieldShiftPower, 'color: orange;');
-                        // If fieldShiftPower is at least 1, we can upgrade the field to something other than default
-                        var xrefs = _self.xrefs;
-                        var $battleField = xrefs.battleField;
-                        var $battleFieldBackground = $battleField.find('.sprite.background');
-                        var currentFieldToken = $battleFieldBackground.attr('data-token') || '';
-                        var battleFieldToken = 'prototype-subspace';
-                        if (fieldShiftPower >= 1){
-                            console.log('-> fieldShiftPower is >= 1 (', fieldShiftPower, '), so we can upgrade the field!');
-                            battleFieldToken = 'gentle-countryside';
-                            }
-                        console.log('-> checking currentFieldToken:', currentFieldToken, 'vs.', 'battleFieldToken:', battleFieldToken);
-                        if (currentFieldToken !== battleFieldToken){
-                            var newBackgroundImage = '/images/fields/'+battleFieldToken+'/battle-field_preview.png?20241104-0121';
-                            console.log('-> updating background image to newBackgroundImage:', newBackgroundImage);
-                            $battleFieldBackground.css('background-image', 'url(' + newBackgroundImage + ')');
-                            $battleFieldBackground.attr('data-token', battleFieldToken);
-                            }
-                        }
-                    // TEMP TEMP TEMP
-
                     // Define which elemental types each slot should be
                     var typePowerTokens = Object.keys(typePowersList);
                     var typePowerTotal = (typePowerTokens.length ? typePowerTokens.reduce((acc, token) => acc + typePowersList[token], 0) : 0);
@@ -1160,9 +1157,21 @@
                     if (numSlotsUsed > 0){ $resetButton.addClass('visible'); }
                     else { $resetButton.removeClass('visible'); }
 
+                    // Pre-clear the mission details, the target list, and the battle field
+                    $missionDetails.html('');
+                    $targetList.html('');
+                    //var $battleField = _self.xrefs.battleField; // TODO
+
                     // Collect the list of void powers and keys so we can re-sort in the next step
                     var voidPowers = _self.powers;
                     var voidPowersKeys = Object.keys(voidPowers);
+                    var voidPowersValSum = 0 + (voidPowersKeys.length ? (function(){ var sum = 0; for (var i = 0; i < voidPowersKeys.length; i++){ var key = voidPowersKeys[i]; sum += voidPowers[key]; } return sum; })() : 0);
+                    if (voidPowersValSum === 0){
+                        $missionDetails.append('<span class="loading">&hellip;</span>');
+                        $targetList.append('<span class="loading">&hellip;</span>');
+                        return;
+                        }
+                    console.log('voidPowersValSum:', voidPowersValSum);
                     console.log('voidPowersKeys(raw):', '\n-> [' + voidPowersKeys.join(', ') + ']');
 
                     // First, sort the power tokens by their values going highest to lowest,
@@ -1193,7 +1202,7 @@
                         if (!pk1IsType && pk2IsType){ return 1; }
                         return 0;
                         });
-                    console.log('voidPowersKeys(stat-type-sorted):', '\n-> [' + voidPowersKeys.join(', ') + ']');
+                    console.log('voidPowersKeys(stat-and-type-sorted):', '\n-> [' + voidPowersKeys.join(', ') + ']');
 
                     // Then we can collect the ordered list of required power tokens and
                     // use that to sort any required power tokens to the top of the list
@@ -1211,7 +1220,6 @@
                     // Now we update the list of void powers in the UI to show any changes
                     console.log('voidPowers:', voidPowers);
                     console.log('voidPowersKeys:', voidPowersKeys);
-                    $missionDetails.html('');
                     if (voidPowersKeys.length){
 
                         // TEMP TEMP TEMP: HARD CODED BASE POWERS!!!
@@ -1353,7 +1361,6 @@
                     // Update the list of target robots in the panel if any have been generated
                     var missionInfo = _self.mission;
                     var missionTargets = missionInfo.targets || [];
-                    $targetList.html('');
                     if (missionTargets.length){
                         console.log('updating mission target list!', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
                         const mmrpgIndexRobots = mmrpgIndex.robots;
