@@ -268,6 +268,7 @@
                                     var token = statOrder[i];
                                     if (!statPowersValues[token]){ continue; }
                                     var values = statPowersValues[token];
+                                    if (!values['value']){ values['value'] = 0; }
                                     const config = {
                                         token: token,
                                         name: token.charAt(0).toUpperCase() + token.slice(1),
@@ -768,6 +769,41 @@
                     //console.log('=> sortedTypePowers:', sortedTypePowers);
                     return sortedTypePowers;
                     // end of voidRecipeWizard.filterTypePowers()
+                    },
+                filterSortPowers: function(powers, kind, sort){
+                    kind = typeof kind !== 'undefined' ? kind : 'all';
+                    sort = typeof sort === 'undefined' ? true : sort;
+                    console.log('%c' + 'voidRecipeWizard.filterSortPowers()', 'color: magenta;');
+                    //console.log('-> w/ powers:', powers, 'kind:', kind, 'sort:', sort);
+                    // parse out powers that represent types and then order them highest first
+                    const _self = this;
+                    var mmrpgStats = _self.indexes.statTokens;
+                    var mmrpgTypes = _self.indexes.typeTokens;
+                    var sortPowers = {};
+                    for (var i = 0; i < mmrpgStats.length; i++){
+                        var statToken = mmrpgStats[i];
+                        var statValue = powers['sort_' + statToken] || 0;
+                        if (statValue !== 0){ sortPowers[statToken] = statValue; }
+                        }
+                    for (var i = 0; i < mmrpgTypes.length; i++){
+                        var typeToken = mmrpgTypes[i];
+                        var typeValue = powers['sort_' + typeToken] || 0;
+                        if (typeValue !== 0){ sortPowers[typeToken] = typeValue; }
+                        }
+                    //console.log('=> sortPowers:', sortPowers);
+                    if (!sort){ return sortPowers; }
+                    // re-sort the sort powers based on their values w/ highest first
+                    var sortPowersKeys = Object.keys(sortPowers);
+                    sortPowersKeys.sort(function(a, b){ return sortPowers[b] - sortPowers[a]; });
+                    var sortedSortPowers = {};
+                    for (var i = 0; i < sortPowersKeys.length; i++){
+                        var sortToken = sortPowersKeys[i];
+                        var sortValue = sortPowers[sortToken];
+                        sortedSortPowers[sortToken] = sortValue;
+                        }
+                    //console.log('=> sortedSortPowers:', sortedSortPowers);
+                    return sortedSortPowers;
+                    // end of voidRecipeWizard.filterSortPowers()
                     },
                 distributeQuanta: function(quanta, spread) {
                     console.log('%c' + 'voidRecipeWizard.distributeQuanta() w/ quanta: ' + quanta + ', spread: ' + spread, 'color: magenta;');
@@ -1384,7 +1420,7 @@
 
                         // Define object variables to hold the different kinds of powers we display
                         var basePowersValues = {quanta: 0, spread: 0};
-                        var rankPowersValues = {level: 1, forte: 1};
+                        var rankPowersValues = {level: 1, forte: 0};
                         var rankPowersValuesMax = {level: 100, forte: 10};
                         var sortPowersGrouped = {};
                         var statPowersValues = {};
@@ -1394,6 +1430,7 @@
                         statPowersValues.defense = { /* ... */ };
                         statPowersValues.speed = { /* ... */ };
 
+                        /*
                         // TEMP TEMP TEMP: HARD CODED TESTING POWERS!!! <<
                         basePowersValues.quanta = 123;
                         basePowersValues.spread = 3;
@@ -1423,6 +1460,27 @@
                         statPowersValues.speed.boosts = 3;
                         statPowersValues.speed.breaks = 0;
                         // >> TEMP TEMP TEMP: HARD CODED TESTING POWERS!!!
+                        */
+
+                        // Pull in current values for the base powers we'll be displaying
+                        if (voidPowers.quanta){ basePowersValues.quanta = voidPowers.quanta; }
+                        if (voidPowers.spread){ basePowersValues.spread = voidPowers.spread; }
+
+                        // Pull in current values for the rank powers we'll be displaying
+                        if (voidPowers.level){ rankPowersValues.level = voidPowers.level; }
+                        if (voidPowers.forte){ rankPowersValues.forte = voidPowers.forte; }
+
+                        // Pull in current values for the sort powers we'll be displaying
+                        var statSortPowers = _self.filterSortPowers(voidPowers, 'stats');
+                        var typeSortPowers = _self.filterSortPowers(voidPowers, 'types');
+                        if (statSortPowers){ sortPowersGrouped.stat = Object.assign({}, sortPowersGrouped.stat, statSortPowers); }
+                        if (typeSortPowers){ sortPowersGrouped.type = Object.assign({}, sortPowersGrouped.type, typeSortPowers); }
+
+                        // Pull in current values for the stat powers we'll be displaying
+                        var statPowers = _self.filterStatPowers(voidPowers);
+                        if (statPowers.attack){ statPowersValues.attack = voidPowers.attack; }
+                        if (statPowers.defense){ statPowersValues.defense = voidPowers.defense; }
+                        if (statPowers.speed){ statPowersValues.speed = voidPowers.speed; }
 
                         // Check the base powers (quanta and spread) to display the appropriate markup
                         VoidPowersRenderer.renderBasePowers($missionDetails, basePowersValues);
@@ -1430,10 +1488,10 @@
                         // Check the rank powers (level and forte) to display appropriate markup
                         VoidPowersRenderer.renderRankPowers($missionDetails, rankPowersValues, rankPowersValuesMax);
 
-                        // Check the stat-sort powers to display appropriate markup
+                        // Check the sort powers (stat and type) to display appropriate markup
                         VoidPowersRenderer.renderSortPowers($missionDetails, sortPowersGrouped);
 
-                        // Check for relative stat levels and display appropriate markup
+                        // Check for relative stat powers (attack, defense, speed) and display appropriate markup
                         VoidPowersRenderer.renderStatPowers($missionDetails, statPowersValues);
 
                         } else {
