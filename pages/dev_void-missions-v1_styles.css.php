@@ -26,7 +26,8 @@
     /* background-color: #443c67; */
     /* background-color: #532556;  */
     /* background-color: #394c82;  */
-    background-color: #2f2b41;
+    /* background-color: #2f2b41;  */
+    background-color: #504486;
     border: 1px solid #1A1A1A;
     border-radius: 6px;
     padding: 12px;
@@ -121,12 +122,13 @@
     margin: 0 auto;
     text-align: center;
     padding: 3px 12px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 1px solid #282339;
+    border-botom: none;
     border-radius: 3px 3px 0 0;
     color: #cfcdd5;
-    /* background-color: #242033;  */
     background-color: #27213b;
     text-shadow: 1px 1px 0 rgb(0 0 0);
+    background-image: linear-gradient(0deg, #27213b, #332d49);
 }
 #void-recipe .title .main {
     display: block;
@@ -366,7 +368,6 @@
 #void-recipe .palette .item-list .wrapper[data-step].disabled {
 
 }
-
 
 #void-recipe .palette .item-list .wrapper[data-step].locked {
     pointer-events: none;
@@ -762,10 +763,9 @@
     border-right-color: #333333;
     /* dynamic border colours */
     background-color: inherit;
-    border-top-color: rgba(0, 0, 0, 0.5);
-    border-left-color: rgba(0, 0, 0, 0.5);
-    border-right-color: rgba(255, 255, 255, 0.01);
-    border-bottom-color: rgba(255, 255, 255, 0.01);
+    border-left-color: #2c273f;
+    border-right-color: #3c3956;
+    border-bottom-color: #3c3956;
 }
 #void-recipe .creation .mission-details,
 #void-recipe .creation .target-list,
@@ -992,13 +992,15 @@
     width: 2px;
     margin: 0;
 }
-#void-recipe .mission-details .void-powers .power > span.blur > strong {
+#void-recipe .mission-details .void-powers .power > span.blur > strong,
+#void-recipe .mission-details .void-powers .power > span.blur > data {
     font-size: 10px;
     font-weight: normal;
     position: relative;
     top: -1px;
 }
-#void-recipe .mission-details .void-powers .power:not(:hover) > span.blur {
+#void-recipe .mission-details .void-powers.bgi .power:not(:hover) > span.blur,
+#void-recipe .mission-details .void-powers.bgo .power:not(:hover) > span.blur:not(:first-child) {
     opacity: 0;
     max-width: 0;
     overflow: hidden;
@@ -1054,8 +1056,27 @@
     z-index: 10;
     left: 6px;
     /* max-width: 200px;  */
-    padding-left: 34px;
+    padding-left: 36px;
 }
+
+#void-recipe .creation .mission-details .sort-powers .power {
+    font-size: 13px;
+    padding: 1px 3px 5px;
+    margin-bottom: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+#void-recipe .creation .mission-details .sort-powers .power > span {
+    font-size: 9px;
+}
+#void-recipe .creation .mission-details .sort-powers .power:nth-child(5n) + .power {
+    clear: left;
+}
+#void-recipe .creation .mission-details .sort-powers .power > span.blur > strong,
+#void-recipe .creation .mission-details .sort-powers .power > span.blur > data {
+    font-size: inherit;
+    top: auto;
+}
+
 #void-recipe .creation .mission-details .sort-powers .label {
     display: block;
     position: absolute;
@@ -1071,38 +1092,20 @@
     line-height: 12px;
     text-align: center;
     border-radius: 6px;
-    border: 1px solid #696969;
     background-color: #2d2c3a;
     text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4);
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    border: 1px solid #3d4166 !important;
 }
 #void-recipe .creation .mission-details .sort-powers .label .icon {
-    display: inline-block;
-    height: auto;
-    width: auto;
-    margin: 0;
-    border: 0 none transparent;
-    background-color: transparent;
+    font-size: 12px;
+    padding-right: 3px;
 }
-#void-recipe .creation .mission-details .sort-powers .label .icon + .icon {
-    margin-left: 3px;
+#void-recipe .creation .mission-details .sort-powers .label .icon,
+#void-recipe .creation .mission-details .sort-powers .label .name {
+    margin: 0 3px 0 0;
 }
-#void-recipe .creation .mission-details .sort-powers .power {
-    font-size: 13px;
-    padding: 2px 3px 5px;
-    margin-bottom: 3px;
-    border-width: 0;
-}
-#void-recipe .creation .mission-details .sort-powers .power > span {
-    font-size: 9px;
-}
-#void-recipe .creation .mission-details .sort-powers .power:nth-child(5n) + .power {
-    clear: left;
-}
-#void-recipe .creation .mission-details .sort-powers .power > span.blur > strong {
-    font-size: inherit;
-    top: auto;
-}
+
 #void-recipe .creation .mission-details .sort-powers .power.ps0 { min-width: 10px; }
 #void-recipe .creation .mission-details .sort-powers .power.ps1 { min-width: 11px; }
 #void-recipe .creation .mission-details .sort-powers .power.ps2 { min-width: 12px; }
