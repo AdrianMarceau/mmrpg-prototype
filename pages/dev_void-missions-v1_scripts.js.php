@@ -131,6 +131,163 @@
                     //console.log('mmrpgRobotMasterTokens:', mmrpgRobotMasterTokens);
                     //console.log('mmrpgRobotBossTokens:', mmrpgRobotBossTokens);
 
+                    // Define a quick class (which we'll add to the parent) for rendering void powers
+                    var voidPowersRenderer = {
+                        generatePowerElement: function({ token, name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasCode, hasArrows, boosts, breaks, blur, spanOrder }){
+                            //console.log('-> generating power element:', {name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasArrows, boosts, breaks, blur});
+                            let arrowClasses = 'value arrows';
+                            let iconClasses = 'icon';
+                            let nameClasses = 'name';
+                            let valueClasses = 'value';
+                            let codeClasses = 'code';
+                            if (typeof blur !== 'object'){ blur = []; }
+                            if (blur.indexOf('arrows') !== -1){ arrowClasses += ' blur'; }
+                            if (blur.indexOf('icon') !== -1){ iconClasses += ' blur'; }
+                            if (blur.indexOf('name') !== -1){ nameClasses += ' blur'; }
+                            if (blur.indexOf('value') !== -1){ valueClasses += ' blur'; }
+                            if (blur.indexOf('code') !== -1){ codeClasses += ' blur'; }
+                            //console.log('-> classes:', {arrowClasses, iconClasses, nameClasses, valueClasses});
+                            var arrowsMarkup = '';
+                            var iconMarkup = '';
+                            var nameMarkup = '';
+                            var valueMarkup = '';
+                            var codeMarkup = '';
+                            if (hasArrows && (boosts || breaks)){
+                                arrowsMarkup += '<span class="'+arrowClasses+'">';
+                                for (let i = 0; i < boosts; i++){ arrowsMarkup += '<span class="arrow boost"><i class="fas fa-caret-up"></i></span>'; }
+                                for (let i = 0; i < breaks; i++){ arrowsMarkup += '<span class="arrow break"><i class="fas fa-caret-down"></i></span>'; }
+                                arrowsMarkup += '</span>';
+                                }
+                            if (icon){
+                                iconMarkup += '<span class="'+iconClasses+'"><i class="fa fas fa-'+icon+'"></i></span>';
+                                }
+                            if (name){
+                                nameMarkup += '<span class="'+nameClasses+'"><strong>'+name+'</strong></span>';
+                                }
+                            if (value !== undefined){
+                                valueMarkup += '<span class="'+valueClasses+'"><data>'+ value + (isPercent ? '%' : '') + '</data>';
+                                if (maxValue !== undefined){ valueMarkup += '<sub>/ '+maxValue+'</sub>'; }
+                                valueMarkup += '</span>';
+                                }
+                            if (hasCode){
+                                var powerCode = token.substring(0, 2).toUpperCase();
+                                if (token === 'energy'){ powerCode = 'LE'; }
+                                if (token === 'weapons'){ powerCode = 'WE'; }
+                                if (token === 'attack'){ powerCode = 'AT'; }
+                                if (token === 'defense'){ powerCode = 'DF'; }
+                                if (token === 'speed'){ powerCode = 'SP'; }
+                                codeMarkup += '<span class="'+codeClasses+'"><code>'+powerCode+'</code></span>';
+                                }
+                            //console.log('-> generated power elements:', {arrowsMarkup, iconMarkup, nameMarkup, valueMarkup, codeMarkup});
+                            if (!Array.isArray(spanOrder)){ spanOrder = []; }
+                            if (spanOrder.indexOf('arrows') === -1){ spanOrder.push('arrows'); }
+                            if (spanOrder.indexOf('icon') === -1){ spanOrder.push('icon'); }
+                            if (spanOrder.indexOf('name') === -1){ spanOrder.push('name'); }
+                            if (spanOrder.indexOf('value') === -1){ spanOrder.push('value'); }
+                            if (spanOrder.indexOf('code') === -1){ spanOrder.push('code'); }
+                            let markup = '<div class="power ' + typeClass + ' ' + (extraClasses || '') + '">';
+                                for (let i = 0; i < spanOrder.length; i++){
+                                    let spanToken = spanOrder[i];
+                                    if (spanToken === 'arrows'){ markup += arrowsMarkup; }
+                                    if (spanToken === 'icon'){ markup += iconMarkup; }
+                                    if (spanToken === 'name'){ markup += nameMarkup; }
+                                    if (spanToken === 'value'){ markup += valueMarkup; }
+                                    if (spanToken === 'code'){ markup += codeMarkup; }
+                                    }
+                            markup += '</div>';
+                            return markup;
+                            },
+                        renderBasePowers: function($missionDetails, basePowersValues){
+                            let markup = '<div class="void-powers ltr bgo base-powers">';
+                                for (const [token, value] of Object.entries(basePowersValues)) {
+                                    const config = {
+                                        token: token,
+                                        name: token === 'quanta' ? 'Quanta' : 'Spread',
+                                        icon: token === 'quanta' ? 'atom' : 'code-branch',
+                                        value,
+                                        typeClass: 'base type ' + (token === 'quanta' ? 'water' : 'laser'),
+                                        blur: ['name']
+                                        };
+                                    markup += this.generatePowerElement(config);
+                                    }
+                            markup += '</div>';
+                            $missionDetails.append(markup);
+                            },
+                        renderRankPowers: function($missionDetails, rankPowersValues, rankPowersMaxValues){
+                            let markup = '<div class="void-powers rtl bgo rank-powers">';
+                                for (const [token, value] of Object.entries(rankPowersValues)) {
+                                    const maxValue = rankPowersMaxValues[token] || 0;
+                                    const config = {
+                                        token: token,
+                                        name: token === 'level' ? 'Level' : 'Forte',
+                                        icon: token === 'level' ? 'star' : 'fist-raised',
+                                        value,
+                                        maxValue,
+                                        typeClass: 'rank type ' + (token === 'level' ? 'electric' : 'shield'),
+                                        //blur: token === 'forte' ? ['name'] : [],
+                                        blur: ['name']
+                                        };
+                                    markup += this.generatePowerElement(config);
+                                    }
+                            markup += '</div>';
+                            $missionDetails.append(markup);
+                            },
+                        renderSortPowers: function($missionDetails, sortPowersGrouped){
+                            for (const [groupToken, groupValues] of Object.entries(sortPowersGrouped)){
+                                let groupIcon = groupToken === 'stat' ? 'bullseye' : 'fire-alt';
+                                let groupName = groupToken === 'stat' ? 'Flow (Stats)' : 'Flow (Types)';
+                                let markup = '<div class="void-powers ltr bgi sort-powers ' + groupToken + '-sort-powers">';
+                                    const groupValuesTokens = Object.keys(groupValues);
+                                    let sortedTokens = Object.values(groupValuesTokens);
+                                    sortedTokens.sort((a, b) => groupValues[b] - groupValues[a]);
+                                    sortedTokens.forEach((token, index) => {
+                                        const config = {
+                                            token: token,
+                                            icon: false,
+                                            name: token.charAt(0).toUpperCase() + token.slice(1),
+                                            value: groupValues[token],
+                                            typeClass: ('sort type ' + token + ' ps'+(sortedTokens.length - index)),
+                                            blur: ['name', 'value']
+                                            };
+                                        markup += this.generatePowerElement(config);
+                                        });
+                                    markup += '<div class="power label type space_empty">';
+                                        markup += '<span class="icon"><i class="fa fas fa-' + groupIcon + '"></i></span>';
+                                        markup += '<span class="name blur"><strong>' + groupName + '</strong></span>';
+                                        markup += '<span class="icon"><i class="fa fas fa-sort"></i></span>';
+                                    markup += '</div>';
+                                markup += '</div>';
+                                $missionDetails.append(markup);
+                                }
+                            },
+                        renderStatPowers: function($missionDetails, statPowersValues){
+                            // sort the rank powers by value to display them in order of energy, weapons, attack, defense, speed
+                            let statOrder = _self.indexes.statTokens;
+                            let markup = '<div class="void-powers rtl bgo stat-powers">';
+                                for (var i = 0; i < statOrder.length; i++){
+                                    var token = statOrder[i];
+                                    if (!statPowersValues[token]){ continue; }
+                                    var values = statPowersValues[token];
+                                    const config = {
+                                        token: token,
+                                        name: token.charAt(0).toUpperCase() + token.slice(1),
+                                        value: values['value'],
+                                        typeClass: ('stat type ' + token),
+                                        hasCode: true,
+                                        hasArrows: true,
+                                        boosts: values['boosts'],
+                                        breaks: values['breaks'],
+                                        blur: ['name', 'value'],
+                                        spanOrder: ['arrows', 'value', 'name', 'code']
+                                        };
+                                    markup += this.generatePowerElement(config);
+                                    }
+                            markup += '</div>';
+                            $missionDetails.append(markup);
+                            }
+                        };
+                    _self.voidPowersRenderer = voidPowersRenderer;
+
                     // Collect references to key and parent elements on the page
                     var $parentDiv = $container;
                     var $missionTargets = $('.creation .target-list', $parentDiv);
@@ -1217,326 +1374,66 @@
                         });
                     console.log('voidPowersKeys(required-first):', '\n-> [' + voidPowersKeys.join(', ') + ']');
 
-                    // Define a quick class (which we'll move later?) for rendering void powers
-                    var VoidPowersRenderer = {
-                        generatePowerElement: function({ token, name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasCode, hasArrows, boosts, breaks, blur, spanOrder }){
-                            //console.log('-> generating power element:', {name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasArrows, boosts, breaks, blur});
-                            let arrowClasses = 'value arrows';
-                            let iconClasses = 'icon';
-                            let nameClasses = 'name';
-                            let valueClasses = 'value';
-                            let codeClasses = 'code';
-                            if (typeof blur !== 'object'){ blur = []; }
-                            if (blur.indexOf('arrows') !== -1){ arrowClasses += ' blur'; }
-                            if (blur.indexOf('icon') !== -1){ iconClasses += ' blur'; }
-                            if (blur.indexOf('name') !== -1){ nameClasses += ' blur'; }
-                            if (blur.indexOf('value') !== -1){ valueClasses += ' blur'; }
-                            if (blur.indexOf('code') !== -1){ codeClasses += ' blur'; }
-                            //console.log('-> classes:', {arrowClasses, iconClasses, nameClasses, valueClasses});
-                            var arrowsMarkup = '';
-                            var iconMarkup = '';
-                            var nameMarkup = '';
-                            var valueMarkup = '';
-                            var codeMarkup = '';
-                            if (hasArrows && (boosts || breaks)){
-                                arrowsMarkup += '<span class="'+arrowClasses+'">';
-                                for (let i = 0; i < boosts; i++){ arrowsMarkup += '<span class="arrow boost"><i class="fas fa-caret-up"></i></span>'; }
-                                for (let i = 0; i < breaks; i++){ arrowsMarkup += '<span class="arrow break"><i class="fas fa-caret-down"></i></span>'; }
-                                arrowsMarkup += '</span>';
-                                }
-                            if (icon){
-                                iconMarkup += '<span class="'+iconClasses+'"><i class="fa fas fa-'+icon+'"></i></span>';
-                                }
-                            if (name){
-                                nameMarkup += '<span class="'+nameClasses+'"><strong>'+name+'</strong></span>';
-                                }
-                            if (value !== undefined){
-                                valueMarkup += '<span class="'+valueClasses+'"><data>'+ value + (isPercent ? '%' : '') + '</data>';
-                                if (maxValue !== undefined){ valueMarkup += '<sub>/ '+maxValue+'</sub>'; }
-                                valueMarkup += '</span>';
-                                }
-                            if (hasCode){
-                                var powerCode = token.substring(0, 2).toUpperCase();
-                                if (token === 'energy'){ powerCode = 'LE'; }
-                                if (token === 'weapons'){ powerCode = 'WE'; }
-                                if (token === 'attack'){ powerCode = 'AT'; }
-                                if (token === 'defense'){ powerCode = 'DF'; }
-                                if (token === 'speed'){ powerCode = 'SP'; }
-                                codeMarkup += '<span class="'+codeClasses+'"><code>'+powerCode+'</code></span>';
-                                }
-                            //console.log('-> generated power elements:', {arrowsMarkup, iconMarkup, nameMarkup, valueMarkup, codeMarkup});
-                            if (!Array.isArray(spanOrder)){ spanOrder = []; }
-                            if (spanOrder.indexOf('arrows') === -1){ spanOrder.push('arrows'); }
-                            if (spanOrder.indexOf('icon') === -1){ spanOrder.push('icon'); }
-                            if (spanOrder.indexOf('name') === -1){ spanOrder.push('name'); }
-                            if (spanOrder.indexOf('value') === -1){ spanOrder.push('value'); }
-                            if (spanOrder.indexOf('code') === -1){ spanOrder.push('code'); }
-                            let markup = '<div class="power ' + typeClass + ' ' + (extraClasses || '') + '">';
-                                for (let i = 0; i < spanOrder.length; i++){
-                                    let spanToken = spanOrder[i];
-                                    if (spanToken === 'arrows'){ markup += arrowsMarkup; }
-                                    if (spanToken === 'icon'){ markup += iconMarkup; }
-                                    if (spanToken === 'name'){ markup += nameMarkup; }
-                                    if (spanToken === 'value'){ markup += valueMarkup; }
-                                    if (spanToken === 'code'){ markup += codeMarkup; }
-                                    }
-                            markup += '</div>';
-                            return markup;
-                            },
-                        renderBasePowers: function($missionDetails, basePowersValues){
-                            let markup = '<div class="void-powers ltr bgo base-powers">';
-                                for (const [token, value] of Object.entries(basePowersValues)) {
-                                    const config = {
-                                        token: token,
-                                        name: token === 'quanta' ? 'Quanta' : 'Spread',
-                                        icon: token === 'quanta' ? 'atom' : 'code-branch',
-                                        value,
-                                        typeClass: 'base type ' + (token === 'quanta' ? 'water' : 'laser'),
-                                        blur: ['name']
-                                        };
-                                    markup += this.generatePowerElement(config);
-                                    }
-                            markup += '</div>';
-                            $missionDetails.append(markup);
-                            },
-                        renderRankPowers: function($missionDetails, rankPowersValues, rankPowersMaxValues){
-                            let markup = '<div class="void-powers rtl bgo rank-powers">';
-                                for (const [token, value] of Object.entries(rankPowersValues)) {
-                                    const maxValue = rankPowersMaxValues[token] || 0;
-                                    const config = {
-                                        token: token,
-                                        name: token === 'level' ? 'Level' : 'Forte',
-                                        icon: token === 'level' ? 'star' : 'fist-raised',
-                                        value,
-                                        maxValue,
-                                        typeClass: 'rank type ' + (token === 'level' ? 'electric' : 'shield'),
-                                        //blur: token === 'forte' ? ['name'] : [],
-                                        blur: ['name']
-                                        };
-                                    markup += this.generatePowerElement(config);
-                                    }
-                            markup += '</div>';
-                            $missionDetails.append(markup);
-                            },
-                        renderSortPowers: function($missionDetails, sortPowersGrouped){
-                            for (const [groupToken, groupValues] of Object.entries(sortPowersGrouped)){
-                                let groupIcon = groupToken === 'stat' ? 'bullseye' : 'fire-alt';
-                                let groupName = groupToken === 'stat' ? 'Flow (Stats)' : 'Flow (Types)';
-                                let markup = '<div class="void-powers ltr bgi sort-powers ' + groupToken + '-sort-powers">';
-                                    const groupValuesTokens = Object.keys(groupValues);
-                                    let sortedTokens = Object.values(groupValuesTokens);
-                                    sortedTokens.sort((a, b) => groupValues[b] - groupValues[a]);
-                                    sortedTokens.forEach((token, index) => {
-                                        const config = {
-                                            token: token,
-                                            icon: false,
-                                            name: token.charAt(0).toUpperCase() + token.slice(1),
-                                            value: groupValues[token],
-                                            typeClass: ('sort type ' + token + ' ps'+(sortedTokens.length - index)),
-                                            blur: ['name', 'value']
-                                            };
-                                        markup += this.generatePowerElement(config);
-                                        });
-                                    markup += '<div class="power label type space_empty">';
-                                        markup += '<span class="icon"><i class="fa fas fa-' + groupIcon + '"></i></span>';
-                                        markup += '<span class="name blur"><strong>' + groupName + '</strong></span>';
-                                        markup += '<span class="icon"><i class="fa fas fa-sort"></i></span>';
-                                    markup += '</div>';
-                                markup += '</div>';
-                                $missionDetails.append(markup);
-                                }
-                            },
-                        renderStatPowers: function($missionDetails, statPowersValues){
-                            // sort the rank powers by value to display them in order of energy, weapons, attack, defense, speed
-                            let statOrder = _self.indexes.statTokens;
-                            let markup = '<div class="void-powers rtl bgo stat-powers">';
-                                for (var i = 0; i < statOrder.length; i++){
-                                    var token = statOrder[i];
-                                    if (!statPowersValues[token]){ continue; }
-                                    var values = statPowersValues[token];
-                                    const config = {
-                                        token: token,
-                                        name: token.charAt(0).toUpperCase() + token.slice(1),
-                                        value: values['value'],
-                                        typeClass: ('stat type ' + token),
-                                        hasCode: true,
-                                        hasArrows: true,
-                                        boosts: values['boosts'],
-                                        breaks: values['breaks'],
-                                        blur: ['name', 'value'],
-                                        spanOrder: ['arrows', 'value', 'name', 'code']
-                                        };
-                                    markup += this.generatePowerElement(config);
-                                    }
-                            markup += '</div>';
-                            $missionDetails.append(markup);
-                            }
-                        };
-
                     // Now we update the list of void powers in the UI to show any changes
                     console.log('voidPowers:', voidPowers);
                     console.log('voidPowersKeys:', voidPowersKeys);
                     if (voidPowersKeys.length){
 
-                        /*
-                        // TEMP TEMP TEMP: HARD CODED BASE POWERS!!!
-                        // Check the base powers (quanta and spread) to display the appropriate markup
-                        var basePowersMarkup = '';
-                        var basePowersValues = {quanta: 123, spread: 3};
-                        var basePowersTokens = Object.keys(basePowersValues);
-                        basePowersMarkup += '<div class="void-powers ltr bgo base-powers">';
-                            for (var i = 0; i < basePowersTokens.length; i++){
-                                var powerToken = basePowersTokens[i];
-                                var powerName = powerToken === 'quanta' ? 'Quanta' : 'Spread';
-                                var powerIcon = powerToken === 'quanta' ? 'atom' : 'code-branch'; //'cubes';
-                                var powerValue = basePowersValues[powerToken];
-                                var powerClass = 'base type ' + (powerToken === 'quanta' ? 'water' : 'laser');
-                                // TEMP TEMP TEMP MAX-VAL TESTING TEMP TEMP TEMP //
-                                powerValue = powerToken === 'quanta' ? 9999 : 8;
-                                // TEMP TEMP TEMP MAX-VAL TESTING TEMP TEMP TEMP //
-                                basePowersMarkup += '<div class="power '+powerClass+'">';
-                                    basePowersMarkup += '<span class="icon"><i class="fa fas fa-'+powerIcon+'"></i></span>';
-                                    basePowersMarkup += '<span class="name blur"><strong>'+powerName+'</strong></span>';
-                                    basePowersMarkup += '<span class="value"><data>'+powerValue+'</data></span>';
-                                basePowersMarkup += '</div>';
-                                }
-                        basePowersMarkup += '</div>';
-                        $missionDetails.append(basePowersMarkup);
-                        */
+                        // Pull in the power renderer to make things easier
+                        var VoidPowersRenderer = _self.voidPowersRenderer;
+
+                        // Define object variables to hold the different kinds of powers we display
+                        var basePowersValues = {quanta: 0, spread: 0};
+                        var rankPowersValues = {level: 1, forte: 1};
+                        var rankPowersValuesMax = {level: 100, forte: 10};
+                        var sortPowersGrouped = {};
+                        var statPowersValues = {};
+                        sortPowersGrouped.stat = { /* ... */ };
+                        sortPowersGrouped.type = { /* ... */ };
+                        statPowersValues.attack = { /* ... */ };
+                        statPowersValues.defense = { /* ... */ };
+                        statPowersValues.speed = { /* ... */ };
+
+                        // TEMP TEMP TEMP: HARD CODED TESTING POWERS!!! <<
+                        basePowersValues.quanta = 123;
+                        basePowersValues.spread = 3;
+                        rankPowersValues.level = 123;
+                        rankPowersValues.forte = 45;
+                        rankPowersValuesMax.level = 999;
+                        rankPowersValuesMax.forte = 99;
+                        sortPowersGrouped.stat.energy = 47;
+                        sortPowersGrouped.stat.weapons = -4;
+                        sortPowersGrouped.stat.attack = 3;
+                        sortPowersGrouped.stat.defense = -25;
+                        sortPowersGrouped.stat.speed = 2;
+                        sortPowersGrouped.type.flame = 3;
+                        sortPowersGrouped.type.water = 1;
+                        sortPowersGrouped.type.electric = 28;
+                        sortPowersGrouped.type.cutter = 7;
+                        sortPowersGrouped.type.crystal = 38;
+                        sortPowersGrouped.type.time = -34;
+                        sortPowersGrouped.type.nature = 2;
+                        statPowersValues.attack.value = 0.3;
+                        statPowersValues.attack.boosts = 0;
+                        statPowersValues.attack.breaks = 0;
+                        statPowersValues.defense.value = -1;
+                        statPowersValues.defense.boosts = 0;
+                        statPowersValues.defense.breaks = 1;
+                        statPowersValues.speed.value = 3;
+                        statPowersValues.speed.boosts = 3;
+                        statPowersValues.speed.breaks = 0;
+                        // >> TEMP TEMP TEMP: HARD CODED TESTING POWERS!!!
 
                         // Check the base powers (quanta and spread) to display the appropriate markup
-                        var basePowersValues = {quanta: 123, spread: 3};
                         VoidPowersRenderer.renderBasePowers($missionDetails, basePowersValues);
 
-                        /*
-                        // TEMP TEMP TEMP: HARD CODED RANK POWERS!!!
                         // Check the rank powers (level and forte) to display appropriate markup
-                        var rankPowersMarkup = '';
-                        var rankPowersValues = {level: 123, forte: 45};
-                        var rankPowersValuesMax = {level: 999, forte: 99};
-                        var rankPowersTokens = Object.keys(rankPowersValues);
-                        rankPowersMarkup += '<div class="void-powers rtl bgo rank-powers">';
-                            for (var i = 0; i < rankPowersTokens.length; i++){
-                                var powerToken = rankPowersTokens[i];
-                                var powerName = powerToken === 'level' ? 'Level' : 'Forte';
-                                var powerValue = rankPowersValues[powerToken] || 0;
-                                var powerValueMax = rankPowersValuesMax[powerToken] || 0;
-                                var powerIsPercent = powerToken === 'forte' ? true : false;
-                                var powerNameBlurred = powerToken === 'level' ? false : true;
-                                var powerClass = 'power rank type ' + (powerToken === 'level' ? 'electric' : 'shield');
-                                var powerIcon = powerToken === 'level' ? 'star' : 'fist-raised';
-                                rankPowersMarkup += '<div class="'+powerClass+'">';
-                                    rankPowersMarkup += '<span class="icon"><i class="fa fas fa-'+powerIcon+'"></i></span>';
-                                    rankPowersMarkup += '<span class="name'+(powerNameBlurred ? ' blur' : '')+'"><strong>'+powerName+'</strong></span>';
-                                    rankPowersMarkup += '<span class="value">';
-                                        rankPowersMarkup += '<data>'+powerValue+'</data>';
-                                        rankPowersMarkup += '<sub>/ '+powerValueMax+'</sub>';
-                                    rankPowersMarkup += '</span>';
-                                rankPowersMarkup += '</div>';
-                                }
-                        rankPowersMarkup += '</div>';
-                        $missionDetails.append(rankPowersMarkup);
-                        */
-
-                        // Check the rank powers (level and forte) to display appropriate markup
-                        var rankPowersValues = {level: 123, forte: 45};
-                        var rankPowersValuesMax = {level: 999, forte: 99};
                         VoidPowersRenderer.renderRankPowers($missionDetails, rankPowersValues, rankPowersValuesMax);
 
-                        /*
-                        // TEMP TEMP TEMP: HARD CODED SORT POWERS!!!
                         // Check the stat-sort powers to display appropriate markup
-                        var sortPowersGrouped = {};
-                        sortPowersGrouped.stat = {energy: 47, weapons: -4, attack: 3, defense: -25, speed: 2};
-                        //sortPowersGrouped.type = {flame: 3, water: 1, electric: 28};
-                        sortPowersGrouped.type = {flame: 3, water: 1, electric: 28, cutter: 7, crystal: 38, time: -34, nature: 2};
-                        var sortPowersGroupedTokens = Object.keys(sortPowersGrouped);
-                        for (var i = 0; i < sortPowersGroupedTokens.length; i++){
-                            var groupToken = sortPowersGroupedTokens[i];
-                            var groupPowerIcon = 'circle';
-                            if (groupToken === 'stat'){ groupPowerIcon = 'bullseye'; }
-                            else if (groupToken === 'type'){ groupPowerIcon = 'fire-alt'; }
-                            else { groupPowerIcon = 'asterisk'; }
-                            var sortPowersMarkup = '';
-                            var sortPowersValues = sortPowersGrouped[groupToken];
-                            var sortPowersTokens = Object.keys(sortPowersValues);
-                            sortPowersMarkup += '<div class="void-powers ltr bgi sort-powers '+groupToken+'-sort-powers">';
-                                for (var j = 0; j < sortPowersTokens.length; j++){
-                                    var powerToken = sortPowersTokens[j];
-                                    var powerName = powerToken.charAt(0).toUpperCase() + powerToken.slice(1);
-                                    var powerValue = sortPowersValues[powerToken];
-                                    var powerSize = (sortPowersTokens.length - j);
-                                    var powerClass = 'power sort type ' + powerToken + ' ps' + powerSize;
-                                    var powerValueClass = 'value';
-                                    // TEMP TEMP TEMP MAX-VAL TESTING TEMP TEMP TEMP //
-                                    powerValue = 999;
-                                    // TEMP TEMP TEMP MAX-VAL TESTING TEMP TEMP TEMP //
-                                    var powerValueText = (powerValue !== 0 ? (powerValue > 0 ? '+' : '-') : '') + Math.abs(powerValue);
-                                    sortPowersMarkup += '<div class="power '+powerClass+'">';
-                                        sortPowersMarkup += '<span class="name blur"><strong>'+powerName+'</strong></span>';
-                                        sortPowersMarkup += '<span class="value blur"><data>'+powerValueText+'</data></span>';
-                                    sortPowersMarkup += '</div>';
-                                }
-                                sortPowersMarkup += '<div class="label type space_empty">';
-                                    sortPowersMarkup += '<span class="icon"><i class="fa fas fa-'+groupPowerIcon+'"></i></span>';
-                                    sortPowersMarkup += '<span class="icon"><i class="fa fas fa-sort"></i></span>';
-                                sortPowersMarkup += '</div>';
-                            sortPowersMarkup += '</div>';
-                            $missionDetails.append(sortPowersMarkup);
-                            }
-                        */
-
-                        // Check the stat-sort powers to display appropriate markup
-                        var sortPowersGrouped = {
-                            stat: {energy: 47, weapons: -4, attack: 3, defense: -25, speed: 2},
-                            type: {flame: 3, water: 1, electric: 28, cutter: 7, crystal: 38, time: -34, nature: 2}
-                            };
                         VoidPowersRenderer.renderSortPowers($missionDetails, sortPowersGrouped);
 
-                        /*
-                        // TEMP TEMP TEMP: HARD CODED STAT POWERS!!!
                         // Check for relative stat levels and display appropriate markup
-                        var statPowersMarkup = '';
-                        var statPowersValues = {};
-                        statPowersValues.attack = {value: 5, boosts: 5, breaks: 0};
-                        statPowersValues.speed = {value: 3, boosts: 3, breaks: 0};
-                        statPowersValues.defense = {value: -1, boosts: 0, breaks: 1};
-                        var statPowersTokens = Object.keys(statPowersValues);
-                        statPowersMarkup += '<div class="void-powers rtl bgo stat-powers">';
-                            for (var i = 0; i < statPowersTokens.length; i++){
-                                var statToken = statPowersTokens[i];
-                                var statName = statToken.charAt(0).toUpperCase() + statToken.slice(1);
-                                var statCode = statToken.substring(0, 2).toUpperCase();
-                                if (statToken === 'attack'){ statCode = 'AT'; }
-                                if (statToken === 'defense'){ statCode = 'DF'; }
-                                if (statToken === 'speed'){ statCode = 'SP'; }
-                                var statValues = statPowersValues[statToken] || false;
-                                if (statValues === false){ continue; }
-                                var statValue = statValues.value;
-                                var statBoosts = statValues.boosts;
-                                var statBreaks = statValues.breaks;
-                                var statHasArrows = statBoosts > 0 || statBreaks > 0 ? true : false;
-                                var statClass = 'power stat type ' + statToken + (statHasArrows ? ' has-arrows' : '');
-                                statPowersMarkup += '<div class="'+statClass+'">';
-                                    statPowersMarkup += '<span class="value arrows">';
-                                        if (statBoosts){ for (var j = 0; j < statBoosts; j++){ statPowersMarkup += '<span class="arrow boost"><i class="fas fa-caret-up"></i></span>'; } }
-                                        if (statBreaks){ for (var j = 0; j < statBreaks; j++){ statPowersMarkup += '<span class="arrow break"><i class="fas fa-caret-down"></i></span>'; } }
-                                    statPowersMarkup += '</span>';
-                                    statPowersMarkup += '<span class="name blur"><strong>'+statName+'</strong></span>';
-                                    statPowersMarkup += '<span class="code"><code>'+statCode+'</code></span>';
-                                statPowersMarkup += '</div>';
-                            }
-                        statPowersMarkup += '</div>';
-                        $missionDetails.append(statPowersMarkup);
-                        */
-
-                        // Check for relative stat levels and display appropriate markup
-                        var statPowersValues = {
-                            attack: {value: 0.3, boosts: 0, breaks: 0},
-                            //attack: {value: 5.3, boosts: 5, breaks: 0},
-                            speed: {value: 3, boosts: 3, breaks: 0},
-                            defense: {value: -1, boosts: 0, breaks: 1}
-                            };
                         VoidPowersRenderer.renderStatPowers($missionDetails, statPowersValues);
 
                         } else {
