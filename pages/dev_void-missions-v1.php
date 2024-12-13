@@ -251,10 +251,19 @@ $void_item_groups_index = array(
         'name' => 'Redirect',
         'label' => 'Form',
         'groups' => array(
+            'queue-rotators' => array(
+                'name' => 'Queue Rotators',
+                'color' => 'energy_weapons',
+                'rowline' => 1,
+                'colspan' => 3,
+                'items' => array(
+                    'mecha-whistle', 'extra-life', 'yashichi',
+                    ),
+                ),
             'attack-diverter' => array(
                 'name' => 'Attack Diverter',
                 'color' => 'defense_speed',
-                'rowline' => 1,
+                'rowline' => 2,
                 'colspan' => 1,
                 'items' => array(
                     'attack-diverter',
@@ -263,7 +272,7 @@ $void_item_groups_index = array(
             'defense-diverter' => array(
                 'name' => 'Defense Diverter',
                 'color' => 'speed_attack',
-                'rowline' => 1,
+                'rowline' => 2,
                 'colspan' => 1,
                 'items' => array(
                     'defense-diverter',
@@ -272,20 +281,11 @@ $void_item_groups_index = array(
             'speed-diverter' => array(
                 'name' => 'Speed Diverter',
                 'color' => 'attack_defense',
-                'rowline' => 1,
+                'rowline' => 2,
                 'colspan' => 1,
                 'items' => array(
                     'speed-diverter',
                     )
-                ),
-            'queue-rotators' => array(
-                'name' => 'Queue Rotators',
-                'color' => 'copy',
-                'rowline' => 2,
-                'colspan' => 3,
-                'items' => array(
-                    'mecha-whistle', 'extra-life', 'yashichi',
-                    ),
                 ),
             'queue-mods' => array(
                 'name' => 'Queue Mods',
@@ -356,6 +356,19 @@ $void_item_groups_index = array(
 
     );
 
+// Disable certain void items until they have a purpose (TEMP PROBABLY)
+$void_items_disabled = array(
+    'salvage-module', 'growth-module', 'fortune-module',
+    'hyperscan-module', 'copycat-module', 'reverse-module',
+    'guard-module', 'persist-module', 'xtreme-module', 'overkill-module',
+    'hourglass-module', 'magnet-module', 'transport-module', 'bulwark-module',
+    'battery-circuit', 'sponge-circuit', 'forge-circuit',
+    'sapling-circuit', 'chrono-circuit', 'cosmo-circuit',
+    'uptick-module', 'siphon-module',
+    'repair-module', 'gambit-module',
+    'alchemy-module', 'distill-module',
+    );
+
 ?>
 <div class="header">
     <div class="header_wrapper">
@@ -414,11 +427,12 @@ $void_item_groups_index = array(
                     $item_name = $item_info['item_name'];
                     $item_name_br = str_replace(' ', '<br />', $item_name);
                     $item_is_oneline = !strstr($item_name, ' ');
+                    $item_is_disabled = in_array($item_token, $void_items_disabled);
                     $item_quantity = mt_rand(33, 99); //mt_rand(0, 99);
                     $item_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_token;
                     $icon_url = '/images/items/'.$item_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
                     ob_start();
-                    echo('<div class="item" '.
+                    echo('<div class="item'.($item_is_disabled ? ' disabled' : '').'" '.
                         'data-key="'.$item_key.'" '.
                         'data-token="'.$item_token.'" '.
                         'data-group="'.$group_token.'" '.

@@ -71,6 +71,7 @@
                     _self.xrefs = {};
                     _self.items = {};
                     _self.powers = {};
+                    _self.flows = {};
                     _self.mission = {};
                     _self.history = [];
                     _self.indexes = {};
@@ -133,8 +134,8 @@
 
                     // Define a quick class (which we'll add to the parent) for rendering void powers
                     var voidPowersRenderer = {
-                        generatePowerElement: function({ token, name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasCode, hasArrows, boosts, breaks, blur, spanOrder }){
-                            //console.log('-> generating power element:', {name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasArrows, boosts, breaks, blur});
+                        generatePowerElement: function({ token, name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasCode, hasArrows, boosts, breaks, blur, spanOrder, borderWidths }){
+                            //console.log('-> generating power element:', {name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasArrows, boosts, breaks, blur, spanOrder, borderWidths});
                             let arrowClasses = 'value arrows';
                             let iconClasses = 'icon';
                             let nameClasses = 'name';
@@ -165,7 +166,8 @@
                                 nameMarkup += '<span class="'+nameClasses+'"><strong>'+name+'</strong></span>';
                                 }
                             if (value !== undefined){
-                                valueMarkup += '<span class="'+valueClasses+'"><data>'+ value + (isPercent ? '%' : '') + '</data>';
+                                var roundedValue = Math.round(value * 10) / 10;
+                                valueMarkup += '<span class="'+valueClasses+'"><data>'+ roundedValue + (isPercent ? '%' : '') + '</data>';
                                 if (maxValue !== undefined){ valueMarkup += '<sub>/ '+maxValue+'</sub>'; }
                                 valueMarkup += '</span>';
                                 }
@@ -185,7 +187,12 @@
                             if (spanOrder.indexOf('name') === -1){ spanOrder.push('name'); }
                             if (spanOrder.indexOf('value') === -1){ spanOrder.push('value'); }
                             if (spanOrder.indexOf('code') === -1){ spanOrder.push('code'); }
-                            let markup = '<div class="power ' + typeClass + ' ' + (extraClasses || '') + '">';
+                            let extraStyles = '';
+                            borderWidths = borderWidths || {};
+                            if (borderWidths.left){ extraStyles += 'border-left-width: ' + borderWidths.left + 'px; '; }
+                            if (borderWidths.right){ extraStyles += 'border-right-width: ' + borderWidths.right + 'px; '; }
+                            if (extraStyles.length){ extraStyles = ' style="' + extraStyles + '"'; }
+                            let markup = '<div class="power ' + typeClass + ' ' + (extraClasses || '') + '"' + (extraStyles || '') + '>';
                                 for (let i = 0; i < spanOrder.length; i++){
                                     let spanToken = spanOrder[i];
                                     if (spanToken === 'arrows'){ markup += arrowsMarkup; }
@@ -232,22 +239,33 @@
                             markup += '</div>';
                             $missionDetails.append(markup);
                             },
-                        renderSortPowers: function($missionDetails, sortPowersGrouped){
-                            for (const [groupToken, groupValues] of Object.entries(sortPowersGrouped)){
+                        renderSortPowers: function($missionDetails, sortFlowsGrouped){
+                            console.log('VoidPowersRenderer.renderSortPowers($missionDetails, sortFlowsGrouped) w/', {sortFlowsGrouped});
+                            for (const [groupToken, groupValues] of Object.entries(sortFlowsGrouped)){
+                                let groupValuesTokens = Object.keys(groupValues);
+                                let groupValuesSum = 0 + (groupValuesTokens.length ? (function(){ var keys = groupValuesTokens, vals = groupValues, sum = 0; for (var i = 0; i < keys.length; i++){ var key = keys[i]; sum += vals[key]; } return sum; })() : 0);
+                                console.log('-> rendering group:', {groupToken, groupValues, groupValuesTokens, groupValuesSum});
+                                if (!groupValuesTokens.length || groupValuesSum === 0){ continue; }
                                 let groupIcon = groupToken === 'stat' ? 'bullseye' : 'fire-alt';
                                 let groupName = groupToken === 'stat' ? 'Flow (Stats)' : 'Flow (Types)';
                                 let markup = '<div class="void-powers ltr bgi sort-powers ' + groupToken + '-sort-powers">';
-                                    const groupValuesTokens = Object.keys(groupValues);
                                     let sortedTokens = Object.values(groupValuesTokens);
+                                    let numSortedTokens = sortedTokens.length;
                                     sortedTokens.sort((a, b) => groupValues[b] - groupValues[a]);
                                     sortedTokens.forEach((token, index) => {
+                                        var groupValue = groupValues[token];
+                                        var absGroupValue = Math.abs(groupValue);
                                         const config = {
                                             token: token,
                                             icon: false,
                                             name: token.charAt(0).toUpperCase() + token.slice(1),
-                                            value: groupValues[token],
-                                            typeClass: ('sort type ' + token + ' ps'+(sortedTokens.length - index)),
-                                            blur: ['name', 'value']
+                                            value: groupValue,
+                                            typeClass: ('sort type ' + token),
+                                            blur: ['name', 'value'],
+                                            borderWidths: {
+                                                left: (groupValue > 0 ? Math.min(25, absGroupValue) : 0),
+                                                right: (groupValue < 0 ? Math.min(25, absGroupValue) : 0),
+                                                },
                                             };
                                         markup += this.generatePowerElement(config);
                                         });
@@ -268,7 +286,9 @@
                                     var token = statOrder[i];
                                     if (!statPowersValues[token]){ continue; }
                                     var values = statPowersValues[token];
+                                    console.log('checking stat:', {token, values});
                                     if (!values['value']){ values['value'] = 0; }
+                                    if (values['value'] === 0){ continue; }
                                     const config = {
                                         token: token,
                                         name: token.charAt(0).toUpperCase() + token.slice(1),
@@ -398,25 +418,6 @@
                             }
                         });
 
-                    // TEMP TEMP TEMP
-                    // DEBUG DEBUG DEBUG
-                    // Make it so clicking the titlebar prints the current void powers to the console
-                    $('> .title', $parentDiv).live('click', function(){
-                        console.log('%c' + 'VOID POWERS:', 'background-color: #242131; color: #fff; font-weight: bold;');
-                        //console.log('_self.powers =', _self.powers);
-                        var powerDebug = '';
-                        var powerKeys = Object.keys(_self.powers);
-                        for (var i = 0; i < powerKeys.length; i++){
-                            var powerKey = powerKeys[i];
-                            var powerValue = _self.powers[powerKey];
-                            powerDebug += '-> ' + powerKey + ': ' + powerValue + '\n';
-                            }
-                        console.log('%c' + powerDebug, 'background-color: #242131; color: #fff; font-weight: bold;');
-                        console.log('via `_self.powers`:', _self.powers);
-                        });
-                    // DEBUG DEBUG DEBUG
-                    // TEMP TEMP TEMP
-
                     // Check to see if there is already a recipe in the URL hash
                     window.addEventListener('load', () => {
                         if (_self.hashUpdatedByApp){ return; }
@@ -436,6 +437,15 @@
                         //console.log('OnHashChange || Mix parameters found:', params.mix);
                         _self.parseItemMix(params.mix);
                         });
+
+                    // TEMP TEMP TEMP
+                    // DEBUG DEBUG DEBUG
+                    // Make it so clicking the titlebar prints the current void powers to the console
+                    $('> .title', $parentDiv).live('click', function(){
+                        _self.showDebug('powers');
+                        });
+                    // DEBUG DEBUG DEBUG
+                    // TEMP TEMP TEMP
 
                     // end of voidRecipeWizard.setup()
                     },
@@ -490,31 +500,43 @@
                     var itemTokens = itemToken.split('-');
                     var itemPrefix = itemTokens[0] || '';
                     var itemSuffix = itemTokens[1] || '';
-                    var itemIsSmall = itemPrefix === 'small';
-                    var itemIsLarge = itemPrefix === 'large';
-                    var itemIsHyper = itemPrefix === 'hyper';
-                    var itemIsEnergy = itemPrefix === 'energy';
-                    var itemIsWeapons = itemPrefix === 'weapons';
-                    var itemIsAttack = itemPrefix === 'attack';
-                    var itemIsDefense = itemPrefix === 'defense';
-                    var itemIsSpeed = itemPrefix === 'speed';
-                    var itemIsSuper = itemPrefix === 'super';
+
+                    // Check to see if this fits into specific kind-based categories
                     var itemIsScrew = itemSuffix === 'screw';
-                    var itemIsShard = itemSuffix === 'shard';
                     var itemIsCore = itemSuffix === 'core';
+                    var itemIsShard = itemSuffix === 'shard';
                     var itemIsPellet = itemSuffix === 'pellet';
                     var itemIsCapsule = itemSuffix === 'capsule';
                     var itemIsTank = itemSuffix === 'tank';
                     var itemIsUpgrade = itemSuffix === 'upgrade';
                     var itemIsBooster = itemSuffix === 'booster';
                     var itemIsDiverter = itemSuffix === 'diverter';
-                    var itemIsModule = itemSuffix === 'module';
                     var itemIsCircuit = itemSuffix === 'circuit';
-                    var itemIsRotator = itemSuffix === 'rotator';
-                    if (itemToken === 'mecha-whistle'){ itemIsRotator = true; }
-                    if (itemToken === 'extra-life'){ itemIsRotator = true; }
-                    if (itemToken === 'yashichi'){ itemIsRotator = true; }
-                    if (itemToken === 'field-booster'){ itemIsRotator = true; }
+                    var itemIsModule = itemSuffix === 'module';
+
+                    // Check to see if this item fits into any specific stat-based categories
+                    var itemIsEnergy = itemPrefix === 'energy';
+                    var itemIsWeapons = itemPrefix === 'weapon';
+                    var itemIsAttack = itemPrefix === 'attack';
+                    var itemIsDefense = itemPrefix === 'defense';
+                    var itemIsSpeed = itemPrefix === 'speed';
+                    var itemIsSuper = itemPrefix === 'super';
+
+                    // Check to see if this item fits into any specific purpose-based categories
+                    var itemGivesQuanta = itemIsScrew ? true : false;
+                    var itemModsQuanta = ['charge-module'].indexOf(itemToken) !== -1;
+                    var itemGivesSpread = itemIsCore ? true : false;
+                    var itemModsSpread = ['spreader-module', 'target-module'].indexOf(itemToken) !== -1;
+                    var itemGivesLevel = itemIsEnergy && (itemIsPellet || itemIsCapsule || itemIsTank) ? true : false;
+                    var itemModsLevel = ['energy-upgrade'].indexOf(itemToken) !== -1; // itemIsEnergy && itemIsUpgrade;
+                    var itemGivesForte = itemIsWeapons && (itemIsPellet || itemIsCapsule || itemIsTank) ? true : false;
+                    var itemModsForte = ['weapon-upgrade'].indexOf(itemToken) !== -1; // itemIsWeapons && itemIsUpgrade;
+                    var itemGivesTriStats = itemIsAttack || itemIsDefense || itemIsSpeed || itemIsSuper;
+                    var itemModsTriStats = (itemGivesTriStats && itemIsBooster) || (itemGivesTriStats && itemIsDiverter);
+                    var itemRotatesQueues = itemSuffix === 'rotator';
+                    if (itemToken === 'mecha-whistle'){ itemRotatesQueues = true; }
+                    if (itemToken === 'extra-life'){ itemRotatesQueues = true; }
+                    if (itemToken === 'yashichi'){ itemRotatesQueues = true; }
 
                     // Increase the delta by one, always, for each item added
                     powers.incPower('delta', 1 * quantity);
@@ -525,15 +547,12 @@
                     if (itemToken === ''){
                         //return;
                         }
-                    // -- ELEMENTAL CORES w/ +SPREAD [+ TYPES]
-                    else if (itemIsCore){
-                        var typeToken = itemPrefix;
-                        var spreadValue = 1.0, typeValue = 5.0;
-                        powers.incPower('spread', spreadValue * quantity);
-                        powers.incPower(typeToken, typeValue * quantity);
-                        }
-                    // -- CYBER SCREWS w/ +QUANTA [+ TIERS]
+
+                    // -- QUANTA ITEMS (SCREWS) -- //
                     else if (itemIsScrew){
+                        var itemIsSmall = itemPrefix === 'small';
+                        var itemIsLarge = itemPrefix === 'large';
+                        var itemIsHyper = itemPrefix === 'hyper';
                         var quantaValue = 0, tierToken = '';
                         if (itemIsSmall){ quantaValue = 5.0, tierToken = 'mecha'; }
                         else if (itemIsLarge){ quantaValue = 10.0, tierToken = 'master'; }
@@ -541,21 +560,60 @@
                         powers.incPower('quanta', quantaValue * quantity);
                         //powers.incPower('quanta_'+tierToken, 1 * quantity);
                         }
-                    // -- PELLETS & CAPSULES w/ +STATS
-                    else if (itemIsPellet || itemIsCapsule){
+
+                    // -- SPREAD ITEMS (CORES) -- //
+                    else if (itemIsCore){
+                        var typeToken = itemPrefix;
+                        var spreadValue = 1.0, typeValue = 5.0;
+                        powers.incPower('spread', spreadValue * quantity);
+                        powers.incFlow(typeToken, quantity);
+                        }
+
+                    // -- TRI-STAT ITEMS (ATTACK, DEFENSE, SPEED)
+                    else if (itemGivesTriStats){
                         var statToken = itemPrefix;
-                        if (!itemIsSuper){
-                            var statValue = (itemIsPellet ? 2.0 : 0) + (itemIsCapsule ? 5.0 : 0);
-                            powers.incPower(statToken, statValue * quantity);
-                            } else {
-                            var statTokens = !itemIsSuper ? [statToken] : ['attack', 'defense', 'speed'];
-                            for (var j = 0; j < statTokens.length; j++){
-                                var subStatToken = statTokens[j];
-                                var subStatValue = (itemIsPellet ? 1.0 : 0) + (itemIsCapsule ? 2.5 : 0);
-                                powers.incPower(subStatToken, subStatValue * quantity);
+                        var statBase = 1 * quantity;
+
+                        // -- STAT BOOSTERS w/ +STATS && +FLOW(STATS)
+                        if (itemIsPellet
+                            || itemIsCapsule
+                            || itemIsBooster){
+                            var flowBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 2 : 0) + (itemIsBooster ? 3 : 0));
+                            var powerBoost = statBase * ((itemIsPellet ? 2 : 0) + (itemIsCapsule ? 3 : 0) + (itemIsBooster ? 5 : 0));
+                            if (!itemIsSuper){
+                                powers.incFlow(statToken, flowBoost);
+                                powers.incPower(statToken, powerBoost);
+                                } else {
+                                var superTokens = ['attack', 'defense', 'speed'];
+                                flowBoost /= superTokens.length;
+                                powerBoost /= superTokens.length;
+                                for (var i = 0; i < superTokens.length; i++){
+                                    var superToken = superTokens[i];
+                                    powers.incFlow(superToken, flowBoost);
+                                    powers.incPower(superToken, powerBoost);
+                                    }
+                                }
+                            }
+                        // -- STAT DIVERTERS w/ ~STATS && ~FLOW(STATS)
+                        else if (itemIsDiverter){
+                            var divertFrom = statToken, divertTo = [], divertToNum = 0;
+                            if (statToken !== 'attack'){ divertTo.push('attack'); }
+                            if (statToken !== 'defense'){ divertTo.push('defense'); }
+                            if (statToken !== 'speed'){ divertTo.push('speed'); }
+                            divertToNum = divertTo.length;
+                            var divertAmount = Math.round(statBase * divertToNum), receiveAmount = Math.round(divertAmount / divertToNum);
+                            var flowBreak = divertAmount * 3, powerBreak = divertAmount * 1;
+                            powers.decFlow(divertFrom, flowBreak);
+                            powers.decPower(divertFrom, powerBreak);
+                            for (var i = 0; i < divertTo.length; i++){
+                                var divertToToken = divertTo[i];
+                                var flowBoost = receiveAmount * 3, powerBoost = receiveAmount * 1;
+                                powers.incFlow(divertToToken, flowBoost);
+                                powers.incPower(divertToToken, powerBoost);
                                 }
                             }
                         }
+
                     // -- TANKS & UPGRADES & MYTHICS w/ LEVEL + FORTE [+ ~STATS]
                     else if (itemIsTank || itemIsUpgrade){
                         var boostKind = itemIsEnergy ? 'level' : 'forte';
@@ -569,15 +627,6 @@
                         var boostKind = itemPrefix;
                         var boostPower = 6;
                         powers.incPower(boostKind, boostPower * quantity);
-                        }
-                    else if (itemIsDiverter){
-                        var divertOrder = [], divertValues = [10, 5, 5];
-                        if (itemIsAttack){ divertOrder = ['attack', 'defense', 'speed']; }
-                        else if (itemIsDefense){ divertOrder = ['defense', 'attack', 'speed']; }
-                        else if (itemIsSpeed){ divertOrder = ['speed', 'attack', 'defense']; }
-                        powers.decPower(divertOrder[0], divertValues[0] * quantity);
-                        powers.incPower(divertOrder[1], divertValues[1] * quantity);
-                        powers.incPower(divertOrder[2], divertValues[2] * quantity);
                         }
                     // ELEMENTAL CIRCUITS w/ TYPES [+ TYPE-MODS]
                     else if (itemIsCircuit){
@@ -624,7 +673,7 @@
                             }
                         }
                     // -- MISC ROTATOR (SHIFT) ITEMS
-                    else if (itemIsRotator){
+                    else if (itemRotatesQueues){
                         if (itemToken === 'mecha-whistle'){
                             var shiftPower = quantity * 1;
                             powers.incPower('xmecha', shiftPower);
@@ -770,40 +819,44 @@
                     return sortedTypePowers;
                     // end of voidRecipeWizard.filterTypePowers()
                     },
-                filterSortPowers: function(powers, kind, sort){
+                filterSortFlows: function(flows, kind, sort){
                     kind = typeof kind !== 'undefined' ? kind : 'all';
                     sort = typeof sort === 'undefined' ? true : sort;
-                    console.log('%c' + 'voidRecipeWizard.filterSortPowers()', 'color: magenta;');
-                    //console.log('-> w/ powers:', powers, 'kind:', kind, 'sort:', sort);
-                    // parse out powers that represent types and then order them highest first
+                    console.log('%c' + 'voidRecipeWizard.filterSortFlows()', 'color: magenta;');
+                    //console.log('-> w/ flows:', flows, 'kind:', kind, 'sort:', sort);
+                    // parse out flows that represent types and then order them highest first
                     const _self = this;
                     var mmrpgStats = _self.indexes.statTokens;
                     var mmrpgTypes = _self.indexes.typeTokens;
-                    var sortPowers = {};
-                    for (var i = 0; i < mmrpgStats.length; i++){
-                        var statToken = mmrpgStats[i];
-                        var statValue = powers['sort_' + statToken] || 0;
-                        if (statValue !== 0){ sortPowers[statToken] = statValue; }
+                    var sortFlows = {};
+                    if (kind === 'stats' || kind === 'all'){
+                        for (var i = 0; i < mmrpgStats.length; i++){
+                            var statToken = mmrpgStats[i];
+                            var statValue = flows[statToken] || 0;
+                            if (statValue !== 0){ sortFlows[statToken] = statValue; }
+                            }
                         }
-                    for (var i = 0; i < mmrpgTypes.length; i++){
-                        var typeToken = mmrpgTypes[i];
-                        var typeValue = powers['sort_' + typeToken] || 0;
-                        if (typeValue !== 0){ sortPowers[typeToken] = typeValue; }
+                    if (kind === 'types' || kind === 'all'){
+                        for (var i = 0; i < mmrpgTypes.length; i++){
+                            var typeToken = mmrpgTypes[i];
+                            var typeValue = flows[typeToken] || 0;
+                            if (typeValue !== 0){ sortFlows[typeToken] = typeValue; }
+                            }
                         }
-                    //console.log('=> sortPowers:', sortPowers);
-                    if (!sort){ return sortPowers; }
-                    // re-sort the sort powers based on their values w/ highest first
-                    var sortPowersKeys = Object.keys(sortPowers);
-                    sortPowersKeys.sort(function(a, b){ return sortPowers[b] - sortPowers[a]; });
+                    //console.log('=> sortFlows:', sortFlows);
+                    if (!sort){ return sortFlows; }
+                    // re-sort the sort flows based on their values w/ highest first
+                    var sortFlowsKeys = Object.keys(sortFlows);
+                    sortFlowsKeys.sort(function(a, b){ return sortFlows[b] - sortFlows[a]; });
                     var sortedSortPowers = {};
-                    for (var i = 0; i < sortPowersKeys.length; i++){
-                        var sortToken = sortPowersKeys[i];
-                        var sortValue = sortPowers[sortToken];
+                    for (var i = 0; i < sortFlowsKeys.length; i++){
+                        var sortToken = sortFlowsKeys[i];
+                        var sortValue = sortFlows[sortToken];
                         sortedSortPowers[sortToken] = sortValue;
                         }
                     //console.log('=> sortedSortPowers:', sortedSortPowers);
                     return sortedSortPowers;
-                    // end of voidRecipeWizard.filterSortPowers()
+                    // end of voidRecipeWizard.filterSortFlows()
                     },
                 distributeQuanta: function(quanta, spread) {
                     console.log('%c' + 'voidRecipeWizard.distributeQuanta() w/ quanta: ' + quanta + ', spread: ' + spread, 'color: magenta;');
@@ -892,8 +945,8 @@
                     const _self = this;
                     const mmrpgIndexRobots = mmrpgIndex.robots;
                     const mmrpgIndexRobotsTokens = Object.keys(mmrpgIndexRobots);
-                    var typePowers = types;
-                    var statPowers = stats;
+                    var typeFlows = types;
+                    var statFlows = stats;
                     var allowTypes = Object.keys(types);
                     var sortByStats = Object.keys(stats);
                     var sortByTypes = Object.keys(types);
@@ -983,6 +1036,7 @@
                     // Define a variable to hold the calculated powers of all the items
                     var voidPowers = {};
                     voidPowers.powers = {};
+                    voidPowers.flows = {};
                     voidPowers.flags = {};
                     voidPowers.getPowers = function(){ return voidPowers.powers; };
                     voidPowers.getPower = function(token, fallback){ return voidPowers.powers[token] || fallback || 0; };
@@ -990,6 +1044,17 @@
                     voidPowers.incPower = function(token, value){ voidPowers.setPower(token, voidPowers.getPower(token) + value); };
                     voidPowers.decPower = function(token, value){ voidPowers.setPower(token, voidPowers.getPower(token) - value); };
                     voidPowers.modPower = function(token, value, fallback){ voidPowers.setPower(token, voidPowers.getPower(token, fallback) * value); };
+                    voidPowers.getFlows = function(){ return voidPowers.flows; };
+                    voidPowers.getFlow = function(token, fallback){ return voidPowers.flows[token] || fallback || 0; };
+                    voidPowers.setFlow = function(token, value){ voidPowers.flows[token] = Math.round(value * 100) / 100; };
+                    voidPowers.incFlow = function(token, value){ voidPowers.setFlow(token, voidPowers.getFlow(token) + value); };
+                    voidPowers.decFlow = function(token, value){ voidPowers.setFlow(token, voidPowers.getFlow(token) - value); };
+                    voidPowers.modFlow = function(token, value, fallback){ voidPowers.setFlow(token, voidPowers.getFlow(token, fallback) * value); };
+                    voidPowers.resetAll = function(){
+                        voidPowers.powers = {};
+                        voidPowers.flows = {};
+                        voidPowers.flags = {};
+                        };
                     voidPowers.powers.delta = 0;
                     voidPowers.powers.spread = 0;
                     voidPowers.powers.quanta = 0;
@@ -1019,7 +1084,12 @@
                         if (voidPowers.powers.level < 1){ voidPowers.powers.level = 1; }
                         }
 
-                    //console.log('voidPowers have been updated!');
+                    // Make sure the spread never goes above max values
+                    var maxSpreadPower = _self.maxTargets;
+                    if (voidPowers.powers.spread > maxSpreadPower){ voidPowers.powers.spread = maxSpreadPower; }
+
+                    // Always copy the calculated powers/flows to the parent so they're easily accessible
+                    //console.log('voidPowers and voidFlows have been updated!');
                     _self.powers = {};
                     var voidPowersList = voidPowers.getPowers();
                     var voidPowerKeys = Object.keys(voidPowersList);
@@ -1030,6 +1100,17 @@
                         if (powerValue === 0 && voidPowersRequired.indexOf(powerToken) === -1){ continue; }
                         _self.powers[powerToken] = powerValue;
                         //console.log('-> voidPowers.' + powerToken + ' =', powerValue);
+                        }
+                    _self.flows = {};
+                    var voidFlowsList = voidPowers.getFlows();
+                    var voidFlowKeys = Object.keys(voidFlowsList);
+                    var voidFlowsRequired = []; //_self.voidFlowsRequired;
+                    for (var i = 0; i < voidFlowKeys.length; i++){
+                        var flowToken = voidFlowKeys[i];
+                        var flowValue = voidFlowsList[flowToken];
+                        if (flowValue === 0 && voidFlowsRequired.indexOf(flowToken) === -1){ continue; }
+                        _self.flows[flowToken] = flowValue;
+                        //console.log('-> voidFlows.' + flowToken + ' =', flowValue);
                         }
 
                     // end of voidRecipeWizard.calculatePowers()
@@ -1046,7 +1127,9 @@
                     // Collect reference to the void items + powers so we can reference them
                     var voidItemsTokens = Object.keys(_self.items);
                     var voidPowersList = _self.powers;
+                    var voidFlowsList = _self.flows;
                     var voidPowersKeys = Object.keys(voidPowersList);
+                    var voidFlowsKeys = Object.keys(voidFlowsList);
 
                     // If we don't have any powers, we can't generate anything
                     if (!voidPowersKeys.length){
@@ -1073,9 +1156,13 @@
 
                     // Pull a filtered list of stat powers and type powers for easier looping
                     var statPowersList = _self.filterStatPowers(voidPowersList);
-                    var typePowersList = _self.filterTypePowers(voidPowersList);
+                    //var typePowersList = _self.filterTypePowers(voidPowersList);
                     //console.log('-> statPowersList:', statPowersList);
                     //console.log('-> typePowersList:', typePowersList);
+                    var statFlowsList = _self.filterSortFlows(voidFlowsList, 'stats');
+                    var typeFlowsList = _self.filterSortFlows(voidFlowsList, 'types');
+                    console.log('-> statFlowsList:', statFlowsList);
+                    console.log('-> typeFlowsList:', typeFlowsList);
 
                     // Loop through and check to see which classes are represented
                     var maxTierLevel = 0;
@@ -1090,17 +1177,17 @@
 
                     // Generate a queue of mechas, masters, and bosses given the powers available
                     var targetRobotQueue = {};
-                    targetRobotQueue['mecha'] = maxTierLevel >= 1 ? _self.generateTargetQueue((_self.indexes.robotMechaTokens || []), typePowersList, statPowersList) : [];
-                    targetRobotQueue['master'] = maxTierLevel >= 2 ? _self.generateTargetQueue((_self.indexes.robotMasterTokens || []), typePowersList, statPowersList) : [];
-                    targetRobotQueue['boss'] = maxTierLevel >= 3 ? _self.generateTargetQueue((_self.indexes.robotBossTokens || []), typePowersList, statPowersList) : [];
+                    targetRobotQueue['mecha'] = maxTierLevel >= 1 ? _self.generateTargetQueue((_self.indexes.robotMechaTokens || []), typeFlowsList, statFlowsList) : [];
+                    targetRobotQueue['master'] = maxTierLevel >= 2 ? _self.generateTargetQueue((_self.indexes.robotMasterTokens || []), typeFlowsList, statFlowsList) : [];
+                    targetRobotQueue['boss'] = maxTierLevel >= 3 ? _self.generateTargetQueue((_self.indexes.robotBossTokens || []), typeFlowsList, statFlowsList) : [];
                     //console.log('-> targetRobotQueue[mecha]:', targetRobotQueue['mecha']);
                     //console.log('-> targetRobotQueue[master]:', targetRobotQueue['master']);
                     //console.log('-> targetRobotQueue[boss]:', targetRobotQueue['boss']);
 
                     // Define which elemental types each slot should be
-                    var typePowerTokens = Object.keys(typePowersList);
-                    var typePowerTotal = (typePowerTokens.length ? typePowerTokens.reduce((acc, token) => acc + typePowersList[token], 0) : 0);
-                    var typePowerTokensSorted = typePowerTokens.slice().sort(function(a, b){
+                    var typeFlowTokens = Object.keys(typeFlowsList);
+                    var typeFlowTotal = (typeFlowTokens.length ? typeFlowTokens.reduce((acc, token) => acc + typeFlowsList[token], 0) : 0);
+                    var typeFlowTokensSorted = typeFlowTokens.slice().sort(function(a, b){
                         var aIndex = voidItemsTokens.indexOf(a+'-core');
                         var bIndex = voidItemsTokens.indexOf(b+'-core');
                         console.log('-> comparing', a, 'w/ index:', aIndex, 'vs.', b, 'w/ index:', bIndex);
@@ -1108,11 +1195,11 @@
                         });
                     var distributedTypes = {};
                     var distributedTypeSlots = [];
-                    for (var i = 0; i < typePowerTokensSorted.length; i++){
-                        var typeToken = typePowerTokensSorted[i];
-                        var typeValue = typePowersList[typeToken];
+                    for (var i = 0; i < typeFlowTokensSorted.length; i++){
+                        var typeToken = typeFlowTokensSorted[i];
+                        var typeValue = typeFlowsList[typeToken];
                         if (typeValue === 0){ continue; }
-                        var typeSlots = Math.round((typeValue / typePowerTotal) * effectiveSpread);
+                        var typeSlots = Math.round((typeValue / typeFlowTotal) * effectiveSpread);
                         distributedTypes[typeToken] = typeSlots;
                         // add the token to the slots array as many times as their are slots for it
                         for (var j = 0; j < typeSlots; j++){ distributedTypeSlots.push(typeToken); }
@@ -1367,26 +1454,37 @@
                     console.log('voidPowersValSum:', voidPowersValSum);
                     console.log('voidPowersKeys(raw):', '\n-> [' + voidPowersKeys.join(', ') + ']');
 
-                    // First, sort the power tokens by their values going highest to lowest,
+                    // Also collect the list of void flows and keys so we can re-sort in the next step
+                    var voidFlows = _self.flows;
+                    var voidFlowsKeys = Object.keys(voidFlows);
+                    var voidFlowsValSum = 0 + (voidFlowsKeys.length ? (function(){ var sum = 0; for (var i = 0; i < voidFlowsKeys.length; i++){ var key = voidFlowsKeys[i]; sum += voidFlows[key]; } return sum; })() : 0);
+                    console.log('voidFlowsValSum:', voidFlowsValSum);
+                    console.log('voidFlowsKeys(raw):', '\n-> [' + voidFlowsKeys.join(', ') + ']');
+
+                    // First, sort the power/flow tokens by their values going highest to lowest,
                     // then sort all the keys pertaining to stats first, all keys pertaining to
                     // elemental types second, and anything else can come after that at the end
-                    voidPowersKeys.sort(function(a, b){
-                        var aPower = voidPowers[a] || 0;
-                        var bPower = voidPowers[b] || 0;
-                        if (aPower > bPower){ return -1; }
-                        if (aPower < bPower){ return 1; }
-                        return 0;
-                        });
-                    console.log('voidPowersKeys(power-sorted):', '\n-> [' + voidPowersKeys.join(', ') + ']');
-                    var statPowerTokens = mmrpgStats;
-                    var typePowerTokens = mmrpgTypes;
-                    voidPowersKeys.sort(function(pk1, pk2){
-                        var pk1StatIndex = statPowerTokens.indexOf(pk1);
-                        var pk1TypeIndex = typePowerTokens.indexOf(pk1);
+                    var statTokens = mmrpgStats;
+                    var typeTokens = mmrpgTypes;
+                    var tempValueSort = function(kind){
+                        let values = {};
+                        if (kind === 'powers'){ values = voidPowers; }
+                        if (kind === 'flows'){ values = voidFlows; }
+                        return function(a, b){
+                            var aPower = values[a] || 0;
+                            var bPower = values[b] || 0;
+                            if (aPower > bPower){ return -1; }
+                            if (aPower < bPower){ return 1; }
+                            return 0;
+                            };
+                        };
+                    var tempValueSort2 = function(pk1, pk2){
+                        var pk1StatIndex = statTokens.indexOf(pk1);
+                        var pk1TypeIndex = typeTokens.indexOf(pk1);
                         var pk1IsStat = pk1StatIndex !== -1;
                         var pk1IsType = pk1TypeIndex !== -1;
-                        var pk2StatIndex = statPowerTokens.indexOf(pk2);
-                        var pk2TypeIndex = typePowerTokens.indexOf(pk2);
+                        var pk2StatIndex = statTokens.indexOf(pk2);
+                        var pk2TypeIndex = typeTokens.indexOf(pk2);
                         var pk2IsStat = pk2StatIndex !== -1;
                         var pk2IsType = pk2TypeIndex !== -1;
                         if (pk1IsStat && !pk2IsStat){ return -1; }
@@ -1394,8 +1492,15 @@
                         if (pk1IsType && !pk2IsType){ return -1; }
                         if (!pk1IsType && pk2IsType){ return 1; }
                         return 0;
-                        });
+                        };
+                    voidPowersKeys.sort(tempValueSort('powers'));
+                    voidFlowsKeys.sort(tempValueSort('flows'));
+                    console.log('voidPowersKeys(power-sorted):', '\n-> [' + voidPowersKeys.join(', ') + ']');
+                    console.log('voidFlowsKeys(power-sorted):', '\n-> [' + voidFlowsKeys.join(', ') + ']');
+                    voidPowersKeys.sort(tempValueSort2);
+                    voidFlowsKeys.sort(tempValueSort2);
                     console.log('voidPowersKeys(stat-and-type-sorted):', '\n-> [' + voidPowersKeys.join(', ') + ']');
+                    console.log('voidFlowsKeys(stat-and-type-sorted):', '\n-> [' + voidFlowsKeys.join(', ') + ']');
 
                     // Then we can collect the ordered list of required power tokens and
                     // use that to sort any required power tokens to the top of the list
@@ -1412,8 +1517,10 @@
 
                     // Now we update the list of void powers in the UI to show any changes
                     console.log('voidPowers:', voidPowers);
+                    console.log('voidFlows:', voidFlows);
                     console.log('voidPowersKeys:', voidPowersKeys);
-                    if (voidPowersKeys.length){
+                    console.log('voidFlowsKeys:', voidFlowsKeys);
+                    if (voidPowersKeys.length || voidFlowsKeys.length){
 
                         // Pull in the power renderer to make things easier
                         var VoidPowersRenderer = _self.voidPowersRenderer;
@@ -1422,13 +1529,13 @@
                         var basePowersValues = {quanta: 0, spread: 0};
                         var rankPowersValues = {level: 1, forte: 0};
                         var rankPowersValuesMax = {level: 100, forte: 10};
-                        var sortPowersGrouped = {};
                         var statPowersValues = {};
-                        sortPowersGrouped.stat = { /* ... */ };
-                        sortPowersGrouped.type = { /* ... */ };
+                        var sortFlowsGrouped = {};
                         statPowersValues.attack = { /* ... */ };
                         statPowersValues.defense = { /* ... */ };
                         statPowersValues.speed = { /* ... */ };
+                        sortFlowsGrouped.type = { /* ... */ };
+                        sortFlowsGrouped.stat = { /* ... */ };
 
                         /*
                         // TEMP TEMP TEMP: HARD CODED TESTING POWERS!!! <<
@@ -1438,18 +1545,18 @@
                         rankPowersValues.forte = 45;
                         rankPowersValuesMax.level = 999;
                         rankPowersValuesMax.forte = 99;
-                        sortPowersGrouped.stat.energy = 47;
-                        sortPowersGrouped.stat.weapons = -4;
-                        sortPowersGrouped.stat.attack = 3;
-                        sortPowersGrouped.stat.defense = -25;
-                        sortPowersGrouped.stat.speed = 2;
-                        sortPowersGrouped.type.flame = 3;
-                        sortPowersGrouped.type.water = 1;
-                        sortPowersGrouped.type.electric = 28;
-                        sortPowersGrouped.type.cutter = 7;
-                        sortPowersGrouped.type.crystal = 38;
-                        sortPowersGrouped.type.time = -34;
-                        sortPowersGrouped.type.nature = 2;
+                        sortFlowsGrouped.stat.energy = 47;
+                        sortFlowsGrouped.stat.weapons = -4;
+                        sortFlowsGrouped.stat.attack = 3;
+                        sortFlowsGrouped.stat.defense = -25;
+                        sortFlowsGrouped.stat.speed = 2;
+                        sortFlowsGrouped.type.flame = 3;
+                        sortFlowsGrouped.type.water = 1;
+                        sortFlowsGrouped.type.electric = 28;
+                        sortFlowsGrouped.type.cutter = 7;
+                        sortFlowsGrouped.type.crystal = 38;
+                        sortFlowsGrouped.type.time = -34;
+                        sortFlowsGrouped.type.nature = 2;
                         statPowersValues.attack.value = 0.3;
                         statPowersValues.attack.boosts = 0;
                         statPowersValues.attack.breaks = 0;
@@ -1471,16 +1578,28 @@
                         if (voidPowers.forte){ rankPowersValues.forte = voidPowers.forte; }
 
                         // Pull in current values for the sort powers we'll be displaying
-                        var statSortPowers = _self.filterSortPowers(voidPowers, 'stats');
-                        var typeSortPowers = _self.filterSortPowers(voidPowers, 'types');
-                        if (statSortPowers){ sortPowersGrouped.stat = Object.assign({}, sortPowersGrouped.stat, statSortPowers); }
-                        if (typeSortPowers){ sortPowersGrouped.type = Object.assign({}, sortPowersGrouped.type, typeSortPowers); }
+                        var typeSortFlows = _self.filterSortFlows(voidFlows, 'types');
+                        var statSortFlows = _self.filterSortFlows(voidFlows, 'stats');
+                        if (typeSortFlows){ sortFlowsGrouped.type = Object.assign({}, sortFlowsGrouped.type, typeSortFlows); }
+                        if (statSortFlows){ sortFlowsGrouped.stat = Object.assign({}, sortFlowsGrouped.stat, statSortFlows); }
+                        console.log('FLOW DEBUG:', {voidFlows, statSortFlows, typeSortFlows, sortFlowsGrouped});
 
                         // Pull in current values for the stat powers we'll be displaying
-                        var statPowers = _self.filterStatPowers(voidPowers);
-                        if (statPowers.attack){ statPowersValues.attack = voidPowers.attack; }
-                        if (statPowers.defense){ statPowersValues.defense = voidPowers.defense; }
-                        if (statPowers.speed){ statPowersValues.speed = voidPowers.speed; }
+                        let rawStatPowers = _self.filterStatPowers(voidPowers);
+                        let rawStatPowersKeys = Object.keys(rawStatPowers);
+                        for (var i = 0; i < rawStatPowersKeys.length; i++){
+                            let statToken = rawStatPowersKeys[i];
+                            let statValue = rawStatPowers[statToken] || 0;
+                            let statValuePower = Math.abs(statValue);
+                            let statValueSpread = basePowersValues.spread || 1;
+                            let statValueArrows = Math.min(5, Math.floor(statValuePower / statValueSpread));
+                            let statValueBoosts = statValue < 0 ? 0 : statValueArrows;
+                            let statValueBreaks = statValue > 0 ? 0 : statValueArrows;
+                            console.log('foo-stat-check:', {statToken, statValue, statValueBoosts, statValueBreaks});
+                            let parsedStatPower = {value: statValue, boosts: statValueBoosts, breaks: statValueBreaks};
+                            statPowersValues[statToken] = parsedStatPower;
+                            }
+                        console.log('STAT DEBUG:', {voidPowers, rawStatPowers, statPowersValues});
 
                         // Check the base powers (quanta and spread) to display the appropriate markup
                         VoidPowersRenderer.renderBasePowers($missionDetails, basePowersValues);
@@ -1489,7 +1608,7 @@
                         VoidPowersRenderer.renderRankPowers($missionDetails, rankPowersValues, rankPowersValuesMax);
 
                         // Check the sort powers (stat and type) to display appropriate markup
-                        VoidPowersRenderer.renderSortPowers($missionDetails, sortPowersGrouped);
+                        VoidPowersRenderer.renderSortPowers($missionDetails, sortFlowsGrouped);
 
                         // Check for relative stat powers (attack, defense, speed) and display appropriate markup
                         VoidPowersRenderer.renderStatPowers($missionDetails, statPowersValues);
@@ -1550,6 +1669,35 @@
                         }
 
                     // end of voidRecipeWizard.refreshUI()
+                    },
+                showDebug: function(kind){
+                    console.log('%c' + 'voidRecipeWizard.showDebug()', 'color: magenta;');
+                    kind = kind || 'all';
+                    const _self = this;
+                    if (kind === 'powers' || kind === 'all'){
+                        console.log('%c' + 'VOID POWERS/FLOWS:', 'background-color: #242131; color: #fff; font-weight: bold;');
+                        //console.log('_self.powers =', _self.powers);
+                        var powerDebug = '';
+                        var powerKeys = Object.keys(_self.powers);
+                        for (var i = 0; i < powerKeys.length; i++){
+                            var powerKey = powerKeys[i];
+                            var powerValue = _self.powers[powerKey];
+                            powerDebug += '(ꝑ)-> ' + powerKey + ': ' + powerValue + '\n';
+                            }
+                        //console.log('_self.flows =', _self.flows);
+                        var flowDebug = '';
+                        var flowKeys = Object.keys(_self.flows);
+                        for (var i = 0; i < flowKeys.length; i++){
+                            var flowKey = flowKeys[i];
+                            var flowValue = _self.flows[flowKey];
+                            flowDebug += '(𝑓)-> ' + flowKey + ': ' + flowValue + '\n';
+                            }
+                        console.log('%c' + powerDebug, 'background-color: #242131; color: #fff; font-weight: bold;');
+                        console.log('%c' + flowDebug, 'background-color: #242131; color: #fff; font-weight: bold;');
+                        console.log('via `_self.powers`:', _self.powers);
+                        console.log('via `_self.flows`:', _self.flows);
+                        }
+                    // end of voidRecipeWizard.showDebug()
                     },
                 };
 

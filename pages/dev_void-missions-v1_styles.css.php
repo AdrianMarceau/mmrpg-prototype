@@ -137,7 +137,7 @@
     line-height: 18px;
     text-transform: uppercase;
     padding-bottom: 3px;
-    border-bottom: 1px solid #1b1825;
+    border-bottom: 1px solid #332c49;
 }
 #void-recipe .title .sub {
     display: block;
@@ -467,6 +467,14 @@
 #void-recipe .item-list[data-select="active"] .item:not(.active) .icon {
     filter: brightness(0.4);
     opacity: 0.6;
+}
+#void-recipe .item-list .item.disabled {
+    filter: brightness(0.9);
+    pointer-events: none;
+    cursor: not-allowed;
+}
+#void-recipe .item-list .item.disabled .icon {
+    filter: brightness(0.4);
 }
 
 #void-recipe .item-list .item.placeholder {
@@ -1063,7 +1071,8 @@
     font-size: 13px;
     padding: 1px 3px 5px;
     margin-bottom: 3px;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid transparent;
+    border-color: rgba(0, 0, 0, 0.1) !important;
 }
 #void-recipe .creation .mission-details .sort-powers .power > span {
     font-size: 9px;
@@ -1106,26 +1115,23 @@
     margin: 0 3px 0 0;
 }
 
-#void-recipe .creation .mission-details .sort-powers .power.ps0 { min-width: 10px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps1 { min-width: 11px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps2 { min-width: 12px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps3 { min-width: 13px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps4 { min-width: 14px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps5 { min-width: 15px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps6 { min-width: 16px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps7 { min-width: 17px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps8 { min-width: 18px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps9 { min-width: 19px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps10 { min-width: 20px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps11 { min-width: 21px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps12 { min-width: 22px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps13 { min-width: 23px; }
-#void-recipe .creation .mission-details .sort-powers .power.ps14 { min-width: 24px; }
+#void-recipe .creation .mission-details .sort-powers .power:not(.label) {
+    min-width: 10px;
+}
 
-#void-recipe .creation .mission-details .stat-sort-powers {
+/*
+#void-recipe .creation .mission-details .type-sort-powers {
     top: 36px;
 }
-#void-recipe .creation .mission-details .type-sort-powers {
+#void-recipe .creation .mission-details .stat-sort-powers {
+    top: 60px;
+}
+*/
+
+#void-recipe .creation .mission-details .sort-powers {
+    top: 36px;
+}
+#void-recipe .creation .mission-details .sort-powers + .sort-powers {
     top: 60px;
 }
 
