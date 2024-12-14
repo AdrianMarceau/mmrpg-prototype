@@ -359,6 +359,7 @@ $void_item_groups_index = array(
 // Disable certain void items until they have a purpose (TEMP PROBABLY)
 $void_items_disabled = array(
     'salvage-module', 'growth-module', 'fortune-module',
+    'field-booster',
     'hyperscan-module', 'copycat-module', 'reverse-module',
     'guard-module', 'persist-module', 'xtreme-module', 'overkill-module',
     'hourglass-module', 'magnet-module', 'transport-module', 'bulwark-module',

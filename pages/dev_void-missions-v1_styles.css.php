@@ -1071,8 +1071,11 @@
     font-size: 13px;
     padding: 1px 3px 5px;
     margin-bottom: 3px;
+    border-radius: 1px 3px 3px 1px;
     border: 1px solid transparent;
     border-color: rgba(0, 0, 0, 0.1) !important;
+    border-left-color: rgba(0, 0, 0, 0.2) !important;
+    border-right-color: rgba(255, 255, 255, 0.05) !important;
 }
 #void-recipe .creation .mission-details .sort-powers .power > span {
     font-size: 9px;

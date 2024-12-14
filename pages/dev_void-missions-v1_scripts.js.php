@@ -134,8 +134,8 @@
 
                     // Define a quick class (which we'll add to the parent) for rendering void powers
                     var voidPowersRenderer = {
-                        generatePowerElement: function({ token, name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasCode, hasArrows, boosts, breaks, blur, spanOrder, borderWidths }){
-                            //console.log('-> generating power element:', {name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasArrows, boosts, breaks, blur, spanOrder, borderWidths});
+                        generatePowerElement: function({ token, name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasCode, hasArrows, boosts, breaks, blur, padding, spanOrder }){
+                            //console.log('-> generating power element:', {name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasArrows, boosts, breaks, blur, padding, spanOrder });
                             let arrowClasses = 'value arrows';
                             let iconClasses = 'icon';
                             let nameClasses = 'name';
@@ -165,7 +165,7 @@
                             if (name){
                                 nameMarkup += '<span class="'+nameClasses+'"><strong>'+name+'</strong></span>';
                                 }
-                            if (value !== undefined){
+                            if (typeof value !== 'undefined'){
                                 var roundedValue = Math.round(value * 10) / 10;
                                 valueMarkup += '<span class="'+valueClasses+'"><data>'+ roundedValue + (isPercent ? '%' : '') + '</data>';
                                 if (maxValue !== undefined){ valueMarkup += '<sub>/ '+maxValue+'</sub>'; }
@@ -188,9 +188,7 @@
                             if (spanOrder.indexOf('value') === -1){ spanOrder.push('value'); }
                             if (spanOrder.indexOf('code') === -1){ spanOrder.push('code'); }
                             let extraStyles = '';
-                            borderWidths = borderWidths || {};
-                            if (borderWidths.left){ extraStyles += 'border-left-width: ' + borderWidths.left + 'px; '; }
-                            if (borderWidths.right){ extraStyles += 'border-right-width: ' + borderWidths.right + 'px; '; }
+                            if (typeof padding !== 'undefined'){ extraStyles += 'padding-left: ' + Math.round(padding) + 'px; '; }
                             if (extraStyles.length){ extraStyles = ' style="' + extraStyles + '"'; }
                             let markup = '<div class="power ' + typeClass + ' ' + (extraClasses || '') + '"' + (extraStyles || '') + '>';
                                 for (let i = 0; i < spanOrder.length; i++){
@@ -244,7 +242,6 @@
                             for (const [groupToken, groupValues] of Object.entries(sortFlowsGrouped)){
                                 let groupValuesTokens = Object.keys(groupValues);
                                 let groupValuesSum = 0 + (groupValuesTokens.length ? (function(){ var keys = groupValuesTokens, vals = groupValues, sum = 0; for (var i = 0; i < keys.length; i++){ var key = keys[i]; sum += vals[key]; } return sum; })() : 0);
-                                console.log('-> rendering group:', {groupToken, groupValues, groupValuesTokens, groupValuesSum});
                                 if (!groupValuesTokens.length || groupValuesSum === 0){ continue; }
                                 let groupIcon = groupToken === 'stat' ? 'bullseye' : 'fire-alt';
                                 let groupName = groupToken === 'stat' ? 'Flow (Stats)' : 'Flow (Types)';
@@ -255,6 +252,7 @@
                                     sortedTokens.forEach((token, index) => {
                                         var groupValue = groupValues[token];
                                         var absGroupValue = Math.abs(groupValue);
+                                        var paddingValue = absGroupValue * (groupToken === 'stat' ? 1 : 5);
                                         const config = {
                                             token: token,
                                             icon: false,
@@ -262,10 +260,7 @@
                                             value: groupValue,
                                             typeClass: ('sort type ' + token),
                                             blur: ['name', 'value'],
-                                            borderWidths: {
-                                                left: (groupValue > 0 ? Math.min(25, absGroupValue) : 0),
-                                                right: (groupValue < 0 ? Math.min(25, absGroupValue) : 0),
-                                                },
+                                            padding: Math.min(25, paddingValue),
                                             };
                                         markup += this.generatePowerElement(config);
                                         });
@@ -286,7 +281,6 @@
                                     var token = statOrder[i];
                                     if (!statPowersValues[token]){ continue; }
                                     var values = statPowersValues[token];
-                                    console.log('checking stat:', {token, values});
                                     if (!values['value']){ values['value'] = 0; }
                                     if (values['value'] === 0){ continue; }
                                     const config = {
@@ -531,7 +525,9 @@
                     var itemModsLevel = ['energy-upgrade'].indexOf(itemToken) !== -1; // itemIsEnergy && itemIsUpgrade;
                     var itemGivesForte = itemIsWeapons && (itemIsPellet || itemIsCapsule || itemIsTank) ? true : false;
                     var itemModsForte = ['weapon-upgrade'].indexOf(itemToken) !== -1; // itemIsWeapons && itemIsUpgrade;
-                    var itemGivesTriStats = itemIsAttack || itemIsDefense || itemIsSpeed || itemIsSuper;
+                    var itemGivesRankStats = (itemGivesLevel || itemGivesForte);
+                    var itemModsRankStats = (itemModsLevel || itemModsForte);
+                    var itemGivesTriStats = (itemIsAttack || itemIsDefense || itemIsSpeed || itemIsSuper);
                     var itemModsTriStats = (itemGivesTriStats && itemIsBooster) || (itemGivesTriStats && itemIsDiverter);
                     var itemRotatesQueues = itemSuffix === 'rotator';
                     if (itemToken === 'mecha-whistle'){ itemRotatesQueues = true; }
@@ -543,59 +539,120 @@
 
                     // Check to see which group the item belongs to and then parse its values
 
-                    // -- UNDEFINED SOMEHOW -----
+                    // -- UNDEFINED -----
                     if (itemToken === ''){
                         //return;
                         }
 
-                    // -- QUANTA ITEMS (SCREWS) -- //
-                    else if (itemIsScrew){
-                        var itemIsSmall = itemPrefix === 'small';
-                        var itemIsLarge = itemPrefix === 'large';
-                        var itemIsHyper = itemPrefix === 'hyper';
-                        var quantaValue = 0, tierToken = '';
-                        if (itemIsSmall){ quantaValue = 5.0, tierToken = 'mecha'; }
-                        else if (itemIsLarge){ quantaValue = 10.0, tierToken = 'master'; }
-                        else if (itemIsHyper){ quantaValue = 100.0, tierToken = 'boss'; }
-                        powers.incPower('quanta', quantaValue * quantity);
-                        //powers.incPower('quanta_'+tierToken, 1 * quantity);
+                    // -- QUANTA ITEMS ---- //
+                    else if (itemGivesQuanta || itemModsQuanta){
+
+                        // SIZED SCREWS (SMALL, LARGE, HYPER)
+                        // Effects: +QUANTA
+                        if (itemIsScrew){
+                            var itemIsSmall = itemPrefix === 'small';
+                            var itemIsLarge = itemPrefix === 'large';
+                            var itemIsHyper = itemPrefix === 'hyper';
+                            var quantaValue = 0, tierToken = '';
+                            if (itemIsSmall){ quantaValue = 5.0, tierToken = 'mecha'; }
+                            else if (itemIsLarge){ quantaValue = 10.0, tierToken = 'master'; }
+                            else if (itemIsHyper){ quantaValue = 100.0, tierToken = 'boss'; }
+                            powers.incPower('quanta', quantaValue * quantity);
+                            //powers.incPower('quanta_'+tierToken, 1 * quantity);
+                            }
+
                         }
 
-                    // -- SPREAD ITEMS (CORES) -- //
-                    else if (itemIsCore){
-                        var typeToken = itemPrefix;
-                        var spreadValue = 1.0, typeValue = 5.0;
-                        powers.incPower('spread', spreadValue * quantity);
-                        powers.incFlow(typeToken, quantity);
+                    // -- SPREAD ITEMS (NUMBER OF TARGETS) --
+                    else if (itemGivesSpread || itemModsSpread){
+
+                        // ELEMENTAL CORES (NATURE, FLAME, WATER, etc.)
+                        // Effects: +SPREAD && +TYPE-FLOW
+                        if (itemIsCore){
+                            var typeToken = itemPrefix;
+                            var spreadValue = 1.0, typeValue = 5.0;
+                            powers.incPower('spread', spreadValue * quantity);
+                            powers.incFlow(typeToken, quantity);
+                            }
+
                         }
 
-                    // -- TRI-STAT ITEMS (ATTACK, DEFENSE, SPEED)
-                    else if (itemGivesTriStats){
+                    // -- RANK-STAT ITEMS (ENERGY[LEVEL], WEAPONS[FORTE]) --
+                    else if (itemGivesRankStats || itemModsRankStats){
+
+                        // Collect the stat token and base value
+                        var statToken = itemIsEnergy ? 'level' : 'forte';
+                        var statBase = 1 * quantity;
+
+                        // LEVEL INCREASERS (ENERGY PELLET, CAPSULE, TANK, UPGRADE)
+                        // Effects: +LEVEL/MAX && +STAT-FLOW
+                        if (itemIsEnergy){
+                            if (itemIsPellet || itemIsCapsule || itemIsTank){
+                                var flowBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 2 : 0) + (itemIsTank ? 3 : 0));
+                                var powerBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 3 : 0) + (itemIsTank ? 5 : 0));
+                                powers.incFlow(statToken, flowBoost);
+                                powers.incPower(statToken, powerBoost);
+                                }
+                            else if (itemIsUpgrade){
+                                var flowBoost = statBase * (5);
+                                var powerBoost = statBase * (100);
+                                powers.incFlow(statToken, flowBoost);
+                                powers.incPower(statToken+'Max', powerBoost);
+                                }
+                            }
+
+                        // FORTE INCREASERS (WEAPON PELLET, CAPSULE, TANK, UPGRADE)
+                        // Effects: +FORTE/MAX && +STAT-FLOW
+                        if (itemIsWeapons){
+                            if (itemIsPellet || itemIsCapsule || itemIsTank){
+                                var flowBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 2 : 0) + (itemIsTank ? 3 : 0));
+                                var powerBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 3 : 0) + (itemIsTank ? 5 : 0));
+                                powers.incFlow(statToken, flowBoost);
+                                powers.incPower(statToken, powerBoost);
+                                }
+                            else if (itemIsUpgrade){
+                                var flowBoost = statBase * (5);
+                                var powerBoost = statBase * (10);
+                                powers.incFlow(statToken, flowBoost);
+                                powers.incPower(statToken+'Max', powerBoost);
+                                }
+                            }
+
+                        }
+
+                    // -- TRI-STAT ITEMS (ATTACK, DEFENSE, SPEED) --
+                    else if (itemGivesTriStats || itemModsTriStats){
+
+                        // Collect the stat token and base value
                         var statToken = itemPrefix;
                         var statBase = 1 * quantity;
 
-                        // -- STAT BOOSTERS w/ +STATS && +FLOW(STATS)
+                        // STAT INCREASERS (PELLETS, CAPSULES, BOOSTERS)
+                        // Effects: +STATS && +STAT-FLOW
                         if (itemIsPellet
                             || itemIsCapsule
                             || itemIsBooster){
                             var flowBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 2 : 0) + (itemIsBooster ? 3 : 0));
                             var powerBoost = statBase * ((itemIsPellet ? 2 : 0) + (itemIsCapsule ? 3 : 0) + (itemIsBooster ? 5 : 0));
-                            if (!itemIsSuper){
+                            if (itemIsAttack || itemIsDefense || itemIsSpeed){
                                 powers.incFlow(statToken, flowBoost);
                                 powers.incPower(statToken, powerBoost);
-                                } else {
+                                }
+                            else if (itemIsSuper){
                                 var superTokens = ['attack', 'defense', 'speed'];
                                 flowBoost /= superTokens.length;
                                 powerBoost /= superTokens.length;
                                 for (var i = 0; i < superTokens.length; i++){
                                     var superToken = superTokens[i];
-                                    powers.incFlow(superToken, flowBoost);
-                                    powers.incPower(superToken, powerBoost);
+                                    powers.incFlow(superToken, Math.floor(flowBoost));
+                                    powers.incPower(superToken, Math.floor(powerBoost));
                                     }
                                 }
                             }
-                        // -- STAT DIVERTERS w/ ~STATS && ~FLOW(STATS)
-                        else if (itemIsDiverter){
+
+                        // STAT MODIFIERS (DIVERTERS)
+                        // Effects: ~STATS && ~STAT-FLOW
+                        if (itemIsDiverter){
                             var divertFrom = statToken, divertTo = [], divertToNum = 0;
                             if (statToken !== 'attack'){ divertTo.push('attack'); }
                             if (statToken !== 'defense'){ divertTo.push('defense'); }
@@ -612,8 +669,10 @@
                                 powers.incPower(divertToToken, powerBoost);
                                 }
                             }
+
                         }
 
+                    /*
                     // -- TANKS & UPGRADES & MYTHICS w/ LEVEL + FORTE [+ ~STATS]
                     else if (itemIsTank || itemIsUpgrade){
                         var boostKind = itemIsEnergy ? 'level' : 'forte';
@@ -640,6 +699,8 @@
                         powers.incPower(opposingTypes[0], opposingValues[0] * quantity);
                         powers.decPower(opposingTypes[1], opposingValues[1] * quantity);
                         }
+                    */
+
                     // -- MODULE ITEMS w/ SPECIAL EFFECTS
                     else if (itemIsModule){
                         if (itemPrefix === 'charge'){
@@ -1062,6 +1123,8 @@
                     voidPowers.powers.forte = 0;
                     voidPowers.powers.effort = 0;
                     voidPowers.powers.reward = 0;
+                    voidPowers.powers.levelMax = 100;
+                    voidPowers.powers.forteMax = 10;
                     voidPowers.flags.guard = false;
                     voidPowers.flags.reverse = false;
                     voidPowers.flags.extreme = false;
@@ -1082,6 +1145,16 @@
                         if (voidPowers.powers.spread < 0){ voidPowers.powers.spread = 0; }
                         // Ensure the level is always at least one if there are items present
                         if (voidPowers.powers.level < 1){ voidPowers.powers.level = 1; }
+                        // Ensure the forte is always at least zero if there are items present
+                        if (voidPowers.powers.forte < 0){ voidPowers.powers.forte = 0; }
+                        // Ensure the max values for level stay above and below thresbholds
+                        if (voidPowers.powers.levelMax < 0){ voidPowers.powers.levelMax = 0; }
+                        else if (voidPowers.powers.levelMax > 999){ voidPowers.powers.levelMax = 999; }
+                        if (voidPowers.powers.level > voidPowers.powers.levelMax){ voidPowers.powers.level = voidPowers.powers.levelMax; }
+                        // Ensure the max values for forte stay above and below thresbholds
+                        if (voidPowers.powers.forteMax < 0){ voidPowers.powers.forteMax = 0; }
+                        else if (voidPowers.powers.forteMax > 99){ voidPowers.powers.forteMax = 99; }
+                        if (voidPowers.powers.forte > voidPowers.powers.forteMax){ voidPowers.powers.forte = voidPowers.powers.forteMax; }
                         }
 
                     // Make sure the spread never goes above max values
@@ -1161,8 +1234,8 @@
                     //console.log('-> typePowersList:', typePowersList);
                     var statFlowsList = _self.filterSortFlows(voidFlowsList, 'stats');
                     var typeFlowsList = _self.filterSortFlows(voidFlowsList, 'types');
-                    console.log('-> statFlowsList:', statFlowsList);
-                    console.log('-> typeFlowsList:', typeFlowsList);
+                    //console.log('-> statFlowsList:', statFlowsList);
+                    //console.log('-> typeFlowsList:', typeFlowsList);
 
                     // Loop through and check to see which classes are represented
                     var maxTierLevel = 0;
@@ -1190,7 +1263,6 @@
                     var typeFlowTokensSorted = typeFlowTokens.slice().sort(function(a, b){
                         var aIndex = voidItemsTokens.indexOf(a+'-core');
                         var bIndex = voidItemsTokens.indexOf(b+'-core');
-                        console.log('-> comparing', a, 'w/ index:', aIndex, 'vs.', b, 'w/ index:', bIndex);
                         return aIndex - bIndex;
                         });
                     var distributedTypes = {};
@@ -1451,15 +1523,15 @@
                         $targetList.append('<span class="loading">&hellip;</span>');
                         return;
                         }
-                    console.log('voidPowersValSum:', voidPowersValSum);
-                    console.log('voidPowersKeys(raw):', '\n-> [' + voidPowersKeys.join(', ') + ']');
+                    //console.log('voidPowersValSum:', voidPowersValSum);
+                    //console.log('voidPowersKeys(raw):', '\n-> [' + voidPowersKeys.join(', ') + ']');
 
                     // Also collect the list of void flows and keys so we can re-sort in the next step
                     var voidFlows = _self.flows;
                     var voidFlowsKeys = Object.keys(voidFlows);
                     var voidFlowsValSum = 0 + (voidFlowsKeys.length ? (function(){ var sum = 0; for (var i = 0; i < voidFlowsKeys.length; i++){ var key = voidFlowsKeys[i]; sum += voidFlows[key]; } return sum; })() : 0);
-                    console.log('voidFlowsValSum:', voidFlowsValSum);
-                    console.log('voidFlowsKeys(raw):', '\n-> [' + voidFlowsKeys.join(', ') + ']');
+                    //console.log('voidFlowsValSum:', voidFlowsValSum);
+                    //console.log('voidFlowsKeys(raw):', '\n-> [' + voidFlowsKeys.join(', ') + ']');
 
                     // First, sort the power/flow tokens by their values going highest to lowest,
                     // then sort all the keys pertaining to stats first, all keys pertaining to
@@ -1495,12 +1567,12 @@
                         };
                     voidPowersKeys.sort(tempValueSort('powers'));
                     voidFlowsKeys.sort(tempValueSort('flows'));
-                    console.log('voidPowersKeys(power-sorted):', '\n-> [' + voidPowersKeys.join(', ') + ']');
-                    console.log('voidFlowsKeys(power-sorted):', '\n-> [' + voidFlowsKeys.join(', ') + ']');
+                    //console.log('voidPowersKeys(power-sorted):', '\n-> [' + voidPowersKeys.join(', ') + ']');
+                    //console.log('voidFlowsKeys(power-sorted):', '\n-> [' + voidFlowsKeys.join(', ') + ']');
                     voidPowersKeys.sort(tempValueSort2);
                     voidFlowsKeys.sort(tempValueSort2);
-                    console.log('voidPowersKeys(stat-and-type-sorted):', '\n-> [' + voidPowersKeys.join(', ') + ']');
-                    console.log('voidFlowsKeys(stat-and-type-sorted):', '\n-> [' + voidFlowsKeys.join(', ') + ']');
+                    //console.log('voidPowersKeys(stat-and-type-sorted):', '\n-> [' + voidPowersKeys.join(', ') + ']');
+                    //console.log('voidFlowsKeys(stat-and-type-sorted):', '\n-> [' + voidFlowsKeys.join(', ') + ']');
 
                     // Then we can collect the ordered list of required power tokens and
                     // use that to sort any required power tokens to the top of the list
@@ -1513,13 +1585,13 @@
                         if (bIndex !== -1){ return 1; }
                         return 0;
                         });
-                    console.log('voidPowersKeys(required-first):', '\n-> [' + voidPowersKeys.join(', ') + ']');
+                    //console.log('voidPowersKeys(required-first):', '\n-> [' + voidPowersKeys.join(', ') + ']');
 
                     // Now we update the list of void powers in the UI to show any changes
-                    console.log('voidPowers:', voidPowers);
-                    console.log('voidFlows:', voidFlows);
-                    console.log('voidPowersKeys:', voidPowersKeys);
-                    console.log('voidFlowsKeys:', voidFlowsKeys);
+                    //console.log('voidPowers:', voidPowers);
+                    //console.log('voidFlows:', voidFlows);
+                    //console.log('voidPowersKeys:', voidPowersKeys);
+                    //console.log('voidFlowsKeys:', voidFlowsKeys);
                     if (voidPowersKeys.length || voidFlowsKeys.length){
 
                         // Pull in the power renderer to make things easier
@@ -1576,13 +1648,15 @@
                         // Pull in current values for the rank powers we'll be displaying
                         if (voidPowers.level){ rankPowersValues.level = voidPowers.level; }
                         if (voidPowers.forte){ rankPowersValues.forte = voidPowers.forte; }
+                        if (voidPowers.levelMax){ rankPowersValuesMax.level = voidPowers.levelMax; }
+                        if (voidPowers.forteMax){ rankPowersValuesMax.forte = voidPowers.forteMax; }
 
                         // Pull in current values for the sort powers we'll be displaying
                         var typeSortFlows = _self.filterSortFlows(voidFlows, 'types');
                         var statSortFlows = _self.filterSortFlows(voidFlows, 'stats');
                         if (typeSortFlows){ sortFlowsGrouped.type = Object.assign({}, sortFlowsGrouped.type, typeSortFlows); }
                         if (statSortFlows){ sortFlowsGrouped.stat = Object.assign({}, sortFlowsGrouped.stat, statSortFlows); }
-                        console.log('FLOW DEBUG:', {voidFlows, statSortFlows, typeSortFlows, sortFlowsGrouped});
+                        //console.log('FLOW DEBUG:', {voidFlows, statSortFlows, typeSortFlows, sortFlowsGrouped});
 
                         // Pull in current values for the stat powers we'll be displaying
                         let rawStatPowers = _self.filterStatPowers(voidPowers);
@@ -1595,11 +1669,10 @@
                             let statValueArrows = Math.min(5, Math.floor(statValuePower / statValueSpread));
                             let statValueBoosts = statValue < 0 ? 0 : statValueArrows;
                             let statValueBreaks = statValue > 0 ? 0 : statValueArrows;
-                            console.log('foo-stat-check:', {statToken, statValue, statValueBoosts, statValueBreaks});
                             let parsedStatPower = {value: statValue, boosts: statValueBoosts, breaks: statValueBreaks};
                             statPowersValues[statToken] = parsedStatPower;
                             }
-                        console.log('STAT DEBUG:', {voidPowers, rawStatPowers, statPowersValues});
+                        //console.log('STAT DEBUG:', {voidPowers, rawStatPowers, statPowersValues});
 
                         // Check the base powers (quanta and spread) to display the appropriate markup
                         VoidPowersRenderer.renderBasePowers($missionDetails, basePowersValues);
