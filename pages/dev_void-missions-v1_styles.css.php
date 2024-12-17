@@ -1383,6 +1383,8 @@
     background-color: transparent;
     background-image: none;
     /* background-color: magenta;  */
+    mix-blend-mode: overlay;
+    opacity: 0.8;
 }
 #void-recipe .creation .black-hole .layer {
     content: "";
@@ -1401,7 +1403,7 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center center;
-    opacity: 0.1;
+    filter: opacity(1.0) invert(0.0);
     z-index: 1;
     animation: none;
     animation-timing-function: linear;
@@ -1409,15 +1411,20 @@
     /* outline: 1px dotted magenta;  */
 }
 
-#void-recipe .creation .black-hole .layer.first { width: 400px; height: 400px; top: -150px; left: -150px; z-index: 1; }
-#void-recipe .creation .black-hole .layer.second { width: 300px; height: 300px; top: -100px; left: -100px; z-index: 1; }
-#void-recipe .creation .black-hole .layer.third { width: 200px; height: 200px; top: -50px; left: -50px; z-index: 2; }
-#void-recipe .creation .black-hole .layer.fourth { width: 100px; height: 100px; top: 0; left: 0; z-index: 3; }
+#void-recipe .creation .black-hole .layer.first { width: 100px; height: 100px; top: 0; left: 0; z-index: 3; }
+#void-recipe .creation .black-hole .layer.second { width: 200px; height: 200px; top: -50px; left: -50px; z-index: 2; }
+#void-recipe .creation .black-hole .layer.third { width: 300px; height: 300px; top: -100px; left: -100px; z-index: 1; }
+#void-recipe .creation .black-hole .layer.fourth { width: 400px; height: 400px; top: -150px; left: -150px; z-index: 1; }
 
-#void-recipe .creation .black-hole .layer.first { animation: rotate-clockwise 20s linear infinite; animation-delay: 0.2s; }
-#void-recipe .creation .black-hole .layer.second { animation: rotate-clockwise 18s linear infinite; animation-delay: 0.4s; }
-#void-recipe .creation .black-hole .layer.third { animation: rotate-clockwise 16s linear infinite; animation-delay: 0.6s; }
-#void-recipe .creation .black-hole .layer.fourth { animation: rotate-clockwise 14s linear infinite; animation-delay: 0.8s; }
+#void-recipe .creation .black-hole .layer.first { animation: rotate-clockwise 120s linear infinite; animation-delay: 0.8s; }
+#void-recipe .creation .black-hole .layer.second { animation: rotate-clockwise 140s linear infinite; animation-delay: 0.6s; }
+#void-recipe .creation .black-hole .layer.third { animation: rotate-clockwise 160s linear infinite; animation-delay: 0.4s; }
+#void-recipe .creation .black-hole .layer.fourth { animation: rotate-clockwise 180s linear infinite; animation-delay: 0.2s; }
+
+#void-recipe .creation .black-hole .layer.first { filter: opacity(0.3) invert(0.0); }
+#void-recipe .creation .black-hole .layer.second { filter: opacity(0.5) invert(1.0); }
+#void-recipe .creation .black-hole .layer.third { filter: opacity(0.3) invert(0.0); }
+#void-recipe .creation .black-hole .layer.fourth { filter: opacity(0.4) invert(1.0); }
 
 @keyframes rotate-clockwise {
     0% { transform: rotate(0deg); }
