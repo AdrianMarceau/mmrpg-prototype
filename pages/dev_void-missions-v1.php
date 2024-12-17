@@ -128,22 +128,13 @@ $void_item_groups_index = array(
                     'space-core', 'shield-core', 'laser-core', 'copy-core', 'none-core',
                     )
                 ),
-            'quanta-balancers' => array(
-                'name' => 'Quanta Balancers',
+            'data-modules' => array(
+                'name' => 'Data Modules',
                 'color' => 'copy',
                 'rowline' => 3,
-                'colspan' => 1,
+                'colspan' => 3,
                 'items' => array(
-                    'charge-module',
-                    )
-                ),
-            'spread-balancers' => array(
-                'name' => 'Spread Balancers',
-                'color' => 'copy',
-                'rowline' => 3,
-                'colspan' => 2,
-                'items' => array(
-                    'spreader-module', 'target-module',
+                    'charge-module', 'spreader-module', 'target-module',
                     )
                 ),
             ),
@@ -190,13 +181,13 @@ $void_item_groups_index = array(
                     'weapon-upgrade',
                     )
                 ),
-            'reward-mods' => array(
-                'name' => 'Reward Mods',
+            'power-balancers' => array(
+                'name' => 'Level Balancers',
                 'color' => 'copy',
                 'rowline' => 5,
                 'colspan' => 3,
                 'items' => array(
-                    'salvage-module', 'growth-module', 'fortune-module',
+                    'fortune-module', 'growth-module', 'salvage-module',
                     )
                 ),
             ),
@@ -403,6 +394,7 @@ $void_items_disabled = array(
         // NEW VERSION:
         // Loop through each of the steps in the index (then each of the groups within those steps), to generate
         // the markup for the item-pallet's wrappers, group containers, and item buttons that will be clicked on
+        $all_items_x99 = !empty($_GET['allx99']) ? true : false;
         $num_items_total = 0;
         $curr_item_rowline = 0;
         $group_markup_by_step = array();
@@ -429,7 +421,7 @@ $void_items_disabled = array(
                     $item_name_br = str_replace(' ', '<br />', $item_name);
                     $item_is_oneline = !strstr($item_name, ' ');
                     $item_is_disabled = in_array($item_token, $void_items_disabled);
-                    $item_quantity = mt_rand(33, 99); //mt_rand(0, 99);
+                    $item_quantity = $all_items_x99 ? 99 : mt_rand(33, 99); //mt_rand(0, 99);
                     $item_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_token;
                     $icon_url = '/images/items/'.$item_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
                     ob_start();

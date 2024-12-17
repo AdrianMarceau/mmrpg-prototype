@@ -1071,11 +1071,18 @@
     font-size: 13px;
     padding: 1px 3px 5px;
     margin-bottom: 3px;
-    border-radius: 1px 3px 3px 1px;
+    border-radius: 3px;
     border: 1px solid transparent;
     border-color: rgba(0, 0, 0, 0.1) !important;
     border-left-color: rgba(0, 0, 0, 0.2) !important;
     border-right-color: rgba(255, 255, 255, 0.05) !important;
+}
+#void-recipe .creation .mission-details .sort-powers .power.plus {
+    border-radius: 1px 3px 3px 1px;
+}
+#void-recipe .creation .mission-details .sort-powers .power.minus {
+    border-radius: 3px 1px 1px 3px;
+    border-style: dotted;
 }
 #void-recipe .creation .mission-details .sort-powers .power > span {
     font-size: 9px;
@@ -1175,6 +1182,26 @@
     right: 0;
     font-size: 20px;
     line-height: 1;
+}
+#void-recipe .creation .mission-details .stat-powers .power.max,
+#void-recipe .creation .mission-details .stat-powers .power.min {
+    outline: 1px solid transparent;
+}
+#void-recipe .creation .mission-details .stat-powers .power.max {
+    outline-color: rgba(255, 255, 255, 0.2);
+}
+#void-recipe .creation .mission-details .stat-powers .power.min {
+    border-style: dotted;
+    outline-color: rgba(0, 0, 0, 0.2);
+}
+#void-recipe .creation .mission-details .stat-powers .power.attack {
+    outline-color: #a96667;
+}
+#void-recipe .creation .mission-details .stat-powers .power.defense {
+    outline-color: #687da6;
+}
+#void-recipe .creation .mission-details .stat-powers .power.speed {
+    outline-color: #a591b1;
 }
 
 

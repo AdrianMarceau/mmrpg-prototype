@@ -30,10 +30,27 @@
                     const _self = this;
                     _self.name = 'voidRecipeWizard';
                     _self.version = '1.0.0';
-                    _self.maxItems = 10;
-                    _self.maxTargets = 8;
-                    _self.minQuantaPerClass = {'mecha': 25, 'master': 50, 'boss': 500};
-                    _self.voidPowersRequired = ['delta', 'spread', 'quanta', 'level', 'forte'];
+                    _self.config = {
+                        maxItems: 10,
+                        maxTargets: 8,
+                        maxArrows: 5,
+                        maxLevel: 100,
+                        maxForte: 10,
+                        realMaxLevel: 999,
+                        realMaxForte: 99,
+                        minQuantaPerClass: {
+                            mecha: 25,
+                            master: 100,
+                            boss: 500
+                            },
+                        voidPowersRequired: [
+                            'delta',
+                            'spread',
+                            'quanta',
+                            'level',
+                            'forte'
+                            ]
+                        };
                     _self.isReady = false;
                     _self.reset(false);
                     _self.setup($container);
@@ -66,6 +83,7 @@
 
                     // Backup a reference to the parent object
                     const _self = this;
+                    const config = _self.config;
 
                     // Predefine some parent variables for the class
                     _self.xrefs = {};
@@ -134,42 +152,64 @@
 
                     // Define a quick class (which we'll add to the parent) for rendering void powers
                     var voidPowersRenderer = {
-                        generatePowerElement: function({ token, name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasCode, hasArrows, boosts, breaks, blur, padding, spanOrder }){
-                            //console.log('-> generating power element:', {name, icon, value, maxValue, typeClass, isPercent, extraClasses, hasArrows, boosts, breaks, blur, padding, spanOrder });
+                        generatePowerElement: function({ token, name, value, maxValue, isPercent,
+                                iconClass, typeClass, extraClasses, extraStyles,
+                                hasCode, hasArrows, numBoosts, numBreaks,
+                                spanOrder, spanPadding, blurSpans,
+                                }){
+                            //console.log('-> generating power element:', {token, name, value, maxValue, isPercent, iconClass, typeClass, extraClasses, extraStyles, hasCode, hasArrows, numBoosts, numBreaks, spanOrder, spanPadding, blurSpans});
+                            token = typeof token === 'string' ? token : '';
+                            name = name || '['+token+']';
+                            value = typeof value !== 'undefined' ? value : 0;
+                            iconClass = iconClass || false;
+                            maxValue = maxValue || null;
+                            typeClass = typeClass || '';
+                            extraClasses = extraClasses || '';
+                            extraStyles = extraStyles || '';
+                            isPercent = isPercent || false;
+                            hasCode = hasCode || false;
+                            hasArrows = hasArrows || false;
+                            numBoosts = numBoosts || 0;
+                            numBreaks = numBreaks || 0;
+                            blurSpans = blurSpans || [];
+                            spanPadding = spanPadding || 0;
+                            spanOrder = spanOrder || [];
                             let arrowClasses = 'value arrows';
                             let iconClasses = 'icon';
                             let nameClasses = 'name';
                             let valueClasses = 'value';
                             let codeClasses = 'code';
-                            if (typeof blur !== 'object'){ blur = []; }
-                            if (blur.indexOf('arrows') !== -1){ arrowClasses += ' blur'; }
-                            if (blur.indexOf('icon') !== -1){ iconClasses += ' blur'; }
-                            if (blur.indexOf('name') !== -1){ nameClasses += ' blur'; }
-                            if (blur.indexOf('value') !== -1){ valueClasses += ' blur'; }
-                            if (blur.indexOf('code') !== -1){ codeClasses += ' blur'; }
+                            if (typeof blurSpans !== 'object'){ blurSpans = []; }
+                            if (blurSpans.indexOf('arrows') !== -1){ arrowClasses += ' blur'; }
+                            if (blurSpans.indexOf('icon') !== -1){ iconClasses += ' blur'; }
+                            if (blurSpans.indexOf('name') !== -1){ nameClasses += ' blur'; }
+                            if (blurSpans.indexOf('value') !== -1){ valueClasses += ' blur'; }
+                            if (blurSpans.indexOf('code') !== -1){ codeClasses += ' blur'; }
                             //console.log('-> classes:', {arrowClasses, iconClasses, nameClasses, valueClasses});
-                            var arrowsMarkup = '';
-                            var iconMarkup = '';
                             var nameMarkup = '';
                             var valueMarkup = '';
+                            var iconMarkup = '';
+                            var arrowsMarkup = '';
                             var codeMarkup = '';
-                            if (hasArrows && (boosts || breaks)){
-                                arrowsMarkup += '<span class="'+arrowClasses+'">';
-                                for (let i = 0; i < boosts; i++){ arrowsMarkup += '<span class="arrow boost"><i class="fas fa-caret-up"></i></span>'; }
-                                for (let i = 0; i < breaks; i++){ arrowsMarkup += '<span class="arrow break"><i class="fas fa-caret-down"></i></span>'; }
-                                arrowsMarkup += '</span>';
-                                }
-                            if (icon){
-                                iconMarkup += '<span class="'+iconClasses+'"><i class="fa fas fa-'+icon+'"></i></span>';
-                                }
                             if (name){
                                 nameMarkup += '<span class="'+nameClasses+'"><strong>'+name+'</strong></span>';
                                 }
                             if (typeof value !== 'undefined'){
                                 var roundedValue = Math.round(value * 10) / 10;
                                 valueMarkup += '<span class="'+valueClasses+'"><data>'+ roundedValue + (isPercent ? '%' : '') + '</data>';
-                                if (maxValue !== undefined){ valueMarkup += '<sub>/ '+maxValue+'</sub>'; }
+                                if (maxValue){ valueMarkup += '<sub>/ '+maxValue+'</sub>'; }
                                 valueMarkup += '</span>';
+                                }
+                            if (iconClass){
+                                iconMarkup += '<span class="'+iconClasses+'"><i class="fa fas fa-'+iconClass+'"></i></span>';
+                                }
+                            if (hasArrows && (numBoosts || numBreaks)){
+                                arrowsMarkup += '<span class="'+arrowClasses+'">';
+                                for (let i = 0; i < numBoosts; i++){ arrowsMarkup += '<span class="arrow boost"><i class="fas fa-caret-up"></i></span>'; }
+                                for (let i = 0; i < numBreaks; i++){ arrowsMarkup += '<span class="arrow break"><i class="fas fa-caret-down"></i></span>'; }
+                                arrowsMarkup += '</span>';
+                                if (numBoosts >= config.maxArrows){ extraClasses += ' max'; }
+                                if (numBreaks >= config.maxArrows){ extraClasses += ' min'; }
                                 }
                             if (hasCode){
                                 var powerCode = token.substring(0, 2).toUpperCase();
@@ -180,17 +220,30 @@
                                 if (token === 'speed'){ powerCode = 'SP'; }
                                 codeMarkup += '<span class="'+codeClasses+'"><code>'+powerCode+'</code></span>';
                                 }
-                            //console.log('-> generated power elements:', {arrowsMarkup, iconMarkup, nameMarkup, valueMarkup, codeMarkup});
                             if (!Array.isArray(spanOrder)){ spanOrder = []; }
                             if (spanOrder.indexOf('arrows') === -1){ spanOrder.push('arrows'); }
                             if (spanOrder.indexOf('icon') === -1){ spanOrder.push('icon'); }
                             if (spanOrder.indexOf('name') === -1){ spanOrder.push('name'); }
                             if (spanOrder.indexOf('value') === -1){ spanOrder.push('value'); }
                             if (spanOrder.indexOf('code') === -1){ spanOrder.push('code'); }
-                            let extraStyles = '';
-                            if (typeof padding !== 'undefined'){ extraStyles += 'padding-left: ' + Math.round(padding) + 'px; '; }
-                            if (extraStyles.length){ extraStyles = ' style="' + extraStyles + '"'; }
-                            let markup = '<div class="power ' + typeClass + ' ' + (extraClasses || '') + '"' + (extraStyles || '') + '>';
+                            var elementClasses = '';
+                            elementClasses += 'power ' + typeClass;
+                            if (extraClasses.length){ elementClasses += ' ' + extraClasses; }
+                            var elementStyles = '';
+                            if (spanPadding){
+                                let left = 0, right = 0;
+                                if (typeof spanPadding === 'number'){ left = right = spanPadding; }
+                                else if (typeof spanPadding === 'object' && spanPadding.left){ left = spanPadding.left; }
+                                else if (typeof spanPadding === 'object' && spanPadding.right){ right = spanPadding.right; }
+                                if (left){ elementStyles += ' padding-left: ' + Math.round(left) + 'px;'; }
+                                if (right){ elementStyles += ' padding-right: ' + Math.round(right) + 'px;'; }
+                                }
+                            if (extraStyles.length){ elementStyles += ' ' + extraStyles; }
+                            elementClasses = elementClasses.trim().replace(/\s+/g, ' ');
+                            elementStyles = elementStyles.trim().replace(/\s+/g, ' ');
+                            let classAttr = elementClasses ? ' class="' + elementClasses + '"' : '';
+                            let stylesAttr = elementStyles ? ' style="' + elementStyles + '"' : '';
+                            let markup = '<div ' + classAttr + stylesAttr + '>';
                                 for (let i = 0; i < spanOrder.length; i++){
                                     let spanToken = spanOrder[i];
                                     if (spanToken === 'arrows'){ markup += arrowsMarkup; }
@@ -205,13 +258,12 @@
                         renderBasePowers: function($missionDetails, basePowersValues){
                             let markup = '<div class="void-powers ltr bgo base-powers">';
                                 for (const [token, value] of Object.entries(basePowersValues)) {
+                                    let name = token.charAt(0).toUpperCase() + token.slice(1);
                                     const config = {
-                                        token: token,
-                                        name: token === 'quanta' ? 'Quanta' : 'Spread',
-                                        icon: token === 'quanta' ? 'atom' : 'code-branch',
-                                        value,
-                                        typeClass: 'base type ' + (token === 'quanta' ? 'water' : 'laser'),
-                                        blur: ['name']
+                                        token, name, value,
+                                        iconClass: (token === 'quanta' ? 'atom' : 'code-branch'),
+                                        typeClass: ('base type ' + (token === 'quanta' ? 'water' : 'laser')),
+                                        blurSpans: ['name']
                                         };
                                     markup += this.generatePowerElement(config);
                                     }
@@ -221,16 +273,13 @@
                         renderRankPowers: function($missionDetails, rankPowersValues, rankPowersMaxValues){
                             let markup = '<div class="void-powers rtl bgo rank-powers">';
                                 for (const [token, value] of Object.entries(rankPowersValues)) {
-                                    const maxValue = rankPowersMaxValues[token] || 0;
+                                    let name = token.charAt(0).toUpperCase() + token.slice(1);
+                                    let maxValue = rankPowersMaxValues[token] || 0;
                                     const config = {
-                                        token: token,
-                                        name: token === 'level' ? 'Level' : 'Forte',
-                                        icon: token === 'level' ? 'star' : 'fist-raised',
-                                        value,
-                                        maxValue,
-                                        typeClass: 'rank type ' + (token === 'level' ? 'electric' : 'shield'),
-                                        //blur: token === 'forte' ? ['name'] : [],
-                                        blur: ['name']
+                                        token, name, value, maxValue,
+                                        iconClass: (token === 'level' ? 'star' : 'fist-raised'),
+                                        typeClass: ('rank type ' + (token === 'level' ? 'electric' : 'shield')),
+                                        blurSpans: ['name'],
                                         };
                                     markup += this.generatePowerElement(config);
                                     }
@@ -241,26 +290,28 @@
                             console.log('VoidPowersRenderer.renderSortPowers($missionDetails, sortFlowsGrouped) w/', {sortFlowsGrouped});
                             for (const [groupToken, groupValues] of Object.entries(sortFlowsGrouped)){
                                 let groupValuesTokens = Object.keys(groupValues);
-                                let groupValuesSum = 0 + (groupValuesTokens.length ? (function(){ var keys = groupValuesTokens, vals = groupValues, sum = 0; for (var i = 0; i < keys.length; i++){ var key = keys[i]; sum += vals[key]; } return sum; })() : 0);
+                                let groupValuesSum = 0 + (groupValuesTokens.length ? (function(){ var keys = groupValuesTokens, vals = groupValues, sum = 0; for (var i = 0; i < keys.length; i++){ var key = keys[i]; sum += Math.abs(vals[key]); } return sum; })() : 0);
                                 if (!groupValuesTokens.length || groupValuesSum === 0){ continue; }
+                                console.log('-> rendering group:', {groupToken, groupValues, groupValuesTokens, groupValuesSum});
                                 let groupIcon = groupToken === 'stat' ? 'bullseye' : 'fire-alt';
                                 let groupName = groupToken === 'stat' ? 'Flow (Stats)' : 'Flow (Types)';
+                                let groupPadd = groupToken === 'stat' ? 1 : 10;
                                 let markup = '<div class="void-powers ltr bgi sort-powers ' + groupToken + '-sort-powers">';
                                     let sortedTokens = Object.values(groupValuesTokens);
                                     let numSortedTokens = sortedTokens.length;
-                                    sortedTokens.sort((a, b) => groupValues[b] - groupValues[a]);
+                                    let maxLeftPadding = Math.min((groupValuesSum * groupPadd), 80);
+                                    sortedTokens.sort((a, b) => groupValues[a] - groupValues[b]);
                                     sortedTokens.forEach((token, index) => {
-                                        var groupValue = groupValues[token];
-                                        var absGroupValue = Math.abs(groupValue);
-                                        var paddingValue = absGroupValue * (groupToken === 'stat' ? 1 : 5);
+                                        let name = token.charAt(0).toUpperCase() + token.slice(1);
+                                        var value = groupValues[token];
+                                        var absGroupValue = Math.abs(value);
+                                        var paddingValue = Math.round((absGroupValue / groupValuesSum) * maxLeftPadding);
                                         const config = {
-                                            token: token,
-                                            icon: false,
-                                            name: token.charAt(0).toUpperCase() + token.slice(1),
-                                            value: groupValue,
+                                            token, name, value,
                                             typeClass: ('sort type ' + token),
-                                            blur: ['name', 'value'],
-                                            padding: Math.min(25, paddingValue),
+                                            blurSpans: ['name', 'value'],
+                                            extraClasses: (value ? (value > 0 ? 'plus' : 'minus') : ''),
+                                            spanPadding: (value !== 0 ? (value > 0 ? {'left': paddingValue} : {'right': paddingValue})  : 0),
                                             };
                                         markup += this.generatePowerElement(config);
                                         });
@@ -278,22 +329,29 @@
                             let statOrder = _self.indexes.statTokens;
                             let markup = '<div class="void-powers rtl bgo stat-powers">';
                                 for (var i = 0; i < statOrder.length; i++){
-                                    var token = statOrder[i];
+                                    let token = statOrder[i];
+                                    let name = token.charAt(0).toUpperCase() + token.slice(1);
                                     if (!statPowersValues[token]){ continue; }
                                     var values = statPowersValues[token];
                                     if (!values['value']){ values['value'] = 0; }
                                     if (values['value'] === 0){ continue; }
+                                    let value = values['value'];
+                                    var iconClass = false;
+                                    switch (token){
+                                        case 'attack': iconClass = 'sword'; break;
+                                        case 'defense': iconClass = 'shield-alt'; break;
+                                        case 'speed': iconClass = 'running'; break;
+                                        }
                                     const config = {
-                                        token: token,
-                                        name: token.charAt(0).toUpperCase() + token.slice(1),
-                                        value: values['value'],
+                                        token, name, value,
+                                        iconClass: iconClass,
                                         typeClass: ('stat type ' + token),
-                                        hasCode: true,
+                                        blurSpans: ['name', 'value', 'code'],
+                                        spanOrder: ['arrows', 'value', 'name', 'code'],
                                         hasArrows: true,
-                                        boosts: values['boosts'],
-                                        breaks: values['breaks'],
-                                        blur: ['name', 'value'],
-                                        spanOrder: ['arrows', 'value', 'name', 'code']
+                                        numBoosts: values['boosts'],
+                                        numBreaks: values['breaks'],
+                                        //hasCode: false,
                                         };
                                     markup += this.generatePowerElement(config);
                                     }
@@ -447,11 +505,12 @@
                     console.log('%c' + 'voidRecipeWizard.addItem() w/ ' + item.token, 'color: magenta;');
                     //console.log('-> w/ item:', item);
                     const _self = this;
+                    const config = _self.config;
                     var token = item.token;
                     var quantity = item.quantity || 1;
                     var existing = Object.keys(_self.items).length;
                     var exists = Object.keys(_self.items).indexOf(token) >= 0;
-                    if (!exists && existing >= _self.maxItems){ return; }
+                    if (!exists && existing >= config.maxItems){ return; }
                     if (!exists){ _self.items[token] = 0; }
                     _self.items[token] += quantity;
                     _self.history.push({ token: token, action: 'add', quantity: quantity });
@@ -561,6 +620,15 @@
                             //powers.incPower('quanta_'+tierToken, 1 * quantity);
                             }
 
+                        // QUANTA MODULES
+                        if (itemIsModule){
+                            // CHARGE | Effects: QUANTA x2
+                            if (itemPrefix === 'charge'){
+                                var quanta = powers.getPower('quanta') * 1.00;
+                                powers.incPower('quanta', quanta * quantity);
+                                }
+                            }
+
                         }
 
                     // -- SPREAD ITEMS (NUMBER OF TARGETS) --
@@ -573,6 +641,20 @@
                             var spreadValue = 1.0, typeValue = 5.0;
                             powers.incPower('spread', spreadValue * quantity);
                             powers.incFlow(typeToken, quantity);
+                            }
+
+                        // SPREAD MODULES
+                        if (itemIsModule){
+                            // SPREADER | Effects: SPREAD +1
+                            if (itemPrefix === 'spreader'){
+                                var spread = 1.00;
+                                powers.incPower('spread', spread * quantity);
+                                }
+                            // TARGET | Effects: SPREAD -1
+                            if (itemPrefix === 'target'){
+                                var spread = 1.00;
+                                powers.decPower('spread', spread * quantity);
+                                }
                             }
 
                         }
@@ -589,7 +671,7 @@
                         if (itemIsEnergy){
                             if (itemIsPellet || itemIsCapsule || itemIsTank){
                                 var flowBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 2 : 0) + (itemIsTank ? 3 : 0));
-                                var powerBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 3 : 0) + (itemIsTank ? 5 : 0));
+                                var powerBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 5 : 0) + (itemIsTank ? 10 : 0));
                                 powers.incFlow(statToken, flowBoost);
                                 powers.incPower(statToken, powerBoost);
                                 }
@@ -673,20 +755,6 @@
                         }
 
                     /*
-                    // -- TANKS & UPGRADES & MYTHICS w/ LEVEL + FORTE [+ ~STATS]
-                    else if (itemIsTank || itemIsUpgrade){
-                        var boostKind = itemIsEnergy ? 'level' : 'forte';
-                        var boostPower = (itemIsTank ? 10 : 0) + (itemIsUpgrade ? 100 : 0);
-                        powers.incPower(statToken, statPower * quantity);
-                        powers.incPower(boostKind, boostPower * quantity);
-                        }
-                    // -- BOOSTERS & DIVERTERS w/ STATS [+ STAT-MODS]
-                    else if (itemIsBooster && itemPrefix !== 'field'){
-                        // otherwise, if normal booster, it simply adjusts stats
-                        var boostKind = itemPrefix;
-                        var boostPower = 6;
-                        powers.incPower(boostKind, boostPower * quantity);
-                        }
                     // ELEMENTAL CIRCUITS w/ TYPES [+ TYPE-MODS]
                     else if (itemIsCircuit){
                         var opposingTypes = [], opposingValues = [10, 10];
@@ -703,19 +771,7 @@
 
                     // -- MODULE ITEMS w/ SPECIAL EFFECTS
                     else if (itemIsModule){
-                        if (itemPrefix === 'charge'){
-                            var quanta = powers.getPower('quanta') * 1.00;
-                            powers.incPower('quanta', quanta * quantity);
-                            }
-                        else if (itemPrefix === 'target'){
-                            var spread = 1.00;
-                            powers.decPower('spread', spread * quantity);
-                            }
-                        else if (itemPrefix === 'spreader'){
-                            var spread = 1.00;
-                            powers.incPower('spread', spread * quantity);
-                            }
-                        else if (itemPrefix === 'growth'){
+                        if (itemPrefix === 'growth'){
                             var effort = 1;
                             powers.incPower('effort', effort * quantity);
                             }
@@ -925,7 +981,8 @@
 
                     // Define the main thresholds for primary slots
                     const _self = this;
-                    const thresholds = { mecha: 25, master: 100, boss: 500 };
+                    const config = _self.config;
+                    const thresholds = config.minQuantaPerClass;
                     const tiers = Object.keys(thresholds);
                     const targets = [];
 
@@ -1089,6 +1146,7 @@
 
                     // Backup a reference to the parent object
                     const _self = this;
+                    const config = _self.config;
 
                     // Collect a reference to the void values object and reset
                     var voidItems = _self.items;
@@ -1158,7 +1216,7 @@
                         }
 
                     // Make sure the spread never goes above max values
-                    var maxSpreadPower = _self.maxTargets;
+                    var maxSpreadPower = config.maxTargets;
                     if (voidPowers.powers.spread > maxSpreadPower){ voidPowers.powers.spread = maxSpreadPower; }
 
                     // Always copy the calculated powers/flows to the parent so they're easily accessible
@@ -1166,7 +1224,7 @@
                     _self.powers = {};
                     var voidPowersList = voidPowers.getPowers();
                     var voidPowerKeys = Object.keys(voidPowersList);
-                    var voidPowersRequired = _self.voidPowersRequired;
+                    var voidPowersRequired = config.voidPowersRequired;
                     for (var i = 0; i < voidPowerKeys.length; i++){
                         var powerToken = voidPowerKeys[i];
                         var powerValue = voidPowersList[powerToken];
@@ -1193,6 +1251,7 @@
 
                     // Backup a reference to the parent object
                     const _self = this;
+                    const config = _self.config;
 
                     // Clear the existing mission if one is already there
                     _self.mission = {};
@@ -1223,7 +1282,7 @@
 
                     // First we set-up the different target slots given quanta vs spread
                     // using predefined thresholds to determine each target's class
-                    var effectiveSpread = baseSpread >= _self.maxTargets ? _self.maxTargets : (baseSpread < 1 ? 1 : Math.trunc(baseSpread));
+                    var effectiveSpread = baseSpread >= config.maxTargets ? config.maxTargets : (baseSpread < 1 ? 1 : Math.trunc(baseSpread));
                     var distributedQuanta = _self.distributeQuanta(baseQuanta, effectiveSpread, true);
                     //console.log('-> effectiveSpread:', effectiveSpread, 'distributedQuanta:', distributedQuanta);
 
@@ -1415,6 +1474,7 @@
 
                     // Backup a reference to the parent object
                     const _self = this;
+                    const config = _self.config;
 
                     // Collect reference to relevant void elements and values
                     var $itemsSelected = _self.xrefs.itemsSelected;
@@ -1443,7 +1503,7 @@
                     var $selectedWrapper = $('.wrapper', $itemsSelected);
                     var $paletteWrappers = $('.wrapper', $itemsPalette);
                     var $paletteItems = $('.item[data-token]', $itemsPalette);
-                    var numSlotsAvailable = _self.maxItems;
+                    var numSlotsAvailable = config.maxItems;
                     var numSlotsUsed = voidItemsTokens.length;
                     $selectedWrapper.html('');
                     $paletteItems.removeClass('active');
@@ -1576,7 +1636,7 @@
 
                     // Then we can collect the ordered list of required power tokens and
                     // use that to sort any required power tokens to the top of the list
-                    var voidPowersRequired = _self.voidPowersRequired;
+                    var voidPowersRequired = config.voidPowersRequired;
                     voidPowersKeys.sort(function(a, b){
                         var aIndex = voidPowersRequired.indexOf(a);
                         var bIndex = voidPowersRequired.indexOf(b);
