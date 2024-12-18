@@ -53,3 +53,23 @@
         url('../.libs/google-fonts/Open_Sans/static/OpenSans-LightItalic.ttf') format('truetype');
 }
 
+/* Extended Font Awesome 5 */
+
+/* Custom HTML Entity */
+.fa-entity {
+    font-family: inherit; /* Use the default font or specify one */
+    font-style: normal;
+    font-weight: normal;
+    display: inline-block;
+    text-align: center;
+    line-height: 1; /* Adjust to match FA5 icons */
+    vertical-align: middle; /* Align to FA icons */
+}
+.fa-entity > span {
+    display: block;
+    margin: 0 auto;
+    padding: 0;
+    line-height: 1; /* Adjust to match FA5 icons */
+    vertical-align: middle; /* Align to FA icons */
+    user-select: none; /* Prevent text selection */
+}
