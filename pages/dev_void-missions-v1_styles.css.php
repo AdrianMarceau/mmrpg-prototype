@@ -1040,11 +1040,66 @@
 
 #void-recipe .creation .mission-details .base-powers {
     z-index: 10;
-    top: 6px;
     left: 6px;
+    top: 6px;
 }
 #void-recipe .creation .mission-details .base-powers .power {
     font-size: 14px;
+}
+
+
+/* -- VOID POWERS // DELTA POWER (NUM PARTS) -- */
+
+#void-recipe .creation .mission-details .delta-power {
+    z-index: 9;
+    left: 6px;
+    top: 89px;
+}
+#void-recipe .creation .mission-details .delta-power .power {
+    font-size: 9px;
+    line-height: 1;
+    box-shadow: none;
+}
+#void-recipe .creation .mission-details .delta-power .power .icon {
+    font-size: inherit;
+    line-height: 1;
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    border: 0 none transparent !important;
+    border-radius: 50%;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 1);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    position: relative;
+    transform: scale(1.0);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+#void-recipe .creation .mission-details .delta-power .power:hover .icon {
+    transform: scale(0.8);
+}
+#void-recipe .creation .mission-details .delta-power .power .icon i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    line-height: 1;
+    font-weight: bold;
+}
+#void-recipe .creation .mission-details .delta-power .power .value,
+#void-recipe .creation .mission-details .delta-power .power .name {
+    font-size: inherit;
+    border: 0 none transparent;
+    padding: 0;
+    margin-right: 3px;
+}
+#void-recipe .creation .mission-details .delta-power .power .name {
+    display: block;
+    text-align: left;
+    font-size: 8px;
+    text-transform: lowercase;
+    transform: translateY(4px);
 }
 
 /* -- VOID POWERS // RANK POWERS (LEVEL + FORTE) -- */
@@ -1416,15 +1471,15 @@
 #void-recipe .creation .black-hole .layer.third { width: 300px; height: 300px; top: -100px; left: -100px; z-index: 1; }
 #void-recipe .creation .black-hole .layer.fourth { width: 400px; height: 400px; top: -150px; left: -150px; z-index: 1; }
 
-#void-recipe .creation .black-hole .layer.first { animation: rotate-clockwise 120s linear infinite; animation-delay: 0.8s; }
-#void-recipe .creation .black-hole .layer.second { animation: rotate-clockwise 140s linear infinite; animation-delay: 0.6s; }
-#void-recipe .creation .black-hole .layer.third { animation: rotate-clockwise 160s linear infinite; animation-delay: 0.4s; }
-#void-recipe .creation .black-hole .layer.fourth { animation: rotate-clockwise 180s linear infinite; animation-delay: 0.2s; }
+#void-recipe .creation .black-hole .layer.first { animation: rotate-clockwise 100s linear infinite; animation-delay: 0.8s; }
+#void-recipe .creation .black-hole .layer.second { animation: rotate-clockwise 120s linear infinite; animation-delay: 0.6s; }
+#void-recipe .creation .black-hole .layer.third { animation: rotate-clockwise 140s linear infinite; animation-delay: 0.4s; }
+#void-recipe .creation .black-hole .layer.fourth { animation: rotate-clockwise 160s linear infinite; animation-delay: 0.2s; }
 
 #void-recipe .creation .black-hole .layer.first { filter: opacity(0.3) invert(0.0); }
-#void-recipe .creation .black-hole .layer.second { filter: opacity(0.5) invert(1.0); }
+#void-recipe .creation .black-hole .layer.second { filter: opacity(0.5) invert(1.0) drop-shadow(2px 4px 6px black); }
 #void-recipe .creation .black-hole .layer.third { filter: opacity(0.3) invert(0.0); }
-#void-recipe .creation .black-hole .layer.fourth { filter: opacity(0.4) invert(1.0); }
+#void-recipe .creation .black-hole .layer.fourth { filter: opacity(0.4) invert(1.0) drop-shadow(2px 4px 6px black); }
 
 @keyframes rotate-clockwise {
     0% { transform: rotate(0deg); }

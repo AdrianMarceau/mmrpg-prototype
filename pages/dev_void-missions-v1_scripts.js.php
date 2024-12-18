@@ -295,11 +295,12 @@
                                 console.log('-> rendering group:', {groupToken, groupValues, groupValuesTokens, groupValuesSum});
                                 let groupIcon = groupToken === 'stat' ? 'bullseye' : 'fire-alt';
                                 let groupName = groupToken === 'stat' ? 'Flow (Stats)' : 'Flow (Types)';
-                                let groupPadd = groupToken === 'stat' ? 1 : 10;
+                                let groupPaddMod = groupToken === 'stat' ? 1 : 15;
+                                let groupPaddMax = groupToken === 'stat' ? 40 : 80;
                                 let markup = '<div class="void-powers ltr bgi sort-powers ' + groupToken + '-sort-powers">';
                                     let sortedTokens = Object.values(groupValuesTokens);
                                     let numSortedTokens = sortedTokens.length;
-                                    let maxLeftPadding = Math.min((groupValuesSum * groupPadd), 80);
+                                    let maxLeftPadding = Math.min((groupValuesSum * groupPaddMod), groupPaddMax);
                                     sortedTokens.sort((a, b) => groupValues[a] - groupValues[b]);
                                     sortedTokens.forEach((token, index) => {
                                         let name = token.charAt(0).toUpperCase() + token.slice(1);
@@ -1745,6 +1746,23 @@
 
                         // Check for relative stat powers (attack, defense, speed) and display appropriate markup
                         VoidPowersRenderer.renderStatPowers($missionDetails, statPowersValues);
+
+
+
+                        // TEMP TEMP TEMP
+                        // Show the current delta value if it's not zero
+                        if (voidPowers.delta){
+                            var deltaValue = voidPowers.delta;
+                            var deltaMarkup = '';
+                            deltaMarkup += '<div class="void-powers ltr bgo delta-power">';
+                                deltaMarkup += '<div class="power">';
+                                    deltaMarkup += '<span class="icon type space_empty"><i class="fa fa-entity"><span>&#x25b3;</span></i></span>';
+                                    deltaMarkup += '<span class="value">' + deltaValue + '</span>';
+                                    //deltaMarkup += '<span class="name blur">Delta</span>';
+                                deltaMarkup += '</div>';
+                            deltaMarkup += '</div>';
+                            $missionDetails.append(deltaMarkup);
+                            }
 
                         } else {
 
