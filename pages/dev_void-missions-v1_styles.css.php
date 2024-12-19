@@ -227,6 +227,7 @@
     background-color: #353144;
     box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s, box-shadow 0.2s;
+    cursor: pointer;
 }
 #void-recipe .palette .item-list .wrapper[data-step]:before {
     content: "";
@@ -242,6 +243,11 @@
     box-shadow: inset 0 0 3px rgb(0, 0, 0, 0.6);
     pointer-events: none;
     z-index: 1;
+    background-image: url(../images/assets/index-background.gif);
+    background-position: center center;
+    background-repeat: repeat;
+    mix-blend-mode: luminosity;
+    opacity: 0.6;
 }
 #void-recipe .palette .item-list .wrapper[data-step] > .label {
     content: "";
@@ -270,6 +276,19 @@
     content: "~";
     padding: 0 3px;
     color: #777194;
+}
+#void-recipe .palette .item-list .wrapper[data-step="1"] > .label:before,
+#void-recipe .palette .item-list .wrapper[data-step="1"] > .label:after {
+    font-family: 'Font Awesome 5 Pro';
+    font-weight: 900;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    content: "\f005";
 }
 #void-recipe .palette .item-list .wrapper[data-step] > .label > strong {
     font-weight: normal;
@@ -366,12 +385,13 @@
 #void-recipe .palette .item-list .wrapper[data-side="right"]:last-child > .label { right: 6px; }
 
 #void-recipe .palette .item-list .wrapper[data-step].disabled {
-
+    cursor: not-allowed;
 }
 
 #void-recipe .palette .item-list .wrapper[data-step].locked {
     pointer-events: none;
     filter: saturate(0.6) brightness(0.8);
+    cursor: not-allowed;
 }
 #void-recipe .palette .item-list .wrapper[data-step].locked .group {
     filter: brightness(0.0);
@@ -588,6 +608,7 @@
     background-color: rgba(77, 77, 77, 0.2);
     border-radius: 3px;
     position: relative;
+    cursor: default;
     z-index: 10;
 }
 #void-recipe .item-list .group:empty {
@@ -1056,7 +1077,7 @@
 #void-recipe .creation .mission-details .delta-power {
     z-index: 9;
     left: 6px;
-    top: 89px;
+    top: 118px;
 }
 #void-recipe .creation .mission-details .delta-power .power {
     font-size: 9px;
@@ -1076,7 +1097,7 @@
     position: relative;
     transform: scale(1.0);
     transition: transform 0.2s;
-    cursor: pointer;
+    cursor: default;
 }
 #void-recipe .creation .mission-details .delta-power .power:hover .icon {
     transform: scale(0.8);

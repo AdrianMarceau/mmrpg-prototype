@@ -328,7 +328,7 @@
                         renderStatPowers: function($missionDetails, statPowersValues){
                             // sort the rank powers by value to display them in order of energy, weapons, attack, defense, speed
                             let statOrder = _self.indexes.statTokens;
-                            let markup = '<div class="void-powers rtl bgo stat-powers">';
+                            let markup = '';
                                 for (var i = 0; i < statOrder.length; i++){
                                     let token = statOrder[i];
                                     let name = token.charAt(0).toUpperCase() + token.slice(1);
@@ -356,7 +356,8 @@
                                         };
                                     markup += this.generatePowerElement(config);
                                     }
-                            markup += '</div>';
+                            if (!markup.length){ return; }
+                            markup = '<div class="void-powers rtl bgo stat-powers">' + markup + '</div>';
                             $missionDetails.append(markup);
                             }
                         };
