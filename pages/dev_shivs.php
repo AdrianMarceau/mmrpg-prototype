@@ -74,4 +74,35 @@ if (!function_exists('array_rearrange_keys')){
     }
 }
 
+// Extend the Font Awesome (5) stylesheet / CSS library to allow
+// for custom HTML entities to be used in place of icons
+if ((int)(substr(MMRPG_CONFIG_CACHE_DATE, 0, 4)) <= 2024){
+    ob_start();
+    ?>
+    <style type="text/css">
+        /* Extended Font Awesome 5 */
+        /* Custom HTML Entity */
+        .fa-entity {
+            font-family: inherit; /* Use the default font or specify one */
+            font-style: normal;
+            font-weight: normal;
+            display: inline-block;
+            text-align: center;
+            line-height: 1; /* Adjust to match FA5 icons */
+            vertical-align: middle; /* Align to FA icons */
+        }
+        .fa-entity > span {
+            display: block;
+            margin: 0 auto;
+            padding: 0;
+            line-height: 1; /* Adjust to match FA5 icons */
+            vertical-align: middle; /* Align to FA icons */
+            user-select: none; /* Prevent text selection */
+        }
+    </style>
+    <?
+    $markup = preg_replace('/\n\s+/', "\n", trim(ob_get_clean()));
+    $website_include_stylesheets .= $markup.PHP_EOL;
+}
+
 ?>
