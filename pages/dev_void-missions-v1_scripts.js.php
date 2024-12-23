@@ -1810,9 +1810,12 @@
                                 targetRobotMarkup += '</div>';
                                 targetRobotMarkup += '<div class="label">';
                                     targetRobotMarkup += '<span class="name">'+targetRobotName+'</span>';
-                                    targetRobotMarkup += '<span class="quanta">'+targetRobotQuanta+'</span>';
+                                    targetRobotMarkup += '<span class="quanta">';
+                                        targetRobotMarkup += '<i class="fa fa-atom"></i>';
+                                        targetRobotMarkup += '<strong>'+targetRobotQuanta+'</strong>';
+                                    targetRobotMarkup += '</span>';
                                 targetRobotMarkup += '</div>';
-                                targetRobotMarkup += '<i class="type '+targetRobotSlotType+'"></i>';
+                                targetRobotMarkup += '<i class="portal type '+targetRobotSlotType+'"></i>';
                             targetRobotMarkup += '</div>';
                             targetListRobotMarkup += targetRobotMarkup;
                             }

@@ -1287,7 +1287,7 @@
 /* -- TARGET LIST -- */
 
 #void-recipe .creation .target-list {
-    bottom: 44px;
+    bottom: 54px;
     width: auto;
     left: 150px;
     right: 150px;
@@ -1343,7 +1343,7 @@
     filter: brightness(1.1);
     outline: 2px solid rgba(255, 255, 255, 0.6);
 }
-#void-recipe .creation .target-list .target > .type {
+#void-recipe .creation .target-list .target > .portal {
     display: block;
     position: absolute;
     z-index: 1;
@@ -1359,7 +1359,7 @@
     filter: opacity(1.0) brightness(0.8) saturate(1.6);
     pointer-events: none;
 }
-#void-recipe .creation .target-list .target > .type.empty {
+#void-recipe .creation .target-list .target > .portal.empty {
     filter: none;
     border-color: #2e2e2e !important;
 }
@@ -1369,7 +1369,7 @@
     z-index: 2;
     width: 40px;
     height: 40px;
-    bottom: 14px;
+    bottom: 16px;
     left: 50%;
     transform: translate(-50%, -50%) scale(2.0);
     /* background-color: rgba(100, 0, 255, 0.1);  */
@@ -1402,6 +1402,37 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+#void-recipe .creation .target-list .target .label .quanta {
+display: block;
+    position: absolute;
+    z-index: 4;
+    width: auto;
+    height: auto;
+    top: 100%;
+    left: 50%;
+    margin: 0;
+    padding: 2px 4px;
+    font: inherit;
+    color: #dedede;
+    font-size: 8px;
+    line-height: 1;
+    border: 0 none #1d1d26;
+    background-color: #363645;
+    transform: translate(-50%, 1px);
+    border-radius: 0 0 2px 2px;
+    box-shadow: 0 1px 0 #1d1d26;
+}
+#void-recipe .creation .target-list .target .label .quanta i,
+#void-recipe .creation .target-list .target .label .quanta strong {
+    display: inline-block;
+    margin: 0 auto;
+}
+#void-recipe .creation .target-list .target .label .quanta i {
+    margin-right: 2px;
+}
+#void-recipe .creation .target-list .target .label .quanta strong {
+    font-weight: normal;
 }
 #void-recipe .creation .target-list .target .image .sprite {
     display: block;
