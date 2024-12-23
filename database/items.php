@@ -20,7 +20,7 @@ $hidden_database_items_count = !empty($hidden_database_items) ? count($hidden_da
 // Collect the item database files from the cache or manually
 $cache_token = md5('database/items/website');
 $cached_index = rpg_object::load_cached_index('database.items', $cache_token);
-if (!empty($cached_index)){
+if (!empty($cached_index) && empty($_GET['refresh'])){
 
     // Collect the cached data for items, item count, and item numbers
     $mmrpg_database_items = $cached_index['mmrpg_database_items'];
@@ -31,6 +31,8 @@ if (!empty($cached_index)){
 } else {
 
     // Collect the database items
+    $item_where = "items.item_token <> 'item' AND items.item_class <> 'system' AND items.item_flag_published = 1 ";
+    if (defined('FORCE_INCLUDE_TEMPLATE_ITEM')){ $item_where = "({$item_where}) OR items.item_token = 'item' "; }
     $item_fields = rpg_item::get_index_fields(true, 'items');
     $mmrpg_database_items = $db->get_array_list("SELECT
         {$item_fields},
@@ -39,9 +41,7 @@ if (!empty($cached_index)){
         FROM mmrpg_index_items AS items
         LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
         LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = items.item_class
-        WHERE items.item_id <> 0
-        AND items.item_class <> 'system'
-        AND items.item_flag_published = 1
+        WHERE {$item_where}
         ORDER BY
         groups.group_order ASC,
         tokens.token_order ASC
@@ -84,7 +84,8 @@ if (!empty($cached_index)){
             $temp_info = rpg_item::parse_index_info($temp_info);
 
             // Collect this item's key in the index
-            $temp_info['item_key'] = $mmrpg_database_items_numbers[$temp_token]['item_key'];
+            if (!isset($mmrpg_database_items_numbers[$temp_token])){ $temp_info['item_key'] = -1; }
+            else { $temp_info['item_key'] = $mmrpg_database_items_numbers[$temp_token]['item_key']; }
 
             // Ensure this item's image exists, else default to the placeholder
             $temp_image_token = isset($temp_info['item_image']) ? $temp_info['item_image'] : $temp_token;
@@ -122,7 +123,8 @@ if (isset($update_mmrpg_database_items)
 if (!empty($mmrpg_database_items)){
     foreach ($mmrpg_database_items AS $temp_token => $temp_info){
         if (!empty($temp_info['item_flag_hidden'])
-            && $temp_info['item_token'] !== $this_current_token){
+            && $temp_info['item_token'] !== $this_current_token
+            && !defined('FORCE_INCLUDE_HIDDEN_ITEMS')){
             unset($mmrpg_database_items[$temp_token]);
         }
     }

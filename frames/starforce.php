@@ -223,6 +223,12 @@ gameSettings.autoScrollTop = false;
                             $ordered_type_tokens = array_reverse($ordered_type_tokens);
 
                             $star_kind_tokens = array('field', 'fusion', 'perfect-fusion');
+                            foreach ($star_kind_tokens AS $kind){
+                                $star_type_counts[$kind] = array();
+                                $star_type_backgrounds[$kind] = array();
+                                $star_type_borders[$kind] = array();
+                            }
+                            //error_log('$star_type_counts = '.print_r($star_type_counts, true));
 
                             foreach($ordered_type_tokens AS $type_key => $type_token){
 

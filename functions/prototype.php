@@ -152,6 +152,40 @@ function mmrpg_prototype_calculate_shop_level_by_experience($this_experience, $m
 }
 
 // Define a function for checking a player has completed the prototype
+function mmrpg_prototype_new_game_plus(){
+    $session_token = mmrpg_game_token();
+    return !empty($_SESSION[$session_token]['flags']['prototype_events']['new_game_plus']);
+}
+
+// Define a function for checking a player has completed the prototype
+function mmrpg_prototype_apply_new_game_plus(&$this_prototype_data){
+    //error_log('mmrpg_prototype_apply_new_game_plus() for '.strtoupper($this_prototype_data['this_player_token']).' w/ $this_prototype_data = '.print_r($this_prototype_data, true));
+
+    // Collect the session token in case we need it
+    $session_token = mmrpg_game_token();
+
+    // Update the chapter levels by boosting them a predefined amount
+    $chapter_levels = $this_prototype_data['this_chapter_levels'];
+    //error_log('$chapter_levels (base): '.print_r($chapter_levels, true));
+    foreach ($chapter_levels AS $chapter_key => $chapter_level){
+        $chapter_levels[$chapter_key] += MMRPG_SETTINGS_NEWGAMEPLUS_LEVELBOOST_DEFAULT;
+    }
+    //error_log('$chapter_levels (boosted): '.print_r($chapter_levels, true));
+    $this_prototype_data['this_chapter_levels'] = $chapter_levels;
+
+    // Return true on success
+    return true;
+
+}
+
+// Define a function for checking a player has completed the prototype
+function mmrpg_prototype_allow_limit_break(){
+    $force_limit_break = false;
+    $has_new_game_plus = mmrpg_prototype_new_game_plus();
+    return $force_limit_break || $has_new_game_plus ? true : false;
+}
+
+// Define a function for checking a player has completed the prototype
 function mmrpg_prototype_complete($player_token = ''){
 
     // Pull in global variables
@@ -173,6 +207,37 @@ function mmrpg_prototype_complete($player_token = ''){
         foreach ($mmrpg_index_players AS $player_token => $player_info){
             if (mmrpg_prototype_player_unlocked($player_token)){
                 if (!empty($_SESSION[$session_token]['flags']['prototype_events'][$player_token]['prototype_complete'])){
+                    $complete_count += 1;
+                }
+            }
+        }
+        // Otherwise return false by default
+        return $complete_count;
+    }
+}
+
+// Define a function for checking a player has completed the prototype
+function mmrpg_prototype_complete_plus($player_token = ''){
+
+    // Pull in global variables
+    global $mmrpg_index_players;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+
+    $session_token = mmrpg_game_token();
+
+    // If the player token was provided, do a quick check
+    if (!empty($player_token)){
+        // Return the prototype complete flag for this player
+        if (!empty($_SESSION[$session_token]['flags']['prototype_events'][$player_token]['prototype_complete_plus'])){ return 1; }
+        else { return 0; }
+    }
+    // Otherwise loop through all players and check each
+    else {
+        // Loop through unlocked robots and return true if any are found to be completed
+        $complete_count = 0;
+        foreach ($mmrpg_index_players AS $player_token => $player_info){
+            if (mmrpg_prototype_player_unlocked($player_token)){
+                if (!empty($_SESSION[$session_token]['flags']['prototype_events'][$player_token]['prototype_complete_plus'])){
                     $complete_count += 1;
                 }
             }
@@ -1197,7 +1262,7 @@ function mmrpg_prototype_player_altimage_unlocked($player_token, $alt_token = ''
 }
 
 // Define a function for counting the number of completed prototype battles
-function mmrpg_prototype_battles_complete($player_token, $unique = true, &$battles_complete = array()){
+function mmrpg_prototype_battles_complete($player_token = '', $unique = true, &$battles_complete = array()){
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
@@ -1218,7 +1283,7 @@ function mmrpg_prototype_battles_complete($player_token, $unique = true, &$battl
 
         // Collect the battle complete count from the session if set
         $battles_complete = isset($_SESSION[$session_token]['values']['battle_complete'][$player_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token] : array();
-        //error_log('$battles_complete = '.count($battles_complete).' = '.print_r($battles_complete, true));
+        //error_log($player_token.' | $battles_complete = '.count($battles_complete).' = '.print_r($battles_complete, true));
 
         // Check if only unique battles were requested or ALL battles
         if (!empty($unique)){
@@ -1245,7 +1310,7 @@ function mmrpg_prototype_battles_complete($player_token, $unique = true, &$battl
 }
 
 // Define a function for counting the number of failured prototype battles
-function mmrpg_prototype_battles_failure($player_token, $unique = true, &$battles_failure = array()){
+function mmrpg_prototype_battles_failure($player_token = '', $unique = true, &$battles_failure = array()){
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
@@ -1607,7 +1672,8 @@ function mmrpg_prototype_stars_unlocked($player_token = '', $star_kind = ''){
     }
 }
 // Define a function for checking how many limit hearts have been unlocked by a player
-function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0){
+function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0, &$extra_hearts = 0){
+    //error_log('mmrpg_prototype_limit_hearts_earned('.$player_token.')');
 
     // Define the number of hearts at zero and we'll go up from there
     $real_max_hearts = 8;
@@ -1621,18 +1687,23 @@ function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0){
     if ($player_chapters_unlocked['2']){ $num_hearts++; }
     if ($player_chapters_unlocked['3']){ $num_hearts++; }
     if ($player_chapters_unlocked['4a']){ $num_hearts++; }
-    if (mmrpg_prototype_complete($player_token)){ $num_hearts++; }
+    if ($player_chapters_unlocked['4z']){ $num_hearts++; }
 
     // Hide the last two hearts behind superboss battles, but don't show them until collected
     $max_hearts -= 2;
     $session_token = mmrpg_game_token();
     $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
-    if (isset($session_robot_database['quint']['robot_defeated'])){ $num_hearts++; }
-    if (isset($session_robot_database['sunstar']['robot_defeated'])){ $num_hearts++; }
+    if (!empty($session_robot_database['quint']['robot_defeated'])){ $num_hearts++; $max_hearts++; $extra_hearts++; }
+    if (!empty($session_robot_database['sunstar']['robot_defeated'])){ $num_hearts++; $max_hearts++; $extra_hearts++; }
     if ($num_hearts > $max_hearts){ $max_hearts = $num_hearts; }
 
     // Make sure we don't go over the max hearts
+    if ($max_hearts > $real_max_hearts){ $max_hearts = $real_max_hearts; }
     if ($num_hearts > $real_max_hearts){ $num_hearts = $real_max_hearts; }
+
+    //error_log('$num_hearts = '.$num_hearts);
+    //error_log('$max_hearts = '.$max_hearts);
+    //error_log('$extra_hearts = '.$extra_hearts);
 
     // Return the total number of hearts this player has earned
     return $num_hearts;
@@ -2169,8 +2240,10 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             elseif (!empty($this_fieldinfo['field_name'])){ $this_option_button_text = $this_fieldinfo['field_name']; }
             else { $this_option_button_text = 'Battle'; }
 
+
+            $option_level_limit_break = mmrpg_prototype_allow_limit_break() ? true : false;
             if ($this_option_min_level < 1){ $this_option_min_level = 1; }
-            if ($this_option_max_level > 100){ $this_option_max_level = 100; }
+            if ($this_option_max_level > 100 && !$option_level_limit_break){ $this_option_max_level = 100; }
             if ($this_option_min_level > $this_option_max_level){ $this_option_max_level = $this_option_min_level; }
             $this_option_level_range = $this_option_min_level == $this_option_max_level ? 'Level '.$this_option_min_level : 'Levels '.$this_option_min_level.'-'.$this_option_max_level;
 
@@ -2750,6 +2823,7 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
     if (empty($target_robots)){ $target_robots[] = array('robot_token' => 'met'); }
     foreach ($target_robots AS $key => $robot_info){
         $index_info = $mmrpg_index_robots[$robot_info['robot_token']];
+        //error_log('checking '.$robot_info['robot_token'].' ...');
         $robot_info['robot_id'] = !empty($robot_info['robot_id']) ? $robot_info['robot_id'] : rpg_game::unique_robot_id($target_info['player_id'], $index_info['robot_id'], ($key + 1));
         $robot_info['robot_level'] = !empty($robot_info['robot_level']) ? $robot_info['robot_level'] : $temp_battle_omega['battle_level'];
         $robot_info['robot_item'] = !empty($robot_info['robot_item']) ? $robot_info['robot_item'] : '';
@@ -2773,6 +2847,7 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
         if ($robot_info['robot_level'] > 100){
             if (!isset($robot_info['values'])){ $robot_info['values'] = array(); }
             $robot_info['values']['robot_level_max'] = $robot_info['robot_level'];
+            //error_log('robot_level = '.$robot_info['robot_level'].' for $robot_info = '.print_r($robot_info, true));
         }
         $target_robots[$key] = $robot_info;
     }

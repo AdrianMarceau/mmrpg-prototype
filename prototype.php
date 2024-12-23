@@ -52,49 +52,23 @@ $prototype_window_event_messages = array();
 // Check if a reset request has been placed
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset'){
 
-    // Collect a reference to the user object
-    $this_user = $_SESSION[$session_token]['USER'];
-
-    // Reset the game session and reload the page
-    //$db->log_queries = true;
-    if (!empty($_REQUEST['full_reset'])
-        && $_REQUEST['full_reset'] == 'true'){
-        mmrpg_reset_game_session(true, $this_user['userid']);
-    } else {
-        mmrpg_reset_game_session();
-    }
-    //$db->log_queries = false;
-
-    // Update the appropriate session variables
-    $_SESSION[$session_token]['USER'] = $this_user;
-
-    // Load the save file into memory and overwrite the session
-    mmrpg_save_game_session();
-
-    // DEBUG DEBUG DEBUG
-
-    //header('Location: prototype.php');
-    unset($db);
-    exit('success');
+    // Require the appropriate reset file
+    require(MMRPG_CONFIG_ROOTDIR.'prototype/reset.php');
 
 }
 // Check if a reset request has been placed
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !empty($_REQUEST['player'])){
 
-    // Reset the appropriate session variables
-    if (!empty($mmrpg_index_players[$_REQUEST['player']])){
-        $temp_session_key = $_REQUEST['player'].'_target-robot-omega_prototype';
-        $_SESSION[$session_token]['values']['battle_complete'][$_REQUEST['player']] = array();
-        $_SESSION[$session_token]['values']['battle_failure'][$_REQUEST['player']] = array();
-        $_SESSION[$session_token]['values'][$temp_session_key] = array();
-    }
+    // Require the appropriate reset file
+    require(MMRPG_CONFIG_ROOTDIR.'prototype/reset-missions.php');
 
-    // Load the save file into memory and overwrite the session
-    mmrpg_save_game_session();
+}
+// Check if a new-game-plus request has been placed
+if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'new-game-plus'){
+    error_log('new-game-plus: '.var_export($_REQUEST, true));
 
-    //header('Location: prototype.php');
-    unset($db);
-    exit('success');
+    // Require the appropriate reset file
+    require(MMRPG_CONFIG_ROOTDIR.'prototype/reset-plus.php');
 
 }
 
@@ -360,6 +334,13 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
                         <i class="fa fas fa-greek-omega"></i>
                     </span>
                 <? } ?>
+                <? if (mmrpg_prototype_new_game_plus()){ ?>
+                    <span class="pipe">|</span>
+                    <span class="amount plus">
+                        <em class="text">NG</em>
+                        <i class="fa fas fa-plus"></i>
+                    </span>
+                <? } ?>
             </div>
         </div>
 
@@ -412,10 +393,10 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
                     <span class="pipe">|</span>
                     <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-maybe-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-robot"></i>
-                        <label><?= mmrpg_prototype_robots_unlocked('dr-light') > 1 ? 'robots' : 'robot' ?></label>
+                        <label><?= mmrpg_prototype_robots_unlocked() > 1 ? 'robots' : 'robot' ?></label>
                     </a>
                 <? endif; ?>
-                <? if (mmrpg_prototype_battles_complete('dr-light') >= MMRPG_SETTINGS_CHAPTER1_MISSIONS): ?>
+                <? if (mmrpg_prototype_players_unlocked() > 1 || mmrpg_prototype_battles_complete('dr-light') >= MMRPG_SETTINGS_CHAPTER1_MISSIONS): ?>
                     <span class="pipe">|</span>
                     <a class="link link_players" data-step="edit_players" data-index="<?= $this_menu_indexes['players'] ?>" data-source="frames/edit_players.php?action=players" data-music="misc/player-editor" data-maybe-tooltip="<?= $this_menu_tooltips['players'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-user-circle"></i>

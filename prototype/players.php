@@ -25,30 +25,52 @@ else {
 
     // Define a quick function for getting the current chapter text
     $get_current_chapter_text = function($player_token, $player_chapters_unlocked){
+        //error_log('generating chapter text for '.$player_token);
         $text_chapter_number = '0';
-        if (mmrpg_prototype_complete($player_token)){ $text_chapter_number = 'X'; }
+        $is_post_game = false;
+        $is_new_game_plus = false;
+        if (mmrpg_prototype_new_game_plus()){ $is_new_game_plus = true; }
+        if ($is_new_game_plus){ $is_post_game = mmrpg_prototype_complete_plus($player_token); }
+        elseif (!$is_new_game_plus){ $is_post_game = mmrpg_prototype_complete($player_token); }
+        //error_log('$is_post_game = '.($is_post_game ? 'true' : 'false'));
+        //error_log('$is_new_game_plus = '.($is_new_game_plus ? 'true' : 'false'));
+        if ($is_post_game){ $text_chapter_number = 'X'; }
         elseif ($player_chapters_unlocked['4a']){ $text_chapter_number = '5'; }
         elseif ($player_chapters_unlocked['3']){ $text_chapter_number = '4'; }
         elseif ($player_chapters_unlocked['2']){ $text_chapter_number = '3'; }
         elseif ($player_chapters_unlocked['1']){ $text_chapter_number = '2'; }
         elseif ($player_chapters_unlocked['0']){ $text_chapter_number = '1'; }
         $current_chapter_text = 'Chapter '.$text_chapter_number;
+        if ($is_new_game_plus){ $current_chapter_text = 'NG+ '.$current_chapter_text; }
+        //$current_chapter_text = 'Chapter '.($is_new_game_plus ? 'X +' : '').$text_chapter_number;
+        //$current_chapter_text = str_replace('X +X', 'ZX', $current_chapter_text);
+        //error_log('chapter text for '.$player_token.' is '.$current_chapter_text);
         return $current_chapter_text;
         };
 
     // Define a quick function for getting the current limit heart markup
     $get_current_limit_hearts = function($player_token, $player_chapters_unlocked){
         $max_hearts = 1;
-        $num_hearts = mmrpg_prototype_limit_hearts_earned($player_token, $max_hearts);
+        $extra_hearts = 0;
+        $num_hearts = mmrpg_prototype_limit_hearts_earned($player_token, $max_hearts, $extra_hearts);
+        $num_hearts_to_show = $num_hearts - $extra_hearts;
+        $max_hearts_to_show = $max_hearts - $extra_hearts;
         $hearts_markup = '';
         $anti_hearts_markup = '';
-        for ($i = 1; $i <= $max_hearts; $i++){
-            if ($num_hearts >= $i){ $hearts_markup .= '<i class="fa fas fa-heart"></i>'; }
+        $extra_hearts_markup = '';
+        for ($i = 1; $i <= $max_hearts_to_show; $i++){
+            if ($num_hearts_to_show >= $i){ $hearts_markup .= '<i class="fa fas fa-heart"></i>'; }
             else { $anti_hearts_markup .= '<i class="fa fas fa-heart-broken"></i>'; }
         }
+        if (!empty($extra_hearts)){
+            for ($i = 1; $i <= $extra_hearts; $i++){
+                $extra_hearts_markup .= '<i class="fa fas fa-heart"></i>';
+            }
+        }
         $limit_hearts_markup = '';
-        $limit_hearts_markup .= '<span class="limit-hearts earned" style="font-size: 70%;">'.$hearts_markup.'</span>';
-        $limit_hearts_markup .= '<span class="limit-hearts unclaimed" style="font-size: 40%; opacity: 0.6; position: relative; bottom: 2px; left: 2px;">'.$anti_hearts_markup.'</span>';
+        if (!empty($extra_hearts_markup)){ $limit_hearts_markup .= '<span class="limit-hearts earned" style="font-size: 70%;">'.$extra_hearts_markup.'</span>'; }
+        if (!empty($hearts_markup)){ $limit_hearts_markup .= '<span class="limit-hearts earned" style="font-size: 70%;">'.$hearts_markup.'</span>'; }
+        if (!empty($anti_hearts_markup)){ $limit_hearts_markup .= '<span class="limit-hearts unclaimed" style="font-size: 40%; opacity: 0.6; position: relative; bottom: 2px; left: 2px; margin-right: 4px;">'.$anti_hearts_markup.'</span>'; }
         return $limit_hearts_markup;
         };
 

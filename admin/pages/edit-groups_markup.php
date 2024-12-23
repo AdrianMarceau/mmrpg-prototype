@@ -63,6 +63,12 @@ $object_index = call_user_func(array('rpg_'.$object_group_kind, 'get_index'), tr
                     $this_html_class .= ' unsorted';
                 }
 
+                // If this is the unsorted group, adjust the settings appropriately
+                if ($group_token === 'Hidden'
+                    || $group_token === 'Unlisted'){
+                    $this_html_class .= ' unlisted';
+                }
+
                 // If this is the template group, adjust the settings appropriately
                 if ($group_token === 'Template'){
                     $readonly = true;
@@ -126,6 +132,8 @@ $object_index = call_user_func(array('rpg_'.$object_group_kind, 'get_index'), tr
                     // Print out two move buttons for going up and/or down in the list
                     echo('<a class="move-handle" data-direction="up" title="Move Up"><i class="fa fas fa-arrow-alt-circle-up"></i></a>'.PHP_EOL);
                     echo('<a class="move-handle" data-direction="down" title="Move Down"><i class="fa fas fa-arrow-alt-circle-down"></i></a>'.PHP_EOL);
+                    echo('<a class="move-handle" data-direction="top" title="Move To Top"><i class="fa fas fa-angle-double-up"></i></a>'.PHP_EOL);
+                    echo('<a class="move-handle" data-direction="bottom" title="Move To Bottom"><i class="fa fas fa-angle-double-down"></i></a>'.PHP_EOL);
 
                 // Print out the closing list item tag for this group
                 echo('</div>'.PHP_EOL);

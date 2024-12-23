@@ -85,7 +85,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '0';
 
     // If the player has completed at least zero battles, display the starter battle
-    if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0'])){
+    if (!empty($this_prototype_data['this_chapter_unlocked']['0'])){
 
         // EVENT MESSAGE : CHAPTER ONE
         $this_prototype_data['battle_options'][] = array(
@@ -189,7 +189,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '1';
 
     // Only continue if the player has defeated first 1 battle
-    if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['1'])){
+    if (!empty($this_prototype_data['this_chapter_unlocked']['1'])){
 
         // EVENT MESSAGE : CHAPTER TWO
         $this_prototype_data['battle_options'][] = array(
@@ -328,7 +328,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '2';
 
     // If the first 1 + 8 battles are complete, unlock the ninth and recollect markup
-    if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['2'])){
+    if (!empty($this_prototype_data['this_chapter_unlocked']['2'])){
 
         // EVENT MESSAGE : CHAPTER THREE
         $this_prototype_data['battle_options'][] = array(
@@ -633,7 +633,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '3';
 
     // Only continue if the player has defeated the first 1 + 8 + 1 battles
-    if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['3'])){
+    if (!empty($this_prototype_data['this_chapter_unlocked']['3'])){
 
         // EVENT MESSAGE : CHAPTER FOUR
         $this_prototype_data['battle_options'][] = array(
@@ -795,8 +795,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '4';
 
     // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
-    if ($this_prototype_data['prototype_complete']
-        || !empty($this_prototype_data['this_chapter_unlocked']['4'])
+    if (!empty($this_prototype_data['this_chapter_unlocked']['4'])
         || !empty($this_prototype_data['this_chapter_unlocked']['4a'])
         || !empty($this_prototype_data['this_chapter_unlocked']['4b'])
         || !empty($this_prototype_data['this_chapter_unlocked']['4c'])){
@@ -1173,7 +1172,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '7';
 
     // Only continue if the player has unlocked this extra chapter
-    if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['7']){
+    if (!empty($this_prototype_data['this_chapter_unlocked']['7'])){
 
         // EVENT MESSAGE : BONUS CHAPTER
         $next_key = count($this_prototype_data['battle_options']);

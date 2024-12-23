@@ -293,8 +293,23 @@ if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
 */
 
 
-// UNLOCK ROBOT : ROLL
+// UNLOCK ROBOT : MEGA MAN
 
+// If the player has somehow not already got one, unlock Mega Man as a playable character
+if (!mmrpg_prototype_robot_unlocked(false, 'mega-man')){
+
+    // Unlock Roll as a playable character
+    $unlock_player_info = $mmrpg_index_players['dr-light'];
+    $unlock_robot_info = rpg_robot::get_index_info('mega-man');
+    $unlock_robot_info['robot_level'] = MMRPG_SETTINGS_GAMESTORY1_STARTLEVEL;
+    $unlock_robot_info['robot_experience'] = 999;
+    mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, false);
+
+}
+
+/*
+// UNLOCK ROBOT : ROLL
+// NOTE:  No longer necessary as Roll is unlocked as part of the campaign
 // If the player has failured at least one battle, unlock Roll as a playable character
 if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false, 'roll')){
 
@@ -306,6 +321,7 @@ if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false,
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
 
 }
+*/
 
 // UNLOCK EVENT : PHASE TWO CHAPTERS (WILY)
 
@@ -407,9 +423,9 @@ if (!$unlock_flag_wily && mmrpg_prototype_complete('dr-light')){
 
 }
 
-
+/*
 // UNLOCK ROBOT : DISCO
-
+// NOTE:  No longer necessary as Disco is unlocked as part of the campaign
 // If the player has failed at least two battles, unlock Disco as a playable character
 if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked(false, 'disco')){
 
@@ -421,6 +437,7 @@ if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked(false, 
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
 
 }
+*/
 
 // UNLOCK EVENT : PHASE THREE CHAPTERS (COSSACK)
 
@@ -521,8 +538,9 @@ if (!$unlock_flag_cossack && mmrpg_prototype_complete('dr-wily')){
 
 }
 
+/*
 // UNLOCK ROBOT : RHYTHM
-
+// NOTE:  No longer necessary as Rhythm is unlocked as part of the campaign
 // If the player has failed at least three battles, unlock Rhythm as a playable character
 if ($battle_failure_counter_cossack >= 3 && !mmrpg_prototype_robot_unlocked(false, 'rhythm')){
 
@@ -534,6 +552,7 @@ if ($battle_failure_counter_cossack >= 3 && !mmrpg_prototype_robot_unlocked(fals
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
 
 }
+*/
 
 // UNLOCK EVENT : PHASE TWO CHAPTERS (LIGHT)
 

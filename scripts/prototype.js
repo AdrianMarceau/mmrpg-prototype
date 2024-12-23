@@ -544,7 +544,8 @@ $(document).ready(function(){
     // If we're on the actual prototype parent frame, load the ready room now
     if (!$('#mmrpg').hasClass('iframe')){
         // Only add the ready room to the banner after the player has unlocked their first homebase
-        if (gameSettings.readyRoomUnlocked){
+        if (thisReadyRoom !== false
+            && gameSettings.readyRoomUnlocked){
 
             // Initialize the ready room on prototype home page load
             var $thisPrototype = $('#prototype');
@@ -606,19 +607,27 @@ function windowResizePrototype(){
 // Define a function to trigger when resetting data
 function mmrpg_trigger_reset(fullReset){
     // Define the confirmation text string
+    var confirmTitle = 'Confirm Reset Game';
+    confirmTitle = (confirmTitle).toUpperCase() + ' \n';
     var fullReset = typeof fullReset !== 'boolean' ? false : true;
-    var confirmText = 'Are you sure you want to reset your entire game?\nAll progress will be lost and cannot be restored including any and all unlocked missions, robots, and abilities. Continue?';
-    var confirmText2 = 'Let me repeat that one more time.\nIf you reset your game ALL unlocks and progress with be lost. \nEverything. \nReset anyway?';
+    var confirmText = confirmTitle + 'Are you sure you want to RESET your ENTIRE game? \n';
+    confirmText += 'ALL progress will be lost and CANNOT be restored, \n';
+    confirmText += 'including ALL missions, robots, abilities, items, etc. \n';
+    confirmText += 'Continue reset anyway?';
+    var confirmText2 = confirmTitle + 'Let me repeat that one more time. \n';
+    confirmText2 += 'If you reset your game ALL unlocks and progress with be lost. \n';
+    confirmText2 += 'Everything.  You will be starting from scratch. \n';
+    confirmText2 += 'Reset anyway?';
     // Attempt to confirm with the user of they want to reset
-    thisReadyRoom.updateRobot('all', {frame: 'damage'}); // damage
-    thisReadyRoom.stopAnimation();
+    if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'damage'}); }
+    if (thisReadyRoom){ thisReadyRoom.stopAnimation(); }
     if (confirm(confirmText) && confirm(confirmText2)){
         // Redirect the user to the prototype reset page
         var postURL = 'prototype.php?action=reset';
         if (fullReset){ postURL += '&full_reset=true'; }
         $.post(postURL, function(){
             //alert('reset complete!');
-            thisReadyRoom.updateRobot('all', {frame: 'defeat'}); // defeat
+            if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'defeat'}); }
             if (window.self != window.parent){
                 window.location = 'prototype.php';
                 } else {
@@ -628,46 +637,139 @@ function mmrpg_trigger_reset(fullReset){
         return true;
         } else {
         // Return false
-        thisReadyRoom.startAnimation();
+        if (thisReadyRoom){ thisReadyRoom.startAnimation(); }
         return false;
         }
 }
 
-// Define a function to trigger when resetting player missions
-function mmrpg_trigger_reset_missions(playerToken, playerName){
+// Define a function to trigger when resetting data
+function mmrpg_trigger_new_game_plus(buttonObject){
+    console.log('mmrpg_trigger_new_game_plus()');
+
     // Define the confirmation text string
-    var confirmText = 'Are you sure you want to reset all mission progress in '+playerName+'\'s game file? Unlocked robots and abilities will be untouched, but all completed missions will be reset and cannot be undone. Continue?';
-    // Attempt to confirm with the user of they want to resey
-    if (navigator.userAgent.match(/Android/i) != null || confirm(confirmText)){
-        // Redirect the user to the prototype reset page
-        var postURL = 'prototype.php?action=reset-missions&player='+playerToken;
+    var confirmTitle = 'Confirm New Game Plus';
+    confirmTitle = (confirmTitle).toUpperCase() + ' \n';
+    var confirmText = confirmTitle;
+    confirmText += 'Are you sure you want to start a NEW GAME PLUS? \n';
+    confirmText += 'ALL robots will be reboot to level one and ALL mission-related progress will be cleared, BUT you\'ll get to keep everything else \n';
+    confirmText += 'including zenny, items, abilities, stars, etc. \n';
+    confirmText += 'Continue?';
+    var confirmText2 = confirmTitle + 'Let me repeat that one more time. \n';
+    confirmText2 += 'If you start a NEW GAME PLUS then ALL robots will be reboot to level one and ALL mission-related progress will be cleared. \n';
+    confirmText2 += 'Reset anyway?';
+    // Attempt to confirm with the user of they want to reset
+    if (thisReadyRoom){
+        thisReadyRoom.updateRobot('all', {frame: 'damage'});
+        thisReadyRoom.stopAnimation();
+        }
+    //console.log('test confirm text');
+    if (confirm(confirmText) && confirm(confirmText2)){
+        //console.log('confirmed');
+        // Redirect the user to the prototype new-game-plus page
+        var postURL = 'prototype.php?action=new-game-plus';
+        console.log('postURL = ', postURL);
         $.post(postURL, function(){
-            window.location = 'prototype.php';
+            //alert('new-game-plus complete!');
+            if (thisReadyRoom){
+                thisReadyRoom.updateRobot('all', {frame: 'defend'});
+                }
+            if (window.self != window.parent){
+                window.location = 'prototype.php';
+                } else {
+                window.location = window.location.href;
+                }
             });
         return true;
         } else {
+        //console.log('not confirmed');
         // Return false
+        if (thisReadyRoom){
+            thisReadyRoom.startAnimation();
+            }
         return false;
         }
+
 }
 
-// Define a function to trigger when resetting player robots
-function mmrpg_trigger_reset_robots(playerToken, playerName){
+/*
+// Define a function to trigger when resetting data
+function mmrpg_trigger_reset_other(resetConfig, buttonObject){
+    console.log('mmrpg_trigger_reset_other(resetConfig) w/ ', resetConfig);
+
+    // Collect the reset config if provided, compensate for missing args
+    if (typeof resetConfig !== 'object'){ resetConfig = {}; } // missions, stars, robots, items
+    if (typeof resetConfig.missions !== 'boolean'){ resetConfig.missions = false; }
+    if (typeof resetConfig.database !== 'boolean'){ resetConfig.database = false; }
+    if (typeof resetConfig.abilities !== 'boolean'){ resetConfig.abilities = false; }
+    if (typeof resetConfig.items !== 'boolean'){ resetConfig.items = false; }
+    if (typeof resetConfig.stars !== 'boolean'){ resetConfig.stars = false; }
+    if (typeof resetConfig.robots !== 'boolean'){ resetConfig.robots = false; }
+    if (typeof resetConfig.extra !== 'string'){ resetConfig.extra = false; }
+    console.log('resetConfig = ', resetConfig);
+
+    // Count to make sure at least one thing has been requested
+    var numResets = 0;
+    var resetTokens = [];
+    if (resetConfig.missions){ numResets++; resetTokens.push('missions'); }
+    if (resetConfig.database){ numResets++; resetTokens.push('database'); }
+    if (resetConfig.stars){ numResets++; resetTokens.push('stars'); }
+    if (resetConfig.robots){ numResets++; resetTokens.push('robots'); }
+    if (resetConfig.items){ numResets++; resetTokens.push('items'); }
+    if (resetConfig.abilities){ numResets++; resetTokens.push('abilities'); }
+    var whatWillBeLost = 'your '+resetTokens.join(' AND ');
+    if (resetConfig.extra){
+        resetTokens.push(resetConfig.extra);
+        whatWillBeLost = '';
+        }
+    console.log('numResets = ', numResets);
+    console.log('resetTokens = ', resetTokens);
+
+    // If no resets were requested, alert the user and return false
+    if (numResets < 1){ return false; }
+
     // Define the confirmation text string
-    var confirmText = 'Are you sure you want to reset all unlocked robots in '+playerName+'\'s game file? All robots will be reset to level one and abilities reset to default. Continue?';
-    // Attempt to confirm with the user of they want to resey
-    if (navigator.userAgent.match(/Android/i) != null || confirm(confirmText)){
-        // Redirect the user to the prototype reset page
-        var postURL = 'prototype.php?action=reset-robots&player='+playerToken;
+    var innerText = 'reset your '+(whatWillBeLost ? whatWillBeLost : 'progress')+'';
+    var innerText2 = 'relevant progress '+(whatWillBeLost ? 'for all '+whatWillBeLost : '')+' will be lost';
+    var innerText3 = 'relevant progress with be lost';
+    var confirmTitle = 'Confirm Reset';
+    if (typeof buttonObject !== 'undefined'){
+        $button = $(buttonObject);
+        if ($button.length && $button.is('[data-confirm]')){ innerText = $button.attr('data-confirm'); }
+        if ($button.length && $button.is('[data-confirm2]')){ innerText3 = $button.attr('data-confirm2'); }
+        if ($button.find('strong').length){ confirmTitle = 'Confirm '+$button.find('strong').first().text().trim(); }
+    }
+    confirmTitle = (confirmTitle).toUpperCase() + ' \n';
+    var confirmText = confirmTitle + 'Are you sure you want to '+innerText+'? All '+innerText2+' and cannot be restored. \n' + 'Continue?';
+    var confirmText2 = confirmTitle + 'Let me repeat that one more time. If you reset '+whatWillBeLost+' then ALL '+innerText3.toUpperCase()+'. \n' + 'Reset anyway?';
+    // Attempt to confirm with the user of they want to reset
+    if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'damage'}); }
+    if (thisReadyRoom){ thisReadyRoom.stopAnimation(); }
+    //console.log('test confirm text');
+    if (confirm(confirmText) && confirm(confirmText2)){
+        //console.log('confirmed');
+        // Redirect the user to the prototype new-game-plus page
+        var postURL = 'prototype.php?action=new-game-plus';
+        postURL += '&reset='+resetTokens.join(',');
+        console.log('postURL = ', postURL);
         $.post(postURL, function(){
-            window.location = 'prototype.php';
+            //alert('new-game-plus complete!');
+            if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'defeat'}); }
+            if (window.self != window.parent){
+                window.location = 'prototype.php';
+                } else {
+                window.location = window.location.href;
+                }
             });
         return true;
         } else {
+        //console.log('not confirmed');
         // Return false
+        if (thisReadyRoom){ thisReadyRoom.startAnimation(); }
         return false;
         }
+
 }
+*/
 
 // Define a function for triggering the game's exit function
 function prototype_trigger_exit(thisContext, thisLink){
@@ -727,7 +829,7 @@ function prototype_menu_loaded(){
                 else if (gameSettings.nextStepName === 'database'){ newRobotFrame = 'base2'; } // base2
                 else if (parseInt(gameSettings.nextStepName) > 0){ newRobotFrame = 'victory'; } // victory
                 else { newRobotFrame = 'defend'; } // defend
-                thisReadyRoom.updateRobot('most', {frame: newRobotFrame});
+                if (thisReadyRoom){ thisReadyRoom.updateRobot('most', {frame: newRobotFrame}); }
                 }
             gameSettings.nextStepName = false;
             gameSettings.nextSlideDirection = false;
@@ -1494,9 +1596,9 @@ function prototype_menu_switch_action(switchOptions){
     if (thisReadyRoom){
         if (dataStepName === 'home'
             && dataStepNumber === 2){
-            thisReadyRoom.updateSpriteBounds({minX: 20, maxX: 80});
+            if (thisReadyRoom){ thisReadyRoom.updateSpriteBounds({minX: 20, maxX: 80}); }
             } else {
-            thisReadyRoom.resetSpriteBounds();
+            if (thisReadyRoom){ thisReadyRoom.resetSpriteBounds(); }
             }
         }
 
@@ -1590,6 +1692,7 @@ function prototype_menu_switch_action(switchOptions){
         //console.log('hoenn');
         var tempReadyRoomFunction = function(loadState){
             //console.log('tempReadyRoomFunction(loadState:', typeof loadState, loadState, ')');
+            if (!thisReadyRoom){ return false; }
             if (typeof loadState === 'undefined'){ loadState = ''; }
 
             // Define some quick filter functions for dealing with player-specific robots

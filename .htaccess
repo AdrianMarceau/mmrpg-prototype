@@ -2,6 +2,14 @@
 BrowserMatchNoCase SemrushBot bad_bot
 BrowserMatchNoCase MJ12Bot bad_bot
 BrowserMatchNoCase DotBot bad_bot
+BrowserMatchNoCase "BLEXBot/1.0" bad_bot
+BrowserMatchNoCase "claudebot" bad_bot
+BrowserMatchNoCase "ClaudeBot" bad_bot
+BrowserMatchNoCase "ClaudeBot/1.0" bad_bot
+BrowserMatchNoCase "Elisabot" bad_bot
+BrowserMatchNoCase "UptimeRobot" bad_bot
+BrowserMatchNoCase "UptimeRobot/1.0" bad_bot
+BrowserMatchNoCase "UptimeRobot/2.0" bad_bot
 Order Deny,Allow
 Deny from env=bad_bot
 

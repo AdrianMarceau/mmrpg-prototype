@@ -108,6 +108,7 @@ define('MMRPG_SETTINGS_BATTLETURNS_PERMECHA', 1); // The point rate per target s
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER', 0.05); // The conversion rate for battle points into zenny rewards
 define('MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER', 2.0); // The point rate per robot level multiplier for player battles
 define('MMRPG_SETTINGS_BATTLETURNS_PLAYERBATTLE_MULTIPLIER', 0.5); // The point rate per target robot multiplier for player battles
+define('MMRPG_SETTINGS_BATTLEPOINTS_PERMISSION', 1000); // The point rate per mission completed when averaging for new-game-plus
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERPLAYER', 10000); // The point rate per wave completed in endless attack mode
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE', 10000); // The point rate per wave completed in endless attack mode
 
@@ -130,6 +131,11 @@ define('MMRPG_SETTINGS_MECHABONUS_MULTIPLIER', 0.50); // support mechas should r
 define('MMRPG_SETTINGS_SHOP_ABILITY_PRICE', 1500);  // use as (PRICE * ENERGY)
 define('MMRPG_SETTINGS_SHOP_ROBOT_PRICE', 32000);
 define('MMRPG_SETTINGS_SHOP_FIELD_PRICE', 48000);
+
+// Define the global values for New Game + related stuff
+define('MMRPG_SETTINGS_NEWGAMEPLUS_LEVELBOOST_MIN', 0); // min level added to each chapter mission in NG+
+define('MMRPG_SETTINGS_NEWGAMEPLUS_LEVELBOOST_MAX', 900); // max level added to each chapter mission in NG+
+define('MMRPG_SETTINGS_NEWGAMEPLUS_LEVELBOOST_DEFAULT', 100); // default level added to each chapter mission in NG+
 
 // Define the global comment size limit for characters
 define('MMRPG_SETTINGS_COMMENT_MINLENGTH', 10); // Prevent spam comments

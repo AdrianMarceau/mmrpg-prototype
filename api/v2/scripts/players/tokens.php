@@ -5,9 +5,8 @@ $api_request_path = 'players';
 require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Include the database file for players and then parse necessary data
-$mmrpg_database_players_filter = "AND player_flag_published = 1 ";
-if (!$api_include_hidden){ $mmrpg_database_players_filter = "AND player_flag_hidden = 0 "; }
-if (!$api_include_incomplete){ $mmrpg_database_players_filter = "AND player_flag_complete = 1 "; }
+define('FORCE_INCLUDE_HIDDEN_PLAYERS', $api_include_hidden);
+define('FORCE_INCLUDE_INCOMPLETE_PLAYERS', $api_include_incomplete);
 require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 if (empty($mmrpg_database_players)){ print_error_and_quit('The player database could not be loaded'); }
