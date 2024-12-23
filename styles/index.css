@@ -4877,8 +4877,8 @@ body.mobileFlag_landscapeMode #window .page .event .option_this-team-select .chr
     background-color: #171717;
     border-radius: 0.3em;
 }
-#window .page .body .subbody .break,
-#window .page .body .subbody .break {
+#window .page .body .subbody div.break,
+#window .page .body .subbody hr.break {
     display: block;
     clear: both;
 }
