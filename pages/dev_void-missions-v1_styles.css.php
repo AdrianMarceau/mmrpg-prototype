@@ -716,13 +716,13 @@
     margin-right: 0;
 }
 #void-recipe .selection .item-list .item .icon {
-    transform: translate(0, 0) scale(2.0);
+    transform: translate(-4px, 0) scale(2.0);
 }
 #void-recipe .selection .item-list .item .icon img {
     filter: saturate(1.2) drop-shadow(0px 0px 1px rgba(255, 255, 255, 0.1));
 }
 #void-recipe .selection .item-list .item .quantity {
-    transform: translate(2px, 0);
+    transform: translate(4px, 0);
 }
 
 #void-recipe .selection .item-list .item.recent {

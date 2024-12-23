@@ -233,18 +233,36 @@ $mmrpg_index_items = $mmrpg_index_items_filtered;
 
 <?
 
+// Check to see if we should be minifying the inline dependencies
+$minify_inline_markup = false;
+if (MMRPG_CONFIG_IS_LIVE){ $minify_inline_markup = true; }
+elseif (true){ $minify_inline_markup = true; } // TEMP TEMP TEMP override for testing
+
+// Require and instantiate the minify library in case we need it
+require_once(MMRPG_CONFIG_ROOTDIR.'.libs/minify.php');
+
 // Include the stylesheet markup for this page as if it were inline
 ob_start();
-echo('<style type="text/css">'.PHP_EOL);
 require_once('pages/dev_void-missions-v1_styles.css.php');
-echo('</style>'.PHP_EOL);
-$website_include_stylesheets .= ob_get_clean();
+$custom_styles = trim(ob_get_clean());
+if ($minify_inline_markup){
+    $minifier = new Minify\CSS();
+    $minifier->add($custom_styles);
+    $custom_styles = $minifier->minify();
+    }
+$website_include_stylesheets .= (
+    '<style type="text/css">'.PHP_EOL.
+    '    '.$custom_styles.PHP_EOL.
+    '</style>'.PHP_EOL
+    );
 
 // Include the javascript marup for this page as if it were inline
 ob_start();
 echo('<script type="text/javascript">'.PHP_EOL);
 require_once('pages/dev_void-missions-v1_scripts.js.php');
 echo('</script>'.PHP_EOL);
-$website_include_javascript .= ob_get_clean();
+$markup = ob_get_clean();
+if ($minify_inline_dependencies){ $markup = preg_replace('/\n\s+/', "\n", trim($markup)); }
+$website_include_javascript .= $markup;
 
 ?>

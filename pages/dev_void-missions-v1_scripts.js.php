@@ -1810,6 +1810,7 @@
                                 targetRobotMarkup += '</div>';
                                 targetRobotMarkup += '<div class="label">';
                                     targetRobotMarkup += '<span class="name">'+targetRobotName+'</span>';
+                                    targetRobotMarkup += '<span class="quanta">'+targetRobotQuanta+'</span>';
                                 targetRobotMarkup += '</div>';
                                 targetRobotMarkup += '<i class="type '+targetRobotSlotType+'"></i>';
                             targetRobotMarkup += '</div>';
