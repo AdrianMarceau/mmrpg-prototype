@@ -999,7 +999,13 @@
                     // We know the spread, so let's pre-populate with empty slots
                     //console.log('-> [step-1] populate targets array with placeholders!');
                     for (let i = 0; i < numTargetSlots; i++) {
-                        targets.push({ tier: '', class: 'mecha', amount: 0 });
+                        targets.push({
+                            tier: '',
+                            class: '',
+                            level: 0,
+                            forte: 0,
+                            quanta: [0, 0],
+                            });
                         }
                     //console.log('-> step-1 // targets:', JSON.stringify(targets));
                     //console.log('-> step-1 // quantaAvailable:', quantaAvailable);
@@ -1009,20 +1015,25 @@
                     //console.log('-> [step-2] upgrade targets in array to upper tiers!');
                     for (let i = 0; i < tiers.length; i++){
                         let tier = tiers[i];
-                        let threshold = thresholds[tier];
-                        //console.log('-> processing tier:', tier, 'w/ threshold:', threshold);
+                        let tierClass = tier.split('-')[0];
+                        let tierThreshold = thresholds[tier];
+                        //console.log('-> processing tier:', tier, 'w/ tierThreshold:', tierThreshold);
                         for (let j = 0; j < targets.length; j++){
                             let target = targets[j];
                             let currentTier = target.tier;
-                            let currentAmount = target.amount;
-                            let needed = threshold - currentAmount;
+                            let currentClass = target.class;
+                            let currentAmount = target.quanta[1];
+                            let needed = tierThreshold - currentAmount;
                             //console.log('-> processing target:', target, 'w/ currentTier:', currentTier, 'currentAmount:', currentAmount);
                             //console.log('-> checking needed:', needed, 'vs. quantaRemaining:', quantaRemaining);
                             if (needed <= 0){ continue; }
                             if (quantaRemaining >= needed){
                                 //console.log('-> quantaRemaining >= needed!');
                                 quantaRemaining -= needed;
-                                targets[j] = { tier: tier, class: tier, amount: threshold };
+                                target.tier = tier;
+                                target.class = tierClass;
+                                target.quanta[0] = tierThreshold;
+                                target.quanta[1] = tierThreshold + currentAmount;
                                 //console.log('-> updated target to tier:', targets[j].tier, 'class:', targets[j].class, 'amount:', targets[j].amount);
                                 }
                             }
@@ -1039,14 +1050,12 @@
                         //console.log('-> quantaPerSlot:', quantaPerSlot, 'quantaOverflow:', quantaOverflow);
                         for (let i = 0; i < targets.length; i++){
                             let target = targets[i];
-                            let currentAmount = target.amount;
-                            let newAmount = currentAmount + quantaPerSlot;
+                            target.quanta[1] += quantaPerSlot;
                             if (quantaOverflow > 0){
-                                newAmount += 1;
+                                target.quanta[1] += 1;
                                 quantaOverflow -= 1;
                                 }
-                            targets[i].amount = newAmount;
-                            //console.log('-> updated target:', targets[i]);
+                            //console.log('-> updated target ['+i+'] to:', target);
                             }
                         }
                     //console.log('-> step-3 // targets:', JSON.stringify(targets));
@@ -1366,12 +1375,12 @@
                         var targetRobot = {};
                         var targetTier = slotTemplate.tier;
                         var targetClass = slotTemplate.class;
-                        var targetQuanta = slotTemplate.amount;
-                        targetRobot.token = '';
+                        var targetQuanta = slotTemplate.quanta;
                         targetRobot.class = targetClass;
-                        targetRobot.quanta = targetQuanta;
+                        targetRobot.token = '';
                         targetRobot.level = 1;
                         targetRobot.type = '';
+                        targetRobot.quanta = Object.values(targetQuanta);
                         if (distributedTypeSlots.length){
                             // decide which element this target will be
                             targetRobot.type = distributedTypeSlots.shift() || '';
@@ -1789,17 +1798,25 @@
                             var targetRobotInfo = mmrpgIndexRobots[targetRobotToken] || false;
                             if (!targetRobotInfo){ continue; }
                             var targetRobotClass = targetRobot.class;
-                            var targetRobotQuanta = targetRobot.quanta;
+                            var targetRobotQuanta = targetRobot.quanta[1];
                             var targetRobotLevel = targetRobot.level;
                             var targetRobotName = targetRobotInfo['robot_name'] || targetRobotToken;
                             var targetRobotImage = targetRobotInfo['robot_image'] || targetRobotToken;
-                            var targetRobotTypes = targetRobotInfo['robot_core'] || 'none';
-                            if (targetRobotInfo['robot_core'] && targetRobotInfo['robot_core2']){ targetRobotTypes += '_'+targetRobotInfo['robot_core2']; }
+                            var targetRobotTypes = [];
+                            if (targetRobotInfo['robot_core']){ targetRobotTypes.push(targetRobotInfo['robot_core']); }
+                            if (targetRobotInfo['robot_core2']){ targetRobotTypes.push(targetRobotInfo['robot_core2']); }
+                            var targetTypeClasses = targetRobotTypes.length ? targetRobotTypes.join('_') : 'none';
+                            //var targetTypeCode = targetRobotTypes[0].substr(0, 2).toUpperCase();
+                            //var targetTypeCode = targetRobotTypes[0].substr(0, 3).toUpperCase();
+                            var targetTypeCode = targetRobotTypes[0].substr(0, 1).toUpperCase() + targetRobotTypes[0].substr(1, 1).toLowerCase();
+                            //var targetTypeCode = targetRobotTypes[0].substr(0, 1).toUpperCase() + targetRobotTypes[0].substr(1, 2).toLowerCase();
+                            //var targetTypeCode = targetRobotTypes[0].substr(0, 1).toUpperCase() + targetRobotTypes[0].substr(1, 2).toLowerCase();
                             var targetRobotImageSize = targetRobotInfo['robot_image_size'] || 40;
                             var targetRobotImageSizeX = targetRobotImageSize + 'x' + targetRobotImageSize;
                             var targetRobotFrame = frameTokenByKey[targetKey] || '00';
                             var targetRobotSprite = '/images/robots/'+targetRobotImage+'/sprite_left_'+targetRobotImageSizeX+'.png?'+gameSettings.cacheTime;
                             var targetRobotMarkup = '<div class="target">';
+                                targetRobotMarkup += '<i class="portal type '+targetRobotSlotType+'"></i>';
                                 targetRobotMarkup += '<div class="image">';
                                     targetRobotMarkup += '<div '
                                         + 'class="sprite sprite_'+targetRobotImageSizeX+' sprite_'+targetRobotImageSizeX+'_'+targetRobotFrame+'" '
@@ -1810,12 +1827,13 @@
                                 targetRobotMarkup += '</div>';
                                 targetRobotMarkup += '<div class="label">';
                                     targetRobotMarkup += '<span class="name">'+targetRobotName+'</span>';
+                                    //targetRobotMarkup += '<span class="type '+targetTypeClasses+'">'+targetRobotTypes.join(', ')+'</span>';
+                                    targetRobotMarkup += '<span class="type '+targetTypeClasses+'">'+targetTypeCode+'</span>';
                                     targetRobotMarkup += '<span class="quanta">';
                                         targetRobotMarkup += '<i class="fa fa-atom"></i>';
-                                        targetRobotMarkup += '<strong>'+targetRobotQuanta+'</strong>';
+                                        targetRobotMarkup += '<strong>'+targetRobotQuanta+'</sub></strong>';
                                     targetRobotMarkup += '</span>';
                                 targetRobotMarkup += '</div>';
-                                targetRobotMarkup += '<i class="portal type '+targetRobotSlotType+'"></i>';
                             targetRobotMarkup += '</div>';
                             targetListRobotMarkup += targetRobotMarkup;
                             }

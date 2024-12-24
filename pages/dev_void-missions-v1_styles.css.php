@@ -1287,7 +1287,7 @@
 /* -- TARGET LIST -- */
 
 #void-recipe .creation .target-list {
-    bottom: 54px;
+    bottom: 45px;
     width: auto;
     left: 150px;
     right: 150px;
@@ -1328,11 +1328,12 @@
     border-radius: 3px;
     text-align: center;
     vertical-align: middle;
-    background-color: transparent;
     cursor: pointer;
+    background-color: transparent;
     filter: opacity(1.0) brightness(1.0);
-    outline: 0 none transparent;
-    transition: filter 0.1s;
+    transition: background 0.4s, filter 0.1s;
+    /* outline: 0 none transparent;  */
+    /* transition: background 0.1sm filter 0.1s, outline 0.1s; */
     /* background-color: #2d2c39;  */
     /* background-color: rgba(255, 0, 100, 0.1);  */
 }
@@ -1341,7 +1342,8 @@
 }
 #void-recipe .creation .target-list .target:hover {
     filter: brightness(1.1);
-    outline: 2px solid rgba(255, 255, 255, 0.6);
+    /* outline: 2px solid rgba(255, 255, 255, 0.6);  */
+    background-color: rgba(255, 255, 255, 0.3);
 }
 #void-recipe .creation .target-list .target > .portal {
     display: block;
@@ -1349,7 +1351,7 @@
     z-index: 1;
     width: auto;
     height: auto;
-    bottom: 9px;
+    bottom: 26px;
     left: 50%;
     transform: translate(-50%, 0);
     width: 50px;
@@ -1369,7 +1371,7 @@
     z-index: 2;
     width: 40px;
     height: 40px;
-    bottom: 16px;
+    bottom: 32px;
     left: 50%;
     transform: translate(-50%, -50%) scale(2.0);
     /* background-color: rgba(100, 0, 255, 0.1);  */
@@ -1378,50 +1380,78 @@
     display: block;
     position: absolute;
     z-index: 3;
-    width: 100%;
-    height: auto;
-    bottom: 0;
+    width: 99%;
+    width: calc(100% - 2px);
+    height: 28px;
+    bottom: 2px;
     left: 50%;
     transform: translate(-50%, 0);
     font-size: 9px;
     line-height: 13px;
-    background-color: #22222b;
-    border: 1px solid #1d1d26;
-    border-radius: 2px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    /* background-color: rgba(100, 100, 0, 0.1); */
+    background-color: transparent;
+    border: 0 none transparent;
+    border-radius: 0;
+    box-shadow: none;
 }
-#void-recipe .creation .target-list .target .label .name {
+#void-recipe .creation .target-list .target .label .name,
+#void-recipe .creation .target-list .target .label .type,
+#void-recipe .creation .target-list .target .label .quanta {
     display: block;
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 1;
     margin: 0 auto;
-    width: 90%;
-    width: calc(100% - 8px);
+    padding: 0;
+    width: auto;
+    height: auto;
+    vertical-align: top;
+    text-align: center;
     font-size: inherit;
     line-height: inherit;
     font-weight: normal;
     white-space: nowrap;
-    text-overflow: ellipsis;
     overflow: hidden;
+    border: 0 none transparent;
+    background-color: transparent;
+    border-radius: 2px;
+}
+#void-recipe .creation .target-list .target .label .name {
+    z-index: 10;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 2px 4px 3px;
+    line-height: 1;
+    text-overflow: ellipsis;
+    border: 1px solid #2c2c3a;
+    background-color: #363645;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+#void-recipe .creation .target-list .target .label .type,
+#void-recipe .creation .target-list .target .label .quanta {
+    top: 16px;
+    padding: 2px 4px;
+    color: #d1d1d1;
+    font-size: 8px;
+    line-height: 8px;
+    background-color: #363645;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+#void-recipe .creation .target-list .target .label .type {
+    z-index: 9;
+    left: 2px;
+    width: 22px;
+    right: auto;
+    border-bottom-right-radius: 0;
 }
 #void-recipe .creation .target-list .target .label .quanta {
-display: block;
-    position: absolute;
-    z-index: 4;
+    z-index: 8;
+    right: 2px;
+    left: 24px;
     width: auto;
-    height: auto;
-    top: 100%;
-    left: 50%;
-    margin: 0;
-    padding: 2px 4px;
-    font: inherit;
-    color: #dedede;
-    font-size: 8px;
-    line-height: 1;
-    border: 0 none #1d1d26;
-    background-color: #363645;
-    transform: translate(-50%, 1px);
-    border-radius: 0 0 2px 2px;
-    box-shadow: 0 1px 0 #1d1d26;
+    border-bottom-left-radius: 0;
 }
 #void-recipe .creation .target-list .target .label .quanta i,
 #void-recipe .creation .target-list .target .label .quanta strong {
@@ -1429,10 +1459,14 @@ display: block;
     margin: 0 auto;
 }
 #void-recipe .creation .target-list .target .label .quanta i {
-    margin-right: 2px;
+    margin-right: 3px;
 }
 #void-recipe .creation .target-list .target .label .quanta strong {
     font-weight: normal;
+}
+#void-recipe .creation .target-list .target .label .quanta sup,
+#void-recipe .creation .target-list .target .label .quanta sub {
+    opacity: 0.5;
 }
 #void-recipe .creation .target-list .target .image .sprite {
     display: block;
