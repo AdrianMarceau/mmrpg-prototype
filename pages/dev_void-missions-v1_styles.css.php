@@ -27,7 +27,8 @@
     /* background-color: #532556;  */
     /* background-color: #394c82;  */
     /* background-color: #2f2b41;  */
-    background-color: #504486;
+    /* background-color: #504486;  */
+    background-color: #383838;
     border: 1px solid #1A1A1A;
     border-radius: 6px;
     padding: 12px;
@@ -110,7 +111,9 @@
 #void-recipe .creation .target-list:after,
 #void-recipe .creation .mission-details:after,
 #void-recipe .creation .mission-details .rank-powers:after,
-#void-recipe .creation .mission-details .stat-powers:after {
+#void-recipe .creation .mission-details .stat-powers:after,
+#void-recipe .creation .mission-details .sort-powers:after,
+#void-recipe .creation .mission-details .void-powers .flow:after {
     content: "";
     display: block;
     clear: both;
@@ -327,10 +330,16 @@
 #void-recipe .palette .item-list .wrapper[data-step]:not(.active) .group {
     filter: brightness(0.6) saturate(1.2);
 }
+@keyframes void-recipe-step-active {
+    0% { transform: translate(0, 0) scale(1.0); }
+    1% { transform: translate(0, -6px) scale(1.02); }
+    100% { transform: translate(0, 0) scale(1.0); }
+}
 #void-recipe .palette .item-list .wrapper[data-step].active {
     background-color: #2f2b40;
     border-color: #4a4360;
     border-color: rgba(255, 255, 255, 0.1);
+    animation: void-recipe-step-active 0.4s 1;
 }
 #void-recipe .palette .item-list .wrapper[data-step]:not(.active) {
     background-color: #242032;
@@ -790,7 +799,7 @@
     border-top: 0 none transparent;
     border-radius: 0 0 9px 9px;
     box-shadow: none;
-    overflow: hidden;
+    overflow: visible;
     border-bottom-color: #333333;
     border-right-color: #333333;
     /* dynamic border colours */
@@ -922,7 +931,7 @@
     line-height: 1;
     color: #ffffff;
     text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
 }
 #void-recipe .mission-details .void-powers .power.type {
     padding: 1px 6px 3px;
@@ -1142,46 +1151,21 @@
 #void-recipe .creation .mission-details .sort-powers {
     z-index: 10;
     left: 6px;
-    /* max-width: 200px;  */
-    padding-left: 36px;
+    top: 36px;
+}
+#void-recipe .creation .mission-details .sort-powers + .sort-powers {
+    top: 60px;
 }
 
-#void-recipe .creation .mission-details .sort-powers .power {
-    font-size: 13px;
-    padding: 1px 3px 5px;
-    margin-bottom: 3px;
-    border-radius: 3px;
-    border: 1px solid transparent;
-    border-color: rgba(0, 0, 0, 0.1) !important;
-    border-left-color: rgba(0, 0, 0, 0.2) !important;
-    border-right-color: rgba(255, 255, 255, 0.05) !important;
-}
-#void-recipe .creation .mission-details .sort-powers .power.plus {
-    border-radius: 1px 3px 3px 1px;
-}
-#void-recipe .creation .mission-details .sort-powers .power.minus {
-    border-radius: 3px 1px 1px 3px;
-    border-style: dotted;
-}
-#void-recipe .creation .mission-details .sort-powers .power > span {
-    font-size: 9px;
-}
-#void-recipe .creation .mission-details .sort-powers .power:nth-child(5n) + .power {
-    clear: left;
-}
-#void-recipe .creation .mission-details .sort-powers .power > span.blur > strong,
-#void-recipe .creation .mission-details .sort-powers .power > span.blur > data {
-    font-size: inherit;
-    top: auto;
-}
-
-#void-recipe .creation .mission-details .sort-powers .label {
+#void-recipe .creation .mission-details .sort-powers .label,
+#void-recipe .creation .mission-details .sort-powers .flow {
     display: block;
-    position: absolute;
-    float: none;
-    top: 0;
-    left: 0;
-    margin: 0;
+    position: relative;
+    vertical-align: top;
+    float: left;
+    margin: 0 3px 0 0;
+}
+#void-recipe .creation .mission-details .sort-powers .label {
     padding: 3px;
     color: #ffffff;
     min-width: 1em;
@@ -1195,34 +1179,72 @@
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
     border: 1px solid #3d4166 !important;
 }
-#void-recipe .creation .mission-details .sort-powers .label .icon {
+#void-recipe .creation .mission-details .void-powers.sort-powers .label .icon {
     font-size: 12px;
-    padding-right: 3px;
+    padding: 0;
+    margin: 0;
 }
-#void-recipe .creation .mission-details .sort-powers .label .icon,
-#void-recipe .creation .mission-details .sort-powers .label .name {
-    margin: 0 3px 0 0;
+#void-recipe .creation .mission-details .void-powers.sort-powers .label .icon:first-child {
+    margin-right: 3px;
+}
+#void-recipe .creation .mission-details .void-powers.sort-powers .label .icon:last-child {
+    padding-left: 3px;
+}
+#void-recipe .creation .mission-details .void-powers.sort-powers .label .name {
+    margin-right: 3px;
 }
 
-#void-recipe .creation .mission-details .sort-powers .power:not(.label) {
+#void-recipe .creation .mission-details .void-powers .flow {
+    display: block;
+    overflow: visible;
+    box-sizing: border-box;
+    width: auto;
+    min-width: 300px;
+    height: 24px;
+}
+#void-recipe .creation .mission-details .sort-powers .flow .power {
     min-width: 10px;
+    font-size: 13px;
+    padding: 1px 3px 5px;
+    margin: 0 3px 3px 0;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    border-left-color: rgba(0, 0, 0, 0.2) !important;
+    border-right-color: rgba(255, 255, 255, 0.05) !important;
+}
+#void-recipe .creation .mission-details .sort-powers .flow .power:first-child {
+    border-radius: 4px 2px 2px 4px;
+}
+#void-recipe .creation .mission-details .sort-powers .flow .power:last-child {
+    border-radius: 2px 4px 4px 2px;
+}
+#void-recipe .creation .mission-details .sort-powers .power.plus:before,
+#void-recipe .creation .mission-details .sort-powers .power.minus:after {
+    content: " ";
+    display: inline-block;
+    width: 3px;
+}
+#void-recipe .creation .mission-details .sort-powers .power.plus {
+    box-shadow: inset 2px 0 0 rgb(255, 255, 255, 0.2);
+}
+#void-recipe .creation .mission-details .sort-powers .power.minus {
+    border-style: dotted;
+    box-shadow: inset -2px 0 0 rgb(0, 0, 0, 0.2);
+    filter: brightness(0.8) saturate(1.6);
+}
+#void-recipe .creation .mission-details .sort-powers .power > span {
+    font-size: 9px;
+}
+#void-recipe .creation .mission-details .sort-powers .power:nth-child(5n) + .power {
+    clear: left;
+}
+#void-recipe .creation .mission-details .sort-powers .power > span.blur > strong,
+#void-recipe .creation .mission-details .sort-powers .power > span.blur > data {
+    font-size: inherit;
+    top: auto;
 }
 
-/*
-#void-recipe .creation .mission-details .type-sort-powers {
-    top: 36px;
-}
-#void-recipe .creation .mission-details .stat-sort-powers {
-    top: 60px;
-}
-*/
-
-#void-recipe .creation .mission-details .sort-powers {
-    top: 36px;
-}
-#void-recipe .creation .mission-details .sort-powers + .sort-powers {
-    top: 60px;
-}
 
 
 /* -- VOID POWERS // STAT POWERS -- */
@@ -1302,7 +1324,8 @@
 #void-recipe .creation .target-list > .wrapper {
     display: block;
     position: absolute;
-    height: 80px;
+    /* height: 80px; */
+    height: 72px;
     width: auto;
     max-width: 580px;
     bottom: 0;
@@ -1321,17 +1344,21 @@
     box-sizing: border-box;
     margin: 6px;
     padding: 0;
+    /*
     width: calc((100% / 8) - 12px);
     height: calc(100% - 12px);
     min-width: 60px;
     min-height: 60px;
+    */
+    width: 60px;
+    height: 60px;
     border-radius: 3px;
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
     background-color: transparent;
     filter: opacity(1.0) brightness(1.0);
-    transition: background 0.4s, filter 0.1s;
+    transition: background 0.6s, filter 0.1s;
     /* outline: 0 none transparent;  */
     /* transition: background 0.1sm filter 0.1s, outline 0.1s; */
     /* background-color: #2d2c39;  */
@@ -1340,15 +1367,18 @@
 #void-recipe .creation .target-list .target > * {
     pointer-events: none;
 }
+/*
 #void-recipe .creation .target-list .target:hover {
     filter: brightness(1.1);
-    /* outline: 2px solid rgba(255, 255, 255, 0.6);  */
-    background-color: rgba(255, 255, 255, 0.3);
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.4);
 }
+*/
 #void-recipe .creation .target-list .target > .portal {
     display: block;
     position: absolute;
     z-index: 1;
+    pointer-events: none;
     width: auto;
     height: auto;
     bottom: 26px;
@@ -1358,40 +1388,38 @@
     height: 50px;
     border: 1px solid transparent;
     border-radius: 50%;
-    filter: opacity(1.0) brightness(0.8) saturate(1.6);
-    pointer-events: none;
+    filter: brightness(0.8) saturate(1.6);
+    transition: bottom 0.4s, filter 0.3s;
+}
+#void-recipe .creation .target-list .target:hover > .portal {
+    bottom: 32px;
+    filter: brightness(0.9) saturate(1.8);
 }
 #void-recipe .creation .target-list .target > .portal.empty {
     filter: none;
     border-color: #2e2e2e !important;
 }
-#void-recipe .creation .target-list .target .image {
-    display: block;
-    position: absolute;
-    z-index: 2;
-    width: 40px;
-    height: 40px;
-    bottom: 32px;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(2.0);
-    /* background-color: rgba(100, 0, 255, 0.1);  */
-}
 #void-recipe .creation .target-list .target .label {
     display: block;
     position: absolute;
-    z-index: 3;
-    width: 99%;
-    width: calc(100% - 2px);
-    height: 28px;
+    z-index: 2;
+    width: 100%;
+    height: 29px;
     bottom: 2px;
     left: 50%;
     transform: translate(-50%, 0);
+    padding: 2px;
     font-size: 9px;
     line-height: 13px;
     background-color: transparent;
     border: 0 none transparent;
-    border-radius: 0;
+    border-radius: 3px;
     box-shadow: none;
+    transition: background-color 0.3s;
+    background-color: rgba(255, 255, 255, 0.0);
+}
+#void-recipe .creation .target-list .target:hover .label {
+    background-color: rgba(255, 255, 255, 0.4);
 }
 #void-recipe .creation .target-list .target .label .name,
 #void-recipe .creation .target-list .target .label .type,
@@ -1417,9 +1445,9 @@
 }
 #void-recipe .creation .target-list .target .label .name {
     z-index: 10;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 2px;
+    left: 2px;
+    right: 2px;
     padding: 2px 4px 3px;
     line-height: 1;
     text-overflow: ellipsis;
@@ -1429,11 +1457,14 @@
 }
 #void-recipe .creation .target-list .target .label .type,
 #void-recipe .creation .target-list .target .label .quanta {
-    top: 16px;
-    padding: 2px 4px;
+    top: 17px;
+    padding: 3px 4px 2px;
     color: #d1d1d1;
     font-size: 8px;
     line-height: 8px;
+    border: 1px solid #2c2c3a;
+    border-color: #2c2c3a !important;
+    border-top-style: none;
     background-color: #363645;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
@@ -1467,6 +1498,17 @@
 #void-recipe .creation .target-list .target .label .quanta sup,
 #void-recipe .creation .target-list .target .label .quanta sub {
     opacity: 0.5;
+}
+#void-recipe .creation .target-list .target .image {
+    display: block;
+    position: absolute;
+    z-index: 3;
+    width: 40px;
+    height: 40px;
+    bottom: 32px;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(2.0);
+    /* background-color: rgba(100, 0, 255, 0.1);  */
 }
 #void-recipe .creation .target-list .target .image .sprite {
     display: block;
@@ -1515,6 +1557,24 @@
     position: absolute;
     z-index: 1;
     margin: 0 auto;
+    width: auto;
+    height: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background-color: transparent;
+    mix-blend-mode: overlay;
+    /* background-color: magenta; */
+}
+#void-recipe .creation .black-hole > .wrapper {
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 1;
+    margin: 0 auto;
     width: 100px;
     height: 100px;
     overflow: visible;
@@ -1523,12 +1583,10 @@
     right: auto;
     bottom: auto;
     transform: translate(-50%, -50%) scale(1.0);
-    pointer-events: none;
     background-color: transparent;
     background-image: none;
-    /* background-color: magenta;  */
-    mix-blend-mode: overlay;
     opacity: 0.8;
+    /* background-color: lime; */
 }
 #void-recipe .creation .black-hole .layer {
     content: "";

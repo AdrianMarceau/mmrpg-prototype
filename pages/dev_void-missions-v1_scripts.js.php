@@ -297,29 +297,33 @@
                                 let groupName = groupToken === 'stat' ? 'Flow (Stats)' : 'Flow (Types)';
                                 let groupPaddMod = groupToken === 'stat' ? 1 : 15;
                                 let groupPaddMax = groupToken === 'stat' ? 40 : 80;
-                                let markup = '<div class="void-powers ltr bgi sort-powers ' + groupToken + '-sort-powers">';
-                                    let sortedTokens = Object.values(groupValuesTokens);
-                                    let numSortedTokens = sortedTokens.length;
-                                    let maxLeftPadding = Math.min((groupValuesSum * groupPaddMod), groupPaddMax);
-                                    sortedTokens.sort((a, b) => groupValues[a] - groupValues[b]);
-                                    sortedTokens.forEach((token, index) => {
-                                        let name = token.charAt(0).toUpperCase() + token.slice(1);
-                                        var value = groupValues[token];
-                                        var absGroupValue = Math.abs(value);
-                                        var paddingValue = Math.round((absGroupValue / groupValuesSum) * maxLeftPadding);
-                                        const config = {
-                                            token, name, value,
-                                            typeClass: ('sort type ' + token),
-                                            blurSpans: ['name', 'value'],
-                                            extraClasses: (value ? (value > 0 ? 'plus' : 'minus') : ''),
-                                            spanPadding: (value !== 0 ? (value > 0 ? {'left': paddingValue} : {'right': paddingValue})  : 0),
-                                            };
-                                        markup += this.generatePowerElement(config);
-                                        });
+                                let markup = '<div class="void-powers rtl bgi sort-powers ' + groupToken + '-sort-powers">';
                                     markup += '<div class="power label type space_empty">';
                                         markup += '<span class="icon"><i class="fa fas fa-' + groupIcon + '"></i></span>';
                                         markup += '<span class="name blur"><strong>' + groupName + '</strong></span>';
                                         markup += '<span class="icon"><i class="fa fas fa-sort"></i></span>';
+                                    markup += '</div>';
+                                    let sortedTokens = Object.values(groupValuesTokens);
+                                    let numSortedTokens = sortedTokens.length;
+                                    let maxLeftPadding = Math.min((groupValuesSum * groupPaddMod), groupPaddMax);
+                                    sortedTokens.sort((a, b) => groupValues[b] - groupValues[a]);
+                                    markup += '<div class="flow">';
+                                        sortedTokens.forEach((token, index) => {
+                                            let name = token.charAt(0).toUpperCase() + token.slice(1);
+                                            var value = groupValues[token];
+                                            var absGroupValue = Math.abs(value);
+                                            var paddingValue = Math.round((absGroupValue / groupValuesSum) * maxLeftPadding);
+                                            const config = {
+                                                token, name, value,
+                                                typeClass: ('sort type ' + token),
+                                                spanOrder: ['value', 'name'],
+                                                blurSpans: ['name'],
+                                                extraClasses: (value ? (value > 0 ? 'plus' : 'minus') : ''),
+                                                //spanPadding: (value !== 0 ? (value > 0 ? {'left': paddingValue} : {'right': paddingValue})  : 0),
+                                                spanPadding: (value !== 0 ? (paddingValue / 2)  : 0),
+                                                };
+                                            markup += this.generatePowerElement(config);
+                                            });
                                     markup += '</div>';
                                 markup += '</div>';
                                 $missionDetails.append(markup);

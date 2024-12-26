@@ -197,10 +197,12 @@ $mmrpg_index_items = $mmrpg_index_items_filtered;
                     >&nbsp;</div>
             </div>
             <div class="black-hole">
-                <div class="layer first"></div>
-                <div class="layer second"></div>
-                <div class="layer third"></div>
-                <div class="layer fourth"></div>
+                <div class="wrapper">
+                    <div class="layer first"></div>
+                    <div class="layer second"></div>
+                    <div class="layer third"></div>
+                    <div class="layer fourth"></div>
+                </div>
             </div>
         </div>
         <div class="palette">
