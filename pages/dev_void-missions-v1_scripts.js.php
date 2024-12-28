@@ -369,6 +369,7 @@
 
                     // Collect references to key and parent elements on the page
                     var $parentDiv = $container;
+                    var $creationDiv = $('.creation', $parentDiv);
                     var $missionTargets = $('.creation .target-list', $parentDiv);
                     var $missionDetails = $('.creation .mission-details', $parentDiv);
                     var $battleField = $('.creation .battle-field', $parentDiv);
@@ -380,6 +381,7 @@
                     // Save the references to the object for later use
                     var xrefs = _self.xrefs;
                     xrefs.parentDiv = $parentDiv;
+                    xrefs.creationDiv = $creationDiv;
                     xrefs.missionTargets = $missionTargets;
                     xrefs.missionDetails = $missionDetails;
                     xrefs.battleField = $battleField;
@@ -1496,6 +1498,7 @@
                     var $itemsPalette = _self.xrefs.itemsPalette;
                     var $resetButton = _self.xrefs.resetButton;
                     var $codeButton = _self.xrefs.codeButton;
+                    var $creationDiv = _self.xrefs.creationDiv;
                     var $missionDetails = _self.xrefs.missionDetails;
                     var $targetList = _self.xrefs.missionTargets;
 
@@ -1513,6 +1516,9 @@
                     if (voidHistory.length){
                         lastItemToken = voidHistory[voidHistory.length - 1].token;
                         }
+
+                    // Remove any existing loaders before we add a new one
+                    $creationDiv.find('.loading').remove();
 
                     // Clear the item selection area and then rebuild it with the new items
                     var $selectedWrapper = $('.wrapper', $itemsSelected);
@@ -1592,10 +1598,9 @@
                     // Collect the list of void powers and keys so we can re-sort in the next step
                     var voidPowers = _self.powers;
                     var voidPowersKeys = Object.keys(voidPowers);
-                    var voidPowersValSum = 0 + (voidPowersKeys.length ? (function(){ var sum = 0; for (var i = 0; i < voidPowersKeys.length; i++){ var key = voidPowersKeys[i]; sum += voidPowers[key]; } return sum; })() : 0);
+                    var voidPowersValSum = 0 + (voidPowersKeys.length ? (function(){ var sum = 0; for (var i = 0; i < voidPowersKeys.length; i++){ var key = voidPowersKeys[i]; if (key.substr(-3, 3) === 'Max'){ continue; } sum += voidPowers[key]; } return sum; })() : 0);
                     if (voidPowersValSum === 0){
-                        $missionDetails.append('<span class="loading">&hellip;</span>');
-                        $targetList.append('<span class="loading">&hellip;</span>');
+                        $creationDiv.append('<span class="loading">&hellip;</span>');
                         return;
                         }
                     //console.log('voidPowersValSum:', voidPowersValSum);
@@ -1604,7 +1609,7 @@
                     // Also collect the list of void flows and keys so we can re-sort in the next step
                     var voidFlows = _self.flows;
                     var voidFlowsKeys = Object.keys(voidFlows);
-                    var voidFlowsValSum = 0 + (voidFlowsKeys.length ? (function(){ var sum = 0; for (var i = 0; i < voidFlowsKeys.length; i++){ var key = voidFlowsKeys[i]; sum += voidFlows[key]; } return sum; })() : 0);
+                    var voidFlowsValSum = 0 + (voidFlowsKeys.length ? (function(){ var sum = 0; for (var i = 0; i < voidFlowsKeys.length; i++){ var key = voidFlowsKeys[i]; if (key.substr(-3, 3) === 'Max'){ continue; } sum += voidFlows[key]; } return sum; })() : 0);
                     //console.log('voidFlowsValSum:', voidFlowsValSum);
                     //console.log('voidFlowsKeys(raw):', '\n-> [' + voidFlowsKeys.join(', ') + ']');
 
@@ -1663,11 +1668,15 @@
                     //console.log('voidPowersKeys(required-first):', '\n-> [' + voidPowersKeys.join(', ') + ']');
 
                     // Now we update the list of void powers in the UI to show any changes
-                    //console.log('voidPowers:', voidPowers);
-                    //console.log('voidFlows:', voidFlows);
-                    //console.log('voidPowersKeys:', voidPowersKeys);
-                    //console.log('voidFlowsKeys:', voidFlowsKeys);
-                    if (voidPowersKeys.length || voidFlowsKeys.length){
+                    console.log('%c' + 'we shall render powers', 'background-color: black; color: cyan; padding: 0 6px;');
+                    console.log('voidPowers:', voidPowers);
+                    console.log('voidPowersKeys:', voidPowersKeys);
+                    console.log('voidPowersValSum:', voidPowersValSum);
+                    console.log('voidFlows:', voidFlows);
+                    console.log('voidFlowsKeys:', voidFlowsKeys);
+                    console.log('voidFlowsValSum:', voidFlowsValSum);
+                    console.log('%c' + 'they have been rendered', 'background-color: black; color: cyan; padding: 0 6px;');
+                    if (voidPowersValSum > 0){
 
                         // Pull in the power renderer to make things easier
                         var VoidPowersRenderer = _self.voidPowersRenderer;
@@ -1758,11 +1767,6 @@
                         // Check the sort powers (stat and type) to display appropriate markup
                         VoidPowersRenderer.renderSortPowers($missionDetails, sortFlowsGrouped);
 
-                        // Check for relative stat powers (attack, defense, speed) and display appropriate markup
-                        VoidPowersRenderer.renderStatPowers($missionDetails, statPowersValues);
-
-
-
                         // TEMP TEMP TEMP
                         // Show the current delta value if it's not zero
                         if (voidPowers.delta){
@@ -1778,10 +1782,13 @@
                             $missionDetails.append(deltaMarkup);
                             }
 
+                        // Check for relative stat powers (attack, defense, speed) and display appropriate markup
+                        VoidPowersRenderer.renderStatPowers($missionDetails, statPowersValues);
+
                         } else {
 
-                        // Put the loading div back into the frame as nothing has been added
-                        $missionDetails.append('<span class="loading">&hellip;</span>');
+                        // Add a loading indicator if no powers have been generated
+                        $creationDiv.append('<span class="loading">&hellip;</span>');
 
                         }
 
@@ -1795,6 +1802,7 @@
                         var targetListRobotMarkup = '';
                         for (var i = 0; i < missionTargets.length; i++){
                             var targetKey = i;
+                            var targetLayer = config.maxTargets - i;
                             var targetRobot = missionTargets[i];
                             //console.log('-> targetRobot:', targetRobot);
                             var targetRobotToken = targetRobot.token;
@@ -1819,7 +1827,7 @@
                             var targetRobotImageSizeX = targetRobotImageSize + 'x' + targetRobotImageSize;
                             var targetRobotFrame = frameTokenByKey[targetKey] || '00';
                             var targetRobotSprite = '/images/robots/'+targetRobotImage+'/sprite_left_'+targetRobotImageSizeX+'.png?'+gameSettings.cacheTime;
-                            var targetRobotMarkup = '<div class="target">';
+                            var targetRobotMarkup = '<div class="target" style="z-index: '+targetLayer+';">';
                                 targetRobotMarkup += '<i class="portal type '+targetRobotSlotType+'"></i>';
                                 targetRobotMarkup += '<div class="image">';
                                     targetRobotMarkup += '<div '
@@ -1842,8 +1850,6 @@
                             targetListRobotMarkup += targetRobotMarkup;
                             }
                         $targetList.append('<div class="wrapper">' + targetListRobotMarkup + '</div>');
-                        } else {
-                        $targetList.append('<span class="loading">&hellip;</span>');
                         }
 
                     // end of voidRecipeWizard.refreshUI()

@@ -179,45 +179,55 @@ $mmrpg_index_items = $mmrpg_index_items_filtered;
     ?>
 
     <div id="void-recipe">
-        <div class="title">
-            <strong class="main">Void Cauldron</strong>
-            <em class="sub">Procedural Mission Generator</em>
-        </div>
-        <div class="creation">
-            <div class="mission-details">
+        <div id="vcr_upper" class="upper-deck">
+            <div id="vcr_title" class="title">
+                <strong class="main">Void Cauldron</strong>
+                <em class="sub">Procedural Mission Generator</em>
+            </div>
+            <div id="vcr_creation" class="creation">
                 <span class="loading">&hellip;</span>
-            </div>
-            <div class="target-list">
-                <span class="loading">&hellip;</span>
-            </div>
-            <div class="battle-field">
-                <div class="sprite background memory-filter"
-                    data-token="prototype-subspace"
-                    style="background-image: url(/images/fields/gentle-countryside/battle-field_preview.png?20241104-0121);"
-                    >&nbsp;</div>
-            </div>
-            <div class="black-hole">
-                <div class="wrapper">
-                    <div class="layer first"></div>
-                    <div class="layer second"></div>
-                    <div class="layer third"></div>
-                    <div class="layer fourth"></div>
-                </div>
-            </div>
-        </div>
-        <div class="palette">
-            <div class="item-list" data-count="<?= $items_palette_count ?>" data-select="*" data-step="1">
-                <?= $items_palette_markup ?>
-            </div>
-        </div>
-        <div class="selection">
-            <div class="item-list" data-count="0">
-                <div class="wrapper float-left">
+                <div class="mission-details">
                     <span class="loading">&hellip;</span>
                 </div>
+                <div class="target-list">
+                    <span class="loading">&hellip;</span>
+                </div>
+                <div class="battle-field">
+                    <span class="loading">&hellip;</span>
+                    <div class="sprite background memory-filter"
+                        data-token="prototype-subspace"
+                        style="background-image: url(/images/fields/prototype-subspace/battle-field_background_base.gif?20241104-0121);"
+                        >&nbsp;</div>
+                    <div class="sprite foreground memory-filter"
+                        data-token="prototype-subspace"
+                        style="background-image: url(/images/fields/prototype-subspace/battle-field_foreground_base.png?20241104-0121);"
+                        >&nbsp;</div>
+                </div>
             </div>
-            <a class="button reset"><i class="fa fas fa-undo"></i></a>
-            <a class="button code"><i class="fa fas fa-code"></i></a>
+            <div id="vcr_selection" class="selection">
+                <div class="item-list" data-count="0">
+                    <div class="wrapper float-left">
+                        <span class="loading">&hellip;</span>
+                    </div>
+                </div>
+                <a class="button reset"><i class="fa fas fa-undo"></i></a>
+                <a class="button code"><i class="fa fas fa-code"></i></a>
+            </div>
+        </div>
+        <div id="vcr_lower" class="lower-deck">
+            <div id="vcr_palette" class="palette">
+                <div class="item-list" data-count="<?= $items_palette_count ?>" data-select="*" data-step="1">
+                    <?= $items_palette_markup ?>
+                </div>
+            </div>
+        </div>
+        <div id="vcr_effects" class="effects">
+            <div class="black-hole">
+                <div class="layer first"></div>
+                <div class="layer second"></div>
+                <div class="layer third"></div>
+                <div class="layer fourth"></div>
+            </div>
         </div>
     </div>
 
