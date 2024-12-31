@@ -94,61 +94,8 @@
                     _self.history = [];
                     _self.indexes = {};
 
-                    // Pre-define a list of item tokens we can use later
-                    const mmrpgIndexItems = mmrpgIndex.items;
-                    var mmrpgItemTokens = Object.keys(mmrpgIndexItems);
-                    _self.indexes.itemTokens = mmrpgItemTokens;
-                    //console.log('mmrpgItemTokens:', mmrpgItemTokens);
-
-                    // Pre-define a list of stat tokens we can use later
-                    var mmrpgStatTokens = ['energy', 'weapons', 'attack', 'defense', 'speed'];
-                    _self.indexes.statTokens = mmrpgStatTokens;
-                    //console.log('mmrpgStatTokens:', mmrpgStatTokens);
-
-                    // Pre-collect a list of type tokens we can use later
-                    const mmrpgIndexTypes = mmrpgIndex.types;
-                    var mmrpgTypeTokens = Object.keys(mmrpgIndexTypes);
-                    mmrpgTypeTokens = mmrpgTypeTokens.filter(function(token){
-                        var info = mmrpgIndexTypes[token];
-                        if (token === 'none'){ return true; }
-                        else if (info.type_class === 'normal'){ return true; }
-                        return false;
-                        });
-                    _self.indexes.typeTokens = mmrpgTypeTokens;
-                    //console.log('mmrpgTypeTokens:', mmrpgTypeTokens);
-
-                    // Pre-collect a list of robot tokens that we can use later
-                    const mmrpgIndexRobots = mmrpgIndex.robots;
-                    var mmrpgRobotTokens = Object.keys(mmrpgIndexRobots);
-                    mmrpgRobotTokens = mmrpgRobotTokens.filter(function(token){
-                        var info = mmrpgIndexRobots[token];
-                        //console.log('checking info for ', token, ' | info:', info);
-                        if (!info.robot_flag_published){ return false; }
-                        else if (!info.robot_flag_complete){ return false; }
-                        else if (info.robot_flag_hidden){ return false; }
-                        else if (info.robot_class === 'system'){ return false; }
-                        return true;
-                        });
-                    _self.indexes.robotTokens = mmrpgRobotTokens;
-                    //console.log('mmrpgRobotTokens:', mmrpgRobotTokens);
-
-                    // Create sub-lists of robot tokens for each class for later
-                    var filterToClass = function(tokens, className){
-                        return tokens.filter(function(token){
-                            var info = mmrpgIndexRobots[token];
-                            if (info.robot_class === className){ return true; }
-                            return false;
-                            });
-                        };
-                    var mmrpgRobotMechaTokens = filterToClass(mmrpgRobotTokens, 'mecha');
-                    var mmrpgRobotMasterTokens = filterToClass(mmrpgRobotTokens, 'master');
-                    var mmrpgRobotBossTokens = filterToClass(mmrpgRobotTokens, 'boss');
-                    _self.indexes.robotMechaTokens = mmrpgRobotMechaTokens;
-                    _self.indexes.robotMasterTokens = mmrpgRobotMasterTokens;
-                    _self.indexes.robotBossTokens = mmrpgRobotBossTokens;
-                    //console.log('mmrpgRobotMechaTokens:', mmrpgRobotMechaTokens);
-                    //console.log('mmrpgRobotMasterTokens:', mmrpgRobotMasterTokens);
-                    //console.log('mmrpgRobotBossTokens:', mmrpgRobotBossTokens);
+                    // Catalogue all of the content indexes
+                    _self.catalogIndexes();
 
                     // Define a quick class (which we'll add to the parent) for rendering void powers
                     var voidPowersRenderer = {
@@ -392,6 +339,91 @@
                     xrefs.codeButton = $codeButton;
                     //console.log('xrefs:', xrefs);
 
+                    // Bind events to the interactive elements
+                    _self.bindEvents();
+
+                    // end of voidRecipeWizard.setup()
+                    },
+                catalogIndexes: function(){
+                    console.log('%c' + 'voidRecipeWizard.catalogIndexes()', 'color: magenta;');
+                    const _self = this;
+                    const config = _self.config;
+
+                    // Pre-define a list of item tokens we can use later
+                    const mmrpgIndexItems = mmrpgIndex.items;
+                    var mmrpgItemTokens = Object.keys(mmrpgIndexItems);
+                    _self.indexes.itemTokens = mmrpgItemTokens;
+                    //console.log('mmrpgItemTokens:', mmrpgItemTokens);
+
+                    // Pre-define a list of stat tokens we can use later
+                    var mmrpgStatTokens = ['energy', 'weapons', 'attack', 'defense', 'speed'];
+                    _self.indexes.statTokens = mmrpgStatTokens;
+                    //console.log('mmrpgStatTokens:', mmrpgStatTokens);
+
+                    // Pre-collect a list of type tokens we can use later
+                    const mmrpgIndexTypes = mmrpgIndex.types;
+                    var mmrpgTypeTokens = Object.keys(mmrpgIndexTypes);
+                    mmrpgTypeTokens = mmrpgTypeTokens.filter(function(token){
+                        var info = mmrpgIndexTypes[token];
+                        if (token === 'none'){ return true; }
+                        else if (info.type_class === 'normal'){ return true; }
+                        return false;
+                        });
+                    _self.indexes.typeTokens = mmrpgTypeTokens;
+                    //console.log('mmrpgTypeTokens:', mmrpgTypeTokens);
+
+                    // Pre-collect a list of robot tokens that we can use later
+                    const mmrpgIndexRobots = mmrpgIndex.robots;
+                    var mmrpgRobotTokens = Object.keys(mmrpgIndexRobots);
+                    mmrpgRobotTokens = mmrpgRobotTokens.filter(function(token){
+                        var info = mmrpgIndexRobots[token];
+                        //console.log('checking info for ', token, ' | info:', info);
+                        if (!info.robot_flag_published){ return false; }
+                        else if (!info.robot_flag_complete){ return false; }
+                        else if (info.robot_flag_hidden){ return false; }
+                        else if (info.robot_class === 'system'){ return false; }
+                        return true;
+                        });
+                    _self.indexes.robotTokens = mmrpgRobotTokens;
+                    //console.log('mmrpgRobotTokens:', mmrpgRobotTokens);
+
+                    // Create sub-lists of robot tokens for each class for later
+                    var filterToClass = function(tokens, className){
+                        return tokens.filter(function(token){
+                            var info = mmrpgIndexRobots[token];
+                            if (info.robot_class === className){ return true; }
+                            return false;
+                            });
+                        };
+                    var mmrpgRobotMechaTokens = filterToClass(mmrpgRobotTokens, 'mecha');
+                    var mmrpgRobotMasterTokens = filterToClass(mmrpgRobotTokens, 'master');
+                    var mmrpgRobotBossTokens = filterToClass(mmrpgRobotTokens, 'boss');
+                    _self.indexes.robotMechaTokens = mmrpgRobotMechaTokens;
+                    _self.indexes.robotMasterTokens = mmrpgRobotMasterTokens;
+                    _self.indexes.robotBossTokens = mmrpgRobotBossTokens;
+                    //console.log('mmrpgRobotMechaTokens:', mmrpgRobotMechaTokens);
+                    //console.log('mmrpgRobotMasterTokens:', mmrpgRobotMasterTokens);
+                    //console.log('mmrpgRobotBossTokens:', mmrpgRobotBossTokens);
+
+                    // end of voidRecipeWizard.catalogIndexes()
+                    },
+                bindEvents: function(){
+                    console.log('%c' + 'voidRecipeWizard.bindEvents()', 'color: magenta;');
+                    const _self = this;
+                    const config = _self.config;
+
+                    // Pull references to objects we'll be binding events to
+                    var xrefs = _self.xrefs;
+                    $parentDiv = xrefs.parentDiv;
+                    $creationDiv = xrefs.creationDiv;
+                    $missionTargets = xrefs.missionTargets;
+                    $missionDetails = xrefs.missionDetails;
+                    $battleField = xrefs.battleField;
+                    $itemsPalette = xrefs.itemsPalette;
+                    $itemsSelected = xrefs.itemsSelected;
+                    $resetButton = xrefs.resetButton;
+                    $codeButton = xrefs.codeButton;
+
                     // Backup every item's base quantity so we can do dynamic calulations in realt-time
                     $('.item[data-quantity]:not([data-base-quantity])', $parentDiv).each(function(){
                         var $item = $(this);
@@ -508,7 +540,7 @@
                     // DEBUG DEBUG DEBUG
                     // TEMP TEMP TEMP
 
-                    // end of voidRecipeWizard.setup()
+                    // end of voidRecipeWizard.bindEvents()
                     },
                 addItem: function(item, refresh){
                     console.log('%c' + 'voidRecipeWizard.addItem() w/ ' + item.token, 'color: magenta;');
