@@ -8,25 +8,25 @@ $void_item_groups_index = array(
         'name' => 'Manifest',
         'label' => 'Data',
         'groups' => array(
-            'quanta-screws' => array(
-                'name' => 'Quanta Screws',
-                'color' => 'water',
-                'rowline' => 1,
-                'colspan' => 3,
-                'items' => array(
-                    'small-screw', 'large-screw', 'hyper-screw',
-                    )
-                ),
             'spread-cores' => array(
                 'name' => 'Spread Cores',
                 'color' => 'laser',
-                'rowline' => 2,
+                'rowline' => 1,
                 'colspan' => 5,
                 'items' => array(
                     'cutter-core', 'impact-core', 'freeze-core', 'explode-core', 'flame-core',
                     'electric-core', 'time-core', 'earth-core', 'wind-core', 'water-core',
                     'swift-core', 'nature-core', 'missile-core', 'crystal-core', 'shadow-core',
                     'space-core', 'shield-core', 'laser-core', 'copy-core', 'none-core',
+                    )
+                ),
+            'quanta-screws' => array(
+                'name' => 'Quanta Screws',
+                'color' => 'water',
+                'rowline' => 2,
+                'colspan' => 3,
+                'items' => array(
+                    'small-screw', 'large-screw', 'hyper-screw',
                     )
                 ),
             'data-modules' => array(

@@ -290,9 +290,10 @@
                             console.log('VoidPowersRenderer.renderSortPowers($missionDetails, sortFlowsGrouped) w/', {sortFlowsGrouped});
                             for (const [groupToken, groupValues] of Object.entries(sortFlowsGrouped)){
                                 let groupValuesTokens = Object.keys(groupValues);
+                                //console.log('-> rendering groupValuesTokens [' + groupValuesTokens.join(', ', ) + ']');
                                 let groupValuesSum = 0 + (groupValuesTokens.length ? (function(){ var keys = groupValuesTokens, vals = groupValues, sum = 0; for (var i = 0; i < keys.length; i++){ var key = keys[i]; sum += Math.abs(vals[key]); } return sum; })() : 0);
                                 if (!groupValuesTokens.length || groupValuesSum === 0){ continue; }
-                                console.log('-> rendering group:', {groupToken, groupValues, groupValuesTokens, groupValuesSum});
+                                //console.log('-> rendering group:', {groupToken, groupValues, groupValuesTokens, groupValuesSum});
                                 let groupIcon = groupToken === 'stat' ? 'bullseye' : 'fire-alt';
                                 let groupName = groupToken === 'stat' ? 'Flow (Stats)' : 'Flow (Types)';
                                 let groupPaddMod = groupToken === 'stat' ? 1 : 15;
@@ -303,10 +304,10 @@
                                         markup += '<span class="name blur"><strong>' + groupName + '</strong></span>';
                                         markup += '<span class="icon"><i class="fa fas fa-sort"></i></span>';
                                     markup += '</div>';
-                                    let sortedTokens = Object.values(groupValuesTokens);
+                                    let sortedTokens = _self.sortTokensByItemOrder(groupValuesTokens);
                                     let numSortedTokens = sortedTokens.length;
                                     let maxLeftPadding = Math.min((groupValuesSum * groupPaddMod), groupPaddMax);
-                                    sortedTokens.sort((a, b) => groupValues[b] - groupValues[a]);
+                                    //sortedTokens.sort((a, b) => groupValues[b] - groupValues[a]); // sort by highest first
                                     markup += '<div class="flow">';
                                         sortedTokens.forEach((token, index) => {
                                             let name = token.charAt(0).toUpperCase() + token.slice(1);
@@ -951,6 +952,9 @@
                     //console.log('-> w/ flows:', flows, 'kind:', kind, 'sort:', sort);
                     // parse out flows that represent types and then order them highest first
                     const _self = this;
+                    var voidItems = _self.items;
+                    var voidItemsTokens = Object.keys(voidItems);
+                    //console.log('=> voidItemsTokens:', voidItemsTokens);
                     var mmrpgStats = _self.indexes.statTokens;
                     var mmrpgTypes = _self.indexes.typeTokens;
                     var sortFlows = {};
@@ -971,17 +975,42 @@
                     //console.log('=> sortFlows:', sortFlows);
                     if (!sort){ return sortFlows; }
                     // re-sort the sort flows based on their values w/ highest first
-                    var sortFlowsKeys = Object.keys(sortFlows);
-                    sortFlowsKeys.sort(function(a, b){ return sortFlows[b] - sortFlows[a]; });
+                    var sortFlowTokens = Object.keys(sortFlows);
+                    sortFlowTokens.sort(function(a, b){
+                        return sortFlows[b] - sortFlows[a];
+                        });
+                    var sortFlowTokensSorted = sortFlowTokens.slice().sort(function(a, b){
+                        var aVal = sortFlows[a];
+                        var bVal = sortFlows[b];
+                        var aIndex = voidItemsTokens.indexOf(a+'-core');
+                        var bIndex = voidItemsTokens.indexOf(b+'-core');
+                        if (aVal > bVal){ return -1; }
+                        if (aVal < bVal){ return 1; }
+                        if (aIndex < bIndex){ return -1; }
+                        if (aIndex > bIndex){ return 1; }
+                        return 0;
+                        });
+                    //console.log('-> sortFlowTokens:', sortFlowTokens);
+                    //console.log('-> sortFlowTokensSorted:', sortFlowTokensSorted);
                     var sortedSortPowers = {};
-                    for (var i = 0; i < sortFlowsKeys.length; i++){
-                        var sortToken = sortFlowsKeys[i];
+                    for (var i = 0; i < sortFlowTokensSorted.length; i++){
+                        var sortToken = sortFlowTokensSorted[i];
                         var sortValue = sortFlows[sortToken];
                         sortedSortPowers[sortToken] = sortValue;
                         }
                     //console.log('=> sortedSortPowers:', sortedSortPowers);
                     return sortedSortPowers;
                     // end of voidRecipeWizard.filterSortFlows()
+                    },
+                sortTokensByItemOrder: function(unsortedTokens){
+                    console.log('%c' + 'voidRecipeWizard.sortTokensByItemOrder()', 'color: magenta;');
+                    //console.log('-> w/ unsortedTokens:', unsortedTokens);
+                    const _self = this;
+                    let voidItemListString = Object.keys(_self.items).join('|');
+                    let sortedTokens = Object.values(unsortedTokens);
+                    sortedTokens.sort((a, b) => voidItemListString.indexOf(a) - voidItemListString.indexOf(b));
+                    return sortedTokens;
+                    // end of voidRecipeWizard.sortTokensByItemOrder()
                     },
                 distributeQuanta: function(quanta, spread) {
                     console.log('%c' + 'voidRecipeWizard.distributeQuanta() w/ quanta: ' + quanta + ', spread: ' + spread, 'color: magenta;');
@@ -1682,7 +1711,7 @@
                         var VoidPowersRenderer = _self.voidPowersRenderer;
 
                         // Define object variables to hold the different kinds of powers we display
-                        var basePowersValues = {quanta: 0, spread: 0};
+                        var basePowersValues = {spread: 0, quanta: 0};
                         var rankPowersValues = {level: 1, forte: 0};
                         var rankPowersValuesMax = {level: 100, forte: 10};
                         var statPowersValues = {};

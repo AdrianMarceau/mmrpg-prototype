@@ -574,14 +574,8 @@
 
 #void-recipe .creation .mission-details .delta-power {
     z-index: 9;
-    left: 7px;
-    top: 32px;
-}
-#void-recipe .creation .mission-details .sort-powers + .delta-power {
-    top: 58px;
-}
-#void-recipe .creation .mission-details .sort-powers + .sort-powers + .delta-power {
-    top: 82px;
+    left: 128px;
+    top: 10px;
 }
 #void-recipe .creation .mission-details .delta-power .power {
     font-size: 9px;
@@ -692,7 +686,9 @@
     overflow: visible;
     box-sizing: border-box;
     width: auto;
-    min-width: 300px;
+    /* min-width: 300px; */
+    min-width: 10px;
+    max-width: none;
     height: 24px;
 }
 #void-recipe .creation .mission-details .sort-powers .flow .power {
@@ -841,7 +837,7 @@
     margin: 3px;
     padding: 0;
     width: 60px;
-    height: 40px;
+    height: 33px;
     border-radius: 3px;
     text-align: center;
     vertical-align: middle;
@@ -853,11 +849,26 @@
 #void-recipe .creation .target-list .target > * {
     pointer-events: none;
 }
+/*
+#void-recipe .creation .target-list .target > .hitbox {
+    pointer-events: auto;
+    display: block;
+    position: absolute;
+    z-index: 10;
+    border: 0 none transparent;
+    background-color: transparent;
+    width: 30px;
+    height: 40px;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+*/
 #void-recipe .creation .target-list .target > .portal {
     display: block;
     position: absolute;
     z-index: 1;
-    pointer-events: none;
+    pointer-events: auto;
     width: auto;
     height: auto;
     bottom: 26px;
@@ -984,10 +995,11 @@
     z-index: 3;
     width: 40px;
     height: 40px;
-    bottom: 18px;
+    bottom: 30px;
     left: 50%;
-    transform: translate(-50%, -50%) scale(1.0);
-    /* background-color: rgba(100, 0, 255, 0.1);  */
+    transform-origin: bottom center;
+    transform: translate(-50%, 0) scale(1.0);
+    /* background-color: rgba(100, 0, 255, 0.1); */
 }
 #void-recipe .creation .target-list .target .image .sprite {
     display: block;
@@ -1037,41 +1049,22 @@
     filter: brightness(0.6);
 }
 
-
-/*
-#void-recipe .creation .target-list .target + .target {
-    margin: 6px 3px;
-    top: 0;
-}
-#void-recipe .creation .target-list .target + .target .image {
-    bottom: 12px;
-    transform: translate(-50%, -50%) scale(1.0);
-    filter: brightness(0.8);
-}
-#void-recipe .creation .target-list .target + .target > .portal {
-    width: 35px;
-    height: 35px;
-}
 #void-recipe .creation .target-list .target:first-child {
     position: absolute;
-    bottom: 0;
+    bottom: 4px;
     left: 50%;
     margin: 0;
     transform: translateX(-50%);
 }
-#void-recipe .creation .target-list .target:hover {
-    z-index: 10 !important;
+#void-recipe .creation .target-list .target:first-child .image {
+    transform: translate(-50%, 0) scale(2.0);
 }
-#void-recipe .creation .target-list .target:hover .image {
-    filter: brightness(1.0);
+#void-recipe .creation .target-list .target:not(:first-child) {
+    bottom: 18px;
 }
-#void-recipe .creation .target-list:hover .target:not(:hover) {
-    filter: brightness(0.6);
+#void-recipe .creation .target-list .target:not(:first-child):not(:hover) {
+    filter: brightness(0.6) saturate(1.4);
 }
-#void-recipe .creation .target-list:hover .target:first-child:not(:hover) {
-    filter: brightness(0.4);
-}
-*/
 
 
 /* -- VOID PALETTE -- */
@@ -1310,7 +1303,7 @@
     border-radius: 6px 6px 0 0;
     border-bottom: 1px solid transparent;
     color: #efefef;
-    z-index: 3;
+    z-index: 2;
     cursor: pointer;
 }
 #void-recipe .palette .item-list .wrapper[data-step] > .label:before,
@@ -1344,7 +1337,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 2;
+    z-index: 3;
 }
 #void-recipe .palette .item-list .wrapper[data-step] .group {
     display: inline-block;
@@ -1549,7 +1542,8 @@
     pointer-events: none;
     cursor: not-allowed;
     border-color: #1b1825;
-    background-color: #242131;
+    background-color: #1b1825;
+    background-color: #1b1825cc;
     box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 #void-recipe .item-list .item.placeholder:before {
