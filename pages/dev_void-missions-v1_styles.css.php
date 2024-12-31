@@ -877,16 +877,33 @@
     bottom: 26px;
     left: 50%;
     transform: translate(-50%, 0);
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border: 1px solid transparent;
     border-radius: 50%;
     filter: brightness(0.8) saturate(1.6);
     transition: bottom 0.4s, filter 0.3s;
 }
+#void-recipe .creation .target-list .target:first-child > .portal {
+    width: 50px;
+    height: 50px;
+}
 #void-recipe .creation .target-list .target:hover > .portal {
     bottom: 32px;
     filter: brightness(0.9) saturate(1.8);
+}
+#void-recipe .creation .target-list .target > .portal:before {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: transparent;
+    background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.4) 0%, rgba(255, 255, 255, 0.0) 100%);
+    mix-blend-mode: soft-light;
+    pointer-events: none;
 }
 #void-recipe .creation .target-list .target > .portal.empty {
     filter: none;
