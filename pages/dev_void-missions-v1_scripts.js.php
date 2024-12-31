@@ -97,8 +97,106 @@
                     // Catalogue all of the content indexes
                     _self.catalogIndexes();
 
-                    // Define a quick class (which we'll add to the parent) for rendering void powers
-                    var voidPowersRenderer = {
+                    // Generate a renderer for the void powers
+                    _self.voidPowersRenderer = _self.getPowerRenderer();
+
+                    // Collect references to key and parent elements on the page
+                    var $parentDiv = $container;
+                    var $creationDiv = $('.creation', $parentDiv);
+                    var $missionTargets = $('.creation .target-list', $parentDiv);
+                    var $missionDetails = $('.creation .mission-details', $parentDiv);
+                    var $battleField = $('.creation .battle-field', $parentDiv);
+                    var $itemsPalette = $('.palette .item-list', $parentDiv);
+                    var $itemsSelected = $('.selection .item-list', $parentDiv);
+                    var $resetButton = $('.selection .button.reset', $parentDiv);
+                    var $codeButton = $('.selection .button.code', $parentDiv);
+
+                    // Save the references to the object for later use
+                    var xrefs = _self.xrefs;
+                    xrefs.parentDiv = $parentDiv;
+                    xrefs.creationDiv = $creationDiv;
+                    xrefs.missionTargets = $missionTargets;
+                    xrefs.missionDetails = $missionDetails;
+                    xrefs.battleField = $battleField;
+                    xrefs.itemsPalette = $itemsPalette;
+                    xrefs.itemsSelected = $itemsSelected;
+                    xrefs.resetButton = $resetButton;
+                    xrefs.codeButton = $codeButton;
+                    //console.log('xrefs:', xrefs);
+
+                    // Bind events to the interactive elements
+                    _self.bindEvents();
+
+                    // end of voidRecipeWizard.setup()
+                    },
+                catalogIndexes: function(){
+                    console.log('%c' + 'voidRecipeWizard.catalogIndexes()', 'color: magenta;');
+                    const _self = this;
+                    const config = _self.config;
+
+                    // Pre-define a list of item tokens we can use later
+                    const mmrpgIndexItems = mmrpgIndex.items;
+                    var mmrpgItemTokens = Object.keys(mmrpgIndexItems);
+                    _self.indexes.itemTokens = mmrpgItemTokens;
+                    //console.log('mmrpgItemTokens:', mmrpgItemTokens);
+
+                    // Pre-define a list of stat tokens we can use later
+                    var mmrpgStatTokens = ['energy', 'weapons', 'attack', 'defense', 'speed'];
+                    _self.indexes.statTokens = mmrpgStatTokens;
+                    //console.log('mmrpgStatTokens:', mmrpgStatTokens);
+
+                    // Pre-collect a list of type tokens we can use later
+                    const mmrpgIndexTypes = mmrpgIndex.types;
+                    var mmrpgTypeTokens = Object.keys(mmrpgIndexTypes);
+                    mmrpgTypeTokens = mmrpgTypeTokens.filter(function(token){
+                        var info = mmrpgIndexTypes[token];
+                        if (token === 'none'){ return true; }
+                        else if (info.type_class === 'normal'){ return true; }
+                        return false;
+                        });
+                    _self.indexes.typeTokens = mmrpgTypeTokens;
+                    //console.log('mmrpgTypeTokens:', mmrpgTypeTokens);
+
+                    // Pre-collect a list of robot tokens that we can use later
+                    const mmrpgIndexRobots = mmrpgIndex.robots;
+                    var mmrpgRobotTokens = Object.keys(mmrpgIndexRobots);
+                    mmrpgRobotTokens = mmrpgRobotTokens.filter(function(token){
+                        var info = mmrpgIndexRobots[token];
+                        //console.log('checking info for ', token, ' | info:', info);
+                        if (!info.robot_flag_published){ return false; }
+                        else if (!info.robot_flag_complete){ return false; }
+                        else if (info.robot_flag_hidden){ return false; }
+                        else if (info.robot_class === 'system'){ return false; }
+                        return true;
+                        });
+                    _self.indexes.robotTokens = mmrpgRobotTokens;
+                    //console.log('mmrpgRobotTokens:', mmrpgRobotTokens);
+
+                    // Create sub-lists of robot tokens for each class for later
+                    var filterToClass = function(tokens, className){
+                        return tokens.filter(function(token){
+                            var info = mmrpgIndexRobots[token];
+                            if (info.robot_class === className){ return true; }
+                            return false;
+                            });
+                        };
+                    var mmrpgRobotMechaTokens = filterToClass(mmrpgRobotTokens, 'mecha');
+                    var mmrpgRobotMasterTokens = filterToClass(mmrpgRobotTokens, 'master');
+                    var mmrpgRobotBossTokens = filterToClass(mmrpgRobotTokens, 'boss');
+                    _self.indexes.robotMechaTokens = mmrpgRobotMechaTokens;
+                    _self.indexes.robotMasterTokens = mmrpgRobotMasterTokens;
+                    _self.indexes.robotBossTokens = mmrpgRobotBossTokens;
+                    //console.log('mmrpgRobotMechaTokens:', mmrpgRobotMechaTokens);
+                    //console.log('mmrpgRobotMasterTokens:', mmrpgRobotMasterTokens);
+                    //console.log('mmrpgRobotBossTokens:', mmrpgRobotBossTokens);
+
+                    // end of voidRecipeWizard.catalogIndexes()
+                    },
+                getPowerRenderer: function(){
+                    console.log('%c' + 'voidRecipeWizard.getPowerRenderer()', 'color: magenta;');
+                    const _self = this;
+                    const config = _self.config;
+                    return {
                         generatePowerElement: function({ token, name, value, maxValue, isPercent,
                                 iconClass, typeClass, extraClasses, extraStyles,
                                 hasCode, hasArrows, numBoosts, numBreaks,
@@ -313,99 +411,7 @@
                             $missionDetails.append(markup);
                             }
                         };
-                    _self.voidPowersRenderer = voidPowersRenderer;
-
-                    // Collect references to key and parent elements on the page
-                    var $parentDiv = $container;
-                    var $creationDiv = $('.creation', $parentDiv);
-                    var $missionTargets = $('.creation .target-list', $parentDiv);
-                    var $missionDetails = $('.creation .mission-details', $parentDiv);
-                    var $battleField = $('.creation .battle-field', $parentDiv);
-                    var $itemsPalette = $('.palette .item-list', $parentDiv);
-                    var $itemsSelected = $('.selection .item-list', $parentDiv);
-                    var $resetButton = $('.selection .button.reset', $parentDiv);
-                    var $codeButton = $('.selection .button.code', $parentDiv);
-
-                    // Save the references to the object for later use
-                    var xrefs = _self.xrefs;
-                    xrefs.parentDiv = $parentDiv;
-                    xrefs.creationDiv = $creationDiv;
-                    xrefs.missionTargets = $missionTargets;
-                    xrefs.missionDetails = $missionDetails;
-                    xrefs.battleField = $battleField;
-                    xrefs.itemsPalette = $itemsPalette;
-                    xrefs.itemsSelected = $itemsSelected;
-                    xrefs.resetButton = $resetButton;
-                    xrefs.codeButton = $codeButton;
-                    //console.log('xrefs:', xrefs);
-
-                    // Bind events to the interactive elements
-                    _self.bindEvents();
-
-                    // end of voidRecipeWizard.setup()
-                    },
-                catalogIndexes: function(){
-                    console.log('%c' + 'voidRecipeWizard.catalogIndexes()', 'color: magenta;');
-                    const _self = this;
-                    const config = _self.config;
-
-                    // Pre-define a list of item tokens we can use later
-                    const mmrpgIndexItems = mmrpgIndex.items;
-                    var mmrpgItemTokens = Object.keys(mmrpgIndexItems);
-                    _self.indexes.itemTokens = mmrpgItemTokens;
-                    //console.log('mmrpgItemTokens:', mmrpgItemTokens);
-
-                    // Pre-define a list of stat tokens we can use later
-                    var mmrpgStatTokens = ['energy', 'weapons', 'attack', 'defense', 'speed'];
-                    _self.indexes.statTokens = mmrpgStatTokens;
-                    //console.log('mmrpgStatTokens:', mmrpgStatTokens);
-
-                    // Pre-collect a list of type tokens we can use later
-                    const mmrpgIndexTypes = mmrpgIndex.types;
-                    var mmrpgTypeTokens = Object.keys(mmrpgIndexTypes);
-                    mmrpgTypeTokens = mmrpgTypeTokens.filter(function(token){
-                        var info = mmrpgIndexTypes[token];
-                        if (token === 'none'){ return true; }
-                        else if (info.type_class === 'normal'){ return true; }
-                        return false;
-                        });
-                    _self.indexes.typeTokens = mmrpgTypeTokens;
-                    //console.log('mmrpgTypeTokens:', mmrpgTypeTokens);
-
-                    // Pre-collect a list of robot tokens that we can use later
-                    const mmrpgIndexRobots = mmrpgIndex.robots;
-                    var mmrpgRobotTokens = Object.keys(mmrpgIndexRobots);
-                    mmrpgRobotTokens = mmrpgRobotTokens.filter(function(token){
-                        var info = mmrpgIndexRobots[token];
-                        //console.log('checking info for ', token, ' | info:', info);
-                        if (!info.robot_flag_published){ return false; }
-                        else if (!info.robot_flag_complete){ return false; }
-                        else if (info.robot_flag_hidden){ return false; }
-                        else if (info.robot_class === 'system'){ return false; }
-                        return true;
-                        });
-                    _self.indexes.robotTokens = mmrpgRobotTokens;
-                    //console.log('mmrpgRobotTokens:', mmrpgRobotTokens);
-
-                    // Create sub-lists of robot tokens for each class for later
-                    var filterToClass = function(tokens, className){
-                        return tokens.filter(function(token){
-                            var info = mmrpgIndexRobots[token];
-                            if (info.robot_class === className){ return true; }
-                            return false;
-                            });
-                        };
-                    var mmrpgRobotMechaTokens = filterToClass(mmrpgRobotTokens, 'mecha');
-                    var mmrpgRobotMasterTokens = filterToClass(mmrpgRobotTokens, 'master');
-                    var mmrpgRobotBossTokens = filterToClass(mmrpgRobotTokens, 'boss');
-                    _self.indexes.robotMechaTokens = mmrpgRobotMechaTokens;
-                    _self.indexes.robotMasterTokens = mmrpgRobotMasterTokens;
-                    _self.indexes.robotBossTokens = mmrpgRobotBossTokens;
-                    //console.log('mmrpgRobotMechaTokens:', mmrpgRobotMechaTokens);
-                    //console.log('mmrpgRobotMasterTokens:', mmrpgRobotMasterTokens);
-                    //console.log('mmrpgRobotBossTokens:', mmrpgRobotBossTokens);
-
-                    // end of voidRecipeWizard.catalogIndexes()
+                    // end of voidRecipeWizard.getPowerRenderer()
                     },
                 bindEvents: function(){
                     console.log('%c' + 'voidRecipeWizard.bindEvents()', 'color: magenta;');
@@ -433,7 +439,7 @@
 
                     // Bind ADD ITEM click events to the palette area's item list buttons
                     $('.item[data-token]', $itemsPalette).live('click', function(e){
-                        console.log('palette button clicked! \n-> add-item:', $(this).attr('data-token'));
+                        //console.log('palette button clicked! \n-> add-item:', $(this).attr('data-token'));
                         e.preventDefault();
                         //e.stopPropagation();
                         var $item = $(this);
@@ -450,7 +456,7 @@
 
                     // Bind REMOVE ITEM click events to the selection area's item list buttons
                     $('.item[data-token]', $itemsSelected).live('click', function(e){
-                        console.log('section button clicked! \n-> remove-item:', $(this).attr('data-token'));
+                        //console.log('section button clicked! \n-> remove-item:', $(this).attr('data-token'));
                         e.preventDefault();
                         var $item = $(this);
                         var itemToken = $item.attr('data-token');
@@ -467,14 +473,14 @@
 
                     // Bind RESET ITEMS click events to the selection area's reset button
                     $resetButton.live('click', function(e){
-                        console.log('reset button clicked! \n-> reset-items');
+                        //console.log('reset button clicked! \n-> reset-items');
                         e.preventDefault();
                         _self.reset();
                         });
 
                     // Bind ITEM MIX ENTRY click events to the selection area's code button
                     $codeButton.live('click', function(e){
-                        console.log('code button clicked! \n-> parse-item-mix');
+                        //console.log('code button clicked! \n-> parse-item-mix');
                         e.preventDefault();
                         var thisMixString = '';
                         // If there's already items, return a mix string to optionally copy/paste
@@ -514,7 +520,7 @@
                     // Check to see if there is already a recipe in the URL hash
                     window.addEventListener('load', () => {
                         if (_self.hashUpdatedByApp){ return; }
-                        console.log('%c' + 'window.load() triggered!', 'color: orange;');
+                        //console.log('%c' + 'window.load() triggered!', 'color: orange;');
                         const params = _self.getHashParams();
                         if (!Object.keys(params).length){ return; }
                         if (!params.mix || !params.mix.length){ return; }
@@ -523,7 +529,7 @@
                         });
                     window.addEventListener('hashchange', () => {
                         if (_self.hashUpdatedByApp){ return; }
-                        console.log('%c' + 'window.hashchange() triggered!', 'color: orange;');
+                        //console.log('%c' + 'window.hashchange() triggered!', 'color: orange;');
                         const params = _self.getHashParams();
                         if (!Object.keys(params).length){ return; }
                         if (!params.mix || !params.mix.length){ return; }
@@ -534,7 +540,7 @@
                     // TEMP TEMP TEMP
                     // DEBUG DEBUG DEBUG
                     // Make it so clicking the titlebar prints the current void powers to the console
-                    $('> .title', $parentDiv).live('click', function(){
+                    $('.title', $parentDiv).live('click', function(){
                         _self.showDebug('powers');
                         });
                     // DEBUG DEBUG DEBUG
