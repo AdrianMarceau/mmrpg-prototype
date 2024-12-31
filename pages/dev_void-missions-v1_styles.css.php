@@ -852,21 +852,6 @@
 #void-recipe .creation .target-list .target > * {
     pointer-events: none;
 }
-/*
-#void-recipe .creation .target-list .target > .hitbox {
-    pointer-events: auto;
-    display: block;
-    position: absolute;
-    z-index: 10;
-    border: 0 none transparent;
-    background-color: transparent;
-    width: 30px;
-    height: 40px;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-}
-*/
 #void-recipe .creation .target-list .target > .portal {
     display: block;
     position: absolute;

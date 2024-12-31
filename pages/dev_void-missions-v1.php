@@ -32,23 +32,6 @@ $void_item_groups_index = array();
 $void_items_disabled = array();
 require_once('pages/dev_void-missions-v1_data.php');
 
-/*
-// Pre-filter the list of items compatible with void recipes for later
-$mmrpg_index_items_filtered = array();
-foreach($mmrpg_index_items as $item_token => $item_info){
-    // Skip this item if it's an event item or a special token
-    if (empty($item_info['item_flag_published'])){ continue; }
-    elseif (empty($item_info['item_flag_complete'])){ continue; }
-    elseif (!empty($item_info['item_flag_hidden'])){ continue; }
-    elseif ($item_info['item_subclass'] === 'event'){ continue; }
-    elseif (substr($item_token, -6) === '-shard'){ continue; }
-    elseif (substr($item_token, -5) === '-star'){ continue; }
-    // Otherwise add it to the filtered list of items
-    $mmrpg_index_items_filtered[$item_token] = $item_info;
-}
-$mmrpg_index_items = $mmrpg_index_items_filtered;
-*/
-
 ?>
 <div class="header">
     <div class="header_wrapper">
