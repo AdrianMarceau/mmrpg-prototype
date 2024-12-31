@@ -179,7 +179,7 @@ $mmrpg_index_items = $mmrpg_index_items_filtered;
     ?>
 
     <div id="void-recipe">
-        <div id="vcr_upper" class="upper-deck">
+        <div id="vcr_upper" class="deck upper-deck">
             <div id="vcr_title" class="title">
                 <strong class="main">Void Cauldron</strong>
                 <em class="sub">Procedural Mission Generator</em>
@@ -214,7 +214,7 @@ $mmrpg_index_items = $mmrpg_index_items_filtered;
                 <a class="button code"><i class="fa fas fa-code"></i></a>
             </div>
         </div>
-        <div id="vcr_lower" class="lower-deck">
+        <div id="vcr_lower" class="deck lower-deck">
             <div id="vcr_palette" class="palette">
                 <div class="item-list" data-count="<?= $items_palette_count ?>" data-select="*" data-step="1">
                     <?= $items_palette_markup ?>

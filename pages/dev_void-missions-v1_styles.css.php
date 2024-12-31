@@ -70,23 +70,30 @@
 
 /* -- BASIC STRUCTURES -- */
 
-#void-recipe .upper-deck,
-#void-recipe .lower-deck,
+#void-recipe .deck,
 #void-recipe .title,
 #void-recipe .creation,
 #void-recipe .selection,
 #void-recipe .effects,
-#void-recipe .palette {
+#void-recipe .palette,
+#void-recipe .void,
+#void-recipe .mission,
+#void-recipe .wrapper,
+#void-recipe .group,
+#void-recipe .item-list,
+#void-recipe .target-list,
+#void-recipe .mission-details,
+#void-recipe .void-powers,
+#void-recipe .flow {
     display: block;
     box-sizing: border-box;
     width: auto;
     height: auto;
     text-align: center;
-    margin: 0 auto;
     position: relative;
+    margin: 0 auto;
 }
-#void-recipe .upper-deck:after,
-#void-recipe .lower-deck:after,
+#void-recipe .deck:after,
 #void-recipe .title:after,
 #void-recipe .creation:after,
 #void-recipe .selection:after,
@@ -94,17 +101,13 @@
 #void-recipe .palette:after,
 #void-recipe .void:after,
 #void-recipe .mission:after,
-#void-recipe .palette .item-list:after,
-#void-recipe .palette .item-list .wrapper:after,
-#void-recipe .palette .item-list .wrapper .group:after,
-#void-recipe .selection .item-list:after,
-#void-recipe .selection .item-list .wrapper:after,
-#void-recipe .creation .target-list:after,
-#void-recipe .creation .mission-details:after,
-#void-recipe .creation .mission-details .rank-powers:after,
-#void-recipe .creation .mission-details .stat-powers:after,
-#void-recipe .creation .mission-details .sort-powers:after,
-#void-recipe .creation .mission-details .void-powers.sort-powers .flow:after {
+#void-recipe .wrapper:after,
+#void-recipe .group:after,
+#void-recipe .item-list:after,
+#void-recipe .target-list:after,
+#void-recipe .mission-details:after,
+#void-recipe .void-powers:after,
+#void-recipe .flow:after {
     content: "";
     display: block;
     clear: both;
@@ -1507,8 +1510,13 @@
     background-color: #434343;
 }
 #void-recipe .item-list .item.active {
-    filter: brightness(1.5);
     outline: 2px solid rgba(255, 255, 255, 0.6);
+}
+#void-recipe .item-list .item.active:after {
+    background-color: #4f4f4f;
+}
+#void-recipe .item-list .item.active .icon {
+    filter: brightness(1.4);
 }
 #void-recipe .item-list .item[data-quantity="0"] {
     filter: opacity(0.6) brightness(0.9);
@@ -1644,6 +1652,7 @@
     display: block;
     text-align: center;
     vertical-align: middle;
+    box-sizing: content-box;
     width: auto;
     padding: 4px 2px 2px 4px;
     margin: 6px auto 0;
