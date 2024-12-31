@@ -100,29 +100,8 @@
                     // Generate a renderer for the void powers
                     _self.voidPowersRenderer = _self.getPowerRenderer();
 
-                    // Collect references to key and parent elements on the page
-                    var $parentDiv = $container;
-                    var $creationDiv = $('.creation', $parentDiv);
-                    var $missionTargets = $('.creation .target-list', $parentDiv);
-                    var $missionDetails = $('.creation .mission-details', $parentDiv);
-                    var $battleField = $('.creation .battle-field', $parentDiv);
-                    var $itemsPalette = $('.palette .item-list', $parentDiv);
-                    var $itemsSelected = $('.selection .item-list', $parentDiv);
-                    var $resetButton = $('.selection .button.reset', $parentDiv);
-                    var $codeButton = $('.selection .button.code', $parentDiv);
-
-                    // Save the references to the object for later use
-                    var xrefs = _self.xrefs;
-                    xrefs.parentDiv = $parentDiv;
-                    xrefs.creationDiv = $creationDiv;
-                    xrefs.missionTargets = $missionTargets;
-                    xrefs.missionDetails = $missionDetails;
-                    xrefs.battleField = $battleField;
-                    xrefs.itemsPalette = $itemsPalette;
-                    xrefs.itemsSelected = $itemsSelected;
-                    xrefs.resetButton = $resetButton;
-                    xrefs.codeButton = $codeButton;
-                    //console.log('xrefs:', xrefs);
+                    // Generate the void cauldron markup given a container
+                    _self.generateMarkup($container);
 
                     // Bind events to the interactive elements
                     _self.bindEvents();
@@ -191,6 +170,40 @@
                     //console.log('mmrpgRobotBossTokens:', mmrpgRobotBossTokens);
 
                     // end of voidRecipeWizard.catalogIndexes()
+                    },
+                generateMarkup: function($container){
+                    console.log('%c' + 'voidRecipeWizard.generateMarkup()', 'color: magenta;');
+                    console.log('-> w/ $container:', typeof $container, $container.length, $container);
+                    const _self = this;
+                    const config = _self.config;
+
+                    // Collect references to key and parent elements on the page
+                    var $parentDiv = $container;
+                    var $creationDiv = $('.creation', $parentDiv);
+                    var $missionTargets = $('.creation .target-list', $parentDiv);
+                    var $missionDetails = $('.creation .mission-details', $parentDiv);
+                    var $battleField = $('.creation .battle-field', $parentDiv);
+                    var $itemsPalette = $('.palette .item-list', $parentDiv);
+                    var $itemsSelected = $('.selection .item-list', $parentDiv);
+                    var $resetButton = $('.selection .button.reset', $parentDiv);
+                    var $codeButton = $('.selection .button.code', $parentDiv);
+
+                    // Save the references to the object for later use
+                    var xrefs = _self.xrefs;
+                    xrefs.parentDiv = $parentDiv;
+                    xrefs.creationDiv = $creationDiv;
+                    xrefs.missionTargets = $missionTargets;
+                    xrefs.missionDetails = $missionDetails;
+                    xrefs.battleField = $battleField;
+                    xrefs.itemsPalette = $itemsPalette;
+                    xrefs.itemsSelected = $itemsSelected;
+                    xrefs.resetButton = $resetButton;
+                    xrefs.codeButton = $codeButton;
+                    //console.log('xrefs:', xrefs);
+
+                    // TODO: Actually generate the markup lol
+
+                    // end of voidRecipeWizard.generateMarkup()
                     },
                 getPowerRenderer: function(){
                     console.log('%c' + 'voidRecipeWizard.getPowerRenderer()', 'color: magenta;');
