@@ -1120,6 +1120,7 @@
     height: auto;
     padding: 6px;
     padding-right: 26px;
+    min-height: 46px;
     /* background-color: magenta; */
 }
 #void-recipe .selection .item-list .item {

@@ -8,15 +8,23 @@
 
     // Add the void mission data to the global object
     mmrpgIndex.types = <?= json_encode($mmrpg_index_types) ?>;
-    mmrpgIndex.players = <?= json_encode($mmrpg_index_players) ?>;
+    //mmrpgIndex.players = <?= json_encode($mmrpg_index_players) ?>;
     mmrpgIndex.robots = <?= json_encode($mmrpg_index_robots) ?>;
-    mmrpgIndex.abilities = <?= json_encode($mmrpg_index_abilities) ?>;
+    //mmrpgIndex.abilities = <?= json_encode($mmrpg_index_abilities) ?>;
     mmrpgIndex.items = <?= json_encode($mmrpg_index_items) ?>;
     mmrpgIndex.fields = <?= json_encode($mmrpg_index_fields) ?>;
     console.log('mmrpgIndex:', typeof mmrpgIndex, mmrpgIndex);
 
+    // Predefine the item groups to be used in the void cauldron item palette
+    let voidRecipeItemGroups = <?= json_encode($void_item_groups_index, JSON_NUMERIC_CHECK) ?>;
+    let voidRecipeItemsDisabled = <?= json_encode($void_items_disabled) ?>;
+    let voidRecipeItemsQuantities = <?= json_encode($void_items_quantities) ?>;
+    //console.log('+++ voidRecipeItemGroups:', voidRecipeItemGroups);
+    //console.log('+++ voidRecipeItemsDisabled:', voidRecipeItemsDisabled);
+    //console.log('+++ voidRecipeItemsQuantities:', voidRecipeItemsQuantities);
+
     // Check to see if the Void Recipe calculator is available
-    var $voidRecipeWizard = $('#void-recipe');
+    let $voidRecipeWizard = $('#void-recipe');
     if ($voidRecipeWizard.length > 0){
         (function(){
 
@@ -24,9 +32,10 @@
 
             // Create a VOID RECIPE WIZARD so we can easily add/remove and recalculate on-the-stop
             var voidRecipeWizard = {
-                init: function($container){
+                init: function($container, customData){
                     console.log('%c' + 'voidRecipeWizard.init()', 'color: magenta;');
                     //console.log('-> w/ $container:', typeof $container, $container.length, $container);
+                    //console.log('-> w/ customData:', typeof customData, customData);
                     const _self = this;
                     _self.name = 'voidRecipeWizard';
                     _self.version = '1.0.0';
@@ -53,13 +62,13 @@
                         };
                     _self.isReady = false;
                     _self.reset(false);
-                    _self.setup($container);
+                    _self.setup($container, customData);
                     _self.calculatePowers();
                     _self.generateMission();
                     _self.refreshUI();
                     _self.isReady = true;
-                    console.log('voidRecipeWizard is ' + ('%c' + 'ready'), 'color: lime;');
-                    console.log('=> voidRecipeWizard:', _self);
+                    //console.log('voidRecipeWizard is ' + ('%c' + 'ready'), 'color: lime;');
+                    //console.log('=> voidRecipeWizard:', _self);
                     // end of voidRecipeWizard.init()
                     },
                 reset: function(refresh){
@@ -77,9 +86,10 @@
                     _self.refreshHash();
                     // end of voidRecipeWizard.reset()
                     },
-                setup: function($container){
+                setup: function($container, customData){
                     console.log('%c' + 'voidRecipeWizard.setup()', 'color: magenta;');
                     //console.log('-> w/ $container:', typeof $container, $container.length, $container);
+                    //console.log('-> w/ customData:', typeof customData, customData);
 
                     // Backup a reference to the parent object
                     const _self = this;
@@ -94,7 +104,15 @@
                     _self.history = [];
                     _self.indexes = {};
 
-                    // Catalogue all of the content indexes
+                    // Catalogue all of the content indexes into easy-to-use reference formats
+                    _self.indexes.types = customData.types || {};
+                    _self.indexes.robots = customData.robots || {};
+                    _self.indexes.items = customData.items || {};
+                    _self.indexes.itemsGroups = customData.itemsGroups || {};
+                    _self.indexes.itemsQuantities = customData.itemsQuantities || {};
+                    _self.indexes.itemsDisabled = customData.itemsDisabled || {};
+                    _self.indexes.fields = customData.fields || {};
+                    _self.indexes.void = {totalGroups: 0, totalItems: 0};
                     _self.catalogIndexes();
 
                     // Generate a renderer for the void powers
@@ -112,6 +130,7 @@
                     console.log('%c' + 'voidRecipeWizard.catalogIndexes()', 'color: magenta;');
                     const _self = this;
                     const config = _self.config;
+                    const mmrpgIndex = _self.indexes;
 
                     // Pre-define a list of item tokens we can use later
                     const mmrpgIndexItems = mmrpgIndex.items;
@@ -173,25 +192,54 @@
                     },
                 generateMarkup: function($container){
                     console.log('%c' + 'voidRecipeWizard.generateMarkup()', 'color: magenta;');
-                    console.log('-> w/ $container:', typeof $container, $container.length, $container);
+                    //console.log('-> w/ $container:', typeof $container, $container.length, $container);
                     const _self = this;
                     const config = _self.config;
+                    const indexes = _self.indexes;
 
                     // Collect references to key and parent elements on the page
-                    var $parentDiv = $container;
-                    var $creationDiv = $('.creation', $parentDiv);
-                    var $missionTargets = $('.creation .target-list', $parentDiv);
-                    var $missionDetails = $('.creation .mission-details', $parentDiv);
-                    var $battleField = $('.creation .battle-field', $parentDiv);
-                    var $itemsPalette = $('.palette .item-list', $parentDiv);
-                    var $itemsSelected = $('.selection .item-list', $parentDiv);
-                    var $resetButton = $('.selection .button.reset', $parentDiv);
-                    var $codeButton = $('.selection .button.code', $parentDiv);
+                    let $parentDiv = $container;
+                    let $titleDiv = $('.title', $parentDiv);
+                    let $creationDiv = $('.creation', $parentDiv);
+                    let $selectionDiv = $('.selection', $parentDiv);
+                    let $paletteDiv = $('.palette', $parentDiv);
+                    let $effectsDiv = $('.effects', $parentDiv);
+                    let $missionTargets = $('.target-list', $creationDiv);
+                    let $missionDetails = $('.mission-details', $creationDiv);
+                    let $battleField = $('.battle-field', $creationDiv);
+
+                    // Generate the item button markup to use in palette
+                    let itemButtonMarkup = _self.getItemButtonMarkup();
+
+                    // Update the palette are with the full item list
+                    $paletteDiv.empty();
+                    var firstStep = indexes.void.firstStep || 1;
+                    var totalGroups = indexes.void.totalGroups || 0;
+                    var totalItems = indexes.void.totalItems || 0;
+                    let itemPaletteMarkup = '<div class="item-list" data-count="' + totalItems + '" data-step="' + firstStep + '" data-select="*">' + itemButtonMarkup + '</div>';
+                    $paletteDiv.append(itemPaletteMarkup);
+                    let $itemsPalette = $('.item-list', $paletteDiv);
+
+                    // Generate the selection area to hold items that have been added
+                    $selectionDiv.empty();
+                    let itemSelectMarkup = '<div class="item-list" data-count="0"><div class="wrapper float-left"><span class="loading">&hellip;</span></div></div>';
+                    let resetButtonMarkup = '<a class="button reset"><i class="fa fas fa-undo"></i></a>';
+                    let codeButtonMarkup = '<a class="button code"><i class="fa fas fa-code"></i></a>';
+                    $selectionDiv.append(itemSelectMarkup);
+                    $selectionDiv.append(resetButtonMarkup);
+                    $selectionDiv.append(codeButtonMarkup);
+                    let $itemsSelected = $('.item-list', $selectionDiv);
+                    let $resetButton = $('.button.reset', $selectionDiv);
+                    let $codeButton = $('.button.code', $selectionDiv);
 
                     // Save the references to the object for later use
                     var xrefs = _self.xrefs;
                     xrefs.parentDiv = $parentDiv;
+                    xrefs.titleDiv = $titleDiv;
                     xrefs.creationDiv = $creationDiv;
+                    xrefs.selectionDiv = $selectionDiv;
+                    xrefs.paletteDiv = $paletteDiv;
+                    xrefs.effectsDiv = $effectsDiv;
                     xrefs.missionTargets = $missionTargets;
                     xrefs.missionDetails = $missionDetails;
                     xrefs.battleField = $battleField;
@@ -201,9 +249,112 @@
                     xrefs.codeButton = $codeButton;
                     //console.log('xrefs:', xrefs);
 
-                    // TODO: Actually generate the markup lol
+                    // Return true on success
+                    return true;
 
                     // end of voidRecipeWizard.generateMarkup()
+                    },
+                getItemButtonMarkup: function(){
+                    console.log('%c' + 'voidRecipeWizard.getItemButtonMarkup()', 'color: magenta;');
+                    const _self = this;
+                    const config = _self.config;
+                    const indexes = _self.indexes;
+
+                    // Collect references to the indexes we need to generate the markup
+                    const mmrpgIndexItems = indexes.items;
+                    const voidItemGroups = indexes.itemsGroups;
+                    const voidItemQuantities = indexes.itemsQuantities;
+                    const voidItemDisabled = indexes.itemsDisabled;
+
+                    // Generate the markup for the items themselves first before grouping
+                    let groupMarkupByStep = {};
+                    let numItemsTotal = 0;
+                    let firstStepNum = -1;
+                    let currItemRowline = 0;
+                    let zIndex = Object.keys(voidItemGroups).length + 11;
+                    Object.keys(voidItemGroups).forEach((stepKey) => {
+                        const stepInfo = voidItemGroups[stepKey];
+                        const stepNum = parseInt(stepKey) + 1;
+                        if (stepNum > firstStepNum){ firstStepNum = stepNum; }
+                        const stepGroups = stepInfo.groups;
+                        if (!stepGroups || Object.keys(stepGroups).length === 0) return;
+                        groupMarkupByStep[stepKey] = [];
+                        Object.keys(stepGroups).forEach((groupToken) => {
+                            const groupInfo = stepGroups[groupToken];
+                            const groupItems = groupInfo.items;
+                            const groupRowline = groupInfo.rowline;
+                            const groupColspan = groupInfo.colspan;
+                            if (!groupItems || groupItems.length === 0) return;
+                            const groupItemsMarkup = [];
+                            groupItems.forEach((itemToken, itemKey) => {
+                                if (!mmrpgIndexItems[itemToken]) return;
+                                const itemInfo = mmrpgIndexItems[itemToken];
+                                const itemName = itemInfo.item_name;
+                                const itemNameBr = itemName.replace(/ /g, '<br />');
+                                const itemIsOneline = !itemName.includes(' ');
+                                const itemIsDisabled = voidItemDisabled.includes(itemToken);
+                                const itemQuantity = voidItemQuantities[itemToken] || 0;
+                                const itemImage = itemInfo.item_image || itemToken;
+                                const iconUrl = '/images/items/' + itemImage + '/icon_right_40x40.png?' + gameSettings.cacheDate;
+                                let itemMarkup = '';
+                                itemMarkup += '<div class="item' + (itemIsDisabled ? ' disabled' : '') + '" ';
+                                        itemMarkup += 'data-key="' + itemKey + '" ';
+                                        itemMarkup += 'data-token="' + itemToken + '" ';
+                                        itemMarkup += 'data-group="' + groupToken + '" ';
+                                        itemMarkup += 'data-quantity="' + itemQuantity + '" ';
+                                        itemMarkup += 'style="z-index: 0;" ';
+                                        itemMarkup += '>';
+                                    itemMarkup += '<div class="icon"><img class="has_pixels" src="' + iconUrl + '" alt="' + itemName + '"></div>';
+                                    itemMarkup += '<div class="name ' + (itemIsOneline ? 'one-line' : '') + '">' + itemNameBr + '</div>';
+                                    itemMarkup += '<div class="quantity">' + itemQuantity + '</div>';
+                                itemMarkup += '</div>';
+                                groupItemsMarkup.push(itemMarkup);
+                                });
+                            if (groupItemsMarkup.length === 0) return;
+                            const addNewline = groupRowline !== currItemRowline && groupMarkupByStep[stepKey].length >= 1;
+                            const groupMarkup = groupItemsMarkup.join('\n');
+                            const groupMarkupClass = 'group ' + groupToken + ' type ' + groupInfo.color;
+                            let groupMarkupAttrs = 'data-group="' + groupToken + '" data-count="' + groupItems.length + '"';
+                            groupMarkupAttrs += ' data-rowline="' + groupRowline + '" data-colspan="' + groupColspan + '"';
+                            let wrappedGroupMarkup = '<div class="' + groupMarkupClass + '" ' + groupMarkupAttrs + '>\n' + groupMarkup + '\n</div>';
+                            if (addNewline) wrappedGroupMarkup = '<div class="clear"></div>\n' + wrappedGroupMarkup;
+                            groupMarkupByStep[stepKey].push(wrappedGroupMarkup);
+                            numItemsTotal += groupItems.length;
+                            currItemRowline = groupRowline;
+                            });
+                        });
+
+
+                    // Now that we have item markup generated and grouped-together, we can wrap them in parent elements
+                    let itemButtonsMarkup = '';
+                    Object.keys(groupMarkupByStep).forEach((stepKey) => {
+                        const wrappedGroupMarkup = groupMarkupByStep[stepKey].join('\n');
+                        const stepInfo = voidItemGroups[stepKey];
+                        const stepNum = parseInt(stepKey) + 1;
+                        const stepSide = stepNum < Math.ceil(Object.keys(voidItemGroups).length / 2) ? 'left' : (stepNum > Math.ceil(Object.keys(voidItemGroups).length / 2) ? 'right' : 'middle');
+                        const stepIsActive = stepNum === 1;
+                        let wrapperMarkup = '';
+                        wrapperMarkup += '<div class="wrapper' + (stepIsActive ? ' active' : '') + '" ';
+                                wrapperMarkup += 'data-step="' + stepNum + '" ';
+                                wrapperMarkup += 'data-side="' + stepSide + '" ';
+                                wrapperMarkup += 'data-layer="' + stepNum + '"';
+                                wrapperMarkup += '>';
+                            wrapperMarkup += '<div class="label">';
+                            wrapperMarkup += '<strong>' + stepInfo.name + ' (' + stepInfo.label + ')</strong>';
+                            wrapperMarkup += '</div>';
+                            wrapperMarkup += '<div class="groups">' + wrappedGroupMarkup + '</div>';
+                        wrapperMarkup += '</div>';
+                        itemButtonsMarkup += wrapperMarkup;
+                        });
+
+                    // Update the void index with any calculated values
+                    indexes.void.totalGroups = Object.keys(voidItemGroups).length;
+                    indexes.void.totalItems = numItemsTotal;
+
+                    // Return the generated button markup
+                    return itemButtonsMarkup;
+
+                    // end of voidRecipeWizard.getItemButtonMarkup()
                     },
                 getPowerRenderer: function(){
                     console.log('%c' + 'voidRecipeWizard.getPowerRenderer()', 'color: magenta;');
@@ -435,6 +586,9 @@
                     var xrefs = _self.xrefs;
                     $parentDiv = xrefs.parentDiv;
                     $creationDiv = xrefs.creationDiv;
+                    $selectionDiv = xrefs.selectionDiv;
+                    $paletteDiv = xrefs.paletteDiv;
+                    $effectsDiv = xrefs.effectsDiv;
                     $missionTargets = xrefs.missionTargets;
                     $missionDetails = xrefs.missionDetails;
                     $battleField = xrefs.battleField;
@@ -442,6 +596,20 @@
                     $itemsSelected = xrefs.itemsSelected;
                     $resetButton = xrefs.resetButton;
                     $codeButton = xrefs.codeButton;
+
+                    //console.log('let us check to see the data type of all the above refs');
+                    //console.log('-> $parentDiv:', typeof $parentDiv, $parentDiv.length, $parentDiv);
+                    //console.log('-> $creationDiv:', typeof $creationDiv, $creationDiv.length, $creationDiv);
+                    //console.log('-> $selectionDiv:', typeof $selectionDiv, $selectionDiv.length, $selectionDiv);
+                    //console.log('-> $paletteDiv:', typeof $paletteDiv, $paletteDiv.length, $paletteDiv);
+                    //console.log('-> $effectsDiv:', typeof $effectsDiv, $effectsDiv.length, $effectsDiv);
+                    //console.log('-> $missionTargets:', typeof $missionTargets, $missionTargets.length, $missionTargets);
+                    //console.log('-> $missionDetails:', typeof $missionDetails, $missionDetails.length, $missionDetails);
+                    //console.log('-> $battleField:', typeof $battleField, $battleField.length, $battleField);
+                    //console.log('-> $itemsPalette:', typeof $itemsPalette, $itemsPalette.length, $itemsPalette);
+                    //console.log('-> $itemsSelected:', typeof $itemsSelected, $itemsSelected.length, $itemsSelected);
+                    //console.log('-> $resetButton:', typeof $resetButton, $resetButton.length, $resetButton);
+                    //console.log('-> $codeButton:', typeof $codeButton, $codeButton.length, $codeButton);
 
                     // Backup every item's base quantity so we can do dynamic calulations in realt-time
                     $('.item[data-quantity]:not([data-base-quantity])', $parentDiv).each(function(){
@@ -451,7 +619,9 @@
                         });
 
                     // Bind ADD ITEM click events to the palette area's item list buttons
-                    $('.item[data-token]', $itemsPalette).live('click', function(e){
+                    let $paletteItems = $('.item[data-token]', $itemsPalette);
+                    //console.log('$paletteItems', {typeof: typeof $paletteItems, length: $paletteItems.length, element: $paletteItems});
+                    $paletteItems.live('click', function(e){
                         //console.log('palette button clicked! \n-> add-item:', $(this).attr('data-token'));
                         e.preventDefault();
                         //e.stopPropagation();
@@ -1619,7 +1789,7 @@
                             var itemQuantity = voidItems[itemToken] || 0;
                             var itemImage = itemInfo.item_image || itemToken;
                             var itemClass = 'item' + (itemToken === lastItemToken ? ' recent' : '');
-                            var itemIcon = '/images/items/'+itemImage+'/icon_right_40x40.png?'+gameSettings.cacheDate;
+                            var itemIcon = '/images/items/'+itemImage+'/icon_right_40x40.png?' + gameSettings.cacheDate;
                             var itemMarkup = '<div class="'+itemClass+'" data-token="'+itemToken+'" data-quantity="'+itemQuantity+'">';
                                 itemMarkup += '<div class="icon"><img class="has_pixels" src="'+itemIcon+'" alt="'+itemName+'"></div>';
                                 itemMarkup += '<div class="name">'+itemNameBr+'</div>';
@@ -1876,7 +2046,7 @@
                     var missionInfo = _self.mission;
                     var missionTargets = missionInfo.targets || [];
                     if (missionTargets.length){
-                        console.log('updating mission target list!', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
+                        console.log('Updating mission target display using new data...', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
                         const mmrpgIndexRobots = mmrpgIndex.robots;
                         const frameTokenByKey = {0: 'base', 1: 'defense', 2: 'base2', 3: 'defend', 4: 'base', 5: 'defend', 6: 'base2', 7: 'defend'};
                         var targetListRobotMarkup = '';
@@ -1958,8 +2128,8 @@
                             }
                         console.log('%c' + powerDebug, 'background-color: #242131; color: #fff; font-weight: bold;');
                         console.log('%c' + flowDebug, 'background-color: #242131; color: #fff; font-weight: bold;');
-                        console.log('via `_self.powers`:', _self.powers);
-                        console.log('via `_self.flows`:', _self.flows);
+                        console.log('via _self.powers:', _self.powers);
+                        console.log('via _self.flows:', _self.flows);
                         }
                     // end of voidRecipeWizard.showDebug()
                     },
@@ -1967,7 +2137,15 @@
 
             // Initialize the void recipe calculator
             console.log('%c' + 'Initializing the voidRecipeWizard()', 'color: orange;');
-            voidRecipeWizard.init($voidRecipeWizard);
+            voidRecipeWizard.init($voidRecipeWizard, {
+                types: mmrpgIndex.types,
+                robots: mmrpgIndex.robots,
+                items: mmrpgIndex.items,
+                itemsGroups: voidRecipeItemGroups,
+                itemsDisabled: voidRecipeItemsDisabled,
+                itemsQuantities: voidRecipeItemsQuantities,
+                fields: mmrpgIndex.fields,
+                });
 
             })();
         }

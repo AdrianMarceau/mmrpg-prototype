@@ -57,110 +57,6 @@ require_once('pages/dev_void-missions-v1_data.php');
         </div>
     </div>
 
-    <?
-
-    // Start the output buffer to collect generated item markup
-    ob_start();
-
-        // NEW VERSION:
-        // Loop through each of the steps in the index (then each of the groups within those steps), to generate
-        // the markup for the item-pallet's wrappers, group containers, and item buttons that will be clicked on
-        $all_items_x99 = !empty($_GET['allx99']) ? true : false;
-        $num_items_total = 0;
-        $curr_item_rowline = 0;
-        $group_markup_by_step = array();
-        $void_item_groups_count = count($void_item_groups_index);
-        foreach ($void_item_groups_index AS $step_key => $step_info){
-            $step_num = $step_key + 1;
-            $step_name = $step_info['name'];
-            $step_label = $step_info['label'];
-            $step_groups = $step_info['groups'];
-            if (empty($step_groups)){ continue; }
-            $group_markup_by_step[$step_key] = array();
-            foreach ($step_groups AS $group_token => $group_info){
-                $group_name = $group_info['name'];
-                $group_color = $group_info['color'];
-                $group_items = $group_info['items'];
-                $group_rowline = $group_info['rowline'];
-                $group_colspan = $group_info['colspan'];
-                if (empty($group_items)){ continue; }
-                $group_items_markup = array();
-                foreach ($group_items AS $item_key => $item_token){
-                    if (!isset($mmrpg_index_items[$item_token])){ continue; }
-                    $item_info = $mmrpg_index_items[$item_token];
-                    $item_name = $item_info['item_name'];
-                    $item_name_br = str_replace(' ', '<br />', $item_name);
-                    $item_is_oneline = !strstr($item_name, ' ');
-                    $item_is_disabled = in_array($item_token, $void_items_disabled);
-                    $item_quantity = $all_items_x99 ? 99 : mt_rand(33, 99); //mt_rand(0, 99);
-                    $item_image = !empty($item_info['item_image']) ? $item_info['item_image'] : $item_token;
-                    $icon_url = '/images/items/'.$item_image.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
-                    ob_start();
-                    echo('<div class="item'.($item_is_disabled ? ' disabled' : '').'" '.
-                        'data-key="'.$item_key.'" '.
-                        'data-token="'.$item_token.'" '.
-                        'data-group="'.$group_token.'" '.
-                        'data-quantity="'.$item_quantity.'" '.
-                        'style="z-index: 0;" '.
-                        '>');
-                        echo('<div class="icon"><img class="has_pixels" src="'.$icon_url.'" alt="'.$item_name.'"></div>');
-                        echo('<div class="name '.($item_is_oneline ? 'one-line' : '').'">'.$item_name_br.'</div>');
-                        echo('<div class="quantity">'.$item_quantity.'</div>');
-                    echo('</div>');
-                    $group_items_markup[] = ob_get_clean();
-                }
-                if (empty($group_items_markup)){ continue; }
-                $added_so_far = count($group_markup_by_step[$step_key]);
-                $add_newline = $group_rowline !== $curr_item_rowline && $added_so_far >= 1 ? true : false;
-                $group_markup = implode(PHP_EOL, $group_items_markup);
-                $group_markup_class = 'group '.$group_token.' type '.$group_color;
-                $group_markup_attrs = 'data-group="'.$group_token.'" data-count="'.count($group_items).'"';
-                $group_markup_attrs .= ' data-rowline="'.$group_rowline.'" data-colspan="'.$group_colspan.'"';
-                $wrapped_group_markup = '<div class="'.$group_markup_class.'" '.$group_markup_attrs.'>'.PHP_EOL.$group_markup.PHP_EOL.'</div>';
-                if ($add_newline){ $wrapped_group_markup = '<div class="clear"></div>'.PHP_EOL.$wrapped_group_markup; }
-                $group_markup_by_step[$step_key][] = $wrapped_group_markup;
-                //console_log(__LINE__, 'adding wrapped group markup for '.$group_token.' to step '.$step);
-                $num_items_total += count($group_items);
-                $curr_item_rowline = $group_rowline;
-            }
-        }
-        $z_index = count($group_markup_by_step) + 11;
-        foreach ($group_markup_by_step AS $step_key => $wrapped_group_markup){
-            ob_start();
-            $step_info = $void_item_groups_index[$step_key];
-            $step_num = $step_key + 1;
-            $step_name = $step_info['name'];
-            $step_label = $step_info['label'];
-            $step_layer = $step_num; // changes dynamically
-            $step_side = 'middle';
-            if ($step_num < round($void_item_groups_count / 2)){ $step_side = 'left'; }
-            if ($step_num > round($void_item_groups_count / 2)){ $step_side = 'right'; }
-            $step_is_active = $step_num === 1 ? true : false;
-            $wrapper_attrs = '';
-            $wrapper_attrs .= 'data-step="'.$step_num.'"';
-            $wrapper_attrs .= 'data-side="'.$step_side.'"';
-            $wrapper_attrs .= 'data-layer="'.$step_layer.'"';
-            $wrapper_class = 'wrapper'.($step_is_active ? ' active' : '');
-            echo('<div class="'.$wrapper_class.'" '.$wrapper_attrs.'>'.PHP_EOL);
-                echo('<div class="label">'.PHP_EOL);
-                    echo('<strong>'.$step_name.' ('.$step_label.')</strong>'.PHP_EOL);
-                echo('</div>'.PHP_EOL);
-                echo('<div class="groups">'.implode(PHP_EOL, $wrapped_group_markup).'</div>'.PHP_EOL);
-            echo('</div>'.PHP_EOL);
-            $group_items_markup = ob_get_clean();
-            if (!empty($group_items_markup)){
-                echo($group_items_markup);
-            }
-        }
-        //console_log(__LINE__, '$void_item_groups_index = '.print_r($void_item_groups_index, true));
-        //console_log(__LINE__, '$group_markup_by_step = '.print_r($group_markup_by_step, true));
-
-    // Collect the generated markup for the item palette from the buffer and save it to a variable
-    $items_palette_markup = ob_get_clean();
-    $items_palette_count = $num_items_total;
-
-    ?>
-
     <div id="void-recipe">
         <div id="vcr_upper" class="deck upper-deck">
             <div id="vcr_title" class="title">
@@ -188,20 +84,12 @@ require_once('pages/dev_void-missions-v1_data.php');
                 </div>
             </div>
             <div id="vcr_selection" class="selection">
-                <div class="item-list" data-count="0">
-                    <div class="wrapper float-left">
-                        <span class="loading">&hellip;</span>
-                    </div>
-                </div>
-                <a class="button reset"><i class="fa fas fa-undo"></i></a>
-                <a class="button code"><i class="fa fas fa-code"></i></a>
+                <span class="loading">&hellip;</span>
             </div>
         </div>
         <div id="vcr_lower" class="deck lower-deck">
             <div id="vcr_palette" class="palette">
-                <div class="item-list" data-count="<?= $items_palette_count ?>" data-select="*" data-step="1">
-                    <?= $items_palette_markup ?>
-                </div>
+                <span class="loading">&hellip;</span>
             </div>
         </div>
         <div id="vcr_effects" class="effects">

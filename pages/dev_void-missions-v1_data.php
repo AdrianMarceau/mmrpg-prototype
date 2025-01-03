@@ -262,4 +262,21 @@ $void_items_disabled = array(
     'alchemy-module', 'distill-module',
     );
 
+// Define an array to hold all the quantities of the player's void items (TEMP PROBABLY)
+$all_items_x99 = !empty($_GET['allx99']) ? true : false;
+$all_items_xRand = !empty($_GET['allxRand']) ? true : false;
+$current_items_inventory = mmrpg_prototype_items_unlocked();
+$void_items_quantities = array();
+foreach ($void_item_groups_index as $group) {
+    foreach ($group['groups'] as $subgroup) {
+        foreach ($subgroup['items'] as $item) {
+            $quantity = $current_items_inventory[$item] || 0;
+            if ($all_items_x99){ $quantity = 99; }
+            else if ($all_items_xRand){ $quantity = mt_rand(0, 99); }
+            $void_items_quantities[$item] = $all_items_x99 ? 99 : 0;
+        }
+    }
+}
+
+
 ?>
