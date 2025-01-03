@@ -1075,8 +1075,8 @@
 /* -- VOID PALETTE -- */
 
 #void-recipe .palette {
-    margin-top: 6px;
-    padding: 0 3px;
+    margin: 6px -9px 0;
+    padding: 0 9px;
     z-index: 10;
 }
 
@@ -1295,11 +1295,12 @@
     display: block;
     box-sizing: border-box;
     position: absolute;
+    top: -24px;
     left: auto;
+    bottom: auto;
     right: auto;
     width: auto;
     min-width: 130px;
-    top: -22px;
     font-size: 11px;
     line-height: 15px;
     height: 24px;
@@ -1311,6 +1312,8 @@
     color: #efefef;
     z-index: 2;
     cursor: pointer;
+    transform-origin: bottom left;
+    transform: none;
 }
 #void-recipe .palette .item-list .wrapper[data-step] > .label:before,
 #void-recipe .palette .item-list .wrapper[data-step] > .label:after {
@@ -1334,6 +1337,7 @@
 #void-recipe .palette .item-list .wrapper[data-step] > .label > strong {
     font-weight: normal;
 }
+
 #void-recipe .palette .item-list .wrapper[data-step] > .groups {
     display: block;
     box-sizing: border-box;
