@@ -5,8 +5,10 @@ $void_item_groups_index = array(
 
     // -- STEP (MANIFEST [DATA]) -- //
     array(
+        'step' => 'manifest',
         'name' => 'Manifest',
         'label' => 'Data',
+        'side' => 'middle',
         'groups' => array(
             'spread-cores' => array(
                 'name' => 'Spread Cores',
@@ -41,10 +43,58 @@ $void_item_groups_index = array(
             ),
         ),
 
+    // -- STEP (BOOST [STATS]) -- //
+    array(
+        'step' => 'boost',
+        'name' => 'Boost',
+        'label' => 'Stats',
+        'side' => 'left',
+        'groups' => array(
+            'attack-boost' => array(
+                'name' => 'Attack-Boost Edibles',
+                'color' => 'attack',
+                'rowline' => 1,
+                'colspan' => 3,
+                'items' => array(
+                    'attack-pellet', 'attack-capsule', 'attack-booster',
+                    )
+                ),
+            'defense-boost' => array(
+                'name' => 'Defense-Boost Edibles',
+                'color' => 'defense',
+                'rowline' => 2,
+                'colspan' => 3,
+                'items' => array(
+                    'defense-pellet',  'defense-capsule', 'defense-booster',
+                    )
+                ),
+            'speed-boost' => array(
+                'name' => 'Speed-Boost Edibles',
+                'color' => 'speed',
+                'rowline' => 3,
+                'colspan' => 3,
+                'items' => array(
+                    'speed-pellet', 'speed-capsule', 'speed-booster',
+                    )
+                ),
+            'super-boost' => array(
+                'name' => 'Omni-Boost Edibles',
+                'color' => 'shield',
+                'rowline' => 4,
+                'colspan' => 3,
+                'items' => array(
+                    'super-pellet', 'super-capsule', 'field-booster',
+                    )
+                ),
+            ),
+        ),
+
     // -- STEP (UPGRADE [POWER]) -- //
     array(
+        'step' => 'upgrade',
         'name' => 'Upgrade',
         'label' => 'Power',
+        'side' => 'left',
         'groups' => array(
             'level-boost' => array(
                 'name' => 'Level-Boost Edibles',
@@ -94,54 +144,12 @@ $void_item_groups_index = array(
             ),
         ),
 
-    // -- STEP (BOOST [STATS]) -- //
-    array(
-        'name' => 'Boost',
-        'label' => 'Stats',
-        'groups' => array(
-            'attack-boost' => array(
-                'name' => 'Attack-Boost Edibles',
-                'color' => 'attack',
-                'rowline' => 1,
-                'colspan' => 3,
-                'items' => array(
-                    'attack-pellet', 'attack-capsule', 'attack-booster',
-                    )
-                ),
-            'defense-boost' => array(
-                'name' => 'Defense-Boost Edibles',
-                'color' => 'defense',
-                'rowline' => 2,
-                'colspan' => 3,
-                'items' => array(
-                    'defense-pellet',  'defense-capsule', 'defense-booster',
-                    )
-                ),
-            'speed-boost' => array(
-                'name' => 'Speed-Boost Edibles',
-                'color' => 'speed',
-                'rowline' => 3,
-                'colspan' => 3,
-                'items' => array(
-                    'speed-pellet', 'speed-capsule', 'speed-booster',
-                    )
-                ),
-            'super-boost' => array(
-                'name' => 'Omni-Boost Edibles',
-                'color' => 'shield',
-                'rowline' => 4,
-                'colspan' => 3,
-                'items' => array(
-                    'super-pellet', 'super-capsule', 'field-booster',
-                    )
-                ),
-            ),
-        ),
-
     // -- STEP (REDIRECT [FORM]) -- //
     array(
+        'step' => 'redirect',
         'name' => 'Redirect',
         'label' => 'Form',
+        'side' => 'right',
         'groups' => array(
             'queue-rotators' => array(
                 'name' => 'Queue Rotators',
@@ -193,8 +201,10 @@ $void_item_groups_index = array(
 
     // -- STEP (DISTORT [CONTEXT]) -- //
     array(
+        'step' => 'distort',
         'name' => 'Distort',
         'label' => 'Context',
+        'side' => 'right',
         'groups' => array(
             'junk' => array(
                 'name' => 'Junk Items',

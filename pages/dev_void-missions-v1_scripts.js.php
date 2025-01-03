@@ -327,17 +327,23 @@
 
                     // Now that we have item markup generated and grouped-together, we can wrap them in parent elements
                     let itemButtonsMarkup = '';
+                    let sideKeys = {middle: 0, left: 0, right: 0};
                     Object.keys(groupMarkupByStep).forEach((stepKey) => {
                         const wrappedGroupMarkup = groupMarkupByStep[stepKey].join('\n');
                         const stepInfo = voidItemGroups[stepKey];
                         const stepNum = parseInt(stepKey) + 1;
-                        const stepSide = stepNum < Math.ceil(Object.keys(voidItemGroups).length / 2) ? 'left' : (stepNum > Math.ceil(Object.keys(voidItemGroups).length / 2) ? 'right' : 'middle');
+                        const stepToken = stepInfo.step || stepNum;
+                        const stepSide = stepInfo.side || (stepNum < Math.ceil(Object.keys(voidItemGroups).length / 2) ? 'left' : (stepNum > Math.ceil(Object.keys(voidItemGroups).length / 2) ? 'right' : 'middle'));
+                        const stepSideKey = sideKeys[stepSide]++;
+                        const stepLayer = stepSide === 'middle' ? 1 : (2 + stepSideKey);
                         const stepIsActive = stepNum === 1;
                         let wrapperMarkup = '';
                         wrapperMarkup += '<div class="wrapper' + (stepIsActive ? ' active' : '') + '" ';
                                 wrapperMarkup += 'data-step="' + stepNum + '" ';
+                                wrapperMarkup += 'data-token="' + stepToken + '" ';
                                 wrapperMarkup += 'data-side="' + stepSide + '" ';
-                                wrapperMarkup += 'data-layer="' + stepNum + '"';
+                                wrapperMarkup += 'data-sidekey="' + stepSideKey + '" ';
+                                wrapperMarkup += 'data-layer="' + stepLayer + '"';
                                 wrapperMarkup += '>';
                             wrapperMarkup += '<div class="label">';
                             wrapperMarkup += '<strong>' + stepInfo.name + ' (' + stepInfo.label + ')</strong>';
@@ -675,28 +681,24 @@
                         });
 
                     // Bind SELECT STEP click events to the group wrappers themselves
+                    let wrapDisplayOrders = {
+                        middle: ['manifest', 'boost', 'redirect', 'upgrade', 'distort'],
+                        left: ['upgrade', 'boost', 'manifest', 'redirect', 'distort'],
+                        right: ['distort', 'redirect', 'manifest', 'boost', 'upgrade'],
+                        };
                     $('.wrapper[data-step]', $itemsPalette).live('click', function(e){
                         //console.log('step wrapper clicked! \n-> select-step:', $(this).attr('data-step'));
                         e.preventDefault();
-                        var $wrapper = $(this);
-                        var $siblings = $wrapper.siblings('.wrapper[data-step]');
-                        var stepNum = parseInt($wrapper.attr('data-step'));
-                        var stepTotal = $siblings.length + $wrapper.length;
-                        var stepLayer = 1;
+                        let $wrap = $(this), $siblings = $wrap.siblings(), $parent = $wrap.parent();
+                        var stepNum = parseInt($wrap.attr('data-step')), stepSide = $wrap.attr('data-side'), stepLayer = 1;
                         $itemsPalette.attr('data-step', stepNum);
                         $siblings.removeClass('active').attr('data-layer', 0);
-                        $wrapper.addClass('active').attr('data-layer', stepLayer++);
-                        if (stepNum > 1){
-                            var prevNum = (stepNum - 1);
-                            for (var num = prevNum; num >= 1; num--){
-                                $siblings.filter('[data-step="'+num+'"]').attr('data-layer', stepLayer++);
-                                }
-                            }
-                        if (stepNum < stepTotal){
-                            var nextNum = (stepNum + 1);
-                            for (var num = nextNum; num <= stepTotal; num++){
-                                $siblings.filter('[data-step="'+num+'"]').attr('data-layer', stepLayer++);
-                                }
+                        $wrap.addClass('active').attr('data-layer', stepLayer++);
+                        var displayOrder = wrapDisplayOrders[stepSide] || [];
+                        for (var i = 0; i < displayOrder.length; i++){
+                            let $wrap = $siblings.filter('.wrapper[data-token="' + displayOrder[i] + '"]');
+                            if (!$wrap.length){ continue; }
+                            $wrap.attr('data-layer', stepLayer++);
                             }
                         });
 
