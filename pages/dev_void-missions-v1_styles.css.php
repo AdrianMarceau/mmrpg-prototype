@@ -544,8 +544,12 @@
 
 #void-recipe #vcr_title {
     display: block;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 10;
-    width: 300px;
+    width: auto;
     margin: 0 auto;
     text-align: center;
     padding: 3px 12px;
