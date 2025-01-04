@@ -202,8 +202,8 @@
     width: 54px;
     height: 34px;
     margin: 0 2px 2px 0;
-    border: 1px solid #1A1A1A;
-    background-color: #262626;
+    border: 1px solid #111111;
+    background-color: #161616;
     border-radius: 3px;
     position: relative;
     cursor: pointer;
@@ -211,7 +211,7 @@
     box-shadow: 0 0 2px rgba(0, 0, 0, 0);
     transition: filter 0.3s, background-color 0.3s, box-shadow 0.3s, transform 0.3s;
 }
-#void-recipe #vcr_lower .item-list .item:hover {
+#void-recipe #vcr_lower .item-list .item[data-token]:hover {
     background-color: #333333;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
     z-index: 99 !important;
@@ -232,7 +232,7 @@
     background-blend-mode: normal;
     opacity: 1.0;
 }
-#void-recipe #vcr_lower .item-list .item:hover:before {
+#void-recipe #vcr_lower .item-list .item[data-token]:hover:before {
     opacity: 0.0;
 }
 #void-recipe #vcr_lower .item-list .item:after {
@@ -248,7 +248,7 @@
     border-radius: 3px;
     transition: top 0.1s, right 0.1s, bottom 0.1s, left 0.1s, background-color 0.1s;
 }
-#void-recipe #vcr_lower .item-list .item:hover:after {
+#void-recipe #vcr_lower .item-list .item[data-token]:hover:after {
     top: 2px;
     bottom: 6px;
     background-color: #434343;
@@ -290,12 +290,7 @@
 }
 
 #void-recipe #vcr_lower .item-list .item.placeholder {
-    filter: opacity(0.6) brightness(0.9);
-    pointer-events: none;
-    cursor: not-allowed;
-    border-color: #1b1825;
-    background-color: #1b1825;
-    background-color: #1b1825cc;
+    cursor: default;
     box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 #void-recipe #vcr_lower .item-list .item.placeholder:before {
@@ -339,7 +334,7 @@
 #void-recipe #vcr_lower .item-list .item .name.one-line {
     line-height: 26px;
 }
-#void-recipe #vcr_lower .item-list .item:hover .name {
+#void-recipe #vcr_lower .item-list .item[data-token]:hover .name {
     bottom: -3px;
     left: -3px;
     right: -3px;
@@ -365,7 +360,7 @@
     display: block;
     margin: 0;
 }
-#void-recipe #vcr_lower .item-list .item:hover .icon {
+#void-recipe #vcr_lower .item-list .item[data-token]:hover .icon {
     transform: translate(0, -2px);
 }
 
@@ -386,7 +381,7 @@
 #void-recipe #vcr_lower .item-list .item .quantity:before {
     content: "\0000d7";
 }
-#void-recipe #vcr_lower .item-list .item:hover .quantity {
+#void-recipe #vcr_lower .item-list .item[data-token]:hover .quantity {
     transform: translate(0, -2px);
 }
 
@@ -571,7 +566,7 @@
     line-height: 18px;
     text-transform: uppercase;
     padding-bottom: 3px;
-    border-bottom: 1px solid #1c1a24;
+    border-bottom: 1px solid #111111;
 }
 #void-recipe #vcr_title .sub {
     font-size: 11px;
@@ -579,7 +574,7 @@
     color: #a49ad6;
     font-style: normal;
     padding-top: 1px;
-    border-top: 1px solid #2a2636;
+    border-top: 1px solid #222222;
 }
 
 /* -- MISSION DETAILS (VOID POWERS) -- */
@@ -619,7 +614,7 @@
     border: 1px solid #111111;
     background-color: #161616;
     overflow: hidden;
-    pointer-events: none;
+    /* pointer-events: none;  */
 }
 #void-recipe #vcr_field > div {
     display: block;
@@ -1054,7 +1049,7 @@
     top: auto;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 6px;
     width: auto;
     height: 40px;
     border-radius: 0;
@@ -1067,7 +1062,7 @@
 #void-recipe #vcr_targets > .wrapper {
     display: block;
     position: absolute;
-    height: 46px;
+    height: 40px;
     width: auto;
     max-width: 580px;
     bottom: 0;
@@ -1303,7 +1298,7 @@
 
 #void-recipe #vcr_targets .target:first-child {
     position: absolute;
-    bottom: 4px;
+    bottom: 0;
     left: 50%;
     margin: 0;
     transform: translateX(-50%);
@@ -1312,7 +1307,7 @@
     transform: translate(-50%, 0) scale(2.0);
 }
 #void-recipe #vcr_targets .target:not(:first-child) {
-    bottom: 18px;
+    bottom: 20px;
 }
 #void-recipe #vcr_targets .target:not(:first-child):not(:hover) {
     filter: brightness(0.6) saturate(1.4);
@@ -1470,7 +1465,7 @@
     white-space: nowrap;
     line-height: 1;
     border-radius: 3px;
-    border: 1px solid #1b1825;
+    border: 1px solid #111111;
     background-color: #353144;
     box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s, box-shadow 0.2s;
