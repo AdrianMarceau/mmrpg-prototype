@@ -45,7 +45,7 @@ require_once('pages/dev_void-missions-v1_data.php');
 <div class="subbody">
 
     <h3 class="subheader">
-        Void Recipe Calculator <sup style="margin-left: 4px; font-size: 60%; position: relative; bottom: 6px;">v1</sup>
+        Void Recipe Calculator <sup style="margin-left: 4px; font-size: 60%; position: relative; bottom: 6px;">v-0.1.55</sup>
     </h3>
     <div class="subbody">
         <div class="text">
@@ -58,19 +58,12 @@ require_once('pages/dev_void-missions-v1_data.php');
     </div>
 
     <div id="void-recipe">
-        <div id="vcr_upper" class="deck upper-deck">
-            <div id="vcr_title" class="title">
+        <div id="vcr_upper">
+            <div id="vcr_title">
                 <strong class="main">Void Cauldron</strong>
                 <em class="sub">Procedural Mission Generator</em>
             </div>
-            <div id="vcr_details" class="mission-details">
-                <span class="loading">&hellip;</span>
-            </div>
-            <div id="vcr_targets" class="target-list">
-                <span class="loading">&hellip;</span>
-            </div>
-            <div id="vcr_field" class="battle-field">
-                <span class="loading">&hellip;</span>
+            <div id="vcr_field">
                 <div class="sprite background memory-filter"
                     data-token="prototype-subspace"
                     style="background-image: url(/images/fields/prototype-subspace/battle-field_background_base.gif?20241104-0121);"
@@ -80,16 +73,14 @@ require_once('pages/dev_void-missions-v1_data.php');
                     style="background-image: url(/images/fields/prototype-subspace/battle-field_foreground_base.png?20241104-0121);"
                     >&nbsp;</div>
             </div>
+            <div id="vcr_details"></div>
+            <div id="vcr_targets"></div>
         </div>
-        <div id="vcr_lower" class="deck lower-deck">
-            <div id="vcr_selection" class="selection">
-                <span class="loading">&hellip;</span>
-            </div>
-            <div id="vcr_palette" class="palette">
-                <span class="loading">&hellip;</span>
-            </div>
+        <div id="vcr_lower">
+            <div id="vcr_selection"></div>
+            <div id="vcr_palette"></div>
         </div>
-        <div id="vcr_effects" class="effects">
+        <div id="vcr_effects">
             <div class="black-hole">
                 <div class="layer first"></div>
                 <div class="layer second"></div>

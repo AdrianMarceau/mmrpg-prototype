@@ -37,7 +37,7 @@ $void_item_groups_index = array(
                 'rowline' => 3,
                 'colspan' => 3,
                 'items' => array(
-                    'charge-module', 'spreader-module', 'target-module',
+                    'charge-module', 'target-module', 'spreader-module',
                     )
                 ),
             ),

@@ -564,12 +564,13 @@
     border-width: 0 10px;
     border-style: solid;
     border-color: transparent;
+    transition: border 0.3s, filter 0.3s;
 }
 #void-recipe #vcr_title .main {
-    font-size: 14px;
-    line-height: 18px;
+    font-size: 16px;
+    line-height: 19px;
     text-transform: uppercase;
-    padding-bottom: 3px;
+    padding-bottom: 6px;
     border-bottom: 1px solid #111111;
 }
 #void-recipe #vcr_title .sub {
@@ -577,8 +578,16 @@
     line-height: 15px;
     color: #a49ad6;
     font-style: normal;
-    padding-top: 1px;
+    padding-top: 3px;
     border-top: 1px solid #222222;
+    filter: opacity(1.0);
+}
+#void-recipe.active #vcr_title .main,
+#void-recipe.active #vcr_title .sub {
+    border-color: transparent;
+}
+#void-recipe.active #vcr_title .sub {
+    filter: opacity(0.0);
 }
 
 /* -- MISSION DETAILS (VOID POWERS) -- */
@@ -586,7 +595,6 @@
 #void-recipe #vcr_details {
     position: absolute;
     width: auto;
-    /* height: 120px; */
     height: 0;
     min-height: 0;
     top: 0;
@@ -992,9 +1000,9 @@
     right: 0;
 }
 #void-recipe #vcr_details .void-powers.stat-powers .power {
-    float: right;
-    clear: both;
-    margin-bottom: 3px;
+    float: left;
+    clear: none;
+    margin: 0 0 3px 3px;
 }
 #void-recipe #vcr_details .void-powers.stat-powers .power .icon {
     min-width: 1em;
@@ -1027,7 +1035,7 @@
 #void-recipe #vcr_details .void-powers.stat-powers .power.max,
 #void-recipe #vcr_details .void-powers.stat-powers .power.min {
     outline: 1px solid transparent;
-    margin-bottom: 4px;
+    margin: 1px 1px 4px 4px;
 }
 #void-recipe #vcr_details .void-powers.stat-powers .power.max {
     outline-color: rgba(255, 255, 255, 0.2);
