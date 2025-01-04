@@ -47,18 +47,9 @@
                         maxForte: 10,
                         realMaxLevel: 999,
                         realMaxForte: 99,
-                        minQuantaPerClass: {
-                            mecha: 25,
-                            master: 100,
-                            boss: 500
-                            },
-                        voidPowersRequired: [
-                            'delta',
-                            'spread',
-                            'quanta',
-                            'level',
-                            'forte'
-                            ]
+                        currentItemMix: '',
+                        minQuantaPerClass: {mecha: 25, master: 100, boss: 500},
+                        voidPowersRequired: ['delta', 'spread', 'quanta', 'level', 'forte'],
                         };
                     _self.isReady = false;
                     _self.reset(false);
@@ -458,7 +449,7 @@
                             elementStyles = elementStyles.trim().replace(/\s+/g, ' ');
                             let classAttr = elementClasses ? ' class="' + elementClasses + '"' : '';
                             let stylesAttr = elementStyles ? ' style="' + elementStyles + '"' : '';
-                            let markup = '<div ' + classAttr + stylesAttr + '>';
+                            let markup = '<div data-power="'+token+'" ' + classAttr + stylesAttr + '>';
                                 for (let i = 0; i < spanOrder.length; i++){
                                     let spanToken = spanOrder[i];
                                     if (spanToken === 'arrows'){ markup += arrowsMarkup; }
@@ -471,13 +462,16 @@
                             return markup;
                             },
                         renderBasePowers: function($missionDetails, basePowersValues){
+                            let icons = {quanta: 'atom', spread: 'code-branch', delta: 'delta'};
+                            let types = {quanta: 'water', spread: 'laser', delta: 'space_empty'};
                             let markup = '<div class="void-powers ltr bgo base-powers">';
                                 for (const [token, value] of Object.entries(basePowersValues)) {
                                     let name = token.charAt(0).toUpperCase() + token.slice(1);
+                                    let icon = token === 'quanta' ? 'atom' : 'code-branch';
                                     const config = {
                                         token, name, value,
-                                        iconClass: (token === 'quanta' ? 'atom' : 'code-branch'),
-                                        typeClass: ('base type ' + (token === 'quanta' ? 'water' : 'laser')),
+                                        iconClass: icons[token],
+                                        typeClass: ('base type ' + types[token]),
                                         blurSpans: ['name']
                                         };
                                     markup += this.generatePowerElement(config);
@@ -1060,6 +1054,11 @@
 
                     // Backup a reference to the parent object
                     const _self = this;
+                    const config = _self.config;
+
+                    // If this mix is already active, do nothing here
+                    console.log('-> mix:', mix, 'currentItemMix:', config.currentItemMix);
+                    if (mix === config.currentItemMix){ return; }
 
                     // Collect valid item tokens to prevent bugs
                     const mmrpgItemTokens = _self.indexes.itemTokens;
@@ -1421,6 +1420,10 @@
                     var voidItems = _self.items;
                     var voidItemsTokens = Object.keys(voidItems);
 
+
+                    // Update the current mix string with whatever we have added
+                    config.currentItemMix = _self.getMixString();
+
                     // Define a variable to hold the calculated powers of all the items
                     var voidPowers = {};
                     voidPowers.powers = {};
@@ -1712,6 +1715,7 @@
 
                     // Backup a reference to the parent object
                     const _self = this;
+                    const config = _self.config;
 
                     // Collect the updated list of added items to the recipe for looping
                     var voidItems = _self.items;
@@ -1728,6 +1732,7 @@
                         //console.log('-> currLocationHash !== newLocationHash');
                         //console.log('-> adding/updating mix in URL:', newLocationHash);
                         _self.hashUpdatedByApp = true;
+                        config.currentItemMix = thisMixString;
                         window.location.hash = newLocationHash;
                         if (_self.hashUpdateTimeout){ clearTimeout(_self.hashUpdateTimeout); }
                         _self.hashUpdateTimeout = setTimeout(function(){
@@ -1934,7 +1939,7 @@
                         var VoidPowersRenderer = _self.voidPowersRenderer;
 
                         // Define object variables to hold the different kinds of powers we display
-                        var basePowersValues = {spread: 0, quanta: 0};
+                        var basePowersValues = {delta: 0, spread: 0, quanta: 0};
                         var rankPowersValues = {level: 1, forte: 0};
                         var rankPowersValuesMax = {level: 100, forte: 10};
                         var statPowersValues = {};
@@ -1978,8 +1983,9 @@
                         */
 
                         // Pull in current values for the base powers we'll be displaying
-                        if (voidPowers.quanta){ basePowersValues.quanta = voidPowers.quanta; }
+                        if (voidPowers.delta){ basePowersValues.delta = voidPowers.delta; }
                         if (voidPowers.spread){ basePowersValues.spread = voidPowers.spread; }
+                        if (voidPowers.quanta){ basePowersValues.quanta = voidPowers.quanta; }
 
                         // Pull in current values for the rank powers we'll be displaying
                         if (voidPowers.level){ rankPowersValues.level = voidPowers.level; }
@@ -2019,6 +2025,7 @@
                         // Check the sort powers (stat and type) to display appropriate markup
                         VoidPowersRenderer.renderSortPowers($missionDetails, sortFlowsGrouped);
 
+                        /*
                         // TEMP TEMP TEMP
                         // Show the current delta value if it's not zero
                         if (voidPowers.delta){
@@ -2033,6 +2040,7 @@
                             deltaMarkup += '</div>';
                             $missionDetails.append(deltaMarkup);
                             }
+                        */
 
                         // Check for relative stat powers (attack, defense, speed) and display appropriate markup
                         VoidPowersRenderer.renderStatPowers($missionDetails, statPowersValues);
