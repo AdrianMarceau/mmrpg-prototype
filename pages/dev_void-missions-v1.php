@@ -63,31 +63,28 @@ require_once('pages/dev_void-missions-v1_data.php');
                 <strong class="main">Void Cauldron</strong>
                 <em class="sub">Procedural Mission Generator</em>
             </div>
-            <div id="vcr_creation" class="creation">
+            <div id="vcr_details" class="mission-details">
                 <span class="loading">&hellip;</span>
-                <div class="mission-details">
-                    <span class="loading">&hellip;</span>
-                </div>
-                <div class="target-list">
-                    <span class="loading">&hellip;</span>
-                </div>
-                <div class="battle-field">
-                    <span class="loading">&hellip;</span>
-                    <div class="sprite background memory-filter"
-                        data-token="prototype-subspace"
-                        style="background-image: url(/images/fields/prototype-subspace/battle-field_background_base.gif?20241104-0121);"
-                        >&nbsp;</div>
-                    <div class="sprite foreground memory-filter"
-                        data-token="prototype-subspace"
-                        style="background-image: url(/images/fields/prototype-subspace/battle-field_foreground_base.png?20241104-0121);"
-                        >&nbsp;</div>
-                </div>
             </div>
-            <div id="vcr_selection" class="selection">
+            <div id="vcr_targets" class="target-list">
                 <span class="loading">&hellip;</span>
+            </div>
+            <div id="vcr_field" class="battle-field">
+                <span class="loading">&hellip;</span>
+                <div class="sprite background memory-filter"
+                    data-token="prototype-subspace"
+                    style="background-image: url(/images/fields/prototype-subspace/battle-field_background_base.gif?20241104-0121);"
+                    >&nbsp;</div>
+                <div class="sprite foreground memory-filter"
+                    data-token="prototype-subspace"
+                    style="background-image: url(/images/fields/prototype-subspace/battle-field_foreground_base.png?20241104-0121);"
+                    >&nbsp;</div>
             </div>
         </div>
         <div id="vcr_lower" class="deck lower-deck">
+            <div id="vcr_selection" class="selection">
+                <span class="loading">&hellip;</span>
+            </div>
             <div id="vcr_palette" class="palette">
                 <span class="loading">&hellip;</span>
             </div>

@@ -190,14 +190,15 @@
 
                     // Collect references to key and parent elements on the page
                     let $parentDiv = $container;
-                    let $titleDiv = $('.title', $parentDiv);
-                    let $creationDiv = $('.creation', $parentDiv);
-                    let $selectionDiv = $('.selection', $parentDiv);
-                    let $paletteDiv = $('.palette', $parentDiv);
-                    let $effectsDiv = $('.effects', $parentDiv);
-                    let $missionTargets = $('.target-list', $creationDiv);
-                    let $missionDetails = $('.mission-details', $creationDiv);
-                    let $battleField = $('.battle-field', $creationDiv);
+                    let $upperDeck = $('#vcr_upper', $parentDiv);
+                    let $lowerDeck = $('#vcr_lower', $parentDiv);
+                    let $titleDiv = $('#vcr_title', $parentDiv);
+                    let $selectionDiv = $('#vcr_selection', $parentDiv);
+                    let $paletteDiv = $('#vcr_palette', $parentDiv);
+                    let $effectsDiv = $('#vcr_effects', $parentDiv);
+                    let $missionTargets = $('#vcr_targets', $parentDiv);
+                    let $missionDetails = $('#vcr_details', $parentDiv);
+                    let $battleField = $('#vcr_field', $parentDiv);
 
                     // Generate the item button markup to use in palette
                     let itemButtonMarkup = _self.getItemButtonMarkup();
@@ -226,8 +227,9 @@
                     // Save the references to the object for later use
                     var xrefs = _self.xrefs;
                     xrefs.parentDiv = $parentDiv;
+                    xrefs.upperDeck = $upperDeck;
+                    xrefs.lowerDeck = $lowerDeck;
                     xrefs.titleDiv = $titleDiv;
-                    xrefs.creationDiv = $creationDiv;
                     xrefs.selectionDiv = $selectionDiv;
                     xrefs.paletteDiv = $paletteDiv;
                     xrefs.effectsDiv = $effectsDiv;
@@ -585,7 +587,6 @@
                     // Pull references to objects we'll be binding events to
                     var xrefs = _self.xrefs;
                     $parentDiv = xrefs.parentDiv;
-                    $creationDiv = xrefs.creationDiv;
                     $selectionDiv = xrefs.selectionDiv;
                     $paletteDiv = xrefs.paletteDiv;
                     $effectsDiv = xrefs.effectsDiv;
@@ -599,7 +600,6 @@
 
                     //console.log('let us check to see the data type of all the above refs');
                     //console.log('-> $parentDiv:', typeof $parentDiv, $parentDiv.length, $parentDiv);
-                    //console.log('-> $creationDiv:', typeof $creationDiv, $creationDiv.length, $creationDiv);
                     //console.log('-> $selectionDiv:', typeof $selectionDiv, $selectionDiv.length, $selectionDiv);
                     //console.log('-> $paletteDiv:', typeof $paletteDiv, $paletteDiv.length, $paletteDiv);
                     //console.log('-> $effectsDiv:', typeof $effectsDiv, $effectsDiv.length, $effectsDiv);
@@ -719,7 +719,7 @@
                     // TEMP TEMP TEMP
                     // DEBUG DEBUG DEBUG
                     // Make it so clicking the titlebar prints the current void powers to the console
-                    $('.title', $parentDiv).live('click', function(){
+                    $('#vcr_title', $parentDiv).live('click', function(){
                         _self.showDebug('powers');
                         });
                     // DEBUG DEBUG DEBUG
@@ -1751,11 +1751,11 @@
                     const config = _self.config;
 
                     // Collect reference to relevant void elements and values
+                    var $upperDeck = _self.xrefs.upperDeck;
                     var $itemsSelected = _self.xrefs.itemsSelected;
                     var $itemsPalette = _self.xrefs.itemsPalette;
                     var $resetButton = _self.xrefs.resetButton;
                     var $codeButton = _self.xrefs.codeButton;
-                    var $creationDiv = _self.xrefs.creationDiv;
                     var $missionDetails = _self.xrefs.missionDetails;
                     var $targetList = _self.xrefs.missionTargets;
 
@@ -1775,7 +1775,7 @@
                         }
 
                     // Remove any existing loaders before we add a new one
-                    $creationDiv.find('.loading').remove();
+                    $upperDeck.find('.loading').remove();
 
                     // Clear the item selection area and then rebuild it with the new items
                     var $selectedWrapper = $('.wrapper', $itemsSelected);
@@ -1857,7 +1857,7 @@
                     var voidPowersKeys = Object.keys(voidPowers);
                     var voidPowersValSum = 0 + (voidPowersKeys.length ? (function(){ var sum = 0; for (var i = 0; i < voidPowersKeys.length; i++){ var key = voidPowersKeys[i]; if (key.substr(-3, 3) === 'Max'){ continue; } sum += voidPowers[key]; } return sum; })() : 0);
                     if (voidPowersValSum === 0){
-                        $creationDiv.append('<span class="loading">&hellip;</span>');
+                        $targetList.append('<span class="loading">&hellip;</span>');
                         return;
                         }
                     //console.log('voidPowersValSum:', voidPowersValSum);
@@ -2048,7 +2048,7 @@
                         } else {
 
                         // Add a loading indicator if no powers have been generated
-                        $creationDiv.append('<span class="loading">&hellip;</span>');
+                        $targetList.append('<span class="loading">&hellip;</span>');
 
                         }
 
