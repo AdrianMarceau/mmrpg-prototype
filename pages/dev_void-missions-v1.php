@@ -61,7 +61,8 @@ require_once('pages/dev_void-missions-v1_data.php');
         <div id="vcr_upper">
             <div id="vcr_title">
                 <strong class="main">Void Cauldron</strong>
-                <em class="sub">Procedural Mission Generator</em>
+                <em class="sub">&bull; Select Mix Items to Generate New Mission &bull;</em>
+                <span class="state"></span>
             </div>
             <div id="vcr_field">
                 <div class="sprite background memory-filter"

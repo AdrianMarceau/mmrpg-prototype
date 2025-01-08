@@ -51,13 +51,12 @@
                         minQuantaPerClass: {mecha: 25, master: 100, boss: 500},
                         voidPowersRequired: ['delta', 'spread', 'quanta', 'level', 'forte'],
                         };
-                    _self.isReady = false;
                     _self.reset(false);
                     _self.setup($container, customData);
                     _self.calculatePowers();
                     _self.generateMission();
                     _self.refreshUI();
-                    _self.isReady = true;
+                    _self.done();
                     //console.log('voidRecipeWizard is ' + ('%c' + 'ready'), 'color: lime;');
                     //console.log('=> voidRecipeWizard:', _self);
                     // end of voidRecipeWizard.init()
@@ -95,6 +94,10 @@
                     _self.history = [];
                     _self.indexes = {};
 
+                    // Update relevant flags to show the wizard is loading and not ready
+                    _self.nowReady(false);
+                    _self.nowLoading(true);
+
                     // Catalogue all of the content indexes into easy-to-use reference formats
                     _self.indexes.types = customData.types || {};
                     _self.indexes.robots = customData.robots || {};
@@ -116,6 +119,14 @@
                     _self.bindEvents();
 
                     // end of voidRecipeWizard.setup()
+                    },
+                done: function(){
+                    console.log('%c' + 'voidRecipeWizard.done()', 'color: magenta;');
+                    const _self = this;
+                    // Update relevant flags to show the wizard is ready and not loading
+                    _self.nowLoading(false);
+                    _self.nowReady(true);
+                    // end of voidRecipeWizard.done()
                     },
                 catalogIndexes: function(){
                     console.log('%c' + 'voidRecipeWizard.catalogIndexes()', 'color: magenta;');
@@ -1758,6 +1769,7 @@
                     var $codeButton = _self.xrefs.codeButton;
                     var $missionDetails = _self.xrefs.missionDetails;
                     var $targetList = _self.xrefs.missionTargets;
+                    var $battleField = _self.xrefs.battleField;
 
                     // Collect a reference to the list of defined elemental types and stats
                     var mmrpgStats = _self.indexes.statTokens;
@@ -1775,7 +1787,13 @@
                         }
 
                     // Remove any existing loaders before we add a new one
+                    _self.hasContent(false);
                     $upperDeck.find('.loading').remove();
+
+                    // Remove any mission details, targets, battle fields, etc. before we add new ones
+                    $missionDetails.html('');
+                    $targetList.html('');
+                    //$battleField.html(''); /* TODO: don't clear field until we can regenerate */
 
                     // Clear the item selection area and then rebuild it with the new items
                     var $selectedWrapper = $('.wrapper', $itemsSelected);
@@ -1847,18 +1865,17 @@
                     if (numSlotsUsed > 0){ $resetButton.addClass('visible'); }
                     else { $resetButton.removeClass('visible'); }
 
-                    // Pre-clear the mission details, the target list, and the battle field
-                    $missionDetails.html('');
-                    $targetList.html('');
-                    //var $battleField = _self.xrefs.battleField; // TODO
-
                     // Collect the list of void powers and keys so we can re-sort in the next step
                     var voidPowers = _self.powers;
                     var voidPowersKeys = Object.keys(voidPowers);
                     var voidPowersValSum = 0 + (voidPowersKeys.length ? (function(){ var sum = 0; for (var i = 0; i < voidPowersKeys.length; i++){ var key = voidPowersKeys[i]; if (key.substr(-3, 3) === 'Max'){ continue; } sum += voidPowers[key]; } return sum; })() : 0);
                     if (voidPowersValSum === 0){
-                        $targetList.append('<span class="loading">&hellip;</span>');
+                        //console.log('%c' + '-> we have NO powers to generate content from!', 'color: amber;');
+                        $upperDeck.append('<span class="loading">&hellip;</span>');
                         return;
+                        } else {
+                        //console.log('%c' + '-> we DO have powers to generate content from!', 'color: amber;');
+                        _self.hasContent(true);
                         }
                     //console.log('voidPowersValSum:', voidPowersValSum);
                     //console.log('voidPowersKeys(raw):', '\n-> [' + voidPowersKeys.join(', ') + ']');
@@ -2025,30 +2042,8 @@
                         // Check the sort powers (stat and type) to display appropriate markup
                         VoidPowersRenderer.renderSortPowers($missionDetails, sortFlowsGrouped);
 
-                        /*
-                        // TEMP TEMP TEMP
-                        // Show the current delta value if it's not zero
-                        if (voidPowers.delta){
-                            var deltaValue = voidPowers.delta;
-                            var deltaMarkup = '';
-                            deltaMarkup += '<div class="void-powers ltr bgo delta-power">';
-                                deltaMarkup += '<div class="power">';
-                                    deltaMarkup += '<span class="icon type space_empty"><i class="fa fa-entity"><span>&#x25b3;</span></i></span>';
-                                    deltaMarkup += '<span class="value">' + deltaValue + '</span>';
-                                    //deltaMarkup += '<span class="name blur">Delta</span>';
-                                deltaMarkup += '</div>';
-                            deltaMarkup += '</div>';
-                            $missionDetails.append(deltaMarkup);
-                            }
-                        */
-
                         // Check for relative stat powers (attack, defense, speed) and display appropriate markup
                         VoidPowersRenderer.renderStatPowers($missionDetails, statPowersValues);
-
-                        } else {
-
-                        // Add a loading indicator if no powers have been generated
-                        $targetList.append('<span class="loading">&hellip;</span>');
 
                         }
 
@@ -2113,6 +2108,38 @@
                         }
 
                     // end of voidRecipeWizard.refreshUI()
+                    },
+                setStatus: function(status, value, prefix){
+                    console.log('%c' + 'voidRecipeWizard.setStatus()', 'color: magenta;');
+                    const _self = this;
+                    const config = _self.config;
+                    const xrefs = _self.xrefs;
+                    if (typeof status === 'undefined' || !status){ return false; }
+                    if (typeof value === 'undefined'){ return false; }
+                    if (typeof prefix === 'undefined'){ prefix = 'is'; }
+                    const htmlCls = (prefix + '-' + status);
+                    if (value){ _self[status] = true; }
+                    else { _self[status] = false; }
+                    if (typeof xrefs.parentDiv === 'undefined' || !xrefs.parentDiv){ return; }
+                    const jsCls = (prefix + status.charAt(0).toUpperCase() + status.slice(1));
+                    if (value){ $parentDiv.addClass(htmlCls); }
+                    else { $parentDiv.removeClass(htmlCls); }
+                    // end of voidRecipeWizard.setStatus()
+                    },
+                nowReady: function(value){
+                    console.log('%c' + 'voidRecipeWizard.nowReady()', 'color: magenta;');
+                    const _self = this; return _self.setStatus('ready', value, 'is');
+                    // end of voidRecipeWizard.nowReady()
+                    },
+                nowLoading: function(value){
+                    console.log('%c' + 'voidRecipeWizard.nowLoading()', 'color: magenta;');
+                    const _self = this; return _self.setStatus('loading', value, 'is');
+                    // end of voidRecipeWizard.nowLoading()
+                    },
+                hasContent: function(value){
+                    console.log('%c' + 'voidRecipeWizard.hasContent()', 'color: magenta;');
+                    const _self = this; return _self.setStatus('content', value, 'has');
+                    // end of voidRecipeWizard.hasContent()
                     },
                 showDebug: function(kind){
                     console.log('%c' + 'voidRecipeWizard.showDebug()', 'color: magenta;');

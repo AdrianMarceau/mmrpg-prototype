@@ -131,7 +131,7 @@
     border: 0 none transparent;
     background-color: transparent;
     background-image: none;
-    min-height: 180px;
+    min-height: 168px;
     margin-bottom: 0;
     border-radius: 0;
 
@@ -146,7 +146,8 @@
     /* background-color: rgba(0, 0, 255, 0.3); */
 }
 
-#void-recipe #vcr_upper .loading {
+#void-recipe #vcr_upper .loading,
+#void-recipe #vcr_upper .waiting {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -154,6 +155,10 @@
     opacity: 0.6;
     z-index: 999;
     pointer-events: none;
+}
+#void-recipe #vcr_upper > .loading {
+    top: auto;
+    bottom: 50px;
 }
 
 /* -- ITEM LISTS -- */
@@ -552,42 +557,75 @@
     width: auto;
     margin: 0 auto;
     text-align: center;
-    padding: 3px 12px;
+    padding: 0 6px;
     border: 0 none transparent;
     background-color: transparent;
     color: #cfcdd5;
+}
+#void-recipe #vcr_title:before {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: auto;
+    height: 46px;
+    border: 1px solid #111111;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #2b2545;
+    border-radius: 3px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    transition: height 0.3s;
+    transition-delay: 0.3s;
 }
 #void-recipe #vcr_title .main,
 #void-recipe #vcr_title .sub {
     display: block;
     margin: 0 auto;
-    border-width: 0 10px;
-    border-style: solid;
-    border-color: transparent;
-    transition: border 0.3s, filter 0.3s;
+    padding: 3px 6px;
+    border: 0 none transparent;
+    transition: none;
+    position: relative;
 }
 #void-recipe #vcr_title .main {
+    z-index: 6;
     font-size: 16px;
     line-height: 19px;
     text-transform: uppercase;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #111111;
 }
 #void-recipe #vcr_title .sub {
+    z-index: 4;
     font-size: 11px;
     line-height: 15px;
     color: #a49ad6;
+    color: hsl(250deg, 42%, 72%);
     font-style: normal;
-    padding-top: 3px;
-    border-top: 1px solid #222222;
     filter: opacity(1.0);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 }
-#void-recipe.active #vcr_title .main,
-#void-recipe.active #vcr_title .sub {
-    border-color: transparent;
+#void-recipe.is-ready #vcr_title .sub {
+    transition: filter 0.3s;
 }
-#void-recipe.active #vcr_title .sub {
+#void-recipe.has-content #vcr_title:before {
+    height: 25px;
+}
+#void-recipe.is-ready.has-content #vcr_title .sub {
     filter: opacity(0.0);
+}
+#void-recipe.is-ready:not(.has-content) #vcr_title .sub {
+    animation: vcr_sub-title-blink 6s infinite;
+    animation-delay: -1.5s;
+}
+@keyframes vcr_sub-title-blink {
+    0%, 100% { color: hsl(250deg, 42%, 72%); }
+    50% { color: hsl(250deg, 22%, 42%); }
+}
+#void-recipe #vcr_title .state {
+    display: none; /* TODO: show a red/yellow/green indicator for status? */
 }
 
 /* -- MISSION DETAILS (VOID POWERS) -- */
@@ -873,7 +911,7 @@
 #void-recipe #vcr_details .void-powers.base-powers {
     z-index: 10;
     left: 0;
-    top: 0;
+    top: 6px;
 }
 #void-recipe #vcr_details .void-powers.base-powers .power {
     font-size: 14px;
@@ -883,7 +921,7 @@
 
 #void-recipe #vcr_details .void-powers.rank-powers {
     z-index: 10;
-    top: 0;
+    top: 6px;
     right: 0;
 }
 #void-recipe #vcr_details .void-powers.rank-powers .power {
@@ -895,10 +933,13 @@
 #void-recipe #vcr_details .void-powers.sort-powers {
     z-index: 10;
     left: 0;
-    top: 26px;
+    top: 30px;
 }
 #void-recipe #vcr_details .void-powers.sort-powers + .sort-powers {
-    top: 52px;
+    top: 54px;
+}
+#void-recipe #vcr_details .void-powers.sort-powers.stat-sort-powers {
+    display: none; /* TODO: Perhaps remove this at the code level too */
 }
 #void-recipe #vcr_details .void-powers.sort-powers .label,
 #void-recipe #vcr_details .void-powers.sort-powers .flow {
@@ -996,7 +1037,7 @@
 
 #void-recipe #vcr_details .void-powers.stat-powers {
     z-index: 10;
-    top: 26px;
+    top: 30px;
     right: 0;
 }
 #void-recipe #vcr_details .void-powers.stat-powers .power {
@@ -1617,6 +1658,7 @@
 #void-recipe #vcr_palette .wrapper[data-step][data-layer="4"] { z-index: 17;  }
 #void-recipe #vcr_palette .wrapper[data-step][data-layer="5"] { z-index: 16;  }
 
+/*
 #void-recipe #vcr_palette .wrapper[data-step][data-token="upgrade"].active { background-color: #2f2b40; }
 #void-recipe #vcr_palette .wrapper[data-step][data-token="upgrade"]:not(.active) { background-color: #242032; }
 
@@ -1631,6 +1673,22 @@
 
 #void-recipe #vcr_palette .wrapper[data-step][data-token="distort"].active { background-color: #2f2b40; }
 #void-recipe #vcr_palette .wrapper[data-step][data-token="distort"]:not(.active) { background-color: #322028; }
+*/
+
+#void-recipe #vcr_palette .wrapper[data-step][data-token="upgrade"].active { background-color: #2b2545; }
+#void-recipe #vcr_palette .wrapper[data-step][data-token="upgrade"]:not(.active) { background-color: #211b36; }
+
+#void-recipe #vcr_palette .wrapper[data-step][data-token="boost"].active { background-color: #2b2545; }
+#void-recipe #vcr_palette .wrapper[data-step][data-token="boost"]:not(.active) { background-color: #2a1b36; }
+
+#void-recipe #vcr_palette .wrapper[data-step][data-token="manifest"].active { background-color: #2b2545; }
+#void-recipe #vcr_palette .wrapper[data-step][data-token="manifest"]:not(.active) { background-color: #331b36; }
+
+#void-recipe #vcr_palette .wrapper[data-step][data-token="redirect"].active { background-color: #2b2545; }
+#void-recipe #vcr_palette .wrapper[data-step][data-token="redirect"]:not(.active) { background-color: #361b30; }
+
+#void-recipe #vcr_palette .wrapper[data-step][data-token="distort"].active { background-color: #2b2545; }
+#void-recipe #vcr_palette .wrapper[data-step][data-token="distort"]:not(.active) { background-color: #361b27; }
 
 #void-recipe #vcr_palette .wrapper[data-step][data-side="left"][data-sidekey="1"] { left: 0; }
 #void-recipe #vcr_palette .wrapper[data-step][data-side="left"][data-sidekey="0"] { left: calc((100% - 320px) * 0.25);  }
