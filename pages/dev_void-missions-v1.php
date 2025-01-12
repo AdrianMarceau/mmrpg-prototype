@@ -91,6 +91,8 @@ require_once('pages/dev_void-missions-v1_data.php');
         </div>
     </div>
 
+    <div id="void-recipe-debug"></div>
+
     <div class="subbody">
         <div class="legend">
             <ul>

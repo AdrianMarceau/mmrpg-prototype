@@ -40,6 +40,7 @@
                     _self.name = 'voidRecipeWizard';
                     _self.version = '1.0.0';
                     _self.config = {
+                        firstStep: 1,
                         maxItems: 10,
                         maxTargets: 8,
                         maxArrows: 5,
@@ -93,21 +94,27 @@
                     _self.mission = {};
                     _self.history = [];
                     _self.indexes = {};
+                    _self.cache = {};
 
                     // Update relevant flags to show the wizard is loading and not ready
                     _self.nowReady(false);
                     _self.nowLoading(true);
 
                     // Catalogue all of the content indexes into easy-to-use reference formats
-                    _self.indexes.types = customData.types || {};
-                    _self.indexes.robots = customData.robots || {};
-                    _self.indexes.items = customData.items || {};
-                    _self.indexes.itemsGroups = customData.itemsGroups || {};
-                    _self.indexes.itemsQuantities = customData.itemsQuantities || {};
-                    _self.indexes.itemsDisabled = customData.itemsDisabled || {};
-                    _self.indexes.fields = customData.fields || {};
-                    _self.indexes.void = {totalGroups: 0, totalItems: 0};
+                    let indexes = _self.indexes;
+                    indexes.types = customData.types || {};
+                    indexes.robots = customData.robots || {};
+                    indexes.items = customData.items || {};
+                    indexes.itemsGroups = customData.itemsGroups || {};
+                    indexes.itemsQuantities = customData.itemsQuantities || {};
+                    indexes.itemsDisabled = customData.itemsDisabled || {};
+                    indexes.fields = customData.fields || {};
                     _self.catalogIndexes();
+
+                    // Set some default values in the cache
+                    let cache = _self.cache;
+                    cache.totalItems = 0;
+                    cache.totalItemsGroups = 0;
 
                     // Generate a renderer for the void powers
                     _self.voidPowersRenderer = _self.getPowerRenderer();
@@ -123,7 +130,6 @@
                 done: function(){
                     console.log('%c' + 'voidRecipeWizard.done()', 'color: magenta;');
                     const _self = this;
-                    // Update relevant flags to show the wizard is ready and not loading
                     _self.nowLoading(false);
                     _self.nowReady(true);
                     // end of voidRecipeWizard.done()
@@ -132,36 +138,37 @@
                     console.log('%c' + 'voidRecipeWizard.catalogIndexes()', 'color: magenta;');
                     const _self = this;
                     const config = _self.config;
-                    const mmrpgIndex = _self.indexes;
+                    const indexes = _self.indexes;
 
                     // Pre-define a list of item tokens we can use later
-                    const mmrpgIndexItems = mmrpgIndex.items;
-                    var mmrpgItemTokens = Object.keys(mmrpgIndexItems);
-                    _self.indexes.itemTokens = mmrpgItemTokens;
+                    const mmrpgItems = indexes.items;
+                    let mmrpgItemTokens = Object.keys(mmrpgItems);
+                    indexes.itemTokens = mmrpgItemTokens;
                     //console.log('mmrpgItemTokens:', mmrpgItemTokens);
 
                     // Pre-define a list of stat tokens we can use later
-                    var mmrpgStatTokens = ['energy', 'weapons', 'attack', 'defense', 'speed'];
-                    _self.indexes.statTokens = mmrpgStatTokens;
-                    //console.log('mmrpgStatTokens:', mmrpgStatTokens);
+                    let mmrpgStats = ['energy', 'weapons', 'attack', 'defense', 'speed'];
+                    indexes.statTokens = mmrpgStats;
+                    //console.log('mmrpgStats:', mmrpgStats);
 
                     // Pre-collect a list of type tokens we can use later
-                    const mmrpgIndexTypes = mmrpgIndex.types;
-                    var mmrpgTypeTokens = Object.keys(mmrpgIndexTypes);
+                    const mmrpgTypes = indexes.types;
+                    if (mmrpgTypes['none']){ mmrpgTypes['none']['type_name'] = 'Neutral'; } // because it drives me crazy
+                    let mmrpgTypeTokens = Object.keys(mmrpgTypes);
                     mmrpgTypeTokens = mmrpgTypeTokens.filter(function(token){
-                        var info = mmrpgIndexTypes[token];
+                        let info = mmrpgTypes[token];
                         if (token === 'none'){ return true; }
                         else if (info.type_class === 'normal'){ return true; }
                         return false;
                         });
-                    _self.indexes.typeTokens = mmrpgTypeTokens;
+                    indexes.typeTokens = mmrpgTypeTokens;
                     //console.log('mmrpgTypeTokens:', mmrpgTypeTokens);
 
                     // Pre-collect a list of robot tokens that we can use later
-                    const mmrpgIndexRobots = mmrpgIndex.robots;
-                    var mmrpgRobotTokens = Object.keys(mmrpgIndexRobots);
+                    const mmrpgRobots = indexes.robots;
+                    let mmrpgRobotTokens = Object.keys(mmrpgRobots);
                     mmrpgRobotTokens = mmrpgRobotTokens.filter(function(token){
-                        var info = mmrpgIndexRobots[token];
+                        let info = mmrpgRobots[token];
                         //console.log('checking info for ', token, ' | info:', info);
                         if (!info.robot_flag_published){ return false; }
                         else if (!info.robot_flag_complete){ return false; }
@@ -169,13 +176,13 @@
                         else if (info.robot_class === 'system'){ return false; }
                         return true;
                         });
-                    _self.indexes.robotTokens = mmrpgRobotTokens;
+                    indexes.robotTokens = mmrpgRobotTokens;
                     //console.log('mmrpgRobotTokens:', mmrpgRobotTokens);
 
                     // Create sub-lists of robot tokens for each class for later
-                    var filterToClass = function(tokens, className){
+                    const filterToClass = function(tokens, className){
                         return tokens.filter(function(token){
-                            var info = mmrpgIndexRobots[token];
+                            var info = mmrpgRobots[token];
                             if (info.robot_class === className){ return true; }
                             return false;
                             });
@@ -183,12 +190,62 @@
                     var mmrpgRobotMechaTokens = filterToClass(mmrpgRobotTokens, 'mecha');
                     var mmrpgRobotMasterTokens = filterToClass(mmrpgRobotTokens, 'master');
                     var mmrpgRobotBossTokens = filterToClass(mmrpgRobotTokens, 'boss');
-                    _self.indexes.robotMechaTokens = mmrpgRobotMechaTokens;
-                    _self.indexes.robotMasterTokens = mmrpgRobotMasterTokens;
-                    _self.indexes.robotBossTokens = mmrpgRobotBossTokens;
+                    indexes.robotMechaTokens = mmrpgRobotMechaTokens;
+                    indexes.robotMasterTokens = mmrpgRobotMasterTokens;
+                    indexes.robotBossTokens = mmrpgRobotBossTokens;
                     //console.log('mmrpgRobotMechaTokens:', mmrpgRobotMechaTokens);
                     //console.log('mmrpgRobotMasterTokens:', mmrpgRobotMasterTokens);
                     //console.log('mmrpgRobotBossTokens:', mmrpgRobotBossTokens);
+
+                    // Loop through every single robot and categorize them into quanta tiers
+                    //let baseQuanta = 50, roundUpTo = 25, roundVariance = 5;
+                    let baseQuanta = 100, roundUpTo = 25, roundVariance = 5;
+                    let voidTiers = {};
+                    let voidTierTypes = [];
+                    let voidTierValues = [];
+                    let voidTierRanks = {};
+                    for (let i = 0; i < mmrpgRobotTokens.length; i++){
+                        let robotToken = mmrpgRobotTokens[i];
+                        let robotInfo = mmrpgRobots[robotToken];
+                        if (robotInfo.robot_core === 'empty'){ continue; }
+                        let robotClass = robotInfo.robot_class || 'mecha';
+                        let robotCoreType = robotInfo.robot_core || 'none';
+                        let robotStatTotal = (robotInfo.robot_energy
+                            //+ robotInfo.robot_weapons
+                            + (robotInfo.robot_weapons * 10)
+                            + robotInfo.robot_attack
+                            + robotInfo.robot_defense
+                            + robotInfo.robot_speed
+                            );
+                        let roundedStatTotal = Math.round((robotStatTotal + roundVariance) / roundUpTo) * roundUpTo;
+                        //let robotTierVal = baseQuanta + roundedStatTotal;
+                        let robotTierVal = robotStatTotal;
+                        let thisVoidTier = voidTiers[robotCoreType] || { type: robotCoreType, thresholds: [], queues: {} };
+                        if (!thisVoidTier.queues[robotTierVal]){ thisVoidTier.queues[robotTierVal] = []; }
+                        thisVoidTier.queues[robotTierVal].push(robotToken);
+                        voidTiers[robotCoreType] = thisVoidTier;
+                        if (voidTierTypes.indexOf(robotCoreType) < 0){ voidTierTypes.push(robotCoreType); }
+                        if (voidTierValues.indexOf(robotTierVal) < 0){ voidTierValues.push(robotTierVal); }
+                        }
+                    for (let i = 0; i < voidTierTypes.length; i++){
+                        let tierType = voidTierTypes[i];
+                        let thisVoidTier = voidTiers[tierType];
+                        thisVoidTier.thresholds = Object.keys(thisVoidTier.queues || {}).map(Number).sort((a, b) => b - a);
+                        console.log('thisVoidTier['+tierType+']', '\n' + '-> type:', thisVoidTier.type, '\n' + '-> thresholds:', thisVoidTier.thresholds, '\n' + '-> queues:', thisVoidTier.queues, '\n' + '-> {raw}:', thisVoidTier);
+                        }
+                    voidTierValues = Object.values(voidTierValues).map(Number).sort((a, b) => a - b);
+                    for (let i = 0; i < voidTierValues.length; i++){
+                        let tierVal = voidTierValues[i], tierRank = 1 + i;
+                        voidTierRanks[tierVal] = tierRank;
+                        }
+                    console.log('voidTiers:', voidTiers);
+                    console.log('voidTierTypes:', voidTierTypes);
+                    console.log('voidTierValues:', voidTierValues);
+                    console.log('voidTierRanks:', voidTierRanks);
+                    indexes.voidTiers = voidTiers;
+                    indexes.voidTierTypes = voidTierTypes;
+                    indexes.voidTierValues = voidTierValues;
+                    indexes.voidTierRanks = voidTierRanks;
 
                     // end of voidRecipeWizard.catalogIndexes()
                     },
@@ -198,6 +255,7 @@
                     const _self = this;
                     const config = _self.config;
                     const indexes = _self.indexes;
+                    const cache = _self.cache;
 
                     // Collect references to key and parent elements on the page
                     let $parentDiv = $container;
@@ -210,15 +268,16 @@
                     let $missionTargets = $('#vcr_targets', $parentDiv);
                     let $missionDetails = $('#vcr_details', $parentDiv);
                     let $battleField = $('#vcr_field', $parentDiv);
+                    let $debugDiv = $('#void-recipe-debug');
 
                     // Generate the item button markup to use in palette
                     let itemButtonMarkup = _self.getItemButtonMarkup();
 
                     // Update the palette are with the full item list
                     $paletteDiv.empty();
-                    var firstStep = indexes.void.firstStep || 1;
-                    var totalGroups = indexes.void.totalGroups || 0;
-                    var totalItems = indexes.void.totalItems || 0;
+                    var firstStep = config.firstStep || 1;
+                    var totalItems = cache.totalItems || 0;
+                    var totalGroups = cache.totalItemsGroups || 0;
                     let itemPaletteMarkup = '<div class="item-list" data-count="' + totalItems + '" data-step="' + firstStep + '" data-select="*">' + itemButtonMarkup + '</div>';
                     $paletteDiv.append(itemPaletteMarkup);
                     let $itemsPalette = $('.item-list', $paletteDiv);
@@ -234,6 +293,9 @@
                     let $itemsSelected = $('.item-list', $selectionDiv);
                     let $resetButton = $('.button.reset', $selectionDiv);
                     let $codeButton = $('.button.code', $selectionDiv);
+
+                    // Ensure a debug div is there else set false
+                    if ($debugDiv.length === 0){ $debugDiv = false; }
 
                     // Save the references to the object for later use
                     var xrefs = _self.xrefs;
@@ -251,7 +313,107 @@
                     xrefs.itemsSelected = $itemsSelected;
                     xrefs.resetButton = $resetButton;
                     xrefs.codeButton = $codeButton;
+                    xrefs.debugDiv = $debugDiv;
                     //console.log('xrefs:', xrefs);
+
+                    // DEBUG DEBUG DEBUG
+                    console.log('CHECK FOR DEBUG', '\n', 'xrefs.debugDiv:', typeof xrefs.debugDiv, xrefs.debugDiv);
+                    if (xrefs.debugDiv){
+                        console.log('SHOWING DEBUG ON PAGE');
+                        let $debugDiv = xrefs.debugDiv;
+                        $debugDiv.find('.debug-tier-costs').remove();
+                        let voidTiers = indexes.voidTiers;
+                        let orderedTypes = Object.values(indexes.typeTokens);
+                        /*
+                        let reorderedTypes = (function(types){
+                            let robotCounts = {};
+                            for (let i = 0; i < types.length; i++){
+                                let tierType = types[i];
+                                if (!voidTiers[tierType]){ continue; }
+                                let thisVoidTier = voidTiers[tierType];
+                                let tierThresholds = thisVoidTier.thresholds;
+                                let reversedTierThresholds = tierThresholds.slice(0).reverse();
+                                let totalRobots = 0;
+                                for (let j = 0; j < reversedTierThresholds.length; j++){
+                                    let tierThreshold = reversedTierThresholds[j];
+                                    let tierRobots = thisVoidTier.queues[tierThreshold];
+                                    totalRobots += tierRobots.length;
+                                    }
+                                robotCounts[tierType] = totalRobots;
+                                }
+                            return Object.keys(robotCounts).sort(function(a, b){
+                                return robotCounts[a] - robotCounts[b];
+                                });
+                            })(orderedTypes);
+                        reorderedTypes = orderedTypes; // TEMP TEMP TEMP
+                        */
+                        let classIcons = {master: 'robot', mecha: 'ghost', boss: 'skull'};
+                        let numColumns = 4;
+                        let blocksPerColumn = Math.ceil(orderedTypes.length / numColumns);
+                        let lastColumn = false;
+                        let currentColumn = 0;
+                        let tierCostsMarkup = '';
+                        let tierCostsMarkupByCol = {};
+                        for (let i = 0; i < orderedTypes.length; i++){
+                            let tierType = orderedTypes[i];
+                            if (!voidTiers[tierType]){ continue; }
+                            let thisVoidTier = voidTiers[tierType];
+                            let tierTypeInfo = indexes.types[tierType];
+                            let tierThresholds = thisVoidTier.thresholds;
+                            let reversedTierThresholds = tierThresholds.slice(0).reverse();
+                            let thisMarkup = '';
+                                thisMarkup += '<div class="block tier-block">';
+                                    thisMarkup += '<strong class="name type ' + tierType + '">' + tierTypeInfo.type_name + '</strong>\n';
+                                    thisMarkup += '<ul class="list">\n';
+                                        for (let j = 0; j < reversedTierThresholds.length; j++){
+                                            let tierThreshold = reversedTierThresholds[j];
+                                            let tierRobots = thisVoidTier.queues[tierThreshold];
+                                            thisMarkup += '<li class="item">\n';
+                                                thisMarkup += '<label class="name type empty">@ ' + tierThreshold + '</label>\n';
+                                                thisMarkup += '<ul class="list">\n';
+                                                    for (let k = 0; k < tierRobots.length; k++){
+                                                        let robotToken = tierRobots[k];
+                                                        let robotOrder = (k + 1), robotOrderText = robotOrder + _self.getOrdinalSuffix(robotOrder);
+                                                        let robotInfo = indexes.robots[robotToken];
+                                                        let robotClass = robotInfo.robot_class || 'mecha';
+                                                        let robotIcon = classIcons[robotClass] || 'bug';
+                                                        let robotName = robotInfo.robot_name;
+                                                        let robotType = robotInfo.robot_core || 'none';
+                                                        let robotImage = robotInfo.robot_image || robotToken;
+                                                        thisMarkup += '<li class="item">';
+                                                            thisMarkup += '<span class="order">' + robotOrderText + '</span>';
+                                                            thisMarkup += '<strong class="robot '+robotClass+'">';
+                                                                thisMarkup += '<span class="r-icon type '+robotType+'"><i class="fa fa-'+robotIcon+'"></i></span>';
+                                                                thisMarkup += '<span class="r-name type '+robotType+'">' + robotName + '</span>\n';
+                                                            thisMarkup += '</strong>\n';
+                                                        thisMarkup += '</li>\n';
+                                                        }
+                                                thisMarkup += '</ul>\n';
+                                            thisMarkup += '</li>\n';
+                                            }
+                                    thisMarkup += '</ul>\n';
+                                thisMarkup += '</div>';
+                            currentColumn++;
+                            if (currentColumn > numColumns){ currentColumn = 1; }
+                            if (!tierCostsMarkupByCol[currentColumn]){ tierCostsMarkupByCol[currentColumn] = ''; }
+                            tierCostsMarkupByCol[currentColumn] += thisMarkup;
+                            lastColumn = currentColumn;
+                            }
+                        //tierCostsMarkup += '</div>';
+                        console.log('tierCostsMarkupByCol:', tierCostsMarkupByCol);
+                        for (let i = 0; i <= numColumns; i++){
+                            if (!tierCostsMarkupByCol[i]){ continue; }
+                            let currentColumn = (i + 1);
+                            let thisMarkup = tierCostsMarkupByCol[i];
+                            thisMarkup = '<div class="col no-'+currentColumn+' of-'+numColumns+'">' + thisMarkup + '</div>';
+                            tierCostsMarkup += thisMarkup;
+                            }
+                        tierCostsMarkup = '<div class="section debug-tier-costs">' + tierCostsMarkup + '</div>';
+                        $debugDiv.append(tierCostsMarkup);
+                        }
+                    // DEBUG DEBUG DEBUG
+
+
 
                     // Return true on success
                     return true;
@@ -263,9 +425,10 @@
                     const _self = this;
                     const config = _self.config;
                     const indexes = _self.indexes;
+                    const cache = _self.cache;
 
                     // Collect references to the indexes we need to generate the markup
-                    const mmrpgIndexItems = indexes.items;
+                    const mmrpgItems = indexes.items;
                     const voidItemGroups = indexes.itemsGroups;
                     const voidItemQuantities = indexes.itemsQuantities;
                     const voidItemDisabled = indexes.itemsDisabled;
@@ -291,8 +454,8 @@
                             if (!groupItems || groupItems.length === 0) return;
                             const groupItemsMarkup = [];
                             groupItems.forEach((itemToken, itemKey) => {
-                                if (!mmrpgIndexItems[itemToken]) return;
-                                const itemInfo = mmrpgIndexItems[itemToken];
+                                if (!mmrpgItems[itemToken]) return;
+                                const itemInfo = mmrpgItems[itemToken];
                                 const itemName = itemInfo.item_name;
                                 const itemNameBr = itemName.replace(/ /g, '<br />');
                                 const itemIsOneline = !itemName.includes(' ');
@@ -358,8 +521,8 @@
                         });
 
                     // Update the void index with any calculated values
-                    indexes.void.totalGroups = Object.keys(voidItemGroups).length;
-                    indexes.void.totalItems = numItemsTotal;
+                    cache.totalItems = numItemsTotal;
+                    cache.totalItemsGroups = Object.keys(voidItemGroups).length;
 
                     // Return the generated button markup
                     return itemButtonsMarkup;
@@ -1245,7 +1408,7 @@
                     return sortedTokens;
                     // end of voidRecipeWizard.sortTokensByItemOrder()
                     },
-                distributeQuanta: function(quanta, spread) {
+                /* distributeQuanta: function(quanta, spread) {
                     console.log('%c' + 'voidRecipeWizard.distributeQuanta() w/ quanta: ' + quanta + ', spread: ' + spread, 'color: magenta;');
                     //console.log('-> w/ quanta:', quanta, 'spread:', spread);
 
@@ -1334,7 +1497,92 @@
                     return targets;
 
                     // end of voidRecipeWizard.distributeQuanta()
-                    },
+                    }, */
+                /* distributeQuantaV2: function(quanta, spread, push) {
+                    console.log('%c' + 'voidRecipeWizard.distributeQuantaV2() w/ quanta: ' + quanta + ', spread: ' + spread + ', push: ' + push, 'color: magenta;');
+                    console.log('-> w/ quanta:', quanta, 'spread:', spread, 'push:', push);
+
+                    // Define the main thresholds for primary slots
+                    const _self = this;
+                    const config = _self.config;
+                    const targets = [];
+                    const tiersByQuanta = _self.indexes.voidTiersByQuanta;
+                    const tiersInOrder = _self.indexes.voidTiersInOrder;
+
+                    // Define defaults for quanta, spread, and push
+                    quanta = quanta || 0, spread = spread || 0, push = push || 0;
+                    if (!quanta && !spread){ return false; }
+
+                    // Predefine variables to hold needed quanta and spread values
+                    var numTargetSlots = spread;
+                    var quantaAvailable = quanta;
+                    var quantaRemaining = quantaAvailable;
+                    console.log('-> numTargetSlots:', numTargetSlots);
+                    console.log('-> quantaAvailable:', quantaAvailable);
+                    console.log('-> quantaRemaining:', quantaRemaining);
+
+                    // We know the spread, so let's pre-populate with empty slots
+                    console.log('-> [step-1] populate targets array with placeholders!');
+                    for (let i = 0; i < numTargetSlots; i++){
+                        targets.push({
+                            tier: 0,
+                            level: 0,
+                            forte: 0,
+                            quanta: 0,
+                            });
+                        }
+                    console.log('-> step-1 // targets:', JSON.stringify(targets));
+                    console.log('-> step-1 // quantaAvailable:', quantaAvailable);
+                    console.log('-> step-1 // quantaRemaining:', quantaRemaining);
+
+                    // Now we can loop through each target and try to get it as high as possible
+                    console.log('-> [step-2] upgrade target to max tier possible given quanta!');
+                    for (let i = 0; i < numTargetSlots; i++){
+                        let target = targets[i];
+                        console.log('--> processing targets['+i+'] (target:', target, ') w/ quantaRemaining:', quantaRemaining);
+                        for (let j = 0; j < tiersInOrder.length; j++){
+                            let tierValue = tiersInOrder[j];
+                            console.log('---> comparing tierValue:', tierValue, 'vs. quantaRemaining:', quantaRemaining);
+                            if (tierValue > quantaRemaining){ continue; }
+                            let tierRobots = tiersByQuanta[tierValue];
+                            console.log('---> ensure there are tierRobots (length:', tierRobots.length, 'tokens:', tierRobots, ')');
+                            if (!tierRobots.length){ continue; }
+                            target.tier = tierValue;
+                            target.quanta = tierValue;
+                            quantaRemaining -= tierValue;
+                            console.log('-> updated target tier to tier:', target.tier, 'w/ quanta:', target.quanta);
+                            break;
+                            }
+                        }
+                    console.log('-> step-2 // targets:', JSON.stringify(targets));
+                    console.log('-> step-2 // quantaAvailable:', quantaAvailable);
+                    console.log('-> step-2 // quantaRemaining:', quantaRemaining);
+
+                    // If there's any remaining quanta, distribute it evenly across the slots
+                    console.log('-> [step-3] distribute remaining quanta evenly across slots!');
+                    if (quantaRemaining > 0){
+                        let quantaPerSlot = Math.floor(quantaRemaining / numTargetSlots);
+                        let quantaOverflow = quantaRemaining % numTargetSlots;
+                        console.log('--> quantaPerSlot:', quantaPerSlot, 'quantaOverflow:', quantaOverflow);
+                        for (let i = 0; i < targets.length; i++){
+                            let target = targets[i];
+                            target.quanta += quantaPerSlot;
+                            if (quantaOverflow > 0){
+                                target.quanta += 1;
+                                quantaOverflow -= 1;
+                                }
+                            console.log('---> updated target ['+i+'] to:', target);
+                            }
+                        }
+                    console.log('-> step-3 // targets:', JSON.stringify(targets));
+                    console.log('-> step-3 // quantaAvailable:', quantaAvailable);
+                    console.log('-> step-3 // quantaRemaining:', quantaRemaining);
+
+                    // Return the list of generated targets
+                    return targets;
+
+                    // end of voidRecipeWizard.distributeQuantaV2()
+                    }, */
                 generateTargetQueue: function(robots, types, stats){
                     console.log('%c' + 'voidRecipeWizard.generateTargetQueue()', 'color: magenta;');
                     //console.log('-> w/ robots:', robots, 'types:', types, 'stats:', stats);
@@ -1563,12 +1811,6 @@
                         return;
                         }
 
-                    // First we set-up the different target slots given quanta vs spread
-                    // using predefined thresholds to determine each target's class
-                    var effectiveSpread = baseSpread >= config.maxTargets ? config.maxTargets : (baseSpread < 1 ? 1 : Math.trunc(baseSpread));
-                    var distributedQuanta = _self.distributeQuanta(baseQuanta, effectiveSpread, true);
-                    //console.log('-> effectiveSpread:', effectiveSpread, 'distributedQuanta:', distributedQuanta);
-
                     // Pull a filtered list of stat powers and type powers for easier looping
                     var statPowersList = _self.filterStatPowers(voidPowersList);
                     //var typePowersList = _self.filterTypePowers(voidPowersList);
@@ -1579,104 +1821,157 @@
                     //console.log('-> statFlowsList:', statFlowsList);
                     //console.log('-> typeFlowsList:', typeFlowsList);
 
-                    // Loop through and check to see which classes are represented
-                    var maxTierLevel = 0;
-                    for (var i = 0; i < distributedQuanta.length; i++){
-                        if (!distributedQuanta[i].tier){ continue; }
-                        var tier = distributedQuanta[i].tier;
-                        if (tier === 'boss'){ maxTierLevel = Math.max(maxTierLevel, 3); }
-                        if (tier === 'master'){ maxTierLevel = Math.max(maxTierLevel, 2); }
-                        if (tier === 'mecha'){ maxTierLevel = Math.max(maxTierLevel, 1); }
-                        }
-                    //console.log('-> maxTierLevel:', maxTierLevel);
-
-                    // Generate a queue of mechas, masters, and bosses given the powers available
-                    var targetRobotQueue = {};
-                    targetRobotQueue['mecha'] = maxTierLevel >= 1 ? _self.generateTargetQueue((_self.indexes.robotMechaTokens || []), typeFlowsList, statFlowsList) : [];
-                    targetRobotQueue['master'] = maxTierLevel >= 2 ? _self.generateTargetQueue((_self.indexes.robotMasterTokens || []), typeFlowsList, statFlowsList) : [];
-                    targetRobotQueue['boss'] = maxTierLevel >= 3 ? _self.generateTargetQueue((_self.indexes.robotBossTokens || []), typeFlowsList, statFlowsList) : [];
-                    //console.log('-> targetRobotQueue[mecha]:', targetRobotQueue['mecha']);
-                    //console.log('-> targetRobotQueue[master]:', targetRobotQueue['master']);
-                    //console.log('-> targetRobotQueue[boss]:', targetRobotQueue['boss']);
+                    // Pre-calculate the effective quanta and spread we're working with
+                    let effectiveQuanta = baseQuanta;
+                    let effectiveSpread = baseSpread >= config.maxTargets ? config.maxTargets : (baseSpread < 1 ? 1 : Math.trunc(baseSpread));
+                    let effectiveOffset = 0;
+                    console.log('-> effectiveQuanta:', effectiveQuanta, '\n' + '-> effectiveSpread:', effectiveSpread, '\n' + '-> effectiveOffset:', effectiveOffset);
 
                     // Define which elemental types each slot should be
-                    var typeFlowTokens = Object.keys(typeFlowsList);
-                    var typeFlowTotal = (typeFlowTokens.length ? typeFlowTokens.reduce((acc, token) => acc + typeFlowsList[token], 0) : 0);
-                    var typeFlowTokensSorted = typeFlowTokens.slice().sort(function(a, b){
-                        var aIndex = voidItemsTokens.indexOf(a+'-core');
-                        var bIndex = voidItemsTokens.indexOf(b+'-core');
-                        return aIndex - bIndex;
-                        });
-                    var distributedTypes = {};
-                    var distributedTypeSlots = [];
-                    for (var i = 0; i < typeFlowTokensSorted.length; i++){
-                        var typeToken = typeFlowTokensSorted[i];
-                        var typeValue = typeFlowsList[typeToken];
-                        if (typeValue === 0){ continue; }
-                        var typeSlots = Math.round((typeValue / typeFlowTotal) * effectiveSpread);
-                        distributedTypes[typeToken] = typeSlots;
-                        // add the token to the slots array as many times as their are slots for it
-                        for (var j = 0; j < typeSlots; j++){ distributedTypeSlots.push(typeToken); }
-                        }
-                    console.log('-> distributedTypes:', JSON.stringify(distributedTypes));
-                    console.log('-> distributedTypeSlots:', JSON.stringify(distributedTypeSlots));
+                    let distributedTypes = {};
+                    let distributedTypeSlots = [];
+                    (function(){
+                        //voidRecipeWizard.distributeTypesV2()
+                        console.log('%c' + 'voidRecipeWizard.generateMission.distributedTypes(~)', 'color: lime;');
+                        var typeFlowTokens = Object.keys(typeFlowsList);
+                        var typeFlowTotal = (typeFlowTokens.length ? typeFlowTokens.reduce((acc, token) => acc + typeFlowsList[token], 0) : 0);
+                        var typeFlowTokensSorted = typeFlowTokens.slice().sort(function(a, b){
+                            var aIndex = voidItemsTokens.indexOf(a+'-core');
+                            var bIndex = voidItemsTokens.indexOf(b+'-core');
+                            return aIndex - bIndex;
+                            });
+                        for (var i = 0; i < typeFlowTokensSorted.length; i++){
+                            var typeToken = typeFlowTokensSorted[i];
+                            var typeValue = typeFlowsList[typeToken];
+                            if (typeValue === 0){ continue; }
+                            var typeSlots = Math.round((typeValue / typeFlowTotal) * effectiveSpread);
+                            distributedTypes[typeToken] = typeSlots;
+                            // add the token to the slots array as many times as their are slots for it
+                            for (var j = 0; j < typeSlots; j++){ distributedTypeSlots.push(typeToken); }
+                            }
+                        })();
+                    console.log('-> distributedTypes:', JSON.stringify(distributedTypes), distributedTypes);
+                    console.log('-> distributedTypeSlots:', JSON.stringify(distributedTypeSlots), distributedTypeSlots);
 
-                    // Define a quick function for getting the first matching robot from a list and shifting it off
-                    const mmrpgIndexRobots = mmrpgIndex.robots;
-                    var firstMatchingType = function(queue, type, offset, rotate){
-                        offset = typeof offset === 'number' && offset > 0 ? offset : 0;
-                        rotate = typeof rotate !== 'undefined' ? (rotate ? true : false) : true;
-                        if (offset > 0){ for (var i = 0; i < offset; i++){ queue.push(queue.shift()); } }
-                        for (var i = 0; i < queue.length; i++){
-                            var robotToken = queue[i];
-                            var robotInfo = mmrpgIndexRobots[robotToken];
-                            if (robotInfo.robot_core === type || robotInfo.robot_core2 === type){
-                                if (rotate){ queue.push(queue.shift()); }
-                                return robotToken;
+                    // First we set-up the different target slots given quanta vs spread
+                    // using predefined thresholds to determine each target's class
+                    let targetSlotTemplates = [];
+                    (function(quanta, spread, offset, types){
+                        //voidRecipeWizard.distributeQuantaV2()
+                        console.log('%c' + 'voidRecipeWizard.generateMission.targetSlotTemplates(~)', 'color: lime;');
+
+                        if (!quanta && !spread){ return false; }
+                        quanta = quanta || 0, spread = spread || 0, offset = offset || 0;
+                        console.log('-> quanta:', quanta, '\n' + '-> spread:', spread, '\n' + '-> offset:', offset, '\n' + '-> types:', types);
+
+                        const indexes = _self.indexes;
+                        const voidTiers = indexes.voidTiers;
+                        const voidTierTypes = indexes.voidTierTypes;
+                        const voidTierValues = indexes.voidTierValues;
+                        const voidTierRanks = indexes.voidTierRanks;
+                        console.log('-> targetSlotTemplates:', targetSlotTemplates, '\n' + '-> voidTiers:', voidTiers, '\n' + '-> voidTierValues:', voidTierValues, '\n' + '-> voidTierRanks:', voidTierRanks);
+
+                        // Predefine variables to hold needed quanta and spread values
+                        var numTargetSlots = spread;
+                        var quantaAvailable = quanta;
+                        var quantaRemaining = quantaAvailable;
+                        console.log('-> numTargetSlots:', numTargetSlots, '\n' + '-> quantaAvailable:', quantaAvailable, '\n' + '-> quantaRemaining:', quantaRemaining);
+
+                        // We know the spread, so let's pre-populate with empty slots
+                        console.log('-> [step-1] populate targetSlotTemplates array with placeholders!');
+                        for (let i = 0; i < numTargetSlots; i++){
+                            targetSlotTemplates.push({
+                                type: '',
+                                tier: 0,
+                                level: 0,
+                                forte: 0,
+                                quanta: 0,
+                                queue: 0,
+                                });
+                            }
+                        console.log('-> step-1 // quantaAvailable:', quantaAvailable);
+                        console.log('-> step-1 // quantaRemaining:', quantaRemaining);
+                        console.log('-> step-1 // targetSlotTemplates:', JSON.stringify(targetSlotTemplates));
+
+                        // Now we can loop through each target and try to get it as high as possible
+                        console.log('-> [step-2] upgrade target to max tier possible given quanta!');
+                        for (let i = 0; i < numTargetSlots; i++){
+                            console.log('--> step-2 // processing target slot {'+i+'}', '\n' + '-> w/ target:', targetSlotTemplates[i], '\n' + '-> w/ targetType:', types[i]);
+                            let target = targetSlotTemplates[i];
+                            let targetType = types[i];
+                            target.type = targetType;
+                            let targetQuanta = 0;
+                            let tierInfo = voidTiers[targetType];
+                            console.log('---> step-2 // checking quanta thresholds in ' + targetType + '-tier:', '\n' + '-> w/ quantaRemaining:', quantaRemaining, '\n' + '-> w/ tierInfo:', tierInfo);
+                            let tierThresholds = tierInfo.thresholds || [];
+                            let tierRobotQueues = tierInfo.queues || {};
+                            console.log('---> step-2 // pulling info about ' + targetType + '-tier:', '\n' + '-> w/ tierThresholds:', tierThresholds, '\n' + '-> w/ tierRobotQueues:', tierRobotQueues);
+                            for (let j = 0; j < tierThresholds.length; j++){
+                                let tierThreshold = tierThresholds[j];
+                                console.log('----> step-2 // comparing tierThreshold:', tierThreshold, 'vs. quantaRemaining:', quantaRemaining);
+                                if (tierThreshold > quantaRemaining){ continue; }
+                                let tierRobotQueue = tierRobotQueues[tierThreshold];
+                                console.log('----> step-2 // ensure there are tierRobotQueue (length:', tierRobotQueue.length, 'tokens:', tierRobotQueue, ')');
+                                if (!tierRobotQueue.length){ continue; }
+                                targetQuanta = tierThreshold;
+                                target.tier = tierThreshold;
+                                target.quanta = targetQuanta;
+                                target.queue = Object.assign([], tierRobotQueue);
+                                quantaRemaining -= targetQuanta;
+                                console.log('----> step-2 // target robot queue exists for '+targetType+'-tier-'+tierThreshold+':', '\n' + '-> w/ target.type:', target.type, '\n' + '-> w/ target.tier:', target.tier, '\n' + '-> w/ target.quanta:', target.quanta, '\n' + '-> w/ target.queue:', target.queue);
+                                break;
                                 }
                             }
-                        return '';
-                        };
+                        console.log('-> step-2 // quantaAvailable:', quantaAvailable);
+                        console.log('-> step-2 // quantaRemaining:', quantaRemaining);
+                        console.log('-> step-2 // targetSlotTemplates:', JSON.stringify(targetSlotTemplates));
+
+                        // If there's any remaining quanta, distribute it evenly across the slots
+                        console.log('-> [step-3] distribute remaining quanta evenly across slots!');
+                        if (quantaRemaining > 0){
+                            let quantaPerSlot = Math.floor(quantaRemaining / numTargetSlots);
+                            let quantaOverflow = quantaRemaining % numTargetSlots;
+                            console.log('--> quantaPerSlot:', quantaPerSlot, 'quantaOverflow:', quantaOverflow);
+                            for (let i = 0; i < targetSlotTemplates.length; i++){
+                                let target = targetSlotTemplates[i];
+                                target.quanta += quantaPerSlot;
+                                if (quantaOverflow > 0){
+                                    target.quanta += 1;
+                                    quantaOverflow -= 1;
+                                    }
+                                console.log('---> updated target ['+i+'] to:', target);
+                                }
+                            }
+                        console.log('-> step-3 // quantaAvailable:', quantaAvailable);
+                        console.log('-> step-3 // quantaRemaining:', quantaRemaining);
+                        console.log('-> step-3 // targetSlotTemplates:', JSON.stringify(targetSlotTemplates));
+
+                        // end of voidRecipeWizard.distributeQuantaV2()
+                        })(effectiveQuanta, effectiveSpread, effectiveOffset, distributedTypeSlots);
+                    console.log('-> targetSlotTemplates:', JSON.stringify(targetSlotTemplates), targetSlotTemplates);
 
                     // Use calculated quanta-per-target to set-up the different target slots
                     var missionTargets = [];
                     var numTargetSlots = effectiveSpread;
                     for (var slotKey = 0; slotKey < numTargetSlots; slotKey++){
-                        var slotTemplate = distributedQuanta[slotKey];
-                        //console.log('--> calculating slotKey:', slotKey, 'w/ slotTemplate:', slotTemplate);
-                        var targetRobot = {};
-                        var targetTier = slotTemplate.tier;
-                        var targetClass = slotTemplate.class;
+                        var slotTemplate = targetSlotTemplates[slotKey];
+                        console.log('--> calculating slotKey:', slotKey, 'w/ slotTemplate:', slotTemplate);
+                        let targetRobot = {};
+                        var targetType = slotTemplate.type;
                         var targetQuanta = slotTemplate.quanta;
-                        targetRobot.class = targetClass;
+                        var targetQueue = slotTemplate.queue;
                         targetRobot.token = '';
+                        targetRobot.class = '';
                         targetRobot.level = 1;
-                        targetRobot.type = '';
-                        targetRobot.quanta = Object.values(targetQuanta);
-                        if (distributedTypeSlots.length){
-                            // decide which element this target will be
-                            targetRobot.type = distributedTypeSlots.shift() || '';
-                            distributedTypeSlots.push(targetRobot.type);
-                            }
-                        if (targetTier.length){
-                            // decide which tier this target will be
-                            var queueOrder = [];
-                            if (targetTier === 'boss'){ queueOrder.push('boss', 'master', 'mecha'); }
-                            if (targetTier === 'master'){ queueOrder.push('master', 'mecha'); }
-                            if (targetTier === 'mecha'){ queueOrder.push('mecha'); }
-                            // loop through and pull appropriate targets given above
-                            for (var i = 0; i < queueOrder.length; i++){
-                                var queueToken = queueOrder[i];
-                                if (targetRobotQueue[queueToken].length){
-                                    var offset = typeof voidPowersList['x'+queueToken] !== 'undefined' ? voidPowersList['x'+queueToken] : 0;
-                                    var nextToken = firstMatchingType(targetRobotQueue[queueToken], targetRobot.type, offset, true);
-                                    if (nextToken){
-                                        targetRobot.token = nextToken;
-                                        targetRobotQueue[queueToken].push(targetRobot.token);
-                                        break;
-                                        }
-                                    }
-                                }
+                        targetRobot.type = targetType;
+                        targetRobot.quanta = targetQuanta;
+                        // If there's at least one token in the queue, collect the target token
+                        if (targetQueue.length){
+                            var nextRobotToken = targetQueue[0];
+                            var nextRobotInfo = mmrpgIndex.robots[nextRobotToken];
+                            var nextRobotClass = nextRobotInfo.robot_class;
+                            targetRobot.class = nextRobotClass;
+                            targetRobot.token = nextRobotToken;
                             }
                         // If a token for this slot count not be found, default to a dark frag
                         if (!targetRobot.token.length){
@@ -1804,11 +2099,11 @@
                     $selectedWrapper.html('');
                     $paletteItems.removeClass('active');
                     if (voidItemsTokens.length > 0){
-                        const mmrpgIndexItems = mmrpgIndex.items;
+                        const mmrpgItems = mmrpgIndex.items;
                         for (var i = 0; i < voidItemsTokens.length; i++){
                             // Generate the markup for the item then add to the selection area
                             var itemToken = voidItemsTokens[i];
-                            var itemInfo = mmrpgIndexItems[itemToken];
+                            var itemInfo = mmrpgItems[itemToken];
                             var itemName = itemInfo.item_name;
                             var itemNameBr = itemName.replace(' ', '<br />');
                             var itemQuantity = voidItems[itemToken] || 0;
@@ -1844,10 +2139,10 @@
                     // Check and update the displayed quantities of any items visible in the palette
                     var itemsToUpdate = _self.indexes.itemTokens;
                     if (itemsToUpdate.length > 0){
-                        const mmrpgIndexItems = mmrpgIndex.items;
+                        const mmrpgItems = mmrpgIndex.items;
                         for (var i = 0; i < itemsToUpdate.length; i++){
                             var itemToken = itemsToUpdate[i];
-                            var itemInfo = mmrpgIndexItems[itemToken];
+                            var itemInfo = mmrpgItems[itemToken];
                             var $paletteButton = $('.item[data-token="'+itemToken+'"]', $itemsPalette);
                             var baseQuantity = parseInt($paletteButton.attr('data-base-quantity'));
                             var addedQuantity = voidItems[itemToken] || 0;
@@ -2065,7 +2360,7 @@
                             var targetRobotInfo = mmrpgIndexRobots[targetRobotToken] || false;
                             if (!targetRobotInfo){ continue; }
                             var targetRobotClass = targetRobot.class;
-                            var targetRobotQuanta = targetRobot.quanta[1];
+                            var targetRobotQuanta = targetRobot.quanta;
                             var targetRobotLevel = targetRobot.level;
                             var targetRobotName = targetRobotInfo['robot_name'] || targetRobotToken;
                             var targetRobotImage = targetRobotInfo['robot_image'] || targetRobotToken;
@@ -2140,6 +2435,13 @@
                     console.log('%c' + 'voidRecipeWizard.hasContent()', 'color: magenta;');
                     const _self = this; return _self.setStatus('content', value, 'has');
                     // end of voidRecipeWizard.hasContent()
+                    },
+                getOrdinalSuffix: function(num){
+                    //console.log('%c' + 'voidRecipeWizard.getOrdinalSuffix()', 'color: magenta;');
+                    const suffixes = ["th", "st", "nd", "rd"];
+                    const value = num % 100;
+                    return suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0];
+                    // end of voidRecipeWizard.getOrdinalSuffix()
                     },
                 showDebug: function(kind){
                     console.log('%c' + 'voidRecipeWizard.showDebug()', 'color: magenta;');

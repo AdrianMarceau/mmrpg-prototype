@@ -208,13 +208,14 @@
     height: 34px;
     margin: 0 2px 2px 0;
     border: 1px solid #111111;
+    outline: 1px solid transparent;
     background-color: #161616;
     border-radius: 3px;
     position: relative;
     cursor: pointer;
     filter: opacity(1.0) brightness(1.0);
     box-shadow: 0 0 2px rgba(0, 0, 0, 0);
-    transition: filter 0.3s, background-color 0.3s, box-shadow 0.3s, transform 0.3s;
+    transition: filter 0.3s, border 0.3s, outline 0.3s, background-color 0.3s, box-shadow 0.3s, transform 0.3s;
 }
 #void-recipe #vcr_lower .item-list .item[data-token]:hover {
     background-color: #333333;
@@ -296,10 +297,15 @@
 
 #void-recipe #vcr_lower .item-list .item.placeholder {
     cursor: default;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    outline: 1px solid #111111;
+    background-color: #261f47;
     box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
+#void-recipe #vcr_lower .item-list .item.placeholder + .placeholder {
+    border-color: rgba(255, 255, 255, 0.05);
+}
 #void-recipe #vcr_lower .item-list .item.placeholder:before {
-    background-color: #242033;
     display: none;
 }
 #void-recipe #vcr_lower .item-list .item.placeholder:after {
@@ -661,8 +667,9 @@
     border-radius: 3px;
     box-shadow: none;
     overflow: visible;
-    border: 1px solid #111111;
-    background-color: #161616;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    outline: 1px solid #111111;
+    background-color: #261f47;
     overflow: hidden;
     /* pointer-events: none;  */
 }
@@ -1023,9 +1030,6 @@
 }
 #void-recipe #vcr_details .void-powers.sort-powers .power > span {
     font-size: 9px;
-}
-#void-recipe #vcr_details .void-powers.sort-powers .power:nth-child(5n) + .power {
-    clear: left;
 }
 #void-recipe #vcr_details .void-powers.sort-powers .power > span.blur > strong,
 #void-recipe #vcr_details .void-powers.sort-powers .power > span.blur > data {
@@ -1733,3 +1737,182 @@
 #void-recipe #vcr_palette .wrapper[data-step].locked > .label:before {
     content: "~ ??? ~";
 }
+
+/* -- VOID DEBUG OUTPUT -- */
+
+#void-recipe-debug,
+#void-recipe-debug .type,
+#void-recipe-debug .section,
+#void-recipe-debug .section .col,
+#void-recipe-debug .section .block,
+#void-recipe-debug .section .list,
+#void-recipe-debug .section .list .item {
+    display: block;
+    position: relative;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+#void-recipe-debug:after,
+#void-recipe-debug .section:after,
+#void-recipe-debug .section .col:after,
+#void-recipe-debug .section .block:after,
+#void-recipe-debug .section .list:after,
+#void-recipe-debug .section .list .item:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#void-recipe-debug {
+    margin-top: 9px;
+    padding-top: 9px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    font-size: 9px;
+    line-height: 1.6;
+}
+#void-recipe-debug .section {
+    margin-bottom: 9px;
+    padding: 6px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 9px;
+    line-height: 12px;
+}
+#void-recipe-debug .section .block {
+    margin: 0 auto 6px;
+    padding: 6px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 0 none transparent;
+    font-size: 6px;
+}
+#void-recipe-debug .section .col {
+    float: left;
+    margin: 0 1px 1px 0;
+    width: auto;
+    min-width: 100px;
+}
+#void-recipe-debug .section .col.of-2 { width: calc((100% / 2) - 1px); }
+#void-recipe-debug .section .col.of-3 { width: calc((100% / 3) - 1px); }
+#void-recipe-debug .section .col.of-4 { width: calc((100% / 4) - 1px); }
+#void-recipe-debug .section .col.of-5 { width: calc((100% / 5) - 1px); }
+#void-recipe-debug .section .col.of-6 { width: calc((100% / 6) - 1px); }
+
+#void-recipe-debug .section.debug-tier-costs .col {
+    min-width: 160px;
+}
+#void-recipe-debug .section .tier-block {
+    float: none;
+    clear: both;
+    margin: 0 auto 2px;
+    width: auto;
+    min-width: 160px;
+    min-height: 160px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+#void-recipe-debug .section .tier-block .type {
+    display: inline-block;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    padding: 0 3px;
+    font-weight: normal;
+}
+#void-recipe-debug .section .tier-block .data {
+    padding: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#void-recipe-debug .section .tier-block .name {
+    clear: left;
+    padding: 3px 6px;
+    font-weight: bold;
+    margin: 0 auto 6px 0;
+}
+#void-recipe-debug .section .tier-block .list {
+
+}
+#void-recipe-debug .section .tier-block .list .item {
+
+}
+#void-recipe-debug .section .tier-block .list .item .name {
+    float: left;
+    margin: 0 6px 3px 0;
+    text-align: center;
+    width: 40px;
+    /* background-color: magenta; */
+}
+#void-recipe-debug .section .tier-block .list .list {
+    float: right;
+    padding-top: 3px;
+    margin: 0 auto 3px 0;
+    width: calc(100% - 48px);
+    /* background-color: cyan; */
+}
+#void-recipe-debug .section .tier-block .list .list .item {
+    float: left;
+    clear: left;
+    margin: 0 3px 3px 0;
+}
+#void-recipe-debug .section .tier-block .list .list .item + .item {
+    filter: brightness(0.6);
+}
+#void-recipe-debug .section .tier-block .order,
+#void-recipe-debug .section .tier-block .robot,
+#void-recipe-debug .section .tier-block .robot > span {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 auto;
+}
+#void-recipe-debug .section .tier-block .order {
+    margin-right: 3px;
+    width: 1rem;
+}
+#void-recipe-debug .section .tier-block .order:after {
+    content: "-";
+    margin-left: 3px;
+    opacity: 0.3;
+}
+#void-recipe-debug .section .tier-block .robot {
+
+}
+#void-recipe-debug .section .tier-block .robot > span {
+    min-width: 7px;
+    min-height: 14px;
+}
+#void-recipe-debug .section .tier-block .robot > span:first-child {
+    border-right: 0 none transparent;
+    border-radius: 3px 0 0 3px;
+}
+#void-recipe-debug .section .tier-block .robot > span:last-child {
+    border-left: 0 none transparent;
+    border-radius: 0 3px 3px 0;
+}
+#void-recipe-debug .section .tier-block .robot .r-icon {
+    width: 15px;
+    position: relative;
+    text-align: center;
+    overflow: hidden;
+}
+#void-recipe-debug .section .tier-block .robot .r-icon:before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    border-radius: 2px 0 0 2px;
+    background-color: rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+#void-recipe-debug .section .tier-block .robot .r-icon > i {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#void-recipe-debug .section .tier-block .robot .r-name {
+    border-left: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+#void-recipe-debug .section .tier-block .robot.mecha .r-icon:before { background-color: rgba(0, 0, 0, 0.2); }
+#void-recipe-debug .section .tier-block .robot.master .r-icon:before { background-color: rgba(0, 0, 0, 0.4); }
+#void-recipe-debug .section .tier-block .robot.boss .r-icon:before { background-color: rgba(0, 0, 0, 0.6); }
