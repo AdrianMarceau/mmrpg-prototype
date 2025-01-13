@@ -207,7 +207,6 @@
                     for (let i = 0; i < mmrpgRobotTokens.length; i++){
                         let robotToken = mmrpgRobotTokens[i];
                         let robotInfo = mmrpgRobots[robotToken];
-                        if (robotInfo.robot_core === 'empty'){ continue; }
                         let robotClass = robotInfo.robot_class || 'mecha';
                         let robotCoreType = robotInfo.robot_core || 'none';
                         let robotStatTotal = (robotInfo.robot_energy
@@ -220,6 +219,12 @@
                         let roundedStatTotal = Math.round((robotStatTotal + roundVariance) / roundUpTo) * roundUpTo;
                         //let robotTierVal = baseQuanta + roundedStatTotal;
                         let robotTierVal = robotStatTotal;
+                        if (robotInfo.robot_core === 'empty'){
+                            if (robotClass === 'mecha'){ robotTierVal = 1; }
+                            else if (robotClass === 'master'){ robotTierVal = 10; }
+                            else if (robotClass === 'boss'){ robotTierVal = 100; }
+                            else { robotTierVal = 0; }
+                            }
                         let thisVoidTier = voidTiers[robotCoreType] || { type: robotCoreType, thresholds: [], queues: {} };
                         if (!thisVoidTier.queues[robotTierVal]){ thisVoidTier.queues[robotTierVal] = []; }
                         thisVoidTier.queues[robotTierVal].push(robotToken);
@@ -268,7 +273,7 @@
                     let $missionTargets = $('#vcr_targets', $parentDiv);
                     let $missionDetails = $('#vcr_details', $parentDiv);
                     let $battleField = $('#vcr_field', $parentDiv);
-                    let $debugDiv = $('#void-recipe-debug');
+                    let $debugDiv = $('#vcr_debug');
 
                     // Generate the item button markup to use in palette
                     let itemButtonMarkup = _self.getItemButtonMarkup();
@@ -324,30 +329,8 @@
                         $debugDiv.find('.debug-tier-costs').remove();
                         let voidTiers = indexes.voidTiers;
                         let orderedTypes = Object.values(indexes.typeTokens);
-                        /*
-                        let reorderedTypes = (function(types){
-                            let robotCounts = {};
-                            for (let i = 0; i < types.length; i++){
-                                let tierType = types[i];
-                                if (!voidTiers[tierType]){ continue; }
-                                let thisVoidTier = voidTiers[tierType];
-                                let tierThresholds = thisVoidTier.thresholds;
-                                let reversedTierThresholds = tierThresholds.slice(0).reverse();
-                                let totalRobots = 0;
-                                for (let j = 0; j < reversedTierThresholds.length; j++){
-                                    let tierThreshold = reversedTierThresholds[j];
-                                    let tierRobots = thisVoidTier.queues[tierThreshold];
-                                    totalRobots += tierRobots.length;
-                                    }
-                                robotCounts[tierType] = totalRobots;
-                                }
-                            return Object.keys(robotCounts).sort(function(a, b){
-                                return robotCounts[a] - robotCounts[b];
-                                });
-                            })(orderedTypes);
-                        reorderedTypes = orderedTypes; // TEMP TEMP TEMP
-                        */
                         let classIcons = {master: 'robot', mecha: 'ghost', boss: 'skull'};
+                        let coreReqThreshold = 500;
                         let numColumns = 4;
                         let blocksPerColumn = Math.ceil(orderedTypes.length / numColumns);
                         let lastColumn = false;
@@ -368,8 +351,12 @@
                                         for (let j = 0; j < reversedTierThresholds.length; j++){
                                             let tierThreshold = reversedTierThresholds[j];
                                             let tierRobots = thisVoidTier.queues[tierThreshold];
+                                            let tierCoreReq = (tierThreshold / coreReqThreshold);
                                             thisMarkup += '<li class="item">\n';
-                                                thisMarkup += '<label class="name type empty">@ ' + tierThreshold + '</label>\n';
+                                                thisMarkup += '<label class="name type empty">';
+                                                    //thisMarkup += '<span class="req"><i class="fa fa-fire-alt"></i> >= ' + tierCoreReq + '</span>';
+                                                    thisMarkup += '<span class="req"><i class="fa fa-atom"></i> >= ' + tierThreshold + '</span>';
+                                                thisMarkup += '</label>\n';
                                                 thisMarkup += '<ul class="list">\n';
                                                     for (let k = 0; k < tierRobots.length; k++){
                                                         let robotToken = tierRobots[k];
@@ -638,8 +625,8 @@
                             return markup;
                             },
                         renderBasePowers: function($missionDetails, basePowersValues){
-                            let icons = {quanta: 'atom', spread: 'code-branch', delta: 'delta'};
-                            let types = {quanta: 'water', spread: 'laser', delta: 'space_empty'};
+                            let icons = {quanta: 'atom', spread: 'code-branch', focus: 'compress', delta: 'delta'};
+                            let types = {quanta: 'water', spread: 'laser', focus: 'time', delta: 'space_empty'};
                             let markup = '<div class="void-powers ltr bgo base-powers">';
                                 for (const [token, value] of Object.entries(basePowersValues)) {
                                     let name = token.charAt(0).toUpperCase() + token.slice(1);
@@ -671,49 +658,46 @@
                             markup += '</div>';
                             $missionDetails.append(markup);
                             },
-                        renderSortPowers: function($missionDetails, sortFlowsGrouped){
-                            console.log('VoidPowersRenderer.renderSortPowers($missionDetails, sortFlowsGrouped) w/', {sortFlowsGrouped});
-                            for (const [groupToken, groupValues] of Object.entries(sortFlowsGrouped)){
-                                let groupValuesTokens = Object.keys(groupValues);
-                                //console.log('-> rendering groupValuesTokens [' + groupValuesTokens.join(', ', ) + ']');
-                                let groupValuesSum = 0 + (groupValuesTokens.length ? (function(){ var keys = groupValuesTokens, vals = groupValues, sum = 0; for (var i = 0; i < keys.length; i++){ var key = keys[i]; sum += Math.abs(vals[key]); } return sum; })() : 0);
-                                if (!groupValuesTokens.length || groupValuesSum === 0){ continue; }
-                                //console.log('-> rendering group:', {groupToken, groupValues, groupValuesTokens, groupValuesSum});
-                                let groupIcon = groupToken === 'stat' ? 'bullseye' : 'fire-alt';
-                                let groupName = groupToken === 'stat' ? 'Flow (Stats)' : 'Flow (Types)';
-                                let groupPaddMod = groupToken === 'stat' ? 1 : 15;
-                                let groupPaddMax = groupToken === 'stat' ? 40 : 80;
-                                let markup = '<div class="void-powers rtl bgi sort-powers ' + groupToken + '-sort-powers">';
-                                    markup += '<div class="power label type space_empty">';
-                                        markup += '<span class="icon"><i class="fa fas fa-' + groupIcon + '"></i></span>';
-                                        markup += '<span class="name blur"><strong>' + groupName + '</strong></span>';
-                                        markup += '<span class="icon"><i class="fa fas fa-sort"></i></span>';
-                                    markup += '</div>';
-                                    let sortedTokens = _self.sortTokensByItemOrder(groupValuesTokens);
-                                    let numSortedTokens = sortedTokens.length;
-                                    let maxLeftPadding = Math.min((groupValuesSum * groupPaddMod), groupPaddMax);
-                                    //sortedTokens.sort((a, b) => groupValues[b] - groupValues[a]); // sort by highest first
-                                    markup += '<div class="flow">';
-                                        sortedTokens.forEach((token, index) => {
-                                            let name = token.charAt(0).toUpperCase() + token.slice(1);
-                                            var value = groupValues[token];
-                                            var absGroupValue = Math.abs(value);
-                                            var paddingValue = Math.round((absGroupValue / groupValuesSum) * maxLeftPadding);
-                                            const config = {
-                                                token, name, value,
-                                                typeClass: ('sort type ' + token),
-                                                spanOrder: ['value', 'name'],
-                                                blurSpans: ['name'],
-                                                extraClasses: (value ? (value > 0 ? 'plus' : 'minus') : ''),
-                                                //spanPadding: (value !== 0 ? (value > 0 ? {'left': paddingValue} : {'right': paddingValue})  : 0),
-                                                spanPadding: (value !== 0 ? (paddingValue / 2)  : 0),
-                                                };
-                                            markup += this.generatePowerElement(config);
-                                            });
-                                    markup += '</div>';
+                        renderFlowPowers: function($missionDetails, flowPowersValues){
+                            console.log('VoidPowersRenderer.renderFlowPowers($missionDetails, flowPowersValues) w/', {flowPowersValues});
+                            let flowPowersTokens = Object.keys(flowPowersValues);
+                            //console.log('-> rendering flowPowersTokens [' + flowPowersTokens.join(', ', ) + ']');
+                            let flowValuesSum = 0 + (flowPowersTokens.length ? (function(){ var keys = flowPowersTokens, vals = flowPowersValues, sum = 0; for (var i = 0; i < keys.length; i++){ var key = keys[i]; sum += Math.abs(vals[key]); } return sum; })() : 0);
+                            if (!flowPowersTokens.length || flowValuesSum === 0){ return; }
+                            //console.log('-> rendering group:', {'typeFlows', flowPowersValues, flowPowersTokens, flowValuesSum});
+                            let groupIcon = 'fire-alt'; //'microchip'; //'bullseye';
+                            let groupName = 'Flow (Types)';
+                            let groupPaddMod = 15;
+                            let groupPaddMax = 80;
+                            let markup = '<div class="void-powers rtl bgi flow-powers">';
+                                markup += '<div class="power label type space_empty">';
+                                    markup += '<span class="icon"><i class="fa fas fa-' + groupIcon + '"></i></span>';
+                                    markup += '<span class="name blur"><strong>' + groupName + '</strong></span>';
+                                    markup += '<span class="icon"><i class="fa fas fa-sort"></i></span>';
                                 markup += '</div>';
-                                $missionDetails.append(markup);
-                                }
+                                let sortedTokens = _self.sortTokensByItemOrder(flowPowersTokens);
+                                let numSortedTokens = sortedTokens.length;
+                                let maxLeftPadding = Math.min((flowValuesSum * groupPaddMod), groupPaddMax);
+                                markup += '<div class="flow">';
+                                    sortedTokens.forEach((token, index) => {
+                                        let name = token.charAt(0).toUpperCase() + token.slice(1);
+                                        var value = flowPowersValues[token];
+                                        var absGroupValue = Math.abs(value);
+                                        var paddingValue = Math.round((absGroupValue / flowValuesSum) * maxLeftPadding);
+                                        const config = {
+                                            token, name, value,
+                                            typeClass: ('sort type ' + token),
+                                            spanOrder: ['value', 'name'],
+                                            blurSpans: ['name'],
+                                            extraClasses: (value ? (value > 0 ? 'plus' : 'minus') : ''),
+                                            //spanPadding: (value !== 0 ? (value > 0 ? {'left': paddingValue} : {'right': paddingValue})  : 0),
+                                            spanPadding: (value !== 0 ? (paddingValue / 2)  : 0),
+                                            };
+                                        markup += this.generatePowerElement(config);
+                                        });
+                                markup += '</div>';
+                            markup += '</div>';
+                            $missionDetails.append(markup);
                             },
                         renderStatPowers: function($missionDetails, statPowersValues){
                             // sort the rank powers by value to display them in order of energy, weapons, attack, defense, speed
@@ -998,69 +982,62 @@
 
                     // Check to see which group the item belongs to and then parse its values
 
-                    // -- UNDEFINED -----
-                    if (itemToken === ''){
-                        //return;
+                    /* QUANTA ITEMS & MODULES */
+
+                    // ELEMENTAL CORES (NATURE, FLAME, WATER, etc.)
+                    // Effects: +FLOW
+                    if (itemIsCore){
+                        var typeToken = itemPrefix;
+                        var typeValue = 1.0;
+                        powers.incFlow(typeToken, typeValue * quantity);
+                        if (powers.getPower('quanta') < 1){ powers.setPower('quanta', 1); }
+                        if (powers.getPower('spread') < 1){ powers.setPower('spread', 1); }
+                        return;
                         }
 
-                    // -- QUANTA ITEMS ---- //
-                    else if (itemGivesQuanta || itemModsQuanta){
-
-                        // SIZED SCREWS (SMALL, LARGE, HYPER)
-                        // Effects: +QUANTA
-                        if (itemIsScrew){
-                            var itemIsSmall = itemPrefix === 'small';
-                            var itemIsLarge = itemPrefix === 'large';
-                            var itemIsHyper = itemPrefix === 'hyper';
-                            var quantaValue = 0, tierToken = '';
-                            if (itemIsSmall){ quantaValue = 5.0, tierToken = 'mecha'; }
-                            else if (itemIsLarge){ quantaValue = 10.0, tierToken = 'master'; }
-                            else if (itemIsHyper){ quantaValue = 100.0, tierToken = 'boss'; }
-                            powers.incPower('quanta', quantaValue * quantity);
-                            //powers.incPower('quanta_'+tierToken, 1 * quantity);
-                            }
-
-                        // QUANTA MODULES
-                        if (itemIsModule){
-                            // CHARGE | Effects: QUANTA x2
-                            if (itemPrefix === 'charge'){
-                                var quanta = powers.getPower('quanta') * 1.00;
-                                powers.incPower('quanta', quanta * quantity);
-                                }
-                            }
-
+                    // METAL SCREWS (SMALL, LARGE, HYPER)
+                    // Effects: +QUANTA
+                    if (itemIsScrew){
+                        var itemIsSmall = itemPrefix === 'small';
+                        var itemIsLarge = itemPrefix === 'large';
+                        var itemIsHyper = itemPrefix === 'hyper';
+                        var quantaValue = 1.0;
+                        if (itemIsSmall){ quantaValue = 5.0; }
+                        else if (itemIsLarge){ quantaValue = 10.0; }
+                        else if (itemIsHyper){ quantaValue = 100.0; }
+                        powers.incPower('quanta', quantaValue * quantity);
+                        if (powers.getPower('spread') < 1){ powers.setPower('spread', 1); }
+                        return;
                         }
 
-                    // -- SPREAD ITEMS (NUMBER OF TARGETS) --
-                    else if (itemGivesSpread || itemModsSpread){
-
-                        // ELEMENTAL CORES (NATURE, FLAME, WATER, etc.)
-                        // Effects: +SPREAD && +TYPE-FLOW
-                        if (itemIsCore){
-                            var typeToken = itemPrefix;
-                            var spreadValue = 1.0, typeValue = 5.0;
-                            powers.incPower('spread', spreadValue * quantity);
-                            powers.incFlow(typeToken, quantity);
-                            }
-
-                        // SPREAD MODULES
-                        if (itemIsModule){
-                            // SPREADER | Effects: SPREAD +1
-                            if (itemPrefix === 'spreader'){
-                                var spread = 1.00;
-                                powers.incPower('spread', spread * quantity);
-                                }
-                            // TARGET | Effects: SPREAD -1
-                            if (itemPrefix === 'target'){
-                                var spread = 1.00;
-                                powers.decPower('spread', spread * quantity);
-                                }
-                            }
-
+                    // CHARGE MODULE
+                    // Effects: xQUANTA
+                    if (itemIsModule && itemPrefix === 'charge'){
+                        var quantaBoost = Math.ceil(powers.getPower('quanta') * 0.5);
+                        powers.incPower('quanta', quantaBoost * quantity);
+                        return;
                         }
+
+                    // TARGET MODULE
+                    // Effects: +SPREAD
+                    if (itemIsModule && itemPrefix === 'target'){
+                        var spreadBoost = 1;
+                        powers.incPower('spread', spreadBoost * quantity);
+                        return;
+                        }
+
+                    // SPREADER MODULE
+                    // Effects: +FOCUS
+                    if (itemIsModule && itemPrefix === 'focus'){
+                        var focusBoost = 1;
+                        powers.incPower('focus', focusBoost * quantity);
+                        return;
+                        }
+
+                    /* RANK-STAT ITEMS & MODULES */
 
                     // -- RANK-STAT ITEMS (ENERGY[LEVEL], WEAPONS[FORTE]) --
-                    else if (itemGivesRankStats || itemModsRankStats){
+                    if (itemGivesRankStats || itemModsRankStats){
 
                         // Collect the stat token and base value
                         var statToken = itemIsEnergy ? 'level' : 'forte';
@@ -1070,16 +1047,14 @@
                         // Effects: +LEVEL/MAX && +STAT-FLOW
                         if (itemIsEnergy){
                             if (itemIsPellet || itemIsCapsule || itemIsTank){
-                                var flowBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 2 : 0) + (itemIsTank ? 3 : 0));
                                 var powerBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 5 : 0) + (itemIsTank ? 10 : 0));
-                                powers.incFlow(statToken, flowBoost);
                                 powers.incPower(statToken, powerBoost);
+                                return;
                                 }
                             else if (itemIsUpgrade){
-                                var flowBoost = statBase * (5);
                                 var powerBoost = statBase * (100);
-                                powers.incFlow(statToken, flowBoost);
                                 powers.incPower(statToken+'Max', powerBoost);
+                                return;
                                 }
                             }
 
@@ -1087,23 +1062,23 @@
                         // Effects: +FORTE/MAX && +STAT-FLOW
                         if (itemIsWeapons){
                             if (itemIsPellet || itemIsCapsule || itemIsTank){
-                                var flowBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 2 : 0) + (itemIsTank ? 3 : 0));
                                 var powerBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 3 : 0) + (itemIsTank ? 5 : 0));
-                                powers.incFlow(statToken, flowBoost);
                                 powers.incPower(statToken, powerBoost);
+                                return;
                                 }
                             else if (itemIsUpgrade){
-                                var flowBoost = statBase * (5);
                                 var powerBoost = statBase * (10);
-                                powers.incFlow(statToken, flowBoost);
                                 powers.incPower(statToken+'Max', powerBoost);
+                                return;
                                 }
                             }
 
                         }
 
+                    /* TRI-STAT ITEMS & MODULES */
+
                     // -- TRI-STAT ITEMS (ATTACK, DEFENSE, SPEED) --
-                    else if (itemGivesTriStats || itemModsTriStats){
+                    if (itemGivesTriStats || itemModsTriStats){
 
                         // Collect the stat token and base value
                         var statToken = itemPrefix;
@@ -1114,21 +1089,19 @@
                         if (itemIsPellet
                             || itemIsCapsule
                             || itemIsBooster){
-                            var flowBoost = statBase * ((itemIsPellet ? 1 : 0) + (itemIsCapsule ? 2 : 0) + (itemIsBooster ? 3 : 0));
                             var powerBoost = statBase * ((itemIsPellet ? 2 : 0) + (itemIsCapsule ? 3 : 0) + (itemIsBooster ? 5 : 0));
                             if (itemIsAttack || itemIsDefense || itemIsSpeed){
-                                powers.incFlow(statToken, flowBoost);
                                 powers.incPower(statToken, powerBoost);
+                                return;
                                 }
                             else if (itemIsSuper){
                                 var superTokens = ['attack', 'defense', 'speed'];
-                                flowBoost /= superTokens.length;
                                 powerBoost /= superTokens.length;
                                 for (var i = 0; i < superTokens.length; i++){
                                     var superToken = superTokens[i];
-                                    powers.incFlow(superToken, Math.floor(flowBoost));
                                     powers.incPower(superToken, Math.floor(powerBoost));
                                     }
+                                return;
                                 }
                             }
 
@@ -1146,15 +1119,22 @@
                             powers.decPower(divertFrom, powerBreak);
                             for (var i = 0; i < divertTo.length; i++){
                                 var divertToToken = divertTo[i];
-                                var flowBoost = receiveAmount * 3, powerBoost = receiveAmount * 1;
-                                powers.incFlow(divertToToken, flowBoost);
+                                var powerBoost = receiveAmount * 1;
                                 powers.incPower(divertToToken, powerBoost);
                                 }
+                            return;
                             }
 
                         }
 
+                    // Otherwise, this item is undefined
+                    return;
+
                     /*
+                    // UNDEFINED ITEM [SKIP]
+                    if (itemToken === ''){
+                        //return;
+                        }
                     // ELEMENTAL CIRCUITS w/ TYPES [+ TYPE-MODS]
                     else if (itemIsCircuit){
                         var opposingTypes = [], opposingValues = [10, 10];
@@ -1167,8 +1147,6 @@
                         powers.incPower(opposingTypes[0], opposingValues[0] * quantity);
                         powers.decPower(opposingTypes[1], opposingValues[1] * quantity);
                         }
-                    */
-
                     // -- MODULE ITEMS w/ SPECIAL EFFECTS
                     else if (itemIsModule){
                         if (itemPrefix === 'growth'){
@@ -1207,7 +1185,6 @@
                             var shiftPower = quantity * 1;
                             powers.incPower('xfield', shiftPower);
                             }
-                        /*
                         else if (itemPrefix === 'field'){
                             // field boost is special and also boosts shift power
                             var fieldPower = Math.floor(quantity / 10); //quantity > 0 ? (Math.floor(quantity / 10) + 1) : 0;
@@ -1215,8 +1192,8 @@
                             powers.incPower('field', fieldPower);
                             powers.incPower('shift', shiftPower);
                             }
-                            */
                         }
+                    */
 
                     // end of voidRecipeWizard.parseItem()
                     },
@@ -1341,10 +1318,10 @@
                     return sortedTypePowers;
                     // end of voidRecipeWizard.filterTypePowers()
                     },
-                filterSortFlows: function(flows, kind, sort){
+                filterFlowPowers: function(flows, kind, sort){
                     kind = typeof kind !== 'undefined' ? kind : 'all';
                     sort = typeof sort === 'undefined' ? true : sort;
-                    console.log('%c' + 'voidRecipeWizard.filterSortFlows()', 'color: magenta;');
+                    console.log('%c' + 'voidRecipeWizard.filterFlowPowers()', 'color: magenta;');
                     //console.log('-> w/ flows:', flows, 'kind:', kind, 'sort:', sort);
                     // parse out flows that represent types and then order them highest first
                     const _self = this;
@@ -1396,7 +1373,7 @@
                         }
                     //console.log('=> sortedSortPowers:', sortedSortPowers);
                     return sortedSortPowers;
-                    // end of voidRecipeWizard.filterSortFlows()
+                    // end of voidRecipeWizard.filterFlowPowers()
                     },
                 sortTokensByItemOrder: function(unsortedTokens){
                     console.log('%c' + 'voidRecipeWizard.sortTokensByItemOrder()', 'color: magenta;');
@@ -1408,181 +1385,6 @@
                     return sortedTokens;
                     // end of voidRecipeWizard.sortTokensByItemOrder()
                     },
-                /* distributeQuanta: function(quanta, spread) {
-                    console.log('%c' + 'voidRecipeWizard.distributeQuanta() w/ quanta: ' + quanta + ', spread: ' + spread, 'color: magenta;');
-                    //console.log('-> w/ quanta:', quanta, 'spread:', spread);
-
-                    // Define the main thresholds for primary slots
-                    const _self = this;
-                    const config = _self.config;
-                    const thresholds = config.minQuantaPerClass;
-                    const tiers = Object.keys(thresholds);
-                    const targets = [];
-
-                    // Predefine variables to hold needed quanta and spread values
-                    var numTargetSlots = spread;
-                    var quantaAvailable = quanta;
-                    var quantaRemaining = quantaAvailable;
-                    //console.log('-> numTargetSlots:', numTargetSlots);
-                    //console.log('-> quantaAvailable:', quantaAvailable);
-                    //console.log('-> quantaRemaining:', quantaRemaining);
-
-                    // We know the spread, so let's pre-populate with empty slots
-                    //console.log('-> [step-1] populate targets array with placeholders!');
-                    for (let i = 0; i < numTargetSlots; i++) {
-                        targets.push({
-                            tier: '',
-                            class: '',
-                            level: 0,
-                            forte: 0,
-                            quanta: [0, 0],
-                            });
-                        }
-                    //console.log('-> step-1 // targets:', JSON.stringify(targets));
-                    //console.log('-> step-1 // quantaAvailable:', quantaAvailable);
-                    //console.log('-> step-1 // quantaRemaining:', quantaRemaining);
-
-                    // Now let's loop through each tier, in order, and try to upgrade each slot
-                    //console.log('-> [step-2] upgrade targets in array to upper tiers!');
-                    for (let i = 0; i < tiers.length; i++){
-                        let tier = tiers[i];
-                        let tierClass = tier.split('-')[0];
-                        let tierThreshold = thresholds[tier];
-                        //console.log('-> processing tier:', tier, 'w/ tierThreshold:', tierThreshold);
-                        for (let j = 0; j < targets.length; j++){
-                            let target = targets[j];
-                            let currentTier = target.tier;
-                            let currentClass = target.class;
-                            let currentAmount = target.quanta[1];
-                            let needed = tierThreshold - currentAmount;
-                            //console.log('-> processing target:', target, 'w/ currentTier:', currentTier, 'currentAmount:', currentAmount);
-                            //console.log('-> checking needed:', needed, 'vs. quantaRemaining:', quantaRemaining);
-                            if (needed <= 0){ continue; }
-                            if (quantaRemaining >= needed){
-                                //console.log('-> quantaRemaining >= needed!');
-                                quantaRemaining -= needed;
-                                target.tier = tier;
-                                target.class = tierClass;
-                                target.quanta[0] = tierThreshold;
-                                target.quanta[1] = tierThreshold + currentAmount;
-                                //console.log('-> updated target to tier:', targets[j].tier, 'class:', targets[j].class, 'amount:', targets[j].amount);
-                                }
-                            }
-                        }
-                    //console.log('-> step-2 // targets:', JSON.stringify(targets));
-                    //console.log('-> step-2 // quantaAvailable:', quantaAvailable);
-                    //console.log('-> step-2 // quantaRemaining:', quantaRemaining);
-
-                    // If there's any remaining quanta, distribute it evenly across the slots
-                    //console.log('-> [step-3] distribute remaining quanta evenly across slots!');
-                    if (quantaRemaining > 0){
-                        let quantaPerSlot = Math.floor(quantaRemaining / numTargetSlots);
-                        let quantaOverflow = quantaRemaining % numTargetSlots;
-                        //console.log('-> quantaPerSlot:', quantaPerSlot, 'quantaOverflow:', quantaOverflow);
-                        for (let i = 0; i < targets.length; i++){
-                            let target = targets[i];
-                            target.quanta[1] += quantaPerSlot;
-                            if (quantaOverflow > 0){
-                                target.quanta[1] += 1;
-                                quantaOverflow -= 1;
-                                }
-                            //console.log('-> updated target ['+i+'] to:', target);
-                            }
-                        }
-                    //console.log('-> step-3 // targets:', JSON.stringify(targets));
-                    //console.log('-> step-3 // quantaAvailable:', quantaAvailable);
-                    //console.log('-> step-3 // quantaRemaining:', quantaRemaining);
-
-                    // Return the list of generated targets
-                    return targets;
-
-                    // end of voidRecipeWizard.distributeQuanta()
-                    }, */
-                /* distributeQuantaV2: function(quanta, spread, push) {
-                    console.log('%c' + 'voidRecipeWizard.distributeQuantaV2() w/ quanta: ' + quanta + ', spread: ' + spread + ', push: ' + push, 'color: magenta;');
-                    console.log('-> w/ quanta:', quanta, 'spread:', spread, 'push:', push);
-
-                    // Define the main thresholds for primary slots
-                    const _self = this;
-                    const config = _self.config;
-                    const targets = [];
-                    const tiersByQuanta = _self.indexes.voidTiersByQuanta;
-                    const tiersInOrder = _self.indexes.voidTiersInOrder;
-
-                    // Define defaults for quanta, spread, and push
-                    quanta = quanta || 0, spread = spread || 0, push = push || 0;
-                    if (!quanta && !spread){ return false; }
-
-                    // Predefine variables to hold needed quanta and spread values
-                    var numTargetSlots = spread;
-                    var quantaAvailable = quanta;
-                    var quantaRemaining = quantaAvailable;
-                    console.log('-> numTargetSlots:', numTargetSlots);
-                    console.log('-> quantaAvailable:', quantaAvailable);
-                    console.log('-> quantaRemaining:', quantaRemaining);
-
-                    // We know the spread, so let's pre-populate with empty slots
-                    console.log('-> [step-1] populate targets array with placeholders!');
-                    for (let i = 0; i < numTargetSlots; i++){
-                        targets.push({
-                            tier: 0,
-                            level: 0,
-                            forte: 0,
-                            quanta: 0,
-                            });
-                        }
-                    console.log('-> step-1 // targets:', JSON.stringify(targets));
-                    console.log('-> step-1 // quantaAvailable:', quantaAvailable);
-                    console.log('-> step-1 // quantaRemaining:', quantaRemaining);
-
-                    // Now we can loop through each target and try to get it as high as possible
-                    console.log('-> [step-2] upgrade target to max tier possible given quanta!');
-                    for (let i = 0; i < numTargetSlots; i++){
-                        let target = targets[i];
-                        console.log('--> processing targets['+i+'] (target:', target, ') w/ quantaRemaining:', quantaRemaining);
-                        for (let j = 0; j < tiersInOrder.length; j++){
-                            let tierValue = tiersInOrder[j];
-                            console.log('---> comparing tierValue:', tierValue, 'vs. quantaRemaining:', quantaRemaining);
-                            if (tierValue > quantaRemaining){ continue; }
-                            let tierRobots = tiersByQuanta[tierValue];
-                            console.log('---> ensure there are tierRobots (length:', tierRobots.length, 'tokens:', tierRobots, ')');
-                            if (!tierRobots.length){ continue; }
-                            target.tier = tierValue;
-                            target.quanta = tierValue;
-                            quantaRemaining -= tierValue;
-                            console.log('-> updated target tier to tier:', target.tier, 'w/ quanta:', target.quanta);
-                            break;
-                            }
-                        }
-                    console.log('-> step-2 // targets:', JSON.stringify(targets));
-                    console.log('-> step-2 // quantaAvailable:', quantaAvailable);
-                    console.log('-> step-2 // quantaRemaining:', quantaRemaining);
-
-                    // If there's any remaining quanta, distribute it evenly across the slots
-                    console.log('-> [step-3] distribute remaining quanta evenly across slots!');
-                    if (quantaRemaining > 0){
-                        let quantaPerSlot = Math.floor(quantaRemaining / numTargetSlots);
-                        let quantaOverflow = quantaRemaining % numTargetSlots;
-                        console.log('--> quantaPerSlot:', quantaPerSlot, 'quantaOverflow:', quantaOverflow);
-                        for (let i = 0; i < targets.length; i++){
-                            let target = targets[i];
-                            target.quanta += quantaPerSlot;
-                            if (quantaOverflow > 0){
-                                target.quanta += 1;
-                                quantaOverflow -= 1;
-                                }
-                            console.log('---> updated target ['+i+'] to:', target);
-                            }
-                        }
-                    console.log('-> step-3 // targets:', JSON.stringify(targets));
-                    console.log('-> step-3 // quantaAvailable:', quantaAvailable);
-                    console.log('-> step-3 // quantaRemaining:', quantaRemaining);
-
-                    // Return the list of generated targets
-                    return targets;
-
-                    // end of voidRecipeWizard.distributeQuantaV2()
-                    }, */
                 generateTargetQueue: function(robots, types, stats){
                     console.log('%c' + 'voidRecipeWizard.generateTargetQueue()', 'color: magenta;');
                     //console.log('-> w/ robots:', robots, 'types:', types, 'stats:', stats);
@@ -1706,8 +1508,9 @@
                         voidPowers.flags = {};
                         };
                     voidPowers.powers.delta = 0;
-                    voidPowers.powers.spread = 0;
                     voidPowers.powers.quanta = 0;
+                    voidPowers.powers.spread = 0;
+                    voidPowers.powers.focus = 0;
                     voidPowers.powers.level = 0;
                     voidPowers.powers.forte = 0;
                     voidPowers.powers.effort = 0;
@@ -1718,32 +1521,50 @@
                     voidPowers.flags.reverse = false;
                     voidPowers.flags.extreme = false;
 
+                    // As long as there are items present, we can pre-boost certain base and rank powers to one
+                    if (voidItemsTokens.length){
+                        voidPowers.powers.quanta = 1;
+                        voidPowers.powers.spread = 1;
+                        voidPowers.powers.focus = 1;
+                        voidPowers.powers.level = 1;
+                        voidPowers.powers.forte = 1;
+                        }
+
                     // Loop through all the items, one-by-one, and parse their intrinsic values
                     for (var i = 0; i < voidItemsTokens.length; i++){
                         var itemToken = voidItemsTokens[i];
                         var itemQuantity = voidItems[itemToken];
                         _self.parseItem({token: itemToken}, itemQuantity, voidPowers);
-                        //for (var j = 0; j < itemQuantity; j++){ }
                         }
 
                     // As long as items are present, we should make keep certain values in scope
                     if (voidItemsTokens.length){
-                        // Ensure the quanta is always at least zero if there are items present
-                        if (voidPowers.powers.quanta < 0){ voidPowers.powers.quanta = 0; }
-                        // Ensure the spread always within range when there are items present
-                        if (voidPowers.powers.spread < 0){ voidPowers.powers.spread = 0; }
-                        // Ensure the level is always at least one if there are items present
-                        if (voidPowers.powers.level < 1){ voidPowers.powers.level = 1; }
-                        // Ensure the forte is always at least zero if there are items present
-                        if (voidPowers.powers.forte < 0){ voidPowers.powers.forte = 0; }
-                        // Ensure the max values for level stay above and below thresbholds
-                        if (voidPowers.powers.levelMax < 0){ voidPowers.powers.levelMax = 0; }
-                        else if (voidPowers.powers.levelMax > 999){ voidPowers.powers.levelMax = 999; }
-                        if (voidPowers.powers.level > voidPowers.powers.levelMax){ voidPowers.powers.level = voidPowers.powers.levelMax; }
-                        // Ensure the max values for forte stay above and below thresbholds
-                        if (voidPowers.powers.forteMax < 0){ voidPowers.powers.forteMax = 0; }
-                        else if (voidPowers.powers.forteMax > 99){ voidPowers.powers.forteMax = 99; }
-                        if (voidPowers.powers.forte > voidPowers.powers.forteMax){ voidPowers.powers.forte = voidPowers.powers.forteMax; }
+                        // Ensure certain values (quanta, spread, etc.) are rounded-up to one if they're above zero
+                        // but otherwise rounded-down to prevent min-values from stacking up and overflowing
+                        let roundedWithCare = ['quanta', 'spread', 'level', 'forte'];
+                        let roundedWithMaxes = {'level': 999, 'forte': 99};
+                        for (var i = 0; i < roundedWithCare.length; i++){
+                            var powerToken = roundedWithCare[i];
+                            var powerValue = voidPowers.powers[powerToken] || 0;
+                            if (powerValue <= 0){ powerValue = 0; }
+                            else if (powerValue > 0 && powerValue < 1){ powerValue = 1; }
+                            else { powerValue = Math.floor(powerValue); }
+                            voidPowers.powers[powerToken] = powerValue;
+                            if (roundedWithMaxes[powerToken]){
+                                var maxPowerToken = powerToken + 'Max';
+                                var maxPowerValue = voidPowers.powers[maxPowerToken] || 0;
+                                var maxPowerLimit = roundedWithMaxes[powerToken];
+                                if (maxPowerValue <= 0){ maxPowerValue = 0; }
+                                else if (maxPowerValue > 0 && maxPowerValue < 1){ maxPowerValue = 1; }
+                                else if (maxPowerValue > maxPowerLimit){ maxPowerValue = maxPowerLimit; }
+                                else { maxPowerValue = Math.floor(maxPowerValue); }
+                                voidPowers.powers[maxPowerToken] = maxPowerValue;
+                                if (powerValue > maxPowerValue){
+                                    powerValue = maxPowerValue;
+                                    voidPowers.powers[powerToken] = powerValue;
+                                    }
+                                }
+                            }
                         }
 
                     // Make sure the spread never goes above max values
@@ -1816,8 +1637,8 @@
                     //var typePowersList = _self.filterTypePowers(voidPowersList);
                     //console.log('-> statPowersList:', statPowersList);
                     //console.log('-> typePowersList:', typePowersList);
-                    var statFlowsList = _self.filterSortFlows(voidFlowsList, 'stats');
-                    var typeFlowsList = _self.filterSortFlows(voidFlowsList, 'types');
+                    var statFlowsList = _self.filterFlowPowers(voidFlowsList, 'stats');
+                    var typeFlowsList = _self.filterFlowPowers(voidFlowsList, 'types');
                     //console.log('-> statFlowsList:', statFlowsList);
                     //console.log('-> typeFlowsList:', typeFlowsList);
 
@@ -1840,18 +1661,23 @@
                             var bIndex = voidItemsTokens.indexOf(b+'-core');
                             return aIndex - bIndex;
                             });
+                        console.log('-> typeFlowTokens:', typeFlowTokens);
+                        console.log('-> typeFlowTotal:', typeFlowTotal);
+                        console.log('-> typeFlowTokensSorted:', typeFlowTokensSorted);
+                        console.log('-> typeFlowsList:', typeFlowsList);
                         for (var i = 0; i < typeFlowTokensSorted.length; i++){
                             var typeToken = typeFlowTokensSorted[i];
                             var typeValue = typeFlowsList[typeToken];
                             if (typeValue === 0){ continue; }
                             var typeSlots = Math.round((typeValue / typeFlowTotal) * effectiveSpread);
+                            if (typeSlots < 1){ typeSlots = 1; }
                             distributedTypes[typeToken] = typeSlots;
                             // add the token to the slots array as many times as their are slots for it
                             for (var j = 0; j < typeSlots; j++){ distributedTypeSlots.push(typeToken); }
                             }
                         })();
-                    console.log('-> distributedTypes:', JSON.stringify(distributedTypes), distributedTypes);
-                    console.log('-> distributedTypeSlots:', JSON.stringify(distributedTypeSlots), distributedTypeSlots);
+                    console.log('-> distributedTypes:', distributedTypes);
+                    console.log('-> distributedTypeSlots:', distributedTypeSlots);
 
                     // First we set-up the different target slots given quanta vs spread
                     // using predefined thresholds to determine each target's class
@@ -1869,7 +1695,7 @@
                         const voidTierTypes = indexes.voidTierTypes;
                         const voidTierValues = indexes.voidTierValues;
                         const voidTierRanks = indexes.voidTierRanks;
-                        console.log('-> targetSlotTemplates:', targetSlotTemplates, '\n' + '-> voidTiers:', voidTiers, '\n' + '-> voidTierValues:', voidTierValues, '\n' + '-> voidTierRanks:', voidTierRanks);
+                        console.log('-> voidTiers:', voidTiers, '\n' + '-> voidTierValues:', voidTierValues, '\n' + '-> voidTierRanks:', voidTierRanks);
 
                         // Predefine variables to hold needed quanta and spread values
                         var numTargetSlots = spread;
@@ -1898,11 +1724,15 @@
                         for (let i = 0; i < numTargetSlots; i++){
                             console.log('--> step-2 // processing target slot {'+i+'}', '\n' + '-> w/ target:', targetSlotTemplates[i], '\n' + '-> w/ targetType:', types[i]);
                             let target = targetSlotTemplates[i];
-                            let targetType = types[i];
+                            let targetType = types[i] || 'empty';
                             target.type = targetType;
                             let targetQuanta = 0;
                             let tierInfo = voidTiers[targetType];
                             console.log('---> step-2 // checking quanta thresholds in ' + targetType + '-tier:', '\n' + '-> w/ quantaRemaining:', quantaRemaining, '\n' + '-> w/ tierInfo:', tierInfo);
+                            if (!tierInfo){
+                                console.log('%c' + '---> step-2 // no tierInfo found for targetType "' + targetType + '"', 'color: red;');
+                                continue;
+                                }
                             let tierThresholds = tierInfo.thresholds || [];
                             let tierRobotQueues = tierInfo.queues || {};
                             console.log('---> step-2 // pulling info about ' + targetType + '-tier:', '\n' + '-> w/ tierThresholds:', tierThresholds, '\n' + '-> w/ tierRobotQueues:', tierRobotQueues);
@@ -2251,53 +2081,20 @@
                         var VoidPowersRenderer = _self.voidPowersRenderer;
 
                         // Define object variables to hold the different kinds of powers we display
-                        var basePowersValues = {delta: 0, spread: 0, quanta: 0};
-                        var rankPowersValues = {level: 1, forte: 0};
+                        var basePowersValues = {delta: 0, quanta: 0, spread: 0, focus: 0};
+                        var rankPowersValues = {level: 0, forte: 0};
                         var rankPowersValuesMax = {level: 100, forte: 10};
+                        var flowPowersValues = {};
                         var statPowersValues = {};
-                        var sortFlowsGrouped = {};
-                        statPowersValues.attack = { /* ... */ };
-                        statPowersValues.defense = { /* ... */ };
-                        statPowersValues.speed = { /* ... */ };
-                        sortFlowsGrouped.type = { /* ... */ };
-                        sortFlowsGrouped.stat = { /* ... */ };
-
-                        /*
-                        // TEMP TEMP TEMP: HARD CODED TESTING POWERS!!! <<
-                        basePowersValues.quanta = 123;
-                        basePowersValues.spread = 3;
-                        rankPowersValues.level = 123;
-                        rankPowersValues.forte = 45;
-                        rankPowersValuesMax.level = 999;
-                        rankPowersValuesMax.forte = 99;
-                        sortFlowsGrouped.stat.energy = 47;
-                        sortFlowsGrouped.stat.weapons = -4;
-                        sortFlowsGrouped.stat.attack = 3;
-                        sortFlowsGrouped.stat.defense = -25;
-                        sortFlowsGrouped.stat.speed = 2;
-                        sortFlowsGrouped.type.flame = 3;
-                        sortFlowsGrouped.type.water = 1;
-                        sortFlowsGrouped.type.electric = 28;
-                        sortFlowsGrouped.type.cutter = 7;
-                        sortFlowsGrouped.type.crystal = 38;
-                        sortFlowsGrouped.type.time = -34;
-                        sortFlowsGrouped.type.nature = 2;
-                        statPowersValues.attack.value = 0.3;
-                        statPowersValues.attack.boosts = 0;
-                        statPowersValues.attack.breaks = 0;
-                        statPowersValues.defense.value = -1;
-                        statPowersValues.defense.boosts = 0;
-                        statPowersValues.defense.breaks = 1;
-                        statPowersValues.speed.value = 3;
-                        statPowersValues.speed.boosts = 3;
-                        statPowersValues.speed.breaks = 0;
-                        // >> TEMP TEMP TEMP: HARD CODED TESTING POWERS!!!
-                        */
+                        for (var i = 0, stats = ['attack', 'defense', 'speed']; i < stats.length; i++){
+                            statPowersValues[stats[i]] = { value: 0, boosts: 0, breaks: 0 };
+                            }
 
                         // Pull in current values for the base powers we'll be displaying
                         if (voidPowers.delta){ basePowersValues.delta = voidPowers.delta; }
                         if (voidPowers.spread){ basePowersValues.spread = voidPowers.spread; }
                         if (voidPowers.quanta){ basePowersValues.quanta = voidPowers.quanta; }
+                        if (voidPowers.focus){ basePowersValues.focus = voidPowers.focus; }
 
                         // Pull in current values for the rank powers we'll be displaying
                         if (voidPowers.level){ rankPowersValues.level = voidPowers.level; }
@@ -2306,11 +2103,9 @@
                         if (voidPowers.forteMax){ rankPowersValuesMax.forte = voidPowers.forteMax; }
 
                         // Pull in current values for the sort powers we'll be displaying
-                        var typeSortFlows = _self.filterSortFlows(voidFlows, 'types');
-                        var statSortFlows = _self.filterSortFlows(voidFlows, 'stats');
-                        if (typeSortFlows){ sortFlowsGrouped.type = Object.assign({}, sortFlowsGrouped.type, typeSortFlows); }
-                        if (statSortFlows){ sortFlowsGrouped.stat = Object.assign({}, sortFlowsGrouped.stat, statSortFlows); }
-                        //console.log('FLOW DEBUG:', {voidFlows, statSortFlows, typeSortFlows, sortFlowsGrouped});
+                        var typeFlows = _self.filterFlowPowers(voidFlows, 'types');
+                        if (typeFlows){ flowPowersValues = Object.assign({}, flowPowersValues, typeFlows); }
+                        console.log('FLOW DEBUG:', {voidFlows, typeFlows, flowPowersValues});
 
                         // Pull in current values for the stat powers we'll be displaying
                         let rawStatPowers = _self.filterStatPowers(voidPowers);
@@ -2328,16 +2123,16 @@
                             }
                         //console.log('STAT DEBUG:', {voidPowers, rawStatPowers, statPowersValues});
 
-                        // Check the base powers (quanta and spread) to display the appropriate markup
+                        // Render the base powers (quanta and spread) to display the appropriate markup
                         VoidPowersRenderer.renderBasePowers($missionDetails, basePowersValues);
 
-                        // Check the rank powers (level and forte) to display appropriate markup
+                        // Render the rank powers (level and forte) to display appropriate markup
                         VoidPowersRenderer.renderRankPowers($missionDetails, rankPowersValues, rankPowersValuesMax);
 
-                        // Check the sort powers (stat and type) to display appropriate markup
-                        VoidPowersRenderer.renderSortPowers($missionDetails, sortFlowsGrouped);
+                        // Render the flow powers (elemental types) to display appropriate markup
+                        VoidPowersRenderer.renderFlowPowers($missionDetails, flowPowersValues);
 
-                        // Check for relative stat powers (attack, defense, speed) and display appropriate markup
+                        // Render for relative stat powers (attack, defense, speed) and display appropriate markup
                         VoidPowersRenderer.renderStatPowers($missionDetails, statPowersValues);
 
                         }
@@ -2350,6 +2145,7 @@
                         const mmrpgIndexRobots = mmrpgIndex.robots;
                         const frameTokenByKey = {0: 'base', 1: 'defense', 2: 'base2', 3: 'defend', 4: 'base', 5: 'defend', 6: 'base2', 7: 'defend'};
                         var targetListRobotMarkup = '';
+                        var targetListRobotCount = 0;
                         for (var i = 0; i < missionTargets.length; i++){
                             var targetKey = i;
                             var targetLayer = config.maxTargets - i;
@@ -2398,8 +2194,9 @@
                                 targetRobotMarkup += '</div>';
                             targetRobotMarkup += '</div>';
                             targetListRobotMarkup += targetRobotMarkup;
+                            targetListRobotCount += 1;
                             }
-                        $targetList.append('<div class="wrapper">' + targetListRobotMarkup + '</div>');
+                        $targetList.append('<div class="wrapper has-'+targetListRobotCount+' '+(targetListRobotCount % 2 === 0 ? 'has-even' : 'has-odd')+'">' + targetListRobotMarkup + '</div>');
                         }
 
                     // end of voidRecipeWizard.refreshUI()
