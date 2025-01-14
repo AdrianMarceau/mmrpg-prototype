@@ -525,6 +525,7 @@
                                 iconClass, typeClass, extraClasses, extraStyles,
                                 hasCode, hasArrows, numBoosts, numBreaks,
                                 spanOrder, spanPadding, blurSpans, hideSpans,
+                                isDisabled,
                                 }){
                             //console.log('-> generating power element:', {token, name, value, maxValue, isPercent, iconClass, typeClass, extraClasses, extraStyles, hasCode, hasArrows, numBoosts, numBreaks, spanOrder, spanPadding, blurSpans});
                             token = typeof token === 'string' ? token : '';
@@ -545,6 +546,8 @@
                             hideSpans = hideSpans || [];
                             spanPadding = spanPadding || 0;
                             spanOrder = spanOrder || [];
+                            isDisabled = isDisabled || false;
+                            isInert = value === 0 || isDisabled;
                             let arrowClasses = 'value arrows';
                             let iconClasses = 'icon';
                             let nameClasses = 'name';
@@ -603,6 +606,8 @@
                             if (spanOrder.indexOf('code') === -1){ spanOrder.push('code'); }
                             var elementClasses = '';
                             elementClasses += 'power ' + typeClass;
+                            if (isInert){ elementClasses += ' inert'; }
+                            if (isDisabled){ elementClasses += ' disabled'; }
                             if (extraClasses.length){ elementClasses += ' ' + extraClasses; }
                             var elementStyles = '';
                             if (spanPadding){
@@ -633,18 +638,20 @@
                         renderBasePowers: function($missionDetails, basePowersValues){
                             let icons = {quanta: 'atom', spread: 'code-branch', focus: 'compress', delta: 'delta'};
                             let types = {quanta: 'water', spread: 'laser', focus: 'time', delta: 'space_empty'};
-                            let markup = '<div class="void-powers ltr bgo base-powers">';
+                            let markup = '<div class="void-powers ltr bgo cts base-powers">';
                                 for (const [token, value] of Object.entries(basePowersValues)) {
                                     //if (value === 0){ continue; }
                                     let name = token.charAt(0).toUpperCase() + token.slice(1);
                                     let icon = token === 'quanta' ? 'atom' : 'code-branch';
+                                    var disabled = (value === 0) ? true : false;
                                     const config = {
                                         token, name, value,
                                         iconClass: icons[token],
-                                        hideSpans: (value === 0 ? ['name', 'value'] : []),
                                         typeClass: ('base type ' + types[token]),
                                         blurSpans: ['name'],
                                         isPlusMinus: (token === 'focus' ? true : false),
+                                        isDisabled: disabled,
+                                        hideSpans: (disabled ? ['name', 'value'] : []),
                                         };
                                     markup += this.generatePowerElement(config);
                                     }
@@ -652,7 +659,7 @@
                             $missionDetails.append(markup);
                             },
                         renderRankPowers: function($missionDetails, rankPowersValues, rankPowersMaxValues){
-                            let markup = '<div class="void-powers rtl bgo rank-powers">';
+                            let markup = '<div class="void-powers rtl bgo cts rank-powers">';
                                 for (const [token, value] of Object.entries(rankPowersValues)) {
                                     let name = token.charAt(0).toUpperCase() + token.slice(1);
                                     let maxValue = rankPowersMaxValues[token] || 0;
@@ -682,7 +689,7 @@
                             let groupName = 'Flow (Types)';
                             let groupPaddMod = 15;
                             let groupPaddMax = 80;
-                            let markup = '<div class="void-powers rtl bgi flow-powers">';
+                            let markup = '<div class="void-powers rtl bgi cts flow-powers">';
                                 markup += '<div class="power label type space_empty">';
                                     markup += '<span class="icon"><i class="fa fas fa-' + groupIcon + '"></i></span>';
                                     markup += '<span class="name blur"><strong>' + groupName + '</strong></span>';
@@ -697,14 +704,16 @@
                                         var value = flowPowersValues[token];
                                         var absGroupValue = Math.abs(value);
                                         var paddingValue = Math.round((absGroupValue / flowValuesSum) * maxLeftPadding);
+                                        var isDisabled = (value === 0) ? true : false;
                                         const config = {
                                             token, name, value,
                                             typeClass: ('sort type ' + token),
                                             spanOrder: ['value', 'name'],
                                             blurSpans: ['name'],
-                                            hideSpans: (value === 0 ? ['name'] : []),
                                             extraClasses: (value ? (value > 0 ? 'plus' : 'minus') : ''),
                                             spanPadding: (value !== 0 ? (paddingValue / 2)  : 0),
+                                            isDisabled: isDisabled,
+                                            hideSpans: (isDisabled ? ['name'] : []),
                                             };
                                         markup += this.generatePowerElement(config);
                                         });
@@ -725,6 +734,7 @@
                                     //if (values['value'] === 0){ continue; }
                                     let value = values['value'];
                                     var iconClass = false;
+                                    var isDisabled = (value === 0) ? true : false;
                                     switch (token){
                                         case 'attack': iconClass = 'sword'; break;
                                         case 'defense': iconClass = 'shield-alt'; break;
@@ -736,16 +746,16 @@
                                         typeClass: ('stat type ' + token),
                                         blurSpans: ['name', 'value', 'code'],
                                         spanOrder: ['arrows', 'value', 'name', 'code'],
-                                        hideSpans: (value === 0 ? ['name', 'value'] : []),
                                         hasArrows: true,
                                         numBoosts: values['boosts'],
                                         numBreaks: values['breaks'],
-                                        //hasCode: false,
+                                        isDisabled: isDisabled,
+                                        hideSpans: (isDisabled ? ['name', 'value'] : []),
                                         };
                                     markup += this.generatePowerElement(config);
                                     }
                             if (!markup.length){ return; }
-                            markup = '<div class="void-powers rtl bgo stat-powers">' + markup + '</div>';
+                            markup = '<div class="void-powers rtl bgo cts stat-powers">' + markup + '</div>';
                             $missionDetails.append(markup);
                             }
                         };
