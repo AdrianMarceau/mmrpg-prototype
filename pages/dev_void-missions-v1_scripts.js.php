@@ -521,10 +521,10 @@
                     const _self = this;
                     const config = _self.config;
                     return {
-                        generatePowerElement: function({ token, name, value, maxValue, isPercent,
+                        generatePowerElement: function({ token, name, value, maxValue, isPercent, isPlusMinus,
                                 iconClass, typeClass, extraClasses, extraStyles,
                                 hasCode, hasArrows, numBoosts, numBreaks,
-                                spanOrder, spanPadding, blurSpans,
+                                spanOrder, spanPadding, blurSpans, hideSpans,
                                 }){
                             //console.log('-> generating power element:', {token, name, value, maxValue, isPercent, iconClass, typeClass, extraClasses, extraStyles, hasCode, hasArrows, numBoosts, numBreaks, spanOrder, spanPadding, blurSpans});
                             token = typeof token === 'string' ? token : '';
@@ -536,11 +536,13 @@
                             extraClasses = extraClasses || '';
                             extraStyles = extraStyles || '';
                             isPercent = isPercent || false;
+                            isPlusMinus = isPlusMinus || false;
                             hasCode = hasCode || false;
                             hasArrows = hasArrows || false;
                             numBoosts = numBoosts || 0;
                             numBreaks = numBreaks || 0;
                             blurSpans = blurSpans || [];
+                            hideSpans = hideSpans || [];
                             spanPadding = spanPadding || 0;
                             spanOrder = spanOrder || [];
                             let arrowClasses = 'value arrows';
@@ -560,19 +562,23 @@
                             var iconMarkup = '';
                             var arrowsMarkup = '';
                             var codeMarkup = '';
-                            if (name){
+                            if (name && !hideSpans.includes('name')){
                                 nameMarkup += '<span class="'+nameClasses+'"><strong>'+name+'</strong></span>';
                                 }
-                            if (typeof value !== 'undefined'){
+                            if (typeof value !== 'undefined' && !hideSpans.includes('value')){
                                 var roundedValue = Math.round(value * 10) / 10;
-                                valueMarkup += '<span class="'+valueClasses+'"><data>'+ roundedValue + (isPercent ? '%' : '') + '</data>';
-                                if (maxValue){ valueMarkup += '<sub>/ '+maxValue+'</sub>'; }
+                                valueMarkup += '<span class="'+valueClasses+'">';
+                                    //valueMarkup += '<data>'+ ((isPlusMinus && roundedValue !== 0) ? (roundedValue > 0 ? '+' : '-') : '') + roundedValue + (isPercent ? '%' : '') + '</data>';
+                                    valueMarkup += ((isPlusMinus && roundedValue !== 0) ? (roundedValue > 0 ? '+' : '-') : '');
+                                    valueMarkup += '<data>' + roundedValue + '</data>';
+                                    valueMarkup += (isPercent ? '%' : '');
+                                    if (maxValue){ valueMarkup += '<sub>/ '+maxValue+'</sub>'; }
                                 valueMarkup += '</span>';
                                 }
-                            if (iconClass){
+                            if (iconClass && !hideSpans.includes('icon')){
                                 iconMarkup += '<span class="'+iconClasses+'"><i class="fa fas fa-'+iconClass+'"></i></span>';
                                 }
-                            if (hasArrows && (numBoosts || numBreaks)){
+                            if (hasArrows && (numBoosts || numBreaks) && !hideSpans.includes('arrows')){
                                 arrowsMarkup += '<span class="'+arrowClasses+'">';
                                 for (let i = 0; i < numBoosts; i++){ arrowsMarkup += '<span class="arrow boost"><i class="fas fa-caret-up"></i></span>'; }
                                 for (let i = 0; i < numBreaks; i++){ arrowsMarkup += '<span class="arrow break"><i class="fas fa-caret-down"></i></span>'; }
@@ -580,7 +586,7 @@
                                 if (numBoosts >= config.maxArrows){ extraClasses += ' max'; }
                                 if (numBreaks >= config.maxArrows){ extraClasses += ' min'; }
                                 }
-                            if (hasCode){
+                            if (hasCode && !hideSpans.includes('code')){
                                 var powerCode = token.substring(0, 2).toUpperCase();
                                 if (token === 'energy'){ powerCode = 'LE'; }
                                 if (token === 'weapons'){ powerCode = 'WE'; }
@@ -629,13 +635,16 @@
                             let types = {quanta: 'water', spread: 'laser', focus: 'time', delta: 'space_empty'};
                             let markup = '<div class="void-powers ltr bgo base-powers">';
                                 for (const [token, value] of Object.entries(basePowersValues)) {
+                                    //if (value === 0){ continue; }
                                     let name = token.charAt(0).toUpperCase() + token.slice(1);
                                     let icon = token === 'quanta' ? 'atom' : 'code-branch';
                                     const config = {
                                         token, name, value,
                                         iconClass: icons[token],
+                                        hideSpans: (value === 0 ? ['name', 'value'] : []),
                                         typeClass: ('base type ' + types[token]),
-                                        blurSpans: ['name']
+                                        blurSpans: ['name'],
+                                        isPlusMinus: (token === 'focus' ? true : false),
                                         };
                                     markup += this.generatePowerElement(config);
                                     }
@@ -663,7 +672,11 @@
                             let flowPowersTokens = Object.keys(flowPowersValues);
                             //console.log('-> rendering flowPowersTokens [' + flowPowersTokens.join(', ', ) + ']');
                             let flowValuesSum = 0 + (flowPowersTokens.length ? (function(){ var keys = flowPowersTokens, vals = flowPowersValues, sum = 0; for (var i = 0; i < keys.length; i++){ var key = keys[i]; sum += Math.abs(vals[key]); } return sum; })() : 0);
-                            if (!flowPowersTokens.length || flowValuesSum === 0){ return; }
+                            //if (!flowPowersTokens.length || flowValuesSum === 0){ return; }
+                            if (!flowPowersTokens.length || flowValuesSum === 0){
+                                flowPowersTokens = ['empty'];
+                                flowPowersValues = {empty: 0};
+                                }
                             //console.log('-> rendering group:', {'typeFlows', flowPowersValues, flowPowersTokens, flowValuesSum});
                             let groupIcon = 'fire-alt'; //'microchip'; //'bullseye';
                             let groupName = 'Flow (Types)';
@@ -689,8 +702,8 @@
                                             typeClass: ('sort type ' + token),
                                             spanOrder: ['value', 'name'],
                                             blurSpans: ['name'],
+                                            hideSpans: (value === 0 ? ['name'] : []),
                                             extraClasses: (value ? (value > 0 ? 'plus' : 'minus') : ''),
-                                            //spanPadding: (value !== 0 ? (value > 0 ? {'left': paddingValue} : {'right': paddingValue})  : 0),
                                             spanPadding: (value !== 0 ? (paddingValue / 2)  : 0),
                                             };
                                         markup += this.generatePowerElement(config);
@@ -707,9 +720,9 @@
                                     let token = statOrder[i];
                                     let name = token.charAt(0).toUpperCase() + token.slice(1);
                                     if (!statPowersValues[token]){ continue; }
-                                    var values = statPowersValues[token];
+                                    var values = statPowersValues[token] || { value: 0, boosts: 0, breaks: 0 };
                                     if (!values['value']){ values['value'] = 0; }
-                                    if (values['value'] === 0){ continue; }
+                                    //if (values['value'] === 0){ continue; }
                                     let value = values['value'];
                                     var iconClass = false;
                                     switch (token){
@@ -723,6 +736,7 @@
                                         typeClass: ('stat type ' + token),
                                         blurSpans: ['name', 'value', 'code'],
                                         spanOrder: ['arrows', 'value', 'name', 'code'],
+                                        hideSpans: (value === 0 ? ['name', 'value'] : []),
                                         hasArrows: true,
                                         numBoosts: values['boosts'],
                                         numBreaks: values['breaks'],
@@ -1018,17 +1032,17 @@
                         return;
                         }
 
-                    // TARGET MODULE
+                    // SPREADER MODULE
                     // Effects: +SPREAD
-                    if (itemIsModule && itemPrefix === 'target'){
+                    if (itemIsModule && itemPrefix === 'spreader'){
                         var spreadBoost = 1;
                         powers.incPower('spread', spreadBoost * quantity);
                         return;
                         }
 
-                    // SPREADER MODULE
+                    // TARGET MODULE
                     // Effects: +FOCUS
-                    if (itemIsModule && itemPrefix === 'focus'){
+                    if (itemIsModule && itemPrefix === 'target'){
                         var focusBoost = 1;
                         powers.incPower('focus', focusBoost * quantity);
                         return;
@@ -1525,7 +1539,6 @@
                     if (voidItemsTokens.length){
                         voidPowers.powers.quanta = 1;
                         voidPowers.powers.spread = 1;
-                        voidPowers.powers.focus = 1;
                         voidPowers.powers.level = 1;
                         voidPowers.powers.forte = 1;
                         }
@@ -2092,8 +2105,8 @@
 
                         // Pull in current values for the base powers we'll be displaying
                         if (voidPowers.delta){ basePowersValues.delta = voidPowers.delta; }
-                        if (voidPowers.spread){ basePowersValues.spread = voidPowers.spread; }
                         if (voidPowers.quanta){ basePowersValues.quanta = voidPowers.quanta; }
+                        if (voidPowers.spread){ basePowersValues.spread = voidPowers.spread; }
                         if (voidPowers.focus){ basePowersValues.focus = voidPowers.focus; }
 
                         // Pull in current values for the rank powers we'll be displaying

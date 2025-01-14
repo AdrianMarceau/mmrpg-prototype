@@ -516,7 +516,7 @@
     transform: translate(-50%, 0) scale(2.0);
     background-color: transparent;
     background-image: none;
-    opacity: 0.8;
+    opacity: 1.0;
     /* background-color: lime; */
 }
 #void-recipe #vcr_effects .black-hole .layer {
@@ -602,6 +602,7 @@
     background-color: rgba(0, 0, 0, 0.2);
     box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.2);
     border-radius: 6px;
+    max-width: 120px;
 }
 #void-recipe #vcr_title .sub {
     z-index: 4;
@@ -851,6 +852,15 @@
     margin: 0;
     padding: 0;
     border: 0 none transparent;
+}
+#void-recipe #vcr_details .void-powers.ltr .power > span:first-child:last-child > i,
+#void-recipe #vcr_details .void-powers.rtl .power > span:first-child:last-child > i,
+#void-recipe #vcr_details .void-powers.ltr .power > span:first-child:last-child > data,
+#void-recipe #vcr_details .void-powers.rtl .power > span:first-child:last-child > data {
+    display: inline-block;
+    min-width: 10px;
+    filter: invert(1) opacity(0.2);
+    text-shadow: none;
 }
 #void-recipe #vcr_details .void-powers .power > span.blur {
     opacity: 1;
