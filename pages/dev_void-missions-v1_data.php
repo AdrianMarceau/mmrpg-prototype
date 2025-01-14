@@ -43,52 +43,6 @@ $void_item_groups_index = array(
             ),
         ),
 
-    // -- STEP (BOOST [STATS]) -- //
-    array(
-        'step' => 'boost',
-        'name' => 'Boost',
-        'label' => 'Stats',
-        'side' => 'left',
-        'groups' => array(
-            'attack-boost' => array(
-                'name' => 'Attack-Boost Edibles',
-                'color' => 'attack',
-                'rowline' => 1,
-                'colspan' => 3,
-                'items' => array(
-                    'attack-pellet', 'attack-capsule', 'attack-booster',
-                    )
-                ),
-            'defense-boost' => array(
-                'name' => 'Defense-Boost Edibles',
-                'color' => 'defense',
-                'rowline' => 2,
-                'colspan' => 3,
-                'items' => array(
-                    'defense-pellet',  'defense-capsule', 'defense-booster',
-                    )
-                ),
-            'speed-boost' => array(
-                'name' => 'Speed-Boost Edibles',
-                'color' => 'speed',
-                'rowline' => 3,
-                'colspan' => 3,
-                'items' => array(
-                    'speed-pellet', 'speed-capsule', 'speed-booster',
-                    )
-                ),
-            'super-boost' => array(
-                'name' => 'Omni-Boost Edibles',
-                'color' => 'shield',
-                'rowline' => 4,
-                'colspan' => 3,
-                'items' => array(
-                    'super-pellet', 'super-capsule', 'field-booster',
-                    )
-                ),
-            ),
-        ),
-
     // -- STEP (UPGRADE [POWER]) -- //
     array(
         'step' => 'upgrade',
@@ -139,6 +93,52 @@ $void_item_groups_index = array(
                 'colspan' => 3,
                 'items' => array(
                     'fortune-module', 'growth-module', 'salvage-module',
+                    )
+                ),
+            ),
+        ),
+
+    // -- STEP (BOOST [STATS]) -- //
+    array(
+        'step' => 'boost',
+        'name' => 'Boost',
+        'label' => 'Stats',
+        'side' => 'left',
+        'groups' => array(
+            'attack-boost' => array(
+                'name' => 'Attack-Boost Edibles',
+                'color' => 'attack',
+                'rowline' => 1,
+                'colspan' => 3,
+                'items' => array(
+                    'attack-pellet', 'attack-capsule', 'attack-booster',
+                    )
+                ),
+            'defense-boost' => array(
+                'name' => 'Defense-Boost Edibles',
+                'color' => 'defense',
+                'rowline' => 2,
+                'colspan' => 3,
+                'items' => array(
+                    'defense-pellet',  'defense-capsule', 'defense-booster',
+                    )
+                ),
+            'speed-boost' => array(
+                'name' => 'Speed-Boost Edibles',
+                'color' => 'speed',
+                'rowline' => 3,
+                'colspan' => 3,
+                'items' => array(
+                    'speed-pellet', 'speed-capsule', 'speed-booster',
+                    )
+                ),
+            'super-boost' => array(
+                'name' => 'Omni-Boost Edibles',
+                'color' => 'shield',
+                'rowline' => 4,
+                'colspan' => 3,
+                'items' => array(
+                    'super-pellet', 'super-capsule', 'field-booster',
                     )
                 ),
             ),

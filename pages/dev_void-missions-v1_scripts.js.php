@@ -847,10 +847,13 @@
                         });
 
                     // Bind SELECT STEP click events to the group wrappers themselves
+                    let wrapTokens = [];
+                    $('.wrapper[data-step]', $itemsPalette).each(function(){ wrapTokens.push($(this).attr('data-token')); });
+                    if (wrapTokens.length < 5){ throw new Error('Invalid number of step wrappers found! [' + wrapTokens.length + '] w/ wrapTokens:', wrapTokens); }
                     let wrapDisplayOrders = {
-                        middle: ['manifest', 'boost', 'redirect', 'upgrade', 'distort'],
-                        left: ['upgrade', 'boost', 'manifest', 'redirect', 'distort'],
-                        right: ['distort', 'redirect', 'manifest', 'boost', 'upgrade'],
+                        middle: [ wrapTokens[0], wrapTokens[1], wrapTokens[3], wrapTokens[2], wrapTokens[4] ],
+                        left: [ wrapTokens[2], wrapTokens[1], wrapTokens[0], wrapTokens[3], wrapTokens[4] ],
+                        right: [ wrapTokens[4], wrapTokens[3], wrapTokens[0], wrapTokens[1], wrapTokens[2] ],
                         };
                     $('.wrapper[data-step]', $itemsPalette).live('click', function(e){
                         //console.log('step wrapper clicked! \n-> select-step:', $(this).attr('data-step'));

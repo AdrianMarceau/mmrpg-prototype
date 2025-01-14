@@ -158,6 +158,7 @@
     border: 1px solid #111111;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background-color: #2b2545;
+    background-color: #2b2545aa;
     border-radius: 3px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
     pointer-events: none;
@@ -317,6 +318,7 @@
     border: 1px solid rgba(255, 255, 255, 0.10);
     outline: 1px solid #111111;
     background-color: #261f47;
+    background-color: #261f47bb;
     box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 #void-recipe #vcr_lower .item-list .item.placeholder + .placeholder {
@@ -614,17 +616,18 @@
     filter: opacity(1.0);
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 }
-#void-recipe.is-ready #vcr_title .main {
-    transition: margin 0.3s;
-}
+#void-recipe.is-ready #vcr_title .main,
 #void-recipe.is-ready #vcr_title .sub {
-    transition: filter 0.3s;
+    transition: margin 0.3s, filter 0.3s;
 }
 #void-recipe.is-ready.has-content #vcr_title .main {
     margin-top: 4px;
 }
 #void-recipe.is-ready.has-content #vcr_title .sub {
     filter: opacity(0.0);
+}
+#void-recipe.is-ready.has-content #vcr_title:hover .main:not(:hover) {
+    filter: opacity(0.3);
 }
 #void-recipe.is-ready:not(.has-content) #vcr_title .sub {
     animation: vcr_sub-title-blink 6s infinite;
@@ -643,6 +646,8 @@
 #void-recipe #vcr_details {
     position: absolute;
     width: auto;
+    /* height: auto; */
+    /* min-height: 46px; */
     height: 0;
     min-height: 0;
     top: 4px;
@@ -1453,6 +1458,12 @@
 }
 #void-recipe #vcr_selection .item-list .item:last-child {
     margin-right: 0;
+}
+#void-recipe #vcr_selection .item-list .item .icon {
+    transform: translate(-4px, 0);
+}
+#void-recipe #vcr_selection .item-list .item .quantity {
+    transform: translate(4px, 0);
 }
 /*
 #void-recipe #vcr_selection .item-list .item .icon {
