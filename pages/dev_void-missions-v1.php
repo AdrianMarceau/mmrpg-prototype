@@ -50,11 +50,17 @@ require_once('pages/dev_void-missions-v1_data.php');
     <div class="subbody">
         <div class="text">
             <p>
-                Void Missions are procedurally generated missions being added to MMRPG.
-                Throw items into The Void to generate a temporary customized mission.
-                Each kinds and quantities have different effects on mission targets.
+                <u>Void Missions</u> are a type of procedurally-generated mission (maybe) being added to MMRPG Prototype.
+                <br /> &bull; <strong>TLDR</strong>; Throw items into The Void to generate a new (temporary) custom
+                mission for you to play, utilizing the kind, quantity, and order of items you have access to in order to
+                influence/determine the mission's properties (including its targets, location, and rewards).
+                <br /> &bull; <strong>Note</strong>: This is a work-in-progress <em>concept</em> of an idea, so it's
+                always changing and may not work as intended. Please be patient and understand if the final version is
+                different from what you see here or not-included at all (worst-case-scenario).
+                Thanks for <a href="#void-recipe_anchor">checking it out</a>!
             </p>
         </div>
+        <a id="void-recipe_anchor"></a>
     </div>
 
     <div id="void-recipe">

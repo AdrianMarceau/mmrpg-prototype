@@ -1719,20 +1719,20 @@
 #void-recipe #vcr_palette .wrapper[data-step][data-token="distort"]:not(.active) { background-color: #322028; }
 */
 
-#void-recipe #vcr_palette .wrapper[data-step][data-token="upgrade"].active { background-color: #2b2545; }
-#void-recipe #vcr_palette .wrapper[data-step][data-token="upgrade"]:not(.active) { background-color: #211b36; }
+#void-recipe #vcr_palette .wrapper[data-step]:nth-child(3).active { background-color: #2b2545; }
+#void-recipe #vcr_palette .wrapper[data-step]:nth-child(3):not(.active) { background-color: #211b36; }
 
-#void-recipe #vcr_palette .wrapper[data-step][data-token="boost"].active { background-color: #2b2545; }
-#void-recipe #vcr_palette .wrapper[data-step][data-token="boost"]:not(.active) { background-color: #2a1b36; }
+#void-recipe #vcr_palette .wrapper[data-step]:nth-child(2).active { background-color: #2b2545; }
+#void-recipe #vcr_palette .wrapper[data-step]:nth-child(2):not(.active) { background-color: #2a1b36; }
 
-#void-recipe #vcr_palette .wrapper[data-step][data-token="manifest"].active { background-color: #2b2545; }
-#void-recipe #vcr_palette .wrapper[data-step][data-token="manifest"]:not(.active) { background-color: #331b36; }
+#void-recipe #vcr_palette .wrapper[data-step]:nth-child(1).active { background-color: #2b2545; }
+#void-recipe #vcr_palette .wrapper[data-step]:nth-child(1):not(.active) { background-color: #331b36; }
 
-#void-recipe #vcr_palette .wrapper[data-step][data-token="redirect"].active { background-color: #2b2545; }
-#void-recipe #vcr_palette .wrapper[data-step][data-token="redirect"]:not(.active) { background-color: #361b30; }
+#void-recipe #vcr_palette .wrapper[data-step]:nth-child(4).active { background-color: #2b2545; }
+#void-recipe #vcr_palette .wrapper[data-step]:nth-child(4):not(.active) { background-color: #361b30; }
 
-#void-recipe #vcr_palette .wrapper[data-step][data-token="distort"].active { background-color: #2b2545; }
-#void-recipe #vcr_palette .wrapper[data-step][data-token="distort"]:not(.active) { background-color: #361b27; }
+#void-recipe #vcr_palette .wrapper[data-step]:nth-child(5).active { background-color: #2b2545; }
+#void-recipe #vcr_palette .wrapper[data-step]:nth-child(5):not(.active) { background-color: #361b27; }
 
 #void-recipe #vcr_palette .wrapper[data-step][data-side="left"][data-sidekey="1"] { left: 0; }
 #void-recipe #vcr_palette .wrapper[data-step][data-side="left"][data-sidekey="0"] { left: calc((100% - 320px) * 0.25);  }

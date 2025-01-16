@@ -43,113 +43,12 @@ $void_item_groups_index = array(
             ),
         ),
 
-    // -- STEP (UPGRADE [POWER]) -- //
-    array(
-        'step' => 'upgrade',
-        'name' => 'Upgrade',
-        'label' => 'Power',
-        'side' => 'left',
-        'groups' => array(
-            'level-boost' => array(
-                'name' => 'Level-Boost Edibles',
-                'color' => 'energy_electric',
-                'rowline' => 1,
-                'colspan' => 3,
-                'items' => array(
-                    'energy-pellet', 'energy-capsule', 'energy-tank',
-                    )
-                ),
-            'max-level-boost' => array(
-                'name' => 'Max Level-Boost Redirects',
-                'color' => 'electric',
-                'rowline' => 1,
-                'colspan' => 1,
-                'items' => array(
-                    'energy-upgrade',
-                    )
-                ),
-            'forte-boost' => array(
-                'name' => 'Forte-Boost Edibles',
-                'color' => 'weapons_shield',
-                'rowline' => 2,
-                'colspan' => 3,
-                'items' => array(
-                    'weapon-pellet', 'weapon-capsule', 'weapon-tank',
-                    )
-                ),
-            'max-forte-boost' => array(
-                'name' => 'Max Level-Boost Redirects',
-                'color' => 'shield',
-                'rowline' => 2,
-                'colspan' => 1,
-                'items' => array(
-                    'weapon-upgrade',
-                    )
-                ),
-            'power-balancers' => array(
-                'name' => 'Level Balancers',
-                'color' => 'copy',
-                'rowline' => 5,
-                'colspan' => 3,
-                'items' => array(
-                    'fortune-module', 'growth-module', 'salvage-module',
-                    )
-                ),
-            ),
-        ),
-
-    // -- STEP (BOOST [STATS]) -- //
-    array(
-        'step' => 'boost',
-        'name' => 'Boost',
-        'label' => 'Stats',
-        'side' => 'left',
-        'groups' => array(
-            'attack-boost' => array(
-                'name' => 'Attack-Boost Edibles',
-                'color' => 'attack',
-                'rowline' => 1,
-                'colspan' => 3,
-                'items' => array(
-                    'attack-pellet', 'attack-capsule', 'attack-booster',
-                    )
-                ),
-            'defense-boost' => array(
-                'name' => 'Defense-Boost Edibles',
-                'color' => 'defense',
-                'rowline' => 2,
-                'colspan' => 3,
-                'items' => array(
-                    'defense-pellet',  'defense-capsule', 'defense-booster',
-                    )
-                ),
-            'speed-boost' => array(
-                'name' => 'Speed-Boost Edibles',
-                'color' => 'speed',
-                'rowline' => 3,
-                'colspan' => 3,
-                'items' => array(
-                    'speed-pellet', 'speed-capsule', 'speed-booster',
-                    )
-                ),
-            'super-boost' => array(
-                'name' => 'Omni-Boost Edibles',
-                'color' => 'shield',
-                'rowline' => 4,
-                'colspan' => 3,
-                'items' => array(
-                    'super-pellet', 'super-capsule', 'field-booster',
-                    )
-                ),
-            ),
-        ),
-
     // -- STEP (REDIRECT [FORM]) -- //
     array(
         'step' => 'redirect',
         'name' => 'Redirect',
         'label' => 'Form',
-        'side' => 'right',
+        'side' => 'left',
         'groups' => array(
             'queue-rotators' => array(
                 'name' => 'Queue Rotators',
@@ -204,7 +103,7 @@ $void_item_groups_index = array(
         'step' => 'distort',
         'name' => 'Distort',
         'label' => 'Context',
-        'side' => 'right',
+        'side' => 'left',
         'groups' => array(
             'junk' => array(
                 'name' => 'Junk Items',
@@ -251,6 +150,107 @@ $void_item_groups_index = array(
                 'colspan' => 1,
                 'items' => array(
                     'alchemy-module', 'distill-module',
+                    )
+                ),
+            ),
+        ),
+
+    // -- STEP (BOOST [STATS]) -- //
+    array(
+        'step' => 'boost',
+        'name' => 'Boost',
+        'label' => 'Stats',
+        'side' => 'right',
+        'groups' => array(
+            'attack-boost' => array(
+                'name' => 'Attack-Boost Edibles',
+                'color' => 'attack',
+                'rowline' => 1,
+                'colspan' => 3,
+                'items' => array(
+                    'attack-pellet', 'attack-capsule', 'attack-booster',
+                    )
+                ),
+            'defense-boost' => array(
+                'name' => 'Defense-Boost Edibles',
+                'color' => 'defense',
+                'rowline' => 2,
+                'colspan' => 3,
+                'items' => array(
+                    'defense-pellet',  'defense-capsule', 'defense-booster',
+                    )
+                ),
+            'speed-boost' => array(
+                'name' => 'Speed-Boost Edibles',
+                'color' => 'speed',
+                'rowline' => 3,
+                'colspan' => 3,
+                'items' => array(
+                    'speed-pellet', 'speed-capsule', 'speed-booster',
+                    )
+                ),
+            'super-boost' => array(
+                'name' => 'Omni-Boost Edibles',
+                'color' => 'shield',
+                'rowline' => 4,
+                'colspan' => 3,
+                'items' => array(
+                    'super-pellet', 'super-capsule', 'field-booster',
+                    )
+                ),
+            ),
+        ),
+
+    // -- STEP (UPGRADE [POWER]) -- //
+    array(
+        'step' => 'upgrade',
+        'name' => 'Upgrade',
+        'label' => 'Power',
+        'side' => 'right',
+        'groups' => array(
+            'level-boost' => array(
+                'name' => 'Level-Boost Edibles',
+                'color' => 'energy_electric',
+                'rowline' => 1,
+                'colspan' => 3,
+                'items' => array(
+                    'energy-pellet', 'energy-capsule', 'energy-tank',
+                    )
+                ),
+            'max-level-boost' => array(
+                'name' => 'Max Level-Boost Redirects',
+                'color' => 'electric',
+                'rowline' => 1,
+                'colspan' => 1,
+                'items' => array(
+                    'energy-upgrade',
+                    )
+                ),
+            'forte-boost' => array(
+                'name' => 'Forte-Boost Edibles',
+                'color' => 'weapons_shield',
+                'rowline' => 2,
+                'colspan' => 3,
+                'items' => array(
+                    'weapon-pellet', 'weapon-capsule', 'weapon-tank',
+                    )
+                ),
+            'max-forte-boost' => array(
+                'name' => 'Max Level-Boost Redirects',
+                'color' => 'shield',
+                'rowline' => 2,
+                'colspan' => 1,
+                'items' => array(
+                    'weapon-upgrade',
+                    )
+                ),
+            'power-balancers' => array(
+                'name' => 'Level Balancers',
+                'color' => 'copy',
+                'rowline' => 5,
+                'colspan' => 3,
+                'items' => array(
+                    'fortune-module', 'growth-module', 'salvage-module',
                     )
                 ),
             ),

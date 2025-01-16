@@ -322,9 +322,9 @@
                     //console.log('xrefs:', xrefs);
 
                     // DEBUG DEBUG DEBUG
-                    console.log('CHECK FOR DEBUG', '\n', 'xrefs.debugDiv:', typeof xrefs.debugDiv, xrefs.debugDiv);
+                    //console.log('CHECK FOR DEBUG', '\n', 'xrefs.debugDiv:', typeof xrefs.debugDiv, xrefs.debugDiv);
                     if (xrefs.debugDiv){
-                        console.log('SHOWING DEBUG ON PAGE');
+                        //console.log('SHOWING DEBUG ON PAGE');
                         let $debugDiv = xrefs.debugDiv;
                         $debugDiv.find('.debug-tier-costs').remove();
                         let voidTiers = indexes.voidTiers;
@@ -387,7 +387,7 @@
                             lastColumn = currentColumn;
                             }
                         //tierCostsMarkup += '</div>';
-                        console.log('tierCostsMarkupByCol:', tierCostsMarkupByCol);
+                        //console.log('tierCostsMarkupByCol:', tierCostsMarkupByCol);
                         for (let i = 0; i <= numColumns; i++){
                             if (!tierCostsMarkupByCol[i]){ continue; }
                             let currentColumn = (i + 1);
@@ -2023,7 +2023,7 @@
                     if (voidPowersValSum === 0){
                         //console.log('%c' + '-> we have NO powers to generate content from!', 'color: amber;');
                         $upperDeck.append('<span class="loading">&hellip;</span>');
-                        return;
+                        //return;
                         } else {
                         //console.log('%c' + '-> we DO have powers to generate content from!', 'color: amber;');
                         _self.hasContent(true);
@@ -2101,7 +2101,7 @@
                     console.log('voidFlowsKeys:', voidFlowsKeys);
                     console.log('voidFlowsValSum:', voidFlowsValSum);
                     console.log('%c' + 'they have been rendered', 'background-color: black; color: cyan; padding: 0 6px;');
-                    if (voidPowersValSum > 0){
+                    if (true || voidPowersValSum > 0){
 
                         // Pull in the power renderer to make things easier
                         var VoidPowersRenderer = _self.voidPowersRenderer;
