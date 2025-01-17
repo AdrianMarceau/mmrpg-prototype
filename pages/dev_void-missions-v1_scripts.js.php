@@ -1672,7 +1672,7 @@
                     //var typePowersList = _self.filterTypePowers(voidPowersList);
                     //console.log('-> statPowersList:', statPowersList);
                     //console.log('-> typePowersList:', typePowersList);
-                    var statFlowsList = _self.filterFlowPowers(voidFlowsList, 'stats');
+                    //var statFlowsList = _self.filterFlowPowers(voidFlowsList, 'stats');
                     var typeFlowsList = _self.filterFlowPowers(voidFlowsList, 'types');
                     //console.log('-> statFlowsList:', statFlowsList);
                     //console.log('-> typeFlowsList:', typeFlowsList);
@@ -1682,8 +1682,6 @@
                     let effectiveSpread = baseSpread >= config.maxTargets ? config.maxTargets : (baseSpread < 1 ? 1 : Math.trunc(baseSpread));
                     let effectiveOffset = 0;
                     console.log('-> effectiveQuanta:', effectiveQuanta, '\n' + '-> effectiveSpread:', effectiveSpread, '\n' + '-> effectiveOffset:', effectiveOffset);
-
-                    // ------
 
                     // Define variables to hold the slot templates with distributed quanta material and elemental energy
                     let numTargetSlots = 0;
@@ -1804,175 +1802,42 @@
 
                         })(effectiveQuanta, effectiveSpread, typeFlowsList);
 
-
-                    /*
-                    // ------
-
-                    // Define which elemental types each slot should be
-                    let distributedTypes = {};
-                    let distributedTypeSlots = [];
-                    (function(){
-                        //voidRecipeWizard.distributeTypesV2()
-                        console.log('%c' + 'voidRecipeWizard.generateMission.distributedTypes(~)', 'color: lime;');
-                        var typeFlowTokens = Object.keys(typeFlowsList);
-                        var typeFlowTotal = (typeFlowTokens.length ? typeFlowTokens.reduce((acc, token) => acc + typeFlowsList[token], 0) : 0);
-                        var typeFlowTokensSorted = typeFlowTokens.slice().sort(function(a, b){
-                            var aIndex = voidItemsTokens.indexOf(a+'-core');
-                            var bIndex = voidItemsTokens.indexOf(b+'-core');
-                            return aIndex - bIndex;
-                            });
-                        console.log('-> typeFlowTokens:', typeFlowTokens);
-                        console.log('-> typeFlowTotal:', typeFlowTotal);
-                        console.log('-> typeFlowTokensSorted:', typeFlowTokensSorted);
-                        console.log('-> typeFlowsList:', typeFlowsList);
-                        for (var i = 0; i < typeFlowTokensSorted.length; i++){
-                            var typeToken = typeFlowTokensSorted[i];
-                            var typeValue = typeFlowsList[typeToken];
-                            if (typeValue === 0){ continue; }
-                            var typeSlots = Math.round((typeValue / typeFlowTotal) * effectiveSpread);
-                            if (typeSlots < 1){ typeSlots = 1; }
-                            distributedTypes[typeToken] = typeSlots;
-                            // add the token to the slots array as many times as their are slots for it
-                            for (var j = 0; j < typeSlots; j++){ distributedTypeSlots.push(typeToken); }
-                            }
-                        })();
-                    console.log('-> distributedTypes:', distributedTypes);
-                    console.log('-> distributedTypeSlots:', distributedTypeSlots);
-                    */
-
-                    /*
-                    // First we set-up the different target slots given quanta vs spread
-                    // using predefined thresholds to determine each target's class
-                    let targetSlotTemplates = [];
-                    (function(quanta, spread, offset, types){
-                        //voidRecipeWizard.distributeQuantaV2()
-                        console.log('%c' + 'voidRecipeWizard.generateMission.targetSlotTemplates(~)', 'color: lime;');
-
-                        if (!quanta && !spread){ return false; }
-                        quanta = quanta || 0, spread = spread || 0, offset = offset || 0;
-                        console.log('-> quanta:', quanta, '\n' + '-> spread:', spread, '\n' + '-> offset:', offset, '\n' + '-> types:', types);
-
-                        const indexes = _self.indexes;
-                        const voidTiers = indexes.voidTiers;
-                        const voidTierTypes = indexes.voidTierTypes;
-                        const voidTierValues = indexes.voidTierValues;
-                        const voidTierRanks = indexes.voidTierRanks;
-                        console.log('-> voidTiers:', voidTiers, '\n' + '-> voidTierValues:', voidTierValues, '\n' + '-> voidTierRanks:', voidTierRanks);
-
-                        // Predefine variables to hold needed quanta and spread values
-                        let numTargets = numTargetSlots;
-                        let quantaAvailable = quanta;
-                        let quantaRemaining = quantaAvailable;
-                        console.log('-> numTargets:', numTargets, '\n' + '-> quantaAvailable:', quantaAvailable, '\n' + '-> quantaRemaining:', quantaRemaining);
-
-                        // We know the spread, so let's pre-populate with empty slots
-                        console.log('-> [step-1] populate targetSlotTemplates array with placeholders!');
-                        for (let i = 0; i < numTargets; i++){
-                            targetSlotTemplates.push({
-                                type: '',
-                                tier: 0,
-                                level: 0,
-                                forte: 0,
-                                quanta: 0,
-                                queue: [],
-                                });
-                            }
-                        console.log('-> step-1 // quantaAvailable:', quantaAvailable);
-                        console.log('-> step-1 // quantaRemaining:', quantaRemaining);
-                        console.log('-> step-1 // targetSlotTemplates:', JSON.stringify(targetSlotTemplates));
-
-                        // Now we can loop through each target and try to get it as high as possible
-                        console.log('-> [step-2] upgrade target to max tier possible given quanta!');
-                        for (let i = 0; i < numTargets; i++){
-                            console.log('--> step-2 // processing target slot {'+i+'}', '\n' + '-> w/ target:', targetSlotTemplates[i], '\n' + '-> w/ targetType:', types[i]);
-                            let target = targetSlotTemplates[i];
-                            let targetType = types[i] || 'empty';
-                            target.type = targetType;
-                            let targetQuanta = 0;
-                            let tierInfo = voidTiers[targetType];
-                            console.log('---> step-2 // checking quanta thresholds in ' + targetType + '-tier:', '\n' + '-> w/ quantaRemaining:', quantaRemaining, '\n' + '-> w/ tierInfo:', tierInfo);
-                            if (!tierInfo){
-                                console.log('%c' + '---> step-2 // no tierInfo found for targetType "' + targetType + '"', 'color: red;');
-                                continue;
-                                }
-                            let tierThresholds = tierInfo.thresholds || [];
-                            let tierRobotQueues = tierInfo.queues || {};
-                            console.log('---> step-2 // pulling info about ' + targetType + '-tier:', '\n' + '-> w/ tierThresholds:', tierThresholds, '\n' + '-> w/ tierRobotQueues:', tierRobotQueues);
-                            for (let j = 0; j < tierThresholds.length; j++){
-                                let tierThreshold = tierThresholds[j];
-                                console.log('----> step-2 // comparing tierThreshold:', tierThreshold, 'vs. quantaRemaining:', quantaRemaining);
-                                if (tierThreshold > quantaRemaining){ continue; }
-                                let tierRobotQueue = tierRobotQueues[tierThreshold];
-                                console.log('----> step-2 // ensure there are tierRobotQueue (length:', tierRobotQueue.length, 'tokens:', tierRobotQueue, ')');
-                                if (!tierRobotQueue.length){ continue; }
-                                targetQuanta = tierThreshold;
-                                target.tier = tierThreshold;
-                                target.quanta = targetQuanta;
-                                target.queue = Object.assign([], tierRobotQueue);
-                                quantaRemaining -= targetQuanta;
-                                console.log('----> step-2 // target robot queue exists for '+targetType+'-tier-'+tierThreshold+':', '\n' + '-> w/ target.type:', target.type, '\n' + '-> w/ target.tier:', target.tier, '\n' + '-> w/ target.quanta:', target.quanta, '\n' + '-> w/ target.queue:', target.queue);
-                                break;
-                                }
-                            }
-                        console.log('-> step-2 // quantaAvailable:', quantaAvailable);
-                        console.log('-> step-2 // quantaRemaining:', quantaRemaining);
-                        console.log('-> step-2 // targetSlotTemplates:', JSON.stringify(targetSlotTemplates));
-
-                        // If there's any remaining quanta, distribute it evenly across the slots
-                        console.log('-> [step-3] distribute remaining quanta evenly across slots!');
-                        if (quantaRemaining > 0){
-                            let quantaPerSlot = Math.floor(quantaRemaining / numTargets);
-                            let quantaOverflow = quantaRemaining % numTargets;
-                            console.log('--> quantaPerSlot:', quantaPerSlot, 'quantaOverflow:', quantaOverflow);
-                            for (let i = 0; i < targetSlotTemplates.length; i++){
-                                let target = targetSlotTemplates[i];
-                                target.quanta += quantaPerSlot;
-                                if (quantaOverflow > 0){
-                                    target.quanta += 1;
-                                    quantaOverflow -= 1;
-                                    }
-                                console.log('---> updated target ['+i+'] to:', target);
-                                }
-                            }
-                        console.log('-> step-3 // quantaAvailable:', quantaAvailable);
-                        console.log('-> step-3 // quantaRemaining:', quantaRemaining);
-                        console.log('-> step-3 // targetSlotTemplates:', JSON.stringify(targetSlotTemplates));
-
-                        // end of voidRecipeWizard.distributeQuantaV2()
-                        })(effectiveQuanta, effectiveSpread, effectiveOffset, distributedTypeSlots);
-                    console.log('-> targetSlotTemplates:', JSON.stringify(targetSlotTemplates), targetSlotTemplates);
-                    */
-
                     // Use calculated quanta-per-target to set-up the different target slots
                     let missionTargets = [];
                     let numTargets = numTargetSlots;
-                    for (var slotKey = 0; slotKey < numTargets; slotKey++){
-                        var slotTemplate = targetSlotTemplates[slotKey];
-                        console.log('--> calculating slotKey:', slotKey, 'w/ slotTemplate:', slotTemplate);
-                        let targetRobot = {};
-                        var targetType = slotTemplate.type;
-                        var targetQuanta = slotTemplate.quanta;
-                        var targetQueue = slotTemplate.queue;
-                        targetRobot.token = '';
-                        targetRobot.class = '';
-                        targetRobot.level = 1;
-                        targetRobot.type = targetType;
-                        targetRobot.quanta = targetQuanta;
-                        // If there's at least one token in the queue, collect the target token
-                        if (targetQueue.length){
-                            var nextRobotToken = targetQueue[0];
-                            var nextRobotInfo = mmrpgIndex.robots[nextRobotToken];
-                            var nextRobotClass = nextRobotInfo.robot_class;
-                            targetRobot.class = nextRobotClass;
-                            targetRobot.token = nextRobotToken;
+                    if (numTargets > 0){
+                        console.log('%c' + 'voidRecipeWizard.generateMission.targetSlotTemplates(~)', 'color: green;');
+
+                        // Loop through the target slots templates w/ queues and use them to generate actual mission targets
+                        for (var slotKey = 0; slotKey < numTargets; slotKey++){
+                            var slotTemplate = targetSlotTemplates[slotKey];
+                            console.log('--> calculating slotKey:', slotKey, 'w/ slotTemplate:', slotTemplate);
+                            let targetRobot = {};
+                            var targetType = slotTemplate.type;
+                            var targetQuanta = slotTemplate.quanta;
+                            var targetQueue = slotTemplate.queue;
+                            targetRobot.token = '';
+                            targetRobot.class = '';
+                            targetRobot.level = 1;
+                            targetRobot.type = targetType;
+                            targetRobot.quanta = targetQuanta;
+                            // If there's at least one token in the queue, collect the target token
+                            if (targetQueue.length){
+                                var nextRobotToken = targetQueue[0];
+                                var nextRobotInfo = mmrpgIndex.robots[nextRobotToken];
+                                var nextRobotClass = nextRobotInfo.robot_class;
+                                targetRobot.class = nextRobotClass;
+                                targetRobot.token = nextRobotToken;
+                                }
+                            // If a token for this slot count not be found, default to a dark frag
+                            if (!targetRobot.token.length){
+                                targetRobot.token = 'dark-frag';
+                                }
+                            // Add the target robot to the mission targets list
+                            missionTargets.push(targetRobot);
+                            //console.log('--> pushed new target!', '\n-> targetRobot:', targetRobot);
                             }
-                        // If a token for this slot count not be found, default to a dark frag
-                        if (!targetRobot.token.length){
-                            targetRobot.token = 'dark-frag';
-                            }
-                        // Add the target robot to the mission targets list
-                        missionTargets.push(targetRobot);
-                        //console.log('--> pushed new target!', '\n-> targetRobot:', targetRobot);
+
                         }
 
                     // Update the mission details with the new targets
