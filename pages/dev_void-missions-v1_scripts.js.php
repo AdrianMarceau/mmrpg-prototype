@@ -1346,63 +1346,52 @@
                     return sortedTypePowers;
                     // end of voidRecipeWizard.filterTypePowers()
                     },
-                filterFlowPowers: function(flows, kind, sort){
-                    kind = typeof kind !== 'undefined' ? kind : 'all';
-                    sort = typeof sort === 'undefined' ? true : sort;
-                    console.log('%c' + 'voidRecipeWizard.filterFlowPowers()', 'color: magenta;');
-                    //console.log('-> w/ flows:', flows, 'kind:', kind, 'sort:', sort);
-                    // parse out flows that represent types and then order them highest first
-                    const _self = this;
-                    var voidItems = _self.items;
-                    var voidItemsTokens = Object.keys(voidItems);
-                    //console.log('=> voidItemsTokens:', voidItemsTokens);
-                    var mmrpgStats = _self.indexes.statTokens;
-                    var mmrpgTypes = _self.indexes.typeTokens;
-                    var sortFlows = {};
-                    if (kind === 'stats' || kind === 'all'){
-                        for (var i = 0; i < mmrpgStats.length; i++){
-                            var statToken = mmrpgStats[i];
-                            var statValue = flows[statToken] || 0;
-                            if (statValue !== 0){ sortFlows[statToken] = statValue; }
-                            }
-                        }
-                    if (kind === 'types' || kind === 'all'){
-                        for (var i = 0; i < mmrpgTypes.length; i++){
-                            var typeToken = mmrpgTypes[i];
-                            var typeValue = flows[typeToken] || 0;
-                            if (typeValue !== 0){ sortFlows[typeToken] = typeValue; }
-                            }
-                        }
-                    //console.log('=> sortFlows:', sortFlows);
-                    if (!sort){ return sortFlows; }
-                    // re-sort the sort flows based on their values w/ highest first
-                    var sortFlowTokens = Object.keys(sortFlows);
-                    sortFlowTokens.sort(function(a, b){
-                        return sortFlows[b] - sortFlows[a];
-                        });
-                    var sortFlowTokensSorted = sortFlowTokens.slice().sort(function(a, b){
-                        var aVal = sortFlows[a];
-                        var bVal = sortFlows[b];
-                        var aIndex = voidItemsTokens.indexOf(a+'-core');
-                        var bIndex = voidItemsTokens.indexOf(b+'-core');
-                        if (aVal > bVal){ return -1; }
-                        if (aVal < bVal){ return 1; }
-                        if (aIndex < bIndex){ return -1; }
-                        if (aIndex > bIndex){ return 1; }
-                        return 0;
-                        });
-                    //console.log('-> sortFlowTokens:', sortFlowTokens);
-                    //console.log('-> sortFlowTokensSorted:', sortFlowTokensSorted);
-                    var sortedSortPowers = {};
-                    for (var i = 0; i < sortFlowTokensSorted.length; i++){
-                        var sortToken = sortFlowTokensSorted[i];
-                        var sortValue = sortFlows[sortToken];
-                        sortedSortPowers[sortToken] = sortValue;
-                        }
-                    //console.log('=> sortedSortPowers:', sortedSortPowers);
-                    return sortedSortPowers;
-                    // end of voidRecipeWizard.filterFlowPowers()
-                    },
+            filterFlowPowers: function(flows, sort){
+                sort = typeof sort === 'undefined' ? true : sort;
+                console.log('%c' + 'voidRecipeWizard.filterFlowPowers()', 'color: magenta;');
+                //console.log('-> w/ flows:', flows, 'sort:', sort);
+                // parse out flows that represent types and then order them highest first
+                const _self = this;
+                var voidItems = _self.items;
+                var voidItemsTokens = Object.keys(voidItems);
+                //console.log('=> voidItemsTokens:', voidItemsTokens);
+                var mmrpgTypes = _self.indexes.typeTokens;
+                var sortFlows = {};
+                for (var i = 0; i < mmrpgTypes.length; i++){
+                    var typeToken = mmrpgTypes[i];
+                    var typeValue = flows[typeToken] || 0;
+                    if (typeValue !== 0){ sortFlows[typeToken] = typeValue; }
+                    }
+                //console.log('=> sortFlows:', sortFlows);
+                if (!sort){ return sortFlows; }
+                // re-sort the sort flows based on their values w/ highest first
+                var sortFlowTokens = Object.keys(sortFlows);
+                sortFlowTokens.sort(function(a, b){
+                    return sortFlows[b] - sortFlows[a];
+                    });
+                var sortFlowTokensSorted = sortFlowTokens.slice().sort(function(a, b){
+                    var aVal = sortFlows[a];
+                    var bVal = sortFlows[b];
+                    var aIndex = voidItemsTokens.indexOf(a+'-core');
+                    var bIndex = voidItemsTokens.indexOf(b+'-core');
+                    if (aVal > bVal){ return -1; }
+                    if (aVal < bVal){ return 1; }
+                    if (aIndex < bIndex){ return -1; }
+                    if (aIndex > bIndex){ return 1; }
+                    return 0;
+                    });
+                //console.log('-> sortFlowTokens:', sortFlowTokens);
+                //console.log('-> sortFlowTokensSorted:', sortFlowTokensSorted);
+                var sortedSortPowers = {};
+                for (var i = 0; i < sortFlowTokensSorted.length; i++){
+                    var sortToken = sortFlowTokensSorted[i];
+                    var sortValue = sortFlows[sortToken];
+                    sortedSortPowers[sortToken] = sortValue;
+                    }
+                //console.log('=> sortedSortPowers:', sortedSortPowers);
+                return sortedSortPowers;
+                // end of voidRecipeWizard.filterFlowPowers()
+                },
                 sortTokensByItemOrder: function(unsortedTokens){
                     console.log('%c' + 'voidRecipeWizard.sortTokensByItemOrder()', 'color: magenta;');
                     //console.log('-> w/ unsortedTokens:', unsortedTokens);
@@ -1669,7 +1658,7 @@
 
                     // Pull a filtered list of stat powers and type powers for easier looping
                     var statPowersList = _self.filterStatPowers(voidPowersList);
-                    var typeFlowsList = _self.filterFlowPowers(voidFlowsList, 'types');
+                    var typeFlowsList = _self.filterFlowPowers(voidFlowsList);
                     //console.log('-> statPowersList:', statPowersList);
                     //console.log('-> typeFlowsList:', typeFlowsList);
 
@@ -2127,7 +2116,7 @@
                         if (voidPowers.forteMax){ rankPowersValuesMax.forte = voidPowers.forteMax; }
 
                         // Pull in current values for the sort powers we'll be displaying
-                        var typeFlows = _self.filterFlowPowers(voidFlows, 'types');
+                        var typeFlows = _self.filterFlowPowers(voidFlows);
                         if (typeFlows){ flowPowersValues = Object.assign({}, flowPowersValues, typeFlows); }
                         console.log('FLOW DEBUG:', {voidFlows, typeFlows, flowPowersValues});
 
