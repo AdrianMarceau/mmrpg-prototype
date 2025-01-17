@@ -1669,12 +1669,8 @@
 
                     // Pull a filtered list of stat powers and type powers for easier looping
                     var statPowersList = _self.filterStatPowers(voidPowersList);
-                    //var typePowersList = _self.filterTypePowers(voidPowersList);
-                    //console.log('-> statPowersList:', statPowersList);
-                    //console.log('-> typePowersList:', typePowersList);
-                    //var statFlowsList = _self.filterFlowPowers(voidFlowsList, 'stats');
                     var typeFlowsList = _self.filterFlowPowers(voidFlowsList, 'types');
-                    //console.log('-> statFlowsList:', statFlowsList);
+                    //console.log('-> statPowersList:', statPowersList);
                     //console.log('-> typeFlowsList:', typeFlowsList);
 
                     // Pre-calculate the effective quanta and spread we're working with
