@@ -1697,9 +1697,26 @@
                         console.log('-> typeFlowRemaining:', typeFlowRemaining);
                         console.log('-> typeFlowPriority:', typeFlowPriority);
 
+                        // VOID POWER: Check for focus power and use it to calculate the shift from bench to active
+                        let focusPowerValue = voidPowersList['focus'] || 0;
+                        let focusPercentMax = 90, focusPercentPower = 5, focusPercentValue = 0;
+                        let quantaShiftLimit = (quantaAvailable - (numTargetSlots - 1));
+                        let quantaShiftAmount = 0, quantaShiftDirection = '';
+                        if (focusPowerValue > 0){
+                            console.log('%c' + '-> Oh! The `focus` voidPower was detected!', 'color: #ff9800;');
+                            focusPercentValue = Math.min(100, Math.max(0, (focusPowerValue * focusPercentPower)));
+                            quantaShiftAmount = Math.floor(quantaAvailable * (focusPercentValue / 100));
+                            quantaShiftDirection = 'active';
+                            console.log('--> VOID POWER [FOCUS]:', '\n' + '-> w/ focusPowerValue:', focusPowerValue, '\n' + '-> focusPercentValue:', focusPercentValue, '\n' + '-> quantaShiftAmount:', quantaShiftAmount, '\n' + '-> quantaShiftDirection:', quantaShiftDirection);
+                            }
+
                         // Loop through the target slots and assign quanta and elemental types to each
                         for (var i = 0; i < numTargetSlots; i++){
                             console.log('%c' + '--> generating slotTemplate for [i='+i+'] w/ [numTargetSlots:'+numTargetSlots+']', 'color: lime;');
+
+                            // Define the key and position for later
+                            let targetKey = i;
+                            let targetPosition = targetKey === 0 ? 'active' : 'bench';
 
                             // Create a new template object for the current slot so we can assign it the quanta and type
                             let slotTemplate = {
@@ -1712,14 +1729,26 @@
                                 };
 
                             // If quanta is available, take an equal portion unless there are special effects at play
-                            let targetQuanta = 0;
+                            let targetQuanta = 0, shiftedQuanta = 0;
                             if (quantaAvailable > 0){
-                                // TODO: add special void power effects here (?)
                                 targetQuanta = Math.floor(quantaAvailable / (numTargetSlots - i));
                                 quantaAvailable -= targetQuanta;
                                 slotTemplate.quanta = targetQuanta;
+                                // If a shift amount was defined and this target's position was a benefactor,
+                                // apply that shift amount to the target's quanta and reduce the available quanta
+                                //
+                                if (quantaShiftAmount > 0){
+                                    if (quantaShiftDirection === targetPosition){
+                                        targetQuanta += quantaShiftAmount;
+                                        quantaAvailable -= quantaShiftAmount;
+                                        slotTemplate.quanta = targetQuanta;
+                                        shiftedQuanta = quantaShiftAmount;
+                                        } else {
+                                        shiftedQuanta = -1 * Math.floor(quantaShiftAmount / (numTargetSlots - 1));
+                                        }
+                                    }
                                 }
-                            console.log('-> targetQuanta:', targetQuanta);
+                            console.log('-> targetQuanta:', targetQuanta, 'shiftedQuanta: ~', shiftedQuanta);
 
                             // Loop through available elemental types in priority order and assign slots first-come-first-serve
                             let targetType = '';
@@ -2088,7 +2117,7 @@
                     console.log('voidFlowsKeys:', voidFlowsKeys);
                     console.log('voidFlowsValSum:', voidFlowsValSum);
                     console.log('%c' + 'they have been rendered', 'background-color: black; color: cyan; padding: 0 6px;');
-                    if (true || voidPowersValSum > 0){
+                    if (true){  // (always render the UI even if there are no powers yet)
 
                         // Pull in the power renderer to make things easier
                         var VoidPowersRenderer = _self.voidPowersRenderer;

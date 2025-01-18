@@ -50,14 +50,21 @@ require_once('pages/dev_void-missions-v1_data.php');
     <div class="subbody">
         <div class="text">
             <p>
-                <u>Void Missions</u> are a type of procedurally-generated mission (maybe) being added to MMRPG Prototype.
-                <br /> &bull; <strong>TLDR</strong>; Throw items into The Void to generate a new (temporary) custom
-                mission for you to play, utilizing the kind, quantity, and order of items you have access to in order to
-                influence/determine the mission's properties (including its targets, location, and rewards).
-                <br /> &bull; <strong>Note</strong>: This is a work-in-progress <em>concept</em> of an idea, so it's
-                always changing and may not work as intended. Please be patient and understand if the final version is
-                different from what you see here or not-included at all (worst-case-scenario).
-                Thanks for <a href="#void-recipe_anchor">checking it out</a>!
+                <u>Void Missions</u> are procedurally-generated missions (maybe) coming to MMRPG Prototype.
+            </p>
+            <p>
+                <strong><u>TLDR</u>; Throw items into The Void to generate a new mission.</strong>
+                <br />&bull;  Required items are <u>Screws</u> (for <i>quanta</i> material) and <u>Cores</u> (for elemental affinity).
+                <br />&bull;  <i>Quanta</i> can optionally be <i>spread</i> to multiple slots via the <u>Spreader Modules</u>.
+                <br />&bull;  Distrubted <i>Quanta</i> can be <i>focused</i> to the active-position via the <u>Target Modules</u>.
+                <br />&bull;  Kind, quantity, and order of items-added determine exact targets, location, rewards, etc.
+                <br />&bull;  Available targets have <u>power-scaled quanta requirements</u> determined by their <i>BSTs</i>.
+                <br /> <em style="display: inline-block; padding-left: 20px; font-size: 80%; color: #cacaca;">
+                        (!) Base Stat Totals (BSTs) are the combined sum of a robot's Energy, Weapons, Attack, Defense, Speed.
+                        <br /> Weapon values are multiplied by 10 for normalization purposes. There are more than three tiers.
+                        </em>
+                <br />&bull;  This is an always-changing work-in-progress <em>concept</em> of an idea, please be kind/patient.
+                <br />&bull;  Otherwise, feel free to experiment and thanks for <a href="#void-recipe_anchor">checking it out</a>!
             </p>
         </div>
         <a id="void-recipe_anchor"></a>
