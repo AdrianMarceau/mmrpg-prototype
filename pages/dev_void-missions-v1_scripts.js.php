@@ -329,7 +329,9 @@
                         $debugDiv.find('.debug-tier-costs').remove();
                         let voidTiers = indexes.voidTiers;
                         let orderedTypes = Object.values(indexes.typeTokens);
-                        let classIcons = {master: 'robot', mecha: 'ghost', boss: 'skull'};
+                        let robotClasses = ['mecha', 'master', 'boss'];
+                        let classIcons = {mecha: 'ghost', master: 'robot', boss: 'skull'};
+                        let flowPerClass = {mecha: 0.25, master: 1.0, boss: 3.0};
                         let coreReqThreshold = 500;
                         let numColumns = 4;
                         let blocksPerColumn = Math.ceil(orderedTypes.length / numColumns);
@@ -337,6 +339,37 @@
                         let currentColumn = 0;
                         let tierCostsMarkup = '';
                         let tierCostsMarkupByCol = {};
+                        // Display a fake tier block showing the elemental energy requirements per-robot
+                        if (true){
+                            let thisMarkup = '';
+                                thisMarkup += '<div class="block tier-block">';
+                                    thisMarkup += '<strong class="name type space_empty">Robot Tiers (By Flow)</strong>\n';
+                                    thisMarkup += '<ul class="list">\n';
+                                        for (let i = 0; i < robotClasses.length; i++){
+                                            let robotClass = robotClasses[i];
+                                            let robotClassName = robotClass.charAt(0).toUpperCase() + robotClass.slice(1);
+                                            let flowRequired = flowPerClass[robotClass];
+                                            let flowDisplayIcon = classIcons[robotClass] || 'bug';
+                                            let flowDisplayType = 'none';
+                                            thisMarkup += '<li class="item">\n';
+                                                thisMarkup += '<label class="cost type empty">';
+                                                    thisMarkup += '<span class="req"><i class="fa fa-fire-alt"></i> >= ' + flowRequired + '</span>';
+                                                thisMarkup += '</label>\n';
+                                                thisMarkup += '<strong class="robot '+robotClass+'">';
+                                                    thisMarkup += '<span class="r-icon type '+flowDisplayType+'"><i class="fa fa-'+flowDisplayIcon+'"></i></span>';
+                                                    thisMarkup += '<span class="r-name type '+flowDisplayType+'">' + robotClassName + '</span>\n';
+                                                thisMarkup += '</strong>\n';
+                                            thisMarkup += '</li>\n';
+                                            }
+                                    thisMarkup += '</ul>\n';
+                                thisMarkup += '</div>';
+                            currentColumn++;
+                            if (currentColumn > numColumns){ currentColumn = 1; }
+                            if (!tierCostsMarkupByCol[currentColumn]){ tierCostsMarkupByCol[currentColumn] = ''; }
+                            tierCostsMarkupByCol[currentColumn] += thisMarkup;
+                            lastColumn = currentColumn;
+                            }
+                        // Loop through and display tier blocks for all the elemental types in database order
                         for (let i = 0; i < orderedTypes.length; i++){
                             let tierType = orderedTypes[i];
                             if (!voidTiers[tierType]){ continue; }
@@ -346,14 +379,14 @@
                             let reversedTierThresholds = tierThresholds.slice(0).reverse();
                             let thisMarkup = '';
                                 thisMarkup += '<div class="block tier-block">';
-                                    thisMarkup += '<strong class="name type ' + tierType + '">' + tierTypeInfo.type_name + '</strong>\n';
+                                    thisMarkup += '<strong class="name type ' + tierType + '">' + tierTypeInfo.type_name + ' Robots (By Quanta)</strong>\n';
                                     thisMarkup += '<ul class="list">\n';
                                         for (let j = 0; j < reversedTierThresholds.length; j++){
                                             let tierThreshold = reversedTierThresholds[j];
                                             let tierRobots = thisVoidTier.queues[tierThreshold];
                                             let tierCoreReq = (tierThreshold / coreReqThreshold);
                                             thisMarkup += '<li class="item">\n';
-                                                thisMarkup += '<label class="name type empty">';
+                                                thisMarkup += '<label class="cost type empty">';
                                                     //thisMarkup += '<span class="req"><i class="fa fa-fire-alt"></i> >= ' + tierCoreReq + '</span>';
                                                     thisMarkup += '<span class="req"><i class="fa fa-atom"></i> >= ' + tierThreshold + '</span>';
                                                 thisMarkup += '</label>\n';

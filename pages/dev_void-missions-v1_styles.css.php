@@ -1872,16 +1872,19 @@
 #vcr_debug .section .tier-block .list .item {
 
 }
-#vcr_debug .section .tier-block .list .item .name {
+#vcr_debug .section .tier-block .list .cost {
     float: left;
     margin: 0 6px 3px 0;
     text-align: center;
     width: 40px;
     /* background-color: magenta; */
 }
-#vcr_debug .section .tier-block .list .item .name .req {
+#vcr_debug .section .tier-block .list .cost .req {
     display: block;
     margin: 0 auto 2px;
+}
+#vcr_debug .section .tier-block .list .robot + .cost {
+    float: none;
 }
 #vcr_debug .section .tier-block .list .list {
     float: right;
