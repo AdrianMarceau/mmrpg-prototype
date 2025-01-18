@@ -179,6 +179,15 @@
                     indexes.robotTokens = mmrpgRobotTokens;
                     //console.log('mmrpgRobotTokens:', mmrpgRobotTokens);
 
+                    // Pre-define a list of robot classes and their properties we can use later
+                    let mmrpgRobotClasses = {};
+                    mmrpgRobotClasses.mecha = {name: 'Mecha', icon: 'ghost', flow: 0.25, quanta: 250};
+                    mmrpgRobotClasses.master = {name: 'Master', icon: 'robot', flow: 1.0, quanta: 500};
+                    mmrpgRobotClasses.boss = {name: 'Boss', icon: 'skull', flow: 2.0, quanta: 700};
+                    let mmrpgRobotClassTokens = Object.keys(mmrpgRobotClasses);
+                    indexes.robotClasses = mmrpgRobotClasses;
+                    indexes.robotClassTokens = mmrpgRobotClassTokens;
+
                     // Create sub-lists of robot tokens for each class for later
                     const filterToClass = function(tokens, className){
                         return tokens.filter(function(token){
@@ -328,11 +337,8 @@
                         let $debugDiv = xrefs.debugDiv;
                         $debugDiv.find('.debug-tier-costs').remove();
                         let voidTiers = indexes.voidTiers;
+                        let robotClasses = indexes.robotClasses;
                         let orderedTypes = Object.values(indexes.typeTokens);
-                        let robotClasses = ['mecha', 'master', 'boss'];
-                        let classIcons = {mecha: 'ghost', master: 'robot', boss: 'skull'};
-                        let flowPerClass = {mecha: 0.25, master: 1.0, boss: 3.0};
-                        let coreReqThreshold = 500;
                         let numColumns = 4;
                         let blocksPerColumn = Math.ceil(orderedTypes.length / numColumns);
                         let lastColumn = false;
@@ -345,20 +351,25 @@
                                 thisMarkup += '<div class="block tier-block">';
                                     thisMarkup += '<strong class="name type space_empty">Robot Tiers (By Flow)</strong>\n';
                                     thisMarkup += '<ul class="list">\n';
-                                        for (let i = 0; i < robotClasses.length; i++){
-                                            let robotClass = robotClasses[i];
-                                            let robotClassName = robotClass.charAt(0).toUpperCase() + robotClass.slice(1);
-                                            let flowRequired = flowPerClass[robotClass];
-                                            let flowDisplayIcon = classIcons[robotClass] || 'bug';
-                                            let flowDisplayType = 'none';
+                                        for (let i = 0, robotClassKeys = Object.keys(robotClasses); i < robotClassKeys.length; i++){
+                                            let robotClass = robotClassKeys[i];
+                                            let robotClassInfo = robotClasses[robotClass];
+                                            let robotClassName = robotClassInfo.name;
+                                            let robotClassIcon = robotClassInfo.icon;
+                                            let classFlowCost = robotClasses[robotClass].flow;
+                                            let classTypeColor = 'none';
                                             thisMarkup += '<li class="item">\n';
-                                                thisMarkup += '<label class="cost type empty">';
-                                                    thisMarkup += '<span class="req"><i class="fa fa-fire-alt"></i> >= ' + flowRequired + '</span>';
-                                                thisMarkup += '</label>\n';
                                                 thisMarkup += '<strong class="robot '+robotClass+'">';
-                                                    thisMarkup += '<span class="r-icon type '+flowDisplayType+'"><i class="fa fa-'+flowDisplayIcon+'"></i></span>';
-                                                    thisMarkup += '<span class="r-name type '+flowDisplayType+'">' + robotClassName + '</span>\n';
+                                                    thisMarkup += '<span class="r-icon type '+classTypeColor+'"><i class="fa fa-'+robotClassIcon+'"></i></span>';
+                                                    thisMarkup += '<span class="r-name type '+classTypeColor+'">' + robotClassName + '</span>\n';
                                                 thisMarkup += '</strong>\n';
+                                                thisMarkup += '<ul class="list solo">\n';
+                                                    thisMarkup += '<li class="item">\n';
+                                                        thisMarkup += '<label class="cost type empty">';
+                                                            thisMarkup += '<span class="req"><i class="fa fa-fire-alt"></i> >= ' + classFlowCost + '</span>';
+                                                        thisMarkup += '</label>\n';
+                                                    thisMarkup += '</li>\n';
+                                                thisMarkup += '</ul>\n';
                                             thisMarkup += '</li>\n';
                                             }
                                     thisMarkup += '</ul>\n';
@@ -384,10 +395,8 @@
                                         for (let j = 0; j < reversedTierThresholds.length; j++){
                                             let tierThreshold = reversedTierThresholds[j];
                                             let tierRobots = thisVoidTier.queues[tierThreshold];
-                                            let tierCoreReq = (tierThreshold / coreReqThreshold);
                                             thisMarkup += '<li class="item">\n';
                                                 thisMarkup += '<label class="cost type empty">';
-                                                    //thisMarkup += '<span class="req"><i class="fa fa-fire-alt"></i> >= ' + tierCoreReq + '</span>';
                                                     thisMarkup += '<span class="req"><i class="fa fa-atom"></i> >= ' + tierThreshold + '</span>';
                                                 thisMarkup += '</label>\n';
                                                 thisMarkup += '<ul class="list">\n';
@@ -396,14 +405,15 @@
                                                         let robotOrder = (k + 1), robotOrderText = robotOrder + _self.getOrdinalSuffix(robotOrder);
                                                         let robotInfo = indexes.robots[robotToken];
                                                         let robotClass = robotInfo.robot_class || 'mecha';
-                                                        let robotIcon = classIcons[robotClass] || 'bug';
+                                                        let robotClassInfo = robotClasses[robotClass];
+                                                        let robotClassIcon = robotClassInfo.icon || 'bug';
                                                         let robotName = robotInfo.robot_name;
                                                         let robotType = robotInfo.robot_core || 'none';
                                                         let robotImage = robotInfo.robot_image || robotToken;
                                                         thisMarkup += '<li class="item">';
                                                             thisMarkup += '<span class="order">' + robotOrderText + '</span>';
                                                             thisMarkup += '<strong class="robot '+robotClass+'">';
-                                                                thisMarkup += '<span class="r-icon type '+robotType+'"><i class="fa fa-'+robotIcon+'"></i></span>';
+                                                                thisMarkup += '<span class="r-icon type '+robotType+'"><i class="fa fa-'+robotClassIcon+'"></i></span>';
                                                                 thisMarkup += '<span class="r-name type '+robotType+'">' + robotName + '</span>\n';
                                                             thisMarkup += '</strong>\n';
                                                         thisMarkup += '</li>\n';
@@ -1707,6 +1717,7 @@
                     let typeFlowAvailable = {};
                     let typeFlowRemaining = {};
                     let typeFlowPriority = [];
+                    let typeFlowThresholds = { quanta: [900, 500, 200], flow: [2.0, 1.0, 0.25] };
                     let targetSlotTemplates = [];
                     let battleFieldConfig = {};
                     (function(quantaPower, spreadPower, typePowers){
@@ -1789,10 +1800,14 @@
                                 for (var j = 0; j < typeFlowPriority.length; j++){
                                     // TODO: add special void power effects here (?)
                                     let typeToken = typeFlowPriority[j];
-                                    let typeValue = typeFlowAvailable[typeToken];
-                                    if (typeValue === 0){ continue; }
+                                    let flowCost = (function(quanta, thresholds){
+                                        let tiers = thresholds.quanta, costs = thresholds.flow;
+                                        for (var k = 0; k < tiers.length; k++){ if (quanta >= tiers[k]){ return costs[k]; } }
+                                        })(targetQuanta, typeFlowThresholds) || 0;
+                                    let flowRemaining = typeFlowRemaining[typeToken];
+                                    if (!flowRemaining || flowRemaining < flowCost){ continue; }
                                     targetType = typeToken;
-                                    typeFlowRemaining[targetType] -= 1;
+                                    typeFlowRemaining[targetType] -= flowCost;
                                     slotTemplate.type = targetType;
                                     break;
                                     }

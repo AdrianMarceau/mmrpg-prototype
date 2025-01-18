@@ -1893,6 +1893,9 @@
     width: calc(100% - 48px);
     /* background-color: cyan; */
 }
+#vcr_debug .section .tier-block .list .list.solo {
+    padding-top: 0;
+}
 #vcr_debug .section .tier-block .list .list .item {
     float: left;
     clear: left;
