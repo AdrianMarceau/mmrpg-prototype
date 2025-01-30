@@ -12,7 +12,7 @@
     window.mmrpgVoidCauldron.config = voidCauldronConfig;
 
     // Set the name and version number for this wizard
-    thisVoidCauldron.name = 'thisVoidCauldron';
+    thisVoidCauldron.name = 'Void Cauldron';
     thisVoidCauldron.version = '0.2.x';
 
     // Predefine void cauldron config settings we can work with later
