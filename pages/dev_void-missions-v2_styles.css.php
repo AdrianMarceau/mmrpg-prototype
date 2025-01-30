@@ -846,6 +846,16 @@
 #void-recipe #vcr_details .void-powers .power > span > strong {
     font-weight: bold;
 }
+#void-recipe #vcr_details .void-powers .power > span > em {
+    font-style: normal;
+    font-size: 80%;
+}
+#void-recipe #vcr_details .void-powers.ltr .power > span > em {
+    padding-left: 4px;
+}
+#void-recipe #vcr_details .void-powers.rtl .power > span > em {
+    padding-right: 4px;
+}
 #void-recipe #vcr_details .void-powers .power > span > code {
     font-size: 10px;
     font-weight: bold;

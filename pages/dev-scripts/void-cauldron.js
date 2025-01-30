@@ -560,7 +560,9 @@
         const _self = thisVoidCauldron;
         const config = _self.config;
         return {
-            generatePowerElement: function({ token, name, value, maxValue, isPercent, isPlusMinus,
+            generatePowerElement: function({ token, name,
+                    value, maxValue, valuePrefix, valueSuffix,
+                    isPercent, isPlusMinus,
                     iconClass, typeClass, extraClasses, extraStyles,
                     hasCode, hasArrows, numBoosts, numBreaks,
                     spanOrder, spanPadding, blurSpans, hideSpans,
@@ -572,6 +574,8 @@
                 value = typeof value !== 'undefined' ? value : 0;
                 iconClass = iconClass || false;
                 maxValue = maxValue || null;
+                valuePrefix = valuePrefix || '';
+                valueSuffix = valueSuffix || '';
                 typeClass = typeClass || '';
                 extraClasses = extraClasses || '';
                 extraStyles = extraStyles || '';
@@ -611,8 +615,10 @@
                     var roundedValue = Math.round(value * 10) / 10;
                     valueMarkup += '<span class="'+valueClasses+'">';
                         //valueMarkup += '<data>'+ ((isPlusMinus && roundedValue !== 0) ? (roundedValue > 0 ? '+' : '-') : '') + roundedValue + (isPercent ? '%' : '') + '</data>';
+                        if (valuePrefix){ valueMarkup += '<em>'+valuePrefix+'</em>'; }
                         valueMarkup += ((isPlusMinus && roundedValue !== 0) ? (roundedValue > 0 ? '+' : '-') : '');
                         valueMarkup += '<data>' + roundedValue + '</data>';
+                        if (valueSuffix){ valueMarkup += '<em>'+valueSuffix+'</em>'; }
                         valueMarkup += (isPercent ? '%' : '');
                         if (maxValue){ valueMarkup += '<sub>/ '+maxValue+'</sub>'; }
                     valueMarkup += '</span>';
@@ -707,6 +713,9 @@
                             iconClass: (token === 'level' ? 'star' : 'fist-raised'),
                             typeClass: ('rank type ' + (token === 'level' ? 'electric' : 'shield')),
                             blurSpans: ['name'],
+                            spanOrder: ['value', 'name', 'icon'],
+                            valuePrefix: (token === 'level' ? 'Lv.' : ''),
+                            valueSuffix: (token === 'forte' ? 'ƒ' : ''),
                             };
                         markup += this.generatePowerElement(config);
                         }
@@ -1504,6 +1513,15 @@
             var itemToken = voidItemsTokens[i];
             var itemQuantity = voidItems[itemToken];
             _self.parseItem({token: itemToken}, itemQuantity, voidPowers);
+            }
+
+        // Use the final delta value to (further) boost the level and forte of the mission
+        var deltaBoost = voidPowers.powers.delta;
+        if (deltaBoost > 0){
+            var deltaLevelBoost = Math.ceil(deltaBoost / 10);
+            var deltaForteBoost = Math.ceil(deltaBoost / 100);
+            voidPowers.incPower('level', deltaLevelBoost);
+            voidPowers.incPower('forte', deltaForteBoost);
             }
 
         // As long as items are present, we should make keep certain values in scope
