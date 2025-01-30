@@ -16,7 +16,7 @@ $this_seo_description = 'An experimental void mission generator for the MMRPG.';
 $this_seo_robots = 'noindex,nofollow';
 
 // Define the Open Graph variables for this page
-$this_graph_data['title'] = 'Void Mission Generator V1';
+$this_graph_data['title'] = 'Void Mission Generator (dev-v2)';
 $this_graph_data['description'] = 'An experimental void mission generator for the MMRPG.';
 
 // Pre-collect the indexes once up here so we don't do it again
