@@ -147,7 +147,7 @@ $website_include_stylesheets .= (
 
 // Include the javascript marup for this page as if it were inline
 ob_start();
-require_once('pages/dev-scripts/void-cauldron.js');
+require_once('pages/dev-scripts/void-cauldron.dev-v2.js');
 require_once('pages/dev_void-missions-v2_scripts.js.php');
 $custom_scripts = ob_get_clean();
 if ($minify_inline_markup){
