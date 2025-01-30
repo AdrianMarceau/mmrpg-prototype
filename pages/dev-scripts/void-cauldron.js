@@ -343,7 +343,7 @@
                     thisMarkup += '<div class="block tier-block">';
                         thisMarkup += '<strong class="name type space_empty">Robot Tiers (By Flow)</strong>\n';
                         thisMarkup += '<ul class="list">\n';
-                            for (let i = 0, robotClassKeys = Object.keys(robotClasses); i < robotClassKeys.length; i++){
+                            for (let robotClassKeys = Object.keys(robotClasses), i = (robotClassKeys.length - 1); i >= 0; i--){
                                 let robotClass = robotClassKeys[i];
                                 let robotClassInfo = robotClasses[robotClass];
                                 let robotClassName = robotClassInfo.name;
@@ -384,8 +384,8 @@
                     thisMarkup += '<div class="block tier-block">';
                         thisMarkup += '<strong class="name type ' + tierType + '">' + tierTypeInfo.type_name + ' Robots (By Quanta)</strong>\n';
                         thisMarkup += '<ul class="list">\n';
-                            for (let j = 0; j < reversedTierThresholds.length; j++){
-                                let tierThreshold = reversedTierThresholds[j];
+                            for (let j = 0; j < tierThresholds.length; j++){
+                                let tierThreshold = tierThresholds[j];
                                 let tierRobots = thisVoidTier.queues[tierThreshold];
                                 thisMarkup += '<li class="item">\n';
                                     thisMarkup += '<label class="cost type empty">';
