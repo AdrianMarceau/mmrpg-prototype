@@ -30,7 +30,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
 // Pull in the void items index and other data we'll need momentaryily
 $void_item_groups_index = array();
 $void_items_disabled = array();
-require_once('pages/dev_void-missions-v1_data.php');
+require_once('pages/dev_void-missions-v2_data.php');
 
 ?>
 <div class="header">
@@ -132,7 +132,7 @@ use MatthiasMullie\Minify;
 
 // Include the stylesheet markup for this page as if it were inline
 ob_start();
-require_once('pages/dev_void-missions-v1_styles.css.php');
+require_once('pages/dev_void-missions-v2_styles.css.php');
 $custom_styles = trim(ob_get_clean());
 if ($minify_inline_markup){
     $minifier = new Minify\CSS();
@@ -148,7 +148,7 @@ $website_include_stylesheets .= (
 // Include the javascript marup for this page as if it were inline
 ob_start();
 require_once('pages/dev-scripts/void-cauldron.js');
-require_once('pages/dev_void-missions-v1_scripts.js.php');
+require_once('pages/dev_void-missions-v2_scripts.js.php');
 $custom_scripts = ob_get_clean();
 if ($minify_inline_markup){
     $minifier = new Minify\JS();
