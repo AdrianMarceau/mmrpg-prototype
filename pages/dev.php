@@ -40,9 +40,10 @@ ob_start();
 
             <ul class="text" style="padding-bottom: 10px;">
                 <li>&raquo; <a class="link_inline" href="#">Experimental link</a></li>
-                <li>&raquo; <a class="link_inline" href="dev/map-test/">Procedurally generated map experiment (MMRPG Conquest)</a></li>
-                <li>&raquo; <a class="link_inline" href="dev/endless-mode-v4/">Procedurally generated mission playlist (Endless Attack Mode)</a></li>
-                <li>&raquo; <a class="link_inline" href="dev/void-missions-v1/">Procedural mission generator recipies (Void Mission Generator) </a></li>
+                <li>&raquo; <a class="link_inline" href="dev/map-test/">Procedurally-generated map experiment (MMRPG Conquest)</a></li>
+                <li>&raquo; <a class="link_inline" href="dev/endless-mode-v4/">Procedurally-generated mission playlist (Endless Attack Mode)</a></li>
+                <li>&raquo; <a class="link_inline" href="dev/void-missions-v1/" style="text-decoration: line-through;">Procedurally-generated mission creator (Void Cauldron <sup style="font-size: 80%; position: relative; bottom: 4px;">v1</sup>)</a></li>
+                <li>&raquo; <a class="link_inline" href="dev/void-missions-v2/">Procedurally-generated mission creator (Void Cauldron <sup style="font-size: 80%; position: relative; bottom: 4px;">v2</sup>)</a></li>
             </ul>
 
         </div>
