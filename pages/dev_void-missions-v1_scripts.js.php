@@ -29,19 +29,19 @@
     if ($voidRecipeWizard.length > 0
         && voidRecipeWizard !== false){
         (function(){
-
-            //console.log('voidRecipeWizard:', $voidRecipeWizard);
+            //console.log('$voidRecipeWizard:', $voidRecipeWizard);
+            //console.log('voidRecipeWizard:', voidRecipeWizard);
 
             // Initialize the void recipe calculator
             console.log('%c' + 'Initializing the voidRecipeWizard()', 'color: orange;');
             voidRecipeWizard.init($voidRecipeWizard, {
                 types: mmrpgIndex.types,
                 robots: mmrpgIndex.robots,
+                fields: mmrpgIndex.fields,
                 items: mmrpgIndex.items,
                 itemsGroups: voidRecipeItemGroups,
                 itemsDisabled: voidRecipeItemsDisabled,
                 itemsQuantities: voidRecipeItemsQuantities,
-                fields: mmrpgIndex.fields,
                 });
 
             })();

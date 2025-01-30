@@ -13,7 +13,7 @@
 
     // Set the name and version number for this wizard
     thisVoidCauldron.name = 'thisVoidCauldron';
-    thisVoidCauldron.version = '0.2.71';
+    thisVoidCauldron.version = '0.2.x';
 
     // Predefine void cauldron config settings we can work with later
     voidCauldronConfig.firstStep = 1;
