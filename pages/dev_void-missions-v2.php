@@ -30,7 +30,7 @@ $mmrpg_index_fields = rpg_field::get_index(true);
 // Pull in the void items index and other data we'll need momentaryily
 $void_item_groups_index = array();
 $void_items_disabled = array();
-require_once('pages/dev_void-missions-v2_data.php');
+require_once('pages/dev-includes/void-cauldron.dev-v2.php');
 
 ?>
 <div class="header">
@@ -106,6 +106,7 @@ require_once('pages/dev_void-missions-v2_data.php');
 
     <div id="vcr_debug"></div>
 
+    <!--
     <div class="subbody">
         <div class="legend">
             <ul>
@@ -115,6 +116,62 @@ require_once('pages/dev_void-missions-v2_data.php');
             </ul>
         </div>
     </div>
+    -->
+
+    <script type="text/javascript">
+        <? ob_start(); ?>
+        (function(){
+
+            // Predefine some object arrays to hold our information
+            gameSettings.customIndex.contentIndex = {};
+            var mmrpgIndex = gameSettings.customIndex.contentIndex;
+            var mmrpgQueue = {};
+            var mmrpgMission = {};
+
+            // Add the void mission data to the global object
+            mmrpgIndex.types = <?= json_encode($mmrpg_index_types) ?>;
+            //mmrpgIndex.players = <?= json_encode($mmrpg_index_players) ?>;
+            mmrpgIndex.robots = <?= json_encode($mmrpg_index_robots) ?>;
+            //mmrpgIndex.abilities = <?= json_encode($mmrpg_index_abilities) ?>;
+            mmrpgIndex.items = <?= json_encode($mmrpg_index_items) ?>;
+            mmrpgIndex.fields = <?= json_encode($mmrpg_index_fields) ?>;
+            console.log('mmrpgIndex:', typeof mmrpgIndex, mmrpgIndex);
+
+            // Predefine the item groups to be used in the void cauldron item palette
+            let voidRecipeItemGroups = <?= json_encode($void_item_groups_index, JSON_NUMERIC_CHECK) ?>;
+            let voidRecipeItemsDisabled = <?= json_encode($void_items_disabled) ?>;
+            let voidRecipeItemsQuantities = <?= json_encode($void_items_quantities) ?>;
+            //console.log('+++ voidRecipeItemGroups:', voidRecipeItemGroups);
+            //console.log('+++ voidRecipeItemsDisabled:', voidRecipeItemsDisabled);
+            //console.log('+++ voidRecipeItemsQuantities:', voidRecipeItemsQuantities);
+
+            // Check to see if the Void Recipe calculator is available
+            let $voidRecipeWizard = $('#void-recipe');
+            let voidRecipeWizard = window.mmrpgVoidCauldron || false;
+            if ($voidRecipeWizard.length > 0
+                && voidRecipeWizard !== false){
+                (function(){
+                    //console.log('$voidRecipeWizard:', $voidRecipeWizard);
+                    //console.log('voidRecipeWizard:', voidRecipeWizard);
+
+                    // Initialize the void recipe calculator
+                    console.log('%c' + 'Initializing the voidRecipeWizard()', 'color: orange;');
+                    voidRecipeWizard.init($voidRecipeWizard, {
+                        types: mmrpgIndex.types,
+                        robots: mmrpgIndex.robots,
+                        fields: mmrpgIndex.fields,
+                        items: mmrpgIndex.items,
+                        itemsGroups: voidRecipeItemGroups,
+                        itemsDisabled: voidRecipeItemsDisabled,
+                        itemsQuantities: voidRecipeItemsQuantities,
+                        });
+
+                    })();
+                }
+
+        })();
+        <? $init_script_markup = trim(ob_get_clean()); ?>
+    </script>
 
 </div>
 
@@ -132,7 +189,7 @@ use MatthiasMullie\Minify;
 
 // Include the stylesheet markup for this page as if it were inline
 ob_start();
-require_once('pages/dev_void-missions-v2_styles.css.php');
+require_once('pages/dev-includes/void-cauldron.dev-v2.css');
 $custom_styles = trim(ob_get_clean());
 if ($minify_inline_markup){
     $minifier = new Minify\CSS();
@@ -147,8 +204,8 @@ $website_include_stylesheets .= (
 
 // Include the javascript marup for this page as if it were inline
 ob_start();
-require_once('pages/dev-scripts/void-cauldron.dev-v2.js');
-require_once('pages/dev_void-missions-v2_scripts.js.php');
+require_once('pages/dev-includes/void-cauldron.dev-v2.js');
+echo($init_script_markup.PHP_EOL);
 $custom_scripts = ob_get_clean();
 if ($minify_inline_markup){
     $minifier = new Minify\JS();
