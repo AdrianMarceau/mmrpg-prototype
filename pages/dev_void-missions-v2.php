@@ -45,7 +45,7 @@ require_once('pages/dev_void-missions-v2_data.php');
 <div class="subbody">
 
     <h3 class="subheader">
-        Void Recipe Calculator <sup style="margin-left: 4px; font-size: 60%; position: relative; bottom: 6px;">v-0.1.55</sup>
+        Void Recipe Calculator <sup style="margin-left: 4px; font-size: 60%; position: relative; bottom: 6px;">v-0.2.x</sup>
     </h3>
     <div class="subbody">
         <div class="text">
