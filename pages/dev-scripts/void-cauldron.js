@@ -171,9 +171,9 @@
 
         // Pre-define a list of robot classes and their properties we can use later
         let mmrpgRobotClasses = {};
-        mmrpgRobotClasses.mecha = {name: 'Mecha', icon: 'ghost', flow: 0.25, quanta: 250};
-        mmrpgRobotClasses.master = {name: 'Master', icon: 'robot', flow: 1.0, quanta: 500};
-        mmrpgRobotClasses.boss = {name: 'Boss', icon: 'skull', flow: 2.0, quanta: 700};
+        mmrpgRobotClasses.mecha = {name: 'Mecha', icon: 'ghost', flow: 1, quanta: 250};
+        mmrpgRobotClasses.master = {name: 'Master', icon: 'robot', flow: 4, quanta: 500};
+        mmrpgRobotClasses.boss = {name: 'Boss', icon: 'skull', flow: 10, quanta: 700};
         let mmrpgRobotClassTokens = Object.keys(mmrpgRobotClasses);
         indexes.robotClasses = mmrpgRobotClasses;
         indexes.robotClassTokens = mmrpgRobotClassTokens;
@@ -726,7 +726,7 @@
                 //console.log('-> rendering group:', {'typeFlows', flowPowersValues, flowPowersTokens, flowValuesSum});
                 let groupIcon = 'fire-alt'; //'microchip'; //'bullseye';
                 let groupName = 'Flow (Types)';
-                let groupPaddMod = 15;
+                let groupPaddMod = 5;
                 let groupPaddMax = 80;
                 let markup = '<div class="void-powers rtl bgi cts flow-powers">';
                     markup += '<div class="power label type space_empty">';
@@ -1062,7 +1062,7 @@
         // Effects: +FLOW
         if (itemIsCore){
             var typeToken = itemPrefix;
-            var typeValue = 1.0;
+            var typeValue = 4.0;
             powers.incFlow(typeToken, typeValue * quantity);
             if (powers.getPower('quanta') < 1){ powers.setPower('quanta', 1); }
             if (powers.getPower('spread') < 1){ powers.setPower('spread', 1); }
@@ -1713,12 +1713,15 @@
         console.log('-> effectiveQuanta:', effectiveQuanta, '\n' + '-> effectiveSpread:', effectiveSpread, '\n' + '-> effectiveOffset:', effectiveOffset);
 
         // Define variables to hold the slot templates with distributed quanta material and elemental energy
+        let robotClasses = mmrpgIndex.robotClasses, robotMechaClass = robotClasses.mecha, robotMasterClass = robotClasses.master, robotBossClass = robotClasses.boss;
+        let robotQuantaThresholds = [robotBossClass.quanta, robotMasterClass.quanta, robotMechaClass.quanta];
+        let robotFlowThresholds = [robotBossClass.flow, robotMasterClass.flow, robotMechaClass.flow];
+        let typeFlowThresholds = { quanta: robotQuantaThresholds, flow: robotFlowThresholds };
         let numTargetSlots = 0;
         let quantaAvailable = 0;
         let typeFlowAvailable = {};
         let typeFlowRemaining = {};
         let typeFlowPriority = [];
-        let typeFlowThresholds = { quanta: [900, 500, 200], flow: [2.0, 1.0, 0.25] };
         let targetSlotTemplates = [];
         let battleFieldConfig = {};
         (function(quantaPower, spreadPower, typePowers){
