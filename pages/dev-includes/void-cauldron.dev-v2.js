@@ -130,17 +130,6 @@
         const config = _self.config;
         const indexes = _self.indexes;
 
-        // Pre-define a list of item tokens we can use later
-        const mmrpgItems = indexes.items;
-        let mmrpgItemTokens = Object.keys(mmrpgItems);
-        indexes.itemTokens = mmrpgItemTokens;
-        //console.log('mmrpgItemTokens:', mmrpgItemTokens);
-
-        // Pre-define a list of stat tokens we can use later
-        let mmrpgStats = ['energy', 'weapons', 'attack', 'defense', 'speed'];
-        indexes.statTokens = mmrpgStats;
-        //console.log('mmrpgStats:', mmrpgStats);
-
         // Pre-collect a list of type tokens we can use later
         const mmrpgTypes = indexes.types;
         if (mmrpgTypes['none']){ mmrpgTypes['none']['type_name'] = 'Neutral'; } // because it drives me crazy
@@ -153,6 +142,23 @@
             });
         indexes.typeTokens = mmrpgTypeTokens;
         //console.log('mmrpgTypeTokens:', mmrpgTypeTokens);
+
+        // Pre-define a list of stat tokens we can use later
+        let mmrpgStats = ['energy', 'weapons', 'attack', 'defense', 'speed'];
+        indexes.statTokens = mmrpgStats;
+        //console.log('mmrpgStats:', mmrpgStats);
+
+        // Pre-define a list of item tokens we can use later
+        const mmrpgItems = indexes.items;
+        let mmrpgItemTokens = Object.keys(mmrpgItems);
+        indexes.itemTokens = mmrpgItemTokens;
+        //console.log('mmrpgItemTokens:', mmrpgItemTokens);
+
+        // Pre-define a list of field tokens we can use later
+        const mmrpgFields = indexes.fields;
+        let mmrpgFieldTokens = Object.keys(mmrpgFields);
+        indexes.fieldTokens = mmrpgFieldTokens;
+        //console.log('mmrpgFieldTokens:', mmrpgFieldTokens);
 
         // Pre-collect a list of robot tokens that we can use later
         const mmrpgRobots = indexes.robots;
@@ -1618,6 +1624,8 @@
         const _self = thisVoidCauldron;
         const config = _self.config;
         const mmrpgIndex = _self.indexes;
+        const mmrpgFields = mmrpgIndex.fields;
+        const mmrpgFieldTokens = mmrpgIndex.fieldTokens;
 
         // Clear the existing mission if one is already there
         _self.mission = {};
@@ -1676,7 +1684,7 @@
         let typeFlowRemaining = {};
         let typeFlowPriority = [];
         let targetSlotTemplates = [];
-        let battleFieldConfig = {};
+        let battleFieldConfig = {type: '', power: 0};
         (function(quantaPower, spreadPower, typePowers){
             console.log('%c' + 'thisVoidCauldron.generateMission.targetSlotTemplates(~)', 'color: green;');
 
@@ -1791,7 +1799,6 @@
                 let targetQueueType = targetType || 'empty';
                 let targetRobotQueue = [];
                 if (voidTiers[targetQueueType]){
-                    // TODO: add special void power effects here (?)
                     let tierInfo = voidTiers[targetQueueType] || {};
                     let tierQueues = tierInfo.queues || {};
                     let tierThresholds = tierInfo.thresholds || [];
@@ -1818,14 +1825,29 @@
 
                 }
 
-            // Use the remaining type flow energy, if any, to update the battle field
-            if (typeFlowRemaining){
+            // Use the remaining type flow energy, if any, to update the battle field to something relevant (if possible)
+            let remainingFlow = typeFlowRemaining ? Object.values(typeFlowRemaining).reduce((a, b) => a + b, 0) : 0;
+            if (remainingFlow > 0){
+                console.log('%c' + '-> FIELD CHANGE!', 'color: #ff9800;');
+                console.log('-> Update battle field w/ remaining type flow energy...', '\n' + 'w/ -> typeFlowRemaining:', typeFlowRemaining, '\n' + '&& -> remainingFlow:', remainingFlow);
                 for (var j = 0; j < typeFlowPriority.length; j++){
                     let typeToken = typeFlowPriority[j];
                     let typeValue = typeFlowRemaining[typeToken];
                     if (typeValue === 0){ continue; }
-                    battleFieldConfig.type = typeToken;
-                    break;
+                    console.log('--> Scanning for compatible field w/ type:', typeToken, 'power:', typeValue, 'mmrpgFieldTokens:', mmrpgFieldTokens);
+                    for (var i = 0; i < mmrpgFieldTokens.length; i++){
+                        let fieldToken = mmrpgFieldTokens[i];
+                        let fieldInfo = mmrpgFields[fieldToken];
+                        let fieldType = fieldInfo.field_type || 'none';
+                        //console.log('----> scanning fieldToken:', fieldToken, ' w/ fieldType:', fieldType, '...');
+                        ///console.log('----> scanning fieldToken:', fieldToken, 'w/ fieldInfo:', fieldInfo, '...');
+                        if (fieldType !== typeToken){ continue; }
+                        console.log('--> Field type selected! fieldToken:', fieldToken, 'typeToken:', typeToken, 'typeValue:', typeValue);
+                        battleFieldConfig.token = fieldToken;
+                        battleFieldConfig.type = typeToken;
+                        battleFieldConfig.power = typeValue;
+                        break;
+                        }
                     }
                 }
 
@@ -1835,6 +1857,9 @@
             return;
 
             })(effectiveQuanta, effectiveSpread, typeFlowsList);
+
+        // Update the mission details with the field configuration
+        _self.mission.field = battleFieldConfig;
 
         // Use calculated quanta-per-target to set-up the different target slots
         let missionTargets = [];
