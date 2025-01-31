@@ -2176,8 +2176,9 @@
         console.log('Updating battle field display using new data...', '\n-> missionField:', missionField);
         /*<div class="sprite background memory-filter" data-token="prototype-subspace" style="background-image: url(/images/fields/prototype-subspace/battle-field_background_base.gif?20241104-0121);">&nbsp;</div>
                 <div class="sprite foreground memory-filter" data-token="prototype-subspace" style="background-image: url(/images/fields/prototype-subspace/battle-field_foreground_base.png?20241104-0121);">&nbsp;</div>*/
-        if (missionField.token){
-            var fieldToken = missionField.token;
+        var fieldToken = 'prototype-subspace';
+        if (missionField.token){ fieldToken = missionField.token; }
+        if (mmrpgFields[fieldToken]){
             var fieldInfo = mmrpgFields[fieldToken];
             var fieldBackground = fieldInfo.field_background || fieldToken;
             var fieldForeground = fieldInfo.field_foreground || fieldToken;
