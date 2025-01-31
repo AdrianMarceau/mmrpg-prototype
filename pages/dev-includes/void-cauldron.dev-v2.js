@@ -196,6 +196,29 @@
         //console.log('mmrpgRobotMasterTokens:', mmrpgRobotMasterTokens);
         //console.log('mmrpgRobotBossTokens:', mmrpgRobotBossTokens);
 
+        // Define a function for checking what the minimum quanta is for a given class within an elementally-scoped void tier
+        let minQuantaByClass = function(voidTier, classToken){
+            //console.log('%c' + 'thisVoidCauldron.generateMission.minQuantaByClass(~)', 'color: grey;');
+            //console.log('-> w/ voidTier:', voidTier.type, 'classToken:', classToken);
+            let queues = voidTier.queues || {}, thresholds = Object.keys(queues);
+            let minQuanta = 0;
+            for (var j = 0; j < thresholds.length; j++){
+                let thresholdValue = thresholds[j];
+                let robots = queues[thresholdValue] || {};
+                for (var k = 0; k < robots.length; k++){
+                    let robotToken = robots[k];
+                    let robotInfo = mmrpgRobots[robotToken];
+                    if (robotInfo.robot_class === classToken){
+                        minQuanta = parseInt(thresholdValue);
+                        break;
+                        }
+                    }
+                if (minQuanta > 0){ break; }
+                }
+            //console.log('-> minQuanta =', minQuanta);
+            return minQuanta;
+            };
+
         // Loop through every single robot and categorize them into quanta tiers
         //let baseQuanta = 50, roundUpTo = 25, roundVariance = 5;
         let baseQuanta = 100, roundUpTo = 25, roundVariance = 5;
@@ -235,6 +258,7 @@
             let tierType = voidTierTypes[i];
             let thisVoidTier = voidTiers[tierType];
             thisVoidTier.thresholds = Object.keys(thisVoidTier.queues || {}).map(Number).sort((a, b) => b - a);
+            thisVoidTier.tiers = {boss: minQuantaByClass(thisVoidTier, 'boss'), master: minQuantaByClass(thisVoidTier, 'master'), mecha: minQuantaByClass(thisVoidTier, 'mecha')};
             //console.log('thisVoidTier['+tierType+']', '\n' + '-> type:', thisVoidTier.type, '\n' + '-> thresholds:', thisVoidTier.thresholds, '\n' + '-> queues:', thisVoidTier.queues, '\n' + '-> {raw}:', thisVoidTier);
             }
         voidTierValues = Object.values(voidTierValues).map(Number).sort((a, b) => a - b);
@@ -1689,29 +1713,6 @@
                 console.log('--> VOID POWER [FOCUS]:', '\n' + '-> w/ focusPowerValue:', focusPowerValue, '\n' + '-> focusPercentValue:', focusPercentValue, '\n' + '-> quantaShiftAmount:', quantaShiftAmount, '\n' + '-> quantaShiftDirection:', quantaShiftDirection);
                 }
 
-            // Define a function for checking what the minimum quanta is for a given class within an elementally-scoped void tier
-            let minQuantaByClass = function(voidTier, classToken){
-                console.log('%c' + 'thisVoidCauldron.generateMission.minQuantaByClass(~)', 'color: grey;');
-                console.log('-> w/ voidTier:', voidTier.type, 'classToken:', classToken);
-                let queues = voidTier.queues || {}, thresholds = Object.keys(queues);
-                let minQuanta = 0;
-                for (var j = 0; j < thresholds.length; j++){
-                    let thresholdValue = thresholds[j];
-                    let robots = queues[thresholdValue] || {};
-                    for (var k = 0; k < robots.length; k++){
-                        let robotToken = robots[k];
-                        let robotInfo = mmrpgIndex.robots[robotToken];
-                        if (robotInfo.robot_class === classToken){
-                            minQuanta = parseInt(thresholdValue);
-                            break;
-                            }
-                        }
-                    if (minQuanta > 0){ break; }
-                    }
-                console.log('-> minQuanta =', minQuanta);
-                return minQuanta;
-                };
-
             // Loop through the target slots and assign quanta and elemental types to each
             for (var i = 0; i < numTargetSlots; i++){
                 console.log('%c' + '--> generating slotTemplate for [i='+i+'] w/ [numTargetSlots:'+numTargetSlots+']', 'color: lime;');
@@ -1762,9 +1763,10 @@
                         let flowCost = 0, quantaCost = 0, tierToken = '';
                         //console.log('-> checking '+ flowType + '-flow availability w/ flowRemaining:', flowRemaining);
                         let flowTypeTier = voidTiers[flowType] || {};
-                        let minQuantaForBoss = minQuantaByClass(flowTypeTier, 'boss');
-                        let minQuantaForMaster = minQuantaByClass(flowTypeTier, 'master');
-                        let minQuantaForMecha = minQuantaByClass(flowTypeTier, 'mecha');
+                        let flowTypeTiers = voidTiers[flowType].tiers || {};
+                        let minQuantaForBoss = flowTypeTiers.boss || 0;
+                        let minQuantaForMaster = flowTypeTiers.master || 0;
+                        let minQuantaForMecha = flowTypeTiers.mecha || 0;
                         if (flowRemaining >= robotBossFlow && targetQuanta >= minQuantaForBoss){ flowCost = robotBossFlow; quantaCost = minQuantaForBoss; tierToken = 'boss'; }
                         else if (flowRemaining >= robotMasterFlow && targetQuanta >= minQuantaForMaster){ flowCost = robotMasterFlow; quantaCost = minQuantaForMaster; tierToken = 'master'; }
                         else if (flowRemaining >= robotMechaFlow && targetQuanta >= minQuantaForMecha){ flowCost = robotMechaFlow; quantaCost = minQuantaForMecha; tierToken = 'mecha'; }
