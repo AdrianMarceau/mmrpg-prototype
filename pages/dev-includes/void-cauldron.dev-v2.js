@@ -1755,22 +1755,25 @@
 
                 // Loop through available elemental flow in priority order and assign to slots first-come-first-serve
                 if (typeFlowPriority.length > 0){
-                    //console.log('-> looping through flow types in order of priority:', typeFlowPriority);
+                    console.log('-> looping through flow types in order of priority:', typeFlowPriority);
                     for (var j = 0; j < typeFlowPriority.length; j++){
                         let flowType = typeFlowPriority[j];
                         let flowRemaining = typeFlowRemaining[flowType];
                         if (!flowRemaining){ continue; }
                         let flowCost = 0, quantaCost = 0, tierToken = '';
-                        //console.log('-> checking '+ flowType + '-flow availability w/ flowRemaining:', flowRemaining);
+                        console.log('-> checking '+ flowType + '-flow availability w/ flowRemaining:', flowRemaining);
                         let flowTypeTier = voidTiers[flowType] || {};
                         let flowTypeTiers = voidTiers[flowType].tiers || {};
                         let minQuantaForBoss = flowTypeTiers.boss || 0;
                         let minQuantaForMaster = flowTypeTiers.master || 0;
                         let minQuantaForMecha = flowTypeTiers.mecha || 0;
-                        if (flowRemaining >= robotBossFlow && targetQuanta >= minQuantaForBoss){ flowCost = robotBossFlow; quantaCost = minQuantaForBoss; tierToken = 'boss'; }
-                        else if (flowRemaining >= robotMasterFlow && targetQuanta >= minQuantaForMaster){ flowCost = robotMasterFlow; quantaCost = minQuantaForMaster; tierToken = 'master'; }
-                        else if (flowRemaining >= robotMechaFlow && targetQuanta >= minQuantaForMecha){ flowCost = robotMechaFlow; quantaCost = minQuantaForMecha; tierToken = 'mecha'; }
-                        //console.log('-> flowCost:', flowCost, 'quantaCost:', quantaCost, 'tierToken:', tierToken);
+                        console.log('-> '+ flowType + '-type robotBossFlow:', robotBossFlow, 'minQuantaForBoss:', minQuantaForBoss);
+                        console.log('-> '+ flowType + '-type robotMasterFlow:', robotMasterFlow, 'minQuantaForMaster:', minQuantaForMaster);
+                        console.log('-> '+ flowType + '-type robotMechaFlow:', robotMechaFlow, 'minQuantaForMecha:', minQuantaForMecha);
+                        if (minQuantaForBoss && targetQuanta >= minQuantaForBoss && flowRemaining >= robotBossFlow){ flowCost = robotBossFlow; quantaCost = minQuantaForBoss; tierToken = 'boss'; }
+                        else if (minQuantaForMaster && targetQuanta >= minQuantaForMaster && flowRemaining >= robotMasterFlow){ flowCost = robotMasterFlow; quantaCost = minQuantaForMaster; tierToken = 'master'; }
+                        else if (minQuantaForMecha && targetQuanta >= minQuantaForMecha && flowRemaining >= robotMechaFlow){ flowCost = robotMechaFlow; quantaCost = minQuantaForMecha; tierToken = 'mecha'; }
+                        console.log('-> flowCost:', flowCost, 'quantaCost:', quantaCost, 'tierToken:', tierToken);
                         if (!flowCost || !quantaCost || flowRemaining < flowCost){ continue; }
                         targetType = flowType;
                         targetTypeFlow = flowCost;
