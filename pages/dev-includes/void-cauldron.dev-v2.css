@@ -827,7 +827,8 @@
     border-radius: 0;
     text-align: center;
 }
-#void-recipe #vcr_details .void-powers .power > span > data + sub {
+#void-recipe #vcr_details .void-powers .power > span > data + sub,
+#void-recipe #vcr_details .void-powers .power > span > data + em + sub {
     font-size: 10px;
     margin-left: 4px;
     color: rgba(255, 255, 255, 0.6);
@@ -850,11 +851,11 @@
     font-style: normal;
     font-size: 80%;
 }
-#void-recipe #vcr_details .void-powers.ltr .power > span > em {
+#void-recipe #vcr_details .void-powers .power > span > em + data {
     padding-left: 4px;
 }
-#void-recipe #vcr_details .void-powers.rtl .power > span > em {
-    padding-right: 4px;
+#void-recipe #vcr_details .void-powers .power > span > data + em {
+    padding-left: 2px;
 }
 #void-recipe #vcr_details .void-powers .power > span > code {
     font-size: 10px;
