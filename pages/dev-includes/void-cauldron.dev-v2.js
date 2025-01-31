@@ -2147,7 +2147,7 @@
         if (missionTargets.length){
             console.log('Updating mission target display using new data...', '\n-> missionInfo:', missionInfo, '\n-> missionTargets:', missionTargets);
             const mmrpgIndexRobots = mmrpgIndex.robots;
-            const frameTokenByKey = {0: 'base', 1: 'defense', 2: 'base2', 3: 'defend', 4: 'base', 5: 'defend', 6: 'base2', 7: 'defend'};
+            const frameTokenByKey = {0:'base', 1:'defend', 2:'base2', 3:'defend', 4:'base', 5:'defend', 6:'base2', 7:'defend'};
             var targetListRobotMarkup = '';
             var targetListRobotCount = 0;
             for (var i = 0; i < missionTargets.length; i++){
