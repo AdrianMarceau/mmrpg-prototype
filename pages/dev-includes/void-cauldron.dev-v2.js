@@ -1925,9 +1925,10 @@
         var $targetList = _self.xrefs.missionTargets;
         var $battleField = _self.xrefs.battleField;
 
-        // Collect a reference to the list of defined elemental types and stats
-        var mmrpgStats = _self.indexes.statTokens;
-        var mmrpgTypes = _self.indexes.typeTokens;
+        // Collect references to the mmrpg indexes we'll be using
+        let mmrpgFields = mmrpgIndex.fields;
+        let mmrpgStats = mmrpgIndex.statTokens;
+        let mmrpgTypes = mmrpgIndex.typeTokens;
 
         // Collect the list of added items and any history
         var voidItems = _self.items;
@@ -1947,7 +1948,7 @@
         // Remove any mission details, targets, battle fields, etc. before we add new ones
         $missionDetails.html('');
         $targetList.html('');
-        //$battleField.html(''); /* TODO: don't clear field until we can regenerate */
+        $battleField.html(''); /* TODO: don't clear field until we can regenerate */
 
         // Clear the item selection area and then rebuild it with the new items
         var $selectedWrapper = $('.wrapper', $itemsSelected);
@@ -2164,6 +2165,27 @@
             // Render for relative stat powers (attack, defense, speed) and display appropriate markup
             VoidPowersRenderer.renderStatPowers($missionDetails, statPowersValues);
 
+            }
+
+        // Collect the mission's target robots and field for display
+        var missionInfo = _self.mission;
+        var missionTargets = missionInfo.targets || [];
+        var missionField = missionInfo.field || {};
+
+        // Update the battle field with whatever the current configuration is
+        console.log('Updating battle field display using new data...', '\n-> missionField:', missionField);
+        /*<div class="sprite background memory-filter" data-token="prototype-subspace" style="background-image: url(/images/fields/prototype-subspace/battle-field_background_base.gif?20241104-0121);">&nbsp;</div>
+                <div class="sprite foreground memory-filter" data-token="prototype-subspace" style="background-image: url(/images/fields/prototype-subspace/battle-field_foreground_base.png?20241104-0121);">&nbsp;</div>*/
+        if (missionField.token){
+            var fieldToken = missionField.token;
+            var fieldInfo = mmrpgFields[fieldToken];
+            var fieldBackground = fieldInfo.field_background || fieldToken;
+            var fieldForeground = fieldInfo.field_foreground || fieldToken;
+            var fieldBackgroundImage = '/images/fields/'+fieldBackground+'/battle-field_background_base.gif?'+gameSettings.cacheTime;
+            var fieldForegroundImage = '/images/fields/'+fieldForeground+'/battle-field_foreground_base.png?'+gameSettings.cacheTime;
+            var fieldMarkup = '<div class="sprite background memory-filter" data-token="'+fieldToken+'" style="background-image: url('+fieldBackgroundImage+');">&nbsp;</div>';
+                fieldMarkup += '<div class="sprite foreground memory-filter" data-token="'+fieldToken+'" style="background-image: url('+fieldForegroundImage+');">&nbsp;</div>';
+            $battleField.append(fieldMarkup);
             }
 
         // Update the list of target robots in the panel if any have been generated
