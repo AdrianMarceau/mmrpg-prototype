@@ -173,7 +173,7 @@
         let mmrpgRobotClasses = {};
         mmrpgRobotClasses.mecha = {name: 'Mecha', icon: 'ghost', flow: 1, quanta: 250};
         mmrpgRobotClasses.master = {name: 'Master', icon: 'robot', flow: 4, quanta: 500};
-        mmrpgRobotClasses.boss = {name: 'Boss', icon: 'skull', flow: 10, quanta: 700};
+        mmrpgRobotClasses.boss = {name: 'Boss', icon: 'skull', flow: 12, quanta: 700};
         let mmrpgRobotClassTokens = Object.keys(mmrpgRobotClasses);
         indexes.robotClasses = mmrpgRobotClasses;
         indexes.robotClassTokens = mmrpgRobotClassTokens;
