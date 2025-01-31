@@ -1644,9 +1644,8 @@
 
         // Define variables to hold the slot templates with distributed quanta material and elemental energy
         let robotClasses = mmrpgIndex.robotClasses, robotMechaClass = robotClasses.mecha, robotMasterClass = robotClasses.master, robotBossClass = robotClasses.boss;
-        let robotQuantaThresholds = [robotBossClass.quanta, robotMasterClass.quanta, robotMechaClass.quanta];
-        let robotFlowThresholds = [robotBossClass.flow, robotMasterClass.flow, robotMechaClass.flow];
-        let typeFlowThresholds = { quanta: robotQuantaThresholds, flow: robotFlowThresholds };
+        let robotBossFlow = robotBossClass.flow, robotMasterFlow = robotMasterClass.flow, robotMechaFlow = robotMechaClass.flow, robotFlowThresholds = [robotBossFlow, robotMasterFlow, robotMechaFlow];
+        let robotBossQuanta = robotBossClass.quanta, robotMasterQuanta = robotMasterClass.quanta, robotMechaQuanta = robotMechaClass.quanta, robotQuantaThresholds = [robotBossQuanta, robotMasterQuanta, robotMechaQuanta];
         let numTargetSlots = 0;
         let quantaAvailable = 0;
         let typeFlowAvailable = {};
@@ -1658,10 +1657,12 @@
             console.log('%c' + 'thisVoidCauldron.generateMission.targetSlotTemplates(~)', 'color: green;');
 
             // Collect the number of slots and quanta available from effective values
-            quantaAvailable = quantaPower;
             numTargetSlots = spreadPower;
-            console.log('-> quantaAvailable:', quantaAvailable);
+            quantaAvailable = quantaPower;
             console.log('-> numTargetSlots:', numTargetSlots);
+            console.log('-> quantaAvailable:', quantaAvailable);
+            console.log('-> robotQuantaThresholds:', robotQuantaThresholds);
+            console.log('-> robotFlowThresholds:', robotFlowThresholds);
 
             // Collect the elemental types available and sort them by priority (we already have quanta from above)
             typeFlowAvailable = Object.assign({}, typePowers);
@@ -1688,6 +1689,29 @@
                 console.log('--> VOID POWER [FOCUS]:', '\n' + '-> w/ focusPowerValue:', focusPowerValue, '\n' + '-> focusPercentValue:', focusPercentValue, '\n' + '-> quantaShiftAmount:', quantaShiftAmount, '\n' + '-> quantaShiftDirection:', quantaShiftDirection);
                 }
 
+            // Define a function for checking what the minimum quanta is for a given class within an elementally-scoped void tier
+            let minQuantaByClass = function(voidTier, classToken){
+                console.log('%c' + 'thisVoidCauldron.generateMission.minQuantaByClass(~)', 'color: grey;');
+                console.log('-> w/ voidTier:', voidTier.type, 'classToken:', classToken);
+                let queues = voidTier.queues || {}, thresholds = Object.keys(queues);
+                let minQuanta = 0;
+                for (var j = 0; j < thresholds.length; j++){
+                    let thresholdValue = thresholds[j];
+                    let robots = queues[thresholdValue] || {};
+                    for (var k = 0; k < robots.length; k++){
+                        let robotToken = robots[k];
+                        let robotInfo = mmrpgIndex.robots[robotToken];
+                        if (robotInfo.robot_class === classToken){
+                            minQuanta = parseInt(thresholdValue);
+                            break;
+                            }
+                        }
+                    if (minQuanta > 0){ break; }
+                    }
+                console.log('-> minQuanta =', minQuanta);
+                return minQuanta;
+                };
+
             // Loop through the target slots and assign quanta and elemental types to each
             for (var i = 0; i < numTargetSlots; i++){
                 console.log('%c' + '--> generating slotTemplate for [i='+i+'] w/ [numTargetSlots:'+numTargetSlots+']', 'color: lime;');
@@ -1695,11 +1719,13 @@
                 // Define the key and position for later
                 let targetKey = i;
                 let targetPosition = targetKey === 0 ? 'active' : 'bench';
+                let targetQuanta = 0, shiftedQuanta = 0;
+                let targetType = '', targetTypeFlow = 0, targetTypeQuanta = 0;
 
                 // Create a new template object for the current slot so we can assign it the quanta and type
                 let slotTemplate = {
                     type: '',
-                    tier: 0,
+                    tier: '',
                     level: 0,
                     forte: 0,
                     quanta: 0,
@@ -1707,14 +1733,12 @@
                     };
 
                 // If quanta is available, take an equal portion unless there are special effects at play
-                let targetQuanta = 0, shiftedQuanta = 0;
                 if (quantaAvailable > 0){
                     targetQuanta = Math.floor(quantaAvailable / (numTargetSlots - i));
                     quantaAvailable -= targetQuanta;
                     slotTemplate.quanta = targetQuanta;
                     // If a shift amount was defined and this target's position was a benefactor,
                     // apply that shift amount to the target's quanta and reduce the available quanta
-                    //
                     if (quantaShiftAmount > 0){
                         if (quantaShiftDirection === targetPosition){
                             targetQuanta += quantaShiftAmount;
@@ -1728,25 +1752,34 @@
                     }
                 console.log('-> targetQuanta:', targetQuanta, 'shiftedQuanta: ~', shiftedQuanta);
 
-                // Loop through available elemental types in priority order and assign slots first-come-first-serve
-                let targetType = '';
+                // Loop through available elemental flow in priority order and assign to slots first-come-first-serve
                 if (typeFlowPriority.length > 0){
+                    //console.log('-> looping through flow types in order of priority:', typeFlowPriority);
                     for (var j = 0; j < typeFlowPriority.length; j++){
-                        // TODO: add special void power effects here (?)
-                        let typeToken = typeFlowPriority[j];
-                        let flowCost = (function(quanta, thresholds){
-                            let tiers = thresholds.quanta, costs = thresholds.flow;
-                            for (var k = 0; k < tiers.length; k++){ if (quanta >= tiers[k]){ return costs[k]; } }
-                            })(targetQuanta, typeFlowThresholds) || 0;
-                        let flowRemaining = typeFlowRemaining[typeToken];
-                        if (!flowRemaining || flowRemaining < flowCost){ continue; }
-                        targetType = typeToken;
+                        let flowType = typeFlowPriority[j];
+                        let flowRemaining = typeFlowRemaining[flowType];
+                        if (!flowRemaining){ continue; }
+                        let flowCost = 0, quantaCost = 0, tierToken = '';
+                        //console.log('-> checking '+ flowType + '-flow availability w/ flowRemaining:', flowRemaining);
+                        let flowTypeTier = voidTiers[flowType] || {};
+                        let minQuantaForBoss = minQuantaByClass(flowTypeTier, 'boss');
+                        let minQuantaForMaster = minQuantaByClass(flowTypeTier, 'master');
+                        let minQuantaForMecha = minQuantaByClass(flowTypeTier, 'mecha');
+                        if (flowRemaining >= robotBossFlow && targetQuanta >= minQuantaForBoss){ flowCost = robotBossFlow; quantaCost = minQuantaForBoss; tierToken = 'boss'; }
+                        else if (flowRemaining >= robotMasterFlow && targetQuanta >= minQuantaForMaster){ flowCost = robotMasterFlow; quantaCost = minQuantaForMaster; tierToken = 'master'; }
+                        else if (flowRemaining >= robotMechaFlow && targetQuanta >= minQuantaForMecha){ flowCost = robotMechaFlow; quantaCost = minQuantaForMecha; tierToken = 'mecha'; }
+                        //console.log('-> flowCost:', flowCost, 'quantaCost:', quantaCost, 'tierToken:', tierToken);
+                        if (!flowCost || !quantaCost || flowRemaining < flowCost){ continue; }
+                        targetType = flowType;
+                        targetTypeFlow = flowCost;
+                        targetTypeQuanta = quantaCost;
                         typeFlowRemaining[targetType] -= flowCost;
                         slotTemplate.type = targetType;
+                        slotTemplate.tier = tierToken;
                         break;
                         }
                     }
-                console.log('-> targetType:', targetType);
+                console.log('-> targetType:', targetType, 'targetTypeFlow:', targetTypeFlow, 'targetTypeQuanta:', targetTypeQuanta);
                 console.log('-> typeFlow['+targetType+'](Remaining/Available):', typeFlowRemaining[targetType] + '/' + typeFlowAvailable[targetType]);
 
                 // Generate a robot-queue given available quanta, type, and defined void tiers
@@ -1759,7 +1792,7 @@
                     let tierThresholds = tierInfo.thresholds || [];
                     for (var j = 0; j < tierThresholds.length; j++){
                         let thresholdValue = tierThresholds[j];
-                        if (slotTemplate.quanta < thresholdValue){ continue; }
+                        if (targetTypeQuanta < thresholdValue){ continue; }
                         if (!tierQueues[thresholdValue]){ continue; }
                         targetRobotQueue = Object.values(tierQueues[thresholdValue]);
                         slotTemplate.queue = targetRobotQueue;
