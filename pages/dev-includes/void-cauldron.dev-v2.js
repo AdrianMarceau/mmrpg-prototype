@@ -1835,6 +1835,11 @@
                     let typeValue = typeFlowRemaining[typeToken];
                     if (typeValue === 0){ continue; }
                     console.log('--> Scanning for compatible field w/ type:', typeToken, 'power:', typeValue, 'mmrpgFieldTokens:', mmrpgFieldTokens);
+                    if (typeToken === 'copy'){
+                        typeToken = typeFlowPriority[0];
+                        typeValue = typeFlowRemaining[typeToken];
+                        console.log('---> Copy-flow defaults to first-type in queue so type:', typeToken, 'after copy');
+                        }
                     for (var i = 0; i < mmrpgFieldTokens.length; i++){
                         let fieldToken = mmrpgFieldTokens[i];
                         let fieldInfo = mmrpgFields[fieldToken];
