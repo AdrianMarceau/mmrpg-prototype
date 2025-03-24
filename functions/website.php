@@ -546,10 +546,11 @@ function mmrpg_formatting_decode($string){
         // Replace any photobucket links with HTTPS urls
         $string = preg_replace('/http:\/\/((?:[a-z0-9]+)\.photobucket\.com\/)/i', 'https://$1', $string);
         // Replace any other image links with HTTPS urls
-        if (preg_match_all('/src="http:\/\/((?:[-_a-z0-9\.\/\+]+)\.(?:jpg|jpeg|png|ico|bmp|svg)(?:\?(.*)?)?)"/i', $string, $matches)){
+        if (preg_match_all('/src="https?:\/\/((?:[-_a-z0-9\.\/\+]+)\.(?:jpg|jpeg|png|ico|bmp|svg|gif)(?:\?(.*)?)?)"/i', $string, $matches)){
             $proxy_script = MMRPG_CONFIG_ROOTURL.'scripts/imageproxy.php';
             foreach ($matches[1] AS $key => $src){
                 $find = $matches[0][$key];
+                if (strstr($src, '.mmrpg-world.net') !== false){ continue; }
                 $src_encoded = urlencode($src);
                 $src_hash = md5(MMRPG_SETTINGS_IMAGEPROXY_SALT . $src);
                 $replace = 'src="'.$proxy_script.'?url='.$src_encoded.'&hash='.$src_hash.'"';
