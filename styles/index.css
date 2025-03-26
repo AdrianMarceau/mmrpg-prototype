@@ -1006,6 +1006,9 @@ button {
     margin: 0 8px 8px;
     padding-bottom: 12px;
 }
+#window .page:first-child {
+    padding-top: 12px;
+}
 
 #window .header {
     display: block;
@@ -5971,6 +5974,14 @@ body.windowFlag_landscapeMode #window .page .type_block {
 #window .page .body .community .post_subbody .postscroll.left {
     left: 12px;
 }
+
+#window .page .body .community .post_subbody {
+    page-break-inside: avoid;
+}
+#window .page .body .community .post_subbody:nth-child(5n) {
+    page-break-after: always;
+}
+
 #window .page .body .community .link_inline {
     display: inline;
     float: none;
@@ -6401,6 +6412,9 @@ body[data-page="community_personal"] #window .page .body .community .thread_subb
     font-size: 10px;
     position: relative;
     bottom: 2px;
+}
+#window .page .body .community .thread_posts_count.haslinks .thread_posts_total:last-child:after {
+    content: "";
 }
 #window .page .body .community .thread_posts_count .thread_posts_pages {
     float: none;
@@ -7860,3 +7874,78 @@ body.windowFlag_landscapeMode #window .page_community .form .field_post_body .te
 #window .popup_overlay ::-webkit-scrollbar-corner { background: #999; }
 /* Resizer */
 #window .popup_overlay ::-webkit-resizer { background: #111; }
+
+
+
+/* -- PRINT VIEW STYLES -- */
+
+html[data-view="print"],
+html[data-view="print"] #mmrpg,
+html[data-view="print"] #window,
+html[data-view="print"] #window > .page {
+    font-family: Verdana, Arial, sans-serif !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0;
+    min-width: 0;
+    max-height: none;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    box-shadow: none;
+    overflow: visible;
+}
+html[data-view="print"] .fa,
+html[data-view="print"] .fas {
+    font-family: 'Font Awesome 5 Pro' !important;
+    font-weight: 900 !important;
+}
+html[data-view="print"],
+html[data-view="print"] body {
+    background-color: #262626 !important;
+    background-image: none !important;
+    width: 1040px !important; /* ~780pt */
+}
+html[data-view="print"] #window {
+    width: 98% !important;
+    background-color: #262626 !important;
+    border: 10px solid #262626 !important;
+    padding: 10px !important;
+    border-radius: 0 !important;
+}
+html[data-view="print"] #window #topscroll {
+    display: none;
+}
+html[data-view="print"] #window > .page > .header {
+    width: 100% !important;
+}
+html[data-view="print"] #window .heade,
+html[data-view="print"] #window .header .title {
+    display: block !important;
+}
+html[data-view="print"] #window .header {
+    font-size: 16px !important;
+    line-height: 32px !important;
+}
+html[data-view="print"] #window .header .title,
+html[data-view="print"] #window .header .title > .wrap,
+html[data-view="print"] #window .header .title > .wrap > h1,
+html[data-view="print"] #window .header .title > .wrap > h1 > .brand {
+    white-space: nowrap !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    text-indent: 0;
+}
+html[data-view="print"] #window .header .title > .wrap,
+html[data-view="print"] #window .header .title > .wrap > h1 {
+    display: inline-block !important;
+}
+html[data-view="print"] #window .header .title > .wrap > h1 > .brand {
+    display: inline !important;
+}
+html[data-view="print"] #window .header .title > .wrap > h1 > .brand:after {
+    content: "\00a0";
+    display: inline-block;
+    line-height: inherit;
+}
