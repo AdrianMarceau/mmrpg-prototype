@@ -705,7 +705,8 @@ function mmrpg_website_sessions_active($session_href = '', $session_timeout = 3,
         $min_time = strtotime('-'.$session_timeout.' minutes', $this_time);
         $saved_active_sessions = $db->get_array_list("SELECT
             DISTINCT user_id,
-            session_href
+            session_href,
+            session_access
             FROM mmrpg_sessions
             WHERE session_access >= {$min_time}
             ORDER BY session_access ASC
