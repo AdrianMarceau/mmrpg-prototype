@@ -7906,9 +7906,11 @@ html[data-view="print"] body {
     background-color: #262626 !important;
     background-image: none !important;
     width: 1040px !important; /* ~780pt */
+    text-align: center !important;
 }
 html[data-view="print"] #window {
     width: 98% !important;
+    margin: 0 auto;
     background-color: #262626 !important;
     border: 10px solid #262626 !important;
     padding: 10px !important;
