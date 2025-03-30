@@ -1853,6 +1853,8 @@
                         battleFieldConfig.power = typeValue;
                         break;
                         }
+                    typeFlowRemaining[typeToken] = 0;
+                    if (battleFieldConfig.token.length){ break; }
                     }
                 }
 
@@ -2229,7 +2231,7 @@
                 var targetRobotImageSize = targetRobotInfo['robot_image_size'] || 40;
                 var targetRobotImageSizeX = targetRobotImageSize + 'x' + targetRobotImageSize;
                 var targetRobotFrame = frameTokenByKey[targetKey] || '00';
-                var targetRobotSprite = '/images/robots/'+targetRobotImage+'/sprite_left_'+targetRobotImageSizeX+'.png?'+gameSettings.cacheTime;
+                var targetRobotSprite = '/images/robots/'+targetRobotImage+'/sprite_right_'+targetRobotImageSizeX+'.png?'+gameSettings.cacheTime;
                 var targetRobotMarkup = '<div class="target" style="z-index: '+targetLayer+';">';
                     targetRobotMarkup += '<i class="portal type '+targetRobotSlotType+'"></i>';
                     targetRobotMarkup += '<div class="image">';

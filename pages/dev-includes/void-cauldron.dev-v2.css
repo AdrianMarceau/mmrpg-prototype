@@ -1519,7 +1519,7 @@
     cursor: pointer;
     transform: scale(1.0);
     transition: transform 0.2s, color 0.2s;
-    background-color: #242131;
+    background-color: #3f355a;
     border: 0 none transparent;
     border-radius: 50%;
 }
