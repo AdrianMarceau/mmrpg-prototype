@@ -10,3 +10,9 @@
 [submodule ".libs/pdf-merger"]
 	path = .libs/pdf-merger
 	url = https://github.com/myokyawhtun/PDFMerger.git
+[submodule ".libs/fpdf"]
+	path = .libs/fpdf
+	url = https://github.com/Setasign/FPDF.git
+[submodule ".libs/fpdi"]
+	path = .libs/fpdi
+	url = https://github.com/Setasign/FPDI.git
