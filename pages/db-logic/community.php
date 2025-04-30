@@ -4,8 +4,12 @@
  */
 
 // Define the viewing as a moderator flag for global use
-if (in_array($this_userinfo['role_id'], array(1, 6, 7))){ define('COMMUNITY_VIEW_MODERATOR', true); }
-else { define('COMMUNITY_VIEW_MODERATOR', false); }
+if (MMRPG_INDEX_FULL_VIEW === true){
+    if (in_array($this_userinfo['role_id'], array(1, 6, 7))){ define('COMMUNITY_VIEW_MODERATOR', true); }
+    else { define('COMMUNITY_VIEW_MODERATOR', false); }
+} else {
+    define('COMMUNITY_VIEW_MODERATOR', false);
+}
 
 // Define the SEO variables for this page
 $this_seo_title = 'Community | '.$this_seo_title;

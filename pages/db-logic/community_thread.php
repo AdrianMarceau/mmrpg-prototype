@@ -101,6 +101,9 @@ if (MMRPG_INDEX_PRINT_VIEW === true){
         }
     }
 }
+//error_log('$print_limit = '.print_r($print_limit, true));
+//error_log('$print_offset = '.print_r($print_offset, true));
+//error_log('$print_range = '.print_r($print_range, true));
 
 
 // Count the number of posts for this specific thread in the database
@@ -133,6 +136,7 @@ if ($this_current_num > $comment_post_pages){
 }
 
 // Now collect all posts (in full) for this specific thread in the database
+$this_posts_array = array();
 if ($show_posts_comments){
     $this_posts_query = "SELECT
 
@@ -184,10 +188,30 @@ if ($show_posts_comments){
         OFFSET {$comment_post_offset}
 
         ;";
+    //error_log('$this_posts_query = '.print_r($this_posts_query, true));
     $this_posts_array = $db->get_array_list($this_posts_query);
 }
 if (empty($this_posts_array)){ $this_posts_array = array(); }
-//error_log('this_posts_query = '.$this_posts_query);
+//error_log('$this_posts_array ('.count($this_posts_array).') = '.print_r($this_posts_array, true));
+
+// If there are comments, let's generate an index of post-IDs so we can determine key/position/etc.
+$this_posts_ids = array();
+if (!empty($this_posts_count)){
+    $this_posts_ids_query = "SELECT
+        posts.post_id
+        FROM mmrpg_posts AS posts
+        WHERE
+            posts.thread_id = '{$this_thread_info['thread_id']}'
+            {$is_personal_query_condition}
+            AND posts.post_deleted = 0
+        ORDER BY posts.post_date ASC
+        ;";
+    //error_log('$this_posts_ids_query = '.print_r($this_posts_ids_query, true));
+    $this_posts_ids = $db->get_array_list($this_posts_ids_query, 'post_id');
+    if (!empty($this_posts_ids)){ $this_posts_ids = array_keys($this_posts_ids); }
+}
+if (empty($this_posts_ids)){ $this_posts_ids = array(); }
+//error_log('$this_posts_ids ('.count($this_posts_ids).') = '.print_r($this_posts_ids, true));
 
 // Define the array of user ids to collect information for
 $temp_user_ids = array();
@@ -390,18 +414,20 @@ ob_start();
             <div class="bodytext"><?= mmrpg_formatting_decode($temp_thread_body) ?></div>
             <? if((COMMUNITY_VIEW_MODERATOR || ($this_userinfo['user_id'] == $this_thread_info['user_id'] && !empty($this_userinfo['user_flag_postpublic']))) && $this_thread_info['category_id'] != 0): ?>
                 <? if($this_thread_info['thread_target'] == 0): ?>
-                <div class="published" style="position: absolute; bottom: 10px; right: 10px;">
+                <div class="published">
                     <?/*<strong><?= $temp_thread_author ?></strong> on <strong><?= $temp_thread_date ?></strong>*/?>
                         <span class="options">[ <a class="edit" rel="noindex,nofollow" href="<?= $_GET['this_current_url'].'action=edit&amp;thread_id='.$this_thread_info['thread_id'].'#discussion-form' ?>">edit</a> ]</span>
                 </div>
                 <? endif; ?>
             <? endif; ?>
-            <div class="viewed" style="position: absolute; bottom: 12px; left: 14px; right: 14px; font-size: 10px; line-height: 13px; color: #565656; text-shadow: 0 0 0 transparent; border-top: 1px solid #252424; padding-top: 6px; width: 90%; ">
+            <div class="viewed">
                 <?
                 // If this is a personal message, only display the time
                 if ($this_category_info['category_id'] == 0){ echo 'Sent by '.$temp_thread_author.' to '.$temp_thread_target.' on '.$temp_thread_date; }
                 // Otherwise display extended details about the post
                 else { echo $temp_thread_name.'<br /> Posted by '.$temp_thread_author.' on '.$temp_thread_date.'<br /> '.($temp_thread_views == 1 ? 'Viewed 1 Time' : 'Viewed '.$temp_thread_views.' Times'); }
+                // If possible, we should add a link to export this thread
+                if (MMRPG_INDEX_FULL_VIEW === true && rpg_user::is_member()){ echo ' | <a class="link_inline" href="'.MMRPG_CONFIG_ROOTURL.'scripts/thread-to-pdf.php?thread='.$this_thread_info['thread_id'].'" target="_blank" rel="noindex,nofollow">Export to PDF</a>'; }
                 ?>
             </div>
 
@@ -478,7 +504,7 @@ ob_start();
                 // Loop through each of the posts and display their markup if allowed
                 if ($show_posts_comments){
 
-                    foreach ($this_posts_array AS $this_post_key => $this_post_info){
+                    foreach ($this_posts_array AS $rel_post_key => $this_post_info){
 
                         // If this is a personal message, we should check stuff
                         if ($is_personal_message){
@@ -487,6 +513,11 @@ ob_start();
                                     continue;
                                 }
                         }
+
+                        // Collect the post key given the current content
+                        $this_post_key = !empty($this_posts_ids) ? array_search($this_post_info['post_id'], $this_posts_ids) : false;
+                        //error_log('$rel_post_key = '.$rel_post_key);
+                        //error_log('$this_post_key = '.$this_post_key);
 
                         // Define this post's overall float direction based on if PM
                         $this_post_float = 'left';
