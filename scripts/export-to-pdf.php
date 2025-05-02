@@ -9,11 +9,12 @@
 // Require the application top file
 define('MMRPG_EXCLUDE_GAME_LOGIC', true);
 require_once('../top.php');
-//exit('<pre>$_GET = '.print_r($_GET, true).'</pre>');
+//exit('<pre>$_REQUEST = '.print_r($_REQUEST, true).'</pre>');
 
 // Define the default values for the export process
-$request_format = isset($_GET['return']) && $_GET['return'] === 'json' ? 'json' : 'html';
-$show_debug = isset($_GET['debug']) && $_GET['debug'] === 'true' ? true : false;
+$request_format = isset($_REQUEST['return']) && $_REQUEST['return'] === 'json' ? 'json' : 'html';
+$show_debug = isset($_REQUEST['debug']) && $_REQUEST['debug'] === 'true' ? true : false;
+$system_os = (MMRPG_CONFIG_IS_LIVE === true ? 'linux' : 'macos');
 $debug_output = '';
 $export_output = array();
 $export_output['status'] = 'pending';
@@ -22,6 +23,11 @@ $export_output['message'] = '...';
 $export_output['data'] = array();
 
 // Define some helper functions for the export process
+function cleanPaths($string){
+    $string = str_replace(MMRPG_CONFIG_ROOTDIR, '', $string);
+    $string = str_replace(MMRPG_CONFIG_ROOTURL, '', $string);
+    return $string;
+}
 function exportKeyGen($src, $dst, $mod){
     return substr(md5(implode('##'.MMRPG_SETTINGS_EXPORTAUTH_SALT.'##', array($src, $dst, $mod))), 6, 6);
 }
@@ -29,6 +35,7 @@ function exitWithHtml($export_output){
     $debug_markup = !empty($export_output['debug']) ? $export_output['debug'] : ''; unset($export_output['debug']);
     $html_markup = !empty($debug_markup) ? $debug_markup : '<div> <p><b><u>Export to PDF</u></b></p> </div>';
     $html_markup .= '<div> <p><b>$export_output:</b></p> <pre>'.json_encode($export_output, JSON_PRETTY_PRINT).'</pre> </div>';
+    $html_markup = cleanPaths($html_markup);
     header('Content-Type: text/html');
     echo('<html>');
     echo('<head><title>Export to PDF</title></head>');
@@ -76,20 +83,19 @@ ob_start();
 echo('<pre style="color: magenta;">First test on line '.__LINE__.'!</pre>'.PHP_EOL);
 echo('<style> html, body { font-family: Arial, sans-serif; font-size: 13px; line-height: 1.6; color: #efefef; background-color: #262626; color: #efefef; margin: 0; padding: 0; }  a { color: #007cf4; text-decoration: underline; } a:hover { color: #3cc0fc; text-decoration: none; } </style>');
 echo('<style> pre { max-width: 100%; } pre:not(.array) { white-space: normal; } pre.array > data { display: block; max-height: 200px; overflow: auto; } </style>'.PHP_EOL);
+echo('<pre>$request_format = '.print_r($request_format, true).'</pre>'.PHP_EOL);
+echo('<pre>$show_debug = '.($show_debug ? 'true' : 'false').'</pre>'.PHP_EOL);
+echo('<pre>$system_os = '.print_r($system_os, true).'</pre>'.PHP_EOL);
 
 /* -- COLLECT SOURCE & DESTINATION -- */
 
 // Collect the source and destination arguments from the request
 echo('<pre style="color: magenta;">Testing on line '.__LINE__.'!</pre>'.PHP_EOL);
-$system_os = (MMRPG_CONFIG_IS_LIVE === true ? 'linux' : 'macos');
 $export_src = !empty($_REQUEST['src']) && is_string($_REQUEST['src']) ? trim($_REQUEST['src']) : '';
 $export_dst = !empty($_REQUEST['dst']) && is_string($_REQUEST['dst']) ? trim($_REQUEST['dst']) : '';
-$export_mod = !empty($_GET['mod']) && is_numeric($_GET['mod']) ? intval($_GET['mod']) : time();
+$export_mod = !empty($_REQUEST['mod']) && is_numeric($_REQUEST['mod']) ? intval($_REQUEST['mod']) : time();
 $export_auth_key_expected = exportKeyGen($export_src, $export_dst, $export_mod);
-$export_auth_key_received = !empty($_GET['auth']) && is_string($_GET['auth']) ? trim($_GET['auth']) : '';
-echo('<pre>$request_format = '.print_r($request_format, true).'</pre>'.PHP_EOL);
-echo('<pre>$show_debug = '.($show_debug ? 'true' : 'false').'</pre>'.PHP_EOL);
-echo('<pre>$system_os = '.print_r($system_os, true).'</pre>'.PHP_EOL);
+$export_auth_key_received = !empty($_REQUEST['auth']) && is_string($_REQUEST['auth']) ? trim($_REQUEST['auth']) : '';
 echo('<pre>$export_src = '.print_r($export_src, true).'</pre>'.PHP_EOL);
 echo('<pre>$export_dst = '.print_r($export_dst, true).'</pre>'.PHP_EOL);
 echo('<pre>$export_mod = '.print_r($export_mod, true).' ('.date('Y-m-d H:i:s', $export_mod).')</pre>'.PHP_EOL);
@@ -121,15 +127,6 @@ echo('<pre>$wkhtmltoimage_base_dir = '.print_r($wkhtmltoimage_base_dir, true).'<
 echo('<pre>$wkhtmltoimage_binary_dir = '.print_r($wkhtmltoimage_binary_dir, true).'</pre>'.PHP_EOL);
 if (!file_exists($wkhtmltoimage_base_dir)){ killScript(__LINE__, "wkhtmltoimage binary dir not found."); }
 if (!file_exists($wkhtmltoimage_base_dir)){ killScript(__LINE__, "wkhtmltoimage binary for {$system_os} not found."); }
-
-// Define the path to the local pdfmerge script
-echo('<pre style="color: magenta;">Testing on line '.__LINE__.'!</pre>'.PHP_EOL);
-$pdfmerger_base_dir = MMRPG_CONFIG_ROOTDIR.'.libs/pdf-merger/';
-$pdfmerger_script_path = $pdfmerger_base_dir.'PDFMerger.php';
-echo('<pre>$pdfmerger_base_dir = '.print_r($pdfmerger_base_dir, true).'</pre>'.PHP_EOL);
-echo('<pre>$pdfmerger_script_path = '.print_r($pdfmerger_script_path, true).'</pre>'.PHP_EOL);
-if (!file_exists($pdfmerger_base_dir)){ killScript(__LINE__, "PDFMerger script dir not found."); }
-if (!file_exists($pdfmerger_script_path)){ killScript(__LINE__, "PDFMerger script not found."); }
 
 // Define the base export directory for the thread conversion
 echo('<pre style="color: magenta;">Testing on line '.__LINE__.'!</pre>'.PHP_EOL);
