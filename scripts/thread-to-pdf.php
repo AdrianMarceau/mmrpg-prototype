@@ -72,8 +72,6 @@ echo('<pre>$dst_base = '.print_r($dst_base, true).'</pre>'.PHP_EOL);
 echo('<pre class="array">$post_ids = <data>'.print_r($post_ids, true).'</data></pre>'.PHP_EOL);
 echo('<pre class="array">$export_manifest = <data>'.print_r($export_manifest, true).'</data></pre>'.PHP_EOL);
 
-echo('<pre style="color: magenta;">Final test on line '.__LINE__.'!</pre>'.PHP_EOL);
-
 // Collect output from the buffer and clear it
 $debug_output = ob_get_clean();
 
@@ -98,7 +96,113 @@ $html_content_head .= ob_get_clean();
 
 // Generate the HTML <body> part of the page
 ob_start();
-?>
+
+    // Define basic variables for the export process
+    $manifest_total = !empty($export_manifest) ? count($export_manifest) : 0;
+    $manifest_base_dir = $dst_base.'/';
+    $manifest_file_path = $manifest_base_dir.'manifest.json';
+    $manifest_file_list = array();
+    $src_base_url = MMRPG_CONFIG_ROOTURL;
+    $dst_base_dir = MMRPG_CONFIG_ROOTDIR.'.cache/';
+    $dst_base_url = MMRPG_CONFIG_ROOTURL.'.cache/';
+    //$final_export_path = $dst_base_dir.$dst_base.$id_pad($thread_id).'.pdf';
+    $final_export_path = $dst_base_dir.$dst_base.'/export.pdf';
+    $final_export_href = $dst_base_url.$dst_base.'/export.pdf';
+    //error_log('$final_export_path = '.$final_export_path);
+    //error_log('$final_export_href = '.$final_export_href);
+    $final_export_exists = file_exists($final_export_path);
+    //error_log('$manifest_file_path: '.print_r($manifest_file_path, true));
+
+    // If the export manifest is not empty, we can generate the HTML for it
+    ob_clean();
+    $manifest_list_items = array();
+    if (!empty($export_manifest)){
+        $manifest_list_items['pending'] = array();
+        $manifest_list_items['complete'] = array();
+        $rel_src_base_url = str_replace(MMRPG_CONFIG_ROOTURL, '', $src_base_url);
+        $rel_dst_base_url = str_replace(MMRPG_CONFIG_ROOTURL, '', $dst_base_url);
+        foreach ($export_manifest AS $key => $item){
+            if (empty($item['src']) || empty($item['dst'])){ continue; }
+            $item_num = ($key + 1); //$item_num = preg_replace('/^([0]+)?/', '<b>$1</b>', str_pad(($key + 1), 3, '0', STR_PAD_LEFT));
+            $name = (!empty($item['name']) ? $item['name'] : 'Item '.($key + 1));
+            $src_path = (!empty($item['src']) ? $item['src'] : '');
+            $dst_path = (!empty($item['dst']) ? $item['dst'] : '');
+            $mod_time = (!empty($item['mod']) ? $item['mod'] : time());
+            $auth_key = exportKeyGen($src_path, $dst_path, $mod_time);
+            $src_href = $rel_src_base_url.$src_path;
+            $dst_href = $rel_dst_base_url.$dst_path;
+            $dst_img_type = 'png';
+            $dst_img_path = $dst_path.'.'.$dst_img_type;
+            $dst_img_href = $rel_dst_base_url.$dst_img_path;
+            $dst_img_exists = file_exists($dst_base_dir.$dst_img_path);
+            $dst_doc_type = 'pdf';
+            $dst_doc_path = $dst_path.'.'.$dst_doc_type;
+            $dst_doc_href = $rel_dst_base_url.$dst_doc_path;
+            $dst_doc_exists = file_exists($dst_base_dir.$dst_doc_path);
+            $manifest_file_list[] = basename($dst_path);
+            //$item_status = '';
+            //if ($dst_img_exists && $dst_doc_exists){ $item_status = 'complete'; }
+            //elseif ($dst_img_exists || $dst_doc_exists){ $item_status = 'pending'; }
+            $item_status = $dst_img_exists && $dst_doc_exists ? 'complete' : 'pending';
+            ob_start();
+            echo('<li class="item"'.
+                ' data-src="'.$src_path.'"'.
+                ' data-dst="'.$dst_path.'"'.
+                ' data-mod="'.$mod_time.'"'.
+                ' data-auth="'.$auth_key.'"'.
+                ' data-status="'.$item_status.'"'.
+                '>');
+                echo('<i class="bullet">&raquo;</i>');
+                echo('<strong class="num">'.$item_num.' <b>/ '.$manifest_total.'</b></strong>');
+                echo('<a class="name" href="'.$src_href.'" target="_blank">'.$name.'</a>');
+                if ($dst_img_exists){ echo('<a class="file img" href="'.$dst_img_href.'" target="_blank">'.strtoupper($dst_img_type).'</a>'); }
+                else { echo('<a class="file img" target="_blank"></a>'); }
+                if ($dst_doc_exists){ echo('<a class="file doc" href="'.$dst_doc_href.'" target="_blank">'.strtoupper($dst_doc_type).'</a>'); }
+                else { echo('<a class="file doc" target="_blank"></a>'); }
+                echo('<i class="status"></i>');
+            echo('</li>'.PHP_EOL);
+            $manifest_list_items[$item_status][] = ob_get_clean();
+        }
+        foreach ($manifest_list_items AS $status => $items){
+            $num_items = count($items);
+            $ratio_vs_total = ($num_items / $manifest_total);
+            $percent_of_total = round($ratio_vs_total * 100, 0);
+            echo('<ol class="list" data-status="'.$status.'">'.PHP_EOL);
+                echo('<li class="title">');
+                    echo('<strong class="name">'.ucfirst($status).'</strong>');
+                    echo('<label class="count">'.$num_items.' / '.$manifest_total.'</label>');
+                    echo('<progress class="progress" value="'.$num_items.'" max="'.$manifest_total.'">'.$percent_of_total.'%</progress>');
+                echo('</li>'.PHP_EOL);
+                if (!empty($items)){
+                    if ($status == 'complete'){ $items = array_reverse($items); }
+                    foreach ($items AS $item){ echo($item); }
+                } else {
+                    echo('<li class="item empty">&nbsp;</li>'.PHP_EOL);
+                }
+            echo('</ol>'.PHP_EOL);
+        }
+    }
+    $export_manifest_markup = ob_get_clean();
+    error_log('$manifest_file_list: '.print_r($manifest_file_list, true));
+    error_log('$manifest_list_items: '.print_r($manifest_list_items, true));
+
+    // Decide the final export status based on the manifest list items
+    $final_export_status = empty($manifest_list_items['pending']) && $final_export_exists ? 'complete' : '';
+
+    // Generate the accompanying JSON manifest file for the export
+    $manifest_file_json = array();
+    $manifest_file_json['title'] = $thread_info['thread_name'];
+    $manifest_file_json['author'] = !empty($thread_info['author_name_public']) ? $thread_info['author_name_public'] : $thread_info['author_name'];
+    $manifest_file_json['published'] = $thread_published;
+    $manifest_file_json['updated'] = $thread_updated;
+    $manifest_file_json['items'] = $manifest_file_list;
+    if (!is_dir($manifest_base_dir)){ recurseMakeDir($manifest_base_dir, $dst_base_dir); }
+    if (file_exists($dst_base_dir.$manifest_file_path)){ unlink($dst_base_dir.$manifest_file_path); }
+    $h = fopen($dst_base_dir.$manifest_file_path, 'w');
+    fwrite($h, json_encode($manifest_file_json, JSON_PRETTY_PRINT));
+    fclose($h);
+
+    ?>
     <div id="intro-text">
         <h1>Thread to PDF Converter</h1>
         <h2>MMRPG Community Thread Export Tool</h2>
@@ -116,22 +220,6 @@ ob_start();
         <p>Click the "Generate" button to get started and then use the "Download" button to grab your file once the export is complete.</p>
         <p>Please be patient while the script generates each section of the document and then assembles them together. Thank you.</p>
     </div>
-    <?
-    $manifest_total = !empty($export_manifest) ? count($export_manifest) : 0;
-    $manifest_base_dir = $dst_base.'/';
-    $manifest_file_path = $manifest_base_dir.'manifest.json';
-    $manifest_file_list = array();
-    $src_base_url = MMRPG_CONFIG_ROOTURL;
-    $dst_base_dir = MMRPG_CONFIG_ROOTDIR.'.cache/';
-    $dst_base_url = MMRPG_CONFIG_ROOTURL.'.cache/';
-    //$final_export_path = $dst_base_dir.$dst_base.$id_pad($thread_id).'.pdf';
-    $final_export_path = $dst_base_dir.$dst_base.'/export.pdf';
-    $final_export_href = $dst_base_url.$dst_base.'/export.pdf';
-    //error_log('$final_export_path = '.$final_export_path);
-    //error_log('$final_export_href = '.$final_export_href);
-    $final_export_exists = file_exists($final_export_path);
-    $final_export_status = $final_export_exists ? 'complete' : '';
-    ?>
     <div id="thread-to-pdf"
         data-thread-id="<?= $thread_id ?>"
         data-thread-token="<?= $thread_token ?>"
@@ -143,7 +231,7 @@ ob_start();
         data-export-path="<?= $final_export_path ?>"
         data-status="<?= $final_export_status ?>">
         <div id="buttons">
-            <? if ($final_export_exists){ ?>
+            <? if ($final_export_status === 'complete'){ ?>
                 <button id="start" class="button" disabled>Generate PDF</button>
                 <button id="stop" class="button" disabled>Stop Generating</button>
                 <button id="download" class="button" href="<?= $final_export_href ?>">Download PDF</button>
@@ -155,88 +243,7 @@ ob_start();
             <i class="status"></i>
         </div>
         <div id="manifest">
-        <?
-        if (!empty($export_manifest)){
-            $list_items = array();
-            $list_items['pending'] = array();
-            $list_items['complete'] = array();
-            $rel_src_base_url = str_replace(MMRPG_CONFIG_ROOTURL, '', $src_base_url);
-            $rel_dst_base_url = str_replace(MMRPG_CONFIG_ROOTURL, '', $dst_base_url);
-            foreach ($export_manifest AS $key => $item){
-                if (empty($item['src']) || empty($item['dst'])){ continue; }
-                $item_num = ($key + 1); //$item_num = preg_replace('/^([0]+)?/', '<b>$1</b>', str_pad(($key + 1), 3, '0', STR_PAD_LEFT));
-                $name = (!empty($item['name']) ? $item['name'] : 'Item '.($key + 1));
-                $src_path = (!empty($item['src']) ? $item['src'] : '');
-                $dst_path = (!empty($item['dst']) ? $item['dst'] : '');
-                $mod_time = (!empty($item['mod']) ? $item['mod'] : time());
-                $auth_key = exportKeyGen($src_path, $dst_path, $mod_time);
-                $src_href = $rel_src_base_url.$src_path;
-                $dst_href = $rel_dst_base_url.$dst_path;
-                $dst_img_type = 'png';
-                $dst_img_path = $dst_path.'.'.$dst_img_type;
-                $dst_img_href = $rel_dst_base_url.$dst_img_path;
-                $dst_img_exists = file_exists($dst_base_dir.$dst_img_path);
-                $dst_doc_type = 'pdf';
-                $dst_doc_path = $dst_path.'.'.$dst_doc_type;
-                $dst_doc_href = $rel_dst_base_url.$dst_doc_path;
-                $dst_doc_exists = file_exists($dst_base_dir.$dst_doc_path);
-                $manifest_file_list[] = basename($dst_path);
-                //$item_status = '';
-                //if ($dst_img_exists && $dst_doc_exists){ $item_status = 'complete'; }
-                //elseif ($dst_img_exists || $dst_doc_exists){ $item_status = 'pending'; }
-                $item_status = $dst_img_exists && $dst_doc_exists ? 'complete' : 'pending';
-                ob_start();
-                echo('<li class="item"'.
-                    ' data-src="'.$src_path.'"'.
-                    ' data-dst="'.$dst_path.'"'.
-                    ' data-mod="'.$mod_time.'"'.
-                    ' data-auth="'.$auth_key.'"'.
-                    ' data-status="'.$item_status.'"'.
-                    '>');
-                    echo('<i class="bullet">&raquo;</i>');
-                    echo('<strong class="num">'.$item_num.' <b>/ '.$manifest_total.'</b></strong>');
-                    echo('<a class="name" href="'.$src_href.'" target="_blank">'.$name.'</a>');
-                    if ($dst_img_exists){ echo('<a class="file img" href="'.$dst_img_href.'" target="_blank">'.strtoupper($dst_img_type).'</a>'); }
-                    else { echo('<a class="file img" target="_blank"></a>'); }
-                    if ($dst_doc_exists){ echo('<a class="file doc" href="'.$dst_doc_href.'" target="_blank">'.strtoupper($dst_doc_type).'</a>'); }
-                    else { echo('<a class="file doc" target="_blank"></a>'); }
-                    echo('<i class="status"></i>');
-                echo('</li>'.PHP_EOL);
-                $list_items[$item_status][] = ob_get_clean();
-            }
-            foreach ($list_items AS $status => $items){
-                $num_items = count($items);
-                $ratio_vs_total = ($num_items / $manifest_total);
-                $percent_of_total = round($ratio_vs_total * 100, 0);
-                echo('<ol class="list" data-status="'.$status.'">'.PHP_EOL);
-                    echo('<li class="title">');
-                        echo('<strong class="name">'.ucfirst($status).'</strong>');
-                        echo('<label class="count">'.$num_items.' / '.$manifest_total.'</label>');
-                        echo('<progress class="progress" value="'.$num_items.'" max="'.$manifest_total.'">'.$percent_of_total.'%</progress>');
-                    echo('</li>'.PHP_EOL);
-                    if (!empty($items)){
-                        if ($status == 'complete'){ $items = array_reverse($items); }
-                        foreach ($items AS $item){ echo($item); }
-                    } else {
-                        echo('<li class="item empty">&nbsp;</li>'.PHP_EOL);
-                    }
-                echo('</ol>'.PHP_EOL);
-            }
-        }
-        //error_log('$manifest_file_path: '.print_r($manifest_file_path, true));
-        //error_log('$manifest_file_list: '.print_r($manifest_file_list, true));
-        $manifest_file_json = array();
-        $manifest_file_json['title'] = $thread_info['thread_name'];
-        $manifest_file_json['author'] = !empty($thread_info['author_name_public']) ? $thread_info['author_name_public'] : $thread_info['author_name'];
-        $manifest_file_json['published'] = $thread_published;
-        $manifest_file_json['updated'] = $thread_updated;
-        $manifest_file_json['items'] = $manifest_file_list;
-        if (!is_dir($manifest_base_dir)){ recurseMakeDir($manifest_base_dir, $dst_base_dir); }
-        if (file_exists($dst_base_dir.$manifest_file_path)){ unlink($dst_base_dir.$manifest_file_path); }
-        $h = fopen($dst_base_dir.$manifest_file_path, 'w');
-        fwrite($h, json_encode($manifest_file_json, JSON_PRETTY_PRINT));
-        fclose($h);
-        ?>
+            <?= $export_manifest_markup ?>
         </div>
     </div>
     <div id="debug-output">
@@ -451,6 +458,7 @@ ob_start();
                         let scriptUrl = mergeScriptPath + '?' + [
                             'path='+urlEncode(baseExportPath),
                             'debug='+(showDebug ? 'true' : 'false'),
+                            'overwrite=true',
                             'return=json'
                             ].join('&');
                         if (showDebug){
