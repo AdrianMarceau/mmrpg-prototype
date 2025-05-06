@@ -426,8 +426,6 @@ ob_start();
                 if ($this_category_info['category_id'] == 0){ echo 'Sent by '.$temp_thread_author.' to '.$temp_thread_target.' on '.$temp_thread_date; }
                 // Otherwise display extended details about the post
                 else { echo $temp_thread_name.'<br /> Posted by '.$temp_thread_author.' on '.$temp_thread_date.'<br /> '.($temp_thread_views == 1 ? 'Viewed 1 Time' : 'Viewed '.$temp_thread_views.' Times'); }
-                // If possible, we should add a link to export this thread
-                if (MMRPG_INDEX_FULL_VIEW === true && rpg_user::is_member()){ echo ' | <a class="link_inline" href="'.MMRPG_CONFIG_ROOTURL.'scripts/thread-to-pdf.php?thread='.$this_thread_info['thread_id'].'" target="_blank" rel="noindex,nofollow">Export to PDF</a>'; }
                 ?>
             </div>
 
@@ -663,12 +661,19 @@ ob_start();
 
                     // Print out the comment listing's footer and links if allowed
                     if ($show_posts_footer){
+                        $thread_export_href = MMRPG_CONFIG_ROOTURL.'scripts/thread-to-pdf.php?thread='.$this_thread_info['thread_id'];
                         ?>
                         <div class="<?= $comment_header_class ?>">
                             <strong class="thread_posts_total">
                                 <i class="fa fas fa-comments"></i>
                                 <?= $comment_header_title ?>
                             </strong>
+                            <? if (rpg_user::is_member() && MMRPG_INDEX_FULL_VIEW === true){ ?>
+                                <a class="thread_export_link" href="<?= $thread_export_href ?>" target="_blank" rel="noindex,nofollow">
+                                    <strong>Export to PDF</strong>
+                                    <i class="fa fas fa-file-pdf"></i>
+                                </a>
+                            <? } ?>
                             <? if ($show_posts_sublinks
                                 && !empty($comment_header_links)){ ?>
                                 <div class="thread_posts_pages">

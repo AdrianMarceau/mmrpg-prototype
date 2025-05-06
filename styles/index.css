@@ -6395,32 +6395,46 @@ body[data-page="community_personal"] #window .page .body .community .thread_subb
 #window .page .body .community .thread_posts_count {
 
 }
+#window .page .body .community .thread_posts_count a > strong {
+    text-decoration: none;
+    font-weight: normal;
+}
+#window .page .body .community .thread_posts_count a:hover > strong {
+    text-decoration: underline;
+}
 #window .page .body .community .thread_posts_count .thread_posts_total {
     float: left;
     text-align: left;
-    margin-right: 6px;
+    margin: 0 6px 6px 0;
     font-weight: normal;
 }
 #window .page .body .community .thread_posts_count .thread_posts_total > i {
     margin-right: 4px;
 }
-#window .page .body .community .thread_posts_count.haslinks .thread_posts_total:after {
-    content: "|";
-    padding-left: 6px;
-    opacity: 0.3;
-    filter: alpha(opacity = 33);
-    font-size: 10px;
-    position: relative;
-    bottom: 2px;
+#window .page .body .community .thread_posts_count .thread_export_link {
+    float: right;
+    text-align: right;
+    margin: 0 0 6px 6px;
+    color: #949494;
+    text-decoration: none;
+    font-size: 11px;
 }
-#window .page .body .community .thread_posts_count.haslinks .thread_posts_total:last-child:after {
-    content: "";
+#window .page .body .community .thread_posts_count .thread_export_link > i {
+    margin-left: 4px;
+}
+#window .page .body .community .thread_posts_count .thread_export_link:hover {
+    color: #dedede;
 }
 #window .page .body .community .thread_posts_count .thread_posts_pages {
     float: none;
+    clear: left;
     text-align: left;
     font-size: 11px;
+    line-height: 1.6;
     letter-spacing: 2px;
+    border-top: 1px solid #1A1A1A;
+    margin: 6px auto 0;
+    padding-top: 3px;
 }
 #window .page .body .community .thread_posts_count .thread_posts_pages a {
     color: #EFEFEF;
