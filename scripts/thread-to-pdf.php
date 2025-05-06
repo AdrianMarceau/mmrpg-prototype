@@ -152,7 +152,7 @@ ob_start();
                 ' data-auth="'.$auth_key.'"'.
                 ' data-status="'.$item_status.'"'.
                 '>');
-                echo('<i class="bullet">&raquo;</i>');
+                if ($item_status === 'pending'){ echo('<i class="bullet">&raquo;</i>'); }
                 echo('<strong class="num">'.$item_num.' <b>/ '.$manifest_total.'</b></strong>');
                 echo('<a class="name" href="'.$src_href.'" target="_blank">'.$name.'</a>');
                 if ($dst_img_exists){ echo('<a class="file img" href="'.$dst_img_href.'" target="_blank">'.strtoupper($dst_img_type).'</a>'); }
@@ -160,6 +160,7 @@ ob_start();
                 if ($dst_doc_exists){ echo('<a class="file doc" href="'.$dst_doc_href.'" target="_blank">'.strtoupper($dst_doc_type).'</a>'); }
                 else { echo('<a class="file doc" target="_blank"></a>'); }
                 echo('<i class="status"></i>');
+                if ($item_status === 'complete'){ echo('<a class="delete">&times;</a>'); }
             echo('</li>'.PHP_EOL);
             $manifest_list_items[$item_status][] = ob_get_clean();
         }
@@ -183,8 +184,8 @@ ob_start();
         }
     }
     $export_manifest_markup = ob_get_clean();
-    error_log('$manifest_file_list: '.print_r($manifest_file_list, true));
-    error_log('$manifest_list_items: '.print_r($manifest_list_items, true));
+    //error_log('$manifest_file_list: '.print_r($manifest_file_list, true));
+    //error_log('$manifest_list_items: '.print_r($manifest_list_items, true));
 
     // Decide the final export status based on the manifest list items
     $final_export_status = empty($manifest_list_items['pending']) && $final_export_exists ? 'complete' : '';
@@ -269,6 +270,7 @@ ob_start();
             // Define some paths for scripts we'll use later
             let exportScriptPath = 'scripts/export-to-pdf.php';
             let mergeScriptPath = 'scripts/merge-pdfs.php';
+            let baseHref = '<?= MMRPG_CONFIG_ROOTURL ?>';
             let baseExportHref = '<?= $dst_base_url ?>';
             let baseExportPath = '<?= $dst_base ?>';
             let threadID = '<?= $thread_id ?>';
@@ -371,6 +373,73 @@ ob_start();
                         }
                     };
 
+                // Define a trigger function for exporting a given item
+                let deleteItem = function($item){
+                    //console.log('Deleting item:', $item);
+                    if (!$item.length){ return false; }
+                    let itemNum = $item.find('.num').text();
+                    let itemName = $item.find('.name').text();
+                    let srcPath = $item.attr('data-src');
+                    let dstPath = $item.attr('data-dst');
+                    let itemStatus = $item.attr('data-status');
+                    //console.log('Item:', {itemNum, itemName, srcPath, dstPath, itemStatus});
+                    if (itemStatus !== 'complete'){ return false; }
+                    $item.attr('data-status', 'deleting');
+                    let $imgFile = $item.find('.file.img');
+                    let $docFile = $item.find('.file.doc');
+                    let filesToDelete = [];
+                    let deletedFiles = [];
+                    if ($imgFile && $imgFile.length){
+                        let imgFileHref = $imgFile.attr('href');
+                        if (imgFileHref.length){
+                            let imgFileDelete = imgFileHref.replace(baseHref, '').replace(/^\.cache\//, '/-cache/');
+                            //console.log('We need to delete the image file:', '\n->', imgFileHref, '\n->', imgFileDelete);
+                            filesToDelete.push({kind: 'img', path: imgFileDelete, elem: $imgFile});
+                            }
+                        }
+                    if ($docFile && $docFile.length){
+                        let docFileHref = $docFile.attr('href');
+                        if (docFileHref.length){
+                            let docFileDelete = docFileHref.replace(baseHref, '').replace(/^\.cache\//, '/-cache/');
+                            //console.log('We need to delete the document file:', '\n->', docFileHref, '\n->', docFileDelete);
+                            filesToDelete.push({kind: 'doc', path: docFileDelete, elem: $docFile});
+                            }
+                        }
+                    if (filesToDelete.length){
+                        for (let i = 0; i < filesToDelete.length; i++){
+                            let fileToDelete = filesToDelete[i];
+                            //console.log('Deleting cached file:', fileToDelete);
+                            $.ajax({
+                                url: fileToDelete.path,
+                                type: 'DELETE',
+                                dataType: 'json',
+                                success: function(response){
+                                    //console.log('Delete success:', response);
+                                    let responseData = response.data || {};
+                                    //console.log('deletion responseData:', responseData);
+                                    deletedFiles.push(fileToDelete.path);
+                                    fileToDelete.elem.removeAttr('href').html('');
+                                    $item.find('.delete').remove();
+                                    $item.append('<span class="bullet">&raquo;</span>');
+                                    if (deletedFiles.length >= filesToDelete.length){
+                                        $item.insertAfter($pendingTitle);
+                                        $item.attr('data-status', 'pending');
+                                        $item.removeClass('confirm-delete');
+                                        }
+                                    },
+                                error: function(response){
+                                    //console.log('Error deleting file:', response);
+                                    }
+                                });
+                            }
+                        $context.attr('data-status', '');
+                        $download.prop('disabled', true);
+                        $download.removeAttr('href');
+                        $start.prop('disabled', false);
+                        }
+                    return false;
+                    };
+
                 // Define a trigger function for the item export functionality
                 let exportItem = function($item){
                     //console.log('Exporting item:', $item);
@@ -407,7 +476,9 @@ ob_start();
                             if ($imgFile.length){ $imgFile.attr('href', baseExportHref+dstPath+'.png').html('PNG'); }
                             if ($docFile.length){ $docFile.attr('href', baseExportHref+dstPath+'.pdf').html('PDF'); }
                             $item.insertAfter($completeTitle);
+                            $item.find('.bullet').remove();
                             $item.attr('data-status', 'complete');
+                            $item.append('<a class="delete">&times;</a>');
                             $item.addClass('slide-in');
                             let numPending = $pending.find('.item').length;
                             $pendingTitle.find('.progress').attr('value', numPending);
@@ -522,12 +593,26 @@ ob_start();
                     };
 
                 // Attach the click event to the download button
-                $download.bind('click', function(event){
-                    event.preventDefault();
+                $download.bind('click', function(e){
+                    e.preventDefault();
                     //console.log('Download button clicked!');
                     let downloadButtonHref = $(this).attr('href');
                     if (!downloadButtonHref){ return false; }
                     window.open(downloadButtonHref, '_blank');
+                    });
+
+                // Attach a delete event to any delete buttons
+                $('.delete', $complete).live('click', function(e){
+                    e.preventDefault();
+                    //console.log('Delete button clicked!');
+                    let $item = $(this).closest('.item');
+                    if (!$item.hasClass('confirm-delete')){
+                        $item.addClass('confirm-delete');
+                        setTimeout(function(){ $item.removeClass('confirm-delete'); }, 3000);
+                        return false;
+                        }
+                    //console.log('Sending delete request for item:', $item);
+                    return deleteItem($item);
                     });
 
                 // Make sure we mark the context area as ready for animation purposes
@@ -680,8 +765,6 @@ ob_start();
             overflow: auto;
             margin: 0 6px 3px;
             padding: 3px;
-            padding-left: calc(6px + 12px);
-            padding-right: calc(6px + 1.6rem);
             background-color: transparent;
             line-height: 1.6;
         }
@@ -690,6 +773,13 @@ ob_start();
         }
         #thread-to-pdf.ready #manifest .item {
             transition: background-color 0.3s;
+        }
+        #thread-to-pdf #manifest .list[data-status="pending"] .item {
+            padding-left: calc(6px + 12px);
+            padding-right: calc(6px + 1.6rem);
+        }
+        #thread-to-pdf #manifest .list[data-status="complete"] .item {
+            padding-right: calc(6px + 1.6rem + 12px);
         }
 
 
@@ -716,7 +806,8 @@ ob_start();
         #thread-to-pdf #manifest .item .bullet,
         #thread-to-pdf #manifest .item .name,
         #thread-to-pdf #manifest .item .file,
-        #thread-to-pdf #manifest .item .status {
+        #thread-to-pdf #manifest .item .status,
+        #thread-to-pdf #manifest .item .delete {
             display: inline-block;
             box-sizing: border-box;
             vertical-align: middle;
@@ -726,7 +817,8 @@ ob_start();
         #thread-to-pdf #manifest .item .num,
         #thread-to-pdf #manifest .item .bullet,
         #thread-to-pdf #manifest .item .name,
-        #thread-to-pdf #manifest .item .file {
+        #thread-to-pdf #manifest .item .file,
+        #thread-to-pdf #manifest .item .delete {
             margin: 0 6px 0 0;
             padding: 3px 6px;
             min-width: 28px;
@@ -756,14 +848,20 @@ ob_start();
         #thread-to-pdf #manifest .item .num > b {
             opacity: 0.5;
         }
-        #thread-to-pdf #manifest .item .bullet {
+        #thread-to-pdf #manifest .item .bullet,
+        #thread-to-pdf #manifest .item .delete {
             position: absolute;
             top: 3px;
-            left: 3px;
             margin: 0;
             padding: 3px 0;
             min-width: 0;
             width: 12px;
+        }
+        #thread-to-pdf #manifest .item .bullet {
+            left: 3px;
+        }
+        #thread-to-pdf #manifest .item .delete {
+            right: 36px;
         }
         #thread-to-pdf #manifest .item .name {
             min-width: calc(100% - 154px);
@@ -772,7 +870,8 @@ ob_start();
             min-width: calc(100% - 78px);
         }
 
-        #thread-to-pdf #manifest .item .file {
+        #thread-to-pdf #manifest .item .file,
+        #thread-to-pdf #manifest .item .delete {
             padding: 1px;
             min-width: 2rem;
             /* background-color: #696969;  */
@@ -790,6 +889,22 @@ ob_start();
         #thread-to-pdf #manifest .item .file[href].img:hover { background-color: #3cc0fc; }
         #thread-to-pdf #manifest .item .file[href].doc { background-color: #ae4fc8; }
         #thread-to-pdf #manifest .item .file[href].doc:hover { background-color: #d77afc; }
+
+        #thread-to-pdf #manifest .item .delete {
+            min-width: 1rem;
+            background-color: #924848;
+            transform: scale(1);
+            transition: background-color 0.3s, transform 0.3s;
+            cursor: pointer;
+        }
+        #thread-to-pdf #manifest .item .delete:hover,
+        #thread-to-pdf #manifest .item.confirm-delete .delete {
+            background-color: #a01d1d;
+            transform: scale(1.2, 1);
+        }
+        #thread-to-pdf #manifest .item.confirm-delete {
+            outline: 1px solid #a01d1d;
+        }
 
         #thread-to-pdf #manifest .item .status {
             position: absolute;
@@ -812,10 +927,6 @@ ob_start();
         #thread-to-pdf [data-status="pending"] .title { color: #d8ac29 !important; }
         #thread-to-pdf[data-status="pending"] .status,
         #thread-to-pdf [data-status="pending"] .status { background-color: #d8ac29 !important; }
-        #thread-to-pdf[data-status="loading"] .title,
-        #thread-to-pdf [data-status="loading"] .title { color: #c46f31 !important; }
-        #thread-to-pdf[data-status="loading"] .status,
-        #thread-to-pdf [data-status="loading"] .status { background-color: #c46f31 !important; animation: item-status-pulse 1s infinite; }
         #thread-to-pdf[data-status="complete"] .title,
         #thread-to-pdf [data-status="complete"] .title { color: #3eaf3e !important; }
         #thread-to-pdf[data-status="complete"] .status,
@@ -824,6 +935,14 @@ ob_start();
         #thread-to-pdf [data-status="error"] .title { color: #ba3b3b !important; }
         #thread-to-pdf[data-status="error"] .status,
         #thread-to-pdf [data-status="error"] .status { background-color: #ba3b3b !important; }
+        #thread-to-pdf[data-status="loading"] .title,
+        #thread-to-pdf [data-status="loading"] .title { color: #c46f31 !important; }
+        #thread-to-pdf[data-status="loading"] .status,
+        #thread-to-pdf [data-status="loading"] .status { background-color: #c46f31 !important; animation: item-status-pulse 1s infinite; }
+        #thread-to-pdf[data-status="deleting"] .title,
+        #thread-to-pdf [data-status="deleting"] .title { color: #ba3b3b !important; }
+        #thread-to-pdf[data-status="deleting"] .status,
+        #thread-to-pdf [data-status="deleting"] .status { background-color: #ba3b3b !important; animation: item-status-pulse 1s infinite; }
 
         /* Buttons section */
 

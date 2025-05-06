@@ -10,14 +10,18 @@ require_once('../top.php');
 //exit('<pre>$_REQUEST = '.print_r($_REQUEST, true).'</pre>');
 
 // Define the default values for the merge process
-$request_format = isset($_REQUEST['return']) && $_REQUEST['return'] === 'json' ? 'json' : 'html';
+$request_format = isset($_REQUEST['return']) && $_REQUEST['return'] === 'html' ? 'html' : 'json';
 $show_debug = isset($_REQUEST['debug']) && $_REQUEST['debug'] === 'true' ? true : false;
 $debug_output = '';
-$merge_output = array();
-$merge_output['status'] = 'pending';
-$merge_output['format'] = $request_format;
-$merge_output['message'] = '...';
-$merge_output['data'] = array();
+$script_output = array();
+$script_output['status'] = 'pending';
+$script_output['format'] = $request_format;
+$script_output['message'] = '...';
+$script_output['data'] = array();
+//error_log('<pre>$request_format = '.print_r($request_format, true).'</pre>'.PHP_EOL);
+//error_log('<pre>$show_debug = '.print_r($show_debug, true).'</pre>'.PHP_EOL);
+//error_log('<pre>$debug_output = '.print_r($debug_output, true).'</pre>'.PHP_EOL);
+
 
 // Define some helper functions for the merge process
 function cleanPaths($string){
@@ -25,10 +29,10 @@ function cleanPaths($string){
     $string = str_replace(MMRPG_CONFIG_ROOTURL, '', $string);
     return $string;
 }
-function exitWithHtml($merge_output){
-    $debug_markup = !empty($merge_output['debug']) ? $merge_output['debug'] : ''; unset($merge_output['debug']);
+function exitWithHtml($script_output){
+    $debug_markup = !empty($script_output['debug']) ? $script_output['debug'] : ''; unset($script_output['debug']);
     $html_markup = !empty($debug_markup) ? $debug_markup : '<div> <p><b><u>Clear Cached File</u></b></p> </div>';
-    $html_markup .= '<div> <p><b>$merge_output:</b></p> <pre>'.json_encode($merge_output, JSON_PRETTY_PRINT).'</pre> </div>';
+    $html_markup .= '<div> <p><b>$script_output:</b></p> <pre>'.json_encode($script_output, JSON_PRETTY_PRINT).'</pre> </div>';
     $html_markup = cleanPaths($html_markup);
     header('Content-Type: text/html');
     echo('<html>');
@@ -37,37 +41,37 @@ function exitWithHtml($merge_output){
     echo('</html>');
     exit();
 }
-function exitWithJson($merge_output){
-    $json_array = $merge_output;
+function exitWithJson($script_output){
+    $json_array = $script_output;
     header('Content-Type: application/json');
     echo(json_encode($json_array));
     exit();
 }
 function endBuffer(){
-    global $show_debug, $merge_output;
+    global $show_debug, $script_output;
     $debug_output = ob_get_clean();
-    if ($show_debug && !empty($debug_output)){ $merge_output['debug'] = $debug_output; }
+    if ($show_debug && !empty($debug_output)){ $script_output['debug'] = $debug_output; }
 }
 function killScript($error_line = 0, $error_message = '', $error_kind = 404){
-    global $request_format, $merge_output;
+    global $request_format, $script_output;
     endBuffer();
-    $merge_output['status'] = 'error';
-    $merge_output['message'] = $error_message;
-    $merge_output['data'] = array('line' => $error_line);
+    $script_output['status'] = 'error';
+    $script_output['message'] = $error_message;
+    $script_output['data'] = array('line' => $error_line);
     if ($error_kind === 404){ header('HTTP/1.0 404 Not Found'); }
     elseif ($error_kind === 403){ header('HTTP/1.0 403 Forbidden'); }
     elseif ($error_kind === 500){ header('HTTP/1.0 500 Internal Server Error'); }
-    if ($request_format === 'html'){ return exitWithHtml($merge_output); }
-    elseif ($request_format === 'json'){ return exitWithJson($merge_output); }
+    if ($request_format === 'html'){ return exitWithHtml($script_output); }
+    elseif ($request_format === 'json'){ return exitWithJson($script_output); }
 }
 function exitScript($return_data = array()){
-    global $request_format, $merge_output;
+    global $request_format, $script_output;
     endBuffer();
-    $merge_output['status'] = 'success';
-    $merge_output['message'] = 'Merge process has completed.';
-    $merge_output['data'] = $return_data;
-    if ($request_format === 'html'){ return exitWithHtml($merge_output); }
-    elseif ($request_format === 'json'){ return exitWithJson($merge_output); }
+    $script_output['status'] = 'success';
+    $script_output['message'] = 'Cached file has been deleted.';
+    $script_output['data'] = $return_data;
+    if ($request_format === 'html'){ return exitWithHtml($script_output); }
+    elseif ($request_format === 'json'){ return exitWithJson($script_output); }
 }
 function shellCommandExists($cmd, &$debug = ''){
     $which = exec('command -v '.escapeshellarg($cmd).' 2>&1', $output, $code);

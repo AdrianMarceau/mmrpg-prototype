@@ -11,7 +11,7 @@ require_once('../top.php');
 //exit('<pre>$_REQUEST = '.print_r($_REQUEST, true).'</pre>');
 
 // Define the default values for the merge process
-$request_format = isset($_REQUEST['return']) && $_REQUEST['return'] === 'json' ? 'json' : 'html';
+$request_format = isset($_REQUEST['return']) && $_REQUEST['return'] === 'html' ? 'html' : 'json';
 $show_debug = isset($_REQUEST['debug']) && $_REQUEST['debug'] === 'true' ? true : false;
 $overwrite_existing = isset($_REQUEST['overwrite']) && $_REQUEST['overwrite'] === 'true' ? true : false;
 $system_os = (MMRPG_CONFIG_IS_LIVE === true ? 'linux' : 'macos');
