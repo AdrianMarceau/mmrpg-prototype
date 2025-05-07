@@ -51,7 +51,8 @@
     /* filter: blur(1px); */
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) translateZ(0);
+    contain: layout paint;
 }
 @keyframes ready-room-scanline-scroll {
     0% { background-position: 0 0; }
@@ -208,6 +209,7 @@
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
     -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+    will-change: transform, opacity, left, bottom, z-index;
 }
 #mmrpg .ready_room .team .sprite .sprite {
     position: relative;

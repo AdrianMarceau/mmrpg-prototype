@@ -726,6 +726,10 @@
         var $thisSprite = thisSprite.sprite;
         var $thisSpriteInner = thisSprite.spriteInner;
 
+        // Define variables to hold the CSS we need to update in bulk at the end
+        var newSpriteStyles = {};
+        var newSpriteInnerStyles = {};
+
         // Collect refererences to the character's sprite and sprite inner elements now that we know we can animate
         var thisSpriteSize = thisSprite.size;
         var thisSpriteFrame = thisSprite.frame;
@@ -746,7 +750,8 @@
             var newBackgroundOffset = -1 * (thisSpriteSize * newSpriteFrame);
             thisSprite.frame = newSpriteFrame;
             $thisSpriteInner.attr('data-frame', newSpriteFrame);
-            $thisSpriteInner.css({'background-position': newBackgroundOffset+'px 0'});
+            //$thisSpriteInner.css({'background-position': newBackgroundOffset+'px 0'});
+            newSpriteInnerStyles['background-position'] = newBackgroundOffset+'px 0';
             }
 
         // If a direction change was requested, we can process that now
@@ -754,7 +759,8 @@
             var newSpriteDirection = newValues.direction;
             thisSprite.direction = newSpriteDirection;
             $thisSpriteInner.attr('data-direction', newSpriteDirection);
-            $thisSprite.css({'transform': 'scale('+(thisSprite.direction !== thisSprite.imageDirection ? -1 : 1)+', 1)'});
+            //$thisSprite.css({'transform': 'scale('+(thisSprite.direction !== thisSprite.imageDirection ? -1 : 1)+', 1)'});
+            newSpriteStyles['transform'] = 'scale('+(thisSprite.direction !== thisSprite.imageDirection ? -1 : 1)+', 1)';
             }
 
         // If an opacity change was requested, we can process that now
@@ -763,7 +769,8 @@
             if (newSpriteOpacity > 1){ newSpriteOpacity = 1; }
             else if (newSpriteOpacity < 0){ newSpriteOpacity = 0; }
             thisSprite.opacity = newSpriteOpacity;
-            $thisSprite.css({'opacity': newSpriteOpacity});
+            //$thisSprite.css({'opacity': newSpriteOpacity});
+            newSpriteStyles['opacity'] = newSpriteOpacity;
             }
 
         // If a position change was requested, we can process that now
@@ -811,6 +818,7 @@
             //console.log('newSpritePosition =', newSpritePosition);
             //console.log('newSpriteBrightness =', newSpriteBrightness);
             thisSprite.position = newSpritePosition;
+            /*
             var newCSS = {
                 'left': newSpritePosition[0]+'%',
                 'bottom': newSpritePosition[1]+'%',
@@ -819,6 +827,11 @@
                 };
             //console.log('updating sprite position for ', characterToken, ' to ', newCSS);
             $thisSprite.css(newCSS);
+            */
+            newSpriteStyles['left'] = newSpritePosition[0]+'%';
+            newSpriteStyles['bottom'] = newSpritePosition[1]+'%';
+            newSpriteStyles['z-index'] = newSpritePosition[2];
+            newSpriteStyles['filter'] = 'brightness('+newSpriteBrightness+')';
             }
 
         // If an image change was requested, we can process that now
@@ -834,7 +847,8 @@
             var newSpriteImageDirection = 'right';
             var newSpriteImagePath = 'images/' + thisSpritePathPrefix + '/' + newSpriteImage + '/sprite_' + newSpriteImageDirection + '_' + thisSpriteSizeX + '.png';
             thisSprite.image = newSpriteImage;
-            $thisSpriteInner.css('background-image', 'url('+newSpriteImagePath+'?'+gameSettings.cacheTime+')');
+            //$thisSpriteInner.css('background-image', 'url('+newSpriteImagePath+'?'+gameSettings.cacheTime+')');
+            newSpriteInnerStyles['background-image'] = 'url('+newSpriteImagePath+'?'+gameSettings.cacheTime+')';
             }
 
         // If an size change was requested, we can process that now
@@ -851,7 +865,19 @@
             var newSpriteImagePath = 'images/' + thisSpritePathPrefix + '/' + thisSpriteImage + '/sprite_' + newSpriteImageDirection + '_' + newSpriteImageSizeX + '.png';
             thisSprite.size = newSpriteImageSize;
             $thisSpriteInner.attr('data-size', newSpriteImageSize);
-            $thisSpriteInner.css('background-image', 'url('+newSpriteImagePath+'?'+gameSettings.cacheTime+')');
+            //$thisSpriteInner.css('background-image', 'url('+newSpriteImagePath+'?'+gameSettings.cacheTime+')');
+            newSpriteInnerStyles['background-image'] = 'url('+newSpriteImagePath+'?'+gameSettings.cacheTime+')';
+            }
+
+        // If there were any sprite styles generated, apply them now
+        if (Object.keys(newSpriteStyles).length){
+            //console.log('updating sprite styles for ', characterToken, ' to ', newSpriteStyles);
+            $thisSprite.css(newSpriteStyles);
+            }
+        // If there were any sprite inner styles generated, apply them now
+        if (Object.keys(newSpriteInnerStyles).length){
+            //console.log('updating sprite inner styles for ', characterToken, ' to ', newSpriteInnerStyles);
+            $thisSpriteInner.css(newSpriteInnerStyles);
             }
 
     }
@@ -1143,14 +1169,25 @@
 
         // Generate the markup for the sprite and the inner sprite
         var $sprite = $('<div class="sprite" data-kind="' + kind + '" data-player="' + thisPlayerToken + '"></div>');
+        var spriteStyles = {};
         if (kind === 'robot'){ $sprite.attr('data-robot', thisRobotToken); }
         if (kind === 'shop'){ $sprite.attr('data-shop', thisShopToken); }
-        $sprite.css({'left': spriteOffsetX+'%', 'bottom': spriteOffsetY+'%', 'z-index': spriteOffsetZ});
-        $sprite.css({'filter': spriteFilterValue});
-        $sprite.css({'transform': 'scale('+(spriteDirection !== thisSpriteImageDirection ? -1 : 1)+', 1)'});
+        spriteStyles['left'] = spriteOffsetX+'%';
+        spriteStyles['bottom'] = spriteOffsetY+'%';
+        spriteStyles['z-index'] = spriteOffsetZ;
+        spriteStyles['filter'] = spriteFilterValue;
+        spriteStyles['transform'] = 'scale('+(spriteDirection !== thisSpriteImageDirection ? -1 : 1)+', 1)';
+        //$sprite.css({'left': spriteOffsetX+'%', 'bottom': spriteOffsetY+'%', 'z-index': spriteOffsetZ});
+        //$sprite.css({'filter': spriteFilterValue});
+        //$sprite.css({'transform': 'scale('+(spriteDirection !== thisSpriteImageDirection ? -1 : 1)+', 1)'});
+        $sprite.css(spriteStyles);
         var $spriteInner = $('<div class="sprite" data-size="'+thisSpriteSize+'" data-direction="'+spriteDirection+'" data-frame="'+spriteFrame+'"></div>');
-        $spriteInner.css('background-image', 'url('+thisSpriteImagePath+'?'+gameSettings.cacheTime+')');
-        $spriteInner.css({'animation-duration': spriteAnimationDuration+'s'});
+        var spriteInnerStyles = {};
+        spriteInnerStyles['background-image'] = 'url('+thisSpriteImagePath+'?'+gameSettings.cacheTime+')';
+        spriteInnerStyles['animation-duration'] = spriteAnimationDuration+'s';
+        //$spriteInner.css('background-image', 'url('+thisSpriteImagePath+'?'+gameSettings.cacheTime+')');
+        //$spriteInner.css({'animation-duration': spriteAnimationDuration+'s'});
+        $spriteInner.css(spriteInnerStyles);
         $sprite.append($spriteInner);
 
         // Generate the sprite data object and then add it to the index
