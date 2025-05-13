@@ -177,6 +177,12 @@ foreach ($this_menu_tooltips AS $token => $text){
 </head>
 <?
 
+// Collect the battle settings from the session, if they exist
+$session_token = rpg_game::session_token();
+$battleSettings = $_SESSION[$session_token]['battle_settings'];
+$readyRoomConfig = rpg_game::get_readyRoomConfig(true);
+$menuButtonConfig = rpg_game::get_menuButtonConfig(true);
+
 // Collect the number of missions complete and the number or robots unlocked by this player
 $total_missions_complete = mmrpg_prototype_battles_complete(false, true);
 $total_player_options = $unlock_count_players;
@@ -186,13 +192,16 @@ $total_robot_options = mmrpg_prototype_robots_unlocked();
 $ready_room_unlocked = false;
 if ($total_missions_complete >= 2){ $ready_room_unlocked = true; }
 
+// Using above, check to see if ready room should be enabled or not
+$ready_room_enabled = $ready_room_unlocked ? $readyRoomConfig['allowReadyRoomSprites'] : false;
+$ready_room_sprite_motion = $ready_room_unlocked ? $readyRoomConfig['readyRoomSpriteMotion'] : false;
+$ready_room_sprite_limit = $ready_room_unlocked ? $readyRoomConfig['readyRoomSpriteLimit'] : 0;
+
 // Decide whether to use an animated or static background for prototype home
 $prototype_banner_image = 'prototype-banners_title-screen_01.gif';
-if ($ready_room_unlocked){ $prototype_banner_image = 'prototype-banners_title-screen_01.png'; }
+if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-screen_01.png'; }
 
 // Collect and prototype-menu settings from the session for display
-$session_token = rpg_game::session_token();
-$battleSettings = $_SESSION[$session_token]['battle_settings'];
 $spriteRenderMode = isset($battleSettings['spriteRenderMode']) ? $battleSettings['spriteRenderMode'] : 'default';
 $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default';
 
@@ -553,7 +562,9 @@ gameSettings.totalPlayerOptions = <?= $total_player_options ?>;
 gameSettings.totalRobotOptions = <?= $total_robot_options ?>;
 gameSettings.prototypeBannerKey = 0;
 gameSettings.prototypeBanners = ['<?= $prototype_banner_image ?>'];
-gameSettings.readyRoomUnlocked = <?= $ready_room_unlocked ? 'true' : 'false' ?>;
+gameSettings.readyRoomEnabled = <?= $ready_room_enabled ? 'true' : 'false' ?>;
+gameSettings.readyRoomSpriteMotion = <?= $ready_room_sprite_motion ? 'true' : 'false' ?>;
+gameSettings.readyRoomSpriteLimit = <?= intval($ready_room_sprite_limit) ?>;
 <?
 
 // Define any menu frames already seen so know what's new
@@ -563,11 +574,11 @@ echo('gameSettings.menuFramesSeen = '.json_encode($menu_frames_seen).';'.PHP_EOL
 
 // Load all the Ready Room details if allowed, otherwise define them as empty
 //debug_profiler_checkpoint('before-ready-room');
-if ($ready_room_unlocked){
+if ($ready_room_enabled){
 
     // Generate a JSON array of all currently unlocked player players w/ basic data for prototype menu reference
     $include_extra = array();
-    if (mmrpg_prototype_item_unlocked('kalinka-link')){ $include_extra['kalinka'] = array('player_token' => 'kalinka', 'current_player' => 'dr-cossack'); }
+    if (mmrpg_prototype_item_unlocked('kalinka-link')){ $include_extra['kalinka'] = array('player_token' => 'kalinka', 'current_player' => 'dr-cossack', 'is_shopkeeper' => true); }
     $this_unlocked_players_index = mmrpg_prototype_players_unlocked_index_json($include_extra);
     //error_log('$include_extra ='.print_r($include_extra, true));
     //error_log('$this_unlocked_players_index ='.print_r($this_unlocked_players_index, true));
@@ -575,8 +586,8 @@ if ($ready_room_unlocked){
 
     // Generate a JSON array of all currently unlocked player robots w/ basic data for prototype menu reference
     $include_extra = array();
-    if (mmrpg_prototype_item_unlocked('auto-link')){ $include_extra['auto'] = array('robot_token' => 'auto', 'robot_image_size' => 80, 'current_player' => 'dr-light'); }
-    if (mmrpg_prototype_item_unlocked('reggae-link')){ $include_extra['reggae'] = array('robot_token' => 'reggae', 'current_player' => 'dr-wily'); }
+    if (mmrpg_prototype_item_unlocked('auto-link')){ $include_extra['auto'] = array('robot_token' => 'auto', 'robot_image_size' => 80, 'current_player' => 'dr-light', 'is_shopkeeper' => true); }
+    if (mmrpg_prototype_item_unlocked('reggae-link')){ $include_extra['reggae'] = array('robot_token' => 'reggae', 'current_player' => 'dr-wily', 'is_shopkeeper' => true); }
     $this_unlocked_robots_index = mmrpg_prototype_robots_unlocked_index_json($include_extra);
     //error_log('$this_unlocked_robots_index ='.print_r($this_unlocked_robots_index, true));
     //error_log('$this_unlocked_robots_index ='.print_r(array_keys($this_unlocked_robots_index), true));
@@ -592,6 +603,8 @@ if ($ready_room_unlocked){
             if (!isset($new_player_data['flags'])){ $new_player_data['flags'] = array(); }
             $new_player_data['flags'][] = 'is_newly_unlocked';
             //error_log('$new_player_data = '.print_r($new_player_data, true));
+            unset($this_unlocked_players_index[$player_token]);
+            $this_unlocked_players_index = array_merge(array($player_token => null), $this_unlocked_players_index);
             $this_unlocked_players_index[$player_token] = $new_player_data;
         }
         rpg_prototype::clear_players_pending_entrance_animations();
@@ -608,6 +621,8 @@ if ($ready_room_unlocked){
             if (!isset($new_robot_data['flags'])){ $new_robot_data['flags'] = array(); }
             $new_robot_data['flags'][] = 'is_newly_unlocked';
             //error_log('$new_robot_data = '.print_r($new_robot_data, true));
+            unset($this_unlocked_robots_index[$robot_token]);
+            $this_unlocked_robots_index = array_merge(array($robot_token => null), $this_unlocked_robots_index);
             $this_unlocked_robots_index[$robot_token] = $new_robot_data;
         }
         rpg_prototype::clear_robots_pending_entrance_animations();

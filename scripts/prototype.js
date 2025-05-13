@@ -17,7 +17,9 @@ gameSettings.nextSlideDirection = 'left';
 gameSettings.startLink = 'home';
 gameSettings.skipPlayerSelect = false;
 gameSettings.menuFramesSeen = [];
-gameSettings.readyRoomUnlocked = false;
+gameSettings.readyRoomEnabled = false;
+gameSettings.readyRoomSpriteMotion = true;
+gameSettings.readyRoomSpriteLimit = 100;
 gameSettings.readyRoomActive = false;
 var battleOptions = {};
 
@@ -545,7 +547,7 @@ $(document).ready(function(){
     if (!$('#mmrpg').hasClass('iframe')){
         // Only add the ready room to the banner after the player has unlocked their first homebase
         if (thisReadyRoom !== false
-            && gameSettings.readyRoomUnlocked){
+            && gameSettings.readyRoomEnabled){
 
             // Initialize the ready room on prototype home page load
             var $thisPrototype = $('#prototype');
@@ -563,8 +565,15 @@ $(document).ready(function(){
                     }
 
                 // Start the actual ready room animation when it's appropriate to do so
-                thisReadyRoom.startAnimation();
-                gameSettings.readyRoomActive = true;
+                if (gameSettings.readyRoomSpriteMotion){
+                    thisReadyRoom.startAnimation();
+                    gameSettings.readyRoomActive = true;
+                    }
+
+                // If a limit has been defined, make sure we update config first
+                if (gameSettings.readyRoomSpriteLimit > 0){
+                    thisReadyRoom.limitVisibleSprites(gameSettings.readyRoomSpriteLimit);
+                    }
 
                 });
             }
