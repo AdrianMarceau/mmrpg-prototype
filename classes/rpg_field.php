@@ -1457,6 +1457,7 @@ class rpg_field extends rpg_object {
         $temp_field_master = !empty($field_info['field_master']) ? $mmrpg_database_robots[$field_info['field_master']] : false;
         $temp_field_mechas = !empty($field_info['field_mechas']) ? $field_info['field_mechas'] : array();
         foreach ($temp_field_mechas AS $key => $token){
+            if (!isset($mmrpg_database_robots[$token])){ continue; }
             $temp_mecha = $mmrpg_database_robots[$token];
             if (!empty($temp_mecha)){ $temp_field_mechas[$key] = $temp_mecha['robot_name'];  }
             else { unset($temp_field_mechas[$key]); }
