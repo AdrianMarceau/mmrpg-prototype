@@ -216,6 +216,9 @@
     overflow: hidden;
     transform: scale(2);
     transform-origin: bottom center;
+    animation: none;
+}
+#mmrpg .ready_room.animating .team .sprite .sprite {
     animation: ready-room-sprite-bounce 0.3s steps(1) infinite;
 }
 #mmrpg .ready_room .team .sprite .sprite[data-size="40"] {
