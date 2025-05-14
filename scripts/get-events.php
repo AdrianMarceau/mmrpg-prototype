@@ -85,7 +85,7 @@ if ($is_logged_in){
     if (!empty($_SESSION[$session_token]['EVENTS'])){ $_SESSION[$session_token]['EVENTS'] = array(); }
 
     // Return the markup for the community formatting guide
-    header('Content-type: text/json; charset=UTF-8');
+    header('Content-type: application/json; charset=UTF-8');
     echo(json_encode(array(
         'status' => 'success',
         'updated' => time(),

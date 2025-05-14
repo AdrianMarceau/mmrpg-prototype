@@ -39,7 +39,7 @@ else { $cache_file_exists = false; $cache_file_date = '00000000-0000'; }
 // LOAD FROM CACHE if data exists and is current, otherwise continue so script can refresh and replace
 if (MMRPG_CONFIG_CACHE_INDEXES && $cache_file_exists && $cache_file_date >= MMRPG_CONFIG_CACHE_DATE){
     $cache_file_markup = file_get_contents($cache_file_path);
-    header('Content-type: text/json; charset=UTF-8');
+    header('Content-type: application/json; charset=UTF-8');
     echo($cache_file_markup);
     exit();
 }
