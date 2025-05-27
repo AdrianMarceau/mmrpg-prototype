@@ -652,35 +652,58 @@ function mmrpg_trigger_reset(fullReset){
 }
 
 // Define a function to trigger when resetting data
-function mmrpg_trigger_new_game_plus(buttonObject){
+function mmrpg_trigger_new_game_plus(buttonObject, playerToken, playerName){
     console.log('mmrpg_trigger_new_game_plus()');
 
+    if (typeof buttonObject === 'undefined' || !buttonObject){ return false; }
+    if (typeof playerToken === 'undefined' || !playerToken){ return false; }
+    if (typeof playerName === 'undefined' || !playerName){ return false; }
+    var playerNameClean = playerName.replace('Dr. ', '');
+    var playerCarePronouns = ['their', 'them'];
+    if (playerToken.match(/\-(light|wily|cossack)$/i)){ playerCarePronouns = ['his', 'him']; }
+    else if (playerToken.match(/-lalinde/i)){ playerCarePronouns = ['her', 'her']; }
+    var filterPlayerFunction = function(token, info){ return info.player === playerToken || info.currentPlayer === playerToken || info.currentPlayer === 'all'; };
+    var filterOtherPlayersFunction = function(token, info){ return info.player !== playerToken && info.currentPlayer !== playerToken && info.currentPlayer !== 'all'; };
+
     // Define the confirmation text string
-    var confirmTitle = 'Confirm New Game Plus';
-    confirmTitle = (confirmTitle).toUpperCase() + ' \n';
-    var confirmText = confirmTitle;
-    confirmText += 'Are you sure you want to start a NEW GAME PLUS? \n';
-    confirmText += 'ALL robots will be reboot to level one and ALL mission-related progress will be cleared, BUT you\'ll get to keep everything else \n';
-    confirmText += 'including zenny, items, abilities, stars, etc. \n';
-    confirmText += 'Continue?';
-    var confirmText2 = confirmTitle + 'Let me repeat that one more time. \n';
-    confirmText2 += 'If you start a NEW GAME PLUS then ALL robots will be reboot to level one and ALL mission-related progress will be cleared. \n';
-    confirmText2 += 'Reset anyway?';
+    var confirmTitle = 'Confirm New Game Plus ('+playerNameClean+' Story)';
+    confirmTitle = (confirmTitle).toUpperCase();
+    var confirmText = '';
+    confirmText += confirmTitle + '\n';
+    confirmText += 'Are you sure you want '+playerName+' to start a New Game Plus? \n';
+    confirmText += '- Any mission-related progress in '+playerNameClean+'\'s story will be reset \n';
+    confirmText += '- Any '+playerNameClean+'-owned robots not-currently under '+playerCarePronouns[0]+' care will \n';
+    confirmText += '   be recalled and returned to '+playerCarePronouns[1]+' (vice-versa for others) \n';
+    confirmText += '- You\'ll still keep everything else you\'ve collected including \n';
+    confirmText += '   zenny, items, abilities, stars, tokens, medallions, etc. \n';
+    //confirmText += '\n';
+    confirmText += '[ Continue? ]';
+    var confirmText2 = '';
+    confirmText2 += 'RE-'+confirmTitle + '\n';
+    confirmText2 += 'Let\'s repeat that one more time, just-in-case ... \n';
+    confirmText2 += 'If you start a New Game Plus w/ '+playerName+' right now; \n';
+    confirmText2 += '- Any mission-related progress in '+playerCarePronouns[0]+' story will be reset \n';
+    confirmText2 += '- Any '+playerNameClean+'-owned robots will be recalled and vice-versa \n';
+    confirmText2 += '- You\'ll still keep all items, abilities, etc. you\'ve collected \n';
+    confirmText2 += 'So with all that said again... \n';
+    confirmText2 += '[ Continue Anyway? ]';
     // Attempt to confirm with the user of they want to reset
     if (thisReadyRoom){
-        thisReadyRoom.updateRobot('all', {frame: 'damage'});
+        thisReadyRoom.updatePlayer(filterPlayerFunction, {frame: 'damage'});
+        thisReadyRoom.updateRobot(filterPlayerFunction, {frame: 'damage'});
         thisReadyRoom.stopAnimation();
         }
     //console.log('test confirm text');
     if (confirm(confirmText) && confirm(confirmText2)){
         //console.log('confirmed');
         // Redirect the user to the prototype new-game-plus page
-        var postURL = 'prototype.php?action=new-game-plus';
-        console.log('postURL = ', postURL);
+        var postURL = 'prototype.php?action=new-game-plus&player='+playerToken;
+        //console.log('postURL = ', postURL);
         $.post(postURL, function(){
-            //alert('new-game-plus complete!');
+            alert('new-game-plus for '+playerToken+' complete!');
             if (thisReadyRoom){
-                thisReadyRoom.updateRobot('all', {frame: 'defend'});
+                thisReadyRoom.updatePlayer(filterPlayerFunction, {frame: 'defend'});
+                thisReadyRoom.updateRobot(filterPlayerFunction, {frame: 'defend'});
                 }
             if (window.self != window.parent){
                 window.location = 'prototype.php';
