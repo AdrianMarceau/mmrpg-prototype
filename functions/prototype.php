@@ -1008,6 +1008,44 @@ function mmrpg_prototype_battle_failure($player_token, $battle_token){
     return isset($_SESSION[$session_token]['values']['battle_failure'][$player_token][$battle_token]) ? $_SESSION[$session_token]['values']['battle_failure'][$player_token][$battle_token] : false;
 }
 
+// Define a function for collecting battle tokens of complete prototype battles, either by player or all
+function mmrpg_prototype_battle_tokens_complete($player_token = ''){
+    // Check if this battle has been completed and return true is it was
+    $session_token = mmrpg_game_token();
+    $battles_complete = !empty($_SESSION[$session_token]['values']['battle_complete']) ? $_SESSION[$session_token]['values']['battle_complete'] : array();
+    if (!empty($player_token)){
+        $player_battles_complete = !empty($battles_complete[$player_token]) ? array_keys($battles_complete[$player_token]) : array();
+        return $player_battles_complete;
+    } else {
+        $players_battles_complete = array();
+        foreach ($battles_complete AS $player_token => $player_battles_complete){
+            if (empty($player_battles_complete)){ continue; }
+            $players_battles_complete[$player_token] = array_keys($player_battles_complete);
+        }
+        return $players_battles_complete;
+    }
+    //return isset($_SESSION[$session_token]['values']['battle_complete'][$player_token][$battle_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token][$battle_token] : false;
+}
+
+// Define a function for collecting battle tokens of failed prototype battles, either by player or all
+function mmrpg_prototype_battle_tokens_failed($player_token = ''){
+    // Check if this battle has been completed and return true is it was
+    $session_token = mmrpg_game_token();
+    $battles_failed = !empty($_SESSION[$session_token]['values']['battle_failure']) ? $_SESSION[$session_token]['values']['battle_failure'] : array();
+    if (!empty($player_token)){
+        $player_battles_failed = !empty($battles_failed[$player_token]) ? array_keys($battles_failed[$player_token]) : array();
+        return $player_battles_failed;
+    } else {
+        $players_battles_failed = array();
+        foreach ($battles_failed AS $player_token => $player_battles_failed){
+            if (empty($player_battles_failed)){ continue; }
+            $players_battles_failed[$player_token] = array_keys($player_battles_failed);
+        }
+        return $players_battles_failed;
+    }
+}
+
+
 // Define a function for checking is a prototype player has been unlocked
 function mmrpg_prototype_player_unlocked($player_token){
     // Check if this battle has been completed and return true is it was
