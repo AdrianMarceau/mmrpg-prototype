@@ -85,6 +85,26 @@ $(document).ready(function(){
 
         }
 
+    // -- PRIMARY SCRIPT FUNCTIONALITY -- //
+
+    // Define a function for showing/highlighting a player in the above ready room when possible
+    showShopInReadyRoom = function(shopToken){
+        //console.log('showShopInReadyRoom(shopToken:', shopToken, ')');
+        // We should add the new player to the parent ready room
+        if (typeof window.parent.mmrpgReadyRoom !== 'undefined'
+            && typeof window.parent.mmrpgReadyRoom.updatePlayer !== 'undefined'
+            && typeof window.parent.mmrpgReadyRoom.updateRobot !== 'undefined'){
+            // If the extra data in dataExtra was not empty and is JSON, parse it into playerInfo
+            var readyRoom = window.parent.mmrpgReadyRoom;
+            var spriteBounds = readyRoom.config.spriteBounds;
+            readyRoom.updatePlayer('all', {frame: 'base', position: [null, (spriteBounds.maxY - 4)]});
+            readyRoom.updateRobot('all', {frame: 'base', position: [null, (spriteBounds.maxY - 6)]});
+            var spriteUpdateData = {frame: 'taunt', direction: 'right', position: [50, (spriteBounds.minY - 2)]};
+            if (readyRoom.isPlayer(shopToken)){ readyRoom.updatePlayer(shopToken, spriteUpdateData); }
+            else if (readyRoom.isRobot(shopToken)){ readyRoom.updateRobot(shopToken, spriteUpdateData); }
+            }
+        };
+
     // Update the player and player count by counting elements
     thisShopData.shopTotal = $('#canvas .wrapper[data-shop]', thisShop).length;
     //console.log('thisShopData', thisShopData);
@@ -101,6 +121,7 @@ $(document).ready(function(){
     // Define a variable to hold the timeout for saving shop settings
     var saveShopSettingTimeout;
     var lastShopToken = thisShopData.lastShopToken.length ? thisShopData.lastShopToken.split('/') : [];
+    showShopInReadyRoom(lastShopToken);
     //console.log('lastShopToken', lastShopToken);
 
     // Create the click event for canvas sprites
@@ -122,6 +143,7 @@ $(document).ready(function(){
         $('#console .scroll_wrapper', thisShop).perfectScrollbar('update');
         dataParent.addClass('wrapper_active').css({display:'block'});
         dataSprite.addClass('sprite_shop_current');
+        showShopInReadyRoom(dataToken);
         var $firstTabLink = false;
         if ($(dataSelectorCurrent, gameConsole).length){
             //console.log('dataSelectorCurrent (', dataSelectorCurrent, ') exists');
