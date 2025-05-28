@@ -202,15 +202,99 @@ $(document).ready(function(){
     }
 
 
-    // -- PLAYER SETTINGS -- //
+    // -- SETTINGS HELPER FUNCTIONS -- //
+
+    // Define a function that updates the range labels for the game settings w/ current values
+    var updateRangeLabelValue = function($input, $value, value){
+        //console.log('updateRangeLabelValue() w/' + '\n$input:', $input, '\n$value:', $value, '\nvalue:', value);
+        var text = value;
+        if ($input.is('[min][max][data-percent]')){
+            //console.log('input has a min, max, and percent');
+            var min = parseFloat($input.attr('min'));
+            var max = parseFloat($input.attr('max'));
+            var percent = 0;
+            if (min === 0 && max === 1){ percent = ((value / max) * 100); }
+            text = percent.toFixed(0) + '%';
+            //console.log('percent debug' + '\nvalue: ', typeof value, value, '\nmin: ', typeof min, min, '\nmax: ', typeof max, max, '\npercent: ', typeof percent, percent, '\ntext: ', typeof text, text);
+        }
+        if ($input.is('[max][data-max-text]')){
+            //console.log('input has a max and max-text');
+            var max = parseFloat($input.attr('max'));
+            var maxText = $input.attr('data-max-text');
+            if (value === max){ text = maxText; }
+            //console.log('max debug' + '\nvalue: ', typeof value, value, '\nmax: ', typeof max, max, '\nmaxText: ', typeof maxText, maxText, '\ntext: ', typeof text, text);
+            }
+        if ($input.is('[min][data-min-text]')){
+            //console.log('input has a min and min-text');
+            var min = parseFloat($input.attr('min'));
+            var minText = $input.attr('data-min-text');
+            if (value === min){ text = minText; }
+            //console.log('min debug' + '\nvalue: ', typeof value, value, '\nmin: ', typeof min, min, '\nminText: ', typeof minText, minText, '\ntext: ', typeof text, text);
+            }
+        if ($input.is('[data-show-sign]')){
+            console.log('input has show-sign flag');
+            if (value > 0){ text = '+' + text; }
+            else if (value < 0){ text = '-' + text; }
+            console.log('sign debug' + '\nvalue: ', typeof value, value, '\ntext: ', typeof text, text);
+            }
+        $value.text(text);
+        };
+
+    // Define a function that takes a given settings panel and binds relevant events to all range inputs
+    var bindRangeInputEvents = function($settings){
+        $('input[type="range"]', $settings).each(function(){
+            var $input = $(this);
+            var $parent = $input.closest('.subfield') || $input.closest('.field');
+            var $label = $('label', $parent);
+            if (!$label.length){ return; }
+            var $value = $label.find('.value');
+            if (!$value.length){ $value = $('<span class="value"></span>').appendTo($label); }
+            var value = parseFloat($input.val());
+            updateRangeLabelValue($input, $value, value);
+            });
+        $('input[type="range"]', $settings).bind('input change', function(e){
+            //console.log('change event on a slider-based config field');
+            var $input = $(this);
+            var fieldName = $input.attr('name');
+            var newValue = parseFloat($input.val());
+            var $parent = $input.closest('.subfield') || $input.closest('.field');
+            var $label = $('label', $parent);
+            var $value = $label.find('.value');
+            if (!$value.length){ return; }
+            updateRangeLabelValue($input, $value, newValue);
+            });
+        };
+
+    // Define a function that takes a given settings panel and binds relevant events to all radio inputs,
+    // making it so clicking a radio button's container automatically triggers the radio button inside too
+    var bindRadioInputEvents = function($settings){
+        var $radioFields = $('.radiofield', $settings);
+        $.each($radioFields, function(i, $radioField){
+            var $radioFieldParent = $(this).closest('.subfield') || $(this).closest('.field');
+            $('.radiofield', $radioFieldParent).bind('click', function(e){
+                var $thisField = $(this);
+                var $radioButton = $('input[type="radio"]', $thisField);
+                $radioButton.prop('checked', true);
+                $radioButton.trigger('change');
+                });
+            $('input[type="radio"]', $radioFieldParent).bind('change', function(e){
+                e.stopPropagation();
+                $radioFieldParent.find('.radiofield').removeClass('active');
+                $('input[type="radio"]:checked', $radioFieldParent).closest('.radiofield').addClass('active');
+                });
+            });
+        };
+
+
+    // -- SETTINGS FUNCTIONALITY BY TAB -- //
 
     // Process complex player setting updates and pass them to the parent window
-    var $playerSettings = $('.player-settings', $thisSettings);
-    if ($playerSettings.length){
+    var $proxySettings = $('.proxy-settings', $thisSettings);
+    if ($proxySettings.length){
         //console.log('we have player settings specifically');
 
         // Collect a reference to the player avatar field so we can add events
-        var $playerAvatarField = $('.field.player-avatar', $playerSettings);
+        var $playerAvatarField = $('.field.player-avatar', $proxySettings);
         var $playerAvatarSelect = $('select', $playerAvatarField);
         var $playerAvatarPreview = $('.preview', $playerAvatarField);
         //console.log('$playerAvatarField =', $playerAvatarField.length, $playerAvatarField);
@@ -232,23 +316,48 @@ $(document).ready(function(){
 
         }
 
-
-    // -- GAME SETTINGS -- //
-
-    // Process complex game setting updates and pass them to the parent window
-    var $gameSettings = $('.game-settings', $thisSettings);
-    if ($gameSettings.length){
+    // Process complex audio setting updates and pass them to the parent window
+    var $audioSettings = $('.audio-settings', $thisSettings);
+    if ($audioSettings.length){
         //console.log('we have game settings specifically');
+
+        // Define change events for all the range elements so we can see their values
+        bindRangeInputEvents($audioSettings);
+
+        // Make it so radio button and their containers can be clicked interchangeably
+        bindRadioInputEvents($audioSettings);
 
         // Collect references to the appropriate windows for updating
         var thisMusicWindow = window.top;
-        var thisSpriteWindow = window.self;
         var thisGameSettings = window.top.gameSettings;
 
+        // ---
+
         // Collect references to the applicable form fields
-        var $audoBalanceConfigField = $('.field[data-setting="audioBalanceConfig"]', $gameSettings);
-        var $spriteRenderModeField = $('.field[data-setting="spriteRenderMode"]', $gameSettings);
-        var $battleButtonModeField = $('.field[data-setting="battleButtonMode"]', $gameSettings);
+        var $audioBalanceConfigField = $('.field[data-setting="audioBalanceConfig"]', $audioSettings);
+
+        // Backup the user's audio changes in case we need to reset them
+        var userAudioConfigBackup = {};
+        userAudioConfigBackup = parseAudioBalanceConfig();
+
+        // Define a function for parsing the audio balance config from the form
+        function parseAudioBalanceConfig(){
+            // collect refs to all three fields manually
+            var $masterVolumeField = $('input[name="masterVolume"]', $audioBalanceConfigField);
+            var $musicVolumeField = $('input[name="musicVolume"]', $audioBalanceConfigField);
+            var $effectVolumeField = $('input[name="effectVolume"]', $audioBalanceConfigField);
+            // collect the values from the three fields
+            var masterVolume = parseFloat($masterVolumeField.val());
+            var musicVolume = parseFloat($musicVolumeField.val());
+            var effectVolume = parseFloat($effectVolumeField.val());
+            // construct a new config object to update with
+            var newConfig = {};
+            newConfig.masterVolume = masterVolume;
+            newConfig.musicVolume = musicVolume;
+            newConfig.effectVolume = effectVolume;
+            //console.log('newConfig = ', newConfig);
+            return newConfig;
+            };
 
         // Define a function for updating the audio balance config w/ form changes
         var prevMasterVolume = false;
@@ -278,130 +387,26 @@ $(document).ready(function(){
             return true;
         }
 
-        // Define a function for updating the sprite rendering mode w/ form changes
-        function updateSpriteRenderMode(newMode){
-            //console.log('updateSpriteRenderMode(newMode) w/', newMode);
-            if (typeof newMode !== 'string'){ return false; }
-            var newRenderMode = newMode.length ? newMode : thisGameSettings.spriteRenderMode;
-            thisGameSettings.spriteRenderMode = newRenderMode;
-            $('#mmrpg').attr('data-render-mode', newRenderMode);
-            return true;
-        }
-
-        // Define a function for updating the battle button mode w/ form changes
-        function updateBattleButtonMode(newMode, updateParent){
-            //console.log('updateBattleButtonMode(newMode) w/', newMode);
-            if (typeof newMode !== 'string'){ return false; }
-            if (typeof updateParent === 'undefined'){ updateParent = false; }
-            var newButtonMode = newMode.length ? newMode : thisGameSettings.battleButtonMode;
-            thisGameSettings.battleButtonMode = newButtonMode;
-            $('#mmrpg').attr('data-button-mode', newButtonMode);
-            if (updateParent && typeof window.parent.prototype_update_game_settings !== 'undefined'){
-                //console.log('sending update request to parent prototype_update_game_settings() w/ '+newButtonMode);
-                window.parent.prototype_update_game_settings({'battleButtonMode': newButtonMode});
-                }
-            return true;
-        }
-
-        // Define a function for parsing the audio balance config from the form
-        function parseAudioBalanceConfig(){
-            // collect refs to all three fields manually
-            var $masterVolumeField = $('input[name="masterVolume"]', $audoBalanceConfigField);
-            var $musicVolumeField = $('input[name="musicVolume"]', $audoBalanceConfigField);
-            var $effectVolumeField = $('input[name="effectVolume"]', $audoBalanceConfigField);
-            // collect the values from the three fields
-            var masterVolume = parseFloat($masterVolumeField.val());
-            var musicVolume = parseFloat($musicVolumeField.val());
-            var effectVolume = parseFloat($effectVolumeField.val());
-            // construct a new config object to update with
-            var newConfig = {};
-            newConfig.masterVolume = masterVolume;
-            newConfig.musicVolume = musicVolume;
-            newConfig.effectVolume = effectVolume;
-            //console.log('newConfig = ', newConfig);
-            return newConfig;
-            };
-
-        // Define a function for parsing the sprite render mode setting from the form
-        function parseSpriteRenderMode(){
-            var $checkedInput = $('input[type="radio"]:checked', $spriteRenderModeField);
-            var checkedValue = $checkedInput.val();
-            return checkedValue;
-            };
-
-        // Define a function for parsing the battle button mode setting from the form
-        function parseBattleButtonMode(){
-            var $checkedInput = $('input[type="radio"]:checked', $battleButtonModeField);
-            var checkedValue = $checkedInput.val();
-            return checkedValue;
-            };
-
-        // Backup the user's audio changes in case we need to reset them
-        var userAudioConfigBackup = {};
-        userAudioConfigBackup = parseAudioBalanceConfig();
-
-        // Backup the user's sprite render mode in case we need to reset it
-        var userSpriteRenderModeBackup = '';
-        userSpriteRenderModeBackup = parseSpriteRenderMode();
-
-        // Backup the user's battle button mode in case we need to reset it
-        var userBattleButtonModeBackup = '';
-        userBattleButtonModeBackup = parseBattleButtonMode();
-
-        // Define click events for the game settings form elements
-        $('input[type="range"]', $audoBalanceConfigField).bind('change', function(e){
+        // Make it so that changing audio balance settings updates live w/ a sound effect
+        $('input[type="range"]', $audioBalanceConfigField).bind('change', function(e){
             //console.log('change event on audio balance config field');
             var newConfig = parseAudioBalanceConfig();
             updateAudioBalanceConfig(newConfig);
             playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0}, true);
             });
 
-        // Make it so when the user clicks on a radio button's container it automatically triggers the radio button inside
-        var $radioFieldParents = [$spriteRenderModeField, $battleButtonModeField];
-        $.each($radioFieldParents, function(i, $radioFieldParent){
-            $('.radiofield', $radioFieldParent).bind('click', function(e){
-                //console.log('click event on sprite render mode field');
-                var $thisField = $(this);
-                var $radioButton = $('input[type="radio"]', $thisField);
-                $radioButton.prop('checked', true);
-                $radioButton.trigger('change');
-                });
-            $('input[type="radio"]', $radioFieldParent).bind('change', function(e){
-                //console.log('change event on sprite render mode field');
-                e.stopPropagation();
-                if ($radioFieldParent === $spriteRenderModeField){
-                    var checkedValue = parseSpriteRenderMode();
-                    updateSpriteRenderMode(checkedValue);
-                    }
-                else if ($radioFieldParent === $battleButtonModeField){
-                    var checkedValue = parseBattleButtonMode();
-                    updateBattleButtonMode(checkedValue);
-                    }
-                $radioFieldParent.find('.radiofield').removeClass('active');
-                $('input[type="radio"]:checked', $radioFieldParent).closest('.radiofield').addClass('active');
-                });
-
-            });
-
+        // ---
 
         // Reset back to backup values if the user switches windows without saving
         var resetGameSettings = function(){
             //console.log('resetGameSettings()');
             //console.log('userAudioConfigBackup = ', userAudioConfigBackup);
-            //console.log('userSpriteRenderModeBackup = ', userSpriteRenderModeBackup);
-            //console.log('userBattleButtonModeBackup = ', userBattleButtonModeBackup);
             updateAudioBalanceConfig(userAudioConfigBackup);
-            updateSpriteRenderMode(userSpriteRenderModeBackup);
-            updateBattleButtonMode(userBattleButtonModeBackup);
             };
         var applyGameSettings = function(){
             //console.log('applyGameSettings()');
             //console.log('parseAudioBalanceConfig() = ', parseAudioBalanceConfig());
-            //console.log('parseSpriteRenderMode() = ', parseSpriteRenderMode());
-            //console.log('parseBattleButtonMode() = ', parseBattleButtonMode());
             updateAudioBalanceConfig(parseAudioBalanceConfig());
-            updateSpriteRenderMode(parseSpriteRenderMode());
-            updateBattleButtonMode(parseBattleButtonMode());
             };
         window.addEventListener('message', function(event){
             //console.log('iframe received a message from', event.origin);
@@ -424,10 +429,376 @@ $(document).ready(function(){
 
         // Automatically update saved game settings to be sure it's working
         updateAudioBalanceConfig(parseAudioBalanceConfig());
+
+        }
+
+    // Process complex game setting updates and pass them to the parent window
+    var $performanceSettings = $('.performance-settings', $thisSettings);
+    if ($performanceSettings.length){
+        //console.log('we have game settings specifically');
+
+        // Define change events for all the range elements so we can see their values
+        bindRangeInputEvents($performanceSettings);
+
+        // Make it so radio button and their containers can be clicked interchange
+        bindRadioInputEvents($performanceSettings);
+
+        // Collect references to the appropriate windows for updating
+        var thisMusicWindow = window.top;
+        var thisSpriteWindow = window.self;
+        var thisGameSettings = window.top.gameSettings;
+
+        // ---
+
+        // Collect references to the applicable form fields
+        var $performanceTweaksField = $('.field[data-setting="performanceTweaks"]', $performanceSettings);
+
+        // Backup this user's menu button sprite settings in case we need to reset them
+        var userAllowMenuButtonSpritesBackup = false;
+        var userMenuButtonSpriteMotionBackup = false;
+        var userMenuButtonSpriteLimitBackup = 0;
+        userAllowMenuButtonSpritesBackup = parseAllowMenuButtonSprites();
+        userMenuButtonSpriteMotionBackup = parseMenuButtonSpriteMotion();
+        userMenuButtonSpriteLimitBackup = parseMenuButtonSpriteLimit();
+
+        // Define a function for parsing the value of the menu button sprite toggle
+        function parseAllowMenuButtonSprites(){
+            //console.log('parseAllowMenuButtonSprites()');
+            var $checkedInput = $('input[type="radio"][name="allowMenuButtonSprites"]:checked', $performanceSettings);
+            var checkedValue = parseInt($checkedInput.val()); // int-based boolean
+            //console.log('checkedValue = ', checkedValue);
+            return checkedValue;
+            };
+
+        // Define a function for parsing the value of the menu button sprite motion toggle
+        function parseMenuButtonSpriteMotion(){
+            //console.log('parseMenuButtonSpriteMotion()');
+            var $checkedInput = $('input[type="radio"][name="menuButtonSpriteMotion"]:checked', $performanceSettings);
+            var checkedValue = parseInt($checkedInput.val()); // int-based boolean
+            //console.log('checkedValue = ', checkedValue);
+            return checkedValue;
+            };
+
+        // Define a function for parsing the menu button sprite limit from the form
+        function parseMenuButtonSpriteLimit(){
+            //console.log('parseMenuButtonSpriteLimit()');
+            var $sliderField = $('input[name="menuButtonSpriteLimit"]', $performanceTweaksField);
+            var sliderValue = parseFloat($sliderField.val());
+            //console.log('sliderValue = ', sliderValue);
+            return sliderValue;
+            };
+
+        // Define a function for updating the menu button sprite toggle given a new value
+        function updateAllowMenuButtonSprites(newToggle){
+            //console.log('updateAllowMenuButtonSprites(newToggle) w/', newToggle);
+            if (typeof newToggle !== 'number'){ return false; }
+            var newToggleValue = newToggle;
+            thisGameSettings.allowMenuButtonSprites = newToggleValue;
+            $('#mmrpg').attr('data-menu-sprites', newToggleValue);
+            return true;
+            };
+
+        // Define a function for updating the menu button sprite motion toggle given a new value
+        function updateMenuButtonSpriteMotion(newMotion){
+            //console.log('updateMenuButtonSpriteMotion(newMotion) w/', newMotion);
+            if (typeof newMotion !== 'number'){ return false; }
+            var newMotionValue = newMotion;
+            thisGameSettings.menuButtonSpriteMotion = newMotionValue;
+            $('#mmrpg').attr('data-menu-sprites-motion', newMotionValue);
+            return true;
+            };
+
+        // Define a function for updating the menu button sprite limit given a new value
+        function updateMenuButtonSpriteLimit(newLimit){
+            //console.log('updateMenuButtonSpriteLimit(newLimit) w/', newLimit);
+            if (typeof newLimit !== 'number'){ return false; }
+            var newSpriteLimit = newLimit;
+            thisGameSettings.menuButtonSpriteLimit = newSpriteLimit;
+            $('#mmrpg').attr('data-menu-sprites-limit', newSpriteLimit);
+            return true;
+            };
+
+        // Make sure any updates to these fields are correctly parsed and applied
+        $('input[name="allowMenuButtonSprites"]', $performanceTweaksField).bind('change', function(e){
+            updateAllowMenuButtonSprites(parseAllowMenuButtonSprites());
+            });
+        $('input[name="menuButtonSpriteMotion"]', $performanceTweaksField).bind('change', function(e){
+            updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
+            });
+        $('input[name="menuButtonSpriteLimit"]', $performanceTweaksField).bind('change', function(e){
+            updateMenuButtonSpriteLimit(parseMenuButtonSpriteLimit());
+            });
+
+        // ---
+
+        // Collect references to the applicable form fields
+        var $performanceTweaksField = $('.field[data-setting="performanceTweaks"]', $performanceSettings);
+
+        // Backup the user's ready room sprite settings in case we need to reset them
+        var userAllowReadyRoomSpritesBackup = false;
+        var userReadyRoomSpriteMotionBackup = false;
+        var userReadyRoomSpriteLimitBackup = 0;
+        userAllowReadyRoomSpritesBackup = parseAllowReadyRoomSprites();
+        userReadyRoomSpriteMotionBackup = parseReadyRoomSpriteMotion();
+        userReadyRoomSpriteLimitBackup = parseReadyRoomSpriteLimit();
+
+        // Define a function for parsing the value of the ready room sprite toggle
+        function parseAllowReadyRoomSprites(){
+            //console.log('parseAllowReadyRoomSprites()');
+            var $checkedInput = $('input[type="radio"][name="allowReadyRoomSprites"]:checked', $performanceSettings);
+            var checkedValue = parseInt($checkedInput.val()); // int-based boolean
+            //console.log('checkedValue = ', checkedValue);
+            return checkedValue;
+            };
+
+        // Define a function for parsing the value of the ready room sprite motion toggle
+        function parseReadyRoomSpriteMotion(){
+            //console.log('parseReadyRoomSpriteMotion()');
+            var $checkedInput = $('input[type="radio"][name="readyRoomSpriteMotion"]:checked', $performanceSettings);
+            var checkedValue = parseInt($checkedInput.val()); // int-based boolean
+            //console.log('checkedValue = ', checkedValue);
+            return checkedValue;
+            };
+
+        // Define a function for parsing the ready room sprite limit from the form
+        function parseReadyRoomSpriteLimit(){
+            //console.log('parseReadyRoomSpriteLimit()');
+            var $sliderField = $('input[name="readyRoomSpriteLimit"]', $performanceTweaksField);
+            var sliderValue = parseFloat($sliderField.val());
+            //console.log('sliderValue = ', sliderValue);
+            return sliderValue;
+            };
+
+        // Define a function for updating the ready room sprite toggle given a new value
+        function updateAllowReadyRoomSprites(newToggle){
+            //console.log('updateAllowReadyRoomSprites(newToggle) w/', newToggle);
+            if (typeof newToggle !== 'number'){ return false; }
+            var newToggleValue = newToggle;
+            thisGameSettings.allowReadyRoomSprites = newToggleValue;
+            $('#mmrpg').attr('data-ready-room', newToggleValue);
+            return true;
+            };
+
+        // Define a function for updating the ready room sprite motion toggle given a new value
+        function updateReadyRoomSpriteMotion(newMotion){
+            //console.log('updateReadyRoomSpriteMotion(newMotion) w/', newMotion);
+            if (typeof newMotion !== 'number'){ return false; }
+            var newMotionValue = newMotion;
+            thisGameSettings.readyRoomSpriteMotion = newMotionValue;
+            $('#mmrpg').attr('data-ready-room-motion', newMotionValue);
+            return true;
+            };
+
+        // Define a function for updating the ready room sprite limit given a new value
+        function updateReadyRoomSpriteLimit(newLimit){
+            //console.log('updateReadyRoomSpriteLimit(newLimit) w/', newLimit);
+            if (typeof newLimit !== 'number'){ return false; }
+            var newSpriteLimit = newLimit;
+            thisGameSettings.readyRoomSpriteLimit = newSpriteLimit;
+            $('#mmrpg').attr('data-ready-room-limit', newSpriteLimit);
+            return true;
+            };
+
+        // Make sure any updates to these fields are correctly parsed and applied
+        $('input[name="allowReadyRoomSprites"]', $performanceTweaksField).bind('change', function(e){
+            updateAllowReadyRoomSprites(parseAllowReadyRoomSprites());
+            });
+        $('input[name="readyRoomSpriteMotion"]', $performanceTweaksField).bind('change', function(e){
+            updateReadyRoomSpriteMotion(parseReadyRoomSpriteMotion());
+            });
+        $('input[name="readyRoomSpriteLimit"]', $performanceTweaksField).bind('change', function(e){
+            updateReadyRoomSpriteLimit(parseReadyRoomSpriteLimit());
+            });
+
+        // ---
+
+        // Collect references to the applicable form fields
+        var $spriteRenderModeField = $('.field[data-setting="spriteRenderMode"]', $performanceSettings);
+
+        // Backup the user's sprite render mode in case we need to reset it
+        var userSpriteRenderModeBackup = '';
+        userSpriteRenderModeBackup = parseSpriteRenderMode();
+
+        // Define a function for parsing the sprite render mode setting from the form
+        function parseSpriteRenderMode(){
+            //console.log('parseSpriteRenderMode()');
+            var $checkedInput = $('input[type="radio"]:checked', $spriteRenderModeField);
+            var checkedValue = $checkedInput.val();
+            //console.log('checkedValue = ', checkedValue);
+            return checkedValue;
+            };
+
+        // Define a function for updating the sprite rendering mode w/ form changes
+        function updateSpriteRenderMode(newMode){
+            //console.log('updateSpriteRenderMode(newMode) w/', newMode);
+            if (typeof newMode !== 'string'){ return false; }
+            var newRenderMode = newMode.length ? newMode : thisGameSettings.spriteRenderMode;
+            thisGameSettings.spriteRenderMode = newRenderMode;
+            $('#mmrpg').attr('data-render-mode', newRenderMode);
+            return true;
+            };
+
+        // Make sure any updates to these fields are correctly parsed and applied
+        $('input[type="radio"]', $spriteRenderModeField).bind('change', function(e){
+            //console.log('change event on spriteRenderMode field');
+            updateSpriteRenderMode(parseSpriteRenderMode());
+            });
+
+        // ---
+
+        // Reset back to backup values if the user switches windows without saving
+        var resetGameSettings = function(){
+            //console.log('resetGameSettings()');
+            //console.log('userAllowMenuButtonSpritesBackup = ', userAllowMenuButtonSpritesBackup);
+            //console.log('userMenuButtonSpriteMotionBackup = ', userMenuButtonSpriteMotionBackup);
+            //console.log('userMenuButtonSpriteLimitBackup = ', userMenuButtonSpriteLimitBackup);
+            //console.log('userAllowReadyRoomSpritesBackup = ', userAllowReadyRoomSpritesBackup);
+            //console.log('userReadyRoomSpriteMotionBackup = ', userReadyRoomSpriteMotionBackup);
+            //console.log('userReadyRoomSpriteLimitBackup = ', userReadyRoomSpriteLimitBackup);
+            //console.log('userSpriteRenderModeBackup = ', userSpriteRenderModeBackup);
+            updateAllowMenuButtonSprites(userAllowMenuButtonSpritesBackup);
+            updateMenuButtonSpriteMotion(userMenuButtonSpriteMotionBackup);
+            updateMenuButtonSpriteLimit(userMenuButtonSpriteLimitBackup);
+            updateAllowReadyRoomSprites(userAllowReadyRoomSpritesBackup);
+            updateReadyRoomSpriteMotion(userReadyRoomSpriteMotionBackup);
+            updateReadyRoomSpriteLimit(userReadyRoomSpriteLimitBackup);
+            updateSpriteRenderMode(userSpriteRenderModeBackup);
+            };
+        var applyGameSettings = function(){
+            //console.log('applyGameSettings()');
+            //console.log('parseAllowMenuButtonSprites() = ', parseAllowMenuButtonSprites());
+            //console.log('parseMenuButtonSpriteMotion() = ', parseMenuButtonSpriteMotion());
+            //console.log('parseMenuButtonSpriteLimit() = ', parseMenuButtonSpriteLimit());
+            //console.log('parseAllowReadyRoomSprites() = ', parseAllowReadyRoomSprites());
+            //console.log('parseReadyRoomSpriteMotion() = ', parseReadyRoomSpriteMotion());
+            //console.log('parseReadyRoomSpriteLimit() = ', parseReadyRoomSpriteLimit());
+            //console.log('parseSpriteRenderMode() = ', parseSpriteRenderMode());
+            updateAllowMenuButtonSprites(parseAllowMenuButtonSprites());
+            updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
+            updateMenuButtonSpriteLimit(parseMenuButtonSpriteLimit());
+            updateAllowReadyRoomSprites(parseAllowReadyRoomSprites());
+            updateReadyRoomSpriteMotion(parseReadyRoomSpriteMotion());
+            updateReadyRoomSpriteLimit(parseReadyRoomSpriteLimit());
+            updateSpriteRenderMode(parseSpriteRenderMode());
+            };
+        window.addEventListener('message', function(event){
+            //console.log('iframe received a message from', event.origin);
+            // IMPORTANT: Check the origin of the data!
+            if (event.origin.startsWith(performanceSettings.baseHref)){
+                if (event.data === 'hidden'){
+                    //console.log('The iframe was hidden!');
+                    resetGameSettings();
+                    }
+                }
+            });
+        window.onblur = function(){
+            //console.log('iframe has lost focus!');
+            resetGameSettings();
+            };
+        window.onfocus = function(){
+            //console.log('iframe has gained focus!');
+            applyGameSettings();
+            };
+
+        // Automatically update saved game settings to be sure it's working
+        updateAllowMenuButtonSprites(parseAllowMenuButtonSprites());
+        updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
+        updateMenuButtonSpriteLimit(parseMenuButtonSpriteLimit());
+        updateAllowReadyRoomSprites(parseAllowReadyRoomSprites());
+        updateReadyRoomSpriteMotion(parseReadyRoomSpriteMotion());
+        updateReadyRoomSpriteLimit(parseReadyRoomSpriteLimit());
         updateSpriteRenderMode(parseSpriteRenderMode());
+
+        }
+
+    // Process complex game setting updates and pass them to the parent window
+    var $miscSettings = $('.misc-settings', $thisSettings);
+    if ($miscSettings.length){
+        //console.log('we have game settings specifically');
+
+        // Define change events for all the range elements so we can see their values
+        bindRangeInputEvents($miscSettings);
+
+        // Make it so radio button and their containers can be clicked interchangeably
+        bindRadioInputEvents($miscSettings);
+
+        // Collect references to the appropriate windows for updating
+        var thisSpriteWindow = window.self;
+        var thisGameSettings = window.top.gameSettings;
+
+        // ---
+
+        // Collect references to the applicable form fields
+        var $battleButtonModeField = $('.field[data-setting="battleButtonMode"]', $miscSettings);
+
+        // Backup the user's battle button mode in case we need to reset it
+        var userBattleButtonModeBackup = '';
+        userBattleButtonModeBackup = parseBattleButtonMode();
+
+        // Define a function for parsing the battle button mode setting from the form
+        function parseBattleButtonMode(){
+            var $checkedInput = $('input[type="radio"]:checked', $battleButtonModeField);
+            var checkedValue = $checkedInput.val();
+            return checkedValue;
+            };
+
+        // Define a function for updating the battle button mode w/ form changes
+        function updateBattleButtonMode(newMode, updateParent){
+            //console.log('updateBattleButtonMode(newMode) w/', newMode);
+            if (typeof newMode !== 'string'){ return false; }
+            if (typeof updateParent === 'undefined'){ updateParent = false; }
+            var newButtonMode = newMode.length ? newMode : thisGameSettings.battleButtonMode;
+            thisGameSettings.battleButtonMode = newButtonMode;
+            $('#mmrpg').attr('data-button-mode', newButtonMode);
+            if (updateParent && typeof window.parent.prototype_update_game_settings !== 'undefined'){
+                //console.log('sending update request to parent prototype_update_game_settings() w/ '+newButtonMode);
+                window.parent.prototype_update_game_settings({'battleButtonMode': newButtonMode});
+                }
+            return true;
+            };
+
+        // Make sure any updates to these fields are correctly parsed and applied
+        $('input[type="radio"]', $battleButtonModeField).bind('change', function(e){
+            //console.log('change event on battleButtonMode field');
+            updateBattleButtonMode(parseBattleButtonMode());
+            });
+
+        // ---
+
+        // Reset back to backup values if the user switches windows without saving
+        var resetGameSettings = function(){
+            //console.log('resetGameSettings()');
+            //console.log('userBattleButtonModeBackup = ', userBattleButtonModeBackup);
+            updateBattleButtonMode(userBattleButtonModeBackup);
+            };
+        var applyGameSettings = function(){
+            //console.log('applyGameSettings()');
+            //console.log('parseBattleButtonMode() = ', parseBattleButtonMode());
+            updateBattleButtonMode(parseBattleButtonMode());
+            };
+        window.addEventListener('message', function(event){
+            //console.log('iframe received a message from', event.origin);
+            // IMPORTANT: Check the origin of the data!
+            if (event.origin.startsWith(gameSettings.baseHref)){
+                if (event.data === 'hidden'){
+                    //console.log('The iframe was hidden!');
+                    resetGameSettings();
+                    }
+                }
+            });
+        window.onblur = function(){
+            //console.log('iframe has lost focus!');
+            resetGameSettings();
+            };
+        window.onfocus = function(){
+            //console.log('iframe has gained focus!');
+            applyGameSettings();
+            };
+
+        // Automatically update saved game settings to be sure it's working
         updateBattleButtonMode(parseBattleButtonMode(), true);
 
-    }
+        }
 
 
     /*
