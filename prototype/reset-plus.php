@@ -5,6 +5,8 @@
 // Collect a reference to the user object
 $this_user = $_SESSION[$session_token]['USER'];
 $user_id = rpg_user::get_current_userid();
+$reset_player = !empty($_REQUEST['player']) ? $_REQUEST['player'] : false;
+if (!mmrpg_prototype_player_unlocked($reset_player)){ die('Invalid player `'.print_r($reset_player, true).'` for New Game + !!!'); }
 
 // Make sure we add the new-game-plus flag to each of the unlocked players
 $mmrpg_index_players = rpg_player::get_index(true);
@@ -16,7 +18,7 @@ $_SESSION[$session_token] = $game_session;
 
 // Create the reset object we'll use to modify save data
 require(MMRPG_CONFIG_ROOTDIR.'classes/rpg_reset.php');
-$reset = new rpg_reset($user_id, $session_token);
+$reset = new rpg_reset($user_id, $session_token, $reset_player);
 
 // First we'll reset the missions in this save file
 $reset->reset_missions();
@@ -26,9 +28,6 @@ $reset->reset_events();
 
 // Lastly, we'll regroup their robots to original owners
 $reset->regroup_robots();
-
-// Lastly, we'll reboot all their robots to level 1
-//$reset->reset_robots();
 
 // Now that we're done, re-inset the user data into the session
 $_SESSION[$session_token]['USER'] = $this_user;

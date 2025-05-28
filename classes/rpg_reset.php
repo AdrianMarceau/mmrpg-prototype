@@ -4,11 +4,13 @@ class rpg_reset {
 
     private $user_id;
     private $session_token;
+    private $session_player;
     private $session_data;
 
-    public function __construct($user_id, $session_token) {
+    public function __construct($user_id, $session_token, $session_player = '') {
         $this->user_id = $user_id;
         $this->session_token = $session_token;
+        $this->session_player = $session_player;
         $this->import();
     }
 
@@ -25,9 +27,10 @@ class rpg_reset {
     // RESET MISSIONS
     // Reset all missions and story progress but keep everything else
     public function reset_missions() {
-        error_log('rpg_reset->reset_missions() called');
+        //error_log('rpg_reset->reset_missions() called');
 
         // Pull necessary indexes for this action
+        $session_player = !empty($this->session_player) ? $this->session_player : false;
         $mmrpg_index_players = rpg_player::get_index(true);
 
         // Pull backups of the battles complete and failure
@@ -35,25 +38,35 @@ class rpg_reset {
         $this_battle_failure = !empty($this->session_data['values']['battle_failure']) ? $this->session_data['values']['battle_failure'] : array();
         $this_turns_total = !empty($this->session_data['counters']['battle_turns_total']) ? $this->session_data['counters']['battle_turns_total'] : 0;
 
-        // Reset the battle complete and failure arrays to empty
-        $this->session_data['values']['battle_index'] = array();
-        $this->session_data['values']['battle_complete'] = array();
-        $this->session_data['values']['battle_failure'] = array();
-        $this->session_data['counters']['battle_turns_total'] = 0;
+        // Make sure required indexes actually exist before looping
+        if (!isset($this->session_data['values']['battle_index'])){ $this->session_data['values']['battle_index'] = array(); }
+        if (!isset($this->session_data['values']['battle_complete'])){ $this->session_data['values']['battle_complete'] = array(); }
+        if (!isset($this->session_data['values']['battle_failure'])){ $this->session_data['values']['battle_failure'] = array(); }
+        if (!isset($this->session_data['counters']['battle_turns_total'])){ $this->session_data['counters']['battle_turns_total'] = 0; }
 
-        // Reset player-specific battle settings
+        // Reset the battle complete and failure arrays to empty, either for everyone or only selected player
         foreach ($mmrpg_index_players as $ptoken => $info) {
+            if (!empty($session_player) && $session_player !== $ptoken){ continue; }
             $pxtoken = str_replace('dr-', '', $ptoken);
-            $this->session_data['counters']['battle_turns_' . $ptoken . '_total'] = 0;
-            $temp_omega_key = $ptoken . '_target-robot-omega_prototype';
-            $this->session_data['values'][$temp_omega_key] = array();
+            $pttoken = 'battle_turns_'.$ptoken.'_total';
+            $pturns = !empty($this->session_data['counters'][$pttoken]) ? $this->session_data['counters'][$pttoken] : 0;
+            $this->session_data['values']['battle_index'][$ptoken] = array();
+            $this->session_data['values']['battle_complete'][$ptoken] = array();
+            $this->session_data['values']['battle_failure'][$ptoken] = array();
+            $this->session_data['counters']['battle_turns_'.$ptoken.'_total'] = 0;
+            $this->session_data['counters']['battle_turns_total'] -= $pturns;
+            if ($this->session_data['counters']['battle_turns_total'] < 0){
+                $this->session_data['counters']['battle_turns_total'] = 0;
+            }
         }
 
-        // Clear endless mode savestates if needed
+        // Clear endless mode savestates if needed, just-in-case player robots are still present there
         $db = cms_database::get_database();
+        $update_condition = "user_id = {$this->user_id}";
+        if (!empty($session_player)){ $update_condition .= " AND challenge_team_config LIKE '{$session_player}::%'"; }
         $db->update('mmrpg_challenges_waveboard',
             array('challenge_wave_savestate' => ''),
-            array('user_id' => $this->user_id)
+            $update_condition
             );
 
         // Export changes to the session data
@@ -66,9 +79,10 @@ class rpg_reset {
     // RESET EVENTS
     // Reset all event-related flags and settings
     public function reset_events() {
-        error_log('rpg_reset->reset_events() called');
+        //error_log('rpg_reset->reset_events() called');
 
         // Pull necessary indexes for this action
+        $session_player = !empty($this->session_player) ? $this->session_player : false;
         $mmrpg_index_players = rpg_player::get_index(true);
 
         // Reset event flags for each player
@@ -78,29 +92,28 @@ class rpg_reset {
             '-event-97_phase-three-complete'
         );
         foreach ($mmrpg_index_players as $ptoken => $info) {
+            if (!empty($session_player) && $session_player !== $ptoken){ continue; }
             $pxtoken = str_replace('dr-', '', $ptoken);
+            // clear the phaseX complete flags first and foremost
             foreach ($clear_event_flags as $event_flag) {
-                $clear_event_flag = $ptoken . $event_flag;
-                unset($this->session_data['flags']['events'][$clear_event_flag]);
+                $clear_event_flag1 = $ptoken . $event_flag;
+                unset($this->session_data['flags']['events'][$clear_event_flag1]);
             }
-            for ($i = 0; $i <= 10; $i++) {
-                $clear_event_flag = $ptoken . '_chapter-' . $i . '-unlocked';
-                unset($this->session_data['flags']['events'][$clear_event_flag]);
+            // clear any of the chapter unlock flags in event flags and in battle settings
+            // (no, i have no idea what this is duplicated but we'll figure that out after)
+            for ($ch = 0; $ch <= 10; $ch++) {
+                $clear_event_flag2 = $ptoken . '_chapter-' . $ch . '-unlocked';
+                unset($this->session_data['flags']['events'][$clear_event_flag2]);
+                $clear_event_flag3 = $ptoken . '_unlocked_chapter_' . $ch;
+                unset($this->session_data['battle_settings']['flags'][$clear_event_flag3]);
             }
-            $clear_event_flag = $pxtoken . '_current_chapter';
-            $this->session_data['battle_settings'][$clear_event_flag] = 0;
+            // clear the current chapter flag in battle settings
+            $clear_event_flag4 = $pxtoken . '_current_chapter';
+            $this->session_data['battle_settings'][$clear_event_flag4] = 0;
         }
 
-        // Clear chapter unlock flags in battle settings
-        if (!empty($this->session_data['battle_settings']['flags'])) {
-            foreach ($this->session_data['battle_settings']['flags'] as $flag => $value) {
-                if (!preg_match('/^([a-z0-9]+)_unlocked_chapter_([0-9]+)$/i', $flag)) {
-                    continue;
-                }
-                unset($this->session_data['battle_settings']['flags'][$flag]);
-            }
-        }
-
+        // Always clear current player token when initiation new game +
+        // regardless of who it is so the game reload at player select
         unset($this->session_data['battle_settings']['this_player_token']);
 
         // Export changes to the session data
@@ -113,14 +126,16 @@ class rpg_reset {
     // RESET ROBOTS
     // Reset robots to level 1 with 999 experience and move them back to their original owners
     public function reset_robots() {
-        error_log('rpg_reset->reset_robots() called');
+        //error_log('rpg_reset->reset_robots() called');
 
         // Pull necessary indexes for this action
+        $session_player = !empty($this->session_player) ? $this->session_player : false;
         $mmrpg_index_players = rpg_player::get_index(true);
         $mmrpg_index_robots = rpg_robot::get_index(true);
 
         // Loop through players and reset their robots
         foreach ($mmrpg_index_players as $ptoken => $info) {
+            if (!empty($session_player) && $session_player !== $ptoken){ continue; }
 
             // Collect the current rewards and settings for this player
             $rewards = !empty($this->session_data['values']['battle_rewards'][$ptoken]) ? $this->session_data['values']['battle_rewards'][$ptoken] : array();
@@ -151,6 +166,7 @@ class rpg_reset {
             elseif ($rtoken === 'bass') { $original_player = 'dr-wily'; }
             elseif ($rtoken === 'proto-man') { $original_player = 'dr-cossack'; }
             if (!empty($original_player)) {
+                if (!empty($session_player) && $session_player !== $original_player){ continue; }
                 foreach ($mmrpg_index_players as $ptoken => $pinfo) {
                     // Move robots to their original owners
                     if ($ptoken === $original_player) {
@@ -205,18 +221,28 @@ class rpg_reset {
         //error_log('rpg_reset->regroup_robots() called');
 
         // Pull necessary indexes for this action
+        $session_player = !empty($this->session_player) ? $this->session_player : false;
         $mmrpg_index_players = rpg_player::get_index(true);
         $mmrpg_index_robots = rpg_robot::get_index(true);
 
-        // First we pull all robots into a single array
+        // Create an array to keep track of which player had which robots initially
+        $robot_to_current_player = array();
+        $robot_to_original_player = array();
+        $robots_by_current_player = array();
+        $robots_by_original_player = array();
+
+        // First we pull all relevant robots into a single array
         $session_robots = array();
         if (!empty($this->session_data['values']['battle_rewards'])){
             foreach ($mmrpg_index_players as $ptoken => $pinfo){
                 if (!empty($this->session_data['values']['battle_rewards'][$ptoken]['player_robots'])){
+                    if (!isset($robots_by_current_player[$ptoken])){ $robots_by_current_player[$ptoken] = array(); }
                     foreach ($this->session_data['values']['battle_rewards'][$ptoken]['player_robots'] as $rtoken => $rewards){
+                        if (!in_array($rtoken, $robots_by_current_player[$ptoken])){ $robots_by_current_player[$ptoken][] = $rtoken; }
                         if (!isset($session_robots[$rtoken])){ $session_robots[$rtoken] = array(); }
                         if (isset($session_robots[$rtoken]['rewards'])){ $rewards = array_merge($session_robots[$rtoken]['rewards'], $rewards); }
                         $session_robots[$rtoken]['rewards'] = $rewards;
+                        $robot_to_current_player[$rtoken] = $ptoken;
                     }
                 }
             }
@@ -224,7 +250,9 @@ class rpg_reset {
         if (!empty($this->session_data['values']['battle_settings'])){
             foreach ($mmrpg_index_players as $ptoken => $pinfo){
                 if (!empty($this->session_data['values']['battle_settings'][$ptoken]['player_robots'])){
+                    if (!isset($robots_by_current_player[$ptoken])){ $robots_by_current_player[$ptoken] = array(); }
                     foreach ($this->session_data['values']['battle_settings'][$ptoken]['player_robots'] as $rtoken => $settings){
+                        if (!in_array($rtoken, $robots_by_current_player[$ptoken])){ $robots_by_current_player[$ptoken][] = $rtoken; }
                         if (!isset($session_robots[$rtoken])){ $session_robots[$rtoken] = array(); }
                         $original_player = '';
                         if ($rtoken === 'mega-man' || $rtoken === 'roll') { $original_player = 'dr-light'; }
@@ -234,11 +262,20 @@ class rpg_reset {
                         $settings['original_player'] = $original_player;
                         if (isset($session_robots[$rtoken]['settings'])){ $settings = array_merge($session_robots[$rtoken]['settings'], $settings); }
                         $session_robots[$rtoken]['settings'] = $settings;
+                        if (!isset($robots_by_original_player[$original_player])){ $robots_by_original_player[$original_player] = array(); }
+                        if (!in_array($rtoken, $robots_by_original_player[$original_player])){ $robots_by_original_player[$original_player][] = $rtoken; }
+                        $robot_to_current_player[$rtoken] = $ptoken;
+                        $robot_to_original_player[$rtoken] = $original_player;
                     }
                 }
             }
         }
         //error_log('$session_robots = '.print_r($session_robots, true));
+        //error_log('$session_robots(tokens)[x'.count($session_robots).'] = '.print_r(implode(', ', array_keys($session_robots)), true).'');
+        //error_log('$robot_to_current_player = '.print_r($robot_to_current_player, true));
+        //error_log('$robot_to_original_player = '.print_r($robot_to_original_player, true));
+        //error_log('$robots_by_current_player = '.print_r($robots_by_current_player, true));
+        //error_log('$robots_by_original_player = '.print_r($robots_by_original_player, true));
 
         // Start new rewards and settings arrays to populate from stored robots
         $new_battle_rewards = $this->session_data['values']['battle_rewards'];
@@ -255,13 +292,19 @@ class rpg_reset {
         }
 
         // Loop through master robots, in order, reassigning them to their original owners
+        $move_method = !empty($session_player) ? 'select' : 'all';
+        //error_log('$move_method = '.$move_method.' ($session_player = '.$session_player.')');
         foreach ($session_robots as $rtoken => $rdata){
-            if (!isset($rdata['settings']['original_player'])){ continue; }
-            else { $ptoken = $rdata['settings']['original_player']; }
+            $curr_ptoken = !empty($robot_to_current_player[$rtoken]) ? $robot_to_current_player[$rtoken] : '';
+            $orig_ptoken = !empty($robot_to_original_player[$rtoken]) ? $robot_to_original_player[$rtoken] : '';
+            $new_ptoken = $curr_ptoken;
+            if ($move_method === 'all'){ $new_ptoken = $orig_ptoken; }
+            if ($move_method === 'select' && $orig_ptoken === $session_player){ $new_ptoken = $orig_ptoken; }
+            //error_log($curr_ptoken.' robot '.$rtoken.' will '.($new_ptoken === $curr_ptoken ? 'stay with '.$curr_ptoken : 'move to '.$new_ptoken));
             $rewards = !empty($rdata['rewards']) ? $rdata['rewards'] : array();
             $settings = !empty($rdata['settings']) ? $rdata['settings'] : array();
-            $new_battle_rewards[$ptoken]['player_robots'][$rtoken] = $rewards;
-            $new_battle_settings[$ptoken]['player_robots'][$rtoken] = $settings;
+            $new_battle_rewards[$new_ptoken]['player_robots'][$rtoken] = $rewards;
+            $new_battle_settings[$new_ptoken]['player_robots'][$rtoken] = $settings;
         }
 
         // Reassign the new rewards and settings arrays to the session data
@@ -281,6 +324,7 @@ class rpg_reset {
 
         // Loop through players again, but this time re-sort all robots by their index position
         foreach ($mmrpg_index_players as $ptoken => $info) {
+            if (!empty($session_player) && $session_player !== $ptoken){ continue; }
             // Collect the current rewards and settings for this player
             $rewards = !empty($this->session_data['values']['battle_rewards'][$ptoken]) ? $this->session_data['values']['battle_rewards'][$ptoken] : array();
             $settings = !empty($this->session_data['values']['battle_settings'][$ptoken]) ? $this->session_data['values']['battle_settings'][$ptoken] : array();

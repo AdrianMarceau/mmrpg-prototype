@@ -64,8 +64,9 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset-missions' && !e
 
 }
 // Check if a new-game-plus request has been placed
-if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'new-game-plus'){
-    error_log('new-game-plus: '.var_export($_REQUEST, true));
+if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'new-game-plus'
+    && !empty($_REQUEST['player']) && preg_match('/^[-_a-z0-9]+$/i', $_REQUEST['player'])){
+    //error_log('new-game-plus: '.var_export($_REQUEST, true));
 
     // Require the appropriate reset file
     require(MMRPG_CONFIG_ROOTDIR.'prototype/reset-plus.php');
