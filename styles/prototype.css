@@ -2067,7 +2067,8 @@ body[data-source="website"] #prototype .menu {
     animation: option-robot-sprite-darken 0.6s infinite;
     animation-delay: 1s;
 }
-#mmrpg #prototype .option_this-player-select:not(.option_disabled) .sprite_robot .sprite {
+#mmrpg #prototype .option_this-player-select:not(.option_disabled) .sprite_player .sprite.bounce,
+#mmrpg #prototype .option_this-player-select:not(.option_disabled) .sprite_robot .sprite.bounce {
     transform: translateY(0px);
     animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
 }
