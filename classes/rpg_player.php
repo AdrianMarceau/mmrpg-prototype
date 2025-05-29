@@ -4224,6 +4224,22 @@ class rpg_player extends rpg_object {
 
     /* -- MISC PLAYER FUNCTIONS -- */
 
+    // Define a function that takes a given player's stats and
+    public static function get_css_animation_duration($player_token_or_info){
+        //error_log('get_css_animation_duration() // $player_token_or_info = '.print_r($player_token_or_info, true));
+        if (!empty($player_token_or_info) && is_string($player_token_or_info)){ $player_info = self::get_index_info($player_token_or_info); }
+        elseif (!empty($player_token_or_info) && is_array($player_token_or_info)){ $player_info = $player_token_or_info; }
+        if (empty($player_info)){ return false; }
+        $this_player_attack = (!empty($player_info['player_attack']) ? $player_info['player_attack'] : 0) + 25;
+        $this_player_defense = (!empty($player_info['player_defense']) ? $player_info['player_defense'] : 0) + 25;
+        $this_player_speed = (!empty($player_info['player_speed']) ? $player_info['player_speed'] : 0) + 25;
+        $player_animation_duration = 1;
+        $player_animation_duration -= $player_animation_duration * ($this_player_speed / ($this_player_attack + $this_player_defense + $this_player_speed));
+        $player_animation_duration += $player_animation_duration * ($this_player_defense / ($this_player_attack + $this_player_defense + $this_player_speed));
+        if ($player_animation_duration < 0.1){ $player_animation_duration = 0.1; }
+        return $player_animation_duration;
+    }
+
     // Define a function for getting a list of intro fields for players
     public static function get_intro_fields(){
         return array(
