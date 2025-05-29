@@ -344,13 +344,6 @@ $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings
                         <i class="fa fas fa-greek-omega"></i>
                     </span>
                 <? } ?>
-                <? if (mmrpg_prototype_new_game_plus()){ ?>
-                    <span class="pipe">|</span>
-                    <span class="amount plus">
-                        <em class="text">NG</em>
-                        <i class="fa fas fa-plus"></i>
-                    </span>
-                <? } ?>
             </div>
         </div>
 
