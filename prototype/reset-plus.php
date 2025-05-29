@@ -14,6 +14,7 @@ $game_session = $_SESSION[$session_token];
 if (!isset($game_session['flags'])){ $game_session['flags'] = array(); }
 if (!isset($game_session['flags']['prototype_events'])){ $game_session['flags']['prototype_events'] = array(); }
 $game_session['flags']['prototype_events']['new_game_plus'] = 1;
+$game_session['flags']['prototype_events']['new_game_plus_'.$reset_player] = 1;
 $_SESSION[$session_token] = $game_session;
 
 // Create the reset object we'll use to modify save data
