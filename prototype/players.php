@@ -23,6 +23,9 @@ else {
     // Collect the player index
     $mmrpg_player_index = rpg_player::get_index();
 
+    // Collect the menu config so we can check robot limit and animation settings
+    $menuButtonConfig = rpg_game::get_menuButtonConfig(true);
+
     // Define a quick function for getting the current chapter text
     $get_current_chapter_text = function($player_token, $player_chapters_unlocked){
         //error_log('generating chapter text for '.$player_token);
@@ -74,6 +77,26 @@ else {
         return $limit_hearts_markup;
         };
 
+    // Define an inline function for getting a given doctor's sprite
+    $get_doctor_sprite_markup = function($doctor_token, $doctor_info, $doctor_sprite_path, $doctor_is_away)
+        use($session_token, $menuButtonConfig) {
+        $allow_menu_sprites = isset($menuButtonConfig['allowMenuButtonSprites']) ? $menuButtonConfig['allowMenuButtonSprites'] : true;
+        $menu_sprite_limit = isset($menuButtonConfig['menuButtonSpriteLimit']) ? $menuButtonConfig['menuButtonSpriteLimit'] : 99;
+        $menu_sprite_motion = isset($menuButtonConfig['menuButtonSpriteMotion']) ? $menuButtonConfig['menuButtonSpriteMotion'] : true;
+        $temp_anim_duration = ($menu_sprite_motion ? rpg_player::get_css_animation_duration($doctor_info) : 0);
+        $temp_anim_classes = ($menu_sprite_motion ? ' bounce' : '');
+        $temp_anim_styles = ($menu_sprite_motion ? ' animation-duration: '.$temp_anim_duration.'s;' : '');
+        $temp_away_styles = ($doctor_is_away ? ' filter: brightness(0);' : '');
+        $text_sprites_markup = '';
+        $text_sprites_markup .= '<span class="sprite sprite_player sprite_40x40" style="top: -2px; right: 0; z-index: 60;">';
+            $text_sprites_markup .= '<span class="sprite sprite_40x40 sprite_40x40_base'.$temp_anim_classes.'" style="background-image: url('.$doctor_sprite_path.');'.$temp_away_styles.$temp_anim_styles.'"></span>';
+            if ($doctor_is_away){ $text_sprites_markup .= '<span class="endless"><i class="fa fas fa-infinity"></i></span>'; }
+        $text_sprites_markup .= '</span>';
+        if ($allow_menu_sprites){ $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites($doctor_token, $session_token, $menu_sprite_limit, $menu_sprite_motion); }
+        $text_sprites_markup = '<span class="battle_sprites">'.$text_sprites_markup.'</span>';
+        return $text_sprites_markup;
+        };
+
     // Collect any endless attack data so we can mess around with it
     $endless_attack_savedata = mmrpg_prototype_get_endless_sessions();
 
@@ -90,13 +113,7 @@ else {
         $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
         $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
         $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
-        $text_sprites_markup = '';
-        $text_sprites_markup .= '<span class="sprite sprite_player sprite_40x40" style="top: -2px; right: 0; z-index: 60;">';
-            $text_sprites_markup .= '<span class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.');'.($doctor_is_away ? ' filter: brightness(0);' : '').'"></span>';
-            if ($doctor_is_away){ $text_sprites_markup .= '<span class="endless"><i class="fa fas fa-infinity"></i></span>'; }
-        $text_sprites_markup .= '</span>';
-        $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites($doctor_token, $session_token);
-        $text_sprites_markup = '<span class="battle_sprites">'.$text_sprites_markup.'</span>';
+        $text_sprites_markup = $get_doctor_sprite_markup($doctor_token, $doctor_info, $doctor_sprite_path, $doctor_is_away);
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
         $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
         $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_light);
@@ -122,13 +139,7 @@ else {
         $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
         $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
         $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
-        $text_sprites_markup = '';
-        $text_sprites_markup .= '<span class="sprite sprite_player sprite_40x40" style="top: -2px; right: 0; z-index: 60;">';
-            $text_sprites_markup .= '<span class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.');'.($doctor_is_away ? ' filter: brightness(0);' : '').'"></span>';
-            if ($doctor_is_away){ $text_sprites_markup .= '<span class="endless"><i class="fa fas fa-infinity"></i></span>'; }
-        $text_sprites_markup .= '</span>';
-        $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites($doctor_token, $session_token);
-        $text_sprites_markup = '<span class="battle_sprites">'.$text_sprites_markup.'</span>';
+        $text_sprites_markup = $get_doctor_sprite_markup($doctor_token, $doctor_info, $doctor_sprite_path, $doctor_is_away);
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
         $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
         $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_wily);
@@ -154,13 +165,7 @@ else {
         $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
         $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
         $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
-        $text_sprites_markup = '';
-        $text_sprites_markup .= '<span class="sprite sprite_player sprite_40x40" style="top: -2px; right: 0; z-index: 60;">';
-            $text_sprites_markup .= '<span class="sprite sprite_40x40 sprite_40x40_base" style="background-image: url('.$doctor_sprite_path.');'.($doctor_is_away ? ' filter: brightness(0);' : '').'"></span>';
-            if ($doctor_is_away){ $text_sprites_markup .= '<span class="endless"><i class="fa fas fa-infinity"></i></span>'; }
-        $text_sprites_markup .= '</span>';
-        $text_sprites_markup .= mmrpg_prototype_get_player_robot_sprites($doctor_token, $session_token);
-        $text_sprites_markup = '<span class="battle_sprites">'.$text_sprites_markup.'</span>';
+        $text_sprites_markup = $get_doctor_sprite_markup($doctor_token, $doctor_info, $doctor_sprite_path, $doctor_is_away);
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
         $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
         $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_cossack);
