@@ -15,41 +15,49 @@ function autocache_debug($str){ error_log($str); }
 //autocache_debug('$_SERVER = '.print_r($_SERVER, true));
 //autocache_debug('$_SERVER[REQUEST_URI] = '.print_r($_SERVER['REQUEST_URI'], true));
 
-// Collect the requestor's IP address to see if it's suspicious
-$request_ip_address = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
-//autocache_debug('$request_ip_address = '.print_r($request_ip_address, true));
-
-// Collect the request path to see if it's suspicious
-$request_uri_path = ltrim((!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''), '/');
+// Collect the request path, method, etc. so we can check if this is cacheable
+$request_method = !empty($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : '';
+$request_uri_path = trim((!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''), '/').'/';
+$request_user_auth = (!empty($_SESSION['GAME']['USER']['userid']) && $_SESSION['GAME']['USER']['userid'] > 0) ? true : false;
+if (preg_match('/\?([-0-9]+)$/i', $request_uri_path)){ $request_uri_path = preg_replace('/\?([-0-9]+)$/i', '', $request_uri_path); }
+//autocache_debug('$request_method = '.print_r($request_method, true));
 //autocache_debug('$request_uri_path = '.print_r($request_uri_path, true));
+//autocache_debug('$request_user_auth = '.print_r($request_user_auth, true));
 
 // -- CACHE FREQUENT REQUESTS -- //
 //autocache_debug('(!) Check if this request is cacheable or not');
 
+// If this is a request for a file instead of a page, we cannot cache it
+if (preg_match('/\.([a-z0-9]{2,4})$/i', $request_uri_path)){ return; }
+
+// If this is not a GET request, we should just return now
+if ($request_method !== 'GET'){ return; }
+
+// If the user is logged-in, we cannot cache the request
+if ($request_user_auth){ return; }
+
 // Define flags for is this request is allowed to be cached, for how long, and if it has already
-$request_is_cacheable = true;
-$request_cache_duration = 0;
-$request_nocache_reasons = array();
+$request_is_cacheable = false;
+$request_cache_duration = 1; // in hours
+$request_cache_reasons = array();
+//$request_nocache_reasons = array();
 //autocache_debug('$request_is_cacheable = '.($request_is_cacheable ? 'true' : 'false'));
 //autocache_debug('$request_cache_duration = '.print_r($request_cache_duration, true));
-
-// If the request is not a GET request, it cannot be cached
-$request_method = !empty($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : '';
-if ($request_method !== 'GET'){ $request_is_cacheable = false; $request_nocache_reasons[] = 'not-get-request'; }
-
-// If this request is for the actual game or any dependent scripts it cannot be cached
-//autocache_debug('$request_uri_path = '.print_r($request_uri_path, true));
-if (strpos($request_uri_path, '.php') !== false){ $request_is_cacheable = false; $request_nocache_reasons[] = 'no-cache-php-files'; }
-if (strpos($request_uri_path, '.cache/') === 0){ $request_is_cacheable = false; $request_nocache_reasons[] = 'no-cache-cache-files'; }
-if (strpos($request_uri_path, 'prototype/') === 0){ $request_is_cacheable = false; $request_nocache_reasons[] = 'no-cache-prototype-files'; }
-if (strpos($request_uri_path, 'admin/') === 0){ $request_is_cacheable = false; $request_nocache_reasons[] = 'no-cache-admin-files'; }
-if (strpos($request_uri_path, 'api/') === 0){ $request_is_cacheable = false; $request_nocache_reasons[] = 'no-cache-api-files'; }
-if (strpos($request_uri_path, 'frames/') === 0){ $request_is_cacheable = false; $request_nocache_reasons[] = 'no-cache-frames-files'; }
-if (strpos($request_uri_path, 'styles/') === 0){ $request_is_cacheable = false; $request_nocache_reasons[] = 'no-cache-styles-files'; }
-if (strpos($request_uri_path, 'scripts/') === 0){ $request_is_cacheable = false; $request_nocache_reasons[] = 'no-cache-scripts-files'; }
-if (strpos($request_uri_path, 'images/') === 0){ $request_is_cacheable = false; $request_nocache_reasons[] = 'no-cache-images-files'; }
-//autocache_debug('$request_is_cacheable = '.($request_is_cacheable ? 'true' : 'false'));
+//autocache_debug('$request_cache_reasons = '.print_r((!empty($request_cache_reasons) ? $request_cache_reasons : '[]'), true));
 //autocache_debug('$request_nocache_reasons = '.print_r((!empty($request_nocache_reasons) ? $request_nocache_reasons : '[]'), true));
+
+// If this request falls under certain criteria, we can and should be caching it
+if ($request_uri_path === '/'){ $request_is_cacheable = true; $request_cache_duration = 6; $request_cache_reasons[] = 'is-home-page'; }
+if (strpos($request_uri_path, 'about/') === 0){ $request_is_cacheable = true; $request_cache_duration = 48; $request_cache_reasons[] = 'is-about-page'; }
+if (strpos($request_uri_path, 'gallery/') === 0){ $request_is_cacheable = true; $request_cache_duration = 24; $request_cache_reasons[] = 'is-gallery-page'; }
+if (strpos($request_uri_path, 'database/') === 0){ $request_is_cacheable = true; $request_cache_duration = 12; $request_cache_reasons[] = 'is-database-page'; }
+if (strpos($request_uri_path, 'credits/') === 0){ $request_is_cacheable = true; $request_cache_duration = 72; $request_cache_reasons[] = 'is-credits-page'; }
+if (strpos($request_uri_path, 'cookies/') === 0){ $request_is_cacheable = true; $request_cache_duration = 148; $request_cache_reasons[] = 'is-cookies-page'; }
+if (strpos($request_uri_path, 'leaderboard/') === 0){ $request_is_cacheable = true; $request_cache_duration = 1; $request_cache_reasons[] = 'is-leaderboard-page'; }
+if (strpos($request_uri_path, 'community/') === 0 && strpos($request_uri_path, '/new/') === false){ $request_is_cacheable = true; $request_cache_duration = 3; $request_cache_reasons[] = 'is-community-page'; }
+//autocache_debug('$request_is_cacheable = '.($request_is_cacheable ? 'true' : 'false'));
+//autocache_debug('$request_cache_duration = '.print_r($request_cache_duration, true));
+//autocache_debug('$request_cache_reasons = '.print_r((!empty($request_cache_reasons) ? $request_cache_reasons : '[]'), true));
 
 // If the request is not cacheable, we should stop processing now
 if (!$request_is_cacheable){ return; }
@@ -72,7 +80,7 @@ if (!is_dir($cache_base_dir)){ mkdir($cache_base_dir, 0755, true); }
 $cache_file_exists = file_exists($cache_file_path) ? true : false;
 $cache_file_mtime = $cache_file_exists ? filemtime($cache_file_path) : 0;
 $cache_file_age = $cache_file_exists ? (time() - $cache_file_mtime) : -1;
-$cache_file_age_limit = 60 * 60; // 1 hour (TODO: define different timeouts per page type)
+$cache_file_age_limit = $request_cache_duration * 3600; // convert hours to seconds
 $cache_file_required = !$cache_file_exists ? true : false;
 //autocache_debug('$cache_file_exists = '.($cache_file_exists ? 'true' : 'false'));
 //autocache_debug('$cache_file_mtime = '.print_r($cache_file_mtime, true));
@@ -116,6 +124,7 @@ function autocache_save(){
     //autocache_debug('autocache_save() called');
     $buffer = ob_get_clean();
     echo(trim($buffer).PHP_EOL);
+    if (defined('MMRPG_PAGE_NOT_FOUND') && MMRPG_PAGE_NOT_FOUND === true){ return; }
     if (!defined('MMRPG_AUTOCACHE_PAGE') || MMRPG_AUTOCACHE_PAGE !== true){ return; }
     if (!defined('MMRPG_AUTOCACHE_PATH') || empty(MMRPG_AUTOCACHE_PATH)){ return; }
     if (empty($buffer)){ return; }
