@@ -9,7 +9,8 @@
   */
 
 // DEBUG DEBUG DEBUG
-function antibot_debug($str){ echo('<pre>'.$str.'</pre>'.PHP_EOL); }
+//function antibot_debug($str){ echo('<pre>'.$str.'</pre>'.PHP_EOL); }
+function antibot_debug($str){ error_log($str); }
 //antibot_debug('$_GET = '.print_r($_GET, true));
 //antibot_debug('$_POST = '.print_r($_POST, true));
 //antibot_debug('$_SERVER = '.print_r($_SERVER, true));
@@ -51,6 +52,29 @@ $num_uri_slashes = substr_count($request_uri_path, '/');
 if ($num_uri_slashes >= $too_many_slashes){
     $request_is_blocked = true;
     $request_blocked_reasons[] = 'too-many-slashes';
+}
+
+// Check to see if the same user is requesting too many pages in quick succession
+// This is a very basic rate-limiting check, and should be improved in the future
+$antibot_session_key = 'ANTIBOT';
+$antibot_session_array = isset($_SESSION[$antibot_session_key]) ? $_SESSION[$antibot_session_key] : array();
+if (!isset($antibot_session_array['times'])){ $antibot_session_array['times'] = array(); }
+$current_time = time();
+$throttle_time = 5; // seconds
+$throttle_requests = 10; // requests
+$antibot_session_array['times'][] = $current_time;
+//antibot_debug('$antibot_session_array(before) = '.print_r($antibot_session_array, true));
+// Remove any timestamps older than the throttle time
+$antibot_session_array['times'] = array_filter(
+    $antibot_session_array['times'],
+    function($time) use ($current_time, $throttle_time){ return ($time >= ($current_time - $throttle_time)); }
+    );
+//antibot_debug('$antibot_session_array(after) = '.print_r($antibot_session_array, true));
+$_SESSION[$antibot_session_key] = $antibot_session_array;
+// If the user has made too many requests in the last 5 seconds, block them
+if (count($antibot_session_array['times']) > $throttle_requests){
+    $request_is_blocked = true;
+    $request_blocked_reasons[] = 'too-many-requests';
 }
 
 // DEBUG DEBUG DEBUG
