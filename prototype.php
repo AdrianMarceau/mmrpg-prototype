@@ -183,6 +183,7 @@ $session_token = rpg_game::session_token();
 $battleSettings = $_SESSION[$session_token]['battle_settings'];
 $readyRoomConfig = rpg_game::get_readyRoomConfig(true);
 $menuButtonConfig = rpg_game::get_menuButtonConfig(true);
+$mmrpgBodyClasses = rpg_game::get_mmrpgBodyClasses('prototype');
 
 // Collect the number of missions complete and the number or robots unlocked by this player
 $total_missions_complete = mmrpg_prototype_battles_complete(false, true);
@@ -202,14 +203,10 @@ $ready_room_sprite_limit = $ready_room_unlocked ? $readyRoomConfig['readyRoomSpr
 $prototype_banner_image = 'prototype-banners_title-screen_01.gif';
 if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-screen_01.png'; }
 
-// Collect and prototype-menu settings from the session for display
-$spriteRenderMode = isset($battleSettings['spriteRenderMode']) ? $battleSettings['spriteRenderMode'] : 'default';
-$battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default';
-
 ?>
-<body id="mmrpg" class="prototype <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?>">
+<body id="mmrpg" class="prototype <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?> <?= implode(' ', $mmrpgBodyClasses) ?>">
 
-<div id="prototype" class="hidden" data-render-mode="<?= $spriteRenderMode ?>" data-button-mode="<?= $battleButtonMode ?>">
+<div id="prototype" class="hidden">
     <div class="bgfx-layer layer-1"></div>
     <div class="bgfx-layer layer-2"></div>
 

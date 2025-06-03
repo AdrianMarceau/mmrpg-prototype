@@ -2036,6 +2036,10 @@ body[data-source="website"] #prototype .menu {
     75% { transform: translateY(-1px); background-position: -360px 0px; }
     100% { transform: translateY(0px); background-position: 0px 0px; }
 }
+#mmrpg #prototype .option .sprite .sprite {
+    will-change: transform;
+    backface-visibility: hidden;
+}
 #mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_robot .sprite,
 #mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_support .sprite {
     transform: translateY(0px);
@@ -2044,27 +2048,43 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype .option_this-robot-select:not(.option_disabled) .sprite_support .sprite {
     animation-delay: 0.3s;
 }
+#mmrpg #prototype .option_this-battle-select:not(.option_complete) .sprite_player .sprite,
 #mmrpg #prototype .option_this-battle-select:not(.option_complete) .sprite_robot .sprite  {
     transform: translateY(0px);
+}
+#mmrpg.menuButtonSpriteMotion #prototype .option_this-battle-select:not(.option_complete) .sprite_player .sprite  {
+    animation: option-player-sprite-bounce 0.6s steps(1) infinite;
+}
+#mmrpg.menuButtonSpriteMotion #prototype .option_this-battle-select:not(.option_complete) .sprite_robot .sprite  {
     animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
 }
 #mmrpg #prototype .option_this-battle-select.option_complete .sprite_robot .sprite  {
     transform: translate(0, 0) scale(1.0);
     filter: brightness(1.0);
+}
+#mmrpg.menuButtonSpriteMotion #prototype .option_this-battle-select.option_complete .sprite_robot .sprite  {
     animation: option-robot-sprite-darken 0.6s infinite;
     animation-delay: 1s;
 }
-#mmrpg #prototype .option_this-player-select:not(.option_disabled) .sprite_player .sprite.bounce,
-#mmrpg #prototype .option_this-player-select:not(.option_disabled) .sprite_robot .sprite.bounce {
+#mmrpg #prototype .option_this-player-select:not(.option_disabled) .sprite_player .sprite,
+#mmrpg #prototype .option_this-player-select:not(.option_disabled) .sprite_robot .sprite {
     transform: translateY(0px);
+}
+#mmrpg.menuButtonSpriteMotion #prototype .option_this-player-select:not(.option_disabled) .sprite_player .sprite {
+    animation: option-player-sprite-bounce 0.6s steps(1) infinite;
+}
+#mmrpg.menuButtonSpriteMotion #prototype .option_this-player-select:not(.option_disabled) .sprite_robot .sprite {
     animation: option-robot-sprite-bounce 0.6s steps(1) infinite;
 }
-#prototype .banner .option_1x1 div label.has_image .sprite_player .sprite {
+#prototype .banner .option div label.has_image .sprite_player .sprite,
+#prototype .banner .option.is_running div label.has_image .sprite_player .sprite  {
     transform: translateY(0px);
+    animation: none;
+}
+#mmrpg.menuButtonSpriteMotion #prototype .banner .option div label.has_image .sprite_player .sprite {
     animation: option-player-sprite-bounce 1s steps(1) infinite;
 }
-#prototype .banner .option_1x1.is_running div label.has_image .sprite_player .sprite  {
-    transform: translateY(0px);
+#mmrpg.menuButtonSpriteMotion #prototype .banner .option.is_running div label.has_image .sprite_player .sprite  {
     animation: option-player-sprite-run 0.6s steps(1) infinite;
 }
 
@@ -2554,15 +2574,15 @@ body[data-source="website"] #prototype .menu {
 #prototype .option_placeholder .inset .multi .maintext > i.fa-lock,
 #prototype .option_placeholder .inset .multi .maintext > i.fa-lock-alt {
     filter: brightness(1.0);
+    transform: translateY(0);
 }
 @keyframes placeholder-lock-bounce-animation {
     0% { transform: translateY(0); }
     50% { transform: translateY(-1px); }
     100% { transform: translateY(0); }
 }
-#prototype .option_placeholder .inset .multi .maintext > i.fa-lock,
-#prototype .option_placeholder .inset .multi .maintext > i.fa-lock-alt {
-    transform: translateY(0);
+#mmrpg.menuButtonSpriteMotion #prototype .option_placeholder .inset .multi .maintext > i.fa-lock,
+#mmrpg.menuButtonSpriteMotion #prototype .option_placeholder .inset .multi .maintext > i.fa-lock-alt {
     animation-name: placeholder-lock-bounce-animation;
     animation-duration: 1s;
     animation-iteration-count: infinite;
@@ -2836,38 +2856,20 @@ body[data-source="website"] #prototype .menu {
 
 /* STAR FIELD OPTION STYLES */
 
-#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.has_image,
-#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.has_image,
-#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.has_image,
-#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.has_image,
-#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.no_image,
-#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.no_image,
-#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.no_image,
-#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.no_image {
+#mmrpg #prototype .option_wrapper .option.starfield div label.has_image,
+#mmrpg #prototype .option_wrapper .option.starfield div label.no_image {
     position: relative;
     box-sizing: border-box;
     width: 40px;
 }
-#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.has_image .battle_sprites,
-#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.has_image .battle_sprites,
-#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.has_image .battle_sprites,
-#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.has_image .battle_sprites,
-#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.no_image .battle_sprites,
-#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.no_image .battle_sprites,
-#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.no_image .battle_sprites,
-#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.no_image .battle_sprites {
+#mmrpg #prototype .option_wrapper .option.starfield div label.has_image .battle_sprites,
+#mmrpg #prototype .option_wrapper .option.starfield div label.no_image .battle_sprites {
     right: -5px;
 }
-#mmrpg #prototype .option_wrapper .option_1x1.starfield div label .multi,
-#mmrpg #prototype .option_wrapper .option_1x2.starfield div label .multi,
-#mmrpg #prototype .option_wrapper .option_1x3.starfield div label .multi,
-#mmrpg #prototype .option_wrapper .option_1x4.starfield div label .multi {
+#mmrpg #prototype .option_wrapper .option.starfield div label .multi {
     display: none;
 }
-#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.no_image .arrow,
-#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.no_image .arrow,
-#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.no_image .arrow,
-#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.no_image .arrow {
+#mmrpg #prototype .option_wrapper .option.starfield div label.no_image .arrow {
     padding-right: calc(50% - 12px);
 }
 
@@ -2892,13 +2894,11 @@ body[data-source="website"] #prototype .menu {
   4%, 6% { transform: translate(2px, 2px) rotate(4deg); }
   10% { transform: translate(0, 0) rotate(0); }
 }
-#mmrpg #prototype .option_wrapper .option_1x1.starfield.starshake div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x2.starfield.starshake div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x3.starfield.starshake div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x4.starfield.starshake div label.has_image .sprite_star {
-
+#mmrpg #prototype .option_wrapper .option.starfield.starshake div label.has_image .sprite_star {
     transform: translate(0, 0), rotate(0);
     transition: transform 0.3s;
+}
+#mmrpg #prototype .option_wrapper .option.starfield.starshake div label.has_image .sprite_star.animate {
 
     -moz-animation-name: starshake;
     -webkit-animation-name: starshake;
@@ -2917,18 +2917,12 @@ body[data-source="website"] #prototype .menu {
     animation-delay: 0s;
 
 }
-#mmrpg #prototype .option_wrapper .option_1x1:nth-child(odd).starfield.starshake div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x2:nth-child(odd).starfield.starshake div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x3:nth-child(odd).starfield.starshake div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x4:nth-child(odd).starfield.starshake div label.has_image .sprite_star {
+#mmrpg #prototype .option_wrapper .option:nth-child(odd).starfield.starshake div label.has_image .sprite_star.animate {
     -moz-animation-name: starshakeB;
     -webkit-animation-name: starshakeB;
     animation-name: starshakeB;
 }
-#mmrpg #prototype .option_wrapper .option_1x1.starfield.starshake.dx div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x2.starfield.starshake.dx div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x3.starfield.starshake.dx div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x4.starfield.starshake.dx div label.has_image .sprite_star {
+#mmrpg #prototype .option_wrapper .option.starfield.starshake.dx div label.has_image .sprite_star.animate {
     -moz-animation-delay: 0.1s;
     -webkit-animation-delay: 0.1s;
     animation-delay: 0.1s;
@@ -2937,10 +2931,7 @@ body[data-source="website"] #prototype .menu {
     animation-name: starshakeX;
 }
 
-#mmrpg #prototype > div:not(.banner) .option_1x1.starfield div label .info[data-click-tooltip],
-#mmrpg #prototype > div:not(.banner) .option_1x2.starfield div label .info[data-click-tooltip],
-#mmrpg #prototype > div:not(.banner) .option_1x3.starfield div label .info[data-click-tooltip],
-#mmrpg #prototype > div:not(.banner) .option_1x4.starfield div label .info[data-click-tooltip] {
+#mmrpg #prototype > div:not(.banner) .option.starfield div label .info[data-click-tooltip] {
     right: -200%;
     right: calc(-200% - 3px);
 }
@@ -2951,17 +2942,13 @@ body[data-source="website"] #prototype .menu {
   66% { transform: translate(0, 0); }
   100% { transform: translate(0, 0); }
 }
-#mmrpg #prototype .option_wrapper .option_1x1.starfield div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x2.starfield div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x3.starfield div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x4.starfield div label.has_image .sprite_star,
-#mmrpg #prototype .banner .option_1x1.starfield div label.has_image .sprite_star,
-#mmrpg #prototype .banner .option_1x2.starfield div label.has_image .sprite_star,
-#mmrpg #prototype .banner .option_1x3.starfield div label.has_image .sprite_star,
-#mmrpg #prototype .banner .option_1x4.starfield div label.has_image .sprite_star {
-
+#mmrpg #prototype .option_wrapper .option.starfield div label.has_image .sprite_star,
+#mmrpg #prototype .banner .option.starfield div label.has_image .sprite_star {
     transform: translate(0, 0);
     transition: none;
+}
+#mmrpg #prototype .option_wrapper .option.starfield div label.has_image .sprite_star.animate,
+#mmrpg #prototype .banner .option.starfield div label.has_image .sprite_star.animate {
 
     -moz-animation-name: none;
     -webkit-animation-name: none;
@@ -2988,10 +2975,7 @@ body[data-source="website"] #prototype .menu {
     animation-name: mission-sprite-starfield-hover;
 
 }
-#mmrpg #prototype .option_wrapper .option_1x1.starfield:hover div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x2.starfield:hover div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x3.starfield:hover div label.has_image .sprite_star,
-#mmrpg #prototype .option_wrapper .option_1x4.starfield:hover div label.has_image .sprite_star {
+#mmrpg #prototype .option_wrapper .option.starfield:hover div label.has_image .sprite_star.animate {
 
     -moz-animation-duration: 2s;
     -webkit-animation-duration: 2s;
@@ -3244,75 +3228,75 @@ body[data-source="website"] #prototype .menu {
 
 /* CINEMATIC CHAPTER BUTTON STYLES (NEW "DEFAULT") */
 
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="0"],
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="2"],
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="4"] {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"],
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="2"],
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="4"] {
     width: calc((100% / 3) - 3px);
     height: calc(26em - 3px);
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="1"] {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="1"] {
     width: calc(((75% - 3px) / 4) - 3px);
     height: calc((26em / 2) - 3px);
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_10 {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_10 {
     clear: left;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14 {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14 {
     width: 25%;
     height: calc(26em - 3px);
     position: absolute;
     top: 51px;
     right: 0;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"] {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"] {
     width: calc(((75% - 3px) / 2) - 3px);
     height: calc((26em / 2) - 3px);
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_22 {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_22 {
     clear: left;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_24 {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_24 {
     width: 25%;
     height: calc(26em - 3px);
     position: absolute;
     top: 51px;
     right: 0;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter].option_placeholder .maintext {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter].option_placeholder .maintext {
     font-size: 200%;
     line-height: 12rem;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="2"].option_placeholder .maintext {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="2"].option_placeholder .maintext {
     font-size: 250%;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="4"].option_placeholder .maintext {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="4"].option_placeholder .maintext {
     font-size: 300%;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14.option_placeholder .maintext,
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_24.option_placeholder .maintext {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14.option_placeholder .maintext,
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_24.option_placeholder .maintext {
     font-size: 200%;
     line-height: 6rem;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14.option_placeholder .maintext > i {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="1"].block_14.option_placeholder .maintext > i {
     width: calc(25% - 6px);
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_24.option_placeholder .maintext > i {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"].block_24.option_placeholder .maintext > i {
     width: calc(50% - 6px);
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="0"].block_4.option_placeholder .maintext > i,
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="2"].block_18.option_placeholder .maintext > i,
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="4"].block_28.option_placeholder .maintext > i {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="0"].block_4.option_placeholder .maintext > i,
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="2"].block_18.option_placeholder .maintext > i,
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="4"].block_28.option_placeholder .maintext > i {
     width: calc(33% - 6px);
 }
 
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .platform {
     filter: none;
     background-size: auto 100%;
     background-position: center 5em;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="1"], [data-chapter="3"]
     ):not(
     .block_14, .block_24
@@ -3320,7 +3304,7 @@ body[data-source="website"] #prototype .menu {
     background-size: auto 200%;
     background-position: center -5em;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .inset {
     background-color: rgba(0, 0, 0, 0.3);
@@ -3329,39 +3313,39 @@ body[data-source="website"] #prototype .menu {
     background-image: linear-gradient( to top, rgba(26, 26, 26, 0.4) 20%, rgba(0, 0, 0, 0.8) 70% );
 }
 
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .arrow {
     font-size: 160%;
     display: none;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="2"], [data-chapter="4"]
     ) .multi {
     font-size: 13px;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="1"]
     ) .multi {
     font-size: 11px;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="3"]
     ) .multi {
     font-size: 12px;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="1"]
     ).block_14 .multi {
     font-size: 13px;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="3"]
     ).block_xxx999 .multi {
     font-size: 13px;
 }
 
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .maintext {
     white-space: break-spaces;
@@ -3375,32 +3359,32 @@ body[data-source="website"] #prototype .menu {
     filter: brightness(0.8);
     transition: filter 0.3s;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="1"], [data-chapter="3"]
     ):not(.block_14) .maintext {
     top: 6%;
     text-align: left;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ):hover .maintext {
     filter: brightness(1.0);
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .maintext br {
     display: inline;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .subtext,
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .subtext2 {
     display: none;
 }
 
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .battle_sprites {
     left: 0;
@@ -3411,7 +3395,7 @@ body[data-source="website"] #prototype .menu {
     text-align: center;
     white-space: nowrap;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .battle_sprites > .sprite {
     display: inline-block;
@@ -3422,7 +3406,7 @@ body[data-source="website"] #prototype .menu {
     bottom: auto;
     margin: 0 -10px;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="1"], [data-chapter="3"]
     ):not(
     .block_14, .block_24
@@ -3430,7 +3414,7 @@ body[data-source="website"] #prototype .menu {
     width: 45%;
     text-align: right;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="2"]
     ):is(
     .block_18
@@ -3439,40 +3423,40 @@ body[data-source="website"] #prototype .menu {
     text-align: right;
 }
 
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .battle_sprites .sprite_robot {
     right: 0 !important;
     transform: translateX(0);
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .battle_sprites .sprite_robot.sprite_80x80 {
     right: -20px !important;
     transform: translateX(0);
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
     ) .battle_sprites .sprite_robot.sprite_160x160 {
     right: -40px !important;
     transform: translateX(0);
 }
 
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select:is(
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="0"]
     ).block_2 .battle_sprites .sprite_robot {
     margin: 0 -16px;
 }
 
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"][data-token*="dr-light"].block_24 .battle_sprites {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"][data-token*="dr-light"].block_24 .battle_sprites {
     padding-left: 2%;
     text-align: left;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"][data-token*="dr-wily"].block_24 .battle_sprites {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"][data-token*="dr-wily"].block_24 .battle_sprites {
     padding-left: 7%;
     text-align: left;
 }
-#mmrpg #prototype[data-button-mode="default"] .menu.select_this_battle .option_this-battle-select[data-chapter="3"][data-token*="dr-cossack"].block_24 .battle_sprites {
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"][data-token*="dr-cossack"].block_24 .battle_sprites {
     padding-left: 11%;
     text-align: left;
 }

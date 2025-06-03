@@ -319,18 +319,18 @@ body.index #header {
 /* -- Sprite Modes -- */
 
 #mmrpg .sprite.smooth-scaling,
-#mmrpg[data-render-mode="default"] #canvas .sprite,
-#mmrpg[data-render-mode="default"] #canvas .sprite_image,
-#mmrpg[data-render-mode="default"] #canvas .has_pixels,
-#mmrpg[data-render-mode="default"] #canvas .sprite img,
-#mmrpg[data-render-mode="default"] #canvas .sprite_image img,
-#mmrpg[data-render-mode="default"] #canvas .has_pixels img,
-#mmrpg[data-render-mode="crisp-edges"] #canvas .sprite,
-#mmrpg[data-render-mode="crisp-edges"] #canvas .sprite_image,
-#mmrpg[data-render-mode="crisp-edges"] #canvas .has_pixels,
-#mmrpg[data-render-mode="crisp-edges"] #canvas .sprite img,
-#mmrpg[data-render-mode="crisp-edges"] #canvas .sprite_image img,
-#mmrpg[data-render-mode="crisp-edges"] #canvas .has_pixels img {
+#mmrpg.spriteRenderMode_default #canvas .sprite,
+#mmrpg.spriteRenderMode_default #canvas .sprite_image,
+#mmrpg.spriteRenderMode_default #canvas .has_pixels,
+#mmrpg.spriteRenderMode_default #canvas .sprite img,
+#mmrpg.spriteRenderMode_default #canvas .sprite_image img,
+#mmrpg.spriteRenderMode_default #canvas .has_pixels img,
+#mmrpg.spriteRenderMode_crisp-edges #canvas .sprite,
+#mmrpg.spriteRenderMode_crisp-edges #canvas .sprite_image,
+#mmrpg.spriteRenderMode_crisp-edges #canvas .has_pixels,
+#mmrpg.spriteRenderMode_crisp-edges #canvas .sprite img,
+#mmrpg.spriteRenderMode_crisp-edges #canvas .sprite_image img,
+#mmrpg.spriteRenderMode_crisp-edges #canvas .has_pixels img {
     -ms-interpolation-mode: bicubic;  /* IE (non-standard property) */
     image-rendering: pixelated;
     image-rendering: crisp-edges;
@@ -339,12 +339,12 @@ body.index #header {
     image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming) */
 }
 #mmrpg .sprite.pixel-scaling,
-#mmrpg[data-render-mode="pixelated"] #canvas .sprite,
-#mmrpg[data-render-mode="pixelated"] #canvas .sprite_image,
-#mmrpg[data-render-mode="pixelated"] #canvas .has_pixels,
-#mmrpg[data-render-mode="pixelated"] #canvas .sprite img,
-#mmrpg[data-render-mode="pixelated"] #canvas .sprite_image img,
-#mmrpg[data-render-mode="pixelated"] #canvas .has_pixels img {
+#mmrpg.spriteRenderMode_pixelated #canvas .sprite,
+#mmrpg.spriteRenderMode_pixelated #canvas .sprite_image,
+#mmrpg.spriteRenderMode_pixelated #canvas .has_pixels,
+#mmrpg.spriteRenderMode_pixelated #canvas .sprite img,
+#mmrpg.spriteRenderMode_pixelated #canvas .sprite_image img,
+#mmrpg.spriteRenderMode_pixelated #canvas .has_pixels img {
     -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
     image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
     image-rendering: -moz-crisp-edges;         /* Firefox */
