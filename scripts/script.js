@@ -3475,6 +3475,18 @@ function dump(arr,level) {
     };
 })(jQuery);
 
+// Extend jQuery to offer a "removeClassByRegex" function that removes classes matching a regex
+// This allows us to remove classes that match a specific pattern without needing to know the exact class names
+(function($) {
+    $.fn.removeClassByRegex = function(regex) {
+      return $(this).removeClass(function(index, classes) {
+        return classes.split(/\s+/).filter(function(c) {
+          return regex.test(c);
+        }).join(' ');
+      });
+    };
+})(jQuery);
+
 /* Define a function to randomize an array in-place using Durstenfeld shuffle algorithm */
 if (typeof window.shuffleArray === 'undefined'){
     function shuffleArray(array) {
