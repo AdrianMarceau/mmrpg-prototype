@@ -2177,19 +2177,26 @@ function prototype_menu_links_refresh(){
 }
 
 // Define a function for updating prototype game settings from anywhere
-function prototype_update_game_settings(newSettings){
+function prototype_update_game_settings(newSettings, saveSetting){
     //console.log('prototype_update_game_settings(newSettings) w/ newSettings:', newSettings);
+    if (typeof saveSetting === 'undefined'){ saveSetting = true; }
 
     // If provided, update the spriteRenderMode in the prototype settings and markup
     if (typeof newSettings.spriteRenderMode !== 'undefined'){
-        gameSettings.spriteRenderMode = newSettings.spriteRenderMode;
-        $('#prototype').attr('data-render-mode', gameSettings.spriteRenderMode);
+        var oldRenderMode = gameSettings.spriteRenderMode;
+        var newRenderMode = newSettings.spriteRenderMode;
+        thisBody.removeClassByRegex(/^spriteRenderMode_/);
+        thisBody.addClass('spriteRenderMode_'+newRenderMode);
+        if (saveSetting){ gameSettings.spriteRenderMode = newRenderMode; }
         }
 
     // If provided, update the battleButtonMode in the prototype settings and markup
     if (typeof newSettings.battleButtonMode !== 'undefined'){
-        gameSettings.battleButtonMode = newSettings.battleButtonMode;
-        $('#prototype').attr('data-button-mode', gameSettings.battleButtonMode);
+        var oldButtonMode = gameSettings.battleButtonMode;
+        var newButtonMode = newSettings.battleButtonMode;
+        thisBody.removeClassByRegex(/^battleButtonMode_/);
+        thisBody.addClass('battleButtonMode_'+newButtonMode);
+        if (saveSetting){ gameSettings.battleButtonMode = newButtonMode; }
         }
 
 }
