@@ -2898,7 +2898,7 @@ body[data-source="website"] #prototype .menu {
     transform: translate(0, 0), rotate(0);
     transition: transform 0.3s;
 }
-#mmrpg #prototype .option_wrapper .option.starfield.starshake div label.has_image .sprite_star.animate {
+#mmrpg.menuButtonSpriteMotion #prototype .option_wrapper .option.starfield.starshake div label.has_image .sprite_star {
 
     -moz-animation-name: starshake;
     -webkit-animation-name: starshake;
@@ -2917,12 +2917,12 @@ body[data-source="website"] #prototype .menu {
     animation-delay: 0s;
 
 }
-#mmrpg #prototype .option_wrapper .option:nth-child(odd).starfield.starshake div label.has_image .sprite_star.animate {
+#mmrpg.menuButtonSpriteMotion #prototype .option_wrapper .option:nth-child(odd).starfield.starshake div label.has_image .sprite_star {
     -moz-animation-name: starshakeB;
     -webkit-animation-name: starshakeB;
     animation-name: starshakeB;
 }
-#mmrpg #prototype .option_wrapper .option.starfield.starshake.dx div label.has_image .sprite_star.animate {
+#mmrpg.menuButtonSpriteMotion #prototype .option_wrapper .option.starfield.starshake.dx div label.has_image .sprite_star {
     -moz-animation-delay: 0.1s;
     -webkit-animation-delay: 0.1s;
     animation-delay: 0.1s;
@@ -2947,8 +2947,8 @@ body[data-source="website"] #prototype .menu {
     transform: translate(0, 0);
     transition: none;
 }
-#mmrpg #prototype .option_wrapper .option.starfield div label.has_image .sprite_star.animate,
-#mmrpg #prototype .banner .option.starfield div label.has_image .sprite_star.animate {
+#mmrpg.menuButtonSpriteMotion #prototype .option_wrapper .option.starfield div label.has_image .sprite_star,
+#mmrpg.menuButtonSpriteMotion #prototype .banner .option.starfield div label.has_image .sprite_star {
 
     -moz-animation-name: none;
     -webkit-animation-name: none;
@@ -2975,7 +2975,7 @@ body[data-source="website"] #prototype .menu {
     animation-name: mission-sprite-starfield-hover;
 
 }
-#mmrpg #prototype .option_wrapper .option.starfield:hover div label.has_image .sprite_star.animate {
+#mmrpg.menuButtonSpriteMotion #prototype .option_wrapper .option.starfield:hover div label.has_image .sprite_star {
 
     -moz-animation-duration: 2s;
     -webkit-animation-duration: 2s;

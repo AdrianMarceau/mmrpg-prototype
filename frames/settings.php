@@ -687,24 +687,6 @@ if (true){
                 </div>
             </div>
 
-            <div class="field" data-setting="battleButtonMode">
-                <div class="label">
-                    <strong>Mission Buttons</strong>
-                </div>
-                <div class="subfield input-group">
-                    <? $active = empty($battleButtonMode) || $battleButtonMode === 'default'; ?>
-                    <div class="radiofield <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="battleButtonMode" value="default" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="default">Default &nbsp;(Aesthetic)</label>
-                    </div>
-                    <? $active = $battleButtonMode === 'classic'; ?>
-                    <div class="radiofield <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="battleButtonMode" value="classic" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="classic">Classic &nbsp;(Detailed)</label>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
     <?
@@ -1007,7 +989,6 @@ if (mmrpg_prototype_item_unlocked('light-program')){
 
 }
 
-/*
 // Generate markup for MISC SETTINGS if applicable
 if (true){
 
@@ -1019,7 +1000,34 @@ if (true){
 
         <div class="game-settings misc-settings">
 
-            <p>&hellip;</p>
+            <?
+
+            // Collect current values if they exist so we can display them as such
+            $session_token = rpg_game::session_token();
+            $battleSettings = rpg_game::get_battleSettings(true);
+            $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default';
+            //error_log('$readyRoomConfig = '.print_r($readyRoomConfig, true));
+            //error_log('$menuButtonConfig = '.print_r($menuButtonConfig, true));
+
+            ?>
+
+            <div class="field" data-setting="battleButtonMode">
+                <div class="label">
+                    <strong>Mission Buttons</strong>
+                </div>
+                <div class="subfield input-group">
+                    <? $active = empty($battleButtonMode) || $battleButtonMode === 'default'; ?>
+                    <div class="radiofield <?= $active ? 'active' : '' ?>">
+                        <input type="radio" name="battleButtonMode" value="default" <?= $active ? 'checked="checked"' : '' ?> />
+                        <label for="default">Default &nbsp;(Aesthetic)</label>
+                    </div>
+                    <? $active = $battleButtonMode === 'classic'; ?>
+                    <div class="radiofield <?= $active ? 'active' : '' ?>">
+                        <input type="radio" name="battleButtonMode" value="classic" <?= $active ? 'checked="checked"' : '' ?> />
+                        <label for="classic">Classic &nbsp;(Detailed)</label>
+                    </div>
+                </div>
+            </div>
 
         </div>
 
@@ -1034,7 +1042,6 @@ if (true){
     }
 
 }
-*/
 
 // Generate markup for ADVANCED SETTINGS if applicable
 if (true){

@@ -494,7 +494,8 @@ $(document).ready(function(){
             if (typeof newToggle !== 'number'){ return false; }
             var newToggleValue = newToggle;
             thisGameSettings.allowMenuButtonSprites = newToggleValue;
-            $('#mmrpg').attr('data-menu-sprites', newToggleValue);
+            if (newToggleValue){ $thisBody.addClass('allowMenuButtonSprites'); }
+            else { $thisBody.removeClass('allowMenuButtonSprites'); }
             return true;
             };
 
@@ -504,7 +505,8 @@ $(document).ready(function(){
             if (typeof newMotion !== 'number'){ return false; }
             var newMotionValue = newMotion;
             thisGameSettings.menuButtonSpriteMotion = newMotionValue;
-            $('#mmrpg').attr('data-menu-sprites-motion', newMotionValue);
+            if (newMotionValue){ $thisBody.addClass('menuButtonSpriteMotion'); }
+            else { $thisBody.removeClass('menuButtonSpriteMotion'); }
             return true;
             };
 
@@ -514,7 +516,6 @@ $(document).ready(function(){
             if (typeof newLimit !== 'number'){ return false; }
             var newSpriteLimit = newLimit;
             thisGameSettings.menuButtonSpriteLimit = newSpriteLimit;
-            $('#mmrpg').attr('data-menu-sprites-limit', newSpriteLimit);
             return true;
             };
 
@@ -575,7 +576,8 @@ $(document).ready(function(){
             if (typeof newToggle !== 'number'){ return false; }
             var newToggleValue = newToggle;
             thisGameSettings.allowReadyRoomSprites = newToggleValue;
-            $('#mmrpg').attr('data-ready-room', newToggleValue);
+            if (newToggleValue){ $thisBody.addClass('allowReadyRoomSprites'); }
+            else { $thisBody.removeClass('allowReadyRoomSprites'); }
             return true;
             };
 
@@ -585,7 +587,8 @@ $(document).ready(function(){
             if (typeof newMotion !== 'number'){ return false; }
             var newMotionValue = newMotion;
             thisGameSettings.readyRoomSpriteMotion = newMotionValue;
-            $('#mmrpg').attr('data-ready-room-motion', newMotionValue);
+            if (newMotionValue){ $thisBody.addClass('readyRoomSpriteMotion'); }
+            else { $thisBody.removeClass('readyRoomSpriteMotion'); }
             return true;
             };
 
@@ -595,7 +598,6 @@ $(document).ready(function(){
             if (typeof newLimit !== 'number'){ return false; }
             var newSpriteLimit = newLimit;
             thisGameSettings.readyRoomSpriteLimit = newSpriteLimit;
-            $('#mmrpg').attr('data-ready-room-limit', newSpriteLimit);
             return true;
             };
 
@@ -632,9 +634,11 @@ $(document).ready(function(){
         function updateSpriteRenderMode(newMode){
             //console.log('updateSpriteRenderMode(newMode) w/', newMode);
             if (typeof newMode !== 'string'){ return false; }
+            var oldRenderMode = thisGameSettings.spriteRenderMode;
             var newRenderMode = newMode.length ? newMode : thisGameSettings.spriteRenderMode;
             thisGameSettings.spriteRenderMode = newRenderMode;
-            $('#mmrpg').attr('data-render-mode', newRenderMode);
+            $thisBody.removeClassByRegex(/^spriteRenderMode_/);
+            $thisBody.addClass('spriteRenderMode_'+newRenderMode);
             return true;
             };
 
@@ -743,23 +747,25 @@ $(document).ready(function(){
             };
 
         // Define a function for updating the battle button mode w/ form changes
-        function updateBattleButtonMode(newMode, updateParent){
+        function updateBattleButtonMode(newMode, saveChanges){
             //console.log('updateBattleButtonMode(newMode) w/', newMode);
             if (typeof newMode !== 'string'){ return false; }
-            if (typeof updateParent === 'undefined'){ updateParent = false; }
+            if (typeof saveChanges === 'undefined'){ saveChanges = false; }
+            var oldButtonMode = thisGameSettings.battleButtonMode;
             var newButtonMode = newMode.length ? newMode : thisGameSettings.battleButtonMode;
             thisGameSettings.battleButtonMode = newButtonMode;
-            $('#mmrpg').attr('data-button-mode', newButtonMode);
-            if (updateParent && typeof window.parent.prototype_update_game_settings !== 'undefined'){
+            $thisBody.removeClassByRegex(/^battleButtonMode_/);
+            $thisBody.addClass('battleButtonMode_'+newButtonMode);
+            if (typeof window.parent.prototype_update_game_settings !== 'undefined'){
                 //console.log('sending update request to parent prototype_update_game_settings() w/ '+newButtonMode);
-                window.parent.prototype_update_game_settings({'battleButtonMode': newButtonMode});
+                window.parent.prototype_update_game_settings({'battleButtonMode': newButtonMode}, saveChanges);
                 }
             return true;
             };
 
         // Make sure any updates to these fields are correctly parsed and applied
         $('input[type="radio"]', $battleButtonModeField).bind('change', function(e){
-            //console.log('change event on battleButtonMode field');
+            console.log('change event on battleButtonMode field');
             updateBattleButtonMode(parseBattleButtonMode());
             });
 

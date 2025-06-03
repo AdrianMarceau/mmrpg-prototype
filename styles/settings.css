@@ -827,15 +827,15 @@ input::-webkit-calendar-picker-indicator {
     display: inline-block;
     margin: 0 10px 0 0;
 }
-#settings .section .performance-settings .field[data-setting="battleButtonMode"] {
-    float: right;
+#settings .section .game-settings .field[data-setting="battleButtonMode"] {
+    float: left;
     clear: none;
 }
-#settings .section .performance-settings .field[data-setting="battleButtonMode"] .label {
+#settings .section .game-settings .field[data-setting="battleButtonMode"] .label {
     float: none;
     clear: both;
 }
-#settings .section .performance-settings .field[data-setting="battleButtonMode"] .radiofield {
+#settings .section .game-settings .field[data-setting="battleButtonMode"] .radiofield {
     float: none;
     display: inline-block;
     margin: 0 10px 0 0;
