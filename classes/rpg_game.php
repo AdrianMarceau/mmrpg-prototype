@@ -648,10 +648,31 @@ class rpg_game {
 
     // -- SETTINGS FUNCTIONS -- //
 
+    // Define a function for collecting relevant settings and generating appropriate body classes for the HTML
+    public static function get_mmrpgBodyClasses($context = 'index', $include_session = true){
+        $session_token = self::session_token();
+        $battleSettings = self::get_battleSettings($include_session);
+        $readyRoomConfig = self::get_readyRoomConfig($include_session);
+        $menuButtonConfig = self::get_menuButtonConfig($include_session);
+        $mmrpgBodyClasses = array();
+        $mmrpgBodyClasses[] = 'spriteRenderMode_'.(isset($battleSettings['spriteRenderMode']) ? $battleSettings['spriteRenderMode'] : 'default');
+        $mmrpgBodyClasses[] = 'battleButtonMode_'.(isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default');
+        if ($menuButtonConfig['allowMenuButtonSprites']){ $mmrpgBodyClasses[] = 'allowMenuButtonSprites'; }
+        if ($menuButtonConfig['menuButtonSpriteMotion']){ $mmrpgBodyClasses[] = 'menuButtonSpriteMotion'; }
+        return $mmrpgBodyClasses;
+    }
+
+    // Define a function for getting the battle settings, with defaults where applicable
+    public static function get_battleSettings($include_session = true){
+        $session_token = self::session_token();
+        $battleSettings = !empty($_SESSION[$session_token]['battle_settings']) ? $_SESSION[$session_token]['battle_settings'] : array();
+        return $battleSettings;
+    }
+
     // Define a function for getting the Ready Room config settings, with defaults where applicable
     public static function get_readyRoomConfig($include_session = true){
         $session_token = self::session_token();
-        $battleSettings = !empty($_SESSION[$session_token]['battle_settings']) ? $_SESSION[$session_token]['battle_settings'] : array();
+        $battleSettings = self::get_battleSettings($include_session);
         $readyRoomConfig = $include_session && !empty($battleSettings['readyRoomConfig']) ? $battleSettings['readyRoomConfig'] : array();
         $readyRoomConfig['allowReadyRoomSprites'] = isset($readyRoomConfig['allowReadyRoomSprites']) ? $readyRoomConfig['allowReadyRoomSprites'] : 1;
         $readyRoomConfig['readyRoomSpriteMotion'] = isset($readyRoomConfig['readyRoomSpriteMotion']) ? $readyRoomConfig['readyRoomSpriteMotion'] : 1;
@@ -662,7 +683,7 @@ class rpg_game {
     // Define a function for the Menu Button config settings, with defaults where applicable
     public static function get_menuButtonConfig($include_session = true){
         $session_token = self::session_token();
-        $battleSettings = !empty($_SESSION[$session_token]['battle_settings']) ? $_SESSION[$session_token]['battle_settings'] : array();
+        $battleSettings = self::get_battleSettings($include_session);
         $menuButtonConfig = $include_session && !empty($battleSettings['menuButtonConfig']) ? $battleSettings['menuButtonConfig'] : array();
         $menuButtonConfig['allowMenuButtonSprites'] = isset($menuButtonConfig['allowMenuButtonSprites']) ? $menuButtonConfig['allowMenuButtonSprites'] : 1;
         $menuButtonConfig['menuButtonSpriteMotion'] = isset($menuButtonConfig['menuButtonSpriteMotion']) ? $menuButtonConfig['menuButtonSpriteMotion'] : 1;
