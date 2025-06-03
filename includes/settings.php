@@ -91,6 +91,9 @@ define('MMRPG_SETTINGS_STARFORCE_FIELDCOUNT', 32);
 define('MMRPG_SETTINGS_STARFORCE_FUSIONCOUNT', 992);
 define('MMRPG_SETTINGS_STARFORCE_STARTOTAL', 1024);
 
+// Define the global variables for the main menu-related settings
+define('MMRPG_SETTINGS_MENUROBOTS_PERPLAYER', 10); // The minimum number of robots displayed per player button
+
 // Define the global variables for the total number of abilities allowed per robot
 define('MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX', 8); // The maximum number of abilities allowed per robot
 
