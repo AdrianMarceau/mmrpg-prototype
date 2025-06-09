@@ -182,7 +182,6 @@ foreach ($this_menu_tooltips AS $token => $text){
 $session_token = rpg_game::session_token();
 $battleSettings = $_SESSION[$session_token]['battle_settings'];
 $readyRoomConfig = rpg_game::get_readyRoomConfig(true);
-$menuButtonConfig = rpg_game::get_menuButtonConfig(true);
 $mmrpgBodyClasses = rpg_game::get_mmrpgBodyClasses('prototype');
 
 // Collect the number of missions complete and the number or robots unlocked by this player
