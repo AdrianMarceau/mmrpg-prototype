@@ -472,7 +472,16 @@ if (!empty($form_actions)){
 
 // Define an array to hold settings tabs and content
 $settings_tabs_index = array();
-$settings_tabs_order = array('account_settings', 'profile_settings', 'proxy_settings', 'audio_settings', 'performance_settings', 'misc_settings', 'advanced_settings', 'omega_settings');
+$settings_tabs_order = array(
+    'account_settings',
+    'profile_settings',
+    'audio_settings',
+    'performance_settings',
+    'misc_settings',
+    'advanced_settings',
+    'proxy_settings',
+    'omega_settings',
+    );
 
 
 // Generate markup for AUDIO SETTINGS if applicable
@@ -486,6 +495,12 @@ if (true){
 
         <div class="game-settings audio-settings">
 
+            <p class="description">
+                <strong class="label">Audio Balancing</strong>
+                Control master volumn levels and/or set relative volume levels for the game's music and special effects.
+                Note that some devices may not support sound effects, in which case only music will play.
+            </p>
+
             <?
 
             // Collect current values if they exist so we can display them as such
@@ -498,8 +513,8 @@ if (true){
                 );
             ?>
 
-            <div class="field" data-setting="audioBalanceConfig">
-                <div class="label">
+            <div class="field fullsize" data-setting="audioBalanceConfig">
+                <div class="label hidden">
                     <strong>Audio Balancing</strong>
                 </div>
                 <div class="subfield input-group">
@@ -542,6 +557,11 @@ if (true){
     ?>
 
         <div class="game-settings performance-settings">
+
+            <p class="description">
+                <strong class="label">Performance Tweaks</strong>
+                Disable special effects and/or adjust display limits to improve performance on lower-end devices.
+            </p>
 
             <?
 
@@ -695,7 +715,9 @@ if (true){
         $settings_tabs_index[$tab_token] = array(
         'token' => $tab_token,
         'name' => $tab_name,
-        'markup' => $tab_markup
+        'markup' => $tab_markup,
+        //'icon' => '<i class="fa fas fa-cogs"></i>',
+        //'class' => 'float_right icon_only'
         );
     }
 
@@ -710,77 +732,90 @@ if (true){
     ob_start();
     ?>
 
-        <div class="field required">
-            <div class="label">
-                <strong>Login Username</strong>
-                <em>cannot be changed</em>
-            </div>
-            <input type="hidden" name="user_name_clean" value="<?= encode_form_value($current_user_info['user_name_clean']) ?>" readonly="readonly" />
-            <input class="textbox" type="text" name="user_name" value="<?= encode_form_value($current_user_info['user_name']) ?>" maxlength="64" readonly="readonly" disabled="disabled" />
-        </div>
+        <div class="game-settings account-settings">
 
-        <? /*
-        <div class="field">
-            <div class="label">
-                <strong>Account Type</strong>
-            </div>
-            <input type="hidden" name="role_name" value="<?= $current_user_info['role_id'] ? >" readonly="readonly" />
-            <input class="textbox" type="text" name="role_name" value="<?= $current_user_info['role_name_full'] ? >" maxlength="64" readonly="readonly" disabled="disabled" />
-        </div>
-        */ ?>
+            <p class="description">
+                <strong class="label">Account Settings</strong>
+                Update your login credentials and/or manage your personal information using the fields below.
+            </p>
 
-        <div class="field">
-            <div class="label">
-                <strong>Display Username</strong>
-            </div>
-            <input class="textbox" type="text" name="user_name_public" value="<?= encode_form_value($current_user_info['user_name_public']) ?>" maxlength="64" />
-        </div>
+            <div class="subwrap">
 
-        <div class="field required">
-            <div class="label">
-                <strong>Email Address</strong>
-                <em>used for account validation</em>
-            </div>
-            <input class="textbox" type="email" name="user_email_address" value="<?= encode_form_value($current_user_info['user_email_address']) ?>" maxlength="128" required="required" />
-        </div>
+                <div class="field required">
+                    <div class="label">
+                        <strong>Login Username</strong>
+                        <em>cannot be changed</em>
+                    </div>
+                    <input type="hidden" name="user_name_clean" value="<?= encode_form_value($current_user_info['user_name_clean']) ?>" readonly="readonly" />
+                    <input class="textbox" type="text" name="user_name" value="<?= encode_form_value($current_user_info['user_name']) ?>" maxlength="64" readonly="readonly" disabled="disabled" />
+                </div>
 
-        <? /*
-        <div class="field required">
-            <div class="label">
-                <strong>Date of Birth</strong>
-                <em>used for age verification</em>
-            </div>
-            <input class="textbox" type="date" name="user_date_birth" value="<?= !empty($current_user_info['user_date_birth']) ? date('Y-m-d', $current_user_info['user_date_birth']) : '' ? >" required="required" maxlength="10" placeholder="YYYY-MM-DD" />
-        </div>
-        */ ?>
+                <? /*
+                <div class="field">
+                    <div class="label">
+                        <strong>Account Type</strong>
+                    </div>
+                    <input type="hidden" name="role_name" value="<?= $current_user_info['role_id'] ? >" readonly="readonly" />
+                    <input class="textbox" type="text" name="role_name" value="<?= $current_user_info['role_name_full'] ? >" maxlength="64" readonly="readonly" disabled="disabled" />
+                </div>
+                */ ?>
 
-        <div class="field">
-            <div class="label">
-                <strong>Gender Identity</strong>
-            </div>
-            <select class="select" name="user_gender">
-                <option value="" <?= empty($current_user_info['user_gender']) ? 'selected="selected"' : '' ?>>-</option>
-                <option value="male" <?= $current_user_info['user_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
-                <option value="female" <?= $current_user_info['user_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
-                <option value="other" <?= $current_user_info['user_gender'] == 'other' ? 'selected="selected"' : '' ?>>Other</option>
-                <option value="none" <?= $current_user_info['user_gender'] == 'none' ? 'selected="selected"' : '' ?>>None</option>
-            </select>
-        </div>
+                <div class="field">
+                    <div class="label">
+                        <strong>Display Username</strong>
+                    </div>
+                    <input class="textbox" type="text" name="user_name_public" value="<?= encode_form_value($current_user_info['user_name_public']) ?>" maxlength="64" />
+                </div>
 
-        <div class="field">
-            <div class="label">
-                <strong>Change Password</strong>
-                <em>6 - 32 characters</em>
-            </div>
-            <input class="textbox" type="password" name="user_password_new" value="" minlength="6" maxlength="32" autocomplete="new-password" />
-        </div>
+                <div class="field required">
+                    <div class="label">
+                        <strong>Email Address</strong>
+                        <em>used for account validation</em>
+                    </div>
+                    <input class="textbox" type="email" name="user_email_address" value="<?= encode_form_value($current_user_info['user_email_address']) ?>" maxlength="128" required="required" />
+                </div>
 
-        <div class="field">
-            <div class="label">
-                <strong>Retype Password</strong>
-                <em>if changing</em>
+                <? /*
+                <div class="field required">
+                    <div class="label">
+                        <strong>Date of Birth</strong>
+                        <em>used for age verification</em>
+                    </div>
+                    <input class="textbox" type="date" name="user_date_birth" value="<?= !empty($current_user_info['user_date_birth']) ? date('Y-m-d', $current_user_info['user_date_birth']) : '' ? >" required="required" maxlength="10" placeholder="YYYY-MM-DD" />
+                </div>
+                */ ?>
+
+                <div class="field">
+                    <div class="label">
+                        <strong>Gender Identity</strong>
+                    </div>
+                    <select class="select" name="user_gender">
+                        <option value="" <?= empty($current_user_info['user_gender']) ? 'selected="selected"' : '' ?>>-</option>
+                        <option value="male" <?= $current_user_info['user_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
+                        <option value="female" <?= $current_user_info['user_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
+                        <option value="other" <?= $current_user_info['user_gender'] == 'other' ? 'selected="selected"' : '' ?>>Other</option>
+                        <option value="none" <?= $current_user_info['user_gender'] == 'none' ? 'selected="selected"' : '' ?>>None</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <div class="label">
+                        <strong>Change Password</strong>
+                        <em>6 - 32 characters</em>
+                    </div>
+                    <input class="textbox" type="password" name="user_password_new" value="" minlength="6" maxlength="32" autocomplete="new-password" />
+                </div>
+
+                <div class="field">
+                    <div class="label">
+                        <strong>Retype Password</strong>
+                        <em>if changing</em>
+                    </div>
+                    <input class="textbox" type="password" name="user_password_new2" value="" minlength="6" maxlength="32" autocomplete="new-password" />
+                </div>
+
             </div>
-            <input class="textbox" type="password" name="user_password_new2" value="" minlength="6" maxlength="32" autocomplete="new-password" />
+
         </div>
 
     <?
@@ -804,73 +839,86 @@ if (true){
     ob_start();
     ?>
 
-        <div class="field">
-            <strong class="label">Profile Avatar</strong>
-            <select class="select" name="user_image_path">
-                <?= str_replace(
-                    'value="'.$current_user_info['user_image_path'].'"',
-                    'value="'.$current_user_info['user_image_path'].'" selected="selected"',
-                    $profile_avatar_options_markup
-                    ) ?>
-            </select>
-        </div>
+        <div class="game-settings profile-settings">
 
-        <div class="field">
-            <strong class="label">Profile Background</strong>
-            <select class="select" name="user_background_path">
-                <?= str_replace(
-                    'value="'.$current_user_info['user_background_path'].'"',
-                    'value="'.$current_user_info['user_background_path'].'" selected="selected"',
-                    $profile_background_options_markup
-                    ) ?>
-            </select>
-        </div>
+            <p class="description">
+                <strong class="label">Profile Settings</strong>
+                Customize your in-game interface colours and personalize your leaderboard profile on the main site.
+            </p>
 
-        <?
-        $prototype_complete = mmrpg_prototype_complete();
-        $profile_colour_two_unlocked = $prototype_complete >= 3 ? true : false;
-        ?>
+            <div class="subwrap">
+                <div class="field">
+                    <strong class="label">Profile Avatar</strong>
+                    <select class="select" name="user_image_path">
+                        <?= str_replace(
+                            'value="'.$current_user_info['user_image_path'].'"',
+                            'value="'.$current_user_info['user_image_path'].'" selected="selected"',
+                            $profile_avatar_options_markup
+                            ) ?>
+                    </select>
+                </div>
 
-        <div class="field">
-            <strong class="label">Profile Colour <?= $profile_colour_two_unlocked ? '#1' : '' ?></strong>
-            <select class="select" name="user_colour_token">
-                <?= str_replace(
-                    'value="'.$current_user_info['user_colour_token'].'"',
-                    'value="'.$current_user_info['user_colour_token'].'" selected="selected"',
-                    $profile_colour_options_markup
-                    ) ?>
-            </select>
-        </div>
+                <div class="field">
+                    <strong class="label">Profile Background</strong>
+                    <select class="select" name="user_background_path">
+                        <?= str_replace(
+                            'value="'.$current_user_info['user_background_path'].'"',
+                            'value="'.$current_user_info['user_background_path'].'" selected="selected"',
+                            $profile_background_options_markup
+                            ) ?>
+                    </select>
+                </div>
 
-        <? if ($profile_colour_two_unlocked){ ?>
-            <div class="field">
-                <strong class="label">Profile Colour #2</strong>
-                <select class="select" name="user_colour_token2">
-                    <?= str_replace(
-                        'value="'.$current_user_info['user_colour_token2'].'"',
-                        'value="'.$current_user_info['user_colour_token2'].'" selected="selected"',
-                        $profile_colour_options_markup
-                        ) ?>
-                </select>
+                <?
+                $prototype_complete = mmrpg_prototype_complete();
+                $profile_colour_two_unlocked = $prototype_complete >= 3 ? true : false;
+                ?>
+
+                <div class="field">
+                    <strong class="label">Profile Colour <?= $profile_colour_two_unlocked ? '#1' : '' ?></strong>
+                    <select class="select" name="user_colour_token">
+                        <?= str_replace(
+                            'value="'.$current_user_info['user_colour_token'].'"',
+                            'value="'.$current_user_info['user_colour_token'].'" selected="selected"',
+                            $profile_colour_options_markup
+                            ) ?>
+                    </select>
+                </div>
+
+                <? if ($profile_colour_two_unlocked){ ?>
+                    <div class="field">
+                        <strong class="label">Profile Colour #2</strong>
+                        <select class="select" name="user_colour_token2">
+                            <?= str_replace(
+                                'value="'.$current_user_info['user_colour_token2'].'"',
+                                'value="'.$current_user_info['user_colour_token2'].'" selected="selected"',
+                                $profile_colour_options_markup
+                                ) ?>
+                        </select>
+                    </div>
+                <? } ?>
+
+                <div class="field">
+                    <div class="label">
+                        <strong>Website Address</strong>
+                    </div>
+                    <input class="textbox" type="text" name="user_website_address" value="<?= encode_form_value($current_user_info['user_website_address']) ?>" maxlength="128" />
+                </div>
+
+                <? /*
+                <div class="field fullsize">
+                    <div class="label">
+                        <strong>Profile Text</strong>
+                        <em>public, also displayed on leaderboard page</em>
+                    </div>
+                    <textarea class="textarea" name="user_profile_text" rows="6"><?= encode_form_value($current_user_info['user_profile_text']) ?></textarea>
+                </div>
+                */ ?>
+
             </div>
-        <? } ?>
 
-        <div class="field">
-            <div class="label">
-                <strong>Website Address</strong>
-            </div>
-            <input class="textbox" type="text" name="user_website_address" value="<?= encode_form_value($current_user_info['user_website_address']) ?>" maxlength="128" />
         </div>
 
-        <? /*
-        <div class="field fullsize">
-            <div class="label">
-                <strong>Profile Text</strong>
-                <em>public, also displayed on leaderboard page</em>
-            </div>
-            <textarea class="textarea" name="user_profile_text" rows="6"><?= encode_form_value($current_user_info['user_profile_text']) ?></textarea>
-        </div>
-        */ ?>
 
     <?
     $tab_markup = trim(ob_get_clean());
@@ -897,9 +945,9 @@ if (mmrpg_prototype_item_unlocked('light-program')){
         <div class="game-settings proxy-settings">
 
             <p class="description">
-                Your <strong>Proxy Settings</strong> are used whenever another user challenges your ghost data to a Player Battle.
-                Use the fields below to customize how your proxy behaves, or leave the dropdowns blank to let the system bots
-                automatically decide for you.  Have fun!
+                <strong class="label">Proxy Settings</strong>
+                Used whenever another player challenges your ghost data to a Player Battle.
+                Customize your proxy's avatar, stats, field, and robots using the dropdowns below or leave them blank to let the system decide.
             </p>
 
             <div class="subwrap">
@@ -983,7 +1031,9 @@ if (mmrpg_prototype_item_unlocked('light-program')){
         $settings_tabs_index[$tab_token] = array(
         'token' => $tab_token,
         'name' => $tab_name,
-        'markup' => $tab_markup
+        'markup' => $tab_markup,
+        'icon' => '<i class="fa fas fa-mask"></i>',
+        'class' => 'float_right icon_only'
         );
     }
 
@@ -994,11 +1044,16 @@ if (true){
 
     // Define the markup for this section
     $tab_token = 'misc_settings';
-    $tab_name = 'Misc'; // 'Game Settings';
+    $tab_name = 'Other'; // 'Game Settings';
     ob_start();
     ?>
 
         <div class="game-settings misc-settings">
+
+            <p class="description">
+                <strong class="label">Other Options</strong>
+                Options that don't fit anywhere else but nonetheless change gameplay or visuals in some way.
+            </p>
 
             <?
 
@@ -1055,7 +1110,7 @@ if (true){
     //error_log('$battles_complete = '.print_r($battles_complete, true));
     $new_game_plus_visible = $completed_campaigns >= 1 ? true : false;
     if (MMRPG_CONFIG_IS_LIVE === false){ $new_game_plus_visible = true; } // Force visible for local testing
-    $new_game_plus_available = array('dr-light', 'dr-wily', 'dr-cossack', 'dr-lalinde', 'proxy');
+    $new_game_plus_available = array('dr-light', 'dr-wily', 'dr-cossack', 'dr-lalinde');
     $new_game_plus_options = '';
     if ($new_game_plus_visible){
 
@@ -1126,24 +1181,32 @@ if (true){
 
     // Define the markup for this section
     $tab_token = 'advanced_settings';
-    $tab_name = 'Advanced'; // 'Advanced Settings';
+    $tab_name = 'Restart'; // 'Advanced Settings';
     ob_start();
     ?>
 
         <div class="game-settings advanced-settings">
 
-            <p class="description" style="text-align: center;">
-                <i class="fa fas fa-exclamation-triangle"></i> <strong>Stop!</strong>
-                Please be careful when using the game options below;
-                their effects are permanent and cannot be undone!
+            <? if ($new_game_plus_visible){ ?>
+                <p class="description">
+                    <strong class="label">New Game +</strong>
+                    Restart any of the available campaigns from the beginning while keeping all of your other progress intact.
+                </p>
+
+                <div class="field buttons sub-buttons" data-setting="newGamePlus">
+                    <div class="wrapper">
+                        <?= $new_game_plus_options ?>
+                    </div>
+                </div>
+            <? } ?>
+
+            <p class="description">
+                <strong class="label">Reset Game</strong>
+                Delete <em>everything</em> and start from scratch.  Please be absolutely sure you want to do this before proceeding.
             </p>
 
             <div class="field buttons sub-buttons" data-setting="newGamePlus">
-                <? /*<div class="label">
-                    <i class="fas fa-cogs"></i> &nbsp; <strong>Advanced Game Options</strong>
-                </div> */ ?>
                 <div class="wrapper">
-                    <?= $new_game_plus_options ?>
                     <?= $reset_game_sub_options ?>
                 </div>
             </div>
@@ -1157,7 +1220,7 @@ if (true){
         'token' => $tab_token,
         'name' => $tab_name,
         'markup' => $tab_markup,
-        'icon' => '<i class="fa fas fa-exclamation-triangle"></i>',
+        'icon' => '<i class="fa fas fa-recycle"></i>',
         'class' => 'float_right icon_only hide_tab_buttons'
         );
     }
@@ -1173,34 +1236,35 @@ if (mmrpg_prototype_item_unlocked('omega-seed')){
     ob_start();
     ?>
 
-        <p class="description">
-            Your <strong>Omega Sequence</strong> influences which <em>Omega Factors</em> are assigned to the doctors, robots, and shop keepers in your game.
-            Omega Factors are mysterious elemental forces that affect different characters and abilities in different ways.
-        </p>
+        <div class="game-settings omega-settings">
 
-        <p class="description">
-            Your default Omega Sequence is based on the username you first signed up with, but you can generate a new one by entering a custom <strong>Omega Seed</strong> value below.
-            Check the robot editor and shop tabs to see which Omega Factors have been assigned to which characters.
-        </p>
+            <p class="description">
+                <strong class="label">Omega Sequence</strong>
+                A hidden string of letters and numbers randomly-generated during account creation and assigned to your profile.
+                Used by the system to calculate which elemental powers ("Omega Factors") influence each of the playable characters, robot masters, and shop keepers within your game.
+                If you are unsatisfied with your current spread, or just want to try something new, enter a new seed value into the field below and save to regenerate.
+            </p>
 
-        <div>
+            <div class="subfield">
 
-            <div class="field">
-                <div class="label">
-                    <strong>Omega Seed</strong>
-                    <em>enter new to regenerate</em>
+                <div class="field">
+                    <div class="label">
+                        <strong>Omega Sequence</strong>
+                    </div>
+                    <input type="hidden" name="user_omega" value="<?= $current_user_info['user_omega'] ?>" />
+                    <input class="textbox" type="text" name="user_omega" value="<?= $current_user_info['user_omega'] ?>" disabled="disabled" maxlength="32" />
                 </div>
-                <input class="textbox" type="text" name="user_omega_seed" value="" minlength="6" maxlength="32" />
-            </div>
 
-            <div class="field">
-                <div class="label">
-                    <strong>Omega Sequence</strong>
+                <div class="field">
+                    <div class="label">
+                        <strong>Omega Seed</strong>
+                        <em>enter new to regenerate</em>
+                    </div>
+                    <input class="textbox" type="text" name="user_omega_seed" value="" minlength="6" maxlength="32" />
                 </div>
-                <input type="hidden" name="user_omega" value="<?= $current_user_info['user_omega'] ?>" />
-                <input class="textbox" type="text" name="user_omega" value="<?= $current_user_info['user_omega'] ?>" disabled="disabled" maxlength="32" />
-            </div>
 
+
+            </div>
 
         </div>
 

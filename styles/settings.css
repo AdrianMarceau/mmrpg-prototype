@@ -213,8 +213,12 @@ body.windowFlag_landscapeMode #prototype {
     height: auto;
     min-height: 100%;
 }
+#settings .settings_panel > .wrapper > form {
+    min-height: calc(100vh - 115px);
+}
 #settings .settings_panel:after,
-#settings .settings_panel > .wrapper:after {
+#settings .settings_panel > .wrapper:after,
+#settings .settings_panel > .wrapper > form:after {
     content: "";
     display: block;
     clear: both;
@@ -303,6 +307,11 @@ body.windowFlag_landscapeMode #prototype {
     text-align: left;
     padding-top: 10px;
     border-top: 1px solid #404040;
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 #settings .tab_buttons.hidden {
     display: none;
@@ -363,11 +372,25 @@ body.windowFlag_landscapeMode #prototype {
     margin: 0 auto 10px;
 }
 #settings .tab_sections .section p.description {
-    font-size: 110%;
+    font-size: 120%;
     line-height: 1.6;
+    padding-top: 2px;
 }
 #settings .tab_sections .section p:last-child {
     margin-bottom: 0;
+}
+#settings .tab_sections .section p.description strong.label {
+    display: inline-block;
+    vertical-align: bottom;
+    position: relative;
+    top: -2px;
+    border: 0 none transparent;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 1px 1px 0 #707070;
+    padding-left: 4px;
+    padding-right: 4px;
+    margin-right: 4px;
 }
 #settings .tab_sections .section hr {
     display: block;
@@ -467,10 +490,14 @@ input::-webkit-calendar-picker-indicator {
     width: auto;
     margin: 0 auto 4px 0;
     font-weight: bold;
+    color: rgb(157, 220, 255);
 }
 #settings .tab_sections .section .field .label.full {
     float: none;
     clear: both;
+}
+#settings .tab_sections .section .field .label.hidden {
+    display: none;
 }
 #settings .tab_sections .section .field.required strong.label:after,
 #settings .tab_sections .section .field.required div.label strong:after {
@@ -519,19 +546,20 @@ input::-webkit-calendar-picker-indicator {
     font-weight: normal;
 }
 #settings .tab_sections .section .field .subfield .label .help {
-    font-size: 60%;
+    font-size: 70%;
     margin-left: 5px;
     opacity: 0.6;
     position: relative;
     top: 0;
 }
 #settings .tab_sections .section .field .subfield .label .value {
-    font-size: 60%;
+    font-size: 80%;
     margin-right: 10px;
-    opacity: 0.6;
+    opacity: 1.0;
     position: relative;
     top: 0;
     float: right;
+    color: #808080;
 }
 #settings .tab_sections .section .field .subfield .label .value:before {
     content: "(";
