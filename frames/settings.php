@@ -418,16 +418,10 @@ if (!empty($form_actions)){
         //error_log('$readyRoomConfig = '.print_r($readyRoomConfig, true));
         $_SESSION[$session_token]['battle_settings']['readyRoomConfig'] = $readyRoomConfig;
 
-        // menuButtonSpriteMotion, menuButtonSpriteLimit
+        // menuButtonSpriteMotion
         if (isset($_POST['menuButtonSpriteMotion'])){ $form_data['menuButtonSpriteMotion'] = $_POST['menuButtonSpriteMotion'] === '0' ? 0 : 1; }
-        if (isset($_POST['menuButtonSpriteLimit'])){
-            $form_data['menuButtonSpriteLimit'] = intval($_POST['menuButtonSpriteLimit']);
-            if ($form_data['menuButtonSpriteLimit'] <= 0){ $form_data['menuButtonSpriteLimit'] = 1; }
-            if ($form_data['menuButtonSpriteLimit'] >= 100){ $form_data['menuButtonSpriteLimit'] = 100; }
-        }
         $menuButtonConfig = rpg_game::get_menuButtonConfig(true);
         $menuButtonConfig['menuButtonSpriteMotion'] = $form_data['menuButtonSpriteMotion'];
-        $menuButtonConfig['menuButtonSpriteLimit'] = $form_data['menuButtonSpriteLimit'];
         //error_log('$menuButtonConfig = '.print_r($menuButtonConfig, true));
         $_SESSION[$session_token]['battle_settings']['menuButtonConfig'] = $menuButtonConfig;
 
@@ -615,7 +609,7 @@ if (true){
                 </div>
 
                 <div class="subfield input-group is-yes-no">
-                    <label class="label" for="menuButtonSpriteMotion">Menu Sprite Motion</label>
+                    <label class="label" for="menuButtonSpriteMotion">Menu Button Sprite Motion</label>
                     <? $active = !empty($menuButtonConfig['menuButtonSpriteMotion']); ?>
                     <div class="radiofield is-yes <?= $active ? 'active' : '' ?>">
                         <input type="radio" name="menuButtonSpriteMotion" value="1" <?= $active ? 'checked="checked"' : '' ?> />
@@ -625,12 +619,6 @@ if (true){
                     <div class="radiofield is-no <?= $active ? 'active' : '' ?>">
                         <input type="radio" name="menuButtonSpriteMotion" value="0" <?= $active ? 'checked="checked"' : '' ?> />
                         <label for="menuButtonSpriteMotion[1]">No</label>
-                    </div>
-                </div>
-                <div class="subfield input-group">
-                    <div class="subfield">
-                        <label class="label" for="menuButtonSpriteLimit">Menu Sprite Limit <sup class="help">(per button)</sup></label>
-                        <input class="slider" type="range" name="menuButtonSpriteLimit" min="1" max="100" data-max-text="No Limit" step="1" value="<?= $menuButtonConfig['menuButtonSpriteLimit'] ?>">
                     </div>
                 </div>
 

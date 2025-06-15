@@ -455,9 +455,7 @@ $(document).ready(function(){
 
         // Backup this user's menu button sprite settings in case we need to reset them
         var userMenuButtonSpriteMotionBackup = false;
-        var userMenuButtonSpriteLimitBackup = 0;
         userMenuButtonSpriteMotionBackup = parseMenuButtonSpriteMotion();
-        userMenuButtonSpriteLimitBackup = parseMenuButtonSpriteLimit();
 
         // Define a function for parsing the value of the menu button sprite motion toggle
         function parseMenuButtonSpriteMotion(){
@@ -466,15 +464,6 @@ $(document).ready(function(){
             var checkedValue = parseInt($checkedInput.val()); // int-based boolean
             //console.log('checkedValue = ', checkedValue);
             return checkedValue;
-            };
-
-        // Define a function for parsing the menu button sprite limit from the form
-        function parseMenuButtonSpriteLimit(){
-            //console.log('parseMenuButtonSpriteLimit()');
-            var $sliderField = $('input[name="menuButtonSpriteLimit"]', $performanceTweaksField);
-            var sliderValue = parseFloat($sliderField.val());
-            //console.log('sliderValue = ', sliderValue);
-            return sliderValue;
             };
 
         // Define a function for updating the menu button sprite motion toggle given a new value
@@ -488,21 +477,9 @@ $(document).ready(function(){
             return true;
             };
 
-        // Define a function for updating the menu button sprite limit given a new value
-        function updateMenuButtonSpriteLimit(newLimit){
-            //console.log('updateMenuButtonSpriteLimit(newLimit) w/', newLimit);
-            if (typeof newLimit !== 'number'){ return false; }
-            var newSpriteLimit = newLimit;
-            thisGameSettings.menuButtonSpriteLimit = newSpriteLimit;
-            return true;
-            };
-
         // Make sure any updates to these fields are correctly parsed and applied
         $('input[name="menuButtonSpriteMotion"]', $performanceTweaksField).bind('change', function(e){
             updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
-            });
-        $('input[name="menuButtonSpriteLimit"]', $performanceTweaksField).bind('change', function(e){
-            updateMenuButtonSpriteLimit(parseMenuButtonSpriteLimit());
             });
 
         // ---
@@ -629,13 +606,11 @@ $(document).ready(function(){
         var resetGameSettings = function(){
             //console.log('resetGameSettings()');
             //console.log('userMenuButtonSpriteMotionBackup = ', userMenuButtonSpriteMotionBackup);
-            //console.log('userMenuButtonSpriteLimitBackup = ', userMenuButtonSpriteLimitBackup);
             //console.log('userAllowReadyRoomSpritesBackup = ', userAllowReadyRoomSpritesBackup);
             //console.log('userReadyRoomSpriteMotionBackup = ', userReadyRoomSpriteMotionBackup);
             //console.log('userReadyRoomSpriteLimitBackup = ', userReadyRoomSpriteLimitBackup);
             //console.log('userSpriteRenderModeBackup = ', userSpriteRenderModeBackup);
             updateMenuButtonSpriteMotion(userMenuButtonSpriteMotionBackup);
-            updateMenuButtonSpriteLimit(userMenuButtonSpriteLimitBackup);
             updateAllowReadyRoomSprites(userAllowReadyRoomSpritesBackup);
             updateReadyRoomSpriteMotion(userReadyRoomSpriteMotionBackup);
             updateReadyRoomSpriteLimit(userReadyRoomSpriteLimitBackup);
@@ -644,13 +619,11 @@ $(document).ready(function(){
         var applyGameSettings = function(){
             //console.log('applyGameSettings()');
             //console.log('parseMenuButtonSpriteMotion() = ', parseMenuButtonSpriteMotion());
-            //console.log('parseMenuButtonSpriteLimit() = ', parseMenuButtonSpriteLimit());
             //console.log('parseAllowReadyRoomSprites() = ', parseAllowReadyRoomSprites());
             //console.log('parseReadyRoomSpriteMotion() = ', parseReadyRoomSpriteMotion());
             //console.log('parseReadyRoomSpriteLimit() = ', parseReadyRoomSpriteLimit());
             //console.log('parseSpriteRenderMode() = ', parseSpriteRenderMode());
             updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
-            updateMenuButtonSpriteLimit(parseMenuButtonSpriteLimit());
             updateAllowReadyRoomSprites(parseAllowReadyRoomSprites());
             updateReadyRoomSpriteMotion(parseReadyRoomSpriteMotion());
             updateReadyRoomSpriteLimit(parseReadyRoomSpriteLimit());
@@ -677,7 +650,6 @@ $(document).ready(function(){
 
         // Automatically update saved game settings to be sure it's working
         updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
-        updateMenuButtonSpriteLimit(parseMenuButtonSpriteLimit());
         updateAllowReadyRoomSprites(parseAllowReadyRoomSprites());
         updateReadyRoomSpriteMotion(parseReadyRoomSpriteMotion());
         updateReadyRoomSpriteLimit(parseReadyRoomSpriteLimit());

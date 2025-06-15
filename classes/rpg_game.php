@@ -685,7 +685,6 @@ class rpg_game {
         $battleSettings = self::get_battleSettings($include_session);
         $menuButtonConfig = $include_session && !empty($battleSettings['menuButtonConfig']) ? $battleSettings['menuButtonConfig'] : array();
         $menuButtonConfig['menuButtonSpriteMotion'] = isset($menuButtonConfig['menuButtonSpriteMotion']) ? $menuButtonConfig['menuButtonSpriteMotion'] : 1;
-        $menuButtonConfig['menuButtonSpriteLimit'] = isset($menuButtonConfig['menuButtonSpriteLimit']) ? $menuButtonConfig['menuButtonSpriteLimit'] : 100;
         return $menuButtonConfig;
     }
 
