@@ -454,21 +454,10 @@ $(document).ready(function(){
         var $performanceTweaksField = $('.field[data-setting="performanceTweaks"]', $performanceSettings);
 
         // Backup this user's menu button sprite settings in case we need to reset them
-        var userAllowMenuButtonSpritesBackup = false;
         var userMenuButtonSpriteMotionBackup = false;
         var userMenuButtonSpriteLimitBackup = 0;
-        userAllowMenuButtonSpritesBackup = parseAllowMenuButtonSprites();
         userMenuButtonSpriteMotionBackup = parseMenuButtonSpriteMotion();
         userMenuButtonSpriteLimitBackup = parseMenuButtonSpriteLimit();
-
-        // Define a function for parsing the value of the menu button sprite toggle
-        function parseAllowMenuButtonSprites(){
-            //console.log('parseAllowMenuButtonSprites()');
-            var $checkedInput = $('input[type="radio"][name="allowMenuButtonSprites"]:checked', $performanceSettings);
-            var checkedValue = parseInt($checkedInput.val()); // int-based boolean
-            //console.log('checkedValue = ', checkedValue);
-            return checkedValue;
-            };
 
         // Define a function for parsing the value of the menu button sprite motion toggle
         function parseMenuButtonSpriteMotion(){
@@ -486,17 +475,6 @@ $(document).ready(function(){
             var sliderValue = parseFloat($sliderField.val());
             //console.log('sliderValue = ', sliderValue);
             return sliderValue;
-            };
-
-        // Define a function for updating the menu button sprite toggle given a new value
-        function updateAllowMenuButtonSprites(newToggle){
-            //console.log('updateAllowMenuButtonSprites(newToggle) w/', newToggle);
-            if (typeof newToggle !== 'number'){ return false; }
-            var newToggleValue = newToggle;
-            thisGameSettings.allowMenuButtonSprites = newToggleValue;
-            if (newToggleValue){ $thisBody.addClass('allowMenuButtonSprites'); }
-            else { $thisBody.removeClass('allowMenuButtonSprites'); }
-            return true;
             };
 
         // Define a function for updating the menu button sprite motion toggle given a new value
@@ -520,9 +498,6 @@ $(document).ready(function(){
             };
 
         // Make sure any updates to these fields are correctly parsed and applied
-        $('input[name="allowMenuButtonSprites"]', $performanceTweaksField).bind('change', function(e){
-            updateAllowMenuButtonSprites(parseAllowMenuButtonSprites());
-            });
         $('input[name="menuButtonSpriteMotion"]', $performanceTweaksField).bind('change', function(e){
             updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
             });
@@ -653,14 +628,12 @@ $(document).ready(function(){
         // Reset back to backup values if the user switches windows without saving
         var resetGameSettings = function(){
             //console.log('resetGameSettings()');
-            //console.log('userAllowMenuButtonSpritesBackup = ', userAllowMenuButtonSpritesBackup);
             //console.log('userMenuButtonSpriteMotionBackup = ', userMenuButtonSpriteMotionBackup);
             //console.log('userMenuButtonSpriteLimitBackup = ', userMenuButtonSpriteLimitBackup);
             //console.log('userAllowReadyRoomSpritesBackup = ', userAllowReadyRoomSpritesBackup);
             //console.log('userReadyRoomSpriteMotionBackup = ', userReadyRoomSpriteMotionBackup);
             //console.log('userReadyRoomSpriteLimitBackup = ', userReadyRoomSpriteLimitBackup);
             //console.log('userSpriteRenderModeBackup = ', userSpriteRenderModeBackup);
-            updateAllowMenuButtonSprites(userAllowMenuButtonSpritesBackup);
             updateMenuButtonSpriteMotion(userMenuButtonSpriteMotionBackup);
             updateMenuButtonSpriteLimit(userMenuButtonSpriteLimitBackup);
             updateAllowReadyRoomSprites(userAllowReadyRoomSpritesBackup);
@@ -670,14 +643,12 @@ $(document).ready(function(){
             };
         var applyGameSettings = function(){
             //console.log('applyGameSettings()');
-            //console.log('parseAllowMenuButtonSprites() = ', parseAllowMenuButtonSprites());
             //console.log('parseMenuButtonSpriteMotion() = ', parseMenuButtonSpriteMotion());
             //console.log('parseMenuButtonSpriteLimit() = ', parseMenuButtonSpriteLimit());
             //console.log('parseAllowReadyRoomSprites() = ', parseAllowReadyRoomSprites());
             //console.log('parseReadyRoomSpriteMotion() = ', parseReadyRoomSpriteMotion());
             //console.log('parseReadyRoomSpriteLimit() = ', parseReadyRoomSpriteLimit());
             //console.log('parseSpriteRenderMode() = ', parseSpriteRenderMode());
-            updateAllowMenuButtonSprites(parseAllowMenuButtonSprites());
             updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
             updateMenuButtonSpriteLimit(parseMenuButtonSpriteLimit());
             updateAllowReadyRoomSprites(parseAllowReadyRoomSprites());
@@ -705,7 +676,6 @@ $(document).ready(function(){
             };
 
         // Automatically update saved game settings to be sure it's working
-        updateAllowMenuButtonSprites(parseAllowMenuButtonSprites());
         updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
         updateMenuButtonSpriteLimit(parseMenuButtonSpriteLimit());
         updateAllowReadyRoomSprites(parseAllowReadyRoomSprites());

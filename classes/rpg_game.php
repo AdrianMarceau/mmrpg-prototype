@@ -657,7 +657,6 @@ class rpg_game {
         $mmrpgBodyClasses = array();
         $mmrpgBodyClasses[] = 'spriteRenderMode_'.(isset($battleSettings['spriteRenderMode']) ? $battleSettings['spriteRenderMode'] : 'default');
         $mmrpgBodyClasses[] = 'battleButtonMode_'.(isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default');
-        if ($menuButtonConfig['allowMenuButtonSprites']){ $mmrpgBodyClasses[] = 'allowMenuButtonSprites'; }
         if ($menuButtonConfig['menuButtonSpriteMotion']){ $mmrpgBodyClasses[] = 'menuButtonSpriteMotion'; }
         return $mmrpgBodyClasses;
     }
@@ -685,7 +684,6 @@ class rpg_game {
         $session_token = self::session_token();
         $battleSettings = self::get_battleSettings($include_session);
         $menuButtonConfig = $include_session && !empty($battleSettings['menuButtonConfig']) ? $battleSettings['menuButtonConfig'] : array();
-        $menuButtonConfig['allowMenuButtonSprites'] = isset($menuButtonConfig['allowMenuButtonSprites']) ? $menuButtonConfig['allowMenuButtonSprites'] : 1;
         $menuButtonConfig['menuButtonSpriteMotion'] = isset($menuButtonConfig['menuButtonSpriteMotion']) ? $menuButtonConfig['menuButtonSpriteMotion'] : 1;
         $menuButtonConfig['menuButtonSpriteLimit'] = isset($menuButtonConfig['menuButtonSpriteLimit']) ? $menuButtonConfig['menuButtonSpriteLimit'] : 100;
         return $menuButtonConfig;

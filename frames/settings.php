@@ -418,8 +418,7 @@ if (!empty($form_actions)){
         //error_log('$readyRoomConfig = '.print_r($readyRoomConfig, true));
         $_SESSION[$session_token]['battle_settings']['readyRoomConfig'] = $readyRoomConfig;
 
-        // allowMenuButtonSprites, menuButtonSpriteMotion, menuButtonSpriteLimit
-        if (isset($_POST['allowMenuButtonSprites'])){ $form_data['allowMenuButtonSprites'] = $_POST['allowMenuButtonSprites'] === '0' ? 0 : 1; }
+        // menuButtonSpriteMotion, menuButtonSpriteLimit
         if (isset($_POST['menuButtonSpriteMotion'])){ $form_data['menuButtonSpriteMotion'] = $_POST['menuButtonSpriteMotion'] === '0' ? 0 : 1; }
         if (isset($_POST['menuButtonSpriteLimit'])){
             $form_data['menuButtonSpriteLimit'] = intval($_POST['menuButtonSpriteLimit']);
@@ -427,7 +426,6 @@ if (!empty($form_actions)){
             if ($form_data['menuButtonSpriteLimit'] >= 100){ $form_data['menuButtonSpriteLimit'] = 100; }
         }
         $menuButtonConfig = rpg_game::get_menuButtonConfig(true);
-        $menuButtonConfig['allowMenuButtonSprites'] = $form_data['allowMenuButtonSprites'];
         $menuButtonConfig['menuButtonSpriteMotion'] = $form_data['menuButtonSpriteMotion'];
         $menuButtonConfig['menuButtonSpriteLimit'] = $form_data['menuButtonSpriteLimit'];
         //error_log('$menuButtonConfig = '.print_r($menuButtonConfig, true));
@@ -616,19 +614,6 @@ if (true){
                     </div>
                 </div>
 
-                <div class="subfield input-group is-yes-no">
-                    <label class="label" for="allowMenuButtonSprites">Menu Sprites</label>
-                    <? $active = !empty($menuButtonConfig['allowMenuButtonSprites']); ?>
-                    <div class="radiofield is-yes <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="allowMenuButtonSprites" value="1" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="allowMenuButtonSprites[0]">Enabled</label>
-                    </div>
-                    <? $active = empty($menuButtonConfig['allowMenuButtonSprites']); ?>
-                    <div class="radiofield is-no <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="allowMenuButtonSprites" value="0" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="allowMenuButtonSprites[1]">Disabled</label>
-                    </div>
-                </div>
                 <div class="subfield input-group is-yes-no">
                     <label class="label" for="menuButtonSpriteMotion">Menu Sprite Motion</label>
                     <? $active = !empty($menuButtonConfig['menuButtonSpriteMotion']); ?>
