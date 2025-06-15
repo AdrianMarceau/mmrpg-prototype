@@ -2986,6 +2986,7 @@ body[data-source="website"] #prototype .menu {
 
 /* 2k23 ANIMATION AND TWEAKS */
 
+/*
 @keyframes prototype-background-zoom-animation {
     0% { background-position: 0 0; }
     100% { background-position: 0 -934px; }
@@ -2993,6 +2994,16 @@ body[data-source="website"] #prototype .menu {
 @keyframes prototype-background-zoom-fade-animation {
     0% { background-position: 0 0; opacity: 0.5; }
     100% { background-position: 0 -934px; opacity: 1.0; }
+}
+*/
+
+@keyframes prototype-background-rising-animation {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(0, -934px); }
+}
+@keyframes prototype-background-rising-fade-animation {
+    0% { transform: translate(0, 0); opacity: 0.5; }
+    100% { transform: translate(0, -934px); opacity: 1.0; }
 }
 
 #mmrpg.prototype #prototype .bgfx-layer {
@@ -3007,21 +3018,35 @@ body[data-source="website"] #prototype .menu {
     height: auto;
     opacity: 1.0;
     background-image: none;
+    background-color: transparent;
     background-position: 0 0;
     background-repeat: repeat;
     background-size: 768px 934px;
     animation: none;
     pointer-events: none;
 }
-#mmrpg.prototype #prototype .bgfx-layer.layer-1 {
+#mmrpg.prototype #prototype .bgfx-layer:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    width: calc(768px * 2);
+    height: calc(934px * 2);
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translate(0, 0);
+    background: inherit;
+}
+#mmrpg.prototype #prototype .bgfx-layer.layer-1:before {
     background-image: url(../images/assets/prototype-background-2k23_stars-only.png);
-    animation: prototype-background-zoom-animation 240s linear infinite;
+    animation: prototype-background-rising-animation 240s linear infinite;
     z-index: 1;
 
 }
-#mmrpg.prototype #prototype .bgfx-layer.layer-2 {
+#mmrpg.prototype #prototype .bgfx-layer.layer-2:before {
     background-image: url(../images/assets/prototype-background-2k23_waves-only.png);
-    animation: prototype-background-zoom-fade-animation 120s linear infinite;
+    animation: prototype-background-rising-fade-animation 120s linear infinite;
     z-index: 2;
 }
 #mmrpg.prototype #prototype > .banner,
