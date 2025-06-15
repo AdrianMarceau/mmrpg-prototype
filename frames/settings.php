@@ -418,10 +418,12 @@ if (!empty($form_actions)){
         //error_log('$readyRoomConfig = '.print_r($readyRoomConfig, true));
         $_SESSION[$session_token]['battle_settings']['readyRoomConfig'] = $readyRoomConfig;
 
-        // menuButtonSpriteMotion
+        // menuButtonSpriteMotion, menuBackgroundImageMotion
         if (isset($_POST['menuButtonSpriteMotion'])){ $form_data['menuButtonSpriteMotion'] = $_POST['menuButtonSpriteMotion'] === '0' ? 0 : 1; }
+        if (isset($_POST['menuBackgroundImageMotion'])){ $form_data['menuBackgroundImageMotion'] = $_POST['menuBackgroundImageMotion'] === '0' ? 0 : 1; }
         $menuButtonConfig = rpg_game::get_menuButtonConfig(true);
         $menuButtonConfig['menuButtonSpriteMotion'] = $form_data['menuButtonSpriteMotion'];
+        $menuButtonConfig['menuBackgroundImageMotion'] = $form_data['menuBackgroundImageMotion'];
         //error_log('$menuButtonConfig = '.print_r($menuButtonConfig, true));
         $_SESSION[$session_token]['battle_settings']['menuButtonConfig'] = $menuButtonConfig;
 
@@ -578,7 +580,7 @@ if (true){
                     </div>
 
                     <div class="subfield input-group is-yes-no">
-                        <label class="label" for="menuButtonSpriteMotion">Menu Button Sprite Motion</label>
+                        <label class="label" for="menuButtonSpriteMotion">Animate Menu Sprites</label>
                         <? $active = !empty($menuButtonConfig['menuButtonSpriteMotion']); ?>
                         <div class="radiofield is-yes <?= $active ? 'active' : '' ?>">
                             <input type="radio" name="menuButtonSpriteMotion" value="1" <?= $active ? 'checked="checked"' : '' ?> />
@@ -588,6 +590,19 @@ if (true){
                         <div class="radiofield is-no <?= $active ? 'active' : '' ?>">
                             <input type="radio" name="menuButtonSpriteMotion" value="0" <?= $active ? 'checked="checked"' : '' ?> />
                             <label for="menuButtonSpriteMotion[1]">No</label>
+                        </div>
+                    </div>
+                    <div class="subfield input-group is-yes-no">
+                        <label class="label" for="menuBackgroundImageMotion">Animate Menu Backgrounds</label>
+                        <? $active = !empty($menuButtonConfig['menuBackgroundImageMotion']); ?>
+                        <div class="radiofield is-yes <?= $active ? 'active' : '' ?>">
+                            <input type="radio" name="menuBackgroundImageMotion" value="1" <?= $active ? 'checked="checked"' : '' ?> />
+                            <label for="menuBackgroundImageMotion[0]">Yes</label>
+                        </div>
+                        <? $active = empty($menuButtonConfig['menuBackgroundImageMotion']); ?>
+                        <div class="radiofield is-no <?= $active ? 'active' : '' ?>">
+                            <input type="radio" name="menuBackgroundImageMotion" value="0" <?= $active ? 'checked="checked"' : '' ?> />
+                            <label for="menuBackgroundImageMotion[1]">No</label>
                         </div>
                     </div>
 
@@ -613,7 +628,7 @@ if (true){
                         </div>
                     </div>
                     <div class="subfield input-group is-yes-no">
-                        <label class="label" for="readyRoomSpriteMotion">Ready Room Sprite Motion</label>
+                        <label class="label" for="readyRoomSpriteMotion">Animate Ready Room Sprites</label>
                         <? $active = !empty($readyRoomConfig['readyRoomSpriteMotion']); ?>
                         <div class="radiofield is-yes <?= $active ? 'active' : '' ?>">
                             <input type="radio" name="readyRoomSpriteMotion" value="1" <?= $active ? 'checked="checked"' : '' ?> />
@@ -627,7 +642,7 @@ if (true){
                     </div>
                     <div class="subfield input-group">
                         <div class="subfield">
-                            <label class="label" for="readyRoomSpriteLimit">Ready Room Sprite Limit <sup class="help">(per player)</sup></label>
+                            <label class="label" for="readyRoomSpriteLimit">Limit Ready Room Sprites <sup class="help">(per player)</sup></label>
                             <input class="slider" type="range" name="readyRoomSpriteLimit" min="1" max="100" data-max-text="No Limit" step="1" value="<?= $readyRoomConfig['readyRoomSpriteLimit'] ?>">
                         </div>
                     </div>

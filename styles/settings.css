@@ -572,6 +572,11 @@ input::-webkit-calendar-picker-indicator {
 #settings .tab_sections .section .field .subfield + .subfield {
     margin-top: 5px;
 }
+#settings .tab_sections .section .field .subfield.redundant-disabled {
+    pointer-events: none;
+    pointer: not-allowed;
+    filter: saturate(0) opacity(0.6);
+}
 
 #settings .tab_sections .section .field .radiofield {
     display: block;

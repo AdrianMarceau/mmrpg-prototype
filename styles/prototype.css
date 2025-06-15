@@ -3040,19 +3040,24 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg.prototype #prototype .bgfx-layer.layer-1:before {
     background-image: url(../images/assets/prototype-background-2k23_stars-only.png);
-    animation: prototype-background-rising-animation 240s linear infinite;
+    animation: none;
     z-index: 1;
-
 }
 #mmrpg.prototype #prototype .bgfx-layer.layer-2:before {
     background-image: url(../images/assets/prototype-background-2k23_waves-only.png);
-    animation: prototype-background-rising-fade-animation 120s linear infinite;
+    animation: none;
     z-index: 2;
 }
 #mmrpg.prototype #prototype > .banner,
 #mmrpg.prototype #prototype > .menu {
     position: relative;
     z-index: 100;
+}
+#mmrpg.prototype.menuBackgroundImageMotion #prototype .bgfx-layer.layer-1:before {
+    animation: prototype-background-rising-animation 240s linear infinite;
+}
+#mmrpg.prototype.menuBackgroundImageMotion #prototype .bgfx-layer.layer-2:before {
+    animation: prototype-background-rising-fade-animation 120s linear infinite;
 }
 
 /*

@@ -455,9 +455,11 @@ $(document).ready(function(){
 
         // Backup this user's menu button sprite settings in case we need to reset them
         var userMenuButtonSpriteMotionBackup = false;
+        var userMenuBackgroundImageMotionBackup = false;
         userMenuButtonSpriteMotionBackup = parseMenuButtonSpriteMotion();
+        userMenuBackgroundImageMotionBackup = parseMenuBackgroundImageMotion();
 
-        // Define a function for parsing the value of the menu button sprite motion toggle
+        // Define a function for parsing the value of the menu-related toggles
         function parseMenuButtonSpriteMotion(){
             //console.log('parseMenuButtonSpriteMotion()');
             var $checkedInput = $('input[type="radio"][name="menuButtonSpriteMotion"]:checked', $performanceSettings);
@@ -465,8 +467,15 @@ $(document).ready(function(){
             //console.log('checkedValue = ', checkedValue);
             return checkedValue;
             };
+        function parseMenuBackgroundImageMotion(){
+            //console.log('parseMenuBackgroundImageMotion()');
+            var $checkedInput = $('input[type="radio"][name="menuBackgroundImageMotion"]:checked', $performanceSettings);
+            var checkedValue = parseInt($checkedInput.val()); // int-based boolean
+            //console.log('checkedValue = ', checkedValue);
+            return checkedValue;
+            };
 
-        // Define a function for updating the menu button sprite motion toggle given a new value
+        // Define a function for updating the menu-related motion toggles given a new value
         function updateMenuButtonSpriteMotion(newMotion){
             //console.log('updateMenuButtonSpriteMotion(newMotion) w/', newMotion);
             if (typeof newMotion !== 'number'){ return false; }
@@ -476,16 +485,31 @@ $(document).ready(function(){
             else { $thisBody.removeClass('menuButtonSpriteMotion'); }
             return true;
             };
+        function updateMenuBackgroundImageMotion(newMotion){
+            //console.log('updateMenuBackgroundImageMotion(newMotion) w/', newMotion);
+            if (typeof newMotion !== 'number'){ return false; }
+            var newMotionValue = newMotion;
+            thisGameSettings.menuBackgroundImageMotion = newMotionValue;
+            if (newMotionValue){ $thisBody.addClass('menuBackgroundImageMotion'); }
+            else { $thisBody.removeClass('menuBackgroundImageMotion'); }
+            return true;
+            };
 
         // Make sure any updates to these fields are correctly parsed and applied
         $('input[name="menuButtonSpriteMotion"]', $performanceTweaksField).bind('change', function(e){
             updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
+            });
+        $('input[name="menuBackgroundImageMotion"]', $performanceTweaksField).bind('change', function(e){
+            updateMenuBackgroundImageMotion(parseMenuBackgroundImageMotion());
             });
 
         // ---
 
         // Collect references to the applicable form fields
         var $performanceTweaksField = $('.field[data-setting="performanceTweaks"]', $performanceSettings);
+        var $allowReadyRoomSpritesField = $('input[name="allowReadyRoomSprites"]', $performanceTweaksField).closest('.subfield');
+        var $readyRoomSpriteMotionField = $('input[name="readyRoomSpriteMotion"]', $performanceTweaksField).closest('.subfield');
+        var $readyRoomSpriteLimitField = $('input[name="readyRoomSpriteLimit"]', $performanceTweaksField).closest('.subfield');
 
         // Backup the user's ready room sprite settings in case we need to reset them
         var userAllowReadyRoomSpritesBackup = false;
@@ -528,8 +552,16 @@ $(document).ready(function(){
             if (typeof newToggle !== 'number'){ return false; }
             var newToggleValue = newToggle;
             thisGameSettings.allowReadyRoomSprites = newToggleValue;
-            if (newToggleValue){ $thisBody.addClass('allowReadyRoomSprites'); }
-            else { $thisBody.removeClass('allowReadyRoomSprites'); }
+            if (newToggleValue){
+                $thisBody.addClass('allowReadyRoomSprites');
+                $readyRoomSpriteMotionField.removeClass('redundant-disabled');
+                $readyRoomSpriteLimitField.removeClass('redundant-disabled');
+                }
+            else {
+                $thisBody.removeClass('allowReadyRoomSprites');
+                $readyRoomSpriteMotionField.addClass('redundant-disabled');
+                $readyRoomSpriteLimitField.addClass('redundant-disabled');
+                }
             return true;
             };
 
@@ -606,11 +638,13 @@ $(document).ready(function(){
         var resetGameSettings = function(){
             //console.log('resetGameSettings()');
             //console.log('userMenuButtonSpriteMotionBackup = ', userMenuButtonSpriteMotionBackup);
+            //console.log('userMenuBackgroundImageMotionBackup = ', userMenuBackgroundImageMotionBackup);
             //console.log('userAllowReadyRoomSpritesBackup = ', userAllowReadyRoomSpritesBackup);
             //console.log('userReadyRoomSpriteMotionBackup = ', userReadyRoomSpriteMotionBackup);
             //console.log('userReadyRoomSpriteLimitBackup = ', userReadyRoomSpriteLimitBackup);
             //console.log('userSpriteRenderModeBackup = ', userSpriteRenderModeBackup);
             updateMenuButtonSpriteMotion(userMenuButtonSpriteMotionBackup);
+            updateMenuBackgroundImageMotion(userMenuBackgroundImageMotionBackup);
             updateAllowReadyRoomSprites(userAllowReadyRoomSpritesBackup);
             updateReadyRoomSpriteMotion(userReadyRoomSpriteMotionBackup);
             updateReadyRoomSpriteLimit(userReadyRoomSpriteLimitBackup);
@@ -619,11 +653,13 @@ $(document).ready(function(){
         var applyGameSettings = function(){
             //console.log('applyGameSettings()');
             //console.log('parseMenuButtonSpriteMotion() = ', parseMenuButtonSpriteMotion());
+            //console.log('parseMenuBackgroundImageMotion() = ', parseMenuBackgroundImageMotion());
             //console.log('parseAllowReadyRoomSprites() = ', parseAllowReadyRoomSprites());
             //console.log('parseReadyRoomSpriteMotion() = ', parseReadyRoomSpriteMotion());
             //console.log('parseReadyRoomSpriteLimit() = ', parseReadyRoomSpriteLimit());
             //console.log('parseSpriteRenderMode() = ', parseSpriteRenderMode());
             updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
+            updateMenuBackgroundImageMotion(parseMenuBackgroundImageMotion());
             updateAllowReadyRoomSprites(parseAllowReadyRoomSprites());
             updateReadyRoomSpriteMotion(parseReadyRoomSpriteMotion());
             updateReadyRoomSpriteLimit(parseReadyRoomSpriteLimit());
@@ -650,6 +686,7 @@ $(document).ready(function(){
 
         // Automatically update saved game settings to be sure it's working
         updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
+        updateMenuBackgroundImageMotion(parseMenuBackgroundImageMotion());
         updateAllowReadyRoomSprites(parseAllowReadyRoomSprites());
         updateReadyRoomSpriteMotion(parseReadyRoomSpriteMotion());
         updateReadyRoomSpriteLimit(parseReadyRoomSpriteLimit());
