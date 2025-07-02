@@ -6,8 +6,8 @@
 (function(){
 
     // Define a global namespace for the ready room functionality
-    var thisReadyRoom = function(){};
-    var thisReadyRoomConfig = {};
+    let thisReadyRoom = function(){};
+    let thisReadyRoomConfig = {};
     window.mmrpgReadyRoom = thisReadyRoom;
     window.mmrpgReadyRoom.config = thisReadyRoomConfig;
 
@@ -30,7 +30,7 @@
     thisReadyRoomConfig.isReady = false;
 
     // Define a function for initializing the ready room with unlocked robots
-    thisReadyRoom.init = function($thisBanner, onComplete){
+    thisReadyRoom.init = function($thisBanner, onComplete, extraConfig){
         //console.log('thisReadyRoom.init()');
         //console.log('thisReadyRoomConfig.charactersIndex =', thisReadyRoomConfig.charactersIndex);
 
@@ -48,6 +48,16 @@
 
         // Compensate for missing onComplete function
         if (typeof onComplete !== 'function'){ onComplete = function(){}; }
+
+        // If the user has provided and config overrides, apply them now
+        if (extraConfig && typeof extraConfig === 'object'){
+            var extraConfigKeys = Object.keys(extraConfig);
+            for (var i = 0; i < extraConfigKeys.length; i++){
+                var extraConfigKey = extraConfigKeys[i];
+                //console.log('extraConfig['+extraConfigKey+'] =', extraConfig[extraConfigKey]);
+                thisReadyRoomConfig[extraConfigKey] = extraConfig[extraConfigKey];
+                }
+            }
 
         // If the ready room has not been created yet do so now, else collect references
         if (!$('.ready_room', $thisBanner).length){
@@ -136,11 +146,25 @@
         var newEntranceTimeout = 1000;
         var newEntranceOffsetX = 90; //spriteBounds.maxX;
         var newEntranceOffsetY = spriteBounds.minY;
+        var spriteLimitPerPlayer = thisReadyRoomConfig.spriteLimit || 100;
+        var spritesByPlayer = thisReadyRoomConfig.spritesByPlayer;
+        //console.log('%c' + 'Init -> Add robot sprites! (limit-per-player:' + spriteLimitPerPlayer + ')!', 'color: cyan;');
         for (var i = 0; i < thisRobotsTokens.length; i++){
             var robotToken = thisRobotsTokens[i];
             var robotInfo = thisRobotsIndex[robotToken];
-            if (typeof robotInfo.flags !== 'undefined'
-                && robotInfo.flags.indexOf('is_newly_unlocked') !== -1){
+            //console.log('-> trying to add robot sprite for ' + robotToken);
+            var isNewlyUnlocked = typeof robotInfo.flags !== 'undefined' && robotInfo.flags.indexOf('is_newly_unlocked') !== -1 ? true : false;
+            var currentPlayerToken = robotInfo.currentPlayer || robotInfo.originalPlayer || '';
+            if (typeof spritesByPlayer[currentPlayerToken] === 'undefined'){ spritesByPlayer[currentPlayerToken] = []; }
+            var playerSprites = spritesByPlayer[currentPlayerToken];
+            //console.log('-> player ' + currentPlayerToken + ' has ' + playerSprites.length + ' sprites vs limit of ' + spriteLimitPerPlayer);
+            var allowAddSprite = isNewlyUnlocked || (playerSprites.length < spriteLimitPerPlayer) ? true : false;
+            if (!allowAddSprite){
+                //console.log('%c' + '-> skipping robot ' + robotToken + ' (player ' + currentPlayerToken + ' has too many sprites)!', 'color: red;');
+                continue;
+                }
+            if (isNewlyUnlocked){
+                //console.log('%c' + '-> adding new robot ' + robotToken + ' for player ' + currentPlayerToken + '', 'color: green;');
                 newEntranceTimeout += 1000;
                 newEntranceOffsetX -= 6;
                 newEntranceOffsetY -= 1;
@@ -159,6 +183,7 @@
                         }, newEntranceTimeout);
                     })(robotToken, robotInfo, newEntranceTimeout, newEntranceOffsetX, newEntranceOffsetY);
                 } else {
+                //console.log('%c' + '-> adding robot ' + robotToken + ' for player ' + currentPlayerToken + '', 'color: green;');
                 thisReadyRoom.addRobotSprite(robotToken, robotInfo);
                 }
             }
@@ -198,6 +223,7 @@
                 var nearbySprite = nearbySpriteData.sprite;
                 var nearbyDistance = nearbySpriteData.distance;
                 //console.log('nearbySprite @', nearbyDistance, 'away w/', nearbySprite);
+                //console.log('nearbySprite ['+i+'] @', nearbyDistance, 'away w/ hidden:', nearbySprite.hidden);
                 var newDirection = nearbySprite.position[0] > clickXPercent ? 'left' : 'right';
                 var newCooldown = Math.floor((thisReadyRoomConfig.framesPerSecond * 1) * nearbySprite.haste);
                 var newProperties = {direction: newDirection};
@@ -327,15 +353,26 @@
 
         // Define a list variable to hold which sprites we should animate this round
         var spritesToAnimate = {};
+        var spritesToAnimateTokens = Object.keys(thisReadyRoomConfig.spritesIndex);
+        //console.log('spritesToAnimateTokens =', spritesToAnimateTokens);
 
         // Loop through players and append to the list of ones we should animate
         var thisPlayersIndex = thisReadyRoomConfig.charactersIndex['player'];
-        var thisPlayersIndexTokens = Object.keys(thisPlayersIndex);
+        var thisPlayersIndexTokens = Object.keys(thisPlayersIndex).filter(function(token){ return spritesToAnimateTokens.indexOf(token) !== -1; });
         for (var i = 0; i < thisPlayersIndexTokens.length; i++){
             var thisPlayerToken = thisPlayersIndexTokens[i];
+            if (spritesToAnimateTokens.indexOf(thisPlayerToken) === -1){
+                //console.error('thisPlayerToken "'+thisPlayerToken+'" not found in spritesToAnimateTokens');
+                continue;
+                }
             var thisPlayerInfo = thisPlayersIndex[thisPlayerToken];
-            //console.log('thisPlayerToken/Info =', thisPlayerToken, thisPlayerInfo);
-            if (!thisReadyRoom.animateSpeedCheck(thisPlayerInfo)){ continue; }
+            var thisPlayerSprite = thisReadyRoomConfig.spritesIndex[thisPlayerToken];
+            //console.log('thisPlayerToken/Info =', thisPlayerToken, thisPlayerInfo, thisPlayerSprite);
+            if (thisPlayerSprite.frame !== 0){ thisPlayerSprite.cooldown = 0; }
+            if (!thisReadyRoom.animateSpeedCheck(thisPlayerInfo)){
+                //console.warn('Skipping player', thisPlayerToken, 'due to animateSpeedCheck failure', '\n-> thisPlayerInfo:', thisPlayerInfo, '\n-> thisPlayerSprite:', thisPlayerSprite);
+                continue;
+                }
             var thisSpriteToken = thisPlayerToken;
             var thisSpriteData = {kind: 'player', token: thisPlayerToken, info: thisPlayerInfo}
             spritesToAnimate[thisSpriteToken] = thisSpriteData;
@@ -344,14 +381,21 @@
 
         // Loop through robots and append to the list of ones we should animate
         var thisRobotsIndex = thisReadyRoomConfig.charactersIndex['robot'];
-        var thisRobotsIndexTokens = Object.keys(thisRobotsIndex);
+        var thisRobotsIndexTokens = Object.keys(thisRobotsIndex).filter(function(token){ return spritesToAnimateTokens.indexOf(token) !== -1; });
         for (var i = 0; i < thisRobotsIndexTokens.length; i++){
             var thisRobotToken = thisRobotsIndexTokens[i];
+            if (spritesToAnimateTokens.indexOf(thisRobotToken) === -1){
+                //console.error('thisRobotToken "'+thisRobotToken+'" not found in spritesToAnimateTokens');
+                continue;
+                }
             var thisRobotInfo = thisRobotsIndex[thisRobotToken];
             var thisRobotSprite = thisReadyRoomConfig.spritesIndex[thisRobotToken];
-            //console.log('thisRobotToken/Info =', thisRobotToken, thisRobotInfo);
+            //console.log('thisRobotToken/Info/Sprite =', thisRobotToken, thisRobotInfo, thisRobotSprite);
             if (thisRobotSprite.frame !== 0){ thisRobotSprite.cooldown = 0; }
-            if (!thisReadyRoom.animateSpeedCheck(thisRobotInfo)){ continue; }
+            if (!thisReadyRoom.animateSpeedCheck(thisRobotInfo)){
+                //console.warn('Skipping robot', thisRobotToken, 'due to animateSpeedCheck failure', '\n-> thisRobotInfo:', thisRobotInfo, '\n-> thisRobotSprite:', thisRobotSprite);
+                continue;
+                }
             var thisSpriteToken = thisRobotToken;
             var thisSpriteData = {kind: 'robot', token: thisRobotToken, info: thisRobotInfo}
             spritesToAnimate[thisSpriteToken] = thisSpriteData;
@@ -732,6 +776,7 @@
         //else if (kind === 'shop'){ loadedCharactersIndex = gameSettings.customIndex.unlockedShopsIndex; }
         else { return false; }
         var characterIndexInfo = loadedCharactersIndex[characterToken];
+        if (!readyRoomSpritesIndex[characterToken]){ return false; }
 
         // Pull the sprite data and element reference from the index
         var thisSprite = readyRoomSpritesIndex[characterToken];
@@ -921,6 +966,7 @@
         // Collect a reference to the sprite's entry in the animation index
         var readyRoomSpritesIndex = thisReadyRoomConfig.spritesIndex;
         var thisSprite = readyRoomSpritesIndex[characterToken];
+        if (!thisSprite){ return false; }
         //console.log('thisSprite =', typeof thisSprite, thisSprite);
         // If this character has a cooldown we gotta decease and wait
         //console.log('thisSprite.cooldown =', thisSprite.cooldown);
@@ -1027,21 +1073,27 @@
         if (!thisReadyRoomConfig.isReady){ return false; }
         if (typeof thisReadyRoomConfig.charactersIndex['player'] === 'undefined'){ return; }
         if (typeof thisReadyRoomConfig.charactersIndex['robot'] === 'undefined'){ return; }
-        // Collect the unlocked characters index
-        var loadedCharactersIndex = {};
-        if (characterKind === 'player'){ loadedCharactersIndex = thisReadyRoomConfig.charactersIndex['player']; }
-        else if (characterKind === 'robot'){ loadedCharactersIndex = thisReadyRoomConfig.charactersIndex['robot']; }
-        //else if (characterKind === 'shop'){ loadedCharactersIndex = gameSettings.customIndex.unlockedShopsIndex; }
-        else { return false; }
-        var readyRoomSpritesIndex = thisReadyRoomConfig.spritesIndex;
+        // Collect the unlocked and loaded characters index
+        let readyRoomSpritesIndex = thisReadyRoomConfig.spritesIndex;
         let readyRoomSpritesByPlayer = thisReadyRoomConfig.spritesByPlayer;
-        //console.log('loadedCharactersIndex =', loadedCharactersIndex);
+        if (!readyRoomSpritesIndex || !readyRoomSpritesByPlayer){ return false; }
+        let loadedCharactersIndex = (function(index, sprites){
+            if (!index || typeof index !== 'object'){ return false; }
+            if (!sprites || typeof sprites !== 'object'){ return false; }
+            let loaded = {}, keys = Object.keys(index).filter(function(token){ return typeof sprites[token] !== 'undefined'; });
+            for (var i = 0; i < keys.length; i++){ var token = keys[i]; loaded[token] = index[token]; }
+            return loaded;
+            })(thisReadyRoomConfig.charactersIndex[characterKind], readyRoomSpritesIndex);
+        //console.log('loadedCharactersIndex(raw) =', Object.keys(thisReadyRoomConfig.charactersIndex[characterKind]));
+        //console.log('loadedCharactersIndex(filtered) =', Object.keys(loadedCharactersIndex));
         //console.log('readyRoomSpritesIndex =', readyRoomSpritesIndex);
+        if (!loadedCharactersIndex){ return false; }
         // Abstract the characterToken in case the user has provided the "all" option
         var requiredCharacters = [];
         if (characterToken === 'all'
             || characterToken === 'most'
             || characterToken === 'some'){
+            //console.log('loadedCharactersIndex(keys) =', Object.keys(loadedCharactersIndex));
             requiredCharacters = Object.keys(loadedCharactersIndex);
             if (characterToken !== 'all'){
                 // shuffle and slice the characters
@@ -1050,76 +1102,89 @@
                 shuffleArray(requiredCharacters);
                 requiredCharacters = requiredCharacters.slice(0, sliceToCount);
                 }
+            requiredCharacters = Object.values(requiredCharacters);
+            //console.log('requiredCharacters =', requiredCharacters);
             }
         else if (typeof characterToken === 'function'){
+            //console.log('thisReadyRoomConfig.charactersIndex['+characterKind+'] =', thisReadyRoomConfig.charactersIndex[characterKind]);
+            //console.log('loadedCharactersIndex =', loadedCharactersIndex);
+            //console.log('loadedCharactersIndex(keys) =', Object.keys(loadedCharactersIndex));
             var characterTokenFunction = characterToken;
-            var unlockedCharactersTokens = Object.keys(loadedCharactersIndex);
-            for (var i = 0; i < unlockedCharactersTokens.length; i++){
-                var characterToken = unlockedCharactersTokens[i];
-                var characterInfo = loadedCharactersIndex[characterToken];
-                if (!characterTokenFunction(characterToken, characterInfo)){ continue; }
-                requiredCharacters.push(characterToken);
-                }
-            }
-        else {
-            requiredCharacters.push(characterToken);
-            }
-        // If this is a robot, pre-loop through required characters to make sure they're actually visible
-        if (characterKind === 'robot'
-            && requiredCharacters.length === 1){
-            //console.log('is robot -> pre-loop through required characters to make sure visible', '\n->', 'requiredCharacters:', requiredCharacters);
+            requiredCharacters = Object.keys(loadedCharactersIndex);
             for (var i = 0; i < requiredCharacters.length; i++){
                 var characterToken = requiredCharacters[i];
-                if (typeof loadedCharactersIndex[characterToken] === 'undefined'){ continue; }
-                if (typeof readyRoomSpritesIndex[characterToken] === 'undefined'){ continue; }
                 var characterInfo = loadedCharactersIndex[characterToken];
-                var spriteInfo = readyRoomSpritesIndex[characterToken];
-                //console.log('characterInfo =', characterInfo);
-                //console.log('spriteInfo =', spriteInfo);
-                if (typeof characterInfo.currentPlayer === 'undefined'){ continue; }
-                let currentPlayer = characterInfo.currentPlayer;
-                //console.log('currentPlayer =', currentPlayer);
-                if (typeof readyRoomSpritesByPlayer[currentPlayer] === 'undefined'){ continue; }
-                let currentPlayerSprites = readyRoomSpritesByPlayer[currentPlayer];
-                let currentRobotIndex = currentPlayerSprites.indexOf(characterToken);
-                //console.log('currentPlayerSprites =', currentPlayerSprites);
-                //console.log('currentRobotIndex =', currentRobotIndex);
-                if (currentRobotIndex === -1){ continue; }
-                //console.log('currentPlayerSprites(before) =', currentPlayerSprites);
-                delete currentPlayerSprites[currentRobotIndex];
-                currentPlayerSprites.unshift(characterToken);
-                //console.log('currentPlayerSprites(after) =', currentPlayerSprites);
+                //console.log('checking characterTokenFunction(', characterToken, ', ', characterInfo, ')');
+                if (!characterTokenFunction(characterToken, characterInfo)){ delete requiredCharacters[i]; }
                 }
-            thisReadyRoom.refreshVisibleSprites();
+            requiredCharacters = Object.values(requiredCharacters);
+            //console.log('requiredCharacters =', requiredCharacters);
             }
+        else {
+            //console.log('characterToken =', characterToken);
+            requiredCharacters.push(characterToken);
+            //console.log('requiredCharacters =', requiredCharacters);
+            }
+
         // Loop through required characters and apply the changes to all of them
+        //console.log('requiredCharacters.length =', requiredCharacters.length);
         for (var i = 0; i < requiredCharacters.length; i++){
             var characterToken = requiredCharacters[i];
+            //console.log('checking characterToken', characterToken, '...');
             // If the character is doesn't exist in the index, we can't do anything to it
             if (typeof loadedCharactersIndex[characterToken] === 'undefined'){ return false; }
             if (typeof readyRoomSpritesIndex[characterToken] === 'undefined'){ return false; }
             // Otherwise we can collect info about the character
             var characterInfo = loadedCharactersIndex[characterToken];
             var spriteInfo = readyRoomSpritesIndex[characterToken];
+            if (spriteInfo.hidden){ continue; }
+            if (!spriteInfo.opacity){ continue; }
             //console.log('characterInfo =', characterInfo);
             //console.log('spriteInfo =', spriteInfo);
             // Trigger the animate function with the provided new values
+            //console.log('calling thisReadyRoom.animateCharacter(', characterKind, ', ', characterToken, ', ', newSpriteProperties, ');');
             thisReadyRoom.animateCharacter(characterKind, characterToken, newSpriteProperties);
             if (typeof cooldownValue === 'number' && cooldownValue > 0){ spriteInfo.cooldown = cooldownValue; }
         }
+
+        // Return true on success
+        return true;
+
     }
 
     // Define a function for updating a existing player sprite(s) in the ready room given values
-    thisReadyRoom.updatePlayer = function(playerToken, newSpriteProperties){
-        //console.log('thisReadyRoom.updatePlayer(playerToken:', playerToken, ', newSpriteProperties:', newSpriteProperties, ')');
-        if (typeof thisReadyRoomConfig.charactersIndex['player'] === 'undefined'){ return; }
-        return thisReadyRoom.updateCharacter('player', playerToken, newSpriteProperties);
+    thisReadyRoom.updatePlayer = function(playerToken, newSpriteProperties, createIfNotExists){
+        //console.log('thisReadyRoom.updatePlayer(playerToken:', playerToken, ', newSpriteProperties:', newSpriteProperties, ', createIfNotExists:', createIfNotExists, ')');
+        let _self = thisReadyRoom;
+        let _config = thisReadyRoomConfig;
+        if (typeof _config.charactersIndex['player'] === 'undefined'){ return; }
+        let loadedCharactersIndex = _config.charactersIndex['player'];
+        let readyRoomSpritesIndex = _config.spritesIndex;
+        if (createIfNotExists
+            && typeof playerToken === 'string'
+            && typeof loadedCharactersIndex[playerToken] !== 'undefined'
+            && typeof readyRoomSpritesIndex[playerToken] === 'undefined'){
+            //console.log('Adding new player sprite for', playerToken);
+            _self.addPlayerSprite(playerToken, loadedCharactersIndex[playerToken]);
+            }
+        return _self.updateCharacter('player', playerToken, newSpriteProperties);
     }
 
     // Define a function for updating existing robot sprite(s) in the ready room given values
-    thisReadyRoom.updateRobot = function(robotToken, newSpriteProperties){
-        //console.log('thisReadyRoom.updateRobot(robotToken:', robotToken, ', newSpriteProperties:', newSpriteProperties, ')');
-        if (typeof thisReadyRoomConfig.charactersIndex['robot'] === 'undefined'){ return; }
+    thisReadyRoom.updateRobot = function(robotToken, newSpriteProperties, createIfNotExists){
+        //console.log('thisReadyRoom.updateRobot(robotToken:', robotToken, ', newSpriteProperties:', newSpriteProperties, ', createIfNotExists:', createIfNotExists, ')');
+        let _self = thisReadyRoom;
+        let _config = thisReadyRoomConfig;
+        if (typeof _config.charactersIndex['robot'] === 'undefined'){ return; }
+        let loadedCharactersIndex = _config.charactersIndex['robot'];
+        let readyRoomSpritesIndex = _config.spritesIndex;
+        if (createIfNotExists
+            && typeof robotToken === 'string'
+            && typeof loadedCharactersIndex[robotToken] !== 'undefined'
+            && typeof readyRoomSpritesIndex[robotToken] === 'undefined'){
+            //console.log('Adding new robot sprite for', robotToken);
+            _self.addRobotSprite(robotToken, loadedCharactersIndex[robotToken]);
+            }
         return thisReadyRoom.updateCharacter('robot', robotToken, newSpriteProperties);
     }
 
@@ -1149,6 +1214,8 @@
     // Define a function for adding a new character sprite to the ready room given info
     thisReadyRoom.addCharacterSprite = function(kind, characterToken, characterInfo, spriteProperties){
         //console.log('thisReadyRoom.addCharacterSprite(kind:', kind, ', characterToken:', characterToken, ', characterInfo:', characterInfo, ', spriteProperties:', spriteProperties, ')');
+        //console.log('thisReadyRoom.addCharacterSprite(kind:', kind, ', characterToken:', characterToken, ', characterInfo:', typeof characterInfo, ', spriteProperties:', typeof spriteProperties, ')');
+        //console.log('%c' + 'thisReadyRoom.addCharacterSprite(' + kind + ', ' + characterToken + (!!characterInfo ? ', characterInfo' : '') + (!!spriteProperties ? ', spriteProperties' : '') + ')', 'color: magenta;');
         if (typeof thisReadyRoomConfig.charactersIndex[kind] === 'undefined'){ return; }
 
         // Initial setup for both player and robot
@@ -1186,11 +1253,17 @@
         //console.log('{} =', {thisToken: thisToken, thisPlayerToken: thisPlayerToken, thisRobotToken: thisRobotToken, thisShopToken: thisShopToken});
         //console.log('thisSpritePathPrefix =', thisSpritePathPrefix);
 
+        // Check to see if this is a de-facto player character or not (and thus has their own dedicated sprites under them)
+        let isPlayerCharacter = (kind === 'player' && (!characterInfo.currentPlayer || characterInfo.currentPlayer === characterToken)) ? true : false;
+
         // If this is anything but a player-character, add it to the sprites-by-player reference list
-        if (kind !== 'player'){
+        if (!isPlayerCharacter){
+            //console.log('Sprite ' + thisToken + ' is not a player character but owned by one, so we append to the list');
             if (typeof readyRoomSpritesByPlayer[thisPlayerToken] === 'undefined'){ readyRoomSpritesByPlayer[thisPlayerToken] = []; }
+            //console.log('readyRoomSpritesByPlayer['+thisPlayerToken+'](before) =', readyRoomSpritesByPlayer[thisPlayerToken]);
             readyRoomSpritesByPlayer[thisPlayerToken].push(thisToken);
-            //console.log('readyRoomSpritesByPlayer =', readyRoomSpritesByPlayer);
+            //console.log('readyRoomSpritesByPlayer['+thisPlayerToken+'](after) =', readyRoomSpritesByPlayer[thisPlayerToken]);
+            //console.log('readyRoomSpritesByPlayer['+thisPlayerToken+'] =', readyRoomSpritesByPlayer[thisPlayerToken].join(', '), '('+readyRoomSpritesByPlayer[thisPlayerToken].length+')');
             }
 
         // Common logic continues
@@ -1395,6 +1468,7 @@
             var sprite = readyRoomSpritesIndex[spriteToken];
             //console.log('spriteToken =', typeof spriteToken, spriteToken);
             //console.log('sprite =', typeof sprite, sprite);
+            if (sprite.hidden){ continue; }
             if (!sprite.opacity){ continue; }
             //console.log('targetX =', typeof targetX, targetX);
             //console.log('targetY =', typeof targetY, targetY);
@@ -1537,52 +1611,7 @@
         //console.log('thisReadyRoom.setSpriteLimit(newSpriteLimit:', newSpriteLimit, ')');
         if (typeof newSpriteLimit !== 'number'){ return; }
         thisReadyRoomConfig.spriteLimit = newSpriteLimit;
-        thisReadyRoom.refreshVisibleSprites();
-    }
-
-    // Define a function for refreshing sprite visibility given a new set of visible
-    thisReadyRoom.refreshVisibleSprites = function(){
-        //console.log('thisReadyRoom.refreshVisibleSprites()');
-        if (!thisReadyRoomConfig.isReady){ return; }
-        let readyRoomSpritesLimit = thisReadyRoomConfig.spriteLimit;
-        let readyRoomSpritesIndex = thisReadyRoomConfig.spritesIndex;
-        let readyRoomSpritesByPlayer = thisReadyRoomConfig.spritesByPlayer;
-        var readyRoomSpritesIndexTokens = Object.keys(readyRoomSpritesIndex);
-        //console.log('readyRoomSpritesLimit =', readyRoomSpritesLimit);
-        //console.log('readyRoomSpritesIndex =', readyRoomSpritesIndex);
-        //console.log('readyRoomSpritesByPlayer =', readyRoomSpritesByPlayer);
-        //console.log('readyRoomSpritesIndexTokens =', readyRoomSpritesIndexTokens);
-        let playersWithSprites = Object.keys(readyRoomSpritesByPlayer);
-        //console.log('playersWithSprites =', playersWithSprites);
-        for (var i = 0; i < playersWithSprites.length; i++){
-            var playerToken = playersWithSprites[i];
-            var allPlayerOwnedSprites = readyRoomSpritesByPlayer[playerToken];
-            var visiblePlayerOwnedSprites = allPlayerOwnedSprites.slice(0, readyRoomSpritesLimit);
-            //console.log(playerToken+' | allPlayerOwnedSprites =', allPlayerOwnedSprites);
-            //console.log(playerToken+' | visiblePlayerOwnedSprites =', visiblePlayerOwnedSprites);
-            for (var j = 0; j < allPlayerOwnedSprites.length; j++){
-                var spriteToken = allPlayerOwnedSprites[j];
-                var spriteInfo = readyRoomSpritesIndex[spriteToken];
-                if (typeof spriteInfo === 'undefined'){ continue; }
-                if (spriteInfo.subKind === 'shop'){ continue; } // skip shops
-                //console.log(playerToken+' > '+spriteToken+' | spriteInfo =', spriteInfo);
-                var spriteIsVisible = visiblePlayerOwnedSprites.indexOf(spriteToken) !== -1 ? true : false;
-                if (spriteIsVisible){
-                    //console.log(playerToken+' | '+spriteToken+' is visible');
-                    spriteInfo.hidden = false;
-                    spriteInfo.opacity = 1;
-                    spriteInfo.sprite.css({opacity: 1});
-                    } else {
-                    //console.log(playerToken+' | '+spriteToken+' is NOT visible');
-                    spriteInfo.hidden = true;
-                    spriteInfo.opacity = 0;
-                    spriteInfo.sprite.css({opacity: 0});
-                    }
-                }
-            }
-        // refresh visibility
-        thisReadyRoom.refresh();
-        return;
+        //thisReadyRoom.refreshVisibleSprites(); // TODO: rewrite this later
     }
 
     // Define a function for easily checking when the ready room is ready

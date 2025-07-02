@@ -554,6 +554,7 @@ $(document).ready(function(){
             var $thisBanner = $('.banner', $thisPrototype);
             var playersIndex = typeof gameSettings.customIndex.unlockedPlayersIndex !== 'undefined' ? gameSettings.customIndex.unlockedPlayersIndex : {};
             var robotsIndex = typeof gameSettings.customIndex.unlockedRobotsIndex !== 'undefined' ? gameSettings.customIndex.unlockedRobotsIndex : {};
+            var extraConfig = { spriteLimit: gameSettings.readyRoomSpriteLimit, framesPerSecond: 1 };
             thisReadyRoom.preloadCharacterIndex('player', playersIndex);
             thisReadyRoom.preloadCharacterIndex('robot', robotsIndex);
             thisReadyRoom.init($thisBanner, function(){
@@ -570,12 +571,7 @@ $(document).ready(function(){
                     gameSettings.readyRoomActive = true;
                     }
 
-                // If a limit has been defined, make sure we update config first
-                if (gameSettings.readyRoomSpriteLimit > 0){
-                    thisReadyRoom.limitVisibleSprites(gameSettings.readyRoomSpriteLimit);
-                    }
-
-                });
+                }, extraConfig);
             }
         }
 

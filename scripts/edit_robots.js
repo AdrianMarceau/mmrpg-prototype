@@ -227,17 +227,17 @@ $(document).ready(function(){
 
     // Define a function for showing/highlighting a robot in the above ready room when possible
     showRobotInReadyRoom = function(playerToken, robotToken){
-        //console.log('showRobotInReadyRoom(playerToken:', playerToken, 'robotToken:', robotToken, ')');
+        console.log('showRobotInReadyRoom(playerToken:', playerToken, 'robotToken:', robotToken, ')');
         // We should add the new robot to the parent ready room
         if (typeof window.parent.mmrpgReadyRoom !== 'undefined'
             && typeof window.parent.mmrpgReadyRoom.updateRobot !== 'undefined'){
             // If the extra data in dataExtra was not empty and is JSON, parse it into robotInfo
             var readyRoom = window.parent.mmrpgReadyRoom;
-            var spriteBounces = readyRoom.config.spriteBounds;
-            readyRoom.updatePlayer('all', {frame: 'base', position: [null, (spriteBounces.maxY - 2)]});
-            readyRoom.updateRobot('all', {frame: 'base', position: [null, '>=20']});
-            readyRoom.updatePlayer(playerToken, {frame: 'victory', direction: 'right', position: [44, (spriteBounces.minY - 2)]});
-            readyRoom.updateRobot(robotToken, {frame: 'victory', direction: 'left', position: [56, (spriteBounces.minY - 2)]});
+            var spriteBounds = readyRoom.config.spriteBounds;
+            readyRoom.updatePlayer('all', {frame: 'base', position: [null, (spriteBounds.maxY - 2)]});
+            readyRoom.updateRobot('all', {frame: 'base', position: [null, '>=40']});
+            readyRoom.updatePlayer(playerToken, {frame: 'victory', direction: 'right', position: [44, (spriteBounds.minY - 2)]}, true);
+            readyRoom.updateRobot(robotToken, {frame: 'victory', direction: 'left', position: [56, (spriteBounds.minY - 2)]}, true);
             }
         };
 
