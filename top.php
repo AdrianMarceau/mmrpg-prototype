@@ -32,7 +32,7 @@ if (get_magic_quotes_gpc()){
 
 // Include the anti-bot and anti-spam protection scripts
 require('includes/antibot.php');
-require('includes/autocache.php');
+//require('includes/autocache.php');
 
 // Include cms classs first and foremost
 require('classes/cms_database.php');
