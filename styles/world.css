@@ -1,0 +1,408 @@
+
+html, body {
+    background-color: rgb(38, 38, 38);
+}
+#world,
+#world #canvas {
+    display: block;
+    width: 768px;
+    height: 622px;
+}
+
+#world #canvas {
+    transition: opacity 1s linear;
+    opacity: 1.0;
+}
+#world.fastfade #canvas {
+    transition: opacity 0.3s linear;
+}
+#world:not(.ready) #canvas {
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.1;
+}
+
+#world #canvas #map {
+    display: block;
+    position: absolute;
+    overflow: hidden;
+    width: auto;
+    height: auto;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+#world #canvas #map .layer {
+    display: block;
+    position: absolute;
+    overflow: visible;
+    width: auto;
+    height: auto;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+#world #canvas #map .layer[data-layer="terrain"] { z-index: 10; }
+#world #canvas #map .layer[data-layer="spawns"] { z-index: 20; }
+#world #canvas #map .layer[data-layer="battles"] { z-index: 30; }
+#world #canvas #map .layer[data-layer="team"] { z-index: 40; }
+#world #canvas #map .layer[data-layer].has-zoom { z-index: 50; }
+
+#world #map .sprite.tile {
+    background-color: transparent;
+    background-image: url(../images/maps/overworld-experiment-v2024-tileset.png);
+    background-position: -9999px -9999px;
+    background-repeat: no-repeat;
+    background-size: auto;
+    width: 40px;
+    height: 40px;
+    top: auto;
+    left: auto;
+    bottom: auto;
+    right: auto;
+    cursor: pointer;
+    pointer-events: auto;
+}
+#world #map.busy .sprite.tile {
+    cursor: default;
+    pointer-events: none;
+}
+
+#world #map .sprite.tile.void { background-position: -160px -320px; }
+#world #map .sprite.tile.grass { background-position: -40px -320px; }
+#world #map .sprite.tile.ground { background-position: -80px -520px; }
+#world #map .sprite.tile.water { background-position: -40px -680px; }
+
+#world #map .sprite.tile.src { background-position: -80px -40px; }
+#world #map .sprite.tile.dst { background-position: -160px -40px; }
+
+#world #map .sprite.tile.col-1 { left: 0; }
+#world #map .sprite.tile.col-2 { left: 0; }
+#world #map .sprite.tile.col-3 { left: 0; }
+#world #map .sprite.tile.col-4 { left: 0; }
+#world #map .sprite.tile.col-5 { left: 0; }
+#world #map .sprite.tile.col-6 { left: 0; }
+#world #map .sprite.tile.col-7 { left: 0; }
+#world #map .sprite.tile.col-8 { left: 0; }
+#world #map .sprite.tile.col-9 { left: 0; }
+#world #map .sprite.tile.col-10 { left: 0; }
+#world #map .sprite.tile.col-11 { left: 0; }
+#world #map .sprite.tile.col-12 { left: 0; }
+#world #map .sprite.tile.col-13 { left: 0; }
+#world #map .sprite.tile.col-14 { left: 0; }
+#world #map .sprite.tile.col-15 { left: 0; }
+#world #map .sprite.tile.col-16 { left: 0; }
+#world #map .sprite.tile.col-17 { left: 0; }
+#world #map .sprite.tile.col-18 { left: 0; }
+
+#world #map .layer.terrain .sprite {
+    pointer-events: auto;
+}
+#world #map .layer.terrain .sprite.tile:before,
+#world #map .layer.terrain .sprite.tile:after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 40px;
+    height: 40px;
+    background: inherit;
+    filter: none;
+    opacity: 0.0;
+    mix-blend-mode: normal;
+    pointer-events: none;
+    transition: none;
+}
+#world #map .layer.terrain .sprite.tile:before {
+    z-index: 1;
+    opacity: 0.3;
+    mix-blend-mode: overlay;
+    background-position: -360px -600px;
+    filter: drop-shadow(2px 4px 6px black);
+    transition: opacity 0.3s, mix-blend-mode 0.3s;
+}
+#world #map:not(.busy) .layer.terrain .sprite.tile:hover:before,
+#world #map .layer.terrain .sprite.tile.focus:before  {
+    mix-blend-mode: screen;
+    opacity: 0.9;
+}
+#world #map .layer.terrain .sprite.tile:after  {
+    z-index: 2;
+    opacity: 0.0;
+    mix-blend-mode: normal;
+    background-position: -560px -520px;
+    transition: opacity 1.0s;
+}
+#world #map .layer.terrain .sprite.tile.active:after  {
+    opacity: 1.0;
+}
+
+#world #map .layer.events .sprite {
+    top: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+#world #map .layer.objects .sprite {
+    top: 0;
+    left: 0;
+    z-index: 1;
+    transform: translate(0, -8px);
+    background-image: none;
+    pointer-events: none;
+    width: 40px;
+    height: 40px;
+    overflow: visible;
+    pointer-events: none;
+}
+#world #map .layer.objects .sprite {
+    top: -160px;
+    left: -160px;
+}
+#world #map .layer.objects .sprite > .sprite {
+    filter: drop-shadow(-1px 1px 0 white);
+    width: inherit;
+    height: inherit;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: translate(0, 0) scale(1.0);
+}
+#world #map .layer.objects .sprite > .sprite_40x40 { width: 40px; height: 40px; left: 0; top: 0; }
+#world #map .layer.objects .sprite > .sprite_80x80 { width: 80px; height: 80px; left: -20px; top: -40px; }
+#world #map .layer.objects .sprite > .sprite_160x160 { width: 160px; height: 160px; left: -40px; top: -80px; }
+#world #map .layer.objects .sprite > .sprite_320x320 { width: 320px; height: 320px; left: -80px; top: -160px; }
+#world #map .layer.objects .sprite > .sprite_640x640 { width: 640px; height: 640px; left: -160px; top: -320px; }
+
+#world #map .layer.objects .sprite.cursor { z-index: 900; }
+#world #map .layer.objects .sprite.team { z-index: 100; }
+#world #map .layer.objects .sprite.team[data-key="0"] { z-index: 100; }
+#world #map .layer.objects .sprite.team[data-key="1"] { z-index: 90; }
+#world #map .layer.objects .sprite.team[data-key="2"] { z-index: 80; }
+#world #map .layer.objects .sprite.team[data-key="3"] { z-index: 70; }
+#world #map .layer.objects .sprite.team[data-key="4"] { z-index: 60; }
+#world #map .layer.objects .sprite.team[data-key="5"] { z-index: 50; }
+#world #map .layer.objects .sprite.team[data-key="6"] { z-index: 40; }
+#world #map .layer.objects .sprite.team[data-key="7"] { z-index: 30; }
+#world #map .layer.objects .sprite.team[data-key="8"] { z-index: 20; }
+#world #map .layer.objects .sprite.team[data-key="9"] { z-index: 10; }
+
+#world #map .layer.objects .sprite.team {
+    transform: scale(2.0);
+}
+
+@keyframes world-sprite-bounce {
+    0%, 100% { transform: translate(0, -8px); }
+    50% { transform: translate(0, -9px); }
+}
+#world #map .layer.objects .sprite.bounce { animation: world-sprite-bounce 1s steps(1) infinite; }
+#world #map .layer.objects .sprite.cursor.bounce { animation-duration: 0.6s; }
+#world #map .layer.objects .sprite.team.bounce { animation-duration: 1.0s; }
+
+@keyframes world-sprite-src-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.5); } }
+@keyframes world-sprite-dst-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(3); } }
+#world #map .layer.events .sprite.src.pulse { animation: world-sprite-src-pulse 2s ease-in infinite; }
+#world #map .layer.events .sprite.dst.pulse { animation: world-sprite-dst-pulse 4s ease-in infinite; }
+
+
+#world #map .layer.events .sprite > .sprite {
+    transform-origin: bottom;
+    transform: scale(1.0);
+    opacity: 1.0;
+    filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.6));
+    transition: transform 0.3s, opacity 0.3s, filter 0.3s;
+}
+#world #map .layer.events .sprite.zoom > .sprite {
+    transform: scale(2);
+}
+#world #map .layer.events.has-zoom .sprite:not(.zoom) > .sprite {
+    /* opacity: 0.6; */
+    filter: brightness(0.6) drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.6));
+}
+
+#world #canvas #click-overlay {
+    display: block;
+    position: absolute;
+    width: 752px;
+    height: 606px;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    pointer-events: none;
+    overflow: visible;
+    pointer-events: all;
+    opacity: 1.0;
+    transition: opacity 0.3s;
+    /* outline: 1px dotted magenta; */
+    /* background-color: lime; */
+    /* background-color: rgb(0 255 0 / 52%); */
+}
+#world #canvas #click-overlay:not(.active) {
+    /* display: none; */
+    pointer-events: none;
+    opacity: 0.0;
+}
+#world #canvas #click-overlay > .wrapper {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#world #canvas #action-dropdown {
+    display: block;
+    position: absolute;
+    z-index: 25;
+    width: 40px;
+    height: 40px;
+    overflow: visible;
+    pointer-events: all;
+    opacity: 1.0;
+    transition: opacity 0.3s;
+    /* background-color: rgba(255, 0, 255, 0.6); */
+    /* outline: 1px dotted magenta; */
+}
+#world #canvas #action-dropdown:not(.active) {
+    /* display: none; */
+    pointer-events: none;
+    opacity: 0.0;
+}
+#world #canvas #action-dropdown > .wrapper {
+    display: block;
+    position: absolute;
+    top: auto;
+    right: auto;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -45px);
+    width: 150px;
+    height: auto;
+    min-height: 30px;
+    pointer-events: inherit;
+    color: #cfcfcf;
+    font-family: monospace;
+    text-align: left;
+    font-size: 12px;
+    line-height: 1.3;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-bottom: 20px solid rgba(0, 0, 0, 0.5);
+    box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+#world #canvas #action-dropdown[data-dir*="left"] > .wrapper { display: block; }
+#world #canvas #action-dropdown[data-dir*="right"] > .wrapper { display: block; }
+
+#world #canvas #action-dropdown .label,
+#world #canvas #action-dropdown .button {
+    display: block;
+    position: relative;
+    clear: both;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    height: auto;
+    font-family: monospace;
+    text-align: left;
+    color: #cfcfcf;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+#world #canvas #action-dropdown .label {
+    font-weight: bold;
+    margin: 0 0 4px 0;
+}
+#world #canvas #action-dropdown .button {
+    margin: 0 2px 2px 0;
+    padding: 3px 6px;
+    border: 1px solid transparent;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    pointer-events: all;
+    transition: border 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+#world #canvas #action-dropdown .button:hover {
+    border: 1px solid #cfcfcf;
+    background-color: rgba(0, 0, 0, 0.7);
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+}
+#world #canvas #action-dropdown .button:before {
+    content: "\0000bb";
+    display: inline-block;
+    position: relative;
+    padding-right: 6px;
+}
+
+
+#world #canvas #position-display {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 1000;
+    width: auto;
+    height: auto;
+    pointer-events: none;
+    color: #cfcfcf;
+    background-color: rgba(0, 0, 0, 0.5);
+    font-family: monospace;
+    text-align: left;
+    font-size: 12px;
+    line-height: 1.2;
+    padding: 4px 16px;
+    border-radius: 6px 0 0 0;
+    box-shadow: -1px -1px 3px rgba(98, 98, 98, 0.3);
+}
+#world #canvas #position-display > .wrapper {
+    display: block;
+    position: static;
+    width: auto;
+    height: auto;
+}
+
+/* MAYBE MAYBE MAYBE? */
+
+#world #canvas #map .layer.terrain:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    background-color: transparent;
+    background-color: transparent;
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(255, 255, 255, 0.3));
+    mix-blend-mode: overlay;
+    opacity: 0.6;
+}
+
+/* MAYBE MAYBE MAYBE? */
+
+/* TEMP TEMP TEMP */
+
+#world #map .layer.objects .sprite.cursor > .sprite {
+    /* transform: scaleY(-1) translate(0, -6px); */
+    transform: translate(-8px, 24px);
+    filter: drop-shadow(-1px -1px 0 white);
+}
+
+#world #map .layer.objects .sprite.team.player[data-dir="left"] > .sprite,
+#world #map .layer.objects .sprite.team.robot[data-dir="left"] > .sprite {
+    transform: scaleX(-1);
+}
+
+/* TEMP TEMP TEMP */
