@@ -44,9 +44,9 @@ class rpg_mission {
         $temp_target_playerid = rpg_game::unique_player_id($temp_target_userid, 0);
 
         $battle_omega = array();
-        $battle_omega['flags'] = array();
-        $battle_omega['counters'] = array();
-        $battle_omega['values'] = array();
+        $battle_omega['flags'] = !empty($battle_config['flags']) ? $battle_config['flags'] : array();
+        $battle_omega['counters'] = !empty($battle_config['counters']) ? $battle_config['counters'] : array();
+        $battle_omega['values'] = !empty($battle_config['values']) ? $battle_config['values'] : array();
         $battle_omega['battle_token'] = !empty($battle_config['token']) ? $battle_config['token'] : $battle_token;
         $battle_omega['battle_size'] = !empty($battle_config['size']) ? $battle_config['size'] : '1x4';
         $battle_omega['battle_phase'] = !empty($battle_config['phase']) ? $battle_config['phase'] : '';
