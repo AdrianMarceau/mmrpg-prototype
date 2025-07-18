@@ -335,7 +335,8 @@ $(document).ready(function(){
         $('.option[data-token]', thisContext).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
-            //alert('option clicked!');
+            //console.log('option clicked!');
+
             // If we're already loading another option click, return false
             if (typeof gameSettings.customValues.optionClicked !== 'undefined'){ return false; }
             // If this option is in the banner, return false
@@ -352,12 +353,14 @@ $(document).ready(function(){
                 clearTimeout(gameSettings.customValues.optionClicked);
                 delete gameSettings.customValues.optionClicked;
                 }, 1000);
+
             // Trigger the prototype option function
             prototype_menu_click_option(thisContext, this, function(){
                 //console.log('onComplete triggered for optionClicked');
                 clearTimeout(gameSettings.customValues.optionClicked);
                 delete gameSettings.customValues.optionClicked;
                 });
+
             });
 
         // Create the click events for the prototype menu back button
@@ -649,7 +652,7 @@ function mmrpg_trigger_reset(fullReset){
 
 // Define a function to trigger when resetting data
 function mmrpg_trigger_new_game_plus(buttonObject, playerToken, playerName){
-    console.log('mmrpg_trigger_new_game_plus()');
+    //console.log('mmrpg_trigger_new_game_plus()');
 
     if (typeof buttonObject === 'undefined' || !buttonObject){ return false; }
     if (typeof playerToken === 'undefined' || !playerToken){ return false; }
@@ -955,7 +958,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
     if (!thisToken.length){
         onComplete();
         return false;
-    }
+        }
 
     // If the next limit was set, apply to the next step
     if (nextLimit){
@@ -1075,9 +1078,16 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
 
             // Count the number of available missions right now
             var availableMissions = $('.option[data-token]', tempShowOptionWrapper);
+            //console.log('availableMissions =', availableMissions);
             $('.header', tempMenu).find('.count').html('Mission Select ('+(availableMissions.length == 1 ? '1 Mission' : availableMissions.length+' Missions')+')');
             $('.menu[data-select="this_battle_token"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
             $('.menu[data-select="this_player_robots"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
+
+            // If a temporary/psuedo player token was clicked, make sure we auto-clear it
+            if (battleOptions['this_player_token'] === 'player'){
+                battleOptions['this_player_token'] = '';
+                battleOptions['this_player_id'] = 0;
+                }
 
             break;
             }
@@ -1596,10 +1606,14 @@ function prototype_menu_switch_action(switchOptions){
     if (switchOptions.stepNumber == 1){
         parent.mmrpg_music_load('misc/player-select', true, false);
         } else if (switchOptions.stepNumber == 2){
-        var newMusicToken = $('.select_this_player .option_this-player-select[data-token="'+battleOptions['this_player_token']+'"]', thisContext).attr('data-music-token');
-        //console.log('newMusicToken = '+newMusicToken);
-        var newMusicPath = newMusicToken.indexOf('/') === -1 ? 'misc/'+newMusicToken : newMusicToken;
-        parent.mmrpg_music_load(newMusicPath, true, false);
+        var $select = $('.select_this_player', thisContext),
+            $option = $('.option_this-player-select[data-token="'+battleOptions['this_player_token']+'"]', $select);
+        if ($option.is('[data-music-token]')){
+            var newMusicToken = $option.attr('data-music-token');
+            //console.log('newMusicToken = '+newMusicToken);
+            var newMusicPath = newMusicToken.indexOf('/') === -1 ? 'misc/'+newMusicToken : newMusicToken;
+            parent.mmrpg_music_load(newMusicPath, true, false);
+            }
         }
 
     // Define the prototype context events

@@ -1369,6 +1369,11 @@ body.mobileFlag_landscapeMode #prototype .option_wrapper_missions .chapter_selec
     border-color: #1A1A1A !important;
 }
 */
+#prototype .option_disabled {
+    cursor: not-allowed;
+    filter: brightness(0.8) saturate(0.8);
+    pointer-events: none;
+}
 #prototype .option_message {
     margin-top: 10px;
     background-color: transparent;
@@ -1582,7 +1587,10 @@ body[data-source="website"] #prototype .menu {
     background-image: url(../images/menus/menu-options_this-player-select.gif);
     background-repeat: repeat;
     background-position: 0 0;
-    animation: player-button-background-scroll 60s linear infinite;
+    animation: player-button-background-scroll 120s linear infinite;
+    border-color: #1A1A1A;
+    outline: 2px solid transparent;
+    background-blend-mode: overlay;
 }
 #mmrpg #prototype .option_this-battle-select {
     background-image: url(../images/menus/menu-options_this-battle-select.gif);
@@ -1600,10 +1608,6 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype .option_this-dr-light-select {
     background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif);
 }
-#mmrpg #prototype .option_this-dr-light-player-select {
-    background-image: url(../images/menus/menu-options_this-dr-light-player-select.gif);
-    animation: player-button-background-scroll 120s linear infinite;
-}
 #mmrpg #prototype .option_this-dr-light-battle-select {
     background-image: url(../images/menus/menu-options_this-dr-light-battle-select.gif);
 }
@@ -1616,10 +1620,6 @@ body[data-source="website"] #prototype .menu {
 
 #mmrpg #prototype .option_this-dr-wily-select {
     background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif);
-}
-#mmrpg #prototype .option_this-dr-wily-player-select {
-    background-image: url(../images/menus/menu-options_this-dr-wily-player-select.gif);
-    animation: player-button-background-scroll 90s linear infinite;
 }
 #mmrpg #prototype .option_this-dr-wily-battle-select {
     background-image: url(../images/menus/menu-options_this-dr-wily-battle-select.gif);
@@ -1634,10 +1634,6 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype .option_this-dr-cossack-select {
     background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
 }
-#mmrpg #prototype .option_this-dr-cossack-player-select {
-    background-image: url(../images/menus/menu-options_this-dr-cossack-player-select.gif);
-    animation: player-button-background-scroll 60s linear infinite;
-}
 #mmrpg #prototype .option_this-dr-cossack-battle-select {
     background-image: url(../images/menus/menu-options_this-dr-cossack-battle-select.gif);
 }
@@ -1646,6 +1642,18 @@ body[data-source="website"] #prototype .menu {
 }
 #mmrpg #prototype .option_this-dr-cossack-team-select {
     background-image: url(../images/menus/menu-options_this-dr-cossack-team-select.gif);
+}
+
+#mmrpg #prototype .option_this-player-select.option_none,
+#mmrpg #prototype .option_this-player-select.option_proxy {
+
+}
+#mmrpg #prototype .option_this-player-select.option_1x4 div label .multi {
+    text-align: center;
+}
+#mmrpg #prototype .option_this-player-select.option_1x4 div label .multi > span {
+    left: 50%;
+    transform: translate(-50%, 0);
 }
 
 #mmrpg #prototype .option_this-player-select {
@@ -2241,9 +2249,9 @@ body[data-source="website"] #prototype .menu {
     background-size: cover;
 }
 @keyframes border-pulsate {
-    0%   { border-color: #C0C0C0; }
-    50% { border-color: #1A1A1A; }
-    100%   { border-color: #C0C0C0; }
+    0%   { border-color: #C0C0C0; outline-color: #C0C0C0; }
+    50% { border-color: #1A1A1A; outline-color: #1A1A1A; }
+    100%   { border-color: #C0C0C0; outline-color: #C0C0C0; }
 }
 #mmrpg #prototype .option[data-token] {
     -moz-transition: border 0.1s linear;
