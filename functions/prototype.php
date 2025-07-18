@@ -1376,27 +1376,33 @@ function mmrpg_prototype_battles_failure($player_token = '', $unique = true, &$b
 }
 
 // Define a function for checking is a prototype player has been unlocked
-function mmrpg_prototype_players_unlocked(){
+function mmrpg_prototype_players_unlocked($return_tokens = false){
     // Check if this battle has been completed and return true is it was
     $session_token = mmrpg_game_token();
-    return isset($_SESSION[$session_token]['values']['battle_rewards']) ? count($_SESSION[$session_token]['values']['battle_rewards']) : 0;
+    $battle_rewards = isset($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
+    if ($return_tokens){ return array_keys($battle_rewards); }
+    else { return count($battle_rewards); }
 }
 
 // Define a function for checking is a prototype robot has been unlocked
-function mmrpg_prototype_robots_unlocked($player_token = ''){
+function mmrpg_prototype_robots_unlocked($player_token = '', $return_tokens = false){
     // Define the game session helper var
     $session_token = mmrpg_game_token();
+    $battle_rewards = isset($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
     if (!empty($player_token)){
-        // Check if this battle has been completed and return true is it was
-        return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots']) ? count($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots']) : 0;
+        $player_robots = isset($battle_rewards[$player_token]['player_robots']) ? $battle_rewards[$player_token]['player_robots'] : array();
+        if ($return_tokens){ return array_keys($player_robots); }
+        else { return count($player_robots); }
     } else {
-        $robot_counter = 0;
-        foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_info){
-            $robot_counter += isset($player_info['player_robots']) ? count($player_info['player_robots']) : 0;
+        $all_player_robots = array();
+        foreach ($battle_rewards AS $player_token => $player_info){
+            if (empty($player_info['player_robots'])){ continue; }
+            $player_robots = $player_info['player_robots'];
+            $all_player_robots = array_merge($all_player_robots, $player_robots);
         }
-        return $robot_counter;
+        if ($return_tokens){ return array_keys($all_player_robots); }
+        else { return count($all_player_robots); }
     }
-
 }
 
 // Define a function for getting a players unlocked index for reference
