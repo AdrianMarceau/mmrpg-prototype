@@ -459,7 +459,7 @@ $(document).ready(function(){
                 let thisPos = getTileAtPosition($clickOverlay, e.pageX, e.pageY);
                 if (thisPos === oldPos || thisPos === lastMouseClick){ return; }
                 lastMouseClick = thisPos;
-                console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
+                //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
                 focusLayerTile(layerToken, thisPos);
                 if (focusTimeouts[oldPos]){ clearTimeout(focusTimeouts[oldPos]); }
                 focusTimeouts[thisPos] = setTimeout(function(){
@@ -474,7 +474,7 @@ $(document).ready(function(){
                 let thisPos = getTileAtPosition($clickOverlay, e.pageX, e.pageY);
                 if (thisPos === lastMouseMove){ return; }
                 lastMouseMove = thisPos;
-                console.log('%c' + 'Mouse move event triggered at position ' + thisPos + '!', 'color: orange;');
+                //console.log('%c' + 'Mouse move event triggered at position ' + thisPos + '!', 'color: orange;');
                 hoverLayerTile(layerToken, thisPos);
                 if (hoverTimeouts[thisPos]){ clearTimeout(hoverTimeouts[thisPos]); }
                 hoverTimeouts[thisPos] = setTimeout(function(){
@@ -600,6 +600,10 @@ $(document).ready(function(){
             let _world = gameSettings.worldState;
             let _worldCursor = _world.cursor;
             let _mapEffects = _config.mapEffects;
+            let _userId = _config.userId;
+            let _playerId = _config.playerId;
+            let _playerToken = _config.playerToken;
+            let _playerRobots = _config.playerRobots;
             let $worldDiv = _elements.world;
             let $canvasMap = _elements.map;
             let thisNewCol = parseInt(newPosition[0]);
@@ -631,7 +635,7 @@ $(document).ready(function(){
                         showDropdown = true;
                         dropdownMarkup += '<strong class="label">Battle Options</strong>';
                         dropdownMarkup += '<a class="button" data-action="battle-info" data-battle="'+dataBattle+'"><span>View Details</span></a>';
-                        dropdownMarkup += '<a class="button" data-action="battle" data-battle="'+dataBattle+'"><span>Start Battle</span></a>';
+                        if (_playerRobots.length){  dropdownMarkup += '<a class="button" data-action="battle" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
                         }
                     if (showDropdown){
                         $('> .wrapper', $actionsDropdown).html(dropdownMarkup);
@@ -652,13 +656,13 @@ $(document).ready(function(){
                                 console.log('-> starting battle with ID ' + battleId + '!');
                                 // battle.php?wap=false&this_user_id=412&this_player_token=dr-light&this_player_id=3&this_battle_token=dr-light-phase0-met&this_player_robots=137_mega-man,203_roll,171_pirate-man
                                 console.log('-> gathering battle variables...');
-                                console.log('-> _config.userId =', _config.userId, '\n', '-> _config.playerId =', _config.playerId, '\n', '-> _config.playerToken =', _config.playerToken, '\n', '-> _config.playerRobots =', _config.playerRobots);
+                                console.log('-> _userId =', _userId, '\n', '-> _playerId =', _playerId, '\n', '-> _playerToken =', _playerToken, '\n', '-> _config.playerRobots =', _config.playerRobots);
                                 let battleVars = [];
                                 battleVars.push('wap=false'); // i hate this
-                                battleVars.push('this_user_id=' + _config.userId);
-                                battleVars.push('this_player_id=' + _config.playerId);
-                                battleVars.push('this_player_token=' + _config.playerToken);
-                                battleVars.push('this_player_robots=' + _config.playerRobots.join(','));
+                                battleVars.push('this_user_id=' + _userId);
+                                battleVars.push('this_player_id=' + _playerId);
+                                battleVars.push('this_player_token=' + _playerToken);
+                                battleVars.push('this_player_robots=' + _playerRobots.join(','));
                                 battleVars.push('this_battle_token=' + battleId);
                                 //battleVars.push('this_battle_token=dr-light-phase0-met'); // DEBUG
                                 let battleHref = 'battle.php?' + battleVars.join('&');

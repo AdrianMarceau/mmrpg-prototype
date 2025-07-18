@@ -43,6 +43,21 @@ $get_xkind = function($kind){
         }
     };
 
+// Define a quick function for getting a random position on a given grid
+// TODO: Define this as an actual function instead of a variable
+$get_randpos = function($cols, $rows, $inset = 0){
+    static $used;
+    if (!$used){ $used = array(); }
+    if (!$cols || !$rows){ return false; }
+    do {
+        $col = mt_rand($inset, ($cols - $inset));
+        $row = mt_rand($inset, ($rows - $inset));
+        $pos = $col.'-'.$row;
+    } while (in_array($pos, $used));
+    $used[] = $pos;
+    return $pos;
+    };
+
 // create a reusable method for the above that takes args and generates markup to return as a string
 // TODO:  Define this as an actual function instead of a variable
 $get_sprite = function($kind, $token, $alt = '', $dir = 'right', $class = '', $styles = '', $attrs = ''){
@@ -166,9 +181,33 @@ $this_prototype_data = array();
 $this_prototype_data['this_current_chapter'] = -1; // required
 $this_prototype_data['battle_phase'] = 1; // required
 $this_prototype_data['battle_round'] = 1; // required
-$this_prototype_data['this_player_id'] = 3; // DEBUG
-$this_prototype_data['this_player_token'] = 'dr-light'; // DEBUG
-$this_prototype_data['this_player_robots'] = array('137_mega-man', '203_roll', '171_pirate-man'); // DEBUG
+$this_prototype_data['this_player_id'] = 1; // required
+$this_prototype_data['this_player_token'] = 'player'; // DEBUG
+$this_prototype_data['this_player_robots'] = array(); // DEBUG
+
+// DEBUG DEBUG DEBUG
+//$this_prototype_data['this_player_token'] = 'dr-light'; // DEBUG
+//$this_prototype_data['this_player_robots'] = array('137_mega-man', '203_roll', '171_pirate-man'); // DEBUG
+
+// DEBUG DEBUG DEBUG(?)
+$allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
+$request_player_token = isset($_REQUEST['player']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['player']) ? trim($_REQUEST['player']) : '';
+if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){
+    $this_prototype_data['this_player_token'] = $request_player_token;
+    $allowed_player_robots = mmrpg_prototype_robots_unlocked($request_player_token, true);
+    $max_player_robots = 8; // TODO: make this dynamic based on limit hearts
+    if (!empty($allowed_player_robots)){
+        $request_player_robots = array();
+        foreach ($allowed_player_robots AS $robot_token){
+            if (empty($mmrpg_index_robots[$robot_token])){ continue; }
+            $robot_info = $mmrpg_index_robots[$robot_token];
+            $robot_id = $robot_info['robot_id'];
+            $robot_string = $robot_id . '_' . $robot_token;
+            $request_player_robots[] = $robot_string;
+        }
+        $this_prototype_data['this_player_robots'] = array_slice($request_player_robots, 0, $max_player_robots);
+    }
+}
 
 // DEBUG DEBUG DEBUG
 $debug_flag_animation = true;
@@ -295,30 +334,18 @@ $flag_skip_fadein = true;
                 ?>
                 <div class="layer layer-3 events objects" data-layer="battles" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
-                    $get_randpos = function($cols, $rows, $inset = 0){
-                        static $used;
-                        if (!$used){ $used = array(); }
-                        if (!$cols || !$rows){ return false; }
-                        do {
-                            $col = mt_rand($inset, ($cols - $inset));
-                            $row = mt_rand($inset, ($rows - $inset));
-                            $pos = $col.'-'.$row;
-                        } while (in_array($pos, $used));
-                        $used[] = $pos;
-                        return $pos;
-                        };
-                    $mooks = array('met', 'flea', 'batton', 'mouslider');
-                    $debug_battles = array();
-                    $max_battles = 10;
-                    for ($i = 0; $i < $max_battles; $i++){
-                        $robot = $mooks[mt_rand(0, count($mooks) - 1)];
+                    $random_encounters = array();
+                    $max_random_encounters = 10;
+                    $allowed_random_encounters = array('met', 'flea', 'batton', 'mouslider');
+                    for ($i = 0; $i < $max_random_encounters; $i++){
+                        $robot = $allowed_random_encounters[mt_rand(0, count($allowed_random_encounters) - 1)];
                         $randpos = $get_randpos($map_col_size, $map_row_size, 4);
                         $battle_token = 'some-battle-token-'.($i + 1);
-                        $debug_battles[] = array('robot', $robot, '', $randpos, $battle_token);
+                        $random_encounters[] = array('robot', $robot, '', $randpos, $battle_token);
                         $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
                             'token' => $battle_token,
-                            'name' => ('Debug Battle '.($i + 1).'/'.$max_battles),
-                            'description' => 'This is a debug battle.  It is '.($i + 1).'/'.$max_battles.' in a series of debug battles.',
+                            'name' => ('Debug Battle '.($i + 1).'/'.$max_random_encounters),
+                            'description' => 'This is a debug battle.  It is '.($i + 1).'/'.$max_random_encounters.' in a series of debug battles.',
                             'turns' => 1234,
                             'zenny' => 5678,
                             'field' => 'gentle-countryside',
@@ -326,12 +353,12 @@ $flag_skip_fadein = true;
                             ), true);
                         //exit('omg $battle_omega = '.print_r($battle_omega, true));
                         }
-                    //$debug_battles[] = array('robot', 'met', '', $randpos(), 'some-battle-token-1');
-                    //$debug_battles[] = array('robot', 'snapper', '', $randpos(), 'some-battle-token-2');
-                    //$debug_battles[] = array('robot', 'batton', '', $randpos(), 'some-battle-token-3');
+                    //$random_encounters[] = array('robot', 'met', '', $randpos(), 'some-battle-token-1');
+                    //$random_encounters[] = array('robot', 'snapper', '', $randpos(), 'some-battle-token-2');
+                    //$random_encounters[] = array('robot', 'batton', '', $randpos(), 'some-battle-token-3');
                     $battle_symbols = array();
                     $battle_index = array();
-                    foreach ($debug_battles as $battle){
+                    foreach ($random_encounters as $battle){
                         $kind = $battle[0];
                         $xkind = $get_xkind($kind);
                         $token = $battle[1];
@@ -359,7 +386,7 @@ $flag_skip_fadein = true;
                             'pos' => $position,
                             );
                         }
-                    //error_log('$debug_battles = '.print_r($debug_battles, true));
+                    //error_log('$random_encounters = '.print_r($random_encounters, true));
                     $battle_symbols_json = json_encode($battle_symbols, JSON_NUMERIC_CHECK);
                     $battle_index_json = json_encode($battle_index, JSON_NUMERIC_CHECK);
                     echo('<script data-json="battleSymbols" type="application/json">'.$battle_symbols_json.'</script>');
@@ -375,42 +402,28 @@ $flag_skip_fadein = true;
                 ?>
                 <div class="layer layer-4 objects characters" data-layer="team" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
-                    // Define the team for testing purposes
+                    // Collect the current team members from the prototype data
                     $team = array();
-                    // Debug 01
-                    //$team[] = array('player', 'dr-light');
-                    //$team[] = array('robot', 'mega-man');
-                    //$team[] = array('robot', 'roll');
-                    //$team[] = array('robot', 'rush');
-                    // Debug 02
-                    //$team[] = array('player', 'dr-wily');
-                    //$team[] = array('robot', 'bass');
-                    //$team[] = array('robot', 'disco');
-                    //$team[] = array('robot', 'treble');
-                    // Debug 03
-                    //$team[] = array('player', 'dr-cossack');
-                    //$team[] = array('robot', 'proto-man');
-                    //$team[] = array('robot', 'rhythm');
-                    //$team[] = array('robot', 'tango');
-                    // Debug 03
-                    $team[] = array('robot', 'slash-man');
-                    $team[] = array('robot', 'rush');
-                    $team[] = array('robot', 'treble');
-                    $team[] = array('robot', 'tango');
-                    // MM1 Robot Masters
-                    //$team[] = array('robot', 'cut-man');
-                    //$team[] = array('robot', 'guts-man');
-                    //$team[] = array('robot', 'ice-man');
-                    //$team[] = array('robot', 'bomb-man');
-                    //$team[] = array('robot', 'fire-man');
-                    //$team[] = array('robot', 'elec-man');
-                    //$team[] = array('robot', 'time-man');
-                    //$team[] = array('robot', 'oil-man');
-                    // Dex w/ Impact Types
-                    //$team[] = array('player', 'proxy', 'alt7');
-                    //$team[] = array('robot', 'guts-man');
-                    //$team[] = array('robot', 'impact-man');
-                    //$team[] = array('robot', 'block-man');
+                    $team_player_token = !empty($this_prototype_data['this_player_token']) ? $this_prototype_data['this_player_token'] : 'player';
+                    $team_player_robots = !empty($this_prototype_data['this_player_robots']) ? $this_prototype_data['this_player_robots'] : array();
+                    if (!empty($team_player_token) && $team_player_token !== 'player'){
+                        //error_log('adding player "'.$team_player_token.'" to team');
+                        $player_token = $team_player_token;
+                        $player = array('player', $player_token);
+                        $team[] = $player;
+                    }
+                    if (!empty($team_player_robots) && is_array($team_player_robots)){
+                        foreach ($team_player_robots AS $robot_string){
+                            //error_log('adding robot "'.$robot_token.'" to team');
+                            list($robot_id, $robot_token) = explode('_', $robot_string, 2);
+                            $robot = array('robot', $robot_token);
+                            $robot_settings = rpg_game::robot_settings($team_player_token, $robot_token);
+                            $robot_image = !empty($robot_settings['robot_image']) ? $robot_settings['robot_image'] : '';
+                            if (!empty($robot_image) && $robot_image !== $robot_token){ $robot[] = explode('_', $robot_image, 2)[1]; }
+                            $team[] = $robot;
+                        }
+                    }
+                    //error_log('$team = '.print_r($team, true));
                     // Generate the markup for the cursor and team sprites
                     $obj = 'cursor';
                     //$sprite = 'images/items/empty-shard/icon_right_40x40.png';
