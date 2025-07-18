@@ -554,6 +554,13 @@ if ($this_action == 'prototype'){
     require_once('battle/actions/prototype.php');
 
 }
+// Else if the player is has requested the world map
+elseif ($this_action == 'world'){
+
+    // Require the prototype action file
+    require_once('battle/actions/world.php');
+
+}
 // Else if the player is has requested to withdraw from the battle (endless mode)
 elseif ($this_action == 'withdraw'){
 

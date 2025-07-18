@@ -7,6 +7,7 @@ ob_start();
 	$is_challenge_battle = !empty($this_battle->flags['challenge_battle']) ? true : false;
 	$is_endless_battle = !empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle']) ? true : false;
 	$has_endless_progress = $is_endless_battle && !empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token]) ? true : false;
+	$is_world_battle = !empty($this_battle->flags['world_battle']) && !empty($this_battle->flags['world_battle']) ? true : false;
 
 	// Define the markup for the option buttons
 	$temp_options = array();
@@ -40,8 +41,11 @@ ob_start();
 
 		// Display the option for RETURN TO MAIN MENU
 		$block_num++;
+		$text = $is_world_battle ? 'Return&nbsp;To<br />World&nbsp;Map' : 'Return&nbsp;To<br />Main&nbsp;Menu';
+		$action = $is_world_battle ? 'world' : 'prototype';
 		$after_icon = '<i class="after fa fas fa-home" style="position: absolute; top: -5px; right: -5px;"></i>';
-		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu'.$after_icon.'</span></label></a>';
+		$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="'.$action.'"><label><span class="multi">'.$text.$after_icon.'</span></label></a>';
+		//$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option block_'.$block_num.' ability_type_attack" type="button" data-action="prototype"><label><span class="multi">Return&nbsp;To<br />Main&nbsp;Menu'.$after_icon.'</span></label></a>';
 
     }
     // If we're in ENDLESS MODE, display the SAVE button here
