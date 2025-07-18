@@ -451,15 +451,15 @@ $(document).ready(function(){
             let $clickOverlay = $('#click-overlay', $canvasMap);
             let focusTimeouts = {}, focusTimeoutDuration = _config.mapEffects.focusTimeout;
             let hoverTimeouts = {}, hoverTimeoutDuration = _config.mapEffects.hoverTimeout;
-            let lastMouseClick, lastMouseMove;
+            let lastMouseClick, lastMouseOver;
             $clickOverlay.bind('click', function(e){
                 if (_cursor.moving){ return false; }
                 //console.log('%c' + 'Map overlay click event!', 'color: cyan;');
                 let oldPos = _cursor.position;
                 let thisPos = getTileAtPosition($clickOverlay, e.pageX, e.pageY);
                 if (thisPos === oldPos || thisPos === lastMouseClick){ return; }
-                lastMouseClick = thisPos;
                 //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
+                lastMouseClick = thisPos;
                 focusLayerTile(layerToken, thisPos);
                 if (focusTimeouts[oldPos]){ clearTimeout(focusTimeouts[oldPos]); }
                 focusTimeouts[thisPos] = setTimeout(function(){
@@ -472,15 +472,16 @@ $(document).ready(function(){
                 if (_cursor.moving){ return false; }
                 //console.log('%c' + 'Map overlay mousemove event!', 'color: cyan;');
                 let thisPos = getTileAtPosition($clickOverlay, e.pageX, e.pageY);
-                if (thisPos === lastMouseMove){ return; }
-                lastMouseMove = thisPos;
+                if (thisPos === lastMouseOver){ return; }
                 //console.log('%c' + 'Mouse move event triggered at position ' + thisPos + '!', 'color: orange;');
+                lastMouseOver = thisPos;
                 hoverLayerTile(layerToken, thisPos);
                 if (hoverTimeouts[thisPos]){ clearTimeout(hoverTimeouts[thisPos]); }
                 hoverTimeouts[thisPos] = setTimeout(function(){
                     unhoverLayerTile(layerToken, thisPos);
                     }, hoverTimeoutDuration);
                 });
+            // Return true on success
             return true;
             }
 
@@ -678,13 +679,27 @@ $(document).ready(function(){
             return true;
             }
 
-        // Collect details about the map cursor if it exists
+        // Collect the map cursor element and automatically move it to the spawn position
         let $mapCursor = $mapLayers.filter('.objects').find('.sprite.cursor');
         if ($mapCursor && $mapCursor.length){
             let cursorPosition = $mapCursor.attr('data-pos');
             let autoMoveTimeout = setTimeout(function(){
                 moveToPosition(cursorPosition, null, true);
                 }, 300);
+            }
+
+        // Bind a click event to the home button in the header that'll bring us to prototype menu
+        let $homeButton = $('#home-button', $thisWorld);
+        if ($homeButton && $homeButton.length){
+            $homeButton.bind('click', function(e){
+                e.preventDefault();
+                console.log('%c' + 'Home button clicked!', 'color: cyan;');
+                if (!confirm('Are you sure you want to leave the world map?')){ return; }
+                $thisWorld.addClass('hidden');
+                let homeMenuURL = $homeButton.attr('data-home-url') || 'prototype.php';
+                window.location.href = homeMenuURL;
+                return true;
+                });
             }
 
         }

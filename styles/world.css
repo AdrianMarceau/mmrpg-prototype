@@ -239,6 +239,7 @@ html, body {
     pointer-events: all;
     opacity: 1.0;
     transition: opacity 0.3s;
+    background-color: transparent;
     /* outline: 1px dotted magenta; */
     /* background-color: lime; */
     /* background-color: rgb(0 255 0 / 52%); */
@@ -348,30 +349,60 @@ html, body {
 }
 
 
-#world #canvas #position-display {
+#world #canvas .chrome {
     position: absolute;
-    bottom: 0;
-    right: 0;
     z-index: 1000;
     width: auto;
     height: auto;
-    pointer-events: none;
-    color: #cfcfcf;
+    color: #efefef;
     background-color: rgba(0, 0, 0, 0.5);
     font-family: monospace;
     text-align: left;
     font-size: 12px;
     line-height: 1.2;
     padding: 4px 16px;
-    border-radius: 6px 0 0 0;
-    box-shadow: -1px -1px 3px rgba(98, 98, 98, 0.3);
+    border-radius: 6px;
+    box-shadow: 0 0 3px rgba(98, 98, 98, 0.3);
+    pointer-events: none;
 }
-#world #canvas #position-display > .wrapper {
+#world #canvas .chrome > .wrapper {
     display: block;
     position: static;
     width: auto;
     height: auto;
 }
+#world #canvas #position-display {
+    bottom: 0;
+    right: 0;
+    z-index: 1001;
+    color: #cfcfcf;
+    font-family: monospace;
+    text-align: right;
+    font-size: 12px;
+    line-height: 1.2;
+    border-radius: 6px 0 0 0;
+}
+#world #canvas #home-button {
+    top: 0;
+    left: 0;
+    z-index: 1002;
+    color: #ffffff;
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.2;
+    padding: 12px;
+    border-radius: 0 0 6px 0;
+    pointer-events: all;
+    cursor: pointer;
+}
+#world #canvas #home-button i {
+    transform: scale(1.0);
+    transition: transform 0.3s;
+}
+#world #canvas #home-button:hover i {
+    transform: scale(1.2);
+}
+
 
 /* MAYBE MAYBE MAYBE? */
 

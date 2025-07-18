@@ -349,7 +349,8 @@ $flag_skip_fadein = true;
                             'turns' => 1234,
                             'zenny' => 5678,
                             'field' => 'gentle-countryside',
-                            'target' => array('robots' => array('token' => $robot))
+                            'target' => array('robots' => array('token' => $robot)),
+                            'flags' => array('world_battle' => true),
                             ), true);
                         //exit('omg $battle_omega = '.print_r($battle_omega, true));
                         }
@@ -461,7 +462,8 @@ $flag_skip_fadein = true;
             </div>
             <!-- [/WORLD-MAP] -->
             <!-- [MAP OVERLAYS] -->
-            <div id="position-display"><div class="wrapper">&hellip;</div></div>
+            <div id="position-display" class="chrome"><div class="wrapper">&hellip;</div></div>
+            <div id="home-button" class="chrome"><div class="wrapper"><i class="fa fas fa-home"></i></div></div>
             <!-- [/MAP OVERLAYS] -->
         </div>
     </div>
