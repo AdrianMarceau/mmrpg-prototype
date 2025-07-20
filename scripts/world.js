@@ -667,10 +667,12 @@ $(document).ready(function(){
                                 battleVars.push('this_battle_token=' + battleId);
                                 //battleVars.push('this_battle_token=dr-light-phase0-met'); // DEBUG
                                 let battleHref = 'battle.php?' + battleVars.join('&');
-                                if (confirm('Navigate to this URL?\n' + battleHref)){
+                                $thisWorld.addClass('hidden');
+                                window.location.href = battleHref;
+                                /*if (confirm('Navigate to this URL?\n' + battleHref)){
                                     $thisWorld.addClass('hidden');
                                     window.location.href = battleHref;
-                                    }
+                                    }*/
                                 }
                             });
                         }
@@ -701,6 +703,21 @@ $(document).ready(function(){
                 return true;
                 });
             }
+
+        // Bind click events to the player switcher options in the world map header
+        let $playerSwitcher = $('#player-switcher', $thisWorld);
+        if ($playerSwitcher && $playerSwitcher.length){
+            $('.option[data-player]', $playerSwitcher).bind('click', function(e){
+                e.preventDefault();
+                let playerToken = $(this).attr('data-player') || false;
+                console.log('%c' + 'Player switcher clicked for ' + playerToken + '!', 'color: cyan;');
+                $thisWorld.addClass('hidden');
+                let worldReloadURL = 'world.php?player=' + playerToken;
+                window.location.href = worldReloadURL;
+                return true;
+                });
+            }
+
 
         }
 

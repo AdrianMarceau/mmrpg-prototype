@@ -45,7 +45,7 @@ $get_xkind = function($kind){
 
 // Define a quick function for getting a random position on a given grid
 // TODO: Define this as an actual function instead of a variable
-$get_randpos = function($cols, $rows, $inset = 0){
+$get_randpos = function($cols, $rows, $inset = 0, $disallowed = array()){
     static $used;
     if (!$used){ $used = array(); }
     if (!$cols || !$rows){ return false; }
@@ -53,7 +53,7 @@ $get_randpos = function($cols, $rows, $inset = 0){
         $col = mt_rand($inset, ($cols - $inset));
         $row = mt_rand($inset, ($rows - $inset));
         $pos = $col.'-'.$row;
-    } while (in_array($pos, $used));
+    } while (in_array($pos, $used) || in_array($pos, $disallowed));
     $used[] = $pos;
     return $pos;
     };
@@ -152,14 +152,19 @@ function loadMapData($map_token){
     $map_data_vars['name'] = isset($map_data_vars['name']) ? $map_data_vars['name'] : '';
     $map_data_vars['size'] = isset($map_data_vars['size']) ? $map_data_vars['size'] : '';
     $map_data_vars['sheet'] = isset($map_data_vars['sheet']) ? $map_data_vars['sheet'] : '';
+    $map_data_vars['field'] = isset($map_data_vars['field']) ? $map_data_vars['field'] : '';
+    $map_data_vars['mechas'] = isset($map_data_vars['mechas']) ? $map_data_vars['mechas'] : array();
     $map_data_vars['tiles'] = isset($map_data_vars['tiles']) ? $map_data_vars['tiles'] : array();
     if (empty($map_data_vars['token'])){ $map_data_vars['token'] = $map_token; }
     if (empty($map_data_vars['name'])){ $map_data_vars['name'] = 'Undefined'; }
+    if (empty($map_data_vars['size'])){ $map_data_vars['size'] = '0 x 0 x 0'; }
     if (empty($map_data_vars['sheet'])){ $map_data_vars['sheet'] = 'undefined.png'; }
+    if (empty($map_data_vars['field'])){ $map_data_vars['field'] = 'field'; }
     if (!empty($map_data_vars['size'])){ $map_data_vars['size'] = explode('x', str_replace(' ', '', $map_data_vars['size'])); }
     if (!isset($map_data_vars['size'][0])){ $map_data_vars['size'][0] = $map_autocols; }
     if (!isset($map_data_vars['size'][1])){ $map_data_vars['size'][1] = $map_autorows; }
     if (!isset($map_data_vars['size'][2])){ $map_data_vars['size'][2] = $map_tilesize; }
+    if (!empty($map_data_vars['mechas'])){ $map_data_vars['mechas'] = explode(',', str_replace(' ', '', $map_data_vars['mechas'])); }
     if (empty($map_data_vars['tiles'])){ $map_data_vars['tiles'][] = 'undefined(0,0)'; }
     $map_data_vars['tiles'] = $map_tiles_parser($map_data_vars['tiles']);
     // Add collected data to the parsed map data
@@ -168,6 +173,8 @@ function loadMapData($map_token){
     $map_data_parsed['name'] = $map_data_vars['name']; unset($map_data_vars['name']);
     $map_data_parsed['size'] = $map_data_vars['size']; unset($map_data_vars['size']);
     $map_data_parsed['sheet'] = $map_data_vars['sheet']; unset($map_data_vars['sheet']);
+    $map_data_parsed['field'] = $map_data_vars['field']; unset($map_data_vars['field']);
+    $map_data_parsed['mechas'] = $map_data_vars['mechas']; unset($map_data_vars['mechas']);
     $map_data_parsed['tiles'] = $map_data_vars['tiles']; unset($map_data_vars['tiles']);
     $map_data_parsed['tiles']['keys'] = array_keys($map_data_parsed['tiles']);
     $map_data_parsed['layers'] = $map_data_layers;
@@ -179,6 +186,7 @@ function loadMapData($map_token){
 // Define or collect the prototype data for the player, their robots, etc.
 $this_prototype_data = array();
 $this_prototype_data['this_current_chapter'] = -1; // required
+$this_prototype_data['this_current_world'] = ''; // required
 $this_prototype_data['battle_phase'] = 1; // required
 $this_prototype_data['battle_round'] = 1; // required
 $this_prototype_data['this_player_id'] = 1; // required
@@ -186,6 +194,8 @@ $this_prototype_data['this_player_token'] = 'player'; // DEBUG
 $this_prototype_data['this_player_robots'] = array(); // DEBUG
 
 // DEBUG DEBUG DEBUG
+//$this_prototype_data['this_current_world'] = 'starter';
+$this_prototype_data['this_current_world'] = 'water';
 //$this_prototype_data['this_player_token'] = 'dr-light'; // DEBUG
 //$this_prototype_data['this_player_robots'] = array('137_mega-man', '203_roll', '171_pirate-man'); // DEBUG
 
@@ -236,12 +246,16 @@ $flag_skip_fadein = true;
 <div id="world" class="hidden <?= $flag_skip_fadein ? 'fastfade' : '' ?>">
     <div id="canvas">
         <div class="wrapper">
-            <!-- [WORLD-MAP] -->
             <?
 
             // Load map data frmo the appropriate map file
-            $map_data_parsed = loadMapData('starter');
+            $map_token = $this_prototype_data['this_current_world'];
+            $map_data_parsed = loadMapData($map_token);
             //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
+
+            // Collect the map's field token and mecha encounters
+            $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
+            $map_mecha_support = !empty($map_data_parsed['mechas']) ? $map_data_parsed['mechas'] : array();
 
             // Collect the overall size variables for this map
             $map_base_size = $map_data_parsed['size'];
@@ -253,8 +267,10 @@ $flag_skip_fadein = true;
             $map_spawn_inset = 3;
             $map_spawn_src_col = mt_rand($map_spawn_inset, floor($map_col_size / 2) - $map_spawn_inset);
             $map_spawn_src_row = mt_rand($map_spawn_inset, floor($map_row_size / 2) - $map_spawn_inset);
+            $map_spawn_src_pos = $map_spawn_src_col.'-'.$map_spawn_src_row;
             $map_spawn_dst_col = mt_rand(ceil($map_col_size / 2) + $map_spawn_inset, $map_col_size - $map_spawn_inset);
             $map_spawn_dst_row = mt_rand(ceil($map_row_size / 2) + $map_spawn_inset, $map_row_size - $map_spawn_inset);
+            $map_spawn_dst_pos = $map_spawn_dst_col.'-'.$map_spawn_dst_row;
 
             // Generate overall the map styles and markup
             $map_offset = array(0, 0); // TODO: make this dynamic
@@ -266,7 +282,6 @@ $flag_skip_fadein = true;
             $map_base_attrs = 'data-cols="'.$map_col_size.'" data-rows="'.$map_row_size.'"';
             ?>
             <div id="map" style="<?= $map_base_styles ?>" <?= $map_base_attrs ?>>
-                <!-- MAP LAYERS -->
                 <?
 
                 // TERRAIN TILES
@@ -334,12 +349,13 @@ $flag_skip_fadein = true;
                 ?>
                 <div class="layer layer-3 events objects" data-layer="battles" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
+                    $disallowed_cells = array($map_spawn_src_pos, $map_spawn_dst_pos);
                     $random_encounters = array();
                     $max_random_encounters = 10;
-                    $allowed_random_encounters = array('met', 'flea', 'batton', 'mouslider');
+                    $allowed_random_encounters = $map_mecha_support;
                     for ($i = 0; $i < $max_random_encounters; $i++){
                         $robot = $allowed_random_encounters[mt_rand(0, count($allowed_random_encounters) - 1)];
-                        $randpos = $get_randpos($map_col_size, $map_row_size, 4);
+                        $randpos = $get_randpos($map_col_size, $map_row_size, 4, $disallowed_cells);
                         $battle_token = 'some-battle-token-'.($i + 1);
                         $random_encounters[] = array('robot', $robot, '', $randpos, $battle_token);
                         $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
@@ -348,7 +364,7 @@ $flag_skip_fadein = true;
                             'description' => 'This is a debug battle.  It is '.($i + 1).'/'.$max_random_encounters.' in a series of debug battles.',
                             'turns' => 1234,
                             'zenny' => 5678,
-                            'field' => 'gentle-countryside',
+                            'field' => $map_field_token,
                             'target' => array('robots' => array('token' => $robot)),
                             'flags' => array('world_battle' => true),
                             ), true);
@@ -456,15 +472,21 @@ $flag_skip_fadein = true;
 
                 // END OF LAYERS
                 ?>
-                <!-- MAP INTERFACE -->
                 <div id="click-overlay" class="active"><div class="wrapper"></div></div>
                 <div id="action-dropdown" class="active"><div class="wrapper"></div></div>
             </div>
-            <!-- [/WORLD-MAP] -->
-            <!-- [MAP OVERLAYS] -->
+            <div id="home-button" class="chrome"><a class="wrapper"><i class="fa fas fa-home"></i></a></div>
             <div id="position-display" class="chrome"><div class="wrapper">&hellip;</div></div>
-            <div id="home-button" class="chrome"><div class="wrapper"><i class="fa fas fa-home"></i></div></div>
-            <!-- [/MAP OVERLAYS] -->
+            <div id="player-switcher" class="chrome"><div class="wrapper"><?
+                $sprite = $get_sprite('robot', 'pointan', '', 'right', 'option');
+                $active = ($this_prototype_data['this_player_token'] === 'player') ? ' active' : '';
+                echo('<a class="option'.$active.'" data-player="player">'.$sprite.'</a>');
+                foreach ($allowed_player_tokens AS $pkey => $ptoken){
+                    if (!empty($mmrpg_index_players[$ptoken])){ $pinfo = $mmrpg_index_players[$ptoken]; } else { continue; }
+                    $sprite = $get_sprite('player', $ptoken, '', 'right', 'option', '');
+                    $active = ($ptoken === $this_prototype_data['this_player_token']) ? ' active' : '';
+                    echo('<a class="option'.$active.'" data-player="'.$ptoken.'">'.$sprite.'</a>');
+                } ?></div></div>
         </div>
     </div>
 </div>

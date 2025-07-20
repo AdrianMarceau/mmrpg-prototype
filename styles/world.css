@@ -1,12 +1,14 @@
 
 html, body {
     background-color: rgb(38, 38, 38);
+    text-align: center;
 }
 #world,
 #world #canvas {
     display: block;
     width: 768px;
     height: 622px;
+    margin: 0 auto;
 }
 
 #world #canvas {
@@ -401,6 +403,66 @@ html, body {
 }
 #world #canvas #home-button:hover i {
     transform: scale(1.2);
+}
+
+#world #canvas #player-switcher {
+    display: block;
+    position: absolute;
+    z-index: 1003;
+    width: auto;
+    height: auto;
+    top: 0;
+    left: 45px;
+    pointer-events: all;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 0 0 6px 6px;
+}
+#world #canvas #player-switcher a.option {
+    display: inline-block;
+    position: relative;
+    margin: 0 6px 0 0;
+    padding: 0;
+    width: 40px;
+    height: 30px;
+    font-family: monospace;
+    text-align: center;
+    color: #cfcfcf;
+    font-size: 12px;
+    line-height: 1.2;
+    border-radius: 3px;
+    outline: 1px solid transparent;
+    background-color: transparent;
+    transition: outline 0.2s, background-color 0.2s;
+    cursor: pointer;
+}
+#world #canvas #player-switcher a.option:last-child {
+    margin-right: 0;
+}
+#world #canvas #player-switcher a.option.active {
+    outline: 1px solid #363636;
+    background-color: #191919;
+}
+#world #canvas #player-switcher a.option:not(.active):hover {
+    outline: 1px solid #262626;
+    background-color: #101010;
+}
+#world #canvas #player-switcher a.option .sprite {
+    display: block;
+    vertical-align: middle;
+    margin: 0 auto;
+    padding: 0;
+    text-indent: 0;
+}
+#world #canvas #player-switcher a.option > .sprite {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    top: -10px;
+}
+#world #canvas #player-switcher a.option > .sprite > .sprite {
+    position: absolute;
+    bottom: 0;
 }
 
 
