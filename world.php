@@ -201,7 +201,8 @@ $this_prototype_data['this_player_robots'] = array(); // DEBUG
 
 // DEBUG DEBUG DEBUG
 //$this_prototype_data['this_current_world'] = 'starter';
-$this_prototype_data['this_current_world'] = 'water';
+//$this_prototype_data['this_current_world'] = 'water';
+$this_prototype_data['this_current_world'] = 'starter-80x80';
 //$this_prototype_data['this_player_token'] = 'dr-light'; // DEBUG
 //$this_prototype_data['this_player_robots'] = array('137_mega-man', '203_roll', '171_pirate-man'); // DEBUG
 
@@ -326,9 +327,6 @@ $flag_skip_fadein = true;
             ?>
             <div id="map" style="<?= $map_base_styles ?>" <?= $map_base_attrs ?>>
                 <?
-
-                // DEBUG DEBUG DEBUG
-                echo('<!-- $map_data_parsed = '.print_r($map_data_parsed, true).' -->');
 
                 // TERRAIN TILES
                 foreach ($map_data_parsed['layers'] AS $map_layer_key => $map_layer_data){
@@ -522,6 +520,10 @@ $flag_skip_fadein = true;
                 <div id="click-overlay" class="active"><div class="wrapper"></div></div>
                 <div id="action-dropdown" class="active"><div class="wrapper"></div></div>
             </div>
+            <?
+            // DEBUG DEBUG DEBUG
+            echo('<!-- $map_data_parsed = '.print_r($map_data_parsed, true).' -->');
+            ?>
             <div id="home-button" class="chrome"><a class="wrapper"><i class="fa fas fa-home"></i></a></div>
             <div id="position-display" class="chrome"><div class="wrapper">&hellip;</div></div>
             <div id="player-switcher" class="chrome"><div class="wrapper"><?

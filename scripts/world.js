@@ -285,9 +285,9 @@ $(document).ready(function(){
             let _world = gameSettings.worldState;
             let layerTilesIndex = _world.layerTilesIndex;
             let thisLayerTiles = layerTilesIndex[layerToken] || false;
-            if (!thisLayerTiles || typeof thisLayerTiles !== 'object' || !Object.keys(thisLayerTiles).length){ console.error('getLayerTileIndexData() missing required thisLayerTiles!'); return false; }
             let thisTileData = thisLayerTiles[tileKey] || false;
-            if (!thisTileData || typeof thisTileData !== 'object'){ console.error('getLayerTileIndexData() missing required thisTileData!'); return false; }
+            if (!thisLayerTiles || typeof thisLayerTiles !== 'object' || !Object.keys(thisLayerTiles).length){ console.error('getLayerTileIndexData() cannot find required thisLayerTiles @ layerTilesIndex['+layerToken+']!'); return false; }
+            if (!thisTileData || typeof thisTileData !== 'object'){ console.error('getLayerTileIndexData() cannot find required thisTileData @ layerTilesIndex['+layerToken+']['+tileKey+']!'); return false; }
             //console.log('---> returning tileIndexData for tileKey ' + tileKey + ' on layer ' + layerToken + ':', thisTileData);
             // make sure the returned tile data object is actually in the parent now
             layerTilesIndex[layerToken][tileKey] = thisTileData;
@@ -619,6 +619,7 @@ $(document).ready(function(){
             //$tileAtPosition.addClass('active');
             $eventsLayers.removeClass('has-zoom');
             $('.sprite.zoom', $eventsLayers).removeClass('zoom');
+            // Move the cursor to the new position first and foremost
             let moveTimeout;
             let timeoutDuration = _mapEffects.moveTimeout;
             let travelDuration = _mapEffects.moveTravel * thisShiftDist;
@@ -643,6 +644,7 @@ $(document).ready(function(){
                     if (typeof onComplete === 'function'){ onComplete(); }
                     }, timeoutDuration);
                 });
+            // If there are any team sprites, move them as well (it's okay if they lay behind the cursor)
             let $teamSprites = $('.sprite.team', $objectsLayer);
             if ($teamSprites && $teamSprites.length){
                 let teamOffsetX = tileOffsetX;
@@ -671,6 +673,31 @@ $(document).ready(function(){
                         });
                     });
                 }
+            // And now we should move the map itself so that the characters are always centered in the viewport
+            // (as much as possible anyway, without overscroll). This is done by moving the entire map container
+            // using it's transform: translate() values.  Make sure we pre-calculate the current dimensions of
+            // the map itself, its parent, and the position of the cursor sprite so we know where to center to
+            let worldWidth = $worldDiv.width();
+            let worldHeight = $worldDiv.height();
+            let mapWidth = $canvasMap.width();
+            let mapHeight = $canvasMap.height();
+            let targetX = tileOffsetX;
+            let targetY = tileOffsetY;
+            //console.log('-> world size: ' + worldWidth + 'x' + worldHeight);
+            //console.log('-> map size: ' + mapWidth + 'x' + mapHeight);
+            //console.log('-> target position: ' + targetX + 'x' + targetY);
+            // Now calculate the new translate values for the map container
+            let translateX = 0, translateY = 0;
+            if (mapWidth < worldWidth){ translateX = (worldWidth - mapWidth) / 2; }
+            else if (targetX < (worldWidth / 2)){ translateX = 0; }
+            else if (targetX > (mapWidth - (worldWidth / 2))){ translateX = -(mapWidth - worldWidth); }
+            else { translateX = -(targetX - (worldWidth / 2)); }
+            if (mapHeight < worldHeight){ translateY = (worldHeight - mapHeight) / 2; }
+            else if (targetY < (worldHeight / 2)){ translateY = 0; }
+            else if (targetY > (mapHeight - (worldHeight / 2))){ translateY = -(mapHeight - worldHeight); }
+            else { translateY = -(targetY - (worldHeight / 2)); }
+            //console.log('-> translateX =', translateX, '| translateY =', translateY);
+            $canvasMap.css({ transform: 'translate(' + translateX + 'px, ' + translateY + 'px)' });
             return true;
             }
 
