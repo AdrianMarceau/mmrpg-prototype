@@ -130,7 +130,9 @@ $(document).ready(function(){
             let size = _config.mapTileSize;
             let width = $overlay.width(), height = $overlay.height(), offset = $overlay.offset();
             if (applyOffset){ xPos -= offset.left; yPos -= offset.top; }
+            if (xPos < 0){ xPos = 0; } if (yPos < 0){ yPos = 0; }
             //console.log('-> canvas(', width, ',', height, ')');
+            //console.log('-> offset(', offset.left, ',', offset.top, ')');
             //console.log('-> pixel position(', xPos, ',', yPos, ')');
             //console.log('-> adjusted position', (applyOffset ? '(' + xPos + ',' + yPos + ')' : 'n/a'));
             let thisCol = Math.floor(xPos / size[0]) + 1;

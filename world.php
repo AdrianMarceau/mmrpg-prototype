@@ -4,8 +4,10 @@
 require_once('top.php');
 
 // Define any world session vars that don't exist yet
-if (!isset($_SESSION['WORLD'])){ $_SESSION['WORLD'] = array(); }
-if (!isset($_SESSION['WORLD_TEMP'])){ $_SESSION['WORLD_TEMP'] = array(); }
+$reset = !empty($_REQUEST['reset']) && $_REQUEST['reset'] === 'world' ? true : false;
+if (!isset($_SESSION['WORLD']) || $reset){ $_SESSION['WORLD'] = array(); }
+if (!isset($_SESSION['WORLD_TEMP']) || $reset){ $_SESSION['WORLD_TEMP'] = array(); }
+if ($reset){ header('Location: world.php'); exit(); }
 
 // Automatically empty temporary session vars from this or other pages
 $_SESSION['BATTLES'] = array();
@@ -293,6 +295,32 @@ if (empty($map_spawn_dst_pos)){
 }
 $WORLD_SESSION[$map_token.'_spawn_dst'] = $map_spawn_dst_pos;
 
+// Generate the random encounters for this map location if not already spawned
+$max_random_encounters = 10;
+$allowed_random_encounters = $map_mecha_support;
+$disallowed_encounter_cells = array($map_spawn_src_pos, $map_spawn_dst_pos);
+$map_random_encounters = !empty($WORLD_SESSION[$map_token.'_random_encounters']) ? $WORLD_SESSION[$map_token.'_random_encounters'] : array();
+if (empty($map_random_encounters)){
+    for ($i = 0; $i < $max_random_encounters; $i++){
+        $robot = $allowed_random_encounters[mt_rand(0, count($allowed_random_encounters) - 1)];
+        $randpos = $get_randpos($map_col_size, $map_row_size, 4, $disallowed_encounter_cells);
+        $battle_token = 'world-battle_'.$map_token.'_debug-'.($i + 1);
+        $map_random_encounters[] = array('robot', $robot, '', $randpos, $battle_token);
+        $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
+            'token' => $battle_token,
+            'name' => ('Debug Battle '.($i + 1).'/'.$max_random_encounters),
+            'description' => 'This is a debug battle.  It is '.($i + 1).'/'.$max_random_encounters.' in a series of debug battles.',
+            'turns' => 1234,
+            'zenny' => 5678,
+            'field' => $map_field_token,
+            'target' => array('robots' => array('token' => $robot)),
+            'flags' => array('world_battle' => true, 'remove_on_complete' => true),
+            ), true);
+        //exit('omg $battle_omega = '.print_r($battle_omega, true));
+        }
+}
+$WORLD_SESSION[$map_token.'_random_encounters'] = $map_random_encounters;
+
 // Define some fallback values for compatibility
 $debug_flag_animation = true;
 $flag_skip_fadein = true;
@@ -402,39 +430,19 @@ $flag_skip_fadein = true;
                 ?>
                 <div class="layer layer-3 events objects" data-layer="battles" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
-                    $disallowed_cells = array($map_spawn_src_pos, $map_spawn_dst_pos);
-                    $random_encounters = array();
-                    $max_random_encounters = 10;
-                    $allowed_random_encounters = $map_mecha_support;
-                    for ($i = 0; $i < $max_random_encounters; $i++){
-                        $robot = $allowed_random_encounters[mt_rand(0, count($allowed_random_encounters) - 1)];
-                        $randpos = $get_randpos($map_col_size, $map_row_size, 4, $disallowed_cells);
-                        $battle_token = 'some-battle-token-'.($i + 1);
-                        $random_encounters[] = array('robot', $robot, '', $randpos, $battle_token);
-                        $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
-                            'token' => $battle_token,
-                            'name' => ('Debug Battle '.($i + 1).'/'.$max_random_encounters),
-                            'description' => 'This is a debug battle.  It is '.($i + 1).'/'.$max_random_encounters.' in a series of debug battles.',
-                            'turns' => 1234,
-                            'zenny' => 5678,
-                            'field' => $map_field_token,
-                            'target' => array('robots' => array('token' => $robot)),
-                            'flags' => array('world_battle' => true),
-                            ), true);
-                        //exit('omg $battle_omega = '.print_r($battle_omega, true));
-                        }
-                    //$random_encounters[] = array('robot', 'met', '', $randpos(), 'some-battle-token-1');
-                    //$random_encounters[] = array('robot', 'snapper', '', $randpos(), 'some-battle-token-2');
-                    //$random_encounters[] = array('robot', 'batton', '', $randpos(), 'some-battle-token-3');
                     $battle_symbols = array();
                     $battle_index = array();
-                    foreach ($random_encounters as $battle){
+                    foreach ($map_random_encounters as $battle){
                         $kind = $battle[0];
                         $xkind = $get_xkind($kind);
                         $token = $battle[1];
                         $alt = $battle[2];
                         $position = $battle[3];
                         $battle = $battle[4];
+                        //error_log('checking battle token = '.$battle);
+                        if (!rpg_battle::has_index_info($battle)){ continue; }
+                        //$index_info = rpg_battle::get_index_info($battle);
+                        //error_log('$index_info['.$battle.'] = '.print_r($index_info, true));
                         list($col, $row) = explode('-', $position);
                         $maxcols = $map_col_size;
                         $maxrows = $map_row_size;
@@ -456,7 +464,7 @@ $flag_skip_fadein = true;
                             'pos' => $position,
                             );
                         }
-                    //error_log('$random_encounters = '.print_r($random_encounters, true));
+                    //error_log('$map_random_encounters = '.print_r($map_random_encounters, true));
                     $battle_symbols_json = json_encode($battle_symbols, JSON_NUMERIC_CHECK);
                     $battle_index_json = json_encode($battle_index, JSON_NUMERIC_CHECK);
                     echo('<script data-json="battleSymbols" type="application/json">'.$battle_symbols_json.'</script>');
