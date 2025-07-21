@@ -2,14 +2,17 @@
 # STARTER MAP
 @token    = water
 @name     = Water Map
-@size     = 19 x 15 x 40
+@field    = waterfall-institute
+@mechas   = snapper,robo-fishtot,bui-boi,pelicanu,shelln
+@size     = 19 x 15 x 40 x 40
 @sheet    = overworld-experiment-v2024-tileset.png
 @tiles[0] = void(160, 320)
 @tiles[1] = grass(40, 320)
 @tiles[2] = ground(40, 400)
 @tiles[3] = water(40, 680)
-@field    = waterfall-institute
-@mechas   = snapper,robo-fishtot,bui-boi,pelicanu,shelln
+@tiles[]  = grid(360, 600)
+@tiles[]  = hover(320, 600)
+@tiles[]  = focus(560, 520)
 #---------------------------#
 ###################
 0000000000000000000

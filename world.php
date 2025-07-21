@@ -80,11 +80,15 @@ $get_sprite = function($kind, $token, $alt = '', $dir = 'right', $class = '', $s
     return('<span class="'.$sprite_class.'"'.$sprite_styles.$sprite_attrs.'><span class="sprite sprite_'.$xsize.'" style="background-image: url('.$sprite_path.');"></span></span>');
     };
 
+// Define some constants for the world map
+define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
+define('MMRPG_WORLD_DEFAULT_TILESIZE', 40);
+
 // Define a function for loading a given map's data from the filesystem
 function loadMapData($map_token){
     //error_log('loadMapData() called!');
     static $map_basedir = MMRPG_CONFIG_ROOTDIR.'prototype/worldmaps/';
-    static $map_tilesize = 40;
+    static $map_tilesize = MMRPG_WORLD_DEFAULT_TILESIZE;
     if (empty($map_token)){
         //error_log('loadMapData() error: missing map token!');
         return false;
@@ -120,7 +124,8 @@ function loadMapData($map_token){
                 $key = substr($name, strpos($name, '[') + 1, -1);
                 $name = substr($name, 0, strpos($name, '['));
                 if (!isset($map_data_vars[$name])){ $map_data_vars[$name] = array(); }
-                $map_data_vars[$name][$key] = $value;
+                if ($key === ''){ $map_data_vars[$name][] = $value; }
+                else { $map_data_vars[$name][$key] = $value; }
                 } else {
                 $map_data_vars[$name] = $value;
                 }
@@ -130,6 +135,7 @@ function loadMapData($map_token){
         if (!isset($map_data_layers[$map_layer_key])){ $map_data_layers[$map_layer_key] = array(); }
         $map_data_layers[$map_layer_key][] = $line;
     }
+    //error_log('$map_data_vars = '.print_r($map_data_vars, true));
     // Review and process the map layer data
     $map_autocols = strlen($map_data_layers[0][0]); // TODO: first row may not be representative of the entire map
     $map_autorows = count($map_data_layers[0]); // TODO: this may not be representative of the entire map
@@ -200,6 +206,13 @@ $this_prototype_data['this_current_world'] = 'water';
 //$this_prototype_data['this_player_robots'] = array('137_mega-man', '203_roll', '171_pirate-man'); // DEBUG
 
 // DEBUG DEBUG DEBUG(?)
+$allowed_world_tokens = array('starter', 'water', 'starter-80x80');
+$request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
+if (!empty($request_world_token) && in_array($request_world_token, $allowed_world_tokens)){
+    $this_prototype_data['this_current_world'] = $request_world_token;
+}
+
+// DEBUG DEBUG DEBUG(?)
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
 $request_player_token = isset($_REQUEST['player']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['player']) ? trim($_REQUEST['player']) : '';
 if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){
@@ -259,9 +272,34 @@ $flag_skip_fadein = true;
 
             // Collect the overall size variables for this map
             $map_base_size = $map_data_parsed['size'];
-            list($map_col_size, $map_row_size, $map_tile_size) = $map_base_size;
-            $map_pixel_width = $map_col_size * $map_tile_size;
-            $map_pixel_height = $map_row_size * $map_tile_size;
+            if (count($map_base_size) === 4){
+                list($map_col_size, $map_row_size, $map_tile_width, $map_tile_height) = $map_base_size;
+                } elseif (count($map_base_size) === 3){
+                list($map_col_size, $map_row_size, $map_tile_width) = $map_base_size;
+                } elseif (count($map_base_size) === 2){
+                list($map_col_size, $map_tile_width) = $map_base_size;
+                } elseif (count($map_base_size) === 1){
+                list($map_col_size) = $map_base_size;
+                }
+            if (!isset($map_col_size)){ $map_col_size = MMRPG_WORLD_DEFAULT_MAPSIZE; }
+            if (!isset($map_row_size)){ $map_row_size = $map_col_size; }
+            if (!isset($map_tile_width)){ $map_tile_width = MMRPG_WORLD_DEFAULT_TILESIZE; }
+            if (!isset($map_tile_height)){ $map_tile_height = $map_tile_width; }
+            //$map_tile_size = max($map_tile_width, $map_tile_height);
+            $map_pixel_width = $map_col_size * $map_tile_width;
+            $map_pixel_height = $map_row_size * $map_tile_height;
+            //$map_col_size = isset($map_base_size[0]) ? intval($map_base_size[0]) : 0;
+            //$map_row_size = isset($map_base_size[1]) ? intval($map_base_size[1]) : 0;
+            //$map_tile_size = isset($map_base_size[2]) ? intval($map_base_size[2]) : 40;
+            //list($map_col_size, $map_row_size, $map_tile_size) = $map_base_size;
+            //$map_pixel_width = $map_col_size * $map_tile_size;
+            //$map_pixel_height = $map_row_size * $map_tile_size;
+            //error_log('$map_col_size = '.$map_col_size);
+            //error_log('$map_row_size = '.$map_row_size);
+            //error_log('$map_tile_width = '.$map_tile_width);
+            //error_log('$map_tile_height = '.$map_tile_height);
+            //error_log('$map_pixel_width = '.$map_pixel_width);
+            //error_log('$map_pixel_height = '.$map_pixel_height);
 
             // Generate the map spawn points
             $map_spawn_inset = 3;
@@ -274,15 +312,23 @@ $flag_skip_fadein = true;
 
             // Generate overall the map styles and markup
             $map_offset = array(0, 0); // TODO: make this dynamic
-            $map_offset_x = $map_offset[0] * $map_tile_size;
-            $map_offset_y = $map_offset[1] * $map_tile_size;
+            $map_offset_x = $map_offset[0] * $map_tile_width;
+            $map_offset_y = $map_offset[1] * $map_tile_height;
+            $map_tilesize_default = MMRPG_WORLD_DEFAULT_TILESIZE;
+            $map_tilesize_offset = array(0, 0);
+            if ($map_tile_height > $map_tilesize_default){ $map_tilesize_offset[0] = floor(($map_tile_height - $map_tilesize_default) / 2); }
+            if ($map_tile_width > $map_tilesize_default){ $map_tilesize_offset[1] = floor(($map_tile_width - $map_tilesize_default) / 2); }
             $map_size_styles = 'width: '.$map_pixel_width.'px; height: '.$map_pixel_height.'px; ';
             $map_offset_styles = 'top: '. $map_offset_y.'px; left: '.$map_offset_x.'px; ';
             $map_base_styles = trim($map_size_styles.$map_offset_styles);
             $map_base_attrs = 'data-cols="'.$map_col_size.'" data-rows="'.$map_row_size.'"';
+            $map_base_attrs .= ' data-size="'.$map_col_size.' x '.$map_row_size.' x '. $map_tile_width.' x '.$map_tile_height.'"';
             ?>
             <div id="map" style="<?= $map_base_styles ?>" <?= $map_base_attrs ?>>
                 <?
+
+                // DEBUG DEBUG DEBUG
+                echo('<!-- $map_data_parsed = '.print_r($map_data_parsed, true).' -->');
 
                 // TERRAIN TILES
                 foreach ($map_data_parsed['layers'] AS $map_layer_key => $map_layer_data){
@@ -292,10 +338,11 @@ $flag_skip_fadein = true;
                     <div class="layer layer-1 tiles terrain has-canvas" data-layer="terrain" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                         <?
                         $data = array();
-                        $data['map_image'] = 'images/maps/overworld-experiment-v2024-tileset.png';
+                        //$data['map_image'] = 'images/maps/overworld-experiment-v2024-tileset.png';
+                        $data['map_image'] = 'images/maps/'.(!empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : 'undefined.png');
                         $data['map_size'] = array($map_pixel_width, $map_pixel_height);
                         $data['map_offset'] = array($map_offset_x, $map_offset_y);
-                        $data['tile_size'] = $map_tile_size;
+                        $data['tile_size'] = array($map_tile_width, $map_tile_height);
                         $data['tile_index'] = $map_data_parsed['tiles'];
                         $data['tile_data'] = array();
                         //error_log('$map layer '.$map_layer_key.' has $data = '.print_r($data, true));
@@ -327,16 +374,16 @@ $flag_skip_fadein = true;
                     $col = $map_spawn_src_col;
                     $row = $map_spawn_src_row;
                     $pos = $col.'-'.$row;
-                    $top = ($row - 1) * $map_tile_size;
-                    $left = ($col - 1) * $map_tile_size;
+                    $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                    $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                     echo('<span class="sprite tile '.$tile.' pulse" data-event="spawn-src" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>');
 
                     $tile = 'dst';
                     $col = $map_spawn_dst_col;
                     $row = $map_spawn_dst_row;
                     $pos = $col.'-'.$row;
-                    $top = ($row - 1) * $map_tile_size;
-                    $left = ($col - 1) * $map_tile_size;
+                    $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                    $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                     echo('<span class="sprite tile '.$tile.' pulse" data-event="spawn-dst" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>');
 
                     ?>
@@ -385,8 +432,8 @@ $flag_skip_fadein = true;
                         list($col, $row) = explode('-', $position);
                         $maxcols = $map_col_size;
                         $maxrows = $map_row_size;
-                        $top = ($row - 1) * $map_tile_size;
-                        $left = ($col - 1) * $map_tile_size;
+                        $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                        $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                         $zindex = ($maxrows + 1) - $row;
                         $class = 'battle bounce';
                         $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$zindex.';';
@@ -448,8 +495,8 @@ $flag_skip_fadein = true;
                     $col = $map_spawn_src_col;
                     $row = $map_spawn_src_row;
                     $pos = $col.'-'.$row;
-                    $top = ($row - 1) * $map_tile_size;
-                    $left = ($col - 1) * $map_tile_size;
+                    $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                    $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                     echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"><span class="sprite sprite_40x40" style="background-image: url('.$sprite.');"></span></span>');
                     if (!empty($team)){
                         foreach ($team as $key => $sprite){
