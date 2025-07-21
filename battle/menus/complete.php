@@ -136,6 +136,12 @@ ob_start();
                         ?><a class="button action_option colspan2" data-action="restart" type="button" data-order="3"><label>Restart Battle</label></a><?
                         ?><a class="button action_switch" data-action="restart_whole-mission" type="button" data-order="4"><label>Restart Mission</label></a><?
 
+                    } elseif (!empty($this_battle->flags['world_battle'])){
+
+                        // This is the only battle in its set so just display normal options
+                        ?><a class="button action_scan colspan2 button_disabled" type="button">&nbsp;</a><?
+                        ?><a class="button action_option colspan2 button_disabled" type="button">&nbsp;</a><?
+
                     } else {
 
                         // This is the only battle in its set so just display normal options
@@ -178,13 +184,14 @@ ob_start();
         }
         // Otherwise if this is any other kind of battle, we can display the default end screen
         else {
+            $exit_action = !empty($this_battle->flags['world_battle']) ? 'world' : 'prototype';
             // Display available main actions
             ?><div class="main_actions"><?
             ?><a class="button action_ability button_disabled" type="button"><label><i class="fa fas fa-skull"></i> Mission Failure&hellip;</label></a><?
             ?></div><?
             // Display the available sub options
             ?><div class="sub_actions"><?
-            ?><a class="button action_scan colspan2" data-action="prototype" type="button" data-order="1"><label>Exit Mission</label></a><?
+            ?><a class="button action_scan colspan2" data-action="<?= $exit_action ?>" type="button" data-order="1"><label>Exit Mission</label></a><?
             ?><a class="button action_item colspan2" data-action="restart" type="button" data-order="2"><label>Retry Battle</label></a><?
             ?></div><?
         }
