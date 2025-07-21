@@ -203,26 +203,22 @@ $this_prototype_data['this_current_world'] = ''; // required
 $this_prototype_data['battle_phase'] = 1; // required
 $this_prototype_data['battle_round'] = 1; // required
 $this_prototype_data['this_player_id'] = 1; // required
-$this_prototype_data['this_player_token'] = 'player'; // DEBUG
-$this_prototype_data['this_player_robots'] = array(); // DEBUG
+$this_prototype_data['this_player_token'] = 'player'; // required
+$this_prototype_data['this_player_robots'] = array(); // required
 
-// DEBUG DEBUG DEBUG
-//$this_prototype_data['this_current_world'] = 'starter';
-//$this_prototype_data['this_current_world'] = 'water';
-$this_prototype_data['this_current_world'] = 'starter-80x80';
-//$this_prototype_data['this_player_token'] = 'dr-light'; // DEBUG
-//$this_prototype_data['this_player_robots'] = array('137_mega-man', '203_roll', '171_pirate-man'); // DEBUG
-
-// DEBUG DEBUG DEBUG(?)
+// Collect or define the current map token we'll be loading from
+$default_world_token = 'starter-80x80';
 $allowed_world_tokens = array('starter', 'water', 'starter-80x80');
 $request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
 if (empty($request_world_token) && !empty($WORLD_SESSION['last_world_token'])){ $request_world_token = $WORLD_SESSION['last_world_token']; }
 if (!empty($request_world_token) && in_array($request_world_token, $allowed_world_tokens)){
     $this_prototype_data['this_current_world'] = $request_world_token;
 }
+if (empty($this_prototype_data['this_current_world'])){ $this_prototype_data['this_current_world'] = $default_world_token; }
 $WORLD_SESSION['last_world_token'] = $this_prototype_data['this_current_world'];
 
-// DEBUG DEBUG DEBUG(?)
+// Collect of define the current player character we'll be using
+$default_player_token = 'player';
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
 $request_player_token = isset($_REQUEST['player']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['player']) ? trim($_REQUEST['player']) : '';
 if (empty($request_player_token) && !empty($WORLD_SESSION['last_player_token'])){ $request_player_token = $WORLD_SESSION['last_player_token']; }
@@ -242,12 +238,56 @@ if (!empty($request_player_token) && in_array($request_player_token, $allowed_pl
         $this_prototype_data['this_player_robots'] = array_slice($request_player_robots, 0, $max_player_robots);
     }
 }
+if (empty($this_prototype_data['this_player_token'])){ $this_prototype_data['this_player_token'] = $default_player_token; }
 $WORLD_SESSION['last_player_token'] = $this_prototype_data['this_player_token'];
 
-// DEBUG DEBUG DEBUG
+// Load map data from the appropriate map file
+$map_token = $this_prototype_data['this_current_world'];
+$map_data_parsed = loadMapData($map_token);
+//error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
+
+// Collect the map's field token and mecha encounters
+$map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
+$map_mecha_support = !empty($map_data_parsed['mechas']) ? $map_data_parsed['mechas'] : array();
+
+// Collect the overall size variables for this map
+$map_base_size = $map_data_parsed['size'];
+if (count($map_base_size) === 4){ list($map_col_size, $map_row_size, $map_tile_width, $map_tile_height) = $map_base_size; }
+elseif (count($map_base_size) === 3){ list($map_col_size, $map_row_size, $map_tile_width) = $map_base_size; }
+elseif (count($map_base_size) === 2){ list($map_col_size, $map_tile_width) = $map_base_size; }
+elseif (count($map_base_size) === 1){ list($map_col_size) = $map_base_size; }
+if (!isset($map_col_size)){ $map_col_size = MMRPG_WORLD_DEFAULT_MAPSIZE; }
+if (!isset($map_row_size)){ $map_row_size = $map_col_size; }
+if (!isset($map_tile_width)){ $map_tile_width = MMRPG_WORLD_DEFAULT_TILESIZE; }
+if (!isset($map_tile_height)){ $map_tile_height = $map_tile_width; }
+//$map_tile_size = max($map_tile_width, $map_tile_height);
+$map_pixel_width = $map_col_size * $map_tile_width;
+$map_pixel_height = $map_row_size * $map_tile_height;
+//$map_col_size = isset($map_base_size[0]) ? intval($map_base_size[0]) : 0;
+//$map_row_size = isset($map_base_size[1]) ? intval($map_base_size[1]) : 0;
+//$map_tile_size = isset($map_base_size[2]) ? intval($map_base_size[2]) : 40;
+//list($map_col_size, $map_row_size, $map_tile_size) = $map_base_size;
+//$map_pixel_width = $map_col_size * $map_tile_size;
+//$map_pixel_height = $map_row_size * $map_tile_size;
+//error_log('$map_col_size = '.$map_col_size);
+//error_log('$map_row_size = '.$map_row_size);
+//error_log('$map_tile_width = '.$map_tile_width);
+//error_log('$map_tile_height = '.$map_tile_height);
+//error_log('$map_pixel_width = '.$map_pixel_width);
+//error_log('$map_pixel_height = '.$map_pixel_height);
+
+// Generate the map spawn points
+$map_spawn_inset = 3;
+$map_spawn_src_col = mt_rand($map_spawn_inset, floor($map_col_size / 2) - $map_spawn_inset);
+$map_spawn_src_row = mt_rand($map_spawn_inset, floor($map_row_size / 2) - $map_spawn_inset);
+$map_spawn_src_pos = $map_spawn_src_col.'-'.$map_spawn_src_row;
+$map_spawn_dst_col = mt_rand(ceil($map_col_size / 2) + $map_spawn_inset, $map_col_size - $map_spawn_inset);
+$map_spawn_dst_row = mt_rand(ceil($map_row_size / 2) + $map_spawn_inset, $map_row_size - $map_spawn_inset);
+$map_spawn_dst_pos = $map_spawn_dst_col.'-'.$map_spawn_dst_row;
+
+// Define some fallback values for compatibility
 $debug_flag_animation = true;
 $flag_skip_fadein = true;
-
 
 ?>
 <!DOCTYPE html>
@@ -272,55 +312,6 @@ $flag_skip_fadein = true;
     <div id="canvas">
         <div class="wrapper">
             <?
-
-            // Load map data frmo the appropriate map file
-            $map_token = $this_prototype_data['this_current_world'];
-            $map_data_parsed = loadMapData($map_token);
-            //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
-
-            // Collect the map's field token and mecha encounters
-            $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
-            $map_mecha_support = !empty($map_data_parsed['mechas']) ? $map_data_parsed['mechas'] : array();
-
-            // Collect the overall size variables for this map
-            $map_base_size = $map_data_parsed['size'];
-            if (count($map_base_size) === 4){
-                list($map_col_size, $map_row_size, $map_tile_width, $map_tile_height) = $map_base_size;
-                } elseif (count($map_base_size) === 3){
-                list($map_col_size, $map_row_size, $map_tile_width) = $map_base_size;
-                } elseif (count($map_base_size) === 2){
-                list($map_col_size, $map_tile_width) = $map_base_size;
-                } elseif (count($map_base_size) === 1){
-                list($map_col_size) = $map_base_size;
-                }
-            if (!isset($map_col_size)){ $map_col_size = MMRPG_WORLD_DEFAULT_MAPSIZE; }
-            if (!isset($map_row_size)){ $map_row_size = $map_col_size; }
-            if (!isset($map_tile_width)){ $map_tile_width = MMRPG_WORLD_DEFAULT_TILESIZE; }
-            if (!isset($map_tile_height)){ $map_tile_height = $map_tile_width; }
-            //$map_tile_size = max($map_tile_width, $map_tile_height);
-            $map_pixel_width = $map_col_size * $map_tile_width;
-            $map_pixel_height = $map_row_size * $map_tile_height;
-            //$map_col_size = isset($map_base_size[0]) ? intval($map_base_size[0]) : 0;
-            //$map_row_size = isset($map_base_size[1]) ? intval($map_base_size[1]) : 0;
-            //$map_tile_size = isset($map_base_size[2]) ? intval($map_base_size[2]) : 40;
-            //list($map_col_size, $map_row_size, $map_tile_size) = $map_base_size;
-            //$map_pixel_width = $map_col_size * $map_tile_size;
-            //$map_pixel_height = $map_row_size * $map_tile_size;
-            //error_log('$map_col_size = '.$map_col_size);
-            //error_log('$map_row_size = '.$map_row_size);
-            //error_log('$map_tile_width = '.$map_tile_width);
-            //error_log('$map_tile_height = '.$map_tile_height);
-            //error_log('$map_pixel_width = '.$map_pixel_width);
-            //error_log('$map_pixel_height = '.$map_pixel_height);
-
-            // Generate the map spawn points
-            $map_spawn_inset = 3;
-            $map_spawn_src_col = mt_rand($map_spawn_inset, floor($map_col_size / 2) - $map_spawn_inset);
-            $map_spawn_src_row = mt_rand($map_spawn_inset, floor($map_row_size / 2) - $map_spawn_inset);
-            $map_spawn_src_pos = $map_spawn_src_col.'-'.$map_spawn_src_row;
-            $map_spawn_dst_col = mt_rand(ceil($map_col_size / 2) + $map_spawn_inset, $map_col_size - $map_spawn_inset);
-            $map_spawn_dst_row = mt_rand(ceil($map_row_size / 2) + $map_spawn_inset, $map_row_size - $map_spawn_inset);
-            $map_spawn_dst_pos = $map_spawn_dst_col.'-'.$map_spawn_dst_row;
 
             // Generate overall the map styles and markup
             $map_offset = array(0, 0); // TODO: make this dynamic
