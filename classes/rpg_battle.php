@@ -105,6 +105,48 @@ class rpg_battle extends rpg_object {
 
     }
 
+    // Define a public function for deleting a given battle's index entry
+    public static function unset_index_info($battle_token){
+
+        global $db;
+
+        // If the internal index has not been created yet, load it into memory
+        if (!isset($db->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
+
+        // If the requested index is not empty, unset the entry
+        if (!empty($db->INDEX['BATTLES'][$battle_token])){
+            unset($db->INDEX['BATTLES'][$battle_token]);
+            unset($_SESSION['GAME']['values']['battle_index'][$battle_token]);
+            return true;
+        }
+        // Otherwise if the battle index doesn't exist at all
+        else {
+            // Return false on failure
+            return false;
+        }
+
+    }
+
+    // Define a public function for checking if a battle index entry exists
+    public static function has_index_info($battle_token){
+
+        global $db;
+
+        // If the internal index has not been created yet, load it into memory
+        if (!isset($db->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
+
+        // If the requested index is not empty, return true
+        if (!empty($db->INDEX['BATTLES'][$battle_token])){
+            return true;
+        }
+        // Otherwise if the battle index doesn't exist at all
+        else {
+            // Return false on failure
+            return false;
+        }
+
+    }
+
     // Define a function for loading the battle index cache file
     public static function load_battle_index(){
 
