@@ -23,6 +23,38 @@ $_SESSION['WORLD_TEMP'] = array();
 // Define a reference object for storing temporary world data
 $WORLD_SESSION = &$_SESSION['WORLD'];
 
+// Define defaults and allowed values for the prototype world data
+$allowed_world_tokens = array('starter', 'water', 'starter-80x80');
+$allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
+$default_world_token = 'starter-80x80';
+$default_player_token = 'player';
+$default_world_position = '';
+
+//error_log('$_GET = '. print_r($_GET, true));
+//error_log('$_POST = '. print_r($_POST, true));
+
+// If a save action was requested, we should do it here and then return exit
+if (!empty($_POST['action']) && $_POST['action'] === 'save'
+    && !empty($_POST['world_data']) && is_array($_POST['world_data'])){
+    $worldData = $_POST['world_data'];
+    if (!empty($worldData['lastWorld']) && in_array($worldData['lastWorld'], $allowed_world_tokens)){
+        $WORLD_SESSION['last_world_token'] = $worldData['lastWorld'];
+    }
+    if (!empty($worldData['lastPlayer']) && in_array($worldData['lastPlayer'], $allowed_player_tokens)){
+        $WORLD_SESSION['last_player_token'] = $worldData['lastPlayer'];
+    }
+    if (!empty($worldData['lastPosition']) && preg_match('/^([-0-9]+)$/i', $worldData['lastPosition'])){
+        $WORLD_SESSION['last_world_position'] = $worldData['lastPosition'];
+    }
+    if (!empty($worldData['lastDirection']) && preg_match('/^([-a-z0-9]+)$/i', $worldData['lastDirection'])){
+        $WORLD_SESSION['last_world_direction'] = $worldData['lastDirection'];
+    }
+    // that's all we support for now, return a success response
+    header('Content-Type: application/json');
+    echo(json_encode(array('status' => 'success', 'message' => 'World data saved successfully.')));
+    exit();
+}
+
 // Pull in a few indexes that we'll need for below
 $mmrpg_index_fields = rpg_field::get_index(true);
 $mmrpg_index_players = rpg_player::get_index(true);
@@ -202,6 +234,7 @@ function loadMapData($map_token){
 $this_prototype_data = array();
 $this_prototype_data['this_current_chapter'] = -1; // required
 $this_prototype_data['this_current_world'] = ''; // required
+$this_prototype_data['this_current_position'] = ''; // required
 $this_prototype_data['battle_phase'] = 1; // required
 $this_prototype_data['battle_round'] = 1; // required
 $this_prototype_data['this_player_id'] = 1; // required
@@ -209,8 +242,6 @@ $this_prototype_data['this_player_token'] = 'player'; // required
 $this_prototype_data['this_player_robots'] = array(); // required
 
 // Collect or define the current map token we'll be loading from
-$default_world_token = 'starter-80x80';
-$allowed_world_tokens = array('starter', 'water', 'starter-80x80');
 $request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
 if (empty($request_world_token) && !empty($WORLD_SESSION['last_world_token'])){ $request_world_token = $WORLD_SESSION['last_world_token']; }
 if (!empty($request_world_token) && in_array($request_world_token, $allowed_world_tokens)){
@@ -219,9 +250,14 @@ if (!empty($request_world_token) && in_array($request_world_token, $allowed_worl
 if (empty($this_prototype_data['this_current_world'])){ $this_prototype_data['this_current_world'] = $default_world_token; }
 $WORLD_SESSION['last_world_token'] = $this_prototype_data['this_current_world'];
 
+// Collect or define the current map position we'll be spawning into
+$request_world_position = isset($_REQUEST['position']) && preg_match('/^([-0-9]+)$/i', $_REQUEST['position']) ? trim($_REQUEST['position']) : '';
+if (empty($request_world_position) && !empty($WORLD_SESSION['last_world_position'])){ $request_world_position = $WORLD_SESSION['last_world_position']; }
+if (!empty($request_world_position)){ $this_prototype_data['this_current_position'] = $request_world_position; }
+else { $this_prototype_data['this_current_position'] = $default_world_position; }
+$WORLD_SESSION['last_world_position'] = $this_prototype_data['this_current_position'];
+
 // Collect of define the current player character we'll be using
-$default_player_token = 'player';
-$allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
 $request_player_token = isset($_REQUEST['player']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['player']) ? trim($_REQUEST['player']) : '';
 if (empty($request_player_token) && !empty($WORLD_SESSION['last_player_token'])){ $request_player_token = $WORLD_SESSION['last_player_token']; }
 if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){
@@ -295,8 +331,11 @@ if (empty($map_spawn_dst_pos)){
 }
 $WORLD_SESSION[$map_token.'_spawn_dst'] = $map_spawn_dst_pos;
 
+// If the world position has not been set yet, we can use the spawn position for it
+if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data['this_current_position'] = $map_spawn_src_pos; }
+
 // Generate the random encounters for this map location if not already spawned
-$max_random_encounters = 10;
+$max_random_encounters = 20;
 $allowed_random_encounters = $map_mecha_support;
 $disallowed_encounter_cells = array($map_spawn_src_pos, $map_spawn_dst_pos);
 $map_random_encounters = !empty($WORLD_SESSION[$map_token.'_random_encounters']) ? $WORLD_SESSION[$map_token.'_random_encounters'] : array();
@@ -363,7 +402,7 @@ $flag_skip_fadein = true;
             $map_base_attrs = 'data-cols="'.$map_col_size.'" data-rows="'.$map_row_size.'"';
             $map_base_attrs .= ' data-size="'.$map_col_size.' x '.$map_row_size.' x '. $map_tile_width.' x '.$map_tile_height.'"';
             ?>
-            <div id="map" style="<?= $map_base_styles ?>" <?= $map_base_attrs ?>>
+            <div id="map" data-token="<?= $map_token ?>" style="<?= $map_base_styles ?>" <?= $map_base_attrs ?>>
                 <?
 
                 // TERRAIN TILES
@@ -506,7 +545,7 @@ $flag_skip_fadein = true;
                     $obj = 'cursor';
                     //$sprite = 'images/items/empty-shard/icon_right_40x40.png';
                     $sprite = 'images/robots/pointan/sprite_right_40x40.png';
-                    $pos = $map_spawn_src_pos;
+                    $pos = $this_prototype_data['this_current_position'];
                     list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                     $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];

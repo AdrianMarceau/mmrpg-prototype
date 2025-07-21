@@ -10,6 +10,7 @@ gameSettings.worldConfig = {
     playerId: 0,
     playerToken: 'player',
     playerRobots: ['robot'],
+    mapToken: 'undefined',
     mapSize: [10, 10],
     mapTileSize: [40, 40],
     mapTileSizeOffset: [0, 0],
@@ -77,8 +78,11 @@ $(document).ready(function(){
         //_config.mapRows = mapRows;
         //_config.mapWidth = mapCols * mapTileSize[0];
         //_config.mapHeight = mapRows * mapTileSize[1];
+        let mapToken = $canvasMap.attr('data-token') || false;
         let dataSize = $canvasMap.attr('data-size') || false;
+        //console.log('---> data-token =', mapToken);
         //console.log('---> data-size =', dataSize);
+        _config.mapToken = mapToken || _config.mapToken;
         if (dataSize && dataSize.length){
             mapSize = dataSize.split('x').map(function(val){ return parseInt(val.trim()); });
             //console.log('---> mapSize =', mapSize);
@@ -572,11 +576,13 @@ $(document).ready(function(){
             }
 
         // Quick function for moving cursor to a given map position
-        function moveToPosition(newPosition, onComplete, forceMove){
+        function moveToPosition(newPosition, onComplete, forceMove, animateMove){
             //console.log('%c' + 'moveToPosition(' + newPosition + ')', 'color: magenta;');
             if (!newPosition || typeof newPosition === 'undefined'){ console.error('newPosition is undefined!'); return false; }
             else if (typeof newPosition !== 'string' || !newPosition.match(/^[0-9]+\-[0-9]+$/)){ console.error('newPosition is invalid!', newPosition); return false; }
             else { newPosition = newPosition.split('-'); }
+            forceMove = typeof forceMove === 'boolean' ? forceMove : false;
+            animateMove = typeof animateMove === 'boolean' ? animateMove : true;
             let _config = gameSettings.worldConfig;
             let _elements = gameSettings.worldElements;
             let _world = gameSettings.worldState;
@@ -627,10 +633,7 @@ $(document).ready(function(){
             let moveTimeout;
             let timeoutDuration = _mapEffects.moveTimeout;
             let travelDuration = _mapEffects.moveTravel * thisShiftDist;
-            $cursorSprite.animate({
-                top: tileOffsetY + 'px',
-                left: tileOffsetX + 'px'
-                }, travelDuration, 'linear', function(){
+            let onMoveComplete = function(){
                 //console.log('-> cursor moved to tile offset ' + tileOffsetX + 'x' + tileOffsetY + '!');
                 _worldCursor.col = thisNewCol;
                 _worldCursor.row = thisNewRow;
@@ -639,7 +642,8 @@ $(document).ready(function(){
                 $cursorSprite.attr('data-col', thisNewCol);
                 $cursorSprite.attr('data-row', thisNewRow);
                 $cursorSprite.attr('data-pos', _worldCursor.position);
-                updateMapPosition(_worldCursor.position);
+                updateMapPosition();
+                saveWorldState();
                 focusLayerTile('terrain', _worldCursor.position);
                 if (moveTimeout){ clearTimeout(moveTimeout); }
                 moveTimeout = setTimeout(function(){
@@ -647,7 +651,18 @@ $(document).ready(function(){
                     $canvasMap.removeClass('busy');
                     if (typeof onComplete === 'function'){ onComplete(); }
                     }, timeoutDuration);
-                });
+                };
+            if (animateMove){
+                $cursorSprite.animate({
+                    top: tileOffsetY + 'px',
+                    left: tileOffsetX + 'px'
+                    }, travelDuration, 'linear', onMoveComplete);
+                } else {
+                $cursorSprite.css({
+                    top: tileOffsetY + 'px',
+                    left: tileOffsetX + 'px'
+                    }); onMoveComplete();
+                }
             // If there are any team sprites, move them as well (it's okay if they lay behind the cursor)
             let $teamSprites = $('.sprite.team', $objectsLayer);
             if ($teamSprites && $teamSprites.length){
@@ -668,13 +683,21 @@ $(document).ready(function(){
                     $thisSprite.attr('data-dir', thisHorDir);
                     if ($thisSprite.is('.robot')){ $innerSprite.addClass('sprite_'+imgSizeX+'_07'); }
                     else if ($thisSprite.is('.player')){ $innerSprite.addClass('sprite_'+imgSizeX+'_09'); }
-                    $thisSprite.animate({
-                        top: teamOffsetY + 'px',
-                        left: teamOffsetX + 'px'
-                        }, teamTravelDuration, 'linear', function(){
+                    let onTeamMoveComplete = function(){
                         if ($thisSprite.is('.robot')){ $innerSprite.removeClass('sprite_'+imgSizeX+'_07'); }
                         else if ($thisSprite.is('.player')){ $innerSprite.removeClass('sprite_'+imgSizeX+'_09'); }
-                        });
+                        };
+                    if (animateMove){
+                        $thisSprite.animate({
+                            top: teamOffsetY + 'px',
+                            left: teamOffsetX + 'px'
+                            }, teamTravelDuration, 'linear', onTeamMoveComplete);
+                        } else {
+                        $thisSprite.css({
+                            top: teamOffsetY + 'px',
+                            left: teamOffsetX + 'px'
+                            }); onTeamMoveComplete();
+                        }
                     });
                 }
             // And now we should move the map itself so that the characters are always centered in the viewport
@@ -701,16 +724,15 @@ $(document).ready(function(){
             else if (targetY > (mapHeight - (worldHeight / 2))){ translateY = -(mapHeight - worldHeight); }
             else { translateY = -(targetY - (worldHeight / 2)); }
             //console.log('-> translateX =', translateX, '| translateY =', translateY);
+            //if (animateMove){ $canvasMap.addClass('animate'); }
+            //else { $canvasMap.removeClass('animate'); }
             $canvasMap.css({ transform: 'translate(' + translateX + 'px, ' + translateY + 'px)' });
             return true;
             }
 
         // Quick function for running post-update checks and actions after moving the cursor
-        function updateMapPosition(newPosition){
-            //console.log('%c' + 'updateMapPosition(' + newPosition + ')', 'color: magenta;');
-            if (!newPosition || typeof newPosition === 'undefined'){ console.error('newPosition is undefined!'); return false; }
-            else if (typeof newPosition !== 'string' || !newPosition.match(/^[0-9]+\-[0-9]+$/)){ console.error('newPosition is invalid!', newPosition); return false; }
-            else { newPosition = newPosition.split('-'); }
+        function updateMapPosition(){
+            //console.log('%c' + 'updateMapPosition()', 'color: magenta;');
             let _config = gameSettings.worldConfig;
             let _elements = gameSettings.worldElements;
             let _world = gameSettings.worldState;
@@ -723,9 +745,11 @@ $(document).ready(function(){
             let _playerRobots = _config.playerRobots;
             let $worldDiv = _elements.world;
             let $canvasMap = _elements.map;
+            let cursorPosition = _worldCursor.position;
+            let newPosition = cursorPosition.split('-');
             let thisNewCol = parseInt(newPosition[0]);
             let thisNewRow = parseInt(newPosition[1]);
-            //console.log('-> updating position display to (' + thisNewCol + '-' + thisNewRow + ')');
+            //console.log('-> updating position display to (' + thisNewCol + '-' + thisNewRow + ') (from: ', newPosition, ')');
             let $positionDisplay = $('#position-display > .wrapper', $worldDiv);
             $positionDisplay.text('X:' + thisNewCol + ' Y:' + thisNewRow);
             //console.log('-> moving the actions dropdown to position (' + thisNewCol + '-' + thisNewRow + ')');
@@ -797,13 +821,44 @@ $(document).ready(function(){
             return true;
             }
 
-        // Collect the map cursor element and automatically move it to the spawn position
-        let $mapCursor = $mapLayers.filter('.objects').find('.sprite.cursor');
-        if ($mapCursor && $mapCursor.length){
-            let cursorPosition = $mapCursor.attr('data-pos');
-            let autoMoveTimeout = setTimeout(function(){
-                moveToPosition(cursorPosition, null, true);
-                }, 300);
+        // Quick function for sending a snapshot of persistent world values back to the server for saving
+        function saveWorldState(){
+            //console.log('%c' + 'saveWorldState()', 'color: magenta;');
+            if (saveWorldState._scheduled){ return; }
+            saveWorldState._scheduled = true;
+            setTimeout(function(){
+                saveWorldState._scheduled = false;
+                saveWorldStateForReal();
+                }, 1000);
+            return;
+            }
+        function saveWorldStateForReal(){
+            //console.log('%c' + 'saveWorldStateForReal()', 'color: magenta;');
+            let _config = gameSettings.worldConfig;
+            let _world = gameSettings.worldState;
+            let _worldCursor = _world.cursor;
+            let _userId = _config.userId;
+            let worldData = {
+                lastWorld: _config.mapToken,
+                lastPlayer: _config.playerToken,
+                lastPosition: _worldCursor.position,
+                lastDirection: _worldCursor.direction,
+                };
+            //console.log('---> saving world state:', worldData);
+            $.ajax({
+                url: 'world.php',
+                type: 'POST',
+                dataType: 'json',
+                data: { action: 'save', world_data: worldData },
+                success: function(response){
+                    //console.log('---> save_world.php response:', response);
+                    return true;
+                    },
+                error: function(xhr, status, error){
+                    //console.error('saveWorldState() failed to save world state!', status, error);
+                    return false;
+                    }
+                });
             }
 
         // Bind a click event to the home button in the header that'll bring us to prototype menu
@@ -812,7 +867,7 @@ $(document).ready(function(){
             $homeButton.bind('click', function(e){
                 e.preventDefault();
                 //console.log('%c' + 'Home button clicked!', 'color: cyan;');
-                if (!confirm('Are you sure you want to leave the world map?')){ return; }
+                //if (!confirm('Are you sure you want to leave the world map?')){ return; }
                 $thisWorld.addClass('hidden');
                 let homeMenuURL = $homeButton.attr('data-home-url') || 'prototype.php';
                 window.location.href = homeMenuURL;
@@ -832,6 +887,15 @@ $(document).ready(function(){
                 window.location.href = worldReloadURL;
                 return true;
                 });
+            }
+
+        // Collect the map cursor element and automatically move it to the spawn position
+        let $mapCursor = $mapLayers.filter('.objects').find('.sprite.cursor');
+        if ($mapCursor && $mapCursor.length){
+            let cursorPosition = $mapCursor.attr('data-pos');
+            let autoMoveTimeout = setTimeout(function(){
+                moveToPosition(cursorPosition, null, true, false);
+                }, 300);
             }
 
 
