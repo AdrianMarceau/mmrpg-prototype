@@ -46,7 +46,7 @@ gameSettings.worldHasLoaded = false;
 
 // Create the document ready events
 $(document).ready(function(){
-    console.log('%c' + 'World map canvas ready!', 'color: green;');
+    //console.log('%c' + 'World map canvas ready!', 'color: green;');
     let _config = gameSettings.worldConfig;
     let _elements = gameSettings.worldElements;
     let _world = gameSettings.worldState;
@@ -126,11 +126,13 @@ $(document).ready(function(){
         function getTileAtPosition($overlay, xPos, yPos, applyOffset){
             //console.log('%c' + 'getTileAtPosition(' + xPos + ', ' + yPos + ')', 'color: magenta;');
             applyOffset = typeof applyOffset === 'boolean' ? applyOffset : true;
+            xPos = xPos > 0 ? parseInt(xPos) : 0, yPos = yPos > 0 ? parseInt(yPos) : 0;
             let size = _config.mapTileSize;
             let width = $overlay.width(), height = $overlay.height(), offset = $overlay.offset();
             if (applyOffset){ xPos -= offset.left; yPos -= offset.top; }
             //console.log('-> canvas(', width, ',', height, ')');
             //console.log('-> pixel position(', xPos, ',', yPos, ')');
+            //console.log('-> adjusted position', (applyOffset ? '(' + xPos + ',' + yPos + ')' : 'n/a'));
             let thisCol = Math.floor(xPos / size[0]) + 1;
             let thisRow = Math.floor(yPos / size[1]) + 1;
             let thisPos = thisCol + '-' + thisRow;

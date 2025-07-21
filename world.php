@@ -3,7 +3,11 @@
 // Include the TOP file
 require_once('top.php');
 
-//// Automatically empty all temporary battle variables
+// Define any world session vars that don't exist yet
+if (!isset($_SESSION['WORLD'])){ $_SESSION['WORLD'] = array(); }
+if (!isset($_SESSION['WORLD_TEMP'])){ $_SESSION['WORLD_TEMP'] = array(); }
+
+// Automatically empty temporary session vars from this or other pages
 $_SESSION['BATTLES'] = array();
 $_SESSION['FIELDS'] = array();
 $_SESSION['PLAYERS'] = array();
@@ -11,8 +15,11 @@ $_SESSION['ROBOTS'] = array();
 $_SESSION['ABILITIES'] = array();
 $_SESSION['ITEMS'] = array();
 $_SESSION['SKILLS'] = array();
-$_SESSION['WORLD_TEMP'] = array();
 $_SESSION['PROTOTYPE_TEMP'] = array();
+$_SESSION['WORLD_TEMP'] = array();
+
+// Define a reference object for storing temporary world data
+$WORLD_SESSION = &$_SESSION['WORLD'];
 
 // Pull in a few indexes that we'll need for below
 $mmrpg_index_fields = rpg_field::get_index(true);
@@ -209,13 +216,16 @@ $this_prototype_data['this_current_world'] = 'starter-80x80';
 // DEBUG DEBUG DEBUG(?)
 $allowed_world_tokens = array('starter', 'water', 'starter-80x80');
 $request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
+if (empty($request_world_token) && !empty($WORLD_SESSION['last_world_token'])){ $request_world_token = $WORLD_SESSION['last_world_token']; }
 if (!empty($request_world_token) && in_array($request_world_token, $allowed_world_tokens)){
     $this_prototype_data['this_current_world'] = $request_world_token;
 }
+$WORLD_SESSION['last_world_token'] = $this_prototype_data['this_current_world'];
 
 // DEBUG DEBUG DEBUG(?)
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
 $request_player_token = isset($_REQUEST['player']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['player']) ? trim($_REQUEST['player']) : '';
+if (empty($request_player_token) && !empty($WORLD_SESSION['last_player_token'])){ $request_player_token = $WORLD_SESSION['last_player_token']; }
 if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){
     $this_prototype_data['this_player_token'] = $request_player_token;
     $allowed_player_robots = mmrpg_prototype_robots_unlocked($request_player_token, true);
@@ -232,6 +242,7 @@ if (!empty($request_player_token) && in_array($request_player_token, $allowed_pl
         $this_prototype_data['this_player_robots'] = array_slice($request_player_robots, 0, $max_player_robots);
     }
 }
+$WORLD_SESSION['last_player_token'] = $this_prototype_data['this_player_token'];
 
 // DEBUG DEBUG DEBUG
 $debug_flag_animation = true;
