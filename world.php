@@ -276,14 +276,22 @@ $map_pixel_height = $map_row_size * $map_tile_height;
 //error_log('$map_pixel_width = '.$map_pixel_width);
 //error_log('$map_pixel_height = '.$map_pixel_height);
 
-// Generate the map spawn points
+// Generate the map spawn points (source and destination)
 $map_spawn_inset = 3;
-$map_spawn_src_col = mt_rand($map_spawn_inset, floor($map_col_size / 2) - $map_spawn_inset);
-$map_spawn_src_row = mt_rand($map_spawn_inset, floor($map_row_size / 2) - $map_spawn_inset);
-$map_spawn_src_pos = $map_spawn_src_col.'-'.$map_spawn_src_row;
-$map_spawn_dst_col = mt_rand(ceil($map_col_size / 2) + $map_spawn_inset, $map_col_size - $map_spawn_inset);
-$map_spawn_dst_row = mt_rand(ceil($map_row_size / 2) + $map_spawn_inset, $map_row_size - $map_spawn_inset);
-$map_spawn_dst_pos = $map_spawn_dst_col.'-'.$map_spawn_dst_row;
+$map_spawn_src_pos = !empty($WORLD_SESSION[$map_token.'_spawn_src']) ? $WORLD_SESSION[$map_token.'_spawn_src'] : '';
+if (empty($map_spawn_src_pos)){
+    $map_spawn_src_col = mt_rand($map_spawn_inset, floor($map_col_size / 2) - $map_spawn_inset);
+    $map_spawn_src_row = mt_rand($map_spawn_inset, floor($map_row_size / 2) - $map_spawn_inset);
+    $map_spawn_src_pos = $map_spawn_src_col.'-'.$map_spawn_src_row;
+}
+$WORLD_SESSION[$map_token.'_spawn_src'] = $map_spawn_src_pos;
+$map_spawn_dst_pos = !empty($WORLD_SESSION[$map_token.'_spawn_dst']) ? $WORLD_SESSION[$map_token.'_spawn_dst'] : '';
+if (empty($map_spawn_dst_pos)){
+    $map_spawn_dst_col = mt_rand(ceil($map_col_size / 2) + $map_spawn_inset, $map_col_size - $map_spawn_inset);
+    $map_spawn_dst_row = mt_rand(ceil($map_row_size / 2) + $map_spawn_inset, $map_row_size - $map_spawn_inset);
+    $map_spawn_dst_pos = $map_spawn_dst_col.'-'.$map_spawn_dst_row;
+}
+$WORLD_SESSION[$map_token.'_spawn_dst'] = $map_spawn_dst_pos;
 
 // Define some fallback values for compatibility
 $debug_flag_animation = true;
@@ -371,17 +379,15 @@ $flag_skip_fadein = true;
                     <?
 
                     $tile = 'src';
-                    $col = $map_spawn_src_col;
-                    $row = $map_spawn_src_row;
-                    $pos = $col.'-'.$row;
+                    $pos = $map_spawn_src_pos;
+                    list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                     $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                     echo('<span class="sprite tile '.$tile.' pulse" data-event="spawn-src" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>');
 
                     $tile = 'dst';
-                    $col = $map_spawn_dst_col;
-                    $row = $map_spawn_dst_row;
-                    $pos = $col.'-'.$row;
+                    $pos = $map_spawn_dst_pos;
+                    list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                     $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                     echo('<span class="sprite tile '.$tile.' pulse" data-event="spawn-dst" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>');
@@ -492,9 +498,8 @@ $flag_skip_fadein = true;
                     $obj = 'cursor';
                     //$sprite = 'images/items/empty-shard/icon_right_40x40.png';
                     $sprite = 'images/robots/pointan/sprite_right_40x40.png';
-                    $col = $map_spawn_src_col;
-                    $row = $map_spawn_src_row;
-                    $pos = $col.'-'.$row;
+                    $pos = $map_spawn_src_pos;
+                    list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                     $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                     echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"><span class="sprite sprite_40x40" style="background-image: url('.$sprite.');"></span></span>');
