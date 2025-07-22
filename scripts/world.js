@@ -11,6 +11,7 @@ gameSettings.worldConfig = {
     playerToken: 'player',
     playerRobots: ['robot'],
     mapToken: 'undefined',
+    mapImage: 'undefined.png',
     mapSize: [10, 10],
     mapTileSize: [40, 40],
     mapTileSizeOffset: [0, 0],
@@ -23,7 +24,10 @@ gameSettings.worldConfig = {
         hoverTimeout: 600, // milliseconds
         moveTimeout: 300, // milliseconds
         moveTravel: 100, // milliseconds
-        }
+        },
+    mapTilesIndex: {},
+    mapSpritesIndex: {},
+    mapPortalsIndex: {},
     };
 gameSettings.worldElements = {
     mmrpg: null,
@@ -66,65 +70,211 @@ $(document).ready(function(){
     _elements.map = $canvasMap;
     _elements.layers = $mapLayers;
     if ($canvasMap.length && $mapLayers.length){
+
         //console.log('%c' + 'World map canvas found with ' + $mapLayers.length + ' layers...', 'color: orange;');
-        // Collect details about this map from the markup
-        //let _config = gameSettings.worldConfig;
-        //let _world = gameSettings.worldState;
-        //let _worldCursor = _world.cursor;
-        //let mapCols = parseInt($canvasMap.attr('data-cols'));
-        //let mapRows = parseInt($canvasMap.attr('data-rows'));
-        //let mapTileSize = _config.mapTileSize;
-        //_config.mapCols = mapCols;
-        //_config.mapRows = mapRows;
-        //_config.mapWidth = mapCols * mapTileSize[0];
-        //_config.mapHeight = mapRows * mapTileSize[1];
-        let mapToken = $canvasMap.attr('data-token') || false;
-        let dataSize = $canvasMap.attr('data-size') || false;
-        //console.log('---> data-token =', mapToken);
-        //console.log('---> data-size =', dataSize);
-        _config.mapToken = mapToken || _config.mapToken;
-        if (dataSize && dataSize.length){
-            mapSize = dataSize.split('x').map(function(val){ return parseInt(val.trim()); });
-            //console.log('---> mapSize =', mapSize);
+        initWorldMap($canvasMap, $mapLayers, function(){
+            //console.log('%c' + 'initWorldMap() complete!', 'color: cyan;');
+            //console.log('---> _config.mapToken =', _config.mapToken);
+            //console.log('---> _config.mapSize =', _config.mapSize);
+            //console.log('---> _config.mapTileSize =', _config.mapTileSize);
+            //console.log('---> _config.mapTileSizeOffset =', _config.mapTileSizeOffset);
+            //console.log('---> _config.mapCols =', _config.mapCols);
+            //console.log('---> _config.mapRows =', _config.mapRows);
+            //console.log('---> _config.mapWidth =', _config.mapWidth);
+            //console.log('---> _config.mapHeight =', _config.mapHeight);
+            });
+
+        // Define the function to run when everything is done loading
+        let onWorldLoaded = function(){
+            bindEventsToCanvas($canvasMap);
+            $canvasMap.addClass('ready');
+            };
+
+        // Loop through each map layer and add the appropriate interactivity
+        let layersPending = $mapLayers.length;
+        $mapLayers.each(function(index, element){
+            //console.log('-> checking layer #' + index + '...');
+            let $thisLayer = $(element);
+            let layerToken = $thisLayer.attr('data-layer') || false;
+            if (layerToken === 'terrain'){
+                //console.log('%c' + '--> Generating tilemap for terrain layer #' + index + '!', 'color: orange;');
+                initMapLayerCanvas($thisLayer, function(){
+                    //console.log('%c' + '--> onComplete() for initMapLayerCanvas() reached!', 'color: green;');
+                    $thisLayer.addClass('ready');
+                    layersPending--;
+                    if (!layersPending){
+                        onWorldLoaded();
+                        }
+                    });
+                return true;
+                }
+            layersPending--;
+            return true;
+            });
+
+        // Quick function for parsing the canvas data in a map layer
+        function initWorldMap($canvasMap, $mapLayers, onComplete){
+            //console.log('%c' + 'initWorldMap($canvasMap:' + typeof $canvasMap + ', $mapLayers:' + typeof $mapLayers + ')', 'color: magenta;');
+            if (!$canvasMap || !$canvasMap.length){ console.error('initWorldMap() missing required $canvasMap!'); return false; }
+            if (!$mapLayers || !$mapLayers.length){ console.error('initWorldMap() missing required $mapLayers!'); return false; }
+            let _config = gameSettings.worldConfig;
+            let _world = gameSettings.worldState;
+            let $mapJson = $('script[data-json]', $canvasMap).first(), mapJson = $mapJson.html(), mapData = mapJson ? JSON.parse(mapJson) : false;
+            if (!mapData || typeof mapData !== 'object' || !Object.keys(mapData).length){ console.error('initWorldMap() unable to parse mapData!'); return false; }
+            let mapToken = mapData.map_token || false;
+            let mapImage = mapData.map_image || false;
+            let mapSize = mapData.map_size || false;
+            let tileSize = mapData.tile_size || false;
+            let tilesIndex = mapData.tiles_index || false;
+            let spritesIndex = mapData.sprites_index || false;
+            let portalsIndex = mapData.portals_index || false;
+            if (!mapToken || !mapImage || !mapSize || !tileSize){ console.error('initWorldMap() missing required properties!', {mapToken, mapImage, mapSize, tileSize}); return false; }
+            if (!tilesIndex || !spritesIndex || !portalsIndex){ console.error('initWorldMap() missing required indexes!', {tilesIndex, spritesIndex, portalsIndex}); return false; }
+            if (!Array.isArray(mapSize) || mapSize.length < 2){ console.error('initWorldMap() mapSize must be an array of at least two values!'); return false; }
+            if (!Array.isArray(tileSize) || tileSize.length < 2){ console.error('initWorldMap() tileSize must be an array of at least two values!'); return false; }
             let defaultMapSize = [_config.mapSize[0], _config.mapSize[1]];
             let defaultMapTileSize = [_config.mapTileSize[0], _config.mapTileSize[1]];
-            if (mapSize.length === 4){ _config.mapSize = [mapSize[0], mapSize[1]]; _config.mapTileSize = [mapSize[2], mapSize[3]]; }
-            else if (mapSize.length === 3){ _config.mapSize = [mapSize[0], mapSize[1]]; _config.mapTileSize = [mapSize[2], mapSize[2]]; }
-            else if (mapSize.length === 2){ _config.mapSize = [mapSize[0], mapSize[0]]; _config.mapTileSize = [mapSize[1], mapSize[1]]; }
-            else if (mapSize.length === 1){ _config.mapSize = [mapSize[0], mapSize[0]]; _config.mapTileSize = [mapSize[0], mapSize[0]]; }
+            _config.mapToken = mapToken;
+            _config.mapImage = mapImage;
+            _config.mapSize = [parseInt(mapSize[0]), parseInt(mapSize[1])];
+            _config.mapTileSize = [parseInt(tileSize[0]), parseInt(tileSize[1])];
+            _config.mapTileSizeOffset = [0, 0]; // default values
             _config.mapCols = _config.mapSize[0];
             _config.mapRows = _config.mapSize[1];
             _config.mapWidth = _config.mapSize[0] * _config.mapTileSize[0];
             _config.mapHeight = _config.mapSize[1] * _config.mapTileSize[1];
             if (_config.mapTileSize[0] > defaultMapTileSize[0]){ _config.mapTileSizeOffset[0] = Math.floor((_config.mapTileSize[0] - defaultMapTileSize[0]) / 2); }
             if (_config.mapTileSize[1] > defaultMapTileSize[1]){ _config.mapTileSizeOffset[1] = Math.floor((_config.mapTileSize[1] - defaultMapTileSize[1]) / 2); }
+            _config.mapTilesIndex = tilesIndex;
+            _config.mapSpritesIndex = spritesIndex;
+            _config.mapPortalsIndex = portalsIndex;
+            // Return true on success or run the oncomplete callback
+            if (typeof onComplete === 'function'){ return onComplete(); }
+            else { return true; }
             }
-        //console.log('---> _config.mapSize =', _config.mapSize);
-        //console.log('---> _config.mapTileSize =', _config.mapTileSize);
-        //console.log('---> _config.mapTileSizeOffset =', _config.mapTileSizeOffset);
-        //console.log('---> _config.mapCols =', _config.mapCols);
-        //console.log('---> _config.mapRows =', _config.mapRows);
-        //console.log('---> _config.mapWidth =', _config.mapWidth);
-        //console.log('---> _config.mapHeight =', _config.mapHeight);
 
-        // Loop through each map and add the appropriate interactivity
-        $mapLayers.each(function(index, element){
-            //console.log('-> checking layer #' + index + '...');
+        // Quick function for parsing the canvas data in a map layer
+        function initMapLayerCanvas($thisLayer, onComplete){
+            //console.log('%c' + 'initMapLayerCanvas($thisLayer:' + typeof $thisLayer + ')', 'color: magenta;');
+            if (!$thisLayer || !$thisLayer.length){ console.error('initMapLayerCanvas() missing required $thisLayer!'); return false; }
+            if (!$('canvas', $thisLayer).length){ console.error('initMapLayerCanvas() $thisLayer missing required <canvas>!'); return false; }
+            if (!$('script[data-json]', $thisLayer).length){ console.error('initMapLayerCanvas() $thisLayer missing required <script data-json>!'); return false; }
             let _config = gameSettings.worldConfig;
-            let $thisLayer = $(element);
-            let layerToken = $thisLayer.attr('data-layer') || false;
-
-            if (layerToken === 'terrain'){
-                //console.log('%c' + '--> Generating tilemap for terrain layer #' + index + '!', 'color: orange;');
-                initMapLayerCanvas($thisLayer, function(){
-                    //console.log('%c' + '--> onComplete() for initMapLayerCanvas() reached!', 'color: green;');
-                    $thisLayer.addClass('ready');
-                    });
-                return true;
+            let _world = gameSettings.worldState;
+            let layerToken = $thisLayer.attr('data-layer');
+            let $canvas = $('canvas', $thisLayer), canvas = $canvas[0], ctx = canvas.getContext('2d');
+            let $canvasJson = $('script[data-json]', $thisLayer).first(), canvasJson = $canvasJson.html(), canvasData = canvasJson ? JSON.parse(canvasJson) : false;
+            if (!canvasData || typeof canvasData !== 'object' || !Object.keys(canvasData).length){ console.error('initMapLayerCanvas() unable to parse canvasData!'); return false; }
+            let mapImage = _config.mapImage;
+            let mapWidth = _config.mapWidth;
+            let mapHeight = _config.mapHeight;
+            let canvasTiles = canvasData.canvas_tiles;
+            $canvas.css({top: 0, left: 0, width: mapWidth, height: mapHeight});
+            $canvas.attr('width', mapWidth).attr('height', mapHeight);
+            ctx.width = mapWidth, ctx.height = mapHeight;
+            $thisLayer.empty().append($canvas);
+            //console.log('---> time to load the sprite sheet for this map layer!');
+            ctx.clearRect(0, 0, mapWidth, mapHeight);
+            let spriteSheet = new Image();
+            let onLoadError = function(){
+                console.error('----> canvas image failed to load from ' + mapImage + '!');
+                if (typeof onComplete === 'function'){ onComplete(); }
+                return false;
                 }
+            let onLoadSuccess = function(){
+                //console.log('%c' + '----> canvas image loaded successfully!', 'color: cyan;');
+                indexCanvasTileData(layerToken, spriteSheet, canvasTiles);
+                drawTilesToCanvas(layerToken);
+                if (typeof onComplete === 'function'){ onComplete(); }
+                return true;
+                };
+            spriteSheet.onerror = function(){ return onLoadError(); }
+            spriteSheet.onload = function(){ return onLoadSuccess(); };
+            //console.log('%c' + '---> loading sprite sheet image from ' + mapImage, 'color: cyan;');
+            spriteSheet.src = mapImage;
+            return true;
+            }
 
-            });
+        // Quick function for drawing tiles to a given canvas object
+        function indexCanvasTileData(layerToken, spriteSheet, canvasTiles){
+            //console.log('%c' + '~indexCanvasTileData(layerToken:' + layerToken + ', spriteSheet:' + typeof spriteSheet + ', canvasTiles:' + typeof canvasTiles + ')', 'color: magenta;');
+            if (!layerToken || !spriteSheet || !canvasTiles){ console.error('indexCanvasTileData() missing required parameters!', {layerToken, spriteSheet, canvasTiles}); return false; }
+            if (typeof canvasTiles !== 'object' || !Object.keys(canvasTiles).length){ console.error('indexCanvasTileData() required canvasTiles missing or malformed!'); return false; }
+            let _config = gameSettings.worldConfig;
+            let _world = gameSettings.worldState;
+            let tileSize = _config.mapTileSize;
+            let tilesIndex = _config.mapTilesIndex;
+            let tilesIndexKeys = tilesIndex.keys;
+            let tileDataKeys = Object.keys(canvasTiles);
+            //console.log('---> loaded ', tilesIndexKeys.length, ' tile defs from index...');
+            //console.log('---> found ', tileDataKeys.length, ' layer tiles in data...');
+            //console.log('---> indexing ', tileDataKeys.length, ' tileDataKeys tiles for canvas...');
+            let layersIndex = _world.layersIndex || {};
+            let layerTilesIndex = _world.layerTilesIndex || {};
+            let thisLayerData = layersIndex[layerToken] || {};
+            let thisLayerTiles = layerTilesIndex[layerToken] || {};
+            thisLayerData.token = layerToken;
+            thisLayerData.sheet = spriteSheet;
+            thisLayerData.tiles = canvasTiles;
+            for (var i = 0; i < tileDataKeys.length; i++){
+                let tileKey = tileDataKeys[i];
+                let tileValue = canvasTiles[tileKey];
+                let tilePos = tileKey.split('-').map(function(val){ return parseInt(val.trim()); });
+                //console.log('---> processing tile #' + i + ' w/ tileKey = ' + tileKey + ' and tileValue = ' + tileValue);
+                let tileSpriteKey = tileValue;
+                let tileSpriteToken = tilesIndexKeys[tileSpriteKey];
+                let tileSpriteInfo = tilesIndex[tileSpriteToken];
+                let tileSpriteOffset = [tileSpriteInfo[0] || 0, tileSpriteInfo[1] || 0];
+                let tileSpriteSize = [tileSpriteInfo[2] || tileSize[0], tileSpriteInfo[3] || tileSize[1]];
+                let tileSpritePosition = [tilePos[0], tilePos[1], ((tilePos[0] - 1) * tileSpriteSize[0]), ((tilePos[1] - 1) * tileSpriteSize[1])];
+                let tileSpriteEffects = {grid: true, hover: false, focus: false}; // default values
+                //console.log('---> tileSpriteKey =', tileSpriteKey);
+                //console.log('---> tileSpriteToken =', tileSpriteToken);
+                //console.log('---> tileSpriteInfo =', tileSpriteInfo);
+                let tilesIndexData = typeof thisLayerTiles[tileKey] !== 'undefined' ? thisLayerTiles[tileKey] : {};
+                tilesIndexData.position = tileSpritePosition;
+                tilesIndexData.effects = tileSpriteEffects;
+                tilesIndexData.sprite = [tileSpriteKey, tileSpriteToken, tileSpriteOffset, tileSpriteSize];
+                tilesIndexData.walkable = tileSpriteToken === 'void' ? false : true;
+                tilesIndexData.dirty = false; // indicates if the tile has been changed since last draw
+                //console.log('---> tilesIndexData =', tilesIndexData);
+                thisLayerTiles[tileKey] = tilesIndexData;
+                }
+            layersIndex[layerToken] = thisLayerData;
+            layerTilesIndex[layerToken] = thisLayerTiles;
+            _world.layersIndex = layersIndex;
+            _world.layerTilesIndex = layerTilesIndex;
+            return true;
+            }
 
+        // Quick function for drawing tiles to a given layer's canvas object
+        function drawTilesToCanvas(layerToken){
+            //console.log('%c' + '~drawTilesToCanvas(layerToken:' + layerToken + ')', 'color: magenta;');
+            if (!layerToken || typeof layerToken !== 'string'){ console.error('drawTilesToCanvas() missing required layerToken!'); return false; }
+            let _config = gameSettings.worldConfig;
+            let _elements = gameSettings.worldElements;
+            let _world = gameSettings.worldState;
+            let $worldDiv = _elements.world;
+            let $canvasMap = _elements.map;
+            let $thisLayer = $('.layer[data-layer="'+layerToken+'"]', $canvasMap);
+            if (!$thisLayer || !$thisLayer.length){ console.error('drawTilesToCanvas() missing required $thisLayer!'); return false; }
+            let layersIndex = _world.layersIndex;
+            let layerTilesIndex = _world.layerTilesIndex;
+            let thisLayerData = layersIndex[layerToken] || false;
+            let thisLayerSheet = thisLayerData ? thisLayerData.sheet : false;
+            let thisLayerTiles = layerTilesIndex[layerToken] || false;
+            let thisLayerTilesKeys = thisLayerTiles ? Object.keys(thisLayerTiles) : false;
+            if (!thisLayerData || !thisLayerSheet){ console.error('drawTilesToCanvas() missing required thisLayerData or thisLayerSheet!'); return false; }
+            if (!thisLayerTiles || !thisLayerTilesKeys){ console.error('drawTilesToCanvas() missing required thisLayerTiles or thisLayerTilesKeys!'); return false; }
+            //console.log('---> drawing ', thisLayerTilesKeys.length, ' thisLayerTilesKeys tiles to canvas...');
+            let $canvas = $('canvas', $thisLayer), canvas = $canvas[0], ctx = canvas.getContext('2d');
+            for (var i = 0; i < thisLayerTilesKeys.length; i++){
+                let tileKey = thisLayerTilesKeys[i];
+                let tilesIndexData = getLayerTileIndexData(layerToken, tileKey);
+                drawTileToCanvas(layerToken, ctx, thisLayerSheet, tileKey, tilesIndexData);
+                }
+            return true;
+            }
 
         // Quick function for calculating the column and row of a tile at a given pixel position
         function getTileAtPosition($overlay, xPos, yPos, applyOffset){
@@ -147,143 +297,6 @@ $(document).ready(function(){
             return thisPos;
             }
 
-        // Quick function for parsing the canvas data in a map layer
-        function initMapLayerCanvas($thisLayer, onComplete){
-            //console.log('%c' + 'initMapLayerCanvas($thisLayer:' + typeof $thisLayer + ')', 'color: magenta;');
-            if (!$thisLayer || !$thisLayer.length){ console.error('initMapLayerCanvas() missing required $thisLayer!'); return false; }
-            if (!$('canvas', $thisLayer).length){ console.error('initMapLayerCanvas() $thisLayer missing required <canvas>!'); return false; }
-            if (!$('script[data-json]', $thisLayer).length){ console.error('initMapLayerCanvas() $thisLayer missing required <script data-json>!'); return false; }
-            let layerToken = $thisLayer.attr('data-layer');
-            let $canvas = $('canvas', $thisLayer), canvas = $canvas[0], ctx = canvas.getContext('2d');
-            let $canvasJson = $('script[data-json]', $thisLayer).first(), canvasJson = $canvasJson.html(), canvasData = canvasJson ? JSON.parse(canvasJson) : false;
-            if (!canvasData || typeof canvasData !== 'object' || !Object.keys(canvasData).length){ console.error('initMapLayerCanvas() unable to parse canvasData!'); return false; }
-            let mapImage = canvasData.map_image || false;
-            let mapSize = canvasData.map_size || false;
-            let mapOffset = canvasData.map_offset || false;
-            let tileSize = canvasData.tile_size || false;
-            let tileIndex = canvasData.tile_index || false;
-            let tileData = canvasData.tile_data || false;
-            if (!mapImage || !mapSize || !mapOffset){ console.error('----> missing required properties!', {mapImage, mapSize, mapOffset}); return false; }
-            if (!tileSize || !tileIndex || !tileData){ console.error('----> missing required properties!', {tileSize, tileIndex, tileData}); return false; }
-            let canvasWidth = parseInt(mapSize[0]) || _config.mapWidth;
-            let canvasHeight = parseInt(mapSize[1]) || _config.mapHeight;
-            let canvasOffsetX = parseInt(mapOffset[0]) || 0;
-            let canvasOffsetY = parseInt(mapOffset[1]) || 0;
-            //console.log('---> setting canvas width and height to', canvasWidth, '×', canvasHeight);
-            $canvas.css({top: canvasOffsetY + 'px', left: canvasOffsetX + 'px', width: canvasWidth, height: canvasHeight});
-            $canvas.attr('width', canvasWidth).attr('height', canvasHeight);
-            ctx.width = canvasWidth, ctx.height = canvasHeight;
-            $thisLayer.empty().append($canvas);
-            //console.log('---> ctx.size =', 'buffer:', canvas.width, '×', canvas.height, 'css:',    canvas.clientWidth, '×', canvas.clientHeight);
-            // load the image into memory
-            //console.log('---> time to generate tiles for this later!');
-            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-            let spriteSheet = new Image();
-            spriteSheet.onerror = function(){
-                console.error('----> canvas image failed to load from ' + mapImage + '!');
-                return false;
-                };
-            spriteSheet.onload = function(){
-                //console.log('%c' + '----> canvas image loaded successfully!', 'color: cyan;');
-                indexCanvasTileData(layerToken, spriteSheet, canvasData);
-                drawTilesToCanvas(layerToken);
-                bindEventsToCanvasTiles(layerToken);
-                if (typeof onComplete === 'function'){ onComplete(); }
-                return true;
-                };
-            //console.log('%c' + '---> loading sprite sheet image from ' + mapImage, 'color: cyan;');
-            spriteSheet.src = mapImage;
-            return true;
-            }
-
-        // Quick function for drawing tiles to a given canvas object
-        function indexCanvasTileData(layerToken, spriteSheet, canvasData){
-            //console.log('%c' + '~indexCanvasTileData(layerToken:' + layerToken + ', spriteSheet:' + typeof spriteSheet + ', canvasData:' + typeof canvasData + ')', 'color: magenta;');
-            if (!layerToken || !spriteSheet || !canvasData){ console.error('indexCanvasTileData() missing required parameters!', {layerToken, spriteSheet, canvasData}); return false; }
-            if (typeof canvasData !== 'object' || !Object.keys(canvasData).length){ console.error('indexCanvasTileData() required canvasData missing or malformed!'); return false; }
-            let _config = gameSettings.worldConfig;
-            let _world = gameSettings.worldState;
-            //let mapImage = canvasData.map_image;
-            //let mapSize = canvasData.map_size;
-            //let mapOffset = canvasData.map_offset;
-            let tileSize = canvasData.tile_size;
-            let tileIndex = canvasData.tile_index;
-            let tileIndexKeys = tileIndex.keys;
-            let tileData = canvasData.tile_data;
-            let tileDataKeys = Object.keys(tileData);
-            //console.log('---> loaded ', tileIndexKeys.length, ' tile defs from index...');
-            //console.log('---> found ', tileDataKeys.length, ' layer tiles in data...');
-            //console.log('---> indexing ', tileDataKeys.length, ' tileDataKeys tiles for canvas...');
-            let layersIndex = _world.layersIndex || {};
-            let layerTilesIndex = _world.layerTilesIndex || {};
-            let thisLayerData = layersIndex[layerToken] || {};
-            let thisLayerTiles = layerTilesIndex[layerToken] || {};
-            thisLayerData.token = layerToken;
-            thisLayerData.sheet = spriteSheet;
-            thisLayerData.data = canvasData;
-            for (var i = 0; i < tileDataKeys.length; i++){
-                let tileKey = tileDataKeys[i];
-                let tileValue = tileData[tileKey];
-                let tilePos = tileKey.split('-').map(function(val){ return parseInt(val.trim()); });
-                //console.log('---> processing tile #' + i + ' w/ tileKey = ' + tileKey + ' and tileValue = ' + tileValue);
-                let tileSpriteKey = tileValue;
-                let tileSpriteToken = tileIndexKeys[tileSpriteKey];
-                let tileSpriteInfo = tileIndex[tileSpriteToken];
-                let tileSpriteOffset = [tileSpriteInfo[0] || 0, tileSpriteInfo[1] || 0];
-                let tileSpriteSize = [tileSpriteInfo[2] || tileSize[0], tileSpriteInfo[3] || tileSize[1]];
-                let tileSpritePosition = [tilePos[0], tilePos[1], ((tilePos[0] - 1) * tileSpriteSize[0]), ((tilePos[1] - 1) * tileSpriteSize[1])];
-                let tileSpriteEffects = {grid: true, hover: false, focus: false}; // default values
-                //console.log('---> tileSpriteKey =', tileSpriteKey);
-                //console.log('---> tileSpriteToken =', tileSpriteToken);
-                //console.log('---> tileSpriteInfo =', tileSpriteInfo);
-                let tileIndexData = typeof thisLayerTiles[tileKey] !== 'undefined' ? thisLayerTiles[tileKey] : {};
-                tileIndexData.position = tileSpritePosition;
-                tileIndexData.effects = tileSpriteEffects;
-                tileIndexData.sprite = [tileSpriteKey, tileSpriteToken, tileSpriteOffset, tileSpriteSize];
-                tileIndexData.dirty = false; // indicates if the tile has been changed since last draw
-                //console.log('---> tileIndexData =', tileIndexData);
-                thisLayerTiles[tileKey] = tileIndexData;
-                }
-            layersIndex[layerToken] = thisLayerData;
-            layerTilesIndex[layerToken] = thisLayerTiles;
-            _world.layersIndex = layersIndex;
-            _world.layerTilesIndex = layerTilesIndex;
-            return true;
-            }
-
-        // Quick function for drawing tiles to a given layer's canvas object
-        function drawTilesToCanvas(layerToken){
-            //console.log('%c' + '~drawTilesToCanvas(layerToken:' + layerToken + ')', 'color: magenta;');
-            if (!layerToken || typeof layerToken !== 'string'){ console.error('drawTilesToCanvas() missing required layerToken!'); return false; }
-            let _config = gameSettings.worldConfig;
-            let _elements = gameSettings.worldElements;
-            let _world = gameSettings.worldState;
-            let $worldDiv = _elements.world;
-            let $canvasMap = _elements.map;
-            let $thisLayer = $('.layer[data-layer="'+layerToken+'"]', $canvasMap);
-            if (!$thisLayer || !$thisLayer.length){ console.error('drawTilesToCanvas() missing required $thisLayer!'); return false; }
-            let layersIndex = _world.layersIndex;
-            let layerTilesIndex = _world.layerTilesIndex;
-            let thisLayerData = layersIndex[layerToken];
-            let thisLayerTiles = layerTilesIndex[layerToken];
-            if (!thisLayerData || !thisLayerData.sheet || !thisLayerData.data){ console.error('drawTilesToCanvas() missing required thisLayerData!'); return false; }
-            if (!thisLayerTiles || typeof thisLayerTiles !== 'object' || !Object.keys(thisLayerTiles).length){ console.error('drawTilesToCanvas() missing required thisLayerTiles!'); return false; }
-            let thisLayerTileKeys = Object.keys(thisLayerTiles);
-            let spriteSheet = thisLayerData.sheet;
-            let canvasData = thisLayerData.data;
-            if (!spriteSheet || !(spriteSheet instanceof Image) || !canvasData || typeof canvasData !== 'object'){ console.error('drawTilesToCanvas() missing required spriteSheet or canvasData!'); return false; }
-            if (!canvasData || !canvasData.tile_size || !canvasData.tile_index || !canvasData.tile_data){ console.error('drawTilesToCanvas() missing required tile_size, tile_index, or tile_data!'); return false; }
-            //console.log('---> drawing ', thisLayerTileKeys.length, ' thisLayerTileKeys tiles to canvas...');
-            let $canvas = $('canvas', $thisLayer), canvas = $canvas[0], ctx = canvas.getContext('2d');
-            for (var i = 0; i < thisLayerTileKeys.length; i++){
-                let tileKey = thisLayerTileKeys[i];
-                //let tileIndexData = thisLayerTiles[tileKey];
-                let tileIndexData = getLayerTileIndexData(layerToken, tileKey);
-                drawTileToCanvas(layerToken, ctx, spriteSheet, tileKey, tileIndexData);
-                }
-            return true;
-            }
-
         // Quick function for getting a given layer tile's index data provided the layer token and tile key
         function getLayerTileIndexData(layerToken, tileKey){
             //console.log('%c' + '~getLayerTileIndexData(layerToken:' + layerToken + ', tileKey:' + tileKey + ')', 'color: magenta;');
@@ -296,7 +309,7 @@ $(document).ready(function(){
             let thisTileData = thisLayerTiles[tileKey] || false;
             if (!thisLayerTiles || typeof thisLayerTiles !== 'object' || !Object.keys(thisLayerTiles).length){ console.error('getLayerTileIndexData() cannot find required thisLayerTiles @ layerTilesIndex['+layerToken+']!'); return false; }
             if (!thisTileData || typeof thisTileData !== 'object'){ console.error('getLayerTileIndexData() cannot find required thisTileData @ layerTilesIndex['+layerToken+']['+tileKey+']!'); return false; }
-            //console.log('---> returning tileIndexData for tileKey ' + tileKey + ' on layer ' + layerToken + ':', thisTileData);
+            //console.log('---> returning tilesIndexData for tileKey ' + tileKey + ' on layer ' + layerToken + ':', thisTileData);
             // make sure the returned tile data object is actually in the parent now
             layerTilesIndex[layerToken][tileKey] = thisTileData;
             return thisTileData;
@@ -309,27 +322,64 @@ $(document).ready(function(){
             if (!tileToken || typeof tileToken !== 'string' || !tileToken.length){ console.error('getLayerTileSpriteData() missing required tileToken!'); return false; }
             let _config = gameSettings.worldConfig;
             let _world = gameSettings.worldState;
-            let layersIndex = _world.layersIndex;
-            let thisLayerData = layersIndex[layerToken] || false;
-            if (!thisLayerData || typeof thisLayerData !== 'object' || !thisLayerData.data){ console.error('getLayerTileSpriteData() missing required thisLayerData!'); return false; }
-            let canvasData = thisLayerData.data;
-            if (!canvasData.tile_index || typeof canvasData.tile_index !== 'object'){ console.error('getLayerTileSpriteData() missing required canvasData.tile_index!'); return false; }
-            let tileIndex = canvasData.tile_index;
-            let tileSpriteInfo = tileIndex[tileToken] || false;
-            if (!tileSpriteInfo || typeof tileSpriteInfo !== 'object'){ console.error('getLayerTileSpriteData() missing required tileSpriteInfo!'); return false; }
+            let layerTilesIndex = _world.layerTilesIndex;
+            if (!layerTilesIndex[layerToken]){ console.error('getLayerTileSpriteData() missing required layerTilesIndex[' + layerToken + ']!'); return false; }
+            if (!layerTilesIndex[layerToken][tileToken]){ console.error('getLayerTileSpriteData() missing required layerTilesIndex[' + layerToken + '][' + tileToken + ']!'); return false; }
+            if (!layerTilesIndex[layerToken][tileToken].sprite){ console.error('getLayerTileSpriteData() missing required layerTilesIndex[' + layerToken + '][' + tileToken + '].sprite!'); return false; }
+            let layerTileData = layerTilesIndex[layerToken][tileToken];
+            let spriteToken = layerTileData.sprite[1];
+            let mapTilesIndex = _config.mapTilesIndex;
+            if (!mapTilesIndex[spriteToken]){ console.error('getLayerTileSpriteData() missing required mapTilesIndex[' + spriteToken + ']!'); return false; }
+            let tileSpriteInfo = mapTilesIndex[spriteToken];
             //console.log('---> returning tile sprite data for token ' + tileToken + ':', tileSpriteInfo);
             return tileSpriteInfo;
             }
 
+        // Quick function for getting a given tile's data (the one with the offset, size, etc.) provided the tile token
+        function getTileData(tileToken){
+            //console.log('%c' + '~getTileData(tileToken:' + tileToken + ')', 'color: magenta;');
+            if (!tileToken || typeof tileToken !== 'string' || !tileToken.length){ console.error('getTileData() missing required tileToken!'); return false; }
+            let _config = gameSettings.worldConfig;
+            let mapTilesIndex = _config.mapTilesIndex;
+            let tileInfo = mapTilesIndex[tileToken] || false;
+            if (!tileInfo){ console.error('getTileData() missing required entry "' + tileToken + '" in mapTilesIndex!'); return false; }
+            //console.log('---> returning tile tile data for token ' + tileToken + ':', tileInfo);
+            return tileInfo;
+            }
+
+        // Quick function for getting a given sprite's data (the one with the offset, size, etc.) provided the sprite token
+        function getSpriteData(spriteToken){
+            //console.log('%c' + '~getSpriteData(spriteToken:' + spriteToken + ')', 'color: magenta;');
+            if (!spriteToken || typeof spriteToken !== 'string' || !spriteToken.length){ console.error('getSpriteData() missing required spriteToken!'); return false; }
+            let _config = gameSettings.worldConfig;
+            let mapSpritesIndex = _config.mapSpritesIndex;
+            let spriteInfo = mapSpritesIndex[spriteToken] || false;
+            if (!spriteInfo){ console.error('getSpriteData() missing required entry "' + spriteToken + '" in mapSpritesIndex!'); return false; }
+            //console.log('---> returning tile sprite data for token ' + spriteToken + ':', spriteInfo);
+            return spriteInfo;
+            }
+
+        // Quick function for getting a given portal's data (the one with the offset, size, etc.) provided the portal token
+        function getPortalData(portalToken){
+            //console.log('%c' + '~getPortalData(portalToken:' + portalToken + ')', 'color: magenta;');
+            if (!portalToken || typeof portalToken !== 'string' || !portalToken.length){ console.error('getPortalData() missing required portalToken!'); return false; }
+            let _config = gameSettings.worldConfig;
+            let mapPortalsIndex = _config.mapPortalsIndex;
+            let portalInfo = mapPortalsIndex[portalToken] || false;
+            if (!portalInfo){ console.error('getPortalData() missing required entry "' + portalToken + '" in mapPortalsIndex!'); return false; }
+            //console.log('---> returning tile portal data for token ' + portalToken + ':', portalInfo);
+            return portalInfo;
+            }
+
         // Quick function for drawing a single tile to a given layer's canvas object given data
-        function drawTileToCanvas(layerToken, ctx, spriteSheet, tileKey, tileIndexData){
-            //console.log('%c' + '~drawTileToCanvas(layerToken:' + layerToken + ', ctx, spriteSheet, tileKey:' + tileKey + ', tileIndexData:' + typeof tileIndexData + ')', 'color: magenta;');
+        function drawTileToCanvas(layerToken, ctx, spriteSheet, tileKey, tileData){
+            //console.log('%c' + '~drawTileToCanvas(layerToken:' + layerToken + ', ctx, spriteSheet, tileKey:' + tileKey + ', tileData:' + typeof tileData + ')', 'color: magenta;');
             let _config = gameSettings.worldConfig;
             let _world = gameSettings.worldState;
             // collect the tile data from the index
-            let tilePosition = tileIndexData.position; // col, row, x, y
-            let tileEffects = tileIndexData.effects; // grid, hover, focus
-            let tileSprite = tileIndexData.sprite; // key, token, offset, size
+            let tilePosition = tileData.position; // col, row, x, y
+            let tileEffects = tileData.effects; // grid, hover, focus
+            let tileSprite = tileData.sprite; // key, token, offset, size
             let tileSpriteKey = tileSprite[0];
             let tileSpriteToken = tileSprite[1];
             let tileSpriteOffset = tileSprite[2];
@@ -346,9 +396,9 @@ $(document).ready(function(){
                 tileSpriteSize[0], tileSpriteSize[1] // destination size
                 );
             // grid/focus/hover: draw any overlay images as defined in the effects
-            let gridSpriteData = getLayerTileSpriteData(layerToken, 'grid');
-            let hoverSpriteData = getLayerTileSpriteData(layerToken, 'hover');
-            let focusSpriteData = getLayerTileSpriteData(layerToken, 'focus');
+            let gridSpriteData = getSpriteData('grid');
+            let hoverSpriteData = getSpriteData('hover');
+            let focusSpriteData = getSpriteData('focus');
             if (!gridSpriteData){ console.warn('drawTileToCanvas() unable to find grid sprite data for layer ' + layerToken + '!'); }
             if (!hoverSpriteData){ console.warn('drawTileToCanvas() unable to find hover sprite data for layer ' + layerToken + '!'); }
             if (!focusSpriteData){ console.warn('drawTileToCanvas() unable to find focus sprite data for layer ' + layerToken + '!'); }
@@ -413,26 +463,23 @@ $(document).ready(function(){
             let $worldDiv = _elements.world;
             let $canvasMap = _elements.map;
             let $thisLayer = $('.layer[data-layer="'+layerToken+'"]', $canvasMap);
-            if (!$thisLayer || !$thisLayer.length){ console.error('refreshCanvasTiles() missing required $thisLayer!'); return false; }
+            if (!$thisLayer || !$thisLayer.length){ console.error('refreshCanvasTilesForReal() missing required $thisLayer!'); return false; }
             let layersIndex = _world.layersIndex;
+            let thisLayerData = layersIndex[layerToken] || false;
+            if (!thisLayerData || !thisLayerData.sheet || !thisLayerData.tiles){ console.error('refreshCanvasTilesForReal() missing required _world.layersIndex[' + layerToken + ']!'); return false; }
             let layerTilesIndex = _world.layerTilesIndex;
-            let thisLayerData = layersIndex[layerToken];
-            let thisLayerTiles = layerTilesIndex[layerToken];
-            let thisLayerTileKeys = Object.keys(thisLayerTiles);
-            if (!thisLayerData || !thisLayerData.sheet || !thisLayerData.data){ console.error('refreshCanvasTiles() missing required thisLayerData!'); return false; }
-            if (!thisLayerTiles || typeof thisLayerTiles !== 'object' || !Object.keys(thisLayerTiles).length){ console.error('refreshCanvasTiles() missing required thisLayerTiles!'); return false; }
+            let thisLayerTiles = layerTilesIndex[layerToken] || false;
+            if (!thisLayerTiles || typeof thisLayerTiles !== 'object'){ console.error('refreshCanvasTiles() missing required _world.layerTilesIndex[' + layerToken + ']!'); return false; }
             let spriteSheet = thisLayerData.sheet;
-            let canvasData = thisLayerData.data;
-            if (!spriteSheet || !(spriteSheet instanceof Image) || !canvasData || typeof canvasData !== 'object'){ console.error('refreshCanvasTiles() missing required spriteSheet or canvasData!'); return false; }
-            if (!canvasData || !canvasData.tile_size || !canvasData.tile_index || !canvasData.tile_data){ console.error('refreshCanvasTiles() missing required tile_size, tile_index, or tile_data!'); return false; }
-            //console.log('---> refreshing ', thisLayerTileKeys.length, ' thisLayerTileKeys tiles on canvas...');
+            let layerTileKeys = Object.keys(thisLayerTiles);
+            //console.log('---> refreshing ', layerTileKeys.length, ' layerTileKeys tiles on canvas...');
             let $canvas = $('canvas', $thisLayer), canvas = $canvas[0], ctx = canvas.getContext('2d');
-            for (var i = 0; i < thisLayerTileKeys.length; i++){
-                let tileKey = thisLayerTileKeys[i];
-                let tileIndexData = thisLayerTiles[tileKey];
-                if (!tileIndexData.dirty){ continue; }
-                drawTileToCanvas(layerToken, ctx, spriteSheet, tileKey, tileIndexData);
-                tileIndexData.dirty = false; // reset the dirty flag
+            for (var i = 0; i < layerTileKeys.length; i++){
+                let tileKey = layerTileKeys[i];
+                let tileData = thisLayerTiles[tileKey];
+                if (!tileData.dirty){ continue; }
+                drawTileToCanvas(layerToken, ctx, spriteSheet, tileKey, tileData);
+                tileData.dirty = false; // reset the dirty flag
                 }
             return true;
             }
@@ -515,39 +562,27 @@ $(document).ready(function(){
             }
 
         // Quick function for binding events to a given layer's canvas object
-        function bindEventsToCanvasTiles(layerToken){
-            //console.log('%c' + '~bindEventsToCanvasTiles(layerToken:' + layerToken + ')', 'color: magenta;');
-            if (!layerToken || typeof layerToken !== 'string'){ console.error('bindEventsToCanvasTiles() missing required layerToken!'); return false; }
+        function bindEventsToCanvas($canvasMap){
+            //console.log('%c' + '~bindEventsToCanvas($canvasMap:' + typeof $canvasMap + ')', 'color: magenta;');
+            if (!$canvasMap || !$canvasMap.length){ console.error('bindEventsToCanvas() missing required $canvasMap!'); return false; }
             let _config = gameSettings.worldConfig;
             let _elements = gameSettings.worldElements;
             let _world = gameSettings.worldState;
             let _cursor = _world.cursor;
-            let $worldDiv = _elements.world;
-            let $canvasMap = _elements.map;
-            let layersIndex = _world.layersIndex;
-            let layerTilesIndex = _world.layerTilesIndex;
-            if (!layersIndex || !layerTilesIndex){ console.error('bindEventsToCanvasTiles() missing required layersIndex or layerTilesIndex!'); return false; }
-            let $thisLayer = $('.layer[data-layer="'+layerToken+'"]', $canvasMap);
-            let thisLayerData = layersIndex[layerToken];
-            let thisLayerTiles = layerTilesIndex[layerToken];
-            if (!$thisLayer || !$thisLayer.length){ console.error('bindEventsToCanvasTiles() missing required $thisLayer!'); return false; }
-            if (!thisLayerData || !thisLayerData.sheet || !thisLayerData.data){ console.error('bindEventsToCanvasTiles() missing required thisLayerData!'); return false; }
-            if (!thisLayerTiles || typeof thisLayerTiles !== 'object' || !Object.keys(thisLayerTiles).length){ console.error('bindEventsToCanvasTiles() missing required thisLayerTiles!'); return false; }
-            let spriteSheet = thisLayerData.sheet;
-            let canvasData = thisLayerData.data;
-            if (!spriteSheet || !(spriteSheet instanceof Image) || !canvasData || typeof canvasData !== 'object'){ console.error('bindEventsToCanvasTiles() missing required spriteSheet or canvasData!'); return false; }
-            if (!canvasData || !canvasData.tile_size || !canvasData.tile_index || !canvasData.tile_data){ console.error('bindEventsToCanvasTiles() missing required tile_size, tile_index, or tile_data!'); return false; }
-            //console.log('---> binding events to canvas tiles for layer ' + layerToken + '...');
+            let layerToken = 'terrain'; // TODO: make this dynamic maybe?
             let $clickOverlay = $('#click-overlay', $canvasMap);
             let focusTimeouts = {}, focusTimeoutDuration = _config.mapEffects.focusTimeout;
             let hoverTimeouts = {}, hoverTimeoutDuration = _config.mapEffects.hoverTimeout;
             let lastMouseClick, lastMouseOver;
+            //console.log('---> binding events to canvas tiles for layer ' + layerToken + ' layer...');
             $clickOverlay.bind('click', function(e){
                 if (_cursor.moving){ return false; }
                 //console.log('%c' + 'Map overlay click event!', 'color: cyan;');
                 let oldPos = _cursor.position;
                 let thisPos = getTileAtPosition($clickOverlay, e.pageX, e.pageY);
+                let tileData = getLayerTileIndexData(layerToken, thisPos);
                 if (thisPos === oldPos || thisPos === lastMouseClick){ return; }
+                if (!tileData.walkable){ return; }
                 //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
                 lastMouseClick = thisPos;
                 focusLayerTile(layerToken, thisPos);
@@ -562,7 +597,9 @@ $(document).ready(function(){
                 if (_cursor.moving){ return false; }
                 //console.log('%c' + 'Map overlay mousemove event!', 'color: cyan;');
                 let thisPos = getTileAtPosition($clickOverlay, e.pageX, e.pageY);
+                let tileData = getLayerTileIndexData(layerToken, thisPos);
                 if (thisPos === lastMouseOver){ return; }
+                if (!tileData.walkable){ return; }
                 //console.log('%c' + 'Mouse move event triggered at position ' + thisPos + '!', 'color: orange;');
                 lastMouseOver = thisPos;
                 hoverLayerTile(layerToken, thisPos);
@@ -871,6 +908,20 @@ $(document).ready(function(){
                 $thisWorld.addClass('hidden');
                 let homeMenuURL = $homeButton.attr('data-home-url') || 'prototype.php';
                 window.location.href = homeMenuURL;
+                return true;
+                });
+            }
+
+        // Bind a click event to the reset button in the header that'll clear world data to start over (dev/debug only)
+        let $resetButton = $('#reset-button', $thisWorld);
+        if ($resetButton && $resetButton.length){
+            $resetButton.bind('click', function(e){
+                e.preventDefault();
+                //console.log('%c' + 'Reset button clicked!', 'color: cyan;');
+                if (!confirm('Are you sure you want to reset the world map?')){ return; }
+                $thisWorld.addClass('hidden');
+                let resetMenuURL = $resetButton.attr('data-reset-url') || 'world.php?reset=world';
+                window.location.href = resetMenuURL;
                 return true;
                 });
             }

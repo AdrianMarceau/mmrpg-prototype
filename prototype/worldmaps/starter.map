@@ -1,18 +1,11 @@
 #---------------------------#
 # STARTER MAP
-@token    = starter
-@name     = Starter Map
-@field    = gentle-countryside
-@mechas   = met,flea,mouslider
-@size     = 19 x 15 x 40 x 40
-@sheet    = overworld-experiment-v2024-tileset.png
-@tiles[0] = void(160, 320)
-@tiles[1] = grass(40, 320)
-@tiles[2] = ground(80, 520)
-@tiles[3] = water(40, 680)
-@tiles[]  = grid(360, 600)
-@tiles[]  = hover(320, 600)
-@tiles[]  = focus(560, 520)
+@token      = starter
+@name       = Starter Map
+@field      = gentle-countryside
+@mechas     = met,flea,mouslider
+@size       = 19 x 16 x 40 x 40
+@sheet      = overworld-experiment-v2024-tileset.png
 #---------------------------#
 ###################
 0000000000000000000
@@ -30,5 +23,18 @@
 0112221111133331110
 0011111111111111100
 0000000000000000000
+0000000000000000000
 ###################
+#---------------------------#
+@tiles[]    = void(0, 160, 320)
+@tiles[]    = grass(1, 40, 320)
+@tiles[]    = ground(2, 80, 520)
+@tiles[]    = water(3, 40, 680)
+#---------------------------#
+@sprites[]  = grid(360, 600)
+@sprites[]  = hover(320, 600)
+@sprites[]  = focus(560, 520)
+#---------------------------#
+@portals[]  = spawn(4, 4)
+@portals[]  = exit(11, 11)
 #---------------------------#

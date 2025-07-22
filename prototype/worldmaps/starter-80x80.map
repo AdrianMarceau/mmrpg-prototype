@@ -2,21 +2,12 @@
 # STARTER MAP
 @token    = starter
 @name     = Starter Map
-@field    = gentle-countryside
-@mechas   = flea,lady-blader,bombomboy,petal-anne
 @size     = 19 x 15 x 80 x 80
 @sheet    = overworld-experiment-v2025-tileset.png
-@tiles[0] = void(40, 40)
-@tiles[1] = grass(200, 200)
-@tiles[2] = grass-top(200, 120)
-@tiles[3] = grass-bot(200, 280)
-@tiles[4] = ground(280, 200)
-@tiles[5] = water(440, 40)
-@tiles[]  = grid(40, 520)
-@tiles[]  = hover(40, 520)
-@tiles[]  = focus(200, 520)
 #---------------------------#
-###################
+@field    = gentle-countryside
+@mechas   = flea,lady-blader,bombomboy,petal-anne
+#---------------------------#
 0000000000000000000
 0022222222222222200
 0111144444444111110
@@ -32,5 +23,24 @@
 0114441111155551110
 0011111111111111100
 0000000000000000000
-###################
 #---------------------------#
+@tiles[]    = void(0, 40, 40)
+@tiles[]    = grass(1, 200, 200)
+@tiles[]    = grass-top(2, 200, 120)
+@tiles[]    = grass-bot(3, 200, 280)
+@tiles[]    = ground(4, 280, 200)
+@tiles[]    = water(5, 440, 40)
+#---------------------------#
+@sprites[]  = grid(40, 520)
+@sprites[]  = hover(40, 520)
+@sprites[]  = focus(200, 520)
+#---------------------------#
+@portals[]  = spawn(4, 4)
+@portals[]  = exit(16, 13)
+@portals[]  = starter(4, 4)
+@portals[]  = water(4, 4)
+#---------------------------#
+# temp temp temp #
+@tiles[]  = grid(-1, 40, 520)
+@tiles[]  = hover(-2, 40, 520)
+@tiles[]  = focus(-3, 200, 520)

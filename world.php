@@ -178,23 +178,39 @@ function loadMapData($map_token){
     }
     //error_log('$map_data_vars = '.print_r($map_data_vars, true));
     // Review and process the map layer data
-    $map_autocols = strlen($map_data_layers[0][0]); // TODO: first row may not be representative of the entire map
-    $map_autorows = count($map_data_layers[0]); // TODO: this may not be representative of the entire map
-    $map_tiles_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntaxL name(x,y) ie. void(0.1,-3.5) => void, 0.1, 13,5
-    static $map_tiles_parser;
-    if (!$map_tiles_parser){
-        $map_tiles_parser = function($raw_tiles) use ($map_tiles_regex){
+    $map_autocols = strlen($map_data_layers[0][0]);
+    $map_autorows = count($map_data_layers[0]);
+    $map_tiles_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
+    $map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
+    static $map_custval_parser;
+    if (!$map_custval_parser){
+        $map_custval_parser = function($raw_tiles, $include_keys = false) use ($map_tiles_custval_regex, $map_other_custval_regex){
             if (empty($raw_tiles)){ return array(); }
+            $parsed_keys = array();
             $parsed_tiles = array();
             foreach ($raw_tiles AS $line){
                 $line = trim(str_replace(' ', '', $line));
-                if (empty($line) || !preg_match($map_tiles_regex, $line)){ continue; }
-                list($name, $x, $y) = explode('/', preg_replace($map_tiles_regex, '$1/$2/$3', $line), 3);
-                $parsed_tiles[$name] = array($x, $y);
+                if (empty($line)){ continue; }
+                $is_tile_custval = preg_match($map_tiles_custval_regex, $line);
+                $is_other_custval = preg_match($map_other_custval_regex, $line);
+                if (!$is_tile_custval && !$is_other_custval){ continue; }
+                if ($is_tile_custval){
+                    list($name, $k, $x, $y) = explode('/', preg_replace($map_tiles_custval_regex, '$1/$2/$3/$4', $line), 4);
+                    $parsed_tiles[$name] = array($x, $y);
+                    $parsed_keys[$k] = $name;
+                    continue;
+                    }
+                if ($is_other_custval){
+                    list($name, $x, $y) = explode('/', preg_replace($map_other_custval_regex, '$1/$2/$3', $line), 3);
+                    $parsed_tiles[$name] = array($x, $y);
+                    continue;
+                    }
                 }
+            if ($include_keys){ $parsed_tiles['keys'] = $parsed_keys; }
             return $parsed_tiles;
             };
         }
+    //error_log('raw $map_data_vars = '.print_r($map_data_vars, true));
     $map_data_vars['token'] = isset($map_data_vars['token']) ? $map_data_vars['token'] : '';
     $map_data_vars['name'] = isset($map_data_vars['name']) ? $map_data_vars['name'] : '';
     $map_data_vars['size'] = isset($map_data_vars['size']) ? $map_data_vars['size'] : '';
@@ -202,6 +218,8 @@ function loadMapData($map_token){
     $map_data_vars['field'] = isset($map_data_vars['field']) ? $map_data_vars['field'] : '';
     $map_data_vars['mechas'] = isset($map_data_vars['mechas']) ? $map_data_vars['mechas'] : array();
     $map_data_vars['tiles'] = isset($map_data_vars['tiles']) ? $map_data_vars['tiles'] : array();
+    $map_data_vars['sprites'] = isset($map_data_vars['sprites']) ? $map_data_vars['sprites'] : array();
+    $map_data_vars['portals'] = isset($map_data_vars['portals']) ? $map_data_vars['portals'] : array();
     if (empty($map_data_vars['token'])){ $map_data_vars['token'] = $map_token; }
     if (empty($map_data_vars['name'])){ $map_data_vars['name'] = 'Undefined'; }
     if (empty($map_data_vars['size'])){ $map_data_vars['size'] = '0 x 0 x 0'; }
@@ -213,7 +231,11 @@ function loadMapData($map_token){
     if (!isset($map_data_vars['size'][2])){ $map_data_vars['size'][2] = $map_tilesize; }
     if (!empty($map_data_vars['mechas'])){ $map_data_vars['mechas'] = explode(',', str_replace(' ', '', $map_data_vars['mechas'])); }
     if (empty($map_data_vars['tiles'])){ $map_data_vars['tiles'][] = 'undefined(0,0)'; }
-    $map_data_vars['tiles'] = $map_tiles_parser($map_data_vars['tiles']);
+    if (empty($map_data_vars['sprites'])){ $map_data_vars['sprites'][] = 'undefined(0,0)'; }
+    if (empty($map_data_vars['portals'])){ $map_data_vars['portals'][] = 'undefined(0,0)'; }
+    $map_data_vars['tiles'] = $map_custval_parser($map_data_vars['tiles'], true);
+    $map_data_vars['sprites'] = $map_custval_parser($map_data_vars['sprites']);
+    $map_data_vars['portals'] = $map_custval_parser($map_data_vars['portals']);
     // Add collected data to the parsed map data
     $map_data_parsed = array();
     $map_data_parsed['token'] = $map_data_vars['token']; unset($map_data_vars['token']);
@@ -223,7 +245,9 @@ function loadMapData($map_token){
     $map_data_parsed['field'] = $map_data_vars['field']; unset($map_data_vars['field']);
     $map_data_parsed['mechas'] = $map_data_vars['mechas']; unset($map_data_vars['mechas']);
     $map_data_parsed['tiles'] = $map_data_vars['tiles']; unset($map_data_vars['tiles']);
-    $map_data_parsed['tiles']['keys'] = array_keys($map_data_parsed['tiles']);
+    $map_data_parsed['sprites'] = $map_data_vars['sprites']; unset($map_data_vars['sprites']);
+    $map_data_parsed['portals'] = $map_data_vars['portals']; unset($map_data_vars['portals']);
+    //$map_data_parsed['tiles']['keys'] = array_keys($map_data_parsed['tiles']);
     $map_data_parsed['layers'] = $map_data_layers;
     if (!empty($map_data_vars)){ $map_data_parsed['vars'] = $map_data_vars; }
     //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
@@ -315,29 +339,30 @@ $map_pixel_height = $map_row_size * $map_tile_height;
 //error_log('$map_pixel_height = '.$map_pixel_height);
 
 // Generate the map spawn points (source and destination)
-$map_spawn_inset = 3;
-$map_spawn_src_pos = !empty($WORLD_SESSION[$map_token.'_spawn_src']) ? $WORLD_SESSION[$map_token.'_spawn_src'] : '';
-if (empty($map_spawn_src_pos)){
-    $map_spawn_src_col = mt_rand($map_spawn_inset, floor($map_col_size / 2) - $map_spawn_inset);
-    $map_spawn_src_row = mt_rand($map_spawn_inset, floor($map_row_size / 2) - $map_spawn_inset);
-    $map_spawn_src_pos = $map_spawn_src_col.'-'.$map_spawn_src_row;
+$map_spawn_pos = !empty($WORLD_SESSION[$map_token.'_spawn_pos']) ? $WORLD_SESSION[$map_token.'_spawn_pos'] : '';
+$map_exit_pos = !empty($WORLD_SESSION[$map_token.'_exit_pos']) ? $WORLD_SESSION[$map_token.'_exit_pos'] : '';
+if (empty($map_spawn_pos)){
+    $map_spawn_inset = 3;
+    $map_spawn_col = mt_rand($map_spawn_inset, floor($map_col_size / 2) - $map_spawn_inset);
+    $map_spawn_row = mt_rand($map_spawn_inset, floor($map_row_size / 2) - $map_spawn_inset);
+    $map_spawn_pos = $map_spawn_col.'-'.$map_spawn_row;
 }
-$WORLD_SESSION[$map_token.'_spawn_src'] = $map_spawn_src_pos;
-$map_spawn_dst_pos = !empty($WORLD_SESSION[$map_token.'_spawn_dst']) ? $WORLD_SESSION[$map_token.'_spawn_dst'] : '';
-if (empty($map_spawn_dst_pos)){
-    $map_spawn_dst_col = mt_rand(ceil($map_col_size / 2) + $map_spawn_inset, $map_col_size - $map_spawn_inset);
-    $map_spawn_dst_row = mt_rand(ceil($map_row_size / 2) + $map_spawn_inset, $map_row_size - $map_spawn_inset);
-    $map_spawn_dst_pos = $map_spawn_dst_col.'-'.$map_spawn_dst_row;
+if (empty($map_exit_pos)){
+    $map_exit_inset = 3;
+    $map_exit_col = mt_rand(ceil($map_col_size / 2) + $map_exit_inset, $map_col_size - $map_exit_inset);
+    $map_exit_row = mt_rand(ceil($map_row_size / 2) + $map_exit_inset, $map_row_size - $map_exit_inset);
+    $map_exit_pos = $map_exit_col.'-'.$map_exit_row;
 }
-$WORLD_SESSION[$map_token.'_spawn_dst'] = $map_spawn_dst_pos;
+$WORLD_SESSION[$map_token.'_spawn_pos'] = $map_spawn_pos;
+$WORLD_SESSION[$map_token.'_exit_pos'] = $map_exit_pos;
 
 // If the world position has not been set yet, we can use the spawn position for it
-if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data['this_current_position'] = $map_spawn_src_pos; }
+if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data['this_current_position'] = $map_spawn_pos; }
 
 // Generate the random encounters for this map location if not already spawned
 $max_random_encounters = 20;
 $allowed_random_encounters = $map_mecha_support;
-$disallowed_encounter_cells = array($map_spawn_src_pos, $map_spawn_dst_pos);
+$disallowed_encounter_cells = array($map_spawn_pos, $map_exit_pos);
 $map_random_encounters = !empty($WORLD_SESSION[$map_token.'_random_encounters']) ? $WORLD_SESSION[$map_token.'_random_encounters'] : array();
 if (empty($map_random_encounters)){
     for ($i = 0; $i < $max_random_encounters; $i++){
@@ -389,21 +414,35 @@ $flag_skip_fadein = true;
             <?
 
             // Generate overall the map styles and markup
-            $map_offset = array(0, 0); // TODO: make this dynamic
-            $map_offset_x = $map_offset[0] * $map_tile_width;
-            $map_offset_y = $map_offset[1] * $map_tile_height;
+            //$map_offset = array(0, 0); // TODO: make this dynamic
+            //$map_offset_x = $map_offset[0] * $map_tile_width;
+            //$map_offset_y = $map_offset[1] * $map_tile_height;
             $map_tilesize_default = MMRPG_WORLD_DEFAULT_TILESIZE;
             $map_tilesize_offset = array(0, 0);
             if ($map_tile_height > $map_tilesize_default){ $map_tilesize_offset[0] = floor(($map_tile_height - $map_tilesize_default) / 2); }
             if ($map_tile_width > $map_tilesize_default){ $map_tilesize_offset[1] = floor(($map_tile_width - $map_tilesize_default) / 2); }
             $map_size_styles = 'width: '.$map_pixel_width.'px; height: '.$map_pixel_height.'px; ';
-            $map_offset_styles = 'top: '. $map_offset_y.'px; left: '.$map_offset_x.'px; ';
+            //$map_offset_styles = 'top: '. $map_offset_y.'px; left: '.$map_offset_x.'px; ';
+            $map_offset_styles = 'top: 0px; left: 0px; ';
             $map_base_styles = trim($map_size_styles.$map_offset_styles);
             $map_base_attrs = 'data-cols="'.$map_col_size.'" data-rows="'.$map_row_size.'"';
             $map_base_attrs .= ' data-size="'.$map_col_size.' x '.$map_row_size.' x '. $map_tile_width.' x '.$map_tile_height.'"';
             ?>
             <div id="map" data-token="<?= $map_token ?>" style="<?= $map_base_styles ?>" <?= $map_base_attrs ?>>
                 <?
+
+                // GLOBAL MAP DATA
+                $data = array();
+                $data['map_token'] = $map_data_parsed['token'];
+                $data['map_image'] = 'images/maps/'.(!empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : 'undefined.png');
+                $data['map_size'] = array($map_col_size, $map_row_size);
+                $data['tile_size'] = array($map_tile_width, $map_tile_height);
+                $data['tiles_index'] = $map_data_parsed['tiles'];
+                $data['sprites_index'] = $map_data_parsed['sprites'];
+                $data['portals_index'] = $map_data_parsed['portals'];
+                //$data['encounters'] = $map_random_encounters;
+                $data_json = json_encode($data, JSON_NUMERIC_CHECK);
+                echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
 
                 // TERRAIN TILES
                 foreach ($map_data_parsed['layers'] AS $map_layer_key => $map_layer_data){
@@ -413,26 +452,18 @@ $flag_skip_fadein = true;
                     <div class="layer layer-1 tiles terrain has-canvas" data-layer="terrain" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                         <?
                         $data = array();
-                        //$data['map_image'] = 'images/maps/overworld-experiment-v2024-tileset.png';
-                        $data['map_image'] = 'images/maps/'.(!empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : 'undefined.png');
-                        $data['map_size'] = array($map_pixel_width, $map_pixel_height);
-                        $data['map_offset'] = array($map_offset_x, $map_offset_y);
-                        $data['tile_size'] = array($map_tile_width, $map_tile_height);
-                        $data['tile_index'] = $map_data_parsed['tiles'];
-                        $data['tile_data'] = array();
-                        //error_log('$map layer '.$map_layer_key.' has $data = '.print_r($data, true));
+                        $data['canvas_tiles'] = array();
                         for ($row = 1; $row <= $map_row_size; $row++){
                             $row_tiles = $map_layer_data[$row - 1];
-                            //error_log('$row_tiles = '.print_r($row_tiles, true));
                             for ($col = 1; $col <= $map_col_size; $col++){
                                 $pos = $col.'-'.$row;
                                 $key = (int)(substr($row_tiles, ($col - 1), 1));
-                                $data['tile_data'][$pos] = $key;
+                                $data['canvas_tiles'][$pos] = $key;
                             }
                         }
                         $data_json = json_encode($data, JSON_NUMERIC_CHECK);
-                        echo('<canvas width="'.$map_pixel_width.'" height="'.$map_pixel_height.'"></canvas>');
-                        echo('<script data-json="canvasData" type="application/json">'.$data_json.'</script>');
+                        echo('<canvas width="'.$map_pixel_width.'" height="'.$map_pixel_height.'"></canvas>'.PHP_EOL);
+                        echo('<script data-json="tileData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
                         ?>
                     </div>
                     <?
@@ -442,32 +473,32 @@ $flag_skip_fadein = true;
                 $map_layer_styles = $map_base_styles;
                 $map_layer_attrs = $map_base_attrs;
                 ?>
-                <div class="layer layer-2 events tiles" data-layer="spawns" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
+                <div class="layer layer-2 tiles events portals" data-layer="portals" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
 
-                    $tile = 'src';
-                    $pos = $map_spawn_src_pos;
+                    $tile = 'spawn';
+                    $pos = $map_spawn_pos;
                     list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                     $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
-                    echo('<span class="sprite tile '.$tile.' pulse" data-event="spawn-src" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>');
+                    echo('<span class="sprite tile '.$tile.' pulse" data-event="spawn" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>'.PHP_EOL);
 
-                    $tile = 'dst';
-                    $pos = $map_spawn_dst_pos;
+                    $tile = 'exit';
+                    $pos = $map_exit_pos;
                     list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                     $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
-                    echo('<span class="sprite tile '.$tile.' pulse" data-event="spawn-dst" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>');
+                    echo('<span class="sprite tile '.$tile.' pulse" data-event="exit" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>'.PHP_EOL);
 
                     ?>
                 </div>
                 <?
 
-                // EVENT OBJECTS
+                // EVENT OBJECTS (UNDER)
                 $map_layer_styles = $map_base_styles;
                 $map_layer_attrs = $map_base_attrs;
                 ?>
-                <div class="layer layer-3 events objects" data-layer="battles" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
+                <div class="layer layer-3 objects events battles" data-layer="battles" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
                     $battle_symbols = array();
                     $battle_index = array();
@@ -506,8 +537,8 @@ $flag_skip_fadein = true;
                     //error_log('$map_random_encounters = '.print_r($map_random_encounters, true));
                     $battle_symbols_json = json_encode($battle_symbols, JSON_NUMERIC_CHECK);
                     $battle_index_json = json_encode($battle_index, JSON_NUMERIC_CHECK);
-                    echo('<script data-json="battleSymbols" type="application/json">'.$battle_symbols_json.'</script>');
-                    echo('<script data-json="battleIndex" type="application/json">'.$battle_index_json.'</script>');
+                    echo('<script data-json="battleSymbols" type="application/json">'.$battle_symbols_json.'</script>'.PHP_EOL);
+                    echo('<script data-json="battleIndex" type="application/json">'.$battle_index_json.'</script>'.PHP_EOL);
 
                     ?>
                 </div>
@@ -517,7 +548,7 @@ $flag_skip_fadein = true;
                 $map_layer_styles = $map_base_styles;
                 $map_layer_attrs = $map_base_attrs;
                 ?>
-                <div class="layer layer-4 objects characters" data-layer="team" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
+                <div class="layer layer-4 objects characters team" data-layer="team" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
                     // Collect the current team members from the prototype data
                     $team = array();
@@ -549,7 +580,7 @@ $flag_skip_fadein = true;
                     list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                     $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
-                    echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"><span class="sprite sprite_40x40" style="background-image: url('.$sprite.');"></span></span>');
+                    echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"><span class="sprite sprite_40x40" style="background-image: url('.$sprite.');"></span></span>'.PHP_EOL);
                     if (!empty($team)){
                         foreach ($team as $key => $sprite){
                             //error_log('$sprite = '.print_r($sprite, true));
@@ -561,12 +592,19 @@ $flag_skip_fadein = true;
                             $styles = '';
                             $attrs = 'data-key="'.$key.'"';
                             $markup = $get_sprite($kind, $token, $alt, $dir, $class, $styles, $attrs);
-                            echo($markup);
+                            echo($markup.PHP_EOL);
 
                         }
                     }
                     ?>
                 </div>
+                <?
+
+                // EVENT OBJECTS (OVER)
+                $map_layer_styles = $map_base_styles;
+                $map_layer_attrs = $map_base_attrs;
+                ?>
+                <div class="layer layer-5 objects zoom" data-layer="zoom" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>> <!-- dynamic layer for temporarily zoomed-sprites --> </div>
                 <?
 
                 // END OF LAYERS
@@ -579,6 +617,7 @@ $flag_skip_fadein = true;
             echo('<!-- $map_data_parsed = '.print_r($map_data_parsed, true).' -->');
             ?>
             <div id="home-button" class="chrome"><a class="wrapper"><i class="fa fas fa-home"></i></a></div>
+            <div id="reset-button" class="chrome"><a class="wrapper"><i class="fa fas fa-trash"></i></a></div>
             <div id="position-display" class="chrome"><div class="wrapper">&hellip;</div></div>
             <div id="player-switcher" class="chrome"><div class="wrapper"><?
                 $sprite = $get_sprite('robot', 'pointan', '', 'right', 'option');

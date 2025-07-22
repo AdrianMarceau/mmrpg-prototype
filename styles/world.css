@@ -47,7 +47,7 @@ html, body {
     pointer-events: none;
 }
 #world #canvas #map .layer[data-layer="terrain"] { z-index: 10; }
-#world #canvas #map .layer[data-layer="spawns"] { z-index: 20; }
+#world #canvas #map .layer[data-layer="portals"] { z-index: 20; }
 #world #canvas #map .layer[data-layer="battles"] { z-index: 30; }
 #world #canvas #map .layer[data-layer="team"] { z-index: 40; }
 #world #canvas #map .layer[data-layer].has-zoom { z-index: 50; }
@@ -77,8 +77,9 @@ html, body {
 #world #map .sprite.tile.ground { background-position: -80px -520px; }
 #world #map .sprite.tile.water { background-position: -40px -680px; }
 
-#world #map .sprite.tile.src { background-position: -80px -40px; }
-#world #map .sprite.tile.dst { background-position: -160px -40px; }
+#world #map .sprite.tile.spawn { background-position: -120px -40px; }
+#world #map .sprite.tile.exit { background-position: -160px -40px; }
+#world #map .sprite.tile.port { background-position: -80px -40px; }
 
 #world #map .sprite.tile.col-1 { left: 0; }
 #world #map .sprite.tile.col-2 { left: 0; }
@@ -143,13 +144,12 @@ html, body {
     opacity: 1.0;
 }
 
-#world #map .layer.events .sprite {
+#world #map .layer.tiles .sprite {
     top: 0;
     left: 0;
     z-index: 1;
     pointer-events: none;
 }
-
 #world #map .layer.objects .sprite {
     top: 0;
     left: 0;
@@ -162,6 +162,7 @@ html, body {
     overflow: visible;
     pointer-events: none;
 }
+
 #world #map .layer.objects .sprite {
     top: -160px;
     left: -160px;
@@ -209,11 +210,12 @@ html, body {
 #world #map .layer.objects .sprite.cursor.bounce { animation-duration: 0.6s; }
 #world #map .layer.objects .sprite.team.bounce { animation-duration: 1.0s; }
 
-@keyframes world-sprite-src-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.5); } }
-@keyframes world-sprite-dst-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(3); } }
-#world #map .layer.events .sprite.src.pulse { animation: world-sprite-src-pulse 2s ease-in infinite; }
-#world #map .layer.events .sprite.dst.pulse { animation: world-sprite-dst-pulse 4s ease-in infinite; }
-
+@keyframes world-sprite-spawn-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.5); } }
+@keyframes world-sprite-exit-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(3.0); } }
+@keyframes world-sprite-portal-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(2.0); } }
+#world #map .layer.events .sprite.spawn.pulse { animation: world-sprite-spawn-pulse 2s ease-in infinite; }
+#world #map .layer.events .sprite.exit.pulse { animation: world-sprite-exit-pulse 4s ease-in infinite; }
+#world #map .layer.events .sprite.portal.pulse { animation: world-sprite-portal-pulse 3s ease-in infinite; }
 
 #world #map .layer.events .sprite > .sprite {
     transform-origin: bottom;
@@ -386,25 +388,38 @@ html, body {
     line-height: 1.2;
     border-radius: 6px 0 0 0;
 }
-#world #canvas #home-button {
-    top: 0;
-    left: 0;
+
+#world #canvas #home-button,
+#world #canvas #reset-button {
     z-index: 1002;
     color: #ffffff;
     text-align: left;
-    font-size: 16px;
     line-height: 1.2;
     padding: 12px;
     border-radius: 0 0 6px 0;
     pointer-events: all;
     cursor: pointer;
 }
-#world #canvas #home-button i {
+#world #canvas #home-button i,
+#world #canvas #reset-button i {
     transform: scale(1.0);
     transition: transform 0.3s;
 }
-#world #canvas #home-button:hover i {
+#world #canvas #home-button:hover i,
+#world #canvas #reset-button:hover i {
     transform: scale(1.2);
+}
+#world #canvas #home-button {
+    top: 0;
+    left: 0;
+    border-radius: 0 0 6px 0;
+    font-size: 16px;
+}
+#world #canvas #reset-button {
+    bottom: 0;
+    left: 0;
+    border-radius: 0 6px 0 0;
+    font-size: 12px;
 }
 
 #world #canvas #player-switcher {
