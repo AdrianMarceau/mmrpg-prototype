@@ -24,7 +24,7 @@ $_SESSION['WORLD_TEMP'] = array();
 $WORLD_SESSION = &$_SESSION['WORLD'];
 
 // Define defaults and allowed values for the prototype world data
-$allowed_world_tokens = array('starter', 'water', 'starter-80x80');
+$allowed_world_tokens = array('starter', 'water', 'starter-80x80', 'water-80x80');
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
 $default_world_token = 'starter-80x80';
 $default_player_token = 'player';
@@ -268,6 +268,7 @@ $this_prototype_data['this_player_robots'] = array(); // required
 // Collect or define the current map token we'll be loading from
 $request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
 if (empty($request_world_token) && !empty($WORLD_SESSION['last_world_token'])){ $request_world_token = $WORLD_SESSION['last_world_token']; }
+if (!empty($request_world_token) && !empty($WORLD_SESSION['last_world_token']) && $request_world_token !== $WORLD_SESSION['last_world_token']){ unset($WORLD_SESSION['last_world_position']); }
 if (!empty($request_world_token) && in_array($request_world_token, $allowed_world_tokens)){
     $this_prototype_data['this_current_world'] = $request_world_token;
 }
@@ -467,19 +468,19 @@ $flag_skip_fadein = true;
                 <div class="layer layer-2 tiles events portals" data-layer="portals" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
 
-                    $tile = 'spawn';
-                    $pos = $map_spawn_pos;
-                    list($col, $row) = explode('-', $pos);
-                    $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
-                    $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
-                    echo('<span class="sprite tile '.$tile.' pulse" data-event="spawn" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>'.PHP_EOL);
-
-                    $tile = 'exit';
-                    $pos = $map_exit_pos;
-                    list($col, $row) = explode('-', $pos);
-                    $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
-                    $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
-                    echo('<span class="sprite tile '.$tile.' pulse" data-event="exit" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>'.PHP_EOL);
+                    // If there are any portals defined, make sure we look through and display them
+                    if (!empty($map_data_parsed['portals'])){
+                        $portal_sprites = $map_data_parsed['portals'];
+                        foreach ($portal_sprites AS $portal_name => $portal_data){
+                            if (empty($portal_data) || !is_array($portal_data) || count($portal_data) < 2){ continue; }
+                            list($x, $y) = $portal_data;
+                            $pos = $x.'-'.$y;
+                            list($col, $row) = explode('-', $pos);
+                            $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                            $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                            echo('<span class="sprite tile portal pulse" data-portal="'.$portal_name.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>'.PHP_EOL);
+                        }
+                    }
 
                     ?>
                 </div>

@@ -77,9 +77,9 @@ html, body {
 #world #map .sprite.tile.ground { background-position: -80px -520px; }
 #world #map .sprite.tile.water { background-position: -40px -680px; }
 
-#world #map .sprite.tile.spawn { background-position: -120px -40px; }
-#world #map .sprite.tile.exit { background-position: -160px -40px; }
-#world #map .sprite.tile.port { background-position: -80px -40px; }
+#world #map .sprite.tile.portal { background-position: -80px -40px; }
+#world #map .sprite.tile[data-portal="spawn"] { background-position: -120px -40px; }
+#world #map .sprite.tile[data-portal="exit"] { background-position: -160px -40px; }
 
 #world #map .sprite.tile.col-1 { left: 0; }
 #world #map .sprite.tile.col-2 { left: 0; }

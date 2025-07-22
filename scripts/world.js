@@ -730,62 +730,87 @@ $(document).ready(function(){
             let $positionDisplay = $('#position-display > .wrapper', $worldDiv);
             $positionDisplay.text('X:' + thisNewCol + ' Y:' + thisNewRow);
             let $actionsDropdown = $('#action-dropdown', $worldDiv);
+            let $actionsDropdownWrapper = $('> .wrapper', $actionsDropdown);
             $actionsDropdown.css({
                 top: ((thisNewRow - 1) * _mapTileSize[1]) + 'px',
                 left: ((thisNewCol - 1) * _mapTileSize[0]) + 'px'
                 }).attr('data-dir', _worldCursor.direction);
+            $actionsDropdownWrapper.empty();
             //console.log('-> checking if there are any events for this position...');
             let $eventsLayers = $('.layer.events', $canvasMap);
-            if ($eventsLayers && $eventsLayers.length){
-                //console.log('-> $eventsLayer found, checking for events...');
-                $eventsLayers.removeClass('has-zoom');
-                $('.sprite', $eventsLayers).removeClass('zoom');
-                let $eventAtPosition = $('.sprite[data-col="' + thisNewCol + '"][data-row="' + thisNewRow + '"]', $eventsLayers);
-                if ($eventAtPosition && $eventAtPosition.length){
-                    //console.log('-> event found at position ' + thisNewCol + '-' + thisNewRow + '!', $eventAtPosition);
-                    let $eventLayer = $eventAtPosition.closest('.layer.events');
-                    var showDropdown = false;
-                    var dropdownMarkup = '';
-                    var dataBattle = $eventAtPosition.attr('data-battle');
-                    if (dataBattle){
-                        showDropdown = true;
-                        dropdownMarkup += '<strong class="label">Battle Options</strong>';
-                        dropdownMarkup += '<a class="button" data-action="battle-info" data-battle="'+dataBattle+'"><span>View Details</span></a>';
-                        if (_playerRobots.length){  dropdownMarkup += '<a class="button" data-action="battle" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
+            if (!$eventsLayers || !$eventsLayers.length){ console.error('updateMapPosition() missing required $eventsLayers!'); return false; }
+            //console.log('-> $eventsLayer found, checking for events...');
+            $eventsLayers.removeClass('has-zoom');
+            $('.sprite', $eventsLayers).removeClass('zoom');
+            let $eventAtPosition = $('.sprite[data-col="' + thisNewCol + '"][data-row="' + thisNewRow + '"]', $eventsLayers);
+            if (!$eventAtPosition || !$eventAtPosition.length){ return; }
+            //console.log('-> event found at position ' + thisNewCol + '-' + thisNewRow + '!', $eventAtPosition);
+            let $eventLayer = $eventAtPosition.closest('.layer.events');
+            var showDropdown = false;
+            var dropdownMarkup = '';
+            var dataBattle = $eventAtPosition.attr('data-battle');
+            var dataPortal = $eventAtPosition.attr('data-portal');
+            if (dataBattle){
+                showDropdown = true;
+                dropdownMarkup += '<strong class="label">Battle Options</strong>';
+                dropdownMarkup += '<a class="button" data-action="battle-info" data-battle="'+dataBattle+'"><span>View Details</span></a>';
+                if (_playerRobots.length){  dropdownMarkup += '<a class="button" data-action="start-battle" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
+                }
+            if (dataPortal && dataPortal.indexOf('goto__') !== -1){
+                showDropdown = true;
+                dropdownMarkup += '<strong class="label">Portal Options</strong>';
+                dropdownMarkup += '<a class="button" data-action="portal-info" data-portal="'+dataPortal+'"><span>View Details</span></a>';
+                dropdownMarkup += '<a class="button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Enter Portal</span></a>';
+                }
+            if (!showDropdown){ return; }
+            $actionsDropdownWrapper.html(dropdownMarkup);
+            $actionsDropdown.addClass('active');
+            $eventLayer.addClass('has-zoom');
+            $eventAtPosition.addClass('zoom');
+            $('.button', $actionsDropdown).bind('click', function(e){
+                //console.log('%c' + 'Action button clicked!', 'color: cyan;');
+                e.preventDefault();
+                let $button = $(this);
+                let action = $button.attr('data-action') || false;
+                //console.log('-> action =', action);
+                if (action === 'start-battle' || action === 'battle-info'){
+                    let battleId = $button.attr('data-battle') || false;
+                    //console.log('-> battleId =', battleId);
+                    if (action === 'battle-info'){
+                        //console.log('-> showing battle info for ID ' + battleId + '!');
+                        alert('Battle ID: ' + battleId + '\n\nThis is where you would show battle details.');
                         }
-                    if (showDropdown){
-                        $('> .wrapper', $actionsDropdown).html(dropdownMarkup);
-                        $actionsDropdown.addClass('active');
-                        $eventLayer.addClass('has-zoom');
-                        $eventAtPosition.addClass('zoom');
-                        $('.button', $actionsDropdown).bind('click', function(e){
-                            //console.log('%c' + 'Action button clicked!', 'color: cyan;');
-                            e.preventDefault();
-                            let $button = $(this);
-                            let action = $button.attr('data-action') || false;
-                            let battleId = $button.attr('data-battle') || false;
-                            //console.log('-> action =', action, '| battleId =', battleId);
-                            if (action === 'battle-info'){
-                                //console.log('-> showing battle info for ID ' + battleId + '!');
-                                alert('Battle ID: ' + battleId + '\n\nThis is where you would show battle details.');
-                                }
-                            else if (action === 'battle'){
-                                //console.log('-> starting battle with ID ' + battleId + '!');
-                                let battleVars = [];
-                                battleVars.push('wap=false'); // i hate this
-                                battleVars.push('this_user_id=' + _userId);
-                                battleVars.push('this_player_id=' + _playerId);
-                                battleVars.push('this_player_token=' + _playerToken);
-                                battleVars.push('this_player_robots=' + _playerRobots.join(','));
-                                battleVars.push('this_battle_token=' + battleId);
-                                let battleHref = 'battle.php?' + battleVars.join('&');
-                                $thisWorld.addClass('hidden');
-                                window.location.href = battleHref;
-                                }
-                            });
+                    else if (action === 'start-battle'){
+                        //console.log('-> starting battle with ID ' + battleId + '!');
+                        let battleVars = [];
+                        battleVars.push('wap=false'); // i hate this
+                        battleVars.push('this_user_id=' + _userId);
+                        battleVars.push('this_player_id=' + _playerId);
+                        battleVars.push('this_player_token=' + _playerToken);
+                        battleVars.push('this_player_robots=' + _playerRobots.join(','));
+                        battleVars.push('this_battle_token=' + battleId);
+                        let battleHref = 'battle.php?' + battleVars.join('&');
+                        $thisWorld.addClass('hidden');
+                        window.location.href = battleHref;
                         }
                     }
-                }
+                if (action === 'enter-portal' || action === 'portal-info'){
+                    let portalName = $button.attr('data-portal') || false;
+                    //console.log('-> portalName =', portalName);
+                    if (action === 'portal-info'){
+                        //console.log('-> showing portal info for ID ' + portalName + '!');
+                        alert('Portal Name: ' + portalName + '\n\nThis is where you would show portal details.');
+                        }
+                    else if (action === 'enter-portal'){
+                        //console.log('-> entering portal with name ' + portalName + '!');
+                        let worldToken = portalName.replace(/^goto__/i, '');
+                        let worldHref = 'world.php?world=' + worldToken;
+                        $thisWorld.addClass('hidden');
+                        window.location.href = worldHref;
+                        }
+
+                    }
+                });
             return true;
             }
 
