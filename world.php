@@ -329,16 +329,26 @@ $map_pixel_height = $map_row_size * $map_tile_height;
 $map_spawn_pos = !empty($WORLD_SESSION[$map_token.'_spawn_pos']) ? $WORLD_SESSION[$map_token.'_spawn_pos'] : '';
 $map_exit_pos = !empty($WORLD_SESSION[$map_token.'_exit_pos']) ? $WORLD_SESSION[$map_token.'_exit_pos'] : '';
 if (empty($map_spawn_pos)){
-    $map_spawn_inset = 3;
-    $map_spawn_col = mt_rand($map_spawn_inset, floor($map_col_size / 2) - $map_spawn_inset);
-    $map_spawn_row = mt_rand($map_spawn_inset, floor($map_row_size / 2) - $map_spawn_inset);
-    $map_spawn_pos = $map_spawn_col.'-'.$map_spawn_row;
+    if (!empty($map_data_parsed['portals']['spawn'])){
+        $spawn = $map_data_parsed['portals']['spawn'];
+        $map_spawn_pos = $spawn[0].'-'.$spawn[1];
+    } else {
+        $map_spawn_inset = 3;
+        $map_spawn_col = mt_rand($map_spawn_inset, floor($map_col_size / 2) - $map_spawn_inset);
+        $map_spawn_row = mt_rand($map_spawn_inset, floor($map_row_size / 2) - $map_spawn_inset);
+        $map_spawn_pos = $map_spawn_col.'-'.$map_spawn_row;
+    }
 }
 if (empty($map_exit_pos)){
-    $map_exit_inset = 3;
-    $map_exit_col = mt_rand(ceil($map_col_size / 2) + $map_exit_inset, $map_col_size - $map_exit_inset);
-    $map_exit_row = mt_rand(ceil($map_row_size / 2) + $map_exit_inset, $map_row_size - $map_exit_inset);
-    $map_exit_pos = $map_exit_col.'-'.$map_exit_row;
+    if (!empty($map_data_parsed['portals']['exit'])){
+        $exit = $map_data_parsed['portals']['exit'];
+        $map_exit_pos = $exit[0].'-'.$exit[1];
+    } else {
+        $map_exit_inset = 3;
+        $map_exit_col = mt_rand(ceil($map_col_size / 2) + $map_exit_inset, $map_col_size - $map_exit_inset);
+        $map_exit_row = mt_rand(ceil($map_row_size / 2) + $map_exit_inset, $map_row_size - $map_exit_inset);
+        $map_exit_pos = $map_exit_col.'-'.$map_exit_row;
+    }
 }
 $WORLD_SESSION[$map_token.'_spawn_pos'] = $map_spawn_pos;
 $WORLD_SESSION[$map_token.'_exit_pos'] = $map_exit_pos;

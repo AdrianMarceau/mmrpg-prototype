@@ -557,6 +557,8 @@ $(document).ready(function(){
                 //console.log('%c' + 'Map overlay mousemove event!', 'color: cyan;');
                 let thisPos = getTileAtPosition($clickOverlay, e.pageX, e.pageY);
                 let tileData = getLayerTileIndexData(layerToken, thisPos);
+                let showPointer = thisPos !== _cursor.position && tileData.walkable;
+                $clickOverlay.css({cursor: showPointer ? 'pointer' : 'default'});
                 if (thisPos === lastMouseOver){ return; }
                 if (!tileData.walkable){ return; }
                 //console.log('%c' + 'Mouse move event triggered at position ' + thisPos + '!', 'color: orange;');
