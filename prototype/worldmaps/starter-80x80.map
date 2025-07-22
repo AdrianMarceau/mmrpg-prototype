@@ -1,7 +1,7 @@
 #---------------------------#
 # STARTER MAP
-@token    = starter
-@name     = Starter Map
+@token    = starter-80x80
+@name     = Starter Map (80x80)
 @size     = 19 x 15 x 80 x 80
 @sheet    = overworld-experiment-v2025-tileset.png
 #---------------------------#
@@ -40,7 +40,3 @@
 @portals[]  = starter(4, 4)
 @portals[]  = water(4, 4)
 #---------------------------#
-# temp temp temp #
-@tiles[]  = grid(-1, 40, 520)
-@tiles[]  = hover(-2, 40, 520)
-@tiles[]  = focus(-3, 200, 520)

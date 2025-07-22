@@ -322,21 +322,8 @@ if (!isset($map_col_size)){ $map_col_size = MMRPG_WORLD_DEFAULT_MAPSIZE; }
 if (!isset($map_row_size)){ $map_row_size = $map_col_size; }
 if (!isset($map_tile_width)){ $map_tile_width = MMRPG_WORLD_DEFAULT_TILESIZE; }
 if (!isset($map_tile_height)){ $map_tile_height = $map_tile_width; }
-//$map_tile_size = max($map_tile_width, $map_tile_height);
 $map_pixel_width = $map_col_size * $map_tile_width;
 $map_pixel_height = $map_row_size * $map_tile_height;
-//$map_col_size = isset($map_base_size[0]) ? intval($map_base_size[0]) : 0;
-//$map_row_size = isset($map_base_size[1]) ? intval($map_base_size[1]) : 0;
-//$map_tile_size = isset($map_base_size[2]) ? intval($map_base_size[2]) : 40;
-//list($map_col_size, $map_row_size, $map_tile_size) = $map_base_size;
-//$map_pixel_width = $map_col_size * $map_tile_size;
-//$map_pixel_height = $map_row_size * $map_tile_size;
-//error_log('$map_col_size = '.$map_col_size);
-//error_log('$map_row_size = '.$map_row_size);
-//error_log('$map_tile_width = '.$map_tile_width);
-//error_log('$map_tile_height = '.$map_tile_height);
-//error_log('$map_pixel_width = '.$map_pixel_width);
-//error_log('$map_pixel_height = '.$map_pixel_height);
 
 // Generate the map spawn points (source and destination)
 $map_spawn_pos = !empty($WORLD_SESSION[$map_token.'_spawn_pos']) ? $WORLD_SESSION[$map_token.'_spawn_pos'] : '';
@@ -380,7 +367,6 @@ if (empty($map_random_encounters)){
             'target' => array('robots' => array('token' => $robot)),
             'flags' => array('world_battle' => true, 'remove_on_complete' => true),
             ), true);
-        //exit('omg $battle_omega = '.print_r($battle_omega, true));
         }
 }
 $WORLD_SESSION[$map_token.'_random_encounters'] = $map_random_encounters;
@@ -414,15 +400,11 @@ $flag_skip_fadein = true;
             <?
 
             // Generate overall the map styles and markup
-            //$map_offset = array(0, 0); // TODO: make this dynamic
-            //$map_offset_x = $map_offset[0] * $map_tile_width;
-            //$map_offset_y = $map_offset[1] * $map_tile_height;
             $map_tilesize_default = MMRPG_WORLD_DEFAULT_TILESIZE;
             $map_tilesize_offset = array(0, 0);
             if ($map_tile_height > $map_tilesize_default){ $map_tilesize_offset[0] = floor(($map_tile_height - $map_tilesize_default) / 2); }
             if ($map_tile_width > $map_tilesize_default){ $map_tilesize_offset[1] = floor(($map_tile_width - $map_tilesize_default) / 2); }
             $map_size_styles = 'width: '.$map_pixel_width.'px; height: '.$map_pixel_height.'px; ';
-            //$map_offset_styles = 'top: '. $map_offset_y.'px; left: '.$map_offset_x.'px; ';
             $map_offset_styles = 'top: 0px; left: 0px; ';
             $map_base_styles = trim($map_size_styles.$map_offset_styles);
             $map_base_attrs = 'data-cols="'.$map_col_size.'" data-rows="'.$map_row_size.'"';
@@ -440,7 +422,6 @@ $flag_skip_fadein = true;
                 $data['tiles_index'] = $map_data_parsed['tiles'];
                 $data['sprites_index'] = $map_data_parsed['sprites'];
                 $data['portals_index'] = $map_data_parsed['portals'];
-                //$data['encounters'] = $map_random_encounters;
                 $data_json = json_encode($data, JSON_NUMERIC_CHECK);
                 echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
 
@@ -509,10 +490,7 @@ $flag_skip_fadein = true;
                         $alt = $battle[2];
                         $position = $battle[3];
                         $battle = $battle[4];
-                        //error_log('checking battle token = '.$battle);
                         if (!rpg_battle::has_index_info($battle)){ continue; }
-                        //$index_info = rpg_battle::get_index_info($battle);
-                        //error_log('$index_info['.$battle.'] = '.print_r($index_info, true));
                         list($col, $row) = explode('-', $position);
                         $maxcols = $map_col_size;
                         $maxrows = $map_row_size;
@@ -534,7 +512,6 @@ $flag_skip_fadein = true;
                             'pos' => $position,
                             );
                         }
-                    //error_log('$map_random_encounters = '.print_r($map_random_encounters, true));
                     $battle_symbols_json = json_encode($battle_symbols, JSON_NUMERIC_CHECK);
                     $battle_index_json = json_encode($battle_index, JSON_NUMERIC_CHECK);
                     echo('<script data-json="battleSymbols" type="application/json">'.$battle_symbols_json.'</script>'.PHP_EOL);
@@ -555,14 +532,12 @@ $flag_skip_fadein = true;
                     $team_player_token = !empty($this_prototype_data['this_player_token']) ? $this_prototype_data['this_player_token'] : 'player';
                     $team_player_robots = !empty($this_prototype_data['this_player_robots']) ? $this_prototype_data['this_player_robots'] : array();
                     if (!empty($team_player_token) && $team_player_token !== 'player'){
-                        //error_log('adding player "'.$team_player_token.'" to team');
                         $player_token = $team_player_token;
                         $player = array('player', $player_token);
                         $team[] = $player;
                     }
                     if (!empty($team_player_robots) && is_array($team_player_robots)){
                         foreach ($team_player_robots AS $robot_string){
-                            //error_log('adding robot "'.$robot_token.'" to team');
                             list($robot_id, $robot_token) = explode('_', $robot_string, 2);
                             $robot = array('robot', $robot_token);
                             $robot_settings = rpg_game::robot_settings($team_player_token, $robot_token);
@@ -571,11 +546,9 @@ $flag_skip_fadein = true;
                             $team[] = $robot;
                         }
                     }
-                    //error_log('$team = '.print_r($team, true));
                     // Generate the markup for the cursor and team sprites
                     $obj = 'cursor';
-                    //$sprite = 'images/items/empty-shard/icon_right_40x40.png';
-                    $sprite = 'images/robots/pointan/sprite_right_40x40.png';
+                    $sprite = 'images/robots/pointan/sprite_right_40x40.png'; // TODO: surely this isn't how we're going to leave this...
                     $pos = $this_prototype_data['this_current_position'];
                     list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
@@ -583,7 +556,6 @@ $flag_skip_fadein = true;
                     echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"><span class="sprite sprite_40x40" style="background-image: url('.$sprite.');"></span></span>'.PHP_EOL);
                     if (!empty($team)){
                         foreach ($team as $key => $sprite){
-                            //error_log('$sprite = '.print_r($sprite, true));
                             $kind = $sprite[0];
                             $token = $sprite[1];
                             $alt = isset($sprite[2]) ? $sprite[2] : '';

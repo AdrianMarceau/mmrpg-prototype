@@ -97,14 +97,10 @@ $(document).ready(function(){
             let $thisLayer = $(element);
             let layerToken = $thisLayer.attr('data-layer') || false;
             if (layerToken === 'terrain'){
-                //console.log('%c' + '--> Generating tilemap for terrain layer #' + index + '!', 'color: orange;');
                 initMapLayerCanvas($thisLayer, function(){
-                    //console.log('%c' + '--> onComplete() for initMapLayerCanvas() reached!', 'color: green;');
                     $thisLayer.addClass('ready');
                     layersPending--;
-                    if (!layersPending){
-                        onWorldLoaded();
-                        }
+                    if (!layersPending){ onWorldLoaded(); }
                     });
                 return true;
                 }
@@ -285,15 +281,9 @@ $(document).ready(function(){
             let width = $overlay.width(), height = $overlay.height(), offset = $overlay.offset();
             if (applyOffset){ xPos -= offset.left; yPos -= offset.top; }
             if (xPos < 0){ xPos = 0; } if (yPos < 0){ yPos = 0; }
-            //console.log('-> canvas(', width, ',', height, ')');
-            //console.log('-> offset(', offset.left, ',', offset.top, ')');
-            //console.log('-> pixel position(', xPos, ',', yPos, ')');
-            //console.log('-> adjusted position', (applyOffset ? '(' + xPos + ',' + yPos + ')' : 'n/a'));
             let thisCol = Math.floor(xPos / size[0]) + 1;
             let thisRow = Math.floor(yPos / size[1]) + 1;
             let thisPos = thisCol + '-' + thisRow;
-            //console.log('-> grid position(', thisCol, ',', thisRow, ')');
-            //console.log('-> thisPos =', thisPos);
             return thisPos;
             }
 
@@ -309,8 +299,6 @@ $(document).ready(function(){
             let thisTileData = thisLayerTiles[tileKey] || false;
             if (!thisLayerTiles || typeof thisLayerTiles !== 'object' || !Object.keys(thisLayerTiles).length){ console.error('getLayerTileIndexData() cannot find required thisLayerTiles @ layerTilesIndex['+layerToken+']!'); return false; }
             if (!thisTileData || typeof thisTileData !== 'object'){ console.error('getLayerTileIndexData() cannot find required thisTileData @ layerTilesIndex['+layerToken+']['+tileKey+']!'); return false; }
-            //console.log('---> returning tilesIndexData for tileKey ' + tileKey + ' on layer ' + layerToken + ':', thisTileData);
-            // make sure the returned tile data object is actually in the parent now
             layerTilesIndex[layerToken][tileKey] = thisTileData;
             return thisTileData;
             }
@@ -331,7 +319,6 @@ $(document).ready(function(){
             let mapTilesIndex = _config.mapTilesIndex;
             if (!mapTilesIndex[spriteToken]){ console.error('getLayerTileSpriteData() missing required mapTilesIndex[' + spriteToken + ']!'); return false; }
             let tileSpriteInfo = mapTilesIndex[spriteToken];
-            //console.log('---> returning tile sprite data for token ' + tileToken + ':', tileSpriteInfo);
             return tileSpriteInfo;
             }
 
@@ -343,7 +330,6 @@ $(document).ready(function(){
             let mapTilesIndex = _config.mapTilesIndex;
             let tileInfo = mapTilesIndex[tileToken] || false;
             if (!tileInfo){ console.error('getTileData() missing required entry "' + tileToken + '" in mapTilesIndex!'); return false; }
-            //console.log('---> returning tile tile data for token ' + tileToken + ':', tileInfo);
             return tileInfo;
             }
 
@@ -355,7 +341,6 @@ $(document).ready(function(){
             let mapSpritesIndex = _config.mapSpritesIndex;
             let spriteInfo = mapSpritesIndex[spriteToken] || false;
             if (!spriteInfo){ console.error('getSpriteData() missing required entry "' + spriteToken + '" in mapSpritesIndex!'); return false; }
-            //console.log('---> returning tile sprite data for token ' + spriteToken + ':', spriteInfo);
             return spriteInfo;
             }
 
@@ -367,7 +352,6 @@ $(document).ready(function(){
             let mapPortalsIndex = _config.mapPortalsIndex;
             let portalInfo = mapPortalsIndex[portalToken] || false;
             if (!portalInfo){ console.error('getPortalData() missing required entry "' + portalToken + '" in mapPortalsIndex!'); return false; }
-            //console.log('---> returning tile portal data for token ' + portalToken + ':', portalInfo);
             return portalInfo;
             }
 
@@ -472,7 +456,6 @@ $(document).ready(function(){
             if (!thisLayerTiles || typeof thisLayerTiles !== 'object'){ console.error('refreshCanvasTiles() missing required _world.layerTilesIndex[' + layerToken + ']!'); return false; }
             let spriteSheet = thisLayerData.sheet;
             let layerTileKeys = Object.keys(thisLayerTiles);
-            //console.log('---> refreshing ', layerTileKeys.length, ' layerTileKeys tiles on canvas...');
             let $canvas = $('canvas', $thisLayer), canvas = $canvas[0], ctx = canvas.getContext('2d');
             for (var i = 0; i < layerTileKeys.length; i++){
                 let tileKey = layerTileKeys[i];
@@ -491,15 +474,10 @@ $(document).ready(function(){
             if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
             let _config = gameSettings.worldConfig;
             let _world = gameSettings.worldState;
-            //let layerTilesIndex = _world.layerTilesIndex;
-            //let thisLayerTiles = layerTilesIndex[layerToken] || false;
-            //let thisTileData = thisLayerTiles[tilePosition] || false;
-            //if (!thisLayerTiles || !thisTileData){ return false; }
             let thisTileData = getLayerTileIndexData(layerToken, tilePosition);
             if (!thisTileData){ console.error('focusLayerTile() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
             thisTileData.effects.focus = true;
             thisTileData.dirty = true;
-            //console.log('---> focusing layer tile at position ' + tilePosition + '!', '\n----> thisTileData =', thisTileData);
             refreshCanvasTiles(layerToken);
             return true;
             }
@@ -509,12 +487,6 @@ $(document).ready(function(){
             //console.log('%c' + 'unfocusLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
             if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
             if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
-            //let _config = gameSettings.worldConfig;
-            //let _world = gameSettings.worldState;
-            //let layerTilesIndex = _world.layerTilesIndex;
-            //let thisLayerTiles = layerTilesIndex[layerToken] || false;
-            //let thisTileData = thisLayerTiles[tilePosition] || false;
-            //if (!thisLayerTiles || !thisTileData){ return false; }
             let thisTileData = getLayerTileIndexData(layerToken, tilePosition);
             if (!thisTileData){ console.error('focusLayerTile() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
             thisTileData.effects.focus = false;
@@ -528,12 +500,6 @@ $(document).ready(function(){
             //console.log('%c' + 'hoverLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
             if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
             if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
-            //let _config = gameSettings.worldConfig;
-            //let _world = gameSettings.worldState;
-            //let layerTilesIndex = _world.layerTilesIndex;
-            //let thisLayerTiles = layerTilesIndex[layerToken] || false;
-            //let thisTileData = thisLayerTiles[tilePosition] || false;
-            //if (!thisLayerTiles || !thisTileData){ return false; }
             let thisTileData = getLayerTileIndexData(layerToken, tilePosition);
             if (!thisTileData){ console.error('hoverLayerTile() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
             thisTileData.effects.hover = true;
@@ -547,12 +513,6 @@ $(document).ready(function(){
             //console.log('%c' + 'unhoverLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
             if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
             if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
-            //let _config = gameSettings.worldConfig;
-            //let _world = gameSettings.worldState;
-            //let layerTilesIndex = _world.layerTilesIndex;
-            //let thisLayerTiles = layerTilesIndex[layerToken] || false;
-            //let thisTileData = thisLayerTiles[tilePosition] || false;
-            //if (!thisLayerTiles || !thisTileData){ return false; }
             let thisTileData = getLayerTileIndexData(layerToken, tilePosition);
             if (!thisTileData){ console.error('unhoverLayerTile() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
             thisTileData.effects.hover = false;
@@ -574,7 +534,6 @@ $(document).ready(function(){
             let focusTimeouts = {}, focusTimeoutDuration = _config.mapEffects.focusTimeout;
             let hoverTimeouts = {}, hoverTimeoutDuration = _config.mapEffects.hoverTimeout;
             let lastMouseClick, lastMouseOver;
-            //console.log('---> binding events to canvas tiles for layer ' + layerToken + ' layer...');
             $clickOverlay.bind('click', function(e){
                 if (_cursor.moving){ return false; }
                 //console.log('%c' + 'Map overlay click event!', 'color: cyan;');
@@ -644,26 +603,15 @@ $(document).ready(function(){
             let thisNewCol = parseInt(newPosition[0]);
             let thisNewRow = parseInt(newPosition[1]);
             if (thisNewCol === thisOldCol && thisNewRow === thisOldRow && !forceMove){ console.error('$cursorSprite already at position!'); return false; }
-            //let $currActiveTile = $('.tile.active', $tilesLayer);
-            //let $tileAtPosition = $('.tile[data-col="' + thisNewCol + '"][data-row="' + thisNewRow + '"]', $tilesLayer);
-            //if (!$tileAtPosition || !$tileAtPosition.length){ console.error('$tileAtPosition not found!'); return false; }
             let thisHorDir = (thisNewCol > thisOldCol) ? 'right' : (thisNewCol < thisOldCol) ? 'left' : false;
             let thisVerDir = (thisNewRow > thisOldRow) ? 'down' : (thisNewRow < thisOldRow) ? 'up' : false;
             let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join(' and '); })(thisHorDir, thisVerDir);
             let thisShiftDist = Math.sqrt(Math.pow(thisNewCol - thisOldCol, 2) + Math.pow(thisNewRow - thisOldRow, 2));
-            //console.log('-> new position (' + thisNewCol + '-' + thisNewRow + ') is ' + thisShiftDir + ' of old position (' + thisOldCol + '-' + thisOldRow + ')');
-            //console.log('-> old position: (' + thisOldCol + '-' + thisOldRow + ')');
-            //console.log('-> new position: (' + thisNewCol + '-' + thisNewRow + ')');
-            //console.log('-> shift direction: (' + thisShiftDir + ')');
-            //console.log('-> shift distance: (' + thisShiftDist + ' tiles)');
             let tileOffsetX = ((thisNewCol - 1) * _mapTileSize[0]) + _mapTileSizeOffset[0];
             let tileOffsetY = ((thisNewRow - 1) * _mapTileSize[1]) + _mapTileSizeOffset[0];
-            //console.log('-> moving cursor to offset ' + tileOffsetX + 'x' + tileOffsetY + '...');
             $canvasMap.addClass('busy');
             _worldCursor.moving = true;
             $actionsDropdown.removeClass('active');
-            //$currActiveTile.removeClass('active');
-            //$tileAtPosition.addClass('active');
             $eventsLayers.removeClass('has-zoom');
             $('.sprite.zoom', $eventsLayers).removeClass('zoom');
             // Move the cursor to the new position first and foremost
@@ -671,7 +619,6 @@ $(document).ready(function(){
             let timeoutDuration = _mapEffects.moveTimeout;
             let travelDuration = _mapEffects.moveTravel * thisShiftDist;
             let onMoveComplete = function(){
-                //console.log('-> cursor moved to tile offset ' + tileOffsetX + 'x' + tileOffsetY + '!');
                 _worldCursor.col = thisNewCol;
                 _worldCursor.row = thisNewRow;
                 _worldCursor.position = thisNewCol + '-' + thisNewRow;
@@ -738,18 +685,12 @@ $(document).ready(function(){
                     });
                 }
             // And now we should move the map itself so that the characters are always centered in the viewport
-            // (as much as possible anyway, without overscroll). This is done by moving the entire map container
-            // using it's transform: translate() values.  Make sure we pre-calculate the current dimensions of
-            // the map itself, its parent, and the position of the cursor sprite so we know where to center to
             let worldWidth = $worldDiv.width();
             let worldHeight = $worldDiv.height();
             let mapWidth = $canvasMap.width();
             let mapHeight = $canvasMap.height();
             let targetX = tileOffsetX;
             let targetY = tileOffsetY;
-            //console.log('-> world size: ' + worldWidth + 'x' + worldHeight);
-            //console.log('-> map size: ' + mapWidth + 'x' + mapHeight);
-            //console.log('-> target position: ' + targetX + 'x' + targetY);
             // Now calculate the new translate values for the map container
             let translateX = 0, translateY = 0;
             if (mapWidth < worldWidth){ translateX = (worldWidth - mapWidth) / 2; }
@@ -760,9 +701,7 @@ $(document).ready(function(){
             else if (targetY < (worldHeight / 2)){ translateY = 0; }
             else if (targetY > (mapHeight - (worldHeight / 2))){ translateY = -(mapHeight - worldHeight); }
             else { translateY = -(targetY - (worldHeight / 2)); }
-            //console.log('-> translateX =', translateX, '| translateY =', translateY);
-            //if (animateMove){ $canvasMap.addClass('animate'); }
-            //else { $canvasMap.removeClass('animate'); }
+            // Apply the new translate values to the map container
             $canvasMap.css({ transform: 'translate(' + translateX + 'px, ' + translateY + 'px)' });
             return true;
             }
@@ -786,11 +725,8 @@ $(document).ready(function(){
             let newPosition = cursorPosition.split('-');
             let thisNewCol = parseInt(newPosition[0]);
             let thisNewRow = parseInt(newPosition[1]);
-            //console.log('-> updating position display to (' + thisNewCol + '-' + thisNewRow + ') (from: ', newPosition, ')');
             let $positionDisplay = $('#position-display > .wrapper', $worldDiv);
             $positionDisplay.text('X:' + thisNewCol + ' Y:' + thisNewRow);
-            //console.log('-> moving the actions dropdown to position (' + thisNewCol + '-' + thisNewRow + ')');
-            //console.log('-> _worldCursor.direction =', _worldCursor.direction);
             let $actionsDropdown = $('#action-dropdown', $worldDiv);
             $actionsDropdown.css({
                 top: ((thisNewRow - 1) * _mapTileSize[1]) + 'px',
@@ -828,13 +764,11 @@ $(document).ready(function(){
                             let battleId = $button.attr('data-battle') || false;
                             //console.log('-> action =', action, '| battleId =', battleId);
                             if (action === 'battle-info'){
+                                //console.log('-> showing battle info for ID ' + battleId + '!');
                                 alert('Battle ID: ' + battleId + '\n\nThis is where you would show battle details.');
                                 }
                             else if (action === 'battle'){
                                 //console.log('-> starting battle with ID ' + battleId + '!');
-                                // battle.php?wap=false&this_user_id=412&this_player_token=dr-light&this_player_id=3&this_battle_token=dr-light-phase0-met&this_player_robots=137_mega-man,203_roll,171_pirate-man
-                                //console.log('-> gathering battle variables...');
-                                //console.log('-> _userId =', _userId, '\n', '-> _playerId =', _playerId, '\n', '-> _playerToken =', _playerToken, '\n', '-> _config.playerRobots =', _config.playerRobots);
                                 let battleVars = [];
                                 battleVars.push('wap=false'); // i hate this
                                 battleVars.push('this_user_id=' + _userId);
@@ -842,14 +776,9 @@ $(document).ready(function(){
                                 battleVars.push('this_player_token=' + _playerToken);
                                 battleVars.push('this_player_robots=' + _playerRobots.join(','));
                                 battleVars.push('this_battle_token=' + battleId);
-                                //battleVars.push('this_battle_token=dr-light-phase0-met'); // DEBUG
                                 let battleHref = 'battle.php?' + battleVars.join('&');
                                 $thisWorld.addClass('hidden');
                                 window.location.href = battleHref;
-                                /*if (confirm('Navigate to this URL?\n' + battleHref)){
-                                    $thisWorld.addClass('hidden');
-                                    window.location.href = battleHref;
-                                    }*/
                                 }
                             });
                         }
