@@ -1,5 +1,5 @@
 #---------------------------#
-# STARTER MAP
+# STARTER MAP (80x80)
 @token    = starter-80x80
 @name     = Starter Map (80x80)
 @size     = 19 x 15 x 80 x 80
@@ -37,6 +37,5 @@
 #---------------------------#
 @portals[]  = spawn(4, 4)
 @portals[]  = exit(16, 13)
-@portals[]  = starter(4, 4)
-@portals[]  = water(4, 4)
+@portals[]  = goto__water-80x80(16, 5)
 #---------------------------#

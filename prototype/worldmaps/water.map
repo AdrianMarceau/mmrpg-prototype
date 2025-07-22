@@ -1,5 +1,5 @@
 #---------------------------#
-# STARTER MAP
+# WATER MAP
 @token      = water
 @name       = Water Map
 @field      = waterfall-institute
