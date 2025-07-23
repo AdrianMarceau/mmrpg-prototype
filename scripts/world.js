@@ -717,6 +717,7 @@ $(document).ready(function(){
             let _worldCursor = _world.cursor;
             let _mapEffects = _config.mapEffects;
             let _mapTileSize = _config.mapTileSize;
+            let _mapTileSizeOffset = _config.mapTileSizeOffset;
             let _userId = _config.userId;
             let _playerId = _config.playerId;
             let _playerToken = _config.playerToken;
@@ -731,21 +732,29 @@ $(document).ready(function(){
             $positionDisplay.text('X:' + thisNewCol + ' Y:' + thisNewRow);
             let $actionsDropdown = $('#action-dropdown', $worldDiv);
             let $actionsDropdownWrapper = $('> .wrapper', $actionsDropdown);
-            $actionsDropdown.css({
-                top: ((thisNewRow - 1) * _mapTileSize[1]) + 'px',
-                left: ((thisNewCol - 1) * _mapTileSize[0]) + 'px'
-                }).attr('data-dir', _worldCursor.direction);
+            $actionsDropdown.css({left: '', top: ''}).removeAttr('data-dir');
             $actionsDropdownWrapper.empty();
             //console.log('-> checking if there are any events for this position...');
             let $eventsLayers = $('.layer.events', $canvasMap);
+            let $zoomLayer = $('.layer.zoom', $canvasMap);
             if (!$eventsLayers || !$eventsLayers.length){ console.error('updateMapPosition() missing required $eventsLayers!'); return false; }
+            if (!$zoomLayer || !$zoomLayer.length){ console.error('updateMapPosition() missing required $zoomLayer!'); return false; }
             //console.log('-> $eventsLayer found, checking for events...');
+
+            //$zoomLayer.empty();
             $eventsLayers.removeClass('has-zoom');
-            $('.sprite', $eventsLayers).removeClass('zoom');
+            $('.sprite', $zoomLayer).each(function(){
+                let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
+                $sprite.appendTo($layer).removeAttr('data-layer');
+                });
+            setTimeout(function(){ $('.sprite', $eventsLayers).removeClass('zoom'); }, 100);
+            //$('.sprite', $zoomLayer).removeClass('zoom');
+
             let $eventAtPosition = $('.sprite[data-col="' + thisNewCol + '"][data-row="' + thisNewRow + '"]', $eventsLayers);
             if (!$eventAtPosition || !$eventAtPosition.length){ return; }
-            //console.log('-> event found at position ' + thisNewCol + '-' + thisNewRow + '!', $eventAtPosition);
             let $eventLayer = $eventAtPosition.closest('.layer.events');
+            let eventLayer = $eventLayer.attr('data-layer') || false;
+
             var showDropdown = false;
             var dropdownMarkup = '';
             var dataBattle = $eventAtPosition.attr('data-battle');
@@ -763,10 +772,18 @@ $(document).ready(function(){
                 dropdownMarkup += '<a class="button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Enter Portal</span></a>';
                 }
             if (!showDropdown){ return; }
+
+            $actionsDropdown.css({
+                left: ((thisNewCol - 1) * _mapTileSize[0] + _mapTileSizeOffset[0]) + 'px',
+                top: ((thisNewRow - 1) * _mapTileSize[1] + _mapTileSizeOffset[1]) + 'px',
+                }).attr('data-dir', _worldCursor.direction);
             $actionsDropdownWrapper.html(dropdownMarkup);
             $actionsDropdown.addClass('active');
+
             $eventLayer.addClass('has-zoom');
-            $eventAtPosition.addClass('zoom');
+            $eventAtPosition.appendTo($zoomLayer).attr('data-layer', eventLayer);
+            setTimeout(function(){ $eventAtPosition.addClass('zoom'); }, 100);
+
             $('.button', $actionsDropdown).bind('click', function(e){
                 //console.log('%c' + 'Action button clicked!', 'color: cyan;');
                 e.preventDefault();

@@ -53,7 +53,7 @@ html, body {
 #world #canvas #map .layer[data-layer="portals"] { z-index: 20; }
 #world #canvas #map .layer[data-layer="battles"] { z-index: 30; }
 #world #canvas #map .layer[data-layer="team"] { z-index: 40; }
-#world #canvas #map .layer[data-layer].has-zoom { z-index: 50; }
+#world #canvas #map .layer[data-layer="zoom"] { z-index: 50; }
 
 #world #map .sprite.tile {
     background-color: transparent;
@@ -225,18 +225,20 @@ html, body {
 #world #map .layer.events .sprite.exit.pulse { animation: world-sprite-exit-pulse 4s ease-in infinite; }
 #world #map .layer.events .sprite.portal.pulse { animation: world-sprite-portal-pulse 3s ease-in infinite; }
 
-#world #map .layer.events .sprite > .sprite {
+#world #map .layer.events .sprite > .sprite,
+#world #map .layer.zoom .sprite > .sprite {
     transform-origin: bottom;
     transform: scale(1.0);
     opacity: 1.0;
     filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.6));
-    transition: transform 0.3s, opacity 0.3s, filter 0.3s;
+    /* transition: transform 0.3s, opacity 0.3s, filter 0.3s;  */
+    transition: transform 0.6s, opacity 0.6s, filter 0.6s;
 }
-#world #map .layer.events .sprite.zoom > .sprite {
+#world #map .layer.events .sprite.zoom > .sprite,
+#world #map .layer.zoom .sprite.zoom > .sprite {
     transform: scale(2);
 }
-#world #map .layer.events.has-zoom .sprite:not(.zoom) > .sprite {
-    /* opacity: 0.6; */
+#world #map .layer.events.has-zoom .sprite > .sprite {
     filter: brightness(0.6) drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.6));
 }
 
@@ -276,7 +278,9 @@ html, body {
 #world #canvas #action-dropdown {
     display: block;
     position: absolute;
-    z-index: 25;
+    z-index: 49;
+    top: -9999px;
+    left: -9999px;
     width: 40px;
     height: 40px;
     overflow: visible;
@@ -296,9 +300,16 @@ html, body {
     position: absolute;
     top: auto;
     right: auto;
+    bottom: auto;
+    left: auto;
+    transform: translate(0, 0);
+    /*
+    top: auto;
+    right: auto;
     bottom: 0;
     left: 50%;
-    transform: translate(-50%, -45px);
+    transform: translate(-50%, -50%);
+    */
     width: 150px;
     height: auto;
     min-height: 75px;
@@ -316,8 +327,22 @@ html, body {
     /* border-bottom: 20px solid rgba(0, 0, 0, 0.5); */
     box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.3);
 }
-#world #canvas #action-dropdown[data-dir*="left"] > .wrapper { display: block; }
-#world #canvas #action-dropdown[data-dir*="right"] > .wrapper { display: block; }
+#world #canvas #action-dropdown[data-dir="left"] > .wrapper {
+    right: 60px;
+    transform: translate(0, -25%);
+}
+#world #canvas #action-dropdown[data-dir="right"] > .wrapper {
+    left: 60px;
+    transform: translate(0, -25%);
+}
+#world #canvas #action-dropdown[data-dir*="up"] > .wrapper {
+    bottom: 60px;
+    transform: translate(calc(-50% + 20px), 0);
+}
+#world #canvas #action-dropdown[data-dir*="down"] > .wrapper {
+    top: 60px;
+    transform: translate(calc(-50% + 20px), 0);
+}
 
 #world #canvas #action-dropdown .label,
 #world #canvas #action-dropdown .button {
