@@ -26,12 +26,15 @@ html, body {
 
 #world #canvas #map {
     display: block;
-    position: absolute;
+    /* position: absolute;  */
+    position: relative;
     overflow: hidden;
     width: auto;
     height: auto;
     top: 0;
     left: 0;
+    right: auto;
+    left: auto;
     z-index: 10;
     transform: translate(0, 0);
     transition: transform 1s ease-in-out;
@@ -207,8 +210,13 @@ html, body {
     50% { transform: translate(0, -9px); }
 }
 #world #map .layer.objects .sprite.bounce { animation: world-sprite-bounce 1s steps(1) infinite; }
-#world #map .layer.objects .sprite.cursor.bounce { animation-duration: 0.6s; }
 #world #map .layer.objects .sprite.team.bounce { animation-duration: 1.0s; }
+
+@keyframes world-cursor-bounce {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(0, -1px); }
+}
+#world #map .layer.objects .sprite.cursor.bounce { animation: world-cursor-bounce 1s steps(1) infinite; }
 
 @keyframes world-sprite-spawn-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.5); } }
 @keyframes world-sprite-exit-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(3.0); } }
@@ -507,8 +515,7 @@ html, body {
 /* TEMP TEMP TEMP */
 
 #world #map .layer.objects .sprite.cursor > .sprite {
-    /* transform: scaleY(-1) translate(0, -6px); */
-    transform: translate(-8px, 24px);
+    transform: translate(-6px, 14px);
     filter: drop-shadow(-1px -1px 0 white);
 }
 

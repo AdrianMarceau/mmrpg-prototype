@@ -610,7 +610,7 @@ $(document).ready(function(){
             let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join(' and '); })(thisHorDir, thisVerDir);
             let thisShiftDist = Math.sqrt(Math.pow(thisNewCol - thisOldCol, 2) + Math.pow(thisNewRow - thisOldRow, 2));
             let tileOffsetX = ((thisNewCol - 1) * _mapTileSize[0]) + _mapTileSizeOffset[0];
-            let tileOffsetY = ((thisNewRow - 1) * _mapTileSize[1]) + _mapTileSizeOffset[0];
+            let tileOffsetY = ((thisNewRow - 1) * _mapTileSize[1]) + _mapTileSizeOffset[1];
             $canvasMap.addClass('busy');
             _worldCursor.moving = true;
             $actionsDropdown.removeClass('active');
@@ -640,13 +640,13 @@ $(document).ready(function(){
                 };
             if (animateMove){
                 $cursorSprite.animate({
+                    left: tileOffsetX + 'px',
                     top: tileOffsetY + 'px',
-                    left: tileOffsetX + 'px'
                     }, travelDuration, 'linear', onMoveComplete);
                 } else {
                 $cursorSprite.css({
+                    left: tileOffsetX + 'px',
                     top: tileOffsetY + 'px',
-                    left: tileOffsetX + 'px'
                     }); onMoveComplete();
                 }
             // If there are any team sprites, move them as well (it's okay if they lay behind the cursor)

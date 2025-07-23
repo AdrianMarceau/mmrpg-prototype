@@ -23,8 +23,17 @@ $_SESSION['WORLD_TEMP'] = array();
 // Define a reference object for storing temporary world data
 $WORLD_SESSION = &$_SESSION['WORLD'];
 
+// Define some constants for the world map
+define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
+define('MMRPG_WORLD_DEFAULT_TILESIZE', 40);
+define('MMRPG_WORLD_MAPFILE_BASEPATH', 'prototype/worldmaps/');
+
 // Define defaults and allowed values for the prototype world data
-$allowed_world_tokens = array('starter', 'water', 'starter-80x80', 'water-80x80');
+//$allowed_world_tokens = array('starter', 'water', 'starter-80x80', 'water-80x80');
+$existing_map_files = glob(MMRPG_CONFIG_ROOTDIR.MMRPG_WORLD_MAPFILE_BASEPATH.'*.map');
+$allowed_world_tokens = array_map(function($path){ return preg_replace('/\.map$/i', '', basename($path)); }, $existing_map_files);
+//error_log('$existing_map_files = '. print_r($existing_map_files, true));
+//error_log('$allowed_world_tokens = '. print_r($allowed_world_tokens, true));
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
 $default_world_token = 'starter-80x80';
 $default_player_token = 'player';
@@ -121,14 +130,11 @@ $get_sprite = function($kind, $token, $alt = '', $dir = 'right', $class = '', $s
     return('<span class="'.$sprite_class.'"'.$sprite_styles.$sprite_attrs.'><span class="sprite sprite_'.$xsize.'" style="background-image: url('.$sprite_path.');"></span></span>');
     };
 
-// Define some constants for the world map
-define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
-define('MMRPG_WORLD_DEFAULT_TILESIZE', 40);
 
 // Define a function for loading a given map's data from the filesystem
 function loadMapData($map_token){
     //error_log('loadMapData() called!');
-    static $map_basedir = MMRPG_CONFIG_ROOTDIR.'prototype/worldmaps/';
+    static $map_basedir = MMRPG_CONFIG_ROOTDIR.MMRPG_WORLD_MAPFILE_BASEPATH;
     static $map_tilesize = MMRPG_WORLD_DEFAULT_TILESIZE;
     if (empty($map_token)){
         //error_log('loadMapData() error: missing map token!');
