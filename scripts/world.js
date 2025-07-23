@@ -757,13 +757,16 @@ $(document).ready(function(){
 
             var showDropdown = false;
             var dropdownMarkup = '';
+            var dataLabel = $eventAtPosition.attr('data-label');
             var dataBattle = $eventAtPosition.attr('data-battle');
             var dataPortal = $eventAtPosition.attr('data-portal');
             if (dataBattle){
                 showDropdown = true;
-                dropdownMarkup += '<strong class="label">Battle Options</strong>';
-                dropdownMarkup += '<a class="button" data-action="battle-info" data-battle="'+dataBattle+'"><span>View Details</span></a>';
-                if (_playerRobots.length){  dropdownMarkup += '<a class="button" data-action="start-battle" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
+                if (dataLabel){ dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                else { dropdownMarkup += '<strong class="label">Battle Options</strong>'; }
+                //dropdownMarkup += '<a class="button" data-action="battle-info" data-battle="'+dataBattle+'"><span>View Details</span></a>';
+                if (_playerRobots.length){  dropdownMarkup += '<a class="button start-battle" data-action="start-battle" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
+                else { dropdownMarkup += '<a class="button start-battle disabled" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
                 }
             if (dataPortal && dataPortal.indexOf('goto__') !== -1){
                 showDropdown = true;

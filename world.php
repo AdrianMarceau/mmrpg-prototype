@@ -118,7 +118,12 @@ $get_sprite = function($kind, $token, $alt = '', $dir = 'right', $class = '', $s
         return false;
         }
     $info = $mmrpg_indexes[$xkind][$token];
+    $anim = 0;
+    if ($kind === 'player'){ $anim = rpg_player::get_css_animation_duration($info); }
+    elseif ($kind === 'robot'){ $anim = rpg_robot::get_css_animation_duration($info); }
+    if (!empty($anim)){ $styles .= ' animation-duration: '.$anim.'s;'; }
     //error_log('$info = '.print_r($info, true));
+    //error_log('$anim = '.print_r($anim, true));
     $dir = 'right';
     $img = $info[$kind.'_image'];
     $size = $info[$kind.'_image_size'];
@@ -372,8 +377,11 @@ if (empty($map_random_encounters)){
     for ($i = 0; $i < $max_random_encounters; $i++){
         $robot = $allowed_random_encounters[mt_rand(0, count($allowed_random_encounters) - 1)];
         $randpos = $get_randpos($map_col_size, $map_row_size, 4, $disallowed_encounter_cells);
+        $robot_info = $mmrpg_index_robots[$robot];
+        $robot_level = mt_rand(1, 10);
         $battle_token = 'world-battle_'.$map_token.'_debug-'.($i + 1);
-        $map_random_encounters[] = array('robot', $robot, '', $randpos, $battle_token);
+        $battle_name = $robot_info['robot_name'].' (Lv. '.$robot_level.')';
+        $map_random_encounters[] = array('robot', $robot, '', $randpos, $battle_token, $battle_name);
         $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
             'token' => $battle_token,
             'name' => ('Debug Battle '.($i + 1).'/'.$max_random_encounters),
@@ -381,7 +389,7 @@ if (empty($map_random_encounters)){
             'turns' => 1234,
             'zenny' => 5678,
             'field' => $map_field_token,
-            'target' => array('robots' => array('token' => $robot)),
+            'target' => array('robots' => array(array('token' => $robot, 'level' => $robot_level))),
             'flags' => array('world_battle' => true, 'remove_on_complete' => true),
             ), true);
         }
@@ -500,13 +508,14 @@ $flag_skip_fadein = true;
                     <?
                     $battle_symbols = array();
                     $battle_index = array();
-                    foreach ($map_random_encounters as $battle){
-                        $kind = $battle[0];
+                    foreach ($map_random_encounters as $encounter){
+                        $kind = $encounter[0];
                         $xkind = $get_xkind($kind);
-                        $token = $battle[1];
-                        $alt = $battle[2];
-                        $position = $battle[3];
-                        $battle = $battle[4];
+                        $token = $encounter[1];
+                        $alt = $encounter[2];
+                        $position = $encounter[3];
+                        $battle = $encounter[4];
+                        $name = $encounter[5];
                         if (!rpg_battle::has_index_info($battle)){ continue; }
                         list($col, $row) = explode('-', $position);
                         $maxcols = $map_col_size;
@@ -517,6 +526,7 @@ $flag_skip_fadein = true;
                         $class = 'battle bounce';
                         $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$zindex.';';
                         $attrs = 'data-battle="'.$battle.'" data-pos="'.$position.'" data-col="'.$col.'" data-row="'.$row.'"';
+                        $attrs .= 'data-label="'.$name.'"';
                         $markup = $get_sprite($kind, $token, $alt, 'right', $class, $style, $attrs);
                         echo($markup);
                         $battle_symbols[$position] = $battle;

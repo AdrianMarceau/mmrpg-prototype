@@ -312,7 +312,8 @@ html, body {
     */
     width: 150px;
     height: auto;
-    min-height: 75px;
+    /* min-height: 75px;  */
+    min-height: 50px;
     pointer-events: inherit;
     color: #cfcfcf;
     font-family: monospace;
@@ -354,7 +355,7 @@ html, body {
     width: auto;
     height: auto;
     font-family: monospace;
-    text-align: left;
+    text-align: center;
     color: #cfcfcf;
     font-size: 12px;
     line-height: 1.2;
@@ -363,6 +364,7 @@ html, body {
 #world #canvas #action-dropdown .label {
     font-weight: bold;
     margin: 0 0 4px 0;
+    line-height: 1.4;
 }
 #world #canvas #action-dropdown .button {
     margin: 0 2px 2px 0;
@@ -371,9 +373,11 @@ html, body {
     background-color: rgba(0, 0, 0, 0.5);
     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     border-radius: 6px;
+    transform: scale(1.0);
     cursor: pointer;
+    user-select: none;
     pointer-events: all;
-    transition: border 0.2s, background-color 0.2s, box-shadow 0.2s;
+    transition: border 0.2s, background-color 0.2s, box-shadow 0.2s, transform 0.3s;
 }
 #world #canvas #action-dropdown .button:hover {
     border: 1px solid #cfcfcf;
@@ -385,6 +389,29 @@ html, body {
     display: inline-block;
     position: relative;
     padding-right: 6px;
+}
+
+#world #canvas #action-dropdown .button.start-battle {
+    background-color: green;
+    border: 1px solid #0f0;
+    font-weight: bold;
+    padding: 6px 6px;
+    font-size: 14px;
+    text-align: center;
+}
+#world #canvas #action-dropdown .button.start-battle:before {
+    content: "";
+    display: none;
+}
+#world #canvas #action-dropdown .button.start-battle.disabled {
+    background-color: #292929;
+    border-color: #464646;
+    color: #969696;
+    font-weight: normal;
+    cursor: not-allowed;
+}
+#world #canvas #action-dropdown .button.start-battle:not(.disabled):hover {
+    transform: scale(1.1);
 }
 
 
