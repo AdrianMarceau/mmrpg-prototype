@@ -687,12 +687,12 @@ $(document).ready(function(){
                     });
                 }
             // And now we should move the map itself so that the characters are always centered in the viewport
-            let worldWidth = $worldDiv.width();
-            let worldHeight = $worldDiv.height();
-            let mapWidth = $canvasMap.width();
-            let mapHeight = $canvasMap.height();
-            let targetX = tileOffsetX;
-            let targetY = tileOffsetY;
+            let worldWidth = $worldDiv.outerWidth();
+            let worldHeight = $worldDiv.outerHeight();
+            let mapWidth = $canvasMap.outerWidth();
+            let mapHeight = $canvasMap.outerHeight();
+            let targetX = tileOffsetX + (_mapTileSize[0] / 2) - (_mapTileSizeOffset[0] / 2);
+            let targetY = tileOffsetY + (_mapTileSize[1] / 2) - (_mapTileSizeOffset[1] / 2);
             // Now calculate the new translate values for the map container
             let translateX = 0, translateY = 0;
             if (mapWidth < worldWidth){ translateX = (worldWidth - mapWidth) / 2; }
