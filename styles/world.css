@@ -415,8 +415,8 @@ html, body {
     border-color: #129d12;
 }
 #world #canvas #action-dropdown .button[data-action="enter-portal"] {
-    background-color: #007070;
-    border-color: #00a1a1;
+    background-color: #363d62;
+    border-color: #5b6493;
 }
 
 
@@ -562,7 +562,7 @@ html, body {
     z-index: 1000;
     background-color: transparent;
     background-color: transparent;
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(255, 255, 255, 0.3));
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(200, 200, 200, 0.3));
     mix-blend-mode: overlay;
     opacity: 0.6;
 }
@@ -590,3 +590,12 @@ html, body {
 }
 
 /* TEMP TEMP TEMP */
+
+/* use for seeing full map in view when too big during dev */
+/* #world #canvas #map {
+    transform: scale(0.25) translate(0, 0) !important;
+    transform-origin: left top !important;
+} */
+
+/* TEMP TEMP TEMP */
+

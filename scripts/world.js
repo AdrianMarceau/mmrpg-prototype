@@ -778,10 +778,10 @@ $(document).ready(function(){
                 }
             if (dataPortal){ // && dataPortal.indexOf('goto__') !== -1
                 showDropdown = true;
-                if (dataLabel){ dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-                else { dropdownMarkup += '<strong class="label">Portal Options</strong>'; }
+                if (!dataLabel){ dataLabel = 'Portal Options'; }
+                dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>';
                 //dropdownMarkup += '<a class="button" data-action="portal-info" data-portal="'+dataPortal+'"><span>View Details</span></a>';
-                if (dataPortal.indexOf('goto__') !== -1){ dropdownMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Enter Portal</span></a>'; }
+                if (dataPortal.indexOf('goto__') !== -1){ dropdownMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Warp to Area</span></a>'; }
                 else if (dataPortal === 'exit'){ dropdownMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Return Home</span></a>'; }
                 }
 
@@ -806,7 +806,7 @@ $(document).ready(function(){
             $actionsDropdown.addClass('active');
 
             // Bind click events to the newly created action buttons in the dropdown
-            $('.button', $actionsDropdown).bind('click', function(e){
+            $('.button[data-action]', $actionsDropdown).bind('click', function(e){
                 //console.log('%c' + 'Action button clicked!', 'color: cyan;');
                 e.preventDefault();
                 let $button = $(this);
