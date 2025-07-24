@@ -275,12 +275,16 @@ function getMapEncounterCells($map_data){
             $available_cells[$pos] = true;
         }
     }
+    //error_log('$map_col_size = '.print_r($map_col_size, true));
+    //error_log('$map_row_size = '.print_r($map_row_size, true));
+    //error_log('$available_cells('.count($available_cells).') = '.print_r($available_cells, true));
     // Now let's loop through portals and remove spaces that have portals on them
     if (!empty($map_data['portals']) && is_array($map_data['portals'])){
         foreach ($map_data['portals'] AS $portal_name => $portal_data){
             if (empty($portal_data) || !is_array($portal_data) || count($portal_data) < 2){ continue; }
             list($x, $y) = $portal_data;
             $pos = $x.'-'.$y;
+            //error_log('-> removing portal position "'.$pos.'" from available cells');
             unset($available_cells[$pos]);
         }
     }
@@ -296,8 +300,9 @@ function getMapEncounterCells($map_data){
                     if (!isset($tilesIndex[$tile_key])){ continue; }
                     $tile_token = $tilesIndex[$tile_key];
                     // If this tile is a "void" type, remove it from the available cells
-                    if ($tile_token === 'void' || strpos($tile_token, 'void') === 0){
+                    if ($tile_token === 'void' || strstr($tile_token, 'void')){
                         $pos = ($col_key + 1).'-'.($row_key + 1);
+                        //error_log('-> removing tile position "'.$pos.'" from available cells (tile: '.$tile_token.')');
                         unset($available_cells[$pos]);
                     }
                 }
@@ -306,6 +311,7 @@ function getMapEncounterCells($map_data){
     }
     // Return the available cells as an array of positions
     $available_cells = array_keys($available_cells);
+    //error_log('$available_cells('.count($available_cells).') = '.print_r($available_cells, true));
     return $available_cells;
 }
 
@@ -410,6 +416,10 @@ $allowed_random_encounters = $map_mecha_support;
 $available_encounter_cells = getMapEncounterCells($map_data_parsed);
 $max_random_encounters = ceil(count($available_encounter_cells) * 0.25);
 $map_random_encounters = !empty($WORLD_SESSION[$map_token.'_random_encounters']) ? $WORLD_SESSION[$map_token.'_random_encounters'] : array();
+error_log('$allowed_random_encounters = '.print_r($allowed_random_encounters, true));
+error_log('$available_encounter_cells = '.print_r($available_encounter_cells, true));
+error_log('$max_random_encounters = '.print_r($max_random_encounters, true));
+error_log('$map_random_encounters = '.print_r($map_random_encounters, true));
 if (empty($map_random_encounters)){
     for ($i = 0; $i < $max_random_encounters; $i++){
         $robot = $allowed_random_encounters[mt_rand(0, count($allowed_random_encounters) - 1)];

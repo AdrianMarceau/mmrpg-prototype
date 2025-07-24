@@ -224,6 +224,11 @@ $(document).ready(function(){
                 let tileSpriteSize = [tileSpriteInfo[2] || tileSize[0], tileSpriteInfo[3] || tileSize[1]];
                 let tileSpritePosition = [tilePos[0], tilePos[1], ((tilePos[0] - 1) * tileSpriteSize[0]), ((tilePos[1] - 1) * tileSpriteSize[1])];
                 let tileSpriteEffects = {grid: true, hover: false, focus: false}; // default values
+                let tileSpriteWalkable = true;
+                if (tileSpriteToken === 'void' || tileSpriteToken.indexOf('void') !== -1){
+                    tileSpriteEffects.grid = false; // no grid for void/+
+                    tileSpriteWalkable = false; // void/+ tiles are not walkable
+                    }
                 //console.log('---> tileSpriteKey =', tileSpriteKey);
                 //console.log('---> tileSpriteToken =', tileSpriteToken);
                 //console.log('---> tileSpriteInfo =', tileSpriteInfo);
@@ -776,7 +781,7 @@ $(document).ready(function(){
                 if (_playerRobots.length){  dropdownMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
                 else { dropdownMarkup += '<a class="button big-button disabled" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
                 }
-            if (dataPortal){ // && dataPortal.indexOf('goto__') !== -1
+            if (dataPortal && dataPortal.indexOf('goto__') !== -1){
                 showDropdown = true;
                 if (!dataLabel){ dataLabel = 'Portal Options'; }
                 dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>';
