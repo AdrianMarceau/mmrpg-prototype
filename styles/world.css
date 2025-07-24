@@ -55,7 +55,7 @@ html, body {
 #world #canvas #map .layer[data-layer="team"] { z-index: 40; }
 #world #canvas #map .layer[data-layer="zoom"] { z-index: 50; }
 
-#world #map .sprite.tile {
+#world #map .layer .sprite.tile {
     background-color: transparent;
     background-image: url(../images/maps/overworld-experiment-v2024-tileset.png);
     background-position: -9999px -9999px;
@@ -70,7 +70,7 @@ html, body {
     cursor: pointer;
     pointer-events: auto;
 }
-#world #map.busy .sprite.tile {
+#world #map.busy .layer .sprite.tile {
     cursor: default;
     pointer-events: none;
 }
@@ -157,13 +157,15 @@ html, body {
     top: 0;
     left: 0;
     z-index: 1;
-    transform: translate(0, -8px);
-    background-image: none;
     pointer-events: none;
     width: 40px;
     height: 40px;
     overflow: visible;
     pointer-events: none;
+}
+#world #map .layer.objects .sprite:not(.tile){
+    background-image: none;
+    transform: translate(0, -8px);
 }
 
 #world #map .layer.objects .sprite {
@@ -226,7 +228,7 @@ html, body {
 #world #map .layer.events .sprite.portal.pulse { animation: world-sprite-portal-pulse 3s ease-in infinite; }
 
 #world #map .layer.events .sprite > .sprite,
-#world #map .layer.zoom .sprite > .sprite {
+#world #map .layer.zoom .sprite:not(.tile) > .sprite {
     transform-origin: bottom;
     transform: scale(1.0);
     opacity: 1.0;
@@ -235,7 +237,7 @@ html, body {
     transition: transform 0.6s, opacity 0.6s, filter 0.6s;
 }
 #world #map .layer.events .sprite.zoom > .sprite,
-#world #map .layer.zoom .sprite.zoom > .sprite {
+#world #map .layer.zoom .sprite:not(.tile).zoom > .sprite {
     transform: scale(2);
 }
 #world #map .layer.events.has-zoom .sprite > .sprite {
@@ -284,15 +286,14 @@ html, body {
     width: 40px;
     height: 40px;
     overflow: visible;
-    pointer-events: all;
+    pointer-events: none;
     opacity: 1.0;
     transition: opacity 0.3s;
     /* background-color: rgba(255, 0, 255, 0.6); */
     /* outline: 1px dotted magenta; */
 }
 #world #canvas #action-dropdown:not(.active) {
-    /* display: none; */
-    pointer-events: none;
+    /* display: none;  */
     opacity: 0.0;
 }
 #world #canvas #action-dropdown > .wrapper {
@@ -303,17 +304,10 @@ html, body {
     bottom: auto;
     left: auto;
     transform: translate(0, 0);
-    /*
-    top: auto;
-    right: auto;
-    bottom: 0;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    */
+    pointer-events: all;
     width: 150px;
     height: auto;
-    /* min-height: 75px;  */
-    min-height: 50px;
+    min-height: 20px;
     pointer-events: inherit;
     color: #cfcfcf;
     font-family: monospace;
@@ -327,6 +321,9 @@ html, body {
     border: 3px transparent;
     /* border-bottom: 20px solid rgba(0, 0, 0, 0.5); */
     box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+#world #canvas #action-dropdown:not(.active) > .wrapper {
+    pointer-events: none;
 }
 #world #canvas #action-dropdown[data-dir="left"] > .wrapper {
     right: 60px;
@@ -391,27 +388,35 @@ html, body {
     padding-right: 6px;
 }
 
-#world #canvas #action-dropdown .button.start-battle {
-    background-color: green;
-    border: 1px solid #0f0;
+#world #canvas #action-dropdown .button.big-button {
+    background-color: #363636;
+    border: 1px solid  #565656;
     font-weight: bold;
     padding: 6px 6px;
     font-size: 14px;
     text-align: center;
 }
-#world #canvas #action-dropdown .button.start-battle:before {
+#world #canvas #action-dropdown .button.big-button:before {
     content: "";
     display: none;
 }
-#world #canvas #action-dropdown .button.start-battle.disabled {
+#world #canvas #action-dropdown .button.big-button.disabled {
     background-color: #292929;
     border-color: #464646;
     color: #969696;
     font-weight: normal;
     cursor: not-allowed;
 }
-#world #canvas #action-dropdown .button.start-battle:not(.disabled):hover {
+#world #canvas #action-dropdown .button.big-button:not(.disabled):hover {
     transform: scale(1.1);
+}
+#world #canvas #action-dropdown .button[data-action="start-battle"] {
+    background-color: #0e6b0e;
+    border-color: #129d12;
+}
+#world #canvas #action-dropdown .button[data-action="enter-portal"] {
+    background-color: #007070;
+    border-color: #00a1a1;
 }
 
 
@@ -571,9 +576,17 @@ html, body {
     filter: drop-shadow(-1px -1px 0 white);
 }
 
+/*
 #world #map .layer.objects .sprite.team.player[data-dir="left"] > .sprite,
 #world #map .layer.objects .sprite.team.robot[data-dir="left"] > .sprite {
     transform: scaleX(-1);
+}
+*/
+#world #map .layer.objects .sprite[data-dir="left"] > .sprite {
+    transform: scale(-1, 1);
+}
+#world #map .layer.objects .sprite.zoom[data-dir="left"] > .sprite {
+    transform: scale(-2, 2);
 }
 
 /* TEMP TEMP TEMP */

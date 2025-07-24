@@ -26,6 +26,7 @@ $WORLD_SESSION = &$_SESSION['WORLD'];
 // Define some constants for the world map
 define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
 define('MMRPG_WORLD_DEFAULT_TILESIZE', 40);
+define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 3); // TODO: make this dependant on limit hearts
 define('MMRPG_WORLD_MAPFILE_BASEPATH', 'prototype/worldmaps/');
 
 // Define defaults and allowed values for the prototype world data
@@ -299,7 +300,7 @@ if (empty($request_player_token) && !empty($WORLD_SESSION['last_player_token']))
 if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){
     $this_prototype_data['this_player_token'] = $request_player_token;
     $allowed_player_robots = mmrpg_prototype_robots_unlocked($request_player_token, true);
-    $max_player_robots = 8; // TODO: make this dynamic based on limit hearts
+    $max_player_robots = MMRPG_WORLD_DEFAULT_TEAMSIZE; // TODO: make this dynamic based on limit hearts
     if (!empty($allowed_player_robots)){
         $request_player_robots = array();
         foreach ($allowed_player_robots AS $robot_token){
@@ -492,7 +493,10 @@ $flag_skip_fadein = true;
                             list($col, $row) = explode('-', $pos);
                             $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                             $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
-                            echo('<span class="sprite tile portal pulse" data-portal="'.$portal_name.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" style="top: '.$top.'px; left: '.$left.'px;"></span>'.PHP_EOL);
+                            $label = preg_match('/^goto__/i', $portal_name) ? ('Go To: '.strtoupper(preg_replace('/^goto__/i', '', $portal_name))) : ('World '.ucfirst($portal_name));
+                            $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                            $style = 'top: '.$top.'px; left: '.$left.'px;';
+                            echo('<span class="sprite tile portal pulse" '.$attrs.' style="'.$style.'"></span>'.PHP_EOL);
                         }
                     }
 

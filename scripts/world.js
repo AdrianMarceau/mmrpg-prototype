@@ -724,24 +724,28 @@ $(document).ready(function(){
             let _playerRobots = _config.playerRobots;
             let $worldDiv = _elements.world;
             let $canvasMap = _elements.map;
+            let cursorDirection = _worldCursor.direction;
             let cursorPosition = _worldCursor.position;
             let newPosition = cursorPosition.split('-');
             let thisNewCol = parseInt(newPosition[0]);
             let thisNewRow = parseInt(newPosition[1]);
             let $positionDisplay = $('#position-display > .wrapper', $worldDiv);
             $positionDisplay.text('X:' + thisNewCol + ' Y:' + thisNewRow);
+
+            // Make sure we empty and hide the action dropdown if it's been shown by previous move
             let $actionsDropdown = $('#action-dropdown', $worldDiv);
             let $actionsDropdownWrapper = $('> .wrapper', $actionsDropdown);
             $actionsDropdown.css({left: '', top: ''}).removeAttr('data-dir');
             $actionsDropdownWrapper.empty();
-            //console.log('-> checking if there are any events for this position...');
+
+            // Collect references to the required event layers and the zoom display layer
             let $eventsLayers = $('.layer.events', $canvasMap);
             let $zoomLayer = $('.layer.zoom', $canvasMap);
             if (!$eventsLayers || !$eventsLayers.length){ console.error('updateMapPosition() missing required $eventsLayers!'); return false; }
             if (!$zoomLayer || !$zoomLayer.length){ console.error('updateMapPosition() missing required $zoomLayer!'); return false; }
             //console.log('-> $eventsLayer found, checking for events...');
 
-            //$zoomLayer.empty();
+            // Make sure we move any existing zoom layer sprites back to their original layers
             $eventsLayers.removeClass('has-zoom');
             $('.sprite', $zoomLayer).each(function(){
                 let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
@@ -750,11 +754,15 @@ $(document).ready(function(){
             setTimeout(function(){ $('.sprite', $eventsLayers).removeClass('zoom'); }, 100);
             //$('.sprite', $zoomLayer).removeClass('zoom');
 
+            // Search for events at the new position so we can show the action dropdown if needed
+            //console.log('-> checking if there are any events for this position...');
             let $eventAtPosition = $('.sprite[data-col="' + thisNewCol + '"][data-row="' + thisNewRow + '"]', $eventsLayers);
             if (!$eventAtPosition || !$eventAtPosition.length){ return; }
             let $eventLayer = $eventAtPosition.closest('.layer.events');
             let eventLayer = $eventLayer.attr('data-layer') || false;
 
+            // Now that we have an event, check its data to see if we should show a dropdown
+            // for either a battle, a portal, or any other compatible event-type for the tile
             var showDropdown = false;
             var dropdownMarkup = '';
             var dataLabel = $eventAtPosition.attr('data-label');
@@ -765,17 +773,31 @@ $(document).ready(function(){
                 if (dataLabel){ dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
                 else { dropdownMarkup += '<strong class="label">Battle Options</strong>'; }
                 //dropdownMarkup += '<a class="button" data-action="battle-info" data-battle="'+dataBattle+'"><span>View Details</span></a>';
-                if (_playerRobots.length){  dropdownMarkup += '<a class="button start-battle" data-action="start-battle" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
-                else { dropdownMarkup += '<a class="button start-battle disabled" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
+                if (_playerRobots.length){  dropdownMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
+                else { dropdownMarkup += '<a class="button big-button disabled" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
                 }
-            if (dataPortal && dataPortal.indexOf('goto__') !== -1){
+            if (dataPortal){ // && dataPortal.indexOf('goto__') !== -1
                 showDropdown = true;
-                dropdownMarkup += '<strong class="label">Portal Options</strong>';
-                dropdownMarkup += '<a class="button" data-action="portal-info" data-portal="'+dataPortal+'"><span>View Details</span></a>';
-                dropdownMarkup += '<a class="button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Enter Portal</span></a>';
+                if (dataLabel){ dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                else { dropdownMarkup += '<strong class="label">Portal Options</strong>'; }
+                //dropdownMarkup += '<a class="button" data-action="portal-info" data-portal="'+dataPortal+'"><span>View Details</span></a>';
+                if (dataPortal.indexOf('goto__') !== -1){ dropdownMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Enter Portal</span></a>'; }
+                else if (dataPortal === 'exit'){ dropdownMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Return Home</span></a>'; }
                 }
+
+            // If there's no dropdown to show, we can return early
             if (!showDropdown){ return; }
 
+            // Elevate the event sprite to the zoom layer and add a zoom class to it so it's more visible
+            if (!$eventAtPosition.hasClass('tile')){
+                $eventLayer.addClass('has-zoom');
+                if (cursorDirection.indexOf('left') !== -1){ $eventAtPosition.attr('data-dir', 'right'); }
+                else if (cursorDirection.indexOf('right') !== -1){ $eventAtPosition.attr('data-dir', 'left'); }
+                $eventAtPosition.appendTo($zoomLayer).attr('data-layer', eventLayer);
+                setTimeout(function(){ $eventAtPosition.addClass('zoom'); }, 100);
+                }
+
+            // Move the action dropdown to the correct position, add the markup, and show it
             $actionsDropdown.css({
                 left: ((thisNewCol - 1) * _mapTileSize[0] + _mapTileSizeOffset[0]) + 'px',
                 top: ((thisNewRow - 1) * _mapTileSize[1] + _mapTileSizeOffset[1]) + 'px',
@@ -783,17 +805,16 @@ $(document).ready(function(){
             $actionsDropdownWrapper.html(dropdownMarkup);
             $actionsDropdown.addClass('active');
 
-            $eventLayer.addClass('has-zoom');
-            $eventAtPosition.appendTo($zoomLayer).attr('data-layer', eventLayer);
-            setTimeout(function(){ $eventAtPosition.addClass('zoom'); }, 100);
-
+            // Bind click events to the newly created action buttons in the dropdown
             $('.button', $actionsDropdown).bind('click', function(e){
                 //console.log('%c' + 'Action button clicked!', 'color: cyan;');
                 e.preventDefault();
                 let $button = $(this);
                 let action = $button.attr('data-action') || false;
+                let isBattle = action.indexOf('battle') !== -1;
+                let isPortal = action.indexOf('portal') !== -1;
                 //console.log('-> action =', action);
-                if (action === 'start-battle' || action === 'battle-info'){
+                if (isBattle){
                     let battleId = $button.attr('data-battle') || false;
                     //console.log('-> battleId =', battleId);
                     if (action === 'battle-info'){
@@ -814,7 +835,7 @@ $(document).ready(function(){
                         window.location.href = battleHref;
                         }
                     }
-                if (action === 'enter-portal' || action === 'portal-info'){
+                else if (isPortal){
                     let portalName = $button.attr('data-portal') || false;
                     //console.log('-> portalName =', portalName);
                     if (action === 'portal-info'){
@@ -823,14 +844,28 @@ $(document).ready(function(){
                         }
                     else if (action === 'enter-portal'){
                         //console.log('-> entering portal with name ' + portalName + '!');
-                        let worldToken = portalName.replace(/^goto__/i, '');
-                        let worldHref = 'world.php?world=' + worldToken;
-                        $thisWorld.addClass('hidden');
-                        window.location.href = worldHref;
+                        let portalHref = false;
+                        if (portalName === 'spawn'){
+                            portalHref = 'prototype.php'; // TODO: make the spawn actually go somewhere specific
+                            } else if (portalName === 'exit'){
+                            portalHref = 'prototype.php'; // TOPO: make the exit actually go somewhere specific
+                            } else if (portalName.indexOf('goto__') !== -1){
+                            let worldToken = portalName.replace(/^goto__/i, '');
+                            portalHref = 'world.php?world=' + worldToken;
+                            }
+                        if (portalHref){
+                            $thisWorld.addClass('hidden');
+                            window.location.href = portalHref;
+                            }
                         }
-
+                    }
+                else {
+                    // no compatible action found, do nothing
+                    return false;
                     }
                 });
+
+            // Return true on success
             return true;
             }
 
