@@ -36,7 +36,7 @@ $allowed_world_tokens = array_map(function($path){ return preg_replace('/\.map$/
 //error_log('$existing_map_files = '. print_r($existing_map_files, true));
 //error_log('$allowed_world_tokens = '. print_r($allowed_world_tokens, true));
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
-$default_world_token = 'starter-80x80';
+$default_world_token = 'debug-area-1'; //'starter-80x80';
 $default_player_token = 'player';
 $default_world_position = '';
 
@@ -96,15 +96,11 @@ $get_xkind = function($kind){
 
 // Define a quick function for getting a random position on a given grid
 // TODO: Define this as an actual function instead of a variable
-$get_randpos = function($cols, $rows, $inset = 0, $disallowed = array()){
+$get_randpos = function($available_encounter_cells){
     static $used;
     if (!$used){ $used = array(); }
-    if (!$cols || !$rows){ return false; }
-    do {
-        $col = mt_rand($inset, ($cols - $inset));
-        $row = mt_rand($inset, ($rows - $inset));
-        $pos = $col.'-'.$row;
-    } while (in_array($pos, $used) || in_array($pos, $disallowed));
+    if (empty($available_encounter_cells)){ return false; }
+    do { $pos = $available_encounter_cells[mt_rand(0, count($available_encounter_cells) - 1)]; } while (in_array($pos, $used));
     $used[] = $pos;
     return $pos;
     };
@@ -209,7 +205,7 @@ function loadMapData($map_token){
                 if ($is_tile_custval){
                     list($name, $k, $x, $y) = explode('/', preg_replace($map_tiles_custval_regex, '$1/$2/$3/$4', $line), 4);
                     $parsed_tiles[$name] = array($x, $y);
-                    $parsed_keys[$k] = $name;
+                    $parsed_keys[intval($k)] = $name;
                     continue;
                     }
                 if ($is_other_custval){
@@ -264,6 +260,53 @@ function loadMapData($map_token){
     if (!empty($map_data_vars)){ $map_data_parsed['vars'] = $map_data_vars; }
     //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
     return $map_data_parsed;
+}
+
+// Define a function for returning all the available cells that encounters can appear on for a given map
+function getMapEncounterCells($map_data){
+    // First we gather the map col and row size so we can generate all possible positions
+    $map_col_size = isset($map_data['size'][0]) ? $map_data['size'][0] : MMRPG_WORLD_DEFAULT_MAPSIZE;
+    $map_row_size = isset($map_data['size'][1]) ? $map_data['size'][1] : MMRPG_WORLD_DEFAULT_MAPSIZE;
+    $available_cells = array();
+    for ($row = 1; $row <= $map_row_size; $row++){
+        for ($col = 1; $col <= $map_col_size; $col++){
+            $pos = $col.'-'.$row;
+            if (isset($available_cells[$pos])){ continue; }
+            $available_cells[$pos] = true;
+        }
+    }
+    // Now let's loop through portals and remove spaces that have portals on them
+    if (!empty($map_data['portals']) && is_array($map_data['portals'])){
+        foreach ($map_data['portals'] AS $portal_name => $portal_data){
+            if (empty($portal_data) || !is_array($portal_data) || count($portal_data) < 2){ continue; }
+            list($x, $y) = $portal_data;
+            $pos = $x.'-'.$y;
+            unset($available_cells[$pos]);
+        }
+    }
+    // Then we through all the tiles and remove any that are unwalkable "void" type
+    if (!empty($map_data['tiles']) && !empty($map_data['tiles']['keys']) && !empty($map_data['layers'])){
+        $tilesIndex = $map_data['tiles']['keys'];
+        $tileLayers = $map_data['layers'];
+        foreach ($tileLayers AS $layer_key => $layer_tiles){
+            foreach ($layer_tiles AS $row_key => $row_tiles){
+                $row_tiles = strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles);
+                $row_tiles = array_map('intval', $row_tiles);
+                foreach ($row_tiles AS $col_key => $tile_key){
+                    if (!isset($tilesIndex[$tile_key])){ continue; }
+                    $tile_token = $tilesIndex[$tile_key];
+                    // If this tile is a "void" type, remove it from the available cells
+                    if ($tile_token === 'void' || strpos($tile_token, 'void') === 0){
+                        $pos = ($col_key + 1).'-'.($row_key + 1);
+                        unset($available_cells[$pos]);
+                    }
+                }
+            }
+        }
+    }
+    // Return the available cells as an array of positions
+    $available_cells = array_keys($available_cells);
+    return $available_cells;
 }
 
 // Define or collect the prototype data for the player, their robots, etc.
@@ -342,25 +385,17 @@ $map_pixel_height = $map_row_size * $map_tile_height;
 $map_spawn_pos = !empty($WORLD_SESSION[$map_token.'_spawn_pos']) ? $WORLD_SESSION[$map_token.'_spawn_pos'] : '';
 $map_exit_pos = !empty($WORLD_SESSION[$map_token.'_exit_pos']) ? $WORLD_SESSION[$map_token.'_exit_pos'] : '';
 if (empty($map_spawn_pos)){
+    $map_spawn_pos = '1-1';
     if (!empty($map_data_parsed['portals']['spawn'])){
         $spawn = $map_data_parsed['portals']['spawn'];
         $map_spawn_pos = $spawn[0].'-'.$spawn[1];
-    } else {
-        $map_spawn_inset = 3;
-        $map_spawn_col = mt_rand($map_spawn_inset, floor($map_col_size / 2) - $map_spawn_inset);
-        $map_spawn_row = mt_rand($map_spawn_inset, floor($map_row_size / 2) - $map_spawn_inset);
-        $map_spawn_pos = $map_spawn_col.'-'.$map_spawn_row;
     }
 }
 if (empty($map_exit_pos)){
+    $map_exit_pos = ($map_col_size + 1).'-'.($map_row_size + 1);
     if (!empty($map_data_parsed['portals']['exit'])){
         $exit = $map_data_parsed['portals']['exit'];
         $map_exit_pos = $exit[0].'-'.$exit[1];
-    } else {
-        $map_exit_inset = 3;
-        $map_exit_col = mt_rand(ceil($map_col_size / 2) + $map_exit_inset, $map_col_size - $map_exit_inset);
-        $map_exit_row = mt_rand(ceil($map_row_size / 2) + $map_exit_inset, $map_row_size - $map_exit_inset);
-        $map_exit_pos = $map_exit_col.'-'.$map_exit_row;
     }
 }
 $WORLD_SESSION[$map_token.'_spawn_pos'] = $map_spawn_pos;
@@ -370,14 +405,15 @@ $WORLD_SESSION[$map_token.'_exit_pos'] = $map_exit_pos;
 if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data['this_current_position'] = $map_spawn_pos; }
 
 // Generate the random encounters for this map location if not already spawned
-$max_random_encounters = 20;
+//$max_random_encounters = 20;
 $allowed_random_encounters = $map_mecha_support;
-$disallowed_encounter_cells = array($map_spawn_pos, $map_exit_pos);
+$available_encounter_cells = getMapEncounterCells($map_data_parsed);
+$max_random_encounters = ceil(count($available_encounter_cells) * 0.25);
 $map_random_encounters = !empty($WORLD_SESSION[$map_token.'_random_encounters']) ? $WORLD_SESSION[$map_token.'_random_encounters'] : array();
 if (empty($map_random_encounters)){
     for ($i = 0; $i < $max_random_encounters; $i++){
         $robot = $allowed_random_encounters[mt_rand(0, count($allowed_random_encounters) - 1)];
-        $randpos = $get_randpos($map_col_size, $map_row_size, 4, $disallowed_encounter_cells);
+        $randpos = $get_randpos($available_encounter_cells);
         $robot_info = $mmrpg_index_robots[$robot];
         $robot_level = mt_rand(1, 10);
         $battle_token = 'world-battle_'.$map_token.'_debug-'.($i + 1);
@@ -462,9 +498,10 @@ $flag_skip_fadein = true;
                         $data['canvas_tiles'] = array();
                         for ($row = 1; $row <= $map_row_size; $row++){
                             $row_tiles = $map_layer_data[$row - 1];
+                            $row_tiles = strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles);
                             for ($col = 1; $col <= $map_col_size; $col++){
                                 $pos = $col.'-'.$row;
-                                $key = (int)(substr($row_tiles, ($col - 1), 1));
+                                $key = isset($row_tiles[$col - 1]) ? $row_tiles[$col - 1] : '';
                                 $data['canvas_tiles'][$pos] = $key;
                             }
                         }
@@ -493,7 +530,7 @@ $flag_skip_fadein = true;
                             list($col, $row) = explode('-', $pos);
                             $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                             $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
-                            $label = preg_match('/^goto__/i', $portal_name) ? ('Go To: '.strtoupper(preg_replace('/^goto__/i', '', $portal_name))) : ('World '.ucfirst($portal_name));
+                            $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucfirst($portal_name));
                             $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                             $style = 'top: '.$top.'px; left: '.$left.'px;';
                             echo('<span class="sprite tile portal pulse" '.$attrs.' style="'.$style.'"></span>'.PHP_EOL);
