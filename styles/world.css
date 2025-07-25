@@ -38,12 +38,38 @@ html, body {
     z-index: 10;
     transform: translate(0, 0);
     transition: none;
+    will-change: transform;
 }
-#world #canvas #map.ready {
+
+#world #canvas #map .layer {
+    display: block;
+    position: absolute;
+    overflow: visible;
+    width: auto;
+    height: auto;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+#world #canvas #map .layer[data-layer="background"] { z-index: 1; }
+#world #canvas #map .layer[data-layer="terrain"] { z-index: 10; }
+#world #canvas #map .layer[data-layer="portals"] { z-index: 20; }
+#world #canvas #map .layer[data-layer="battles"] { z-index: 30; }
+#world #canvas #map .layer[data-layer="team"] { z-index: 40; }
+#world #canvas #map .layer[data-layer="zoom"] { z-index: 50; }
+
+#world #canvas #map,
+#world #canvas #map .layer[data-layer="background"] {
+    transition: none;
+    transform: translate(0, 0);
+    will-change: transform;
+}
+#world #canvas #map.ready,
+#world #canvas #map.ready .layer[data-layer="background"] {
     transition: transform 1s ease-in-out;
 }
 
-#world #canvas #map > .sprite.field.background {
+#world #map .layer .sprite.field {
     display: block;
     position: absolute;
     overflow: hidden;
@@ -56,25 +82,12 @@ html, body {
     background-size: 100%;
     background-size: cover;
     background-position: 0 0;
+    filter: none;
+    transform: translate(0, 0);
+}
+#world #map .layer .sprite.field.background {
     filter: blur(6px);
 }
-
-
-#world #canvas #map .layer {
-    display: block;
-    position: absolute;
-    overflow: visible;
-    width: auto;
-    height: auto;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-}
-#world #canvas #map .layer[data-layer="terrain"] { z-index: 10; }
-#world #canvas #map .layer[data-layer="portals"] { z-index: 20; }
-#world #canvas #map .layer[data-layer="battles"] { z-index: 30; }
-#world #canvas #map .layer[data-layer="team"] { z-index: 40; }
-#world #canvas #map .layer[data-layer="zoom"] { z-index: 50; }
 
 #world #map .layer .sprite.tile {
     background-color: transparent;

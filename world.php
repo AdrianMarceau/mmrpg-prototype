@@ -498,10 +498,16 @@ $flag_skip_fadein = true;
                 $data_json = json_encode($data, JSON_NUMERIC_CHECK);
                 echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
 
-                // Display the map background image if it exists in this spot for the layer
+                // BACKGROUND LAYER
+                $map_layer_styles = $map_base_styles; // TODO: support custom styles per layer maybe?
+                $map_layer_attrs = $map_base_attrs; // TODO: support custom attributes per layer maybe?
                 $field_background_image = 'images/fields/'.$map_field_token.'/battle-field_background_base.gif';
                 $field_background_styles = 'top: 0; left: 0; background-image: url('.$field_background_image.');';
-                echo('<span class="sprite field background" style="'.$field_background_styles.'"></span>');
+                ?>
+                <div class="layer layer-0 background" data-layer="background" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
+                    <span class="sprite field background" style="<?= $field_background_styles ?>"></span>
+                </div>
+                <?
 
                 // TERRAIN TILES
                 foreach ($map_data_parsed['layers'] AS $map_layer_key => $map_layer_data){

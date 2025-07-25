@@ -701,6 +701,7 @@ class mmrpgWorldMap {
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
         let $worldDiv = _elements.world;
         let $canvasMap = _elements.map;
+        let $backgroundLayer = $('.layer.background', $canvasMap);
         var $tilesLayer = $('.layer.tiles', $canvasMap);
         let $objectsLayer = $('.layer.objects', $canvasMap);
         let $eventsLayers = $('.layer.events', $canvasMap);
@@ -814,8 +815,11 @@ class mmrpgWorldMap {
         else if (targetY < (worldHeight / 2)){ translateY = 0; }
         else if (targetY > (mapHeight - (worldHeight / 2))){ translateY = -(mapHeight - worldHeight); }
         else { translateY = -(targetY - (worldHeight / 2)); }
+        let subTranslateX = Math.round(-1 * (translateX * 0.9));
+        let subTranslateY = Math.round(-1 * (translateY * 0.9));
         // Apply the new translate values to the map container
         $canvasMap.css({ transform: 'translate(' + translateX + 'px, ' + translateY + 'px)' });
+        $backgroundLayer.css({ transform: 'translate(' + subTranslateX + 'px, ' + subTranslateY + 'px)' });
         return true;
         }
 
