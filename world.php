@@ -416,10 +416,10 @@ $allowed_random_encounters = $map_mecha_support;
 $available_encounter_cells = getMapEncounterCells($map_data_parsed);
 $max_random_encounters = ceil(count($available_encounter_cells) * 0.25);
 $map_random_encounters = !empty($WORLD_SESSION[$map_token.'_random_encounters']) ? $WORLD_SESSION[$map_token.'_random_encounters'] : array();
-error_log('$allowed_random_encounters = '.print_r($allowed_random_encounters, true));
-error_log('$available_encounter_cells = '.print_r($available_encounter_cells, true));
-error_log('$max_random_encounters = '.print_r($max_random_encounters, true));
-error_log('$map_random_encounters = '.print_r($map_random_encounters, true));
+//error_log('$allowed_random_encounters = '.print_r($allowed_random_encounters, true));
+//error_log('$available_encounter_cells = '.print_r($available_encounter_cells, true));
+//error_log('$max_random_encounters = '.print_r($max_random_encounters, true));
+//error_log('$map_random_encounters = '.print_r($map_random_encounters, true));
 if (empty($map_random_encounters)){
     for ($i = 0; $i < $max_random_encounters; $i++){
         $robot = $allowed_random_encounters[mt_rand(0, count($allowed_random_encounters) - 1)];
@@ -494,8 +494,14 @@ $flag_skip_fadein = true;
                 $data['tiles_index'] = $map_data_parsed['tiles'];
                 $data['sprites_index'] = $map_data_parsed['sprites'];
                 $data['portals_index'] = $map_data_parsed['portals'];
+                $data['start_position'] = $this_prototype_data['this_current_position'];
                 $data_json = json_encode($data, JSON_NUMERIC_CHECK);
                 echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
+
+                // Display the map background image if it exists in this spot for the layer
+                $field_background_image = 'images/fields/'.$map_field_token.'/battle-field_background_base.gif';
+                $field_background_styles = 'top: 0; left: 0; background-image: url('.$field_background_image.');';
+                echo('<span class="sprite field background" style="'.$field_background_styles.'"></span>');
 
                 // TERRAIN TILES
                 foreach ($map_data_parsed['layers'] AS $map_layer_key => $map_layer_data){
@@ -504,6 +510,8 @@ $flag_skip_fadein = true;
                     ?>
                     <div class="layer layer-1 tiles terrain has-canvas" data-layer="terrain" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                         <?
+
+                        // Generate the json data for the map tiles and then print them out for the canvas
                         $data = array();
                         $data['canvas_tiles'] = array();
                         for ($row = 1; $row <= $map_row_size; $row++){
@@ -518,6 +526,7 @@ $flag_skip_fadein = true;
                         $data_json = json_encode($data, JSON_NUMERIC_CHECK);
                         echo('<canvas width="'.$map_pixel_width.'" height="'.$map_pixel_height.'"></canvas>'.PHP_EOL);
                         echo('<script data-json="tileData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
+
                         ?>
                     </div>
                     <?

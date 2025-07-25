@@ -86,8 +86,14 @@ $(document).ready(function(){
 
         // Define the function to run when everything is done loading
         let onWorldLoaded = function(){
+            let portals = _config.mapPortalsIndex || {};
             bindEventsToCanvas($canvasMap);
-            $canvasMap.addClass('ready');
+            bindEventsToWorld($thisWorld);
+            let startPosition = '1-1';
+            if (_config.mapStartPosition){ startPosition = _config.mapStartPosition; }
+            else if (portals['spawn']){ startPosition = portals['spawn'].join('-'); }
+            moveToPosition(startPosition, null, true, false);
+            setTimeout(function(){ $canvasMap.addClass('ready'); }, 100);
             };
 
         // Loop through each map layer and add the appropriate interactivity
@@ -124,6 +130,7 @@ $(document).ready(function(){
             let tilesIndex = mapData.tiles_index || false;
             let spritesIndex = mapData.sprites_index || false;
             let portalsIndex = mapData.portals_index || false;
+            let startPosition = mapData.start_position || false;
             if (!mapToken || !mapImage || !mapSize || !tileSize){ console.error('initWorldMap() missing required properties!', {mapToken, mapImage, mapSize, tileSize}); return false; }
             if (!tilesIndex || !spritesIndex || !portalsIndex){ console.error('initWorldMap() missing required indexes!', {tilesIndex, spritesIndex, portalsIndex}); return false; }
             if (!Array.isArray(mapSize) || mapSize.length < 2){ console.error('initWorldMap() mapSize must be an array of at least two values!'); return false; }
@@ -144,6 +151,7 @@ $(document).ready(function(){
             _config.mapTilesIndex = tilesIndex;
             _config.mapSpritesIndex = spritesIndex;
             _config.mapPortalsIndex = portalsIndex;
+            _config.mapStartPosition = startPosition; // default to the top-left corner
             // Return true on success or run the oncomplete callback
             if (typeof onComplete === 'function'){ return onComplete(); }
             else { return true; }
@@ -537,7 +545,7 @@ $(document).ready(function(){
             let layerToken = 'terrain'; // TODO: make this dynamic maybe?
             let $clickOverlay = $('#click-overlay', $canvasMap);
             let focusTimeouts = {}, focusTimeoutDuration = _config.mapEffects.focusTimeout;
-            let hoverTimeouts = {}, hoverTimeoutDuration = _config.mapEffects.hoverTimeout;
+            let hoverTimeouts = {}, hoverTimeoutDuration = _config.mapEffects.hoverTimeout, hoverTiles = [];
             let lastMouseClick, lastMouseOver;
             $clickOverlay.bind('click', function(e){
                 if (_cursor.moving){ return false; }
@@ -564,16 +572,77 @@ $(document).ready(function(){
                 let tileData = getLayerTileIndexData(layerToken, thisPos);
                 let showPointer = thisPos !== _cursor.position && tileData.walkable;
                 $clickOverlay.css({cursor: showPointer ? 'pointer' : 'default'});
+                if (hoverTiles.length){
+                    for (var i = 0; i < hoverTiles.length; i++){
+                        let hoverPos = hoverTiles[i];
+                        if (hoverPos === thisPos){ continue; }
+                        delete hoverTimeouts[hoverPos];
+                        unhoverLayerTile(layerToken, hoverPos);
+                        }
+                    }
                 if (thisPos === lastMouseOver){ return; }
                 if (!tileData.walkable){ return; }
                 //console.log('%c' + 'Mouse move event triggered at position ' + thisPos + '!', 'color: orange;');
                 lastMouseOver = thisPos;
                 hoverLayerTile(layerToken, thisPos);
+                hoverTiles.push(thisPos);
+                /*
                 if (hoverTimeouts[thisPos]){ clearTimeout(hoverTimeouts[thisPos]); }
                 hoverTimeouts[thisPos] = setTimeout(function(){
                     unhoverLayerTile(layerToken, thisPos);
                     }, hoverTimeoutDuration);
+                */
                 });
+            // Return true on success
+            return true;
+            }
+
+        // Quick function for binding events to the main world object
+        function bindEventsToWorld($thisWorld){
+            //console.log('%c' + '~bindEventsToWorld($thisWorld:' + typeof $thisWorld + ')', 'color: magenta;');
+            if (!$thisWorld || !$thisWorld.length){ console.error('bindEventsToWorld() missing required $thisWorld!'); return false; }
+            let _config = gameSettings.worldConfig;
+            let _elements = gameSettings.worldElements;
+            let _world = gameSettings.worldState;
+            // Bind a click event to the home button in the header that'll bring us to prototype menu
+            let $homeButton = $('#home-button', $thisWorld);
+            if ($homeButton && $homeButton.length){
+                $homeButton.bind('click', function(e){
+                    e.preventDefault();
+                    //console.log('%c' + 'Home button clicked!', 'color: cyan;');
+                    //if (!confirm('Are you sure you want to leave the world map?')){ return; }
+                    $thisWorld.addClass('hidden');
+                    let homeMenuURL = $homeButton.attr('data-home-url') || 'prototype.php';
+                    window.location.href = homeMenuURL;
+                    return true;
+                    });
+                }
+            // Bind a click event to the reset button in the header that'll clear world data to start over (dev/debug only)
+            let $resetButton = $('#reset-button', $thisWorld);
+            if ($resetButton && $resetButton.length){
+                $resetButton.bind('click', function(e){
+                    e.preventDefault();
+                    //console.log('%c' + 'Reset button clicked!', 'color: cyan;');
+                    if (!confirm('Are you sure you want to reset the world map?')){ return; }
+                    $thisWorld.addClass('hidden');
+                    let resetMenuURL = $resetButton.attr('data-reset-url') || 'world.php?reset=world';
+                    window.location.href = resetMenuURL;
+                    return true;
+                    });
+                }
+            // Bind click events to the player switcher options in the world map header
+            let $playerSwitcher = $('#player-switcher', $thisWorld);
+            if ($playerSwitcher && $playerSwitcher.length){
+                $('.option[data-player]', $playerSwitcher).bind('click', function(e){
+                    e.preventDefault();
+                    let playerToken = $(this).attr('data-player') || false;
+                    //console.log('%c' + 'Player switcher clicked for ' + playerToken + '!', 'color: cyan;');
+                    $thisWorld.addClass('hidden');
+                    let worldReloadURL = 'world.php?player=' + playerToken;
+                    window.location.href = worldReloadURL;
+                    return true;
+                    });
+                }
             // Return true on success
             return true;
             }
@@ -914,48 +983,7 @@ $(document).ready(function(){
                 });
             }
 
-        // Bind a click event to the home button in the header that'll bring us to prototype menu
-        let $homeButton = $('#home-button', $thisWorld);
-        if ($homeButton && $homeButton.length){
-            $homeButton.bind('click', function(e){
-                e.preventDefault();
-                //console.log('%c' + 'Home button clicked!', 'color: cyan;');
-                //if (!confirm('Are you sure you want to leave the world map?')){ return; }
-                $thisWorld.addClass('hidden');
-                let homeMenuURL = $homeButton.attr('data-home-url') || 'prototype.php';
-                window.location.href = homeMenuURL;
-                return true;
-                });
-            }
-
-        // Bind a click event to the reset button in the header that'll clear world data to start over (dev/debug only)
-        let $resetButton = $('#reset-button', $thisWorld);
-        if ($resetButton && $resetButton.length){
-            $resetButton.bind('click', function(e){
-                e.preventDefault();
-                //console.log('%c' + 'Reset button clicked!', 'color: cyan;');
-                if (!confirm('Are you sure you want to reset the world map?')){ return; }
-                $thisWorld.addClass('hidden');
-                let resetMenuURL = $resetButton.attr('data-reset-url') || 'world.php?reset=world';
-                window.location.href = resetMenuURL;
-                return true;
-                });
-            }
-
-        // Bind click events to the player switcher options in the world map header
-        let $playerSwitcher = $('#player-switcher', $thisWorld);
-        if ($playerSwitcher && $playerSwitcher.length){
-            $('.option[data-player]', $playerSwitcher).bind('click', function(e){
-                e.preventDefault();
-                let playerToken = $(this).attr('data-player') || false;
-                //console.log('%c' + 'Player switcher clicked for ' + playerToken + '!', 'color: cyan;');
-                $thisWorld.addClass('hidden');
-                let worldReloadURL = 'world.php?player=' + playerToken;
-                window.location.href = worldReloadURL;
-                return true;
-                });
-            }
-
+        /*
         // Collect the map cursor element and automatically move it to the spawn position
         let $mapCursor = $mapLayers.filter('.objects').find('.sprite.cursor');
         if ($mapCursor && $mapCursor.length){
@@ -964,6 +992,7 @@ $(document).ready(function(){
                 moveToPosition(cursorPosition, null, true, false);
                 }, 300);
             }
+        */
 
 
         }
