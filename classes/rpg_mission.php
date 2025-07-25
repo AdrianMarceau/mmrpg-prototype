@@ -141,7 +141,7 @@ class rpg_mission {
                 $robot_info = $mmrpg_index_robots[$robot_token];
                 $robot_info_plus_data = array_merge($robot_info, $robot_data);
                 if (empty($robot_data['robot_id'])){
-                    $auto_robot_id = rpg_game::unique_robot_id($temp_target_playerid, $robot_info['robot_id'], 1);
+                    $auto_robot_id = rpg_game::unique_robot_id($temp_target_playerid, $robot_info['robot_id'], $robot_key);
                     $robot_data['robot_id'] = $auto_robot_id;
                     }
                 if (empty($robot_data['robot_abilities'])){
