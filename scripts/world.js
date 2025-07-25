@@ -30,6 +30,14 @@ gameSettings.worldConfig = {
     mapPortalsIndex: {},
     mapBattleIndex: {},
     mapBattleSymbols: {},
+    windowWidth: 1024, // default only
+    widthHeight: 768, // default only
+    mmrpgWidth: 800, // default only
+    mmrpgHeight: 600, // default only
+    worldWidth: 800, // default only
+    worldHeight: 600, // default only
+    canvasWidth: 800, // default only
+    canvasHeight: 600, // default only
     };
 gameSettings.worldElements = {
     mmrpg: null,
@@ -37,6 +45,7 @@ gameSettings.worldElements = {
     canvas: null,
     map: null,
     layers: null,
+    cursor: null,
     };
 gameSettings.worldState = {
     cursor: {
@@ -80,8 +89,10 @@ class mmrpgWorldMap {
         _elements.canvas = $thisCanvas;
         let $canvasMap = $('#map', $thisCanvas);
         let $mapLayers = $('.layer', $canvasMap);
+        let $worldCursor = $('.sprite.cursor', $canvasMap);
         _elements.map = $canvasMap;
         _elements.layers = $mapLayers;
+        _elements.cursor = $worldCursor;
         if ($canvasMap.length && $mapLayers.length){
             //console.log('%c' + 'World map canvas found with ' + $mapLayers.length + ' layers...', 'color: orange;');
             // Define the function to run when everything is done loading
@@ -161,6 +172,7 @@ class mmrpgWorldMap {
         if (!$mapLayers || !$mapLayers.length){ console.error('initWorldMap() missing required $mapLayers!'); return false; }
         let _self = this;
         let _config = _self.config;
+        let _elements = _self.elements;
         let _world = _self.state;
         let $mapJson = $('script[data-json]', $canvasMap).first(), mapJson = $mapJson.html(), mapData = mapJson ? JSON.parse(mapJson) : false;
         if (!mapData || typeof mapData !== 'object' || !Object.keys(mapData).length){ console.error('initWorldMap() unable to parse mapData!'); return false; }
@@ -193,6 +205,14 @@ class mmrpgWorldMap {
         _config.mapSpritesIndex = spritesIndex;
         _config.mapPortalsIndex = portalsIndex;
         _config.mapStartPosition = startPosition; // default to the top-left corner
+        _config.windowWidth = $(window).width();
+        _config.windowHeight = $(window).height();
+        _config.mmrpgWidth = _elements.mmrpg.outerWidth();
+        _config.mmrpgHeight = _elements.mmrpg.outerHeight();
+        _config.worldWidth = _elements.world.outerWidth();
+        _config.worldHeight = _elements.world.outerHeight();
+        _config.canvasWidth = _elements.canvas.outerWidth();
+        _config.canvasHeight = _elements.canvas.outerHeight();
         // Return true on success or run the oncomplete callback
         if (typeof onComplete === 'function'){ return onComplete(); }
         else { return true; }
@@ -344,6 +364,17 @@ class mmrpgWorldMap {
         let thisRow = Math.floor(yPos / size[1]) + 1;
         let thisPos = thisCol + '-' + thisRow;
         return thisPos;
+        }
+
+    // Quick function for calculating the relative difference between two positions
+    getPositionRelative(position1, position2){
+        //console.log('%c' + 'getPositionRelative(position1:' + position1 + ', position2:' + position2 + ')', 'color: magenta;');
+        if (typeof position1 !== 'string' && !Array.isArray(position1)){ console.error('getPositionRelative() missing required position1!'); return false; }
+        if (typeof position2 !== 'string' && !Array.isArray(position2)){ console.error('getPositionRelative() missing required position2!'); return false; }
+        position1 = typeof position1 === 'string' ? position1.split('-') : position1;
+        position2 = typeof position2 === 'string' ? position2.split('-') : position2;
+        let positionRelative = [position2[0] - position1[0], position2[1] - position1[1]];
+        return positionRelative;
         }
 
     // Quick function for getting a given layer tile's index data provided the layer token and tile key
@@ -854,7 +885,7 @@ class mmrpgWorldMap {
         }
 
     // Quick function for running post-update checks and actions after moving the cursor
-    updateMapPosition(){
+    async updateMapPosition(){
         //console.log('%c' + 'updateMapPosition()', 'color: magenta;');
         let _self = this;
         let _config = _self.config;
@@ -870,6 +901,7 @@ class mmrpgWorldMap {
         let _playerRobots = _config.playerRobots;
         let $worldDiv = _elements.world;
         let $canvasMap = _elements.map;
+        let $worldCursor = _elements.cursor;
         let cursorDirection = _worldCursor.direction;
         let cursorPosition = _worldCursor.position;
         let newPosition = cursorPosition.split('-');
@@ -892,6 +924,7 @@ class mmrpgWorldMap {
         //console.log('-> $eventsLayer found, checking for events...');
 
         // Make sure we move any existing zoom layer sprites back to their original layers
+        $worldCursor.removeClass('busy');
         $eventsLayers.removeClass('has-zoom');
         $('.sprite', $zoomLayer).each(function(){
             let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
@@ -913,6 +946,7 @@ class mmrpgWorldMap {
         // Now that we have an event, check its data to see if we should show a dropdown
         // for either a battle, a portal, or any other compatible event-type for the tile
         var showDropdown = false;
+        var showDropdownType = '';
         var dropdownMarkup = '';
         if ($eventsAtPosition[0].is('[data-portal]')){
             // If the cursor is literally on a portal, only one event sprite matters right now
@@ -926,113 +960,184 @@ class mmrpgWorldMap {
                 //dropdownMarkup += '<a class="button" data-action="portal-info" data-portal="'+dataPortal+'"><span>View Details</span></a>';
                 if (dataPortal.indexOf('goto__') !== -1){ dropdownMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Warp to Area</span></a>'; }
                 else if (dataPortal === 'exit'){ dropdownMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Return Home</span></a>'; }
+                showDropdownType = 'portal';
                 }
             }
         else {
             // Otherwise we can/should check all the posiitons for any battles to round-up and trigger
+            let dataLabels = [], dataBattles = [];
             for (var i = 0; i < $eventsAtPosition.length; i++){
                 let $eventAtPosition = $eventsAtPosition[i];
                 if ($eventAtPosition.is('[data-portal]')){ continue; } // skip portals, we already handled them above
+                let dataPosition = $eventAtPosition.attr('data-pos');
                 var dataLabel = $eventAtPosition.attr('data-label');
                 var dataBattle = $eventAtPosition.attr('data-battle');
                 //console.log('-> checking event sprite', $eventAtPosition, 'for data-battle:', dataBattle);
                 if (dataBattle){
-                    showDropdown = true;
-                    if (dataLabel){ dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-                    else { dropdownMarkup += '<strong class="label">Battle Options</strong>'; }
-                    //dropdownMarkup += '<a class="button" data-action="battle-info" data-battle="'+dataBattle+'"><span>View Details</span></a>';
-                    if (_playerRobots.length){  dropdownMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
-                    else { dropdownMarkup += '<a class="button big-button disabled" data-battle="'+dataBattle+'"><span>Start Battle</span></a>'; }
+                    dataLabels.push([dataLabel, dataPosition]);
+                    dataBattles.push(dataBattle);
                     }
+                }
+            if (dataLabels.length && dataBattles.length){
+                showDropdown = true;
+                //console.log('-> showing dropdown with battles:', dataBattles);
+                let dataBattlesJoined = dataBattles.join(',');
+                let dataLabelsJoined = (function(labels){
+                    for (var i = 0, markup = []; i < labels.length; i++){
+                        let label = labels[i][0], labelPosition = labels[i][1];
+                        let positionRelative = _self.getPositionRelative(cursorPosition, labelPosition);
+                        let labelText = label;
+                        let labelClasses = 'label sublabel';
+                        labelClasses += ' ' + (positionRelative[0] === 0 ? 'center' : (positionRelative[0] < 0 ? 'left' : 'right'));
+                        labelClasses += ' ' + (positionRelative[1] === 0 ? 'middle' : (positionRelative[1] < 0 ? 'up' : 'down'));
+                        markup.push('<strong class="'+labelClasses+'" data-pos="' + labelPosition + '" data-rel="' + positionRelative + '">' + labelText + '</strong>');
+                        } return markup;
+                    })(dataLabels).join('');
+                dropdownMarkup += dataLabelsJoined;
+                dropdownMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                if (_playerRobots.length){  dropdownMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
+                else { dropdownMarkup += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
+                showDropdownType = 'battle';
                 }
             }
 
         // If there's no dropdown to show, we can return early
         if (!showDropdown){ return; }
 
-        // Elevate the event sprite(s) to the zoom layer and add a zoom class to it so it's more visible
-        for (var i = 0; i < $eventsAtPosition.length; i++){
-            let $eventSprite = $eventsAtPosition[i];
-            //console.log('-> checking event sprite', $eventSprite);
-            if ($eventSprite.hasClass('tile')){ continue; } // skip tiles
-            let $eventLayer = $eventSprite.closest('.layer.events');
-            let eventLayer = $eventLayer.attr('data-layer');
-            $eventLayer.addClass('has-zoom');
-            if (cursorDirection.indexOf('left') !== -1){ $eventSprite.attr('data-dir', 'right'); }
-            else if (cursorDirection.indexOf('right') !== -1){ $eventSprite.attr('data-dir', 'left'); }
-            $eventSprite.appendTo($zoomLayer);
-            $eventSprite.attr('data-layer', eventLayer);
-            //console.log('-> moving event sprite to zoom layer', eventLayer, 'from events layer');
-            setTimeout(function(){ $eventSprite.addClass('zoom'); }, 100);
-            }
+        // Define an inline function to zoom and show the dropdown which we'll call after a timeout
+        let zoomAndShowDropdown = function(){
 
-        // Move the action dropdown to the correct position, add the markup, and show it
-        $actionsDropdown.css({
-            left: ((thisNewCol - 1) * _mapTileSize[0] + _mapTileSizeOffset[0]) + 'px',
-            top: ((thisNewRow - 1) * _mapTileSize[1] + _mapTileSizeOffset[1]) + 'px',
-            }).attr('data-dir', _worldCursor.direction);
-        $actionsDropdownWrapper.html(dropdownMarkup);
-        $actionsDropdown.addClass('active');
+            // Add the busy class to the cursor so it hides behind the player
+            $worldCursor.addClass('busy');
 
-        // Bind click events to the newly created action buttons in the dropdown
-        $('.button[data-action]', $actionsDropdown).bind('click', function(e){
-            //console.log('%c' + 'Action button clicked!', 'color: cyan;');
-            e.preventDefault();
-            let $button = $(this);
-            let action = $button.attr('data-action') || false;
-            let isBattle = action.indexOf('battle') !== -1;
-            let isPortal = action.indexOf('portal') !== -1;
-            //console.log('-> action =', action);
-            if (isBattle){
-                let battleId = $button.attr('data-battle') || false;
-                //console.log('-> battleId =', battleId);
-                if (action === 'battle-info'){
-                    //console.log('-> showing battle info for ID ' + battleId + '!');
-                    alert('Battle ID: ' + battleId + '\n\nThis is where you would show battle details.');
-                    }
-                else if (action === 'start-battle'){
-                    //console.log('-> starting battle with ID ' + battleId + '!');
-                    let battleVars = [];
-                    battleVars.push('wap=false'); // i hate this
-                    battleVars.push('this_user_id=' + _userId);
-                    battleVars.push('this_player_id=' + _playerId);
-                    battleVars.push('this_player_token=' + _playerToken);
-                    battleVars.push('this_player_robots=' + _playerRobots.join(','));
-                    battleVars.push('this_battle_token=' + battleId);
-                    let battleHref = 'battle.php?' + battleVars.join('&');
-                    $thisWorld.addClass('hidden');
-                    window.location.href = battleHref;
-                    }
+            // Elevate the event sprite(s) to the zoom layer and add a zoom class to it so it's more visible
+            let cursorPositionXY = cursorPosition.split('-');
+            for (var i = 0; i < $eventsAtPosition.length; i++){
+                let $eventSprite = $eventsAtPosition[i];
+                let eventPosition = $eventSprite.attr('data-pos');
+                //let eventPositionXY = eventPosition.split('-');
+                if ($eventSprite.hasClass('tile')){ continue; } // skip tiles
+                let $eventLayer = $eventSprite.closest('.layer.events');
+                let eventLayer = $eventLayer.attr('data-layer');
+                $eventLayer.addClass('has-zoom');
+                //let relativePosition = [eventPositionXY[0] - cursorPositionXY[0], eventPositionXY[1] - cursorPositionXY[1]];
+                let relativePosition = _self.getPositionRelative(cursorPosition, eventPosition);
+                if (relativePosition[0] < 0){ $eventSprite.attr('data-dir', 'right'); }
+                else if (relativePosition[0] > 0){ $eventSprite.attr('data-dir', 'left'); }
+                else if (cursorDirection.indexOf('right') !== -1){ $eventSprite.attr('data-dir', 'left'); }
+                else if (cursorDirection.indexOf('left') !== -1){ $eventSprite.attr('data-dir', 'right'); }
+                $eventSprite.appendTo($zoomLayer);
+                $eventSprite.attr('data-layer', eventLayer);
+                //console.log('-> moving event sprite to zoom layer', eventLayer, 'from events layer');
+                setTimeout(function(){ $eventSprite.addClass('zoom'); }, 100);
                 }
-            else if (isPortal){
-                let portalName = $button.attr('data-portal') || false;
-                //console.log('-> portalName =', portalName);
-                if (action === 'portal-info'){
-                    //console.log('-> showing portal info for ID ' + portalName + '!');
-                    alert('Portal Name: ' + portalName + '\n\nThis is where you would show portal details.');
-                    }
-                else if (action === 'enter-portal'){
-                    //console.log('-> entering portal with name ' + portalName + '!');
-                    let portalHref = false;
-                    if (portalName === 'spawn'){
-                        portalHref = 'prototype.php'; // TODO: make the spawn actually go somewhere specific
-                        } else if (portalName === 'exit'){
-                        portalHref = 'prototype.php'; // TOPO: make the exit actually go somewhere specific
-                        } else if (portalName.indexOf('goto__') !== -1){
-                        let worldToken = portalName.replace(/^goto__/i, '');
-                        portalHref = 'world.php?world=' + worldToken;
+
+            // Move the action dropdown to the correct position, add the markup, and show it
+            $actionsDropdown.css({
+                left: ((thisNewCol - 1) * _mapTileSize[0] + _mapTileSizeOffset[0]) + 'px',
+                top: ((thisNewRow - 1) * _mapTileSize[1] + _mapTileSizeOffset[1]) + 'px',
+                }).attr('data-dir', _worldCursor.direction).attr('data-type', showDropdownType).attr('data-align', 'center');
+            $actionsDropdownWrapper.html(dropdownMarkup);
+            setTimeout(function(){
+                $actionsDropdown.addClass('active');
+                // collect the new offset so we can compare to parent size
+                let dropdownParentSize = [_config.worldWidth, _config.worldHeight];
+                let dropdownOffset = $actionsDropdown.offset();
+                let dropdownOffsets = [dropdownOffset.left, dropdownOffset.top];
+                let dropdownPositionDelta = [
+                    (1 - (dropdownParentSize[0] - dropdownOffsets[0]) / dropdownParentSize[0]),
+                    (1 - (dropdownParentSize[1] - dropdownOffsets[1]) / dropdownParentSize[1])
+                    ];
+                //console.log('-> dropdownParentSize:', dropdownParentSize);
+                //console.log('-> dropdownOffset:', dropdownOffset);
+                //console.log('-> dropdownOffsets:', dropdownOffsets);
+                //console.log('-> dropdownPositionDelta:', dropdownPositionDelta);
+                // decide whether the button should appear above or below the wrapper given where it is in parent
+                let dropdownAlign = 'below'; // default to below for when nothing else matches
+                if (dropdownPositionDelta[1] >= 0.5){ dropdownAlign = 'above'; }
+                else if (dropdownPositionDelta[1] < 0.5){ dropdownAlign = 'below'; }
+                if (dropdownPositionDelta[0] <= 0.25){ dropdownAlign += '-right'; }
+                if (dropdownPositionDelta[0] >= 0.75){ dropdownAlign += '-left'; }
+                //console.log('-> dropdownAlign:', dropdownAlign);
+                $actionsDropdown.attr('data-align', dropdownAlign);
+                }, 200);
+
+            // Bind click events to the newly created action buttons in the dropdown
+            $('.button[data-action]', $actionsDropdown).bind('click', function(e){
+                //console.log('%c' + 'Action button clicked!', 'color: cyan;');
+                e.preventDefault();
+                let $button = $(this);
+                let action = $button.attr('data-action') || false;
+                let isBattle = action.indexOf('battle') !== -1;
+                let isPortal = action.indexOf('portal') !== -1;
+                let isDismiss = action === 'dismiss';
+                //console.log('-> action =', action);
+                if (isBattle){
+                    let battleId = $button.attr('data-battle') || false;
+                    //console.log('-> battleId =', battleId);
+                    if (action === 'battle-info'){
+                        //console.log('-> showing battle info for ID ' + battleId + '!');
+                        alert('Battle ID: ' + battleId + '\n\nThis is where you would show battle details.');
                         }
-                    if (portalHref){
+                    else if (action === 'start-battle'){
+                        //console.log('-> starting battle with ID ' + battleId + '!');
+                        let battleVars = [];
+                        battleVars.push('wap=false'); // i hate this
+                        battleVars.push('this_user_id=' + _userId);
+                        battleVars.push('this_player_id=' + _playerId);
+                        battleVars.push('this_player_token=' + _playerToken);
+                        battleVars.push('this_player_robots=' + _playerRobots.join(','));
+                        battleVars.push('this_battle_token=' + battleId);
+                        let battleHref = 'battle.php?' + battleVars.join('&');
                         $thisWorld.addClass('hidden');
-                        window.location.href = portalHref;
+                        window.location.href = battleHref;
                         }
                     }
-                }
-            else {
-                // no compatible action found, do nothing
-                return false;
-                }
-            });
+                else if (isPortal){
+                    let portalName = $button.attr('data-portal') || false;
+                    //console.log('-> portalName =', portalName);
+                    if (action === 'portal-info'){
+                        //console.log('-> showing portal info for ID ' + portalName + '!');
+                        alert('Portal Name: ' + portalName + '\n\nThis is where you would show portal details.');
+                        }
+                    else if (action === 'enter-portal'){
+                        //console.log('-> entering portal with name ' + portalName + '!');
+                        let portalHref = false;
+                        if (portalName === 'spawn'){
+                            portalHref = 'prototype.php'; // TODO: make the spawn actually go somewhere specific
+                            } else if (portalName === 'exit'){
+                            portalHref = 'prototype.php'; // TOPO: make the exit actually go somewhere specific
+                            } else if (portalName.indexOf('goto__') !== -1){
+                            let worldToken = portalName.replace(/^goto__/i, '');
+                            portalHref = 'world.php?world=' + worldToken;
+                            }
+                        if (portalHref){
+                            $thisWorld.addClass('hidden');
+                            window.location.href = portalHref;
+                            }
+                        }
+                    }
+                else if (isDismiss){
+                    //console.log('-> dismissing action dropdown!');
+                    $actionsDropdown.removeClass('active');
+                    $actionsDropdownWrapper.empty();
+                    $worldCursor.removeClass('busy');
+                    $eventsLayers.removeClass('has-zoom');
+                    $('.sprite.zoom', $eventsLayers).removeClass('zoom');
+                    $('.sprite', $zoomLayer).each(function(){
+                        let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
+                        $sprite.appendTo($layer).removeAttr('data-layer').removeClass('zoom');
+                        });
+                    }
+                else {
+                    // no compatible action found, do nothing
+                    return false;
+                    }
+                });
+            };
+
+        if (_self.updateMapPosition.zoomTimeout){ clearTimeout(_self.updateMapPosition.zoomTimeout); }
+        _self.updateMapPosition.zoomTimeout = setTimeout(zoomAndShowDropdown, 1200);
 
         // Return true on success
         return true;
@@ -1126,6 +1231,12 @@ class mmrpgWorldMap {
                 return false;
                 }
             });
+        return;
+        }
+
+    // Quick function for intentionally waiting for a given amount of time (in milliseconds)
+    wait(ms){
+        return new Promise(resolve => setTimeout(resolve, ms));
         }
 
 }

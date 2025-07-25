@@ -225,6 +225,7 @@ html, body {
 #world #map .layer.objects .sprite > .sprite_640x640 { width: 640px; height: 640px; left: -160px; top: -320px; }
 
 #world #map .layer.objects .sprite.cursor { z-index: 900; }
+#world #map .layer.objects .sprite.cursor.busy { z-index: 5; }
 #world #map .layer.objects .sprite.team { z-index: 100; }
 #world #map .layer.objects .sprite.team[data-key="0"] { z-index: 100; }
 #world #map .layer.objects .sprite.team[data-key="1"] { z-index: 90; }
@@ -236,6 +237,26 @@ html, body {
 #world #map .layer.objects .sprite.team[data-key="7"] { z-index: 30; }
 #world #map .layer.objects .sprite.team[data-key="8"] { z-index: 20; }
 #world #map .layer.objects .sprite.team[data-key="9"] { z-index: 10; }
+
+/* add a 'shake' effect to the busy cursor to show its scared */
+
+#world #map .layer.objects .sprite.cursor.busy > .sprite {
+    transform: translate(-6px, 14px) rotate(0deg);
+    filter: drop-shadow(-1px -1px 0 white);
+    animation: world-sprite-shake 0.9s steps(1) infinite;
+}
+@keyframes world-sprite-shake {
+    0% { transform: translate(-6px, 14px) rotate(0deg); }
+    10% { transform: translate(-6px, 14px) rotate(2deg); }
+    20% { transform: translate(-6px, 14px) rotate(-2deg); }
+    30% { transform: translate(-6px, 14px) rotate(2deg); }
+    40% { transform: translate(-6px, 14px) rotate(-2deg); }
+    50% { transform: translate(-6px, 14px) rotate(0deg); }
+    60% { transform: translate(-6px, 14px) rotate(2deg); }
+    70% { transform: translate(-6px, 14px) rotate(-2deg); }
+    80% { transform: translate(-6px, 14px) rotate(2deg); }
+    90% { transform: translate(-6px, 14px) rotate(-2deg); }
+}
 
 #world #map .layer.objects .sprite.team {
     transform: scale(2.0);
@@ -327,7 +348,6 @@ html, body {
     /* outline: 1px dotted magenta; */
 }
 #world #canvas #action-dropdown:not(.active) {
-    /* display: none;  */
     opacity: 0.0;
 }
 #world #canvas #action-dropdown > .wrapper {
@@ -338,11 +358,10 @@ html, body {
     bottom: auto;
     left: auto;
     transform: translate(0, 0);
-    pointer-events: all;
+    pointer-events: none;
     width: 150px;
     height: auto;
     min-height: 20px;
-    pointer-events: inherit;
     color: #cfcfcf;
     font-family: monospace;
     text-align: left;
@@ -356,30 +375,15 @@ html, body {
     /* border-bottom: 20px solid rgba(0, 0, 0, 0.5); */
     box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.3);
 }
-#world #canvas #action-dropdown:not(.active) > .wrapper {
-    pointer-events: none;
-}
-#world #canvas #action-dropdown[data-dir="left"] > .wrapper {
-    right: 60px;
-    transform: translate(0, -25%);
-}
-#world #canvas #action-dropdown[data-dir="right"] > .wrapper {
-    left: 60px;
-    transform: translate(0, -25%);
-}
-#world #canvas #action-dropdown[data-dir*="up"] > .wrapper {
-    bottom: 60px;
-    transform: translate(calc(-50% + 20px), 0);
-}
-#world #canvas #action-dropdown[data-dir*="down"] > .wrapper {
-    top: 60px;
-    transform: translate(calc(-50% + 20px), 0);
+#world #canvas #action-dropdown.active > .wrapper {
+    pointer-events: all;
 }
 
 #world #canvas #action-dropdown .label,
 #world #canvas #action-dropdown .button {
     display: block;
     position: relative;
+    box-sizing: border-box;
     clear: both;
     margin: 0;
     padding: 0;
@@ -422,7 +426,8 @@ html, body {
     padding-right: 6px;
 }
 
-#world #canvas #action-dropdown .button.big-button {
+#world #canvas #action-dropdown .button.big-button,
+#world #canvas #action-dropdown .button.sub-button {
     background-color: #363636;
     border: 1px solid  #565656;
     font-weight: bold;
@@ -430,11 +435,13 @@ html, body {
     font-size: 14px;
     text-align: center;
 }
-#world #canvas #action-dropdown .button.big-button:before {
+#world #canvas #action-dropdown .button.big-button:before,
+#world #canvas #action-dropdown .button.sub-button:before {
     content: "";
     display: none;
 }
-#world #canvas #action-dropdown .button.big-button.disabled {
+#world #canvas #action-dropdown .button.big-button.disabled,
+#world #canvas #action-dropdown .button.sub-button.disabled {
     background-color: #292929;
     border-color: #464646;
     color: #969696;
@@ -442,7 +449,10 @@ html, body {
     cursor: not-allowed;
 }
 #world #canvas #action-dropdown .button.big-button:not(.disabled):hover {
-    transform: scale(1.1);
+    transform: scale(1.10);
+}
+#world #canvas #action-dropdown .button.sub-button:not(.disabled):hover {
+    transform: scale(1.05);
 }
 #world #canvas #action-dropdown .button[data-action="start-battle"] {
     background-color: #0e6b0e;
@@ -452,6 +462,132 @@ html, body {
     background-color: #363d62;
     border-color: #5b6493;
 }
+#world #canvas #action-dropdown .button[data-action="dismiss"] {
+    background-color: #8b1d1d;
+    border-color: #b23333;
+}
+
+
+#world #canvas #action-dropdown[data-dir="left"] > .wrapper {
+    right: 60px;
+    transform: translate(0, -25%);
+}
+#world #canvas #action-dropdown[data-dir="right"] > .wrapper {
+    left: 60px;
+    transform: translate(0, -25%);
+}
+#world #canvas #action-dropdown[data-dir*="up"] > .wrapper {
+    bottom: 60px;
+    transform: translate(calc(-50% + 20px), 0);
+}
+#world #canvas #action-dropdown[data-dir*="down"] > .wrapper {
+    top: 60px;
+    transform: translate(calc(-50% + 20px), 0);
+}
+
+#world #canvas #action-dropdown[data-type="battle"] > .wrapper {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    width: 240px;
+    height: 240px;
+    border: 0 none transparent;
+    box-shadow: none;
+    background-image: none;
+    background-color: transparent;
+}
+#world #canvas #action-dropdown[data-type="battle"] > .wrapper:before {
+    content: "";
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    /* border: double 9px rgba(0, 0, 0, 0.3); */
+    border: double 9px rgba(255, 255, 255, 0.6);
+    border-radius: 30px;
+    background: inherit;
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.0) 30%, rgba(0, 0, 0, 0.15));
+    background-blend-mode: overlay;
+}
+#world #canvas #action-dropdown[data-type="battle"] .big-button,
+#world #canvas #action-dropdown[data-type="battle"] .sub-button {
+    position: absolute;
+    left: -20px;
+    right: -20px;
+    z-index: 150;
+}
+#world #canvas #action-dropdown[data-type="battle"] .big-button {
+    bottom: -90px;
+    font-size: 18px;
+    padding: 12px 24px;
+    width: calc(100% + 40px);
+}
+#world #canvas #action-dropdown[data-type="battle"] .sub-button {
+    bottom: -124px;
+    font-size: 12px;
+    padding: 6px 12px;
+    width: calc(100% + 20px);
+}
+#world #canvas #action-dropdown[data-type="battle"] .label {
+    position: absolute;
+    top: -40px;
+    left: -40px;
+    right: -40px;
+    bottom: auto;
+    width: auto;
+    height: auto;
+    background-color: #090909;
+    border-radius: 6px;
+    padding: 9px 12px;
+    z-index: 100;
+}
+#world #canvas #action-dropdown[data-type="battle"] .sublabel {
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    transform: translate(0, 0);
+    z-index: 50;
+}
+#world #canvas #action-dropdown[data-type="battle"] .sublabel.left { right: calc(100% - 8px); }
+#world #canvas #action-dropdown[data-type="battle"] .sublabel.right { left: calc(100% - 8px); }
+#world #canvas #action-dropdown[data-type="battle"] .sublabel.center { left: 50%; transform: translateX(-50%); }
+#world #canvas #action-dropdown[data-type="battle"] .sublabel.up { bottom: calc(100% - 6px); }
+#world #canvas #action-dropdown[data-type="battle"] .sublabel.down { top: calc(100% - 2px); }
+#world #canvas #action-dropdown[data-type="battle"] .sublabel.middle { top: 50%; transform: translateY(-50%); }
+#world #canvas #action-dropdown[data-type="battle"] .sublabel.left.up { transform: translate(8px, 16px); }
+#world #canvas #action-dropdown[data-type="battle"] .sublabel.right.up { transform: translate(-8px, 16px); }
+#world #canvas #action-dropdown[data-type="battle"] .sublabel.left.down { transform: translate(8px, -16px); }
+#world #canvas #action-dropdown[data-type="battle"] .sublabel.right.down { transform: translate(-8px, -16px); }
+
+#world #canvas #action-dropdown[data-type="battle"][data-align] .big-button { top: auto; bottom: auto; right: -20px; left: -20px; }
+#world #canvas #action-dropdown[data-type="battle"][data-align^="above"] .big-button { top: -90px; }
+#world #canvas #action-dropdown[data-type="battle"][data-align^="below"] .big-button { bottom: -90px; }
+#world #canvas #action-dropdown[data-type="battle"][data-align$="left"] .big-button { left: -90px; right: auto; }
+#world #canvas #action-dropdown[data-type="battle"][data-align$="right"] .big-button { right: -90px; left: auto; }
+
+#world #canvas #action-dropdown[data-type="battle"][data-align] .sub-button { top: auto; bottom: auto; right: -10px; left: -10px; }
+#world #canvas #action-dropdown[data-type="battle"][data-align^="above"] .sub-button { top: -70px; }
+#world #canvas #action-dropdown[data-type="battle"][data-align^="below"] .sub-button { bottom: -124px; }
+#world #canvas #action-dropdown[data-type="battle"][data-align$="left"] .sub-button { left: -78px; right: auto; }
+#world #canvas #action-dropdown[data-type="battle"][data-align$="right"] .sub-button { right: -78px; left: auto; }
+
+#world #canvas #action-dropdown[data-type="battle"][data-align^="above"] .sub-button + .big-button { margin-top: -32px }
+#world #canvas #action-dropdown[data-type="battle"][data-align^="below"] .sub-button + .big-button { /* ... */ }
+#world #canvas #action-dropdown[data-type="battle"][data-align$="left"] .sub-button + .big-button { /* ... */ }
+#world #canvas #action-dropdown[data-type="battle"][data-align$="right"] .sub-button + .big-button { /* ... */ }
 
 
 #world #canvas .chrome {

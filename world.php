@@ -348,7 +348,15 @@ $request_player_token = isset($_REQUEST['player']) && preg_match('/^([-_a-z0-9]+
 if (empty($request_player_token) && !empty($WORLD_SESSION['last_player_token'])){ $request_player_token = $WORLD_SESSION['last_player_token']; }
 if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){
     $this_prototype_data['this_player_token'] = $request_player_token;
+    //$session_token = mmrpg_game_token();
+    //$temp_robot_settings = $_SESSION[$session_token]['values']['battle_settings'][$request_player_token]['player_robots'];
+    //$temp_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$request_player_token]['player_robots'];
+    //error_log('$temp_robot_settings = '.print_r($temp_robot_settings, true));
+    //error_log('$temp_robot_rewards = '.print_r($temp_robot_rewards, true));
+    //error_log('$temp_robot_settings(keys) = '.print_r(array_keys($temp_robot_settings), true));
+    //error_log('$temp_robot_rewards(keys) = '.print_r(array_keys($temp_robot_rewards), true));
     $allowed_player_robots = mmrpg_prototype_robots_unlocked($request_player_token, true);
+    //error_log('$allowed_player_robots = '.print_r($allowed_player_robots, true));
     $max_player_robots = MMRPG_WORLD_DEFAULT_TEAMSIZE; // TODO: make this dynamic based on limit hearts
     if (!empty($allowed_player_robots)){
         $request_player_robots = array();
@@ -677,10 +685,6 @@ $flag_skip_fadein = true;
                 <div id="click-overlay" class="active"><div class="wrapper"></div></div>
                 <div id="action-dropdown" class="active"><div class="wrapper"></div></div>
             </div>
-            <?
-            // DEBUG DEBUG DEBUG
-            echo('<!-- $map_data_parsed = '.print_r($map_data_parsed, true).' -->');
-            ?>
             <div id="home-button" class="chrome"><a class="wrapper"><i class="fa fas fa-home"></i></a></div>
             <div id="reset-button" class="chrome"><a class="wrapper"><i class="fa fas fa-trash"></i></a></div>
             <div id="position-display" class="chrome"><div class="wrapper">&hellip;</div></div>
@@ -694,6 +698,10 @@ $flag_skip_fadein = true;
                     $active = ($ptoken === $this_prototype_data['this_player_token']) ? ' active' : '';
                     echo('<a class="option'.$active.'" data-player="'.$ptoken.'">'.$sprite.'</a>');
                 } ?></div></div>
+            <?
+            // DEBUG DEBUG DEBUG
+            echo('<pre data-var="$map_data_parsed" style="display: none;"><!-- $map_data_parsed = '.print_r($map_data_parsed, true).' --></pre>');
+            ?>
         </div>
     </div>
 </div>
