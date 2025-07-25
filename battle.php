@@ -41,14 +41,81 @@ $this_player_robots = isset($_GET['this_player_robots']) ? $_GET['this_player_ro
 $target_player_id = isset($_GET['target_player_id']) ? $_GET['target_player_id'] : 0;
 $target_player_token = isset($_GET['target_player_token']) ? $_GET['target_player_token'] : '';
 $flag_skip_fadein = isset($_GET['flag_skip_fadein']) && $_GET['flag_skip_fadein'] == 'true' ? true : false;
+//echo('<pre>$this_battle_token = '.print_r($this_battle_token, true).'</pre>');
+//exit();
 
 // Collect the battle index data if available
 if (!empty($this_battle_token)){
+
+    // MULTI-BATTLE-TOKEN-PRE-CHECK
+    // Pre-check to see if multiple battle tokens have been supplied (it's a world thing)
+    $multi_battle_tokens = false;
+    if (strstr($this_battle_token, ',')){
+        $multi_battle_tokens = explode(',', $this_battle_token);
+        $this_battle_token = $multi_battle_tokens[0];
+        //error_log('$multi_battle_tokens(1) = '.print_r($multi_battle_tokens, true));
+    }
+
+    // Collect the battle data from the index given whatever battle token was collected
     $this_battle_data = rpg_battle::get_index_info($this_battle_token);
     if (empty($this_battle_data['battle_id'])){
         $this_battle_id = !empty($this_battle_id) ? $this_battle_id : 1;
         $this_battle_data['battle_id'] = $this_battle_id;
     }
+
+    // MULTI-BATTLE-TOKEN-POST-CHECK
+    // If multiple battle tokens were provided, loop through them and merge-in target robots, rewards, etc.
+    if ($multi_battle_tokens){
+        //error_log('$multi_battle_tokens(2) = '.print_r($multi_battle_tokens, true));
+        $temp_target_playerid = $this_battle_data['battle_target_player']['player_id'];
+        $new_battle_turns = 0;
+        $new_battle_zenny = 0;
+        $new_battle_rewards = array();
+        $new_target_robots = array();
+        foreach ($multi_battle_tokens AS $multi_key => $multi_token){
+            //if ($multi_key === 0){ continue; }
+            //error_log('checking $multi_token = '.print_r($multi_token, true));
+            $temp_battle_token = trim($multi_token);
+            $temp_battle_data = rpg_battle::get_index_info($temp_battle_token);
+            $temp_battle_turns = !empty($temp_battle_data['battle_turns']) ? $temp_battle_data['battle_turns'] : 0;
+            $temp_battle_zenny = !empty($temp_battle_data['battle_zenny']) ? $temp_battle_data['battle_zenny'] : 0;
+            $temp_target_player = !empty($temp_battle_data['battle_target_player']) ? $temp_battle_data['battle_target_player'] : array();
+            $temp_battle_rewards = !empty($temp_battle_data['battle_rewards']) ? $temp_battle_data['battle_rewards'] : array();
+            $temp_target_robots = !empty($temp_target_player['player_robots']) ? $temp_target_player['player_robots'] : array();
+            //error_log('$temp_battle_token = '.print_r($temp_battle_token, true));
+            //error_log('$temp_battle_data = '.print_r($temp_battle_data, true));
+            //error_log('$temp_battle_turns = '.print_r($temp_battle_turns, true));
+            //error_log('$temp_battle_zenny = '.print_r($temp_battle_zenny, true));
+            //error_log('$temp_target_player = '.print_r($temp_target_player, true));
+            //error_log('$temp_battle_rewards = '.print_r($temp_battle_rewards, true));
+            //error_log('$temp_target_robots = '.print_r($temp_target_robots, true));
+            if ($temp_battle_turns){ $new_battle_turns += $temp_battle_turns; }
+            if ($temp_battle_zenny){ $new_battle_zenny += $temp_battle_zenny; }
+            if (!empty($temp_battle_rewards)){
+                //error_log('merging in $temp_battle_rewards = '.print_r($temp_battle_rewards, true));
+                foreach ($temp_battle_rewards AS $kind => $rewards){
+                    if (!isset($new_battle_rewards[$kind])){ $new_battle_rewards[$kind] = array(); }
+                    $new_battle_rewards[$kind] = array_merge($new_battle_rewards[$kind], $rewards);
+                }
+            }
+            if (!empty($temp_target_robots)){
+                //error_log('merging in $temp_target_robots = '.print_r($temp_target_robots, true));
+                foreach ($temp_target_robots AS $temp_robot_data){
+                    if (!empty($temp_robot_data['flags']['guest'])){ continue; }
+                    elseif ($multi_key > 0){ $temp_robot_data['flags']['guest'] = true; }
+                    $robot_key = count($new_target_robots);
+                    $robot_info = rpg_robot::get_index_info($temp_robot_data['robot_token']);
+                    $temp_robot_data['robot_id'] = rpg_game::unique_robot_id($temp_target_playerid, $robot_info['robot_id'], ($robot_key + 1));
+                    $new_target_robots[] = $temp_robot_data;
+                }
+            }
+        }
+        $new_target_robots = array_slice($new_target_robots, 0, MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX);
+        $this_battle_data['battle_target_player']['player_robots'] = $new_target_robots;
+        rpg_battle::update_index_info($this_battle_token, $this_battle_data);
+        //error_log('new $this_battle_data = '.print_r($this_battle_data, true));
+    }
+
 }
 else {
     $this_battle_id = 0;
