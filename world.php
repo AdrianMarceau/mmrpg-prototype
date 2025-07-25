@@ -698,6 +698,7 @@ $flag_skip_fadein = true;
                     $active = ($ptoken === $this_prototype_data['this_player_token']) ? ' active' : '';
                     echo('<a class="option'.$active.'" data-player="'.$ptoken.'">'.$sprite.'</a>');
                 } ?></div></div>
+            <div id="side-buttons" class="chrome"><div class="wrapper">&hellip;</div></div>
             <?
             // DEBUG DEBUG DEBUG
             echo('<pre data-var="$map_data_parsed" style="display: none;"><!-- $map_data_parsed = '.print_r($map_data_parsed, true).' --></pre>');

@@ -369,8 +369,9 @@ html, body {
     line-height: 1.3;
     padding: 6px 12px;
     border-radius: 6px;
-    background-color: rgba(0, 0, 0, 0.7);
-    background: transparent linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9));
+    background-color: rgba(0, 0, 0, 0.6);
+    /* background-color: rgba(0, 0, 0, 0.7);  */
+    /* background: transparent linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 10%, rgba(0, 0, 0, 0.8) 90%, rgba(0, 0, 0, 0.4));  */
     border: 3px transparent;
     /* border-bottom: 20px solid rgba(0, 0, 0, 0.5); */
     box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.3);
@@ -395,7 +396,6 @@ html, body {
     font-size: 12px;
     line-height: 1.2;
 }
-
 #world #canvas #action-dropdown .label {
     font-weight: bold;
     margin: 0 0 4px 0;
@@ -425,63 +425,25 @@ html, body {
     position: relative;
     padding-right: 6px;
 }
-
-#world #canvas #action-dropdown .button.big-button,
-#world #canvas #action-dropdown .button.sub-button {
-    background-color: #363636;
-    border: 1px solid  #565656;
-    font-weight: bold;
-    padding: 6px 6px;
-    font-size: 14px;
-    text-align: center;
+#world #canvas #action-dropdown .label:last-child,
+#world #canvas #action-dropdown .button:last-child {
+    margin: 0;
 }
-#world #canvas #action-dropdown .button.big-button:before,
-#world #canvas #action-dropdown .button.sub-button:before {
-    content: "";
-    display: none;
-}
-#world #canvas #action-dropdown .button.big-button.disabled,
-#world #canvas #action-dropdown .button.sub-button.disabled {
-    background-color: #292929;
-    border-color: #464646;
-    color: #969696;
-    font-weight: normal;
-    cursor: not-allowed;
-}
-#world #canvas #action-dropdown .button.big-button:not(.disabled):hover {
-    transform: scale(1.10);
-}
-#world #canvas #action-dropdown .button.sub-button:not(.disabled):hover {
-    transform: scale(1.05);
-}
-#world #canvas #action-dropdown .button[data-action="start-battle"] {
-    background-color: #0e6b0e;
-    border-color: #129d12;
-}
-#world #canvas #action-dropdown .button[data-action="enter-portal"] {
-    background-color: #363d62;
-    border-color: #5b6493;
-}
-#world #canvas #action-dropdown .button[data-action="dismiss"] {
-    background-color: #8b1d1d;
-    border-color: #b23333;
-}
-
 
 #world #canvas #action-dropdown[data-dir="left"] > .wrapper {
-    right: 60px;
+    right: 62px;
     transform: translate(0, -25%);
 }
 #world #canvas #action-dropdown[data-dir="right"] > .wrapper {
-    left: 60px;
+    left: 62px;
     transform: translate(0, -25%);
 }
 #world #canvas #action-dropdown[data-dir*="up"] > .wrapper {
-    bottom: 60px;
+    bottom: 62px;
     transform: translate(calc(-50% + 20px), 0);
 }
 #world #canvas #action-dropdown[data-dir*="down"] > .wrapper {
-    top: 60px;
+    top: 62px;
     transform: translate(calc(-50% + 20px), 0);
 }
 
@@ -518,25 +480,6 @@ html, body {
     background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.0) 30%, rgba(0, 0, 0, 0.15));
     background-blend-mode: overlay;
 }
-#world #canvas #action-dropdown[data-type="battle"] .big-button,
-#world #canvas #action-dropdown[data-type="battle"] .sub-button {
-    position: absolute;
-    left: -20px;
-    right: -20px;
-    z-index: 150;
-}
-#world #canvas #action-dropdown[data-type="battle"] .big-button {
-    bottom: -90px;
-    font-size: 18px;
-    padding: 12px 24px;
-    width: calc(100% + 40px);
-}
-#world #canvas #action-dropdown[data-type="battle"] .sub-button {
-    bottom: -124px;
-    font-size: 12px;
-    padding: 6px 12px;
-    width: calc(100% + 20px);
-}
 #world #canvas #action-dropdown[data-type="battle"] .label {
     position: absolute;
     top: -40px;
@@ -560,7 +503,22 @@ html, body {
     overflow: hidden;
     transform: translate(0, 0);
     z-index: 50;
+    opacity: 0.0;
+    transition: opacity 0.3s;
+    pointer-events: none;
 }
+
+#world #canvas #action-dropdown[data-type="battle"] .label,
+#world #canvas #action-dropdown[data-type="battle"] .sublabel {
+    opacity: 1.0;
+    transition: opacity 0.3s;
+}
+#world #canvas #action-dropdown[data-type="battle"]:not(:hover) .label,
+#world #canvas #action-dropdown[data-type="battle"]:not(:hover) .sublabel {
+    opacity: 0.0;
+    pointer-events: none;
+}
+
 #world #canvas #action-dropdown[data-type="battle"] .sublabel.left { right: calc(100% - 8px); }
 #world #canvas #action-dropdown[data-type="battle"] .sublabel.right { left: calc(100% - 8px); }
 #world #canvas #action-dropdown[data-type="battle"] .sublabel.center { left: 50%; transform: translateX(-50%); }
@@ -571,24 +529,6 @@ html, body {
 #world #canvas #action-dropdown[data-type="battle"] .sublabel.right.up { transform: translate(-8px, 16px); }
 #world #canvas #action-dropdown[data-type="battle"] .sublabel.left.down { transform: translate(8px, -16px); }
 #world #canvas #action-dropdown[data-type="battle"] .sublabel.right.down { transform: translate(-8px, -16px); }
-
-#world #canvas #action-dropdown[data-type="battle"][data-align] .big-button { top: auto; bottom: auto; right: -20px; left: -20px; }
-#world #canvas #action-dropdown[data-type="battle"][data-align^="above"] .big-button { top: -90px; }
-#world #canvas #action-dropdown[data-type="battle"][data-align^="below"] .big-button { bottom: -90px; }
-#world #canvas #action-dropdown[data-type="battle"][data-align$="left"] .big-button { left: -90px; right: auto; }
-#world #canvas #action-dropdown[data-type="battle"][data-align$="right"] .big-button { right: -90px; left: auto; }
-
-#world #canvas #action-dropdown[data-type="battle"][data-align] .sub-button { top: auto; bottom: auto; right: -10px; left: -10px; }
-#world #canvas #action-dropdown[data-type="battle"][data-align^="above"] .sub-button { top: -70px; }
-#world #canvas #action-dropdown[data-type="battle"][data-align^="below"] .sub-button { bottom: -124px; }
-#world #canvas #action-dropdown[data-type="battle"][data-align$="left"] .sub-button { left: -78px; right: auto; }
-#world #canvas #action-dropdown[data-type="battle"][data-align$="right"] .sub-button { right: -78px; left: auto; }
-
-#world #canvas #action-dropdown[data-type="battle"][data-align^="above"] .sub-button + .big-button { margin-top: -32px }
-#world #canvas #action-dropdown[data-type="battle"][data-align^="below"] .sub-button + .big-button { /* ... */ }
-#world #canvas #action-dropdown[data-type="battle"][data-align$="left"] .sub-button + .big-button { /* ... */ }
-#world #canvas #action-dropdown[data-type="battle"][data-align$="right"] .sub-button + .big-button { /* ... */ }
-
 
 #world #canvas .chrome {
     position: absolute;
@@ -611,6 +551,11 @@ html, body {
     position: static;
     width: auto;
     height: auto;
+}
+#world #canvas .chrome > .wrapper:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 #world #canvas #position-display {
     bottom: 0;
@@ -715,6 +660,104 @@ html, body {
 #world #canvas #player-switcher a.option > .sprite > .sprite {
     position: absolute;
     bottom: 0;
+}
+
+#world #canvas #side-buttons {
+    bottom: 26px;
+    right: 0;
+    text-align: right;
+    border-radius: 6px 0 0 6px;
+    min-height: 80px;
+    max-width: 999px;
+    padding: 9px 24px 12px 9px;
+    opacity: 1.0;
+    transition: max-width 0.6s, padding 0.6s, opacity 0.9s;
+    will-change: max-width, padding, opacity;
+}
+#world #canvas #side-buttons:not(.active) {
+    max-width: 2px;
+    padding: 9px 0 12px 0;
+    opacity: 0.0;
+}
+#world #canvas #side-buttons .button {
+    display: block;
+    float: right;
+    position: relative;
+    box-sizing: border-box;
+    clear: both;
+    margin: 0 0 0 auto;
+    padding: 3px 6px;
+    width: auto;
+    height: auto;
+    min-width: 200px;
+    font-family: monospace;
+    text-align: center;
+    color: #cfcfcf;
+    font-size: 12px;
+    line-height: 1.2;
+    border: 1px solid transparent;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    transform: scale(1.0);
+    cursor: pointer;
+    user-select: none;
+    pointer-events: all;
+    transition: border 0.2s, background-color 0.2s, min-width 0.3s;
+}
+#world #canvas #side-buttons .button:not(.disabled):hover {
+    border-color: #cfcfcf;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+#world #canvas #side-buttons .button + .button {
+    margin-top: 6px;
+}
+#world #canvas #side-buttons .big-button,
+#world #canvas #side-buttons .sub-button {
+    background-color: #363636;
+    border: 1px solid  #565656;
+    font-weight: bold;
+    padding: 6px 6px;
+    font-size: 14px;
+    text-align: center;
+    z-index: 150;
+}
+#world #canvas #side-buttons .big-button {
+    min-width: 240px;
+    font-size: 18px;
+    padding: 12px 24px;
+}
+#world #canvas #side-buttons .sub-button {
+    min-width: 200px;
+    font-size: 12px;
+    padding: 6px 12px;
+}
+#world #canvas #side-buttons .big-button:not(.disabled):hover {
+    min-width: 280px;
+}
+#world #canvas #side-buttons .sub-button:not(.disabled):hover {
+    min-width: 220px;
+}
+#world #canvas #side-buttons .big-button.disabled,
+#world #canvas #side-buttons .sub-button.disabled {
+    background-color: #292929;
+    border-color: #464646;
+    color: #969696;
+    font-weight: normal;
+    cursor: not-allowed;
+}
+
+#world #canvas #side-buttons .button[data-action="start-battle"] {
+    background-color: #0e6b0e !important;
+    border-color: #129d12 !important;
+}
+#world #canvas #side-buttons .button[data-action="enter-portal"] {
+    background-color: #0e4f6b !important;
+    border-color: #12709d !important;
+}
+#world #canvas #side-buttons .button[data-action="dismiss"] {
+    background-color: #8b1d1d !important;
+    border-color: #b23333 !important;
 }
 
 

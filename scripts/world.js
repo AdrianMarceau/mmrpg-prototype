@@ -81,18 +81,28 @@ class mmrpgWorldMap {
         let _elements = _self.elements;
         let _world = _self.state;
         let _worldCursor = _world.cursor;
-        $thisPrototype = $mmrpg;
-        $thisWorld = $('#world', $thisPrototype);
-        $thisCanvas = $('#canvas', $thisWorld);
-        _elements.mmrpg = $thisPrototype;
-        _elements.world = $thisWorld;
-        _elements.canvas = $thisCanvas;
+        let $thisPrototype = $mmrpg;
+        let $thisWorld = $('#world', $thisPrototype);
+        let $thisCanvas = $('#canvas', $thisWorld);
         let $canvasMap = $('#map', $thisCanvas);
         let $mapLayers = $('.layer', $canvasMap);
         let $worldCursor = $('.sprite.cursor', $canvasMap);
+        let $homeButton = $('#home-button', $thisWorld);
+        let $resetButton = $('#reset-button', $thisWorld);
+        let $playerSwitcher = $('#player-switcher', $thisWorld);
+        let $sideButtons = $('#side-buttons', $thisWorld);
+        let $actionDropdown = $('#action-dropdown', $thisWorld);
+        _elements.mmrpg = $thisPrototype;
+        _elements.world = $thisWorld;
+        _elements.canvas = $thisCanvas;
         _elements.map = $canvasMap;
         _elements.layers = $mapLayers;
         _elements.cursor = $worldCursor;
+        _elements.homeButton = $homeButton;
+        _elements.resetButton = $resetButton;
+        _elements.playerSwitcher = $playerSwitcher;
+        _elements.sideButtons = $sideButtons;
+        _elements.actionDropdown = $actionDropdown;
         if ($canvasMap.length && $mapLayers.length){
             //console.log('%c' + 'World map canvas found with ' + $mapLayers.length + ' layers...', 'color: orange;');
             // Define the function to run when everything is done loading
@@ -327,7 +337,7 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
-        let $worldDiv = _elements.world;
+        let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
         let $thisLayer = $('.layer[data-layer="'+layerToken+'"]', $canvasMap);
         if (!$thisLayer || !$thisLayer.length){ console.error('drawTilesToCanvas() missing required $thisLayer!'); return false; }
@@ -542,7 +552,7 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
-        let $worldDiv = _elements.world;
+        let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
         let $thisLayer = $('.layer[data-layer="'+layerToken+'"]', $canvasMap);
         if (!$thisLayer || !$thisLayer.length){ console.error('refreshCanvasTilesForReal() missing required $thisLayer!'); return false; }
@@ -702,7 +712,7 @@ class mmrpgWorldMap {
         let _elements = _self.elements;
         let _world = _self.state;
         // Bind a click event to the home button in the header that'll bring us to prototype menu
-        let $homeButton = $('#home-button', $thisWorld);
+        let $homeButton = _elements.homeButton;
         if ($homeButton && $homeButton.length){
             $homeButton.bind('click', function(e){
                 e.preventDefault();
@@ -715,7 +725,7 @@ class mmrpgWorldMap {
                 });
             }
         // Bind a click event to the reset button in the header that'll clear world data to start over (dev/debug only)
-        let $resetButton = $('#reset-button', $thisWorld);
+        let $resetButton = _elements.resetButton;
         if ($resetButton && $resetButton.length){
             $resetButton.bind('click', function(e){
                 e.preventDefault();
@@ -728,7 +738,7 @@ class mmrpgWorldMap {
                 });
             }
         // Bind click events to the player switcher options in the world map header
-        let $playerSwitcher = $('#player-switcher', $thisWorld);
+        let $playerSwitcher = _elements.playerSwitcher;
         if ($playerSwitcher && $playerSwitcher.length){
             $('.option[data-player]', $playerSwitcher).bind('click', function(e){
                 e.preventDefault();
@@ -760,19 +770,20 @@ class mmrpgWorldMap {
         let _mapEffects = _config.mapEffects;
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
-        let $worldDiv = _elements.world;
+        let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
+        let $sideButtons = _elements.sideButtons;
+        let $actionDropdown = _elements.actionDropdown;
         let $backgroundLayer = $('.layer.background', $canvasMap);
         var $tilesLayer = $('.layer.tiles', $canvasMap);
         let $objectsLayer = $('.layer.objects', $canvasMap);
         let $eventsLayers = $('.layer.events', $canvasMap);
         let $cursorSprite = $('.sprite.cursor', $objectsLayer);
-        let $actionsDropdown = $('#action-dropdown', $worldDiv);
         if (!$tilesLayer || !$tilesLayer.length){ console.error('$tilesLayer does not exist!'); return false; }
         if (!$objectsLayer || !$objectsLayer.length){ console.error('$objectsLayer does not exist!'); return false; }
         if (!$eventsLayers || !$eventsLayers.length){ console.error('$eventsLayers do not exist!'); return false; }
         if (!$cursorSprite || !$cursorSprite.length){ console.error('$cursorSprite not found!'); return false; }
-        if (!$actionsDropdown || !$actionsDropdown.length){ console.error('$actionsDropdown not found!'); return false; }
+        if (!$actionDropdown || !$actionDropdown.length){ console.error('$actionDropdown not found!'); return false; }
         let thisOldCol = _worldCursor.col;
         let thisOldRow = _worldCursor.row;
         let thisNewCol = parseInt(newPosition[0]);
@@ -786,7 +797,7 @@ class mmrpgWorldMap {
         let tileOffsetY = ((thisNewRow - 1) * _mapTileSize[1]) + _mapTileSizeOffset[1];
         $canvasMap.addClass('busy');
         _worldCursor.moving = true;
-        $actionsDropdown.removeClass('active');
+        $actionDropdown.removeClass('active');
         $eventsLayers.removeClass('has-zoom');
         $('.sprite.zoom', $eventsLayers).removeClass('zoom');
         // Move the cursor to the new position first and foremost
@@ -860,8 +871,8 @@ class mmrpgWorldMap {
                 });
             }
         // And now we should move the map itself so that the characters are always centered in the viewport
-        let worldWidth = $worldDiv.outerWidth();
-        let worldHeight = $worldDiv.outerHeight();
+        let worldWidth = $thisWorld.outerWidth();
+        let worldHeight = $thisWorld.outerHeight();
         let mapWidth = $canvasMap.outerWidth();
         let mapHeight = $canvasMap.outerHeight();
         let targetX = tileOffsetX + (_mapTileSize[0] / 2) - (_mapTileSizeOffset[0] / 2);
@@ -899,7 +910,7 @@ class mmrpgWorldMap {
         let _playerId = _config.playerId;
         let _playerToken = _config.playerToken;
         let _playerRobots = _config.playerRobots;
-        let $worldDiv = _elements.world;
+        let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
         let $worldCursor = _elements.cursor;
         let cursorDirection = _worldCursor.direction;
@@ -907,14 +918,26 @@ class mmrpgWorldMap {
         let newPosition = cursorPosition.split('-');
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
-        let $positionDisplay = $('#position-display > .wrapper', $worldDiv);
-        $positionDisplay.text('X:' + thisNewCol + ' Y:' + thisNewRow);
+
+        // Define the default zoom timeout for after movement ends
+        let zoomTimeoutDuration = 2000;
+
+        // First we update the cursor sprite position and attributes
+        let $positionDisplay = $('#position-display', $thisWorld);
+        let $positionDisplayWrapper = $('> .wrapper', $positionDisplay);
+        $positionDisplayWrapper.text('X:' + thisNewCol + ' Y:' + thisNewRow);
 
         // Make sure we empty and hide the action dropdown if it's been shown by previous move
-        let $actionsDropdown = $('#action-dropdown', $worldDiv);
-        let $actionsDropdownWrapper = $('> .wrapper', $actionsDropdown);
-        $actionsDropdown.removeClass('active').css({left: '', top: ''}).removeAttr('data-dir');
-        $actionsDropdownWrapper.empty();
+        let $actionDropdown = _elements.actionDropdown;
+        let $actionDropdownWrapper = $('> .wrapper', $actionDropdown);
+        $actionDropdown.removeClass('active').css({left: '', top: ''}).removeAttr('data-dir');
+        $actionDropdownWrapper.empty();
+
+        // Make sure we also empty the sidebar buttons in case any were added by previous move
+        let $sideButtons = _elements.sideButtons;
+        let $sideButtonsWrapper = $('> .wrapper', $sideButtons);
+        $sideButtons.removeClass('active');
+        $sideButtonsWrapper.empty();
 
         // Collect references to the required event layers and the zoom display layer
         let $eventsLayers = $('.layer.events', $canvasMap);
@@ -948,6 +971,7 @@ class mmrpgWorldMap {
         var showDropdown = false;
         var showDropdownType = '';
         var dropdownMarkup = '';
+        var dropdownButtons = '';
         if ($eventsAtPosition[0].is('[data-portal]')){
             // If the cursor is literally on a portal, only one event sprite matters right now
             let $eventAtPosition = $eventsAtPosition[0];
@@ -957,10 +981,11 @@ class mmrpgWorldMap {
                 showDropdown = true;
                 if (!dataLabel){ dataLabel = 'Portal Options'; }
                 dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>';
-                //dropdownMarkup += '<a class="button" data-action="portal-info" data-portal="'+dataPortal+'"><span>View Details</span></a>';
-                if (dataPortal.indexOf('goto__') !== -1){ dropdownMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Warp to Area</span></a>'; }
-                else if (dataPortal === 'exit'){ dropdownMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Return Home</span></a>'; }
+                if (dataPortal.indexOf('goto__') !== -1){ dropdownButtons += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Warp to Area</span></a>'; }
+                else if (dataPortal === 'exit'){ dropdownButtons += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Return Home</span></a>'; }
+                dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showDropdownType = 'portal';
+                zoomTimeoutDuration = 500; // if we show a portal dropdown, we want to zoom in quickly
                 }
             }
         else {
@@ -994,21 +1019,27 @@ class mmrpgWorldMap {
                         } return markup;
                     })(dataLabels).join('');
                 dropdownMarkup += dataLabelsJoined;
-                dropdownMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-                if (_playerRobots.length){  dropdownMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
-                else { dropdownMarkup += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
+                if (_playerRobots.length){  dropdownButtons += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
+                else { dropdownButtons += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
+                dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showDropdownType = 'battle';
+                zoomTimeoutDuration = 1500; // otherwise if this is a battle we wait a moment
                 }
             }
 
         // If there's no dropdown to show, we can return early
         if (!showDropdown){ return; }
 
-        // Define an inline function to zoom and show the dropdown which we'll call after a timeout
-        let zoomAndShowDropdown = function(){
+        // Define an inline function to mark the cursor as busy for dramatic effect
+        let markCursorAsBusy = function(){
 
             // Add the busy class to the cursor so it hides behind the player
             $worldCursor.addClass('busy');
+
+            };
+
+        // Define an inline function to zoom and show the dropdown which we'll call after a timeout
+        let zoomAndShowDropdown = function(){
 
             // Elevate the event sprite(s) to the zoom layer and add a zoom class to it so it's more visible
             let cursorPositionXY = cursorPosition.split('-');
@@ -1033,37 +1064,17 @@ class mmrpgWorldMap {
                 }
 
             // Move the action dropdown to the correct position, add the markup, and show it
-            $actionsDropdown.css({
+            $actionDropdown.css({
                 left: ((thisNewCol - 1) * _mapTileSize[0] + _mapTileSizeOffset[0]) + 'px',
                 top: ((thisNewRow - 1) * _mapTileSize[1] + _mapTileSizeOffset[1]) + 'px',
                 }).attr('data-dir', _worldCursor.direction).attr('data-type', showDropdownType).attr('data-align', 'center');
-            $actionsDropdownWrapper.html(dropdownMarkup);
-            setTimeout(function(){
-                $actionsDropdown.addClass('active');
-                // collect the new offset so we can compare to parent size
-                let dropdownParentSize = [_config.worldWidth, _config.worldHeight];
-                let dropdownOffset = $actionsDropdown.offset();
-                let dropdownOffsets = [dropdownOffset.left, dropdownOffset.top];
-                let dropdownPositionDelta = [
-                    (1 - (dropdownParentSize[0] - dropdownOffsets[0]) / dropdownParentSize[0]),
-                    (1 - (dropdownParentSize[1] - dropdownOffsets[1]) / dropdownParentSize[1])
-                    ];
-                //console.log('-> dropdownParentSize:', dropdownParentSize);
-                //console.log('-> dropdownOffset:', dropdownOffset);
-                //console.log('-> dropdownOffsets:', dropdownOffsets);
-                //console.log('-> dropdownPositionDelta:', dropdownPositionDelta);
-                // decide whether the button should appear above or below the wrapper given where it is in parent
-                let dropdownAlign = 'below'; // default to below for when nothing else matches
-                if (dropdownPositionDelta[1] >= 0.5){ dropdownAlign = 'above'; }
-                else if (dropdownPositionDelta[1] < 0.5){ dropdownAlign = 'below'; }
-                if (dropdownPositionDelta[0] <= 0.25){ dropdownAlign += '-right'; }
-                if (dropdownPositionDelta[0] >= 0.75){ dropdownAlign += '-left'; }
-                //console.log('-> dropdownAlign:', dropdownAlign);
-                $actionsDropdown.attr('data-align', dropdownAlign);
-                }, 200);
+            $actionDropdownWrapper.html(dropdownMarkup); // dropdownButtons
 
-            // Bind click events to the newly created action buttons in the dropdown
-            $('.button[data-action]', $actionsDropdown).bind('click', function(e){
+            // Add the buttons to the sidebar area so that they are out-of-the-way
+            $sideButtonsWrapper.html(dropdownButtons);
+
+            // Define the event to fun when clicking one of these new action buttons
+            let onActionButtonClick = function(e){
                 //console.log('%c' + 'Action button clicked!', 'color: cyan;');
                 e.preventDefault();
                 let $button = $(this);
@@ -1119,8 +1130,10 @@ class mmrpgWorldMap {
                     }
                 else if (isDismiss){
                     //console.log('-> dismissing action dropdown!');
-                    $actionsDropdown.removeClass('active');
-                    $actionsDropdownWrapper.empty();
+                    $actionDropdown.removeClass('active');
+                    $actionDropdownWrapper.empty();
+                    $sideButtons.removeClass('active');
+                    $sideButtonsWrapper.empty();
                     $worldCursor.removeClass('busy');
                     $eventsLayers.removeClass('has-zoom');
                     $('.sprite.zoom', $eventsLayers).removeClass('zoom');
@@ -1133,11 +1146,38 @@ class mmrpgWorldMap {
                     // no compatible action found, do nothing
                     return false;
                     }
-                });
+                };
+
+            // Bind click events to the newly created action buttons in the dropdown
+            //$('.button[data-action]', $actionDropdown).bind('click', onActionButtonClick);
+            $('.button[data-action]', $sideButtons).bind('click', onActionButtonClick);
+
+            // Wait a moment for visual flow and then show the dropdown (adjusting alignment as needed)
+            setTimeout(function(){
+                // Add the active class so it shows and has a box model
+                $actionDropdown.addClass('active');
+                $sideButtons.addClass('active');
+                // Collect parent and child sizes and offsets to determine alignment
+                let dropdownParentSize = [_config.worldWidth, _config.worldHeight];
+                let dropdownOffset = $actionDropdown.offset();
+                let dropdownOffsets = [dropdownOffset.left, dropdownOffset.top];
+                let dropdownPositionDelta = [];
+                dropdownPositionDelta.push(1 - (dropdownParentSize[0] - dropdownOffsets[0]) / dropdownParentSize[0]);
+                dropdownPositionDelta.push(1 - (dropdownParentSize[1] - dropdownOffsets[1]) / dropdownParentSize[1]);
+                let dropdownAlign = dropdownPositionDelta[1] >= 0.5 ? 'above' : 'below';
+                if (dropdownPositionDelta[0] <= 0.25){ dropdownAlign += '-right'; }
+                if (dropdownPositionDelta[0] >= 0.75){ dropdownAlign += '-left'; }
+                // Apply the alignment to the dropdown
+                $actionDropdown.attr('data-align', dropdownAlign);
+                }, 200);
+
             };
 
-        if (_self.updateMapPosition.zoomTimeout){ clearTimeout(_self.updateMapPosition.zoomTimeout); }
-        _self.updateMapPosition.zoomTimeout = setTimeout(zoomAndShowDropdown, 1200);
+        let _selfRef = _self.updateMapPosition;
+        if (_selfRef.zoomCursorTimeout){ clearTimeout(_selfRef.zoomCursorTimeout); }
+        if (_selfRef.zoomDropdownTimeout){ clearTimeout(_selfRef.zoomDropdownTimeout); }
+        _selfRef.zoomCursorTimeout = setTimeout(markCursorAsBusy, Math.ceil(zoomTimeoutDuration / 2));
+        _selfRef.zoomDropdownTimeout = setTimeout(zoomAndShowDropdown, zoomTimeoutDuration);
 
         // Return true on success
         return true;

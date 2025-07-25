@@ -1,3 +1,8 @@
+
+#mmrpg {
+    overflow: hidden;
+}
+
 #volumeControl_musicLevels,
 #volumeControl_soundLevels {
   display: block;
