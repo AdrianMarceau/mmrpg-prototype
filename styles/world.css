@@ -596,9 +596,9 @@ html, body {
     font-size: 16px;
 }
 #world #canvas #reset-button {
-    bottom: 0;
+    top: 46px;
     left: 0;
-    border-radius: 0 6px 0 0;
+    border-radius: 0 6px 6px 0;
     font-size: 12px;
 }
 
@@ -608,12 +608,12 @@ html, body {
     z-index: 1003;
     width: auto;
     height: auto;
-    top: 0;
-    left: 45px;
+    bottom: 0;
+    left: 0;
     pointer-events: all;
     cursor: pointer;
     padding: 6px 12px;
-    border-radius: 0 0 6px 6px;
+    border-radius: 0 6px 0 0;
 }
 #world #canvas #player-switcher a.option {
     display: inline-block;
