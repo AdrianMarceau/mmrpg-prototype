@@ -63,6 +63,10 @@ gameSettings.spriteRenderMode = 'default'; // the render mode we should be using
 gameSettings.battleButtonMode = 'default'; // the button mode we should be using for missions
 gameSettings.enableGameMusic = true; // default to true to turn off on unsupported devices
 gameSettings.enableSoundEffects = true; // default to true to turn off on unsupported devices
+gameSettings.playVictorySound = true; // default to true to play the victory sound at the end of battles
+gameSettings.playVictoryMusic = true; // default to true to play the victory music at the end of battles
+gameSettings.playDefeatSound = true; // default to true to play the defeat sound at the end of battles
+gameSettings.playDefeatMusic = true; // default to true to play the defeat music at the end of battles
 
 // Define an object to hold change events for settings when/if they happen
 var gameSettingsChangeEvents = {};
@@ -2010,12 +2014,21 @@ function mmrpg_events(){
             && thisEvent.event_flags.victory === true){
             // Play the victory music
             //console.log('mmrpg_events() / Play the victory music');
-            parent.mmrpg_music_volume(0, false);
-            parent.mmrpg_play_sound_effect('battle-victory-sound');
-            setTimeout(function(){
-                parent.mmrpg_music_load('misc/leader-board', true, false);
-                //parent.mmrpg_reset_music_volume();
-                }, 1000);
+            if (gameSettings.playVictorySound){
+                let victorySound = 'battle-victory-sound';
+                let victoryMusic = 'misc/leader-board';
+                parent.mmrpg_music_volume(0, false);
+                parent.mmrpg_play_sound_effect(victorySound);
+                setTimeout(function(){
+                    if (gameSettings.playVictoryMusic){
+                        parent.mmrpg_music_load(victoryMusic, true, false);
+                        } else {
+                        parent.mmrpg_reset_music_volume();
+                        }
+                    }, 1000);
+                } else if (gameSettings.playVictoryMusic){
+                parent.mmrpg_music_load(victoryMusic, true, false);
+                }
             if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
             battleResultsDisplayed = true;
             }
@@ -2024,12 +2037,21 @@ function mmrpg_events(){
             && thisEvent.event_flags.defeat === true){
             // Play the failure music
             //console.log('mmrpg_events() / Play the failure music');
-            parent.mmrpg_music_volume(0, false);
-            parent.mmrpg_play_sound_effect('battle-defeat-sound');
-            setTimeout(function(){
-                parent.mmrpg_music_load('misc/leader-board', true, false);
-                //parent.mmrpg_reset_music_volume();
-                }, 2500);
+            if (gameSettings.playDefeatSound){
+                let defeatSound = 'battle-defeat-sound';
+                let defeatMusic = 'misc/leader-board';
+                parent.mmrpg_music_volume(0, false);
+                parent.mmrpg_play_sound_effect(defeatSound);
+                setTimeout(function(){
+                    if (gameSettings.playDefeatMusic){
+                        parent.mmrpg_music_load(defeatMusic, true, false);
+                        } else {
+                        parent.mmrpg_reset_music_volume();
+                        }
+                    }, 1000);
+                } else if (gameSettings.playDefeatMusic){
+                parent.mmrpg_music_load(defeatMusic, true, false);
+                }
             if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
             battleResultsDisplayed = true;
             }
