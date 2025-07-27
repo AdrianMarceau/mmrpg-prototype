@@ -429,8 +429,27 @@ $map_random_encounters = !empty($WORLD_SESSION[$map_token.'_random_encounters'])
 //error_log('$max_random_encounters = '.print_r($max_random_encounters, true));
 //error_log('$map_random_encounters = '.print_r($map_random_encounters, true));
 if (empty($map_random_encounters)){
+    $ratios = array();
+    foreach ($allowed_random_encounters AS $key => $robot){
+        $ratio = strstr($robot, '(') && strstr($robot, ')') ? explode('(', str_replace(')', '', $robot)) : array($robot, 1);
+        $robot = $ratio[0]; $value = intval($ratio[1]);
+        $ratios[$robot] = $value;
+        }
+    $ratios_sum = array_sum($ratios);
+    $distributed_encounters = array_map(function($value) use ($ratios_sum, $max_random_encounters){
+        return round(($value / $ratios_sum) * $max_random_encounters);
+        }, $ratios);
+    asort($distributed_encounters);
+    $options = array_keys($distributed_encounters);
+    //error_log('$ratios = '.print_r($ratios, true));
+    //error_log('$options = '.print_r($options, true));
+    //error_log('$ratios_sum = '.print_r($ratios_sum, true));
+    //error_log('$max_random_encounters = '.print_r($max_random_encounters, true));
+    //error_log('$distributed_encounters = '.print_r($distributed_encounters, true));
+    $robot = '';
     for ($i = 0; $i < $max_random_encounters; $i++){
-        $robot = $allowed_random_encounters[mt_rand(0, count($allowed_random_encounters) - 1)];
+        if (empty($robot)){ $robot = array_shift($options);  error_log('-> next robot = "'.$robot.'"'); }
+        if (!isset($generated_encounters[$robot])){ $generated_encounters[$robot] = 0; }
         $randpos = $get_randpos($available_encounter_cells);
         $robot_info = $mmrpg_index_robots[$robot];
         $robot_level = mt_rand(1, 10);
@@ -447,7 +466,11 @@ if (empty($map_random_encounters)){
             'target' => array('robots' => array(array('token' => $robot, 'level' => $robot_level))),
             'flags' => array('world_battle' => true, 'remove_on_complete' => true),
             ), true);
+        $generated_encounters[$robot]++;
+        $distributed_encounters[$robot]--;
+        if (empty($distributed_encounters[$robot])){ $robot = ''; }
         }
+    //error_log('$generated_encounters = '.print_r($generated_encounters, true));
 }
 $WORLD_SESSION[$map_token.'_random_encounters'] = $map_random_encounters;
 

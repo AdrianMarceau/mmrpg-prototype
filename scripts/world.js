@@ -717,7 +717,7 @@ class mmrpgWorldMap {
             $homeButton.bind('click', function(e){
                 e.preventDefault();
                 //console.log('%c' + 'Home button clicked!', 'color: cyan;');
-                //if (!confirm('Are you sure you want to leave the world map?')){ return; }
+                if (!confirm('Are you sure you want to leave the world map?')){ return; }
                 $thisWorld.addClass('hidden');
                 let homeMenuURL = $homeButton.attr('data-home-url') || 'prototype.php';
                 window.location.href = homeMenuURL;
