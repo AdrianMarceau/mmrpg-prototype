@@ -5,8 +5,10 @@
 @size     = 11 x 22 x 80 x 80
 @sheet    = overworld-experiment-v2025-tileset.png
 #---------------------------#
-@field    = gentle-countryside
-@mechas   = met
+@field       = gentle-countryside
+@mechas      = met(2),trille-bot(1)
+@habitats[]  = met(grass)
+@habitats[]  = trille-bot(subspace)
 #---------------------------#
 00,00,00,00,00,00,00,00,00,00,00
 00,00,00,00,00,00,00,00,00,00,00
