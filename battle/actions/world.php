@@ -24,6 +24,11 @@ if ($this_battle->battle_status == 'complete'){
     if (!empty($this_battle->flags['remove_on_complete'])){
         //error_log('Removing prototype battle '.$this_battle->battle_token.' from index', 0);
         rpg_battle::unset_index_info($this_battle->battle_token);
+        if (!empty($this_battle->values['multi_battle_tokens'])){
+            foreach ($this_battle->values['multi_battle_tokens'] AS $remove_battle_token){
+                rpg_battle::unset_index_info($remove_battle_token);
+            }
+        }
     }
 }
 

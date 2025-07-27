@@ -112,6 +112,7 @@ if (!empty($this_battle_token)){
         }
         $new_target_robots = array_slice($new_target_robots, 0, MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX);
         $this_battle_data['battle_target_player']['player_robots'] = $new_target_robots;
+        $this_battle_data['values']['multi_battle_tokens'] = $multi_battle_tokens;
         rpg_battle::update_index_info($this_battle_token, $this_battle_data);
         //error_log('new $this_battle_data = '.print_r($this_battle_data, true));
     }
