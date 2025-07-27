@@ -105,21 +105,6 @@ class mmrpgWorldMap {
         _elements.actionDropdown = $actionDropdown;
         if ($canvasMap.length && $mapLayers.length){
             //console.log('%c' + 'World map canvas found with ' + $mapLayers.length + ' layers...', 'color: orange;');
-            // Define the function to run when everything is done loading
-            let onWorldLoaded = function(){
-                let portals = _config.mapPortalsIndex || {};
-                _self.bindEventsToCanvas($canvasMap);
-                _self.bindEventsToWorld($thisWorld);
-                let startPosition = '1-1';
-                if (_config.mapStartPosition){ startPosition = _config.mapStartPosition; }
-                else if (portals['spawn']){ startPosition = portals['spawn'].join('-'); }
-                _self.moveToPosition(startPosition, null, true, false);
-                setTimeout(function(){
-                    $thisWorld.removeClass('hidden');
-                    $thisWorld.addClass('ready');
-                    $canvasMap.addClass('ready');
-                    }, 100);
-                };
             // Initialize the world map with the provided canvas and layers
             _self.initWorldMap($canvasMap, $mapLayers, function(){
                 //console.log('%c' + 'initWorldMap() complete!', 'color: cyan;');
@@ -131,45 +116,6 @@ class mmrpgWorldMap {
                 //console.log('---> _config.mapRows =', _config.mapRows);
                 //console.log('---> _config.mapWidth =', _config.mapWidth);
                 //console.log('---> _config.mapHeight =', _config.mapHeight);
-                // Loop through each map layer and generate graphics and/or interactivity
-                let layersPending = $mapLayers.length;
-                let reduceLayersPending = function(){
-                    layersPending--;
-                    if (!layersPending){ return onWorldLoaded(); }
-                    else { return true; }
-                    };
-                $mapLayers.each(function(index, element){
-                    //console.log('-> checking layer #' + index + '...');
-                    let $thisLayer = $(element);
-                    let layerToken = $thisLayer.attr('data-layer') || false;
-                    let $jsonScripts = $('script[data-json]', $thisLayer);
-                    let onLayerReady = function(){
-                        $thisLayer.addClass('ready');
-                        reduceLayersPending();
-                        return true;
-                        };
-                    if (layerToken === 'terrain'){
-                        _self.initMapLayerCanvas($thisLayer, onLayerReady);
-                        return true;
-                        }
-                    if ($jsonScripts.length > 0){
-                        //console.log('---> found ' + $jsonScripts.length + ' [data-json] scripts in layer #' + index + '!');
-                        $jsonScripts.each(function(index){
-                            //console.log('---> processing script[data-json] #' + index + '...');
-                            let $thisJson = $(this);
-                            let jsonKind = $thisJson.attr('data-json'), jsonData = $thisJson.html(), jsonObject = jsonData ? JSON.parse(jsonData) : false;
-                            if (!jsonData || !jsonData.length){ console.warn('---> JSON data for layer ' + layerToken + ' (script[data-json="'+jsonKind+'"]) was empty!'); return true; }
-                            if (!jsonObject || typeof jsonObject !== 'object' || !Object.keys(jsonObject).length){ console.error('---> unable to parse JSON data for layer ' + layerToken + ' (script[data-json="'+jsonKind+'"])!'); return true; }
-                            //console.log('---> parsed json layer data for ' + layerToken + ' (script[data-json="'+jsonKind+'"]) !!! jsonObject =', jsonObject);
-                            let configName = 'map' + jsonKind[0].toUpperCase() + jsonKind.slice(1);
-                            //console.log('---> setting _config.' + configName + ' =', jsonObject);
-                            _config[configName] = jsonObject;
-                            return true;
-                            });
-                        }
-                    onLayerReady();
-                    return true;
-                    });
                 });
             }
         return true;
@@ -184,6 +130,9 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
+        let $thisPrototype = _elements.mmrpg;
+        let $thisWorld = _elements.world;
+        // Collect the main json object for this world map and then parse it into the appropriate config values for the game
         let $mapJson = $('script[data-json]', $canvasMap).first(), mapJson = $mapJson.html(), mapData = mapJson ? JSON.parse(mapJson) : false;
         if (!mapData || typeof mapData !== 'object' || !Object.keys(mapData).length){ console.error('initWorldMap() unable to parse mapData!'); return false; }
         let mapToken = mapData.map_token || false;
@@ -223,6 +172,60 @@ class mmrpgWorldMap {
         _config.worldHeight = _elements.world.outerHeight();
         _config.canvasWidth = _elements.canvas.outerWidth();
         _config.canvasHeight = _elements.canvas.outerHeight();
+        // Define the function to run when everything is done loading
+        let onWorldLoaded = function(){
+            _self.bindEventsToCanvas($canvasMap);
+            _self.bindEventsToWorld($thisWorld);
+            let startPosition = '1-1';
+            if (_config.mapStartPosition){ startPosition = _config.mapStartPosition; }
+            else if (portalsIndex['spawn']){ startPosition = portalsIndex['spawn'].join('-'); }
+            _self.moveToPosition(startPosition, null, true, false);
+            setTimeout(function(){
+                $thisWorld.removeClass('hidden');
+                $thisWorld.addClass('ready');
+                $canvasMap.addClass('ready');
+                }, 100);
+            };
+        // Define the function for run when each layer is done being rendered
+        let layersPending = $mapLayers.length;
+        let reduceLayersPending = function(){
+            layersPending--;
+            if (!layersPending){ return onWorldLoaded(); }
+            else { return true; }
+            };
+        // Loop through each map layer and generate graphics and/or interactivity
+        $mapLayers.each(function(index, element){
+            //console.log('-> checking layer #' + index + '...');
+            let $thisLayer = $(element);
+            let layerToken = $thisLayer.attr('data-layer') || false;
+            let $jsonScripts = $('script[data-json]', $thisLayer);
+            let onLayerReady = function(){
+                $thisLayer.addClass('ready');
+                reduceLayersPending();
+                return true;
+                };
+            if (layerToken === 'terrain'){
+                _self.initMapLayerCanvas($thisLayer, onLayerReady);
+                return true;
+                }
+            if ($jsonScripts.length > 0){
+                //console.log('---> found ' + $jsonScripts.length + ' [data-json] scripts in layer #' + index + '!');
+                $jsonScripts.each(function(index){
+                    //console.log('---> processing script[data-json] #' + index + '...');
+                    let $thisJson = $(this);
+                    let jsonKind = $thisJson.attr('data-json'), jsonData = $thisJson.html(), jsonObject = jsonData ? JSON.parse(jsonData) : false;
+                    if (!jsonData || !jsonData.length){ console.warn('---> JSON data for layer ' + layerToken + ' (script[data-json="'+jsonKind+'"]) was empty!'); return true; }
+                    if (!jsonObject || typeof jsonObject !== 'object' || !Object.keys(jsonObject).length){ console.error('---> unable to parse JSON data for layer ' + layerToken + ' (script[data-json="'+jsonKind+'"])!'); return true; }
+                    //console.log('---> parsed json layer data for ' + layerToken + ' (script[data-json="'+jsonKind+'"]) !!! jsonObject =', jsonObject);
+                    let configName = 'map' + jsonKind[0].toUpperCase() + jsonKind.slice(1);
+                    //console.log('---> setting _config.' + configName + ' =', jsonObject);
+                    _config[configName] = jsonObject;
+                    return true;
+                    });
+                }
+            onLayerReady();
+            return true;
+            });
         // Return true on success or run the oncomplete callback
         if (typeof onComplete === 'function'){ return onComplete(); }
         else { return true; }
