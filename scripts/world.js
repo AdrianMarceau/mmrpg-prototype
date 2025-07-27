@@ -38,6 +38,7 @@ gameSettings.worldConfig = {
     worldHeight: 600, // default only
     canvasWidth: 800, // default only
     canvasHeight: 600, // default only
+    allowWorldEvents: false, // default until user interaction
     };
 gameSettings.worldElements = {
     mmrpg: null,
@@ -65,7 +66,7 @@ class mmrpgWorldMap {
 
     // Constructor function for the world map
     constructor($mmrpg){
-        //console.log('%c' + 'mmrpgWorldMap() constructor called!', 'color: green;');
+        //console.log('%c' + 'mmrpgWorldMap() constructor', 'color: green;');
         let _self = this;
         _self.config = gameSettings.worldConfig;
         _self.elements = gameSettings.worldElements;
@@ -75,7 +76,7 @@ class mmrpgWorldMap {
 
     // Quick function to initialize world map variables
     initWorld($mmrpg){
-        //console.log('%c' + 'mmrpgWorldMap.initWorld() called!', 'color: green;');
+        //console.log('%c' + 'mmrpgWorldMap.initWorld()', 'color: green;');
         let _self = this;
         let _config = _self.config;
         let _elements = _self.elements;
@@ -107,7 +108,7 @@ class mmrpgWorldMap {
             //console.log('%c' + 'World map canvas found with ' + $mapLayers.length + ' layers...', 'color: orange;');
             // Initialize the world map with the provided canvas and layers
             _self.initWorldMap($canvasMap, $mapLayers, function(){
-                //console.log('%c' + 'initWorldMap() complete!', 'color: cyan;');
+                console.log('%c' + 'initWorldMap() complete!', 'color: green;');
                 //console.log('---> _config.mapToken =', _config.mapToken);
                 //console.log('---> _config.mapSize =', _config.mapSize);
                 //console.log('---> _config.mapTileSize =', _config.mapTileSize);
@@ -116,6 +117,17 @@ class mmrpgWorldMap {
                 //console.log('---> _config.mapRows =', _config.mapRows);
                 //console.log('---> _config.mapWidth =', _config.mapWidth);
                 //console.log('---> _config.mapHeight =', _config.mapHeight);
+                // ...
+                //console.log('%c' + 'time to calculate all walkable tiles', 'color: orange;');
+                    //let walkableMapTiles = _self.calculateWalkableMapTiles(true, true, true);
+                    //console.log('%c' + 'walkableMapTiles =', 'color: orange;', walkableMapTiles);
+                //console.log('%c' + 'time to filter walkable tiles by ones within range', 'color: orange;');
+                    //let targetPosition = _worldCursor.position || '1-1';
+                    //let walkableTilesRange = 3; // TODO: make this dynamic per player
+                    //let walkableTilesWithinRange = _self.calculateTilesWithinRange(walkableMapTiles, targetPosition, walkableTilesRange);
+                    //console.log('%c' + 'walkableTilesWithinRange =', 'color: orange;', walkableTilesWithinRange);
+                //console.log('%c' + 'time to highlight tiles within reach using the hover effect', 'color: #cacaca; text-decoration: line-through;');
+                // ...
                 });
             }
         return true;
@@ -123,7 +135,7 @@ class mmrpgWorldMap {
 
     // Quick function for parsing the canvas data in a map layer
     initWorldMap($canvasMap, $mapLayers, onComplete){
-        //console.log('%c' + 'initWorldMap($canvasMap:' + typeof $canvasMap + ', $mapLayers:' + typeof $mapLayers + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.initWorldMap($canvasMap:' + typeof $canvasMap + ', $mapLayers:' + typeof $mapLayers + ')', 'color: magenta;');
         if (!$canvasMap || !$canvasMap.length){ console.error('initWorldMap() missing required $canvasMap!'); return false; }
         if (!$mapLayers || !$mapLayers.length){ console.error('initWorldMap() missing required $mapLayers!'); return false; }
         let _self = this;
@@ -184,6 +196,7 @@ class mmrpgWorldMap {
                 $thisWorld.removeClass('hidden');
                 $thisWorld.addClass('ready');
                 $canvasMap.addClass('ready');
+                _config.allowWorldEvents = true;
                 }, 100);
             };
         // Define the function for run when each layer is done being rendered
@@ -233,7 +246,7 @@ class mmrpgWorldMap {
 
     // Quick function for parsing the canvas data in a map layer
     initMapLayerCanvas($thisLayer, onComplete){
-        //console.log('%c' + 'initMapLayerCanvas($thisLayer:' + typeof $thisLayer + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.initMapLayerCanvas($thisLayer:' + typeof $thisLayer + ')', 'color: magenta;');
         if (!$thisLayer || !$thisLayer.length){ console.error('initMapLayerCanvas() missing required $thisLayer!'); return false; }
         if (!$('canvas', $thisLayer).length){ console.error('initMapLayerCanvas() $thisLayer missing required <canvas>!'); return false; }
         if (!$('script[data-json]', $thisLayer).length){ console.error('initMapLayerCanvas() $thisLayer missing required <script data-json>!'); return false; }
@@ -262,7 +275,6 @@ class mmrpgWorldMap {
             }
         let onLoadSuccess = function(){
             //console.log('%c' + '----> canvas image loaded successfully!', 'color: cyan;');
-            _self.indexCanvasTileData(layerToken, spriteSheet, canvasTiles);
             _self.drawTilesToCanvas(layerToken);
             if (typeof onComplete === 'function'){ onComplete(); }
             return true;
@@ -270,13 +282,14 @@ class mmrpgWorldMap {
         spriteSheet.onerror = function(){ return onLoadError(); }
         spriteSheet.onload = function(){ return onLoadSuccess(); };
         //console.log('%c' + '---> loading sprite sheet image from ' + mapImage, 'color: cyan;');
+        _self.indexCanvasTileData(layerToken, spriteSheet, canvasTiles);
         spriteSheet.src = mapImage;
         return true;
         }
 
     // Quick function for drawing tiles to a given canvas object
     indexCanvasTileData(layerToken, spriteSheet, canvasTiles){
-        //console.log('%c' + '~indexCanvasTileData(layerToken:' + layerToken + ', spriteSheet:' + typeof spriteSheet + ', canvasTiles:' + typeof canvasTiles + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.indexCanvasTileData(layerToken:' + layerToken + ', spriteSheet:' + typeof spriteSheet + ', canvasTiles:' + typeof canvasTiles + ')', 'color: magenta;');
         if (!layerToken || !spriteSheet || !canvasTiles){ console.error('indexCanvasTileData() missing required parameters!', {layerToken, spriteSheet, canvasTiles}); return false; }
         if (typeof canvasTiles !== 'object' || !Object.keys(canvasTiles).length){ console.error('indexCanvasTileData() required canvasTiles missing or malformed!'); return false; }
         let _self = this;
@@ -334,7 +347,7 @@ class mmrpgWorldMap {
 
     // Quick function for drawing tiles to a given layer's canvas object
     drawTilesToCanvas(layerToken){
-        //console.log('%c' + '~drawTilesToCanvas(layerToken:' + layerToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.drawTilesToCanvas(layerToken:' + layerToken + ')', 'color: magenta;');
         if (!layerToken || typeof layerToken !== 'string'){ console.error('drawTilesToCanvas() missing required layerToken!'); return false; }
         let _self = this;
         let _config = _self.config;
@@ -362,9 +375,105 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Quick function to calculate all the walkable tile positions for this map given
+    // its base properties (size, terrain) and current conditions (player, enemy placement)
+    calculateWalkableMapTiles(excludePlayer, excludeBattles, forceRefresh){
+        console.log('%c' + 'mmrpgWorldMap.calculateWalkableMapTiles()', 'color: magenta;');
+        excludePlayer = typeof excludePlayer === 'boolean' ? excludePlayer : true;
+        excludeBattles = typeof excludeBattles === 'boolean' ? excludeBattles : true;
+        forceRefresh = typeof forceRefresh === 'boolean' ? forceRefresh : false;
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let mapCols = _config.mapCols;
+        let mapRows = _config.mapRows;
+        let mapTileSize = _config.mapTileSize;
+        let mapTilesIndex = _config.mapTilesIndex;
+        let layerTilesIndex = _world.layerTilesIndex;
+        let layerTilesKeys = Object.keys(layerTilesIndex);
+        let portalsIndex = _config.mapPortalsIndex || {};
+        //console.log('---> mapCols =', mapCols);
+        //console.log('---> mapRows =', mapRows);
+        //console.log('---> mapTileSize =', mapTileSize);
+        //console.log('---> mapTilesIndex =', mapTilesIndex);
+        //console.log('---> layerTilesIndex =', layerTilesIndex);
+        //console.log('---> layerTilesKeys =', layerTilesKeys);
+
+        // Collect the walkable tiles from the world state if already exist, else create
+        let walkableMapTiles = _world.walkableMapTiles || [];
+        if (!walkableMapTiles || forceRefresh){
+
+            // Loop through each column and row to generate the tile positions
+            let baseMapTileKeys = [];
+            for (let col = 1; col <= mapCols; col++){
+                for (let row = 1; row <= mapRows; row++){
+                    let tileKey = col + '-' + row;
+                    baseMapTileKeys.push(tileKey);
+                }
+            }
+            //console.log('---> baseMapTileKeys =', baseMapTileKeys);
+
+            // Now filter out the ones that have their walkable flag set to false on the terrain layer
+            walkableMapTiles = [];
+            let terrainTilesIndex = layerTilesIndex['terrain'];
+            if (baseMapTileKeys && terrainTilesIndex){
+                //console.log('---> terrainTilesIndex =', terrainTilesIndex);
+                for (let i = 0; i < baseMapTileKeys.length; i++){
+                    let tileKey = baseMapTileKeys[i];
+                    let tileData = terrainTilesIndex[tileKey] || false;
+                    //console.log('---> checking tileKey:', tileKey, 'w/ tileData:', tileData);
+                    if (!tileData){ continue; }
+                    if (!tileData.walkable){ continue; }
+                    walkableMapTiles.push(tileKey);
+                    }
+                }
+            //console.log('---> walkableMapTiles =', walkableMapTiles);
+            _world.walkableMapTiles = walkableMapTiles;
+
+            }
+
+        console.log('---> walkableMapTiles (base) =', walkableMapTiles);
+
+        // If we are to exclude the player (cursor), make sure we  remove that position
+        let playerPosition = '1-1';
+        if (_config.mapStartPosition){ playerPosition = _config.mapStartPosition; }
+        else if (portalsIndex['spawn']){ playerPosition = portalsIndex['spawn'].join('-'); }
+        if (excludePlayer && playerPosition){
+            //console.log('---> excluding player position:', playerPosition);
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
+                return tileKey !== playerPosition;
+                });
+            console.log('---> walkableMapTiles after player exclusions =', walkableMapTiles);
+            }
+
+        // If we are to exclude the enemies, make sure we remove those positions
+        // battleSymbols is object like { "1-1":"battle-token-foo","2-2":"battle-token-bar", [...] }
+        let battleSymbols = _config.mapBattleSymbols;
+        let battleSymbolsKeys = Object.keys(battleSymbols);
+        if (excludeBattles && battleSymbols){
+            //console.log('---> excluding enemies positions:', battleSymbolsKeys);
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
+                return !battleSymbolsKeys.includes(tileKey);
+                });
+            console.log('---> walkableMapTiles after battle exclusions =', walkableMapTiles);
+            }
+
+        // Return the walkable map tiles
+        return walkableMapTiles;
+
+        }
+
+    // Quick function for narrowing down a list of walkable map tiles to only those that
+    // fall within the given range of the supplied target position
+    calculateTilesWithinRange(walkableMapTiles, targetPosition, walkableTilesRange){
+        //console.log('%c' + 'mmrpgWorldMap.calculateTilesWithinRange()', 'color: magenta;');
+
+        }
+
     // Quick function for calculating the column and row of a tile at a given pixel position
     getTileAtPosition($overlay, xPos, yPos, applyOffset){
-        //console.log('%c' + 'getTileAtPosition(' + xPos + ', ' + yPos + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getTileAtPosition(' + xPos + ', ' + yPos + ')', 'color: magenta;');
         applyOffset = typeof applyOffset === 'boolean' ? applyOffset : true;
         xPos = xPos > 0 ? parseInt(xPos) : 0, yPos = yPos > 0 ? parseInt(yPos) : 0;
         let _self = this;
@@ -381,7 +490,7 @@ class mmrpgWorldMap {
 
     // Quick function for calculating the relative difference between two positions
     getPositionRelative(position1, position2){
-        //console.log('%c' + 'getPositionRelative(position1:' + position1 + ', position2:' + position2 + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getPositionRelative(position1:' + position1 + ', position2:' + position2 + ')', 'color: magenta;');
         if (typeof position1 !== 'string' && !Array.isArray(position1)){ console.error('getPositionRelative() missing required position1!'); return false; }
         if (typeof position2 !== 'string' && !Array.isArray(position2)){ console.error('getPositionRelative() missing required position2!'); return false; }
         position1 = typeof position1 === 'string' ? position1.split('-') : position1;
@@ -392,7 +501,7 @@ class mmrpgWorldMap {
 
     // Quick function for getting a given layer tile's index data provided the layer token and tile key
     getLayerTileIndexData(layerToken, tileKey){
-        //console.log('%c' + '~getLayerTileIndexData(layerToken:' + layerToken + ', tileKey:' + tileKey + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getLayerTileIndexData(layerToken:' + layerToken + ', tileKey:' + tileKey + ')', 'color: magenta;');
         if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ console.error('getLayerTileIndexData() missing required layerToken!'); return false; }
         if (!tileKey || typeof tileKey !== 'string' || !tileKey.length){ console.error('getLayerTileIndexData() missing required tileKey!'); return false; }
         let _self = this;
@@ -409,7 +518,7 @@ class mmrpgWorldMap {
 
     // Quick function for getting a given layer tile's sprite data (the one with the offset, size, etc.) provided the layer token and tile token
     getLayerTileSpriteData(layerToken, tileToken){
-        //console.log('%c' + '~getLayerTileSpriteData(layerToken:' + layerToken + ', tileToken:' + tileToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getLayerTileSpriteData(layerToken:' + layerToken + ', tileToken:' + tileToken + ')', 'color: magenta;');
         if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ console.error('getLayerTileSpriteData() missing required layerToken!'); return false; }
         if (!tileToken || typeof tileToken !== 'string' || !tileToken.length){ console.error('getLayerTileSpriteData() missing required tileToken!'); return false; }
         let _self = this;
@@ -429,7 +538,7 @@ class mmrpgWorldMap {
 
     // Quick function for getting a given tile's data (the one with the offset, size, etc.) provided the tile token
     getTileData(tileToken){
-        //console.log('%c' + '~getTileData(tileToken:' + tileToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getTileData(tileToken:' + tileToken + ')', 'color: magenta;');
         if (!tileToken || typeof tileToken !== 'string' || !tileToken.length){ console.error('getTileData() missing required tileToken!'); return false; }
         let _self = this;
         let _config = _self.config;
@@ -441,7 +550,7 @@ class mmrpgWorldMap {
 
     // Quick function for getting a given sprite's data (the one with the offset, size, etc.) provided the sprite token
     getSpriteData(spriteToken){
-        //console.log('%c' + '~getSpriteData(spriteToken:' + spriteToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getSpriteData(spriteToken:' + spriteToken + ')', 'color: magenta;');
         if (!spriteToken || typeof spriteToken !== 'string' || !spriteToken.length){ console.error('getSpriteData() missing required spriteToken!'); return false; }
         let _self = this;
         let _config = _self.config;
@@ -453,7 +562,7 @@ class mmrpgWorldMap {
 
     // Quick function for getting a given portal's data (the one with the offset, size, etc.) provided the portal token
     getPortalData(portalToken){
-        //console.log('%c' + '~getPortalData(portalToken:' + portalToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getPortalData(portalToken:' + portalToken + ')', 'color: magenta;');
         if (!portalToken || typeof portalToken !== 'string' || !portalToken.length){ console.error('getPortalData() missing required portalToken!'); return false; }
         let _self = this;
         let _config = _self.config;
@@ -465,7 +574,7 @@ class mmrpgWorldMap {
 
     // Quick function for drawing a single tile to a given layer's canvas object given data
     drawTileToCanvas(layerToken, ctx, spriteSheet, tileKey, tileData){
-        //console.log('%c' + '~drawTileToCanvas(layerToken:' + layerToken + ', ctx, spriteSheet, tileKey:' + tileKey + ', tileData:' + typeof tileData + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.drawTileToCanvas(layerToken:' + layerToken + ', ctx, spriteSheet, tileKey:' + tileKey + ', tileData:' + typeof tileData + ')', 'color: magenta;');
         let _self = this;
         let _config = _self.config;
         let _world = _self.state;
@@ -538,7 +647,7 @@ class mmrpgWorldMap {
 
     // Quick functions for updating any canvas map layer tiles that have changed properties
     refreshCanvasTiles(layerToken){
-        //console.log('%c' + '~refreshCanvasTiles(layerToken:' + layerToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.refreshCanvasTiles(layerToken:' + layerToken + ')', 'color: magenta;');
         if (!layerToken || typeof layerToken !== 'string'){ console.error('refreshCanvasTiles() missing required layerToken!'); return false; }
         let _self = this;
         if (_self.refreshCanvasTiles._scheduled){ return; }
@@ -550,7 +659,7 @@ class mmrpgWorldMap {
         return;
         }
     refreshCanvasTilesForReal(layerToken) {
-        //console.log('%c' + '~refreshCanvasTilesForReal(layerToken:' + layerToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.refreshCanvasTilesForReal(layerToken:' + layerToken + ')', 'color: magenta;');
         let _self = this;
         let _config = _self.config;
         let _elements = _self.elements;
@@ -580,7 +689,7 @@ class mmrpgWorldMap {
 
     // Quick function for applying a "focus" effect to a given layer tile
     focusLayerTile(layerToken, tilePosition){
-        //console.log('%c' + 'focusLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.focusLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
         if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
         if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
         let _self = this;
@@ -596,7 +705,7 @@ class mmrpgWorldMap {
 
     // Quick function for renmoving a "focus" effect from a given layer tile
     unfocusLayerTile(layerToken, tilePosition){
-        //console.log('%c' + 'unfocusLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.unfocusLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
         if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
         if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
         let _self = this;
@@ -610,7 +719,7 @@ class mmrpgWorldMap {
 
     // Quick function for applying a "hover" effect to a given layer tile
     hoverLayerTile(layerToken, tilePosition){
-        //console.log('%c' + 'hoverLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.hoverLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
         if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
         if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
         let _self = this;
@@ -624,7 +733,7 @@ class mmrpgWorldMap {
 
     // Quick function for removing a "hover" effect from a given layer tile
     unhoverLayerTile(layerToken, tilePosition){
-        //console.log('%c' + 'unhoverLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.unhoverLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
         if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
         if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
         let _self = this;
@@ -638,7 +747,7 @@ class mmrpgWorldMap {
 
     // Quick function for binding events to a given layer's canvas object
     bindEventsToCanvas($canvasMap){
-        //console.log('%c' + '~bindEventsToCanvas($canvasMap:' + typeof $canvasMap + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.bindEventsToCanvas($canvasMap:' + typeof $canvasMap + ')', 'color: magenta;');
         if (!$canvasMap || !$canvasMap.length){ console.error('bindEventsToCanvas() missing required $canvasMap!'); return false; }
         let _self = this;
         let _config = _self.config;
@@ -708,7 +817,7 @@ class mmrpgWorldMap {
 
     // Quick function for binding events to the main world object
     bindEventsToWorld($thisWorld){
-        //console.log('%c' + '~bindEventsToWorld($thisWorld:' + typeof $thisWorld + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.bindEventsToWorld($thisWorld:' + typeof $thisWorld + ')', 'color: magenta;');
         if (!$thisWorld || !$thisWorld.length){ console.error('bindEventsToWorld() missing required $thisWorld!'); return false; }
         let _self = this;
         let _config = _self.config;
@@ -759,7 +868,7 @@ class mmrpgWorldMap {
 
     // Quick function for moving cursor to a given map position
     moveToPosition(newPosition, onComplete, forceMove, animateMove){
-        //console.log('%c' + 'moveToPosition(' + newPosition + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.moveToPosition(' + newPosition + ')', 'color: magenta;');
         if (!newPosition || typeof newPosition === 'undefined'){ console.error('newPosition is undefined!'); return false; }
         else if (typeof newPosition !== 'string' || !newPosition.match(/^[0-9]+\-[0-9]+$/)){ console.error('newPosition is invalid!', newPosition); return false; }
         else { newPosition = newPosition.split('-'); }
@@ -900,7 +1009,7 @@ class mmrpgWorldMap {
 
     // Quick function for running post-update checks and actions after moving the cursor
     async updateMapPosition(){
-        //console.log('%c' + 'updateMapPosition()', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.updateMapPosition()', 'color: magenta;');
         let _self = this;
         let _config = _self.config;
         let _elements = _self.elements;
@@ -960,6 +1069,9 @@ class mmrpgWorldMap {
         setTimeout(function(){ $('.sprite', $eventsLayers).removeClass('zoom'); }, 100);
         //$('.sprite', $zoomLayer).removeClass('zoom');
 
+        // If the player has not moved from their spawn position yet, we should not do anything further
+        if (!_config.allowWorldEvents){ return true; }
+
         // Search for events at the new position so we can show the action dropdown if needed
         //console.log('-> checking if there are any events for this position...');
         let $eventsAtPosition = _self.getEventsAtPosition(newPosition);
@@ -978,6 +1090,7 @@ class mmrpgWorldMap {
         var autoRedirect = false;
         var autoRedirectURL = '';
         if ($eventsAtPosition[0].is('[data-portal]')){
+            //console.log('-> event at position is a portal, preparing dropdown');
             // If the cursor is literally on a portal, only one event sprite matters right now
             let $eventAtPosition = $eventsAtPosition[0];
             var dataLabel = $eventAtPosition.attr('data-label');
@@ -992,9 +1105,10 @@ class mmrpgWorldMap {
                 showDropdownType = 'portal';
                 zoomTimeoutDuration = 500; // if we show a portal dropdown, we want to zoom in quickly
                 // Automatically redirect to this portal (temp maybe?) TODO: review this in the future
-                console.log('-> entering portal with name ' + dataPortal + '!');
+                //console.log('-> entering portal with name ' + dataPortal + '!');
                 if (dataPortal === 'spawn'){
                     // TODO: make the spawn actually go somewhere specific ?
+                    console.warn('-> spawn portals not yet implemented yet');
                     } else if (dataPortal === 'exit'){
                     // TODO: make the exit actually go somewhere specific ?
                     autoRedirect = true;
@@ -1061,7 +1175,7 @@ class mmrpgWorldMap {
 
         // Define an inline function to redirect to the portal if needed
         let redirectToLocation = function(){
-            console.log('%c' + 'redirectToLocation() called!', 'color: cyan;');
+            //console.log('%c' + 'redirectToLocation()', 'color: cyan;');
             $thisWorld.addClass('hidden');
             window.location.href = autoRedirectURL;
             return true;
@@ -1227,7 +1341,7 @@ class mmrpgWorldMap {
 
     // Quick function that, given a column and row returns any events on or around that position on the map
     getEventsAtPosition(searchPosition, searchRadius){
-        //console.log('%c' + 'getEventsAtPosition(searchPosition:' + searchPosition + ', searchRadius:' + searchRadius + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getEventsAtPosition(searchPosition:' + searchPosition + ', searchRadius:' + searchRadius + ')', 'color: magenta;');
         if (!searchPosition || (typeof searchPosition !== 'string' && !Array.isArray(searchPosition))){ console.error('getEventsAtPosition() missing or invalid searchPosition!'); return false; }
         searchPosition = typeof searchPosition !== 'string' ? searchPosition.join('-') : searchPosition; // join if provided as array
         searchRadius = typeof searchRadius === 'number' ? searchRadius : 1; // default to one if not provided
@@ -1275,7 +1389,7 @@ class mmrpgWorldMap {
 
     // Quick function for sending a snapshot of persistent world values back to the server for saving
     saveWorldState(){
-        //console.log('%c' + 'saveWorldState()', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.saveWorldState()', 'color: magenta;');
         let _self = this;
         if (_self.saveWorldState._scheduled){ return; }
         _self.saveWorldState._scheduled = true;
@@ -1286,7 +1400,7 @@ class mmrpgWorldMap {
         return;
         }
     saveWorldStateForReal(){
-        //console.log('%c' + 'saveWorldStateForReal()', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.saveWorldStateForReal()', 'color: magenta;');
         let _self = this;
         let _config = _self.config;
         let _world = _self.state;

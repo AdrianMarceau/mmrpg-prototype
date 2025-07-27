@@ -189,7 +189,8 @@ function loadMapData($map_token){
     $map_autocols = strlen($map_data_layers[0][0]);
     $map_autorows = count($map_data_layers[0]);
     $map_tiles_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
-    $map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
+    $map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)(,[-_a-z0-9,]+)?\)$/i'; // syntax: name(x,y[,flag1,flag2,etc.]) ie. spawn(4,4) or spawn(4,4,other-area-2) => name:spawn, x:4, y:4
+    //$map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
     static $map_custval_parser;
     if (!$map_custval_parser){
         $map_custval_parser = function($raw_tiles, $include_keys = false) use ($map_tiles_custval_regex, $map_other_custval_regex){
@@ -203,14 +204,19 @@ function loadMapData($map_token){
                 $is_other_custval = preg_match($map_other_custval_regex, $line);
                 if (!$is_tile_custval && !$is_other_custval){ continue; }
                 if ($is_tile_custval){
-                    list($name, $k, $x, $y) = explode('/', preg_replace($map_tiles_custval_regex, '$1/$2/$3/$4', $line), 4);
+                    $exploded = explode('/', preg_replace($map_tiles_custval_regex, '$1/$2/$3/$4', $line), 4);
+                    //error_log('tile $exploded ='.print_r($exploded, true));
+                    list($name, $k, $x, $y) = $exploded;
                     $parsed_tiles[$name] = array($x, $y);
                     $parsed_keys[intval($k)] = $name;
                     continue;
                     }
                 if ($is_other_custval){
-                    list($name, $x, $y) = explode('/', preg_replace($map_other_custval_regex, '$1/$2/$3', $line), 3);
+                    $exploded = explode('/', preg_replace($map_other_custval_regex, '$1/$2/$3/$4', $line), 4);
+                    //error_log('other $exploded ='.print_r($exploded, true));
+                    list($name, $x, $y) = $exploded;
                     $parsed_tiles[$name] = array($x, $y);
+                    if (!empty($exploded[3])){ $parsed_tiles[$name] = array_merge($parsed_tiles[$name], explode(',', trim($exploded[3], ','))); }
                     continue;
                     }
                 }
@@ -588,10 +594,13 @@ $flag_skip_fadein = true;
                             list($col, $row) = explode('-', $pos);
                             $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                             $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                            $hidden = in_array('hidden', $portal_data) ? true : false;
+                            if ($hidden){ continue; }
                             $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucfirst($portal_name));
                             $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                            $classes = 'sprite tile portal'.($portal_name !== 'spawn' ? ' pulse' : '').($hidden ? ' hidden' : '');
                             $style = 'top: '.$top.'px; left: '.$left.'px;';
-                            echo('<span class="sprite tile portal pulse" '.$attrs.' style="'.$style.'"></span>'.PHP_EOL);
+                            echo('<span class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>'.PHP_EOL);
                         }
                     }
 
