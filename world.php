@@ -99,8 +99,9 @@ $get_xkind = function($kind){
 $get_randpos = function($available_encounter_cells){
     static $used;
     if (!$used){ $used = array(); }
-    if (empty($available_encounter_cells)){ return false; }
-    do { $pos = $available_encounter_cells[mt_rand(0, count($available_encounter_cells) - 1)]; } while (in_array($pos, $used));
+    $available = array_values(array_diff($available_encounter_cells, $used));
+    if (empty($available)){ return false; }
+    $pos = $available[mt_rand(0, count($available) - 1)];
     $used[] = $pos;
     return $pos;
     };
@@ -190,10 +191,11 @@ function loadMapData($map_token){
     $map_autorows = count($map_data_layers[0]);
     $map_tiles_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
     $map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)(,[-_a-z0-9,]+)?\)$/i'; // syntax: name(x,y[,flag1,flag2,etc.]) ie. spawn(4,4) or spawn(4,4,other-area-2) => name:spawn, x:4, y:4
+    $map_listval_custval_regex = '/^([.a-z0-9-_]+)\(([,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
     //$map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
     static $map_custval_parser;
     if (!$map_custval_parser){
-        $map_custval_parser = function($raw_tiles, $include_keys = false) use ($map_tiles_custval_regex, $map_other_custval_regex){
+        $map_custval_parser = function($raw_tiles, $include_keys = false) use ($map_tiles_custval_regex, $map_other_custval_regex, $map_listval_custval_regex){
             if (empty($raw_tiles)){ return array(); }
             $parsed_keys = array();
             $parsed_tiles = array();
@@ -202,7 +204,8 @@ function loadMapData($map_token){
                 if (empty($line)){ continue; }
                 $is_tile_custval = preg_match($map_tiles_custval_regex, $line);
                 $is_other_custval = preg_match($map_other_custval_regex, $line);
-                if (!$is_tile_custval && !$is_other_custval){ continue; }
+                $is_listval_custval = preg_match($map_listval_custval_regex, $line);
+                if (!$is_tile_custval && !$is_other_custval && !$is_listval_custval){ continue; }
                 if ($is_tile_custval){
                     $exploded = explode('/', preg_replace($map_tiles_custval_regex, '$1/$2/$3/$4', $line), 4);
                     //error_log('tile $exploded ='.print_r($exploded, true));
@@ -219,18 +222,28 @@ function loadMapData($map_token){
                     if (!empty($exploded[3])){ $parsed_tiles[$name] = array_merge($parsed_tiles[$name], explode(',', trim($exploded[3], ','))); }
                     continue;
                     }
+                if ($is_listval_custval){
+                    $exploded = explode('/', preg_replace($map_listval_custval_regex, '$1/$2', $line), 2);
+                    //error_log('list $exploded ='.print_r($exploded, true));
+                    list($name, $tokens) = $exploded;
+                    $tokens = explode(',', $tokens);
+                    if (empty($tokens) || count($tokens) < 1){ continue; }
+                    foreach ($tokens AS $token){ if (empty($token)){ continue; } $parsed_tiles[$name][] = trim($token, ','); }
+                    continue;
+                    }
                 }
             if ($include_keys){ $parsed_tiles['keys'] = $parsed_keys; }
             return $parsed_tiles;
             };
         }
-    //error_log('raw $map_data_vars = '.print_r($map_data_vars, true));
+    //error_log('raw $map_data_vars(before) = '.print_r($map_data_vars, true));
     $map_data_vars['token'] = isset($map_data_vars['token']) ? $map_data_vars['token'] : '';
     $map_data_vars['name'] = isset($map_data_vars['name']) ? $map_data_vars['name'] : '';
     $map_data_vars['size'] = isset($map_data_vars['size']) ? $map_data_vars['size'] : '';
     $map_data_vars['sheet'] = isset($map_data_vars['sheet']) ? $map_data_vars['sheet'] : '';
     $map_data_vars['field'] = isset($map_data_vars['field']) ? $map_data_vars['field'] : '';
     $map_data_vars['mechas'] = isset($map_data_vars['mechas']) ? $map_data_vars['mechas'] : array();
+    $map_data_vars['habitats'] = isset($map_data_vars['habitats']) ? $map_data_vars['habitats'] : array();
     $map_data_vars['tiles'] = isset($map_data_vars['tiles']) ? $map_data_vars['tiles'] : array();
     $map_data_vars['sprites'] = isset($map_data_vars['sprites']) ? $map_data_vars['sprites'] : array();
     $map_data_vars['portals'] = isset($map_data_vars['portals']) ? $map_data_vars['portals'] : array();
@@ -244,12 +257,14 @@ function loadMapData($map_token){
     if (!isset($map_data_vars['size'][1])){ $map_data_vars['size'][1] = $map_autorows; }
     if (!isset($map_data_vars['size'][2])){ $map_data_vars['size'][2] = $map_tilesize; }
     if (!empty($map_data_vars['mechas'])){ $map_data_vars['mechas'] = explode(',', str_replace(' ', '', $map_data_vars['mechas'])); }
-    if (empty($map_data_vars['tiles'])){ $map_data_vars['tiles'][] = 'undefined(0,0)'; }
-    if (empty($map_data_vars['sprites'])){ $map_data_vars['sprites'][] = 'undefined(0,0)'; }
-    if (empty($map_data_vars['portals'])){ $map_data_vars['portals'][] = 'undefined(0,0)'; }
+    if (empty($map_data_vars['habitats'])){ $map_data_vars['habitats'] = ''; }
+    if (empty($map_data_vars['tiles'])){ $map_data_vars['tiles'][] = ''; }
+    if (empty($map_data_vars['sprites'])){ $map_data_vars['sprites'][] = ''; }
+    if (empty($map_data_vars['portals'])){ $map_data_vars['portals'][] = ''; }
     $map_data_vars['tiles'] = $map_custval_parser($map_data_vars['tiles'], true);
     $map_data_vars['sprites'] = $map_custval_parser($map_data_vars['sprites']);
     $map_data_vars['portals'] = $map_custval_parser($map_data_vars['portals']);
+    $map_data_vars['habitats'] = $map_custval_parser($map_data_vars['habitats']);
     // Add collected data to the parsed map data
     $map_data_parsed = array();
     $map_data_parsed['token'] = $map_data_vars['token']; unset($map_data_vars['token']);
@@ -258,6 +273,7 @@ function loadMapData($map_token){
     $map_data_parsed['sheet'] = $map_data_vars['sheet']; unset($map_data_vars['sheet']);
     $map_data_parsed['field'] = $map_data_vars['field']; unset($map_data_vars['field']);
     $map_data_parsed['mechas'] = $map_data_vars['mechas']; unset($map_data_vars['mechas']);
+    $map_data_parsed['habitats'] = $map_data_vars['habitats']; unset($map_data_vars['habitats']);
     $map_data_parsed['tiles'] = $map_data_vars['tiles']; unset($map_data_vars['tiles']);
     $map_data_parsed['sprites'] = $map_data_vars['sprites']; unset($map_data_vars['sprites']);
     $map_data_parsed['portals'] = $map_data_vars['portals']; unset($map_data_vars['portals']);
@@ -277,7 +293,6 @@ function getMapEncounterCells($map_data){
     for ($row = 1; $row <= $map_row_size; $row++){
         for ($col = 1; $col <= $map_col_size; $col++){
             $pos = $col.'-'.$row;
-            if (isset($available_cells[$pos])){ continue; }
             $available_cells[$pos] = true;
         }
     }
@@ -295,6 +310,7 @@ function getMapEncounterCells($map_data){
         }
     }
     // Then we through all the tiles and remove any that are unwalkable "void" type
+    $by_terrain = array();
     if (!empty($map_data['tiles']) && !empty($map_data['tiles']['keys']) && !empty($map_data['layers'])){
         $tilesIndex = $map_data['tiles']['keys'];
         $tileLayers = $map_data['layers'];
@@ -303,13 +319,22 @@ function getMapEncounterCells($map_data){
                 $row_tiles = strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles);
                 $row_tiles = array_map('intval', $row_tiles);
                 foreach ($row_tiles AS $col_key => $tile_key){
+                    $pos = ($col_key + 1).'-'.($row_key + 1);
+                    if (!isset($available_cells[$pos])){ continue; }
                     if (!isset($tilesIndex[$tile_key])){ continue; }
                     $tile_token = $tilesIndex[$tile_key];
                     // If this tile is a "void" type, remove it from the available cells
                     if ($tile_token === 'void' || strstr($tile_token, 'void')){
-                        $pos = ($col_key + 1).'-'.($row_key + 1);
                         //error_log('-> removing tile position "'.$pos.'" from available cells (tile: '.$tile_token.')');
                         unset($available_cells[$pos]);
+                    }
+                    // Otherwise we should add it to the appropriate array in the by_terrain list
+                    else {
+                        list($tile_token_clean) = strstr($tile_token, '-') ? explode('-', $tile_token) : array($tile_token);
+                        //error_log('-> adding tile position "'.$pos.'" to by_terrain["'.$tile_token_clean.'"] (tile: '.$tile_token.')');
+                        if (!isset($by_terrain[$tile_token_clean])){ $by_terrain[$tile_token_clean] = array(); }
+                        $by_terrain[$tile_token_clean][] = $pos;
+                        //error_log('-> adding tile position "'.$pos.'" to by_terrain["'.$tile_token.'"]');
                     }
                 }
             }
@@ -317,8 +342,14 @@ function getMapEncounterCells($map_data){
     }
     // Return the available cells as an array of positions
     $available_cells = array_keys($available_cells);
+    $total = count($available_cells);
     //error_log('$available_cells('.count($available_cells).') = '.print_r($available_cells, true));
-    return $available_cells;
+    //error_log('$by_terrain('.count($by_terrain).') = '.print_r($by_terrain, true));
+    return array(
+        'all' => $available_cells,
+        'by_terrain' => $by_terrain,
+        'total' => $total
+        );
 }
 
 // Define or collect the prototype data for the player, their robots, etc.
@@ -386,7 +417,19 @@ $map_data_parsed = loadMapData($map_token);
 
 // Collect the map's field token and mecha encounters
 $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
+$map_field_info = !empty($mmrpg_index_fields[$map_field_token]) ? $mmrpg_index_fields[$map_field_token] : array();
+$map_field_background = !empty($map_field_info['field_background']) ? $map_field_info['field_background'] : 'field';
+$map_field_foreground = !empty($map_field_info['field_foreground']) ? $map_field_info['field_foreground'] : 'field';
+$map_field_music = !empty($map_field_info['field_music']) ? $map_field_info['field_music'] : 'misc/star-force'; // TODO: find a better default for this
 $map_mecha_support = !empty($map_data_parsed['mechas']) ? $map_data_parsed['mechas'] : array();
+$map_mecha_habitats = !empty($map_data_parsed['habitats']) ? $map_data_parsed['habitats'] : array();
+//error_log('$map_field_token = '.print_r($map_field_token, true));
+//error_log('$map_field_info = '.print_r($map_field_info, true));
+//error_log('$map_field_background = '.print_r($map_field_background, true));
+//error_log('$map_field_foreground = '.print_r($map_field_foreground, true));
+//error_log('$map_field_music = '.print_r($map_field_music, true));
+//error_log('$map_mecha_support = '.print_r($map_mecha_support, true));
+//error_log('$map_mecha_habitats = '.print_r($map_mecha_habitats, true));
 
 // Collect the overall size variables for this map
 $map_base_size = $map_data_parsed['size'];
@@ -428,7 +471,7 @@ if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data[
 //$max_random_encounters = 20;
 $allowed_random_encounters = $map_mecha_support;
 $available_encounter_cells = getMapEncounterCells($map_data_parsed);
-$max_random_encounters = ceil(count($available_encounter_cells) * 0.25);
+$max_random_encounters = ceil($available_encounter_cells['total'] * 0.25);
 $map_random_encounters = !empty($WORLD_SESSION[$map_token.'_random_encounters']) ? $WORLD_SESSION[$map_token.'_random_encounters'] : array();
 //error_log('$allowed_random_encounters = '.print_r($allowed_random_encounters, true));
 //error_log('$available_encounter_cells = '.print_r($available_encounter_cells, true));
@@ -443,22 +486,37 @@ if (empty($map_random_encounters)){
         }
     $ratios_sum = array_sum($ratios);
     $distributed_encounters = array_map(function($value) use ($ratios_sum, $max_random_encounters){
-        return round(($value / $ratios_sum) * $max_random_encounters);
+        return ceil(($value / $ratios_sum) * $max_random_encounters);
         }, $ratios);
     asort($distributed_encounters);
     $options = array_keys($distributed_encounters);
-    //error_log('$ratios = '.print_r($ratios, true));
-    //error_log('$options = '.print_r($options, true));
-    //error_log('$ratios_sum = '.print_r($ratios_sum, true));
-    //error_log('$max_random_encounters = '.print_r($max_random_encounters, true));
-    //error_log('$distributed_encounters = '.print_r($distributed_encounters, true));
+    //echo('<pre>'.PHP_EOL);
+    //error_log('$map_data_parsed = '.print_r($map_data_parsed, true).PHP_EOL);
+    //error_log('$ratios = '.print_r($ratios, true).PHP_EOL);
+    //error_log('$options = '.print_r($options, true).PHP_EOL);
+    //error_log('$ratios_sum = '.print_r($ratios_sum, true).PHP_EOL);
+    //error_log('$max_random_encounters = '.print_r($max_random_encounters, true).PHP_EOL);
+    //error_log('$distributed_encounters = '.print_r($distributed_encounters, true).PHP_EOL);
     $robot = '';
     for ($i = 0; $i < $max_random_encounters; $i++){
         if (empty($options)){ $options = array_keys($distributed_encounters); }
         if (empty($robot)){ $robot = array_shift($options); }
         if (!isset($generated_encounters[$robot])){ $generated_encounters[$robot] = 0; }
-        //error_log('-> next robot = "'.$robot.'"');
-        $randpos = $get_randpos($available_encounter_cells);
+        //error_log('-> next robot = "'.$robot.'"'.PHP_EOL);
+        $habitats = !empty($map_mecha_habitats[$robot]) ? $map_mecha_habitats[$robot] : '';
+        //error_log('-> getting random position for robot "'.$robot.'" (habitats: '.print_r(implode(',', $habitats), true).')');
+        $available = array();
+        if (!empty($habitats)){
+            $by_terrain = $available_encounter_cells['by_terrain'];
+            foreach ($by_terrain AS $terrain => $cells){
+                if (!in_array($terrain, $habitats)){ continue; }
+                $available = array_merge($available, $cells);
+                }
+            }
+        if (empty($available)){ $available = $available_encounter_cells['all']; }
+        //error_log('$available = '.print_r($available, true).PHP_EOL);
+        //exit();
+        $randpos = $get_randpos($available);
         $robot_info = $mmrpg_index_robots[$robot];
         $robot_level = mt_rand(1, 10);
         $battle_token = 'world-battle_'.$map_token.'_debug-'.($i + 1);
@@ -478,7 +536,9 @@ if (empty($map_random_encounters)){
         $distributed_encounters[$robot]--;
         if (empty($distributed_encounters[$robot])){ $robot = ''; }
         }
-    //error_log('$generated_encounters = '.print_r($generated_encounters, true));
+    //error_log'$generated_encounters = '.print_r($generated_encounters, true).PHP_EOL);
+    //echo('</pre>'.PHP_EOL);
+    //exit();
 }
 $WORLD_SESSION[$map_token.'_random_encounters'] = $map_random_encounters;
 
@@ -762,6 +822,18 @@ $(document).ready(function(){
 
     // Make sure the music button is in the appropriate place
     top.mmrpg_music_context('world');
+
+    // Start the music playing in the background (default if none for this field)
+    parent.mmrpg_music_load('<?= $map_field_music ?>', false, false);
+
+    // Collect a ref to the game div then initialize the world map
+    let $mmrpg = $('#mmrpg');
+    if ($mmrpg.length){
+        //console.log('%c' + 'Creating new mmrpgWorldMap object...', 'color: green;');
+        let worldMapObject = new mmrpgWorldMap($mmrpg);
+        gameSettings.worldMapObject = worldMapObject;
+        window.worldMapObject = worldMapObject;
+        }
 
     <? if (rpg_game::is_user()){ ?>
         // The user is logged-in so let's keep the session alive

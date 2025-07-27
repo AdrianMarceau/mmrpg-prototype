@@ -608,8 +608,8 @@ class mmrpgWorldMap {
         if (!focusSpriteData){ console.warn('drawTileToCanvas() unable to find focus sprite data for layer ' + layerToken + '!'); }
         if (tileHasGrid && gridSpriteData){
             let gridSpriteOpacity = 0.3;
-            if (tileSpriteToken === 'void'){ gridSpriteOpacity = 0.1; }
-            else if (tileSpriteToken === 'grass'){ gridSpriteOpacity = 0.6; }
+            if (tileSpriteToken === 'void' || tileSpriteToken.indexOf('void-') === 0){ gridSpriteOpacity = 0.0; }
+            else if (tileSpriteToken === 'grass' || tileSpriteToken.indexOf('grass-') === 0){ gridSpriteOpacity = 0.6; }
             ctx.globalAlpha = gridSpriteOpacity;
             ctx.globalCompositeOperation = 'overlay';
             ctx.drawImage(spriteSheet,
@@ -1438,15 +1438,3 @@ class mmrpgWorldMap {
         }
 
 }
-
-// Create the document ready events
-$(document).ready(function(){
-    //console.log('%c' + 'World map canvas ready!', 'color: green;');
-    let $mmrpg = $('#mmrpg');
-    if ($mmrpg.length){
-        //console.log('%c' + 'Creating new mmrpgWorldMap object...', 'color: green;');
-        let worldMapObject = new mmrpgWorldMap($mmrpg);
-        gameSettings.worldMapObject = worldMapObject;
-        window.worldMapObject = worldMapObject;
-        }
-});

@@ -111,7 +111,7 @@ html, body {
 }
 
 #world #map .sprite.tile.portal { background-position: -380px -380px; }
-#world #map .sprite.tile[data-portal="spawn"] { background-position: -300px -380px; }
+#world #map .sprite.tile[data-portal="spawn"] { background-position: -60px -380px; }
 #world #map .sprite.tile[data-portal="exit"] { background-position: -460 px -380px; }
 
 #world #map .sprite.tile.col-1 { left: 0; }
@@ -741,6 +741,7 @@ html, body {
     color: #969696;
     font-weight: normal;
     cursor: not-allowed;
+    text-decoration: line-through;
 }
 
 #world #canvas #side-buttons .button[data-action="start-battle"] {
