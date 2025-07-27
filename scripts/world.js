@@ -972,6 +972,8 @@ class mmrpgWorldMap {
         var showDropdownType = '';
         var dropdownMarkup = '';
         var dropdownButtons = '';
+        var autoRedirect = false;
+        var autoRedirectURL = '';
         if ($eventsAtPosition[0].is('[data-portal]')){
             // If the cursor is literally on a portal, only one event sprite matters right now
             let $eventAtPosition = $eventsAtPosition[0];
@@ -986,6 +988,22 @@ class mmrpgWorldMap {
                 dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showDropdownType = 'portal';
                 zoomTimeoutDuration = 500; // if we show a portal dropdown, we want to zoom in quickly
+                // Automatically redirect to this portal (temp maybe?) TODO: review this in the future
+                console.log('-> entering portal with name ' + dataPortal + '!');
+                if (dataPortal === 'spawn'){
+                    // TODO: make the spawn actually go somewhere specific ?
+                    } else if (dataPortal === 'exit'){
+                    // TODO: make the exit actually go somewhere specific ?
+                    autoRedirect = true;
+                    showDropdown = false;
+                    autoRedirectURL = 'prototype.php';
+                    } else if (dataPortal.indexOf('goto__') !== -1){
+                    // Make the portal token a world token for the redirect
+                    autoRedirect = true;
+                    showDropdown = false;
+                    let worldToken = dataPortal.replace(/^goto__/i, '');
+                    autoRedirectURL = 'world.php?world=' + worldToken;
+                    }
                 }
             }
         else {
@@ -1028,7 +1046,7 @@ class mmrpgWorldMap {
             }
 
         // If there's no dropdown to show, we can return early
-        if (!showDropdown){ return; }
+        if (!showDropdown && !autoRedirect){ return; }
 
         // Define an inline function to mark the cursor as busy for dramatic effect
         let markCursorAsBusy = function(){
@@ -1036,6 +1054,14 @@ class mmrpgWorldMap {
             // Add the busy class to the cursor so it hides behind the player
             $worldCursor.addClass('busy');
 
+            };
+
+        // Define an inline function to redirect to the portal if needed
+        let redirectToLocation = function(){
+            console.log('%c' + 'redirectToLocation() called!', 'color: cyan;');
+            $thisWorld.addClass('hidden');
+            window.location.href = autoRedirectURL;
+            return true;
             };
 
         // Define an inline function to zoom and show the dropdown which we'll call after a timeout
@@ -1173,11 +1199,24 @@ class mmrpgWorldMap {
 
             };
 
+        // First we mark the cursor as busy so it trembles a bit before the encounter
         let _selfRef = _self.updateMapPosition;
         if (_selfRef.zoomCursorTimeout){ clearTimeout(_selfRef.zoomCursorTimeout); }
-        if (_selfRef.zoomDropdownTimeout){ clearTimeout(_selfRef.zoomDropdownTimeout); }
         _selfRef.zoomCursorTimeout = setTimeout(markCursorAsBusy, Math.ceil(zoomTimeoutDuration / 2));
-        _selfRef.zoomDropdownTimeout = setTimeout(zoomAndShowDropdown, zoomTimeoutDuration);
+
+        // If a redirect was requested, this is where we exit actually
+        if (autoRedirect){
+            if (_selfRef.zoomRedirectTimeout){ clearTimeout(_selfRef.zoomRedirectTimeout); }
+            _selfRef.zoomRedirectTimeout = setTimeout(redirectToLocation, zoomTimeoutDuration);
+            return true;
+            }
+
+        // Otherwise we can actually trigger the dropdown and zoom in on the events
+        if (showDropdown){
+            if (_selfRef.zoomDropdownTimeout){ clearTimeout(_selfRef.zoomDropdownTimeout); }
+            _selfRef.zoomDropdownTimeout = setTimeout(zoomAndShowDropdown, zoomTimeoutDuration);
+            return true;
+            }
 
         // Return true on success
         return true;

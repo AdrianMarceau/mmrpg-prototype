@@ -448,8 +448,10 @@ if (empty($map_random_encounters)){
     //error_log('$distributed_encounters = '.print_r($distributed_encounters, true));
     $robot = '';
     for ($i = 0; $i < $max_random_encounters; $i++){
-        if (empty($robot)){ $robot = array_shift($options);  error_log('-> next robot = "'.$robot.'"'); }
+        if (empty($options)){ $options = array_keys($distributed_encounters); }
+        if (empty($robot)){ $robot = array_shift($options); }
         if (!isset($generated_encounters[$robot])){ $generated_encounters[$robot] = 0; }
+        //error_log('-> next robot = "'.$robot.'"');
         $randpos = $get_randpos($available_encounter_cells);
         $robot_info = $mmrpg_index_robots[$robot];
         $robot_level = mt_rand(1, 10);
