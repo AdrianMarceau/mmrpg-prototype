@@ -40,6 +40,6 @@
 @sprites[]  = hover(40, 520)
 @sprites[]  = focus(200, 520)
 #---------------------------#
-@portals[]  = spawn(16, 4)
+@portals[]  = spawn(17, 4, hidden)
 @portals[]  = goto__debug-area-1(17, 4)
 #---------------------------#

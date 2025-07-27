@@ -665,7 +665,7 @@ html, body {
     border-radius: 6px 0 0 6px;
     min-height: 80px;
     max-width: 999px;
-    padding: 9px 24px 12px 9px;
+    padding: 9px 9px 12px;
     opacity: 1.0;
     transition: max-width 0.6s, padding 0.6s, opacity 0.9s;
     will-change: max-width, padding, opacity;

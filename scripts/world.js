@@ -108,7 +108,7 @@ class mmrpgWorldMap {
             //console.log('%c' + 'World map canvas found with ' + $mapLayers.length + ' layers...', 'color: orange;');
             // Initialize the world map with the provided canvas and layers
             _self.initWorldMap($canvasMap, $mapLayers, function(){
-                console.log('%c' + 'initWorldMap() complete!', 'color: green;');
+                //console.log('%c' + 'initWorldMap() complete!', 'color: green;');
                 //console.log('---> _config.mapToken =', _config.mapToken);
                 //console.log('---> _config.mapSize =', _config.mapSize);
                 //console.log('---> _config.mapTileSize =', _config.mapTileSize);
