@@ -127,6 +127,12 @@ else {
     exit();
 }
 
+// Define some flags of what this battle is or isn't
+$this_is_challenge_battle = !empty($this_battle_data['flags']['challenge_battle']) ? true : false;
+$this_is_endless_battle = !empty($this_battle_data['flags']['endless_battle']) ? true : false;
+$this_is_player_battle = !empty($this_battle_data['flags']['player_battle']) ? true : false;
+$this_is_world_battle = !empty($this_battle_data['flags']['world_battle']) ? true : false;
+
 // Collect the field index if available
 $mmrpg_index_fields = rpg_field::get_index(true);
 // Collect the field index data if available
@@ -1029,12 +1035,18 @@ gameSettings.customIndex.animationEffects = <?= json_encode($animation_effects_i
 gameSettings.customIndex.gameSpeeds = <?= json_encode($game_speeds_index) ?>;
 gameSettings.customIndex.renderModes = <?= json_encode($render_modes_index) ?>;
 gameSettings.currentBattleData = <?= json_encode($this_battle_data) ?>;
+gameSettings.playVictoryMusic = <?= !$this_is_world_battle ? 'true' : 'false' ?>;
+gameSettings.playDefeatMusic = <?= !$this_is_world_battle ? 'true' : 'false' ?>;
 
 // Create the document ready events
 $(document).ready(function(){
 
     // Make sure the music button is in the appropriate place
     top.mmrpg_music_context('battle');
+
+    // Start playing the appropriate stage music
+    let restartMusic = <?= !$this_is_world_battle ? 'true' : 'false' ?>;
+    parent.mmrpg_music_load(gameSettings.fieldMusic, restartMusic, false);
 
 <?
 // Preload the target player robot sprites first because we see them first

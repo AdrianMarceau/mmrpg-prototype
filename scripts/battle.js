@@ -14,9 +14,6 @@ $(document).ready(function(){
     $thisPrototype = $('#mmrpg');
     $thisCanvas = $('#canvas', $thisPrototype);
 
-    // Start playing the appropriate stage music
-    parent.mmrpg_music_load(gameSettings.fieldMusic, true, false);
-
     // Preload battle related image files
     mmrpg_preload_assets();
 
