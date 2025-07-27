@@ -590,6 +590,8 @@ class mmrpgWorldMap {
         let tileHasGrid = tileEffects.grid;
         let tileIsFocused = tileEffects.focus;
         let tileIsHovered = tileEffects.hover;
+        // clear a rect at the exact position and no larger
+        ctx.clearRect(tilePosition[2], tilePosition[3], tileSpriteSize[0], tileSpriteSize[1]);
         // sprite: draw the main tile sprite at the correct position
         ctx.drawImage(spriteSheet,
             tileSpriteOffset[0], tileSpriteOffset[1], // source offset
