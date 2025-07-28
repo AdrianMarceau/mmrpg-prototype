@@ -47,17 +47,21 @@ $default_world_position = '';
 if (!empty($_POST['action']) && $_POST['action'] === 'save'
     && !empty($_POST['world_data']) && is_array($_POST['world_data'])){
     $worldData = $_POST['world_data'];
-    if (!empty($worldData['lastWorld']) && in_array($worldData['lastWorld'], $allowed_world_tokens)){
-        $WORLD_SESSION['last_world_token'] = $worldData['lastWorld'];
-    }
     if (!empty($worldData['lastPlayer']) && in_array($worldData['lastPlayer'], $allowed_player_tokens)){
-        $WORLD_SESSION['last_player_token'] = $worldData['lastPlayer'];
-    }
-    if (!empty($worldData['lastPosition']) && preg_match('/^([-0-9]+)$/i', $worldData['lastPosition'])){
-        $WORLD_SESSION['last_world_position'] = $worldData['lastPosition'];
-    }
-    if (!empty($worldData['lastDirection']) && preg_match('/^([-a-z0-9]+)$/i', $worldData['lastDirection'])){
-        $WORLD_SESSION['last_world_direction'] = $worldData['lastDirection'];
+        $lastPlayer = $worldData['lastPlayer'];
+        $WORLD_SESSION['last_player_token'] = $lastPlayer;
+        if (!empty($worldData['lastWorld']) && in_array($worldData['lastWorld'], $allowed_world_tokens)){
+            $last_world_token_key = 'last_'.$lastPlayer.'_world_token';
+            $WORLD_SESSION[$last_world_token_key] = $worldData['lastWorld'];
+        }
+        if (!empty($worldData['lastPosition']) && preg_match('/^([-0-9]+)$/i', $worldData['lastPosition'])){
+            $last_world_position_key = 'last_'.$lastPlayer.'_world_position';
+            $WORLD_SESSION[$last_world_position_key] = $worldData['lastPosition'];
+        }
+        if (!empty($worldData['lastDirection']) && preg_match('/^([-a-z0-9]+)$/i', $worldData['lastDirection'])){
+            $last_world_direction_key = 'last_'.$lastPlayer.'_world_direction';
+            $WORLD_SESSION[$last_world_direction_key] = $worldData['lastDirection'];
+        }
     }
     // that's all we support for now, return a success response
     header('Content-Type: application/json');
@@ -352,49 +356,38 @@ function getMapEncounterCells($map_data){
         );
 }
 
-// Define or collect the prototype data for the player, their robots, etc.
+// Define the default prototype data fields and values so we don't get errors
 $this_prototype_data = array();
 $this_prototype_data['this_current_chapter'] = -1; // required
+$this_prototype_data['this_current_player'] = ''; // required
 $this_prototype_data['this_current_world'] = ''; // required
 $this_prototype_data['this_current_position'] = ''; // required
 $this_prototype_data['battle_phase'] = 1; // required
 $this_prototype_data['battle_round'] = 1; // required
-$this_prototype_data['this_player_id'] = 1; // required
-$this_prototype_data['this_player_token'] = 'player'; // required
-$this_prototype_data['this_player_robots'] = array(); // required
-
-// Collect or define the current map token we'll be loading from
-$request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
-if (empty($request_world_token) && !empty($WORLD_SESSION['last_world_token'])){ $request_world_token = $WORLD_SESSION['last_world_token']; }
-if (!empty($request_world_token) && !empty($WORLD_SESSION['last_world_token']) && $request_world_token !== $WORLD_SESSION['last_world_token']){ unset($WORLD_SESSION['last_world_position']); }
-if (!empty($request_world_token) && in_array($request_world_token, $allowed_world_tokens)){
-    $this_prototype_data['this_current_world'] = $request_world_token;
-}
-if (empty($this_prototype_data['this_current_world'])){ $this_prototype_data['this_current_world'] = $default_world_token; }
-$WORLD_SESSION['last_world_token'] = $this_prototype_data['this_current_world'];
-
-// Collect or define the current map position we'll be spawning into
-$request_world_position = isset($_REQUEST['position']) && preg_match('/^([-0-9]+)$/i', $_REQUEST['position']) ? trim($_REQUEST['position']) : '';
-if (empty($request_world_position) && !empty($WORLD_SESSION['last_world_position'])){ $request_world_position = $WORLD_SESSION['last_world_position']; }
-if (!empty($request_world_position)){ $this_prototype_data['this_current_position'] = $request_world_position; }
-else { $this_prototype_data['this_current_position'] = $default_world_position; }
-$WORLD_SESSION['last_world_position'] = $this_prototype_data['this_current_position'];
 
 // Collect of define the current player character we'll be using
 $request_player_token = isset($_REQUEST['player']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['player']) ? trim($_REQUEST['player']) : '';
 if (empty($request_player_token) && !empty($WORLD_SESSION['last_player_token'])){ $request_player_token = $WORLD_SESSION['last_player_token']; }
-if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){
-    $this_prototype_data['this_player_token'] = $request_player_token;
-    //$session_token = mmrpg_game_token();
-    //$temp_robot_settings = $_SESSION[$session_token]['values']['battle_settings'][$request_player_token]['player_robots'];
-    //$temp_robot_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$request_player_token]['player_robots'];
-    //error_log('$temp_robot_settings = '.print_r($temp_robot_settings, true));
-    //error_log('$temp_robot_rewards = '.print_r($temp_robot_rewards, true));
-    //error_log('$temp_robot_settings(keys) = '.print_r(array_keys($temp_robot_settings), true));
-    //error_log('$temp_robot_rewards(keys) = '.print_r(array_keys($temp_robot_rewards), true));
-    $allowed_player_robots = mmrpg_prototype_robots_unlocked($request_player_token, true);
-    //error_log('$allowed_player_robots = '.print_r($allowed_player_robots, true));
+if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){ $this_prototype_data['this_current_player'] = $request_player_token; }
+if (empty($this_prototype_data['this_current_player'])){ $this_prototype_data['this_current_player'] = $default_player_token; }
+$WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
+
+// Now that we have the player, we should collect the player's robots and other data
+$this_player_id = 1;
+$this_player_token = 'player';
+$this_player_info = array();
+$this_player_robots = array();
+$this_prototype_data['this_player_id'] = $this_player_id; // required
+$this_prototype_data['this_player_token'] = $this_player_token; // required
+$this_prototype_data['this_player_robots'] = $this_player_robots; // required
+if (!empty($this_prototype_data['this_current_player'])){
+    $this_player_token = $this_prototype_data['this_current_player'];
+    $this_player_info = !empty($mmrpg_index_players[$this_player_token]) ? $mmrpg_index_players[$this_player_token] : array();
+    $this_prototype_data['this_player_id'] = $this_player_info['player_id'];
+    $this_prototype_data['this_player_token'] = $this_player_info['player_token'];
+    $allowed_player_robots = mmrpg_prototype_robots_unlocked($this_player_token, true);
     $max_player_robots = MMRPG_WORLD_DEFAULT_TEAMSIZE; // TODO: make this dynamic based on limit hearts
+    //error_log('$allowed_player_robots = '.print_r($allowed_player_robots, true));
     if (!empty($allowed_player_robots)){
         $request_player_robots = array();
         foreach ($allowed_player_robots AS $robot_token){
@@ -404,11 +397,34 @@ if (!empty($request_player_token) && in_array($request_player_token, $allowed_pl
             $robot_string = $robot_id . '_' . $robot_token;
             $request_player_robots[] = $robot_string;
         }
-        $this_prototype_data['this_player_robots'] = array_slice($request_player_robots, 0, $max_player_robots);
+        $this_player_robots = array_slice($request_player_robots, 0, $max_player_robots);
+        $this_prototype_data['this_player_robots'] = $this_player_robots;
     }
+} else {
+    die('MMRPG World Fatal Error - No player token defined!');
 }
-if (empty($this_prototype_data['this_player_token'])){ $this_prototype_data['this_player_token'] = $default_player_token; }
-$WORLD_SESSION['last_player_token'] = $this_prototype_data['this_player_token'];
+
+// Define the session keys we'll be using to store player-specific world settings
+$last_world_token_key = 'last_'.$this_player_token.'_world_token';
+$last_world_position_key = 'last_'.$this_player_token.'_world_position';
+$last_world_direction_key = 'last_'.$this_player_token.'_world_direction';
+
+// Collect or define the current map token we'll be loading from
+$request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
+if (empty($request_world_token) && !empty($WORLD_SESSION[$last_world_token_key])){ $request_world_token = $WORLD_SESSION[$last_world_token_key]; }
+if (!empty($request_world_token) && !empty($WORLD_SESSION[$last_world_token_key]) && $request_world_token !== $WORLD_SESSION[$last_world_token_key]){ unset($WORLD_SESSION[$last_world_position_key]); }
+if (!empty($request_world_token) && in_array($request_world_token, $allowed_world_tokens)){
+    $this_prototype_data['this_current_world'] = $request_world_token;
+}
+if (empty($this_prototype_data['this_current_world'])){ $this_prototype_data['this_current_world'] = $default_world_token; }
+$WORLD_SESSION[$last_world_token_key] = $this_prototype_data['this_current_world'];
+
+// Collect or define the current map position we'll be spawning into
+$request_world_position = isset($_REQUEST['position']) && preg_match('/^([-0-9]+)$/i', $_REQUEST['position']) ? trim($_REQUEST['position']) : '';
+if (empty($request_world_position) && !empty($WORLD_SESSION[$last_world_position_key])){ $request_world_position = $WORLD_SESSION[$last_world_position_key]; }
+if (!empty($request_world_position)){ $this_prototype_data['this_current_position'] = $request_world_position; }
+else { $this_prototype_data['this_current_position'] = $default_world_position; }
+$WORLD_SESSION[$last_world_position_key] = $this_prototype_data['this_current_position'];
 
 // Load map data from the appropriate map file
 $map_token = $this_prototype_data['this_current_world'];
