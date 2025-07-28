@@ -1045,7 +1045,7 @@ $(document).ready(function(){
     top.mmrpg_music_context('battle');
 
     // Start playing the appropriate stage music
-    let restartMusic = <?= !$this_is_world_battle ? 'true' : 'false' ?>;
+    let restartMusic = <?= !$this_is_world_battle ? 'true' : 'false' ?>; // in case we're in free-roam
     parent.mmrpg_music_load(gameSettings.fieldMusic, restartMusic, false);
 
 <?
