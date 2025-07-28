@@ -2644,11 +2644,11 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
     var onendFunction = typeof onendFunction === 'function' ? onendFunction : mmrpgMusicEndedDefault;
     if (newTrack == 'last-track'){
         var lastTrack = musicStream.attr('data-last-track');
-        if (lastTrack.length){ newTrack = lastTrack; }
+        if (lastTrack && lastTrack.length){ newTrack = lastTrack; }
         }
     else if (newTrack == 'current-track'){
         let currentTrack = musicStream.attr('data-track');
-        if (currentTrack.length){ newTrack = currentTrack; }
+        if (currentTrack && currentTrack.length){ newTrack = currentTrack; }
         }
     if (isRestart == false && newTrack == thisTrack){
         return false;
