@@ -574,7 +574,7 @@ html, body {
     padding: 12px;
     border-radius: 0 0 6px 0;
     pointer-events: all;
-    cursor: pointer;
+    cursor: default;
 }
 #world #canvas #home-button i,
 #world #canvas #reset-button i {
@@ -584,6 +584,16 @@ html, body {
 #world #canvas #home-button:hover i,
 #world #canvas #reset-button:hover i {
     transform: scale(1.2);
+}
+#world #canvas #home-button a,
+#world #canvas #reset-button a {
+    display: block;
+    pointer-events: all;
+    cursor: pointer;
+}
+#world #canvas #home-button a *,
+#world #canvas #reset-button a * {
+    pointer-events: none;
 }
 #world #canvas #home-button {
     top: 0;

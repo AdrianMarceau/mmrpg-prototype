@@ -192,6 +192,7 @@ class mmrpgWorldMap {
             if (_config.mapStartPosition){ startPosition = _config.mapStartPosition; }
             else if (portalsIndex['spawn']){ startPosition = portalsIndex['spawn'].join('-'); }
             _self.moveToPosition(startPosition, null, true, false);
+            _self.playSoundEffect('teleport-in');
             setTimeout(function(){
                 $thisWorld.removeClass('hidden');
                 $thisWorld.addClass('ready');
@@ -773,6 +774,7 @@ class mmrpgWorldMap {
             if (thisPos === oldPos || thisPos === lastMouseClick){ return; }
             if (!tileData.walkable || battleAtPosition){ return; }
             //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
+            _self.playSoundEffect('link-click');
             lastMouseClick = thisPos;
             _self.focusLayerTile(layerToken, thisPos);
             if (focusTimeouts[oldPos]){ clearTimeout(focusTimeouts[oldPos]); }
@@ -803,15 +805,10 @@ class mmrpgWorldMap {
             if (thisPos === lastMouseOver){ return; }
             if (!tileData.walkable || battleAtPosition){ return; }
             //console.log('%c' + 'Mouse move event triggered at position ' + thisPos + '!', 'color: orange;');
+            _self.playSoundEffect('icon-hover');
             lastMouseOver = thisPos;
             _self.hoverLayerTile(layerToken, thisPos);
             hoverTiles.push(thisPos);
-            /*
-            if (hoverTimeouts[thisPos]){ clearTimeout(hoverTimeouts[thisPos]); }
-            hoverTimeouts[thisPos] = setTimeout(function(){
-                _self.unhoverLayerTile(layerToken, thisPos);
-                }, hoverTimeoutDuration);
-            */
             });
         // Return true on success
         return true;
@@ -832,9 +829,18 @@ class mmrpgWorldMap {
                 e.preventDefault();
                 //console.log('%c' + 'Home button clicked!', 'color: cyan;');
                 if (!confirm('Are you sure you want to leave the world map?')){ return; }
-                $thisWorld.addClass('hidden');
+                _self.playSoundEffect('bounce-sound');
                 let homeMenuURL = $homeButton.attr('data-home-url') || 'prototype.php';
                 window.location.href = homeMenuURL;
+                $thisWorld.animate({opacity: 0}, 600, function(){
+                    $thisWorld.addClass('hidden');
+                    });
+                return true;
+                });
+            $homeButton.bind('mouseenter', function(e){
+                //e.preventDefault();
+                //console.log('%c' + 'Home button hovered!', 'color: cyan;');
+                _self.playSoundEffect('icon-hover');
                 return true;
                 });
             }
@@ -845,10 +851,19 @@ class mmrpgWorldMap {
                 e.preventDefault();
                 //console.log('%c' + 'Reset button clicked!', 'color: cyan;');
                 if (!confirm('Are you sure you want to reset the world map?')){ return; }
-                $thisWorld.addClass('hidden');
+                _self.playSoundEffect('destroyed-sound');
+                _self.loadMusicTrack('current-track', true);
                 let resetMenuURL = $resetButton.attr('data-reset-url') || 'world.php?reset=world';
                 window.location.href = resetMenuURL;
+                $thisWorld.animate({opacity: 0}, 600, function(){
+                    $thisWorld.addClass('hidden');
+                    });
                 return true;
+                });
+            $resetButton.bind('mouseenter', function(e){
+                e.preventDefault();
+                //console.log('%c' + 'Reset button hovered!', 'color: cyan;');
+                _self.playSoundEffect('icon-hover');
                 });
             }
         // Bind click events to the player switcher options in the world map header
@@ -858,10 +873,16 @@ class mmrpgWorldMap {
                 e.preventDefault();
                 let playerToken = $(this).attr('data-player') || false;
                 //console.log('%c' + 'Player switcher clicked for ' + playerToken + '!', 'color: cyan;');
+                _self.playSoundEffect('switch-in');
                 $thisWorld.addClass('hidden');
                 let worldReloadURL = 'world.php?player=' + playerToken;
                 window.location.href = worldReloadURL;
                 return true;
+                });
+            $('.option[data-player]', $playerSwitcher).bind('mouseenter', function(e){
+                e.preventDefault();
+                //console.log('%c' + 'Player switcher hovered!', 'color: cyan;');
+                _self.playSoundEffect('icon-hover');
                 });
             }
         // Return true on success
@@ -1087,10 +1108,12 @@ class mmrpgWorldMap {
         // for either a battle, a portal, or any other compatible event-type for the tile
         var showDropdown = false;
         var showDropdownType = '';
+        var showDropdownSound = '';
         var dropdownMarkup = '';
         var dropdownButtons = '';
         var autoRedirect = false;
         var autoRedirectURL = '';
+        var autoRedirectSound = '';
         if ($eventsAtPosition[0].is('[data-portal]')){
             //console.log('-> event at position is a portal, preparing dropdown');
             // If the cursor is literally on a portal, only one event sprite matters right now
@@ -1122,6 +1145,7 @@ class mmrpgWorldMap {
                     showDropdown = false;
                     let worldToken = dataPortal.replace(/^goto__/i, '');
                     autoRedirectURL = 'world.php?world=' + worldToken;
+                    autoRedirectSound = 'bounce-sound';
                     }
                 }
             }
@@ -1160,6 +1184,8 @@ class mmrpgWorldMap {
                 else { dropdownButtons += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
                 dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showDropdownType = 'battle';
+                //showDropdownSound = 'background-spawn';
+                showDropdownSound = 'mecha-taunt-sound' + (dataBattles.length > 1 ? '*'+dataBattles.length : '');
                 zoomTimeoutDuration = 1500; // otherwise if this is a battle we wait a moment
                 }
             }
@@ -1179,7 +1205,8 @@ class mmrpgWorldMap {
         let redirectToLocation = function(){
             //console.log('%c' + 'redirectToLocation()', 'color: cyan;');
             $thisWorld.addClass('hidden');
-            window.location.href = autoRedirectURL;
+            if (autoRedirectSound){ _self.playSoundEffect(autoRedirectSound); }
+            if (autoRedirectURL){ window.location.href = autoRedirectURL; }
             return true;
             };
 
@@ -1218,7 +1245,7 @@ class mmrpgWorldMap {
             // Add the buttons to the sidebar area so that they are out-of-the-way
             $sideButtonsWrapper.html(dropdownButtons);
 
-            // Define the event to fun when clicking one of these new action buttons
+            // Define the event to run when clicking one of these new action buttons
             let onActionButtonClick = function(e){
                 //console.log('%c' + 'Action button clicked!', 'color: cyan;');
                 e.preventDefault();
@@ -1237,6 +1264,7 @@ class mmrpgWorldMap {
                         }
                     else if (action === 'start-battle'){
                         //console.log('-> starting battle with ID ' + battleId + '!');
+                        _self.playSoundEffect('lets-go-robots');
                         let battleVars = [];
                         battleVars.push('wap=false'); // i hate this
                         battleVars.push('this_user_id=' + _userId);
@@ -1258,6 +1286,7 @@ class mmrpgWorldMap {
                         }
                     else if (action === 'enter-portal'){
                         //console.log('-> entering portal with name ' + portalName + '!');
+                        _self.playSoundEffect('bounce-sound');
                         let portalHref = false;
                         if (portalName === 'spawn'){
                             portalHref = 'prototype.php'; // TODO: make the spawn actually go somewhere specific
@@ -1275,6 +1304,7 @@ class mmrpgWorldMap {
                     }
                 else if (isDismiss){
                     //console.log('-> dismissing action dropdown!');
+                    _self.playSoundEffect('back-click');
                     $actionDropdown.removeClass('active');
                     $actionDropdownWrapper.empty();
                     $sideButtons.removeClass('active');
@@ -1293,9 +1323,15 @@ class mmrpgWorldMap {
                     }
                 };
 
+            // Define the event to run when hovering one of these new action buttons
+            let onActionButtonHover = function(e){
+                //e.preventDefault();
+                _self.playSoundEffect('icon-hover');
+                };
+
             // Bind click events to the newly created action buttons in the dropdown
-            //$('.button[data-action]', $actionDropdown).bind('click', onActionButtonClick);
             $('.button[data-action]', $sideButtons).bind('click', onActionButtonClick);
+            $('.button[data-action]', $sideButtons).bind('mouseenter', onActionButtonHover);
 
             // Wait a moment for visual flow and then show the dropdown (adjusting alignment as needed)
             setTimeout(function(){
@@ -1314,6 +1350,15 @@ class mmrpgWorldMap {
                 if (dropdownPositionDelta[0] >= 0.75){ dropdownAlign += '-left'; }
                 // Apply the alignment to the dropdown
                 $actionDropdown.attr('data-align', dropdownAlign);
+                // If sound effect(s) have been defined play now
+                if (showDropdownSound){
+                    let sound = showDropdownSound, repeat = 1, delay = 0;
+                    if (sound.indexOf('*') !== -1){ var parts = sound.split('*'); sound = parts[0]; repeat = parseInt(parts[1]); }
+                    for (var i = 0; i < repeat; i++){
+                        if (!delay){ _self.playSoundEffect(sound); delay += 50; }
+                        else { setTimeout(function(){ _self.playSoundEffect(sound); }, delay); delay *= 2; }
+                        }
+                    }
                 }, 200);
 
             };
@@ -1387,6 +1432,57 @@ class mmrpgWorldMap {
             }
         // Return the found events
         return $eventsAtPosition;
+        }
+
+    // Quick function for playing a sound effect (if available)
+    playSoundEffect(soundName, options){
+        //console.log('%c' + 'mmrpgWorldMap.playSoundEffect(' + soundName + ')', 'color: green;');
+        if (!soundName || typeof soundName !== 'string' || !soundName.length){ console.error('playSoundEffect() missing required soundName!'); return false; }
+        if (typeof options !== 'object' || !options){ options = {}; }
+        let _self = this;
+        let _selfReference = _self.playSoundEffect;
+        let _config = _self.config;
+        let _world = _self.state;
+        let _elements = _self.elements;
+        let mmrpgPlaySoundEffect = _selfReference.mmrpgPlaySoundEffect;
+        if (!mmrpgPlaySoundEffect){
+            mmrpgPlaySoundEffect = function(soundName, options){
+                if (this instanceof jQuery || this instanceof Element){
+                    if ($(this).data('silentClick')){ return; }
+                    if ($(this).is('.disabled')){ return; }
+                    if ($(this).is('.button_disabled')){ return; }
+                    }
+                if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+                    top.mmrpg_play_sound_effect(soundName, options);
+                    } else {
+                    console.warn('mmrpgWorldMap.playSoundEffect() unable to play sound effect "' + soundName + '" because top.mmrpg_play_sound_effect is not defined!');
+                    }
+                };
+                _selfReference.mmrpgPlaySoundEffect = mmrpgPlaySoundEffect;
+            }
+        return mmrpgPlaySoundEffect.call(_selfReference, soundName, options);
+        }
+
+    // Quick function for loading a music track (if available)
+    // abstraction for top.mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction)
+    // much like above was abstraction for top.mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound)
+    loadMusicTrack(newTrack, restartTrack, playOnce, onendFunction){
+        //console.log('%c' + 'mmrpgWorldMap.loadMusicTrack(' + newTrack + ')', 'color: green;');
+        if (!newTrack || typeof newTrack !== 'string' || !newTrack.length){ console.error('loadMusicTrack() missing required newTrack!'); return false; }
+        let _self = this;
+        let _selfReference = _self.loadMusicTrack;
+        let mmrpgLoadMusicTrack = _selfReference.mmrpgLoadMusicTrack;
+        if (!mmrpgLoadMusicTrack){
+            mmrpgLoadMusicTrack = function(newTrack, restartTrack, playOnce, onendFunction){
+                if (typeof top.mmrpg_music_load !== 'undefined'){
+                    top.mmrpg_music_load(newTrack, restartTrack, playOnce, onendFunction);
+                    } else {
+                    console.warn('mmrpgWorldMap.loadMusicTrack() unable to load music track "' + newTrack + '" because top.mmrpg_music_load is not defined!');
+                    }
+                };
+                _selfReference.mmrpgLoadMusicTrack = mmrpgLoadMusicTrack;
+            }
+        return mmrpgLoadMusicTrack.call(_selfReference, newTrack, restartTrack, playOnce, onendFunction);
         }
 
     // Quick function for sending a snapshot of persistent world values back to the server for saving
