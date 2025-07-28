@@ -1233,7 +1233,8 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
         var thisPosition = numOptions + 1;
 
         // Only append to banner if not a team select option
-        if (!thisOption.hasClass('option_this-team-select')){
+        if (!thisOption.hasClass('option_this-team-select')
+            && !thisOption.hasClass('option_free-roam')){
 
             // Append this option object to the main banner window
             var cloneOption = thisOption.clone();
