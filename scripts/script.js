@@ -57,6 +57,7 @@ gameSettings.musicVolume = 0.4; // music volume for the game, relative to master
 gameSettings.effectVolume = 0.6; // effect volume for the game, relative to master, slightly higher than e
 gameSettings.menuEffectVolume = 0.6; // menu effect volume modifier, relative effect volume, may be unique later
 gameSettings.musicVolumeEnabled = true; // default to true to allow music unless otherwise stated
+gameSettings.musicTrackSpeed = 1.0; // the speed at which music tracks should be played (1.0 = normal)
 gameSettings.effectVolumeEnabled = true; // default to true to allow music unless otherwise stated
 gameSettings.audioBalanceConfig = {}; // default to empty but can hold custom overrides for above
 gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
@@ -2645,6 +2646,10 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
         var lastTrack = musicStream.attr('data-last-track');
         if (lastTrack.length){ newTrack = lastTrack; }
         }
+    else if (newTrack == 'current-track'){
+        let currentTrack = musicStream.attr('data-track');
+        if (currentTrack.length){ newTrack = currentTrack; }
+        }
     if (isRestart == false && newTrack == thisTrack){
         return false;
         }
@@ -2679,6 +2684,10 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
             loop: [loopStart, loopDuration, true]
             };
         }
+    if (gameSettings.musicTrackSpeed){
+        //console.log('gameSettings.musicTrackSpeed =', gameSettings.musicTrackSpeed);
+        audioConfig.rate = gameSettings.musicTrackSpeed;
+        }
     if (waitTime > 0){ audioConfig.autoplay = false; }
     //console.log('audioConfig =', audioConfig);
     mmrpg_music_volume(0, false);
@@ -2693,6 +2702,19 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
             mmrpg_music_play();
             }, waitTime);
         }
+}
+
+// Define a function for adjusting the speed of the currently playing music track
+function mmrpg_music_speed(newSpeed, fadeMusic){
+    console.log('mmrpg_music_speed(newSpeed:', newSpeed, ', fadeMusic:', fadeMusic, ')');
+    if (typeof newSpeed !== 'number' || newSpeed < 0.1){ newSpeed = 1; }
+    if (typeof fadeMusic !== 'boolean'){ fadeMusic = true; }
+    gameSettings.musicTrackSpeed = newSpeed;
+    if (!mmrpgMusicSound || !mmrpgMusicSound.playing()){ return false; }
+    //console.log('newSpeed =', newSpeed);
+    if (fadeMusic){ mmrpg_music_volume(0, false, 300); }
+    mmrpgMusicSound.rate(gameSettings.musicTrackSpeed);
+    if (fadeMusic){ mmrpg_reset_music_volume(); }
 }
 
 // Define a function for playing a specific fanfare track
