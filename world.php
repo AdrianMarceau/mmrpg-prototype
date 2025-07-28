@@ -779,8 +779,9 @@ $flag_skip_fadein = true;
                 <div id="click-overlay" class="active"><div class="wrapper"></div></div>
                 <div id="action-dropdown" class="active"><div class="wrapper"></div></div>
             </div>
-            <div id="home-button" class="chrome"><a class="wrapper"><i class="fa fas fa-home"></i></a></div>
-            <div id="reset-button" class="chrome"><a class="wrapper"><i class="fa fas fa-trash"></i></a></div>
+            <div id="back-button" class="chrome chrome-button"><a class="wrapper"><i class="fa fas fa-sign-out"></i></a></div>
+            <div id="home-button" class="chrome chrome-button"><a class="wrapper"><i class="fa fas fa-home"></i></a></div>
+            <div id="reset-button" class="chrome chrome-button"><a class="wrapper"><i class="fa fas fa-recycle"></i></a></div>
             <div id="position-display" class="chrome"><div class="wrapper">&hellip;</div></div>
             <div id="player-switcher" class="chrome"><div class="wrapper"><?
                 $sprite = $get_sprite('robot', 'pointan', '', 'right', 'option');
@@ -814,6 +815,9 @@ _worldConfig.userId = <?= rpg_game::get_userid() ?>;
 _worldConfig.playerId = <?= json_encode($this_prototype_data['this_player_id']) ?>;
 _worldConfig.playerToken = <?= json_encode($this_prototype_data['this_player_token']) ?>;
 _worldConfig.playerRobots = <?= json_encode($this_prototype_data['this_player_robots']) ?>;
+_worldConfig.backButtonURL = 'prototype.php';
+_worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&position=<?= $default_world_position ?>';
+_worldConfig.resetButtonURL = 'world.php?reset=world';
 
 // Create the document ready events
 $(document).ready(function(){

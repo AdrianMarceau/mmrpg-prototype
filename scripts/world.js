@@ -39,6 +39,9 @@ gameSettings.worldConfig = {
     canvasWidth: 800, // default only
     canvasHeight: 600, // default only
     allowWorldEvents: false, // default until user interaction
+    backButtonURL: '#', // populated on init
+    homeButtonURL: '#', // populated on init
+    resetButtonURL: '#', // populated on init
     };
 gameSettings.worldElements = {
     mmrpg: null,
@@ -88,6 +91,7 @@ class mmrpgWorldMap {
         let $canvasMap = $('#map', $thisCanvas);
         let $mapLayers = $('.layer', $canvasMap);
         let $worldCursor = $('.sprite.cursor', $canvasMap);
+        let $backButton = $('#back-button', $thisWorld);
         let $homeButton = $('#home-button', $thisWorld);
         let $resetButton = $('#reset-button', $thisWorld);
         let $playerSwitcher = $('#player-switcher', $thisWorld);
@@ -99,6 +103,7 @@ class mmrpgWorldMap {
         _elements.map = $canvasMap;
         _elements.layers = $mapLayers;
         _elements.cursor = $worldCursor;
+        _elements.backButton = $backButton;
         _elements.homeButton = $homeButton;
         _elements.resetButton = $resetButton;
         _elements.playerSwitcher = $playerSwitcher;
@@ -822,16 +827,38 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
+        // Bind a click event to the back button in the header that'll bring us to prototype menu
+        let $backButton = _elements.backButton;
+        if ($backButton && $backButton.length){
+            $backButton.bind('click', function(e){
+                e.preventDefault();
+                //console.log('%c' + 'Back button clicked!', 'color: cyan;');
+                if (!confirm('Are you sure you want to leave the world map?')){ return; }
+                _self.playSoundEffect('bounce-sound');
+                let backButtonURL = $backButton.attr('data-url') || _config.backButtonURL;
+                window.location.href = backButtonURL;
+                $thisWorld.animate({opacity: 0}, 600, function(){
+                    $thisWorld.addClass('hidden');
+                    });
+                return true;
+                });
+            $backButton.bind('mouseenter', function(e){
+                //e.preventDefault();
+                //console.log('%c' + 'Back button hovered!', 'color: cyan;');
+                _self.playSoundEffect('icon-hover');
+                return true;
+                });
+            }
         // Bind a click event to the home button in the header that'll bring us to prototype menu
         let $homeButton = _elements.homeButton;
         if ($homeButton && $homeButton.length){
             $homeButton.bind('click', function(e){
                 e.preventDefault();
                 //console.log('%c' + 'Home button clicked!', 'color: cyan;');
-                if (!confirm('Are you sure you want to leave the world map?')){ return; }
+                if (!confirm('Are you sure you want to return to the home area?')){ return; }
                 _self.playSoundEffect('bounce-sound');
-                let homeMenuURL = $homeButton.attr('data-home-url') || 'prototype.php';
-                window.location.href = homeMenuURL;
+                let homeButtonURL = $homeButton.attr('data-url') || _config.homeButtonURL;
+                window.location.href = homeButtonURL;
                 $thisWorld.animate({opacity: 0}, 600, function(){
                     $thisWorld.addClass('hidden');
                     });
@@ -853,8 +880,8 @@ class mmrpgWorldMap {
                 if (!confirm('Are you sure you want to reset the world map?')){ return; }
                 _self.playSoundEffect('destroyed-sound');
                 _self.loadMusicTrack('current-track', true);
-                let resetMenuURL = $resetButton.attr('data-reset-url') || 'world.php?reset=world';
-                window.location.href = resetMenuURL;
+                let resetButtonURL = $resetButton.attr('data-url') || _config.resetButtonURL;
+                window.location.href = resetButtonURL;
                 $thisWorld.animate({opacity: 0}, 600, function(){
                     $thisWorld.addClass('hidden');
                     });

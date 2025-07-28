@@ -553,59 +553,62 @@ html, body {
     display: block;
     clear: both;
 }
-#world #canvas #position-display {
-    bottom: 0;
-    right: 0;
-    z-index: 1001;
-    color: #cfcfcf;
-    font-family: monospace;
-    text-align: right;
-    font-size: 12px;
-    line-height: 1.2;
-    border-radius: 6px 0 0 0;
-}
 
-#world #canvas #home-button,
-#world #canvas #reset-button {
+#world #canvas .chrome-button {
     z-index: 1002;
     color: #ffffff;
     text-align: left;
     line-height: 1.2;
-    padding: 12px;
+    padding: 0;
     border-radius: 0 0 6px 0;
     pointer-events: all;
     cursor: default;
 }
-#world #canvas #home-button i,
-#world #canvas #reset-button i {
-    transform: scale(1.0);
-    transition: transform 0.3s;
-}
-#world #canvas #home-button:hover i,
-#world #canvas #reset-button:hover i {
-    transform: scale(1.2);
-}
-#world #canvas #home-button a,
-#world #canvas #reset-button a {
+#world #canvas .chrome-button > a {
     display: block;
     pointer-events: all;
     cursor: pointer;
+    padding: 12px;
 }
-#world #canvas #home-button a *,
-#world #canvas #reset-button a * {
+#world #canvas .chrome-button > a > * {
     pointer-events: none;
 }
-#world #canvas #home-button {
-    top: 0;
+#world #canvas .chrome-button > a > i {
+    transform: scale(1.0);
+    transition: transform 0.3s;
+}
+#world #canvas .chrome-button:hover > a > i {
+    transform: scale(1.2);
+}
+
+#world #canvas #back-button,
+#world #canvas #home-button,
+#world #canvas #reset-button {
     left: 0;
+}
+#world #canvas #back-button {
+    top: 0;
     border-radius: 0 0 6px 0;
-    font-size: 16px;
+    font-size: 20px;
+}
+#world #canvas #back-button > a {
+    transform: scaleX(-1) translateX(3px);
+}
+#world #canvas #home-button,
+#world #canvas #reset-button {
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+}
+#world #canvas #home-button {
+    top: 51px;
 }
 #world #canvas #reset-button {
-    top: 46px;
-    left: 0;
-    border-radius: 0 6px 6px 0;
-    font-size: 12px;
+    /* top: 96px; */
+    top: 126px;
+    transition: left 0.3s;
+}
+#world #canvas #reset-button:not(:hover) {
+    left: -28px;
 }
 
 #world #canvas #player-switcher {
@@ -765,6 +768,18 @@ html, body {
 #world #canvas #side-buttons .button[data-action="dismiss"] {
     background-color: #8b1d1d !important;
     border-color: #b23333 !important;
+}
+
+#world #canvas #position-display {
+    bottom: 0;
+    right: 0;
+    z-index: 1001;
+    color: #cfcfcf;
+    font-family: monospace;
+    text-align: right;
+    font-size: 12px;
+    line-height: 1.2;
+    border-radius: 6px 0 0 0;
 }
 
 
