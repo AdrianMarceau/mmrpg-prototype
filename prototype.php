@@ -434,9 +434,24 @@ if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-scr
 
     </div>
 
-    <div class="menu select_this_player" data-step="1" data-title="Player Select (<?= !empty($_SESSION[$session_token]['DEMO']) || $unlock_count_players == 1 ? '1 Player' : $unlock_count_players.' Players' ?>)" data-select="this_player_token">
+    <?
+
+    // Define the player select title based on the number of players unlocked (old version)
+    //$player_select_title = 'Player Select ('.(!empty($_SESSION[$session_token]['DEMO']) || $unlock_count_players == 1 ? '1 Player' : $unlock_count_players.' Players').')';
+
+    // Define the player select title based on the number of players unlocked (new version)
+    $free_roam_unlocked = true;
+    $void_cauldron_unlocked = false;
+    // 1x Free Roam + 4x Player Stories + 1x Void Cauldron
+    $game_modes_total = 1 + 4 + 1;
+    // Free Roam always unlocked, 1-4 Players unlocked over time, Void Cauldron at the very end
+    $game_modes_unlocked = ($free_roam_unlocked ? 1 : 0) + ($unlock_count_players) + ($void_cauldron_unlocked ? 1 : 0);
+    $player_select_title = 'Select Game Mode'; //.'('.$game_modes_unlocked.' / '.$game_modes_total.' Unlocked)';
+
+    ?>
+    <div class="menu select_this_player" data-step="1" data-title="<?= $player_select_title ?>" data-select="this_player_token">
         <span class="header block_1 header_types type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
-            <span class="count">Player Select (<?= !empty($_SESSION[$session_token]['DEMO']) || $unlock_count_players == 1 ? '1 Player' : $unlock_count_players.' Players' ?>)</span>
+            <span class="count"><?= $player_select_title ?></span>
             <?/*<span class="reload">&#8634;</span>*/?>
         </span>
         <?

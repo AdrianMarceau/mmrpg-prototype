@@ -44,8 +44,9 @@ else {
         elseif ($player_chapters_unlocked['2']){ $text_chapter_number = '3'; }
         elseif ($player_chapters_unlocked['1']){ $text_chapter_number = '2'; }
         elseif ($player_chapters_unlocked['0']){ $text_chapter_number = '1'; }
+        if ($is_new_game_plus){ $text_chapter_number = '&plus;'.$text_chapter_number; }
         $current_chapter_text = 'Chapter '.$text_chapter_number;
-        if ($is_new_game_plus){ $current_chapter_text = 'NG+ '.$current_chapter_text; }
+        //if ($is_new_game_plus){ $current_chapter_text = 'NG+ '.$current_chapter_text; }
         //$current_chapter_text = 'Chapter '.($is_new_game_plus ? 'X +' : '').$text_chapter_number;
         //$current_chapter_text = str_replace('X +X', 'ZX', $current_chapter_text);
         //error_log('chapter text for '.$player_token.' is '.$current_chapter_text);
@@ -53,7 +54,7 @@ else {
         };
 
     // Define a quick function for getting the current limit heart markup
-    $get_current_limit_hearts = function($player_token){
+    $get_current_limit_hearts = function($player_token, $heart_icon = 'heart', $no_heart_icon = 'heart-broken'){
         $max_hearts = 1;
         $extra_hearts = 0;
         $num_hearts = mmrpg_prototype_limit_hearts_earned($player_token, $max_hearts, $extra_hearts);
@@ -63,12 +64,12 @@ else {
         $anti_hearts_markup = '';
         $extra_hearts_markup = '';
         for ($i = 1; $i <= $max_hearts_to_show; $i++){
-            if ($num_hearts_to_show >= $i){ $hearts_markup .= '<i class="fa fas fa-heart"></i>'; }
-            else { $anti_hearts_markup .= '<i class="fa fas fa-heart-broken"></i>'; }
+            if ($num_hearts_to_show >= $i){ $hearts_markup .= '<i class="fa fas fa-'.$heart_icon.'"></i>'; }
+            else { $anti_hearts_markup .= '<i class="fa fas fa-'.$no_heart_icon.'"></i>'; }
         }
         if (!empty($extra_hearts)){
             for ($i = 1; $i <= $extra_hearts; $i++){
-                $extra_hearts_markup .= '<i class="fa fas fa-heart"></i>';
+                $extra_hearts_markup .= '<i class="fa fas fa-'.$heart_icon.'"></i>';
             }
         }
         $limit_hearts_markup = '';
@@ -105,11 +106,19 @@ else {
     $doctor_token = 'player';
     $doctor_info = isset($mmrpg_player_index[$doctor_token]) ? $mmrpg_player_index[$doctor_token] : array();
     if (true){
-        $text_player_hearts = $get_current_limit_hearts($doctor_token);
+        $heart_icons = array('dot-circle', 'draw-circle');
+        $text_button_label = 'Free Roam'; // None (Free Roam)
+        $text_player_hearts = $get_current_limit_hearts($doctor_token, $heart_icons[0], $heart_icons[1]);
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' option_free-roam block_1 type_none';
+        $text_world_location = 'Area Unknown'; // DOTNET Area 3
+        if (!empty($_SESSION['WORLD']['last_world_token'])){
+            $last_world_token = $_SESSION['WORLD']['last_world_token'];
+            $last_world_name = str_replace(' AREA ', ' Area ', strtoupper(str_replace('-', ' ', $last_world_token)));
+            $text_world_location = $last_world_name;
+        }
         echo '<a class="'.$text_option_classes.'"  data-token="'.$doctor_token.'" data-token-id="0" data-next-href="world.php">';
             echo '<div class="platform"><div class="chrome"><div class="inset">';
-                echo '<label class="has_image"><span class="multi"><span class="maintext">None (Free Roam)</span><span class="subtext">DOTNET Area 3</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+                echo '<label class="has_image"><span class="multi"><span class="maintext">'.$text_button_label.'</span><span class="subtext">'.$text_world_location.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
             echo '</div></div></div>';
         echo '</a>'."\n";
     }
@@ -134,11 +143,12 @@ else {
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
         $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
         $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_light);
-        $text_player_hearts = $get_current_limit_hearts($doctor_token, $chapters_unlocked_light);
+        $text_player_hearts = $get_current_limit_hearts($doctor_token);
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_defense';
+        $text_button_label = str_replace('Dr. ', '', $doctor_info['player_name']).' Story';
         echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_light.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
             echo '<div class="platform"><div class="chrome"><div class="inset">';
-                echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$doctor_info['player_name'].(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+                echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$text_button_label.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
             echo '</div></div></div>';
         echo '</a>'."\n";
     } else {
@@ -167,11 +177,12 @@ else {
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
         $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
         $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_wily);
-        $text_player_hearts = $get_current_limit_hearts($doctor_token, $chapters_unlocked_wily);
+        $text_player_hearts = $get_current_limit_hearts($doctor_token);
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_attack';
+        $text_button_label = str_replace('Dr. ', '', $doctor_info['player_name']).' Story';
         echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_wily.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
         echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$doctor_info['player_name'].(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$text_button_label.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
         echo '</div></div></div>';
         echo '</a>'."\n";
     } else {
@@ -200,11 +211,12 @@ else {
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
         $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
         $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_cossack);
-        $text_player_hearts = $get_current_limit_hearts($doctor_token, $chapters_unlocked_cossack);
+        $text_player_hearts = $get_current_limit_hearts($doctor_token);
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_speed';
+        $text_button_label = str_replace('Dr. ', '', $doctor_info['player_name']).' Story';
         echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_cossack.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
         echo '<div class="platform"><div class="chrome"><div class="inset">';
-        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$doctor_info['player_name'].(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+        echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$text_button_label.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="Light Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
         echo '</div></div></div>';
         echo '</a>'."\n";
     } else {
@@ -234,11 +246,12 @@ else {
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
         $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
         $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_lalinde);
-        $text_player_hearts = $get_current_limit_hearts($doctor_token, $chapters_unlocked_lalinde);
+        $text_player_hearts = $get_current_limit_hearts($doctor_token);
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_energy ';
+        $text_button_label = str_replace('Dr. ', '', $doctor_info['player_name']).' Story';
         echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_lalinde.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
             echo '<div class="platform"><div class="chrome"><div class="inset">';
-                echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$doctor_info['player_name'].(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="LaLinde Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+                echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$text_button_label.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="LaLinde Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
             echo '</div></div></div>';
         echo '</a>'."\n";
     } else {
