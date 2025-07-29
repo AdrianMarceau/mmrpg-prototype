@@ -21,6 +21,15 @@ class rpg_world {
         return true;
     }
 
+    // Define a function for getting the indexes loaded into this class
+    public static function get_indexes($kind = ''){
+        //error_log('rpg_world::get_indexes() called!');
+        if (empty(self::$mmrpg_indexes)){ return array(); }
+        if (empty($kind)){ return self::$mmrpg_indexes; }
+        if (!isset(self::$mmrpg_indexes[$kind])){ return array(); }
+        return self::$mmrpg_indexes[$kind];
+    }
+
     // Define a function for loading a given map's data from the filesystem
     public static function load_map_data($map_token){
         //error_log('load_map_data() called!');

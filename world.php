@@ -103,17 +103,9 @@ $mmrpg_indexes = array(
     'players' => &$mmrpg_index_players,
     'robots' => &$mmrpg_index_robots,
     'abilities' => &$mmrpg_index_abilities,
-    'items' => &$mmrpg_index_items
+    'items' => &$mmrpg_index_items,
     );
 rpg_world::load_indexes($mmrpg_indexes);
-
-// TODO: replace below legacy versions in the code thereafter with their new counterparts within the rpg_world class
-$get_xkind = function($kind){ return rpg_world::get_xkind($kind); };
-$get_randpos = function($available_encounter_cells){ return rpg_world::get_randpos($available_encounter_cells); };
-$get_sprite = function($kind, $token, $alt = '', $dir = 'right', $class = '', $styles = '', $attrs = ''){ return rpg_world::get_sprite($kind, $token, $alt, $dir, $class, $styles, $attrs); };
-$get_battle_history = function($player_token = '', $record_token = ''){ return rpg_world::get_battle_history($player_token, $record_token); };
-function loadMapData($map_token){ return rpg_world::load_map_data($map_token); }
-function getMapEncounterCells($map_data){ return rpg_world::get_map_encounter_cells($map_data); }
 
 // Define the default prototype data fields and values so we don't get errors
 $this_prototype_data = array();
@@ -163,7 +155,7 @@ $this_prototype_data['this_player_token'] = $this_player_info['player_token'];
 $max_player_robots = MMRPG_WORLD_DEFAULT_TEAMSIZE; // TODO: make this dynamic based on limit hearts
 $allowed_player_robots = mmrpg_prototype_robots_unlocked($this_player_token, true);
 $current_player_robots = !empty($allowed_player_robots) ? array_slice($allowed_player_robots, 0, $max_player_robots) : array(); // TODO: make this customizable
-$summoned_player_robots = $get_battle_history($this_player_token, 'robots_summoned');
+$summoned_player_robots = rpg_world::get_battle_history($this_player_token, 'robots_summoned');
 //error_log('$allowed_player_robots = '.print_r($allowed_player_robots, true));
 //error_log('$current_player_robots = '.print_r($current_player_robots, true));
 //error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));
@@ -210,7 +202,7 @@ $WORLD_PLAYER_SESSION[$last_world_position_key] = $this_prototype_data['this_cur
 
 // Load map data from the appropriate map file
 $map_token = $this_prototype_data['this_current_world'];
-$map_data_parsed = loadMapData($map_token);
+$map_data_parsed = rpg_world::load_map_data($map_token);
 //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
 
 // Collect the map's field token and mecha encounters
@@ -268,7 +260,7 @@ if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data[
 // Generate the random encounters for this map location if not already spawned
 //$max_random_encounters = 20;
 $allowed_random_encounters = $map_mecha_support;
-$available_encounter_cells = getMapEncounterCells($map_data_parsed);
+$available_encounter_cells = rpg_world::get_map_encounter_cells($map_data_parsed);
 $max_random_encounters = ceil($available_encounter_cells['total'] * 0.25);
 $map_random_encounters = !empty($WORLD_SESSION[$map_token.'_random_encounters']) ? $WORLD_SESSION[$map_token.'_random_encounters'] : array();
 //error_log('$allowed_random_encounters = '.print_r($allowed_random_encounters, true));
@@ -314,7 +306,7 @@ if (empty($map_random_encounters)){
         if (empty($available)){ $available = $available_encounter_cells['all']; }
         //error_log('$available = '.print_r($available, true).PHP_EOL);
         //exit();
-        $randpos = $get_randpos($available);
+        $randpos = rpg_world::get_rand_pos($available);
         $robot_info = $mmrpg_index_robots[$robot];
         $robot_level = mt_rand(1, 10);
         $battle_token = 'world-battle_'.$map_token.'_debug-'.($i + 1);
@@ -476,7 +468,7 @@ $flag_skip_fadein = true;
                     $battle_index = array();
                     foreach ($map_random_encounters as $encounter){
                         $kind = $encounter[0];
-                        $xkind = $get_xkind($kind);
+                        $xkind = rpg_world::get_xkind($kind);
                         $token = $encounter[1];
                         $alt = $encounter[2];
                         $position = $encounter[3];
@@ -493,7 +485,7 @@ $flag_skip_fadein = true;
                         $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$zindex.';';
                         $attrs = 'data-battle="'.$battle.'" data-pos="'.$position.'" data-col="'.$col.'" data-row="'.$row.'"';
                         $attrs .= 'data-label="'.$name.'"';
-                        $markup = $get_sprite($kind, $token, $alt, 'right', $class, $style, $attrs);
+                        $markup = rpg_world::get_sprite($kind, $token, $alt, 'right', $class, $style, $attrs);
                         echo($markup);
                         $battle_symbols[$position] = $battle;
                         $battle_index[$battle] = array(
@@ -523,7 +515,7 @@ $flag_skip_fadein = true;
 
                     // Quick function for generation the team sprites for a given player
                     $get_team_sprites = function($team_sprites, $target_position = '1-1', $team_class = 'team')
-                        use ($get_sprite, $map_tile_height, $map_tile_width, $map_tilesize_offset){
+                        use ($map_tile_height, $map_tile_width, $map_tilesize_offset){
                         $sprites = array();
                         list($col, $row) = explode('-', $target_position);
                         $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
@@ -537,7 +529,7 @@ $flag_skip_fadein = true;
                             $class = $team_class; //'team bounce';
                             $styles = 'top: '.$top.'px; left: '.$left.'px; ';
                             $attrs = 'data-key="'.$key.'"';
-                            $markup = $get_sprite($kind, $token, $alt, $dir, $class, $styles, $attrs);
+                            $markup = rpg_world::get_sprite($kind, $token, $alt, $dir, $class, $styles, $attrs);
                             if (!empty($markup)){ $sprites[] = $markup; }
                             }
                         return implode(PHP_EOL, $sprites);
@@ -638,14 +630,14 @@ $flag_skip_fadein = true;
                 $get_label_span = function($name, $kind){ return ('<span class="label">'.$name.' ('.ucfirst($kind).')</span>'); };
                 $cursor_token = 'player';
                 $cursor_active = $this_prototype_data['this_player_token'] === $cursor_token ? true : false;
-                $cursor_sprite = $get_sprite('robot', 'pointan', '', 'right', 'cursor');
+                $cursor_sprite = rpg_world::get_sprite('robot', 'pointan', '', 'right', 'cursor');
                 $cursor_label = $get_label_span('Prε', 'cursor');
                 echo('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
                 foreach ($allowed_player_tokens AS $player_key => $player_token){
                     if ($player_token === 'player' || empty($mmrpg_index_players[$player_token])){ continue; }
                     $player_info = $mmrpg_index_players[$player_token];
                     $player_active = $player_token === $this_prototype_data['this_player_token'] ? true : false;
-                    $player_sprite = $get_sprite('player', $player_token, '', 'right', 'character', '');
+                    $player_sprite = rpg_world::get_sprite('player', $player_token, '', 'right', 'character', '');
                     $player_label = $get_label_span($player_info['player_name'], 'player');
                     echo('<a class="option'.($player_active ? ' active' : '').'" data-player="'.$player_token.'">'.$player_sprite.$cursor_sprite.$player_label.'</a>');
                 }

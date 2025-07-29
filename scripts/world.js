@@ -1142,13 +1142,6 @@ class mmrpgWorldMap {
         // If the player has not moved from their spawn position yet, we should not do anything further
         if (!_config.allowWorldEvents){ return true; }
 
-        // Just to make sure we don't put ourselves in any infinit loops, check to see if the player has moved from spawn position
-        //console.log('-> checking if player has moved from spawn position...');
-        //console.log('-> _config.mapStartPosition =', _config.mapStartPosition);
-        //console.log('-> newPosition =', newPosition, '=>', newPosition.join('-'));
-        //let playerOnStartPosition = (_config.mapStartPosition === newPosition.join('-')) ? true : false;
-        //console.log('-> playerOnStartPosition =', playerOnStartPosition);
-
         // Search for events at the new position so we can show the action dropdown if needed
         //console.log('-> checking if there are any events for this position...');
         let $eventsAtPosition = _self.getEventsAtPosition(newPosition);
