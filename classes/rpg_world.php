@@ -252,6 +252,7 @@ class rpg_world {
     // Define a quick function for translating singular kinds to plural kinds
     // TODO:  Find the class method that already does this if exists, else create
     public static function get_xkind($kind){
+        //error_log('rpg_world::get_xkind() called for "'.$kind.'"');
         if (!$kind){ return false; }
         switch($kind){
             case 'object': return 'objects';
@@ -268,6 +269,7 @@ class rpg_world {
     // Define a quick function for getting a random position on a given grid
     // TODO: Define this as an actual function instead of a variable
     public static function get_rand_pos($available_encounter_cells){
+        //error_log('rpg_world::get_rand_pos() called!');
         static $used;
         if (!$used){ $used = array(); }
         $available = array_values(array_diff($available_encounter_cells, $used));
@@ -280,6 +282,7 @@ class rpg_world {
     // Define a reusable method for the above that takes args and generates markup to return as a string
     // TODO:  Define this as an actual function instead of a variable
     public static function get_sprite($kind, $token, $alt = '', $dir = 'right', $class = '', $styles = '', $attrs = ''){
+        //error_log('rpg_world::get_sprite() called for "'.$kind.'" with token "'.$token.'"');
         $mmrpg_indexes = self::$mmrpg_indexes;
         $xkind = self::get_xkind($kind);
         if (empty($mmrpg_indexes)){ error_log('error: $mmrpg_indexes does not exist!'); return false; }
@@ -305,6 +308,7 @@ class rpg_world {
 
     // Define a function for getting the battle history for a given player token
     public static function get_battle_history($player_token = '', $record_token = ''){
+        //error_log('rpg_world::get_battle_history() called for player "'.$player_token.'" and record "'.$record_token.'"');
         $session_token = rpg_game::session_token();
         $this_battle_history = !empty($_SESSION[$session_token]['values']['battle_history']) ? $_SESSION[$session_token]['values']['battle_history'] : array();
         if (empty($player_token)){ return $this_battle_history; }
@@ -312,6 +316,28 @@ class rpg_world {
         if (empty($record_token)){ return $player_battle_history; }
         $battle_history_record = !empty($player_battle_history[$record_token]) ? $player_battle_history[$record_token] : array();
         return $battle_history_record;
+    }
+
+    // Define a function for getting the player switcher markup given current conditions
+    public static function get_player_switcher_markup($this_prototype_data, $allowed_player_tokens){
+        //error_log('rpg_world::get_player_switcher_markup() called!');
+        $return_markup = '';
+        $get_label_span = function($name, $kind){ return ('<span class="label">'.$name.' ('.ucfirst($kind).')</span>'); };
+        $cursor_token = 'player';
+        $cursor_active = $this_prototype_data['this_player_token'] === $cursor_token ? true : false;
+        $cursor_sprite = self::get_sprite('robot', 'pointan', '', 'right', 'cursor');
+        $cursor_label = $get_label_span('Prε', 'cursor');
+        $return_markup .= ('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
+        $mmrpg_index_players = self::get_indexes('players');
+        foreach ($allowed_player_tokens AS $player_key => $player_token){
+            if ($player_token === 'player' || empty($mmrpg_index_players[$player_token])){ continue; }
+            $player_info = $mmrpg_index_players[$player_token];
+            $player_active = $player_token === $this_prototype_data['this_player_token'] ? true : false;
+            $player_sprite = self::get_sprite('player', $player_token, '', 'right', 'character', '');
+            $player_label = $get_label_span($player_info['player_name'], 'player');
+            $return_markup .= ('<a class="option'.($player_active ? ' active' : '').'" data-player="'.$player_token.'">'.$player_sprite.$cursor_sprite.$player_label.'</a>');
+        }
+        return $return_markup;
     }
 
 

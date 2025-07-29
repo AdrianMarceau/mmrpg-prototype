@@ -622,27 +622,22 @@ $flag_skip_fadein = true;
                 <div id="click-overlay" class="active"><div class="wrapper"></div></div>
                 <div id="action-dropdown" class="active"><div class="wrapper"></div></div>
             </div>
-            <div id="back-button" class="chrome chrome-button"><a class="wrapper"><i class="fa fas fa-sign-out"></i></a></div>
-            <div id="home-button" class="chrome chrome-button"><a class="wrapper"><i class="fa fas fa-home"></i></a></div>
-            <div id="reset-button" class="chrome chrome-button"><a class="wrapper"><i class="fa fas fa-bomb"></i></a></div>
-            <div id="position-display" class="chrome"><div class="wrapper">&hellip;</div></div>
-            <div id="player-switcher" class="chrome"><div class="wrapper"><?
-                $get_label_span = function($name, $kind){ return ('<span class="label">'.$name.' ('.ucfirst($kind).')</span>'); };
-                $cursor_token = 'player';
-                $cursor_active = $this_prototype_data['this_player_token'] === $cursor_token ? true : false;
-                $cursor_sprite = rpg_world::get_sprite('robot', 'pointan', '', 'right', 'cursor');
-                $cursor_label = $get_label_span('Prε', 'cursor');
-                echo('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
-                foreach ($allowed_player_tokens AS $player_key => $player_token){
-                    if ($player_token === 'player' || empty($mmrpg_index_players[$player_token])){ continue; }
-                    $player_info = $mmrpg_index_players[$player_token];
-                    $player_active = $player_token === $this_prototype_data['this_player_token'] ? true : false;
-                    $player_sprite = rpg_world::get_sprite('player', $player_token, '', 'right', 'character', '');
-                    $player_label = $get_label_span($player_info['player_name'], 'player');
-                    echo('<a class="option'.($player_active ? ' active' : '').'" data-player="'.$player_token.'">'.$player_sprite.$cursor_sprite.$player_label.'</a>');
-                }
-                ?></div></div>
-            <div id="side-buttons" class="chrome"><div class="wrapper">&hellip;</div></div>
+            <?
+            // Define or generate the markup for the various buttons and UI elements around the world map
+            $wrap_markup = function($markup, $tag = 'div'){ return '<'.$tag.' class="wrapper">'.$markup.'</'.$tag.'>'; };
+            $back_button_markup = $wrap_markup('<i class="fa fas fa-sign-out"></i>', 'a');
+            $home_button_markup = $wrap_markup('<i class="fa fas fa-home"></i>', 'a');
+            $reset_button_markup = $wrap_markup('<i class="fa fas fa-bomb"></i>', 'a');
+            $player_switcher_markup = $wrap_markup(rpg_world::get_player_switcher_markup($this_prototype_data, $allowed_player_tokens));
+            $position_display_markup = $wrap_markup('&hellip;');
+            $side_buttons_markup = $wrap_markup('&hellip;');
+            ?>
+            <div id="back-button" class="chrome chrome-button"><?= $back_button_markup ?></div>
+            <div id="home-button" class="chrome chrome-button"><?= $home_button_markup ?></div>
+            <div id="reset-button" class="chrome chrome-button"><?= $reset_button_markup ?></div>
+            <div id="player-switcher" class="chrome"><?= $player_switcher_markup ?></div>
+            <div id="position-display" class="chrome"><?= $position_display_markup ?></div>
+            <div id="side-buttons" class="chrome"><?= $side_buttons_markup ?></div>
             <?
             // DEBUG DEBUG DEBUG
             echo('<pre data-var="$map_data_parsed" style="display: none;"><!-- $map_data_parsed = '.print_r($map_data_parsed, true).' --></pre>');
