@@ -168,6 +168,7 @@ require('classes/rpg_user_role.php');
 require('classes/rpg_functions.php');
 require('classes/rpg_game.php');
 require('classes/rpg_prototype.php');
+require('classes/rpg_world.php');
 require('classes/rpg_mission.php');
 require('classes/rpg_mission_starter.php');
 require('classes/rpg_mission_single.php');
