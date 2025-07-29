@@ -20,6 +20,12 @@ $_SESSION['SKILLS'] = array();
 $_SESSION['PROTOTYPE_TEMP'] = array();
 $_SESSION['WORLD_TEMP'] = array();
 
+// Collect the game session token in case we need it later
+$session_token = rpg_game::session_token();
+
+//unset($_SESSION[$session_token]['battle_history']);
+//unset($_SESSION[$session_token]['values']['battle_history']);
+
 // Define a reference object for storing temporary world data
 $WORLD_SESSION = &$_SESSION['WORLD'];
 
@@ -383,21 +389,36 @@ $this_prototype_data['this_player_robots'] = $this_player_robots; // required
 if (!empty($this_prototype_data['this_current_player'])){
     $this_player_token = $this_prototype_data['this_current_player'];
     $this_player_info = !empty($mmrpg_index_players[$this_player_token]) ? $mmrpg_index_players[$this_player_token] : array();
+    $this_battle_history = !empty($_SESSION[$session_token]['values']['battle_history']) && !empty($_SESSION[$session_token]['values']['battle_history'][$this_player_token]) ? $_SESSION[$session_token]['values']['battle_history'][$this_player_token] : array();
     $this_prototype_data['this_player_id'] = $this_player_info['player_id'];
     $this_prototype_data['this_player_token'] = $this_player_info['player_token'];
-    $allowed_player_robots = mmrpg_prototype_robots_unlocked($this_player_token, true);
     $max_player_robots = MMRPG_WORLD_DEFAULT_TEAMSIZE; // TODO: make this dynamic based on limit hearts
+    $allowed_player_robots = mmrpg_prototype_robots_unlocked($this_player_token, true);
     //error_log('$allowed_player_robots = '.print_r($allowed_player_robots, true));
-    if (!empty($allowed_player_robots)){
-        $request_player_robots = array();
-        foreach ($allowed_player_robots AS $robot_token){
+    $current_player_robots = !empty($allowed_player_robots) ? array_slice($allowed_player_robots, 0, $max_player_robots) : array(); // TODO: make this customizable
+    //error_log('$current_player_robots = '.print_r($current_player_robots, true));
+    $summoned_player_robots = !empty($this_battle_history['robots_summoned']) ? $this_battle_history['robots_summoned'] : array();
+    //error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));
+    if (!empty($summoned_player_robots)){
+        //error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));
+        usort($current_player_robots, function($a, $b) use ($summoned_player_robots){
+            $a_summoned = array_search($a, $summoned_player_robots);
+            $b_summoned = array_search($b, $summoned_player_robots);
+            if ($a_summoned !== false && $b_summoned !== false){ return $a_summoned - $b_summoned; }
+            elseif ($a_summoned !== false){ return 1; } elseif ($b_summoned !== false){ return -1; }
+            else { return 0; }
+            });
+        //error_log('$current_player_robots (sorted) = '.print_r($current_player_robots, true));
+    }
+    if (!empty($current_player_robots)){
+        $this_player_robots = array();
+        foreach ($current_player_robots AS $robot_token){
             if (empty($mmrpg_index_robots[$robot_token])){ continue; }
             $robot_info = $mmrpg_index_robots[$robot_token];
             $robot_id = $robot_info['robot_id'];
             $robot_string = $robot_id . '_' . $robot_token;
-            $request_player_robots[] = $robot_string;
+            $this_player_robots[] = $robot_string;
         }
-        $this_player_robots = array_slice($request_player_robots, 0, $max_player_robots);
         $this_prototype_data['this_player_robots'] = $this_player_robots;
     }
 } else {
