@@ -5,6 +5,14 @@ let $thisWorld = false;
 let $thisCanvas = false;
 
 // Expand the game settings object with a variable world specific data
+gameSettings.worldElements = {
+    mmrpg: null,
+    world: null,
+    canvas: null,
+    map: null,
+    layers: null,
+    cursor: null,
+    };
 gameSettings.worldConfig = {
     userId: 0,
     playerId: 0,
@@ -30,6 +38,7 @@ gameSettings.worldConfig = {
     mapPortalsIndex: {},
     mapBattleIndex: {},
     mapBattleSymbols: {},
+    mapRivalSymbols: {},
     windowWidth: 1024, // default only
     widthHeight: 768, // default only
     mmrpgWidth: 800, // default only
@@ -38,26 +47,19 @@ gameSettings.worldConfig = {
     worldHeight: 600, // default only
     canvasWidth: 800, // default only
     canvasHeight: 600, // default only
-    allowWorldEvents: false, // default until user interaction
     backButtonURL: '#', // populated on init
     homeButtonURL: '#', // populated on init
     resetButtonURL: '#', // populated on init
-    };
-gameSettings.worldElements = {
-    mmrpg: null,
-    world: null,
-    canvas: null,
-    map: null,
-    layers: null,
-    cursor: null,
+    allowWorldEvents: false, // default until user interaction
     };
 gameSettings.worldState = {
     cursor: {
         direction: '',
-        moving: false,
         position: '0-0',
         col: 0,
         row: 0,
+        moving: false,
+        moved: false,
         },
     layersIndex: {},
     layerTilesIndex: {},
@@ -196,13 +198,13 @@ class mmrpgWorldMap {
             let startPosition = '1-1';
             if (_config.mapStartPosition){ startPosition = _config.mapStartPosition; }
             else if (portalsIndex['spawn']){ startPosition = portalsIndex['spawn'].join('-'); }
-            _self.moveToPosition(startPosition, null, true, false);
+            _config.allowWorldEvents = true;
             _self.playSoundEffect('teleport-in');
+            _self.moveToPosition(startPosition, null, true, false);
             setTimeout(function(){
                 $thisWorld.removeClass('hidden');
                 $thisWorld.addClass('ready');
                 $canvasMap.addClass('ready');
-                _config.allowWorldEvents = true;
                 }, 100);
             };
         // Define the function for run when each layer is done being rendered
@@ -234,7 +236,7 @@ class mmrpgWorldMap {
                     let $thisJson = $(this);
                     let jsonKind = $thisJson.attr('data-json'), jsonData = $thisJson.html(), jsonObject = jsonData ? JSON.parse(jsonData) : false;
                     if (!jsonData || !jsonData.length){ console.warn('---> JSON data for layer ' + layerToken + ' (script[data-json="'+jsonKind+'"]) was empty!'); return true; }
-                    if (!jsonObject || typeof jsonObject !== 'object' || !Object.keys(jsonObject).length){ console.error('---> unable to parse JSON data for layer ' + layerToken + ' (script[data-json="'+jsonKind+'"])!'); return true; }
+                    if (!jsonObject || typeof jsonObject !== 'object'){ console.error('---> unable to parse JSON data for layer ' + layerToken + ' (script[data-json="'+jsonKind+'"])!', '\n---> jsonData was', jsonData); return true; }
                     //console.log('---> parsed json layer data for ' + layerToken + ' (script[data-json="'+jsonKind+'"]) !!! jsonObject =', jsonObject);
                     let configName = 'map' + jsonKind[0].toUpperCase() + jsonKind.slice(1);
                     //console.log('---> setting _config.' + configName + ' =', jsonObject);
@@ -384,7 +386,7 @@ class mmrpgWorldMap {
     // Quick function to calculate all the walkable tile positions for this map given
     // its base properties (size, terrain) and current conditions (player, enemy placement)
     calculateWalkableMapTiles(excludePlayer, excludeBattles, forceRefresh){
-        console.log('%c' + 'mmrpgWorldMap.calculateWalkableMapTiles()', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.calculateWalkableMapTiles()', 'color: magenta;');
         excludePlayer = typeof excludePlayer === 'boolean' ? excludePlayer : true;
         excludeBattles = typeof excludeBattles === 'boolean' ? excludeBattles : true;
         forceRefresh = typeof forceRefresh === 'boolean' ? forceRefresh : false;
@@ -439,7 +441,7 @@ class mmrpgWorldMap {
 
             }
 
-        console.log('---> walkableMapTiles (base) =', walkableMapTiles);
+        //console.log('---> walkableMapTiles (base) =', walkableMapTiles);
 
         // If we are to exclude the player (cursor), make sure we  remove that position
         let playerPosition = '1-1';
@@ -450,7 +452,7 @@ class mmrpgWorldMap {
             walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 return tileKey !== playerPosition;
                 });
-            console.log('---> walkableMapTiles after player exclusions =', walkableMapTiles);
+            //console.log('---> walkableMapTiles after player exclusions =', walkableMapTiles);
             }
 
         // If we are to exclude the enemies, make sure we remove those positions
@@ -462,7 +464,7 @@ class mmrpgWorldMap {
             walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 return !battleSymbolsKeys.includes(tileKey);
                 });
-            console.log('---> walkableMapTiles after battle exclusions =', walkableMapTiles);
+            //console.log('---> walkableMapTiles after battle exclusions =', walkableMapTiles);
             }
 
         // Return the walkable map tiles
@@ -774,10 +776,12 @@ class mmrpgWorldMap {
             let thisPos = _self.getTileAtPosition($clickOverlay, e.pageX, e.pageY);
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
             let battleSymbols = _config.mapBattleSymbols;
+            let rivalSymbols = _config.mapRivalSymbols;
             //console.log('-> checking battleSymbols =', battleSymbols);
             let battleAtPosition = Object.keys(battleSymbols).indexOf(thisPos) !== -1;
+            let rivalAtPosition = Object.keys(rivalSymbols).indexOf(thisPos) !== -1;
             if (thisPos === oldPos || thisPos === lastMouseClick){ return; }
-            if (!tileData.walkable || battleAtPosition){ return; }
+            if (!tileData.walkable || battleAtPosition || rivalAtPosition){ return; }
             //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
             _self.playSoundEffect('link-click');
             lastMouseClick = thisPos;
@@ -795,9 +799,11 @@ class mmrpgWorldMap {
             let thisPos = _self.getTileAtPosition($clickOverlay, e.pageX, e.pageY);
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
             let battleSymbols = _config.mapBattleSymbols;
+            let rivalSymbols = _config.mapRivalSymbols;
             //console.log('-> checking battleSymbols =', battleSymbols);
             let battleAtPosition = Object.keys(battleSymbols).indexOf(thisPos) !== -1;
-            let showPointer = thisPos !== _cursor.position && tileData.walkable && !battleAtPosition;
+            let rivalAtPosition = Object.keys(rivalSymbols).indexOf(thisPos) !== -1;
+            let showPointer = thisPos !== _cursor.position && tileData.walkable && !battleAtPosition && !rivalAtPosition;
             $clickOverlay.css({cursor: showPointer ? 'pointer' : 'default'});
             if (hoverTiles.length){
                 for (var i = 0; i < hoverTiles.length; i++){
@@ -808,7 +814,7 @@ class mmrpgWorldMap {
                     }
                 }
             if (thisPos === lastMouseOver){ return; }
-            if (!tileData.walkable || battleAtPosition){ return; }
+            if (!tileData.walkable || battleAtPosition || rivalAtPosition){ return; }
             //console.log('%c' + 'Mouse move event triggered at position ' + thisPos + '!', 'color: orange;');
             _self.playSoundEffect('icon-hover');
             lastMouseOver = thisPos;
@@ -833,7 +839,7 @@ class mmrpgWorldMap {
             $backButton.bind('click', function(e){
                 e.preventDefault();
                 //console.log('%c' + 'Back button clicked!', 'color: cyan;');
-                if (!confirm('Are you sure you want to leave the world map?')){ return; }
+                //if (!confirm('Are you sure you want to leave the world map?')){ return; }
                 _self.playSoundEffect('bounce-sound');
                 let backButtonURL = $backButton.attr('data-url') || _config.backButtonURL;
                 window.location.href = backButtonURL;
@@ -855,7 +861,7 @@ class mmrpgWorldMap {
             $homeButton.bind('click', function(e){
                 e.preventDefault();
                 //console.log('%c' + 'Home button clicked!', 'color: cyan;');
-                if (!confirm('Are you sure you want to return to the home area?')){ return; }
+                //if (!confirm('Are you sure you want to return to the home area?')){ return; }
                 _self.playSoundEffect('bounce-sound');
                 let homeButtonURL = $homeButton.attr('data-url') || _config.homeButtonURL;
                 window.location.href = homeButtonURL;
@@ -897,9 +903,10 @@ class mmrpgWorldMap {
         let $playerSwitcher = _elements.playerSwitcher;
         if ($playerSwitcher && $playerSwitcher.length){
             $('.option[data-player]', $playerSwitcher).bind('click', function(e){
-                e.preventDefault();
-                let playerToken = $(this).attr('data-player') || false;
                 //console.log('%c' + 'Player switcher clicked for ' + playerToken + '!', 'color: cyan;');
+                e.preventDefault();
+                let $option = $(this);
+                let playerToken = $option.attr('data-player') || false;
                 _self.playSoundEffect('switch-in');
                 $thisWorld.addClass('hidden');
                 let worldReloadURL = 'world.php?player=' + playerToken;
@@ -907,9 +914,17 @@ class mmrpgWorldMap {
                 return true;
                 });
             $('.option[data-player]', $playerSwitcher).bind('mouseenter', function(e){
-                e.preventDefault();
                 //console.log('%c' + 'Player switcher hovered!', 'color: cyan;');
+                e.preventDefault();
+                let $option = $(this);
+                $('.sprite.player > .sprite', $option).addClass('sprite_40x40_taunt');
                 _self.playSoundEffect('icon-hover');
+                });
+            $('.option[data-player]', $playerSwitcher).bind('mouseleave', function(e){
+                //console.log('%c' + 'Player switcher mouseleave!', 'color: cyan;');
+                e.preventDefault();
+                let $option = $(this);
+                $('.sprite.player > .sprite', $option).removeClass('sprite_40x40_taunt');
                 });
             }
         // Return true on success
@@ -932,6 +947,7 @@ class mmrpgWorldMap {
         let _mapEffects = _config.mapEffects;
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
+        let _mapStartPosition = _config.mapStartPosition;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
         let $sideButtons = _elements.sideButtons;
@@ -951,12 +967,14 @@ class mmrpgWorldMap {
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
         if (thisNewCol === thisOldCol && thisNewRow === thisOldRow && !forceMove){ console.error('$cursorSprite already at position!'); return false; }
+        let thisNewPos = thisNewCol + '-' + thisNewRow;
         let thisHorDir = (thisNewCol > thisOldCol) ? 'right' : (thisNewCol < thisOldCol) ? 'left' : false;
         let thisVerDir = (thisNewRow > thisOldRow) ? 'down' : (thisNewRow < thisOldRow) ? 'up' : false;
         let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join(' and '); })(thisHorDir, thisVerDir);
         let thisShiftDist = Math.sqrt(Math.pow(thisNewCol - thisOldCol, 2) + Math.pow(thisNewRow - thisOldRow, 2));
         let tileOffsetX = ((thisNewCol - 1) * _mapTileSize[0]) + _mapTileSizeOffset[0];
         let tileOffsetY = ((thisNewRow - 1) * _mapTileSize[1]) + _mapTileSizeOffset[1];
+        let cursorHasMoved = _worldCursor.moved || thisNewPos !== _mapStartPosition ? true : false;
         $canvasMap.addClass('busy');
         _worldCursor.moving = true;
         $actionDropdown.removeClass('active');
@@ -969,8 +987,10 @@ class mmrpgWorldMap {
         let onMoveComplete = function(){
             _worldCursor.col = thisNewCol;
             _worldCursor.row = thisNewRow;
-            _worldCursor.position = thisNewCol + '-' + thisNewRow;
+            _worldCursor.position = thisNewPos;
             _worldCursor.direction = thisShiftDir.replace(/ and /g, '-');
+            _worldCursor.moved = cursorHasMoved;
+            //console.log('_worldCursor =', '\n-> col =', _worldCursor.col, '\n-> row =', _worldCursor.row, '\n-> position =', _worldCursor.position, '\n-> direction =', _worldCursor.direction, '\n-> moved =', _worldCursor.moved);
             $cursorSprite.attr('data-col', thisNewCol);
             $cursorSprite.attr('data-row', thisNewRow);
             $cursorSprite.attr('data-pos', _worldCursor.position);
@@ -1122,6 +1142,13 @@ class mmrpgWorldMap {
         // If the player has not moved from their spawn position yet, we should not do anything further
         if (!_config.allowWorldEvents){ return true; }
 
+        // Just to make sure we don't put ourselves in any infinit loops, check to see if the player has moved from spawn position
+        //console.log('-> checking if player has moved from spawn position...');
+        //console.log('-> _config.mapStartPosition =', _config.mapStartPosition);
+        //console.log('-> newPosition =', newPosition, '=>', newPosition.join('-'));
+        //let playerOnStartPosition = (_config.mapStartPosition === newPosition.join('-')) ? true : false;
+        //console.log('-> playerOnStartPosition =', playerOnStartPosition);
+
         // Search for events at the new position so we can show the action dropdown if needed
         //console.log('-> checking if there are any events for this position...');
         let $eventsAtPosition = _self.getEventsAtPosition(newPosition);
@@ -1151,28 +1178,33 @@ class mmrpgWorldMap {
                 showDropdown = true;
                 if (!dataLabel){ dataLabel = 'Portal Options'; }
                 dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>';
-                if (dataPortal.indexOf('goto__') !== -1){ dropdownButtons += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Warp to Area</span></a>'; }
+                if (dataPortal.indexOf('goto__') !== -1){ dropdownButtons += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Use Teleport</span></a>'; }
                 else if (dataPortal === 'exit'){ dropdownButtons += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Return Home</span></a>'; }
                 dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showDropdownType = 'portal';
                 zoomTimeoutDuration = 500; // if we show a portal dropdown, we want to zoom in quickly
-                // Automatically redirect to this portal (temp maybe?) TODO: review this in the future
-                //console.log('-> entering portal with name ' + dataPortal + '!');
-                if (dataPortal === 'spawn'){
-                    // TODO: make the spawn actually go somewhere specific ?
-                    console.warn('-> spawn portals not yet implemented yet');
-                    } else if (dataPortal === 'exit'){
-                    // TODO: make the exit actually go somewhere specific ?
-                    autoRedirect = true;
+                // Automatically redirect to this portal if player has moved at least once
+                if (_worldCursor.moved){
+                    //console.log('-> entering portal with name ' + dataPortal + '!');
+                    if (dataPortal === 'spawn'){
+                        // TODO: make the spawn actually go somewhere specific ?
+                        console.warn('-> spawn portals not yet implemented yet');
+                        } else if (dataPortal === 'exit'){
+                        // TODO: make the exit actually go somewhere specific ?
+                        autoRedirect = true;
+                        showDropdown = false;
+                        autoRedirectURL = 'prototype.php';
+                        } else if (dataPortal.indexOf('goto__') !== -1){
+                        // Make the portal token a world token for the redirect
+                        autoRedirect = true;
+                        showDropdown = false;
+                        let worldToken = dataPortal.replace(/^goto__/i, '');
+                        autoRedirectURL = 'world.php?world=' + worldToken;
+                        autoRedirectSound = 'bounce-sound';
+                        }
+                    } else {
+                    //console.log('-> portal ' + dataPortal + ' disabled until cursor movement!');
                     showDropdown = false;
-                    autoRedirectURL = 'prototype.php';
-                    } else if (dataPortal.indexOf('goto__') !== -1){
-                    // Make the portal token a world token for the redirect
-                    autoRedirect = true;
-                    showDropdown = false;
-                    let worldToken = dataPortal.replace(/^goto__/i, '');
-                    autoRedirectURL = 'world.php?world=' + worldToken;
-                    autoRedirectSound = 'bounce-sound';
                     }
                 }
             }
@@ -1359,6 +1391,10 @@ class mmrpgWorldMap {
             // Bind click events to the newly created action buttons in the dropdown
             $('.button[data-action]', $sideButtons).bind('click', onActionButtonClick);
             $('.button[data-action]', $sideButtons).bind('mouseenter', onActionButtonHover);
+
+            // Bind an event to the side-button area itself for showing/hiding action labels on hover
+            $sideButtons.bind('mouseenter', function(e){ $actionDropdown.addClass('hover'); });
+            $sideButtons.bind('mouseleave', function(e){ $actionDropdown.removeClass('hover'); });
 
             // Wait a moment for visual flow and then show the dropdown (adjusting alignment as needed)
             setTimeout(function(){

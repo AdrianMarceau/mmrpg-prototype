@@ -42,6 +42,7 @@ $allowed_world_tokens = array_map(function($path){ return preg_replace('/\.map$/
 //error_log('$existing_map_files = '. print_r($existing_map_files, true));
 //error_log('$allowed_world_tokens = '. print_r($allowed_world_tokens, true));
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
+array_unshift($allowed_player_tokens, 'player'); // always allow the "player" token
 $default_world_token = 'debug-area-1'; //'starter-80x80';
 $default_player_token = 'player';
 $default_world_position = '';
@@ -53,21 +54,37 @@ $default_world_position = '';
 if (!empty($_POST['action']) && $_POST['action'] === 'save'
     && !empty($_POST['world_data']) && is_array($_POST['world_data'])){
     $worldData = $_POST['world_data'];
-    if (!empty($worldData['lastPlayer']) && in_array($worldData['lastPlayer'], $allowed_player_tokens)){
+    if (!empty($worldData['lastPlayer'])
+        && in_array($worldData['lastPlayer'], $allowed_player_tokens)){
+        $WORLD_SESSION['last_player_token'] = $worldData['lastPlayer'];
+        // Collect the last player session data so we can update
         $lastPlayer = $worldData['lastPlayer'];
-        $WORLD_SESSION['last_player_token'] = $lastPlayer;
+        if (!isset($WORLD_SESSION['last_player_sessions'][$lastPlayer])){ $WORLD_SESSION['last_player_sessions'][$lastPlayer] = array(); }
+        $lastPlayerSession = &$WORLD_SESSION['last_player_sessions'][$lastPlayer];
+        // Collect the cursor player session data so we can update too
+        $cursorPlayer = 'player';
+        if (!isset($WORLD_SESSION['last_player_sessions'][$cursorPlayer])){ $WORLD_SESSION['last_player_sessions'][$cursorPlayer] = array(); }
+        $cursorPlayerSession = &$WORLD_SESSION['last_player_sessions'][$cursorPlayer];
+        // If last world was provided, save it to the sessions
         if (!empty($worldData['lastWorld']) && in_array($worldData['lastWorld'], $allowed_world_tokens)){
-            $last_world_token_key = 'last_'.$lastPlayer.'_world_token';
-            $WORLD_SESSION[$last_world_token_key] = $worldData['lastWorld'];
+            $last_world_token_key = 'last_world_token';
+            $lastPlayerSession[$last_world_token_key] = $worldData['lastWorld'];
+            $cursorPlayerSession[$last_world_token_key] = $worldData['lastWorld'];
         }
+        // If last position was provided, save it to the sessions
         if (!empty($worldData['lastPosition']) && preg_match('/^([-0-9]+)$/i', $worldData['lastPosition'])){
-            $last_world_position_key = 'last_'.$lastPlayer.'_world_position';
-            $WORLD_SESSION[$last_world_position_key] = $worldData['lastPosition'];
+            $last_world_position_key = 'last_world_position';
+            $lastPlayerSession[$last_world_position_key] = $worldData['lastPosition'];
+            $cursorPlayerSession[$last_world_position_key] = $worldData['lastPosition'];
         }
+        // If last direction was provided, save it to the sessions
         if (!empty($worldData['lastDirection']) && preg_match('/^([-a-z0-9]+)$/i', $worldData['lastDirection'])){
-            $last_world_direction_key = 'last_'.$lastPlayer.'_world_direction';
-            $WORLD_SESSION[$last_world_direction_key] = $worldData['lastDirection'];
+            $last_world_direction_key = 'last_world_direction';
+            $lastPlayerSession[$last_world_direction_key] = $worldData['lastDirection'];
+            $cursorPlayerSession[$last_world_direction_key] = $worldData['lastDirection'];
         }
+        //error_log('World data saved successfully for player "'.$lastPlayer.'" with world "'.$lastPlayerSession[$last_world_token_key].'" and position "'.$lastPlayerSession[$last_world_position_key].'"');
+        //error_log('$WORLD_SESSION = '.print_r($WORLD_SESSION, true));
     }
     // that's all we support for now, return a success response
     header('Content-Type: application/json');
@@ -116,7 +133,7 @@ $get_randpos = function($available_encounter_cells){
     return $pos;
     };
 
-// create a reusable method for the above that takes args and generates markup to return as a string
+// Define a reusable method for the above that takes args and generates markup to return as a string
 // TODO:  Define this as an actual function instead of a variable
 $get_sprite = function($kind, $token, $alt = '', $dir = 'right', $class = '', $styles = '', $attrs = ''){
     global $mmrpg_indexes, $get_xkind;
@@ -143,6 +160,16 @@ $get_sprite = function($kind, $token, $alt = '', $dir = 'right', $class = '', $s
     return('<span class="'.$sprite_class.'"'.$sprite_styles.$sprite_attrs.'><span class="sprite sprite_'.$xsize.'" style="background-image: url('.$sprite_path.');"></span></span>');
     };
 
+// Define a function for getting the battle history for a given player token
+$get_battle_history = function($player_token = '', $record_token = ''){
+    $session_token = rpg_game::session_token();
+    $this_battle_history = !empty($_SESSION[$session_token]['values']['battle_history']) ? $_SESSION[$session_token]['values']['battle_history'] : array();
+    if (empty($player_token)){ return $this_battle_history; }
+    $player_battle_history = !empty($this_battle_history[$player_token]) ? $this_battle_history[$player_token] : array();
+    if (empty($record_token)){ return $player_battle_history; }
+    $battle_history_record = !empty($player_battle_history[$record_token]) ? $player_battle_history[$record_token] : array();
+    return $battle_history_record;
+    };
 
 // Define a function for loading a given map's data from the filesystem
 function loadMapData($map_token){
@@ -389,63 +416,71 @@ $this_prototype_data['this_player_robots'] = $this_player_robots; // required
 if (!empty($this_prototype_data['this_current_player'])){
     $this_player_token = $this_prototype_data['this_current_player'];
     $this_player_info = !empty($mmrpg_index_players[$this_player_token]) ? $mmrpg_index_players[$this_player_token] : array();
-    $this_battle_history = !empty($_SESSION[$session_token]['values']['battle_history']) && !empty($_SESSION[$session_token]['values']['battle_history'][$this_player_token]) ? $_SESSION[$session_token]['values']['battle_history'][$this_player_token] : array();
-    $this_prototype_data['this_player_id'] = $this_player_info['player_id'];
-    $this_prototype_data['this_player_token'] = $this_player_info['player_token'];
-    $max_player_robots = MMRPG_WORLD_DEFAULT_TEAMSIZE; // TODO: make this dynamic based on limit hearts
-    $allowed_player_robots = mmrpg_prototype_robots_unlocked($this_player_token, true);
-    //error_log('$allowed_player_robots = '.print_r($allowed_player_robots, true));
-    $current_player_robots = !empty($allowed_player_robots) ? array_slice($allowed_player_robots, 0, $max_player_robots) : array(); // TODO: make this customizable
-    //error_log('$current_player_robots = '.print_r($current_player_robots, true));
-    $summoned_player_robots = !empty($this_battle_history['robots_summoned']) ? $this_battle_history['robots_summoned'] : array();
-    //error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));
-    if (!empty($summoned_player_robots)){
-        //error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));
-        usort($current_player_robots, function($a, $b) use ($summoned_player_robots){
-            $a_summoned = array_search($a, $summoned_player_robots);
-            $b_summoned = array_search($b, $summoned_player_robots);
-            if ($a_summoned !== false && $b_summoned !== false){ return $a_summoned - $b_summoned; }
-            elseif ($a_summoned !== false){ return 1; } elseif ($b_summoned !== false){ return -1; }
-            else { return 0; }
-            });
-        //error_log('$current_player_robots (sorted) = '.print_r($current_player_robots, true));
-    }
-    if (!empty($current_player_robots)){
-        $this_player_robots = array();
-        foreach ($current_player_robots AS $robot_token){
-            if (empty($mmrpg_index_robots[$robot_token])){ continue; }
-            $robot_info = $mmrpg_index_robots[$robot_token];
-            $robot_id = $robot_info['robot_id'];
-            $robot_string = $robot_id . '_' . $robot_token;
-            $this_player_robots[] = $robot_string;
-        }
-        $this_prototype_data['this_player_robots'] = $this_player_robots;
-    }
 } else {
     die('MMRPG World Fatal Error - No player token defined!');
 }
 
 // Define the session keys we'll be using to store player-specific world settings
-$last_world_token_key = 'last_'.$this_player_token.'_world_token';
-$last_world_position_key = 'last_'.$this_player_token.'_world_position';
-$last_world_direction_key = 'last_'.$this_player_token.'_world_direction';
+$last_world_token_key = 'last_world_token';
+$last_world_position_key = 'last_world_position';
+$last_world_direction_key = 'last_world_direction';
+$last_world_robots_key = 'last_world_robots';
+
+// Make sure the appropriate player token is set in the settings array
+if (!isset($WORLD_SESSION['last_player_sessions'])){ $WORLD_SESSION['last_player_sessions'] = array(); }
+if (!isset($WORLD_SESSION['last_player_sessions'][$this_player_token])){ $WORLD_SESSION['last_player_sessions'][$this_player_token] = array(); }
+$WORLD_PLAYER_SESSION = &$WORLD_SESSION['last_player_sessions'][$this_player_token];
+
+// Collect the current player's robots and battle history
+$this_prototype_data['this_player_id'] = $this_player_info['player_id'];
+$this_prototype_data['this_player_token'] = $this_player_info['player_token'];
+$max_player_robots = MMRPG_WORLD_DEFAULT_TEAMSIZE; // TODO: make this dynamic based on limit hearts
+$allowed_player_robots = mmrpg_prototype_robots_unlocked($this_player_token, true);
+$current_player_robots = !empty($allowed_player_robots) ? array_slice($allowed_player_robots, 0, $max_player_robots) : array(); // TODO: make this customizable
+$summoned_player_robots = $get_battle_history($this_player_token, 'robots_summoned');
+//error_log('$allowed_player_robots = '.print_r($allowed_player_robots, true));
+//error_log('$current_player_robots = '.print_r($current_player_robots, true));
+//error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));
+if (!empty($summoned_player_robots)){
+    //error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));
+    usort($current_player_robots, function($a, $b) use ($summoned_player_robots){
+        $a_summoned = array_search($a, $summoned_player_robots);
+        $b_summoned = array_search($b, $summoned_player_robots);
+        if ($a_summoned !== false && $b_summoned !== false){ return $a_summoned - $b_summoned; }
+        elseif ($a_summoned !== false){ return 1; } elseif ($b_summoned !== false){ return -1; }
+        else { return 0; }
+        });
+    //error_log('$current_player_robots (sorted) = '.print_r($current_player_robots, true));
+}
+if (!empty($current_player_robots)){
+    $this_player_robots = array();
+    foreach ($current_player_robots AS $robot_token){
+        if (empty($mmrpg_index_robots[$robot_token])){ continue; }
+        $robot_info = $mmrpg_index_robots[$robot_token];
+        $robot_id = $robot_info['robot_id'];
+        $robot_string = $robot_id . '_' . $robot_token;
+        $this_player_robots[] = $robot_string;
+    }
+    $this_prototype_data['this_player_robots'] = $this_player_robots;
+}
+$WORLD_PLAYER_SESSION[$last_world_robots_key] = implode(',', $this_prototype_data['this_player_robots']);
 
 // Collect or define the current map token we'll be loading from
 $request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
-if (empty($request_world_token) && !empty($WORLD_SESSION[$last_world_token_key])){ $request_world_token = $WORLD_SESSION[$last_world_token_key]; }
-if (!empty($request_world_token) && !empty($WORLD_SESSION[$last_world_token_key]) && $request_world_token !== $WORLD_SESSION[$last_world_token_key]){ unset($WORLD_SESSION[$last_world_position_key]); }
+if (empty($request_world_token) && !empty($WORLD_PLAYER_SESSION[$last_world_token_key])){ $request_world_token = $WORLD_PLAYER_SESSION[$last_world_token_key]; }
+if (!empty($request_world_token) && !empty($WORLD_PLAYER_SESSION[$last_world_token_key]) && $request_world_token !== $WORLD_PLAYER_SESSION[$last_world_token_key]){ unset($WORLD_PLAYER_SESSION[$last_world_position_key]); }
 if (!empty($request_world_token) && in_array($request_world_token, $allowed_world_tokens)){
     $this_prototype_data['this_current_world'] = $request_world_token;
 }
 if (empty($this_prototype_data['this_current_world'])){ $this_prototype_data['this_current_world'] = $default_world_token; }
-$WORLD_SESSION[$last_world_token_key] = $this_prototype_data['this_current_world'];
+$WORLD_PLAYER_SESSION[$last_world_token_key] = $this_prototype_data['this_current_world'];
 
 // Collect or define the current map position we'll be spawning into
 $request_world_position = isset($_REQUEST['position']) && preg_match('/^([-0-9]+)$/i', $_REQUEST['position']) ? trim($_REQUEST['position']) : '';
-if (empty($request_world_position) && !empty($WORLD_SESSION[$last_world_position_key])){ $request_world_position = $WORLD_SESSION[$last_world_position_key]; }
+if (empty($request_world_position) && !empty($WORLD_PLAYER_SESSION[$last_world_position_key])){ $request_world_position = $WORLD_PLAYER_SESSION[$last_world_position_key]; }
 if (!empty($request_world_position)){ $this_prototype_data['this_current_position'] = $request_world_position; }
 else { $this_prototype_data['this_current_position'] = $default_world_position; }
-$WORLD_SESSION[$last_world_position_key] = $this_prototype_data['this_current_position'];
+$WORLD_PLAYER_SESSION[$last_world_position_key] = $this_prototype_data['this_current_position'];
 
 // Load map data from the appropriate map file
 $map_token = $this_prototype_data['this_current_world'];
@@ -753,20 +788,44 @@ $flag_skip_fadein = true;
                 </div>
                 <?
 
-                // CHARACTER OBJECTS
+                // CHARACTER OBJECTS (TEAM)
                 $map_layer_styles = $map_base_styles;
                 $map_layer_attrs = $map_base_attrs;
                 ?>
                 <div class="layer layer-4 objects characters team" data-layer="team" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
+
+                    // Quick function for generation the team sprites for a given player
+                    $get_team_sprites = function($team_sprites, $target_position = '1-1', $team_class = 'team')
+                        use ($get_sprite, $map_tile_height, $map_tile_width, $map_tilesize_offset){
+                        $sprites = array();
+                        list($col, $row) = explode('-', $target_position);
+                        $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                        $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                        foreach ($team_sprites as $key => $sprite){
+                            $kind = $sprite[0];
+                            $token = $sprite[1];
+                            $alt = isset($sprite[2]) ? $sprite[2] : '';
+                            $dir = 'right';
+                            if ($key > 0){ $top -= 2; $left -= 4; }
+                            $class = $team_class; //'team bounce';
+                            $styles = 'top: '.$top.'px; left: '.$left.'px; ';
+                            $attrs = 'data-key="'.$key.'"';
+                            $markup = $get_sprite($kind, $token, $alt, $dir, $class, $styles, $attrs);
+                            if (!empty($markup)){ $sprites[] = $markup; }
+                            }
+                        return implode(PHP_EOL, $sprites);
+                        };
+
                     // Collect the current team members from the prototype data
-                    $team = array();
+                    $team_position = $this_prototype_data['this_current_position'];
+                    $team_sprites = array();
                     $team_player_token = !empty($this_prototype_data['this_player_token']) ? $this_prototype_data['this_player_token'] : 'player';
                     $team_player_robots = !empty($this_prototype_data['this_player_robots']) ? $this_prototype_data['this_player_robots'] : array();
                     if (!empty($team_player_token) && $team_player_token !== 'player'){
                         $player_token = $team_player_token;
                         $player = array('player', $player_token);
-                        $team[] = $player;
+                        $team_sprites[] = $player;
                     }
                     if (!empty($team_player_robots) && is_array($team_player_robots)){
                         foreach ($team_player_robots AS $robot_string){
@@ -775,31 +834,60 @@ $flag_skip_fadein = true;
                             $robot_settings = rpg_game::robot_settings($team_player_token, $robot_token);
                             $robot_image = !empty($robot_settings['robot_image']) ? $robot_settings['robot_image'] : '';
                             if (!empty($robot_image) && $robot_image !== $robot_token){ $robot[] = explode('_', $robot_image, 2)[1]; }
-                            $team[] = $robot;
+                            $team_sprites[] = $robot;
                         }
                     }
-                    // Generate the markup for the cursor and team sprites
+
+                    // Generate the markup for the cursor sprites
                     $obj = 'cursor';
                     $sprite = 'images/robots/pointan/sprite_right_40x40.png'; // TODO: surely this isn't how we're going to leave this...
-                    $pos = $this_prototype_data['this_current_position'];
+                    $pos = $team_position;
                     list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                     $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                     echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"><span class="sprite sprite_40x40" style="background-image: url('.$sprite.');"></span></span>'.PHP_EOL);
-                    if (!empty($team)){
-                        foreach ($team as $key => $sprite){
-                            $kind = $sprite[0];
-                            $token = $sprite[1];
-                            $alt = isset($sprite[2]) ? $sprite[2] : '';
-                            $dir = 'right';
-                            $class = 'team bounce';
-                            $styles = '';
-                            $attrs = 'data-key="'.$key.'"';
-                            $markup = $get_sprite($kind, $token, $alt, $dir, $class, $styles, $attrs);
-                            echo($markup.PHP_EOL);
 
+                    // Generate the markup for the team sprites if any are defined
+                    echo($get_team_sprites($team_sprites, $team_position, 'team bounce'));
+
+                    // Loop through the other allowed players to see if any are also on this map
+                    $rival_symbols = array();
+                    foreach ($allowed_player_tokens AS $pkey => $ptoken){
+                        if ($ptoken === 'player'){ continue; } // skip the default player
+                        if ($ptoken === $team_player_token){ continue; } // skip the current player
+                        if (empty($mmrpg_index_players[$ptoken])){ continue; } // skip if not a valid player
+                        if (empty($WORLD_SESSION['last_player_sessions'][$ptoken])){ continue; } // skip if no player session
+                        //error_log('Checking for player "'.$ptoken.'" on map "'.$map_token.'"');
+                        $pinfo = $mmrpg_index_players[$ptoken];
+                        $tmp_session = $WORLD_SESSION['last_player_sessions'][$ptoken];
+                        $tmp_world_token = !empty($tmp_session[$last_world_token_key]) ? $tmp_session[$last_world_token_key] : '';
+                        $tmp_world_position = !empty($tmp_session[$last_world_position_key]) ? $tmp_session[$last_world_position_key] : '';
+                        $tmp_world_direction = !empty($tmp_session[$last_world_direction_key]) ? $tmp_session[$last_world_direction_key] : '';
+                        $tmp_world_robots = !empty($tmp_session[$last_world_robots_key]) ? $tmp_session[$last_world_robots_key] : '';
+                        if (empty($tmp_world_token) || $tmp_world_token !== $map_token){ continue; } // skip if not on this map
+                        if (empty($tmp_world_position)){ continue; } // skip if no position
+                        $rival_symbols[$tmp_world_position] = $ptoken;
+                        // If we made it this far, show this other player on the map at their current location (just non-interactacble)
+                        //error_log('Found player "'.$ptoken.'" on map "'.$map_token.'" at position "'.$tmp_world_position.'"');
+                        $tmp_team_sprites = array();
+                        $tmp_team_sprites[] = array('player', $ptoken);
+                        if (!empty($tmp_world_robots)){
+                            $tmp_world_robots = explode(',', $tmp_world_robots);
+                            foreach ($tmp_world_robots AS $robot_string){
+                                list($robot_id, $robot_token) = explode('_', $robot_string, 2);
+                                $robot = array('robot', $robot_token);
+                                $robot_settings = rpg_game::robot_settings($ptoken, $robot_token);
+                                $robot_image = !empty($robot_settings['robot_image']) ? $robot_settings['robot_image'] : '';
+                                if (!empty($robot_image) && $robot_image !== $robot_token){ $robot[] = explode('_', $robot_image, 2)[1]; }
+                                $tmp_team_sprites[] = $robot;
+                            }
                         }
+                        echo($get_team_sprites($tmp_team_sprites, $tmp_world_position, 'rival bounce'));
                     }
+
+                    $rival_symbols_json = json_encode($rival_symbols, JSON_NUMERIC_CHECK);
+                    echo('<script data-json="rivalSymbols" type="application/json">'.$rival_symbols_json.'</script>'.PHP_EOL);
+
                     ?>
                 </div>
                 <?
@@ -818,18 +906,24 @@ $flag_skip_fadein = true;
             </div>
             <div id="back-button" class="chrome chrome-button"><a class="wrapper"><i class="fa fas fa-sign-out"></i></a></div>
             <div id="home-button" class="chrome chrome-button"><a class="wrapper"><i class="fa fas fa-home"></i></a></div>
-            <div id="reset-button" class="chrome chrome-button"><a class="wrapper"><i class="fa fas fa-recycle"></i></a></div>
+            <div id="reset-button" class="chrome chrome-button"><a class="wrapper"><i class="fa fas fa-bomb"></i></a></div>
             <div id="position-display" class="chrome"><div class="wrapper">&hellip;</div></div>
             <div id="player-switcher" class="chrome"><div class="wrapper"><?
-                $sprite = $get_sprite('robot', 'pointan', '', 'right', 'option');
-                $active = ($this_prototype_data['this_player_token'] === 'player') ? ' active' : '';
-                echo('<a class="option'.$active.'" data-player="player">'.$sprite.'</a>');
-                foreach ($allowed_player_tokens AS $pkey => $ptoken){
-                    if (!empty($mmrpg_index_players[$ptoken])){ $pinfo = $mmrpg_index_players[$ptoken]; } else { continue; }
-                    $sprite = $get_sprite('player', $ptoken, '', 'right', 'option', '');
-                    $active = ($ptoken === $this_prototype_data['this_player_token']) ? ' active' : '';
-                    echo('<a class="option'.$active.'" data-player="'.$ptoken.'">'.$sprite.'</a>');
-                } ?></div></div>
+                $get_label_span = function($name, $kind){ return ('<span class="label">'.$name.' ('.ucfirst($kind).')</span>'); };
+                $cursor_token = 'player';
+                $cursor_active = $this_prototype_data['this_player_token'] === $cursor_token ? true : false;
+                $cursor_sprite = $get_sprite('robot', 'pointan', '', 'right', 'cursor');
+                $cursor_label = $get_label_span('Prε', 'cursor');
+                echo('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
+                foreach ($allowed_player_tokens AS $player_key => $player_token){
+                    if ($player_token === 'player' || empty($mmrpg_index_players[$player_token])){ continue; }
+                    $player_info = $mmrpg_index_players[$player_token];
+                    $player_active = $player_token === $this_prototype_data['this_player_token'] ? true : false;
+                    $player_sprite = $get_sprite('player', $player_token, '', 'right', 'character', '');
+                    $player_label = $get_label_span($player_info['player_name'], 'player');
+                    echo('<a class="option'.($player_active ? ' active' : '').'" data-player="'.$player_token.'">'.$player_sprite.$cursor_sprite.$player_label.'</a>');
+                }
+                ?></div></div>
             <div id="side-buttons" class="chrome"><div class="wrapper">&hellip;</div></div>
             <?
             // DEBUG DEBUG DEBUG

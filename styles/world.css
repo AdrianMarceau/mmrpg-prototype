@@ -222,17 +222,32 @@ html, body {
 
 #world #map .layer.objects .sprite.cursor { z-index: 900; }
 #world #map .layer.objects .sprite.cursor.busy { z-index: 5; }
-#world #map .layer.objects .sprite.team { z-index: 100; }
-#world #map .layer.objects .sprite.team[data-key="0"] { z-index: 100; }
-#world #map .layer.objects .sprite.team[data-key="1"] { z-index: 90; }
-#world #map .layer.objects .sprite.team[data-key="2"] { z-index: 80; }
-#world #map .layer.objects .sprite.team[data-key="3"] { z-index: 70; }
-#world #map .layer.objects .sprite.team[data-key="4"] { z-index: 60; }
-#world #map .layer.objects .sprite.team[data-key="5"] { z-index: 50; }
-#world #map .layer.objects .sprite.team[data-key="6"] { z-index: 40; }
-#world #map .layer.objects .sprite.team[data-key="7"] { z-index: 30; }
-#world #map .layer.objects .sprite.team[data-key="8"] { z-index: 20; }
-#world #map .layer.objects .sprite.team[data-key="9"] { z-index: 10; }
+
+#world #map .layer.objects .sprite.team { z-index: 300; }
+#world #map .layer.objects .sprite.team[data-key="0"] { z-index: 300; }
+#world #map .layer.objects .sprite.team[data-key="1"] { z-index: 290; }
+#world #map .layer.objects .sprite.team[data-key="2"] { z-index: 280; }
+#world #map .layer.objects .sprite.team[data-key="3"] { z-index: 270; }
+#world #map .layer.objects .sprite.team[data-key="4"] { z-index: 260; }
+#world #map .layer.objects .sprite.team[data-key="5"] { z-index: 250; }
+#world #map .layer.objects .sprite.team[data-key="6"] { z-index: 240; }
+#world #map .layer.objects .sprite.team[data-key="7"] { z-index: 230; }
+#world #map .layer.objects .sprite.team[data-key="8"] { z-index: 220; }
+#world #map .layer.objects .sprite.team[data-key="9"] { z-index: 210; }
+
+#world #map .layer.objects .sprite.rival { z-index: 100; }
+#world #map .layer.objects .sprite.rival[data-key="0"] { z-index: 100; }
+#world #map .layer.objects .sprite.rival[data-key="1"] { z-index: 90; }
+#world #map .layer.objects .sprite.rival[data-key="2"] { z-index: 80; }
+#world #map .layer.objects .sprite.rival[data-key="3"] { z-index: 70; }
+#world #map .layer.objects .sprite.rival[data-key="4"] { z-index: 60; }
+#world #map .layer.objects .sprite.rival[data-key="5"] { z-index: 50; }
+#world #map .layer.objects .sprite.rival[data-key="6"] { z-index: 40; }
+#world #map .layer.objects .sprite.rival[data-key="7"] { z-index: 30; }
+#world #map .layer.objects .sprite.rival[data-key="8"] { z-index: 20; }
+#world #map .layer.objects .sprite.rival[data-key="9"] { z-index: 10; }
+
+#world #map .layer.objects .sprite.rival { filter: brightness(0.6); }
 
 /* add a 'shake' effect to the busy cursor to show its scared */
 
@@ -461,7 +476,6 @@ html, body {
     display: block;
     box-sizing: border-box;
     position: absolute;
-    pointer-events: none;
     top: 0;
     left: 0;
     width: 100%;
@@ -475,6 +489,11 @@ html, body {
     background-clip: content-box, border-box;
     background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.0) 30%, rgba(0, 0, 0, 0.15));
     background-blend-mode: overlay;
+}
+#world #canvas #action-dropdown[data-type="battle"] > .wrapper,
+#world #canvas #action-dropdown[data-type="battle"] > .wrapper:before,
+#world #canvas #action-dropdown[data-type="battle"] > .wrapper * {
+    pointer-events: none;
 }
 #world #canvas #action-dropdown[data-type="battle"] .label {
     position: absolute;
@@ -501,18 +520,18 @@ html, body {
     z-index: 50;
     opacity: 0.0;
     transition: opacity 0.3s;
-    pointer-events: none;
 }
 
 #world #canvas #action-dropdown[data-type="battle"] .label,
 #world #canvas #action-dropdown[data-type="battle"] .sublabel {
-    opacity: 1.0;
+    opacity: 0.0;
     transition: opacity 0.3s;
 }
-#world #canvas #action-dropdown[data-type="battle"]:not(:hover) .label,
-#world #canvas #action-dropdown[data-type="battle"]:not(:hover) .sublabel {
-    opacity: 0.0;
-    pointer-events: none;
+#world #canvas #action-dropdown[data-type="battle"]:hover .label,
+#world #canvas #action-dropdown[data-type="battle"]:hover .sublabel,
+#world #canvas #action-dropdown[data-type="battle"].hover .label,
+#world #canvas #action-dropdown[data-type="battle"].hover .sublabel {
+    opacity: 1.0;
 }
 
 #world #canvas #action-dropdown[data-type="battle"] .sublabel.left { right: calc(100% - 8px); }
@@ -665,11 +684,48 @@ html, body {
     width: 40px;
     height: 40px;
     top: -10px;
+    z-index: 2;
+}
+#world #canvas #player-switcher a.option:hover > .sprite {
+    top: -12px;
 }
 #world #canvas #player-switcher a.option > .sprite > .sprite {
     position: absolute;
     bottom: 0;
 }
+#world #canvas #player-switcher a.option > .sprite + .sprite {
+    position: absolute;
+    top: auto;
+    left: 8px;
+    bottom: -8px;
+    z-index: 1;
+    transform: scale(0.7);
+}
+#world #canvas #player-switcher a.option:hover > .sprite + .sprite {
+    left: 9px;
+    bottom: -9px;
+}
+#world #canvas #player-switcher a.option > .label {
+    display: block;
+    position: absolute;
+    bottom: 38px;
+    left: 0;
+    background-color: rgb(25, 25, 25, 0.8);
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: #cfcfcf;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0.0;
+    transition: opacity 0.3s;
+}
+#world #canvas #player-switcher a.option:hover > .label {
+    opacity: 1.0;
+}
+
 
 #world #canvas #side-buttons {
     bottom: 26px;
