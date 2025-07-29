@@ -111,10 +111,16 @@ else {
         $text_player_hearts = $get_current_limit_hearts($doctor_token, $heart_icons[0], $heart_icons[1]);
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' option_free-roam block_1 type_none';
         $text_world_location = 'Area Unknown'; // DOTNET Area 3
-        if (!empty($_SESSION['WORLD']['last_world_token'])){
-            $last_world_token = $_SESSION['WORLD']['last_world_token'];
+        $last_player_token = !empty($_SESSION['WORLD']['last_player_token']) ? $_SESSION['WORLD']['last_player_token'] : '';
+        $last_player_sessions = !empty($_SESSION['WORLD']['last_player_sessions']) ? $_SESSION['WORLD']['last_player_sessions'] : array();
+        $last_player_session = !empty($last_player_sessions[$last_player_token]) ? $last_player_sessions[$last_player_token] : array();
+        if (!empty($last_player_token) && !empty($last_player_session)){
+            $last_player_info = isset($mmrpg_player_index[$last_player_token]) ? $mmrpg_player_index[$last_player_token] : false;
+            $last_player_name = !empty($last_player_info) && !empty($last_player_info['player_name']) ? $last_player_info['player_name'] : false;
+            $last_world_token = $last_player_session['last_world_token'];
             $last_world_name = str_replace(' AREA ', ' Area ', strtoupper(str_replace('-', ' ', $last_world_token)));
-            $text_world_location = $last_world_name;
+            //$last_world_name = strtoupper(str_replace('-', ' ', $last_world_token));
+            $text_world_location = $last_world_name.(!empty($last_player_name) ? ' ('.$last_player_name.')' : '');
         }
         echo '<a class="'.$text_option_classes.'"  data-token="'.$doctor_token.'" data-token-id="0" data-next-href="world.php">';
             echo '<div class="platform"><div class="chrome"><div class="inset">';
