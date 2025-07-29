@@ -254,6 +254,33 @@ if (empty($this_player_robots)){
     exit();
 }
 
+// As long as this is a non-competitive battle mode, we should save the team data to the history
+if (!empty($this_player_token)
+    && $this_player_token !== 'player'
+    && !$this_is_challenge_battle
+    && !$this_is_endless_battle){
+
+    // If the player token is empty, we can't save the team data
+    $session_token = rpg_game::session_token();
+    //error_log('debug in '.basename(__FILE__).' on line '.__LINE__.' : we should save this player\'s team data to the history');
+    //error_log('$this_player_token = '.print_r($this_player_token, true));
+    //error_log('$this_player_robots = '.print_r($this_player_robots, true));
+    $battle_history = !empty($_SESSION[$session_token]['values']['battle_history']) ? $_SESSION[$session_token]['values']['battle_history'] : array();
+    if (!isset($battle_history[$this_player_token])){ $battle_history[$this_player_token] = array(); }
+    if (!isset($battle_history[$this_player_token]['robots_summoned'])){ $battle_history[$this_player_token]['robots_summoned'] = array(); }
+    $robots_summoned_history = $battle_history[$this_player_token]['robots_summoned'];
+    $robots_summoned_tokens = array_map(function($token){ return explode('_', $token)[1]; }, explode(',', $this_player_robots));
+    //error_log('$robots_summoned_history = '.print_r($robots_summoned_history, true));
+    //error_log('$robots_summoned_tokens = '.print_r($robots_summoned_tokens, true));
+    if (!empty($robots_summoned_tokens)){
+        $robots_summoned_history = array_unique(array_merge($robots_summoned_tokens, $robots_summoned_history));
+        //error_log('(new) $robots_summoned_history = '.print_r($robots_summoned_history, true));
+        $battle_history[$this_player_token]['robots_summoned'] = $robots_summoned_history;
+    }
+    //error_log('(new) $battle_history = '.print_r($battle_history, true));
+    $_SESSION[$session_token]['values']['battle_history'] = $battle_history;
+
+}
 
 // Collect the target player's index data if available
 if (!empty($target_player_token)){
