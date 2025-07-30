@@ -3,7 +3,7 @@
 @token    = debug-area-1n
 @name     = DEBUG AREA 1N
 @size     = 15 x 15 x 80 x 80
-@sheet    = overworld-experiment-v2025-tileset.png
+@sheet    = mmrpg-overworld-2k25_terrain-tiles.png
 #---------------------------#
 @field    = wintry-forefront
 @mechas   = curlinger,frosty-throwman,tel-tel
@@ -46,7 +46,7 @@
 @sprites[]  = grid(40, 520)
 @sprites[]  = hover(40, 520)
 @sprites[]  = outline(280, 520)
-@sprites[]  = focus(200, 520)
+@sprites[]  = focus(680, 520)
 @sprites[]  = active(200, 520)
 #---------------------------#
 @portals[]  = spawn(8, 13, hidden)

@@ -3,7 +3,7 @@
 @token    = debug-area-1w
 @name     = DEBUG AREA 1W
 @size     = 20 x 12 x 80 x 80
-@sheet    = overworld-experiment-v2025-tileset.png
+@sheet    = mmrpg-overworld-2k25_terrain-tiles.png
 #---------------------------#
 @field    = maniacal-hideaway
 @mechas   = drill-mole,molier,rockscotch
@@ -39,7 +39,7 @@
 @sprites[]  = grid(40, 520)
 @sprites[]  = hover(40, 520)
 @sprites[]  = outline(280, 520)
-@sprites[]  = focus(200, 520)
+@sprites[]  = focus(680, 520)
 @sprites[]  = active(200, 520)
 #---------------------------#
 @portals[]  = spawn(17, 4, hidden)
