@@ -475,7 +475,7 @@ $flag_skip_fadein = true;
                 <div class="layer layer-3 objects events battles" data-layer="battles" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
                     $battle_symbols = array();
-                    $battle_index = array();
+                    $battles_index = array();
                     foreach ($map_random_encounters as $encounter){
                         $kind = $encounter[0];
                         $xkind = rpg_world::get_xkind($kind);
@@ -498,7 +498,7 @@ $flag_skip_fadein = true;
                         $markup = rpg_world::get_sprite($kind, $token, $alt, 'right', $class, $style, $attrs);
                         echo($markup);
                         $battle_symbols[$position] = $battle;
-                        $battle_index[$battle] = array(
+                        $battles_index[$battle] = array(
                             'kind' => $kind,
                             'token' => $token,
                             'alt' => $alt,
@@ -508,9 +508,9 @@ $flag_skip_fadein = true;
                             );
                         }
                     $battle_symbols_json = json_encode($battle_symbols, JSON_NUMERIC_CHECK);
-                    $battle_index_json = json_encode($battle_index, JSON_NUMERIC_CHECK);
+                    $battles_index_json = json_encode($battles_index, JSON_NUMERIC_CHECK);
                     echo('<script data-json="battleSymbols" type="application/json">'.$battle_symbols_json.'</script>'.PHP_EOL);
-                    echo('<script data-json="battleIndex" type="application/json">'.$battle_index_json.'</script>'.PHP_EOL);
+                    echo('<script data-json="battlesIndex" type="application/json">'.$battles_index_json.'</script>'.PHP_EOL);
 
                     ?>
                 </div>

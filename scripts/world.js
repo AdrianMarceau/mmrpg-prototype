@@ -36,7 +36,7 @@ gameSettings.worldConfig = {
     mapTilesIndex: {},
     mapSpritesIndex: {},
     mapPortalsIndex: {},
-    mapBattleIndex: {},
+    mapBattlesIndex: {},
     mapPortalSymbols: {},
     mapBattleSymbols: {},
     mapRivalSymbols: {},
@@ -64,6 +64,8 @@ gameSettings.worldState = {
         },
     layersIndex: {},
     layerTilesIndex: {},
+    baseMapTileKeys: [], // base array of tile keys that are part of the map
+    walkableMapTileKeys: [], // array of tile keys that are specifically walkable
     };
 gameSettings.worldHasLoaded = false;
 
@@ -117,25 +119,6 @@ class mmrpgWorldMap {
             // Initialize the world map with the provided canvas and layers
             _self.initWorldMap($canvasMap, $mapLayers, function(){
                 //console.log('%c' + 'initWorldMap() complete!', 'color: green;');
-                //console.log('---> _config.mapToken =', _config.mapToken);
-                //console.log('---> _config.mapSize =', _config.mapSize);
-                //console.log('---> _config.mapTileSize =', _config.mapTileSize);
-                //console.log('---> _config.mapTileSizeOffset =', _config.mapTileSizeOffset);
-                //console.log('---> _config.mapCols =', _config.mapCols);
-                //console.log('---> _config.mapRows =', _config.mapRows);
-                //console.log('---> _config.mapWidth =', _config.mapWidth);
-                //console.log('---> _config.mapHeight =', _config.mapHeight);
-                // ...
-                //console.log('%c' + 'time to calculate all walkable tiles', 'color: orange;');
-                    //let walkableMapTiles = _self.calculateWalkableMapTiles(true, true, true);
-                    //console.log('%c' + 'walkableMapTiles =', 'color: orange;', walkableMapTiles);
-                //console.log('%c' + 'time to filter walkable tiles by ones within range', 'color: orange;');
-                    //let targetPosition = _worldCursor.position || '1-1';
-                    //let walkableTilesRange = 3; // TODO: make this dynamic per player
-                    //let walkableTilesWithinRange = _self.calculateTilesWithinRange(walkableMapTiles, targetPosition, walkableTilesRange);
-                    //console.log('%c' + 'walkableTilesWithinRange =', 'color: orange;', walkableTilesWithinRange);
-                //console.log('%c' + 'time to highlight tiles within reach using the hover effect', 'color: #cacaca; text-decoration: line-through;');
-                // ...
                 });
             }
         return true;
@@ -196,6 +179,7 @@ class mmrpgWorldMap {
         let onWorldLoaded = function(){
             _self.bindEventsToCanvas($canvasMap);
             _self.bindEventsToWorld($thisWorld);
+            _self.calculateWalkableMapTiles();
             let startPosition = '1-1';
             if (_config.mapStartPosition){ startPosition = _config.mapStartPosition; }
             else if (portalsIndex['spawn']){ startPosition = portalsIndex['spawn'].join('-'); }
@@ -384,24 +368,50 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Quick function for generating the currently walkable map tiles
+    getWalkableMapTiles(){
+        //console.log('%c' + 'mmrpgWorldMap.getWalkableMapTiles()', 'color: magenta;');
+        let _self = this;
+        let _world = _self.state;
+        if (!_world.walkableMapTileKeys){ _self.calculateWalkableMapTiles(); }
+        return _world.walkableMapTileKeys;
+        }
+
     // Quick function to calculate all the walkable tile positions for this map given
     // its base properties (size, terrain) and current conditions (player, enemy placement)
-    calculateWalkableMapTiles(excludePlayer, excludeBattles, forceRefresh){
+    calculateWalkableMapTiles(refresh, exclude){
         //console.log('%c' + 'mmrpgWorldMap.calculateWalkableMapTiles()', 'color: magenta;');
-        excludePlayer = typeof excludePlayer === 'boolean' ? excludePlayer : true;
-        excludeBattles = typeof excludeBattles === 'boolean' ? excludeBattles : true;
-        forceRefresh = typeof forceRefresh === 'boolean' ? forceRefresh : false;
+
+        // Collect the parameters and set defaults
+        refresh = typeof refresh === 'boolean' ? refresh : false;
+        exclude = typeof exclude === 'object' ? exclude : {};
+        exclude.terrain = typeof exclude.terrain === 'boolean' ? exclude.terrain : true;
+        exclude.obstacles = typeof exclude.obstacles === 'boolean' ? exclude.obstacles : true;
+        exclude.portals = typeof exclude.portals === 'boolean' ? exclude.portals : true;
+        exclude.battles = typeof exclude.battles === 'boolean' ? exclude.battles : true;
+        exclude.players = typeof exclude.players === 'boolean' ? exclude.players : true;
+        exclude.rivals = typeof exclude.rivals === 'boolean' ? exclude.rivals : true;
+        exclude.cursor = typeof exclude.cursor === 'boolean' ? exclude.cursor : true;
+
+        // Collect refs to class variables
         let _self = this;
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
+
+        // If refresh was not requested and walkable tiles already exists, return that array now
+        let walkableMapTiles = _world.walkableMapTileKeys || [];
+        if (walkableMapTiles.length && !refresh){ return true; }
+        if (!walkableMapTiles.length || refresh){ walkableMapTiles = []; }
+        //console.log('-> walkableMapTiles (start) =', walkableMapTiles);
+
+        // Otherwise collect the map properties and indexes so we can generate the tiles
         let mapCols = _config.mapCols;
         let mapRows = _config.mapRows;
         let mapTileSize = _config.mapTileSize;
         let mapTilesIndex = _config.mapTilesIndex;
         let layerTilesIndex = _world.layerTilesIndex;
         let layerTilesKeys = Object.keys(layerTilesIndex);
-        let portalsIndex = _config.mapPortalsIndex || {};
         //console.log('---> mapCols =', mapCols);
         //console.log('---> mapRows =', mapRows);
         //console.log('---> mapTileSize =', mapTileSize);
@@ -409,67 +419,130 @@ class mmrpgWorldMap {
         //console.log('---> layerTilesIndex =', layerTilesIndex);
         //console.log('---> layerTilesKeys =', layerTilesKeys);
 
-        // Collect the walkable tiles from the world state if already exist, else create
-        let walkableMapTiles = _world.walkableMapTiles || [];
-        if (!walkableMapTiles || forceRefresh){
+        // Collect references to other indexes we'll need to review tile properties
+        let portalsIndex = _config.mapPortalsIndex;
+        let battlesIndex = _config.mapBattlesIndex;
+        let battleSymbols = _config.mapBattleSymbols;
+        let rivalSymbols = _config.mapRivalSymbols;
+        let portalSymbols = _config.mapPortalSymbols;
+        //console.log('---> portalsIndex =', portalsIndex);
+        //console.log('---> battlesIndex =', battlesIndex);
+        //console.log('---> battleSymbols =', battleSymbols);
+        //console.log('---> rivalSymbols =', rivalSymbols);
+        //console.log('---> portalSymbols =', portalSymbols);
 
-            // Loop through each column and row to generate the tile positions
-            let baseMapTileKeys = [];
+        // Loop through each column and row to generate the base tile positions
+        //console.log('collecting the base map tiles ...');
+        let baseMapTiles = _world.baseMapTileKeys || [];
+        if (!baseMapTiles.length){
+            //console.log('... baseMapTiles is empty, generating now');
             for (let col = 1; col <= mapCols; col++){
                 for (let row = 1; row <= mapRows; row++){
                     let tileKey = col + '-' + row;
-                    baseMapTileKeys.push(tileKey);
-                }
-            }
-            //console.log('---> baseMapTileKeys =', baseMapTileKeys);
-
-            // Now filter out the ones that have their walkable flag set to false on the terrain layer
-            walkableMapTiles = [];
-            let terrainTilesIndex = layerTilesIndex['terrain'];
-            if (baseMapTileKeys && terrainTilesIndex){
-                //console.log('---> terrainTilesIndex =', terrainTilesIndex);
-                for (let i = 0; i < baseMapTileKeys.length; i++){
-                    let tileKey = baseMapTileKeys[i];
-                    let tileData = terrainTilesIndex[tileKey] || false;
-                    //console.log('---> checking tileKey:', tileKey, 'w/ tileData:', tileData);
-                    if (!tileData){ continue; }
-                    if (!tileData.walkable){ continue; }
-                    walkableMapTiles.push(tileKey);
+                    baseMapTiles.push(tileKey);
                     }
                 }
-            //console.log('---> walkableMapTiles =', walkableMapTiles);
-            _world.walkableMapTiles = walkableMapTiles;
-
+            //console.log('---> baseMapTiles (generated) =', baseMapTiles);
+            _world.baseMapTileKeys = baseMapTiles;
             }
 
-        //console.log('---> walkableMapTiles (base) =', walkableMapTiles);
+        // To start, populate the walkableMapTiles array with all the base map tiles
+        //console.log('assigning the base map tiles to walkableMapTiles ...');
+        walkableMapTiles = Object.values(baseMapTiles);
+        //console.log('-> walkableMapTiles (base) =', walkableMapTiles);
 
-        // If we are to exclude the player (cursor), make sure we  remove that position
-        let playerPosition = '1-1';
-        if (_config.mapStartPosition){ playerPosition = _config.mapStartPosition; }
-        else if (portalsIndex['spawn']){ playerPosition = portalsIndex['spawn'].join('-'); }
-        if (excludePlayer && playerPosition){
-            //console.log('---> excluding player position:', playerPosition);
-            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
+        // Now filter out the ones that have their walkable flag set to false on the terrain layer
+        //console.log('filtering walkableMapTiles by terrain layer ...');
+        let terrainTilesIndex = layerTilesIndex['terrain'];
+        if (exclude.terrain && terrainTilesIndex){
+            //console.log('... checking terrainTilesIndex =', terrainTilesIndex);
+            let allowedTerrain = [];
+            for (let i = 0; i < walkableMapTiles.length; i++){
+                let tileKey = walkableMapTiles[i];
+                let tileData = terrainTilesIndex[tileKey] || false;
+                //console.log('---> checking tileKey:', tileKey, 'w/ tileData:', tileData);
+                if (!tileData || !tileData.walkable){ continue; }
+                allowedTerrain.push(tileKey);
+                }
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                return allowedTerrain.includes(tileKey);
+                }));
+            //console.log('--> walkableMapTiles (post-terrain) =', walkableMapTiles);
+            }
+
+        /*
+        // If we are to exclude any players, make sure we remove those positions too (???)
+        //console.log('filtering walkableMapTiles by player position ...');
+        let playerPosition = _config.mapStartPosition || (portalsIndex['spawn'] ? portalsIndex['spawn'].join('-') : '') || '1-1';
+        if (exclude.players && playerPosition){
+            //console.log('---> checking playerPosition =', playerPosition);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
                 return tileKey !== playerPosition;
-                });
-            //console.log('---> walkableMapTiles after player exclusions =', walkableMapTiles);
+                }));
+            //console.log('---> walkableMapTiles (post-player) =', walkableMapTiles);
             }
+        */
 
-        // If we are to exclude the enemies, make sure we remove those positions
+        // If we are to exclude the battles, make sure we remove those positions
         // battleSymbols is object like { "1-1":"battle-token-foo","2-2":"battle-token-bar", [...] }
-        let battleSymbols = _config.mapBattleSymbols;
-        let battleSymbolsKeys = Object.keys(battleSymbols);
-        if (excludeBattles && battleSymbols){
-            //console.log('---> excluding enemies positions:', battleSymbolsKeys);
-            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
-                return !battleSymbolsKeys.includes(tileKey);
-                });
-            //console.log('---> walkableMapTiles after battle exclusions =', walkableMapTiles);
+        let battleSymbolKeys = Object.keys(battleSymbols);
+        if (exclude.battles && battleSymbols){
+            //console.log('---> checking battleSymbolKeys =', battleSymbolKeys);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                return !battleSymbolKeys.includes(tileKey);
+                }));
+            //console.log('---> walkableMapTiles (post-battles) =', walkableMapTiles);
             }
 
-        // Return the walkable map tiles
-        return walkableMapTiles;
+        // If we are to exclude the rivals, make sure we remove those positions
+        // rivalSymbols is object like { "1-1":"rival-token-foo","2-2":"rival-token-bar", [...] }
+        let rivalSymbolKeys = Object.keys(rivalSymbols);
+        if (exclude.rivals && rivalSymbols){
+            //console.log('---> checking rivalSymbolKeys =', rivalSymbolKeys);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                return !rivalSymbolKeys.includes(tileKey);
+                }));
+            //console.log('---> walkableMapTiles (post-rivals) =', walkableMapTiles);
+            }
+
+        // If we are to exclude portals, make sure we remove those positions (only when locked though)
+        let battlePortalKeys = Object.keys(portalSymbols);
+        if (exclude.portals && portalSymbols){
+            //console.log('---> checking portalSymbolKeys =', battlePortalKeys);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                //console.log('---> checking tileKey:', tileKey, 'against portalSymbolKeys:', battlePortalKeys);
+                if (battlePortalKeys.includes(tileKey)){
+                    //console.log('---> tileKey:', tileKey, 'is a portal, checking if locked...');
+                    let portalInfo = portalsIndex[portalSymbols[tileKey]] || false;
+                    //console.log('---> portalInfo =', portalInfo);
+                    if (portalInfo && portalInfo.indexOf('locked') !== -1){
+                        //console.log('---> portal at ' + tileKey + ' is locked, removing from walkableMapTiles');
+                        return false; // remove this tile
+                        } else {
+                        //console.log('---> portal at ' + tileKey + ' is open, keeping in walkableMapTiles');
+                        }
+                    }
+                return true; // keep this tile
+                }));
+            //console.log('---> walkableMapTiles (post-portals) =', walkableMapTiles);
+            }
+
+        // If we are to exclude the cursor, make sure we remove that position too
+        //console.log('filtering walkableMapTiles by cursor position ...');
+        let cursorPosition = _world.cursor.position;
+        if (exclude.cursor && cursorPosition){
+            //console.log('---> checking cursorPosition =', cursorPosition);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                return tileKey !== cursorPosition;
+                }));
+            //console.log('---> walkableMapTiles (post-cursor) =', walkableMapTiles);
+            }
+
+        // Assign the walkableMapTiles array to the world state
+        _world.walkableMapTileKeys = walkableMapTiles;
+
+        // Return true on success
+        return true;
 
         }
 
@@ -776,13 +849,10 @@ class mmrpgWorldMap {
             let oldPos = _cursor.position;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.pageX, e.pageY);
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
-            let battleSymbols = _config.mapBattleSymbols;
-            let rivalSymbols = _config.mapRivalSymbols;
-            //console.log('-> checking battleSymbols =', battleSymbols);
-            let battleAtPosition = Object.keys(battleSymbols).indexOf(thisPos) !== -1;
-            let rivalAtPosition = Object.keys(rivalSymbols).indexOf(thisPos) !== -1;
             if (thisPos === oldPos || thisPos === lastMouseClick){ return; }
-            if (!tileData.walkable || battleAtPosition || rivalAtPosition){ return; }
+            let walkableTiles = _self.getWalkableMapTiles();
+            let tileIsWalkable = walkableTiles.indexOf(thisPos) !== -1 ? true : false;
+            if (!tileIsWalkable){ return; }
             //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
             _self.playSoundEffect('link-click');
             lastMouseClick = thisPos;
@@ -797,15 +867,9 @@ class mmrpgWorldMap {
         $clickOverlay.bind('mousemove', function(e){
             if (_cursor.moving){ return false; }
             //console.log('%c' + 'Map overlay mousemove event!', 'color: cyan;');
+            let oldPos = _cursor.position;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.pageX, e.pageY);
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
-            let battleSymbols = _config.mapBattleSymbols;
-            let rivalSymbols = _config.mapRivalSymbols;
-            //console.log('-> checking battleSymbols =', battleSymbols);
-            let battleAtPosition = Object.keys(battleSymbols).indexOf(thisPos) !== -1;
-            let rivalAtPosition = Object.keys(rivalSymbols).indexOf(thisPos) !== -1;
-            let showPointer = thisPos !== _cursor.position && tileData.walkable && !battleAtPosition && !rivalAtPosition;
-            $clickOverlay.css({cursor: showPointer ? 'pointer' : 'default'});
             if (hoverTiles.length){
                 for (var i = 0; i < hoverTiles.length; i++){
                     let hoverPos = hoverTiles[i];
@@ -815,8 +879,12 @@ class mmrpgWorldMap {
                     }
                 }
             if (thisPos === lastMouseOver){ return; }
-            if (!tileData.walkable || battleAtPosition || rivalAtPosition){ return; }
+            let walkableTiles = _self.getWalkableMapTiles();
+            let tileIsWalkable = walkableTiles.indexOf(thisPos) !== -1 ? true : false;
             //console.log('%c' + 'Mouse move event triggered at position ' + thisPos + '!', 'color: orange;');
+            let showPointer = thisPos !== oldPos && tileIsWalkable ? true : false;
+            $clickOverlay.css({cursor: showPointer ? 'pointer' : 'default'});
+            if (!tileIsWalkable){ return; }
             _self.playSoundEffect('icon-hover');
             lastMouseOver = thisPos;
             _self.hoverLayerTile(layerToken, thisPos);
@@ -1139,6 +1207,9 @@ class mmrpgWorldMap {
             });
         setTimeout(function(){ $('.sprite', $eventsLayers).removeClass('zoom'); }, 100);
         //$('.sprite', $zoomLayer).removeClass('zoom');
+
+        // Update the walkable map tiles now that things have changed slightly
+        _self.calculateWalkableMapTiles(true);
 
         // If the player has not moved from their spawn position yet, we should not do anything further
         if (!_config.allowWorldEvents){ return true; }
