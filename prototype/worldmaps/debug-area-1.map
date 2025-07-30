@@ -2,7 +2,7 @@
 # DEBUG AREA 1
 @token    = debug-area-1
 @name     = DEBUG AREA 1
-@size     = 11 x 22 x 80 x 80
+@size     = 11 x 24 x 80 x 80
 @sheet    = overworld-experiment-v2025-tileset.png
 #---------------------------#
 @field       = gentle-countryside
@@ -12,7 +12,9 @@
 #---------------------------#
 00,00,00,00,00,00,00,00,00,00,00
 00,00,00,00,00,00,00,00,00,00,00
-00,00,14,02,02,02,02,02,15,00,00
+00,00,00,00,00,02,00,00,00,00,00
+00,00,00,00,00,01,00,00,00,00,00
+00,00,14,02,02,01,02,02,15,00,00
 00,00,01,01,01,10,01,01,01,00,00
 00,00,01,01,01,01,01,01,01,00,00
 00,00,01,04,01,01,01,07,01,00,00
@@ -57,11 +59,14 @@
 #---------------------------#
 @sprites[]  = grid(40, 520)
 @sprites[]  = hover(40, 520)
+@sprites[]  = outline(280, 520)
 @sprites[]  = focus(200, 520)
+@sprites[]  = active(200, 520)
 #---------------------------#
-@portals[]  = spawn(6, 6)
-@portals[]  = goto__debug-area-1n(6, 4)
-@portals[]  = goto__debug-area-1s(6, 8)
-@portals[]  = goto__debug-area-1w(4, 6)
-@portals[]  = goto__debug-area-1e(8, 6)
+@portals[]  = spawn(6, 8)
+@portals[]  = goto__debug-area-1n(6, 6)
+@portals[]  = goto__debug-area-1s(6, 10)
+@portals[]  = goto__debug-area-1w(4, 8)
+@portals[]  = goto__debug-area-1e(8, 8)
+@portals[]  = goto__starter-80x80(6, 3, locked)
 #---------------------------#

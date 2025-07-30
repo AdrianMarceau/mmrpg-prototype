@@ -23,11 +23,14 @@ gameSettings.worldConfig = {
     mapSize: [10, 10],
     mapTileSize: [80, 80],
     mapTileSizeOffset: [0, 0],
+    mapSpriteSize: [80, 80],
+    mapSpriteSizeOffset: [0, 0],
     mapCols: 10, // default only
     mapRows: 10, // default only
     mapWidth: 400, // 10 tiles * 40px per tile, will be dynamic later
     mapHeight: 400, // 10 tiles * 40px per tile, will be dynamic later
     mapEffects: {
+        activeTimeout: 600, // milliseconds
         focusTimeout: 600, // milliseconds
         hoverTimeout: 600, // milliseconds
         moveTimeout: 300, // milliseconds
@@ -157,12 +160,18 @@ class mmrpgWorldMap {
         _config.mapSize = [parseInt(mapSize[0]), parseInt(mapSize[1])];
         _config.mapTileSize = [parseInt(tileSize[0]), parseInt(tileSize[1])];
         _config.mapTileSizeOffset = [0, 0]; // default values
+        _config.mapSpriteSize = [40, 40]; // hard-coded from mmrpg-defaults
+        _config.mapSpriteSizeOffset = [0, 0]; // default values
         _config.mapCols = _config.mapSize[0];
         _config.mapRows = _config.mapSize[1];
         _config.mapWidth = _config.mapSize[0] * _config.mapTileSize[0];
         _config.mapHeight = _config.mapSize[1] * _config.mapTileSize[1];
         if (_config.mapTileSize[0] > defaultMapTileSize[0]){ _config.mapTileSizeOffset[0] = Math.floor((_config.mapTileSize[0] - defaultMapTileSize[0]) / 2); }
         if (_config.mapTileSize[1] > defaultMapTileSize[1]){ _config.mapTileSizeOffset[1] = Math.floor((_config.mapTileSize[1] - defaultMapTileSize[1]) / 2); }
+        if (_config.mapSpriteSize[0] > _config.mapTileSize[0]){ _config.mapSpriteSizeOffset[0] = Math.floor((_config.mapSpriteSize[0] - _config.mapTileSize[0]) / 2); }
+        else if (_config.mapSpriteSize[0] < _config.mapTileSize[0]){ _config.mapSpriteSizeOffset[0] = Math.ceil((_config.mapTileSize[0] - _config.mapSpriteSize[0]) / 2); }
+        if (_config.mapSpriteSize[1] > _config.mapTileSize[1]){ _config.mapSpriteSizeOffset[1] = Math.floor((_config.mapSpriteSize[1] - _config.mapTileSize[1]) / 2); }
+        else if (_config.mapSpriteSize[1] < _config.mapTileSize[1]){ _config.mapSpriteSizeOffset[1] = Math.ceil((_config.mapTileSize[1] - _config.mapSpriteSize[1]) / 2); }
         _config.mapTilesIndex = tilesIndex;
         _config.mapSpritesIndex = spritesIndex;
         _config.mapPortalsIndex = portalsIndex;
@@ -313,7 +322,7 @@ class mmrpgWorldMap {
             let tileSpriteOffset = [tileSpriteInfo[0] || 0, tileSpriteInfo[1] || 0];
             let tileSpriteSize = [tileSpriteInfo[2] || tileSize[0], tileSpriteInfo[3] || tileSize[1]];
             let tileSpritePosition = [tilePos[0], tilePos[1], ((tilePos[0] - 1) * tileSpriteSize[0]), ((tilePos[1] - 1) * tileSpriteSize[1])];
-            let tileSpriteEffects = {grid: true, hover: false, focus: false}; // default values
+            let tileSpriteEffects = {grid: true, hover: false, outline: false, focus: false, active: false}; // default values
             let tileSpriteWalkable = true;
             if (tileSpriteToken === 'void' || tileSpriteToken.indexOf('void') !== -1){
                 tileSpriteEffects.grid = false; // no grid for void/+
@@ -670,8 +679,10 @@ class mmrpgWorldMap {
         let tileSpriteSize = tileSprite[3];
         // check if the tile is focused or hovered and apply the effects
         let tileHasGrid = tileEffects.grid;
-        let tileIsFocused = tileEffects.focus;
         let tileIsHovered = tileEffects.hover;
+        let tileIsOutlined = tileEffects.outline;
+        let tileIsFocused = tileEffects.focus;
+        let tileIsActive = tileEffects.active;
         // clear a rect at the exact position and no larger
         ctx.clearRect(tilePosition[2], tilePosition[3], tileSpriteSize[0], tileSpriteSize[1]);
         // sprite: draw the main tile sprite at the correct position
@@ -681,13 +692,19 @@ class mmrpgWorldMap {
             tilePosition[2], tilePosition[3], // destination offset
             tileSpriteSize[0], tileSpriteSize[1] // destination size
             );
-        // grid/focus/hover: draw any overlay images as defined in the effects
+        // grid/hover/outline/focus/active: collect sprite data for known effects
+        // then we draw any overlay images as defined in the effects on top
         let gridSpriteData = _self.getSpriteData('grid');
         let hoverSpriteData = _self.getSpriteData('hover');
+        let outlineSpriteData = _self.getSpriteData('outline');
         let focusSpriteData = _self.getSpriteData('focus');
+        let activeSpriteData = _self.getSpriteData('active');
         if (!gridSpriteData){ console.warn('drawTileToCanvas() unable to find grid sprite data for layer ' + layerToken + '!'); }
         if (!hoverSpriteData){ console.warn('drawTileToCanvas() unable to find hover sprite data for layer ' + layerToken + '!'); }
+        if (!outlineSpriteData){ console.warn('drawTileToCanvas() unable to find outline sprite data for layer ' + layerToken + '!'); }
         if (!focusSpriteData){ console.warn('drawTileToCanvas() unable to find focus sprite data for layer ' + layerToken + '!'); }
+        if (!activeSpriteData){ console.warn('drawTileToCanvas() unable to find active sprite data for layer ' + layerToken + '!'); }
+        // grid: draw another image at the same positon but w/ the grid sprite
         if (tileHasGrid && gridSpriteData){
             let gridSpriteOpacity = 0.3;
             if (tileSpriteToken === 'void' || tileSpriteToken.indexOf('void-') === 0){ gridSpriteOpacity = 0.0; }
@@ -716,10 +733,28 @@ class mmrpgWorldMap {
             ctx.globalAlpha = 1.0;
             ctx.globalCompositeOperation = 'normal';
             }
+        // outline: draw another image at the same positon but w/ the border sprite
+        if (tileIsOutlined && outlineSpriteData){
+            ctx.drawImage(spriteSheet,
+                outlineSpriteData[0], outlineSpriteData[1], // source offset
+                tileSpriteSize[0], tileSpriteSize[1], // source size
+                tilePosition[2], tilePosition[3], // destination offset
+                tileSpriteSize[0], tileSpriteSize[1] // destination size
+                );
+            }
         // focus: draw another image at the same positon but w/ the border sprite
         if (tileIsFocused && focusSpriteData){
             ctx.drawImage(spriteSheet,
                 focusSpriteData[0], focusSpriteData[1], // source offset
+                tileSpriteSize[0], tileSpriteSize[1], // source size
+                tilePosition[2], tilePosition[3], // destination offset
+                tileSpriteSize[0], tileSpriteSize[1] // destination size
+                );
+            }
+        // active: draw another image at the same positon but w/ the border sprite
+        if (tileIsActive && activeSpriteData){
+            ctx.drawImage(spriteSheet,
+                activeSpriteData[0], activeSpriteData[1], // source offset
                 tileSpriteSize[0], tileSpriteSize[1], // source size
                 tilePosition[2], tilePosition[3], // destination offset
                 tileSpriteSize[0], tileSpriteSize[1] // destination size
@@ -771,63 +806,45 @@ class mmrpgWorldMap {
         return true;
         }
 
-    // Quick function for applying a "focus" effect to a given layer tile
-    focusLayerTile(layerToken, tilePosition){
-        //console.log('%c' + 'mmrpgWorldMap.focusLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
+    // Quick function for applying a given effect to a given layer tile
+    applyLayerTileEffect(layerToken, tilePosition, effectName){
+        //console.log('%c' + 'mmrpgWorldMap.applyLayerTileEffect(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ', effectName:' + effectName + ')', 'color: magenta;');
         if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
         if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
+        if (!effectName || typeof effectName !== 'string' || !effectName.length){ return false; }
         let _self = this;
-        let _config = _self.config;
-        let _world = _self.state;
         let thisTileData = _self.getLayerTileIndexData(layerToken, tilePosition);
-        if (!thisTileData){ console.error('focusLayerTile() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
-        thisTileData.effects.focus = true;
+        if (!thisTileData){ console.error('applyLayerTileEffect() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
+        thisTileData.effects[effectName] = true;
         thisTileData.dirty = true;
         _self.refreshCanvasTiles(layerToken);
         return true;
         }
 
-    // Quick function for renmoving a "focus" effect from a given layer tile
-    unfocusLayerTile(layerToken, tilePosition){
-        //console.log('%c' + 'mmrpgWorldMap.unfocusLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
+    // Quick function for removing a given effect from a given layer tile
+    removeLayerTileEffect(layerToken, tilePosition, effectName){
+        //console.log('%c' + 'mmrpgWorldMap.removeLayerTileEffect(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ', effectName:' + effectName + ')', 'color: magenta;');
         if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
         if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
+        if (!effectName || typeof effectName !== 'string' || !effectName.length){ return false; }
         let _self = this;
         let thisTileData = _self.getLayerTileIndexData(layerToken, tilePosition);
-        if (!thisTileData){ console.error('focusLayerTile() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
-        thisTileData.effects.focus = false;
+        if (!thisTileData){ console.error('removeLayerTileEffect() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
+        thisTileData.effects[effectName] = false;
         thisTileData.dirty = true;
         _self.refreshCanvasTiles(layerToken);
         return true;
         }
 
-    // Quick function for applying a "hover" effect to a given layer tile
-    hoverLayerTile(layerToken, tilePosition){
-        //console.log('%c' + 'mmrpgWorldMap.hoverLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
-        if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
-        if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
-        let _self = this;
-        let thisTileData = _self.getLayerTileIndexData(layerToken, tilePosition);
-        if (!thisTileData){ console.error('hoverLayerTile() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
-        thisTileData.effects.hover = true;
-        thisTileData.dirty = true;
-        _self.refreshCanvasTiles(layerToken);
-        return true;
-        }
-
-    // Quick function for removing a "hover" effect from a given layer tile
-    unhoverLayerTile(layerToken, tilePosition){
-        //console.log('%c' + 'mmrpgWorldMap.unhoverLayerTile(layerToken:' + layerToken + ', tilePosition:' + tilePosition + ')', 'color: magenta;');
-        if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
-        if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
-        let _self = this;
-        let thisTileData = _self.getLayerTileIndexData(layerToken, tilePosition);
-        if (!thisTileData){ console.error('unhoverLayerTile() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
-        thisTileData.effects.hover = false;
-        thisTileData.dirty = true;
-        _self.refreshCanvasTiles(layerToken);
-        return true;
-        }
+    // Quick alias functions for applying and removing tile effects as per above
+    hoverLayerTile(tilePosition){ return this.applyLayerTileEffect('terrain', tilePosition, 'hover'); }
+    unhoverLayerTile(tilePosition){ return this.removeLayerTileEffect('terrain', tilePosition, 'hover'); }
+    focusLayerTile(tilePosition){ return this.applyLayerTileEffect('terrain', tilePosition, 'focus'); }
+    unfocusLayerTile(tilePosition){ return this.removeLayerTileEffect('terrain', tilePosition, 'focus'); }
+    outlineLayerTile(tilePosition){ return this.applyLayerTileEffect('terrain', tilePosition, 'outline'); }
+    unoutlineLayerTile(tilePosition){ return this.removeLayerTileEffect('terrain', tilePosition, 'outline'); }
+    makeLayerTileActive(tilePosition){ return this.applyLayerTileEffect('terrain', tilePosition, 'active'); }
+    makeLayerTileInactive(tilePosition){ return this.removeLayerTileEffect('terrain', tilePosition, 'active'); }
 
     // Quick function for binding events to a given layer's canvas object
     bindEventsToCanvas($canvasMap){
@@ -840,55 +857,58 @@ class mmrpgWorldMap {
         let _cursor = _world.cursor;
         let layerToken = 'terrain'; // TODO: make this dynamic maybe?
         let $clickOverlay = $('#click-overlay', $canvasMap);
+        let activeTimeouts = {}, activeTimeoutDuration = _config.mapEffects.activeTimeout;
         let focusTimeouts = {}, focusTimeoutDuration = _config.mapEffects.focusTimeout;
         let hoverTimeouts = {}, hoverTimeoutDuration = _config.mapEffects.hoverTimeout, hoverTiles = [];
         let lastMouseClick, lastMouseOver;
         $clickOverlay.bind('click', function(e){
+            e.preventDefault();
             if (_cursor.moving){ return false; }
             //console.log('%c' + 'Map overlay click event!', 'color: cyan;');
             let oldPos = _cursor.position;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.pageX, e.pageY);
+            let sameAsLast = thisPos === lastMouseClick;
+            let sameAsCurrent = thisPos === oldPos;
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
-            if (thisPos === oldPos || thisPos === lastMouseClick){ return; }
             let walkableTiles = _self.getWalkableMapTiles();
             let tileIsWalkable = walkableTiles.indexOf(thisPos) !== -1 ? true : false;
-            if (!tileIsWalkable){ return; }
-            //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
-            _self.playSoundEffect('link-click');
             lastMouseClick = thisPos;
-            _self.focusLayerTile(layerToken, thisPos);
-            if (focusTimeouts[oldPos]){ clearTimeout(focusTimeouts[oldPos]); }
-            focusTimeouts[thisPos] = setTimeout(function(){
+            if (!tileIsWalkable || sameAsLast || sameAsCurrent){ return false; }
+            //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
+            if (!sameAsLast){ _self.playSoundEffect('link-click'); }
+            _self.makeLayerTileActive(thisPos);
+            if (activeTimeouts[oldPos]){ clearTimeout(activeTimeouts[oldPos]); }
+            activeTimeouts[thisPos] = setTimeout(function(){
                 _self.moveToPosition(thisPos, function(){
-                    _self.unfocusLayerTile(layerToken, oldPos);
+                    _self.makeLayerTileInactive(oldPos);
                     }, true);
-                }, focusTimeoutDuration);
+                }, activeTimeoutDuration);
             });
         $clickOverlay.bind('mousemove', function(e){
-            if (_cursor.moving){ return false; }
+            e.preventDefault();
+            //if (_cursor.moving){ return false; }
             //console.log('%c' + 'Map overlay mousemove event!', 'color: cyan;');
-            let oldPos = _cursor.position;
+            let curPos = _cursor.position;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.pageX, e.pageY);
+            let sameAsLast = thisPos === lastMouseOver;
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
+            let walkableTiles = _self.getWalkableMapTiles();
+            let tileIsWalkable = walkableTiles.indexOf(thisPos) !== -1 ? true : false;
+            let showPointer = thisPos !== curPos && tileIsWalkable ? true : false;
+            $clickOverlay.css({cursor: showPointer ? 'pointer' : 'default'});
             if (hoverTiles.length){
                 for (var i = 0; i < hoverTiles.length; i++){
                     let hoverPos = hoverTiles[i];
                     if (hoverPos === thisPos){ continue; }
                     delete hoverTimeouts[hoverPos];
-                    _self.unhoverLayerTile(layerToken, hoverPos);
+                    _self.unhoverLayerTile(hoverPos);
                     }
                 }
-            if (thisPos === lastMouseOver){ return; }
-            let walkableTiles = _self.getWalkableMapTiles();
-            let tileIsWalkable = walkableTiles.indexOf(thisPos) !== -1 ? true : false;
-            //console.log('%c' + 'Mouse move event triggered at position ' + thisPos + '!', 'color: orange;');
-            let showPointer = thisPos !== oldPos && tileIsWalkable ? true : false;
-            $clickOverlay.css({cursor: showPointer ? 'pointer' : 'default'});
-            if (!tileIsWalkable){ return; }
-            _self.playSoundEffect('icon-hover');
             lastMouseOver = thisPos;
-            _self.hoverLayerTile(layerToken, thisPos);
+            if (!tileIsWalkable){ return; }
+            _self.hoverLayerTile(thisPos);
             hoverTiles.push(thisPos);
+            if (!sameAsLast){  _self.playSoundEffect('icon-hover'); }
             });
         // Return true on success
         return true;
@@ -1016,6 +1036,7 @@ class mmrpgWorldMap {
         let _mapEffects = _config.mapEffects;
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
+        let _mapSpriteSizeOffset = _config.mapSpriteSizeOffset;
         let _mapStartPosition = _config.mapStartPosition;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
@@ -1041,8 +1062,8 @@ class mmrpgWorldMap {
         let thisVerDir = (thisNewRow > thisOldRow) ? 'down' : (thisNewRow < thisOldRow) ? 'up' : false;
         let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join(' and '); })(thisHorDir, thisVerDir);
         let thisShiftDist = Math.sqrt(Math.pow(thisNewCol - thisOldCol, 2) + Math.pow(thisNewRow - thisOldRow, 2));
-        let tileOffsetX = ((thisNewCol - 1) * _mapTileSize[0]) + _mapTileSizeOffset[0];
-        let tileOffsetY = ((thisNewRow - 1) * _mapTileSize[1]) + _mapTileSizeOffset[1];
+        let tileOffsetX = ((thisNewCol - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0];
+        let tileOffsetY = ((thisNewRow - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1];
         let cursorHasMoved = _worldCursor.moved || thisNewPos !== _mapStartPosition ? true : false;
         $canvasMap.addClass('busy');
         _worldCursor.moving = true;
@@ -1065,7 +1086,7 @@ class mmrpgWorldMap {
             $cursorSprite.attr('data-pos', _worldCursor.position);
             _self.updateMapPosition();
             _self.saveWorldState();
-            _self.focusLayerTile('terrain', _worldCursor.position);
+            _self.makeLayerTileActive(_worldCursor.position);
             if (moveTimeout){ clearTimeout(moveTimeout); }
             moveTimeout = setTimeout(function(){
                 _worldCursor.moving = false;
