@@ -18,6 +18,7 @@ gameSettings.worldConfig = {
     playerId: 0,
     playerToken: 'player',
     playerRobots: ['robot'],
+    playerMobility: 1, // default only
     mapToken: 'undefined',
     mapImage: 'undefined.png',
     mapSize: [10, 10],
@@ -386,6 +387,17 @@ class mmrpgWorldMap {
         return _world.walkableMapTileKeys;
         }
 
+    // Quick function for generating the currently walkable map tiles within range of a target position
+    getWalkableMapTilesByProximity(targetPosition, filterRange){
+        //console.log('%c' + 'mmrpgWorldMap.getWalkableMapTilesByProximity(targetPosition:' + targetPosition + ', filterRange:' + filterRange + ')', 'color: magenta;');
+        let _self = this;
+        let walkableTiles = _self.getWalkableMapTiles();
+        if (!walkableTiles || !Array.isArray(walkableTiles) || !walkableTiles.length){ console.error('getWalkableMapTilesByProximity() missing required walkable tiles!'); return false; }
+        if (!targetPosition || typeof targetPosition !== 'string' || !targetPosition.length){ console.error('getWalkableMapTilesByProximity() missing required targetPosition!'); return false; }
+        filterRange = typeof filterRange === 'number' && filterRange > 0 ? parseInt(filterRange) : 1;
+        return _self.filterTilesByProximity(walkableTiles, targetPosition, filterRange);
+        }
+
     // Quick function to calculate all the walkable tile positions for this map given
     // its base properties (size, terrain) and current conditions (player, enemy placement)
     calculateWalkableMapTiles(refresh, exclude){
@@ -557,9 +569,28 @@ class mmrpgWorldMap {
 
     // Quick function for narrowing down a list of walkable map tiles to only those that
     // fall within the given range of the supplied target position
-    calculateTilesWithinRange(walkableMapTiles, targetPosition, walkableTilesRange){
-        //console.log('%c' + 'mmrpgWorldMap.calculateTilesWithinRange()', 'color: magenta;');
-
+    filterTilesByProximity(walkableTiles, targetPosition, filterRange){
+        //console.log('%c' + 'mmrpgWorldMap.filterTilesByProximity(walkableTiles:' + typeof walkableTiles + ', targetPosition:' + targetPosition + ', filterRange:' + filterRange + ')', 'color: magenta;');
+        if (!Array.isArray(walkableTiles) || !walkableTiles.length){ console.error('filterTilesByProximity() missing required walkableTiles!'); return false; }
+        if (!targetPosition || typeof targetPosition !== 'string' || !targetPosition.length){ console.error('filterTilesByProximity() missing required targetPosition!'); return false; }
+        filterRange = typeof filterRange === 'number' && filterRange > 0 ? parseInt(filterRange) : 1;
+        let _self = this;
+        let _config = _self.config;
+        let _world = _self.state;
+        let targetPositionXY = targetPosition.split('-');
+        targetPositionXY = targetPositionXY.map(function(val){ return parseInt(val.trim()); });
+        let filteredTiles = [];
+        for (let i = 0; i < walkableTiles.length; i++){
+            let tilePosition = walkableTiles[i].split('-');
+            tilePosition = tilePosition.map(function(val){ return parseInt(val.trim()); });
+            let positionRelative = _self.getPositionRelative(targetPositionXY, tilePosition);
+            if (Math.abs(positionRelative[0]) <= filterRange && Math.abs(positionRelative[1]) <= filterRange){
+                filteredTiles.push(walkableTiles[i]);
+                }
+            }
+        //console.log('---> filteredTiles =', filteredTiles);
+        // Otherwise return the filtered tiles
+        return filteredTiles;
         }
 
     // Quick function for calculating the column and row of a tile at a given pixel position
@@ -667,6 +698,7 @@ class mmrpgWorldMap {
     drawTileToCanvas(layerToken, ctx, spriteSheet, tileKey, tileData){
         //console.log('%c' + 'mmrpgWorldMap.drawTileToCanvas(layerToken:' + layerToken + ', ctx, spriteSheet, tileKey:' + tileKey + ', tileData:' + typeof tileData + ')', 'color: magenta;');
         let _self = this;
+        let _selfRef = _self.drawTileToCanvas;
         let _config = _self.config;
         let _world = _self.state;
         // collect the tile data from the index
@@ -677,14 +709,39 @@ class mmrpgWorldMap {
         let tileSpriteToken = tileSprite[1];
         let tileSpriteOffset = tileSprite[2];
         let tileSpriteSize = tileSprite[3];
+        // define some internal methods we can use for effect-drawingoptimization
+        let _saveDrawRestore = function(ctx, callback){
+            ctx.save(); callback.call(this); ctx.restore();
+            };
+        let _drawSpriteFromData = function(ctx, spriteData, alpha, composite){
+            if (!spriteData){ return; }
+            _saveDrawRestore(ctx, function(){
+                ctx.globalAlpha = typeof alpha === 'number' ? alpha : 1.0;
+                ctx.globalCompositeOperation = typeof composite === 'string' ? composite : 'source-over';
+                ctx.drawImage(spriteSheet,
+                    spriteData[0], spriteData[1], // source offset
+                    tileSpriteSize[0], tileSpriteSize[1], // source size
+                    tilePosition[2], tilePosition[3], // destination offset
+                    tileSpriteSize[0], tileSpriteSize[1] // destination size
+                    );
+                });
+            };
+        let drawSpriteFromData = function(spriteData, alpha, composite){
+            return _drawSpriteFromData(ctx, spriteData, alpha, composite);
+            };
         // check if the tile is focused or hovered and apply the effects
         let tileHasGrid = tileEffects.grid;
         let tileIsHovered = tileEffects.hover;
         let tileIsOutlined = tileEffects.outline;
         let tileIsFocused = tileEffects.focus;
         let tileIsActive = tileEffects.active;
+        // check if this tile falls into any oft-used categories
+        let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void') !== -1 ? true : false;
+        let tileIsGrass = tileSpriteToken === 'grass' || tileSpriteToken.indexOf('grass') !== -1 ? true : false;
         // clear a rect at the exact position and no larger
         ctx.clearRect(tilePosition[2], tilePosition[3], tileSpriteSize[0], tileSpriteSize[1]);
+        // void tiles have no sprite, so we skip drawing them
+        if (tileIsVoid){ return false; }
         // sprite: draw the main tile sprite at the correct position
         ctx.drawImage(spriteSheet,
             tileSpriteOffset[0], tileSpriteOffset[1], // source offset
@@ -704,61 +761,31 @@ class mmrpgWorldMap {
         if (!outlineSpriteData){ console.warn('drawTileToCanvas() unable to find outline sprite data for layer ' + layerToken + '!'); }
         if (!focusSpriteData){ console.warn('drawTileToCanvas() unable to find focus sprite data for layer ' + layerToken + '!'); }
         if (!activeSpriteData){ console.warn('drawTileToCanvas() unable to find active sprite data for layer ' + layerToken + '!'); }
-        // grid: draw another image at the same positon but w/ the grid sprite
+        // [GRID]: draw another image at the same positon but w/ the grid sprite
         if (tileHasGrid && gridSpriteData){
-            let gridSpriteOpacity = 0.3;
-            if (tileSpriteToken === 'void' || tileSpriteToken.indexOf('void-') === 0){ gridSpriteOpacity = 0.0; }
-            else if (tileSpriteToken === 'grass' || tileSpriteToken.indexOf('grass-') === 0){ gridSpriteOpacity = 0.6; }
-            ctx.globalAlpha = gridSpriteOpacity;
-            ctx.globalCompositeOperation = 'overlay';
-            ctx.drawImage(spriteSheet,
-                gridSpriteData[0], gridSpriteData[1], // source offset
-                tileSpriteSize[0], tileSpriteSize[1], // source size
-                tilePosition[2], tilePosition[3], // destination offset
-                tileSpriteSize[0], tileSpriteSize[1] // destination size
-                );
-            ctx.globalAlpha = 1.0;
-            ctx.globalCompositeOperation = 'normal';
+            var gridSpriteAlpha = tileIsGrass ? 4.0 : 0.3;
+            drawSpriteFromData(gridSpriteData, gridSpriteAlpha);
             }
-        // hover: draw another image at the same positon but w/ the border sprite
+        // [HOVER]: draw another image at the same positon but w/ the border sprite
         if (tileIsHovered && hoverSpriteData){
-            ctx.globalAlpha = 0.9;
-            ctx.globalCompositeOperation = 'screen';
-            ctx.drawImage(spriteSheet,
-                hoverSpriteData[0], hoverSpriteData[1], // source offset
-                tileSpriteSize[0], tileSpriteSize[1], // source size
-                tilePosition[2], tilePosition[3], // destination offset
-                tileSpriteSize[0], tileSpriteSize[1] // destination size
-                );
-            ctx.globalAlpha = 1.0;
-            ctx.globalCompositeOperation = 'normal';
+            let hoverSpriteAlpha = tileIsFocused ? 0.9 : 0.3;
+            drawSpriteFromData(hoverSpriteData, hoverSpriteAlpha, 'screen');
             }
         // outline: draw another image at the same positon but w/ the border sprite
         if (tileIsOutlined && outlineSpriteData){
-            ctx.drawImage(spriteSheet,
-                outlineSpriteData[0], outlineSpriteData[1], // source offset
-                tileSpriteSize[0], tileSpriteSize[1], // source size
-                tilePosition[2], tilePosition[3], // destination offset
-                tileSpriteSize[0], tileSpriteSize[1] // destination size
-                );
+            drawSpriteFromData(outlineSpriteData);
             }
         // focus: draw another image at the same positon but w/ the border sprite
         if (tileIsFocused && focusSpriteData){
-            ctx.drawImage(spriteSheet,
-                focusSpriteData[0], focusSpriteData[1], // source offset
-                tileSpriteSize[0], tileSpriteSize[1], // source size
-                tilePosition[2], tilePosition[3], // destination offset
-                tileSpriteSize[0], tileSpriteSize[1] // destination size
-                );
+            let focusSpriteAlpha = tileIsHovered ? 0.50 : 0.25;
+            drawSpriteFromData(focusSpriteData, focusSpriteAlpha, 'luminosity');
+            if (outlineSpriteData){
+                drawSpriteFromData(outlineSpriteData);
+                }
             }
         // active: draw another image at the same positon but w/ the border sprite
         if (tileIsActive && activeSpriteData){
-            ctx.drawImage(spriteSheet,
-                activeSpriteData[0], activeSpriteData[1], // source offset
-                tileSpriteSize[0], tileSpriteSize[1], // source size
-                tilePosition[2], tilePosition[3], // destination offset
-                tileSpriteSize[0], tileSpriteSize[1] // destination size
-                );
+            drawSpriteFromData(activeSpriteData);
             }
         // Return true on success
         return true;
@@ -836,15 +863,40 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Quick function for bulk-removing a given effect for any layer tiles that have it
+    bulkRemoveLayerTileEffect(layerToken, effectName){
+        //console.log('%c' + 'mmrpgWorldMap.bulkRemoveLayerTileEffect(layerToken:' + layerToken + ', effectName:' + effectName + ')', 'color: magenta;');
+        if (!layerToken || typeof layerToken !== 'string' || !layerToken.length){ return false; }
+        if (!effectName || typeof effectName !== 'string' || !effectName.length){ return false; }
+        let _self = this;
+        let _world = _self.state;
+        let layerTilesIndex = _world.layerTilesIndex;
+        let thisLayerTiles = layerTilesIndex[layerToken] || false;
+        if (!thisLayerTiles || typeof thisLayerTiles !== 'object'){ console.error('bulkRemoveLayerTileEffect() missing required _world.layerTilesIndex[' + layerToken + ']!'); return false; }
+        for (let tileKey in thisLayerTiles){
+            let thisTileData = thisLayerTiles[tileKey];
+            if (thisTileData.effects[effectName]){
+                thisTileData.effects[effectName] = false;
+                thisTileData.dirty = true;
+                }
+            }
+        _self.refreshCanvasTiles(layerToken);
+        return true;
+        }
+
     // Quick alias functions for applying and removing tile effects as per above
     hoverLayerTile(tilePosition){ return this.applyLayerTileEffect('terrain', tilePosition, 'hover'); }
     unhoverLayerTile(tilePosition){ return this.removeLayerTileEffect('terrain', tilePosition, 'hover'); }
+    unhoverLayerTiles(){ return this.bulkRemoveLayerTileEffect('terrain', 'hover'); }
     focusLayerTile(tilePosition){ return this.applyLayerTileEffect('terrain', tilePosition, 'focus'); }
     unfocusLayerTile(tilePosition){ return this.removeLayerTileEffect('terrain', tilePosition, 'focus'); }
+    unfocusLayerTiles(){ return this.bulkRemoveLayerTileEffect('terrain', 'focus'); }
     outlineLayerTile(tilePosition){ return this.applyLayerTileEffect('terrain', tilePosition, 'outline'); }
     unoutlineLayerTile(tilePosition){ return this.removeLayerTileEffect('terrain', tilePosition, 'outline'); }
+    unoutlineLayerTiles(){ return this.bulkRemoveLayerTileEffect('terrain', 'outline'); }
     makeLayerTileActive(tilePosition){ return this.applyLayerTileEffect('terrain', tilePosition, 'active'); }
     makeLayerTileInactive(tilePosition){ return this.removeLayerTileEffect('terrain', tilePosition, 'active'); }
+    makeLayerTilesInactive(){ return this.bulkRemoveLayerTileEffect('terrain', 'active'); }
 
     // Quick function for binding events to a given layer's canvas object
     bindEventsToCanvas($canvasMap){
@@ -856,6 +908,7 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let _cursor = _world.cursor;
         let layerToken = 'terrain'; // TODO: make this dynamic maybe?
+        let playerMobility = _config.playerMobility || 1;
         let $clickOverlay = $('#click-overlay', $canvasMap);
         let activeTimeouts = {}, activeTimeoutDuration = _config.mapEffects.activeTimeout;
         let focusTimeouts = {}, focusTimeoutDuration = _config.mapEffects.focusTimeout;
@@ -865,15 +918,17 @@ class mmrpgWorldMap {
             e.preventDefault();
             if (_cursor.moving){ return false; }
             //console.log('%c' + 'Map overlay click event!', 'color: cyan;');
-            let oldPos = _cursor.position;
+            let oldPos = _cursor.position, curPos = oldPos;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.pageX, e.pageY);
             let sameAsLast = thisPos === lastMouseClick;
             let sameAsCurrent = thisPos === oldPos;
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
             let walkableTiles = _self.getWalkableMapTiles();
+            let tilesWithinRange = _self.getWalkableMapTilesByProximity(curPos, playerMobility);
             let tileIsWalkable = walkableTiles.indexOf(thisPos) !== -1 ? true : false;
+            let tileIsWithinRange = tilesWithinRange.indexOf(thisPos) !== -1 ? true : false;
             lastMouseClick = thisPos;
-            if (!tileIsWalkable || sameAsLast || sameAsCurrent){ return false; }
+            if (!tileIsWithinRange || sameAsLast || sameAsCurrent){ return false; }
             //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
             if (!sameAsLast){ _self.playSoundEffect('link-click'); }
             _self.makeLayerTileActive(thisPos);
@@ -893,8 +948,14 @@ class mmrpgWorldMap {
             let sameAsLast = thisPos === lastMouseOver;
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
             let walkableTiles = _self.getWalkableMapTiles();
+            let tilesWithinRange = _self.getWalkableMapTilesByProximity(curPos, playerMobility);
+            //console.log('-> walkableTiles:', walkableTiles);
+            //console.log('-> tilesWithinRange:', tilesWithinRange);
             let tileIsWalkable = walkableTiles.indexOf(thisPos) !== -1 ? true : false;
-            let showPointer = thisPos !== curPos && tileIsWalkable ? true : false;
+            let tileIsWithinRange = tilesWithinRange.indexOf(thisPos) !== -1 ? true : false;
+            //console.log('-> tileIsWalkable:', tileIsWalkable);
+            //console.log('-> tileIsWithinRange:', tileIsWithinRange);
+            let showPointer = thisPos !== curPos && tileIsWithinRange ? true : false;
             $clickOverlay.css({cursor: showPointer ? 'pointer' : 'default'});
             if (hoverTiles.length){
                 for (var i = 0; i < hoverTiles.length; i++){
@@ -1231,6 +1292,25 @@ class mmrpgWorldMap {
 
         // Update the walkable map tiles now that things have changed slightly
         _self.calculateWalkableMapTiles(true);
+
+        // Collect the walkable map tiles so we can filter down to only those in proximity
+        //console.log('-> player has moved to new position, refresh tile-focus to only those within range');
+        //let walkableTiles = _self.getWalkableMapTiles(), targetPosition = cursorPosition, filterRange = _config.playerMobility;
+        //let tilesWithinRange = _self.filterTilesByProximity(walkableTiles, targetPosition, filterRange);
+        //console.log('-> walkableTiles:', walkableTiles);
+        //console.log('-> targetPosition:', targetPosition);
+        //console.log('-> filterRange:', filterRange);
+        let targetPosition = cursorPosition, filterRange = _config.playerMobility;
+        let tilesWithinRange = _self.getWalkableMapTilesByProximity(targetPosition, filterRange);
+        //console.log('-> new tilesWithinRange:', tilesWithinRange);
+        _self.unfocusLayerTiles(); // unfocus all tiles first
+        if (tilesWithinRange){ // then apply outlines to tiles within range
+            for (let i = 0; i < tilesWithinRange.length; i++){
+                let tilePosition = tilesWithinRange[i];
+                _self.focusLayerTile(tilePosition);
+                }
+            //console.log('-> added focus to ' + tilesWithinRange.length + ' tiles within range of player position', targetPosition);
+            }
 
         // If the player has not moved from their spawn position yet, we should not do anything further
         if (!_config.allowWorldEvents){ return true; }

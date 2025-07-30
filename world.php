@@ -34,6 +34,7 @@ define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
 define('MMRPG_WORLD_DEFAULT_TILESIZE', 80);
 define('MMRPG_WORLD_DEFAULT_SPRITESITE', 40);
 define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 3); // TODO: make this dependant on limit hearts
+define('MMRPG_WORLD_DEFAULT_MOBILITY', 1); // TODO: make this dependant on player skill
 define('MMRPG_WORLD_MAPFILE_BASEPATH', 'prototype/worldmaps/');
 
 // Define defaults and allowed values for the prototype world data
@@ -669,6 +670,7 @@ _worldConfig.userId = <?= rpg_game::get_userid() ?>;
 _worldConfig.playerId = <?= json_encode($this_prototype_data['this_player_id']) ?>;
 _worldConfig.playerToken = <?= json_encode($this_prototype_data['this_player_token']) ?>;
 _worldConfig.playerRobots = <?= json_encode($this_prototype_data['this_player_robots']) ?>;
+_worldConfig.playerMobility = <?= MMRPG_WORLD_DEFAULT_MOBILITY ?>;
 _worldConfig.backButtonURL = 'prototype.php';
 _worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&position=<?= $default_world_position ?>';
 _worldConfig.resetButtonURL = 'world.php?reset=world';
