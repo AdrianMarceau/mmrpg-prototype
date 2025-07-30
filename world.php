@@ -440,6 +440,7 @@ $flag_skip_fadein = true;
                     <?
 
                     // If there are any portals defined, make sure we look through and display them
+                    $portal_symbols = array();
                     if (!empty($map_data_parsed['portals'])){
                         $portal_sprites = $map_data_parsed['portals'];
                         foreach ($portal_sprites AS $portal_name => $portal_data){
@@ -450,14 +451,18 @@ $flag_skip_fadein = true;
                             $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                             $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                             $hidden = in_array('hidden', $portal_data) ? true : false;
+                            $locked = in_array('locked', $portal_data) ? true : false;
                             if ($hidden){ continue; }
                             $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucfirst($portal_name));
                             $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
-                            $classes = 'sprite tile portal'.($portal_name !== 'spawn' ? ' pulse' : '').($hidden ? ' hidden' : '');
+                            $classes = 'sprite tile portal'.($portal_name !== 'spawn' && !$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                             $style = 'top: '.$top.'px; left: '.$left.'px;';
+                            $portal_symbols[$pos] = $portal_name;
                             echo('<span class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>'.PHP_EOL);
                         }
                     }
+                    $portal_symbols_json = json_encode($portal_symbols, JSON_NUMERIC_CHECK);
+                    echo('<script data-json="portalSymbols" type="application/json">'.$portal_symbols_json.'</script>'.PHP_EOL);
 
                     ?>
                 </div>

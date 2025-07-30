@@ -37,6 +37,7 @@ gameSettings.worldConfig = {
     mapSpritesIndex: {},
     mapPortalsIndex: {},
     mapBattleIndex: {},
+    mapPortalSymbols: {},
     mapBattleSymbols: {},
     mapRivalSymbols: {},
     windowWidth: 1024, // default only
