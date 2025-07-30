@@ -31,7 +31,8 @@ $WORLD_SESSION = &$_SESSION['WORLD'];
 
 // Define some constants for the world map
 define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
-define('MMRPG_WORLD_DEFAULT_TILESIZE', 40);
+define('MMRPG_WORLD_DEFAULT_TILESIZE', 80);
+define('MMRPG_WORLD_DEFAULT_SPRITESITE', 40);
 define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 3); // TODO: make this dependant on limit hearts
 define('MMRPG_WORLD_MAPFILE_BASEPATH', 'prototype/worldmaps/');
 
@@ -365,6 +366,10 @@ $flag_skip_fadein = true;
             $map_tilesize_offset = array(0, 0);
             if ($map_tile_height > $map_tilesize_default){ $map_tilesize_offset[0] = floor(($map_tile_height - $map_tilesize_default) / 2); }
             if ($map_tile_width > $map_tilesize_default){ $map_tilesize_offset[1] = floor(($map_tile_width - $map_tilesize_default) / 2); }
+            $map_spritesize_default = MMRPG_WORLD_DEFAULT_SPRITESITE;
+            $map_spritesize_offset = array(0, 0);
+            if ($map_tile_height > $map_spritesize_default){ $map_spritesize_offset[0] = floor(($map_tile_height - $map_spritesize_default) / 2); }
+            if ($map_tile_width > $map_spritesize_default){ $map_spritesize_offset[1] = floor(($map_tile_width - $map_spritesize_default) / 2); }
             $map_size_styles = 'width: '.$map_pixel_width.'px; height: '.$map_pixel_height.'px; ';
             $map_offset_styles = 'top: 0px; left: 0px; ';
             $map_base_styles = trim($map_size_styles.$map_offset_styles);
@@ -478,8 +483,8 @@ $flag_skip_fadein = true;
                         list($col, $row) = explode('-', $position);
                         $maxcols = $map_col_size;
                         $maxrows = $map_row_size;
-                        $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
-                        $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                        $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
+                        $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
                         $zindex = ($maxrows + 1) - $row;
                         $class = 'battle bounce';
                         $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$zindex.';';
@@ -515,11 +520,11 @@ $flag_skip_fadein = true;
 
                     // Quick function for generation the team sprites for a given player
                     $get_team_sprites = function($team_sprites, $target_position = '1-1', $team_class = 'team')
-                        use ($map_tile_height, $map_tile_width, $map_tilesize_offset){
+                        use ($map_tile_height, $map_tile_width, $map_spritesize_offset){
                         $sprites = array();
                         list($col, $row) = explode('-', $target_position);
-                        $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
-                        $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                        $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
+                        $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
                         foreach ($team_sprites as $key => $sprite){
                             $kind = $sprite[0];
                             $token = $sprite[1];
@@ -561,8 +566,8 @@ $flag_skip_fadein = true;
                     $sprite = 'images/robots/pointan/sprite_right_40x40.png'; // TODO: surely this isn't how we're going to leave this...
                     $pos = $team_position;
                     list($col, $row) = explode('-', $pos);
-                    $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
-                    $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                    $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
+                    $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
                     echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"><span class="sprite sprite_40x40" style="background-image: url('.$sprite.');"></span></span>'.PHP_EOL);
 
                     // Generate the markup for the team sprites if any are defined

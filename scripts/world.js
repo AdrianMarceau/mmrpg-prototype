@@ -21,7 +21,7 @@ gameSettings.worldConfig = {
     mapToken: 'undefined',
     mapImage: 'undefined.png',
     mapSize: [10, 10],
-    mapTileSize: [40, 40],
+    mapTileSize: [80, 80],
     mapTileSizeOffset: [0, 0],
     mapCols: 10, // default only
     mapRows: 10, // default only
