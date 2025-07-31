@@ -312,7 +312,7 @@ class rpg_world {
         }
         //error_log('$map_col_size = '.print_r($map_col_size, true));
         //error_log('$map_row_size = '.print_r($map_row_size, true));
-        //error_log('$available_cells('.count($available_cells).') = '.print_r($available_cells, true));
+        //error_log('$available_cells('.count($available_cells).') = ['.implode(', ', array_keys($available_cells)).']');
         // Now let's loop through portals and remove spaces that have portals on them
         if (!empty($map_data['portals']) && is_array($map_data['portals'])){
             foreach ($map_data['portals'] AS $portal_name => $portal_data){
@@ -327,16 +327,27 @@ class rpg_world {
         $by_terrain = array();
         if (!empty($map_data['tiles']) && !empty($map_data['tiles']['keys']) && !empty($map_data['layers'])){
             $tilesIndex = $map_data['tiles']['keys'];
+            //error_log('-> $tilesIndex = '.print_r($tilesIndex, true));
             $tileLayers = $map_data['layers'];
+            //error_log('-> $tileLayers = '.print_r($tileLayers, true));
             foreach ($tileLayers AS $layer_key => $layer_tiles){
+                //error_log('-> checking layer #'.$layer_key.' $tileLayers ...');
+                //error_log('-> found '.count($layer_tiles).' rows in $layer_tiles ...');
                 foreach ($layer_tiles AS $row_key => $row_tiles){
+                    //error_log('-> checking $tileLayers['.$layer_key.']['.$row_key.'] ...');
+                    //error_log('-> $tileLayers['.$layer_key.']['.$row_key.'] = '.print_r($row_tiles, true));
+                    $row_tiles = str_replace(array('[', ']'), '', $row_tiles);
+                    //error_log('-> $row_tiles(1) = '.print_r($row_tiles, true));
                     $row_tiles = strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles);
+                    //error_log('-> $row_tiles(2) = '.print_r($row_tiles, true));
                     $row_tiles = array_map('intval', $row_tiles);
+                    //error_log('-> $row_tiles(3) = '.print_r($row_tiles, true));
                     foreach ($row_tiles AS $col_key => $tile_key){
                         $pos = ($col_key + 1).'-'.($row_key + 1);
                         if (!isset($available_cells[$pos])){ continue; }
                         if (!isset($tilesIndex[$tile_key])){ continue; }
                         $tile_token = $tilesIndex[$tile_key];
+                        //error_log('-> $tilesIndex['.$tile_key.'] = "'.$tile_token.'"');
                         // If this tile is a "void" type, remove it from the available cells
                         if ($tile_token === 'void' || strstr($tile_token, 'void')){
                             //error_log('-> removing tile position "'.$pos.'" from available cells (tile: '.$tile_token.')');
@@ -348,7 +359,6 @@ class rpg_world {
                             //error_log('-> adding tile position "'.$pos.'" to by_terrain["'.$tile_token_clean.'"] (tile: '.$tile_token.')');
                             if (!isset($by_terrain[$tile_token_clean])){ $by_terrain[$tile_token_clean] = array(); }
                             $by_terrain[$tile_token_clean][] = $pos;
-                            //error_log('-> adding tile position "'.$pos.'" to by_terrain["'.$tile_token.'"]');
                         }
                     }
                 }

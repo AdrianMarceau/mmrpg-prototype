@@ -739,6 +739,7 @@ class mmrpgWorldMap {
         // check if this tile falls into any oft-used categories
         let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void') !== -1 ? true : false;
         let tileIsGrass = tileSpriteToken === 'grass' || tileSpriteToken.indexOf('grass') !== -1 ? true : false;
+        let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water') !== -1 ? true : false;
         // clear a rect at the exact position and no larger
         ctx.clearRect(tilePosition[2], tilePosition[3], tileSpriteSize[0], tileSpriteSize[1]);
         // void tiles have no sprite, so we skip drawing them
@@ -764,12 +765,14 @@ class mmrpgWorldMap {
         if (!activeSpriteData){ console.warn('drawTileToCanvas() unable to find active sprite data for layer ' + layerToken + '!'); }
         // [GRID]: draw another image at the same positon but w/ the grid sprite
         if (tileHasGrid && gridSpriteData){
-            var gridSpriteAlpha = tileIsGrass ? 0.4 : 0.3;
-            drawSpriteFromData(gridSpriteData, gridSpriteAlpha);
+            var gridSpriteAlpha = 0.3;
+            if (tileIsGrass){ gridSpriteAlpha += 0.2; }
+            drawSpriteFromData(gridSpriteData, gridSpriteAlpha, 'source-over');
             }
         // [HOVER]: draw another image at the same positon but w/ the border sprite
         if (tileIsHovered && hoverSpriteData){
-            let hoverSpriteAlpha = tileIsFocused ? 0.9 : 0.3;
+            var hoverSpriteAlpha = 0.3;
+            if (tileIsFocused){ hoverSpriteAlpha += 0.6; }
             drawSpriteFromData(hoverSpriteData, hoverSpriteAlpha, 'screen');
             }
         // outline: draw another image at the same positon but w/ the border sprite
@@ -778,9 +781,13 @@ class mmrpgWorldMap {
             }
         // focus: draw another image at the same positon but w/ the border sprite
         if (tileIsFocused && focusSpriteData){
-            let focusSpriteAlpha = tileIsHovered ? 0.50 : 0.25;
+            var focusSpriteAlpha = 0.25;
+            if (tileIsGrass){ focusSpriteAlpha += 0.10; }
+            if (tileIsHovered){ focusSpriteAlpha += 0.25; }
             drawSpriteFromData(focusSpriteData, focusSpriteAlpha, 'luminosity');
             if (outlineSpriteData){
+                var outlineSpriteAlpha = 1.00;
+                if (tileIsWater){ outlineSpriteAlpha -= 0.30; }
                 drawSpriteFromData(outlineSpriteData);
                 }
             }

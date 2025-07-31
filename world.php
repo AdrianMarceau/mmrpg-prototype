@@ -461,6 +461,7 @@ $flag_skip_fadein = true;
                             for ($col = 1; $col <= $map_col_size; $col++){
                                 $pos = $col.'-'.$row;
                                 $key = isset($row_tiles[$col - 1]) ? $row_tiles[$col - 1] : '';
+                                if (strstr($key, '[') || strstr($key, ']')){ $key = trim($key, '[]'); }
                                 $data['canvas_tiles'][$pos] = $key;
                             }
                         }
