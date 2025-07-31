@@ -719,6 +719,7 @@ class mmrpgWorldMap {
             _saveDrawRestore(ctx, function(){
                 ctx.globalAlpha = typeof alpha === 'number' ? alpha : 1.0;
                 ctx.globalCompositeOperation = typeof composite === 'string' ? composite : 'source-over';
+                //console.log('-> drawing sprite[' + layerToken + '/' + tileKey + '] w/', '\n-> globalAlpha = ', ctx.globalAlpha, '\n-> globalCompositeOperation =', ctx.globalCompositeOperation);
                 ctx.drawImage(spriteSheet,
                     spriteData[0], spriteData[1], // source offset
                     tileSpriteSize[0], tileSpriteSize[1], // source size
@@ -744,6 +745,8 @@ class mmrpgWorldMap {
         ctx.clearRect(tilePosition[2], tilePosition[3], tileSpriteSize[0], tileSpriteSize[1]);
         // void tiles have no sprite, so we skip drawing them
         if (tileIsVoid){ return false; }
+        //console.log('---> tile[' + layerToken + '/' + tileKey + '/' + tileSpriteToken + '] tileData =', JSON.stringify(tileData));
+        //console.log('---> tile[' + layerToken + '/' + tileKey + ']::tileIsVoid =', tileIsVoid);
         // sprite: draw the main tile sprite at the correct position
         ctx.drawImage(spriteSheet,
             tileSpriteOffset[0], tileSpriteOffset[1], // source offset
@@ -837,7 +840,9 @@ class mmrpgWorldMap {
             if (!tileData.dirty){ continue; }
             _self.drawTileToCanvas(layerToken, ctx, spriteSheet, tileKey, tileData);
             tileData.dirty = false; // reset the dirty flag
+            thisLayerTiles[tileKey] = tileData; // reassign the tile data
             }
+        layerTilesIndex[layerToken] = thisLayerTiles; // reassign the layer tiles index
         return true;
         }
 
@@ -881,8 +886,9 @@ class mmrpgWorldMap {
         let layerTilesIndex = _world.layerTilesIndex;
         let thisLayerTiles = layerTilesIndex[layerToken] || false;
         if (!thisLayerTiles || typeof thisLayerTiles !== 'object'){ console.error('bulkRemoveLayerTileEffect() missing required _world.layerTilesIndex[' + layerToken + ']!'); return false; }
-        for (let tileKey in thisLayerTiles){
-            let thisTileData = thisLayerTiles[tileKey];
+        for (let tilePosition in thisLayerTiles){
+            //let thisTileData = thisLayerTiles[tilePosition];
+            let thisTileData = _self.getLayerTileIndexData(layerToken, tilePosition);
             if (thisTileData.effects[effectName]){
                 thisTileData.effects[effectName] = false;
                 thisTileData.dirty = true;
@@ -954,6 +960,8 @@ class mmrpgWorldMap {
             let curPos = _cursor.position;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.pageX, e.pageY);
             let sameAsLast = thisPos === lastMouseOver;
+            if (sameAsLast){ return; }
+            $clickOverlay.attr('title', 'Position: ' + thisPos);
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
             let walkableTiles = _self.getWalkableMapTiles();
             let tilesWithinRange = _self.getWalkableMapTilesByProximity(curPos, playerMobility);
@@ -972,6 +980,7 @@ class mmrpgWorldMap {
                     delete hoverTimeouts[hoverPos];
                     _self.unhoverLayerTile(hoverPos);
                     }
+                hoverTiles = [];
                 }
             lastMouseOver = thisPos;
             if (!tileIsWalkable){ return; }
