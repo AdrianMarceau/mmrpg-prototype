@@ -320,6 +320,7 @@ class mmrpgWorldMap {
             let tileSpriteKey = tileValue;
             let tileSpriteToken = tilesIndexKeys[tileSpriteKey];
             let tileSpriteInfo = tilesIndex[tileSpriteToken];
+            if (!tileSpriteInfo){ console.error('indexCanvasTileData() missing tileSpriteInfo for tileKey:', tileKey, 'and tileSpriteKey:', tileSpriteKey); continue; }
             let tileSpriteOffset = [tileSpriteInfo[0] || 0, tileSpriteInfo[1] || 0];
             let tileSpriteSize = [tileSpriteInfo[2] || tileSize[0], tileSpriteInfo[3] || tileSize[1]];
             let tileSpritePosition = [tilePos[0], tilePos[1], ((tilePos[0] - 1) * tileSpriteSize[0]), ((tilePos[1] - 1) * tileSpriteSize[1])];
@@ -763,7 +764,7 @@ class mmrpgWorldMap {
         if (!activeSpriteData){ console.warn('drawTileToCanvas() unable to find active sprite data for layer ' + layerToken + '!'); }
         // [GRID]: draw another image at the same positon but w/ the grid sprite
         if (tileHasGrid && gridSpriteData){
-            var gridSpriteAlpha = tileIsGrass ? 4.0 : 0.3;
+            var gridSpriteAlpha = tileIsGrass ? 0.4 : 0.3;
             drawSpriteFromData(gridSpriteData, gridSpriteAlpha);
             }
         // [HOVER]: draw another image at the same positon but w/ the border sprite

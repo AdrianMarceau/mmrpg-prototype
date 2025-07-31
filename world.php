@@ -38,11 +38,15 @@ define('MMRPG_WORLD_DEFAULT_MOBILITY', 1); // TODO: make this dependant on playe
 define('MMRPG_WORLD_MAPFILE_BASEPATH', 'prototype/worldmaps/');
 
 // Define defaults and allowed values for the prototype world data
-//$allowed_world_tokens = array('starter', 'water', 'starter-80x80', 'water-80x80');
+//$allowed_map_tokens = array('starter', 'water', 'starter-80x80', 'water-80x80');
+$existing_sheet_files = glob(MMRPG_CONFIG_ROOTDIR.MMRPG_WORLD_MAPFILE_BASEPATH.'*.sheet');
 $existing_map_files = glob(MMRPG_CONFIG_ROOTDIR.MMRPG_WORLD_MAPFILE_BASEPATH.'*.map');
-$allowed_world_tokens = array_map(function($path){ return preg_replace('/\.map$/i', '', basename($path)); }, $existing_map_files);
+$allowed_sheet_tokens = array_map(function($path){ return preg_replace('/\.sheet$/i', '', basename($path)); }, $existing_sheet_files);
+$allowed_map_tokens = array_map(function($path){ return preg_replace('/\.map$/i', '', basename($path)); }, $existing_map_files);
+//error_log('$existing_sheet_files = '. print_r($existing_sheet_files, true));
 //error_log('$existing_map_files = '. print_r($existing_map_files, true));
-//error_log('$allowed_world_tokens = '. print_r($allowed_world_tokens, true));
+//error_log('$allowed_sheet_tokens = '. print_r($allowed_sheet_tokens, true));
+//error_log('$allowed_map_tokens = '. print_r($allowed_map_tokens, true));
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
 array_unshift($allowed_player_tokens, 'player'); // always allow the "player" token
 $default_world_token = 'debug-area-1'; //'starter-80x80';
@@ -68,7 +72,7 @@ if (!empty($_POST['action']) && $_POST['action'] === 'save'
         if (!isset($WORLD_SESSION['last_player_sessions'][$cursorPlayer])){ $WORLD_SESSION['last_player_sessions'][$cursorPlayer] = array(); }
         $cursorPlayerSession = &$WORLD_SESSION['last_player_sessions'][$cursorPlayer];
         // If last world was provided, save it to the sessions
-        if (!empty($worldData['lastWorld']) && in_array($worldData['lastWorld'], $allowed_world_tokens)){
+        if (!empty($worldData['lastWorld']) && in_array($worldData['lastWorld'], $allowed_map_tokens)){
             $last_world_token_key = 'last_world_token';
             $lastPlayerSession[$last_world_token_key] = $worldData['lastWorld'];
             $cursorPlayerSession[$last_world_token_key] = $worldData['lastWorld'];
@@ -189,7 +193,7 @@ $WORLD_PLAYER_SESSION[$last_world_robots_key] = implode(',', $this_prototype_dat
 $request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
 if (empty($request_world_token) && !empty($WORLD_PLAYER_SESSION[$last_world_token_key])){ $request_world_token = $WORLD_PLAYER_SESSION[$last_world_token_key]; }
 if (!empty($request_world_token) && !empty($WORLD_PLAYER_SESSION[$last_world_token_key]) && $request_world_token !== $WORLD_PLAYER_SESSION[$last_world_token_key]){ unset($WORLD_PLAYER_SESSION[$last_world_position_key]); }
-if (!empty($request_world_token) && in_array($request_world_token, $allowed_world_tokens)){
+if (!empty($request_world_token) && in_array($request_world_token, $allowed_map_tokens)){
     $this_prototype_data['this_current_world'] = $request_world_token;
 }
 if (empty($this_prototype_data['this_current_world'])){ $this_prototype_data['this_current_world'] = $default_world_token; }
@@ -204,8 +208,44 @@ $WORLD_PLAYER_SESSION[$last_world_position_key] = $this_prototype_data['this_cur
 
 // Load map data from the appropriate map file
 $map_token = $this_prototype_data['this_current_world'];
+//error_log('$map_token = '.print_r($map_token, true));
 $map_data_parsed = rpg_world::load_map_data($map_token);
 //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
+$map_sprite_sheet = !empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : '';
+//error_log('$map_sprite_sheet = '.print_r($map_sprite_sheet, true));
+if (!empty($map_sprite_sheet)){
+    if (substr($map_sprite_sheet, -4) !== '.png'){
+        $sheet_token = $map_sprite_sheet;
+        $sheet_data_parsed = !empty($sheet_token) ? rpg_world::load_sheet_data($sheet_token) : array();
+        //error_log('$sheet_data_parsed = '.print_r($sheet_data_parsed, true));
+        if (!empty($sheet_data_parsed)){
+            $map_sheet = !empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : '';
+            $map_size = !empty($map_data_parsed['size']) ? $map_data_parsed['size'] : array();
+            $map_tiles = !empty($map_data_parsed['tiles']) ? $map_data_parsed['tiles'] : array();
+            $map_tiles_keys = !empty($map_tiles['keys']) ? $map_tiles['keys'] : array();
+            $map_sprites = !empty($map_data_parsed['sprites']) ? $map_data_parsed['sprites'] : array();
+            $map_sprites_keys = !empty($map_sprites['keys']) ? $map_sprites['keys'] : array();
+            $sheet_image = !empty($sheet_data_parsed['image']) ? $sheet_data_parsed['image'] : '';
+            $sheet_size = !empty($sheet_data_parsed['size']) ? $sheet_data_parsed['size'] : array();
+            $sheet_tiles = !empty($sheet_data_parsed['tiles']) ? $sheet_data_parsed['tiles'] : array();
+            $sheet_tiles_keys = !empty($sheet_tiles['keys']) ? $sheet_tiles['keys'] : array();
+            $sheet_sprites = !empty($sheet_data_parsed['sprites']) ? $sheet_data_parsed['sprites'] : array();
+            $sheet_sprites_keys = !empty($sheet_sprites['keys']) ? $sheet_sprites['keys'] : array();
+            if (!empty($sheet_image)){ $map_sheet = $sheet_image; }
+            if (!empty($sheet_size)){ list($x, $y) = $map_size; list($w, $h) = $sheet_size; $map_size = array($x, $y, $w, $h); }
+            if (!empty($sheet_tiles)){ $map_tiles = array_merge($map_tiles, $sheet_tiles); $map_tiles['keys'] = $map_tiles_keys + $sheet_tiles_keys; }
+            if (!empty($sheet_sprites)){ $map_sprites = array_merge($map_sprites, $sheet_sprites); $map_sprites['keys'] = $map_sprites_keys + $sheet_sprites_keys; }
+            $map_data_parsed['sheet'] = $map_sheet;
+            $map_data_parsed['size'] = $map_size;
+            $map_data_parsed['tiles'] = $map_tiles;
+            $map_data_parsed['sprites'] = $map_sprites;
+        }
+        $map_sprite_sheet = $map_data_parsed['sheet'];
+        //error_log('$map_sprite_sheet (parsed) = '.print_r($map_sprite_sheet, true));
+        //error_log('$map_data_parsed (merged) = '.print_r($map_data_parsed, true));
+        //exit();
+    }
+}
 
 // Collect the map's field token and mecha encounters
 $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
