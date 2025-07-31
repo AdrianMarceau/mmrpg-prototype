@@ -2,13 +2,20 @@
 # DEBUG AREA 1
 @token    = debug-area-1
 @name     = DEBUG AREA 1
-@sheet    = mmrpg-overworld-2k25
 @size     = 11 x 24
+@sheet    = mmrpg-overworld-2k25
 #---------------------------#
 @field       = gentle-countryside
 @mechas      = met(2),trille-bot(1)
 @habitats[]  = met(grass)
 @habitats[]  = trille-bot(subspace)
+#---------------------------#
+@portals[]  = spawn(6, 8)
+@portals[]  = goto__debug-area-1n(6, 6)
+@portals[]  = goto__debug-area-1s(6, 10)
+@portals[]  = goto__debug-area-1w(4, 8)
+@portals[]  = goto__debug-area-1e(8, 8)
+@portals[]  = goto__starter-80x80(6, 3, locked)
 #---------------------------#
 [00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00]
 [00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00]
@@ -34,11 +41,4 @@
 [00],[00],[00],[92],[90],[90],[90],[92],[00],[00],[00]
 [00],[00],[00],[00],[92],[92],[92],[00],[00],[00],[00]
 [00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00]
-#---------------------------#
-@portals[]  = spawn(6, 8)
-@portals[]  = goto__debug-area-1n(6, 6)
-@portals[]  = goto__debug-area-1s(6, 10)
-@portals[]  = goto__debug-area-1w(4, 8)
-@portals[]  = goto__debug-area-1e(8, 8)
-@portals[]  = goto__starter-80x80(6, 3, locked)
 #---------------------------#
