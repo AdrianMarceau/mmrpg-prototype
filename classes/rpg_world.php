@@ -180,6 +180,123 @@ class rpg_world {
         return $map_data_parsed;
     }
 
+    // Define a function for loading a given sheet's data from the filesystem
+    public static function load_sheet_data($sheet_token){
+        //error_log('load_sheet_data() called!');
+        static $sheet_basedir = MMRPG_CONFIG_ROOTDIR.MMRPG_WORLD_MAPFILE_BASEPATH;
+        static $sheet_tilesize = MMRPG_WORLD_DEFAULT_TILESIZE;
+        if (empty($sheet_token)){ error_log('rpg_world::load_sheet_data() error - missing sheet token!'); return false; }
+        $sheet_filename = $sheet_token.'.sheet';
+        $sheet_filedir = $sheet_basedir.$sheet_filename;
+        if (!file_exists($sheet_filedir)){ error_log('rpg_world::load_sheet_data() error - file not found "'.$sheet_filedir.'"!'); return false; }
+        $sheet_data_raw = file_get_contents($sheet_filedir);
+        if (empty($sheet_data_raw)){ error_log('rpg_world::load_sheet_data() error - file empty "'.$sheet_filedir.'"!'); return false; }
+        $sheet_data_array = explode("\n", trim($sheet_data_raw));
+        $sheet_data_vars = array();
+        foreach ($sheet_data_array AS $line){
+            $line = trim($line);
+            // Ignore empty lines and comments
+            if (empty(trim($line))){ continue; }
+            else if (strpos($line, '#') === 0){ continue; }
+            else if (strpos($line, '//') === 0){ continue; }
+            // If this is not a variable line, skip it (ie. @foo = bar)
+            // ie. void(0.1,-3.5) => void, 0.1, 13,5
+            else if (strpos($line, '@') !== 0){ continue; }
+            else if (!strstr($line, '=')){ continue; }
+            // Otherwise parse the value of the variable and add it to the data
+            $line = preg_replace('/\s+\=\s+/i', '=', trim($line, '@ '));
+            list($name, $value) = explode('=', $line, 2);
+            if (strstr($name, '[') && strstr($name, ']')){
+                $key = substr($name, strpos($name, '[') + 1, -1);
+                $name = substr($name, 0, strpos($name, '['));
+                if (!isset($sheet_data_vars[$name])){ $sheet_data_vars[$name] = array(); }
+                if ($key === ''){ $sheet_data_vars[$name][] = $value; }
+                else { $sheet_data_vars[$name][$key] = $value; }
+                } else {
+                $sheet_data_vars[$name] = $value;
+                }
+        }
+        //error_log('$sheet_data_vars = '.print_r($sheet_data_vars, true));
+        // Review and process the sheet layer data
+        $sheet_tiles_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
+        $sheet_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)(,[-_a-z0-9,]+)?\)$/i'; // syntax: name(x,y[,flag1,flag2,etc.]) ie. spawn(4,4) or spawn(4,4,other-area-2) => name:spawn, x:4, y:4
+        $sheet_listval_custval_regex = '/^([.a-z0-9-_]+)\(([,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
+        //$sheet_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
+        static $sheet_custval_parser;
+        if (!$sheet_custval_parser){
+            $sheet_custval_parser = function($raw_tiles, $include_keys = false)
+                use ($sheet_tiles_custval_regex, $sheet_other_custval_regex, $sheet_listval_custval_regex){
+                if (empty($raw_tiles)){ return array(); }
+                $parsed_keys = array();
+                $parsed_tiles = array();
+                foreach ($raw_tiles AS $line){
+                    $line = trim(str_replace(' ', '', $line));
+                    if (empty($line)){ continue; }
+                    $is_tile_custval = preg_match($sheet_tiles_custval_regex, $line);
+                    $is_other_custval = preg_match($sheet_other_custval_regex, $line);
+                    $is_listval_custval = preg_match($sheet_listval_custval_regex, $line);
+                    if (!$is_tile_custval && !$is_other_custval && !$is_listval_custval){ continue; }
+                    if ($is_tile_custval){
+                        $exploded = explode('/', preg_replace($sheet_tiles_custval_regex, '$1/$2/$3/$4', $line), 4);
+                        //error_log('tile $exploded ='.print_r($exploded, true));
+                        list($name, $k, $x, $y) = $exploded;
+                        $parsed_tiles[$name] = array($x, $y);
+                        $parsed_keys[intval($k)] = $name;
+                        continue;
+                        }
+                    if ($is_other_custval){
+                        $exploded = explode('/', preg_replace($sheet_other_custval_regex, '$1/$2/$3/$4', $line), 4);
+                        //error_log('other $exploded ='.print_r($exploded, true));
+                        list($name, $x, $y) = $exploded;
+                        $parsed_tiles[$name] = array($x, $y);
+                        if (!empty($exploded[3])){ $parsed_tiles[$name] = array_merge($parsed_tiles[$name], explode(',', trim($exploded[3], ','))); }
+                        continue;
+                        }
+                    if ($is_listval_custval){
+                        $exploded = explode('/', preg_replace($sheet_listval_custval_regex, '$1/$2', $line), 2);
+                        //error_log('list $exploded ='.print_r($exploded, true));
+                        list($name, $tokens) = $exploded;
+                        $tokens = explode(',', $tokens);
+                        if (empty($tokens) || count($tokens) < 1){ continue; }
+                        foreach ($tokens AS $token){ if (empty($token)){ continue; } $parsed_tiles[$name][] = trim($token, ','); }
+                        continue;
+                        }
+                    }
+                if ($include_keys){ $parsed_tiles['keys'] = $parsed_keys; }
+                return $parsed_tiles;
+                };
+            }
+        //error_log('raw $sheet_data_vars(before) = '.print_r($sheet_data_vars, true));
+        $sheet_data_vars['token'] = isset($sheet_data_vars['token']) ? $sheet_data_vars['token'] : '';
+        $sheet_data_vars['name'] = isset($sheet_data_vars['name']) ? $sheet_data_vars['name'] : '';
+        $sheet_data_vars['size'] = isset($sheet_data_vars['size']) ? $sheet_data_vars['size'] : '';
+        $sheet_data_vars['image'] = isset($sheet_data_vars['image']) ? $sheet_data_vars['image'] : '';
+        $sheet_data_vars['tiles'] = isset($sheet_data_vars['tiles']) ? $sheet_data_vars['tiles'] : array();
+        $sheet_data_vars['sprites'] = isset($sheet_data_vars['sprites']) ? $sheet_data_vars['sprites'] : array();
+        if (empty($sheet_data_vars['token'])){ $sheet_data_vars['token'] = $sheet_token; }
+        if (empty($sheet_data_vars['name'])){ $sheet_data_vars['name'] = 'Undefined'; }
+        if (empty($sheet_data_vars['size'])){ $sheet_data_vars['size'] = '0 x 0'; }
+        if (empty($sheet_data_vars['image'])){ $sheet_data_vars['image'] = 'undefined.png'; }
+        if (!empty($sheet_data_vars['size'])){ $sheet_data_vars['size'] = explode('x', str_replace(' ', '', $sheet_data_vars['size'])); }
+        if (!isset($sheet_data_vars['size'][0])){ $sheet_data_vars['size'][0] = $sheet_tilesize; }
+        if (!isset($sheet_data_vars['size'][1])){ $sheet_data_vars['size'][1] = $sheet_tilesize; }
+        if (empty($sheet_data_vars['tiles'])){ $sheet_data_vars['tiles'][] = ''; }
+        if (empty($sheet_data_vars['sprites'])){ $sheet_data_vars['sprites'][] = ''; }
+        $sheet_data_vars['tiles'] = $sheet_custval_parser($sheet_data_vars['tiles'], true);
+        $sheet_data_vars['sprites'] = $sheet_custval_parser($sheet_data_vars['sprites']);
+        // Add collected data to the parsed sheet data
+        $sheet_data_parsed = array();
+        $sheet_data_parsed['token'] = $sheet_data_vars['token']; unset($sheet_data_vars['token']);
+        $sheet_data_parsed['name'] = $sheet_data_vars['name']; unset($sheet_data_vars['name']);
+        $sheet_data_parsed['size'] = $sheet_data_vars['size']; unset($sheet_data_vars['size']);
+        $sheet_data_parsed['image'] = $sheet_data_vars['image']; unset($sheet_data_vars['image']);
+        $sheet_data_parsed['tiles'] = $sheet_data_vars['tiles']; unset($sheet_data_vars['tiles']);
+        $sheet_data_parsed['sprites'] = $sheet_data_vars['sprites']; unset($sheet_data_vars['sprites']);
+        if (!empty($sheet_data_vars)){ $sheet_data_parsed['vars'] = $sheet_data_vars; }
+        //error_log('$sheet_data_parsed = '.print_r($sheet_data_parsed, true));
+        return $sheet_data_parsed;
+    }
+
     // Define a function for returning all the available cells that encounters can appear on for a given map
     public static function get_map_encounter_cells($map_data){
         //error_log('rpg_world::get_map_encounter_cells() called!');
