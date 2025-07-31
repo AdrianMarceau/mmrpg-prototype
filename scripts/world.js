@@ -325,11 +325,11 @@ class mmrpgWorldMap {
             let tileSpriteSize = [tileSpriteInfo[2] || tileSize[0], tileSpriteInfo[3] || tileSize[1]];
             let tileSpritePosition = [tilePos[0], tilePos[1], ((tilePos[0] - 1) * tileSpriteSize[0]), ((tilePos[1] - 1) * tileSpriteSize[1])];
             let tileSpriteEffects = {grid: true, hover: false, outline: false, focus: false, active: false}; // default values
+            let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void') !== -1 ? true : false;
+            let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water') !== -1 ? true : false;
             let tileSpriteWalkable = true;
-            if (tileSpriteToken === 'void' || tileSpriteToken.indexOf('void') !== -1){
-                tileSpriteEffects.grid = false; // no grid for void/+
-                tileSpriteWalkable = false; // void/+ tiles are not walkable
-                }
+            if (tileIsVoid){ tileSpriteEffects.grid = false; tileSpriteWalkable = false; } // no grid or walk for void tiles
+            if (tileIsWater){ tileSpriteWalkable = false; } // no walk for water tiles
             //console.log('---> tileSpriteKey =', tileSpriteKey);
             //console.log('---> tileSpriteToken =', tileSpriteToken);
             //console.log('---> tileSpriteInfo =', tileSpriteInfo);
@@ -337,7 +337,7 @@ class mmrpgWorldMap {
             tilesIndexData.position = tileSpritePosition;
             tilesIndexData.effects = tileSpriteEffects;
             tilesIndexData.sprite = [tileSpriteKey, tileSpriteToken, tileSpriteOffset, tileSpriteSize];
-            tilesIndexData.walkable = tileSpriteToken === 'void' ? false : true;
+            tilesIndexData.walkable = tileSpriteWalkable;
             tilesIndexData.dirty = false; // indicates if the tile has been changed since last draw
             //console.log('---> tilesIndexData =', tilesIndexData);
             thisLayerTiles[tileKey] = tilesIndexData;
@@ -711,14 +711,16 @@ class mmrpgWorldMap {
         let tileSpriteOffset = tileSprite[2];
         let tileSpriteSize = tileSprite[3];
         // define some internal methods we can use for effect-drawingoptimization
-        let _saveDrawRestore = function(ctx, callback){
+        let _saveDrawRestore = function(callback){
             ctx.save(); callback.call(this); ctx.restore();
             };
-        let _drawSpriteFromData = function(ctx, spriteData, alpha, composite){
+        let _drawSpriteFromData = function(spriteData, alpha){ //, composite
             if (!spriteData){ return; }
-            _saveDrawRestore(ctx, function(){
+            _saveDrawRestore(function(){
                 ctx.globalAlpha = typeof alpha === 'number' ? alpha : 1.0;
-                ctx.globalCompositeOperation = typeof composite === 'string' ? composite : 'source-over';
+                ctx.globalCompositeOperation = 'source-atop';
+                //ctx.globalCompositeOperation = typeof composite === 'string' ? composite : 'source-atop';
+                //ctx.globalCompositeOperation = 'source-atop'; // TEMP TEMP TEMP
                 //console.log('-> drawing sprite[' + layerToken + '/' + tileKey + '] w/', '\n-> globalAlpha = ', ctx.globalAlpha, '\n-> globalCompositeOperation =', ctx.globalCompositeOperation);
                 ctx.drawImage(spriteSheet,
                     spriteData[0], spriteData[1], // source offset
@@ -728,8 +730,8 @@ class mmrpgWorldMap {
                     );
                 });
             };
-        let drawSpriteFromData = function(spriteData, alpha, composite){
-            return _drawSpriteFromData(ctx, spriteData, alpha, composite);
+        let drawSpriteFromData = function(spriteData, alpha){ //, composite
+            return _drawSpriteFromData(spriteData, alpha); //, composite
             };
         // check if the tile is focused or hovered and apply the effects
         let tileHasGrid = tileEffects.grid;
@@ -770,31 +772,31 @@ class mmrpgWorldMap {
         if (tileHasGrid && gridSpriteData){
             var gridSpriteAlpha = 0.3;
             if (tileIsGrass){ gridSpriteAlpha += 0.2; }
-            drawSpriteFromData(gridSpriteData, gridSpriteAlpha, 'source-over');
+            drawSpriteFromData(gridSpriteData, gridSpriteAlpha);
             }
         // [HOVER]: draw another image at the same positon but w/ the border sprite
         if (tileIsHovered && hoverSpriteData){
             var hoverSpriteAlpha = 0.3;
             if (tileIsFocused){ hoverSpriteAlpha += 0.6; }
-            drawSpriteFromData(hoverSpriteData, hoverSpriteAlpha, 'screen');
+            drawSpriteFromData(hoverSpriteData, hoverSpriteAlpha);
             }
-        // outline: draw another image at the same positon but w/ the border sprite
+        // [OUTLINE]: draw another image at the same positon but w/ the border sprite
         if (tileIsOutlined && outlineSpriteData){
             drawSpriteFromData(outlineSpriteData);
             }
-        // focus: draw another image at the same positon but w/ the border sprite
+        // [FOCUS]: draw another image at the same positon but w/ the border sprite
         if (tileIsFocused && focusSpriteData){
             var focusSpriteAlpha = 0.25;
             if (tileIsGrass){ focusSpriteAlpha += 0.10; }
             if (tileIsHovered){ focusSpriteAlpha += 0.25; }
-            drawSpriteFromData(focusSpriteData, focusSpriteAlpha, 'luminosity');
+            drawSpriteFromData(focusSpriteData, focusSpriteAlpha);
             if (outlineSpriteData){
                 var outlineSpriteAlpha = 1.00;
                 if (tileIsWater){ outlineSpriteAlpha -= 0.30; }
                 drawSpriteFromData(outlineSpriteData);
                 }
             }
-        // active: draw another image at the same positon but w/ the border sprite
+        // [ACTIVE]: draw another image at the same positon but w/ the border sprite
         if (tileIsActive && activeSpriteData){
             drawSpriteFromData(activeSpriteData);
             }
