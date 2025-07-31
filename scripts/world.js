@@ -940,7 +940,7 @@ class mmrpgWorldMap {
             let sameAsCurrent = thisPos === oldPos;
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
             let walkableTiles = _self.getWalkableMapTiles();
-            let tilesWithinRange = _self.getWalkableMapTilesByProximity(curPos, playerMobility);
+            let tilesWithinRange = playerMobility > 0 ? _self.getWalkableMapTilesByProximity(curPos, playerMobility) : walkableTiles;
             let tileIsWalkable = walkableTiles.indexOf(thisPos) !== -1 ? true : false;
             let tileIsWithinRange = tilesWithinRange.indexOf(thisPos) !== -1 ? true : false;
             lastMouseClick = thisPos;
@@ -966,7 +966,7 @@ class mmrpgWorldMap {
             $clickOverlay.attr('title', 'Position: ' + thisPos);
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
             let walkableTiles = _self.getWalkableMapTiles();
-            let tilesWithinRange = _self.getWalkableMapTilesByProximity(curPos, playerMobility);
+            let tilesWithinRange = playerMobility > 0 ? _self.getWalkableMapTilesByProximity(curPos, playerMobility) : walkableTiles;
             //console.log('-> walkableTiles:', walkableTiles);
             //console.log('-> tilesWithinRange:', tilesWithinRange);
             let tileIsWalkable = walkableTiles.indexOf(thisPos) !== -1 ? true : false;
@@ -1283,11 +1283,13 @@ class mmrpgWorldMap {
 
         // Collect the walkable map tiles so we can filter down to only those in proximity
         //console.log('-> player has moved to new position, refresh tile-focus to only those within range');
-        let targetPosition = cursorPosition, filterRange = _config.playerMobility;
-        let tilesWithinRange = _self.getWalkableMapTilesByProximity(targetPosition, filterRange);
+        let targetPosition = cursorPosition;
+        let playerMobility = _config.playerMobility;
+        let walkableTiles = _self.getWalkableMapTiles();
+        let tilesWithinRange = playerMobility > 0 ? _self.getWalkableMapTilesByProximity(targetPosition, playerMobility) : walkableTiles;
         //console.log('-> new tilesWithinRange:', tilesWithinRange);
         _self.unfocusLayerTiles(); // unfocus all tiles first
-        if (tilesWithinRange){ // then apply outlines to tiles within range
+        if (playerMobility > 0 && tilesWithinRange){ // then apply outlines to tiles within range
             for (let i = 0; i < tilesWithinRange.length; i++){
                 let tilePosition = tilesWithinRange[i];
                 _self.focusLayerTile(tilePosition);

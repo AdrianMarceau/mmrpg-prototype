@@ -137,6 +137,7 @@ $this_player_robots = array();
 $this_prototype_data['this_player_id'] = $this_player_id; // required
 $this_prototype_data['this_player_token'] = $this_player_token; // required
 $this_prototype_data['this_player_robots'] = $this_player_robots; // required
+$this_prototype_data['this_player_mobility'] = MMRPG_WORLD_DEFAULT_MOBILITY; // required
 if (!empty($this_prototype_data['this_current_player'])){
     $this_player_token = $this_prototype_data['this_current_player'];
     $this_player_info = !empty($mmrpg_index_players[$this_player_token]) ? $mmrpg_index_players[$this_player_token] : array();
@@ -188,6 +189,10 @@ if (!empty($current_player_robots)){
     $this_prototype_data['this_player_robots'] = $this_player_robots;
 }
 $WORLD_PLAYER_SESSION[$last_world_robots_key] = implode(',', $this_prototype_data['this_player_robots']);
+
+// Update the player's mobility with any character-specific bonuses or contextual modifiers
+if ($this_prototype_data['this_player_token'] === 'player'){ $this_prototype_data['this_player_mobility'] = -1; }
+else { $this_prototype_data['this_player_mobility'] = MMRPG_WORLD_DEFAULT_MOBILITY; }
 
 // Collect or define the current map token we'll be loading from
 $request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
@@ -711,7 +716,7 @@ _worldConfig.userId = <?= rpg_game::get_userid() ?>;
 _worldConfig.playerId = <?= json_encode($this_prototype_data['this_player_id']) ?>;
 _worldConfig.playerToken = <?= json_encode($this_prototype_data['this_player_token']) ?>;
 _worldConfig.playerRobots = <?= json_encode($this_prototype_data['this_player_robots']) ?>;
-_worldConfig.playerMobility = <?= MMRPG_WORLD_DEFAULT_MOBILITY ?>;
+_worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility']) ?>;
 _worldConfig.backButtonURL = 'prototype.php';
 _worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&position=<?= $default_world_position ?>';
 _worldConfig.resetButtonURL = 'world.php?reset=world';
