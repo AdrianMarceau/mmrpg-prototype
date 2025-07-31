@@ -580,13 +580,14 @@ $flag_skip_fadein = true;
                         foreach ($team_sprites as $key => $sprite){
                             $kind = $sprite[0];
                             $token = $sprite[1];
-                            $alt = isset($sprite[2]) ? $sprite[2] : '';
+                            $img = isset($sprite[2]) ? $sprite[2] : $token;
+                            $alt = strstr($img, '_') ? explode('_', $img, 2)[1] : '';
                             $dir = 'right';
                             if ($key > 0){ $top -= 2; $left -= 4; }
                             $class = $team_class; //'team bounce';
                             $styles = 'top: '.$top.'px; left: '.$left.'px; ';
                             $attrs = 'data-key="'.$key.'"';
-                            $markup = rpg_world::get_sprite($kind, $token, $alt, $dir, $class, $styles, $attrs);
+                            $markup = rpg_world::get_sprite($kind, $img, $alt, $dir, $class, $styles, $attrs);
                             if (!empty($markup)){ $sprites[] = $markup; }
                             }
                         return implode(PHP_EOL, $sprites);
@@ -607,8 +608,10 @@ $flag_skip_fadein = true;
                             list($robot_id, $robot_token) = explode('_', $robot_string, 2);
                             $robot = array('robot', $robot_token);
                             $robot_settings = rpg_game::robot_settings($team_player_token, $robot_token);
-                            $robot_image = !empty($robot_settings['robot_image']) ? $robot_settings['robot_image'] : '';
-                            if (!empty($robot_image) && $robot_image !== $robot_token){ $robot[] = explode('_', $robot_image, 2)[1]; }
+                            $robot_image = '';
+                            if (!empty($robot_settings['robot_persona_image'])){ $robot_image = $robot_settings['robot_persona_image']; }
+                            elseif (!empty($robot_settings['robot_image'])){ $robot_image = $robot_settings['robot_image']; }
+                            if (!empty($robot_image)){ $robot[] = $robot_image; }
                             $team_sprites[] = $robot;
                         }
                     }
