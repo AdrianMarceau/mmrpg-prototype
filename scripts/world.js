@@ -1236,9 +1236,69 @@ class mmrpgWorldMap {
         return true;
         }
 
-    // Quick function for running post-update checks and actions after moving the cursor
+    // Quick function for updating the map interface and zoom/scroll after a position change
     async updateMapPosition(){
         //console.log('%c' + 'mmrpgWorldMap.updateMapPosition()', 'color: magenta;');
+
+        // Collect references, indexes, and other variables we need to work with
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldCursor = _world.cursor;
+        let _mapEffects = _config.mapEffects;
+        let _mapTileSize = _config.mapTileSize;
+        let _mapTileSizeOffset = _config.mapTileSizeOffset;
+        let _userId = _config.userId;
+        let _playerId = _config.playerId;
+        let _playerToken = _config.playerToken;
+        let _playerRobots = _config.playerRobots;
+        let $thisWorld = _elements.world;
+        let $canvasMap = _elements.map;
+        let $worldCursor = _elements.cursor;
+        let cursorDirection = _worldCursor.direction;
+        let cursorPosition = _worldCursor.position;
+        let newPosition = cursorPosition.split('-');
+        let thisNewCol = parseInt(newPosition[0]);
+        let thisNewRow = parseInt(newPosition[1]);
+
+        // First we update the cursor sprite position and attributes
+        let $positionDisplay = $('#position-display', $thisWorld);
+        let $positionDisplayWrapper = $('> .wrapper', $positionDisplay);
+        $positionDisplayWrapper.text('X:' + thisNewCol + ' Y:' + thisNewRow);
+
+        // Update the walkable map tiles now that things have changed slightly
+        _self.calculateWalkableMapTiles(true);
+
+        // Collect the walkable map tiles so we can filter down to only those in proximity
+        //console.log('-> player has moved to new position, refresh tile-focus to only those within range');
+        let targetPosition = cursorPosition, filterRange = _config.playerMobility;
+        let tilesWithinRange = _self.getWalkableMapTilesByProximity(targetPosition, filterRange);
+        //console.log('-> new tilesWithinRange:', tilesWithinRange);
+        _self.unfocusLayerTiles(); // unfocus all tiles first
+        if (tilesWithinRange){ // then apply outlines to tiles within range
+            for (let i = 0; i < tilesWithinRange.length; i++){
+                let tilePosition = tilesWithinRange[i];
+                _self.focusLayerTile(tilePosition);
+                }
+            //console.log('-> added focus to ' + tilesWithinRange.length + ' tiles within range of player position', targetPosition);
+            }
+
+        // If the player has not moved from their spawn position yet, we should not do anything further
+        if (!_config.allowWorldEvents){ return true; }
+
+        // Otherwise, we should refresh all the map position events given the new position
+        _self.refreshMapPositionEvents();
+
+        // Return true on success
+        return true;
+        }
+
+    // Quick function for clearing out any existing map events then checking for new ones at new position
+    async refreshMapPositionEvents(){
+        //console.log('%c' + 'mmrpgWorldMap.refreshMapPositionEvents()', 'color: magenta;');
+
+        // Collect references, indexes, and other variables we need to work with
         let _self = this;
         let _config = _self.config;
         let _elements = _self.elements;
@@ -1262,11 +1322,6 @@ class mmrpgWorldMap {
 
         // Define the default zoom timeout for after movement ends
         let zoomTimeoutDuration = 2000;
-
-        // First we update the cursor sprite position and attributes
-        let $positionDisplay = $('#position-display', $thisWorld);
-        let $positionDisplayWrapper = $('> .wrapper', $positionDisplay);
-        $positionDisplayWrapper.text('X:' + thisNewCol + ' Y:' + thisNewRow);
 
         // Make sure we empty and hide the action dropdown if it's been shown by previous move
         let $actionDropdown = _elements.actionDropdown;
@@ -1297,31 +1352,6 @@ class mmrpgWorldMap {
             });
         setTimeout(function(){ $('.sprite', $eventsLayers).removeClass('zoom'); }, 100);
         //$('.sprite', $zoomLayer).removeClass('zoom');
-
-        // Update the walkable map tiles now that things have changed slightly
-        _self.calculateWalkableMapTiles(true);
-
-        // Collect the walkable map tiles so we can filter down to only those in proximity
-        //console.log('-> player has moved to new position, refresh tile-focus to only those within range');
-        //let walkableTiles = _self.getWalkableMapTiles(), targetPosition = cursorPosition, filterRange = _config.playerMobility;
-        //let tilesWithinRange = _self.filterTilesByProximity(walkableTiles, targetPosition, filterRange);
-        //console.log('-> walkableTiles:', walkableTiles);
-        //console.log('-> targetPosition:', targetPosition);
-        //console.log('-> filterRange:', filterRange);
-        let targetPosition = cursorPosition, filterRange = _config.playerMobility;
-        let tilesWithinRange = _self.getWalkableMapTilesByProximity(targetPosition, filterRange);
-        //console.log('-> new tilesWithinRange:', tilesWithinRange);
-        _self.unfocusLayerTiles(); // unfocus all tiles first
-        if (tilesWithinRange){ // then apply outlines to tiles within range
-            for (let i = 0; i < tilesWithinRange.length; i++){
-                let tilePosition = tilesWithinRange[i];
-                _self.focusLayerTile(tilePosition);
-                }
-            //console.log('-> added focus to ' + tilesWithinRange.length + ' tiles within range of player position', targetPosition);
-            }
-
-        // If the player has not moved from their spawn position yet, we should not do anything further
-        if (!_config.allowWorldEvents){ return true; }
 
         // Search for events at the new position so we can show the action dropdown if needed
         //console.log('-> checking if there are any events for this position...');
@@ -1601,7 +1631,7 @@ class mmrpgWorldMap {
             };
 
         // First we mark the cursor as busy so it trembles a bit before the encounter
-        let _selfRef = _self.updateMapPosition;
+        let _selfRef = _self.refreshMapPositionEvents;
         if (_selfRef.zoomCursorTimeout){ clearTimeout(_selfRef.zoomCursorTimeout); }
         _selfRef.zoomCursorTimeout = setTimeout(markCursorAsBusy, Math.ceil(zoomTimeoutDuration / 2));
 
