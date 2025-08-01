@@ -29,6 +29,15 @@ $session_token = rpg_game::session_token();
 // Define a reference object for storing temporary world data
 $WORLD_SESSION = &$_SESSION['WORLD'];
 
+// Predefine any missing world session variables so they're available
+//if (!isset($WORLD_SESSION['last_player_token'])){ $WORLD_SESSION['last_player_token'] = ''; }
+if (!isset($WORLD_SESSION['player_sessions'])){ $WORLD_SESSION['player_sessions'] = array(); }
+if (!isset($WORLD_SESSION['player_sessions']['last_player'])){ $WORLD_SESSION['player_sessions']['last_player'] = ''; }
+if (!isset($WORLD_SESSION['world_maps'])){ $WORLD_SESSION['world_maps'] = array(); }
+if (!isset($WORLD_SESSION['world_buttons'])){ $WORLD_SESSION['world_buttons'] = array(); }
+if (!isset($WORLD_SESSION['world_switches'])){ $WORLD_SESSION['world_switches'] = array(); }
+if (!isset($WORLD_SESSION['world_encounters'])){ $WORLD_SESSION['world_encounters'] = array(); }
+
 // Define some constants for the world map
 define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
 define('MMRPG_WORLD_DEFAULT_TILESIZE', 80);
@@ -60,35 +69,60 @@ $default_world_position = '';
 if (!empty($_POST['action']) && $_POST['action'] === 'save'
     && !empty($_POST['world_data']) && is_array($_POST['world_data'])){
     $worldData = $_POST['world_data'];
+    $playerSessions = &$WORLD_SESSION['player_sessions'];
     if (!empty($worldData['lastPlayer'])
         && in_array($worldData['lastPlayer'], $allowed_player_tokens)){
-        $WORLD_SESSION['last_player_token'] = $worldData['lastPlayer'];
+        //$WORLD_SESSION['last_player_token'] = $worldData['lastPlayer'];
+        $playerSessions['last_player'] = $worldData['lastPlayer'];
         // Collect the last player session data so we can update
         $lastPlayer = $worldData['lastPlayer'];
-        if (!isset($WORLD_SESSION['last_player_sessions'][$lastPlayer])){ $WORLD_SESSION['last_player_sessions'][$lastPlayer] = array(); }
-        $lastPlayerSession = &$WORLD_SESSION['last_player_sessions'][$lastPlayer];
+        if (!isset($playerSessions[$lastPlayer])){ $playerSessions[$lastPlayer] = array(); }
+        $lastPlayerSession = &$playerSessions[$lastPlayer];
         // Collect the cursor player session data so we can update too
         $cursorPlayer = 'player';
-        if (!isset($WORLD_SESSION['last_player_sessions'][$cursorPlayer])){ $WORLD_SESSION['last_player_sessions'][$cursorPlayer] = array(); }
-        $cursorPlayerSession = &$WORLD_SESSION['last_player_sessions'][$cursorPlayer];
+        if (!isset($playerSessions[$cursorPlayer])){ $playerSessions[$cursorPlayer] = array(); }
+        $cursorPlayerSession = &$playerSessions[$cursorPlayer];
         // If last world was provided, save it to the sessions
-        if (!empty($worldData['lastWorld']) && in_array($worldData['lastWorld'], $allowed_map_tokens)){
-            $last_world_token_key = 'last_world_token';
-            $lastPlayerSession[$last_world_token_key] = $worldData['lastWorld'];
-            $cursorPlayerSession[$last_world_token_key] = $worldData['lastWorld'];
+        if (!empty($worldData['lastPlayerWorld']) && in_array($worldData['lastPlayerWorld'], $allowed_map_tokens)){
+            $last_world_token_key = 'last_world';
+            $lastPlayerSession[$last_world_token_key] = $worldData['lastPlayerWorld'];
+            $cursorPlayerSession[$last_world_token_key] = $worldData['lastPlayerWorld'];
         }
         // If last position was provided, save it to the sessions
-        if (!empty($worldData['lastPosition']) && preg_match('/^([-0-9]+)$/i', $worldData['lastPosition'])){
-            $last_world_position_key = 'last_world_position';
-            $lastPlayerSession[$last_world_position_key] = $worldData['lastPosition'];
-            $cursorPlayerSession[$last_world_position_key] = $worldData['lastPosition'];
+        if (!empty($worldData['lastPlayerPosition']) && preg_match('/^([-0-9]+)$/i', $worldData['lastPlayerPosition'])){
+            $last_world_position_key = 'last_position';
+            $lastPlayerSession[$last_world_position_key] = $worldData['lastPlayerPosition'];
+            $cursorPlayerSession[$last_world_position_key] = $worldData['lastPlayerPosition'];
         }
         // If last direction was provided, save it to the sessions
-        if (!empty($worldData['lastDirection']) && preg_match('/^([-a-z0-9]+)$/i', $worldData['lastDirection'])){
-            $last_world_direction_key = 'last_world_direction';
-            $lastPlayerSession[$last_world_direction_key] = $worldData['lastDirection'];
-            $cursorPlayerSession[$last_world_direction_key] = $worldData['lastDirection'];
+        if (!empty($worldData['lastPlayerDirection']) && preg_match('/^([-a-z0-9]+)$/i', $worldData['lastPlayerDirection'])){
+            $last_world_direction_key = 'last_direction';
+            $lastPlayerSession[$last_world_direction_key] = $worldData['lastPlayerDirection'];
+            $cursorPlayerSession[$last_world_direction_key] = $worldData['lastPlayerDirection'];
         }
+        // If world button states were provided, save them to the session
+        if (!empty($worldData['lastWorldButtons'])){
+            $last_world_buttons_key = 'world_buttons';
+            if (!isset($WORLD_SESSION[$last_world_buttons_key])){ $WORLD_SESSION[$last_world_buttons_key] = array(); }
+            $worldButtonStates = &$WORLD_SESSION[$last_world_buttons_key];
+            foreach ($worldData['lastWorldButtons'] AS $map_token => $button_states){
+                if (!in_array($map_token, $allowed_map_tokens)){ continue; }
+                if (!isset($worldButtonStates[$map_token])){ $worldButtonStates[$map_token] = array(); }
+                $worldButtonStates[$map_token] = array_merge($worldButtonStates[$map_token], $button_states);
+            }
+        }
+        // If world switch states were provided, save them to the session
+        if (!empty($worldData['lastWorldSwitches'])){
+            $last_world_switches_key = 'world_switches';
+            if (!isset($WORLD_SESSION[$last_world_switches_key])){ $WORLD_SESSION[$last_world_switches_key] = array(); }
+            $worldSwitchStates = &$WORLD_SESSION[$last_world_switches_key];
+            foreach ($worldData['lastWorldSwitches'] AS $map_token => $switch_states){
+                if (!in_array($map_token, $allowed_map_tokens)){ continue; }
+                if (!isset($worldSwitchStates[$map_token])){ $worldSwitchStates[$map_token] = array(); }
+                $worldSwitchStates[$map_token] = array_merge($worldSwitchStates[$map_token], $switch_states);
+            }
+        }
+        //error_log('World data saved successfully for player "'.$lastPlayer.'"!');
         //error_log('World data saved successfully for player "'.$lastPlayer.'" with world "'.$lastPlayerSession[$last_world_token_key].'" and position "'.$lastPlayerSession[$last_world_position_key].'"');
         //error_log('$WORLD_SESSION = '.print_r($WORLD_SESSION, true));
     }
@@ -124,10 +158,12 @@ $this_prototype_data['battle_round'] = 1; // required
 
 // Collect of define the current player character we'll be using
 $request_player_token = isset($_REQUEST['player']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['player']) ? trim($_REQUEST['player']) : '';
-if (empty($request_player_token) && !empty($WORLD_SESSION['last_player_token'])){ $request_player_token = $WORLD_SESSION['last_player_token']; }
+//if (empty($request_player_token) && !empty($WORLD_SESSION['last_player_token'])){ $request_player_token = $WORLD_SESSION['last_player_token']; }
+if (empty($request_player_token) && !empty($WORLD_SESSION['player_sessions']['last_player'])){ $request_player_token = $WORLD_SESSION['player_sessions']['last_player']; }
 if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){ $this_prototype_data['this_current_player'] = $request_player_token; }
 if (empty($this_prototype_data['this_current_player'])){ $this_prototype_data['this_current_player'] = $default_player_token; }
-$WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
+//$WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
+$WORLD_SESSION['player_sessions']['last_player'] = $this_prototype_data['this_current_player'];
 
 // Now that we have the player, we should collect the player's robots and other data
 $this_player_id = 1;
@@ -146,15 +182,14 @@ if (!empty($this_prototype_data['this_current_player'])){
 }
 
 // Define the session keys we'll be using to store player-specific world settings
-$last_world_token_key = 'last_world_token';
-$last_world_position_key = 'last_world_position';
-$last_world_direction_key = 'last_world_direction';
-$last_world_robots_key = 'last_world_robots';
+$last_world_token_key = 'last_world';
+$last_world_position_key = 'last_position';
+$last_world_direction_key = 'last_direction';
+$last_world_robots_key = 'last_robots';
 
 // Make sure the appropriate player token is set in the settings array
-if (!isset($WORLD_SESSION['last_player_sessions'])){ $WORLD_SESSION['last_player_sessions'] = array(); }
-if (!isset($WORLD_SESSION['last_player_sessions'][$this_player_token])){ $WORLD_SESSION['last_player_sessions'][$this_player_token] = array(); }
-$WORLD_PLAYER_SESSION = &$WORLD_SESSION['last_player_sessions'][$this_player_token];
+if (!isset($WORLD_SESSION['player_sessions'][$this_player_token])){ $WORLD_SESSION['player_sessions'][$this_player_token] = array(); }
+$WORLD_PLAYER_SESSION = &$WORLD_SESSION['player_sessions'][$this_player_token];
 
 // Collect the current player's robots and battle history
 $this_prototype_data['this_player_id'] = $this_player_info['player_id'];
@@ -252,6 +287,12 @@ if (!empty($map_sprite_sheet)){
     }
 }
 
+// Make sure there's room in relevant session arrays for this map's data
+if (!isset($WORLD_SESSION['world_maps'][$map_token])){ $WORLD_SESSION['world_maps'][$map_token] = array(); }
+if (!isset($WORLD_SESSION['world_encounters'][$map_token])){ $WORLD_SESSION['world_encounters'][$map_token] = array(); }
+if (!isset($WORLD_SESSION['world_buttons'][$map_token])){ $WORLD_SESSION['world_buttons'][$map_token] = array(); }
+if (!isset($WORLD_SESSION['world_switches'][$map_token])){ $WORLD_SESSION['world_switches'][$map_token] = array(); }
+
 // Collect the map's field token and mecha encounters
 $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
 $map_field_info = !empty($mmrpg_index_fields[$map_field_token]) ? $mmrpg_index_fields[$map_field_token] : array();
@@ -282,8 +323,8 @@ $map_pixel_width = $map_col_size * $map_tile_width;
 $map_pixel_height = $map_row_size * $map_tile_height;
 
 // Generate the map spawn points (source and destination)
-$map_spawn_pos = !empty($WORLD_SESSION[$map_token.'_spawn_pos']) ? $WORLD_SESSION[$map_token.'_spawn_pos'] : '';
-$map_exit_pos = !empty($WORLD_SESSION[$map_token.'_exit_pos']) ? $WORLD_SESSION[$map_token.'_exit_pos'] : '';
+$map_spawn_pos = !empty($WORLD_SESSION['world_maps'][$map_token]['spawn_pos']) ? $WORLD_SESSION['world_maps'][$map_token]['spawn_pos'] : '';
+$map_exit_pos = !empty($WORLD_SESSION['world_maps'][$map_token]['exit_pos']) ? $WORLD_SESSION['world_maps'][$map_token]['exit_pos'] : '';
 if (empty($map_spawn_pos)){
     $map_spawn_pos = '1-1';
     if (!empty($map_data_parsed['portals']['spawn'])){
@@ -298,8 +339,8 @@ if (empty($map_exit_pos)){
         $map_exit_pos = $exit[0].'-'.$exit[1];
     }
 }
-$WORLD_SESSION[$map_token.'_spawn_pos'] = $map_spawn_pos;
-$WORLD_SESSION[$map_token.'_exit_pos'] = $map_exit_pos;
+$WORLD_SESSION['world_maps'][$map_token]['spawn_pos'] = $map_spawn_pos;
+$WORLD_SESSION['world_maps'][$map_token]['exit_pos'] = $map_exit_pos;
 
 // If the world position has not been set yet, we can use the spawn position for it
 if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data['this_current_position'] = $map_spawn_pos; }
@@ -309,7 +350,7 @@ if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data[
 $allowed_random_encounters = $map_mecha_support;
 $available_encounter_cells = rpg_world::get_map_encounter_cells($map_data_parsed);
 $max_random_encounters = ceil($available_encounter_cells['total'] * 0.25);
-$map_random_encounters = !empty($WORLD_SESSION[$map_token.'_random_encounters']) ? $WORLD_SESSION[$map_token.'_random_encounters'] : array();
+$map_random_encounters = !empty($WORLD_SESSION['world_encounters'][$map_token]) ? $WORLD_SESSION['world_encounters'][$map_token] : array();
 //error_log('$allowed_random_encounters = '.print_r($allowed_random_encounters, true));
 //error_log('$available_encounter_cells = '.print_r($available_encounter_cells, true));
 //error_log('$max_random_encounters = '.print_r($max_random_encounters, true));
@@ -377,7 +418,7 @@ if (empty($map_random_encounters)){
     //echo('</pre>'.PHP_EOL);
     //exit();
 }
-$WORLD_SESSION[$map_token.'_random_encounters'] = $map_random_encounters;
+$WORLD_SESSION['world_encounters'][$map_token] = $map_random_encounters;
 
 // Define some fallback values for compatibility
 $debug_flag_animation = true;
@@ -433,7 +474,10 @@ $flag_skip_fadein = true;
                 $data['tile_size'] = array($map_tile_width, $map_tile_height);
                 $data['tiles_index'] = $map_data_parsed['tiles'];
                 $data['sprites_index'] = $map_data_parsed['sprites'];
-                $data['portals_index'] = $map_data_parsed['portals'];
+                $data['groups_index'] = $map_data_parsed['groups'];
+                //$data['portals_index'] = $map_data_parsed['portals'];
+                //$data['buttons_index'] = $map_data_parsed['buttons'];
+                //$data['switches_index'] = $map_data_parsed['switches'];
                 $data['start_position'] = $this_prototype_data['this_current_position'];
                 $data_json = json_encode($data, JSON_NUMERIC_CHECK);
                 echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
@@ -479,7 +523,7 @@ $flag_skip_fadein = true;
                     <?
                 }
 
-                // EVENT TILES
+                // EVENT TILES (PORTALS)
                 $map_layer_styles = $map_base_styles;
                 $map_layer_attrs = $map_base_attrs;
                 ?>
@@ -488,6 +532,7 @@ $flag_skip_fadein = true;
 
                     // If there are any portals defined, make sure we look through and display them
                     $portal_symbols = array();
+                    $portals_index = array();
                     if (!empty($map_data_parsed['portals'])){
                         $portal_sprites = $map_data_parsed['portals'];
                         foreach ($portal_sprites AS $portal_name => $portal_data){
@@ -504,18 +549,84 @@ $flag_skip_fadein = true;
                             $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                             $classes = 'sprite tile portal'.($portal_name !== 'spawn' && !$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                             $style = 'top: '.$top.'px; left: '.$left.'px;';
-                            $portal_symbols[$pos] = $portal_name;
                             echo('<span class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>'.PHP_EOL);
+                            $portal_symbols[$pos] = $portal_name;
+                            $portals_index[$portal_name] = array(
+                                'pos' => $pos,
+                                'col' => $col,
+                                'row' => $row,
+                                'label' => $label,
+                                'hidden' => $hidden,
+                                'locked' => $locked,
+                                );
                         }
                     }
                     $portal_symbols_json = json_encode($portal_symbols, JSON_NUMERIC_CHECK);
+                    $portals_index_json = json_encode($portals_index, JSON_NUMERIC_CHECK);
                     echo('<script data-json="portalSymbols" type="application/json">'.$portal_symbols_json.'</script>'.PHP_EOL);
+                    echo('<script data-json="portalsIndex" type="application/json">'.$portals_index_json.'</script>'.PHP_EOL);
 
                     ?>
                 </div>
                 <?
 
-                // EVENT OBJECTS (UNDER)
+                // EVENT TILES (BUTTONS)
+                $map_layer_styles = $map_base_styles;
+                $map_layer_attrs = $map_base_attrs;
+                ?>
+                <div class="layer layer-2 tiles events buttons" data-layer="buttons" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
+                    <?
+
+                    // If there are any buttons defined, make sure we look through and display them
+                    $button_symbols = array();
+                    $buttons_index = array();
+                    if (!empty($map_data_parsed['buttons'])){
+                        $button_sprites = $map_data_parsed['buttons'];
+                        foreach ($button_sprites AS $button_name => $button_data){
+                            if (empty($button_data) || !is_array($button_data) || count($button_data) < 2){ continue; }
+                            list($x, $y) = $button_data; unset($button_data[0], $button_data[1]);
+                            $pos = $x.'-'.$y;
+                            list($col, $row) = explode('-', $pos);
+                            $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                            $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                            $colour = !empty($button_data[2]) ? $button_data[2] : 'black'; unset($button_data[2]);
+                            $state = !empty($button_data[3]) ? $button_data[3] : 'up'; unset($button_data[3]);
+                            $action = !empty($button_data[4]) ? $button_data[4] : ''; unset($button_data[4]);
+                            $hidden = false; if (in_array('hidden', $button_data)){ $hidden = true; unset($button_data[array_search('hidden', $button_data)]); }
+                            $locked = false; if (in_array('locked', $button_data)){ $locked = true; unset($button_data[array_search('locked', $button_data)]); }
+                            $data = array_values($button_data);
+                            if ($hidden){ continue; }
+                            $base_classes = 'sprite tile button';
+                            $kind_classes = $colour.' '.$state;
+                            $sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
+                            $attrs = 'data-button="'.$button_name.'" data-colour="'.$colour.'" data-state="'.$state.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                            $styles = 'top: '.$top.'px; left: '.$left.'px;';
+                            $classes = $base_classes.(!$hidden && !$locked  ? ' glow' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                            echo('<span class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$sprite.'</span>'.PHP_EOL);
+                            $button_symbols[$pos] = $button_name;
+                            $buttons_index[$button_name] = array(
+                                'pos' => $pos,
+                                'col' => $col,
+                                'row' => $row,
+                                'colour' => $colour,
+                                'state' => $state,
+                                'action' => $action,
+                                'data' => $data,
+                                'hidden' => $hidden,
+                                'locked' => $locked,
+                                );
+                        }
+                    }
+                    $button_symbols_json = json_encode($button_symbols, JSON_NUMERIC_CHECK);
+                    $buttons_index_json = json_encode($buttons_index, JSON_NUMERIC_CHECK);
+                    echo('<script data-json="buttonSymbols" type="application/json">'.$button_symbols_json.'</script>'.PHP_EOL);
+                    echo('<script data-json="buttonsIndex" type="application/json">'.$buttons_index_json.'</script>'.PHP_EOL);
+
+                    ?>
+                </div>
+                <?
+
+                // EVENT OBJECTS (BATTLES)
                 $map_layer_styles = $map_base_styles;
                 $map_layer_attrs = $map_base_attrs;
                 ?>
@@ -634,10 +745,10 @@ $flag_skip_fadein = true;
                         if ($ptoken === 'player'){ continue; } // skip the default player
                         if ($ptoken === $team_player_token){ continue; } // skip the current player
                         if (empty($mmrpg_index_players[$ptoken])){ continue; } // skip if not a valid player
-                        if (empty($WORLD_SESSION['last_player_sessions'][$ptoken])){ continue; } // skip if no player session
+                        if (empty($WORLD_SESSION['player_sessions'][$ptoken])){ continue; } // skip if no player session
                         //error_log('Checking for player "'.$ptoken.'" on map "'.$map_token.'"');
                         $pinfo = $mmrpg_index_players[$ptoken];
-                        $tmp_session = $WORLD_SESSION['last_player_sessions'][$ptoken];
+                        $tmp_session = $WORLD_SESSION['player_sessions'][$ptoken];
                         $tmp_world_token = !empty($tmp_session[$last_world_token_key]) ? $tmp_session[$last_world_token_key] : '';
                         $tmp_world_position = !empty($tmp_session[$last_world_position_key]) ? $tmp_session[$last_world_position_key] : '';
                         $tmp_world_direction = !empty($tmp_session[$last_world_direction_key]) ? $tmp_session[$last_world_direction_key] : '';

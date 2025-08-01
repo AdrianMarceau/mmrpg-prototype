@@ -38,12 +38,18 @@ gameSettings.worldConfig = {
         moveTravel: 100, // milliseconds
         },
     mapTilesIndex: {},
+    mapGroupsIndex: {},
     mapSpritesIndex: {},
-    mapPortalsIndex: {},
-    mapBattlesIndex: {},
     mapPortalSymbols: {},
+    mapPortalsIndex: {},
+    mapButtonSymbols: {},
+    mapButtonsIndex: {},
+    mapSwitchSymbols: {},
+    mapSwitchesIndex: {},
     mapBattleSymbols: {},
+    mapBattlesIndex: {},
     mapRivalSymbols: {},
+    mapRivalsIndex: {},
     windowWidth: 1024, // default only
     widthHeight: 768, // default only
     mmrpgWidth: 800, // default only
@@ -59,13 +65,20 @@ gameSettings.worldConfig = {
     };
 gameSettings.worldState = {
     cursor: {
-        direction: '',
         position: '0-0',
-        col: 0,
-        row: 0,
+        direction: '',
         moving: false,
         moved: false,
+        col: 0,
+        row: 0,
         },
+    player: {
+        token: 'player',
+        position: '0-0',
+        direction: '',
+        },
+    buttons: {},
+    switches: {},
     layersIndex: {},
     layerTilesIndex: {},
     baseMapTileKeys: [], // base array of tile keys that are part of the map
@@ -137,6 +150,8 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
+        let _worldCursor = _world.cursor;
+        let _worldPlayer = _world.player;
         let $thisPrototype = _elements.mmrpg;
         let $thisWorld = _elements.world;
         // Collect the main json object for this world map and then parse it into the appropriate config values for the game
@@ -147,11 +162,12 @@ class mmrpgWorldMap {
         let mapSize = mapData.map_size || false;
         let tileSize = mapData.tile_size || false;
         let tilesIndex = mapData.tiles_index || false;
+        let groupsIndex = mapData.groups_index || false;
         let spritesIndex = mapData.sprites_index || false;
-        let portalsIndex = mapData.portals_index || false;
+        //let portalsIndex = mapData.portals_index || {};
         let startPosition = mapData.start_position || false;
         if (!mapToken || !mapImage || !mapSize || !tileSize){ console.error('initWorldMap() missing required properties!', {mapToken, mapImage, mapSize, tileSize}); return false; }
-        if (!tilesIndex || !spritesIndex || !portalsIndex){ console.error('initWorldMap() missing required indexes!', {tilesIndex, spritesIndex, portalsIndex}); return false; }
+        if (!tilesIndex  || !spritesIndex){ console.error('initWorldMap() missing required indexes!', {tilesIndex, spritesIndex}); return false; }
         if (!Array.isArray(mapSize) || mapSize.length < 2){ console.error('initWorldMap() mapSize must be an array of at least two values!'); return false; }
         if (!Array.isArray(tileSize) || tileSize.length < 2){ console.error('initWorldMap() tileSize must be an array of at least two values!'); return false; }
         let defaultMapSize = [_config.mapSize[0], _config.mapSize[1]];
@@ -173,9 +189,9 @@ class mmrpgWorldMap {
         else if (_config.mapSpriteSize[0] < _config.mapTileSize[0]){ _config.mapSpriteSizeOffset[0] = Math.ceil((_config.mapTileSize[0] - _config.mapSpriteSize[0]) / 2); }
         if (_config.mapSpriteSize[1] > _config.mapTileSize[1]){ _config.mapSpriteSizeOffset[1] = Math.floor((_config.mapSpriteSize[1] - _config.mapTileSize[1]) / 2); }
         else if (_config.mapSpriteSize[1] < _config.mapTileSize[1]){ _config.mapSpriteSizeOffset[1] = Math.ceil((_config.mapTileSize[1] - _config.mapSpriteSize[1]) / 2); }
-        _config.mapTilesIndex = tilesIndex;
-        _config.mapSpritesIndex = spritesIndex;
-        _config.mapPortalsIndex = portalsIndex;
+        _config.mapTilesIndex = tilesIndex || {};
+        _config.mapGroupsIndex = groupsIndex || {};
+        _config.mapSpritesIndex = spritesIndex || {};
         _config.mapStartPosition = startPosition; // default to the top-left corner
         _config.windowWidth = $(window).width();
         _config.windowHeight = $(window).height();
@@ -185,6 +201,9 @@ class mmrpgWorldMap {
         _config.worldHeight = _elements.world.outerHeight();
         _config.canvasWidth = _elements.canvas.outerWidth();
         _config.canvasHeight = _elements.canvas.outerHeight();
+        _worldPlayer.token = _config.playerToken || 'player';
+        _worldPlayer.position = _worldCursor.position || '0-0';
+        _worldPlayer.direction = _worldCursor.direction || '';
         // Define the function to run when everything is done loading
         let onWorldLoaded = function(){
             _self.bindEventsToCanvas($canvasMap);
@@ -410,6 +429,8 @@ class mmrpgWorldMap {
         exclude.terrain = typeof exclude.terrain === 'boolean' ? exclude.terrain : true;
         exclude.obstacles = typeof exclude.obstacles === 'boolean' ? exclude.obstacles : true;
         exclude.portals = typeof exclude.portals === 'boolean' ? exclude.portals : true;
+        exclude.buttons = typeof exclude.buttons === 'boolean' ? exclude.buttons : true;
+        exclude.switches = typeof exclude.switches === 'boolean' ? exclude.switches : true;
         exclude.battles = typeof exclude.battles === 'boolean' ? exclude.battles : true;
         exclude.players = typeof exclude.players === 'boolean' ? exclude.players : true;
         exclude.rivals = typeof exclude.rivals === 'boolean' ? exclude.rivals : true;
@@ -447,11 +468,15 @@ class mmrpgWorldMap {
         let battleSymbols = _config.mapBattleSymbols;
         let rivalSymbols = _config.mapRivalSymbols;
         let portalSymbols = _config.mapPortalSymbols;
+        let buttonSymbols = _config.mapButtonSymbols;
+        let switchSymbols = _config.mapSwitchSymbols;
         //console.log('---> portalsIndex =', portalsIndex);
         //console.log('---> battlesIndex =', battlesIndex);
         //console.log('---> battleSymbols =', battleSymbols);
         //console.log('---> rivalSymbols =', rivalSymbols);
         //console.log('---> portalSymbols =', portalSymbols);
+        //console.log('---> buttonSymbols =', buttonSymbols);
+        //console.log('---> switchSymbols =', switchSymbols);
 
         // Loop through each column and row to generate the base tile positions
         //console.log('collecting the base map tiles ...');
@@ -537,7 +562,7 @@ class mmrpgWorldMap {
                     //console.log('---> tileKey:', tileKey, 'is a portal, checking if locked...');
                     let portalInfo = portalsIndex[portalSymbols[tileKey]] || false;
                     //console.log('---> portalInfo =', portalInfo);
-                    if (portalInfo && portalInfo.indexOf('locked') !== -1){
+                    if (portalInfo.locked){
                         //console.log('---> portal at ' + tileKey + ' is locked, removing from walkableMapTiles');
                         return false; // remove this tile
                         } else {
@@ -547,6 +572,23 @@ class mmrpgWorldMap {
                 return true; // keep this tile
                 }));
             //console.log('---> walkableMapTiles (post-portals) =', walkableMapTiles);
+            }
+
+        // If we are to exclude buttons, make sure we remove those positions
+        let battleButtonKeys = Object.keys(buttonSymbols);
+        if (exclude.buttons && buttonSymbols){
+            //console.log('---> checking battleButtonKeys =', battleButtonKeys);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                //console.log('---> checking tileKey:', tileKey, 'against buttonSymbols:', battleButtonKeys);
+                if (battleButtonKeys.includes(tileKey)){
+                    //console.log('---> tileKey:', tileKey, 'is a button, removing from walkableMapTiles');
+                    return false; // remove this tile
+                    } else {
+                    //console.log('---> tileKey:', tileKey, 'is not a button, keeping in walkableMapTiles');
+                    }
+                return true; // keep this tile
+                }));
+            //console.log('---> walkableMapTiles (post-buttons) =', walkableMapTiles);
             }
 
         // If we are to exclude the cursor, make sure we remove that position too
@@ -1011,7 +1053,7 @@ class mmrpgWorldMap {
                 //if (!confirm('Are you sure you want to leave the world map?')){ return; }
                 _self.playSoundEffect('bounce-sound');
                 let backButtonURL = $backButton.attr('data-url') || _config.backButtonURL;
-                window.location.href = backButtonURL;
+                _self.saveWorldState(function(){ window.location.href = backButtonURL; });
                 $thisWorld.animate({opacity: 0}, 600, function(){
                     $thisWorld.addClass('hidden');
                     });
@@ -1033,7 +1075,7 @@ class mmrpgWorldMap {
                 //if (!confirm('Are you sure you want to return to the home area?')){ return; }
                 _self.playSoundEffect('bounce-sound');
                 let homeButtonURL = $homeButton.attr('data-url') || _config.homeButtonURL;
-                window.location.href = homeButtonURL;
+                _self.saveWorldState(function(){ window.location.href = homeButtonURL; });
                 $thisWorld.animate({opacity: 0}, 600, function(){
                     $thisWorld.addClass('hidden');
                     });
@@ -1056,7 +1098,7 @@ class mmrpgWorldMap {
                 _self.playSoundEffect('destroyed-sound');
                 _self.loadMusicTrack('current-track', true);
                 let resetButtonURL = $resetButton.attr('data-url') || _config.resetButtonURL;
-                window.location.href = resetButtonURL;
+                _self.saveWorldState(function(){ window.location.href = resetButtonURL; });
                 $thisWorld.animate({opacity: 0}, 600, function(){
                     $thisWorld.addClass('hidden');
                     });
@@ -1079,7 +1121,7 @@ class mmrpgWorldMap {
                 _self.playSoundEffect('switch-in');
                 $thisWorld.addClass('hidden');
                 let worldReloadURL = 'world.php?player=' + playerToken;
-                window.location.href = worldReloadURL;
+                _self.saveWorldState(function(){ window.location.href = worldReloadURL; });
                 return true;
                 });
             $('.option[data-player]', $playerSwitcher).bind('mouseenter', function(e){
@@ -1113,6 +1155,7 @@ class mmrpgWorldMap {
         let _elements = _self.elements;
         let _world = _self.state;
         let _worldCursor = _world.cursor;
+        let _worldPlayer = _world.player;
         let _mapEffects = _config.mapEffects;
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
@@ -1160,18 +1203,20 @@ class mmrpgWorldMap {
             _worldCursor.position = thisNewPos;
             _worldCursor.direction = thisShiftDir.replace(/ and /g, '-');
             _worldCursor.moved = cursorHasMoved;
+            _worldPlayer.position = _worldCursor.position;
+            _worldPlayer.direction = _worldCursor.direction;
             //console.log('_worldCursor =', '\n-> col =', _worldCursor.col, '\n-> row =', _worldCursor.row, '\n-> position =', _worldCursor.position, '\n-> direction =', _worldCursor.direction, '\n-> moved =', _worldCursor.moved);
             $cursorSprite.attr('data-col', thisNewCol);
             $cursorSprite.attr('data-row', thisNewRow);
             $cursorSprite.attr('data-pos', _worldCursor.position);
             _self.updateMapPosition();
-            _self.saveWorldState();
             _self.makeLayerTileActive(_worldCursor.position);
             if (moveTimeout){ clearTimeout(moveTimeout); }
             moveTimeout = setTimeout(function(){
                 _worldCursor.moving = false;
                 $canvasMap.removeClass('busy');
                 if (typeof onComplete === 'function'){ onComplete(); }
+                if (cursorHasMoved){ _self.saveWorldState(null, 6); }
                 }, timeoutDuration);
             };
         if (animateMove){
@@ -1425,6 +1470,25 @@ class mmrpgWorldMap {
                     }
                 }
             }
+        else if ($eventsAtPosition[0].is('[data-button]')){
+            //console.log('-> event at position is a button, preparing dropdown');
+            // If the cursor is literally on a button, only one event sprite matters right now
+            let $eventAtPosition = $eventsAtPosition[0];
+            var dataLabel = $eventAtPosition.attr('data-label');
+            var dataButton = $eventAtPosition.attr('data-button');
+            var dataColour = $eventAtPosition.attr('data-colour');
+            var dataState = $eventAtPosition.attr('data-state');
+            if (dataButton && dataState === 'up'){
+                showDropdown = true;
+                //var buttonName = (dataColour ? (dataColour[0].toUpperCase() + dataColour.slice(1) + ' ') : '') + 'Button';
+                //if (!dataLabel){ dataLabel = 'Button Options'; }
+                if (dataLabel){ dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                dropdownButtons += '<a class="button big-button'+(dataColour ? ' '+dataColour : '')+'" data-action="push-button" data-button="'+dataButton+'"><span>Push Button?</span></a>';
+                dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                showDropdownType = 'button';
+                zoomTimeoutDuration = 500; // if we show a button dropdown, we want to zoom in quickly
+                }
+            }
         else {
             // Otherwise we can/should check all the posiitons for any battles to round-up and trigger
             let dataLabels = [], dataBattles = [];
@@ -1466,6 +1530,16 @@ class mmrpgWorldMap {
                 }
             }
 
+        // Filter the  array of events at this position to include only the ones that we matched above before continuing
+        //console.log('-> filtering events at position', cursorPosition, 'to only those that match the dropdown type:', showDropdownType);
+        //console.log('-> $eventsAtPosition (before) =', $eventsAtPosition.length, $eventsAtPosition);
+        for (var i = $eventsAtPosition.length - 1; i >= 0; i--){
+            let $eventSprite = $eventsAtPosition[i];
+            if (!$eventSprite.is('[data-'+showDropdownType+']')){ $eventsAtPosition.splice(i, 1); }
+            }
+        $eventsAtPosition = Object.values($eventsAtPosition); // re-index the array
+        //console.log('-> $eventsAtPosition (after) =', $eventsAtPosition.length, $eventsAtPosition);
+
         // If there's no dropdown to show, we can return early
         if (!showDropdown && !autoRedirect){ return; }
 
@@ -1482,7 +1556,7 @@ class mmrpgWorldMap {
             //console.log('%c' + 'redirectToLocation()', 'color: cyan;');
             $thisWorld.addClass('hidden');
             if (autoRedirectSound){ _self.playSoundEffect(autoRedirectSound); }
-            if (autoRedirectURL){ window.location.href = autoRedirectURL; }
+            if (autoRedirectURL){ _self.saveWorldState(function(){ window.location.href = autoRedirectURL; }); }
             return true;
             };
 
@@ -1512,14 +1586,34 @@ class mmrpgWorldMap {
                 }
 
             // Move the action dropdown to the correct position, add the markup, and show it
-            $actionDropdown.css({
-                left: ((thisNewCol - 1) * _mapTileSize[0] + _mapTileSizeOffset[0]) + 'px',
-                top: ((thisNewRow - 1) * _mapTileSize[1] + _mapTileSizeOffset[1]) + 'px',
-                }).attr('data-dir', _worldCursor.direction).attr('data-type', showDropdownType).attr('data-align', 'center');
-            $actionDropdownWrapper.html(dropdownMarkup); // dropdownButtons
+            if (dropdownMarkup.length){
+                $actionDropdown.css({
+                    left: ((thisNewCol - 1) * _mapTileSize[0] + _mapTileSizeOffset[0]) + 'px',
+                    top: ((thisNewRow - 1) * _mapTileSize[1] + _mapTileSizeOffset[1]) + 'px',
+                    }).attr('data-dir', _worldCursor.direction).attr('data-type', showDropdownType).attr('data-align', 'center');
+                $actionDropdownWrapper.html(dropdownMarkup);
+                }
 
             // Add the buttons to the sidebar area so that they are out-of-the-way
             $sideButtonsWrapper.html(dropdownButtons);
+
+            // Define the function for dismissing the dropdown and side buttons
+            let dismissDropdown = function(playSound){
+                //console.log('-> dismissing action dropdown!');
+                playSound = typeof playSound === 'boolean' ? playSound : true;
+                if (playSound){ _self.playSoundEffect('back-click'); }
+                $actionDropdown.removeClass('active');
+                $actionDropdownWrapper.empty();
+                $sideButtons.removeClass('active');
+                $sideButtonsWrapper.empty();
+                $worldCursor.removeClass('busy');
+                $eventsLayers.removeClass('has-zoom');
+                $('.sprite.zoom', $eventsLayers).removeClass('zoom');
+                $('.sprite', $zoomLayer).each(function(){
+                    let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
+                    $sprite.appendTo($layer).removeAttr('data-layer').removeClass('zoom');
+                    });
+                };
 
             // Define the event to run when clicking one of these new action buttons
             let onActionButtonClick = function(e){
@@ -1529,6 +1623,7 @@ class mmrpgWorldMap {
                 let action = $button.attr('data-action') || false;
                 let isBattle = action.indexOf('battle') !== -1;
                 let isPortal = action.indexOf('portal') !== -1;
+                let isButton = action.indexOf('button') !== -1;
                 let isDismiss = action === 'dismiss';
                 //console.log('-> action =', action);
                 if (isBattle){
@@ -1550,7 +1645,7 @@ class mmrpgWorldMap {
                         battleVars.push('this_battle_token=' + battleId);
                         let battleHref = 'battle.php?' + battleVars.join('&');
                         $thisWorld.addClass('hidden');
-                        window.location.href = battleHref;
+                        _self.saveWorldState(function(){ window.location.href = battleHref; });
                         }
                     }
                 else if (isPortal){
@@ -1574,12 +1669,102 @@ class mmrpgWorldMap {
                             }
                         if (portalHref){
                             $thisWorld.addClass('hidden');
-                            window.location.href = portalHref;
+                            _self.saveWorldState(function(){ window.location.href = portalHref; });
                             }
                         }
                     }
+                else if (isButton){
+                    //console.log('-> world-button clicked with action:', action);
+                    let buttonsIndex = _config.mapButtonsIndex;
+                    let buttonStates = _world.buttons;
+                    let buttonName = $button.attr('data-button') || false;
+                    let buttonInfo = buttonName && (buttonsIndex && buttonsIndex[buttonName]) ? buttonsIndex[buttonName] : false;
+                    let $eventSprite = $eventsAtPosition[0];
+                    let $innerSprite = $eventSprite ? $('> .sprite', $eventSprite) : false;
+                    //console.log('-> buttonName =', buttonName);
+                    //console.log('-> buttonInfo =', buttonInfo);
+                    //console.log('-> $eventSprite =', $eventSprite);
+                    //console.log('-> $innerSprite =', $innerSprite);
+                    if (!buttonName || !buttonInfo){ console.error('-> button name or info not found, cannot push button!'); return false; }
+                    if (!$eventSprite || !$eventSprite.length){ console.error('-> event sprite not found, cannot push button!'); return false; }
+                    if (!$innerSprite || !$innerSprite.length){ console.error('-> inner sprite not found, cannot push button!'); return false; }
+                    // dismiss the dropdown and side buttons first
+                    dismissDropdown(false);
+                    // change the internal state of the button and update
+                    buttonInfo.state = 'down'; // change the button state to down
+                    buttonsIndex[buttonName] = buttonInfo; // sync button info with index
+                    buttonStates[buttonName] = 'down'; // sync button state with world state
+                    $eventSprite.attr('data-state', 'down'); // update the event sprite state
+                    // update the visual state of the button on-screen
+                    $innerSprite.removeClass('up').addClass('down'); // change the inner sprite to down state
+                    $eventSprite.removeClass('glow');
+                    // play sounds to indicate button has been pushed
+                    _self.playSoundEffect('button-click');
+                    _self.playSoundEffect('hyper-stomp-sound', {delay: 200});
+                    // shake the map briefly to indicate button has been pushed
+                    $canvasMap.addClass('shake-once');
+                    setTimeout(function(){ $canvasMap.removeClass('shake-once'); }, 1000);
+
+                    // If the button has a callback function, run it now
+                    (function(buttonInfo){
+                        if (!buttonInfo.action){ return false; }
+                        let buttonAction = buttonInfo.action;
+                        let buttonData = buttonInfo.data || {};
+
+                        // event action SET-GROUP-TERRAIN for buttons, switches, etc. to use
+                        if (buttonAction === 'set-group-terrain'){
+                            //console.log('-> setting group terrain for button', buttonName);
+                            let groupName = buttonData[0] || false;
+                            let terrainName = buttonData[1] || false;
+                            //console.log('-> groupName =', groupName, '\n', '-> terrainName =', terrainName);
+                            if (!groupName){ console.error('-> groupName not provided, cannot set group terrain!'); return false; }
+                            if (!terrainName){ console.error('-> terrainName not provided, cannot set group terrain!'); return false; }
+                            let mapTilesIndex = _config.mapTilesIndex;
+                            let layerTilesIndex = _world.layerTilesIndex;
+                            let terrainTilesIndex = layerTilesIndex['terrain'] || false;
+                            let terrainSpriteData = mapTilesIndex[terrainName] || false;
+                            let terrainIsVoid = terrainName.indexOf('void') !== -1 ? true : false;
+                            let terrainIsWater = terrainName.indexOf('water') !== -1 ? true : false;
+                            let terrainIsWalkable = !terrainIsVoid && !terrainIsWater ? true : false;
+                            //console.log('-> layerTilesIndex =', layerTilesIndex);
+                            //console.log('-> terrainTilesIndex =', terrainTilesIndex);
+                            //console.log('-> terrainSpriteData =', terrainSpriteData);
+                            //console.log('-> terrainIsWalkable =', terrainIsWalkable);
+                            if (!layerTilesIndex || !terrainTilesIndex){ console.error('-> layerTilesIndex or terrainTilesIndex not found, cannot set terrain!'); return false; }
+                            if (!terrainSpriteData){ console.error('-> terrainSpriteData not found, cannot set terrain!'); return false; }
+                            let groupsIndex = _config.mapGroupsIndex;
+                            let groupTiles = groupsIndex[groupName] || false;
+                            //console.log('-> groupsIndex =', groupsIndex);
+                            //console.log('-> groupTiles =', groupTiles);
+                            if (!groupsIndex || !groupTiles){ console.error('-> groupsIndex not found, cannot set terrain!'); return false; }
+                            for (let i = 0; i < groupTiles.length; i++){
+                                let tileKey = groupTiles[i];
+                                let tileData = terrainTilesIndex[tileKey] || false;
+                                if (!tileData){ console.error('-> tile data not found for tile', tileKey, ', cannot set terrain!'); continue; }
+                                //console.log('-> setting terrain for tile', tileKey, 'to', terrainName, 'w/ tileData:', tileData);
+                                tileData.sprite[1] = terrainName;
+                                tileData.sprite[2] = [terrainSpriteData[0], terrainSpriteData[1]];
+                                tileData.walkable = terrainIsWalkable;
+                                tileData.effects.grid = terrainIsWalkable;
+                                tileData.dirty = true;
+                                terrainTilesIndex[tileKey] = tileData; // sync the tile data back to the index
+                                }
+                            layerTilesIndex['terrain'] = terrainTilesIndex; // sync the layer tiles index with the new terrain tiles index
+                            _world.layerTilesIndex = layerTilesIndex; // sync the world state with the new layer tiles index
+                            _self.refreshCanvasTiles('terrain'); // refresh the canvas tiles
+                            _self.calculateWalkableMapTiles(true); // recalculate walkable tiles
+                            _self.refreshMapPositionEvents(); // refresh the map position events
+                            _self.saveWorldState();
+                            }
+
+                        })(buttonInfo);
+                    // .......
+                    // ...
+
+                    }
                 else if (isDismiss){
                     //console.log('-> dismissing action dropdown!');
+                    /*
                     _self.playSoundEffect('back-click');
                     $actionDropdown.removeClass('active');
                     $actionDropdownWrapper.empty();
@@ -1592,6 +1777,8 @@ class mmrpgWorldMap {
                         let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
                         $sprite.appendTo($layer).removeAttr('data-layer').removeClass('zoom');
                         });
+                    */
+                    dismissDropdown(true);
                     }
                 else {
                     // no compatible action found, do nothing
@@ -1766,31 +1953,47 @@ class mmrpgWorldMap {
         }
 
     // Quick function for sending a snapshot of persistent world values back to the server for saving
-    saveWorldState(){
-        //console.log('%c' + 'mmrpgWorldMap.saveWorldState()', 'color: magenta;');
+    saveWorldState(callback, delay){
+        //console.log('%c' + 'mmrpgWorldMap.saveWorldState(callback, delay)', 'color: magenta;');
+        delay = (typeof delay === 'number' ? delay : 1) * 1000; // default to one second if not provided/invalid
         let _self = this;
-        if (_self.saveWorldState._scheduled){ return; }
-        _self.saveWorldState._scheduled = true;
-        setTimeout(function(){
-            _self.saveWorldState._scheduled = false;
-            _self.saveWorldStateForReal();
-            }, 1000);
+        let _selfRef = _self.saveWorldState;
+        if (_selfRef._scheduled){ clearTimeout(_selfRef._scheduled); }
+        //console.log('-> scheduling world state save in ' + delay + 'ms');
+        _selfRef._scheduled = setTimeout(function(){
+            if (_selfRef._busy){
+                // if busy, try again in one second
+                //console.log('%c' + '--> save in progress, calling saveWorldState() again in ' + delay + 'ms ...', 'color: orange;');
+                _self.saveWorldState(callback, delay);
+                } else {
+                // not busy so we can save for real now
+                _self.saveWorldStateForReal(callback);
+                }
+            }, delay);
         return;
         }
-    saveWorldStateForReal(){
-        //console.log('%c' + 'mmrpgWorldMap.saveWorldStateForReal()', 'color: magenta;');
+    saveWorldStateForReal(callback){
+        //console.log('%c' + 'mmrpgWorldMap.saveWorldStateForReal(callback)', 'color: magenta;');
+        callback = typeof callback === 'function' ? callback : false; // default to no callback if not provided
         let _self = this;
+        let _selfRef = _self.saveWorldState;
         let _config = _self.config;
-        let _world = _self.state;
-        let _worldCursor = _world.cursor;
         let _userId = _config.userId;
-        let worldData = {
-            lastWorld: _config.mapToken,
-            lastPlayer: _config.playerToken,
-            lastPosition: _worldCursor.position,
-            lastDirection: _worldCursor.direction,
-            };
-        //console.log('---> saving world state:', worldData);
+        let _world = _self.state;
+        //let _worldCursor = _world.cursor;
+        let _worldPlayer = _world.player;
+        let _worldButtons = _world.buttons;
+        let _worldSwitches = _world.switches;
+        let lastPlayer = _worldPlayer.token;
+        let lastPlayerWorld = _config.mapToken;
+        let lastPlayerPosition = _worldPlayer.position;
+        let lastPlayerDirection = _worldPlayer.direction;
+        let lastWorldButtons = {}; lastWorldButtons[lastPlayerWorld] = _worldButtons;
+        let lastWorldSwitches = {}; lastWorldSwitches[lastPlayerWorld] = _worldSwitches;
+        let worldData = {lastPlayer, lastPlayerWorld, lastPlayerPosition, lastPlayerDirection, lastWorldButtons, lastWorldSwitches};
+        //console.log('%c' + 'Saving World State ...', 'color: cyan;');
+        //console.log('w/ worldData:', worldData);
+        _selfRef._busy = true;
         $.ajax({
             url: 'world.php',
             type: 'POST',
@@ -1798,11 +2001,17 @@ class mmrpgWorldMap {
             data: { action: 'save', world_data: worldData },
             success: function(response){
                 //console.log('---> save_world.php response:', response);
-                return true;
+                //console.log('%c' + '... World State Saved!', 'color: green;');
+                _selfRef._busy = false;
+                if (callback){ return callback.call(_self, 'success', {response}); }
+                else { return true; }
                 },
             error: function(xhr, status, error){
                 //console.error('saveWorldState() failed to save world state!', status, error);
-                return false;
+                //console.log('%c' + '... World State Not Saved!', 'color: red;');
+                _selfRef._busy = false;
+                if (callback){ return callback.call(_self, 'error', {xhr, status, error}); }
+                else { return false; }
                 }
             });
         return;
