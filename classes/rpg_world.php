@@ -143,6 +143,9 @@ class rpg_world {
         $map_data_vars['tiles'] = isset($map_data_vars['tiles']) ? $map_data_vars['tiles'] : array();
         $map_data_vars['sprites'] = isset($map_data_vars['sprites']) ? $map_data_vars['sprites'] : array();
         $map_data_vars['portals'] = isset($map_data_vars['portals']) ? $map_data_vars['portals'] : array();
+        $map_data_vars['groups'] = isset($map_data_vars['groups']) ? $map_data_vars['groups'] : array();
+        $map_data_vars['buttons'] = isset($map_data_vars['buttons']) ? $map_data_vars['buttons'] : array();
+        $map_data_vars['switches'] = isset($map_data_vars['switches']) ? $map_data_vars['switches'] : array();
         if (empty($map_data_vars['token'])){ $map_data_vars['token'] = $map_token; }
         if (empty($map_data_vars['name'])){ $map_data_vars['name'] = 'Undefined'; }
         if (empty($map_data_vars['size'])){ $map_data_vars['size'] = '0 x 0 x 0'; }
@@ -157,10 +160,16 @@ class rpg_world {
         if (empty($map_data_vars['tiles'])){ $map_data_vars['tiles'][] = ''; }
         if (empty($map_data_vars['sprites'])){ $map_data_vars['sprites'][] = ''; }
         if (empty($map_data_vars['portals'])){ $map_data_vars['portals'][] = ''; }
+        if (empty($map_data_vars['groups'])){ $map_data_vars['groups'][] = ''; }
+        if (empty($map_data_vars['buttons'])){ $map_data_vars['buttons'][] = ''; }
+        if (empty($map_data_vars['switches'])){ $map_data_vars['switches'][] = ''; }
+        $map_data_vars['habitats'] = $map_custval_parser($map_data_vars['habitats']);
         $map_data_vars['tiles'] = $map_custval_parser($map_data_vars['tiles'], true);
         $map_data_vars['sprites'] = $map_custval_parser($map_data_vars['sprites']);
         $map_data_vars['portals'] = $map_custval_parser($map_data_vars['portals']);
-        $map_data_vars['habitats'] = $map_custval_parser($map_data_vars['habitats']);
+        $map_data_vars['groups'] = $map_custval_parser($map_data_vars['groups']);
+        $map_data_vars['buttons'] = $map_custval_parser($map_data_vars['buttons']);
+        $map_data_vars['switches'] = $map_custval_parser($map_data_vars['switches']);
         // Add collected data to the parsed map data
         $map_data_parsed = array();
         $map_data_parsed['token'] = $map_data_vars['token']; unset($map_data_vars['token']);
@@ -173,6 +182,9 @@ class rpg_world {
         $map_data_parsed['tiles'] = $map_data_vars['tiles']; unset($map_data_vars['tiles']);
         $map_data_parsed['sprites'] = $map_data_vars['sprites']; unset($map_data_vars['sprites']);
         $map_data_parsed['portals'] = $map_data_vars['portals']; unset($map_data_vars['portals']);
+        $map_data_parsed['groups'] = $map_data_vars['groups']; unset($map_data_vars['groups']);
+        $map_data_parsed['buttons'] = $map_data_vars['buttons']; unset($map_data_vars['buttons']);
+        $map_data_parsed['switches'] = $map_data_vars['switches']; unset($map_data_vars['switches']);
         //$map_data_parsed['tiles']['keys'] = array_keys($map_data_parsed['tiles']);
         $map_data_parsed['layers'] = $map_data_layers;
         if (!empty($map_data_vars)){ $map_data_parsed['vars'] = $map_data_vars; }
@@ -320,6 +332,16 @@ class rpg_world {
                 list($x, $y) = $portal_data;
                 $pos = $x.'-'.$y;
                 //error_log('-> removing portal position "'.$pos.'" from available cells');
+                unset($available_cells[$pos]);
+            }
+        }
+        // Now let's loop through buttons and remove spaces that have buttons on them
+        if (!empty($map_data['buttons']) && is_array($map_data['buttons'])){
+            foreach ($map_data['buttons'] AS $button_name => $button_data){
+                if (empty($button_data) || !is_array($button_data) || count($button_data) < 2){ continue; }
+                list($x, $y) = $button_data;
+                $pos = $x.'-'.$y;
+                //error_log('-> removing button position "'.$pos.'" from available cells');
                 unset($available_cells[$pos]);
             }
         }
