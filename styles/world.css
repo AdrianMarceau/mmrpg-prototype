@@ -41,6 +41,7 @@ html, body {
     will-change: transform;
 }
 
+
 #world #canvas #map .layer {
     display: block;
     position: absolute;
@@ -50,13 +51,32 @@ html, body {
     top: 0;
     left: 0;
     pointer-events: none;
+    transform: translate(0, 0);
 }
 #world #canvas #map .layer[data-layer="background"] { z-index: 1; }
 #world #canvas #map .layer[data-layer="terrain"] { z-index: 10; }
 #world #canvas #map .layer[data-layer="portals"] { z-index: 20; }
+#world #canvas #map .layer[data-layer="buttons"] { z-index: 22; }
+#world #canvas #map .layer[data-layer="switches"] { z-index: 24; }
 #world #canvas #map .layer[data-layer="battles"] { z-index: 30; }
 #world #canvas #map .layer[data-layer="team"] { z-index: 40; }
 #world #canvas #map .layer[data-layer="zoom"] { z-index: 50; }
+
+/* define an animation for shaking the map back and forth rapidly to simulate damage/explosion/dramtic events */
+@keyframes world-map-shake {
+    0% { transform: translate(0, 0); }
+    10% { transform: translate(-2px, -1px); }
+    20% { transform: translate(2px, -1px); }
+    30% { transform: translate(-2px, 1px); }
+    40% { transform: translate(2px, 1px); }
+    50% { transform: translate(0, 0); }
+}
+#world #canvas #map.shake .layer:not([data-layer="background"]) {
+    animation: world-map-shake 0.6s steps(1) infinite;
+}
+#world #canvas #map.shake-once .layer:not([data-layer="background"]) {
+    animation: world-map-shake 0.6s steps(1) forwards;
+}
 
 #world #canvas #map,
 #world #canvas #map .layer[data-layer="background"] {
@@ -111,10 +131,47 @@ html, body {
     pointer-events: none;
 }
 
+#world #map .layer > .sprite.tile.button,
+#world #map .layer > .sprite.tile.switch {
+    transform-origin: bottom;
+    transform: scale(1.0);
+}
+#world #map .layer .sprite.tile.button > .sprite,
+#world #map .layer .sprite.tile.switch > .sprite {
+    transform-origin: bottom;
+    transform: scale(2.0) translateY(25%);
+    transition-duration: 1.5s;
+    transition-timing-function: swing;
+    filter: drop-shadow(1px -2px 2px rgba(0, 0, 0, 0.1));
+}
+#world #map .layer .sprite.tile.button > .sprite.up {
+    filter: drop-shadow(1px -2px 2px rgba(0, 0, 0, 0.3));
+}
+#world #map .layer .sprite.tile.button > .sprite.down {
+    filter: drop-shadow(1px -1px 1px rgba(0, 0, 0, 0.1)) brightness(0.7);
+}
+
 #world #map .sprite.tile.portal { background-position: -360px -40px; }
 #world #map .sprite.tile.portal.locked { background-position: -440px -40px; }
 #world #map .sprite.tile[data-portal="spawn"] { background-position: -40px -40px; }
-#world #map .sprite.tile[data-portal="exit"] { background-position: -440px px -40px; }
+#world #map .sprite.tile[data-portal="exit"] { background-position: -440px -40px; }
+
+#world #map .sprite.tile.button-up { background-position: -40px -280px; }
+#world #map .sprite.tile.button-down { background-position: -40px -360px; }
+#world #map .sprite.tile.button.black.up { background-position: -40px -280px; }
+#world #map .sprite.tile.button.black.down { background-position: -40px -360px; }
+#world #map .sprite.tile.button.red.up { background-position: -120px -280px; }
+#world #map .sprite.tile.button.red.down { background-position: -120px -360px; }
+#world #map .sprite.tile.button.blue.up { background-position: -200px -280px; }
+#world #map .sprite.tile.button.blue.down { background-position: -200px -360px; }
+#world #map .sprite.tile.button.yellow.up { background-position: -280px -280px; }
+#world #map .sprite.tile.button.yellow.down { background-position: -280px -360px; }
+#world #map .sprite.tile.button.green.up { background-position: -360px -280px; }
+#world #map .sprite.tile.button.green.down { background-position: -360px -360px; }
+#world #map .sprite.tile.button.purple.up { background-position: -440px -280px; }
+#world #map .sprite.tile.button.purple.down { background-position: -440px -360px; }
+#world #map .sprite.tile.button.orange.up { background-position: -520px -280px; }
+#world #map .sprite.tile.button.orange.down { background-position: -520px -360px; }
 
 #world #map .sprite.tile.col-1 { left: 0; }
 #world #map .sprite.tile.col-2 { left: 0; }
@@ -251,9 +308,11 @@ html, body {
 @keyframes world-sprite-spawn-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.5); } }
 @keyframes world-sprite-exit-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(3.0); } }
 @keyframes world-sprite-portal-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(2.0); } }
+@keyframes world-sprite-button-glow { 0%, 100% { filter: brightness(1); transform: scaleY(1.0); } 50% { filter: brightness(1.5); transform: scaleY(0.95);  } }
 #world #map .layer.events .sprite.spawn.pulse { animation: world-sprite-spawn-pulse 2s ease-in infinite; }
 #world #map .layer.events .sprite.exit.pulse { animation: world-sprite-exit-pulse 4s ease-in infinite; }
 #world #map .layer.events .sprite.portal.pulse { animation: world-sprite-portal-pulse 3s ease-in infinite; }
+#world #map .layer.events .sprite.button.glow { animation: world-sprite-button-glow 1.5s ease-in infinite; }
 
 #world #map .layer.events .sprite > .sprite,
 #world #map .layer.zoom .sprite:not(.tile) > .sprite {
@@ -787,6 +846,35 @@ html, body {
     background-color: #8b1d1d !important;
     border-color: #b23333 !important;
 }
+#world #canvas #side-buttons .button[data-action="push-button"] {
+    background-color: #1e2736 !important;
+    border-color: #354d75 !important;
+}
+#world #canvas #side-buttons .button[data-action="push-button"].red {
+    background-color: #8b1d1d !important;
+    border-color: #b23333 !important;
+
+}
+#world #canvas #side-buttons .button[data-action="push-button"].blue {
+    background-color: #1e2736 !important;
+    border-color: #354d75 !important;
+}
+#world #canvas #side-buttons .button[data-action="push-button"].yellow {
+    background-color: #4d3d1e !important;
+    border-color: #6e5d34 !important;
+}
+#world #canvas #side-buttons .button[data-action="push-button"].green {
+    background-color: #1e4d36 !important;
+    border-color: #34755d !important;
+}
+#world #canvas #side-buttons .button[data-action="push-button"].purple {
+    background-color: #4d3da2 !important;
+    border-color: #6e5dc6 !important;
+}
+#world #canvas #side-buttons .button[data-action="push-button"].orange {
+    background-color: #a24d1e !important;
+    border-color: #c66e34 !important;
+}
 
 #world #canvas #position-display {
     bottom: 0;
@@ -830,6 +918,10 @@ html, body {
 }
 #world #canvas .sprite.zoom,
 #world #canvas .sprite.zoom > .sprite {
+    image-rendering: pixelated;
+}
+#world #canvas .sprite.button,
+#world #canvas .sprite.button > .sprite {
     image-rendering: pixelated;
 }
 #world #map .layer.objects .sprite.cursor > .sprite {
