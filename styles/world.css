@@ -891,10 +891,20 @@ html, body {
 
 /* MAYBE MAYBE MAYBE? */
 
-#world #canvas #map .layer.terrain:after {
+
+#world #canvas #map .layer[data-layer="terrain"] canvas {
+    /* filter: drop-shadow(0px 9px 6px rgba(0, 0, 0, 0.3));  */
+    /* filter: drop-shadow(0px 10px 0 rgba(0, 0, 0, 0.25)); */
+    /* filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.2));  */
+    filter: drop-shadow(0px 9px 6px rgba(0, 0, 0, 0.3));
+    position: relative;
+    z-index: 1;
+}
+#world #canvas #map .layer[data-layer="terrain"]:after {
     content: "";
     display: block;
     position: absolute;
+    z-index: 3;
     top: 0;
     left: 0;
     width: 100%;
@@ -926,7 +936,14 @@ html, body {
 }
 #world #map .layer.objects .sprite.cursor > .sprite {
     transform: translate(-6px, 14px);
-    filter: drop-shadow(-1px -1px 0 white);
+    /* filter: drop-shadow(-1px -1px 0 white);  */
+    filter: drop-shadow(-1px -1px 0 white) hue-rotate(180deg);
+}
+#world #map .layer.objects .sprite.cursor.busy > .sprite {
+    filter: drop-shadow(-1px -1px 0 white) hue-rotate(180deg);
+}
+#world #canvas #player-switcher a.option > .sprite.cursor > .sprite {
+    filter: hue-rotate(180deg);
 }
 #world #map .layer.objects .sprite[data-dir="left"] > .sprite {
     transform: scale(-1, 1);
@@ -934,6 +951,7 @@ html, body {
 #world #map .layer.objects .sprite.zoom[data-dir="left"] > .sprite {
     transform: scale(-2, 2);
 }
+
 
 /* TEMP TEMP TEMP */
 

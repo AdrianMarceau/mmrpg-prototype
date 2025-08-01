@@ -420,6 +420,77 @@ if (empty($map_random_encounters)){
 }
 $WORLD_SESSION['world_encounters'][$map_token] = $map_random_encounters;
 
+// If there are any buttons defined, check to see if any of them have been pushed already
+if (!empty($map_data_parsed['buttons'])){
+    $button_sprites = $map_data_parsed['buttons'];
+    $world_buttons = !empty($WORLD_SESSION['world_buttons'][$map_token]) ? $WORLD_SESSION['world_buttons'][$map_token] : array();
+    foreach ($button_sprites AS $button_name => $button_data){
+        if (empty($button_data) || !is_array($button_data) || count($button_data) < 2){ continue; }
+        list($x, $y) = $button_data; unset($button_data[0], $button_data[1]);
+        $colour = !empty($button_data[2]) ? $button_data[2] : 'black'; unset($button_data[2]);
+        $state = !empty($button_data[3]) ? $button_data[3] : 'up'; unset($button_data[3]);
+        $action = !empty($button_data[4]) ? $button_data[4] : ''; unset($button_data[4]);
+        $hidden = false; if (in_array('hidden', $button_data)){ $hidden = true; unset($button_data[array_search('hidden', $button_data)]); }
+        $locked = false; if (in_array('locked', $button_data)){ $locked = true; unset($button_data[array_search('locked', $button_data)]); }
+        $data = array_values($button_data);
+        if (!empty($world_buttons[$button_name])){ $state = $world_buttons[$button_name]; }
+        if ($state !== 'down'){ continue; }
+        //error_log('[button-check] world map button "'.$button_name.'" is already DOWN!');
+        // ...
+        // event action SET-GROUP-TERRAIN for buttons, switches, etc. to use
+        if ($action === 'set-group-terrain'){
+            //error_log('world map button "'.$button_name.'" is setting group terrain');
+            //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
+            $group_name = !empty($data[0]) ? $data[0] : '';
+            $terrain_name = !empty($data[1]) ? $data[1] : '';
+            //error_log('$group_name = '.print_r($group_name, true));
+            //error_log('$terrain_name = '.print_r($terrain_name, true));
+            if (!$group_name){ error_log('-> missing group name for button "'.$button_name.'"'); continue; }
+            if (!$terrain_name){ error_log('-> missing terrain name for button "'.$button_name.'"'); continue; }
+            $groups_index = !empty($map_data_parsed['groups']) ? $map_data_parsed['groups'] : array();
+            $group_tiles = !empty($groups_index[$group_name]) ? $groups_index[$group_name] : array();
+            $tiles_index = !empty($map_data_parsed['tiles']) ? $map_data_parsed['tiles'] : array();
+            $tiles_index_keys = !empty($tiles_index['keys']) ? array_flip($tiles_index['keys']) : array();
+            $layer_key = 0; // currently, this is the main and only terrain layer
+            $layer_tiles = !empty($map_data_parsed['layers'][$layer_key]) ? $map_data_parsed['layers'][$layer_key] : array();
+            //error_log('$groups_index = '.print_r($groups_index, true));
+            //error_log('$group_tiles = '.print_r($group_tiles, true));
+            //error_log('$tiles_index = '.print_r($tiles_index, true));
+            //error_log('$tiles_index_keys = '.print_r($tiles_index_keys, true));
+            //error_log('$layer_tiles = '.print_r($layer_tiles, true));
+            if (!$groups_index){ error_log('-> no groups defined for this map'); continue; }
+            if (!$group_tiles){ error_log('-> no group tiles defined for "'.$group_name.'"'); continue; }
+            if (!$tiles_index){ error_log('-> no tiles index defined for this map'); continue; }
+            if (!$layer_tiles){ error_log('-> no layer tiles defined for this map'); continue; }
+            if (!empty($group_tiles)){
+                foreach ($group_tiles AS $tile_key){
+                    //error_log('-> processing tile key "'.$tile_key.'"');
+                    list($col, $row) = explode('-', $tile_key);
+                    $tx = $col - 1; $ty = $row - 1;
+                    //error_log('--> $col = '.$col.', $row = '.$row);
+                    if (!isset($layer_tiles[$ty])){ error_log('-> layer row "'.$ty.'" not found in layer tiles'); continue; }
+                    //error_log('--> $layer_tiles['.$ty.'](raw) = '.print_r($layer_tiles[$ty], true));
+                    $row_tiles = !empty($layer_tiles[$ty]) ? $layer_tiles[$ty] : '';
+                    $row_tiles = !empty($row_tiles) ? str_replace(array('[', ']'), '', $row_tiles) : '';
+                    $row_tiles = !empty($row_tiles) ? (strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles)) : array();
+                    //error_log('--> $row_tiles(parsed) = '.print_r($row_tiles, true));
+                    if (empty($row_tiles[$tx])){ error_log('-> tile key "'.$tile_key.'" not found in row tiles'); continue; }
+                    $current_tile_value = $row_tiles[$tx];
+                    $new_tile_value = $tiles_index_keys[$terrain_name]; // TODO: this should be a number lol
+                    //error_log('--> $current_tile_value = '.print_r($current_tile_value, true));
+                    //error_log('--> $new_tile_value = '.print_r($new_tile_value, true));
+                    $row_tiles[$tx] = $new_tile_value;
+                    $row_tiles = implode(',', array_map(function($tile){ return '['.$tile.']'; }, $row_tiles));
+                    $layer_tiles[$ty] = $row_tiles;
+                    //error_log('--> $layer_tiles['.$ty.'](updated) = '.print_r($layer_tiles[$ty], true));
+                }
+                $map_data_parsed['layers'][$layer_key] = $layer_tiles;
+            }
+        }
+        // ...
+    }
+}
+
 // Define some fallback values for compatibility
 $debug_flag_animation = true;
 $flag_skip_fadein = true;
@@ -582,11 +653,11 @@ $flag_skip_fadein = true;
                     $buttons_index = array();
                     if (!empty($map_data_parsed['buttons'])){
                         $button_sprites = $map_data_parsed['buttons'];
+                        $world_buttons = !empty($WORLD_SESSION['world_buttons'][$map_token]) ? $WORLD_SESSION['world_buttons'][$map_token] : array();
                         foreach ($button_sprites AS $button_name => $button_data){
                             if (empty($button_data) || !is_array($button_data) || count($button_data) < 2){ continue; }
                             list($x, $y) = $button_data; unset($button_data[0], $button_data[1]);
-                            $pos = $x.'-'.$y;
-                            list($col, $row) = explode('-', $pos);
+                            $pos = $x.'-'.$y; list($col, $row) = explode('-', $pos);
                             $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                             $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                             $colour = !empty($button_data[2]) ? $button_data[2] : 'black'; unset($button_data[2]);
@@ -595,13 +666,15 @@ $flag_skip_fadein = true;
                             $hidden = false; if (in_array('hidden', $button_data)){ $hidden = true; unset($button_data[array_search('hidden', $button_data)]); }
                             $locked = false; if (in_array('locked', $button_data)){ $locked = true; unset($button_data[array_search('locked', $button_data)]); }
                             $data = array_values($button_data);
+                            if (!empty($world_buttons[$button_name])){ $state = $world_buttons[$button_name]; }
                             if ($hidden){ continue; }
+                            $is_glowing = $state !== 'down' && !$hidden && !$locked ? true : false;
                             $base_classes = 'sprite tile button';
                             $kind_classes = $colour.' '.$state;
                             $sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
                             $attrs = 'data-button="'.$button_name.'" data-colour="'.$colour.'" data-state="'.$state.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                             $styles = 'top: '.$top.'px; left: '.$left.'px;';
-                            $classes = $base_classes.(!$hidden && !$locked  ? ' glow' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                            $classes = $base_classes.($is_glowing ? ' glow' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                             echo('<span class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$sprite.'</span>'.PHP_EOL);
                             $button_symbols[$pos] = $button_name;
                             $buttons_index[$button_name] = array(

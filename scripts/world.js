@@ -1711,6 +1711,8 @@ class mmrpgWorldMap {
                         let buttonAction = buttonInfo.action;
                         let buttonData = buttonInfo.data || {};
 
+                        // ...
+
                         // event action SET-GROUP-TERRAIN for buttons, switches, etc. to use
                         if (buttonAction === 'set-group-terrain'){
                             //console.log('-> setting group terrain for button', buttonName);
@@ -1757,6 +1759,8 @@ class mmrpgWorldMap {
                             _self.saveWorldState();
                             }
 
+                        // ...
+
                         })(buttonInfo);
                     // .......
                     // ...
@@ -1764,20 +1768,6 @@ class mmrpgWorldMap {
                     }
                 else if (isDismiss){
                     //console.log('-> dismissing action dropdown!');
-                    /*
-                    _self.playSoundEffect('back-click');
-                    $actionDropdown.removeClass('active');
-                    $actionDropdownWrapper.empty();
-                    $sideButtons.removeClass('active');
-                    $sideButtonsWrapper.empty();
-                    $worldCursor.removeClass('busy');
-                    $eventsLayers.removeClass('has-zoom');
-                    $('.sprite.zoom', $eventsLayers).removeClass('zoom');
-                    $('.sprite', $zoomLayer).each(function(){
-                        let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
-                        $sprite.appendTo($layer).removeAttr('data-layer').removeClass('zoom');
-                        });
-                    */
                     dismissDropdown(true);
                     }
                 else {
