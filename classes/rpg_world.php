@@ -339,11 +339,31 @@ class rpg_world {
         // Now let's loop through buttons and remove spaces that have buttons on them
         if (!empty($map_data['buttons']) && is_array($map_data['buttons'])){
             foreach ($map_data['buttons'] AS $button_name => $button_data){
-                if (empty($button_data) || !is_array($button_data) || count($button_data) < 2){ continue; }
-                list($x, $y) = $button_data;
-                $pos = $x.'-'.$y;
+                if (empty($button_data) || !is_array($button_data)){ continue; }
+                $pos = $button_data[0];
                 //error_log('-> removing button position "'.$pos.'" from available cells');
                 unset($available_cells[$pos]);
+            }
+        }
+        // If there's a group defined called "no-encounters", loop through the cells and add them too
+        if (!empty($map_data['groups']) && is_array($map_data['groups']) && isset($map_data['groups']['no-encounters'])){
+            $no_encounters = $map_data['groups']['no-encounters'];
+            if (!empty($no_encounters) && is_array($no_encounters)){
+                $no_encounters_groups = array();
+                foreach ($no_encounters AS $key => $pos){
+                    if (preg_match('/^([0-9]+)\-([0-9]+)$/i', $pos)){ continue; }
+                    //error_log('-> no-encounters position "'.$pos.'" might be group...');
+                    if (!isset($map_data['groups'][$pos])){ continue; }
+                    elseif (empty($map_data['groups'][$pos])){ continue; }
+                    //error_log('-> ... no-encounters position "'.$pos.'" IS a group w/ '.count($map_data['groups'][$pos]).' items!');
+                    $no_encounters_groups += $map_data['groups'][$pos];
+                    unset($no_encounters[$key]);
+                }
+                $no_encounters = array_merge($no_encounters, $no_encounters_groups);
+                foreach ($no_encounters AS $pos){
+                    //error_log('-> removing no-encounters position "'.$pos.'" from available cells');
+                    unset($available_cells[$pos]);
+                }
             }
         }
         // Then we through all the tiles and remove any that are unwalkable "void" type
