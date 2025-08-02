@@ -328,15 +328,13 @@ $map_exit_pos = !empty($WORLD_SESSION['world_maps'][$map_token]['exit_pos']) ? $
 if (empty($map_spawn_pos)){
     $map_spawn_pos = '1-1';
     if (!empty($map_data_parsed['portals']['spawn'])){
-        $spawn = $map_data_parsed['portals']['spawn'];
-        $map_spawn_pos = $spawn[0].'-'.$spawn[1];
+        $map_spawn_pos = $map_data_parsed['portals']['spawn'][0];
     }
 }
 if (empty($map_exit_pos)){
     $map_exit_pos = ($map_col_size + 1).'-'.($map_row_size + 1);
     if (!empty($map_data_parsed['portals']['exit'])){
-        $exit = $map_data_parsed['portals']['exit'];
-        $map_exit_pos = $exit[0].'-'.$exit[1];
+        $map_exit_pos = $map_data_parsed['portals']['exit'][0];
     }
 }
 $WORLD_SESSION['world_maps'][$map_token]['spawn_pos'] = $map_spawn_pos;
@@ -346,16 +344,15 @@ $WORLD_SESSION['world_maps'][$map_token]['exit_pos'] = $map_exit_pos;
 if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data['this_current_position'] = $map_spawn_pos; }
 
 // Generate the random encounters for this map location if not already spawned
-//$max_random_encounters = 20;
-$allowed_random_encounters = $map_mecha_support;
-$available_encounter_cells = rpg_world::get_map_encounter_cells($map_data_parsed);
-$max_random_encounters = ceil($available_encounter_cells['total'] * 0.25);
 $map_random_encounters = !empty($WORLD_SESSION['world_encounters'][$map_token]) ? $WORLD_SESSION['world_encounters'][$map_token] : array();
-//error_log('$allowed_random_encounters = '.print_r($allowed_random_encounters, true));
-//error_log('$available_encounter_cells = '.print_r($available_encounter_cells, true));
-//error_log('$max_random_encounters = '.print_r($max_random_encounters, true));
 //error_log('$map_random_encounters = '.print_r($map_random_encounters, true));
 if (empty($map_random_encounters)){
+    $allowed_random_encounters = $map_mecha_support;
+    $available_encounter_cells = rpg_world::get_map_encounter_cells($map_data_parsed);
+    $max_random_encounters = ceil($available_encounter_cells['total'] * 0.25);
+    //error_log('$allowed_random_encounters = '.print_r($allowed_random_encounters, true));
+    //error_log('$available_encounter_cells = '.print_r($available_encounter_cells, true));
+    //error_log('$max_random_encounters = '.print_r($max_random_encounters, true));
     $ratios = array();
     foreach ($allowed_random_encounters AS $key => $robot){
         $ratio = strstr($robot, '(') && strstr($robot, ')') ? explode('(', str_replace(')', '', $robot)) : array($robot, 1);
@@ -425,11 +422,11 @@ if (!empty($map_data_parsed['buttons'])){
     $button_sprites = $map_data_parsed['buttons'];
     $world_buttons = !empty($WORLD_SESSION['world_buttons'][$map_token]) ? $WORLD_SESSION['world_buttons'][$map_token] : array();
     foreach ($button_sprites AS $button_name => $button_data){
-        if (empty($button_data) || !is_array($button_data) || count($button_data) < 2){ continue; }
-        list($x, $y) = $button_data; unset($button_data[0], $button_data[1]);
-        $colour = !empty($button_data[2]) ? $button_data[2] : 'black'; unset($button_data[2]);
-        $state = !empty($button_data[3]) ? $button_data[3] : 'up'; unset($button_data[3]);
-        $action = !empty($button_data[4]) ? $button_data[4] : ''; unset($button_data[4]);
+        if (empty($button_data) || !is_array($button_data)){ continue; }
+        $position = $button_data[0]; unset($button_data[0]);
+        $colour = !empty($button_data[1]) ? $button_data[1] : 'black'; unset($button_data[1]);
+        $state = !empty($button_data[2]) ? $button_data[2] : 'up'; unset($button_data[2]);
+        $action = !empty($button_data[3]) ? $button_data[3] : ''; unset($button_data[3]);
         $hidden = false; if (in_array('hidden', $button_data)){ $hidden = true; unset($button_data[array_search('hidden', $button_data)]); }
         $locked = false; if (in_array('locked', $button_data)){ $locked = true; unset($button_data[array_search('locked', $button_data)]); }
         $data = array_values($button_data);
@@ -546,9 +543,6 @@ $flag_skip_fadein = true;
                 $data['tiles_index'] = $map_data_parsed['tiles'];
                 $data['sprites_index'] = $map_data_parsed['sprites'];
                 $data['groups_index'] = $map_data_parsed['groups'];
-                //$data['portals_index'] = $map_data_parsed['portals'];
-                //$data['buttons_index'] = $map_data_parsed['buttons'];
-                //$data['switches_index'] = $map_data_parsed['switches'];
                 $data['start_position'] = $this_prototype_data['this_current_position'];
                 $data_json = json_encode($data, JSON_NUMERIC_CHECK);
                 echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
@@ -607,9 +601,8 @@ $flag_skip_fadein = true;
                     if (!empty($map_data_parsed['portals'])){
                         $portal_sprites = $map_data_parsed['portals'];
                         foreach ($portal_sprites AS $portal_name => $portal_data){
-                            if (empty($portal_data) || !is_array($portal_data) || count($portal_data) < 2){ continue; }
-                            list($x, $y) = $portal_data;
-                            $pos = $x.'-'.$y;
+                            if (empty($portal_data) || !is_array($portal_data)){ continue; }
+                            $pos = $portal_data[0];
                             list($col, $row) = explode('-', $pos);
                             $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                             $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
@@ -656,13 +649,12 @@ $flag_skip_fadein = true;
                         $world_buttons = !empty($WORLD_SESSION['world_buttons'][$map_token]) ? $WORLD_SESSION['world_buttons'][$map_token] : array();
                         foreach ($button_sprites AS $button_name => $button_data){
                             if (empty($button_data) || !is_array($button_data) || count($button_data) < 2){ continue; }
-                            list($x, $y) = $button_data; unset($button_data[0], $button_data[1]);
-                            $pos = $x.'-'.$y; list($col, $row) = explode('-', $pos);
+                            $pos = $button_data[0]; list($col, $row) = explode('-', $pos); unset($button_data[0]);
                             $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                             $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
-                            $colour = !empty($button_data[2]) ? $button_data[2] : 'black'; unset($button_data[2]);
-                            $state = !empty($button_data[3]) ? $button_data[3] : 'up'; unset($button_data[3]);
-                            $action = !empty($button_data[4]) ? $button_data[4] : ''; unset($button_data[4]);
+                            $colour = !empty($button_data[1]) ? $button_data[1] : 'black'; unset($button_data[1]);
+                            $state = !empty($button_data[2]) ? $button_data[2] : 'up'; unset($button_data[2]);
+                            $action = !empty($button_data[3]) ? $button_data[3] : ''; unset($button_data[3]);
                             $hidden = false; if (in_array('hidden', $button_data)){ $hidden = true; unset($button_data[array_search('hidden', $button_data)]); }
                             $locked = false; if (in_array('locked', $button_data)){ $locked = true; unset($button_data[array_search('locked', $button_data)]); }
                             $data = array_values($button_data);
@@ -802,7 +794,8 @@ $flag_skip_fadein = true;
 
                     // Generate the markup for the cursor sprites
                     $obj = 'cursor';
-                    $sprite = 'images/robots/pointan/sprite_right_40x40.png'; // TODO: surely this isn't how we're going to leave this...
+                    //$sprite = 'images/robots/pointan/sprite_right_40x40.png'; // T-D-: surely this isn't how we're going to leave this...
+                    $sprite = 'images/assets/cursor_right_40x40.png'; // TODO: maybe refine this a bit more before release
                     $pos = $team_position;
                     list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];

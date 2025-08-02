@@ -330,9 +330,8 @@ class rpg_world {
         // Now let's loop through portals and remove spaces that have portals on them
         if (!empty($map_data['portals']) && is_array($map_data['portals'])){
             foreach ($map_data['portals'] AS $portal_name => $portal_data){
-                if (empty($portal_data) || !is_array($portal_data) || count($portal_data) < 2){ continue; }
-                list($x, $y) = $portal_data;
-                $pos = $x.'-'.$y;
+                if (empty($portal_data) || !is_array($portal_data)){ continue; }
+                $pos = $portal_data[0];
                 //error_log('-> removing portal position "'.$pos.'" from available cells');
                 unset($available_cells[$pos]);
             }
