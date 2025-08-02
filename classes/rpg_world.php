@@ -475,6 +475,7 @@ class rpg_world {
         $cursor_token = 'player';
         $cursor_active = $this_prototype_data['this_player_token'] === $cursor_token ? true : false;
         $cursor_sprite = self::get_sprite('robot', 'pointan', '', 'right', 'cursor');
+        $cursor_sprite = str_replace('images/robots/pointan/sprite_', 'images/assets/cursor_', $cursor_sprite);
         $cursor_label = $get_label_span('Prε', 'cursor');
         $return_markup .= ('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         $mmrpg_index_players = self::get_indexes('players');
