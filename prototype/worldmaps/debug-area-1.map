@@ -1,25 +1,33 @@
 #---------------------------#
 # DEBUG AREA 1
-@token    = debug-area-1
-@name     = DEBUG AREA 1
-@size     = 11 x 24
-@sheet    = mmrpg-overworld-2k25
+@token       = debug-area-1
+@name        = DEBUG AREA 1
+@size        = 11 x 24
+@sheet       = mmrpg-overworld-2k25
 #---------------------------#
 @field       = gentle-countryside
+@terrain[]   = grass(gentle-countryside)
+@terrain[]   = subspace(prototype-subspace)
+#---------------------------#
 @mechas      = met(2),trille-bot(1)
 @habitats[]  = met(grass)
 @habitats[]  = trille-bot(subspace)
 #---------------------------#
-@portals[]  = spawn(6, 8)
-@portals[]  = goto__debug-area-1n(6, 6)
-@portals[]  = goto__debug-area-1s(6, 10)
-@portals[]  = goto__debug-area-1w(4, 8)
-@portals[]  = goto__debug-area-1e(8, 8)
-@portals[]  = goto__starter-80x80(6, 3, locked)
+@portals[]   = spawn(6-8)
+@portals[]   = goto__debug-area-1n(6-6)
+@portals[]   = goto__debug-area-1s(6-10)
+@portals[]   = goto__debug-area-1w(4-8)
+@portals[]   = goto__debug-area-1e(8-8)
+@portals[]   = goto__starter-80x80(6-3, locked)
 #---------------------------#
-@groups[]  = subspace-path(6-12, 6-13, 6-14, 6-15)
+@groups[]    = test-group(9-6, 10-6)
+@groups[]    = subspace-path(6-12, 6-13, 6-14, 6-15)
+@groups[]    = no-encounters(test-group, 6-11, subspace-path, 6-16)
 #---------------------------#
-@buttons[]  = subspace-button(6, 22, purple, up, set-group-terrain, subspace-path, subspace)
+@buttons[]   = subspace-button(6-22, purple, up, set-group-terrain, subspace-path, subspace)
+#---------------------------#
+@bosses[]    = test-boss(9-6, trill, attack, set-group-terrain, test-group, grass)
+@bosses[]    = subspace-boss(6-21, trill, speed, set-portal-state, goto__starter-80x80, unlocked)
 #---------------------------#
 [00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00]
 [00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00]

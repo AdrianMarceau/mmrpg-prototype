@@ -11,8 +11,8 @@
 @habitats[]  = shelln(beach,water)
 @habitats[]  = snapper(beach)
 #---------------------------#
-@portals[]  = spawn(5, 2, hidden)
-@portals[]  = goto__debug-area-1(5, 2)
+@portals[]  = spawn(5-2, hidden)
+@portals[]  = goto__debug-area-1(5-2)
 #---------------------------#
 [00],[00],[99],[99],[99],[99],[99],[99],[00],[00]
 [00],[99],[99],[99],[40],[99],[99],[99],[99],[00]

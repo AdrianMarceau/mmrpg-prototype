@@ -8,8 +8,8 @@
 @field    = wintry-forefront
 @mechas   = curlinger,frosty-throwman,tel-tel
 #---------------------------#
-@portals[]  = spawn(8, 13, hidden)
-@portals[]  = goto__debug-area-1(8, 13)
+@portals[]  = spawn(8-13, hidden)
+@portals[]  = goto__debug-area-1(8-13)
 #---------------------------#
 [00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00]
 [00],[53],[51],[51],[51],[51],[51],[51],[51],[51],[51],[51],[51],[54],[00]
