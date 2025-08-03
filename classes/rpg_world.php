@@ -348,6 +348,7 @@ class rpg_world {
         // If there's a group defined called "no-encounters", loop through the cells and add them too
         if (!empty($map_data['groups']) && is_array($map_data['groups']) && isset($map_data['groups']['no-encounters'])){
             $no_encounters = $map_data['groups']['no-encounters'];
+            //error_log('-> no-encounters group was defined! | $no_encounters = '.print_r($no_encounters, true));
             if (!empty($no_encounters) && is_array($no_encounters)){
                 $no_encounters_groups = array();
                 foreach ($no_encounters AS $key => $pos){
@@ -356,9 +357,10 @@ class rpg_world {
                     if (!isset($map_data['groups'][$pos])){ continue; }
                     elseif (empty($map_data['groups'][$pos])){ continue; }
                     //error_log('-> ... no-encounters position "'.$pos.'" IS a group w/ '.count($map_data['groups'][$pos]).' items!');
-                    $no_encounters_groups += $map_data['groups'][$pos];
+                    $no_encounters_groups = array_merge($no_encounters_groups, $map_data['groups'][$pos]);
                     unset($no_encounters[$key]);
                 }
+                //error_log('-> no-$no_encounters_groups = '.print_r($no_encounters_groups, true));
                 $no_encounters = array_merge($no_encounters, $no_encounters_groups);
                 foreach ($no_encounters AS $pos){
                     //error_log('-> removing no-encounters position "'.$pos.'" from available cells');
@@ -419,6 +421,26 @@ class rpg_world {
             );
     }
 
+    // Define a function for getting the terrain type for a given position on the map, but do not limit only to available tiles
+    public static function get_map_position_terrain($position, $map_data_parsed){
+        //error_log('rpg_world::get_map_position_terrain() called for position "'.$position.'"');
+        if (empty($position) || !is_string($position) || !isset($map_data_parsed['tiles']) || !isset($map_data_parsed['layers'])){ return 'unknown'; }
+        // Loop through the tiles and find the one that matches this position
+        $tilesIndex = $map_data_parsed['tiles']['keys'];
+        foreach ($map_data_parsed['layers'] AS $layer_key => $layer_tiles){
+            foreach ($layer_tiles AS $row_key => $row_tiles){
+                $row_tiles = str_replace(array('[', ']'), '', $row_tiles);
+                $row_tiles = strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles);
+                foreach ($row_tiles AS $col_key => $tile_key){
+                    if (!isset($tilesIndex[$tile_key])){ continue; }
+                    $pos = ($col_key + 1).'-'.($row_key + 1);
+                    if ($pos === $position){ return explode('-', $tilesIndex[$tile_key])[0]; }
+                }
+            }
+        }
+        return 'unknown';
+    }
+
     // Define a quick function for translating singular kinds to plural kinds
     // TODO:  Find the class method that already does this if exists, else create
     public static function get_xkind($kind){
@@ -438,10 +460,11 @@ class rpg_world {
 
     // Define a quick function for getting a random position on a given grid
     // TODO: Define this as an actual function instead of a variable
-    public static function get_rand_pos($available_encounter_cells){
+    public static function get_rand_pos($available_encounter_cells, &$used = array()){
         //error_log('rpg_world::get_rand_pos() called!');
-        static $used;
-        if (!$used){ $used = array(); }
+        //static $used;
+        //if (!$used){ $used = array(); }
+        if (!is_array($used)){ $used = array(); }
         $available = array_values(array_diff($available_encounter_cells, $used));
         if (empty($available)){ return false; }
         $pos = $available[mt_rand(0, count($available) - 1)];
@@ -465,14 +488,15 @@ class rpg_world {
         if (!empty($anim)){ $styles .= ' animation-duration: '.$anim.'s;'; }
         //error_log('$info = '.print_r($info, true));
         //error_log('$anim = '.print_r($anim, true));
-        $dir = 'right';
+        $dir = $dir;
+        $img_dir = $dir; //'right';
         $img = $info[$kind.'_image'];
         $size = $info[$kind.'_image_size'];
         $xsize = $size. 'x'.$size;
-        $sprite_path = 'images/'.$xkind.'/'.$img.($alt ? '_'.$alt : '').'/sprite_'.$dir.'_'.$xsize.'.png';
+        $sprite_path = 'images/'.$xkind.'/'.$img.($alt ? '_'.$alt : '').'/sprite_'.$img_dir.'_'.$xsize.'.png';
         $sprite_class = 'sprite '.$kind.($class ? ' '.$class : '');
         $sprite_styles = ($styles ? ' style="'.$styles.'"' : '');
-        $sprite_attrs = ' data-size="'.$size.'"'.($attrs ? ' '.$attrs : '');
+        $sprite_attrs = ' data-size="'.$size.'" data-dir="'.$dir.'" data-img-dir="'.$img_dir.'"'.($attrs ? ' '.$attrs : '');
         return('<span class="'.$sprite_class.'"'.$sprite_styles.$sprite_attrs.'><span class="sprite sprite_'.$xsize.'" style="background-image: url('.$sprite_path.');"></span></span>');
     }
 

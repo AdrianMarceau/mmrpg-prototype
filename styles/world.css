@@ -324,7 +324,9 @@ html, body {
     transition: transform 0.6s, opacity 0.6s, filter 0.6s;
 }
 #world #map .layer.events .sprite.zoom > .sprite,
-#world #map .layer.zoom .sprite:not(.tile).zoom > .sprite {
+#world #map .layer.zoom .sprite:not(.tile).zoom > .sprite,
+#world #map .layer.events .sprite.always-zoom > .sprite,
+#world #map .layer.zoom .sprite:not(.tile).always-zoom > .sprite {
     transform: scale(2);
 }
 #world #map .layer.events.has-zoom .sprite > .sprite {
@@ -927,7 +929,9 @@ html, body {
     image-rendering: auto;
 }
 #world #canvas .sprite.zoom,
-#world #canvas .sprite.zoom > .sprite {
+#world #canvas .sprite.zoom > .sprite,
+#world #canvas .sprite.always-zoom,
+#world #canvas .sprite.always-zoom > .sprite {
     image-rendering: pixelated;
 }
 #world #canvas .sprite.button,
@@ -948,10 +952,14 @@ html, body {
     /* filter: hue-rotate(180deg) saturate(0.5) brightness(1.5); */
     filter: none;
 }
-#world #map .layer.objects .sprite[data-dir="left"] > .sprite {
+#world #map .layer.objects .sprite[data-img-dir="right"][data-dir="left"] > .sprite,
+#world #map .layer.objects .sprite[data-img-dir="left"][data-dir="right"] > .sprite {
     transform: scale(-1, 1);
 }
-#world #map .layer.objects .sprite.zoom[data-dir="left"] > .sprite {
+#world #map .layer.objects .sprite.zoom[data-img-dir="right"][data-dir="left"] > .sprite,
+#world #map .layer.objects .sprite.zoom[data-img-dir="left"][data-dir="right"] > .sprite,
+#world #map .layer.objects .sprite.always-zoom[data-img-dir="right"][data-dir="left"] > .sprite,
+#world #map .layer.objects .sprite.always-zoom[data-img-dir="left"][data-dir="right"] > .sprite {
     transform: scale(-2, 2);
 }
 
