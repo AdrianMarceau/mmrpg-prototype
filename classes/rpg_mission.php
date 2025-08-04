@@ -71,7 +71,14 @@ class rpg_mission {
         $field_base['field_token'] = 'field';
         if (!empty($field_config)){
             if (is_string($field_config)){
-                $field_base['field_token'] = $field_config;
+                if (strstr($field_config, '/')){
+                    list($background, $foreground) = explode('/', $field_config);
+                    $field_base['field_token'] = $background;
+                    $field_base['field_background'] = $background;
+                    $field_base['field_foreground'] = $foreground;
+                } else {
+                    $field_base['field_token'] = $field_config;
+                }
             } elseif (is_array($field_config)){
                 if (isset($field_config['id'])){ $field_base['field_id'] = $field_config['id']; }
                 if (isset($field_config['token'])){ $field_base['field_token'] = $field_config['token']; }
@@ -81,6 +88,7 @@ class rpg_mission {
             }
         }
         $battle_omega['battle_field_base'] = $field_base;
+        //error_log('rpg_mission::generate_mission()::'.__LINE__.' | $field_base = '.print_r($field_base, true));
         //error_log('rpg_mission::generate_mission()::'.__LINE__.' | $battle_omega = '.print_r($battle_omega, true));
 
         $target_config = array();
