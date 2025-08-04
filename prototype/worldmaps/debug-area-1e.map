@@ -6,6 +6,9 @@
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
 @field      = oil-wells
+@terrain[]   = desert(oil-wells)
+@terrain[]   = grass(gentle-countryside)
+#---------------------------#
 @mechas     = gockroach-s(70),beetle-borg(70),antlin-g(20),bombomboy(5)
 @habitats[] = gockroach-s(desert)
 @habitats[] = beetle-borg(desert)

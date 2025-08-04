@@ -6,6 +6,8 @@
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
 @field    = waterfall-institute
+@terrain[]   = beach(oil-wells)
+#---------------------------#
 @mechas   = snapper(5),octone(5),shelln(1)
 @habitats[]  = octone(water)
 @habitats[]  = shelln(beach,water)
