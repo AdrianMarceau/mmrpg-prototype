@@ -61,6 +61,7 @@ array_unshift($allowed_player_tokens, 'player'); // always allow the "player" to
 $default_world_token = 'debug-area-1'; //'starter-80x80';
 $default_player_token = 'player';
 $default_world_position = '';
+$default_world_direction = '';
 
 //error_log('$_GET = '. print_r($_GET, true));
 //error_log('$_POST = '. print_r($_POST, true));
@@ -153,6 +154,7 @@ $this_prototype_data['this_current_chapter'] = -1; // required
 $this_prototype_data['this_current_player'] = ''; // required
 $this_prototype_data['this_current_world'] = ''; // required
 $this_prototype_data['this_current_position'] = ''; // required
+$this_prototype_data['this_current_direction'] = ''; // required
 $this_prototype_data['battle_phase'] = 1; // required
 $this_prototype_data['battle_round'] = 1; // required
 
@@ -241,9 +243,11 @@ $WORLD_PLAYER_SESSION[$last_world_token_key] = $this_prototype_data['this_curren
 
 // Collect or define the current map position we'll be spawning into
 $request_world_position = isset($_REQUEST['position']) && preg_match('/^([-0-9]+)$/i', $_REQUEST['position']) ? trim($_REQUEST['position']) : '';
+$request_world_direction = isset($_REQUEST['direction']) && preg_match('/^([-a-z0-9]+)$/i', $_REQUEST['direction']) ? trim($_REQUEST['direction']) : '';
 if (empty($request_world_position) && !empty($WORLD_PLAYER_SESSION[$last_world_position_key])){ $request_world_position = $WORLD_PLAYER_SESSION[$last_world_position_key]; }
-if (!empty($request_world_position)){ $this_prototype_data['this_current_position'] = $request_world_position; }
-else { $this_prototype_data['this_current_position'] = $default_world_position; }
+if (empty($request_world_direction) && !empty($WORLD_PLAYER_SESSION[$last_world_direction_key])){ $request_world_direction = $WORLD_PLAYER_SESSION[$last_world_direction_key]; }
+$this_prototype_data['this_current_position'] = !empty($request_world_position) ? $request_world_position : $default_world_position;
+$this_prototype_data['this_current_direction'] = !empty($request_world_direction) ? $request_world_direction : $default_world_direction;
 $WORLD_PLAYER_SESSION[$last_world_position_key] = $this_prototype_data['this_current_position'];
 
 // Load map data from the appropriate map file
@@ -611,6 +615,7 @@ $flag_skip_fadein = true;
                 $data['sprites_index'] = $map_data_parsed['sprites'];
                 $data['groups_index'] = $map_data_parsed['groups'];
                 $data['start_position'] = $this_prototype_data['this_current_position'];
+                $data['start_direction'] = $this_prototype_data['this_current_direction'];
                 $data_json = json_encode($data, JSON_NUMERIC_CHECK);
                 echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
 
@@ -817,7 +822,7 @@ $flag_skip_fadein = true;
                     <?
 
                     // Quick function for generation the team sprites for a given player
-                    $get_team_sprites = function($team_sprites, $target_position = '1-1', $team_class = 'team')
+                    $get_team_sprites = function($team_sprites, $target_position = '1-1', $team_class = 'team', $team_dir = 'down-right')
                         use ($map_tile_height, $map_tile_width, $map_spritesize_offset){
                         $sprites = array();
                         list($col, $row) = explode('-', $target_position);
@@ -828,8 +833,13 @@ $flag_skip_fadein = true;
                             $token = $sprite[1];
                             $img = isset($sprite[2]) ? $sprite[2] : $token;
                             $alt = strstr($img, '_') ? explode('_', $img, 2)[1] : '';
-                            $dir = 'right';
-                            if ($key > 0){ $top -= 2; $left -= 4; }
+                            $dir = strstr($team_dir, 'left') ? 'left' : 'right';
+                            if ($key > 0){
+                                if (strstr($team_dir, 'right')){ $left -= 4; }
+                                elseif (strstr($team_dir, 'right')){ $left += 4; }
+                                if (strstr($team_dir, 'up')){ $top += 2; }
+                                elseif (strstr($team_dir, 'down')){ $top -= 2; }
+                                }
                             $class = $team_class; //'team bounce';
                             $styles = 'top: '.$top.'px; left: '.$left.'px; ';
                             $attrs = 'data-key="'.$key.'"';
@@ -841,6 +851,7 @@ $flag_skip_fadein = true;
 
                     // Collect the current team members from the prototype data
                     $team_position = $this_prototype_data['this_current_position'];
+                    $team_direction = $this_prototype_data['this_current_direction'];
                     $team_sprites = array();
                     $team_player_token = !empty($this_prototype_data['this_player_token']) ? $this_prototype_data['this_player_token'] : 'player';
                     $team_player_robots = !empty($this_prototype_data['this_player_robots']) ? $this_prototype_data['this_player_robots'] : array();
@@ -870,10 +881,10 @@ $flag_skip_fadein = true;
                     list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
                     $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
-                    echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"><span class="sprite sprite_40x40" style="background-image: url('.$sprite.');"></span></span>'.PHP_EOL);
+                    echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" data-dir="'.$team_direction.'"><span class="sprite sprite_40x40" style="background-image: url('.$sprite.');"></span></span>'.PHP_EOL);
 
                     // Generate the markup for the team sprites if any are defined
-                    echo($get_team_sprites($team_sprites, $team_position, 'team bounce'));
+                    echo($get_team_sprites($team_sprites, $team_position, 'team bounce', $team_direction));
 
                     // Loop through the other allowed players to see if any are also on this map
                     $rival_symbols = array();

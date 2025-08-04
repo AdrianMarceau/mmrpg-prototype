@@ -166,6 +166,7 @@ class mmrpgWorldMap {
         let spritesIndex = mapData.sprites_index || false;
         //let portalsIndex = mapData.portals_index || {};
         let startPosition = mapData.start_position || false;
+        let startDirection = mapData.start_direction || false;
         if (!mapToken || !mapImage || !mapSize || !tileSize){ console.error('initWorldMap() missing required properties!', {mapToken, mapImage, mapSize, tileSize}); return false; }
         if (!tilesIndex  || !spritesIndex){ console.error('initWorldMap() missing required indexes!', {tilesIndex, spritesIndex}); return false; }
         if (!Array.isArray(mapSize) || mapSize.length < 2){ console.error('initWorldMap() mapSize must be an array of at least two values!'); return false; }
@@ -192,7 +193,8 @@ class mmrpgWorldMap {
         _config.mapTilesIndex = tilesIndex || {};
         _config.mapGroupsIndex = groupsIndex || {};
         _config.mapSpritesIndex = spritesIndex || {};
-        _config.mapStartPosition = startPosition; // default to the top-left corner
+        _config.mapStartPosition = startPosition;
+        _config.mapStartDirection = startDirection;
         _config.windowWidth = $(window).width();
         _config.windowHeight = $(window).height();
         _config.mmrpgWidth = _elements.mmrpg.outerWidth();
@@ -201,24 +203,34 @@ class mmrpgWorldMap {
         _config.worldHeight = _elements.world.outerHeight();
         _config.canvasWidth = _elements.canvas.outerWidth();
         _config.canvasHeight = _elements.canvas.outerHeight();
+        if (startPosition){ _worldCursor.position = startPosition; }
+        if (startDirection){ _worldCursor.direction = startDirection; }
         _worldPlayer.token = _config.playerToken || 'player';
         _worldPlayer.position = _worldCursor.position || '0-0';
-        _worldPlayer.direction = _worldCursor.direction || '';
+        _worldPlayer.direction = _worldCursor.direction || 'down-right';
         // Define the function to run when everything is done loading
         let onWorldLoaded = function(){
             _self.bindEventsToCanvas($canvasMap);
             _self.bindEventsToWorld($thisWorld);
             _self.calculateWalkableMapTiles();
             let startPosition = '1-1';
+            let startDirection = 'down-right';
             if (_config.mapStartPosition){ startPosition = _config.mapStartPosition; }
             else if (portalsIndex['spawn']){ startPosition = portalsIndex['spawn'].join('-'); }
+            if (_config.mapStartDirection){ startDirection = _config.mapStartDirection; }
+            let fakeOldPosition = startPosition.split('-').map(function(val){ return parseInt(val.trim()); });
+            if (startDirection.indexOf('right') !== -1){ fakeOldPosition[0] = fakeOldPosition[0] - 1; }
+            else if (startDirection.indexOf('left') !== -1){ fakeOldPosition[0] = fakeOldPosition[0] + 1; }
+            if (startDirection.indexOf('down') !== -1){ fakeOldPosition[1] = fakeOldPosition[1] - 1; }
+            else if (startDirection.indexOf('up') !== -1){ fakeOldPosition[1] = fakeOldPosition[1] + 1; }
             _config.allowWorldEvents = true;
             _self.playSoundEffect('teleport-in');
-            _self.moveToPosition(startPosition, null, true, false);
+            _self.moveToPosition(startPosition, null, true, false, fakeOldPosition);
             setTimeout(function(){
                 $thisWorld.removeClass('hidden');
                 $thisWorld.addClass('ready');
                 $canvasMap.addClass('ready');
+                _self.startIdleAnimation();
                 }, 100);
             };
         // Define the function for run when each layer is done being rendered
@@ -1143,7 +1155,7 @@ class mmrpgWorldMap {
         }
 
     // Quick function for moving cursor to a given map position
-    moveToPosition(newPosition, onComplete, forceMove, animateMove){
+    moveToPosition(newPosition, onComplete, forceMove, animateMove, thisOldPos){
         //console.log('%c' + 'mmrpgWorldMap.moveToPosition(' + newPosition + ')', 'color: magenta;');
         if (!newPosition || typeof newPosition === 'undefined'){ console.error('newPosition is undefined!'); return false; }
         else if (typeof newPosition !== 'string' || !newPosition.match(/^[0-9]+\-[0-9]+$/)){ console.error('newPosition is invalid!', newPosition); return false; }
@@ -1175,8 +1187,9 @@ class mmrpgWorldMap {
         if (!$eventsLayers || !$eventsLayers.length){ console.error('$eventsLayers do not exist!'); return false; }
         if (!$cursorSprite || !$cursorSprite.length){ console.error('$cursorSprite not found!'); return false; }
         if (!$actionDropdown || !$actionDropdown.length){ console.error('$actionDropdown not found!'); return false; }
-        let thisOldCol = _worldCursor.col;
-        let thisOldRow = _worldCursor.row;
+        if (!thisOldPos){ thisOldPos = [_worldCursor.col, _worldCursor.row]; }
+        let thisOldCol = thisOldPos[0]; //_worldCursor.col;
+        let thisOldRow = thisOldPos[1]; //_worldCursor.row;
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
         if (thisNewCol === thisOldCol && thisNewRow === thisOldRow && !forceMove){ console.error('$cursorSprite already at position!'); return false; }
@@ -1193,6 +1206,7 @@ class mmrpgWorldMap {
         $actionDropdown.removeClass('active');
         $eventsLayers.removeClass('has-zoom');
         $('.sprite.zoom', $eventsLayers).removeClass('zoom');
+        $('.sprite[data-frame]', $canvasMap).attr('data-frame', '00');
         // Move the cursor to the new position first and foremost
         let moveTimeout;
         let timeoutDuration = _mapEffects.moveTimeout;
@@ -1582,7 +1596,10 @@ class mmrpgWorldMap {
                 $eventSprite.appendTo($zoomLayer);
                 $eventSprite.attr('data-layer', eventLayer);
                 //console.log('-> moving event sprite to zoom layer', eventLayer, 'from events layer');
-                setTimeout(function(){ $eventSprite.addClass('zoom'); }, 100);
+                setTimeout(function(){
+                    $eventSprite.addClass('zoom');
+                    if (isRobot){ $innerSprite.attr('data-frame', '01'); }
+                    }, 100);
                 }
 
             // Move the action dropdown to the correct position, add the markup, and show it
@@ -1609,8 +1626,10 @@ class mmrpgWorldMap {
                 $worldCursor.removeClass('busy');
                 $eventsLayers.removeClass('has-zoom');
                 $('.sprite.zoom', $eventsLayers).removeClass('zoom');
-                $('.sprite', $zoomLayer).each(function(){
+                $('.sprite[data-frame]', $eventsLayers).attr('data-frame', '00');
+                $('.sprite.zoom', $zoomLayer).each(function(){
                     let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
+                    $('.sprite[data-frame]', $sprite).attr('data-frame', '00');
                     $sprite.appendTo($layer).removeAttr('data-layer').removeClass('zoom');
                     });
                 };
@@ -1638,6 +1657,7 @@ class mmrpgWorldMap {
                         _self.playSoundEffect('lets-go-robots');
                         let battleVars = [];
                         battleVars.push('wap=false'); // i hate this
+                        battleVars.push('flag_skip_fadein=true'); // its just faster
                         battleVars.push('this_user_id=' + _userId);
                         battleVars.push('this_player_id=' + _playerId);
                         battleVars.push('this_player_token=' + _playerToken);
