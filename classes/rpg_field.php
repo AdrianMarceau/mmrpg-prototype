@@ -81,6 +81,11 @@ class rpg_field extends rpg_object {
         $this->field_foreground_variant = isset($this_fieldinfo['field_foreground_variant']) ? $this_fieldinfo['field_foreground_variant'] : '';
         $this->field_music = isset($this_fieldinfo['field_music']) ? $this_fieldinfo['field_music'] : 'field';
 
+        // If the battle itself has any extra field multipliers, apply them to the current field
+        if (!empty($this->battle->values['extra_field_multipliers'])){
+            $this->field_multipliers = array_merge($this->field_multipliers, $this->battle->values['extra_field_multipliers']);
+        }
+
         // Define the internal field base values using the fields index array
         $this->field_base_name = isset($this_fieldinfo['field_base_name']) ? $this_fieldinfo['field_base_name'] : $this->field_name;
         $this->field_base_token = isset($this_fieldinfo['field_base_token']) ? $this_fieldinfo['field_base_token'] : $this->field_token;
