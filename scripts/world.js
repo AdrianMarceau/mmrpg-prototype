@@ -1434,6 +1434,35 @@ class mmrpgWorldMap {
             return;
             }
 
+        // Sort the events at this position so that battles are always at the top
+        $eventsAtPosition = $eventsAtPosition.sort(function(a, b){
+            let aBattle = $(a).attr('data-battle') || false;
+            let bBattle = $(b).attr('data-battle') || false;
+            if (aBattle && !bBattle){ return -1; } // a is battle, b is not
+            else if (!aBattle && bBattle){ return 1; } // a is not battle, b is
+            else { return 0; } // both are battles or neither are
+            });
+
+        // Check to see what the very first event type is
+        let $firstEvent = $eventsAtPosition[0];
+        let firstEventType;
+        if ($firstEvent.is('[data-portal]')){ firstEventType = 'portal'; }
+        else if ($firstEvent.is('[data-button]')){ firstEventType = 'button'; }
+        else if ($firstEvent.is('[data-battle]')){ firstEventType = 'battle'; }
+        else { firstEventType = 'unknown'; }
+
+        // Remove other events that don't match the first type
+        //console.log('-> before filtering, there are ' + $eventsAtPosition.length + ' ' + firstEventType + ' events near cursorPosition', cursorPosition);
+        for (let i = 1; i < $eventsAtPosition.length; i++){
+            let $eventAtPosition = $eventsAtPosition[i];
+            if ($eventAtPosition.is('[data-portal]') && firstEventType !== 'portal'){ delete $eventsAtPosition[i]; }
+            else if ($eventAtPosition.is('[data-button]') && firstEventType !== 'button'){ delete $eventsAtPosition[i]; }
+            else if ($eventAtPosition.is('[data-battle]') && firstEventType !== 'battle'){ delete $eventsAtPosition[i]; }
+            }
+        //console.log('-> after filtering, there are ' + $eventsAtPosition.length + ' ' + firstEventType + ' events near cursorPosition', cursorPosition);
+        $eventsAtPosition = Object.values($eventsAtPosition); // re-index the array to avoid issues with gaps
+        $firstEvent = $eventsAtPosition[0]; // re-assign the first event after filtering
+
         // Now that we have an event, check its data to see if we should show a dropdown
         // for either a battle, a portal, or any other compatible event-type for the tile
         var showDropdown = false;
@@ -1444,12 +1473,13 @@ class mmrpgWorldMap {
         var autoRedirect = false;
         var autoRedirectURL = '';
         var autoRedirectSound = '';
-        if ($eventsAtPosition[0].is('[data-portal]')){
+        if (firstEventType === 'portal'
+            && $firstEvent.is('[data-portal]')){
             //console.log('-> event at position is a portal, preparing dropdown');
             // If the cursor is literally on a portal, only one event sprite matters right now
-            let $eventAtPosition = $eventsAtPosition[0];
-            var dataLabel = $eventAtPosition.attr('data-label');
-            var dataPortal = $eventAtPosition.attr('data-portal');
+            let $portalEvent = $firstEvent;
+            var dataLabel = $portalEvent.attr('data-label');
+            var dataPortal = $portalEvent.attr('data-portal');
             if (dataPortal && dataPortal.indexOf('goto__') !== -1){
                 showDropdown = true;
                 if (!dataLabel){ dataLabel = 'Portal Options'; }
@@ -1484,14 +1514,15 @@ class mmrpgWorldMap {
                     }
                 }
             }
-        else if ($eventsAtPosition[0].is('[data-button]')){
+        else if (firstEventType === 'button'
+            && $firstEvent.is('[data-button]')){
             //console.log('-> event at position is a button, preparing dropdown');
             // If the cursor is literally on a button, only one event sprite matters right now
-            let $eventAtPosition = $eventsAtPosition[0];
-            var dataLabel = $eventAtPosition.attr('data-label');
-            var dataButton = $eventAtPosition.attr('data-button');
-            var dataColour = $eventAtPosition.attr('data-colour');
-            var dataState = $eventAtPosition.attr('data-state');
+            let $buttonEvent = $firstEvent;
+            var dataLabel = $buttonEvent.attr('data-label');
+            var dataButton = $buttonEvent.attr('data-button');
+            var dataColour = $buttonEvent.attr('data-colour');
+            var dataState = $buttonEvent.attr('data-state');
             if (dataButton && dataState === 'up'){
                 showDropdown = true;
                 //var buttonName = (dataColour ? (dataColour[0].toUpperCase() + dataColour.slice(1) + ' ') : '') + 'Button';
@@ -1503,21 +1534,65 @@ class mmrpgWorldMap {
                 zoomTimeoutDuration = 500; // if we show a button dropdown, we want to zoom in quickly
                 }
             }
-        else {
+        else if (firstEventType === 'battle'
+            && $firstEvent.is('[data-battle]')){
+
             // Otherwise we can/should check all the posiitons for any battles to round-up and trigger
             let dataLabels = [], dataBattles = [];
             for (var i = 0; i < $eventsAtPosition.length; i++){
-                let $eventAtPosition = $eventsAtPosition[i];
-                if ($eventAtPosition.is('[data-portal]')){ continue; } // skip portals, we already handled them above
-                let dataPosition = $eventAtPosition.attr('data-pos');
-                var dataLabel = $eventAtPosition.attr('data-label');
-                var dataBattle = $eventAtPosition.attr('data-battle');
-                //console.log('-> checking event sprite', $eventAtPosition, 'for data-battle:', dataBattle);
+                let $battleEvent = $eventsAtPosition[i];
+                let dataPosition = $battleEvent.attr('data-pos');
+                var dataLabel = $battleEvent.attr('data-label');
+                var dataBattle = $battleEvent.attr('data-battle');
+                //console.log('-> checking event sprite', $battleEvent, 'for data-battle:', dataBattle);
                 if (dataBattle){
                     dataLabels.push([dataLabel, dataPosition]);
-                    dataBattles.push(dataBattle);
+                    dataBattles.push([dataBattle, dataPosition]);
                     }
                 }
+            //console.log('check the direction the player is facing and sort the battle events accordingly');
+            //console.log('-> cursorDirection =', cursorDirection);
+            //console.log('-> cursorPosition =', cursorPosition);
+            let standingAtPosition = (cursorPosition.split('-')).map(function(num){ return parseInt(num); });
+            let lookingAtPosition = [standingAtPosition[0], standingAtPosition[1]];
+            if (cursorDirection.indexOf('right') !== -1){ lookingAtPosition[0] = lookingAtPosition[0] + 1; }
+            else if (cursorDirection.indexOf('left') !== -1){ lookingAtPosition[0] = lookingAtPosition[0] - 1; }
+            if (cursorDirection.indexOf('down') !== -1){ lookingAtPosition[1] = lookingAtPosition[1] + 1; }
+            else if (cursorDirection.indexOf('up') !== -1){ lookingAtPosition[1] = lookingAtPosition[1] - 1; }
+            //standingAtPosition = standingAtPosition.join('-');
+            //lookingAtPosition = lookingAtPosition.join('-');
+            //console.log('-> standingAtPosition =', standingAtPosition);
+            //console.log('-> lookingAtPosition =', lookingAtPosition);
+            // populate an array with the positions around the user, clockwise, but make it start at the position they're looking at
+            let tilesAroundPosition = [];
+            tilesAroundPosition.push((standingAtPosition[0] + 1) + '-' + (standingAtPosition[1] - 1)); // top-right
+            tilesAroundPosition.push((standingAtPosition[0] + 1) + '-' + standingAtPosition[1]); // right
+            tilesAroundPosition.push((standingAtPosition[0] + 1) + '-' + (standingAtPosition[1] + 1)); // bottom-right
+            tilesAroundPosition.push(standingAtPosition[0] + '-' + (standingAtPosition[1] + 1)); // bottom
+            tilesAroundPosition.push((standingAtPosition[0] - 1) + '-' + (standingAtPosition[1] + 1)); // bottom-left
+            tilesAroundPosition.push((standingAtPosition[0] - 1) + '-' + standingAtPosition[1]); // left
+            tilesAroundPosition.push((standingAtPosition[0] - 1) + '-' + (standingAtPosition[1] - 1)); // top-left
+            tilesAroundPosition.push(standingAtPosition[0] + '-' + (standingAtPosition[1] - 1)); // top
+            standingAtPosition = standingAtPosition.join('-');
+            lookingAtPosition = lookingAtPosition.join('-');
+            // rotate above so that whichever one matches lookingAtPosition is first but maintain order!!!
+            do {
+                let firstTile = tilesAroundPosition.shift();
+                if (firstTile === lookingAtPosition){ tilesAroundPosition.push(firstTile); break; }
+                else { tilesAroundPosition.push(firstTile); }
+            } while (tilesAroundPosition[0] !== lookingAtPosition);
+            //console.log('-> tilesAroundPosition =', tilesAroundPosition);
+            // now, finally, we can sort the dataBattles by their index in the tilesAroundPosition array
+            dataBattles.sort(function(a, b){
+                let aPosition = a[1], bPosition = b[1];
+                let aIndex = tilesAroundPosition.indexOf(aPosition);
+                let bIndex = tilesAroundPosition.indexOf(bPosition);
+                if (aIndex < bIndex){ return -1; } // a comes before b
+                else if (aIndex > bIndex){ return 1; } // a comes after b
+                else { return 0; } // a and b are equal
+                });
+            //console.log('-> dataBattles after sorting by position:', dataBattles.join('\n'));
+
             if (dataLabels.length && dataBattles.length){
                 showDropdown = true;
                 //console.log('-> showing dropdown with battles:', dataBattles);
@@ -1581,9 +1656,13 @@ class mmrpgWorldMap {
             let cursorPositionXY = cursorPosition.split('-');
             for (var i = 0; i < $eventsAtPosition.length; i++){
                 let $eventSprite = $eventsAtPosition[i];
+                let $innerSprite = $('.sprite', $eventSprite);
                 let eventPosition = $eventSprite.attr('data-pos');
                 //let eventPositionXY = eventPosition.split('-');
                 if ($eventSprite.hasClass('tile')){ continue; } // skip tiles
+                let isRobot = $eventSprite.hasClass('robot');
+                //console.log('-> $eventsAtPosition['+i+'] / isRobot = ', isRobot);
+                let dataSize = $eventSprite.attr('data-size') || 40;
                 let $eventLayer = $eventSprite.closest('.layer.events');
                 let eventLayer = $eventLayer.attr('data-layer');
                 $eventLayer.addClass('has-zoom');
