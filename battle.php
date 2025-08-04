@@ -66,8 +66,11 @@ if (!empty($this_battle_token)){
     // MULTI-BATTLE-TOKEN-POST-CHECK
     // If multiple battle tokens were provided, loop through them and merge-in target robots, rewards, etc.
     if ($multi_battle_tokens){
+        //error_log('has multi-battle-tokens, merging in data');
         //error_log('$multi_battle_tokens(2) = '.print_r($multi_battle_tokens, true));
         $temp_target_playerid = $this_battle_data['battle_target_player']['player_id'];
+        $combo_multiplier = count($multi_battle_tokens);
+        $exp_multiplier = $combo_multiplier;
         $new_battle_turns = 0;
         $new_battle_zenny = 0;
         $new_battle_rewards = array();
@@ -90,7 +93,7 @@ if (!empty($this_battle_token)){
             //error_log('$temp_battle_rewards = '.print_r($temp_battle_rewards, true));
             //error_log('$temp_target_robots = '.print_r($temp_target_robots, true));
             if ($temp_battle_turns){ $new_battle_turns += $temp_battle_turns; }
-            if ($temp_battle_zenny){ $new_battle_zenny += $temp_battle_zenny; }
+            if ($temp_battle_zenny){ $new_battle_zenny += ($temp_battle_zenny * $combo_multiplier); }
             if (!empty($temp_battle_rewards)){
                 //error_log('merging in $temp_battle_rewards = '.print_r($temp_battle_rewards, true));
                 foreach ($temp_battle_rewards AS $kind => $rewards){
@@ -110,9 +113,15 @@ if (!empty($this_battle_token)){
                 }
             }
         }
+        //$new_field_multipliers = !empty($this_battle_data['battle_field_base']['field_multipliers']) ? $this_battle_data['battle_field_base']['field_multipliers'] : array();
+        //$new_field_multipliers['experience'] = (!empty($new_field_multipliers['experience']) ? $new_field_multipliers['experience'] : 1) * $exp_multiplier;
         $new_target_robots = array_slice($new_target_robots, 0, MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX);
+        $this_battle_data['battle_turns'] = $new_battle_turns;
+        $this_battle_data['battle_zenny'] = $new_battle_zenny;
+        //$this_battle_data['battle_field_base']['field_multipliers'] = $new_field_multipliers;
         $this_battle_data['battle_target_player']['player_robots'] = $new_target_robots;
         $this_battle_data['values']['multi_battle_tokens'] = $multi_battle_tokens;
+        $this_battle_data['values']['extra_field_multipliers'] = array('experience' => $exp_multiplier);
         rpg_battle::update_index_info($this_battle_token, $this_battle_data);
         //error_log('new $this_battle_data = '.print_r($this_battle_data, true));
     }
@@ -136,6 +145,7 @@ $this_is_world_battle = !empty($this_battle_data['flags']['world_battle']) ? tru
 // Collect the field index if available
 $mmrpg_index_fields = rpg_field::get_index(true);
 // Collect the field index data if available
+//error_log('$this_battle_data = '.print_r($this_battle_data, true));
 if (!empty($this_field_token) && isset($mmrpg_index_fields[$this_field_token])){
     $this_field_data = rpg_field::parse_index_info($mmrpg_index_fields[$this_field_token]);
     if (empty($this_field_data['field_id'])){
@@ -157,6 +167,7 @@ else {
     $this_field_token = '';
     $this_field_data = array();
 }
+// If any extra field multipliers were defined, let's add them now
 
 // Collect this player's index data if available
 $temp_this_robot_classes = array();
