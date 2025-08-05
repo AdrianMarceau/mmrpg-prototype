@@ -887,6 +887,8 @@ class rpg_world {
         $map_tile_height = $map_config['tile_height'];
         $map_tile_width = $map_config['tile_width'];
         $map_tilesize_offset = $map_config['tilesize_offset'];
+        $this_player_token = $this_prototype_data['this_player_token'];
+        $this_is_cursor = $this_player_token === 'player' ? true : false;
         $portals_markup = array();
         $portal_symbols = array();
         $portals_index = array();
@@ -900,6 +902,7 @@ class rpg_world {
                 $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                 $hidden = in_array('hidden', $portal_data) ? true : false;
                 $locked = in_array('locked', $portal_data) ? true : false;
+                if ($this_is_cursor && !$locked && $portal_name !== 'spawn'){ $locked = true; }
                 if ($hidden){ continue; }
                 $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucfirst($portal_name));
                 $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
