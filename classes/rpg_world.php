@@ -785,6 +785,16 @@ class rpg_world {
         return($sprite_markup);
     }
 
+    // Define a function for getting the cursor sprite specifically (which has it's own rules)
+    public static function get_cursor_sprite($dir = '', $class = '', $styles = '', $attrs = ''){
+        //error_log('rpg_world::get_cursor_sprite() called for dir "'.$dir.'"');
+        $cursor_sprite = self::get_sprite('robot', 'pointan', '', $dir, $class, $styles, $attrs);
+        //$cursor_sprite = str_replace('images/robots/pointan/sprite_', 'images/assets/cursor_', $cursor_sprite);
+        $cursor_sprite = str_replace('pointan', 'cursor', $cursor_sprite);
+        $cursor_sprite = preg_replace('/background-image: url\(([^\(\)]+)\);/i', 'background-image: url(images/assets/cursor_40x40.png);', $cursor_sprite);
+        return $cursor_sprite;
+    }
+
     // Define a function for getting the battle history for a given player token
     public static function get_battle_history($player_token = '', $record_token = ''){
         //error_log('rpg_world::get_battle_history() called for player "'.$player_token.'" and record "'.$record_token.'"');
@@ -804,9 +814,10 @@ class rpg_world {
         $get_label_span = function($name, $kind){ return ('<span class="label">'.$name.' ('.ucfirst($kind).')</span>'); };
         $cursor_token = 'player';
         $cursor_active = $this_prototype_data['this_player_token'] === $cursor_token ? true : false;
-        $cursor_sprite = self::get_sprite('robot', 'pointan', '', 'right', 'cursor');
+        //$cursor_sprite = self::get_sprite('robot', 'pointan', '', 'right', 'cursor');
         //$cursor_sprite = str_replace('images/robots/pointan/sprite_', 'images/assets/cursor_', $cursor_sprite);
-        $cursor_sprite = preg_replace('/background-image: url\(([^\(\)]+)\);/i', 'background-image: url(images/assets/cursor_40x40.png);', $cursor_sprite);
+        //$cursor_sprite = preg_replace('/background-image: url\(([^\(\)]+)\);/i', 'background-image: url(images/assets/cursor_40x40.png);', $cursor_sprite);
+        $cursor_sprite = self::get_cursor_sprite('right', 'cursor');
         $cursor_label = $get_label_span('Prε', 'cursor');
         $cursor_types = ' type explode';
         //$return_markup .= ('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
