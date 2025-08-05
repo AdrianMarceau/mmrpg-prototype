@@ -1,8 +1,5 @@
 <?
 
-// Require the global config file
-require('../top.php');
-
 // Pre-collect request arguments provided in a different syntax
 $request_args = !empty($_GET['args']) ? $_GET['args'] : array();
 //error_log('$request_args (before) = '.print_r($request_args, true));
@@ -50,6 +47,7 @@ if (is_numeric($request_editor)){ $request_editor = (int)($request_editor); }
 if (empty($request_dir) && strstr($request_file, 'left_')){ $request_dir = 'left'; }
 elseif (empty($request_dir) && strstr($request_file, 'right_')){ $request_dir = 'right'; }
 if (!$request_crop){ $request_frame = 'all'; }
+$cached_file_hash = md5($request_kind.$request_type.$request_sub_type.$request_token.$request_editor.$request_file.$request_size.$request_alt.$request_crop.$request_frame.$request_dir);
 //error_log('// ----- new get-images.php request @'.date('Ymd-His').' -----/');
 //error_log('$request_kind = '.print_r($request_kind, true));
 //error_log('$request_type = '.print_r($request_type, true));
@@ -63,6 +61,7 @@ if (!$request_crop){ $request_frame = 'all'; }
 //error_log('$request_frame = '.print_r($request_frame, true));
 //error_log('$request_dir = '.print_r($request_dir, true));
 //error_log('$force_refresh = '.print_r($force_refresh, true));
+//exit();
 
 // If required fields were empty or not provided, immediately error out with a 404 header
 if (empty($request_kind) || empty($request_type) || empty($request_file)){
@@ -83,8 +82,14 @@ if ($request_file_ext === 'json'){ $request_format = 'index'; }
 else { $request_format = 'image'; }
 //error_log('$request_format = '.print_r($request_format, true));
 
+// Manually define the root dir based on this script's location
+// (because we don't want to load the top file until we have to)
+$root_dir = rtrim(dirname(dirname(__FILE__)), '/').'/';
+
 // Given what we know above, construct the filename for the cached file
-$composite_base_path = MMRPG_CONFIG_CACHE_PATH.'sprites/';
+$root_cache_dir = $root_dir.'.cache/';
+$composite_base_path = $root_cache_dir.'sprites/';
+//$composite_base_path = MMRPG_CONFIG_CACHE_PATH.'sprites/';
 if (!file_exists($composite_base_path)){ mkdir($composite_base_path, 0777, true); }
 $composite_base_token = str_replace('_', '-', $request_file_name);
 if (!empty($request_size)){ $composite_base_token .= '_s-'.$request_size; }
@@ -99,10 +104,13 @@ $composite_image_index_path = $request_type.'_'.$composite_base_token.'.json';
 //error_log('$composite_image_index_path = '.print_r($composite_image_index_path, true));
 
 // Define the sprite object path given the request type
-$sprite_object_dir = MMRPG_CONFIG_CONTENT_PATH.$request_type.'/';
+$root_content_dir = $root_dir.'content/';
+$sprite_object_dir = $root_content_dir.$request_type.'/';
+//$sprite_object_dir = MMRPG_CONFIG_CONTENT_PATH.$request_type.'/';
 
 // Collect the global cache time and break it down to an exact time
-list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
+//list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
+list($new_cache_date, $new_cache_time) = explode('-', date('Ymd-Hi', strtotime('-6 hours')));
 $yyyy = substr($new_cache_date, 0, 4); $mm = substr($new_cache_date, 4, 2); $dd = substr($new_cache_date, 6, 2);
 $hh = substr($new_cache_time, 0, 2); $ii = substr($new_cache_time, 2, 2);
 $mmrpg_config_cache_time = mktime($hh, $ii, 0, $mm, $dd, $yyyy);
@@ -151,17 +159,25 @@ $composite_index = array();
 $object_xname = $request_type;
 $object_name = rtrim($object_xname, 's');
 $object_frame_index = array();
-if ($request_type === 'abilities'){ $object_name = 'ability'; }
-if ($request_type === 'players'){ $object_frame_index = MMRPG_SETTINGS_PLAYER_FRAMEINDEX; }
-elseif ($request_type === 'robots'){ $object_frame_index = MMRPG_SETTINGS_ROBOT_FRAMEINDEX; }
-elseif ($request_type === 'abilities'){ $object_frame_index = MMRPG_SETTINGS_ABILITY_FRAMEINDEX; }
-elseif ($request_type === 'items'){ $object_frame_index = MMRPG_SETTINGS_ITEM_FRAMEINDEX; }
-elseif ($request_type === 'skills'){ $object_frame_index = MMRPG_SETTINGS_SKILL_FRAMEINDEX; }
-elseif ($request_type === 'fields'){ $object_frame_index = 'base'; }
-$object_frame_index = strstr($object_frame_index, '/') ? explode('/', $object_frame_index) : array($object_frame_index);
 
 // If we must regenerate everything, we should do it now
 if ($must_regenerate){
+    //error_log('Must regenerate the composite index and/or image now for '.$request_type.' ('.$request_file.')');
+
+    // Require the global config file
+    define('MMRPG_EXCLUDE_GAME_LOGIC', true);
+    define('MMRPG_INDEX_STYLES', true);
+    require('../top.php');
+
+    // Populate the object details index based on the request type
+    if ($request_type === 'abilities'){ $object_name = 'ability'; }
+    if ($request_type === 'players'){ $object_frame_index = MMRPG_SETTINGS_PLAYER_FRAMEINDEX; }
+    elseif ($request_type === 'robots'){ $object_frame_index = MMRPG_SETTINGS_ROBOT_FRAMEINDEX; }
+    elseif ($request_type === 'abilities'){ $object_frame_index = MMRPG_SETTINGS_ABILITY_FRAMEINDEX; }
+    elseif ($request_type === 'items'){ $object_frame_index = MMRPG_SETTINGS_ITEM_FRAMEINDEX; }
+    elseif ($request_type === 'skills'){ $object_frame_index = MMRPG_SETTINGS_SKILL_FRAMEINDEX; }
+    elseif ($request_type === 'fields'){ $object_frame_index = 'base'; }
+    $object_frame_index = strstr($object_frame_index, '/') ? explode('/', $object_frame_index) : array($object_frame_index);
 
     // First, pull in the index of all objects given the type requested
     if ($request_type === 'players'){
@@ -694,6 +710,7 @@ if ($must_regenerate && !empty($composite_index)){
 // If the requested file already exists, we can just return it verbatim
 if ($request_format === 'image' && file_exists($composite_base_path.$composite_image_binary_path)
     || $request_format === 'index' && file_exists($composite_base_path.$composite_image_index_path)){
+    //error_log('Composite '.($request_format === 'index' ? 'Index' : 'Image').' File Already Exists, Setting Cache Headers');
 
     // Define and set the cache headers for this file
     $cache_time = 24 * 60 * 60; // hours * minutes * seconds
@@ -704,9 +721,9 @@ if ($request_format === 'image' && file_exists($composite_base_path.$composite_i
 
 }
 
-
 // If the requested file already exists, we can just return it verbatim
 if ($request_format === 'image' && file_exists($composite_base_path.$composite_image_binary_path)){
+    //error_log('Composite Image File Already Exists, Returning Existing File');
 
     // Gather the composite image properties, update the headers, return the file
     $full_path = $composite_base_path.$composite_image_binary_path;
@@ -721,6 +738,7 @@ if ($request_format === 'image' && file_exists($composite_base_path.$composite_i
 
 
 } elseif ($request_format === 'index' && file_exists($composite_base_path.$composite_image_index_path)){
+    //error_log('Composite Image Index Already Exists, Returning Existing File');
 
     // Pull the file's content into memory, update the headers, return the file
     $full_path = $composite_base_path.$composite_image_index_path;
