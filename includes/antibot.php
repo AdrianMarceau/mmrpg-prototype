@@ -8,6 +8,10 @@
   * --------------------------------
   */
 
+// Unneccessary if this script is being requested by another same-domain script
+$http_referer = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+if (!empty($http_referer) && strpos($http_referer, MMRPG_CONFIG_ROOTURL) === 0){ return; }
+
 // DEBUG DEBUG DEBUG
 //function antibot_debug($str){ echo('<pre>'.$str.'</pre>'.PHP_EOL); }
 function antibot_debug($str){ error_log($str); }
@@ -91,6 +95,7 @@ if ($request_is_blocked){
     echo('403 Forbidden'.PHP_EOL);
     echo('Access to this page has been blocked due to suspicious activity.'.PHP_EOL);
     echo('Please return to the home page and try your request again.'.PHP_EOL);
+    echo('$_SERVER = '.print_r($_SERVER, true).PHP_EOL);
     die();
 }
 
