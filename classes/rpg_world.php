@@ -474,7 +474,7 @@ class rpg_world {
 
     // Define a reusable method for the above that takes args and generates markup to return as a string
     // TODO:  Define this as an actual function instead of a variable
-    public static function get_sprite($kind, $token, $alt = '', $dir = 'right', $class = '', $styles = '', $attrs = ''){
+    public static function get_sprite($kind, $token, $alt = '', $dir = 'left', $class = '', $styles = '', $attrs = ''){
         //error_log('rpg_world::get_sprite() called for "'.$kind.'" with token "'.$token.'"');
         $mmrpg_indexes = self::$mmrpg_indexes;
         $xkind = self::get_xkind($kind);
@@ -483,9 +483,15 @@ class rpg_world {
         elseif (empty($mmrpg_indexes[$xkind][$token])){ error_log('error: $mmrpg_indexes['.$xkind.']['.$token.'] does not exist!'); return false; }
         $info = $mmrpg_indexes[$xkind][$token];
         $anim = 0;
+        $anim_styles1 = '';
+        $anim_styles2 = '';
+        $anim_attrs = '';
         if ($kind === 'player'){ $anim = rpg_player::get_css_animation_duration($info); }
         elseif ($kind === 'robot'){ $anim = rpg_robot::get_css_animation_duration($info); }
-        if (!empty($anim)){ $styles .= ' animation-duration: '.$anim.'s;'; }
+        if (!empty($anim)){
+            $anim_styles1 .= ' --sprite-speed: '.$anim.';';
+            $anim_styles2 .= ' animation-delay: -'.(mt_rand(1, 100) / 100).'s;';
+            }
         //error_log('$info = '.print_r($info, true));
         //error_log('$anim = '.print_r($anim, true));
         $dir = $dir;
@@ -493,11 +499,22 @@ class rpg_world {
         $img = $info[$kind.'_image'];
         $size = $info[$kind.'_image_size'];
         $xsize = $size. 'x'.$size;
-        $sprite_path = 'images/'.$xkind.'/'.$img.($alt ? '_'.$alt : '').'/sprite_'.$img_dir.'_'.$xsize.'.png';
+        $styles .= $anim_styles1.$anim_styles2;
+        $attrs .= $anim_attrs;
+        // old format: images/robots/frosty-throwman/sprite_right_40x40.png
+        //$sprite_path = 'images/'.$xkind.'/'.$img.($alt ? '_'.$alt : '').'/sprite_'.$img_dir.'_'.$xsize.'.png';
+        // new format: images/robots/all/token:frosty-throwman+crop:false+dir:both/sprite_left_40x40.png
+        $sprite_path = 'images/'.$xkind.'/all/token:'.$img.($alt ? '+alt:'.$alt : '').'+crop:false+dir:both/sprite_left_'.$xsize.'.png';
         $sprite_class = 'sprite '.$kind.($class ? ' '.$class : '');
         $sprite_styles = ($styles ? ' style="'.$styles.'"' : '');
-        $sprite_attrs = ' data-size="'.$size.'" data-dir="'.$dir.'" data-img-dir="'.$img_dir.'"'.($attrs ? ' '.$attrs : '');
-        return('<span class="'.$sprite_class.'"'.$sprite_styles.$sprite_attrs.'><span class="sprite sprite_'.$xsize.'" style="background-image: url('.$sprite_path.');"></span></span>');
+        $sprite_attrs = ' data-token="'.$img.'" data-size="'.$size.'" data-dir="'.$dir.'" data-frame="00" '.($attrs ? ' '.$attrs : '');
+        $sprite_markup = '';
+        $sprite_markup .= '<span class="'.$sprite_class.'"'.$sprite_attrs.$sprite_styles.'>';
+            $sprite_markup .= '<span class="wrap">';
+                $sprite_markup .= '<span class="sprite" style="background-image: url('.$sprite_path.');"></span>';
+            $sprite_markup .= '</span>';
+        $sprite_markup .= '</span>';
+        return($sprite_markup);
     }
 
     // Define a function for getting the battle history for a given player token
@@ -520,7 +537,8 @@ class rpg_world {
         $cursor_token = 'player';
         $cursor_active = $this_prototype_data['this_player_token'] === $cursor_token ? true : false;
         $cursor_sprite = self::get_sprite('robot', 'pointan', '', 'right', 'cursor');
-        $cursor_sprite = str_replace('images/robots/pointan/sprite_', 'images/assets/cursor_', $cursor_sprite);
+        //$cursor_sprite = str_replace('images/robots/pointan/sprite_', 'images/assets/cursor_', $cursor_sprite);
+        $cursor_sprite = preg_replace('/background-image: url\(([^\(\)]+)\);/i', 'background-image: url(images/assets/cursor_40x40.png);', $cursor_sprite);
         $cursor_label = $get_label_span('Prε', 'cursor');
         $return_markup .= ('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         $mmrpg_index_players = self::get_indexes('players');

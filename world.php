@@ -595,7 +595,13 @@ $flag_skip_fadein = true;
             $map_spritesize_default = MMRPG_WORLD_DEFAULT_SPRITESITE;
             $map_spritesize_offset = array(0, 0);
             if ($map_tile_height > $map_spritesize_default){ $map_spritesize_offset[0] = floor(($map_tile_height - $map_spritesize_default) / 2); }
+            elseif ($map_tile_height < $map_spritesize_default){ $map_spritesize_offset[0] = floor(($map_spritesize_default - $map_tile_height) / 2); }
             if ($map_tile_width > $map_spritesize_default){ $map_spritesize_offset[1] = floor(($map_tile_width - $map_spritesize_default) / 2); }
+            elseif ($map_tile_width < $map_spritesize_default){ $map_spritesize_offset[1] = floor(($map_spritesize_default - $map_tile_width) / 2); }
+            //error_log('$map_spritesize_default = '.print_r($map_spritesize_default, true));
+            //error_log('$map_tile_height = '.print_r($map_tile_height, true));
+            //error_log('$map_tile_width = '.print_r($map_tile_width, true));
+            //error_log('$map_spritesize_offset = '.print_r($map_spritesize_offset, true));
             $map_size_styles = 'width: '.$map_pixel_width.'px; height: '.$map_pixel_height.'px; ';
             $map_offset_styles = 'top: 0px; left: 0px; ';
             $map_base_styles = trim($map_size_styles.$map_offset_styles);
@@ -777,32 +783,33 @@ $flag_skip_fadein = true;
                         //$xkind = rpg_world::get_xkind($kind);
                         $token = $encounter[1];
                         $alt = $encounter[2];
-                        $position = $encounter[3];
+                        $pos = $encounter[3];
                         $battle = $encounter[4];
                         $name = $encounter[5];
                         if (!rpg_battle::has_index_info($battle)){ continue; }
-                        list($col, $row) = explode('-', $position);
+                        list($col, $row) = explode('-', $pos);
                         $maxcols = $map_col_size;
                         $maxrows = $map_row_size;
                         $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
                         $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
                         $zindex = ($maxrows + 1) - $row;
                         $dir = ($col > ($map_col_size / 2)) ? 'left' : 'right';
+                        if (mt_rand(1, 2) === 1){ $dir = $dir !== 'left' ? 'left' : 'right'; }
                         $class = 'battle vs-'.$subkind.' bounce';
                         if ($subkind === 'boss'){ $class .= ' always-zoom'; }
                         $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$zindex.';';
-                        $attrs = 'data-battle="'.$battle.'" data-pos="'.$position.'" data-col="'.$col.'" data-row="'.$row.'"';
+                        $attrs = 'data-battle="'.$battle.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                         $attrs .= 'data-label="'.$name.'"';
                         $markup = rpg_world::get_sprite($kind, $token, $alt, $dir, $class, $style, $attrs);
                         echo($markup);
-                        $battle_symbols[$position] = $battle;
+                        $battle_symbols[$pos] = $battle;
                         $battles_index[$battle] = array(
                             'kind' => $kind,
                             'token' => $token,
                             'alt' => $alt,
                             'col' => $col,
                             'row' => $row,
-                            'pos' => $position,
+                            'pos' => $pos,
                             );
                         }
                     $battle_symbols_json = json_encode($battle_symbols, JSON_NUMERIC_CHECK);
@@ -881,7 +888,7 @@ $flag_skip_fadein = true;
                     list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
                     $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
-                    echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" data-dir="'.$team_direction.'"><span class="sprite sprite_40x40" style="background-image: url('.$sprite.');"></span></span>'.PHP_EOL);
+                    echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" data-dir="'.$team_direction.'"><span class="wrap"><span class="sprite" style="background-image: url('.$sprite.');"></span></span></span>'.PHP_EOL);
 
                     // Generate the markup for the team sprites if any are defined
                     echo($get_team_sprites($team_sprites, $team_position, 'team bounce', $team_direction));

@@ -1140,14 +1140,14 @@ class mmrpgWorldMap {
                 //console.log('%c' + 'Player switcher hovered!', 'color: cyan;');
                 e.preventDefault();
                 let $option = $(this);
-                $('.sprite.player > .sprite', $option).addClass('sprite_40x40_taunt');
+                $('.sprite.player > .sprite', $option).attr('data-frame', '01'); // taunt
                 _self.playSoundEffect('icon-hover');
                 });
             $('.option[data-player]', $playerSwitcher).bind('mouseleave', function(e){
                 //console.log('%c' + 'Player switcher mouseleave!', 'color: cyan;');
                 e.preventDefault();
                 let $option = $(this);
-                $('.sprite.player > .sprite', $option).removeClass('sprite_40x40_taunt');
+                $('.sprite.player > .sprite', $option).attr('data-frame', '00'); // base
                 });
             }
         // Return true on success
@@ -1262,12 +1262,9 @@ class mmrpgWorldMap {
                 if (thisHorDir === 'left'){ teamOffsetX += 20; }
                 else if (thisHorDir === 'right'){ teamOffsetX -= 20; }
                 $thisSprite.attr('data-dir', thisHorDir);
-                if ($thisSprite.is('.robot')){ $innerSprite.addClass('sprite_'+imgSizeX+'_07'); }
-                else if ($thisSprite.is('.player')){ $innerSprite.addClass('sprite_'+imgSizeX+'_09'); }
-                let onTeamMoveComplete = function(){
-                    if ($thisSprite.is('.robot')){ $innerSprite.removeClass('sprite_'+imgSizeX+'_07'); }
-                    else if ($thisSprite.is('.player')){ $innerSprite.removeClass('sprite_'+imgSizeX+'_09'); }
-                    };
+                let newFrame = $thisSprite.is('.player') ? '09' : $thisSprite.is('.robot') ? '07' : '00'; // run for players, slide for robots
+                $thisSprite.attr('data-frame', newFrame);
+                let onTeamMoveComplete = function(){ $thisSprite.attr('data-frame', '00'); };
                 if (animateMove){
                     $thisSprite.animate({
                         top: teamOffsetY + 'px',
@@ -1672,8 +1669,8 @@ class mmrpgWorldMap {
                 else if (relativePosition[0] > 0){ $eventSprite.attr('data-dir', 'left'); }
                 else if (cursorDirection.indexOf('right') !== -1){ $eventSprite.attr('data-dir', 'left'); }
                 else if (cursorDirection.indexOf('left') !== -1){ $eventSprite.attr('data-dir', 'right'); }
-                $eventSprite.appendTo($zoomLayer);
-                $eventSprite.attr('data-layer', eventLayer);
+                //$eventSprite.appendTo($zoomLayer);
+                //$eventSprite.attr('data-layer', eventLayer);
                 //console.log('-> moving event sprite to zoom layer', eventLayer, 'from events layer');
                 setTimeout(function(){
                     $eventSprite.addClass('zoom');
