@@ -424,6 +424,16 @@ $flag_skip_fadein = true;
             <?
 
             // Generate overall the map styles and markup
+            $map_config = $map_data_parsed['config'];
+            $map_tilesize_default = $map_config['tilesize_default'];
+            $map_tilesize_offset = $map_config['tilesize_offset'];
+            $map_spritesize_default = $map_config['spritesize_default'];
+            $map_spritesize_offset = $map_config['spritesize_offset'];
+            $map_size_styles = $map_config['size_styles'];
+            $map_offset_styles = $map_config['offset_styles'];
+            $map_base_styles = $map_config['base_styles'];
+            $map_base_attrs = $map_config['base_attrs'];
+            /*
             $map_tilesize_default = MMRPG_WORLD_DEFAULT_TILESIZE;
             $map_tilesize_offset = array(0, 0);
             if ($map_tile_height > $map_tilesize_default){ $map_tilesize_offset[0] = floor(($map_tile_height - $map_tilesize_default) / 2); }
@@ -443,6 +453,8 @@ $flag_skip_fadein = true;
             $map_base_styles = trim($map_size_styles.$map_offset_styles);
             $map_base_attrs = 'data-cols="'.$map_col_size.'" data-rows="'.$map_row_size.'"';
             $map_base_attrs .= ' data-size="'.$map_col_size.' x '.$map_row_size.' x '. $map_tile_width.' x '.$map_tile_height.'"';
+            */
+
             ?>
             <div id="map" data-token="<?= $map_token ?>" style="<?= $map_base_styles ?>" <?= $map_base_attrs ?>>
                 <?

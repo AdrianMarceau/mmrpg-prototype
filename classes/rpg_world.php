@@ -191,6 +191,54 @@ class rpg_world {
         $map_data_parsed['layers'] = $map_data_layers;
         if (!empty($map_data_vars)){ $map_data_parsed['vars'] = $map_data_vars; }
         //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
+        // Calculate basic config values (dimensions, etc.) this map for easier sizing and stuff
+        $map_base_size = $map_data_parsed['size'];
+        if (count($map_base_size) === 4){ list($map_col_size, $map_row_size, $map_tile_width, $map_tile_height) = $map_base_size; }
+        elseif (count($map_base_size) === 3){ list($map_col_size, $map_row_size, $map_tile_width) = $map_base_size; }
+        elseif (count($map_base_size) === 2){ list($map_col_size, $map_tile_width) = $map_base_size; }
+        elseif (count($map_base_size) === 1){ list($map_col_size) = $map_base_size; }
+        if (!isset($map_col_size)){ $map_col_size = MMRPG_WORLD_DEFAULT_MAPSIZE; }
+        if (!isset($map_row_size)){ $map_row_size = $map_col_size; }
+        if (!isset($map_tile_width)){ $map_tile_width = MMRPG_WORLD_DEFAULT_TILESIZE; }
+        if (!isset($map_tile_height)){ $map_tile_height = $map_tile_width; }
+        $map_pixel_width = $map_col_size * $map_tile_width;
+        $map_pixel_height = $map_row_size * $map_tile_height;
+        $map_tilesize_default = MMRPG_WORLD_DEFAULT_TILESIZE;
+        $map_tilesize_offset = array(0, 0);
+        if ($map_tile_height > $map_tilesize_default){ $map_tilesize_offset[0] = floor(($map_tile_height - $map_tilesize_default) / 2); }
+        if ($map_tile_width > $map_tilesize_default){ $map_tilesize_offset[1] = floor(($map_tile_width - $map_tilesize_default) / 2); }
+        $map_spritesize_default = MMRPG_WORLD_DEFAULT_SPRITESITE;
+        $map_spritesize_offset = array(0, 0);
+        if ($map_tile_height > $map_spritesize_default){ $map_spritesize_offset[0] = floor(($map_tile_height - $map_spritesize_default) / 2); }
+        elseif ($map_tile_height < $map_spritesize_default){ $map_spritesize_offset[0] = floor(($map_spritesize_default - $map_tile_height) / 2); }
+        if ($map_tile_width > $map_spritesize_default){ $map_spritesize_offset[1] = floor(($map_tile_width - $map_spritesize_default) / 2); }
+        elseif ($map_tile_width < $map_spritesize_default){ $map_spritesize_offset[1] = floor(($map_spritesize_default - $map_tile_width) / 2); }
+        //error_log('$map_spritesize_default = '.print_r($map_spritesize_default, true));
+        //error_log('$map_tile_height = '.print_r($map_tile_height, true));
+        //error_log('$map_tile_width = '.print_r($map_tile_width, true));
+        //error_log('$map_spritesize_offset = '.print_r($map_spritesize_offset, true));
+        $map_size_styles = 'width: '.$map_pixel_width.'px; height: '.$map_pixel_height.'px; ';
+        $map_offset_styles = 'top: 0px; left: 0px; ';
+        $map_base_styles = trim($map_size_styles.$map_offset_styles);
+        $map_base_attrs = 'data-cols="'.$map_col_size.'" data-rows="'.$map_row_size.'"';
+        $map_base_attrs .= ' data-size="'.$map_col_size.' x '.$map_row_size.' x '. $map_tile_width.' x '.$map_tile_height.'"';
+        $map_config = array();
+        $map_config['base_size'] = $map_base_size;
+        $map_config['col_size'] = $map_col_size;
+        $map_config['row_size'] = $map_row_size;
+        $map_config['tile_width'] = $map_tile_width;
+        $map_config['tile_height'] = $map_tile_height;
+        $map_config['pixel_width'] = $map_pixel_width;
+        $map_config['pixel_height'] = $map_pixel_height;
+        $map_config['tilesize_default'] = $map_tilesize_default;
+        $map_config['tilesize_offset'] = $map_tilesize_offset;
+        $map_config['spritesize_default'] = $map_spritesize_default;
+        $map_config['spritesize_offset'] = $map_spritesize_offset;
+        $map_config['size_styles'] = $map_size_styles;
+        $map_config['offset_styles'] = $map_offset_styles;
+        $map_config['base_styles'] = $map_base_styles;
+        $map_config['base_attrs'] = $map_base_attrs;
+        $map_data_parsed['config'] = $map_config;
         // If the map has a sprite sheet token defined, rather than just an image, load it and merge the data
         $map_sprite_sheet = !empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : '';
         //error_log('$map_sprite_sheet = '.print_r($map_sprite_sheet, true));
