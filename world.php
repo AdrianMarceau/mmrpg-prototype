@@ -452,21 +452,12 @@ $flag_skip_fadein = true;
                 $data_json = json_encode($data, JSON_NUMERIC_CHECK);
                 echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
 
-                /*
-                rpg_world::get_background_layer_markup();
-                rpg_world::get_terrain_layer_markup();
-                rpg_world::get_portals_layer_markup();
-                rpg_world::get_buttons_layer_markup();
-                rpg_world::get_battles_layer_markup();
-                rpg_world::get_team_layer_markup();
-                */
-
-                // BACKGROUND LAYER
+                // BACKGROUND IMAGE
                 $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                 $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
-                $background_layer_sprites = rpg_world::get_background_layer_markup($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-0 background" data-layer="background"'.$map_layer_styles.$map_layer_attrs.'>');
-                    echo($background_layer_sprites);
+                $background_layer_markup = rpg_world::get_background_layer_markup($this_prototype_data, $map_data_parsed);
+                echo('<div class="layer layer-0 background" data-layer="background" '.$map_layer_styles.$map_layer_attrs.'>');
+                    echo($background_layer_markup);
                 echo('</div>'.PHP_EOL);
 
                 // TERRAIN TILES
@@ -474,56 +465,18 @@ $flag_skip_fadein = true;
                     $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                     $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
                     $terrain_layer_markup = rpg_world::get_terrain_layer_markup($this_prototype_data, $map_data_parsed, $map_layer_data);
-                    echo('<div class="layer layer-1 tiles terrain has-canvas" data-layer="terrain"'.$map_layer_styles.$map_layer_attrs.'>');
+                    echo('<div class="layer layer-1 tiles terrain has-canvas" data-layer="terrain" '.$map_layer_styles.$map_layer_attrs.'>');
                         echo($terrain_layer_markup);
                     echo('</div>'.PHP_EOL);
                 }
 
-                // EVENT TILES (PORTALS)
-                $map_layer_styles = $map_base_styles;
-                $map_layer_attrs = $map_base_attrs;
-                ?>
-                <div class="layer layer-2 tiles events portals" data-layer="portals" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
-                    <?
-
-                    // If there are any portals defined, make sure we look through and display them
-                    $portal_symbols = array();
-                    $portals_index = array();
-                    if (!empty($map_data_parsed['portals'])){
-                        $portal_sprites = $map_data_parsed['portals'];
-                        foreach ($portal_sprites AS $portal_name => $portal_data){
-                            if (empty($portal_data) || !is_array($portal_data)){ continue; }
-                            $pos = $portal_data[0];
-                            list($col, $row) = explode('-', $pos);
-                            $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
-                            $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
-                            $hidden = in_array('hidden', $portal_data) ? true : false;
-                            $locked = in_array('locked', $portal_data) ? true : false;
-                            if ($hidden){ continue; }
-                            $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucfirst($portal_name));
-                            $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
-                            $classes = 'sprite tile portal'.($portal_name !== 'spawn' && !$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
-                            $style = 'top: '.$top.'px; left: '.$left.'px;';
-                            echo('<span class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>'.PHP_EOL);
-                            $portal_symbols[$pos] = $portal_name;
-                            $portals_index[$portal_name] = array(
-                                'pos' => $pos,
-                                'col' => $col,
-                                'row' => $row,
-                                'label' => $label,
-                                'hidden' => $hidden,
-                                'locked' => $locked,
-                                );
-                        }
-                    }
-                    $portal_symbols_json = json_encode($portal_symbols, JSON_NUMERIC_CHECK);
-                    $portals_index_json = json_encode($portals_index, JSON_NUMERIC_CHECK);
-                    echo('<script data-json="portalSymbols" type="application/json">'.$portal_symbols_json.'</script>'.PHP_EOL);
-                    echo('<script data-json="portalsIndex" type="application/json">'.$portals_index_json.'</script>'.PHP_EOL);
-
-                    ?>
-                </div>
-                <?
+                // PORTAL SPRITES
+                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
+                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
+                $portals_layer_markup = rpg_world::get_portals_layer_markup($this_prototype_data, $map_data_parsed);
+                echo('<div class="layer layer-2 tiles events portals" data-layer="portals" '.$map_layer_styles.$map_layer_attrs.'>');
+                    echo($portals_layer_markup);
+                echo('</div>'.PHP_EOL);
 
                 // EVENT TILES (BUTTONS)
                 $map_layer_styles = $map_base_styles;

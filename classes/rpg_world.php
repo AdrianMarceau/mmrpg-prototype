@@ -847,11 +847,48 @@ class rpg_world {
     }
 
     // Define a function for getting the PORTALS LAYER sprite markup for the world map
-    public static function get_portals_layer_markup(){
-        error_log('rpg_world::get_portals_layer_sprites() called!');
-        $markup = '';
-        // ...
-        return $markup;
+    public static function get_portals_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_portals_layer_sprites() called!');
+        // PORTALS LAYER
+        $portals_markup = array();
+        $map_config = $map_data_parsed['config'];
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_tilesize_offset = $map_config['tilesize_offset'];
+        $portal_symbols = array();
+        $portals_index = array();
+        if (!empty($map_data_parsed['portals'])){
+            $portal_sprites = $map_data_parsed['portals'];
+            foreach ($portal_sprites AS $portal_name => $portal_data){
+                if (empty($portal_data) || !is_array($portal_data)){ continue; }
+                $pos = $portal_data[0];
+                list($col, $row) = explode('-', $pos);
+                $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                $hidden = in_array('hidden', $portal_data) ? true : false;
+                $locked = in_array('locked', $portal_data) ? true : false;
+                if ($hidden){ continue; }
+                $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucfirst($portal_name));
+                $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                $classes = 'sprite tile portal'.($portal_name !== 'spawn' && !$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $style = 'top: '.$top.'px; left: '.$left.'px;';
+                $portals_markup[] = '<span data-layer="portals" class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>';
+                $portal_symbols[$pos] = $portal_name;
+                $portals_index[$portal_name] = array(
+                    'pos' => $pos,
+                    'col' => $col,
+                    'row' => $row,
+                    'label' => $label,
+                    'hidden' => $hidden,
+                    'locked' => $locked,
+                    );
+            }
+        }
+        $portal_symbols_json = json_encode($portal_symbols, JSON_NUMERIC_CHECK);
+        $portals_index_json = json_encode($portals_index, JSON_NUMERIC_CHECK);
+        $portals_markup[] = '<script data-json="portalSymbols" type="application/json">'.$portal_symbols_json.'</script>';
+        $portals_markup[] = '<script data-json="portalsIndex" type="application/json">'.$portals_index_json.'</script>';
+        return implode(PHP_EOL, $portals_markup);
     }
 
     // Define a function for getting the BUTTONS LAYER sprite markup for the world map
