@@ -828,8 +828,10 @@ class rpg_world {
             $player_active = $player_token === $this_prototype_data['this_player_token'] ? true : false;
             $player_sprite = self::get_sprite('player', $player_token, '', 'right', 'character', '');
             $player_label = $get_label_span($player_info['player_name'], 'player');
-            $player_types = ' type '.$player_info['player_type'];
-            $return_markup .= ('<a class="option'.$player_types.($player_active ? ' active' : '').'" data-player="'.$player_token.'">'.$player_sprite.$cursor_sprite.$player_label.'</a>');
+            $player_types = 'type '.$player_info['player_type'];
+            $link_class = 'option '.$player_types.($player_active ? ' active' : '');
+            $link_attrs = !$player_active ? ' data-player="'.$player_token.'"' : '';
+            $return_markup .= ('<a class="'.$link_class.'"'.$link_attrs.'>'.$player_sprite.$cursor_sprite.$player_label.'</a>');
         }
         $return_markup .= ('<a class="option'.$cursor_types.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         return $return_markup;

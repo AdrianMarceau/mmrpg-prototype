@@ -113,6 +113,7 @@ class mmrpgWorldMap {
         let $canvasMap = $('#map', $thisCanvas);
         let $mapLayers = $('.layer', $canvasMap);
         let $worldCursor = $('.sprite.cursor', $canvasMap);
+        let $teamSprites = $('.sprite.team', $canvasMap);
         let $backButton = $('#back-button', $thisWorld);
         let $homeButton = $('#home-button', $thisWorld);
         let $resetButton = $('#reset-button', $thisWorld);
@@ -125,6 +126,7 @@ class mmrpgWorldMap {
         _elements.map = $canvasMap;
         _elements.layers = $mapLayers;
         _elements.cursor = $worldCursor;
+        _elements.teamSprites = $teamSprites;
         _elements.backButton = $backButton;
         _elements.homeButton = $homeButton;
         _elements.resetButton = $resetButton;
@@ -1266,7 +1268,7 @@ class mmrpgWorldMap {
                 else if (thisVerDir === 'down'){ teamOffsetY -= 10; }
                 if (thisHorDir === 'left'){ teamOffsetX += 20; }
                 else if (thisHorDir === 'right'){ teamOffsetX -= 20; }
-                $thisSprite.attr('data-dir', thisHorDir);
+                if (thisHorDir){ $thisSprite.attr('data-dir', thisHorDir); }
                 let newFrame = $thisSprite.is('.player') ? '09' : $thisSprite.is('.robot') ? '07' : '00'; // run for players, slide for robots
                 $thisSprite.attr('data-frame', newFrame);
                 let onTeamMoveComplete = function(){ $thisSprite.attr('data-frame', '00'); };
@@ -1388,6 +1390,7 @@ class mmrpgWorldMap {
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
         let $worldCursor = _elements.cursor;
+        let $teamSprites = _elements.teamSprites;
         let cursorDirection = _worldCursor.direction;
         let cursorPosition = _worldCursor.position;
         let newPosition = cursorPosition.split('-');
@@ -1417,14 +1420,14 @@ class mmrpgWorldMap {
         //console.log('-> $eventsLayer found, checking for events...');
 
         // Make sure we move any existing zoom layer sprites back to their original layers
-        $worldCursor.removeClass('busy');
+        $worldCursor.removeClass('shake');
         $eventsLayers.removeClass('has-zoom');
         $('.sprite', $zoomLayer).each(function(){
             let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
             $sprite.appendTo($layer).removeAttr('data-layer');
             //console.log('-> moving sprite back to layer', layer, 'from zoom layer');
             });
-        setTimeout(function(){ $('.sprite', $eventsLayers).removeClass('zoom'); }, 100);
+        setTimeout(function(){ $('.sprite', $canvasMap).removeClass('zoom'); }, 100);
         //$('.sprite', $zoomLayer).removeClass('zoom');
 
         // Search for events at the new position so we can show the action dropdown if needed
@@ -1634,11 +1637,18 @@ class mmrpgWorldMap {
         // If there's no dropdown to show, we can return early
         if (!showDropdown && !autoRedirect){ return; }
 
-        // Define an inline function to mark the cursor as busy for dramatic effect
-        let markCursorAsBusy = function(){
+        // Define an inline function to put the team into their battle-ready poses
+        let getTeamSpritesReady = function(){
 
-            // Add the busy class to the cursor so it hides behind the player
-            $worldCursor.addClass('busy');
+            // Add the shake class to the cursor so it hides behind the player
+            $worldCursor.addClass('shake');
+
+            // Zoom one or more of the team sprites (?)
+            let playerFrames = ['04'], robotFrames = ['04', '08', '01', '06', '10', '00', '04', '01'];
+            $teamSprites.filter('.player').each(function(index){ $(this).attr('data-frame', playerFrames[index % playerFrames.length] || '00'); });
+            $teamSprites.filter('.robot').each(function(index){ $(this).attr('data-frame', robotFrames[index % robotFrames.length] || '00'); });
+            //$teamSprites.filter('.player').attr('data-frame', '04'); // player "command" frame
+            //$teamSprites.filter('.robot').attr('data-frame', '01'); // robot "taunt" frame
 
             };
 
@@ -1712,15 +1722,14 @@ class mmrpgWorldMap {
                 $actionDropdownWrapper.empty();
                 $sideButtons.removeClass('active');
                 $sideButtonsWrapper.empty();
-                $worldCursor.removeClass('busy');
+                $worldCursor.removeClass('shake');
                 $eventsLayers.removeClass('has-zoom');
-                $('.sprite.zoom', $eventsLayers).removeClass('zoom');
-                $('.sprite[data-frame]', $eventsLayers).attr('data-frame', '00');
-                $('.sprite.zoom', $zoomLayer).each(function(){
+                $('.sprite.zoom', $canvasMap).removeClass('zoom');
+                $('.sprite[data-frame]', $canvasMap).attr('data-frame', '00');
+                /* $('.sprite.zoom', $zoomLayer).each(function(){
                     let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
-                    $('.sprite[data-frame]', $sprite).attr('data-frame', '00');
-                    $sprite.appendTo($layer).removeAttr('data-layer').removeClass('zoom');
-                    });
+                    $sprite.appendTo($layer).removeAttr('data-layer').removeClass('zoom').attr('data-frame', '00');
+                    }); // unused now? */
                 };
 
             // Define the event to run when clicking one of these new action buttons
@@ -1929,10 +1938,10 @@ class mmrpgWorldMap {
 
             };
 
-        // First we mark the cursor as busy so it trembles a bit before the encounter
+        // Make the cursor shake so it trembles a bit before the encounter
         let _selfRef = _self.refreshMapPositionEvents;
-        if (_selfRef.zoomCursorTimeout){ clearTimeout(_selfRef.zoomCursorTimeout); }
-        _selfRef.zoomCursorTimeout = setTimeout(markCursorAsBusy, Math.ceil(zoomTimeoutDuration / 2));
+        if (_selfRef.teamSpritesTimeout){ clearTimeout(_selfRef.teamSpritesTimeout); }
+        _selfRef.teamSpritesTimeout = setTimeout(getTeamSpritesReady, Math.ceil(zoomTimeoutDuration * 0.9));
 
         // If a redirect was requested, this is where we exit actually
         if (autoRedirect){

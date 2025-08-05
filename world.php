@@ -597,15 +597,15 @@ $flag_skip_fadein = true;
                         }
                     }
 
-                    // Generate the markup for the cursor sprites
-                    $obj = 'cursor';
-                    //$sprite = 'images/robots/pointan/sprite_right_40x40.png'; // T-D-: surely this isn't how we're going to leave this...
-                    $sprite = 'images/assets/cursor_right_40x40.png'; // TODO: maybe refine this a bit more before release
+                    // Generate the markup for the cursor sprite
                     $pos = $team_position;
                     list($col, $row) = explode('-', $pos);
                     $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
                     $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
-                    echo('<span class="sprite '.$obj.' bounce" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'" data-dir="'.$team_direction.'"><span class="wrap"><span class="sprite" style="background-image: url('.$sprite.');"></span></span></span>'.PHP_EOL);
+                    $class = 'cursor bounce';
+                    $styles = 'top: '.$top.'px; left: '.$left.'px; ';
+                    $attrs = 'data-pos="'.$team_position.'" data-col="'.$col.'" data-row="'.$row.'"';
+                    echo(rpg_world::get_cursor_sprite($team_direction, $class, $styles, $attrs));
 
                     // Generate the markup for the team sprites if any are defined
                     echo($get_team_sprites($team_sprites, $team_position, 'team bounce', $team_direction));

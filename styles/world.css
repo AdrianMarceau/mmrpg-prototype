@@ -413,12 +413,63 @@ html, body {
     filter: drop-shadow(4px -1px 0 rgba(0, 0, 0, 0.2));
 }
 
+/* define cursor-specific rules and animations for the pointer character */
 
+@keyframes world-cursor-bounce {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(0, -1px); }
+}
+@keyframes world-cursor-shake {
+    0% { transform: rotate(0deg); }
+    10% { transform: rotate(2deg); }
+    20% { transform: rotate(-2deg); }
+    30% { transform: rotate(2deg); }
+    40% { transform: rotate(-2deg); }
+    50% { transform: rotate(0deg); }
+    60% { transform: rotate(2deg); }
+    70% { transform: rotate(-2deg); }
+    80% { transform: rotate(2deg); }
+    90% { transform: rotate(-2deg); }
+}
+#world #map .layer.objects .sprite.cursor {
+
+}
+#world #map .layer.objects .sprite.cursor > .wrap {
+    transform: translate(0, 0) scale(1.0);
+    transition: transform 0.9s;
+}
+#world #map .layer.objects .sprite.cursor > .wrap > .sprite {
+
+}
+
+/* add a 'bounce' effect to the cursor so it's like the humans */
+#world #map .layer.objects .sprite.cursor.bounce {
+    animation: world-cursor-bounce 1s steps(1) infinite;
+}
+
+/* add a 'shake' effect to the shake cursor to show its scared */
+#world #map .layer.objects .sprite.cursor.shake {
+    /* animation: none; */
+    animation-play-state: paused;
+    image-rendering: pixelated;
+}
+#world #map .layer.objects .sprite.cursor.shake > .wrap {
+    transform: translate(-6px, 14px) scale(0.8);
+}
+#world #map .layer.objects .sprite.cursor.shake > .wrap > .sprite {
+    /* transform: rotate(0deg); */
+    filter: drop-shadow(-1px -1px 0 white);
+    animation: world-cursor-shake 0.9s steps(1) infinite;
+}
+
+
+/* define z-index rules for the different types of sprites */
+/* BUT hopefully we can remove these and just rely on y-position instead later */
 
 #world #map .layer.objects .sprite.cursor { z-index: 900; }
-#world #map .layer.objects .sprite.cursor > .sprite { transform: translate(-6px, 14px); }
-#world #map .layer.objects .sprite.cursor.busy { z-index: 5; }
-#world #map .layer.objects .sprite.cursor.busy > .sprite { /* ... */ }
+#world #map .layer.objects .sprite.cursor .sprite { /* ... */ }
+#world #map .layer.objects .sprite.cursor.busy { /* ... */ }
+#world #map .layer.objects .sprite.cursor.busy .sprite { /* ... */ }
 
 #world #map .layer.objects .sprite.team { z-index: 300; }
 #world #map .layer.objects .sprite.team[data-key="0"] { z-index: 300; }
@@ -446,38 +497,13 @@ html, body {
 
 #world #map .layer.objects .sprite.rival { filter: brightness(0.6); }
 
-/* add a 'bounce' effect to the busy cursor so it's like the humans */
-@keyframes world-cursor-bounce {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(0, -1px); }
-}
-#world #map .layer.objects .sprite.cursor.bounce { animation: world-cursor-bounce 1s steps(1) infinite; }
-
-/* add a 'shake' effect to the busy cursor to show its scared */
-#world #map .layer.objects .sprite.cursor.busy > .sprite {
-    transform: translate(-6px, 14px) rotate(0deg);
-    filter: drop-shadow(-1px -1px 0 white);
-    animation: world-sprite-shake 0.9s steps(1) infinite;
-}
-@keyframes world-sprite-shake {
-    0% { transform: translate(-6px, 14px) rotate(0deg); }
-    10% { transform: translate(-6px, 14px) rotate(2deg); }
-    20% { transform: translate(-6px, 14px) rotate(-2deg); }
-    30% { transform: translate(-6px, 14px) rotate(2deg); }
-    40% { transform: translate(-6px, 14px) rotate(-2deg); }
-    50% { transform: translate(-6px, 14px) rotate(0deg); }
-    60% { transform: translate(-6px, 14px) rotate(2deg); }
-    70% { transform: translate(-6px, 14px) rotate(-2deg); }
-    80% { transform: translate(-6px, 14px) rotate(2deg); }
-    90% { transform: translate(-6px, 14px) rotate(-2deg); }
-}
 
 /* define some bounce animations for the sprites */
 #world #map .layer.objects .sprite {
     --sprite-speed: 1;
     --base-transition-speed: 0.6s;
     --base-bounce-duration: 1s;
-    --base-march-duration: 4s;
+    --base-march-duration: 3s;
     --zoom-march-duration: 1s;
 }
 @keyframes world-sprite-bounce {
@@ -499,51 +525,6 @@ html, body {
 #world #map .layer .sprite[data-dir="right"].march > .wrap {
     transform: translate(16px, 0);
 }
-
-/* define some marching animations for the sprites */
-
-/*
-#world #map .layer .sprite[data-dir="left"].march > .wrap {
-    transform: translate(-20px, 0);
-}
-#world #map .layer .sprite[data-dir="right"].march > .wrap {
-    transform: translate(20px, 0);
-}
-@keyframes world-sprite-wrap-march-right {
-  0%, 50%, 100%   { transform: translateX(0); }
-  25%  { transform: translateX(20px); }
-  75%  { transform: translateX(-20px); }
-}
-@keyframes world-sprite-sprite-march-right {
-  0%, 100%  { background-position: 0 0; }
-  25%  { background-position: 0 0; }
-  50%  { background-position: 0 -40px; }
-  75%  { background-position: 0 -40px; }
-}
-#world #map .layer .sprite[data-dir="right"].march > .wrap {
-  animation: world-sprite-wrap-march-right calc(var(--base-march-duration) * var(--sprite-speed))
-             steps(40) infinite;
-}
-*/
-/*
-@keyframes world-sprite-wrap-march-left {
-  0%   { transform: translateX(0); }
-  100%  { transform: translateX(-20px); }
-}
-@keyframes world-sprite-wrap-march-right {
-  0%   { transform: translateX(0); }
-  100%  { transform: translateX(20px); }
-}
-#world #map .layer .sprite[data-dir="left"].march > .wrap {
-    animation: world-sprite-wrap-march-left calc(var(--base-march-duration) * var(--sprite-speed))
-             steps(20) forwards;
-}
-#world #map .layer .sprite[data-dir="right"].march > .wrap {
-    animation: world-sprite-wrap-march-right calc(var(--base-march-duration) * var(--sprite-speed))
-             steps(20) forwards;
-}
-*/
-
 
 /* define the special zoom styles that are applied when something is focused */
 #world #map .layer.zoom .sprite:not(.tile) > .wrap > .sprite,
@@ -907,6 +888,9 @@ html, body {
     transition: outline 0.3s, background-color 0.3s;
     cursor: pointer;
 }
+#world #canvas #player-switcher a.option > * {
+    pointer-events: none;
+}
 #world #canvas #player-switcher a.option:last-child {
     margin-right: 0;
 }
@@ -916,6 +900,7 @@ html, body {
 }
 #world #canvas #player-switcher a.option.active {
     outline: 1px solid #969696;
+    cursor: default;
 }
 #world #canvas #player-switcher a.option:not(.active):not(:hover) {
     /* background-color: #191919 !important; */
@@ -970,7 +955,7 @@ html, body {
 #world #canvas #player-switcher a.option > .label {
     display: block;
     position: absolute;
-    bottom: 38px;
+    top: 44px;
     left: 0;
     background-color: rgb(25, 25, 25, 0.8);
     border-radius: 6px;
