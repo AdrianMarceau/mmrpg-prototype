@@ -1658,28 +1658,36 @@ class mmrpgWorldMap {
             let cursorPositionXY = cursorPosition.split('-');
             for (var i = 0; i < $eventsAtPosition.length; i++){
                 let $eventSprite = $eventsAtPosition[i];
-                let $innerSprite = $('.sprite', $eventSprite);
                 let eventPosition = $eventSprite.attr('data-pos');
                 //let eventPositionXY = eventPosition.split('-');
                 if ($eventSprite.hasClass('tile')){ continue; } // skip tiles
                 let isRobot = $eventSprite.hasClass('robot');
+                let isMecha = $eventSprite.hasClass('vs-mecha');
+                let isMaster = $eventSprite.hasClass('vs-master');
+                let isBoss = $eventSprite.hasClass('vs-boss');
                 //console.log('-> $eventsAtPosition['+i+'] / isRobot = ', isRobot);
                 let dataSize = $eventSprite.attr('data-size') || 40;
                 let $eventLayer = $eventSprite.closest('.layer.events');
                 let eventLayer = $eventLayer.attr('data-layer');
-                $eventLayer.addClass('has-zoom');
                 //let relativePosition = [eventPositionXY[0] - cursorPositionXY[0], eventPositionXY[1] - cursorPositionXY[1]];
                 let relativePosition = _self.getPositionRelative(cursorPosition, eventPosition);
-                if (relativePosition[0] < 0){ $eventSprite.attr('data-dir', 'right'); }
-                else if (relativePosition[0] > 0){ $eventSprite.attr('data-dir', 'left'); }
-                else if (cursorDirection.indexOf('right') !== -1){ $eventSprite.attr('data-dir', 'left'); }
-                else if (cursorDirection.indexOf('left') !== -1){ $eventSprite.attr('data-dir', 'right'); }
+                let newDirection = false;
+                if (relativePosition[0] < 0){ newDirection = 'right'; }
+                else if (relativePosition[0] > 0){ newDirection = 'left'; }
+                else if (cursorDirection.indexOf('right') !== -1){ newDirection = 'left'; }
+                else if (cursorDirection.indexOf('left') !== -1){ newDirection = 'right'; }
                 //$eventSprite.appendTo($zoomLayer);
                 //$eventSprite.attr('data-layer', eventLayer);
                 //console.log('-> moving event sprite to zoom layer', eventLayer, 'from events layer');
                 setTimeout(function(){
                     $eventSprite.addClass('zoom');
-                    if (isRobot){ $innerSprite.attr('data-frame', '01'); }
+                    $eventLayer.addClass('has-zoom');
+                    if (newDirection){ $eventSprite.attr('data-dir', newDirection); }
+                    if (isRobot){
+                        if (isMecha){ $eventSprite.attr('data-frame', '08'); }
+                        else if (isMaster){ $eventSprite.attr('data-frame', '01'); }
+                        else if (isBoss){ $eventSprite.attr('data-frame', '06'); }
+                        }
                     }, 100);
                 }
 
