@@ -845,34 +845,31 @@ html, body {
     transform: scale(1.2);
 }
 
-#world #canvas #back-button,
-#world #canvas #home-button,
-#world #canvas #reset-button {
-    left: 0;
-}
 #world #canvas #back-button {
     top: 0;
+    left: 0;
     border-radius: 0 0 6px 0;
     font-size: 20px;
 }
 #world #canvas #back-button > a {
     transform: scaleX(-1) translateX(3px);
 }
-#world #canvas #home-button,
-#world #canvas #reset-button {
+
+#world #canvas #home-button {
+    top: 51px;
     border-radius: 0 6px 6px 0;
     font-size: 14px;
 }
-#world #canvas #home-button {
-    top: 51px;
-}
+
 #world #canvas #reset-button {
-    /* top: 96px; */
-    top: 126px;
-    transition: left 0.3s;
+    top: 4px;
+    right: 0;
+    border-radius: 6px 0 0 6px;
+    transition: right 0.3s;
+    font-size: 14px;
 }
 #world #canvas #reset-button:not(:hover) {
-    left: -28px;
+    right: -28px;
 }
 
 #world #canvas #player-switcher {
