@@ -1128,12 +1128,17 @@ class mmrpgWorldMap {
             $('.option[data-player]', $playerSwitcher).bind('click', function(e){
                 //console.log('%c' + 'Player switcher clicked for ' + playerToken + '!', 'color: cyan;');
                 e.preventDefault();
+                $('.option', $playerSwitcher).removeClass('active');
                 let $option = $(this);
                 let playerToken = $option.attr('data-player') || false;
+                $option.addClass('active');
                 _self.playSoundEffect('switch-in');
-                $thisWorld.addClass('hidden');
+                $thisWorld.addClass('loading');
                 let worldReloadURL = 'world.php?player=' + playerToken;
-                _self.saveWorldState(function(){ window.location.href = worldReloadURL; });
+                _self.saveWorldState(function(){
+                    $thisWorld.addClass('redirecting');
+                    window.location.href = worldReloadURL;
+                    });
                 return true;
                 });
             $('.option[data-player]', $playerSwitcher).bind('mouseenter', function(e){

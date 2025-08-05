@@ -89,6 +89,7 @@ html, body {
     opacity: 0.6;
 }
 
+
 /* define an animation for shaking the map back and forth rapidly to simulate damage/explosion/dramtic events */
 @keyframes world-map-shake {
     0% { transform: translate(0, 0); }
@@ -108,11 +109,26 @@ html, body {
 #world #canvas #map .layer[data-layer="background"] {
     transition: none;
     transform: translate(0, 0);
+    filter: brightness(1.0);
     will-change: transform;
 }
-#world #canvas #map.ready,
-#world #canvas #map.ready .layer[data-layer="background"] {
+#world.ready #canvas #map {
+    transition: filter 0.6s ease-in, transform 1s ease-in-out;
+}
+#world.ready #canvas #map .layer[data-layer="background"] {
     transition: transform 1s ease-in-out;
+}
+#world:not(.ready) #canvas #map {
+    filter: brightness(0.3);
+}
+#world.ready #canvas #map {
+    filter: brightness(1.0);
+}
+#world.loading #canvas #map {
+    filter: brightness(0.6);
+}
+#world.redirecting #canvas #map {
+    filter: brightness(0.0);
 }
 
 /* define the rules for sprites that appear on the overworld map */
@@ -398,8 +414,12 @@ html, body {
     filter: drop-shadow(-1px 1px 0 white);
 }
 
+
+
 #world #map .layer.objects .sprite.cursor { z-index: 900; }
+#world #map .layer.objects .sprite.cursor > .sprite { transform: translate(-6px, 14px); }
 #world #map .layer.objects .sprite.cursor.busy { z-index: 5; }
+#world #map .layer.objects .sprite.cursor.busy > .sprite { /* ... */ }
 
 #world #map .layer.objects .sprite.team { z-index: 300; }
 #world #map .layer.objects .sprite.team[data-key="0"] { z-index: 300; }
@@ -865,14 +885,14 @@ html, body {
     left: 47px;
     pointer-events: all;
     cursor: pointer;
-    padding: 6px 12px;
+    padding: 4px 9px 3px;
     border-radius: 0 0 6px 6px;
 }
 #world #canvas #player-switcher a.option {
     display: inline-block;
     position: relative;
     margin: 0 6px 0 0;
-    padding: 0;
+    padding: 3px;
     width: 40px;
     height: 30px;
     font-family: monospace;
@@ -883,19 +903,24 @@ html, body {
     border-radius: 3px;
     outline: 1px solid transparent;
     background-color: transparent;
-    transition: outline 0.2s, background-color 0.2s;
+    background-image: none !important;
+    transition: outline 0.3s, background-color 0.3s;
     cursor: pointer;
 }
 #world #canvas #player-switcher a.option:last-child {
     margin-right: 0;
 }
-#world #canvas #player-switcher a.option.active {
-    outline: 1px solid #363636;
-    background-color: #191919;
+#world #canvas #player-switcher a.option.active,
+#world #canvas #player-switcher a.option:hover {
+    box-shadow: inset -1px -1px 0 rgba(0, 0, 0.3);
 }
-#world #canvas #player-switcher a.option:not(.active):hover {
-    outline: 1px solid #262626;
-    background-color: #101010;
+#world #canvas #player-switcher a.option.active {
+    outline: 1px solid #969696;
+}
+#world #canvas #player-switcher a.option:not(.active):not(:hover) {
+    /* background-color: #191919 !important; */
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    box-shadow: inset 1px 1px 0 black;
 }
 #world #canvas #player-switcher a.option .sprite {
     display: block;
@@ -913,6 +938,12 @@ html, body {
 }
 #world #canvas #player-switcher a.option:hover > .sprite {
     top: -12px;
+}
+#world #canvas #player-switcher a.option > .sprite.cursor {
+    top: -6px;
+}
+#world #canvas #player-switcher a.option:hover > .sprite.cursor {
+    top: -8px;
 }
 #world #canvas #player-switcher a.option > .sprite > .wrap,
 #world #canvas #player-switcher a.option > .sprite > .wrap > .sprite {
@@ -1096,41 +1127,6 @@ html, body {
     line-height: 1.2;
     border-radius: 6px 0 0 0;
 }
-
-/* TEMP TEMP TEMP */
-
-
-#world #canvas .sprite.button,
-#world #canvas .sprite.button > .sprite {
-    image-rendering: pixelated;
-}
-#world #map .layer.objects .sprite.cursor > .sprite {
-    transform: translate(-6px, 14px);
-    /* filter: drop-shadow(-1px -1px 0 white);  */
-    /* filter: drop-shadow(-1px -1px 0 white) hue-rotate(180deg) saturate(0.5) brightness(1.5); */
-    filter: none;
-}
-#world #map .layer.objects .sprite.cursor.busy > .sprite {
-    /* filter: drop-shadow(-1px -1px 0 white) hue-rotate(180deg) saturate(0.5) brightness(1.5); */
-    filter: none;
-}
-#world #canvas #player-switcher a.option > .sprite.cursor > .sprite {
-    /* filter: hue-rotate(180deg) saturate(0.5) brightness(1.5); */
-    filter: none;
-}
-
-/*
-#world #map .layer.objects .sprite[data-img-dir="right"][data-dir="left"] > .sprite,
-#world #map .layer.objects .sprite[data-img-dir="left"][data-dir="right"] > .sprite {
-    transform: scale(-1, 1);
-}
-#world #map .layer.objects .sprite.zoom[data-img-dir="right"][data-dir="left"] > .sprite,
-#world #map .layer.objects .sprite.zoom[data-img-dir="left"][data-dir="right"] > .sprite,
-#world #map .layer.objects .sprite.always-zoom[data-img-dir="right"][data-dir="left"] > .sprite,
-#world #map .layer.objects .sprite.always-zoom[data-img-dir="left"][data-dir="right"] > .sprite {
-    transform: scale(-2, 2);
-}
-*/
 
 
 /* TEMP TEMP TEMP */

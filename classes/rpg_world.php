@@ -540,7 +540,8 @@ class rpg_world {
         //$cursor_sprite = str_replace('images/robots/pointan/sprite_', 'images/assets/cursor_', $cursor_sprite);
         $cursor_sprite = preg_replace('/background-image: url\(([^\(\)]+)\);/i', 'background-image: url(images/assets/cursor_40x40.png);', $cursor_sprite);
         $cursor_label = $get_label_span('Prε', 'cursor');
-        $return_markup .= ('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
+        $cursor_types = ' type explode';
+        //$return_markup .= ('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         $mmrpg_index_players = self::get_indexes('players');
         foreach ($allowed_player_tokens AS $player_key => $player_token){
             if ($player_token === 'player' || empty($mmrpg_index_players[$player_token])){ continue; }
@@ -548,8 +549,10 @@ class rpg_world {
             $player_active = $player_token === $this_prototype_data['this_player_token'] ? true : false;
             $player_sprite = self::get_sprite('player', $player_token, '', 'right', 'character', '');
             $player_label = $get_label_span($player_info['player_name'], 'player');
-            $return_markup .= ('<a class="option'.($player_active ? ' active' : '').'" data-player="'.$player_token.'">'.$player_sprite.$cursor_sprite.$player_label.'</a>');
+            $player_types = ' type '.$player_info['player_type'];
+            $return_markup .= ('<a class="option'.$player_types.($player_active ? ' active' : '').'" data-player="'.$player_token.'">'.$player_sprite.$cursor_sprite.$player_label.'</a>');
         }
+        $return_markup .= ('<a class="option'.$cursor_types.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         return $return_markup;
     }
 
