@@ -803,8 +803,8 @@ class rpg_world {
     }
 
     // Define a function for getting the BACKGROUND LAYER sprite markup for the world map
-    public static function get_background_layer_sprites($this_prototype_data, $map_data_parsed){
-        //error_log('rpg_world::get_background_layer_sprites() called!');
+    public static function get_background_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_background_layer_markup() called!');
         // BACKGROUND LAYER
         $background_sprites = array();
         $mmrpg_index_fields = self::get_indexes('fields');
@@ -818,16 +818,36 @@ class rpg_world {
         return implode(PHP_EOL, $background_sprites);
     }
 
-    // Define a function for getting the TERRAIN LAYER tile-sprite markup for the world map
-    public static function get_terrain_layer_tiles(){
-        error_log('rpg_world::get_terrain_layer_tiles() called!');
-        $markup = '';
-        // ...
-        return $markup;
+    // Define a function for getting the TERRAIN LAYER markup for the world map
+    public static function get_terrain_layer_markup($this_prototype_data, $map_data_parsed, $map_layer_data){
+        //error_log('rpg_world::get_terrain_layer_markup() called!');
+        // TERRAIN LAYER
+        $terrain_markup = array();
+        $map_config = $map_data_parsed['config'];
+        $map_row_size = $map_config['row_size'];
+        $map_col_size = $map_config['col_size'];
+        $map_pixel_width = $map_config['pixel_width'];
+        $map_pixel_height = $map_config['pixel_height'];
+        $tile_data = array();
+        $tile_data['canvas_tiles'] = array();
+        for ($row = 1; $row <= $map_row_size; $row++){
+            $row_tiles = $map_layer_data[$row - 1];
+            $row_tiles = strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles);
+            for ($col = 1; $col <= $map_col_size; $col++){
+                $pos = $col.'-'.$row;
+                $key = isset($row_tiles[$col - 1]) ? $row_tiles[$col - 1] : '';
+                if (strstr($key, '[') || strstr($key, ']')){ $key = trim($key, '[]'); }
+                $tile_data['canvas_tiles'][$pos] = $key;
+            }
+        }
+        $tile_data_json = json_encode($tile_data, JSON_NUMERIC_CHECK);
+        $terrain_markup[] = '<canvas width="'.$map_pixel_width.'" height="'.$map_pixel_height.'"></canvas>';
+        $terrain_markup[] = '<script data-json="tileData" type="application/json">'.$tile_data_json.'</script>';
+        return implode(PHP_EOL, $terrain_markup);
     }
 
     // Define a function for getting the PORTALS LAYER sprite markup for the world map
-    public static function get_portals_layer_sprites(){
+    public static function get_portals_layer_markup(){
         error_log('rpg_world::get_portals_layer_sprites() called!');
         $markup = '';
         // ...
@@ -835,7 +855,7 @@ class rpg_world {
     }
 
     // Define a function for getting the BUTTONS LAYER sprite markup for the world map
-    public static function get_buttons_layer_sprites(){
+    public static function get_buttons_layer_markup(){
         error_log('rpg_world::get_buttons_layer_sprites() called!');
         $markup = '';
         // ...
@@ -843,7 +863,7 @@ class rpg_world {
     }
 
     // Define a function for getting the BATTLES LAYER sprite markup for the world map
-    public static function get_battles_layer_sprites(){
+    public static function get_battles_layer_markup(){
         error_log('rpg_world::get_battles_layer_sprites() called!');
         $markup = '';
         // ...
@@ -851,7 +871,7 @@ class rpg_world {
     }
 
     // Define a function for getting the TEAM LAYER sprite markup for the world map
-    public static function get_team_layer_sprites(){
+    public static function get_team_layer_markup(){
         error_log('rpg_world::get_team_layer_sprites() called!');
         $markup = '';
         // ...

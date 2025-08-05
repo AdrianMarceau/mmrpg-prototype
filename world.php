@@ -452,40 +452,31 @@ $flag_skip_fadein = true;
                 $data_json = json_encode($data, JSON_NUMERIC_CHECK);
                 echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
 
+                /*
+                rpg_world::get_background_layer_markup();
+                rpg_world::get_terrain_layer_markup();
+                rpg_world::get_portals_layer_markup();
+                rpg_world::get_buttons_layer_markup();
+                rpg_world::get_battles_layer_markup();
+                rpg_world::get_team_layer_markup();
+                */
+
                 // BACKGROUND LAYER
                 $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                 $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
-                $background_layer_sprites = rpg_world::get_background_layer_sprites($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-0 background" data-layer="background"'.$map_layer_styles.$map_layer_attrs.'>'.$background_layer_sprites.'</div>'.PHP_EOL);
+                $background_layer_sprites = rpg_world::get_background_layer_markup($this_prototype_data, $map_data_parsed);
+                echo('<div class="layer layer-0 background" data-layer="background"'.$map_layer_styles.$map_layer_attrs.'>');
+                    echo($background_layer_sprites);
+                echo('</div>'.PHP_EOL);
 
                 // TERRAIN TILES
                 foreach ($map_data_parsed['layers'] AS $map_layer_key => $map_layer_data){
-                    $map_layer_styles = $map_base_styles; // TODO: support custom styles per layer maybe?
-                    $map_layer_attrs = $map_base_attrs; // TODO: support custom attributes per layer maybe?
-                    ?>
-                    <div class="layer layer-1 tiles terrain has-canvas" data-layer="terrain" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
-                        <?
-
-                        // Generate the json data for the map tiles and then print them out for the canvas
-                        $data = array();
-                        $data['canvas_tiles'] = array();
-                        for ($row = 1; $row <= $map_row_size; $row++){
-                            $row_tiles = $map_layer_data[$row - 1];
-                            $row_tiles = strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles);
-                            for ($col = 1; $col <= $map_col_size; $col++){
-                                $pos = $col.'-'.$row;
-                                $key = isset($row_tiles[$col - 1]) ? $row_tiles[$col - 1] : '';
-                                if (strstr($key, '[') || strstr($key, ']')){ $key = trim($key, '[]'); }
-                                $data['canvas_tiles'][$pos] = $key;
-                            }
-                        }
-                        $data_json = json_encode($data, JSON_NUMERIC_CHECK);
-                        echo('<canvas width="'.$map_pixel_width.'" height="'.$map_pixel_height.'"></canvas>'.PHP_EOL);
-                        echo('<script data-json="tileData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
-
-                        ?>
-                    </div>
-                    <?
+                    $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
+                    $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
+                    $terrain_layer_markup = rpg_world::get_terrain_layer_markup($this_prototype_data, $map_data_parsed, $map_layer_data);
+                    echo('<div class="layer layer-1 tiles terrain has-canvas" data-layer="terrain"'.$map_layer_styles.$map_layer_attrs.'>');
+                        echo($terrain_layer_markup);
+                    echo('</div>'.PHP_EOL);
                 }
 
                 // EVENT TILES (PORTALS)
