@@ -3,12 +3,6 @@
 // Include the TOP file
 require_once('top.php');
 
-// Define any world session vars that don't exist yet
-$reset = !empty($_REQUEST['reset']) && $_REQUEST['reset'] === 'world' ? true : false;
-if (!isset($_SESSION['WORLD']) || $reset){ $_SESSION['WORLD'] = array(); }
-if (!isset($_SESSION['WORLD_TEMP']) || $reset){ $_SESSION['WORLD_TEMP'] = array(); }
-if ($reset){ header('Location: world.php'); exit(); }
-
 // Automatically empty temporary session vars from this or other pages
 $_SESSION['BATTLES'] = array();
 $_SESSION['FIELDS'] = array();
@@ -20,13 +14,27 @@ $_SESSION['SKILLS'] = array();
 $_SESSION['PROTOTYPE_TEMP'] = array();
 $_SESSION['WORLD_TEMP'] = array();
 
+// If a reset action was requested, we should reset the world session and redirect
+if (!empty($_REQUEST['reset'])
+    && $_REQUEST['reset'] === 'world'){
+    rpg_world::reset_session();
+    header('Location: world.php');
+    exit();
+}
+
+// Define some constants for the world map
+define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
+define('MMRPG_WORLD_DEFAULT_TILESIZE', 80);
+define('MMRPG_WORLD_DEFAULT_SPRITESITE', 40);
+define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 3); // TODO: make this dependant on limit hearts
+define('MMRPG_WORLD_DEFAULT_MOBILITY', 1); // TODO: make this dependant on player skill
+define('MMRPG_WORLD_MAPFILE_BASEPATH', 'prototype/worldmaps/');
+
 // Collect the game session token in case we need it later
 $session_token = rpg_game::session_token();
 
-//unset($_SESSION[$session_token]['battle_history']);
-//unset($_SESSION[$session_token]['values']['battle_history']);
-
 // Define a reference object for storing temporary world data
+rpg_world::init_session();
 $WORLD_SESSION = &$_SESSION['WORLD'];
 
 // Predefine any missing world session variables so they're available
@@ -37,14 +45,6 @@ if (!isset($WORLD_SESSION['world_maps'])){ $WORLD_SESSION['world_maps'] = array(
 if (!isset($WORLD_SESSION['world_buttons'])){ $WORLD_SESSION['world_buttons'] = array(); }
 if (!isset($WORLD_SESSION['world_switches'])){ $WORLD_SESSION['world_switches'] = array(); }
 if (!isset($WORLD_SESSION['world_encounters'])){ $WORLD_SESSION['world_encounters'] = array(); }
-
-// Define some constants for the world map
-define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
-define('MMRPG_WORLD_DEFAULT_TILESIZE', 80);
-define('MMRPG_WORLD_DEFAULT_SPRITESITE', 40);
-define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 3); // TODO: make this dependant on limit hearts
-define('MMRPG_WORLD_DEFAULT_MOBILITY', 1); // TODO: make this dependant on player skill
-define('MMRPG_WORLD_MAPFILE_BASEPATH', 'prototype/worldmaps/');
 
 // Define defaults and allowed values for the prototype world data
 //$allowed_map_tokens = array('starter', 'water', 'starter-80x80', 'water-80x80');
@@ -478,68 +478,19 @@ $flag_skip_fadein = true;
                     echo($portals_layer_markup);
                 echo('</div>'.PHP_EOL);
 
-                // EVENT TILES (BUTTONS)
-                $map_layer_styles = $map_base_styles;
-                $map_layer_attrs = $map_base_attrs;
-                ?>
-                <div class="layer layer-2 tiles events buttons" data-layer="buttons" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
-                    <?
-
-                    // If there are any buttons defined, make sure we look through and display them
-                    $button_symbols = array();
-                    $buttons_index = array();
-                    if (!empty($map_data_parsed['buttons'])){
-                        $button_sprites = $map_data_parsed['buttons'];
-                        $world_buttons = !empty($WORLD_SESSION['world_buttons'][$map_token]) ? $WORLD_SESSION['world_buttons'][$map_token] : array();
-                        foreach ($button_sprites AS $button_name => $button_data){
-                            if (empty($button_data) || !is_array($button_data) || count($button_data) < 2){ continue; }
-                            $pos = $button_data[0]; list($col, $row) = explode('-', $pos); unset($button_data[0]);
-                            $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
-                            $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
-                            $colour = !empty($button_data[1]) ? $button_data[1] : 'black'; unset($button_data[1]);
-                            $state = !empty($button_data[2]) ? $button_data[2] : 'up'; unset($button_data[2]);
-                            $action = !empty($button_data[3]) ? $button_data[3] : ''; unset($button_data[3]);
-                            $hidden = false; if (in_array('hidden', $button_data)){ $hidden = true; unset($button_data[array_search('hidden', $button_data)]); }
-                            $locked = false; if (in_array('locked', $button_data)){ $locked = true; unset($button_data[array_search('locked', $button_data)]); }
-                            $data = array_values($button_data);
-                            if (!empty($world_buttons[$button_name])){ $state = $world_buttons[$button_name]; }
-                            if ($hidden){ continue; }
-                            $is_glowing = $state !== 'down' && !$hidden && !$locked ? true : false;
-                            $base_classes = 'sprite tile button';
-                            $kind_classes = $colour.' '.$state;
-                            $sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
-                            $attrs = 'data-button="'.$button_name.'" data-colour="'.$colour.'" data-state="'.$state.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
-                            $styles = 'top: '.$top.'px; left: '.$left.'px;';
-                            $classes = $base_classes.($is_glowing ? ' glow' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
-                            echo('<span class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$sprite.'</span>'.PHP_EOL);
-                            $button_symbols[$pos] = $button_name;
-                            $buttons_index[$button_name] = array(
-                                'pos' => $pos,
-                                'col' => $col,
-                                'row' => $row,
-                                'colour' => $colour,
-                                'state' => $state,
-                                'action' => $action,
-                                'data' => $data,
-                                'hidden' => $hidden,
-                                'locked' => $locked,
-                                );
-                        }
-                    }
-                    $button_symbols_json = json_encode($button_symbols, JSON_NUMERIC_CHECK);
-                    $buttons_index_json = json_encode($buttons_index, JSON_NUMERIC_CHECK);
-                    echo('<script data-json="buttonSymbols" type="application/json">'.$button_symbols_json.'</script>'.PHP_EOL);
-                    echo('<script data-json="buttonsIndex" type="application/json">'.$buttons_index_json.'</script>'.PHP_EOL);
-
-                    ?>
-                </div>
-                <?
+                // BUTTON SPRITES
+                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
+                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
+                $buttons_layer_markup = rpg_world::get_buttons_layer_markup($this_prototype_data, $map_data_parsed);
+                echo('<div class="layer layer-3 tiles events buttons" data-layer="buttons" '.$map_layer_styles.$map_layer_attrs.'>');
+                    echo($buttons_layer_markup);
+                echo('</div>'.PHP_EOL);
 
                 // EVENT OBJECTS (BATTLES)
                 $map_layer_styles = $map_base_styles;
                 $map_layer_attrs = $map_base_attrs;
                 ?>
-                <div class="layer layer-3 objects events battles" data-layer="battles" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
+                <div class="layer layer-4 objects events battles" data-layer="battles" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
                     $battle_symbols = array();
                     $battles_index = array();
@@ -591,7 +542,7 @@ $flag_skip_fadein = true;
                 $map_layer_styles = $map_base_styles;
                 $map_layer_attrs = $map_base_attrs;
                 ?>
-                <div class="layer layer-4 objects characters team" data-layer="team" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
+                <div class="layer layer-5 objects characters team" data-layer="team" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
                     <?
 
                     // Quick function for generation the team sprites for a given player
@@ -705,7 +656,7 @@ $flag_skip_fadein = true;
                 $map_layer_styles = $map_base_styles;
                 $map_layer_attrs = $map_base_attrs;
                 ?>
-                <div class="layer layer-5 objects zoom" data-layer="zoom" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>> <!-- dynamic layer for temporarily zoomed-sprites --> </div>
+                <div class="layer layer-6 objects zoom" data-layer="zoom" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>> <!-- dynamic layer for temporarily zoomed-sprites --> </div>
                 <?
 
                 // END OF LAYERS

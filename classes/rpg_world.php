@@ -8,6 +8,28 @@ class rpg_world {
     // Define the static variables for this class
     static $mmrpg_indexes = array();
 
+    // Define a function for initializing the world session if not exists yet
+    public static function init_session(){
+        //error_log('rpg_world::init_session() called!');
+        if (!isset($_SESSION['WORLD'])){ $_SESSION['WORLD'] = array(); }
+        return true;
+    }
+
+    // Define a function for getting the current world session
+    public static function get_session(){
+        //error_log('rpg_world::get_session() called!');
+        if (!isset($_SESSION['WORLD'])){ $_SESSION['WORLD'] = array(); }
+        return $_SESSION['WORLD'];
+    }
+
+    // Define a function for resetting the world session
+    public static function reset_session(){
+        //error_log('rpg_world::reset_session() called!');
+        if (isset($_SESSION['WORLD'])){ unset($_SESSION['WORLD']); }
+        $_SESSION['WORLD'] = array();
+        return true;
+    }
+
     // Define a function for loading indexes into this class
     public static function load_indexes($indexes = array()){
         //error_log('rpg_world::load_indexes() called!');
@@ -850,11 +872,11 @@ class rpg_world {
     public static function get_portals_layer_markup($this_prototype_data, $map_data_parsed){
         //error_log('rpg_world::get_portals_layer_sprites() called!');
         // PORTALS LAYER
-        $portals_markup = array();
         $map_config = $map_data_parsed['config'];
         $map_tile_height = $map_config['tile_height'];
         $map_tile_width = $map_config['tile_width'];
         $map_tilesize_offset = $map_config['tilesize_offset'];
+        $portals_markup = array();
         $portal_symbols = array();
         $portals_index = array();
         if (!empty($map_data_parsed['portals'])){
@@ -892,24 +914,75 @@ class rpg_world {
     }
 
     // Define a function for getting the BUTTONS LAYER sprite markup for the world map
-    public static function get_buttons_layer_markup(){
-        error_log('rpg_world::get_buttons_layer_sprites() called!');
-        $markup = '';
-        // ...
-        return $markup;
+    public static function get_buttons_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_buttons_layer_markup() called!');
+        // BUTTONS LAYER
+        $WORLD_SESSION = self::get_session();
+        $world_buttons = !empty($WORLD_SESSION['world_buttons']) ? $WORLD_SESSION['world_buttons'] : array();
+        $map_config = $map_data_parsed['config'];
+        $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : '';
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_tilesize_offset = $map_config['tilesize_offset'];
+        $buttons_markup = array();
+        $button_symbols = array();
+        $buttons_index = array();
+        if (!empty($map_data_parsed['buttons'])){
+            $button_sprites = $map_data_parsed['buttons'];
+            $world_map_buttons = !empty($world_buttons[$map_token]) ? $world_buttons[$map_token] : array();
+            foreach ($button_sprites AS $button_name => $button_data){
+                if (empty($button_data) || !is_array($button_data) || count($button_data) < 2){ continue; }
+                $pos = $button_data[0]; list($col, $row) = explode('-', $pos); unset($button_data[0]);
+                $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                $colour = !empty($button_data[1]) ? $button_data[1] : 'black'; unset($button_data[1]);
+                $state = !empty($button_data[2]) ? $button_data[2] : 'up'; unset($button_data[2]);
+                $action = !empty($button_data[3]) ? $button_data[3] : ''; unset($button_data[3]);
+                $hidden = false; if (in_array('hidden', $button_data)){ $hidden = true; unset($button_data[array_search('hidden', $button_data)]); }
+                $locked = false; if (in_array('locked', $button_data)){ $locked = true; unset($button_data[array_search('locked', $button_data)]); }
+                $data = array_values($button_data);
+                if (!empty($world_map_buttons[$button_name])){ $state = $world_map_buttons[$button_name]; }
+                if ($hidden){ continue; }
+                $is_glowing = $state !== 'down' && !$hidden && !$locked ? true : false;
+                $base_classes = 'sprite tile button';
+                $kind_classes = $colour.' '.$state;
+                $sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
+                $attrs = 'data-button="'.$button_name.'" data-colour="'.$colour.'" data-state="'.$state.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                $styles = 'top: '.$top.'px; left: '.$left.'px;';
+                $classes = $base_classes.($is_glowing ? ' glow' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $buttons_markup[] = '<span data-layer="buttons" class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$sprite.'</span>';
+                $button_symbols[$pos] = $button_name;
+                $buttons_index[$button_name] = array(
+                    'pos' => $pos,
+                    'col' => $col,
+                    'row' => $row,
+                    'colour' => $colour,
+                    'state' => $state,
+                    'action' => $action,
+                    'data' => $data,
+                    'hidden' => $hidden,
+                    'locked' => $locked,
+                    );
+            }
+        }
+        $button_symbols_json = json_encode($button_symbols, JSON_NUMERIC_CHECK);
+        $buttons_index_json = json_encode($buttons_index, JSON_NUMERIC_CHECK);
+        $buttons_markup[] = '<script data-json="buttonSymbols" type="application/json">'.$button_symbols_json.'</script>';
+        $buttons_markup[] = '<script data-json="buttonsIndex" type="application/json">'.$buttons_index_json.'</script>';
+        return implode(PHP_EOL, $buttons_markup);
     }
 
     // Define a function for getting the BATTLES LAYER sprite markup for the world map
-    public static function get_battles_layer_markup(){
-        error_log('rpg_world::get_battles_layer_sprites() called!');
+    public static function get_battles_layer_markup($this_prototype_data, $map_data_parsed){
+        error_log('rpg_world::get_battles_layer_markup() called!');
         $markup = '';
         // ...
         return $markup;
     }
 
     // Define a function for getting the TEAM LAYER sprite markup for the world map
-    public static function get_team_layer_markup(){
-        error_log('rpg_world::get_team_layer_sprites() called!');
+    public static function get_team_layer_markup($this_prototype_data, $map_data_parsed){
+        error_log('rpg_world::get_team_layer_markup() called!');
         $markup = '';
         // ...
         return $markup;
