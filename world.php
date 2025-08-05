@@ -433,27 +433,6 @@ $flag_skip_fadein = true;
             $map_offset_styles = $map_config['offset_styles'];
             $map_base_styles = $map_config['base_styles'];
             $map_base_attrs = $map_config['base_attrs'];
-            /*
-            $map_tilesize_default = MMRPG_WORLD_DEFAULT_TILESIZE;
-            $map_tilesize_offset = array(0, 0);
-            if ($map_tile_height > $map_tilesize_default){ $map_tilesize_offset[0] = floor(($map_tile_height - $map_tilesize_default) / 2); }
-            if ($map_tile_width > $map_tilesize_default){ $map_tilesize_offset[1] = floor(($map_tile_width - $map_tilesize_default) / 2); }
-            $map_spritesize_default = MMRPG_WORLD_DEFAULT_SPRITESITE;
-            $map_spritesize_offset = array(0, 0);
-            if ($map_tile_height > $map_spritesize_default){ $map_spritesize_offset[0] = floor(($map_tile_height - $map_spritesize_default) / 2); }
-            elseif ($map_tile_height < $map_spritesize_default){ $map_spritesize_offset[0] = floor(($map_spritesize_default - $map_tile_height) / 2); }
-            if ($map_tile_width > $map_spritesize_default){ $map_spritesize_offset[1] = floor(($map_tile_width - $map_spritesize_default) / 2); }
-            elseif ($map_tile_width < $map_spritesize_default){ $map_spritesize_offset[1] = floor(($map_spritesize_default - $map_tile_width) / 2); }
-            //error_log('$map_spritesize_default = '.print_r($map_spritesize_default, true));
-            //error_log('$map_tile_height = '.print_r($map_tile_height, true));
-            //error_log('$map_tile_width = '.print_r($map_tile_width, true));
-            //error_log('$map_spritesize_offset = '.print_r($map_spritesize_offset, true));
-            $map_size_styles = 'width: '.$map_pixel_width.'px; height: '.$map_pixel_height.'px; ';
-            $map_offset_styles = 'top: 0px; left: 0px; ';
-            $map_base_styles = trim($map_size_styles.$map_offset_styles);
-            $map_base_attrs = 'data-cols="'.$map_col_size.'" data-rows="'.$map_row_size.'"';
-            $map_base_attrs .= ' data-size="'.$map_col_size.' x '.$map_row_size.' x '. $map_tile_width.' x '.$map_tile_height.'"';
-            */
 
             ?>
             <div id="map" data-token="<?= $map_token ?>" style="<?= $map_base_styles ?>" <?= $map_base_attrs ?>>
@@ -474,15 +453,10 @@ $flag_skip_fadein = true;
                 echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
 
                 // BACKGROUND LAYER
-                $map_layer_styles = $map_base_styles; // TODO: support custom styles per layer maybe?
-                $map_layer_attrs = $map_base_attrs; // TODO: support custom attributes per layer maybe?
-                $field_background_image = 'images/fields/'.$map_field_token.'/battle-field_background_base.gif';
-                $field_background_styles = 'top: 0; left: 0; background-image: url('.$field_background_image.');';
-                ?>
-                <div class="layer layer-0 background" data-layer="background" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
-                    <span class="sprite field background" style="<?= $field_background_styles ?>"></span>
-                </div>
-                <?
+                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
+                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
+                $background_layer_sprites = rpg_world::get_background_layer_sprites($this_prototype_data, $map_data_parsed);
+                echo('<div class="layer layer-0 background" data-layer="background"'.$map_layer_styles.$map_layer_attrs.'>'.$background_layer_sprites.'</div>'.PHP_EOL);
 
                 // TERRAIN TILES
                 foreach ($map_data_parsed['layers'] AS $map_layer_key => $map_layer_data){

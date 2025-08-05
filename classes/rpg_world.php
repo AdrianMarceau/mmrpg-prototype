@@ -802,6 +802,62 @@ class rpg_world {
         return $return_markup;
     }
 
+    // Define a function for getting the BACKGROUND LAYER sprite markup for the world map
+    public static function get_background_layer_sprites($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_background_layer_sprites() called!');
+        // BACKGROUND LAYER
+        $background_sprites = array();
+        $mmrpg_index_fields = self::get_indexes('fields');
+        $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
+        $map_field_info = !empty($mmrpg_index_fields[$map_field_token]) ? $mmrpg_index_fields[$map_field_token] : array();
+        $map_field_background = !empty($map_field_info['field_background']) ? $map_field_info['field_background'] : 'field';
+        $map_field_foreground = !empty($map_field_info['field_foreground']) ? $map_field_info['field_foreground'] : 'field';
+        $field_background_image = 'images/fields/'.$map_field_token.'/battle-field_background_base.gif';
+        $field_background_styles = 'top: 0; left: 0; background-image: url('.$field_background_image.');';
+        $background_sprites[] = '<span data-layer="background" class="sprite field background" style="'.$field_background_styles.'"></span>';
+        return implode(PHP_EOL, $background_sprites);
+    }
+
+    // Define a function for getting the TERRAIN LAYER tile-sprite markup for the world map
+    public static function get_terrain_layer_tiles(){
+        error_log('rpg_world::get_terrain_layer_tiles() called!');
+        $markup = '';
+        // ...
+        return $markup;
+    }
+
+    // Define a function for getting the PORTALS LAYER sprite markup for the world map
+    public static function get_portals_layer_sprites(){
+        error_log('rpg_world::get_portals_layer_sprites() called!');
+        $markup = '';
+        // ...
+        return $markup;
+    }
+
+    // Define a function for getting the BUTTONS LAYER sprite markup for the world map
+    public static function get_buttons_layer_sprites(){
+        error_log('rpg_world::get_buttons_layer_sprites() called!');
+        $markup = '';
+        // ...
+        return $markup;
+    }
+
+    // Define a function for getting the BATTLES LAYER sprite markup for the world map
+    public static function get_battles_layer_sprites(){
+        error_log('rpg_world::get_battles_layer_sprites() called!');
+        $markup = '';
+        // ...
+        return $markup;
+    }
+
+    // Define a function for getting the TEAM LAYER sprite markup for the world map
+    public static function get_team_layer_sprites(){
+        error_log('rpg_world::get_team_layer_sprites() called!');
+        $markup = '';
+        // ...
+        return $markup;
+    }
+
 
 }
 ?>
