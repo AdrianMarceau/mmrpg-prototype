@@ -1987,6 +1987,41 @@ class mmrpgWorldMap {
         return $eventsAtPosition;
         }
 
+    // Quick function for starting an interval timer that animations on-screen encounter sprites in a while
+    startIdleAnimation(){
+        //console.log('%c' + 'mmrpgWorldMap.startIdleAnimation()', 'color: magenta;');
+        let _self = this;
+        let _selfRef = _self.startIdleAnimation;
+        let _elements = _self.elements;
+        let $canvasMap = _elements.map;
+        let $vsMechas = $('.sprite.vs-mecha', $canvasMap);
+        $vsMechas.addClass('march');
+        if (_selfRef._interval){ clearInterval(_selfRef._interval); }
+        _selfRef._interval = setInterval(function(){
+            $vsMechas = $('.sprite.vs-mecha:not(.zoom)', $canvasMap);
+            $vsMechas.each(function(){
+                let $mecha = $(this);
+                if ($mecha.data('cooldown') && $mecha.data('cooldown') > 0){
+                    $mecha.data('cooldown', $mecha.data('cooldown') - 1);
+                    return true;
+                    }
+                let curDir = $mecha.attr('data-dir') || 'right';
+                let newDir = curDir === 'right' ? 'left' : 'right';
+                let hasMarch = $mecha.hasClass('march');
+                let changed = false;
+                let changeDirection = Math.random() > 0.5 ? true : false;
+                //let changeMarch = Math.random() > 0.5 ? true : false;
+                if (changeDirection){ $mecha.attr('data-dir', newDir); changed = true; }
+                //if (changeMarch){ $mecha.addClass('march'); changed = true; }
+                if (!changed){ return true; }
+                let randCooldown = 4 + Math.ceil(Math.random() * 6);
+                $mecha.data('cooldown', randCooldown);
+                });
+            }, 500);
+        // Return true on success
+        return true;
+    }
+
     // Quick function for playing a sound effect (if available)
     playSoundEffect(soundName, options){
         //console.log('%c' + 'mmrpgWorldMap.playSoundEffect(' + soundName + ')', 'color: green;');
