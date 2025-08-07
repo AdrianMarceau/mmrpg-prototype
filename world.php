@@ -483,8 +483,8 @@ $flag_skip_fadein = true;
 
                 // END OF LAYERS
                 ?>
-                <div id="click-overlay" class="active"><div class="wrapper"></div></div>
-                <div id="action-dropdown" class="active"><div class="wrapper"></div></div>
+                <div id="click-overlay"><div class="wrapper"></div></div>
+                <div id="action-dropdown"><div class="wrapper"></div></div>
             </div>
             <?
             // Define or generate the markup for the various buttons and UI elements around the world map
@@ -499,8 +499,8 @@ $flag_skip_fadein = true;
             <div id="back-button" class="chrome chrome-button"><?= $back_button_markup ?></div>
             <div id="home-button" class="chrome chrome-button"><?= $home_button_markup ?></div>
             <div id="reset-button" class="chrome chrome-button"><?= $reset_button_markup ?></div>
-            <div id="player-switcher" class="chrome"><?= $player_switcher_markup ?></div>
             <div id="position-display" class="chrome"><?= $position_display_markup ?></div>
+            <div id="player-switcher" class="chrome"><?= $player_switcher_markup ?></div>
             <div id="side-buttons" class="chrome"><?= $side_buttons_markup ?></div>
             <?
             // DEBUG DEBUG DEBUG

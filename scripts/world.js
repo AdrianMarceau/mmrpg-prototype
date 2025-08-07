@@ -113,28 +113,32 @@ class mmrpgWorldMap {
         let $thisWorld = $('#world', $thisPrototype);
         let $thisCanvas = $('#canvas', $thisWorld);
         let $canvasMap = $('#map', $thisCanvas);
-        let $mapLayers = $('.layer', $canvasMap);
-        let $worldCursor = $('.sprite.cursor', $canvasMap);
-        let $teamSprites = $('.sprite.team', $canvasMap);
+        let $mapLayers = $('.layer[data-layer]', $canvasMap);
         let $backButton = $('#back-button', $thisWorld);
         let $homeButton = $('#home-button', $thisWorld);
         let $resetButton = $('#reset-button', $thisWorld);
+        let $positionDisplay = $('#position-display', $thisWorld);
         let $playerSwitcher = $('#player-switcher', $thisWorld);
         let $sideButtons = $('#side-buttons', $thisWorld);
         let $actionDropdown = $('#action-dropdown', $thisWorld);
+        let $clickOverlay = $('#click-overlay', $thisWorld);
+        let $worldCursor = $('.sprite[data-sprite="team-cursor"]', $canvasMap);
+        let $teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap);
         _elements.mmrpg = $thisPrototype;
         _elements.world = $thisWorld;
         _elements.canvas = $thisCanvas;
         _elements.map = $canvasMap;
         _elements.layers = $mapLayers;
-        _elements.cursor = $worldCursor;
-        _elements.teamSprites = $teamSprites;
         _elements.backButton = $backButton;
         _elements.homeButton = $homeButton;
         _elements.resetButton = $resetButton;
+        _elements.positionDisplay = $positionDisplay;
         _elements.playerSwitcher = $playerSwitcher;
         _elements.sideButtons = $sideButtons;
         _elements.actionDropdown = $actionDropdown;
+        _elements.clickOverlay = $clickOverlay;
+        _elements.worldCursor = $worldCursor;
+        _elements.teamSprites = $teamSprites;
         if ($canvasMap.length && $mapLayers.length){
             //console.log('%c' + 'World map canvas found with ' + $mapLayers.length + ' layers...', 'color: orange;');
             // Initialize the world map with the provided canvas and layers
@@ -988,11 +992,11 @@ class mmrpgWorldMap {
         let _cursor = _world.cursor;
         let layerToken = 'terrain'; // TODO: make this dynamic maybe?
         let playerMobility = _config.playerMobility || 1;
-        let $clickOverlay = $('#click-overlay', $canvasMap);
         let activeTimeouts = {}, activeTimeoutDuration = _config.mapEffects.activeTimeout;
         let focusTimeouts = {}, focusTimeoutDuration = _config.mapEffects.focusTimeout;
         let hoverTimeouts = {}, hoverTimeoutDuration = _config.mapEffects.hoverTimeout, hoverTiles = [];
         let lastMouseClick, lastMouseOver;
+        let $clickOverlay = _elements.clickOverlay;
         $clickOverlay.bind('click', function(e){
             e.preventDefault();
             if (_cursor.moving){ return false; }
@@ -1053,6 +1057,7 @@ class mmrpgWorldMap {
             hoverTiles.push(thisPos);
             if (!sameAsLast){  _self.playSoundEffect('icon-hover'); }
             });
+        $clickOverlay.addClass('active');
         // Return true on success
         return true;
         }
@@ -1440,6 +1445,7 @@ class mmrpgWorldMap {
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
+        //let $terrainLayer = $('.layer.terrain', $canvasMap);
         let $backgroundLayer = $('.layer.background', $canvasMap);
         if (typeof scrollX !== 'number'){ scrollX = _worldCursor.positionXY[0] || 0; }
         if (typeof scrollY !== 'number'){ scrollY = _worldCursor.positionXY[1] || 0; }
@@ -1476,6 +1482,7 @@ class mmrpgWorldMap {
         //$canvasMap.css({ transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px)' });
         $canvasMap.attr('data-zoom', worldZoom);
         $canvasMap.css({ transformOrigin: 'left top', transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) scale(' + worldZoom + ')' });
+        //$terrainLayer.css({ transform: 'perspective(800px) rotateX(25deg) rotateY(0deg)' });
         $backgroundLayer.css({ transformOrigin: 'left top', transform: 'translate(' + subTranslateX + 'px, ' + subTranslateY + 'px)' });
         // Return true on success
         return true;
@@ -1515,7 +1522,7 @@ class mmrpgWorldMap {
         let _playerRobots = _config.playerRobots;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
-        let $worldCursor = _elements.cursor;
+        let $worldCursor = _elements.worldCursor;
         let cursorDirection = _worldCursor.direction;
         let cursorPosition = _worldCursor.position;
         let cursorPositionXY = _worldCursor.positionXY;
@@ -1579,7 +1586,7 @@ class mmrpgWorldMap {
         let _playerRobots = _config.playerRobots;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
-        let $worldCursor = _elements.cursor;
+        let $worldCursor = _elements.worldCursor;
         let $teamSprites = _elements.teamSprites;
         let cursorDirection = _worldCursor.direction;
         let cursorPosition = _worldCursor.position;
@@ -1839,7 +1846,7 @@ class mmrpgWorldMap {
             let rushDistanceY = Math.ceil(_mapTileSize[1] / 4);
             let playerFrames = ['06', '01', '04'];
             let robotFrames = ['04', '08', '01', '06', '10', '00', '04', '01'];
-            $teamSprites.each(function(index){
+            $teamSprites.filter(':not(.cursor)').each(function(index){
                 let $sprite = $(this);
                 let oldX = $sprite.prop('worldX') || parseInt($sprite.css('left')) || 0;
                 let oldY = $sprite.prop('worldY') || parseInt($sprite.css('top')) || 0;
