@@ -1199,8 +1199,8 @@ class mmrpgWorldMap {
         let $actionDropdown = _elements.actionDropdown;
         $(document).bind('keydown', function(e){
             //console.log('%c' + 'World map keydown event!', 'color: cyan;');
-            e.preventDefault();
-            e.stopPropagation();
+            //e.preventDefault();
+            //e.stopPropagation();
             //console.log('-> event:', e);
             if (_world.cursor.moving){ return false; }
             //console.log('-> pressedKeys:', pressedKeys);
@@ -1209,6 +1209,7 @@ class mmrpgWorldMap {
             // If the player has pressed any of the arrow keys, let's update the position accordingly
             if (pressedKeys.ArrowLeft || pressedKeys.ArrowRight || pressedKeys.ArrowUp || pressedKeys.ArrowDown){
                 //console.log('%c' + 'Arrow key pressed!', 'color: orange;');
+                e.preventDefault();
                 let oldPos = _world.cursor.position, curPos = oldPos;
                 let thisPos = oldPos.split('-');
                 let thisCol = parseInt(thisPos[0]);
@@ -1245,6 +1246,7 @@ class mmrpgWorldMap {
                 // If the player has pressed the space or enter keys, let's confirm the side-button action if it's open
                 if (pressedKeys.Space || pressedKeys.Enter || pressedKeys.NumpadEnter ){
                     console.log('%c' + 'Confirm action popup!', 'color: orange;');
+                    e.preventDefault();
                     if (!$sideButtons.is('.active')){ return false; }
                     let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
                     if (!$confirmButton || !$confirmButton.length){ console.error('bindEventsToWorld() unable to find confirm button!'); return false; }
@@ -1256,6 +1258,7 @@ class mmrpgWorldMap {
                 // Else if the player has pressed the backspace or escape keys, let's close the side-button action if it's open
                 else if (pressedKeys.Backspace || pressedKeys.Escape){
                     console.log('%c' + 'Dismiss action popup!', 'color: orange;');
+                    e.preventDefault();
                     if (!$sideButtons.is('.active')){ return false; }
                     let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
                     if (!$dismissButton || !$dismissButton.length){ console.error('bindEventsToWorld() unable to find dismiss button!'); return false; }
@@ -1265,12 +1268,26 @@ class mmrpgWorldMap {
                 // Else if the player has just pressed shift, make sure we add the hover class to the action-dropdown
                 else if (pressedKeys.Shift){
                     console.log('%c' + 'Shift key pressed!', 'color: orange;');
+                    e.preventDefault();
                     if (!$sideButtons.is('.active')){ return false; }
                     $actionDropdown.toggleClass('hover');
                     }
                 }
 
             });
+        // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed
+        $(window).bind('resize', function(e){
+            //console.log('%c' + 'World map window resize event!', 'color: cyan;');
+            //e.preventDefault();
+            //e.stopPropagation();
+            //console.log('-> event:', e);
+            //console.log('-> window.devicePixelRatio:', window.devicePixelRatio);
+            let pixelRatio = window.devicePixelRatio || 1;
+            let imageRendering = pixelRatio === 1 || pixelRatio >= 2 ? 'pixelated' : 'auto';
+            //console.log('-> pixelRatio:', pixelRatio, '\n', '-> imageRendering:', imageRendering);
+            $thisWorld.attr('data-rendering', imageRendering);
+            }).trigger('resize');
+
         // Return true on success
         return true;
         }

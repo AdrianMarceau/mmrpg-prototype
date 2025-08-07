@@ -772,7 +772,7 @@ class rpg_world {
         // old format: images/robots/frosty-throwman/sprite_right_40x40.png
         //$sprite_path = 'images/'.$xkind.'/'.$img.($alt ? '_'.$alt : '').'/sprite_'.$img_dir.'_'.$xsize.'.png';
         // new format: images/robots/all/token:frosty-throwman+crop:false+dir:both/sprite_left_40x40.png
-        $sprite_path = 'images/'.$xkind.'/all/token:'.$img.($alt ? '+alt:'.$alt : '').'+crop:false+dir:both/sprite_left_'.$xsize.'.png';
+        $sprite_path = 'images/'.$xkind.'/all/token:'.$img.($alt ? '+alt:'.$alt : '').'+dir:both+zoom:true+crop:false/sprite_left_'.$xsize.'.png';
         $sprite_class = 'sprite '.$kind.($class ? ' '.$class : '');
         $sprite_styles = ($styles ? ' style="'.$styles.'"' : '');
         $sprite_attrs = ' data-token="'.$img.'" data-size="'.$size.'" data-dir="'.$dir.'" data-frame="00" '.($attrs ? ' '.$attrs : '');

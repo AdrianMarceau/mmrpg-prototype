@@ -175,14 +175,17 @@ html, body {
 
 #mmrpg #world .sprite[data-size="40"] > .wrap > .sprite {
     width: 40px; height: 40px;
+    background-size: auto 80px;
     left: 0; top: 0;
 }
 #mmrpg #world .sprite[data-size="80"] > .wrap > .sprite {
     width: 80px; height: 80px;
+    background-size: auto 160px;
     left: -20px; top: -40px;
 }
 #mmrpg #world .sprite[data-size="160"] > .wrap > .sprite {
     width: 160px; height: 160px;
+    background-size: auto 320px;
     left: -40px; top: -80px;
 }
 
@@ -945,8 +948,15 @@ html, body {
     height: 40px;
     position: absolute;
     bottom: 0;
-    image-rendering: pixelated;
+    /* image-rendering: pixelated;  */
 }
+#world[data-rendering="auto"] #canvas #player-switcher a.option > .sprite > .wrap > .sprite {
+    image-rendering: auto !important;
+}
+#world[data-rendering="pixelated"] #canvas #player-switcher a.option > .sprite > .wrap > .sprite {
+    image-rendering: pixelated !important;
+}
+
 #world #canvas #player-switcher a.option > .sprite + .sprite {
     position: absolute;
     top: auto;
