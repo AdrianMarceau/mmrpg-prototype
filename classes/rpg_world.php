@@ -1161,10 +1161,10 @@ class rpg_world {
             //error_log('Checking for player "'.$ptoken.'" on map "'.$map_token.'"');
             $pinfo = $mmrpg_index_players[$ptoken];
             $tmp_session = $world_player_sessions[$ptoken];
-            $tmp_world_token = !empty($tmp_session[$last_world_token_key]) ? $tmp_session[$last_world_token_key] : '';
-            $tmp_world_position = !empty($tmp_session[$last_world_position_key]) ? $tmp_session[$last_world_position_key] : '';
-            $tmp_world_direction = !empty($tmp_session[$last_world_direction_key]) ? $tmp_session[$last_world_direction_key] : '';
-            $tmp_world_robots = !empty($tmp_session[$last_world_robots_key]) ? $tmp_session[$last_world_robots_key] : '';
+            $tmp_world_token = !empty($tmp_session['last_world']) ? $tmp_session['last_world'] : '';
+            $tmp_world_position = !empty($tmp_session['last_position']) ? $tmp_session['last_position'] : '';
+            $tmp_world_direction = !empty($tmp_session['last_direction']) ? $tmp_session['last_direction'] : '';
+            $tmp_world_robots = !empty($tmp_session['last_robots']) ? $tmp_session['last_robots'] : '';
             if (empty($tmp_world_token) || $tmp_world_token !== $map_token){ continue; } // skip if not on this map
             if (empty($tmp_world_position)){ continue; } // skip if no position
             $rival_symbols[$tmp_world_position] = $ptoken;

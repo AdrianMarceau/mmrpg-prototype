@@ -1179,7 +1179,7 @@ class mmrpgWorldMap {
             else if (e.wheelDelta < 0 && e.wheelDelta > -200){ return false; }
             let oldZoom = _world.zoomLevel || 1;
             let newZoom = oldZoom + (e.wheelDelta > 0 ? 0.5 : -0.5);
-            if (newZoom < 1){ newZoom = 1; }
+            if (newZoom < 0.5){ newZoom = 0.5; }
             if (newZoom > 2){ newZoom = 2; }
             if (newZoom === oldZoom){ return; }
             busyZooming = true;
@@ -1339,6 +1339,7 @@ class mmrpgWorldMap {
         let tileOffsetX = ((thisNewCol - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0];
         let tileOffsetY = ((thisNewRow - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1];
         let cursorHasMoved = _worldCursor.moved || thisNewPos !== _mapStartPosition ? true : false;
+        _self.updateZoomLevel(1);
         $canvasMap.addClass('busy');
         _worldCursor.moving = true;
         $actionDropdown.removeClass('active');
@@ -1362,6 +1363,7 @@ class mmrpgWorldMap {
             $cursorSprite.attr('data-col', thisNewCol);
             $cursorSprite.attr('data-row', thisNewRow);
             $cursorSprite.attr('data-pos', _worldCursor.position);
+            _self.updateZoomLevel(1);
             _self.updateMapPosition();
             _self.makeLayerTileActive(_worldCursor.position);
             if (moveTimeout){ clearTimeout(moveTimeout); }
@@ -1822,6 +1824,7 @@ class mmrpgWorldMap {
 
         // Define an inline function to put the team into their battle-ready poses
         let getTeamSpritesReady = function(){
+            if (_worldCursor.moving || _worldCursor.position !== cursorPosition){ return; }
 
             // Add the shake class to the cursor so it hides behind the player
             $worldCursor.addClass('shake');
@@ -1858,6 +1861,7 @@ class mmrpgWorldMap {
         // Define an inline function to redirect to the portal if needed
         let redirectToLocation = function(){
             //console.log('%c' + 'redirectToLocation()', 'color: cyan;');
+            if (_worldCursor.moving || _worldCursor.position !== cursorPosition){ return; }
             $thisWorld.addClass('hidden');
             if (autoRedirectSound){
                 _self.playSoundEffect(autoRedirectSound);
@@ -1865,6 +1869,8 @@ class mmrpgWorldMap {
             if (autoRedirectURL){
                 _self.updateZoomLevel(1.25);
                 _self.saveWorldState(function(){
+                    if (_worldCursor.moving || _worldCursor.position !== cursorPosition){ return; }
+                    else { _self.updateZoomLevel(1); }
                     _self.updateZoomLevel(1.5);
                     window.location.href = autoRedirectURL;
                     _self.updateZoomLevel(2.0);
@@ -1875,12 +1881,7 @@ class mmrpgWorldMap {
 
         // Define an inline function to zoom and show the dropdown which we'll call after a timeout
         let zoomAndShowDropdown = function(){
-
-            // If the cursor started moving before/as this event showed, cancel it
-            //console.log('checking if _worldCursor.moving or position !== newPosition');
-            //console.log('-> _worldCursor.moving =', _worldCursor.moving);
-            //console.log('-> _worldCursor.position =', _worldCursor.position);
-            //console.log('-> cursorPosition =', cursorPosition);
+            //console.log('%c' + 'zoomAndShowDropdown()', 'color: cyan;');
             if (_worldCursor.moving || _worldCursor.position !== cursorPosition){ return; }
 
             // Elevate the event sprite(s) to the zoom layer and add a zoom class to it so it's more visible

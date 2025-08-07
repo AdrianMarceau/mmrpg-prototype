@@ -81,27 +81,23 @@ if (!empty($_POST['action']) && $_POST['action'] === 'save'
         $cursorPlayerSession = &$playerSessions[$cursorPlayer];
         // If last world was provided, save it to the sessions
         if (!empty($worldData['lastPlayerWorld']) && in_array($worldData['lastPlayerWorld'], $allowed_map_tokens)){
-            $last_world_token_key = 'last_world';
-            $lastPlayerSession[$last_world_token_key] = $worldData['lastPlayerWorld'];
-            $cursorPlayerSession[$last_world_token_key] = $worldData['lastPlayerWorld'];
+            $lastPlayerSession['last_world'] = $worldData['lastPlayerWorld'];
+            $cursorPlayerSession['last_world'] = $worldData['lastPlayerWorld'];
         }
         // If last position was provided, save it to the sessions
         if (!empty($worldData['lastPlayerPosition']) && preg_match('/^([-0-9]+)$/i', $worldData['lastPlayerPosition'])){
-            $last_world_position_key = 'last_position';
-            $lastPlayerSession[$last_world_position_key] = $worldData['lastPlayerPosition'];
-            $cursorPlayerSession[$last_world_position_key] = $worldData['lastPlayerPosition'];
+            $lastPlayerSession['last_position'] = $worldData['lastPlayerPosition'];
+            $cursorPlayerSession['last_position'] = $worldData['lastPlayerPosition'];
         }
         // If last direction was provided, save it to the sessions
         if (!empty($worldData['lastPlayerDirection']) && preg_match('/^([-a-z0-9]+)$/i', $worldData['lastPlayerDirection'])){
-            $last_world_direction_key = 'last_direction';
-            $lastPlayerSession[$last_world_direction_key] = $worldData['lastPlayerDirection'];
-            $cursorPlayerSession[$last_world_direction_key] = $worldData['lastPlayerDirection'];
+            $lastPlayerSession['last_direction'] = $worldData['lastPlayerDirection'];
+            $cursorPlayerSession['last_direction'] = $worldData['lastPlayerDirection'];
         }
         // If world button states were provided, save them to the session
         if (!empty($worldData['lastWorldButtons'])){
-            $last_world_buttons_key = 'world_buttons';
-            if (!isset($WORLD_SESSION[$last_world_buttons_key])){ $WORLD_SESSION[$last_world_buttons_key] = array(); }
-            $worldButtonStates = &$WORLD_SESSION[$last_world_buttons_key];
+            if (!isset($WORLD_SESSION['world_buttons'])){ $WORLD_SESSION['world_buttons'] = array(); }
+            $worldButtonStates = &$WORLD_SESSION['world_buttons'];
             foreach ($worldData['lastWorldButtons'] AS $map_token => $button_states){
                 if (!in_array($map_token, $allowed_map_tokens)){ continue; }
                 if (!isset($worldButtonStates[$map_token])){ $worldButtonStates[$map_token] = array(); }
@@ -110,9 +106,8 @@ if (!empty($_POST['action']) && $_POST['action'] === 'save'
         }
         // If world switch states were provided, save them to the session
         if (!empty($worldData['lastWorldSwitches'])){
-            $last_world_switches_key = 'world_switches';
-            if (!isset($WORLD_SESSION[$last_world_switches_key])){ $WORLD_SESSION[$last_world_switches_key] = array(); }
-            $worldSwitchStates = &$WORLD_SESSION[$last_world_switches_key];
+            if (!isset($WORLD_SESSION['world_switches'])){ $WORLD_SESSION['world_switches'] = array(); }
+            $worldSwitchStates = &$WORLD_SESSION['world_switches'];
             foreach ($worldData['lastWorldSwitches'] AS $map_token => $switch_states){
                 if (!in_array($map_token, $allowed_map_tokens)){ continue; }
                 if (!isset($worldSwitchStates[$map_token])){ $worldSwitchStates[$map_token] = array(); }
@@ -120,7 +115,7 @@ if (!empty($_POST['action']) && $_POST['action'] === 'save'
             }
         }
         //error_log('World data saved successfully for player "'.$lastPlayer.'"!');
-        //error_log('World data saved successfully for player "'.$lastPlayer.'" with world "'.$lastPlayerSession[$last_world_token_key].'" and position "'.$lastPlayerSession[$last_world_position_key].'"');
+        //error_log('World data saved successfully for player "'.$lastPlayer.'" with world "'.$lastPlayerSession['last_world'].'" and position "'.$lastPlayerSession['last_position'].'"');
         //error_log('$WORLD_SESSION = '.print_r($WORLD_SESSION, true));
     }
     // that's all we support for now, return a success response
@@ -180,12 +175,6 @@ if (!empty($this_prototype_data['this_current_player'])){
     die('MMRPG World Fatal Error - No player token defined!');
 }
 
-// Define the session keys we'll be using to store player-specific world settings
-$last_world_token_key = 'last_world';
-$last_world_position_key = 'last_position';
-$last_world_direction_key = 'last_direction';
-$last_world_robots_key = 'last_robots';
-
 // Make sure the appropriate player token is set in the settings array
 if (!isset($WORLD_SESSION['player_sessions'][$this_player_token])){ $WORLD_SESSION['player_sessions'][$this_player_token] = array(); }
 $WORLD_PLAYER_SESSION = &$WORLD_SESSION['player_sessions'][$this_player_token];
@@ -222,7 +211,7 @@ if (!empty($current_player_robots)){
     //error_log('$this_player_token.' robots = '.print_r($this_player_robots, true));
     $this_prototype_data['this_player_robots'] = $this_player_robots;
 }
-$WORLD_PLAYER_SESSION[$last_world_robots_key] = implode(',', $this_prototype_data['this_player_robots']);
+$WORLD_PLAYER_SESSION['last_robots'] = implode(',', $this_prototype_data['this_player_robots']);
 
 // Update the player's mobility with any character-specific bonuses or contextual modifiers
 if ($this_prototype_data['this_player_token'] === 'player'){ $this_prototype_data['this_player_mobility'] = -1; }
@@ -230,22 +219,22 @@ else { $this_prototype_data['this_player_mobility'] = MMRPG_WORLD_DEFAULT_MOBILI
 
 // Collect or define the current map token we'll be loading from
 $request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
-if (empty($request_world_token) && !empty($WORLD_PLAYER_SESSION[$last_world_token_key])){ $request_world_token = $WORLD_PLAYER_SESSION[$last_world_token_key]; }
-if (!empty($request_world_token) && !empty($WORLD_PLAYER_SESSION[$last_world_token_key]) && $request_world_token !== $WORLD_PLAYER_SESSION[$last_world_token_key]){ unset($WORLD_PLAYER_SESSION[$last_world_position_key]); }
+if (empty($request_world_token) && !empty($WORLD_PLAYER_SESSION['last_world'])){ $request_world_token = $WORLD_PLAYER_SESSION['last_world']; }
+if (!empty($request_world_token) && !empty($WORLD_PLAYER_SESSION['last_world']) && $request_world_token !== $WORLD_PLAYER_SESSION['last_world']){ unset($WORLD_PLAYER_SESSION['last_position']); }
 if (!empty($request_world_token) && in_array($request_world_token, $allowed_map_tokens)){
     $this_prototype_data['this_current_world'] = $request_world_token;
 }
 if (empty($this_prototype_data['this_current_world'])){ $this_prototype_data['this_current_world'] = $default_world_token; }
-$WORLD_PLAYER_SESSION[$last_world_token_key] = $this_prototype_data['this_current_world'];
+$WORLD_PLAYER_SESSION['last_world'] = $this_prototype_data['this_current_world'];
 
 // Collect or define the current map position we'll be spawning into
 $request_world_position = isset($_REQUEST['position']) && preg_match('/^([-0-9]+)$/i', $_REQUEST['position']) ? trim($_REQUEST['position']) : '';
 $request_world_direction = isset($_REQUEST['direction']) && preg_match('/^([-a-z0-9]+)$/i', $_REQUEST['direction']) ? trim($_REQUEST['direction']) : '';
-if (empty($request_world_position) && !empty($WORLD_PLAYER_SESSION[$last_world_position_key])){ $request_world_position = $WORLD_PLAYER_SESSION[$last_world_position_key]; }
-if (empty($request_world_direction) && !empty($WORLD_PLAYER_SESSION[$last_world_direction_key])){ $request_world_direction = $WORLD_PLAYER_SESSION[$last_world_direction_key]; }
+if (empty($request_world_position) && !empty($WORLD_PLAYER_SESSION['last_position'])){ $request_world_position = $WORLD_PLAYER_SESSION['last_position']; }
+if (empty($request_world_direction) && !empty($WORLD_PLAYER_SESSION['last_direction'])){ $request_world_direction = $WORLD_PLAYER_SESSION['last_direction']; }
 $this_prototype_data['this_current_position'] = !empty($request_world_position) ? $request_world_position : $default_world_position;
 $this_prototype_data['this_current_direction'] = !empty($request_world_direction) ? $request_world_direction : $default_world_direction;
-$WORLD_PLAYER_SESSION[$last_world_position_key] = $this_prototype_data['this_current_position'];
+$WORLD_PLAYER_SESSION['last_position'] = $this_prototype_data['this_current_position'];
 
 // Load map data from the appropriate map file
 $map_token = $this_prototype_data['this_current_world'];
