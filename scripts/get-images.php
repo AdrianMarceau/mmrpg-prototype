@@ -39,6 +39,7 @@ $request_file = isset($_GET['file']) && preg_match($allowed_file_regex, $_GET['f
 $request_size = !empty($_GET['size']) && is_numeric($_GET['size']) ? (int)($_GET['size']) : false;
 $request_alt = !empty($_GET['alt']) && preg_match('/^[-_a-z0-9]+$/', $_GET['alt']) ? $_GET['alt'] : 0;
 $request_crop = !empty($_GET['crop']) && $_GET['crop'] === 'false' ? false : true;
+$request_zoomed = !empty($_GET['zoom']) && $_GET['zoom'] === 'true' ? true : false;
 $request_frame = !empty($_GET['frame']) && is_numeric($_GET['frame']) ? (int)($_GET['frame']) : 0;
 $request_dir = !empty($_GET['dir']) && in_array($_GET['dir'], $allowed_directions) ? $_GET['dir'] : false;
 $force_refresh = !empty($_GET['refresh']) && $_GET['refresh'] === 'true' ? true : false;
@@ -58,6 +59,7 @@ $cached_file_hash = md5($request_kind.$request_type.$request_sub_type.$request_t
 //error_log('$request_size = '.print_r($request_size, true));
 //error_log('$request_alt = '.print_r($request_alt, true));
 //error_log('$request_crop = '.print_r($request_crop, true));
+//error_log('$request_zoomed = '.print_r(($request_zoomed ? 'true' : 'false'), true));
 //error_log('$request_frame = '.print_r($request_frame, true));
 //error_log('$request_dir = '.print_r($request_dir, true));
 //error_log('$force_refresh = '.print_r($force_refresh, true));
@@ -97,8 +99,10 @@ if (!empty($request_alt)){ $composite_base_token .= '_a-'.$request_alt; }
 if (!empty($request_frame)){ $composite_base_token .= '_f-'.$request_frame; }
 if (!empty($request_editor)){ $composite_base_token .= '_e-'.$request_editor; }
 if (!empty($request_token)){ $composite_base_token .= '_t-'.preg_replace('/[^-a-z0-9]+/i', '-', $request_token); }
+if (!empty($request_zoomed)){ $composite_base_token .= '_x2'; }
 $composite_image_binary_path = $request_type.'_'.$composite_base_token.'.png';
 $composite_image_index_path = $request_type.'_'.$composite_base_token.'.json';
+//error_log('$composite_base_token = '.print_r($composite_base_token, true));
 //error_log('$composite_base_path = '.print_r($composite_base_path, true));
 //error_log('$composite_image_binary_path = '.print_r($composite_image_binary_path, true));
 //error_log('$composite_image_index_path = '.print_r($composite_image_index_path, true));
@@ -304,7 +308,9 @@ if ($must_regenerate){
             }
             // Now check to see if the file actually exists, else unset for that too
             else {
-                $size_string = $object_info['image_size'].'x'.$object_info['image_size'];
+                $image_size = $object_info['image_size'];
+                if ($request_zoomed){ $image_size *= 2; }
+                $size_string = $image_size.'x'.$image_size;
                 $src_folder = $request_alt > 0 ? 'sprites_alt'.($request_alt > 1 ? $request_alt : '') : 'sprites';
                 $src_base = $sprite_object_dir.$object_info['image'].'/'.$src_folder.'/';
                 $src_file = preg_replace('/([0-9]{1,3})x([0-9]{1,3})/', $size_string, $request_file_name).'.png';
@@ -323,8 +329,10 @@ if ($must_regenerate){
     $max_sprite_height = 0;
     if (!empty($composite_objects)){
         foreach ($composite_objects AS $object_token => $object_info){
-            if ($object_info['image_size'] > $max_sprite_width){ $max_sprite_width = $object_info['image_size']; }
-            if ($object_info['image_size'] > $max_sprite_height){ $max_sprite_height = $object_info['image_size']; }
+            $image_size = $object_info['image_size'];
+            if ($request_zoomed){ $image_size *= 2; }
+            if ($image_size > $max_sprite_width){ $max_sprite_width = $image_size; }
+            if ($image_size > $max_sprite_height){ $max_sprite_height = $image_size; }
         }
     }
     //error_log('$max_sprite_width = '.print_r($max_sprite_width, true));
@@ -504,7 +512,9 @@ if ($must_regenerate){
                 $opposite_direction = $object_direction === 'left' ? 'right' : 'left';
                 $object_file = str_replace('_'.$opposite_direction.'_', '_'.$object_direction.'_', $request_file_name);
                 $position = $calculate_position($object_key, $sprite_objects_grid_width, $sprite_objects_grid_height, $target_sprite_width, $target_sprite_height);
-                $size_string = $object_info['image_size'].'x'.$object_info['image_size'];
+                $image_size = $object_info['image_size'];
+                if ($request_zoomed){ $image_size *= 2; }
+                $size_string = $image_size.'x'.$image_size;
                 $src_folder = $request_alt > 0 ? 'sprites_alt'.($request_alt > 1 ? $request_alt : '') : 'sprites';
                 $src_base = $sprite_object_dir.$object_info['image'].'/'.$src_folder.'/';
                 $src_file = preg_replace('/([0-9]{1,3})x([0-9]{1,3})/', $size_string, $object_file).'.png';
@@ -515,7 +525,7 @@ if ($must_regenerate){
                     'image' => $object_info['image'],
                     'file' => $object_file,
                     'source' => $source_path_relative,
-                    'size' => $object_info['image_size'],
+                    'size' => $image_size,
                     'position' => array('col' => $position['col'], 'row' => $position['row']),
                     'offset' => array('x' => $position['x'], 'y' => $position['y'])
                     );
