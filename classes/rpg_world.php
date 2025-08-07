@@ -1011,7 +1011,6 @@ class rpg_world {
     public static function get_battles_layer_markup($this_prototype_data, $map_data_parsed){
         //error_log('rpg_world::get_battles_layer_markup() called!');
         // BATTLES LAYER
-        // Generate the random encounters for this map location if not already spawned
         $WORLD_SESSION = self::get_session();
         $map_config = $map_data_parsed['config'];
         $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : '';

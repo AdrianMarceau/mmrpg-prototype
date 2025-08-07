@@ -317,15 +317,6 @@ $WORLD_SESSION['world_maps'][$map_token]['exit_pos'] = $map_exit_pos;
 // If the world position has not been set yet, we can use the spawn position for it
 if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data['this_current_position'] = $map_spawn_pos; }
 
-/*
-// Generate the random encounters for this map location if not already spawned
-$world_map_encounters = !empty($WORLD_SESSION['world_encounters'][$map_token]) ? $WORLD_SESSION['world_encounters'][$map_token] : array();
-//error_log('$world_map_encounters = '.print_r($world_map_encounters, true));
-if (empty($world_map_encounters)){ $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed); }
-//error_log('$world_map_encounters = '.print_r($world_map_encounters, true));
-$WORLD_SESSION['world_encounters'][$map_token] = $world_map_encounters;
-*/
-
 // If there are any buttons defined, check to see if any of them have been pushed already
 if (!empty($map_data_parsed['buttons'])){
     $button_sprites = $map_data_parsed['buttons'];
@@ -608,13 +599,6 @@ $flag_skip_fadein = true;
 
                     ?>
                 </div>
-                <?
-
-                // EVENT OBJECTS (OVER)
-                $map_layer_styles = $map_base_styles;
-                $map_layer_attrs = $map_base_attrs;
-                ?>
-                <div class="layer layer-6 objects zoom" data-layer="zoom" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>> <!-- dynamic layer for temporarily zoomed-sprites --> </div>
                 <?
 
                 // END OF LAYERS

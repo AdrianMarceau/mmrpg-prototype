@@ -1604,21 +1604,13 @@ class mmrpgWorldMap {
 
         // Collect references to the required event layers and the zoom display layer
         let $eventsLayers = $('.layer.events', $canvasMap);
-        let $zoomLayer = $('.layer.zoom', $canvasMap);
         if (!$eventsLayers || !$eventsLayers.length){ console.error('updateMapPosition() missing required $eventsLayers!'); return false; }
-        if (!$zoomLayer || !$zoomLayer.length){ console.error('updateMapPosition() missing required $zoomLayer!'); return false; }
         //console.log('-> $eventsLayer found, checking for events...');
 
         // Make sure we move any existing zoom layer sprites back to their original layers
         $worldCursor.removeClass('shake');
         $eventsLayers.removeClass('has-zoom');
-        $('.sprite', $zoomLayer).each(function(){
-            let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
-            $sprite.appendTo($layer).removeAttr('data-layer');
-            //console.log('-> moving sprite back to layer', layer, 'from zoom layer');
-            });
         setTimeout(function(){ $('.sprite', $canvasMap).removeClass('zoom'); }, 100);
-        //$('.sprite', $zoomLayer).removeClass('zoom');
 
         // Search for events at the new position so we can show the action dropdown if needed
         //console.log('-> checking if there are any events for this position...');
@@ -1909,7 +1901,6 @@ class mmrpgWorldMap {
                 else if (relativePosition[0] > 0){ newDirection = 'left'; }
                 else if (cursorDirection.indexOf('right') !== -1){ newDirection = 'left'; }
                 else if (cursorDirection.indexOf('left') !== -1){ newDirection = 'right'; }
-                //$eventSprite.appendTo($zoomLayer);
                 //$eventSprite.attr('data-layer', eventLayer);
                 //console.log('-> moving event sprite to zoom layer', eventLayer, 'from events layer');
                 setTimeout(function(){
@@ -1949,10 +1940,6 @@ class mmrpgWorldMap {
                 $eventsLayers.removeClass('has-zoom');
                 $('.sprite.zoom', $canvasMap).removeClass('zoom');
                 $('.sprite[data-frame]', $canvasMap).attr('data-frame', '00');
-                /* $('.sprite.zoom', $zoomLayer).each(function(){
-                    let $sprite = $(this), layer = $sprite.attr('data-layer'), $layer = $('.layer[data-layer="'+layer+'"]', $canvasMap);
-                    $sprite.appendTo($layer).removeAttr('data-layer').removeClass('zoom').attr('data-frame', '00');
-                    }); // unused now? */
                 };
 
             // Define the event to run when clicking one of these new action buttons

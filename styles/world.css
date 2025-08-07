@@ -61,7 +61,6 @@ html, body {
 #world #canvas #map .layer[data-layer="switches"] { z-index: 24; }
 #world #canvas #map .layer[data-layer="battles"] { z-index: 30; }
 #world #canvas #map .layer[data-layer="team"] { z-index: 40; }
-#world #canvas #map .layer[data-layer="zoom"] { z-index: 50; }
 
 /* define some special-effect styles for the terrain layer specifically */
 #world #canvas #map .layer[data-layer="terrain"] canvas {
@@ -538,7 +537,6 @@ html, body {
 }
 
 /* define the special zoom styles that are applied when something is focused */
-#world #map .layer.zoom .sprite:not(.tile) > .wrap > .sprite,
 #world #map .layer .sprite:not(.tile).zoom > .wrap > .sprite,
 #world #map .layer .sprite:not(.tile).always-zoom > .wrap > .sprite {
     image-rendering: pixelated;
