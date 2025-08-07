@@ -245,8 +245,18 @@ class mmrpgWorldMap {
         let layersPending = $mapLayers.length;
         let reduceLayersPending = function(){
             layersPending--;
-            if (!layersPending){ return onWorldLoaded(); }
+            if (!layersPending){ return onLayersLoaded(); }
             else { return true; }
+            };
+        let onLayersLoaded = function(){
+            let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
+            let dropdownRequired = !_elements.actionDropdown || !_elements.actionDropdown.length;
+            if ($terrainLayer.length && dropdownRequired){
+                let $actionDropdown = $('<div id="action-dropdown"><div class="wrapper"></div></div>');
+                $terrainLayer.append($actionDropdown);
+                _elements.actionDropdown = $actionDropdown;
+                }
+            return onWorldLoaded();
             };
         // Loop through each map layer and generate graphics and/or interactivity
         $mapLayers.each(function(index, element){
@@ -259,10 +269,7 @@ class mmrpgWorldMap {
                 reduceLayersPending();
                 return true;
                 };
-            if (layerToken === 'terrain'){
-                _self.initMapLayerCanvas($thisLayer, onLayerReady);
-                return true;
-                }
+            // If there are any blocks of json inside this layer, parse them now
             if ($jsonScripts.length > 0){
                 //console.log('---> found ' + $jsonScripts.length + ' [data-json] scripts in layer #' + index + '!');
                 $jsonScripts.each(function(index){
@@ -277,6 +284,11 @@ class mmrpgWorldMap {
                     _config[configName] = jsonObject;
                     return true;
                     });
+                }
+            // If this is a terrain layer, we need to initialize the canvas and draw the tiles
+            if (layerToken === 'terrain'){
+                _self.initMapLayerCanvas($thisLayer, onLayerReady);
+                return true;
                 }
             onLayerReady();
             return true;

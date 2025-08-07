@@ -481,10 +481,12 @@ $flag_skip_fadein = true;
                     echo($teams_layer_markup);
                 echo('</div>'.PHP_EOL);
 
+                // CLICK OVERLAY
+                // Print out the click overlay after everything else to capture mouse events
+                echo('<div id="click-overlay"><div class="wrapper"></div></div>'.PHP_EOL);
+
                 // END OF LAYERS
                 ?>
-                <div id="click-overlay"><div class="wrapper"></div></div>
-                <div id="action-dropdown"><div class="wrapper"></div></div>
             </div>
             <?
             // Define or generate the markup for the various buttons and UI elements around the world map
