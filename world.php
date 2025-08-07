@@ -15,6 +15,8 @@ $_SESSION['PROTOTYPE_TEMP'] = array();
 $_SESSION['WORLD_TEMP'] = array();
 
 // If a reset action was requested, we should reset the world session and redirect
+//error_log('$_GET = '. print_r($_GET, true));
+//error_log('$_POST = '. print_r($_POST, true));
 if (!empty($_REQUEST['reset'])
     && $_REQUEST['reset'] === 'world'){
     rpg_world::reset_session();
@@ -38,7 +40,6 @@ rpg_world::init_session();
 $WORLD_SESSION = &$_SESSION['WORLD'];
 
 // Predefine any missing world session variables so they're available
-//if (!isset($WORLD_SESSION['last_player_token'])){ $WORLD_SESSION['last_player_token'] = ''; }
 if (!isset($WORLD_SESSION['player_sessions'])){ $WORLD_SESSION['player_sessions'] = array(); }
 if (!isset($WORLD_SESSION['player_sessions']['last_player'])){ $WORLD_SESSION['player_sessions']['last_player'] = ''; }
 if (!isset($WORLD_SESSION['world_maps'])){ $WORLD_SESSION['world_maps'] = array(); }
@@ -47,7 +48,6 @@ if (!isset($WORLD_SESSION['world_switches'])){ $WORLD_SESSION['world_switches'] 
 if (!isset($WORLD_SESSION['world_encounters'])){ $WORLD_SESSION['world_encounters'] = array(); }
 
 // Define defaults and allowed values for the prototype world data
-//$allowed_map_tokens = array('starter', 'water', 'starter-80x80', 'water-80x80');
 $existing_sheet_files = glob(MMRPG_CONFIG_ROOTDIR.MMRPG_WORLD_MAPFILE_BASEPATH.'*.sheet');
 $existing_map_files = glob(MMRPG_CONFIG_ROOTDIR.MMRPG_WORLD_MAPFILE_BASEPATH.'*.map');
 $allowed_sheet_tokens = array_map(function($path){ return preg_replace('/\.sheet$/i', '', basename($path)); }, $existing_sheet_files);
@@ -58,13 +58,10 @@ $allowed_map_tokens = array_map(function($path){ return preg_replace('/\.map$/i'
 //error_log('$allowed_map_tokens = '. print_r($allowed_map_tokens, true));
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
 array_unshift($allowed_player_tokens, 'player'); // always allow the "player" token
-$default_world_token = 'debug-area-1'; //'starter-80x80';
+$default_world_token = 'debug-area-1';
 $default_player_token = 'player';
 $default_world_position = '';
 $default_world_direction = '';
-
-//error_log('$_GET = '. print_r($_GET, true));
-//error_log('$_POST = '. print_r($_POST, true));
 
 // If a save action was requested, we should do it here and then return exit
 if (!empty($_POST['action']) && $_POST['action'] === 'save'
@@ -73,7 +70,6 @@ if (!empty($_POST['action']) && $_POST['action'] === 'save'
     $playerSessions = &$WORLD_SESSION['player_sessions'];
     if (!empty($worldData['lastPlayer'])
         && in_array($worldData['lastPlayer'], $allowed_player_tokens)){
-        //$WORLD_SESSION['last_player_token'] = $worldData['lastPlayer'];
         $playerSessions['last_player'] = $worldData['lastPlayer'];
         // Collect the last player session data so we can update
         $lastPlayer = $worldData['lastPlayer'];
@@ -205,7 +201,6 @@ $summoned_player_robots = rpg_world::get_battle_history($this_player_token, 'rob
 //error_log('$current_player_robots = '.print_r($current_player_robots, true));
 //error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));
 if (!empty($summoned_player_robots)){
-    //error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));
     usort($current_player_robots, function($a, $b) use ($summoned_player_robots){
         $a_summoned = array_search($a, $summoned_player_robots);
         $b_summoned = array_search($b, $summoned_player_robots);
@@ -224,6 +219,7 @@ if (!empty($current_player_robots)){
         $robot_string = $robot_id . '_' . $robot_token;
         $this_player_robots[] = $robot_string;
     }
+    //error_log('$this_player_token.' robots = '.print_r($this_player_robots, true));
     $this_prototype_data['this_player_robots'] = $this_player_robots;
 }
 $WORLD_PLAYER_SESSION[$last_world_robots_key] = implode(',', $this_prototype_data['this_player_robots']);
@@ -254,11 +250,11 @@ $WORLD_PLAYER_SESSION[$last_world_position_key] = $this_prototype_data['this_cur
 // Load map data from the appropriate map file
 $map_token = $this_prototype_data['this_current_world'];
 $map_name = str_replace(' AREA ', ' Area ', strtoupper(str_replace('-', ' ', $map_token)));
+$map_data_parsed = rpg_world::load_map_data($map_token);
+$map_sprite_sheet = !empty($map_data_parsed) && !empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : '';
 //error_log('$map_token = '.print_r($map_token, true));
 //error_log('$map_name = '.print_r($map_name, true));
-$map_data_parsed = rpg_world::load_map_data($map_token);
 //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
-$map_sprite_sheet = !empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : '';
 //error_log('$map_sprite_sheet = '.print_r($map_sprite_sheet, true));
 if (empty($map_sprite_sheet)){ error_log('MMRPG World Fatal Error - No sprite sheet defined for map "'.$map_token.'"!'); die(); }
 

@@ -794,7 +794,7 @@ class rpg_world {
         $sprite_path = 'images/'.$xkind.'/all/token:'.$img.($alt ? '+alt:'.$alt : '').'+dir:both+zoom:true+crop:false/sprite_left_'.$xsize.'.png';
         $sprite_class = 'sprite '.$kind.($class ? ' '.$class : '');
         $sprite_styles = ($styles ? ' style="'.$styles.'"' : '');
-        $sprite_attrs = ' data-token="'.$img.'" data-size="'.$size.'" data-dir="'.$dir.'" data-frame="00" '.($attrs ? ' '.$attrs : '');
+        $sprite_attrs = ' data-sprite="'.$kind.'" data-token="'.$img.'" data-size="'.$size.'" data-dir="'.$dir.'" data-frame="00" '.($attrs ? ' '.$attrs : '');
         $sprite_markup = '';
         $sprite_markup .= '<span class="'.$sprite_class.'"'.$sprite_attrs.$sprite_styles.'>';
             $sprite_markup .= '<span class="wrap">';
@@ -868,7 +868,7 @@ class rpg_world {
         $map_field_foreground = !empty($map_field_info['field_foreground']) ? $map_field_info['field_foreground'] : 'field';
         $field_background_image = 'images/fields/'.$map_field_token.'/battle-field_background_base.gif';
         $field_background_styles = 'top: 0; left: 0; background-image: url('.$field_background_image.');';
-        $background_sprites[] = '<span data-layer="background" class="sprite field background" style="'.$field_background_styles.'"></span>';
+        $background_sprites[] = '<span data-sprite="background" class="sprite field background" style="'.$field_background_styles.'"></span>';
         return implode(PHP_EOL, $background_sprites);
     }
 
@@ -895,7 +895,7 @@ class rpg_world {
             }
         }
         $tile_data_json = json_encode($tile_data, JSON_NUMERIC_CHECK);
-        $terrain_markup[] = '<canvas width="'.$map_pixel_width.'" height="'.$map_pixel_height.'"></canvas>';
+        $terrain_markup[] = '<canvas data-canvas="terrain" width="'.$map_pixel_width.'" height="'.$map_pixel_height.'"></canvas>';
         $terrain_markup[] = '<script data-json="tileData" type="application/json">'.$tile_data_json.'</script>';
         return implode(PHP_EOL, $terrain_markup);
     }
@@ -929,7 +929,7 @@ class rpg_world {
                 $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                 $classes = 'sprite tile portal'.($portal_name !== 'spawn' && !$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 $style = 'top: '.$top.'px; left: '.$left.'px;';
-                $portals_markup[] = '<span data-layer="portals" class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>';
+                $portals_markup[] = '<span data-sprite="portal" class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>';
                 $portal_symbols[$pos] = $portal_name;
                 $portals_index[$portal_name] = array(
                     'pos' => $pos,
@@ -985,7 +985,7 @@ class rpg_world {
                 $attrs = 'data-button="'.$button_name.'" data-colour="'.$colour.'" data-state="'.$state.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                 $styles = 'top: '.$top.'px; left: '.$left.'px;';
                 $classes = $base_classes.($is_glowing ? ' glow' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
-                $buttons_markup[] = '<span data-layer="buttons" class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$sprite.'</span>';
+                $buttons_markup[] = '<span data-sprite="button" class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$sprite.'</span>';
                 $button_symbols[$pos] = $button_name;
                 $buttons_index[$button_name] = array(
                     'pos' => $pos,
@@ -1050,9 +1050,9 @@ class rpg_world {
             $class = 'battle vs-'.$subkind.' bounce';
             if ($subkind === 'boss'){ $class .= ' always-zoom'; }
             $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$zindex.';';
-            $attrs = 'data-battle="'.$battle.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
-            $attrs .= 'data-label="'.$name.'"';
+            $attrs = 'data-battle="'.$battle.'" data-label="'.$name.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
             $markup = self::get_sprite($kind, $token, $alt, $dir, $class, $style, $attrs);
+            $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="battle-'.$kind.'"', $markup);
             $battles_markup[] = $markup;
             $battle_symbols[$pos] = $battle;
             $battles_index[$battle] = array(
@@ -1103,10 +1103,11 @@ class rpg_world {
                     if (strstr($team_dir, 'up')){ $top += 2; }
                     elseif (strstr($team_dir, 'down')){ $top -= 2; }
                     }
-                $class = $team_class; //'team bounce';
+                $class = $team_class.' bounce';
                 $styles = 'top: '.$top.'px; left: '.$left.'px; ';
                 $attrs = 'data-key="'.$key.'"';
                 $markup = self::get_sprite($kind, $img, $alt, $dir, $class, $styles, $attrs);
+                $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$team_class.'-'.$kind.'"', $markup);
                 if (!empty($markup)){ $sprites[] = $markup; }
                 }
             return implode(PHP_EOL, $sprites);
@@ -1142,9 +1143,11 @@ class rpg_world {
         $class = 'cursor bounce';
         $styles = 'top: '.$top.'px; left: '.$left.'px; ';
         $attrs = 'data-pos="'.$team_position.'" data-col="'.$col.'" data-row="'.$row.'"';
-        $teams_markup[] = self::get_cursor_sprite($team_direction, $class, $styles, $attrs);
+        $markup = self::get_cursor_sprite($team_direction, $class, $styles, $attrs);
+        $markup = str_replace('data-sprite="robot"', 'data-sprite="team-cursor"', $markup);
+        $teams_markup[] = $markup;
         // Generate the markup for the team sprites if any are defined
-        $teams_markup[] = $get_team_sprites($team_sprites, $team_position, 'team bounce', $team_direction);
+        $teams_markup[] = $get_team_sprites($team_sprites, $team_position, 'team', $team_direction);
         // Loop through the other allowed players to see if any are also on this map
         $rival_symbols = array();
         $mmrpg_index_players = self::get_indexes('players');
@@ -1180,7 +1183,7 @@ class rpg_world {
                     $tmp_team_sprites[] = $robot;
                 }
             }
-            $teams_markup[] = $get_team_sprites($tmp_team_sprites, $tmp_world_position, 'rival bounce');
+            $teams_markup[] = $get_team_sprites($tmp_team_sprites, $tmp_world_position, 'rival', $tmp_world_direction);
         }
         $rival_symbols_json = json_encode($rival_symbols, JSON_NUMERIC_CHECK);
         $teams_markup[] = '<script data-json="rivalSymbols" type="application/json">'.$rival_symbols_json.'</script>';
