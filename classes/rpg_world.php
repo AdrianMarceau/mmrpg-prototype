@@ -1072,11 +1072,119 @@ class rpg_world {
     }
 
     // Define a function for getting the TEAM LAYER sprite markup for the world map
-    public static function get_team_layer_markup($this_prototype_data, $map_data_parsed){
-        error_log('rpg_world::get_team_layer_markup() called!');
-        $markup = '';
-        // ...
-        return $markup;
+    public static function get_teams_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_teams_layer_markup() called!');
+        // TEAM LAYER
+        $WORLD_SESSION = self::get_session();
+        $map_config = $map_data_parsed['config'];
+        $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : '';
+        $map_col_size = $map_config['col_size'];
+        $map_row_size = $map_config['row_size'];
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_spritesize_offset = $map_config['spritesize_offset'];
+        $teams_markup = array();
+        // Quick function for generation the team sprites for a given player
+        $get_team_sprites = function($team_sprites, $target_position = '1-1', $team_class = 'team', $team_dir = 'down-right')
+            use ($map_tile_height, $map_tile_width, $map_spritesize_offset){
+            $sprites = array();
+            list($col, $row) = explode('-', $target_position);
+            $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
+            $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
+            foreach ($team_sprites as $key => $sprite){
+                $kind = $sprite[0];
+                $token = $sprite[1];
+                $img = isset($sprite[2]) ? $sprite[2] : $token;
+                $alt = strstr($img, '_') ? explode('_', $img, 2)[1] : '';
+                $dir = strstr($team_dir, 'left') ? 'left' : 'right';
+                if ($key > 0){
+                    if (strstr($team_dir, 'right')){ $left -= 4; }
+                    elseif (strstr($team_dir, 'right')){ $left += 4; }
+                    if (strstr($team_dir, 'up')){ $top += 2; }
+                    elseif (strstr($team_dir, 'down')){ $top -= 2; }
+                    }
+                $class = $team_class; //'team bounce';
+                $styles = 'top: '.$top.'px; left: '.$left.'px; ';
+                $attrs = 'data-key="'.$key.'"';
+                $markup = self::get_sprite($kind, $img, $alt, $dir, $class, $styles, $attrs);
+                if (!empty($markup)){ $sprites[] = $markup; }
+                }
+            return implode(PHP_EOL, $sprites);
+            };
+        // Collect the current team members from the prototype data
+        $team_position = $this_prototype_data['this_current_position'];
+        $team_direction = $this_prototype_data['this_current_direction'];
+        $team_sprites = array();
+        $team_player_token = !empty($this_prototype_data['this_player_token']) ? $this_prototype_data['this_player_token'] : 'player';
+        $team_player_robots = !empty($this_prototype_data['this_player_robots']) ? $this_prototype_data['this_player_robots'] : array();
+        if (!empty($team_player_token) && $team_player_token !== 'player'){
+            $player_token = $team_player_token;
+            $player = array('player', $player_token);
+            $team_sprites[] = $player;
+        }
+        if (!empty($team_player_robots) && is_array($team_player_robots)){
+            foreach ($team_player_robots AS $robot_string){
+                list($robot_id, $robot_token) = explode('_', $robot_string, 2);
+                $robot = array('robot', $robot_token);
+                $robot_settings = rpg_game::robot_settings($team_player_token, $robot_token);
+                $robot_image = '';
+                if (!empty($robot_settings['robot_persona_image'])){ $robot_image = $robot_settings['robot_persona_image']; }
+                elseif (!empty($robot_settings['robot_image'])){ $robot_image = $robot_settings['robot_image']; }
+                if (!empty($robot_image)){ $robot[] = $robot_image; }
+                $team_sprites[] = $robot;
+            }
+        }
+        // Generate the markup for the cursor sprite
+        $pos = $team_position;
+        list($col, $row) = explode('-', $pos);
+        $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
+        $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
+        $class = 'cursor bounce';
+        $styles = 'top: '.$top.'px; left: '.$left.'px; ';
+        $attrs = 'data-pos="'.$team_position.'" data-col="'.$col.'" data-row="'.$row.'"';
+        $teams_markup[] = self::get_cursor_sprite($team_direction, $class, $styles, $attrs);
+        // Generate the markup for the team sprites if any are defined
+        $teams_markup[] = $get_team_sprites($team_sprites, $team_position, 'team bounce', $team_direction);
+        // Loop through the other allowed players to see if any are also on this map
+        $rival_symbols = array();
+        $mmrpg_index_players = self::get_indexes('players');
+        $world_player_sessions = !empty($WORLD_SESSION['player_sessions']) ? $WORLD_SESSION['player_sessions'] : array();
+        $allowed_player_tokens = !empty($world_player_sessions['allowed']) ? $world_player_sessions['allowed'] : array_keys($world_player_sessions);
+        foreach ($allowed_player_tokens AS $pkey => $ptoken){
+            if ($ptoken === 'player'){ continue; } // skip the default player
+            if ($ptoken === $team_player_token){ continue; } // skip the current player
+            if (empty($mmrpg_index_players[$ptoken])){ continue; } // skip if not a valid player
+            if (empty($world_player_sessions[$ptoken])){ continue; } // skip if no player session
+            //error_log('Checking for player "'.$ptoken.'" on map "'.$map_token.'"');
+            $pinfo = $mmrpg_index_players[$ptoken];
+            $tmp_session = $world_player_sessions[$ptoken];
+            $tmp_world_token = !empty($tmp_session[$last_world_token_key]) ? $tmp_session[$last_world_token_key] : '';
+            $tmp_world_position = !empty($tmp_session[$last_world_position_key]) ? $tmp_session[$last_world_position_key] : '';
+            $tmp_world_direction = !empty($tmp_session[$last_world_direction_key]) ? $tmp_session[$last_world_direction_key] : '';
+            $tmp_world_robots = !empty($tmp_session[$last_world_robots_key]) ? $tmp_session[$last_world_robots_key] : '';
+            if (empty($tmp_world_token) || $tmp_world_token !== $map_token){ continue; } // skip if not on this map
+            if (empty($tmp_world_position)){ continue; } // skip if no position
+            $rival_symbols[$tmp_world_position] = $ptoken;
+            // If we made it this far, show this other player on the map at their current location (just non-interactacble)
+            //error_log('Found player "'.$ptoken.'" on map "'.$map_token.'" at position "'.$tmp_world_position.'"');
+            $tmp_team_sprites = array();
+            $tmp_team_sprites[] = array('player', $ptoken);
+            if (!empty($tmp_world_robots)){
+                $tmp_world_robots = explode(',', $tmp_world_robots);
+                foreach ($tmp_world_robots AS $robot_string){
+                    list($robot_id, $robot_token) = explode('_', $robot_string, 2);
+                    $robot = array('robot', $robot_token);
+                    $robot_settings = rpg_game::robot_settings($ptoken, $robot_token);
+                    $robot_image = !empty($robot_settings['robot_image']) ? $robot_settings['robot_image'] : '';
+                    if (!empty($robot_image) && $robot_image !== $robot_token){ $robot[] = explode('_', $robot_image, 2)[1]; }
+                    $tmp_team_sprites[] = $robot;
+                }
+            }
+            $teams_markup[] = $get_team_sprites($tmp_team_sprites, $tmp_world_position, 'rival bounce');
+        }
+        $rival_symbols_json = json_encode($rival_symbols, JSON_NUMERIC_CHECK);
+        $teams_markup[] = '<script data-json="rivalSymbols" type="application/json">'.$rival_symbols_json.'</script>';
+        return implode(PHP_EOL, $teams_markup);
     }
 
 
