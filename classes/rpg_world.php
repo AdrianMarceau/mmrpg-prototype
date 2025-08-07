@@ -30,6 +30,25 @@ class rpg_world {
         return true;
     }
 
+    // Define a function for saving the current world session
+    public static function update_session(){
+        //error_log('rpg_world::update_session() called!');
+        $args = func_get_args();
+        if (count($args) < 2) { return false; }
+        $value = array_pop($args);
+        $keys  = $args;
+        foreach ($keys as $k){ if (empty($k) || !is_string($k)) { return false; } }
+        if (empty($value) || !is_array($value)) { return false; }
+        if (!isset($_SESSION['WORLD'])){ $_SESSION['WORLD'] = array(); }
+        $ref =& $_SESSION['WORLD'];
+        foreach ($keys as $k){
+            if (!isset($ref[$k]) || !is_array($ref[$k])) { $ref[$k] = array(); }
+            $ref =& $ref[$k];
+        }
+        $ref = $value;
+        return true;
+    }
+
     // Define a function for loading indexes into this class
     public static function load_indexes($indexes = array()){
         //error_log('rpg_world::load_indexes() called!');
@@ -990,10 +1009,67 @@ class rpg_world {
 
     // Define a function for getting the BATTLES LAYER sprite markup for the world map
     public static function get_battles_layer_markup($this_prototype_data, $map_data_parsed){
-        error_log('rpg_world::get_battles_layer_markup() called!');
-        $markup = '';
-        // ...
-        return $markup;
+        //error_log('rpg_world::get_battles_layer_markup() called!');
+        // BATTLES LAYER
+        // Generate the random encounters for this map location if not already spawned
+        $WORLD_SESSION = self::get_session();
+        $map_config = $map_data_parsed['config'];
+        $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : '';
+        $map_col_size = $map_config['col_size'];
+        $map_row_size = $map_config['row_size'];
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_spritesize_offset = $map_config['spritesize_offset'];
+        $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
+        $world_map_encounters = !empty($world_encounters[$map_token]) ? $world_encounters[$map_token] : array();
+        if (empty($world_map_encounters)){
+            $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed);
+            self::update_session('world_encounters', $map_token, $world_map_encounters);
+        }
+        //error_log('$world_map_encounters = '.print_r($world_map_encounters, true));
+        $battles_markup = array();
+        $battle_symbols = array();
+        $battles_index = array();
+        foreach ($world_map_encounters as $encounter){
+            $kind = $encounter[0]; $subkind = '';
+            if (strstr($kind, '/')){ list($kind, $subkind) = explode('/', $kind, 2); }
+            //$xkind = rpg_world::get_xkind($kind);
+            $token = $encounter[1];
+            $alt = $encounter[2];
+            $pos = $encounter[3];
+            $battle = $encounter[4];
+            $name = $encounter[5];
+            if (!rpg_battle::has_index_info($battle)){ continue; }
+            list($col, $row) = explode('-', $pos);
+            $maxcols = $map_col_size;
+            $maxrows = $map_row_size;
+            $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
+            $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
+            $zindex = ($maxrows + 1) - $row;
+            $dir = ($col > ($map_col_size / 2)) ? 'left' : 'right';
+            if (mt_rand(1, 2) === 1){ $dir = $dir !== 'left' ? 'left' : 'right'; }
+            $class = 'battle vs-'.$subkind.' bounce';
+            if ($subkind === 'boss'){ $class .= ' always-zoom'; }
+            $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$zindex.';';
+            $attrs = 'data-battle="'.$battle.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+            $attrs .= 'data-label="'.$name.'"';
+            $markup = self::get_sprite($kind, $token, $alt, $dir, $class, $style, $attrs);
+            $battles_markup[] = $markup;
+            $battle_symbols[$pos] = $battle;
+            $battles_index[$battle] = array(
+                'kind' => $kind,
+                'token' => $token,
+                'alt' => $alt,
+                'col' => $col,
+                'row' => $row,
+                'pos' => $pos,
+                );
+            }
+        $battle_symbols_json = json_encode($battle_symbols, JSON_NUMERIC_CHECK);
+        $battles_index_json = json_encode($battles_index, JSON_NUMERIC_CHECK);
+        $battles_markup[] = '<script data-json="battleSymbols" type="application/json">'.$battle_symbols_json.'</script>';
+        $battles_markup[] = '<script data-json="battlesIndex" type="application/json">'.$battles_index_json.'</script>';
+        return implode(PHP_EOL, $battles_markup);
     }
 
     // Define a function for getting the TEAM LAYER sprite markup for the world map

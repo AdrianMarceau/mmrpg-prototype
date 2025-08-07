@@ -317,12 +317,14 @@ $WORLD_SESSION['world_maps'][$map_token]['exit_pos'] = $map_exit_pos;
 // If the world position has not been set yet, we can use the spawn position for it
 if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data['this_current_position'] = $map_spawn_pos; }
 
+/*
 // Generate the random encounters for this map location if not already spawned
 $world_map_encounters = !empty($WORLD_SESSION['world_encounters'][$map_token]) ? $WORLD_SESSION['world_encounters'][$map_token] : array();
 //error_log('$world_map_encounters = '.print_r($world_map_encounters, true));
 if (empty($world_map_encounters)){ $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed); }
 //error_log('$world_map_encounters = '.print_r($world_map_encounters, true));
 $WORLD_SESSION['world_encounters'][$map_token] = $world_map_encounters;
+*/
 
 // If there are any buttons defined, check to see if any of them have been pushed already
 if (!empty($map_data_parsed['buttons'])){
@@ -486,57 +488,13 @@ $flag_skip_fadein = true;
                     echo($buttons_layer_markup);
                 echo('</div>'.PHP_EOL);
 
-                // EVENT OBJECTS (BATTLES)
-                $map_layer_styles = $map_base_styles;
-                $map_layer_attrs = $map_base_attrs;
-                ?>
-                <div class="layer layer-4 objects events battles" data-layer="battles" style="<?= $map_layer_styles ?>" <?= $map_layer_attrs ?>>
-                    <?
-                    $battle_symbols = array();
-                    $battles_index = array();
-                    foreach ($world_map_encounters as $encounter){
-                        $kind = $encounter[0]; $subkind = '';
-                        if (strstr($kind, '/')){ list($kind, $subkind) = explode('/', $kind, 2); }
-                        //$xkind = rpg_world::get_xkind($kind);
-                        $token = $encounter[1];
-                        $alt = $encounter[2];
-                        $pos = $encounter[3];
-                        $battle = $encounter[4];
-                        $name = $encounter[5];
-                        if (!rpg_battle::has_index_info($battle)){ continue; }
-                        list($col, $row) = explode('-', $pos);
-                        $maxcols = $map_col_size;
-                        $maxrows = $map_row_size;
-                        $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
-                        $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
-                        $zindex = ($maxrows + 1) - $row;
-                        $dir = ($col > ($map_col_size / 2)) ? 'left' : 'right';
-                        if (mt_rand(1, 2) === 1){ $dir = $dir !== 'left' ? 'left' : 'right'; }
-                        $class = 'battle vs-'.$subkind.' bounce';
-                        if ($subkind === 'boss'){ $class .= ' always-zoom'; }
-                        $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$zindex.';';
-                        $attrs = 'data-battle="'.$battle.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
-                        $attrs .= 'data-label="'.$name.'"';
-                        $markup = rpg_world::get_sprite($kind, $token, $alt, $dir, $class, $style, $attrs);
-                        echo($markup);
-                        $battle_symbols[$pos] = $battle;
-                        $battles_index[$battle] = array(
-                            'kind' => $kind,
-                            'token' => $token,
-                            'alt' => $alt,
-                            'col' => $col,
-                            'row' => $row,
-                            'pos' => $pos,
-                            );
-                        }
-                    $battle_symbols_json = json_encode($battle_symbols, JSON_NUMERIC_CHECK);
-                    $battles_index_json = json_encode($battles_index, JSON_NUMERIC_CHECK);
-                    echo('<script data-json="battleSymbols" type="application/json">'.$battle_symbols_json.'</script>'.PHP_EOL);
-                    echo('<script data-json="battlesIndex" type="application/json">'.$battles_index_json.'</script>'.PHP_EOL);
-
-                    ?>
-                </div>
-                <?
+                // BATTLE SPRITES
+                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
+                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
+                $battles_layer_markup = rpg_world::get_battles_layer_markup($this_prototype_data, $map_data_parsed);
+                echo('<div class="layer layer-4 objects events battles" data-layer="battles" '.$map_layer_styles.$map_layer_attrs.'>');
+                    echo($battles_layer_markup);
+                echo('</div>'.PHP_EOL);
 
                 // CHARACTER OBJECTS (TEAM)
                 $map_layer_styles = $map_base_styles;
