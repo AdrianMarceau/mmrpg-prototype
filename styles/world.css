@@ -37,6 +37,7 @@ html, body {
     left: auto;
     z-index: 10;
     transform: translate(0, 0);
+    transform-origin: center;
     transition: none;
     will-change: transform;
 }
@@ -452,9 +453,11 @@ html, body {
     /* animation: none; */
     animation-play-state: paused;
     image-rendering: pixelated;
+    z-index: 5;
 }
 #world #map .layer.objects .sprite.cursor.shake > .wrap {
-    transform: translate(-6px, 14px) scale(0.8);
+    /* transform: translate(-6px, 14px) scale(0.8);  */
+    transform: translate(14px, -14px) scale(0.8);
 }
 #world #map .layer.objects .sprite.cursor.shake > .wrap > .sprite {
     /* transform: rotate(0deg); */
@@ -524,6 +527,11 @@ html, body {
 }
 #world #map .layer .sprite[data-dir="right"].march > .wrap {
     transform: translate(16px, 0);
+}
+
+/* define the special styles for when the map itself has been zoomed in */
+#world #map[data-zoom]:not([data-zoom="1"]) .layer .sprite:not(.tile) > .wrap > .sprite {
+    /* image-rendering: pixelated !important; */
 }
 
 /* define the special zoom styles that are applied when something is focused */

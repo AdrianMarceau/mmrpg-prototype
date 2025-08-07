@@ -66,6 +66,7 @@ gameSettings.worldConfig = {
 gameSettings.worldState = {
     cursor: {
         position: '0-0',
+        positionXY: [0, 0],
         direction: '',
         moving: false,
         moved: false,
@@ -83,6 +84,7 @@ gameSettings.worldState = {
     layerTilesIndex: {},
     baseMapTileKeys: [], // base array of tile keys that are part of the map
     walkableMapTileKeys: [], // array of tile keys that are specifically walkable
+    zoomLevel: 1.0, // default zoom level
     };
 gameSettings.worldHasLoaded = false;
 
@@ -657,9 +659,12 @@ class mmrpgWorldMap {
         xPos = xPos > 0 ? parseInt(xPos) : 0, yPos = yPos > 0 ? parseInt(yPos) : 0;
         let _self = this;
         let _config = _self.config;
+        let _world = _self.state;
         let size = _config.mapTileSize;
+        let zoom = _world.zoomLevel;
         let width = $overlay.width(), height = $overlay.height(), offset = $overlay.offset();
         if (applyOffset){ xPos -= offset.left; yPos -= offset.top; }
+        if (zoom > 1){ xPos /= zoom; yPos /= zoom; }
         if (xPos < 0){ xPos = 0; } if (yPos < 0){ yPos = 0; }
         let thisCol = Math.floor(xPos / size[0]) + 1;
         let thisRow = Math.floor(yPos / size[1]) + 1;
@@ -806,12 +811,14 @@ class mmrpgWorldMap {
         //console.log('---> tile[' + layerToken + '/' + tileKey + '/' + tileSpriteToken + '] tileData =', JSON.stringify(tileData));
         //console.log('---> tile[' + layerToken + '/' + tileKey + ']::tileIsVoid =', tileIsVoid);
         // sprite: draw the main tile sprite at the correct position
+        if (tileIsWater){ ctx.globalAlpha = 0.8; }
         ctx.drawImage(spriteSheet,
             tileSpriteOffset[0], tileSpriteOffset[1], // source offset
             tileSpriteSize[0], tileSpriteSize[1], // source size
             tilePosition[2], tilePosition[3], // destination offset
             tileSpriteSize[0], tileSpriteSize[1] // destination size
             );
+        ctx.globalAlpha = 1.0;
         // grid/hover/outline/focus/active: collect sprite data for known effects
         // then we draw any overlay images as defined in the effects on top
         let gridSpriteData = _self.getSpriteData('grid');
@@ -1226,6 +1233,7 @@ class mmrpgWorldMap {
             _worldCursor.moved = cursorHasMoved;
             _worldPlayer.position = _worldCursor.position;
             _worldPlayer.direction = _worldCursor.direction;
+            _worldCursor.positionXY = [tileOffsetX, tileOffsetY];
             //console.log('_worldCursor =', '\n-> col =', _worldCursor.col, '\n-> row =', _worldCursor.row, '\n-> position =', _worldCursor.position, '\n-> direction =', _worldCursor.direction, '\n-> moved =', _worldCursor.moved);
             $cursorSprite.attr('data-col', thisNewCol);
             $cursorSprite.attr('data-row', thisNewRow);
@@ -1272,26 +1280,57 @@ class mmrpgWorldMap {
                 let newFrame = $thisSprite.is('.player') ? '09' : $thisSprite.is('.robot') ? '07' : '00'; // run for players, slide for robots
                 $thisSprite.attr('data-frame', newFrame);
                 let onTeamMoveComplete = function(){ $thisSprite.attr('data-frame', '00'); };
+                $thisSprite.prop('worldX', teamOffsetX);
+                $thisSprite.prop('worldY', teamOffsetY);
                 if (animateMove){
                     $thisSprite.animate({
+                        left: teamOffsetX + 'px',
                         top: teamOffsetY + 'px',
-                        left: teamOffsetX + 'px'
                         }, teamTravelDuration, 'linear', onTeamMoveComplete);
                     } else {
                     $thisSprite.css({
+                        left: teamOffsetX + 'px',
                         top: teamOffsetY + 'px',
-                        left: teamOffsetX + 'px'
                         }); onTeamMoveComplete();
                     }
                 });
             }
+        // Make sure we start the scroll to the new position
+        _self.scrollMap(tileOffsetX, tileOffsetY);
+        return true;
+        }
+
+    // Quick function for re-centering the map on the player's position and the map's current zoom level
+    scrollMap(scrollX, scrollY){
+        //console.log('%c' + 'mmrpgWorldMap.scrollMap(scrollX:' + scrollX + ', scrollY:' + scrollY + ')', 'color: magenta;');
+        // Collect references, indexes, and other variables we need to work with
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldCursor = _world.cursor;
+        let _mapEffects = _config.mapEffects;
+        let _mapTileSize = _config.mapTileSize;
+        let _mapTileSizeOffset = _config.mapTileSizeOffset;
+        let $thisWorld = _elements.world;
+        let $canvasMap = _elements.map;
+        let $backgroundLayer = $('.layer.background', $canvasMap);
+        if (typeof scrollX !== 'number'){ scrollX = _worldCursor.positionXY[0] || 0; }
+        if (typeof scrollY !== 'number'){ scrollY = _worldCursor.positionXY[1] || 0; }
         // And now we should move the map itself so that the characters are always centered in the viewport
-        let worldWidth = $thisWorld.outerWidth();
-        let worldHeight = $thisWorld.outerHeight();
-        let mapWidth = $canvasMap.outerWidth();
-        let mapHeight = $canvasMap.outerHeight();
-        let targetX = tileOffsetX + (_mapTileSize[0] / 2) - (_mapTileSizeOffset[0] / 2);
-        let targetY = tileOffsetY + (_mapTileSize[1] / 2) - (_mapTileSizeOffset[1] / 2);
+        let worldZoom = _world.zoomLevel;
+        let worldWidth = _config.worldWidth;
+        let worldHeight = _config.worldHeight;
+        let mapWidth = _config.mapWidth * worldZoom;
+        let mapHeight = _config.mapHeight * worldZoom;
+        let mapTileSizeX = _mapTileSize[0];
+        let mapTileSizeY = _mapTileSize[1];
+        let mapTileSizeOffsetX = _mapTileSizeOffset[0];
+        let mapTileSizeOffsetY = _mapTileSizeOffset[1];
+        let mapScrollX = scrollX;
+        let mapScrollY = scrollY;
+        let targetX = (mapScrollX + (mapTileSizeX / 2) - (mapTileSizeOffsetX / 2)) * worldZoom;
+        let targetY = (mapScrollY + (mapTileSizeY / 2) - (mapTileSizeOffsetY / 2)) * worldZoom;
         // Now calculate the new translate values for the map container
         let translateX = 0, translateY = 0;
         if (mapWidth < worldWidth){ translateX = (worldWidth - mapWidth) / 2; }
@@ -1302,11 +1341,32 @@ class mmrpgWorldMap {
         else if (targetY < (worldHeight / 2)){ translateY = 0; }
         else if (targetY > (mapHeight - (worldHeight / 2))){ translateY = -(mapHeight - worldHeight); }
         else { translateY = -(targetY - (worldHeight / 2)); }
-        let subTranslateX = Math.round(-1 * (translateX * 0.9));
-        let subTranslateY = Math.round(-1 * (translateY * 0.9));
+        //let mapTranslateX = Math.round(translateX * worldZoom);
+        let mapTranslateX = translateX;
+        let mapTranslateY = translateY;
+        let subTranslateX = Math.round(-1 * (translateX * 0.1));
+        let subTranslateY = Math.round(-1 * (translateY * 0.1));
         // Apply the new translate values to the map container
-        $canvasMap.css({ transform: 'translate(' + translateX + 'px, ' + translateY + 'px)' });
-        $backgroundLayer.css({ transform: 'translate(' + subTranslateX + 'px, ' + subTranslateY + 'px)' });
+        //$canvasMap.css({ transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px)' });
+        $canvasMap.attr('data-zoom', worldZoom);
+        $canvasMap.css({ transformOrigin: 'left top', transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) scale(' + worldZoom + ')' });
+        $backgroundLayer.css({ transformOrigin: 'left top', transform: 'translate(' + subTranslateX + 'px, ' + subTranslateY + 'px)' });
+        // Return true on success
+        return true;
+        }
+
+    // Quick function for updating the map's current zoom level
+    updateZoomLevel(newZoomLevel){
+        //console.log('%c' + 'mmrpgWorldMap.updateZoomLevel(newZoomLevel:' + newZoomLevel + ')', 'color: magenta;');
+        if (!newZoomLevel || typeof newZoomLevel !== 'number' || newZoomLevel <= 0){
+            console.error('updateZoomLevel() requires a valid zoom level!');
+            return false;
+            }
+        let _self = this;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        _world.zoomLevel = newZoomLevel
+        _self.scrollMap();
         return true;
         }
 
@@ -1332,6 +1392,7 @@ class mmrpgWorldMap {
         let $worldCursor = _elements.cursor;
         let cursorDirection = _worldCursor.direction;
         let cursorPosition = _worldCursor.position;
+        let cursorPositionXY = _worldCursor.positionXY;
         let newPosition = cursorPosition.split('-');
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
@@ -1340,6 +1401,9 @@ class mmrpgWorldMap {
         let $positionDisplay = $('#position-display', $thisWorld);
         let $positionDisplayWrapper = $('> .wrapper', $positionDisplay);
         $positionDisplayWrapper.text('X:' + thisNewCol + ' Y:' + thisNewRow);
+
+        // Make sure we start the scroll to the new position
+        _self.scrollMap(cursorPositionXY[0], cursorPositionXY[1]);
 
         // Update the walkable map tiles now that things have changed slightly
         _self.calculateWalkableMapTiles(true);
@@ -1399,6 +1463,8 @@ class mmrpgWorldMap {
 
         // Define the default zoom timeout for after movement ends
         let zoomTimeoutDuration = 2000;
+        let teamReadyDuration = 1800;
+        let teamRushDuration = 300;
 
         // Make sure we empty and hide the action dropdown if it's been shown by previous move
         let $actionDropdown = _elements.actionDropdown;
@@ -1644,11 +1710,31 @@ class mmrpgWorldMap {
             $worldCursor.addClass('shake');
 
             // Zoom one or more of the team sprites (?)
-            let playerFrames = ['04'], robotFrames = ['04', '08', '01', '06', '10', '00', '04', '01'];
-            $teamSprites.filter('.player').each(function(index){ $(this).attr('data-frame', playerFrames[index % playerFrames.length] || '00'); });
-            $teamSprites.filter('.robot').each(function(index){ $(this).attr('data-frame', robotFrames[index % robotFrames.length] || '00'); });
-            //$teamSprites.filter('.player').attr('data-frame', '04'); // player "command" frame
-            //$teamSprites.filter('.robot').attr('data-frame', '01'); // robot "taunt" frame
+            //$teamSprites.css('top', '+= 10px'); // move the team sprites up a little bit
+            let goingUp = _worldCursor.direction.indexOf('up') !== -1 ? true : false;
+            let goingDown = _worldCursor.direction.indexOf('down') !== -1 ? true : false;
+            let goingLeft = _worldCursor.direction.indexOf('left') !== -1 ? true : false;
+            let goingRight = _worldCursor.direction.indexOf('right') !== -1 ? true : false;
+            let rushDistanceX = Math.ceil(_mapTileSize[0] / 4);
+            let rushDistanceY = Math.ceil(_mapTileSize[1] / 4);
+            let playerFrames = ['06', '01', '04'];
+            let robotFrames = ['04', '08', '01', '06', '10', '00', '04', '01'];
+            $teamSprites.each(function(index){
+                let $sprite = $(this);
+                let oldX = $sprite.prop('worldX') || parseInt($sprite.css('left')) || 0;
+                let oldY = $sprite.prop('worldY') || parseInt($sprite.css('top')) || 0;
+                let newX = oldX + (goingRight ? rushDistanceX : goingLeft ? (-1 * rushDistanceX) : 0);
+                let newY = oldY + (goingDown ? rushDistanceY : goingUp ? (-1 * rushDistanceY) : 0);
+                $sprite.animate({left: newX + 'px', top: newY + 'px' }, teamRushDuration);
+                });
+            $teamSprites.filter('.player').each(function(index){
+                let $sprite = $(this);
+                $sprite.attr('data-frame', playerFrames[index % playerFrames.length] || '00');
+                });
+            $teamSprites.filter('.robot').each(function(index){
+                let $sprite = $(this);
+                $sprite.attr('data-frame', robotFrames[index % robotFrames.length] || '00');
+                });
 
             };
 
@@ -1941,7 +2027,7 @@ class mmrpgWorldMap {
         // Make the cursor shake so it trembles a bit before the encounter
         let _selfRef = _self.refreshMapPositionEvents;
         if (_selfRef.teamSpritesTimeout){ clearTimeout(_selfRef.teamSpritesTimeout); }
-        _selfRef.teamSpritesTimeout = setTimeout(getTeamSpritesReady, Math.ceil(zoomTimeoutDuration * 0.9));
+        _selfRef.teamSpritesTimeout = setTimeout(getTeamSpritesReady, teamReadyDuration);
 
         // If a redirect was requested, this is where we exit actually
         if (autoRedirect){

@@ -695,6 +695,8 @@ $flag_skip_fadein = true;
 // Update relevent game settings and flags
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 
+//gameSettings.worldState.zoomLevel = 1.5; // TEMP TEMP TEMP TEMP TEMP
+
 // Update relevant world-specific game settings and flags
 let _worldConfig = gameSettings.worldConfig;
 _worldConfig.userId = <?= rpg_game::get_userid() ?>;
