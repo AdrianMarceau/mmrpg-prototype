@@ -2195,7 +2195,7 @@ class mmrpgWorldMap {
         let layerTilesIndex = _world.layerTilesIndex;
         let mapBattleSymbols = _config.mapBattleSymbols;
         let $canvasMap = _elements.map;
-        let $eventLayers = $('.layer.events', $canvasMap);
+        //let $eventLayers = $('.layer.events', $canvasMap);
         let $eventsAtPosition = [];
         let positionsToCheck = [];
         positionsToCheck.push(searchPosition); // always check the exact position first
@@ -2215,12 +2215,19 @@ class mmrpgWorldMap {
                 }
             }
         //console.log('-> positionsToCheck =', positionsToCheck);
+        let eventSpriteKinds = ['portal', 'button', 'battle'];
         for (let i = 0; i < positionsToCheck.length; i++){
             let checkPosition = positionsToCheck[i];
             let eventPosition = checkPosition.split('-');
-            let $eventAtPosition = $('.sprite[data-col="' + eventPosition[0] + '"][data-row="' + eventPosition[1] + '"]', $eventLayers);
-            if (!$eventAtPosition || !$eventAtPosition.length){ continue; }
-            let eventIsPortal = $eventAtPosition.is('[data-portal]');
+            //let $eventAtPosition = $('.sprite[data-col="' + eventPosition[0] + '"][data-row="' + eventPosition[1] + '"]', $eventLayers);
+            let $spriteAtPosition = $('.sprite[data-sprite][data-col="' + eventPosition[0] + '"][data-row="' + eventPosition[1] + '"]', $canvasMap);
+            if (!$spriteAtPosition || !$spriteAtPosition.length){ continue; }
+            let spriteKind = $spriteAtPosition.attr('data-sprite') || false, baseSpriteKind = spriteKind.indexOf('-') !== -1 ? spriteKind.split('-')[0] : spriteKind;
+            //console.log('-> checking position', checkPosition, 'for sprite kind:', spriteKind, 'base kind:', baseSpriteKind, 'against eventSpriteKinds:', eventSpriteKinds);
+            if (!spriteKind || !baseSpriteKind || eventSpriteKinds.indexOf(baseSpriteKind) === -1){ continue; } // skip if not an event sprite
+            let $eventAtPosition = $spriteAtPosition;
+            //let eventIsPortal = $eventAtPosition.is('[data-portal]');
+            let eventIsPortal = spriteKind === 'portal';
             if (eventIsPortal && checkPosition !== searchPosition){ continue; } // skip portals unless it's the exact position
             $eventsAtPosition.push($eventAtPosition);
             if (eventIsPortal){ break; }
