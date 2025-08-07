@@ -1664,8 +1664,7 @@ class mmrpgWorldMap {
         var autoRedirect = false;
         var autoRedirectURL = '';
         var autoRedirectSound = '';
-        if (firstEventType === 'portal'
-            && $firstEvent.is('[data-portal]')){
+        if (firstEventType === 'portal' && $firstEvent.is('[data-portal]')){
             //console.log('-> event at position is a portal, preparing dropdown');
             // If the cursor is literally on a portal, only one event sprite matters right now
             let $portalEvent = $firstEvent;
@@ -1705,8 +1704,7 @@ class mmrpgWorldMap {
                     }
                 }
             }
-        else if (firstEventType === 'button'
-            && $firstEvent.is('[data-button]')){
+        else if (firstEventType === 'button' && $firstEvent.is('[data-button]')){
             //console.log('-> event at position is a button, preparing dropdown');
             // If the cursor is literally on a button, only one event sprite matters right now
             let $buttonEvent = $firstEvent;
@@ -1725,8 +1723,7 @@ class mmrpgWorldMap {
                 zoomTimeoutDuration = 500; // if we show a button dropdown, we want to zoom in quickly
                 }
             }
-        else if (firstEventType === 'battle'
-            && $firstEvent.is('[data-battle]')){
+        else if (firstEventType === 'battle' && $firstEvent.is('[data-battle]')){
 
             // Otherwise we can/should check all the posiitons for any battles to round-up and trigger
             let dataLabels = [], dataBattles = [];
@@ -1878,6 +1875,13 @@ class mmrpgWorldMap {
 
         // Define an inline function to zoom and show the dropdown which we'll call after a timeout
         let zoomAndShowDropdown = function(){
+
+            // If the cursor started moving before/as this event showed, cancel it
+            //console.log('checking if _worldCursor.moving or position !== newPosition');
+            //console.log('-> _worldCursor.moving =', _worldCursor.moving);
+            //console.log('-> _worldCursor.position =', _worldCursor.position);
+            //console.log('-> cursorPosition =', cursorPosition);
+            if (_worldCursor.moving || _worldCursor.position !== cursorPosition){ return; }
 
             // Elevate the event sprite(s) to the zoom layer and add a zoom class to it so it's more visible
             let cursorPositionXY = cursorPosition.split('-');
