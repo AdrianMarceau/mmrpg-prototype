@@ -1147,6 +1147,7 @@ class mmrpgWorldMap {
                 _self.saveWorldState(function(){
                     $thisWorld.addClass('redirecting');
                     window.location.href = worldReloadURL;
+                    _self.updateZoomLevel(2);
                     });
                 return true;
                 });
@@ -1164,6 +1165,112 @@ class mmrpgWorldMap {
                 $('.sprite.player > .sprite', $option).attr('data-frame', '00'); // base
                 });
             }
+        // Bind events to the scrolling of the user's mouse if detected to allow for zooming the map
+        let busyZooming = false;
+        $thisWorld.bind('mousewheel', function(e){
+            //console.log('%c' + 'World map mousewheel event!', 'color: cyan;');
+            e.preventDefault();
+            e.stopPropagation();
+            //console.log('-> event:', e);
+            //console.log('-> wheelDelta:', e.wheelDelta);
+            if (busyZooming){ return false; }
+            if (!e.wheelDelta){ return false; }
+            else if (e.wheelDelta > 0 && e.wheelDelta < 200){ return false; }
+            else if (e.wheelDelta < 0 && e.wheelDelta > -200){ return false; }
+            let oldZoom = _world.zoomLevel || 1;
+            let newZoom = oldZoom + (e.wheelDelta > 0 ? 0.5 : -0.5);
+            if (newZoom < 1){ newZoom = 1; }
+            if (newZoom > 2){ newZoom = 2; }
+            if (newZoom === oldZoom){ return; }
+            busyZooming = true;
+            _self.playSoundEffect('spawn-sound');
+            _self.updateZoomLevel(newZoom);
+            setTimeout(function(){ busyZooming = false; }, 1000);
+            return true;
+            });
+        // Bind events to the keyboard arrow keys if detected to allow for;
+        // - moving the player up/down/left/right
+        // - confirming an action popup via enter/space
+        // - declining an action popup via escape/backspace
+        let pressedKeys = {};
+        document.addEventListener('keydown', (event) => { pressedKeys[event.key] = true; });
+        document.addEventListener('keyup', (event) => { delete pressedKeys[event.key]; });
+        let $sideButtons = _elements.sideButtons;
+        let $actionDropdown = _elements.actionDropdown;
+        $(document).bind('keydown', function(e){
+            //console.log('%c' + 'World map keydown event!', 'color: cyan;');
+            e.preventDefault();
+            e.stopPropagation();
+            //console.log('-> event:', e);
+            if (_world.cursor.moving){ return false; }
+            //console.log('-> pressedKeys:', pressedKeys);
+            // Collect references and checks on certain key elements
+            let sideButtonsActive = $sideButtons.is('.active') ? true : false;
+            // If the player has pressed any of the arrow keys, let's update the position accordingly
+            if (pressedKeys.ArrowLeft || pressedKeys.ArrowRight || pressedKeys.ArrowUp || pressedKeys.ArrowDown){
+                //console.log('%c' + 'Arrow key pressed!', 'color: orange;');
+                let oldPos = _world.cursor.position, curPos = oldPos;
+                let thisPos = oldPos.split('-');
+                let thisCol = parseInt(thisPos[0]);
+                let thisRow = parseInt(thisPos[1]);
+                let newCol = thisCol, newRow = thisRow;
+                //console.log('%c' + 'Current position: ' + oldPos, 'color: orange;');
+                if (pressedKeys.ArrowLeft){ newCol--; }
+                else if (pressedKeys.ArrowRight){ newCol++; }
+                if (pressedKeys.ArrowUp){ newRow--; }
+                else if (pressedKeys.ArrowDown){ newRow++; }
+                let newPos = newCol + '-' + newRow;
+                //console.log('%c' + 'New position: ' + newPos, 'color: orange;');
+                // Check if the new position is the same as the old position
+                if (newCol === thisCol && newRow === thisRow){ return false; }
+                // Otherwise, let's pull the list of walkable tiles and see if this new position is valid
+                //console.log('%c' + 'Checking if new position is walkable...', 'color: orange;');
+                let playerMobility = _config.playerMobility;
+                let walkableTiles = _self.getWalkableMapTiles();
+                let tilesWithinRange = playerMobility > 0 ? _self.getWalkableMapTilesByProximity(oldPos, playerMobility) : walkableTiles;
+                if (walkableTiles.indexOf(newPos) === -1 && tilesWithinRange.indexOf(newPos) === -1){
+                    //console.warn('%c' + 'New position is not walkable!', 'color: red;');
+                    //_self.playSoundEffect('glass-klink');
+                    return false;
+                    }
+                // Otherwise, let's move the cursor to the new position
+                _self.makeLayerTileActive(newPos);
+                _self.playSoundEffect('no-effect');
+                _self.moveToPosition(newPos, function(){
+                    _self.makeLayerTileInactive(oldPos);
+                    });
+                }
+            // If the side buttons panel is currently open, process those actions too
+            if (sideButtonsActive){
+                // If the player has pressed the space or enter keys, let's confirm the side-button action if it's open
+                if (pressedKeys.Space || pressedKeys.Enter || pressedKeys.NumpadEnter ){
+                    console.log('%c' + 'Confirm action popup!', 'color: orange;');
+                    if (!$sideButtons.is('.active')){ return false; }
+                    let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
+                    if (!$confirmButton || !$confirmButton.length){ console.error('bindEventsToWorld() unable to find confirm button!'); return false; }
+                    if (!$confirmButton.is('.maybe')){ $confirmButton.addClass('maybe'); return; }
+                    $confirmButton.removeClass('maybe'); //.addClass('clicked');
+                    console.log('Triggering click on confirm button:', $confirmButton);
+                    $confirmButton.trigger('click');
+                    }
+                // Else if the player has pressed the backspace or escape keys, let's close the side-button action if it's open
+                else if (pressedKeys.Backspace || pressedKeys.Escape){
+                    console.log('%c' + 'Dismiss action popup!', 'color: orange;');
+                    if (!$sideButtons.is('.active')){ return false; }
+                    let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
+                    if (!$dismissButton || !$dismissButton.length){ console.error('bindEventsToWorld() unable to find dismiss button!'); return false; }
+                    $sideButtons.removeClass('maybe');
+                    $dismissButton.trigger('click');
+                    }
+                // Else if the player has just pressed shift, make sure we add the hover class to the action-dropdown
+                else if (pressedKeys.Shift){
+                    console.log('%c' + 'Shift key pressed!', 'color: orange;');
+                    if (!$sideButtons.is('.active')){ return false; }
+                    $actionDropdown.toggleClass('hover');
+                    }
+                }
+
+            });
         // Return true on success
         return true;
         }
@@ -1507,9 +1614,13 @@ class mmrpgWorldMap {
 
         // Sort the events at this position so that battles are always at the top
         $eventsAtPosition = $eventsAtPosition.sort(function(a, b){
+            let aPortal = $(a).attr('data-portal') || false;
+            let bPortal = $(b).attr('data-portal') || false;
             let aBattle = $(a).attr('data-battle') || false;
             let bBattle = $(b).attr('data-battle') || false;
-            if (aBattle && !bBattle){ return -1; } // a is battle, b is not
+            if (aPortal && !bPortal){ return -1; } // a is portal, b is not
+            else if (!aPortal && bPortal){ return 1; } // a is not portal, b is
+            else if (aBattle && !bBattle){ return -1; } // a is battle, b is not
             else if (!aBattle && bBattle){ return 1; } // a is not battle, b is
             else { return 0; } // both are battles or neither are
             });
@@ -1742,8 +1853,17 @@ class mmrpgWorldMap {
         let redirectToLocation = function(){
             //console.log('%c' + 'redirectToLocation()', 'color: cyan;');
             $thisWorld.addClass('hidden');
-            if (autoRedirectSound){ _self.playSoundEffect(autoRedirectSound); }
-            if (autoRedirectURL){ _self.saveWorldState(function(){ window.location.href = autoRedirectURL; }); }
+            if (autoRedirectSound){
+                _self.playSoundEffect(autoRedirectSound);
+                }
+            if (autoRedirectURL){
+                _self.updateZoomLevel(1.25);
+                _self.saveWorldState(function(){
+                    _self.updateZoomLevel(1.5);
+                    window.location.href = autoRedirectURL;
+                    _self.updateZoomLevel(2.0);
+                    });
+                }
             return true;
             };
 
@@ -1828,6 +1948,7 @@ class mmrpgWorldMap {
                 let isPortal = action.indexOf('portal') !== -1;
                 let isButton = action.indexOf('button') !== -1;
                 let isDismiss = action === 'dismiss';
+                if (!isDismiss){ $button.addClass('clicked'); }
                 //console.log('-> action =', action);
                 if (isBattle){
                     let battleId = $button.attr('data-battle') || false;
@@ -1873,7 +1994,12 @@ class mmrpgWorldMap {
                             }
                         if (portalHref){
                             $thisWorld.addClass('hidden');
-                            _self.saveWorldState(function(){ window.location.href = portalHref; });
+                            _self.updateZoomLevel(1.25);
+                            _self.saveWorldState(function(){
+                                _self.updateZoomLevel(1.5);
+                                window.location.href = portalHref;
+                                _self.updateZoomLevel(2.0);
+                                });
                             }
                         }
                     }
