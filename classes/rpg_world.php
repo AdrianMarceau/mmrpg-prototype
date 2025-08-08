@@ -810,7 +810,8 @@ class rpg_world {
         $cursor_sprite = self::get_sprite('robot', 'pointan', '', $dir, $class, $styles, $attrs);
         //$cursor_sprite = str_replace('images/robots/pointan/sprite_', 'images/assets/cursor_', $cursor_sprite);
         $cursor_sprite = str_replace('pointan', 'cursor', $cursor_sprite);
-        $cursor_sprite = preg_replace('/background-image: url\(([^\(\)]+)\);/i', 'background-image: url(images/assets/cursor_40x40.png);', $cursor_sprite);
+        //$cursor_sprite = preg_replace('/background-image: url\(([^\(\)]+)\);/i', 'background-image: url(images/assets/cursor_40x40.png);', $cursor_sprite);
+        $cursor_sprite = preg_replace('/background-image: url\(([^\(\)]+)\);/i', 'background-image: url(images/assets/cursor_80x80.png);', $cursor_sprite);
         return $cursor_sprite;
     }
 
@@ -905,9 +906,14 @@ class rpg_world {
         //error_log('rpg_world::get_portals_layer_sprites() called!');
         // PORTALS LAYER
         $map_config = $map_data_parsed['config'];
+        $map_width = $map_config['pixel_width'];
+        $map_height = $map_config['pixel_height'];
         $map_tile_height = $map_config['tile_height'];
         $map_tile_width = $map_config['tile_width'];
         $map_tilesize_offset = $map_config['tilesize_offset'];
+        //$map_perspective_matrix = self::get_perspective_matrix(array($map_width, $map_height));
+        //error_log('$map_perspective_matrix = '.print_r($map_perspective_matrix, true));
+        //error_log('$map_perspective_matrix = '.PHP_EOL.print_r(self::print_matrix($map_perspective_matrix), true));
         $this_player_token = $this_prototype_data['this_player_token'];
         $this_is_cursor = $this_player_token === 'player' ? true : false;
         $portals_markup = array();
@@ -921,6 +927,10 @@ class rpg_world {
                 list($col, $row) = explode('-', $pos);
                 $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                //list($mod_top, $mod_left) = self::transform_point_with_matrix(array($left, $top), $map_perspective_matrix);
+                //error_log('-> portal "'.$portal_name.'" at pos "'.$pos.'" (col: '.$col.', row: '.$row.')');
+                //error_log('-> $top = '.$top.', $left = '.$left.' | $mod_top = '.$mod_top.', $mod_left = '.$mod_left);
+                //$top = $mod_top; $left = $mod_left;
                 $hidden = in_array('hidden', $portal_data) ? true : false;
                 $locked = in_array('locked', $portal_data) ? true : false;
                 if ($this_is_cursor && !$locked && $portal_name !== 'spawn'){ $locked = true; }
@@ -1190,6 +1200,92 @@ class rpg_world {
         $rival_symbols_json = json_encode($rival_symbols, JSON_NUMERIC_CHECK);
         $teams_markup[] = '<script data-json="rivalSymbols" type="application/json">'.$rival_symbols_json.'</script>';
         return implode(PHP_EOL, $teams_markup);
+    }
+
+    // Define a function for generating a perspective matrix (given known values) for world map positioning
+    public static function get_perspective_matrix($dimensions, $transform = array()){
+        //error_log('rpg_world::get_perspective_matrix() called!');
+        if (empty($dimensions) || !is_array($dimensions) || count($dimensions) !== 2){ error_log('error: $dimensions must be an array with two numeric values!'); return false; }
+        if (empty($transform)){ $transform = array(800, 25, 1.5); } // TODO: hard-coded defaults we should store somewhere
+        // Unpack dimensions and transform values
+        list($width, $height) = $dimensions;
+        list($perspectiveDistance, $rotateX, $scale) = $transform;
+        // Perspective matrix (d = perspectiveDistance)
+        $p = [
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, -1 / $perspectiveDistance],
+            [0, 0, 0, 1]
+            ];
+        // Rotation matrix around X-axis (rotateX degrees)
+        $theta = deg2rad($rotateX);
+        $rx = [
+            [1, 0, 0, 0],
+            [0, cos($theta), -sin($theta), 0],
+            [0, sin($theta), cos($theta), 0],
+            [0, 0, 0, 1]
+            ];
+        // Rotation matrix around Y-axis (rotateY is fixed at 0 degrees, so identity matrix)
+        $ry = [
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+            ];
+        // Scaling matrix (scale factor)
+        $s = [
+            [$scale, 0, 0, 0],
+            [0, $scale, 0, 0],
+            [0, 0, $scale, 0],
+            [0, 0, 0, 1]
+            ];
+        // Multiply matrices in order: P * Rx * Ry * S
+        $transformMatrix = self::multiply_matrices(self::multiply_matrices(self::multiply_matrices($p, $rx), $ry), $s);
+        return $transformMatrix;
+    }
+    // Define a function for transforming a point using the perspective matrix
+    public static function transform_point_with_matrix($xy, $matrix) {
+        //error_log('rpg_world::transform_point_with_matrix() called!');
+        // Apply the affine transformation
+        list($x, $y) = $xy;
+        // If the matrix is a 4x4 matrix (affine transformation matrix), apply the transformation accordingly
+        if (count($matrix) == 4 && count($matrix[0]) == 4) {
+            // Use homogeneous coordinates for affine transformation (add z=0 and w=1)
+            $z = 0;
+            $w = 1;
+            // Apply the matrix to the point (in homogeneous coordinates)
+            $newX = $matrix[0][0] * $x + $matrix[0][1] * $y + $matrix[0][2] * $z + $matrix[0][3] * $w;
+            $newY = $matrix[1][0] * $x + $matrix[1][1] * $y + $matrix[1][2] * $z + $matrix[1][3] * $w;
+            $newZ = $matrix[2][0] * $x + $matrix[2][1] * $y + $matrix[2][2] * $z + $matrix[2][3] * $w;
+            $newW = $matrix[3][0] * $x + $matrix[3][1] * $y + $matrix[3][2] * $z + $matrix[3][3] * $w;
+            // We return the point (x', y') for 2D space (homogeneous coordinates)
+            // Here we ignore the Z and W because they aren't relevant for 2D projections
+            return [$newX / $newW, $newY / $newW];
+        } else {
+            // Fallback if the matrix is not the expected size (shouldn't happen with correct input)
+            throw new Exception("Matrix must be a 4x4 matrix.");
+        }
+    }
+    // Matrix multiplication function
+    public static function multiply_matrices($A, $B){
+        $C = [];
+        for ($i = 0; $i < 4; $i++) {
+            for ($j = 0; $j < 4; $j++) {
+                $C[$i][$j] = 0;
+                for ($k = 0; $k < 4; $k++) {
+                    $C[$i][$j] += $A[$i][$k] * $B[$k][$j];
+                }
+            }
+        }
+        return $C;
+    }
+    // Print a patrix in an easy-to-understand way
+    public static function print_matrix($matrix) {
+        $output = '';
+        foreach ($matrix as $row) {
+            $output .= '[ ' . implode(' ', array_map(function($value) { return number_format($value, 2); }, $row)) . " ]\n";
+        }
+        return $output;
     }
 
 

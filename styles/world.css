@@ -60,7 +60,7 @@ html, body {
 #world #canvas #map .layer[data-layer="buttons"] { z-index: 22; }
 #world #canvas #map .layer[data-layer="switches"] { z-index: 24; }
 #world #canvas #map .layer[data-layer="battles"] { z-index: 30; }
-#world #canvas #map .layer[data-layer="team"] { z-index: 40; }
+#world #canvas #map .layer[data-layer="teams"] { z-index: 40; }
 
 /* define some special-effect styles for the terrain layer specifically */
 #world #canvas #map .layer[data-layer="terrain"] canvas {
@@ -90,6 +90,20 @@ html, body {
     opacity: 0.6;
 }
 */
+
+/* code for perspective mode (flakey right now, but maybe in future) */
+#world #canvas #map.has-perspective {
+    --base-perspective-width: 800px;
+    --map-perspective-width: var(--base-perspective-width);
+}
+#world #canvas #map.has-perspective .layer[data-layer="background"] {
+    width: 100% !important;
+    height: 100% !important;
+}
+#world #canvas #map.has-perspective .layer:not([data-layer="background"]) {
+    transform-style: preserve-3d;
+    transform: perspective(var(--map-perspective-width)) rotateX(25deg) rotateY(0deg) scale(1);
+}
 
 /* define an animation for shaking the map back and forth rapidly to simulate damage/explosion/dramtic events */
 @keyframes world-map-shake {

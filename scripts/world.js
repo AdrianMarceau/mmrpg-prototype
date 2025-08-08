@@ -86,6 +86,7 @@ gameSettings.worldState = {
     baseMapTileKeys: [], // base array of tile keys that are part of the map
     walkableMapTileKeys: [], // array of tile keys that are specifically walkable
     zoomLevel: 1.0, // default zoom level,
+    userZoomLevel: 1.0, // current zoom level set by user
     allowHovers: true, // allow hover effects on tiles
     allowClicks: true, // allow click events on tiles
     };
@@ -878,7 +879,6 @@ class mmrpgWorldMap {
         let zoom = _world.zoomLevel;
         let width = $overlay.width(), height = $overlay.height(), offset = $overlay.offset();
         if (applyOffset){ xPos -= offset.left; yPos -= offset.top; }
-        if (zoom !== 1){ sizeX *= zoom; sizeY *= zoom; }
         if (xPos < 0){ xPos = 0; } if (yPos < 0){ yPos = 0; }
         let thisCol = Math.floor(xPos / sizeX) + 1;
         let thisRow = Math.floor(yPos / sizeY) + 1;
@@ -1101,8 +1101,9 @@ class mmrpgWorldMap {
             if (!_world.allowClicks){ return false; }
             if (_cursor.moving){ return false; }
             //console.log('%c' + 'Map overlay click event!', 'color: cyan;');
+            //console.log('-> w/ e =', e);
             let oldPos = _cursor.position, curPos = oldPos;
-            let thisPos = _self.getTileAtPosition($clickOverlay, e.pageX, e.pageY);
+            let thisPos = _self.getTileAtPosition($clickOverlay, e.offsetX, e.offsetY, false);
             let sameAsLast = thisPos === lastMouseClick;
             let sameAsCurrent = thisPos === oldPos;
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
@@ -1125,10 +1126,11 @@ class mmrpgWorldMap {
         $clickOverlay.bind('mousemove', function(e){
             e.preventDefault();
             if (!_world.allowHovers){ return false; }
-            if (_cursor.moving){ return false; }
+            //if (_cursor.moving){ return false; }
             //console.log('%c' + 'Map overlay mousemove event!', 'color: cyan;');
+            //console.log('-> w/ e =', e);
             let curPos = _cursor.position;
-            let thisPos = _self.getTileAtPosition($clickOverlay, e.pageX, e.pageY);
+            let thisPos = _self.getTileAtPosition($clickOverlay, e.offsetX, e.offsetY, false);
             let sameAsLast = thisPos === lastMouseOver;
             if (sameAsLast){ return; }
             $clickOverlay.attr('title', 'Position: ' + thisPos);
@@ -1250,10 +1252,12 @@ class mmrpgWorldMap {
                 _self.playSoundEffect('switch-in');
                 $thisWorld.addClass('loading');
                 let worldReloadURL = 'world.php?player=' + playerToken;
+                _self.incZoomLevel();
                 _self.saveWorldState(function(){
+                    _self.incZoomLevel();
                     $thisWorld.addClass('redirecting');
                     window.location.href = worldReloadURL;
-                    _self.updateZoomLevel(2);
+                    _self.incZoomLevel();
                     });
                 return true;
                 });
@@ -1283,15 +1287,15 @@ class mmrpgWorldMap {
             if (!e.wheelDelta){ return false; }
             else if (e.wheelDelta > 0 && e.wheelDelta < 200){ return false; }
             else if (e.wheelDelta < 0 && e.wheelDelta > -200){ return false; }
-            let oldZoom = _world.zoomLevel || 1;
-            let newZoom = oldZoom + (e.wheelDelta > 0 ? 0.5 : -0.5);
-            if (newZoom < 0.5){ newZoom = 0.5; }
-            if (newZoom > 2){ newZoom = 2; }
-            if (newZoom === oldZoom){ return; }
             busyZooming = true;
-            _self.playSoundEffect('spawn-sound');
-            _self.updateZoomLevel(newZoom);
-            setTimeout(function(){ busyZooming = false; }, 1000);
+            let wheelDir = e.wheelDelta > 0 ? 'up' : 'down';
+            let oldZoom = _world.zoomLevel || 1;
+            if (wheelDir === 'up'){ _self.incZoomLevel(null, true); }
+            else { _self.decZoomLevel(null, true); }
+            let newZoom = _world.zoomLevel || 1;
+            if (newZoom === oldZoom){ busyZooming = false; return; }
+            else { setTimeout(function(){ busyZooming = false; }, 1000); }
+            _self.playSoundEffect('spawn-sound')
             return true;
             });
         // Bind events to the keyboard arrow keys if detected to allow for;
@@ -1448,7 +1452,7 @@ class mmrpgWorldMap {
         let tileOffsetX = ((thisNewCol - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0];
         let tileOffsetY = ((thisNewRow - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1];
         let cursorHasMoved = _worldCursor.moved || thisNewPos !== _mapStartPosition ? true : false;
-        _self.updateZoomLevel(1);
+        _self.resetZoomLevel();
         $canvasMap.addClass('busy');
         _worldCursor.moving = true;
         $actionDropdown.removeClass('active');
@@ -1472,7 +1476,7 @@ class mmrpgWorldMap {
             $cursorSprite.attr('data-col', thisNewCol);
             $cursorSprite.attr('data-row', thisNewRow);
             $cursorSprite.attr('data-pos', _worldCursor.position);
-            _self.updateZoomLevel(1);
+            _self.resetZoomLevel();
             _self.updateMapPosition();
             _self.makeLayerTileActive(_worldCursor.position);
             if (moveTimeout){ clearTimeout(moveTimeout); }
@@ -1552,7 +1556,7 @@ class mmrpgWorldMap {
         let usePerspective = _mapEffects.usePerspective;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
-        let $backgroundLayer = $('.layer[data-layer="background]', $canvasMap);
+        let $backgroundLayer = $('.layer[data-layer="background"]', $canvasMap);
         let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
         if (typeof scrollX !== 'number'){ scrollX = _worldCursor.positionXY[0] || 0; }
         if (typeof scrollY !== 'number'){ scrollY = _worldCursor.positionXY[1] || 0; }
@@ -1570,6 +1574,23 @@ class mmrpgWorldMap {
         let mapScrollY = scrollY;
         let targetX = (mapScrollX + (mapTileSizeX / 2) - (mapTileSizeOffsetX / 2)) * worldZoom;
         let targetY = (mapScrollY + (mapTileSizeY / 2) - (mapTileSizeOffsetY / 2)) * worldZoom;
+        // If perspective mode is currently on, we need to do some other pre-adjustments
+        if (usePerspective){
+            //console.log('-> _config.mapWidth:', _config.mapWidth, '_config.mapHeight:', _config.mapHeight);
+            $canvasMap.addClass('has-perspective');
+            $canvasMap.get(0).style.setProperty('--map-perspective-width', _config.mapWidth+'px');
+            let newLayerRect = $terrainLayer[0].getBoundingClientRect();
+            let newLayerWidth = newLayerRect.width, newLayerHeight = newLayerRect.height;
+            //console.log('-> newLayerRect:', newLayerRect);
+            //console.log('-> newLayerWidth:', newLayerWidth, 'newLayerHeight:', newLayerHeight);
+            $canvasMap.css({ width: newLayerWidth + 'px', height: newLayerHeight + 'px' });
+            mapWidth = newLayerWidth, mapHeight = newLayerHeight;
+            }
+        else {
+            $canvasMap.removeClass('has-perspective');
+            $canvasMap.get(0).style.setProperty('--map-perspective-width', '');
+            $canvasMap.css({ width: _config.mapWidth + 'px', height: _config.mapHeight + 'px' });
+            }
         // Now calculate the new translate values for the map container
         let translateX = 0, translateY = 0;
         if (mapWidth < worldWidth){ translateX = (worldWidth - mapWidth) / 2; }
@@ -1580,7 +1601,6 @@ class mmrpgWorldMap {
         else if (targetY < (worldHeight / 2)){ translateY = 0; }
         else if (targetY > (mapHeight - (worldHeight / 2))){ translateY = -(mapHeight - worldHeight); }
         else { translateY = -(targetY - (worldHeight / 2)); }
-        //let mapTranslateX = Math.round(translateX * worldZoom);
         let mapTranslateX = translateX;
         let mapTranslateY = translateY;
         let subTranslateX = Math.round(-1 * (translateX * 0.1));
@@ -1591,15 +1611,13 @@ class mmrpgWorldMap {
         $canvasMap.attr('data-zoom', worldZoom);
         $canvasMap.css({ transformOrigin: 'left top', transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) scale(' + worldZoom + ')' });
         $backgroundLayer.css({ transformOrigin: 'left top', transform: 'translate(' + subTranslateX + 'px, ' + subTranslateY + 'px)' });
-        if (usePerspective){ $terrainLayer.css({ transform: 'perspective(800px) rotateX(25deg) rotateY(0deg) scale(1.5)' }); }
-        else { $terrainLayer.css({ transform: 'none' }); }
         setTimeout(function(){ _world.allowClicks = _world.allowHovers = true; }, 1000);
         // Return true on success
         return true;
         }
 
     // Quick function for updating the map's current zoom level
-    updateZoomLevel(newZoomLevel){
+    updateZoomLevel(newZoomLevel, updateUserZoom){
         //console.log('%c' + 'mmrpgWorldMap.updateZoomLevel(newZoomLevel:' + newZoomLevel + ')', 'color: magenta;');
         if (!newZoomLevel || typeof newZoomLevel !== 'number' || newZoomLevel <= 0){
             console.error('updateZoomLevel() requires a valid zoom level!');
@@ -1608,8 +1626,42 @@ class mmrpgWorldMap {
         let _self = this;
         let _elements = _self.elements;
         let _world = _self.state;
+        updateUserZoom = typeof updateUserZoom === 'boolean' ? updateUserZoom : false;
         _world.zoomLevel = newZoomLevel
+        if (updateUserZoom){ _world.userZoomLevel = newZoomLevel; }
         _self.scrollMap();
+        return true;
+        }
+
+    // Quick function for increasing/decreasing the zoom level while respecting system min/max defaults
+    modZoomLevel(modAmount, updateUserZoom){
+        //console.log('%c' + 'mmrpgWorldMap.modZoomLevel(modAmount:' + modAmount + ')', 'color: magenta;');
+        if (!modAmount || typeof modAmount !== 'number' || modAmount === 0){
+            console.error('modZoomLevel() requires a valid modification amount!');
+            return false;
+            }
+        let _self = this;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let userZoomLevel = _world.userZoomLevel || 1;
+        userZoomLevel += modAmount;
+        if (userZoomLevel < 0.5){ userZoomLevel = 0.5; }
+        else if (userZoomLevel > 2){ userZoomLevel = 2; }
+        return _self.updateZoomLevel(userZoomLevel, updateUserZoom);
+        }
+    incZoomLevel(incAmount, updateUserZoom){ return this.modZoomLevel((incAmount || 0.25), updateUserZoom); }
+    decZoomLevel(decAmount, updateUserZoom){ return this.modZoomLevel(-(decAmount || 0.25), updateUserZoom); }
+
+    // Quick function for resetting the map's zoom level to the user's current setting
+    resetZoomLevel(){
+        //console.log('%c' + 'mmrpgWorldMap.resetZoomLevel()', 'color: magenta;');
+        let _self = this;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let userZoomLevel = _world.userZoomLevel || 1;
+        if (userZoomLevel < 0.5){ userZoomLevel = 0.5; }
+        else if (userZoomLevel > 2){ userZoomLevel = 2; }
+        _self.updateZoomLevel(userZoomLevel, true);
         return true;
         }
 
@@ -1989,13 +2041,13 @@ class mmrpgWorldMap {
                 _self.playSoundEffect(autoRedirectSound);
                 }
             if (autoRedirectURL){
-                _self.updateZoomLevel(1.25);
+                _self.incZoomLevel();
                 _self.saveWorldState(function(){
                     if (_worldCursor.moving || _worldCursor.position !== cursorPosition){ return; }
-                    else { _self.updateZoomLevel(1); }
-                    _self.updateZoomLevel(1.5);
+                    else { _self.resetZoomLevel(); }
+                    _self.incZoomLevel();
                     window.location.href = autoRedirectURL;
-                    _self.updateZoomLevel(2.0);
+                    _self.incZoomLevel();
                     });
                 }
             return true;
@@ -2125,11 +2177,11 @@ class mmrpgWorldMap {
                             }
                         if (portalHref){
                             $thisWorld.addClass('hidden');
-                            _self.updateZoomLevel(1.25);
+                            _self.incZoomLevel();
                             _self.saveWorldState(function(){
-                                _self.updateZoomLevel(1.5);
+                                _self.incZoomLevel();
                                 window.location.href = portalHref;
-                                _self.updateZoomLevel(2.0);
+                                _self.incZoomLevel();
                                 });
                             }
                         }
