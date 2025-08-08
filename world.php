@@ -300,10 +300,10 @@ if (empty($map_exit_pos)){
 $WORLD_SESSION['world_maps'][$map_token]['spawn_pos'] = $map_spawn_pos;
 $WORLD_SESSION['world_maps'][$map_token]['exit_pos'] = $map_exit_pos;
 
-// If the default position has not been set, we can use the spawn position for that
-if (empty($default_world_position)){ $default_world_position = $map_spawn_pos; }
 // If the world position has not been set yet, we can use the spawn position for it as well
 if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data['this_current_position'] = $map_spawn_pos; }
+// If the default position has not been set, we can use the spawn position for that
+if ($this_prototype_data['this_current_world'] === $default_world_token && empty($default_world_position)){ $default_world_position = $map_spawn_pos; }
 
 // If there are any buttons defined, check to see if any of them have been pushed already
 if (!empty($map_data_parsed['buttons'])){

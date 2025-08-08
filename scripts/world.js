@@ -1351,19 +1351,20 @@ class mmrpgWorldMap {
             if (sideButtonsActive){
                 // If the player has pressed the space or enter keys, let's confirm the side-button action if it's open
                 if (pressedKeys.Space || pressedKeys.Enter || pressedKeys.NumpadEnter ){
-                    console.log('%c' + 'Confirm action popup!', 'color: orange;');
+                    //console.log('%c' + 'Confirm action popup!', 'color: orange;');
                     e.preventDefault();
                     if (!$sideButtons.is('.active')){ return false; }
                     let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
                     if (!$confirmButton || !$confirmButton.length){ console.error('bindEventsToWorld() unable to find confirm button!'); return false; }
+                    if ($confirmButton.is('.clicked')){ return }
                     if (!$confirmButton.is('.maybe')){ $confirmButton.addClass('maybe'); return; }
-                    $confirmButton.removeClass('maybe'); //.addClass('clicked');
-                    console.log('Triggering click on confirm button:', $confirmButton);
+                    $confirmButton.removeClass('maybe');
+                    //console.log('Triggering click on confirm button:', $confirmButton);
                     $confirmButton.trigger('click');
                     }
                 // Else if the player has pressed the backspace or escape keys, let's close the side-button action if it's open
                 else if (pressedKeys.Backspace || pressedKeys.Escape){
-                    console.log('%c' + 'Dismiss action popup!', 'color: orange;');
+                    //console.log('%c' + 'Dismiss action popup!', 'color: orange;');
                     e.preventDefault();
                     if (!$sideButtons.is('.active')){ return false; }
                     let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
@@ -1373,7 +1374,7 @@ class mmrpgWorldMap {
                     }
                 // Else if the player has just pressed shift, make sure we add the hover class to the action-dropdown
                 else if (pressedKeys.Shift){
-                    console.log('%c' + 'Shift key pressed!', 'color: orange;');
+                    //console.log('%c' + 'Shift key pressed!', 'color: orange;');
                     e.preventDefault();
                     if (!$sideButtons.is('.active')){ return false; }
                     $actionDropdown.toggleClass('hover');
@@ -1475,12 +1476,15 @@ class mmrpgWorldMap {
             _self.updateMapPosition();
             _self.makeLayerTileActive(_worldCursor.position);
             if (moveTimeout){ clearTimeout(moveTimeout); }
-            moveTimeout = setTimeout(function(){
+            let delay = timeoutDuration - travelDuration;
+            let doAfterDelay = function(){
                 _worldCursor.moving = false;
                 $canvasMap.removeClass('busy');
                 if (typeof onComplete === 'function'){ onComplete(); }
                 if (cursorHasMoved){ _self.saveWorldState(null, 6); }
-                }, timeoutDuration);
+                };
+            if (delay > 0){ moveTimeout = setTimeout(doAfterDelay, delay); }
+            else { doAfterDelay(); }
             };
         if (animateMove){
             $cursorSprite.animate({
