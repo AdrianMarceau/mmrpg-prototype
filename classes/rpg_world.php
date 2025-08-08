@@ -1091,6 +1091,8 @@ class rpg_world {
             list($col, $row) = explode('-', $target_position);
             $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
             $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
+            if (strstr($team_dir, 'left')){ $left += count($team_sprites) * 4; }
+            elseif (strstr($team_dir, 'right')){ $left -= count($team_sprites) * 4; }
             foreach ($team_sprites as $key => $sprite){
                 $kind = $sprite[0];
                 $token = $sprite[1];
@@ -1098,10 +1100,10 @@ class rpg_world {
                 $alt = strstr($img, '_') ? explode('_', $img, 2)[1] : '';
                 $dir = strstr($team_dir, 'left') ? 'left' : 'right';
                 if ($key > 0){
-                    if (strstr($team_dir, 'right')){ $left -= 4; }
-                    elseif (strstr($team_dir, 'right')){ $left += 4; }
-                    if (strstr($team_dir, 'up')){ $top += 2; }
-                    elseif (strstr($team_dir, 'down')){ $top -= 2; }
+                    if (strstr($team_dir, 'left')){ $left -= 10; }
+                    elseif (strstr($team_dir, 'right')){ $left += 10; }
+                    if (strstr($team_dir, 'up')){ $top += 4; }
+                    elseif (strstr($team_dir, 'down')){ $top -= 4; }
                     }
                 $class = $team_class.' bounce';
                 $styles = 'top: '.$top.'px; left: '.$left.'px; ';
