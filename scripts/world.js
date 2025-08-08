@@ -1584,7 +1584,7 @@ class mmrpgWorldMap {
             //console.log('-> newLayerRect:', newLayerRect);
             //console.log('-> newLayerWidth:', newLayerWidth, 'newLayerHeight:', newLayerHeight);
             $canvasMap.css({ width: newLayerWidth + 'px', height: newLayerHeight + 'px' });
-            mapWidth = newLayerWidth, mapHeight = newLayerHeight;
+            mapWidth = newLayerWidth * worldZoom, mapHeight = newLayerHeight * worldZoom;
             }
         else {
             $canvasMap.removeClass('has-perspective');
@@ -1662,6 +1662,18 @@ class mmrpgWorldMap {
         if (userZoomLevel < 0.5){ userZoomLevel = 0.5; }
         else if (userZoomLevel > 2){ userZoomLevel = 2; }
         _self.updateZoomLevel(userZoomLevel, true);
+        return true;
+        }
+
+    // Quick function for toggling perspective mode on/off and then re-scrolling the map to refresh
+    togglePerspectiveMode(){
+        //console.log('%c' + 'mmrpgWorldMap.togglePerspectiveMode()', 'color: magenta;');
+        let _self = this;
+        let _config = _self.config;
+        let _mapEffects = _config.mapEffects;
+        if (!_mapEffects.usePerspective){ _mapEffects.usePerspective = true; }
+        else { _mapEffects.usePerspective = false; }
+        _self.scrollMap();
         return true;
         }
 
