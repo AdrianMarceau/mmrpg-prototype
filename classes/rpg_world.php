@@ -841,6 +841,7 @@ class rpg_world {
         $cursor_types = ' type explode';
         //$return_markup .= ('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         $mmrpg_index_players = self::get_indexes('players');
+        $return_markup .= ('<a class="option'.$cursor_types.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         foreach ($allowed_player_tokens AS $player_key => $player_token){
             if ($player_token === 'player' || empty($mmrpg_index_players[$player_token])){ continue; }
             $player_info = $mmrpg_index_players[$player_token];
@@ -852,7 +853,6 @@ class rpg_world {
             $link_attrs = !$player_active ? ' data-player="'.$player_token.'"' : '';
             $return_markup .= ('<a class="'.$link_class.'"'.$link_attrs.'>'.$player_sprite.$cursor_sprite.$player_label.'</a>');
         }
-        $return_markup .= ('<a class="option'.$cursor_types.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         return $return_markup;
     }
 
