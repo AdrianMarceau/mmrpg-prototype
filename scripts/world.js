@@ -36,6 +36,7 @@ gameSettings.worldConfig = {
         hoverTimeout: 600, // milliseconds
         moveTimeout: 300, // milliseconds
         moveTravel: 100, // milliseconds
+        usePerspective: false, // make it easy to toggle this during dev
         },
     mapTilesIndex: {},
     mapGroupsIndex: {},
@@ -438,6 +439,180 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Quick function for drawing a single tile to a given layer's canvas object given data
+    drawTileToCanvas(layerToken, ctx, spriteSheet, tileKey, tileData){
+        //console.log('%c' + 'mmrpgWorldMap.drawTileToCanvas(layerToken:' + layerToken + ', ctx, spriteSheet, tileKey:' + tileKey + ', tileData:' + typeof tileData + ')', 'color: magenta;');
+        let _self = this;
+        let _selfRef = _self.drawTileToCanvas;
+        let _config = _self.config;
+        let _world = _self.state;
+        // collect the tile data from the index
+        let tilePosition = tileData.position; // col, row, x, y
+        let tileEffects = tileData.effects; // grid, hover, focus
+        let tileSprite = tileData.sprite; // key, token, offset, size
+        let tileSpriteKey = tileSprite[0];
+        let tileSpriteToken = tileSprite[1];
+        let tileSpriteOffset = tileSprite[2];
+        let tileSpriteSize = tileSprite[3];
+        // define some internal methods we can use for effect-drawingoptimization
+        let _saveDrawRestore = function(callback){
+            ctx.save(); callback.call(this); ctx.restore();
+            };
+        let _drawSpriteFromData = function(spriteData, alpha){ //, composite
+            if (!spriteData){ return; }
+            _saveDrawRestore(function(){
+                ctx.globalAlpha = typeof alpha === 'number' ? alpha : 1.0;
+                ctx.globalCompositeOperation = 'source-atop';
+                //ctx.globalCompositeOperation = typeof composite === 'string' ? composite : 'source-atop';
+                //ctx.globalCompositeOperation = 'source-atop'; // TEMP TEMP TEMP
+                //console.log('-> drawing sprite[' + layerToken + '/' + tileKey + '] w/', '\n-> globalAlpha = ', ctx.globalAlpha, '\n-> globalCompositeOperation =', ctx.globalCompositeOperation);
+                ctx.drawImage(spriteSheet,
+                    spriteData[0], spriteData[1], // source offset
+                    tileSpriteSize[0], tileSpriteSize[1], // source size
+                    tilePosition[2], tilePosition[3], // destination offset
+                    tileSpriteSize[0], tileSpriteSize[1] // destination size
+                    );
+                });
+            };
+        let drawSpriteFromData = function(spriteData, alpha){ //, composite
+            return _drawSpriteFromData(spriteData, alpha); //, composite
+            };
+        // check if the tile is focused or hovered and apply the effects
+        let tileHasGrid = tileEffects.grid;
+        let tileIsHovered = tileEffects.hover;
+        let tileIsOutlined = tileEffects.outline;
+        let tileIsFocused = tileEffects.focus;
+        let tileIsActive = tileEffects.active;
+        // check if this tile falls into any oft-used categories
+        let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void') !== -1 ? true : false;
+        let tileIsGrass = tileSpriteToken === 'grass' || tileSpriteToken.indexOf('grass') !== -1 ? true : false;
+        let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water') !== -1 ? true : false;
+        // clear a rect at the exact position and no larger
+        ctx.clearRect(tilePosition[2], tilePosition[3], tileSpriteSize[0], tileSpriteSize[1]);
+        // void tiles have no sprite, so we skip drawing them
+        if (tileIsVoid){ return false; }
+        //console.log('---> tile[' + layerToken + '/' + tileKey + '/' + tileSpriteToken + '] tileData =', JSON.stringify(tileData));
+        //console.log('---> tile[' + layerToken + '/' + tileKey + ']::tileIsVoid =', tileIsVoid);
+        // sprite: draw the main tile sprite at the correct position
+        if (tileIsWater){ ctx.globalAlpha = 0.8; }
+        ctx.drawImage(spriteSheet,
+            tileSpriteOffset[0], tileSpriteOffset[1], // source offset
+            tileSpriteSize[0], tileSpriteSize[1], // source size
+            tilePosition[2], tilePosition[3], // destination offset
+            tileSpriteSize[0], tileSpriteSize[1] // destination size
+            );
+        ctx.globalAlpha = 1.0;
+        // grid/hover/outline/focus/active: collect sprite data for known effects
+        // then we draw any overlay images as defined in the effects on top
+        let gridSpriteData = _self.getSpriteData('grid');
+        let hoverSpriteData = _self.getSpriteData('hover');
+        let outlineSpriteData = _self.getSpriteData('outline');
+        let focusSpriteData = _self.getSpriteData('focus');
+        let activeSpriteData = _self.getSpriteData('active');
+        if (!gridSpriteData){ console.warn('drawTileToCanvas() unable to find grid sprite data for layer ' + layerToken + '!'); }
+        if (!hoverSpriteData){ console.warn('drawTileToCanvas() unable to find hover sprite data for layer ' + layerToken + '!'); }
+        if (!outlineSpriteData){ console.warn('drawTileToCanvas() unable to find outline sprite data for layer ' + layerToken + '!'); }
+        if (!focusSpriteData){ console.warn('drawTileToCanvas() unable to find focus sprite data for layer ' + layerToken + '!'); }
+        if (!activeSpriteData){ console.warn('drawTileToCanvas() unable to find active sprite data for layer ' + layerToken + '!'); }
+        // [GRID]: draw another image at the same positon but w/ the grid sprite
+        if (tileHasGrid && gridSpriteData){
+            var gridSpriteAlpha = 0.3;
+            if (tileIsGrass){ gridSpriteAlpha += 0.2; }
+            drawSpriteFromData(gridSpriteData, gridSpriteAlpha);
+            }
+        // [HOVER]: draw another image at the same positon but w/ the border sprite
+        if (tileIsHovered && hoverSpriteData){
+            var hoverSpriteAlpha = 0.3;
+            if (tileIsFocused){ hoverSpriteAlpha += 0.6; }
+            drawSpriteFromData(hoverSpriteData, hoverSpriteAlpha);
+            }
+        // [OUTLINE]: draw another image at the same positon but w/ the border sprite
+        if (tileIsOutlined && outlineSpriteData){
+            drawSpriteFromData(outlineSpriteData);
+            }
+        // [FOCUS]: draw another image at the same positon but w/ the border sprite
+        if (tileIsFocused && focusSpriteData){
+            var focusSpriteAlpha = 0.25;
+            if (tileIsGrass){ focusSpriteAlpha += 0.10; }
+            if (tileIsHovered){ focusSpriteAlpha += 0.25; }
+            drawSpriteFromData(focusSpriteData, focusSpriteAlpha);
+            if (outlineSpriteData){
+                var outlineSpriteAlpha = 1.00;
+                if (tileIsWater){ outlineSpriteAlpha -= 0.30; }
+                drawSpriteFromData(outlineSpriteData);
+                }
+            }
+        // [ACTIVE]: draw another image at the same positon but w/ the border sprite
+        if (tileIsActive && activeSpriteData){
+            drawSpriteFromData(activeSpriteData);
+            }
+        // Return true on success
+        return true;
+        }
+
+    // === GRADIENT OVERLAY HELPERS ===
+    // Define a quick function for getting an offscreen canvas
+    _getOffscreen(w, h){
+        if ('OffscreenCanvas' in window) {
+            const c = new OffscreenCanvas(w, h);
+            return c;
+            }
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        return c;
+        }
+    // Define a function for making the gradient used in the overlay
+    _makeOverlayGradient(bctx, w, h){
+        const g = bctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, 'rgba(255,200,150,0.6)');
+        g.addColorStop(1, 'rgba(50,60,120,0.6)');
+        return g;
+        }
+    // Build (or reuse) the full-canvas gradient buffer for this layer.
+    // Cache is invalidated automatically if canvas size changes.
+    getOverlayGradientBuffer(layerToken, ctx){
+        let _self = self;
+        _self._overlayCache = _self._overlayCache || { gradients: {}, sliceBuf: null };
+        const cache = self._overlayCache.gradients;
+        const key = layerToken;
+        const cw = ctx.canvas.width, ch = ctx.canvas.height;
+        let entry = cache[key];
+        if (!entry || entry.w !== cw || entry.h !== ch){
+            const buf = _self._getOffscreen(cw, ch);
+            const bctx = buf.getContext('2d');
+            bctx.clearRect(0, 0, cw, ch);
+            const g = _self._makeOverlayGradient(bctx, cw, ch);
+            bctx.fillStyle = g;
+            bctx.fillRect(0, 0, cw, ch);
+            entry = cache[key] = { buf, w: cw, h: ch };
+            }
+        return entry.buf;
+        }
+    // Apply the overlay to a single rect without stacking.
+    // Slices the gradient buffer, masks with current scene alpha in that rect, then blends back.
+    applyOverlayToRect(ctx, gradBuf, x, y, w, h, blend){
+        let _self = self;
+        _self._overlayCache = _self._overlayCache || { gradients: {}, sliceBuf: null };
+        let slice = _self._overlayCache.sliceBuf;
+        if (!slice){ slice = _self._overlayCache.sliceBuf = _getOffscreen(w, h); }
+        // Resize if needed (clears content)
+        if (slice.width !== w || slice.height !== h){ slice.width = w; slice.height = h; }
+        const sctx = slice.getContext('2d');
+        sctx.globalCompositeOperation = 'source-over';
+        sctx.clearRect(0, 0, w, h);
+        // 1) draw the relevant gradient slice
+        sctx.drawImage(gradBuf, x, y, w, h, 0, 0, w, h);
+        // 2) keep only where pixels exist in the scene
+        sctx.globalCompositeOperation = 'destination-in';
+        sctx.drawImage(ctx.canvas, x, y, w, h, 0, 0, w, h);
+        // 3) blend it back
+        ctx.save();
+        ctx.globalCompositeOperation = blend || 'multiply';
+        ctx.drawImage(slice, x, y);
+        ctx.restore();
+        }
+    // === END GRADIENT OVERLAY HELPERS ===
+
     // Quick function for generating the currently walkable map tiles
     getWalkableMapTiles(){
         //console.log('%c' + 'mmrpgWorldMap.getWalkableMapTiles()', 'color: magenta;');
@@ -779,117 +954,6 @@ class mmrpgWorldMap {
         if (!portalInfo){ console.error('getPortalData() missing required entry "' + portalToken + '" in mapPortalsIndex!'); return false; }
         return portalInfo;
         }
-
-    // Quick function for drawing a single tile to a given layer's canvas object given data
-    drawTileToCanvas(layerToken, ctx, spriteSheet, tileKey, tileData){
-        //console.log('%c' + 'mmrpgWorldMap.drawTileToCanvas(layerToken:' + layerToken + ', ctx, spriteSheet, tileKey:' + tileKey + ', tileData:' + typeof tileData + ')', 'color: magenta;');
-        let _self = this;
-        let _selfRef = _self.drawTileToCanvas;
-        let _config = _self.config;
-        let _world = _self.state;
-        // collect the tile data from the index
-        let tilePosition = tileData.position; // col, row, x, y
-        let tileEffects = tileData.effects; // grid, hover, focus
-        let tileSprite = tileData.sprite; // key, token, offset, size
-        let tileSpriteKey = tileSprite[0];
-        let tileSpriteToken = tileSprite[1];
-        let tileSpriteOffset = tileSprite[2];
-        let tileSpriteSize = tileSprite[3];
-        // define some internal methods we can use for effect-drawingoptimization
-        let _saveDrawRestore = function(callback){
-            ctx.save(); callback.call(this); ctx.restore();
-            };
-        let _drawSpriteFromData = function(spriteData, alpha){ //, composite
-            if (!spriteData){ return; }
-            _saveDrawRestore(function(){
-                ctx.globalAlpha = typeof alpha === 'number' ? alpha : 1.0;
-                ctx.globalCompositeOperation = 'source-atop';
-                //ctx.globalCompositeOperation = typeof composite === 'string' ? composite : 'source-atop';
-                //ctx.globalCompositeOperation = 'source-atop'; // TEMP TEMP TEMP
-                //console.log('-> drawing sprite[' + layerToken + '/' + tileKey + '] w/', '\n-> globalAlpha = ', ctx.globalAlpha, '\n-> globalCompositeOperation =', ctx.globalCompositeOperation);
-                ctx.drawImage(spriteSheet,
-                    spriteData[0], spriteData[1], // source offset
-                    tileSpriteSize[0], tileSpriteSize[1], // source size
-                    tilePosition[2], tilePosition[3], // destination offset
-                    tileSpriteSize[0], tileSpriteSize[1] // destination size
-                    );
-                });
-            };
-        let drawSpriteFromData = function(spriteData, alpha){ //, composite
-            return _drawSpriteFromData(spriteData, alpha); //, composite
-            };
-        // check if the tile is focused or hovered and apply the effects
-        let tileHasGrid = tileEffects.grid;
-        let tileIsHovered = tileEffects.hover;
-        let tileIsOutlined = tileEffects.outline;
-        let tileIsFocused = tileEffects.focus;
-        let tileIsActive = tileEffects.active;
-        // check if this tile falls into any oft-used categories
-        let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void') !== -1 ? true : false;
-        let tileIsGrass = tileSpriteToken === 'grass' || tileSpriteToken.indexOf('grass') !== -1 ? true : false;
-        let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water') !== -1 ? true : false;
-        // clear a rect at the exact position and no larger
-        ctx.clearRect(tilePosition[2], tilePosition[3], tileSpriteSize[0], tileSpriteSize[1]);
-        // void tiles have no sprite, so we skip drawing them
-        if (tileIsVoid){ return false; }
-        //console.log('---> tile[' + layerToken + '/' + tileKey + '/' + tileSpriteToken + '] tileData =', JSON.stringify(tileData));
-        //console.log('---> tile[' + layerToken + '/' + tileKey + ']::tileIsVoid =', tileIsVoid);
-        // sprite: draw the main tile sprite at the correct position
-        if (tileIsWater){ ctx.globalAlpha = 0.8; }
-        ctx.drawImage(spriteSheet,
-            tileSpriteOffset[0], tileSpriteOffset[1], // source offset
-            tileSpriteSize[0], tileSpriteSize[1], // source size
-            tilePosition[2], tilePosition[3], // destination offset
-            tileSpriteSize[0], tileSpriteSize[1] // destination size
-            );
-        ctx.globalAlpha = 1.0;
-        // grid/hover/outline/focus/active: collect sprite data for known effects
-        // then we draw any overlay images as defined in the effects on top
-        let gridSpriteData = _self.getSpriteData('grid');
-        let hoverSpriteData = _self.getSpriteData('hover');
-        let outlineSpriteData = _self.getSpriteData('outline');
-        let focusSpriteData = _self.getSpriteData('focus');
-        let activeSpriteData = _self.getSpriteData('active');
-        if (!gridSpriteData){ console.warn('drawTileToCanvas() unable to find grid sprite data for layer ' + layerToken + '!'); }
-        if (!hoverSpriteData){ console.warn('drawTileToCanvas() unable to find hover sprite data for layer ' + layerToken + '!'); }
-        if (!outlineSpriteData){ console.warn('drawTileToCanvas() unable to find outline sprite data for layer ' + layerToken + '!'); }
-        if (!focusSpriteData){ console.warn('drawTileToCanvas() unable to find focus sprite data for layer ' + layerToken + '!'); }
-        if (!activeSpriteData){ console.warn('drawTileToCanvas() unable to find active sprite data for layer ' + layerToken + '!'); }
-        // [GRID]: draw another image at the same positon but w/ the grid sprite
-        if (tileHasGrid && gridSpriteData){
-            var gridSpriteAlpha = 0.3;
-            if (tileIsGrass){ gridSpriteAlpha += 0.2; }
-            drawSpriteFromData(gridSpriteData, gridSpriteAlpha);
-            }
-        // [HOVER]: draw another image at the same positon but w/ the border sprite
-        if (tileIsHovered && hoverSpriteData){
-            var hoverSpriteAlpha = 0.3;
-            if (tileIsFocused){ hoverSpriteAlpha += 0.6; }
-            drawSpriteFromData(hoverSpriteData, hoverSpriteAlpha);
-            }
-        // [OUTLINE]: draw another image at the same positon but w/ the border sprite
-        if (tileIsOutlined && outlineSpriteData){
-            drawSpriteFromData(outlineSpriteData);
-            }
-        // [FOCUS]: draw another image at the same positon but w/ the border sprite
-        if (tileIsFocused && focusSpriteData){
-            var focusSpriteAlpha = 0.25;
-            if (tileIsGrass){ focusSpriteAlpha += 0.10; }
-            if (tileIsHovered){ focusSpriteAlpha += 0.25; }
-            drawSpriteFromData(focusSpriteData, focusSpriteAlpha);
-            if (outlineSpriteData){
-                var outlineSpriteAlpha = 1.00;
-                if (tileIsWater){ outlineSpriteAlpha -= 0.30; }
-                drawSpriteFromData(outlineSpriteData);
-                }
-            }
-        // [ACTIVE]: draw another image at the same positon but w/ the border sprite
-        if (tileIsActive && activeSpriteData){
-            drawSpriteFromData(activeSpriteData);
-            }
-        // Return true on success
-        return true;
-        };
 
     // Quick functions for updating any canvas map layer tiles that have changed properties
     refreshCanvasTiles(layerToken){
@@ -1464,10 +1528,11 @@ class mmrpgWorldMap {
         let _mapEffects = _config.mapEffects;
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
+        let usePerspective = _mapEffects.usePerspective;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
-        //let $terrainLayer = $('.layer.terrain', $canvasMap);
-        let $backgroundLayer = $('.layer.background', $canvasMap);
+        let $backgroundLayer = $('.layer[data-layer="background]', $canvasMap);
+        let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
         if (typeof scrollX !== 'number'){ scrollX = _worldCursor.positionXY[0] || 0; }
         if (typeof scrollY !== 'number'){ scrollY = _worldCursor.positionXY[1] || 0; }
         // And now we should move the map itself so that the characters are always centered in the viewport
@@ -1503,8 +1568,9 @@ class mmrpgWorldMap {
         //$canvasMap.css({ transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px)' });
         $canvasMap.attr('data-zoom', worldZoom);
         $canvasMap.css({ transformOrigin: 'left top', transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) scale(' + worldZoom + ')' });
-        //$terrainLayer.css({ transform: 'perspective(800px) rotateX(25deg) rotateY(0deg)' });
         $backgroundLayer.css({ transformOrigin: 'left top', transform: 'translate(' + subTranslateX + 'px, ' + subTranslateY + 'px)' });
+        if (usePerspective){ $terrainLayer.css({ transform: 'perspective(800px) rotateX(25deg) rotateY(0deg) scale(1.5)' }); }
+        else { $terrainLayer.css({ transform: 'none' }); }
         // Return true on success
         return true;
         }
