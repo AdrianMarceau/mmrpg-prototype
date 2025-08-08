@@ -250,11 +250,19 @@ class mmrpgWorldMap {
             };
         let onLayersLoaded = function(){
             let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
-            let dropdownRequired = !_elements.actionDropdown || !_elements.actionDropdown.length;
-            if ($terrainLayer.length && dropdownRequired){
-                let $actionDropdown = $('<div id="action-dropdown"><div class="wrapper"></div></div>');
-                $terrainLayer.append($actionDropdown);
-                _elements.actionDropdown = $actionDropdown;
+            if ($terrainLayer.length){
+                let dropdownRequired = !_elements.actionDropdown || !_elements.actionDropdown.length;
+                let overlayRequired = !_elements.clickOverlay || !_elements.clickOverlay.length;
+                if (dropdownRequired){
+                    let $actionDropdown = $('<div id="action-dropdown"><div class="wrapper"></div></div>');
+                    $terrainLayer.append($actionDropdown);
+                    _elements.actionDropdown = $actionDropdown;
+                    }
+                if (overlayRequired){
+                    let $clickOverlay = $('<div id="click-overlay"><div class="wrapper"></div></div>');
+                    $terrainLayer.append($clickOverlay);
+                    _elements.clickOverlay = $clickOverlay;
+                    }
                 }
             return onWorldLoaded();
             };
@@ -1332,11 +1340,13 @@ class mmrpgWorldMap {
         let $canvasMap = _elements.map;
         let $sideButtons = _elements.sideButtons;
         let $actionDropdown = _elements.actionDropdown;
+        let $teamSprites = _elements.teamSprites;
         let $backgroundLayer = $('.layer.background', $canvasMap);
         var $tilesLayer = $('.layer.tiles', $canvasMap);
         let $objectsLayer = $('.layer.objects', $canvasMap);
         let $eventsLayers = $('.layer.events', $canvasMap);
-        let $cursorSprite = $('.sprite.cursor', $objectsLayer);
+        let $cursorSprite = $teamSprites.filter('.cursor');
+        let $otherSprites = $teamSprites.filter(':not(.cursor)');
         if (!$tilesLayer || !$tilesLayer.length){ console.error('$tilesLayer does not exist!'); return false; }
         if (!$objectsLayer || !$objectsLayer.length){ console.error('$objectsLayer does not exist!'); return false; }
         if (!$eventsLayers || !$eventsLayers.length){ console.error('$eventsLayers do not exist!'); return false; }
@@ -1403,13 +1413,12 @@ class mmrpgWorldMap {
                 }); onMoveComplete();
             }
         // If there are any team sprites, move them as well (it's okay if they lay behind the cursor)
-        let $teamSprites = $('.sprite.team', $objectsLayer);
-        if ($teamSprites && $teamSprites.length){
+        if ($otherSprites && $otherSprites.length){
             let teamOffsetX = tileOffsetX;
             let teamOffsetY = tileOffsetY;
             let teamTravelDuration = travelDuration;
             teamTravelDuration += 50;
-            $teamSprites.each(function(index, element){
+            $otherSprites.each(function(index, element){
                 let $thisSprite = $(element);
                 let $innerSprite = $('.sprite', $thisSprite);
                 let imgSize = $thisSprite.attr('data-size') || 40;
@@ -1858,7 +1867,12 @@ class mmrpgWorldMap {
             let rushDistanceY = Math.ceil(_mapTileSize[1] / 4);
             let playerFrames = ['06', '01', '04'];
             let robotFrames = ['04', '08', '01', '06', '10', '00', '04', '01'];
-            $teamSprites.filter(':not(.cursor)').each(function(index){
+            let $cursorSprite = $teamSprites.filter('.sprite.cursor');
+            let $otherSprites = $teamSprites.filter('.sprite:not(.cursor)');
+            let $playerSprites = $otherSprites.filter('.sprite.player');
+            let $robotSprites = $otherSprites.filter('.sprite.robot');
+            $cursorSprite.attr('data-frame', '01');
+            $otherSprites.each(function(index){
                 let $sprite = $(this);
                 let oldX = $sprite.prop('worldX') || parseInt($sprite.css('left')) || 0;
                 let oldY = $sprite.prop('worldY') || parseInt($sprite.css('top')) || 0;
@@ -1866,11 +1880,11 @@ class mmrpgWorldMap {
                 let newY = oldY + (goingDown ? rushDistanceY : goingUp ? (-1 * rushDistanceY) : 0);
                 $sprite.animate({left: newX + 'px', top: newY + 'px' }, teamRushDuration);
                 });
-            $teamSprites.filter('.player').each(function(index){
+            $playerSprites.each(function(index){
                 let $sprite = $(this);
                 $sprite.attr('data-frame', playerFrames[index % playerFrames.length] || '00');
                 });
-            $teamSprites.filter('.robot').each(function(index){
+            $robotSprites.each(function(index){
                 let $sprite = $(this);
                 $sprite.attr('data-frame', robotFrames[index % robotFrames.length] || '00');
                 });

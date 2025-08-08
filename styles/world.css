@@ -423,16 +423,12 @@ html, body {
     50% { transform: translate(0, -1px); }
 }
 @keyframes world-cursor-shake {
-    0% { transform: rotate(0deg); }
-    10% { transform: rotate(2deg); }
-    20% { transform: rotate(-2deg); }
-    30% { transform: rotate(2deg); }
-    40% { transform: rotate(-2deg); }
-    50% { transform: rotate(0deg); }
-    60% { transform: rotate(2deg); }
-    70% { transform: rotate(-2deg); }
-    80% { transform: rotate(2deg); }
-    90% { transform: rotate(-2deg); }
+    0% { transform: translate(0, 0); }
+    10% { transform: translate(-2px, -1px); }
+    20% { transform: translate(2px, -1px); }
+    30% { transform: translate(-2px, 1px); }
+    40% { transform: translate(2px, 1px); }
+    50% { transform: translate(0, 0); }
 }
 #world #map .layer.objects .sprite.cursor {
 
