@@ -471,6 +471,15 @@ class rpg_world {
                 unset($available_cells[$pos]);
             }
         }
+        // Now let's loop through static bosses and make sure those aren't used either
+        if (!empty($map_data['bosses']) && is_array($map_data['bosses'])){
+            foreach ($map_data['bosses'] AS $boss_name => $boss_data){
+                if (empty($boss_data) || !is_array($boss_data)){ continue; }
+                $pos = $boss_data[0];
+                //error_log('-> removing boss position "'.$pos.'" from available cells');
+                unset($available_cells[$pos]);
+            }
+        }
         // If there's a group defined called "no-encounters", loop through the cells and add them too
         if (!empty($map_data['groups']) && is_array($map_data['groups']) && isset($map_data['groups']['no-encounters'])){
             $no_encounters = $map_data['groups']['no-encounters'];
