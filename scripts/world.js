@@ -85,7 +85,9 @@ gameSettings.worldState = {
     layerTilesIndex: {},
     baseMapTileKeys: [], // base array of tile keys that are part of the map
     walkableMapTileKeys: [], // array of tile keys that are specifically walkable
-    zoomLevel: 1.0, // default zoom level
+    zoomLevel: 1.0, // default zoom level,
+    allowHovers: true, // allow hover effects on tiles
+    allowClicks: true, // allow click events on tiles
     };
 gameSettings.worldHasLoaded = false;
 
@@ -502,6 +504,13 @@ class mmrpgWorldMap {
             tileSpriteSize[0], tileSpriteSize[1] // destination size
             );
         ctx.globalAlpha = 1.0;
+        // gradient-overlay: draw a slice of the gradient overlay on top of this tile for aesthetic purposes
+        var gradBuf = _self.getOverlayGradientBuffer(layerToken, ctx);
+        _self.applyOverlayToRect(ctx, gradBuf,
+            tilePosition[2], tilePosition[3],
+            tileSpriteSize[0], tileSpriteSize[1],
+            'overlay'
+            );
         // grid/hover/outline/focus/active: collect sprite data for known effects
         // then we draw any overlay images as defined in the effects on top
         let gridSpriteData = _self.getSpriteData('grid');
@@ -523,7 +532,8 @@ class mmrpgWorldMap {
         // [HOVER]: draw another image at the same positon but w/ the border sprite
         if (tileIsHovered && hoverSpriteData){
             var hoverSpriteAlpha = 0.3;
-            if (tileIsFocused){ hoverSpriteAlpha += 0.6; }
+            if (tileIsGrass){ hoverSpriteAlpha += 0.2; }
+            if (tileIsFocused){ hoverSpriteAlpha += 0.5; }
             drawSpriteFromData(hoverSpriteData, hoverSpriteAlpha);
             }
         // [OUTLINE]: draw another image at the same positon but w/ the border sprite
@@ -564,16 +574,17 @@ class mmrpgWorldMap {
     // Define a function for making the gradient used in the overlay
     _makeOverlayGradient(bctx, w, h){
         const g = bctx.createLinearGradient(0, 0, 0, h);
-        g.addColorStop(0, 'rgba(255,200,150,0.6)');
-        g.addColorStop(1, 'rgba(50,60,120,0.6)');
+        g.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
+        g.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
         return g;
         }
     // Build (or reuse) the full-canvas gradient buffer for this layer.
     // Cache is invalidated automatically if canvas size changes.
     getOverlayGradientBuffer(layerToken, ctx){
-        let _self = self;
-        _self._overlayCache = _self._overlayCache || { gradients: {}, sliceBuf: null };
-        const cache = self._overlayCache.gradients;
+        let _self = this;
+        let _selfRef = self;
+        _selfRef._overlayCache = _selfRef._overlayCache || { gradients: {}, sliceBuf: null };
+        const cache = _selfRef._overlayCache.gradients;
         const key = layerToken;
         const cw = ctx.canvas.width, ch = ctx.canvas.height;
         let entry = cache[key];
@@ -591,10 +602,11 @@ class mmrpgWorldMap {
     // Apply the overlay to a single rect without stacking.
     // Slices the gradient buffer, masks with current scene alpha in that rect, then blends back.
     applyOverlayToRect(ctx, gradBuf, x, y, w, h, blend){
-        let _self = self;
-        _self._overlayCache = _self._overlayCache || { gradients: {}, sliceBuf: null };
-        let slice = _self._overlayCache.sliceBuf;
-        if (!slice){ slice = _self._overlayCache.sliceBuf = _getOffscreen(w, h); }
+        let _self = this;
+        let _selfRef = self;
+        _selfRef._overlayCache = _selfRef._overlayCache || { gradients: {}, sliceBuf: null };
+        let slice = _selfRef._overlayCache.sliceBuf;
+        if (!slice){ slice = _selfRef._overlayCache.sliceBuf = _self._getOffscreen(w, h); }
         // Resize if needed (clears content)
         if (slice.width !== w || slice.height !== h){ slice.width = w; slice.height = h; }
         const sctx = slice.getContext('2d');
@@ -607,8 +619,10 @@ class mmrpgWorldMap {
         sctx.drawImage(ctx.canvas, x, y, w, h, 0, 0, w, h);
         // 3) blend it back
         ctx.save();
+        ctx.globalAlpha = 0.6;
         ctx.globalCompositeOperation = blend || 'multiply';
         ctx.drawImage(slice, x, y);
+        ctx.globalAlpha = 1.0;
         ctx.restore();
         }
     // === END GRADIENT OVERLAY HELPERS ===
@@ -860,13 +874,14 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _world = _self.state;
         let size = _config.mapTileSize;
+        let sizeX = size[0], sizeY = size[1];
         let zoom = _world.zoomLevel;
         let width = $overlay.width(), height = $overlay.height(), offset = $overlay.offset();
         if (applyOffset){ xPos -= offset.left; yPos -= offset.top; }
-        if (zoom > 1){ xPos /= zoom; yPos /= zoom; }
+        if (zoom !== 1){ sizeX *= zoom; sizeY *= zoom; }
         if (xPos < 0){ xPos = 0; } if (yPos < 0){ yPos = 0; }
-        let thisCol = Math.floor(xPos / size[0]) + 1;
-        let thisRow = Math.floor(yPos / size[1]) + 1;
+        let thisCol = Math.floor(xPos / sizeX) + 1;
+        let thisRow = Math.floor(yPos / sizeY) + 1;
         let thisPos = thisCol + '-' + thisRow;
         return thisPos;
         }
@@ -1083,6 +1098,7 @@ class mmrpgWorldMap {
         let $clickOverlay = _elements.clickOverlay;
         $clickOverlay.bind('click', function(e){
             e.preventDefault();
+            if (!_world.allowClicks){ return false; }
             if (_cursor.moving){ return false; }
             //console.log('%c' + 'Map overlay click event!', 'color: cyan;');
             let oldPos = _cursor.position, curPos = oldPos;
@@ -1108,7 +1124,8 @@ class mmrpgWorldMap {
             });
         $clickOverlay.bind('mousemove', function(e){
             e.preventDefault();
-            //if (_cursor.moving){ return false; }
+            if (!_world.allowHovers){ return false; }
+            if (_cursor.moving){ return false; }
             //console.log('%c' + 'Map overlay mousemove event!', 'color: cyan;');
             let curPos = _cursor.position;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.pageX, e.pageY);
@@ -1566,11 +1583,13 @@ class mmrpgWorldMap {
         let subTranslateY = Math.round(-1 * (translateY * 0.1));
         // Apply the new translate values to the map container
         //$canvasMap.css({ transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px)' });
+        _world.allowClicks = _world.allowHovers = false;
         $canvasMap.attr('data-zoom', worldZoom);
         $canvasMap.css({ transformOrigin: 'left top', transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) scale(' + worldZoom + ')' });
         $backgroundLayer.css({ transformOrigin: 'left top', transform: 'translate(' + subTranslateX + 'px, ' + subTranslateY + 'px)' });
         if (usePerspective){ $terrainLayer.css({ transform: 'perspective(800px) rotateX(25deg) rotateY(0deg) scale(1.5)' }); }
         else { $terrainLayer.css({ transform: 'none' }); }
+        setTimeout(function(){ _world.allowClicks = _world.allowHovers = true; }, 1000);
         // Return true on success
         return true;
         }

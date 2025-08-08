@@ -71,6 +71,7 @@ html, body {
     position: relative;
     z-index: 1;
 }
+/*
 #world #canvas #map .layer[data-layer="terrain"]:after {
     content: "";
     display: block;
@@ -88,7 +89,7 @@ html, body {
     mix-blend-mode: overlay;
     opacity: 0.6;
 }
-
+*/
 
 /* define an animation for shaking the map back and forth rapidly to simulate damage/explosion/dramtic events */
 @keyframes world-map-shake {
