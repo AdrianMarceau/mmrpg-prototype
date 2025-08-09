@@ -404,7 +404,11 @@ $flag_skip_fadein = true;
         <div class="wrapper">
             <?
 
-            // Generate overall the map styles and markup
+            // Grab the background sprite for this map and place a copy of it here behind everything else (for when the user over-zooms)
+            $background_layer_sprite = rpg_world::get_background_layer_sprite($this_prototype_data, $map_data_parsed, true);
+            echo('<div id="bg">'.$background_layer_sprite.'</div>'.PHP_EOL);
+
+            // Collect top-level map data and define preset styles for the layers to use
             $map_config = $map_data_parsed['config'];
             $map_tilesize_default = $map_config['tilesize_default'];
             $map_tilesize_offset = $map_config['tilesize_offset'];
@@ -414,7 +418,6 @@ $flag_skip_fadein = true;
             $map_offset_styles = $map_config['offset_styles'];
             $map_base_styles = $map_config['base_styles'];
             $map_base_attrs = $map_config['base_attrs'];
-
             ?>
             <div id="map" data-token="<?= $map_token ?>" style="<?= $map_base_styles ?>" <?= $map_base_attrs ?>>
                 <?
@@ -436,9 +439,9 @@ $flag_skip_fadein = true;
                 // BACKGROUND IMAGE
                 $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                 $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
-                $background_layer_markup = rpg_world::get_background_layer_markup($this_prototype_data, $map_data_parsed);
+                $background_layer_sprite = rpg_world::get_background_layer_sprite($this_prototype_data, $map_data_parsed);
                 echo('<div class="layer layer-0 background" data-layer="background" '.$map_layer_styles.$map_layer_attrs.'>');
-                    echo($background_layer_markup);
+                    echo($background_layer_sprite);
                 echo('</div>'.PHP_EOL);
 
                 // TERRAIN TILES
@@ -455,7 +458,7 @@ $flag_skip_fadein = true;
                 $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                 $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
                 $portals_layer_markup = rpg_world::get_portals_layer_markup($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-2 tiles events portals" data-layer="portals" '.$map_layer_styles.$map_layer_attrs.'>');
+                echo('<div class="layer layer-2 sprites tiles events portals" data-layer="portals" '.$map_layer_styles.$map_layer_attrs.'>');
                     echo($portals_layer_markup);
                 echo('</div>'.PHP_EOL);
 
@@ -463,7 +466,7 @@ $flag_skip_fadein = true;
                 $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                 $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
                 $buttons_layer_markup = rpg_world::get_buttons_layer_markup($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-3 tiles events buttons" data-layer="buttons" '.$map_layer_styles.$map_layer_attrs.'>');
+                echo('<div class="layer layer-3 sprites tiles events buttons" data-layer="buttons" '.$map_layer_styles.$map_layer_attrs.'>');
                     echo($buttons_layer_markup);
                 echo('</div>'.PHP_EOL);
 
@@ -471,7 +474,7 @@ $flag_skip_fadein = true;
                 $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                 $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
                 $battles_layer_markup = rpg_world::get_battles_layer_markup($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-4 objects events battles" data-layer="battles" '.$map_layer_styles.$map_layer_attrs.'>');
+                echo('<div class="layer layer-4 sprites objects events battles" data-layer="battles" '.$map_layer_styles.$map_layer_attrs.'>');
                     echo($battles_layer_markup);
                 echo('</div>'.PHP_EOL);
 
@@ -479,7 +482,7 @@ $flag_skip_fadein = true;
                 $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                 $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
                 $teams_layer_markup = rpg_world::get_teams_layer_markup($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-5 objects characters team" data-layer="teams" '.$map_layer_styles.$map_layer_attrs.'>');
+                echo('<div class="layer layer-5 sprites objects characters team" data-layer="teams" '.$map_layer_styles.$map_layer_attrs.'>');
                     echo($teams_layer_markup);
                 echo('</div>'.PHP_EOL);
 

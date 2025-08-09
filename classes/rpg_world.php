@@ -867,8 +867,8 @@ class rpg_world {
     }
 
     // Define a function for getting the BACKGROUND LAYER sprite markup for the world map
-    public static function get_background_layer_markup($this_prototype_data, $map_data_parsed){
-        //error_log('rpg_world::get_background_layer_markup() called!');
+    public static function get_background_layer_sprite($this_prototype_data, $map_data_parsed, $preview_only = false){
+        //error_log('rpg_world::get_background_layer_sprite() called!');
         // BACKGROUND LAYER
         $background_sprites = array();
         $mmrpg_index_fields = self::get_indexes('fields');
@@ -876,8 +876,9 @@ class rpg_world {
         $map_field_info = !empty($mmrpg_index_fields[$map_field_token]) ? $mmrpg_index_fields[$map_field_token] : array();
         $map_field_background = !empty($map_field_info['field_background']) ? $map_field_info['field_background'] : 'field';
         $map_field_foreground = !empty($map_field_info['field_foreground']) ? $map_field_info['field_foreground'] : 'field';
-        $field_background_image = 'images/fields/'.$map_field_token.'/battle-field_background_base.gif';
-        $field_background_styles = 'top: 0; left: 0; background-image: url('.$field_background_image.');';
+        $field_background_image = !$preview_only ? 'battle-field_background_base.gif' : 'battle-field_preview.png';
+        $field_background_image_url = 'images/fields/'.$map_field_token.'/'.$field_background_image;
+        $field_background_styles = 'top: 0; left: 0; background-image: url('.$field_background_image_url.');';
         $background_sprites[] = '<span data-sprite="background" class="sprite field background" style="'.$field_background_styles.'"></span>';
         return implode(PHP_EOL, $background_sprites);
     }

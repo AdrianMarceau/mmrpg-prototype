@@ -497,7 +497,7 @@ class mmrpgWorldMap {
         //console.log('---> tile[' + layerToken + '/' + tileKey + '/' + tileSpriteToken + '] tileData =', JSON.stringify(tileData));
         //console.log('---> tile[' + layerToken + '/' + tileKey + ']::tileIsVoid =', tileIsVoid);
         // sprite: draw the main tile sprite at the correct position
-        if (tileIsWater){ ctx.globalAlpha = 0.8; }
+        if (tileIsWater){ ctx.globalAlpha = 0.7; }
         ctx.drawImage(spriteSheet,
             tileSpriteOffset[0], tileSpriteOffset[1], // source offset
             tileSpriteSize[0], tileSpriteSize[1], // source size
@@ -1427,15 +1427,11 @@ class mmrpgWorldMap {
         let $sideButtons = _elements.sideButtons;
         let $actionDropdown = _elements.actionDropdown;
         let $teamSprites = _elements.teamSprites;
-        let $backgroundLayer = $('.layer.background', $canvasMap);
-        var $tilesLayer = $('.layer.tiles', $canvasMap);
-        let $objectsLayer = $('.layer.objects', $canvasMap);
-        let $eventsLayers = $('.layer.events', $canvasMap);
+        let $backgroundLayer = $('.layer[data-layer="background"]', $canvasMap);
+        let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap); // later: $('.layer[data-layer="sprites"]', $canvasMap);
         let $cursorSprite = $teamSprites.filter('.cursor');
         let $otherSprites = $teamSprites.filter(':not(.cursor)');
-        if (!$tilesLayer || !$tilesLayer.length){ console.error('$tilesLayer does not exist!'); return false; }
-        if (!$objectsLayer || !$objectsLayer.length){ console.error('$objectsLayer does not exist!'); return false; }
-        if (!$eventsLayers || !$eventsLayers.length){ console.error('$eventsLayers do not exist!'); return false; }
+        if (!$spritesLayer || !$spritesLayer.length){ console.error('$spritesLayer do not exist!'); return false; }
         if (!$cursorSprite || !$cursorSprite.length){ console.error('$cursorSprite not found!'); return false; }
         if (!$actionDropdown || !$actionDropdown.length){ console.error('$actionDropdown not found!'); return false; }
         if (!thisOldPos){ thisOldPos = [_worldCursor.col, _worldCursor.row]; }
@@ -1456,8 +1452,8 @@ class mmrpgWorldMap {
         $canvasMap.addClass('busy');
         _worldCursor.moving = true;
         $actionDropdown.removeClass('active');
-        $eventsLayers.removeClass('has-zoom');
-        $('.sprite.zoom', $eventsLayers).removeClass('zoom');
+        $spritesLayer.removeClass('has-zoom');
+        $('.sprite.zoom', $spritesLayer).removeClass('zoom');
         $('.sprite[data-frame]', $canvasMap).attr('data-frame', '00');
         // Move the cursor to the new position first and foremost
         let moveTimeout;
@@ -1785,14 +1781,14 @@ class mmrpgWorldMap {
         $sideButtons.removeClass('active');
         $sideButtonsWrapper.empty();
 
-        // Collect references to the required event layers and the zoom display layer
-        let $eventsLayers = $('.layer.events', $canvasMap);
-        if (!$eventsLayers || !$eventsLayers.length){ console.error('updateMapPosition() missing required $eventsLayers!'); return false; }
+        // Collect references to the required sprites layer for adjustments
+        let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap); // later: $('.layer[data-layer="sprites"]', $canvasMap);
+        if (!$spritesLayer || !$spritesLayer.length){ console.error('updateMapPosition() missing required $spritesLayer!'); return false; }
         //console.log('-> $eventsLayer found, checking for events...');
 
         // Make sure we move any existing zoom layer sprites back to their original layers
         $worldCursor.removeClass('shake');
-        $eventsLayers.removeClass('has-zoom');
+        $spritesLayer.removeClass('has-zoom');
         setTimeout(function(){ $('.sprite', $canvasMap).removeClass('zoom'); }, 100);
 
         // Search for events at the new position so we can show the action dropdown if needed
@@ -1963,7 +1959,6 @@ class mmrpgWorldMap {
                 else { return 0; } // a and b are equal
                 });
             //console.log('-> dataBattles after sorting by position:', dataBattles.join('\n'));
-
             if (dataLabels.length && dataBattles.length){
                 showDropdown = true;
                 //console.log('-> showing dropdown with battles:', dataBattles);
@@ -2083,7 +2078,7 @@ class mmrpgWorldMap {
                 let isBoss = $eventSprite.hasClass('vs-boss');
                 //console.log('-> $eventsAtPosition['+i+'] / isRobot = ', isRobot);
                 let dataSize = $eventSprite.attr('data-size') || 40;
-                let $eventLayer = $eventSprite.closest('.layer.events');
+                let $eventLayer = $eventSprite.closest('.layer');
                 let eventLayer = $eventLayer.attr('data-layer');
                 //let relativePosition = [eventPositionXY[0] - cursorPositionXY[0], eventPositionXY[1] - cursorPositionXY[1]];
                 let relativePosition = _self.getPositionRelative(cursorPosition, eventPosition);
@@ -2128,7 +2123,7 @@ class mmrpgWorldMap {
                 $sideButtons.removeClass('active');
                 $sideButtonsWrapper.empty();
                 $worldCursor.removeClass('shake');
-                $eventsLayers.removeClass('has-zoom');
+                $spritesLayer.removeClass('has-zoom');
                 $('.sprite.zoom', $canvasMap).removeClass('zoom');
                 $('.sprite[data-frame]', $canvasMap).attr('data-frame', '00');
                 };
@@ -2382,7 +2377,6 @@ class mmrpgWorldMap {
         let layerTilesIndex = _world.layerTilesIndex;
         let mapBattleSymbols = _config.mapBattleSymbols;
         let $canvasMap = _elements.map;
-        //let $eventLayers = $('.layer.events', $canvasMap);
         let $eventsAtPosition = [];
         let positionsToCheck = [];
         positionsToCheck.push(searchPosition); // always check the exact position first
