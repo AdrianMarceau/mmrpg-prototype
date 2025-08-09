@@ -1,7 +1,7 @@
 #---------------------------#
 # DEBUG AREA 1N (TUNDRA)
 @token    = debug-area-1n
-@name     = DEBUG AREA 1N
+@name     = DEBUG Area 1N
 @size     = 15 x 15
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#

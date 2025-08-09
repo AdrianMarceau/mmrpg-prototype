@@ -1,7 +1,7 @@
 #---------------------------#
 # DEBUG AREA 1S (WATER)
 @token    = debug-area-1s
-@name     = DEBUG AREA 1S
+@name     = DEBUG Area 1S
 @size     = 10 x 13
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
