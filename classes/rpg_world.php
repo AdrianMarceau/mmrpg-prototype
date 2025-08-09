@@ -873,6 +873,22 @@ class rpg_world {
         $mmrpg_index_robots = self::get_indexes('robots');
         $current_player_token = $this_prototype_data['this_player_token'];
         if ($current_player_token === 'player'){ return $return_markup; }
+        $get_rating_token = function($percent){
+            if ($percent === 100){ return 'full'; }
+            elseif ($percent >= 50){ return 'high'; }
+            elseif ($percent >= 20){ return 'med'; }
+            elseif ($percent >= 1){ return 'low'; }
+            else { return 'no'; }
+            };
+        $get_robot_energy_frame = function($rating){
+            if ($rating === 'full'){ return '10'; } // base2
+            elseif ($rating === 'high'){ return '01'; } // taunt
+            //elseif ($rating === 'med'){ return '08'; } // defend
+            elseif ($rating === 'med'){ return '00'; } // base
+            //elseif ($rating === 'low'){ return '09'; } // damage
+            elseif ($rating === 'low'){ return '08'; } // defend
+            else { return '03'; } // defeat
+            };
         $robot_tokens_reversed = array_reverse($robot_tokens);
         foreach ($robot_tokens_reversed AS $robot_key => $robot_token){
             if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
@@ -887,13 +903,11 @@ class rpg_world {
             $robot_name = $robot_info['robot_name'];
             $robot_types = 'type '.(!empty($robot_info['robot_core']) ? ($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' '.$robot_info['robot_core2'] : '')) : 'none');
             $robot_level = !empty($robot_rewards['robot_level']) ? $robot_rewards['robot_level'] : 1;
-            $robot_energy_percent = mt_rand(1, 100);
-            $robot_energy_rating = $robot_energy_percent >= 50 ? 'high' : ($robot_energy_percent >= 20 ? 'med' : 'low');
-            $robot_energy_types = 'type '.($robot_energy_rating === 'high' ? 'energy' : ($robot_energy_rating === 'med' ? 'electric' : 'flame'));
+            $robot_energy_percent = mt_rand(1, 2) === 2 ? 100 : mt_rand(1, 100);
+            $robot_energy_rating = $get_rating_token($robot_energy_percent);
             $robot_weapons_percent = mt_rand(1, 100);
-            $robot_weapons_rating = $robot_weapons_percent >= 50 ? 'high' : ($robot_weapons_percent >= 20 ? 'med' : 'low');
-            $robot_weapons_types = 'type weapons';
-            $robot_frame = !$robot_energy_percent ? '03' : ($robot_energy_rating === 'high' ? '01' : ($robot_energy_rating === 'med' ? '00' : '08'));
+            $robot_weapons_rating = $get_rating_token($robot_weapons_percent);
+            $robot_frame = $get_robot_energy_frame($robot_energy_rating);
             $robot_sprite = str_replace('data-frame="00"', 'data-frame="'.$robot_frame.'"', $robot_sprite);
             $link_class = 'team-robot'.(' '.$robot_energy_rating.'-energy').($robot_disabled ? ' disabled' : '');
             $link_attrs = !$robot_disabled ? ' data-robot="'.$robot_token.'"' : '';
@@ -902,10 +916,10 @@ class rpg_world {
                 $robot_markup .= '<div class="icon '.$robot_types.'">'.$robot_sprite.'</div>';
                 $robot_markup .= '<div class="label">';
                     $robot_markup .= '<strong class="name">'.$robot_name.'</strong>';
-                    $robot_markup .= '<span class="lvl type '.($robot_level >= 100 ? 'level' : 'none').'">Lv.'.$robot_level.'</span>';
+                    $robot_markup .= '<span class="lvl type '.($robot_level >= 100 ? 'level' : 'none').'">Lv. '.$robot_level.'</span>';
                 $robot_markup .= '</div>';
-                $robot_markup .= '<div class="guage energy '.$robot_energy_rating.'"><i class="'.$robot_energy_types.'" style="width: '.$robot_energy_percent.'%;"></i></div>';
-                $robot_markup .= '<div class="guage weapons '.$robot_weapons_rating.'"><i class="'.$robot_weapons_types.'" style="width: '.$robot_weapons_percent.'%;"></i></div>';
+                $robot_markup .= '<div class="guage energy '.$robot_energy_rating.'"><i style="width: '.$robot_energy_percent.'%;"></i></div>';
+                $robot_markup .= '<div class="guage weapons '.$robot_weapons_rating.'"><i style="width: '.$robot_weapons_percent.'%;"></i></div>';
             $robot_markup .= '</div>';
             $return_markup .= $robot_markup;
         }

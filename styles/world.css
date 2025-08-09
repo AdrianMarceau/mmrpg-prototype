@@ -9,6 +9,9 @@ html, body {
     width: 768px;
     height: 622px;
     margin: 0 auto;
+    font-family: 'Open Sans', sans-serif, monospace;
+    font-size: 16px;
+    line-height: 1.2;
 }
 
 #world #canvas {
@@ -550,7 +553,6 @@ html, body {
 /* define some bounce animations for the sprites */
 #world #map .layer.objects .sprite {
     --sprite-speed: 1;
-    --base-transition-speed: 0.6s;
     --base-bounce-duration: 1s;
     --base-march-duration: 3s;
     --zoom-march-duration: 1s;
@@ -658,7 +660,6 @@ html, body {
     height: auto;
     min-height: 20px;
     color: #cfcfcf;
-    font-family: monospace;
     text-align: left;
     font-size: 12px;
     line-height: 1.3;
@@ -684,7 +685,6 @@ html, body {
     padding: 0;
     width: auto;
     height: auto;
-    font-family: monospace;
     text-align: center;
     color: #cfcfcf;
     font-size: 12px;
@@ -835,7 +835,6 @@ html, body {
     height: auto;
     color: #efefef;
     background-color: rgba(0, 0, 0, 0.5);
-    font-family: monospace;
     text-align: left;
     font-size: 12px;
     line-height: 1.2;
@@ -931,7 +930,6 @@ html, body {
     padding: 3px;
     width: 40px;
     height: 30px;
-    font-family: monospace;
     text-align: center;
     color: #cfcfcf;
     font-size: 12px;
@@ -1092,7 +1090,6 @@ html, body {
     width: auto;
     min-height: 36px;
     min-width: 40px;
-    font-family: monospace;
     text-align: center;
     color: #cfcfcf;
     font-size: 12px;
@@ -1154,11 +1151,11 @@ html, body {
     position: relative;
     width: 40px;
     height: 40px;
-    top: -6px;
+    top: -8px;
     z-index: 2;
 }
 #world #canvas #robots-overview .team-robot:hover .icon > .sprite {
-    top: -8px;
+    top: -10px !important;
 }
 #world #canvas #robots-overview .team-robot .icon > .sprite > .wrap,
 #world #canvas #robots-overview .team-robot .icon > .sprite > .wrap .icon > .sprite {
@@ -1172,11 +1169,48 @@ html, body {
 #world[data-rendering="auto"] #canvas #robots-overview .team-robot .icon > .sprite > .wrap .icon > .sprite { image-rendering: auto !important; }
 #world[data-rendering="pixelated"] #canvas #robots-overview .team-robot .icon > .sprite > .wrap .icon > .sprite { image-rendering: pixelated !important; }
 
+@keyframes robots-overview-sprite-bounce {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(0, -1px); }
+}
+@keyframes robots-overview-sprite-shake {
+    0% { transform: translate(0, 0); }
+    1% { transform: translate(-2px, 0); }
+    2% { transform: translate(2px, 0); }
+    3% { transform: translate(-2px, 0); }
+    4% { transform: translate(2px, 0); }
+    5% { transform: translate(0, 0); }
+}
+#world #canvas #robots-overview .team-robot .icon .sprite .sprite {
+    --sprite-speed: 1;
+    --base-bounce-duration: 1s;
+    --base-shake-duration: 1s;
+}
+#world #canvas #robots-overview .team-robot .icon .sprite .wrap {
+    /*
+    transform-origin: bottom center;
+    transform: scale(2);
+    */
+}
+#world #canvas #robots-overview .team-robot.full-energy .icon .sprite .sprite {
+    filter: drop-shadow(1px 1px 0 rgba(255, 255, 255, 0.5));
+    /* animation: robots-overview-sprite-bounce calc(var(--base-bounce-duration) * var(--sprite-speed)) steps(1) infinite;  */
+}
+#world #canvas #robots-overview .team-robot.high-energy .icon .sprite .sprite {
+    filter: drop-shadow(1px 1px 0 rgba(255, 255, 255, 0.5));
+}
 #world #canvas #robots-overview .team-robot.med-energy .icon .sprite .sprite {
-
+    filter: drop-shadow(1px 1px 0 orange);
 }
 #world #canvas #robots-overview .team-robot.low-energy .icon .sprite .sprite {
     filter: drop-shadow(1px 1px 0 red);
+    animation: robots-overview-sprite-shake calc(var(--base-shake-duration) * var(--sprite-speed)) steps(1) infinite;
+}
+#world #canvas #robots-overview .team-robot.no-energy .icon .sprite .sprite {
+    filter: drop-shadow(1px 1px 0 red);
+}
+#world #canvas #robots-overview .team-robot:hover .icon .sprite .sprite {
+    animation-play-state: paused !important;
 }
 
 #world #canvas #robots-overview .team-robot > .label {
@@ -1207,7 +1241,7 @@ html, body {
 }
 #world #canvas #robots-overview .team-robot > .guage {
     display: block;
-    margin: 0 21px 1px 0;
+    margin: 0 0 1px 0;
     width: auto;
     height: 6px;
     overflow: hidden;
@@ -1217,11 +1251,53 @@ html, body {
 }
 #world #canvas #robots-overview .team-robot > .guage > i {
     display: block;
+    position: relative;
     box-sizing: border-box;
     height: 100%;
     padding: 0 3px;
     width: auto;
+    border: 1px solid #191919;
+    border-left: none;
     background-color: #292929;
+}
+/* add repeating 1px opaque/transparent alternating gradient overtop to look like megaman health bars */
+#world #canvas #robots-overview .team-robot > .guage > i:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 1) 50%);
+    background-size: 2px 100%;
+    background-repeat: repeat-x;
+    pointer-events: none;
+    opacity: 0.1;
+}
+#world #canvas #robots-overview .team-robot > .guage.energy {
+    margin-right: 20px;
+    background-color: #294921;
+}
+#world #canvas #robots-overview .team-robot > .guage.weapons {
+    margin-right: 50px;
+    background-color: #1b3652;
+}
+#world #canvas #robots-overview .team-robot > .guage.energy > i {
+    border-color: #64a455;
+    background-color: #598a4e;
+}
+#world #canvas #robots-overview .team-robot > .guage.energy.med > i {
+    border-color: #dca030;
+    background-color: #b98c38;
+}
+#world #canvas #robots-overview .team-robot > .guage.energy.low > i {
+    border-color: #c83d3d;
+    background-color: #a32121;
+}
+#world #canvas #robots-overview .team-robot > .guage.weapons > i {
+    border-color: rgb(61, 124, 190);
+    background-color: rgb(43, 101, 163);
 }
 #world #canvas #robots-overview:after,
 #world #canvas #robots-overview .team-robot:after,
@@ -1262,7 +1338,6 @@ html, body {
     width: auto;
     height: auto;
     min-width: 200px;
-    font-family: monospace;
     text-align: center;
     color: #cfcfcf;
     font-size: 12px;
@@ -1396,11 +1471,13 @@ html, body {
     right: 0;
     z-index: 1001;
     color: #cfcfcf;
-    font-family: monospace;
     text-align: right;
     font-size: 12px;
     line-height: 1.2;
     border-radius: 6px 0 0 0;
+    font-family: monospace;
+    user-select: auto;
+    pointer-events: all;
 }
 
 

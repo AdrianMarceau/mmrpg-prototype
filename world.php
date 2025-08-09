@@ -425,6 +425,7 @@ $flag_skip_fadein = true;
                 // GLOBAL MAP DATA
                 $data = array();
                 $data['map_token'] = $map_data_parsed['token'];
+                $data['map_name'] = $map_data_parsed['name'];
                 $data['map_image'] = 'images/maps/'.(!empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : 'undefined.png');
                 $data['map_size'] = array($map_col_size, $map_row_size);
                 $data['tile_size'] = array($map_tile_width, $map_tile_height);

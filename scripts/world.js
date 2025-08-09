@@ -20,6 +20,7 @@ gameSettings.worldConfig = {
     playerRobots: ['robot'],
     playerMobility: 1, // default only
     mapToken: 'undefined',
+    mapName: 'Undefined Map',
     mapImage: 'undefined.png',
     mapSize: [10, 10],
     mapTileSize: [80, 80],
@@ -170,6 +171,7 @@ class mmrpgWorldMap {
         let $mapJson = $('script[data-json]', $canvasMap).first(), mapJson = $mapJson.html(), mapData = mapJson ? JSON.parse(mapJson) : false;
         if (!mapData || typeof mapData !== 'object' || !Object.keys(mapData).length){ console.error('initWorldMap() unable to parse mapData!'); return false; }
         let mapToken = mapData.map_token || false;
+        let mapName = mapData.map_name || false;
         let mapImage = mapData.map_image || false;
         let mapSize = mapData.map_size || false;
         let tileSize = mapData.tile_size || false;
@@ -183,9 +185,11 @@ class mmrpgWorldMap {
         if (!tilesIndex  || !spritesIndex){ console.error('initWorldMap() missing required indexes!', {tilesIndex, spritesIndex}); return false; }
         if (!Array.isArray(mapSize) || mapSize.length < 2){ console.error('initWorldMap() mapSize must be an array of at least two values!'); return false; }
         if (!Array.isArray(tileSize) || tileSize.length < 2){ console.error('initWorldMap() tileSize must be an array of at least two values!'); return false; }
+        let defaultMapName = mapToken.replace(/-/g, ' ').replace(/ AREA /g, ' Area ').replace(/\b\w/g, function(l){ return l.toUpperCase(); });
         let defaultMapSize = [_config.mapSize[0], _config.mapSize[1]];
         let defaultMapTileSize = [_config.mapTileSize[0], _config.mapTileSize[1]];
         _config.mapToken = mapToken;
+        _config.mapName = mapName || defaultMapName;
         _config.mapImage = mapImage;
         _config.mapSize = [parseInt(mapSize[0]), parseInt(mapSize[1])];
         _config.mapTileSize = [parseInt(tileSize[0]), parseInt(tileSize[1])];
@@ -1131,9 +1135,10 @@ class mmrpgWorldMap {
             //console.log('-> w/ e =', e);
             let curPos = _cursor.position;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.offsetX, e.offsetY, false);
+            let thisPosXY = thisPos.split('-');
             let sameAsLast = thisPos === lastMouseOver;
             if (sameAsLast){ return; }
-            $clickOverlay.attr('title', 'Position: ' + thisPos);
+            $clickOverlay.attr('title', ('X' + thisPosXY[0] + '-Y' + thisPosXY[1]));
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
             let walkableTiles = _self.getWalkableMapTiles();
             let tilesWithinRange = playerMobility > 0 ? _self.getWalkableMapTilesByProximity(curPos, playerMobility) : walkableTiles;
@@ -1705,7 +1710,9 @@ class mmrpgWorldMap {
         // First we update the cursor sprite position and attributes
         let $positionDisplay = $('#position-display', $thisWorld);
         let $positionDisplayWrapper = $('> .wrapper', $positionDisplay);
-        $positionDisplayWrapper.text('X:' + thisNewCol + ' Y:' + thisNewRow);
+        let newPositionText = _config.mapName + ' | ' + ('X' + thisNewCol + '-Y' + thisNewRow);
+        //$positionDisplayWrapper.text('X:' + thisNewCol + ' Y:' + thisNewRow);
+        $positionDisplayWrapper.text(newPositionText);
 
         // Make sure we start the scroll to the new position
         _self.scrollMap(cursorPositionXY[0], cursorPositionXY[1]);
