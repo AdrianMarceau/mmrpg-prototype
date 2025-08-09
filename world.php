@@ -491,20 +491,24 @@ $flag_skip_fadein = true;
             </div>
             <?
             // Define or generate the markup for the various buttons and UI elements around the world map
-            $wrap_markup = function($markup, $tag = 'div'){ return '<'.$tag.' class="wrapper">'.$markup.'</'.$tag.'>'; };
+            $wrap_markup = function($markup, $tag = 'div'){ if (empty($markup)){ return ''; } return '<'.$tag.' class="wrapper">'.$markup.'</'.$tag.'>'; };
             $back_button_markup = $wrap_markup('<i class="fa fas fa-sign-out"></i>', 'a');
             $home_button_markup = $wrap_markup('<i class="fa fas fa-home"></i>', 'a');
             $reset_button_markup = $wrap_markup('<i class="fa fas fa-bomb"></i>', 'a');
-            $player_switcher_markup = $wrap_markup(rpg_world::get_player_switcher_markup($this_prototype_data, $allowed_player_tokens));
             $position_display_markup = $wrap_markup('&hellip;');
             $side_buttons_markup = $wrap_markup('&hellip;');
+            $player_switcher_players = $allowed_player_tokens;
+            $robot_overview_robots = $current_player_robots;
+            $player_switcher_markup = $wrap_markup(rpg_world::get_player_switcher_markup($this_prototype_data, $player_switcher_players));
+            $robots_overview_markup = $wrap_markup(rpg_world::get_robots_overview_markup($this_prototype_data, $robot_overview_robots));
             ?>
             <div id="back-button" class="chrome chrome-button"><?= $back_button_markup ?></div>
             <div id="home-button" class="chrome chrome-button"><?= $home_button_markup ?></div>
             <div id="reset-button" class="chrome chrome-button"><?= $reset_button_markup ?></div>
             <div id="position-display" class="chrome"><?= $position_display_markup ?></div>
-            <div id="player-switcher" class="chrome"><?= $player_switcher_markup ?></div>
             <div id="side-buttons" class="chrome"><?= $side_buttons_markup ?></div>
+            <? if (!empty($player_switcher_markup)){ ?><div id="player-switcher" class="chrome"><?= $player_switcher_markup ?></div><? } ?>
+            <? if (!empty($robots_overview_markup)){ ?><div id="robots-overview" class="chrome"><?= $robots_overview_markup ?></div><? } ?>
             <?
             // DEBUG DEBUG DEBUG
             echo('<pre data-var="$map_data_parsed" style="display: none;"><!-- $map_data_parsed = '.print_r($map_data_parsed, true).' --></pre>');

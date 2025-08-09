@@ -837,7 +837,7 @@ class rpg_world {
     }
 
     // Define a function for getting the player switcher markup given current conditions
-    public static function get_player_switcher_markup($this_prototype_data, $allowed_player_tokens){
+    public static function get_player_switcher_markup($this_prototype_data, $player_tokens){
         //error_log('rpg_world::get_player_switcher_markup() called!');
         $return_markup = '';
         $get_label_span = function($name, $kind){ return ('<span class="label">'.$name.' ('.ucfirst($kind).')</span>'); };
@@ -848,20 +848,66 @@ class rpg_world {
         //$cursor_sprite = preg_replace('/background-image: url\(([^\(\)]+)\);/i', 'background-image: url(images/assets/cursor_40x40.png);', $cursor_sprite);
         $cursor_sprite = self::get_cursor_sprite('right', 'cursor');
         $cursor_label = $get_label_span('Prε', 'cursor');
-        $cursor_types = ' type explode';
+        $cursor_types = 'type explode';
         //$return_markup .= ('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         $mmrpg_index_players = self::get_indexes('players');
-        $return_markup .= ('<a class="option'.$cursor_types.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
-        foreach ($allowed_player_tokens AS $player_key => $player_token){
+        foreach ($player_tokens AS $player_key => $player_token){
             if ($player_token === 'player' || empty($mmrpg_index_players[$player_token])){ continue; }
             $player_info = $mmrpg_index_players[$player_token];
             $player_active = $player_token === $this_prototype_data['this_player_token'] ? true : false;
             $player_sprite = self::get_sprite('player', $player_token, '', 'right', 'character', '');
             $player_label = $get_label_span($player_info['player_name'], 'player');
             $player_types = 'type '.$player_info['player_type'];
-            $link_class = 'option '.$player_types.($player_active ? ' active' : '');
+            $link_class = 'team-player '.$player_types.($player_active ? ' active' : '');
             $link_attrs = !$player_active ? ' data-player="'.$player_token.'"' : '';
             $return_markup .= ('<a class="'.$link_class.'"'.$link_attrs.'>'.$player_sprite.$cursor_sprite.$player_label.'</a>');
+        }
+        $return_markup .= ('<a class="team-player '.$cursor_types.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
+        return $return_markup;
+    }
+
+    // Define a function for getting the robot switcher markup given current conditions
+    public static function get_robots_overview_markup($this_prototype_data, $robot_tokens){
+        //error_log('rpg_world::get_robot_overview_markup() called!');
+        $return_markup = '';
+        $mmrpg_index_robots = self::get_indexes('robots');
+        $current_player_token = $this_prototype_data['this_player_token'];
+        if ($current_player_token === 'player'){ return $return_markup; }
+        $robot_tokens_reversed = array_reverse($robot_tokens);
+        foreach ($robot_tokens_reversed AS $robot_key => $robot_token){
+            if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
+            $robot_info = $mmrpg_index_robots[$robot_token];
+            $robot_rewards = rpg_game::robot_rewards($current_player_token, $robot_token);
+            $robot_settings = rpg_game::robot_settings($current_player_token, $robot_token);
+            $robot_disabled = false;
+            $robot_image = $robot_token;
+            if (!empty($robot_settings['robot_persona_image'])){ $robot_image = $robot_settings['robot_persona_image']; }
+            elseif (!empty($robot_settings['robot_image'])){ $robot_image = $robot_settings['robot_image']; }
+            $robot_sprite = self::get_sprite('robot', $robot_image, '', 'right', 'character', '');
+            $robot_name = $robot_info['robot_name'];
+            $robot_types = 'type '.(!empty($robot_info['robot_core']) ? ($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' '.$robot_info['robot_core2'] : '')) : 'none');
+            $robot_level = !empty($robot_rewards['robot_level']) ? $robot_rewards['robot_level'] : 1;
+            $robot_energy_percent = mt_rand(1, 100);
+            $robot_energy_rating = $robot_energy_percent >= 50 ? 'high' : ($robot_energy_percent >= 20 ? 'med' : 'low');
+            $robot_energy_types = 'type '.($robot_energy_rating === 'high' ? 'energy' : ($robot_energy_rating === 'med' ? 'electric' : 'flame'));
+            $robot_weapons_percent = mt_rand(1, 100);
+            $robot_weapons_rating = $robot_weapons_percent >= 50 ? 'high' : ($robot_weapons_percent >= 20 ? 'med' : 'low');
+            $robot_weapons_types = 'type weapons';
+            $robot_frame = !$robot_energy_percent ? '03' : ($robot_energy_rating === 'high' ? '01' : ($robot_energy_rating === 'med' ? '00' : '08'));
+            $robot_sprite = str_replace('data-frame="00"', 'data-frame="'.$robot_frame.'"', $robot_sprite);
+            $link_class = 'team-robot'.(' '.$robot_energy_rating.'-energy').($robot_disabled ? ' disabled' : '');
+            $link_attrs = !$robot_disabled ? ' data-robot="'.$robot_token.'"' : '';
+            $robot_markup = '';
+            $robot_markup .= '<div class="'.$link_class.'"'.$link_attrs.'>';
+                $robot_markup .= '<div class="icon '.$robot_types.'">'.$robot_sprite.'</div>';
+                $robot_markup .= '<div class="label">';
+                    $robot_markup .= '<strong class="name">'.$robot_name.'</strong>';
+                    $robot_markup .= '<span class="lvl type '.($robot_level >= 100 ? 'level' : 'none').'">Lv.'.$robot_level.'</span>';
+                $robot_markup .= '</div>';
+                $robot_markup .= '<div class="guage energy '.$robot_energy_rating.'"><i class="'.$robot_energy_types.'" style="width: '.$robot_energy_percent.'%;"></i></div>';
+                $robot_markup .= '<div class="guage weapons '.$robot_weapons_rating.'"><i class="'.$robot_weapons_types.'" style="width: '.$robot_weapons_percent.'%;"></i></div>';
+            $robot_markup .= '</div>';
+            $return_markup .= $robot_markup;
         }
         return $return_markup;
     }

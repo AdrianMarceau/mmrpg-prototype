@@ -920,11 +920,11 @@ html, body {
     top: 0;
     left: 47px;
     pointer-events: all;
-    cursor: pointer;
+    cursor: default;
     padding: 4px 9px 3px;
     border-radius: 0 0 6px 6px;
 }
-#world #canvas #player-switcher a.option {
+#world #canvas #player-switcher .team-player {
     display: inline-block;
     position: relative;
     margin: 0 6px 0 0;
@@ -943,65 +943,78 @@ html, body {
     transition: outline 0.3s, background-color 0.3s;
     cursor: pointer;
 }
-#world #canvas #player-switcher a.option > * {
+#world #canvas #player-switcher .team-player:before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 1px;
+    bottom: 1px;
+    height: 50%;
+    background-color: inherit;
+    filter: saturate(2) brightness(0.8);
+    border-radius: 0 0 3px 3px;
+    pointer-events: none;
+    opacity: 1.0;
+    transition: opacity 0.3s;
+    z-index: 1;
+}
+#world #canvas #player-switcher .team-player > * {
     pointer-events: none;
 }
-#world #canvas #player-switcher a.option:last-child {
+#world #canvas #player-switcher .team-player:last-child {
     margin-right: 0;
 }
-#world #canvas #player-switcher a.option.active,
-#world #canvas #player-switcher a.option:hover {
+#world #canvas #player-switcher .team-player.active,
+#world #canvas #player-switcher .team-player:hover {
     box-shadow: inset -1px -1px 0 rgba(0, 0, 0.3);
 }
-#world #canvas #player-switcher a.option.active {
+#world #canvas #player-switcher .team-player.active {
     outline: 1px solid #969696;
     cursor: default;
 }
-#world #canvas #player-switcher a.option:not(.active):not(:hover) {
-    /* background-color: #191919 !important; */
+#world #canvas #player-switcher .team-player:not(.active):not(:hover) {
     background-color: rgba(0, 0, 0, 0.3) !important;
     box-shadow: inset 1px 1px 0 black;
 }
-#world #canvas #player-switcher a.option .sprite {
+#world #canvas #player-switcher .team-player:not(.active):not(:hover):before {
+    opacity: 0.0;
+}
+#world #canvas #player-switcher .team-player .sprite {
     display: block;
     vertical-align: middle;
     margin: 0 auto;
     padding: 0;
     text-indent: 0;
 }
-#world #canvas #player-switcher a.option > .sprite {
+#world #canvas #player-switcher .team-player > .sprite {
     position: relative;
     width: 40px;
     height: 40px;
     top: -10px;
     z-index: 2;
 }
-#world #canvas #player-switcher a.option:hover > .sprite {
+#world #canvas #player-switcher .team-player:hover > .sprite {
     top: -12px;
 }
-#world #canvas #player-switcher a.option > .sprite.cursor {
+#world #canvas #player-switcher .team-player > .sprite.cursor {
     top: -6px;
 }
-#world #canvas #player-switcher a.option:hover > .sprite.cursor {
+#world #canvas #player-switcher .team-player:hover > .sprite.cursor {
     top: -8px;
 }
-#world #canvas #player-switcher a.option > .sprite > .wrap,
-#world #canvas #player-switcher a.option > .sprite > .wrap > .sprite {
+#world #canvas #player-switcher .team-player > .sprite > .wrap,
+#world #canvas #player-switcher .team-player > .sprite > .wrap > .sprite {
     display: block;
-    width: 40px;
-    height: 40px;
     position: absolute;
     bottom: 0;
-    /* image-rendering: pixelated;  */
 }
-#world[data-rendering="auto"] #canvas #player-switcher a.option > .sprite > .wrap > .sprite {
-    image-rendering: auto !important;
-}
-#world[data-rendering="pixelated"] #canvas #player-switcher a.option > .sprite > .wrap > .sprite {
-    image-rendering: pixelated !important;
-}
-
-#world #canvas #player-switcher a.option > .sprite + .sprite {
+#world #canvas #player-switcher .team-player > .sprite[data-size="40"] > .wrap > .sprite { width: 40px; height: 40px; }
+#world #canvas #player-switcher .team-player > .sprite[data-size="80"] > .wrap > .sprite { width: 80px; height: 80px; }
+#world #canvas #player-switcher .team-player > .sprite[data-size="160"] > .wrap > .sprite { width: 160px; height: 160px; }
+#world[data-rendering="auto"] #canvas #player-switcher .team-player > .sprite > .wrap > .sprite { image-rendering: auto !important; }
+#world[data-rendering="pixelated"] #canvas #player-switcher .team-player > .sprite > .wrap > .sprite { image-rendering: pixelated !important; }
+#world #canvas #player-switcher .team-player > .sprite + .sprite {
     position: absolute;
     top: auto;
     left: 10px;
@@ -1010,11 +1023,12 @@ html, body {
     transform: scale(0.7);
     filter: brightness(0.6);
 }
-#world #canvas #player-switcher a.option:hover > .sprite + .sprite {
+#world #canvas #player-switcher .team-player:hover > .sprite + .sprite {
     left: 9px;
     bottom: -1px;
 }
-#world #canvas #player-switcher a.option > .label {
+
+#world #canvas #player-switcher .team-player > .label {
     display: block;
     position: absolute;
     top: 44px;
@@ -1031,8 +1045,190 @@ html, body {
     opacity: 0.0;
     transition: opacity 0.3s;
 }
-#world #canvas #player-switcher a.option:hover > .label {
+#world #canvas #player-switcher .team-player:hover > .label {
     opacity: 1.0;
+}
+
+#world #canvas #robots-overview {
+    display: block;
+    position: absolute;
+    z-index: 1004;
+    width: auto;
+    height: auto;
+    bottom: 0;
+    left: 0;
+    pointer-events: all;
+    cursor: default;
+    padding: 8px 12px 8px 8px;
+    border-radius: 0 6px 0 0;
+    background-color: transparent;
+    box-shadow: none;
+}
+#world #canvas #robots-overview:before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: -50px;
+    bottom: 0;
+    z-index: 1;
+    width: 100px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 4px 16px;
+    border-radius: 0 6px 0 0;
+    box-shadow: 0 0 3px rgba(98, 98, 98, 0.3);
+    pointer-events: none;
+    transform: skewX(10deg);
+}
+#world #canvas #robots-overview .team-robot {
+    display: block;
+    float: left;
+    clear: both;
+    position: relative;
+    z-index: 10;
+    margin: 0 0 6px 0;
+    padding: 4px 0 0 48px;
+    height: auto;
+    width: auto;
+    min-height: 36px;
+    min-width: 40px;
+    font-family: monospace;
+    text-align: center;
+    color: #cfcfcf;
+    font-size: 12px;
+    line-height: 1.2;
+    outline: 1px solid transparent;
+    background-color: transparent;
+    background-image: none !important;
+    transition: outline 0.3s, background-color 0.3s;
+    cursor: pointer;
+}
+#world #canvas #robots-overview .team-robot > * {
+    pointer-events: none;
+}
+#world #canvas #robots-overview .team-robot:nth-child(1) { margin-left: 0; }
+#world #canvas #robots-overview .team-robot:nth-child(2) { margin-left: 10px; }
+#world #canvas #robots-overview .team-robot:nth-child(3) { margin-left: 20px; }
+#world #canvas #robots-overview .team-robot:nth-child(4) { margin-left: 30px; }
+#world #canvas #robots-overview .team-robot:last-child { margin-bottom: 0; }
+#world #canvas #robots-overview .team-robot .sprite {
+    display: block;
+    vertical-align: middle;
+    margin: 0 auto;
+    padding: 0;
+    text-indent: 0;
+}
+#world #canvas #robots-overview .team-robot .icon {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 3px;
+    width: 40px;
+    height: 34px;
+    border-radius: 3px;
+    text-align: center;
+    border-right: 2px solid #191919 !important;
+    border-bottom: 2px solid #191919 !important;
+}
+#world #canvas #robots-overview .team-robot .icon:before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 50%;
+    background-color: inherit;
+    filter: saturate(2) brightness(0.8);
+    border-radius: 0 0 3px 3px;
+    pointer-events: none;
+    z-index: 1;
+}
+#world #canvas #robots-overview .team-robot:nth-last-child(1) .icon { filter: brightness(1.0); }
+#world #canvas #robots-overview .team-robot:nth-last-child(2) .icon { filter: brightness(0.9); }
+#world #canvas #robots-overview .team-robot:nth-last-child(3) .icon { filter: brightness(0.8); }
+#world #canvas #robots-overview .team-robot:nth-last-child(4) .icon { filter: brightness(0.7); }
+#world #canvas #robots-overview .team-robot .icon > .sprite {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    top: -6px;
+    z-index: 2;
+}
+#world #canvas #robots-overview .team-robot:hover .icon > .sprite {
+    top: -8px;
+}
+#world #canvas #robots-overview .team-robot .icon > .sprite > .wrap,
+#world #canvas #robots-overview .team-robot .icon > .sprite > .wrap .icon > .sprite {
+    display: block;
+    position: absolute;
+    bottom: 0;
+}
+#world #canvas #robots-overview .team-robot .icon > .sprite[data-size="40"] > .wrap .icon > .sprite { width: 40px; height: 40px; }
+#world #canvas #robots-overview .team-robot .icon > .sprite[data-size="80"] > .wrap .icon > .sprite { width: 80px; height: 80px; }
+#world #canvas #robots-overview .team-robot .icon > .sprite[data-size="160"] > .wrap .icon > .sprite { width: 160px; height: 160px; }
+#world[data-rendering="auto"] #canvas #robots-overview .team-robot .icon > .sprite > .wrap .icon > .sprite { image-rendering: auto !important; }
+#world[data-rendering="pixelated"] #canvas #robots-overview .team-robot .icon > .sprite > .wrap .icon > .sprite { image-rendering: pixelated !important; }
+
+#world #canvas #robots-overview .team-robot.med-energy .icon .sprite .sprite {
+
+}
+#world #canvas #robots-overview .team-robot.low-energy .icon .sprite .sprite {
+    filter: drop-shadow(1px 1px 0 red);
+}
+
+#world #canvas #robots-overview .team-robot > .label {
+    display: block;
+    margin: 0 auto 1px 0;
+    background-color: #292929;
+    border-radius: 0 6px 6px 0;
+    padding: 4px 12px;
+    color: #cfcfcf;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: nowrap;
+    min-width: 120px;
+    box-shadow: -1px 1px 0 black;
+}
+#world #canvas #robots-overview .team-robot > .label .name {
+    float: left;
+    font-weight: bold;
+}
+#world #canvas #robots-overview .team-robot > .label .lvl {
+    float: right;
+    font-weight: normal;
+    font-size: 10px;
+    margin-left: 20px;
+    border-radius: 2px;
+    padding: 0 4px;
+}
+#world #canvas #robots-overview .team-robot > .guage {
+    display: block;
+    margin: 0 21px 1px 0;
+    width: auto;
+    height: 6px;
+    overflow: hidden;
+    background-color: #191919;
+    border-radius: 0 3px 3px 0;
+    box-shadow: -1px 1px 0 black;
+}
+#world #canvas #robots-overview .team-robot > .guage > i {
+    display: block;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 0 3px;
+    width: auto;
+    background-color: #292929;
+}
+#world #canvas #robots-overview:after,
+#world #canvas #robots-overview .team-robot:after,
+#world #canvas #robots-overview .team-robot > .label:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 
 #world #canvas #side-buttons {

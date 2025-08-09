@@ -620,7 +620,7 @@ class mmrpgWorldMap {
         sctx.drawImage(ctx.canvas, x, y, w, h, 0, 0, w, h);
         // 3) blend it back
         ctx.save();
-        ctx.globalAlpha = 0.6;
+        ctx.globalAlpha = 0.8;
         ctx.globalCompositeOperation = blend || 'multiply';
         ctx.drawImage(slice, x, y);
         ctx.globalAlpha = 1.0;
@@ -1242,10 +1242,10 @@ class mmrpgWorldMap {
         // Bind click events to the player switcher options in the world map header
         let $playerSwitcher = _elements.playerSwitcher;
         if ($playerSwitcher && $playerSwitcher.length){
-            $('.option[data-player]', $playerSwitcher).bind('click', function(e){
+            $('.team-player[data-player]', $playerSwitcher).bind('click', function(e){
                 //console.log('%c' + 'Player switcher clicked for ' + playerToken + '!', 'color: cyan;');
                 e.preventDefault();
-                $('.option', $playerSwitcher).removeClass('active');
+                $('.team-player', $playerSwitcher).removeClass('active');
                 let $option = $(this);
                 let playerToken = $option.attr('data-player') || false;
                 $option.addClass('active');
@@ -1261,14 +1261,14 @@ class mmrpgWorldMap {
                     });
                 return true;
                 });
-            $('.option[data-player]', $playerSwitcher).bind('mouseenter', function(e){
+            $('.team-player[data-player]', $playerSwitcher).bind('mouseenter', function(e){
                 //console.log('%c' + 'Player switcher hovered!', 'color: cyan;');
                 e.preventDefault();
                 let $option = $(this);
                 $('.sprite.player > .sprite', $option).attr('data-frame', '01'); // taunt
                 _self.playSoundEffect('icon-hover');
                 });
-            $('.option[data-player]', $playerSwitcher).bind('mouseleave', function(e){
+            $('.team-player[data-player]', $playerSwitcher).bind('mouseleave', function(e){
                 //console.log('%c' + 'Player switcher mouseleave!', 'color: cyan;');
                 e.preventDefault();
                 let $option = $(this);
@@ -1542,6 +1542,7 @@ class mmrpgWorldMap {
         //console.log('%c' + 'mmrpgWorldMap.scrollMap(scrollX:' + scrollX + ', scrollY:' + scrollY + ')', 'color: magenta;');
         // Collect references, indexes, and other variables we need to work with
         let _self = this;
+        let _selfRef = self;
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
@@ -1557,6 +1558,7 @@ class mmrpgWorldMap {
         if (typeof scrollX !== 'number'){ scrollX = _worldCursor.positionXY[0] || 0; }
         if (typeof scrollY !== 'number'){ scrollY = _worldCursor.positionXY[1] || 0; }
         // And now we should move the map itself so that the characters are always centered in the viewport
+        if (!_selfRef.lastWorldZoom){ _selfRef.lastWorldZoom = _world.zoomLevel; }
         let worldZoom = _world.zoomLevel;
         let worldWidth = _config.worldWidth;
         let worldHeight = _config.worldHeight;
@@ -1603,11 +1605,11 @@ class mmrpgWorldMap {
         let subTranslateY = Math.round(-1 * (translateY * 0.1));
         // Apply the new translate values to the map container
         //$canvasMap.css({ transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px)' });
-        _world.allowClicks = _world.allowHovers = false;
+        if (worldZoom !== _selfRef.lastWorldZoom){ _world.allowClicks = _world.allowHovers = false; }
         $canvasMap.attr('data-zoom', worldZoom);
         $canvasMap.css({ transformOrigin: 'left top', transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) scale(' + worldZoom + ')' });
         $backgroundLayer.css({ transformOrigin: 'left top', transform: 'translate(' + subTranslateX + 'px, ' + subTranslateY + 'px)' });
-        setTimeout(function(){ _world.allowClicks = _world.allowHovers = true; }, 1000);
+        if (worldZoom !== _selfRef.lastWorldZoom){ setTimeout(function(){ _world.allowClicks = _world.allowHovers = true; }, 1000); }
         // Return true on success
         return true;
         }
