@@ -82,6 +82,27 @@ class rpg_world {
         return true;
     }
 
+    // Define a function for saving the current world session to the system
+    public static function save_session(){
+        //error_log('rpg_world::save_session() called!');
+        // loop through and update the json session files with new data
+        $WORLD_SESSION = self::get_session();
+        $is_member = rpg_user::is_member();
+        $user_group = $is_member ? 'members' : 'guests';
+        $user_id = $is_member ? rpg_user::get_current_userid() : rpg_user::get_current_userip();
+        $json_session_path = MMRPG_CONFIG_ROOTDIR.'.cache/sessions/'.$user_group.'/'.$user_id.'/';
+        foreach ($WORLD_SESSION AS $key => $values){
+            if (in_array($key, array('player_sessions', 'world_maps', 'world_encounters', 'world_buttons', 'world_switches'))){
+                $json_session_file = 'WORLD__'.$key.'.json';
+                $json_session_file_path = $json_session_path.$json_session_file;
+                if (!is_dir(dirname($json_session_file_path))){ mkdir(dirname($json_session_file_path), 0755, true); }
+                file_put_contents($json_session_file_path, json_encode($values, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+            }
+        }
+        // return true on success
+        return true;
+    }
+
     // Define a function for loading indexes into this class
     public static function load_indexes($indexes = array()){
         //error_log('rpg_world::load_indexes() called!');
