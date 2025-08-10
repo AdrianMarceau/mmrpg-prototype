@@ -431,6 +431,17 @@ class rpg_user {
 
     }
 
+    /**
+     * Define a function for getting the current USER ip-address if available, empty if not
+     * @return string
+     */
+    public static function get_current_userip(){
+        $remote_address = !empty($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : '';
+        $remote_address = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $remote_address;
+        $remote_address = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : $remote_address;
+        return $remote_address;
+    }
+
 
     // -- USER PERMISSIONS FUNCTIONS -- //
 
