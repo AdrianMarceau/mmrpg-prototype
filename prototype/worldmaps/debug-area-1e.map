@@ -2,6 +2,7 @@
 # DEBUG AREA 1E (DESERT)
 @token    = debug-area-1e
 @name     = DEBUG Area 1E
+@level    = 40
 @size     = 50 x 16
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#

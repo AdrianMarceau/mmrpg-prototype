@@ -2,6 +2,7 @@
 # DEBUG AREA 2 (MISC)
 @token    = debug-area-2
 @name     = DEBUG Area 2
+@level    = 50
 @size     = 50 x 16
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
