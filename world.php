@@ -110,6 +110,8 @@ if (!empty($_POST['action']) && $_POST['action'] === 'save'
         //error_log('World data saved successfully for player "'.$lastPlayer.'" with world "'.$lastPlayerSession['last_world'].'" and position "'.$lastPlayerSession['last_position'].'"');
         //error_log('$WORLD_SESSION = '.print_r($WORLD_SESSION, true));
     }
+    // save the session with any new changes we just made
+    rpg_world::save_session();
     // that's all we support for now, return a success response
     header('Content-Type: application/json');
     echo(json_encode(array('status' => 'success', 'message' => 'World data saved successfully.')));
@@ -401,6 +403,9 @@ if (!empty($map_data_parsed['buttons'])){
         // ...
     }
 }
+
+// Automatically save the world session w/ any recent changes
+rpg_world::save_session();
 
 // Define some fallback values for compatibility
 $debug_flag_animation = true;
