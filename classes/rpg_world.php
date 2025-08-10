@@ -640,7 +640,7 @@ class rpg_world {
             if (empty($options)){ $options = array_keys($distributed_encounters); }
             if (empty($mecha_token)){ $mecha_token = array_shift($options); }
             if (!isset($generated_encounters[$mecha_token])){ $generated_encounters[$mecha_token] = 0; }
-            //error_log('-> next mecha = "'.$mecha_token.'"'.PHP_EOL);
+            //error_log(PHP_EOL.'-> next mecha = "'.$mecha_token.'"');
             $habitats = !empty($map_mecha_habitats[$mecha_token]) ? $map_mecha_habitats[$mecha_token] : '';
             //error_log('-> getting random position for robot "'.$mecha_token.'" (habitats: '.print_r(implode(',', $habitats), true).')');
             $available = array();
@@ -652,9 +652,10 @@ class rpg_world {
                     }
                 }
             if (empty($available)){ $available = $available_encounter_cells['all']; }
-            //error_log('$available = '.print_r($available, true).PHP_EOL);
-            //exit();
+            //error_log('$available = '.print_r($available, true));
+            //error_log('$available(count) = '.count($available).' vs. $used_encounter_cells(count) = '.count($used_encounter_cells));
             $mecha_pos = self::get_rand_pos($available, $used_encounter_cells);
+            if (!$mecha_pos){ continue; } // means there's no more room for this type!!!
             $mecha_pos_terrain = self::get_map_position_terrain($mecha_pos, $map_data_parsed);
             //error_log('$mecha_pos = '.print_r($mecha_pos, true));
             //error_log('$mecha_pos_terrain = '.print_r($mecha_pos_terrain, true));
