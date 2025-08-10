@@ -902,10 +902,14 @@ class rpg_world {
     // Define a function for getting the robot switcher markup given current conditions
     public static function get_robots_overview_markup($this_prototype_data, $robot_tokens){
         //error_log('rpg_world::get_robot_overview_markup() called!');
+        if (empty($this_prototype_data) || empty($robot_tokens)){ return ''; }
+        if ($this_prototype_data['this_player_token'] === 'player'){ return ''; }
         $return_markup = '';
+        $WORLD_SESSION = self::get_session();
+        $WORLD_ROBOT_SESSIONS = &$WORLD_SESSION['robot_sessions'];
         $mmrpg_index_robots = self::get_indexes('robots');
         $current_player_token = $this_prototype_data['this_player_token'];
-        if ($current_player_token === 'player'){ return $return_markup; }
+        $player_starforce = rpg_game::starforce_unlocked();
         $get_rating_token = function($percent){
             if ($percent === 100){ return 'full'; }
             elseif ($percent >= 50){ return 'high'; }
@@ -922,24 +926,76 @@ class rpg_world {
             elseif ($rating === 'low'){ return '08'; } // defend
             else { return '03'; } // defeat
             };
-        $robot_tokens_reversed = array_reverse($robot_tokens);
-        foreach ($robot_tokens_reversed AS $robot_key => $robot_token){
+        //$robot_tokens_reversed = array_reverse($robot_tokens);
+        foreach ($robot_tokens AS $robot_key => $robot_token){
             if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
-            $robot_info = $mmrpg_index_robots[$robot_token];
+            $robot_index_info = $mmrpg_index_robots[$robot_token];
+            $robot_info = $robot_index_info;
             $robot_rewards = rpg_game::robot_rewards($current_player_token, $robot_token);
             $robot_settings = rpg_game::robot_settings($current_player_token, $robot_token);
+            $robot_session = !empty($WORLD_ROBOT_SESSIONS[$robot_token]) ? $WORLD_ROBOT_SESSIONS[$robot_token] : array();
+            $robot_name = $robot_info['robot_name'];
+            $robot_types = 'type '.(!empty($robot_info['robot_core']) ? ($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' '.$robot_info['robot_core2'] : '')) : 'none');
+            $robot_level = !empty($robot_rewards['robot_level']) ? $robot_rewards['robot_level'] : 1;
+            $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
+            $robot_core2 = !empty($robot_info['robot_core2']) ? $robot_info['robot_core2'] : '';
+            $robot_core_or_none = !empty($robot_core) ? $robot_core : 'none';
+            $robot_item = !empty($robot_settings['robot_item']) ? $robot_settings['robot_item'] : '';
+            $has_persona_applied = false;
+            if (!empty($robot_settings['robot_persona'])
+                && !empty($robot_settings['robot_abilities']['copy-style'])){
+                //error_log($robot_info['robot_token'].' has a persona: '.$robot_settings['robot_persona']);
+                $persona_token = $robot_settings['robot_persona'];
+                $persona_image_token = !empty($robot_settings['robot_persona_image']) ? $robot_settings['robot_persona_image'] : $robot_settings['robot_persona'];
+                $persona_index_info = $mmrpg_index_robots[$persona_token];
+                rpg_robot::apply_persona_info($robot_info, $persona_index_info, $robot_settings);
+                //error_log('new $robot_info = '.print_r($robot_info, true));
+                $has_persona_applied = true;
+            }
+            $robot_persona = !empty($robot_info['robot_persona']) ? $robot_info['robot_persona'] : '';
+            $base_core_type = $has_persona_applied ? 'copy' : $robot_core;
+            $base_stats_ref = $has_persona_applied ? array_merge($robot_info, array('robot_token' => $robot_settings['robot_persona'])) : $robot_info;
+            $robot_stats = rpg_robot::calculate_stat_values($robot_level, $base_stats_ref, $robot_rewards, true, $base_core_type, $player_starforce);
+            //error_log($robot_token.' | $robot_stats = '.print_r($robot_stats, true));
             $robot_disabled = false;
             $robot_image = $robot_token;
             if (!empty($robot_settings['robot_persona_image'])){ $robot_image = $robot_settings['robot_persona_image']; }
             elseif (!empty($robot_settings['robot_image'])){ $robot_image = $robot_settings['robot_image']; }
             $robot_sprite = self::get_sprite('robot', $robot_image, '', 'right', 'character', '');
-            $robot_name = $robot_info['robot_name'];
-            $robot_types = 'type '.(!empty($robot_info['robot_core']) ? ($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' '.$robot_info['robot_core2'] : '')) : 'none');
-            $robot_level = !empty($robot_rewards['robot_level']) ? $robot_rewards['robot_level'] : 1;
-            $robot_energy_percent = mt_rand(1, 2) === 2 ? 100 : mt_rand(1, 100);
-            $robot_energy_rating = $get_rating_token($robot_energy_percent);
-            $robot_weapons_percent = mt_rand(1, 100);
-            $robot_weapons_rating = $get_rating_token($robot_weapons_percent);
+            $robot_energy_markup = '';
+            if (!empty($robot_info['robot_energy'])){
+                $robot_energy = $robot_stats['energy']['current'];
+                $robot_energy_max = $robot_stats['energy']['current'];
+                //error_log($robot_token.' | $robot_energy = '.print_r($robot_energy, true));
+                //error_log($robot_token.' | $robot_energy_max = '.print_r($robot_energy_max, true));
+                if (isset($robot_session['energy'])){
+                    //error_log($robot_token.' | $robot_session[energy] = '.print_r($robot_session['energy'], true));
+                    $robot_energy += $robot_session['energy'];
+                    }
+                //error_log($robot_token.' | $robot_energy(2) = '.print_r($robot_energy, true));
+                $robot_energy_percent = ceil(($robot_energy / $robot_energy_max) * 100);
+                //error_log($robot_token.' | $robot_energy_percent = '.print_r($robot_energy_percent, true));
+                $robot_energy_rating = $get_rating_token($robot_energy_percent);
+                $robot_energy_label = $robot_energy.' / '.$robot_energy_max.' LE ('.$robot_energy_percent.'%)';
+                $robot_energy_markup = '<div class="guage energy '.$robot_energy_rating.'" title="'.$robot_energy_label.'"><i style="width: '.$robot_energy_percent.'%;"></i></div>';
+                }
+            $robot_weapons_markup = '';
+            if (!empty($robot_info['robot_weapons'])){
+                $robot_weapons = $robot_stats['weapons']['current'];
+                $robot_weapons_max = $robot_stats['weapons']['current'];
+                //error_log($robot_token.' | $robot_weapons = '.print_r($robot_weapons, true));
+                //error_log($robot_token.' | $robot_weapons_max = '.print_r($robot_weapons_max, true));
+                if (isset($robot_session['weapons'])){
+                    //error_log($robot_token.' | $robot_session[weapons] = '.print_r($robot_session['weapons'], true));
+                    $robot_weapons += $robot_session['weapons'];
+                    }
+                //error_log($robot_token.' | $robot_weapons(2) = '.print_r($robot_weapons, true));
+                $robot_weapons_percent = ceil(($robot_weapons / $robot_weapons_max) * 100);
+                //error_log($robot_token.' | $robot_weapons_percent = '.print_r($robot_weapons_percent, true));
+                $robot_weapons_rating = $get_rating_token($robot_weapons_percent);
+                $robot_weapons_label = $robot_weapons.' / '.$robot_weapons_max.' WE ('.$robot_weapons_percent.'%)';
+                $robot_weapons_markup = '<div class="guage weapons '.$robot_weapons_rating.'" title="'.$robot_weapons_label.'"><i style="width: '.$robot_weapons_percent.'%;"></i></div>';
+                }
             $robot_frame = $get_robot_energy_frame($robot_energy_rating);
             $robot_sprite = str_replace('data-frame="00"', 'data-frame="'.$robot_frame.'"', $robot_sprite);
             $link_class = 'team-robot'.(' '.$robot_energy_rating.'-energy').($robot_disabled ? ' disabled' : '');
@@ -951,8 +1007,8 @@ class rpg_world {
                     $robot_markup .= '<strong class="name">'.$robot_name.'</strong>';
                     $robot_markup .= '<span class="lvl type '.($robot_level >= 100 ? 'level' : 'none').'">Lv. '.$robot_level.'</span>';
                 $robot_markup .= '</div>';
-                $robot_markup .= '<div class="guage energy '.$robot_energy_rating.'"><i style="width: '.$robot_energy_percent.'%;"></i></div>';
-                $robot_markup .= '<div class="guage weapons '.$robot_weapons_rating.'"><i style="width: '.$robot_weapons_percent.'%;"></i></div>';
+                $robot_markup .= $robot_energy_markup;
+                $robot_markup .= $robot_weapons_markup;
             $robot_markup .= '</div>';
             $return_markup .= $robot_markup;
         }
