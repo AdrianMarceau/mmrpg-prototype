@@ -10,7 +10,7 @@
 @terrain[]   = grass(gentle-countryside)
 @terrain[]   = subspace(prototype-subspace)
 #---------------------------#
-@mechas      = met(2),trille-bot(1)
+@encounters  = met(2),trille-bot(1)
 @habitats[]  = met(grass)
 @habitats[]  = trille-bot(subspace)
 #---------------------------#

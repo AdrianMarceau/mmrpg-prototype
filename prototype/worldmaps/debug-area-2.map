@@ -11,7 +11,7 @@
 @terrain[]   = water(wintry-forefront)
 @terrain[]   = ground(mountain-mines)
 #---------------------------#
-@mechas     = frosty-throwman(123),curlinger(64),tel-tel(48),bomb-sleigh(24),nitron-b(12),peng(12),eggalodon(6),cline(1)
+@encounters = frosty-throwman(123),curlinger(64),tel-tel(48),bomb-sleigh(24),nitron-b(12),peng(12),eggalodon(6),cline(1)
 @habitats[] = frosty-throwman(tundra)
 @habitats[] = curlinger(tundra)
 @habitats[] = tel-tel(tundra)

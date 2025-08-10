@@ -10,7 +10,7 @@
 @terrain[]   = desert(oil-wells)
 @terrain[]   = grass(gentle-countryside)
 #---------------------------#
-@mechas     = gockroach-s(70),beetle-borg(70),antlin-g(20),bombomboy(5),power-muscler(1)
+@encounters = gockroach-s(70),beetle-borg(70),antlin-g(20),bombomboy(5),power-muscler(1)
 @habitats[] = gockroach-s(desert)
 @habitats[] = beetle-borg(desert)
 @habitats[] = antlin-g(desert)

@@ -9,7 +9,7 @@
 @field    = waterfall-institute
 @terrain[]   = beach(oil-wells)
 #---------------------------#
-@mechas   = snapper(5),octone(5),shelln(1)
+@encounters  = snapper(5),octone(5),shelln(1)
 @habitats[]  = octone(water)
 @habitats[]  = shelln(beach,water)
 @habitats[]  = snapper(beach)

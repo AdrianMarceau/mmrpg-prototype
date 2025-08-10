@@ -3,7 +3,7 @@
 @token      = water
 @name       = Water Map
 @field      = waterfall-institute
-@mechas     = snapper,robo-fishtot,bui-boi,pelicanu,shelln
+@encounters = snapper,robo-fishtot,bui-boi,pelicanu,shelln
 @size       = 19 x 16 x 40 x 40
 @sheet      = overworld-experiment-v2024-tileset.png
 #---------------------------#

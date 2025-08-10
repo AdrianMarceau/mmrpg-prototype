@@ -6,8 +6,8 @@
 @size     = 15 x 15
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
-@field    = wintry-forefront
-@mechas   = curlinger,frosty-throwman,tel-tel
+@field        = wintry-forefront
+@encounters   = curlinger,frosty-throwman,tel-tel
 #---------------------------#
 @portals[]  = spawn(8-12, hidden)
 @portals[]  = goto__debug-area-1(8-12)

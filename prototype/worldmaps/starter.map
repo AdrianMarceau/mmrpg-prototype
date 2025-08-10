@@ -3,7 +3,7 @@
 @token      = starter
 @name       = Starter Map
 @field      = gentle-countryside
-@mechas     = met,flea,mouslider
+@encounters = met,flea,mouslider
 @size       = 19 x 16 x 40 x 40
 @sheet      = overworld-experiment-v2024-tileset.png
 #---------------------------#

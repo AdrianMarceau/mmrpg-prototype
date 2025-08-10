@@ -11,7 +11,7 @@
 @terrain[]   = grass(gentle-countryside)
 @terrain[]   = water(rainey-sewers)
 #---------------------------#
-@mechas     = batton(20),monking-r(10),eggalodon(5),petal-anne(20),petit-snakey(10),bombomboy(5),kabuton(5)
+@encounters = batton(20),monking-r(10),eggalodon(5),petal-anne(20),petit-snakey(10),bombomboy(5),kabuton(5)
 @habitats[] = batton(ground)
 @habitats[] = monking-r(ground)
 @habitats[] = eggalodon(ground)

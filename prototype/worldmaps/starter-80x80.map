@@ -5,8 +5,8 @@
 @size     = 19 x 15 x 80 x 80
 @sheet    = overworld-experiment-v2025-tileset.png
 #---------------------------#
-@field    = gentle-countryside
-@mechas   = flea,lady-blader,bombomboy,petal-anne
+@field      = gentle-countryside
+@encounters = flea,lady-blader,bombomboy,petal-anne
 #---------------------------#
 0000000000000000000
 0022222222222222200

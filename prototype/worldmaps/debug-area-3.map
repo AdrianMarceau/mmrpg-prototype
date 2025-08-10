@@ -11,7 +11,7 @@
 @terrain[]   = subspace(prototype-subspace)
 @terrain[]   = water(reflection-chamber)
 #---------------------------#
-@mechas     = dark-frag(12),trille-bot(6),novamite(3),mega-man-ds(1),bass-ds(1),proto-man-ds(1)
+@encounters = dark-frag(12),trille-bot(6),novamite(3),mega-man-ds(1),bass-ds(1),proto-man-ds(1)
 @habitats[] = dark-frag(darkness)
 @habitats[] = trille-bot(subspace)
 @habitats[] = novamite(water)

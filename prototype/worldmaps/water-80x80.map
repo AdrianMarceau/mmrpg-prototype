@@ -6,7 +6,7 @@
 @sheet      = overworld-experiment-v2025-tileset.png
 #---------------------------#
 @field      = waterfall-institute
-@mechas     = snapper,robo-fishtot,bui-boi,pelicanu,shelln
+@encounters = snapper,robo-fishtot,bui-boi,pelicanu,shelln
 #---------------------------#
 00000000000000000000
 00333333333333333300
