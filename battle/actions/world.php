@@ -43,6 +43,24 @@ if (!empty($this_player->player_token)
     //error_log('(new) $battle_history = '.print_r($battle_history, true));
     $_SESSION[$session_token]['values']['battle_history'] = $battle_history;
 
+    // Make sure we also save the robot's current damage, used-ammo, etc. values to the world session
+    rpg_world::init_session();
+    $WORLD_SESSION = &$_SESSION['WORLD'];
+    $WORLD_ROBOT_SESSIONS = &$WORLD_SESSION['robot_sessions'];
+    //error_log('Saving robot sessions for player '.$this_player->player_token.PHP_EOL.' w/ $this_player->player_robots = '.print_r($this_player->player_robots, true));
+    foreach ($this_player->player_robots AS $robot_key => $robot_info){
+        $robot_token = $robot_info['robot_token'];
+        if (!isset($WORLD_ROBOT_SESSIONS[$robot_token])){ $WORLD_ROBOT_SESSIONS[$robot_token] = array(); }
+        $robot_session = &$WORLD_ROBOT_SESSIONS[$robot_token];
+        $robot_session['energy'] = $robot_info['robot_energy'] - $robot_info['robot_base_energy'];
+        $robot_session['weapons'] = $robot_info['robot_weapons'] - $robot_info['robot_base_weapons'];
+        $robot_session['attack'] = !empty($robot_info['counters']['attack_mods']) ? $robot_info['counters']['attack_mods'] : 0;
+        $robot_session['defense'] = !empty($robot_info['counters']['defense_mods']) ? $robot_info['counters']['defense_mods'] : 0;
+        $robot_session['speed'] = !empty($robot_info['counters']['speed_mods']) ? $robot_info['counters']['speed_mods'] : 0;
+        //error_log('Saving robot session for '.$robot_token.' : '.print_r($robot_session, true));
+        $WORLD_ROBOT_SESSIONS[$robot_token] = $robot_session;
+    }
+
 }
 
 // If this battle was completed, check to see if we should be running any post-complete actions
