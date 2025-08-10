@@ -298,9 +298,10 @@ if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data[
 if ($this_prototype_data['this_current_world'] === $default_world_token && empty($default_world_position)){ $default_world_position = $map_spawn_pos; }
 
 // If the encounters for this map have not been generated yet, we can do so now
+$reset_encounters = !empty($_GET['reset']) && $_GET['reset'] === 'encounters' ? true : false;
 $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
 $world_map_encounters = !empty($world_encounters[$map_token]) ? $world_encounters[$map_token] : array();
-if (empty($world_map_encounters)){
+if (empty($world_map_encounters) || $reset_encounters === true){
     $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed);
     rpg_world::update_session('world_encounters', $map_token, $world_map_encounters);
 }
