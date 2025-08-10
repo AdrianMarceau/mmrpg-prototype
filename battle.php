@@ -70,7 +70,7 @@ if (!empty($this_battle_token)){
         //error_log('$multi_battle_tokens(2) = '.print_r($multi_battle_tokens, true));
         $temp_target_playerid = $this_battle_data['battle_target_player']['player_id'];
         $combo_multiplier = count($multi_battle_tokens);
-        $exp_multiplier = $combo_multiplier;
+        $exp_multiplier = 1 + ($combo_multiplier * 0.25);
         $new_battle_turns = 0;
         $new_battle_zenny = 0;
         $new_battle_rewards = array();
