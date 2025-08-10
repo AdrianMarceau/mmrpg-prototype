@@ -26,18 +26,40 @@ class rpg_world {
         return true;
     }
 
+    // Define a function for getting the world session token
+    public static function session_token(){
+        //error_log('rpg_world::session_token() called!');
+        return 'WORLD';
+    }
+
     // Define a function for getting the current world session
     public static function get_session(){
         //error_log('rpg_world::get_session() called!');
-        if (!isset($_SESSION['WORLD'])){ $_SESSION['WORLD'] = array(); }
-        return $_SESSION['WORLD'];
+        $session_token = self::session_token();
+        if (!isset($_SESSION[$session_token])){ $_SESSION[$session_token] = array(); }
+        return $_SESSION[$session_token];
     }
 
     // Define a function for resetting the world session
     public static function reset_session(){
         //error_log('rpg_world::reset_session() called!');
-        if (isset($_SESSION['WORLD'])){ unset($_SESSION['WORLD']); }
-        $_SESSION['WORLD'] = array();
+        // Clear the top-level WORLD session variable entirely to start fresh
+        $world_session_token = self::session_token();
+        if (isset($_SESSION[$world_session_token])){ unset($_SESSION[$world_session_token]); }
+        $_SESSION[$world_session_token] = array();
+        // Also clear any parent-level GAME session variables that are world-specific
+        $game_session_token = rpg_game::session_token();
+        if (!isset($_SESSION[$game_session_token])){ return true; } // return early if no game session exists
+        $GAME_SESSION = &$_SESSION[$game_session_token];
+        // If there are any world-specific battles in game battle index, unset them now
+        if (!empty($GAME_SESSION['values']['battle_index'])){
+            foreach ($GAME_SESSION['values']['battle_index'] AS $battle_token => $battle_data){
+                if (strpos($battle_token, 'world-battle_') !== 0){ continue; } // not a world-battle, don't touch it
+                //error_log('rpg_world::reset_session() unsetting world-battle token "'.$battle_token.'"');
+                unset($GAME_SESSION['values']['battle_index'][$battle_token]); // unset this battle from the game session
+            }
+        }
+        // Return true now that we're done resetting the session
         return true;
     }
 
