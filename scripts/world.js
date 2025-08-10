@@ -2443,7 +2443,9 @@ class mmrpgWorldMap {
         let _elements = _self.elements;
         let $canvasMap = _elements.map;
         let $vsMechas = $('.sprite.vs-mecha', $canvasMap);
+        let $vsBosses = $('.sprite.vs-boss', $canvasMap);
         $vsMechas.addClass('march');
+        $vsBosses.addClass('march');
         if (_selfRef._interval){ clearInterval(_selfRef._interval); }
         _selfRef._interval = setInterval(function(){
             $vsMechas = $('.sprite.vs-mecha:not(.zoom)', $canvasMap);
@@ -2464,6 +2466,27 @@ class mmrpgWorldMap {
                 if (!changed){ return true; }
                 let randCooldown = 4 + Math.ceil(Math.random() * 6);
                 $mecha.data('cooldown', randCooldown);
+                });
+            $vsBosses = $('.sprite.vs-boss:not(.zoom)', $canvasMap);
+            $vsBosses.each(function(){
+                let $boss = $(this);
+                if ($boss.data('cooldown') && $boss.data('cooldown') > 0){
+                    $boss.data('cooldown', $boss.data('cooldown') - 1);
+                    return true;
+                    }
+                let curDir = $boss.attr('data-dir') || 'right';
+                let newDir = curDir === 'right' ? 'left' : 'right';
+                let curFrame = $boss.attr('data-frame') || '00';
+                let newFrame = curFrame !== '01' ? '01' : '00';
+                let hasMarch = $boss.hasClass('march');
+                let changed = false;
+                let changeDirection = Math.random() > 0.5 ? true : false;
+                let changeFrame = Math.random() > 0.5 ? true : false;
+                if (changeDirection){ $boss.attr('data-dir', newDir); changed = true; }
+                if (changeFrame){ $boss.attr('data-frame', newFrame); changed = true; }
+                if (!changed){ return true; }
+                let randCooldown = 4 + Math.ceil(Math.random() * 6);
+                $boss.data('cooldown', randCooldown);
                 });
             }, 500);
         // Return true on success
