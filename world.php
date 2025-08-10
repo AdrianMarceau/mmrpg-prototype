@@ -302,7 +302,7 @@ $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION[
 $world_map_encounters = !empty($world_encounters[$map_token]) ? $world_encounters[$map_token] : array();
 if (empty($world_map_encounters)){
     $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed);
-    self::update_session('world_encounters', $map_token, $world_map_encounters);
+    rpg_world::update_session('world_encounters', $map_token, $world_map_encounters);
 }
 
 // If there are any portals define, check to see if any are being covered by battles or obstacles
