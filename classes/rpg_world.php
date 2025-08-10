@@ -241,7 +241,7 @@ class rpg_world {
         $map_data_vars['switches'] = isset($map_data_vars['switches']) ? $map_data_vars['switches'] : array();
         $map_data_vars['field'] = isset($map_data_vars['field']) ? $map_data_vars['field'] : '';
         $map_data_vars['terrain'] = isset($map_data_vars['terrain']) ? $map_data_vars['terrain'] : array();
-        $map_data_vars['mechas'] = isset($map_data_vars['mechas']) ? $map_data_vars['mechas'] : '';
+        $map_data_vars['encounters'] = isset($map_data_vars['encounters']) ? $map_data_vars['encounters'] : '';
         $map_data_vars['masters'] = isset($map_data_vars['masters']) ? $map_data_vars['masters'] : '';
         $map_data_vars['habitats'] = isset($map_data_vars['habitats']) ? $map_data_vars['habitats'] : array();
         $map_data_vars['bosses'] = isset($map_data_vars['bosses']) ? $map_data_vars['bosses'] : array();
@@ -254,7 +254,7 @@ class rpg_world {
         if (!isset($map_data_vars['size'][1])){ $map_data_vars['size'][1] = $map_autorows; }
         if (!isset($map_data_vars['size'][2])){ $map_data_vars['size'][2] = $map_tilesize; }
         if (empty($map_data_vars['field'])){ $map_data_vars['field'] = 'field'; }
-        if (!empty($map_data_vars['mechas'])){ $map_data_vars['mechas'] = explode(',', str_replace(' ', '', $map_data_vars['mechas'])); }
+        if (!empty($map_data_vars['encounters'])){ $map_data_vars['encounters'] = explode(',', str_replace(' ', '', $map_data_vars['encounters'])); }
         if (!empty($map_data_vars['masters'])){ $map_data_vars['masters'] = explode(',', str_replace(' ', '', $map_data_vars['masters'])); }
         $map_data_vars['tiles'] = $map_custval_parser($map_data_vars['tiles'], true);
         $map_data_vars['groups'] = $map_custval_parser($map_data_vars['groups']);
@@ -280,7 +280,7 @@ class rpg_world {
         $map_data_parsed['switches'] = $map_data_vars['switches']; unset($map_data_vars['switches']);
         $map_data_parsed['field'] = $map_data_vars['field']; unset($map_data_vars['field']);
         $map_data_parsed['terrain'] = $map_data_vars['terrain']; unset($map_data_vars['terrain']);
-        $map_data_parsed['mechas'] = $map_data_vars['mechas']; unset($map_data_vars['mechas']);
+        $map_data_parsed['encounters'] = $map_data_vars['encounters']; unset($map_data_vars['encounters']);
         $map_data_parsed['masters'] = $map_data_vars['masters']; unset($map_data_vars['masters']);
         $map_data_parsed['habitats'] = $map_data_vars['habitats']; unset($map_data_vars['habitats']);
         $map_data_parsed['bosses'] = $map_data_vars['bosses']; unset($map_data_vars['bosses']);
@@ -624,20 +624,21 @@ class rpg_world {
         $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : 'undefined';
         $map_name = !empty($map_data_parsed['name']) ? $map_data_parsed['name'] : 'Undefined';
         $map_level = !empty($map_data_parsed['level']) ? $map_data_parsed['level'] : 1;
+        $map_encounters = !empty($map_data_parsed['encounters']) ? $map_data_parsed['encounters'] : array();
+        $map_habitats = !empty($map_data_parsed['habitats']) ? $map_data_parsed['habitats'] : array();
         $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
         $map_field_info = !empty($mmrpg_index_fields[$map_field_token]) ? $mmrpg_index_fields[$map_field_token] : array();
         $map_field_background = !empty($map_field_info['field_background']) ? $map_field_info['field_background'] : 'field';
         $map_field_foreground = !empty($map_field_info['field_foreground']) ? $map_field_info['field_foreground'] : 'field';
         $map_field_music = !empty($map_field_info['field_music']) ? $map_field_info['field_music'] : 'misc/star-force'; // TODO: find a better default for this
-        $map_mecha_support = !empty($map_data_parsed['mechas']) ? $map_data_parsed['mechas'] : array();
-        $map_mecha_habitats = !empty($map_data_parsed['habitats']) ? $map_data_parsed['habitats'] : array();
+        $map_field_mechas = !empty($map_field_info['field_mechas']) ? $map_field_info['field_mechas'] : array();
+        //error_log('$map_encounters = '.print_r($map_encounters, true));
+        //error_log('$map_habitats = '.print_r($map_habitats, true));
         //error_log('$map_field_token = '.print_r($map_field_token, true));
         //error_log('$map_field_info = '.print_r($map_field_info, true));
         //error_log('$map_field_background = '.print_r($map_field_background, true));
         //error_log('$map_field_foreground = '.print_r($map_field_foreground, true));
         //error_log('$map_field_music = '.print_r($map_field_music, true));
-        //error_log('$map_mecha_support = '.print_r($map_mecha_support, true));
-        //error_log('$map_mecha_habitats = '.print_r($map_mecha_habitats, true));
 
         // Calculate the available encounter cells based on the map data and define a var to hold used encounter cells later
         $world_map_encounters = array();
@@ -646,7 +647,7 @@ class rpg_world {
         $used_encounter_cells = array();
 
         // RANDOM ENCOUNTERS (w/ Mecha Support)
-        $allowed_random_encounters = $map_mecha_support;
+        $allowed_random_encounters = $map_encounters;
         $max_random_encounters = ceil($available_encounter_cells['total'] * 0.25);
         $allowed_held_items = array();
         if ($map_level >= 10){ $allowed_held_items += array('energy-pellet', 'weapon-pellet'); }
@@ -684,7 +685,7 @@ class rpg_world {
             if (empty($mecha_token)){ $mecha_token = array_shift($options); }
             if (!isset($generated_encounters[$mecha_token])){ $generated_encounters[$mecha_token] = 0; }
             //error_log(PHP_EOL.'-> next mecha = "'.$mecha_token.'"');
-            $habitats = !empty($map_mecha_habitats[$mecha_token]) ? $map_mecha_habitats[$mecha_token] : '';
+            $habitats = !empty($map_habitats[$mecha_token]) ? $map_habitats[$mecha_token] : '';
             //error_log('-> getting random position for robot "'.$mecha_token.'" (habitats: '.print_r(implode(',', $habitats), true).')');
             $available = array();
             if (!empty($habitats)){
