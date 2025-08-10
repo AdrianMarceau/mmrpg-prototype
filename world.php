@@ -297,6 +297,39 @@ if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data[
 // If the default position has not been set, we can use the spawn position for that
 if ($this_prototype_data['this_current_world'] === $default_world_token && empty($default_world_position)){ $default_world_position = $map_spawn_pos; }
 
+// If the encounters for this map have not been generated yet, we can do so now
+$world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
+$world_map_encounters = !empty($world_encounters[$map_token]) ? $world_encounters[$map_token] : array();
+if (empty($world_map_encounters)){
+    $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed);
+    self::update_session('world_encounters', $map_token, $world_map_encounters);
+}
+
+// If there are any portals define, check to see if any are being covered by battles or obstacles
+if (!empty($map_data_parsed['portals'])){
+    //error_log('[portal-check] checking for world map portals on map "'.$map_token.'"');
+    //error_log('-> $map_data_parsed[\'portals\'] = '.print_r($map_data_parsed['portals'], true));
+    //error_log('-> $world_map_encounters = '.print_r($world_map_encounters, true));
+    $active_map_encounters = array_filter($world_map_encounters, function($encounter){
+        $battle = $encounter[4]; return rpg_battle::has_index_info($battle);
+        });
+    $active_encounter_cells = array_map(function($encounter){
+        $battle = $encounter[3]; return $battle;
+        }, $active_map_encounters);
+    //error_log('-> $active_map_encounters = '.print_r($active_map_encounters, true));
+    //error_log('-> $active_encounter_cells = '.print_r($active_encounter_cells, true));
+    foreach ($map_data_parsed['portals'] AS $portal_name => $portal_data){
+        if (empty($portal_data) || !is_array($portal_data)){ continue; }
+        //error_log('[portal-check] checking portal w/ name "'.$portal_name.'" & data ['.implode(', ', $portal_data).']');
+        if (!in_array($portal_data[0], $active_encounter_cells)){ continue; }
+        //error_log('[portal-check] portal "'.$portal_name.'" at position "'.$portal_data[0].'" is occupied by an encounter!');
+        // lock this portal as it's currently occupied by an encounter
+        $portal_data[] = 'locked';
+        $map_data_parsed['portals'][$portal_name] = $portal_data;
+    }
+    //error_log('-> $map_data_parsed[\'portals\'] (new) = '.print_r($map_data_parsed['portals'], true));
+}
+
 // If there are any buttons defined, check to see if any of them have been pushed already
 if (!empty($map_data_parsed['buttons'])){
     $button_sprites = $map_data_parsed['buttons'];

@@ -2410,17 +2410,26 @@ class mmrpgWorldMap {
             let checkPosition = positionsToCheck[i];
             let eventPosition = checkPosition.split('-');
             //let $eventAtPosition = $('.sprite[data-col="' + eventPosition[0] + '"][data-row="' + eventPosition[1] + '"]', $eventLayers);
-            let $spriteAtPosition = $('.sprite[data-sprite][data-col="' + eventPosition[0] + '"][data-row="' + eventPosition[1] + '"]', $canvasMap);
-            if (!$spriteAtPosition || !$spriteAtPosition.length){ continue; }
-            let spriteKind = $spriteAtPosition.attr('data-sprite') || false, baseSpriteKind = spriteKind.indexOf('-') !== -1 ? spriteKind.split('-')[0] : spriteKind;
-            //console.log('-> checking position', checkPosition, 'for sprite kind:', spriteKind, 'base kind:', baseSpriteKind, 'against eventSpriteKinds:', eventSpriteKinds);
-            if (!spriteKind || !baseSpriteKind || eventSpriteKinds.indexOf(baseSpriteKind) === -1){ continue; } // skip if not an event sprite
-            let $eventAtPosition = $spriteAtPosition;
-            //let eventIsPortal = $eventAtPosition.is('[data-portal]');
-            let eventIsPortal = spriteKind === 'portal';
-            if (eventIsPortal && checkPosition !== searchPosition){ continue; } // skip portals unless it's the exact position
-            $eventsAtPosition.push($eventAtPosition);
-            if (eventIsPortal){ break; }
+            let $spritesAtPosition = $('.sprite[data-sprite][data-col="' + eventPosition[0] + '"][data-row="' + eventPosition[1] + '"]', $canvasMap);
+            //console.log('-> checking position', checkPosition, 'for sprite:', $spritesAtPosition);
+            if (!$spritesAtPosition || !$spritesAtPosition.length){ continue; }
+            $spritesAtPosition.each(function(){
+                let $spriteAtPosition = $(this);
+                let spriteKind = $spriteAtPosition.attr('data-sprite') || false, baseSpriteKind = spriteKind.indexOf('-') !== -1 ? spriteKind.split('-')[0] : spriteKind;
+                //console.log('-> spriteKind =', spriteKind, 'baseSpriteKind =', baseSpriteKind);
+                // skip if not an event sprite
+                if (!spriteKind || !baseSpriteKind || eventSpriteKinds.indexOf(baseSpriteKind) === -1){
+                    //console.log('getEventsAtPosition() skipping position', checkPosition, 'because it is not an event sprite:', $spriteAtPosition);
+                    return;
+                    }
+                // collect sprite ref as we know its an event now
+                let $eventAtPosition = $spriteAtPosition;
+                // skip portals unless it's the exact position
+                let eventIsPortal = spriteKind === 'portal';
+                if (eventIsPortal && checkPosition !== searchPosition){ return; } // skip portals unless it's the exact position
+                // otherwise we are fine to add to the events array
+                $eventsAtPosition.push($eventAtPosition);
+                });
             }
         // Return the found events
         return $eventsAtPosition;
