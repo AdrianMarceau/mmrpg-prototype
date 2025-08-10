@@ -176,6 +176,7 @@ class rpg_world {
         //error_log('raw $map_data_vars(before) = '.print_r($map_data_vars, true));
         $map_data_vars['token'] = isset($map_data_vars['token']) ? $map_data_vars['token'] : '';
         $map_data_vars['name'] = isset($map_data_vars['name']) ? $map_data_vars['name'] : '';
+        $map_data_vars['level'] = isset($map_data_vars['level']) ? $map_data_vars['level'] : 1;
         $map_data_vars['size'] = isset($map_data_vars['size']) ? $map_data_vars['size'] : '';
         $map_data_vars['sheet'] = isset($map_data_vars['sheet']) ? $map_data_vars['sheet'] : '';
         $map_data_vars['tiles'] = isset($map_data_vars['tiles']) ? $map_data_vars['tiles'] : array();
@@ -214,6 +215,7 @@ class rpg_world {
         $map_data_parsed = array();
         $map_data_parsed['token'] = $map_data_vars['token']; unset($map_data_vars['token']);
         $map_data_parsed['name'] = $map_data_vars['name']; unset($map_data_vars['name']);
+        $map_data_parsed['level'] = $map_data_vars['level']; unset($map_data_vars['level']);
         $map_data_parsed['size'] = $map_data_vars['size']; unset($map_data_vars['size']);
         $map_data_parsed['sheet'] = $map_data_vars['sheet']; unset($map_data_vars['sheet']);
         $map_data_parsed['tiles'] = $map_data_vars['tiles']; unset($map_data_vars['tiles']);
@@ -565,8 +567,9 @@ class rpg_world {
         $mmrpg_index_fields = self::get_indexes('fields');
 
         // Collect the map's field token and mecha encounters
-        $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : '';
-        $map_name = !empty($map_data_parsed['name']) ? $map_data_parsed['name'] : '';
+        $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : 'undefined';
+        $map_name = !empty($map_data_parsed['name']) ? $map_data_parsed['name'] : 'Undefined';
+        $map_level = !empty($map_data_parsed['level']) ? $map_data_parsed['level'] : 1;
         $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
         $map_field_info = !empty($mmrpg_index_fields[$map_field_token]) ? $mmrpg_index_fields[$map_field_token] : array();
         $map_field_background = !empty($map_field_info['field_background']) ? $map_field_info['field_background'] : 'field';
@@ -591,6 +594,13 @@ class rpg_world {
         // RANDOM ENCOUNTERS (w/ Mecha Support)
         $allowed_random_encounters = $map_mecha_support;
         $max_random_encounters = ceil($available_encounter_cells['total'] * 0.25);
+        $allowed_held_items = array();
+        if ($map_level >= 10){ $allowed_held_items += array('energy-pellet', 'weapon-pellet'); }
+        if ($map_level >= 20){ $allowed_held_items += array('attack-pellet', 'defense-pellet', 'speed-pellet'); }
+        if ($map_level >= 30){ $allowed_held_items += array('energy-capsule', 'weapon-capsule'); }
+        if ($map_level >= 40){ $allowed_held_items += array('attack-capsule', 'defense-capsule', 'speed-capsule'); }
+        if ($map_level >= 50){ $allowed_held_items += array('energy-tank', 'weapon-tank'); }
+        if ($map_level >= 100){ $allowed_held_items += array('extra-life', 'yashichi'); }
         //error_log('$allowed_random_encounters = '.print_r($allowed_random_encounters, true));
         //error_log('$available_encounter_terrain = '.print_r($available_encounter_terrain, true));
         //error_log('$available_encounter_cells = '.print_r($available_encounter_cells, true));
@@ -640,7 +650,12 @@ class rpg_world {
             //error_log('$battle_background = '.print_r($battle_background, true));
             //error_log('$battle_foreground = '.print_r($battle_foreground, true));
             $mecha_info = $mmrpg_index_robots[$mecha_token];
-            $mecha_level = mt_rand(1, 10);
+            $mecha_level = mt_rand($map_level, ceil($map_level * 1.5));
+            // pick random item from $allowed_held_items w/ 50% chance
+            $mecha_item = '';
+            if (!empty($allowed_held_items) && mt_rand(1, 100) <= 50){
+                $mecha_item = $allowed_held_items[mt_rand(0, count($allowed_held_items) - 1)];
+                }
             $mecha_label = $mecha_info['robot_name'].' (Lv. '.$mecha_level.')';
             $battle_token = 'world-battle_'.$map_token.'_mecha-'.($mecha_key + 1);
             $battle_name = $map_name.' Mecha Battle';
@@ -655,8 +670,15 @@ class rpg_world {
                 'turns' => MMRPG_SETTINGS_BATTLETURNS_PERMECHA, // mecha value
                 'zenny' => MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2, // mecha value
                 'field' => $battle_field,
-                'target' => array('robots' => array(array('token' => $mecha_token, 'level' => $mecha_level))),
-                'flags' => array('world_battle' => true, 'remove_on_complete' => true),
+                'target' => array('robots' => array(array(
+                    'token' => $mecha_token,
+                    'level' => $mecha_level,
+                    'item' => $mecha_item,
+                    ))),
+                'flags' => array(
+                    'world_battle' => true,
+                    'remove_on_complete' => true
+                    ),
                 ), true);
             $generated_encounters[$mecha_token]++;
             $distributed_encounters[$mecha_token]--;
