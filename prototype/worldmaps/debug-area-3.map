@@ -1,5 +1,5 @@
 #---------------------------#
-# DEBUG AREA 3 (MISC)
+# DEBUG AREA 3 (SUBSPACE)
 @token    = debug-area-3
 @name     = DEBUG Area 3
 @level    = 80
