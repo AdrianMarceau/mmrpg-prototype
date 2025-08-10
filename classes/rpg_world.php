@@ -12,6 +12,17 @@ class rpg_world {
     public static function init_session(){
         //error_log('rpg_world::init_session() called!');
         if (!isset($_SESSION['WORLD'])){ $_SESSION['WORLD'] = array(); }
+        $WORLD_SESSION = &$_SESSION['WORLD'];
+        // Predefine any missing world session variables so they're available
+        if (!isset($WORLD_SESSION['player_sessions'])){ $WORLD_SESSION['player_sessions'] = array(); }
+        if (!isset($WORLD_SESSION['robot_sessions'])){ $WORLD_SESSION['robot_sessions'] = array(); }
+        if (!isset($WORLD_SESSION['world_maps'])){ $WORLD_SESSION['world_maps'] = array(); }
+        if (!isset($WORLD_SESSION['world_buttons'])){ $WORLD_SESSION['world_buttons'] = array(); }
+        if (!isset($WORLD_SESSION['world_switches'])){ $WORLD_SESSION['world_switches'] = array(); }
+        if (!isset($WORLD_SESSION['world_encounters'])){ $WORLD_SESSION['world_encounters'] = array(); }
+        // ...as well as any nested variables inside those parent arrays
+        if (!isset($WORLD_SESSION['player_sessions']['last_player'])){ $WORLD_SESSION['player_sessions']['last_player'] = ''; }
+        // Return true now that we're done preparing the session
         return true;
     }
 
