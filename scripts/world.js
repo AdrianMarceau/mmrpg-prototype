@@ -2457,11 +2457,15 @@ class mmrpgWorldMap {
                     }
                 let curDir = $mecha.attr('data-dir') || 'right';
                 let newDir = curDir === 'right' ? 'left' : 'right';
+                let curFrame = $mecha.attr('data-frame') || '00';
+                let newFrame = curFrame !== '01' ? '01' : '00';
                 let hasMarch = $mecha.hasClass('march');
                 let changed = false;
                 let changeDirection = Math.random() > 0.5 ? true : false;
+                let changeFrame = Math.random() > 0.9 ? true : false;
                 //let changeMarch = Math.random() > 0.5 ? true : false;
                 if (changeDirection){ $mecha.attr('data-dir', newDir); changed = true; }
+                if (changeFrame){ $mecha.attr('data-frame', newFrame); changed = true; }
                 //if (changeMarch){ $mecha.addClass('march'); changed = true; }
                 if (!changed){ return true; }
                 let randCooldown = 4 + Math.ceil(Math.random() * 6);
