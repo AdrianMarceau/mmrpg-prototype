@@ -3,16 +3,107 @@
  * Mega Man RPG World
  * <p>The global world (map) class for the Mega Man RPG Prototype.</p>
  */
+
+// Define the constants that will be used in the class and maybe elsewhere
+define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
+define('MMRPG_WORLD_DEFAULT_TILESIZE', 80);
+define('MMRPG_WORLD_DEFAULT_SPRITESITE', 40);
+define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 3); // TODO: make this dependant on limit hearts
+define('MMRPG_WORLD_DEFAULT_MOBILITY', 1); // TODO: make this dependant on player skill
+define('MMRPG_WORLD_DEFAULT_BASEPATH', '/');
+
+// Define the actual RPG_WORLD class that uses the above constants and methods
 class rpg_world {
+
+    // -- PREDEFINED CONSTANTS -- //
+
+    // Define the defaults for this class
+    static $worldmap_mapsize = MMRPG_WORLD_DEFAULT_MAPSIZE;
+    static $worldmap_tilesize = MMRPG_WORLD_DEFAULT_TILESIZE;
+    static $worldmap_spritesize = MMRPG_WORLD_DEFAULT_SPRITESITE;
+    static $worldmap_basedir = MMRPG_CONFIG_ROOTDIR;
+    static $worldmap_baseurl = MMRPG_CONFIG_ROOTURL;
+    static $worldmap_basepath = MMRPG_WORLD_DEFAULT_BASEPATH;
+
+    // Define functions for manually setting the map constants for this class
+    public static function set_mapsize($mapsize){
+        //error_log('rpg_world::set_mapsize() called!');
+        if (empty($mapsize) || !is_numeric($mapsize)){ return false; }
+        self::$worldmap_mapsize = intval($mapsize);
+        //error_log('set map size to "'.self::$worldmap_mapsize.'"');
+        return true;
+    }
+    public static function set_tilesize($tilesize){
+        //error_log('rpg_world::set_tilesize() called!');
+        if (empty($tilesize) || !is_numeric($tilesize)){ return false; }
+        self::$worldmap_tilesize = intval($tilesize);
+        //error_log('set map tile size to "'.self::$worldmap_tilesize.'"');
+        return true;
+    }
+    public static function set_spritesize($spritesize){
+        //error_log('rpg_world::set_spritesize() called!');
+        if (empty($spritesize) || !is_numeric($spritesize)){ return false; }
+        self::$worldmap_spritesize = intval($spritesize);
+        //error_log('set map sprite size to "'.self::$worldmap_spritesize.'"');
+        return true;
+    }
+    public static function set_basepath($basepath){
+        //error_log('rpg_world::set_basepath() called!');
+        if (empty($basepath) || !is_string($basepath)){ return false; }
+        $basepath = trim($basepath, '/').'/';
+        self::$worldmap_basepath = $basepath;
+        //error_log('set map base path to "'.self::$worldmap_basepath.'"');
+        return true;
+    }
+
+    // -- CONTENT INDEXES -- //
 
     // Define the static variables for this class
     static $mmrpg_indexes = array();
 
+    // Define a function for getting a specific index loaded into this class
+    public static function get_index($kind){
+        //error_log('rpg_world::get_index() called!');
+        if (empty($kind) || !isset(self::$mmrpg_indexes[$kind])){ false; }
+        elseif (empty(self::$mmrpg_indexes[$kind])){ return array(); }
+        return self::$mmrpg_indexes[$kind];
+    }
+
+    // Define a function for getting the indexes loaded into this class
+    public static function get_indexes(){
+        //error_log('rpg_world::get_indexes() called!');
+        if (!isset(self::$mmrpg_indexes)){ return false; }
+        elseif (empty(self::$mmrpg_indexes)){ return array(); }
+        return self::$mmrpg_indexes;
+    }
+
+    // Define a function for preloading indexes into this class
+    public static function preload_indexes($indexes = array()){
+        //error_log('rpg_world::preload_indexes() called!');
+        if (empty($indexes) || !is_array($indexes)){ return false; }
+        // Loop through the indexes and add them to the static variable
+        foreach ($indexes AS $kind => $index){
+            if (empty($kind) || empty($index) || !is_array($index)){ continue; }
+            self::$mmrpg_indexes[$kind] = $index;
+            //error_log('loaded index for "'.$kind.'" with '.count($index).' items');
+        }
+        return true;
+    }
+
+    // -- WORLD SESSION METHODS -- //
+
+    // Define a function for getting the world session token
+    public static function session_token(){
+        //error_log('rpg_world::session_token() called!');
+        return 'WORLD';
+    }
+
     // Define a function for initializing the world session if not exists yet
     public static function init_session(){
         //error_log('rpg_world::init_session() called!');
-        if (!isset($_SESSION['WORLD'])){ $_SESSION['WORLD'] = array(); }
-        $WORLD_SESSION = &$_SESSION['WORLD'];
+        $session_token = self::session_token();
+        if (!isset($_SESSION[$session_token])){ $_SESSION[$session_token] = array(); }
+        $WORLD_SESSION = &$_SESSION[$session_token];
         // Predefine any missing world session variables so they're available
         if (!isset($WORLD_SESSION['player_sessions'])){ $WORLD_SESSION['player_sessions'] = array(); }
         if (!isset($WORLD_SESSION['robot_sessions'])){ $WORLD_SESSION['robot_sessions'] = array(); }
@@ -24,12 +115,6 @@ class rpg_world {
         if (!isset($WORLD_SESSION['player_sessions']['last_player'])){ $WORLD_SESSION['player_sessions']['last_player'] = ''; }
         // Return true now that we're done preparing the session
         return true;
-    }
-
-    // Define a function for getting the world session token
-    public static function session_token(){
-        //error_log('rpg_world::session_token() called!');
-        return 'WORLD';
     }
 
     // Define a function for getting the current world session
@@ -66,14 +151,15 @@ class rpg_world {
     // Define a function for saving the current world session
     public static function update_session(){
         //error_log('rpg_world::update_session() called!');
+        $session_token = self::session_token();
         $args = func_get_args();
         if (count($args) < 2) { return false; }
         $value = array_pop($args);
         $keys  = $args;
         foreach ($keys as $k){ if (empty($k) || !is_string($k)) { return false; } }
         if (empty($value) || !is_array($value)) { return false; }
-        if (!isset($_SESSION['WORLD'])){ $_SESSION['WORLD'] = array(); }
-        $ref =& $_SESSION['WORLD'];
+        if (!isset($_SESSION[$session_token])){ $_SESSION[$session_token] = array(); }
+        $ref =& $_SESSION[$session_token];
         foreach ($keys as $k){
             if (!isset($ref[$k]) || !is_array($ref[$k])) { $ref[$k] = array(); }
             $ref =& $ref[$k];
@@ -103,38 +189,17 @@ class rpg_world {
         return true;
     }
 
-    // Define a function for loading indexes into this class
-    public static function load_indexes($indexes = array()){
-        //error_log('rpg_world::load_indexes() called!');
-        if (empty($indexes) || !is_array($indexes)){ return false; }
-        // Loop through the indexes and add them to the static variable
-        foreach ($indexes AS $kind => $index){
-            if (empty($kind) || empty($index) || !is_array($index)){ continue; }
-            self::$mmrpg_indexes[$kind] = $index;
-            //error_log('loaded index for "'.$kind.'" with '.count($index).' items');
-        }
-        return true;
-    }
-
-    // Define a function for getting the indexes loaded into this class
-    public static function get_indexes($kind = ''){
-        //error_log('rpg_world::get_indexes() called!');
-        if (empty(self::$mmrpg_indexes)){ return array(); }
-        if (empty($kind)){ return self::$mmrpg_indexes; }
-        if (!isset(self::$mmrpg_indexes[$kind])){ return array(); }
-        return self::$mmrpg_indexes[$kind];
-    }
+    // -- WORLD MAP METHODS -- //
 
     // Define a function for loading a given map's data from the filesystem
     public static function load_map_data($map_token){
         //error_log('load_map_data() called!');
-        static $map_basedir = MMRPG_CONFIG_ROOTDIR.MMRPG_WORLD_MAPFILE_BASEPATH;
-        static $map_tilesize = MMRPG_WORLD_DEFAULT_TILESIZE;
         if (empty($map_token)){
             //error_log('load_map_data() error: missing map token!');
             return false;
             }
-        $map_filename = $map_token.'.map';
+        $map_basedir = self::$worldmap_basedir.self::$worldmap_basepath;
+        $map_filename = str_replace('__', '/', $map_token).'.map';
         $map_filedir = $map_basedir.$map_filename;
         if (!file_exists($map_filedir)){
             //error_log('load_map_data() file not found "'.$map_filedir.'"!');
@@ -178,6 +243,8 @@ class rpg_world {
         }
         //error_log('$map_data_vars = '.print_r($map_data_vars, true));
         // Review and process the map layer data
+        $map_mapsize = self::$worldmap_mapsize;
+        $map_tilesize = self::$worldmap_tilesize;
         $map_autocols = strlen($map_data_layers[0][0]);
         $map_autorows = count($map_data_layers[0]);
         $map_tiles_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
@@ -297,17 +364,17 @@ class rpg_world {
         elseif (count($map_base_size) === 3){ list($map_col_size, $map_row_size, $map_tile_width) = $map_base_size; }
         elseif (count($map_base_size) === 2){ list($map_col_size, $map_tile_width) = $map_base_size; }
         elseif (count($map_base_size) === 1){ list($map_col_size) = $map_base_size; }
-        if (!isset($map_col_size)){ $map_col_size = MMRPG_WORLD_DEFAULT_MAPSIZE; }
+        if (!isset($map_col_size)){ $map_col_size = self::$worldmap_mapsize; }
         if (!isset($map_row_size)){ $map_row_size = $map_col_size; }
-        if (!isset($map_tile_width)){ $map_tile_width = MMRPG_WORLD_DEFAULT_TILESIZE; }
+        if (!isset($map_tile_width)){ $map_tile_width = self::$worldmap_tilesize; }
         if (!isset($map_tile_height)){ $map_tile_height = $map_tile_width; }
         $map_pixel_width = $map_col_size * $map_tile_width;
         $map_pixel_height = $map_row_size * $map_tile_height;
-        $map_tilesize_default = MMRPG_WORLD_DEFAULT_TILESIZE;
+        $map_tilesize_default = self::$worldmap_tilesize;
         $map_tilesize_offset = array(0, 0);
         if ($map_tile_height > $map_tilesize_default){ $map_tilesize_offset[0] = floor(($map_tile_height - $map_tilesize_default) / 2); }
         if ($map_tile_width > $map_tilesize_default){ $map_tilesize_offset[1] = floor(($map_tile_width - $map_tilesize_default) / 2); }
-        $map_spritesize_default = MMRPG_WORLD_DEFAULT_SPRITESITE;
+        $map_spritesize_default = self::$worldmap_spritesize;
         $map_spritesize_offset = array(0, 0);
         if ($map_tile_height > $map_spritesize_default){ $map_spritesize_offset[0] = floor(($map_tile_height - $map_spritesize_default) / 2); }
         elseif ($map_tile_height < $map_spritesize_default){ $map_spritesize_offset[0] = floor(($map_spritesize_default - $map_tile_height) / 2); }
@@ -414,10 +481,10 @@ class rpg_world {
     // Define a function for loading a given sheet's data from the filesystem
     public static function load_sheet_data($sheet_token){
         //error_log('load_sheet_data() called!');
-        static $sheet_basedir = MMRPG_CONFIG_ROOTDIR.MMRPG_WORLD_MAPFILE_BASEPATH;
-        static $sheet_tilesize = MMRPG_WORLD_DEFAULT_TILESIZE;
+        $sheet_basedir = self::$worldmap_basedir.self::$worldmap_basepath;
+        $sheet_tilesize = self::$worldmap_tilesize;
         if (empty($sheet_token)){ error_log('rpg_world::load_sheet_data() error - missing sheet token!'); return false; }
-        $sheet_filename = $sheet_token.'.sheet';
+        $sheet_filename = str_replace('__', '/', $sheet_token).'.sheet';
         $sheet_filedir = $sheet_basedir.$sheet_filename;
         if (!file_exists($sheet_filedir)){ error_log('rpg_world::load_sheet_data() error - file not found "'.$sheet_filedir.'"!'); return false; }
         $sheet_data_raw = file_get_contents($sheet_filedir);
@@ -532,8 +599,8 @@ class rpg_world {
     public static function get_map_encounter_cells($map_data){
         //error_log('rpg_world::get_map_encounter_cells() called!');
         // First we gather the map col and row size so we can generate all possible positions
-        $map_col_size = isset($map_data['size'][0]) ? $map_data['size'][0] : MMRPG_WORLD_DEFAULT_MAPSIZE;
-        $map_row_size = isset($map_data['size'][1]) ? $map_data['size'][1] : MMRPG_WORLD_DEFAULT_MAPSIZE;
+        $map_col_size = isset($map_data['size'][0]) ? $map_data['size'][0] : self::$worldmap_mapsize;
+        $map_row_size = isset($map_data['size'][1]) ? $map_data['size'][1] : self::$worldmap_mapsize;
         $available_cells = array();
         for ($row = 1; $row <= $map_row_size; $row++){
             for ($col = 1; $col <= $map_col_size; $col++){
@@ -642,8 +709,8 @@ class rpg_world {
         //error_log('rpg_world::generate_worldmap_encounters() called!');
 
         // Collect any indexes we're gonna need for this part
-        $mmrpg_index_robots = self::get_indexes('robots');
-        $mmrpg_index_fields = self::get_indexes('fields');
+        $mmrpg_index_robots = self::get_index('robots');
+        $mmrpg_index_fields = self::get_index('fields');
 
         // Collect the map's field token and mecha encounters
         $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : 'undefined';
@@ -984,7 +1051,7 @@ class rpg_world {
         $cursor_label = $get_label_span('Prε', 'cursor');
         $cursor_types = 'type explode';
         //$return_markup .= ('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
-        $mmrpg_index_players = self::get_indexes('players');
+        $mmrpg_index_players = self::get_index('players');
         foreach ($player_tokens AS $player_key => $player_token){
             if ($player_token === 'player' || empty($mmrpg_index_players[$player_token])){ continue; }
             $player_info = $mmrpg_index_players[$player_token];
@@ -1008,7 +1075,7 @@ class rpg_world {
         $return_markup = '';
         $WORLD_SESSION = self::get_session();
         $WORLD_ROBOT_SESSIONS = &$WORLD_SESSION['robot_sessions'];
-        $mmrpg_index_robots = self::get_indexes('robots');
+        $mmrpg_index_robots = self::get_index('robots');
         $current_player_token = $this_prototype_data['this_player_token'];
         $player_starforce = rpg_game::starforce_unlocked();
         $get_rating_token = function($percent){
@@ -1121,7 +1188,7 @@ class rpg_world {
         //error_log('rpg_world::get_background_layer_sprite() called!');
         // BACKGROUND LAYER
         $background_sprites = array();
-        $mmrpg_index_fields = self::get_indexes('fields');
+        $mmrpg_index_fields = self::get_index('fields');
         $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
         $map_field_info = !empty($mmrpg_index_fields[$map_field_token]) ? $mmrpg_index_fields[$map_field_token] : array();
         $map_field_background = !empty($map_field_info['field_background']) ? $map_field_info['field_background'] : 'field';
@@ -1423,7 +1490,7 @@ class rpg_world {
         $teams_markup[] = $get_team_sprites($team_sprites, $team_position, 'team', $team_direction);
         // Loop through the other allowed players to see if any are also on this map
         $rival_symbols = array();
-        $mmrpg_index_players = self::get_indexes('players');
+        $mmrpg_index_players = self::get_index('players');
         $world_player_sessions = !empty($WORLD_SESSION['player_sessions']) ? $WORLD_SESSION['player_sessions'] : array();
         $allowed_player_tokens = !empty($world_player_sessions['allowed']) ? $world_player_sessions['allowed'] : array_keys($world_player_sessions);
         foreach ($allowed_player_tokens AS $pkey => $ptoken){
@@ -1462,6 +1529,8 @@ class rpg_world {
         $teams_markup[] = '<script data-json="rivalSymbols" type="application/json">'.$rival_symbols_json.'</script>';
         return implode(PHP_EOL, $teams_markup);
     }
+
+    // -- MISC HELPER METHODS -- //
 
     // Define a function for generating a perspective matrix (given known values) for world map positioning
     public static function get_perspective_matrix($dimensions, $transform = array()){

@@ -24,33 +24,51 @@ if (!empty($_REQUEST['reset'])
     exit();
 }
 
-// Define some constants for the world map
-define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
-define('MMRPG_WORLD_DEFAULT_TILESIZE', 80);
-define('MMRPG_WORLD_DEFAULT_SPRITESITE', 40);
-define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 3); // TODO: make this dependant on limit hearts
-define('MMRPG_WORLD_DEFAULT_MOBILITY', 1); // TODO: make this dependant on player skill
-define('MMRPG_WORLD_MAPFILE_BASEPATH', 'prototype/worldmaps/');
+// Preset critical world-map constants before we do anything else
+$mapfile_basepath = 'prototype/worldmaps/';
+rpg_world::set_basepath($mapfile_basepath);
 
 // Collect the game session token in case we need it later
-$session_token = rpg_game::session_token();
+$game_session_token = rpg_game::session_token();
+$GAME_SESSION = &$_SESSION[$game_session_token];
 
 // Define a reference object for storing temporary world data
 rpg_world::init_session();
-$WORLD_SESSION = &$_SESSION['WORLD'];
+$world_session_token = rpg_world::session_token();
+$WORLD_SESSION = &$_SESSION[$world_session_token];
 
 // Define defaults and allowed values for the prototype world data
-$existing_sheet_files = glob(MMRPG_CONFIG_ROOTDIR.MMRPG_WORLD_MAPFILE_BASEPATH.'*.sheet');
-$existing_map_files = glob(MMRPG_CONFIG_ROOTDIR.MMRPG_WORLD_MAPFILE_BASEPATH.'*.map');
-$allowed_sheet_tokens = array_map(function($path){ return preg_replace('/\.sheet$/i', '', basename($path)); }, $existing_sheet_files);
-$allowed_map_tokens = array_map(function($path){ return preg_replace('/\.map$/i', '', basename($path)); }, $existing_map_files);
-//error_log('$existing_sheet_files = '. print_r($existing_sheet_files, true));
-//error_log('$existing_map_files = '. print_r($existing_map_files, true));
+//error_log('scanning for existing worldmap files ...');
+$allowed_sheet_tokens = array();
+$allowed_map_tokens = array();
+$mapfile_basedir = rpg_world::$worldmap_basedir.rpg_world::$worldmap_basepath;
+$mapfile_subdirs = glob($mapfile_basedir.'*', GLOB_ONLYDIR);
+//error_log('$mapfile_basedir = '. print_r($mapfile_basedir, true));
+//error_log('$mapfile_subdirs = '. print_r($mapfile_subdirs, true));
+$existing_map_files = glob($mapfile_basedir.'*.map');
+$existing_sheet_files = glob($mapfile_basedir.'*.sheet');
+//error_log('$existing_map_files(base) = '. print_r($existing_map_files, true));
+//error_log('$existing_sheet_files(base) = '. print_r($existing_sheet_files, true));
+if (!empty($mapfile_subdirs)){
+    foreach ($mapfile_subdirs AS $key => $path){
+        $path = rtrim($path, '/').'/';
+        $sub_map_files = glob($path.'*.map');
+        $sub_sheet_files = glob($path.'*.sheet');
+        //error_log('$sub_map_files = '. print_r($sub_map_files, true));
+        //error_log('$sub_sheet_files = '. print_r($sub_sheet_files, true));
+        if (!empty($sub_map_files)){ $existing_map_files = array_merge($existing_map_files, $sub_map_files); }
+        if (!empty($sub_sheet_files)){ $existing_sheet_files = array_merge($existing_sheet_files, $sub_sheet_files); }
+    }
+}
+//error_log('$existing_map_files(w/subs) = '. print_r($existing_map_files, true));
+//error_log('$existing_sheet_files(w/subs) = '. print_r($existing_sheet_files, true));
+$allowed_sheet_tokens = array_map(function($path)use($mapfile_basedir){ return str_replace('/', '__', preg_replace('/\.sheet$/i', '', str_replace($mapfile_basedir, '', $path))); }, $existing_sheet_files);
+$allowed_map_tokens = array_map(function($path)use($mapfile_basedir){ return str_replace('/', '__', preg_replace('/\.map$/i', '', str_replace($mapfile_basedir, '', $path))); }, $existing_map_files);
 //error_log('$allowed_sheet_tokens = '. print_r($allowed_sheet_tokens, true));
 //error_log('$allowed_map_tokens = '. print_r($allowed_map_tokens, true));
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
 array_unshift($allowed_player_tokens, 'player'); // always allow the "player" token
-$default_world_token = 'debug-area-1';
+$default_world_token = 'debug__debug-area-1';
 $default_player_token = 'player';
 $default_world_position = '';
 $default_world_direction = '';
@@ -131,7 +149,7 @@ $mmrpg_indexes = array(
     'abilities' => &$mmrpg_index_abilities,
     'items' => &$mmrpg_index_items,
     );
-rpg_world::load_indexes($mmrpg_indexes);
+rpg_world::preload_indexes($mmrpg_indexes);
 
 // Define the default prototype data fields and values so we don't get errors
 $this_prototype_data = array();
@@ -265,9 +283,9 @@ if (count($map_base_size) === 4){ list($map_col_size, $map_row_size, $map_tile_w
 elseif (count($map_base_size) === 3){ list($map_col_size, $map_row_size, $map_tile_width) = $map_base_size; }
 elseif (count($map_base_size) === 2){ list($map_col_size, $map_tile_width) = $map_base_size; }
 elseif (count($map_base_size) === 1){ list($map_col_size) = $map_base_size; }
-if (!isset($map_col_size)){ $map_col_size = MMRPG_WORLD_DEFAULT_MAPSIZE; }
+if (!isset($map_col_size)){ $map_col_size = rpg_world::$default_mapsize; }
 if (!isset($map_row_size)){ $map_row_size = $map_col_size; }
-if (!isset($map_tile_width)){ $map_tile_width = MMRPG_WORLD_DEFAULT_TILESIZE; }
+if (!isset($map_tile_width)){ $map_tile_width = rpg_world::$default_tilesize; }
 if (!isset($map_tile_height)){ $map_tile_height = $map_tile_width; }
 $map_pixel_width = $map_col_size * $map_tile_width;
 $map_pixel_height = $map_row_size * $map_tile_height;
