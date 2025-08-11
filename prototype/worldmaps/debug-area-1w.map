@@ -7,7 +7,7 @@
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
 @field    = maniacal-hideaway
-@mechas   = drill-mole,molier,rockscotch
+@encounters   = drill-mole,molier,rockscotch
 #---------------------------#
 @portals[]  = spawn(17-4, hidden)
 @portals[]  = goto__debug-area-1(17-4)
