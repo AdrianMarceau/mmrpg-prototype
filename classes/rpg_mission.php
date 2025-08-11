@@ -55,7 +55,7 @@ class rpg_mission {
         $battle_omega['battle_description2'] = !empty($battle_config['description2']) ? $battle_config['description2'] : '';
         $battle_omega['battle_field_base'] = array(); //$battle_config['field'] || array();
         $battle_omega['battle_target_player'] = array(); //$battle_config['target'] || array();
-        $battle_omega['battle_rewards'] = array(); //$battle_config['rewards'] || array();
+        $battle_omega['battle_rewards'] = !empty($battle_config['rewards']) ? $battle_config['rewards'] : array();
         $battle_omega['battle_turns'] = !empty($battle_config['turns']) ? $battle_config['turns'] : 0;
         $battle_omega['battle_zenny'] = !empty($battle_config['zenny']) ? $battle_config['zenny'] : 0;
         $battle_omega['battle_complete'] = isset($battle_config['complete']) ? $battle_config['complete'] : false;
