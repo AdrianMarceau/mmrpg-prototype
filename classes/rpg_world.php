@@ -242,8 +242,9 @@ class rpg_world {
         $map_data_vars['field'] = isset($map_data_vars['field']) ? $map_data_vars['field'] : '';
         $map_data_vars['terrain'] = isset($map_data_vars['terrain']) ? $map_data_vars['terrain'] : array();
         $map_data_vars['encounters'] = isset($map_data_vars['encounters']) ? $map_data_vars['encounters'] : '';
-        $map_data_vars['masters'] = isset($map_data_vars['masters']) ? $map_data_vars['masters'] : '';
         $map_data_vars['habitats'] = isset($map_data_vars['habitats']) ? $map_data_vars['habitats'] : array();
+        $map_data_vars['mechas'] = isset($map_data_vars['mechas']) ? $map_data_vars['mechas'] : array();
+        $map_data_vars['masters'] = isset($map_data_vars['masters']) ? $map_data_vars['masters'] : array();
         $map_data_vars['bosses'] = isset($map_data_vars['bosses']) ? $map_data_vars['bosses'] : array();
         if (empty($map_data_vars['token'])){ $map_data_vars['token'] = $map_token; }
         if (empty($map_data_vars['name'])){ $map_data_vars['name'] = 'Undefined'; }
@@ -255,7 +256,6 @@ class rpg_world {
         if (!isset($map_data_vars['size'][2])){ $map_data_vars['size'][2] = $map_tilesize; }
         if (empty($map_data_vars['field'])){ $map_data_vars['field'] = 'field'; }
         if (!empty($map_data_vars['encounters'])){ $map_data_vars['encounters'] = explode(',', str_replace(' ', '', $map_data_vars['encounters'])); }
-        if (!empty($map_data_vars['masters'])){ $map_data_vars['masters'] = explode(',', str_replace(' ', '', $map_data_vars['masters'])); }
         $map_data_vars['tiles'] = $map_custval_parser($map_data_vars['tiles'], true);
         $map_data_vars['groups'] = $map_custval_parser($map_data_vars['groups']);
         $map_data_vars['sprites'] = $map_custval_parser($map_data_vars['sprites']);
@@ -264,6 +264,8 @@ class rpg_world {
         $map_data_vars['switches'] = $map_custval_parser($map_data_vars['switches']);
         $map_data_vars['terrain'] = $map_custval_parser($map_data_vars['terrain']);
         $map_data_vars['habitats'] = $map_custval_parser($map_data_vars['habitats']);
+        $map_data_vars['mechas'] = $map_custval_parser($map_data_vars['mechas']);
+        $map_data_vars['masters'] = $map_custval_parser($map_data_vars['masters']);
         $map_data_vars['bosses'] = $map_custval_parser($map_data_vars['bosses']);
         // Add collected data to the parsed map data
         $map_data_parsed = array();
@@ -281,8 +283,9 @@ class rpg_world {
         $map_data_parsed['field'] = $map_data_vars['field']; unset($map_data_vars['field']);
         $map_data_parsed['terrain'] = $map_data_vars['terrain']; unset($map_data_vars['terrain']);
         $map_data_parsed['encounters'] = $map_data_vars['encounters']; unset($map_data_vars['encounters']);
-        $map_data_parsed['masters'] = $map_data_vars['masters']; unset($map_data_vars['masters']);
         $map_data_parsed['habitats'] = $map_data_vars['habitats']; unset($map_data_vars['habitats']);
+        $map_data_parsed['mechas'] = $map_data_vars['mechas']; unset($map_data_vars['mechas']);
+        $map_data_parsed['masters'] = $map_data_vars['masters']; unset($map_data_vars['masters']);
         $map_data_parsed['bosses'] = $map_data_vars['bosses']; unset($map_data_vars['bosses']);
         //$map_data_parsed['tiles']['keys'] = array_keys($map_data_parsed['tiles']);
         $map_data_parsed['layers'] = $map_data_layers;
@@ -640,13 +643,28 @@ class rpg_world {
         //error_log('$map_field_foreground = '.print_r($map_field_foreground, true));
         //error_log('$map_field_music = '.print_r($map_field_music, true));
 
+        // Define a quick matrix for the turns and zenny values per class
+        $rewards_matrix = array(
+            'mecha' => array('turns' => MMRPG_SETTINGS_BATTLETURNS_PERMECHA, 'zenny' => MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2),
+            'master' => array('turns' => MMRPG_SETTINGS_BATTLETURNS_PERROBOT, 'zenny' => MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL),
+            'boss' => array('turns' => MMRPG_SETTINGS_BATTLETURNS_PERBOSS, 'zenny' => MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL0)
+            );
+
+        // Define a quick matrix for the level-range values per class
+        //$robot_level = mt_rand(ceil($map_level * 1.2), ceil($map_level * 1.4));
+        $levels_matrix = array(
+            'mecha' => array('min' => ceil($map_level * 0.6), 'max' => ceil($map_level * 0.8)),
+            'master' => array('min' => ceil($map_level * 0.9), 'max' => ceil($map_level * 1.1)),
+            'boss' => array('min' => ceil($map_level * 1.2), 'max' => ceil($map_level * 1.4))
+            );
+
         // Calculate the available encounter cells based on the map data and define a var to hold used encounter cells later
         $world_map_encounters = array();
         $available_encounter_cells = self::get_map_encounter_cells($map_data_parsed);
         $available_encounter_terrain = !empty($map_data_parsed['terrain']) ? $map_data_parsed['terrain'] : array();
         $used_encounter_cells = array();
 
-        // RANDOM ENCOUNTERS (w/ Mecha Support)
+        // RANDOM ENCOUNTERS (within defined limits)
         $allowed_random_encounters = $map_encounters;
         $max_random_encounters = ceil($available_encounter_cells['total'] * 0.25);
         $allowed_held_items = array();
@@ -656,6 +674,10 @@ class rpg_world {
         if ($map_level >= 40){ $allowed_held_items += array('attack-capsule', 'defense-capsule', 'speed-capsule'); }
         if ($map_level >= 50){ $allowed_held_items += array('energy-tank', 'weapon-tank'); }
         if ($map_level >= 100){ $allowed_held_items += array('extra-life', 'yashichi'); }
+        $get_random_allowed_item = function() use ($allowed_held_items){
+            if (empty($allowed_held_items)){ return ''; }
+            return $allowed_held_items[mt_rand(0, count($allowed_held_items) - 1)];
+            };
         //error_log('$allowed_random_encounters = '.print_r($allowed_random_encounters, true));
         //error_log('$available_encounter_terrain = '.print_r($available_encounter_terrain, true));
         //error_log('$available_encounter_cells = '.print_r($available_encounter_cells, true));
@@ -679,14 +701,14 @@ class rpg_world {
         //error_log('$ratios_sum = '.print_r($ratios_sum, true).PHP_EOL);
         //error_log('$max_random_encounters = '.print_r($max_random_encounters, true).PHP_EOL);
         //error_log('$distributed_encounters = '.print_r($distributed_encounters, true).PHP_EOL);
-        $mecha_token = '';
-        for ($mecha_key = 0; $mecha_key < $max_random_encounters; $mecha_key++){
+        $robot_token = '';
+        for ($robot_key = 0; $robot_key < $max_random_encounters; $robot_key++){
             if (empty($options)){ $options = array_keys($distributed_encounters); }
-            if (empty($mecha_token)){ $mecha_token = array_shift($options); }
-            if (!isset($generated_encounters[$mecha_token])){ $generated_encounters[$mecha_token] = 0; }
-            //error_log(PHP_EOL.'-> next mecha = "'.$mecha_token.'"');
-            $habitats = !empty($map_habitats[$mecha_token]) ? $map_habitats[$mecha_token] : '';
-            //error_log('-> getting random position for robot "'.$mecha_token.'" (habitats: '.print_r(implode(',', $habitats), true).')');
+            if (empty($robot_token)){ $robot_token = array_shift($options); }
+            if (!isset($generated_encounters[$robot_token])){ $generated_encounters[$robot_token] = 0; }
+            //error_log(PHP_EOL.'-> next robot = "'.$robot_token.'"');
+            $habitats = !empty($map_habitats[$robot_token]) ? $map_habitats[$robot_token] : '';
+            //error_log('-> getting random position for robot "'.$robot_token.'" (habitats: '.print_r(implode(',', $habitats), true).')');
             $available = array();
             if (!empty($habitats)){
                 $by_terrain = $available_encounter_cells['by_terrain'];
@@ -698,96 +720,112 @@ class rpg_world {
             if (empty($available)){ $available = $available_encounter_cells['all']; }
             //error_log('$available = '.print_r($available, true));
             //error_log('$available(count) = '.count($available).' vs. $used_encounter_cells(count) = '.count($used_encounter_cells));
-            $mecha_pos = self::get_rand_pos($available, $used_encounter_cells);
-            if (!$mecha_pos){ continue; } // means there's no more room for this type!!!
-            $mecha_pos_terrain = self::get_map_position_terrain($mecha_pos, $map_data_parsed);
-            //error_log('$mecha_pos = '.print_r($mecha_pos, true));
-            //error_log('$mecha_pos_terrain = '.print_r($mecha_pos_terrain, true));
+            $robot_pos = self::get_rand_pos($available, $used_encounter_cells);
+            if (!$robot_pos){ continue; } // means there's no more room for this type!!!
+            $robot_pos_terrain = self::get_map_position_terrain($robot_pos, $map_data_parsed);
+            //error_log('$robot_pos = '.print_r($robot_pos, true));
+            //error_log('$robot_pos_terrain = '.print_r($robot_pos_terrain, true));
             //error_log('$battle_background = '.print_r($battle_background, true));
             //error_log('$battle_foreground = '.print_r($battle_foreground, true));
-            $mecha_info = $mmrpg_index_robots[$mecha_token];
-            $mecha_level = mt_rand($map_level, ceil($map_level * 1.5));
-            // pick random item from $allowed_held_items w/ 50% chance
-            $mecha_item = '';
-            if (!empty($allowed_held_items) && mt_rand(1, 100) <= 50){
-                $mecha_item = $allowed_held_items[mt_rand(0, count($allowed_held_items) - 1)];
-                }
-            $mecha_label = $mecha_info['robot_name'].' (Lv. '.$mecha_level.')';
-            $battle_token = 'world-battle_'.$map_token.'_mecha-'.($mecha_key + 1);
-            $battle_name = $map_name.' Mecha Battle';
+            $robot_info = $mmrpg_index_robots[$robot_token];
+            $robot_class = $robot_info['robot_class'];
+            $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']);
+            $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
+            $robot_label = $robot_info['robot_name'].' (Lv. '.$robot_level.')';
+            $battle_token = 'world-battle_'.$map_token.'_random-robot-'.($robot_key + 1);
+            $battle_name = $map_name.' '.ucfirst($robot_class).' Battle';
+            $battle_description = 'This is a debug '.$robot_class.' battle.  It is casual fun.';
             $battle_background = $map_field_token;
-            $battle_foreground = !empty($available_encounter_terrain[$mecha_pos_terrain]) ? $available_encounter_terrain[$mecha_pos_terrain][0] : $map_field_token;
+            $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
             $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
-            $world_map_encounters[] = array('robot/mecha', $mecha_token, '', $mecha_pos, $battle_token, $mecha_label);
+            $world_map_encounters[] = array('robot/'.$robot_class, $robot_token, '', $robot_pos, $battle_token, $robot_label);
             $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
                 'token' => $battle_token,
                 'name' => $battle_name,
-                'description' => 'This is a debug mecha battle.  It is casual fun.',
-                'turns' => MMRPG_SETTINGS_BATTLETURNS_PERMECHA, // mecha value
-                'zenny' => MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL2, // mecha value
+                'description' => $battle_description,
+                'turns' => $rewards_matrix[$robot_class]['turns'],
+                'zenny' => $rewards_matrix[$robot_class]['zenny'],
                 'field' => $battle_field,
                 'target' => array('robots' => array(array(
-                    'token' => $mecha_token,
-                    'level' => $mecha_level,
-                    'item' => $mecha_item,
+                    'token' => $robot_token,
+                    'level' => $robot_level,
+                    'item' => $robot_item,
                     ))),
                 'flags' => array(
                     'world_battle' => true,
                     'remove_on_complete' => true
                     ),
                 ), true);
-            $generated_encounters[$mecha_token]++;
-            $distributed_encounters[$mecha_token]--;
-            if (empty($distributed_encounters[$mecha_token])){ $mecha_token = ''; }
+            $generated_encounters[$robot_token]++;
+            $distributed_encounters[$robot_token]--;
+            if (empty($distributed_encounters[$robot_token])){ $robot_token = ''; }
         }
         //error_log'$generated_encounters = '.print_r($generated_encounters, true).PHP_EOL);
         //echo('</pre>'.PHP_EOL);
         //exit();
 
-        // STATIC ENCOUNTERS (w/ Fortress Bosses)
-        if (!empty($map_data_parsed['bosses'])){
-            $map_bosses = $map_data_parsed['bosses'];
-            //error_log('$map_bosses = '.print_r($map_bosses, true));
-            foreach ($map_bosses AS $boss_key => $boss_data){
-                //error_log('-> next $boss_key = '.print_r($boss_key, true));
-                //error_log('-> next $boss_data = '.print_r($boss_data, true));
-                //error_log('-> next $boss_key = '.$boss_key.PHP_EOL.'---> w/ $boss_data = '.print_r($boss_data, true));
-                $boss_pos = $boss_data[0]; unset($boss_data[0]);
-                $boss_token = !empty($boss_data[1]) ? $boss_data[1] : 'robot'; unset($boss_data[1]);
-                $form = !empty($boss_data[2]) ? $boss_data[2] : ''; unset($boss_data[2]);
-                $effect = !empty($boss_data[3]) ? $boss_data[3] : ''; unset($boss_data[3]);
-                $target = !empty($boss_data[4]) ? $boss_data[4] : ''; unset($boss_data[4]);
-                $value = !empty($boss_data[5]) ? $boss_data[5] : ''; unset($boss_data[5]);
-                //error_log('-> $boss_pos = '.print_r($boss_pos, true));
-                //error_log('-> $boss_token = '.print_r($boss_token, true));
-                //error_log('-> $form = '.print_r($form, true));
-                //error_log('-> $effect = '.print_r($effect, true));
-                //error_log('-> $target = '.print_r($target, true));
-                //error_log('-> $value = '.print_r($value, true));
-                //error_log('-> next boss = "'.$boss_token.'" (key: '.$boss_key.')');
-                $boss_pos_terrain = rpg_world::get_map_position_terrain($boss_pos, $map_data_parsed);
-                $boss_info = $mmrpg_index_robots[$boss_token];
-                //error_log('-> $boss_info = '.print_r($boss_info, true));
-                $boss_level = mt_rand(11, 20);
-                $boss_label = $boss_info['robot_name'].' (Lv. '.$boss_level.')';
-                $battle_token = 'world-battle_'.$map_token.'_boss-'.($boss_key + 1);
-                $battle_name = $map_name.' Boss Battle';
-                $battle_background = $map_field_token;
-                $battle_foreground = !empty($available_encounter_terrain[$boss_pos_terrain]) ? $available_encounter_terrain[$boss_pos_terrain][0] : $map_field_token;
-                $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
-                $world_map_encounters[] = array('robot/boss', $boss_token, '', $boss_pos, $battle_token, $boss_label);
-                //error_log('-> generating boss battle "'.$battle_token.'" ('.$battle_name.')');
-                $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
-                    'token' => $battle_token,
-                    'name' => $battle_name,
-                    'description' => 'This is a debug boss battle.  It is very serious.',
-                    'turns' => MMRPG_SETTINGS_BATTLETURNS_PERBOSS, // boss value
-                    'zenny' => MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL0, // boss value
-                    'field' => $battle_field,
-                    'target' => array('robots' => array(array('token' => $boss_token, 'level' => $boss_level))),
-                    'flags' => array('world_battle' => true, 'remove_on_complete' => true),
-                    ), true);
-                //error_log('-> $battle_omega = '.print_r($battle_omega, true));
+        // STATIC ENCOUNTERS (w/ Mechas, Masters, Bosses)
+        $static_encounter_key = 0;
+        $static_encounter_types = array('mecha' => 'mechas', 'master' => 'masters', 'boss' => 'bosses');
+        foreach ($static_encounter_types AS $encounter_class => $encounter_xclass){
+            if (!empty($map_data_parsed[$encounter_xclass])){
+                $static_encounters = $map_data_parsed[$encounter_xclass];
+                //error_log('$static_encounters = '.print_r($static_encounters, true));
+                foreach ($static_encounters AS $key => $robot_data){
+                    //error_log('-> next $robot_key = '.print_r($robot_key, true));
+                    //error_log('-> next $robot_data = '.print_r($robot_data, true));
+                    //error_log('-> next $robot_key = '.$robot_key.PHP_EOL.'---> w/ $robot_data = '.print_r($robot_data, true));
+                    $robot_key = $static_encounter_key++;
+                    $robot_pos = $robot_data[0]; unset($robot_data[0]);
+                    $robot_token = !empty($robot_data[1]) ? $robot_data[1] : 'robot'; unset($robot_data[1]);
+                    $form = !empty($robot_data[2]) ? $robot_data[2] : ''; unset($robot_data[2]);
+                    $effect = !empty($robot_data[3]) ? $robot_data[3] : ''; unset($robot_data[3]);
+                    $target = !empty($robot_data[4]) ? $robot_data[4] : ''; unset($robot_data[4]);
+                    $value = !empty($robot_data[5]) ? $robot_data[5] : ''; unset($robot_data[5]);
+                    //error_log('-> $robot_pos = '.print_r($robot_pos, true));
+                    //error_log('-> $robot_token = '.print_r($robot_token, true));
+                    //error_log('-> $form = '.print_r($form, true));
+                    //error_log('-> $effect = '.print_r($effect, true));
+                    //error_log('-> $target = '.print_r($target, true));
+                    //error_log('-> $value = '.print_r($value, true));
+                    //error_log('-> next '.$encounter_class.' = "'.$robot_token.'" (key: '.$robot_key.')');
+                    $robot_pos_terrain = rpg_world::get_map_position_terrain($robot_pos, $map_data_parsed);
+                    $robot_info = $mmrpg_index_robots[$robot_token];
+                    $robot_class = $robot_info['robot_class'];
+                    //error_log('-> $robot_info = '.print_r($robot_info, true));
+                    $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']);
+                    $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
+                    $robot_label = $robot_info['robot_name'].' (Lv. '.$robot_level.')';
+                    $battle_token = 'world-battle_'.$map_token.'_static-'.$robot_class.'-'.($robot_key + 1);
+                    $battle_name = $map_name.' '.ucfirst($robot_class).' Battle';
+                    $battle_background = $map_field_token;
+                    $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
+                    $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
+                    $world_map_encounters[] = array('robot/'.$robot_class, $robot_token, '', $robot_pos, $battle_token, $robot_label);
+                    $battle_rewards = array();
+                    if ($robot_class === 'master'
+                        && !mmrpg_prototype_robot_unlocked('', $robot_token)){
+                        if (!isset($battle_rewards['robots'])){ $battle_rewards['robots'] = array(); }
+                        $battle_rewards['robots'][] = array('token' => $robot_token, 'level' => $robot_level);
+                        }
+                    //error_log('-> generating '.$robot_class.' battle "'.$battle_token.'" ('.$battle_name.')');
+                    $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
+                        'token' => $battle_token,
+                        'name' => $battle_name,
+                        'description' => 'This is a debug '.$robot_class.' battle.  It is very serious.',
+                        'field' => $battle_field,
+                        'turns' => $rewards_matrix[$robot_class]['turns'],
+                        'zenny' => $rewards_matrix[$robot_class]['zenny'],
+                        'target' => array('robots' => array(array(
+                            'token' => $robot_token,
+                            'level' => $robot_level,
+                            'item' => $robot_item,
+                            ))),
+                        'flags' => array('world_battle' => true, 'remove_on_complete' => true),
+                        'rewards' => $battle_rewards,
+                        ), true);
+                    //error_log('-> $battle_omega = '.print_r($battle_omega, true));
+                }
             }
         }
 
@@ -833,7 +871,6 @@ class rpg_world {
     }
 
     // Define a quick function for getting a random position on a given grid
-    // TODO: Define this as an actual function instead of a variable
     public static function get_rand_pos($available_encounter_cells, &$used = array()){
         //error_log('rpg_world::get_rand_pos() called!');
         //static $used;
@@ -846,8 +883,7 @@ class rpg_world {
         return $pos;
     }
 
-    // Define a reusable method for the above that takes args and generates markup to return as a string
-    // TODO:  Define this as an actual function instead of a variable
+    // Define a reusable function for grabbing the markup for a given character sprite (player or robot)
     public static function get_sprite($kind, $token, $alt = '', $dir = 'left', $class = '', $styles = '', $attrs = ''){
         //error_log('rpg_world::get_sprite() called for "'.$kind.'" with token "'.$token.'"');
         $mmrpg_indexes = self::$mmrpg_indexes;
@@ -1262,7 +1298,8 @@ class rpg_world {
             $dir = ($col > ($map_col_size / 2)) ? 'left' : 'right';
             if (mt_rand(1, 2) === 1){ $dir = $dir !== 'left' ? 'left' : 'right'; }
             $class = 'battle vs-'.$subkind.' bounce';
-            if ($subkind === 'boss'){ $class .= ' always-zoom'; }
+            if ($subkind === 'master'){ $class .= ' always-zoom'; }
+            elseif ($subkind === 'boss'){ $class .= ' always-zoom'; }
             $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$zindex.';';
             $attrs = 'data-battle="'.$battle.'" data-label="'.$name.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
             $markup = self::get_sprite($kind, $token, $alt, $dir, $class, $style, $attrs);
