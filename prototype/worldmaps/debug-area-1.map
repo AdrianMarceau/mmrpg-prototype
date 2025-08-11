@@ -30,8 +30,12 @@
 #---------------------------#
 @buttons[]   = subspace-button(6-22, purple, up, set-group-terrain, subspace-path, subspace)
 #---------------------------#
-#@bosses[]    = test-boss(9-6, trill, attack, set-group-terrain, test-group, grass)
-@bosses[]    = subspace-boss(6-21, trill, speed, set-portal-state, goto__starter-80x80, unlocked)
+@mechas[]    = west-portal-mecha(4-8, rockscotch)
+@mechas[]    = east-portal-mecha(8-8, antlin-g)
+@mechas[]    = north-portal-mecha(6-6, frosty-throwman)
+@mechas[]    = south-portal-mecha(6-10, octone)
+#---------------------------#
+@bosses[]    = subspace-portal-boss(6-21, trill, speed)
 #---------------------------#
 [00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00]
 [00],[00],[00],[00],[00],[00],[00],[00],[00],[00],[00]
