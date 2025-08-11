@@ -375,6 +375,38 @@ class rpg_world {
                 //exit();
             }
         }
+        // Given we have all the information we need, let's actually parse the map layers into useable data now
+        if (!empty($map_data_parsed['layers'])
+            && !empty($map_data_parsed['tiles']['keys'])){
+            //error_log('Let\'s actually parse the map tiles now...');
+            //error_log('-> $map_data_parsed[\'layers\'](before) = '.print_r($map_data_parsed['layers'], true));
+            $parsed_map_layers = array();
+            $raw_map_layers = $map_data_parsed['layers'];
+            $raw_tile_keys = $map_data_parsed['tiles']['keys'];
+            //error_log('-> $raw_map_layers = '.print_r($raw_map_layers, true));
+            //error_log('-> $raw_tile_keys = '.print_r($raw_tile_keys, true));
+            foreach ($raw_map_layers AS $layer_key => $layer_tiles){
+                //error_log('--> checking $layer_key = '.print_r($layer_key, true));
+                foreach ($layer_tiles AS $row_key => $row_tiles){
+                    //error_log('---> checking $row_key = '.$row_key.' w/ $row_tiles = '.print_r($row_tiles, true));
+                    if (empty(trim($row_tiles))){ continue; }
+                    $row_tiles = explode(',', str_replace(' ', '', trim($row_tiles)));
+                    foreach ($row_tiles AS $col_key => $col_tile){
+                        //error_log('----> checking $col_key = '.$col_key.' w/ $col_tile = '.print_r($col_tile, true));
+                        if (substr($col_tile, 0, 1) === '[' && substr($col_tile, -1) === ']'){ $col_tile = substr($col_tile, 1, -1); } // remove brackets if present
+                        if (!is_numeric($col_tile)){ $col_tile = 0; } // ensure this is a numeric tile key
+                        $col_tile = intval($col_tile); // ensure this is an integer tile key
+                        $col_tile_key = isset($raw_tile_keys[$col_tile]) ? $raw_tile_keys[$col_tile] : ''; // get the tile key from the raw keys
+                        //error_log('----> parsed $col_tile '.print_r($row_tiles[$col_key], true).' => '.print_r($col_tile, true).' => '.print_r($col_tile_key, true));
+                        $parsed_map_layers[$layer_key][$row_key][$col_key] = $col_tile_key; // add the tile key to the parsed map layers
+                    }
+                    $parsed_map_layers[$layer_key][$row_key] = implode(',', $parsed_map_layers[$layer_key][$row_key]); // implode the row tiles back into a string
+                }
+                $map_data_parsed['layers'][$layer_key] = $parsed_map_layers[$layer_key]; // add the parsed layer to the map data
+            }
+            //error_log('-> $parsed_map_layers = '.print_r($parsed_map_layers, true));
+            //error_log('-> $map_data_parsed[\'layers\'](after) = '.print_r($map_data_parsed['layers'], true));
+        }
         // Return the parsed map data
         return $map_data_parsed;
     }
@@ -564,9 +596,7 @@ class rpg_world {
         }
         // Then we through all the tiles and remove any that are unwalkable "void" type
         $by_terrain = array();
-        if (!empty($map_data['tiles']) && !empty($map_data['tiles']['keys']) && !empty($map_data['layers'])){
-            $tilesIndex = $map_data['tiles']['keys'];
-            //error_log('-> $tilesIndex = '.print_r($tilesIndex, true));
+        if (!empty($map_data['layers'])){
             $tileLayers = $map_data['layers'];
             //error_log('-> $tileLayers = '.print_r($tileLayers, true));
             foreach ($tileLayers AS $layer_key => $layer_tiles){
@@ -575,20 +605,12 @@ class rpg_world {
                 foreach ($layer_tiles AS $row_key => $row_tiles){
                     //error_log('-> checking $tileLayers['.$layer_key.']['.$row_key.'] ...');
                     //error_log('-> $tileLayers['.$layer_key.']['.$row_key.'] = '.print_r($row_tiles, true));
-                    $row_tiles = str_replace(array('[', ']'), '', $row_tiles);
-                    //error_log('-> $row_tiles(1) = '.print_r($row_tiles, true));
-                    $row_tiles = strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles);
-                    //error_log('-> $row_tiles(2) = '.print_r($row_tiles, true));
-                    $row_tiles = array_map('intval', $row_tiles);
-                    //error_log('-> $row_tiles(3) = '.print_r($row_tiles, true));
-                    foreach ($row_tiles AS $col_key => $tile_key){
+                    $row_tiles = explode(',', $row_tiles);
+                    foreach ($row_tiles AS $col_key => $tile_token){
                         $pos = ($col_key + 1).'-'.($row_key + 1);
                         if (!isset($available_cells[$pos])){ continue; }
-                        if (!isset($tilesIndex[$tile_key])){ continue; }
-                        $tile_token = $tilesIndex[$tile_key];
-                        //error_log('-> $tilesIndex['.$tile_key.'] = "'.$tile_token.'"');
                         // If this tile is a "void" type, remove it from the available cells
-                        if ($tile_token === 'void' || strstr($tile_token, 'void')){
+                        if ($tile_token === 'void' || strpos($tile_token, 'void') === 0){
                             //error_log('-> removing tile position "'.$pos.'" from available cells (tile: '.$tile_token.')');
                             unset($available_cells[$pos]);
                         }
@@ -838,15 +860,13 @@ class rpg_world {
         //error_log('rpg_world::get_map_position_terrain() called for position "'.$position.'"');
         if (empty($position) || !is_string($position) || !isset($map_data_parsed['tiles']) || !isset($map_data_parsed['layers'])){ return 'unknown'; }
         // Loop through the tiles and find the one that matches this position
-        $tilesIndex = $map_data_parsed['tiles']['keys'];
         foreach ($map_data_parsed['layers'] AS $layer_key => $layer_tiles){
             foreach ($layer_tiles AS $row_key => $row_tiles){
                 $row_tiles = str_replace(array('[', ']'), '', $row_tiles);
                 $row_tiles = strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles);
-                foreach ($row_tiles AS $col_key => $tile_key){
-                    if (!isset($tilesIndex[$tile_key])){ continue; }
+                foreach ($row_tiles AS $col_key => $tile_token){
                     $pos = ($col_key + 1).'-'.($row_key + 1);
-                    if ($pos === $position){ return explode('-', $tilesIndex[$tile_key])[0]; }
+                    if ($pos === $position){ return explode('-', $tile_token)[0]; }
                 }
             }
         }

@@ -359,13 +359,11 @@ if (!empty($map_data_parsed['buttons'])){
             $groups_index = !empty($map_data_parsed['groups']) ? $map_data_parsed['groups'] : array();
             $group_tiles = !empty($groups_index[$group_name]) ? $groups_index[$group_name] : array();
             $tiles_index = !empty($map_data_parsed['tiles']) ? $map_data_parsed['tiles'] : array();
-            $tiles_index_keys = !empty($tiles_index['keys']) ? array_flip($tiles_index['keys']) : array();
             $layer_key = 0; // currently, this is the main and only terrain layer
             $layer_tiles = !empty($map_data_parsed['layers'][$layer_key]) ? $map_data_parsed['layers'][$layer_key] : array();
             //error_log('$groups_index = '.print_r($groups_index, true));
             //error_log('$group_tiles = '.print_r($group_tiles, true));
             //error_log('$tiles_index = '.print_r($tiles_index, true));
-            //error_log('$tiles_index_keys = '.print_r($tiles_index_keys, true));
             //error_log('$layer_tiles = '.print_r($layer_tiles, true));
             if (!$groups_index){ error_log('-> no groups defined for this map'); continue; }
             if (!$group_tiles){ error_log('-> no group tiles defined for "'.$group_name.'"'); continue; }
@@ -385,11 +383,11 @@ if (!empty($map_data_parsed['buttons'])){
                     //error_log('--> $row_tiles(parsed) = '.print_r($row_tiles, true));
                     if (empty($row_tiles[$tx])){ error_log('-> tile key "'.$tile_key.'" not found in row tiles'); continue; }
                     $current_tile_value = $row_tiles[$tx];
-                    $new_tile_value = $tiles_index_keys[$terrain_name]; // TODO: this should be a number lol
+                    $new_tile_value = $terrain_name;
                     //error_log('--> $current_tile_value = '.print_r($current_tile_value, true));
                     //error_log('--> $new_tile_value = '.print_r($new_tile_value, true));
                     $row_tiles[$tx] = $new_tile_value;
-                    $row_tiles = implode(',', array_map(function($tile){ return '['.$tile.']'; }, $row_tiles));
+                    $row_tiles = implode(',', $row_tiles);
                     $layer_tiles[$ty] = $row_tiles;
                     //error_log('--> $layer_tiles['.$ty.'](updated) = '.print_r($layer_tiles[$ty], true));
                 }

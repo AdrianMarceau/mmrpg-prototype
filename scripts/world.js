@@ -367,9 +367,7 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let tileSize = _config.mapTileSize;
         let tilesIndex = _config.mapTilesIndex;
-        let tilesIndexKeys = tilesIndex.keys;
         let tileDataKeys = Object.keys(canvasTiles);
-        //console.log('---> loaded ', tilesIndexKeys.length, ' tile defs from index...');
         //console.log('---> found ', tileDataKeys.length, ' layer tiles in data...');
         //console.log('---> indexing ', tileDataKeys.length, ' tileDataKeys tiles for canvas...');
         let layersIndex = _world.layersIndex || {};
@@ -384,10 +382,10 @@ class mmrpgWorldMap {
             let tileValue = canvasTiles[tileKey];
             let tilePos = tileKey.split('-').map(function(val){ return parseInt(val.trim()); });
             //console.log('---> processing tile #' + i + ' w/ tileKey = ' + tileKey + ' and tileValue = ' + tileValue);
-            let tileSpriteKey = tileValue;
-            let tileSpriteToken = tilesIndexKeys[tileSpriteKey];
+            let tileSpriteKey = tileKey;
+            let tileSpriteToken = tileValue;
             let tileSpriteInfo = tilesIndex[tileSpriteToken];
-            if (!tileSpriteInfo){ console.error('indexCanvasTileData() missing tileSpriteInfo for tileKey:', tileKey, 'and tileSpriteKey:', tileSpriteKey); continue; }
+            if (!tileSpriteInfo){ console.error('indexCanvasTileData() missing tileSpriteInfo for tileKey:', tileKey, 'and tileValue:', tileValue); continue; }
             let tileSpriteOffset = [tileSpriteInfo[0] || 0, tileSpriteInfo[1] || 0];
             let tileSpriteSize = [tileSpriteInfo[2] || tileSize[0], tileSpriteInfo[3] || tileSize[1]];
             let tileSpritePosition = [tilePos[0], tilePos[1], ((tilePos[0] - 1) * tileSpriteSize[0]), ((tilePos[1] - 1) * tileSpriteSize[1])];
