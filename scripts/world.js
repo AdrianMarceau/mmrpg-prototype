@@ -17,7 +17,8 @@ gameSettings.worldConfig = {
     userId: 0,
     playerId: 0,
     playerToken: 'player',
-    playerRobots: ['robot'],
+    playerRobots: ['0_robot'],
+    playerRobotsIndex: {},
     playerMobility: 1, // default only
     mapWorld: 'undefined',
     mapToken: 'undefined',

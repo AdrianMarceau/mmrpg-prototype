@@ -207,9 +207,11 @@ $this_player_id = 1;
 $this_player_token = 'player';
 $this_player_info = array();
 $this_player_robots = array();
+$this_player_robots_index = array();
 $this_prototype_data['this_player_id'] = $this_player_id; // required
 $this_prototype_data['this_player_token'] = $this_player_token; // required
 $this_prototype_data['this_player_robots'] = $this_player_robots; // required
+$this_prototype_data['this_player_robots_index'] = $this_player_robots_index; // required
 $this_prototype_data['this_player_mobility'] = MMRPG_WORLD_DEFAULT_MOBILITY; // required
 if (!empty($this_prototype_data['this_current_player'])){
     $this_player_token = $this_prototype_data['this_current_player'];
@@ -245,19 +247,22 @@ if (!empty($summoned_player_robots)){
         elseif ($a_summoned !== false){ return 1; } elseif ($b_summoned !== false){ return -1; }
         else { return 0; }
         });
-    //error_log('$current_player_robots (sorted) = '.print_r($current_player_robots, true));
 }
 if (!empty($current_player_robots)){
-    $this_player_robots = array();
     foreach ($current_player_robots AS $robot_token){
         if (empty($mmrpg_index_robots[$robot_token])){ continue; }
         $robot_info = $mmrpg_index_robots[$robot_token];
         $robot_id = $robot_info['robot_id'];
         $robot_string = $robot_id . '_' . $robot_token;
+        $robot_info = rpg_world::get_player_robot_overview($this_player_token, $robot_token, $robot_id);
         $this_player_robots[] = $robot_string;
+        $this_player_robots_index[$robot_string] = $robot_info;
     }
-    //error_log('$this_player_token.' robots = '.print_r($this_player_robots, true));
+    error_log('$this_player_token = '.print_r($this_player_token, true));
+    error_log('$this_player_robots = '.print_r($this_player_robots, true));
+    error_log('$this_player_robots_index = '.print_r($this_player_robots_index, true));
     $this_prototype_data['this_player_robots'] = $this_player_robots;
+    $this_prototype_data['this_player_robots_index'] = $this_player_robots_index;
 }
 $WORLD_PLAYER_SESSION['last_robots'] = implode(',', $this_prototype_data['this_player_robots']);
 
@@ -641,6 +646,7 @@ _worldConfig.userId = <?= rpg_game::get_userid() ?>;
 _worldConfig.playerId = <?= json_encode($this_prototype_data['this_player_id']) ?>;
 _worldConfig.playerToken = <?= json_encode($this_prototype_data['this_player_token']) ?>;
 _worldConfig.playerRobots = <?= json_encode($this_prototype_data['this_player_robots']) ?>;
+_worldConfig.playerRobotsIndex = <?= json_encode($this_prototype_data['this_player_robots_index']) ?>;
 _worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility']) ?>;
 _worldConfig.backButtonURL = 'prototype.php';
 //_worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=<?= $default_world_position ?>';

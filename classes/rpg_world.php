@@ -1555,7 +1555,7 @@ class rpg_world {
 
     // Define a method for quickly grabbing an overview of a given player's robot (including name, level, stats, etc.)
     public static function get_player_robot_overview($player_token, $robot_token, $robot_id){
-        error_log('rpg_world::get_player_robot_overview() called for player "'.$player_token.'" and robot "'.$robot_token.'"');
+        //error_log('rpg_world::get_player_robot_overview() called for player "'.$player_token.'" and robot "'.$robot_token.'"');
         // First validate the player and robot tokens and pull their index info
         if (empty($player_token) || $player_token === 'player'){ error_log('Invalid player token "'.$player_token.'"'); return false; }
         if (empty($robot_token) || $robot_token === 'robot'){ error_log('Invalid robot token "'.$robot_token.'"'); return false; }
