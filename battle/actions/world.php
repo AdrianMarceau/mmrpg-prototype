@@ -64,7 +64,8 @@ if (!empty($this_player->player_token)
 }
 
 // If this battle was completed, check to see if we should be running any post-complete actions
-if ($this_battle->battle_status == 'complete'){
+if ($this_battle->battle_status === 'complete'
+    && $this_battle->battle_result === 'victory'){
 
     // This battle was completed so check to see if we should remove it from the index
     //error_log('Prototype battle '.$this_battle->battle_token.' completed by '.$this_player->player_token, 0);
