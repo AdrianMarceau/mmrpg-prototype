@@ -1553,6 +1553,108 @@ class rpg_world {
 
     // -- MISC HELPER METHODS -- //
 
+    // Define a method for quickly grabbing an overview of a given player's robot (including name, level, stats, etc.)
+    public static function get_player_robot_overview($player_token, $robot_token, $robot_id){
+        error_log('rpg_world::get_player_robot_overview() called for player "'.$player_token.'" and robot "'.$robot_token.'"');
+        // First validate the player and robot tokens and pull their index info
+        if (empty($player_token) || $player_token === 'player'){ error_log('Invalid player token "'.$player_token.'"'); return false; }
+        if (empty($robot_token) || $robot_token === 'robot'){ error_log('Invalid robot token "'.$robot_token.'"'); return false; }
+        if (empty($robot_id) || !is_numeric($robot_id)){ error_log('Invalid robot ID "'.$robot_id.'"'); return false; }
+        static $mmrpg_index_players; if (empty($mmrpg_index_players)){ $mmrpg_index_players = self::get_index('players'); }
+        static $mmrpg_index_robots; if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = self::get_index('robots'); }
+        if (empty($mmrpg_index_players[$player_token])){ error_log('Invalid player token "'.$player_token.'"'); return false; }
+        if (empty($mmrpg_index_robots[$robot_token])){ error_log('Invalid robot token "'.$robot_token.'"'); return false; }
+        static $player_starforce; if (empty($player_starforce)){ $player_starforce = rpg_game::starforce_unlocked(); }
+        static $get_rating_token; if (empty($get_rating_token)){ $get_rating_token = function($percent){
+            if ($percent === 100){ return 'full'; }
+            elseif ($percent >= 50){ return 'high'; }
+            elseif ($percent >= 20){ return 'med'; }
+            elseif ($percent >= 1){ return 'low'; }
+            else { return 'no'; }
+            }; }
+        $player_index_info = $mmrpg_index_players[$player_token];
+        $robot_index_info = $mmrpg_index_robots[$robot_token];
+        // Pull any world session states for these robots as well
+        $WORLD_SESSION = self::get_session();
+        $WORLD_ROBOT_SESSIONS = &$WORLD_SESSION['robot_sessions'];
+        // Start grabbing the robot data from their index info and any session states
+        $robot_info = $robot_index_info;
+        $robot_rewards = rpg_game::robot_rewards($player_token, $robot_token);
+        $robot_settings = rpg_game::robot_settings($player_token, $robot_token);
+        $robot_session = !empty($WORLD_ROBOT_SESSIONS[$robot_token]) ? $WORLD_ROBOT_SESSIONS[$robot_token] : array();
+        $robot_level = !empty($robot_rewards['robot_level']) ? $robot_rewards['robot_level'] : 1;
+        $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
+        $robot_core2 = !empty($robot_info['robot_core2']) ? $robot_info['robot_core2'] : '';
+        $robot_item = !empty($robot_settings['robot_item']) ? $robot_settings['robot_item'] : '';
+        $has_persona_applied = false;
+        if (!empty($robot_settings['robot_persona'])
+            && !empty($robot_settings['robot_abilities']['copy-style'])){
+            //error_log($robot_info['robot_token'].' has a persona: '.$robot_settings['robot_persona']);
+            $persona_token = $robot_settings['robot_persona'];
+            $persona_image_token = !empty($robot_settings['robot_persona_image']) ? $robot_settings['robot_persona_image'] : $robot_settings['robot_persona'];
+            $persona_index_info = $mmrpg_index_robots[$persona_token];
+            rpg_robot::apply_persona_info($robot_info, $persona_index_info, $robot_settings);
+            //error_log('new $robot_info = '.print_r($robot_info, true));
+            $has_persona_applied = true;
+        }
+        $robot_persona = !empty($robot_info['robot_persona']) ? $robot_info['robot_persona'] : '';
+        $base_core_type = $has_persona_applied ? 'copy' : $robot_core;
+        $base_stats_ref = $has_persona_applied ? array_merge($robot_info, array('robot_token' => $robot_settings['robot_persona'])) : $robot_info;
+        $robot_stats = rpg_robot::calculate_stat_values($robot_level, $base_stats_ref, $robot_rewards, true, $base_core_type, $player_starforce);
+        //error_log($robot_token.' | $robot_stats = '.print_r($robot_stats, true));
+        $robot_disabled = false;
+        $robot_image = $robot_token;
+        if (!empty($robot_settings['robot_persona_image'])){ $robot_image = $robot_settings['robot_persona_image']; }
+        elseif (!empty($robot_settings['robot_image'])){ $robot_image = $robot_settings['robot_image']; }
+        $robot_info['robot_image'] = $robot_image;
+        $robot_energy = $robot_energy_max = $robot_energy_percent = 0; $robot_energy_rating = 'no';
+        if (!empty($robot_info['robot_energy'])){
+            $robot_energy = $robot_stats['energy']['current'];
+            $robot_energy_max = $robot_stats['energy']['current'];
+            if (isset($robot_session['energy'])){ $robot_energy += $robot_session['energy']; }
+            $robot_energy_percent = ceil(($robot_energy / $robot_energy_max) * 100);
+            $robot_energy_rating = $get_rating_token($robot_energy_percent);
+            if (empty($robot_energy)){ $robot_disabled = true; }
+            }
+        $robot_weapons = $robot_weapons_max = $robot_weapons_percent = 0; $robot_weapons_rating = 'no';
+        if (!empty($robot_info['robot_weapons'])){
+            $robot_weapons = $robot_stats['weapons']['current'];
+            $robot_weapons_max = $robot_stats['weapons']['current'];
+            if (isset($robot_session['weapons'])){ $robot_weapons += $robot_session['weapons']; }
+            $robot_weapons_percent = ceil(($robot_weapons / $robot_weapons_max) * 100);
+            $robot_weapons_rating = $get_rating_token($robot_weapons_percent);
+            }
+        // Collect the above details into a single array and return it
+        $robot_overview = array(
+            'id' => $robot_id,
+            'token' => $robot_token,
+            'persona' => $robot_persona,
+            'name' => $robot_info['robot_name'],
+            'core' => $robot_info['robot_core'],
+            'core2' => $robot_info['robot_core2'],
+            'image' => $robot_info['robot_image'],
+            'level' => $robot_level,
+            'item' => $robot_item,
+            'energy' => $robot_energy,
+            'energyMax' => $robot_energy_max,
+            'energyPercent' => $robot_energy_percent,
+            'energyRating' => $robot_energy_rating,
+            'weapons' => $robot_weapons,
+            'weaponsMax' => $robot_weapons_max,
+            'weaponsPercent' => $robot_weapons_percent,
+            'weaponsRating' => $robot_weapons_rating,
+            'attack' => $robot_stats['attack']['current'],
+            'attackMods' => (isset($robot_session['attack']) ? $robot_session['attack'] : 0),
+            'defense' => $robot_stats['defense']['current'],
+            'defenseMods' => (isset($robot_session['defense']) ? $robot_session['defense'] : 0),
+            'speed' => $robot_stats['speed']['current'],
+            'speedMods' => (isset($robot_session['speed']) ? $robot_session['speed'] : 0),
+            'disabled' => $robot_disabled,
+            );
+        if (!$has_persona_applied){ unset($robot_overview['persona']); }
+        return $robot_overview;
+    }
+
     // Define a function for generating a perspective matrix (given known values) for world map positioning
     public static function get_perspective_matrix($dimensions, $transform = array()){
         //error_log('rpg_world::get_perspective_matrix() called!');
