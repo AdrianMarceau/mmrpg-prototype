@@ -606,13 +606,11 @@ $(document).ready(function(){
             //console.log('userAllowReadyRoomSpritesBackup = ', userAllowReadyRoomSpritesBackup);
             //console.log('userReadyRoomSpriteMotionBackup = ', userReadyRoomSpriteMotionBackup);
             //console.log('userReadyRoomSpriteLimitBackup = ', userReadyRoomSpriteLimitBackup);
-            //console.log('userSpriteRenderModeBackup = ', userSpriteRenderModeBackup);
             updateMenuButtonSpriteMotion(userMenuButtonSpriteMotionBackup);
             updateMenuBackgroundImageMotion(userMenuBackgroundImageMotionBackup);
             updateAllowReadyRoomSprites(userAllowReadyRoomSpritesBackup);
             updateReadyRoomSpriteMotion(userReadyRoomSpriteMotionBackup);
             updateReadyRoomSpriteLimit(userReadyRoomSpriteLimitBackup);
-            updateSpriteRenderMode(userSpriteRenderModeBackup);
             };
         var applyGameSettings = function(){
             //console.log('applyGameSettings()');
@@ -621,13 +619,11 @@ $(document).ready(function(){
             //console.log('parseAllowReadyRoomSprites() = ', parseAllowReadyRoomSprites());
             //console.log('parseReadyRoomSpriteMotion() = ', parseReadyRoomSpriteMotion());
             //console.log('parseReadyRoomSpriteLimit() = ', parseReadyRoomSpriteLimit());
-            //console.log('parseSpriteRenderMode() = ', parseSpriteRenderMode());
             updateMenuButtonSpriteMotion(parseMenuButtonSpriteMotion());
             updateMenuBackgroundImageMotion(parseMenuBackgroundImageMotion());
             updateAllowReadyRoomSprites(parseAllowReadyRoomSprites());
             updateReadyRoomSpriteMotion(parseReadyRoomSpriteMotion());
             updateReadyRoomSpriteLimit(parseReadyRoomSpriteLimit());
-            updateSpriteRenderMode(parseSpriteRenderMode());
             };
         window.addEventListener('message', function(event){
             //console.log('iframe received a message from', event.origin);
@@ -654,7 +650,6 @@ $(document).ready(function(){
         updateAllowReadyRoomSprites(parseAllowReadyRoomSprites());
         updateReadyRoomSpriteMotion(parseReadyRoomSpriteMotion());
         updateReadyRoomSpriteLimit(parseReadyRoomSpriteLimit());
-        updateSpriteRenderMode(parseSpriteRenderMode());
 
         }
 
