@@ -258,9 +258,9 @@ if (!empty($current_player_robots)){
         $this_player_robots[] = $robot_string;
         $this_player_robots_index[$robot_string] = $robot_info;
     }
-    error_log('$this_player_token = '.print_r($this_player_token, true));
-    error_log('$this_player_robots = '.print_r($this_player_robots, true));
-    error_log('$this_player_robots_index = '.print_r($this_player_robots_index, true));
+    //error_log('$this_player_token = '.print_r($this_player_token, true));
+    //error_log('$this_player_robots = '.print_r($this_player_robots, true));
+    //error_log('$this_player_robots_index = '.print_r($this_player_robots_index, true));
     $this_prototype_data['this_player_robots'] = $this_player_robots;
     $this_prototype_data['this_player_robots_index'] = $this_player_robots_index;
 }
