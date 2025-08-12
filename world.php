@@ -488,7 +488,7 @@ if (!empty($map_data_parsed['buttons'])){
 }
 
 // Automatically save the world session w/ any recent changes
-rpg_world::save_session();
+//rpg_world::save_session();
 
 // Define some fallback values for compatibility
 $debug_flag_animation = true;
