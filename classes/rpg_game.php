@@ -655,7 +655,6 @@ class rpg_game {
         $readyRoomConfig = self::get_readyRoomConfig($include_session);
         $menuButtonConfig = self::get_menuButtonConfig($include_session);
         $mmrpgBodyClasses = array();
-        $mmrpgBodyClasses[] = 'spriteRenderMode_'.(isset($battleSettings['spriteRenderMode']) ? $battleSettings['spriteRenderMode'] : 'default');
         $mmrpgBodyClasses[] = 'battleButtonMode_'.(isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default');
         if ($menuButtonConfig['menuButtonSpriteMotion']){ $mmrpgBodyClasses[] = 'menuButtonSpriteMotion'; }
         if ($menuButtonConfig['menuBackgroundImageMotion']){ $mmrpgBodyClasses[] = 'menuBackgroundImageMotion'; }

@@ -284,9 +284,6 @@ body.index #header {
     position: absolute;
     background: transparent none scroll no-repeat 0 0;
 }
-#mmrpg .sprite.scaled {
-
-}
 #mmrpg .sprite[data-shadowid] {
     display: none;
     filter: brightness(0) opacity(0.2);
@@ -314,43 +311,8 @@ body.index #header {
     image-rendering: crisp-edges;
     image-rendering: pixelated;
 }
-
-
-/* -- Sprite Modes -- */
-
-#mmrpg .sprite.smooth-scaling,
-#mmrpg.spriteRenderMode_default #canvas .sprite,
-#mmrpg.spriteRenderMode_default #canvas .sprite_image,
-#mmrpg.spriteRenderMode_default #canvas .has_pixels,
-#mmrpg.spriteRenderMode_default #canvas .sprite img,
-#mmrpg.spriteRenderMode_default #canvas .sprite_image img,
-#mmrpg.spriteRenderMode_default #canvas .has_pixels img,
-#mmrpg.spriteRenderMode_crisp-edges #canvas .sprite,
-#mmrpg.spriteRenderMode_crisp-edges #canvas .sprite_image,
-#mmrpg.spriteRenderMode_crisp-edges #canvas .has_pixels,
-#mmrpg.spriteRenderMode_crisp-edges #canvas .sprite img,
-#mmrpg.spriteRenderMode_crisp-edges #canvas .sprite_image img,
-#mmrpg.spriteRenderMode_crisp-edges #canvas .has_pixels img {
-    -ms-interpolation-mode: bicubic;  /* IE (non-standard property) */
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    image-rendering:   -o-crisp-edges;         /* Opera */
-    image-rendering: -moz-crisp-edges;         /* Firefox */
-    image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming) */
-}
-#mmrpg .sprite.pixel-scaling,
-#mmrpg.spriteRenderMode_pixelated #canvas .sprite,
-#mmrpg.spriteRenderMode_pixelated #canvas .sprite_image,
-#mmrpg.spriteRenderMode_pixelated #canvas .has_pixels,
-#mmrpg.spriteRenderMode_pixelated #canvas .sprite img,
-#mmrpg.spriteRenderMode_pixelated #canvas .sprite_image img,
-#mmrpg.spriteRenderMode_pixelated #canvas .has_pixels img {
-    -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
-    image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
-    image-rendering: -moz-crisp-edges;         /* Firefox */
-    image-rendering:   -o-crisp-edges;         /* Opera */
-    image-rendering: crisp-edges;
-    image-rendering: pixelated;
+#mmrpg .sprite.scaled {
+    image-rendering: auto !important;
 }
 
 #mmrpg .sprite_fullscreen {

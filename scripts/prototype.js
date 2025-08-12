@@ -2192,15 +2192,6 @@ function prototype_update_game_settings(newSettings, saveSetting){
     //console.log('prototype_update_game_settings(newSettings) w/ newSettings:', newSettings);
     if (typeof saveSetting === 'undefined'){ saveSetting = true; }
 
-    // If provided, update the spriteRenderMode in the prototype settings and markup
-    if (typeof newSettings.spriteRenderMode !== 'undefined'){
-        var oldRenderMode = gameSettings.spriteRenderMode;
-        var newRenderMode = newSettings.spriteRenderMode;
-        thisBody.removeClassByRegex(/^spriteRenderMode_/);
-        thisBody.addClass('spriteRenderMode_'+newRenderMode);
-        if (saveSetting){ gameSettings.spriteRenderMode = newRenderMode; }
-        }
-
     // If provided, update the battleButtonMode in the prototype settings and markup
     if (typeof newSettings.battleButtonMode !== 'undefined'){
         var oldButtonMode = gameSettings.battleButtonMode;

@@ -598,42 +598,6 @@ $(document).ready(function(){
 
         // ---
 
-        // Collect references to the applicable form fields
-        var $spriteRenderModeField = $('.field[data-setting="spriteRenderMode"]', $performanceSettings);
-
-        // Backup the user's sprite render mode in case we need to reset it
-        var userSpriteRenderModeBackup = '';
-        userSpriteRenderModeBackup = parseSpriteRenderMode();
-
-        // Define a function for parsing the sprite render mode setting from the form
-        function parseSpriteRenderMode(){
-            //console.log('parseSpriteRenderMode()');
-            var $checkedInput = $('input[type="radio"]:checked', $spriteRenderModeField);
-            var checkedValue = $checkedInput.val();
-            //console.log('checkedValue = ', checkedValue);
-            return checkedValue;
-            };
-
-        // Define a function for updating the sprite rendering mode w/ form changes
-        function updateSpriteRenderMode(newMode){
-            //console.log('updateSpriteRenderMode(newMode) w/', newMode);
-            if (typeof newMode !== 'string'){ return false; }
-            var oldRenderMode = thisGameSettings.spriteRenderMode;
-            var newRenderMode = newMode.length ? newMode : thisGameSettings.spriteRenderMode;
-            thisGameSettings.spriteRenderMode = newRenderMode;
-            $thisBody.removeClassByRegex(/^spriteRenderMode_/);
-            $thisBody.addClass('spriteRenderMode_'+newRenderMode);
-            return true;
-            };
-
-        // Make sure any updates to these fields are correctly parsed and applied
-        $('input[type="radio"]', $spriteRenderModeField).bind('change', function(e){
-            //console.log('change event on spriteRenderMode field');
-            updateSpriteRenderMode(parseSpriteRenderMode());
-            });
-
-        // ---
-
         // Reset back to backup values if the user switches windows without saving
         var resetGameSettings = function(){
             //console.log('resetGameSettings()');

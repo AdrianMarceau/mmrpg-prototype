@@ -800,57 +800,6 @@ input::-webkit-calendar-picker-indicator {
     float: left;
     clear: left;
 }
-#settings .section .performance-settings .field[data-setting="spriteRenderMode"] {
-    float: right;
-    clear: right;
-}
-#settings .section .performance-settings .field[data-setting="spriteRenderMode"] .samples {
-    display: block;
-    position: absolute;
-    top: 20px;
-    right: 0;
-    display: block;
-    box-sizing: border-box;
-    width: 210px;
-    height: 134px;
-    /* border: 1px dotted red; */
-}
-#settings .section .performance-settings .field[data-setting="spriteRenderMode"] .samples .group {
-    display: block;
-    float: left;
-    width: 100%;
-    height: 100%;
-    position: relative;
-    /* border: 1px dotted cyan; */
-    margin-bottom: 2px;
-}
-#settings .section .performance-settings .field[data-setting="spriteRenderMode"] .samples:after,
-#settings .section .performance-settings .field[data-setting="spriteRenderMode"] .samples .group:after {
-    content: "";
-    display: block;
-    clear: both;
-}
-#settings .section .performance-settings .field[data-setting="spriteRenderMode"] .samples .group.of2 {
-    /* height: 50%; */
-    height: 64px;
-}
-#settings .section .performance-settings .field[data-setting="spriteRenderMode"] .samples .group .sprite {
-    position: absolute;
-    margin: 0;
-    background-size: auto 100%;
-}
-#settings .section .performance-settings .field[data-setting="spriteRenderMode"] .samples .group .sprite_40x40 {
-    top: -16px;
-    left: -10px;
-}
-#settings .section .performance-settings .field[data-setting="spriteRenderMode"] .samples .group .sprite_80x80 {
-    top: -30px;
-    left: 0px;
-}
-#settings .section .performance-settings .field[data-setting="spriteRenderMode"] .samples .group .sprite_160x160 {
-    bottom: 0;
-    left: -10px;
-}
 #settings .section .performance-settings .field[data-setting="performanceTweaks"] .subfield:not(.is-yes-no) .label {
     float: none;
     clear: both;

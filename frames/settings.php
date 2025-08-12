@@ -397,12 +397,6 @@ if (!empty($form_actions)){
         $form_data = array();
         //error_log('$_POST = '.print_r($_POST, true));
 
-        // spriteRenderMode
-        $allowed_render_modes = array('default', 'crisp-edges', 'pixelated');
-        $form_data['spriteRenderMode'] = !empty($_POST['spriteRenderMode']) && in_array($_POST['spriteRenderMode'], $allowed_render_modes) ? $_POST['spriteRenderMode'] : $allowed_render_modes[0];
-        //error_log('$form_data = '.print_r($form_data, true));
-        $_SESSION[$session_token]['battle_settings']['spriteRenderMode'] = $form_data['spriteRenderMode'];
-
         // allowReadyRoomSprites, readyRoomSpriteMotion, readyRoomSpriteLimit
         if (isset($_POST['allowReadyRoomSprites'])){ $form_data['allowReadyRoomSprites'] = $_POST['allowReadyRoomSprites'] === '0' ? 0 : 1; }
         if (isset($_POST['readyRoomSpriteMotion'])){ $form_data['readyRoomSpriteMotion'] = $_POST['readyRoomSpriteMotion'] === '0' ? 0 : 1; }
@@ -562,7 +556,6 @@ if (true){
             // Collect current values if they exist so we can display them as such
             $session_token = rpg_game::session_token();
             $battleSettings = $_SESSION[$session_token]['battle_settings'];
-            $spriteRenderMode = isset($battleSettings['spriteRenderMode']) ? $battleSettings['spriteRenderMode'] : 'default';
             $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default';
             $readyRoomConfig = rpg_game::get_readyRoomConfig(true);
             $menuButtonConfig = rpg_game::get_menuButtonConfig(true);
@@ -649,62 +642,6 @@ if (true){
 
                 </div>
 
-            </div>
-
-            <div class="field" data-setting="spriteRenderMode">
-                <div class="label">
-                    <strong>Sprite Rendering</strong>
-                </div>
-                <div class="subfield input-group">
-                    <label class="label full" for="spriteRenderMode">Scaling Method</label>
-                    <? $active = empty($spriteRenderMode) || $spriteRenderMode === 'default'; ?>
-                    <div class="radiofield <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="spriteRenderMode" value="default" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="default">Auto</label>
-                    </div>
-                    <? $active = $spriteRenderMode === 'crisp-edges'; ?>
-                    <div class="radiofield <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="spriteRenderMode" value="crisp-edges" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="crisp-edges">Crisp Edges</label>
-                    </div>
-                    <? $active = $spriteRenderMode === 'pixelated'; ?>
-                    <div class="radiofield <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="spriteRenderMode" value="pixelated" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="pixelated">Pixelated</label>
-                    </div>
-                </div>
-                <div id="canvas" class="samples">
-                    <?
-                    // Print out some sample sprites to show how things look
-                    $samples = array();
-                    $samples[40] = 'images/robots/mega-man/sprite_right_40x40.png';
-                    $samples[80] = 'images/robots/proto-man/sprite_right_80x80.png';
-                    foreach ($samples AS $size => $path){
-                        ?>
-                        <div class="group of2" data-base="<?= $size ?>">
-                            <?
-                            for ($i = 0; $i <= 3; $i++){
-                                $px = 40 + (20 * ($i * 1));
-                                $os = $size === 40 ? 'left' : 'right';
-                                $opx = -10 + ($i * ($px / 2)) - ($i * $i * 3);
-                                if ($size === 40){ $opx += 12; }
-                                elseif ($size === 80){ $opx += 18; }
-                                ?>
-                                <div class="sprite" style="
-                                    background-image: url('<?= $path ?>');
-                                    width: <?= $px ?>px;
-                                    height: <?= $px ?>px;
-                                    bottom: 0;
-                                    <?= $os ?>: <?= $opx ?>px;
-                                    "></div>
-                                <?
-                            }
-                            ?>
-                        </div>
-                        <?
-                    }
-                    ?>
-                </div>
             </div>
 
         </div>

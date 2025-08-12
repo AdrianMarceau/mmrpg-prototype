@@ -60,7 +60,6 @@ gameSettings.musicVolumeEnabled = true; // default to true to allow music unless
 gameSettings.musicTrackSpeed = 1.0; // the speed at which music tracks should be played (1.0 = normal)
 gameSettings.effectVolumeEnabled = true; // default to true to allow music unless otherwise stated
 gameSettings.audioBalanceConfig = {}; // default to empty but can hold custom overrides for above
-gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
 gameSettings.battleButtonMode = 'default'; // the button mode we should be using for missions
 gameSettings.enableGameMusic = true; // default to true to turn off on unsupported devices
 gameSettings.enableSoundEffects = true; // default to true to turn off on unsupported devices
@@ -469,41 +468,6 @@ $(document).ready(function(){
     // Ensure this is the battle document
     if (gameEngine.length){
 
-        // Define a list of valid render modes we can use
-        //var allowedRenderModes = ['default', 'auto', 'smooth', 'pixelated', 'high-quality', 'crisp-edges'];
-        var allowedRenderModes = ['default', 'pixelated', 'crisp-edges'];
-
-        // Update the body to use the requested sprite rendering mode
-        //console.log('setting data-render-mode to ', gameSettings['spriteRenderMode']);
-        mmrpgBody.attr('data-render-mode', gameSettings['spriteRenderMode']);
-
-        // If a localStorage value has been set, load that instead
-        if (typeof window.localStorage !== 'undefined'){
-            var spriteRenderMode = window.localStorage.getItem('spriteRenderMode');
-            if (typeof spriteRenderMode !== 'undefined' && allowedRenderModes.indexOf(spriteRenderMode) !== -1){
-                gameSettings['spriteRenderMode'] = spriteRenderMode;
-            }
-        }
-
-        // Define a change event for whenever this game setting is altered
-        gameSettingsChangeEvents['spriteRenderMode'] = function(newValue){
-            //console.log('setting data-render-mode to ', newValue);
-            mmrpgBody.attr('data-render-mode', newValue);
-            if (typeof window.localStorage !== 'undefined'){
-                window.localStorage.setItem('spriteRenderMode', newValue);
-                }
-            var $actionButton = $('.button.action_option[data-panel="settings_spriteRenderMode"]', gameActions);
-            if ($actionButton.length){
-                var newValueTitle = newValue.replace('/\-/g', ' ').replace(/\b\w/g, function(l){ return l.toUpperCase() });
-                if (typeof gameSettings.customIndex.renderModes !== 'undefined'){
-                    var renderModesIndex = gameSettings.customIndex.renderModes;
-                    newValueTitle = renderModesIndex[newValue]['name'];
-                    }
-                $actionButton.find('.value').html(newValueTitle);
-                }
-            };
-        gameSettingsChangeEvents['spriteRenderMode'](gameSettings.spriteRenderMode);
-
         // Define a change event for whenever this game setting is altered
         gameSettingsChangeEvents['eventTimeout'] = function(newValue){
             //console.log('setting eventTimeout to ', newValue, typeof newValue);
@@ -556,7 +520,7 @@ $(document).ready(function(){
         gameSettingsChangeEvents['eventCameraShift'](gameSettings.eventCameraShift);
 
         // Auto-highlight settings buttons that are "active"
-        var settingsWithActiveStates = ['eventTimeout', 'eventCrossFade', 'spriteRenderMode'];
+        var settingsWithActiveStates = ['eventTimeout', 'eventCrossFade'];
         for (var i = 0; i < settingsWithActiveStates.length; i++){
             var settingsKey = settingsWithActiveStates[i];
             var settingsValue = gameSettings[settingsKey];
