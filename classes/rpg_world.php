@@ -192,14 +192,13 @@ class rpg_world {
     // -- WORLD MAP METHODS -- //
 
     // Define a function for loading a given map's data from the filesystem
-    public static function load_map_data($map_token){
+    public static function load_map_data($world_map_token){
         //error_log('load_map_data() called!');
-        if (empty($map_token)){
-            //error_log('load_map_data() error: missing map token!');
-            return false;
-            }
+        if (empty($world_map_token)){ error_log('rpg_world::load_map_data() error - missing world-map token!'); return false; }
+        if (!strstr($world_map_token, '__')){ error_log('rpg_world::load_map_data() error - invalid world-map token "'.$world_map_token.'"!'); return false; }
+        list($world_token, $map_token) = explode('__', $world_map_token);
         $map_basedir = self::$worldmap_basedir.self::$worldmap_basepath;
-        $map_filename = str_replace('__', '/', $map_token).'.map';
+        $map_filename = $world_token.'/'.$map_token.'.map';
         $map_filedir = $map_basedir.$map_filename;
         if (!file_exists($map_filedir)){
             //error_log('load_map_data() file not found "'.$map_filedir.'"!');
@@ -295,6 +294,7 @@ class rpg_world {
                 };
             }
         //error_log('raw $map_data_vars(before) = '.print_r($map_data_vars, true));
+        $map_data_vars['world'] = isset($map_data_vars['world']) ? $map_data_vars['world'] : '';
         $map_data_vars['token'] = isset($map_data_vars['token']) ? $map_data_vars['token'] : '';
         $map_data_vars['name'] = isset($map_data_vars['name']) ? $map_data_vars['name'] : '';
         $map_data_vars['level'] = isset($map_data_vars['level']) ? $map_data_vars['level'] : 1;
@@ -313,6 +313,7 @@ class rpg_world {
         $map_data_vars['mechas'] = isset($map_data_vars['mechas']) ? $map_data_vars['mechas'] : array();
         $map_data_vars['masters'] = isset($map_data_vars['masters']) ? $map_data_vars['masters'] : array();
         $map_data_vars['bosses'] = isset($map_data_vars['bosses']) ? $map_data_vars['bosses'] : array();
+        if (empty($map_data_vars['world'])){ $map_data_vars['world'] = $world_token; }
         if (empty($map_data_vars['token'])){ $map_data_vars['token'] = $map_token; }
         if (empty($map_data_vars['name'])){ $map_data_vars['name'] = 'Undefined'; }
         if (empty($map_data_vars['size'])){ $map_data_vars['size'] = '0 x 0 x 0'; }
@@ -336,6 +337,7 @@ class rpg_world {
         $map_data_vars['bosses'] = $map_custval_parser($map_data_vars['bosses']);
         // Add collected data to the parsed map data
         $map_data_parsed = array();
+        $map_data_parsed['world'] = $map_data_vars['world']; unset($map_data_vars['world']);
         $map_data_parsed['token'] = $map_data_vars['token']; unset($map_data_vars['token']);
         $map_data_parsed['name'] = $map_data_vars['name']; unset($map_data_vars['name']);
         $map_data_parsed['level'] = $map_data_vars['level']; unset($map_data_vars['level']);
@@ -412,7 +414,7 @@ class rpg_world {
         if (!empty($map_sprite_sheet)){
             if (substr($map_sprite_sheet, -4) !== '.png'){
                 $sheet_token = $map_sprite_sheet;
-                $sheet_data_parsed = !empty($sheet_token) ? self::load_sheet_data($sheet_token) : array();
+                $sheet_data_parsed = !empty($sheet_token) ? self::load_sheet_data($world_token.'__'.$sheet_token) : array();
                 //error_log('$sheet_data_parsed = '.print_r($sheet_data_parsed, true));
                 if (!empty($sheet_data_parsed)){
                     $map_sheet = !empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : '';
@@ -479,12 +481,14 @@ class rpg_world {
     }
 
     // Define a function for loading a given sheet's data from the filesystem
-    public static function load_sheet_data($sheet_token){
+    public static function load_sheet_data($world_sheet_token){
         //error_log('load_sheet_data() called!');
+        if (empty($world_sheet_token)){ error_log('rpg_world::load_sheet_data() error - missing world-sheet token!'); return false; }
+        elseif (!strstr($world_sheet_token, '__')){ error_log('rpg_world::load_sheet_data() error - invalid world-sheet token "'.$world_sheet_token.'"!'); return false; }
+        list($world_token, $sheet_token) = explode('__', $world_sheet_token);
         $sheet_basedir = self::$worldmap_basedir.self::$worldmap_basepath;
         $sheet_tilesize = self::$worldmap_tilesize;
-        if (empty($sheet_token)){ error_log('rpg_world::load_sheet_data() error - missing sheet token!'); return false; }
-        $sheet_filename = str_replace('__', '/', $sheet_token).'.sheet';
+        $sheet_filename = $world_token.'/'.$sheet_token.'.sheet';
         $sheet_filedir = $sheet_basedir.$sheet_filename;
         if (!file_exists($sheet_filedir)){ error_log('rpg_world::load_sheet_data() error - file not found "'.$sheet_filedir.'"!'); return false; }
         $sheet_data_raw = file_get_contents($sheet_filedir);
@@ -565,12 +569,14 @@ class rpg_world {
                 };
             }
         //error_log('raw $sheet_data_vars(before) = '.print_r($sheet_data_vars, true));
+        $sheet_data_vars['world'] = isset($sheet_data_vars['world']) ? $sheet_data_vars['world'] : '';
         $sheet_data_vars['token'] = isset($sheet_data_vars['token']) ? $sheet_data_vars['token'] : '';
         $sheet_data_vars['name'] = isset($sheet_data_vars['name']) ? $sheet_data_vars['name'] : '';
         $sheet_data_vars['size'] = isset($sheet_data_vars['size']) ? $sheet_data_vars['size'] : '';
         $sheet_data_vars['image'] = isset($sheet_data_vars['image']) ? $sheet_data_vars['image'] : '';
         $sheet_data_vars['tiles'] = isset($sheet_data_vars['tiles']) ? $sheet_data_vars['tiles'] : array();
         $sheet_data_vars['sprites'] = isset($sheet_data_vars['sprites']) ? $sheet_data_vars['sprites'] : array();
+        if (empty($sheet_data_vars['world'])){ $sheet_data_vars['world'] = $world_token; }
         if (empty($sheet_data_vars['token'])){ $sheet_data_vars['token'] = $sheet_token; }
         if (empty($sheet_data_vars['name'])){ $sheet_data_vars['name'] = 'Undefined'; }
         if (empty($sheet_data_vars['size'])){ $sheet_data_vars['size'] = '0 x 0'; }
@@ -584,6 +590,7 @@ class rpg_world {
         $sheet_data_vars['sprites'] = $sheet_custval_parser($sheet_data_vars['sprites']);
         // Add collected data to the parsed sheet data
         $sheet_data_parsed = array();
+        $sheet_data_parsed['world'] = $sheet_data_vars['world']; unset($sheet_data_vars['world']);
         $sheet_data_parsed['token'] = $sheet_data_vars['token']; unset($sheet_data_vars['token']);
         $sheet_data_parsed['name'] = $sheet_data_vars['name']; unset($sheet_data_vars['name']);
         $sheet_data_parsed['size'] = $sheet_data_vars['size']; unset($sheet_data_vars['size']);
@@ -713,7 +720,10 @@ class rpg_world {
         $mmrpg_index_fields = self::get_index('fields');
 
         // Collect the map's field token and mecha encounters
-        $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : 'undefined';
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+        $world_battle_token = 'world-battle_'.str_replace('__', '-', $world_map_token);
         $map_name = !empty($map_data_parsed['name']) ? $map_data_parsed['name'] : 'Undefined';
         $map_level = !empty($map_data_parsed['level']) ? $map_data_parsed['level'] : 1;
         $map_encounters = !empty($map_data_parsed['encounters']) ? $map_data_parsed['encounters'] : array();
@@ -821,7 +831,7 @@ class rpg_world {
             $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']);
             $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
             $robot_label = $robot_info['robot_name'].' (Lv. '.$robot_level.')';
-            $battle_token = 'world-battle_'.$map_token.'_random-robot-'.($robot_key + 1);
+            $battle_token = $world_battle_token.'_random-robot-'.($robot_key + 1);
             $battle_name = $map_name.' '.ucfirst($robot_class).' Battle';
             $battle_description = 'This is a debug '.$robot_class.' battle.  It is casual fun.';
             $battle_background = $map_field_token;
@@ -885,7 +895,7 @@ class rpg_world {
                     $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']);
                     $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
                     $robot_label = $robot_info['robot_name'].' (Lv. '.$robot_level.')';
-                    $battle_token = 'world-battle_'.$map_token.'_static-'.$robot_class.'-'.($robot_key + 1);
+                    $battle_token = $world_battle_token.'_static-'.$robot_class.'-'.($robot_key + 1);
                     $battle_name = $map_name.' '.ucfirst($robot_class).' Battle';
                     $battle_background = $map_field_token;
                     $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
@@ -1292,7 +1302,9 @@ class rpg_world {
         $WORLD_SESSION = self::get_session();
         $world_buttons = !empty($WORLD_SESSION['world_buttons']) ? $WORLD_SESSION['world_buttons'] : array();
         $map_config = $map_data_parsed['config'];
-        $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : '';
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
         $map_tile_height = $map_config['tile_height'];
         $map_tile_width = $map_config['tile_width'];
         $map_tilesize_offset = $map_config['tilesize_offset'];
@@ -1301,7 +1313,7 @@ class rpg_world {
         $buttons_index = array();
         if (!empty($map_data_parsed['buttons'])){
             $button_sprites = $map_data_parsed['buttons'];
-            $world_map_buttons = !empty($world_buttons[$map_token]) ? $world_buttons[$map_token] : array();
+            $world_map_buttons = !empty($world_buttons[$world_map_token]) ? $world_buttons[$world_map_token] : array();
             foreach ($button_sprites AS $button_name => $button_data){
                 if (empty($button_data) || !is_array($button_data) || count($button_data) < 2){ continue; }
                 $pos = $button_data[0]; list($col, $row) = explode('-', $pos); unset($button_data[0]);
@@ -1350,17 +1362,19 @@ class rpg_world {
         // BATTLES LAYER
         $WORLD_SESSION = self::get_session();
         $map_config = $map_data_parsed['config'];
-        $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : '';
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
         $map_col_size = $map_config['col_size'];
         $map_row_size = $map_config['row_size'];
         $map_tile_height = $map_config['tile_height'];
         $map_tile_width = $map_config['tile_width'];
         $map_spritesize_offset = $map_config['spritesize_offset'];
         $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
-        $world_map_encounters = !empty($world_encounters[$map_token]) ? $world_encounters[$map_token] : array();
+        $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array();
         if (empty($world_map_encounters)){
             $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed);
-            self::update_session('world_encounters', $map_token, $world_map_encounters);
+            self::update_session('world_encounters', $world_map_token, $world_map_encounters);
         }
         //error_log('$world_map_encounters = '.print_r($world_map_encounters, true));
         $battles_markup = array();
@@ -1415,7 +1429,9 @@ class rpg_world {
         // TEAM LAYER
         $WORLD_SESSION = self::get_session();
         $map_config = $map_data_parsed['config'];
-        $map_token = !empty($map_data_parsed['token']) ? $map_data_parsed['token'] : '';
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
         $map_col_size = $map_config['col_size'];
         $map_row_size = $map_config['row_size'];
         $map_tile_height = $map_config['tile_height'];
@@ -1498,14 +1514,16 @@ class rpg_world {
             if ($ptoken === $team_player_token){ continue; } // skip the current player
             if (empty($mmrpg_index_players[$ptoken])){ continue; } // skip if not a valid player
             if (empty($world_player_sessions[$ptoken])){ continue; } // skip if no player session
-            //error_log('Checking for player "'.$ptoken.'" on map "'.$map_token.'"');
+            //error_log('Checking for player "'.$ptoken.'" on map "'.$world_map_token.'"');
             $pinfo = $mmrpg_index_players[$ptoken];
             $tmp_session = $world_player_sessions[$ptoken];
             $tmp_world_token = !empty($tmp_session['last_world']) ? $tmp_session['last_world'] : '';
+            $tmp_map_token = !empty($tmp_session['last_map']) ? $tmp_session['last_map'] : '';
             $tmp_world_position = !empty($tmp_session['last_position']) ? $tmp_session['last_position'] : '';
             $tmp_world_direction = !empty($tmp_session['last_direction']) ? $tmp_session['last_direction'] : '';
             $tmp_world_robots = !empty($tmp_session['last_robots']) ? $tmp_session['last_robots'] : '';
-            if (empty($tmp_world_token) || $tmp_world_token !== $map_token){ continue; } // skip if not on this map
+            if (empty($tmp_world_token) || $tmp_world_token !== $world_token){ continue; } // skip if not on this world
+            if (empty($tmp_map_token) || $tmp_map_token !== $map_token){ continue; } // skip if not on this map
             if (empty($tmp_world_position)){ continue; } // skip if no position
             $rival_symbols[$tmp_world_position] = $ptoken;
             // If we made it this far, show this other player on the map at their current location (just non-interactacble)

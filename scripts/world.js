@@ -19,6 +19,7 @@ gameSettings.worldConfig = {
     playerToken: 'player',
     playerRobots: ['robot'],
     playerMobility: 1, // default only
+    mapWorld: 'undefined',
     mapToken: 'undefined',
     mapName: 'Undefined Map',
     mapImage: 'undefined.png',
@@ -170,6 +171,7 @@ class mmrpgWorldMap {
         // Collect the main json object for this world map and then parse it into the appropriate config values for the game
         let $mapJson = $('script[data-json]', $canvasMap).first(), mapJson = $mapJson.html(), mapData = mapJson ? JSON.parse(mapJson) : false;
         if (!mapData || typeof mapData !== 'object' || !Object.keys(mapData).length){ console.error('initWorldMap() unable to parse mapData!'); return false; }
+        let mapWorld = mapData.map_world || false;
         let mapToken = mapData.map_token || false;
         let mapName = mapData.map_name || false;
         let mapImage = mapData.map_image || false;
@@ -188,6 +190,7 @@ class mmrpgWorldMap {
         let defaultMapName = mapToken.replace(/-/g, ' ').replace(/ AREA /g, ' Area ').replace(/\b\w/g, function(l){ return l.toUpperCase(); });
         let defaultMapSize = [_config.mapSize[0], _config.mapSize[1]];
         let defaultMapTileSize = [_config.mapTileSize[0], _config.mapTileSize[1]];
+        _config.mapWorld = mapWorld;
         _config.mapToken = mapToken;
         _config.mapName = mapName || defaultMapName;
         _config.mapImage = mapImage;
@@ -1880,8 +1883,11 @@ class mmrpgWorldMap {
                         // Make the portal token a world token for the redirect
                         autoRedirect = true;
                         showDropdown = false;
-                        let worldToken = dataPortal.replace(/^goto__/i, '');
-                        autoRedirectURL = 'world.php?world=' + worldToken;
+                        let worldToken, mapToken;
+                        let goToPath = dataPortal.replace(/^goto__/i, '').split('__');
+                        if (goToPath[1]){ worldToken = goToPath[0]; mapToken = goToPath[1]; }
+                        else { worldToken = _config.mapWorld; mapToken = goToPath[0]; }
+                        autoRedirectURL = 'world.php?world=' + worldToken + '&map=' + mapToken;
                         autoRedirectSound = 'bounce-sound';
                         }
                     } else {
@@ -2186,8 +2192,11 @@ class mmrpgWorldMap {
                             } else if (portalName === 'exit'){
                             portalHref = 'prototype.php'; // TOPO: make the exit actually go somewhere specific
                             } else if (portalName.indexOf('goto__') !== -1){
-                            let worldToken = portalName.replace(/^goto__/i, '');
-                            portalHref = 'world.php?world=' + worldToken;
+                            let worldToken, mapToken;
+                            let goToPath = portalName.replace(/^goto__/i, '').split('__');
+                            if (goToPath[1]){ worldToken = goToPath[0]; mapToken = goToPath[1]; }
+                            else { worldToken = _config.mapWorld; mapToken = goToPath[0]; }
+                            portalHref = 'world.php?world=' + worldToken + '&map=' + mapToken;
                             }
                         if (portalHref){
                             $thisWorld.addClass('hidden');
@@ -2579,12 +2588,13 @@ class mmrpgWorldMap {
         let _worldButtons = _world.buttons;
         let _worldSwitches = _world.switches;
         let lastPlayer = _worldPlayer.token;
-        let lastPlayerWorld = _config.mapToken;
+        let lastPlayerWorld = _config.mapWorld;
+        let lastPlayerWorldMap = _config.mapWorld + '__' + _config.mapToken;
         let lastPlayerPosition = _worldPlayer.position;
         let lastPlayerDirection = _worldPlayer.direction;
-        let lastWorldButtons = {}; lastWorldButtons[lastPlayerWorld] = _worldButtons;
-        let lastWorldSwitches = {}; lastWorldSwitches[lastPlayerWorld] = _worldSwitches;
-        let worldData = {lastPlayer, lastPlayerWorld, lastPlayerPosition, lastPlayerDirection, lastWorldButtons, lastWorldSwitches};
+        let lastWorldButtons = {}; lastWorldButtons[lastPlayerWorldMap] = _worldButtons;
+        let lastWorldSwitches = {}; lastWorldSwitches[lastPlayerWorldMap] = _worldSwitches;
+        let worldData = {lastPlayer, lastPlayerWorld, lastPlayerWorldMap, lastPlayerPosition, lastPlayerDirection, lastWorldButtons, lastWorldSwitches};
         //console.log('%c' + 'Saving World State ...', 'color: cyan;');
         //console.log('w/ worldData:', worldData);
         _selfRef._busy = true;
