@@ -19,8 +19,8 @@
 @portals[]   = goto__debug-area-1s(6-10)
 @portals[]   = goto__debug-area-1w(4-8)
 @portals[]   = goto__debug-area-1e(8-8)
-@portals[]   = goto__debug-area-2(6-3)
-@portals[]   = goto__debug-area-2(6-21, locked)
+@portals[]   = goto__debug-area-3(6-21)
+@portals[]   = goto__debug-area-0(6-3, locked)
 #---------------------------#
 @groups[]    = subspace-path(6-12, 6-13, 6-14, 6-15)
 @groups[]    = subspace-path-ends(6-11, 6-16)
