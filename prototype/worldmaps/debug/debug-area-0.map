@@ -1,26 +1,28 @@
 #---------------------------#
-# DEBUG AREA 3 (SUBSPACE)
-@token    = debug-area-3
-@name     = DEBUG Area 3
+# DEBUG AREA 0 (SUBSPACE)
+@token    = debug-area-0
+@name     = DEBUG Area 0
 @level    = 80
 @size     = 50 x 16
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
-@field      = prototype-subspace
+@portals[]  = spawn(10-6, hidden)
+@portals[]  = goto__debug-area-1(10-6, 6-21)
+#---------------------------#
+@field       = prototype-subspace
+#---------------------------#
+@encounters = dark-frag(12),trille-bot(6),novamite(3),mega-man-ds(1),bass-ds(1),proto-man-ds(1)
+#---------------------------#
 @terrain[]   = darkness(genesis-tower)
 @terrain[]   = subspace(prototype-subspace)
 @terrain[]   = water(reflection-chamber)
 #---------------------------#
-@encounters = dark-frag(12),trille-bot(6),novamite(3),mega-man-ds(1),bass-ds(1),proto-man-ds(1)
 @habitats[] = dark-frag(darkness)
 @habitats[] = trille-bot(subspace)
 @habitats[] = novamite(water)
 @habitats[] = mega-man-ds(subspace)
 @habitats[] = bass-ds(subspace)
 @habitats[] = proto-man-ds(subspace)
-#---------------------------#
-@portals[]  = spawn(10-6, hidden)
-@portals[]  = goto__debug-area-1(10-6, 6-21)
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[91],[91],[91],[91],[91],[91],[91],[__],[91],[91],[99],[91],[91],[91],[91],[99],[91],[91],[91],[91],[91],[91],[91],[91],[91],[91],[__],[__],[__],[91],[88],[88],[__],[91],[__],[91],[__],[__],[91],[91],[91],[__],[__],[__],[__],[__]

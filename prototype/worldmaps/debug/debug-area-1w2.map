@@ -1,17 +1,22 @@
 #---------------------------#
-# DEBUG AREA 4 (NATURE)
-@token    = debug-area-4
-@name     = DEBUG Area 4
+# DEBUG AREA 1W2 (NATURE)
+@token    = debug-area-1w2
+@name     = DEBUG Area 1W2
 @level    = 30
 @size     = 20 x 25
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
+@portals[]  = spawn(14-22, hidden)
+@portals[]  = goto__debug-area-1w(14-22, 4-10)
+#---------------------------#
 @field      = preserved-forest
+#---------------------------#
+@encounters = batton(20),monking-r(10),eggalodon(5),petal-anne(20),petit-snakey(10),bombomboy(5),kabuton(5)
+#---------------------------#
 @terrain[]   = ground(preserved-forest)
 @terrain[]   = grass(gentle-countryside)
 @terrain[]   = water(rainey-sewers)
 #---------------------------#
-@encounters = batton(20),monking-r(10),eggalodon(5),petal-anne(20),petit-snakey(10),bombomboy(5),kabuton(5)
 @habitats[] = batton(ground)
 @habitats[] = monking-r(ground)
 @habitats[] = eggalodon(ground)
@@ -19,9 +24,6 @@
 @habitats[] = petit-snakey(grass)
 @habitats[] = bombomboy(grass)
 @habitats[] = kabuton(water)
-#---------------------------#
-@portals[]  = spawn(14-22, hidden)
-@portals[]  = goto__debug-area-1(14-22)
 #---------------------------#
 @bosses[]    = savage-boss(6-4, slash-man)
 @bosses[]    = treetop-boss(15-4, tengu-man)

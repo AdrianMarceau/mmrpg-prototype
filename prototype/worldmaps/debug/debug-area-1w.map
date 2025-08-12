@@ -6,12 +6,13 @@
 @size     = 20 x 12
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
-@field    = maniacal-hideaway
-@encounters   = drill-mole,molier,rockscotch
-#---------------------------#
 @portals[]  = spawn(17-4, hidden)
-@portals[]  = goto__debug-area-1(17-4)
-@portals[]  = goto__debug-area-4(4-10)
+@portals[]  = goto__debug-area-1(17-4, 4-8)
+@portals[]  = goto__debug-area-1w2(4-10, 14-22)
+#---------------------------#
+@field    = maniacal-hideaway
+#---------------------------#
+@encounters   = drill-mole,molier,rockscotch
 #---------------------------#
 @bosses[]    = upper-boss(6-4, drill-man)
 @bosses[]    = lower-boss(15-10, oil-man)

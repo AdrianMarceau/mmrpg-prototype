@@ -6,28 +6,23 @@
 @size        = 11 x 24
 @sheet       = mmrpg-overworld-2k25
 #---------------------------#
+@portals[]   = spawn(6-8)
+@portals[]   = goto__debug-area-1n(6-6, 8-12)
+@portals[]   = goto__debug-area-1s(6-10, 5-2)
+@portals[]   = goto__debug-area-1w(4-8, 17-4)
+@portals[]   = goto__debug-area-1e(8-8, 3-4)
+@portals[]   = goto__debug-area-0(6-21, 10-6)
+@portals[]   = goto__debug-area-99(6-3, locked)
+#---------------------------#
 @field       = gentle-countryside
+#---------------------------#
+@encounters  = met(2),trille-bot(1)
+#---------------------------#
 @terrain[]   = grass(gentle-countryside)
 @terrain[]   = subspace(prototype-subspace)
 #---------------------------#
-@encounters  = met(2),trille-bot(1)
 @habitats[]  = met(grass)
 @habitats[]  = trille-bot(subspace)
-#---------------------------#
-@portals[]   = spawn(6-8)
-@portals[]   = goto__debug-area-1n(6-6)
-@portals[]   = goto__debug-area-1s(6-10)
-@portals[]   = goto__debug-area-1w(4-8)
-@portals[]   = goto__debug-area-1e(8-8)
-@portals[]   = goto__debug-area-3(6-21)
-@portals[]   = goto__debug-area-0(6-3, locked)
-#---------------------------#
-@groups[]    = subspace-path(6-12, 6-13, 6-14, 6-15)
-@groups[]    = subspace-path-ends(6-11, 6-16)
-@groups[]    = under-subspace-button(5-22, 5-23, 6-23, 7-23, 7-22)
-@groups[]    = no-encounters(under-subspace-button, subspace-path, subspace-path-ends)
-#---------------------------#
-@buttons[]   = subspace-button(6-22, purple, up, set-group-terrain, subspace-path, subspace)
 #---------------------------#
 @mechas[]    = west-portal-mecha(4-8, rockscotch)
 @mechas[]    = east-portal-mecha(8-8, antlin-g)
@@ -35,6 +30,13 @@
 @mechas[]    = south-portal-mecha(6-10, octone)
 #---------------------------#
 @bosses[]    = subspace-portal-boss(6-21, trill, speed)
+#---------------------------#
+@buttons[]   = subspace-button(6-22, purple, up, set-group-terrain, subspace-path, subspace)
+#---------------------------#
+@groups[]    = subspace-path(6-12, 6-13, 6-14, 6-15)
+@groups[]    = subspace-path-ends(6-11, 6-16)
+@groups[]    = under-subspace-button(5-22, 5-23, 6-23, 7-23, 7-22)
+@groups[]    = no-encounters(under-subspace-button, subspace-path, subspace-path-ends)
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
