@@ -386,6 +386,7 @@ html, body {
 #world #map .sprite.tile.portal.locked { background-position: -440px -40px; }
 #world #map .sprite.tile[data-portal="spawn"] { background-position: -40px -40px; }
 #world #map .sprite.tile[data-portal="exit"] { background-position: -440px -40px; }
+#world #map .sprite.tile.portal.hidden { display: none; }
 
 #world #map .sprite.tile.button-up { background-position: -40px -280px; }
 #world #map .sprite.tile.button-down { background-position: -40px -360px; }

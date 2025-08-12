@@ -1271,8 +1271,8 @@ class rpg_world {
                 //$top = $mod_top; $left = $mod_left;
                 $hidden = in_array('hidden', $portal_data) ? true : false;
                 $locked = in_array('locked', $portal_data) ? true : false;
+                if ($hidden && $portal_name === 'spawn'){ continue; }
                 if ($this_is_cursor && !$locked && $portal_name !== 'spawn'){ $locked = true; }
-                if ($hidden){ continue; }
                 $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucfirst($portal_name));
                 $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                 $classes = 'sprite tile portal'.($portal_name !== 'spawn' && !$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
