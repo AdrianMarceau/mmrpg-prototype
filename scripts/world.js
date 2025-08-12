@@ -1461,7 +1461,7 @@ class mmrpgWorldMap {
         $actionDropdown.removeClass('active');
         $spritesLayer.removeClass('has-zoom');
         $('.sprite.zoom', $spritesLayer).removeClass('zoom');
-        $('.sprite[data-frame]', $canvasMap).attr('data-frame', '00');
+        $('.sprite[data-frame]:not(.disabled)', $canvasMap).attr('data-frame', '00');
         // Move the cursor to the new position first and foremost
         let moveTimeout;
         let timeoutDuration = _mapEffects.moveTimeout;
@@ -1521,9 +1521,12 @@ class mmrpgWorldMap {
                 if (thisHorDir === 'left'){ teamOffsetX += 20; }
                 else if (thisHorDir === 'right'){ teamOffsetX -= 20; }
                 if (thisHorDir){ $thisSprite.attr('data-dir', thisHorDir); }
-                let newFrame = $thisSprite.is('.player') ? '09' : $thisSprite.is('.robot') ? '07' : '00'; // run for players, slide for robots
-                $thisSprite.attr('data-frame', newFrame);
-                let onTeamMoveComplete = function(){ $thisSprite.attr('data-frame', '00'); };
+                let onTeamMoveComplete = function(){};
+                if (!$thisSprite.is('.disabled')){
+                    let newFrame = $thisSprite.is('.player') ? '09' : $thisSprite.is('.robot') ? '07' : '00'; // run for players, slide for robots
+                    $thisSprite.attr('data-frame', newFrame);
+                    onTeamMoveComplete = function(){ $thisSprite.attr('data-frame', '00'); };
+                    }
                 $thisSprite.prop('worldX', teamOffsetX);
                 $thisSprite.prop('worldY', teamOffsetY);
                 if (animateMove){
@@ -2047,10 +2050,12 @@ class mmrpgWorldMap {
                 });
             $playerSprites.each(function(index){
                 let $sprite = $(this);
+                if ($sprite.is('.disabled')){ return; }
                 $sprite.attr('data-frame', playerFrames[index % playerFrames.length] || '00');
                 });
             $robotSprites.each(function(index){
                 let $sprite = $(this);
+                if ($sprite.is('.disabled')){ return; }
                 $sprite.attr('data-frame', robotFrames[index % robotFrames.length] || '00');
                 });
 
@@ -2142,7 +2147,7 @@ class mmrpgWorldMap {
                 $worldCursor.removeClass('shake');
                 $spritesLayer.removeClass('has-zoom');
                 $('.sprite.zoom', $canvasMap).removeClass('zoom');
-                $('.sprite[data-frame]', $canvasMap).attr('data-frame', '00');
+                $('.sprite[data-frame]:not(.disabled)', $canvasMap).attr('data-frame', '00');
                 };
 
             // Define the event to run when clicking one of these new action buttons

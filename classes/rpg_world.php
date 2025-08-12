@@ -1404,17 +1404,19 @@ class rpg_world {
             $img = isset($sprite[2]) ? $sprite[2] : $token;
             $alt = strstr($img, '_') ? explode('_', $img, 2)[1] : '';
             $dir = strstr($team_dir, 'left') ? 'left' : 'right';
+            $disabled = in_array('disabled', $sprite) ? true : false;
             if ($key > 0){
                 if (strstr($team_dir, 'left')){ $left -= 10; }
                 elseif (strstr($team_dir, 'right')){ $left += 10; }
                 if (strstr($team_dir, 'up')){ $top += 4; }
                 elseif (strstr($team_dir, 'down')){ $top -= 4; }
                 }
-            $class = $team_class.' bounce';
+            $class = $team_class.' bounce'.($disabled ? ' disabled' : '');
             $styles = 'top: '.$top.'px; left: '.$left.'px; ';
             $attrs = 'data-key="'.$key.'"';
             $markup = self::get_sprite($kind, $img, $alt, $dir, $class, $styles, $attrs);
             $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$team_class.'-'.$kind.'"', $markup);
+            if ($disabled){ $markup = str_replace('data-frame="00"', 'data-frame="03"', $markup); }
             if (!empty($markup)){ $sprites[] = $markup; }
             }
         return implode(PHP_EOL, $sprites);
@@ -1450,11 +1452,9 @@ class rpg_world {
             foreach ($team_player_robots AS $robot_string){
                 list($robot_id, $robot_token) = explode('_', $robot_string, 2);
                 $robot = array('robot', $robot_token);
-                $robot_settings = rpg_game::robot_settings($team_player_token, $robot_token);
-                $robot_image = '';
-                if (!empty($robot_settings['robot_persona_image'])){ $robot_image = $robot_settings['robot_persona_image']; }
-                elseif (!empty($robot_settings['robot_image'])){ $robot_image = $robot_settings['robot_image']; }
-                if (!empty($robot_image)){ $robot[] = $robot_image; }
+                $robot_overview = self::get_player_robot_overview($team_player_token, $robot_token, $robot_id);
+                if (!empty($robot_overview['image'])){ $robot[] = $robot_overview['image']; }
+                if (!empty($robot_overview['disabled'])){ $robot[] = 'disabled'; }
                 $team_sprites[] = $robot;
             }
         }
