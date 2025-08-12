@@ -1768,6 +1768,7 @@ class mmrpgWorldMap {
         let _playerId = _config.playerId;
         let _playerToken = _config.playerToken;
         let _playerRobots = _config.playerRobots;
+        let _playerRobotsIndex = _config.playerRobotsIndex;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
         let $worldCursor = _elements.worldCursor;
@@ -1777,6 +1778,18 @@ class mmrpgWorldMap {
         let newPosition = cursorPosition.split('-');
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
+
+        // Before we do anything else, check to see if this player has any active robots
+        //console.log('_playerRobots = ', _playerRobots);
+        //console.log('_playerRobotsIndex = ', _playerRobotsIndex);
+        let playerActiveRobots = 0;
+        for (var i = 0; i < _playerRobots.length; i++){
+            let token = _playerRobots[i];
+            let info = _playerRobotsIndex[token] || false;
+            if (!info || info.disabled){ continue; }
+            playerActiveRobots++;
+            }
+        //console.log('playerActiveRobots = ', playerActiveRobots);
 
         // Define the default zoom timeout for after movement ends
         let zoomTimeoutDuration = 2000;
@@ -1995,7 +2008,7 @@ class mmrpgWorldMap {
                         } return markup;
                     })(dataLabels).join('');
                 dropdownMarkup += dataLabelsJoined;
-                if (_playerRobots.length){  dropdownButtons += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
+                if (playerActiveRobots >= 1){  dropdownButtons += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
                 else { dropdownButtons += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
                 dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showDropdownType = 'battle';

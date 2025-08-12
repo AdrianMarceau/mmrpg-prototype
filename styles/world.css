@@ -535,6 +535,7 @@ html, body {
 #world #map .layer.objects .sprite.team[data-key="7"] { z-index: 230; }
 #world #map .layer.objects .sprite.team[data-key="8"] { z-index: 220; }
 #world #map .layer.objects .sprite.team[data-key="9"] { z-index: 210; }
+#world #map .layer.objects .sprite.team.disabled { z-index: 0; display: none; }
 
 #world #map .layer.objects .sprite.rival { z-index: 100; }
 #world #map .layer.objects .sprite.rival[data-key="0"] { z-index: 100; }
@@ -547,6 +548,7 @@ html, body {
 #world #map .layer.objects .sprite.rival[data-key="7"] { z-index: 30; }
 #world #map .layer.objects .sprite.rival[data-key="8"] { z-index: 20; }
 #world #map .layer.objects .sprite.rival[data-key="9"] { z-index: 10; }
+#world #map .layer.objects .sprite.rival.disabled { z-index: 0; display: none; }
 
 #world #map .layer.objects .sprite.rival { filter: brightness(0.6); }
 
