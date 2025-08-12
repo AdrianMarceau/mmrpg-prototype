@@ -765,7 +765,7 @@ class rpg_world {
 
         // RANDOM ENCOUNTERS (within defined limits)
         $allowed_random_encounters = $map_encounters;
-        $max_random_encounters = ceil($available_encounter_cells['total'] * 0.25);
+        $max_random_encounters = ceil($available_encounter_cells['total'] * 0.20); // TODO: make this configurable in the map file
         $allowed_held_items = array();
         if ($map_level >= 10){ $allowed_held_items += array('energy-pellet', 'weapon-pellet'); }
         if ($map_level >= 20){ $allowed_held_items += array('attack-pellet', 'defense-pellet', 'speed-pellet'); }
