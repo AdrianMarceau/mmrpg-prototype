@@ -118,6 +118,7 @@ if (!empty($this_battle_token)){
         $new_target_robots = array_slice($new_target_robots, 0, MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX);
         $this_battle_data['battle_turns'] = $new_battle_turns;
         $this_battle_data['battle_zenny'] = $new_battle_zenny;
+        $this_battle_data['battle_rewards'] = $new_battle_rewards;
         //$this_battle_data['battle_field_base']['field_multipliers'] = $new_field_multipliers;
         $this_battle_data['battle_target_player']['player_robots'] = $new_target_robots;
         $this_battle_data['values']['multi_battle_tokens'] = $multi_battle_tokens;

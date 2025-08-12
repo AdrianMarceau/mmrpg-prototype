@@ -903,9 +903,10 @@ class rpg_world {
                     $world_map_encounters[] = array('robot/'.$robot_class, $robot_token, '', $robot_pos, $battle_token, $robot_label);
                     $battle_rewards = array();
                     if ($robot_class === 'master'
-                        && !mmrpg_prototype_robot_unlocked('', $robot_token)){
+                        && !mmrpg_prototype_robot_unlocked(false, $robot_token)){
+                        //error_log('-> '.$robot_token.' is a master that is not unlocked yet!');
                         if (!isset($battle_rewards['robots'])){ $battle_rewards['robots'] = array(); }
-                        $battle_rewards['robots'][] = array('token' => $robot_token, 'level' => $robot_level);
+                        $battle_rewards['robots'][] = array('token' => $robot_token, 'level' => $robot_level, 'experience' => 999);
                         }
                     //error_log('-> generating '.$robot_class.' battle "'.$battle_token.'" ('.$battle_name.')');
                     $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
