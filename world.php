@@ -300,6 +300,17 @@ $request_world_direction = $this_prototype_data['this_current_direction'];
 //error_log('$this_prototype_data = '. print_r($this_prototype_data, true));
 //error_log('$WORLD_PLAYER_SESSION = '. print_r($WORLD_PLAYER_SESSION, true));
 
+// Now that we've collected required args that may have been passed in the URL, reload w/o them to prevent double-entry
+if (!empty($_REQUEST['player'])
+    || !empty($_REQUEST['world'])
+    || !empty($_REQUEST['map'])
+    || !empty($_REQUEST['position'])
+    || !empty($_REQUEST['direction'])){
+    // Redirect to the clean world URL
+    header('Location: world.php');
+    exit();
+}
+
 // Load map data from the appropriate map file
 $world_map_token = $this_prototype_data['this_current_world'].'__'.$this_prototype_data['this_current_map'];
 $world_token = $this_prototype_data['this_current_world'];
@@ -367,12 +378,6 @@ $WORLD_SESSION['world_maps'][$world_map_token]['exit_pos'] = $map_exit_pos;
 
 // If the world position has not been set yet, we can use the spawn position for it as well
 if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data['this_current_position'] = $map_spawn_pos; }
-// If the default position has not been set, we can use the spawn position for that
-/* if (empty($default_world_position)
-    && $this_prototype_data['this_current_world'] === $default_world_token
-    && $this_prototype_data['this_current_map'] === $default_map_token){
-    $default_world_position = $map_spawn_pos;
-} */
 
 // If the encounters for this map have not been generated yet, we can do so now
 $reset_encounters = !empty($_GET['reset']) && $_GET['reset'] === 'encounters' ? true : false;
