@@ -1019,6 +1019,7 @@
     // Define a function for abruptly stopping the ready room animation
     thisReadyRoom.stopAnimation = function(){
         //console.log('thisReadyRoom.stopAnimation()');
+        if (!thisReadyRoomConfig.isReady){ return false; }
         thisReadyRoomConfig.parentElement.removeClass('animating');
         thisReadyRoomConfig.animateEnabled = false;
         return;
