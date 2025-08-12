@@ -597,9 +597,11 @@ $flag_skip_fadein = true;
                 // TEAM SPRITES
                 $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                 $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
-                $teams_layer_markup = rpg_world::get_teams_layer_markup($this_prototype_data, $map_data_parsed);
+                $team_layer_markup = rpg_world::get_team_layer_markup($this_prototype_data, $map_data_parsed);
+                $rivals_layer_markup = rpg_world::get_rivals_layer_markup($this_prototype_data, $map_data_parsed);
                 echo('<div class="layer layer-5 sprites objects characters team" data-layer="teams" '.$map_layer_styles.$map_layer_attrs.'>');
-                    echo($teams_layer_markup);
+                    echo($team_layer_markup);
+                    echo($rivals_layer_markup);
                 echo('</div>'.PHP_EOL);
 
                 // END OF LAYERS
