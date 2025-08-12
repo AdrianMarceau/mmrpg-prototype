@@ -11,14 +11,26 @@
 #---------------------------#
 @field        = waterworks-dam
 #---------------------------#
-@encounters   = bombomboy,blocky,arc-weldy,picket-man,tosanaizer-v,robo-fishtot
+@encounters   = bombomboy(10),blocky(12),arc-weldy(12),picket-man(6),tosanaizer-v(3),air-stone(9),robo-fishtot(10)
+#---------------------------#
+@terrain[]   = grass(gentle-countryside)
+@terrain[]   = plain(waterworks-dam)
+@terrain[]   = ground(maniacal-hideaway)
+@terrain[]   = water(space-simulator)
 #---------------------------#
 @habitats[] = bombomboy(grass)
 @habitats[] = blocky(plain)
 @habitats[] = arc-weldy(plain)
 @habitats[] = picket-man(ground)
 @habitats[] = tosanaizer-v(ground)
+@habitats[] = air-stone(ground)
 @habitats[] = robo-fishtot(water)
+#---------------------------#
+@bosses[]   = north-dam-boss(8-6, concrete-man)
+@bosses[]   = south-dam-boss(8-12, guts-man)
+@bosses[]   = west-dam-boss(6-9, pump-man)
+@bosses[]   = east-dam-boss(10-9, wave-man)
+@bosses[]   = lower-grounds-boss(8-19, block-man)
 #---------------------------#
 @groups[]    = entrance-area(1-11, 2-11, 3-11, 2-10, 2-12)
 @groups[]    = no-encounters(entrance-area)
