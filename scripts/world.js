@@ -1857,9 +1857,11 @@ class mmrpgWorldMap {
             //console.log('-> event at position is a portal, preparing dropdown');
             // If the cursor is literally on a portal, only one event sprite matters right now
             let $portalEvent = $firstEvent;
-            var dataLabel = $portalEvent.attr('data-label');
-            var dataPortal = $portalEvent.attr('data-portal');
+            let dataLabel = $portalEvent.attr('data-label');
+            let dataPortal = $portalEvent.attr('data-portal');
             if (dataPortal && dataPortal.indexOf('goto__') !== -1){
+                let portalInfo = _config.mapPortalsIndex[dataPortal] || false;
+                //console.log('-> found portalInfo for ' + dataPortal + ':', portalInfo);
                 showDropdown = true;
                 if (!dataLabel){ dataLabel = 'Portal Options'; }
                 dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>';
@@ -1872,15 +1874,15 @@ class mmrpgWorldMap {
                 if (_worldCursor.moved){
                     //console.log('-> entering portal with name ' + dataPortal + '!');
                     if (dataPortal === 'spawn'){
-                        // TODO: make the spawn actually go somewhere specific ?
+                        // TODO: SPAWN PORTAL - make the spawn actually go somewhere specific ?
                         console.warn('-> spawn portals not yet implemented yet');
                         } else if (dataPortal === 'exit'){
-                        // TODO: make the exit actually go somewhere specific ?
+                        // TODO: EXIT PORTAL - make the exit actually go somewhere specific ?
                         autoRedirect = true;
                         showDropdown = false;
                         autoRedirectURL = 'prototype.php';
                         } else if (dataPortal.indexOf('goto__') !== -1){
-                        // Make the portal token a world token for the redirect
+                        // GOTO PORTAL - use the portal token as worldmap token for redirect
                         autoRedirect = true;
                         showDropdown = false;
                         let worldToken, mapToken;
@@ -1888,6 +1890,7 @@ class mmrpgWorldMap {
                         if (goToPath[1]){ worldToken = goToPath[0]; mapToken = goToPath[1]; }
                         else { worldToken = _config.mapWorld; mapToken = goToPath[0]; }
                         autoRedirectURL = 'world.php?world=' + worldToken + '&map=' + mapToken;
+                        if (portalInfo['dst']){ autoRedirectURL += '&position='+portalInfo['dst']; }
                         autoRedirectSound = 'bounce-sound';
                         }
                     } else {
@@ -1900,10 +1903,10 @@ class mmrpgWorldMap {
             //console.log('-> event at position is a button, preparing dropdown');
             // If the cursor is literally on a button, only one event sprite matters right now
             let $buttonEvent = $firstEvent;
-            var dataLabel = $buttonEvent.attr('data-label');
-            var dataButton = $buttonEvent.attr('data-button');
-            var dataColour = $buttonEvent.attr('data-colour');
-            var dataState = $buttonEvent.attr('data-state');
+            let dataLabel = $buttonEvent.attr('data-label');
+            let dataButton = $buttonEvent.attr('data-button');
+            let dataColour = $buttonEvent.attr('data-colour');
+            let dataState = $buttonEvent.attr('data-state');
             if (dataButton && dataState === 'up'){
                 showDropdown = true;
                 //var buttonName = (dataColour ? (dataColour[0].toUpperCase() + dataColour.slice(1) + ' ') : '') + 'Button';

@@ -1261,6 +1261,7 @@ class rpg_world {
             foreach ($portal_sprites AS $portal_name => $portal_data){
                 if (empty($portal_data) || !is_array($portal_data)){ continue; }
                 $pos = $portal_data[0];
+                $dst = !empty($portal_data[1]) ? $portal_data[1] : '';
                 list($col, $row) = explode('-', $pos);
                 $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
@@ -1280,6 +1281,7 @@ class rpg_world {
                 $portal_symbols[$pos] = $portal_name;
                 $portals_index[$portal_name] = array(
                     'pos' => $pos,
+                    'dst' => $dst,
                     'col' => $col,
                     'row' => $row,
                     'label' => $label,
