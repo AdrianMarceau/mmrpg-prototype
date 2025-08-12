@@ -1300,6 +1300,11 @@ html, body {
     border-color: #c83d3d;
     background-color: #a32121;
 }
+#world #canvas #robots-overview .team-robot > .guage.energy.no > i {
+    border-color: #c83d3d;
+    background-color: #a32121;
+    padding: 0;
+}
 #world #canvas #robots-overview .team-robot > .guage.weapons > i {
     border-color: rgb(61, 124, 190);
     background-color: rgb(43, 101, 163);
