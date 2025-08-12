@@ -30,6 +30,7 @@ function mmrpg_reset_game_session($delete_db_records = false, $delete_db_records
     // Unset known session variables used by the game
     unset(
         $_SESSION['GAME'],
+        $_SESSION['WORLD'],
         //$_SESSION['INDEX'],
         $_SESSION['PROTOTYPE_TEMP'],
         //$_SESSION['LEADERBOARD'],
