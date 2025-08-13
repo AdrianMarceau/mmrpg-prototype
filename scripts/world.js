@@ -1419,6 +1419,7 @@ class mmrpgWorldMap {
         forceMove = typeof forceMove === 'boolean' ? forceMove : false;
         animateMove = typeof animateMove === 'boolean' ? animateMove : true;
         let _self = this;
+        let _selfRef = self;
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
@@ -1462,6 +1463,7 @@ class mmrpgWorldMap {
         $spritesLayer.removeClass('has-zoom');
         $('.sprite.zoom', $spritesLayer).removeClass('zoom');
         $('.sprite[data-frame]:not(.disabled)', $canvasMap).attr('data-frame', '00');
+        $('.sprite.idle', $spritesLayer).removeClass('idle');
         // Move the cursor to the new position first and foremost
         let moveTimeout;
         let timeoutDuration = _mapEffects.moveTimeout;
@@ -1517,7 +1519,7 @@ class mmrpgWorldMap {
                 let imgSizeX = imgSize + 'x' + imgSize;
                 teamTravelDuration += 30; // add a little extra time for the team sprites to move
                 if (thisVerDir === 'up'){ teamOffsetY += 10; }
-                else if (thisVerDir === 'down'){ teamOffsetY -= 10; }
+                else if (thisVerDir === 'down'){ teamOffsetY -= 20; }
                 if (thisHorDir === 'left'){ teamOffsetX += 20; }
                 else if (thisHorDir === 'right'){ teamOffsetX -= 20; }
                 if (thisHorDir){ $thisSprite.attr('data-dir', thisHorDir); }
@@ -1544,6 +1546,12 @@ class mmrpgWorldMap {
             }
         // Make sure we start the scroll to the new position
         _self.scrollMap(tileOffsetX, tileOffsetY);
+        // Start the idle timeout (clearing if already exists) so we can run idle-actions
+        if (_selfRef.idleTimeout){ clearTimeout(_selfRef.idleTimeout); }
+        _selfRef.idleTimeout = setTimeout(function(){
+            //console.log('%c' + 'Idle timeout triggered!', 'color: orange;');
+            $cursorSprite.addClass('idle');
+            }, 3000);
         return true;
         }
 

@@ -497,6 +497,9 @@ html, body {
 #world #map .layer.objects .sprite.cursor.bounce {
     animation: world-cursor-bounce 1s steps(1) infinite;
 }
+#world #map .layer.objects .sprite.cursor.bounce.idle > .wrap {
+    transform: translate(80%, -10%);
+}
 
 /* add a 'shake' effect to the shake cursor to show its scared */
 #world #map .layer.objects .sprite.cursor.shake {
