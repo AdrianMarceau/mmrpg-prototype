@@ -303,6 +303,7 @@ class rpg_world {
         $map_data_vars['tiles'] = isset($map_data_vars['tiles']) ? $map_data_vars['tiles'] : array();
         $map_data_vars['groups'] = isset($map_data_vars['groups']) ? $map_data_vars['groups'] : array();
         $map_data_vars['sprites'] = isset($map_data_vars['sprites']) ? $map_data_vars['sprites'] : array();
+        $map_data_vars['events'] = isset($map_data_vars['events']) ? $map_data_vars['events'] : array();
         $map_data_vars['portals'] = isset($map_data_vars['portals']) ? $map_data_vars['portals'] : array();
         $map_data_vars['buttons'] = isset($map_data_vars['buttons']) ? $map_data_vars['buttons'] : array();
         $map_data_vars['switches'] = isset($map_data_vars['switches']) ? $map_data_vars['switches'] : array();
@@ -327,6 +328,7 @@ class rpg_world {
         $map_data_vars['tiles'] = $map_custval_parser($map_data_vars['tiles'], true);
         $map_data_vars['groups'] = $map_custval_parser($map_data_vars['groups']);
         $map_data_vars['sprites'] = $map_custval_parser($map_data_vars['sprites']);
+        $map_data_vars['events'] = $map_custval_parser($map_data_vars['events']);
         $map_data_vars['portals'] = $map_custval_parser($map_data_vars['portals']);
         $map_data_vars['buttons'] = $map_custval_parser($map_data_vars['buttons']);
         $map_data_vars['switches'] = $map_custval_parser($map_data_vars['switches']);
@@ -346,6 +348,7 @@ class rpg_world {
         $map_data_parsed['tiles'] = $map_data_vars['tiles']; unset($map_data_vars['tiles']);
         $map_data_parsed['groups'] = $map_data_vars['groups']; unset($map_data_vars['groups']);
         $map_data_parsed['sprites'] = $map_data_vars['sprites']; unset($map_data_vars['sprites']);
+        $map_data_parsed['events'] = $map_data_vars['events']; unset($map_data_vars['events']);
         $map_data_parsed['portals'] = $map_data_vars['portals']; unset($map_data_vars['portals']);
         $map_data_parsed['buttons'] = $map_data_vars['buttons']; unset($map_data_vars['buttons']);
         $map_data_parsed['switches'] = $map_data_vars['switches']; unset($map_data_vars['switches']);
@@ -1196,6 +1199,63 @@ class rpg_world {
         $terrain_markup[] = '<canvas data-canvas="terrain" width="'.$map_pixel_width.'" height="'.$map_pixel_height.'"></canvas>';
         $terrain_markup[] = '<script data-json="tileData" type="application/json">'.$tile_data_json.'</script>';
         return implode(PHP_EOL, $terrain_markup);
+    }
+
+    // Define a function for getting the EVENTS LAYER sprite markup for the world map
+    public static function get_events_layer_markup($this_prototype_data, $map_data_parsed){
+        error_log('rpg_world::get_events_layer_sprites() called!');
+        // EVENTS LAYER
+        $map_config = $map_data_parsed['config'];
+        $map_width = $map_config['pixel_width'];
+        $map_height = $map_config['pixel_height'];
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_tilesize_offset = $map_config['tilesize_offset'];
+        $this_player_token = $this_prototype_data['this_player_token'];
+        $this_is_cursor = $this_player_token === 'player' ? true : false;
+        $events_markup = array();
+        $event_symbols = array();
+        $events_index = array();
+        if (!empty($map_data_parsed['events'])){
+            $event_sprites = $map_data_parsed['events'];
+            foreach ($event_sprites AS $event_name => $event_data){
+                if (empty($event_data) || !is_array($event_data)){ continue; }
+                $pos = $event_data[0];
+                $sprite = !empty($event_data[1]) ? $event_data[1] : '';
+                $filter = !empty($event_data[2]) ? $event_data[2] : '';
+                $action = !empty($event_data[3]) ? $event_data[3] : '';
+                error_log('processing event "'.$event_name.'" with pos "'.$pos.'"'.PHP_EOL.'-> $sprite = "'.$sprite.'"'.PHP_EOL.'-> filter = "'.$filter.'"'.PHP_EOL.'-> $action = "'.$action.'"');
+                list($col, $row) = explode('-', $pos);
+                $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                $hidden = in_array('hidden', $event_data) ? true : false; unset($event_data[array_search('hidden', $event_data)]);
+                $locked = in_array('locked', $event_data) ? true : false; unset($event_data[array_search('locked', $event_data)]);
+                $data = array_values($event_data); // remaining vaules if any
+                $label = 'World '.ucfirst($event_name);
+                $attrs = 'data-event="'.$event_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                $classes = 'sprite tile event'.($sprite ? ' '.$sprite : '').(!$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $style = 'top: '.$top.'px; left: '.$left.'px;';
+                $events_markup[] = '<span data-sprite="event" class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>';
+                $event_symbols[$pos] = $event_name;
+                $events_index[$event_name] = array(
+                    'pos' => $pos,
+                    'sprite' => $sprite,
+                    'filter' => $filter,
+                    'action' => $action,
+                    'col' => $col,
+                    'row' => $row,
+                    'label' => $label,
+                    'hidden' => $hidden,
+                    'locked' => $locked,
+                    'data' => $data,
+                    );
+            }
+        }
+        $event_symbols_json = json_encode($event_symbols, JSON_NUMERIC_CHECK);
+        $events_index_json = json_encode($events_index, JSON_NUMERIC_CHECK);
+        $events_markup[] = '<script data-json="eventSymbols" type="application/json">'.$event_symbols_json.'</script>';
+        $events_markup[] = '<script data-json="eventsIndex" type="application/json">'.$events_index_json.'</script>';
+        return implode(PHP_EOL, $events_markup);
     }
 
     // Define a function for getting the PORTALS LAYER sprite markup for the world map

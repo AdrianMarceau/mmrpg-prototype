@@ -92,9 +92,10 @@ html, body {
 }
 #world #canvas #map .layer[data-layer="background"] { z-index: 1; }
 #world #canvas #map .layer[data-layer="terrain"] { z-index: 10; }
-#world #canvas #map .layer[data-layer="portals"] { z-index: 20; }
-#world #canvas #map .layer[data-layer="buttons"] { z-index: 22; }
-#world #canvas #map .layer[data-layer="switches"] { z-index: 24; }
+#world #canvas #map .layer[data-layer="events"] { z-index: 20; }
+#world #canvas #map .layer[data-layer="portals"] { z-index: 22; }
+#world #canvas #map .layer[data-layer="buttons"] { z-index: 24; }
+#world #canvas #map .layer[data-layer="switches"] { z-index: 26; }
 #world #canvas #map .layer[data-layer="battles"] { z-index: 30; }
 #world #canvas #map .layer[data-layer="teams"] { z-index: 40; }
 

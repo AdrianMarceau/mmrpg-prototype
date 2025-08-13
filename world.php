@@ -570,6 +570,14 @@ $flag_skip_fadein = true;
                     echo('</div>'.PHP_EOL);
                 }
 
+                // EVENT SPRITES
+                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
+                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
+                $events_layer_markup = rpg_world::get_events_layer_markup($this_prototype_data, $map_data_parsed);
+                echo('<div class="layer layer-2 sprites tiles events" data-layer="events" '.$map_layer_styles.$map_layer_attrs.'>');
+                    echo($events_layer_markup);
+                echo('</div>'.PHP_EOL);
+
                 // PORTAL SPRITES
                 $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                 $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
