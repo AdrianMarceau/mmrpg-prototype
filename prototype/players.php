@@ -277,12 +277,32 @@ else {
     $doctor_token = 'proxy';
     $doctor_info = isset($mmrpg_player_index[$doctor_token]) ? $mmrpg_player_index[$doctor_token] : array();
     if (false && $unlock_flag_proxy){
-       // TODO: write this so it actually does something
+        // TODO: update this so it actually does something
+        //$maintext_string = 'Proxy Story';
+        //$subtext_string = 'Rogue of Network // The Void Cauldron';
+        //$subtext2_string = '[ <i class="fa fas">★★★★★☆☆☆☆☆</i> ]';
     } else {
+        // Show progress toward unlocking this mode via vague icon usage
+        // TODO: define a real unlock method for this instead of below
+        //$num_robots_unlockable = 100; // TODO: hard-coded for now, but its been the same number for over a decade sooo....
+        //$num_robots_unlocked = mmrpg_prototype_robots_unlocked();
+        //if ($num_robots_unlocked > $num_robots_unlockable){ $num_robots_unlocked = $num_robots_unlockable; }
+        //$num_star_icons_max = 10;
+        //$num_star_icons_earned = floor(($num_robots_unlocked / $num_robots_unlockable) * $num_star_icons_max);
+        $num_stars_unlocked = mmrpg_prototype_stars_unlocked();
+        $num_stars_required = 100; // TODO: seems like a good number for a requirement but maybe don't hard-core forever
+        $num_star_icons_max = 10; // this is just how many are displayed on-screen at once
+        $num_star_icons_earned = floor(($num_stars_unlocked / $num_stars_required) * $num_star_icons_max);
+        $star_icon_string = str_repeat('★', $num_star_icons_earned) . str_repeat('☆', ($num_star_icons_max - $num_star_icons_earned));
+        $maintext_string = 'Proxy Story';
+        $subtext_string = 'Rogue of Network // The Void Cauldron';
+        $subtext2_string = '[ <i class="fa fas">'.$star_icon_string.'</i> ]';
+        $maintext_string = preg_replace('/[^\s]/i', '-', $maintext_string);
+        $subtext_string = preg_replace('/[^\s]/i', '-', $subtext_string);
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' option_void-cauldron block_1 type_empty option_disabled';
         echo '<a class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="0">';
             echo '<div class="platform"><div class="chrome"><div class="inset">';
-                echo '<label class="has_image"><span class="multi"><span class="maintext">......</span><span class="subtext">...</span><span class="subtext2">...</span></span><span class="arrow">&nbsp;</span></label>';
+                echo '<label class="has_image"><span class="multi"><span class="maintext">'.$maintext_string.'</span><span class="subtext">'.$subtext_string.'</span><span class="subtext2">'.$subtext2_string.'</span></span><span class="arrow">&nbsp;</span></label>';
             echo '</div></div></div>';
         echo '</a>'."\n";
     }

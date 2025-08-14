@@ -2576,6 +2576,10 @@ body[data-source="website"] #prototype .menu {
     transform: translate(-50%, 0);
 }
 
+#mmrpg #prototype .option_this-player-select.option_proxy .maintext { top: -2px; background-color: transparent; }
+#mmrpg #prototype .option_this-player-select.option_proxy .subtext { top: 18px; background-color: transparent; }
+#mmrpg #prototype .option_this-player-select.option_proxy .subtext2 { top: 35px; background-color: transparent; }
+
 #mmrpg #prototype .option_this-player-select {
 
 }
