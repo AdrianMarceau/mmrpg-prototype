@@ -1704,14 +1704,32 @@ function mmrpg_prototype_stars_unlocked($player_token = '', $star_kind = ''){
         return count($temp_stars_index);
     }
 }
+// Define a function that returns the hard-coded list of player tokens that can be unlocked
+function mmrpg_prototype_unlockable_players(){
+    //error_log('mmrpg_prototype_unlockable_players() called');
+    return array('dr-light', 'dr-wily', 'dr-cossack', 'dr-lalinde');
+}
 // Define a function for checking how many limit hearts have been unlocked by a player
 function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0, &$extra_hearts = 0){
     //error_log('mmrpg_prototype_limit_hearts_earned('.$player_token.')');
 
+    // If this is "player" (the cursor), limit hearts are not relevant for one who cannot command robots
+    if ($player_token === 'player'){
+        // Instead, we'll simply return a representation of how many players have been unlocked so far
+        $human_players = mmrpg_prototype_unlockable_players();
+        $num_hearts = 1;
+        $real_max_hearts = count($human_players) + 1; // +1 for cursor
+        $max_hearts = $real_max_hearts;
+        foreach ($human_players AS $token){ if (mmrpg_prototype_player_unlocked($token)){ $num_hearts++; } }
+        if ($max_hearts > $real_max_hearts){ $max_hearts = $real_max_hearts; }
+        if ($num_hearts > $real_max_hearts){ $num_hearts = $real_max_hearts; }
+        return $num_hearts;
+    }
+
     // Define the number of hearts at zero and we'll go up from there
+    $num_hearts = 0;
     $real_max_hearts = 8;
     $max_hearts = $real_max_hearts;
-    $num_hearts = 0;
 
     // Collect the player's progress in terms of chapters to determine hearts
     $player_chapters_unlocked = rpg_prototype::get_player_chapters_unlocked($player_token);
