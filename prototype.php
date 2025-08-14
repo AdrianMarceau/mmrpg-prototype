@@ -469,14 +469,8 @@ if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-scr
 
         // Require the prototype campaign chapters display file
         require_once(MMRPG_CONFIG_ROOTDIR.'prototype/chapters.php');
-
-        // If we're NOT in demo mode, maybe add a back button
-        if (empty($_SESSION[$session_token]['DEMO'])){
-            // Print out the back button for going back to player select
-            if ($unlock_count_players > 1){
-                echo '<a class="option option_back block_1" data-back="1">&#9668; Back</a>'."\n";
-            }
-        }
+        // Print out the back button for going back to player select
+        echo '<a class="option option_back block_1" data-back="1">&#9668; Back</a>'."\n";
 
         ?>
     </div>
@@ -662,9 +656,6 @@ battleOptions['this_user_id'] = <?= $this_userid ?>;
 <? if (!empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){ ?>
     battleOptions['this_player_id'] = <?= $mmrpg_index_players[$_SESSION[$session_token]['battle_settings']['this_player_token']]['player_id'] ?>;
     battleOptions['this_player_token'] = '<?= $_SESSION[$session_token]['battle_settings']['this_player_token'] ?>';
-<? } elseif($unlock_count_players < 2){ ?>
-    battleOptions['this_player_id'] = <?= $mmrpg_index_players['dr-light']['player_id'] ?>;
-    battleOptions['this_player_token'] = 'dr-light';
 <? } ?>
 <? if ($unlock_count_players === 1 && mmrpg_prototype_robots_unlocked() === 1){ ?>
     battleOptions['this_player_robots'] = ['101_mega-man'];
