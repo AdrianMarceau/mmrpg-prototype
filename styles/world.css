@@ -402,6 +402,18 @@ html, body {
 #world #map .sprite.tile[data-portal="exit"] { background-position: -440px -40px; }
 #world #map .sprite.tile.portal.hidden { display: none; }
 
+@keyframes world-sprite-healpad-glow { 0%, 100% { filter: brightness(1) saturate(1); transform: scale(1); } 50% { filter: brightness(1.2) saturate(2); transform: scale(1.1); } }
+#world #map .sprite.event.healpad { background-position: -520px -40px; }
+#world #map .sprite.event.healpad.animate { animation: world-sprite-healpad-glow 4s ease-in infinite; transform-origin: center; }
+
+#world #map .sprite.event.console { background-position: -600px -40px; }
+#world #map .sprite.event.console.multi { background-position: -680px -40px; }
+#world #map .sprite.event.console.healing { background-position: -600px -120px; }
+#world #map .sprite.event.console.weapons { background-position: -680px -120px; }
+#world #map .sprite.event.console.items { background-position: -600px -200px; }
+#world #map .sprite.event.console.misc { background-position: -680px -200px; }
+#world #map .sprite.event.console.off { background-position: -600px -40px; }
+
 #world #map .sprite.tile.button-up { background-position: -40px -280px; }
 #world #map .sprite.tile.button-down { background-position: -40px -360px; }
 #world #map .sprite.tile.button.black.up { background-position: -40px -280px; }
@@ -1537,6 +1549,11 @@ html, body {
 #world #canvas #side-buttons .button[data-action="push-button"].orange {
     background-color: #a24d1e !important;
     border-color: #c66e34 !important;
+}
+
+#world #canvas #side-buttons .button[data-action="trigger-event"] {
+    background-color: #303f58 !important;
+    border-color: #5276b1 !important;
 }
 
 #world #canvas #position-display {
