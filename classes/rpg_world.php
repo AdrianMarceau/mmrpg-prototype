@@ -1133,6 +1133,7 @@ class rpg_world {
             $robot_item = $robot_overview['item'];
             $robot_image = $robot_overview['image'];
             $robot_sprite = self::get_sprite('robot', $robot_image, '', 'right', 'character', '');
+            $robot_disabled = empty($robot_overview['energy']) ? true : false;
             $robot_energy = $robot_overview['energy'];
                 $robot_energy_max = $robot_overview['energyMax'];
                 $robot_energy_rating = $robot_overview['energyRating'];
@@ -1145,7 +1146,6 @@ class rpg_world {
                 $robot_weapons_rating = $robot_overview['weaponsRating'];
             $robot_weapons_label = $robot_weapons.' / '.$robot_weapons_max.' WE ('.$robot_weapons_percent.'%)';
             $robot_weapons_markup = '<div class="guage weapons" title="'.$robot_weapons_label.'"><i class="'.$robot_weapons_rating.'" style="width: '.$robot_weapons_percent.'%;"></i></div>';
-            $robot_disabled = empty($robot_energy) ? true : false;
             $robot_frame = $get_robot_energy_frame($robot_energy_rating);
             $robot_sprite = str_replace('data-frame="00"', 'data-frame="'.$robot_frame.'"', $robot_sprite);
             $markup_class = 'team-robot'.($robot_disabled ? ' disabled' : '');

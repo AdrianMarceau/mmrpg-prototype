@@ -1306,7 +1306,7 @@ html, body {
     position: relative;
     box-sizing: border-box;
     height: 100%;
-    padding: 0 3px;
+    padding: 0;
     width: auto;
     border: 1px solid #191919;
     border-left: none;
@@ -1351,11 +1351,15 @@ html, body {
 #world #canvas #robots-overview .team-robot > .guage.energy > i.no {
     border-color: transparent;
     background-color: transparent;
-    padding: 0;
 }
 #world #canvas #robots-overview .team-robot > .guage.weapons > i {
     border-color: rgb(61, 124, 190);
     background-color: rgb(43, 101, 163);
+}
+#world #canvas #robots-overview .team-robot[data-status="no-energy"] > .guage.weapons > i {
+    border-color: transparent !important;
+    background-color: transparent !important;
+    width: 0% !important;
 }
 #world #canvas #robots-overview:after,
 #world #canvas #robots-overview .team-robot:after,
