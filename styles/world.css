@@ -975,6 +975,7 @@ html, body {
     background-image: none !important;
     transition: outline 0.3s, background-color 0.3s;
     cursor: pointer;
+    user-select: none;
 }
 #world #canvas #player-switcher .team-player:before {
     content: "";
@@ -1239,21 +1240,21 @@ html, body {
     transform: scale(2);
     */
 }
-#world #canvas #robots-overview .team-robot.full-energy .icon .sprite .sprite {
+#world #canvas #robots-overview .team-robot[data-status="full-energy"] .icon .sprite .sprite {
     filter: drop-shadow(1px 1px 0 rgba(255, 255, 255, 0.5));
     /* animation: robots-overview-sprite-bounce calc(var(--base-bounce-duration) * var(--sprite-speed)) steps(1) infinite;  */
 }
-#world #canvas #robots-overview .team-robot.high-energy .icon .sprite .sprite {
+#world #canvas #robots-overview .team-robot[data-status="high-energy"] .icon .sprite .sprite {
     filter: drop-shadow(1px 1px 0 rgba(255, 255, 255, 0.5));
 }
-#world #canvas #robots-overview .team-robot.med-energy .icon .sprite .sprite {
+#world #canvas #robots-overview .team-robot[data-status="med-energy"] .icon .sprite .sprite {
     filter: drop-shadow(1px 1px 0 orange);
 }
-#world #canvas #robots-overview .team-robot.low-energy .icon .sprite .sprite {
+#world #canvas #robots-overview .team-robot[data-status="low-energy"] .icon .sprite .sprite {
     filter: drop-shadow(1px 1px 0 red);
     animation: robots-overview-sprite-shake calc(var(--base-shake-duration) * var(--sprite-speed)) steps(1) infinite;
 }
-#world #canvas #robots-overview .team-robot.no-energy .icon .sprite .sprite {
+#world #canvas #robots-overview .team-robot[data-status="no-energy"] .icon .sprite .sprite {
     filter: drop-shadow(1px 1px 0 red);
 }
 #world #canvas #robots-overview .team-robot:hover .icon .sprite .sprite {
@@ -1310,6 +1311,7 @@ html, body {
     border: 1px solid #191919;
     border-left: none;
     background-color: #292929;
+    transition: width 0.9s, background-color 1.2s, border-color 1.2s;
 }
 /* add repeating 1px opaque/transparent alternating gradient overtop to look like megaman health bars */
 #world #canvas #robots-overview .team-robot > .guage > i:after {
@@ -1347,8 +1349,8 @@ html, body {
     background-color: #a32121;
 }
 #world #canvas #robots-overview .team-robot > .guage.energy > i.no {
-    border-color: #c83d3d;
-    background-color: #a32121;
+    border-color: transparent;
+    background-color: transparent;
     padding: 0;
 }
 #world #canvas #robots-overview .team-robot > .guage.weapons > i {
@@ -1362,6 +1364,27 @@ html, body {
     display: block;
     clear: both;
 }
+
+@keyframes robots-overview-energy-restored {
+    0% { transform: scale(1.0); filter: brightness(1.0); }
+    50% { transform: scale(1.2); filter: brightness(1.5) saturate(1.2); }
+    100% { transform: scale(1.0); filter: brightness(1.0); }
+}
+#world #canvas #robots-overview .team-robot.energy-restored {
+    transform-origin: left center;
+    transform: scale(1.0);
+    filter: brightness(1.0);
+    animation: robots-overview-energy-restored 2s ease-in-out forwards;
+}
+
+#world #canvas #robots-overview .team-robot:nth-child(1) { z-index: 10; }
+#world #canvas #robots-overview .team-robot:nth-child(2) { z-index: 9; }
+#world #canvas #robots-overview .team-robot:nth-child(3) { z-index: 8; }
+#world #canvas #robots-overview .team-robot:nth-child(4) { z-index: 7; }
+#world #canvas #robots-overview .team-robot:nth-child(5) { z-index: 6; }
+#world #canvas #robots-overview .team-robot:nth-child(6) { z-index: 5; }
+#world #canvas #robots-overview .team-robot:nth-child(7) { z-index: 4; }
+#world #canvas #robots-overview .team-robot:nth-child(8) { z-index: 3; }
 
 #world #canvas #robots-overview .team-robot:nth-child(1) .icon { filter: brightness(1.0); }
 #world #canvas #robots-overview .team-robot:nth-child(2) .icon { filter: brightness(0.9); }

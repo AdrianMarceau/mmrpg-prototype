@@ -232,10 +232,11 @@ if (!isset($WORLD_PLAYER_SESSION['last_robots'])){ $WORLD_PLAYER_SESSION['last_r
 // Collect the current player's robots and battle history
 $this_prototype_data['this_player_id'] = $this_player_info['player_id'];
 $this_prototype_data['this_player_token'] = $this_player_info['player_token'];
-$max_player_robots = mmrpg_prototype_limit_hearts_earned($this_player_token) || 0;
+$max_player_robots = mmrpg_prototype_limit_hearts_earned($this_player_token);
 $allowed_player_robots = mmrpg_prototype_robots_unlocked($this_player_token, true);
 $current_player_robots = !empty($allowed_player_robots) ? array_slice($allowed_player_robots, 0, $max_player_robots) : array(); // TODO: make this customizable
 $summoned_player_robots = rpg_world::get_battle_history($this_player_token, 'robots_summoned');
+//error_log('$max_player_robots = '.print_r($max_player_robots, true));
 //error_log('$allowed_player_robots = '.print_r($allowed_player_robots, true));
 //error_log('$current_player_robots = '.print_r($current_player_robots, true));
 //error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));

@@ -8,7 +8,7 @@
 define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
 define('MMRPG_WORLD_DEFAULT_TILESIZE', 80);
 define('MMRPG_WORLD_DEFAULT_SPRITESITE', 40);
-define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 3); // TODO: make this dependant on limit hearts
+define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 1); // TODO: make this dependant on limit hearts
 define('MMRPG_WORLD_DEFAULT_MOBILITY', 1); // TODO: make this dependant on player skill
 define('MMRPG_WORLD_DEFAULT_BASEPATH', '/');
 
@@ -1073,9 +1073,9 @@ class rpg_world {
             $player_sprite = self::get_sprite('player', $player_token, '', 'right', 'character', '');
             $player_label = $get_label_span($player_info['player_name'], 'player');
             $player_types = 'type '.$player_info['player_type'];
-            $link_class = 'team-player '.$player_types.($player_active ? ' active' : '');
-            $link_attrs = !$player_active ? ' data-player="'.$player_token.'"' : '';
-            $return_markup .= ('<a class="'.$link_class.'"'.$link_attrs.'>'.$player_sprite.$cursor_sprite.$player_label.'</a>');
+            $markup_class = 'team-player '.$player_types.($player_active ? ' active' : '');
+            $markup_attrs = !$player_active ? ' data-player="'.$player_token.'"' : '';
+            $return_markup .= ('<a class="'.$markup_class.'"'.$markup_attrs.'>'.$player_sprite.$cursor_sprite.$player_label.'</a>');
         }
         $return_markup .= ('<a class="team-player '.$cursor_types.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         return $return_markup;
@@ -1139,10 +1139,10 @@ class rpg_world {
             $robot_disabled = empty($robot_energy) ? true : false;
             $robot_frame = $get_robot_energy_frame($robot_energy_rating);
             $robot_sprite = str_replace('data-frame="00"', 'data-frame="'.$robot_frame.'"', $robot_sprite);
-            $link_class = 'team-robot'.(' '.$robot_energy_rating.'-energy').($robot_disabled ? ' disabled' : '');
-            $link_attrs = ' data-robot="'.$robot_id.'_'.$robot_token.'"'; //!$robot_disabled ? ' data-robot="'.$robot_token.'"' : '';
+            $markup_class = 'team-robot'.($robot_disabled ? ' disabled' : '');
+            $markup_attrs = 'data-robot="'.$robot_id.'_'.$robot_token.'" data-status="'.$robot_energy_rating.'-energy"';
             $robot_markup = '';
-            $robot_markup .= '<div class="'.$link_class.'"'.$link_attrs.'>';
+            $robot_markup .= '<div class="'.$markup_class.'" '.$markup_attrs.'>';
                 $robot_markup .= '<div class="icon '.$robot_core_types.'">'.$robot_sprite.'</div>';
                 $robot_markup .= '<div class="label">';
                     $robot_markup .= '<strong class="name">'.$robot_name.'</strong>';
@@ -1220,20 +1220,20 @@ class rpg_world {
             $event_sprites = $map_data_parsed['events'];
             foreach ($event_sprites AS $event_name => $event_data){
                 if (empty($event_data) || !is_array($event_data)){ continue; }
-                $pos = $event_data[0];
-                $sprite = !empty($event_data[1]) ? $event_data[1] : '';
-                $filter = !empty($event_data[2]) ? $event_data[2] : '';
-                $action = !empty($event_data[3]) ? $event_data[3] : '';
-                error_log('processing event "'.$event_name.'" with pos "'.$pos.'"'.PHP_EOL.'-> $sprite = "'.$sprite.'"'.PHP_EOL.'-> filter = "'.$filter.'"'.PHP_EOL.'-> $action = "'.$action.'"');
+                $pos = $event_data[0]; unset($event_data[0]);
+                $sprite = !empty($event_data[1]) ? $event_data[1] : ''; unset($event_data[1]);
+                $filter = !empty($event_data[2]) ? $event_data[2] : ''; unset($event_data[2]);
+                $action = !empty($event_data[3]) ? $event_data[3] : ''; unset($event_data[3]);
+                //error_log('processing event "'.$event_name.'" with pos "'.$pos.'"'.PHP_EOL.'-> $sprite = "'.$sprite.'"'.PHP_EOL.'-> filter = "'.$filter.'"'.PHP_EOL.'-> $action = "'.$action.'"');
                 list($col, $row) = explode('-', $pos);
                 $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                 $hidden = in_array('hidden', $event_data) ? true : false; unset($event_data[array_search('hidden', $event_data)]);
                 $locked = in_array('locked', $event_data) ? true : false; unset($event_data[array_search('locked', $event_data)]);
                 $data = array_values($event_data); // remaining vaules if any
-                $label = 'World '.ucfirst($event_name);
+                $label = 'World '.ucwords(str_replace('-', ' ', $event_name));
                 $attrs = 'data-event="'.$event_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
-                $classes = 'sprite tile event'.($sprite ? ' '.$sprite : '').(!$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $classes = 'sprite tile event'.($sprite ? ' '.$sprite : '').(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 $style = 'top: '.$top.'px; left: '.$left.'px;';
                 $events_markup[] = '<span data-sprite="event" class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>';
                 $event_symbols[$pos] = $event_name;

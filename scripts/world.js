@@ -126,6 +126,7 @@ class mmrpgWorldMap {
         let $resetButton = $('#reset-button', $thisWorld);
         let $positionDisplay = $('#position-display', $thisWorld);
         let $playerSwitcher = $('#player-switcher', $thisWorld);
+        let $robotsOverview = $('#robots-overview', $thisWorld);
         let $sideButtons = $('#side-buttons', $thisWorld);
         let $actionDropdown = $('#action-dropdown', $thisWorld);
         let $clickOverlay = $('#click-overlay', $thisWorld);
@@ -141,6 +142,7 @@ class mmrpgWorldMap {
         _elements.resetButton = $resetButton;
         _elements.positionDisplay = $positionDisplay;
         _elements.playerSwitcher = $playerSwitcher;
+        _elements.robotsOverview = $robotsOverview;
         _elements.sideButtons = $sideButtons;
         _elements.actionDropdown = $actionDropdown;
         _elements.clickOverlay = $clickOverlay;
@@ -2655,5 +2657,234 @@ class mmrpgWorldMap {
     wait(ms){
         return new Promise(resolve => setTimeout(resolve, ms));
         }
+
+    // Quick function for triggering a world event (lol) and any effects that may occur
+    triggerWorldEvent(eventAction, eventData, $eventSprite){
+        //console.log('%c' + 'mmrpgWorldMap.triggerWorldEvent(' + eventAction + ', ' + eventData + ', $eventSprite:' + typeof $eventSprite + ')', 'color: magenta;');
+        if (!eventAction || typeof eventAction !== 'string' || !eventAction.length){ console.error('triggerWorldEvent() missing required eventAction!'); return false; }
+        // Collect references to world objects
+        let _self = this;
+        let _selfRef = _self.triggerWorldEvent;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldCursor = _world.cursor;
+        let $canvasMap = _elements.map;
+        let $teamSprites = _elements.teamSprites;
+        // If the cursor hasn't moved yet, we shouldn't be processing anything
+        if (!_worldCursor.moved){
+            console.warn('triggerWorldEvent() called but cursor has not moved yet!');
+            return false;
+            }
+        // Check to see if the event is valid
+        let allowedActions = ['trigger-effects'];
+        if (allowedActions.indexOf(eventAction) === -1){
+            console.error('triggerWorldEvent() invalid eventAction provided: ' + eventAction);
+            return false;
+            }
+        // Define an inline function for processing the different event actions possible
+        let processEventAction = function(eventAction, onComplete, afterDelay){
+            if (!onComplete || typeof onComplete !== 'function'){ onComplete = false; }
+            if (!afterDelay || typeof afterDelay !== 'number'){ afterDelay = 0; }
+            // Process the event action based on it's token
+            if (eventAction === 'trigger-effects'){
+                //console.log('-> triggering effects for event with data:', eventData);
+                _self.playSoundEffect('use-recovery-item');
+                let eventEffects = Object.values(eventData);
+                for (let i = 0; i < eventEffects.length; i++){
+                    let effect = eventEffects[i];
+                    //console.log('-> effect =', effect);
+                    if (!effect){ continue; }
+                    // If this is a RESTORE TEAM ENERGY effect, let's process that now
+                    else if (effect === 'restore-team-energy'){
+                        //console.log('%c' + '-> restoring team energy via event panel', 'color: lime;');
+                        let _playerRobots = _config.playerRobots || [];
+                        for (let j = 0; j < _playerRobots.length; j++){ _self.restoreRobotEnergy(_playerRobots[j], true); }
+                        //_self.playSoundEffect('recovery-energy');
+                        }
+                    // If this is a RESTORE TEAM WEAPONS effect, let's process that now
+                    else if (effect === 'restore-team-weapons'){
+                        //console.log('%c' + '-> restoring team weapons for event panel', 'color: cyan;');
+                        let _playerRobots = _config.playerRobots || [];
+                        for (let j = 0; j < _playerRobots.length; j++){ _self.restoreRobotWeapons(_playerRobots[j], true); }
+                        //_self.playSoundEffect('recovery-weapons');
+                        }
+                    }
+                }
+            // If an onComplete function was provided, call it now (with delay if requested)
+            if (onComplete){
+                if (!afterDelay){ onComplete.call(_self, eventAction, eventData, $eventSprite); }
+                else { setTimeout(function(){ onComplete.call(_self, eventAction, eventData, $eventSprite); }, afterDelay); }
+                }
+            };
+        // Now process the event given the action and data provided after some visual fluff
+        let delayTime = 1000;
+        _self.incZoomLevel();
+        setTimeout(function(){
+            processEventAction(eventAction, function(){
+                _self.resetZoomLevel();
+                $teamSprites.removeClass('shake');
+                $teamSprites.filter(':not(.disabled)').attr('data-frame', '00');
+                }, delayTime);
+            }, delayTime);
+        // Return true on success
+        return true;
+        }
+
+
+    // Quick function for getting a rating token given a percent value
+    getRatingToken(percent){
+        //console.log('%c' + 'mmrpgWorldMap.getRatingToken(' + percent + ')', 'color: magenta;');
+        if (typeof percent !== 'number' || isNaN(percent) || percent < 0 || percent > 100){ console.error('getRatingToken() missing or invalid percent value!'); return false; }
+        if (percent === 100){ return 'full'; }
+        else if (percent >= 50){ return 'high'; }
+        else if (percent >= 20){ return 'med'; }
+        else if (percent >= 1){ return 'low'; }
+        else { return 'no'; }
+        }
+
+    // Quick function for getting a robot energy frame given a rating token
+    getRobotEnergyFrame(rating){
+        //console.log('%c' + 'mmrpgWorldMap.getRobotEnergyFrame(' + rating + ')', 'color: magenta;');
+        if (!rating || typeof rating !== 'string' || !rating.length){ console.error('getRobotEnergyFrame() missing required rating!'); return false; }
+        if (rating === 'full'){ return '10'; } // base2
+        else if (rating === 'high'){ return '01'; } // taunt
+        else if (rating === 'med'){ return '00'; } // base
+        else if (rating === 'low'){ return '08'; } // defend
+        else { return '03'; } // defeat
+        }
+
+    // Quick function for restoring a robot's energy (if available) by a specific amount (or all if === true)
+    restoreRobotEnergy(robotString, restoreAmount, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.restoreRobotEnergy(' + robotString + ', ' + restoreAmount + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('restoreRobotEnergy() missing required robotString!'); return false; }
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        // If restoreAmount is true, restore all energy, otherwise restore the amount provided
+        restoreAmount = (typeof restoreAmount === 'number' ? restoreAmount : (restoreAmount === true ? true : 0));
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        // Break the robot sprite into ID and token and collect its info
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _config.playerRobotsIndex[robotString] || false;
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // Collect a reference to this robot's element in the overview panel
+        let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', _elements.robotsOverview);
+        if (!$robotOverview || !$robotOverview.length){ console.warn('restoreRobotEnergy() could not find overview for robot ' + robotString + '!'); return false; }
+        let $robotIconSprite = $('.icon > .sprite', $robotOverview);
+        let $robotEnergyGuage = $('.guage.energy', $robotOverview);
+        if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('restoreRobotEnergy() could not find icon sprite for robot ' + robotString + '!'); return false; }
+        if (!$robotEnergyGuage || !$robotEnergyGuage.length){ console.warn('restoreRobotEnergy() could not find energy guage for robot ' + robotString + '!'); return false; }
+        // Collect the current energy value for this robot
+        let wasDisabled = robotInfo.energy === 0 ? true : false; // was this robot disabled?
+        let currentEnergy = robotInfo.energy || 0;
+        let maxEnergy = robotInfo.energyMax || 0;
+        //console.log('-> currentEnergy =', currentEnergy);
+        //console.log('-> maxEnergy =', maxEnergy);
+        //console.log('-> restoreAmount =', restoreAmount);
+        // If restoreAmount is true, restore all energy, otherwise restore the amount provided
+        let newEnergy = 0;
+        if (restoreAmount === true){ newEnergy = maxEnergy; }
+        else if (typeof restoreAmount === 'number' && restoreAmount > 0){ newEnergy = Math.min(currentEnergy + restoreAmount, maxEnergy); }
+        //console.log('-> newEnergy =', newEnergy);
+        // If the new and old energy values are the same, do nothing
+        if (newEnergy === currentEnergy){
+            //console.log('restoreRobotEnergy() called but energy values are the same, nothing changed!');
+            return true;
+            }
+        // Update the robot info with the new energy value
+        robotInfo.energy = newEnergy;
+        robotInfo.energyPercent = Math.floor((robotInfo.energy / robotInfo.energyMax) * 100);
+        robotInfo.energyRating = _self.getRatingToken(robotInfo.energyPercent);
+        _config.playerRobotsIndex[robotString] = robotInfo; // sync the robot info with the index
+        // Update the overview with any changes to the status
+        if (robotInfo.energy > 0){ $robotOverview.removeClass('disabled'); }
+        else { $robotOverview.addClass('disabled'); }
+        $robotOverview.attr('data-status', robotInfo.energyRating+'-energy');
+        // Update this robot's sprite on the actual overworld too
+        let $teamSprites = _elements.teamSprites;
+        let $robotSprite = $teamSprites.filter('.sprite[data-token="' + robotToken + '"]');
+        if (robotInfo.energy > 0){ $robotSprite.removeClass('disabled').attr('data-frame', '08'); }
+        else { $robotSprite.addClass('disabled'); }
+        // Update the robot's icon sprite with a new frame matching its new energy value
+        let robotEnergyFrame = _self.getRobotEnergyFrame(robotInfo.energyRating);
+        $robotIconSprite.attr('data-frame', robotEnergyFrame);
+        // Update the energy guage title and bar within with the new energy value
+        $robotEnergyGuage.attr('title', newEnergy + '/' + maxEnergy + ' LE (' + robotInfo.energyPercent + '%)');
+        $('> i', $robotEnergyGuage).css({width: robotInfo.energyPercent + '%'}).removeClass().addClass(robotInfo.energyRating);
+        // Add a restored class to this robot to show it being effected by the action
+        if (playSound){ _self.playSoundEffect('recovery-energy'); }
+        $robotOverview.addClass('energy-restored');
+        setTimeout(function(){ $robotOverview.removeClass('energy-restored'); }, 3000);
+        // Trigger a save of the world state to persist this change
+        //_self.saveWorldState(); // not yet
+        // Return true on success
+        return true;
+    }
+
+    // Quick function for restoring a robot's weapons (if available) by a specific amount (or all if === true)
+    restoreRobotWeapons(robotString, restoreAmount, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.restoreRobotWeapons(' + robotString + ', ' + restoreAmount + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('restoreRobotWeapons() missing required robotString!'); return false; }
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        // If restoreAmount is true, restore all weapons, otherwise restore the amount provided
+        restoreAmount = (typeof restoreAmount === 'number' ? restoreAmount : (restoreAmount === true ? true : 0));
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        // Break the robot sprite into ID and token and collect its info
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _config.playerRobotsIndex[robotString] || false;
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // Collect a reference to this robot's element in the overview panel
+        let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', _elements.robotsOverview);
+        if (!$robotOverview || !$robotOverview.length){ console.warn('restoreRobotEnergy() could not find overview for robot ' + robotString + '!'); return false; }
+        let $robotIconSprite = $('.icon > .sprite', $robotOverview);
+        let $robotWeaponsGuage = $('.guage.weapons', $robotOverview);
+        if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('restoreRobotWeapons() could not find icon sprite for robot ' + robotString + '!'); return false; }
+        if (!$robotWeaponsGuage || !$robotWeaponsGuage.length){ console.warn('restoreRobotWeapons() could not find weapons guage for robot ' + robotString + '!'); return false; }
+        // Collect the current weapons value for this robot
+        let currentWeapons = robotInfo.weapons || 0;
+        let maxWeapons = robotInfo.weaponsMax || 0;
+        //console.log('-> currentWeapons =', currentWeapons);
+        //console.log('-> maxWeapons =', maxWeapons);
+        //console.log('-> restoreAmount =', restoreAmount);
+        // If restoreAmount is true, restore all weapons, otherwise restore the amount provided
+        let newWeapons = 0;
+        if (restoreAmount === true){ newWeapons = maxWeapons; }
+        else if (typeof restoreAmount === 'number' && restoreAmount > 0){ newWeapons = Math.min(currentWeapons + restoreAmount, maxWeapons); }
+        //console.log('-> newWeapons =', newWeapons);
+        // If the new and old weapons values are the same, do nothing
+        if (newWeapons === currentWeapons){
+            //console.log('restoreRobotWeapons() called but weapons values are the same, nothing changed!');
+            return true;
+            }
+        // Update the robot info with the new weapons value
+        robotInfo.weapons = newWeapons;
+        robotInfo.weaponsPercent = Math.floor((robotInfo.weapons / robotInfo.weaponsMax) * 100);
+        robotInfo.weaponsRating = _self.getRatingToken(robotInfo.weaponsPercent);
+        _config.playerRobotsIndex[robotString] = robotInfo; // sync the robot info with the index
+        // Update the weapons guage title and bar within with the new weapons value
+        $robotWeaponsGuage.attr('title', newWeapons + '/' + maxWeapons + ' WE (' + robotInfo.weaponsPercent + '%)');
+        $('> i', $robotWeaponsGuage).css({width: robotInfo.weaponsPercent + '%'}).removeClass().addClass(robotInfo.weaponsRating);
+        // Add a restored class to this robot to show it being effected by the action
+        if (playSound){ _self.playSoundEffect('recovery-weapons'); }
+        $robotOverview.addClass('weapons-restored');
+        setTimeout(function(){ $robotOverview.removeClass('weapons-restored'); }, 3000);
+        // Trigger a save of the world state to persist this change
+        //_self.saveWorldState(); // not yet
+        // Return true on success
+        return true;
+    }
 
 }
