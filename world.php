@@ -86,6 +86,9 @@ if (!empty($existing_world_dirs)){
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
 array_unshift($allowed_player_tokens, 'player'); // always allow the "player" token
 
+// Define which robot tokens are allowed to be used in the prototype world
+$allowed_robot_tokens = mmrpg_prototype_robots_unlocked('', true);
+
 // Define defaults for the prototype world data
 //$default_world_token = 'debug__debug-area-1';
 $default_world_token = 'debug';
@@ -99,6 +102,7 @@ if (!empty($_POST['action']) && $_POST['action'] === 'save'
     && !empty($_POST['world_data']) && is_array($_POST['world_data'])){
     $worldData = $_POST['world_data'];
     $playerSessions = &$WORLD_SESSION['player_sessions'];
+    $robotSessions = &$WORLD_SESSION['robot_sessions'];
     if (!empty($worldData['lastPlayer'])
         && in_array($worldData['lastPlayer'], $allowed_player_tokens)){
         $playerSessions['last_player'] = $worldData['lastPlayer'];
@@ -133,6 +137,30 @@ if (!empty($_POST['action']) && $_POST['action'] === 'save'
         if (!empty($worldData['lastPlayerDirection']) && preg_match('/^([-a-z0-9]+)$/i', $worldData['lastPlayerDirection'])){
             $lastPlayerSession['last_direction'] = $worldData['lastPlayerDirection'];
             $cursorPlayerSession['last_direction'] = $worldData['lastPlayerDirection'];
+        }
+        // If the last robots were provided, save them to the sessions
+        if (!empty($worldData['lastPlayerRobots'])){
+            // scan the player robots for changes in: energy, weapons, attack, defense, speed
+            $lastPlayerRobots = $worldData['lastPlayerRobots'];
+            //error_log('$lastPlayerRobots = '. print_r($lastPlayerRobots, true));
+            foreach ($lastPlayerRobots AS $key => $data){
+                //error_log('-> checking robot key "'.$key.'"');
+                if (!strstr($key, '_')){ continue; }
+                if (empty($data) || !is_array($data)){ continue; }
+                list($id, $token) = explode('_', $key, 2);
+                if (!in_array($token, $allowed_robot_tokens)){ continue; }
+                if (!isset($robotSessions[$token])){ continue; }
+                // Okay, now we know it exists, we can update values as we find them
+                $robot_session = &$robotSessions[$token];
+                //error_log('-> (new) $data = '. print_r($data, true));
+                //error_log('-> $robot_session(before) = '. print_r($robot_session, true));
+                if (isset($data['energy']) && isset($data['energyMax'])){ $robot_session['energy'] = intval($data['energy']) - intval($data['energyMax']); }
+                if (isset($data['weapons']) && isset($data['weaponsMax'])){ $robot_session['weapons'] = intval($data['weapons']) - intval($data['weaponsMax']); }
+                if (isset($data['attackMods'])){ $robot_session['attack'] = intval($data['attackMods']); }
+                if (isset($data['defenseMods'])){ $robot_session['defense'] = intval($data['defenseMods']); }
+                if (isset($data['speedMods'])){ $robot_session['speed'] = intval($data['speedMods']); }
+                //error_log('-> $robot_session(after) = '. print_r($robot_session, true));
+            }
         }
         // If world button states were provided, save them to the session
         if (!empty($worldData['lastWorldButtons'])){

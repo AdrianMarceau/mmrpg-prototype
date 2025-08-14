@@ -83,6 +83,7 @@ gameSettings.worldState = {
         token: 'player',
         position: '0-0',
         direction: '',
+        robots: {},
         },
     buttons: {},
     switches: {},
@@ -232,6 +233,27 @@ class mmrpgWorldMap {
         _worldPlayer.token = _config.playerToken || 'player';
         _worldPlayer.position = _worldCursor.position || '0-0';
         _worldPlayer.direction = _worldCursor.direction || 'down-right';
+        // If player robots were defined in the predefined index, copy them over to the state
+        let _playerRobots = _config.playerRobots;
+        let _playerRobotsIndex = _config.playerRobotsIndex;
+        if (_playerRobots.length
+            && Object.keys(_playerRobotsIndex).length){
+            //console.log('---> initWorldMap() found ' + _playerRobots.length + ' player robots to initialize!');
+            let livePlayerRobots = {};
+            for (var i = 0; i < _playerRobots.length; i++){
+                let robotString = _playerRobots[i];
+                let robotInfo = _playerRobotsIndex[robotString] || false;
+                if (!robotInfo || typeof robotInfo !== 'object' || !Object.keys(robotInfo).length){
+                    //console.warn('initWorldMap() missing robotInfo for robotString:', robotString);
+                    continue;
+                    }
+                //console.log('---> adding robot #' + i + ' w/ robotString = ' + robotString);
+                let liveRobotInfo = JSON.parse(JSON.stringify(robotInfo)); // clone the info object
+                livePlayerRobots[robotString] = liveRobotInfo;
+                }
+            _worldPlayer.robots = livePlayerRobots;
+            //console.log('---> initWorldMap() livePlayerRobots =', livePlayerRobots);
+            }
         // Define the function to run when everything is done loading
         let onWorldLoaded = function(){
             _self.bindEventsToCanvas($canvasMap);
@@ -2683,13 +2705,14 @@ class mmrpgWorldMap {
         let _worldButtons = _world.buttons;
         let _worldSwitches = _world.switches;
         let lastPlayer = _worldPlayer.token;
+        let lastPlayerRobots = _worldPlayer.robots;
         let lastPlayerWorld = _config.mapWorld;
         let lastPlayerWorldMap = _config.mapWorld + '__' + _config.mapToken;
         let lastPlayerPosition = _worldPlayer.position;
         let lastPlayerDirection = _worldPlayer.direction;
         let lastWorldButtons = {}; lastWorldButtons[lastPlayerWorldMap] = _worldButtons;
         let lastWorldSwitches = {}; lastWorldSwitches[lastPlayerWorldMap] = _worldSwitches;
-        let worldData = {lastPlayer, lastPlayerWorld, lastPlayerWorldMap, lastPlayerPosition, lastPlayerDirection, lastWorldButtons, lastWorldSwitches};
+        let worldData = {lastPlayer, lastPlayerRobots, lastPlayerWorld, lastPlayerWorldMap, lastPlayerPosition, lastPlayerDirection, lastWorldButtons, lastWorldSwitches};
         //console.log('%c' + 'Saving World State ...', 'color: cyan;');
         //console.log('w/ worldData:', worldData);
         _selfRef._busy = true;
@@ -2794,7 +2817,6 @@ class mmrpgWorldMap {
         return true;
         }
 
-
     // Quick function for getting a rating token given a percent value
     getRatingToken(percent){
         //console.log('%c' + 'mmrpgWorldMap.getRatingToken(' + percent + ')', 'color: magenta;');
@@ -2829,10 +2851,13 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
         // Break the robot sprite into ID and token and collect its info
         let robotId = parseInt(robotString.split('_')[0]) || false;
         let robotToken = robotString.split('_')[1] || false;
-        let robotInfo = _config.playerRobotsIndex[robotString] || false;
+        let robotInfo = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('restoreRobotEnergy() could not find robot info for robot ' + robotString + '!'); return false; }
         //console.log('-> robotId =', robotId);
         //console.log('-> robotToken =', robotToken);
         //console.log('-> robotInfo =', robotInfo);
@@ -2864,7 +2889,7 @@ class mmrpgWorldMap {
         robotInfo.energy = newEnergy;
         robotInfo.energyPercent = Math.floor((robotInfo.energy / robotInfo.energyMax) * 100);
         robotInfo.energyRating = _self.getRatingToken(robotInfo.energyPercent);
-        _config.playerRobotsIndex[robotString] = robotInfo; // sync the robot info with the index
+        _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
         // Update the overview with any changes to the status
         if (robotInfo.energy > 0){ $robotOverview.removeClass('disabled'); }
         else { $robotOverview.addClass('disabled'); }
@@ -2902,10 +2927,13 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
         // Break the robot sprite into ID and token and collect its info
         let robotId = parseInt(robotString.split('_')[0]) || false;
         let robotToken = robotString.split('_')[1] || false;
-        let robotInfo = _config.playerRobotsIndex[robotString] || false;
+        let robotInfo = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('restoreRobotWeapons() could not find robot info for robot ' + robotString + '!'); return false; }
         //console.log('-> robotId =', robotId);
         //console.log('-> robotToken =', robotToken);
         //console.log('-> robotInfo =', robotInfo);
@@ -2936,7 +2964,7 @@ class mmrpgWorldMap {
         robotInfo.weapons = newWeapons;
         robotInfo.weaponsPercent = Math.floor((robotInfo.weapons / robotInfo.weaponsMax) * 100);
         robotInfo.weaponsRating = _self.getRatingToken(robotInfo.weaponsPercent);
-        _config.playerRobotsIndex[robotString] = robotInfo; // sync the robot info with the index
+        _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
         // Update the weapons guage title and bar within with the new weapons value
         $robotWeaponsGuage.attr('title', newWeapons + '/' + maxWeapons + ' WE (' + robotInfo.weaponsPercent + '%)');
         $('> i', $robotWeaponsGuage).css({width: robotInfo.weaponsPercent + '%'}).removeClass().addClass(robotInfo.weaponsRating);
