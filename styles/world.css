@@ -1113,10 +1113,6 @@ html, body {
 #world #canvas #robots-overview .team-robot > * {
     pointer-events: none;
 }
-#world #canvas #robots-overview .team-robot:nth-child(1) { margin-left: 0; }
-#world #canvas #robots-overview .team-robot:nth-child(2) { margin-left: 10px; }
-#world #canvas #robots-overview .team-robot:nth-child(3) { margin-left: 20px; }
-#world #canvas #robots-overview .team-robot:nth-child(4) { margin-left: 30px; }
 #world #canvas #robots-overview .team-robot:last-child { margin-bottom: 0; }
 #world #canvas #robots-overview .team-robot .sprite {
     display: block;
@@ -1133,7 +1129,7 @@ html, body {
     margin: 0;
     padding: 3px;
     width: 40px;
-    height: 34px;
+    height: 38px;
     border-radius: 3px;
     text-align: center;
     border-right: 2px solid #191919 !important;
@@ -1143,9 +1139,9 @@ html, body {
     content: "";
     display: block;
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: 1px;
+    right: 1px;
+    bottom: 1px;
     height: 50%;
     background-color: inherit;
     filter: saturate(2) brightness(0.8);
@@ -1153,18 +1149,34 @@ html, body {
     pointer-events: none;
     z-index: 1;
 }
-#world #canvas #robots-overview .team-robot:nth-last-child(1) .icon { filter: brightness(1.0); }
-#world #canvas #robots-overview .team-robot:nth-last-child(2) .icon { filter: brightness(0.9); }
-#world #canvas #robots-overview .team-robot:nth-last-child(3) .icon { filter: brightness(0.8); }
-#world #canvas #robots-overview .team-robot:nth-last-child(4) .icon { filter: brightness(0.7); }
+#world #canvas #robots-overview .team-robot .icon:after {
+    content: "";
+    display: block;
+    position: absolute;
+    box-sizing: border-box;
+    top: -8px;
+    left: 2px;
+    min-width: 25px;
+    pointer-events: none;
+    color: #f0f0f0;
+    text-shadow: 1px 1px 0 #000000;
+    background-color: inherit;
+    border-radius: 3px 3px 0 0;
+    padding: 1px 4px;
+    font-size: 10px;
+    line-height: 1;
+    font-family: sans-serif;
+    z-index: 2;
+}
+
 #world #canvas #robots-overview .team-robot .icon > .sprite {
     position: relative;
     width: 40px;
     height: 40px;
     top: -8px;
-    z-index: 2;
+    z-index: 3;
 }
-#world #canvas #robots-overview .team-robot:hover .icon > .sprite {
+#world #canvas #robots-overview .team-robot:not(.disabled):hover .icon > .sprite {
     top: -10px !important;
 }
 #world #canvas #robots-overview .team-robot .icon > .sprite > .wrap,
@@ -1225,17 +1237,17 @@ html, body {
 
 #world #canvas #robots-overview .team-robot > .label {
     display: block;
-    margin: 0 auto 1px 0;
     background-color: #292929;
     border-radius: 0 6px 6px 0;
-    padding: 4px 12px;
+    margin: 0 auto 0 0;
+    padding: 6px 12px 4px 8px;
     color: #cfcfcf;
     text-align: center;
     font-size: 12px;
     line-height: 1.2;
     white-space: nowrap;
     min-width: 120px;
-    box-shadow: -1px 1px 0 black;
+    border-bottom: 2px solid #000000;
 }
 #world #canvas #robots-overview .team-robot > .label .name {
     float: left;
@@ -1249,15 +1261,18 @@ html, body {
     border-radius: 2px;
     padding: 0 4px;
 }
+#world #canvas #robots-overview .team-robot > .label + .guage {
+    margin-top: -1px;
+}
 #world #canvas #robots-overview .team-robot > .guage {
     display: block;
-    margin: 0 0 1px 0;
+    margin: 0 auto 0 0;
     width: auto;
     height: 6px;
     overflow: hidden;
     background-color: #191919;
     border-radius: 0 3px 3px 0;
-    box-shadow: -1px 1px 0 black;
+    border-bottom: 1px solid #000000;
     pointer-events: auto;
 }
 #world #canvas #robots-overview .team-robot > .guage > i {
@@ -1298,15 +1313,15 @@ html, body {
     border-color: #64a455;
     background-color: #598a4e;
 }
-#world #canvas #robots-overview .team-robot > .guage.energy.med > i {
+#world #canvas #robots-overview .team-robot > .guage.energy > i.med {
     border-color: #dca030;
     background-color: #b98c38;
 }
-#world #canvas #robots-overview .team-robot > .guage.energy.low > i {
+#world #canvas #robots-overview .team-robot > .guage.energy > i.low {
     border-color: #c83d3d;
     background-color: #a32121;
 }
-#world #canvas #robots-overview .team-robot > .guage.energy.no > i {
+#world #canvas #robots-overview .team-robot > .guage.energy > i.no {
     border-color: #c83d3d;
     background-color: #a32121;
     padding: 0;
@@ -1321,6 +1336,35 @@ html, body {
     content: "";
     display: block;
     clear: both;
+}
+
+#world #canvas #robots-overview .team-robot:nth-child(1) .icon { filter: brightness(1.0); }
+#world #canvas #robots-overview .team-robot:nth-child(2) .icon { filter: brightness(0.9); }
+#world #canvas #robots-overview .team-robot:nth-child(3) .icon { filter: brightness(0.81); }
+#world #canvas #robots-overview .team-robot:nth-child(4) .icon { filter: brightness(0.729); }
+#world #canvas #robots-overview .team-robot:nth-child(5) .icon { filter: brightness(0.6561); }
+#world #canvas #robots-overview .team-robot:nth-child(6) .icon { filter: brightness(0.59049); }
+#world #canvas #robots-overview .team-robot:nth-child(7) .icon { filter: brightness(0.531441); }
+#world #canvas #robots-overview .team-robot:nth-child(8) .icon { filter: brightness(0.4782969); }
+
+#world #canvas #robots-overview .team-robot:nth-child(1) .icon:after { content: "1st"; }
+#world #canvas #robots-overview .team-robot:nth-child(2) .icon:after { content: "2nd"; }
+#world #canvas #robots-overview .team-robot:nth-child(3) .icon:after { content: "3rd"; }
+#world #canvas #robots-overview .team-robot:nth-child(4) .icon:after { content: "4th"; }
+#world #canvas #robots-overview .team-robot:nth-child(5) .icon:after { content: "5th"; }
+#world #canvas #robots-overview .team-robot:nth-child(6) .icon:after { content: "6th"; }
+#world #canvas #robots-overview .team-robot:nth-child(7) .icon:after { content: "7th"; }
+#world #canvas #robots-overview .team-robot:nth-child(8) .icon:after { content: "8th"; }
+
+#world #canvas #robots-overview .team-robot:nth-child(1) {
+    margin-bottom: 22px;
+    padding-left: 56px;
+}
+#world #canvas #robots-overview .team-robot:nth-child(1) > .icon {
+    padding: 7px;
+}
+#world #canvas #robots-overview .team-robot:nth-child(1) > .label {
+
 }
 
 #world #canvas #side-buttons {

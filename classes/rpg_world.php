@@ -1129,18 +1129,18 @@ class rpg_world {
                 $robot_energy_rating = $robot_overview['energyRating'];
                 $robot_energy_percent = $robot_overview['energyPercent'];
             $robot_energy_label = $robot_energy.' / '.$robot_energy_max.' LE ('.$robot_energy_percent.'%)';
-            $robot_energy_markup = '<div class="guage energy '.$robot_energy_rating.'" title="'.$robot_energy_label.'"><i style="width: '.$robot_energy_percent.'%;"></i></div>';
+            $robot_energy_markup = '<div class="guage energy" title="'.$robot_energy_label.'"><i class="'.$robot_energy_rating.'" style="width: '.$robot_energy_percent.'%;"></i></div>';
             $robot_weapons = $robot_overview['weapons'];
                 $robot_weapons_max = $robot_overview['weaponsMax'];
                 $robot_weapons_percent = $robot_overview['weaponsPercent'];
                 $robot_weapons_rating = $robot_overview['weaponsRating'];
             $robot_weapons_label = $robot_weapons.' / '.$robot_weapons_max.' WE ('.$robot_weapons_percent.'%)';
-            $robot_weapons_markup = '<div class="guage weapons '.$robot_weapons_rating.'" title="'.$robot_weapons_label.'"><i style="width: '.$robot_weapons_percent.'%;"></i></div>';
+            $robot_weapons_markup = '<div class="guage weapons" title="'.$robot_weapons_label.'"><i class="'.$robot_weapons_rating.'" style="width: '.$robot_weapons_percent.'%;"></i></div>';
             $robot_disabled = empty($robot_energy) ? true : false;
             $robot_frame = $get_robot_energy_frame($robot_energy_rating);
             $robot_sprite = str_replace('data-frame="00"', 'data-frame="'.$robot_frame.'"', $robot_sprite);
             $link_class = 'team-robot'.(' '.$robot_energy_rating.'-energy').($robot_disabled ? ' disabled' : '');
-            $link_attrs = !$robot_disabled ? ' data-robot="'.$robot_token.'"' : '';
+            $link_attrs = ' data-robot="'.$robot_id.'_'.$robot_token.'"'; //!$robot_disabled ? ' data-robot="'.$robot_token.'"' : '';
             $robot_markup = '';
             $robot_markup .= '<div class="'.$link_class.'"'.$link_attrs.'>';
                 $robot_markup .= '<div class="icon '.$robot_core_types.'">'.$robot_sprite.'</div>';
@@ -1203,7 +1203,7 @@ class rpg_world {
 
     // Define a function for getting the EVENTS LAYER sprite markup for the world map
     public static function get_events_layer_markup($this_prototype_data, $map_data_parsed){
-        error_log('rpg_world::get_events_layer_sprites() called!');
+        //error_log('rpg_world::get_events_layer_sprites() called!');
         // EVENTS LAYER
         $map_config = $map_data_parsed['config'];
         $map_width = $map_config['pixel_width'];
