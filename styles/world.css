@@ -3,20 +3,33 @@ html, body {
     background-color: rgb(38, 38, 38);
     text-align: center;
 }
+
 #world,
 #world #canvas {
     display: block;
+    overflow: hidden;
+    vertical-align: top;
     width: 768px;
     height: 622px;
     margin: 0 auto;
     font-family: 'Open Sans', sans-serif, monospace;
     font-size: 16px;
     line-height: 1.2;
+    border: 0 none transparent;
+    border-bottom-style: none;
+    background-color: transparent;
+    position: relative;
 }
 
 #world #canvas {
     transition: opacity 1s linear;
     opacity: 1.0;
+}
+#world #canvas .wrapper {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 #world.fastfade #canvas {
     transition: opacity 0.3s linear;
