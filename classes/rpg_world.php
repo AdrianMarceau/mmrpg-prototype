@@ -621,6 +621,15 @@ class rpg_world {
         //error_log('$map_col_size = '.print_r($map_col_size, true));
         //error_log('$map_row_size = '.print_r($map_row_size, true));
         //error_log('$available_cells('.count($available_cells).') = ['.implode(', ', array_keys($available_cells)).']');
+        // Let let's loop through events and remove spaces that have events on them
+        if (!empty($map_data['events']) && is_array($map_data['events'])){
+            foreach ($map_data['events'] AS $event_name => $event_data){
+                if (empty($event_data) || !is_array($event_data)){ continue; }
+                $pos = $event_data[0];
+                //error_log('-> removing event position "'.$pos.'" from available cells');
+                unset($available_cells[$pos]);
+            }
+        }
         // Now let's loop through portals and remove spaces that have portals on them
         if (!empty($map_data['portals']) && is_array($map_data['portals'])){
             foreach ($map_data['portals'] AS $portal_name => $portal_data){
