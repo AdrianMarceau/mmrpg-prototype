@@ -101,104 +101,17 @@ $default_world_direction = '';
 if (!empty($_POST['action']) && $_POST['action'] === 'save'
     && !empty($_POST['world_data']) && is_array($_POST['world_data'])){
     $worldData = $_POST['world_data'];
-    $playerSessions = &$WORLD_SESSION['player_sessions'];
-    $robotSessions = &$WORLD_SESSION['robot_sessions'];
-    if (!empty($worldData['lastPlayer'])
-        && in_array($worldData['lastPlayer'], $allowed_player_tokens)){
-        $playerSessions['last_player'] = $worldData['lastPlayer'];
-        // Collect the last player session data so we can update
-        $lastPlayer = $worldData['lastPlayer'];
-        if (!isset($playerSessions[$lastPlayer])){ $playerSessions[$lastPlayer] = array(); }
-        $lastPlayerSession = &$playerSessions[$lastPlayer];
-        // Collect the cursor player session data so we can update too
-        $cursorPlayer = 'player';
-        if (!isset($playerSessions[$cursorPlayer])){ $playerSessions[$cursorPlayer] = array(); }
-        $cursorPlayerSession = &$playerSessions[$cursorPlayer];
-        // If last world was provided, save it to the sessions
-        if (!empty($worldData['lastPlayerWorld'])
-            && in_array($worldData['lastPlayerWorld'], $allowed_world_tokens)){
-            $world_token = $worldData['lastPlayerWorld'];
-            $lastPlayerSession['last_world'] = $world_token;
-            $cursorPlayerSession['last_world'] = $world_token;
-            // If last world-map was provided, save it to the sessions
-            if (!empty($worldData['lastPlayerWorldMap'])
-                && in_array($worldData['lastPlayerWorldMap'], $allowed_world_map_tokens)){
-                $map_token = explode('__', $worldData['lastPlayerWorldMap'])[1];
-                $lastPlayerSession['last_map'] = $map_token;
-                $cursorPlayerSession['last_map'] = $map_token;
-            }
-        }
-        // If last position was provided, save it to the sessions
-        if (!empty($worldData['lastPlayerPosition']) && preg_match('/^([-0-9]+)$/i', $worldData['lastPlayerPosition'])){
-            $lastPlayerSession['last_position'] = $worldData['lastPlayerPosition'];
-            $cursorPlayerSession['last_position'] = $worldData['lastPlayerPosition'];
-        }
-        // If last direction was provided, save it to the sessions
-        if (!empty($worldData['lastPlayerDirection']) && preg_match('/^([-a-z0-9]+)$/i', $worldData['lastPlayerDirection'])){
-            $lastPlayerSession['last_direction'] = $worldData['lastPlayerDirection'];
-            $cursorPlayerSession['last_direction'] = $worldData['lastPlayerDirection'];
-        }
-        // If the last robots were provided, save them to the sessions
-        if (!empty($worldData['lastPlayerRobots'])){
-            // scan the player robots for changes in: energy, weapons, attack, defense, speed
-            $lastPlayerRobots = $worldData['lastPlayerRobots'];
-            //error_log('$lastPlayerRobots(raw) = '. print_r($lastPlayerRobots, true));
-            if (!empty($lastPlayerRobots)){
-                $old_last_robots = !empty($lastPlayerSession['last_robots']) ? explode(',', $lastPlayerSession['last_robots']) : array();
-                $new_last_robots = !empty($lastPlayerRobots) ? array_keys($lastPlayerRobots) : array();
-                //error_log('$old_last_robots = '. print_r($old_last_robots, true));
-                //error_log('$new_last_robots = '. print_r($new_last_robots, true));
-                // update the player's last robots string and then any relevant session values per-robot
-                $lastPlayerSession['last_robots'] = implode(',', $new_last_robots);
-                foreach ($lastPlayerRobots AS $key => $data){
-                    //error_log('-> checking robot key "'.$key.'"');
-                    if (!strstr($key, '_')){ continue; }
-                    if (empty($data) || !is_array($data)){ continue; }
-                    list($id, $token) = explode('_', $key, 2);
-                    if (!in_array($token, $allowed_robot_tokens)){ continue; }
-                    if (!isset($robotSessions[$token])){ continue; }
-                    // Okay, now we know it exists, we can update values as we find them
-                    $robotSession = &$robotSessions[$token];
-                    //error_log('-> (new) $data = '. print_r($data, true));
-                    //error_log('-> $robotSession(before) = '. print_r($robotSession, true));
-                    if (isset($data['energy']) && isset($data['energyMax'])){ $robotSession['energy'] = intval($data['energy']) - intval($data['energyMax']); }
-                    if (isset($data['weapons']) && isset($data['weaponsMax'])){ $robotSession['weapons'] = intval($data['weapons']) - intval($data['weaponsMax']); }
-                    if (isset($data['attackMods'])){ $robotSession['attack'] = intval($data['attackMods']); }
-                    if (isset($data['defenseMods'])){ $robotSession['defense'] = intval($data['defenseMods']); }
-                    if (isset($data['speedMods'])){ $robotSession['speed'] = intval($data['speedMods']); }
-                    //error_log('-> $robotSession(after) = '. print_r($robotSession, true));
-                }
-                //error_log('$lastPlayerSession = '. print_r($lastPlayerSession, true));
-                //error_log('$robotSessions = '. print_r($robotSessions, true));
-            }
-        }
-        // If world button states were provided, save them to the session
-        if (!empty($worldData['lastWorldButtons'])){
-            if (!isset($WORLD_SESSION['world_buttons'])){ $WORLD_SESSION['world_buttons'] = array(); }
-            $worldButtonStates = &$WORLD_SESSION['world_buttons'];
-            foreach ($worldData['lastWorldButtons'] AS $map_token => $button_states){
-                if (!in_array($map_token, $allowed_world_map_tokens)){ continue; }
-                if (!isset($worldButtonStates[$map_token])){ $worldButtonStates[$map_token] = array(); }
-                $worldButtonStates[$map_token] = array_merge($worldButtonStates[$map_token], $button_states);
-            }
-        }
-        // If world switch states were provided, save them to the session
-        if (!empty($worldData['lastWorldSwitches'])){
-            if (!isset($WORLD_SESSION['world_switches'])){ $WORLD_SESSION['world_switches'] = array(); }
-            $worldSwitchStates = &$WORLD_SESSION['world_switches'];
-            foreach ($worldData['lastWorldSwitches'] AS $map_token => $switch_states){
-                if (!in_array($map_token, $allowed_world_map_tokens)){ continue; }
-                if (!isset($worldSwitchStates[$map_token])){ $worldSwitchStates[$map_token] = array(); }
-                $worldSwitchStates[$map_token] = array_merge($worldSwitchStates[$map_token], $switch_states);
-            }
-        }
-        //error_log('World data saved successfully for player "'.$lastPlayer.'"!');
-        //error_log('World data saved successfully for player "'.$lastPlayer.'" with world "'.$lastPlayerSession['last_world'].'" and position "'.$lastPlayerSession['last_position'].'"');
-        //error_log('$WORLD_SESSION = '.print_r($WORLD_SESSION, true));
-    }
+    // save the provided world data to the session (validation happens there)
+    rpg_world::save_world_data_to_session($worldData, array(
+        'world_tokens' => $allowed_world_tokens,
+        'world_map_tokens' => $allowed_world_map_tokens,
+        'world_sheet_tokens' => $allowed_world_sheet_tokens,
+        'player_tokens' => $allowed_player_tokens,
+        'robot_tokens' => $allowed_robot_tokens,
+        ));
     // save the session with any new changes we just made
-    rpg_world::save_session();
-    // that's all we support for now, return a success response
+    //rpg_world::save_session();
+    // Now that we're done saving, return a success response
     header('Content-Type: application/json');
     echo(json_encode(array('status' => 'success', 'message' => 'World data saved successfully.')));
     exit();
