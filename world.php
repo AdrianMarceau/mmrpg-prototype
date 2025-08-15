@@ -536,56 +536,6 @@ $flag_skip_fadein = true;
                     echo('</div>'.PHP_EOL);
                 }
 
-                /*
-
-                // -- OLD VERSION -- //
-
-                // EVENT SPRITES
-                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
-                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
-                $events_layer_markup = rpg_world::get_events_layer_markup($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-2 sprites tiles events" data-layer="events" '.$map_layer_styles.$map_layer_attrs.'>');
-                    echo($events_layer_markup);
-                echo('</div>'.PHP_EOL);
-
-                // PORTAL SPRITES
-                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
-                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
-                $portals_layer_markup = rpg_world::get_portals_layer_markup($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-2 sprites tiles events portals" data-layer="portals" '.$map_layer_styles.$map_layer_attrs.'>');
-                    echo($portals_layer_markup);
-                echo('</div>'.PHP_EOL);
-
-                // BUTTON SPRITES
-                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
-                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
-                $buttons_layer_markup = rpg_world::get_buttons_layer_markup($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-3 sprites tiles events buttons" data-layer="buttons" '.$map_layer_styles.$map_layer_attrs.'>');
-                    echo($buttons_layer_markup);
-                echo('</div>'.PHP_EOL);
-
-                // BATTLE SPRITES
-                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
-                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
-                $battles_layer_markup = rpg_world::get_battles_layer_markup($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-4 sprites objects events battles" data-layer="battles" '.$map_layer_styles.$map_layer_attrs.'>');
-                    echo($battles_layer_markup);
-                echo('</div>'.PHP_EOL);
-
-                // TEAM SPRITES
-                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
-                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
-                $team_layer_markup = rpg_world::get_team_layer_markup($this_prototype_data, $map_data_parsed);
-                $rivals_layer_markup = rpg_world::get_rivals_layer_markup($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-5 sprites objects characters team" data-layer="teams" '.$map_layer_styles.$map_layer_attrs.'>');
-                    echo($team_layer_markup);
-                    echo($rivals_layer_markup);
-                echo('</div>'.PHP_EOL);
-
-                */
-
-                // -- NEW VERSION
-
                 // ALL TILE SPRITES
                 $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                 $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';

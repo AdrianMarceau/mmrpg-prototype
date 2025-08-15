@@ -102,17 +102,7 @@ html, body {
     pointer-events: none;
     transform: translate(0, 0);
 }
-/*
-// OLD VERSION
-#world #canvas #map .layer[data-layer="background"] { z-index: 1; }
-#world #canvas #map .layer[data-layer="terrain"] { z-index: 10; }
-#world #canvas #map .layer[data-layer="events"] { z-index: 20; }
-#world #canvas #map .layer[data-layer="portals"] { z-index: 22; }
-#world #canvas #map .layer[data-layer="buttons"] { z-index: 24; }
-#world #canvas #map .layer[data-layer="switches"] { z-index: 26; }
-#world #canvas #map .layer[data-layer="battles"] { z-index: 30; }
-#world #canvas #map .layer[data-layer="teams"] { z-index: 40; }
-*/
+
 #world #canvas #map .layer[data-layer="background"] { z-index: 1; }
 #world #canvas #map .layer[data-layer="terrain"] { z-index: 10; }
 #world #canvas #map .layer[data-layer^="sprites/"] { z-index: 20; }
@@ -121,32 +111,10 @@ html, body {
 
 /* define some special-effect styles for the terrain layer specifically */
 #world #canvas #map .layer[data-layer="terrain"] canvas {
-    /* filter: drop-shadow(0px 9px 6px rgba(0, 0, 0, 0.3));  */
-    /* filter: drop-shadow(0px 10px 0 rgba(0, 0, 0, 0.25)); */
-    /* filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.2));  */
     filter: drop-shadow(0px 9px 6px rgba(0, 0, 0, 0.3));
     position: relative;
     z-index: 1;
 }
-/*
-#world #canvas #map .layer[data-layer="terrain"]:after {
-    content: "";
-    display: block;
-    position: absolute;
-    z-index: 3;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1000;
-    background-color: transparent;
-    background-color: transparent;
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(200, 200, 200, 0.3));
-    mix-blend-mode: overlay;
-    opacity: 0.6;
-}
-*/
 
 /* code for perspective mode (flakey right now, but maybe in future) */
 #world #canvas #map.has-perspective {
