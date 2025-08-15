@@ -1324,9 +1324,11 @@ class mmrpgWorldMap {
                     if (newKey < firstKey){ newKey = lastKey; }
                     $robot.attr('data-key', newKey);
                     let newPosition = teamPositionsByKey[newKey] || [0, 0];
+                    let newPositionZ = newPosition[1] + 1;
                     $robot.css({
                         left: newPosition[0] + 'px',
-                        top: newPosition[1] + 'px'
+                        top: newPosition[1] + 'px',
+                        zIndex: newPositionZ
                         });
                     });
                 // and then save the world state with the new robot order
@@ -1544,6 +1546,7 @@ class mmrpgWorldMap {
         let thisShiftDist = Math.sqrt(Math.pow(thisNewCol - thisOldCol, 2) + Math.pow(thisNewRow - thisOldRow, 2));
         let tileOffsetX = ((thisNewCol - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0];
         let tileOffsetY = ((thisNewRow - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1];
+        let tileOffsetZ = tileOffsetY + 1;
         let cursorHasMoved = _worldCursor.moved || thisNewPos !== _mapStartPosition ? true : false;
         _self.resetZoomLevel();
         $canvasMap.addClass('busy');
@@ -1588,11 +1591,13 @@ class mmrpgWorldMap {
             $cursorSprite.animate({
                 left: tileOffsetX + 'px',
                 top: tileOffsetY + 'px',
+                zIndex: tileOffsetZ,
                 }, travelDuration, 'linear', onMoveComplete);
             } else {
             $cursorSprite.css({
                 left: tileOffsetX + 'px',
                 top: tileOffsetY + 'px',
+                zIndex: tileOffsetZ,
                 }); onMoveComplete();
             }
         // If there are any team sprites, move them as well (it's okay if they lay behind the cursor)
@@ -1609,6 +1614,7 @@ class mmrpgWorldMap {
             //console.log('-> $otherSpritesInOrder =', $otherSpritesInOrder);
             let teamOffsetX = tileOffsetX;
             let teamOffsetY = tileOffsetY;
+            let teamOffsetZ = tileOffsetZ;
             let teamTravelDuration = travelDuration;
             teamTravelDuration += 50;
             $otherSpritesInOrder.each(function(index, element){
@@ -1621,6 +1627,7 @@ class mmrpgWorldMap {
                 else if (thisVerDir === 'down'){ teamOffsetY -= 20; }
                 if (thisHorDir === 'left'){ teamOffsetX += 20; }
                 else if (thisHorDir === 'right'){ teamOffsetX -= 20; }
+                teamOffsetZ = teamOffsetY + 1;
                 if (thisHorDir){ $thisSprite.attr('data-dir', thisHorDir); }
                 let onTeamMoveComplete = function(){};
                 if (!$thisSprite.is('.disabled')){
@@ -1630,15 +1637,18 @@ class mmrpgWorldMap {
                     }
                 $thisSprite.prop('worldX', teamOffsetX);
                 $thisSprite.prop('worldY', teamOffsetY);
+                $thisSprite.prop('worldZ', teamOffsetZ);
                 if (animateMove){
                     $thisSprite.animate({
                         left: teamOffsetX + 'px',
                         top: teamOffsetY + 'px',
+                        zIndex: teamOffsetZ,
                         }, teamTravelDuration, 'linear', onTeamMoveComplete);
                     } else {
                     $thisSprite.css({
                         left: teamOffsetX + 'px',
                         top: teamOffsetY + 'px',
+                        zIndex: teamOffsetZ,
                         }); onTeamMoveComplete();
                     }
                 });
@@ -2200,14 +2210,20 @@ class mmrpgWorldMap {
             let $otherSprites = $teamSprites.filter('.sprite:not(.cursor)');
             let $playerSprites = $otherSprites.filter('.sprite.player');
             let $robotSprites = $otherSprites.filter('.sprite.robot');
+            //console.log(('-> eventsAtPosition =', eventsAtPosition);
+            //console.log(('-> goingRight =', goingRight, '| goingLeft =', goingLeft, '| goingUp =', goingUp, '| goingDown =', goingDown);
+            //console.log(('-> rushDistanceX =', rushDistanceX, '| rushDistanceY =', rushDistanceY);
             $cursorSprite.attr('data-frame', '01');
             $otherSprites.each(function(index){
                 let $sprite = $(this);
                 let oldX = $sprite.prop('worldX') || parseInt($sprite.css('left')) || 0;
                 let oldY = $sprite.prop('worldY') || parseInt($sprite.css('top')) || 0;
+                let oldZ = $sprite.prop('worldZ') || parseInt($sprite.css('zIndex')) || 1;
                 let newX = oldX + (goingRight ? rushDistanceX : goingLeft ? (-1 * rushDistanceX) : 0);
                 let newY = oldY + (goingDown ? rushDistanceY : goingUp ? (-1 * rushDistanceY) : 0);
-                $sprite.animate({left: newX + 'px', top: newY + 'px' }, teamRushDuration);
+                let newZ = newY + 1;
+                //console.log(('-> moving sprite', $sprite.attr('data-token'), 'from [', oldX, oldY, oldZ, '] to [', newX, newY, newZ, ']');
+                $sprite.animate({left: newX + 'px', top: newY + 'px', zIndex: newZ }, teamRushDuration);
                 });
             $playerSprites.each(function(index){
                 let $sprite = $(this);

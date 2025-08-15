@@ -499,7 +499,7 @@ class rpg_world {
         //error_log('$map_tile_width = '.print_r($map_tile_width, true));
         //error_log('$map_spritesize_offset = '.print_r($map_spritesize_offset, true));
         $map_size_styles = 'width: '.$map_pixel_width.'px; height: '.$map_pixel_height.'px; ';
-        $map_offset_styles = 'top: 0px; left: 0px; ';
+        $map_offset_styles = 'top: 0px; left: 0px; z-index: 1; ';
         $map_base_styles = trim($map_size_styles.$map_offset_styles);
         $map_base_attrs = 'data-cols="'.$map_col_size.'" data-rows="'.$map_row_size.'"';
         $map_base_attrs .= ' data-size="'.$map_col_size.' x '.$map_row_size.' x '. $map_tile_width.' x '.$map_tile_height.'"';
@@ -1294,7 +1294,7 @@ class rpg_world {
         $map_field_foreground = !empty($map_field_info['field_foreground']) ? $map_field_info['field_foreground'] : 'field';
         $field_background_image = !$preview_only ? 'battle-field_background_base.gif' : 'battle-field_preview.png';
         $field_background_image_url = 'images/fields/'.$map_field_token.'/'.$field_background_image;
-        $field_background_styles = 'top: 0; left: 0; background-image: url('.$field_background_image_url.');';
+        $field_background_styles = 'top: 0; left: 0; z-index: 1; background-image: url('.$field_background_image_url.');';
         $background_sprites[] = '<span data-sprite="background" class="sprite field background" style="'.$field_background_styles.'"></span>';
         return implode(PHP_EOL, $background_sprites);
     }
@@ -1354,13 +1354,14 @@ class rpg_world {
                 list($col, $row) = explode('-', $pos);
                 $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                $z_index = $top + 1;
                 $hidden = in_array('hidden', $event_data) ? true : false; unset($event_data[array_search('hidden', $event_data)]);
                 $locked = in_array('locked', $event_data) ? true : false; unset($event_data[array_search('locked', $event_data)]);
                 $data = array_values($event_data); // remaining vaules if any
                 $label = 'World '.ucwords(str_replace('-', ' ', $event_name));
                 $attrs = 'data-event="'.$event_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                 $classes = 'sprite tile event'.($sprite ? ' '.$sprite : '').(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
-                $style = 'top: '.$top.'px; left: '.$left.'px;';
+                $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
                 $events_markup[] = '<span data-sprite="event" class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>';
                 $event_symbols[$pos] = $event_name;
                 $events_index[$event_name] = array(
@@ -1411,6 +1412,7 @@ class rpg_world {
                 list($col, $row) = explode('-', $pos);
                 $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                $z_index = $top + 1;
                 //list($mod_top, $mod_left) = self::transform_point_with_matrix(array($left, $top), $map_perspective_matrix);
                 //error_log('-> portal "'.$portal_name.'" at pos "'.$pos.'" (col: '.$col.', row: '.$row.')');
                 //error_log('-> $top = '.$top.', $left = '.$left.' | $mod_top = '.$mod_top.', $mod_left = '.$mod_left);
@@ -1422,7 +1424,7 @@ class rpg_world {
                 $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucfirst($portal_name));
                 $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                 $classes = 'sprite tile portal'.($portal_name !== 'spawn' && !$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
-                $style = 'top: '.$top.'px; left: '.$left.'px;';
+                $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
                 $portals_markup[] = '<span data-sprite="portal" class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>';
                 $portal_symbols[$pos] = $portal_name;
                 $portals_index[$portal_name] = array(
@@ -1467,6 +1469,7 @@ class rpg_world {
                 $pos = $button_data[0]; list($col, $row) = explode('-', $pos); unset($button_data[0]);
                 $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                $z_index = $top + 1;
                 $colour = !empty($button_data[1]) ? $button_data[1] : 'black'; unset($button_data[1]);
                 $state = !empty($button_data[2]) ? $button_data[2] : 'up'; unset($button_data[2]);
                 $action = !empty($button_data[3]) ? $button_data[3] : ''; unset($button_data[3]);
@@ -1480,7 +1483,7 @@ class rpg_world {
                 $kind_classes = $colour.' '.$state;
                 $sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
                 $attrs = 'data-button="'.$button_name.'" data-colour="'.$colour.'" data-state="'.$state.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
-                $styles = 'top: '.$top.'px; left: '.$left.'px;';
+                $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
                 $classes = $base_classes.($is_glowing ? ' glow' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 $buttons_markup[] = '<span data-sprite="button" class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$sprite.'</span>';
                 $button_symbols[$pos] = $button_name;
@@ -1543,13 +1546,13 @@ class rpg_world {
             $maxrows = $map_row_size;
             $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
             $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
-            $zindex = ($maxrows + 1) - $row;
+            $z_index = $top + 1;
             $dir = ($col > ($map_col_size / 2)) ? 'left' : 'right';
             if (mt_rand(1, 2) === 1){ $dir = $dir !== 'left' ? 'left' : 'right'; }
             $class = 'battle vs-'.$subkind.' bounce';
             if ($subkind === 'master'){ $class .= ' always-zoom'; }
             elseif ($subkind === 'boss'){ $class .= ' always-zoom'; }
-            $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$zindex.';';
+            $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
             $attrs = 'data-battle="'.$battle.'" data-label="'.$name.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
             $markup = self::get_sprite($kind, $token, $alt, $dir, $class, $style, $attrs);
             $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="battle-'.$kind.'"', $markup);
@@ -1582,6 +1585,7 @@ class rpg_world {
         list($col, $row) = explode('-', $target_position);
         $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
         $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
+        $z_index = $top + 1;
         if (strstr($team_dir, 'left')){ $left += count($team_sprites) * 4; }
         elseif (strstr($team_dir, 'right')){ $left -= count($team_sprites) * 4; }
         foreach ($team_sprites as $key => $sprite){
@@ -1598,9 +1602,10 @@ class rpg_world {
                 elseif (strstr($team_dir, 'right')){ $left += 10; }
                 if (strstr($team_dir, 'up')){ $top += 4; }
                 elseif (strstr($team_dir, 'down')){ $top -= 4; }
+                $z_index = $top + 1;
                 }
             $class = $team_class.' bounce'.($disabled ? ' disabled' : '');
-            $styles = 'top: '.$top.'px; left: '.$left.'px; ';
+            $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
             $attrs = 'data-key="'.$key.'"';
             if (!empty($id)){ $attrs .= ' data-id="'.$id.'"'; }
             $markup = self::get_sprite($kind, $img, $alt, $dir, $class, $styles, $attrs);
@@ -1653,8 +1658,9 @@ class rpg_world {
         list($col, $row) = explode('-', $pos);
         $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
         $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
+        $z_index = $top + 1;
         $class = 'cursor bounce';
-        $styles = 'top: '.$top.'px; left: '.$left.'px; ';
+        $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
         $attrs = 'data-pos="'.$team_position.'" data-col="'.$col.'" data-row="'.$row.'"';
         $cursor_markup = self::get_cursor_sprite($team_direction, $class, $styles, $attrs);
         $cursor_markup = str_replace('data-sprite="robot"', 'data-sprite="team-cursor"', $cursor_markup);

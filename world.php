@@ -536,6 +536,10 @@ $flag_skip_fadein = true;
                     echo('</div>'.PHP_EOL);
                 }
 
+                /*
+
+                // -- OLD VERSION -- //
+
                 // EVENT SPRITES
                 $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                 $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
@@ -577,6 +581,40 @@ $flag_skip_fadein = true;
                     echo($team_layer_markup);
                     echo($rivals_layer_markup);
                 echo('</div>'.PHP_EOL);
+
+                */
+
+                // -- NEW VERSION
+
+                // ALL TILE SPRITES
+                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
+                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
+                echo('<div class="layer layer-2 sprites tiles" data-layer="sprites/tiles" '.$map_layer_styles.$map_layer_attrs.'>');
+                    // EVENT TILE SPRITES
+                    $events_layer_markup = rpg_world::get_events_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($events_layer_markup);
+                    // PORTAL TILE SPRITES
+                    $portals_layer_markup = rpg_world::get_portals_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($portals_layer_markup);
+                    // BUTTON TILE SPRITES
+                    $buttons_layer_markup = rpg_world::get_buttons_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($buttons_layer_markup);
+                echo('</div>'.PHP_EOL);
+
+                // ALL OBJECT SPRITES
+                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
+                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
+                echo('<div class="layer layer-3 sprites objects" data-layer="sprites/objects" '.$map_layer_styles.$map_layer_attrs.'>');
+                    // BATTLE OBJECT SPRITES
+                    $battles_layer_markup = rpg_world::get_battles_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($battles_layer_markup);
+                    // TEAM & RIVAL OBJECT SPRITES
+                    $team_layer_markup = rpg_world::get_team_layer_markup($this_prototype_data, $map_data_parsed);
+                    $rivals_layer_markup = rpg_world::get_rivals_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($team_layer_markup);
+                    echo($rivals_layer_markup);
+                echo('</div>'.PHP_EOL);
+
 
                 // END OF LAYERS
                 ?>

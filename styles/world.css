@@ -91,7 +91,6 @@ html, body {
     will-change: transform;
 }
 
-
 #world #canvas #map .layer {
     display: block;
     position: absolute;
@@ -103,6 +102,8 @@ html, body {
     pointer-events: none;
     transform: translate(0, 0);
 }
+/*
+// OLD VERSION
 #world #canvas #map .layer[data-layer="background"] { z-index: 1; }
 #world #canvas #map .layer[data-layer="terrain"] { z-index: 10; }
 #world #canvas #map .layer[data-layer="events"] { z-index: 20; }
@@ -111,6 +112,12 @@ html, body {
 #world #canvas #map .layer[data-layer="switches"] { z-index: 26; }
 #world #canvas #map .layer[data-layer="battles"] { z-index: 30; }
 #world #canvas #map .layer[data-layer="teams"] { z-index: 40; }
+*/
+#world #canvas #map .layer[data-layer="background"] { z-index: 1; }
+#world #canvas #map .layer[data-layer="terrain"] { z-index: 10; }
+#world #canvas #map .layer[data-layer^="sprites/"] { z-index: 20; }
+#world #canvas #map .layer[data-layer="sprites/tiles"] { z-index: 30; }
+#world #canvas #map .layer[data-layer="sprites/objects"] { z-index: 40; }
 
 /* define some special-effect styles for the terrain layer specifically */
 #world #canvas #map .layer[data-layer="terrain"] canvas {
@@ -458,7 +465,7 @@ html, body {
 }
 
 /* define the base rules for the event sprites */
-#world #map .layer.events .sprite {
+#world #map .layer.sprites.tiles .sprite {
     width: 80px;
     height: 80px;
 }
@@ -468,10 +475,10 @@ html, body {
 @keyframes world-sprite-exit-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(3.0); } }
 @keyframes world-sprite-portal-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(2.0); } }
 @keyframes world-sprite-button-glow { 0%, 100% { filter: brightness(1); transform: scaleY(1.0); } 50% { filter: brightness(1.5); transform: scaleY(0.95);  } }
-#world #map .layer.events .sprite.spawn.pulse { animation: world-sprite-spawn-pulse 2s ease-in infinite; }
-#world #map .layer.events .sprite.exit.pulse { animation: world-sprite-exit-pulse 4s ease-in infinite; }
-#world #map .layer.events .sprite.portal.pulse { animation: world-sprite-portal-pulse 3s ease-in infinite; }
-#world #map .layer.events .sprite.button.glow { animation: world-sprite-button-glow 1.5s ease-in infinite; }
+#world #map .layer.sprites.tiles .sprite.spawn.pulse { animation: world-sprite-spawn-pulse 2s ease-in infinite; }
+#world #map .layer.sprites.tiles .sprite.exit.pulse { animation: world-sprite-exit-pulse 4s ease-in infinite; }
+#world #map .layer.sprites.tiles .sprite.portal.pulse { animation: world-sprite-portal-pulse 3s ease-in infinite; }
+#world #map .layer.sprites.tiles .sprite.button.glow { animation: world-sprite-button-glow 1.5s ease-in infinite; }
 
 /* define the base rules for any object sprites */
 #world #map .layer.objects .sprite {
