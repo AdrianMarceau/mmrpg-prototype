@@ -8,7 +8,7 @@
 define('MMRPG_WORLD_DEFAULT_MAPSIZE', 10);
 define('MMRPG_WORLD_DEFAULT_TILESIZE', 80);
 define('MMRPG_WORLD_DEFAULT_SPRITESITE', 40);
-define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 1); // TODO: make this dependant on limit hearts
+define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 8); // TODO: hardcode for now, review later
 define('MMRPG_WORLD_DEFAULT_MOBILITY', 1); // TODO: make this dependant on player skill
 define('MMRPG_WORLD_DEFAULT_BASEPATH', '/');
 
@@ -1101,6 +1101,7 @@ class rpg_world {
         $mmrpg_index_robots = self::get_index('robots');
         $current_player_token = $this_prototype_data['this_player_token'];
         $player_starforce = rpg_game::starforce_unlocked();
+        $limit_hearts = mmrpg_prototype_limit_hearts_earned($current_player_token);
         $get_rating_token = function($percent){
             if ($percent === 100){ return 'full'; }
             elseif ($percent >= 50){ return 'high'; }
@@ -1118,6 +1119,12 @@ class rpg_world {
             else { return '03'; } // defeat
             };
         //$robot_tokens_reversed = array_reverse($robot_tokens);
+        $return_markup .= '<a class="team-rotate" title="Rotate Team"><i class="fa fas fa-sync"></i></a>';
+        $return_markup .= '<div class="limit-hearts" title="x'.$limit_hearts.' Limit Hearts">';
+            $return_markup .= '<i class="player '.$current_player_token.'"></i>';
+            $return_markup .= str_repeat('<i class="heart fa fas fa-heart"></i>', $limit_hearts);
+        $return_markup .= '</div>';
+        $return_markup .= '<div class="team-robots">';
         foreach ($robot_tokens AS $robot_key => $robot_token){
             if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
             $robot_index_info = $mmrpg_index_robots[$robot_token];
@@ -1162,6 +1169,7 @@ class rpg_world {
             $robot_markup .= '</div>';
             $return_markup .= $robot_markup;
         }
+        $return_markup .= '</div>';
         return $return_markup;
     }
 
@@ -1468,8 +1476,10 @@ class rpg_world {
         if (strstr($team_dir, 'left')){ $left += count($team_sprites) * 4; }
         elseif (strstr($team_dir, 'right')){ $left -= count($team_sprites) * 4; }
         foreach ($team_sprites as $key => $sprite){
+            $id = 0;
             $kind = $sprite[0];
             $token = $sprite[1];
+            if (strstr($token, '_')){ list($id, $token) = explode('_', $token, 2); }
             $img = isset($sprite[2]) ? $sprite[2] : $token;
             $alt = strstr($img, '_') ? explode('_', $img, 2)[1] : '';
             $dir = strstr($team_dir, 'left') ? 'left' : 'right';
@@ -1483,6 +1493,7 @@ class rpg_world {
             $class = $team_class.' bounce'.($disabled ? ' disabled' : '');
             $styles = 'top: '.$top.'px; left: '.$left.'px; ';
             $attrs = 'data-key="'.$key.'"';
+            if (!empty($id)){ $attrs .= ' data-id="'.$id.'"'; }
             $markup = self::get_sprite($kind, $img, $alt, $dir, $class, $styles, $attrs);
             $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$team_class.'-'.$kind.'"', $markup);
             if ($disabled){ $markup = str_replace('data-frame="00"', 'data-frame="03"', $markup); }
@@ -1520,7 +1531,8 @@ class rpg_world {
         if (!empty($team_player_robots) && is_array($team_player_robots)){
             foreach ($team_player_robots AS $robot_string){
                 list($robot_id, $robot_token) = explode('_', $robot_string, 2);
-                $robot = array('robot', $robot_token);
+                //$robot = array('robot', $robot_token);
+                $robot = array('robot', $robot_string);
                 $robot_overview = self::get_player_robot_overview($team_player_token, $robot_token, $robot_id);
                 if (!empty($robot_overview['image'])){ $robot[] = $robot_overview['image']; }
                 if (!empty($robot_overview['disabled'])){ $robot[] = 'disabled'; }

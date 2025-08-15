@@ -1206,6 +1206,8 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
         // Bind a click event to the back button in the header that'll bring us to prototype menu
         let $backButton = _elements.backButton;
         if ($backButton && $backButton.length){
@@ -1270,6 +1272,67 @@ class mmrpgWorldMap {
                 e.preventDefault();
                 //console.log('%c' + 'Reset button hovered!', 'color: cyan;');
                 _self.playSoundEffect('icon-hover');
+                });
+            }
+        // Bind a click event to the team-rotate button in the robots overview
+        let $robotsOverview = _elements.robotsOverview;
+        if ($robotsOverview && $robotsOverview.length){
+            let $teamSprites = _elements.teamSprites;
+            let $rotateButton = $('.team-rotate', $robotsOverview);
+            let $robotsOnMap = $teamSprites.filter('.robot:not(.cursor)');
+            let $robotsInOverview = $('.team-robots', $robotsOverview);
+            $rotateButton.bind('click', function(e){
+                e.preventDefault();
+                //console.log('%c' + 'Team rotate button clicked!', 'color: cyan;');
+                // First we rotate the actual robot data in the world state by one position (if allowed)
+                let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                //console.log('-> playerRobotKeys =', playerRobotKeys);
+                if (playerRobotKeys.length < 2){ return; } // nothing to rotate
+                //console.log('-> _worldPlayerRobots(keys)(before) =', playerRobotKeys);
+                _self.playSoundEffect('switch-in');
+                let firstRobotKey = playerRobotKeys[0];
+                let firstPlayerRobot = _worldPlayerRobots[firstRobotKey];
+                //console.log('-> firstRobotKey =', firstRobotKey);
+                //console.log('-> firstPlayerRobot =', firstPlayerRobot);
+                delete _worldPlayerRobots[firstRobotKey];
+                _worldPlayerRobots[firstRobotKey] = firstPlayerRobot;
+                playerRobotKeys = Object.keys(_worldPlayerRobots);
+                //console.log('-> _worldPlayerRobots(keys)(after) =', playerRobotKeys);
+                // Now we rotate the robots in the overview by moving the first robot to the end of the list
+                let $firstOverviewRobot = $('.team-robot[data-robot]', $robotsInOverview).first();
+                //console.log('-> $firstOverviewRobot =', $firstOverviewRobot);
+                $firstOverviewRobot.appendTo($robotsInOverview);
+                // And then finally we need to reposition the robots on the world map too by indexing all their current positions,
+                // then removing the first robot from the map and appending it to the end of the list, then repositioning all the robots
+                let teamPositionsByKey = [];
+                $robotsOnMap.each(function(index, robot){
+                    let $robot = $(robot);
+                    let key = parseInt($robot.attr('data-key'));
+                    let xPos = parseInt($robot.css('left')) || 0;
+                    let yPos = parseInt($robot.css('top')) || 0;
+                    teamPositionsByKey[key] = [xPos, yPos];
+                    });
+                let firstKey = parseInt(Object.keys(teamPositionsByKey)[0]) || false;
+                let lastKey = parseInt(Object.keys(teamPositionsByKey).slice(-1)[0]) || false;
+                //console.log('---> teamPositionsByKey =', teamPositionsByKey);
+                //console.log('---> firstKey =', firstKey);
+                //console.log('---> lastKey =', lastKey);
+                $robotsOnMap.each(function(){
+                    let $robot = $(this);
+                    let key = parseInt($robot.attr('data-key'));
+                    let newKey = key - 1;
+                    if (newKey < firstKey){ newKey = lastKey; }
+                    $robot.attr('data-key', newKey);
+                    let newPosition = teamPositionsByKey[newKey] || [0, 0];
+                    $robot.css({
+                        left: newPosition[0] + 'px',
+                        top: newPosition[1] + 'px'
+                        });
+                    });
+                // and then save the world state with the new robot order
+                _self.saveWorldState();
+                // Return true on success
+                return true;
                 });
             }
         // Bind click events to the player switcher options in the world map header
@@ -1534,11 +1597,21 @@ class mmrpgWorldMap {
             }
         // If there are any team sprites, move them as well (it's okay if they lay behind the cursor)
         if ($otherSprites && $otherSprites.length){
+            let $otherSpritesInOrder = $(Array.from($otherSprites).sort(function(a, b){
+                const aKey = parseInt($(a).attr('data-key'));
+                const bKey = parseInt($(b).attr('data-key'));
+                //console.log('-> aKey =', aKey, 'vs bKey =', bKey);
+                if (aKey < bKey) return -1;
+                if (aKey > bKey) return 1;
+                return 0;
+                }));
+            //console.log('-> $otherSprites =', $otherSprites);
+            //console.log('-> $otherSpritesInOrder =', $otherSpritesInOrder);
             let teamOffsetX = tileOffsetX;
             let teamOffsetY = tileOffsetY;
             let teamTravelDuration = travelDuration;
             teamTravelDuration += 50;
-            $otherSprites.each(function(index, element){
+            $otherSpritesInOrder.each(function(index, element){
                 let $thisSprite = $(element);
                 let $innerSprite = $('.sprite', $thisSprite);
                 let imgSize = $thisSprite.attr('data-size') || 40;
@@ -1796,6 +1869,8 @@ class mmrpgWorldMap {
         let _elements = _self.elements;
         let _world = _self.state;
         let _worldCursor = _world.cursor;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
         let _mapEffects = _config.mapEffects;
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
@@ -2274,7 +2349,7 @@ class mmrpgWorldMap {
                         battleVars.push('this_user_id=' + _userId);
                         battleVars.push('this_player_id=' + _playerId);
                         battleVars.push('this_player_token=' + _playerToken);
-                        battleVars.push('this_player_robots=' + _playerRobots.join(','));
+                        battleVars.push('this_player_robots=' + Object.keys(_worldPlayerRobots).join(','));
                         battleVars.push('this_battle_token=' + battleId);
                         let battleHref = 'battle.php?' + battleVars.join('&');
                         $thisWorld.addClass('hidden');

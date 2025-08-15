@@ -142,24 +142,34 @@ if (!empty($_POST['action']) && $_POST['action'] === 'save'
         if (!empty($worldData['lastPlayerRobots'])){
             // scan the player robots for changes in: energy, weapons, attack, defense, speed
             $lastPlayerRobots = $worldData['lastPlayerRobots'];
-            //error_log('$lastPlayerRobots = '. print_r($lastPlayerRobots, true));
-            foreach ($lastPlayerRobots AS $key => $data){
-                //error_log('-> checking robot key "'.$key.'"');
-                if (!strstr($key, '_')){ continue; }
-                if (empty($data) || !is_array($data)){ continue; }
-                list($id, $token) = explode('_', $key, 2);
-                if (!in_array($token, $allowed_robot_tokens)){ continue; }
-                if (!isset($robotSessions[$token])){ continue; }
-                // Okay, now we know it exists, we can update values as we find them
-                $robot_session = &$robotSessions[$token];
-                //error_log('-> (new) $data = '. print_r($data, true));
-                //error_log('-> $robot_session(before) = '. print_r($robot_session, true));
-                if (isset($data['energy']) && isset($data['energyMax'])){ $robot_session['energy'] = intval($data['energy']) - intval($data['energyMax']); }
-                if (isset($data['weapons']) && isset($data['weaponsMax'])){ $robot_session['weapons'] = intval($data['weapons']) - intval($data['weaponsMax']); }
-                if (isset($data['attackMods'])){ $robot_session['attack'] = intval($data['attackMods']); }
-                if (isset($data['defenseMods'])){ $robot_session['defense'] = intval($data['defenseMods']); }
-                if (isset($data['speedMods'])){ $robot_session['speed'] = intval($data['speedMods']); }
-                //error_log('-> $robot_session(after) = '. print_r($robot_session, true));
+            //error_log('$lastPlayerRobots(raw) = '. print_r($lastPlayerRobots, true));
+            if (!empty($lastPlayerRobots)){
+                $old_last_robots = !empty($lastPlayerSession['last_robots']) ? explode(',', $lastPlayerSession['last_robots']) : array();
+                $new_last_robots = !empty($lastPlayerRobots) ? array_keys($lastPlayerRobots) : array();
+                //error_log('$old_last_robots = '. print_r($old_last_robots, true));
+                //error_log('$new_last_robots = '. print_r($new_last_robots, true));
+                // update the player's last robots string and then any relevant session values per-robot
+                $lastPlayerSession['last_robots'] = implode(',', $new_last_robots);
+                foreach ($lastPlayerRobots AS $key => $data){
+                    //error_log('-> checking robot key "'.$key.'"');
+                    if (!strstr($key, '_')){ continue; }
+                    if (empty($data) || !is_array($data)){ continue; }
+                    list($id, $token) = explode('_', $key, 2);
+                    if (!in_array($token, $allowed_robot_tokens)){ continue; }
+                    if (!isset($robotSessions[$token])){ continue; }
+                    // Okay, now we know it exists, we can update values as we find them
+                    $robotSession = &$robotSessions[$token];
+                    //error_log('-> (new) $data = '. print_r($data, true));
+                    //error_log('-> $robotSession(before) = '. print_r($robotSession, true));
+                    if (isset($data['energy']) && isset($data['energyMax'])){ $robotSession['energy'] = intval($data['energy']) - intval($data['energyMax']); }
+                    if (isset($data['weapons']) && isset($data['weaponsMax'])){ $robotSession['weapons'] = intval($data['weapons']) - intval($data['weaponsMax']); }
+                    if (isset($data['attackMods'])){ $robotSession['attack'] = intval($data['attackMods']); }
+                    if (isset($data['defenseMods'])){ $robotSession['defense'] = intval($data['defenseMods']); }
+                    if (isset($data['speedMods'])){ $robotSession['speed'] = intval($data['speedMods']); }
+                    //error_log('-> $robotSession(after) = '. print_r($robotSession, true));
+                }
+                //error_log('$lastPlayerSession = '. print_r($lastPlayerSession, true));
+                //error_log('$robotSessions = '. print_r($robotSessions, true));
             }
         }
         // If world button states were provided, save them to the session
@@ -262,21 +272,35 @@ $this_prototype_data['this_player_id'] = $this_player_info['player_id'];
 $this_prototype_data['this_player_token'] = $this_player_info['player_token'];
 $max_player_robots = mmrpg_prototype_limit_hearts_earned($this_player_token);
 $allowed_player_robots = mmrpg_prototype_robots_unlocked($this_player_token, true);
-$current_player_robots = !empty($allowed_player_robots) ? array_slice($allowed_player_robots, 0, $max_player_robots) : array(); // TODO: make this customizable
 $summoned_player_robots = rpg_world::get_battle_history($this_player_token, 'robots_summoned');
 //error_log('$max_player_robots = '.print_r($max_player_robots, true));
 //error_log('$allowed_player_robots = '.print_r($allowed_player_robots, true));
-//error_log('$current_player_robots = '.print_r($current_player_robots, true));
 //error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));
-if (!empty($summoned_player_robots)){
+$current_player_robots = array();
+if (!empty($WORLD_PLAYER_SESSION['last_robots'])){
+    //error_log('-> adding from $WORLD_PLAYER_SESSION[last_robots] = '. print_r($WORLD_PLAYER_SESSION['last_robots'], true));
+    $last_robots = explode(',', $WORLD_PLAYER_SESSION['last_robots']);
+    $current_player_robots += array_map(function($r){ return explode('_', $r, 2)[1]; }, $last_robots);
+}
+if (!empty($allowed_player_robots) && count($current_player_robots) < $max_player_robots){
+    //error_log('-> adding from $allowed_player_robots = '. print_r($allowed_player_robots, true));
+    $slots_open = $max_player_robots - count($current_player_robots);
+    $robots_not_yet_included = array_diff($allowed_player_robots, $current_player_robots);
+    $current_player_robots += array_slice($robots_not_yet_included, 0, $slots_open);
+}
+//error_log('$current_player_robots = '.print_r($current_player_robots, true));
+/* if (!empty($summoned_player_robots)){
     usort($current_player_robots, function($a, $b) use ($summoned_player_robots){
-        $a_summoned = array_search($a, $summoned_player_robots);
-        $b_summoned = array_search($b, $summoned_player_robots);
-        if ($a_summoned !== false && $b_summoned !== false){ return $a_summoned - $b_summoned; }
-        elseif ($a_summoned !== false){ return 1; } elseif ($b_summoned !== false){ return -1; }
+        $a_last_summoned = array_search($a, $summoned_player_robots);
+        $b_last_summoned = array_search($b, $summoned_player_robots);
+        if ($a_last_summoned === false){ $a_last_summoned = 9999; }
+        if ($b_last_summoned === false){ $b_last_summoned = 9999; }
+        if ($a_last_summoned < $b_last_summoned){ return -1; }
+        elseif ($a_last_summoned > $b_last_summoned){ return 1; }
         else { return 0; }
         });
-}
+    //error_log('$current_player_robots (after-sort) = '.print_r($current_player_robots, true));
+} */
 if (!empty($current_player_robots)){
     foreach ($current_player_robots AS $robot_token){
         if (empty($mmrpg_index_robots[$robot_token])){ continue; }
