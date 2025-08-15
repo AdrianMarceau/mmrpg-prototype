@@ -1093,7 +1093,7 @@ html, body {
     left: 0;
     pointer-events: all;
     cursor: default;
-    padding: 8px 12px 28px 8px;
+    padding: 0 12px 28px 8px;
     border-radius: 0 6px 0 0;
     background-color: transparent;
     box-shadow: none;
@@ -1177,7 +1177,7 @@ html, body {
 #world #canvas #robots-overview .limit-hearts > .player.dr-lalinde { background-image: url("../images/players/dr-lalinde/chapter-sprite.gif"); }
 
 #world #canvas #robots-overview .team-robots {
-    padding: 10px 0 5px;
+    padding: 20px 40px 5px 0;
     max-height: 245px;
     overflow: hidden;
     transition: max-height 0.9s, background-color 0.3s;
