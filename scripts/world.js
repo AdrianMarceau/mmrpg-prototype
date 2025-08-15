@@ -2566,6 +2566,78 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Quick function that, given a column and row returns any events on or around that position on the map
+    getEventsAtPosition(searchPosition, searchRadius){
+        //console.log('%c' + 'mmrpgWorldMap.getEventsAtPosition(searchPosition:' + searchPosition + ', searchRadius:' + searchRadius + ')', 'color: magenta;');
+        if (!searchPosition || (typeof searchPosition !== 'string' && !Array.isArray(searchPosition))){ console.error('getEventsAtPosition() missing or invalid searchPosition!'); return false; }
+        searchPosition = typeof searchPosition !== 'string' ? searchPosition.join('-') : searchPosition; // join if provided as array
+        searchRadius = typeof searchRadius === 'number' ? searchRadius : 1; // default to one if not provided
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldCursor = _world.cursor;
+        let $canvasMap = _elements.map;
+        let eventsAtPosition = [];
+        let positionsToCheck = [];
+        positionsToCheck.push(searchPosition); // always check the exact position first
+        // If a search radius is provided, add the surrounding positions to check
+        // including diagonal positions
+        if (searchRadius > 0){
+            let searchCol = parseInt(searchPosition.split('-')[0]);
+            let searchRow = parseInt(searchPosition.split('-')[1]);
+            for (let colOffset = -searchRadius; colOffset <= searchRadius; colOffset++){
+                for (let rowOffset = -searchRadius; rowOffset <= searchRadius; rowOffset++){
+                    if (colOffset === 0 && rowOffset === 0){ continue; } // skip the center position
+                    let newCol = searchCol + colOffset;
+                    let newRow = searchRow + rowOffset;
+                    if (newCol < 1 || newRow < 1){ continue; } // skip invalid positions
+                    positionsToCheck.push(newCol + '-' + newRow);
+                    }
+                }
+            }
+        //console.log('-> positionsToCheck =', positionsToCheck);
+        let eventKinds = ['event', 'portal', 'button', 'battle'];
+        for (let e = 0; e < eventKinds.length; e++){
+            let eventKind = eventKinds[e];
+            //console.log('checking for ' + eventKind+'s at: ' + positionsToCheck.join(', '));
+            // ie: mapKindSymbols
+            let symbolsKey = 'map' + (eventKind[0].toUpperCase() + eventKind.slice(1)) + 'Symbols';
+            let eventSymbols = _config.hasOwnProperty(symbolsKey) ? _config[symbolsKey] : false;
+            let eventSymbolKeys = eventSymbols ? Object.keys(eventSymbols) : [];
+            //console.log('-> symbolsKey =', symbolsKey);
+            //console.log('-> eventSymbols =', eventSymbols);
+            //console.log('-> eventSymbolKeys =', eventSymbolKeys);
+            //console.log('-> ' + symbolsKey + ' =', eventSymbols);
+            //console.log('-> ' + symbolsKey + ' =', eventSymbolKeys);
+            if (!eventSymbolKeys.length){ continue; }
+            for (let i = 0; i < positionsToCheck.length; i++){
+                let eventPosition = positionsToCheck[i];
+                let eventPositionXY = eventPosition.split('-');
+                //console.log('-> checking ' + symbolsKey + ' for ' + eventPosition);
+                if (!eventSymbols[eventPosition]){ continue; } // skip if no event symbols at this position
+                let eventToken = eventSymbols[eventPosition];
+                let $eventSprite = $('.sprite[data-' + eventKind + '="'+eventToken+'"]', $canvasMap);
+                if ($eventSprite && $eventSprite.length){ $eventSprite = $eventSprite.first().get(0); }
+                let eventAtPosition = {kind: eventKind, position: eventPosition, token: eventToken, sprite: $eventSprite};
+                //console.log('%c' + '--> found valid '+ eventKind + ' event at position ' + eventPosition, 'color: lime;');
+                //console.log('----> eventToken =', eventToken);
+                //console.log('----> eventAtPosition =', eventAtPosition);
+                // skip portals unless it's the exact position
+                let eventIsCustom = eventKind === 'event';
+                let eventIsPortal = eventKind === 'portal';
+                if (eventIsCustom && eventPosition !== searchPosition){ return; } // skip custom unless it's the exact position
+                if (eventIsPortal && eventPosition !== searchPosition){ return; } // skip portals unless it's the exact position
+                // otherwise we are fine to add to the events array
+                //console.log('----> adding ' + eventKind + ' at ' + eventPosition + ' to eventsAtPosition array');
+                eventsAtPosition.push(eventAtPosition);
+                }
+            }
+        // Return the found events
+        //console.log('-> Found ' + eventsAtPosition.length + ' events at position ' + searchPosition + ':', eventsAtPosition);
+        return eventsAtPosition;
+        }
+
     // Quick function that, given a column and row returns any event sprites on or around that position on the map
     getEventSpritesAtPosition(searchPosition, searchRadius){
         //console.log('%c' + 'mmrpgWorldMap.getEventSpritesAtPosition(searchPosition:' + searchPosition + ', searchRadius:' + searchRadius + ')', 'color: magenta;');
