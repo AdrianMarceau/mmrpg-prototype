@@ -1068,7 +1068,7 @@ html, body {
     left: 0;
     pointer-events: all;
     cursor: default;
-    padding: 0 12px 28px 8px;
+    padding: 6px 12px 28px 8px;
     border-radius: 0 6px 0 0;
     background-color: transparent;
     box-shadow: none;
@@ -1093,7 +1093,18 @@ html, body {
 #world #canvas #robots-overview > .wrapper {
 
 }
-
+#world #canvas #robots-overview .team-size {
+    display: block;
+    position: absolute;
+    z-index: 90;
+    color: #e0e0e0;
+    font-size: 10px;
+    line-height: 1;
+    top: 0;
+    left: 10px;
+    pointer-events: none;
+    text-shadow: 1px 1px 0 #000000;
+}
 #world #canvas #robots-overview .team-rotate {
     display: block;
     position: absolute;
@@ -1115,7 +1126,6 @@ html, body {
     color: #ffffff;
     transform: scale(1.2) rotate(180deg);
 }
-
 #world #canvas #robots-overview .limit-hearts {
     display: block;
     position: absolute;

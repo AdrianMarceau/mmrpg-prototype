@@ -1211,6 +1211,8 @@ class rpg_world {
         $current_player_token = $this_prototype_data['this_player_token'];
         $player_starforce = rpg_game::starforce_unlocked();
         $limit_hearts = mmrpg_prototype_limit_hearts_earned($current_player_token);
+        $num_robot_unlocked = mmrpg_prototype_robots_unlocked($current_player_token);
+        $current_team_size = $limit_hearts;
         $get_rating_token = function($percent){
             if ($percent === 100){ return 'full'; }
             elseif ($percent >= 50){ return 'high'; }
@@ -1228,6 +1230,8 @@ class rpg_world {
             else { return '03'; } // defeat
             };
         //$robot_tokens_reversed = array_reverse($robot_tokens);
+        if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<strong class="team-size">'.$current_team_size.' of '.$num_robot_unlocked.'</strong>'; }
+        else { $return_markup .= '<strong class="team-size">'.$current_team_size.' robots</strong>'; }
         $return_markup .= '<a class="team-rotate" title="Rotate Team"><i class="fa fas fa-sync"></i></a>';
         $return_markup .= '<div class="limit-hearts" title="x'.$limit_hearts.' Limit Hearts">';
             $return_markup .= '<i class="player '.$current_player_token.'"></i>';
