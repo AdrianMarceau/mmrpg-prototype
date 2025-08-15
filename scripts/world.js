@@ -1928,6 +1928,10 @@ class mmrpgWorldMap {
         $spritesLayer.removeClass('has-zoom');
         setTimeout(function(){ $('.sprite', $canvasMap).removeClass('zoom'); }, 100);
 
+        // -- OLD VERSION -- //
+
+        /*
+
         // Search for events at the new position so we can show the action dropdown if needed
         //console.log('-> checking if there are any events for this position...');
         let $eventSpritesAtPosition = _self.getEventSpritesAtPosition(newPosition);
@@ -1971,6 +1975,51 @@ class mmrpgWorldMap {
         //console.log('-> after filtering, there are ' + $eventSpritesAtPosition.length + ' ' + firstEventType + ' events near cursorPosition', cursorPosition);
         $firstEvent = $eventSpritesAtPosition[0]; // re-assign the first event after filtering
 
+        */
+
+        // -- NEW VERSION -- //
+
+        // Search for events at the new position so we can show the action dropdown if needed
+        //console.log('-> checking if there are any events for this position...');
+        let eventsAtPosition = _self.getEventsAtPosition(newPosition);
+        //console.log('-> found ' + eventsAtPosition.length + ' events at position', '\n--> eventsAtPosition:', eventsAtPosition);
+        if (!eventsAtPosition || !eventsAtPosition.length){
+            //console.log('-> no events found at position', cursorPosition, 'skipping dropdown display');
+            return;
+            }
+
+        // Sort the events at this position by priority with portals > battles > everything-else
+        eventsAtPosition = eventsAtPosition.sort(function(a, b){
+            if (a.kind === 'portal' && b.kind !== 'portal'){ return -1; } // a is portal, b is not
+            else if (a.kind !== 'portal' && b.kind === 'portal'){ return 1; } // a is not portal, but b is
+            else if (a.kind === 'battle' && b.kind !== 'battle'){ return -1; } // a is battle, b is not
+            else if (a.kind !== 'battle' && b.kind === 'battle'){ return 1; } // a is not battle, but b is
+            else { return 0; } // both are same or of irrelevant kind
+            });
+        //console.log('-> eventsAtPosition(after-sort) = ', JSON.parse(JSON.stringify(eventsAtPosition)));
+
+        // Check to see what the very first event type is
+        let firstEvent = eventsAtPosition[0];
+        let firstEventType = firstEvent.kind;
+        //console.log('-> firstEvent =', JSON.parse(JSON.stringify(firstEvent)));
+        //console.log('-> firstEventType =', firstEventType);
+
+        // Unless this is a battle (where it's possible to fight many at once), we should
+        // filter out all the other event types than the first so we only show one dropdown
+        //console.log('-> before filtering, there are ' + eventsAtPosition.length + ' ' + firstEventType + ' events near cursorPosition', cursorPosition);
+        if (firstEventType !== 'battle'){
+            eventsAtPosition = eventsAtPosition.slice(0, 1); // only keep the first event
+            } else {
+            for (let i = 1; i < eventsAtPosition.length; i++){
+                if (eventsAtPosition[i].kind !== 'battle'){
+                    delete eventsAtPosition[i];
+                    }
+                }
+            }
+        eventsAtPosition = Object.values(eventsAtPosition); // re-index the array to avoid issues with gaps
+        //console.log('-> after filtering, there are ' + eventsAtPosition.length + ' ' + firstEventType + ' events near cursorPosition', cursorPosition);
+        firstEvent = eventsAtPosition[0]; // re-assign the first event after filtering
+
         // Now that we have an event, check its data to see if we should show a dropdown
         // for either a battle, a portal, or any other compatible event-type for the tile
         let triggerEffect = false;
@@ -1985,10 +2034,10 @@ class mmrpgWorldMap {
         let dropdownMarkup = '';
         let dropdownButtons = '';
         let readyTeamSprites = false;
-        if (firstEventType === 'custom' && $firstEvent.is('[data-event]')){
+        if (firstEventType === 'custom'){
             //console.log('-> event at position is custom, checking what comes next...');
             // If the cursor is literally on a event, only one event sprite matters right now
-            let $customEvent = $firstEvent;
+            let $customEvent = $(firstEvent.sprite);
             let dataLabel = $customEvent.attr('data-label');
             let dataEvent = $customEvent.attr('data-event');
             let eventInfo = _config.mapEventsIndex[dataEvent] || false;
@@ -2026,10 +2075,10 @@ class mmrpgWorldMap {
                 //console.log('-> no eventInfo found for ' + dataEvent + ', skipping');
                 }
             }
-        else if (firstEventType === 'portal' && $firstEvent.is('[data-portal]')){
+        else if (firstEventType === 'portal'){
             //console.log('-> event at position is a portal, preparing dropdown');
             // If the cursor is literally on a portal, only one event sprite matters right now
-            let $portalEvent = $firstEvent;
+            let $portalEvent = $(firstEvent.sprite);
             let dataLabel = $portalEvent.attr('data-label');
             let dataPortal = $portalEvent.attr('data-portal');
             if (dataPortal && dataPortal.indexOf('goto__') !== -1){
@@ -2073,10 +2122,10 @@ class mmrpgWorldMap {
                     }
                 }
             }
-        else if (firstEventType === 'button' && $firstEvent.is('[data-button]')){
+        else if (firstEventType === 'button'){
             //console.log('-> event at position is a button, preparing dropdown');
             // If the cursor is literally on a button, only one event sprite matters right now
-            let $buttonEvent = $firstEvent;
+            let $buttonEvent = $(firstEvent.sprite);
             let dataLabel = $buttonEvent.attr('data-label');
             let dataButton = $buttonEvent.attr('data-button');
             let dataColour = $buttonEvent.attr('data-colour');
@@ -2092,10 +2141,12 @@ class mmrpgWorldMap {
                 zoomTimeoutDuration = 500; // if we show a button dropdown, we want to zoom in quickly
                 }
             }
-        else if (firstEventType === 'battle' && $firstEvent.is('[data-battle]')){
+        else if (firstEventType === 'battle'){
 
             // Otherwise we can/should check all the posiitons for any battles to round-up and trigger
             let dataLabels = [], dataBattles = [];
+            /*
+            // OLD VERSION
             for (var i = 0; i < $eventSpritesAtPosition.length; i++){
                 let $battleEvent = $eventSpritesAtPosition[i];
                 let dataPosition = $battleEvent.attr('data-pos');
@@ -2107,6 +2158,20 @@ class mmrpgWorldMap {
                     dataBattles.push([dataBattle, dataPosition]);
                     }
                 }
+                */
+            for (var i = 0; i < eventsAtPosition.length; i++){
+                //console.log('-> parsing battleEvent from eventsAtPosition[i]', eventsAtPosition[i]);
+                let battleEvent = eventsAtPosition[i];
+                let dataPosition = battleEvent.position;
+                var dataBattle = battleEvent.token;
+                var dataLabel = battleEvent.label;
+                if (dataBattle){
+                    dataLabels.push([dataLabel, dataPosition]);
+                    dataBattles.push([dataBattle, dataPosition]);
+                    }
+                }
+            //console.log('-> dataLabels =', dataLabels);
+            //console.log('-> dataBattles =', dataBattles);
             //console.log('check the direction the player is facing and sort the battle events accordingly');
             //console.log('-> cursorDirection =', cursorDirection);
             //console.log('-> cursorPosition =', cursorPosition);
@@ -2176,6 +2241,8 @@ class mmrpgWorldMap {
                 }
             }
 
+        /*
+        // OLD VERSION (totally unnecessary now as it's done earlier in the script)
         // Filter the  array of events at this position to include only the ones that we matched above before continuing
         //console.log('-> filtering events at position', cursorPosition, 'to only those that match the dropdown type:', showDropdownType);
         //console.log('-> $eventSpritesAtPosition (before) =', $eventSpritesAtPosition.length, $eventSpritesAtPosition);
@@ -2185,6 +2252,7 @@ class mmrpgWorldMap {
             }
         $eventSpritesAtPosition = Object.values($eventSpritesAtPosition); // re-index the array
         //console.log('-> $eventSpritesAtPosition (after) =', $eventSpritesAtPosition.length, $eventSpritesAtPosition);
+        */
 
         // If there's no dropdown to show, we can return early
         if (!showDropdown && !autoRedirect && !triggerEffect){ return; }
@@ -2260,16 +2328,19 @@ class mmrpgWorldMap {
 
             // Elevate the event sprite(s) to the zoom layer and add a zoom class to it so it's more visible
             let cursorPositionXY = cursorPosition.split('-');
-            for (var i = 0; i < $eventSpritesAtPosition.length; i++){
-                let $eventSprite = $eventSpritesAtPosition[i];
+            //for (var i = 0; i < $eventSpritesAtPosition.length; i++){ // OLD VERSION
+            for (var i = 0; i < eventsAtPosition.length; i++){
+                //let $eventSprite = $eventSpritesAtPosition[i]; // OLD VERSION
+                let eventData = eventsAtPosition[i];
+                let $eventSprite = $(eventData.sprite);
                 let eventPosition = $eventSprite.attr('data-pos');
-                //let eventPositionXY = eventPosition.split('-');
                 if ($eventSprite.hasClass('tile')){ continue; } // skip tiles
                 let isRobot = $eventSprite.hasClass('robot');
                 let isMecha = $eventSprite.hasClass('vs-mecha');
                 let isMaster = $eventSprite.hasClass('vs-master');
                 let isBoss = $eventSprite.hasClass('vs-boss');
-                //console.log('-> $eventSpritesAtPosition['+i+'] / isRobot = ', isRobot);
+                //console.log('-> $eventSpritesAtPosition['+i+'] / isRobot = ', isRobot); // OLD VERSION
+                //console.log('-> eventsAtPosition['+i+'] / isRobot = ', isRobot);
                 let dataSize = $eventSprite.attr('data-size') || 40;
                 let $eventLayer = $eventSprite.closest('.layer');
                 let eventLayer = $eventLayer.attr('data-layer');
@@ -2395,7 +2466,8 @@ class mmrpgWorldMap {
                     let buttonStates = _world.buttons;
                     let buttonName = $button.attr('data-button') || false;
                     let buttonInfo = buttonName && (buttonsIndex && buttonsIndex[buttonName]) ? buttonsIndex[buttonName] : false;
-                    let $eventSprite = $eventSpritesAtPosition[0];
+                    //let $eventSprite = $eventSpritesAtPosition[0]; // OLD VERSION
+                    let $eventSprite = $(firstEvent.sprite);
                     let $innerSprite = $eventSprite ? $('> .sprite', $eventSprite) : false;
                     //console.log('-> buttonName =', buttonName);
                     //console.log('-> buttonInfo =', buttonInfo);
@@ -2618,8 +2690,10 @@ class mmrpgWorldMap {
                 if (!eventSymbols[eventPosition]){ continue; } // skip if no event symbols at this position
                 let eventToken = eventSymbols[eventPosition];
                 let $eventSprite = $('.sprite[data-' + eventKind + '="'+eventToken+'"]', $canvasMap);
+                let eventLabel = $eventSprite.length ? $eventSprite.attr('data-label') : '';
                 if ($eventSprite && $eventSprite.length){ $eventSprite = $eventSprite.first().get(0); }
-                let eventAtPosition = {kind: eventKind, position: eventPosition, token: eventToken, sprite: $eventSprite};
+                let eventKind2 = eventKind === 'event' ? 'custom' : eventKind;
+                let eventAtPosition = {kind: eventKind2, position: eventPosition, token: eventToken, sprite: $eventSprite, label: eventLabel};
                 //console.log('%c' + '--> found valid '+ eventKind + ' event at position ' + eventPosition, 'color: lime;');
                 //console.log('----> eventToken =', eventToken);
                 //console.log('----> eventAtPosition =', eventAtPosition);
