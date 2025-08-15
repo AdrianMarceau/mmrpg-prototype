@@ -1166,6 +1166,8 @@ class mmrpgWorldMap {
             let thisPosXY = thisPos.split('-');
             let sameAsLast = thisPos === lastMouseOver;
             if (sameAsLast){ return; }
+            if (thisPosXY[0] < 1 || thisPosXY[0] > _config.mapCols){ return; }
+            if (thisPosXY[1] < 1 || thisPosXY[1] > _config.mapRows){ return; }
             $clickOverlay.attr('title', ('X' + thisPosXY[0] + '-Y' + thisPosXY[1]));
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
             let walkableTiles = _self.getWalkableMapTiles();
@@ -1622,7 +1624,7 @@ class mmrpgWorldMap {
                 let $innerSprite = $('.sprite', $thisSprite);
                 let imgSize = $thisSprite.attr('data-size') || 40;
                 let imgSizeX = imgSize + 'x' + imgSize;
-                teamTravelDuration += 30; // add a little extra time for the team sprites to move
+                teamTravelDuration += 50; // add a little extra time for the team sprites to move
                 if (thisVerDir === 'up'){ teamOffsetY += 10; }
                 else if (thisVerDir === 'down'){ teamOffsetY -= 20; }
                 if (thisHorDir === 'left'){ teamOffsetX += 20; }
@@ -1643,7 +1645,7 @@ class mmrpgWorldMap {
                         left: teamOffsetX + 'px',
                         top: teamOffsetY + 'px',
                         zIndex: teamOffsetZ,
-                        }, teamTravelDuration, 'linear', onTeamMoveComplete);
+                        }, teamTravelDuration, 'swing', onTeamMoveComplete);
                     } else {
                     $thisSprite.css({
                         left: teamOffsetX + 'px',
@@ -1941,11 +1943,12 @@ class mmrpgWorldMap {
         // Search for events at the new position so we can show the action dropdown if needed
         //console.log('-> checking if there are any events for this position...');
         let eventsAtPosition = _self.getEventsAtPosition(newPosition);
-        //console.log('-> found ' + eventsAtPosition.length + ' events at position', '\n--> eventsAtPosition:', eventsAtPosition);
+        //console.log('-> eventsAtPosition =', eventsAtPosition);
         if (!eventsAtPosition || !eventsAtPosition.length){
             //console.log('-> no events found at position', cursorPosition, 'skipping dropdown display');
             return;
             }
+        //console.log('-> found ' + eventsAtPosition.length + ' events at position');
 
         // Sort the events at this position by priority with portals > battles > everything-else
         eventsAtPosition = eventsAtPosition.sort(function(a, b){
@@ -2634,8 +2637,8 @@ class mmrpgWorldMap {
                 // skip portals unless it's the exact position
                 let eventIsCustom = eventKind === 'event';
                 let eventIsPortal = eventKind === 'portal';
-                if (eventIsCustom && eventPosition !== searchPosition){ return; } // skip custom unless it's the exact position
-                if (eventIsPortal && eventPosition !== searchPosition){ return; } // skip portals unless it's the exact position
+                if (eventIsCustom && eventPosition !== searchPosition){ continue; } // skip custom unless it's the exact position
+                if (eventIsPortal && eventPosition !== searchPosition){ continue; } // skip portals unless it's the exact position
                 // otherwise we are fine to add to the events array
                 //console.log('----> adding ' + eventKind + ' at ' + eventPosition + ' to eventsAtPosition array');
                 eventsAtPosition.push(eventAtPosition);

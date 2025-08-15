@@ -103,6 +103,10 @@ html, body {
     transform: translate(0, 0);
 }
 
+#world #canvas #map .layer canvas {
+    backface-visibility: hidden;
+}
+
 #world #canvas #map .layer[data-layer="background"] { z-index: 1; }
 #world #canvas #map .layer[data-layer="terrain"] { z-index: 10; }
 #world #canvas #map .layer[data-layer^="sprites/"] { z-index: 20; }
@@ -153,7 +157,7 @@ html, body {
     will-change: transform;
 }
 #world.ready #canvas #map {
-    transition: filter 0.6s ease-in, transform 1s ease-in-out;
+    transition: filter 0.6s ease-in, transform 0.9s ease-out;
 }
 #world.ready #canvas #map .layer[data-layer="background"] {
     transition: transform 1s ease-in-out;
@@ -599,7 +603,7 @@ html, body {
 #world #map .layer .sprite:not(.tile).always-zoom.zoom > .wrap > .sprite {
     transform: scale(3);
 }
-#world #map .layer.has-zoom .sprite:not(.tile):not(.zoom) > .wrap > .sprite {
+#world #map .layer.has-zoom .sprite:not(.tile):not(.zoom):not(.team) > .wrap > .sprite {
     filter: brightness(0.6) drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.6));
 }
 
@@ -1068,7 +1072,7 @@ html, body {
     left: 0;
     pointer-events: all;
     cursor: default;
-    padding: 6px 12px 28px 8px;
+    padding: 6px 12px 56px 8px;
     border-radius: 0 6px 0 0;
     background-color: transparent;
     box-shadow: none;
@@ -1078,12 +1082,13 @@ html, body {
     content: "";
     display: block;
     position: absolute;
+    top: -10px;
     left: -50px;
     bottom: 0;
     z-index: 1;
     width: 100px;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    height: auto;
+    background-color: rgba(0, 0, 0, 0.7);
     padding: 4px 16px;
     border-radius: 0 6px 0 0;
     box-shadow: 0 0 3px rgba(98, 98, 98, 0.3);
@@ -1093,6 +1098,62 @@ html, body {
 #world #canvas #robots-overview > .wrapper {
 
 }
+#world #canvas #robots-overview .team-switch,
+#world #canvas #robots-overview .team-rotate {
+    display: block;
+    position: absolute;
+    z-index: 100;
+    color: #e0e0e0;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    background-color: transparent;
+    line-height: 1;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    transform: scale(1) rotate(0deg);
+    transition: none;
+}
+#world #canvas #robots-overview .team-switch:not(a) {
+    display: none;
+}
+#world #canvas #robots-overview .team-switch i,
+#world #canvas #robots-overview .team-rotate i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1.0);
+    font-size: 100%;
+    color: #efefef;
+    text-shadow: 1px 1px 0 #000000;
+    text-align: center;
+    vertical-align: middle;
+    pointer-events: none;
+    transition: color 0.6s;
+}
+#world #canvas #robots-overview .team-switch:hover i,
+#world #canvas #robots-overview .team-rotate:hover i {
+    color: #ffffff;
+}
+#world #canvas #robots-overview .team-switch {
+    bottom: 32px;
+    left: 10px;
+    font-size: 18px;
+    transition: transform 0.3s;
+}
+#world #canvas #robots-overview .team-rotate {
+    top: -5px;
+    left: 40px;
+    font-size: 16px;
+    transition: transform 0.6s;
+}
+#world #canvas #robots-overview .team-switch:hover {
+    transform: scale(1.4);
+}
+#world #canvas #robots-overview .team-rotate:hover {
+    transform: scale(1.2) rotate(180deg);
+}
 #world #canvas #robots-overview .team-size {
     display: block;
     position: absolute;
@@ -1100,31 +1161,10 @@ html, body {
     color: #e0e0e0;
     font-size: 10px;
     line-height: 1;
-    top: 0;
-    left: 10px;
+    bottom: 34px;
+    left: 38px;
     pointer-events: none;
     text-shadow: 1px 1px 0 #000000;
-}
-#world #canvas #robots-overview .team-rotate {
-    display: block;
-    position: absolute;
-    z-index: 100;
-    color: #e0e0e0;
-    font-size: 14px;
-    line-height: 1;
-    top: -30px;
-    left: 10px;
-    cursor: pointer;
-    text-shadow: 1px 1px 0 #000000;
-}
-#world #canvas #robots-overview .team-rotate i {
-    color: #e0e0e0;
-    transform: scale(1) rotate(0deg);
-    transition: color 0.6s, transform 0.6s;
-}
-#world #canvas #robots-overview .team-rotate:hover i {
-    color: #ffffff;
-    transform: scale(1.2) rotate(180deg);
 }
 #world #canvas #robots-overview .limit-hearts {
     display: block;
@@ -1486,6 +1526,7 @@ html, body {
     max-width: 999px;
     padding: 9px 9px 12px;
     opacity: 1.0;
+    background-color: rgba(0, 0, 0, 0.7);
     transition: max-width 0.6s, padding 0.6s, opacity 0.9s;
     will-change: max-width, padding, opacity;
 }

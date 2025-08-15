@@ -1230,9 +1230,14 @@ class rpg_world {
             else { return '03'; } // defeat
             };
         //$robot_tokens_reversed = array_reverse($robot_tokens);
-        if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<strong class="team-size">'.$current_team_size.' of '.$num_robot_unlocked.'</strong>'; }
-        else { $return_markup .= '<strong class="team-size">'.$current_team_size.' robots</strong>'; }
         $return_markup .= '<a class="team-rotate" title="Rotate Team"><i class="fa fas fa-sync"></i></a>';
+        if ($num_robot_unlocked > $current_team_size){
+            $return_markup .= '<a class="team-switch" title="Switch-Out Robots"><i class="fa fas fa-robot"></i></a>';
+            $return_markup .= '<strong class="team-size">'.$current_team_size.' of '.$num_robot_unlocked.'</strong>';
+            } else {
+            $return_markup .= '<span class="team-switch"><i class="fa fas fa-robot"></i></span>';
+            $return_markup .= '<strong class="team-size">'.$current_team_size.' robots</strong>';
+            }
         $return_markup .= '<div class="limit-hearts" title="x'.$limit_hearts.' Limit Hearts">';
             $return_markup .= '<i class="player '.$current_player_token.'"></i>';
             $return_markup .= str_repeat('<i class="heart fa fas fa-heart"></i>', $limit_hearts);
