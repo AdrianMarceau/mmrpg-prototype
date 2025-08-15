@@ -1072,7 +1072,7 @@ html, body {
     left: 0;
     pointer-events: all;
     cursor: default;
-    padding: 6px 12px 56px 8px;
+    padding: 6px 12px 52px 8px;
     border-radius: 0 6px 0 0;
     background-color: transparent;
     box-shadow: none;
@@ -1098,12 +1098,12 @@ html, body {
 #world #canvas #robots-overview > .wrapper {
 
 }
-#world #canvas #robots-overview .team-switch,
-#world #canvas #robots-overview .team-rotate {
+#world #canvas #robots-overview .team-rotate,
+#world #canvas #robots-overview .team-switch {
     display: block;
     position: absolute;
     z-index: 100;
-    color: #e0e0e0;
+    color: #efefef;
     width: 20px;
     height: 20px;
     font-size: 20px;
@@ -1118,29 +1118,26 @@ html, body {
 #world #canvas #robots-overview .team-switch:not(a) {
     display: none;
 }
-#world #canvas #robots-overview .team-switch i,
-#world #canvas #robots-overview .team-rotate i {
+#world #canvas #robots-overview .team-rotate {
+    color: #969696;
+}
+#world #canvas #robots-overview .team-rotate i,
+#world #canvas #robots-overview .team-switch i {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(1.0);
     font-size: 100%;
-    color: #efefef;
+    color: inherit;
     text-shadow: 1px 1px 0 #000000;
     text-align: center;
     vertical-align: middle;
     pointer-events: none;
     transition: color 0.6s;
 }
-#world #canvas #robots-overview .team-switch:hover i,
-#world #canvas #robots-overview .team-rotate:hover i {
+#world #canvas #robots-overview .team-rotate:hover i,
+#world #canvas #robots-overview .team-switch:hover i {
     color: #ffffff;
-}
-#world #canvas #robots-overview .team-switch {
-    bottom: 32px;
-    left: 10px;
-    font-size: 18px;
-    transition: transform 0.3s;
 }
 #world #canvas #robots-overview .team-rotate {
     top: -5px;
@@ -1148,11 +1145,17 @@ html, body {
     font-size: 16px;
     transition: transform 0.6s;
 }
-#world #canvas #robots-overview .team-switch:hover {
-    transform: scale(1.4);
+#world #canvas #robots-overview .team-switch {
+    bottom: 32px;
+    left: 10px;
+    font-size: 18px;
+    transition: transform 0.3s;
 }
 #world #canvas #robots-overview .team-rotate:hover {
     transform: scale(1.2) rotate(180deg);
+}
+#world #canvas #robots-overview .team-switch:hover {
+    transform: scale(1.4);
 }
 #world #canvas #robots-overview .team-size {
     display: block;
@@ -1202,7 +1205,7 @@ html, body {
 #world #canvas #robots-overview .limit-hearts > .player.dr-lalinde { background-image: url("../images/players/dr-lalinde/chapter-sprite.gif"); }
 
 #world #canvas #robots-overview .team-robots {
-    padding: 20px 40px 5px 0;
+    padding: 20px 40px 10px 0;
     max-height: 245px;
     overflow: hidden;
     transition: max-height 0.9s, background-color 0.3s;
@@ -1458,6 +1461,66 @@ html, body {
     background-color: transparent !important;
     width: 0% !important;
 }
+#world #canvas #robots-overview .team-robot > .statmods {
+    display: block;
+    position: absolute;
+    bottom: -10px;
+    width: auto;
+    height: 10px;
+    font-size: 10px;
+    line-height: 1;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.7);
+    background-color: transparent;
+    background-color: #202020;
+    padding: 0 2px 0px 4px;
+    border-radius: 0 3px 3px 0;
+}
+#world #canvas #robots-overview .team-robot > .statmods > .mod {
+    display: inline-block;
+    min-width: 1em;
+    margin: 0 3px 0 0;
+    letter-spacing: 1px;
+    text-shadow: 0 0 0 #ffffff;
+    transform: translate(0, 0);
+}
+#world #canvas #robots-overview .team-robot > .statmods > .mod.up {
+    text-shadow: 0 -1px 0 #ffffff;
+    filter: saturate(1.5);
+}
+#world #canvas #robots-overview .team-robot > .statmods > .mod.down {
+    text-shadow: 0 1px 0 #ffffff;
+    filter: saturate(1.5) brightness(0.8);
+}
+#world #canvas #robots-overview .team-robot > .statmods > .mod > i {
+    position: relative;
+    font-size: 14px;
+    top: -3px;
+    transform: translate(0, 0);
+}
+@keyframes robots-overview-mod-down {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(0, 1px); }
+}
+@keyframes robots-overview-mod-up {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(0, -2px); }
+}
+#world #canvas #robots-overview .team-robot > .statmods > .mod.down {
+    animation: robots-overview-mod-down 2.7s steps(2) infinite;
+}
+#world #canvas #robots-overview .team-robot > .statmods > .mod.up > i {
+    animation: robots-overview-mod-up 0.9s steps(2) infinite;
+}
+#world #canvas #robots-overview .team-robot > .statmods > .mod.down:nth-child(1) { animation-delay: 0s; }
+#world #canvas #robots-overview .team-robot > .statmods > .mod.down:nth-child(2) { animation-delay: 0.1s; }
+#world #canvas #robots-overview .team-robot > .statmods > .mod.down:nth-child(3) { animation-delay: 0.2s; }
+#world #canvas #robots-overview .team-robot > .statmods > .mod.up > i:nth-child(1) { animation-delay: 0s; }
+#world #canvas #robots-overview .team-robot > .statmods > .mod.up > i:nth-child(2) { animation-delay: 0.1s; }
+#world #canvas #robots-overview .team-robot > .statmods > .mod.up > i:nth-child(3) { animation-delay: 0.2s; }
+#world #canvas #robots-overview .team-robot > .statmods > .mod.up > i:nth-child(4) { animation-delay: 0.3s; }
+#world #canvas #robots-overview .team-robot > .statmods > .mod.up > i:nth-child(5) { animation-delay: 0.4s; }
+
 #world #canvas #robots-overview:after,
 #world #canvas #robots-overview .team-robots:after,
 #world #canvas #robots-overview .team-robot:after,
