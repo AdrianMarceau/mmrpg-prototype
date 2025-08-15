@@ -23,7 +23,7 @@ if (!empty($this_player->player_token)
     && empty($this_battle->flags['challenge_battle'])
     && empty($this_battle->flags['endless_battle'])){
 
-    // If the player token is empty, we can't save the team data
+    // Update this robot's summoned history in the battle session
     $session_token = rpg_game::session_token();
     //error_log('debug in '.basename(__FILE__).' on line '.__LINE__.' : we should save this player\'s team data to the history');
     //error_log('$this_player->player_token = '.print_r($this_player->player_token, true));
@@ -42,6 +42,22 @@ if (!empty($this_player->player_token)
     }
     //error_log('(new) $battle_history = '.print_r($battle_history, true));
     $_SESSION[$session_token]['values']['battle_history'] = $battle_history;
+
+    // We should also update the player's "last_robots" string in case order changed
+    $last_robots = array_map(function($robot){
+        if (empty($robot['robot_token'])){ return false; }
+        $info = rpg_robot::get_index_info($robot['robot_token']);
+        if (empty($info)){ return false; }
+        return $info['robot_id'].'_'.$robot['robot_token'];
+        }, $this_player->player_robots);
+    $last_robots_string = implode(',', array_filter($last_robots));
+    //error_log('$last_robots = '.print_r($last_robots, true));
+    //error_log('$last_robots_string = '.print_r($last_robots_string, true));
+    $world_session_token = rpg_world::session_token();
+    $WORLD_SESSION = &$_SESSION[$world_session_token];
+    $WORLD_PLAYER_SESSION = &$WORLD_SESSION['player_sessions'][$this_player_token];
+    $WORLD_PLAYER_SESSION['last_robots'] = $last_robots_string;
+    //error_log('new $WORLD_PLAYER_SESSION = '.print_r($WORLD_PLAYER_SESSION, true));
 
     // Make sure we also save the robot's current damage, used-ammo, etc. values to the world session
     rpg_world::init_session();

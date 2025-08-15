@@ -292,6 +292,25 @@ if (!empty($this_player_token)
     //error_log('(new) $battle_history = '.print_r($battle_history, true));
     $_SESSION[$session_token]['values']['battle_history'] = $battle_history;
 
+    // If this is a world battle, we should also update the player's "last_robots" string
+    if ($this_is_world_battle){
+        $last_robots = array_map(function($token){
+            list($bid, $token) = explode('_', $token, 2);
+            if (empty($bid) || empty($token)){ return false; }
+            $info = rpg_robot::get_index_info($token);
+            if (empty($info)){ return false; }
+            return $info['robot_id'].'_'.$token;
+            }, explode(',', $this_player_robots));
+        $last_robots_string = implode(',', array_filter($last_robots));
+        //error_log('$last_robots = '.print_r($last_robots, true));
+        //error_log('$last_robots_string = '.print_r($last_robots_string, true));
+        $world_session_token = rpg_world::session_token();
+        $WORLD_SESSION = &$_SESSION[$world_session_token];
+        $WORLD_PLAYER_SESSION = &$WORLD_SESSION['player_sessions'][$this_player_token];
+        $WORLD_PLAYER_SESSION['last_robots'] = $last_robots_string;
+        //error_log('new $WORLD_PLAYER_SESSION = '.print_r($WORLD_PLAYER_SESSION, true));
+    }
+
 }
 
 // Collect the target player's index data if available
