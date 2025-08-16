@@ -1107,6 +1107,7 @@ class rpg_world {
         //error_log('rpg_world::get_sprite() called for "'.$kind.'" with token "'.$token.'"');
         $mmrpg_indexes = self::$mmrpg_indexes;
         $xkind = self::get_xkind($kind);
+        if (strstr($token, '_')){ list($token, $alt) = explode('_', $token, 2); }
         if (empty($mmrpg_indexes)){ error_log('error: $mmrpg_indexes does not exist!'); return false; }
         elseif (empty($mmrpg_indexes[$xkind])){ error_log('error: $mmrpg_indexes['.$xkind.'] does not exist!'); return false; }
         elseif (empty($mmrpg_indexes[$xkind][$token])){ error_log('error: $mmrpg_indexes['.$xkind.']['.$token.'] does not exist!'); return false; }
@@ -1277,6 +1278,13 @@ class rpg_world {
                 $robot_weapons_markup = '<div class="guage weapons" title="'.$robot_weapons_label.'"><i class="'.$robot_weapons_rating.'" style="width: '.$robot_weapons_percent.'%;"></i></div>';
                 // generate the markup for the attack/defense/speed mods
                 $has_statmods = false;
+
+                // DEBUG DEBUG DEBUG
+                $robot_overview['attackMods'] = mt_rand(1, 5);
+                $robot_overview['defenseMods'] = -1 * mt_rand(1, 5);
+                $robot_overview['speedMods'] = mt_rand(1, 5);
+                // DEBUG DEBUG DEBUG
+
                 $robot_stats_markup = '';
                 $stat_tokens = array('attack', 'defense', 'speed');
                 foreach ($stat_tokens AS $stat_token){

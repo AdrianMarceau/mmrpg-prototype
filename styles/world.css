@@ -1072,7 +1072,7 @@ html, body {
     left: 0;
     pointer-events: all;
     cursor: default;
-    padding: 0px 0px 20px 0;
+    padding: 0px 0px 60px 0;
     border-radius: 0 6px 0 0;
     background-color: transparent;
     box-shadow: none;
@@ -1233,12 +1233,13 @@ html, body {
 
 #world #canvas #robots-overview .team-robots {
     padding: 50px 50px 50px 8px;
-    max-height: 245px;
+    max-height: 132px;
     overflow: hidden;
     transition: max-height 0.9s, background-color 0.3s;
 }
-#world #canvas #robots-overview:hover .team-robots {
-    max-height: 457px;
+#world #canvas #robots-overview:hover .team-robots,
+#world #canvas #robots-overview.expanded .team-robots {
+    max-height: 418px;
 }
 
 #world #canvas #robots-overview .storage-robots {
@@ -1355,7 +1356,7 @@ html, body {
     clear: both;
     position: relative;
     z-index: 10;
-    margin: 0 0 26px 0;
+    margin: 0 0 14px 0;
     padding: 4px 0 0 48px;
     height: auto;
     width: auto;
@@ -1370,6 +1371,9 @@ html, body {
     background-image: none !important;
     transition: outline 0.3s, background-color 0.3s;
     cursor: pointer;
+}
+#world #canvas #robots-overview .team-robot.selected {
+    z-index: 20;
 }
 #world #canvas #robots-overview .team-robot > * {
     pointer-events: none;
@@ -1628,7 +1632,7 @@ html, body {
     background-color: transparent;
     background-color: #202020;
     padding: 0 2px 0px 4px;
-    border-radius: 0 3px 3px 0;
+    border-radius: 0 3px 3px 3px;
 }
 #world #canvas #robots-overview .team-robot > .statmods > .mod {
     display: inline-block;
@@ -1714,6 +1718,7 @@ html, body {
 #world #canvas #robots-overview .team-robot:nth-child(6) .icon { filter: brightness(0.59049); }
 #world #canvas #robots-overview .team-robot:nth-child(7) .icon { filter: brightness(0.531441); }
 #world #canvas #robots-overview .team-robot:nth-child(8) .icon { filter: brightness(0.4782969); }
+#world #canvas #robots-overview .team-robot:nth-child(n+8) .icon { filter: brightness(0.4782969); }
 
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(1) .icon:after { content: "1st"; }
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(2) .icon:after { content: "2nd"; }
@@ -1725,7 +1730,7 @@ html, body {
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(8) .icon:after { content: "8th"; }
 
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(1) {
-    margin-bottom: 28px;
+    margin-bottom: 22px;
     padding-left: 56px;
 }
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(1) > .icon {

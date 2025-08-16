@@ -76,6 +76,7 @@ gameSettings.worldState = {
         direction: '',
         moving: false,
         moved: false,
+        busy: false,
         col: 0,
         row: 0,
         },
@@ -93,6 +94,7 @@ gameSettings.worldState = {
     walkableMapTileKeys: [], // array of tile keys that are specifically walkable
     zoomLevel: 1.0, // default zoom level,
     userZoomLevel: 1.0, // current zoom level set by user
+    mapIsHidden: false, // map is full visible by default
     allowHovers: true, // allow hover effects on tiles
     allowClicks: true, // allow click events on tiles
     };
@@ -109,6 +111,23 @@ class mmrpgWorldMap {
         _self.elements = gameSettings.worldElements;
         _self.state = gameSettings.worldState;
         _self.initWorld($mmrpg);
+        }
+
+    // Quick function for checking if the world is "already busy" doing something (either explicitly or by some action like moving)
+    worldIsBusy(){
+        //console.log('%c' + 'mmrpgWorldMap.worldIsBusy()', 'color: green;');
+        let _self = this;
+        let _world = _self.state;
+        let _worldCursor = _world.cursor;
+        return _worldCursor.busy || _worldCursor.moving;
+        }
+
+    // Quick function for checking if the world map specifically is busy doing something (either busy because world, or because hidden)
+    worldMapIsHidden(){
+        //console.log('%c' + 'mmrpgWorldMap.worldMapIsHidden()', 'color: green;');
+        let _self = this;
+        let _world = _self.state;
+        return _world.mapIsHidden;
         }
 
     // Quick function to initialize world map variables
@@ -1120,7 +1139,7 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
-        let _cursor = _world.cursor;
+        let _worldCursor = _world.cursor;
         let layerToken = 'terrain'; // TODO: make this dynamic maybe?
         let playerMobility = _config.playerMobility || 1;
         let activeTimeouts = {}, activeTimeoutDuration = _config.mapEffects.activeTimeout;
@@ -1130,11 +1149,12 @@ class mmrpgWorldMap {
         let $clickOverlay = _elements.clickOverlay;
         $clickOverlay.bind('click', function(e){
             e.preventDefault();
+            if (_self.worldMapIsHidden()){ return false; }
+            if (_self.worldIsBusy()){ return false; }
             if (!_world.allowClicks){ return false; }
-            if (_cursor.moving){ return false; }
             //console.log('%c' + 'Map overlay click event!', 'color: cyan;');
             //console.log('-> w/ e =', e);
-            let oldPos = _cursor.position, curPos = oldPos;
+            let oldPos = _worldCursor.position, curPos = oldPos;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.offsetX, e.offsetY, false);
             let sameAsLast = thisPos === lastMouseClick;
             let sameAsCurrent = thisPos === oldPos;
@@ -1157,11 +1177,12 @@ class mmrpgWorldMap {
             });
         $clickOverlay.bind('mousemove', function(e){
             e.preventDefault();
+            if (_self.worldMapIsHidden()){ return false; }
             if (!_world.allowHovers){ return false; }
-            //if (_cursor.moving){ return false; }
+            //if (_self.worldIsBusy()){ return false; }
             //console.log('%c' + 'Map overlay mousemove event!', 'color: cyan;');
             //console.log('-> w/ e =', e);
-            let curPos = _cursor.position;
+            let curPos = _worldCursor.position;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.offsetX, e.offsetY, false);
             let thisPosXY = thisPos.split('-');
             let sameAsLast = thisPos === lastMouseOver;
@@ -1208,6 +1229,7 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
+        let _worldCursor = _world.cursor;
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
         // Bind a click event to the back button in the header that'll bring us to prototype menu
@@ -1294,6 +1316,7 @@ class mmrpgWorldMap {
             $('.team-player[data-player]', $playerSwitcher).bind('click', function(e){
                 //console.log('%c' + 'Player switcher clicked for ' + playerToken + '!', 'color: cyan;');
                 e.preventDefault();
+                if (_self.worldIsBusy()){ return false; }
                 $('.team-player', $playerSwitcher).removeClass('active');
                 let $option = $(this);
                 let playerToken = $option.attr('data-player') || false;
@@ -1342,6 +1365,8 @@ class mmrpgWorldMap {
             if ($rotateButton && $rotateButton.length){
                 $rotateButton.bind('click', function(e){
                     e.preventDefault();
+                    if (_self.worldIsBusy()){ return false; }
+                    if (_self.worldMapIsHidden()){ return false; }
                     //console.log('%c' + 'Team rotate button clicked!', 'color: cyan;');
                     // First we rotate the actual robot data in the world state by one position (if allowed)
                     let playerRobotKeys = Object.keys(_worldPlayerRobots);
@@ -1403,11 +1428,15 @@ class mmrpgWorldMap {
                 // expand/collapse the robot storage tray by clicking the switch button
                 $switchButton.bind('click', function(e){
                     e.preventDefault();
+                    if (_self.worldIsBusy()){ return; }
                     //console.log('%c' + 'Team switch button clicked!', 'color: cyan;');
                     // First we start by either toggling the expanded class on the overview panel itself
                     $robotsOverview.toggleClass('expanded');
                     $teamRobotsInOverview.removeClass('selected');
-                    if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, then we're done here
+                    let isExpandedNow = $robotsOverview.is('.expanded');
+                    //_worldCursor.busy = isExpandedNow ? true : false; // set the cursor busy state
+                    _world.mapIsHidden = isExpandedNow ? true : false; // set the map hidden state
+                    if (!isExpandedNow){ return; } // if we're not expanded, then we're done here
                     // Make the first robot in the overview as selected via class
                     let $firstOverviewRobot = $teamRobotsInOverview.first();
                     $firstOverviewRobot.addClass('selected');
@@ -1417,6 +1446,7 @@ class mmrpgWorldMap {
                 // if the storage tray is open, clicking a robot in the team-list marks it as selected
                 $teamRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
                     e.preventDefault();
+                    if (_self.worldIsBusy()){ return; }
                     if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
                     //console.log('%c' + 'Team robot clicked!', 'color: cyan;');
                     // First we remove the selected class from any robots that already have it
@@ -1429,6 +1459,7 @@ class mmrpgWorldMap {
                 // if the storage tray is open, clicking a robot in the storage-list swaps it with selected team-robot
                 $storageRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
                     e.preventDefault();
+                    if (_self.worldIsBusy()){ return; }
                     if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
                     //console.log('%c' + 'Storage robot clicked!', 'color: cyan;');
                     // First we collect references to the selected team-robot and clicked storage-robot
@@ -1533,6 +1564,8 @@ class mmrpgWorldMap {
         let busyZooming = false;
         $thisWorld.bind('mousewheel', function(e){
             //console.log('%c' + 'World map mousewheel event!', 'color: cyan;');
+            if (_self.worldIsBusy()){ return; }
+            if (_self.worldMapIsHidden()){ return; }
             e.preventDefault();
             e.stopPropagation();
             //console.log('-> event:', e);
@@ -1566,7 +1599,7 @@ class mmrpgWorldMap {
             //e.preventDefault();
             //e.stopPropagation();
             //console.log('-> event:', e);
-            if (_world.cursor.moving){ return false; }
+            if (_self.worldIsBusy()){ return false; }
             //console.log('-> pressedKeys:', pressedKeys);
             // Collect references and checks on certain key elements
             let sideButtonsActive = $sideButtons.is('.active') ? true : false;
@@ -1574,36 +1607,47 @@ class mmrpgWorldMap {
             if (pressedKeys.ArrowLeft || pressedKeys.ArrowRight || pressedKeys.ArrowUp || pressedKeys.ArrowDown){
                 //console.log('%c' + 'Arrow key pressed!', 'color: orange;');
                 e.preventDefault();
-                let oldPos = _world.cursor.position, curPos = oldPos;
-                let thisPos = oldPos.split('-');
-                let thisCol = parseInt(thisPos[0]);
-                let thisRow = parseInt(thisPos[1]);
-                let newCol = thisCol, newRow = thisRow;
-                //console.log('%c' + 'Current position: ' + oldPos, 'color: orange;');
-                if (pressedKeys.ArrowLeft){ newCol--; }
-                else if (pressedKeys.ArrowRight){ newCol++; }
-                if (pressedKeys.ArrowUp){ newRow--; }
-                else if (pressedKeys.ArrowDown){ newRow++; }
-                let newPos = newCol + '-' + newRow;
-                //console.log('%c' + 'New position: ' + newPos, 'color: orange;');
-                // Check if the new position is the same as the old position
-                if (newCol === thisCol && newRow === thisRow){ return false; }
-                // Otherwise, let's pull the list of walkable tiles and see if this new position is valid
-                //console.log('%c' + 'Checking if new position is walkable...', 'color: orange;');
-                let playerMobility = _config.playerMobility;
-                let walkableTiles = _self.getWalkableMapTiles();
-                let tilesWithinRange = playerMobility > 0 ? _self.getWalkableMapTilesByProximity(oldPos, playerMobility) : walkableTiles;
-                if (walkableTiles.indexOf(newPos) === -1 && tilesWithinRange.indexOf(newPos) === -1){
-                    //console.warn('%c' + 'New position is not walkable!', 'color: red;');
-                    //_self.playSoundEffect('glass-klink');
-                    return false;
+                let worldMapIsHidden = _self.worldMapIsHidden();
+                // World map is NOT hidden, so the arrow keys must be controlling the player
+                if (!worldMapIsHidden){
+                    let oldPos = _world.cursor.position, curPos = oldPos;
+                    let thisPos = oldPos.split('-');
+                    let thisCol = parseInt(thisPos[0]);
+                    let thisRow = parseInt(thisPos[1]);
+                    let newCol = thisCol, newRow = thisRow;
+                    //console.log('%c' + 'Current position: ' + oldPos, 'color: orange;');
+                    if (pressedKeys.ArrowLeft){ newCol--; }
+                    else if (pressedKeys.ArrowRight){ newCol++; }
+                    if (pressedKeys.ArrowUp){ newRow--; }
+                    else if (pressedKeys.ArrowDown){ newRow++; }
+                    let newPos = newCol + '-' + newRow;
+                    //console.log('%c' + 'New position: ' + newPos, 'color: orange;');
+                    // Check if the new position is the same as the old position
+                    if (newCol === thisCol && newRow === thisRow){ return false; }
+                    // Otherwise, let's pull the list of walkable tiles and see if this new position is valid
+                    //console.log('%c' + 'Checking if new position is walkable...', 'color: orange;');
+                    let playerMobility = _config.playerMobility;
+                    let walkableTiles = _self.getWalkableMapTiles();
+                    let tilesWithinRange = playerMobility > 0 ? _self.getWalkableMapTilesByProximity(oldPos, playerMobility) : walkableTiles;
+                    if (walkableTiles.indexOf(newPos) === -1 && tilesWithinRange.indexOf(newPos) === -1){
+                        //console.warn('%c' + 'New position is not walkable!', 'color: red;');
+                        //_self.playSoundEffect('glass-klink');
+                        return false;
+                        }
+                    // Otherwise, let's move the cursor to the new position
+                    _self.makeLayerTileActive(newPos);
+                    _self.playSoundEffect('no-effect');
+                    _self.moveToPosition(newPos, function(){
+                        _self.makeLayerTileInactive(oldPos);
+                        });
                     }
-                // Otherwise, let's move the cursor to the new position
-                _self.makeLayerTileActive(newPos);
-                _self.playSoundEffect('no-effect');
-                _self.moveToPosition(newPos, function(){
-                    _self.makeLayerTileInactive(oldPos);
-                    });
+                // Otherwise if world map IS HIDDEN, might mean we need to use arrow keys for something else
+                else {
+
+                    // TODO: add functionality for when player-switcher pallet is active
+                    // TODO: add functionality to the team-switch drawer is open
+
+                    }
                 }
             // If the side buttons panel is currently open, process those actions too
             if (sideButtonsActive){
@@ -2349,7 +2393,8 @@ class mmrpgWorldMap {
 
         // Define an inline function to put the team into their battle-ready poses
         let getTeamSpritesReady = function(){
-            if (_worldCursor.moving || _worldCursor.position !== cursorPosition){ return; }
+            if (_self.worldIsBusy()){ return; }
+            if (_worldCursor.position !== cursorPosition){ return; }
 
             // Add the shake class to the cursor so it hides behind the player
             $worldCursor.addClass('shake');
@@ -2399,7 +2444,8 @@ class mmrpgWorldMap {
         // Define an inline function to redirect to the portal if needed
         let redirectToLocation = function(){
             //console.log('%c' + 'redirectToLocation()', 'color: cyan;');
-            if (_worldCursor.moving || _worldCursor.position !== cursorPosition){ return; }
+            if (_self.worldIsBusy()){ return; }
+            if (_worldCursor.position !== cursorPosition){ return; }
             $thisWorld.addClass('hidden');
             if (autoRedirectSound){
                 _self.playSoundEffect(autoRedirectSound);
@@ -2407,7 +2453,8 @@ class mmrpgWorldMap {
             if (autoRedirectURL){
                 _self.incZoomLevel();
                 _self.saveWorldState(function(){
-                    if (_worldCursor.moving || _worldCursor.position !== cursorPosition){ return; }
+                    if (_self.worldIsBusy()){ return; }
+                    if (_worldCursor.position !== cursorPosition){ return; }
                     else { _self.resetZoomLevel(); }
                     _self.incZoomLevel();
                     window.location.href = autoRedirectURL;
@@ -2420,7 +2467,8 @@ class mmrpgWorldMap {
         // Define an inline function to zoom and show the dropdown which we'll call after a timeout
         let zoomAndShowDropdown = function(){
             //console.log('%c' + 'zoomAndShowDropdown()', 'color: cyan;');
-            if (_worldCursor.moving || _worldCursor.position !== cursorPosition){ return; }
+            if (_self.worldIsBusy()){ return; }
+            if (_worldCursor.position !== cursorPosition){ return; }
 
             // Elevate the event sprite(s) to the zoom layer and add a zoom class to it so it's more visible
             let cursorPositionXY = cursorPosition.split('-');
