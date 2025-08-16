@@ -1200,9 +1200,9 @@ class rpg_world {
     }
 
     // Define a function for getting the robot switcher markup given current conditions
-    public static function get_robots_overview_markup($this_prototype_data, $robot_tokens){
+    public static function get_robots_overview_markup($this_prototype_data, $current_robot_tokens){
         //error_log('rpg_world::get_robot_overview_markup() called!');
-        if (empty($this_prototype_data) || empty($robot_tokens)){ return ''; }
+        if (empty($this_prototype_data) || empty($current_robot_tokens)){ return ''; }
         if ($this_prototype_data['this_player_token'] === 'player'){ return ''; }
         $return_markup = '';
         $WORLD_SESSION = self::get_session();
@@ -1212,6 +1212,8 @@ class rpg_world {
         $player_starforce = rpg_game::starforce_unlocked();
         $limit_hearts = mmrpg_prototype_limit_hearts_earned($current_player_token);
         $num_robot_unlocked = mmrpg_prototype_robots_unlocked($current_player_token);
+        $storage_robot_tokens = mmrpg_prototype_robots_unlocked($current_player_token, true);
+        $storage_robot_tokens = array_diff($storage_robot_tokens, $current_robot_tokens);
         $current_team_size = $limit_hearts;
         $get_rating_token = function($percent){
             if ($percent === 100){ return 'full'; }
@@ -1229,7 +1231,7 @@ class rpg_world {
             elseif ($rating === 'low'){ return '08'; } // defend
             else { return '03'; } // defeat
             };
-        //$robot_tokens_reversed = array_reverse($robot_tokens);
+        //$current_robot_tokens_reversed = array_reverse($current_robot_tokens);
         $return_markup .= '<a class="team-rotate" title="Rotate Team"><i class="fa fas fa-sync"></i></a>';
         if ($num_robot_unlocked > $current_team_size){
             $return_markup .= '<a class="team-switch" title="Switch-Out Robots"><i class="fa fas fa-robot"></i></a>';
@@ -1243,70 +1245,140 @@ class rpg_world {
             $return_markup .= str_repeat('<i class="heart fa fas fa-heart"></i>', $limit_hearts);
         $return_markup .= '</div>';
         $return_markup .= '<div class="team-robots">';
-        foreach ($robot_tokens AS $robot_key => $robot_token){
-            if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
-            // collect all the info we need about this robot
-            $robot_index_info = $mmrpg_index_robots[$robot_token];
-            $robot_info = $robot_index_info;
-            $robot_id = $robot_info['robot_id'];
-            $robot_overview = self::get_player_robot_overview($current_player_token, $robot_token, $robot_id);
-            $robot_name = $robot_overview['name'];
-            $robot_level = $robot_overview['level'];
-            $robot_core = $robot_overview['core'];
-            $robot_core2 = $robot_overview['core2'];
-            $robot_core_types = $robot_overview['coreTypes'];
-            $robot_core_or_none = $robot_overview['coreElse'];
-            $robot_item = $robot_overview['item'];
-            $robot_image = $robot_overview['image'];
-            $robot_sprite = self::get_sprite('robot', $robot_image, '', 'right', 'character', '');
-            $robot_disabled = empty($robot_overview['energy']) ? true : false;
-            // generate markup for energy and weapons guages
-            $robot_energy = $robot_overview['energy'];
-                $robot_energy_max = $robot_overview['energyMax'];
-                $robot_energy_rating = $robot_overview['energyRating'];
-                $robot_energy_percent = $robot_overview['energyPercent'];
-            $robot_energy_label = $robot_energy.' / '.$robot_energy_max.' LE ('.$robot_energy_percent.'%)';
-            $robot_energy_markup = '<div class="guage energy" title="'.$robot_energy_label.'"><i class="'.$robot_energy_rating.'" style="width: '.$robot_energy_percent.'%;"></i></div>';
-            $robot_weapons = $robot_overview['weapons'];
-                $robot_weapons_max = $robot_overview['weaponsMax'];
-                $robot_weapons_percent = $robot_overview['weaponsPercent'];
-                $robot_weapons_rating = $robot_overview['weaponsRating'];
-            $robot_weapons_label = $robot_weapons.' / '.$robot_weapons_max.' WE ('.$robot_weapons_percent.'%)';
-            $robot_weapons_markup = '<div class="guage weapons" title="'.$robot_weapons_label.'"><i class="'.$robot_weapons_rating.'" style="width: '.$robot_weapons_percent.'%;"></i></div>';
-            // generate the markup for the attack/defense/speed mods
-            $robot_stats_markup = '';
-            $stat_tokens = array('attack', 'defense', 'speed');
-            foreach ($stat_tokens AS $stat_token){
-                $mod_token = $stat_token.'Mods';
-                $stat_mods = !empty($robot_overview[$mod_token]) ? $robot_overview[$mod_token] : 0;
-                if (empty($stat_mods)){ continue; }
-                $num_arrows = abs($stat_mods);
-                if ($stat_mods < 1){ $stat_dir = 'down'; }
-                else { $stat_dir = 'up'; }
-                $stat_markup = str_repeat('<i class="fa fas fa-caret-'.$stat_dir.'"></i>', $num_arrows);
-                $robot_stats_markup .= '<div class="mod color '.$stat_token.' '.$stat_dir.'" title="'.ucfirst($stat_token).' Mods">'.$stat_markup.'</div>';
-            }
-            if (!empty($robot_stats_markup)){ $robot_stats_markup = '<div class="statmods">'.$robot_stats_markup.'</div>'; }
-            // collect the robot's frame based on its current health
-            $robot_frame = $get_robot_energy_frame($robot_energy_rating);
-            $robot_sprite = str_replace('data-frame="00"', 'data-frame="'.$robot_frame.'"', $robot_sprite);
-            // put it all together to generate the robot markup
-            $markup_class = 'team-robot'.($robot_disabled ? ' disabled' : '');
-            $markup_attrs = 'data-robot="'.$robot_id.'_'.$robot_token.'" data-status="'.$robot_energy_rating.'-energy"';
-            $robot_markup = '';
-            $robot_markup .= '<div class="'.$markup_class.'" '.$markup_attrs.'>';
-                $robot_markup .= '<div class="icon '.$robot_core_types.'">'.$robot_sprite.'</div>';
-                $robot_markup .= '<div class="label">';
-                    $robot_markup .= '<strong class="name">'.$robot_name.'</strong>';
-                    $robot_markup .= '<span class="lvl type '.($robot_level >= 100 ? 'level' : 'none').'">Lv. '.$robot_level.'</span>';
+            foreach ($current_robot_tokens AS $robot_key => $robot_token){
+                if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
+                // collect all the info we need about this robot
+                $robot_index_info = $mmrpg_index_robots[$robot_token];
+                $robot_info = $robot_index_info;
+                $robot_id = $robot_info['robot_id'];
+                $robot_overview = self::get_player_robot_overview($current_player_token, $robot_token, $robot_id);
+                $robot_name = $robot_overview['name'];
+                $robot_level = $robot_overview['level'];
+                $robot_core = $robot_overview['core'];
+                $robot_core2 = $robot_overview['core2'];
+                $robot_core_types = $robot_overview['coreTypes'];
+                $robot_core_or_none = $robot_overview['coreElse'];
+                $robot_item = $robot_overview['item'];
+                $robot_image = $robot_overview['image'];
+                $robot_sprite = self::get_sprite('robot', $robot_image, '', 'right', 'character', '');
+                $robot_disabled = empty($robot_overview['energy']) ? true : false;
+                // generate markup for energy and weapons guages
+                $robot_energy = $robot_overview['energy'];
+                    $robot_energy_max = $robot_overview['energyMax'];
+                    $robot_energy_rating = $robot_overview['energyRating'];
+                    $robot_energy_percent = $robot_overview['energyPercent'];
+                $robot_energy_label = $robot_energy.' / '.$robot_energy_max.' LE ('.$robot_energy_percent.'%)';
+                $robot_energy_markup = '<div class="guage energy" title="'.$robot_energy_label.'"><i class="'.$robot_energy_rating.'" style="width: '.$robot_energy_percent.'%;"></i></div>';
+                $robot_weapons = $robot_overview['weapons'];
+                    $robot_weapons_max = $robot_overview['weaponsMax'];
+                    $robot_weapons_percent = $robot_overview['weaponsPercent'];
+                    $robot_weapons_rating = $robot_overview['weaponsRating'];
+                $robot_weapons_label = $robot_weapons.' / '.$robot_weapons_max.' WE ('.$robot_weapons_percent.'%)';
+                $robot_weapons_markup = '<div class="guage weapons" title="'.$robot_weapons_label.'"><i class="'.$robot_weapons_rating.'" style="width: '.$robot_weapons_percent.'%;"></i></div>';
+                // generate the markup for the attack/defense/speed mods
+                $has_statmods = false;
+                $robot_stats_markup = '';
+                $stat_tokens = array('attack', 'defense', 'speed');
+                foreach ($stat_tokens AS $stat_token){
+                    $mod_token = $stat_token.'Mods';
+                    $stat_mods = !empty($robot_overview[$mod_token]) ? $robot_overview[$mod_token] : 0;
+                    if (empty($stat_mods)){ continue; }
+                    $num_arrows = abs($stat_mods);
+                    if ($stat_mods < 1){ $stat_dir = 'down'; }
+                    else { $stat_dir = 'up'; }
+                    $stat_markup = str_repeat('<i class="fa fas fa-caret-'.$stat_dir.'"></i>', $num_arrows);
+                    $robot_stats_markup .= '<div class="mod color '.$stat_token.' '.$stat_dir.'" title="'.ucfirst($stat_token).' Mods">'.$stat_markup.'</div>';
+                }
+                if (!empty($robot_stats_markup)){
+                    $has_statmods = true;
+                    $robot_stats_markup = '<div class="statmods">'.$robot_stats_markup.'</div>';
+                    }
+                // collect the robot's frame based on its current health
+                $robot_frame = $get_robot_energy_frame($robot_energy_rating);
+                $robot_sprite = str_replace('data-frame="00"', 'data-frame="'.$robot_frame.'"', $robot_sprite);
+                // put it all together to generate the robot markup
+                $markup_class = 'team-robot'.($has_statmods ? ' hasmods' : '').($robot_disabled ? ' disabled' : '');
+                $markup_attrs = 'data-robot="'.$robot_id.'_'.$robot_token.'" data-status="'.$robot_energy_rating.'-energy"';
+                $robot_markup = '';
+                $robot_markup .= '<div class="'.$markup_class.'" '.$markup_attrs.'>';
+                    $robot_markup .= '<div class="icon '.$robot_core_types.'">'.$robot_sprite.'</div>';
+                    $robot_markup .= '<div class="label">';
+                        $robot_markup .= '<strong class="name">'.$robot_name.'</strong>';
+                        $robot_markup .= '<span class="lvl type '.($robot_level >= 100 ? 'level' : 'none').'">Lv. '.$robot_level.'</span>';
+                    $robot_markup .= '</div>';
+                    $robot_markup .= $robot_energy_markup;
+                    $robot_markup .= $robot_weapons_markup;
+                    $robot_markup .= $robot_stats_markup;
                 $robot_markup .= '</div>';
-                $robot_markup .= $robot_energy_markup;
-                $robot_markup .= $robot_weapons_markup;
-                $robot_markup .= $robot_stats_markup;
-            $robot_markup .= '</div>';
-            // add this robot's markup to the return markup
-            $return_markup .= $robot_markup;
-        }
+                // add this robot's markup to the return markup
+                $return_markup .= $robot_markup;
+            }
+        $return_markup .= '</div>';
+        $return_markup .= '<div class="storage-robots">';
+            foreach ($storage_robot_tokens AS $robot_key => $robot_token){
+                if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
+                // collect all the info we need about this robot
+                $robot_index_info = $mmrpg_index_robots[$robot_token];
+                $robot_info = $robot_index_info;
+                $robot_id = $robot_info['robot_id'];
+                $robot_overview = self::get_player_robot_overview($current_player_token, $robot_token, $robot_id);
+                $robot_name = $robot_overview['name'];
+                $robot_level = $robot_overview['level'];
+                $robot_core = $robot_overview['core'];
+                $robot_core2 = $robot_overview['core2'];
+                $robot_core_types = $robot_overview['coreTypes'];
+                $robot_core_or_none = $robot_overview['coreElse'];
+                $robot_item = $robot_overview['item'];
+                $robot_image = $robot_overview['image'];
+                $robot_sprite = self::get_sprite('robot', $robot_image, '', 'right', 'character', '');
+                $robot_disabled = empty($robot_overview['energy']) ? true : false;
+                // generate markup for energy and weapons guages
+                $robot_energy = $robot_overview['energy'];
+                    $robot_energy_max = $robot_overview['energyMax'];
+                    $robot_energy_rating = $robot_overview['energyRating'];
+                    $robot_energy_percent = $robot_overview['energyPercent'];
+                $robot_energy_label = $robot_energy.' / '.$robot_energy_max.' LE ('.$robot_energy_percent.'%)';
+                $robot_energy_markup = '<div class="guage energy" title="'.$robot_energy_label.'"><i class="'.$robot_energy_rating.'" style="width: '.$robot_energy_percent.'%;"></i></div>';
+                $robot_weapons = $robot_overview['weapons'];
+                    $robot_weapons_max = $robot_overview['weaponsMax'];
+                    $robot_weapons_percent = $robot_overview['weaponsPercent'];
+                    $robot_weapons_rating = $robot_overview['weaponsRating'];
+                $robot_weapons_label = $robot_weapons.' / '.$robot_weapons_max.' WE ('.$robot_weapons_percent.'%)';
+                $robot_weapons_markup = '<div class="guage weapons" title="'.$robot_weapons_label.'"><i class="'.$robot_weapons_rating.'" style="width: '.$robot_weapons_percent.'%;"></i></div>';
+                // generate the markup for the attack/defense/speed mods
+                $robot_stats_markup = '';
+                $stat_tokens = array('attack', 'defense', 'speed');
+                foreach ($stat_tokens AS $stat_token){
+                    $mod_token = $stat_token.'Mods';
+                    $stat_mods = !empty($robot_overview[$mod_token]) ? $robot_overview[$mod_token] : 0;
+                    if (empty($stat_mods)){ continue; }
+                    $num_arrows = abs($stat_mods);
+                    if ($stat_mods < 1){ $stat_dir = 'down'; }
+                    else { $stat_dir = 'up'; }
+                    $stat_markup = str_repeat('<i class="fa fas fa-caret-'.$stat_dir.'"></i>', $num_arrows);
+                    $robot_stats_markup .= '<div class="mod color '.$stat_token.' '.$stat_dir.'" title="'.ucfirst($stat_token).' Mods">'.$stat_markup.'</div>';
+                }
+                if (!empty($robot_stats_markup)){ $robot_stats_markup = '<div class="statmods">'.$robot_stats_markup.'</div>'; }
+                // collect the robot's frame based on its current health
+                $robot_frame = $get_robot_energy_frame($robot_energy_rating);
+                $robot_sprite = str_replace('data-frame="00"', 'data-frame="'.$robot_frame.'"', $robot_sprite);
+                // put it all together to generate the robot markup
+                $markup_class = 'team-robot'.($robot_disabled ? ' disabled' : '');
+                $markup_attrs = 'data-robot="'.$robot_id.'_'.$robot_token.'" data-status="'.$robot_energy_rating.'-energy"';
+                $robot_markup = '';
+                $robot_markup .= '<div class="'.$markup_class.'" '.$markup_attrs.'>';
+                    $robot_markup .= '<div class="icon '.$robot_core_types.'">'.$robot_sprite.'</div>';
+                    $robot_markup .= '<div class="label">';
+                        $robot_markup .= '<strong class="name">'.$robot_name.'</strong>';
+                        $robot_markup .= '<span class="lvl type '.($robot_level >= 100 ? 'level' : 'none').'">Lv. '.$robot_level.'</span>';
+                    $robot_markup .= '</div>';
+                    $robot_markup .= $robot_energy_markup;
+                    $robot_markup .= $robot_weapons_markup;
+                    $robot_markup .= $robot_stats_markup;
+                $robot_markup .= '</div>';
+                // add this robot's markup to the return markup
+                $return_markup .= $robot_markup;
+            }
         $return_markup .= '</div>';
         return $return_markup;
     }

@@ -1219,9 +1219,13 @@ class mmrpgWorldMap {
                 //if (!confirm('Are you sure you want to leave the world map?')){ return; }
                 _self.playSoundEffect('bounce-sound');
                 let backButtonURL = $backButton.attr('data-url') || _config.backButtonURL;
-                _self.saveWorldState(function(){ window.location.href = backButtonURL; });
-                $thisWorld.animate({opacity: 0}, 600, function(){
-                    $thisWorld.addClass('hidden');
+                _self.decZoomLevel();
+                _self.saveWorldState(function(){
+                    _self.decZoomLevel(0.5);
+                    window.location.href = backButtonURL;
+                    });
+                $thisWorld.animate({opacity: 0}, 900, function(){
+                    $thisWorld.addClass('hidden').addClass('busy');
                     });
                 return true;
                 });
@@ -1241,9 +1245,13 @@ class mmrpgWorldMap {
                 //if (!confirm('Are you sure you want to return to the home area?')){ return; }
                 _self.playSoundEffect('bounce-sound');
                 let homeButtonURL = $homeButton.attr('data-url') || _config.homeButtonURL;
-                _self.saveWorldState(function(){ window.location.href = homeButtonURL; });
+                _self.decZoomLevel();
+                _self.saveWorldState(function(){
+                    _self.decZoomLevel();
+                    window.location.href = homeButtonURL;
+                    });
                 $thisWorld.animate({opacity: 0}, 600, function(){
-                    $thisWorld.addClass('hidden');
+                    $thisWorld.addClass('hidden').addClass('busy');
                     });
                 return true;
                 });
@@ -1264,9 +1272,13 @@ class mmrpgWorldMap {
                 _self.playSoundEffect('destroyed-sound');
                 _self.loadMusicTrack('current-track', true);
                 let resetButtonURL = $resetButton.attr('data-url') || _config.resetButtonURL;
-                _self.saveWorldState(function(){ window.location.href = resetButtonURL; });
-                $thisWorld.animate({opacity: 0}, 600, function(){
-                    $thisWorld.addClass('hidden');
+                _self.decZoomLevel(0.5);
+                _self.saveWorldState(function(){
+                    _self.decZoomLevel(1.0);
+                    window.location.href = resetButtonURL;
+                    });
+                $thisWorld.animate({opacity: 0}, 1200, function(){
+                    $thisWorld.addClass('hidden').addClass('busy');
                     });
                 return true;
                 });
@@ -1274,69 +1286,6 @@ class mmrpgWorldMap {
                 e.preventDefault();
                 //console.log('%c' + 'Reset button hovered!', 'color: cyan;');
                 _self.playSoundEffect('icon-hover');
-                });
-            }
-        // Bind a click event to the team-rotate button in the robots overview
-        let $robotsOverview = _elements.robotsOverview;
-        if ($robotsOverview && $robotsOverview.length){
-            let $teamSprites = _elements.teamSprites;
-            let $rotateButton = $('.team-rotate', $robotsOverview);
-            let $robotsOnMap = $teamSprites.filter('.robot:not(.cursor)');
-            let $robotsInOverview = $('.team-robots', $robotsOverview);
-            $rotateButton.bind('click', function(e){
-                e.preventDefault();
-                //console.log('%c' + 'Team rotate button clicked!', 'color: cyan;');
-                // First we rotate the actual robot data in the world state by one position (if allowed)
-                let playerRobotKeys = Object.keys(_worldPlayerRobots);
-                //console.log('-> playerRobotKeys =', playerRobotKeys);
-                if (playerRobotKeys.length < 2){ return; } // nothing to rotate
-                //console.log('-> _worldPlayerRobots(keys)(before) =', playerRobotKeys);
-                _self.playSoundEffect('switch-in');
-                let firstRobotKey = playerRobotKeys[0];
-                let firstPlayerRobot = _worldPlayerRobots[firstRobotKey];
-                //console.log('-> firstRobotKey =', firstRobotKey);
-                //console.log('-> firstPlayerRobot =', firstPlayerRobot);
-                delete _worldPlayerRobots[firstRobotKey];
-                _worldPlayerRobots[firstRobotKey] = firstPlayerRobot;
-                playerRobotKeys = Object.keys(_worldPlayerRobots);
-                //console.log('-> _worldPlayerRobots(keys)(after) =', playerRobotKeys);
-                // Now we rotate the robots in the overview by moving the first robot to the end of the list
-                let $firstOverviewRobot = $('.team-robot[data-robot]', $robotsInOverview).first();
-                //console.log('-> $firstOverviewRobot =', $firstOverviewRobot);
-                $firstOverviewRobot.appendTo($robotsInOverview);
-                // And then finally we need to reposition the robots on the world map too by indexing all their current positions,
-                // then removing the first robot from the map and appending it to the end of the list, then repositioning all the robots
-                let teamPositionsByKey = [];
-                $robotsOnMap.each(function(index, robot){
-                    let $robot = $(robot);
-                    let key = parseInt($robot.attr('data-key'));
-                    let xPos = parseInt($robot.css('left')) || 0;
-                    let yPos = parseInt($robot.css('top')) || 0;
-                    teamPositionsByKey[key] = [xPos, yPos];
-                    });
-                let firstKey = parseInt(Object.keys(teamPositionsByKey)[0]) || false;
-                let lastKey = parseInt(Object.keys(teamPositionsByKey).slice(-1)[0]) || false;
-                //console.log('---> teamPositionsByKey =', teamPositionsByKey);
-                //console.log('---> firstKey =', firstKey);
-                //console.log('---> lastKey =', lastKey);
-                $robotsOnMap.each(function(){
-                    let $robot = $(this);
-                    let key = parseInt($robot.attr('data-key'));
-                    let newKey = key - 1;
-                    if (newKey < firstKey){ newKey = lastKey; }
-                    $robot.attr('data-key', newKey);
-                    let newPosition = teamPositionsByKey[newKey] || [0, 0];
-                    let newPositionZ = newPosition[1] + 1;
-                    $robot.css({
-                        left: newPosition[0] + 'px',
-                        top: newPosition[1] + 'px',
-                        zIndex: newPositionZ
-                        });
-                    });
-                // and then save the world state with the new robot order
-                _self.saveWorldState();
-                // Return true on success
-                return true;
                 });
             }
         // Bind click events to the player switcher options in the world map header
@@ -1355,7 +1304,7 @@ class mmrpgWorldMap {
                 _self.incZoomLevel();
                 _self.saveWorldState(function(){
                     _self.incZoomLevel();
-                    $thisWorld.addClass('redirecting');
+                    $thisWorld.addClass('hidden').removeClass('busy');
                     window.location.href = worldReloadURL;
                     _self.incZoomLevel();
                     });
@@ -1374,6 +1323,211 @@ class mmrpgWorldMap {
                 let $option = $(this);
                 $('.sprite.player > .sprite', $option).attr('data-frame', '00'); // base
                 });
+            }
+        // Check to make sure the robotsOverview exists, and then bind events to its elements
+        let $robotsOverview = _elements.robotsOverview;
+        if ($robotsOverview && $robotsOverview.length){
+            let $teamSprites = _elements.teamSprites;
+            let $robotsOnMap = $teamSprites.filter('.robot:not(.cursor)');
+            let $teamRobotsDiv = $('.team-robots', $robotsOverview);
+            let $storageRobotsDiv = $('.storage-robots', $robotsOverview);
+            let $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
+            let $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
+            let listOfRobotsInOverview = $teamRobotsInOverview.map(function(){ return $(this).attr('data-robot'); }).get();
+            //console.log('-> $teamRobotsInOverview = ', $teamRobotsInOverview.length, $teamRobotsInOverview);
+            //console.log('-> $storageRobotsInOverview = ', $storageRobotsInOverview.length, $storageRobotsInOverview);
+            //console.log('-> listOfRobotsInOverview = ', listOfRobotsInOverview);
+            // Bind a click event to the team-rotate button in the robots overview
+            let $rotateButton = $('.team-rotate', $robotsOverview);
+            if ($rotateButton && $rotateButton.length){
+                $rotateButton.bind('click', function(e){
+                    e.preventDefault();
+                    //console.log('%c' + 'Team rotate button clicked!', 'color: cyan;');
+                    // First we rotate the actual robot data in the world state by one position (if allowed)
+                    let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                    //console.log('-> playerRobotKeys =', playerRobotKeys);
+                    if (playerRobotKeys.length < 2){ return; } // nothing to rotate
+                    //console.log('-> _worldPlayerRobots(keys)(before) =', playerRobotKeys);
+                    _self.playSoundEffect('switch-in');
+                    let firstRobotKey = playerRobotKeys[0];
+                    let firstPlayerRobot = _worldPlayerRobots[firstRobotKey];
+                    //console.log('-> firstRobotKey =', firstRobotKey);
+                    //console.log('-> firstPlayerRobot =', firstPlayerRobot);
+                    delete _worldPlayerRobots[firstRobotKey];
+                    _worldPlayerRobots[firstRobotKey] = firstPlayerRobot;
+                    playerRobotKeys = Object.keys(_worldPlayerRobots);
+                    //console.log('-> _worldPlayerRobots(keys)(after) =', playerRobotKeys);
+                    // Now we rotate the robots in the overview by moving the first robot to the end of the list
+                    $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
+                    let $firstOverviewRobot = $teamRobotsInOverview.first();
+                    //console.log('-> $firstOverviewRobot =', $firstOverviewRobot);
+                    $firstOverviewRobot.appendTo($('.team-robots', $robotsOverview));
+                    // And then finally we need to reposition the robots on the world map too by indexing all their current positions,
+                    // then removing the first robot from the map and appending it to the end of the list, then repositioning all the robots
+                    let teamPositionsByKey = [];
+                    $robotsOnMap.each(function(index, robot){
+                        let $robot = $(robot);
+                        let key = parseInt($robot.attr('data-key'));
+                        let xPos = parseInt($robot.css('left')) || 0;
+                        let yPos = parseInt($robot.css('top')) || 0;
+                        teamPositionsByKey[key] = [xPos, yPos];
+                        });
+                    let firstKey = parseInt(Object.keys(teamPositionsByKey)[0]) || false;
+                    let lastKey = parseInt(Object.keys(teamPositionsByKey).slice(-1)[0]) || false;
+                    //console.log('---> teamPositionsByKey =', teamPositionsByKey);
+                    //console.log('---> firstKey =', firstKey);
+                    //console.log('---> lastKey =', lastKey);
+                    $robotsOnMap.each(function(){
+                        let $robot = $(this);
+                        let key = parseInt($robot.attr('data-key'));
+                        let newKey = key - 1;
+                        if (newKey < firstKey){ newKey = lastKey; }
+                        $robot.attr('data-key', newKey);
+                        let newPosition = teamPositionsByKey[newKey] || [0, 0];
+                        let newPositionZ = newPosition[1] + 1;
+                        $robot.css({
+                            left: newPosition[0] + 'px',
+                            top: newPosition[1] + 'px',
+                            zIndex: newPositionZ
+                            });
+                        });
+                    // and then save the world state with the new robot order
+                    _self.saveWorldState();
+                    // Return true on success
+                    return true;
+                    });
+                }
+            // Bind a click event to the team-switch button in the robots overview
+            let $switchButton = $('.team-switch', $robotsOverview);
+            if ($switchButton && $switchButton.length){
+                // expand/collapse the robot storage tray by clicking the switch button
+                $switchButton.bind('click', function(e){
+                    e.preventDefault();
+                    //console.log('%c' + 'Team switch button clicked!', 'color: cyan;');
+                    // First we start by either toggling the expanded class on the overview panel itself
+                    $robotsOverview.toggleClass('expanded');
+                    $teamRobotsInOverview.removeClass('selected');
+                    if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, then we're done here
+                    // Make the first robot in the overview as selected via class
+                    let $firstOverviewRobot = $teamRobotsInOverview.first();
+                    $firstOverviewRobot.addClass('selected');
+                    // Return true on success
+                    return true;
+                    });
+                // if the storage tray is open, clicking a robot in the team-list marks it as selected
+                $teamRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
+                    e.preventDefault();
+                    if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
+                    //console.log('%c' + 'Team robot clicked!', 'color: cyan;');
+                    // First we remove the selected class from any robots that already have it
+                    $teamRobotsInOverview.removeClass('selected');
+                    // Then add it to the clicked robot instead
+                    $(this).addClass('selected');
+                    // Return true on success
+                    return true;
+                    });
+                // if the storage tray is open, clicking a robot in the storage-list swaps it with selected team-robot
+                $storageRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
+                    e.preventDefault();
+                    if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
+                    //console.log('%c' + 'Storage robot clicked!', 'color: cyan;');
+                    // First we collect references to the selected team-robot and clicked storage-robot
+                    let $selectedTeamRobot = $teamRobotsInOverview.filter('.selected').first();
+                    if (!$selectedTeamRobot || !$selectedTeamRobot.length){ return; } // if no robot is selected, ignore clicks
+                    let $clickedStorageRobot = $(this);
+                    if (!$clickedStorageRobot || !$clickedStorageRobot.length){ return; } // if no robot is clicked, ignore clicks
+                    //console.log('-> $selectedTeamRobot =', $selectedTeamRobot);
+                    //console.log('-> swap for $clickedStorageRobot =', $clickedStorageRobot);
+                    // Collect the robot tokens for each robot and make sure they're different
+                    let selectedRobotToken = $selectedTeamRobot.attr('data-robot') || false;
+                    let clickedRobotToken = $clickedStorageRobot.attr('data-robot') || false;
+                    if (!selectedRobotToken || !clickedRobotToken || selectedRobotToken === clickedRobotToken){ return; }
+                    //console.log('-> selectedRobotToken =', selectedRobotToken);
+                    //console.log('-> swap for clickedRobotToken =', clickedRobotToken);
+                    // Clone the current spans so we can easily reset if we have to
+                    let $teamRobotsInOverviewBackup = $teamRobotsInOverview.clone(true).detach(); // save for later
+                    let $storageRobotsInOverviewBackup = $storageRobotsInOverview.clone(true).detach(); // save for later
+                    // Now we swap the two elements at exactly the same position without their respective parent containers
+                    $selectedTeamRobot.clone(true).insertAfter($clickedStorageRobot).removeClass('selected');
+                    $clickedStorageRobot.clone(true).insertBefore($selectedTeamRobot).addClass('selected');
+                    $selectedTeamRobot.remove();
+                    $clickedStorageRobot.remove();
+                    $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
+                    $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
+                    // If this new list of robots in the overview does not match what's saved, add save button
+                    let newListOfRobotsInOverview = $teamRobotsInOverview.map(function(){ return $(this).attr('data-robot'); }).get();
+                    let listHasChanged = newListOfRobotsInOverview.join(',') !== listOfRobotsInOverview.join(',') ? true : false;
+                    //console.log('-> newListOfRobotsInOverview = ', newListOfRobotsInOverview);
+                    //console.log('-> listHasChanged = ', listHasChanged);
+                    if (!listHasChanged){ return; }
+                    // Add the save/cancel button set to the overview panel if it doesn't already exist
+                    let $saveButton = $('<a href="#" class="button save">Save &amp Reload</a>');
+                    let $cancelButton = $('<a href="#" class="button cancel">Cancel</a>');
+                    $storageRobotsDiv.append($saveButton).append($cancelButton);
+                    $switchButton.addClass('disabled');
+                    // Define the save/cancel actions to bind to the buttons
+                    let cancelAction = function(){
+                        //console.log('%c' + '-> robot-storage cancelAction() triggered', 'color: magenta;');
+                        // First we revert the robots in the overview back to the backup copy we made earlier
+                        $teamRobotsDiv.empty().append($teamRobotsInOverviewBackup);
+                        $storageRobotsDiv.empty().append($storageRobotsInOverviewBackup);
+                        $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
+                        $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
+                        // Then we remove the save/cancel button set from the overview panel
+                        $saveButton.remove();
+                        $cancelButton.remove();
+                        $switchButton.removeClass('disabled');
+                        // Return true on success
+                        return true;
+                        };
+                    let saveAction = function(){
+                        //console.log('%c' + '-> robot-storage saveAction() triggered', 'color: magenta;');
+                        // First we remove the save/cancel button set from the overview panel
+                        $saveButton.remove();
+                        $cancelButton.remove();
+                        // Then we update the world player robots data to match the new order in the overview
+                        let newPlayerRobotList = [];
+                        $teamRobotsInOverview.each(function(index, robot){
+                            //console.log('-> checking robot', index, robot);
+                            let $robot = $(robot);
+                            let robotString = $robot.attr('data-robot') || false;
+                            if (!robotString || !robotString.length){ return; }
+                            //console.log('-> robotString =', robotString);
+                            newPlayerRobotList.push(robotString);
+                            });
+                        //console.log('-> newPlayerRobotList =', newPlayerRobotList);
+                        // Make sure we have new robots selected, else abort the save
+                        if (!newPlayerRobotList.length){ cancelAction(); return false; }
+                        // Then we save the world state with the new robot order and reload the page to reflect changes
+                        // NOTE: We don't need to actually swap robots on the map since we're reloading the page
+                        //console.log('okay time to save the world state!');
+                        _self.incZoomLevel();
+                        _self.saveWorldState(function(){
+                            _self.playSoundEffect('switch-in');
+                            let worldReloadURL = 'world.php?robots=' + newPlayerRobotList.join(',');
+                            //console.log('-> worldReloadURL =', worldReloadURL);
+                            $thisWorld.addClass('hidden').removeClass('busy');
+                            window.location.href = worldReloadURL;
+                            });
+                        // Return true on success
+                        return true;
+                        };
+                    // Bind events to the cancel button that'll revert the changes we've mapStartDirection made
+                    $cancelButton.bind('click', function(e){
+                        //console.log('%c' + 'Robot swap cancel button clicked!', 'color: cyan;');
+                        e.preventDefault();
+                        return cancelAction();
+                        });
+                    // Bind events to the save button that'll save the changes we've made
+                    $saveButton.bind('click', function(e){
+                        //console.log('%c' + 'Robot swap save button clicked!', 'color: cyan;');
+                        e.preventDefault();
+                        saveAction();
+                        });
+                    // Return true on success
+                    return true;
+                    });
+                }
             }
         // Bind events to the scrolling of the user's mouse if detected to allow for zooming the map
         let busyZooming = false;
@@ -1883,6 +2037,7 @@ class mmrpgWorldMap {
         let _worldCursor = _world.cursor;
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
+        let _worldPlayerRobotsKeys = Object.keys(_worldPlayerRobots);
         let _mapEffects = _config.mapEffects;
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
@@ -1902,12 +2057,12 @@ class mmrpgWorldMap {
         let thisNewRow = parseInt(newPosition[1]);
 
         // Before we do anything else, check to see if this player has any active robots
-        //console.log('_playerRobots = ', _playerRobots);
-        //console.log('_playerRobotsIndex = ', _playerRobotsIndex);
+        //console.log('_worldPlayerRobots = ', _worldPlayerRobots);
+        //console.log('_worldPlayerRobotsKeys = ', _worldPlayerRobotsKeys);
         let playerActiveRobots = 0;
-        for (var i = 0; i < _playerRobots.length; i++){
-            let token = _playerRobots[i];
-            let info = _playerRobotsIndex[token] || false;
+        for (var i = 0; i < _worldPlayerRobotsKeys.length; i++){
+            let token = _worldPlayerRobotsKeys[i];
+            let info = _worldPlayerRobots[token] || false;
             if (!info || info.disabled){ continue; }
             playerActiveRobots++;
             }
@@ -2351,6 +2506,17 @@ class mmrpgWorldMap {
                         }
                     else if (action === 'start-battle'){
                         //console.log('-> starting battle with ID ' + battleId + '!');
+                        _worldPlayerRobotsKeys = Object.keys(_worldPlayerRobots); // refresh in case changed
+                        //console.log('_worldPlayerRobots = ', _worldPlayerRobots);
+                        //console.log('_worldPlayerRobotsKeys = ', _worldPlayerRobotsKeys);
+                        let activeRobots = [];
+                        for (let i = 0; i < _worldPlayerRobotsKeys.length; i++){
+                            let token = _worldPlayerRobotsKeys[i];
+                            let info = _worldPlayerRobots[token] || false;
+                            if (!info || info.disabled){ continue; }
+                            activeRobots.push(token);
+                            }
+                        //console.log('activeRobots = ', activeRobots);
                         _self.playSoundEffect('lets-go-robots');
                         let battleVars = [];
                         battleVars.push('wap=false'); // i hate this
@@ -2358,10 +2524,10 @@ class mmrpgWorldMap {
                         battleVars.push('this_user_id=' + _userId);
                         battleVars.push('this_player_id=' + _playerId);
                         battleVars.push('this_player_token=' + _playerToken);
-                        battleVars.push('this_player_robots=' + Object.keys(_worldPlayerRobots).join(','));
+                        battleVars.push('this_player_robots=' + activeRobots.join(','));
                         battleVars.push('this_battle_token=' + battleId);
                         let battleHref = 'battle.php?' + battleVars.join('&');
-                        $thisWorld.addClass('hidden');
+                        $thisWorld.addClass('hidden').addClass('busy');
                         _self.saveWorldState(function(){ window.location.href = battleHref; });
                         }
                     }
@@ -2388,7 +2554,7 @@ class mmrpgWorldMap {
                             portalHref = 'world.php?world=' + worldToken + '&map=' + mapToken;
                             }
                         if (portalHref){
-                            $thisWorld.addClass('hidden');
+                            $thisWorld.addClass('hidden').addClass('busy');
                             _self.incZoomLevel();
                             _self.saveWorldState(function(){
                                 _self.incZoomLevel();
