@@ -1466,6 +1466,7 @@ button {
     display: block;
     position: static;
     margin: -24px 0 10px;
+    image-rendering: pixelated;
 }
 #window .page .body .subbody .float .sprite_animated {
     transform: translateY(0);
@@ -3280,6 +3281,9 @@ button {
     left: 87px;
     bottom: 16px;
     z-index: 3;
+}
+#window .page .leaderboard .file .avatar .sprite {
+    image-rendering: pixelated;
 }
 @keyframes leaderboard-avatar-wrapper-bounce {
     0% { transform: translateY(0px); }
