@@ -1236,10 +1236,10 @@ class rpg_world {
         $return_markup .= '<a class="team-rotate" title="Rotate Team"><i class="fa fas fa-sync"></i></a>';
         if ($num_robot_unlocked > $current_team_size){
             $return_markup .= '<a class="team-switch" title="Switch-Out Robots"><i class="fa fas fa-robot"></i></a>';
-            $return_markup .= '<strong class="team-size">'.$current_team_size.' of '.$num_robot_unlocked.'</strong>';
+            $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>';
             } else {
             $return_markup .= '<span class="team-switch"><i class="fa fas fa-robot"></i></span>';
-            $return_markup .= '<strong class="team-size">'.$current_team_size.' robots</strong>';
+            $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' robots</strong></div>';
             }
         $return_markup .= '<div class="limit-hearts" title="x'.$limit_hearts.' Limit Hearts">';
             $return_markup .= '<i class="player '.$current_player_token.'"></i>';
@@ -1278,13 +1278,6 @@ class rpg_world {
                 $robot_weapons_markup = '<div class="guage weapons" title="'.$robot_weapons_label.'"><i class="'.$robot_weapons_rating.'" style="width: '.$robot_weapons_percent.'%;"></i></div>';
                 // generate the markup for the attack/defense/speed mods
                 $has_statmods = false;
-
-                // DEBUG DEBUG DEBUG
-                $robot_overview['attackMods'] = mt_rand(1, 5);
-                $robot_overview['defenseMods'] = -1 * mt_rand(1, 5);
-                $robot_overview['speedMods'] = mt_rand(1, 5);
-                // DEBUG DEBUG DEBUG
-
                 $robot_stats_markup = '';
                 $stat_tokens = array('attack', 'defense', 'speed');
                 foreach ($stat_tokens AS $stat_token){

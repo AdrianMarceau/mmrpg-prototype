@@ -91,6 +91,17 @@ html, body {
     will-change: transform;
 }
 
+#world #canvas #map div,
+#world #canvas #map ul,
+#world #canvas #map ol,
+#world #canvas #map p,
+#world #canvas #map a,
+#world #canvas #map span,
+#world #canvas #map img,
+#world #canvas #map canvas {
+    box-sizing: border-box;
+}
+
 #world #canvas #map .layer {
     display: block;
     position: absolute;
@@ -1082,12 +1093,12 @@ html, body {
     content: "";
     display: block;
     position: absolute;
+    box-sizing: border-box;
     top: 10px;
-    left: -50px;
-    bottom: 0;
+    left: -452px;
     z-index: 1;
-    width: 100px;
-    height: auto;
+    width: 580px;
+    height: 580px;
     background-color: rgba(0, 0, 0, 0.7);
     padding: 4px 16px;
     border-top: 2px solid transparent;
@@ -1096,13 +1107,14 @@ html, body {
     box-shadow: 0 0 3px rgba(98, 98, 98, 0.3);
     pointer-events: none;
     transform: skewX(10deg);
-    transition: top 0.6s, width 0.6s, background-color 0.3s, border-color 0.3s;
+    transition: top 0.6s, left 0.6s, transform 0.6s, background-color 0.3s, border-color 0.3s;
 }
 #world #canvas #robots-overview.expanded:before {
-    /* top: 0;  */
-    width: 580px;
+    top: 20px;
+    left: -56px;
     border-color: #000000;
     background-color: rgba(0, 0, 0, 0.8);
+    transform: skewX(0deg);
     pointer-events: auto;
 }
 #world #canvas #robots-overview > .wrapper {
@@ -1127,8 +1139,8 @@ html, body {
     transition: none;
 }
 #world #canvas #robots-overview .team-rotate {
-    top: 15px;
-    left: 40px;
+    top: 18px;
+    left: 50px;
     font-size: 16px;
     color: #969696;
     transition: transform 0.6s, opacity 0.3s, color 0.6s;
@@ -1189,12 +1201,17 @@ html, body {
     position: absolute;
     z-index: 90;
     color: #e0e0e0;
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1;
     bottom: 34px;
     left: 38px;
     pointer-events: none;
     text-shadow: 1px 1px 0 #000000;
+    transition: left 0.3s, font-size 0.3s;
+}
+#world #canvas #robots-overview.expanded .team-size,
+#world #canvas #robots-overview .team-switch:hover + .team-size {
+    left: 42px;
 }
 #world #canvas #robots-overview .limit-hearts {
     display: block;
@@ -1233,13 +1250,18 @@ html, body {
 
 #world #canvas #robots-overview .team-robots {
     padding: 50px 50px 50px 8px;
-    max-height: 132px;
+    margin-bottom: -40px;
+    max-height: 168px;
+    min-height: 44px;
     overflow: hidden;
-    transition: max-height 0.9s, background-color 0.3s;
+    transition: min-height 0.9s, max-height 0.9s, background-color 0.3s;
 }
 #world #canvas #robots-overview:hover .team-robots,
 #world #canvas #robots-overview.expanded .team-robots {
-    max-height: 418px;
+    max-height: 452px;
+}
+#world #canvas #robots-overview.expanded .team-robots {
+    min-height: 452px;
 }
 
 #world #canvas #robots-overview .storage-robots {
@@ -1248,29 +1270,28 @@ html, body {
     position: absolute;
     z-index: 10;
     left: 220px;
-    bottom: -800px;
+    top: 800px;
     height: calc(100% - 30px);
-    width: 310px;
+    max-height: 522px;
+    width: 286px;
     background-color: rgba(0, 0, 0, 0.4);
     box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.6);
-    padding: 9px;
+    padding: 24px 0 24px 54px;
     border-radius: 9px;
     overflow: visible;
     opacity: 0.0;
     pointer-events: none;
-    transition: opacity 0.3s, bottom 0.6s;
+    transition: opacity 0.3s, top 0.6s;
 }
 #world #canvas #robots-overview.expanded .storage-robots {
     opacity: 1.0;
-    bottom: 10px;
+    top: 36px;
     pointer-events: auto;
 }
 #robots-overview .storage-robots .button {
     display: block;
     position: absolute;
     z-index: 20;
-    bottom: 0;
-    right: -60px;
     box-sizing: border-box;
     margin: 0 0 0 auto;
     padding: 3px 6px;
@@ -1283,6 +1304,8 @@ html, body {
     line-height: 1.2;
     font-weight: bold;
     text-decoration: none;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     border: 1px solid transparent;
     background-color: rgba(0, 0, 0, 0.5);
     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
@@ -1295,15 +1318,24 @@ html, body {
     border: 1px solid  #565656;
     transition: border 0.2s, background-color 0.2s, min-width 0.3s;
 }
+#robots-overview .storage-robots .button.active,
 #robots-overview .storage-robots .button:not(.disabled):hover {
     border-color: #cfcfcf;
     background-color: rgba(0, 0, 0, 0.7);
 }
+#robots-overview .storage-robots .button.active {
+    cursor: default;
+    pointer-events: none;
+}
 #robots-overview .storage-robots .button.save {
-    bottom: 26px;
+    left: calc(100% + 10px);
+    bottom: 36px;
+    font-size: 14px;
+    line-height: 1.4;
 }
 #robots-overview .storage-robots .button.cancel {
-    bottom: 0;
+    left: calc(100% + 10px);
+    bottom: 8px;
 }
 #robots-overview .storage-robots .button.save.disabled,
 #robots-overview .storage-robots .button.cancel.disabled {
@@ -1349,9 +1381,110 @@ html, body {
     animation-fill-mode: forwards;
     transform-origin: center center;
 }
+#robots-overview .storage-robots .bullets {
+    display: block;
+    position: absolute;
+    z-index: 20;
+    left: 24px;
+    top: 24px;
+    bottom: 52px;
+    height: auto;
+    width: auto;
+    text-align: center;
+    color: #a0a0a0;
+    font-size: 12px;
+    line-height: 1.2;
+    font-weight: bold;
+    text-decoration: none;
+    background-color: transparent;
+    user-select: none;
+}
+#robots-overview .storage-robots .bullets .bullet {
+display: block;
+    position: relative;
+    box-sizing: border-box;
+    padding: 9px 0 0;
+    width: 20px;
+    height: 58px;
+    border: 0 none transparent;
+    background-color: transparent;
+    color: #cfcfcf;
+}
+#robots-overview .storage-robots .pages {
+    display: block;
+    position: absolute;
+    z-index: 20;
+    bottom: 14px;
+    left: 14px;
+    right: 14px;
+    padding: 0 36px 2px;
+    width: auto;
+    height: auto;
+    text-align: left;
+    color: #cfcfcf;
+    font-size: 12px;
+    line-height: 1.2;
+    font-weight: bold;
+    text-decoration: none;
+    background-color: transparent;
+    user-select: none;
+}
+#robots-overview .storage-robots .pages:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 10px;
+    left: 26px;
+    right: 26px;
+    height: 6px;
+    background-color: #202020;
+    border-radius: 6px;
+    pointer-events: none;
+    border-bottom: 1px solid #000000;
+    pointer-events: none;
+}
+#robots-overview .storage-robots .pages .button.page {
+    position: static;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    display: inline-block;
+    box-sizing: border-box;
+    min-width: 20px;
+    background-color: #191919;
+    border-color: #393939;
+    margin: 2px 2px 0;
+    padding: 3px 6px;
+    z-index: 5;
+}
+#robots-overview .storage-robots .pages .button.page[data-page="back"],
+#robots-overview .storage-robots .pages .button.page[data-page="next"] {
+    position: absolute;
+    z-index: 10;
+}
+#robots-overview .storage-robots .pages .button.page[data-page="back"] {
+    left: 0;
+    right: auto;
+}
+#robots-overview .storage-robots .pages .button.page[data-page="next"] {
+    left: auto;
+    right: 0;
+}
+#robots-overview .storage-robots .pages .button.page.active {
+    background-color: #efefef;
+    color: #090909;
+}
+#robots-overview .storage-robots .pages .button.page.disabled {
+    color: #464646;
+    cursor: default;
+    pointer-events: none;
+    border-color: transparent;
+}
 
 #world #canvas #robots-overview .team-robot {
     display: block;
+    box-sizing: border-box;
     float: left;
     clear: both;
     position: relative;
@@ -1360,20 +1493,18 @@ html, body {
     padding: 4px 0 0 48px;
     height: auto;
     width: auto;
-    min-height: 36px;
+    min-height: 44px;
     min-width: 40px;
     text-align: center;
     color: #cfcfcf;
     font-size: 12px;
     line-height: 1.2;
+    filter: brightness(1) opacity(1);
     outline: 1px solid transparent;
     background-color: transparent;
     background-image: none !important;
-    transition: outline 0.3s, background-color 0.3s;
+    transition: outline 0.3s, background-color 0.3s, filter 0.3s;
     cursor: pointer;
-}
-#world #canvas #robots-overview .team-robot.selected {
-    z-index: 20;
 }
 #world #canvas #robots-overview .team-robot > * {
     pointer-events: none;
@@ -1587,11 +1718,11 @@ html, body {
     opacity: 0.1;
 }
 #world #canvas #robots-overview .team-robot > .guage.energy {
-    margin-right: 20px;
+    width: 120px;
     background-color: #294921;
 }
 #world #canvas #robots-overview .team-robot > .guage.weapons {
-    margin-right: 50px;
+    width: 90px;
     background-color: #1b3652;
 }
 #world #canvas #robots-overview .team-robot > .guage.energy > i {
@@ -1627,6 +1758,7 @@ html, body {
     height: 10px;
     font-size: 10px;
     line-height: 1;
+    white-space: nowrap;
     overflow: hidden;
     background-color: rgba(0, 0, 0, 0.7);
     background-color: transparent;
@@ -1709,16 +1841,23 @@ html, body {
 #world #canvas #robots-overview .team-robot:nth-child(6) { z-index: 5; }
 #world #canvas #robots-overview .team-robot:nth-child(7) { z-index: 4; }
 #world #canvas #robots-overview .team-robot:nth-child(8) { z-index: 3; }
+#world #canvas #robots-overview .team-robot:hover { z-index: 20; }
+#world #canvas #robots-overview .team-robot.selected { z-index: 20; }
 
-#world #canvas #robots-overview .team-robot:nth-child(1) .icon { filter: brightness(1.0); }
-#world #canvas #robots-overview .team-robot:nth-child(2) .icon { filter: brightness(0.9); }
-#world #canvas #robots-overview .team-robot:nth-child(3) .icon { filter: brightness(0.81); }
-#world #canvas #robots-overview .team-robot:nth-child(4) .icon { filter: brightness(0.729); }
-#world #canvas #robots-overview .team-robot:nth-child(5) .icon { filter: brightness(0.6561); }
-#world #canvas #robots-overview .team-robot:nth-child(6) .icon { filter: brightness(0.59049); }
-#world #canvas #robots-overview .team-robot:nth-child(7) .icon { filter: brightness(0.531441); }
-#world #canvas #robots-overview .team-robot:nth-child(8) .icon { filter: brightness(0.4782969); }
-#world #canvas #robots-overview .team-robot:nth-child(n+8) .icon { filter: brightness(0.4782969); }
+#world #canvas #robots-overview:not(:hover):not(.expanded) .team-robots .team-robot:nth-child(n+4) { filter: brightness(0.2); }
+#world #canvas #robots-overview:not(:hover):not(.expanded) .team-robots .team-robot:nth-child(n+5) { filter: brightness(0.0); }
+
+#world #canvas #robots-overview .team-robots .team-robot:nth-child(1) .icon { filter: brightness(1.0); }
+#world #canvas #robots-overview .team-robots .team-robot:nth-child(2) .icon { filter: brightness(0.9); }
+#world #canvas #robots-overview .team-robots .team-robot:nth-child(3) .icon { filter: brightness(0.81); }
+#world #canvas #robots-overview .team-robots .team-robot:nth-child(4) .icon { filter: brightness(0.729); }
+#world #canvas #robots-overview .team-robots .team-robot:nth-child(5) .icon { filter: brightness(0.6561); }
+#world #canvas #robots-overview .team-robots .team-robot:nth-child(6) .icon { filter: brightness(0.59049); }
+#world #canvas #robots-overview .team-robots .team-robot:nth-child(7) .icon { filter: brightness(0.531441); }
+#world #canvas #robots-overview .team-robots .team-robot:nth-child(8) .icon { filter: brightness(0.4782969); }
+#world #canvas #robots-overview .team-robots .team-robot:nth-child(n+8) .icon { filter: brightness(0.4782969); }
+#world #canvas #robots-overview .team-robots .team-robot:hover .icon { filter: brightness(1.0); }
+#world #canvas #robots-overview .team-robots .team-robot.selected .icon { filter: brightness(1.0); }
 
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(1) .icon:after { content: "1st"; }
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(2) .icon:after { content: "2nd"; }
@@ -1728,6 +1867,16 @@ html, body {
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(6) .icon:after { content: "6th"; }
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(7) .icon:after { content: "7th"; }
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(8) .icon:after { content: "8th"; }
+
+#world #canvas #robots-overview .storage-robots .team-robot:not([data-slot]) .icon { filter: brightness(0.1); }
+#world #canvas #robots-overview .storage-robots .team-robot[data-slot="1"] .icon { filter: brightness(1.0); }
+#world #canvas #robots-overview .storage-robots .team-robot[data-slot="2"] .icon { filter: brightness(0.9); }
+#world #canvas #robots-overview .storage-robots .team-robot[data-slot="3"] .icon { filter: brightness(0.81); }
+#world #canvas #robots-overview .storage-robots .team-robot[data-slot="4"] .icon { filter: brightness(0.729); }
+#world #canvas #robots-overview .storage-robots .team-robot[data-slot="5"] .icon { filter: brightness(0.6561); }
+#world #canvas #robots-overview .storage-robots .team-robot[data-slot="6"] .icon { filter: brightness(0.59049); }
+#world #canvas #robots-overview .storage-robots .team-robot[data-slot="7"] .icon { filter: brightness(0.531441); }
+#world #canvas #robots-overview .storage-robots .team-robot[data-slot="8"] .icon { filter: brightness(0.4782969); }
 
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(1) {
     margin-bottom: 22px;
@@ -1745,6 +1894,9 @@ html, body {
 }
 #world #canvas #robots-overview .storage-robots .team-robot.hasmods:before {
     bottom: -13px;
+}
+#world #canvas #robots-overview .storage-robots .team-robot.hidden {
+    display: none;
 }
 
 #world #canvas #side-buttons {

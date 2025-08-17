@@ -68,6 +68,7 @@ gameSettings.worldConfig = {
     homeButtonURL: '#', // populated on init
     resetButtonURL: '#', // populated on init
     allowWorldEvents: false, // default until user interaction
+    robotStorageSlotsVisible: 8, // probably wont change as it's what fits
     };
 gameSettings.worldState = {
     cursor: {
@@ -1232,6 +1233,8 @@ class mmrpgWorldMap {
         let _worldCursor = _world.cursor;
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
+        let $sideButtons = _elements.sideButtons;
+        let $actionDropdown = _elements.actionDropdown;
         // Bind a click event to the back button in the header that'll bring us to prototype menu
         let $backButton = _elements.backButton;
         if ($backButton && $backButton.length){
@@ -1360,6 +1363,14 @@ class mmrpgWorldMap {
             //console.log('-> $teamRobotsInOverview = ', $teamRobotsInOverview.length, $teamRobotsInOverview);
             //console.log('-> $storageRobotsInOverview = ', $storageRobotsInOverview.length, $storageRobotsInOverview);
             //console.log('-> listOfRobotsInOverview = ', listOfRobotsInOverview);
+            let storageSlotsVisible = _config.robotStorageSlotsVisible;
+            let storageRobotsWaiting = $storageRobotsInOverview.length;
+            let numStoragePagesRequired = Math.ceil(storageRobotsWaiting / storageSlotsVisible);
+            let currentStoragePageNum = 0;
+            //console.log('-> storageSlotsVisible = ', storageSlotsVisible);
+            //console.log('-> storageRobotsWaiting = ', storageRobotsWaiting);
+            //console.log('-> numStoragePagesRequired = ', numStoragePagesRequired);
+            //console.log('-> currentStoragePageNum = ', currentStoragePageNum);
             // Bind a click event to the team-rotate button in the robots overview
             let $rotateButton = $('.team-rotate', $robotsOverview);
             if ($rotateButton && $rotateButton.length){
@@ -1440,6 +1451,14 @@ class mmrpgWorldMap {
                     // Make the first robot in the overview as selected via class
                     let $firstOverviewRobot = $teamRobotsInOverview.first();
                     $firstOverviewRobot.addClass('selected');
+                    if ($sideButtons.is('.active')){
+                        //console.log('-> side buttons active, make sure we dismiss!');
+                        let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
+                        $sideButtons.removeClass('maybe');
+                        $dismissButton.trigger('click');
+                        }
+                    // Refresh the page buttons after opening the storage drawer just-in-case
+                    //makeStoragePages();
                     // Return true on success
                     return true;
                     });
@@ -1472,15 +1491,17 @@ class mmrpgWorldMap {
                     // Collect the robot tokens for each robot and make sure they're different
                     let selectedRobotToken = $selectedTeamRobot.attr('data-robot') || false;
                     let clickedRobotToken = $clickedStorageRobot.attr('data-robot') || false;
+                    let clickedRobotSlot = $clickedStorageRobot.attr('data-slot') || false;
                     if (!selectedRobotToken || !clickedRobotToken || selectedRobotToken === clickedRobotToken){ return; }
+                    if (!clickedRobotSlot || isNaN(parseInt(clickedRobotSlot))){ return; } // if no slot, ignore clicks
                     //console.log('-> selectedRobotToken =', selectedRobotToken);
                     //console.log('-> swap for clickedRobotToken =', clickedRobotToken);
                     // Clone the current spans so we can easily reset if we have to
                     let $teamRobotsInOverviewBackup = $teamRobotsInOverview.clone(true).detach(); // save for later
                     let $storageRobotsInOverviewBackup = $storageRobotsInOverview.clone(true).detach(); // save for later
                     // Now we swap the two elements at exactly the same position without their respective parent containers
-                    $selectedTeamRobot.clone(true).insertAfter($clickedStorageRobot).removeClass('selected');
-                    $clickedStorageRobot.clone(true).insertBefore($selectedTeamRobot).addClass('selected');
+                    $selectedTeamRobot.clone(true).insertAfter($clickedStorageRobot).removeClass('selected').attr('data-slot', clickedRobotSlot);
+                    $clickedStorageRobot.clone(true).insertBefore($selectedTeamRobot).addClass('selected').removeAttr('data-slot');
                     $selectedTeamRobot.remove();
                     $clickedStorageRobot.remove();
                     $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
@@ -1558,6 +1579,109 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
+                // if the storage tray is open, clicking a page-button in the storage-list scrolls through selected team-robots
+                let makeStorageBullets = function(){
+                    //console.log('%c' + 'makeStorageBullets() called!', 'color: magenta;');
+                    $('.bullets', $storageRobotsDiv).remove();
+                    let listBulletsMarkup = '';
+                    listBulletsMarkup += '<div class="bullets">';
+                        for (var i = 0; i < storageSlotsVisible; i++){
+                            let key = i;
+                            let position = (i + 1);
+                            let bulletMarkup = '<span class="bullet" data-key="' + key + '">' + position + '</span>';
+                            listBulletsMarkup += bulletMarkup;
+                            }
+                    listBulletsMarkup += '</div>';
+                    //console.log('-> appending listBulletsMarkup =', listBulletsMarkup);
+                    $storageRobotsDiv.append(listBulletsMarkup);
+                    return true;
+                    };
+                let makeStoragePages = function(){
+                    //console.log('-> makeStoragePages() called!');
+                    // (Re)count the number of robots present in the storage locker and paginate if necessary
+                    storageSlotsVisible = _config.robotStorageSlotsVisible;
+                    storageRobotsWaiting = $storageRobotsInOverview.length;
+                    //console.log('-> storageSlotsVisible = ', storageSlotsVisible);
+                    //console.log('-> storageRobotsWaiting = ', storageRobotsWaiting);
+                    if (storageRobotsWaiting <= storageSlotsVisible){ return; }
+                    // Add buttons for each of the available pages (we'll arrange them in the CSS)
+                    numStoragePagesRequired = Math.ceil(storageRobotsWaiting / storageSlotsVisible);
+                    //console.log('-> need to paginate storage robots across ' + numStoragePagesRequired + ' pages');
+                    $('.pages', $storageRobotsDiv).remove();
+                    let pageButtonMarkup = '';
+                    pageButtonMarkup += '<div class="pages">';
+                        pageButtonMarkup += '<a href="#" class="button page back" data-page="back"><i class="fa fas fa-caret-left"></i></a>';
+                        for (var i = 0; i < numStoragePagesRequired; i++){
+                            let pageNum = (i + 1);
+                            let buttonMarkup = '<a href="#" class="button page' + (i === 0 ? ' active' : '') + '" data-page="' + pageNum + '">' + pageNum + '</a>';
+                            pageButtonMarkup += buttonMarkup;
+                            }
+                        pageButtonMarkup += '<a href="#" class="button page next" data-page="next"><i class="fa fas fa-caret-right"></i></a>';
+                    pageButtonMarkup += '</div>';
+                    //console.log('-> appending pageButtonMarkup =', pageButtonMarkup);
+                    $storageRobotsDiv.append(pageButtonMarkup);
+                    };
+                let goToStoragePage = function(pageNum){
+                    //console.log('%c' + '-> goToStoragePage(' + pageNum + ') triggered', 'color: magenta;');
+                    let storageSlotsVisible = _config.robotStorageSlotsVisible;
+                    if (typeof pageNum !== 'number'){ pageNum = parseInt(pageNum); }
+                    if (!pageNum || pageNum < 1){ pageNum = 1; }
+                    let startIndex = (pageNum - 1) * storageSlotsVisible;
+                    let endIndex = startIndex + storageSlotsVisible;
+                    //console.log('-> goToStoragePage() for pageNum ' + pageNum + ' with startIndex ' + startIndex + ' and endIndex ' + endIndex);
+                    $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
+                    //console.log('-> $storageRobotsInOverview = ', $storageRobotsInOverview.length, $storageRobotsInOverview);
+                    $('.bullet[data-key]', $storageRobotsDiv).text(''); // clear the bullets
+                    $storageRobotsInOverview.removeAttr('data-slot');
+                    $storageRobotsInOverview.addClass('hidden');
+                    $storageRobotsInOverview.slice(startIndex, endIndex).removeClass('hidden').each(function(index){
+                        //console.log('-> adding slot to robot at index ' + index + ' (data-slot will be ' + (index + 1) + ')');
+                        let $robot = $(this);
+                        let newSlot = (index + 1);
+                        let overallPosition = (startIndex + index + 1);
+                        $robot.attr('data-slot', newSlot);
+                        $('.bullet[data-key="'+index+'"]', $storageRobotsDiv).text(overallPosition);
+                        });
+                    currentStoragePageNum = pageNum;
+                    //console.log('-> currentStoragePageNum =', currentStoragePageNum);
+                    //console.log('-> numStoragePagesRequired =', numStoragePagesRequired);
+                    $('.button[data-page]', $storageRobotsDiv).removeClass('active').removeClass('disabled');
+                    $('.button[data-page="' + pageNum + '"]', $storageRobotsDiv).addClass('active');
+                    if (currentStoragePageNum === 1){
+                        //console.log('-> $storageRobotsDiv buttons... ', $('.button', $storageRobotsDiv));
+                        //console.log('-> disabling back button');
+                        $('.button[data-page="back"]', $storageRobotsDiv).addClass('disabled');
+                        }
+                    if (currentStoragePageNum === numStoragePagesRequired){
+                        //console.log('-> disabling next button');
+                        $('.button[data-page="next"]', $storageRobotsDiv).addClass('disabled');
+                        }
+                    };
+                $storageRobotsDiv.delegate('.button[data-page]', 'click', function(e){
+                    e.preventDefault();
+                    if (_self.worldIsBusy()){ return; }
+                    if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
+                    //console.log('%c' + 'Storage page button clicked!', 'color: cyan;');
+                    let $button = $(this);
+                    if ($button.is('.active')){ return; } // already on this page, ignore clicks
+                    let curNum = currentStoragePageNum;
+                    let pageNum = $button.attr('data-page');
+                    if (pageNum === 'back'){ pageNum = curNum - 1; }
+                    else if (pageNum === 'next'){ pageNum = curNum + 1; }
+                    else if (typeof pageNum === 'number'){ pageNum = parseInt(pageNum); }
+                    if (!pageNum || pageNum < 1){ pageNum = 1; }
+                    //console.log('-> pageNum =', pageNum);
+                    if (pageNum === currentStoragePageNum){ return; } // already on this page, ignore clicks
+                    //$('.button', $storageRobotsDiv).removeClass('active');
+                    //$button.addClass('active');
+                    goToStoragePage(pageNum);
+                    // Return true on success
+                    return true;
+                    });
+                // make sure we show the first page of storage robots by default
+                makeStorageBullets();
+                makeStoragePages();
+                goToStoragePage(1); // initialize to page 1
                 }
             }
         // Bind events to the scrolling of the user's mouse if detected to allow for zooming the map
@@ -1592,8 +1716,6 @@ class mmrpgWorldMap {
         let pressedKeys = {};
         document.addEventListener('keydown', (event) => { pressedKeys[event.key] = true; });
         document.addEventListener('keyup', (event) => { delete pressedKeys[event.key]; });
-        let $sideButtons = _elements.sideButtons;
-        let $actionDropdown = _elements.actionDropdown;
         $(document).bind('keydown', function(e){
             //console.log('%c' + 'World map keydown event!', 'color: cyan;');
             //e.preventDefault();
