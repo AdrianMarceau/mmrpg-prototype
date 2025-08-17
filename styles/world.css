@@ -2047,8 +2047,8 @@ display: block;
     border-color: #6e5d34 !important;
 }
 #world #canvas #side-buttons .button[data-action="push-button"].green {
-    background-color: #1e4d36 !important;
-    border-color: #34755d !important;
+    background-color: #3e7a2e !important;
+    border-color: #50b236 !important;
 }
 #world #canvas #side-buttons .button[data-action="push-button"].purple {
     background-color: #4d3da2 !important;
