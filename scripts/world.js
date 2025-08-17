@@ -1829,7 +1829,7 @@ class mmrpgWorldMap {
                     e.preventDefault();
                     if (!$sideButtons.is('.active')){ return false; }
                     let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
-                    if (!$confirmButton || !$confirmButton.length){ console.error('bindEventsToWorld() unable to find confirm button!'); return false; }
+                    if (!$confirmButton || !$confirmButton.length){ /* console.error('bindEventsToWorld() unable to find confirm button!'); */ return false; }
                     if ($confirmButton.is('.clicked')){ return }
                     if (!$confirmButton.is('.maybe')){ $confirmButton.addClass('maybe'); return; }
                     $confirmButton.removeClass('maybe');
