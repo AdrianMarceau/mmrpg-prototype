@@ -998,10 +998,11 @@ class rpg_world {
                     $robot_key = $static_encounter_key++;
                     $robot_pos = $robot_data[0]; unset($robot_data[0]);
                     $robot_token = !empty($robot_data[1]) ? $robot_data[1] : 'robot'; unset($robot_data[1]);
-                    $form = !empty($robot_data[2]) ? $robot_data[2] : ''; unset($robot_data[2]);
-                    $effect = !empty($robot_data[3]) ? $robot_data[3] : ''; unset($robot_data[3]);
-                    $target = !empty($robot_data[4]) ? $robot_data[4] : ''; unset($robot_data[4]);
-                    $value = !empty($robot_data[5]) ? $robot_data[5] : ''; unset($robot_data[5]);
+                    $level = !empty($robot_data[2]) ? $robot_data[2] : ''; unset($robot_data[2]);
+                    $flags = !empty($robot_data[3]) ? $robot_data[3] : ''; unset($robot_data[3]);
+                    $effect = !empty($robot_data[4]) ? $robot_data[4] : ''; unset($robot_data[4]);
+                    $target = !empty($robot_data[5]) ? $robot_data[5] : ''; unset($robot_data[5]);
+                    $value = !empty($robot_data[6]) ? $robot_data[6] : ''; unset($robot_data[6]);
                     //error_log('-> $robot_pos = '.print_r($robot_pos, true));
                     //error_log('-> $robot_token = '.print_r($robot_token, true));
                     //error_log('-> $form = '.print_r($form, true));
@@ -1013,7 +1014,8 @@ class rpg_world {
                     $robot_info = $mmrpg_index_robots[$robot_token];
                     $robot_class = $robot_info['robot_class'];
                     //error_log('-> $robot_info = '.print_r($robot_info, true));
-                    $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']);
+                    if (!empty($level) && is_numeric($level) && intval($level) > 0){ $robot_level = $level; }
+                    else { $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']); }
                     $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
                     $robot_label = $robot_info['robot_name'].' (Lv. '.$robot_level.')';
                     $battle_token = $world_battle_token.'_static-'.$robot_class.'-'.($robot_key + 1);
@@ -1185,6 +1187,7 @@ class rpg_world {
         $cursor_types = 'type explode';
         //$return_markup .= ('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         $mmrpg_index_players = self::get_index('players');
+        $return_markup .= ('<a class="team-player '.$cursor_types.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         foreach ($player_tokens AS $player_key => $player_token){
             if ($player_token === 'player' || empty($mmrpg_index_players[$player_token])){ continue; }
             $player_info = $mmrpg_index_players[$player_token];
@@ -1196,7 +1199,6 @@ class rpg_world {
             $markup_attrs = !$player_active ? ' data-player="'.$player_token.'"' : '';
             $return_markup .= ('<a class="'.$markup_class.'"'.$markup_attrs.'>'.$player_sprite.$cursor_sprite.$player_label.'</a>');
         }
-        $return_markup .= ('<a class="team-player '.$cursor_types.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         return $return_markup;
     }
 
