@@ -664,6 +664,28 @@ $(document).ready(function(){
         mmrpg_keep_session_alive(<?= rpg_game::get_userid() ?>);
     <? } ?>
 
+    // Make sure we always poll the server for popup events after loading
+    //console.log('queuing the windowEventsPull event (via world)');
+    if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
+        window.top.mmrpg_queue_for_game_start(function(){
+            //console.log('i guess the game has started');
+            setTimeout(function(){
+                //console.log('attempting to pull window events via parent.windowEventsPull()', parent.windowEventsPull);
+                let result = parent.windowEventsPull(true);
+                if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+                //else { console.log('windowEventsPull returned successfully: ' + result); }
+                }, 1000);
+            });
+        }
+    else if (typeof window.top.windowEventsPull !== 'undefined'){
+        //console.log('i guess we pull events manually via parent.windowEventsPull()', parent.windowEventsPull);
+        setTimeout(function(){
+            let result = parent.windowEventsPull(true);
+            if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+            //else { console.log('windowEventsPull returned successfully: ' + result); }
+            }, 1000);
+        }
+
 });
 
 </script>

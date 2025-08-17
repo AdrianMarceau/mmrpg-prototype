@@ -21,8 +21,8 @@ gameSettings.baseHref = 'http://localhost/'; // the base href where this game is
 gameSettings.wapFlag = false; // whether or not this game is running in mobile mode
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
-gameSettings.eventTimeout = 800; // default animation frame base internal
-gameSettings.eventTimeoutDefault = 800; // default animation frame base internal
+gameSettings.eventTimeout = 600; // default animation frame base internal
+gameSettings.eventTimeoutDefault = 600; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
@@ -2936,14 +2936,17 @@ function mmrpg_queue_for_game_start(onGameStart){
 // -- POPUP WINDOW EVENT FUNCTIONS -- //
 
 // Define a function that checks the server for any event popups to display
-function windowEventsPull(){
+function windowEventsPull(forcePull){
     //console.log('windowEventsPull()');
     // Do not pull events if we're currently in a sub-menu iframe
+    forcePull = typeof forcePull === 'boolean' ? forcePull : false;
     var $mmrpg = $('#mmrpg');
     var $prototype = $('#prototype');
-    if (!$mmrpg.length || $mmrpg.is('.iframe')){ return -1; }
-    else if ($mmrpg.is('.iframe')){ return -2; }
-    else if (!$prototype.length){ return -3; }
+    if (!forcePull){
+        if (!$mmrpg.length || $mmrpg.is('.iframe')){ return -1; }
+        else if ($mmrpg.is('.iframe')){ return -2; }
+        else if (!$prototype.length){ return -3; }
+        }
     // Otherwise we can pull events from the server and display them
     $.ajax({
         url: 'scripts/get-events.php',
@@ -2963,6 +2966,8 @@ function windowEventsPull(){
                 }
             }
         });
+    // Return true to indicate that the pull was successful
+    return true;
 }
 
 // Define a function for displaying event messages to the player
