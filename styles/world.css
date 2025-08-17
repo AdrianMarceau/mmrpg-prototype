@@ -1106,6 +1106,7 @@ html, body {
     background-color: transparent;
     box-shadow: none;
     transition: background-color 0.3s;
+    pointer-events: none;
 }
 #world #canvas #robots-overview:before {
     content: "";
@@ -1123,7 +1124,7 @@ html, body {
     border-right: 4px solid transparent;
     border-radius: 0 6px 0 0;
     box-shadow: 0 0 3px rgba(98, 98, 98, 0.3);
-    pointer-events: none;
+    pointer-events: auto;
     transform: skewX(10deg);
     transition: top 0.9s, left 0.9s, transform 0.9s, background-color 0.3s, border-color 0.3s;
 }
@@ -1140,7 +1141,7 @@ html, body {
     pointer-events: auto;
 }
 #world #canvas #robots-overview > .wrapper {
-
+    pointer-events: none;
 }
 #world #canvas #robots-overview .team-rotate,
 #world #canvas #robots-overview .team-switch {
@@ -1277,6 +1278,7 @@ html, body {
     min-height: 44px;
     overflow: hidden;
     transition: min-height 0.9s, max-height 0.9s, background-color 0.3s;
+    pointer-events: none;
 }
 #world #canvas #robots-overview:hover .team-robots,
 #world #canvas #robots-overview.expanded .team-robots {
@@ -1526,10 +1528,12 @@ display: block;
     background-color: transparent;
     background-image: none !important;
     transition: outline 0.3s, background-color 0.3s, filter 0.3s;
+    pointer-events: none;
     cursor: pointer;
 }
-#world #canvas #robots-overview .team-robot > * {
-    pointer-events: none;
+#world #canvas #robots-overview:hover .team-robot,
+#world #canvas #robots-overview.expanded .team-robot {
+    pointer-events: auto;
 }
 #world #canvas #robots-overview .team-robot:before {
     content: "";
@@ -1550,7 +1554,9 @@ display: block;
 #world #canvas #robots-overview.expanded .team-robot.selected:before {
     border-color: #ffffff;
 }
-#world #canvas #robots-overview .team-robot:last-child { margin-bottom: 0; }
+#world #canvas #robots-overview .team-robot:last-child {
+    margin-bottom: 0;
+}
 #world #canvas #robots-overview .team-robot .sprite {
     display: block;
     vertical-align: middle;
@@ -1689,6 +1695,7 @@ display: block;
 #world #canvas #robots-overview .team-robot > .label .name {
     float: left;
     font-weight: bold;
+    pointer-events: auto;
 }
 #world #canvas #robots-overview .team-robot > .label .lvl {
     float: right;
@@ -1787,6 +1794,7 @@ display: block;
     background-color: #202020;
     padding: 0 2px 0px 4px;
     border-radius: 0 3px 3px 3px;
+    pointer-events: none;
 }
 #world #canvas #robots-overview .team-robot > .statmods > .mod {
     display: inline-block;
@@ -1903,6 +1911,9 @@ display: block;
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(1) {
     margin-bottom: 22px;
     padding-left: 56px;
+}
+#world #canvas #robots-overview .team-robots .team-robot:last-child {
+    margin-bottom: 0;
 }
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(1) > .icon {
     padding: 7px;

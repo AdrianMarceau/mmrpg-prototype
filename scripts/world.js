@@ -1148,9 +1148,16 @@ class mmrpgWorldMap {
         let hoverTimeouts = {}, hoverTimeoutDuration = _config.mapEffects.hoverTimeout, hoverTiles = [];
         let lastMouseClick, lastMouseOver;
         let $clickOverlay = _elements.clickOverlay;
+        let $sideButtons = _elements.sideButtons;
+        let $robotsOverview = _elements.robotsOverview;
         $clickOverlay.bind('click', function(e){
             e.preventDefault();
-            if (_self.worldMapIsHidden()){ return false; }
+            if (_self.worldMapIsHidden()){
+                if ($robotsOverview.is('.expanded')){
+                    $robotsOverview.find('.team-switch').trigger('click');
+                    }
+                return false;
+                }
             if (_self.worldIsBusy()){ return false; }
             if (!_world.allowClicks){ return false; }
             //console.log('%c' + 'Map overlay click event!', 'color: cyan;');
@@ -1165,6 +1172,8 @@ class mmrpgWorldMap {
             let tileIsWalkable = walkableTiles.indexOf(thisPos) !== -1 ? true : false;
             let tileIsWithinRange = tilesWithinRange.indexOf(thisPos) !== -1 ? true : false;
             lastMouseClick = thisPos;
+            if ($sideButtons.is('.active')){ $sideButtons.find('.button[data-action="dismiss"]').trigger('click'); }
+            else if (sameAsCurrent){ _self.refreshMapPositionEvents(0); }
             if (!tileIsWithinRange || sameAsLast || sameAsCurrent){ return false; }
             //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
             if (!sameAsLast){ _self.playSoundEffect('link-click'); }
@@ -2233,8 +2242,9 @@ class mmrpgWorldMap {
         }
 
     // Quick function for clearing out any existing map events then checking for new ones at new position
-    async refreshMapPositionEvents(){
+    async refreshMapPositionEvents(timeoutMultiplier){
         //console.log('%c' + 'mmrpgWorldMap.refreshMapPositionEvents()', 'color: magenta;');
+        timeoutMultiplier = typeof timeoutMultiplier === 'number' ? timeoutMultiplier : 1;
 
         // Collect references, indexes, and other variables we need to work with
         let _self = this;
@@ -2277,9 +2287,9 @@ class mmrpgWorldMap {
         //console.log('playerActiveRobots = ', playerActiveRobots);
 
         // Define the default zoom timeout for after movement ends
-        let zoomTimeoutDuration = 2000;
-        let teamReadyDuration = 1800;
-        let teamRushDuration = 300;
+        let zoomTimeoutDuration = 2000 * timeoutMultiplier;
+        let teamReadyDuration = 1800 * timeoutMultiplier;
+        let teamRushDuration = 300 * timeoutMultiplier;
 
         // Make sure we empty and hide the action dropdown if it's been shown by previous move
         let $actionDropdown = _elements.actionDropdown;
@@ -2919,7 +2929,7 @@ class mmrpgWorldMap {
                         else { setTimeout(function(){ _self.playSoundEffect(sound); }, delay); delay *= 2; }
                         }
                     }
-                }, 200);
+                }, (200 * timeoutMultiplier));
 
             };
 
@@ -2931,21 +2941,21 @@ class mmrpgWorldMap {
         if (triggerEffect){
             //console.log('%c' + 'triggerEffectFunction()', 'color: cyan;');
             if (_selfRef.zoomEffectTimeout){ clearTimeout(_selfRef.zoomEffectTimeout); }
-            _selfRef.zoomEffectTimeout = setTimeout(triggerEffectFunction, zoomTimeoutDuration);
+            _selfRef.zoomEffectTimeout = setTimeout(triggerEffectFunction, (zoomTimeoutDuration * timeoutMultiplier));
             return true;
             }
 
         // If a redirect was requested, this is where we exit actually
         if (autoRedirect){
             if (_selfRef.zoomRedirectTimeout){ clearTimeout(_selfRef.zoomRedirectTimeout); }
-            _selfRef.zoomRedirectTimeout = setTimeout(redirectToLocation, zoomTimeoutDuration);
+            _selfRef.zoomRedirectTimeout = setTimeout(redirectToLocation, (zoomTimeoutDuration * timeoutMultiplier));
             return true;
             }
 
         // Otherwise we can actually trigger the dropdown and zoom in on the events
         if (showDropdown){
             if (_selfRef.zoomDropdownTimeout){ clearTimeout(_selfRef.zoomDropdownTimeout); }
-            _selfRef.zoomDropdownTimeout = setTimeout(zoomAndShowDropdown, zoomTimeoutDuration);
+            _selfRef.zoomDropdownTimeout = setTimeout(zoomAndShowDropdown, (zoomTimeoutDuration * timeoutMultiplier));
             return true;
             }
 
