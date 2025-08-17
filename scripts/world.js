@@ -1856,6 +1856,7 @@ class mmrpgWorldMap {
                 }
 
             });
+
         // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed
         $(window).bind('resize', function(e){
             //console.log('%c' + 'World map window resize event!', 'color: cyan;');
@@ -1864,7 +1865,7 @@ class mmrpgWorldMap {
             //console.log('-> event:', e);
             //console.log('-> window.devicePixelRatio:', window.devicePixelRatio);
             let pixelRatio = window.devicePixelRatio || 1;
-            let imageRendering = pixelRatio === 1 || pixelRatio >= 2 ? 'pixelated' : 'auto';
+            let imageRendering = pixelRatio === 1 || pixelRatio % 2 === 0 ? 'pixelated' : 'auto';
             //console.log('-> pixelRatio:', pixelRatio, '\n', '-> imageRendering:', imageRendering);
             $thisWorld.attr('data-rendering', imageRendering);
             }).trigger('resize');

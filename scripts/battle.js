@@ -26,6 +26,20 @@ $(document).ready(function(){
         topFrame.mmrpg_toggle_index_loaded(true);
     }
 
+    // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed
+    let $mmrpgDiv = $('#mmrpg');
+    $(window).bind('resize', function(e){
+        //console.log('%c' + 'Battle window resize event!', 'color: cyan;');
+        //e.preventDefault();
+        //e.stopPropagation();
+        //console.log('-> event:', e);
+        //console.log('-> window.devicePixelRatio:', window.devicePixelRatio);
+        let pixelRatio = window.devicePixelRatio || 1;
+        let imageRendering = pixelRatio === 1 || pixelRatio % 2 === 0 ? 'pixelated' : 'auto';
+        //console.log('-> pixelRatio:', pixelRatio, '\n', '-> imageRendering:', imageRendering);
+        $mmrpgDiv.attr('data-rendering', imageRendering);
+        }).trigger('resize');
+
     // Fade in the battle screen slowly
     var thisContext = $('#battle');
     if (thisContext.hasClass('fastfade')){

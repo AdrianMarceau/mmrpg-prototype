@@ -297,12 +297,21 @@ body.index #header {
     }
 }
 
+
 #mmrpg .sprite,
 #mmrpg .sprite_image,
 #mmrpg .has_pixels,
 #mmrpg .sprite img,
 #mmrpg .sprite_image img,
 #mmrpg .has_pixels img {
+    image-rendering: auto;
+}
+#mmrpg[data-rendering="pixelated"] .sprite,
+#mmrpg[data-rendering="pixelated"] .sprite_image,
+#mmrpg[data-rendering="pixelated"] .has_pixels,
+#mmrpg[data-rendering="pixelated"] .sprite img,
+#mmrpg[data-rendering="pixelated"] .sprite_image img,
+#mmrpg[data-rendering="pixelated"] .has_pixels img {
     -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
     image-rendering: -moz-crisp-edges;         /* Firefox */
     image-rendering:   -o-crisp-edges;         /* Opera */
@@ -311,6 +320,7 @@ body.index #header {
     image-rendering: crisp-edges;
     image-rendering: pixelated;
 }
+
 #mmrpg .sprite.scaled {
     image-rendering: auto !important;
 }

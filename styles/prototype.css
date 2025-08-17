@@ -1850,12 +1850,13 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .banner .subpoints {
     top: 43px;
     width: 250px;
-    height: 19px;
+    height: 20px;
     right: -30px;
     font-size: 9px;
     -moz-border-radius: 0 0 2em 2em;
     -webkit-border-radius: 0 0 2em 2em;
     border-radius: 0 0 2em 2em;
+    z-index: 29;
 }
 #prototype .banner .points > .wrapper,
 #prototype .banner .subpoints > .wrapper {
@@ -4981,6 +4982,11 @@ body[data-source="website"] #prototype .menu {
     right: auto !important;
     bottom: auto;
     margin: 0 -10px;
+}
+#mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
+    [data-chapter="0"], [data-chapter="1"], [data-chapter="2"], [data-chapter="3"], [data-chapter="4"]
+    ) .battle_sprites .sprite {
+    image-rendering: pixelated !important;
 }
 #mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select:is(
     [data-chapter="1"], [data-chapter="3"]
