@@ -293,7 +293,10 @@ else {
         $num_stars_required = 100; // TODO: seems like a good number for a requirement but maybe don't hard-core forever
         $num_star_icons_max = 10; // this is just how many are displayed on-screen at once
         $num_star_icons_earned = floor(($num_stars_unlocked / $num_stars_required) * $num_star_icons_max);
-        $star_icon_string = str_repeat('★', $num_star_icons_earned) . str_repeat('☆', ($num_star_icons_max - $num_star_icons_earned));
+        $num_star_icons_remaining = $num_star_icons_earned < $num_star_icons_max ? ($num_star_icons_max - $num_star_icons_earned) : 0;
+        $star_icon_string = '';
+        if (!empty($num_star_icons_earned)){ $star_icon_string .= str_repeat('★', $num_star_icons_earned); }
+        if (!empty($num_star_icons_remaining)){ $star_icon_string .= str_repeat('☆', $num_star_icons_remaining); }
         $maintext_string = 'Proxy Story';
         $subtext_string = 'Rogue of Network // The Void Cauldron';
         $subtext2_string = '[ <i class="fa fas">'.$star_icon_string.'</i> ]';
