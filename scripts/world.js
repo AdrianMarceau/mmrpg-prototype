@@ -3438,8 +3438,13 @@ class mmrpgWorldMap {
         robotInfo.energyRating = _self.getRatingToken(robotInfo.energyPercent);
         _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
         // Update the overview with any changes to the status
-        if (robotInfo.energy > 0){ $robotOverview.removeClass('disabled'); }
-        else { $robotOverview.addClass('disabled'); }
+        if (robotInfo.energy > 0){
+            robotInfo.disabled = false;
+            $robotOverview.removeClass('disabled');
+            } else {
+            robotInfo.disabled = true;
+            $robotOverview.addClass('disabled');
+            }
         $robotOverview.attr('data-status', robotInfo.energyRating+'-energy');
         // Update this robot's sprite on the actual overworld too
         let $teamSprites = _elements.teamSprites;
