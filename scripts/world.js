@@ -1240,6 +1240,7 @@ class mmrpgWorldMap {
         if ($backButton && $backButton.length){
             $backButton.bind('click', function(e){
                 e.preventDefault();
+                if ($(this).is('.disabled')){ return false; }
                 //console.log('%c' + 'Back button clicked!', 'color: cyan;');
                 //if (!confirm('Are you sure you want to leave the world map?')){ return; }
                 _self.playSoundEffect('bounce-sound');
@@ -1256,6 +1257,7 @@ class mmrpgWorldMap {
                 });
             $backButton.bind('mouseenter', function(e){
                 //e.preventDefault();
+                if ($(this).is('.disabled')){ return false; }
                 //console.log('%c' + 'Back button hovered!', 'color: cyan;');
                 _self.playSoundEffect('icon-hover');
                 return true;
@@ -1266,6 +1268,7 @@ class mmrpgWorldMap {
         if ($homeButton && $homeButton.length){
             $homeButton.bind('click', function(e){
                 e.preventDefault();
+                if ($(this).is('.disabled')){ return false; }
                 //console.log('%c' + 'Home button clicked!', 'color: cyan;');
                 //if (!confirm('Are you sure you want to return to the home area?')){ return; }
                 _self.playSoundEffect('bounce-sound');
@@ -1282,6 +1285,7 @@ class mmrpgWorldMap {
                 });
             $homeButton.bind('mouseenter', function(e){
                 //e.preventDefault();
+                if ($(this).is('.disabled')){ return false; }
                 //console.log('%c' + 'Home button hovered!', 'color: cyan;');
                 _self.playSoundEffect('icon-hover');
                 return true;
@@ -1292,6 +1296,7 @@ class mmrpgWorldMap {
         if ($resetButton && $resetButton.length){
             $resetButton.bind('click', function(e){
                 e.preventDefault();
+                if ($(this).is('.disabled')){ return false; }
                 //console.log('%c' + 'Reset button clicked!', 'color: cyan;');
                 if (!confirm('Are you sure you want to reset the world map?')){ return; }
                 _self.playSoundEffect('destroyed-sound');
@@ -1309,6 +1314,7 @@ class mmrpgWorldMap {
                 });
             $resetButton.bind('mouseenter', function(e){
                 e.preventDefault();
+                if ($(this).is('.disabled')){ return false; }
                 //console.log('%c' + 'Reset button hovered!', 'color: cyan;');
                 _self.playSoundEffect('icon-hover');
                 });
@@ -1319,6 +1325,8 @@ class mmrpgWorldMap {
             $('.team-player[data-player]', $playerSwitcher).bind('click', function(e){
                 //console.log('%c' + 'Player switcher clicked for ' + playerToken + '!', 'color: cyan;');
                 e.preventDefault();
+                if ($(this).is('.disabled')){ return false; }
+                if ($playerSwitcher.is('.disabled')){ return false; }
                 if (_self.worldIsBusy()){ return false; }
                 $('.team-player', $playerSwitcher).removeClass('active');
                 let $option = $(this);
@@ -1339,6 +1347,8 @@ class mmrpgWorldMap {
             $('.team-player[data-player]', $playerSwitcher).bind('mouseenter', function(e){
                 //console.log('%c' + 'Player switcher hovered!', 'color: cyan;');
                 e.preventDefault();
+                if ($(this).is('.disabled')){ return false; }
+                if ($playerSwitcher.is('.disabled')){ return false; }
                 let $option = $(this);
                 $('.sprite.player > .sprite', $option).attr('data-frame', '01'); // taunt
                 _self.playSoundEffect('icon-hover');
@@ -1346,6 +1356,8 @@ class mmrpgWorldMap {
             $('.team-player[data-player]', $playerSwitcher).bind('mouseleave', function(e){
                 //console.log('%c' + 'Player switcher mouseleave!', 'color: cyan;');
                 e.preventDefault();
+                if ($(this).is('.disabled')){ return false; }
+                if ($playerSwitcher.is('.disabled')){ return false; }
                 let $option = $(this);
                 $('.sprite.player > .sprite', $option).attr('data-frame', '00'); // base
                 });
@@ -1515,6 +1527,22 @@ class mmrpgWorldMap {
                         $('.button[data-page="next"]', $storageRobotsDiv).addClass('disabled');
                         }
                     };
+                // Define a function for disabling incompatible or distraction UI elements
+                let disableOtherElements = function(){
+                    //console.log('%c' + 'disableOtherElements() called!', 'color: magenta;');
+                    $homeButton.addClass('disabled');
+                    $backButton.addClass('disabled');
+                    $resetButton.addClass('disabled');
+                    $playerSwitcher.addClass('disabled');
+                    };
+                // Define a function for enabling the incompatible or distraction UI elements again
+                let enableOtherElements = function(){
+                    //console.log('%c' + 'enableOtherElements() called!', 'color: magenta;');
+                    $homeButton.removeClass('disabled');
+                    $backButton.removeClass('disabled');
+                    $resetButton.removeClass('disabled');
+                    $playerSwitcher.removeClass('disabled');
+                    };
                 // expand/collapse the robot storage tray by clicking the switch button
                 $switchButton.bind('click', function(e){
                     e.preventDefault();
@@ -1524,9 +1552,18 @@ class mmrpgWorldMap {
                     $robotsOverview.toggleClass('expanded');
                     $teamRobotsInOverview.removeClass('selected');
                     let isExpandedNow = $robotsOverview.is('.expanded');
-                    //_worldCursor.busy = isExpandedNow ? true : false; // set the cursor busy state
-                    _world.mapIsHidden = isExpandedNow ? true : false; // set the map hidden state
-                    if (!isExpandedNow){ return; } // if we're not expanded, then we're done here
+                    // if we're not expanded, run some cleanup then we're done
+                    if (!isExpandedNow){
+                        enableOtherElements();
+                        _world.mapIsHidden = false;
+                        $('.pages', $storageRobotsDiv).remove();
+                        $('.bullets', $storageRobotsDiv).remove();
+                        return;  // if we're not expanded, then we're done here
+                        }
+                    // otherwise if we're expanded we need to run some setup
+                    _world.mapIsHidden = true; // set the map hidden state
+                    // Disable the outside UI buttons to prevent bad-clicks and visual clutter
+                    disableOtherElements();
                     // Remake the storage bullets nad pages now
                     makeStorageBullets();
                     makeStoragePages();
@@ -1540,8 +1577,6 @@ class mmrpgWorldMap {
                         $sideButtons.removeClass('maybe');
                         $dismissButton.trigger('click');
                         }
-                    // Refresh the page buttons after opening the storage drawer just-in-case
-                    //makeStoragePages();
                     // Return true on success
                     return true;
                     });

@@ -905,6 +905,15 @@ html, body {
 #world #canvas .chrome-button:hover > a > i {
     transform: scale(1.2);
 }
+#world #canvas .chrome-button.disabled {
+    background-color: #191919;
+    color: #909090;
+    pointer-events: none;
+}
+#world #canvas .chrome-button.disabled > a {
+    filter: brightness(0.6);
+    pointer-events: none;
+}
 
 #world #canvas #back-button {
     top: 0;
@@ -1072,6 +1081,15 @@ html, body {
 #world #canvas #player-switcher .team-player:hover > .label {
     opacity: 1.0;
 }
+#world #canvas #player-switcher.disabled .team-player,
+#world #canvas #player-switcher .team-player.disabled {
+    pointer-events: none;
+}
+#world #canvas #player-switcher.disabled .team-player:not(.active),
+#world #canvas #player-switcher .team-player.disabled:not(.active) {
+    filter: brightness(0.3);
+}
+
 
 #world #canvas #robots-overview {
     display: block;
@@ -1097,17 +1115,21 @@ html, body {
     top: 10px;
     left: -452px;
     z-index: 1;
-    width: 580px;
+    width: 645px;
     height: 580px;
     background-color: rgba(0, 0, 0, 0.7);
     padding: 4px 16px;
-    border-top: 2px solid transparent;
+    border-top: 4px solid transparent;
     border-right: 4px solid transparent;
     border-radius: 0 6px 0 0;
     box-shadow: 0 0 3px rgba(98, 98, 98, 0.3);
     pointer-events: none;
     transform: skewX(10deg);
-    transition: top 0.6s, left 0.6s, transform 0.6s, background-color 0.3s, border-color 0.3s;
+    transition: top 0.9s, left 0.9s, transform 0.9s, background-color 0.3s, border-color 0.3s;
+}
+#world #canvas #robots-overview:hover:before {
+    border-color: #000000;
+    background-color: rgba(0, 0, 0, 0.8);
 }
 #world #canvas #robots-overview.expanded:before {
     top: 20px;
@@ -1269,11 +1291,11 @@ html, body {
     box-sizing: border-box;
     position: absolute;
     z-index: 10;
-    left: 220px;
+    left: 246px;
     top: 800px;
     height: calc(100% - 30px);
     max-height: 522px;
-    width: 286px;
+    width: 326px;
     background-color: rgba(0, 0, 0, 0.4);
     box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.6);
     padding: 24px 0 24px 54px;
@@ -1494,7 +1516,7 @@ display: block;
     height: auto;
     width: auto;
     min-height: 44px;
-    min-width: 40px;
+    min-width: 222px;
     text-align: center;
     color: #cfcfcf;
     font-size: 12px;
