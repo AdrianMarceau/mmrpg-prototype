@@ -357,24 +357,25 @@ class rpg_world {
         $map_autorows = count($map_data_layers[0]);
         $map_tiles_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
         $map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)(,[-_a-z0-9,]+)?\)$/i'; // syntax: name(x,y[,flag1,flag2,etc.]) ie. spawn(4,4) or spawn(4,4,other-area-2) => name:spawn, x:4, y:4
-        $map_listval_custval_regex = '/^([.a-z0-9-_]+)\(([,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
+        $map_listval_custval_regex = '/^([.a-z0-9-_]+)\(([.,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
         //$map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
         static $map_custval_parser;
         if (!$map_custval_parser){
-            $map_custval_parser = function($raw_tiles, $include_keys = false) use ($map_tiles_custval_regex, $map_other_custval_regex, $map_listval_custval_regex){
+            $map_custval_parser = function($custval_kind, $raw_tiles, $include_keys = false) use ($map_tiles_custval_regex, $map_other_custval_regex, $map_listval_custval_regex){
                 if (empty($raw_tiles)){ return array(); }
                 $parsed_keys = array();
                 $parsed_tiles = array();
                 foreach ($raw_tiles AS $line){
                     $line = trim(str_replace(' ', '', $line));
                     if (empty($line)){ continue; }
+                    //error_log('parsing custval line: '.$line);
                     $is_tile_custval = preg_match($map_tiles_custval_regex, $line);
                     $is_other_custval = preg_match($map_other_custval_regex, $line);
                     $is_listval_custval = preg_match($map_listval_custval_regex, $line);
                     if (!$is_tile_custval && !$is_other_custval && !$is_listval_custval){ continue; }
                     if ($is_tile_custval){
                         $exploded = explode('/', preg_replace($map_tiles_custval_regex, '$1/$2/$3/$4', $line), 4);
-                        //error_log('tile $exploded ='.print_r($exploded, true));
+                        //error_log($custval_kind.' tile $exploded ='.print_r($exploded, true));
                         list($name, $k, $x, $y) = $exploded;
                         $parsed_tiles[$name] = array($x, $y);
                         $parsed_keys[intval($k)] = $name;
@@ -382,7 +383,7 @@ class rpg_world {
                         }
                     if ($is_other_custval){
                         $exploded = explode('/', preg_replace($map_other_custval_regex, '$1/$2/$3/$4', $line), 4);
-                        //error_log('other $exploded ='.print_r($exploded, true));
+                        //error_log($custval_kind.' other $exploded ='.print_r($exploded, true));
                         list($name, $x, $y) = $exploded;
                         $parsed_tiles[$name] = array($x, $y);
                         if (!empty($exploded[3])){ $parsed_tiles[$name] = array_merge($parsed_tiles[$name], explode(',', trim($exploded[3], ','))); }
@@ -390,7 +391,7 @@ class rpg_world {
                         }
                     if ($is_listval_custval){
                         $exploded = explode('/', preg_replace($map_listval_custval_regex, '$1/$2', $line), 2);
-                        //error_log('list $exploded ='.print_r($exploded, true));
+                        //error_log($custval_kind.' list $exploded ='.print_r($exploded, true));
                         list($name, $tokens) = $exploded;
                         $tokens = explode(',', $tokens);
                         if (empty($tokens) || count($tokens) < 1){ continue; }
@@ -434,18 +435,18 @@ class rpg_world {
         if (!isset($map_data_vars['size'][2])){ $map_data_vars['size'][2] = $map_tilesize; }
         if (empty($map_data_vars['field'])){ $map_data_vars['field'] = 'field'; }
         if (!empty($map_data_vars['encounters'])){ $map_data_vars['encounters'] = explode(',', str_replace(' ', '', $map_data_vars['encounters'])); }
-        $map_data_vars['tiles'] = $map_custval_parser($map_data_vars['tiles'], true);
-        $map_data_vars['groups'] = $map_custval_parser($map_data_vars['groups']);
-        $map_data_vars['sprites'] = $map_custval_parser($map_data_vars['sprites']);
-        $map_data_vars['events'] = $map_custval_parser($map_data_vars['events']);
-        $map_data_vars['portals'] = $map_custval_parser($map_data_vars['portals']);
-        $map_data_vars['buttons'] = $map_custval_parser($map_data_vars['buttons']);
-        $map_data_vars['switches'] = $map_custval_parser($map_data_vars['switches']);
-        $map_data_vars['terrain'] = $map_custval_parser($map_data_vars['terrain']);
-        $map_data_vars['habitats'] = $map_custval_parser($map_data_vars['habitats']);
-        $map_data_vars['mechas'] = $map_custval_parser($map_data_vars['mechas']);
-        $map_data_vars['masters'] = $map_custval_parser($map_data_vars['masters']);
-        $map_data_vars['bosses'] = $map_custval_parser($map_data_vars['bosses']);
+        $map_data_vars['tiles'] = $map_custval_parser('tiles', $map_data_vars['tiles'], true);
+        $map_data_vars['groups'] = $map_custval_parser('groups', $map_data_vars['groups']);
+        $map_data_vars['sprites'] = $map_custval_parser('sprites', $map_data_vars['sprites']);
+        $map_data_vars['events'] = $map_custval_parser('events', $map_data_vars['events']);
+        $map_data_vars['portals'] = $map_custval_parser('portals', $map_data_vars['portals']);
+        $map_data_vars['buttons'] = $map_custval_parser('buttons', $map_data_vars['buttons']);
+        $map_data_vars['switches'] = $map_custval_parser('switches', $map_data_vars['switches']);
+        $map_data_vars['terrain'] = $map_custval_parser('terrain', $map_data_vars['terrain']);
+        $map_data_vars['habitats'] = $map_custval_parser('habitats', $map_data_vars['habitats']);
+        $map_data_vars['mechas'] = $map_custval_parser('mechas', $map_data_vars['mechas']);
+        $map_data_vars['masters'] = $map_custval_parser('masters', $map_data_vars['masters']);
+        $map_data_vars['bosses'] = $map_custval_parser('bosses', $map_data_vars['bosses']);
         // Add collected data to the parsed map data
         $map_data_parsed = array();
         $map_data_parsed['world'] = $map_data_vars['world']; unset($map_data_vars['world']);
@@ -554,6 +555,40 @@ class rpg_world {
                 //error_log('$map_sprite_sheet (parsed) = '.print_r($map_sprite_sheet, true));
                 //error_log('$map_data_parsed (merged) = '.print_r($map_data_parsed, true));
                 //exit();
+            }
+        }
+        // Let's pre-parsed the groups array in case any shorthand was used so we don't have to do it later
+        if (!empty($map_data_parsed['groups'])){
+            foreach ($map_data_parsed['groups'] AS $group_key => $group_tiles){
+                if (empty($group_tiles)){ continue; }
+                //error_log('-> $group_key = '.print_r($group_key, true));
+                //error_log('-> $group_tiles = '.print_r($group_tiles, true));
+                foreach ($group_tiles AS $tile_key => $tile_string){
+                    //error_log('--> $tile_key = '.print_r($tile_key, true));
+                    //error_log('--> $tile_string = '.print_r($tile_string, true));
+                    // If this value is using range syntax, parse it into a range
+                    if (preg_match('/^([0-9]{1,}-[0-9]{1,})\.\.\.([0-9]{1,}-[0-9]{1,})$/', $tile_string, $matches)){
+                        //error_log('---> parsing range syntax for tile string "'.$tile_string.'"');
+                        //error_log('---> $matches = '. print_r($matches, true));
+                        $range_start = intval($matches[1]); // will be in format x-y
+                        list($range_start_x, $range_start_y) = explode('-', $matches[1]);
+                        $range_end = intval($matches[2]); // will also be in format x-y
+                        list($range_end_x, $range_end_y) = explode('-', $matches[2]);
+                        $range_tiles = array();
+                        for ($x = $range_start_x; $x <= $range_end_x; $x++){
+                            for ($y = $range_start_y; $y <= $range_end_y; $y++){
+                                $range_tiles[] = $x.'-'.$y; // add the tile to the range
+                            }
+                        }
+                        //error_log('---> $range_tiles = '. print_r($range_tiles, true));
+                        // Now we can replace the tile string with the range tiles
+                        $group_tiles[$tile_key] = '';
+                        $group_tiles = array_merge($group_tiles, $range_tiles); // merge the range tiles into the group tiles
+                    }
+                }
+                $group_tiles = array_values(array_filter($group_tiles));
+                //error_log('---> '.$group_key.' $group_tiles = '. print_r($group_tiles, true));
+                $map_data_parsed['groups'][$group_key] = $group_tiles; // update the group tiles
             }
         }
         // Given we have all the information we need, let's actually parse the map layers into useable data now
@@ -778,6 +813,7 @@ class rpg_world {
                     if (!isset($map_data['groups'][$pos])){ continue; }
                     elseif (empty($map_data['groups'][$pos])){ continue; }
                     //error_log('-> ... no-encounters position "'.$pos.'" IS a group w/ '.count($map_data['groups'][$pos]).' items!');
+                    //error_log('-> $map_data[groups]['.$pos.'] = '.print_r($map_data['groups'][$pos], true));
                     $no_encounters_groups = array_merge($no_encounters_groups, $map_data['groups'][$pos]);
                     unset($no_encounters[$key]);
                 }
