@@ -2274,6 +2274,7 @@ class mmrpgWorldMap {
         let newPosition = cursorPosition.split('-');
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
+        let stillAtPosition = function(){ return (_worldCursor.position === cursorPosition) ? true : false; };
 
         // Before we do anything else, check to see if this player has any active robots
         //console.log('_worldPlayerRobots = ', _worldPlayerRobots);
@@ -2324,9 +2325,11 @@ class mmrpgWorldMap {
             }
         //console.log('-> found ' + eventsAtPosition.length + ' events at position');
 
-        // Sort the events at this position by priority with portals > battles > everything-else
+        // Sort the events at this position by priority with sanctuaries > portals > battles > everything-else
         eventsAtPosition = eventsAtPosition.sort(function(a, b){
-            if (a.kind === 'portal' && b.kind !== 'portal'){ return -1; } // a is portal, b is not
+            if (a.kind2 === 'sanctuary' && b.kind2 !== 'sanctuary'){ return -1; } // a is sanctuary, b is not
+            else if (a.kind2 !== 'sanctuary' && b.kind2 === 'sanctuary'){ return 1; } // a is not sanctuary, but b is
+            else if (a.kind === 'portal' && b.kind !== 'portal'){ return -1; } // a is portal, b is not
             else if (a.kind !== 'portal' && b.kind === 'portal'){ return 1; } // a is not portal, but b is
             else if (a.kind === 'battle' && b.kind !== 'battle'){ return -1; } // a is battle, b is not
             else if (a.kind !== 'battle' && b.kind === 'battle'){ return 1; } // a is not battle, but b is
@@ -2370,7 +2373,8 @@ class mmrpgWorldMap {
         let dropdownMarkup = '';
         let dropdownButtons = '';
         let readyTeamSprites = false;
-        if (firstEventType === 'custom'){
+        if (firstEventType === 'event'
+            || firstEventType === 'custom'){
             //console.log('-> event at position is custom, checking what comes next...');
             // If the cursor is literally on a event, only one event sprite matters right now
             let $customEvent = $(firstEvent.sprite);
@@ -2389,7 +2393,9 @@ class mmrpgWorldMap {
                         //console.log('-> eventAction is "', eventAction, '" so defer it to triggerEffectFunction()');
                         triggerEffect = true;
                         readyTeamSprites = true;
+                        zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
                         triggerEffectFunction = function(){
+                            if (!stillAtPosition()){ return false; }
                             //console.log('-> running triggerEffectFunction for eventAction "' + eventAction + '" with eventData:', eventData);
                             _self.triggerWorldEvent(eventAction, eventData, $customEvent);
                             };
@@ -2569,7 +2575,7 @@ class mmrpgWorldMap {
         // Define an inline function to put the team into their battle-ready poses
         let getTeamSpritesReady = function(){
             if (_self.worldIsBusy()){ return; }
-            if (_worldCursor.position !== cursorPosition){ return; }
+            if (!stillAtPosition()){ return; }
 
             // Add the shake class to the cursor so it hides behind the player
             $worldCursor.addClass('shake');
@@ -2620,7 +2626,7 @@ class mmrpgWorldMap {
         let redirectToLocation = function(){
             //console.log('%c' + 'redirectToLocation()', 'color: cyan;');
             if (_self.worldIsBusy()){ return; }
-            if (_worldCursor.position !== cursorPosition){ return; }
+            if (!stillAtPosition()){ return; }
             $thisWorld.addClass('hidden');
             if (autoRedirectSound){
                 _self.playSoundEffect(autoRedirectSound);
@@ -2629,7 +2635,7 @@ class mmrpgWorldMap {
                 _self.incZoomLevel();
                 _self.saveWorldState(function(){
                     if (_self.worldIsBusy()){ return; }
-                    if (_worldCursor.position !== cursorPosition){ return; }
+                    if (!stillAtPosition()){ return; }
                     else { _self.resetZoomLevel(); }
                     _self.incZoomLevel();
                     window.location.href = autoRedirectURL;
@@ -2643,7 +2649,7 @@ class mmrpgWorldMap {
         let zoomAndShowDropdown = function(){
             //console.log('%c' + 'zoomAndShowDropdown()', 'color: cyan;');
             if (_self.worldIsBusy()){ return; }
-            if (_worldCursor.position !== cursorPosition){ return; }
+            if (!stillAtPosition()){ return; }
 
             // Elevate the event sprite(s) to the zoom layer and add a zoom class to it so it's more visible
             let cursorPositionXY = cursorPosition.split('-');
@@ -3001,31 +3007,43 @@ class mmrpgWorldMap {
             //console.log('checking for ' + eventKind+'s at: ' + positionsToCheck.join(', '));
             // ie: mapKindSymbols
             let symbolsKey = 'map' + (eventKind[0].toUpperCase() + eventKind.slice(1)) + 'Symbols';
+            let indexKey = 'map' + (eventKind[0].toUpperCase() + eventKind.slice(1)) + 'sIndex';
             let eventSymbols = _config.hasOwnProperty(symbolsKey) ? _config[symbolsKey] : false;
-            let eventSymbolKeys = eventSymbols ? Object.keys(eventSymbols) : [];
+            let eventsIndex = _config.hasOwnProperty(indexKey) ? _config[indexKey] : false;
+            let eventKeys = eventSymbols ? Object.keys(eventSymbols) : [];
             //console.log('-> symbolsKey =', symbolsKey);
+            //console.log('-> indexKey =', indexKey);
             //console.log('-> eventSymbols =', eventSymbols);
-            //console.log('-> eventSymbolKeys =', eventSymbolKeys);
+            //console.log('-> eventsIndex =', eventsIndex);
+            //console.log('-> eventKeys =', eventKeys);
             //console.log('-> ' + symbolsKey + ' =', eventSymbols);
-            //console.log('-> ' + symbolsKey + ' =', eventSymbolKeys);
-            if (!eventSymbolKeys.length){ continue; }
+            //console.log('-> ' + symbolsKey + ' =', eventKeys);
+            if (!eventKeys.length){ continue; }
             for (let i = 0; i < positionsToCheck.length; i++){
                 let eventPosition = positionsToCheck[i];
                 let eventPositionXY = eventPosition.split('-');
                 //console.log('-> checking ' + symbolsKey + ' for ' + eventPosition);
                 if (!eventSymbols[eventPosition]){ continue; } // skip if no event symbols at this position
                 let eventToken = eventSymbols[eventPosition];
+                let eventInfo = eventsIndex[eventToken];
                 let $eventSprite = $('.sprite[data-' + eventKind + '="'+eventToken+'"]', $canvasMap);
                 let eventLabel = $eventSprite.length ? $eventSprite.attr('data-label') : '';
                 if ($eventSprite && $eventSprite.length){ $eventSprite = $eventSprite.first().get(0); }
                 let eventKind2 = eventKind === 'event' ? 'custom' : eventKind;
-                let eventAtPosition = {kind: eventKind2, position: eventPosition, token: eventToken, sprite: $eventSprite, label: eventLabel};
-                //console.log('%c' + '--> found valid '+ eventKind + ' event at position ' + eventPosition, 'color: lime;');
+                if (eventKind2 === 'custom'
+                    && (eventInfo.sprite === 'healpad' || eventInfo.sprite === 'resetpad')){
+                    eventKind2 = 'sanctuary'; // treat healpads and resetpads as sanctuary events
+                    }
+                let eventAtPosition = {kind: eventKind, kind2: eventKind2, position: eventPosition, token: eventToken, sprite: $eventSprite, label: eventLabel};
+                //console.log('%c' + '--> found valid '+ eventKind + '/'+ eventKind2 + ' at position ' + eventPosition, 'color: lime;');
                 //console.log('----> eventToken =', eventToken);
+                //console.log('----> eventInfo =', eventInfo);
                 //console.log('----> eventAtPosition =', eventAtPosition);
                 // skip portals unless it's the exact position
                 let eventIsCustom = eventKind === 'event';
                 let eventIsPortal = eventKind === 'portal';
+                //let eventIsSanctuary = eventKind === 'event' && (eventInfo.sprite === 'healpad' || eventInfo.sprite === 'resetpad');
+                //console.log('-> eventIsCustom =', eventIsCustom, '| eventIsPortal =', eventIsPortal, '| eventIsSanctuary =', eventIsSanctuary);
                 if (eventIsCustom && eventPosition !== searchPosition){ continue; } // skip custom unless it's the exact position
                 if (eventIsPortal && eventPosition !== searchPosition){ continue; } // skip portals unless it's the exact position
                 // otherwise we are fine to add to the events array
@@ -3323,24 +3341,48 @@ class mmrpgWorldMap {
             if (eventAction === 'trigger-effects'){
                 //console.log('-> triggering effects for event with data:', eventData);
                 _self.playSoundEffect('use-recovery-item');
+                let _playerRobots = _config.playerRobots || [];
                 let eventEffects = Object.values(eventData);
                 for (let i = 0; i < eventEffects.length; i++){
                     let effect = eventEffects[i];
                     //console.log('-> effect =', effect);
                     if (!effect){ continue; }
-                    // If this is a RESTORE TEAM ENERGY effect, let's process that now
-                    else if (effect === 'restore-team-energy'){
-                        //console.log('%c' + '-> restoring team energy via event panel', 'color: lime;');
-                        let _playerRobots = _config.playerRobots || [];
-                        for (let j = 0; j < _playerRobots.length; j++){ _self.restoreRobotEnergy(_playerRobots[j], true); }
-                        //_self.playSoundEffect('recovery-energy');
-                        }
-                    // If this is a RESTORE TEAM WEAPONS effect, let's process that now
-                    else if (effect === 'restore-team-weapons'){
-                        //console.log('%c' + '-> restoring team weapons for event panel', 'color: cyan;');
-                        let _playerRobots = _config.playerRobots || [];
-                        for (let j = 0; j < _playerRobots.length; j++){ _self.restoreRobotWeapons(_playerRobots[j], true); }
-                        //_self.playSoundEffect('recovery-weapons');
+                    // If this is a team-wide effect, we're going to have to loop
+                    if (effect.indexOf('-team-') !== -1){
+                        //console.log('%c' + '-> team-effect via event panel: ' + effect, 'color: lime;');
+                        for (let j = 0; j < _playerRobots.length; j++){
+                            let robot = _playerRobots[j];
+                            // If this is a RESTORE TEAM ENERGY effect, let's process that now
+                            if (effect === 'restore-team-energy'){
+                                //console.log('%c' + '-> restoring energy for ' + robot + ' via event panel', 'color: #64a455;');
+                                _self.restoreRobotEnergy(robot, true);
+                                _self.playSoundEffect('recovery-energy');
+                                }
+                            // If this is a RESTORE TEAM WEAPONS effect, let's process that now
+                            if (effect === 'restore-team-weapons'){
+                                //console.log('%c' + '-> restoring weapons for ' + robot + ' via event panel', 'color: #3d7cbe;');
+                                _self.restoreRobotWeapons(robot, true);
+                                _self.playSoundEffect('recovery-weapons');
+                                }
+                            // If this is a RESET TEAM ATTACK effect, let's process that now
+                            if (effect === 'reset-team-attack'){
+                                //console.log('%c' + '-> resetting attack for ' + robot + ' via event panel', 'color: #8b5050;');
+                                _self.resetRobotAttack(robot, false);
+                                _self.playSoundEffect('small-buff-received');
+                                }
+                            // If this is a RESET TEAM DEFENSE effect, let's process that now
+                            if (effect === 'reset-team-defense'){
+                                //console.log('%c' + '-> resetting ' + robot + ' defense for event panel', 'color: #50638a;');
+                                _self.resetRobotDefense(robot, false);
+                                _self.playSoundEffect('small-buff-received');
+                                }
+                            // If this is a RESET TEAM SPEED effect, let's process that now
+                            if (effect === 'reset-team-speed'){
+                                //console.log('%c' + '-> resetting ' + robot + ' speed for event panel', 'color: #8b739b;');
+                                _self.resetRobotSpeed(robot, false);
+                                _self.playSoundEffect('small-buff-received');
+                                }
+                            }
                         }
                     }
                 }
@@ -3459,13 +3501,14 @@ class mmrpgWorldMap {
         $('> i', $robotEnergyGuage).css({width: robotInfo.energyPercent + '%'}).removeClass().addClass(robotInfo.energyRating);
         // Add a restored class to this robot to show it being effected by the action
         if (playSound){ _self.playSoundEffect('recovery-energy'); }
-        $robotOverview.addClass('energy-restored');
+        $robotOverview.addClass('energy-restored life-energy-restored');
+        setTimeout(function(){ $robotOverview.removeClass('life-energy-restored'); }, 2000);
         setTimeout(function(){ $robotOverview.removeClass('energy-restored'); }, 3000);
         // Trigger a save of the world state to persist this change
-        //_self.saveWorldState(); // not yet
+        _self.saveWorldState();
         // Return true on success
         return true;
-    }
+        }
 
     // Quick function for restoring a robot's weapons (if available) by a specific amount (or all if === true)
     restoreRobotWeapons(robotString, restoreAmount, playSound){
@@ -3522,12 +3565,87 @@ class mmrpgWorldMap {
         $('> i', $robotWeaponsGuage).css({width: robotInfo.weaponsPercent + '%'}).removeClass().addClass(robotInfo.weaponsRating);
         // Add a restored class to this robot to show it being effected by the action
         if (playSound){ _self.playSoundEffect('recovery-weapons'); }
-        $robotOverview.addClass('weapons-restored');
-        setTimeout(function(){ $robotOverview.removeClass('weapons-restored'); }, 3000);
+        $robotOverview.addClass('energy-restored weapon-energy-restored');
+        setTimeout(function(){ $robotOverview.removeClass('weapon-energy-restored'); }, 2000);
+        setTimeout(function(){ $robotOverview.removeClass('energy-restored'); }, 3000);
         // Trigger a save of the world state to persist this change
-        //_self.saveWorldState(); // not yet
+        _self.saveWorldState();
         // Return true on success
         return true;
-    }
+        }
+
+    // Quick function for resetting a robot's stat mods for a given stat back to zero
+    resetRobotStat(robotString, statToken, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.resetRobotStat(robot:' + robotString + ', stat:' + statToken + ', sound:' + playSound + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('resetRobotStat() missing required robotString!'); return false; }
+        if (!statToken || typeof statToken !== 'string' || !statToken.length){ console.error('resetRobotStat() missing required statToken!'); return false; }
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        // Break the robot sprite into ID and token and collect its info
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('resetRobotStat() could not find robot info for robot ' + robotString + '!'); return false; }
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // If this robot does not have any relevant mods to reset, return now
+        let statModKey = statToken + 'Mods';
+        let statModKeys = ['attackMods', 'defenseMods', 'speedMods'];
+        if (statModKeys.indexOf(statModKey) === -1){ return false; }
+        else if (!robotInfo[statModKey]){ return true; }
+        let robotHasMods = function(){ return (parseInt(robotInfo[statModKeys[0]]) + parseInt(robotInfo[statModKeys[1]]) + parseInt(robotInfo[statModKeys[2]])) > 0 ? true : false; };
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // Collect a reference to this robot's element in the overview panel
+        let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', _elements.robotsOverview);
+        if (!$robotOverview || !$robotOverview.length){ console.warn('resetRobotStat() could not find overview for robot ' + robotString + '!'); return false; }
+        let $robotIconSprite = $('.icon > .sprite', $robotOverview);
+        if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('resetRobotStat() could not find icon sprite for robot ' + robotString + '!'); return false; }
+        let $robotStatMods = $('.statmods', $robotOverview);
+        if (!$robotStatMods || !$robotStatMods.length){ console.warn('resetRobotStat() could not find statmods for robot ' + robotString + '!'); return false; }
+        let $statModArrows = $('.mod.'+statToken, $robotStatMods);
+        if (!$statModArrows || !$statModArrows.length){ console.warn('resetRobotStat() could not find mod.'+statToken+' for robot ' + robotString + '!'); return false; }
+        // Update the robot info with the new stat-mod value
+        let hadModsThen = robotHasMods();
+        robotInfo[statModKey] = 0;
+        _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
+        // Update the overview with any changes to the status
+        setTimeout(function(){
+            if (playSound){ _self.playSoundEffect('recovery-stats'); }
+            $statModArrows.remove();
+            let hasModsNow = robotHasMods();
+            if (hasModsNow){ $robotOverview.addClass('hasmods'); }
+            else { $robotOverview.removeClass('hasmods'); $robotStatMods.remove(); }
+            }, 1000); // minor delay to sync with animation
+        // Add a reset class to this robot to show it being effected by the action
+        $robotOverview.addClass('stat-reset ' + statToken + '-stat-reset');
+        setTimeout(function(){ $robotOverview.removeClass(statToken + '-stat-reset'); }, 2000);
+        setTimeout(function(){ $robotOverview.removeClass('stat-reset'); }, 3000);
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState();
+        // Return true on success
+        return true;
+        }
+    // Define some quick alias functions for the above (attack, defense, and speed varieties)
+    resetRobotAttack(robotString, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.resetRobotAttack(robot:' + robotString + ', sound:' + playSound + ')', 'color: magenta;');
+        let _self = this; return _self.resetRobotStat(robotString, 'attack', playSound);
+        }
+    resetRobotDefense(robotString, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.resetRobotDefense(robot:' + robotString + ', sound:' + playSound + ')', 'color: magenta;');
+        let _self = this; return _self.resetRobotStat(robotString, 'defense', playSound);
+        }
+    resetRobotSpeed(robotString, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.resetRobotSpeed(robot:' + robotString + ', sound:' + playSound + ')', 'color: magenta;');
+        let _self = this; return _self.resetRobotStat(robotString, 'speed', playSound);
+        }
 
 }

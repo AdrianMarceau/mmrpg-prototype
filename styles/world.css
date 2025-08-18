@@ -1897,6 +1897,27 @@ display: block;
     animation: robots-overview-energy-restored 2s ease-in-out forwards;
 }
 
+@keyframes robots-overview-stat-reset {
+    0%, 100% { transform: translateY(0); filter: brightness(1.0); }
+    40% { transform: translateY(0); filter: brightness(1.5) saturate(1.2); }
+
+    41% { transform: translateY(-3px); filter: brightness(1.5) saturate(1.2); }
+    42% { transform: translateY(3px); filter: brightness(1.5) saturate(1.2); }
+    44% { transform: translateY(-6px); filter: brightness(1.5) saturate(1.2); }
+    46% { transform: translateY(6px); filter: brightness(1.5) saturate(1.2); }
+    48% { transform: translateY(-4px); filter: brightness(1.5) saturate(1.2); }
+    50% { transform: translateY(4px); filter: brightness(1.5) saturate(1.2); }
+    51% { transform: translateY(-3px); filter: brightness(1.5) saturate(1.2); }
+    52% { transform: translateY(3px); filter: brightness(1.5) saturate(1.2); }
+    53% { transform: translateY(0); filter: brightness(1.5) saturate(1.2); }
+}
+#world #canvas #robots-overview .team-robot.stat-reset {
+    transform-origin: center;
+    transform: translateY(0);
+    filter: brightness(1.0);
+    animation: robots-overview-stat-reset 2s linear forwards;
+}
+
 #world #canvas #robots-overview .team-robot:nth-child(1) { z-index: 10; }
 #world #canvas #robots-overview .team-robot:nth-child(2) { z-index: 9; }
 #world #canvas #robots-overview .team-robot:nth-child(3) { z-index: 8; }
