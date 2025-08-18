@@ -32,12 +32,18 @@
 #---------------------------#
 @buttons[]   = subspace-button(6-22, purple, up, set-group-terrain, subspace-path, subspace)
 #---------------------------#
-@events[]   = auto-heal(6-3, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
+@events[]    = auto-heal(4-6, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
+@events[]    = auto-reset(8-6, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
 #---------------------------#
 @groups[]    = subspace-path(6-12, 6-13, 6-14, 6-15)
 @groups[]    = subspace-path-ends(6-11, 6-16)
 @groups[]    = under-subspace-button(5-22, 5-23, 6-23, 7-23, 7-22)
 @groups[]    = no-encounters(under-subspace-button, subspace-path, subspace-path-ends)
+#---------------------------#
+@items[]     = first-player-program(6-18, light-program, x1, once)
+@items[]     = first-robot-core(6-18, copy-core, x1, once)
+@items[]     = intro-gift-one(4-10, energy-tank, x1, daily)
+@items[]     = intro-gift-one(4-10, weapon-tank, x1, daily)
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
