@@ -1236,6 +1236,10 @@ class rpg_world {
             };
         //$current_robot_tokens_reversed = array_reverse($current_robot_tokens);
         $return_markup .= '<a class="team-rotate" title="Rotate Team"><i class="fa fas fa-sync"></i></a>';
+        $return_markup .= '<div class="limit-hearts" title="x'.$limit_hearts.' Limit Hearts">';
+            $return_markup .= '<i class="player '.$current_player_token.'"></i>';
+            $return_markup .= str_repeat('<i class="heart fa fas fa-heart"></i>', $limit_hearts);
+        $return_markup .= '</div>';
         if ($num_robot_unlocked > $current_team_size){
             $return_markup .= '<a class="team-switch" title="Switch-Out Robots"><i class="fa fas fa-robot"></i></a>';
             $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>';
@@ -1243,10 +1247,6 @@ class rpg_world {
             $return_markup .= '<span class="team-switch"><i class="fa fas fa-robot"></i></span>';
             $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' robots</strong></div>';
             }
-        $return_markup .= '<div class="limit-hearts" title="x'.$limit_hearts.' Limit Hearts">';
-            $return_markup .= '<i class="player '.$current_player_token.'"></i>';
-            $return_markup .= str_repeat('<i class="heart fa fas fa-heart"></i>', $limit_hearts);
-        $return_markup .= '</div>';
         $return_markup .= '<div class="team-robots">';
             foreach ($current_robot_tokens AS $robot_key => $robot_token){
                 if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }

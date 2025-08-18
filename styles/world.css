@@ -1215,8 +1215,8 @@ html, body {
     color: #4a4a4a;
 }
 #world #canvas #robots-overview .team-switch {
-    bottom: 32px;
-    left: 10px;
+    bottom: 12px;
+    left: 38px;
     font-size: 18px;
     transition: transform 0.3s;
 }
@@ -1260,15 +1260,15 @@ html, body {
     color: #e0e0e0;
     font-size: 11px;
     line-height: 1;
-    bottom: 34px;
-    left: 38px;
+    bottom: 14px;
+    left: 64px;
     pointer-events: none;
     text-shadow: 1px 1px 0 #000000;
     transition: left 0.3s, font-size 0.3s;
 }
 #world #canvas #robots-overview.expanded .team-size,
 #world #canvas #robots-overview .team-switch:hover + .team-size {
-    left: 42px;
+    left: 70px;
 }
 #world #canvas #robots-overview .limit-hearts {
     display: block;
@@ -1278,27 +1278,45 @@ html, body {
     font-size: 15px;
     line-height: 1;
     letter-spacing: 1px;
-    bottom: 6px;
+    bottom: 38px;
     left: 10px;
+    padding-left: 30px;
     text-shadow: 1px 1px 0 #000000;
+    transition: bottom 0.6s, padding-left 0.6s;
+}
+#world #canvas #robots-overview.expanded .limit-hearts {
+
 }
 #world #canvas #robots-overview .limit-hearts > i {
+    position: relative;
     display: inline-block;
     vertical-align: middle;
     pointer-events: none;
     min-width: 1em;
+    z-index: 1;
 }
 #world #canvas #robots-overview .limit-hearts > .heart {
 
 }
 #world #canvas #robots-overview .limit-hearts > .player {
+    position: absolute;
+    top: 0;
+    left: 6px;
+    z-index: 2;
     width: 18px;
     height: 19px;
+    margin: 0;
     background-image: none;
     background-repeat: no-repeat;
     background-position: center center;
     background-color: transparent;
-    margin-right: 3px;
+    transform-origin: center;
+    transform: scale(2);
+    image-rendering: pixelated;
+    transition: transform 0.6s;
+}
+#world #canvas #robots-overview.expanded .limit-hearts > .player {
+    transform: scale(1);
 }
 #world #canvas #robots-overview .limit-hearts > .player.dr-light { background-image: url("../images/players/dr-light/chapter-sprite.gif"); }
 #world #canvas #robots-overview .limit-hearts > .player.dr-wily { background-image: url("../images/players/dr-wily/chapter-sprite.gif"); }
@@ -1916,6 +1934,40 @@ display: block;
     transform: translateY(0);
     filter: brightness(1.0);
     animation: robots-overview-stat-reset 2s linear forwards;
+}
+
+@keyframes robots-overview-stat-boosted {
+    0%, 100% { transform: translateY(0); filter: brightness(1.0); }
+    40% { transform: translateY(0); filter: brightness(1.5) saturate(1.2); }
+
+    41% { transform: translateY(-3px); filter: brightness(1.5) saturate(1.2); }
+    42% { transform: translateY(3px); filter: brightness(1.5) saturate(1.2); }
+    44% { transform: translateY(-6px); filter: brightness(1.5) saturate(1.2); }
+    46% { transform: translateY(6px); filter: brightness(1.5) saturate(1.2); }
+    48% { transform: translateY(-4px); filter: brightness(1.5) saturate(1.2); }
+    50% { transform: translateY(4px); filter: brightness(1.5) saturate(1.2); }
+}
+#world #canvas #robots-overview .team-robot.stat-boosted {
+    transform-origin: center;
+    transform: translateY(0);
+    filter: brightness(1.0);
+    animation: robots-overview-stat-boosted 2s linear forwards;
+}
+
+@keyframes robots-overview-stat-breaked {
+    0%, 100% { transform: translateY(0); filter: brightness(1.0); }
+    40% { transform: translateY(0); filter: brightness(1.5) saturate(1.2); }
+
+    41% { transform: translateY(-3px); filter: brightness(1.5) saturate(1.2); }
+    42% { transform: translateY(3px); filter: brightness(1.5) saturate(1.2); }
+    44% { transform: translateY(-6px); filter: brightness(1.5) saturate(1.2); }
+    46% { transform: translateY(6px); filter: brightness(1.5) saturate(1.2); }
+}
+#world #canvas #robots-overview .team-robot.stat-breaked {
+    transform-origin: center;
+    transform: translateY(0);
+    filter: brightness(1.0);
+    animation: robots-overview-stat-breaked 2s linear forwards;
 }
 
 #world #canvas #robots-overview .team-robot:nth-child(1) { z-index: 10; }

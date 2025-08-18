@@ -2148,7 +2148,7 @@ class mmrpgWorldMap {
         else if (userZoomLevel > 2){ userZoomLevel = 2; }
         return _self.updateZoomLevel(userZoomLevel, updateUserZoom);
         }
-    incZoomLevel(incAmount, updateUserZoom){ return this.modZoomLevel((incAmount || 0.25), updateUserZoom); }
+    incZoomLevel(boostAmount, updateUserZoom){ return this.modZoomLevel((boostAmount || 0.25), updateUserZoom); }
     decZoomLevel(decAmount, updateUserZoom){ return this.modZoomLevel(-(decAmount || 0.25), updateUserZoom); }
 
     // Quick function for resetting the map's zoom level to the user's current setting
@@ -3599,7 +3599,8 @@ class mmrpgWorldMap {
         let statModKey = statToken + 'Mods';
         let statModKeys = ['attackMods', 'defenseMods', 'speedMods'];
         if (statModKeys.indexOf(statModKey) === -1){ return false; }
-        else if (!robotInfo[statModKey]){ return true; }
+        if (!robotInfo[statModKey]){ return true; }
+        //console.log('-> looks like we can reset');
         let robotHasMods = function(){ return (parseInt(robotInfo[statModKeys[0]]) + parseInt(robotInfo[statModKeys[1]]) + parseInt(robotInfo[statModKeys[2]])) > 0 ? true : false; };
         //console.log('-> robotId =', robotId);
         //console.log('-> robotToken =', robotToken);
@@ -3611,8 +3612,8 @@ class mmrpgWorldMap {
         if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('resetRobotStat() could not find icon sprite for robot ' + robotString + '!'); return false; }
         let $robotStatMods = $('.statmods', $robotOverview);
         if (!$robotStatMods || !$robotStatMods.length){ console.warn('resetRobotStat() could not find statmods for robot ' + robotString + '!'); return false; }
-        let $statModArrows = $('.mod.'+statToken, $robotStatMods);
-        if (!$statModArrows || !$statModArrows.length){ console.warn('resetRobotStat() could not find mod.'+statToken+' for robot ' + robotString + '!'); return false; }
+        let $robotStatModDiv = $('.mod.'+statToken, $robotStatMods);
+        if (!$robotStatModDiv || !$robotStatModDiv.length){ console.warn('resetRobotStat() could not find mod.'+statToken+' for robot ' + robotString + '!'); return false; }
         // Update the robot info with the new stat-mod value
         let hadModsThen = robotHasMods();
         robotInfo[statModKey] = 0;
@@ -3620,7 +3621,7 @@ class mmrpgWorldMap {
         // Update the overview with any changes to the status
         setTimeout(function(){
             if (playSound){ _self.playSoundEffect('recovery-stats'); }
-            $statModArrows.remove();
+            $robotStatModDiv.remove();
             let hasModsNow = robotHasMods();
             if (hasModsNow){ $robotOverview.addClass('hasmods'); }
             else { $robotOverview.removeClass('hasmods'); $robotStatMods.remove(); }
@@ -3646,6 +3647,207 @@ class mmrpgWorldMap {
     resetRobotSpeed(robotString, playSound){
         //console.log('%c' + 'mmrpgWorldMap.resetRobotSpeed(robot:' + robotString + ', sound:' + playSound + ')', 'color: magenta;');
         let _self = this; return _self.resetRobotStat(robotString, 'speed', playSound);
+        }
+
+    // Quick function for boosting (incrementing) a given robots stat by a specific amount (up to max of +5)
+    boostRobotStat(robotString, statToken, boostAmount, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.boostRobotStat(robot:' + robotString + ', stat:' + statToken + ', amount:' + boostAmount + ', sound:' + playSound + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('boostRobotStat() missing required robotString!'); return false; }
+        if (!statToken || typeof statToken !== 'string' || !statToken.length){ console.error('boostRobotStat() missing required statToken!'); return false; }
+        if (typeof boostAmount !== 'number' || isNaN(boostAmount) || boostAmount < 1){ console.error('boostRobotStat() missing or invalid boostAmount!'); return false; }
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        // Break the robot sprite into ID and token and collect its info
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('boostRobotStat() could not find robot info for robot ' + robotString + '!'); return false; }
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // If this robot is already at the max value for stat mods, return now
+        let statDir = 'up';
+        let statName = statToken[0].toUpperCase() + statToken.slice(1);
+        let statBoostAmount = Math.abs(boostAmount);
+        let statModMax = 5;
+        let statModKey = statToken + 'Mods';
+        let statModKeys = ['attackMods', 'defenseMods', 'speedMods'];
+        //console.log('-> statModKey =', statModKey);
+        //console.log('-> robotInfo[statModKey] =', robotInfo[statModKey]);
+        if (statModKeys.indexOf(statModKey) === -1){ return false; }
+        if (robotInfo[statModKey] && robotInfo[statModKey] >= statModMax){ return true; }
+        //console.log('-> looks like we can boost ' + statToken + ' for ' + robotToken + '!');
+        let robotHasMods = function(){ return (parseInt(robotInfo[statModKeys[0]]) + parseInt(robotInfo[statModKeys[1]]) + parseInt(robotInfo[statModKeys[2]])) !== 0 ? true : false; };
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // Collect a reference to this robot's element in the overview panel
+        let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', _elements.robotsOverview);
+        if (!$robotOverview || !$robotOverview.length){ console.warn('boostRobotStat() could not find overview for robot ' + robotString + '!'); return false; }
+        let $robotIconSprite = $('.icon > .sprite', $robotOverview);
+        if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('boostRobotStat() could not find icon sprite for robot ' + robotString + '!'); return false; }
+        let $robotStatMods = $('.statmods', $robotOverview);
+        let $robotStatModDiv = $('.mod.'+statToken, $robotStatMods);
+        // Update the robot info with the new stat-mod value
+        let hadModsThen = robotHasMods();
+        let newStatModValue = (robotInfo[statModKey] || 0) + statBoostAmount;
+        if (newStatModValue > statModMax){ newStatModValue = statModMax; } // cap at max value
+        robotInfo[statModKey] = newStatModValue;
+        _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
+        // Create the statmods container if it does not already exist then append to container
+        if (!$robotStatMods || !$robotStatMods.length){
+            // create the statmods container if it doesn't exist
+            $robotOverview.append('<div class="statmods"></div>');
+            $robotStatMods = $('.statmods', $robotOverview);
+            }
+        // Update the arrows for this stat mod or create them if they do not already exist
+        let arrowMarkup = '';
+        let arrowCount = Math.abs(newStatModValue);
+        let arrowDir = newStatModValue > 0 ? 'up' : 'down';
+        for (let i = 0; i < arrowCount; i++){ arrowMarkup += '<i class="fa fas fa-caret-' + arrowDir + '"></i>'; }
+        if (!$robotStatModDiv || !$robotStatModDiv.length){
+            $robotStatMods.append('<div class="mod color ' + statToken + ' ' + arrowDir + '" title="' + statName + ' Mods"></div>');
+            $robotStatModDiv = $('.mod.'+statToken, $robotStatMods);
+            }
+        // Update the overview with any changes to the status and the arrows we just created
+        setTimeout(function(){
+            if (playSound){ _self.playSoundEffect('recovery-stats'); }
+            $robotStatModDiv.empty().append(arrowMarkup);
+            $robotStatModDiv.removeClass('up down').addClass(arrowDir);
+            let hasModsNow = robotHasMods();
+            if (hasModsNow){ $robotOverview.addClass('hasmods'); }
+            else { $robotOverview.removeClass('hasmods'); $robotStatMods.remove(); }
+            }, 1000); // minor delay to sync with animation
+        // Add a boost class to this robot to show it being effected by the action
+        $robotOverview.addClass('stat-boosted ' + statToken + '-stat-boosted');
+        setTimeout(function(){ $robotOverview.removeClass(statToken + '-stat-boosted'); }, 2000);
+        setTimeout(function(){ $robotOverview.removeClass('stat-boosted'); }, 3000);
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState();
+        // Return true on success
+        return true;
+        }
+    // Define some quick alias functions for the above (attack, defense, and speed varieties)
+    boostRobotAttack(robotString, boostAmount, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.boostRobotAttack(robot:' + robotString + ', amount:' + boostAmount + ', sound:' + playSound + ')', 'color: magenta;');
+        let _self = this; return _self.boostRobotStat(robotString, 'attack', boostAmount, playSound);
+        }
+    boostRobotDefense(robotString, boostAmount, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.boostRobotDefense(robot:' + robotString + ', amount:' + boostAmount + ', sound:' + playSound + ')', 'color: magenta;');
+        let _self = this; return _self.boostRobotStat(robotString, 'defense', boostAmount, playSound);
+        }
+    boostRobotSpeed(robotString, boostAmount, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.boostRobotSpeed(robot:' + robotString + ', amount:' + boostAmount + ', sound:' + playSound + ')', 'color: magenta;');
+        let _self = this; return _self.boostRobotStat(robotString, 'speed', boostAmount, playSound);
+        }
+
+    // Quick function for breaking (decrementing) a given robots stat by a specific amount (down to min of -5)
+    breakRobotStat(robotString, statToken, breakAmount, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.breakRobotStat(robot:' + robotString + ', stat:' + statToken + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('breakRobotStat() missing required robotString!'); return false; }
+        if (!statToken || typeof statToken !== 'string' || !statToken.length){ console.error('breakRobotStat() missing required statToken!'); return false; }
+        if (typeof breakAmount !== 'number' || isNaN(breakAmount) || breakAmount < 1){ console.error('breakRobotStat() missing or invalid breakAmount!'); return false; }
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        // Break the robot sprite into ID and token and collect its info
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('breakRobotStat() could not find robot info for robot ' + robotString + '!'); return false; }
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // If this robot is already at the min value for stat mods, return now
+        let statDir = 'down';
+        let statName = statToken[0].toUpperCase() + statToken.slice(1);
+        let statBreakAmount = Math.abs(breakAmount);
+        let statModMin = -5;
+        let statModKey = statToken + 'Mods';
+        let statModKeys = ['attackMods', 'defenseMods', 'speedMods'];
+        //console.log('-> statModKey =', statModKey);
+        //console.log('-> robotInfo[statModKey] =', robotInfo[statModKey]);
+        if (statModKeys.indexOf(statModKey) === -1){ return false; }
+        if (robotInfo[statModKey] && robotInfo[statModKey] <= statModMin){ return true; }
+        //console.log('-> looks like we can break ' + statToken + ' for ' + robotToken + '!');
+        let robotHasMods = function(){ return (parseInt(robotInfo[statModKeys[0]]) + parseInt(robotInfo[statModKeys[1]]) + parseInt(robotInfo[statModKeys[2]])) !== 0 ? true : false; };
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // Collect a reference to this robot's element in the overview panel
+        let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', _elements.robotsOverview);
+        if (!$robotOverview || !$robotOverview.length){ console.warn('breakRobotStat() could not find overview for robot ' + robotString + '!'); return false; }
+        let $robotIconSprite = $('.icon > .sprite', $robotOverview);
+        if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('breakRobotStat() could not find icon sprite for robot ' + robotString + '!'); return false; }
+        let $robotStatMods = $('.statmods', $robotOverview);
+        let $robotStatModDiv = $('.mod.'+statToken, $robotStatMods);
+        // Update the robot info with the new stat-mod value
+        let hadModsThen = robotHasMods();
+        let newStatModValue = (robotInfo[statModKey] || 0) - statBreakAmount;
+        if (newStatModValue < statModMin){ newStatModValue = statModMin; } // cap at min value
+        robotInfo[statModKey] = newStatModValue;
+        _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
+        // Create the statmods container if it does not already exist then append to container
+        if (!$robotStatMods || !$robotStatMods.length){
+            // create the statmods container if it doesn't exist
+            //console.log('-> create the statmods container as it does not exist');
+            $robotOverview.append('<div class="statmods"></div>');
+            $robotStatMods = $('.statmods', $robotOverview);
+            }
+        // Update the arrows for this stat mod or create them if they do not already exist
+        let arrowMarkup = '';
+        let arrowCount = Math.abs(newStatModValue);
+        let arrowDir = newStatModValue > 0 ? 'up' : 'down';
+        //console.log('-> arrowCount =', arrowCount);
+        //console.log('-> arrowDir =', arrowDir);
+        for (let i = 0; i < arrowCount; i++){ arrowMarkup += '<i class="fa fas fa-caret-' + arrowDir + '"></i>'; }
+        //console.log('-> generated arrowMarkup =', arrowMarkup);
+        if (!$robotStatModDiv || !$robotStatModDiv.length){
+            //console.log('-> create the statmod arrow div as it does not exist');
+            $robotStatMods.append('<div class="mod color ' + statToken + ' ' + arrowDir + '" title="' + statName + ' Mods"></div>');
+            $robotStatModDiv = $('.mod.'+statToken, $robotStatMods);
+            }
+        // Update the overview with any changes to the status and the arrows we just created
+        setTimeout(function(){
+            if (playSound){ _self.playSoundEffect('damage-stats'); }
+            $robotStatModDiv.empty().append(arrowMarkup);
+            $robotStatModDiv.removeClass('up down').addClass(arrowDir);
+            let hasModsNow = robotHasMods();
+            if (hasModsNow){ $robotOverview.addClass('hasmods'); }
+            else { $robotOverview.removeClass('hasmods'); $robotStatMods.remove(); }
+            }, 1000); // minor delay to sync with animation
+        // Add a break class to this robot to show it being effected by the action
+        $robotOverview.addClass('stat-breaked ' + statToken + '-stat-breaked');
+        setTimeout(function(){ $robotOverview.removeClass(statToken + '-stat-breaked'); }, 2000);
+        setTimeout(function(){ $robotOverview.removeClass('stat-breaked'); }, 3000);
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState();
+        // Return true on success
+        return true;
+        }
+    // Define some quick alias functions for the above (attack, defense, and speed varieties)
+    breakRobotAttack(robotString, breakAmount, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.breakRobotAttack(robot:' + robotString + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
+        let _self = this; return _self.breakRobotStat(robotString, 'attack', breakAmount, playSound);
+        }
+    breakRobotDefense(robotString, breakAmount, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.breakRobotDefense(robot:' + robotString + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
+        let _self = this; return _self.breakRobotStat(robotString, 'defense', breakAmount, playSound);
+        }
+    breakRobotSpeed(robotString, breakAmount, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.breakRobotSpeed(robot:' + robotString + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
+        let _self = this; return _self.breakRobotStat(robotString, 'speed', breakAmount, playSound);
         }
 
 }
