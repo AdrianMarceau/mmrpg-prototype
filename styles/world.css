@@ -602,6 +602,53 @@ html, body {
 
 #world #map .layer.objects .sprite.rival { filter: brightness(0.6); }
 
+@keyframes world-sprite-item-hover {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(0, -4px); }
+}
+#world #map .layer.objects .sprite.item {
+    background-color: transparent;
+}
+#world #map .layer.objects .sprite.item > .wrap {
+    top: auto;
+    bottom: 10px;
+    z-index: 1;
+}
+#world #map .layer.objects .sprite.item > .wrap > .sprite {
+    filter: none;
+}
+#world #map .layer.objects .sprite.item.animate > .wrap {
+    animation: world-sprite-item-hover 2s steps(4) infinite;
+}
+@keyframes world-sprite-item-shadow-hover {
+    0%, 100% { transform: scale(1.0); }
+    50% { transform: scale(0.8); }
+}
+#world #map .layer.objects .sprite.item:after {
+    /* shadow */
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    height: 6px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.2);
+    /* filter: blur(1px);  */
+    z-index: -1;
+}
+#world #map .layer.objects .sprite.item[data-token*="-pellet"]:after {
+    left: 15px;
+    right: 15px;
+    height: 4px;
+    bottom: 13px;
+}
+#world #map .layer.objects .sprite.item.animate:after {
+    animation: world-sprite-item-shadow-hover 2s steps(4) infinite;
+}
+
 
 /* define some bounce animations for the sprites */
 #world #map .layer.objects .sprite {

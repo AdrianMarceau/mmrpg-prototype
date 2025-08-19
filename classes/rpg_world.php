@@ -424,6 +424,8 @@ class rpg_world {
         $map_data_vars['mechas'] = isset($map_data_vars['mechas']) ? $map_data_vars['mechas'] : array();
         $map_data_vars['masters'] = isset($map_data_vars['masters']) ? $map_data_vars['masters'] : array();
         $map_data_vars['bosses'] = isset($map_data_vars['bosses']) ? $map_data_vars['bosses'] : array();
+        $map_data_vars['items'] = isset($map_data_vars['items']) ? $map_data_vars['items'] : array();
+        $map_data_vars['abilities'] = isset($map_data_vars['abilities']) ? $map_data_vars['abilities'] : array();
         if (empty($map_data_vars['world'])){ $map_data_vars['world'] = $world_token; }
         if (empty($map_data_vars['token'])){ $map_data_vars['token'] = $map_token; }
         if (empty($map_data_vars['name'])){ $map_data_vars['name'] = 'Undefined'; }
@@ -447,6 +449,8 @@ class rpg_world {
         $map_data_vars['mechas'] = $map_custval_parser('mechas', $map_data_vars['mechas']);
         $map_data_vars['masters'] = $map_custval_parser('masters', $map_data_vars['masters']);
         $map_data_vars['bosses'] = $map_custval_parser('bosses', $map_data_vars['bosses']);
+        $map_data_vars['items'] = $map_custval_parser('items', $map_data_vars['items']);
+        $map_data_vars['abilities'] = $map_custval_parser('abilities', $map_data_vars['abilities']);
         // Add collected data to the parsed map data
         $map_data_parsed = array();
         $map_data_parsed['world'] = $map_data_vars['world']; unset($map_data_vars['world']);
@@ -469,6 +473,8 @@ class rpg_world {
         $map_data_parsed['mechas'] = $map_data_vars['mechas']; unset($map_data_vars['mechas']);
         $map_data_parsed['masters'] = $map_data_vars['masters']; unset($map_data_vars['masters']);
         $map_data_parsed['bosses'] = $map_data_vars['bosses']; unset($map_data_vars['bosses']);
+        $map_data_parsed['items'] = $map_data_vars['items']; unset($map_data_vars['items']);
+        $map_data_parsed['abilities'] = $map_data_vars['abilities']; unset($map_data_vars['abilities']);
         //$map_data_parsed['tiles']['keys'] = array_keys($map_data_parsed['tiles']);
         $map_data_parsed['layers'] = $map_data_layers;
         if (!empty($map_data_vars)){ $map_data_parsed['vars'] = $map_data_vars; }
@@ -798,6 +804,24 @@ class rpg_world {
                 if (empty($boss_data) || !is_array($boss_data)){ continue; }
                 $pos = $boss_data[0];
                 //error_log('-> removing boss position "'.$pos.'" from available cells');
+                unset($available_cells[$pos]);
+            }
+        }
+        // Now let's loop through any items and remove spaces that have item pickups on them
+        if (!empty($map_data['items']) && is_array($map_data['items'])){
+            foreach ($map_data['items'] AS $item_name => $item_data){
+                if (empty($item_data) || !is_array($item_data)){ continue; }
+                $pos = $item_data[0];
+                //error_log('-> removing item position "'.$pos.'" from available cells');
+                unset($available_cells[$pos]);
+            }
+        }
+        // Now let's loop through any abilities and remove spaces that have ability pickups on them
+        if (!empty($map_data['abilities']) && is_array($map_data['abilities'])){
+            foreach ($map_data['abilities'] AS $ability_name => $ability_data){
+                if (empty($ability_data) || !is_array($ability_data)){ continue; }
+                $pos = $ability_data[0];
+                //error_log('-> removing ability position "'.$pos.'" from available cells');
                 unset($available_cells[$pos]);
             }
         }
@@ -1141,7 +1165,7 @@ class rpg_world {
     }
 
     // Define a reusable function for grabbing the markup for a given character sprite (player or robot)
-    public static function get_sprite($kind, $token, $alt = '', $dir = 'left', $class = '', $styles = '', $attrs = ''){
+    public static function get_sprite($kind, $token, $alt = '', $dir = 'left', $class = '', $styles = '', $attrs = '', $prefix = ''){
         //error_log('rpg_world::get_sprite() called for "'.$kind.'" with token "'.$token.'"');
         $mmrpg_indexes = self::$mmrpg_indexes;
         $xkind = self::get_xkind($kind);
@@ -1163,19 +1187,20 @@ class rpg_world {
         //error_log('$info = '.print_r($info, true));
         //error_log('$anim = '.print_r($anim, true));
         $dir = $dir;
-        $img_dir = $dir; //'right';
         $img = $info[$kind.'_image'];
-        $size = $info[$kind.'_image_size'];
-        $xsize = $size. 'x'.$size;
+        $img_size = $info[$kind.'_image_size'];
+        $img_dir = 'both'; //$kind === 'item' || $kind === 'ability' ? $dir : 'both';
+        $img_prefix = !empty($prefix) ? $prefix : 'sprite';
+        $xsize = $img_size. 'x'.$img_size;
         $styles .= $anim_styles1.$anim_styles2;
         $attrs .= $anim_attrs;
         // old format: images/robots/frosty-throwman/sprite_right_40x40.png
         //$sprite_path = 'images/'.$xkind.'/'.$img.($alt ? '_'.$alt : '').'/sprite_'.$img_dir.'_'.$xsize.'.png';
         // new format: images/robots/all/token:frosty-throwman+crop:false+dir:both/sprite_left_40x40.png
-        $sprite_path = 'images/'.$xkind.'/all/token:'.$img.($alt ? '+alt:'.$alt : '').'+dir:both+zoom:true+crop:false/sprite_left_'.$xsize.'.png';
+        $sprite_path = 'images/'.$xkind.'/all/token:'.$img.($alt ? '+alt:'.$alt : '').'+dir:'.$img_dir.'+zoom:true+crop:false/'.$img_prefix.'_left_'.$xsize.'.png';
         $sprite_class = 'sprite '.$kind.($class ? ' '.$class : '');
         $sprite_styles = ($styles ? ' style="'.$styles.'"' : '');
-        $sprite_attrs = ' data-sprite="'.$kind.'" data-token="'.$img.'" data-size="'.$size.'" data-dir="'.$dir.'" data-frame="00" '.($attrs ? ' '.$attrs : '');
+        $sprite_attrs = ' data-sprite="'.$kind.'" data-token="'.$img.'" data-size="'.$img_size.'" data-dir="'.$dir.'" data-frame="00" '.($attrs ? ' '.$attrs : '');
         $sprite_markup = '';
         $sprite_markup .= '<span class="'.$sprite_class.'"'.$sprite_attrs.$sprite_styles.'>';
             $sprite_markup .= '<span class="wrap">';
@@ -1715,8 +1740,8 @@ class rpg_world {
     }
 
     // Define a function for getting the TEAM LAYER sprite markup for the world map
-    public static function get_team_sprites($map_data_parsed, $team_sprites, $target_position = '1-1', $team_class = 'team', $team_dir = 'down-right'){
-        //error_log('rpg_world::get_team_sprites() called!');
+    public static function get_team_sprites_markup($map_data_parsed, $team_sprites, $target_position = '1-1', $team_class = 'team', $team_dir = 'down-right'){
+        //error_log('rpg_world::get_team_sprites_markup() called!');
         $map_config = $map_data_parsed['config'];
         $map_tile_height = $map_config['tile_height'];
         $map_tile_width = $map_config['tile_width'];
@@ -1806,7 +1831,7 @@ class rpg_world {
         $cursor_markup = str_replace('data-sprite="robot"', 'data-sprite="team-cursor"', $cursor_markup);
         $team_markup[] = $cursor_markup;
         // Now we can generate the markup for the actual team sprites if any were defined
-        $team_markup[] = self::get_team_sprites($map_data_parsed, $team_sprites, $team_position, 'team', $team_direction);
+        $team_markup[] = self::get_team_sprites_markup($map_data_parsed, $team_sprites, $team_position, 'team', $team_direction);
         // Return the generated team markup
         return implode(PHP_EOL, $team_markup);
     }
@@ -1865,12 +1890,156 @@ class rpg_world {
                     $tmp_team_sprites[] = $robot;
                 }
             }
-            $rivals_markup[] = self::get_team_sprites($map_data_parsed, $tmp_team_sprites, $tmp_world_position, 'rival', $tmp_world_direction);
+            $rivals_markup[] = self::get_team_sprites_markup($map_data_parsed, $tmp_team_sprites, $tmp_world_position, 'rival', $tmp_world_direction);
         }
         $rival_symbols_json = json_encode($rival_symbols, JSON_NUMERIC_CHECK);
         $rivals_markup[] = '<script data-json="rivalSymbols" type="application/json">'.$rival_symbols_json.'</script>';
         // Return the gernated rivals markup
         return implode(PHP_EOL, $rivals_markup);
+    }
+
+    // Define a function for getting the ITEMS LAYER sprite markup for the world map
+    public static function get_items_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_items_layer_sprites() called!');
+        // ITEMS LAYER
+        $map_config = $map_data_parsed['config'];
+        $map_width = $map_config['pixel_width'];
+        $map_height = $map_config['pixel_height'];
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_spritesize_offset = $map_config['spritesize_offset'];
+        $this_player_token = $this_prototype_data['this_player_token'];
+        $this_is_cursor = $this_player_token === 'player' ? true : false;
+        $mmrpg_index_items = self::get_index('items');
+        $items_markup = array();
+        $item_symbols = array();
+        $items_index = array();
+        //error_log('checking for items in $map_data_parsed[items]: '.print_r($map_data_parsed['items'], true));
+        if (!empty($map_data_parsed['items'])){
+            $item_sprites = $map_data_parsed['items'];
+            //error_log('$item_sprites = '.print_r($item_sprites, true));
+            foreach ($item_sprites AS $item_key => $item_data){
+                //error_log('Processing item "'.$item_key.'" with data: '.print_r($item_data, true));
+                if (empty($item_data) || !is_array($item_data)){ continue; }
+                $kind = 'item';
+                $pos = $item_data[0]; unset($item_data[0]);
+                $token = !empty($item_data[1]) ? $item_data[1] : ''; unset($item_data[1]);
+                $quantity = !empty($item_data[2]) ? $item_data[2] : ''; unset($item_data[2]);
+                $repeat = !empty($item_data[3]) ? $item_data[3] : ''; unset($item_data[3]);
+                $info = $mmrpg_index_items[$token];
+                //error_log('-> $pos = '.print_r($pos, true));
+                //error_log('-> $token = '.print_r($token, true));
+                //error_log('-> $quantity = '.print_r($quantity, true));
+                //error_log('-> $info = '.print_r(json_encode($info), true));
+                //error_log('processing item "'.$item_key.'" with pos "'.$pos.'"'.PHP_EOL.'-> $token = "'.$token.'"'.PHP_EOL.'-> $quantity = "'.$quantity.'"'.PHP_EOL.'-> $info = '.print_r($info, true));
+                if (empty($pos) || !is_string($pos) || !preg_match('/^\d+-\d+$/', $pos)){ continue; } // skip if no position
+                if (empty($token) || !is_string($token) || !isset($mmrpg_index_items[$token])){ continue; } // skip if no token
+                list($col, $row) = explode('-', $pos);
+                $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
+                $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
+                $z_index = $top + 1;
+                $hidden = in_array('hidden', $item_data) ? true : false; unset($item_data[array_search('hidden', $item_data)]);
+                $locked = in_array('locked', $item_data) ? true : false; unset($item_data[array_search('locked', $item_data)]);
+                $data = array_values($item_data); // remaining vaules if any
+                $label = $info['item_name'];
+                $class = $token.(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
+                $attrs = 'data-item="'.$token.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$item_key.'"
+                $markup = self::get_sprite($kind, $token, '', 'right', $class, $style, $attrs, 'icon');
+                $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$kind.'-pickup"', $markup);
+                $items_markup[] = $markup;
+                $item_symbols[$pos] = $item_key;
+                $items_index[$item_key] = array(
+                    'pos' => $pos,
+                    'token' => $token,
+                    'quantity' => $quantity,
+                    'repeat' => $repeat,
+                    'col' => $col,
+                    'row' => $row,
+                    'label' => $label,
+                    'hidden' => $hidden,
+                    'locked' => $locked,
+                    'data' => $data,
+                    );
+            }
+        }
+        $item_symbols_json = json_encode($item_symbols, JSON_NUMERIC_CHECK);
+        $items_index_json = json_encode($items_index, JSON_NUMERIC_CHECK);
+        $items_markup[] = '<script data-json="itemSymbols" type="application/json">'.$item_symbols_json.'</script>';
+        $items_markup[] = '<script data-json="itemsIndex" type="application/json">'.$items_index_json.'</script>';
+        return implode(PHP_EOL, $items_markup);
+    }
+
+    // Define a function for getting the ABILITIES LAYER sprite markup for the world map
+    public static function get_abilities_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_abilities_layer_sprites() called!');
+        // ABILITIES LAYER
+        $map_config = $map_data_parsed['config'];
+        $map_width = $map_config['pixel_width'];
+        $map_height = $map_config['pixel_height'];
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_spritesize_offset = $map_config['spritesize_offset'];
+        $this_player_token = $this_prototype_data['this_player_token'];
+        $this_is_cursor = $this_player_token === 'player' ? true : false;
+        $mmrpg_index_abilities = self::get_index('abilities');
+        $abilities_markup = array();
+        $ability_symbols = array();
+        $abilities_index = array();
+        //error_log('checking for abilities in $map_data_parsed[abilities]: '.print_r($map_data_parsed['abilities'], true));
+        if (!empty($map_data_parsed['abilities'])){
+            $ability_sprites = $map_data_parsed['abilities'];
+            //error_log('$ability_sprites = '.print_r($ability_sprites, true));
+            foreach ($ability_sprites AS $ability_key => $ability_data){
+                //error_log('Processing ability "'.$ability_key.'" with data: '.print_r($ability_data, true));
+                if (empty($ability_data) || !is_array($ability_data)){ continue; }
+                $kind = 'ability';
+                $pos = $ability_data[0]; unset($ability_data[0]);
+                $token = !empty($ability_data[1]) ? $ability_data[1] : ''; unset($ability_data[1]);
+                $quantity = !empty($ability_data[2]) ? $ability_data[2] : ''; unset($ability_data[2]);
+                $repeat = !empty($ability_data[3]) ? $ability_data[3] : ''; unset($ability_data[3]);
+                $info = $mmrpg_index_abilities[$token];
+                //error_log('-> $pos = '.print_r($pos, true));
+                //error_log('-> $token = '.print_r($token, true));
+                //error_log('-> $quantity = '.print_r($quantity, true));
+                //error_log('-> $info = '.print_r(json_encode($info), true));
+                //error_log('processing ability "'.$ability_key.'" with pos "'.$pos.'"'.PHP_EOL.'-> $token = "'.$token.'"'.PHP_EOL.'-> $quantity = "'.$quantity.'"'.PHP_EOL.'-> $info = '.print_r($info, true));
+                if (empty($pos) || !is_string($pos) || !preg_match('/^\d+-\d+$/', $pos)){ continue; } // skip if no position
+                if (empty($token) || !is_string($token) || !isset($mmrpg_index_abilities[$token])){ continue; } // skip if no token
+                list($col, $row) = explode('-', $pos);
+                $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
+                $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
+                $z_index = $top + 1;
+                $hidden = in_array('hidden', $ability_data) ? true : false; unset($ability_data[array_search('hidden', $ability_data)]);
+                $locked = in_array('locked', $ability_data) ? true : false; unset($ability_data[array_search('locked', $ability_data)]);
+                $data = array_values($ability_data); // remaining vaules if any
+                $label = $info['ability_name'];
+                $class = $token.(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
+                $attrs = 'data-ability="'.$token.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$ability_key.'"
+                $markup = self::get_sprite($kind, $token, '', 'right', $class, $style, $attrs, 'icon');
+                $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$kind.'-pickup"', $markup);
+                $abilities_markup[] = $markup;
+                $ability_symbols[$pos] = $ability_key;
+                $abilities_index[$ability_key] = array(
+                    'pos' => $pos,
+                    'token' => $token,
+                    'quantity' => $quantity,
+                    'repeat' => $repeat,
+                    'col' => $col,
+                    'row' => $row,
+                    'label' => $label,
+                    'hidden' => $hidden,
+                    'locked' => $locked,
+                    'data' => $data,
+                    );
+            }
+        }
+        $ability_symbols_json = json_encode($ability_symbols, JSON_NUMERIC_CHECK);
+        $abilities_index_json = json_encode($abilities_index, JSON_NUMERIC_CHECK);
+        $abilities_markup[] = '<script data-json="abilitySymbols" type="application/json">'.$ability_symbols_json.'</script>';
+        $abilities_markup[] = '<script data-json="abilitiesIndex" type="application/json">'.$abilities_index_json.'</script>';
+        return implode(PHP_EOL, $abilities_markup);
     }
 
 

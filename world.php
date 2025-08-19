@@ -579,6 +579,12 @@ $flag_skip_fadein = true;
                     // BATTLE OBJECT SPRITES
                     $battles_layer_markup = rpg_world::get_battles_layer_markup($this_prototype_data, $map_data_parsed);
                     echo($battles_layer_markup);
+                    // ITEM OBJECT SPRITES
+                    $items_layer_markup = rpg_world::get_items_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($items_layer_markup);
+                    // ABILITY OBJECT SPRITES
+                    $abilities_layer_markup = rpg_world::get_abilities_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($abilities_layer_markup);
                     // TEAM & RIVAL OBJECT SPRITES
                     $team_layer_markup = rpg_world::get_team_layer_markup($this_prototype_data, $map_data_parsed);
                     $rivals_layer_markup = rpg_world::get_rivals_layer_markup($this_prototype_data, $map_data_parsed);
