@@ -1115,13 +1115,14 @@ function mmrpg_prototype_item_unlocked_count($item_token){
 }
 
 // Define a function for checking how many prototype items have been unlock
-function mmrpg_prototype_items_unlocked($unique = true){
+function mmrpg_prototype_items_unlocked($unique = true, &$items_unlocked = array()){
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
 
     // If items are not yet loaded, return false
     if (empty($_SESSION[$session_token]['values']['battle_items'])){ return 0; }
+    $items_unlocked = $_SESSION[$session_token]['values']['battle_items'];
 
     // If unique item count was requested, simply return the array size
     if ($unique){ return count($_SESSION[$session_token]['values']['battle_items']); }
