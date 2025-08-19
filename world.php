@@ -159,11 +159,15 @@ $this_player_id = 1;
 $this_player_token = 'player';
 $this_player_info = array();
 $this_player_robots = array();
+$this_player_abilities = array();
 $this_player_robots_index = array();
+$this_player_items_index = array();
 $this_prototype_data['this_player_id'] = $this_player_id; // required
 $this_prototype_data['this_player_token'] = $this_player_token; // required
 $this_prototype_data['this_player_robots'] = $this_player_robots; // required
+$this_prototype_data['this_player_abilities'] = $this_player_abilities; // required
 $this_prototype_data['this_player_robots_index'] = $this_player_robots_index; // required
+$this_prototype_data['this_player_items_index'] = $this_player_items_index; // required
 $this_prototype_data['this_player_mobility'] = MMRPG_WORLD_DEFAULT_MOBILITY; // required
 if (!empty($this_prototype_data['this_current_player'])){
     $this_player_token = $this_prototype_data['this_current_player'];
@@ -251,6 +255,26 @@ if (!empty($current_player_robots)){
 }
 $WORLD_PLAYER_SESSION['last_robots'] = implode(',', $this_prototype_data['this_player_robots']);
 //error_log('-> $WORLD_PLAYER_SESSION[\'last_robots\'] (final) = '. print_r($WORLD_PLAYER_SESSION['last_robots'], true));
+
+// Collect the user's list of unlocked abilities so we know what we already have (all players share)
+$unlocked_player_abilities = array();
+$unlocked_abilities_count = mmrpg_prototype_abilities_unlocked('', '', $unlocked_player_abilities);
+//error_log('$unlocked_abilities_count = '. print_r($unlocked_abilities_count, true));
+//error_log('$unlocked_player_abilities = '. print_r($unlocked_player_abilities, true));
+if (!empty($unlocked_player_abilities)
+    && empty($this_prototype_data['this_player_abilities'])){
+    $this_prototype_data['this_player_abilities'] = array_values($unlocked_player_abilities);
+}
+
+// Collect the user's list of collected items so we know what we already have and how many (all players share)
+$unlocked_player_items = array();
+$unlocked_items_count = mmrpg_prototype_items_unlocked(true, $unlocked_player_items);
+//error_log('$unlocked_items_count = '. print_r($unlocked_items_count, true));
+//error_log('$unlocked_player_items = '. print_r($unlocked_player_items, true));
+if (!empty($unlocked_player_items)
+    && empty($this_prototype_data['this_player_items_index'])){
+    $this_prototype_data['this_player_items_index'] = $unlocked_player_items;
+}
 
 // Update the player's mobility with any character-specific bonuses or contextual modifiers
 if ($this_prototype_data['this_player_token'] === 'player'){ $this_prototype_data['this_player_mobility'] = -1; }
@@ -638,7 +662,9 @@ _worldConfig.userId = <?= rpg_game::get_userid() ?>;
 _worldConfig.playerId = <?= json_encode($this_prototype_data['this_player_id']) ?>;
 _worldConfig.playerToken = <?= json_encode($this_prototype_data['this_player_token']) ?>;
 _worldConfig.playerRobots = <?= json_encode($this_prototype_data['this_player_robots']) ?>;
+_worldConfig.playerAbilities = <?= json_encode($this_prototype_data['this_player_abilities']) ?>;
 _worldConfig.playerRobotsIndex = <?= json_encode($this_prototype_data['this_player_robots_index']) ?>;
+_worldConfig.playerItemsIndex = <?= json_encode($this_prototype_data['this_player_items_index']) ?>;
 _worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility']) ?>;
 _worldConfig.backButtonURL = 'prototype.php';
 //_worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=<?= $default_world_position ?>';
