@@ -3,15 +3,15 @@
 @token       = debug-area-1
 @name        = DEBUG Area 1
 @level       = 1
-@size        = 11 x 24
+@size        = 11 x 26
 @sheet       = mmrpg-overworld-2k25
 #---------------------------#
-@portals[]   = spawn(6-8)
-@portals[]   = goto__debug-area-1n(6-6, 8-12)
-@portals[]   = goto__debug-area-1s(6-10, 5-2)
-@portals[]   = goto__debug-area-1w(4-8, 17-4)
-@portals[]   = goto__debug-area-1e(8-8, 3-4)
-@portals[]   = goto__debug-area-0(6-21, 10-6)
+@portals[]   = spawn(6-10)
+@portals[]   = goto__debug-area-1n(6-8, 8-13)
+@portals[]   = goto__debug-area-1s(6-12, 5-3)
+@portals[]   = goto__debug-area-1w(4-10, 17-5)
+@portals[]   = goto__debug-area-1e(8-10, 3-5)
+@portals[]   = goto__debug-area-0(6-23, 10-7)
 #---------------------------#
 @field       = gentle-countryside
 #---------------------------#
@@ -23,32 +23,48 @@
 @habitats[]  = met(grass)
 @habitats[]  = trille-bot(subspace)
 #---------------------------#
-@mechas[]    = west-portal-mecha(4-8, rockscotch)
-@mechas[]    = east-portal-mecha(8-8, antlin-g)
-@mechas[]    = north-portal-mecha(6-6, frosty-throwman)
-@mechas[]    = south-portal-mecha(6-10, octone)
+@mechas[]    = west-portal-mecha(4-10, rockscotch)
+@mechas[]    = east-portal-mecha(8-10, antlin-g)
+@mechas[]    = north-portal-mecha(6-8, frosty-throwman)
+@mechas[]    = south-portal-mecha(6-12, octone)
 #---------------------------#
-@bosses[]    = subspace-portal-boss(6-21, trill, 50, speed)
+@bosses[]    = subspace-portal-boss(6-23, trill, 50, speed)
 #---------------------------#
-@buttons[]   = subspace-button(6-22, purple, up, set-group-terrain, subspace-path, subspace)
+@buttons[]   = subspace-button(6-24, purple, up, set-group-terrain, subspace-path, subspace)
 #---------------------------#
-@events[]    = auto-heal(4-6, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
-@events[]    = auto-reset(8-6, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
+@events[]    = auto-heal(4-8, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
+@events[]    = auto-reset(8-8, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
 #---------------------------#
-@groups[]    = central-area(4-6...8-10)
-@groups[]    = subspace-path(6-12, 6-13, 6-14, 6-15)
-@groups[]    = subspace-path-ends(6-11, 6-16)
-@groups[]    = under-subspace-button(5-22, 5-23, 6-23, 7-23, 7-22)
-@groups[]    = no-encounters(central-area, under-subspace-button, subspace-path, subspace-path-ends)
+@groups[]    = central-area(4-8...8-12)
+@groups[]    = item-corridor(2-2...10-4, 6-5, 6-6)
+@groups[]    = subspace-path(6-14, 6-15, 6-16, 6-17)
+@groups[]    = subspace-path-ends(6-13, 6-18)
+@groups[]    = under-subspace-button(5-24, 5-25, 6-25, 7-25, 7-24)
+@groups[]    = no-encounters(central-area, item-corridor, under-subspace-button, subspace-path, subspace-path-ends)
 #---------------------------#
-@items[]     = first-player-program(6-18, light-program, x1, once)
-@items[]     = first-robot-core(6-18, copy-core, x1, once)
-@items[]     = intro-gift-one(4-10, energy-tank, x1, daily)
-@items[]     = intro-gift-one(4-10, weapon-tank, x1, daily)
+## PSEUDO-TUTORIAL ITEMS
+@items[]     = first-player-program(4-12, light-program, x1, once)
+@items[]     = first-robot-core(8-12, copy-core, x1, once)
+## ITEM-CORRIDOR ENERGY ITEMS
+@items[]     = first-consumable-epi(5-4, energy-pellet, x1, always)
+@items[]     = first-consumable-wpi(4-4, energy-capsule, x1, always)
+@items[]     = first-consumable-wti(3-4, energy-tank, x1, always)
+@items[]     = first-consumable-eci(5-2, weapon-pellet, x1, always)
+@items[]     = first-consumable-eti(3-2, weapon-tank, x1, always)
+@items[]     = first-consumable-wci(4-2, weapon-capsule, x1, always)
+## ITEM-CORRIDOR STATMOD ITEMS
+@items[]     = first-consumable-api(7-4, attack-pellet, x1, always)
+@items[]     = first-consumable-aci(7-2, attack-capsule, x1, always)
+@items[]     = first-consumable-dpi(8-4, defense-pellet, x1, always)
+@items[]     = first-consumable-dci(8-2, defense-capsule, x1, always)
+@items[]     = first-consumable-spi(9-4, speed-pellet, x1, always)
+@items[]     = first-consumable-sci(9-2, speed-capsule, x1, always)
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
-[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
-[__],[__],[__],[__],[__],[11],[__],[__],[__],[__],[__]
+[__],[13],[11],[11],[11],[11],[11],[11],[11],[14],[__]
+[__],[10],[10],[10],[10],[10],[10],[10],[10],[10],[__]
+[__],[15],[12],[12],[12],[10],[12],[12],[12],[16],[__]
+[__],[__],[__],[__],[__],[10],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[10],[__],[__],[__],[__],[__]
 [__],[__],[13],[11],[11],[10],[11],[11],[14],[__],[__]
 [__],[__],[10],[10],[10],[50],[10],[10],[10],[__],[__]
