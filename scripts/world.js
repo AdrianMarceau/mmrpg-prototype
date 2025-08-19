@@ -18,7 +18,9 @@ gameSettings.worldConfig = {
     playerId: 0,
     playerToken: 'player',
     playerRobots: ['0_robot'],
+    playerAbilities: ['buster-shot'],
     playerRobotsIndex: {},
+    playerItemsIndex: {},
     playerMobility: 1, // default only
     mapWorld: 'undefined',
     mapToken: 'undefined',
@@ -56,6 +58,10 @@ gameSettings.worldConfig = {
     mapBattlesIndex: {},
     mapRivalSymbols: {},
     mapRivalsIndex: {},
+    mapItemSymbols: {},
+    mapItemsIndex: {},
+    mapAbilitySymbols: {},
+    mapAbilitiesIndex: {},
     windowWidth: 1024, // default only
     widthHeight: 768, // default only
     mmrpgWidth: 800, // default only
@@ -69,6 +75,9 @@ gameSettings.worldConfig = {
     resetButtonURL: '#', // populated on init
     allowWorldEvents: false, // default until user interaction
     robotStorageSlotsVisible: 8, // probably wont change as it's what fits
+    robotStatModMax: 5, // match the battle system
+    robotStatModMin: -5, // match the battle system
+    itemInventoryMax: 99, // match the battle system
     };
 gameSettings.worldState = {
     cursor: {
@@ -86,6 +95,8 @@ gameSettings.worldState = {
         position: '0-0',
         direction: '',
         robots: {},
+        items: {},
+        abilities: {},
         },
     buttons: {},
     switches: {},
@@ -253,11 +264,10 @@ class mmrpgWorldMap {
         _worldPlayer.token = _config.playerToken || 'player';
         _worldPlayer.position = _worldCursor.position || '0-0';
         _worldPlayer.direction = _worldCursor.direction || 'down-right';
-        // If player robots were defined in the predefined index, copy them over to the state
+        // If player robots were defined [list + index] in the predefined config, copy them over to the state
         let _playerRobots = _config.playerRobots;
         let _playerRobotsIndex = _config.playerRobotsIndex;
-        if (_playerRobots.length
-            && Object.keys(_playerRobotsIndex).length){
+        if (_playerRobots.length && Object.keys(_playerRobotsIndex).length){
             //console.log('---> initWorldMap() found ' + _playerRobots.length + ' player robots to initialize!');
             let livePlayerRobots = {};
             for (var i = 0; i < _playerRobots.length; i++){
@@ -273,6 +283,24 @@ class mmrpgWorldMap {
                 }
             _worldPlayer.robots = livePlayerRobots;
             //console.log('---> initWorldMap() livePlayerRobots =', livePlayerRobots);
+            }
+        // If player abilities were defined [list] in the predefined config, copy them over to the state
+        let _playerAbilities = _config.playerAbilities;
+        if (_playerAbilities.length){
+            //console.log('---> initWorldMap() found ' + _playerAbilities.length + ' player abilities to initialize!');
+            let livePlayerAbilities = JSON.parse(JSON.stringify(_playerAbilities));
+            //console.log('---> adding abilities to player state:', livePlayerAbilities);
+            _worldPlayer.abilities = livePlayerAbilities;
+            //console.log('---> initWorldMap() livePlayerAbilities =', livePlayerAbilities);
+            }
+        // If player items were defined [index] in the predefined config, copy them over to the state
+        let _playerItemsIndex = _config.playerItemsIndex;
+        if (Object.keys(_playerItemsIndex).length){
+            //console.log('---> initWorldMap() found ' + Object.keys(_playerItemsIndex).length + ' player items to initialize!');
+            let livePlayerItems = JSON.parse(JSON.stringify(_playerItemsIndex));
+            //console.log('---> adding items to player state:', livePlayerItems);
+            _worldPlayer.items = livePlayerItems;
+            //console.log('---> initWorldMap() livePlayerItems =', livePlayerItems);
             }
         // Define the function to run when everything is done loading
         let onWorldLoaded = function(){
@@ -2320,10 +2348,17 @@ class mmrpgWorldMap {
         let eventsAtPosition = _self.getEventsAtPosition(newPosition);
         //console.log('-> eventsAtPosition =', eventsAtPosition);
         if (!eventsAtPosition || !eventsAtPosition.length){
-            //console.log('-> no events found at position', cursorPosition, 'skipping dropdown display');
+            //console.log('-> no events found at position', cursorPosition, 'skipping further processing');
             return;
             }
         //console.log('-> found ' + eventsAtPosition.length + ' events at position');
+        //console.log('-> eventsAtPosition =', eventsAtPosition);
+
+        // Check to see what the very first event type is
+        let firstEvent = eventsAtPosition[0];
+        let firstEventType = firstEvent.kind;
+        //console.log('-> firstEvent =', JSON.parse(JSON.stringify(firstEvent)));
+        //console.log('-> firstEventType =', firstEventType);
 
         // Sort the events at this position by priority with sanctuaries > portals > battles > everything-else
         eventsAtPosition = eventsAtPosition.sort(function(a, b){
@@ -2337,9 +2372,9 @@ class mmrpgWorldMap {
             });
         //console.log('-> eventsAtPosition(after-sort) = ', JSON.parse(JSON.stringify(eventsAtPosition)));
 
-        // Check to see what the very first event type is
-        let firstEvent = eventsAtPosition[0];
-        let firstEventType = firstEvent.kind;
+        // Refresh the first event variables in case they've changed
+        firstEvent = eventsAtPosition[0];
+        firstEventType = firstEvent.kind;
         //console.log('-> firstEvent =', JSON.parse(JSON.stringify(firstEvent)));
         //console.log('-> firstEventType =', firstEventType);
 
@@ -2373,8 +2408,7 @@ class mmrpgWorldMap {
         let dropdownMarkup = '';
         let dropdownButtons = '';
         let readyTeamSprites = false;
-        if (firstEventType === 'event'
-            || firstEventType === 'custom'){
+        if (firstEventType === 'event'){
             //console.log('-> event at position is custom, checking what comes next...');
             // If the cursor is literally on a event, only one event sprite matters right now
             let $customEvent = $(firstEvent.sprite);
@@ -2393,6 +2427,7 @@ class mmrpgWorldMap {
                         //console.log('-> eventAction is "', eventAction, '" so defer it to triggerEffectFunction()');
                         triggerEffect = true;
                         readyTeamSprites = true;
+                        //teamReadyDuration = 600; // for event panels we want to zoom in quickly
                         zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
                         triggerEffectFunction = function(){
                             if (!stillAtPosition()){ return false; }
@@ -2567,6 +2602,62 @@ class mmrpgWorldMap {
                 showDropdownSound = 'mecha-taunt-sound' + (dataBattles.length > 1 ? '*'+dataBattles.length : '');
                 zoomTimeoutDuration = 1500; // otherwise if this is a battle we wait a moment
                 }
+            }
+        else if (firstEventType === 'item'){
+            //console.log('-> event at position is an item, preparing either dropdown or pickup');
+            // If the cursor is literally on a button, only one event sprite matters right now
+            let $itemEvent = $(firstEvent.sprite);
+            let dataLabel = $itemEvent.attr('data-label');
+            let dataItem = $itemEvent.attr('data-item');
+            let dataItemToken = $itemEvent.attr('data-token');
+            let dataColour = dataItemToken.length ? dataItemToken.split('-')[0] : 'none';
+            if (dataColour === 'weapon'){ dataColour = 'weapons'; }
+            else if (dataColour === 'super'){ dataColour = 'shield'; }
+            else if (dataColour === 'field'){ dataColour = 'none'; }
+            let itemAlreadyTaken = false; // TODO: track items already taken
+            let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
+            //console.log('-> playerIsCursor =', playerIsCursor);
+            if (dataItem && dataItemToken && !itemAlreadyTaken){
+                // If the player is the cursor player, we should show the item pickup dropdown
+                if (playerIsCursor){
+                    //console.log('-> player is cursor, preparing item pickup dropdown');
+                    showDropdown = true;
+                    if (dataLabel){ dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                    dropdownButtons += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pick-up-item" data-item="'+dataItem+'"><span>Pick Up Item?</span></a>';
+                    dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                    showDropdownType = 'button';
+                    zoomTimeoutDuration = 750; // if we show a pick-up dropdown, we want to zoom in faster
+                    }
+                // Otherwise if this is a human player, we should trigger the auto-pickup functionality instead
+                else {
+                    //console.log('-> player is human player, triggering auto-pickup');
+                    triggerEffect = true;
+                    readyTeamSprites = true;
+                    teamReadyDuration = 600; // for event panels we want to zoom in quickly
+                    zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
+                    triggerEffectFunction = function(){
+                        if (!stillAtPosition()){ return false; }
+                        //console.log('-> running');
+                        // If the first event in the list (before sorting) is an item, we should defer it to the pickup function
+                        if (firstEvent.kind === 'item'){
+                            //console.log('-> first event is an item, deferring to pickup function');
+                            _self.triggerItemPickup(firstEvent, 600);
+                            }
+                        // Else if the first event in the list (before sorting) is an ability, we should defer it to the pickup function
+                        else if (firstEvent.kind === 'ability'){
+                            //console.log('-> first event is an ability, deferring to pickup function');
+                            _self.triggerAbilityPickup(firstEvent, 600);
+                            }
+                        };
+
+                    }
+                }
+            }
+        else if (firstEventType === 'ability'){
+            //console.log('-> event at position is an ability, preparing dropdown');
+
+            // ...
+
             }
 
         // If there's no dropdown to show, we can return early
@@ -3001,7 +3092,7 @@ class mmrpgWorldMap {
                 }
             }
         //console.log('-> positionsToCheck =', positionsToCheck);
-        let eventKinds = ['event', 'portal', 'button', 'battle'];
+        let eventKinds = ['event', 'portal', 'button', 'battle', 'item', 'ability'];
         for (let e = 0; e < eventKinds.length; e++){
             let eventKind = eventKinds[e];
             //console.log('checking for ' + eventKind+'s at: ' + positionsToCheck.join(', '));
@@ -3029,25 +3120,39 @@ class mmrpgWorldMap {
                 let $eventSprite = $('.sprite[data-' + eventKind + '="'+eventToken+'"]', $canvasMap);
                 let eventLabel = $eventSprite.length ? $eventSprite.attr('data-label') : '';
                 if ($eventSprite && $eventSprite.length){ $eventSprite = $eventSprite.first().get(0); }
-                let eventKind2 = eventKind === 'event' ? 'custom' : eventKind;
-                if (eventKind2 === 'custom'
-                    && (eventInfo.sprite === 'healpad' || eventInfo.sprite === 'resetpad')){
-                    eventKind2 = 'sanctuary'; // treat healpads and resetpads as sanctuary events
+                let eventKind2 = eventKind;
+                if (eventKind === 'event'){
+                    // treat healpads and resetpads as sanctuary events
+                    if (eventInfo.sprite === 'healpad' || eventInfo.sprite === 'resetpad'){ eventKind2 = 'sanctuary'; }
+                    // otherwise it's just a generic custom event tile
+                    else { eventKind2 = 'custom'; }
+                    }
+                else if (eventKind === 'item' || eventKind === 'ability'){
+                    // skip if already claimed by the player
+                    if (eventInfo.claimed){ continue; }
+                    // collect the token as the second "kind"
+                    eventKind2 = eventInfo.token;
                     }
                 let eventAtPosition = {kind: eventKind, kind2: eventKind2, position: eventPosition, token: eventToken, sprite: $eventSprite, label: eventLabel};
-                //console.log('%c' + '--> found valid '+ eventKind + '/'+ eventKind2 + ' at position ' + eventPosition, 'color: lime;');
-                //console.log('----> eventToken =', eventToken);
-                //console.log('----> eventInfo =', eventInfo);
-                //console.log('----> eventAtPosition =', eventAtPosition);
+                if (eventKind === 'item' || eventKind === 'ability'){ eventAtPosition.claimed = eventInfo.claimed; }
+                //console.log('%c' + '> found valid '+ eventKind + '/'+ eventKind2 + ' at position ' + eventPosition, 'color: lime;');
+                //console.log('--> eventToken =', eventToken);
+                //console.log('--> eventInfo =', eventInfo);
+                //console.log('--> eventAtPosition =', eventAtPosition);
                 // skip portals unless it's the exact position
                 let eventIsCustom = eventKind === 'event';
                 let eventIsPortal = eventKind === 'portal';
-                //let eventIsSanctuary = eventKind === 'event' && (eventInfo.sprite === 'healpad' || eventInfo.sprite === 'resetpad');
-                //console.log('-> eventIsCustom =', eventIsCustom, '| eventIsPortal =', eventIsPortal, '| eventIsSanctuary =', eventIsSanctuary);
-                if (eventIsCustom && eventPosition !== searchPosition){ continue; } // skip custom unless it's the exact position
-                if (eventIsPortal && eventPosition !== searchPosition){ continue; } // skip portals unless it's the exact position
+                let eventIsSanctuary = eventKind2 === 'sanctuary';
+                let eventIsPickup = eventKind === 'item' || eventKind === 'ability';
+                //console.log('--> eventIsCustom =', eventIsCustom, '| eventIsPortal =', eventIsPortal, '| eventIsSanctuary =', eventIsSanctuary, '| eventIsPickup =', eventIsPickup);
+                if (eventPosition !== searchPosition
+                    && (eventIsCustom || eventIsPortal || eventIsSanctuary || eventIsPickup)){
+                    // skip custom unless it's the exact position
+                    //console.log('----> skipping ' + eventKind + ' at ' + eventPosition + ' because it is not the exact position');
+                    continue;
+                    }
                 // otherwise we are fine to add to the events array
-                //console.log('----> adding ' + eventKind + ' at ' + eventPosition + ' to eventsAtPosition array');
+                //console.log('--> adding ' + eventKind + ' at ' + eventPosition + ' to eventsAtPosition array', '\n--> w/ eventAtPosition = ', eventAtPosition);
                 eventsAtPosition.push(eventAtPosition);
                 }
             }
@@ -3675,7 +3780,7 @@ class mmrpgWorldMap {
         let statDir = 'up';
         let statName = statToken[0].toUpperCase() + statToken.slice(1);
         let statBoostAmount = Math.abs(boostAmount);
-        let statModMax = 5;
+        let statModMax = _config.robotStatModMax; //5;
         let statModKey = statToken + 'Mods';
         let statModKeys = ['attackMods', 'defenseMods', 'speedMods'];
         //console.log('-> statModKey =', statModKey);
@@ -3773,7 +3878,7 @@ class mmrpgWorldMap {
         let statDir = 'down';
         let statName = statToken[0].toUpperCase() + statToken.slice(1);
         let statBreakAmount = Math.abs(breakAmount);
-        let statModMin = -5;
+        let statModMin = _config.robotStatModMin; //-5;
         let statModKey = statToken + 'Mods';
         let statModKeys = ['attackMods', 'defenseMods', 'speedMods'];
         //console.log('-> statModKey =', statModKey);
@@ -3849,5 +3954,235 @@ class mmrpgWorldMap {
         //console.log('%c' + 'mmrpgWorldMap.breakRobotSpeed(robot:' + robotString + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
         let _self = this; return _self.breakRobotStat(robotString, 'speed', breakAmount, playSound);
         }
+
+    // Define a quick function for triggering a live item pickup on the field (and any effects that may have
+    triggerItemPickup(itemEvent, zoomDelay){
+        //console.log('%c' + 'mmrpgWorldMap.triggerItemPickup()', 'color: magenta;');
+        //console.log('--> itemEvent =', itemEvent);
+        if (!itemEvent || typeof itemEvent !== 'object'){ console.error('triggerItemPickup() missing required itemEvent!'); return false; }
+        if (typeof itemEvent.sprite === 'undefined'){ console.error('triggerItemPickup() missing required itemEvent.sprite!'); return false; }
+        if (itemEvent.claimed === true){ console.warn('triggerItemPickup() called for item that has already been claimed!'); return false; }
+        // Collect local references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        let _mapItemsIndex = _config.mapItemsIndex;
+        let $teamSprites = _elements.teamSprites;
+        // Collect as much info about the item as we can from the event data
+        let $itemEventSprite = $(itemEvent.sprite);
+        let $itemEventLayer = $itemEventSprite.closest('.layer');
+        let itemEventToken = itemEvent.token;
+        let itemEventInfo = _mapItemsIndex[itemEventToken];
+        let itemEventQuantity = itemEventInfo.quantity;
+        let itemToken = itemEvent.kind2;
+        //console.log('--> itemEventToken =', itemEventToken);
+        //console.log('--> itemEventQuantity =', itemEventQuantity);
+        //console.log('--> itemEventInfo =', itemEventInfo);
+        //console.log('--> itemToken =', itemToken);
+        // If the quantity is somehow less than one, return early
+        if (!itemEventQuantity || itemEventQuantity < 1){ console.error('triggerItemPickup() called for item with quantity less than one!'); return false; }
+        // Collect some information about the player too
+        let numPlayerRobots = Object.keys(_worldPlayerRobots).length;
+        if (!numPlayerRobots || numPlayerRobots < 1){ console.error('triggerItemPickup() could not find any player robots!'); return false; }
+        // First zoom the item sprite into the zoom layer so it's more visible to the player
+        //console.log('-> zooming item sprite make it more visible');
+        zoomDelay = typeof zoomDelay === 'number' ? zoomDelay : 1200; // default to sync with standard use-case
+        setTimeout(function(){
+            $itemEventSprite.addClass('zoom');
+            $itemEventLayer.addClass('has-zoom');
+            }, Math.ceil(zoomDelay / 3));
+
+        // Define some variables to hold the pickup action config
+        let pickupFunction = function(onComplete, afterDelay){
+            if (!onComplete || typeof onComplete !== 'function'){ onComplete = false; }
+            if (!afterDelay || typeof afterDelay !== 'number'){ afterDelay = 0; }
+            // Check to make sure the item token was not empty
+            if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){
+                console.error('triggerItemPickup() called for item with empty token!');
+                return false;
+                }
+            // Check if the item was a consumable health or weapon energy item
+            // and apply it to the first robot that needs it, else pocket it
+            else if (itemToken.match(/^(energy|weapon)-(pellet|capsule|tank)$/i)){
+                //console.log('oh this is an restorative-recovery item, so let us apply it');
+                let itemStat = itemToken.split('-')[0];
+                let itemSize = itemToken.split('-')[1];
+                let itemPower = (itemSize === 'tank' ? true : (itemSize === 'capsule' ? 3 : 2));
+                if (itemStat === 'weapon'){ itemStat = 'weapons'; }
+                //console.log('--> itemStat =', itemStat);
+                //console.log('--> itemSize =', itemSize);
+                //console.log('--> itemPower =', itemPower);
+                // Loop through player robots and see if any of them "need" this item
+                let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                for (let i = 0; i < playerRobotKeys.length; i++){
+                    let robotString = playerRobotKeys[i];
+                    let playerRobot = _worldPlayerRobots[robotString];
+                    let statKey = itemStat;
+                    let statMaxKey = itemStat + 'Max';
+                    let robotEnergy = playerRobot[statKey];
+                    let robotEnergyMax = playerRobot[statMaxKey];
+                    //console.log('-> checking robot:', robotString, playerRobot);
+                    //console.log('-> playerRobot[' + statKey + '] =', robotEnergy);
+                    //console.log('-> playerRobot[' + statMaxKey + '] =', robotEnergyMax);
+                    if (robotEnergy >= robotEnergyMax){
+                        //console.log('-> skipping robot', robotString, 'b/c it already has max', itemStat);
+                        continue; // skip this robot if it already has max of this energy
+                        }
+                    //console.log('-> found a robot (', playerRobot, ') that needs their', itemStat, 'stat restored...');
+                    //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
+                    if (itemStat === 'energy'){ _self.restoreRobotEnergy(robotString, itemPower, true); }
+                    else if (itemStat === 'weapons'){ _self.restoreRobotWeapons(robotString, itemPower, true); }
+                    itemEvent.claimed = true;
+                    itemEventQuantity--;
+                    if (!itemEventQuantity){ break; } // exit the loop early if none left
+                    }
+                }
+            // Check if the item was a consumable attack, defense, or speed-stat item
+            // and apply it to the first robot that needs it, else pocket it
+            else if (itemToken.match(/^(attack|defense|speed)-(pellet|capsule)$/i)){
+                //console.log('oh this is a stat-boost item, so let us apply it');
+                let itemStat = itemToken.split('-')[0];
+                let itemSize = itemToken.split('-')[1];
+                let itemPower = itemSize === 'capsule' ? 3 : 2;
+                //console.log('--> itemStat =', itemStat);
+                //console.log('--> itemSize =', itemSize);
+                //console.log('--> itemPower =', itemPower);
+                // Loop through player robots and see if any of them "need" this item
+                let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                let robotStatModMax = _config.robotStatModMax;
+                for (let i = 0; i < playerRobotKeys.length; i++){
+                    let robotString = playerRobotKeys[i];
+                    let playerRobot = _worldPlayerRobots[robotString];
+                    if (!playerRobot){ console.warn('-> skipping robot', robotString, 'b/c it is not defined'); continue; }
+                    //console.log('-> checking robotString:', robotString, 'playerRobot:', playerRobot);
+                    let statModKey = itemStat + 'Mods';
+                    let currentModValue = playerRobot[statModKey] || 0;
+                    //console.log('-> statModKey:', statModKey);
+                    //console.log('-> currentModValue:', currentModValue);
+                    //console.log('-> robotStatModMax:', robotStatModMax);
+                    if (currentModValue >= robotStatModMax){
+                        //console.log('-> skipping robot', robotString, 'b/c it already has max stat mods for', itemStat);
+                        continue; // skip this robot if it already has max stat mods for this stat
+                        }
+                    //console.log('-> found a robot (', robotString, ') that we can boost ', itemStat, 'for...');
+                    //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
+                    _self.boostRobotStat(robotString, itemStat, itemPower, true);
+                    itemEvent.claimed = true;
+                    itemEventQuantity--;
+                    if (!itemEventQuantity){ break; } // exit the loop early if none left
+                    }
+                }
+            // If the item has not been claimed it, it means we should (try to) add it to the inventory instead
+            if (!itemEvent.claimed){
+                //console.log('-> no robots needed this item, so we will add it to the inventory instead');
+                if (_self.addItemToInventory(itemToken, itemEventQuantity)){
+                    // only remove if inventory function returns true, that way full-stock players leave it behind
+                    itemEvent.claimed = true;
+                    itemEventQuantity--;
+                    }
+                }
+            // Update the real copy with any changes to claimed flag
+            itemEventInfo.claimed = itemEvent.claimed;
+            // If an onComplete function was provided, call it now (with delay if requested)
+            if (onComplete){
+                if (!afterDelay){ onComplete.call(_self); }
+                else { setTimeout(function(){ onComplete.call(_self); }, afterDelay); }
+                }
+            };
+
+        // Now we can remove the zoom and delete the item sprite from the events layer
+        // TODO: we need to actually save the item to the player's inventory and save the event to permanently remove it
+        //console.log('-> zooming and queueing pickup function for item sprite on map');
+        _self.incZoomLevel();
+        setTimeout(function(){
+            // call the pickup function to apply the item effects
+            pickupFunction(function(){
+                //console.log('--> resetting zoom level and team sprite classes');
+                //console.log('--> $teamSprites =', $teamSprites);
+                _self.resetZoomLevel();
+                $itemEventLayer.removeClass('has-zoom');
+                $teamSprites.removeClass('shake');
+                $teamSprites.filter(':not(.disabled)').attr('data-frame', '00');
+                if (!itemEventQuantity){
+                    //console.log('--> removing item sprite from the map', '\n--> b/c itemEventQuantity =', itemEventQuantity);
+                    $itemEventSprite.animate({opacity: 0, filter: 'brightness(2)'}, zoomDelay, function(){ $itemEventSprite.remove(); });
+                    console.warn('--> we must also save this removal into long-term memory somewhere!'); // TODO: read the message
+                    }
+                });
+            }, (zoomDelay * 2));
+
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState();
+        // Return true on success
+        return true;
+        }
+
+    // Define a quick function for triggering a live ability pickup on the field (and any effects that may have
+    triggerAbilityPickup(abilityEvent){
+        console.log('%c' + 'mmrpgWorldMap.triggerAbilityPickup()', 'color: magenta;');
+        console.log('--> abilityEvent =', abilityEvent);
+
+        // Return true on success
+        console.warn('...not done yet!');
+        return true;
+        }
+
+    // Define a quick function for adding an item to the player's inventory if there's room for it
+    addItemToInventory(itemToken, itemQuantity, animatePickup, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.addItemToInventory(item:' + itemToken + ', quantity:' + itemQuantity + ')', 'color: magenta;');
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('addItemToInventory() missing required itemToken!'); return false; }
+        if (typeof itemQuantity !== 'number' || isNaN(itemQuantity) || itemQuantity < 1){ itemQuantity = 1; }
+        if (typeof animatePickup !== 'boolean'){ animatePickup = true; } // default to true if not provided
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        //console.log('--> itemToken =', itemToken);
+        //console.log('--> itemQuantity =', itemQuantity);
+        //console.log('--> animatePickup =', animatePickup);
+        //console.log('--> playSound =', playSound);
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerItems = _worldPlayer.items;
+        let itemInventoryMax = _config.playerInventoryMax; // 99;
+        // Create an entry in the items index if it does not already exist
+        if (typeof _worldPlayerItems[itemToken] === 'undefined'){ _worldPlayerItems[itemToken] = 0; }
+        // Check to see if there's room for the item in the inventory
+        let currentItemQuantity = _worldPlayerItems[itemToken];
+        //console.log('--> currentItemQuantity =', currentItemQuantity);
+        if (currentItemQuantity >= itemInventoryMax){
+            console.warn('addItemToInventory() called for item that is already at max quantity!');
+            return false; // no room in the inventory
+            }
+        // If there is room, add the item to the inventory
+        let overflowQuantity = 0;
+        let newItemQuantity = currentItemQuantity + itemQuantity;
+        //console.log('--> newItemQuantity =', newItemQuantity);
+        if (newItemQuantity > itemInventoryMax){
+            console.warn('--> inventory for item', itemToken, 'is full, so capping at max value');
+            overflowQuantity = newItemQuantity - itemInventoryMax; // calculate overflow
+            newItemQuantity = itemInventoryMax; // cap at max value
+            //console.log('--> overflowQuantity =', overflowQuantity);
+            //console.log('--> newItemQuantity(adjusted) =', newItemQuantity);
+            // TODO: do something with overflow later b/c right now we don't wanna
+            }
+        _worldPlayerItems[itemToken] = newItemQuantity;
+        //console.log('--> updated _worldPlayerItems['+itemToken+'] => ', _worldPlayerItems[itemToken]);
+        // If an animation was requested, make sure we show it above the player's head
+        if (animatePickup){
+            // TODO: write this animation code later
+            console.warn('addItemToInventory() would animate the item pickup now...'); // TODO: read the message
+            }
+        // If a sound was requested, play it now
+        if (playSound){ _self.playSoundEffect('get-item'); }
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState();
+        // Return true on success
+        return true;
+    }
 
 }

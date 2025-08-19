@@ -452,25 +452,6 @@ html, body {
 #world #map .sprite.tile.button.orange.up { background-position: -520px -280px; }
 #world #map .sprite.tile.button.orange.down { background-position: -520px -360px; }
 
-#world #map .sprite.tile.col-1 { left: 0; }
-#world #map .sprite.tile.col-2 { left: 0; }
-#world #map .sprite.tile.col-3 { left: 0; }
-#world #map .sprite.tile.col-4 { left: 0; }
-#world #map .sprite.tile.col-5 { left: 0; }
-#world #map .sprite.tile.col-6 { left: 0; }
-#world #map .sprite.tile.col-7 { left: 0; }
-#world #map .sprite.tile.col-8 { left: 0; }
-#world #map .sprite.tile.col-9 { left: 0; }
-#world #map .sprite.tile.col-10 { left: 0; }
-#world #map .sprite.tile.col-11 { left: 0; }
-#world #map .sprite.tile.col-12 { left: 0; }
-#world #map .sprite.tile.col-13 { left: 0; }
-#world #map .sprite.tile.col-14 { left: 0; }
-#world #map .sprite.tile.col-15 { left: 0; }
-#world #map .sprite.tile.col-16 { left: 0; }
-#world #map .sprite.tile.col-17 { left: 0; }
-#world #map .sprite.tile.col-18 { left: 0; }
-
 #world #map .layer.tiles .sprite {
     top: 0;
     left: 0;
@@ -2148,6 +2129,7 @@ display: block;
     font-size: 14px;
     text-align: center;
     z-index: 150;
+    text-shadow: 1px 1px 0 black;
 }
 #world #canvas #side-buttons .big-button {
     min-width: 240px;

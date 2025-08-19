@@ -1935,6 +1935,8 @@ class rpg_world {
                 if (empty($pos) || !is_string($pos) || !preg_match('/^\d+-\d+$/', $pos)){ continue; } // skip if no position
                 if (empty($token) || !is_string($token) || !isset($mmrpg_index_items[$token])){ continue; } // skip if no token
                 list($col, $row) = explode('-', $pos);
+                $quantity = intval(trim($quantity, 'x'));
+                if (!$quantity){ $quantity = 1; }
                 $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
                 $z_index = $top + 1;
@@ -1944,7 +1946,7 @@ class rpg_world {
                 $label = $info['item_name'];
                 $class = $token.(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
-                $attrs = 'data-item="'.$token.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$item_key.'"
+                $attrs = 'data-item="'.$item_key.'" data-token="'.$token.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$item_key.'"
                 $markup = self::get_sprite($kind, $token, '', 'right', $class, $style, $attrs, 'icon');
                 $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$kind.'-pickup"', $markup);
                 $items_markup[] = $markup;
@@ -2016,7 +2018,7 @@ class rpg_world {
                 $label = $info['ability_name'];
                 $class = $token.(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
-                $attrs = 'data-ability="'.$token.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$ability_key.'"
+                $attrs = 'data-ability="'.$ability_key.'" data-token="'.$token.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$ability_key.'"
                 $markup = self::get_sprite($kind, $token, '', 'right', $class, $style, $attrs, 'icon');
                 $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$kind.'-pickup"', $markup);
                 $abilities_markup[] = $markup;
@@ -2149,92 +2151,6 @@ class rpg_world {
             );
         if (!$has_persona_applied){ unset($robot_overview['persona']); }
         return $robot_overview;
-    }
-
-    // Define a function for generating a perspective matrix (given known values) for world map positioning
-    public static function get_perspective_matrix($dimensions, $transform = array()){
-        //error_log('rpg_world::get_perspective_matrix() called!');
-        if (empty($dimensions) || !is_array($dimensions) || count($dimensions) !== 2){ error_log('error: $dimensions must be an array with two numeric values!'); return false; }
-        if (empty($transform)){ $transform = array(800, 25, 1.5); } // TODO: hard-coded defaults we should store somewhere
-        // Unpack dimensions and transform values
-        list($width, $height) = $dimensions;
-        list($perspectiveDistance, $rotateX, $scale) = $transform;
-        // Perspective matrix (d = perspectiveDistance)
-        $p = [
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 1, -1 / $perspectiveDistance],
-            [0, 0, 0, 1]
-            ];
-        // Rotation matrix around X-axis (rotateX degrees)
-        $theta = deg2rad($rotateX);
-        $rx = [
-            [1, 0, 0, 0],
-            [0, cos($theta), -sin($theta), 0],
-            [0, sin($theta), cos($theta), 0],
-            [0, 0, 0, 1]
-            ];
-        // Rotation matrix around Y-axis (rotateY is fixed at 0 degrees, so identity matrix)
-        $ry = [
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 1, 0],
-            [0, 0, 0, 1]
-            ];
-        // Scaling matrix (scale factor)
-        $s = [
-            [$scale, 0, 0, 0],
-            [0, $scale, 0, 0],
-            [0, 0, $scale, 0],
-            [0, 0, 0, 1]
-            ];
-        // Multiply matrices in order: P * Rx * Ry * S
-        $transformMatrix = self::multiply_matrices(self::multiply_matrices(self::multiply_matrices($p, $rx), $ry), $s);
-        return $transformMatrix;
-    }
-    // Define a function for transforming a point using the perspective matrix
-    public static function transform_point_with_matrix($xy, $matrix) {
-        //error_log('rpg_world::transform_point_with_matrix() called!');
-        // Apply the affine transformation
-        list($x, $y) = $xy;
-        // If the matrix is a 4x4 matrix (affine transformation matrix), apply the transformation accordingly
-        if (count($matrix) == 4 && count($matrix[0]) == 4) {
-            // Use homogeneous coordinates for affine transformation (add z=0 and w=1)
-            $z = 0;
-            $w = 1;
-            // Apply the matrix to the point (in homogeneous coordinates)
-            $newX = $matrix[0][0] * $x + $matrix[0][1] * $y + $matrix[0][2] * $z + $matrix[0][3] * $w;
-            $newY = $matrix[1][0] * $x + $matrix[1][1] * $y + $matrix[1][2] * $z + $matrix[1][3] * $w;
-            $newZ = $matrix[2][0] * $x + $matrix[2][1] * $y + $matrix[2][2] * $z + $matrix[2][3] * $w;
-            $newW = $matrix[3][0] * $x + $matrix[3][1] * $y + $matrix[3][2] * $z + $matrix[3][3] * $w;
-            // We return the point (x', y') for 2D space (homogeneous coordinates)
-            // Here we ignore the Z and W because they aren't relevant for 2D projections
-            return [$newX / $newW, $newY / $newW];
-        } else {
-            // Fallback if the matrix is not the expected size (shouldn't happen with correct input)
-            throw new Exception("Matrix must be a 4x4 matrix.");
-        }
-    }
-    // Matrix multiplication function
-    public static function multiply_matrices($A, $B){
-        $C = [];
-        for ($i = 0; $i < 4; $i++) {
-            for ($j = 0; $j < 4; $j++) {
-                $C[$i][$j] = 0;
-                for ($k = 0; $k < 4; $k++) {
-                    $C[$i][$j] += $A[$i][$k] * $B[$k][$j];
-                }
-            }
-        }
-        return $C;
-    }
-    // Print a patrix in an easy-to-understand way
-    public static function print_matrix($matrix) {
-        $output = '';
-        foreach ($matrix as $row) {
-            $output .= '[ ' . implode(' ', array_map(function($value) { return number_format($value, 2); }, $row)) . " ]\n";
-        }
-        return $output;
     }
 
 
