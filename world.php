@@ -346,6 +346,8 @@ if (empty($map_sprite_sheet)){ error_log('MMRPG World Fatal Error - No sprite sh
 // Make sure there's room in relevant session arrays for this map's data
 if (!isset($WORLD_SESSION['world_maps'][$world_map_token])){ $WORLD_SESSION['world_maps'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_encounters'][$world_map_token])){ $WORLD_SESSION['world_encounters'][$world_map_token] = array(); }
+if (!isset($WORLD_SESSION['world_items'][$world_map_token])){ $WORLD_SESSION['world_items'][$world_map_token] = array(); }
+if (!isset($WORLD_SESSION['world_abilities'][$world_map_token])){ $WORLD_SESSION['world_abilities'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_buttons'][$world_map_token])){ $WORLD_SESSION['world_buttons'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_switches'][$world_map_token])){ $WORLD_SESSION['world_switches'][$world_map_token] = array(); }
 

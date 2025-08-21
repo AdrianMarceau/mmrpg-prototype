@@ -600,6 +600,7 @@ html, body {
 }
 #world #map .layer.objects .sprite.item.animate > .wrap {
     animation: world-sprite-item-hover 2s steps(4) infinite;
+    animation-delay: inherit;
 }
 @keyframes world-sprite-item-shadow-hover {
     0%, 100% { transform: scale(1.0); }
@@ -610,26 +611,111 @@ html, body {
     content: "";
     display: block;
     position: absolute;
-    bottom: 12px;
+    bottom: 14px;
     left: 12px;
     right: 12px;
     width: auto;
-    height: 6px;
+    height: 4px;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.2);
-    /* filter: blur(1px);  */
     z-index: -1;
 }
 #world #map .layer.objects .sprite.item[data-token*="-pellet"]:after {
     left: 15px;
     right: 15px;
     height: 4px;
-    bottom: 13px;
+    bottom: 20px;
 }
 #world #map .layer.objects .sprite.item.animate:after {
     animation: world-sprite-item-shadow-hover 2s steps(4) infinite;
 }
 
+
+@keyframes world-sprite-ability-flip {
+    0% { transform: scaleX(1); }
+    25% { transform: scaleX(0.05); }
+    50% { transform: scaleX(1); }
+    75% { transform: scaleX(0.05); }
+    100% { transform: scaleX(1); }
+}
+@keyframes world-sprite-ability-flip-v2 {
+    0% { transform: scaleX(1); }
+
+    20% { transform: scaleX(1); }
+    25% { transform: scaleX(0.05); }
+    30% { transform: scaleX(1); }
+
+    70% { transform: scaleX(1); }
+    75% { transform: scaleX(0.05); }
+    80% { transform: scaleX(1); }
+
+    100% { transform: scaleX(1); }
+}
+@keyframes world-sprite-ability-hover {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(0, -4px); }
+}
+#world #map .layer.objects .sprite.ability {
+    background-color: transparent;
+    transform: scaleX(1);
+    transform-origin: center bottom;
+}
+#world #map .layer.objects .sprite.ability > .wrap {
+    top: auto;
+    bottom: 24px;
+    z-index: 1;
+    border: 1px solid #191919 !important;
+    border-radius: 6px;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.6));
+}
+#world #map .layer.objects .sprite.ability > .wrap:before {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 3px;
+}
+#world #map .layer.objects .sprite.ability > .wrap > .sprite {
+    filter: none;
+    z-index: 2;
+    left: -1px;
+    top: -1px;
+}
+#world #map .layer.objects .sprite.ability.animate {
+    animation: world-sprite-ability-flip-v2 18s infinite;
+    animation-delay: 1s;
+}
+#world #map .layer.objects .sprite.ability.animate > .wrap {
+    animation: world-sprite-ability-hover 2s steps(4) infinite;
+    animation-delay: inherit;
+}
+@keyframes world-sprite-ability-shadow-hover {
+    0%, 100% { transform: scale(1.0); }
+    50% { transform: scale(0.8); }
+}
+#world #map .layer.objects .sprite.ability:after {
+    /* shadow */
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 12px;
+    left: 1px;
+    right: 1px;
+    width: auto;
+    height: 4px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.2);
+    /* filter: blur(1px);  */
+    z-index: -1;
+}
+#world #map .layer.objects .sprite.ability.animate:after {
+    animation: world-sprite-ability-shadow-hover 2s steps(4) infinite;
+}
 
 /* define some bounce animations for the sprites */
 #world #map .layer.objects .sprite {
@@ -1308,12 +1394,12 @@ html, body {
     letter-spacing: 1px;
     bottom: 38px;
     left: 10px;
-    padding-left: 30px;
+    padding-left: 34px;
     text-shadow: 1px 1px 0 #000000;
     transition: bottom 0.6s, padding-left 0.6s;
 }
 #world #canvas #robots-overview.expanded .limit-hearts {
-
+    padding-left: 30px;
 }
 #world #canvas #robots-overview .limit-hearts > i {
     position: relative;

@@ -98,6 +98,8 @@ gameSettings.worldState = {
         items: {},
         abilities: {},
         },
+    items: {},
+    abilities: {},
     buttons: {},
     switches: {},
     layersIndex: {},
@@ -2351,8 +2353,8 @@ class mmrpgWorldMap {
             //console.log('-> no events found at position', cursorPosition, 'skipping further processing');
             return;
             }
-        //console.log('-> found ' + eventsAtPosition.length + ' events at position');
-        //console.log('-> eventsAtPosition =', eventsAtPosition);
+        console.log('-> found ' + eventsAtPosition.length + ' events at position');
+        console.log('-> eventsAtPosition =', eventsAtPosition);
 
         // Check to see what the very first event type is
         let firstEvent = eventsAtPosition[0];
@@ -2639,25 +2641,52 @@ class mmrpgWorldMap {
                         if (!stillAtPosition()){ return false; }
                         //console.log('-> running');
                         // If the first event in the list (before sorting) is an item, we should defer it to the pickup function
-                        if (firstEvent.kind === 'item'){
-                            //console.log('-> first event is an item, deferring to pickup function');
-                            _self.triggerItemPickup(firstEvent, 600);
-                            }
-                        // Else if the first event in the list (before sorting) is an ability, we should defer it to the pickup function
-                        else if (firstEvent.kind === 'ability'){
-                            //console.log('-> first event is an ability, deferring to pickup function');
-                            _self.triggerAbilityPickup(firstEvent, 600);
-                            }
+                        //console.log('-> first event is an item, deferring to pickup function');
+                        _self.triggerItemPickup(firstEvent, 600);
                         };
 
                     }
                 }
             }
         else if (firstEventType === 'ability'){
-            //console.log('-> event at position is an ability, preparing dropdown');
+            //console.log('-> event at position is an ability, preparing either dropdown or pickup');
+            // If the cursor is literally on a button, only one event sprite matters right now
+            let $abilityEvent = $(firstEvent.sprite);
+            let dataLabel = $abilityEvent.attr('data-label');
+            let dataAbility = $abilityEvent.attr('data-ability');
+            let dataAbilityToken = $abilityEvent.attr('data-token');
+            let dataColour = ''; // TODO: import ability data so we know what type it is
+            let abilityAlreadyTaken = false; // TODO: track abilities already taken
+            let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
+            //console.log('-> playerIsCursor =', playerIsCursor);
+            if (dataAbility && dataAbilityToken && !abilityAlreadyTaken){
+                // If the player is the cursor player, we should show the ability pickup dropdown
+                if (playerIsCursor){
+                    //console.log('-> player is cursor, preparing ability pickup dropdown');
+                    showDropdown = true;
+                    if (dataLabel){ dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                    dropdownButtons += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pick-up-ability" data-ability="'+dataAbility+'"><span>Pick Up Ability?</span></a>';
+                    dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                    showDropdownType = 'button';
+                    zoomTimeoutDuration = 750; // if we show a pick-up dropdown, we want to zoom in faster
+                    }
+                // Otherwise if this is a human player, we should trigger the auto-pickup functionality instead
+                else {
+                    //console.log('-> player is human player, triggering auto-pickup');
+                    triggerEffect = true;
+                    readyTeamSprites = true;
+                    teamReadyDuration = 600; // for event panels we want to zoom in quickly
+                    zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
+                    triggerEffectFunction = function(){
+                        if (!stillAtPosition()){ return false; }
+                        //console.log('-> running');
+                        // If the first event in the list (before sorting) is an ability, we should defer it to the pickup function
+                        //console.log('-> first event is an ability, deferring to pickup function');
+                        _self.triggerAbilityPickup(firstEvent, 600);
+                        };
 
-            // ...
-
+                    }
+                }
             }
 
         // If there's no dropdown to show, we can return early
@@ -3095,10 +3124,13 @@ class mmrpgWorldMap {
         let eventKinds = ['event', 'portal', 'button', 'battle', 'item', 'ability'];
         for (let e = 0; e < eventKinds.length; e++){
             let eventKind = eventKinds[e];
+            let eventKindPlural = eventKind + 's';
+            eventKindPlural = eventKindPlural.replace(/ys/i, 'ies'); // fix pluralization issues
+            eventKindPlural = eventKindPlural.replace(/ss/i, 'ses'); // fix pluralization issues
             //console.log('checking for ' + eventKind+'s at: ' + positionsToCheck.join(', '));
             // ie: mapKindSymbols
             let symbolsKey = 'map' + (eventKind[0].toUpperCase() + eventKind.slice(1)) + 'Symbols';
-            let indexKey = 'map' + (eventKind[0].toUpperCase() + eventKind.slice(1)) + 'sIndex';
+            let indexKey = 'map' + (eventKindPlural[0].toUpperCase() + eventKindPlural.slice(1)) + 'Index';
             let eventSymbols = _config.hasOwnProperty(symbolsKey) ? _config[symbolsKey] : false;
             let eventsIndex = _config.hasOwnProperty(indexKey) ? _config[indexKey] : false;
             let eventKeys = eventSymbols ? Object.keys(eventSymbols) : [];
@@ -3129,6 +3161,10 @@ class mmrpgWorldMap {
                     }
                 else if (eventKind === 'item' || eventKind === 'ability'){
                     // skip if already claimed by the player
+                    //console.log('-> eventPosition: ', eventPosition);
+                    //console.log('-> eventToken: ', eventToken);
+                    //console.log('-> eventInfo: ', eventInfo);
+                    //console.log('-> eventsIndex: ', eventsIndex);
                     if (eventInfo.claimed){ continue; }
                     // collect the token as the second "kind"
                     eventKind2 = eventInfo.token;
@@ -3363,7 +3399,7 @@ class mmrpgWorldMap {
         return;
         }
     saveWorldStateForReal(callback){
-        //console.log('%c' + 'mmrpgWorldMap.saveWorldStateForReal(callback)', 'color: magenta;');
+        console.log('%c' + 'mmrpgWorldMap.saveWorldStateForReal(callback)', 'color: magenta;');
         callback = typeof callback === 'function' ? callback : false; // default to no callback if not provided
         let _self = this;
         let _selfRef = _self.saveWorldState;
@@ -3372,17 +3408,36 @@ class mmrpgWorldMap {
         let _world = _self.state;
         //let _worldCursor = _world.cursor;
         let _worldPlayer = _world.player;
+        let _worldItems = _world.items;
+        let _worldAbilities = _world.abilities;
         let _worldButtons = _world.buttons;
         let _worldSwitches = _world.switches;
         let lastPlayer = _worldPlayer.token;
         let lastPlayerRobots = _worldPlayer.robots;
+        let lastPlayerAbilities = _worldPlayer.abilities;
+        let lastPlayerItems = _worldPlayer.items;
         let lastPlayerWorld = _config.mapWorld;
         let lastPlayerWorldMap = _config.mapWorld + '__' + _config.mapToken;
         let lastPlayerPosition = _worldPlayer.position;
         let lastPlayerDirection = _worldPlayer.direction;
+        let lastWorldItems = {}; lastWorldItems[lastPlayerWorldMap] = _worldItems;
+        let lastWorldAbilities = {}; lastWorldAbilities[lastPlayerWorldMap] = _worldAbilities;
         let lastWorldButtons = {}; lastWorldButtons[lastPlayerWorldMap] = _worldButtons;
         let lastWorldSwitches = {}; lastWorldSwitches[lastPlayerWorldMap] = _worldSwitches;
-        let worldData = {lastPlayer, lastPlayerRobots, lastPlayerWorld, lastPlayerWorldMap, lastPlayerPosition, lastPlayerDirection, lastWorldButtons, lastWorldSwitches};
+        let worldData = {
+            lastPlayer,
+            lastPlayerRobots,
+            lastPlayerAbilities,
+            lastPlayerItems,
+            lastPlayerWorld,
+            lastPlayerWorldMap,
+            lastPlayerPosition,
+            lastPlayerDirection,
+            lastWorldItems,
+            lastWorldAbilities,
+            lastWorldButtons,
+            lastWorldSwitches
+            };
         //console.log('%c' + 'Saving World State ...', 'color: cyan;');
         //console.log('w/ worldData:', worldData);
         _selfRef._busy = true;
@@ -3505,6 +3560,7 @@ class mmrpgWorldMap {
                 _self.resetZoomLevel();
                 $teamSprites.removeClass('shake');
                 $teamSprites.filter(':not(.disabled)').attr('data-frame', '00');
+                _self.triggerWindowEventsPull();
                 }, delayTime);
             }, delayTime);
         // Return true on success
@@ -3969,6 +4025,7 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
+        let _worldItemStates = _world.items;
         let _mapItemsIndex = _config.mapItemsIndex;
         let $teamSprites = _elements.teamSprites;
         // Collect as much info about the item as we can from the event data
@@ -3994,8 +4051,7 @@ class mmrpgWorldMap {
             $itemEventSprite.addClass('zoom');
             $itemEventLayer.addClass('has-zoom');
             }, Math.ceil(zoomDelay / 3));
-
-        // Define some variables to hold the pickup action config
+        // Define a variable to hold the pickup action function
         let pickupFunction = function(onComplete, afterDelay){
             if (!onComplete || typeof onComplete !== 'function'){ onComplete = false; }
             if (!afterDelay || typeof afterDelay !== 'number'){ afterDelay = 0; }
@@ -4085,16 +4141,18 @@ class mmrpgWorldMap {
                     }
                 }
             // Update the real copy with any changes to claimed flag
-            itemEventInfo.claimed = itemEvent.claimed;
+            if (itemEvent.claimed){
+                let claimTime = new Date().getTime();
+                itemEventInfo.claimed = true;
+                _worldItemStates[itemEventToken] = claimTime; // update world item states w/ claim time
+                }
             // If an onComplete function was provided, call it now (with delay if requested)
             if (onComplete){
                 if (!afterDelay){ onComplete.call(_self); }
                 else { setTimeout(function(){ onComplete.call(_self); }, afterDelay); }
                 }
             };
-
         // Now we can remove the zoom and delete the item sprite from the events layer
-        // TODO: we need to actually save the item to the player's inventory and save the event to permanently remove it
         //console.log('-> zooming and queueing pickup function for item sprite on map');
         _self.incZoomLevel();
         setTimeout(function(){
@@ -4106,14 +4164,13 @@ class mmrpgWorldMap {
                 $itemEventLayer.removeClass('has-zoom');
                 $teamSprites.removeClass('shake');
                 $teamSprites.filter(':not(.disabled)').attr('data-frame', '00');
+                //_self.triggerWindowEventsPull();
                 if (!itemEventQuantity){
                     //console.log('--> removing item sprite from the map', '\n--> b/c itemEventQuantity =', itemEventQuantity);
                     $itemEventSprite.animate({opacity: 0, filter: 'brightness(2)'}, zoomDelay, function(){ $itemEventSprite.remove(); });
-                    console.warn('--> we must also save this removal into long-term memory somewhere!'); // TODO: read the message
                     }
                 });
             }, (zoomDelay * 2));
-
         // Trigger a save of the world state to persist this change
         _self.saveWorldState();
         // Return true on success
@@ -4121,12 +4178,86 @@ class mmrpgWorldMap {
         }
 
     // Define a quick function for triggering a live ability pickup on the field (and any effects that may have
-    triggerAbilityPickup(abilityEvent){
+    triggerAbilityPickup(abilityEvent, zoomDelay){
         console.log('%c' + 'mmrpgWorldMap.triggerAbilityPickup()', 'color: magenta;');
         console.log('--> abilityEvent =', abilityEvent);
+        if (!abilityEvent || typeof abilityEvent !== 'object'){ console.error('triggerAbilityPickup() missing required abilityEvent!'); return false; }
+        if (typeof abilityEvent.sprite === 'undefined'){ console.error('triggerAbilityPickup() missing required abilityEvent.sprite!'); return false; }
+        if (abilityEvent.claimed === true){ console.warn('triggerAbilityPickup() called for ability that has already been claimed!'); return false; }
+        // Collect local references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        let _worldAbilityStates = _world.abilities;
+        let _mapAbilitiesIndex = _config.mapAbilitiesIndex;
+        let $teamSprites = _elements.teamSprites;
+        // Collect as much info about the ability as we can from the event data
+        let $abilityEventSprite = $(abilityEvent.sprite);
+        let $abilityEventLayer = $abilityEventSprite.closest('.layer');
+        let abilityEventToken = abilityEvent.token;
+        let abilityEventInfo = _mapAbilitiesIndex[abilityEventToken];
+        let abilityToken = abilityEvent.kind2;
+        console.log('--> abilityEventToken =', abilityEventToken);
+        console.log('--> abilityEventInfo =', abilityEventInfo);
+        console.log('--> abilityToken =', abilityToken);
+        // First zoom the ability sprite into the zoom layer so it's more visible to the player
+        console.log('-> zooming ability sprite make it more visible');
+        zoomDelay = typeof zoomDelay === 'number' ? zoomDelay : 1200; // default to sync with standard use-case
+        setTimeout(function(){
+            $abilityEventSprite.addClass('zoom');
+            $abilityEventLayer.addClass('has-zoom');
+            }, Math.ceil(zoomDelay / 3));
+        // Define a variable to hold the pickup action function
+        let pickupFunction = function(onComplete, afterDelay){
+            if (!onComplete || typeof onComplete !== 'function'){ onComplete = false; }
+            if (!afterDelay || typeof afterDelay !== 'number'){ afterDelay = 0; }
+            // Check to make sure the ability token was not empty
+            if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){
+                console.error('triggerAbilityPickup() called for ability with empty token!');
+                return false;
+                }
+            // We can add this ability directly to the player's collection
+            if (_self.addAbilityToCollection(abilityToken)){
+                // only remove if collection function returns true, though it should never technically be false
+                abilityEvent.claimed = true;
+                }
+            // Update the real copy with any changes to claimed flag
+            if (abilityEvent.claimed){
+                let claimTime = new Date().getTime();
+                abilityEventInfo.claimed = true;
+                _worldAbilityStates[abilityEventToken] = claimTime; // update world ability states w/ claim time
+                }
+            // If an onComplete function was provided, call it now (with delay if requested)
+            if (onComplete){
+                if (!afterDelay){ onComplete.call(_self); }
+                else { setTimeout(function(){ onComplete.call(_self); }, afterDelay); }
+                }
+            };
+        // Now we can remove the zoom and delete the ability sprite from the events layer
+        // TODO: we need to actually save the ability to the player's inventory and save the event to permanently remove it
+        //console.log('-> zooming and queueing pickup function for ability sprite on map');
+        _self.incZoomLevel();
+        setTimeout(function(){
+            // call the pickup function to apply the ability effects
+            pickupFunction(function(){
+                //console.log('--> resetting zoom level and team sprite classes');
+                //console.log('--> $teamSprites =', $teamSprites);
+                _self.resetZoomLevel();
+                $abilityEventLayer.removeClass('has-zoom');
+                $teamSprites.removeClass('shake');
+                $teamSprites.filter(':not(.disabled)').attr('data-frame', '00');
+                //_self.triggerWindowEventsPull();
+                //console.log('--> removing ability sprite from the map');
+                $abilityEventSprite.animate({opacity: 0, filter: 'brightness(2)'}, zoomDelay, function(){ $abilityEventSprite.remove(); });
+                });
+            }, (zoomDelay * 2));
 
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState();
         // Return true on success
-        console.warn('...not done yet!');
         return true;
         }
 
@@ -4180,9 +4311,83 @@ class mmrpgWorldMap {
         // If a sound was requested, play it now
         if (playSound){ _self.playSoundEffect('get-item'); }
         // Trigger a save of the world state to persist this change
-        _self.saveWorldState();
+        _self.saveWorldState(function(){
+            _self.triggerWindowEventsPull(0);
+            });
         // Return true on success
         return true;
-    }
+        }
+
+    // Define a quick function for adding an ability to the player's collection if they don't already have it
+    addAbilityToCollection(abilityToken, animatePickup, playSound){
+        console.log('%c' + 'mmrpgWorldMap.addAbilityToCollection(ability:' + abilityToken + ')', 'color: magenta;');
+        if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('addAbilityToCollection() missing required abilityToken!'); return false; }
+        if (typeof animatePickup !== 'boolean'){ animatePickup = true; } // default to true if not provided
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        console.log('--> abilityToken =', abilityToken);
+        console.log('--> animatePickup =', animatePickup);
+        console.log('--> playSound =', playSound);
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerAbilities = _worldPlayer.abilities;
+        let abilityInventoryMax = _config.playerInventoryMax; // 99;
+        // Check to see if there's room for the ability in the collection
+        let abilityAlreadyUnlocked = _worldPlayerAbilities.indexOf(abilityToken) !== -1 ? true : false;
+        console.log('--> abilityAlreadyUnlocked =', abilityAlreadyUnlocked);
+        if (abilityAlreadyUnlocked){
+            console.warn('addAbilityToCollection() called for ability that is already unlocked!');
+            // we're gonna "collect" it anyway though
+            //return false;
+            }
+        // If it's not already there, add the ability to the collection
+        if (!abilityAlreadyUnlocked){ _worldPlayerAbilities.push(abilityToken); }
+        //console.log('--> updated _worldPlayerAbilities['+abilityToken+'] => ', _worldPlayerAbilities[abilityToken]);
+        // If an animation was requested, make sure we show it above the player's head
+        if (animatePickup){
+            // TODO: write this animation code later
+            console.warn('addAbilityToCollection() would animate the ability pickup now...'); // TODO: read the message
+            }
+        // If a sound was requested, play it now
+        if (playSound){ _self.playSoundEffect('get-ability'); }
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState(function(){
+            _self.triggerWindowEventsPull(0);
+            });
+        // Return true on success
+        return true;
+        }
+
+
+    // Define a quick functino for polling the server for new events (but only if we can actually show them)
+    triggerWindowEventsPull(afterDelay){
+        console.log('%c' + 'mmrpgWorldMap.triggerWindowEventsPull()', 'color: magenta;');
+        afterDelay = typeof afterDelay === 'number' ? afterDelay : 1000; // default to zero if not provided
+        console.log('queuing the windowEventsPull event (via world)');
+        if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
+            window.top.mmrpg_queue_for_game_start(function(){
+                console.log('i guess the game has started');
+                setTimeout(function(){
+                    console.log('attempting to pull window events via parent.windowEventsPull()', parent.windowEventsPull);
+                    let result = parent.windowEventsPull(true);
+                    if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+                    else { console.log('windowEventsPull returned successfully: ' + result); }
+                    }, afterDelay);
+                });
+            }
+        else if (typeof window.top.windowEventsPull !== 'undefined'){
+            console.log('i guess we pull events manually via parent.windowEventsPull()', parent.windowEventsPull);
+            setTimeout(function(){
+                let result = parent.windowEventsPull(true);
+                if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+                else { console.log('windowEventsPull returned successfully: ' + result); }
+                }, afterDelay);
+            }
+        // Return no specific result
+        return;
+        }
 
 }
