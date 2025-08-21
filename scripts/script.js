@@ -3028,6 +3028,9 @@ function windowEventDisplay(){
             windowEventDestroy();
             if (gameSettings.canvasMarkupArray.length || gameSettings.messagesMarkupArray.length){
                 windowEventDisplay();
+                } else {
+                let windowIframe = document.querySelector('#window iframe');
+                if (windowIframe){ windowIframe.contentWindow.focus(); }
                 }
             });
 
