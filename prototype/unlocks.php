@@ -307,22 +307,6 @@ if (!mmrpg_prototype_robot_unlocked(false, 'mega-man')){
 
 }
 
-/*
-// UNLOCK ROBOT : ROLL
-// NOTE:  No longer necessary as Roll is unlocked as part of the campaign
-// If the player has failured at least one battle, unlock Roll as a playable character
-if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false, 'roll')){
-
-    // Unlock Roll as a playable character
-    $unlock_player_info = $mmrpg_index_players['dr-light'];
-    $unlock_robot_info = rpg_robot::get_index_info('roll');
-    $unlock_robot_info['robot_level'] = MMRPG_SETTINGS_GAMESTORY1_STARTLEVEL;
-    $unlock_robot_info['robot_experience'] = 999;
-    mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
-
-}
-*/
-
 // UNLOCK EVENT : PHASE TWO CHAPTERS (WILY)
 
 // If Dr. Light has completed all of his second phase, open Dr. Wily's second
@@ -374,8 +358,8 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
 // UNLOCK PLAYER : DR. WILY
 
-// If Dr. Light has completed phase1 of his battles, unlock Dr. Wily
-if (!$unlock_flag_wily && mmrpg_prototype_complete('dr-light')){
+// If Dr. Light has completed phase1 of his battles (or found the Wily Program early), unlock Dr. Wily
+if (!$unlock_flag_wily && (mmrpg_prototype_item_unlocked('wily-program') || mmrpg_prototype_complete('dr-light'))){
 
     // Unlock Dr. Wily as a playable character
     $unlock_player_info = $mmrpg_index_players['dr-wily'];
@@ -422,22 +406,6 @@ if (!$unlock_flag_wily && mmrpg_prototype_complete('dr-light')){
     exit();
 
 }
-
-/*
-// UNLOCK ROBOT : DISCO
-// NOTE:  No longer necessary as Disco is unlocked as part of the campaign
-// If the player has failed at least two battles, unlock Disco as a playable character
-if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked(false, 'disco')){
-
-    // Unlock Disco as a playable character
-    $unlock_player_info = $mmrpg_index_players['dr-wily'];
-    $unlock_robot_info = rpg_robot::get_index_info('disco');
-    $unlock_robot_info['robot_level'] = MMRPG_SETTINGS_GAMESTORY2_STARTLEVEL;
-    $unlock_robot_info['robot_experience'] = 999;
-    mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
-
-}
-*/
 
 // UNLOCK EVENT : PHASE THREE CHAPTERS (COSSACK)
 
@@ -490,7 +458,7 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 // UNLOCK PLAYER : DR. COSSACK
 
 // If Dr. Light has completed phase1 of his battles, unlock Dr. Cossack
-if (!$unlock_flag_cossack && mmrpg_prototype_complete('dr-wily')){
+if (!$unlock_flag_cossack && (mmrpg_prototype_item_unlocked('cossack-program') || mmrpg_prototype_complete('dr-wily'))){
 
     // Unlock Dr. Cossack as a playable character
     $unlock_player_info = $mmrpg_index_players['dr-cossack'];
@@ -537,22 +505,6 @@ if (!$unlock_flag_cossack && mmrpg_prototype_complete('dr-wily')){
     exit();
 
 }
-
-/*
-// UNLOCK ROBOT : RHYTHM
-// NOTE:  No longer necessary as Rhythm is unlocked as part of the campaign
-// If the player has failed at least three battles, unlock Rhythm as a playable character
-if ($battle_failure_counter_cossack >= 3 && !mmrpg_prototype_robot_unlocked(false, 'rhythm')){
-
-    // Unlock Rhythm as a playable character
-    $unlock_player_info = $mmrpg_index_players['dr-cossack'];
-    $unlock_robot_info = rpg_robot::get_index_info('rhythm');
-    $unlock_robot_info['robot_level'] = MMRPG_SETTINGS_GAMESTORY3_STARTLEVEL;
-    $unlock_robot_info['robot_experience'] = 999;
-    mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
-
-}
-*/
 
 // UNLOCK EVENT : PHASE TWO CHAPTERS (LIGHT)
 
