@@ -292,7 +292,7 @@ if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
 
 */
 
-
+/*
 // UNLOCK ROBOT : MEGA MAN
 
 // If the player has somehow not already got one, unlock Mega Man as a playable character
@@ -306,6 +306,7 @@ if (!mmrpg_prototype_robot_unlocked(false, 'mega-man')){
     mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, false);
 
 }
+*/
 
 // UNLOCK EVENT : PHASE TWO CHAPTERS (WILY)
 
