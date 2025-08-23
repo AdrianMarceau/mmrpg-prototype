@@ -180,7 +180,8 @@ foreach ($this_menu_tooltips AS $token => $text){
 
 // Collect the battle settings from the session, if they exist
 $session_token = rpg_game::session_token();
-$battleSettings = $_SESSION[$session_token]['battle_settings'];
+$battleSettings = !empty($_SESSION[$session_token]['battle_settings']) ? $_SESSION[$session_token]['battle_settings'] : array();
+$battleRewards = !empty($_SESSION[$session_token]['battle_rewards']) ? $_SESSION[$session_token]['battle_rewards'] : array();
 $readyRoomConfig = rpg_game::get_readyRoomConfig(true);
 $mmrpgBodyClasses = rpg_game::get_mmrpgBodyClasses('prototype');
 
