@@ -2411,11 +2411,11 @@ class mmrpgWorldMap {
         let autoRedirect = false;
         let autoRedirectURL = '';
         let autoRedirectSound = '';
-        let showDropdown = false;
-        let showDropdownType = '';
-        let showDropdownSound = '';
-        let dropdownMarkup = '';
-        let dropdownButtons = '';
+        let showActionArea = false;
+        let showActionAreaType = '';
+        let showActionAreaSound = '';
+        let actionAreaMarkup = '';
+        let sideButtonsMarkup = '';
         let readyTeamSprites = false;
         if (firstEventType === 'event'){
             //console.log('-> event at position is custom, checking what comes next...');
@@ -2445,12 +2445,12 @@ class mmrpgWorldMap {
                             };
                         } else {
                         //console.log('-> eventAction is false, so prepare dropdown instead');
-                        showDropdown = true;
+                        showActionArea = true;
                         if (!dataLabel){ dataLabel = 'Event Options'; }
-                        dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>';
-                        dropdownButtons += '<a class="button big-button" data-action="trigger-event" data-event="'+dataEvent+'"><span>Trigger Event</span></a>';
-                        dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-                        showDropdownType = 'event';
+                        actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>';
+                        sideButtonsMarkup += '<a class="button big-button" data-action="trigger-event" data-event="'+dataEvent+'"><span>Trigger Event</span></a>';
+                        sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                        showActionAreaType = 'event';
                         }
                     } else {
                     //console.log('-> event not allowed based on filter "' + eventFilter + '"');
@@ -2470,13 +2470,13 @@ class mmrpgWorldMap {
             if (dataPortal && dataPortal.indexOf('goto__') !== -1){
                 let portalInfo = _config.mapPortalsIndex[dataPortal] || false;
                 //console.log('-> found portalInfo for ' + dataPortal + ':', portalInfo);
-                showDropdown = true;
+                showActionArea = true;
                 if (!dataLabel){ dataLabel = 'Portal Options'; }
-                dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>';
-                if (dataPortal.indexOf('goto__') !== -1){ dropdownButtons += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Use Teleport</span></a>'; }
-                else if (dataPortal === 'exit'){ dropdownButtons += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Return Home</span></a>'; }
-                dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-                showDropdownType = 'portal';
+                actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>';
+                if (dataPortal.indexOf('goto__') !== -1){ sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Use Teleport</span></a>'; }
+                else if (dataPortal === 'exit'){ sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Return Home</span></a>'; }
+                sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                showActionAreaType = 'portal';
                 zoomTimeoutDuration = 500; // if we show a portal dropdown, we want to zoom in quickly
                 // Automatically redirect to this portal if player has moved at least once
                 if (_worldCursor.moved){
@@ -2487,12 +2487,12 @@ class mmrpgWorldMap {
                         } else if (dataPortal === 'exit'){
                         // TODO: EXIT PORTAL - make the exit actually go somewhere specific ?
                         autoRedirect = true;
-                        showDropdown = false;
+                        showActionArea = false;
                         autoRedirectURL = 'prototype.php';
                         } else if (dataPortal.indexOf('goto__') !== -1){
                         // GOTO PORTAL - use the portal token as worldmap token for redirect
                         autoRedirect = true;
-                        showDropdown = false;
+                        showActionArea = false;
                         let worldToken, mapToken;
                         let goToPath = dataPortal.replace(/^goto__/i, '').split('__');
                         if (goToPath[1]){ worldToken = goToPath[0]; mapToken = goToPath[1]; }
@@ -2504,7 +2504,7 @@ class mmrpgWorldMap {
                         }
                     } else {
                     //console.log('-> portal ' + dataPortal + ' disabled until cursor movement!');
-                    showDropdown = false;
+                    showActionArea = false;
                     }
                 }
             }
@@ -2517,13 +2517,13 @@ class mmrpgWorldMap {
             let dataColour = $buttonEvent.attr('data-colour');
             let dataState = $buttonEvent.attr('data-state');
             if (dataButton && dataState === 'up'){
-                showDropdown = true;
+                showActionArea = true;
                 //var buttonName = (dataColour ? (dataColour[0].toUpperCase() + dataColour.slice(1) + ' ') : '') + 'Button';
                 //if (!dataLabel){ dataLabel = 'Button Options'; }
-                if (dataLabel){ dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-                dropdownButtons += '<a class="button big-button'+(dataColour ? ' '+dataColour : '')+'" data-action="push-button" data-button="'+dataButton+'"><span>Push Button?</span></a>';
-                dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-                showDropdownType = 'button';
+                if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' '+dataColour : '')+'" data-action="push-button" data-button="'+dataButton+'"><span>Push Button?</span></a>';
+                sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                showActionAreaType = 'button';
                 zoomTimeoutDuration = 500; // if we show a button dropdown, we want to zoom in quickly
                 }
             }
@@ -2587,7 +2587,7 @@ class mmrpgWorldMap {
                 });
             //console.log('-> dataBattles after sorting by position:', dataBattles.join('\n'));
             if (dataLabels.length && dataBattles.length){
-                showDropdown = true;
+                showActionArea = true;
                 readyTeamSprites = true;
                 //console.log('-> showing dropdown with battles:', dataBattles);
                 let dataBattlesJoined = dataBattles.join(',');
@@ -2602,13 +2602,13 @@ class mmrpgWorldMap {
                         markup.push('<strong class="'+labelClasses+'" data-pos="' + labelPosition + '" data-rel="' + positionRelative + '">' + labelText + '</strong>');
                         } return markup;
                     })(dataLabels).join('');
-                dropdownMarkup += dataLabelsJoined;
-                if (playerActiveRobots >= 1){  dropdownButtons += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
-                else { dropdownButtons += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
-                dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-                showDropdownType = 'battle';
-                //showDropdownSound = 'background-spawn';
-                showDropdownSound = 'mecha-taunt-sound' + (dataBattles.length > 1 ? '*'+dataBattles.length : '');
+                actionAreaMarkup += dataLabelsJoined;
+                if (playerActiveRobots >= 1){  sideButtonsMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
+                else { sideButtonsMarkup += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
+                sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                showActionAreaType = 'battle';
+                //showActionAreaSound = 'background-spawn';
+                showActionAreaSound = 'mecha-taunt-sound' + (dataBattles.length > 1 ? '*'+dataBattles.length : '');
                 zoomTimeoutDuration = 1500; // otherwise if this is a battle we wait a moment
                 }
             }
@@ -2630,11 +2630,11 @@ class mmrpgWorldMap {
                 // If the player is the cursor player, we should show the item pickup dropdown
                 if (playerIsCursor){
                     //console.log('-> player is cursor, preparing item pickup dropdown');
-                    showDropdown = true;
-                    if (dataLabel){ dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-                    dropdownButtons += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pick-up-item" data-item="'+dataItem+'"><span>Pick Up Item?</span></a>';
-                    dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-                    showDropdownType = 'button';
+                    showActionArea = true;
+                    if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                    sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pick-up-item" data-item="'+dataItem+'"><span>Pick Up Item?</span></a>';
+                    sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                    showActionAreaType = 'button';
                     zoomTimeoutDuration = 750; // if we show a pick-up dropdown, we want to zoom in faster
                     }
                 // Otherwise if this is a human player, we should trigger the auto-pickup functionality instead
@@ -2670,11 +2670,11 @@ class mmrpgWorldMap {
                 // If the player is the cursor player, we should show the ability pickup dropdown
                 if (playerIsCursor){
                     //console.log('-> player is cursor, preparing ability pickup dropdown');
-                    showDropdown = true;
-                    if (dataLabel){ dropdownMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-                    dropdownButtons += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pick-up-ability" data-ability="'+dataAbility+'"><span>Pick Up Ability?</span></a>';
-                    dropdownButtons += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-                    showDropdownType = 'button';
+                    showActionArea = true;
+                    if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                    sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pick-up-ability" data-ability="'+dataAbility+'"><span>Pick Up Ability?</span></a>';
+                    sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                    showActionAreaType = 'button';
                     zoomTimeoutDuration = 750; // if we show a pick-up dropdown, we want to zoom in faster
                     }
                 // Otherwise if this is a human player, we should trigger the auto-pickup functionality instead
@@ -2697,7 +2697,7 @@ class mmrpgWorldMap {
             }
 
         // If there's no dropdown to show, we can return early
-        if (!showDropdown && !autoRedirect && !triggerEffect){ return; }
+        if (!showActionArea && !autoRedirect && !triggerEffect){ return; }
 
         // Define an inline function to put the team into their battle-ready poses
         let getTeamSpritesReady = function(){
@@ -2815,16 +2815,16 @@ class mmrpgWorldMap {
                 }
 
             // Move the action dropdown to the correct position, add the markup, and show it
-            if (dropdownMarkup.length){
+            if (actionAreaMarkup.length){
                 $actionDropdown.css({
                     left: ((thisNewCol - 1) * _mapTileSize[0] + _mapTileSizeOffset[0]) + 'px',
                     top: ((thisNewRow - 1) * _mapTileSize[1] + _mapTileSizeOffset[1]) + 'px',
-                    }).attr('data-dir', _worldCursor.direction).attr('data-type', showDropdownType).attr('data-align', 'center');
-                $actionDropdownWrapper.html(dropdownMarkup);
+                    }).attr('data-dir', _worldCursor.direction).attr('data-type', showActionAreaType).attr('data-align', 'center');
+                $actionDropdownWrapper.html(actionAreaMarkup);
                 }
 
             // Add the buttons to the sidebar area so that they are out-of-the-way
-            $sideButtonsWrapper.html(dropdownButtons);
+            $sideButtonsWrapper.html(sideButtonsMarkup);
 
             // Define the function for dismissing the dropdown and side buttons
             let dismissDropdown = function(playSound){
@@ -3055,8 +3055,8 @@ class mmrpgWorldMap {
                 // Apply the alignment to the dropdown
                 $actionDropdown.attr('data-align', dropdownAlign);
                 // If sound effect(s) have been defined play now
-                if (showDropdownSound){
-                    let sound = showDropdownSound, repeat = 1, delay = 0;
+                if (showActionAreaSound){
+                    let sound = showActionAreaSound, repeat = 1, delay = 0;
                     if (sound.indexOf('*') !== -1){ var parts = sound.split('*'); sound = parts[0]; repeat = parseInt(parts[1]); }
                     for (var i = 0; i < repeat; i++){
                         if (!delay){ _self.playSoundEffect(sound); delay += 50; }
@@ -3087,7 +3087,7 @@ class mmrpgWorldMap {
             }
 
         // Otherwise we can actually trigger the dropdown and zoom in on the events
-        if (showDropdown){
+        if (showActionArea){
             if (_selfRef.zoomDropdownTimeout){ clearTimeout(_selfRef.zoomDropdownTimeout); }
             _selfRef.zoomDropdownTimeout = setTimeout(zoomAndShowDropdown, (zoomTimeoutDuration * timeoutMultiplier));
             return true;
@@ -4322,7 +4322,7 @@ class mmrpgWorldMap {
         if (itemToken.indexOf('-heart') !== -1){ reloadWorldOnSave = true; } // limit hearts always reload the world
         _self.saveWorldState(function(){
             _self.triggerWindowEventsPull(0);
-            console.log('reloadWorldOnSave = ', reloadWorldOnSave);
+            //console.log('reloadWorldOnSave = ', reloadWorldOnSave);
             // maybe reload the page to update the inventory display
             if (reloadWorldOnSave){ window.location.reload(); }
             });
