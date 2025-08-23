@@ -1738,26 +1738,44 @@ function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0, &$
     $max_hearts = $real_max_hearts;
 
     // Collect the player's progress in terms of chapters to determine hearts
+    $limit_hearts_earned = array();
+    $limit_heart_token = str_replace('dr-', '', $player_token).'-heart';
+    mmrpg_prototype_items_unlocked(true, $items_unlocked);
+    $player_items_unlocked = !empty($items_unlocked) ? array_keys($items_unlocked) : array();
     $player_chapters_unlocked = rpg_prototype::get_player_chapters_unlocked($player_token);
-    if ($player_chapters_unlocked['0']){ $num_hearts++; }
-    if ($player_chapters_unlocked['1']){ $num_hearts++; }
-    if ($player_chapters_unlocked['2']){ $num_hearts++; }
-    if ($player_chapters_unlocked['3']){ $num_hearts++; }
-    if ($player_chapters_unlocked['4a']){ $num_hearts++; }
-    if ($player_chapters_unlocked['4z']){ $num_hearts++; }
+    //error_log('$player_items_unlocked = '.print_r($player_items_unlocked, true));
+    //error_log('$player_chapters_unlocked = '.print_r($player_chapters_unlocked, true));
+    if ($player_chapters_unlocked['0'] || in_array($limit_heart_token.'__1', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__1'; }
+    if ($player_chapters_unlocked['1'] || in_array($limit_heart_token.'__2', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__2'; }
+    if ($player_chapters_unlocked['2'] || in_array($limit_heart_token.'__3', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__3'; }
+    if ($player_chapters_unlocked['3'] || in_array($limit_heart_token.'__4', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__4'; }
+    if ($player_chapters_unlocked['4a'] || in_array($limit_heart_token.'__5', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__5'; }
+    if ($player_chapters_unlocked['4z'] || in_array($limit_heart_token.'__6', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__6'; }
 
     // Hide the last two hearts behind superboss battles, but don't show them until collected
     $max_hearts -= 2;
     $session_token = mmrpg_game_token();
     $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
-    if (!empty($session_robot_database['quint']['robot_defeated'])){ $num_hearts++; $max_hearts++; $extra_hearts++; }
-    if (!empty($session_robot_database['sunstar']['robot_defeated'])){ $num_hearts++; $max_hearts++; $extra_hearts++; }
+    if (!empty($session_robot_database['quint']['robot_defeated'])
+        || in_array($limit_heart_token.'__7', $player_items_unlocked)){
+        $limit_hearts_earned[] = $limit_heart_token.'__7';
+        $max_hearts++; $extra_hearts++;
+        }
+    if (!empty($session_robot_database['sunstar']['robot_defeated'])
+        || in_array($limit_heart_token.'__8', $player_items_unlocked)){
+        $limit_hearts_earned[] = $limit_heart_token.'__8';
+        $max_hearts++; $extra_hearts++;
+        }
+
+    // Now count all the limit hearts the player has earner from wherever
+    $limit_hearts_earned = array_unique($limit_hearts_earned);
+    //error_log('$limit_hearts_earned = '.print_r($limit_hearts_earned, true));
+    $num_hearts = count($limit_hearts_earned);
     if ($num_hearts > $max_hearts){ $max_hearts = $num_hearts; }
 
     // Make sure we don't go over the max hearts
     if ($max_hearts > $real_max_hearts){ $max_hearts = $real_max_hearts; }
     if ($num_hearts > $real_max_hearts){ $num_hearts = $real_max_hearts; }
-
     //error_log('$num_hearts = '.$num_hearts);
     //error_log('$max_hearts = '.$max_hearts);
     //error_log('$extra_hearts = '.$extra_hearts);
