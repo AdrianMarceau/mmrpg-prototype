@@ -411,17 +411,22 @@ function mmrpg_save_game_session(){
         $legacy_player_field_tokens = array('dr_light', 'dr_wily', 'dr_cossack');
 
         // Define the board database update array and populate
+        $temp_robots_unlocked = !empty($battle_points_index['robots_unlocked']) ? $battle_points_index['robots_unlocked'] : array();
+        $temp_abilities_unlocked = !empty($battle_points_index['abilities_unlocked']) ? $battle_points_index['abilities_unlocked'] : array();
+        $temp_field_stars_collected = !empty($battle_points_index['field_stars_collected']) ? $battle_points_index['field_stars_collected'] : array();
+        $temp_fusion_stars_collected = !empty($battle_points_index['fusion_stars_collected']) ? $battle_points_index['fusion_stars_collected'] : array();
+        $temp_items_unlocked = !empty($battle_points_index['items_unlocked']) ? $battle_points_index['items_unlocked'] : array();
         $this_board_array = array();
         $this_board_array['board_points'] = $battle_points_index['total_battle_points'];
             foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_points_'.$ptoken] = 0; }
-        $this_board_array['board_robots'] = implode(',', $battle_points_index['robots_unlocked']);
-        $this_board_array['board_robots_count'] = count($battle_points_index['robots_unlocked']);
+        $this_board_array['board_robots'] = implode(',', $temp_robots_unlocked);
+        $this_board_array['board_robots_count'] = count($temp_robots_unlocked);
             foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_robots_'.$ptoken] = ''; }
-        $this_board_array['board_abilities'] = count($battle_points_index['abilities_unlocked']);
+        $this_board_array['board_abilities'] = count($temp_abilities_unlocked);
             foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_abilities_'.$ptoken] = 0; }
-        $this_board_array['board_stars'] = count($battle_points_index['field_stars_collected']) + count($battle_points_index['fusion_stars_collected']);
+        $this_board_array['board_stars'] = count($temp_field_stars_collected) + count($temp_fusion_stars_collected);
             foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_stars_'.$ptoken] = 0; }
-        $this_board_array['board_items'] = count($battle_points_index['items_unlocked']);
+        $this_board_array['board_items'] = count($temp_items_unlocked);
         $this_board_array['board_battles'] = 0;
             foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_battles_'.$ptoken] = 0; }
         $this_board_array['board_missions'] = 0;
