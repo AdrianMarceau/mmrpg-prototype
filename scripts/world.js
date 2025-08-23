@@ -1183,9 +1183,8 @@ class mmrpgWorldMap {
         $clickOverlay.bind('click', function(e){
             e.preventDefault();
             if (_self.worldMapIsHidden()){
-                if ($robotsOverview.is('.expanded')){
-                    $robotsOverview.find('.team-switch').trigger('click');
-                    }
+                $('.button[data-action="dismiss"]', $sideButtons).trigger('click');
+                if ($robotsOverview.is('.expanded')){ $robotsOverview.find('.team-switch').trigger('click'); }
                 return false;
                 }
             if (_self.worldIsBusy()){ return false; }
@@ -1273,6 +1272,7 @@ class mmrpgWorldMap {
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
         let $sideButtons = _elements.sideButtons;
+        let $sideButtonsWrapper = $('> .wrapper', $sideButtons);
         let $actionDropdown = _elements.actionDropdown;
         // Bind a click event to the back button in the header that'll bring us to prototype menu
         let $backButton = _elements.backButton;
@@ -1638,6 +1638,9 @@ class mmrpgWorldMap {
                     if (_self.worldIsBusy()){ return; }
                     if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
                     //console.log('%c' + 'Storage robot clicked!', 'color: cyan;');
+                    // Empty the side-button area before starting
+                    $sideButtons.removeClass('active');
+                    $sideButtonsWrapper.empty();
                     // First we collect references to the selected team-robot and clicked storage-robot
                     let $selectedTeamRobot = $teamRobotsInOverview.filter('.selected').first();
                     if (!$selectedTeamRobot || !$selectedTeamRobot.length){ return; } // if no robot is selected, ignore clicks
@@ -1669,26 +1672,13 @@ class mmrpgWorldMap {
                     //console.log('-> newListOfRobotsInOverview = ', newListOfRobotsInOverview);
                     //console.log('-> listHasChanged = ', listHasChanged);
                     if (!listHasChanged){ return; }
-                    // Add the save/cancel button set to the overview panel if it doesn't already exist
-                    let $saveButton = $('<a href="#" class="button save">Save &amp Reload</a>');
-                    let $cancelButton = $('<a href="#" class="button cancel">Cancel</a>');
-                    $storageRobotsDiv.append($saveButton).append($cancelButton);
-                    $switchButton.addClass('disabled');
+                    $switchButton.addClass('disabled'); // do not allow going back until either saving or reverting
+                    // Generate the save/cancel buttons and append them to the side-buttons panel
+                    let $saveButton = $('<a class="button big-button narrow" data-action="save-reload"><span>Save &amp Reload</span></a>');
+                    let $cancelButton = $('<a class="button sub-button narrow" data-action="dismiss"><span>Cancel</span></a>');
+                    $sideButtonsWrapper.append($saveButton).append($cancelButton);
+                    $sideButtons.addClass('active');
                     // Define the save/cancel actions to bind to the buttons
-                    let cancelAction = function(){
-                        //console.log('%c' + '-> robot-storage cancelAction() triggered', 'color: magenta;');
-                        // First we revert the robots in the overview back to the backup copy we made earlier
-                        $teamRobotsDiv.empty().prepend($teamRobotsInOverviewBackup);
-                        $storageRobotsDiv.empty().prepend($storageRobotsInOverviewBackup);
-                        $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
-                        $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
-                        // Then we remove the save/cancel button set from the overview panel
-                        $saveButton.remove();
-                        $cancelButton.remove();
-                        $switchButton.removeClass('disabled');
-                        // Return true on success
-                        return true;
-                        };
                     let saveAction = function(){
                         //console.log('%c' + '-> robot-storage saveAction() triggered', 'color: magenta;');
                         // First we remove the save/cancel button set from the overview panel
@@ -1721,17 +1711,33 @@ class mmrpgWorldMap {
                         // Return true on success
                         return true;
                         };
-                    // Bind events to the cancel button that'll revert the changes we've mapStartDirection made
-                    $cancelButton.bind('click', function(e){
-                        //console.log('%c' + 'Robot swap cancel button clicked!', 'color: cyan;');
-                        e.preventDefault();
-                        return cancelAction();
-                        });
+                    let cancelAction = function(){
+                        //console.log('%c' + '-> robot-storage cancelAction() triggered', 'color: magenta;');
+                        // First we revert the robots in the overview back to the backup copy we made earlier
+                        $teamRobotsDiv.empty().prepend($teamRobotsInOverviewBackup);
+                        $storageRobotsDiv.empty().prepend($storageRobotsInOverviewBackup);
+                        $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
+                        $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
+                        // Then we remove the save/cancel button set from the overview panel
+                        $saveButton.remove();
+                        $cancelButton.remove();
+                        $switchButton.removeClass('disabled');
+                        $sideButtons.removeClass('active');
+                        $sideButtonsWrapper.empty();
+                        // Return true on success
+                        return true;
+                        };
                     // Bind events to the save button that'll save the changes we've made
                     $saveButton.bind('click', function(e){
                         //console.log('%c' + 'Robot swap save button clicked!', 'color: cyan;');
                         e.preventDefault();
                         saveAction();
+                        });
+                    // Bind events to the cancel button that'll revert the changes we've mapStartDirection made
+                    $cancelButton.bind('click', function(e){
+                        //console.log('%c' + 'Robot swap cancel button clicked!', 'color: cyan;');
+                        e.preventDefault();
+                        return cancelAction();
                         });
                     // Return true on success
                     return true;
@@ -2305,6 +2311,7 @@ class mmrpgWorldMap {
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
         let stillAtPosition = function(){ return (_worldCursor.position === cursorPosition) ? true : false; };
+        let otherMenusActiveNow = function(){ return (_elements.robotsOverview.is('.expanded') || _elements.sideButtons.is('.active')) ? true : false; };
 
         // Before we do anything else, check to see if this player has any active robots
         //console.log('_worldPlayerRobots = ', _worldPlayerRobots);
@@ -2353,8 +2360,8 @@ class mmrpgWorldMap {
             //console.log('-> no events found at position', cursorPosition, 'skipping further processing');
             return;
             }
-        console.log('-> found ' + eventsAtPosition.length + ' events at position');
-        console.log('-> eventsAtPosition =', eventsAtPosition);
+        //console.log('-> found ' + eventsAtPosition.length + ' events at position');
+        //console.log('-> eventsAtPosition =', eventsAtPosition);
 
         // Check to see what the very first event type is
         let firstEvent = eventsAtPosition[0];
@@ -2432,7 +2439,7 @@ class mmrpgWorldMap {
                         //teamReadyDuration = 600; // for event panels we want to zoom in quickly
                         zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
                         triggerEffectFunction = function(){
-                            if (!stillAtPosition()){ return false; }
+                            if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
                             //console.log('-> running triggerEffectFunction for eventAction "' + eventAction + '" with eventData:', eventData);
                             _self.triggerWorldEvent(eventAction, eventData, $customEvent);
                             };
@@ -2638,7 +2645,7 @@ class mmrpgWorldMap {
                     teamReadyDuration = 600; // for event panels we want to zoom in quickly
                     zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
                     triggerEffectFunction = function(){
-                        if (!stillAtPosition()){ return false; }
+                        if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
                         //console.log('-> running');
                         // If the first event in the list (before sorting) is an item, we should defer it to the pickup function
                         //console.log('-> first event is an item, deferring to pickup function');
@@ -2678,7 +2685,7 @@ class mmrpgWorldMap {
                     teamReadyDuration = 600; // for event panels we want to zoom in quickly
                     zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
                     triggerEffectFunction = function(){
-                        if (!stillAtPosition()){ return false; }
+                        if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
                         //console.log('-> running');
                         // If the first event in the list (before sorting) is an ability, we should defer it to the pickup function
                         //console.log('-> first event is an ability, deferring to pickup function');
@@ -2695,7 +2702,7 @@ class mmrpgWorldMap {
         // Define an inline function to put the team into their battle-ready poses
         let getTeamSpritesReady = function(){
             if (_self.worldIsBusy()){ return; }
-            if (!stillAtPosition()){ return; }
+            if (!stillAtPosition() || otherMenusActiveNow()){ return; }
 
             // Add the shake class to the cursor so it hides behind the player
             $worldCursor.addClass('shake');
@@ -2746,7 +2753,7 @@ class mmrpgWorldMap {
         let redirectToLocation = function(){
             //console.log('%c' + 'redirectToLocation()', 'color: cyan;');
             if (_self.worldIsBusy()){ return; }
-            if (!stillAtPosition()){ return; }
+            if (!stillAtPosition() || otherMenusActiveNow()){ return; }
             $thisWorld.addClass('hidden');
             if (autoRedirectSound){
                 _self.playSoundEffect(autoRedirectSound);
@@ -2755,7 +2762,7 @@ class mmrpgWorldMap {
                 _self.incZoomLevel();
                 _self.saveWorldState(function(){
                     if (_self.worldIsBusy()){ return; }
-                    if (!stillAtPosition()){ return; }
+                    if (!stillAtPosition() || otherMenusActiveNow()){ return; }
                     else { _self.resetZoomLevel(); }
                     _self.incZoomLevel();
                     window.location.href = autoRedirectURL;
@@ -2769,7 +2776,7 @@ class mmrpgWorldMap {
         let zoomAndShowDropdown = function(){
             //console.log('%c' + 'zoomAndShowDropdown()', 'color: cyan;');
             if (_self.worldIsBusy()){ return; }
-            if (!stillAtPosition()){ return; }
+            if (!stillAtPosition() || otherMenusActiveNow()){ return; }
 
             // Elevate the event sprite(s) to the zoom layer and add a zoom class to it so it's more visible
             let cursorPositionXY = cursorPosition.split('-');
@@ -3399,7 +3406,7 @@ class mmrpgWorldMap {
         return;
         }
     saveWorldStateForReal(callback){
-        console.log('%c' + 'mmrpgWorldMap.saveWorldStateForReal(callback)', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.saveWorldStateForReal(callback)', 'color: magenta;');
         callback = typeof callback === 'function' ? callback : false; // default to no callback if not provided
         let _self = this;
         let _selfRef = _self.saveWorldState;
@@ -4179,8 +4186,8 @@ class mmrpgWorldMap {
 
     // Define a quick function for triggering a live ability pickup on the field (and any effects that may have
     triggerAbilityPickup(abilityEvent, zoomDelay){
-        console.log('%c' + 'mmrpgWorldMap.triggerAbilityPickup()', 'color: magenta;');
-        console.log('--> abilityEvent =', abilityEvent);
+        //console.log('%c' + 'mmrpgWorldMap.triggerAbilityPickup()', 'color: magenta;');
+        //console.log('--> abilityEvent =', abilityEvent);
         if (!abilityEvent || typeof abilityEvent !== 'object'){ console.error('triggerAbilityPickup() missing required abilityEvent!'); return false; }
         if (typeof abilityEvent.sprite === 'undefined'){ console.error('triggerAbilityPickup() missing required abilityEvent.sprite!'); return false; }
         if (abilityEvent.claimed === true){ console.warn('triggerAbilityPickup() called for ability that has already been claimed!'); return false; }
@@ -4200,11 +4207,11 @@ class mmrpgWorldMap {
         let abilityEventToken = abilityEvent.token;
         let abilityEventInfo = _mapAbilitiesIndex[abilityEventToken];
         let abilityToken = abilityEvent.kind2;
-        console.log('--> abilityEventToken =', abilityEventToken);
-        console.log('--> abilityEventInfo =', abilityEventInfo);
-        console.log('--> abilityToken =', abilityToken);
+        //console.log('--> abilityEventToken =', abilityEventToken);
+        //console.log('--> abilityEventInfo =', abilityEventInfo);
+        //console.log('--> abilityToken =', abilityToken);
         // First zoom the ability sprite into the zoom layer so it's more visible to the player
-        console.log('-> zooming ability sprite make it more visible');
+        //console.log('-> zooming ability sprite make it more visible');
         zoomDelay = typeof zoomDelay === 'number' ? zoomDelay : 1200; // default to sync with standard use-case
         setTimeout(function(){
             $abilityEventSprite.addClass('zoom');
@@ -4311,8 +4318,13 @@ class mmrpgWorldMap {
         // If a sound was requested, play it now
         if (playSound){ _self.playSoundEffect('get-item'); }
         // Trigger a save of the world state to persist this change
+        let reloadWorldOnSave = false;
+        if (itemToken.indexOf('-heart') !== -1){ reloadWorldOnSave = true; } // limit hearts always reload the world
         _self.saveWorldState(function(){
             _self.triggerWindowEventsPull(0);
+            console.log('reloadWorldOnSave = ', reloadWorldOnSave);
+            // maybe reload the page to update the inventory display
+            if (reloadWorldOnSave){ window.location.reload(); }
             });
         // Return true on success
         return true;
@@ -4320,13 +4332,13 @@ class mmrpgWorldMap {
 
     // Define a quick function for adding an ability to the player's collection if they don't already have it
     addAbilityToCollection(abilityToken, animatePickup, playSound){
-        console.log('%c' + 'mmrpgWorldMap.addAbilityToCollection(ability:' + abilityToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.addAbilityToCollection(ability:' + abilityToken + ')', 'color: magenta;');
         if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('addAbilityToCollection() missing required abilityToken!'); return false; }
         if (typeof animatePickup !== 'boolean'){ animatePickup = true; } // default to true if not provided
         if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
-        console.log('--> abilityToken =', abilityToken);
-        console.log('--> animatePickup =', animatePickup);
-        console.log('--> playSound =', playSound);
+        //console.log('--> abilityToken =', abilityToken);
+        //console.log('--> animatePickup =', animatePickup);
+        //console.log('--> playSound =', playSound);
         // Collect references to world objects
         let _self = this;
         let _config = _self.config;
@@ -4337,7 +4349,7 @@ class mmrpgWorldMap {
         let abilityInventoryMax = _config.playerInventoryMax; // 99;
         // Check to see if there's room for the ability in the collection
         let abilityAlreadyUnlocked = _worldPlayerAbilities.indexOf(abilityToken) !== -1 ? true : false;
-        console.log('--> abilityAlreadyUnlocked =', abilityAlreadyUnlocked);
+        //console.log('--> abilityAlreadyUnlocked =', abilityAlreadyUnlocked);
         if (abilityAlreadyUnlocked){
             console.warn('addAbilityToCollection() called for ability that is already unlocked!');
             // we're gonna "collect" it anyway though
@@ -4364,14 +4376,14 @@ class mmrpgWorldMap {
 
     // Define a quick functino for polling the server for new events (but only if we can actually show them)
     triggerWindowEventsPull(afterDelay){
-        console.log('%c' + 'mmrpgWorldMap.triggerWindowEventsPull()', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.triggerWindowEventsPull()', 'color: magenta;');
         afterDelay = typeof afterDelay === 'number' ? afterDelay : 1000; // default to zero if not provided
-        console.log('queuing the windowEventsPull event (via world)');
+        //console.log('queuing the windowEventsPull event (via world)');
         if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
             window.top.mmrpg_queue_for_game_start(function(){
-                console.log('i guess the game has started');
+                //console.log('i guess the game has started');
                 setTimeout(function(){
-                    console.log('attempting to pull window events via parent.windowEventsPull()', parent.windowEventsPull);
+                    //console.log('attempting to pull window events via parent.windowEventsPull()', parent.windowEventsPull);
                     let result = parent.windowEventsPull(true);
                     if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
                     else { console.log('windowEventsPull returned successfully: ' + result); }
@@ -4379,7 +4391,7 @@ class mmrpgWorldMap {
                 });
             }
         else if (typeof window.top.windowEventsPull !== 'undefined'){
-            console.log('i guess we pull events manually via parent.windowEventsPull()', parent.windowEventsPull);
+            //console.log('i guess we pull events manually via parent.windowEventsPull()', parent.windowEventsPull);
             setTimeout(function(){
                 let result = parent.windowEventsPull(true);
                 if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }

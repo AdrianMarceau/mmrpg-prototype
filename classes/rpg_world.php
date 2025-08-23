@@ -274,36 +274,66 @@ class rpg_world {
             // If the last player items were provided, update their game session quantities w/ any changes
             if (!empty($worldData['lastPlayerItems'])){
                 //error_log('scanning last player items for changes...');
+                $mmrpgPlayersIndex = rpg_world::get_index('players');
                 $mmrpgItemsIndex = rpg_world::get_index('items');
+                if (empty($mmrpgPlayersIndex)){ $mmrpgPlayersIndex = rpg_player::get_index(true); }
                 if (empty($mmrpgItemsIndex)){ $mmrpgItemsIndex = rpg_item::get_index(true); }
                 $game_session_token = rpg_game::session_token();
                 $GAME_SESSION = &$_SESSION[$game_session_token];
                 if (!isset($GAME_SESSION['values'])){ $GAME_SESSION['values'] = array(); }
                 if (!isset($GAME_SESSION['values']['battle_items'])){ $GAME_SESSION['values']['battle_items'] = array(); }
                 $sessionBattleItems = &$GAME_SESSION['values']['battle_items'];
+                $sessionBattleItemsCSV = ','.implode(',', array_keys($sessionBattleItems)).',';
+                $lastPlayerInfo = $mmrpgPlayersIndex[$lastPlayer];
                 $lastPlayerItems = $worldData['lastPlayerItems'];
+                $lastPlayerPronoun = 'They';
+                if (!empty($lastPlayerInfo['player_gender']) && $lastPlayerInfo['player_gender'] === 'male'){ $lastPlayerPronoun = 'He'; }
+                elseif (!empty($lastPlayerInfo['player_gender']) && $lastPlayerInfo['player_gender'] === 'female'){ $lastPlayerPronoun = 'She'; }
                 //error_log('$mmrpgItemsIndex = '. print_r($mmrpgItemsIndex, true));
                 //error_log('$sessionBattleItems = '. print_r($sessionBattleItems, true));
+                //error_log('$sessionBattleItemsCSV = '. print_r($sessionBattleItemsCSV, true));
                 //error_log('$lastPlayerItems = '. print_r($lastPlayerItems, true));
                 if (!empty($lastPlayerItems)){
                     foreach ($lastPlayerItems AS $item_token => $item_quantity){
                         //error_log('-> checking item token "'.$item_token.'"');
                         if (empty($item_token) || !is_string($item_token)){ continue; }
+                        $num_in_set = false; $set_token = false;
+                        if (strstr($item_token, '__')){ $set_token = $item_token; list($item_token, $num_in_set) = explode('__', $set_token, 2); }
                         if (empty($mmrpgItemsIndex[$item_token])){ continue; }
+                        $unlock_item_token = !empty($set_token) ? $set_token : $item_token;
                         $item_info = $mmrpgItemsIndex[$item_token];
-                        $currentQuantity = isset($sessionBattleItems[$item_token]) ? intval($sessionBattleItems[$item_token]) : 0;
+                        $item_subclass = !empty($item_info['item_subclass']) ? $item_info['item_subclass'] : '';
+                        $currentQuantity = isset($sessionBattleItems[$unlock_item_token]) ? intval($sessionBattleItems[$unlock_item_token]) : 0;
+                        $realCurrentQuantity = substr_count($sessionBattleItemsCSV, ','.$item_token.',') + substr_count($sessionBattleItemsCSV, ','.$item_token.'__');
                         $newQuantity = intval($item_quantity);
-                        //error_log('-> comparing '.$item_token.' ('.$currentQuantity.' => '.$newQuantity.')');
+                        $realNewQuantity = $realCurrentQuantity + 1;
+                        //error_log('-> $unlock_item_token = '. print_r($unlock_item_token, true));
+                        //error_log('-> item_info = '. print_r($item_info, true));
+                        //error_log('-> $item_subclass = '. print_r($item_subclass, true));
+                        //error_log('-> $currentQuantity = '. print_r($currentQuantity, true));
+                        //error_log('-> $realCurrentQuantity = '. print_r($realCurrentQuantity, true));
+                        //error_log('-> $newQuantity = '. print_r($newQuantity, true));
+                        //error_log('-> $realNewQuantity = '. print_r($realNewQuantity, true));
+                        //error_log('-> comparing '.$unlock_item_token.' ('.$currentQuantity.' ?? '.$newQuantity.')');
                         if ($currentQuantity === $newQuantity){ continue; } // no change, skip
-                        //error_log('-> '.$item_token.' quantity was updated! ('.$currentQuantity.' => '.$newQuantity.')');
+                        //error_log('-> '.$unlock_item_token.' quantity was updated! ('.$currentQuantity.' => '.$newQuantity.')');
                         // If this was an event item, make sure we trigger a popup for it
-                        if (!empty($item_info['item_subclass']) && $item_info['item_subclass'] === 'event'){
-                            //error_log('-> triggering unlock-item popup for '.$item_token.' ');
-                            $action_text = '{player} found the {item}!';
-                            $action_text2 = 'The new item was added to the inventory!';
+                        //error_log('-> checking if '.$unlock_item_token.' is an event item...');
+                        if ($item_subclass === 'event'){
+                            //error_log('-> triggering unlock-item popup for '.$unlock_item_token.' ');
+                            $is_heart = strstr($item_token, '-heart') ? true : false;
+                            $is_own_heart = $is_heart && explode('-', $item_token)[0] === explode('-', $lastPlayer)[1];
+                            $is_unique = !$is_heart ? true : false;
+                            $is_repeat = $realNewQuantity > 1 ? true : false;
+                            $action_text = '{player} found '.($is_repeat ? 'another' : ($is_unique ? 'the' : 'a')).' {item}!';
+                            $action_text2 = '';
+                            if (!$is_heart || !$is_own_heart){
+                                $action_text2 = 'The'.(!$is_repeat ? ' new ' : ' ').'item was added to the inventory!';
+                                if ($is_repeat){ $action_text2 .= ' That makes '.$realNewQuantity.' total!'; }
+                                }
                             $homebase_field = rpg_player::get_homebase_field($lastPlayer);
-                            mmrpg_game_unlock_item($item_token, array(
-                                'event_text' => $action_text.' <br /> '.$action_text2,
+                            mmrpg_game_unlock_item($unlock_item_token, array(
+                                'event_text' => $action_text.(!empty($action_text2) ? ' <br /> '.$action_text2 : ''),
                                 'player_token' => $lastPlayer,
                                 'show_images' => array('player'),
                                 'field_background' => $homebase_field,
@@ -312,8 +342,8 @@ class rpg_world {
                         }
                         // Otherwise we can just increment the session value directly
                         else {
-                            //error_log('-> saving new '.$item_token.' quantity to session');
-                            $sessionBattleItems[$item_token] = intval($item_quantity);
+                            //error_log('-> saving new '.$unlock_item_token.' quantity to session');
+                            $sessionBattleItems[$unlock_item_token] = intval($item_quantity);
                         }
                     }
                 }
@@ -1402,6 +1432,7 @@ class rpg_world {
         $storage_robot_tokens = mmrpg_prototype_robots_unlocked($current_player_token, true);
         $storage_robot_tokens = array_diff($storage_robot_tokens, $current_robot_tokens);
         $current_team_size = $limit_hearts;
+        if ($current_team_size > $num_robot_unlocked){ $current_team_size = $num_robot_unlocked; }
         $get_rating_token = function($percent){
             if ($percent === 100){ return 'full'; }
             elseif ($percent >= 50){ return 'high'; }
@@ -1429,7 +1460,9 @@ class rpg_world {
             $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>';
             } else {
             $return_markup .= '<span class="team-switch"><i class="fa fas fa-robot"></i></span>';
-            $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' robots</strong></div>';
+            if ($num_robot_unlocked === 1){ $return_markup .= '<div class="team-size"><strong>1 robot</strong></div>'; }
+            elseif ($num_robot_unlocked === $current_team_size){ $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' robots</strong></div>'; }
+            else { $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>'; }
             }
         $return_markup .= '<div class="team-robots">';
             foreach ($current_robot_tokens AS $robot_key => $robot_token){
@@ -2049,8 +2082,14 @@ class rpg_world {
             //error_log('$item_sprites = '.print_r($item_sprites, true));
             //error_log('$world_map_items = '.print_r($world_map_items, true));
             foreach ($item_sprites AS $item_namekey => $item_data){
+                //error_log('----------');
                 //error_log('Processing item "'.$item_namekey.'" with data: '.print_r($item_data, true));
                 if (empty($item_data) || !is_array($item_data)){ continue; }
+                if (empty($item_data[0]) || !is_string($item_data[0]) || !preg_match('/^\d+-\d+$/', $item_data[0])){ continue; } // skip if no position
+                if (empty($item_data[1]) || !is_string($item_data[1])){ continue; } // skip if no token
+                $claimed = !empty($world_map_items[$item_namekey]) ? $world_map_items[$item_namekey] : 0; // unix-timestamp
+                //error_log('-> '.$item_namekey.' already claimed, skipping...');
+                if ($claimed){ continue; } // skip if already claimed
                 $kind = 'item';
                 $pos = $item_data[0]; unset($item_data[0]);
                 $token = !empty($item_data[1]) ? $item_data[1] : ''; unset($item_data[1]);
@@ -2058,48 +2097,52 @@ class rpg_world {
                 $repeat = !empty($item_data[3]) ? $item_data[3] : ''; unset($item_data[3]);
                 $hidden = in_array('hidden', $item_data) ? true : false; unset($item_data[array_search('hidden', $item_data)]);
                 $locked = in_array('locked', $item_data) ? true : false; unset($item_data[array_search('locked', $item_data)]);
+                $num_in_set = false; $set_token = false;
+                if (strstr($token, '__')){  $set_token = $token; list($token, $num_in_set) = explode('__', $set_token, 2); }
+                $unlock_token = !empty($set_token) ? $set_token : $token;
+                $quantity = intval(trim($quantity, 'x')); if (!$quantity){ $quantity = 1; }
+                list($col, $row) = explode('-', $pos);
                 $data = array_values($item_data); // remaining values if any
-                $claimed = !empty($world_map_items[$item_namekey]) ? $world_map_items[$item_namekey] : 0; // unix-timestamp
+                //error_log('-> $item_namekey = '.print_r($item_namekey, true));
+                //error_log('-> $kind = '.print_r($kind, true));
                 //error_log('-> $kind = '.print_r($kind, true));
                 //error_log('-> $pos = '.print_r($pos, true));
                 //error_log('-> $token = '.print_r($token, true));
                 //error_log('-> $quantity = '.print_r($quantity, true));
                 //error_log('-> $repeat = '.print_r($repeat, true));
-                //error_log('-> $claimed = '.print_r($claimed, true));
-                if (empty($pos) || !is_string($pos) || !preg_match('/^\d+-\d+$/', $pos)){ continue; } // skip if no position
-                if (empty($token) || !is_string($token) || !isset($mmrpg_index_items[$token])){ continue; } // skip if no token
-                if ($claimed){ continue; } // skip if already claimed
-                list($col, $row) = explode('-', $pos);
+                //error_log('-> $hidden = '.print_r($hidden, true));
+                //error_log('-> $locked = '.print_r($locked, true));
+                //error_log('-> $num_in_set = '.print_r($num_in_set, true));
+                //error_log('-> $set_token = '.print_r($set_token, true));
+                //error_log('-> $unlock_token = '.print_r($unlock_token, true));
+                if (!isset($mmrpg_index_items[$token])){ continue; } // skip if not valid item
                 $info = $mmrpg_index_items[$token];
+                $subclass = !empty($info['item_subclass']) ? $info['item_subclass'] : '';
+                $is_unique = $subclass === 'event' && !strstr($token, '-heart') ? true : false;
+                $is_already_owned = !empty($this_player_items[$unlock_token]) ? true : false;
                 //error_log('-> $info = '.print_r(json_encode($info), true));
-                $item_subclass = !empty($info['item_subclass']) ? $info['item_subclass'] : '';
-                $already_owned = !empty($this_player_items[$token]) ? true : false;
-                $is_unique = $item_subclass == 'event' ? true : false;
-                //error_log('-> $item_subclass = '.print_r($item_subclass, true));
-                //error_log('-> $already_owned = '.print_r($already_owned, true));
+                //error_log('-> $subclass = '.print_r($subclass, true));
                 //error_log('-> $is_unique = '.print_r($is_unique, true));
-                if ($is_unique){
-                    if ($already_owned){ continue; } // skip if unique and already owned
-                    else { $quantity = 1; $repeat = 'once'; } // else set quantity to 1 and repeat to once
-                    }
-                // Otherwise we can actually show this item on the map
-                //error_log('processing item "'.$item_namekey.'" with pos "'.$pos.'"'.PHP_EOL.'-> $token = "'.$token.'"'.PHP_EOL.'-> $quantity = "'.$quantity.'"'.PHP_EOL.'-> $info = '.print_r($info, true));
-                $quantity = intval(trim($quantity, 'x'));
-                if (!$quantity){ $quantity = 1; }
+                //error_log('-> $is_already_owned = '.print_r($is_already_owned, true));
+                if ($is_unique && $is_already_owned){ continue; } // skip if unique and already owned
+                elseif ($is_unique){ $quantity = 1; $repeat = 'once'; } // else set quantity to 1 and repeat to once
+                //error_log('-> generating item "'.$item_namekey.'" with pos "'.$pos.'"'.PHP_EOL.'-> $token = "'.$token.'"'.PHP_EOL.'-> $quantity = "'.$quantity.'"'.PHP_EOL.'-> $info = '.print_r($info, true));
                 $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
                 $z_index = $top + 1;
                 $label = $info['item_name'];
                 $class = $token.(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                if ($subclass === 'event'){ $class .= ' always-zoom'; }
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
-                $attrs = 'data-item="'.$item_namekey.'" data-token="'.$token.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$item_namekey.'"
+                $attrs = 'data-item="'.$item_namekey.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$item_namekey.'"
                 $markup = self::get_sprite($kind, $token, '', 'right', $class, $style, $attrs, 'icon');
                 $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$kind.'-pickup"', $markup);
+                $markup = str_replace('data-token="'.$token.'"', 'data-token="'.$unlock_token.'"', $markup);
                 $items_markup[] = $markup;
                 $item_symbols[$pos] = $item_namekey;
                 $items_index[$item_namekey] = array(
                     'pos' => $pos,
-                    'token' => $token,
+                    'token' => $unlock_token,
                     'quantity' => $quantity,
                     'repeat' => $repeat,
                     'col' => $col,
@@ -2169,7 +2212,8 @@ class rpg_world {
                 //error_log('-> $info = '.print_r(json_encode($info), true));
                 $already_owned = in_array($token, $this_player_abilities) ? true : false;
                 //error_log('-> $already_owned = '.print_r($already_owned, true));
-                if ($already_owned){ error_log('should-skip-owned-abilities'); } // skip if already owned
+                if ($already_owned){ continue; } // skip if already owned
+                //if ($already_owned){ error_log('should-skip-owned-abilities'); } // skip if already owned
                 // Otherwise we can actually show this ability on the map
                 //error_log('processing ability "'.$ability_namekey.'" with pos "'.$pos.'"'.PHP_EOL.'-> $token = "'.$token.'"'.PHP_EOL.'-> $info = '.print_r($info, true));
                 $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];

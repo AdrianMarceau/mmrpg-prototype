@@ -629,7 +629,12 @@ html, body {
 #world #map .layer.objects .sprite.item.animate:after {
     animation: world-sprite-item-shadow-hover 2s steps(4) infinite;
 }
-
+#world #map .layer.objects .sprite.item[data-token$="-link"],
+#world #map .layer.objects .sprite.item[data-token$="-codes"],
+#world #map .layer.objects .sprite.item[data-token$="-program"],
+#world #map .layer.objects .sprite.item[data-token*="-heart"] {
+    filter: drop-shadow(0px 0px 3px white) saturate(2);
+}
 
 @keyframes world-sprite-ability-flip {
     0% { transform: scaleX(1); }
@@ -655,6 +660,10 @@ html, body {
     0%, 100% { transform: translate(0, 0); }
     50% { transform: translate(0, -4px); }
 }
+@keyframes world-sprite-ability-hover-zoom {
+    0%, 100% { transform: scale(2) translate(0, 0); }
+    50% { transform: scale(2) translate(0, -4px); }
+}
 #world #map .layer.objects .sprite.ability {
     background-color: transparent;
     transform: scaleX(1);
@@ -662,11 +671,14 @@ html, body {
 }
 #world #map .layer.objects .sprite.ability > .wrap {
     top: auto;
+    left: 2px;
     bottom: 24px;
+    width: 36px;
+    height: 36px;
     z-index: 1;
     border: 1px solid #191919 !important;
     border-radius: 6px;
-    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.6));
+    filter: drop-shadow(0px 0px 3px white) saturate(2);
 }
 #world #map .layer.objects .sprite.ability > .wrap:before {
     content: "";
@@ -683,8 +695,14 @@ html, body {
 #world #map .layer.objects .sprite.ability > .wrap > .sprite {
     filter: none;
     z-index: 2;
-    left: -1px;
-    top: -1px;
+    left: -3px;
+    top: -3px;
+}
+#world #map .layer .sprite.ability:not(.tile).zoom {
+    transform: scale(2);
+}}
+#world #map .layer .sprite.ability:not(.tile).zoom > .wrap > .sprite {
+    transform: none !important;
 }
 #world #map .layer.objects .sprite.ability.animate {
     animation: world-sprite-ability-flip-v2 18s infinite;
@@ -693,6 +711,9 @@ html, body {
 #world #map .layer.objects .sprite.ability.animate > .wrap {
     animation: world-sprite-ability-hover 2s steps(4) infinite;
     animation-delay: inherit;
+}
+#world #map .layer.objects .sprite.ability.zoom.nimate > .wrap {
+    animation: world-sprite-ability-hover-zoom 2s steps(4) infinite;
 }
 @keyframes world-sprite-ability-shadow-hover {
     0%, 100% { transform: scale(1.0); }
@@ -1280,8 +1301,8 @@ html, body {
     background-color: rgba(0, 0, 0, 0.8);
 }
 #world #canvas #robots-overview.expanded:before {
-    top: 20px;
-    left: -56px;
+    top: 24px;
+    left: -84px;
     border-color: #000000;
     background-color: rgba(0, 0, 0, 0.8);
     transform: skewX(0deg);
@@ -1463,7 +1484,7 @@ html, body {
     top: 800px;
     height: calc(100% - 30px);
     max-height: 522px;
-    width: 326px;
+    width: 303px;
     background-color: rgba(0, 0, 0, 0.4);
     box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.6);
     padding: 24px 0 24px 54px;
@@ -1490,7 +1511,7 @@ html, body {
     min-width: 80px;
     text-align: center;
     color: #cfcfcf;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.2;
     font-weight: bold;
     text-decoration: none;
@@ -1518,14 +1539,14 @@ html, body {
     pointer-events: none;
 }
 #robots-overview .storage-robots .button.save {
-    left: calc(100% + 10px);
-    bottom: 36px;
-    font-size: 14px;
+    left: calc(100% - 12px);
+    bottom: 40px;
+    font-size: 18px;
     line-height: 1.4;
 }
 #robots-overview .storage-robots .button.cancel {
-    left: calc(100% + 10px);
-    bottom: 8px;
+    left: calc(100% - 12px);
+    bottom: 12px;
 }
 #robots-overview .storage-robots .button.save.disabled,
 #robots-overview .storage-robots .button.cancel.disabled {
@@ -2154,6 +2175,7 @@ display: block;
 }
 
 #world #canvas #side-buttons {
+    z-index: 1010;
     bottom: 26px;
     right: 0;
     text-align: right;
@@ -2206,8 +2228,7 @@ display: block;
 #world #canvas #side-buttons .button + .button {
     margin-top: 6px;
 }
-#world #canvas #side-buttons .big-button,
-#world #canvas #side-buttons .sub-button {
+#world #canvas #side-buttons .button {
     background-color: #363636;
     border: 1px solid  #565656;
     font-weight: bold;
@@ -2233,8 +2254,19 @@ display: block;
 #world #canvas #side-buttons .sub-button:not(.disabled):hover {
     min-width: 220px;
 }
-#world #canvas #side-buttons .big-button.disabled,
-#world #canvas #side-buttons .sub-button.disabled {
+#world #canvas #side-buttons .big-button.narrow {
+    min-width: 180px;
+}
+#world #canvas #side-buttons .big-button.narrow:not(.disabled):hover {
+    min-width: 220px;
+}
+#world #canvas #side-buttons .sub-button.narrow {
+    min-width: 160px;
+}
+#world #canvas #side-buttons .sub-button.narrow:not(.disabled):hover {
+    min-width: 180px;
+}
+#world #canvas #side-buttons .button.disabled {
     background-color: #292929;
     border-color: #464646;
     color: #969696;
@@ -2249,10 +2281,8 @@ display: block;
     50% { outline: 2px solid rgba(255, 255, 255, 0.6); }
     100% { outline: 2px solid rgba(255, 255, 255, 1.0); }
 }
-#world #canvas #side-buttons .big-button:hover,
-#world #canvas #side-buttons .sub-button:hover,
-#world #canvas #side-buttons .big-button.maybe,
-#world #canvas #side-buttons .sub-button.maybe {
+#world #canvas #side-buttons .button:hover,
+#world #canvas #side-buttons .button.maybe {
     outline: 2px solid rgba(255, 255, 255, 1.0);
     animation: world-action-button-maybe 1.5s ease-in-out infinite;
 }
@@ -2263,8 +2293,7 @@ display: block;
     50% { transform: scale(1.2); }
     100% { transform: scale(1.0); }
 }
-#world #canvas #side-buttons .big-button.clicked,
-#world #canvas #side-buttons .sub-button.clicked {
+#world #canvas #side-buttons .button.clicked {
     outline: 2px solid rgba(255, 255, 255, 1.0);
     transform: scale(1.0);
     animation: world-action-button-clicked 0.9s ease-in-out infinite;
@@ -2272,6 +2301,10 @@ display: block;
     transform-origin: center center;
 }
 
+#world #canvas #side-buttons .button[data-action="save-reload"] {
+    background-color: #0e6b0e !important;
+    border-color: #129d12 !important;
+}
 #world #canvas #side-buttons .button[data-action="start-battle"] {
     background-color: #0e6b0e !important;
     border-color: #129d12 !important;
