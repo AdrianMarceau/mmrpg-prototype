@@ -650,11 +650,9 @@ function mmrpg_trigger_reset(fullReset){
         $.post(postURL, function(){
             //alert('reset complete!');
             if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'defeat'}); }
-            if (window.self != window.parent){
-                window.location = 'prototype.php';
-                } else {
-                window.location = window.location.href;
-                }
+            $('#mmrpg').css({opacity:1}).animate({opacity:0}, 1000, 'swing');
+            if (window.self != window.parent){ window.location = 'prototype.php'; }
+            else { window.location = window.location.href; }
             });
         return true;
         } else {
