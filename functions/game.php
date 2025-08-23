@@ -259,6 +259,8 @@ function mmrpg_game_robot_tokens_unlocked($player_token = ''){
 
 // Define a function for unlocking a game robot for use in battle
 function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = true, $events_create = true){
+    //error_log('mmrpg_game_unlock_robot('.print_r($player_info, true).', '.print_r($robot_info, true).', '.$unlock_abilities.', '.$events_create.')');
+    //error_log('-> debug_backtrace(mmrpg_game_unlock_robot)'.PHP_EOL.print_r(debug_backtrace(), true));
 
     // Reference the global variables
     global $db;
@@ -947,6 +949,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
 
 // Define a function for unlocking a game item for use in battle
 function mmrpg_game_unlock_item($item_token, $print_options = array()){
+    //error_log('mmrpg_game_unlock_item($item_token:'.$item_token.', $print_options'.print_r($print_options, true).')');
     $session_token = mmrpg_game_token();
 
     // Define or collect the various print options
@@ -974,19 +977,29 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
     if (!$print_options['force_event'] && mmrpg_prototype_item_unlocked($item_token)){ $print_options['event_text'] = ''; }
     if (!$print_options['force_event'] && rpg_game::is_demo()){ $print_options['event_text'] = ''; }
 
+    // Check to see if this item has been unlocked as part of a set
+    $num_in_set = false;
+    $item_set_token = false;
+    if (strstr($item_token, '__')){
+        $item_set_token = $item_token;
+        list($item_token, $num_in_set) = explode('__', $item_set_token);
+        }
+    $item_token_to_unlock = !empty($item_set_token) ? $item_set_token : $item_token;
+
+    // Check to see if this item is a limit heart w/ special considerations
+    $is_heart = strstr($item_token, '-heart') ? true : false;
+    $is_own_heart = $is_heart && explode('-', $item_token)[0] === explode('-', $print_options['player_token'])[1] ? true : false;
+
     // Attempt to collect info for this item
     $item_info = rpg_item::get_index_info($item_token);
 
     // If this item does not exist in the global index, return false
     if (empty($item_info)){ return false; }
 
-    // Automatically unlock this item for use in battle
-    $this_reward = $this_setting = array('item_token' => $item_token);
-
     // No matter what, always unlock new items in the main array
     if (!isset($_SESSION[$session_token]['values']['battle_items'])){ $_SESSION[$session_token]['values']['battle_items'] = array(); }
-    if (!isset($_SESSION[$session_token]['values']['battle_items'][$item_token])){ $_SESSION[$session_token]['values']['battle_items'][$item_token] = 1; }
-    else { $_SESSION[$session_token]['values']['battle_items'][$item_token] += 1; }
+    if (!isset($_SESSION[$session_token]['values']['battle_items'][$item_token_to_unlock])){ $_SESSION[$session_token]['values']['battle_items'][$item_token_to_unlock] = 1; }
+    else { $_SESSION[$session_token]['values']['battle_items'][$item_token_to_unlock] += 1; }
 
     // Only show the event if allowed by the function args and not empty
     if (!empty($print_options['event_text'])){
@@ -1068,9 +1081,10 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
                 }
             }
             //error_log('$shop_info = '.print_r($shop_info, true));
-            $shop_image_file_path = $shop_info['shop_image_path'].'sprite_'.$direction.'_'.($shop_info['shop_image_size'].'x'.$shop_info['shop_image_size']).'.png?'.MMRPG_CONFIG_CACHE_DATE;
-            $shop_image_offset = ($shop_info['shop_image_size'] - 80) / 2;
-            $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_'.$frame.'" style="background-image: url('.$shop_image_file_path.'); bottom: 40px; left: '.$offset.'px; z-index: 12; filter: brightness(0.95);">'.ucfirst($shop_token).'</div>';
+            $shop_image_xsize = $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'];
+            $shop_image_file_path = $shop_info['shop_image_path'].'sprite_'.$direction.'_'.$shop_image_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+            $shop_image_offset = $offset - ($shop_info['shop_image_size'] - 80) / 2;
+            $temp_canvas_markup .= '<div class="sprite sprite_'.$shop_image_xsize.' sprite_'.$shop_image_xsize.'_'.$frame.'" style="background-image: url('.$shop_image_file_path.'); bottom: 40px; left: '.$shop_image_offset.'px; z-index: 12; filter: brightness(0.95);">'.ucfirst($shop_token).'</div>';
         }
 
         // Wrap all of this in a sprite wrapper for animation and stuff
@@ -1135,36 +1149,54 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
         }
 
         // Generate the search and replace arrays for the console event text
+        $console_item_name = $item_info['item_name'];
+        $console_player_name = $player_info['player_name'];
+        $console_shop_name = ucfirst($shop_info['shop_name']);
+        if ($is_heart && $is_own_heart){ $console_item_name = 'Limit Heart'; }
         $console_search = array();
         $console_replace = array();
         $console_search[] = '{item}';
-        $console_replace[] = rpg_type::print_span(array($item_info['item_type'], $item_info['item_type2']), $item_info['item_name']);
+        $console_replace[] = rpg_type::print_span(array($item_info['item_type'], $item_info['item_type2']), $console_item_name);
         $console_search[] = '{player}';
-        $console_replace[] = rpg_type::print_span($player_type, $player_info['player_name']);
+        $console_replace[] = rpg_type::print_span($player_type, $console_player_name);
         $console_search[] = '{shop}';
-        $console_replace[] = rpg_type::print_span(array($item_info['item_type'], $item_info['item_type2']), ucfirst($shop_info['shop_name']));
+        $console_replace[] = rpg_type::print_span(array($item_info['item_type'], $item_info['item_type2']), $console_shop_name);
 
         // Print out the parsed event text and the item database markup
         $headline_text = ($is_shop_item ? 'You Got A New Shop' : 'You Got A New Item').'!';
+        $quotetext_color = $player_type;
+        if (strstr($item_token, 'light-')){ $quotetext_color = 'defense'; }
+        elseif (strstr($item_token, 'wily-')){ $quotetext_color = 'attack'; }
+        elseif (strstr($item_token, 'cossack-')){ $quotetext_color = 'speed'; }
+        elseif (strstr($item_token, 'lalinde-')){ $quotetext_color = 'energy'; }
         $temp_console_markup = '';
         $temp_console_markup .= '<p class="headline ability_type type_'.$player_info['player_type'].'"><strong>'.$headline_text.'</strong></p>';
         $temp_console_markup .= '<div class="inset_panel compact">';
-            $temp_console_markup .= '<p style="text-align: center; line-height: 2;">';
+            $temp_console_markup .= '<p style="text-align: center; line-height: 2; padding-bottom: 0;">';
                 $temp_console_markup .= $print_options['positive_word'].' ';
                 $temp_console_markup .= str_replace($console_search, $console_replace, $print_options['event_text']);
             $temp_console_markup .= '</p>';
             $temp_console_markup .= '<div id="console" style="width: auto; height: auto; font-size: 120%; line-height: 1.6; margin-top: 5px;">';
                 $temp_console_markup .= '<div class="extra"><div class="extra2" style="max-width: 460px; margin: 0 auto; position: relative;">';
                     $temp_console_markup .= '<i class="fa fas fa-quote-left" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; left: -15px;"></i> ';
-                    $temp_console_markup .= '<span class="color '.$player_type.'" style="filter: brightness(2); text-shadow: none;">'.$this_description.'</span> ';
+                    $temp_console_markup .= '<span class="color '.$quotetext_color.'" style="filter: brightness(1.5); text-shadow: none;">'.$this_description.'</span> ';
                     $temp_console_markup .= '<i class="fa fas fa-quote-right" style="font-size: 80%; filter: brightness(1); position: absolute; top: 0; right: -15px;"></i>';
                 $temp_console_markup .= '</div></div>';
             $temp_console_markup .= '</div>';
         $temp_console_markup .= '</div>';
         $temp_console_markup .= '<div class="inset_panel compact">';
-            $temp_console_markup .= '<p style="text-align: center; font-size: 90%; margin-top: 10px; filter: brightness(1);">';
-                if ($is_shop_item){ $temp_console_markup .= 'Check the <strong><i class="fa fas fa-shopping-cart"></i> <ins>shop</ins></strong> tab to see what\'s available!'; }
-                else { $temp_console_markup .= 'Check the <strong><i class="fa fas fa-briefcase"></i> <ins>items</ins></strong> tab for more info!'; }
+            $temp_console_markup .= '<p style="text-align: center; font-size: 90%; margin-top: 0; filter: brightness(1);">';
+                if ($is_heart && $is_own_heart){
+                    $temp_limit_hearts = mmrpg_prototype_limit_hearts_earned($player_token);
+                    $temp_limit_hearts_icons = trim(str_repeat('<i class="fa fa-heart"></i> ', $temp_limit_hearts));
+                    $temp_console_markup .= 'The doctor feels strong enough to bring <strong>'.$temp_limit_hearts.' robots '.$temp_limit_hearts_icons.'</strong> into battle now!';
+                    }
+                elseif ($is_shop_item){
+                    $temp_console_markup .= 'Check the <strong><i class="fa fas fa-shopping-cart"></i> <ins>shop</ins></strong> tab to see what\'s available!';
+                    }
+                else {
+                    $temp_console_markup .= 'Check the <strong><i class="fa fas fa-briefcase"></i> <ins>items</ins></strong> tab for more info!';
+                    }
             $temp_console_markup .= '</p>';
         $temp_console_markup .= '</div>';
 
@@ -1185,8 +1217,11 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
     }
 
     // Create the event flag for unlocking this item
-    $temp_game_flags['events']['unlocked-item_'.$item_token] = true;
-    if (!empty($player_token)){ $temp_game_flags['events']['unlocked-item_'.$player_token.'_'.$item_token] = true; }
+    $event_item_token = preg_replace('/_+/', '_', $item_token_to_unlock);
+    $temp_game_flags['events']['unlocked-item_'.$event_item_token] = true;
+    //error_log('$temp_game_flags[\'events\'][\'unlocked-item_'.$event_item_token.'\'] = true;');
+    if (!empty($player_token)){ $temp_game_flags['events']['unlocked-item_'.$player_token.'_'.$event_item_token] = true; }
+
 
     // Return true on success
     return true;
