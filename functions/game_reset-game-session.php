@@ -110,8 +110,12 @@ function mmrpg_reset_game_session($delete_db_records = false, $delete_db_records
         $_SESSION[$session_token]['RESET'] = true;
 
         // Create the global item and ability arrays
+        $_SESSION[$session_token]['values']['battle_rewards'] = array();
+        $_SESSION[$session_token]['values']['battle_settings'] = array();
         $_SESSION[$session_token]['values']['battle_items'] = array();
         $_SESSION[$session_token]['values']['battle_abilities'] = array('buster-shot');
+
+        /*
 
         // Unlock Dr. Light as a playable character
         $unlock_player_info = $mmrpg_index_players['dr-light'];
@@ -128,6 +132,8 @@ function mmrpg_reset_game_session($delete_db_records = false, $delete_db_records
         $unlock_robot_info['robot_experience'] = 999;
         mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, false);
         //$_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_robots']['mega-man']['robot_experience'] = 4000;
+
+        */
 
     }
 
