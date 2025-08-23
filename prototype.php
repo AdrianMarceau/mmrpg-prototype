@@ -424,12 +424,13 @@ if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-scr
                         <label>stars</label>
                     </a>
                 <? endif; ?>
+                <? if (count(rpg_game::robot_database()) > 0): ?>
                 <span class="pipe">|</span>
                 <a class="link link_data" data-step="database" data-index="<?= $this_menu_indexes['database'] ?>" data-source="frames/database.php" data-music="misc/data-base" data-maybe-tooltip="<?= $this_menu_tooltips['database'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <i class="fa fas fa-compact-disc"></i>
                     <label>database</label>
                 </a>
-
+                <? endif; ?>
             </div>
         </div>
 
