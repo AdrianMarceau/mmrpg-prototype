@@ -256,6 +256,18 @@ function generate_prototype_postgame_message($player_token){
  * DR. LIGHT UNLOCKS
  */
 
+// UNLOCK PLAYER : DR. WILY
+
+// If the Light Program has been found, we can unlock Dr. Light
+if (!$unlock_flag_light && mmrpg_prototype_item_unlocked('light-program')){
+
+    // Unlock Dr. Light as a playable character
+    $unlock_player_info = $mmrpg_index_players['dr-light'];
+    mmrpg_game_unlock_player($unlock_player_info, false, true);
+    $_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_points'] = 0;
+
+}
+
 /*
 
 // DISABLING THIS UNTIL WE HAVE A REAL STORY
