@@ -1030,18 +1030,21 @@ function mmrpg_prototype_battle_tokens_failed($player_token = ''){
 function mmrpg_prototype_player_unlocked($player_token){
     // Check if this battle has been completed and return true is it was
     $session_token = mmrpg_game_token();
-    return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]) ? true : false;
+    $battle_rewards = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
+    return isset($battle_rewards[$player_token]) ? true : false;
 }
 
 // Define a function for checking is a prototype robot has been unlocked
 function mmrpg_prototype_robot_unlocked($player_token, $robot_token){
     // Define the game session helper var
     $session_token = mmrpg_game_token();
+    $battle_rewards = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
+    $battle_settings = !empty($_SESSION[$session_token]['values']['battle_settings']) ? $_SESSION[$session_token]['values']['battle_settings'] : array();
     // If the player token was not false, check to see if that particular player has unlocked
     if (!empty($player_token)){
         // Check if this battle has been completed and return true is it was
-        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])
-            && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
+        if (!empty($battle_rewards[$player_token]['player_robots'][$robot_token])
+            && !empty($battle_settings[$player_token]['player_robots'][$robot_token])){
             return true;
         } else {
             return false;
@@ -1051,10 +1054,10 @@ function mmrpg_prototype_robot_unlocked($player_token, $robot_token){
     else {
         // Loop through all the player tokens in the battle rewards
         $robot_unlocked = false;
-        foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_info){
+        foreach ($battle_rewards AS $player_token => $player_info){
             if (isset($player_info['player_robots'][$robot_token])
-                && !empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])
-                && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
+                && !empty($battle_rewards[$player_token]['player_robots'][$robot_token])
+                && !empty($battle_settings[$player_token]['player_robots'][$robot_token])){
                 $robot_unlocked = true;
                 break;
             }
@@ -1064,20 +1067,21 @@ function mmrpg_prototype_robot_unlocked($player_token, $robot_token){
 }
 
 // Define a function for checking if a prototype ability has been unlocked
-function mmrpg_prototype_ability_unlocked($player_token, $robot_token = '', $ability_token = ''){
-
+function mmrpg_prototype_ability_unlocked($player_token = '', $robot_token = '', $ability_token = ''){
     // Define the game session helper var
     $session_token = mmrpg_game_token();
-
+    $battle_rewards = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
+    $battle_abilities = !empty($_SESSION[$session_token]['values']['battle_abilities']) ? $_SESSION[$session_token]['values']['battle_abilities'] : array();
+    if (!empty($player_token) && empty($battle_rewards[$player_token])){ return false; }
+    if (!empty($robot_token) && empty($battle_rewards[$player_token]['player_robots'][$robot_token])){ return false; }
     // If a specific robot token was provided
     if (!empty($robot_token)){
         // Check if this ability has been unlocked by the specified robot and return true if it was
-        return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities'][$ability_token]) ? true : false;
+        return !empty($battle_rewards[$player_token]['player_robots'][$robot_token]['robot_abilities'][$ability_token]) ? true : false;
     } else {
         // Check if this ability has been unlocked by the player and return true if it was
-        return in_array($ability_token, $_SESSION[$session_token]['values']['battle_abilities']) ? true : false;
+        return in_array($ability_token, $battle_abilities) ? true : false;
     }
-
 }
 
 // Define a function for checking if a prototype item has been unlocked
@@ -1710,6 +1714,7 @@ function mmrpg_prototype_unlockable_players(){
     //error_log('mmrpg_prototype_unlockable_players() called');
     return array('dr-light', 'dr-wily', 'dr-cossack', 'dr-lalinde');
 }
+
 // Define a function for checking how many limit hearts have been unlocked by a player
 function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0, &$extra_hearts = 0){
     //error_log('mmrpg_prototype_limit_hearts_earned('.$player_token.')');
