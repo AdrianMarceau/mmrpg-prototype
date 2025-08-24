@@ -639,7 +639,11 @@ html, body {
     height: 4px;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.2);
+    filter: none;
     z-index: -1;
+}
+#world #map .layer.objects .sprite.item.always-zoom:after {
+    bottom: 18px;
 }
 #world #map .layer.objects .sprite.item[data-token*="-pellet"]:after {
     left: 15px;
@@ -650,11 +654,11 @@ html, body {
 #world #map .layer.objects .sprite.item.animate:after {
     animation: world-sprite-item-shadow-hover 2s steps(4) infinite;
 }
-#world #map .layer.objects .sprite.item[data-token$="-link"],
-#world #map .layer.objects .sprite.item[data-token$="-codes"],
-#world #map .layer.objects .sprite.item[data-token$="-program"],
-#world #map .layer.objects .sprite.item[data-token*="-heart"] {
-    filter: drop-shadow(0px 0px 3px white) saturate(2);
+#world #map .layer.objects .sprite.item[data-token$="-link"] .wrap,
+#world #map .layer.objects .sprite.item[data-token$="-codes"] .wrap,
+#world #map .layer.objects .sprite.item[data-token$="-program"] .wrap,
+#world #map .layer.objects .sprite.item[data-token*="-heart"] .wrap {
+    filter: drop-shadow(0px 0px 3px white) saturate(1.5);
 }
 #world #map .layer.objects .sprite.item.tracking-cursor {
     filter: drop-shadow(0px 0px 3px orange) saturate(2);
@@ -684,30 +688,38 @@ html, body {
     transform: scaleX(1);
     transform-origin: center bottom;
 }
+#world #canvas .chrome .sprite.ability > .wrap {
+    left: 4px;
+}
 #world #map .layer.objects .sprite.ability > .wrap {
     top: auto;
     left: 2px;
-    bottom: 24px;
+    bottom: 12px;
     width: 36px;
     height: 36px;
     z-index: 1;
     transform: scale(1) translate(0, 0);
     filter: none;
 }
+#world #canvas .chrome .sprite.ability > .wrap > .back,
 #world #map .layer.objects .sprite.ability > .wrap > .back {
     display: block;
     position: absolute;
     z-index: 1;
-    top: 4px;
-    left: 4px;
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+    top: 3px;
+    left: -1px;
+    width: 38px;
+    height: 30px;
+    border-radius: 6px 6px 2px 2px;
     border: 1px solid #191919 !important;
     background-color: #cacaca;
     filter: drop-shadow(0px 0px 3px white) saturate(2);
     transition: top 0.6s, transform 0.6s, opacity 0.6s, filter 0.6s;
 }
+#world #canvas .chrome .sprite.ability > .wrap > .back {
+    filter: saturate(2);
+}
+#world #canvas .chrome .sprite.ability > .wrap > .back:before,
 #world #map .layer.objects .sprite.ability > .wrap > .back:before {
     content: "";
     display: block;
@@ -719,8 +731,24 @@ html, body {
     width: auto;
     height: auto;
     border-radius: 3px;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.6);
 }
+#world #canvas .chrome .sprite.ability > .wrap > .back:after,
+#world #map .layer.objects .sprite.ability > .wrap > .back:after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -3px;
+    left: 3px;
+    right: 3px;
+    height: 2px;
+    background-color: silver;
+    border: 1px solid #090909;
+    border-top: none;
+    background-image: repeating-linear-gradient(90deg, #696969, #909090 1px, #090909 2px);
+    box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+#world #canvas .chrome .sprite.ability > .wrap > .sprite,
 #world #map .layer.objects .sprite.ability > .wrap > .sprite {
     filter: none;
     z-index: 2;
@@ -1389,6 +1417,10 @@ html, body {
 #world #canvas #cursor-palette .slots.temp > .slot {
     width: 80px;
     height: 80px;
+}
+#world #canvas #cursor-palette .slots.temp > .slot[data-ability] {
+    width: 100px;
+    height: 90px;
 }
 #world #canvas #cursor-palette .slots > .slot:before {
     content: "";
@@ -2447,6 +2479,13 @@ display: block;
     font-size: 12px;
     padding: 6px 12px;
 }
+#world #canvas #side-buttons .big-button > span {
+    display: block;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 3px 12px;
+    margin: -6px -16px;
+    border-radius: 6px;
+}
 #world #canvas #side-buttons .big-button:not(.disabled):hover {
     min-width: 280px;
 }
@@ -2472,6 +2511,7 @@ display: block;
     font-weight: normal;
     cursor: not-allowed;
     text-decoration: line-through;
+    filter: saturate(0.5) brightness(0.5);
 }
 
 /* define an glowing outline to show this button has been focused by the user */

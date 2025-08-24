@@ -2452,7 +2452,7 @@ class mmrpgWorldMap {
                         showActionArea = true;
                         if (!dataLabel){ dataLabel = 'Event Options'; }
                         actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>';
-                        sideButtonsMarkup += '<a class="button big-button" data-action="trigger-event" data-event="'+dataEvent+'"><span>Trigger Event</span></a>';
+                        sideButtonsMarkup += '<a class="button big-button" data-action="trigger-event" data-event="'+dataEvent+'"><span><sup>Ready To</sup> Trigger Event</span></a>';
                         sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                         showActionAreaType = 'event';
                         }
@@ -2477,8 +2477,8 @@ class mmrpgWorldMap {
                 showActionArea = true;
                 if (!dataLabel){ dataLabel = 'Portal Options'; }
                 actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>';
-                if (dataPortal.indexOf('goto__') !== -1){ sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Use Teleport</span></a>'; }
-                else if (dataPortal === 'exit'){ sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span>Return Home</span></a>'; }
+                if (dataPortal.indexOf('goto__') !== -1){ sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Enter Teleport</span></a>'; }
+                else if (dataPortal === 'exit'){ sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Return Home</span></a>'; }
                 sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showActionAreaType = 'portal';
                 zoomTimeoutDuration = 500; // if we show a portal dropdown, we want to zoom in quickly
@@ -2525,7 +2525,7 @@ class mmrpgWorldMap {
                 //var buttonName = (dataColour ? (dataColour[0].toUpperCase() + dataColour.slice(1) + ' ') : '') + 'Button';
                 //if (!dataLabel){ dataLabel = 'Button Options'; }
                 if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-                sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' '+dataColour : '')+'" data-action="push-button" data-button="'+dataButton+'"><span>Push Button</span></a>';
+                sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' '+dataColour : '')+'" data-action="push-button" data-button="'+dataButton+'"><span><sup>Push The</sup> ' + (dataColour[0].toUpperCase() + dataColour.slice(1)) + ' Button</span></a>';
                 sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showActionAreaType = 'button';
                 zoomTimeoutDuration = 500; // if we show a button dropdown, we want to zoom in quickly
@@ -2607,8 +2607,8 @@ class mmrpgWorldMap {
                         } return markup;
                     })(dataLabels).join('');
                 actionAreaMarkup += dataLabelsJoined;
-                if (playerActiveRobots >= 1){  sideButtonsMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
-                else { sideButtonsMarkup += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span>Start Battle</span></a>'; }
+                if (playerActiveRobots >= 1){  sideButtonsMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span><sup>Ready To</sup> Start Battle</span></a>'; }
+                else { sideButtonsMarkup += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span><sup>Ready To</sup> Start Battle</span></a>'; }
                 sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showActionAreaType = 'battle';
                 //showActionAreaSound = 'background-spawn';
@@ -2640,7 +2640,7 @@ class mmrpgWorldMap {
                         sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pickup-item" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
                         } else if (_worldCursor.holding && _worldCursor.holding === 'item/'+dataItem){
                         // We're holding something and this is that item, we should allow dropping it
-                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="drop-item" data-item="'+dataItem+'"><span><sup>Put Down</sup> '+dataLabel+'</span></a>';
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="drop-item" data-item="'+dataItem+'"><span><sup>Put Down</sup> ' + dataLabel + '</span></a>';
                         } else if (_worldCursor.holding){
                         // Otherwise we're holding something else, so we should not allow picking up this item
                         sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+' disabled" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
@@ -2691,7 +2691,7 @@ class mmrpgWorldMap {
                         sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pickup-ability" data-ability="'+dataAbility+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
                         } else if (_worldCursor.holding && _worldCursor.holding === 'ability/'+dataAbility){
                         // We're holding something and this is that ability, we should allow dropping it
-                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="drop-ability" data-ability="'+dataAbility+'"><span><sup>Put Down</sup> '+dataLabel+'</span></a>';
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="drop-ability" data-ability="'+dataAbility+'"><span><sup>Put Down</sup> ' + dataLabel + '</span></a>';
                         } else if (_worldCursor.holding){
                         // Otherwise we're holding something else, so we should not allow picking up this ability
                         sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+' disabled" data-ability="'+dataAbility+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
