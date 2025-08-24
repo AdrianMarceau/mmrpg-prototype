@@ -49,7 +49,7 @@
 @items[]     = wily-program-pickup(4-22, wily-program)
 @items[]     = cossack-program-pickup(8-22, cossack-program)
 @items[]     = item-codes-pickup(6-2, item-codes)
-@items[]     = copy-core-pickup(6-13, copy-core, x1, once)
+@items[]     = copy-core-pickup(6-3, copy-core, x1, once)
 ## ITEM-CORRIDOR ENERGY ITEMS
 @items[]     = first-consumable-epi(5-4, energy-pellet, x1, always)
 @items[]     = first-consumable-wpi(4-4, energy-capsule, x1, always)
