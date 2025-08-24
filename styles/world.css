@@ -510,6 +510,10 @@ html, body {
     40% { transform: translate(2px, 1px); }
     50% { transform: translate(0, 0); }
 }
+@keyframes world-cursor-pickup {
+    0%, 100% { transform: translate(0, 0) scale(1.0); }
+    50% { transform: translate(0, -10%) scale(1.6); }
+}
 #world #map .layer.objects .sprite.cursor {
 
 }
@@ -544,6 +548,15 @@ html, body {
     /* transform: rotate(0deg); */
     filter: drop-shadow(-1px -1px 0 white);
     animation: world-cursor-shake 0.9s steps(1) infinite;
+}
+
+/* add a 'pickup' effect to make the cursor look like it's grabbing the item below */
+#world #map .layer.objects .sprite.cursor.pickup {
+
+}
+#world #map .layer.objects .sprite.cursor.pickup > .wrap > .sprite {
+    animation: world-cursor-pickup 0.9s linear forwards;
+    image-rendering: pixelated;
 }
 
 
@@ -634,6 +647,10 @@ html, body {
 #world #map .layer.objects .sprite.item[data-token$="-program"],
 #world #map .layer.objects .sprite.item[data-token*="-heart"] {
     filter: drop-shadow(0px 0px 3px white) saturate(2);
+}
+
+#world #map .layer.objects .sprite.item.tracking-cursor {
+    filter: drop-shadow(0px 0px 3px orange) saturate(2);
 }
 
 @keyframes world-sprite-ability-flip {
@@ -1258,6 +1275,155 @@ html, body {
     filter: brightness(0.3);
 }
 
+#world #canvas #cursor-palette {
+    display: block;
+    position: absolute;
+    z-index: 1004;
+    width: auto;
+    height: auto;
+    bottom: 0;
+    left: 0;
+    pointer-events: all;
+    cursor: default;
+    padding: 6px;
+    border-radius: 0 6px 0 0;
+    background-color: transparent;
+    box-shadow: none;
+    pointer-events: none;
+    transition: left 0.9s, bottom 0.9s;
+}
+#world #canvas #cursor-palette:before {
+    content: "";
+    display: block;
+    position: absolute;
+    box-sizing: border-box;
+    top: -5px;
+    right: -10px;
+    left: -20px;
+    bottom: -20px;
+    z-index: 1;
+    width: auto;
+    height: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 4px 16px;
+    border-top: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-radius: 0 6px 0 0;
+    box-shadow: 0 0 3px rgba(98, 98, 98, 0.3);
+    pointer-events: auto;
+    transform: skewX(10deg);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+#world #canvas #cursor-palette:hover:before {
+    border-color: #000000;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+#world #canvas #cursor-palette:not(.active) {
+    left: -200px;
+    bottom: -200px;
+    pointer-events: none;
+}
+#world #canvas #cursor-palette > .wrapper {
+    pointer-events: none;
+}
+#world #canvas #cursor-palette .item-slots {
+    display: block;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    margin: 0;
+}
+#world #canvas #cursor-palette .item-slots:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#world #canvas #cursor-palette .item-slots.perm-slots {
+    width: 80px;
+    float: left;
+    margin-right: 6px;
+}
+#world #canvas #cursor-palette .item-slots.temp-slots {
+    width: auto;
+    float: right;
+}
+#world #canvas #cursor-palette .item-slots > .slot {
+    display: block;
+    float: left;
+    width: auto;
+    height: auto;
+    position: relative;
+    pointer-events: auto;
+}
+#world #canvas #cursor-palette .item-slots.perm-slots > .slot {
+    width: 40px;
+    height: 40px;
+}
+#world #canvas #cursor-palette .item-slots.temp-slots > .slot {
+    width: 80px;
+    height: 80px;
+}
+#world #canvas #cursor-palette .item-slots > .slot:before {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    width: auto;
+    height: auto;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background-color: rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    pointer-events: none;
+}
+#world #canvas #cursor-palette .item-slots > .slot:not(.active):before {
+    border-color: rgba(0, 0, 0, 0.3);
+}
+#world #canvas #cursor-palette .item-slots > .slot > .sprite {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+@keyframes world-cursor-palette-item-float {
+    0% { transform: translate(-50%, -50%) scale(1.0); }
+    50% { transform: translate(-50%, -50%) scale(1.05); }
+    100% { transform: translate(-50%, -50%) scale(1.0); }
+}
+#world #canvas #cursor-palette .item-slots > .slot > .sprite > .wrap {
+    transform: scale(2.0) translateY(0);
+    transform-origin: center;
+    image-rendering: pixelated;
+    transition: transform 0.3s;
+}
+@keyframes world-cursor-palette-new-item {
+    0% { transform: scale(2.0) translateY(100%); }
+    50% { transform: scale(2.0) translateY(-10%); }
+    55% { transform: scale(2.0) translateY(10%); }
+    60% { transform: scale(2.0) translateY(0); }
+    100% { transform: scale(2.0) translateY(0); }
+}
+@keyframes world-cursor-palette-dropped-item {
+    0% { transform: scale(2.0) translateY(0); }
+    50% { transform: scale(2.0) translateY(-10%); }
+    55% { transform: scale(2.0) translateY(10%); }
+    60% { transform: scale(2.0) translateY(100%); }
+    100% { transform: scale(2.0) translateY(100%); }
+}
+#world #canvas #cursor-palette .item-slots > .slot > .sprite.new > .wrap {
+    animation: world-cursor-palette-new-item 1s ease-in-out forwards;
+}
+#world #canvas #cursor-palette .item-slots > .slot > .sprite.dropped > .wrap {
+    animation: world-cursor-palette-dropped-item 1s ease-in-out forwards;
+}
 
 #world #canvas #robots-overview {
     display: block;
@@ -2238,6 +2404,13 @@ display: block;
     z-index: 150;
     text-shadow: 1px 1px 0 black;
 }
+#world #canvas #side-buttons .button sup {
+    display: block;
+    text-align: center;
+    font-size: 80%;
+    line-height: 1.2;
+    margin: 0 auto 2px;
+}
 #world #canvas #side-buttons .big-button {
     min-width: 240px;
     font-size: 18px;
@@ -2301,25 +2474,48 @@ display: block;
     transform-origin: center center;
 }
 
+#world #canvas #side-buttons .button[data-save],
 #world #canvas #side-buttons .button[data-action="save-reload"] {
     background-color: #0e6b0e !important;
     border-color: #129d12 !important;
 }
+#world #canvas #side-buttons .button[data-battle],
 #world #canvas #side-buttons .button[data-action="start-battle"] {
     background-color: #0e6b0e !important;
     border-color: #129d12 !important;
 }
+#world #canvas #side-buttons .button[data-portal],
 #world #canvas #side-buttons .button[data-action="enter-portal"] {
     background-color: #0e4f6b !important;
     border-color: #12709d !important;
 }
+#world #canvas #side-buttons .button[data-button],
+#world #canvas #side-buttons .button[data-action="push-button"],
+#world #canvas #side-buttons .button[data-action="push-button"]:hover {
+    background-color: #1e2736;
+    border-color: #354d75;
+}
+#world #canvas #side-buttons .button[data-item],
+#world #canvas #side-buttons .button[data-action="pickup-item"],
+#world #canvas #side-buttons .button[data-action="pickup-item"]:hover {
+    background-color: #0e6b0e;
+    border-color: #129d12;
+}
+#world #canvas #side-buttons .button[data-ability],
+#world #canvas #side-buttons .button[data-action="pickup-ability"],
+#world #canvas #side-buttons .button[data-action="pickup-ability"]:hover {
+    background-color: #0e6b0e;
+    border-color: #129d12;
+}
+#world #canvas #side-buttons .button[data-event],
+#world #canvas #side-buttons .button[data-action="trigger-event"] {
+    background-color: #303f58 !important;
+    border-color: #5276b1 !important;
+}
+#world #canvas #side-buttons .button[data-dismiss],
 #world #canvas #side-buttons .button[data-action="dismiss"] {
     background-color: #8b1d1d !important;
     border-color: #b23333 !important;
-}
-#world #canvas #side-buttons .button[data-action="push-button"] {
-    background-color: #1e2736 !important;
-    border-color: #354d75 !important;
 }
 #world #canvas #side-buttons .button[data-action="push-button"].red {
     background-color: #8b1d1d !important;
@@ -2345,11 +2541,6 @@ display: block;
 #world #canvas #side-buttons .button[data-action="push-button"].orange {
     background-color: #a24d1e !important;
     border-color: #c66e34 !important;
-}
-
-#world #canvas #side-buttons .button[data-action="trigger-event"] {
-    background-color: #303f58 !important;
-    border-color: #5276b1 !important;
 }
 
 #world #canvas #position-display {

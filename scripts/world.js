@@ -84,6 +84,7 @@ gameSettings.worldState = {
         position: '0-0',
         positionXY: [0, 0],
         direction: '',
+        holding: '',
         moving: false,
         moved: false,
         busy: false,
@@ -162,6 +163,7 @@ class mmrpgWorldMap {
         let $resetButton = $('#reset-button', $thisWorld);
         let $positionDisplay = $('#position-display', $thisWorld);
         let $playerSwitcher = $('#player-switcher', $thisWorld);
+        let $cursorPalette = $('#cursor-palette', $thisWorld);
         let $robotsOverview = $('#robots-overview', $thisWorld);
         let $sideButtons = $('#side-buttons', $thisWorld);
         let $actionDropdown = $('#action-dropdown', $thisWorld);
@@ -178,6 +180,7 @@ class mmrpgWorldMap {
         _elements.resetButton = $resetButton;
         _elements.positionDisplay = $positionDisplay;
         _elements.playerSwitcher = $playerSwitcher;
+        _elements.cursorPalette = $cursorPalette;
         _elements.robotsOverview = $robotsOverview;
         _elements.sideButtons = $sideButtons;
         _elements.actionDropdown = $actionDropdown;
@@ -1939,6 +1942,7 @@ class mmrpgWorldMap {
         let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap); // later: $('.layer[data-layer="sprites"]', $canvasMap);
         let $cursorSprite = $teamSprites.filter('.cursor');
         let $otherSprites = $teamSprites.filter(':not(.cursor)');
+        let $trackingCursor = $('.sprite.tracking-cursor', $canvasMap);
         if (!$spritesLayer || !$spritesLayer.length){ console.error('$spritesLayer do not exist!'); return false; }
         if (!$cursorSprite || !$cursorSprite.length){ console.error('$cursorSprite not found!'); return false; }
         if (!$actionDropdown || !$actionDropdown.length){ console.error('$actionDropdown not found!'); return false; }
@@ -1996,18 +2000,14 @@ class mmrpgWorldMap {
             if (delay > 0){ moveTimeout = setTimeout(doAfterDelay, delay); }
             else { doAfterDelay(); }
             };
+        let newCursorStyles = { left: tileOffsetX + 'px', top: tileOffsetY + 'px', zIndex: tileOffsetZ };
+        let newCursorTrackerStyles = { left: (tileOffsetX + 10) + 'px', top: (tileOffsetY + 5) + 'px', zIndex: (tileOffsetZ - 1) };
         if (animateMove){
-            $cursorSprite.animate({
-                left: tileOffsetX + 'px',
-                top: tileOffsetY + 'px',
-                zIndex: tileOffsetZ,
-                }, travelDuration, 'linear', onMoveComplete);
+            $cursorSprite.animate(newCursorStyles, travelDuration, 'linear', onMoveComplete);
+            if ($trackingCursor.length){ $trackingCursor.animate(newCursorTrackerStyles, travelDuration, 'linear'); }
             } else {
-            $cursorSprite.css({
-                left: tileOffsetX + 'px',
-                top: tileOffsetY + 'px',
-                zIndex: tileOffsetZ,
-                }); onMoveComplete();
+            $cursorSprite.css(newCursorStyles); onMoveComplete();
+            if ($trackingCursor.length){ $trackingCursor.css(newCursorTrackerStyles); }
             }
         // If there are any team sprites, move them as well (it's okay if they lay behind the cursor)
         if ($otherSprites && $otherSprites.length){
@@ -2023,7 +2023,7 @@ class mmrpgWorldMap {
             //console.log('-> $otherSpritesInOrder =', $otherSpritesInOrder);
             let teamOffsetX = tileOffsetX;
             let teamOffsetY = tileOffsetY;
-            let teamOffsetZ = tileOffsetZ;
+            let teamOffsetZ = tileOffsetZ + 1;
             let teamTravelDuration = travelDuration;
             teamTravelDuration += 50;
             $otherSpritesInOrder.each(function(index, element){
@@ -2296,6 +2296,7 @@ class mmrpgWorldMap {
         let _mapEffects = _config.mapEffects;
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
+        let _mapSpriteSizeOffset = _config.mapSpriteSizeOffset;
         let _userId = _config.userId;
         let _playerId = _config.playerId;
         let _playerToken = _config.playerToken;
@@ -2362,6 +2363,7 @@ class mmrpgWorldMap {
             }
         //console.log('-> found ' + eventsAtPosition.length + ' events at position');
         //console.log('-> eventsAtPosition =', eventsAtPosition);
+        //console.log('-> found ' + eventsAtPosition.length + ' eventsAtPosition =', eventsAtPosition);
 
         // Check to see what the very first event type is
         let firstEvent = eventsAtPosition[0];
@@ -2521,7 +2523,7 @@ class mmrpgWorldMap {
                 //var buttonName = (dataColour ? (dataColour[0].toUpperCase() + dataColour.slice(1) + ' ') : '') + 'Button';
                 //if (!dataLabel){ dataLabel = 'Button Options'; }
                 if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-                sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' '+dataColour : '')+'" data-action="push-button" data-button="'+dataButton+'"><span>Push Button?</span></a>';
+                sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' '+dataColour : '')+'" data-action="push-button" data-button="'+dataButton+'"><span>Push Button</span></a>';
                 sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showActionAreaType = 'button';
                 zoomTimeoutDuration = 500; // if we show a button dropdown, we want to zoom in quickly
@@ -2619,10 +2621,9 @@ class mmrpgWorldMap {
             let dataLabel = $itemEvent.attr('data-label');
             let dataItem = $itemEvent.attr('data-item');
             let dataItemToken = $itemEvent.attr('data-token');
-            let dataColour = dataItemToken.length ? dataItemToken.split('-')[0] : 'none';
-            if (dataColour === 'weapon'){ dataColour = 'weapons'; }
-            else if (dataColour === 'super'){ dataColour = 'shield'; }
-            else if (dataColour === 'field'){ dataColour = 'none'; }
+            let dataColour = $itemEvent.attr('data-colour');
+            //console.log('-> dataItem =', dataItem, '| dataItemToken =', dataItemToken, '| dataColour =', dataColour);
+            if (!dataColour){ dataColour = 'none'; }
             let itemAlreadyTaken = false; // TODO: track items already taken
             let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
             //console.log('-> playerIsCursor =', playerIsCursor);
@@ -2631,8 +2632,17 @@ class mmrpgWorldMap {
                 if (playerIsCursor){
                     //console.log('-> player is cursor, preparing item pickup dropdown');
                     showActionArea = true;
-                    if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-                    sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pick-up-item" data-item="'+dataItem+'"><span>Pick Up Item?</span></a>';
+                    if (!_worldCursor.holding){
+                        // Normal item pickup, not already holding anything
+                        //if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pickup-item" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
+                        } else if (_worldCursor.holding && _worldCursor.holding === 'item/'+dataItem){
+                        // We're holding something and this is that item, we should allow dropping it
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="drop-item" data-item="'+dataItem+'"><span><sup>Drop</sup> '+dataLabel+'</span></a>';
+                        } else if (_worldCursor.holding){
+                        // Otherwise we're holding something else, so we should not allow picking up this item
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+' disabled" data-item="'+dataItem+'"><span>Pick Up</sup> ' + dataLabel + '</span></a>';
+                        }
                     sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                     showActionAreaType = 'button';
                     zoomTimeoutDuration = 750; // if we show a pick-up dropdown, we want to zoom in faster
@@ -2671,8 +2681,8 @@ class mmrpgWorldMap {
                 if (playerIsCursor){
                     //console.log('-> player is cursor, preparing ability pickup dropdown');
                     showActionArea = true;
-                    if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-                    sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pick-up-ability" data-ability="'+dataAbility+'"><span>Pick Up Ability?</span></a>';
+                    //if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                    sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pick-up-ability" data-ability="'+dataAbility+'"><span><sup>Pick Up</sup> ' + (dataLabel ? dataLabel : 'Ability') + '</span></a>';
                     sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                     showActionAreaType = 'button';
                     zoomTimeoutDuration = 750; // if we show a pick-up dropdown, we want to zoom in faster
@@ -2844,15 +2854,17 @@ class mmrpgWorldMap {
             // Define the event to run when clicking one of these new action buttons
             let onActionButtonClick = function(e){
                 //console.log('%c' + 'Action button clicked!', 'color: cyan;');
+                //console.log('-> data-action =', $(this).attr('data-action'));
                 e.preventDefault();
                 let $button = $(this);
                 let action = $button.attr('data-action') || false;
+                if (!action){ console.error('-> no action found on button, skipping!'); return false; }
                 let isBattle = action.indexOf('battle') !== -1;
                 let isPortal = action.indexOf('portal') !== -1;
                 let isButton = action.indexOf('button') !== -1;
+                let isItem = action.indexOf('item') !== -1;
                 let isDismiss = action === 'dismiss';
                 if (!isDismiss){ $button.addClass('clicked'); }
-                //console.log('-> action =', action);
                 if (isBattle){
                     let battleId = $button.attr('data-battle') || false;
                     //console.log('-> battleId =', battleId);
@@ -3013,6 +3025,107 @@ class mmrpgWorldMap {
                     // ...
 
                     }
+                else if (isItem){
+                    //console.log('-> item button clicked with action:', action);
+                    let itemSymbols = _config.mapItemSymbols;
+                    let itemsIndex = _config.mapItemsIndex;
+                    let itemClaims = _world.items;
+                    let itemName = $button.attr('data-item') || false;
+                    let itemInfo = itemName && (itemsIndex && itemsIndex[itemName]) ? itemsIndex[itemName] : false;
+                    let $eventSprite = $(firstEvent.sprite);
+                    let $innerSprite = $eventSprite ? $('.sprite', $eventSprite) : false;
+                    //console.log('-> itemName =', itemName);
+                    //console.log('-> itemInfo =', itemInfo);
+                    //console.log('-> $eventSprite =', $eventSprite);
+                    //console.log('-> $innerSprite =', $innerSprite);
+                    if (!itemName || !itemInfo){ console.error('-> item name or info not found, cannot pick up item!'); return false; }
+                    // dismiss the dropdown and side buttons first
+                    dismissDropdown(false);
+                    // collect refs to the cursor palette and temp item slots
+                    let $cursorPalette = _elements.cursorPalette;
+                    let $tempItemSlots = $('.item-slots.temp-slots', $cursorPalette);
+                    // if this is a pickup action, process normally
+                    if (action === 'pickup-item'){
+                        //console.log('-> picking up item:', itemName);
+                        // check to make sure we have an open even slot to drop the item into
+                        let $firstOpenTempSlot = $('.slot:not(.active)', $tempItemSlots).first();
+                        if (!$firstOpenTempSlot.length){
+                            console.error('-> no open temp item slots found, cannot pick up item!');
+                            return false;
+                            }
+                        $cursorPalette.addClass('active');
+                        $worldCursor.addClass('pickup');
+                        // clone the item to the cursor palette to show it being picked up
+                        let newTop = _config.worldHeight + 200;
+                        let newLeft = (parseInt($eventSprite.css('left')) || 0) - 200;
+                        let $clonedEventSprite = $eventSprite.clone();
+                        setTimeout(function(){
+                            $clonedEventSprite.css({top:'',left:'',zIndex:''}); // reset the event sprite position
+                            $clonedEventSprite.appendTo($firstOpenTempSlot).addClass('new');; // move the event sprite to the temp item slot
+                            $firstOpenTempSlot.addClass('active').attr('data-item', itemName);
+                            setTimeout(function(){
+                                $worldCursor.removeClass('pickup');
+                                $clonedEventSprite.removeClass('new');
+                                }, 3000);
+                            }, 600);
+                        // make the event sprite track the cursor's movement until we put it down
+                        itemInfo.beingHeld = true; // set the item info tracking state to cursor
+                        _worldCursor.holding = 'item/'+itemName; //{kind: 'item', name: itemName, item: itemInfo};
+                        $eventSprite.addClass('tracking-cursor');
+                        let targetLeft = parseInt($worldCursor.css('left') || 0) + 10;
+                        let targetTop = parseInt($worldCursor.css('top') || 0) + 5;
+                        let targetZ = parseInt($worldCursor.css('zIndex') || 0) - 1;
+                        $eventSprite.css({left: targetLeft + 'px', top: targetTop + 'px', zIndex: targetZ});
+                        if ($eventSprite.is('.always-zoom')){ $eventSprite.addClass('not-always-zoom').removeClass('always-zoom'); }
+                        }
+                    // else if this is a drop action, we need to do a bit more work
+                    else if (action === 'drop-item'){
+                        //console.log('-> dropping item:', itemName);
+                        // check to make sure we have an active temp item slot holding an item
+                        let $firstActiveTempSlot = $('.slot.active', $tempItemSlots).first();
+                        if (!$firstActiveTempSlot.length){
+                            console.error('-> no active temp item slots found, cannot drop item!');
+                            return false;
+                            }
+                        $cursorPalette.removeClass('active');
+                        $worldCursor.addClass('drop');
+                        // remove the item from the cursor pallet first and formost
+                        let $clonedEventSprite = $firstActiveTempSlot.find('.sprite');
+                        $clonedEventSprite.addClass('dropped');
+                        setTimeout(function(){
+                            $firstActiveTempSlot.removeClass('active').attr('data-item', '');
+                            setTimeout(function(){
+                                $worldCursor.removeClass('drop');
+                                $clonedEventSprite.remove();
+                                }, 3000);
+                            }, 600);
+                        // detach the event sprite from the cursor's movement so that it's actually put down
+                        _worldCursor.holding = '';
+                        $eventSprite.removeClass('tracking-cursor');
+                        let newItemPosition = _worldCursor.position;
+                        let newItemPositionXY = newItemPosition.split('-');
+                        let targetLeft = ((newItemPositionXY[0] - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0];
+                        let targetTop = ((newItemPositionXY[1] - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1];
+                        let targetZ = targetTop + 1;
+                        $eventSprite.css({left: targetLeft + 'px', top: targetTop + 'px', zIndex: targetZ});
+                        if ($eventSprite.is('.not-always-zoom')){ $eventSprite.addClass('always-zoom').removeClass('not-always-zoom'); }
+                        // update the event sprite position to the new position
+                        let oldItemPosition = itemInfo.pos;
+                        itemInfo.pos = newItemPosition; // update the item position in the info
+                        itemInfo.position = newItemPositionXY; // update the item position in the info
+                        itemInfo.col = parseInt(newItemPositionXY[0]) || 1; // update the item column in the info
+                        itemInfo.row = parseInt(newItemPositionXY[1]) || 1; // update the item row in the info
+                        itemInfo.beingHeld = false; // set the item info tracking state to not being held
+                        delete itemSymbols[oldItemPosition];
+                        itemSymbols[newItemPosition] = itemName; // update the event symbols with the new position
+                        // save these changes to the world state
+
+                        // TODO:  how should we save something like this?
+                        console.warn('moved item changes are not currently saved to the world state!');
+
+                        }
+
+                    }
                 else if (isDismiss){
                     //console.log('-> dismissing action dropdown!');
                     dismissDropdown(true);
@@ -3149,6 +3262,7 @@ class mmrpgWorldMap {
             //console.log('-> ' + symbolsKey + ' =', eventSymbols);
             //console.log('-> ' + symbolsKey + ' =', eventKeys);
             if (!eventKeys.length){ continue; }
+            // Loop through the event symbols and check if any of them are at the positions to check
             for (let i = 0; i < positionsToCheck.length; i++){
                 let eventPosition = positionsToCheck[i];
                 let eventPositionXY = eventPosition.split('-');
@@ -3156,6 +3270,9 @@ class mmrpgWorldMap {
                 if (!eventSymbols[eventPosition]){ continue; } // skip if no event symbols at this position
                 let eventToken = eventSymbols[eventPosition];
                 let eventInfo = eventsIndex[eventToken];
+                if (!eventToken || !eventInfo){ console.warn('-> no event token or info found for ' + eventKind + ' at position ' + eventPosition + ', skipping!'); continue; }
+                if (eventInfo.disabled){ continue; }
+                if (eventInfo.beingHeld){ continue; }
                 let $eventSprite = $('.sprite[data-' + eventKind + '="'+eventToken+'"]', $canvasMap);
                 let eventLabel = $eventSprite.length ? $eventSprite.attr('data-label') : '';
                 if ($eventSprite && $eventSprite.length){ $eventSprite = $eventSprite.first().get(0); }
@@ -3165,6 +3282,10 @@ class mmrpgWorldMap {
                     if (eventInfo.sprite === 'healpad' || eventInfo.sprite === 'resetpad'){ eventKind2 = 'sanctuary'; }
                     // otherwise it's just a generic custom event tile
                     else { eventKind2 = 'custom'; }
+                    }
+                else if (eventKind === 'portal'){
+                    // spawns are usually hidden behind other portals, never interactable directly
+                    if (eventToken === 'spawn'){ continue; }
                     }
                 else if (eventKind === 'item' || eventKind === 'ability'){
                     // skip if already claimed by the player
@@ -3197,6 +3318,37 @@ class mmrpgWorldMap {
                 // otherwise we are fine to add to the events array
                 //console.log('--> adding ' + eventKind + ' at ' + eventPosition + ' to eventsAtPosition array', '\n--> w/ eventAtPosition = ', eventAtPosition);
                 eventsAtPosition.push(eventAtPosition);
+                }
+            // Check to see if the cursor is holding any events, if so they are "at this position"
+            // (putting this last so that the cursor can't drop items where another event already is)
+            //console.log('-> checking cursor holding for ' + eventKind + ' at position ' + searchPosition);
+            //console.log('-> but only if no events found in eventsAtPosition =', eventsAtPosition.length, eventsAtPosition);
+            if (!eventsAtPosition.length && _worldCursor.holding && _worldCursor.holding.indexOf(eventKind + '/') === 0){
+                //console.log('-> cursor is holding an event of kind ' + eventKind + ', adding to eventsAtPosition array');
+                let eventToken = _worldCursor.holding.split('/')[1] || false;
+                let eventInfo = eventsIndex[eventToken] || false;
+                //console.log('-> eventToken =', eventToken);
+                //console.log('-> eventInfo =', eventInfo);
+                let $eventSprite = $('.sprite[data-' + eventKind + '="'+eventToken+'"]', $canvasMap);
+                let eventLabel = $eventSprite.length ? $eventSprite.attr('data-label') : '';
+                if ($eventSprite && $eventSprite.length){ $eventSprite = $eventSprite.first().get(0); }
+                let eventKind2 = eventKind;
+                if (eventKind === 'event'){
+                    // treat healpads and resetpads as sanctuary events
+                    if (eventInfo.sprite === 'healpad' || eventInfo.sprite === 'resetpad'){ eventKind2 = 'sanctuary'; }
+                    // otherwise it's just a generic custom event tile
+                    else { eventKind2 = 'custom'; }
+                    }
+                else if (eventKind === 'item' || eventKind === 'ability'){
+                    // skip if already claimed by the player
+                    if (eventInfo.claimed){ continue; }
+                    // collect the token as the second "kind"
+                    eventKind2 = eventInfo.token;
+                    }
+                let eventAtPosition = {kind: eventKind, kind2: eventKind2, position: searchPosition, token: eventToken, sprite: $eventSprite, label: eventLabel};
+                if (eventKind === 'item' || eventKind === 'ability'){ eventAtPosition.claimed = eventInfo.claimed; }
+                eventsAtPosition.push(eventAtPosition);
+                continue; // skip the rest of this loop
                 }
             }
         // Return the found events

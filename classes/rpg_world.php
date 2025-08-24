@@ -1416,6 +1416,24 @@ class rpg_world {
         return $return_markup;
     }
 
+    // Define a function for getting the cursor pallet markup given current conditions
+    public static function get_cursor_palette_markup($this_prototype_data){
+        //error_log('rpg_world::get_cursor_palette_markup() called!');
+        if (empty($this_prototype_data)){ return ''; }
+        if ($this_prototype_data['this_player_token'] !== 'player'){ return ''; }
+        $return_markup = '';
+        // Define the markup for the permanent quest-like items that show progress
+        //$perm_item_slots = 4; // TODO: add this to the settings file as a constant (after deciding what these represent)
+        //$return_markup .= '<div class="item-slots perm-slots" data-slots="'.$perm_item_slots.'">';
+        //    for ($i = 0; $i < $perm_item_slots; $i++){ $return_markup .= '<div class="slot" data-slot="'.($i + 1).'"></div>'; }
+        //$return_markup .= '</div>';
+        // Define the markup for the temporary item slot for stuff that can be picked-up/put-down
+        $return_markup .= '<div class="item-slots temp-slots" data-slots="1">';
+            $return_markup .= '<div class="slot" data-slot="1"></div>';
+        $return_markup .= '</div>';
+        return $return_markup;
+    }
+
     // Define a function for getting the robot switcher markup given current conditions
     public static function get_robots_overview_markup($this_prototype_data, $current_robot_tokens){
         //error_log('rpg_world::get_robot_overview_markup() called!');
@@ -2118,6 +2136,7 @@ class rpg_world {
                 if (!isset($mmrpg_index_items[$token])){ continue; } // skip if not valid item
                 $info = $mmrpg_index_items[$token];
                 $subclass = !empty($info['item_subclass']) ? $info['item_subclass'] : '';
+                $subtypes = array((!empty($info['item_type']) ? $info['item_type'] : ''), (!empty($info['item_type2']) ? $info['item_type2'] : ''));
                 $is_unique = $subclass === 'event' && !strstr($token, '-heart') ? true : false;
                 $is_already_owned = !empty($this_player_items[$unlock_token]) ? true : false;
                 //error_log('-> $info = '.print_r(json_encode($info), true));
@@ -2133,8 +2152,9 @@ class rpg_world {
                 $label = $info['item_name'];
                 $class = $token.(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 if ($subclass === 'event'){ $class .= ' always-zoom'; }
+                $colour = !empty($subtypes) ? implode(' ', array_filter($subtypes)) : '';
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
-                $attrs = 'data-item="'.$item_namekey.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$item_namekey.'"
+                $attrs = 'data-item="'.$item_namekey.'" data-colour="'.$colour.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$item_namekey.'"
                 $markup = self::get_sprite($kind, $token, '', 'right', $class, $style, $attrs, 'icon');
                 $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$kind.'-pickup"', $markup);
                 $markup = str_replace('data-token="'.$token.'"', 'data-token="'.$unlock_token.'"', $markup);
