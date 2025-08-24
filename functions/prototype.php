@@ -1385,8 +1385,13 @@ function mmrpg_prototype_players_unlocked($return_tokens = false){
     // Check if this battle has been completed and return true is it was
     $session_token = mmrpg_game_token();
     $battle_rewards = isset($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
-    if ($return_tokens){ return array_keys($battle_rewards); }
-    else { return count($battle_rewards); }
+    $battle_settings = isset($_SESSION[$session_token]['values']['battle_settings']) ? $_SESSION[$session_token]['values']['battle_settings'] : array();
+    $unique_player_tokens = array_unique(array_merge(array_keys($battle_rewards), array_keys($battle_settings)));
+    if (in_array('player', $unique_player_tokens)){ unset($unique_player_tokens[array_search('player', $unique_player_tokens)]); } // not the kind of player we're talking about
+    if (in_array('proxy', $unique_player_tokens)){ unset($unique_player_tokens[array_search('proxy', $unique_player_tokens)]); } // more of a separate mode than a real player
+    $unique_player_tokens = array_values($unique_player_tokens); // re-key just in case any were removed
+    if ($return_tokens){ return $unique_player_tokens; }
+    else { return count($unique_player_tokens); }
 }
 
 // Define a function for checking is a prototype robot has been unlocked
