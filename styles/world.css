@@ -194,7 +194,8 @@ html, body {
 /* define the rules for sprites that appear on the overworld map */
 #mmrpg #world .sprite,
 #mmrpg #world .sprite > .wrap,
-#mmrpg #world .sprite > .wrap > .sprite {
+#mmrpg #world .sprite > .wrap > .sprite,
+#mmrpg #world .sprite > .wrap > .back {
     display: block;
     box-sizing: border-box;
     width: 40px;
@@ -221,15 +222,22 @@ html, body {
 }
 #mmrpg #world .sprite > .sprite,
 #mmrpg #world .sprite > .wrap,
-#mmrpg #world .sprite > .wrap > .sprite {
+#mmrpg #world .sprite > .wrap > .sprite,
+#mmrpg #world .sprite > .wrap > .back {
     position: relative;
     top: 0;
     left: 0;
     bottom: auto;
     right: auto;
 }
-#mmrpg #world .sprite > .wrap > .sprite {
+#mmrpg #world .sprite > .wrap > .sprite,
+#mmrpg #world .sprite > .wrap > .back {
     transition: transform 0.6s, opacity 0.6s, filter 0.6s;
+}
+#mmrpg #world .sprite > .wrap > .back {
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
 }
 
 #mmrpg #world .sprite[data-size="40"] > .wrap > .sprite {
@@ -648,29 +656,18 @@ html, body {
 #world #map .layer.objects .sprite.item[data-token*="-heart"] {
     filter: drop-shadow(0px 0px 3px white) saturate(2);
 }
-
 #world #map .layer.objects .sprite.item.tracking-cursor {
     filter: drop-shadow(0px 0px 3px orange) saturate(2);
 }
 
 @keyframes world-sprite-ability-flip {
     0% { transform: scaleX(1); }
-    25% { transform: scaleX(0.05); }
-    50% { transform: scaleX(1); }
-    75% { transform: scaleX(0.05); }
-    100% { transform: scaleX(1); }
-}
-@keyframes world-sprite-ability-flip-v2 {
-    0% { transform: scaleX(1); }
-
     20% { transform: scaleX(1); }
     25% { transform: scaleX(0.05); }
     30% { transform: scaleX(1); }
-
     70% { transform: scaleX(1); }
     75% { transform: scaleX(0.05); }
     80% { transform: scaleX(1); }
-
     100% { transform: scaleX(1); }
 }
 @keyframes world-sprite-ability-hover {
@@ -682,7 +679,8 @@ html, body {
     50% { transform: scale(2) translate(0, -4px); }
 }
 #world #map .layer.objects .sprite.ability {
-    background-color: transparent;
+    background-color: transparent !important;
+    border-color: transparent !important;
     transform: scaleX(1);
     transform-origin: center bottom;
 }
@@ -693,45 +691,58 @@ html, body {
     width: 36px;
     height: 36px;
     z-index: 1;
-    border: 1px solid #191919 !important;
-    border-radius: 6px;
-    filter: drop-shadow(0px 0px 3px white) saturate(2);
+    transform: scale(1) translate(0, 0);
+    filter: none;
 }
-#world #map .layer.objects .sprite.ability > .wrap:before {
-    content: "";
+#world #map .layer.objects .sprite.ability > .wrap > .back {
     display: block;
     position: absolute;
     z-index: 1;
+    top: 4px;
+    left: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid #191919 !important;
+    background-color: #cacaca;
+    filter: drop-shadow(0px 0px 3px white) saturate(2);
+    transition: top 0.6s, transform 0.6s, opacity 0.6s, filter 0.6s;
+}
+#world #map .layer.objects .sprite.ability > .wrap > .back:before {
+    content: "";
+    display: block;
+    position: absolute;
     top: 3px;
     left: 3px;
     right: 3px;
     bottom: 3px;
-    background-color: rgba(0, 0, 0, 0.6);
+    width: auto;
+    height: auto;
     border-radius: 3px;
+    background-color: rgba(0, 0, 0, 0.3);
 }
 #world #map .layer.objects .sprite.ability > .wrap > .sprite {
     filter: none;
     z-index: 2;
-    left: -3px;
-    top: -3px;
-}
-#world #map .layer .sprite.ability:not(.tile).zoom {
-    transform: scale(2);
-}}
-#world #map .layer .sprite.ability:not(.tile).zoom > .wrap > .sprite {
-    transform: none !important;
+    top: -2px;
+    left: -2px;
 }
 #world #map .layer.objects .sprite.ability.animate {
-    animation: world-sprite-ability-flip-v2 18s infinite;
+    animation: world-sprite-ability-flip 18s infinite;
     animation-delay: 1s;
 }
 #world #map .layer.objects .sprite.ability.animate > .wrap {
     animation: world-sprite-ability-hover 2s steps(4) infinite;
     animation-delay: inherit;
 }
-#world #map .layer.objects .sprite.ability.zoom.nimate > .wrap {
-    animation: world-sprite-ability-hover-zoom 2s steps(4) infinite;
+#world #map .layer.objects .sprite.ability.animate > .wrap > .sprite {
+
 }
+#world #map .layer.objects .sprite.ability.zoom > .wrap > .back {
+    top: 0;
+}
+
+
 @keyframes world-sprite-ability-shadow-hover {
     0%, 100% { transform: scale(1.0); }
     50% { transform: scale(0.8); }
@@ -753,6 +764,9 @@ html, body {
 }
 #world #map .layer.objects .sprite.ability.animate:after {
     animation: world-sprite-ability-shadow-hover 2s steps(4) infinite;
+}
+#world #map .layer.objects .sprite.ability.tracking-cursor {
+    filter: drop-shadow(0px 0px 3px orange) saturate(2);
 }
 
 /* define some bounce animations for the sprites */
@@ -788,15 +802,26 @@ html, body {
 }
 
 /* define the special zoom styles that are applied when something is focused */
+#world #map .layer .sprite:not(.tile).zoom > .wrap > .back,
+#world #map .layer .sprite:not(.tile).always-zoom > .wrap > .back {
+    filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.6));
+    transform: scale(2);
+}
 #world #map .layer .sprite:not(.tile).zoom > .wrap > .sprite,
 #world #map .layer .sprite:not(.tile).always-zoom > .wrap > .sprite {
     image-rendering: pixelated;
     filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.6));
     transform: scale(2);
 }
+#world #map .layer .sprite:not(.tile).zoom > .wrap > .back + .sprite,
+#world #map .layer .sprite:not(.tile).always-zoom > .wrap > .back + .sprite {
+    filter: none;
+}
+#world #map .layer .sprite:not(.tile).always-zoom.zoom > .wrap > .back,
 #world #map .layer .sprite:not(.tile).always-zoom.zoom > .wrap > .sprite {
     transform: scale(3);
 }
+#world #map .layer.has-zoom .sprite:not(.tile):not(.zoom):not(.team) > .wrap > .back,
 #world #map .layer.has-zoom .sprite:not(.tile):not(.zoom):not(.team) > .wrap > .sprite {
     filter: brightness(0.6) drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.6));
 }
@@ -1326,7 +1351,7 @@ html, body {
 #world #canvas #cursor-palette > .wrapper {
     pointer-events: none;
 }
-#world #canvas #cursor-palette .item-slots {
+#world #canvas #cursor-palette .slots {
     display: block;
     padding: 0;
     border: none;
@@ -1335,21 +1360,21 @@ html, body {
     border-radius: 0;
     margin: 0;
 }
-#world #canvas #cursor-palette .item-slots:after {
+#world #canvas #cursor-palette .slots:after {
     content: "";
     display: block;
     clear: both;
 }
-#world #canvas #cursor-palette .item-slots.perm-slots {
+#world #canvas #cursor-palette .slots.perm {
     width: 80px;
     float: left;
     margin-right: 6px;
 }
-#world #canvas #cursor-palette .item-slots.temp-slots {
+#world #canvas #cursor-palette .slots.temp {
     width: auto;
     float: right;
 }
-#world #canvas #cursor-palette .item-slots > .slot {
+#world #canvas #cursor-palette .slots > .slot {
     display: block;
     float: left;
     width: auto;
@@ -1357,15 +1382,15 @@ html, body {
     position: relative;
     pointer-events: auto;
 }
-#world #canvas #cursor-palette .item-slots.perm-slots > .slot {
+#world #canvas #cursor-palette .slots.perm > .slot {
     width: 40px;
     height: 40px;
 }
-#world #canvas #cursor-palette .item-slots.temp-slots > .slot {
+#world #canvas #cursor-palette .slots.temp > .slot {
     width: 80px;
     height: 80px;
 }
-#world #canvas #cursor-palette .item-slots > .slot:before {
+#world #canvas #cursor-palette .slots > .slot:before {
     content: "";
     display: block;
     position: absolute;
@@ -1382,10 +1407,10 @@ html, body {
     border-radius: 3px;
     pointer-events: none;
 }
-#world #canvas #cursor-palette .item-slots > .slot:not(.active):before {
+#world #canvas #cursor-palette .slots > .slot:not(.active):before {
     border-color: rgba(0, 0, 0, 0.3);
 }
-#world #canvas #cursor-palette .item-slots > .slot > .sprite {
+#world #canvas #cursor-palette .slots > .slot > .sprite {
     position: absolute;
     z-index: 2;
     top: 50%;
@@ -1398,11 +1423,12 @@ html, body {
     50% { transform: translate(-50%, -50%) scale(1.05); }
     100% { transform: translate(-50%, -50%) scale(1.0); }
 }
-#world #canvas #cursor-palette .item-slots > .slot > .sprite > .wrap {
+#world #canvas #cursor-palette .slots > .slot > .sprite > .wrap {
     transform: scale(2.0) translateY(0);
     transform-origin: center;
     image-rendering: pixelated;
     transition: transform 0.3s;
+    background-color: transparent !important;
 }
 @keyframes world-cursor-palette-new-item {
     0% { transform: scale(2.0) translateY(100%); }
@@ -1418,10 +1444,10 @@ html, body {
     60% { transform: scale(2.0) translateY(100%); }
     100% { transform: scale(2.0) translateY(100%); }
 }
-#world #canvas #cursor-palette .item-slots > .slot > .sprite.new > .wrap {
+#world #canvas #cursor-palette .slots > .slot > .sprite.new > .wrap {
     animation: world-cursor-palette-new-item 1s ease-in-out forwards;
 }
-#world #canvas #cursor-palette .item-slots > .slot > .sprite.dropped > .wrap {
+#world #canvas #cursor-palette .slots > .slot > .sprite.dropped > .wrap {
     animation: world-cursor-palette-dropped-item 1s ease-in-out forwards;
 }
 

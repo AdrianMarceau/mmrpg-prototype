@@ -1376,6 +1376,7 @@ class rpg_world {
         $sprite_markup = '';
         $sprite_markup .= '<span class="'.$sprite_class.'"'.$sprite_attrs.$sprite_styles.'>';
             $sprite_markup .= '<span class="wrap">';
+                if ($kind === 'ability'){ $sprite_markup .= '<i class="back"></i>'; }
                 $sprite_markup .= '<span class="sprite" style="background-image: url('.$sprite_path.');"></span>';
             $sprite_markup .= '</span>';
         $sprite_markup .= '</span>';
@@ -1443,11 +1444,11 @@ class rpg_world {
         $return_markup = '';
         // Define the markup for the permanent quest-like items that show progress
         //$perm_item_slots = 4; // TODO: add this to the settings file as a constant (after deciding what these represent)
-        //$return_markup .= '<div class="item-slots perm-slots" data-slots="'.$perm_item_slots.'">';
+        //$return_markup .= '<div class="slots perm" data-slots="'.$perm_item_slots.'">';
         //    for ($i = 0; $i < $perm_item_slots; $i++){ $return_markup .= '<div class="slot" data-slot="'.($i + 1).'"></div>'; }
         //$return_markup .= '</div>';
         // Define the markup for the temporary item slot for stuff that can be picked-up/put-down
-        $return_markup .= '<div class="item-slots temp-slots" data-slots="1">';
+        $return_markup .= '<div class="slots temp" data-slots="1">';
             $return_markup .= '<div class="slot" data-slot="1"></div>';
         $return_markup .= '</div>';
         return $return_markup;
@@ -2259,11 +2260,13 @@ class rpg_world {
                 if (!empty($world_map_ability_symbols[$ability_namekey])){ $pos = $world_map_ability_symbols[$ability_namekey]; }
                 list($col, $row) = explode('-', $pos);
                 $info = $mmrpg_index_abilities[$token];
+                $subclass = !empty($info['ability_subclass']) ? $info['ability_subclass'] : '';
+                $subtypes = array((!empty($info['ability_type']) ? $info['ability_type'] : ''), (!empty($info['ability_type2']) ? $info['ability_type2'] : ''));
                 //error_log('-> $info = '.print_r(json_encode($info), true));
-                $already_owned = in_array($token, $this_player_abilities) ? true : false;
-                //error_log('-> $already_owned = '.print_r($already_owned, true));
-                if ($already_owned){ continue; } // skip if already owned
-                //if ($already_owned){ error_log('should-skip-owned-abilities'); } // skip if already owned
+                $is_already_owned = in_array($token, $this_player_abilities) ? true : false;
+                //error_log('-> $is_already_owned = '.print_r($is_already_owned, true));
+                if ($is_already_owned){ continue; } // skip if already owned
+                //if ($is_already_owned){ error_log('should-skip-owned-abilities'); } // skip if already owned
                 // Otherwise we can actually show this ability on the map
                 //error_log('processing ability "'.$ability_namekey.'" with pos "'.$pos.'"'.PHP_EOL.'-> $token = "'.$token.'"'.PHP_EOL.'-> $info = '.print_r($info, true));
                 $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
@@ -2272,11 +2275,13 @@ class rpg_world {
                 $label = $info['ability_name'];
                 $class = $token.(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 $types = 'type '.(!empty($info['ability_type']) ? $info['ability_type'] : 'none').(!empty($info['ability_type2']) ? ' '.$info['ability_type2'] : '');
+                $colour = !empty($subtypes) ? implode(' ', array_filter($subtypes)) : '';
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
-                $attrs = 'data-ability="'.$ability_namekey.'" data-token="'.$token.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$ability_namekey.'"
+                $attrs = 'data-ability="'.$ability_namekey.'" data-colour="'.$colour.'" data-token="'.$token.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$ability_namekey.'"
                 $markup = self::get_sprite($kind, $token, '', 'right', $class, $style, $attrs, 'icon');
                 $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$kind.'-pickup"', $markup);
-                $markup = str_replace('class="wrap"', 'class="wrap '.$types.'"', $markup);
+                $markup = str_replace('class="wrap"', 'class="wrap"', $markup);
+                $markup = str_replace('class="back"', 'class="back '.$types.'"', $markup);
                 $abilities_markup[] = $markup;
                 $ability_symbols[$pos] = $ability_namekey;
                 $abilities_index[$ability_namekey] = array(

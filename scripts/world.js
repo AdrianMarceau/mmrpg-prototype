@@ -2625,6 +2625,7 @@ class mmrpgWorldMap {
             let dataItemToken = $itemEvent.attr('data-token');
             let dataColour = $itemEvent.attr('data-colour');
             //console.log('-> dataItem =', dataItem, '| dataItemToken =', dataItemToken, '| dataColour =', dataColour);
+            if (!dataLabel){ dataLabel = dataItemToken; }
             if (!dataColour){ dataColour = 'none'; }
             let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
             //console.log('-> playerIsCursor =', playerIsCursor);
@@ -2673,17 +2674,28 @@ class mmrpgWorldMap {
             let dataLabel = $abilityEvent.attr('data-label');
             let dataAbility = $abilityEvent.attr('data-ability');
             let dataAbilityToken = $abilityEvent.attr('data-token');
-            let dataColour = ''; // TODO: import ability data so we know what type it is
-            let abilityAlreadyTaken = false; // TODO: track abilities already taken
+            let dataColour = $abilityEvent.attr('data-colour');
+            //console.log('-> dataAbility =', dataAbility, '| dataAbilityToken =', dataAbilityToken, '| dataColour =', dataColour);
+            if (!dataLabel){ dataLabel = dataAbilityToken; }
+            if (!dataColour){ dataColour = 'none'; }
             let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
             //console.log('-> playerIsCursor =', playerIsCursor);
-            if (dataAbility && dataAbilityToken && !abilityAlreadyTaken){
+            if (dataAbility && dataAbilityToken){
                 // If the player is the cursor player, we should show the ability pickup dropdown
                 if (playerIsCursor){
                     //console.log('-> player is cursor, preparing ability pickup dropdown');
                     showActionArea = true;
-                    //if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-                    sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pick-up-ability" data-ability="'+dataAbility+'"><span><sup>Pick Up</sup> ' + (dataLabel ? dataLabel : 'Ability') + '</span></a>';
+                    if (!_worldCursor.holding){
+                        // Normal ability pickup, not already holding anything
+                        //if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pickup-ability" data-ability="'+dataAbility+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
+                        } else if (_worldCursor.holding && _worldCursor.holding === 'ability/'+dataAbility){
+                        // We're holding something and this is that ability, we should allow dropping it
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="drop-ability" data-ability="'+dataAbility+'"><span><sup>Put Down</sup> '+dataLabel+'</span></a>';
+                        } else if (_worldCursor.holding){
+                        // Otherwise we're holding something else, so we should not allow picking up this ability
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+' disabled" data-ability="'+dataAbility+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
+                        }
                     sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                     showActionAreaType = 'button';
                     zoomTimeoutDuration = 750; // if we show a pick-up dropdown, we want to zoom in faster
@@ -2864,6 +2876,7 @@ class mmrpgWorldMap {
                 let isPortal = action.indexOf('portal') !== -1;
                 let isButton = action.indexOf('button') !== -1;
                 let isItem = action.indexOf('item') !== -1;
+                let isAbility = action.indexOf('ability') !== -1;
                 let isDismiss = action === 'dismiss';
                 if (!isDismiss){ $button.addClass('clicked'); }
                 if (isBattle){
@@ -3038,14 +3051,14 @@ class mmrpgWorldMap {
                     dismissDropdown(false);
                     // collect refs to the cursor palette and temp item slots
                     let $cursorPalette = _elements.cursorPalette;
-                    let $tempItemSlots = $('.item-slots.temp-slots', $cursorPalette);
+                    let $tempItemSlots = $('.slots.temp', $cursorPalette);
                     // if this is a pickup action, process normally
                     if (action === 'pickup-item'){
                         //console.log('-> picking up item:', itemName);
                         // check to make sure we have an open even slot to drop the item into
                         let $firstOpenTempSlot = $('.slot:not(.active)', $tempItemSlots).first();
                         if (!$firstOpenTempSlot.length){
-                            console.error('-> no open temp item slots found, cannot pick up item!');
+                            console.error('-> no open temp slots found in palette, cannot pick up item!');
                             return false;
                             }
                         $cursorPalette.addClass('active');
@@ -3079,7 +3092,7 @@ class mmrpgWorldMap {
                         // check to make sure we have an active temp item slot holding an item
                         let $firstActiveTempSlot = $('.slot.active', $tempItemSlots).first();
                         if (!$firstActiveTempSlot.length){
-                            console.error('-> no active temp item slots found, cannot drop item!');
+                            console.error('-> no active temp slots found in palette, cannot drop item!');
                             return false;
                             }
                         $cursorPalette.removeClass('active');
@@ -3120,7 +3133,107 @@ class mmrpgWorldMap {
                         _worldSymbols.items[itemName] = newItemPosition; // create a redirect pointer for the new item position
                         _self.saveWorldState();
                         }
-
+                    }
+                else if (isAbility){
+                    //console.log('-> ability button clicked with action:', action);
+                    let abilitySymbols = _config.mapAbilitySymbols;
+                    let abilitiesIndex = _config.mapAbilitiesIndex;
+                    let abilityClaims = _world.abilities;
+                    let abilityName = $button.attr('data-ability') || false;
+                    let abilityInfo = abilityName && (abilitiesIndex && abilitiesIndex[abilityName]) ? abilitiesIndex[abilityName] : false;
+                    let $eventSprite = $(firstEvent.sprite);
+                    let $innerSprite = $eventSprite ? $('.sprite', $eventSprite) : false;
+                    //console.log('-> abilityName =', abilityName);
+                    //console.log('-> abilityInfo =', abilityInfo);
+                    //console.log('-> $eventSprite =', $eventSprite);
+                    //console.log('-> $innerSprite =', $innerSprite);
+                    if (!abilityName || !abilityInfo){ console.error('-> ability name or info not found, cannot pick up ability!'); return false; }
+                    // dismiss the dropdown and side buttons first
+                    dismissDropdown(false);
+                    // collect refs to the cursor palette and temp ability slots
+                    let $cursorPalette = _elements.cursorPalette;
+                    let $tempAbilitySlots = $('.slots.temp', $cursorPalette);
+                    // if this is a pickup action, process normally
+                    if (action === 'pickup-ability'){
+                        //console.log('-> picking up ability:', abilityName);
+                        // check to make sure we have an open even slot to drop the ability into
+                        let $firstOpenTempSlot = $('.slot:not(.active)', $tempAbilitySlots).first();
+                        if (!$firstOpenTempSlot.length){
+                            console.error('-> no open temp slots found in palette, cannot pick up ability!');
+                            return false;
+                            }
+                        $cursorPalette.addClass('active');
+                        $worldCursor.addClass('pickup');
+                        // clone the ability to the cursor palette to show it being picked up
+                        let newTop = _config.worldHeight + 200;
+                        let newLeft = (parseInt($eventSprite.css('left')) || 0) - 200;
+                        let $clonedEventSprite = $eventSprite.clone();
+                        setTimeout(function(){
+                            $clonedEventSprite.css({top:'',left:'',zIndex:''}); // reset the event sprite position
+                            $clonedEventSprite.appendTo($firstOpenTempSlot).addClass('new');; // move the event sprite to the temp ability slot
+                            $firstOpenTempSlot.addClass('active').attr('data-ability', abilityName);
+                            setTimeout(function(){
+                                $worldCursor.removeClass('pickup');
+                                $clonedEventSprite.removeClass('new');
+                                }, 3000);
+                            }, 600);
+                        // make the event sprite track the cursor's movement until we put it down
+                        abilityInfo.beingHeld = true; // set the ability info tracking state to cursor
+                        _worldCursor.holding = 'ability/'+abilityName; //{kind: 'ability', name: abilityName, ability: abilityInfo};
+                        $eventSprite.addClass('tracking-cursor');
+                        let targetLeft = parseInt($worldCursor.css('left') || 0) + 10;
+                        let targetTop = parseInt($worldCursor.css('top') || 0) + 5;
+                        let targetZ = parseInt($worldCursor.css('zIndex') || 0) - 1;
+                        $eventSprite.css({left: targetLeft + 'px', top: targetTop + 'px', zIndex: targetZ});
+                        if ($eventSprite.is('.always-zoom')){ $eventSprite.addClass('not-always-zoom').removeClass('always-zoom'); }
+                        }
+                    // else if this is a drop action, we need to do a bit more work
+                    else if (action === 'drop-ability'){
+                        //console.log('-> dropping ability:', abilityName);
+                        // check to make sure we have an active temp ability slot holding an ability
+                        let $firstActiveTempSlot = $('.slot.active', $tempAbilitySlots).first();
+                        if (!$firstActiveTempSlot.length){
+                            console.error('-> no active temp slots found in palette, cannot drop ability!');
+                            return false;
+                            }
+                        $cursorPalette.removeClass('active');
+                        $worldCursor.addClass('drop');
+                        // remove the ability from the cursor pallet first and formost
+                        let $clonedEventSprite = $firstActiveTempSlot.find('.sprite');
+                        $clonedEventSprite.addClass('dropped');
+                        setTimeout(function(){
+                            $firstActiveTempSlot.removeClass('active').attr('data-ability', '');
+                            setTimeout(function(){
+                                $worldCursor.removeClass('drop');
+                                $clonedEventSprite.remove();
+                                }, 3000);
+                            }, 600);
+                        // detach the event sprite from the cursor's movement so that it's actually put down
+                        _worldCursor.holding = '';
+                        $eventSprite.removeClass('tracking-cursor');
+                        let newAbilityPosition = _worldCursor.position;
+                        let newAbilityPositionXY = newAbilityPosition.split('-');
+                        let targetLeft = ((newAbilityPositionXY[0] - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0];
+                        let targetTop = ((newAbilityPositionXY[1] - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1];
+                        let targetZ = targetTop + 1;
+                        $eventSprite.css({left: targetLeft + 'px', top: targetTop + 'px', zIndex: targetZ});
+                        if ($eventSprite.is('.not-always-zoom')){ $eventSprite.addClass('always-zoom').removeClass('not-always-zoom'); }
+                        // update the event sprite position to the new position
+                        let oldAbilityPosition = abilityInfo.pos;
+                        abilityInfo.pos = newAbilityPosition; // update the ability position in the info
+                        abilityInfo.position = newAbilityPositionXY; // update the ability position in the info
+                        abilityInfo.col = parseInt(newAbilityPositionXY[0]) || 1; // update the ability column in the info
+                        abilityInfo.row = parseInt(newAbilityPositionXY[1]) || 1; // update the ability row in the info
+                        abilityInfo.beingHeld = false; // set the ability info tracking state to not being held
+                        delete abilitySymbols[oldAbilityPosition];
+                        abilitySymbols[newAbilityPosition] = abilityName; // update the event symbols with the new position
+                        // save these changes to the world state
+                        //console.log('-> saving ability relocation to the world state!');
+                        //console.log('-> ', abilityName, ' moved from', oldAbilityPosition, 'to', newAbilityPosition);
+                        if (typeof _worldSymbols.abilities === 'undefined'){ _worldSymbols.abilities = {}; }
+                        _worldSymbols.abilities[abilityName] = newAbilityPosition; // create a redirect pointer for the new ability position
+                        _self.saveWorldState();
+                        }
                     }
                 else if (isDismiss){
                     //console.log('-> dismissing action dropdown!');
