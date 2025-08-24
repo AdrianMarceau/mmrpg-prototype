@@ -111,7 +111,10 @@ class rpg_world {
         if (!isset($WORLD_SESSION['world_maps'])){ $WORLD_SESSION['world_maps'] = array(); }
         if (!isset($WORLD_SESSION['world_buttons'])){ $WORLD_SESSION['world_buttons'] = array(); }
         if (!isset($WORLD_SESSION['world_switches'])){ $WORLD_SESSION['world_switches'] = array(); }
+        if (!isset($WORLD_SESSION['world_items'])){ $WORLD_SESSION['world_items'] = array(); }
+        if (!isset($WORLD_SESSION['world_abilities'])){ $WORLD_SESSION['world_abilities'] = array(); }
         if (!isset($WORLD_SESSION['world_encounters'])){ $WORLD_SESSION['world_encounters'] = array(); }
+        if (!isset($WORLD_SESSION['world_symbols'])){ $WORLD_SESSION['world_symbols'] = array(); }
         // ...as well as any nested variables inside those parent arrays
         if (!isset($WORLD_SESSION['player_sessions']['last_player'])){ $WORLD_SESSION['player_sessions']['last_player'] = ''; }
         // Return true now that we're done preparing the session
@@ -439,6 +442,22 @@ class rpg_world {
                     if (!in_array($map_token, $allowed_world_map_tokens)){ continue; }
                     if (!isset($worldSwitchStates[$map_token])){ $worldSwitchStates[$map_token] = array(); }
                     $worldSwitchStates[$map_token] = array_merge($worldSwitchStates[$map_token], $switch_states);
+                }
+            }
+            // If world symbol position changes were provided, save them to the session
+            if (!empty($worldData['lastWorldSymbols'])){
+                //$allowed_world_symbol_kinds = array('encounters', 'items', 'abilities', 'buttons', 'switches');
+                $allowed_world_symbol_kinds = array('items', 'abilities', 'encounters');
+                if (!isset($WORLD_SESSION['world_symbols'])){ $WORLD_SESSION['world_symbols'] = array(); }
+                $worldSymbolStates = &$WORLD_SESSION['world_symbols'];
+                foreach ($worldData['lastWorldSymbols'] AS $map_token => $symbol_kinds){
+                    if (!in_array($map_token, $allowed_world_map_tokens)){ continue; }
+                    if (!isset($worldSymbolStates[$map_token])){ $worldSymbolStates[$map_token] = array(); }
+                    foreach ($symbol_kinds AS $symbol_kind => $symbol_states){
+                        if (!in_array($symbol_kind, $allowed_world_symbol_kinds)){ continue; }
+                        if (!isset($worldSymbolStates[$map_token][$symbol_kind])){ $worldSymbolStates[$map_token][$symbol_kind] = array(); }
+                        $worldSymbolStates[$map_token][$symbol_kind] = array_merge($worldSymbolStates[$map_token][$symbol_kind], $symbol_states);
+                    }
                 }
             }
             //error_log('World data saved successfully for player "'.$lastPlayer.'"!');
@@ -1850,6 +1869,8 @@ class rpg_world {
         //error_log('rpg_world::get_battles_layer_markup() called!');
         // BATTLES LAYER
         $WORLD_SESSION = self::get_session();
+        $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
+        $world_symbols = !empty($WORLD_SESSION['world_symbols']) ? $WORLD_SESSION['world_symbols'] : array();
         $map_config = $map_data_parsed['config'];
         $world_token = $map_data_parsed['world'];
         $map_token = $map_data_parsed['token'];
@@ -1861,6 +1882,7 @@ class rpg_world {
         $map_spritesize_offset = $map_config['spritesize_offset'];
         $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
         $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array();
+        $world_map_encounter_symbols = !empty($world_symbols[$world_map_token]['encounters']) ? $world_symbols[$world_map_token]['encounters'] : array();
         if (empty($world_map_encounters)){
             $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed);
             self::update_session('world_encounters', $world_map_token, $world_map_encounters);
@@ -1869,16 +1891,17 @@ class rpg_world {
         $battles_markup = array();
         $battle_symbols = array();
         $battles_index = array();
-        foreach ($world_map_encounters as $encounter){
-            $kind = $encounter[0]; $subkind = '';
+        foreach ($world_map_encounters AS $encounter_namekey => $encounter_data){
+            $kind = $encounter_data[0]; $subkind = '';
             if (strstr($kind, '/')){ list($kind, $subkind) = explode('/', $kind, 2); }
             //$xkind = rpg_world::get_xkind($kind);
-            $token = $encounter[1];
-            $alt = $encounter[2];
-            $pos = $encounter[3];
-            $battle = $encounter[4];
-            $name = $encounter[5];
+            $token = $encounter_data[1];
+            $alt = $encounter_data[2];
+            $pos = $encounter_data[3];
+            $battle = $encounter_data[4];
+            $name = $encounter_data[5];
             if (!rpg_battle::has_index_info($battle)){ continue; }
+            if (!empty($world_map_encounter_symbols[$encounter_namekey])){ $pos = $world_map_encounter_symbols[$encounter_namekey]; }
             list($col, $row) = explode('-', $pos);
             $maxcols = $map_col_size;
             $maxrows = $map_row_size;
@@ -2077,6 +2100,7 @@ class rpg_world {
         // ITEMS LAYER
         $WORLD_SESSION = self::get_session();
         $world_items = !empty($WORLD_SESSION['world_items']) ? $WORLD_SESSION['world_items'] : array();
+        $world_symbols = !empty($WORLD_SESSION['world_symbols']) ? $WORLD_SESSION['world_symbols'] : array();
         $map_config = $map_data_parsed['config'];
         $world_token = $map_data_parsed['world'];
         $map_token = $map_data_parsed['token'];
@@ -2097,8 +2121,10 @@ class rpg_world {
         if (!empty($map_data_parsed['items'])){
             $item_sprites = $map_data_parsed['items'];
             $world_map_items = !empty($world_items[$world_map_token]) ? $world_items[$world_map_token] : array();
+            $world_map_item_symbols = !empty($world_symbols[$world_map_token]['items']) ? $world_symbols[$world_map_token]['items'] : array();
             //error_log('$item_sprites = '.print_r($item_sprites, true));
             //error_log('$world_map_items = '.print_r($world_map_items, true));
+            //error_log('$world_map_item_symbols = '.print_r($world_map_item_symbols, true));
             foreach ($item_sprites AS $item_namekey => $item_data){
                 //error_log('----------');
                 //error_log('Processing item "'.$item_namekey.'" with data: '.print_r($item_data, true));
@@ -2119,6 +2145,7 @@ class rpg_world {
                 if (strstr($token, '__')){  $set_token = $token; list($token, $num_in_set) = explode('__', $set_token, 2); }
                 $unlock_token = !empty($set_token) ? $set_token : $token;
                 $quantity = intval(trim($quantity, 'x')); if (!$quantity){ $quantity = 1; }
+                if (!empty($world_map_item_symbols[$item_namekey])){ $pos = $world_map_item_symbols[$item_namekey]; }
                 list($col, $row) = explode('-', $pos);
                 $data = array_values($item_data); // remaining values if any
                 //error_log('-> $item_namekey = '.print_r($item_namekey, true));
@@ -2188,6 +2215,7 @@ class rpg_world {
         // ABILITIES LAYER
         $WORLD_SESSION = self::get_session();
         $world_abilities = !empty($WORLD_SESSION['world_abilities']) ? $WORLD_SESSION['world_abilities'] : array();
+        $world_symbols = !empty($WORLD_SESSION['world_symbols']) ? $WORLD_SESSION['world_symbols'] : array();
         $map_config = $map_data_parsed['config'];
         $world_token = $map_data_parsed['world'];
         $map_token = $map_data_parsed['token'];
@@ -2208,6 +2236,7 @@ class rpg_world {
         if (!empty($map_data_parsed['abilities'])){
             $ability_sprites = $map_data_parsed['abilities'];
             $world_map_abilities = !empty($world_abilities[$world_map_token]) ? $world_abilities[$world_map_token] : array();
+            $world_map_ability_symbols = !empty($world_symbols[$world_map_token]['abilities']) ? $world_symbols[$world_map_token]['abilities'] : array();
             //error_log('$ability_sprites = '.print_r($ability_sprites, true));
             //error_log('$world_map_abilities = '.print_r($world_map_abilities, true));
             foreach ($ability_sprites AS $ability_namekey => $ability_data){
@@ -2227,6 +2256,7 @@ class rpg_world {
                 if (empty($pos) || !is_string($pos) || !preg_match('/^\d+-\d+$/', $pos)){ continue; } // skip if no position
                 if (empty($token) || !is_string($token) || !isset($mmrpg_index_abilities[$token])){ continue; } // skip if no token
                 if ($claimed){ continue; } // skip if already claimed
+                if (!empty($world_map_ability_symbols[$ability_namekey])){ $pos = $world_map_ability_symbols[$ability_namekey]; }
                 list($col, $row) = explode('-', $pos);
                 $info = $mmrpg_index_abilities[$token];
                 //error_log('-> $info = '.print_r(json_encode($info), true));

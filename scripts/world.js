@@ -103,6 +103,7 @@ gameSettings.worldState = {
     abilities: {},
     buttons: {},
     switches: {},
+    symbols: {},
     layersIndex: {},
     layerTilesIndex: {},
     baseMapTileKeys: [], // base array of tile keys that are part of the map
@@ -2293,6 +2294,7 @@ class mmrpgWorldMap {
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
         let _worldPlayerRobotsKeys = Object.keys(_worldPlayerRobots);
+        let _worldSymbols = _world.symbols;
         let _mapEffects = _config.mapEffects;
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
@@ -2624,10 +2626,9 @@ class mmrpgWorldMap {
             let dataColour = $itemEvent.attr('data-colour');
             //console.log('-> dataItem =', dataItem, '| dataItemToken =', dataItemToken, '| dataColour =', dataColour);
             if (!dataColour){ dataColour = 'none'; }
-            let itemAlreadyTaken = false; // TODO: track items already taken
             let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
             //console.log('-> playerIsCursor =', playerIsCursor);
-            if (dataItem && dataItemToken && !itemAlreadyTaken){
+            if (dataItem && dataItemToken){
                 // If the player is the cursor player, we should show the item pickup dropdown
                 if (playerIsCursor){
                     //console.log('-> player is cursor, preparing item pickup dropdown');
@@ -3017,13 +3018,7 @@ class mmrpgWorldMap {
                             _self.refreshMapPositionEvents(); // refresh the map position events
                             _self.saveWorldState();
                             }
-
-                        // ...
-
                         })(buttonInfo);
-                    // .......
-                    // ...
-
                     }
                 else if (isItem){
                     //console.log('-> item button clicked with action:', action);
@@ -3119,10 +3114,11 @@ class mmrpgWorldMap {
                         delete itemSymbols[oldItemPosition];
                         itemSymbols[newItemPosition] = itemName; // update the event symbols with the new position
                         // save these changes to the world state
-
-                        // TODO:  how should we save something like this?
-                        console.warn('moved item changes are not currently saved to the world state!');
-
+                        //console.log('-> saving item relocation to the world state!');
+                        //console.log('-> ', itemName, ' moved from', oldItemPosition, 'to', newItemPosition);
+                        if (typeof _worldSymbols.items === 'undefined'){ _worldSymbols.items = {}; }
+                        _worldSymbols.items[itemName] = newItemPosition; // create a redirect pointer for the new item position
+                        _self.saveWorldState();
                         }
 
                     }
@@ -3567,10 +3563,11 @@ class mmrpgWorldMap {
         let _world = _self.state;
         //let _worldCursor = _world.cursor;
         let _worldPlayer = _world.player;
-        let _worldItems = _world.items;
-        let _worldAbilities = _world.abilities;
         let _worldButtons = _world.buttons;
         let _worldSwitches = _world.switches;
+        let _worldItems = _world.items;
+        let _worldAbilities = _world.abilities;
+        let _worldSymbols = _world.symbols;
         let lastPlayer = _worldPlayer.token;
         let lastPlayerRobots = _worldPlayer.robots;
         let lastPlayerAbilities = _worldPlayer.abilities;
@@ -3579,10 +3576,11 @@ class mmrpgWorldMap {
         let lastPlayerWorldMap = _config.mapWorld + '__' + _config.mapToken;
         let lastPlayerPosition = _worldPlayer.position;
         let lastPlayerDirection = _worldPlayer.direction;
-        let lastWorldItems = {}; lastWorldItems[lastPlayerWorldMap] = _worldItems;
-        let lastWorldAbilities = {}; lastWorldAbilities[lastPlayerWorldMap] = _worldAbilities;
         let lastWorldButtons = {}; lastWorldButtons[lastPlayerWorldMap] = _worldButtons;
         let lastWorldSwitches = {}; lastWorldSwitches[lastPlayerWorldMap] = _worldSwitches;
+        let lastWorldItems = {}; lastWorldItems[lastPlayerWorldMap] = _worldItems;
+        let lastWorldAbilities = {}; lastWorldAbilities[lastPlayerWorldMap] = _worldAbilities;
+        let lastWorldSymbols = {}; lastWorldSymbols[lastPlayerWorldMap] = _worldSymbols;
         let worldData = {
             lastPlayer,
             lastPlayerRobots,
@@ -3592,10 +3590,11 @@ class mmrpgWorldMap {
             lastPlayerWorldMap,
             lastPlayerPosition,
             lastPlayerDirection,
+            lastWorldButtons,
+            lastWorldSwitches,
             lastWorldItems,
             lastWorldAbilities,
-            lastWorldButtons,
-            lastWorldSwitches
+            lastWorldSymbols,
             };
         //console.log('%c' + 'Saving World State ...', 'color: cyan;');
         //console.log('w/ worldData:', worldData);
@@ -3613,7 +3612,7 @@ class mmrpgWorldMap {
                 else { return true; }
                 },
             error: function(xhr, status, error){
-                //console.error('saveWorldState() failed to save world state!', status, error);
+                console.error('saveWorldState() failed to save world state!', status, error);
                 //console.log('%c' + '... World State Not Saved!', 'color: red;');
                 _selfRef._busy = false;
                 if (callback){ return callback.call(_self, 'error', {xhr, status, error}); }
