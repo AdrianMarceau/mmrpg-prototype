@@ -2638,10 +2638,10 @@ class mmrpgWorldMap {
                         sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pickup-item" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
                         } else if (_worldCursor.holding && _worldCursor.holding === 'item/'+dataItem){
                         // We're holding something and this is that item, we should allow dropping it
-                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="drop-item" data-item="'+dataItem+'"><span><sup>Drop</sup> '+dataLabel+'</span></a>';
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="drop-item" data-item="'+dataItem+'"><span><sup>Put Down</sup> '+dataLabel+'</span></a>';
                         } else if (_worldCursor.holding){
                         // Otherwise we're holding something else, so we should not allow picking up this item
-                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+' disabled" data-item="'+dataItem+'"><span>Pick Up</sup> ' + dataLabel + '</span></a>';
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+' disabled" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
                         }
                     sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                     showActionAreaType = 'button';
@@ -3639,6 +3639,7 @@ class mmrpgWorldMap {
         let _elements = _self.elements;
         let _world = _self.state;
         let _worldCursor = _world.cursor;
+        let _worldPlayer = _world.player;
         let $canvasMap = _elements.map;
         let $teamSprites = _elements.teamSprites;
         // If the cursor hasn't moved yet, we shouldn't be processing anything
@@ -3653,6 +3654,7 @@ class mmrpgWorldMap {
             return false;
             }
         // Define an inline function for processing the different event actions possible
+        let actionsCompleted = 0;
         let processEventAction = function(eventAction, onComplete, afterDelay){
             if (!onComplete || typeof onComplete !== 'function'){ onComplete = false; }
             if (!afterDelay || typeof afterDelay !== 'number'){ afterDelay = 0; }
@@ -3661,6 +3663,7 @@ class mmrpgWorldMap {
                 //console.log('-> triggering effects for event with data:', eventData);
                 _self.playSoundEffect('use-recovery-item');
                 let _playerRobots = _config.playerRobots || [];
+                let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
                 let eventEffects = Object.values(eventData);
                 for (let i = 0; i < eventEffects.length; i++){
                     let effect = eventEffects[i];
@@ -3668,6 +3671,8 @@ class mmrpgWorldMap {
                     if (!effect){ continue; }
                     // If this is a team-wide effect, we're going to have to loop
                     if (effect.indexOf('-team-') !== -1){
+                        // If this is a cursor player, we don't have a team
+                        if (playerIsCursor){ continue; }
                         //console.log('%c' + '-> team-effect via event panel: ' + effect, 'color: lime;');
                         for (let j = 0; j < _playerRobots.length; j++){
                             let robot = _playerRobots[j];
@@ -3676,30 +3681,35 @@ class mmrpgWorldMap {
                                 //console.log('%c' + '-> restoring energy for ' + robot + ' via event panel', 'color: #64a455;');
                                 _self.restoreRobotEnergy(robot, true);
                                 _self.playSoundEffect('recovery-energy');
+                                actionsCompleted++;
                                 }
                             // If this is a RESTORE TEAM WEAPONS effect, let's process that now
                             if (effect === 'restore-team-weapons'){
                                 //console.log('%c' + '-> restoring weapons for ' + robot + ' via event panel', 'color: #3d7cbe;');
                                 _self.restoreRobotWeapons(robot, true);
                                 _self.playSoundEffect('recovery-weapons');
+                                actionsCompleted++;
                                 }
                             // If this is a RESET TEAM ATTACK effect, let's process that now
                             if (effect === 'reset-team-attack'){
                                 //console.log('%c' + '-> resetting attack for ' + robot + ' via event panel', 'color: #8b5050;');
                                 _self.resetRobotAttack(robot, false);
                                 _self.playSoundEffect('small-buff-received');
+                                actionsCompleted++;
                                 }
                             // If this is a RESET TEAM DEFENSE effect, let's process that now
                             if (effect === 'reset-team-defense'){
                                 //console.log('%c' + '-> resetting ' + robot + ' defense for event panel', 'color: #50638a;');
                                 _self.resetRobotDefense(robot, false);
                                 _self.playSoundEffect('small-buff-received');
+                                actionsCompleted++;
                                 }
                             // If this is a RESET TEAM SPEED effect, let's process that now
                             if (effect === 'reset-team-speed'){
                                 //console.log('%c' + '-> resetting ' + robot + ' speed for event panel', 'color: #8b739b;');
                                 _self.resetRobotSpeed(robot, false);
                                 _self.playSoundEffect('small-buff-received');
+                                actionsCompleted++;
                                 }
                             }
                         }
@@ -3713,10 +3723,10 @@ class mmrpgWorldMap {
             };
         // Now process the event given the action and data provided after some visual fluff
         let delayTime = 1000;
-        _self.incZoomLevel();
+        if (actionsCompleted){ _self.incZoomLevel(); }
         setTimeout(function(){
             processEventAction(eventAction, function(){
-                _self.resetZoomLevel();
+                if (actionsCompleted){ _self.resetZoomLevel(); }
                 $teamSprites.removeClass('shake');
                 $teamSprites.filter(':not(.disabled)').attr('data-frame', '00');
                 _self.triggerWindowEventsPull();
