@@ -3380,8 +3380,10 @@ class mmrpgWorldMap {
                 let eventToken = eventSymbols[eventPosition];
                 let eventInfo = eventsIndex[eventToken];
                 if (!eventToken || !eventInfo){ console.warn('-> no event token or info found for ' + eventKind + ' at position ' + eventPosition + ', skipping!'); continue; }
+                //console.log('-> found ' + eventKind + ' at position ' + eventPosition + ' with token ' + eventToken, eventInfo);
                 if (eventInfo.disabled){ continue; }
                 if (eventInfo.beingHeld){ continue; }
+                if (eventInfo.action === 'drop-zone'){ continue; }
                 let $eventSprite = $('.sprite[data-' + eventKind + '="'+eventToken+'"]', $canvasMap);
                 let eventLabel = $eventSprite.length ? $eventSprite.attr('data-label') : '';
                 if ($eventSprite && $eventSprite.length){ $eventSprite = $eventSprite.first().get(0); }

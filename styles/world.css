@@ -435,6 +435,47 @@ html, body {
 }
 #world #map .sprite.event.resetpad.animate { animation-delay: -3s; }
 
+@keyframes world-sprite-lightpad-glow {
+    0%, 100% { filter: brightness(1.0) opacity(0.6); }
+    50% { filter: brightness(1.6) opacity(0.9); }
+    }
+#world #map .sprite.event.lightpad-left,
+#world #map .sprite.event.lightpad-middle,
+#world #map .sprite.event.lightpad-right {
+    /* ... */
+}
+#world #map .sprite.event.lightpad-left:before,
+#world #map .sprite.event.lightpad-middle:before,
+#world #map .sprite.event.lightpad-right:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: inherit;
+    height: inherit;
+    background: inherit;
+    filter: brightness(1) opacity(0.6);
+    transition: filter 0.3s;
+}
+#world #map .sprite.event.lightpad-left:not(.active):before,
+#world #map .sprite.event.lightpad-middle:not(.active):before,
+#world #map .sprite.event.lightpad-right:not(.active):before {
+    filter: brightness(1) opacity(0);
+}
+#world #map .sprite.event.lightpad-left.active.animate:before,
+#world #map .sprite.event.lightpad-middle.active.animate:before,
+#world #map .sprite.event.lightpad-right.active.animate:before {
+    animation: world-sprite-lightpad-glow 3s ease-out infinite;
+}
+#world #map .sprite.event.lightpad-left { background-position: -600px -40px; }
+#world #map .sprite.event.lightpad-middle { background-position: -680px -40px; }
+#world #map .sprite.event.lightpad-right { background-position: -760px -40px; }
+#world #map .sprite.event.lightpad-left:before { background-position: -600px -360px; }
+#world #map .sprite.event.lightpad-middle:before { background-position: -680px -360px; }
+#world #map .sprite.event.lightpad-right:before { background-position: -760px -360px; }
+
+
 #world #map .sprite.event.console { background-position: -600px -40px; }
 #world #map .sprite.event.console.multi { background-position: -680px -40px; }
 #world #map .sprite.event.console.healing { background-position: -600px -120px; }
@@ -659,6 +700,10 @@ html, body {
 #world #map .layer.objects .sprite.item[data-token$="-program"] .wrap,
 #world #map .layer.objects .sprite.item[data-token*="-heart"] .wrap {
     filter: drop-shadow(0px 0px 3px white) saturate(1.5);
+}
+#world #map .layer.objects .sprite.item[data-token$="-shard"] .wrap,
+#world #map .layer.objects .sprite.item[data-token$="-core"] .wrap {
+    filter: saturate(1.5);
 }
 #world #map .layer.objects .sprite.item.tracking-cursor {
     filter: drop-shadow(0px 0px 3px orange) saturate(2);

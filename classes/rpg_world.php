@@ -527,7 +527,7 @@ class rpg_world {
         $map_autorows = count($map_data_layers[0]);
         $map_tiles_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
         $map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)(,[-_a-z0-9,]+)?\)$/i'; // syntax: name(x,y[,flag1,flag2,etc.]) ie. spawn(4,4) or spawn(4,4,other-area-2) => name:spawn, x:4, y:4
-        $map_listval_custval_regex = '/^([.a-z0-9-_]+)\(([.,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
+        $map_listval_custval_regex = '/^([.a-z0-9-_]+)\(([\+\:\.\,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
         //$map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
         static $map_custval_parser;
         if (!$map_custval_parser){
@@ -2179,7 +2179,8 @@ class rpg_world {
                 $z_index = $top + 1;
                 $label = $info['item_name'];
                 $class = $token.(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
-                if ($subclass === 'event'){ $class .= ' always-zoom'; }
+                //if ($subclass === 'event'){ $class .= ' always-zoom'; }
+                //elseif (strstr($token, '-core')){ $class .= ' always-zoom'; }
                 $colour = !empty($subtypes) ? implode(' ', array_filter($subtypes)) : '';
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
                 $attrs = 'data-item="'.$item_namekey.'" data-colour="'.$colour.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$item_namekey.'"
