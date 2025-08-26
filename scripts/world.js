@@ -2299,6 +2299,8 @@ class mmrpgWorldMap {
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
         let _mapSpriteSizeOffset = _config.mapSpriteSizeOffset;
+        let _mapEventSymbols = _config.mapEventSymbols;
+        let _mapEventsIndex = _config.mapEventsIndex;
         let _userId = _config.userId;
         let _playerId = _config.playerId;
         let _playerToken = _config.playerToken;
@@ -3040,6 +3042,7 @@ class mmrpgWorldMap {
                     let itemClaims = _world.items;
                     let itemName = $button.attr('data-item') || false;
                     let itemInfo = itemName && (itemsIndex && itemsIndex[itemName]) ? itemsIndex[itemName] : false;
+                    let itemPosition = itemInfo ? itemInfo.pos : false;
                     let $eventSprite = $(firstEvent.sprite);
                     let $innerSprite = $eventSprite ? $('.sprite', $eventSprite) : false;
                     //console.log('-> itemName =', itemName);
@@ -3085,6 +3088,17 @@ class mmrpgWorldMap {
                         let targetZ = parseInt($worldCursor.css('zIndex') || 0) - 1;
                         $eventSprite.css({left: targetLeft + 'px', top: targetTop + 'px', zIndex: targetZ});
                         if ($eventSprite.is('.always-zoom')){ $eventSprite.addClass('not-always-zoom').removeClass('always-zoom'); }
+                        // check to see if this spot below this was a drop-zone
+                        //console.log('-> checking for event under picked-up item position:', itemPosition);
+                        if (_mapEventSymbols[itemPosition]){
+                            let eventUnderPosition = _mapEventSymbols[itemPosition];
+                            let eventUnderInfo = _mapEventsIndex[eventUnderPosition];
+                            //console.log('-> eventUnderPosition =', eventUnderPosition, '| eventUnderInfo =', eventUnderInfo);
+                            if (eventUnderInfo && eventUnderInfo.action === 'drop-zone'){
+                                //console.log('-> item picked-up from drop-zone event, triggering drop-zone empty action');
+                                _self.triggerDropZoneEmpty(eventUnderPosition, eventUnderInfo);
+                                }
+                            }
                         }
                     // else if this is a drop action, we need to do a bit more work
                     else if (action === 'drop-item'){
@@ -3131,6 +3145,18 @@ class mmrpgWorldMap {
                         //console.log('-> ', itemName, ' moved from', oldItemPosition, 'to', newItemPosition);
                         if (typeof _worldSymbols.items === 'undefined'){ _worldSymbols.items = {}; }
                         _worldSymbols.items[itemName] = newItemPosition; // create a redirect pointer for the new item position
+                        // check to see if this spot below this was a drop-zone
+                        //console.log('-> checking for event under new item position:', newItemPosition);
+                        if (_mapEventSymbols[newItemPosition]){
+                            let eventUnderPosition = _mapEventSymbols[newItemPosition];
+                            let eventUnderInfo = _mapEventsIndex[eventUnderPosition];
+                            //console.log('-> eventUnderPosition =', eventUnderPosition, '| eventUnderInfo =', eventUnderInfo);
+                            if (eventUnderInfo && eventUnderInfo.action === 'drop-zone'){
+                                //console.log('-> item dropped onto drop-zone event, triggering drop-zone action for item:', itemName);
+                                _self.triggerDropZoneEvent(eventUnderPosition, eventUnderInfo, 'item', itemName, itemInfo);
+                                }
+                            }
+                        // save all these changes to the world state now
                         _self.saveWorldState();
                         }
                     }
@@ -3186,6 +3212,17 @@ class mmrpgWorldMap {
                         let targetZ = parseInt($worldCursor.css('zIndex') || 0) - 1;
                         $eventSprite.css({left: targetLeft + 'px', top: targetTop + 'px', zIndex: targetZ});
                         if ($eventSprite.is('.always-zoom')){ $eventSprite.addClass('not-always-zoom').removeClass('always-zoom'); }
+                        // check to see if this spot below this was a drop-zone
+                        //console.log('-> checking for event under picked-up ability position:', abilityPosition);
+                        if (_mapEventSymbols[abilityPosition]){
+                            let eventUnderPosition = _mapEventSymbols[abilityPosition];
+                            let eventUnderInfo = _mapEventsIndex[eventUnderPosition];
+                            //console.log('-> eventUnderPosition =', eventUnderPosition, '| eventUnderInfo =', eventUnderInfo);
+                            if (eventUnderInfo && eventUnderInfo.action === 'drop-zone'){
+                                //console.log('-> ability picked-up from drop-zone event, triggering drop-zone empty action');
+                                _self.triggerDropZoneEmpty(eventUnderPosition, eventUnderInfo);
+                                }
+                            }
                         }
                     // else if this is a drop action, we need to do a bit more work
                     else if (action === 'drop-ability'){
@@ -3232,6 +3269,18 @@ class mmrpgWorldMap {
                         //console.log('-> ', abilityName, ' moved from', oldAbilityPosition, 'to', newAbilityPosition);
                         if (typeof _worldSymbols.abilities === 'undefined'){ _worldSymbols.abilities = {}; }
                         _worldSymbols.abilities[abilityName] = newAbilityPosition; // create a redirect pointer for the new ability position
+                        // check to see if this spot below this was a drop-zone
+                        //console.log('-> checking for event under new ability position:', newAbilityPosition);
+                        if (_mapEventSymbols[newAbilityPosition]){
+                            let eventUnderPosition = _mapEventSymbols[newAbilityPosition];
+                            let eventUnderInfo = _mapEventsIndex[eventUnderPosition];
+                            //console.log('-> eventUnderPosition =', eventUnderPosition, '| eventUnderInfo =', eventUnderInfo);
+                            if (eventUnderInfo && eventUnderInfo.action === 'drop-zone'){
+                                //console.log('-> ability dropped onto drop-zone event, triggering drop-zone action for ability:', abilityName);
+                                _self.triggerDropZoneEvent(eventUnderPosition, eventUnderInfo, 'ability', abilityName, abilityInfo);
+                                }
+                            }
+                        // save all these changes to the world state now
                         _self.saveWorldState();
                         }
                     }
@@ -3320,11 +3369,12 @@ class mmrpgWorldMap {
         }
 
     // Quick function that, given a column and row returns any events on or around that position on the map
-    getEventsAtPosition(searchPosition, searchRadius){
+    getEventsAtPosition(searchPosition, searchRadius, includeLocked){
         //console.log('%c' + 'mmrpgWorldMap.getEventsAtPosition(searchPosition:' + searchPosition + ', searchRadius:' + searchRadius + ')', 'color: magenta;');
         if (!searchPosition || (typeof searchPosition !== 'string' && !Array.isArray(searchPosition))){ console.error('getEventsAtPosition() missing or invalid searchPosition!'); return false; }
         searchPosition = typeof searchPosition !== 'string' ? searchPosition.join('-') : searchPosition; // join if provided as array
         searchRadius = typeof searchRadius === 'number' ? searchRadius : 1; // default to one if not provided
+        includeLocked = typeof includeLocked === 'boolean' ? includeLocked : false; // default to false if not provided
         let _self = this;
         let _config = _self.config;
         let _elements = _self.elements;
@@ -3383,6 +3433,7 @@ class mmrpgWorldMap {
                 //console.log('-> found ' + eventKind + ' at position ' + eventPosition + ' with token ' + eventToken, eventInfo);
                 if (eventInfo.disabled){ continue; }
                 if (eventInfo.beingHeld){ continue; }
+                if (eventInfo.locked && !includeLocked){ continue; }
                 if (eventInfo.action === 'drop-zone'){ continue; }
                 let $eventSprite = $('.sprite[data-' + eventKind + '="'+eventToken+'"]', $canvasMap);
                 let eventLabel = $eventSprite.length ? $eventSprite.attr('data-label') : '';
@@ -3843,6 +3894,161 @@ class mmrpgWorldMap {
                 if (actionsCompleted){ _self.resetZoomLevel(); }
                 $teamSprites.removeClass('shake');
                 $teamSprites.filter(':not(.disabled)').attr('data-frame', '00');
+                _self.triggerWindowEventsPull();
+                }, delayTime);
+            }, delayTime);
+        // Return true on success
+        return true;
+        }
+
+    // Quick function for triggering a drop zone event (if available) when an item, ability, or other compatible item is dropped there
+    triggerDropZoneEvent(eventName, eventInfo, objectKind, objectName, objectInfo){
+        //console.log('%c' + 'mmrpgWorldMap.triggerDropZoneEvent(' + eventName + ', ' + objectKind + ', ' + objectName + ')', 'color: magenta;');
+        if (!eventName || typeof eventName !== 'string' || !eventName.length){ console.error('triggerDropZoneEvent() missing required eventName!'); return false; }
+        if (!eventInfo || typeof eventInfo !== 'object' || !Object.keys(eventInfo).length){ console.error('triggerDropZoneEvent() missing required eventInfo!'); return false; }
+        if (!objectKind || typeof objectKind !== 'string' || !objectKind.length){ console.error('triggerDropZoneEvent() missing required objectKind!'); return false; }
+        else if (objectKind !== 'item' && objectKind !== 'ability'){ console.error('triggerDropZoneEvent() invalid objectKind provided: ' + objectKind); return false; }
+        if (!objectName || typeof objectName !== 'string' || !objectName.length){ console.error('triggerDropZoneEvent() missing required objectName!'); return false; }
+        if (!objectInfo || typeof objectInfo !== 'object' || !Object.keys(objectInfo).length){ console.error('triggerDropZoneEvent() missing required objectInfo!'); return false; }
+        if (!objectInfo.token || typeof objectInfo.token !== 'string' || !objectInfo.token.length){ console.error('triggerDropZoneEvent() missing required objectInfo.token!'); return false; }
+        let rawObjectToken = objectInfo.token;
+        let objectToken = rawObjectToken.indexOf('__') !== -1 ? rawObjectToken.split('__')[0] : rawObjectToken;
+        //console.log('-> eventName =', eventName);
+        //console.log('-> eventInfo =', eventInfo);
+        //console.log('-> objectKind =', objectKind);
+        //console.log('-> objectName =', objectName);
+        //console.log('-> objectInfo =', objectInfo);
+        //console.log('-> objectToken =', objectToken);
+        //console.log('-> rawObjectToken =', rawObjectToken);
+        // Collect references to world objects
+        let _self = this;
+        let _selfRef = _self.triggerDropZoneEvent;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldCursor = _world.cursor;
+        let _worldPlayer = _world.player;
+        let $canvasMap = _elements.map;
+        let $eventSprite = $('.sprite[data-event="' + eventName + '"]', $canvasMap);
+        if (!$eventSprite || !$eventSprite.length){ console.error('triggerDropZoneEvent() could not find event sprite for eventName: ' + eventName); return false; }
+        // Collect the parameters from the event data
+        let dropFilter = eventInfo.data[0] || false;
+        let dropAction = eventInfo.data[1] || false;
+        //console.log('-> dropFilter =', dropFilter);
+        //console.log('-> dropAction =', dropAction);
+        if (!dropFilter){ console.error('triggerDropZoneEvent() invalid dropFilter provided in eventInfo.data[0]: ' + dropFilter); return false; }
+        if (!dropAction){ console.error('triggerDropZoneEvent() invalid dropAction provided in eventInfo.data[1]: ' + dropAction); return false; }
+        dropFilter = dropFilter.indexOf(':') !== -1 ? dropFilter.split(':') : [dropFilter];
+        let dropFilterKind = (dropFilter[0] || '');
+        let dropFilterValues = (dropFilter[1] || '').split(',');
+        //console.log('-> dropFilterKind =', dropFilterKind);
+        //console.log('-> dropFilterValues =', dropFilterValues);
+        //console.log('-> vs. objectKind =', objectKind);
+        //console.log('-> vs. objectToken =', objectToken);
+        // If the filter kind was not empty, and the provided objected does not match it, return now
+        if (dropFilterKind.length){
+            if (dropFilterKind !== objectKind){
+                console.warn('triggerDropZoneEvent() exiting early because objectKind does not match dropFilterKind!');
+                return false;
+                }
+            if (dropFilterValues.length && dropFilterValues.indexOf(objectToken) === -1){
+                console.warn('triggerDropZoneEvent() exiting early because objectInfo.token does not match dropFilterValues!');
+                return false;
+                }
+            }
+        //console.log('-> drop action is valid, processing ...');
+        // Define an inline function for processing the different drop actions possible
+        let actionsCompleted = 0;
+        let processDropAction = function(dropAction, onComplete, afterDelay){
+            if (!onComplete || typeof onComplete !== 'function'){ onComplete = false; }
+            if (!afterDelay || typeof afterDelay !== 'number'){ afterDelay = 0; }
+            // Process the drop action based on it's token
+            if (dropAction === 'activate-player-platform'){
+                //console.log('-> this drop zone is a player-platform awaiting activation...');
+                //console.log('-> activating player platform for player', _worldPlayer.token, 'at position', _worldPlayer.position);
+                $eventSprite.addClass('active');
+                eventInfo.active = true;
+                objectInfo.locked = true;
+                // TODO: ... and then what?
+                console.warn('triggerDropZoneEvent() dropAction "' + dropAction + '" not fully implemented yet!');
+                actionsCompleted++;
+                }
+            // If an onComplete function was provided, call it now (with delay if requested)
+            if (onComplete){
+                if (!afterDelay){ onComplete.call(_self, dropAction, eventInfo, objectKind, objectName, objectInfo); }
+                else { setTimeout(function(){ onComplete.call(_self, dropAction, eventInfo, objectKind, objectName, objectInfo); }, afterDelay); }
+                }
+            };
+        // Now process the drop action given the action and data provided after some visual fluff
+        let delayTime = 1000;
+        if (actionsCompleted){ _self.incZoomLevel(); }
+        setTimeout(function(){
+            processDropAction(dropAction, function(){
+                if (actionsCompleted){ _self.resetZoomLevel(); }
+                _self.triggerWindowEventsPull();
+                }, delayTime);
+            }, delayTime);
+        // Return true on success
+        return true;
+        }
+
+    // Quick function for triggering a drop zone empty event (if necessary) when an item, ability, or other item is removed from this location
+    triggerDropZoneEmpty(eventName, eventInfo){
+        //console.log('%c' + 'mmrpgWorldMap.triggerDropZoneEmpty(' + eventName + ')', 'color: magenta;');
+        if (!eventName || typeof eventName !== 'string' || !eventName.length){ console.error('triggerDropZoneEmpty() missing required eventName!'); return false; }
+        if (!eventInfo || typeof eventInfo !== 'object' || !Object.keys(eventInfo).length){ console.error('triggerDropZoneEmpty() missing required eventInfo!'); return false; }
+        let rawObjectToken = eventInfo.data[0] || false;
+        let objectToken = rawObjectToken && rawObjectToken.indexOf('__') !== -1 ? rawObjectToken.split('__')[0] : rawObjectToken;
+        //console.log('-> eventName =', eventName);
+        //console.log('-> eventInfo =', eventInfo);
+        //console.log('-> objectToken =', objectToken);
+        // Collect references to world objects
+        let _self = this;
+        let _selfRef = _self.triggerDropZoneEmpty;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldCursor = _world.cursor;
+        let _worldPlayer = _world.player;
+        let $canvasMap = _elements.map;
+        let $eventSprite = $('.sprite[data-event="' + eventName + '"]', $canvasMap);
+        if (!$eventSprite || !$eventSprite.length){ console.error('triggerDropZoneEvent() could not find event sprite for eventName: ' + eventName); return false; }
+        // Collect the parameters from the event data
+        let dropFilter = eventInfo.data[0] || false;
+        let dropAction = eventInfo.data[1] || false;
+        //console.log('-> dropFilter =', dropFilter);
+        //console.log('-> dropAction =', dropAction);
+        if (!dropFilter){ console.error('triggerDropZoneEvent() invalid dropFilter provided in eventInfo.data[0]: ' + dropFilter); return false; }
+        if (!dropAction){ console.error('triggerDropZoneEvent() invalid dropAction provided in eventInfo.data[1]: ' + dropAction); return false; }
+        // We don't really care about the filter, but we do care about the action so let's reverse it if it exists
+        //console.log('-> drop action is valid, reverting ...');
+        // Define an inline function for reverting the different drop actions possible
+        let actionsReverted = 0;
+        let processDropRevert = function(dropAction, onComplete, afterDelay){
+            if (!onComplete || typeof onComplete !== 'function'){ onComplete = false; }
+            if (!afterDelay || typeof afterDelay !== 'number'){ afterDelay = 0; }
+            // Process the drop action based on it's token
+            if (dropAction === 'activate-player-platform'){
+                //console.log('-> this drop zone is a player-platform awaiting deactivation...');
+                //console.log('-> deactivating player platform for player', _worldPlayer.token, 'at position', _worldPlayer.position);
+                $eventSprite.removeClass('active');
+                eventInfo.active = false;
+                // TODO: ... and then what?
+                console.warn('triggerDropZoneEmpty() dropAction "' + dropAction + '" not fully implemented yet!');
+                actionsReverted++;
+                }
+            // If an onComplete function was provided, call it now (with delay if requested)
+            if (onComplete){
+                if (!afterDelay){ onComplete.call(_self, dropAction, eventInfo); }
+                else { setTimeout(function(){ onComplete.call(_self, dropAction, eventInfo); }, afterDelay); }
+                }
+            };
+        // Now process the drop action given the action and data provided after some visual fluff
+        let delayTime = 1000;
+        if (actionsReverted){ _self.incZoomLevel(); }
+        setTimeout(function(){
+            processDropRevert(dropAction, function(){
+                if (actionsReverted){ _self.resetZoomLevel(); }
                 _self.triggerWindowEventsPull();
                 }, delayTime);
             }, delayTime);

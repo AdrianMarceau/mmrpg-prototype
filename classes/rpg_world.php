@@ -1716,10 +1716,11 @@ class rpg_world {
                 $z_index = $top + 1;
                 $hidden = in_array('hidden', $event_data) ? true : false; unset($event_data[array_search('hidden', $event_data)]);
                 $locked = in_array('locked', $event_data) ? true : false; unset($event_data[array_search('locked', $event_data)]);
+                $active = in_array('active', $event_data) ? true : false; unset($event_data[array_search('active', $event_data)]);
                 $data = array_values($event_data); // remaining vaules if any
                 $label = 'World '.ucwords(str_replace('-', ' ', $event_name));
                 $attrs = 'data-event="'.$event_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
-                $classes = 'sprite tile event'.($sprite ? ' '.$sprite : '').(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $classes = 'sprite tile event'.($sprite ? ' '.$sprite : '').(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '').($active ? ' active' : '');
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
                 $events_markup[] = '<span data-sprite="event" class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>';
                 $event_symbols[$pos] = $event_name;
@@ -1733,6 +1734,7 @@ class rpg_world {
                     'label' => $label,
                     'hidden' => $hidden,
                     'locked' => $locked,
+                    'active' => $active,
                     'data' => $data,
                     );
             }
@@ -2136,19 +2138,19 @@ class rpg_world {
                 //error_log('-> '.$item_namekey.' already claimed, skipping...');
                 if ($claimed){ continue; } // skip if already claimed
                 $kind = 'item';
+                $hidden = in_array('hidden', $item_data) ? true : false; if ($hidden){ unset($item_data[array_search('hidden', $item_data)]); }
+                $locked = in_array('locked', $item_data) ? true : false; if ($locked){ unset($item_data[array_search('locked', $item_data)]); }
+                $data = array_values($item_data); // remaining values if any
                 $pos = $item_data[0]; unset($item_data[0]);
                 $token = !empty($item_data[1]) ? $item_data[1] : ''; unset($item_data[1]);
                 $quantity = !empty($item_data[2]) ? $item_data[2] : ''; unset($item_data[2]);
                 $repeat = !empty($item_data[3]) ? $item_data[3] : ''; unset($item_data[3]);
-                $hidden = in_array('hidden', $item_data) ? true : false; unset($item_data[array_search('hidden', $item_data)]);
-                $locked = in_array('locked', $item_data) ? true : false; unset($item_data[array_search('locked', $item_data)]);
                 $num_in_set = false; $set_token = false;
                 if (strstr($token, '__')){  $set_token = $token; list($token, $num_in_set) = explode('__', $set_token, 2); }
                 $unlock_token = !empty($set_token) ? $set_token : $token;
                 $quantity = intval(trim($quantity, 'x')); if (!$quantity){ $quantity = 1; }
                 if (!empty($world_map_item_symbols[$item_namekey])){ $pos = $world_map_item_symbols[$item_namekey]; }
                 list($col, $row) = explode('-', $pos);
-                $data = array_values($item_data); // remaining values if any
                 //error_log('-> $item_namekey = '.print_r($item_namekey, true));
                 //error_log('-> $kind = '.print_r($kind, true));
                 //error_log('-> $kind = '.print_r($kind, true));
@@ -2178,9 +2180,9 @@ class rpg_world {
                 $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
                 $z_index = $top + 1;
                 $label = $info['item_name'];
-                $class = $token.(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
-                //if ($subclass === 'event'){ $class .= ' always-zoom'; }
-                //elseif (strstr($token, '-core')){ $class .= ' always-zoom'; }
+                $class = $token.(!$hidden  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                if ($subclass === 'event'){ $class .= ' always-zoom'; }
+                elseif (strstr($token, '-core')){ $class .= ' always-zoom'; }
                 $colour = !empty($subtypes) ? implode(' ', array_filter($subtypes)) : '';
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
                 $attrs = 'data-item="'.$item_namekey.'" data-colour="'.$colour.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$item_namekey.'"
@@ -2245,11 +2247,11 @@ class rpg_world {
                 //error_log('Processing ability "'.$ability_namekey.'" with data: '.print_r($ability_data, true));
                 if (empty($ability_data) || !is_array($ability_data)){ continue; }
                 $kind = 'ability';
+                $hidden = in_array('hidden', $ability_data) ? true : false; if ($hidden){ unset($ability_data[array_search('hidden', $ability_data)]); }
+                $locked = in_array('locked', $ability_data) ? true : false; if ($locked){ unset($ability_data[array_search('locked', $ability_data)]); }
+                $data = array_values($ability_data); // remaining values if any
                 $pos = $ability_data[0]; unset($ability_data[0]);
                 $token = !empty($ability_data[1]) ? $ability_data[1] : ''; unset($ability_data[1]);
-                $hidden = in_array('hidden', $ability_data) ? true : false; unset($ability_data[array_search('hidden', $ability_data)]);
-                $locked = in_array('locked', $ability_data) ? true : false; unset($ability_data[array_search('locked', $ability_data)]);
-                $data = array_values($ability_data); // remaining values if any
                 $claimed = !empty($world_map_abilities[$ability_namekey]) ? $world_map_abilities[$ability_namekey] : 0; // unix-timestamp
                 //error_log('-> $kind = '.print_r($kind, true));
                 //error_log('-> $pos = '.print_r($pos, true));
@@ -2274,7 +2276,7 @@ class rpg_world {
                 $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
                 $z_index = $top + 1;
                 $label = $info['ability_name'];
-                $class = $token.(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $class = $token.(!$hidden  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 $types = 'type '.(!empty($info['ability_type']) ? $info['ability_type'] : 'none').(!empty($info['ability_type2']) ? ' '.$info['ability_type2'] : '');
                 $colour = !empty($subtypes) ? implode(' ', array_filter($subtypes)) : '';
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';

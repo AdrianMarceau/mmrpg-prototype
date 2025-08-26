@@ -345,6 +345,7 @@ if (empty($map_sprite_sheet)){ error_log('MMRPG World Fatal Error - No sprite sh
 
 // Make sure there's room in relevant session arrays for this map's data
 if (!isset($WORLD_SESSION['world_maps'][$world_map_token])){ $WORLD_SESSION['world_maps'][$world_map_token] = array(); }
+if (!isset($WORLD_SESSION['world_events'][$world_map_token])){ $WORLD_SESSION['world_events'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_buttons'][$world_map_token])){ $WORLD_SESSION['world_buttons'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_switches'][$world_map_token])){ $WORLD_SESSION['world_switches'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_items'][$world_map_token])){ $WORLD_SESSION['world_items'][$world_map_token] = array(); }
@@ -430,6 +431,115 @@ if (!empty($map_data_parsed['portals'])){
         $map_data_parsed['portals'][$portal_name] = $portal_data;
     }
     //error_log('-> $map_data_parsed[\'portals\'] (new) = '.print_r($map_data_parsed['portals'], true));
+}
+
+// If there are any events defined, check to see if any of them have been interacted with already
+if (!empty($map_data_parsed['events'])){
+    $event_sprites = $map_data_parsed['events'];
+    $world_events = !empty($WORLD_SESSION['world_events'][$world_map_token]) ? $WORLD_SESSION['world_events'][$world_map_token] : array();
+    $dynamic_event_actions = array('drop-zone'); // these event actions change based on persistent/dynamic data
+    foreach ($event_sprites AS $event_name => $event_data){
+        if (empty($event_data) || !is_array($event_data)){ continue; }
+        $pos = $event_data[0]; unset($event_data[0]);
+        $sprite = !empty($event_data[1]) ? $event_data[1] : ''; unset($event_data[1]);
+        $filter = !empty($event_data[2]) ? $event_data[2] : ''; unset($event_data[2]);
+        $action = !empty($event_data[3]) ? $event_data[3] : ''; unset($event_data[3]);
+        $hidden = false; if (in_array('hidden', $event_data)){ $hidden = true; unset($event_data[array_search('hidden', $event_data)]); }
+        $locked = false; if (in_array('locked', $event_data)){ $locked = true; unset($event_data[array_search('locked', $event_data)]); }
+        $data = array_values($event_data);
+        if (!empty($world_events[$event_name])){ $action = $world_events[$event_name]; }
+        if (empty($action) || !in_array($action, $dynamic_event_actions)){ continue; }
+        //error_log('[event-check] world map event "'.$event_name.'" has action "'.$action.'"');
+        // ...
+        // event action for DROP-ZONES to check if their action should be preset or not
+        if ($action === 'drop-zone'){
+            //error_log('world map event "'.$event_name.'" ('.$pos.') is a drop-zone, checking for items here');
+            $position = $pos;
+            $world_item_symbols = !empty($WORLD_SESSION['world_symbols'][$world_map_token]['items']) ? $WORLD_SESSION['world_symbols'][$world_map_token]['items'] : array();
+            $world_ability_symbols = !empty($WORLD_SESSION['world_symbols'][$world_map_token]['abilities']) ? $WORLD_SESSION['world_symbols'][$world_map_token]['abilities'] : array();
+            $world_item_symbols_by_pos = array_flip($world_item_symbols);
+            $world_ability_symbols_by_pos = array_flip($world_ability_symbols);
+            //error_log('-> $position = '.print_r($position, true));
+            //error_log('-> $world_item_symbols = '.print_r($world_item_symbols, true));
+            //error_log('-> $world_ability_symbols = '.print_r($world_ability_symbols, true));
+            //error_log('-> $world_item_symbols_by_pos = '.print_r($world_item_symbols_by_pos, true));
+            //error_log('-> $world_ability_symbols_by_pos = '.print_r($world_ability_symbols_by_pos, true));
+            $item_dropped_here = !empty($world_item_symbols_by_pos[$position]) ? $world_item_symbols_by_pos[$position] : '';
+            $ability_dropped_here = !empty($world_ability_symbols_by_pos[$position]) ? $world_ability_symbols_by_pos[$position] : '';
+            //error_log('-> $item_dropped_here = '.print_r($item_dropped_here, true));
+            //error_log('-> $ability_dropped_here = '.print_r($ability_dropped_here, true));
+            if (!$item_dropped_here && !$ability_dropped_here){ continue; }
+            list($drop_filter, $drop_action) = $data;
+            $drop_filter = strstr($drop_filter, ':') ? explode(':', $drop_filter) : array($drop_filter);
+            $drop_filter_kind = $drop_filter[0];
+            $drop_filter_values = strstr($drop_filter[1], ',') ? explode(',', $drop_filter[1]) : array($drop_filter[1]);
+            //error_log('-> $drop_filter = '.print_r(json_encode($drop_filter), true));
+            //error_log('-> $drop_filter_kind = '.print_r($drop_filter_kind, true));
+            //error_log('-> $drop_filter_values = '.print_r(json_encode($drop_filter_values), true));
+            if (!empty($item_dropped_here)){
+                //error_log('-----------------------------------');
+                //error_log('-> item detected in drop-zone "'.$event_name.'" ('.$pos.')! let us check if it\'s valid...');
+                $item_namekey = $item_dropped_here;
+                $item_eventinfo = !empty($map_data_parsed['items'][$item_namekey]) ? $map_data_parsed['items'][$item_namekey] : array();
+                $item_position = !empty($item_eventinfo[0]) ? $item_eventinfo[0] : '';
+                $item_token = !empty($item_eventinfo[1]) ? $item_eventinfo[1] : '';
+                if (strstr($item_token, '__')){ list($item_token) = explode('__', $item_token, 2); }
+                //error_log('-> $item_namekey = '.print_r($item_namekey, true));
+                //error_log('-> $item_eventinfo = '.print_r(json_encode($item_eventinfo), true));
+                //error_log('-> $item_position = '.print_r($item_position, true));
+                //error_log('-> $item_token = '.print_r($item_token, true));
+                if ($drop_filter_kind === 'item'){
+                    if (in_array($item_token, $drop_filter_values) || in_array('any', $drop_filter_values)){
+                        //error_log('-> item "'.$item_token.'" is valid for this drop-zone!');
+                        //error_log('-> activating drop-zone "'.$event_name.'" ('.$pos.') since it has a valid item in it');
+                        $event_data = $map_data_parsed['events'][$event_name];
+                        $event_data[] = 'active';
+                        $map_data_parsed['events'][$event_name] = $event_data;
+                        $item_data = $map_data_parsed['items'][$item_namekey];
+                        $item_data[] = 'locked';
+                        $map_data_parsed['items'][$item_namekey] = $item_data;
+                        //error_log('-> $map_data_parsed[\'events\']['.$event_name.'] = '.print_r($map_data_parsed['events'][$event_name], true));
+                        //error_log('-> $map_data_parsed[\'items\']['.$item_namekey.'] = '.print_r($map_data_parsed['items'][$item_namekey], true));
+
+                    } else {
+                        //error_log('-> item "'.$item_token.'" is NOT valid for this drop-zone, leaving it deactivated');
+                    }
+                } else {
+                    //error_log('-> drop-zone "'.$event_name.'" is not configured to accept items, leaving it deactivated');
+                }
+            } elseif (!empty($ability_dropped_here)){
+                //error_log('-----------------------------------');
+                //error_log('-> ability detected in drop-zone "'.$event_name.'" ('.$pos.')! let us check if it\'s valid...');
+                $ability_namekey = $ability_dropped_here;
+                $ability_eventinfo = !empty($map_data_parsed['abilities'][$ability_namekey]) ? $map_data_parsed['abilities'][$ability_namekey] : array();
+                $ability_position = !empty($ability_eventinfo[0]) ? $ability_eventinfo[0] : '';
+                $ability_token = !empty($ability_eventinfo[1]) ? $ability_eventinfo[1] : '';
+                //error_log('-> $ability_namekey = '.print_r($ability_namekey, true));
+                //error_log('-> $ability_eventinfo = '.print_r(json_encode($ability_eventinfo), true));
+                //error_log('-> $ability_position = '.print_r($ability_position, true));
+                //error_log('-> $ability_token = '.print_r($ability_token, true));
+                if ($drop_filter_kind === 'ability'){
+                    if (in_array($ability_token, $drop_filter_values) || in_array('any', $drop_filter_values)){
+                        //error_log('-> ability "'.$ability_token.'" is valid for this drop-zone!');
+                        //error_log('-> activating drop-zone "'.$event_name.'" ('.$pos.') since it has a valid ability in it');
+                        $event_data = $map_data_parsed['events'][$event_name];
+                        $event_data[] = 'active';
+                        $map_data_parsed['events'][$event_name] = $event_data;
+                        $ability_data = $map_data_parsed['abilities'][$ability_namekey];
+                        $ability_data[] = 'locked';
+                        $map_data_parsed['abilities'][$ability_namekey] = $ability_data;
+                    } else {
+                        //error_log('-> ability "'.$ability_token.'" is NOT valid for this drop-zone, leaving it deactivated');
+                    }
+                } else {
+                    //error_log('-> drop-zone "'.$event_name.'" is not configured to accept abilities, leaving it deactivated');
+                }
+            } else {
+                //error_log('-> no item/ability dropped here yet, leaving this drop-zone unlocked');
+            }
+        }
+        // ...
+    }
 }
 
 // If there are any buttons defined, check to see if any of them have been pushed already
