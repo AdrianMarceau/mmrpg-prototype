@@ -1774,52 +1774,161 @@ class mmrpgWorldMap {
                 goToStoragePage(1); // initialize to page 1
                 }
             }
-        // Bind events to the scrolling of the user's mouse if detected to allow for zooming the map
-        let busyZooming = false;
-        $thisWorld.bind('mousewheel', function(e){
-            //console.log('%c' + 'World map mousewheel event!', 'color: cyan;');
-            if (_self.worldIsBusy()){ return; }
-            if (_self.worldMapIsHidden()){ return; }
-            e.preventDefault();
-            e.stopPropagation();
-            //console.log('-> event:', e);
-            //console.log('-> wheelDelta:', e.wheelDelta);
-            if (busyZooming){ return false; }
-            if (!e.wheelDelta){ return false; }
-            else if (e.wheelDelta > 0 && e.wheelDelta < 200){ return false; }
-            else if (e.wheelDelta < 0 && e.wheelDelta > -200){ return false; }
-            busyZooming = true;
-            let wheelDir = e.wheelDelta > 0 ? 'up' : 'down';
-            let oldZoom = _world.zoomLevel || 1;
-            if (wheelDir === 'up'){ _self.incZoomLevel(null, true); }
-            else { _self.decZoomLevel(null, true); }
-            let newZoom = _world.zoomLevel || 1;
-            if (newZoom === oldZoom){ busyZooming = false; return; }
-            else { setTimeout(function(){ busyZooming = false; }, 1000); }
-            _self.playSoundEffect('spawn-sound')
-            return true;
+
+        // Define an index of symbolic "userInputs" we can abstract actions behind, and then
+        // worry about specific key-bindings and button-mappings later on to keep things clean
+        let userInputs = {}; // below will be the default for now, but we'll allow customizing later
+        userInputs.A = {icon: 'Ⓐ', keyboard: ['Enter', 'Space'], gamepad: [0]};
+        userInputs.B = {icon: 'Ⓑ', keyboard: ['Backspace'], gamepad: [1]};
+        userInputs.X = {icon: 'Ⓧ', keyboard: ['Backslash'], gamepad: [2]};
+        userInputs.Y = {icon: 'Ⓨ', keyboard: ['Shift'], gamepad: [3]};
+        userInputs.Up = {icon: '⏶', keyboard: ['ArrowUp'], gamepad: [12]};
+        userInputs.Down = {icon: '⏷', keyboard: ['ArrowDown'], gamepad: [13]};
+        userInputs.Left = {icon: '⏴', keyboard: ['ArrowLeft'], gamepad: [14]};
+        userInputs.Right = {icon: '⏵', keyboard: ['ArrowRight'], gamepad: [15]};
+        userInputs.L1 = {icon: 'L1', keyboard: ['BracketLeft'], gamepad: [4]};
+        userInputs.R1 = {icon: 'R1', keyboard: ['BracketRight'], gamepad: [5]};
+        userInputs.L2 = {icon: 'L2', keyboard: ['PageUp'], gamepad: [6]};
+        userInputs.R2 = {icon: 'R2', keyboard: ['PageDown'], gamepad: [7]};
+        userInputs.Start = {icon: '+', keyboard: ['Home'], gamepad: [9]};
+        userInputs.Select = {icon: '−', keyboard: ['End'], gamepad: [8]};
+
+        // If toggled, make sure we swap the A and B buttons for a Nintendo-style layout
+        let useNintendoLayout = true; // TODO: make this customizable later
+        if (useNintendoLayout){
+            // Swap the A and B buttons with each other
+            let aButtonGamepad = userInputs.A.gamepad;
+            let bButtonGamepad = userInputs.B.gamepad;
+            userInputs.A.gamepad = Object.values(bButtonGamepad);
+            userInputs.B.gamepad = Object.values(aButtonGamepad);
+            // Do the same for the X and Y buttons too
+            let xButtonGamepad = userInputs.X.gamepad;
+            let yButtonGamepad = userInputs.Y.gamepad;
+            userInputs.X.gamepad = Object.values(yButtonGamepad);
+            userInputs.Y.gamepad = Object.values(xButtonGamepad);
+            }
+
+        // Define a quick function that takes a given keyboard press (mixed) and returns the user input key for it
+        let getUserInputFromKeyboardEvent = function(keyCode){
+            //console.log('%c' + 'getUserInputFromKeyboardEvent(keyCode:', keyCode, ') called!', 'color: magenta;');
+            //console.log('-> keyCode =', keyCode);
+            if (!keyCode){ return false; }
+            let returnKey = false;
+            Object.keys(userInputs).forEach(function(inputKey){
+                let inputData = userInputs[inputKey];
+                if (inputData.keyboard && inputData.keyboard.indexOf(keyCode) !== -1){
+                    //console.log('-> inputKey =', inputKey);
+                    returnKey = inputKey;
+                    return;
+                    }
+                });
+            return returnKey;
+            };
+        // Define a quick function that takes a given gamepad key (numeric) and returns the input key for it
+        let getUserInputFromGamepadKey = function(keyNum){
+            //console.log('%c' + 'getUserInputFromGamepadKey(keyNum:', keyNum, ') called!', 'color: magenta;');
+            //console.log('-> keyNum =', keyNum);
+            if (typeof keyNum !== 'number'){ keyNum = parseInt(keyNum); }
+            if (isNaN(keyNum)){ return foundInput; }
+            let returnKey = false;
+            Object.keys(userInputs).forEach(function(inputKey){
+                let inputData = userInputs[inputKey];
+                if (inputData.gamepad && inputData.gamepad.indexOf(keyNum) !== -1){
+                    //console.log('-> inputKey =', inputKey);
+                    returnKey = inputKey;
+                    return;
+                    }
+                });
+            return returnKey;
+            };
+
+        // Define an object to hold all currently pressed keys individually or in combo
+        let activeInputs = {};
+
+        // Bind events to the keyboard arrow keys if detected to allow for it
+        document.addEventListener('keydown', (event) => { let input = getUserInputFromKeyboardEvent(event.key); if (input){ activeInputs[input] = true; } });
+        document.addEventListener('keyup', (event) => { let input = getUserInputFromKeyboardEvent(event.key); if (input){ delete activeInputs[input]; } });
+
+        // Bind events to the scrolling of the user's mouse if detected and map to L2 + R2 button inputs
+        // (make sure we ignore deltas less than +/- threshold to avoid accidental button presses)
+        // (ignore the use-case above, L2 and R2 might be used for other stuff too so be generic)
+        let busyScrolling = false;
+        let wheelThreshold = 150;
+        let wheelTimeout = 100;
+        document.addEventListener('mousewheel', (event) => {
+            if (busyScrolling){ return; }
+            if (!event.wheelDelta){ return false; }
+            //console.log('event.wheelDelta =', event.wheelDelta);
+            if (event.wheelDelta > 0 && event.wheelDelta < wheelThreshold){ return false; }
+            else if (event.wheelDelta < 0 && event.wheelDelta > (-1 * wheelThreshold)){ return false; }
+            busyScrolling = true;
+            let inputKey = event.wheelDelta > 0 ? 'L2' : 'R2';
+            if (typeof activeInputs[inputKey] === 'undefined'){
+                activeInputs[inputKey] = true;
+                checkUserInputs();
+                }
+            setTimeout(function(){
+                delete activeInputs[inputKey];
+                busyScrolling = false;
+                }, wheelTimeout);
             });
-        // Bind events to the keyboard arrow keys if detected to allow for;
-        // - moving the player up/down/left/right
-        // - confirming an action popup via enter/space
-        // - declining an action popup via escape/backspace
-        let pressedKeys = {};
-        document.addEventListener('keydown', (event) => { pressedKeys[event.key] = true; });
-        document.addEventListener('keyup', (event) => { delete pressedKeys[event.key]; });
-        $(document).bind('keydown', function(e){
-            //console.log('%c' + 'World map keydown event!', 'color: cyan;');
-            //e.preventDefault();
-            //e.stopPropagation();
+
+        // Beind events to any connected gamepads to allow for the same
+        // functionality as the keyboard arrow keys (mirror for easier coding)
+        let connectedGamepad = null;
+        window.addEventListener("gamepadconnected", (event) => { watchGamepadInputs(event.gamepad); });
+        window.addEventListener("gamepaddisconnected", (event) => { watchGamepadInputs(null); });
+        let watchGamepadInputs = function(gamepad){
+            connectedGamepad = gamepad;
+            if (!connectedGamepad){ return false; }
+            let gp = navigator.getGamepads()[connectedGamepad.index];
+            if (!gp){ return false; }
+            //console.log('-> gp.buttons:', gp.buttons);
+            gp.buttons.forEach((button, index) => {
+                let inputKey = getUserInputFromGamepadKey(index);
+                if (!inputKey){ return; }
+                if (button.pressed){
+                    //console.log('%c' + 'Gamepad button pressed!', 'color: orange;');
+                    //console.log('-> inputKey:', inputKey, '-> index:', index);
+                    if (typeof activeInputs[inputKey] === 'undefined'){
+                        activeInputs[inputKey] = true;
+                        //console.log('-> activeInputs:', activeInputs);
+                        checkUserInputs({ key: inputKey, preventDefault: function(){}, stopPropagation: function(){} });
+                        } else {
+                        checkUserInputs();
+                        }
+                    }
+                else {
+                    if (typeof activeInputs[inputKey] !== 'undefined'){
+                        delete activeInputs[inputKey];
+                        }
+                    }
+                });
+            requestAnimationFrame(function(){
+                watchGamepadInputs(connectedGamepad);
+                });
+            };
+
+        // Define a function to run each time user inputs are updated so we can react
+        let listenForInput = true;
+        let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 250; listenForInput = false; setTimeout(function(){ listenForInput = true; }, delay); };
+        let checkUserInputs = function(event){
+            //console.log('%c' + 'checkUserInputs() - World map keydown event!', 'color: cyan;');
+            //event.preventDefault();
+            //event.stopPropagation();
             //console.log('-> event:', e);
+            if (!listenForInput){ return false; }
             if (_self.worldIsBusy()){ return false; }
-            //console.log('-> pressedKeys:', pressedKeys);
+            if (!Object.keys(activeInputs).length){ return false; } // nothing pressed, ignore
+            //console.log('-> activeInputs:', activeInputs);
+            ignoreInputFor();
             // Collect references and checks on certain key elements
+            let worldMapIsHidden = _self.worldMapIsHidden();
             let sideButtonsActive = $sideButtons.is('.active') ? true : false;
             // If the player has pressed any of the arrow keys, let's update the position accordingly
-            if (pressedKeys.ArrowLeft || pressedKeys.ArrowRight || pressedKeys.ArrowUp || pressedKeys.ArrowDown){
+            if (activeInputs.Left || activeInputs.Right || activeInputs.Up || activeInputs.Down){
                 //console.log('%c' + 'Arrow key pressed!', 'color: orange;');
-                e.preventDefault();
-                let worldMapIsHidden = _self.worldMapIsHidden();
+                if (event){ event.preventDefault(); }
                 // World map is NOT hidden, so the arrow keys must be controlling the player
                 if (!worldMapIsHidden){
                     let oldPos = _world.cursor.position, curPos = oldPos;
@@ -1828,10 +1937,10 @@ class mmrpgWorldMap {
                     let thisRow = parseInt(thisPos[1]);
                     let newCol = thisCol, newRow = thisRow;
                     //console.log('%c' + 'Current position: ' + oldPos, 'color: orange;');
-                    if (pressedKeys.ArrowLeft){ newCol--; }
-                    else if (pressedKeys.ArrowRight){ newCol++; }
-                    if (pressedKeys.ArrowUp){ newRow--; }
-                    else if (pressedKeys.ArrowDown){ newRow++; }
+                    if (activeInputs.Left){ newCol--; }
+                    else if (activeInputs.Right){ newCol++; }
+                    if (activeInputs.Up){ newRow--; }
+                    else if (activeInputs.Down){ newRow++; }
                     let newPos = newCol + '-' + newRow;
                     //console.log('%c' + 'New position: ' + newPos, 'color: orange;');
                     // Check if the new position is the same as the old position
@@ -1855,18 +1964,16 @@ class mmrpgWorldMap {
                     }
                 // Otherwise if world map IS HIDDEN, might mean we need to use arrow keys for something else
                 else {
-
                     // TODO: add functionality for when player-switcher pallet is active
                     // TODO: add functionality to the team-switch drawer is open
-
                     }
                 }
             // If the side buttons panel is currently open, process those actions too
             if (sideButtonsActive){
                 // If the player has pressed the space or enter keys, let's confirm the side-button action if it's open
-                if (pressedKeys.Space || pressedKeys.Enter || pressedKeys.NumpadEnter ){
+                if (activeInputs.A){
                     //console.log('%c' + 'Confirm action popup!', 'color: orange;');
-                    e.preventDefault();
+                    if (event){ event.preventDefault(); }
                     if (!$sideButtons.is('.active')){ return false; }
                     let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
                     if (!$confirmButton || !$confirmButton.length){ /* console.error('bindEventsToWorld() unable to find confirm button!'); */ return false; }
@@ -1877,9 +1984,9 @@ class mmrpgWorldMap {
                     $confirmButton.trigger('click');
                     }
                 // Else if the player has pressed the backspace or escape keys, let's close the side-button action if it's open
-                else if (pressedKeys.Backspace || pressedKeys.Escape){
+                else if (activeInputs.B){
                     //console.log('%c' + 'Dismiss action popup!', 'color: orange;');
-                    e.preventDefault();
+                    if (event){ event.preventDefault(); }
                     if (!$sideButtons.is('.active')){ return false; }
                     let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
                     if (!$dismissButton || !$dismissButton.length){ console.error('bindEventsToWorld() unable to find dismiss button!'); return false; }
@@ -1887,15 +1994,33 @@ class mmrpgWorldMap {
                     $dismissButton.trigger('click');
                     }
                 // Else if the player has just pressed shift, make sure we add the hover class to the action-dropdown
-                else if (pressedKeys.Shift){
+                else if (activeInputs.Y){
                     //console.log('%c' + 'Shift key pressed!', 'color: orange;');
-                    e.preventDefault();
+                    if (event){ event.preventDefault(); }
                     if (!$sideButtons.is('.active')){ return false; }
                     $actionDropdown.toggleClass('hover');
                     }
                 }
-
-            });
+            // If the player has pressed either of the triggers (or scrolled) we should zoom/unzoom the map
+            if (activeInputs.L2 || activeInputs.R2){
+                //console.log('%c' + 'Trigger key pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                if (!worldMapIsHidden){
+                    let zoomDir = false;
+                    if (activeInputs.L2){ zoomDir = 'out'; }
+                    if (activeInputs.R2){ zoomDir = 'in'; }
+                    let oldZoom = _world.zoomLevel || 1;
+                    if (zoomDir === 'out'){ _self.decZoomLevel(null, true); }
+                    else { _self.incZoomLevel(null, true); }
+                    let newZoom = _world.zoomLevel || 1;
+                    if (newZoom !== oldZoom){
+                        _self.playSoundEffect('spawn-sound');
+                        ignoreInputFor(1000);
+                        }
+                    }
+                }
+            };
+        document.addEventListener('keydown', checkUserInputs);
 
         // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed
         $(window).bind('resize', function(e){
