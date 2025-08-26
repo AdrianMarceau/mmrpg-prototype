@@ -256,7 +256,7 @@ function generate_prototype_postgame_message($player_token){
  * DR. LIGHT UNLOCKS
  */
 
-// UNLOCK PLAYER : DR. WILY
+// UNLOCK PLAYER : DR. LIGHT
 
 // If the Light Program has been found, we can unlock Dr. Light
 if (!$unlock_flag_light && mmrpg_prototype_item_unlocked('light-program')){
@@ -917,10 +917,49 @@ foreach ($chapter_unlock_players AS $player_key => $player_token){
 
 }
 
+// If Light was unlocked, but the player has not yet seen the unlock event, display it
+if ($unlock_flag_light){
+
+    // Display the first level-up event showing Mega Man and the Mega Buster
+    $temp_event_flag = 'dr-light-event-00_player-unlocked';
+    if (empty($temp_game_flags['events'][$temp_event_flag])){
+        $temp_game_flags['events'][$temp_event_flag] = true;
+        $temp_canvas_markup = '';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/gentle-countryside/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(1px) brightness(0.8);"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/gentle-countryside/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-light/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: calc(50% - 20px); transform: scale(1.5) translate(-50%, 0); transform-origin: bottom right;"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/mega-man/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: calc(50% + 20px); transform: scale(1) translate(-50%, 0); transform-origin: bottom left; filter: brightness(0.9);"></div>';
+        $temp_console_markup = '';
+        $temp_console_markup .= '<p class="ability_type ability_type_defense" style="margin: 5px auto 10px; text-align: center;">Congratulations!</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span('defense', 'Dr. Light').' has been unlocked as a player character!</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Light</strong> and <strong>Mega Man</strong> to experience the story from their perspective.  This beginner-level campaign teaches you the basics while you fight through an army of powered up opponents!</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_defense">Dr. Light</strong> from the player select menu to play through his campaign at any time.</p>';
+        array_push($_SESSION[$session_token]['EVENTS'], array(
+            'canvas_markup' => $temp_canvas_markup,
+            'console_markup' => $temp_console_markup,
+            'player_token' => 'dr-light',
+            'event_type' => 'new-player'
+            ));
+        $clear_seen_frame_token = 'edit_players';
+        rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
+    }
+
+    // If Light has been unlocked but somehow Mega Man was not
+    if (!mmrpg_prototype_robot_unlocked(false, 'mega-man')){
+        // Unlock Bass as a playable character
+        $unlock_player_info = $mmrpg_index_players['dr-light'];
+        $unlock_robot_info = rpg_robot::get_index_info('mega-man');
+        $unlock_robot_info['robot_level'] = MMRPG_SETTINGS_GAMESTORY1_STARTLEVEL;
+        $unlock_robot_info['robot_experience'] = 999;
+        mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
+    }
+
+}
+
 // If Wily was unlocked, but the player has not yet seen the unlock event, display it
 if ($unlock_flag_wily){
 
-    // Display the first level-up event showing Bass and the Proto Buster
+    // Display the first level-up event showing Bass and the Bass Buster
     $temp_event_flag = 'dr-wily-event-00_player-unlocked';
     if (empty($temp_game_flags['events'][$temp_event_flag])){
         $temp_game_flags['events'][$temp_event_flag] = true;

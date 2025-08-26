@@ -611,6 +611,76 @@ if (!empty($map_data_parsed['buttons'])){
     }
 }
 
+// Check to see if this map has any player platforms on it and review each group as a whole
+$map_player_platforms = array();
+$map_has_player_platforms = false;
+if (!empty($map_data_parsed['events'])){
+    $event_sprites = $map_data_parsed['events'];
+    foreach ($event_sprites AS $event_name => $event_data){
+        if (empty($event_data) || !is_array($event_data)){ continue; }
+        $hidden = false; if (in_array('hidden', $event_data)){ $hidden = true; unset($event_data[array_search('hidden', $event_data)]); }
+        $locked = false; if (in_array('locked', $event_data)){ $locked = true; unset($event_data[array_search('locked', $event_data)]); }
+        $active = false; if (in_array('active', $event_data)){ $active = true; unset($event_data[array_search('active', $event_data)]); }
+        $data = array_values($event_data);
+        $pos = $event_data[0]; unset($event_data[0]);
+        $sprite = !empty($event_data[1]) ? $event_data[1] : ''; unset($event_data[1]);
+        $filter = !empty($event_data[2]) ? $event_data[2] : ''; unset($event_data[2]);
+        $action = !empty($event_data[3]) ? $event_data[3] : ''; unset($event_data[3]);
+        if ($action !== 'drop-zone'){ continue; }
+        elseif (!preg_match('/^(light|wily|cossack|lalinde)pad-/i', $sprite)){ continue; }
+        $map_has_player_platforms = true;
+        $platform_kind = explode('-', $sprite, 2)[0];
+        $player_token = 'dr-'.substr($platform_kind, 0, -3);
+        //error_log('Map "'.$world_map_token.'" has player platform event "'.$event_name.'" with sprite "'.$sprite.'"' );
+        //error_log('-> $platform_kind = '.print_r($platform_kind, true));
+        //error_log('-> $player_token = '.print_r($player_token, true));
+        //error_log('-> $active = '.print_r($active, true));
+        if (!isset($map_player_platforms[$player_token])){ $map_player_platforms[$player_token] = array(); }
+        $map_player_platforms[$player_token][$pos] = $active ? 1 : 0;
+    }
+}
+//error_log('Map "'.$world_map_token.'" has player platforms? '.($map_has_player_platforms ? 'YES' : 'no'));
+//error_log('-> $map_player_platforms = '.print_r($map_player_platforms, true));
+if ($map_has_player_platforms && !empty($map_player_platforms)){
+    foreach ($map_player_platforms AS $player_token => $platform_data){
+        $all_active = array_sum($platform_data) === count($platform_data) ? true : false;
+        //error_log('-> player "'.$player_token.'" has all platforms active? '.($all_active ? 'YES' : 'no'));
+        if ($all_active && !mmrpg_prototype_player_unlocked($player_token)){
+            //error_log('-> unlocking player "'.$player_token.'" since all their platforms are active!');
+            $player_info = $mmrpg_index_players[$player_token];
+            mmrpg_game_unlock_player(array('player_token' => $player_token), true, true);
+            $player_robots_unlocked = mmrpg_prototype_robots_unlocked($player_token, true);
+            $first_player_robot = !empty($player_robots_unlocked[0]) ? $player_robots_unlocked[0] : 'robot';
+            $player_robot_info = !empty($mmrpg_index_robots[$first_player_robot]) ? $mmrpg_index_robots[$first_player_robot] : array();
+            $temp_event_flag = $player_token.'-event-00_player-unlocked';
+            $temp_game_flags = &$_SESSION[$game_session_token]['flags'];
+            if (empty($temp_game_flags['events'][$temp_event_flag])){
+                $temp_game_flags['events'][$temp_event_flag] = true;
+                $temp_canvas_markup = '';
+                $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/gentle-countryside/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(1px) brightness(0.8);"></div>';
+                $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/gentle-countryside/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+                $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/'.$player_token.'/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: calc(50% - 20px); transform: scale(1.5) translate(-50%, 0); transform-origin: bottom right;"></div>';
+                $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/'.$first_player_robot.'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: calc(50% + 20px); transform: scale(1) translate(-50%, 0); transform-origin: bottom left; filter: brightness(0.9);"></div>';
+                $temp_console_markup = '';
+                $temp_console_markup .= '<p class="ability_type ability_type_defense" style="margin: 5px auto 10px; text-align: center;">Congratulations!</p>';
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span($player_info['player_type'], $player_info['player_name']).' has been unlocked as a player character!</p>';
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>'.$player_info['player_name'].'</strong> and <strong>Mega Man</strong> to experience the story from their perspective.  This beginner-level campaign teaches you the basics while you fight through an army of powered up opponents!</p>';
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_defense">'.$player_info['player_name'].'</strong> from the player select menu to play through his campaign at any time.</p>';
+                array_push($_SESSION[$game_session_token]['EVENTS'], array(
+                    'canvas_markup' => $temp_canvas_markup,
+                    'console_markup' => $temp_console_markup,
+                    'player_token' => $player_token,
+                    'event_type' => 'new-player'
+                    ));
+                $clear_seen_frame_token = 'edit_players';
+                rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
+            }
+            header('Location: world.php');
+            exit();
+        }
+    }
+}
+
 // Automatically save the world session w/ any recent changes
 //rpg_world::save_session();
 

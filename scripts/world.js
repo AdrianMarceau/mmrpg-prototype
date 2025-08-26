@@ -3971,6 +3971,7 @@ class mmrpgWorldMap {
                 objectInfo.locked = true;
                 // TODO: ... and then what?
                 console.warn('triggerDropZoneEvent() dropAction "' + dropAction + '" not fully implemented yet!');
+                _self.refreshPlayerPlatforms();
                 actionsCompleted++;
                 }
             // If an onComplete function was provided, call it now (with delay if requested)
@@ -4035,6 +4036,7 @@ class mmrpgWorldMap {
                 eventInfo.active = false;
                 // TODO: ... and then what?
                 console.warn('triggerDropZoneEmpty() dropAction "' + dropAction + '" not fully implemented yet!');
+                _self.refreshPlayerPlatforms();
                 actionsReverted++;
                 }
             // If an onComplete function was provided, call it now (with delay if requested)
@@ -4052,6 +4054,81 @@ class mmrpgWorldMap {
                 _self.triggerWindowEventsPull();
                 }, delayTime);
             }, delayTime);
+        // Return true on success
+        return true;
+        }
+
+    // Quick function for checking if any player platforms are on this map and their drop-status
+    // Basically, we check each one to see if all parts of "active" status and if so, that means
+    // the platform has been activated and that player can be unlocked (we just need to reload)
+    async refreshPlayerPlatforms(){
+        //console.log('%c' + 'mmrpgWorldMap.refreshPlayerPlatforms()', 'color: magenta;');
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldCursor = _world.cursor;
+        let _worldPlayer = _world.player;
+        let _mapEventSymbols = _config.mapEventSymbols;
+        let _mapEventsIndex = _config.mapEventsIndex;
+        let _mapEventsIndexKeys = Object.keys(_mapEventsIndex);
+        let $thisWorld = _elements.world;
+        let $canvasMap = _elements.map;
+        //console.log('-> _mapEventSymbols =', _mapEventSymbols);
+        //console.log('-> _mapEventsIndex =', _mapEventsIndex);
+        if (!_mapEventSymbols || !Object.keys(_mapEventSymbols).length){ return; }
+        if (!_mapEventsIndex || !Object.keys(_mapEventsIndex).length){ return; }
+        // First scan to see if we have any player platforms to review
+        let hasPlatforms = false;
+        let playerPlatforms = {};
+        //console.log('-> scanning ' + _mapEventsIndexKeys.length + ' map events for player platforms ...');
+        for (var i = 0; i < _mapEventsIndexKeys.length; i++){
+            //console.log('-- refreshPlayerPlatforms checking event index ' + i + ' of ' + _mapEventsIndexKeys.length);
+            let eventKey = _mapEventsIndexKeys[i];
+            let eventInfo = _mapEventsIndex[eventKey];
+            let eventPosition = eventInfo.pos;
+            let eventActive = eventInfo.active;
+            //console.log('-> eventKey =', eventKey);
+            //console.log('-> eventInfo =', eventInfo);
+            //console.log('-> eventPosition =', eventPosition);
+            //console.log('-> eventActive =', eventActive);
+            if (!eventInfo.action || eventInfo.action !== 'drop-zone'){ continue; }
+            if (!eventInfo.sprite || !eventInfo.sprite.match(/^(light|wily|cossack|lalinde)pad-/i)){ continue; }
+            //console.log('-> found player platform event:', eventInfo);
+            hasPlatforms = true;
+            let platformKind = eventInfo.sprite.split('-')[0]
+            let playerToken = 'dr-' + platformKind.substring(0, -3);
+            //console.log('-> platformKind =', platformKind);
+            //console.log('-> playerToken =', playerToken);
+            if (typeof playerPlatforms[playerToken] === 'undefined'){ playerPlatforms[playerToken] = {}; }
+            playerPlatforms[playerToken][eventPosition] = eventActive ? 1 : 0;
+            }
+        //console.log('-> hasPlatforms =', hasPlatforms);
+        //console.log('-> playerPlatforms =', playerPlatforms);
+        if (hasPlatforms && Object.keys(playerPlatforms).length){
+            let playerPlatformsKeys = Object.keys(playerPlatforms);
+            for (var j = 0; j < playerPlatformsKeys.length; j++){
+                //console.log('-- refreshPlayerPlatforms checking player platforms ' + j + ' of ' + playerPlatformsKeys.length);
+                let playerToken = playerPlatformsKeys[j];
+                let platformParts = Object.values(playerPlatforms[playerToken]);
+                let platformActive = platformParts.length && platformParts.indexOf(0) === -1 ? true : false;
+                //console.log('-> playerToken =', playerToken);
+                //console.log('-> platformParts =', platformParts);
+                //console.log('-> platformActive =', platformActive);
+                if (!platformActive){ continue; }
+                // If we made it here, this player's platform is active and they can be unlocked
+                //console.log('%c' + '-> player ' + playerToken + ' has an active platform and can be unlocked!', 'color: lime;');
+                $thisWorld.addClass('busy');
+                _self.incZoomLevel();
+                _self.saveWorldState(function(){
+                    _self.incZoomLevel();
+                    $thisWorld.addClass('hidden');
+                    window.location.reload();
+                    });
+                }
+            }
+
         // Return true on success
         return true;
         }
