@@ -34,13 +34,13 @@
 #---------------------------#
 @events[]    = auto-heal(4-8, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
 @events[]    = auto-reset(8-8, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
-@events[]    = light-platform-left(5-2, lightpad-left, any, drop-zone, item:light-program, check-player-platform)
-@events[]    = light-platform-middle(6-2, lightpad-middle, any, drop-zone, item:light-heart, check-player-platform)
-@events[]    = light-platform-right(7-2, lightpad-right, any, drop-zone, item:copy-core, check-player-platform)
+@events[]    = light-platform-left(5-2, lightpad-left, any, drop-zone, item:light-program, activate-player-platform)
+@events[]    = light-platform-middle(6-2, lightpad-middle, any, drop-zone, item:light-heart, activate-player-platform)
+@events[]    = light-platform-right(7-2, lightpad-right, any, drop-zone, item:copy-core, activate-player-platform)
 #---------------------------#
 @groups[]    = central-area(4-8...8-12)
 @groups[]    = light-boundary(5-18...7-20)
-@groups[]    = item-corridor(2-2...10-4, 6-5, 6-6)
+@groups[]    = item-corridor(2-2...12-4, 6-5, 6-6)
 @groups[]    = item-corridor-2(11-8...13-12, 10-10)
 @groups[]    = item-island-1(2-15...3-16)
 @groups[]    = item-island-2(11-15...13-17)
@@ -56,7 +56,15 @@
 ## UNLOCKABLE-FEATURE CODES
 @items[]     = item-codes-pickup(2-16, item-codes)
 ## PLAYER-HERO-BOT CORES
-@items[]     = copy-core-pickup(12-16, copy-core, x1, once)
+@items[]     = copy-core-pickup-1(11-15, copy-core, x1, once)
+@items[]     = copy-core-pickup-2(11-16, copy-core, x1, once)
+@items[]     = copy-core-pickup-3(11-17, copy-core, x1, once)
+@items[]     = none-core-pickup-1(12-15, none-core, x1, once)
+@items[]     = none-core-pickup-2(12-16, none-core, x1, once)
+@items[]     = none-core-pickup-3(12-17, none-core, x1, once)
+@items[]     = other-core-pickup-1(13-15, nature-core, x1, once)
+@items[]     = other-core-pickup-2(13-16, flame-core, x1, once)
+@items[]     = other-core-pickup-3(13-17, water-core, x1, once)
 ## ITEM-CORRIDOR STATMOD ITEMS
 @items[]     = first-consumable-api(10-4, attack-pellet, x1, always)
 @items[]     = first-consumable-aci(10-2, attack-capsule, x1, always)
