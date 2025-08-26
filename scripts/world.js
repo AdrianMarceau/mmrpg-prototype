@@ -1775,139 +1775,11 @@ class mmrpgWorldMap {
                 }
             }
 
-        // Define an index of symbolic "userInputs" we can abstract actions behind, and then
-        // worry about specific key-bindings and button-mappings later on to keep things clean
-        let userInputs = {}; // below will be the default for now, but we'll allow customizing later
-        userInputs.A = {icon: 'Ⓐ', keyboard: ['Enter', 'Space'], gamepad: [0]};
-        userInputs.B = {icon: 'Ⓑ', keyboard: ['Backspace'], gamepad: [1]};
-        userInputs.X = {icon: 'Ⓧ', keyboard: ['Backslash'], gamepad: [2]};
-        userInputs.Y = {icon: 'Ⓨ', keyboard: ['Shift'], gamepad: [3]};
-        userInputs.Up = {icon: '⏶', keyboard: ['ArrowUp'], gamepad: [12]};
-        userInputs.Down = {icon: '⏷', keyboard: ['ArrowDown'], gamepad: [13]};
-        userInputs.Left = {icon: '⏴', keyboard: ['ArrowLeft'], gamepad: [14]};
-        userInputs.Right = {icon: '⏵', keyboard: ['ArrowRight'], gamepad: [15]};
-        userInputs.L1 = {icon: 'L1', keyboard: ['BracketLeft'], gamepad: [4]};
-        userInputs.R1 = {icon: 'R1', keyboard: ['BracketRight'], gamepad: [5]};
-        userInputs.L2 = {icon: 'L2', keyboard: ['PageUp'], gamepad: [6]};
-        userInputs.R2 = {icon: 'R2', keyboard: ['PageDown'], gamepad: [7]};
-        userInputs.Start = {icon: '+', keyboard: ['Home'], gamepad: [9]};
-        userInputs.Select = {icon: '−', keyboard: ['End'], gamepad: [8]};
-
-        // If toggled, make sure we swap the A and B buttons for a Nintendo-style layout
-        let useNintendoLayout = true; // TODO: make this customizable later
-        if (useNintendoLayout){
-            // Swap the A and B buttons with each other
-            let aButtonGamepad = userInputs.A.gamepad;
-            let bButtonGamepad = userInputs.B.gamepad;
-            userInputs.A.gamepad = Object.values(bButtonGamepad);
-            userInputs.B.gamepad = Object.values(aButtonGamepad);
-            // Do the same for the X and Y buttons too
-            let xButtonGamepad = userInputs.X.gamepad;
-            let yButtonGamepad = userInputs.Y.gamepad;
-            userInputs.X.gamepad = Object.values(yButtonGamepad);
-            userInputs.Y.gamepad = Object.values(xButtonGamepad);
-            }
-
-        // Define a quick function that takes a given keyboard press (mixed) and returns the user input key for it
-        let getUserInputFromKeyboardEvent = function(keyCode){
-            //console.log('%c' + 'getUserInputFromKeyboardEvent(keyCode:', keyCode, ') called!', 'color: magenta;');
-            //console.log('-> keyCode =', keyCode);
-            if (!keyCode){ return false; }
-            let returnKey = false;
-            Object.keys(userInputs).forEach(function(inputKey){
-                let inputData = userInputs[inputKey];
-                if (inputData.keyboard && inputData.keyboard.indexOf(keyCode) !== -1){
-                    //console.log('-> inputKey =', inputKey);
-                    returnKey = inputKey;
-                    return;
-                    }
-                });
-            return returnKey;
-            };
-        // Define a quick function that takes a given gamepad key (numeric) and returns the input key for it
-        let getUserInputFromGamepadKey = function(keyNum){
-            //console.log('%c' + 'getUserInputFromGamepadKey(keyNum:', keyNum, ') called!', 'color: magenta;');
-            //console.log('-> keyNum =', keyNum);
-            if (typeof keyNum !== 'number'){ keyNum = parseInt(keyNum); }
-            if (isNaN(keyNum)){ return foundInput; }
-            let returnKey = false;
-            Object.keys(userInputs).forEach(function(inputKey){
-                let inputData = userInputs[inputKey];
-                if (inputData.gamepad && inputData.gamepad.indexOf(keyNum) !== -1){
-                    //console.log('-> inputKey =', inputKey);
-                    returnKey = inputKey;
-                    return;
-                    }
-                });
-            return returnKey;
-            };
-
-        // Define an object to hold all currently pressed keys individually or in combo
-        let activeInputs = {};
-
-        // Bind events to the keyboard arrow keys if detected to allow for it
-        document.addEventListener('keydown', (event) => { let input = getUserInputFromKeyboardEvent(event.key); if (input){ activeInputs[input] = true; } });
-        document.addEventListener('keyup', (event) => { let input = getUserInputFromKeyboardEvent(event.key); if (input){ delete activeInputs[input]; } });
-
-        // Bind events to the scrolling of the user's mouse if detected and map to L2 + R2 button inputs
-        // (make sure we ignore deltas less than +/- threshold to avoid accidental button presses)
-        // (ignore the use-case above, L2 and R2 might be used for other stuff too so be generic)
-        let busyScrolling = false;
-        let wheelThreshold = 150;
-        let wheelTimeout = 100;
-        document.addEventListener('mousewheel', (event) => {
-            if (busyScrolling){ return; }
-            if (!event.wheelDelta){ return false; }
-            //console.log('event.wheelDelta =', event.wheelDelta);
-            if (event.wheelDelta > 0 && event.wheelDelta < wheelThreshold){ return false; }
-            else if (event.wheelDelta < 0 && event.wheelDelta > (-1 * wheelThreshold)){ return false; }
-            busyScrolling = true;
-            let inputKey = event.wheelDelta > 0 ? 'L2' : 'R2';
-            if (typeof activeInputs[inputKey] === 'undefined'){
-                activeInputs[inputKey] = true;
-                checkUserInputs();
-                }
-            setTimeout(function(){
-                delete activeInputs[inputKey];
-                busyScrolling = false;
-                }, wheelTimeout);
-            });
-
-        // Beind events to any connected gamepads to allow for the same
-        // functionality as the keyboard arrow keys (mirror for easier coding)
-        let connectedGamepad = null;
-        window.addEventListener("gamepadconnected", (event) => { watchGamepadInputs(event.gamepad); });
-        window.addEventListener("gamepaddisconnected", (event) => { watchGamepadInputs(null); });
-        let watchGamepadInputs = function(gamepad){
-            connectedGamepad = gamepad;
-            if (!connectedGamepad){ return false; }
-            let gp = navigator.getGamepads()[connectedGamepad.index];
-            if (!gp){ return false; }
-            //console.log('-> gp.buttons:', gp.buttons);
-            gp.buttons.forEach((button, index) => {
-                let inputKey = getUserInputFromGamepadKey(index);
-                if (!inputKey){ return; }
-                if (button.pressed){
-                    //console.log('%c' + 'Gamepad button pressed!', 'color: orange;');
-                    //console.log('-> inputKey:', inputKey, '-> index:', index);
-                    if (typeof activeInputs[inputKey] === 'undefined'){
-                        activeInputs[inputKey] = true;
-                        //console.log('-> activeInputs:', activeInputs);
-                        checkUserInputs({ key: inputKey, preventDefault: function(){}, stopPropagation: function(){} });
-                        } else {
-                        checkUserInputs();
-                        }
-                    }
-                else {
-                    if (typeof activeInputs[inputKey] !== 'undefined'){
-                        delete activeInputs[inputKey];
-                        }
-                    }
-                });
-            requestAnimationFrame(function(){
-                watchGamepadInputs(connectedGamepad);
-                });
-            };
+        // Start the user input watcher and collect reference to active inputs
+        let userInputWatcher = new mmrpgUserInputWatcher();
+        //console.log('-> userInputWatcher:', userInputWatcher);
+        let activeInputs = userInputWatcher.activeInputs;
+        //console.log('-> activeInputs:', activeInputs);
 
         // Define a function to run each time user inputs are updated so we can react
         let listenForInput = true;
@@ -2021,6 +1893,8 @@ class mmrpgWorldMap {
                 }
             };
         document.addEventListener('keydown', checkUserInputs);
+        document.addEventListener('mousewheel', checkUserInputs);
+        document.addEventListener('gamepadinput', checkUserInputs);
 
         // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed
         $(window).bind('resize', function(e){
