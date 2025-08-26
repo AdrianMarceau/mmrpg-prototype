@@ -3511,50 +3511,37 @@ if (typeof window.shuffleArray === 'undefined'){
             var temp = array[i];
             array[i] = array[j];
             array[j] = temp;
+            }
         }
     }
-}
 
 /* Define a function to calculate distance between two points */
 if (typeof window.calcDistance === 'undefined'){
     function calculateDistance(x1, y1, x2, y2) {
-      return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
     }
-}
 
 // Fix the indexOf issue for IE8 and lower
 if (!Array.prototype.indexOf) {
-        Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
-                "use strict";
-                if (this === void 0 || this === null) {
-                        throw new TypeError();
-                }
-                var t = Object(this);
-                var len = t.length >>> 0;
-                if (len === 0) {
-                        return -1;
-                }
-                var n = 0;
-                if (arguments.length > 0) {
-                        n = Number(arguments[1]);
-                        if (n !== n) { // shortcut for verifying if it's NaN
-                                n = 0;
-                        } else if (n !== 0 && n !== Infinity && n !== -Infinity) {
-                                n = (n > 0 || -1) * Math.floor(Math.abs(n));
-                        }
-                }
-                if (n >= len) {
-                        return -1;
-                }
-                var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
-                for (; k < len; k++) {
-                        if (k in t && t[k] === searchElement) {
-                                return k;
-                        }
-                }
-                return -1;
+    Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
+        "use strict";
+        if (this === void 0 || this === null) { throw new TypeError(); }
+        var t = Object(this);
+        var len = t.length >>> 0;
+        if (len === 0) { return -1; }
+        var n = 0;
+        if (arguments.length > 0) {
+            n = Number(arguments[1]);
+            if (n !== n) { n = 0; }
+            else if (n !== 0 && n !== Infinity && n !== -Infinity) { n = (n > 0 || -1) * Math.floor(Math.abs(n)); }
+            }
+        if (n >= len) { return -1; }
+        var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
+        for (; k < len; k++) { if (k in t && t[k] === searchElement) { return k; } }
+        return -1;
         }
-}
+    };
 
 // Polyfill for requestAnimationFrame if not exists
 window.requestAnimationFrame = window.requestAnimationFrame
@@ -3565,3 +3552,4 @@ window.requestAnimationFrame = window.requestAnimationFrame
 window.cancelAnimationFrame = window.cancelAnimationFrame
     || window.mozCancelAnimationFrame
     || function(requestID){clearTimeout(requestID)};
+
