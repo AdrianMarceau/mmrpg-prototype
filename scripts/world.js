@@ -1876,18 +1876,33 @@ class mmrpgWorldMap {
             // If the player has pressed either of the triggers (or scrolled) we should zoom/unzoom the map
             if (activeInputs.L2 || activeInputs.R2){
                 //console.log('%c' + 'Trigger key pressed!', 'color: orange;');
+                //console.log('-> activeInputs: ', Object.keys(activeInputs).length ? activeInputs : 'none');
                 if (event){ event.preventDefault(); }
                 if (!worldMapIsHidden){
-                    let zoomDir = false;
-                    if (activeInputs.L2){ zoomDir = 'out'; }
-                    if (activeInputs.R2){ zoomDir = 'in'; }
-                    let oldZoom = _world.zoomLevel || 1;
-                    if (zoomDir === 'out'){ _self.decZoomLevel(null, true); }
-                    else { _self.incZoomLevel(null, true); }
-                    let newZoom = _world.zoomLevel || 1;
-                    if (newZoom !== oldZoom){
-                        _self.playSoundEffect('spawn-sound');
-                        ignoreInputFor(1000);
+                    if (activeInputs.L2 && activeInputs.R2){
+                        //console.log('%c' + 'Both triggers held, reset zoom!', 'color: orange;');
+                        // when both are held, we reset the zoom
+                        let oldZoom = _world.zoomLevel || 1;
+                        _self.updateZoomLevel(1, true);
+                        let newZoom = _world.zoomLevel || 1;
+                        if (newZoom !== oldZoom){
+                            _self.playSoundEffect('spawn-sound');
+                            ignoreInputFor(1000);
+                            }
+                        } else {
+                        //console.log('%c' + (activeInputs.L2 ? 'L2' : 'R2') + ' held, zooming ' + (activeInputs.L2 ? 'out' : 'in') + '!', 'color: orange;');
+                        // otherwise we use L1 to zoom out and R1 to zoom in
+                        let zoomDir = false;
+                        if (activeInputs.L2){ zoomDir = 'out'; }
+                        if (activeInputs.R2){ zoomDir = 'in'; }
+                        let oldZoom = _world.zoomLevel || 1;
+                        if (zoomDir === 'out'){ _self.decZoomLevel(null, true); }
+                        else { _self.incZoomLevel(null, true); }
+                        let newZoom = _world.zoomLevel || 1;
+                        if (newZoom !== oldZoom){
+                            _self.playSoundEffect('spawn-sound');
+                            ignoreInputFor(1000);
+                            }
                         }
                     }
                 }
@@ -2162,7 +2177,7 @@ class mmrpgWorldMap {
         let _elements = _self.elements;
         let _world = _self.state;
         updateUserZoom = typeof updateUserZoom === 'boolean' ? updateUserZoom : false;
-        _world.zoomLevel = newZoomLevel
+        _world.zoomLevel = newZoomLevel;
         if (updateUserZoom){ _world.userZoomLevel = newZoomLevel; }
         _self.scrollMap();
         return true;
