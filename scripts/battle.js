@@ -138,9 +138,10 @@ $(document).ready(function(){
 
     // Define a quick function for gennerating a buttonRows matrix for keyboard/controller interactions
     let lastWrapperToken = false; // for saving which wrapper we last generated the matrix for
+    let lastWrapperPage = false; // for saving which subpage of a given wrapper we're viewing
     let lastWrapperButtons = []; // for saving the rows of buttons that make-up the matrix
     let lastWrapperPosition = []; // for saving the last row/col for quicker lookups on repeat
-    let generateButtonMatrix = function($currentWrapper, currentWrapperToken){
+    let generateButtonMatrix = function($currentWrapper, currentWrapperToken, currentWrapperPage){
         // Menus work in the following way;
         // -> Up top are "Main Buttons" (1-8, w/ 4-per-row), which are usually individual actions within a given category (abilities, items, teammates, etc.)
         // (one exception: the main 'battle' wrapper which just has one big "Ability" button up-top)
@@ -156,18 +157,37 @@ $(document).ready(function(){
         // we should add empty placeholders to the buttonRows array so that the left/right movement is consistent across rows.
         // and then detect that on-press and auto-move to next row if empty so the user doesn't have to press twice when few buttons.
         //console.log('generateButtonMatrix() for', currentWrapperToken);
-        if (lastWrapperToken === currentWrapperToken){ return lastWrapperButtons; }
+        if (!currentWrapperPage){ currentWrapperPage = lastWrapperPage ? lastWrapperPage : 1; }
+        if (currentWrapperToken === lastWrapperToken
+            && currentWrapperPage === lastWrapperPage){
+            return lastWrapperButtons;
+            }
+        //console.log('-> currentWrapperToken(', currentWrapperToken, ') !== lastWrapperToken(', lastWrapperToken, ')');
+        //console.log('-> OR currentWrapperPage(', currentWrapperPage, ') !== currentWrapperPage(', currentWrapperPage, ')');
+        //console.log('generateButtonMatrix() w/', '\n', ' currentWrapperToken:', currentWrapperToken, '\n', 'currentWrapperPage:', currentWrapperPage);
         //console.log('...generating new buttonRows array');
         lastWrapperButtons = [];
         lastWrapperPosition = [];
         lastWrapperToken = currentWrapperToken;
+        lastWrapperPage = currentWrapperPage;
         let buttonRows = [];
+        let buttonSelector = '.button:visible:not(.button_disabled):not(.float_links *)';
         let $currentMainActions = $('.main_actions', $currentWrapper);
         let $currentSubActions = $('.sub_actions', $currentWrapper);
-        let $currentMainActionButtons = $('.button:not(.button_disabled)', $currentMainActions);
-        let $currentSubActionButtons = $('.button:not(.button_disabled)', $currentSubActions);
+        let $currentMainActionButtons = $(buttonSelector, $currentMainActions);
+        let $currentSubActionButtons = $(buttonSelector, $currentSubActions);
         let mainActionButtons = $currentMainActionButtons.toArray();
         let subActionButtons = $currentSubActionButtons.toArray();
+        /*
+        // slice the main action buttons to only the ones we should be seeing on the current page
+        let buttonsPerRow = 4;
+        let rowsPerPage = 2;
+        let buttonsPagePage = buttonsPerRow * rowsPerPage;
+        let startIndex = (lastWrapperPage - 1) * buttonsPagePage;
+        let endIndex = startIndex + buttonsPagePage;
+        mainActionButtons = mainActionButtons.slice(startIndex, endIndex);
+        */
+        // now build the buttonRows array
         let rowCount = Math.ceil(mainActionButtons.length / 4);
         for (let r = 0; r < rowCount; r++){
             buttonRows[r] = [];
@@ -263,15 +283,17 @@ $(document).ready(function(){
             if (!allowClick){ return false; }
             }
         // With those out of the way, let's continue with normal menu interaction processing
-        let buttonSelector = '.button:not(.button_disabled):not(.float_links *)';
+        let buttonSelector = '.button:visible:not(.button_disabled):not(.float_links *)';
+        let hoverButtonSelector = buttonSelector+'.button_hover';
         let $currentMainActions = $('.main_actions', $currentWrapper);
         let $currentSubActions = $('.sub_actions', $currentWrapper);
         let $currentButtons = $(buttonSelector, $currentWrapper);
         let $currentMainActionButtons = $(buttonSelector, $currentMainActions);
         let $currentSubActionButtons = $(buttonSelector, $currentSubActions);
-        let $hoverButton = $('.button_hover', $currentWrapper);
+        let $hoverButton = $(hoverButtonSelector, $currentWrapper);
         let $continueButtton = $('.action_continue', $battleActions);
         let $firstButton = $currentButtons.first();
+        let buttonRows = generateButtonMatrix($currentWrapper, currentWrapperToken);
         // If the user has pressed the confirm (A) button
         // then confirm whatever input is currently selected
         if (activeInputs.A){ // A button
@@ -298,7 +320,7 @@ $(document).ready(function(){
                 if ($buttonToClick.is('[data-panel]')){
                     let $newWrapper = $('#actions_' + $buttonToClick.attr('data-panel'), $battleActions);
                     let $newButtons = $(buttonSelector, $newWrapper);
-                    let $hoverButton = $('.button_hover', $newWrapper);
+                    let $hoverButton = $(hoverButtonSelector, $newWrapper);
                     if (!$hoverButton.length || $hoverButton.is('.action_back')){
                         let $newFirstButton = $newButtons.first();
                         if ($newFirstButton.length){
@@ -341,7 +363,7 @@ $(document).ready(function(){
                     }
                 }
             }
-        // Else if the user has pressed a D-Pad or Left Stick direction
+        //If the user has pressed a D-Pad or Left Stick direction
         if (activeInputs.Up || activeInputs.Down || activeInputs.Left || activeInputs.Right){ // D-Pad or Left Stick
             //console.log('%c' + 'D-Pad or Left Stick direction pressed!', 'color: orange;');
             if (event){ event.preventDefault(); }
@@ -372,7 +394,7 @@ $(document).ready(function(){
                     //console.log('%c' + 'Direction input LEFT or RIGHT on the BATTLE menu panel...', 'color: orange;');
                     let $firstMainButton = $currentMainActionButtons.first();
                     let $firstSubButton = $currentSubActionButtons.first();
-                    let $firstHoverButton = $('.button_hover', $currentWrapper).first();
+                    let $firstHoverButton = $(hoverButtonSelector, $currentWrapper).first();
                     if (!$firstHoverButton.length){
                         if ($firstMainButton.length){
                             $currentButtons.removeClass('button_hover');
@@ -403,14 +425,14 @@ $(document).ready(function(){
                     // any other buttons supported?
                 } else {
                 //console.log('%c' + 'Direction input on the (sub) ' + currentWrapperToken.toUpperCase() + ' menu panel...', 'color: orange;');
-                let buttonRows = generateButtonMatrix($currentWrapper, currentWrapperToken);
                 let lastPosition = lastWrapperPosition;
                 //console.log('-> buttonRows:', buttonRows);
                 //console.log('-> lastPosition:', lastPosition);
                 // If we don't have a last position to work from, we need to find it via hover-class
                 if (!lastPosition.length){
+                    //console.log('-> refreshing lastPosition');
                     // first check to make sure we have a hover button
-                    let $firstHoverButton = $('.button_hover', $currentWrapper).first();
+                    let $firstHoverButton = $(hoverButtonSelector, $currentWrapper).first();
                     if (!$firstHoverButton.length){
                         if ($firstButton.length){
                             $currentButtons.removeClass('button_hover');
@@ -436,6 +458,7 @@ $(document).ready(function(){
                     }
                 // Now that we have a position (well, assuming we do), attempt to move it based on input
                 if (lastPosition.length){
+                    //console.log('-> using lastPosition:', lastPosition);
                     let hoverRow = lastPosition[0];
                     let hoverIndex = lastPosition[1];
                     if (hoverIndex > -1 && hoverRow > -1){
@@ -520,6 +543,36 @@ $(document).ready(function(){
                         }
                     }
 
+                }
+            }
+        // If the user has pressed the L1/R1 bumpers to scoll sub-pages
+        // if the mainactions have .float_links and .button.num pages inside
+        // then the L1/R1 buttons should scroll through them and "click"
+        if (activeInputs.L1 || activeInputs.R1){ // L1/R1 bumpers
+            //console.log('%c' + 'L1 or R1 bumper pressed!', 'color: orange;');
+            if (event){ event.preventDefault(); }
+            let $floatLinks = $('.float_links', $currentMainActions);
+            if ($floatLinks.length){
+                let $allButtons = $('.button.num:not(.disabled):not([data-action])', $floatLinks);
+                let $activeButton = $allButtons.filter('[href="#' + lastWrapperPage + '"]');
+                if ($activeButton.length && $allButtons.length > 1){
+                    let visibleIndex = $allButtons.index($activeButton);
+                    let nextIndex = visibleIndex;
+                    if (activeInputs.L1){ nextIndex = visibleIndex - 1; }
+                    else if (activeInputs.R1){ nextIndex = visibleIndex + 1; }
+                    if (nextIndex < 0){ nextIndex = $allButtons.length - 1; }
+                    if (nextIndex >= $allButtons.length){ nextIndex = 0; }
+                    let $nextButton = $allButtons.eq(nextIndex);
+                    if ($nextButton.length){
+                        $nextButton.trigger('click');
+                        // also update the hover class to match
+                        let newPageNum = parseInt($nextButton.html());
+                        buttonRows = generateButtonMatrix($currentWrapper, currentWrapperToken, newPageNum);
+                        let $firstButton = $(buttonRows[0][0]);
+                        $firstButton.addClass('button_hover');
+                        return true;
+                        }
+                    }
                 }
             }
         };
