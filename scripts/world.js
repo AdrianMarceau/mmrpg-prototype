@@ -1797,12 +1797,79 @@ class mmrpgWorldMap {
             // Collect references and checks on certain key elements
             let worldMapIsHidden = _self.worldMapIsHidden();
             let sideButtonsActive = $sideButtons.is('.active') ? true : false;
-            // If the player has pressed any of the arrow keys, let's update the position accordingly
-            if (activeInputs.Left || activeInputs.Right || activeInputs.Up || activeInputs.Down){
-                //console.log('%c' + 'Arrow key pressed!', 'color: orange;');
-                if (event){ event.preventDefault(); }
-                // World map is NOT hidden, so the arrow keys must be controlling the player
-                if (!worldMapIsHidden){
+            // If the side buttons panel is currently open, process those actions too
+            if (sideButtonsActive){
+                // If the player has pressed the space or enter keys, let's confirm the side-button action if it's open
+                if (activeInputs.A){
+                    //console.log('%c' + 'Confirm action popup!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    if (!$sideButtons.is('.active')){ return false; }
+                    let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
+                    if (!$confirmButton || !$confirmButton.length){ /* console.error('bindEventsToWorld() unable to find confirm button!'); */ return false; }
+                    if ($confirmButton.is('.clicked')){ return }
+                    if (!$confirmButton.is('.maybe')){ $confirmButton.addClass('maybe'); return; }
+                    $confirmButton.removeClass('maybe');
+                    //console.log('Triggering click on confirm button:', $confirmButton);
+                    $confirmButton.trigger('click');
+                    return true;
+                    }
+                // Else if the player has pressed the backspace or escape keys, let's close the side-button action if it's open
+                else if (activeInputs.B){
+                    //console.log('%c' + 'Dismiss action popup!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    if (!$sideButtons.is('.active')){ return false; }
+                    let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
+                    if (!$dismissButton || !$dismissButton.length){ console.error('bindEventsToWorld() unable to find dismiss button!'); return false; }
+                    $sideButtons.removeClass('maybe');
+                    $dismissButton.trigger('click');
+                    return true;
+                    }
+                // Else if the player has just pressed shift, make sure we add the hover class to the action-dropdown
+                else if (activeInputs.Y){
+                    //console.log('%c' + 'Shift key pressed!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    if (!$sideButtons.is('.active')){ return false; }
+                    $actionDropdown.toggleClass('hover');
+                    return true;
+                    }
+                }
+            // Otherwise if the world map is NOT hidden, so the arrow keys must be controlling the player
+            if (!worldMapIsHidden){
+                // If the player has pressed either of the triggers (or scrolled) we should zoom/unzoom the map
+                if (activeInputs.L2 || activeInputs.R2){
+                    //console.log('%c' + 'Trigger key pressed!', 'color: orange;');
+                    //console.log('-> activeInputs: ', Object.keys(activeInputs).length ? activeInputs : 'none');
+                    if (event){ event.preventDefault(); }
+                    if (activeInputs.L2 && activeInputs.R2){
+                        //console.log('%c' + 'Both triggers held, reset zoom!', 'color: orange;');
+                        // when both are held, we reset the zoom
+                        let oldZoom = _world.zoomLevel || 1;
+                        _self.updateZoomLevel(1, true);
+                        let newZoom = _world.zoomLevel || 1;
+                        if (newZoom !== oldZoom){
+                            _self.playSoundEffect('spawn-sound');
+                            ignoreInputFor(1000);
+                            }
+                        } else {
+                        //console.log('%c' + (activeInputs.L2 ? 'L2' : 'R2') + ' held, zooming ' + (activeInputs.L2 ? 'out' : 'in') + '!', 'color: orange;');
+                        // otherwise we use L1 to zoom out and R1 to zoom in
+                        let zoomDir = false;
+                        if (activeInputs.L2){ zoomDir = 'out'; }
+                        if (activeInputs.R2){ zoomDir = 'in'; }
+                        let oldZoom = _world.zoomLevel || 1;
+                        if (zoomDir === 'out'){ _self.decZoomLevel(null, true); }
+                        else { _self.incZoomLevel(null, true); }
+                        let newZoom = _world.zoomLevel || 1;
+                        if (newZoom !== oldZoom){
+                            _self.playSoundEffect('spawn-sound');
+                            ignoreInputFor(1000);
+                            }
+                        }
+                    }
+                // If the player has pressed any of the arrow keys, let's update the position accordingly
+                if (activeInputs.Left || activeInputs.Right || activeInputs.Up || activeInputs.Down){
+                    //console.log('%c' + 'Arrow key pressed!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
                     let oldPos = _world.cursor.position, curPos = oldPos;
                     let thisPos = oldPos.split('-');
                     let thisCol = parseInt(thisPos[0]);
@@ -1833,77 +1900,6 @@ class mmrpgWorldMap {
                     _self.moveToPosition(newPos, function(){
                         _self.makeLayerTileInactive(oldPos);
                         });
-                    }
-                // Otherwise if world map IS HIDDEN, might mean we need to use arrow keys for something else
-                else {
-                    // TODO: add functionality for when player-switcher pallet is active
-                    // TODO: add functionality to the team-switch drawer is open
-                    }
-                }
-            // If the side buttons panel is currently open, process those actions too
-            if (sideButtonsActive){
-                // If the player has pressed the space or enter keys, let's confirm the side-button action if it's open
-                if (activeInputs.A){
-                    //console.log('%c' + 'Confirm action popup!', 'color: orange;');
-                    if (event){ event.preventDefault(); }
-                    if (!$sideButtons.is('.active')){ return false; }
-                    let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
-                    if (!$confirmButton || !$confirmButton.length){ /* console.error('bindEventsToWorld() unable to find confirm button!'); */ return false; }
-                    if ($confirmButton.is('.clicked')){ return }
-                    if (!$confirmButton.is('.maybe')){ $confirmButton.addClass('maybe'); return; }
-                    $confirmButton.removeClass('maybe');
-                    //console.log('Triggering click on confirm button:', $confirmButton);
-                    $confirmButton.trigger('click');
-                    }
-                // Else if the player has pressed the backspace or escape keys, let's close the side-button action if it's open
-                else if (activeInputs.B){
-                    //console.log('%c' + 'Dismiss action popup!', 'color: orange;');
-                    if (event){ event.preventDefault(); }
-                    if (!$sideButtons.is('.active')){ return false; }
-                    let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
-                    if (!$dismissButton || !$dismissButton.length){ console.error('bindEventsToWorld() unable to find dismiss button!'); return false; }
-                    $sideButtons.removeClass('maybe');
-                    $dismissButton.trigger('click');
-                    }
-                // Else if the player has just pressed shift, make sure we add the hover class to the action-dropdown
-                else if (activeInputs.Y){
-                    //console.log('%c' + 'Shift key pressed!', 'color: orange;');
-                    if (event){ event.preventDefault(); }
-                    if (!$sideButtons.is('.active')){ return false; }
-                    $actionDropdown.toggleClass('hover');
-                    }
-                }
-            // If the player has pressed either of the triggers (or scrolled) we should zoom/unzoom the map
-            if (activeInputs.L2 || activeInputs.R2){
-                //console.log('%c' + 'Trigger key pressed!', 'color: orange;');
-                //console.log('-> activeInputs: ', Object.keys(activeInputs).length ? activeInputs : 'none');
-                if (event){ event.preventDefault(); }
-                if (!worldMapIsHidden){
-                    if (activeInputs.L2 && activeInputs.R2){
-                        //console.log('%c' + 'Both triggers held, reset zoom!', 'color: orange;');
-                        // when both are held, we reset the zoom
-                        let oldZoom = _world.zoomLevel || 1;
-                        _self.updateZoomLevel(1, true);
-                        let newZoom = _world.zoomLevel || 1;
-                        if (newZoom !== oldZoom){
-                            _self.playSoundEffect('spawn-sound');
-                            ignoreInputFor(1000);
-                            }
-                        } else {
-                        //console.log('%c' + (activeInputs.L2 ? 'L2' : 'R2') + ' held, zooming ' + (activeInputs.L2 ? 'out' : 'in') + '!', 'color: orange;');
-                        // otherwise we use L1 to zoom out and R1 to zoom in
-                        let zoomDir = false;
-                        if (activeInputs.L2){ zoomDir = 'out'; }
-                        if (activeInputs.R2){ zoomDir = 'in'; }
-                        let oldZoom = _world.zoomLevel || 1;
-                        if (zoomDir === 'out'){ _self.decZoomLevel(null, true); }
-                        else { _self.incZoomLevel(null, true); }
-                        let newZoom = _world.zoomLevel || 1;
-                        if (newZoom !== oldZoom){
-                            _self.playSoundEffect('spawn-sound');
-                            ignoreInputFor(1000);
-                            }
-                        }
                     }
                 }
             };
