@@ -174,27 +174,41 @@ $(document).ready(function(){
         if (true){
             //console.log('deciding to attach tooltips');
 
-            var tooltipDelay = 1200; //600;
-            var tooltipTimeout = false;
-            var tooltipShowing = false;
-            var tooltipInitiator = false;
+            let tooltipDelay = 1200; //600;
+            let tooltipTimeout = false;
+            let tooltipShowing = false;
+            let tooltipInitiator = false;
 
             // Define the function for showing the tooltip
-            var showTooltipFunction = function(e){
-                var thisElement = $(this);
-                $('.tooltip', mmrpgBody).empty();
-                var thisDate = new Date();
-                var thisTime = thisDate.getTime();
+            let $lastTooltipElement = false;
+            let showTooltipFunction = function(element, event){
+                //console.log('showTooltipFunction() w/ element:', element, ' and event:', event);
+                let $thisElement = $(element);
+                let $tooltip = $('#mmrpg-tooltip', mmrpgBody);
+                //console.log('-> checking $tooltip:', $tooltip);
+                //console.log('-> comparing $thisElement:', $thisElement, ' to $lastTooltipElement:', $lastTooltipElement);
+                if ($tooltip && $tooltip.length && $thisElement[0] === $lastTooltipElement[0]){
+                    //console.log('same element, closing existing tooltip');
+                    $lastTooltipElement = false;
+                    $tooltip.removeClass('active');
+                    $tooltip.empty();
+                    return;
+                    } else {
+                    //console.log('different element, continuing to show new tooltip');
+                    $lastTooltipElement = $thisElement;
+                    }
+                //var thisDate = new Date();
+                //var thisTime = thisDate.getTime();
                 //console.log('starting the tooltip at '+thisTime);
-                var thisClassList = thisElement.attr('class') != undefined ? thisElement.attr('class').split(/\s+/) : '';
-                var thisTitle = thisElement.attr('data-backup-title') != undefined ? thisElement.attr('data-backup-title') : (thisElement.attr('title') != undefined ? thisElement.attr('title') : '');
-                var thisTooltip = thisElement.attr('data-tooltip') != undefined ? thisElement.attr('data-tooltip') : '';
-                if (!thisTooltip.length && thisElement.attr('data-click-tooltip') != undefined){ thisTooltip = thisElement.attr('data-click-tooltip'); }
+                var thisClassList = $thisElement.attr('class') != undefined ? $thisElement.attr('class').split(/\s+/) : '';
+                var thisTitle = $thisElement.attr('data-backup-title') != undefined ? $thisElement.attr('data-backup-title') : ($thisElement.attr('title') != undefined ? $thisElement.attr('title') : '');
+                var thisTooltip = $thisElement.attr('data-tooltip') != undefined ? $thisElement.attr('data-tooltip') : '';
+                if (!thisTooltip.length && $thisElement.attr('data-click-tooltip') != undefined){ thisTooltip = $thisElement.attr('data-click-tooltip'); }
                 if (!thisTitle.length && !thisTooltip.length){ return false; }
                 else if (thisTitle.length && !thisTooltip.length){ thisTooltip = thisTitle; }
                 thisTooltip = thisTooltip.replace(/\n/g, '<br />').replace(/\|\|/g, '<br />').replace(/\|/g, '<span class="pipe">|</span>').replace(/\s?\/\/\s?/g, '<br />').replace(/\[\[([^\[\]]+)\]\]/ig, '<span class="subtext">$1</span>');
-                var thisTooltipAlign = thisElement.attr('data-tooltip-align') != undefined ? thisElement.attr('data-tooltip-align') : 'left';
-                var thisTooltipType = thisElement.attr('data-tooltip-type') != undefined ? thisElement.attr('data-tooltip-type') : '';
+                var thisTooltipAlign = $thisElement.attr('data-tooltip-align') != undefined ? $thisElement.attr('data-tooltip-align') : 'left';
+                var thisTooltipType = $thisElement.attr('data-tooltip-type') != undefined ? $thisElement.attr('data-tooltip-type') : '';
                 if (!thisTooltipType.length){
                     for (i in thisClassList){
                         var tempClass = thisClassList[i] != undefined ? thisClassList[i].toString() : '';
@@ -211,41 +225,50 @@ $(document).ready(function(){
                     }
                 //console.log('thisTitle : '+thisTitle);
                 //console.log('append and trigger animation at '+thisTime);
-                thisElement.attr('data-backup-title', thisTitle).removeAttr('title');
-                if (!$('.tooltip', mmrpgBody).length){ $('<p class="tooltip '+thisTooltipType+'"></p>').html('<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>').appendTo(mmrpgBody).fadeIn('fast'); }
-                else { $('.tooltip', mmrpgBody).removeClass().addClass('tooltip').addClass(thisTooltipType).html('<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>').fadeIn('fast'); }
-                //$('.tooltip', mmrpgBody).css({width:''});
-                //var toolwidth = $('.tooltip', mmrpgBody).outerWidth();
-                //$('.tooltip', mmrpgBody).css({width:toolwidth+'px'});
-                alignTooltipFunction.call(this, e);
+                $thisElement.attr('data-backup-title', thisTitle).removeAttr('title');
+                let messageMarkup = '<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>';
+                if (!$tooltip.length){
+                    $('<p id="mmrpg-tooltip" class="tooltip '+thisTooltipType+'">' + messageMarkup + '</p>').appendTo(mmrpgBody);
+                    $tooltip = $('#mmrpg-tooltip', mmrpgBody);
+                    } else {
+                    $tooltip.removeClass().addClass('tooltip '+thisTooltipType).empty().html(messageMarkup);
+                    }
+                $tooltip.addClass('active').fadeIn('fast');
+                // collect the position of the button that spawned the tooltip in the first place
+                let spawnPosition = $thisElement.offset();
+                //console.log('spawnPosition =', spawnPosition);
+                alignTooltipFunction.call(this, event);
                 tooltipShowing = true;
                 if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
                     top.mmrpg_play_sound_effect('tooltip-text');
                     }
                 };
 
-            // Define the function for positioning the tooltip
-            var alignTooltipFunction = function(e){
-                //console.log('alignTooltipFunction()');
-                //console.log('gameSettings.currentBodyWidth =', gameSettings.currentBodyWidth);
-                //console.log('gameSettings.currentBodyHeight =', gameSettings.currentBodyHeight);
-
-
-                var mouseX = e.pageX;
-                var mouseY = e.pageY;
-
-                $('.tooltip', mmrpgBody).css({left:0,top:0,right:'auto',bottom:'auto'});
-                var toolWidth = $('.tooltip', mmrpgBody).outerWidth() + 20;
-                var toolHeight = $('.tooltip', mmrpgBody).outerHeight() + 10;
-
-                var invertX = mouseX >= (gameSettings.currentBodyWidth / 2) ? true : false;
-                var invertY = mouseY >= (gameSettings.currentBodyHeight / 2) ? true : false;
-
-                var newPosX = mouseX + (invertX ? ((toolWidth + 5) * -1) : 5);
-                var newPosY = mouseY + (invertY ? ((toolHeight + 5) * -1) : 5);
-
-                $('.tooltip', mmrpgBody).css({left:newPosX,top:newPosY});
-
+            // Define the function for positioning the tooltip (v2)
+            let alignTooltipFunction = function(event){
+                //console.log('alignTooltipFunction() w/ event:', event);
+                let $tooltip = $('#mmrpg-tooltip', mmrpgBody);
+                let targetX, targetY;
+                if (typeof event.pageX !== 'undefined'
+                    && typeof event.pageY !== 'undefined'){
+                    //console.log('aligning to mouse position');
+                    targetX = event.pageX;
+                    targetY = event.pageY;
+                    } else if (typeof $lastTooltipElement !== 'undefined'
+                    && $lastTooltipElement.length){
+                    //console.log('aligning to last element position', $lastTooltipElement);
+                    let targetOffset = $lastTooltipElement.offset();
+                    targetX = targetOffset.left + ($lastTooltipElement.outerWidth() / 2);
+                    targetY = targetOffset.top + ($lastTooltipElement.outerHeight() / 2);
+                    //let $target = $lastTooltipElement;
+                    //targetX = $target.offsetLeft + ($target.offsetWidth / 2);
+                    //targetY = $target.offsetTop + ($target.offsetHeight / 2);
+                    } else {
+                    //console.log('aligning to center of screen');
+                    targetX = Math.floor(gameSettings.currentBodyWidth / 2);
+                    targetY = Math.floor(gameSettings.currentBodyHeight / 2);
+                    }
+                return mmrpg_align_element_to_target($tooltip, targetX, targetY);
                 };
 
             // If we're on the main website, we can use the standard hover events
@@ -254,21 +277,21 @@ $(document).ready(function(){
 
                 // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
                 var tooltipSelector = '*[title],*[data-backup-title]:not([data-click-tooltip]),*[data-tooltip]';
-                $(tooltipSelector, mmrpgBody).live('mouseenter', function(e){
-                    e.preventDefault();
+                $(tooltipSelector, mmrpgBody).live('mouseenter', function(event){
+                    event.preventDefault();
                     if (tooltipTimeout == false){
-                        var thisObject = this;
-                        tooltipInitiator = thisObject;
+                        var element = this;
+                        tooltipInitiator = element;
                         requestAnimationFrame(function(){
                             tooltipTimeout = setTimeout(function(){
                                 tooltipShowing = true;
-                                showTooltipFunction.call(thisObject, e);
+                                showTooltipFunction(element, event);
                                 }, tooltipDelay);
                             });
-                        var thisElement = $(this);
-                        if (thisElement.attr('title')){
-                            thisElement.attr('data-backup-title', thisElement.attr('title'));
-                            thisElement.removeAttr('title');
+                        var $thisElement = $(this);
+                        if ($thisElement.attr('title')){
+                            $thisElement.attr('data-backup-title', $thisElement.attr('title'));
+                            $thisElement.removeAttr('title');
                             }
                         }
                     });
@@ -279,29 +302,24 @@ $(document).ready(function(){
                 //console.log('we are in the game somewhere');
 
                 // Define the live CLICK events for any elements with a click-title tag (which should be a few)
-                var tooltipSelector = '*[data-click-tooltip]';
-                $(tooltipSelector, mmrpgBody).live('click', function(e){
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (tooltipShowing){
-                        $('.tooltip', mmrpgBody).empty();
-                        clearTimeout(tooltipTimeout);
-                        tooltipTimeout = false;
-                        tooltipShowing = false;
-                        } else {
-                        if (tooltipTimeout == false){
-                            var thisObject = this;
-                            tooltipInitiator = thisObject;
-                            requestAnimationFrame(function(){
-                                tooltipShowing = true;
-                                showTooltipFunction.call(thisObject, e);
-                                if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
-                                    top.mmrpg_play_sound_effect('tooltip-open');
-                                    }
-                                });
+                let tooltipSelector = '*[data-click-tooltip]';
+                $(tooltipSelector, mmrpgBody).live('click', function(event){
+                    //console.log('tooltip click event!');
+                    event.preventDefault();
+                    event.stopPropagation();
+                    var element = this;
+                    requestAnimationFrame(function(){
+                        showTooltipFunction(element, event);
+                        if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+                            top.mmrpg_play_sound_effect('tooltip-open');
                             }
-                        }
+                        });
                     });
+
+                // If any extra input is detected, dismiss the tooltip immediately
+                //document.addEventListener('keydown', hideTooltip);
+                //document.addEventListener('mousewheel', hideTooltip);
+                //document.addEventListener('gamepadinput', hideTooltip);
 
             }
 
@@ -314,7 +332,7 @@ $(document).ready(function(){
             // Define the live MOUSELEAVE events for any elements with a title tag (which should be many)
             $(tooltipSelector, mmrpgBody).live('mouseleave', function(e){
                 e.preventDefault();
-                $('.tooltip', mmrpgBody).empty();
+                $('#mmrpg-tooltip', mmrpgBody).empty();
                 clearTimeout(tooltipTimeout);
                 tooltipTimeout = false;
                 tooltipShowing = false;
@@ -323,7 +341,7 @@ $(document).ready(function(){
             // If the user clicks somewhere in the body, immediately remove the tooltip
             $('*', mmrpgBody).click(function(e){
                 if (e.target === tooltipInitiator){ return; }
-                $('.tooltip', mmrpgBody).empty();
+                $('#mmrpg-tooltip', mmrpgBody).empty();
                 clearTimeout(tooltipTimeout);
                 tooltipTimeout = false;
                 tooltipShowing = false;
@@ -2670,7 +2688,7 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
 
 // Define a function for adjusting the speed of the currently playing music track
 function mmrpg_music_speed(newSpeed, fadeMusic){
-    console.log('mmrpg_music_speed(newSpeed:', newSpeed, ', fadeMusic:', fadeMusic, ')');
+    //console.log('mmrpg_music_speed(newSpeed:', newSpeed, ', fadeMusic:', fadeMusic, ')');
     if (typeof newSpeed !== 'number' || newSpeed < 0.1){ newSpeed = 1; }
     if (typeof fadeMusic !== 'boolean'){ fadeMusic = true; }
     gameSettings.musicTrackSpeed = newSpeed;
@@ -3291,6 +3309,53 @@ function mmrpg_keep_session_alive(sessionUserID){
 
 }
 
+// Define a function that takes a given element and aligns it to a specific target X,Y
+// while knowing the bounds of the window and making sure the tooltip
+// is always fully visible.  This means making it center-bottom aligned
+// to the target position by default, but adjusting in the following:
+// -  when too far left to show entire tooltip, make left-aligned
+// -  when too far right to show entire tooltip, make right-aligned
+// -  when too far down to show entire tooltip, make bottom-aligned
+// -  when too far up to show entire tooltip, make top-aligned
+function mmrpg_align_element_to_target($element, targetX, targetY){
+    //console.log('mmrpg_align_element_to_target() w/ targetX =', targetX, ' & targetY =', targetY);
+    let $mmrpgBody = $('#mmrpg');
+    if (!$element.length){ console.error('no element found!'); return false; }
+    else if (!$element.is(':visible')){ console.error('element not visible!'); return false; }
+    let elementWidth = $element.outerWidth();
+    let elementHeight = $element.outerHeight();
+    let currentBodyWidth = gameSettings.currentBodyWidth;
+    let currentBodyHeight = gameSettings.currentBodyHeight;
+    //console.log('-> elementWidth:', elementWidth, '\n', '-> elementHeight:', elementHeight, '\n', '-> currentBodyWidth:', currentBodyWidth, '\n', '-> currentBodyHeight:', currentBodyHeight);
+    let newPosX = targetX - (elementWidth / 2);
+    let newPosY = targetY - elementHeight - 10;
+    let newPosRight = 'auto';
+    let newPosBottom = 'auto';
+    let newPosLeft = newPosX;
+    let newPosTop = newPosY;
+    // If the new X position is too far left, make it left-aligned
+    if (newPosX < 10){
+        newPosLeft = targetX + 10;
+        }
+    // If the new X position is too far right, make it right-aligned
+    else if ((newPosX + elementWidth) > (currentBodyWidth - 10)){
+        newPosLeft = 'auto';
+        newPosRight = currentBodyWidth - targetX + 10;
+        }
+    // If the new Y position is too far up, make it top-aligned
+    if (newPosY < 10){
+        newPosTop = targetY + 10;
+        newPosBottom = 'auto';
+        }
+    // If the new Y position is too far down, make it bottom-aligned
+    else if ((newPosY + elementHeight) > (currentBodyHeight - 10)){
+        newPosTop = 'auto';
+        newPosBottom = currentBodyHeight - targetY + 10;
+        }
+    $element.css({left:newPosLeft, top:newPosTop, right:newPosRight, bottom:newPosBottom});
+    return true;
+}
+
 // Define a reusable object for watching user input and storing it button abstractions we can work with elsewhere
 class mmrpgUserInputWatcher {
     constructor(){
@@ -3395,7 +3460,7 @@ class mmrpgUserInputWatcher {
                 delete activeInputs[inputKey];
                 busyScrolling = false;
                 }, wheelTimeout);
-            });
+            }, { passive: false });
 
         // Beind events to any connected gamepads to allow for the same
         // functionality as the keyboard arrow keys (mirror for easier coding)
