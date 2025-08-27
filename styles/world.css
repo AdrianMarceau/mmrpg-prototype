@@ -1606,7 +1606,8 @@ html, body {
     color: #e0e0e0;
     transition: transform 0.6s, opacity 0.3s, color 0.6s;
 }
-#world #canvas #robots-overview .team-rotate:hover {
+#world #canvas #robots-overview .team-rotate:hover,
+#world #canvas #robots-overview .team-rotate.clicked {
     transform: scale(1.2) rotate(180deg);
 }
 #world #canvas #robots-overview.expanded .team-rotate {

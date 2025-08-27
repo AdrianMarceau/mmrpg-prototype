@@ -1835,6 +1835,20 @@ class mmrpgWorldMap {
                 }
             // Otherwise if the world map is NOT hidden, so the arrow keys must be controlling the player
             if (!worldMapIsHidden){
+                // If the player has pressed the select button, try to click the team-rotate button if exists/not-disabled
+                if (activeInputs.Select){
+                    //console.log('%c' + 'Select key pressed!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    let $rotateButton = $('.team-rotate', $robotsOverview);
+                    if ($rotateButton.length
+                        && $rotateButton.is(':visible')
+                        && !$rotateButton.is('.disabled')){
+                        $rotateButton.addClass('clicked');
+                        $rotateButton.trigger('click');
+                        setTimeout(function(){ $rotateButton.removeClass('clicked'); }, 200);
+                        return true;
+                        }
+                    }
                 // If the player has pressed either of the triggers (or scrolled) we should zoom/unzoom the map
                 if (activeInputs.L2 || activeInputs.R2){
                     //console.log('%c' + 'Trigger key pressed!', 'color: orange;');
@@ -1850,6 +1864,7 @@ class mmrpgWorldMap {
                             _self.playSoundEffect('spawn-sound');
                             ignoreInputFor(1000);
                             }
+                        return true;
                         } else {
                         //console.log('%c' + (activeInputs.L2 ? 'L2' : 'R2') + ' held, zooming ' + (activeInputs.L2 ? 'out' : 'in') + '!', 'color: orange;');
                         // otherwise we use L1 to zoom out and R1 to zoom in
@@ -1864,6 +1879,7 @@ class mmrpgWorldMap {
                             _self.playSoundEffect('spawn-sound');
                             ignoreInputFor(1000);
                             }
+                        return true;
                         }
                     }
                 // If the player has pressed any of the arrow keys, let's update the position accordingly
