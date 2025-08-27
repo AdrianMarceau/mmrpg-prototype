@@ -1797,6 +1797,27 @@ class mmrpgWorldMap {
             // Collect references and checks on certain key elements
             let worldMapIsHidden = _self.worldMapIsHidden();
             let sideButtonsActive = $sideButtons.is('.active') ? true : false;
+            let robotStorageIsActive = $robotsOverview.is('.expanded') ? true : false;
+            // If the robot storage area is currently open, process those actions too
+            if (robotStorageIsActive){
+                // If the player has pressed the start button again, attempt to close the storage area via the same button
+                // (allow dismissing with the B button as well for convenience)
+                if (activeInputs.Start || activeInputs.B){
+                    //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    let $switchButton = $('.team-switch', $robotsOverview);
+                    if ($switchButton.length
+                        && $switchButton.is(':visible')
+                        && !$switchButton.is('.disabled')){
+                        $switchButton.addClass('clicked');
+                        $switchButton.trigger('click');
+                        setTimeout(function(){ $switchButton.removeClass('clicked'); }, 600);
+                        ignoreInputFor(1200);
+                        return true;
+                        }
+                    }
+                return;
+                }
             // If the side buttons panel is currently open, process those actions too
             if (sideButtonsActive){
                 // If the player has pressed the space or enter keys, let's confirm the side-button action if it's open
@@ -1845,7 +1866,23 @@ class mmrpgWorldMap {
                         && !$rotateButton.is('.disabled')){
                         $rotateButton.addClass('clicked');
                         $rotateButton.trigger('click');
-                        setTimeout(function(){ $rotateButton.removeClass('clicked'); }, 200);
+                        setTimeout(function(){ $rotateButton.removeClass('clicked'); }, 300);
+                        ignoreInputFor(900);
+                        return true;
+                        }
+                    }
+                // If the player has pressed the start button, try to click the team-switch button if exists/not-disabled
+                if (activeInputs.Start){
+                    //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    let $switchButton = $('.team-switch', $robotsOverview);
+                    if ($switchButton.length
+                        && $switchButton.is(':visible')
+                        && !$switchButton.is('.disabled')){
+                        $switchButton.addClass('clicked');
+                        $switchButton.trigger('click');
+                        setTimeout(function(){ $switchButton.removeClass('clicked'); }, 200);
+                        ignoreInputFor(1200);
                         return true;
                         }
                     }
