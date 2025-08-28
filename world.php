@@ -409,6 +409,15 @@ if (empty($world_map_encounters) || $reset_encounters === true){
     rpg_world::update_session('world_encounters', $world_map_token, $world_map_encounters);
 }
 
+// If the pickups for this map have not been generated yet, we can do so now
+$reset_pickups = !empty($_GET['reset']) && $_GET['reset'] === 'pickups' ? true : false;
+$world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
+$world_map_pickups = !empty($world_pickups[$world_map_token]) ? $world_pickups[$world_map_token] : array();
+if (empty($world_map_pickups) || $reset_pickups === true){
+    $world_map_pickups = rpg_world::generate_worldmap_pickups($this_prototype_data, $map_data_parsed);
+    rpg_world::update_session('world_pickups', $world_map_token, $world_map_pickups);
+}
+
 // If there are any portals define, check to see if any are being covered by battles or obstacles
 if (!empty($map_data_parsed['portals'])){
     //error_log('[portal-check] checking for world map portals on map "'.$world_map_token.'"');
