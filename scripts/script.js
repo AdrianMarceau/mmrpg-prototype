@@ -3036,8 +3036,8 @@ function windowEventDisplay(){
         $eventContainerParent.append($eventContainer);
 
         // Define a click event for the event window continue button
-        var eventContinue = $('#buttons .event_continue', $eventContainer);
-        eventContinue.bind('click', function(e){
+        var $eventContinue = $('#buttons .event_continue', $eventContainer);
+        $eventContinue.bind('click', function(e){
             e.preventDefault();
             //alert('clicked');
             if (typeof window.top.mmrpg_play_sound_effect !== 'undefined'){
@@ -3052,14 +3052,38 @@ function windowEventDisplay(){
                 }
             });
 
-        // Bind the keyboard's spacebar and enter key to the "continue" button while it exists
-        $(document).bind('keydown', function(e){
-            // capture the key pressed and compare it to the code for enter/return and spacebar to see if it matches either
-            var key = e.which || e.keyCode;
-            if (key == 13 || key == 32){
-                eventContinue.trigger('click');
+        // Start the user input watcher and collect reference to active inputs
+        let userInputWatcher = new mmrpgUserInputWatcher();
+        //console.log('-> userInputWatcher:', userInputWatcher);
+        let activeInputs = userInputWatcher.activeInputs;
+        //console.log('-> activeInputs:', activeInputs);
+
+        // Define a function to run each time user inputs are updated so we can react
+        let listenForInput = true;
+        let eventsAreVisible = function(){ return $('#events').is(':visible:not(.hidden)') ? true : false; };
+        let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 250; listenForInput = false; setTimeout(function(){ listenForInput = true; }, delay); };
+        let checkUserInputs = function(event){
+            //console.log('%c' + 'checkUserInputs() - Events keydown event!', 'color: cyan;');
+            if (!listenForInput){ return false; }
+            if (!eventsAreVisible()){ return false; }
+            if (!Object.keys(activeInputs).length){ return false; } // nothing pressed, ignore
+            //console.log('-> activeInputs:', activeInputs);
+            ignoreInputFor();
+            // Collect refs to important elements
+            let $eventContainer = $('#events');
+            //console.log('-> $eventContainer:', $eventContainer);
+            // If there's an event showing, then pressing the Start, A, or B will all dismiss to next
+            if (activeInputs.Start || activeInputs.A || activeInputs.B){
+                //console.log('%c' + 'Start/A/B button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                $eventContinue.trigger('click');
+                ignoreInputFor(1000);
+                return;
                 }
-            });
+            };
+        document.addEventListener('keydown', checkUserInputs);
+        document.addEventListener('mousewheel', checkUserInputs);
+        document.addEventListener('gamepadinput', checkUserInputs);
 
         }
 
