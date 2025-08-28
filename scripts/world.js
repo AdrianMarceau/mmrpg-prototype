@@ -1269,6 +1269,7 @@ class mmrpgWorldMap {
         //console.log('%c' + 'mmrpgWorldMap.bindEventsToWorld($thisWorld:' + typeof $thisWorld + ')', 'color: magenta;');
         if (!$thisWorld || !$thisWorld.length){ console.error('bindEventsToWorld() missing required $thisWorld!'); return false; }
         let _self = this;
+        let _selfRef = _self.bindEventsToWorld;
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
@@ -1807,7 +1808,24 @@ class mmrpgWorldMap {
             // Collect references and checks on certain key elements
             let worldMapIsHidden = _self.worldMapIsHidden();
             let sideButtonsActive = $sideButtons.is('.active') ? true : false;
+            let playerSwitcherFocused = $playerSwitcher.is('.focused') ? true : false;
             let robotStorageIsActive = $robotsOverview.is('.expanded') ? true : false;
+            // If the player switcher is currently focused, we should listen for a confirmation button
+            if (playerSwitcherFocused){
+                // If the player has pressed the A button, we can simple click whichever team-player is currently "hovered"
+                if (activeInputs.A){
+                    //console.log('%c' + 'Confirm player switch!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    let $hoveredPlayer = $('.team-player.hovered', $playerSwitcher).first();
+                    if (!$hoveredPlayer || !$hoveredPlayer.length){ return false; }
+                    //console.log('Triggering click on hovered player:', $hoveredPlayer);
+                    $hoveredPlayer.trigger('click');
+                    $playerSwitcher.removeClass('focused');
+                    $('.team-player', $playerSwitcher).removeClass('hovered');
+                    ignoreInputFor(1200);
+                    return true;
+                    }
+                }
             // If the robot storage area is currently open, process those actions too
             if (robotStorageIsActive){
                 // Collect references to key elements within the robots overview
@@ -2003,7 +2021,45 @@ class mmrpgWorldMap {
                         return true;
                         }
                     }
-                // If the player has pressed either of the triggers (or scrolled) we should zoom/unzoom the map
+                // If the player has pressed either of the bumpers we should let them scroll within the player-switcher
+                if (activeInputs.L1 || activeInputs.R1){
+                    //console.log('%c' + 'Bumper key pressed!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    let $playerButtons = $('.team-player[data-player]', $playerSwitcher);
+                    let $hoveredPlayer = $playerButtons.filter('.hovered').first();
+                    let $activePlayer = $playerButtons.filter('.active').first();
+                    let $nextPlayer = false;
+                    $playerSwitcher.addClass('focused');
+                    if (activeInputs.L1){
+                        if ($hoveredPlayer && $hoveredPlayer.length){
+                            $nextPlayer = $hoveredPlayer.prevAll('.team-player').first();
+                            }
+                        if (!$nextPlayer || !$nextPlayer.length){
+                            $nextPlayer = $playerButtons.last();
+                            }
+                        }
+                    else if (activeInputs.R1){
+                        if ($hoveredPlayer && $hoveredPlayer.length){
+                            $nextPlayer = $hoveredPlayer.nextAll('.team-player').first();
+                            }
+                        if (!$nextPlayer || !$nextPlayer.length){
+                            $nextPlayer = $playerButtons.first();
+                            }
+                        }
+                    if ($nextPlayer && $nextPlayer.length){
+                        $playerButtons.removeClass('hovered');
+                        $nextPlayer.addClass('hovered');
+                        }
+                    let focusTimeout = _selfRef._playerSwitcherTimeout;
+                    if (focusTimeout){ clearTimeout(focusTimeout); }
+                    focusTimeout = setTimeout(function(){
+                        $playerSwitcher.removeClass('focused');
+                        $playerButtons.removeClass('hovered');
+                        }, 2000);
+                    _selfRef._playerSwitcherTimeout = focusTimeout;
+                    return true;
+                    }
+                // If the player has pressed either of the triggers we should zoom/unzoom the map
                 if (activeInputs.L2 || activeInputs.R2){
                     //console.log('%c' + 'Trigger key pressed!', 'color: orange;');
                     //console.log('-> activeInputs: ', Object.keys(activeInputs).length ? activeInputs : 'none');
@@ -3347,6 +3403,7 @@ class mmrpgWorldMap {
                     let abilityClaims = _world.abilities;
                     let abilityName = $button.attr('data-ability') || false;
                     let abilityInfo = abilityName && (abilitiesIndex && abilitiesIndex[abilityName]) ? abilitiesIndex[abilityName] : false;
+                    let abilityPosition = abilityInfo ? abilityInfo.pos : false;
                     let $eventSprite = $(firstEvent.sprite);
                     let $innerSprite = $eventSprite ? $('.sprite', $eventSprite) : false;
                     //console.log('-> abilityName =', abilityName);

@@ -1238,6 +1238,9 @@ html, body {
     padding: 4px 9px 3px;
     border-radius: 0 0 6px 6px;
 }
+#world #canvas #player-switcher.focused {
+    outline: 1px solid white;
+}
 #world #canvas #player-switcher .team-player {
     display: inline-block;
     position: relative;
@@ -1280,21 +1283,29 @@ html, body {
     margin-right: 0;
 }
 #world #canvas #player-switcher .team-player.active,
-#world #canvas #player-switcher .team-player:hover {
+#world #canvas #player-switcher .team-player:hover,
+#world #canvas #player-switcher .team-player.hovered {
     border-right: 2px solid black !important;
     border-bottom: 2px solid black !important;
+}
+#world #canvas #player-switcher .team-player:hover,
+#world #canvas #player-switcher .team-player.hovered {
+    outline: 1px solid #ffffff !important;
 }
 #world #canvas #player-switcher .team-player.active {
     outline: 1px solid #969696;
     cursor: default;
 }
-#world #canvas #player-switcher .team-player:not(.active):not(:hover) {
+#world #canvas #player-switcher .team-player:not(.active):not(:hover):not(.hovered) {
     background-color: rgba(0, 0, 0, 0.3) !important;
     border-top: 1px solid black !important;
     border-left: 1px solid black !important;
 }
-#world #canvas #player-switcher .team-player:not(.active):not(:hover):before {
+#world #canvas #player-switcher .team-player:not(.active):not(:hover):not(.hovered):before {
     opacity: 0.0;
+}
+#world #canvas #player-switcher.focused .team-player:not(.hovered) {
+    filter: brightness(0.6) saturate(0.6);
 }
 #world #canvas #player-switcher .team-player .sprite {
     display: block;
