@@ -2136,12 +2136,15 @@ class rpg_world {
                 if (empty($item_data[1]) || !is_string($item_data[1])){ continue; } // skip if no token
                 $claimed = !empty($world_map_items[$item_namekey]) ? $world_map_items[$item_namekey] : 0; // unix-timestamp
                 //error_log('-> '.$item_namekey.' already claimed, skipping...');
-                if ($claimed){ continue; } // skip if already claimed
                 $kind = 'item';
                 $hidden = in_array('hidden', $item_data) ? true : false; if ($hidden){ unset($item_data[array_search('hidden', $item_data)]); }
                 $locked = in_array('locked', $item_data) ? true : false; if ($locked){ unset($item_data[array_search('locked', $item_data)]); }
                 $anchored = in_array('anchored', $item_data) ? true : false; if ($anchored){ unset($item_data[array_search('anchored', $item_data)]); }
                 $data = array_values($item_data); // remaining values if any
+                if ($claimed && !$anchored){
+                    //error_log('-> '.$item_namekey.' already claimed and not anchored, skipping...');
+                    continue;
+                    } // skip if already claimed but not anchored
                 $pos = $item_data[0]; unset($item_data[0]);
                 $token = !empty($item_data[1]) ? $item_data[1] : ''; unset($item_data[1]);
                 $quantity = !empty($item_data[2]) ? $item_data[2] : ''; unset($item_data[2]);
@@ -2165,7 +2168,10 @@ class rpg_world {
                 //error_log('-> $num_in_set = '.print_r($num_in_set, true));
                 //error_log('-> $set_token = '.print_r($set_token, true));
                 //error_log('-> $unlock_token = '.print_r($unlock_token, true));
-                if (!isset($mmrpg_index_items[$token])){ continue; } // skip if not valid item
+                if (!isset($mmrpg_index_items[$token])){
+                    //error_log('-> '.$item_namekey.' has invalid token "'.$token.'", skipping...');
+                    continue;
+                    } // skip if not valid item
                 $info = $mmrpg_index_items[$token];
                 $subclass = !empty($info['item_subclass']) ? $info['item_subclass'] : '';
                 $subtypes = array((!empty($info['item_type']) ? $info['item_type'] : ''), (!empty($info['item_type2']) ? $info['item_type2'] : ''));
@@ -2175,8 +2181,14 @@ class rpg_world {
                 //error_log('-> $subclass = '.print_r($subclass, true));
                 //error_log('-> $is_unique = '.print_r($is_unique, true));
                 //error_log('-> $is_already_owned = '.print_r($is_already_owned, true));
-                if ($is_unique && $is_already_owned){ continue; } // skip if unique and already owned
-                elseif ($is_unique){ $quantity = 1; $repeat = 'once'; } // else set quantity to 1 and repeat to once
+                if ($is_unique && $is_already_owned && !$anchored){
+                    //error_log('-> '.$item_namekey.' is unique and already owned, skipping...');
+                    continue;
+                    } // skip if unique and already owned
+                elseif ($is_unique){
+                    $quantity = 1;
+                    $repeat = 'once';
+                    } // else set quantity to 1 and repeat to once
                 //error_log('-> generating item "'.$item_namekey.'" with pos "'.$pos.'"'.PHP_EOL.'-> $token = "'.$token.'"'.PHP_EOL.'-> $quantity = "'.$quantity.'"'.PHP_EOL.'-> $info = '.print_r($info, true));
                 $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
@@ -2184,7 +2196,7 @@ class rpg_world {
                 $label = $info['item_name'];
                 $class = $token.(!$hidden  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 if ($subclass === 'event'){ $class .= ' always-zoom'; }
-                elseif (strstr($token, '-core')){ $class .= ' always-zoom'; }
+                elseif (strstr($token, '-core') && $anchored){ $class .= ' always-zoom'; }
                 $colour = !empty($subtypes) ? implode(' ', array_filter($subtypes)) : '';
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
                 $attrs = 'data-item="'.$item_namekey.'" data-colour="'.$colour.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$item_namekey.'"
@@ -2252,6 +2264,7 @@ class rpg_world {
                 $kind = 'ability';
                 $hidden = in_array('hidden', $ability_data) ? true : false; if ($hidden){ unset($ability_data[array_search('hidden', $ability_data)]); }
                 $locked = in_array('locked', $ability_data) ? true : false; if ($locked){ unset($ability_data[array_search('locked', $ability_data)]); }
+                $anchored = in_array('anchored', $ability_data) ? true : false; if ($anchored){ unset($ability_data[array_search('anchored', $ability_data)]); }
                 $data = array_values($ability_data); // remaining values if any
                 $pos = $ability_data[0]; unset($ability_data[0]);
                 $token = !empty($ability_data[1]) ? $ability_data[1] : ''; unset($ability_data[1]);
@@ -2262,7 +2275,7 @@ class rpg_world {
                 //error_log('-> $claimed = '.print_r($claimed, true));
                 if (empty($pos) || !is_string($pos) || !preg_match('/^\d+-\d+$/', $pos)){ continue; } // skip if no position
                 if (empty($token) || !is_string($token) || !isset($mmrpg_index_abilities[$token])){ continue; } // skip if no token
-                if ($claimed){ continue; } // skip if already claimed
+                if ($claimed && !$anchored){ continue; } // skip if already claimed but not anchored
                 if (!empty($world_map_ability_symbols[$ability_namekey])){ $pos = $world_map_ability_symbols[$ability_namekey]; }
                 list($col, $row) = explode('-', $pos);
                 $info = $mmrpg_index_abilities[$token];
@@ -2271,7 +2284,7 @@ class rpg_world {
                 //error_log('-> $info = '.print_r(json_encode($info), true));
                 $is_already_owned = in_array($token, $this_player_abilities) ? true : false;
                 //error_log('-> $is_already_owned = '.print_r($is_already_owned, true));
-                if ($is_already_owned){ continue; } // skip if already owned
+                if ($is_already_owned && !$anchored){ continue; } // skip if already owned
                 //if ($is_already_owned){ error_log('should-skip-owned-abilities'); } // skip if already owned
                 // Otherwise we can actually show this ability on the map
                 //error_log('processing ability "'.$ability_namekey.'" with pos "'.$pos.'"'.PHP_EOL.'-> $token = "'.$token.'"'.PHP_EOL.'-> $info = '.print_r($info, true));

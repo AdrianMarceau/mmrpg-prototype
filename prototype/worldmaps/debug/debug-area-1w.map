@@ -19,12 +19,11 @@
 #---------------------------#
 @events[]    = wily-platform-left(5-2, wilypad-left, any, drop-zone, item:wily-program, activate-player-platform)
 @events[]    = wily-platform-middle(6-2, wilypad-middle, any, drop-zone, item:wily-heart, activate-player-platform)
-@events[]    = wily-platform-right(7-2, wilypad-right, any, drop-zone, item:wily-core, activate-player-platform)
+@events[]    = wily-platform-right(7-2, wilypad-right, any, drop-zone, item:copy-core, activate-player-platform)
 #---------------------------#
-@items[]     = wily-program-pickup(14-10, wily-program)
-@items[]     = wily-heart-2(6-3, wily-heart__2)
-@items[]     = copy-core-pickup-1(2-7, copy-core, x1, once)
-@items[]     = copy-core-pickup-2(19-7, copy-core, x1, once)
+@items[]     = wily-init-program(14-10, wily-program, anchored)
+@items[]     = wily-init-heart(6-3, wily-heart__2, anchored)
+@items[]     = wily-init-core(11-4, copy-core, anchored)
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[21],[21],[21],[21],[21],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
