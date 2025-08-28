@@ -27,7 +27,7 @@
 #---------------------------#
 @bosses[]    = savage-boss(6-4, slash-man)
 @bosses[]    = treetop-boss(15-4, tengu-man)
-@bosses[]    = garden-boss(18-20, wood-man)
+@bosses[]    = garden-boss(17-20, wood-man)
 @bosses[]    = serpent-boss(5-15, snake-man)
 #---------------------------#
 @buttons[]   = waterway-button(3-21, green, up, set-group-terrain, waterway-path, grass)
@@ -36,6 +36,11 @@
 @groups[]    = waterway-path-ends(4-21, 9-21)
 @groups[]    = around-waterway-button(2-21, 4-21, 3-20, 3-22, 2-20, 2-22, 4-20, 4-22)
 @groups[]    = no-encounters(around-waterway-button, waterway-path, waterway-path-ends)
+#---------------------------#
+@items[]     = wily-heart-3(17-19, wily-heart__3)
+@items[]     = wily-heart-4(6-17, wily-heart__4)
+@items[]     = wily-heart-5(5-4, wily-heart__5)
+@items[]     = wily-heart-6(16-4, wily-heart__6)
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]

@@ -51,7 +51,6 @@
 #---------------------------#
 ## PLAYER-PROGRAM ITEMS
 @items[]     = light-program-pickup(6-19, light-program)
-@items[]     = wily-program-pickup(4-22, wily-program)
 ## UNLOCKABLE-FEATURE CODES
 @items[]     = item-codes-pickup(2-16, item-codes)
 ## PLAYER-HERO-BOT CORES
@@ -80,17 +79,11 @@
 @items[]     = first-consumable-eti(4-12, energy-tank, x1, always)
 @items[]     = first-consumable-wti(8-12, weapon-tank, x1, always)
 ## LIGHT LIMIT-HEART ITEMS
-@items[]     = light-heart-2(12-8, light-heart__2)
-@items[]     = light-heart-3(12-9, light-heart__3)
-@items[]     = light-heart-4(12-10, light-heart__4)
-@items[]     = light-heart-5(12-11, light-heart__5)
-@items[]     = light-heart-6(12-12, light-heart__6)
-## WILY LIMIT-HEART ITEMS
-@items[]     = wily-heart-2(13-8, wily-heart__2)
-@items[]     = wily-heart-3(13-9, wily-heart__3)
-@items[]     = wily-heart-4(13-10, wily-heart__4)
-@items[]     = wily-heart-5(13-11, wily-heart__5)
-@items[]     = wily-heart-6(13-12, wily-heart__6)
+@items[]     = light-heart-2(13-8, light-heart__2)
+@items[]     = light-heart-3(13-9, light-heart__3)
+@items[]     = light-heart-4(13-10, light-heart__4)
+@items[]     = light-heart-5(13-11, light-heart__5)
+@items[]     = light-heart-6(13-12, light-heart__6)
 #---------------------------#
 @abilities[] = light-buster-pickup(4-2, light-buster)
 @abilities[] = wily-buster-pickup(3-2, wily-buster)
