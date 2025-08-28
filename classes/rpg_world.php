@@ -929,7 +929,7 @@ class rpg_world {
     }
 
     // Define a function for returning all the available cells on a given map that don't have anything on them yet
-    public static function get_available_cells($map_data, $check_existing = true){
+    public static function get_available_cells($map_data, $exclude_existing = array()){
         //error_log('rpg_world::get_available_cells() called!');
         // First we gather the map col and row size so we can generate all possible positions
         $map_col_size = isset($map_data['size'][0]) ? $map_data['size'][0] : self::$worldmap_mapsize;
@@ -1023,34 +1023,40 @@ class rpg_world {
             }
         }
         // If we're allowed to check existing, let's exclude any encounters or pickups already-spawned and using any of these
-        if ($check_existing){
+        if (!empty($exclude_existing)){
+            //error_log('-> checking existing encounters and pickups to exclude from available cells...');
+            $WORLD_SESSION = self::get_session();
             $world_token = $map_data['world'];
             $map_token = $map_data['token'];
             $world_map_token = $world_token.'__'.$map_token;
-            $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
-            $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array();
-            $world_encounter_cells = array();
-            if (!empty($world_map_encounters)){
-                foreach ($world_map_encounters AS $key => $encounter){
-                    list($kind, $token, $alt, $position, $battle, $label) = $encounter;
-                    if (!rpg_battle::has_index_info($battle)){ continue; }
-                    $world_encounter_cells[$position] = true;
+            if (in_array('encounters', $exclude_existing)){
+                $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
+                $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array();
+                $world_encounter_cells = array();
+                if (!empty($world_map_encounters)){
+                    foreach ($world_map_encounters AS $key => $encounter){
+                        list($kind, $token, $alt, $position, $namekey, $label) = $encounter;
+                        if (!rpg_battle::has_index_info($namekey)){ continue; }
+                        $world_encounter_cells[] = $position;
+                        }
                     }
-                }
-            $world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
-            $world_map_pickups = !empty($world_pickups[$world_map_token]) ? $world_pickups[$world_map_token] : array();
-            $world_pickup_cells = array();
-            if (!empty($world_map_pickups)){
-                foreach ($world_map_pickups AS $key => $pickup){
-                    list($kind, $token, $alt, $position, $label) = $pickup;
-                    $world_pickup_cells[$position] = true;
+                //error_log('-> $world_map_encounters('.count($world_map_encounters).') = '.print_r($world_map_encounters, true));
+                //error_log('-> $world_encounter_cells('.count($world_encounter_cells).') = '.print_r($world_encounter_cells, true));
+                foreach ($world_encounter_cells AS $position){ unset($available_cells[$position]); }
+            }
+            if (in_array('pickups', $exclude_existing)){
+                $world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
+                $world_map_pickups = !empty($world_pickups[$world_map_token]) ? $world_pickups[$world_map_token] : array();
+                $world_pickup_cells = array();
+                if (!empty($world_map_pickups)){
+                    foreach ($world_map_pickups AS $key => $pickup){
+                        list($kind, $token, $position, $namekey, $label) = $pickup;
+                        $world_pickup_cells[] = $position;
+                        }
                     }
-                }
-            // Now remove any cells that appear in either the encounter or pickup lists
-            $used_cells = array_keys($world_encounter_cells + $world_pickup_cells);
-            foreach ($used_cells AS $pos){
-                //error_log('-> removing already-used position "'.$pos.'" from available cells');
-                unset($available_cells[$pos]);
+                //error_log('-> $world_map_pickups('.count($world_map_pickups).') = '.print_r($world_map_pickups, true));
+                //error_log('-> $world_pickup_cells('.count($world_pickup_cells).') = '.print_r($world_pickup_cells, true));
+                foreach ($world_pickup_cells AS $position){ unset($available_cells[$position]); }
             }
         }
         // Then we through all the tiles and remove any that are unwalkable "void" type
@@ -1144,7 +1150,7 @@ class rpg_world {
 
         // Calculate the available encounter cells based on the map data and define a var to hold used encounter cells later
         $world_map_encounters = array();
-        $available_encounter_cells = self::get_available_cells($map_data_parsed);
+        $available_encounter_cells = self::get_available_cells($map_data_parsed, array('encounters'));
         $available_encounter_terrain = !empty($map_data_parsed['terrain']) ? $map_data_parsed['terrain'] : array();
         $used_encounter_cells = array();
 
@@ -1350,13 +1356,13 @@ class rpg_world {
 
         // Calculate the available pickup cells based on the map data and define a var to hold used pickup cells later
         $world_map_pickups = array();
-        $available_pickup_cells = self::get_available_cells($map_data_parsed);
+        $available_pickup_cells = self::get_available_cells($map_data_parsed, array('pickups'));
         $available_pickup_terrain = !empty($map_data_parsed['terrain']) ? $map_data_parsed['terrain'] : array();
         $used_pickup_cells = array();
 
         // RANDOM PICKUPS (within defined limits)
         $allowed_random_pickups = $map_pickups;
-        $max_random_pickups = ceil($available_pickup_cells['total'] * 0.20); // TODO: make this configurable in the map file
+        $max_random_pickups = ceil($available_pickup_cells['total'] * 0.10); // TODO: make this configurable in the map file
         //error_log('$allowed_random_pickups = '.print_r($allowed_random_pickups, true));
         //error_log('$available_pickup_terrain = '.print_r($available_pickup_terrain, true));
         //error_log('$available_pickup_cells = '.print_r($available_pickup_cells, true));
@@ -1386,7 +1392,9 @@ class rpg_world {
             if (!isset($generated_pickups[$item_token])){ $generated_pickups[$item_token] = 0; }
             //error_log(PHP_EOL.'-> next item = "'.$item_token.'"');
             //error_log('-> getting random position for item "'.$item_token.'"');
-            $available = $available_pickup_cells['all'];
+            $all_available = !empty($available_pickup_cells['all']) ? $available_pickup_cells['all'] : array();
+            $water_tiles = !empty($available_pickup_cells['by_terrain']['water']) ? $available_pickup_cells['by_terrain']['water'] : array();
+            $available = array_diff($all_available, $water_tiles);
             //error_log('$available = '.print_r($available, true));
             //error_log('$available(count) = '.count($available).' vs. $used_pickup_cells(count) = '.count($used_pickup_cells));
             $item_pos = self::get_rand_pos($available, $used_pickup_cells);
@@ -2239,6 +2247,7 @@ class rpg_world {
         $this_player_token = $this_prototype_data['this_player_token'];
         $this_player_items = $this_prototype_data['this_player_items_index'];
         $this_is_cursor = $this_player_token === 'player' ? true : false;
+        $non_hovering_items = array('small-screw', 'large-screw');
         $mmrpg_index_items = self::get_index('items');
         $world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
         $world_map_pickups = !empty($world_pickups[$world_map_token]) ? $world_pickups[$world_map_token] : array();
@@ -2334,11 +2343,12 @@ class rpg_world {
                     $repeat = 'once';
                     } // else set quantity to 1 and repeat to once
                 //error_log('-> generating item "'.$item_namekey.'" with pos "'.$pos.'"'.PHP_EOL.'-> $token = "'.$token.'"'.PHP_EOL.'-> $quantity = "'.$quantity.'"'.PHP_EOL.'-> $info = '.print_r($info, true));
+                $animated = !$hidden && !in_array($token, $non_hovering_items) ? true : false;
                 $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
                 $z_index = $top + 1;
                 $label = $info['item_name'];
-                $class = $token.(!$hidden  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $class = $token.($animated  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 if ($subclass === 'event'){ $class .= ' always-zoom'; }
                 elseif (strstr($token, '-core') && $anchored){ $class .= ' always-zoom'; }
                 $colour = !empty($subtypes) ? implode(' ', array_filter($subtypes)) : '';
