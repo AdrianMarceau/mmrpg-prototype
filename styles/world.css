@@ -692,6 +692,18 @@ html, body {
     height: 4px;
     bottom: 20px;
 }
+#world #map .layer.objects .sprite.item[data-token="small-screw"]:after {
+    left: 15px;
+    right: 15px;
+    height: 6px;
+    bottom: 14px;
+}
+#world #map .layer.objects .sprite.item[data-token="large-screw"]:after {
+    left: 11px;
+    right: 11px;
+    height: 7px;
+    bottom: 12px;
+}
 #world #map .layer.objects .sprite.item.animate:after {
     animation: world-sprite-item-shadow-hover 2s steps(4) infinite;
 }
@@ -704,6 +716,9 @@ html, body {
 #world #map .layer.objects .sprite.item[data-token$="-shard"] .wrap,
 #world #map .layer.objects .sprite.item[data-token$="-core"] .wrap {
     filter: saturate(1.5);
+}
+#world #map .layer.objects .sprite.item[data-token$="-screw"] > .wrap {
+    bottom: 0;
 }
 #world #map .layer.objects .sprite.item.tracking-cursor {
     filter: drop-shadow(0px 0px 3px orange) saturate(1.5);
