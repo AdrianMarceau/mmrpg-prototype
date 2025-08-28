@@ -9,8 +9,11 @@
 @portals[]  = spawn(4-1, hidden)
 @portals[]  = goto__debug-area-1s(4-1, 4-13, hidden)
 @portals[]  = goto__debug-area-1sw(1-8, 8-41, hidden)
+@portals[]  = goto__debug-area-1e2(20-2, 8-21, hidden)
 #---------------------------#
 @field    = rainy-sewers
+#---------------------------#
+@pickups      = weapon-pellet(10),weapon-capsule(5),defense-pellet(6),defense-capsule(3)
 #---------------------------#
 @encounters  = shelln(6),snapper(5),pelicanu(4),robo-fishtot(3),octone(2),bui-boi(1),manta-missile(1)
 #---------------------------#
@@ -31,7 +34,7 @@
 @bosses[]    = roaming-boss-2(3-11, splash-woman)
 @bosses[]    = roaming-boss-3(15-3, pirate-man)
 @bosses[]    = roaming-boss-4(15-8, dive-man)
-@bosses[]    = roaming-boss-5(20-2, aqua-man)
+@bosses[]    = roaming-boss-5(19-2, aqua-man)
 #---------------------------#
 @groups[]    = around-island-item(16-11...18-13)
 @groups[]    = no-encounters(around-island-item)

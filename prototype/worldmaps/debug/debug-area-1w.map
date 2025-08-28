@@ -12,6 +12,8 @@
 #---------------------------#
 @field    = maniacal-hideaway
 #---------------------------#
+@pickups      = attack-pellet(6),weapon-pellet(4),attack-capsule(2),small-screw(1)
+#---------------------------#
 @encounters   = drill-mole,molier,rockscotch
 #---------------------------#
 @bosses[]    = upper-boss(6-4, drill-man)
@@ -23,7 +25,7 @@
 #---------------------------#
 @items[]     = wily-init-program(14-10, wily-program, anchored)
 @items[]     = wily-init-heart(6-3, wily-heart__2, anchored)
-@items[]     = wily-init-core(11-4, copy-core, anchored)
+@items[]     = wily-init-core(11-7, copy-core, anchored)
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[21],[21],[21],[21],[21],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]

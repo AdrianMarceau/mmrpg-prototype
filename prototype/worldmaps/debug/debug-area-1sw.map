@@ -8,13 +8,15 @@
 #---------------------------#
 @portals[]  = spawn(8-12, hidden)
 @portals[]  = goto__debug-area-1w2(4-1, 5-25, hidden)
-@portals[]  = goto__debug-area-1s2(7-41, 1-8, hidden)
+@portals[]  = goto__debug-area-1s2(8-41, 1-8, hidden)
 #---------------------------#
 @field        = electrical-tower
 #---------------------------#
 @terrain[]   = plain(electrical-tower)
 @terrain[]   = ground(maniacal-hideaway)
 @terrain[]   = beach(oil-wells)
+#---------------------------#
+@pickups      = large-screw(10),small-screw(20),energy-tank(1),weapon-tank(1)
 #---------------------------#
 @encounters   = spine(10),elec-n(9),bulb-blaster(8),nitron-y(7),plasma-plus(6),electriri(5),beak(3),snapper(6)
 #---------------------------#

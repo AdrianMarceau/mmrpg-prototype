@@ -8,10 +8,13 @@
 #---------------------------#
 @portals[]  = spawn(14-22, hidden)
 @portals[]  = goto__debug-area-1w(14-22, 4-10)
+@portals[]  = goto__debug-area-1sw(5-25, 4-1, hidden)
 #---------------------------#
 @field      = preserved-forest
 #---------------------------#
-@encounters = batton(20),monking-r(10),eggalodon(5),petal-anne(20),petit-snakey(10),bombomboy(5),kabuton(5)
+@pickups      = attack-pellet(2),attack-capsule(1),defense-pellet(2),defense-capsule(1),speed-pellet(2),speed-capsule(1)
+#---------------------------#
+@encounters = batton(20),monking-r(10),eggalodon(5),petal-anne(20),petit-snakey(10),bombomboy(5),kabuton(5),merserker(5)
 #---------------------------#
 @terrain[]   = ground(preserved-forest)
 @terrain[]   = grass(gentle-countryside)
@@ -24,11 +27,17 @@
 @habitats[] = petit-snakey(grass)
 @habitats[] = bombomboy(grass)
 @habitats[] = kabuton(water)
+@habitats[] = merserker(void)
 #---------------------------#
 @bosses[]    = savage-boss(6-4, slash-man)
 @bosses[]    = treetop-boss(15-4, tengu-man)
 @bosses[]    = garden-boss(17-20, wood-man)
 @bosses[]    = serpent-boss(5-15, snake-man)
+@bosses[]    = blade-boss(19-7, blade-man)
+@bosses[]    = cutter-boss(11-7, cut-man)
+@bosses[]    = needle-boss(2-7, needle-man)
+@bosses[]    = burner-boss(14-13, burner-man)
+@bosses[]    = planty-boss(9-21, plant-man)
 #---------------------------#
 @buttons[]   = waterway-button(3-21, green, up, set-group-terrain, waterway-path, grass)
 #---------------------------#

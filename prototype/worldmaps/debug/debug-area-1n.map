@@ -12,7 +12,7 @@
 #---------------------------#
 @field        = wintry-forefront
 #---------------------------#
-@pickups      = speed-pellet(6),energy-pellet(4),speed-capsule(2)
+@pickups      = speed-pellet(6),energy-pellet(4),speed-capsule(2),small-screw(1)
 #---------------------------#
 @encounters   = curlinger,frosty-throwman,tel-tel
 #---------------------------#

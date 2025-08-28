@@ -12,6 +12,8 @@
 #---------------------------#
 @field    = waterfall-institute
 #---------------------------#
+@pickups      = weapon-pellet(5),energy-capsule(1)
+#---------------------------#
 @encounters  = snapper(5),octone(5),shelln(1)
 #---------------------------#
 @terrain[]   = beach(oil-wells)
