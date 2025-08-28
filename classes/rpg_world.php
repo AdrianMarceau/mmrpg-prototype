@@ -2140,6 +2140,7 @@ class rpg_world {
                 $kind = 'item';
                 $hidden = in_array('hidden', $item_data) ? true : false; if ($hidden){ unset($item_data[array_search('hidden', $item_data)]); }
                 $locked = in_array('locked', $item_data) ? true : false; if ($locked){ unset($item_data[array_search('locked', $item_data)]); }
+                $anchored = in_array('anchored', $item_data) ? true : false; if ($anchored){ unset($item_data[array_search('anchored', $item_data)]); }
                 $data = array_values($item_data); // remaining values if any
                 $pos = $item_data[0]; unset($item_data[0]);
                 $token = !empty($item_data[1]) ? $item_data[1] : ''; unset($item_data[1]);
@@ -2160,6 +2161,7 @@ class rpg_world {
                 //error_log('-> $repeat = '.print_r($repeat, true));
                 //error_log('-> $hidden = '.print_r($hidden, true));
                 //error_log('-> $locked = '.print_r($locked, true));
+                //error_log('-> $anchored = '.print_r($anchored, true));
                 //error_log('-> $num_in_set = '.print_r($num_in_set, true));
                 //error_log('-> $set_token = '.print_r($set_token, true));
                 //error_log('-> $unlock_token = '.print_r($unlock_token, true));
@@ -2201,6 +2203,7 @@ class rpg_world {
                     'label' => $label,
                     'hidden' => $hidden,
                     'locked' => $locked,
+                    'anchored' => $anchored,
                     'claimed' => $claimed,
                     'data' => $data,
                     );

@@ -2595,6 +2595,10 @@ class mmrpgWorldMap {
         let _mapSpriteSizeOffset = _config.mapSpriteSizeOffset;
         let _mapEventSymbols = _config.mapEventSymbols;
         let _mapEventsIndex = _config.mapEventsIndex;
+        let _mapItemSymbols = _config.mapItemSymbols;
+        let _mapItemsIndex = _config.mapItemsIndex;
+        let _mapAbilitySymbols = _config.mapAbilitySymbols;
+        let _mapAbilitiesIndex = _config.mapAbilitiesIndex;
         let _userId = _config.userId;
         let _playerId = _config.playerId;
         let _playerToken = _config.playerToken;
@@ -2915,7 +2919,10 @@ class mmrpgWorldMap {
         else if (firstEventType === 'item'){
             //console.log('-> event at position is an item, preparing either dropdown or pickup');
             // If the cursor is literally on a button, only one event sprite matters right now
+            let eventInfo = firstEvent;
+            let itemInfo = _mapItemsIndex[eventInfo.token];
             let $itemEvent = $(firstEvent.sprite);
+            //console.log('-> eventInfo =', eventInfo, '| itemInfo =', itemInfo, '| $itemEvent =', $itemEvent);
             let dataLabel = $itemEvent.attr('data-label');
             let dataItem = $itemEvent.attr('data-item');
             let dataItemToken = $itemEvent.attr('data-token');
@@ -2942,31 +2949,47 @@ class mmrpgWorldMap {
                         sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+' disabled" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
                         }
                     sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-                    showActionAreaType = 'button';
+                    showActionAreaType = 'item';
                     zoomTimeoutDuration = 750; // if we show a pick-up dropdown, we want to zoom in faster
                     }
                 // Otherwise if this is a human player, we should trigger the auto-pickup functionality instead
                 else {
-                    //console.log('-> player is human player, triggering auto-pickup');
-                    triggerEffect = true;
-                    readyTeamSprites = true;
-                    teamReadyDuration = 600; // for event panels we want to zoom in quickly
-                    zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
-                    triggerEffectFunction = function(){
-                        if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
-                        //console.log('-> running');
-                        // If the first event in the list (before sorting) is an item, we should defer it to the pickup function
-                        //console.log('-> first event is an item, deferring to pickup function');
-                        _self.triggerItemPickup(firstEvent, 600);
-                        };
-
+                    //console.log('-> player is human player, trying auto-pickup for item...');
+                    // If this item is NOT anchored, we can pick it up normally
+                    if (!itemInfo.anchored){
+                        //console.log('-> item is not anchored so we can add run normal pickup function');
+                        triggerEffect = true;
+                        readyTeamSprites = true;
+                        teamReadyDuration = 600; // for event panels we want to zoom in quickly
+                        zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
+                        triggerEffectFunction = function(){
+                            if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
+                            //console.log('-> running');
+                            // If the first event in the list (before sorting) is an item, we should defer it to the pickup function
+                            //console.log('-> first event is an item, deferring to pickup function');
+                            _self.triggerItemPickup(firstEvent, 600);
+                            };
+                        }
+                    // Otherwise we just display a disabled "Pick Up" menu hinting the player should switch to cursor
+                    else {
+                        //console.log('-> item is anchored so we cannot pick it up, showing disabled dropdown');
+                        showActionArea = true;
+                        if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+' disabled" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
+                        sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                        showActionAreaType = 'item';
+                        zoomTimeoutDuration = 750; // if we show a pick-up dropdown, we want to zoom in faster
+                        }
                     }
                 }
             }
         else if (firstEventType === 'ability'){
             //console.log('-> event at position is an ability, preparing either dropdown or pickup');
             // If the cursor is literally on a button, only one event sprite matters right now
+            let eventInfo = firstEvent;
+            let abilityInfo = _mapAbilitiesIndex[eventInfo.token];
             let $abilityEvent = $(firstEvent.sprite);
+            //console.log('-> eventInfo =', eventInfo, '| abilityInfo =', abilityInfo, '| $abilityEvent =', $abilityEvent);
             let dataLabel = $abilityEvent.attr('data-label');
             let dataAbility = $abilityEvent.attr('data-ability');
             let dataAbilityToken = $abilityEvent.attr('data-token');
@@ -2998,19 +3021,32 @@ class mmrpgWorldMap {
                     }
                 // Otherwise if this is a human player, we should trigger the auto-pickup functionality instead
                 else {
-                    //console.log('-> player is human player, triggering auto-pickup');
-                    triggerEffect = true;
-                    readyTeamSprites = true;
-                    teamReadyDuration = 600; // for event panels we want to zoom in quickly
-                    zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
-                    triggerEffectFunction = function(){
-                        if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
-                        //console.log('-> running');
-                        // If the first event in the list (before sorting) is an ability, we should defer it to the pickup function
-                        //console.log('-> first event is an ability, deferring to pickup function');
-                        _self.triggerAbilityPickup(firstEvent, 600);
-                        };
-
+                    //console.log('-> player is human player, trying auto-pickup for ability...');
+                    // If this ability is NOT anchored, we can pick it up normally
+                    if (!abilityInfo.anchored){
+                        //console.log('-> ability is not anchored so we can add run normal pickup function');
+                        triggerEffect = true;
+                        readyTeamSprites = true;
+                        teamReadyDuration = 600; // for event panels we want to zoom in quickly
+                        zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
+                        triggerEffectFunction = function(){
+                            if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
+                            //console.log('-> running');
+                            // If the first event in the list (before sorting) is an ability, we should defer it to the pickup function
+                            //console.log('-> first event is an ability, deferring to pickup function');
+                            _self.triggerAbilityPickup(firstEvent, 600);
+                            };
+                        }
+                    // Otherwise we just display a disabled "Pick Up" menu hinting the player should switch to cursor
+                    else {
+                        //console.log('-> ability is anchored so we cannot pick it up, showing disabled dropdown');
+                        showActionArea = true;
+                        if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                        sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+' disabled" data-ability="'+dataAbility+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
+                        sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                        showActionAreaType = 'ability';
+                        zoomTimeoutDuration = 750; // if we show a pick-up dropdown, we want to zoom in faster
+                        }
                     }
                 }
             }
