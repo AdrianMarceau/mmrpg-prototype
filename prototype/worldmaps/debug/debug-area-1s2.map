@@ -8,6 +8,7 @@
 #---------------------------#
 @portals[]  = spawn(4-1, hidden)
 @portals[]  = goto__debug-area-1s(4-1, 4-13, hidden)
+@portals[]  = goto__debug-area-1sw(1-8, 8-41, hidden)
 #---------------------------#
 @field    = rainy-sewers
 #---------------------------#
