@@ -1963,6 +1963,14 @@ display: block;
     border-color: transparent;
 }
 
+#world #canvas #robots-overview .team-robots.focused,
+#world #canvas #robots-overview .storage-robots.focused {
+
+}
+#world #canvas #robots-overview .storage-robots.focused {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
 #world #canvas #robots-overview .team-robot {
     display: block;
     box-sizing: border-box;
@@ -2005,7 +2013,8 @@ display: block;
     border-radius: 6px;
     pointer-events: none;
 }
-#world #canvas #robots-overview.expanded .team-robot:hover:before {
+#world #canvas #robots-overview.expanded .team-robot:hover:before,
+#world #canvas #robots-overview.expanded .team-robot.hovered:before {
     border-color: rgba(255, 255, 255, 0.5);
 }
 #world #canvas #robots-overview.expanded .team-robot.selected:before {

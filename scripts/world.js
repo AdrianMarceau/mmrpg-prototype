@@ -1601,6 +1601,8 @@ class mmrpgWorldMap {
                         _world.mapIsHidden = false;
                         $('.pages', $storageRobotsDiv).remove();
                         $('.bullets', $storageRobotsDiv).remove();
+                        $teamRobotsDiv.removeClass('focused');
+                        $storageRobotsDiv.removeClass('focused');
                         return;  // if we're not expanded, then we're done here
                         }
                     // otherwise if we're expanded we need to run some setup
@@ -1611,6 +1613,8 @@ class mmrpgWorldMap {
                     makeStorageBullets();
                     makeStoragePages();
                     goToStoragePage(1);
+                    // Mark the team-robots side as the focused one
+                    $teamRobotsDiv.addClass('focused');
                     // Make the first robot in the overview as selected via class
                     let $firstOverviewRobot = $teamRobotsInOverview.first();
                     $firstOverviewRobot.addClass('selected');
@@ -1783,7 +1787,13 @@ class mmrpgWorldMap {
 
         // Define a function to run each time user inputs are updated so we can react
         let listenForInput = true;
-        let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 250; listenForInput = false; setTimeout(function(){ listenForInput = true; }, delay); };
+        let ignoreTimeout = null;
+        let ignoreInputFor = function(delay){
+            delay = typeof delay === 'number' ? delay : 250;
+            listenForInput = false;
+            if (ignoreTimeout){ clearTimeout(ignoreTimeout); }
+            ignoreTimeout = setTimeout(function(){ listenForInput = true; }, delay);
+            };
         let checkUserInputs = function(event){
             //console.log('%c' + 'checkUserInputs() - World map keydown event!', 'color: cyan;');
             //event.preventDefault();
@@ -1800,21 +1810,128 @@ class mmrpgWorldMap {
             let robotStorageIsActive = $robotsOverview.is('.expanded') ? true : false;
             // If the robot storage area is currently open, process those actions too
             if (robotStorageIsActive){
-                // If the player has pressed the start button again, attempt to close the storage area via the same button
-                // (allow dismissing with the B button as well for convenience)
-                if (activeInputs.Start || activeInputs.B){
-                    //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                // Collect references to key elements within the robots overview
+                let $teamRobotsDiv = $('.team-robots', $robotsOverview);
+                let $storageRobotsDiv = $('.storage-robots', $robotsOverview);
+                let $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
+                let $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
+                let focusedPanel = $storageRobotsDiv.is('.focused') ? 'storage' : 'team';
+                let $focusedDiv = focusedPanel === 'storage' ? $storageRobotsDiv : $teamRobotsDiv;
+                let $robotsInFocusedDiv = focusedPanel === 'storage' ? $storageRobotsInOverview : $teamRobotsInOverview;
+                //console.log('-> robotStorageIsActive =', robotStorageIsActive);
+                //console.log('-> focusedPanel =', focusedPanel);
+                //console.log('-> sideButtonsActive =', sideButtonsActive);
+                // If the side buttons are active, then we use Start and B to control them specifically
+                if (sideButtonsActive){
+                    // If the side buttons are available, we can use Start to click the save button and B to click cancel
+                    // (make sure we do the usual requirement of adding the maybe class first THEN clicking if already there)
+                    let $saveButton = $('.button[data-action="save-reload"]', $sideButtons);
+                    let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
+                    if (activeInputs.Start && $saveButton.length && !$saveButton.is('.disabled')){
+                        //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                        if (event){ event.preventDefault(); }
+                        if (!$saveButton.is('.maybe')){ $saveButton.addClass('maybe'); }
+                        else {
+                            $saveButton.removeClass('maybe').addClass('clicked');
+                            $saveButton.trigger('click');
+                            setTimeout(function(){ $saveButton.removeClass('clicked'); }, 600);
+                            ignoreInputFor(1200);
+                            return true;
+                            }
+                        }
+                    if (activeInputs.B && $dismissButton.length && !$dismissButton.is('.disabled')){
+                        //console.log('%c' + 'B key pressed!', 'color: orange;');
+                        if (event){ event.preventDefault(); }
+                        if (!$dismissButton.is('.maybe')){ $dismissButton.addClass('maybe'); }
+                        else {
+                            $dismissButton.removeClass('maybe').addClass('clicked');
+                            $dismissButton.trigger('click');
+                            setTimeout(function(){ $dismissButton.removeClass('clicked'); }, 600);
+                            ignoreInputFor(1200);
+                            return true;
+                            }
+                        }
+                    }
+                // Otherwise if no side buttons yet, then we use either Start or B to close the panel instead
+                else {
+                    // If the player has pressed the start button again, attempt to close the storage area via the same button
+                    // (allow dismissing with the B button as well for convenience)
+                    if (activeInputs.Start || activeInputs.B){
+                        //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                        if (event){ event.preventDefault(); }
+                        let $switchButton = $('.team-switch', $robotsOverview);
+                        if ($switchButton.length
+                            && $switchButton.is(':visible')
+                            && !$switchButton.is('.disabled')){
+                            $switchButton.addClass('clicked');
+                            $switchButton.trigger('click');
+                            setTimeout(function(){ $switchButton.removeClass('clicked'); }, 600);
+                            ignoreInputFor(900);
+                            return true;
+                            }
+                        }
+                    }
+                // If the player has pressed the A button, we can simple click whichever team-robot is currently "hovered"
+                if (activeInputs.A){
+                    //console.log('%c' + 'Confirm robot swap!', 'color: orange;');
                     if (event){ event.preventDefault(); }
-                    let $switchButton = $('.team-switch', $robotsOverview);
-                    if ($switchButton.length
-                        && $switchButton.is(':visible')
-                        && !$switchButton.is('.disabled')){
-                        $switchButton.addClass('clicked');
-                        $switchButton.trigger('click');
-                        setTimeout(function(){ $switchButton.removeClass('clicked'); }, 600);
-                        ignoreInputFor(1200);
+                    let $focusedPanel = $storageRobotsDiv.is('.focused') ? $storageRobotsDiv : ($teamRobotsDiv.is('.focused') ? $teamRobotsDiv : false);
+                    if (!$focusedPanel || !$focusedPanel.length){ return false; }
+                    let $otherPanel = $focusedPanel.is($storageRobotsDiv) ? $teamRobotsDiv : $storageRobotsDiv;
+                    let $hoveredRobot = $('.team-robot.hovered', $focusedPanel).first();
+                    if (!$hoveredRobot || !$hoveredRobot.length){ return false; }
+                    //console.log('Triggering click on hovered robot:', $hoveredRobot);
+                    $hoveredRobot.trigger('click');
+                    $focusedPanel.removeClass('focused');
+                    $('.team-robot', $focusedPanel).removeClass('hovered');
+                    $otherPanel.addClass('focused');
+                    $('.team-robot', $otherPanel).removeClass('hovered');
+                    $('.team-robot', $otherPanel).first().addClass('hovered');
+                    ignoreInputFor(900);
+                    return true;
+                    }
+                // If the player has pressed an arrow key, move the "hover" class accordingly in the appropriate of the two columns
+                // Left/Right directional inputs switch which panel is "focused" between team-robots (left) and storage-robots (right)
+                // Up/Down directional inputs then move the "hovered" class up and down within the currently active panel (selected for left, hover for right)
+                if (activeInputs.Up || activeInputs.Down || activeInputs.Left || activeInputs.Right){
+                    //console.log('%c' + 'Arrow key pressed!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    if (activeInputs.Left || activeInputs.Right){
+                        //console.log('-> switching focused panel to ' + (focusedPanel === 'team' ? 'storage' : 'team'));
+                        let $newPanel = focusedPanel === 'team' ? $storageRobotsDiv : $teamRobotsDiv;
+                        let $oldPanel = focusedPanel === 'team' ? $teamRobotsDiv : $storageRobotsDiv;
+                        $oldPanel.removeClass('focused');
+                        $newPanel.addClass('focused');
+                        $('.team-robot', $oldPanel).removeClass('hovered');
+                        $('.team-robot', $newPanel).removeClass('hovered');
+                        $('.team-robot', $newPanel).first().addClass('hovered');
                         return true;
                         }
+                    let $nextRobot = false;
+                    let $hoveredRobot = $robotsInFocusedDiv.filter('.hovered').first();
+                    if (!$hoveredRobot.length){ $hoveredRobot = $robotsInFocusedDiv.first(); }
+                    $robotsInFocusedDiv.removeClass('hovered');
+                    $hoveredRobot.addClass('hovered');
+                    if (activeInputs.Up){
+                        if ($hoveredRobot && $hoveredRobot.length){
+                            $nextRobot = $hoveredRobot.prevAll('.team-robot:not(.hidden)').first();
+                            }
+                        if (!$nextRobot || !$nextRobot.length){
+                            $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').last();
+                            }
+                        } else if (activeInputs.Down){
+                        if ($hoveredRobot && $hoveredRobot.length){
+                            $nextRobot = $hoveredRobot.nextAll('.team-robot:not(.hidden)').first();
+                            }
+                        if (!$nextRobot || !$nextRobot.length){
+                            $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').first();
+                            }
+                        }
+                    if ($nextRobot && $nextRobot.length){
+                        $hoveredRobot.removeClass('hovered');
+                        $nextRobot.addClass('hovered');
+                        }
+                    return true;
                     }
                 return;
                 }
@@ -1882,7 +1999,7 @@ class mmrpgWorldMap {
                         $switchButton.addClass('clicked');
                         $switchButton.trigger('click');
                         setTimeout(function(){ $switchButton.removeClass('clicked'); }, 200);
-                        ignoreInputFor(1200);
+                        ignoreInputFor(1000);
                         return true;
                         }
                     }
