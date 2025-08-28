@@ -2130,7 +2130,7 @@ class mmrpgWorldMap {
                             // if none are found we return false, but if we find one in the direction they were going, and there are only void-tiles in-between, we can move them there
                             let checkCol = thisCol, checkRow = thisRow;
                             let foundWalkableTile = false;
-                            let maxChecks = 20; // arbitrary limit to avoid infinite loops
+                            let maxChecks = 10; // arbitrary limit to avoid infinite loops
                             let numChecks = 0;
                             while (!foundWalkableTile && numChecks < maxChecks){
                                 numChecks++;

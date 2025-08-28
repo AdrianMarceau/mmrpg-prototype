@@ -929,8 +929,8 @@ class rpg_world {
     }
 
     // Define a function for returning all the available cells on a given map that don't have anything on them yet
-    public static function get_available_cells($map_data, $exclude_existing = array()){
-        //error_log('rpg_world::get_available_cells() called!');
+    public static function get_available_cells($map_data, $exclude_existing = true, $ignore_existing = array()){
+        //error_log('rpg_world::get_available_cells() called w/ $exclude_existing = '.print_r($exclude_existing, true).' & $ignore_existing = '.print_r($ignore_existing, true));
         // First we gather the map col and row size so we can generate all possible positions
         $map_col_size = isset($map_data['size'][0]) ? $map_data['size'][0] : self::$worldmap_mapsize;
         $map_row_size = isset($map_data['size'][1]) ? $map_data['size'][1] : self::$worldmap_mapsize;
@@ -1023,13 +1023,15 @@ class rpg_world {
             }
         }
         // If we're allowed to check existing, let's exclude any encounters or pickups already-spawned and using any of these
-        if (!empty($exclude_existing)){
+        if ($exclude_existing){
             //error_log('-> checking existing encounters and pickups to exclude from available cells...');
+            //error_log('-> $exclude_existing = '.($exclude_existing ? 'true' : 'false'));
+            //error_log('-> $ignore_existing = '.print_r($ignore_existing, true));
             $WORLD_SESSION = self::get_session();
             $world_token = $map_data['world'];
             $map_token = $map_data['token'];
             $world_map_token = $world_token.'__'.$map_token;
-            if (in_array('encounters', $exclude_existing)){
+            if (!in_array('encounters', $ignore_existing)){
                 $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
                 $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array();
                 $world_encounter_cells = array();
@@ -1044,7 +1046,7 @@ class rpg_world {
                 //error_log('-> $world_encounter_cells('.count($world_encounter_cells).') = '.print_r($world_encounter_cells, true));
                 foreach ($world_encounter_cells AS $position){ unset($available_cells[$position]); }
             }
-            if (in_array('pickups', $exclude_existing)){
+            if (!in_array('pickups', $ignore_existing)){
                 $world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
                 $world_map_pickups = !empty($world_pickups[$world_map_token]) ? $world_pickups[$world_map_token] : array();
                 $world_pickup_cells = array();
@@ -1150,7 +1152,7 @@ class rpg_world {
 
         // Calculate the available encounter cells based on the map data and define a var to hold used encounter cells later
         $world_map_encounters = array();
-        $available_encounter_cells = self::get_available_cells($map_data_parsed, array('encounters'));
+        $available_encounter_cells = self::get_available_cells($map_data_parsed, true, array('encounters'));
         $available_encounter_terrain = !empty($map_data_parsed['terrain']) ? $map_data_parsed['terrain'] : array();
         $used_encounter_cells = array();
 
@@ -1356,7 +1358,7 @@ class rpg_world {
 
         // Calculate the available pickup cells based on the map data and define a var to hold used pickup cells later
         $world_map_pickups = array();
-        $available_pickup_cells = self::get_available_cells($map_data_parsed, array('pickups'));
+        $available_pickup_cells = self::get_available_cells($map_data_parsed, true, array('pickups'));
         $available_pickup_terrain = !empty($map_data_parsed['terrain']) ? $map_data_parsed['terrain'] : array();
         $used_pickup_cells = array();
 
