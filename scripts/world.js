@@ -1279,6 +1279,7 @@ class mmrpgWorldMap {
         let $sideButtons = _elements.sideButtons;
         let $sideButtonsWrapper = $('> .wrapper', $sideButtons);
         let $actionDropdown = _elements.actionDropdown;
+        let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
         // Bind a click event to the back button in the header that'll bring us to prototype menu
         let $backButton = _elements.backButton;
         if ($backButton && $backButton.length){
@@ -2117,9 +2118,42 @@ class mmrpgWorldMap {
                     let walkableTiles = _self.getWalkableMapTiles();
                     let tilesWithinRange = playerMobility > 0 ? _self.getWalkableMapTilesByProximity(oldPos, playerMobility) : walkableTiles;
                     if (walkableTiles.indexOf(newPos) === -1 && tilesWithinRange.indexOf(newPos) === -1){
-                        //console.warn('%c' + 'New position is not walkable!', 'color: red;');
+                        //console.log('%c' + 'New position is not walkable!', 'color: orange;');
                         //_self.playSoundEffect('glass-klink');
-                        return false;
+                        if (!playerIsCursor){
+                            //console.log('%c' + 'Player is human, can only walk to adjacent tiles!', 'color: red;');
+                            return false;
+                            } else {
+                            //console.log('%c' + 'Player is cursor, can cross voids if walkable tiles on other side!', 'color: green;');
+                            // If the player is the cursor, we can allow crossing voids if there's a walkable tile on the other side
+                            // So, let's loop through, adding +1 to the direction they were travelling, and trying to find a walkable tile
+                            // if none are found we return false, but if we find one in the direction they were going, and there are only void-tiles in-between, we can move them there
+                            let checkCol = thisCol, checkRow = thisRow;
+                            let foundWalkableTile = false;
+                            let maxChecks = 20; // arbitrary limit to avoid infinite loops
+                            let numChecks = 0;
+                            while (!foundWalkableTile && numChecks < maxChecks){
+                                numChecks++;
+                                if (activeInputs.Left){ checkCol--; }
+                                else if (activeInputs.Right){ checkCol++; }
+                                if (activeInputs.Up){ checkRow--; }
+                                else if (activeInputs.Down){ checkRow++; }
+                                let checkPos = checkCol + '-' + checkRow;
+                                if (walkableTiles.indexOf(checkPos) !== -1){
+                                    foundWalkableTile = true;
+                                    newPos = checkPos;
+                                    //console.log('%c' + 'Found walkable tile at ' + newPos + ', allowing move!', 'color: green;');
+                                    } else if (tilesWithinRange.indexOf(checkPos) !== -1){
+                                    foundWalkableTile = true;
+                                    newPos = checkPos;
+                                    //console.log('%c' + 'Found walkable tile within range at ' + newPos + ', allowing move!', 'color: green;');
+                                    }
+                                }
+                            if (!foundWalkableTile){
+                                //console.log('%c' + 'No walkable tile found in that direction!', 'color: orange;');
+                                return false;
+                                }
+                            }
                         }
                     // Otherwise, let's move the cursor to the new position
                     _self.makeLayerTileActive(newPos);
