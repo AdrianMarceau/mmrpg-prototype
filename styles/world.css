@@ -1211,6 +1211,9 @@ html, body {
     border-radius: 0 6px 6px 0;
     font-size: 14px;
 }
+#world #canvas #home-button.focused {
+    outline: 1px solid white;
+}
 
 #world #canvas #reset-button {
     top: 4px;

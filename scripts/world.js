@@ -1795,6 +1795,7 @@ class mmrpgWorldMap {
             if (ignoreTimeout){ clearTimeout(ignoreTimeout); }
             ignoreTimeout = setTimeout(function(){ listenForInput = true; }, delay);
             };
+        let userInputVars = {};
         let checkUserInputs = function(event){
             //console.log('%c' + 'checkUserInputs() - World map keydown event!', 'color: cyan;');
             //event.preventDefault();
@@ -2126,6 +2127,63 @@ class mmrpgWorldMap {
                     _self.moveToPosition(newPos, function(){
                         _self.makeLayerTileInactive(oldPos);
                         });
+                    }
+                // If the user has pressed the X button, we need to implement some nuanced functionality
+                // -> if it's a simple press, it's for the "menu" (not implemented yet, so just show a console.warn message)
+                // -> else if it's a long-press (user is holding button) then add the "focused" class to the home button, wait an appropriate amount of time, then click it
+                // The important thing here is to zoom the map in closer and closer as the user holds the button until we reach a threshold, and THEN click it, but if the user stops pressing the button then the focused class is removed and the zoom is reset and the whole thing is cancelled
+                if (typeof userInputVars.xTimeout === 'undefined'){ userInputVars.xTimeout = false; }
+                if (typeof userInputVars.xWasPressedAt === 'undefined'){ userInputVars.xWasPressedAt = null; }
+                if (typeof userInputVars.xWasPressedFor === 'undefined'){ userInputVars.xWasPressedFor = 0; }
+                if (activeInputs.X){
+                    //console.log('%c' + 'X key pressed!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    if (!userInputVars.xWasPressedAt){ userInputVars.xWasPressedAt = Date.now(); }
+                    // throttle the zooming action to every 300ms
+                    let timeThreshold = 300;
+                    let timeToIgnoreAfter = 3000;
+                    let timeoutRefresh = 1200;
+                    let timeSincePress = Date.now() - userInputVars.xWasPressedAt;
+                    // If it's been a while since the last press, we know this is a home-button request
+                    if (timeSincePress >= timeThreshold){
+                        $homeButton.addClass('focused');
+                        userInputVars.xWasPressedAt = Date.now();
+                        userInputVars.xWasPressedFor++;
+                        let newZoomLevel = 1.00 + (0.25 * (userInputVars.xWasPressedFor - 1));
+                        //console.log('%c' + 'X key has been pressed for ' + userInputVars.xWasPressedFor + 'x times!', 'color: orange;');
+                        _self.updateZoomLevel(newZoomLevel);
+                        let $teamSprites = _elements.teamSprites;
+                        let $cursorSprite = $teamSprites.filter('.cursor');
+                        let $otherSprites = $teamSprites.filter(':not(.cursor)');
+                        $cursorSprite.addClass('shake');
+                        $otherSprites.filter(':not([data-frame="06"])').first().attr('data-frame', '06'); // summon
+                        if (userInputVars.xTimeout){ clearTimeout(userInputVars.xTimeout);  }
+                        if (userInputVars.xWasPressedFor >= 5){
+                            //console.log('%c' + 'X key held long enough, triggering home button!', 'color: orange;');
+                            $homeButton.trigger('click');
+                            userInputVars.xWasPressedAt = null;
+                            userInputVars.xWasPressedFor = 0;
+                            ignoreInputFor(timeToIgnoreAfter);
+                            } else {
+                            userInputVars.xTimeout = setTimeout(function(){
+                                //console.log('%c' + 'X key timeout!', 'color: orange;');
+                                userInputVars.xWasPressedAt = null;
+                                userInputVars.xWasPressedFor = 0;
+                                $homeButton.removeClass('focused');
+                                _self.resetZoomLevel();
+                                $otherSprites.attr('data-frame', '00');
+                                $cursorSprite.removeClass('shake');
+                                }, timeoutRefresh);
+                            }
+                        }
+                    // Otherwise if this is a fresh press, the user must be trying to open the main menu
+                    else {
+                        //console.log('%c' + 'X key fresh press, open menu (not implemented yet)!', 'color: orange;');
+                        if (userInputVars.xTimeout){ clearTimeout(userInputVars.xTimeout);  }
+                        userInputVars.xTimeout = setTimeout(function(){
+                            console.warn('Menu functionality not implemented yet!');
+                            }, (timeThreshold * 2));
+                        }
                     }
                 }
             };

@@ -299,12 +299,13 @@ $WORLD_PLAYER_SESSION['last_map'] = $this_prototype_data['this_current_map'];
 $request_map_token = $this_prototype_data['this_current_map'];
 
 // Collect or define the current map position we'll be spawning into
+$is_spawn_request = !empty($_REQUEST['position']) && $_REQUEST['position'] === 'spawn' ? true : false;
 $request_world_position = isset($_REQUEST['position']) && preg_match('/^([-0-9]+)$/i', $_REQUEST['position']) ? trim($_REQUEST['position']) : '';
 $request_world_direction = isset($_REQUEST['direction']) && preg_match('/^([-a-z0-9]+)$/i', $_REQUEST['direction']) ? trim($_REQUEST['direction']) : '';
 if (empty($request_world_position) && !empty($WORLD_PLAYER_SESSION['last_position'])){ $request_world_position = $WORLD_PLAYER_SESSION['last_position']; }
 if (empty($request_world_direction) && !empty($WORLD_PLAYER_SESSION['last_direction'])){ $request_world_direction = $WORLD_PLAYER_SESSION['last_direction']; }
-$this_prototype_data['this_current_position'] = !empty($request_world_position) ? $request_world_position : $default_world_position;
-$this_prototype_data['this_current_direction'] = !empty($request_world_direction) ? $request_world_direction : $default_world_direction;
+$this_prototype_data['this_current_position'] = $is_spawn_request ? $default_world_position : (!empty($request_world_position) ? $request_world_position : $default_world_position);
+$this_prototype_data['this_current_direction'] = $is_spawn_request ? $default_world_direction : (!empty($request_world_direction) ? $request_world_direction : $default_world_direction);
 $WORLD_PLAYER_SESSION['last_position'] = $this_prototype_data['this_current_position'];
 $WORLD_PLAYER_SESSION['last_direction'] = $this_prototype_data['this_current_direction'];
 $request_world_position = $this_prototype_data['this_current_position'];
@@ -853,7 +854,7 @@ _worldConfig.playerItemsIndex = <?= json_encode($this_prototype_data['this_playe
 _worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility']) ?>;
 _worldConfig.backButtonURL = 'prototype.php';
 //_worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=<?= $default_world_position ?>';
-_worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>';
+_worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=spawn';
 _worldConfig.resetButtonURL = 'world.php?reset=world';
 
 // Create the document ready events
