@@ -12,6 +12,8 @@
 #---------------------------#
 @field        = wintry-forefront
 #---------------------------#
+@pickups      = speed-pellet(6),energy-pellet(4),speed-capsule(2)
+#---------------------------#
 @encounters   = curlinger,frosty-throwman,tel-tel
 #---------------------------#
 @bosses[]     = south-spawn-boss(8-13, ice-man)
