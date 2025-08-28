@@ -2074,7 +2074,7 @@ class mmrpgWorldMap {
                 }
             };
         document.addEventListener('keydown', checkUserInputs);
-        document.addEventListener('mousewheel', checkUserInputs);
+        document.addEventListener('mousewheel', checkUserInputs, { passive: false });
         document.addEventListener('gamepadinput', checkUserInputs);
 
         // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed

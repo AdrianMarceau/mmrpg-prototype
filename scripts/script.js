@@ -3452,7 +3452,7 @@ class mmrpgUserInputWatcher {
             if (event.wheelDelta > 0 && event.wheelDelta < wheelThreshold){ return false; }
             else if (event.wheelDelta < 0 && event.wheelDelta > (-1 * wheelThreshold)){ return false; }
             busyScrolling = true;
-            let inputKey = event.wheelDelta > 0 ? 'L2' : 'R2';
+            let inputKey = event.wheelDelta < 0 ? 'L2' : 'R2';
             if (typeof activeInputs[inputKey] === 'undefined'){
                 activeInputs[inputKey] = true;
                 }
