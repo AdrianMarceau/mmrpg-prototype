@@ -7,11 +7,11 @@
 @sheet       = mmrpg-overworld-2k25
 #---------------------------#
 @portals[]   = spawn(6-10)
-@portals[]   = goto__debug-area-1n(6-8, 8-13)
-@portals[]   = goto__debug-area-1s(6-12, 5-3)
-@portals[]   = goto__debug-area-1w(4-10, 17-5)
-@portals[]   = goto__debug-area-1e(8-10, 3-5)
-@portals[]   = goto__debug-area-0(6-23, 10-7)
+@portals[]   = goto__debug-area-1n(6-8, 8-12)
+@portals[]   = goto__debug-area-1s(6-12, 5-2)
+@portals[]   = goto__debug-area-1w(4-10, 17-4)
+@portals[]   = goto__debug-area-1e(8-10, 3-4)
+@portals[]   = goto__debug-area-0(6-23, 10-6)
 #---------------------------#
 @field       = gentle-countryside
 #---------------------------#

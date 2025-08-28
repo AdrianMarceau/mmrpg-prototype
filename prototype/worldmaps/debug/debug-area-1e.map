@@ -7,7 +7,7 @@
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
 @portals[]  = spawn(3-4, hidden)
-@portals[]  = goto__debug-area-1(3-4, 8-8)
+@portals[]  = goto__debug-area-1(3-4, 8-10)
 @portals[]  = goto__debug-area-1e2(50-11, 1-12, hidden)
 #---------------------------#
 @field      = oil-wells

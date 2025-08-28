@@ -7,7 +7,7 @@
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
 @portals[]  = spawn(5-2, hidden)
-@portals[]  = goto__debug-area-1(5-2, 6-10)
+@portals[]  = goto__debug-area-1(5-2, 6-12)
 #---------------------------#
 @field    = waterfall-institute
 #---------------------------#

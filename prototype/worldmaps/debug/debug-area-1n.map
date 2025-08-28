@@ -7,7 +7,7 @@
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
 @portals[]  = spawn(8-12, hidden)
-@portals[]  = goto__debug-area-1(8-12, 6-6)
+@portals[]  = goto__debug-area-1(8-12, 6-8)
 @portals[]  = goto__debug-area-1n2(8-4, 25-13)
 #---------------------------#
 @field        = wintry-forefront
