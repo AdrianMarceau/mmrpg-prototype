@@ -1346,6 +1346,7 @@ class rpg_world {
         //error_log('$map_field_info = '.print_r($map_field_info, true));
         //error_log('$map_field_background = '.print_r($map_field_background, true));
         //error_log('$map_field_foreground = '.print_r($map_field_foreground, true));
+        if (empty($map_pickups)){ return array(); }
 
         // Calculate the available pickup cells based on the map data and define a var to hold used pickup cells later
         $world_map_pickups = array();
