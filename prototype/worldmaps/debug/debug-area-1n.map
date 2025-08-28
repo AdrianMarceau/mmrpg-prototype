@@ -18,6 +18,15 @@
 @bosses[]     = north-west-boss(4-4, blizzard-man)
 @bosses[]     = north-east-boss(12-4, frost-man)
 #---------------------------#
+@events[]    = cossack-platform-left(7-2, cossackpad-left, any, drop-zone, item:cossack-program, activate-player-platform)
+@events[]    = cossack-platform-middle(8-2, cossackpad-middle, any, drop-zone, item:cossack-heart, activate-player-platform)
+@events[]    = cossack-platform-right(9-2, cossackpad-right, any, drop-zone, item:cossack-core, activate-player-platform)
+#---------------------------#
+@items[]     = cossack-program-pickup(12-3, cossack-program)
+@items[]     = cossack-heart-2(4-3, cossack-heart__2)
+@items[]     = copy-core-pickup-1(3-9, copy-core, x1, once)
+@items[]     = copy-core-pickup-2(13-9, copy-core, x1, once)
+#---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[53],[51],[51],[51],[51],[51],[51],[51],[51],[51],[51],[51],[54],[__]
 [__],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[__]

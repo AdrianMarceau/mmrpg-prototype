@@ -435,18 +435,14 @@ html, body {
 }
 #world #map .sprite.event.resetpad.animate { animation-delay: -3s; }
 
-@keyframes world-sprite-lightpad-glow {
+@keyframes world-sprite-playerpad-glow {
     0%, 100% { filter: brightness(1.0) opacity(0.6); }
     50% { filter: brightness(1.6) opacity(0.9); }
     }
-#world #map .sprite.event.lightpad-left,
-#world #map .sprite.event.lightpad-middle,
-#world #map .sprite.event.lightpad-right {
+#world #map .sprite.event[data-event*="-platform-"] {
     /* ... */
 }
-#world #map .sprite.event.lightpad-left:before,
-#world #map .sprite.event.lightpad-middle:before,
-#world #map .sprite.event.lightpad-right:before {
+#world #map .sprite.event[data-event*="-platform-"]:before {
     content: "";
     display: block;
     position: absolute;
@@ -458,23 +454,27 @@ html, body {
     filter: brightness(1) opacity(0.6);
     transition: filter 0.3s;
 }
-#world #map .sprite.event.lightpad-left:not(.active):before,
-#world #map .sprite.event.lightpad-middle:not(.active):before,
-#world #map .sprite.event.lightpad-right:not(.active):before {
+#world #map .sprite.event[data-event*="-platform-"]:not(.active):before {
     filter: brightness(1) opacity(0);
 }
-#world #map .sprite.event.lightpad-left.active.animate:before,
-#world #map .sprite.event.lightpad-middle.active.animate:before,
-#world #map .sprite.event.lightpad-right.active.animate:before {
-    animation: world-sprite-lightpad-glow 3s ease-out infinite;
+#world #map .sprite.event[data-event*="-platform-"].active.animate:before {
+    animation: world-sprite-playerpad-glow 3s ease-out infinite;
 }
 #world #map .sprite.event.lightpad-left { background-position: -600px -40px; }
 #world #map .sprite.event.lightpad-middle { background-position: -680px -40px; }
 #world #map .sprite.event.lightpad-right { background-position: -760px -40px; }
-#world #map .sprite.event.lightpad-left:before { background-position: -600px -360px; }
-#world #map .sprite.event.lightpad-middle:before { background-position: -680px -360px; }
-#world #map .sprite.event.lightpad-right:before { background-position: -760px -360px; }
-
+#world #map .sprite.event.wilypad-left { background-position: -600px -120px; }
+#world #map .sprite.event.wilypad-middle { background-position: -680px -120px; }
+#world #map .sprite.event.wilypad-right { background-position: -760px -120px; }
+#world #map .sprite.event.cossackpad-left { background-position: -600px -200px; }
+#world #map .sprite.event.cossackpad-middle { background-position: -680px -200px; }
+#world #map .sprite.event.cossackpad-right { background-position: -760px -200px; }
+#world #map .sprite.event.lalindepad-left { background-position: -600px -280px; }
+#world #map .sprite.event.lalindepad-middle { background-position: -680px -280px; }
+#world #map .sprite.event.lalindepad-right { background-position: -760px -280px; }
+#world #map .sprite.event[data-event*="-platform-left"]:before { background-position: -600px -360px; }
+#world #map .sprite.event[data-event*="-platform-middle"]:before { background-position: -680px -360px; }
+#world #map .sprite.event[data-event*="-platform-right"]:before { background-position: -760px -360px; }
 
 #world #map .sprite.event.console { background-position: -600px -40px; }
 #world #map .sprite.event.console.multi { background-position: -680px -40px; }
