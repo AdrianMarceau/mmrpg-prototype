@@ -658,24 +658,53 @@ if ($map_has_player_platforms && !empty($map_player_platforms)){
         if ($all_active && !mmrpg_prototype_player_unlocked($player_token)){
             //error_log('-> unlocking player "'.$player_token.'" since all their platforms are active!');
             $player_info = $mmrpg_index_players[$player_token];
+            $player_size = !empty($player_info['player_image_size']) ? $player_info['player_image_size'] : 40;
+            $player_xsize = $player_size.'x'.$player_size;
+            $player_zoom_size = $player_size * 2;
+            $player_zoom_xsize = $player_zoom_size.'x'.$player_zoom_size;
+            $player_type = !empty($player_info['player_type']) ? $player_info['player_type'] : 'none';
+            $player_name = !empty($player_info['player_name']) ? $player_info['player_name'] : ucwords(str_replace('-', ' ', $player_token));
+            $player_story = ucfirst(explode('-', $player_token)[1]).' Story';
+            $player_pronoun = rpg_player::get_player_pronoun($player_info['player_gender'], 'possessive2');
+            $player_intro_field = rpg_player::get_intro_field($player_token);
+            $player_starter_robot = rpg_player::get_starter_robot($player_token);
+            $player_unlock_subtext = 'This campaign is undefined and this text should not appear. Do no engage.';
+            if ($player_token === 'dr-light'){ $player_unlock_subtext = 'This beginner-level campaign teaches you the basics while you fight through an army of powered-up opponents!'; }
+            elseif ($player_token === 'dr-wily'){ $player_unlock_subtext = 'This campaign offers a bit more challenge than the normal one and expects you to already-know the basics of battle!'; }
+            elseif ($player_token === 'dr-cossack'){ $player_unlock_subtext = 'This veteran-level campaign acts as the conclusion to the doctors\' individual stories and packs the hardest punch of all!'; }
+            elseif ($player_token === 'dr-lalinde'){ $player_unlock_subtext = 'This campaign used to look a lot different but system damage has left it nearly unrecognizable - can it be saved?'; }
             mmrpg_game_unlock_player(array('player_token' => $player_token), true, true);
             $player_robots_unlocked = mmrpg_prototype_robots_unlocked($player_token, true);
-            $first_player_robot = !empty($player_robots_unlocked[0]) ? $player_robots_unlocked[0] : 'robot';
-            $player_robot_info = !empty($mmrpg_index_robots[$first_player_robot]) ? $mmrpg_index_robots[$first_player_robot] : array();
+            $first_robot = !empty($player_robots_unlocked[0]) ? $player_robots_unlocked[0] : 'robot';
+            $first_robot_info = !empty($mmrpg_index_robots[$first_robot]) ? $mmrpg_index_robots[$first_robot] : array();
+            $first_robot_size = !empty($first_robot_info['robot_image_size']) ? $first_robot_info['robot_image_size'] : 40;
+            $first_robot_xsize = $first_robot_size.'x'.$first_robot_size;
+            $first_robot_zoom_size = $first_robot_size * 2;
+            $first_robot_zoom_xsize = $first_robot_zoom_size.'x'.$first_robot_zoom_size;
+            $first_robot_name = !empty($first_robot_info['robot_name']) ? $first_robot_info['robot_name'] : ucwords(str_replace('-', ' ', $first_robot));
+            $first_robot_core = !empty($first_robot_info['robot_core']) ? $first_robot_info['robot_core'] : 'none';
             $temp_event_flag = $player_token.'-event-00_player-unlocked';
             $temp_game_flags = &$_SESSION[$game_session_token]['flags'];
             if (empty($temp_game_flags['events'][$temp_event_flag])){
                 $temp_game_flags['events'][$temp_event_flag] = true;
+                // canvas
                 $temp_canvas_markup = '';
-                $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/gentle-countryside/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(1px) brightness(0.8);"></div>';
-                $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/gentle-countryside/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
-                $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/'.$player_token.'/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: calc(50% - 20px); transform: scale(1.5) translate(-50%, 0); transform-origin: bottom right;"></div>';
-                $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/'.$first_player_robot.'/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: calc(50% + 20px); transform: scale(1) translate(-50%, 0); transform-origin: bottom left; filter: brightness(0.9);"></div>';
+                $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$player_intro_field.'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(1px) brightness(0.8);"></div>';
+                    $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$player_intro_field.'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+                $temp_canvas_markup .= '<div class="sprite_wrapper breathing_animation" style="bottom: 20px; left: calc(50% + 100px);"><div class="wrap">';
+                    $temp_canvas_markup .= '<div class="sprite sprite_player sprite_shadow sprite_'.$player_zoom_xsize.' sprite_'.$player_zoom_xsize.'_victory" style="background-image: url(images/players/'.$player_token.'/sprite_left_'.$player_zoom_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 0; left: 0; transform: scale(1.5, 0.5) translate('.(-50 + ($player_zoom_size > 80 ? 5 : 0)).'%, 0) skew(26deg, 0); transform-origin: bottom left; filter: brightness(0); opacity: 0.1;"></div>';
+                    $temp_canvas_markup .= '<div class="sprite sprite_player sprite_'.$player_zoom_xsize.' sprite_'.$player_zoom_xsize.'_victory" style="background-image: url(images/players/'.$player_token.'/sprite_left_'.$player_zoom_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 0; left: 0; transform: scale(1.5) translate('.(-50 + ($player_zoom_size > 80 ? 5 : 0)).'%, 0); transform-origin: bottom center; image-rendering: pixelated;"></div>';
+                $temp_canvas_markup .= '</div></div>';
+                $temp_canvas_markup .= '<div class="sprite_wrapper breathing_animation" style="bottom: 20px; left: calc(50% - 50px);"><div class="wrap">';
+                    $temp_canvas_markup .= '<div class="sprite sprite_robot sprite_shadow sprite_'.$first_robot_zoom_xsize.' sprite_'.$first_robot_zoom_xsize.'_victory" style="background-image: url(images/robots/'.$first_robot.'/sprite_right_'.$first_robot_zoom_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 0; left: 0; transform: scale(1.5, 0.5) translate('.(-50 + ($first_robot_zoom_size > 80 ? 5 : 0)).'%, 0) skew(26deg, 0); transform-origin: bottom right; filter: brightness(0); opacity: 0.1;"></div>';
+                    $temp_canvas_markup .= '<div class="sprite sprite_robot sprite_'.$first_robot_zoom_xsize.' sprite_'.$first_robot_zoom_xsize.'_victory" style="background-image: url(images/robots/'.$first_robot.'/sprite_right_'.$first_robot_zoom_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 0; left: 0; transform: scale(1.5) translate('.(-50 + ($first_robot_zoom_size > 80 ? 5 : 0)).'%, 0); transform-origin: bottom center; image-rendering: pixelated;"></div>';
+                $temp_canvas_markup .= '</div></div>';
+                // console
                 $temp_console_markup = '';
                 $temp_console_markup .= '<p class="ability_type ability_type_defense" style="margin: 5px auto 10px; text-align: center;">Congratulations!</p>';
-                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span($player_info['player_type'], $player_info['player_name']).' has been unlocked as a player character!</p>';
-                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>'.$player_info['player_name'].'</strong> and <strong>Mega Man</strong> to experience the story from their perspective.  This beginner-level campaign teaches you the basics while you fight through an army of powered up opponents!</p>';
-                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_defense">'.$player_info['player_name'].'</strong> from the player select menu to play through his campaign at any time.</p>';
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span($player_type, $player_name).' has been unlocked as a playable character in Free Roam and <br /> the '.rpg_type::print_span($player_type, $player_story).' campaign has been unlocked on the Main Menu!</p>';
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>'.$player_name.'</strong> and <strong>'.$first_robot_name.'</strong> to experience events from their perspective, unlocking new robots, items, and abilities using their unique skills! '.$player_unlock_subtext.'</p>';
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="player_type type '.$player_type.'">'.$player_name.'</strong> from the player select menu to play through '.$player_pronoun.' story missions at any time.</p>';
                 array_push($_SESSION[$game_session_token]['EVENTS'], array(
                     'canvas_markup' => $temp_canvas_markup,
                     'console_markup' => $temp_console_markup,

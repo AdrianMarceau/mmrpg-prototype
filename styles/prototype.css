@@ -1268,6 +1268,10 @@ body.prototype {
     animation-delay: 1s;
     animation-iteration-count: 1;
 }
+#events #canvas .sprite_wrapper.breathing_animation .sprite_player,
+#events #canvas .sprite_wrapper.breathing_animation .sprite_robot {
+    animation-delay: 5s;
+}
 @keyframes sprite-wrapper-breathing-animation-for-sprite {
     0%   { background-position: -40px 0; }
     25%  { background-position: -80px 0; }
@@ -1291,13 +1295,44 @@ body.prototype {
 }
 #events #canvas .sprite_wrapper.breathing_animation .sprite_robot {
     animation: sprite-wrapper-breathing-animation-for-sprite 10s steps(1) infinite;
-    animation-delay: 5s;
 }
 #events #canvas .sprite_wrapper.breathing_animation .sprite_robot.sprite_80x80 {
     animation-name: sprite-wrapper-breathing-animation-for-sprite-x80;
 }
 #events #canvas .sprite_wrapper.breathing_animation .sprite_robot.sprite_160x160 {
     animation-name: sprite-wrapper-breathing-animation-for-sprite-x160;
+}
+
+@keyframes sprite-wrapper-breathing-animation-for-player-sprite {
+    0%   { background-position: -40px 0; }
+    25%  { background-position: -80px 0; }
+    50%  { background-position: -40px 0; }
+    75%  { background-position: -240px 0; }
+    100% { background-position: -40px 0; }
+}
+@keyframes sprite-wrapper-breathing-animation-for-player-sprite-x80 {
+    0%   { background-position: -80px 0; }
+    25%  { background-position: -160px 0; }
+    50%  { background-position: -80px 0; }
+    75%  { background-position: -480px 0; }
+    100% { background-position: -80px 0; }
+}
+@keyframes sprite-wrapper-breathing-animation-for-player-sprite-x160 {
+    0%   { background-position: -160px 0; }
+    25%  { background-position: -320px 0; }
+    50%  { background-position: -160px 0; }
+    75%  { background-position: -960px 0; }
+    100% { background-position: -160px 0; }
+}
+
+#events #canvas .sprite_wrapper.breathing_animation .sprite_player {
+    animation: sprite-wrapper-breathing-animation-for-player-sprite 10s steps(1) infinite;
+}
+#events #canvas .sprite_wrapper.breathing_animation .sprite_player.sprite_80x80 {
+    animation-name: sprite-wrapper-breathing-animation-for-player-sprite-x80;
+}
+#events #canvas .sprite_wrapper.breathing_animation .sprite_player.sprite_160x160 {
+    animation-name: sprite-wrapper-breathing-animation-for-player-sprite-x160;
 }
 
 /* define a quick animation for the event banners so that they start zoomed in on pageload but then zoom outward to 100% and stay that way */
