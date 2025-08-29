@@ -310,7 +310,8 @@ if (!$this_thread_info['thread_sticky']){
     if ($this_category_info['category_token'] === 'news'){ $last_mod_date = $this_thread_info['thread_date']; }
     else { $last_mod_date = !empty($this_thread_info['thread_mod_date']) ? $this_thread_info['thread_mod_date'] : $this_thread_info['thread_date']; }
     $thread_time_inactive = time() - $last_mod_date;
-    if ($thread_time_inactive >= MMRPG_SETTINGS_LEGACY_TIMEOUT){
+    if ($thread_time_inactive >= MMRPG_SETTINGS_LEGACY_TIMEOUT && !COMMUNITY_VIEW_MODERATOR){
+        //error_log('this thread is being manually locked due to inactivity');
         $this_thread_info['thread_locked'] = true;
     }
 }
