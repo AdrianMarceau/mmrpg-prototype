@@ -2027,30 +2027,31 @@ class mmrpgWorldMap {
                 if (activeInputs.L1 || activeInputs.R1){
                     //console.log('%c' + 'Bumper key pressed!', 'color: orange;');
                     if (event){ event.preventDefault(); }
-                    let $playerButtons = $('.team-player[data-player]', $playerSwitcher);
-                    let $hoveredPlayer = $playerButtons.filter('.hovered').first();
+                    let $playerButtons = $('.team-player', $playerSwitcher);
+                    if ($playerButtons.length < 2){ return true; } // nothing to switch to, ignore
                     let $activePlayer = $playerButtons.filter('.active').first();
-                    let $nextPlayer = false;
-                    $playerSwitcher.addClass('focused');
-                    if (activeInputs.L1){
-                        if ($hoveredPlayer && $hoveredPlayer.length){
-                            $nextPlayer = $hoveredPlayer.prevAll('.team-player').first();
-                            }
-                        if (!$nextPlayer || !$nextPlayer.length){
-                            $nextPlayer = $playerButtons.last();
-                            }
-                        }
-                    else if (activeInputs.R1){
-                        if ($hoveredPlayer && $hoveredPlayer.length){
-                            $nextPlayer = $hoveredPlayer.nextAll('.team-player').first();
-                            }
-                        if (!$nextPlayer || !$nextPlayer.length){
-                            $nextPlayer = $playerButtons.first();
-                            }
-                        }
-                    if ($nextPlayer && $nextPlayer.length){
+                    let $hoveredPlayer = $playerButtons.filter('.hovered').first();
+                    if (!$playerSwitcher.is('.focused')
+                        || !$hoveredPlayer.length){
+                        $playerSwitcher.addClass('focused');
                         $playerButtons.removeClass('hovered');
-                        $nextPlayer.addClass('hovered');
+                        $activePlayer.addClass('hovered');
+                        ignoreInputFor(300);
+                        return true;
+                        } else {
+                        $playerButtons.removeClass('hovered');
+                        if (activeInputs.L1){
+                            let $prevPlayer = $hoveredPlayer.prevAll('.team-player').first();
+                            if (!$prevPlayer || !$prevPlayer.length){ $prevPlayer = $playerButtons.last(); }
+                            if ($prevPlayer.length){ $prevPlayer.addClass('hovered'); }
+                            }
+                        else if (activeInputs.R1){
+                            let $nextPlayer = $hoveredPlayer.nextAll('.team-player').first();
+                            if (!$nextPlayer || !$nextPlayer.length){ $nextPlayer = $playerButtons.first(); }
+                            if ($nextPlayer.length){ $nextPlayer.addClass('hovered'); }
+                            }
+                        ignoreInputFor(300);
+                        return true;
                         }
                     let focusTimeout = _selfRef._playerSwitcherTimeout;
                     if (focusTimeout){ clearTimeout(focusTimeout); }
