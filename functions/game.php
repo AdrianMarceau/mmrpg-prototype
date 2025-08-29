@@ -473,6 +473,8 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
 
     // Loop through the ability rewards for this robot if set
     if ($unlock_abilities && !empty($this_robot_rewards['abilities'])){
+        // Define an array to track any new abilities unlocked
+        $new_abilities_unlocked = array();
         // Define any auto-abilities that we should unlock for the robot first
         $auto_abilities = array();
         // Automatically unlock the Buster Shot for all robot masters
@@ -493,8 +495,41 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
                 if (empty($this_ability_info['ability_flag_complete'])){ continue; }
                 if (empty($this_ability_info['ability_flag_unlockable'])){ continue; }
                 $this_ability_info['ability_points'] = $ability_reward_info['level'];
-                $show_event = !mmrpg_game_ability_unlocked('', '', $ability_reward_info['token']) ? true : false;
+                $ability_unlocked = mmrpg_game_ability_unlocked('', '', $ability_reward_info['token']);
+                $show_event = !$ability_unlocked ? true : false;
                 mmrpg_game_unlock_ability($player_info, $robot_info, $this_ability_info, $show_event);
+                if (!$ability_unlocked){ $new_abilities_unlocked[] = $ability_reward_info['token']; }
+            }
+        }
+        // Pull the list of abilities unlocked overall, and then loop through to see if any are compatible
+        $all_unlocked_abilities = array();
+        mmrpg_prototype_abilities_unlocked('', '', $all_unlocked_abilities);
+        $robot_unlocked_abilities = array();
+        mmrpg_prototype_abilities_unlocked($this_player_token, $this_robot_token, $robot_unlocked_abilities);
+        //error_log('$all_unlocked_abilities = '.print_r($all_unlocked_abilities, true));
+        //error_log('$robot_unlocked_abilities = '.print_r($robot_unlocked_abilities, true));
+        if (!empty($all_unlocked_abilities)
+            && count($robot_unlocked_abilities) < MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX){
+            $this_robot_rewards = rpg_game::robot_rewards($this_player_token, $this_robot_token);
+            $this_robot_settings = rpg_game::robot_settings($this_player_token, $this_robot_token);
+            $this_robot_item = !empty($this_robot_settings['robot_item']) ? $this_robot_settings['robot_item'] : '';
+            foreach ($all_unlocked_abilities AS $ability_token){
+                if (in_array($ability_token, $robot_unlocked_abilities)){ continue; }
+                //error_log('checking '.$this_robot_token.' compatibility w/ '.$ability_token);
+                if (rpg_robot::has_ability_compatibility($this_robot_token, $ability_token, $this_robot_item)){
+                    //error_log($this_robot_token.' IS compatible w/ '.$ability_token.'!');
+                    if (!mmrpg_game_ability_unlocked($this_player_token, $this_robot_token, $ability_token)){
+                        $this_ability_info = $this_ability_index[$ability_token];
+                        if (empty($this_ability_info['ability_flag_published'])){ continue; }
+                        if (empty($this_ability_info['ability_flag_complete'])){ continue; }
+                        if (empty($this_ability_info['ability_flag_unlockable'])){ continue; }
+                        $this_ability_info['ability_points'] = 0;
+                        mmrpg_game_unlock_ability($player_info, $robot_info, $this_ability_info, false);
+                        //error_log('unlocked '.$ability_token.' for '.$this_robot_token.'!');
+                        $robot_unlocked_abilities[] = $ability_token;
+                        if (count($robot_unlocked_abilities) >= MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX){ break; }
+                    }
+                }
             }
         }
     }
