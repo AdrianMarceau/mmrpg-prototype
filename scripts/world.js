@@ -85,6 +85,7 @@ gameSettings.worldState = {
         positionXY: [0, 0],
         direction: '',
         holding: '',
+        loading: false,
         moving: false,
         moved: false,
         busy: false,
@@ -135,7 +136,7 @@ class mmrpgWorldMap {
         let _self = this;
         let _world = _self.state;
         let _worldCursor = _world.cursor;
-        return _worldCursor.busy || _worldCursor.moving;
+        return _worldCursor.loading || _worldCursor.busy || _worldCursor.moving;
         }
 
     // Quick function for checking if the world map specifically is busy doing something (either busy because world, or because hidden)
@@ -3474,6 +3475,7 @@ class mmrpgWorldMap {
                             console.error('-> no active temp slots found in palette, cannot drop item!');
                             return false;
                             }
+                        _worldCursor.busy = true; // mark the cursor as busy while we drop the item
                         $cursorPalette.removeClass('active');
                         $worldCursor.addClass('drop');
                         // remove the item from the cursor pallet first and formost
@@ -3522,7 +3524,7 @@ class mmrpgWorldMap {
                                 }
                             }
                         // save all these changes to the world state now
-                        _self.saveWorldState();
+                        _self.saveWorldState(function(){ _worldCursor.busy = false; });
                         }
                     }
                 else if (isAbility){
@@ -4485,6 +4487,8 @@ class mmrpgWorldMap {
                 if (!platformActive){ continue; }
                 // If we made it here, this player's platform is active and they can be unlocked
                 //console.log('%c' + '-> player ' + playerToken + ' has an active platform and can be unlocked!', 'color: lime;');
+                _worldCursor.busy = true;
+                _worldCursor.loading = true;
                 $thisWorld.addClass('busy');
                 _self.incZoomLevel();
                 _self.saveWorldState(function(){
