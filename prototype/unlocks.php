@@ -803,6 +803,8 @@ if (mmrpg_prototype_complete('dr-cossack')
  * MULTI DR. EVENT ITEMS
  */
 
+/*
+
 // Define the index of chapter-relavant players and their chapter details
 $chapter_unlock_players = array('dr-light', 'dr-wily', 'dr-cossack');
 $chapter_unlock_players_config = array(
@@ -851,6 +853,7 @@ $chapter_unlock_popup_index[] = array('chapter_key' => '5', 'chapter_token' => '
 $chapter_unlock_popup_index[] = array('chapter_key' => '8', 'chapter_token' => 'chapter-challenges', 'chapter_name' => 'Challenges', 'chapter_subname' => 'Bonus Chapter : Challenge Mode', 'chapter_is_bonus' => true);
 
 // Loop through each unlocked player and get ready to process their chapters
+//error_log('checking player chapter unlocks');
 foreach ($chapter_unlock_players AS $player_key => $player_token){
     if (!mmrpg_prototype_player_unlocked($player_token)){ continue; } // continue if player not unlocked yet
 
@@ -916,6 +919,8 @@ foreach ($chapter_unlock_players AS $player_key => $player_token){
     }
 
 }
+
+*/
 
 // If Light was unlocked, but the player has not yet seen the unlock event, display it
 if ($unlock_flag_light){
