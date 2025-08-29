@@ -473,11 +473,15 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
 
     // Loop through the ability rewards for this robot if set
     if ($unlock_abilities && !empty($this_robot_rewards['abilities'])){
+        // Define any auto-abilities that we should unlock for the robot first
+        $auto_abilities = array();
         // Automatically unlock the Buster Shot for all robot masters
-        array_unshift($this_robot_rewards['abilities'], array('level' => 0, 'token' => 'buster-shot'));
-        // If the player buster has been unlocked, make sure add that too
+        $auto_abilities[] = array('level' => 0, 'token' => 'buster-shot');
+        // If the player buster has been unlocked, make sure add that after buster shot
         $player_buster_token = str_replace('dr-', '', $this_player_token).'-buster';
-        if (mmrpg_game_ability_unlocked('', '', $player_buster_token)){ array_unshift($this_robot_rewards['abilities'], array('level' => 0, 'token' => $player_buster_token)); }
+        if (mmrpg_game_ability_unlocked('', '', $player_buster_token)){ $auto_abilities[] = array('level' => 0, 'token' => $player_buster_token); }
+        // If there were any auto-abliities, make sure we prepend the to the start of the list
+        if (!empty($auto_abilities)){ $this_robot_rewards['abilities'] = array_merge($auto_abilities, $this_robot_rewards['abilities']); }
         // Collect the ability index for calculation purposes
         $this_ability_index = rpg_ability::get_index(true);
         foreach ($this_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
