@@ -4998,7 +4998,7 @@ class mmrpgWorldMap {
                 //console.log('oh this is an restorative-recovery item, so let us apply it');
                 let itemStat = itemToken.split('-')[0];
                 let itemSize = itemToken.split('-')[1];
-                let itemPower = (itemSize === 'tank' ? true : (itemSize === 'capsule' ? 3 : 2));
+                let itemPower = (itemSize === 'tank' ? true : (itemSize === 'capsule' ? 50 : 25));
                 if (itemStat === 'weapon'){ itemStat = 'weapons'; }
                 //console.log('--> itemStat =', itemStat);
                 //console.log('--> itemSize =', itemSize);
@@ -5021,8 +5021,10 @@ class mmrpgWorldMap {
                         }
                     //console.log('-> found a robot (', playerRobot, ') that needs their', itemStat, 'stat restored...');
                     //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
-                    if (itemStat === 'energy'){ _self.restoreRobotEnergy(robotString, itemPower, true); }
-                    else if (itemStat === 'weapons'){ _self.restoreRobotWeapons(robotString, itemPower, true); }
+                    let recoveryPower = Math.ceil(((itemPower === true ? 100 : itemPower)/100) * robotEnergyMax);
+                    //console.log('-> recoveryPower =', recoveryPower);
+                    if (itemStat === 'energy'){ _self.restoreRobotEnergy(robotString, recoveryPower, true); }
+                    else if (itemStat === 'weapons'){ _self.restoreRobotWeapons(robotString, recoveryPower, true); }
                     itemEvent.claimed = true;
                     itemEventQuantity--;
                     if (!itemEventQuantity){ break; } // exit the loop early if none left
@@ -5057,7 +5059,9 @@ class mmrpgWorldMap {
                         }
                     //console.log('-> found a robot (', robotString, ') that we can boost ', itemStat, 'for...');
                     //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
-                    _self.boostRobotStat(robotString, itemStat, itemPower, true);
+                    let boostPower = itemPower;
+                    //console.log('-> boostPower =', boostPower);
+                    _self.boostRobotStat(robotString, itemStat, boostPower, true);
                     itemEvent.claimed = true;
                     itemEventQuantity--;
                     if (!itemEventQuantity){ break; } // exit the loop early if none left
