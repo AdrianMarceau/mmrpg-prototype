@@ -1150,6 +1150,14 @@ class rpg_world {
             'boss' => array('min' => ceil($map_level * 1.2), 'max' => ceil($map_level * 1.4))
             );
 
+        // Pull the list of robots unlocked already overall, so that we do not need to keep checking the session
+        $all_unlocked_robots = array();
+        $all_unlocked_robots = mmrpg_prototype_robots_unlocked('', true);
+
+        // Pull the list of abilities unlocked already overall, so that we do not need to keep checking the session
+        $all_unlocked_abilities = array();
+        mmrpg_prototype_abilities_unlocked('', '', $all_unlocked_abilities);
+
         // Calculate the available encounter cells based on the map data and define a var to hold used encounter cells later
         $world_map_encounters = array();
         $available_encounter_cells = self::get_available_cells($map_data_parsed, true, array('encounters'));
@@ -1297,12 +1305,27 @@ class rpg_world {
                     $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
                     $world_map_encounters[] = array('robot/'.$robot_class, $robot_token, '', $robot_pos, $battle_token, $robot_label);
                     $battle_rewards = array();
-                    if ($robot_class === 'master'
-                        && !mmrpg_prototype_robot_unlocked(false, $robot_token)){
-                        //error_log('-> '.$robot_token.' is a master that is not unlocked yet!');
-                        if (!isset($battle_rewards['robots'])){ $battle_rewards['robots'] = array(); }
-                        $battle_rewards['robots'][] = array('token' => $robot_token, 'level' => $robot_level, 'experience' => 999);
+                    // If this is a master battle, make sure we add the necessary robot and ability rewards to this battle
+                    if ($robot_class === 'master'){
+                        if (!mmrpg_prototype_robot_unlocked('', $robot_token)){
+                            //error_log('-> '.$robot_token.' is a master that is not unlocked yet!');
+                            if (!isset($battle_rewards['robots'])){ $battle_rewards['robots'] = array(); }
+                            $battle_rewards['robots'][] = array('token' => $robot_token, 'level' => $robot_level, 'experience' => 999);
+                            //error_log('-> ... adding '.$robot_token.' to the battle rewards!');
                         }
+                        $master_abilities = !empty($robot_info['robot_rewards']['abilities']) ? $robot_info['robot_rewards']['abilities'] : array();
+                        if (!empty($master_abilities)){
+                            //error_log('-> '.$robot_token.' is a master that has abilities to unlock!');
+                            $master_abilities = array_map(function($value){ return $value['token']; }, $master_abilities);
+                            //error_log('-> $master_abilities = '.print_r($master_abilities, true));
+                            foreach ($master_abilities AS $ability){
+                                if (in_array($ability, $all_unlocked_abilities)){ continue; }
+                                if (!isset($battle_rewards['abilities'])){ $battle_rewards['abilities'] = array(); }
+                                $battle_rewards['abilities'][] = array('token' => $ability);
+                                //error_log('-> ... adding '.$ability.' to the battle rewards!');
+                            }
+                        }
+                    }
                     //error_log('-> generating '.$robot_class.' battle "'.$battle_token.'" ('.$battle_name.')');
                     $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
                         'token' => $battle_token,
