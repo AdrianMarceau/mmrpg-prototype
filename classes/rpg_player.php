@@ -610,6 +610,45 @@ class rpg_player extends rpg_object {
         $this->set_info('player_base_image_size', $size);
     }
 
+    /**
+     * Return the pronoun of a given player character
+     * @param string $form The form of the pronoun to return (subject, object, possessive, possessive2, reflexive)
+     */
+    public function get_pronoun($form = 'subject'){
+        return self::get_player_pronoun($this->player_class, $this->get_gender(), $form);
+    }
+
+    /**
+     * Return the pronoun of a given player character (static version)
+     * @param string $gender The gender of the player character in question, if they have one
+     * @param string $form The form of the pronoun to return (subject, object, possessive, possessive2, reflexive)
+     */
+    public static function get_player_pronoun($gender, $form = 'subject', $person = true){
+        if ($form === 'subject'){
+            if ($gender === 'male'){ return 'he'; }
+            elseif ($gender === 'female'){ return 'she'; }
+            else { return !$person ? 'it' : 'they'; }
+        } elseif ($form === 'object'){
+            if ($gender === 'male'){ return 'him'; }
+            elseif ($gender === 'female'){ return 'her'; }
+            else { return !$person ? 'it' : 'them'; }
+        } elseif ($form === 'possessive'){
+            if ($gender === 'male'){ return 'his'; }
+            elseif ($gender === 'female'){ return 'hers'; }
+            else { return !$person ? 'its' : 'theirs'; }
+        } elseif ($form === 'possessive2'){
+            if ($gender === 'male'){ return 'his'; }
+            elseif ($gender === 'female'){ return 'her'; }
+            else { return !$person ? 'its' : 'their'; }
+        } elseif ($form === 'reflexive'){
+            if ($gender === 'male'){ return 'himself'; }
+            elseif ($gender === 'female'){ return 'herself'; }
+            else { return !$person ? 'itself' : 'themselves'; }
+        } else {
+            return false;
+        }
+    }
+
 
     // -- ROBOT FUNCTIONS -- //
 
