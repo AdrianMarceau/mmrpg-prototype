@@ -714,7 +714,9 @@ if ($map_has_player_platforms && !empty($map_player_platforms)){
                 $clear_seen_frame_token = 'edit_players';
                 rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
             }
-            header('Location: world.php');
+            $redirect_to_player = $player_token;
+            $redirect_to_position = $this_prototype_data['this_current_position'];
+            header('Location: world.php?player='.$redirect_to_player.'&position='.$redirect_to_position);
             exit();
         }
     }
