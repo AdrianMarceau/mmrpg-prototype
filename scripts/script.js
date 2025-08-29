@@ -2954,8 +2954,15 @@ function mmrpg_queue_for_game_start(onGameStart){
 // -- POPUP WINDOW EVENT FUNCTIONS -- //
 
 // Define a function that checks the server for any event popups to display
-function windowEventsPull(forcePull){
+gameSettings.eventPullTimeout = false;
+function windowEventsPull(forcePull, butForReal){
     //console.log('windowEventsPull()');
+    if (!butForReal){
+        if (gameSettings.eventPullTimeout){ clearTimeout(gameSettings.eventPullTimeout); }
+        gameSettings.eventPullTimeout = setTimeout(function(){
+            windowEventsPull(forcePull, true);
+            }, 300);
+        }
     // Do not pull events if we're currently in a sub-menu iframe
     forcePull = typeof forcePull === 'boolean' ? forcePull : false;
     var $mmrpg = $('#mmrpg');
@@ -2994,8 +3001,8 @@ gameSettings.messagesMarkupArray = [];
 function windowEventCreate(canvasMarkupArray, messagesMarkupArray, autoDisplay){
     //console.log('windowEventCreate('+canvasMarkupArray+', '+messagesMarkupArray+')');
     if (typeof autoDisplay !== 'boolean'){ autoDisplay = true; }
-    gameSettings.canvasMarkupArray = canvasMarkupArray;
-    gameSettings.messagesMarkupArray = messagesMarkupArray;
+    for (var i = 0; i < canvasMarkupArray.length; i++){ gameSettings.canvasMarkupArray.push(canvasMarkupArray[i]); }
+    for (var i = 0; i < messagesMarkupArray.length; i++){ gameSettings.messagesMarkupArray.push(messagesMarkupArray[i]); }
     if (autoDisplay){
         if (!gameSettings.gameHasStarted){
             gameSettings.onGameStart.push(function(){ setTimeout(windowEventDisplay, 1000); });
@@ -3007,8 +3014,11 @@ function windowEventCreate(canvasMarkupArray, messagesMarkupArray, autoDisplay){
 }
 
 // Define a function for displaying event messages to the player
+gameSettings.activeWindowEvent = false;
 function windowEventDisplay(){
     //console.log('windowEventDisplay()');
+    if (gameSettings.activeWindowEvent){ return false; }
+    gameSettings.activeWindowEvent = true;
 
     // Check if the event container exists and, if not, create it
     var $eventContainer = $('#events');
@@ -3044,6 +3054,7 @@ function windowEventDisplay(){
                 window.top.mmrpg_play_sound_effect('link-click');
                 }
             windowEventDestroy();
+            gameSettings.activeWindowEvent = false;
             if (gameSettings.canvasMarkupArray.length || gameSettings.messagesMarkupArray.length){
                 windowEventDisplay();
                 } else {

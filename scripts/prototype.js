@@ -425,12 +425,13 @@ $(document).ready(function(){
                         windowResizePrototype();
                         topFrame.mmrpg_toggle_index_loaded(true);
                         gameSettings.startLink = 'home';
-                        if ((gameSettings.windowEventsCanvas != undefined && gameSettings.windowEventsCanvas.length)
+                        triggerWindowEventsPull();
+                        /* if ((gameSettings.windowEventsCanvas != undefined && gameSettings.windowEventsCanvas.length)
                             || (gameSettings.windowEventsMessages != undefined && gameSettings.windowEventsMessages.length)){
                             //topFrame.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
                             //console.log('trying to topFrame.windowEventsPull() [A]');
                             topFrame.windowEventsPull();
-                            }
+                            } */
                         }, 1000);
                     }, false, true);
                 } else {
@@ -440,12 +441,13 @@ $(document).ready(function(){
                 windowResizePrototype();
                 topFrame.mmrpg_toggle_index_loaded(true);
                 gameSettings.startLink = 'home';
-                if ((gameSettings.windowEventsCanvas != undefined && gameSettings.windowEventsCanvas.length)
+                triggerWindowEventsPull();
+                /* if ((gameSettings.windowEventsCanvas != undefined && gameSettings.windowEventsCanvas.length)
                     || (gameSettings.windowEventsMessages != undefined && gameSettings.windowEventsMessages.length)){
                     //topFrame.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
                     //console.log('trying to topFrame.windowEventsPull() [B]');
                     topFrame.windowEventsPull();
-                    }
+                    } */
                 }
             };
 
@@ -544,13 +546,13 @@ $(document).ready(function(){
             }
 
         // Make sure we always poll the server for popup events after loading
-        //console.log('queuing the windowEventsPull event (via prototype)');
-        if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
+        triggerWindowEventsPull();
+        /* if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
             window.top.mmrpg_queue_for_game_start(function(){
                 //console.log('i guess the game has started');
                 setTimeout(function(){ windowEventsPull(); }, 1000);
                 });
-            }
+            } */
 
 
         }
@@ -596,6 +598,38 @@ $(document).ready(function(){
     // -- end of document ready markup -- //
 
 });
+
+// Define a quick function for polling the server for new events (but only if we can actually show them)
+function triggerWindowEventsPull(afterDelay){
+    //console.log('%c' + 'prototypeReady.triggerWindowEventsPull()', 'color: magenta;');
+    afterDelay = typeof afterDelay === 'number' ? afterDelay : 1000; // default to zero if not provided
+    //console.log('queuing the windowEventsPull event (via prototype)');
+    let topFrame = window.top !== window.self ? window.top : window.parent;
+    if (typeof topFrame.mmrpg_queue_for_game_start !== 'undefined'){
+        topFrame.mmrpg_queue_for_game_start(function(){
+            //console.log('i guess the game has started?');
+            setTimeout(function(){
+                //console.log('attempting to pull window events via parent.windowEventsPull()', parent.windowEventsPull);
+                let result = topFrame.windowEventsPull(true);
+                if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+                else { console.log('windowEventsPull returned successfully: ' + result); }
+                }, afterDelay);
+            });
+        }
+    else if (typeof topFrame.windowEventsPull !== 'undefined'){
+        //console.log('i guess we pull events manually via parent.windowEventsPull()', parent.windowEventsPull);
+        setTimeout(function(){
+            let result = topFrame.windowEventsPull(true);
+            if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+            else { console.log('windowEventsPull returned successfully: ' + result); }
+            }, afterDelay);
+        }
+    else {
+        console.warn('no windowEventsPull function found');
+        }
+    // Return no specific result
+    return;
+}
 
 // Create the windowResize event for this page
 function windowResizePrototype(){
@@ -934,6 +968,7 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
 // Define a function for triggering a prototype option link
 function prototype_menu_click_option(thisContext, thisOption, onComplete){
     //console.log('prototype_menu_click_option(thisContext:', thisContext, ', thisOption:', thisOption, ', onComplete:', onComplete, ')');
+    //console.log('prototype_menu_click_option() called!');
 
     // If this option is disabled, ignore its input
     if ($(this).hasClass('option_disabled')
@@ -1285,7 +1320,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
             }
 
         // If this was a mission select, update the banner background image
-        if (thisSelect == 'this_battle_token'){
+        if (thisSelect === 'this_battle_token'){
             // Change the background image based on the current option data
             var newBackgroundToken = thisOption.attr('data-background');
             var backgroundFileToken = 'battle-field_background_base';
@@ -1343,10 +1378,20 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
     //var thisRedirect = 'battle.new.php?wap='+(gameSettings.wapFlag ? 'true' : 'false');
     for (var key in battleOptions){ thisRedirect += '&'+key+'='+battleOptions[key]; }
 
+    // If this was a player select, make sure we re-pull window events just in case new stuff happened
+    if (thisSelect === 'this_player_token'){
+        let oldOnComplete = onComplete;
+        let newOnComplete = function(){
+            triggerWindowEventsPull();
+            oldOnComplete();
+            };
+        onComplete = newOnComplete;
+        };
+
     // If this was a mission select, make sure we re-flow the robot select when ready
-    if (thisSelect == 'this_battle_token'){
-        var oldOnComplete = onComplete;
-        var newOnComplete = function(){
+    if (thisSelect === 'this_battle_token'){
+        let oldOnComplete = onComplete;
+        let newOnComplete = function(){
             var tempCondition = 'this_player_token='+battleOptions['this_player_token'];
             var $tempMenu = $('.menu[data-select="this_player_robots"]', thisContext);
             var $tempWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', $tempMenu);

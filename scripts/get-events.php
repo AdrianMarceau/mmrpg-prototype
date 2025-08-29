@@ -6,6 +6,7 @@ require('../top.php');
 // Return markup based on provided arguments
 $is_logged_in = !rpg_user::is_guest();
 if ($is_logged_in){
+    //error_log("AJAX REQUEST: get-events.php");
 
     // Collect the session token so we can find events
     $session_token = rpg_game::session_token();
