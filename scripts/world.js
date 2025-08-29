@@ -5028,7 +5028,7 @@ class mmrpgWorldMap {
                     }
                 }
             // Check if the item was a consumable attack, defense, or speed-stat item
-            // and apply it to the first robot that needs it, else pocket it
+            // and apply it to the first robot that can use a boost to that stat, else pocket it
             else if (itemToken.match(/^(attack|defense|speed)-(pellet|capsule)$/i)){
                 //console.log('oh this is a stat-boost item, so let us apply it');
                 let itemStat = itemToken.split('-')[0];
@@ -5057,6 +5057,51 @@ class mmrpgWorldMap {
                     //console.log('-> found a robot (', robotString, ') that we can boost ', itemStat, 'for...');
                     //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
                     _self.boostRobotStat(robotString, itemStat, itemPower, true);
+                    itemEvent.claimed = true;
+                    itemEventQuantity--;
+                    if (!itemEventQuantity){ break; } // exit the loop early if none left
+                    }
+                }
+            // Check if the item was a consumable super-stat item (attack + defense + speed all-in-one)
+            // and apply it to the first robot that can use a boost to any of those stats, else pocket it
+            else if (itemToken.match(/^(super)-(pellet|capsule)$/i)){
+                //console.log('oh this is a super-stat-boost item, so let us apply it');
+                let itemStat = itemToken.split('-')[0];
+                let itemSize = itemToken.split('-')[1];
+                let itemPower = itemSize === 'capsule' ? 2 : 1; // to each stat
+                //console.log('--> itemStat =', itemStat);
+                //console.log('--> itemSize =', itemSize);
+                //console.log('--> itemPower =', itemPower);
+                // Loop through player robots and see if any of them "need" this item
+                let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                let robotStatModMax = _config.robotStatModMax;
+                for (let i = 0; i < playerRobotKeys.length; i++){
+                    let robotString = playerRobotKeys[i];
+                    let playerRobot = _worldPlayerRobots[robotString];
+                    if (!playerRobot){ console.warn('-> skipping robot', robotString, 'b/c it is not defined'); continue; }
+                    //console.log('-> checking robotString:', robotString, 'playerRobot:', playerRobot);
+                    let statModKeys = ['attackMods', 'defenseMods', 'speedMods'];
+                    let canBoostAnyStat = false;
+                    for (let s = 0; s < statModKeys.length; s++){
+                        let statModKey = statModKeys[s];
+                        let currentModValue = playerRobot[statModKey] || 0;
+                        //console.log('-> statModKey:', statModKey);
+                        //console.log('-> currentModValue:', currentModValue);
+                        //console.log('-> robotStatModMax:', robotStatModMax);
+                        if (currentModValue < robotStatModMax){
+                            canBoostAnyStat = true;
+                            break;
+                            }
+                        }
+                    if (!canBoostAnyStat){
+                        //console.log('-> skipping robot', robotString, 'b/c it already has max stat mods for all stats');
+                        continue; // skip this robot if it already has max stat mods for all stats
+                        }
+                    //console.log('-> found a robot (', robotString, ') that we can boost some stats for...');
+                    //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
+                    _self.boostRobotAttack(robotString, itemPower, true);
+                    _self.boostRobotDefense(robotString, itemPower, true);
+                    _self.boostRobotSpeed(robotString, itemPower, true);
                     itemEvent.claimed = true;
                     itemEventQuantity--;
                     if (!itemEventQuantity){ break; } // exit the loop early if none left
