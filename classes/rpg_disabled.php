@@ -1409,6 +1409,27 @@ class rpg_disabled {
                     $this_robot_experience = !empty($robot_reward_info['experience']) ? $robot_reward_info['experience'] : 0;
                     $this_robot_rewards = !empty($robot_info['robot_rewards']) ? $robot_info['robot_rewards'] : array();
 
+                    // If the provided level was "auto", then it will be the average of whomever fought it
+                    if ($this_robot_level === 'auto'){
+                        //error_log('Calculating auto level (via '.basename(__FILE__).') for robot '.$this_robot_token.' using '.count($target_player->player_robots).' opposing robots...');
+                        $this_robot_level = 0;
+                        foreach ($target_player->player_robots AS $key => $info){ $this_robot_level += $info['robot_level']; }
+                        $this_robot_level = ceil($this_robot_level / count($target_player->player_robots));
+                        if ($this_robot_level >= 100){ $this_robot_level = 100; }
+                        //error_log('$this_robot_level = '.$this_robot_level);
+                    }
+                    // If the provided experience was "auto", then it will be based on how many turns it took to fight
+                    if ($this_robot_experience === 'auto'){
+                        //error_log('Calculating auto experience (via '.basename(__FILE__).') for robot '.$this_robot_token.' using '.$this_battle->counters['battle_turn'].' turns...');
+                        $this_robot_experience = ceil($this_battle->counters['battle_turn'] * 100) - 1;
+                        if ($this_robot_experience >= 999){ $this_robot_experience = 999; }
+                        elseif ($this_robot_experience < 0){ $this_robot_experience = 0; }
+                        //error_log('$this_robot_experience = '.$this_robot_experience);
+                    }
+                    // Fallbacks for unrecognized values
+                    if (!is_numeric($this_robot_level)){ $this_robot_level = 1; }
+                    if (!is_numeric($this_robot_experience)){ $this_robot_experience = 0; }
+
                     // Create the temp new robot for the player
                     $temp_unlock_robot_data = array();
                     $temp_unlock_robot_data['robot_id'] = rpg_game::unique_robot_id($target_player->player_id, $robot_reward_index['robot_id'], 99);

@@ -1310,7 +1310,8 @@ class rpg_world {
                         if (!mmrpg_prototype_robot_unlocked('', $robot_token)){
                             //error_log('-> '.$robot_token.' is a master that is not unlocked yet!');
                             if (!isset($battle_rewards['robots'])){ $battle_rewards['robots'] = array(); }
-                            $battle_rewards['robots'][] = array('token' => $robot_token, 'level' => $robot_level, 'experience' => 999);
+                            //$battle_rewards['robots'][] = array('token' => $robot_token, 'level' => $robot_level, 'experience' => 999);
+                            $battle_rewards['robots'][] = array('token' => $robot_token, 'level' => 'auto', 'experience' => 'auto');
                             //error_log('-> ... adding '.$robot_token.' to the battle rewards!');
                         }
                         $master_abilities = !empty($robot_info['robot_rewards']['abilities']) ? $robot_info['robot_rewards']['abilities'] : array();
