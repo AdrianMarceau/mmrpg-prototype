@@ -489,6 +489,9 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
             if ($this_robot_level >= $ability_reward_info['level']){
                 // Unlock this ability
                 $this_ability_info = $this_ability_index[$ability_reward_info['token']];
+                if (empty($this_ability_info['ability_flag_published'])){ continue; }
+                if (empty($this_ability_info['ability_flag_complete'])){ continue; }
+                if (empty($this_ability_info['ability_flag_unlockable'])){ continue; }
                 $this_ability_info['ability_points'] = $ability_reward_info['level'];
                 $show_event = !mmrpg_game_ability_unlocked('', '', $ability_reward_info['token']) ? true : false;
                 mmrpg_game_unlock_ability($player_info, $robot_info, $this_ability_info, $show_event);
