@@ -98,5 +98,35 @@ if ($this_battle->battle_status === 'complete'
     }
 
 }
+// Otherwise if we're leaving early and/or have given up, check to see we can at least removed defeated targets
+else {
+    //error_log('Prototype battle '.$this_battle->battle_token.' exited early by '.$this_player->player_token.'...');
+
+    // Loop through the target player's robots to check their status, making note of source tokens
+    $disabled_target_battle_sources = array();
+    if (!empty($target_player->player_robots)){
+        //error_log('...checking target player robots for disabled status');
+        foreach ($target_player->player_robots AS $robot_key => $robot_info){
+            //error_log('-> '.$robot_info['robot_token'].' $robot_info = '.print_r($robot_info, true));
+            if ($robot_info['robot_status'] === 'disabled'
+                && !empty($robot_info['values']['source_battle'])){
+                $source_battle = trim($robot_info['values']['source_battle']);
+                $disabled_target_battle_sources[] = $source_battle;
+                //error_log('--> '.$robot_info['robot_token'].' is disabled and came from battle '.$source_battle);
+            }
+        }
+    }
+    //error_log('$disabled_target_battle_sources = '.print_r($disabled_target_battle_sources, true));
+    // If there were any disabled target robots, we should remove their source battles from the index
+    if (!empty($disabled_target_battle_sources)){
+        $disabled_target_battle_sources = array_unique($disabled_target_battle_sources);
+        foreach ($disabled_target_battle_sources AS $remove_battle_token){
+            //error_log('Removing prototype battle '.$remove_battle_token.' from index');
+            rpg_battle::unset_index_info($remove_battle_token);
+        }
+    }
+
+}
+
 
 ?>

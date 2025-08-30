@@ -106,6 +106,7 @@ if (!empty($this_battle_token)){
                 foreach ($temp_target_robots AS $temp_robot_data){
                     if (!empty($temp_robot_data['flags']['guest'])){ continue; }
                     elseif ($multi_key > 0){ $temp_robot_data['flags']['guest'] = true; }
+                    $temp_robot_data['values']['source_battle'] = $temp_battle_token;
                     $robot_key = count($new_target_robots);
                     $robot_info = rpg_robot::get_index_info($temp_robot_data['robot_token']);
                     $temp_robot_data['robot_id'] = rpg_game::unique_robot_id($temp_target_playerid, $robot_info['robot_id'], ($robot_key + 1));
