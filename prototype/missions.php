@@ -1692,6 +1692,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         // Unlock the LIGHT BUSTER / WILY BUSTER / COSSACK BUSTER if the player has unlocked at least three robots (hero + support + robot master)
         foreach ($chapter_unlock_players AS $player_token){
+            if ($player_token !== $this_prototype_data['this_player_token']){ continue; } // continue if not current player
             // If the player has a doctor unlocked without also having their buster, unlock it now
             $buster_token = str_replace('dr-', '', $player_token).'-buster';
             if (mmrpg_prototype_player_unlocked($player_token)
@@ -1720,6 +1721,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         //error_log('checking player chapter unlocks');
         foreach ($chapter_unlock_players AS $player_key => $player_token){
             if (!mmrpg_prototype_player_unlocked($player_token)){ continue; } // continue if player not unlocked yet
+            if ($player_token !== $this_prototype_data['this_player_token']){ continue; } // continue if not current player
 
             // Now loop through and display chapter unlock messages where relevant
             foreach ($chapter_unlock_popup_index AS $key => $chapter_info){
