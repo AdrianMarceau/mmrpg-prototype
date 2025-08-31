@@ -1178,14 +1178,21 @@ class rpg_disabled {
 
                             // If this ability is already unlocked, continue
                             if (mmrpg_prototype_ability_unlocked($target_player->player_token, $temp_robot_token, $ability_reward_info['token'])){ continue; }
+
                             // If we're in DEMO mode, continue
                             if (!empty($_SESSION['GAME']['DEMO'])){ continue; }
+
+                            // Collect the ability info from the index
+                            $ability_info = $temp_abilities_index[$ability_reward_info['token']];
+
+                            // If this ability is not actually complete yet, we shouldn't unlock it...
+                            if (empty($ability_info['ability_flag_published'])){ continue; }
+                            if (empty($ability_info['ability_flag_complete'])){ continue; }
+                            if (empty($ability_info['ability_flag_unlockable'])){ continue; }
 
                             // Check if the required level has been met by this robot
                             if ($temp_new_level >= $ability_reward_info['level']){
 
-                                // Collect the ability info from the index
-                                $ability_info = $temp_abilities_index[$ability_reward_info['token']];
                                 // Create the temporary ability object for event creation
                                 $temp_ability = rpg_game::get_ability($this_robot->battle, $target_player, $temp_target_robot, $ability_info);
 

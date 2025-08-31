@@ -5954,15 +5954,44 @@ class rpg_robot extends rpg_object {
                                         }
                                     }
 
+                                    // Make sure we remove any abilities that are not actually available yet or were removed/unpublished
+                                    $sanitize_ability_list = function($ability_rewards) use ($mmrpg_database_abilities){
+                                        if (empty($ability_rewards)){ return array(); }
+                                        foreach ($ability_rewards AS $key => $ability){
+                                            if (is_array($ability)){ $ability_token = $ability['ability_token']; }
+                                            elseif (is_string($ability)){ $ability_token = $ability; }
+                                            else { unset($ability_rewards[$key]); continue; }
+                                            if (!isset($mmrpg_database_abilities[$ability_token])){
+                                                //error_log('$mmrpg_database_abilities['.$ability_token.'] does not exist!');
+                                                unset($ability_rewards[$key]);
+                                                continue;
+                                                }
+                                            $ability_info = $mmrpg_database_abilities[$ability_token];
+                                            if (empty($ability_info['ability_flag_published'])
+                                                || empty($ability_info['ability_flag_complete'])
+                                                || empty($ability_info['ability_flag_unlockable'])){
+                                                //error_log('$mmrpg_database_abilities['.$ability_token.'] is not published, complete, or unlockable!');
+                                                unset($ability_rewards[$key]);
+                                                continue;
+                                            }
+                                        }
+                                        $ability_rewards = array_values($ability_rewards);
+                                        return $ability_rewards;
+                                    };
+                                    $player_ability_rewards = $sanitize_ability_list($player_ability_rewards);
+                                    $robot_ability_rewards = $sanitize_ability_list($robot_ability_rewards);
+
                                     ?>
                                     <div class="ability_container" data-compatible="<?= implode(',', $allowed_ability_ids) ?>">
                                         <?
 
                                         // Sort the player ability index based on ability number
                                         uasort($player_ability_rewards, array('rpg_functions', 'abilities_sort_for_editor'));
+                                        //error_log('$player_ability_rewards: '.print_r($player_ability_rewards, true));
 
                                         // Sort the robot ability index based on ability number
                                         sort($robot_ability_rewards);
+                                        //error_log('robot_ability_rewards: '.print_r($robot_ability_rewards, true));
 
                                         // Collect the ability reward options to be used on all selects
                                         $ability_rewards_options = $global_allow_editing ? rpg_ability::print_editor_options_list_markup($player_ability_rewards, $robot_ability_rewards, $player_info, $robot_info) : '';
