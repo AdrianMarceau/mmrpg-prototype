@@ -529,7 +529,8 @@ if ($must_regenerate){
                     'position' => array('col' => $position['col'], 'row' => $position['row']),
                     'offset' => array('x' => $position['x'], 'y' => $position['y'])
                     );
-                $composite_token = $object_token.'_'.$object_direction;
+                $composite_token = $object_token;
+                if ($request_dir === 'both'){ $composite_token .= '_'.$object_direction; }
                 $composite_index[$composite_token] = $composite_config;
                 // If the player has requested all alts for this object, we have to add them
                 if ($request_alt === 'all'
