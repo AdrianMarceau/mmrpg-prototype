@@ -473,35 +473,36 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
 
     // Loop through the ability rewards for this robot if set
     if ($unlock_abilities && !empty($this_robot_rewards['abilities'])){
-        // Define an array to track any new abilities unlocked
-        $new_abilities_unlocked = array();
-        // Define any auto-abilities that we should unlock for the robot first
-        $auto_abilities = array();
-        // Automatically unlock the Buster Shot for all robot masters
-        $auto_abilities[] = array('level' => 0, 'token' => 'buster-shot');
-        // If the player buster has been unlocked, make sure add that after buster shot
-        $player_buster_token = str_replace('dr-', '', $this_player_token).'-buster';
-        if (mmrpg_game_ability_unlocked('', '', $player_buster_token)){ $auto_abilities[] = array('level' => 0, 'token' => $player_buster_token); }
-        // If there were any auto-abliities, make sure we prepend the to the start of the list
-        if (!empty($auto_abilities)){ $this_robot_rewards['abilities'] = array_merge($auto_abilities, $this_robot_rewards['abilities']); }
+
         // Collect the ability index for calculation purposes
         $this_ability_index = rpg_ability::get_index(true);
+
+        // Define an array to track any new abilities unlocked
+        $abilities_to_unlock = array();
+        $new_abilities_unlocked = array();
+
+        // Automatically unlock the Buster Shot for all robot masters
+        $abilities_to_unlock[] = array('level' => 0, 'token' => 'buster-shot');
+
+        // Loop through any of this robot's level-up abilities and add them too where appropriate
         foreach ($this_robot_rewards['abilities'] AS $ability_reward_key => $ability_reward_info){
             // Check if the required amount of points have been met by this robot
             if ($this_robot_level >= $ability_reward_info['level']){
-                // Unlock this ability
+                // Pull the info for this ability and make sure it's unlockable
                 $this_ability_info = $this_ability_index[$ability_reward_info['token']];
                 if (empty($this_ability_info['ability_flag_published'])){ continue; }
                 if (empty($this_ability_info['ability_flag_complete'])){ continue; }
                 if (empty($this_ability_info['ability_flag_unlockable'])){ continue; }
-                $this_ability_info['ability_points'] = $ability_reward_info['level'];
-                $ability_unlocked = mmrpg_game_ability_unlocked('', '', $ability_reward_info['token']);
-                $show_event = !$ability_unlocked ? true : false;
-                mmrpg_game_unlock_ability($player_info, $robot_info, $this_ability_info, $show_event);
-                if (!$ability_unlocked){ $new_abilities_unlocked[] = $ability_reward_info['token']; }
+                // Add this ability to the unlock list
+                $abilities_to_unlock[] = array('level' => 0, 'token' => $ability_reward_info['token']);
             }
         }
-        // Pull the list of abilities unlocked overall, and then loop through to see if any are compatible
+
+        // If the player buster has been unlocked, make sure add that after buster shot
+        $player_buster_token = str_replace('dr-', '', $this_player_token).'-buster';
+        if (mmrpg_game_ability_unlocked('', '', $player_buster_token)){ $abilities_to_unlock[] = array('level' => 0, 'token' => $player_buster_token); }
+
+        // Now pull the list of battle abilities unlocked overall, and then loop through to see if any are compatible
         $all_unlocked_abilities = array();
         mmrpg_prototype_abilities_unlocked('', '', $all_unlocked_abilities);
         $robot_unlocked_abilities = array();
@@ -518,21 +519,31 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
                 if (!isset($this_ability_index[$ability_token])){ continue; }
                 //error_log('checking '.$this_robot_token.' compatibility w/ '.$ability_token);
                 $this_ability_info = $this_ability_index[$ability_token];
-                if (empty($this_ability_info['ability_type'])){ continue; } // skip neutral-type abilities and leave that for the editor
+                // skip neutral-type abilities for non-support robots and leave that for the editor
+                if (empty($this_ability_info['ability_type']) && !empty($robot_info['robot_core'])){ continue; }
                 if (rpg_robot::has_ability_compatibility($this_robot_token, $ability_token, $this_robot_item)){
                     //error_log($this_robot_token.' IS compatible w/ '.$ability_token.'!');
                     if (!mmrpg_game_ability_unlocked($this_player_token, $this_robot_token, $ability_token)){
+                        // Make sure this ability is unlockable
                         if (empty($this_ability_info['ability_flag_published'])){ continue; }
                         if (empty($this_ability_info['ability_flag_complete'])){ continue; }
                         if (empty($this_ability_info['ability_flag_unlockable'])){ continue; }
-                        $this_ability_info['ability_points'] = 0;
-                        mmrpg_game_unlock_ability($player_info, $robot_info, $this_ability_info, false);
-                        //error_log('unlocked '.$ability_token.' for '.$this_robot_token.'!');
-                        $robot_unlocked_abilities[] = $ability_token;
-                        if (count($robot_unlocked_abilities) >= MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX){ break; }
+                        // Add this ability to the unlock list
+                        $abilities_to_unlock[] = array('level' => 0, 'token' => $ability_token);
                     }
                 }
             }
+        }
+        //error_log('$abilities_to_unlock = '.print_r($abilities_to_unlock, true));
+
+        // Now finally loop through all the abilities we've decided can be unlocked and actually unlock them
+        foreach ($abilities_to_unlock AS $ability_reward_key => $ability_reward_info){
+            // Unlock this ability for this robot and player, showing an event only if it's a new unlock overall
+            $this_ability_info = $this_ability_index[$ability_reward_info['token']];
+            $ability_unlocked_overall = mmrpg_game_ability_unlocked('', '', $ability_reward_info['token']);
+            if (!$ability_unlocked_overall){ $new_abilities_unlocked[] = $ability_reward_info['token']; }
+            $show_event = !$ability_unlocked_overall ? true : false;
+            mmrpg_game_unlock_ability($player_info, $robot_info, $this_ability_info, $show_event);
         }
     }
 
