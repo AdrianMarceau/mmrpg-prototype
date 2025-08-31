@@ -715,8 +715,17 @@ if ($map_has_player_platforms && !empty($map_player_platforms)){
                 rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
             }
             $redirect_to_player = $player_token;
-            $redirect_to_position = $this_prototype_data['this_current_position'];
-            header('Location: world.php?player='.$redirect_to_player.'&position='.$redirect_to_position);
+            $redirect_to_world = $WORLD_PLAYER_SESSION['last_world'];
+            $redirect_to_map = $WORLD_PLAYER_SESSION['last_map'];
+            $redirect_to_position = $WORLD_PLAYER_SESSION['last_position'];
+            $redirect_to_url = 'world.php?'.implode('&', array(
+                'player='.$redirect_to_player,
+                'world='.$redirect_to_world,
+                'map='.$redirect_to_map,
+                'position='.$redirect_to_position
+                ));
+            //error_log('-> redirecting to new world URL: '.$redirect_to_url);
+            header('Location: '.$redirect_to_url);
             exit();
         }
     }
