@@ -515,11 +515,13 @@ function mmrpg_game_unlock_robot($player_info, $robot_info, $unlock_abilities = 
             $this_robot_item = !empty($this_robot_settings['robot_item']) ? $this_robot_settings['robot_item'] : '';
             foreach ($all_unlocked_abilities AS $ability_token){
                 if (in_array($ability_token, $robot_unlocked_abilities)){ continue; }
+                if (!isset($this_ability_index[$ability_token])){ continue; }
                 //error_log('checking '.$this_robot_token.' compatibility w/ '.$ability_token);
+                $this_ability_info = $this_ability_index[$ability_token];
+                if (empty($this_ability_info['ability_type'])){ continue; } // skip neutral-type abilities and leave that for the editor
                 if (rpg_robot::has_ability_compatibility($this_robot_token, $ability_token, $this_robot_item)){
                     //error_log($this_robot_token.' IS compatible w/ '.$ability_token.'!');
                     if (!mmrpg_game_ability_unlocked($this_player_token, $this_robot_token, $ability_token)){
-                        $this_ability_info = $this_ability_index[$ability_token];
                         if (empty($this_ability_info['ability_flag_published'])){ continue; }
                         if (empty($this_ability_info['ability_flag_complete'])){ continue; }
                         if (empty($this_ability_info['ability_flag_unlockable'])){ continue; }
