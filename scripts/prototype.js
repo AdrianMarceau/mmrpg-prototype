@@ -880,20 +880,17 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
     var stepMusic = thisLink.attr('data-music') != undefined ? thisLink.attr('data-music') : false;
     var stepSource = thisLink.attr('data-source') != undefined ? thisLink.attr('data-source') : false;
 
-    // Only clear banner options if we're not in demo mode or there's only one player
-    if (gameSettings.demo != true && gameSettings.totalPlayerOptions > 1){
-        // Clear any select options from the banner
-        $('.banner .option[data-select]', thisContext).animate({opacity:0},600,'swing',function(){
-            var thisSelect = $(this).attr('data-select');
-            $(this).remove();
-            var remainingOptions = $('.banner .option', thisContext).length;
-            if (remainingOptions < 1){
-                $('.banner .is_shifted', thisContext).removeClass('is_shifted').animate({opacity:1.0},600,'swing');
-                $('.menu .option_wrapper[data-condition]', thisContext).css({display:''});
-                battleOptions[thisSelect] = undefined;
-                }
-            });
-    }
+    // Clear any select options from the banner
+    $('.banner .option[data-select]', thisContext).animate({opacity:0},600,'swing',function(){
+        var thisSelect = $(this).attr('data-select');
+        $(this).remove();
+        var remainingOptions = $('.banner .option', thisContext).length;
+        if (remainingOptions < 1){
+            $('.banner .is_shifted', thisContext).removeClass('is_shifted').animate({opacity:1.0},600,'swing');
+            $('.menu .option_wrapper[data-condition]', thisContext).css({display:''});
+            battleOptions[thisSelect] = undefined;
+            }
+        });
 
     // If there was music requested, start playing it
     if (stepMusic.length){ parent.mmrpg_music_load(stepMusic, true); }
@@ -1249,16 +1246,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
     if (typeof thisOption.attr('data-child') === 'undefined'){
 
         // Collect the context for the banner area and remove and foregrounds
-
         var thisBanner = $('.banner', thisContext);
-        /*
-        //console.log('get ready to fade credits to '+creditsOpacity+'!');
-        var creditsOpacity = ((gameSettings.demo == true || (gameSettings.demo != true && gameSettings.totalPlayerOptions == 1 && thisSelect == 'this_player_token')) ? 1.0 : 0.0);
-        $('.banner_credits', thisBanner).removeClass('is_shifted').animate({opacity:creditsOpacity},{duration:600,easing:'swing',sync:false,complete:function(){
-            //console.log('credits have been animated to '+creditsOpacity);
-            $(this).addClass('is_shifted');
-            }});
-        */
         $('.banner_foreground:not(.is_shifted)', thisBanner).css({opacity:0.6}).animate({opacity:1.0},{duration:600,easing:'swing',sync:false,complete:function(){
             $(this).addClass('is_shifted');
             }});
@@ -1650,10 +1638,7 @@ function prototype_menu_switch_action(switchOptions){
         }
 
     // Else if this is the HOME screen, expand the banner height
-    if ((switchOptions.stepName == '1' || switchOptions.stepNumber == 1)
-        || (gameSettings.demo == true && (switchOptions.stepName == '2' || switchOptions.stepNumber == 2))
-        || (gameSettings.demo != true && gameSettings.totalPlayerOptions == 1 && (switchOptions.stepName == '2' || switchOptions.stepNumber == 2))
-        ){
+    if (switchOptions.stepName == '1' || switchOptions.stepNumber == 1){
         var newHeight = 184;
         //console.log('Expanding the banner height to '+newHeight);
         thisBanner.removeClass('compact').addClass('fullsize').animate({height:newHeight+'px'},{duration:500,easing:'swing',queue:false});

@@ -376,7 +376,7 @@ if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-scr
         <div class="options options_fullmenu field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <div class="wrapper">
 
-                <a class="link link_home link_active" data-step="<?= $unlock_count_players == 1 ? 2 : 1 ?>" data-index="<?= $this_menu_indexes['home'] ?>" data-music="misc/<?= $unlock_count_players == 1 ? 'stage-select-dr-light' : 'player-select' ?>" data-maybe-tooltip="<?= $this_menu_tooltips['home'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                <a class="link link_home link_active" data-step="1" data-index="<?= $this_menu_indexes['home'] ?>" data-music="misc/player-select" data-maybe-tooltip="<?= $this_menu_tooltips['home'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                     <i class="fa fas fa-home"></i>
                     <label>home</label>
                 </a>
@@ -438,9 +438,6 @@ if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-scr
 
     <?
 
-    // Define the player select title based on the number of players unlocked (old version)
-    //$player_select_title = 'Player Select ('.(!empty($_SESSION[$session_token]['DEMO']) || $unlock_count_players == 1 ? '1 Player' : $unlock_count_players.' Players').')';
-
     // Define the player select title based on the number of players unlocked (new version)
     $free_roam_unlocked = true;
     $void_cauldron_unlocked = false;
@@ -478,33 +475,21 @@ if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-scr
     </div>
 
     <?
-        /*
-         * DEMO ROBOT SELECT
-         */
-        if (!empty($_SESSION[$session_token]['DEMO'])){
+        // ROBOT SELECT MARKUP
 
-            // There is no demo get out of here!
+        // Print out the opening tags for the robot select container
+        echo '<div class="menu menu_hide select_this_player_robots" data-step="3" data-limit="" data-title="Robot Select" data-select="this_player_robots">'."\n";
+        echo '<span class="header block_1 header_types type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE.'"><span class="count">Robot Select</span></span>'."\n";
 
-        }
-        /*
-         * NORMAL ROBOT SELECT
-         */
-        elseif (mmrpg_prototype_robots_unlocked() > 1){
+        // Require the prototype robots display file
+        require_once(MMRPG_CONFIG_ROOTDIR.'prototype/robots.php');
 
-            // Print out the opening tags for the robot select container
-            echo '<div class="menu menu_hide select_this_player_robots" data-step="3" data-limit="" data-title="Robot Select" data-select="this_player_robots">'."\n";
-            echo '<span class="header block_1 header_types type_'.MMRPG_SETTINGS_CURRENT_FIELDTYPE.'"><span class="count">Robot Select</span></span>'."\n";
+        // Print out the back button for going back to player select
+        echo '<a class="option option_back block_1" data-back="2">&#9668; Back</a>'."\n";
 
-            // Require the prototype robots display file
-            require_once(MMRPG_CONFIG_ROOTDIR.'prototype/robots.php');
+        // Print out the closing tags for the robot select container
+        echo '</div>'."\n";
 
-            // Print out the back button for going back to player select
-            echo '<a class="option option_back block_1" data-back="2">&#9668; Back</a>'."\n";
-
-            // Print out the closing tags for the robot select container
-            echo '</div>'."\n";
-
-        }
     ?>
 
     <div class="menu menu_hide menu_file_save" data-step="file_save" data-source="frames/settings.php"></div>
@@ -658,9 +643,6 @@ battleOptions['this_user_id'] = <?= $this_userid ?>;
 <? if (!empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){ ?>
     battleOptions['this_player_id'] = <?= $mmrpg_index_players[$_SESSION[$session_token]['battle_settings']['this_player_token']]['player_id'] ?>;
     battleOptions['this_player_token'] = '<?= $_SESSION[$session_token]['battle_settings']['this_player_token'] ?>';
-<? } ?>
-<? if ($unlock_count_players === 1 && mmrpg_prototype_robots_unlocked() === 1){ ?>
-    battleOptions['this_player_robots'] = ['101_mega-man'];
 <? } ?>
 
 // Create the document ready events
