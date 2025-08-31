@@ -94,7 +94,7 @@ function mmrpg_game_unlock_player($player_info, $unlock_robots = true, $unlock_a
                 // Unlock this robot and all abilities
                 $this_robot_info = $temp_robots_index[$robot_reward_info['token']];
                 $this_robot_info['robot_level'] = !empty($robot_reward_info['level']) ? $robot_reward_info['level'] : 1;
-                $this_robot_info['robot_experience'] = !empty($robot_reward_info['experience']) ? $robot_reward_info['experience'] : 0;
+                $this_robot_info['robot_experience'] = !empty($robot_reward_info['experience']) ? $robot_reward_info['experience'] : 999;
                 mmrpg_game_unlock_robot($player_info, $this_robot_info, true, false);
             }
         }
