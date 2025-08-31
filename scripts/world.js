@@ -2930,7 +2930,13 @@ class mmrpgWorldMap {
                 showActionArea = true;
                 readyTeamSprites = true;
                 //console.log('-> showing dropdown with battles:', dataBattles);
-                let dataBattlesJoined = dataBattles.join(',');
+                //let dataBattlesJoined = dataBattles.join(',');
+                let dataBattlesJoined = (function(battles){
+                    for (var i = 0, list = []; i < battles.length; i++){
+                        let battle = battles[i][0], battlePosition = battles[i][1];
+                        list.push(battle);
+                        } return list;
+                    })(dataBattles).join(',');
                 let dataLabelsJoined = (function(labels){
                     for (var i = 0, markup = []; i < labels.length; i++){
                         let label = labels[i][0], labelPosition = labels[i][1];
