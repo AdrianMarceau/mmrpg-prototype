@@ -887,7 +887,7 @@ function windowResizeUpdate(updateType){
         var gameConsoleWrapper = gameConsole.find('.wrapper');
         //gameConsoleWrapper.css({overflow:'scroll',width:(gameConsole.width() + 18)+'px',height:(gameConsole.height() + 18)+'px'});
         gameConsoleWrapper.css({width:(gameConsole.width() + 18)+'px',height:(gameConsole.height() + 0)+'px'});
-        gameConsoleWrapper.perfectScrollbar(thisScrollbarSettings);
+        if (typeof $.fn.perfectScrollbar !== 'undefined'){ gameConsoleWrapper.perfectScrollbar(thisScrollbarSettings); }
         }
 
     // If height reszing is allowed, update the window height
@@ -3043,6 +3043,7 @@ function windowEventDisplay(){
         if ($('#window').length){ $eventContainerParent = $('#window').first(); }
         else if ($('#prototype').length){ $eventContainerParent = $('#prototype').first(); }
         else if ($('#battle').length){ $eventContainerParent = $('#battle').first(); }
+        else if ($('#mmrpg').length){ $eventContainerParent = $('#mmrpg').first(); }
         $eventContainerParent.append($eventContainer);
 
         // Define a click event for the event window continue button
@@ -3161,7 +3162,7 @@ function windowEventDisplay(){
         // Animate the event container into view and re-add the animate class to ensure it players
         $innerEventContainer.removeClass('animate');
         $eventContainer.animate({opacity:1},300,'swing');
-        $('#messages', $eventContainer).perfectScrollbar(thisScrollbarSettings);
+        if (typeof $.fn.perfectScrollbar !== 'undefined'){ $('#messages', $eventContainer).perfectScrollbar(thisScrollbarSettings); }
         setTimeout(function(){ $innerEventContainer.addClass('animate'); }, 250);
         $(window).focus();
 

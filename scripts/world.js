@@ -328,10 +328,13 @@ class mmrpgWorldMap {
             _self.playSoundEffect('teleport-in');
             _self.moveToPosition(startPosition, null, true, false, fakeOldPosition);
             setTimeout(function(){
+                console.log('MMRPG WORLD LOADED & READY!');
+                gameSettings.gameHasStarted = true;
                 $thisWorld.removeClass('hidden');
                 $thisWorld.addClass('ready');
                 $canvasMap.addClass('ready');
                 _self.startIdleAnimation();
+                _self.triggerWindowEventsPull();
                 }, 100);
             };
         // Define the function for run when each layer is done being rendered
@@ -4148,6 +4151,7 @@ class mmrpgWorldMap {
                 //console.log('---> save_world.php response:', response);
                 //console.log('%c' + '... World State Saved!', 'color: green;');
                 _selfRef._busy = false;
+                _self.triggerWindowEventsPull(0);
                 if (callback){ return callback.call(_self, 'success', {response}); }
                 else { return true; }
                 },
@@ -5305,7 +5309,6 @@ class mmrpgWorldMap {
         let reloadWorldOnSave = false;
         if (itemToken.indexOf('-heart') !== -1){ reloadWorldOnSave = true; } // limit hearts always reload the world
         _self.saveWorldState(function(){
-            _self.triggerWindowEventsPull(0);
             //console.log('reloadWorldOnSave = ', reloadWorldOnSave);
             // maybe reload the page to update the inventory display
             if (reloadWorldOnSave){ window.location.reload(); }
@@ -5350,9 +5353,7 @@ class mmrpgWorldMap {
         // If a sound was requested, play it now
         if (playSound){ _self.playSoundEffect('get-ability'); }
         // Trigger a save of the world state to persist this change
-        _self.saveWorldState(function(){
-            _self.triggerWindowEventsPull(0);
-            });
+        _self.saveWorldState();
         // Return true on success
         return true;
         }
@@ -5364,13 +5365,14 @@ class mmrpgWorldMap {
         afterDelay = typeof afterDelay === 'number' ? afterDelay : 1000; // default to zero if not provided
         //console.log('queuing the windowEventsPull event (via world)');
         if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
+            //console.log('i guess we wait for the game to start via parent.mmrpg_queue_for_game_start()', parent.mmrpg_queue_for_game_start);
             window.top.mmrpg_queue_for_game_start(function(){
                 //console.log('i guess the game has started');
                 setTimeout(function(){
                     //console.log('attempting to pull window events via parent.windowEventsPull()', parent.windowEventsPull);
                     let result = parent.windowEventsPull(true);
                     if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
-                    else { console.log('windowEventsPull returned successfully: ' + result); }
+                    //else { console.log('windowEventsPull returned successfully: ' + result); }
                     }, afterDelay);
                 });
             }
@@ -5379,8 +5381,11 @@ class mmrpgWorldMap {
             setTimeout(function(){
                 let result = parent.windowEventsPull(true);
                 if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
-                else { console.log('windowEventsPull returned successfully: ' + result); }
+                //else { console.log('windowEventsPull returned successfully: ' + result); }
                 }, afterDelay);
+            }
+        else {
+            //console.warn('could not find a way to pull window events from the parent window!');
             }
         // Return no specific result
         return;
