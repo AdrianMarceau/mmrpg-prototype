@@ -206,6 +206,8 @@ class rpg_world {
         $WORLD_SESSION = &$_SESSION[$session_key];
         $playerSessions = &$WORLD_SESSION['player_sessions'];
         $robotSessions = &$WORLD_SESSION['robot_sessions'];
+        //$world_session_hash = md5(serialize($WORLD_SESSION));
+        //error_log('$world_session_hash = '.$world_session_hash);
         if (!empty($worldData['lastPlayer'])
             && in_array($worldData['lastPlayer'], $allowed_player_tokens)){
             $playerSessions['last_player'] = $worldData['lastPlayer'];
@@ -460,9 +462,34 @@ class rpg_world {
                     }
                 }
             }
+            // Check to see if anything has actually changed about the game session
+            //$new_world_session_hash = md5(serialize($WORLD_SESSION));
+            //$game_session_changed = $world_session_hash !== $new_world_session_hash ? true : false;
+            //error_log('$new_world_session_hash = '.$new_world_session_hash);
+            //error_log('rpg_world::save_world_data_to_session() $game_session_changed = '.($game_session_changed ? 'true' : 'false'));
             //error_log('World data saved successfully for player "'.$lastPlayer.'"!');
             //error_log('World data saved successfully for player "'.$lastPlayer.'" with world "'.$lastPlayerSession['last_world'].'" and position "'.$lastPlayerSession['last_position'].'"');
             //error_log('$WORLD_SESSION = '.print_r($WORLD_SESSION, true));
+            /*
+            // DEBUG DEBUG DEBUG
+            // Show a debug-popup event to prove the game was saved
+            $show_debug_popup = false;
+            if ($show_debug_popup
+                && !empty($game_session_changed)){
+                $game_session_token = rpg_game::session_token();
+                $temp_canvas_markup = '';
+                $temp_canvas_markup .= '<div class="sprite" style="background-image: url(images/fields/field/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(2px) brightness(0.7);"></div>';
+                $temp_console_markup = '';
+                $temp_console_markup .= '<p class="headline type nature"><strong>Game Saved!</strong></p>';
+                $temp_console_markup .= '<div class="inset_panel compact"><p style="text-align: center; margin: 5px auto;">Your progress has been saved.</p></div>';
+                $_SESSION[$game_session_token]['EVENTS'][] = array(
+                    'canvas_markup' => $temp_canvas_markup,
+                    'console_markup' => $temp_console_markup,
+                    'player_token' => $lastPlayer,
+                    'event_type' => 'debug'
+                    );
+                }
+            */
         }
         // Return true on success
         return true;
