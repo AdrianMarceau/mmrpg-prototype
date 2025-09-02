@@ -24,6 +24,11 @@ class rpg_world {
     static $worldmap_basedir = MMRPG_CONFIG_ROOTDIR;
     static $worldmap_baseurl = MMRPG_CONFIG_ROOTURL;
     static $worldmap_basepath = MMRPG_WORLD_DEFAULT_BASEPATH;
+    static $static_encounter_types = array(
+        'mecha' => 'mechas',
+        'master' => 'masters',
+        'boss' => 'bosses',
+        );
 
     // Define functions for manually setting the map constants for this class
     public static function set_mapsize($mapsize){
@@ -619,9 +624,7 @@ class rpg_world {
         $map_data_vars['encounters'] = isset($map_data_vars['encounters']) ? $map_data_vars['encounters'] : '';
         $map_data_vars['pickups'] = isset($map_data_vars['pickups']) ? $map_data_vars['pickups'] : '';
         $map_data_vars['habitats'] = isset($map_data_vars['habitats']) ? $map_data_vars['habitats'] : array();
-        $map_data_vars['mechas'] = isset($map_data_vars['mechas']) ? $map_data_vars['mechas'] : array();
-        $map_data_vars['masters'] = isset($map_data_vars['masters']) ? $map_data_vars['masters'] : array();
-        $map_data_vars['bosses'] = isset($map_data_vars['bosses']) ? $map_data_vars['bosses'] : array();
+        foreach (self::$static_encounter_types AS $type){ $map_data_vars[$type] = isset($map_data_vars[$type]) ? $map_data_vars[$type] : array(); }
         $map_data_vars['items'] = isset($map_data_vars['items']) ? $map_data_vars['items'] : array();
         $map_data_vars['abilities'] = isset($map_data_vars['abilities']) ? $map_data_vars['abilities'] : array();
         if (empty($map_data_vars['world'])){ $map_data_vars['world'] = $world_token; }
@@ -645,9 +648,7 @@ class rpg_world {
         $map_data_vars['switches'] = $map_custval_parser('switches', $map_data_vars['switches']);
         $map_data_vars['terrain'] = $map_custval_parser('terrain', $map_data_vars['terrain']);
         $map_data_vars['habitats'] = $map_custval_parser('habitats', $map_data_vars['habitats']);
-        $map_data_vars['mechas'] = $map_custval_parser('mechas', $map_data_vars['mechas']);
-        $map_data_vars['masters'] = $map_custval_parser('masters', $map_data_vars['masters']);
-        $map_data_vars['bosses'] = $map_custval_parser('bosses', $map_data_vars['bosses']);
+        foreach (self::$static_encounter_types AS $type){ $map_data_vars[$type] = $map_custval_parser($type, $map_data_vars[$type]); }
         $map_data_vars['items'] = $map_custval_parser('items', $map_data_vars['items']);
         $map_data_vars['abilities'] = $map_custval_parser('abilities', $map_data_vars['abilities']);
         // Add collected data to the parsed map data
@@ -670,9 +671,7 @@ class rpg_world {
         $map_data_parsed['encounters'] = $map_data_vars['encounters']; unset($map_data_vars['encounters']);
         $map_data_parsed['pickups'] = $map_data_vars['pickups']; unset($map_data_vars['pickups']);
         $map_data_parsed['habitats'] = $map_data_vars['habitats']; unset($map_data_vars['habitats']);
-        $map_data_parsed['mechas'] = $map_data_vars['mechas']; unset($map_data_vars['mechas']);
-        $map_data_parsed['masters'] = $map_data_vars['masters']; unset($map_data_vars['masters']);
-        $map_data_parsed['bosses'] = $map_data_vars['bosses']; unset($map_data_vars['bosses']);
+        foreach (self::$static_encounter_types AS $type){ $map_data_parsed[$type] = $map_data_vars[$type]; unset($map_data_vars[$type]); }
         $map_data_parsed['items'] = $map_data_vars['items']; unset($map_data_vars['items']);
         $map_data_parsed['abilities'] = $map_data_vars['abilities']; unset($map_data_vars['abilities']);
         //$map_data_parsed['tiles']['keys'] = array_keys($map_data_parsed['tiles']);
@@ -998,13 +997,16 @@ class rpg_world {
                 unset($available_cells[$pos]);
             }
         }
-        // Now let's loop through static bosses and make sure those aren't used either
-        if (!empty($map_data['bosses']) && is_array($map_data['bosses'])){
-            foreach ($map_data['bosses'] AS $boss_name => $boss_data){
-                if (empty($boss_data) || !is_array($boss_data)){ continue; }
-                $pos = $boss_data[0];
-                //error_log('-> removing boss position "'.$pos.'" from available cells');
-                unset($available_cells[$pos]);
+        // Now let's loop through static mechas, masters, bosses, etc. to make sure those aren't used either
+        $static_encounter_types = self::$static_encounter_types;
+        foreach ($static_encounter_types AS $type => $map_key){
+            if (!empty($map_data[$map_key]) && is_array($map_data[$map_key])){
+                foreach ($map_data[$map_key] AS $encounter_name => $encounter_data){
+                    if (empty($encounter_data) || !is_array($encounter_data)){ continue; }
+                    $pos = $encounter_data[0];
+                    //error_log('-> removing '.$type.' position "'.$pos.'" from available cells');
+                    unset($available_cells[$pos]);
+                }
             }
         }
         // Now let's loop through any items and remove spaces that have item pickups on them
@@ -1291,18 +1293,19 @@ class rpg_world {
         //echo('</pre>'.PHP_EOL);
         //exit();
 
-        // STATIC ENCOUNTERS (w/ Mechas, Masters, Bosses)
-        $static_encounter_key = 0;
-        $static_encounter_types = array('mecha' => 'mechas', 'master' => 'masters', 'boss' => 'bosses');
+        // STATIC ENCOUNTERS (w/ Mechas, Masters, Bosses, etc.)
+        $static_encounter_key = array();
+        $static_encounter_types = self::$static_encounter_types;
         foreach ($static_encounter_types AS $encounter_class => $encounter_xclass){
             if (!empty($map_data_parsed[$encounter_xclass])){
                 $static_encounters = $map_data_parsed[$encounter_xclass];
+                if (!isset($static_encounter_key[$encounter_class])){ $static_encounter_key[$encounter_class] = 0; }
                 //error_log('$static_encounters = '.print_r($static_encounters, true));
                 foreach ($static_encounters AS $key => $robot_data){
                     //error_log('-> next $robot_key = '.print_r($robot_key, true));
                     //error_log('-> next $robot_data = '.print_r($robot_data, true));
                     //error_log('-> next $robot_key = '.$robot_key.PHP_EOL.'---> w/ $robot_data = '.print_r($robot_data, true));
-                    $robot_key = $static_encounter_key++;
+                    $robot_key = $static_encounter_key[$encounter_class]++;
                     $robot_pos = $robot_data[0]; unset($robot_data[0]);
                     $robot_token = !empty($robot_data[1]) ? $robot_data[1] : 'robot'; unset($robot_data[1]);
                     $level = !empty($robot_data[2]) ? $robot_data[2] : ''; unset($robot_data[2]);
