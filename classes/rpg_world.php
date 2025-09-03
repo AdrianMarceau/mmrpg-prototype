@@ -1027,10 +1027,18 @@ class rpg_world {
                 unset($available_cells[$pos]);
             }
         }
-        // If there's a group defined called "no-encounters", loop through the cells and add them too
-        if (!empty($map_data['groups']) && is_array($map_data['groups']) && isset($map_data['groups']['no-encounters'])){
-            $no_encounters = $map_data['groups']['no-encounters'];
-            //error_log('-> no-encounters group was defined! | $no_encounters = '.print_r($no_encounters, true));
+        // If there are any groups named or prefixed with "no-encounters", loop through the cells and add them too
+        //if (!empty($map_data['groups']) && is_array($map_data['groups']) && isset($map_data['groups']['no-encounters'])){
+        if (!empty($map_data['groups']) && is_array($map_data['groups'])){
+            $no_encounters = array();
+            $map_groups = $map_data['groups'];
+            $map_groups_keys = array_keys($map_groups);
+            $no_encounters_keys = array_filter($map_groups_keys, function($v){ return (strtolower($v) === 'no-encounters' || strtolower(substr($v, 0, 14)) === 'no-encounters_'); });
+            foreach ($no_encounters_keys AS $group_key){ $no_encounters = array_merge($no_encounters, $map_data['groups'][$group_key]); }
+            $no_encounters = array_unique($no_encounters);
+            //$no_encounters = $map_data['groups']['no-encounters'];
+            //error_log('-> $no_encounters_keys = '.print_r($no_encounters_keys, true));
+            //error_log('-> $no_encounters (list) = '.print_r($no_encounters, true));
             if (!empty($no_encounters) && is_array($no_encounters)){
                 $no_encounters_groups = array();
                 foreach ($no_encounters AS $key => $pos){
