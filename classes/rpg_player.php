@@ -2583,6 +2583,8 @@ class rpg_player extends rpg_object {
         $this->counters['robots_total'] = 0;
         $this->counters['robots_active'] = 0;
         $this->counters['robots_disabled'] = 0;
+        $this->counters['robots_to_disable'] = 0;
+        $this->counters['robots_to_rescue'] = 0;
         $this->counters['robots_positions'] = array(
             'active' => 0,
             'bench' => 0
@@ -2614,10 +2616,16 @@ class rpg_player extends rpg_object {
                 if ($temp_robot->robot_position == 'active'){
                     $this->values['current_robot'] = $temp_robot->robot_string;
                 }
+                // Check if this is a rescue robot to save
+                if (!empty($temp_robot->flags['rescue_robot'])){
+                    $this->counters['robots_to_rescue']++;
+                }
                 // Check if this robot is in active status
                 if ($temp_robot->robot_status == 'active'){
                     // Increment the active robot counter
                     $this->counters['robots_active']++;
+                    // Increment the to-disable robot counter
+                    $this->counters['robots_to_disable']++;
                     // Add this robot to the active robots array
                     $this->values['robots_active'][] = $new_player_robots[$temp_robot->robot_id];
                     // Check if this robot is in the active position
