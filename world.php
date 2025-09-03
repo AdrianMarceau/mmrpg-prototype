@@ -656,6 +656,7 @@ if (!empty($map_data_parsed['events'])){
 //error_log('-> $map_player_platforms = '.print_r($map_player_platforms, true));
 if ($map_has_player_platforms && !empty($map_player_platforms)){
     foreach ($map_player_platforms AS $player_token => $platform_data){
+        //error_log('-> '.$player_token.' $platform_data = '.print_r($platform_data, true));
         $all_active = array_sum($platform_data) === count($platform_data) ? true : false;
         //error_log('-> player "'.$player_token.'" has all platforms active? '.($all_active ? 'YES' : 'no'));
         if ($all_active && !mmrpg_prototype_player_unlocked($player_token)){
@@ -717,15 +718,17 @@ if ($map_has_player_platforms && !empty($map_player_platforms)){
                 $clear_seen_frame_token = 'edit_players';
                 rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
             }
+            $middle_platform_key = count($platform_data) > 2 ? array_keys($platform_data)[floor(count($platform_data) / 2)] : '';
             $redirect_to_player = $player_token;
             $redirect_to_world = $WORLD_PLAYER_SESSION['last_world'];
             $redirect_to_map = $WORLD_PLAYER_SESSION['last_map'];
-            $redirect_to_position = $WORLD_PLAYER_SESSION['last_position'];
+            $redirect_to_position = !empty($middle_platform_key) ? $middle_platform_key : $WORLD_PLAYER_SESSION['last_position'];
             $redirect_to_url = 'world.php?'.implode('&', array(
                 'player='.$redirect_to_player,
                 'world='.$redirect_to_world,
                 'map='.$redirect_to_map,
-                'position='.$redirect_to_position
+                'position='.$redirect_to_position,
+                'return=prototype'
                 ));
             //error_log('-> redirecting to new world URL: '.$redirect_to_url);
             header('Location: '.$redirect_to_url);

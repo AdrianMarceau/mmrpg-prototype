@@ -144,7 +144,8 @@ class mmrpgWorldMap {
         //console.log('%c' + 'mmrpgWorldMap.worldMapIsHidden()', 'color: green;');
         let _self = this;
         let _world = _self.state;
-        return _world.mapIsHidden;
+        let activeWindowEvent = gameSettings.activeWindowEvent ? true : false;
+        return _world.mapIsHidden || activeWindowEvent;
         }
 
     // Quick function to initialize world map variables
@@ -3167,7 +3168,7 @@ class mmrpgWorldMap {
                     _self.incZoomLevel();
                     window.location.href = autoRedirectURL;
                     _self.incZoomLevel();
-                    });
+                    }, true, false);
                 }
             return true;
             };
@@ -3287,7 +3288,12 @@ class mmrpgWorldMap {
                         battleVars.push('this_battle_token=' + battleId);
                         let battleHref = 'battle.php?' + battleVars.join('&');
                         $thisWorld.addClass('hidden').addClass('busy');
-                        _self.saveWorldState(function(){ window.location.href = battleHref; });
+                        _self.incZoomLevel();
+                        _self.saveWorldState(function(){
+                            _self.incZoomLevel();
+                            window.location.href = battleHref;
+                            _self.incZoomLevel();
+                            }, true, false);
                         }
                     }
                 else if (isPortal){
@@ -3319,7 +3325,7 @@ class mmrpgWorldMap {
                                 _self.incZoomLevel();
                                 window.location.href = portalHref;
                                 _self.incZoomLevel();
-                                });
+                                }, true, false);
                             }
                         }
                     }
@@ -3533,7 +3539,9 @@ class mmrpgWorldMap {
                                 }
                             }
                         // save all these changes to the world state now
-                        _self.saveWorldState(function(){ _worldCursor.busy = false; });
+                        _self.saveWorldState(function(){
+                            _worldCursor.busy = false;
+                            });
                         }
                     }
                 else if (isAbility){
@@ -4077,9 +4085,10 @@ class mmrpgWorldMap {
         }
 
     // Quick function for sending a snapshot of persistent world values back to the server for saving
-    saveWorldState(callback, delay){
+    saveWorldState(callback, delay, pullEvents){
         //console.log('%c' + 'mmrpgWorldMap.saveWorldState(callback, delay)', 'color: magenta;');
         delay = (typeof delay === 'number' ? delay : 1) * 1000; // default to one second if not provided/invalid
+        pullEvents = typeof pullEvents === 'boolean' ? pullEvents : true; // default to true if not provided/invalid
         let _self = this;
         let _selfRef = _self.saveWorldState;
         if (_selfRef._scheduled){ clearTimeout(_selfRef._scheduled); }
@@ -4088,15 +4097,15 @@ class mmrpgWorldMap {
             if (_selfRef._busy){
                 // if busy, try again in one second
                 //console.log('%c' + '--> save in progress, calling saveWorldState() again in ' + delay + 'ms ...', 'color: orange;');
-                _self.saveWorldState(callback, delay);
+                _self.saveWorldState(callback, delay, pullEvents);
                 } else {
                 // not busy so we can save for real now
-                _self.saveWorldStateForReal(callback);
+                _self.saveWorldStateForReal(callback, pullEvents);
                 }
             }, delay);
         return;
         }
-    saveWorldStateForReal(callback){
+    saveWorldStateForReal(callback, pullEvents){
         //console.log('%c' + 'mmrpgWorldMap.saveWorldStateForReal(callback)', 'color: magenta;');
         callback = typeof callback === 'function' ? callback : false; // default to no callback if not provided
         let _self = this;
@@ -4151,7 +4160,7 @@ class mmrpgWorldMap {
                 //console.log('---> save_world.php response:', response);
                 //console.log('%c' + '... World State Saved!', 'color: green;');
                 _selfRef._busy = false;
-                _self.triggerWindowEventsPull(0);
+                if (pullEvents){ _self.triggerWindowEventsPull(0); }
                 if (callback){ return callback.call(_self, 'success', {response}); }
                 else { return true; }
                 },
@@ -4347,8 +4356,6 @@ class mmrpgWorldMap {
                 $eventSprite.addClass('active');
                 eventInfo.active = true;
                 objectInfo.locked = true;
-                // TODO: ... and then what?
-                console.warn('triggerDropZoneEvent() dropAction "' + dropAction + '" not fully implemented yet!');
                 _self.refreshPlayerPlatforms();
                 actionsCompleted++;
                 }
@@ -4412,8 +4419,6 @@ class mmrpgWorldMap {
                 //console.log('-> deactivating player platform for player', _worldPlayer.token, 'at position', _worldPlayer.position);
                 $eventSprite.removeClass('active');
                 eventInfo.active = false;
-                // TODO: ... and then what?
-                console.warn('triggerDropZoneEmpty() dropAction "' + dropAction + '" not fully implemented yet!');
                 _self.refreshPlayerPlatforms();
                 actionsReverted++;
                 }
@@ -4505,13 +4510,46 @@ class mmrpgWorldMap {
                     _self.incZoomLevel();
                     $thisWorld.addClass('hidden');
                     window.location.reload();
-                    });
+                    _self.incZoomLevel();
+                    }, true, false);
                 }
             }
 
         // Return true on success
         return true;
         }
+
+    // Quick function for running a callback (first arg) after a condition (second arg, also a callback) is met (returns true)
+    dontRunUntil(onReady, checkCondition, checkInterval, maxWait){
+        //console.log('%c' + 'mmrpgWorldMap.dontRunUntil(onReady, checkCondition, checkInterval, maxWait)', 'color: magenta;');
+        if (!onReady || typeof onReady !== 'function'){ console.error('dontRunUntil() missing required onReady callback!'); return false; }
+        if (!checkCondition || typeof checkCondition !== 'function'){ console.error('dontRunUntil() missing required checkCondition callback!'); return false; }
+        checkInterval = (typeof checkInterval === 'number' && checkInterval > 0 ? checkInterval : 100); // default to 100ms if not provided/invalid
+        maxWait = (typeof maxWait === 'number' && maxWait > 0 ? maxWait : 10000); // default to 10 seconds if not provided/invalid
+        let _self = this;
+        let _selfRef = _self.dontRunUntil;
+        let timeWaited = 0;
+        if (_selfRef._checking){ clearInterval(_selfRef._checking); }
+        //console.log('-> checking condition every ' + checkInterval + 'ms for up to ' + maxWait + 'ms ...');
+        _selfRef._checking = setInterval(function(){
+            timeWaited += checkInterval;
+            //console.log('-> checking condition, timeWaited = ' + timeWaited + 'ms ...');
+            if (checkCondition.call(_self)){
+                //console.log('%c' + '--> condition met, running onReady callback now ...', 'color: green;');
+                clearInterval(_selfRef._checking);
+                _selfRef._checking = false;
+                return onReady.call(_self);
+                }
+            else if (timeWaited >= maxWait){
+                //console.log('%c' + '--> maxWait reached, stopping checks and not running onReady callback!', 'color: red;');
+                clearInterval(_selfRef._checking);
+                _selfRef._checking = false;
+                return false;
+                }
+            }, checkInterval);
+        return true;
+        }
+
 
     // Quick function for getting a rating token given a percent value
     getRatingToken(percent){
@@ -5164,10 +5202,10 @@ class mmrpgWorldMap {
                     //console.log('--> removing item sprite from the map', '\n--> b/c itemEventQuantity =', itemEventQuantity);
                     $itemEventSprite.animate({opacity: 0, filter: 'brightness(2)'}, zoomDelay, function(){ $itemEventSprite.remove(); });
                     }
+                // Trigger a save of the world state to persist this change
+                _self.saveWorldState();
                 });
             }, (zoomDelay * 2));
-        // Trigger a save of the world state to persist this change
-        _self.saveWorldState();
         // Return true on success
         return true;
         }
@@ -5247,11 +5285,10 @@ class mmrpgWorldMap {
                 //_self.triggerWindowEventsPull();
                 //console.log('--> removing ability sprite from the map');
                 $abilityEventSprite.animate({opacity: 0, filter: 'brightness(2)'}, zoomDelay, function(){ $abilityEventSprite.remove(); });
+                // Trigger a save of the world state to persist this change
+                _self.saveWorldState();
                 });
             }, (zoomDelay * 2));
-
-        // Trigger a save of the world state to persist this change
-        _self.saveWorldState();
         // Return true on success
         return true;
         }
@@ -5312,7 +5349,7 @@ class mmrpgWorldMap {
             //console.log('reloadWorldOnSave = ', reloadWorldOnSave);
             // maybe reload the page to update the inventory display
             if (reloadWorldOnSave){ window.location.reload(); }
-            });
+            }, true, !reloadWorldOnSave);
         // Return true on success
         return true;
         }
