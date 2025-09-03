@@ -324,7 +324,10 @@ if (!empty($_REQUEST['player'])
     || !empty($_REQUEST['position'])
     || !empty($_REQUEST['direction'])){
     // Redirect to the clean world URL
-    header('Location: world.php');
+    $allowed_returns = array('world' => 'world.php', 'prototype' => 'prototype.php');
+    $return_to = !empty($_REQUEST['return']) && in_array($_REQUEST['return'], array_keys($allowed_returns)) ? $_REQUEST['return'] : 'world';
+    $return_url = $allowed_returns[$return_to];
+    header('Location: '.$return_url);
     exit();
 }
 
@@ -903,7 +906,6 @@ _worldConfig.playerRobotsIndex = <?= json_encode($this_prototype_data['this_play
 _worldConfig.playerItemsIndex = <?= json_encode($this_prototype_data['this_player_items_index']) ?>;
 _worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility']) ?>;
 _worldConfig.backButtonURL = 'prototype.php';
-//_worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=<?= $default_world_position ?>';
 _worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=spawn';
 _worldConfig.resetButtonURL = 'world.php?reset=world';
 
