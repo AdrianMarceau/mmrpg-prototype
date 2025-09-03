@@ -438,6 +438,10 @@ class rpg_canvas {
                 $this_data['robot_markup_class'] .= 'scaled ';
             }
 
+            if (!empty($this_robot->flags['rescue_robot'])){
+                $this_data['robot_markup_class'] .= 'rescue ';
+            }
+
             // Put everything together to generate this robot sprite's style attribute
             $background_frame_offset = -1 * ceil(($this_data['robot_size'] * $frame_position));
             $background_image_path = 'images/robots/'.$this_data['robot_image'].'/sprite_'.$this_data['robot_direction'].'_'.$this_data['robot_size_path'].'.png?'.MMRPG_CONFIG_CACHE_DATE;

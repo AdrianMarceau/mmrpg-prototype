@@ -2302,7 +2302,7 @@ class mmrpgWorldMap {
         $actionDropdown.removeClass('active');
         $spritesLayer.removeClass('has-zoom');
         $('.sprite.zoom', $spritesLayer).removeClass('zoom');
-        $('.sprite[data-frame]:not(.disabled)', $canvasMap).attr('data-frame', '00');
+        $('.sprite[data-frame]:not(.disabled):not(.frame-lock)', $canvasMap).attr('data-frame', '00');
         $('.sprite.idle', $spritesLayer).removeClass('idle');
         // Move the cursor to the new position first and foremost
         let moveTimeout;
@@ -3190,6 +3190,7 @@ class mmrpgWorldMap {
                 let isMecha = $eventSprite.hasClass('vs-mecha');
                 let isMaster = $eventSprite.hasClass('vs-master');
                 let isBoss = $eventSprite.hasClass('vs-boss');
+                let isRescue = $eventSprite.hasClass('vs-rescue');
                 //console.log('-> eventsAtPosition['+i+'] / isRobot = ', isRobot);
                 let dataSize = $eventSprite.attr('data-size') || 40;
                 let $eventLayer = $eventSprite.closest('.layer');
@@ -3204,13 +3205,14 @@ class mmrpgWorldMap {
                 //$eventSprite.attr('data-layer', eventLayer);
                 //console.log('-> moving event sprite to zoom layer', eventLayer, 'from events layer');
                 setTimeout(function(){
-                    $eventSprite.addClass('zoom');
+                    $eventSprite.filter(':not(.vs-rescue)').addClass('zoom');
                     $eventLayer.addClass('has-zoom');
                     if (newDirection){ $eventSprite.attr('data-dir', newDirection); }
                     if (isRobot){
-                        if (isMecha){ $eventSprite.attr('data-frame', '08'); }
+                        if (isMecha){ $eventSprite.attr('data-frame', '04'); }
                         else if (isMaster){ $eventSprite.attr('data-frame', '01'); }
                         else if (isBoss){ $eventSprite.attr('data-frame', '06'); }
+                        else if (isRescue){ $eventSprite.attr('data-frame', '08'); }
                         }
                     }, 100);
                 }
@@ -3239,7 +3241,7 @@ class mmrpgWorldMap {
                 $worldCursor.removeClass('shake');
                 $spritesLayer.removeClass('has-zoom');
                 $('.sprite.zoom', $canvasMap).removeClass('zoom');
-                $('.sprite[data-frame]:not(.disabled)', $canvasMap).attr('data-frame', '00');
+                $('.sprite[data-frame]:not(.disabled):not(.frame-lock)', $canvasMap).attr('data-frame', '00');
                 };
 
             // Define the event to run when clicking one of these new action buttons
@@ -3824,7 +3826,11 @@ class mmrpgWorldMap {
                 let eventLabel = $eventSprite.length ? $eventSprite.attr('data-label') : '';
                 if ($eventSprite && $eventSprite.length){ $eventSprite = $eventSprite.first().get(0); }
                 let eventKind2 = eventKind;
-                if (eventKind === 'event'){
+                if (eventKind === 'battle'){
+                    // make sure we take the secondary type (mecha/master/boss/rescue) as the second "kind"
+                    eventKind2 = eventInfo.kind2;
+                    }
+                else if (eventKind === 'event'){
                     // treat healpads and resetpads as sanctuary events
                     if (eventInfo.sprite === 'healpad' || eventInfo.sprite === 'resetpad'){ eventKind2 = 'sanctuary'; }
                     // otherwise it's just a generic custom event tile
@@ -3880,7 +3886,11 @@ class mmrpgWorldMap {
                 let eventLabel = $eventSprite.length ? $eventSprite.attr('data-label') : '';
                 if ($eventSprite && $eventSprite.length){ $eventSprite = $eventSprite.first().get(0); }
                 let eventKind2 = eventKind;
-                if (eventKind === 'event'){
+                if (eventKind === 'battle'){
+                    // make sure we take the secondary type (mecha/master/boss/rescue) as the second "kind"
+                    eventKind2 = eventInfo.kind2;
+                    }
+                else if (eventKind === 'event'){
                     // treat healpads and resetpads as sanctuary events
                     if (eventInfo.sprite === 'healpad' || eventInfo.sprite === 'resetpad'){ eventKind2 = 'sanctuary'; }
                     // otherwise it's just a generic custom event tile
@@ -3980,8 +3990,10 @@ class mmrpgWorldMap {
         let $canvasMap = _elements.map;
         let $vsMechas = $('.sprite.vs-mecha', $canvasMap);
         let $vsBosses = $('.sprite.vs-boss', $canvasMap);
+        let $vsRescues = $('.sprite.vs-rescue', $canvasMap);
         $vsMechas.addClass('march');
         $vsBosses.addClass('march');
+        $vsRescues.addClass('shake');
         if (_selfRef._interval){ clearInterval(_selfRef._interval); }
         _selfRef._interval = setInterval(function(){
             $vsMechas = $('.sprite.vs-mecha:not(.zoom)', $canvasMap);
@@ -4027,6 +4039,26 @@ class mmrpgWorldMap {
                 if (!changed){ return true; }
                 let randCooldown = 4 + Math.ceil(Math.random() * 6);
                 $boss.data('cooldown', randCooldown);
+                });
+            $vsRescues = $('.sprite.vs-rescue:not(.zoom)', $canvasMap);
+            $vsRescues.each(function(){
+                let $rescue = $(this);
+                if ($rescue.data('cooldown') && $rescue.data('cooldown') > 0){
+                    $rescue.data('cooldown', $rescue.data('cooldown') - 1);
+                    return true;
+                    }
+                let curDir = $rescue.attr('data-dir') || 'right';
+                let newDir = curDir === 'right' ? 'left' : 'right';
+                //let curFrame = $rescue.attr('data-frame') || '09';
+                //let newFrame = curFrame !== '08' ? '08' : '09';
+                let changed = false;
+                let changeDirection = Math.random() > 0.5 ? true : false;
+                let changeFrame = Math.random() > 0.5 ? true : false;
+                if (changeDirection){ $rescue.attr('data-dir', newDir); changed = true; }
+                //if (changeFrame){ $rescue.attr('data-frame', newFrame); changed = true; }
+                if (!changed){ return true; }
+                let randCooldown = 4 + Math.ceil(Math.random() * 6);
+                $rescue.data('cooldown', randCooldown);
                 });
             }, 500);
         // Return true on success
@@ -4280,7 +4312,7 @@ class mmrpgWorldMap {
             processEventAction(eventAction, function(){
                 if (actionsCompleted){ _self.resetZoomLevel(); }
                 $teamSprites.removeClass('shake');
-                $teamSprites.filter(':not(.disabled)').attr('data-frame', '00');
+                $teamSprites.filter(':not(.disabled):not(.frame-lock)').attr('data-frame', '00');
                 _self.triggerWindowEventsPull();
                 }, delayTime);
             }, delayTime);
@@ -5196,8 +5228,7 @@ class mmrpgWorldMap {
                 _self.resetZoomLevel();
                 $itemEventLayer.removeClass('has-zoom');
                 $teamSprites.removeClass('shake');
-                $teamSprites.filter(':not(.disabled)').attr('data-frame', '00');
-                //_self.triggerWindowEventsPull();
+                $teamSprites.filter(':not(.disabled):not(.frame-lock)').attr('data-frame', '00');
                 if (!itemEventQuantity){
                     //console.log('--> removing item sprite from the map', '\n--> b/c itemEventQuantity =', itemEventQuantity);
                     $itemEventSprite.animate({opacity: 0, filter: 'brightness(2)'}, zoomDelay, function(){ $itemEventSprite.remove(); });
@@ -5281,8 +5312,7 @@ class mmrpgWorldMap {
                 _self.resetZoomLevel();
                 $abilityEventLayer.removeClass('has-zoom');
                 $teamSprites.removeClass('shake');
-                $teamSprites.filter(':not(.disabled)').attr('data-frame', '00');
-                //_self.triggerWindowEventsPull();
+                $teamSprites.filter(':not(.disabled):not(.frame-lock)').attr('data-frame', '00');
                 //console.log('--> removing ability sprite from the map');
                 $abilityEventSprite.animate({opacity: 0, filter: 'brightness(2)'}, zoomDelay, function(){ $abilityEventSprite.remove(); });
                 // Trigger a save of the world state to persist this change

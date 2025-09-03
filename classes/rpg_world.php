@@ -28,6 +28,7 @@ class rpg_world {
         'mecha' => 'mechas',
         'master' => 'masters',
         'boss' => 'bosses',
+        'rescue' => 'rescues',
         );
 
     // Define functions for manually setting the map constants for this class
@@ -1265,13 +1266,17 @@ class rpg_world {
             //error_log('$battle_background = '.print_r($battle_background, true));
             //error_log('$battle_foreground = '.print_r($battle_foreground, true));
             $robot_info = $mmrpg_index_robots[$robot_token];
+            $robot_name = $robot_info['robot_name'];
             $robot_class = $robot_info['robot_class'];
             $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']);
             $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
             $robot_label = $robot_info['robot_name'].' (Lv. '.$robot_level.')';
             $battle_token = $world_battle_token.'_random-robot-'.($robot_key + 1);
             $battle_name = $map_name.' '.ucfirst($robot_class).' Battle';
-            $battle_description = 'This is a debug '.$robot_class.' battle.  It is casual fun.';
+            $battle_description = 'Defeat '.$robot_name.' in battle!';
+            if ($robot_class === 'mecha'){ $battle_description = 'Defeat the '.$robot_name.' support mecha in battle!'; }
+            elseif ($robot_class === 'master'){ $battle_description = 'Defeat the robot master '.$robot_name.' in battle!'; }
+            elseif ($robot_class === 'boss'){ $battle_description = 'Defeat '.$robot_name.' the fortress boss in battle!'; }
             $battle_background = $map_field_token;
             $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
             $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
@@ -1331,20 +1336,36 @@ class rpg_world {
                     $robot_pos_terrain = rpg_world::get_map_position_terrain($robot_pos, $map_data_parsed);
                     $robot_info = $mmrpg_index_robots[$robot_token];
                     $robot_class = $robot_info['robot_class'];
+                    $robot_gender = $robot_info['robot_gender'];
                     //error_log('-> $robot_info = '.print_r($robot_info, true));
                     if (!empty($level) && is_numeric($level) && intval($level) > 0){ $robot_level = $level; }
                     else { $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']); }
                     $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
-                    $robot_label = $robot_info['robot_name'].' (Lv. '.$robot_level.')';
-                    $battle_token = $world_battle_token.'_static-'.$robot_class.'-'.($robot_key + 1);
-                    $battle_name = $map_name.' '.ucfirst($robot_class).' Battle';
+                    $robot_name = $robot_info['robot_name'];
+                    $robot_label = $robot_name.' (Lv. '.$robot_level.')';
+                    $robot_flags = array();
+                    $battle_token = $world_battle_token.'_static-'.$encounter_class.'-'.($robot_key + 1);
+                    if ($encounter_class === 'rescue'){
+                        $battle_name = $map_name.' '.ucfirst($robot_class).' Rescue';
+                        $rescue_pronoun = rpg_robot::get_robot_pronoun($robot_class, $robot_gender, 'object');
+                        $battle_description = 'Protect '.$robot_name.' from falling in battle to rescue '.$rescue_pronoun.'!';
+                        } else {
+                        $battle_name = $map_name.' '.ucfirst($robot_class).' Battle';
+                        $battle_description = 'Defeat '.$robot_name.' in battle!';
+                        if ($encounter_class === 'mecha'){ $battle_description = 'Defeat the '.$robot_name.' support mecha in battle!'; }
+                        elseif ($encounter_class === 'master'){ $battle_description = 'Defeat the robot master '.$robot_name.' in battle!'; }
+                        elseif ($encounter_class === 'boss'){ $battle_description = 'Defeat '.$robot_name.' the fortress boss in battle!'; }
+                        }
                     $battle_background = $map_field_token;
                     $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
                     $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
-                    $world_map_encounters[] = array('robot/'.$robot_class, $robot_token, '', $robot_pos, $battle_token, $robot_label);
                     $battle_rewards = array();
+                    $battle_flags = array();
+                    $battle_flags['world_battle'] = true;
+                    $battle_flags['remove_on_complete'] = true;
                     // If this is a master battle, make sure we add the necessary robot and ability rewards to this battle
-                    if ($robot_class === 'master'){
+                    if ($robot_class === 'master'
+                        && $encounter_class !== 'rescue'){
                         if (!mmrpg_prototype_robot_unlocked('', $robot_token)){
                             //error_log('-> '.$robot_token.' is a master that is not unlocked yet!');
                             if (!isset($battle_rewards['robots'])){ $battle_rewards['robots'] = array(); }
@@ -1365,11 +1386,26 @@ class rpg_world {
                             }
                         }
                     }
+                    // If this is a rescue battle, the robot should be added to the rewards too
+                    if ($encounter_class === 'rescue'){
+                        $battle_flags['rescue_battle'] = true;
+                        $robot_flags['rescue_robot'] = true;
+                        $robot_flags['is_friendly'] = true;
+                        $robot_label = $robot_name.' (Help!)';
+                        if (!mmrpg_prototype_robot_unlocked('', $robot_token)){
+                            //error_log('-> '.$robot_token.' is a rescue that is not unlocked yet!');
+                            if (!isset($battle_rewards['robots'])){ $battle_rewards['robots'] = array(); }
+                            //$battle_rewards['robots'][] = array('token' => $robot_token, 'level' => 'auto', 'experience' => 'auto');
+                            $battle_rewards['robots'][] = array('token' => $robot_token, 'level' => $robot_level, 'experience' => 999);
+                            //error_log('-> ... adding '.$robot_token.' to the battle rewards!');
+                        }
+                    }
                     //error_log('-> generating '.$robot_class.' battle "'.$battle_token.'" ('.$battle_name.')');
+                    $world_map_encounters[] = array('robot/'.$encounter_class, $robot_token, '', $robot_pos, $battle_token, $robot_label);
                     $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
                         'token' => $battle_token,
                         'name' => $battle_name,
-                        'description' => 'This is a debug '.$robot_class.' battle.  It is very serious.',
+                        'description' => $battle_description,
                         'field' => $battle_field,
                         'turns' => $rewards_matrix[$robot_class]['turns'],
                         'zenny' => $rewards_matrix[$robot_class]['zenny'],
@@ -1377,9 +1413,10 @@ class rpg_world {
                             'token' => $robot_token,
                             'level' => $robot_level,
                             'item' => $robot_item,
+                            'flags' => $robot_flags,
                             ))),
-                        'flags' => array('world_battle' => true, 'remove_on_complete' => true),
                         'rewards' => $battle_rewards,
+                        'flags' => $battle_flags,
                         ), true);
                     //error_log('-> $battle_omega = '.print_r($battle_omega, true));
                 }
@@ -2111,14 +2148,17 @@ class rpg_world {
             $class = 'battle vs-'.$subkind.' bounce';
             if ($subkind === 'master'){ $class .= ' always-zoom'; }
             elseif ($subkind === 'boss'){ $class .= ' always-zoom'; }
+            elseif ($subkind === 'rescue'){ $class .= ' always-zoom frame-lock'; }
             $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
             $attrs = 'data-battle="'.$battle.'" data-label="'.$name.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
             $markup = self::get_sprite($kind, $token, $alt, $dir, $class, $style, $attrs);
             $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="battle-'.$kind.'"', $markup);
+            if ($subkind === 'rescue'){ $markup = str_replace('data-frame="00"', 'data-frame="08"', $markup); }
             $battles_markup[] = $markup;
             $battle_symbols[$pos] = $battle;
             $battles_index[$battle] = array(
                 'kind' => $kind,
+                'kind2' => $subkind,
                 'token' => $token,
                 'alt' => $alt,
                 'col' => $col,

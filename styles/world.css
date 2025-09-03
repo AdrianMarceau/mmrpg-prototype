@@ -4,6 +4,10 @@ html, body {
     text-align: center;
 }
 
+#mmrpg {
+    overflow: hidden;
+}
+
 #world,
 #world #canvas {
     display: block;
@@ -401,7 +405,7 @@ html, body {
 
 #world #map .sprite.tile.portal { background-position: -360px -40px; }
 #world #map .sprite.tile.portal.locked { background-position: -440px -40px; }
-#world #map .sprite.tile[data-portal="spawn"] { background-position: -40px -40px; }
+#world #map .sprite.tile[data-portal="spawn"] { background-position: -120px -40px; }
 #world #map .sprite.tile[data-portal="exit"] { background-position: -440px -40px; }
 #world #map .sprite.tile.portal.hidden { display: none; }
 
@@ -882,6 +886,19 @@ html, body {
 }
 #world #map .layer .sprite[data-dir="right"].march > .wrap {
     transform: translate(16px, 0);
+}
+
+/* define a shake animation for sprites that are scared a need rescuing */
+@keyframes world-sprite-shake {
+    0% { transform: translate(0, 0); }
+    1% { transform: translate(-2px, 0); }
+    2% { transform: translate(2px, 0); }
+    3% { transform: translate(-2px, 0); }
+    4% { transform: translate(2px, 0); }
+    5% { transform: translate(0, 0); }
+}
+#world #map .layer .sprite.shake > .wrap {
+    animation: world-sprite-shake 1.6s steps(1) infinite;
 }
 
 /* define the special styles for when the map itself has been zoomed in */

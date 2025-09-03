@@ -1130,7 +1130,8 @@ function mmrpg_canvas_animate(){
     $('.sprite[data-type="robot"]', gameCanvas).each(function(){
 
         // Collect a reference to the current robot
-        var thisRobot = $(this);
+        let thisRobot = $(this);
+        let robotIsRescue = thisRobot.is('.rescue') ? true : false;
         // Ensure the robot has not been disabled
         if (thisRobot.attr('data-status') != 'disabled'){
             // Generate a random number
@@ -1150,10 +1151,18 @@ function mmrpg_canvas_animate(){
                 // If the player has been defeated, only show one frame, otherwise randomize
                 if (relativeResult == 'defeat'){
                     // Defeault to the defeat frame
-                    newFrame = 'defeat';
+                    newFrame = robotIsRescue ? 'victory' : 'defeat';
                     } else {
-                    // Only change to an action frame if currently base
-                    if (currentFrame == 'base'){
+                    // Special defense-only animations for rescue robots
+                    if (robotIsRescue){
+                        if (currentFrame === 'defend' && thisRandom >= 90){
+                            newFrame = 'base';
+                            } else {
+                            newFrame = 'defend';
+                            }
+                        }
+                    // Else only change to an action frame if currently base
+                    else if (currentFrame == 'base'){
                         // Animation freqency based on position
                         if (thisRobot.attr('data-position') != 'active'){
                             // Higher animation freqency if not active (BENCH)

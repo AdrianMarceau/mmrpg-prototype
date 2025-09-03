@@ -1954,13 +1954,14 @@ class rpg_battle extends rpg_object {
                 // Change all this player's robot sprite to their taunt
                 foreach ($this_player->values['robots_active'] AS $key => $info){
                     if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
+                    $is_rescue = !empty($info['flags']['rescue_robot']) ? true : false;
                     if ($this_robot->robot_id == $info['robot_id']){
-                        $this_robot->set_frame('defend');
+                        $this_robot->set_frame($is_rescue ? 'damage' : 'defend');
                         $this_robot->set_frame_styles('');
                         $this_robot->set_detail_styles('');
                     } else {
                         $temp_robot = rpg_game::get_robot($this, $this_player, $info);
-                        $temp_robot->set_frame('taunt');
+                        $temp_robot->set_frame($is_rescue ? 'defend' : 'taunt');
                         $temp_robot->set_frame_styles('');
                         $temp_robot->set_detail_styles('');
                     }
@@ -2314,11 +2315,16 @@ class rpg_battle extends rpg_object {
                     if ($active_robot_count == 1){
                         $new_robotinfo = $this_player->values['robots_active'][0];
                     } elseif ($active_robot_count > 1){
+                        $non_rescue_targets = array_values(array_filter($this_player->values['robots_active'], function($robot){
+                            $is_rescue = !empty($robot['flags']['rescue_robot']) ? true : false;
+                            return !$is_rescue;
+                            }));
+                        $non_rescue_targets_count = count($non_rescue_targets);
                         $this_last_switch = !empty($this_recent_switches) ? array_slice($this_recent_switches, -1, 1, false) : array('');
                         $this_last_switch = $this_last_switch[0];
                         $this_current_token = $this_robot->robot_id.'_'.$this_robot->robot_token;
                         do {
-                            $new_robotinfo = $this_player->values['robots_active'][mt_rand(0, ($active_robot_count - 1))];
+                            $new_robotinfo = $non_rescue_targets[mt_rand(0, ($non_rescue_targets_count - 1))];
                             if ($new_robotinfo['robot_id'] == $this_robot->robot_id){ continue; }
                             elseif ($new_robotinfo['robot_token'] == 'robot'){ continue; }
                             $this_temp_token = $new_robotinfo['robot_id'].'_'.$new_robotinfo['robot_token'];
@@ -2360,6 +2366,7 @@ class rpg_battle extends rpg_object {
                     // Collect a temp version of the new robot for key reading
                     $temp_new_robot = rpg_game::get_robot($this_battle, $this_player, $new_robotinfo);
                     $temp_new_robot_key = $temp_new_robot->robot_key;
+                    $temp_new_robot_is_rescue = !empty($temp_new_robot->flags['rescue_robot']) ? true : false;
 
                     // If the new robot is not valid for some reason, return false
                     if ($temp_new_robot->robot_token == 'robot'){ return false; }
@@ -2473,14 +2480,16 @@ class rpg_battle extends rpg_object {
                         $this_player->set_value('current_robot', $temp_new_robot->robot_string);
                         $this_player->set_value('current_robot_enter', $this_battle->counters['battle_turn']);
                         $event_header = ($this_player->player_visible ? $this_player->player_name.'&#39;s ' : '').$temp_new_robot->robot_name;
-                        $event_body = "{$temp_new_robot->print_name()} ".($this_player->player_side === 'left' ? 'joins' : 'enters')." the battle!<br />";
+                        if ($temp_new_robot_is_rescue){ $event_body = "{$temp_new_robot->print_name()} survived the battle!<br />"; }
+                        else { $event_body = "{$temp_new_robot->print_name()} ".($this_player->player_side === 'left' ? 'joins' : 'enters')." the battle!<br />"; }
                         $event_options = array();
                         rpg_canvas::apply_camera_action_flags($event_options, $temp_new_robot);
                         if (isset($temp_new_robot->robot_quotes['battle_start'])){
                             $temp_new_robot->set_frame('taunt');
                             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                             $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $temp_new_robot->robot_name);
-                            $event_body .= $temp_new_robot->print_quote('battle_start', $this_find, $this_replace);
+                            $quote_kind = $temp_new_robot_is_rescue ? 'battle_victory' : 'battle_start';
+                            $event_body .= $temp_new_robot->print_quote($quote_kind, $this_find, $this_replace);
                         }
 
                         // Only show the enter event if the switch reason was removed or if there is more then one robot
