@@ -1,10 +1,18 @@
 #---------------------------#
 # DEBUG AREA 1
+#---------------------------#
 @token       = debug-area-1
 @name        = DEBUG Area 1
 @level       = 1
 @size        = 14 x 26
 @sheet       = mmrpg-overworld-2k25
+#---------------------------#
+@portals[]   = spawn(6-10)
+@portals[]   = goto__debug-area-1n(6-8, 8-12)
+@portals[]   = goto__debug-area-1s(6-12, 5-2)
+@portals[]   = goto__debug-area-1w(4-10, 17-4)
+@portals[]   = goto__debug-area-1e(8-10, 3-4)
+@portals[]   = goto__debug-area-0(6-23, 10-6)
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[13],[11],[11],[11],[11],[11],[11],[11],[11],[11],[14],[__],[__]
@@ -22,87 +30,116 @@
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[13],[14],[__],[__],[__],[__],[__],[__],[__],[13],[11],[14],[__]
 [__],[15],[16],[__],[__],[__],[__],[__],[__],[__],[10],[10],[10],[__]
-[__],[__],[__],[__],[__],[91],[__],[__],[__],[__],[15],[10],[10],[__]
-[__],[__],[__],[__],[91],[90],[91],[__],[__],[__],[__],[10],[10],[__]
-[__],[__],[__],[91],[90],[90],[90],[91],[__],[__],[__],[10],[10],[__]
-[__],[__],[91],[90],[90],[90],[90],[90],[91],[__],[__],[10],[10],[__]
-[__],[__],[90],[90],[90],[90],[90],[90],[90],[__],[__],[10],[10],[__]
-[__],[__],[90],[90],[90],[90],[90],[90],[90],[__],[__],[15],[16],[__]
-[__],[__],[92],[90],[90],[90],[90],[90],[92],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[91],[__],[__],[__],[__],[15],[12],[16],[__]
+[__],[__],[__],[__],[91],[90],[91],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[91],[90],[90],[90],[91],[__],[__],[__],[__],[__],[__]
+[__],[__],[91],[90],[90],[90],[90],[90],[91],[__],[__],[__],[__],[__]
+[__],[__],[90],[90],[90],[90],[90],[90],[90],[__],[13],[11],[14],[__]
+[__],[__],[90],[90],[90],[90],[90],[90],[90],[__],[10],[10],[10],[__]
+[__],[__],[92],[90],[90],[90],[90],[90],[92],[__],[15],[12],[16],[__]
 [__],[__],[__],[92],[90],[90],[90],[92],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[92],[92],[92],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 #---------------------------#
-@portals[]   = spawn(6-10)
-@portals[]   = goto__debug-area-1n(6-8, 8-12)
-@portals[]   = goto__debug-area-1s(6-12, 5-2)
-@portals[]   = goto__debug-area-1w(4-10, 17-4)
-@portals[]   = goto__debug-area-1e(8-10, 3-4)
-@portals[]   = goto__debug-area-0(6-23, 10-6)
-#---------------------------#
+# FIELD AND TERRAIN
+#--------------------
 @field       = gentle-countryside
-#---------------------------#
 @terrain[]   = grass(gentle-countryside)
 @terrain[]   = subspace(prototype-subspace)
 #---------------------------#
+# ENCOUNTERS AND HABITATS
+#--------------------------
 @encounters  = met(2),trille-bot(1)
-#---------------------------#
 @habitats[]  = met(grass)
 @habitats[]  = trille-bot(subspace)
 #---------------------------#
-@mechas[]    = west-portal-mecha(4-10, rockscotch)
-@mechas[]    = east-portal-mecha(8-10, antlin-g)
-@mechas[]    = north-portal-mecha(6-8, frosty-throwman)
-@mechas[]    = south-portal-mecha(6-12, octone)
-#---------------------------#
-@bosses[]    = subspace-portal-boss(6-23, trill, 50, speed)
-#---------------------------#
+# SPAWN AREA BUFFER
+# + EVENT PANELS
+# + GIFT ITEMS
+#----------------------
+@groups[]    = no-encounters_spawn-buffer(4-7...8-12)
 @events[]    = auto-heal(4-8, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
 @events[]    = auto-reset(8-8, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
-#---------------------------#
-@events[]    = light-platform-left(5-2, lightpad-left, any, drop-zone, item:light-program, activate-player-platform)
-@events[]    = light-platform-middle(6-2, lightpad-middle, any, drop-zone, item:light-heart, activate-player-platform)
-@events[]    = light-platform-right(7-2, lightpad-right, any, drop-zone, item:copy-core, activate-player-platform)
-#---------------------------#
-@items[]     = light-init-heart(12-10, light-heart__2, anchored)
-@items[]     = light-init-program(6-19, light-program, anchored)
-@items[]     = light-init-core(12-16, copy-core, anchored)
-#---------------------------#
 @items[]     = first-consumable-eti(4-12, energy-tank, x1, always)
 @items[]     = first-consumable-wti(8-12, weapon-tank, x1, always)
 #---------------------------#
-@items[]     = first-consumable-api(10-4, attack-pellet, x1, always)
-@items[]     = first-consumable-aci(10-2, attack-capsule, x1, always)
-@items[]     = first-consumable-dpi(11-4, defense-pellet, x1, always)
-@items[]     = first-consumable-dci(11-2, defense-capsule, x1, always)
-@items[]     = first-consumable-spi(12-4, speed-pellet, x1, always)
-@items[]     = first-consumable-sci(12-2, speed-capsule, x1, always)
+# LIGHT PLAYER PLATFORM
+# + INIT ITEMS
+#------------------------
+@events[]     = light-platform-left(5-2, lightpad-left, any, drop-zone, item:light-program, activate-player-platform)
+@events[]     = light-platform-middle(6-2, lightpad-middle, any, drop-zone, item:light-heart, activate-player-platform)
+@events[]     = light-platform-right(7-2, lightpad-right, any, drop-zone, item:copy-core, activate-player-platform)
+@items[]      = light-init-program(6-19, light-program, anchored)
+@items[]      = light-init-heart(12-11, light-heart__2, anchored)
+@items[]      = light-init-core(12-16, copy-core, anchored)
+@groups[]     = no-encounters_light-platform(4-2...8-3)
+@groups[]     = no-encounters_light-init-program(5-18...7-20)
+@groups[]     = no-encounters_light-init-heart(11-10...13-12)
+@groups[]     = no-encounters_light-init-core(11-15...13-17)
 #---------------------------#
-@items[]     = first-consumable-epi(8-4, energy-pellet, x1, always)
-@items[]     = first-consumable-wpi(8-2, energy-capsule, x1, always)
-@items[]     = first-consumable-eci(9-4, weapon-pellet, x1, always)
-@items[]     = first-consumable-wci(9-2, weapon-capsule, x1, always)
+# INTRO ENCOUNTER
+#------------------
+@mechas[]    = light-runway-mecha(6-5, met, 1)
+@groups[]    = no-encounters_light-runway(6-4...6-7)
 #---------------------------#
+# MECHA PORTAL BOSSES
+#----------------------
+@mechas[]    = south-portal-mecha(6-12, octone, 1)
+@mechas[]    = north-portal-mecha(6-8, frosty-throwman, 2)
+@mechas[]    = west-portal-mecha(4-10, rockscotch, 3)
+@mechas[]    = east-portal-mecha(8-10, antlin-g, 4)
+#---------------------------#
+# ROLL RESCUE MISSION
+#----------------------
+@rescues[]   = rescue-roll-robot(13-23, roll, 2)
+@mechas[]    = rescue-roll-guard-1(12-23, sniper-joe, 2)
+@mechas[]    = rescue-roll-guard-2(13-22, sniper-joe, 2)
+@mechas[]    = rescue-roll-guard-3(11-23, met, 1)
+@mechas[]    = rescue-roll-guard-4(13-21, met, 1)
+@items[]     = rescue-roll-pickup-1(11-21, extra-life)
+@groups[]    = no-encounters_rescue-roll(11-21...13-23)
+#---------------------------#
+# ITEMS CODES PICKUP
+#---------------------
 @items[]     = item-codes-pickup(2-16, item-codes)
+@groups[]    = no-encounters_item-codes(1-15...3-17)
 #---------------------------#
-@abilities[] = light-buster-pickup(4-2, light-buster)
-@abilities[] = wily-buster-pickup(3-2, wily-buster)
-@abilities[] = cossack-buster-pickup(2-2, cossack-buster)
+# ITEM CORRIDOR PICKUPS
+# + STARTER ABILITIES
+#------------------------
+@items[]      = attack-pellet-pickup(10-4, attack-pellet)
+@items[]      = attack-capsule-pickup(10-2, attack-capsule)
+@items[]      = defense-pellet-pickup(11-4, defense-pellet)
+@items[]      = defense-capsule-pickup(11-2, defense-capsule)
+@items[]      = speed-pellet-pickup(12-4, speed-pellet)
+@items[]      = speed-capsule-pickup(12-2, speed-capsule)
+@items[]      = energy-pellet-pickup(8-4, energy-pellet)
+@items[]      = energy-capsule-pickup(8-2, energy-capsule)
+@items[]      = weapon-pellet-pickup(9-4, weapon-pellet)
+@items[]      = weapon-capsule-pickup(9-2, weapon-capsule)
+@abilities[]  = light-buster-pickup(4-2, light-buster)
+@abilities[]  = wily-buster-pickup(3-2, wily-buster)
+@abilities[]  = cossack-buster-pickup(2-2, cossack-buster)
+@abilities[]  = copy-shot-pickup(4-4, copy-shot)
+@abilities[]  = copy-soul-pickup(3-4, copy-soul)
+@abilities[]  = copy-style-pickup(2-4, copy-style)
+@groups[]     = no-encounters_item-ability-corridor(2-2...12-4)
 #---------------------------#
-@abilities[] = copy-shot-pickup(4-4, copy-shot)
-@abilities[] = copy-soul-pickup(3-4, copy-soul)
-@abilities[] = copy-style-pickup(2-4, copy-style)
+# ISLAND BUTTON + EVENTS
+#-------------------------
+@buttons[]   = island-button(12-8, green, up, set-group-terrain, island-paths, grass)
+@groups[]    = no-encounters_island-button(11-7...13-9)
+@groups[]    = island-paths(12-12...12-15, 12-17...12-21)
+@groups[]    = no-encounters_island-paths(12-8...12-13)
+@mechas[]    = island-button-guard-1(11-8, met)
+@mechas[]    = island-button-guard-2(13-8, met)
+@groups[]    = no-encounters_island-button-guard(9-10...11-10)
 #---------------------------#
+# SUBSPACE BUTTON + EVENTS
+#---------------------------
+@bosses[]    = subspace-portal-boss(6-23, trill, 50, speed)
 @buttons[]   = subspace-button(6-24, purple, up, set-group-terrain, subspace-path, subspace)
-#---------------------------#
-@groups[]    = central-area(4-8...8-12)
-@groups[]    = light-boundary(5-18...7-20)
-@groups[]    = item-corridor(2-2...12-4, 6-5, 6-6)
-@groups[]    = item-corridor-2(11-8...13-12, 10-10)
-@groups[]    = item-island-1(2-15...3-16)
-@groups[]    = item-island-2(11-15...13-17)
 @groups[]    = subspace-path(6-14, 6-15, 6-16, 6-17)
-@groups[]    = subspace-path-ends(6-13, 6-18)
-@groups[]    = under-subspace-button(5-24, 5-25, 6-25, 7-25, 7-24)
-@groups[]    = no-encounters(central-area, item-corridor, item-corridor-2, item-island-1, item-island-2, light-boundary, under-subspace-button, subspace-path, subspace-path-ends)
+@groups[]    = no-encounters_subspace-button(5-24...7-25)
+@groups[]    = no-encounters_subspace-path(6-13...6-17)
 #---------------------------#
