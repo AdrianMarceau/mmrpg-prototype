@@ -2759,8 +2759,9 @@ class rpg_robot extends rpg_object {
             $trigger_return = rpg_skill_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
         }
 
-        // Check if this unlockable robot's data has been corrupted
-        if (!empty($this->flags['robot_is_unlockable'])){
+        // Check if this unlockable robot's data has been corrupted (not applicable to rescue bots)
+        if (!empty($this->flags['robot_is_unlockable'])
+            && empty($this->flags['robot_is_rescue'])){
 
             // Calculate whether or not this robot is currently corrupted
             $is_corrupted = false;

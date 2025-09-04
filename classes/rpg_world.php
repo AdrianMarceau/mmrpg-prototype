@@ -1389,7 +1389,7 @@ class rpg_world {
                     // If this is a rescue battle, the robot should be added to the rewards too
                     if ($encounter_class === 'rescue'){
                         $battle_flags['rescue_battle'] = true;
-                        $robot_flags['rescue_robot'] = true;
+                        $robot_flags['robot_is_rescue'] = true;
                         $robot_flags['is_friendly'] = true;
                         $robot_label = $robot_name.' (Help!)';
                         if (!mmrpg_prototype_robot_unlocked('', $robot_token)){

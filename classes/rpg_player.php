@@ -2617,7 +2617,7 @@ class rpg_player extends rpg_object {
                     $this->values['current_robot'] = $temp_robot->robot_string;
                 }
                 // Check if this is a rescue robot to save
-                if (!empty($temp_robot->flags['rescue_robot'])){
+                if (!empty($temp_robot->flags['robot_is_rescue'])){
                     $this->counters['robots_to_rescue']++;
                 }
                 // Check if this robot is in active status

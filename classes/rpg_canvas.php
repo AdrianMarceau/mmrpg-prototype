@@ -438,7 +438,7 @@ class rpg_canvas {
                 $this_data['robot_markup_class'] .= 'scaled ';
             }
 
-            if (!empty($this_robot->flags['rescue_robot'])){
+            if (!empty($this_robot->flags['robot_is_rescue'])){
                 $this_data['robot_markup_class'] .= 'rescue ';
             }
 
@@ -617,6 +617,7 @@ class rpg_canvas {
                 // Calculate whether or not this robot is currently unlockable
                 $is_unlockable = isset($this_robot->flags['robot_is_unlockable']) ? $this_robot->flags['robot_is_unlockable'] : false;
                 $is_corrupted = isset($this_robot->flags['robot_is_unlockable_corrupted']) ? $this_robot->flags['robot_is_unlockable_corrupted'] : false;
+                $is_rescue = isset($this_robot->flags['robot_is_rescue']) ? $this_robot->flags['robot_is_rescue'] : false;
 
                 // If this robot is unlockable, display the icon above its head
                 if ($is_unlockable && $this_robot->robot_status != 'disabled'){
@@ -631,6 +632,8 @@ class rpg_canvas {
                     $icon_file_width = ceil($icon_scale * $icon_size * count($frame_index2));
                     $icon_file_height = ceil($icon_scale * $icon_size);
                     $icon_float = $this_data['robot_float'];
+                    $icon_image_path = '';
+                    $icon_extra_styles = '';
 
                     // Calculate the offsets based on robot and scale
                     $icon_offset_z = $this_data['canvas_offset_z'] + 1;
@@ -644,43 +647,63 @@ class rpg_canvas {
                         $icon_offset_y += ($base_multi - 1) * 6;
                     }
 
-                    // Define the animation frames based on corrupted or not
-                    if (!$is_corrupted){
-                        $frame_animate = array('00', '01', '00', '02');
-                    } else {
-                        $frame_animate = array('03', '04', '05');
+                    // If this is a RESCUE, we need to display the "Help!" text above their head
+                    if ($is_rescue){
+
+                        // Define the animation frames for the help text
+                        $icon_image_path = 'images/objects/help-me/sprite_left_'.$icon_size.'x'.$icon_size.'.png';
+                        $frame_animate = array('00', '01', '02');
+                        $frame_token = $frame_animate[0];
+                        $frame_position = array_search($frame_token, $frame_index2);
+                        $frame_background_offset = -1 * ceil(($icon_sprite_size * $frame_position));
+                        $icon_offset_y -= 10;
+                        $icon_offset_x += 15;
+
                     }
-                    $frame_token = $frame_animate[0];
-                    $frame_position = array_search($frame_token, $frame_index2);
-                    $frame_background_offset = -1 * ceil(($icon_sprite_size * $frame_position));
+                    // Otherwise, we can display the normal HEART CORE icon sprite above their head
+                    else {
 
+                        // Define the animation frames based on corrupted or not
+                        $icon_image_path = 'images/objects/heart-cores/'.$icon_type.'/sprite_left_'.$icon_size.'x'.$icon_size.'.png';
+                        $icon_extra_styles .= !$is_corrupted ? '' : 'filter: opacity(0.5); ';
+                        $frame_animate = !$is_corrupted ? array('00', '01', '00', '02') : array('03', '04', '05');
+                        $frame_token = $frame_animate[0];
+                        $frame_position = array_search($frame_token, $frame_index2);
+                        $frame_background_offset = -1 * ceil(($icon_sprite_size * $frame_position));
 
-                    // Generate the markup for the unlockable icon sprite
-                    echo '<div '.
-                        'class="'.
-                            'sprite '.
-                            'sprite_'.$icon_size.'x'.$icon_size.' '.
-                            'sprite_'.$icon_size.'x'.$icon_size.'_'.$frame_token.' '.
-                            '" '.
-                        'style="'.
-                            'background-image: url(images/objects/heart-cores/'.$icon_type.'/sprite_left_'.$icon_size.'x'.$icon_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.
-                            'background-size: '.$icon_file_width.'px '.$icon_file_height.'px; '.
-                            'background-position: '.(!empty($frame_background_offset) ? $frame_background_offset.'px' : '0').' 0; '.
-                            'width: '.$icon_sprite_size.'px; '.
-                            'height: '.$icon_sprite_size.'px; '.
-                            'z-index: '.$icon_offset_z.'; '.
-                            $icon_float.': '.$icon_offset_x.'px; '.
-                            'bottom: '.$icon_offset_y.'px; '.
-                            ($is_corrupted ? 'filter: opacity(0.5); ' : '').
-                            (!empty($camera_action_styles) ? $camera_action_styles : '').
-                            '" '.
-                        'data-type="attachment" '.
-                        'data-size="'.$icon_sprite_size.'" '.
-                        'data-direction="'.$icon_direction.'" '.
-                        'data-frame="'.$frame_token.'" '.
-                        'data-animate="'.implode(',',$frame_animate).'" '.
-                        'data-scale="'.$icon_scale.'" '.
-                        '></div>';
+                    }
+
+                    // If we're got an image path, we can display the icon
+                    if (!empty($icon_image_path)){
+
+                        // Generate the markup for the unlockable icon sprite
+                        echo '<div '.
+                            'class="'.
+                                'sprite '.
+                                'sprite_'.$icon_size.'x'.$icon_size.' '.
+                                'sprite_'.$icon_size.'x'.$icon_size.'_'.$frame_token.' '.
+                                '" '.
+                            'style="'.
+                                'background-image: url('.$icon_image_path.'?'.MMRPG_CONFIG_CACHE_DATE.'); '.
+                                'background-size: '.$icon_file_width.'px '.$icon_file_height.'px; '.
+                                'background-position: '.(!empty($frame_background_offset) ? $frame_background_offset.'px' : '0').' 0; '.
+                                'width: '.$icon_sprite_size.'px; '.
+                                'height: '.$icon_sprite_size.'px; '.
+                                'z-index: '.$icon_offset_z.'; '.
+                                $icon_float.': '.$icon_offset_x.'px; '.
+                                'bottom: '.$icon_offset_y.'px; '.
+                                $icon_extra_styles.
+                                (!empty($camera_action_styles) ? $camera_action_styles : '').
+                                '" '.
+                            'data-type="attachment" '.
+                            'data-size="'.$icon_sprite_size.'" '.
+                            'data-direction="'.$icon_direction.'" '.
+                            'data-frame="'.$frame_token.'" '.
+                            'data-animate="'.implode(',',$frame_animate).'" '.
+                            'data-scale="'.$icon_scale.'" '.
+                            '></div>';
+
+                    }
 
                 }
 

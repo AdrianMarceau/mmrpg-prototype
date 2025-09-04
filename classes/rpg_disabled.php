@@ -90,8 +90,9 @@ class rpg_disabled {
 
             // Show the target robot being disabled
             $this_robot->flags[$disabled_message_flag] = true;
+            $target_or_rescue = !empty($this_robot->flags['robot_is_rescue']) ? 'imperiled' : 'target';
             $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
-            $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The target ').' '.$this_robot->print_name().' was disabled!<br />';
+            $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The '.$target_or_rescue.' ').' '.$this_robot->print_name().' was disabled!<br />';
             if (isset($this_robot->robot_quotes['battle_defeat'])){
                 $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                 $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
@@ -1378,8 +1379,11 @@ class rpg_disabled {
             && $target_player->player_side == 'left'
             && !empty($this_battle->battle_rewards['robots'])){
 
-            // Only continue if this robot is unlockable
-            if (!empty($this_robot->flags['robot_is_unlockable'])){
+            // Only continue if this robot is unlockable and only unlock if NOT a rescue
+            // (disabling a rescue does NOT mean you rescued it!)
+            $robot_is_unlockable = !empty($this_robot->flags['robot_is_unlockable']) ? true : false;
+            $robot_is_rescue = !empty($this_robot->flags['robot_is_rescue']) ? true : false;
+            if ($robot_is_unlockable){
 
                 // Scan the reward array to find this robot's key
                 $temp_reward_key = false;
@@ -1391,8 +1395,8 @@ class rpg_disabled {
                 }
 
                 // Calculate whether or not this robot is currently corrupted
-                $temp_is_corrupted = false;
-                if (!empty($this_robot->history['triggered_damage_types'])){
+                $temp_is_corrupted = $robot_is_rescue ? true : false;
+                if (!$temp_is_corrupted && !empty($this_robot->history['triggered_damage_types'])){
                     foreach ($this_robot->history['triggered_damage_types'] AS $types){
                         if (!empty($types)){
                             $temp_is_corrupted = true;

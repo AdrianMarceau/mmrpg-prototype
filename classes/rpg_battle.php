@@ -1954,7 +1954,7 @@ class rpg_battle extends rpg_object {
                 // Change all this player's robot sprite to their taunt
                 foreach ($this_player->values['robots_active'] AS $key => $info){
                     if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
-                    $is_rescue = !empty($info['flags']['rescue_robot']) ? true : false;
+                    $is_rescue = !empty($info['flags']['robot_is_rescue']) ? true : false;
                     if ($this_robot->robot_id == $info['robot_id']){
                         $this_robot->set_frame($is_rescue ? 'damage' : 'defend');
                         $this_robot->set_frame_styles('');
@@ -2316,7 +2316,7 @@ class rpg_battle extends rpg_object {
                         $new_robotinfo = $this_player->values['robots_active'][0];
                     } elseif ($active_robot_count > 1){
                         $non_rescue_targets = array_values(array_filter($this_player->values['robots_active'], function($robot){
-                            $is_rescue = !empty($robot['flags']['rescue_robot']) ? true : false;
+                            $is_rescue = !empty($robot['flags']['robot_is_rescue']) ? true : false;
                             return !$is_rescue;
                             }));
                         $non_rescue_targets_count = count($non_rescue_targets);
@@ -2366,7 +2366,7 @@ class rpg_battle extends rpg_object {
                     // Collect a temp version of the new robot for key reading
                     $temp_new_robot = rpg_game::get_robot($this_battle, $this_player, $new_robotinfo);
                     $temp_new_robot_key = $temp_new_robot->robot_key;
-                    $temp_new_robot_is_rescue = !empty($temp_new_robot->flags['rescue_robot']) ? true : false;
+                    $temp_new_robot_is_rescue = !empty($temp_new_robot->flags['robot_is_rescue']) ? true : false;
 
                     // If the new robot is not valid for some reason, return false
                     if ($temp_new_robot->robot_token == 'robot'){ return false; }
