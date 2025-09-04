@@ -915,9 +915,15 @@ class rpg_battle extends rpg_object {
                 $this_player->player_frame = 'victory';
                 $this_robot->update_session();
                 $this_player->update_session();
-                $event_header = $this_player->player_name.' Victorious';
-                $event_body = $this_player->print_name().' was victorious! ';
-                $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
+                if (!empty($target_player->counters['robots_disabled'])){
+                    $event_header = $this_player->player_name.' Victorious';
+                    $event_body = $this_player->print_name().' was victorious! ';
+                    $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
+                } else {
+                    $event_header = 'Mission Complete';
+                    $event_body = $this_player->print_name().' completed '.$this_player->get_pronoun('possessive2').' mission! ';
+                    if (!empty($target_player->counters['robots_to_rescue'])){ $event_body .= 'The '.($target_player->counters['robots_to_rescue'] > 1 ? 'targets were' : 'target was').' rescued!'; }
+                }
                 $event_body .= '<br />';
                 $event_options = array();
                 $event_options['console_show_this_player'] = true;
@@ -943,9 +949,15 @@ class rpg_battle extends rpg_object {
                 // Display the win message for this player with battle zenny
                 $this_robot->robot_frame = 'victory';
                 $this_robot->update_session();
-                $event_header = $this_robot->robot_name.' Victorious';
-                $event_body = $this_robot->print_name().' was victorious! ';
-                $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
+                if (!empty($target_player->counters['robots_disabled'])){
+                    $event_header = $this_robot->robot_name.' Victorious';
+                    $event_body = $this_robot->print_name().' was victorious! ';
+                    $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
+                } else {
+                    $event_header = 'Mission Complete';
+                    $event_body = $this_robot->print_name().' completed '.$this_robot->get_pronoun('possessive2').' mission! ';
+                    if (!empty($target_player->counters['robots_to_rescue'])){ $event_body .= 'The '.($target_player->counters['robots_to_rescue'] > 1 ? 'targets were' : 'target was').' rescued!'; }
+                }
                 $event_body .= '<br />';
                 $event_options = array();
                 $event_options['console_show_this_robot'] = true;
