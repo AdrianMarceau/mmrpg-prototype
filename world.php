@@ -673,11 +673,13 @@ if ($map_has_player_platforms && !empty($map_player_platforms)){
             $player_intro_field = rpg_player::get_intro_field($player_token);
             $player_starter_robot = rpg_player::get_starter_robot($player_token);
             $player_unlock_subtext = 'This campaign is undefined and this text should not appear. Do no engage.';
+            $player_heart_token = str_replace('dr-', '', $player_token).'-heart__1'; // player's first limit heart
             if ($player_token === 'dr-light'){ $player_unlock_subtext = 'This beginner-level campaign teaches you the basics while you fight through an army of powered-up opponents!'; }
             elseif ($player_token === 'dr-wily'){ $player_unlock_subtext = 'This campaign offers a bit more challenge than the normal one and expects you to already-know the basics of battle!'; }
             elseif ($player_token === 'dr-cossack'){ $player_unlock_subtext = 'This veteran-level campaign acts as the conclusion to the doctors\' individual stories and packs the hardest punch of all!'; }
             elseif ($player_token === 'dr-lalinde'){ $player_unlock_subtext = 'This campaign used to look a lot different but system damage has left it nearly unrecognizable - can it be saved?'; }
             mmrpg_game_unlock_player(array('player_token' => $player_token), true, true);
+            mmrpg_game_unlock_item($player_heart_token, false);
             $player_robots_unlocked = mmrpg_prototype_robots_unlocked($player_token, true);
             $first_robot = !empty($player_robots_unlocked[0]) ? $player_robots_unlocked[0] : 'robot';
             $first_robot_info = !empty($mmrpg_index_robots[$first_robot]) ? $mmrpg_index_robots[$first_robot] : array();
@@ -709,6 +711,7 @@ if ($map_has_player_platforms && !empty($map_player_platforms)){
                 $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span($player_type, $player_name).' has been unlocked as a playable character in Free Roam and <br /> the '.rpg_type::print_span($player_type, $player_story).' campaign has been unlocked on the Main Menu!</p>';
                 $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>'.$player_name.'</strong> and <strong>'.$first_robot_name.'</strong> to experience events from their perspective, unlocking new robots, items, and abilities using their unique skills! '.$player_unlock_subtext.'</p>';
                 $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="player_type type '.$player_type.'">'.$player_name.'</strong> from the player select menu to play through '.$player_pronoun.' story missions at any time.</p>';
+                if (!isset($_SESSION[$game_session_token]['EVENTS'])){ $_SESSION[$game_session_token]['EVENTS'] = array(); }
                 array_push($_SESSION[$game_session_token]['EVENTS'], array(
                     'canvas_markup' => $temp_canvas_markup,
                     'console_markup' => $temp_console_markup,
