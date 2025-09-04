@@ -2733,7 +2733,7 @@ class mmrpgWorldMap {
             }
         //console.log('-> found ' + eventsAtPosition.length + ' events at position');
         //console.log('-> eventsAtPosition =', eventsAtPosition);
-        //console.log('-> found ' + eventsAtPosition.length + ' eventsAtPosition =', eventsAtPosition);
+        console.log('-> found ' + eventsAtPosition.length + ' eventsAtPosition =', eventsAtPosition);
 
         // Check to see what the very first event type is
         let firstEvent = eventsAtPosition[0];
@@ -3863,6 +3863,14 @@ class mmrpgWorldMap {
                     if (eventInfo.sprite === 'healpad' || eventInfo.sprite === 'resetpad'){ eventKind2 = 'sanctuary'; }
                     // otherwise it's just a generic custom event tile
                     else { eventKind2 = 'custom'; }
+                    }
+                else if (eventKind === 'button'){
+                    // if the button has already been pushed (state:down), just continue
+                    //console.log('-> eventPosition: ', eventPosition);
+                    //console.log('-> eventToken: ', eventToken);
+                    //console.log('-> eventInfo: ', eventInfo);
+                    //console.log('-> eventsIndex: ', eventsIndex);
+                    if (eventInfo.state === 'down'){ continue; }
                     }
                 else if (eventKind === 'portal'){
                     // spawns are usually hidden behind other portals, never interactable directly
