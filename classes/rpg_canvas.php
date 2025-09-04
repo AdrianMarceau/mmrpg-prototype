@@ -618,6 +618,7 @@ class rpg_canvas {
                 $is_unlockable = isset($this_robot->flags['robot_is_unlockable']) ? $this_robot->flags['robot_is_unlockable'] : false;
                 $is_corrupted = isset($this_robot->flags['robot_is_unlockable_corrupted']) ? $this_robot->flags['robot_is_unlockable_corrupted'] : false;
                 $is_rescue = isset($this_robot->flags['robot_is_rescue']) ? $this_robot->flags['robot_is_rescue'] : false;
+                $is_rescue_saved = $is_rescue && $this_robot->battle->battle_status == 'complete' && $this_robot->robot_status != 'disabled' ? true : false;
 
                 // If this robot is unlockable, display the icon above its head
                 if ($is_unlockable && $this_robot->robot_status != 'disabled'){
@@ -651,8 +652,8 @@ class rpg_canvas {
                     if ($is_rescue){
 
                         // Define the animation frames for the help text
-                        $icon_image_path = 'images/objects/help-me/sprite_left_'.$icon_size.'x'.$icon_size.'.png';
-                        $frame_animate = array('00', '01', '02');
+                        $icon_image_path = 'images/objects/rescue-text/sprite_left_'.$icon_size.'x'.$icon_size.'.png';
+                        $frame_animate = !$is_rescue_saved ? array('00', '01', '02') : array('03', '04', '05');
                         $frame_token = $frame_animate[0];
                         $frame_position = array_search($frame_token, $frame_index2);
                         $frame_background_offset = -1 * ceil(($icon_sprite_size * $frame_position));
