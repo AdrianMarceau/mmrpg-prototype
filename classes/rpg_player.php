@@ -70,6 +70,8 @@ class rpg_player extends rpg_object {
         $this->player_number = isset($this_playerinfo['player_number']) ? $this_playerinfo['player_number'] : 0;
         $this->player_type = isset($this_playerinfo['player_type']) ? $this_playerinfo['player_type'] : '';
         $this->player_type2 = isset($this_playerinfo['player_type2']) ? $this_playerinfo['player_type2'] : '';
+        $this->player_class = isset($this_playerinfo['player_class']) ? $this_playerinfo['player_class'] : '';
+        $this->player_gender = isset($this_playerinfo['player_gender']) ? $this_playerinfo['player_gender'] : '';
         $this->player_image = isset($this_playerinfo['player_image']) ? $this_playerinfo['player_image'] : $this->player_token;
         $this->player_image_size = isset($this_playerinfo['player_image_size']) ? $this_playerinfo['player_image_size'] : 40;
         $this->player_description = isset($this_playerinfo['player_description']) ? $this_playerinfo['player_description'] : '';
@@ -369,6 +371,23 @@ class rpg_player extends rpg_object {
     }
 
 
+    /**
+     * Get the gender of this player object
+     * @return string
+     */
+    public function get_gender(){
+        return $this->get_info('player_gender');
+    }
+
+    /**
+     * Set the gender of this player object
+     * @param string $value
+     */
+    public function set_gender($value){
+        $this->set_info('player_gender', $value);
+    }
+
+
     // -- ENERGY FUNCTIONS -- //
 
     /**
@@ -614,8 +633,8 @@ class rpg_player extends rpg_object {
      * Return the pronoun of a given player character
      * @param string $form The form of the pronoun to return (subject, object, possessive, possessive2, reflexive)
      */
-    public function get_pronoun($form = 'subject'){
-        return self::get_player_pronoun($this->player_class, $this->get_gender(), $form);
+    public function get_pronoun($form = 'subject', $person = true){
+        return self::get_player_pronoun($this->get_gender(), $form, $person);
     }
 
     /**
