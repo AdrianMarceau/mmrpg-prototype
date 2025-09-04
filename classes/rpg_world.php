@@ -1280,13 +1280,15 @@ class rpg_world {
             $battle_background = $map_field_token;
             $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
             $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
+            $battle_turns = $rewards_matrix[$robot_class]['turns'];
+            $battle_zenny = $rewards_matrix[$robot_class]['zenny'];
             $world_map_encounters[] = array('robot/'.$robot_class, $robot_token, '', $robot_pos, $battle_token, $robot_label);
             $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
                 'token' => $battle_token,
                 'name' => $battle_name,
                 'description' => $battle_description,
-                'turns' => $rewards_matrix[$robot_class]['turns'],
-                'zenny' => $rewards_matrix[$robot_class]['zenny'],
+                'turns' => $battle_turns,
+                'zenny' => $battle_zenny,
                 'field' => $battle_field,
                 'target' => array('robots' => array(array(
                     'token' => $robot_token,
@@ -1359,6 +1361,8 @@ class rpg_world {
                     $battle_background = $map_field_token;
                     $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
                     $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
+                    $battle_turns = $rewards_matrix[$robot_class]['turns'];
+                    $battle_zenny = $rewards_matrix[$robot_class]['zenny'];
                     $battle_rewards = array();
                     $battle_flags = array();
                     $battle_flags['world_battle'] = true;
@@ -1388,6 +1392,8 @@ class rpg_world {
                     }
                     // If this is a rescue battle, the robot should be added to the rewards too
                     if ($encounter_class === 'rescue'){
+                        $battle_turns = 1; // one turn goal for rescue battles
+                        $battle_zenny *= 2; // double the zenny reward for rescue battles
                         $battle_flags['rescue_battle'] = true;
                         $robot_flags['robot_is_rescue'] = true;
                         $robot_flags['is_friendly'] = true;
@@ -1407,8 +1413,8 @@ class rpg_world {
                         'name' => $battle_name,
                         'description' => $battle_description,
                         'field' => $battle_field,
-                        'turns' => $rewards_matrix[$robot_class]['turns'],
-                        'zenny' => $rewards_matrix[$robot_class]['zenny'],
+                        'turns' => $battle_turns,
+                        'zenny' => $battle_zenny,
                         'target' => array('robots' => array(array(
                             'token' => $robot_token,
                             'level' => $robot_level,
