@@ -31,4 +31,17 @@ $target_robot = rpg_game::get_robot_by_id($target_robot->robot_id);
 // Create an empty field to remove any leftover frames
 //$this_battle->events_create();
 
+// Just in case this battle is left-over from a larger one, check if its only rescue bots (and end early if true)
+if (!empty($target_player->counters['robots_to_rescue'])){
+    //error_log('Checking in battlestart if all-rescue-bot and thus battle is over early...');
+    //error_log('$target_player->player_token = '.$target_player->player_token);
+    //error_log('$target_player->counters[\'robots_active\'] = '.$target_player->counters['robots_active']);
+    //error_log('$target_player->counters[\'robots_to_rescue\'] = '.$target_player->counters['robots_to_rescue']);
+    if ($target_player->counters['robots_active'] <= $target_player->counters['robots_to_rescue']){
+        //error_log('All of '.$target_player->player_name.'\'s remaining robots are rescue units!');
+        // Trigger the battle complete action to update status and result
+        $this_battle->battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, '', '');
+    }
+}
+
 ?>
