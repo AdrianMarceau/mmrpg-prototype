@@ -2535,6 +2535,34 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Quick function that starts an "animation" whereby the map zooms a bit at a time from current
+    // to a max value given a delay between each zoom increment. Make sure we use the above functions!
+    async animateZoomToMax(maxZoomLevel, zoomIncrement, zoomDelay){
+        //console.log('%c' + 'mmrpgWorldMap.animateZoomToMax(maxZoomLevel:' + maxZoomLevel + ', zoomIncrement:' + zoomIncrement + ', zoomDelay:' + zoomDelay + ')', 'color: magenta;');
+        if (!maxZoomLevel || typeof maxZoomLevel !== 'number' || maxZoomLevel <= 0){
+            console.error('animateZoomToMax() requires a valid maxZoomLevel!');
+            return false;
+            }
+        if (!zoomIncrement || typeof zoomIncrement !== 'number' || zoomIncrement <= 0){
+            console.error('animateZoomToMax() requires a valid zoomIncrement!');
+            return false;
+            }
+        if (!zoomDelay || typeof zoomDelay !== 'number' || zoomDelay <= 0){
+            console.error('animateZoomToMax() requires a valid zoomDelay!');
+            return false;
+            }
+        let _self = this;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let currentZoomLevel = _world.zoomLevel || 1;
+        if (currentZoomLevel >= maxZoomLevel){ return true; }
+        let newZoomLevel = currentZoomLevel + zoomIncrement;
+        if (newZoomLevel > maxZoomLevel){ newZoomLevel = maxZoomLevel; }
+        _self.updateZoomLevel(newZoomLevel, true);
+        await new Promise(resolve => setTimeout(resolve, zoomDelay));
+        return _self.animateZoomToMax(maxZoomLevel, zoomIncrement, zoomDelay);
+        }
+
     // Quick function for toggling perspective mode on/off and then re-scrolling the map to refresh
     togglePerspectiveMode(){
         //console.log('%c' + 'mmrpgWorldMap.togglePerspectiveMode()', 'color: magenta;');
@@ -4539,10 +4567,11 @@ class mmrpgWorldMap {
                 $thisWorld.addClass('busy');
                 _self.incZoomLevel();
                 _self.saveWorldState(function(){
-                    _self.incZoomLevel();
+                    //_self.incZoomLevel();
+                    _self.resetZoomLevel();
+                    _self.animateZoomToMax(4, 0.25, 600);
                     $thisWorld.addClass('hidden');
                     window.location.reload();
-                    _self.incZoomLevel();
                     }, true, false);
                 }
             }
