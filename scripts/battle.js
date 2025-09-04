@@ -576,9 +576,9 @@ $(document).ready(function(){
                 }
             }
         };
-    document.addEventListener('keydown', checkUserInputs);
-    document.addEventListener('mousewheel', checkUserInputs);
-    document.addEventListener('gamepadinput', checkUserInputs);
+    document.addEventListener('keydown', checkUserInputs, { passive: false });
+    document.addEventListener('mousewheel', checkUserInputs, { passive: false });
+    document.addEventListener('gamepadinput', checkUserInputs, { passive: false });
 
     // Define the live Rogue Star ticker functionality if present
     $rogueStar = $('#canvas .rogue_star', $thisPrototype);
