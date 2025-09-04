@@ -1607,11 +1607,13 @@ class rpg_battle extends rpg_object {
             }
 
             // Print out the current vs allowed turns for this mission and the penalty or bonus, if any
+            $current_turn = !empty($this->counters['battle_turn']) ? $this->counters['battle_turn'] : 1;
+            $turn_goal = !empty($this->battle_turns) ? $this->battle_turns : 1;
             $reward_mod_strings = array();
-            $reward_mod_strings[] = ' Turns vs Goal: '.$this->counters['battle_turn'].' / '.$this->battle_turns;
-            if ($this->counters['battle_turn'] != $this->battle_turns){
-                $temp_bonus_multiplier = number_format(round(($this->battle_turns / $this->counters['battle_turn']), 2), 1, '.', ',');
-                if ($this->counters['battle_turn'] < $this->battle_turns){  $this_star_rating += 1; $reward_mod_strings[] = 'Turn Bonus: x'.$temp_bonus_multiplier.''; }
+            $reward_mod_strings[] = ' Turns vs Goal: '.$current_turn.' / '.$turn_goal;
+            if ($current_turn != $turn_goal){
+                $temp_bonus_multiplier = number_format(round(($turn_goal / $current_turn), 2), 1, '.', ',');
+                if ($current_turn < $turn_goal){  $this_star_rating += 1; $reward_mod_strings[] = 'Turn Bonus: x'.$temp_bonus_multiplier.''; }
                 else { $this_star_rating -= 1; $reward_mod_strings[] = 'Turn Penalty: x'.$temp_bonus_multiplier.''; }
                 $total_zenny_rewards = ceil($total_zenny_rewards * $temp_bonus_multiplier);
             } else {
@@ -1650,8 +1652,8 @@ class rpg_battle extends rpg_object {
             // Define the victory results for calculating
             if (!empty($this->flags['challenge_battle'])){
                 $victory_results = array(
-                    'challenge_turns_used' => $this->counters['battle_turn'],
-                    'challenge_turn_limit' => $this->battle_turns,
+                    'challenge_turns_used' => $current_turn,
+                    'challenge_turn_limit' => $turn_goal,
                     'challenge_robots_used' => $this_player->counters['robots_start_total'],
                     'challenge_robot_limit' => $temp_target_robot_limit
                     );
@@ -3378,11 +3380,12 @@ class rpg_battle extends rpg_object {
 
         // Calculate the number of turn zenny for this player using the base amounts
         $this_base_zenny = $base_zenny;
-        if ($this->counters['battle_turn'] < $base_turns
-            || $this->counters['battle_turn'] > $base_turns){
+        $this_battle_turn = !empty($this->counters['battle_turn']) ? $this->counters['battle_turn'] : 1;
+        if ($this_battle_turn < $base_turns
+            || $this_battle_turn > $base_turns){
             //$this_half_zenny = $base_zenny * 0.10;
             //$this_turn_zenny = ceil($this_half_zenny * ($base_turns / $this->counters['battle_turn']));
-            $this_base_zenny = ceil($this_base_zenny * ($base_turns / $this->counters['battle_turn']));
+            $this_base_zenny = ceil($this_base_zenny * ($base_turns / $this_battle_turn));
         }
 
         //$this_battle_zenny = $this_base_zenny + $this_turn_zenny + $this_stat_zenny;
