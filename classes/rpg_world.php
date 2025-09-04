@@ -2135,7 +2135,9 @@ class rpg_world {
             $pos = $encounter_data[3];
             $battle = $encounter_data[4];
             $name = $encounter_data[5];
+            //error_log('-> processing battle w/'.PHP_EOL.'-> $token ='.' '.$token.PHP_EOL.'-> $kind = '.$kind.PHP_EOL.'-> $subkind = '.$subkind.PHP_EOL.'-> $alt = '.$alt.PHP_EOL.'-> $pos = '.$pos.PHP_EOL.'-> $battle = '.$battle);
             if (!rpg_battle::has_index_info($battle)){ continue; }
+            if ($subkind === 'rescue' && mmrpg_prototype_robot_unlocked('', $token)){ continue; }
             if (!empty($world_map_encounter_symbols[$encounter_namekey])){ $pos = $world_map_encounter_symbols[$encounter_namekey]; }
             list($col, $row) = explode('-', $pos);
             $maxcols = $map_col_size;
