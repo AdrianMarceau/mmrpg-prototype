@@ -2018,6 +2018,11 @@ class rpg_world {
                 //$top = $mod_top; $left = $mod_left;
                 $hidden = in_array('hidden', $portal_data) ? true : false;
                 $locked = in_array('locked', $portal_data) ? true : false;
+                $direction = false;
+                if (in_array('left-only', $portal_data)){ $direction = 'left'; }
+                elseif (in_array('right-only', $portal_data)){ $direction = 'right'; }
+                elseif (in_array('up-only', $portal_data)){ $direction = 'up'; }
+                elseif (in_array('down-only', $portal_data)){ $direction = 'down'; }
                 if ($hidden && $portal_name === 'spawn'){ continue; }
                 //if ($this_is_cursor && !$locked && $portal_name !== 'spawn'){ $locked = true; }
                 $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucfirst($portal_name));
@@ -2034,6 +2039,7 @@ class rpg_world {
                     'label' => $label,
                     'hidden' => $hidden,
                     'locked' => $locked,
+                    'direction' => $direction,
                     );
             }
         }

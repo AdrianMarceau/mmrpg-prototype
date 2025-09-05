@@ -87,8 +87,12 @@ gameSettings.worldState = {
         holding: '',
         loading: false,
         moving: false,
-        moved: false,
         busy: false,
+        moved: false, // moved positions (or tried to)
+        othered: false, // did any other action (besides move)
+        clicked: false, // included in above 'othered'
+        hovered: false, // included in above 'othered'
+        pressed: false, // included in above 'othered'
         col: 0,
         row: 0,
         },
@@ -1200,6 +1204,8 @@ class mmrpgWorldMap {
             if (!_world.allowClicks){ return false; }
             //console.log('%c' + 'Map overlay click event!', 'color: cyan;');
             //console.log('-> w/ e =', e);
+            _worldCursor.othered = true;
+            _worldCursor.clicked = true;
             let oldPos = _worldCursor.position, curPos = oldPos;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.offsetX, e.offsetY, false);
             let sameAsLast = thisPos === lastMouseClick;
@@ -1230,6 +1236,8 @@ class mmrpgWorldMap {
             //if (_self.worldIsBusy()){ return false; }
             //console.log('%c' + 'Map overlay mousemove event!', 'color: cyan;');
             //console.log('-> w/ e =', e);
+            _worldCursor.othered = true;
+            _worldCursor.hovered = true;
             let curPos = _worldCursor.position;
             let thisPos = _self.getTileAtPosition($clickOverlay, e.offsetX, e.offsetY, false);
             let thisPosXY = thisPos.split('-');
@@ -1805,6 +1813,8 @@ class mmrpgWorldMap {
             if (!listenForInput){ return false; }
             if (_self.worldIsBusy()){ return false; }
             if (!Object.keys(activeInputs).length){ return false; } // nothing pressed, ignore
+            _worldCursor.othered = true;
+            _worldCursor.pressed = true;
             //console.log('-> activeInputs:', activeInputs);
             ignoreInputFor();
             // Collect references and checks on certain key elements
@@ -2110,9 +2120,18 @@ class mmrpgWorldMap {
                     if (activeInputs.Up){ newRow--; }
                     else if (activeInputs.Down){ newRow++; }
                     let newPos = newCol + '-' + newRow;
+                    // Always set this just in case the player gets stuck somewhere
+                    let thisHorDir = (newCol > thisCol) ? 'right' : (newCol < thisCol) ? 'left' : false;
+                    let thisVerDir = (newRow > thisRow) ? 'down' : (newRow < thisRow) ? 'up' : false;
+                    let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join('-'); })(thisHorDir, thisVerDir);
+                    _worldCursor.moved = true; // represents them at least trying to move
+                    _worldCursor.direction = thisShiftDir; // the direction they are trying to move
                     //console.log('%c' + 'New position: ' + newPos, 'color: orange;');
                     // Check if the new position is the same as the old position
-                    if (newCol === thisCol && newRow === thisRow){ return false; }
+                    if (newCol === thisCol && newRow === thisRow){
+                        //console.log('%c' + 'New position is the same as the old position!', 'color: orange;');
+                        return false;
+                        }
                     // Otherwise, let's pull the list of walkable tiles and see if this new position is valid
                     //console.log('%c' + 'Checking if new position is walkable...', 'color: orange;');
                     let playerMobility = _config.playerMobility;
@@ -3812,6 +3831,8 @@ class mmrpgWorldMap {
                 }
             }
         //console.log('-> positionsToCheck =', positionsToCheck);
+        //console.log('-> _worldCursor.moved =', _worldCursor.moved);
+        //console.log('-> _worldCursor.othered =', _worldCursor.othered);
         let eventKinds = ['event', 'portal', 'button', 'battle', 'item', 'ability'];
         for (let e = 0; e < eventKinds.length; e++){
             let eventKind = eventKinds[e];
@@ -3852,6 +3873,8 @@ class mmrpgWorldMap {
                 if ($eventSprite && $eventSprite.length){ $eventSprite = $eventSprite.first().get(0); }
                 let eventKind2 = eventKind;
                 if (eventKind === 'battle'){
+                    // if we haven't done moved/othered yet, don't return any battles
+                    if (!_worldCursor.moved && !_worldCursor.othered){ continue; }
                     // make sure we take the secondary type (mecha/master/boss/rescue) as the second "kind"
                     eventKind2 = eventInfo.kind2;
                     }
@@ -3870,8 +3893,16 @@ class mmrpgWorldMap {
                     if (eventInfo.state === 'down'){ continue; }
                     }
                 else if (eventKind === 'portal'){
+                    // if we haven't moved, never trigger a portal
+                    if (!_worldCursor.moved){ continue; }
                     // spawns are usually hidden behind other portals, never interactable directly
                     if (eventToken === 'spawn'){ continue; }
+                    // if this portal has an assosiated direction, only trigger if player is facing that way
+                    if (eventInfo.direction
+                        && typeof eventInfo.direction === 'string'
+                        && eventInfo.direction !== _worldCursor.direction){
+                        continue;
+                        }
                     }
                 else if (eventKind === 'item' || eventKind === 'ability'){
                     // skip if already claimed by the player
@@ -4172,7 +4203,6 @@ class mmrpgWorldMap {
         }
     saveWorldStateForReal(callback, pullEvents){
         //console.log('%c' + 'mmrpgWorldMap.saveWorldStateForReal(callback)', 'color: magenta;');
-        callback = typeof callback === 'function' ? callback : false; // default to no callback if not provided
         let _self = this;
         let _selfRef = _self.saveWorldState;
         let _config = _self.config;
