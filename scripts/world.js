@@ -39,7 +39,7 @@ gameSettings.worldConfig = {
         activeTimeout: 600, // milliseconds
         focusTimeout: 600, // milliseconds
         hoverTimeout: 600, // milliseconds
-        moveTimeout: 300, // milliseconds
+        moveTimeout: 200, // milliseconds
         moveTravel: 100, // milliseconds
         usePerspective: false, // make it easy to toggle this during dev
         },
@@ -2180,6 +2180,7 @@ class mmrpgWorldMap {
                     _self.playSoundEffect('no-effect');
                     _self.moveToPosition(newPos, function(){
                         _self.makeLayerTileInactive(oldPos);
+                        //ignoreInputFor(0);
                         });
                     }
                 // If the user has pressed the X button, we need to implement some nuanced functionality
@@ -2354,8 +2355,8 @@ class mmrpgWorldMap {
         let newCursorStyles = { left: tileOffsetX + 'px', top: tileOffsetY + 'px', zIndex: tileOffsetZ };
         let newCursorTrackerStyles = { left: (tileOffsetX + 10) + 'px', top: (tileOffsetY + 5) + 'px', zIndex: (tileOffsetZ - 1) };
         if (animateMove){
-            $cursorSprite.animate(newCursorStyles, travelDuration, 'linear', onMoveComplete);
-            if ($trackingCursor.length){ $trackingCursor.animate(newCursorTrackerStyles, travelDuration, 'linear'); }
+            $cursorSprite.stop(true, true).animate(newCursorStyles, travelDuration, 'linear', onMoveComplete);
+            if ($trackingCursor.length){ $trackingCursor.stop(true, true).animate(newCursorTrackerStyles, travelDuration, 'linear'); }
             } else {
             $cursorSprite.css(newCursorStyles); onMoveComplete();
             if ($trackingCursor.length){ $trackingCursor.css(newCursorTrackerStyles); }
@@ -2400,7 +2401,7 @@ class mmrpgWorldMap {
                 $thisSprite.prop('worldY', teamOffsetY);
                 $thisSprite.prop('worldZ', teamOffsetZ);
                 if (animateMove){
-                    $thisSprite.stop().animate({
+                    $thisSprite.stop(true, true).animate({
                         left: teamOffsetX + 'px',
                         top: teamOffsetY + 'px',
                         zIndex: teamOffsetZ,
