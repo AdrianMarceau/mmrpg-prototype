@@ -3073,18 +3073,12 @@ function windowEventDisplay(){
                 }
             });
 
-        // Start the user input watcher and collect reference to active inputs
-        let userInputWatcher = new mmrpgUserInputWatcher();
-        //console.log('-> userInputWatcher:', userInputWatcher);
-        let activeInputs = userInputWatcher.activeInputs;
-        //console.log('-> activeInputs:', activeInputs);
-
         // Define a function to run each time user inputs are updated so we can react
         let listenForInput = true;
         let eventsAreVisible = function(){ return $('#events').is(':visible:not(.hidden)') ? true : false; };
         let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 250; listenForInput = false; setTimeout(function(){ listenForInput = true; }, delay); };
-        let checkUserInputs = function(event){
-            //console.log('%c' + 'checkUserInputs() - Events keydown event!', 'color: cyan;');
+        let checkUserInputs = function(kind, event, activeInputs, userInputs){
+            //console.log('%c' + 'windowEventDisplay.checkUserInputs(kind:' + kind + ', event)', 'color: cyan;');
             if (!listenForInput){ return false; }
             if (!eventsAreVisible()){ return false; }
             if (!Object.keys(activeInputs).length){ return false; } // nothing pressed, ignore
@@ -3102,9 +3096,11 @@ function windowEventDisplay(){
                 return;
                 }
             };
-        document.addEventListener('keydown', checkUserInputs);
-        document.addEventListener('mousewheel', checkUserInputs);
-        document.addEventListener('gamepadinput', checkUserInputs);
+
+        // Start the user input watcher and collect reference to active inputs
+        let userInputWatcher = new mmrpgUserInputWatcher();
+        userInputWatcher.onUserInput(checkUserInputs);
+        userInputWatcher.startWatching();
 
         }
 

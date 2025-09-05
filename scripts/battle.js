@@ -232,18 +232,12 @@ $(document).ready(function(){
         return buttonRows;
         };
 
-    // Start the user input watcher and collect reference to active inputs
-    let userInputWatcher = new mmrpgUserInputWatcher();
-    //console.log('-> userInputWatcher:', userInputWatcher);
-    let activeInputs = userInputWatcher.activeInputs;
-    //console.log('-> activeInputs:', activeInputs);
-
     // Define a function to run each time user inputs are updated so we can react
     let listenForInput = true;
     let battleIsBusy = function(){ return gameSettings.currentActionPanel === 'loading' ? true : false; };
     let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 250; listenForInput = false; setTimeout(function(){ listenForInput = true; }, delay); };
-    let checkUserInputs = function(event){
-        //console.log('%c' + 'checkUserInputs() - Battle keydown event!', 'color: cyan;');
+    let checkUserInputs = function(kind, event, activeInputs, userInputs){
+        //console.log('%c' + 'mmrpgBattleWindow.checkUserInputs(kind:' + kind + ', event)', 'color: cyan;');
         if (!listenForInput){ return false; }
         if (battleIsBusy()){ return false; }
         if (!Object.keys(activeInputs).length){ return false; } // nothing pressed, ignore
@@ -576,9 +570,11 @@ $(document).ready(function(){
                 }
             }
         };
-    document.addEventListener('keydown', checkUserInputs, { passive: false });
-    document.addEventListener('mousewheel', checkUserInputs, { passive: false });
-    document.addEventListener('gamepadinput', checkUserInputs, { passive: false });
+
+    // Start the user input watcher and collect reference to active inputs
+    let userInputWatcher = new mmrpgUserInputWatcher();
+    userInputWatcher.onUserInput(checkUserInputs);
+    userInputWatcher.startWatching();
 
     // Define the live Rogue Star ticker functionality if present
     $rogueStar = $('#canvas .rogue_star', $thisPrototype);

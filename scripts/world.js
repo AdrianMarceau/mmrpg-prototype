@@ -1786,24 +1786,19 @@ class mmrpgWorldMap {
                 }
             }
 
-        // Start the user input watcher and collect reference to active inputs
-        let userInputWatcher = new mmrpgUserInputWatcher();
-        //console.log('-> userInputWatcher:', userInputWatcher);
-        let activeInputs = userInputWatcher.activeInputs;
-        //console.log('-> activeInputs:', activeInputs);
-
         // Define a function to run each time user inputs are updated so we can react
         let listenForInput = true;
         let ignoreTimeout = null;
         let ignoreInputFor = function(delay){
             delay = typeof delay === 'number' ? delay : 250;
+            if (delay < 1){ listenForInput = true; return; }
             listenForInput = false;
             if (ignoreTimeout){ clearTimeout(ignoreTimeout); }
             ignoreTimeout = setTimeout(function(){ listenForInput = true; }, delay);
             };
         let userInputVars = {};
-        let checkUserInputs = function(event){
-            //console.log('%c' + 'checkUserInputs() - World map keydown event!', 'color: cyan;');
+        let checkUserInputs = function(kind, event, activeInputs, userInputs){
+            //console.log('%c' + 'mmrpgWorldMap.checkUserInputs(kind:' + kind + ', event, activeInputs, userInputs)', 'color: cyan;');
             //event.preventDefault();
             //event.stopPropagation();
             //console.log('-> event:', e);
@@ -2104,7 +2099,7 @@ class mmrpgWorldMap {
                 if (activeInputs.Left || activeInputs.Right || activeInputs.Up || activeInputs.Down){
                     //console.log('%c' + 'Arrow key pressed!', 'color: orange;');
                     if (event){ event.preventDefault(); }
-                    let oldPos = _world.cursor.position, curPos = oldPos;
+                    let oldPos = _worldCursor.position, curPos = oldPos;
                     let thisPos = oldPos.split('-');
                     let thisCol = parseInt(thisPos[0]);
                     let thisRow = parseInt(thisPos[1]);
@@ -2227,9 +2222,11 @@ class mmrpgWorldMap {
                     }
                 }
             };
-        document.addEventListener('keydown', checkUserInputs, { passive: false });
-        document.addEventListener('mousewheel', checkUserInputs, { passive: false });
-        document.addEventListener('gamepadinput', checkUserInputs, { passive: false });
+
+        // Start the user input watcher and collect reference to active inputs
+        let userInputWatcher = new mmrpgUserInputWatcher();
+        userInputWatcher.onUserInput(checkUserInputs);
+        userInputWatcher.startWatching();
 
         // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed
         $(window).bind('resize', function(e){
