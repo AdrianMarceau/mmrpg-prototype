@@ -2033,6 +2033,16 @@ class mmrpgWorldMap {
                         return true;
                         }
                     }
+                // If the player has pressed the A button without any menus open, perhaps they're trying to re-init nearby events
+                if (activeInputs.A){
+                    //console.log('%c' + 'A key pressed!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    // Only allow this if the map is not currently animating and the player is not currently moving
+                    if (_world.mapIsAnimating || _world.playerIsMoving){ return false; }
+                    // If there are any nearby events, re-init them now
+                    _self.refreshMapPositionEvents(0);
+                    ignoreInputFor(100);
+                    }
                 // If the player has pressed either of the bumpers we should let them scroll within the player-switcher
                 if (activeInputs.L1 || activeInputs.R1){
                     //console.log('%c' + 'Bumper key pressed!', 'color: orange;');
@@ -2142,6 +2152,7 @@ class mmrpgWorldMap {
                         //_self.playSoundEffect('glass-klink');
                         if (!playerIsCursor){
                             //console.log('%c' + 'Player is human, can only walk to adjacent tiles!', 'color: red;');
+                            _self.refreshMapPositionEvents(0);
                             return false;
                             } else {
                             //console.log('%c' + 'Player is cursor, can cross voids if walkable tiles on other side!', 'color: green;');
@@ -2171,6 +2182,7 @@ class mmrpgWorldMap {
                                 }
                             if (!foundWalkableTile){
                                 //console.log('%c' + 'No walkable tile found in that direction!', 'color: orange;');
+                                _self.refreshMapPositionEvents(0);
                                 return false;
                                 }
                             }
@@ -2750,7 +2762,7 @@ class mmrpgWorldMap {
             }
         //console.log('-> found ' + eventsAtPosition.length + ' events at position');
         //console.log('-> eventsAtPosition =', eventsAtPosition);
-        console.log('-> found ' + eventsAtPosition.length + ' eventsAtPosition =', eventsAtPosition);
+        //console.log('-> found ' + eventsAtPosition.length + ' eventsAtPosition =', eventsAtPosition);
 
         // Check to see what the very first event type is
         let firstEvent = eventsAtPosition[0];
