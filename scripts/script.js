@@ -3403,10 +3403,36 @@ function mmrpg_align_element_to_target($element, targetX, targetY){
 
 // Define a reusable object for watching user input and storing it button abstractions we can work with elsewhere
 class mmrpgUserInputWatcher {
-    constructor(){
+    constructor(config, callbacks){
+        //console.log('%c' + 'mmrpgUserInputWatcher.constructor()', 'color: magenta;');
+        config = typeof config === 'object' ? config : {};
+        callbacks = typeof callbacks === 'object' ? callbacks : {};
+
+        // Define the top-level object and its defaults
         let _self = this;
-        _self.userInputs = {};
-        _self.activeInputs = {};
+        _self.config = null;
+        _self.events = null;
+        _self.userInputs = {}; // all possible inputs
+        _self.activeInputs = {}; // currently active inputs
+
+        // Define the config object and its defaults
+        let _config = {};
+        _config.autoStart = typeof config.autoStart === 'boolean' ? config.autoStart : false;
+        _config.inputTimeout = typeof config.inputTimeout === 'number' ? config.inputTimeout : (1000 / 60); // 60fps
+        _config.wheelTimeout = typeof config.wheelTimeout === 'number' ?  config.wheelTimeout : _config.inputTimeout;
+        _config.gamepadTimeout = typeof config.gamepadTimeout === 'number' ? config.gamepadTimeout : _config.inputTimeout;
+        _self.config = _config;
+
+        // Define the events object and its defaults
+        let _events = {};
+        _events.onUserInput = typeof callbacks.onUserInput === 'function'
+            ? callbacks.onUserInput : function(kind, event, activeInputs, userInputs){
+            // to-be-replaced by the calling function
+            console.warn('%c' + 'default onUserInput() called!', 'color: orange;');
+            console.warn('w/ -> kind:', kind, '\n', '-> event:', activeInputs, '\n', '-> activeInputs:', activeInputs, '\n', '-> userInputs:', userInputs);
+            return true;
+            };
+        _self.events = _events;
 
         // Define an index of symbolic "userInputs" we can abstract actions behind, and then
         // worry about specific key-bindings and button-mappings later on to keep things clean
@@ -3426,6 +3452,9 @@ class mmrpgUserInputWatcher {
         userInputs.Start = {icon: '+', keyboard: ['Home'], gamepad: [9]};
         userInputs.Select = {icon: '−', keyboard: ['End'], gamepad: [8]};
         _self.userInputs = userInputs;
+
+        // Define the abstraction method for handling user input events
+        let onUserInput = function(kind, event){ _events.onUserInput.call(_self, kind, event, activeInputs, userInputs); };
 
         // If toggled, make sure we swap the A and B buttons for a Nintendo-style layout
         let useNintendoLayout = true; // TODO: make this customizable later
@@ -3476,22 +3505,14 @@ class mmrpgUserInputWatcher {
             return returnKey;
             };
 
-        // Define an object to hold all currently pressed keys individually or in combo
-        let activeInputs = {};
-        _self.activeInputs = activeInputs;
-
-        // Bind events to the keyboard arrow keys if detected to allow for it
-        document.addEventListener('keydown', (event) => { let input = getUserInputFromKeyboardEvent(event.key); if (input){ activeInputs[input] = true; } });
-        document.addEventListener('keyup', (event) => { let input = getUserInputFromKeyboardEvent(event.key); if (input){ delete activeInputs[input]; } });
-
-        // Bind events to the scrolling of the user's mouse if detected and map to L2 + R2 button inputs
+        // Define a function for taking a scroll-wheel event and translating it into L2 + R2 button presses
         // (make sure we ignore deltas less than +/- threshold to avoid accidental button presses)
         // (ignore the use-case above, L2 and R2 might be used for other stuff too so be generic)
         let busyScrolling = false;
         let wheelThreshold = 150;
-        let wheelTimeout = 100;
-        document.addEventListener('mousewheel', (event) => {
-            if (busyScrolling){ return; }
+        let wheelTimeout = _config.wheelTimeout;
+        let getUserInputFromWheelEvent = function(event){
+            if (busyScrolling){ return false; }
             if (!event.wheelDelta){ return false; }
             //console.log('event.wheelDelta =', event.wheelDelta);
             if (event.wheelDelta > 0 && event.wheelDelta < wheelThreshold){ return false; }
@@ -3505,13 +3526,12 @@ class mmrpgUserInputWatcher {
                 delete activeInputs[inputKey];
                 busyScrolling = false;
                 }, wheelTimeout);
-            }, { passive: false });
+            return inputKey;
+            };
 
-        // Beind events to any connected gamepads to allow for the same
-        // functionality as the keyboard arrow keys (mirror for easier coding)
+        // Define a function for watching gamepad inputs and updating the activeInputs object accordingly
         let connectedGamepad = null;
-        window.addEventListener("gamepadconnected", (event) => { watchGamepadInputs(event.gamepad); });
-        window.addEventListener("gamepaddisconnected", (event) => { watchGamepadInputs(null); });
+        let gamepadTimeout = null;
         let watchGamepadInputs = function(gamepad){
             connectedGamepad = gamepad;
             if (!connectedGamepad){ return false; }
@@ -3533,18 +3553,87 @@ class mmrpgUserInputWatcher {
                     inputChange = true;
                     }
                 //console.log('-> trying to emit gamepadinput event on input (inputChange:', inputChange, ')');
-                document.dispatchEvent(new Event('gamepadinput'));
+                if (inputChange
+                    || Object.keys(activeInputs).length > 0){
+                    let nullfn = function(){};
+                    let event = new Event('gamepadinput', { bubbles: true, cancelable: true, preventDefault: nullfn, stopPropagation: nullfn });
+                    document.dispatchEvent(event);
+                    onUserInput('gamepadinput', event);
+                    }
                 });
-            requestAnimationFrame(function(){
-                watchGamepadInputs(connectedGamepad);
-                });
+            if (gamepadTimeout){ clearTimeout(gamepadTimeout); }
+            gamepadTimeout = setTimeout(function(){
+                requestAnimationFrame(function(){
+                    watchGamepadInputs(connectedGamepad);
+                    });
+                }, _config.gamepadTimeout);
             };
+
+        // Define an object to hold all currently pressed keys individually or in combo
+        let activeInputs = {};
+        _self.activeInputs = activeInputs;
+
+        // Define a quick object to hold all the listening objects (in case we need to remove them)
+        let eventListeners = {};
+        eventListeners.keydown = function(event){ let input = getUserInputFromKeyboardEvent(event.key); if (input){ activeInputs[input] = true; } onUserInput('keydown', event); };
+        eventListeners.keyup = function(event){ let input = getUserInputFromKeyboardEvent(event.key); if (input){ delete activeInputs[input]; } onUserInput('keyup', event); };
+        eventListeners.mousewheel = function(event){ getUserInputFromWheelEvent(event); onUserInput('mousewheel', event); };
+        eventListeners.gamepadconnected = function(event){ watchGamepadInputs(event.gamepad); onUserInput('gamepadconnected', event); };
+        eventListeners.gamepaddisconnected = function(event){ watchGamepadInputs(null); onUserInput('gamepaddisconnected', event); };
+
+        // Define an event to call when we want to start watching all the inputs
+        let startWatchingInputs = function(){
+            //console.log('%c' + 'mmrpgUserInputWatcher.startWatchingInputs()', 'color: magenta;');
+
+            // Bind events to the keyboard arrow keys if detected to allow for it
+            document.addEventListener('keydown', eventListeners.keydown, { passive: false });
+            document.addEventListener('keyup', eventListeners.keyup, { passive: false });
+
+            // Bind events to the scrolling of the user's mouse if detected and map to L2 + R2 button inputs
+            document.addEventListener('mousewheel', eventListeners.mousewheel, { passive: false });
+
+            // Beind events to any connected gamepads to allow for the same
+            // functionality as the keyboard arrow keys (mirror for easier coding)
+            window.addEventListener("gamepadconnected", eventListeners.gamepadconnected, { passive: false });
+            window.addEventListener("gamepaddisconnected", eventListeners.gamepaddisconnected, { passive: false });
+
+            };
+
+        // Define an event to call when we want to stop watching all the inputs
+        let stopWatchingInputs = function(){
+            //console.log('%c' + 'mmrpgUserInputWatcher.stopWatchingInputs()', 'color: magenta;');
+
+            // Remove events from the keyboard arrow keys
+            document.removeEventListener('keydown', eventListeners.keydown);
+            document.removeEventListener('keyup', eventListeners.keyup);
+
+            // Remove events from the scrolling of the user's mouse
+            document.removeEventListener('mousewheel', eventListeners.mousewheel);
+
+            // Remove events from any connected gamepads
+            window.removeEventListener("gamepadconnected", eventListeners.gamepadconnected);
+            window.removeEventListener("gamepaddisconnected", eventListeners.gamepaddisconnected);
+
+            };
+
+        // Start watching the inputs right away
+        if (_config.autoStart){ startWatchingInputs(); }
 
         // Return a little API for accessing the userInputs and activeInputs objects
         return {
+            config: _self.config,
+            events: _self.events,
             userInputs: _self.userInputs,
             activeInputs: _self.activeInputs,
+            startWatching: startWatchingInputs,
+            stopWatching: stopWatchingInputs,
+            onUserInput: function(callback){
+                if (typeof callback !== 'function'){ return false; }
+                _self.events.onUserInput = callback;
+                return true;
+                }
             };
+
     }
 }
 
