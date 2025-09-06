@@ -3825,9 +3825,13 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let _worldCursor = _world.cursor;
         let $canvasMap = _elements.map;
+        // Define an array to hold the events at this position
         let eventsAtPosition = [];
+        // If we haven't actually moved/othered yet, don't return anything yet
+        if (!_worldCursor.moved && !_worldCursor.othered){ return eventsAtPosition; }
+        // Define an array to hold positions and always check the exact position first
         let positionsToCheck = [];
-        positionsToCheck.push(searchPosition); // always check the exact position first
+        positionsToCheck.push(searchPosition);
         // If a search radius is provided, add the surrounding positions to check
         // including diagonal positions
         if (searchRadius > 0){
@@ -3886,8 +3890,6 @@ class mmrpgWorldMap {
                 if ($eventSprite && $eventSprite.length){ $eventSprite = $eventSprite.first().get(0); }
                 let eventKind2 = eventKind;
                 if (eventKind === 'battle'){
-                    // if we haven't done moved/othered yet, don't return any battles
-                    if (!_worldCursor.moved && !_worldCursor.othered){ continue; }
                     // make sure we take the secondary type (mecha/master/boss/rescue) as the second "kind"
                     eventKind2 = eventInfo.kind2;
                     }
