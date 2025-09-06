@@ -8,7 +8,7 @@
 #---------------------------#
 @portals[]  = spawn(5-2, hidden)
 @portals[]  = goto__debug-area-1(5-2, 6-12)
-@portals[]  = goto__debug-area-1s2(4-13, 4-1, hidden)
+@portals[]  = goto__debug-area-1s2(4-13, 4-1, down-only)
 #---------------------------#
 @field    = waterfall-institute
 #---------------------------#

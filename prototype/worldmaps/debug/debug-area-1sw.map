@@ -7,8 +7,8 @@
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
 @portals[]  = spawn(8-12, hidden)
-@portals[]  = goto__debug-area-1w2(4-1, 5-25, hidden)
-@portals[]  = goto__debug-area-1s2(8-41, 1-8, hidden)
+@portals[]  = goto__debug-area-1w2(4-1, 5-25, up-only)
+@portals[]  = goto__debug-area-1s2(8-41, 1-8, right-only)
 #---------------------------#
 @field        = electrical-tower
 #---------------------------#

@@ -8,7 +8,7 @@
 #---------------------------#
 @portals[]  = spawn(14-22, hidden)
 @portals[]  = goto__debug-area-1w(14-22, 4-10)
-@portals[]  = goto__debug-area-1sw(5-25, 4-1, hidden)
+@portals[]  = goto__debug-area-1sw(5-25, 4-1, down-only)
 #---------------------------#
 @field      = preserved-forest
 #---------------------------#

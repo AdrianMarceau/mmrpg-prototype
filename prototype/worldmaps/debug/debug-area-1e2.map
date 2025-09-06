@@ -7,8 +7,8 @@
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
 @portals[]  = spawn(1-12, hidden)
-@portals[]  = goto__debug-area-1e(1-12, 50-11, hidden)
-@portals[]  = goto__debug-area-1s2(8-21, 20-2, hidden)
+@portals[]  = goto__debug-area-1e(1-12, 50-11, left-only)
+@portals[]  = goto__debug-area-1s2(8-21, 20-2, down-only)
 #---------------------------#
 @field        = waterworks-dam
 #---------------------------#

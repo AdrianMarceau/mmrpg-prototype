@@ -7,9 +7,9 @@
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
 @portals[]  = spawn(4-1, hidden)
-@portals[]  = goto__debug-area-1s(4-1, 4-13, hidden)
-@portals[]  = goto__debug-area-1sw(1-8, 8-41, hidden)
-@portals[]  = goto__debug-area-1e2(20-2, 8-21, hidden)
+@portals[]  = goto__debug-area-1s(4-1, 4-13, up-only)
+@portals[]  = goto__debug-area-1sw(1-8, 8-41, left-only)
+@portals[]  = goto__debug-area-1e2(20-2, 8-21, right-only)
 #---------------------------#
 @field    = rainy-sewers
 #---------------------------#
