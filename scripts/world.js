@@ -4197,27 +4197,31 @@ class mmrpgWorldMap {
 
     // Quick function for sending a snapshot of persistent world values back to the server for saving
     saveWorldState(callback, delay, pullEvents){
-        //console.log('%c' + 'mmrpgWorldMap.saveWorldState(callback, delay)', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.saveWorldState(callback:' + (callback ? typeof callback : 'false') + ', delay:' + (delay ? delay : typeof delay) + ', pullEvents:' + (pullEvents ? 'true' : 'false') + ')', 'color: magenta;');
+        callback = (typeof callback === 'function' ? callback : false);
         delay = (typeof delay === 'number' ? delay : 1) * 1000; // default to one second if not provided/invalid
         pullEvents = typeof pullEvents === 'boolean' ? pullEvents : true; // default to true if not provided/invalid
         let _self = this;
         let _selfRef = _self.saveWorldState;
+        if (typeof _selfRef._scheduled === 'undefined'){ _selfRef._scheduled = null; }
+        if (typeof _selfRef._callbacks === 'undefined'){ _selfRef._callbacks = []; }
         if (_selfRef._scheduled){ clearTimeout(_selfRef._scheduled); }
+        if (callback){ _selfRef._callbacks.push(callback); }
         //console.log('-> scheduling world state save in ' + delay + 'ms');
         _selfRef._scheduled = setTimeout(function(){
             if (_selfRef._busy){
                 // if busy, try again in one second
                 //console.log('%c' + '--> save in progress, calling saveWorldState() again in ' + delay + 'ms ...', 'color: orange;');
-                _self.saveWorldState(callback, delay, pullEvents);
+                _self.saveWorldState(false, delay, pullEvents);
                 } else {
                 // not busy so we can save for real now
-                _self.saveWorldStateForReal(callback, pullEvents);
+                _self.saveWorldStateForReal(pullEvents);
                 }
             }, delay);
         return;
         }
-    saveWorldStateForReal(callback, pullEvents){
-        //console.log('%c' + 'mmrpgWorldMap.saveWorldStateForReal(callback)', 'color: magenta;');
+    saveWorldStateForReal(pullEvents){
+        //console.log('%c' + 'mmrpgWorldMap.saveWorldStateForReal(pullEvents:' + (pullEvents ? 'true' : 'false') + ')', 'color: magenta;');
         let _self = this;
         let _selfRef = _self.saveWorldState;
         let _config = _self.config;
@@ -4258,8 +4262,22 @@ class mmrpgWorldMap {
             lastWorldAbilities,
             lastWorldSymbols,
             };
-        //console.log('%c' + 'Saving World State ...', 'color: cyan;');
+        let callbackQueue = _selfRef._callbacks;
+        let callbackReturn = [];
+        let triggerSaveCallbacks = function(returnData){
+            if (!callbackQueue.length){ return []; }
+            do {
+                //console.log('-> executing saved callback #' + (callbackQueue.length) + ' of ' + (callbackQueue.length));
+                let callback = callbackQueue.shift();
+                callbackReturn.push(callback.call(_self, 'success', returnData));
+                //console.log('-> remaining callbackQueue:', callbackQueue.length);
+                } while (callbackQueue.length);
+            return callbackReturn;
+            };
+        //console.log('%c' + 'Saving World State ...', 'color: orange;');
+        //console.log('w/ pullEvents:', pullEvents);
         //console.log('w/ worldData:', worldData);
+        //console.log('w/ callbackQueue:', callbackQueue);
         _selfRef._busy = true;
         $.ajax({
             url: 'world.php',
@@ -4267,19 +4285,18 @@ class mmrpgWorldMap {
             dataType: 'json',
             data: { action: 'save', world_data: worldData },
             success: function(response){
-                //console.log('---> save_world.php response:', response);
                 //console.log('%c' + '... World State Saved!', 'color: green;');
+                //console.log('saveWorldState() returned successfully! w/', '\n-> response:', response);
                 _selfRef._busy = false;
+                triggerSaveCallbacks({response});
                 if (pullEvents){ _self.triggerWindowEventsPull(0); }
-                if (callback){ return callback.call(_self, 'success', {response}); }
-                else { return true; }
                 },
             error: function(xhr, status, error){
-                console.error('saveWorldState() failed to save world state!', status, error);
                 //console.log('%c' + '... World State Not Saved!', 'color: red;');
+                console.error('saveWorldState() failed to save world state! w/', '\n-> status:', status, '\n-> error:', error);
                 _selfRef._busy = false;
-                if (callback){ return callback.call(_self, 'error', {xhr, status, error}); }
-                else { return false; }
+                triggerSaveCallbacks({xhr, status, error});
+                if (pullEvents){ _self.triggerWindowEventsPull(0); }
                 }
             });
         return;
@@ -5452,12 +5469,19 @@ class mmrpgWorldMap {
         // If a sound was requested, play it now
         if (playSound){ _self.playSoundEffect('get-item'); }
         // Trigger a save of the world state to persist this change
+        //console.log('-> checking if we should reload the world on save');
         let reloadWorldOnSave = false;
+        //console.log('-> itemToken =', itemToken);
         if (itemToken.indexOf('-heart') !== -1){ reloadWorldOnSave = true; } // limit hearts always reload the world
+        //console.log('-> reloadWorldOnSave =', reloadWorldOnSave);
         _self.saveWorldState(function(){
-            //console.log('reloadWorldOnSave = ', reloadWorldOnSave);
+            //console.log('saveWorldState (via addItemToInventory) complete!');
+            //console.log('-> reloadWorldOnSave =', reloadWorldOnSave);
             // maybe reload the page to update the inventory display
-            if (reloadWorldOnSave){ window.location.reload(); }
+            if (reloadWorldOnSave){
+                //console.log('-> reloading the world now...');
+                window.location.reload();
+                }
             }, true, !reloadWorldOnSave);
         // Return true on success
         return true;
