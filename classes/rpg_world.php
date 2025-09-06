@@ -2038,9 +2038,11 @@ class rpg_world {
                 elseif (in_array('down-only', $portal_data)){ $direction = 'down'; }
                 if ($hidden && $portal_name === 'spawn'){ continue; }
                 //if ($this_is_cursor && !$locked && $portal_name !== 'spawn'){ $locked = true; }
+                $sprite = 'portal';
+                if (!empty($direction)){ $sprite .= '-'.$direction; }
                 $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucfirst($portal_name));
                 $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
-                $classes = 'sprite tile portal'.($portal_name !== 'spawn' && !$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $classes = 'sprite tile '.$sprite.' '.($portal_name !== 'spawn' && !$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
                 $portals_markup[] = '<span data-sprite="portal" class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>';
                 $portal_symbols[$pos] = $portal_name;

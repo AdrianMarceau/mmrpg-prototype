@@ -405,6 +405,10 @@ html, body {
 
 #world #map .sprite.tile.portal { background-position: -360px -40px; }
 #world #map .sprite.tile.portal.locked { background-position: -440px -40px; }
+#world #map .sprite.tile.portal-right { background-position: -680px -760px; }
+#world #map .sprite.tile.portal-left { background-position: -600px -760px; }
+#world #map .sprite.tile.portal-up { background-position: -600px -680px; }
+#world #map .sprite.tile.portal-down { background-position: -680px -680px; }
 #world #map .sprite.tile[data-portal="spawn"] { background-position: -120px -40px; }
 #world #map .sprite.tile[data-portal="exit"] { background-position: -440px -40px; }
 #world #map .sprite.tile.portal.hidden { display: none; }
