@@ -1253,6 +1253,9 @@ class rpg_battle extends rpg_object {
 
                     // Collect the ability info from the index
                     $ability_info = $temp_abilities_index[$ability_reward_info['token']];
+                    if (empty($ability_info['ability_flag_published'])){ continue; }
+                    elseif (empty($ability_info['ability_flag_complete'])){ continue; }
+                    elseif (empty($ability_info['ability_flag_unlockable'])){ continue; }
                     // Create the temporary robot object for event creation
                     $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $ability_info);
 
