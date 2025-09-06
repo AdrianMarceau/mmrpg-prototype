@@ -1148,6 +1148,7 @@ class rpg_world {
 
         // Collect any indexes we're gonna need for this part
         $mmrpg_index_robots = self::get_index('robots');
+        $mmrpg_index_abilities = self::get_index('abilities');
         $mmrpg_index_fields = self::get_index('fields');
 
         // Collect the map's field token and mecha encounters
@@ -1370,7 +1371,9 @@ class rpg_world {
                     // If this is a master battle, make sure we add the necessary robot and ability rewards to this battle
                     if ($robot_class === 'master'
                         && $encounter_class !== 'rescue'){
-                        if (!mmrpg_prototype_robot_unlocked('', $robot_token)){
+                        if (!mmrpg_prototype_robot_unlocked('', $robot_token)
+                            && !empty($robot_info['robot_flag_complete'])
+                            && !empty($robot_info['robot_flag_unlockable'])){
                             //error_log('-> '.$robot_token.' is a master that is not unlocked yet!');
                             if (!isset($battle_rewards['robots'])){ $battle_rewards['robots'] = array(); }
                             //$battle_rewards['robots'][] = array('token' => $robot_token, 'level' => $robot_level, 'experience' => 999);
@@ -1380,7 +1383,17 @@ class rpg_world {
                         $master_abilities = !empty($robot_info['robot_rewards']['abilities']) ? $robot_info['robot_rewards']['abilities'] : array();
                         if (!empty($master_abilities)){
                             //error_log('-> '.$robot_token.' is a master that has abilities to unlock!');
-                            $master_abilities = array_map(function($value){ return $value['token']; }, $master_abilities);
+                            $master_abilities = array_map(function($value){
+                                return $value['token'];
+                                }, $master_abilities);
+                            $master_abilities = array_filter($master_abilities, function($token) use ($mmrpg_index_abilities){
+                                $info = $mmrpg_index_abilities[$token];
+                                if (empty($info)){ return false; }
+                                elseif (empty($info['ability_flag_published'])){ return false; }
+                                elseif (empty($info['ability_flag_complete'])){ return false; }
+                                elseif (empty($info['ability_flag_unlockable'])){ return false; }
+                                return true;
+                                });
                             //error_log('-> $master_abilities = '.print_r($master_abilities, true));
                             foreach ($master_abilities AS $ability){
                                 if (in_array($ability, $all_unlocked_abilities)){ continue; }
