@@ -2613,6 +2613,29 @@ class rpg_world {
 
     // -- WORLDMAP REFRESH METHODS -- //
 
+    // Define a function for checking and refreshing world map portals, butons, etc. with persistent data
+    public static function refresh_world_map($this_prototype_data, &$map_data_parsed){
+        //error_log('rpg_world::refresh_map() called!');
+
+        // If there are any portals define, check to see if any are being covered by battles or obstacles
+        self::refresh_map_portals($this_prototype_data, $map_data_parsed);
+
+        // If there are any events defined, check to see if any of them have been interacted with already
+        self::refresh_map_events($this_prototype_data, $map_data_parsed);
+
+        // If there are any buttons defined, check to see if any of them have been interacted with already
+        self::refresh_map_buttons($this_prototype_data, $map_data_parsed);
+
+        // If there are any switches defined, check to see if any of them have been interacted with already
+        self::refresh_map_switches($this_prototype_data, $map_data_parsed);
+
+        // If there are any platforms defined, check to see if any of them have been interacted with already
+        self::refresh_map_platforms($this_prototype_data, $map_data_parsed);
+
+        // Return true on success
+        return true;
+    }
+
     // If there are any portals define, check to see if any are being covered by battles or obstacles
     public static function refresh_map_portals($this_prototype_data, &$map_data_parsed){
         //error_log('rpg_world::refresh_map_portals() called!');

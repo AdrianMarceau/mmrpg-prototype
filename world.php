@@ -421,20 +421,8 @@ if (empty($world_map_pickups) || $reset_pickups === true){
     rpg_world::update_session('world_pickups', $world_map_token, $world_map_pickups);
 }
 
-// If there are any portals define, check to see if any are being covered by battles or obstacles
-rpg_world::refresh_map_portals($this_prototype_data, $map_data_parsed);
-
-// If there are any events defined, check to see if any of them have been interacted with already
-rpg_world::refresh_map_events($this_prototype_data, $map_data_parsed);
-
-// If there are any buttons defined, check to see if any of them have been interacted with already
-rpg_world::refresh_map_buttons($this_prototype_data, $map_data_parsed);
-
-// If there are any switches defined, check to see if any of them have been interacted with already
-rpg_world::refresh_map_switches($this_prototype_data, $map_data_parsed);
-
-// If there are any platforms defined, check to see if any of them have been interacted with already
-rpg_world::refresh_map_platforms($this_prototype_data, $map_data_parsed);
+// Refresh the world map with any persistent changes that have occurred
+rpg_world::refresh_world_map($this_prototype_data, $map_data_parsed);
 
 // Automatically save the world session w/ any recent changes
 //rpg_world::save_session();
