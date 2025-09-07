@@ -626,11 +626,15 @@ if (!empty($map_data_parsed['buttons'])){
 
 // Check to see if this map has any player platforms on it and review each group as a whole
 $map_player_platforms = array();
+$map_player_platforms_index = array();
 $map_has_player_platforms = false;
 if (!empty($map_data_parsed['events'])){
     $event_sprites = $map_data_parsed['events'];
     foreach ($event_sprites AS $event_name => $event_data){
         if (empty($event_data) || !is_array($event_data)){ continue; }
+        $raw_event_data = $event_data;
+        //error_log('Checking event "'.$event_name.'" for player platform data...');
+        //error_log('-> $event_data = '.print_r($event_data, true));
         $hidden = false; if (in_array('hidden', $event_data)){ $hidden = true; unset($event_data[array_search('hidden', $event_data)]); }
         $locked = false; if (in_array('locked', $event_data)){ $locked = true; unset($event_data[array_search('locked', $event_data)]); }
         $active = false; if (in_array('active', $event_data)){ $active = true; unset($event_data[array_search('active', $event_data)]); }
@@ -641,9 +645,15 @@ if (!empty($map_data_parsed['events'])){
         $action = !empty($event_data[3]) ? $event_data[3] : ''; unset($event_data[3]);
         if ($action !== 'drop-zone'){ continue; }
         elseif (!preg_match('/^(light|wily|cossack|lalinde)pad-/i', $sprite)){ continue; }
+        // This is a PLAYER PLATFORM event, so collect its data for later processing
         $map_has_player_platforms = true;
         $platform_kind = explode('-', $sprite, 2)[0];
         $player_token = 'dr-'.substr($platform_kind, 0, -3);
+        $player_unlocked = mmrpg_prototype_player_unlocked($player_token);
+        // Add this platform to the index in case we need access to this later
+        //error_log('-> '.$event_name.' $raw_event_data = '.print_r($raw_event_data, true));
+        if (!isset($map_player_platforms_index[$player_token])){ $map_player_platforms_index[$player_token] = array(); }
+        $map_player_platforms_index[$player_token][$event_name] = $raw_event_data;
         //error_log('Map "'.$world_map_token.'" has player platform event "'.$event_name.'" with sprite "'.$sprite.'"' );
         //error_log('-> $platform_kind = '.print_r($platform_kind, true));
         //error_log('-> $player_token = '.print_r($player_token, true));
@@ -652,15 +662,55 @@ if (!empty($map_data_parsed['events'])){
         $map_player_platforms[$player_token][$pos] = $active ? 1 : 0;
     }
 }
+// Unlock new player-characters if their platforms exist here and are fully active (all objects placed) not not unlocked yet
+// OR Automatically activate platforms (by placing all objects) for players already unlocked
 //error_log('Map "'.$world_map_token.'" has player platforms? '.($map_has_player_platforms ? 'YES' : 'no'));
 //error_log('-> $map_player_platforms = '.print_r($map_player_platforms, true));
+//error_log('-> $map_player_platforms_index = '.print_r($map_player_platforms_index, true));
 if ($map_has_player_platforms && !empty($map_player_platforms)){
-    foreach ($map_player_platforms AS $player_token => $platform_data){
+    // Define a quick inline function for looking up drop objects by kind and token when needed
+    $find_drop_object = function($kind, $token) use ($map_data_parsed){
+        if (empty($kind) || empty($token)){ return false; }
+        //error_log('$find_drop_object($kind: '.$kind.', $token: '.$token.')');
+        if ($kind === 'item'){
+            static $parsed_items = null;
+            if (!is_array($parsed_items)){ $parsed_items = !empty($map_data_parsed['items']) ? $map_data_parsed['items'] : array(); }
+            //error_log('-> $parsed_items = '.print_r($parsed_items, true));
+            $parsed_objects = $parsed_items;
+            } elseif ($kind === 'ability'){
+            static $parsed_abilities = null;
+            if (!is_array($parsed_abilities)){ $parsed_abilities = !empty($map_data_parsed['abilities']) ? $map_data_parsed['abilities'] : array(); }
+            //error_log('-> $parsed_abilities = '.print_r($parsed_abilities, true));
+            $parsed_objects = $parsed_abilities;
+            } else {
+            return false;
+            }
+        foreach ($parsed_objects AS $namekey => $data){
+            if (empty($data) || !is_array($data)){ continue; }
+            $position = !empty($data[0]) ? $data[0] : '';
+            $object_token = !empty($data[1]) ? $data[1] : '';
+            if ($kind === 'item' && strstr($object_token, '__')){ list($object_token) = explode('__', $object_token, 2); }
+            if ($object_token !== $token){ continue; }
+            //error_log('-> found '.$kind.' "'.$token.'" at position "'.$position.'"');
+            //return array($namekey, $data);
+            return $namekey;
+            }
+        return false;
+        };
+    // Loop through each player and their platforms to see if they need unlocking or activating
+    foreach ($map_player_platforms AS $player_token => $platforms_active){
+        //error_log('-> '.$player_token.' $platforms_active = '.print_r($platforms_active, true));
+        $platform_data = $map_player_platforms_index[$player_token];
         //error_log('-> '.$player_token.' $platform_data = '.print_r($platform_data, true));
-        $all_active = array_sum($platform_data) === count($platform_data) ? true : false;
-        //error_log('-> player "'.$player_token.'" has all platforms active? '.($all_active ? 'YES' : 'no'));
-        if ($all_active && !mmrpg_prototype_player_unlocked($player_token)){
-            //error_log('-> unlocking player "'.$player_token.'" since all their platforms are active!');
+        $player_unlocked = mmrpg_prototype_player_unlocked($player_token);
+        $all_active = array_sum($platforms_active) === count($platforms_active) ? true : false;
+        //error_log('-> player "'.$player_token.'" is already unlocked? '.($player_unlocked ? 'YES' : 'NO'));
+        //error_log('-> player "'.$player_token.'" has all platforms active? '.($all_active ? 'YES' : 'NO'));
+        // If the player is NOT UNLOCKED YET but SHOULD BE given all active platforms, do so now
+        if (!$player_unlocked && $all_active){
+            //error_log('-> auto-unlocking player "'.$player_token.'" since all of their platforms are active!');
+            //error_log('-> '.$player_token.' $platforms_active = '.print_r($platforms_active, true));
+            //error_log('-> '.$player_token.' $platform_data = '.print_r($platform_data, true));
             $player_info = $mmrpg_index_players[$player_token];
             $player_size = !empty($player_info['player_image_size']) ? $player_info['player_image_size'] : 40;
             $player_xsize = $player_size.'x'.$player_size;
@@ -736,6 +786,40 @@ if ($map_has_player_platforms && !empty($map_player_platforms)){
             //error_log('-> redirecting to new world URL: '.$redirect_to_url);
             header('Location: '.$redirect_to_url);
             exit();
+        }
+        // Else if the player IS UNLOCKED but platforms are NOT ACTIVE YET, auto-move objects into place
+        elseif ($player_unlocked && !$all_active){
+            //error_log('-> auto-moving init-items for "'.$player_token.'" as they\'re already unlocked!');
+            //error_log('-> '.$player_token.' $platforms_active = '.print_r($platforms_active, true));
+            //error_log('-> '.$player_token.' $platform_data = '.print_r($platform_data, true));
+            // We need to move the items into place and save it as if the player already did-so themselves
+            $world_objects_required = array_map(function($data) use ($find_drop_object){
+                if (empty($data[0]) || !strstr($data[0], '-')){ return false; }
+                if (empty($data[4]) || !strstr($data[4], ':')){ return false; }
+                $position = $data[0]; $filter = trim($data[4]);
+                list($filter_kind, $filter_token) = explode(':', $filter);
+                $object_namekey = $find_drop_object($filter_kind, $filter_token);
+                return array($filter_kind, $object_namekey, $position);
+                }, $platform_data);
+            //error_log('-> $world_objects_required = '.print_r($world_objects_required, true));
+            if (!empty($world_objects_required)){
+                foreach ($world_objects_required AS $event_namekey => $object_data){
+                    //error_log('-> processing object #'.$event_namekey.' = '.print_r($object_data, true));
+                    if (empty($object_data) || !is_array($object_data) || count($object_data) < 3){ continue; }
+                    list($object_kind, $object_namekey, $object_position) = $object_data;
+                    if (empty($object_namekey)){ continue; }
+                    if ($object_kind === 'item'){ $object_xkind = 'items'; }
+                    elseif ($object_kind === 'ability'){ $object_xkind = 'abilities'; }
+                    else { $object_xkind = false; }
+                    if (!$object_xkind){ /*error_log('-> unrecognized object kind "'.$object_kind.'", skipping it');*/ continue; }
+                    if (!isset($WORLD_SESSION['world_symbols'][$world_map_token][$object_xkind])){ $WORLD_SESSION['world_symbols'][$world_map_token][$object_xkind] = array(); }
+                    $world_object_symbols = &$WORLD_SESSION['world_symbols'][$world_map_token][$object_xkind];
+                    $world_object_symbols[$object_namekey] = $object_position;
+                    $map_data_parsed['events'][$event_namekey][] = 'active';
+                    //error_log('-> auto-placed '.$object_kind.' "'.$object_namekey.'" into position "'.$object_position.'"' );
+                }
+            }
+            //error_log('-> theoretically, all objects should be placed and this should not require a reload...');
         }
     }
 }
