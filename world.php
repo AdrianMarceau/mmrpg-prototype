@@ -422,6 +422,22 @@ if (empty($world_map_pickups) || $reset_pickups === true){
 }
 
 // If there are any portals define, check to see if any are being covered by battles or obstacles
+rpg_world::refresh_map_portals($this_prototype_data, $map_data_parsed);
+
+// If there are any events defined, check to see if any of them have been interacted with already
+rpg_world::refresh_map_events($this_prototype_data, $map_data_parsed);
+
+// If there are any buttons defined, check to see if any of them have been interacted with already
+rpg_world::refresh_map_buttons($this_prototype_data, $map_data_parsed);
+
+// If there are any switches defined, check to see if any of them have been interacted with already
+rpg_world::refresh_map_switches($this_prototype_data, $map_data_parsed);
+
+// If there are any platforms defined, check to see if any of them have been interacted with already
+rpg_world::refresh_map_platforms($this_prototype_data, $map_data_parsed);
+
+/*
+// If there are any portals define, check to see if any are being covered by battles or obstacles
 if (!empty($map_data_parsed['portals'])){
     //error_log('[portal-check] checking for world map portals on map "'.$world_map_token.'"');
     //error_log('-> $map_data_parsed[\'portals\'] = '.print_r($map_data_parsed['portals'], true));
@@ -445,7 +461,9 @@ if (!empty($map_data_parsed['portals'])){
     }
     //error_log('-> $map_data_parsed[\'portals\'] (new) = '.print_r($map_data_parsed['portals'], true));
 }
+*/
 
+/*
 // If there are any events defined, check to see if any of them have been interacted with already
 if (!empty($map_data_parsed['events'])){
     $event_sprites = $map_data_parsed['events'];
@@ -554,7 +572,9 @@ if (!empty($map_data_parsed['events'])){
         // ...
     }
 }
+*/
 
+/*
 // If there are any buttons defined, check to see if any of them have been pushed already
 if (!empty($map_data_parsed['buttons'])){
     $button_sprites = $map_data_parsed['buttons'];
@@ -623,7 +643,9 @@ if (!empty($map_data_parsed['buttons'])){
         // ...
     }
 }
+*/
 
+/*
 // Check to see if this map has any player platforms on it and review each group as a whole
 $map_player_platforms = array();
 $map_player_platforms_index = array();
@@ -662,6 +684,8 @@ if (!empty($map_data_parsed['events'])){
         $map_player_platforms[$player_token][$pos] = $active ? 1 : 0;
     }
 }
+*/
+/*
 // Unlock new player-characters if their platforms exist here and are fully active (all objects placed) not not unlocked yet
 // OR Automatically activate platforms (by placing all objects) for players already unlocked
 //error_log('Map "'.$world_map_token.'" has player platforms? '.($map_has_player_platforms ? 'YES' : 'no'));
@@ -811,7 +835,7 @@ if ($map_has_player_platforms && !empty($map_player_platforms)){
                     if ($object_kind === 'item'){ $object_xkind = 'items'; }
                     elseif ($object_kind === 'ability'){ $object_xkind = 'abilities'; }
                     else { $object_xkind = false; }
-                    if (!$object_xkind){ /*error_log('-> unrecognized object kind "'.$object_kind.'", skipping it');*/ continue; }
+                    if (!$object_xkind){ error_log('-> unrecognized object kind "'.$object_kind.'", skipping it'); continue; }
                     if (!isset($WORLD_SESSION['world_symbols'][$world_map_token][$object_xkind])){ $WORLD_SESSION['world_symbols'][$world_map_token][$object_xkind] = array(); }
                     $world_object_symbols = &$WORLD_SESSION['world_symbols'][$world_map_token][$object_xkind];
                     $world_object_symbols[$object_namekey] = $object_position;
@@ -823,6 +847,7 @@ if ($map_has_player_platforms && !empty($map_player_platforms)){
         }
     }
 }
+*/
 
 // Automatically save the world session w/ any recent changes
 //rpg_world::save_session();
