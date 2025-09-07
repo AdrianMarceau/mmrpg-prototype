@@ -1372,6 +1372,7 @@ class rpg_world {
                     if ($robot_class === 'master'
                         && $encounter_class !== 'rescue'){
                         if (!mmrpg_prototype_robot_unlocked('', $robot_token)
+                            && !empty($robot_info['robot_flag_published'])
                             && !empty($robot_info['robot_flag_complete'])
                             && !empty($robot_info['robot_flag_unlockable'])){
                             //error_log('-> '.$robot_token.' is a master that is not unlocked yet!');
