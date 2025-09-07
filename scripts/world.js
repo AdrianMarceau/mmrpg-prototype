@@ -1217,7 +1217,7 @@ class mmrpgWorldMap {
             let tileIsWithinRange = tilesWithinRange.indexOf(thisPos) !== -1 ? true : false;
             lastMouseClick = thisPos;
             if ($sideButtons.is('.active')){ $sideButtons.find('.button[data-action="dismiss"]').trigger('click'); }
-            else if (sameAsCurrent){ _self.refreshMapPositionEvents(0); }
+            else if (sameAsCurrent){ _self.refreshMapPositionEvents(0, true); }
             if (!tileIsWithinRange || sameAsLast || sameAsCurrent){ return false; }
             //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
             if (!sameAsLast){ _self.playSoundEffect('link-click'); }
@@ -2671,9 +2671,10 @@ class mmrpgWorldMap {
         }
 
     // Quick function for clearing out any existing map events then checking for new ones at new position
-    async refreshMapPositionEvents(timeoutMultiplier){
+    async refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         //console.log('%c' + 'mmrpgWorldMap.refreshMapPositionEvents()', 'color: magenta;');
         timeoutMultiplier = typeof timeoutMultiplier === 'number' ? timeoutMultiplier : 1;
+        forceRefresh = typeof forceRefresh === 'boolean' ? forceRefresh : false;
 
         // Collect references, indexes, and other variables we need to work with
         let _self = this;
@@ -2705,13 +2706,33 @@ class mmrpgWorldMap {
         let $canvasMap = _elements.map;
         let $worldCursor = _elements.worldCursor;
         let $teamSprites = _elements.teamSprites;
-        let cursorDirection = _worldCursor.direction;
+        let lastPosition = _selfRef.lastPosition || false;
+        let lastDirection = _selfRef.lastDirection || false;
         let cursorPosition = _worldCursor.position;
+        let cursorDirection = _worldCursor.direction;
         let newPosition = cursorPosition.split('-');
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
+        let sameAsLastPosition = lastPosition === cursorPosition ? true : false;
+        let sameAsLastDirection = lastDirection === cursorDirection ? true : false;
         let stillAtPosition = function(){ return (_worldCursor.position === cursorPosition) ? true : false; };
         let otherMenusActiveNow = function(){ return (_elements.robotsOverview.is('.expanded') || _elements.sideButtons.is('.active')) ? true : false; };
+        //console.log('-> lastPosition (old):', lastPosition);
+        //console.log('-> lastDirection (old):', lastDirection);
+        //console.log('-> cursorPosition (new):', cursorPosition);
+        //console.log('-> cursorDirection (new):', cursorDirection);
+        //console.log('-> sameAsLastPosition:', sameAsLastPosition);
+        //console.log('-> sameAsLastDirection:', sameAsLastDirection);
+
+        // If nothing has changed, we should not do anything further
+        if (sameAsLastPosition && sameAsLastDirection && !forceRefresh){
+            //console.log('-> player has not changed position or direction, skipping further processing');
+            return true;
+            }
+
+        // Update the "last" variables for next time
+        _selfRef.lastPosition = cursorPosition;
+        _selfRef.lastDirection = cursorDirection;
 
         // Before we do anything else, check to see if this player has any active robots
         //console.log('_worldPlayerRobots = ', _worldPlayerRobots);
@@ -2730,27 +2751,36 @@ class mmrpgWorldMap {
         let teamReadyDuration = 1800 * timeoutMultiplier;
         let teamRushDuration = 300 * timeoutMultiplier;
 
+        // Collect references to the required sprites layer for adjustments
+        let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap); // later: $('.layer[data-layer="sprites"]', $canvasMap);
+        if (!$spritesLayer || !$spritesLayer.length){
+            console.error('updateMapPosition() missing required $spritesLayer!');
+            return false;
+            }
+        //console.log('-> $eventsLayer found, checking for events...');
+
         // Make sure we empty and hide the action dropdown if it's been shown by previous move
         let $actionDropdown = _elements.actionDropdown;
         let $actionDropdownWrapper = $('> .wrapper', $actionDropdown);
-        $actionDropdown.removeClass('active').css({left: '', top: ''}).removeAttr('data-dir');
-        $actionDropdownWrapper.empty();
+        if (!sameAsLastPosition){
+            $actionDropdown.removeClass('active').css({left: '', top: ''}).removeAttr('data-dir');
+            $actionDropdownWrapper.empty();
+            }
 
         // Make sure we also empty the sidebar buttons in case any were added by previous move
         let $sideButtons = _elements.sideButtons;
         let $sideButtonsWrapper = $('> .wrapper', $sideButtons);
-        $sideButtons.removeClass('active');
-        $sideButtonsWrapper.empty();
-
-        // Collect references to the required sprites layer for adjustments
-        let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap); // later: $('.layer[data-layer="sprites"]', $canvasMap);
-        if (!$spritesLayer || !$spritesLayer.length){ console.error('updateMapPosition() missing required $spritesLayer!'); return false; }
-        //console.log('-> $eventsLayer found, checking for events...');
+        if (!sameAsLastPosition){
+            $sideButtons.removeClass('active');
+            $sideButtonsWrapper.empty();
+            }
 
         // Make sure we move any existing zoom layer sprites back to their original layers
-        $worldCursor.removeClass('shake');
-        $spritesLayer.removeClass('has-zoom');
-        setTimeout(function(){ $('.sprite', $canvasMap).removeClass('zoom'); }, 100);
+        if (!sameAsLastPosition){
+            $worldCursor.removeClass('shake');
+            $spritesLayer.removeClass('has-zoom');
+            setTimeout(function(){ $('.sprite', $canvasMap).removeClass('zoom'); }, 100);
+            }
 
         // Search for events at the new position so we can show the action dropdown if needed
         //console.log('-> checking if there are any events for this position...');
@@ -3159,8 +3189,9 @@ class mmrpgWorldMap {
 
         // Define an inline function to put the team into their battle-ready poses
         let getTeamSpritesReady = function(){
+            //console.log('%c' + 'getTeamSpritesReady()', 'color: cyan;');
             if (_self.worldIsBusy()){ return; }
-            if (!stillAtPosition() || otherMenusActiveNow()){ return; }
+            if (!stillAtPosition() || (otherMenusActiveNow() && sameAsLastDirection)){ return; }
 
             // Add the shake class to the cursor so it hides behind the player
             $worldCursor.addClass('shake');
@@ -3197,11 +3228,17 @@ class mmrpgWorldMap {
             $playerSprites.each(function(index){
                 let $sprite = $(this);
                 if ($sprite.is('.disabled')){ return; }
+                let dataDir = $sprite.attr('data-dir') || 'right';
+                if (goingLeft && dataDir !== 'left'){ $sprite.attr('data-dir', 'left'); }
+                else if (goingRight && dataDir !== 'right'){ $sprite.attr('data-dir', 'right'); }
                 $sprite.attr('data-frame', playerFrames[index % playerFrames.length] || '00');
                 });
             $robotSprites.each(function(index){
                 let $sprite = $(this);
                 if ($sprite.is('.disabled')){ return; }
+                let dataDir = $sprite.attr('data-dir') || 'right';
+                if (goingLeft && dataDir !== 'left'){ $sprite.attr('data-dir', 'left'); }
+                else if (goingRight && dataDir !== 'right'){ $sprite.attr('data-dir', 'right'); }
                 $sprite.attr('data-frame', robotFrames[index % robotFrames.length] || '00');
                 });
 
