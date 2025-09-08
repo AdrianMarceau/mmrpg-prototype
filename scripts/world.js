@@ -2321,8 +2321,8 @@ class mmrpgWorldMap {
         let thisVerDir = (thisNewRow > thisOldRow) ? 'down' : (thisNewRow < thisOldRow) ? 'up' : false;
         let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join(' and '); })(thisHorDir, thisVerDir);
         let thisShiftDist = Math.sqrt(Math.pow(thisNewCol - thisOldCol, 2) + Math.pow(thisNewRow - thisOldRow, 2));
-        let tileOffsetX = ((thisNewCol - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0];
-        let tileOffsetY = ((thisNewRow - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1];
+        let tileOffsetX = (((thisNewCol - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0]);
+        let tileOffsetY = (((thisNewRow - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1]) - 10;
         let tileOffsetZ = tileOffsetY + 1;
         let cursorHasMoved = _worldCursor.moved || thisNewPos !== _mapStartPosition ? true : false;
         _self.resetZoomLevel();
@@ -2750,6 +2750,9 @@ class mmrpgWorldMap {
         let zoomTimeoutDuration = 2000 * timeoutMultiplier;
         let teamReadyDuration = 1800 * timeoutMultiplier;
         let teamRushDuration = 300 * timeoutMultiplier;
+        if (teamRushDuration < 1){ teamRushDuration = 100; }
+        //console.log('timeoutMultiplier = ', timeoutMultiplier);
+        //console.log('teamRushDuration = ', teamRushDuration);
 
         // Collect references to the required sprites layer for adjustments
         let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap); // later: $('.layer[data-layer="sprites"]', $canvasMap);
@@ -3191,19 +3194,20 @@ class mmrpgWorldMap {
         let getTeamSpritesReady = function(){
             //console.log('%c' + 'getTeamSpritesReady()', 'color: cyan;');
             if (_self.worldIsBusy()){ return; }
-            if (!stillAtPosition() || (otherMenusActiveNow() && sameAsLastDirection)){ return; }
+            if (!stillAtPosition()){ return; }
 
             // Add the shake class to the cursor so it hides behind the player
             $worldCursor.addClass('shake');
 
-            // Zoom one or more of the team sprites (?)
-            //$teamSprites.css('top', '+= 10px'); // move the team sprites up a little bit
+            // Collect all the team sprites and details about their current positions
             let goingUp = _worldCursor.direction.indexOf('up') !== -1 ? true : false;
             let goingDown = _worldCursor.direction.indexOf('down') !== -1 ? true : false;
             let goingLeft = _worldCursor.direction.indexOf('left') !== -1 ? true : false;
             let goingRight = _worldCursor.direction.indexOf('right') !== -1 ? true : false;
+            let goingHorz = goingLeft || goingRight ? true : false;
+            let goingVert = goingUp || goingDown ? true : false;
             let rushDistanceX = Math.ceil(_mapTileSize[0] / 4);
-            let rushDistanceY = Math.ceil(_mapTileSize[1] / 4);
+            let rushDistanceY = Math.ceil(_mapTileSize[1] / 2); //Math.ceil(_mapTileSize[1] / 4);
             let playerFrames = ['06', '01', '04'];
             let robotFrames = ['04', '08', '01', '06', '10', '00', '04', '01'];
             let $cursorSprite = $teamSprites.filter('.sprite.cursor');
@@ -3213,18 +3217,10 @@ class mmrpgWorldMap {
             //console.log(('-> eventsAtPosition =', eventsAtPosition);
             //console.log(('-> goingRight =', goingRight, '| goingLeft =', goingLeft, '| goingUp =', goingUp, '| goingDown =', goingDown);
             //console.log(('-> rushDistanceX =', rushDistanceX, '| rushDistanceY =', rushDistanceY);
+            //console.log('-> $otherSprites =', $otherSprites);
+
+            // Change all team sprite frames and directions where needed
             $cursorSprite.attr('data-frame', '01');
-            $otherSprites.each(function(index){
-                let $sprite = $(this);
-                let oldX = $sprite.prop('worldX') || parseInt($sprite.css('left')) || 0;
-                let oldY = $sprite.prop('worldY') || parseInt($sprite.css('top')) || 0;
-                let oldZ = $sprite.prop('worldZ') || parseInt($sprite.css('zIndex')) || 1;
-                let newX = oldX + (goingRight ? rushDistanceX : goingLeft ? (-1 * rushDistanceX) : 0);
-                let newY = oldY + (goingDown ? rushDistanceY : goingUp ? (-1 * rushDistanceY) : 0);
-                let newZ = newY + 1;
-                //console.log(('-> moving sprite', $sprite.attr('data-token'), 'from [', oldX, oldY, oldZ, '] to [', newX, newY, newZ, ']');
-                $sprite.animate({left: newX + 'px', top: newY + 'px', zIndex: newZ }, teamRushDuration);
-                });
             $playerSprites.each(function(index){
                 let $sprite = $(this);
                 if ($sprite.is('.disabled')){ return; }
@@ -3241,6 +3237,63 @@ class mmrpgWorldMap {
                 else if (goingRight && dataDir !== 'right'){ $sprite.attr('data-dir', 'right'); }
                 $sprite.attr('data-frame', robotFrames[index % robotFrames.length] || '00');
                 });
+
+            // Move the team sprites in such a way that they point in the direction they're facing
+            // We do this by first moving the player sprite(s) to the extreme edge of the panel (top/bottom/left/right/top-right/bottom-left/etc.)
+            // Then we can loop through the others in order and position them relative to the player sprite (only align robot sprites to first player)
+            let targetX = (thisNewCol - 1) * _mapTileSize[0];
+            let targetY = (thisNewRow - 1) * _mapTileSize[1];
+            let spacingX = Math.ceil(_mapTileSize[0] / 4);
+            let spacingY = Math.ceil(_mapTileSize[1] / 6);
+            let playerPositions = [];
+            $playerSprites.each(function(index){
+                let $sprite = $(this);
+                let spriteWidth = parseInt($sprite.attr('data-size')) || 40;
+                let spriteHeight = parseInt($sprite.attr('data-size')) || 40;
+                let posX = targetX;
+                let posY = targetY;
+                // use if instead of if/else to support combination directions
+                if (goingRight){ posX = targetX + _mapTileSize[0] - spriteWidth - _mapTileSizeOffset[0]; } // align-right
+                else if (goingLeft){ posX = targetX + _mapTileSizeOffset[0]; } // align-left
+                else { posX = targetX + Math.ceil((_mapTileSize[0] - spriteWidth) / 2); } // align-center
+                if (goingUp){ posY = (targetY + _mapTileSizeOffset[1]) - (_mapSpriteSizeOffset[1] / 1); } // align-top
+                else if (goingDown){ posY = targetY + _mapTileSize[1] - spriteHeight - _mapTileSizeOffset[1]; } // align-bottom
+                else { posY = targetY + Math.ceil((_mapTileSize[1] - spriteHeight) / 2) - (_mapSpriteSizeOffset[1] / 2); } // align-middle
+                playerPositions.push([posX, posY]);
+                $sprite.animate({left: posX + 'px', top: posY + 'px', zIndex: (posY + 10) }, teamRushDuration);
+                });
+            let firstPlayerPosition = playerPositions[0] || [targetX, targetY];
+            let robotSpriteKey = 0;
+            $robotSprites.each(function(index){
+                let $sprite = $(this);
+                let spriteWidth = parseInt($sprite.attr('data-size')) || 40;
+                let spriteHeight = parseInt($sprite.attr('data-size')) || 40;
+                let posKey = robotSpriteKey++;
+                let posX = firstPlayerPosition[0];
+                let posY = firstPlayerPosition[1];
+                let horzSpacing = Math.ceil(spacingX * (posKey + 1));
+                let vertSpacing = Math.ceil(spacingY * (posKey + 1));
+                if (goingHorz && goingVert){ horzSpacing = Math.ceil(horzSpacing / 2); }
+                if (goingRight){ posX -= horzSpacing; } // align-right
+                else if (goingLeft){ posX += horzSpacing; } // align-left
+                if (goingUp){ posY += vertSpacing; } // align-top
+                else if (goingDown){ posY -= vertSpacing; } // align-bottom
+                $sprite.animate({left: posX + 'px', top: posY + 'px', zIndex: (posY + 10) }, teamRushDuration);
+                });
+            // Make sure we put the cursor sprite lower (in z-index) than the team so it's like it's hiding
+            //console.log('-> $otherSprites =', $otherSprites);
+            let lowestOtherSpriteZ = (function($otherSprites){
+                let lowestZ = null;
+                $otherSprites.each(function(){
+                    let $sprite = $(this);
+                    let spriteZ = parseInt($sprite.css('zIndex'));
+                    //console.log('-> $sprite(' + $sprite.attr('class') + ') zIndex =', spriteZ);
+                    if (lowestZ === null || spriteZ < lowestZ){ lowestZ = spriteZ; }
+                    });
+                return lowestZ !== null ? lowestZ : 1;
+                })($otherSprites);
+            //console.log('-> lowestOtherSpriteZ =', lowestOtherSpriteZ);
+            $cursorSprite.attr('data-frame', '01').css({zIndex:(lowestOtherSpriteZ - 1)});
 
             };
 
