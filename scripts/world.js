@@ -2787,7 +2787,7 @@ class mmrpgWorldMap {
 
         // Search for events at the new position so we can show the action dropdown if needed
         //console.log('-> checking if there are any events for this position...');
-        let eventsAtPosition = _self.getEventsAtPosition(newPosition);
+        let eventsAtPosition = _self.getEventsAtPosition(cursorPosition, cursorDirection);
         //console.log('-> eventsAtPosition =', eventsAtPosition);
         if (!eventsAtPosition || !eventsAtPosition.length){
             //console.log('-> no events found at position', cursorPosition, 'skipping further processing');
@@ -3199,13 +3199,39 @@ class mmrpgWorldMap {
             // Add the shake class to the cursor so it hides behind the player
             $worldCursor.addClass('shake');
 
-            // Collect all the team sprites and details about their current positions
-            let goingUp = _worldCursor.direction.indexOf('up') !== -1 ? true : false;
-            let goingDown = _worldCursor.direction.indexOf('down') !== -1 ? true : false;
-            let goingLeft = _worldCursor.direction.indexOf('left') !== -1 ? true : false;
-            let goingRight = _worldCursor.direction.indexOf('right') !== -1 ? true : false;
+            // Collect the position of the firstEvent (the one we're triggering) and use it to
+            // decide which direction the cursor needs to face in order to "see" the first event
+            //console.log('firstEvent = ', firstEvent);
+            //console.log('firstEvent.token = ', firstEvent.token);
+            let cursorPosition = _worldCursor.position;
+            let cursorPositionXY = cursorPosition.split('-').map(function(num){ return parseInt(num); });
+            let cursorDirection = _worldCursor.direction;
+            let firstEventPosition = firstEvent.position;
+            let firstEventPositionXY = firstEventPosition.split('-').map(function(num){ return parseInt(num); });
+            let firstEventDirection = [];
+            if (firstEventPositionXY[0] > cursorPositionXY[0]){ firstEventDirection.push('right'); }
+            else if (firstEventPositionXY[0] < cursorPositionXY[0]){ firstEventDirection.push('left'); }
+            if (firstEventPositionXY[1] < cursorPositionXY[1]){ firstEventDirection.push('up'); }
+            else if (firstEventPositionXY[1] > cursorPositionXY[1]){ firstEventDirection.push('down'); }
+            firstEventDirection = firstEventDirection.join('-');
+            //console.log('-> cursorPosition =', cursorPosition, cursorPositionXY);
+            //console.log('-> cursorDirection =', cursorDirection);
+            //console.log('-> firstEventPosition =', firstEventPosition, firstEventPositionXY);
+            //console.log('-> firstEventDirection =', firstEventDirection);
+
+            // Collect details about the world cursor direction so we know where we're looking
+            //let goingUp = _worldCursor.direction.indexOf('up') !== -1 ? true : false;
+            //let goingDown = _worldCursor.direction.indexOf('down') !== -1 ? true : false;
+            //let goingLeft = _worldCursor.direction.indexOf('left') !== -1 ? true : false;
+            //let goingRight = _worldCursor.direction.indexOf('right') !== -1 ? true : false;
+            let goingUp = firstEventDirection.indexOf('up') !== -1 ? true : false;
+            let goingDown = firstEventDirection.indexOf('down') !== -1 ? true : false;
+            let goingLeft = firstEventDirection.indexOf('left') !== -1 ? true : false;
+            let goingRight = firstEventDirection.indexOf('right') !== -1 ? true : false;
             let goingHorz = goingLeft || goingRight ? true : false;
             let goingVert = goingUp || goingDown ? true : false;
+
+            // Collect all the team sprites and details about their current positions
             let rushDistanceX = Math.ceil(_mapTileSize[0] / 4);
             let rushDistanceY = Math.ceil(_mapTileSize[1] / 2); //Math.ceil(_mapTileSize[1] / 4);
             let playerFrames = ['06', '01', '04'];
@@ -3903,10 +3929,12 @@ class mmrpgWorldMap {
         }
 
     // Quick function that, given a column and row returns any events on or around that position on the map
-    getEventsAtPosition(searchPosition, searchRadius, includeLocked){
+    getEventsAtPosition(searchPosition, searchDirection, searchRadius, includeLocked){
         //console.log('%c' + 'mmrpgWorldMap.getEventsAtPosition(searchPosition:' + searchPosition + ', searchRadius:' + searchRadius + ')', 'color: magenta;');
         if (!searchPosition || (typeof searchPosition !== 'string' && !Array.isArray(searchPosition))){ console.error('getEventsAtPosition() missing or invalid searchPosition!'); return false; }
+        if (!searchDirection || (typeof searchDirection !== 'string' && !Array.isArray(searchDirection))){ console.error('getEventsAtPosition() missing or invalid searchDirection!'); return false; }
         searchPosition = typeof searchPosition !== 'string' ? searchPosition.join('-') : searchPosition; // join if provided as array
+        searchDirection = typeof searchDirection !== 'string' ? searchDirection.join('-') : searchDirection; // join if provided as array
         searchRadius = typeof searchRadius === 'number' ? searchRadius : 1; // default to one if not provided
         includeLocked = typeof includeLocked === 'boolean' ? includeLocked : false; // default to false if not provided
         let _self = this;
@@ -4077,6 +4105,36 @@ class mmrpgWorldMap {
                 continue; // skip the rest of this loop
                 }
             }
+        // Now that we have our events, we need to do some serious sorting given the direction we're facing
+        // Most important is the first event, so decide which panel we're "facing" given direction and work out way outward
+        let searchPositionXY = searchPosition.split('-').map(function(v){ return parseInt(v); });
+        let searchDirectionXY = searchDirection.split('-').map(function(v){ return v.toLowerCase(); });
+        let firstEventPositionXY = [];
+        if (searchDirectionXY.indexOf('up') !== -1){ firstEventPositionXY[1] = searchPositionXY[1] - 1; }
+        else if (searchDirectionXY.indexOf('down') !== -1){ firstEventPositionXY[1] = searchPositionXY[1] + 1; }
+        else { firstEventPositionXY[1] = searchPositionXY[1]; }
+        if (searchDirectionXY.indexOf('left') !== -1){ firstEventPositionXY[0] = searchPositionXY[0] - 1; }
+        else if (searchDirectionXY.indexOf('right') !== -1){ firstEventPositionXY[0] = searchPositionXY[0] + 1; }
+        else { firstEventPositionXY[0] = searchPositionXY[0]; }
+        let firstEventPosition = firstEventPositionXY.join('-');
+        //console.log('-> searchPosition =', searchPosition);
+        //console.log('-> searchDirection =', searchDirection);
+        //console.log('-> searchPositionXY =', searchPositionXY);
+        //console.log('-> searchDirectionXY =', searchDirectionXY);
+        //console.log('-> firstEventPositionXY =', firstEventPositionXY);
+        //console.log('-> firstEventPosition =', firstEventPosition);
+        // Now use the above (especially the firstEventPositionXY) to sort events by how close they are to that position
+        eventsAtPosition.sort(function(a, b){
+            let aPositionXY = a.position.split('-').map(function(v){ return parseInt(v); });
+            let bPositionXY = b.position.split('-').map(function(v){ return parseInt(v); });
+            let aDeltaX = Math.abs(aPositionXY[0] - firstEventPositionXY[0]);
+            let aDeltaY = Math.abs(aPositionXY[1] - firstEventPositionXY[1]);
+            let bDeltaX = Math.abs(bPositionXY[0] - firstEventPositionXY[0]);
+            let bDeltaY = Math.abs(bPositionXY[1] - firstEventPositionXY[1]);
+            let aDelta = aDeltaX + aDeltaY;
+            let bDelta = bDeltaX + bDeltaY;
+            return aDelta - bDelta;
+            });
         // Return the found events
         //console.log('-> Found ' + eventsAtPosition.length + ' events at position ' + searchPosition + ':', eventsAtPosition);
         return eventsAtPosition;
