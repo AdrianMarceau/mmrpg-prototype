@@ -2118,27 +2118,46 @@ class mmrpgWorldMap {
                 // If the player has pressed any of the arrow keys, let's update the position accordingly
                 if (activeInputs.Left || activeInputs.Right || activeInputs.Up || activeInputs.Down){
                     //console.log('%c' + 'Arrow key pressed!', 'color: orange;');
+                    //console.log('_worldCursor.position = ' + _worldCursor.position);
+                    //console.log('_worldCursor.direction = ' + _worldCursor.direction);
                     if (event){ event.preventDefault(); }
                     let oldPos = _worldCursor.position, curPos = oldPos;
                     let thisPos = oldPos.split('-');
                     let thisCol = parseInt(thisPos[0]);
                     let thisRow = parseInt(thisPos[1]);
                     let newCol = thisCol, newRow = thisRow;
+                    let newDir = (function(a){
+                        let d = [];
+                        if (a.Left){ d.push('left'); } else if (a.Right){ d.push('right'); }
+                        if (a.Up){ d.push('up'); } else if (a.Down){ d.push('down'); }
+                        return d.join('-');
+                        })(activeInputs);
+                    let inPlaceMovement = activeInputs.B ? true : false;
                     //console.log('%c' + 'Current position: ' + oldPos, 'color: orange;');
-                    if (activeInputs.Left){ newCol--; }
-                    else if (activeInputs.Right){ newCol++; }
-                    if (activeInputs.Up){ newRow--; }
-                    else if (activeInputs.Down){ newRow++; }
+                    if (!inPlaceMovement){
+                        if (activeInputs.Left){ newCol--; }
+                        else if (activeInputs.Right){ newCol++; }
+                        if (activeInputs.Up){ newRow--; }
+                        else if (activeInputs.Down){ newRow++; }
+                        }
                     let newPos = newCol + '-' + newRow;
                     // Always set this just in case the player gets stuck somewhere
+                    _worldCursor.moved = true; // represents them at least trying to move
                     let thisHorDir = (newCol > thisCol) ? 'right' : (newCol < thisCol) ? 'left' : false;
                     let thisVerDir = (newRow > thisRow) ? 'down' : (newRow < thisRow) ? 'up' : false;
-                    let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join('-'); })(thisHorDir, thisVerDir);
-                    _worldCursor.moved = true; // represents them at least trying to move
-                    _worldCursor.direction = thisShiftDir; // the direction they are trying to move
+                    if (!inPlaceMovement){
+                        let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join('-'); })(thisHorDir, thisVerDir);
+                        _worldCursor.direction = thisShiftDir; // the direction they are trying to move
+                        //console.log('-> _worldCursor.direction to thisShiftDir(', thisShiftDir, ')');
+                        } else {
+                        _worldCursor.direction = newDir;
+                        //console.log('-> _worldCursor.direction to newDir(', newDir, ')');
+                        }
                     //console.log('%c' + 'New position: ' + newPos, 'color: orange;');
                     // Check if the new position is the same as the old position
-                    if (newCol === thisCol && newRow === thisRow){
+                    if (!inPlaceMovement
+                        && newCol === thisCol
+                        && newRow === thisRow){
                         //console.log('%c' + 'New position is the same as the old position!', 'color: orange;');
                         return false;
                         }
@@ -2147,7 +2166,9 @@ class mmrpgWorldMap {
                     let playerMobility = _config.playerMobility;
                     let walkableTiles = _self.getWalkableMapTiles();
                     let tilesWithinRange = playerMobility > 0 ? _self.getWalkableMapTilesByProximity(oldPos, playerMobility) : walkableTiles;
-                    if (walkableTiles.indexOf(newPos) === -1 && tilesWithinRange.indexOf(newPos) === -1){
+                    if (!inPlaceMovement
+                        && walkableTiles.indexOf(newPos) === -1
+                        && tilesWithinRange.indexOf(newPos) === -1){
                         //console.log('%c' + 'New position is not walkable!', 'color: orange;');
                         //_self.playSoundEffect('glass-klink');
                         if (!playerIsCursor){
@@ -2188,12 +2209,14 @@ class mmrpgWorldMap {
                             }
                         }
                     // Otherwise, let's move the cursor to the new position
+                    //console.log('%c' + 'New position is walkable, moving there now!', 'color: orange;');
+                    let forceMove = inPlaceMovement ? true : false;
                     _self.makeLayerTileActive(newPos);
                     _self.playSoundEffect('no-effect');
                     _self.moveToPosition(newPos, function(){
                         _self.makeLayerTileInactive(oldPos);
-                        //ignoreInputFor(0);
-                        });
+                        if (thisHorDir && thisVerDir){ ignoreInputFor(); }
+                        }, forceMove);
                     }
                 // If the user has pressed the X button, we need to implement some nuanced functionality
                 // -> if it's a simple press, it's for the "menu" (not implemented yet, so just show a console.warn message)
@@ -2315,12 +2338,29 @@ class mmrpgWorldMap {
         let thisOldRow = thisOldPos[1]; //_worldCursor.row;
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
-        if (thisNewCol === thisOldCol && thisNewRow === thisOldRow && !forceMove){ console.error('$cursorSprite already at position!'); return false; }
+        let colHasChanged = thisNewCol !== thisOldCol ? true : false;
+        let rowHasChanged = thisNewRow !== thisOldRow ? true : false;
+        let posHasChanged = colHasChanged || rowHasChanged ? true : false;
+        if (!posHasChanged && !forceMove){ console.error('$cursorSprite already at position!'); return false; }
         let thisNewPos = thisNewCol + '-' + thisNewRow;
-        let thisHorDir = (thisNewCol > thisOldCol) ? 'right' : (thisNewCol < thisOldCol) ? 'left' : false;
-        let thisVerDir = (thisNewRow > thisOldRow) ? 'down' : (thisNewRow < thisOldRow) ? 'up' : false;
-        let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join(' and '); })(thisHorDir, thisVerDir);
-        let thisShiftDist = Math.sqrt(Math.pow(thisNewCol - thisOldCol, 2) + Math.pow(thisNewRow - thisOldRow, 2));
+        let thisHorDir = false;
+        let thisVerDir = false;
+        let thisShiftDir = '';
+        let thisShiftDist = 1;
+        if (posHasChanged){
+            thisHorDir = (thisNewCol > thisOldCol) ? 'right' : (thisNewCol < thisOldCol) ? 'left' : false;
+            thisVerDir = (thisNewRow > thisOldRow) ? 'down' : (thisNewRow < thisOldRow) ? 'up' : false;
+            thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join(' and '); })(thisHorDir, thisVerDir);
+            thisShiftDist = Math.sqrt(Math.pow(thisNewCol - thisOldCol, 2) + Math.pow(thisNewRow - thisOldRow, 2));
+            } else {
+            thisShiftDir = _worldCursor.direction.replace('-', ' and ');
+            thisShiftDist = 1;
+            if (thisShiftDir.indexOf('left') !== -1){ thisHorDir = 'left'; }
+            else if (thisShiftDir.indexOf('right') !== -1){ thisHorDir = 'right'; }
+            if (thisShiftDir.indexOf('up') !== -1){ thisVerDir = 'up'; }
+            else if (thisShiftDir.indexOf('down') !== -1){ thisVerDir = 'down'; }
+            }
+        //console.log('-> posHasChanged =', posHasChanged, '\n-> thisOldPos =', thisOldPos, '\n-> thisNewPos =', thisNewPos, '\n-> thisShiftDir =', thisShiftDir, '\n-> thisShiftDist =', thisShiftDist);
         let tileOffsetX = (((thisNewCol - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0]);
         let tileOffsetY = (((thisNewRow - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1]) - 10;
         let tileOffsetZ = tileOffsetY + 1;
@@ -2334,6 +2374,7 @@ class mmrpgWorldMap {
         $('.sprite[data-frame]:not(.disabled):not(.frame-lock)', $canvasMap).attr('data-frame', '00');
         $('.sprite.idle', $spritesLayer).removeClass('idle');
         // Move the cursor to the new position first and foremost
+        //console.log('%c' + 'Moving cursor from ' + thisOldCol + '-' + thisOldRow + ' to ' + thisNewCol + '-' + thisNewRow + ' (' + thisShiftDir + ')', 'color: magenta;');
         let moveTimeout;
         let timeoutDuration = _mapEffects.moveTimeout;
         let travelDuration = _mapEffects.moveTravel * thisShiftDist;
