@@ -2443,6 +2443,7 @@ display: block;
 #world #canvas #robots-overview .team-robot:nth-child(7) { z-index: 4; }
 #world #canvas #robots-overview .team-robot:nth-child(8) { z-index: 3; }
 #world #canvas #robots-overview .team-robot:hover { z-index: 20; }
+#world #canvas #robots-overview .team-robot.hovered { z-index: 20; }
 #world #canvas #robots-overview .team-robot.selected { z-index: 20; }
 
 #world #canvas #robots-overview:not(:hover):not(.expanded) .team-robots .team-robot:nth-child(n+4) { filter: brightness(0) opacity(0.6); }
@@ -2458,6 +2459,7 @@ display: block;
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(8) .icon { filter: brightness(0.4782969); }
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(n+8) .icon { filter: brightness(0.4782969); }
 #world #canvas #robots-overview .team-robots .team-robot:hover .icon { filter: brightness(1.0); }
+#world #canvas #robots-overview .team-robots .team-robot.hovered .icon { filter: brightness(1.0); }
 #world #canvas #robots-overview .team-robots .team-robot.selected .icon { filter: brightness(1.0); }
 
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(1) .icon:after { content: "1st"; }
@@ -2478,6 +2480,9 @@ display: block;
 #world #canvas #robots-overview .storage-robots .team-robot[data-slot="6"] .icon { filter: brightness(0.59049); }
 #world #canvas #robots-overview .storage-robots .team-robot[data-slot="7"] .icon { filter: brightness(0.531441); }
 #world #canvas #robots-overview .storage-robots .team-robot[data-slot="8"] .icon { filter: brightness(0.4782969); }
+#world #canvas #robots-overview .storage-robots .team-robot[data-slot]:hover .icon { filter: brightness(1.0); }
+#world #canvas #robots-overview .storage-robots .team-robot[data-slot].hovered .icon { filter: brightness(1.0); }
+#world #canvas #robots-overview .storage-robots .team-robot[data-slot].selected .icon { filter: brightness(1.0); }
 
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(1) {
     margin-bottom: 22px;

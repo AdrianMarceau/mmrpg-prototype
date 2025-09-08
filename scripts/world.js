@@ -2148,9 +2148,11 @@ class mmrpgWorldMap {
                     if (!inPlaceMovement){
                         let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join('-'); })(thisHorDir, thisVerDir);
                         _worldCursor.direction = thisShiftDir; // the direction they are trying to move
+                        _worldPlayer.direction = _worldCursor.direction;
                         //console.log('-> _worldCursor.direction to thisShiftDir(', thisShiftDir, ')');
                         } else {
                         _worldCursor.direction = newDir;
+                        _worldPlayer.direction = _worldCursor.direction;
                         //console.log('-> _worldCursor.direction to newDir(', newDir, ')');
                         }
                     //console.log('%c' + 'New position: ' + newPos, 'color: orange;');
@@ -2757,7 +2759,8 @@ class mmrpgWorldMap {
         let sameAsLastPosition = lastPosition === cursorPosition ? true : false;
         let sameAsLastDirection = lastDirection === cursorDirection ? true : false;
         let stillAtPosition = function(){ return (_worldCursor.position === cursorPosition) ? true : false; };
-        let otherMenusActiveNow = function(){ return (_elements.robotsOverview.is('.expanded') || _elements.sideButtons.is('.active')) ? true : false; };
+        let otherMenusActiveNow = function(){ return ( _elements.robotsOverview.is('.expanded') ) ? true : false; };
+        //let otherMenusActiveNow = function(){ return (_elements.robotsOverview.is('.expanded') || _elements.sideButtons.is('.active')) ? true : false; };
         //console.log('-> lastPosition (old):', lastPosition);
         //console.log('-> lastDirection (old):', lastDirection);
         //console.log('-> cursorPosition (new):', cursorPosition);
@@ -3051,21 +3054,11 @@ class mmrpgWorldMap {
                 else { tilesAroundPosition.push(firstTile); }
             } while (tilesAroundPosition[0] !== lookingAtPosition);
             //console.log('-> tilesAroundPosition =', tilesAroundPosition);
-            // now, finally, we can sort the dataBattles by their index in the tilesAroundPosition array
-            dataBattles.sort(function(a, b){
-                let aPosition = a[1], bPosition = b[1];
-                let aIndex = tilesAroundPosition.indexOf(aPosition);
-                let bIndex = tilesAroundPosition.indexOf(bPosition);
-                if (aIndex < bIndex){ return -1; } // a comes before b
-                else if (aIndex > bIndex){ return 1; } // a comes after b
-                else { return 0; } // a and b are equal
-                });
             //console.log('-> dataBattles after sorting by position:', dataBattles.join('\n'));
             if (dataLabels.length && dataBattles.length){
                 showActionArea = true;
                 readyTeamSprites = true;
-                //console.log('-> showing dropdown with battles:', dataBattles);
-                //let dataBattlesJoined = dataBattles.join(',');
+                //console.log('showing dropdown with battles:', '\n->', dataBattles.join('\n-> '));
                 let dataBattlesJoined = (function(battles){
                     for (var i = 0, list = []; i < battles.length; i++){
                         let battle = battles[i][0], battlePosition = battles[i][1];
@@ -3083,10 +3076,12 @@ class mmrpgWorldMap {
                         markup.push('<strong class="'+labelClasses+'" data-pos="' + labelPosition + '" data-rel="' + positionRelative + '">' + labelText + '</strong>');
                         } return markup;
                     })(dataLabels).join('');
+                //console.log('generated dataBattlesJoined:', '\n->', dataBattlesJoined.split(',').join('\n-> '));
                 actionAreaMarkup += dataLabelsJoined;
                 if (playerActiveRobots >= 1){  sideButtonsMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span><sup>Ready To</sup> Start Battle</span></a>'; }
                 else { sideButtonsMarkup += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span><sup>Ready To</sup> Start Battle</span></a>'; }
                 sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                //console.log('sideButtonsMarkup =', sideButtonsMarkup);
                 showActionAreaType = 'battle';
                 //showActionAreaSound = 'background-spawn';
                 showActionAreaSound = 'mecha-taunt-sound' + (dataBattles.length > 1 ? '*'+dataBattles.length : '');
@@ -3235,7 +3230,7 @@ class mmrpgWorldMap {
         let getTeamSpritesReady = function(){
             //console.log('%c' + 'getTeamSpritesReady()', 'color: cyan;');
             if (_self.worldIsBusy()){ return; }
-            if (!stillAtPosition()){ return; }
+            if (!stillAtPosition() || otherMenusActiveNow()){ return; }
 
             // Add the shake class to the cursor so it hides behind the player
             $worldCursor.addClass('shake');
@@ -3243,7 +3238,7 @@ class mmrpgWorldMap {
             // Collect the position of the firstEvent (the one we're triggering) and use it to
             // decide which direction the cursor needs to face in order to "see" the first event
             //console.log('firstEvent = ', firstEvent);
-            //console.log('firstEvent.token = ', firstEvent.token);
+            //console.log('team is facing firstEvent:', '\n-> token:', firstEvent.token, '\n-> sprite:', firstEvent.sprite);
             let cursorPosition = _worldCursor.position;
             let cursorPositionXY = cursorPosition.split('-').map(function(num){ return parseInt(num); });
             let cursorDirection = _worldCursor.direction;
@@ -3437,11 +3432,11 @@ class mmrpgWorldMap {
                     left: ((thisNewCol - 1) * _mapTileSize[0] + _mapTileSizeOffset[0]) + 'px',
                     top: ((thisNewRow - 1) * _mapTileSize[1] + _mapTileSizeOffset[1]) + 'px',
                     }).attr('data-dir', _worldCursor.direction).attr('data-type', showActionAreaType).attr('data-align', 'center');
-                $actionDropdownWrapper.html(actionAreaMarkup);
+                $actionDropdownWrapper.empty().html(actionAreaMarkup);
                 }
 
             // Add the buttons to the sidebar area so that they are out-of-the-way
-            $sideButtonsWrapper.html(sideButtonsMarkup);
+            $sideButtonsWrapper.empty().html(sideButtonsMarkup);
 
             // Define the function for dismissing the dropdown and side buttons
             let dismissDropdown = function(playSound){
