@@ -1771,6 +1771,7 @@ class rpg_world {
                 $robot_item = $robot_overview['item'];
                 $robot_image = $robot_overview['image'];
                 $robot_sprite = self::get_sprite('robot', $robot_image, '', 'right', 'character', '');
+                $item_sprite = !empty($robot_item) ? self::get_sprite('item', $robot_item, '', 'right', 'holding', '', '', 'icon') : '';
                 $robot_disabled = empty($robot_overview['energy']) ? true : false;
                 // generate markup for energy and weapons guages
                 $robot_energy = $robot_overview['energy'];
@@ -1798,7 +1799,7 @@ class rpg_world {
                     else { $stat_dir = 'up'; }
                     $stat_markup = str_repeat('<i class="fa fas fa-caret-'.$stat_dir.'"></i>', $num_arrows);
                     $robot_stats_markup .= '<div class="mod color '.$stat_token.' '.$stat_dir.'" title="'.ucfirst($stat_token).' Mods">'.$stat_markup.'</div>';
-                }
+                    }
                 if (!empty($robot_stats_markup)){
                     $has_statmods = true;
                     $robot_stats_markup = '<div class="statmods">'.$robot_stats_markup.'</div>';
@@ -1811,7 +1812,7 @@ class rpg_world {
                 $markup_attrs = 'data-robot="'.$robot_id.'_'.$robot_token.'" data-status="'.$robot_energy_rating.'-energy"';
                 $robot_markup = '';
                 $robot_markup .= '<div class="'.$markup_class.'" '.$markup_attrs.'>';
-                    $robot_markup .= '<div class="icon '.$robot_core_types.'">'.$robot_sprite.'</div>';
+                    $robot_markup .= '<div class="icon '.$robot_core_types.'">'.$robot_sprite.$item_sprite.'</div>';
                     $robot_markup .= '<div class="label">';
                         $robot_markup .= '<strong class="name">'.$robot_name.'</strong>';
                         $robot_markup .= '<span class="lvl type '.($robot_level >= 100 ? 'level' : 'none').'">Lv. '.$robot_level.'</span>';
@@ -1841,6 +1842,7 @@ class rpg_world {
                 $robot_item = $robot_overview['item'];
                 $robot_image = $robot_overview['image'];
                 $robot_sprite = self::get_sprite('robot', $robot_image, '', 'right', 'character', '');
+                $item_sprite = !empty($robot_item) ? self::get_sprite('item', $robot_item, '', 'right', 'holding', '', '', 'icon') : '';
                 $robot_disabled = empty($robot_overview['energy']) ? true : false;
                 // generate markup for energy and weapons guages
                 $robot_energy = $robot_overview['energy'];
@@ -1877,7 +1879,7 @@ class rpg_world {
                 $markup_attrs = 'data-robot="'.$robot_id.'_'.$robot_token.'" data-status="'.$robot_energy_rating.'-energy"';
                 $robot_markup = '';
                 $robot_markup .= '<div class="'.$markup_class.'" '.$markup_attrs.'>';
-                    $robot_markup .= '<div class="icon '.$robot_core_types.'">'.$robot_sprite.'</div>';
+                    $robot_markup .= '<div class="icon '.$robot_core_types.'">'.$robot_sprite.$item_sprite.'</div>';
                     $robot_markup .= '<div class="label">';
                         $robot_markup .= '<strong class="name">'.$robot_name.'</strong>';
                         $robot_markup .= '<span class="lvl type '.($robot_level >= 100 ? 'level' : 'none').'">Lv. '.$robot_level.'</span>';

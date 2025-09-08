@@ -1807,7 +1807,7 @@ html, body {
     width: 303px;
     background-color: rgba(0, 0, 0, 0.4);
     box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.6);
-    padding: 24px 0 24px 54px;
+    padding: 20px 0 28px 54px;
     border-radius: 9px;
     overflow: visible;
     opacity: 0.0;
@@ -2132,11 +2132,26 @@ display: block;
     position: relative;
     width: 40px;
     height: 40px;
+    z-index: 1;
+    pointer-events: none;
+}
+#world #canvas #robots-overview .team-robot .icon > .sprite.robot {
     top: -8px;
     z-index: 3;
 }
-#world #canvas #robots-overview .team-robot:not(.disabled):hover .icon > .sprite {
+#world #canvas #robots-overview .team-robot:not(.disabled):hover .icon > .sprite.robot {
     top: -10px !important;
+}
+#world #canvas #robots-overview .team-robot .icon > .sprite.item {
+    position: absolute;
+    top: auto;
+    left: auto;
+    right: -8px;
+    bottom: -8px;
+    z-index: 4;
+}
+#world #canvas #robots-overview .team-robot .icon > .sprite.item > .wrap > .sprite {
+    filter: none;
 }
 #world #canvas #robots-overview .team-robot .icon > .sprite > .wrap,
 #world #canvas #robots-overview .team-robot .icon > .sprite > .wrap .icon > .sprite {
