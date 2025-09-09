@@ -1592,9 +1592,9 @@ class rpg_world {
         $mmrpg_indexes = self::$mmrpg_indexes;
         $xkind = self::get_xkind($kind);
         if (strstr($token, '_')){ list($token, $alt) = explode('_', $token, 2); }
-        if (empty($mmrpg_indexes)){ error_log('error: $mmrpg_indexes does not exist!'); return false; }
-        elseif (empty($mmrpg_indexes[$xkind])){ error_log('error: $mmrpg_indexes['.$xkind.'] does not exist!'); return false; }
-        elseif (empty($mmrpg_indexes[$xkind][$token])){ error_log('error: $mmrpg_indexes['.$xkind.']['.$token.'] does not exist!'); return false; }
+        if (empty($mmrpg_indexes)){ error_log('rpg_world::get_sprite() error: $mmrpg_indexes does not exist!'); return false; }
+        elseif (empty($mmrpg_indexes[$xkind])){ error_log('rpg_world::get_sprite() error: $mmrpg_indexes['.$xkind.'] does not exist!'); return false; }
+        elseif (empty($mmrpg_indexes[$xkind][$token])){ error_log('rpg_world::get_sprite() error: $mmrpg_indexes['.$xkind.']['.$token.'] does not exist!'); return false; }
         $info = $mmrpg_indexes[$xkind][$token];
         $anim = 0;
         $anim_styles1 = '';
@@ -2355,7 +2355,7 @@ class rpg_world {
                     $robot = array('robot', $robot_token);
                     $robot_settings = rpg_game::robot_settings($ptoken, $robot_token);
                     $robot_image = !empty($robot_settings['robot_image']) ? $robot_settings['robot_image'] : '';
-                    if (!empty($robot_image) && $robot_image !== $robot_token){ $robot[] = explode('_', $robot_image, 2)[1]; }
+                    if (!empty($robot_image) && $robot_image !== $robot_token){ $robot[] = $robot_image; }
                     $tmp_team_sprites[] = $robot;
                 }
             }
