@@ -1304,12 +1304,14 @@ class mmrpgWorldMap {
                 _self.playSoundEffect('bounce-sound');
                 let backButtonURL = $backButton.attr('data-url') || _config.backButtonURL;
                 _self.decZoomLevel();
+                $thisWorld.addClass('busy');
                 _self.saveWorldState(function(){
                     _self.decZoomLevel(0.5);
+                    $thisWorld.addClass('loading');
                     window.location.href = backButtonURL;
                     });
                 $thisWorld.animate({opacity: 0}, 900, function(){
-                    $thisWorld.addClass('hidden').addClass('busy');
+                    $thisWorld.addClass('hidden');
                     });
                 return true;
                 });
@@ -1332,12 +1334,14 @@ class mmrpgWorldMap {
                 _self.playSoundEffect('bounce-sound');
                 let homeButtonURL = $homeButton.attr('data-url') || _config.homeButtonURL;
                 _self.decZoomLevel();
+                $thisWorld.addClass('busy');
                 _self.saveWorldState(function(){
                     _self.decZoomLevel();
+                    $thisWorld.addClass('loading');
                     window.location.href = homeButtonURL;
                     });
                 $thisWorld.animate({opacity: 0}, 600, function(){
-                    $thisWorld.addClass('hidden').addClass('busy');
+                    $thisWorld.addClass('hidden');
                     });
                 return true;
                 });
@@ -1361,12 +1365,14 @@ class mmrpgWorldMap {
                 _self.loadMusicTrack('current-track', true);
                 let resetButtonURL = $resetButton.attr('data-url') || _config.resetButtonURL;
                 _self.decZoomLevel(0.5);
+                $thisWorld.addClass('busy');
                 _self.saveWorldState(function(){
                     _self.decZoomLevel(1.0);
+                    $thisWorld.addClass('loading');
                     window.location.href = resetButtonURL;
                     });
                 $thisWorld.animate({opacity: 0}, 1200, function(){
-                    $thisWorld.addClass('hidden').addClass('busy');
+                    $thisWorld.addClass('hidden');
                     });
                 return true;
                 });
@@ -1394,9 +1400,10 @@ class mmrpgWorldMap {
                 $thisWorld.addClass('loading');
                 let worldReloadURL = 'world.php?player=' + playerToken;
                 _self.incZoomLevel();
+                $thisWorld.addClass('busy');
                 _self.saveWorldState(function(){
                     _self.incZoomLevel();
-                    $thisWorld.addClass('hidden').removeClass('busy');
+                    $thisWorld.addClass('loading');
                     window.location.href = worldReloadURL;
                     _self.incZoomLevel();
                     });
@@ -1724,11 +1731,12 @@ class mmrpgWorldMap {
                         // NOTE: We don't need to actually swap robots on the map since we're reloading the page
                         //console.log('okay time to save the world state!');
                         _self.incZoomLevel();
+                        $thisWorld.addClass('busy');
                         _self.saveWorldState(function(){
                             _self.playSoundEffect('switch-in');
                             let worldReloadURL = 'world.php?robots=' + newPlayerRobotList.join(',');
                             //console.log('-> worldReloadURL =', worldReloadURL);
-                            $thisWorld.addClass('hidden').removeClass('busy');
+                            $thisWorld.addClass('loading');
                             window.location.href = worldReloadURL;
                             });
                         // Return true on success
@@ -3364,17 +3372,18 @@ class mmrpgWorldMap {
             //console.log('%c' + 'redirectToLocation()', 'color: cyan;');
             if (_self.worldIsBusy()){ return; }
             if (!stillAtPosition() || otherMenusActiveNow()){ return; }
-            $thisWorld.addClass('hidden');
             if (autoRedirectSound){
                 _self.playSoundEffect(autoRedirectSound);
                 }
             if (autoRedirectURL){
                 _self.incZoomLevel();
+                $thisWorld.addClass('busy');
                 _self.saveWorldState(function(){
                     if (_self.worldIsBusy()){ return; }
                     if (!stillAtPosition() || otherMenusActiveNow()){ return; }
                     else { _self.resetZoomLevel(); }
                     _self.incZoomLevel();
+                    $thisWorld.addClass('loading');
                     window.location.href = autoRedirectURL;
                     _self.incZoomLevel();
                     }, true, false);
@@ -3498,10 +3507,11 @@ class mmrpgWorldMap {
                         battleVars.push('this_player_robots=' + activeRobots.join(','));
                         battleVars.push('this_battle_token=' + battleId);
                         let battleHref = 'battle.php?' + battleVars.join('&');
-                        $thisWorld.addClass('hidden').addClass('busy');
+                        $thisWorld.addClass('busy');
                         _self.incZoomLevel();
                         _self.saveWorldState(function(){
                             _self.incZoomLevel();
+                            $thisWorld.addClass('loading');
                             window.location.href = battleHref;
                             _self.incZoomLevel();
                             }, true, false);
@@ -3530,13 +3540,17 @@ class mmrpgWorldMap {
                             portalHref = 'world.php?world=' + worldToken + '&map=' + mapToken;
                             }
                         if (portalHref){
-                            $thisWorld.addClass('hidden').addClass('busy');
                             _self.incZoomLevel();
+                            $thisWorld.addClass('busy');
                             _self.saveWorldState(function(){
                                 _self.incZoomLevel();
+                                $thisWorld.addClass('loading');
                                 window.location.href = portalHref;
                                 _self.incZoomLevel();
                                 }, true, false);
+                            $thisWorld.animate({opacity: 0}, 1200, function(){
+                                $thisWorld.addClass('hidden');
+                                });
                             }
                         }
                     }
@@ -4409,15 +4423,16 @@ class mmrpgWorldMap {
         let _self = this;
         let _selfRef = _self.saveWorldState;
         let _config = _self.config;
+        let _elements = _self.elements;
         let _userId = _config.userId;
         let _world = _self.state;
-        //let _worldCursor = _world.cursor;
         let _worldPlayer = _world.player;
         let _worldButtons = _world.buttons;
         let _worldSwitches = _world.switches;
         let _worldItems = _world.items;
         let _worldAbilities = _world.abilities;
         let _worldSymbols = _world.symbols;
+        let $thisWorld = _elements.world;
         let lastPlayer = _worldPlayer.token;
         let lastPlayerRobots = _worldPlayer.robots;
         let lastPlayerAbilities = _worldPlayer.abilities;
@@ -4463,6 +4478,7 @@ class mmrpgWorldMap {
         //console.log('w/ worldData:', worldData);
         //console.log('w/ callbackQueue:', callbackQueue);
         _selfRef._busy = true;
+        $thisWorld.addClass('saving');
         $.ajax({
             url: 'world.php',
             type: 'POST',
@@ -4472,6 +4488,7 @@ class mmrpgWorldMap {
                 //console.log('%c' + '... World State Saved!', 'color: green;');
                 //console.log('saveWorldState() returned successfully! w/', '\n-> response:', response);
                 _selfRef._busy = false;
+                $thisWorld.removeClass('saving');
                 triggerSaveCallbacks({response});
                 if (pullEvents){ _self.triggerWindowEventsPull(0); }
                 },
@@ -4479,6 +4496,7 @@ class mmrpgWorldMap {
                 //console.log('%c' + '... World State Not Saved!', 'color: red;');
                 console.error('saveWorldState() failed to save world state! w/', '\n-> status:', status, '\n-> error:', error);
                 _selfRef._busy = false;
+                $thisWorld.removeClass('saving');
                 triggerSaveCallbacks({xhr, status, error});
                 if (pullEvents){ _self.triggerWindowEventsPull(0); }
                 }
@@ -4815,13 +4833,13 @@ class mmrpgWorldMap {
                 //console.log('%c' + '-> player ' + playerToken + ' has an active platform and can be unlocked!', 'color: lime;');
                 _worldCursor.busy = true;
                 _worldCursor.loading = true;
-                $thisWorld.addClass('busy');
                 _self.incZoomLevel();
+                $thisWorld.addClass('busy');
                 _self.saveWorldState(function(){
                     //_self.incZoomLevel();
                     _self.resetZoomLevel();
                     _self.animateZoomToMax(4, 0.25, 600);
-                    $thisWorld.addClass('hidden');
+                    $thisWorld.addClass('loading');
                     window.location.reload();
                     }, true, false);
                 }
@@ -5618,6 +5636,7 @@ class mmrpgWorldMap {
         let _self = this;
         let _config = _self.config;
         let _elements = _self.elements;
+        let $thisWorld = _elements.world;
         let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerItems = _worldPlayer.items;
@@ -5658,12 +5677,16 @@ class mmrpgWorldMap {
         //console.log('-> itemToken =', itemToken);
         if (itemToken.indexOf('-heart') !== -1){ reloadWorldOnSave = true; } // limit hearts always reload the world
         //console.log('-> reloadWorldOnSave =', reloadWorldOnSave);
+        if (reloadWorldOnSave){
+            $thisWorld.addClass('busy');
+            }
         _self.saveWorldState(function(){
             //console.log('saveWorldState (via addItemToInventory) complete!');
             //console.log('-> reloadWorldOnSave =', reloadWorldOnSave);
             // maybe reload the page to update the inventory display
             if (reloadWorldOnSave){
                 //console.log('-> reloading the world now...');
+                $thisWorld.addClass('loading');
                 window.location.reload();
                 }
             }, true, !reloadWorldOnSave);
