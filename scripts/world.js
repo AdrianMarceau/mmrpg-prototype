@@ -2016,6 +2016,35 @@ class mmrpgWorldMap {
                         return true;
                         }
                     }
+                // If the player has pressed the L1 or R1 buttons, we should scroll through the storage pages (assuming the buttons exist)
+                if (activeInputs.L1 || activeInputs.R1){
+                    //console.log('%c' + 'Bumper key pressed!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    if (true){ // focusedPanel === 'storage' ???
+                        let $backButton = $('.button[data-page="back"]:not(.disabled)', $storageRobotsDiv);
+                        let $nextButton = $('.button[data-page="next"]:not(.disabled)', $storageRobotsDiv);
+                        if (activeInputs.L1){
+                            if ($backButton.length){
+                                $backButton.trigger('click');
+                                } else {
+                                let $lastButton = $('.button[data-page]:not(.disabled):not(.back):not(.next)', $storageRobotsDiv).last();
+                                if ($lastButton.length){ $lastButton.trigger('click'); }
+                                }
+                            ignoreInputFor(300);
+                            return true;
+                            }
+                        else if (activeInputs.R1){
+                            if ($nextButton.length){
+                                $nextButton.trigger('click');
+                                } else {
+                                let $firstButton = $('.button[data-page]:not(.disabled):not(.back):not(.next)', $storageRobotsDiv).first();
+                                if ($firstButton.length){ $firstButton.trigger('click'); }
+                                }
+                            ignoreInputFor(300);
+                            return true;
+                            }
+                        }
+                    }
                 return;
                 }
             // If the side buttons panel is currently open, process those actions too
