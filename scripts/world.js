@@ -1867,10 +1867,11 @@ class mmrpgWorldMap {
                 let $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
                 let $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
                 let focusedPanel = $storageRobotsDiv.is('.focused') ? 'storage' : 'team';
+                let focusedClass = focusedPanel === 'storage' ? 'hovered' : 'selected';
                 let $focusedDiv = focusedPanel === 'storage' ? $storageRobotsDiv : $teamRobotsDiv;
                 let $robotsInFocusedDiv = focusedPanel === 'storage' ? $storageRobotsInOverview : $teamRobotsInOverview;
                 //console.log('-> robotStorageIsActive =', robotStorageIsActive);
-                //console.log('-> focusedPanel =', focusedPanel);
+                //console.log('-> focusedPanel =', focusedPanel, ' && focusedClass =', focusedClass);
                 //console.log('-> sideButtonsActive =', sideButtonsActive);
                 // If the side buttons are active, then we use Start and B to control them specifically
                 if (sideButtonsActive){
@@ -1922,23 +1923,39 @@ class mmrpgWorldMap {
                             }
                         }
                     }
-                // If the player has pressed the A button, we can simple click whichever team-robot is currently "hovered"
+                // If the player has pressed the A button, we can simply click whichever team-robot is currently focused
                 if (activeInputs.A){
                     //console.log('%c' + 'Confirm robot swap!', 'color: orange;');
                     if (event){ event.preventDefault(); }
-                    let $focusedPanel = $storageRobotsDiv.is('.focused') ? $storageRobotsDiv : ($teamRobotsDiv.is('.focused') ? $teamRobotsDiv : false);
-                    if (!$focusedPanel || !$focusedPanel.length){ return false; }
-                    let $otherPanel = $focusedPanel.is($storageRobotsDiv) ? $teamRobotsDiv : $storageRobotsDiv;
-                    let $hoveredRobot = $('.team-robot.hovered', $focusedPanel).first();
-                    if (!$hoveredRobot || !$hoveredRobot.length){ return false; }
-                    //console.log('Triggering click on hovered robot:', $hoveredRobot);
-                    $hoveredRobot.trigger('click');
-                    $focusedPanel.removeClass('focused');
-                    $('.team-robot', $focusedPanel).removeClass('hovered');
-                    $otherPanel.addClass('focused');
-                    $('.team-robot', $otherPanel).removeClass('hovered');
-                    $('.team-robot', $otherPanel).first().addClass('hovered');
-                    ignoreInputFor(900);
+                    // If the team robots are focused, clicking A simply affirms the already-selected robot and
+                    // then auto-swaps over to the storage panel for actually chosing the robot to swap with
+                    if (focusedPanel === 'team'){
+                        $teamRobotsDiv.removeClass('focused');
+                        $storageRobotsDiv.addClass('focused');
+                        $('.team-robot', $teamRobotsDiv).removeClass('hovered');
+                        $('.team-robot', $storageRobotsDiv).removeClass('hovered');
+                        let $firstRobot = $('.team-robot:not(.hidden)', $storageRobotsDiv).first();
+                        $firstRobot.addClass('hovered');
+                        ignoreInputFor(300);
+                        return true;
+                        }
+                    // Otherwise if the storage panel is focused, whichever hovered robot we click is the one
+                    // we swap with the selected robot in the team view on the left (auto-switch when done)
+                    else if (focusedPanel === 'storage'){
+                        let $selectedRobot = $('.team-robot.selected', $teamRobotsDiv).first();
+                        let $hoveredRobot = $('.team-robot.hovered', $storageRobotsDiv).first();
+                        if (!$selectedRobot || !$selectedRobot.length){ return false; }
+                        if (!$hoveredRobot || !$hoveredRobot.length){ return false; }
+                        //console.log('Triggering click on hovered robot:', $hoveredRobot.attr('class'), $hoveredRobot);
+                        $hoveredRobot.trigger('click');
+                        setTimeout(function(){
+                            $('.team-robot', $storageRobotsDiv).removeClass('hovered');
+                            $('.team-robot', $teamRobotsDiv).removeClass('hovered');
+                            $storageRobotsDiv.removeClass('focused');
+                            $teamRobotsDiv.addClass('focused');
+                            }, 100);
+                        }
+                    ignoreInputFor(300);
                     return true;
                     }
                 // If the player has pressed an arrow key, move the "hover" class accordingly in the appropriate of the two columns
@@ -1949,40 +1966,55 @@ class mmrpgWorldMap {
                     if (event){ event.preventDefault(); }
                     if (activeInputs.Left || activeInputs.Right){
                         //console.log('-> switching focused panel to ' + (focusedPanel === 'team' ? 'storage' : 'team'));
-                        let $newPanel = focusedPanel === 'team' ? $storageRobotsDiv : $teamRobotsDiv;
-                        let $oldPanel = focusedPanel === 'team' ? $teamRobotsDiv : $storageRobotsDiv;
+                        let oldPanel = focusedPanel;
+                        let newPanel = oldPanel === 'team' ? 'storage' : 'team';
+                        let $oldPanel = oldPanel === 'team' ? $teamRobotsDiv : $storageRobotsDiv;
+                        let $newPanel = newPanel === 'team' ? $teamRobotsDiv : $storageRobotsDiv;
                         $oldPanel.removeClass('focused');
                         $newPanel.addClass('focused');
                         $('.team-robot', $oldPanel).removeClass('hovered');
                         $('.team-robot', $newPanel).removeClass('hovered');
-                        $('.team-robot', $newPanel).first().addClass('hovered');
+                        if (newPanel === 'team'){
+                            let $selectedRobot = $('.team-robot.selected', $newPanel).first();
+                            if (!$selectedRobot.length){
+                                $selectedRobot = $('.team-robot:not(.hidden)', $newPanel).first();
+                                $selectedRobot.addClass('selected');
+                                }
+                            }
+                        else if (newPanel === 'storage'){
+                            let $firstRobot = $('.team-robot:not(.hidden)', $newPanel).first();
+                            $firstRobot.addClass('hovered');
+                            }
                         return true;
                         }
-                    let $nextRobot = false;
-                    let $hoveredRobot = $robotsInFocusedDiv.filter('.hovered').first();
-                    if (!$hoveredRobot.length){ $hoveredRobot = $robotsInFocusedDiv.first(); }
-                    $robotsInFocusedDiv.removeClass('hovered');
-                    $hoveredRobot.addClass('hovered');
-                    if (activeInputs.Up){
-                        if ($hoveredRobot && $hoveredRobot.length){
-                            $nextRobot = $hoveredRobot.prevAll('.team-robot:not(.hidden)').first();
+                    else if (activeInputs.Up || activeInputs.Down){
+                        let $nextRobot = false;
+                        let $focusedRobot = $robotsInFocusedDiv.filter('.' + focusedClass).first();
+                        if (!$focusedRobot.length){ $focusedRobot = $robotsInFocusedDiv.first(); }
+                        $robotsInFocusedDiv.removeClass(focusedClass);
+                        $focusedRobot.addClass(focusedClass);
+                        if (activeInputs.Up){
+                            if ($focusedRobot && $focusedRobot.length){
+                                $nextRobot = $focusedRobot.prevAll('.team-robot:not(.hidden)').first();
+                                }
+                            if (!$nextRobot || !$nextRobot.length){
+                                $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').last();
+                                }
                             }
-                        if (!$nextRobot || !$nextRobot.length){
-                            $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').last();
+                        else if (activeInputs.Down){
+                            if ($focusedRobot && $focusedRobot.length){
+                                $nextRobot = $focusedRobot.nextAll('.team-robot:not(.hidden)').first();
+                                }
+                            if (!$nextRobot || !$nextRobot.length){
+                                $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').first();
+                                }
                             }
-                        } else if (activeInputs.Down){
-                        if ($hoveredRobot && $hoveredRobot.length){
-                            $nextRobot = $hoveredRobot.nextAll('.team-robot:not(.hidden)').first();
+                        if ($nextRobot && $nextRobot.length){
+                            $focusedRobot.removeClass(focusedClass);
+                            $nextRobot.addClass(focusedClass);
                             }
-                        if (!$nextRobot || !$nextRobot.length){
-                            $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').first();
-                            }
+                        return true;
                         }
-                    if ($nextRobot && $nextRobot.length){
-                        $hoveredRobot.removeClass('hovered');
-                        $nextRobot.addClass('hovered');
-                        }
-                    return true;
                     }
                 return;
                 }

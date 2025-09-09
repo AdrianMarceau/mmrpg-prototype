@@ -2524,6 +2524,11 @@ display: block;
     display: none;
 }
 
+#world #canvas #robots-overview.expanded .team-robots:not(.focused) .team-robot,
+#world #canvas #robots-overview.expanded .storage-robots:not(.focused) .team-robot {
+    opacity: 0.6;
+}
+
 #world #canvas #side-buttons {
     z-index: 1010;
     bottom: 26px;
