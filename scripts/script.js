@@ -3433,20 +3433,20 @@ class mmrpgUserInputWatcher {
         // Define an index of symbolic "userInputs" we can abstract actions behind, and then
         // worry about specific key-bindings and button-mappings later on to keep things clean
         let userInputs = {}; // below will be the default for now, but we'll allow customizing later
-        userInputs.A = {icon: 'Ⓐ', keyboard: ['Enter', 'Space'], gamepad: [0]};
-        userInputs.B = {icon: 'Ⓑ', keyboard: ['Backspace'], gamepad: [1]};
-        userInputs.X = {icon: 'Ⓧ', keyboard: ['Backslash'], gamepad: [2]};
-        userInputs.Y = {icon: 'Ⓨ', keyboard: ['Shift'], gamepad: [3]};
+        userInputs.A = {icon: 'Ⓐ', keyboard: ['d', 'Enter', 'Space'], gamepad: [0]};
+        userInputs.B = {icon: 'Ⓑ', keyboard: ['s', 'Backspace'], gamepad: [1]};
+        userInputs.X = {icon: 'Ⓧ', keyboard: ['w', 'Backslash'], gamepad: [2]};
+        userInputs.Y = {icon: 'Ⓨ', keyboard: ['a', 'Shift'], gamepad: [3]};
+        userInputs.L1 = {icon: 'L1', keyboard: ['q', 'BracketLeft'], gamepad: [4]};
+        userInputs.R1 = {icon: 'R1', keyboard: ['e', 'BracketRight'], gamepad: [5]};
+        userInputs.L2 = {icon: 'L2', keyboard: ['z', 'PageUp'], gamepad: [6]};
+        userInputs.R2 = {icon: 'R2', keyboard: ['c', 'PageDown'], gamepad: [7]};
+        userInputs.Start = {icon: '+', keyboard: ['Tab', 'Home'], gamepad: [9]};
+        userInputs.Select = {icon: '−', keyboard: ['Shift', 'End'], gamepad: [8]};
         userInputs.Up = {icon: '⏶', keyboard: ['ArrowUp'], gamepad: [12]};
         userInputs.Down = {icon: '⏷', keyboard: ['ArrowDown'], gamepad: [13]};
         userInputs.Left = {icon: '⏴', keyboard: ['ArrowLeft'], gamepad: [14]};
         userInputs.Right = {icon: '⏵', keyboard: ['ArrowRight'], gamepad: [15]};
-        userInputs.L1 = {icon: 'L1', keyboard: ['BracketLeft'], gamepad: [4]};
-        userInputs.R1 = {icon: 'R1', keyboard: ['BracketRight'], gamepad: [5]};
-        userInputs.L2 = {icon: 'L2', keyboard: ['PageUp'], gamepad: [6]};
-        userInputs.R2 = {icon: 'R2', keyboard: ['PageDown'], gamepad: [7]};
-        userInputs.Start = {icon: '+', keyboard: ['Home'], gamepad: [9]};
-        userInputs.Select = {icon: '−', keyboard: ['End'], gamepad: [8]};
         _self.userInputs = userInputs;
 
         // Define the abstraction method for handling user input events
