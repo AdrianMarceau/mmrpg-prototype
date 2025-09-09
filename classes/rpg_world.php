@@ -2233,6 +2233,7 @@ class rpg_world {
                 elseif (strstr($team_dir, 'right')){ $left += 10; }
                 if (strstr($team_dir, 'up')){ $top += 4; }
                 elseif (strstr($team_dir, 'down')){ $top -= 4; }
+                else { $top -= 2; }
                 $z_index = $top + 1;
                 }
             $class = $team_class.' bounce'.($disabled ? ' disabled' : '');
