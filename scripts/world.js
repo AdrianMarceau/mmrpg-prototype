@@ -2048,7 +2048,8 @@ class mmrpgWorldMap {
                     // Only allow this if the map is not currently animating and the player is not currently moving
                     if (_world.mapIsAnimating || _world.playerIsMoving){ return false; }
                     // If there are any nearby events, re-init them now
-                    _self.refreshMapPositionEvents(0);
+                    //console.log('-> checking for nearby events to re-init...');
+                    _self.refreshMapPositionEvents(0, true);
                     ignoreInputFor(100);
                     }
                 // If the player has pressed either of the bumpers we should let them scroll within the player-switcher
