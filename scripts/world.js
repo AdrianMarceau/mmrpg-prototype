@@ -22,6 +22,7 @@ gameSettings.worldConfig = {
     playerRobotsIndex: {},
     playerItemsIndex: {},
     playerMobility: 1, // default only
+    playerHistory: [], // list of prev-player tokens in rev-chron order
     mapWorld: 'undefined',
     mapToken: 'undefined',
     mapName: 'Undefined Map',
@@ -1399,13 +1400,13 @@ class mmrpgWorldMap {
                 _self.playSoundEffect('switch-in');
                 $thisWorld.addClass('loading');
                 let worldReloadURL = 'world.php?player=' + playerToken;
-                _self.incZoomLevel();
+                _self.decZoomLevel();
                 $thisWorld.addClass('busy');
                 _self.saveWorldState(function(){
-                    _self.incZoomLevel();
+                    _self.decZoomLevel();
                     $thisWorld.addClass('loading');
                     window.location.href = worldReloadURL;
-                    _self.incZoomLevel();
+                    _self.decZoomLevel();
                     });
                 return true;
                 });
@@ -1830,10 +1831,32 @@ class mmrpgWorldMap {
             let sideButtonsActive = $sideButtons.is('.active') ? true : false;
             let playerSwitcherFocused = $playerSwitcher.is('.focused') ? true : false;
             let robotStorageIsActive = $robotsOverview.is('.expanded') ? true : false;
+            // Define some quick actions that we may need to re-use a few times over
+            let confirmSideButtonAction = function(){
+                if (!sideButtonsActive){ return; }
+                let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
+                if (!$confirmButton || !$confirmButton.length){ /* console.error('bindEventsToWorld() unable to find confirm button!'); */ return false; }
+                if ($confirmButton.is('.clicked')){ return }
+                if (!$confirmButton.is('.maybe')){ $confirmButton.addClass('maybe'); return; }
+                $confirmButton.removeClass('maybe');
+                //console.log('Triggering click on confirm button:', $confirmButton);
+                $confirmButton.trigger('click');
+                return true;
+                };
+            let dismissSideButtonAction = function(){
+                if (!sideButtonsActive){ return; }
+                let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
+                if (!$dismissButton || !$dismissButton.length){ console.error('bindEventsToWorld() unable to find dismiss button!'); return false; }
+                $sideButtons.removeClass('maybe');
+                $dismissButton.trigger('click');
+                return true;
+                };
             // If the player switcher is currently focused, we should listen for a confirmation button
             if (playerSwitcherFocused){
+                // Should not be open while player-switching is being used
+                dismissSideButtonAction();
                 // If the player has pressed the A button, we can simple click whichever team-player is currently "hovered"
-                if (activeInputs.A){
+                if (activeInputs.A || activeInputs.Start){
                     //console.log('%c' + 'Confirm player switch!', 'color: orange;');
                     if (event){ event.preventDefault(); }
                     let $hoveredPlayer = $('.team-player.hovered', $playerSwitcher).first();
@@ -1849,13 +1872,9 @@ class mmrpgWorldMap {
                 if (activeInputs.B){
                     //console.log('%c' + 'Dismiss player switch!', 'color: orange;');
                     if (event){ event.preventDefault(); }
-                    let $activePlayer = $('.team-player.active', $playerSwitcher).first();
-                    if (!$activePlayer || !$activePlayer.length){ return false; }
-                    //console.log('Triggering click on active player:', $activePlayer);
-                    $activePlayer.trigger('click');
-                    $playerSwitcher.removeClass('focused');
                     $('.team-player', $playerSwitcher).removeClass('hovered');
-                    ignoreInputFor(900);
+                    $playerSwitcher.removeClass('focused');
+                    ignoreInputFor(600);
                     return true;
                     }
                 }
@@ -2050,17 +2069,11 @@ class mmrpgWorldMap {
             // If the side buttons panel is currently open, process those actions too
             if (sideButtonsActive){
                 // If the player has pressed the space or enter keys, let's confirm the side-button action if it's open
-                if (activeInputs.A){
+                if (activeInputs.A || activeInputs.Start){
                     //console.log('%c' + 'Confirm action popup!', 'color: orange;');
                     if (event){ event.preventDefault(); }
                     if (!$sideButtons.is('.active')){ return false; }
-                    let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
-                    if (!$confirmButton || !$confirmButton.length){ /* console.error('bindEventsToWorld() unable to find confirm button!'); */ return false; }
-                    if ($confirmButton.is('.clicked')){ return }
-                    if (!$confirmButton.is('.maybe')){ $confirmButton.addClass('maybe'); return; }
-                    $confirmButton.removeClass('maybe');
-                    //console.log('Triggering click on confirm button:', $confirmButton);
-                    $confirmButton.trigger('click');
+                    confirmSideButtonAction();
                     return true;
                     }
                 // Else if the player has pressed the backspace or escape keys, let's close the side-button action if it's open
@@ -2068,10 +2081,7 @@ class mmrpgWorldMap {
                     //console.log('%c' + 'Dismiss action popup!', 'color: orange;');
                     if (event){ event.preventDefault(); }
                     if (!$sideButtons.is('.active')){ return false; }
-                    let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
-                    if (!$dismissButton || !$dismissButton.length){ console.error('bindEventsToWorld() unable to find dismiss button!'); return false; }
-                    $sideButtons.removeClass('maybe');
-                    $dismissButton.trigger('click');
+                    dismissSideButtonAction();
                     return true;
                     }
                 // Else if the player has just pressed shift, make sure we add the hover class to the action-dropdown
@@ -2127,34 +2137,83 @@ class mmrpgWorldMap {
                     ignoreInputFor(100);
                     }
                 // If the player has pressed either of the bumpers we should let them scroll within the player-switcher
-                if (activeInputs.L1 || activeInputs.R1){
+                if (activeInputs.L1 || activeInputs.R1 || activeInputs.LR1){
                     //console.log('%c' + 'Bumper key pressed!', 'color: orange;');
                     if (event){ event.preventDefault(); }
                     let $playerButtons = $('.team-player', $playerSwitcher);
                     if ($playerButtons.length < 2){ return true; } // nothing to switch to, ignore
+                    let $cursorPlayer = $playerButtons.filter('[data-player="player"]').first();
                     let $activePlayer = $playerButtons.filter('.active').first();
                     let $hoveredPlayer = $playerButtons.filter('.hovered').first();
-                    if (!$playerSwitcher.is('.focused')
-                        || !$hoveredPlayer.length){
+                    // We must first focus the player switcher if not already focused
+                    if (!$playerSwitcher.is('.focused') || !$hoveredPlayer.length){
+                        //console.log('%c' + 'Focusing player switcher!', 'color: orange;');
                         $playerSwitcher.addClass('focused');
                         $playerButtons.removeClass('hovered');
-                        $activePlayer.addClass('hovered');
+                        if ((activeInputs.L1 && activeInputs.R1) || activeInputs.LR1){
+                            let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
+                            let playerHistory = _config.playerHistory || [];
+                            if (!playerIsCursor){
+                                $cursorPlayer.addClass('hovered');
+                                }
+                            else if (playerHistory.length > 1){
+                                let lastPlayerToken = (function(a, t){ for (let i = 0; i < a.length; i++){ if (a[i] !== t){ return a[i]; } } })(playerHistory, _worldPlayer.token);
+                                let $lastPlayerButton = lastPlayerToken.length ? $playerButtons.filter('[data-player="' + lastPlayerToken + '"]').first() : false;
+                                if ($lastPlayerButton.length){ $lastPlayerButton.addClass('hovered'); }
+                                }
+                            }
+                        else {
+                            $activePlayer.addClass('hovered');
+                            }
                         ignoreInputFor(300);
                         return true;
-                        } else {
-                        $playerButtons.removeClass('hovered');
-                        if (activeInputs.L1){
-                            let $prevPlayer = $hoveredPlayer.prevAll('.team-player').first();
-                            if (!$prevPlayer || !$prevPlayer.length){ $prevPlayer = $playerButtons.last(); }
-                            if ($prevPlayer.length){ $prevPlayer.addClass('hovered'); }
+                        }
+                    // Otherwise if already-focused, the bumpers scroll and/or switch between players
+                    else {
+                        // If the player has pressed both bumpers at the same-time, quick-switch to/from cursor
+                        if ((activeInputs.L1 && activeInputs.R1) || activeInputs.LR1){
+                            //console.log('%c' + 'Both bumpers held, quick-switch to...', 'color: orange;');
+                            let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
+                            let playerHistory = _config.playerHistory || [];
+                            if (!playerIsCursor){
+                                //console.log('%c' + '...cursor player!', 'color: orange;');
+                                $cursorPlayer.trigger('click');
+                                $playerSwitcher.removeClass('focused');
+                                $('.team-player', $playerSwitcher).removeClass('hovered');
+                                ignoreInputFor(1200);
+                                return true;
+                                }
+                            else if (playerHistory.length > 1){
+                                //console.log('%c' + '...last player!', 'color: orange;');
+                                //console.log('-> playerHistory =', playerHistory);
+                                // get the first token in the list (which is chronologically the most recent player token) AFTER this one
+                                let lastPlayerToken = (function(a, t){ for (let i = 0; i < a.length; i++){ if (a[i] !== t){ return a[i]; } } })(playerHistory, _worldPlayer.token);
+                                let $lastPlayerButton = lastPlayerToken.length ? $playerButtons.filter('[data-player="' + lastPlayerToken + '"]').first() : false;
+                                //console.log('-> lastPlayerToken =', lastPlayerToken);
+                                //console.log('-> $lastPlayerButton =', $lastPlayerButton);
+                                if ($lastPlayerButton.length){ $lastPlayerButton.trigger('click'); }
+                                ignoreInputFor(1200);
+                                return true;
+                                }
+                            return;
                             }
-                        else if (activeInputs.R1){
-                            let $nextPlayer = $hoveredPlayer.nextAll('.team-player').first();
-                            if (!$nextPlayer || !$nextPlayer.length){ $nextPlayer = $playerButtons.first(); }
-                            if ($nextPlayer.length){ $nextPlayer.addClass('hovered'); }
+                        // Otherwise if just one is being pressed, we scroll in that direction to the next player
+                        else {
+                            //console.log('%c' + (activeInputs.L1 ? 'L1' : 'R1') + ' held, switching to hovered player!', 'color: orange;');
+                            $playerButtons.removeClass('hovered');
+                            if (activeInputs.L1){
+                                let $prevPlayer = $hoveredPlayer.prevAll('.team-player').first();
+                                if (!$prevPlayer || !$prevPlayer.length){ $prevPlayer = $playerButtons.last(); }
+                                if ($prevPlayer.length){ $prevPlayer.addClass('hovered'); }
+                                }
+                            else if (activeInputs.R1){
+                                let $nextPlayer = $hoveredPlayer.nextAll('.team-player').first();
+                                if (!$nextPlayer || !$nextPlayer.length){ $nextPlayer = $playerButtons.first(); }
+                                if ($nextPlayer.length){ $nextPlayer.addClass('hovered'); }
+                                }
+                            ignoreInputFor(300);
+                            return true;
                             }
-                        ignoreInputFor(300);
-                        return true;
                         }
                     let focusTimeout = _selfRef._playerSwitcherTimeout;
                     if (focusTimeout){ clearTimeout(focusTimeout); }
@@ -2166,11 +2225,11 @@ class mmrpgWorldMap {
                     return true;
                     }
                 // If the player has pressed either of the triggers we should zoom/unzoom the map
-                if (activeInputs.L2 || activeInputs.R2){
+                if (activeInputs.L2 || activeInputs.R2 || activeInputs.LR2){
                     //console.log('%c' + 'Trigger key pressed!', 'color: orange;');
                     //console.log('-> activeInputs: ', Object.keys(activeInputs).length ? activeInputs : 'none');
                     if (event){ event.preventDefault(); }
-                    if (activeInputs.L2 && activeInputs.R2){
+                    if ( (activeInputs.L2 && activeInputs.R2) || activeInputs.LR2 ){
                         //console.log('%c' + 'Both triggers held, reset zoom!', 'color: orange;');
                         // when both are held, we reset the zoom
                         let oldZoom = _world.zoomLevel || 1;
