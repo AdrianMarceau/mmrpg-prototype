@@ -1845,6 +1845,19 @@ class mmrpgWorldMap {
                     ignoreInputFor(1200);
                     return true;
                     }
+                // If the player has pressed the B button instead, we should dismiss the player switcher
+                if (activeInputs.B){
+                    //console.log('%c' + 'Dismiss player switch!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    let $activePlayer = $('.team-player.active', $playerSwitcher).first();
+                    if (!$activePlayer || !$activePlayer.length){ return false; }
+                    //console.log('Triggering click on active player:', $activePlayer);
+                    $activePlayer.trigger('click');
+                    $playerSwitcher.removeClass('focused');
+                    $('.team-player', $playerSwitcher).removeClass('hovered');
+                    ignoreInputFor(900);
+                    return true;
+                    }
                 }
             // If the robot storage area is currently open, process those actions too
             if (robotStorageIsActive){
