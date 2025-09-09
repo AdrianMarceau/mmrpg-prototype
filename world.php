@@ -153,6 +153,19 @@ if (empty($this_prototype_data['this_current_player'])){ $this_prototype_data['t
 //$WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
 $WORLD_SESSION['player_sessions']['last_player'] = $this_prototype_data['this_current_player'];
 $WORLD_SESSION['player_sessions']['allowed'] = $allowed_player_tokens; // store the allowed player tokens in the session
+//error_log('$WORLD_SESSION[\'player_sessions\'][\'allowed\'] = '. print_r($WORLD_SESSION['player_sessions']['allowed'], true));
+
+// Update the player session history in case we need to review it or switch back
+if (empty($WORLD_SESSION['player_sessions']['history'])){ $WORLD_SESSION['player_sessions']['history'] = array(); }
+//error_log('$WORLD_SESSION[\'player_sessions\'][\'history\'] = '. print_r($WORLD_SESSION['player_sessions']['history'], true));
+$world_player_session_history = !empty($WORLD_SESSION['player_sessions']['history']) ? $WORLD_SESSION['player_sessions']['history'] : array();
+$world_player_session_history = array_reverse($world_player_session_history);
+$world_player_session_history[] = $this_prototype_data['this_current_player'];
+$world_player_session_history = array_reverse($world_player_session_history);
+$world_player_session_history = array_unique($world_player_session_history);
+$world_player_session_history = array_values($world_player_session_history);
+//error_log('$world_player_session_history = '. print_r($world_player_session_history, true));
+$WORLD_SESSION['player_sessions']['history'] = $world_player_session_history;
 
 // Now that we have the player, we should collect the player's robots and other data
 $this_player_id = 1;
@@ -595,6 +608,7 @@ _worldConfig.playerAbilities = <?= json_encode($this_prototype_data['this_player
 _worldConfig.playerRobotsIndex = <?= json_encode($this_prototype_data['this_player_robots_index']) ?>;
 _worldConfig.playerItemsIndex = <?= json_encode($this_prototype_data['this_player_items_index']) ?>;
 _worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility']) ?>;
+_worldConfig.playerHistory = <?= json_encode($world_player_session_history) ?>;
 _worldConfig.backButtonURL = 'prototype.php';
 _worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=spawn';
 _worldConfig.resetButtonURL = 'world.php?reset=world';
