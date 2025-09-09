@@ -2317,6 +2317,8 @@ class rpg_world {
         $map_tile_height = $map_config['tile_height'];
         $map_tile_width = $map_config['tile_width'];
         $map_spritesize_offset = $map_config['spritesize_offset'];
+        $world_spawn_portal = !empty($map_data_parsed['portals']['spawn']) ? $map_data_parsed['portals']['spawn'] : false;
+        $world_spawn_position = $world_spawn_portal ? $world_spawn_portal[0] : '0-0';
         // Loop through the other allowed players to see if any are also on this map
         $rivals_markup = array();
         $rival_symbols = array();
@@ -2340,6 +2342,7 @@ class rpg_world {
             if (empty($tmp_world_token) || $tmp_world_token !== $world_token){ continue; } // skip if not on this world
             if (empty($tmp_map_token) || $tmp_map_token !== $map_token){ continue; } // skip if not on this map
             if (empty($tmp_world_position)){ continue; } // skip if no position
+            elseif ($tmp_world_position === $world_spawn_position){ continue; } // skip if still on spawn point
             $rival_symbols[$tmp_world_position] = $ptoken;
             // If we made it this far, show this other player on the map at their current location (just non-interactacble)
             //error_log('Found player "'.$ptoken.'" on map "'.$map_token.'" at position "'.$tmp_world_position.'"');
