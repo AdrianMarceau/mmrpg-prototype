@@ -3088,7 +3088,7 @@ function windowEventDisplay(){
             let $eventContainer = $('#events');
             //console.log('-> $eventContainer:', $eventContainer);
             // If there's an event showing, then pressing the Start, A, or B will all dismiss to next
-            if (activeInputs.Start || activeInputs.A || activeInputs.B){
+            if (activeInputs.A || activeInputs.B || activeInputs.Start){
                 //console.log('%c' + 'Start/A/B button pressed!', 'color: orange;');
                 if (event){ event.preventDefault(); }
                 $eventContinue.trigger('click');
@@ -3433,15 +3433,17 @@ class mmrpgUserInputWatcher {
         // Define an index of symbolic "userInputs" we can abstract actions behind, and then
         // worry about specific key-bindings and button-mappings later on to keep things clean
         let userInputs = {}; // below will be the default for now, but we'll allow customizing later
-        userInputs.A = {icon: 'Ⓐ', keyboard: ['d', 'Enter', 'Space'], gamepad: [0]};
+        userInputs.A = {icon: 'Ⓐ', keyboard: ['d', 'Space'], gamepad: [0]};
         userInputs.B = {icon: 'Ⓑ', keyboard: ['s', 'Backspace'], gamepad: [1]};
-        userInputs.X = {icon: 'Ⓧ', keyboard: ['w', 'Backslash'], gamepad: [2]};
-        userInputs.Y = {icon: 'Ⓨ', keyboard: ['a', 'Shift'], gamepad: [3]};
-        userInputs.L1 = {icon: 'L1', keyboard: ['q', 'BracketLeft'], gamepad: [4]};
-        userInputs.R1 = {icon: 'R1', keyboard: ['e', 'BracketRight'], gamepad: [5]};
-        userInputs.L2 = {icon: 'L2', keyboard: ['z', 'PageUp'], gamepad: [6]};
-        userInputs.R2 = {icon: 'R2', keyboard: ['c', 'PageDown'], gamepad: [7]};
-        userInputs.Start = {icon: '+', keyboard: ['Tab', 'Home'], gamepad: [9]};
+        userInputs.X = {icon: 'Ⓧ', keyboard: ['f', 'Escape', '\\'], gamepad: [2]};
+        userInputs.Y = {icon: 'Ⓨ', keyboard: ['a', 'Tab'], gamepad: [3]};
+        userInputs.L1 = {icon: 'L1', keyboard: ['q', '['], gamepad: [4]};
+        userInputs.R1 = {icon: 'R1', keyboard: ['e', ']'], gamepad: [5]};
+        userInputs.LR1 = {icon: 'L1+R1', keyboard: ['w'], gamepad: []};
+        userInputs.L2 = {icon: 'L2', keyboard: ['z', '-'], gamepad: [6]};
+        userInputs.R2 = {icon: 'R2', keyboard: ['c', '='], gamepad: [7]};
+        userInputs.LR2 = {icon: 'L2+R2', keyboard: ['x'], gamepad: []};
+        userInputs.Start = {icon: '+', keyboard: ['Enter', 'Home'], gamepad: [9]};
         userInputs.Select = {icon: '−', keyboard: ['Shift', 'End'], gamepad: [8]};
         userInputs.Up = {icon: '⏶', keyboard: ['ArrowUp'], gamepad: [12]};
         userInputs.Down = {icon: '⏷', keyboard: ['ArrowDown'], gamepad: [13]};
