@@ -15,6 +15,8 @@
 @pickups      = small-screw(12),large-screw(6),defense-pellet(8),defense-capsule(4),energy-pellet(2),weapon-pellet(2)
 #---------------------------#
 @encounters = gockroach-s(70),beetle-borg(70),antlin-g(20),bombomboy(5),power-muscler(1)
+@groups[]   = no-encounters_da1-exit-buffer(2-3...4-5)
+@groups[]   = no-encounters_da1e2-exit-buffer(48-10...50-12)
 #---------------------------#
 @terrain[]   = desert(oil-wells)
 @terrain[]   = grass(gentle-countryside)

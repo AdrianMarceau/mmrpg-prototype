@@ -15,6 +15,8 @@
 @pickups      = attack-pellet(6),weapon-pellet(4),attack-capsule(2),small-screw(1)
 #---------------------------#
 @encounters   = drill-mole,molier,rockscotch
+@groups[]     = no-encounters_da1-exit-buffer(15-3...17-5)
+@groups[]     = no-encounters_da1w2-exit-buffer(3-9...5-11)
 #---------------------------#
 @bosses[]    = upper-boss(6-4, drill-man)
 @bosses[]    = lower-boss(15-10, ground-man)

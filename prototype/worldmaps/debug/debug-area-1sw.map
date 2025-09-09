@@ -19,6 +19,8 @@
 @pickups      = large-screw(10),small-screw(20),energy-tank(1),weapon-tank(1)
 #---------------------------#
 @encounters   = spine(10),elec-n(9),bulb-blaster(8),nitron-y(7),plasma-plus(6),electriri(5),beak(3),snapper(6)
+@groups[]     = no-encounters_da1w2-exit-buffer(3-1...5-3)
+@groups[]     = no-encounters_da1s2-exit-buffer(6-40...8-42)
 #---------------------------#
 @habitats[]  = spine(ground)
 @habitats[]  = elec-n(plain)

@@ -15,6 +15,8 @@
 @pickups      = attack-pellet(2),attack-capsule(1),defense-pellet(2),defense-capsule(1),speed-pellet(2),speed-capsule(1)
 #---------------------------#
 @encounters = batton(20),monking-r(10),eggalodon(5),petal-anne(20),petit-snakey(10),bombomboy(5),kabuton(5),merserker(5)
+@groups[]   = no-encounters_da1w-exit-buffer(13-21...15-23)
+@groups[]   = no-encounters_da1sw-exit-buffer(4-23...6-25)
 #---------------------------#
 @terrain[]   = ground(preserved-forest)
 @terrain[]   = grass(gentle-countryside)
