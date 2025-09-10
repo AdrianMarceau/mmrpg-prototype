@@ -769,6 +769,8 @@ if (strstr($page_content_parsed, $find)){
         // Define a function for pulling pulling extended info for a given post given it's base data
         $get_full_thread_post_info = function($this_thread_info, $this_post_info) use ($thread_categories_index, $user_roles_index, $get_user_data_from_index) {
                 $full_post_info = $this_post_info;
+                if (empty($this_thread_info['category_id'])){ return false; }
+                elseif (!isset($thread_categories_index[$this_thread_info['category_id']])){ return false; }
                 $full_post_info = array_merge($full_post_info, $thread_categories_index[$this_thread_info['category_id']]);
                 if (!empty($this_post_info['user_id'])){
                     $temp_user_info = $get_user_data_from_index($this_post_info['user_id']);
@@ -844,12 +846,15 @@ if (strstr($page_content_parsed, $find)){
                     // Collect parent thread info for this post so we can use it later
                     $this_thread_info = $thread_index_array[$this_post_info['thread_id']];
                     $full_thread_info = $get_full_thread_info($this_thread_info);
+                    if (empty($this_thread_info) || empty($full_thread_info)){ continue; }
 
                     // Merge in relevant info from the post user, category, and role indexes
                     $full_post_info = $get_full_thread_post_info($full_thread_info, $this_post_info);
+                    if (empty($full_post_info)){ continue; }
 
                     // Collect category info to prevent function errors w/ requiring global var
                     $this_category_info = $this_categories_index[$this_thread_info['category_token']];
+                    if (empty($this_category_info)){ continue; }
 
                     // Collect markup for this post from the function
                     $temp_thread_info = $thread_index_array[$this_post_info['thread_id']];
