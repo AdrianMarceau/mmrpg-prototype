@@ -604,21 +604,25 @@ if (true || strstr($page_content_parsed, $find)){
                                             // Process the individual items in the category list differently depending on type
                                             if ($category_token === 'doctors_unlocked'){
                                                 $token = $data;
+                                                if (!isset($mmrpg_index_players[$token])){ continue; }
                                                 $info = $mmrpg_index_players[$token];
                                                 $details_markup[] = '<li><a class="player_type type_'.$info['player_type'].'" href="database/players/'.$info['player_token'].'/">'.$info['player_name'].'</a></li>';
                                             } elseif ($category_token === 'chapters_completed'){
                                                 list($token, $chapter) = explode('_', $data);
+                                                if (!isset($mmrpg_index_players[$token])){ continue; }
                                                 $info = $mmrpg_index_players[$token];
                                                 $chapter = ucwords(str_replace('-', ' ', $chapter));
                                                 $details_markup[] = '<li><a class="player_type type_'.$info['player_type'].'">'.$info['player_name'].' '.$chapter.'</a></li>';
                                             } elseif ($category_token === 'campaigns_completed'){
                                                 $token = $data;
+                                                if (!isset($mmrpg_index_players[$token])){ continue; }
                                                 $info = $mmrpg_index_players[$token];
                                                 $details_markup[] = '<li><a class="player_type type_'.$info['player_type'].'">'.$info['player_name'].'\'s Story</a></li>';
                                             }  elseif (strstr($category_token, 'robots_unlocked')
                                                 || strstr($category_token, 'database_robots')){
                                                 if (strstr($data, ' x')){ list($token, $num) = explode(' x', $data); $num = (int)($num); }
                                                 else { $token = $data; $num = 1; }
+                                                if (!isset($mmrpg_index_robots[$token])){ continue; }
                                                 $info = $mmrpg_index_robots[$token];
                                                 $type = !empty($info['robot_core']) ? $info['robot_core'] : 'none';
                                                 if (!empty($info['robot_core2'])){ $type = ($type !== 'none' ? $type.'_'.$info['robot_core2'] : $info['robot_core2']); }
@@ -628,6 +632,7 @@ if (true || strstr($page_content_parsed, $find)){
                                                 $details_markup[] = '<li><a class="robot_type type_'.$type.'" href="database/'.$cls.'/'.$info['robot_token'].'/">'.$info['robot_name'].($num !== 1 ? ' x'.$num : '').'</a></li>';
                                             } elseif ($category_token === 'abilities_unlocked'){
                                                 $token = $data;
+                                                if (!isset($mmrpg_index_abilities[$token])){ continue; }
                                                 $info = $mmrpg_index_abilities[$token];
                                                 $type = !empty($info['ability_type']) ? $info['ability_type'] : 'none';
                                                 if (!empty($info['ability_type2'])){ $type = ($type !== 'none' ? $type.'_'.$info['ability_type2'] : $info['ability_type2']); }
@@ -635,18 +640,22 @@ if (true || strstr($page_content_parsed, $find)){
                                             } elseif ($category_token === 'items_unlocked'){
                                                 if (strstr($data, ' x')){ list($token, $num) = explode(' x', $data); $num = (int)($num); }
                                                 else { $token = $data; $num = 1; }
+                                                if (!isset($mmrpg_index_items[$token])){ continue; }
                                                 $info = $mmrpg_index_items[$token];
                                                 $type = !empty($info['item_type']) ? $info['item_type'] : 'none';
                                                 if (!empty($info['item_type2'])){ $type = ($type !== 'none' ? $type.'_'.$info['item_type2'] : $info['item_type2']); }
                                                 $details_markup[] = '<li><a class="item_type type_'.$type.'" href="database/items/'.$info['item_token'].'/">'.$info['item_name'].($num !== 1 ? ' x'.$num : '').'</a></li>';
                                             } elseif ($category_token === 'fields_unlocked'){
                                                 $token = $data;
+                                                if (!isset($mmrpg_index_fields[$token])){ continue; }
                                                 $info = $mmrpg_index_fields[$token];
                                                 $type = !empty($info['field_type']) ? $info['field_type'] : 'none';
                                                 $details_markup[] = '<li><a class="field_type type_'.$type.'" href="database/fields/'.$info['field_token'].'/">'.$info['field_name'].'</a></li>';
                                             } elseif ($category_token === 'field_stars_collected'
                                                 || $category_token === 'fusion_stars_collected'){
                                                 list($token1, $token2) = explode('-', $data);
+                                                if (!isset($mmrpg_index_fields_types[$token1])){ continue; }
+                                                if (!isset($mmrpg_index_fields_types[$token2])){ continue; }
                                                 $type1 = $mmrpg_index_fields_types[$token1];
                                                 $type2 = $mmrpg_index_fields_types[$token2];
                                                 $type = !empty($type1) && !empty($type2) && $type1 !== $type2 ? $type1.'_'.$type2 : $type1;
