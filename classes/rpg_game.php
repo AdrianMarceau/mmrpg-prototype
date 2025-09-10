@@ -1855,7 +1855,7 @@ class rpg_game {
         $composite_sprite_path = 'images/'.$kind_path.'all/'.$config_path.$image_path;
         if ($include_cache_date){ $composite_sprite_path .= '?'.MMRPG_CONFIG_CACHE_DATE; }
         // Return the generated path value
-        //error_log('$composite_sprite_path = '.print_r($composite_sprite_path, true));
+        //error_log('get_sprite_composite_path() = $composite_sprite_path = '.print_r($composite_sprite_path, true));
         return $composite_sprite_path;
     }
 
@@ -1869,12 +1869,14 @@ class rpg_game {
         if (!empty($config['frame'])){ $composite_base_token .= '_f-'.$config['frame']; }
         if (!empty($config['editor'])){ $composite_base_token .= '_e-'.$config['editor']; }
         if (!empty($config['token'])){ $composite_base_token .= '_t-'.preg_replace('/[^-a-z0-9]+/i', '-', (is_array($config['token']) ? implode(',', $config['token']) : $config['token'])); }
+        if (!empty($config['zoom'])){ $composite_base_token .= '_x2'; }
         $composite_cache_token = $config['kind'].'_'.$composite_base_token;
         $composite_cache_path_full = $composite_base_path.$composite_cache_token.'.png';
         $composite_cache_path_rel = str_replace(MMRPG_CONFIG_ROOTDIR, '', $composite_cache_path_full);
         //error_log('$composite_cache_token = '.print_r($composite_cache_token, true));
         //error_log('$composite_cache_path_full = '.print_r($composite_cache_path_full, true));
         //error_log('$composite_cache_path_rel = '.print_r($composite_cache_path_rel, true));
+        //error_log('get_sprite_composite_cache_path() = $composite_cache_path_rel = '.print_r($composite_cache_path_rel, true));
         return $composite_cache_path_rel;
     }
 
@@ -1889,7 +1891,7 @@ class rpg_game {
         static $composite_index_cache = array();
         //error_log('$composite_index_cache = '.print_r($composite_index_cache, true));
         if (!isset($composite_index_cache[$composite_sprite_path])){
-            $composite_index_array = self::get_sprite_composite_index_json($composite_sprite_cache_path);
+            $composite_index_array = self::get_sprite_composite_index_json($composite_sprite_path);
             //error_log('$composite_index_array = '.print_r($composite_index_array, true));
             $composite_index_cache[$composite_sprite_path] = $composite_index_array;
         }
@@ -1912,6 +1914,7 @@ class rpg_game {
         //  Define the index JSON's path give the provided sprite path
         $composite_index_path = str_replace('.png', '.json', $composite_sprite_path);
         $composite_index_path_clean = preg_replace('/\?.*/', '', $composite_index_path);
+        //error_log('$composite_sprite_path = '.print_r($composite_sprite_path, true));
         //error_log('$composite_index_path = '.print_r($composite_index_path, true));
         //error_log('$composite_index_path_clean = '.print_r($composite_index_path_clean, true));
 
@@ -1934,7 +1937,8 @@ class rpg_game {
             $composite_index_json = fread($file_handle, filesize(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean));
             fclose($file_handle);
         } else {
-            $composite_index_json = file_get_contents(MMRPG_CONFIG_ROOTURL.$composite_index_path);
+            $stream_config = array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false)); // permissive b/c self-request only
+            $composite_index_json = file_get_contents(MMRPG_CONFIG_ROOTURL.$composite_index_path, false, stream_context_create($stream_config));
         }
         //error_log('$composite_index_json = '.print_r($composite_index_json, true));
 
