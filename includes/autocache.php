@@ -47,14 +47,20 @@ $request_cache_reasons = array();
 //autocache_debug('$request_nocache_reasons = '.print_r((!empty($request_nocache_reasons) ? $request_nocache_reasons : '[]'), true));
 
 // If this request falls under certain criteria, we can and should be caching it
-if ($request_uri_path === '/'){ $request_is_cacheable = true; $request_cache_duration = 6; $request_cache_reasons[] = 'is-home-page'; }
+if ($request_uri_path === '/'){ $request_is_cacheable = true; $request_cache_duration = (1 / 60); $request_cache_reasons[] = 'is-home-page'; }
 if (strpos($request_uri_path, 'about/') === 0){ $request_is_cacheable = true; $request_cache_duration = 48; $request_cache_reasons[] = 'is-about-page'; }
 if (strpos($request_uri_path, 'gallery/') === 0){ $request_is_cacheable = true; $request_cache_duration = 24; $request_cache_reasons[] = 'is-gallery-page'; }
 if (strpos($request_uri_path, 'database/') === 0){ $request_is_cacheable = true; $request_cache_duration = 12; $request_cache_reasons[] = 'is-database-page'; }
 if (strpos($request_uri_path, 'credits/') === 0){ $request_is_cacheable = true; $request_cache_duration = 72; $request_cache_reasons[] = 'is-credits-page'; }
 if (strpos($request_uri_path, 'cookies/') === 0){ $request_is_cacheable = true; $request_cache_duration = 148; $request_cache_reasons[] = 'is-cookies-page'; }
-if (strpos($request_uri_path, 'leaderboard/') === 0){ $request_is_cacheable = true; $request_cache_duration = 1; $request_cache_reasons[] = 'is-leaderboard-page'; }
-if (strpos($request_uri_path, 'community/') === 0 && strpos($request_uri_path, '/new/') === false){ $request_is_cacheable = true; $request_cache_duration = 3; $request_cache_reasons[] = 'is-community-page'; }
+if (strpos($request_uri_path, 'leaderboard/') === 0){ $request_is_cacheable = true; $request_cache_duration = (1 / 60); $request_cache_reasons[] = 'is-leaderboard-page'; }
+if (strpos($request_uri_path, 'community/') === 0
+    && strpos($request_uri_path, '/new/') === false
+    && strpos($request_uri_path, '/search/') === false){
+    $request_is_cacheable = true;
+    $request_cache_duration = (2 / 60);
+    $request_cache_reasons[] = 'is-community-page';
+}
 //autocache_debug('$request_is_cacheable = '.($request_is_cacheable ? 'true' : 'false'));
 //autocache_debug('$request_cache_duration = '.print_r($request_cache_duration, true));
 //autocache_debug('$request_cache_reasons = '.print_r((!empty($request_cache_reasons) ? $request_cache_reasons : '[]'), true));
