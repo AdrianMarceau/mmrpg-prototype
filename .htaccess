@@ -53,6 +53,10 @@ RewriteEngine on
 # -- LEGACY PAGE/ASSET REWRITES -- #
 ####################################
 
+# Redirect the private directories to 404s
+RewriteRule ^.git(/.*)?$ - [R=404,NC,L]
+RewriteRule ^.not-git(/.*)?$ - [R=404,NC,L]
+
 # Redirect the non-existant pages to better places
 RewriteRule ^home/?$ / [R,L]
 RewriteRule ^updates/?$ /community/news/ [R,L]
