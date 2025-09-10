@@ -692,9 +692,9 @@ if (true || strstr($page_content_parsed, $find)){
                                         $num_turns = (int)($category_list['challenge_turns_used']);
                                         $team_config = $category_list['challenge_team_config'];
 
-                                        $base_points = $num_waves * $wave_value;
-                                        $robot_points = ceil($base_points / $num_robots);
-                                        $turn_points = ceil($base_points / ($num_turns / $num_waves));
+                                        $base_points = !empty($num_waves) ? ceil($num_waves * $wave_value) : 0;
+                                        $robot_points = !empty($num_robots) ? ceil($base_points / $num_robots) : 0;
+                                        $turn_points = !empty($num_turns) && !empty($num_waves) ? ceil($base_points / ($num_turns / $num_waves)) : 0;
                                         $total_points = $base_points + $robot_points + $turn_points;
 
                                         $print_wave_value = number_format($wave_value, 0, '.', ',');
