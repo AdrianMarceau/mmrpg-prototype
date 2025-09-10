@@ -8,14 +8,16 @@ echo '<'.'?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
 $global_rooturl = MMRPG_CONFIG_ROOTURL;
 $global_lastmod = preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})-([0-9]{2,4})$/', '$1-$2-$3', MMRPG_CONFIG_CACHE_DATE);
 // Define the gallery variables for the sitemap
-$iterator = new DirectoryIterator('images/gallery/screenshots/thumbs/');
-$gallery_mtime = -1;
 $file;
-foreach ($iterator as $fileinfo){
-  if ($fileinfo->isFile()){
-    if ($fileinfo->getMTime() > $gallery_mtime){
-      $file = $fileinfo->getFilename();
-      $gallery_mtime = $fileinfo->getMTime();
+$gallery_mtime = -1;
+if (file_exists('images/gallery/screenshots/thumbs/')){
+  $iterator = new DirectoryIterator('images/gallery/screenshots/thumbs/');
+  foreach ($iterator as $fileinfo){
+    if ($fileinfo->isFile()){
+      if ($fileinfo->getMTime() > $gallery_mtime){
+        $file = $fileinfo->getFilename();
+        $gallery_mtime = $fileinfo->getMTime();
+      }
     }
   }
 }
