@@ -90,6 +90,44 @@ require_once('database/include.php');
   }
   ?>
   <url>
+    <loc><?= $global_rooturl ?>database/bosses/</loc>
+    <lastmod><?= $global_lastmod ?></lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <?
+  // Loop through the database bosses
+  foreach ($mmrpg_database_bosses AS $boss_key => $boss_info){
+    ?>
+    <url>
+      <loc><?= $global_rooturl ?>database/bosses/<?= $boss_info['robot_token'] ?>/</loc>
+      <lastmod><?= $global_lastmod ?></lastmod>
+      <changefreq>yearly</changefreq>
+      <priority>0.6</priority>
+    </url>
+    <?
+  }
+  ?>
+  <url>
+    <loc><?= $global_rooturl ?>database/mechas/</loc>
+    <lastmod><?= $global_lastmod ?></lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <?
+  // Loop through the database mechas
+  foreach ($mmrpg_database_mechas AS $mecha_key => $mecha_info){
+    ?>
+    <url>
+      <loc><?= $global_rooturl ?>database/mechas/<?= $mecha_info['robot_token'] ?>/</loc>
+      <lastmod><?= $global_lastmod ?></lastmod>
+      <changefreq>yearly</changefreq>
+      <priority>0.4</priority>
+    </url>
+    <?
+  }
+  ?>
+  <url>
     <loc><?= $global_rooturl ?>database/abilities/</loc>
     <lastmod><?= $global_lastmod ?></lastmod>
     <changefreq>monthly</changefreq>
@@ -101,6 +139,25 @@ require_once('database/include.php');
     ?>
     <url>
       <loc><?= $global_rooturl ?>database/abilities/<?= $ability_info['ability_token'] ?>/</loc>
+      <lastmod><?= $global_lastmod ?></lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.8</priority>
+    </url>
+    <?
+  }
+  ?>
+  <url>
+    <loc><?= $global_rooturl ?>database/items/</loc>
+    <lastmod><?= $global_lastmod ?></lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <?
+  // Loop through the database items
+  foreach ($mmrpg_database_items AS $item_key => $item_info){
+    ?>
+    <url>
+      <loc><?= $global_rooturl ?>database/items/<?= $item_info['item_token'] ?>/</loc>
       <lastmod><?= $global_lastmod ?></lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
