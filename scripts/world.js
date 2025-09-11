@@ -1622,6 +1622,7 @@ class mmrpgWorldMap {
                     if (!isExpandedNow){
                         enableOtherElements();
                         _world.mapIsHidden = false;
+                        $robotsOverview.attr('data-view', '');
                         $('.pages', $storageRobotsDiv).remove();
                         $('.bullets', $storageRobotsDiv).remove();
                         $teamRobotsDiv.removeClass('focused');
@@ -1630,6 +1631,7 @@ class mmrpgWorldMap {
                         }
                     // otherwise if we're expanded we need to run some setup
                     _world.mapIsHidden = true; // set the map hidden state
+                    $robotsOverview.attr('data-view', 'robots'); // set the current panel
                     // Disable the outside UI buttons to prevent bad-clicks and visual clutter
                     disableOtherElements();
                     // Remake the storage bullets nad pages now

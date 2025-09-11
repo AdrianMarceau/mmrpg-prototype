@@ -1829,21 +1829,24 @@ class rpg_world {
             elseif ($rating === 'low'){ return '08'; } // defend
             else { return '03'; } // defeat
             };
-        //$current_robot_tokens_reversed = array_reverse($current_robot_tokens);
-        $return_markup .= '<a class="team-rotate" title="Rotate Team"><i class="fa fas fa-sync"></i></a>';
-        $return_markup .= '<div class="limit-hearts" title="x'.$limit_hearts.' Limit Hearts">';
+        // [robots-overview][team-size]
+        if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>'; }
+        elseif ($num_robot_unlocked === 1){ $return_markup .= '<div class="team-size"><strong>1 robot</strong></div>'; }
+        elseif ($num_robot_unlocked === $current_team_size){ $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' robots</strong></div>'; }
+        else { $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>'; }
+        // [robots-overview][team-rotate]
+        if ($num_robot_unlocked > 1){ $return_markup .= '<a class="team-rotate"><i class="fa fas fa-sync"></i></a>'; }
+        // [robots-overview][team-switch]
+        if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<a class="team-switch"><i class="fa fas fa-robot"></i><b>robots</b></a>'; }
+        else { $return_markup .= '<span class="team-switch"><i class="fa fas fa-robot"></i><b>robots</b></span>'; }
+        // [robots-overview][team-items]
+        $return_markup .= '<a class="team-items"><i class="fa fas fa-briefcase"></i><b>items</b></a>';
+        // [robots-overview][limit-hearts]
+        $return_markup .= '<div class="limit-hearts">';
             $return_markup .= '<i class="player '.$current_player_token.'"></i>';
             $return_markup .= str_repeat('<i class="heart fa fas fa-heart"></i>', $limit_hearts);
         $return_markup .= '</div>';
-        if ($num_robot_unlocked > $current_team_size){
-            $return_markup .= '<a class="team-switch" title="Switch-Out Robots"><i class="fa fas fa-robot"></i></a>';
-            $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>';
-            } else {
-            $return_markup .= '<span class="team-switch"><i class="fa fas fa-robot"></i></span>';
-            if ($num_robot_unlocked === 1){ $return_markup .= '<div class="team-size"><strong>1 robot</strong></div>'; }
-            elseif ($num_robot_unlocked === $current_team_size){ $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' robots</strong></div>'; }
-            else { $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>'; }
-            }
+        // [robots-overview][team-robots]
         $return_markup .= '<div class="team-robots">';
             foreach ($current_robot_tokens AS $robot_key => $robot_token){
                 if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
@@ -1915,6 +1918,7 @@ class rpg_world {
                 $return_markup .= $robot_markup;
             }
         $return_markup .= '</div>';
+        // [robots-overview][storage-robots]
         $return_markup .= '<div class="storage-robots">';
             foreach ($storage_robot_tokens AS $robot_key => $robot_token){
                 if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
