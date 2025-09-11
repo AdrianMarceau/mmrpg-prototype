@@ -2574,15 +2574,22 @@ class mmrpgWorldMap {
             let teamOffsetY = tileOffsetY;
             let teamOffsetZ = tileOffsetZ + 1;
             let teamTravelDuration = travelDuration;
+            let lastTeamSpriteKind = false;
             teamTravelDuration += 50;
             $otherSpritesInOrder.each(function(index, element){
                 let $thisSprite = $(element);
+                let spriteKind = $thisSprite.attr('data-sprite');
                 let $innerSprite = $('.sprite', $thisSprite);
                 let imgSize = $thisSprite.attr('data-size') || 40;
                 let imgSizeX = imgSize + 'x' + imgSize;
                 teamTravelDuration += 50; // add a little extra time for the team sprites to move
+                if (!lastTeamSpriteKind){ lastTeamSpriteKind = spriteKind; }
+                if (lastTeamSpriteKind !== spriteKind){
+                    if (thisVerDir === 'up'){ teamOffsetY += 15; }
+                    }
                 if (thisVerDir === 'up'){ teamOffsetY += 10; }
                 else if (thisVerDir === 'down'){ teamOffsetY -= 20; }
+                else { teamOffsetY -= 1; }
                 if (thisHorDir === 'left'){ teamOffsetX += 20; }
                 else if (thisHorDir === 'right'){ teamOffsetX -= 20; }
                 teamOffsetZ = teamOffsetY + 1;
@@ -2610,6 +2617,7 @@ class mmrpgWorldMap {
                         zIndex: teamOffsetZ,
                         }); onTeamMoveComplete();
                     }
+                lastTeamSpriteKind = spriteKind;
                 });
             }
         // Make sure we start the scroll to the new position
