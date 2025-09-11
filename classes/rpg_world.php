@@ -1841,6 +1841,8 @@ class rpg_world {
         else { $return_markup .= '<span class="team-switch"><i class="fa fas fa-robot"></i><b>robots</b></span>'; }
         // [robots-overview][team-items]
         $return_markup .= '<a class="team-items"><i class="fa fas fa-briefcase"></i><b>items</b></a>';
+        // [robots-overview][team-abilities]
+        $return_markup .= '<a class="team-abilities"><i class="fa fas fa-compact-disc"></i><b>abilities</b></a>';
         // [robots-overview][limit-hearts]
         $return_markup .= '<div class="limit-hearts">';
             $return_markup .= '<i class="player '.$current_player_token.'"></i>';
