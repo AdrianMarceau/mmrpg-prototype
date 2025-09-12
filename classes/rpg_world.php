@@ -1837,12 +1837,12 @@ class rpg_world {
         // [robots-overview][team-rotate]
         if ($num_robot_unlocked > 1){ $return_markup .= '<a class="team-rotate"><i class="fa fas fa-sync"></i></a>'; }
         // [robots-overview][team-switch]
-        if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<a class="team-switch"><i class="fa fas fa-robot"></i><b>robots</b></a>'; }
-        else { $return_markup .= '<span class="team-switch"><i class="fa fas fa-robot"></i><b>robots</b></span>'; }
-        // [robots-overview][team-items]
-        $return_markup .= '<a class="team-items"><i class="fa fas fa-briefcase"></i><b>items</b></a>';
+        if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<a class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></a>'; }
+        else { $return_markup .= '<span class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></span>'; }
         // [robots-overview][team-abilities]
-        $return_markup .= '<a class="team-abilities"><i class="fa fas fa-compact-disc"></i><b>abilities</b></a>';
+        $return_markup .= '<a class="storage-button team-abilities" data-view="abilities"><i class="fa fas fa-compact-disc"></i><b>abilities</b></a>';
+        // [robots-overview][team-items]
+        $return_markup .= '<a class="storage-button team-items" data-view="items"><i class="fa fas fa-briefcase"></i><b>items</b></a>';
         // [robots-overview][limit-hearts]
         $return_markup .= '<div class="limit-hearts">';
             $return_markup .= '<i class="player '.$current_player_token.'"></i>';
@@ -1921,7 +1921,7 @@ class rpg_world {
             }
         $return_markup .= '</div>';
         // [robots-overview][storage-robots]
-        $return_markup .= '<div class="storage-robots">';
+        $return_markup .= '<div class="storage-box storage-robots">';
             foreach ($storage_robot_tokens AS $robot_key => $robot_token){
                 if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
                 // collect all the info we need about this robot
@@ -1988,6 +1988,16 @@ class rpg_world {
                 $return_markup .= $robot_markup;
             }
         $return_markup .= '</div>';
+        // [robots-overview][storage-items]
+        $return_markup .= '<div class="storage-box storage-items">';
+            $return_markup .= '<div>&hellip; items &hellip;</div>';
+        $return_markup .= '</div>';
+        // [robots-overview][storage-abilities]
+        $return_markup .= '<div class="storage-box storage-abilities">';
+            $return_markup .= '<div>&hellip; abilities &hellip;</div>';
+        $return_markup .= '</div>';
+        // [robots-overview][close-button]
+        $return_markup .= '<a class="team-close"><i class="fa fas fa-times"></i></a>';
         return $return_markup;
     }
 

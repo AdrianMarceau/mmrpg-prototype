@@ -1606,7 +1606,7 @@ html, body {
     left: 0;
     pointer-events: all;
     cursor: default;
-    padding: 0px 0px 68px 0;
+    padding: 0px 0px 64px 0;
     border-radius: 0 6px 0 0;
     background-color: transparent;
     box-shadow: none;
@@ -1631,7 +1631,7 @@ html, body {
 }
 #world #canvas #robots-overview:before {
     z-index: 1;
-    top: 10px;
+    top: 30px;
     bottom: -10px;
     left: -480px;
     height: auto;
@@ -1657,8 +1657,10 @@ html, body {
 #world #canvas #robots-overview.expanded:before {
     background-color: rgba(0, 0, 0, 0.8);
     border-color: #000000;
+    left: -460px;
 }
 #world #canvas #robots-overview.expanded:before {
+    top: 10px;
     left: -84px;
     bottom: -10px;
     transform: skewX(0deg);
@@ -1670,6 +1672,7 @@ html, body {
 #world #canvas #robots-overview > .wrapper {
     pointer-events: none;
 }
+#world #canvas #robots-overview .team-close,
 #world #canvas #robots-overview .team-rotate,
 #world #canvas #robots-overview .team-switch,
 #world #canvas #robots-overview .team-items,
@@ -1691,6 +1694,7 @@ html, body {
     transition: none;
     pointer-events: auto;
 }
+#world #canvas #robots-overview .team-close:not(a),
 #world #canvas #robots-overview .team-rotate:not(a),
 #world #canvas #robots-overview .team-switch:not(a),
 #world #canvas #robots-overview .team-items:not(a),
@@ -1698,6 +1702,7 @@ html, body {
     cursor: default;
     pointer-events: none;
 }
+#world #canvas #robots-overview .team-close i,
 #world #canvas #robots-overview .team-rotate i,
 #world #canvas #robots-overview .team-switch i,
 #world #canvas #robots-overview .team-items i,
@@ -1706,7 +1711,7 @@ html, body {
     z-index: 3;
     top: 50%;
     left: 50%;
-    transform-origin: center;
+    transform-origin: center right;
     transform: translate(-50%, -50%) scale(1.0);
     font-size: 100%;
     color: inherit;
@@ -1716,6 +1721,7 @@ html, body {
     pointer-events: auto;
     transition: transform 0.3s, color 0.3s;
 }
+#world #canvas #robots-overview .team-close:hover i,
 #world #canvas #robots-overview .team-rotate:hover i,
 #world #canvas #robots-overview .team-switch:hover i,
 #world #canvas #robots-overview .team-items:hover i,
@@ -1746,6 +1752,7 @@ html, body {
     bottom: 0;
     left: 0;
 }
+#world #canvas #robots-overview .team-close.disabled,
 #world #canvas #robots-overview .team-rotate.disabled,
 #world #canvas #robots-overview .team-switch.disabled,
 #world #canvas #robots-overview .team-items.disabled {
@@ -1768,17 +1775,16 @@ html, body {
     font-size: 10px;
     font-weight: bold;
     text-transform: uppercase;
-    transform: translateX(0);
-    transition: transform 0.3s;
     border-radius: 3px;
 }
 #world #canvas #robots-overview .team-switch:hover b,
 #world #canvas #robots-overview .team-items:hover b,
-#world #canvas #robots-overview .team-abilities:hover b,
+#world #canvas #robots-overview .team-abilities:hover b {
+    background-color: #464646;
+}
 #world #canvas #robots-overview[data-view="robots"].expanded .team-switch b,
 #world #canvas #robots-overview[data-view="items"].expanded .team-items b,
 #world #canvas #robots-overview[data-view="abilities"].expanded .team-abilities b {
-    transform: translateX(6px);
     background-color: #efefef;
     color: #191919;
 }
@@ -1793,62 +1799,86 @@ html, body {
 }
 
 #world #canvas #robots-overview .team-switch {
-    padding-left: 13px;
+    padding-left: 14px;
     left: 44px;
 }
-#world #canvas #robots-overview .team-items {
-    padding-left: 11px;
-    left: 133px;
-}
 #world #canvas #robots-overview .team-abilities {
-    padding-left: 9px;
-    left: 206px;
+    padding-left: 11px;
+    left: 130px;
 }
-#world #canvas #robots-overview .team-items i {
-    top: calc(50% + 1px);
+#world #canvas #robots-overview .team-items {
+    padding-left: 12px;
+    left: 218px;
 }
 #world #canvas #robots-overview .team-abilities i {
     top: calc(50% + 2px);
 }
+#world #canvas #robots-overview .team-items i {
+    top: calc(50% + 1px);
+}
 
-
+#world #canvas #robots-overview .team-close,
 #world #canvas #robots-overview .team-rotate {
-    bottom: 32px;
-    left: 10px;
     font-size: 16px;
     color: #e0e0e0;
     background-color: #191919;
     border: 1px solid #090909;
     padding: 4px;
     border-radius: 50%;
+    opacity: 1.0;
+}
+#world #canvas #robots-overview .team-rotate {
+    bottom: 32px;
+    left: 10px;
+    transition: opacity 0.3s;
+}
+#world #canvas #robots-overview .team-close {
+    bottom: 558px;
+    left: 540px;
+    transition: opacity 0.9s;
+}
+#world #canvas #robots-overview .team-close i,
+#world #canvas #robots-overview .team-rotate i {
+    transform-origin: center;
+}
+#world #canvas #robots-overview .team-close i {
+    transition: transform 0.3s;
 }
 #world #canvas #robots-overview .team-rotate i {
-    transition: transform 0.6s, opacity 0.3s, color 0.6s;
+    transition: transform 0.6s;
+}
+#world #canvas #robots-overview .team-close:hover i,
+#world #canvas #robots-overview .team-close.clicked i {
+    transform: translate(-50%, -50%) scale(1.4);
 }
 #world #canvas #robots-overview .team-rotate:hover i,
 #world #canvas #robots-overview .team-rotate.clicked i {
     transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
 }
-#world #canvas #robots-overview.expanded .team-rotate {
+#world #canvas #robots-overview.expanded .team-rotate,
+#world #canvas #robots-overview:not(.expanded) .team-close {
     opacity: 0;
+    bottom: -9999px;
+    left: -9999px;
     pointer-events: none;
+    pointer: default;
 }
 
 #world #canvas #robots-overview .team-size {
     display: block;
     position: absolute;
     z-index: 90;
-    color: #e0e0e0;
+    color: #cacaca;
     font-size: 11px;
     line-height: 1;
     top: 20px;
-    left: 12px;
+    left: 90px;
     pointer-events: none;
     text-shadow: 1px 1px 0 #000000;
-    transition: left 0.6s, font-size 0.3s;
+    transition: top 0.6s, left 0.6s, font-size 0.3s;
 }
-#world #canvas #robots-overview.expanded .team-size {
-    left: 90px;
+#world #canvas #robots-overview:not(.expanded) .team-size {
+    display: none;
 }
 
 #world #canvas #robots-overview .limit-hearts {
@@ -1918,13 +1948,13 @@ html, body {
 }
 #world #canvas #robots-overview:hover .team-robots,
 #world #canvas #robots-overview.expanded .team-robots {
-    max-height: 418px;
+    max-height: 422px;
 }
 #world #canvas #robots-overview.expanded .team-robots {
-    min-height: 418px;
+    min-height: 422px;
 }
 
-#world #canvas #robots-overview .storage-robots {
+#world #canvas #robots-overview .storage-box {
     display: block;
     box-sizing: border-box;
     position: absolute;
@@ -1944,12 +1974,14 @@ html, body {
     pointer-events: none;
     transition: opacity 0.3s, top 0.6s;
 }
-#world #canvas #robots-overview[data-view="robots"].expanded .storage-robots {
+#world #canvas #robots-overview[data-view="robots"].expanded .storage-robots,
+#world #canvas #robots-overview[data-view="items"].expanded .storage-items,
+#world #canvas #robots-overview[data-view="abilities"].expanded .storage-abilities {
     opacity: 1.0;
     top: 16px;
     pointer-events: auto;
 }
-#robots-overview .storage-robots .button {
+#robots-overview .storage-box .button {
     display: block;
     position: absolute;
     z-index: 20;
@@ -1979,27 +2011,27 @@ html, body {
     border: 1px solid  #565656;
     transition: border 0.2s, background-color 0.2s, min-width 0.3s;
 }
-#robots-overview .storage-robots .button.active,
-#robots-overview .storage-robots .button:not(.disabled):hover {
+#robots-overview .storage-box .button.active,
+#robots-overview .storage-box .button:not(.disabled):hover {
     border-color: #cfcfcf;
     background-color: rgba(0, 0, 0, 0.7);
 }
-#robots-overview .storage-robots .button.active {
+#robots-overview .storage-box .button.active {
     cursor: default;
     pointer-events: none;
 }
-#robots-overview .storage-robots .button.save {
+#robots-overview .storage-box .button.save {
     left: calc(100% - 12px);
     bottom: 40px;
     font-size: 18px;
     line-height: 1.4;
 }
-#robots-overview .storage-robots .button.cancel {
+#robots-overview .storage-box .button.cancel {
     left: calc(100% - 12px);
     bottom: 12px;
 }
-#robots-overview .storage-robots .button.save.disabled,
-#robots-overview .storage-robots .button.cancel.disabled {
+#robots-overview .storage-box .button.save.disabled,
+#robots-overview .storage-box .button.cancel.disabled {
     background-color: #292929;
     border-color: #464646;
     color: #969696;
@@ -2007,11 +2039,11 @@ html, body {
     cursor: not-allowed;
     text-decoration: line-through;
 }
-#robots-overview .storage-robots .button.save {
+#robots-overview .storage-box .button.save {
     background-color: #0e6b0e !important;
     border-color: #129d12 !important;
 }
-#robots-overview .storage-robots .button.cancel {
+#robots-overview .storage-box .button.cancel {
     background-color: #8b1d1d !important;
     border-color: #b23333 !important;
 }
@@ -2021,10 +2053,10 @@ html, body {
     50% { outline: 2px solid rgba(255, 255, 255, 0.6); }
     100% { outline: 2px solid rgba(255, 255, 255, 1.0); }
 }
-#robots-overview .storage-robots .button.save:hover,
-#robots-overview .storage-robots .button.cancel:hover,
-#robots-overview .storage-robots .button.save.maybe,
-#robots-overview .storage-robots .button.cancel.maybe {
+#robots-overview .storage-box .button.save:hover,
+#robots-overview .storage-box .button.cancel:hover,
+#robots-overview .storage-box .button.save.maybe,
+#robots-overview .storage-box .button.cancel.maybe {
     outline: 2px solid rgba(255, 255, 255, 1.0);
     animation: world-storage-button-maybe 1.5s ease-in-out infinite;
 }
@@ -2034,14 +2066,95 @@ html, body {
     50% { transform: scale(1.2); }
     100% { transform: scale(1.0); }
 }
-#robots-overview .storage-robots .button.save.clicked,
-#robots-overview .storage-robots .button.cancel.clicked {
+#robots-overview .storage-box .button.save.clicked,
+#robots-overview .storage-box .button.cancel.clicked {
     outline: 2px solid rgba(255, 255, 255, 1.0);
     transform: scale(1.0);
     animation: storage 0.9s ease-in-out infinite;
     animation-fill-mode: forwards;
     transform-origin: center center;
 }
+
+#robots-overview .storage-box .pages {
+    display: block;
+    position: absolute;
+    z-index: 20;
+    bottom: 9px;
+    left: 50px;
+    right: 12px;
+    padding: 0 36px 2px;
+    width: auto;
+    height: auto;
+    text-align: left;
+    color: #cfcfcf;
+    font-size: 12px;
+    line-height: 1.2;
+    font-weight: bold;
+    text-decoration: none;
+    background-color: transparent;
+    user-select: none;
+}
+#robots-overview .storage-box .pages:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 10px;
+    left: 26px;
+    right: 26px;
+    height: 6px;
+    background-color: #202020;
+    border-radius: 6px;
+    pointer-events: none;
+    border-bottom: 1px solid #000000;
+    pointer-events: none;
+}
+#robots-overview .storage-box .pages .button.page {
+    position: static;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    display: inline-block;
+    box-sizing: border-box;
+    min-width: 20px;
+    background-color: #191919;
+    border-color: #393939;
+    margin: 2px 2px 0;
+    padding: 3px 6px;
+    z-index: 5;
+}
+#robots-overview .storage-box .pages .button.page[data-page="back"],
+#robots-overview .storage-box .pages .button.page[data-page="next"] {
+    position: absolute;
+    z-index: 10;
+}
+#robots-overview .storage-box .pages .button.page[data-page="back"] {
+    left: 0;
+    right: auto;
+}
+#robots-overview .storage-box .pages .button.page[data-page="next"] {
+    left: auto;
+    right: 0;
+}
+#robots-overview .storage-box .pages .button.page.active {
+    background-color: #efefef;
+    color: #090909;
+}
+#robots-overview .storage-box .pages .button.page.disabled {
+    color: #464646;
+    cursor: default;
+    pointer-events: none;
+    border-color: transparent;
+}
+
+#world #canvas #robots-overview .team-robots.focused,
+#world #canvas #robots-overview .storage-robots.focused {
+
+}
+#world #canvas #robots-overview .storage-robots.focused {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
 #robots-overview .storage-robots .bullets {
     display: block;
     position: absolute;
@@ -2070,85 +2183,6 @@ display: block;
     border: 0 none transparent;
     background-color: transparent;
     color: #cfcfcf;
-}
-#robots-overview .storage-robots .pages {
-    display: block;
-    position: absolute;
-    z-index: 20;
-    bottom: 9px;
-    left: 50px;
-    right: 12px;
-    padding: 0 36px 2px;
-    width: auto;
-    height: auto;
-    text-align: left;
-    color: #cfcfcf;
-    font-size: 12px;
-    line-height: 1.2;
-    font-weight: bold;
-    text-decoration: none;
-    background-color: transparent;
-    user-select: none;
-}
-#robots-overview .storage-robots .pages:before {
-    content: "";
-    display: block;
-    position: absolute;
-    top: 10px;
-    left: 26px;
-    right: 26px;
-    height: 6px;
-    background-color: #202020;
-    border-radius: 6px;
-    pointer-events: none;
-    border-bottom: 1px solid #000000;
-    pointer-events: none;
-}
-#robots-overview .storage-robots .pages .button.page {
-    position: static;
-    top: auto;
-    bottom: auto;
-    left: auto;
-    right: auto;
-    display: inline-block;
-    box-sizing: border-box;
-    min-width: 20px;
-    background-color: #191919;
-    border-color: #393939;
-    margin: 2px 2px 0;
-    padding: 3px 6px;
-    z-index: 5;
-}
-#robots-overview .storage-robots .pages .button.page[data-page="back"],
-#robots-overview .storage-robots .pages .button.page[data-page="next"] {
-    position: absolute;
-    z-index: 10;
-}
-#robots-overview .storage-robots .pages .button.page[data-page="back"] {
-    left: 0;
-    right: auto;
-}
-#robots-overview .storage-robots .pages .button.page[data-page="next"] {
-    left: auto;
-    right: 0;
-}
-#robots-overview .storage-robots .pages .button.page.active {
-    background-color: #efefef;
-    color: #090909;
-}
-#robots-overview .storage-robots .pages .button.page.disabled {
-    color: #464646;
-    cursor: default;
-    pointer-events: none;
-    border-color: transparent;
-}
-
-#world #canvas #robots-overview .team-robots.focused,
-#world #canvas #robots-overview .storage-robots.focused {
-
-}
-#world #canvas #robots-overview .storage-robots.focused {
-    background-color: rgba(0, 0, 0, 0.6);
 }
 
 #world #canvas #robots-overview .team-robot {

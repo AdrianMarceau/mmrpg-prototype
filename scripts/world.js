@@ -1431,6 +1431,9 @@ class mmrpgWorldMap {
         // Check to make sure the robotsOverview exists, and then bind events to its elements
         let $robotsOverview = _elements.robotsOverview;
         if ($robotsOverview && $robotsOverview.length){
+            // Collect some commonly used elements and data for use below and pre-calculate some values
+            let $storageButtons = $('.storage-button', $robotsOverview);
+            let $storageBoxes = $('.storage-box', $robotsOverview);
             let $teamSprites = _elements.teamSprites;
             let $robotsOnMap = $teamSprites.filter('.robot:not(.cursor)');
             let $teamRobotsDiv = $('.team-robots', $robotsOverview);
@@ -1445,10 +1448,63 @@ class mmrpgWorldMap {
             let storageRobotsWaiting = $storageRobotsInOverview.length;
             let numStoragePagesRequired = Math.ceil(storageRobotsWaiting / storageSlotsVisible);
             let currentStoragePageNum = 0;
+            // Define a function for disabling incompatible or distraction UI elements
+            let disableOtherElements = function(){
+                //console.log('%c' + 'disableOtherElements() called!', 'color: magenta;');
+                $homeButton.addClass('disabled');
+                $backButton.addClass('disabled');
+                $resetButton.addClass('disabled');
+                $playerSwitcher.addClass('disabled');
+                };
+            // Define a function for enabling the incompatible or distraction UI elements again
+            let enableOtherElements = function(){
+                //console.log('%c' + 'enableOtherElements() called!', 'color: magenta;');
+                $homeButton.removeClass('disabled');
+                $backButton.removeClass('disabled');
+                $resetButton.removeClass('disabled');
+                $playerSwitcher.removeClass('disabled');
+                };
+            // Define a function for expanding the robots-overview panel and showing a specific view
+            let showRobotsOverviewPanel = function(viewToken){
+                //console.log('%c' + 'showRobotsOverviewPanel(viewToken:' + (viewToken ? viewToken : typeof viewToken) + ') called!', 'color: magenta;');
+                // Otherwise we can expand (if not already) the panel and switch to this specific view
+                // and then disable the outside UI buttons to prevent bad-clicks and visual clutter
+                viewToken = viewToken && typeof viewToken === 'string' && viewToken.length ? viewToken : '';
+                $teamRobotsDiv.addClass('focused');
+                $robotsOverview.addClass('expanded').attr('data-view', viewToken);
+                $storageButtons.removeClass('active').filter('[data-view="' + viewToken + '"]').addClass('active');
+                _world.mapIsHidden = true; // set the map hidden state
+                disableOtherElements();
+                return;
+                };
+            // Define a function for dismissing the whole robots-overview panel and all views at-once
+            let disableRobotsOverview = function(){
+                //console.log('%c' + 'disableRobotsOverview() called!', 'color: magenta;');
+                enableOtherElements();
+                _world.mapIsHidden = false;
+                $robotsOverview.removeClass('expanded').attr('data-view', '');
+                $storageButtons.removeClass('active');
+                $teamRobotsDiv.removeClass('focused');
+                $storageBoxes.removeClass('focused');
+                $('.pages', $storageRobotsDiv).remove();
+                $('.bullets', $storageRobotsDiv).remove();
+                return;
+                };
             //console.log('-> storageSlotsVisible = ', storageSlotsVisible);
             //console.log('-> storageRobotsWaiting = ', storageRobotsWaiting);
             //console.log('-> numStoragePagesRequired = ', numStoragePagesRequired);
             //console.log('-> currentStoragePageNum = ', currentStoragePageNum);
+            // Bind a click event to the team-close button in the robots overview
+            let $closeButton = $('.team-close', $robotsOverview);
+            if ($closeButton && $closeButton.length){
+                $closeButton.bind('click', function(e){
+                    e.preventDefault();
+                    if (_self.worldIsBusy()){ return false; }
+                    //console.log('%c' + 'Team close button clicked!', 'color: cyan;');
+                    disableRobotsOverview();
+                    return true;
+                    });
+                }
             // Bind a click event to the team-rotate button in the robots overview
             let $rotateButton = $('.team-rotate', $robotsOverview);
             if ($rotateButton && $rotateButton.length){
@@ -1593,47 +1649,23 @@ class mmrpgWorldMap {
                         $('.button[data-page="next"]', $storageRobotsDiv).addClass('disabled');
                         }
                     };
-                // Define a function for disabling incompatible or distraction UI elements
-                let disableOtherElements = function(){
-                    //console.log('%c' + 'disableOtherElements() called!', 'color: magenta;');
-                    $homeButton.addClass('disabled');
-                    $backButton.addClass('disabled');
-                    $resetButton.addClass('disabled');
-                    $playerSwitcher.addClass('disabled');
-                    };
-                // Define a function for enabling the incompatible or distraction UI elements again
-                let enableOtherElements = function(){
-                    //console.log('%c' + 'enableOtherElements() called!', 'color: magenta;');
-                    $homeButton.removeClass('disabled');
-                    $backButton.removeClass('disabled');
-                    $resetButton.removeClass('disabled');
-                    $playerSwitcher.removeClass('disabled');
-                    };
                 // expand/collapse the robot storage tray by clicking the switch button
                 $switchButton.bind('click', function(e){
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return; }
-                    //console.log('%c' + 'Team switch button clicked!', 'color: cyan;');
-                    // First we start by either toggling the expanded class on the overview panel itself
-                    $robotsOverview.toggleClass('expanded');
-                    $teamRobotsInOverview.removeClass('selected');
-                    let isExpandedNow = $robotsOverview.is('.expanded');
-                    // if we're not expanded, run some cleanup then we're done
-                    if (!isExpandedNow){
-                        enableOtherElements();
-                        _world.mapIsHidden = false;
-                        $robotsOverview.attr('data-view', '');
-                        $('.pages', $storageRobotsDiv).remove();
-                        $('.bullets', $storageRobotsDiv).remove();
-                        $teamRobotsDiv.removeClass('focused');
-                        $storageRobotsDiv.removeClass('focused');
-                        return;  // if we're not expanded, then we're done here
+                    //console.log('%c' + 'Team-switch (robot-storage) button clicked!', 'color: cyan;');
+                    // Check if this panel is already active, and if so we collapse everything
+                    let alreadyExpanded = $robotsOverview.is('.expanded[data-view="robots"]') ? true : false;
+                    if (alreadyExpanded){
+                        // collapse everything and return as we're done here
+                        //console.log('-> robot-overview already expanded to "robots", so collapse!');
+                        disableRobotsOverview();
+                        return;
                         }
-                    // otherwise if we're expanded we need to run some setup
-                    _world.mapIsHidden = true; // set the map hidden state
-                    $robotsOverview.attr('data-view', 'robots'); // set the current panel
-                    // Disable the outside UI buttons to prevent bad-clicks and visual clutter
-                    disableOtherElements();
+                    // Expand the robot overview to the robot-storage view panel
+                    showRobotsOverviewPanel('robots');
+                    // Now we can run setup for the rest of the UI elements in this view
+                    $teamRobotsInOverview.removeClass('selected');
                     // Remake the storage bullets nad pages now
                     makeStorageBullets();
                     makeStoragePages();
@@ -1803,6 +1835,56 @@ class mmrpgWorldMap {
                 makeStoragePages();
                 goToStoragePage(1); // initialize to page 1
                 }
+            // Bind a click event to the team-items button in the robots overview
+            let $itemsButton = $('.team-items', $robotsOverview);
+            if ($itemsButton && $itemsButton.length){
+                // expand/collapse the item storage tray by clicking the items button
+                $itemsButton.bind('click', function(e){
+                    e.preventDefault();
+                    if (_self.worldIsBusy()){ return; }
+                    //console.log('%c' + 'Team-items (inventory) button clicked!', 'color: cyan;');
+                    // Check if this panel is already active, and if so we collapse everything
+                    let alreadyExpanded = $robotsOverview.is('.expanded[data-view="items"]') ? true : false;
+                    if (alreadyExpanded){
+                        // collapse everything and return as we're done here
+                        //console.log('-> robot-overview already expanded to "items", so collapse!');
+                        disableRobotsOverview();
+                        return;
+                        }
+                    // Expand the robot overview to the item-storage view panel
+                    showRobotsOverviewPanel('items');
+                    // Now we can run setup for the rest of the UI elements in this view
+                    console.warn('TODO: insert the rest of the item-storage bindings here');
+                    // Return true on success
+                    return true;
+                    });
+                // ....
+                }
+            // Bind a click event to the team-abilities button in the robots overview
+            let $abilitiesButton = $('.team-abilities', $robotsOverview);
+            if ($abilitiesButton && $abilitiesButton.length){
+                // expand/collapse the ability storage tray by clicking the abilities button
+                $abilitiesButton.bind('click', function(e){
+                    e.preventDefault();
+                    if (_self.worldIsBusy()){ return; }
+                    //console.log('%c' + 'Team-abilities (weapons) button clicked!', 'color: cyan;');
+                    // Check if this panel is already active, and if so we collapse everything
+                    let alreadyExpanded = $robotsOverview.is('.expanded[data-view="abilities"]') ? true : false;
+                    if (alreadyExpanded){
+                        // collapse everything and return as we're done here
+                        //console.log('-> robot-overview already expanded to "abilities", so collapse!');
+                        disableRobotsOverview();
+                        return;
+                        }
+                    // Expand the robot overview to the ability-storage view panel
+                    showRobotsOverviewPanel('abilities');
+                    // Now we can run setup for the rest of the UI elements in this view
+                    console.warn('TODO: insert the rest of the ability-storage bindings here');
+                    // Return true on success
+                    return true;
+                    });
+                // ....
+                }
             }
 
         // Define a function to run each time user inputs are updated so we can react
@@ -1832,7 +1914,9 @@ class mmrpgWorldMap {
             let worldMapIsHidden = _self.worldMapIsHidden();
             let sideButtonsActive = $sideButtons.is('.active') ? true : false;
             let playerSwitcherFocused = $playerSwitcher.is('.focused') ? true : false;
-            let robotStorageIsActive = $robotsOverview.is('.expanded') ? true : false;
+            let robotsOverviewIsExpanded = $robotsOverview.is('.expanded') ? true : false;
+            let currentRobotsOverviewPanel = robotsOverviewIsExpanded ? $robotsOverview.attr('data-view') : false;
+            //console.log('-> robotsOverviewIsExpanded =', robotsOverviewIsExpanded, '\n-> currentRobotsOverviewPanel =', currentRobotsOverviewPanel);
             // Define some quick actions that we may need to re-use a few times over
             let confirmSideButtonAction = function(){
                 if (!sideButtonsActive){ return; }
@@ -1880,20 +1964,8 @@ class mmrpgWorldMap {
                     return true;
                     }
                 }
-            // If the robot storage area is currently open, process those actions too
-            if (robotStorageIsActive){
-                // Collect references to key elements within the robots overview
-                let $teamRobotsDiv = $('.team-robots', $robotsOverview);
-                let $storageRobotsDiv = $('.storage-robots', $robotsOverview);
-                let $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
-                let $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
-                let focusedPanel = $storageRobotsDiv.is('.focused') ? 'storage' : 'team';
-                let focusedClass = focusedPanel === 'storage' ? 'hovered' : 'selected';
-                let $focusedDiv = focusedPanel === 'storage' ? $storageRobotsDiv : $teamRobotsDiv;
-                let $robotsInFocusedDiv = focusedPanel === 'storage' ? $storageRobotsInOverview : $teamRobotsInOverview;
-                //console.log('-> robotStorageIsActive =', robotStorageIsActive);
-                //console.log('-> focusedPanel =', focusedPanel, ' && focusedClass =', focusedClass);
-                //console.log('-> sideButtonsActive =', sideButtonsActive);
+            // If the robots overview is open, make sure we respond to panel-agnostic inputs
+            if (robotsOverviewIsExpanded){
                 // If the side buttons are active, then we use Start and B to control them specifically
                 if (sideButtonsActive){
                     // If the side buttons are available, we can use Start to click the save button and B to click cancel
@@ -1928,22 +2000,76 @@ class mmrpgWorldMap {
                 // Otherwise if no side buttons yet, then we use either Start or B to close the panel instead
                 else {
                     // If the player has pressed the start button again, attempt to close the storage area via the same button
-                    // (allow dismissing with the B button as well for convenience)
-                    if (activeInputs.Start || activeInputs.B){
+                    if (activeInputs.Start){
+                        // removed: || activeInputs.B  reason: we need B for other actions in-menu sorry
                         //console.log('%c' + 'Start key pressed!', 'color: orange;');
                         if (event){ event.preventDefault(); }
+                        let $closeButton = $('.team-close', $robotsOverview);
+                        if ($closeButton.length
+                            && $closeButton.is(':visible')
+                            && !$closeButton.is('.disabled')){
+                            $closeButton.addClass('clicked');
+                            $closeButton.trigger('click');
+                            setTimeout(function(){ $closeButton.removeClass('clicked'); }, 600);
+                            ignoreInputFor(900);
+                            return true;
+                            }
+                        }
+                    // If the player has pressed the L2 or R2 buttons, we should switch to other available buttons (robots/abilities/items)
+                    if (activeInputs.L2 || activeInputs.R2){
+                        //console.log('%c' + 'L2 or R2 key pressed!', 'color: orange;');
+                        if (event){ event.preventDefault(); }
                         let $switchButton = $('.team-switch', $robotsOverview);
-                        if ($switchButton.length
-                            && $switchButton.is(':visible')
-                            && !$switchButton.is('.disabled')){
-                            $switchButton.addClass('clicked');
-                            $switchButton.trigger('click');
-                            setTimeout(function(){ $switchButton.removeClass('clicked'); }, 600);
+                        let $abilitiesButton = $('.team-abilities', $robotsOverview);
+                        let $itemsButton = $('.team-items', $robotsOverview);
+                        //console.log('-> $switchButton =', $switchButton);
+                        //console.log('-> $abilitiesButton =', $abilitiesButton);
+                        //console.log('-> $itemsButton =', $itemsButton);
+                        let $availableButtons = $();
+                        if ($switchButton.length){ $availableButtons = $availableButtons.add($switchButton); }
+                        if ($abilitiesButton.length){ $availableButtons = $availableButtons.add($abilitiesButton); }
+                        if ($itemsButton.length){ $availableButtons = $availableButtons.add($itemsButton); }
+                        //console.log('->$availableButtons =', $availableButtons);
+                        if (!$availableButtons.length || $availableButtons.length < 2){ return false; }
+                        let $currentButton = $availableButtons.filter('.active').first();
+                        //console.log('-> $currentButton =', $currentButton);
+                        if (!$currentButton || !$currentButton.length){ return false; }
+                        let currentIndex = $availableButtons.index($currentButton);
+                        //console.log('-> currentIndex =', currentIndex);
+                        let newIndex = currentIndex;
+                        if (activeInputs.L2){ newIndex--; }
+                        else if (activeInputs.R2){ newIndex++; }
+                        if (newIndex < 0){ newIndex = $availableButtons.length - 1; }
+                        if (newIndex >= $availableButtons.length){ newIndex = 0; }
+                        //console.log('-> newIndex =', newIndex);
+                        let $newButton = $availableButtons.eq(newIndex);
+                        //console.log('-> $newButton =', $newButton);
+                        if ($newButton && $newButton.length && !$newButton.is($currentButton)){
+                            //console.log('-> switching to new button:', $newButton);
+                            $newButton.addClass('clicked');
+                            $newButton.trigger('click');
+                            setTimeout(function(){ $newButton.removeClass('clicked'); }, 600);
                             ignoreInputFor(900);
                             return true;
                             }
                         }
                     }
+                }
+            // If the robot storage area is currently open, process those actions too
+            if (robotsOverviewIsExpanded
+                && currentRobotsOverviewPanel === 'robots'){
+                // Collect references to key elements within the robots overview
+                let $teamRobotsDiv = $('.team-robots', $robotsOverview);
+                let $storageRobotsDiv = $('.storage-robots', $robotsOverview);
+                let $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
+                let $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
+                let focusedPanel = $storageRobotsDiv.is('.focused') ? 'storage' : 'team';
+                let focusedClass = focusedPanel === 'storage' ? 'hovered' : 'selected';
+                let $focusedDiv = focusedPanel === 'storage' ? $storageRobotsDiv : $teamRobotsDiv;
+                let $robotsInFocusedDiv = focusedPanel === 'storage' ? $storageRobotsInOverview : $teamRobotsInOverview;
+                //console.log('-> robotsOverviewIsExpanded =', robotsOverviewIsExpanded);
+                //console.log('-> focusedPanel =', focusedPanel, ' && focusedClass =', focusedClass);
+                //console.log('-> sideButtonsActive =', sideButtonsActive);
                 // If the player has pressed the A button, we can simply click whichever team-robot is currently focused
                 if (activeInputs.A){
                     //console.log('%c' + 'Confirm robot swap!', 'color: orange;');
