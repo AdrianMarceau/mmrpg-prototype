@@ -1805,8 +1805,8 @@ class rpg_world {
         $WORLD_SESSION = self::get_session();
         $WORLD_ROBOT_SESSIONS = &$WORLD_SESSION['robot_sessions'];
         $mmrpg_index_robots = self::get_index('robots');
-        $mmrpg_index_abilities = self::get_index('abilities');
         $mmrpg_index_items = self::get_index('items');
+        $mmrpg_index_abilities = self::get_index('abilities');
         $current_player_token = $this_prototype_data['this_player_token'];
         $player_starforce = rpg_game::starforce_unlocked();
         $limit_hearts = mmrpg_prototype_limit_hearts_earned($current_player_token);
@@ -1814,7 +1814,9 @@ class rpg_world {
         $storage_robot_tokens = mmrpg_prototype_robots_unlocked($current_player_token, true);
         $storage_robot_tokens = array_diff($storage_robot_tokens, $current_robot_tokens);
         $storage_item_tokens = array(); mmrpg_prototype_items_unlocked(true, $storage_item_tokens);
-        //error_log('$storage_item_tokens = '.print_r($storage_item_tokens, true));
+        $storage_ability_tokens = array(); mmrpg_prototype_abilities_unlocked('', '', $storage_ability_tokens);
+        //error_log('$storage_item_tokens('.count($storage_item_tokens).') = '.print_r($storage_item_tokens, true));
+        //error_log('$storage_ability_tokens('.count($storage_ability_tokens).') = '.print_r($storage_ability_tokens, true));
         $current_team_size = $limit_hearts;
         if ($current_team_size > $num_robot_unlocked){ $current_team_size = $num_robot_unlocked; }
         $get_rating_token = function($percent){
@@ -1844,7 +1846,7 @@ class rpg_world {
         if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<a class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></a>'; }
         else { $return_markup .= '<span class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></span>'; }
         // [robots-overview][team-abilities]
-        $return_markup .= '<a class="storage-button team-abilities" data-view="abilities"><i class="fa fas fa-compact-disc"></i><b>abilities</b></a>';
+        $return_markup .= '<a class="storage-button team-abilities" data-view="abilities"><i class="fa fas fa-fire-alt"></i><b>abilities</b></a>';
         // [robots-overview][team-items]
         $return_markup .= '<a class="storage-button team-items" data-view="items"><i class="fa fas fa-briefcase"></i><b>items</b></a>';
         // [robots-overview][limit-hearts]
@@ -2003,11 +2005,14 @@ class rpg_world {
                 $item_info = $mmrpg_index_items[$item_token];
                 $item_name = $item_info['item_name'];
                 $item_class = $item_info['item_class'];
-                $item_types = 'type'.(empty($item_info['item_type']) ? ' none' : ' '.$item_info['item_type'].(!empty($item_info['item_type2']) ? ' '.$item_info['item_type2'] : ''));
-                $item_display_types = 'type'.(empty($item_info['item_type']) && empty($item_info['item_type2']) ? ' none' : ((!empty($item_info['item_type']) ? ' '.$item_info['item_type'] : '').(!empty($item_info['item_type2']) ? ' '.$item_info['item_type2'] : '')));
+                $item_types = 'type '.(empty($item_info['item_type']) ? 'none' : $item_info['item_type'].(!empty($item_info['item_type2']) ? '_'.$item_info['item_type2'] : ''));
+                $item_display_types = 'type ';
+                if (empty($item_info['item_type']) && empty($item_info['item_type2'])){ $item_display_types .= 'none'; }
+                elseif (empty($item_info['item_type']) && !empty($item_info['item_type2'])){ $item_display_types .= $item_info['item_type2']; }
+                else { $item_display_types .= $item_info['item_type'].(!empty($item_info['item_type2']) ? '_'.$item_info['item_type2'] : ''); }
                 $item_sprite = self::get_sprite('item', $item_token, '', 'right', 'icon', '', '', 'icon');
                 $item_markup = '';
-                $item_markup .= '<div class="team-item" data-item="'.$item_token.'">';
+                $item_markup .= '<div class="team-item" data-item="'.$item_token.'" data-quantity="'.$item_quantity.'">';
                     $item_markup .= '<div class="image '.$item_display_types.'">';
                         $item_markup .= $item_sprite;
                     $item_markup .= '</div>';
@@ -2019,7 +2024,26 @@ class rpg_world {
         $return_markup .= '</div>';
         // [robots-overview][storage-abilities]
         $return_markup .= '<div class="storage-box storage-abilities">';
-            $return_markup .= '<div>&hellip; abilities &hellip;</div>';
+            //$return_markup .= '<div>&hellip; abilities &hellip;</div>';
+            foreach ($storage_ability_tokens AS $ability_key => $ability_token){
+                if ($ability_token === 'ability' || empty($mmrpg_index_abilities[$ability_token])){ continue; }
+                $ability_info = $mmrpg_index_abilities[$ability_token];
+                $ability_name = $ability_info['ability_name'];
+                $ability_types = 'type '.(empty($ability_info['ability_type']) ? 'none' : $ability_info['ability_type'].(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : ''));
+                $ability_display_types = 'type ';
+                if (empty($ability_info['ability_type']) && empty($ability_info['ability_type2'])){ $ability_display_types .= 'none'; }
+                elseif (empty($ability_info['ability_type']) && !empty($ability_info['ability_type2'])){ $ability_display_types .= $ability_info['ability_type2']; }
+                else { $ability_display_types .= $ability_info['ability_type'].(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : ''); }
+                $ability_sprite = self::get_sprite('ability', $ability_token, '', 'right', 'icon', '', '', 'icon');
+                $ability_markup = '';
+                $ability_markup .= '<div class="team-ability" data-ability="'.$ability_token.'">';
+                    $ability_markup .= '<div class="image">';
+                        $ability_markup .= str_replace('class="back"', 'class="back '.$ability_display_types.'"', $ability_sprite);
+                    $ability_markup .= '</div>';
+                    $ability_markup .= '<strong class="name'.(!strstr($ability_name, ' ') ? ' oneline' : '').'">'.str_replace(' ', '<br />', $ability_name).'</strong>';
+                $ability_markup .= '</div>';
+                $return_markup .= $ability_markup;
+            }
         $return_markup .= '</div>';
         // [robots-overview][close-button]
         $return_markup .= '<a class="team-close"><i class="fa fas fa-times"></i></a>';
