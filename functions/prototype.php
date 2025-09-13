@@ -1932,6 +1932,7 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
         elseif (empty($info['ability_flag_complete'])){ unset($ability_tokens[$key]); }
         elseif (!empty($info['ability_flag_hidden'])){ unset($ability_tokens[$key]); }
     }
+    $ability_tokens = array_values($ability_tokens);
 
     // Return the total amount of ability tokens pulled
     return !empty($ability_tokens) ? count($ability_tokens) : 0;
