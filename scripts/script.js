@@ -3531,8 +3531,9 @@ class mmrpgUserInputWatcher {
         let connectedGamepad = null;
         let gamepadTimeout = null;
         let watchGamepadInputs = function(gamepad){
-            connectedGamepad = gamepad;
-            if (!connectedGamepad){ return false; }
+            if (gamepad === null){ connectedGamepad = null; return; }
+            else if (typeof gamepad !== 'undefined'){ connectedGamepad = gamepad; }
+            if (!connectedGamepad || typeof connectedGamepad.index === 'undefined'){ return false; }
             let gp = navigator.getGamepads()[connectedGamepad.index];
             if (!gp){ return false; }
             //console.log('-> gp.buttons:', gp.buttons);
@@ -3562,7 +3563,7 @@ class mmrpgUserInputWatcher {
             if (gamepadTimeout){ clearTimeout(gamepadTimeout); }
             gamepadTimeout = setTimeout(function(){
                 requestAnimationFrame(function(){
-                    watchGamepadInputs(connectedGamepad);
+                    watchGamepadInputs();
                     });
                 }, _config.gamepadTimeout);
             };
