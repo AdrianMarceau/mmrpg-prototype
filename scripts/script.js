@@ -3503,9 +3503,9 @@ class mmrpgUserInputWatcher {
             return returnKey;
             };
 
-        // Define a function for taking a scroll-wheel event and translating it into L2 + R2 button presses
+        // Define a function for taking a scroll-wheel event and translating it into L1 + R1 button presses
         // (make sure we ignore deltas less than +/- threshold to avoid accidental button presses)
-        // (ignore the use-case above, L2 and R2 might be used for other stuff too so be generic)
+        // (ignore the use-case above, L1 and R1 might be used for other stuff too so be generic)
         let busyScrolling = false;
         let wheelThreshold = 150;
         let wheelTimeout = _config.wheelTimeout;
@@ -3516,7 +3516,7 @@ class mmrpgUserInputWatcher {
             if (event.wheelDelta > 0 && event.wheelDelta < wheelThreshold){ return false; }
             else if (event.wheelDelta < 0 && event.wheelDelta > (-1 * wheelThreshold)){ return false; }
             busyScrolling = true;
-            let inputKey = event.wheelDelta < 0 ? 'L2' : 'R2';
+            let inputKey = event.wheelDelta < 0 ? 'L1' : 'R1';
             if (typeof activeInputs[inputKey] === 'undefined'){
                 activeInputs[inputKey] = true;
                 }

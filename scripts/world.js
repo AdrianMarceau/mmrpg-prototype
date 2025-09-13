@@ -2264,8 +2264,8 @@ class mmrpgWorldMap {
                     _self.refreshMapPositionEvents(0, true);
                     ignoreInputFor(100);
                     }
-                // If the player has pressed either of the bumpers we should let them scroll within the player-switcher
-                if (activeInputs.L1 || activeInputs.R1 || activeInputs.LR1){
+                // If the player has pressed either of the triggers we should let them scroll within the player-switcher
+                if (activeInputs.L2 || activeInputs.R2 || activeInputs.LR2){
                     //console.log('%c' + 'Bumper key pressed!', 'color: orange;');
                     if (event){ event.preventDefault(); }
                     let $playerButtons = $('.team-player', $playerSwitcher);
@@ -2278,7 +2278,7 @@ class mmrpgWorldMap {
                         //console.log('%c' + 'Focusing player switcher!', 'color: orange;');
                         $playerSwitcher.addClass('focused');
                         $playerButtons.removeClass('hovered');
-                        if ((activeInputs.L1 && activeInputs.R1) || activeInputs.LR1){
+                        if ((activeInputs.L2 && activeInputs.R2) || activeInputs.LR2){
                             let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
                             let playerHistory = _config.playerHistory || [];
                             if (!playerIsCursor){
@@ -2299,7 +2299,7 @@ class mmrpgWorldMap {
                     // Otherwise if already-focused, the bumpers scroll and/or switch between players
                     else {
                         // If the player has pressed both bumpers at the same-time, quick-switch to/from cursor
-                        if ((activeInputs.L1 && activeInputs.R1) || activeInputs.LR1){
+                        if ((activeInputs.L2 && activeInputs.R2) || activeInputs.LR2){
                             //console.log('%c' + 'Both bumpers held, quick-switch to...', 'color: orange;');
                             let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
                             let playerHistory = _config.playerHistory || [];
@@ -2327,14 +2327,14 @@ class mmrpgWorldMap {
                             }
                         // Otherwise if just one is being pressed, we scroll in that direction to the next player
                         else {
-                            //console.log('%c' + (activeInputs.L1 ? 'L1' : 'R1') + ' held, switching to hovered player!', 'color: orange;');
+                            //console.log('%c' + (activeInputs.L2 ? 'L2' : 'R2') + ' held, switching to hovered player!', 'color: orange;');
                             $playerButtons.removeClass('hovered');
-                            if (activeInputs.L1){
+                            if (activeInputs.L2){
                                 let $prevPlayer = $hoveredPlayer.prevAll('.team-player').first();
                                 if (!$prevPlayer || !$prevPlayer.length){ $prevPlayer = $playerButtons.last(); }
                                 if ($prevPlayer.length){ $prevPlayer.addClass('hovered'); }
                                 }
-                            else if (activeInputs.R1){
+                            else if (activeInputs.R2){
                                 let $nextPlayer = $hoveredPlayer.nextAll('.team-player').first();
                                 if (!$nextPlayer || !$nextPlayer.length){ $nextPlayer = $playerButtons.first(); }
                                 if ($nextPlayer.length){ $nextPlayer.addClass('hovered'); }
@@ -2353,11 +2353,11 @@ class mmrpgWorldMap {
                     return true;
                     }
                 // If the player has pressed either of the triggers we should zoom/unzoom the map
-                if (activeInputs.L2 || activeInputs.R2 || activeInputs.LR2){
+                if (activeInputs.L1 || activeInputs.R1 || activeInputs.LR1){
                     //console.log('%c' + 'Trigger key pressed!', 'color: orange;');
                     //console.log('-> activeInputs: ', Object.keys(activeInputs).length ? activeInputs : 'none');
                     if (event){ event.preventDefault(); }
-                    if ( (activeInputs.L2 && activeInputs.R2) || activeInputs.LR2 ){
+                    if ( (activeInputs.L1 && activeInputs.R1) || activeInputs.LR1 ){
                         //console.log('%c' + 'Both triggers held, reset zoom!', 'color: orange;');
                         // when both are held, we reset the zoom
                         let oldZoom = _world.zoomLevel || 1;
@@ -2369,11 +2369,11 @@ class mmrpgWorldMap {
                             }
                         return true;
                         } else {
-                        //console.log('%c' + (activeInputs.L2 ? 'L2' : 'R2') + ' held, zooming ' + (activeInputs.L2 ? 'out' : 'in') + '!', 'color: orange;');
+                        //console.log('%c' + (activeInputs.L1 ? 'L1' : 'R2') + ' held, zooming ' + (activeInputs.L1 ? 'out' : 'in') + '!', 'color: orange;');
                         // otherwise we use L1 to zoom out and R1 to zoom in
                         let zoomDir = false;
-                        if (activeInputs.L2){ zoomDir = 'out'; }
-                        if (activeInputs.R2){ zoomDir = 'in'; }
+                        if (activeInputs.L1){ zoomDir = 'out'; }
+                        if (activeInputs.R1){ zoomDir = 'in'; }
                         let oldZoom = _world.zoomLevel || 1;
                         if (zoomDir === 'out'){ _self.decZoomLevel(null, true); }
                         else { _self.incZoomLevel(null, true); }
