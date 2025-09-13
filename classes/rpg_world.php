@@ -1805,12 +1805,16 @@ class rpg_world {
         $WORLD_SESSION = self::get_session();
         $WORLD_ROBOT_SESSIONS = &$WORLD_SESSION['robot_sessions'];
         $mmrpg_index_robots = self::get_index('robots');
+        $mmrpg_index_abilities = self::get_index('abilities');
+        $mmrpg_index_items = self::get_index('items');
         $current_player_token = $this_prototype_data['this_player_token'];
         $player_starforce = rpg_game::starforce_unlocked();
         $limit_hearts = mmrpg_prototype_limit_hearts_earned($current_player_token);
         $num_robot_unlocked = mmrpg_prototype_robots_unlocked($current_player_token);
         $storage_robot_tokens = mmrpg_prototype_robots_unlocked($current_player_token, true);
         $storage_robot_tokens = array_diff($storage_robot_tokens, $current_robot_tokens);
+        $storage_item_tokens = array(); mmrpg_prototype_items_unlocked(true, $storage_item_tokens);
+        //error_log('$storage_item_tokens = '.print_r($storage_item_tokens, true));
         $current_team_size = $limit_hearts;
         if ($current_team_size > $num_robot_unlocked){ $current_team_size = $num_robot_unlocked; }
         $get_rating_token = function($percent){
@@ -1830,10 +1834,10 @@ class rpg_world {
             else { return '03'; } // defeat
             };
         // [robots-overview][team-size]
-        if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>'; }
-        elseif ($num_robot_unlocked === 1){ $return_markup .= '<div class="team-size"><strong>1 robot</strong></div>'; }
-        elseif ($num_robot_unlocked === $current_team_size){ $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' robots</strong></div>'; }
-        else { $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>'; }
+        //if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>'; }
+        //elseif ($num_robot_unlocked === 1){ $return_markup .= '<div class="team-size"><strong>1 robot</strong></div>'; }
+        //elseif ($num_robot_unlocked === $current_team_size){ $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' robots</strong></div>'; }
+        //else { $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>'; }
         // [robots-overview][team-rotate]
         if ($num_robot_unlocked > 1){ $return_markup .= '<a class="team-rotate"><i class="fa fas fa-sync"></i></a>'; }
         // [robots-overview][team-switch]
@@ -1990,7 +1994,28 @@ class rpg_world {
         $return_markup .= '</div>';
         // [robots-overview][storage-items]
         $return_markup .= '<div class="storage-box storage-items">';
-            $return_markup .= '<div>&hellip; items &hellip;</div>';
+            //$return_markup .= '<div>&hellip; items &hellip;</div>';
+            foreach ($storage_item_tokens AS $item_token => $item_quantity){
+                if ($item_token === 'item' || empty($mmrpg_index_items[$item_token])){ continue; }
+                if (strstr($item_token, '-shard') && $item_quantity > MMRPG_SETTINGS_SHARDS_MAXQUANTITY){ $item_quantity = MMRPG_SETTINGS_SHARDS_MAXQUANTITY; }
+                elseif (strstr($item_token, '-core') && $item_quantity > MMRPG_SETTINGS_CORES_MAXQUANTITY){ $item_quantity = MMRPG_SETTINGS_CORES_MAXQUANTITY; }
+                elseif ($item_quantity > MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $item_quantity = MMRPG_SETTINGS_ITEMS_MAXQUANTITY; }
+                $item_info = $mmrpg_index_items[$item_token];
+                $item_name = $item_info['item_name'];
+                $item_class = $item_info['item_class'];
+                $item_types = 'type'.(empty($item_info['item_type']) ? ' none' : ' '.$item_info['item_type'].(!empty($item_info['item_type2']) ? ' '.$item_info['item_type2'] : ''));
+                $item_display_types = 'type'.(empty($item_info['item_type']) && empty($item_info['item_type2']) ? ' none' : ((!empty($item_info['item_type']) ? ' '.$item_info['item_type'] : '').(!empty($item_info['item_type2']) ? ' '.$item_info['item_type2'] : '')));
+                $item_sprite = self::get_sprite('item', $item_token, '', 'right', 'icon', '', '', 'icon');
+                $item_markup = '';
+                $item_markup .= '<div class="team-item" data-item="'.$item_token.'">';
+                    $item_markup .= '<div class="image '.$item_display_types.'">';
+                        $item_markup .= $item_sprite;
+                    $item_markup .= '</div>';
+                    $item_markup .= '<strong class="name'.(!strstr($item_name, ' ') ? ' oneline' : '').'">'.str_replace(' ', '<br />', $item_name).'</strong>';
+                    if ($item_class !== 'event'){ $item_markup .= '<span class="quantity">&times; '.$item_quantity.'</span>'; }
+                $item_markup .= '</div>';
+                $return_markup .= $item_markup;
+            }
         $return_markup .= '</div>';
         // [robots-overview][storage-abilities]
         $return_markup .= '<div class="storage-box storage-abilities">';

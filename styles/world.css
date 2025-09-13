@@ -1964,15 +1964,17 @@ html, body {
     height: calc(100% - 30px);
     max-height: 516px;
     width: 303px;
-    background-color: rgba(0, 0, 0, 0.4);
     background-color: #191919;
-    box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.6);
-    padding: 16px 0 28px 54px;
+    box-shadow: inset 2px 2px 0 #090909;
+    padding: 16px 0 28px 16px;
     border-radius: 9px 9px 9px 36px;
     overflow: visible;
     opacity: 0.0;
     pointer-events: none;
     transition: opacity 0.3s, top 0.6s;
+}
+#world #canvas #robots-overview .storage-robots {
+    padding-left: 54px;
 }
 #world #canvas #robots-overview[data-view="robots"].expanded .storage-robots,
 #world #canvas #robots-overview[data-view="items"].expanded .storage-items,
@@ -2689,6 +2691,95 @@ display: block;
 #world #canvas #robots-overview.expanded .team-robots:not(.focused):not(:hover) .team-robot,
 #world #canvas #robots-overview.expanded .storage-robots:not(.focused):not(:hover) .team-robot {
     opacity: 0.6;
+}
+
+#world #canvas #robots-overview .storage-items .team-item {
+    display: block;
+    box-sizing: border-box;
+    float: left;
+    clear: none;
+    position: relative;
+    z-index: 10;
+    margin: 0 4px 4px 0;
+    padding: 0px 34px 0px 29px;
+    height: 34px;
+    min-width: 128px;
+    width: calc((100% / 2) - 4px);
+    text-align: center;
+    color: #cfcfcf;
+    font-size: 12px;
+    line-height: 1.2;
+    text-shadow: 1px 1px 0 black;
+    filter: brightness(1) opacity(1);
+    outline: 1px solid transparent;
+    border-radius: 6px;
+    border: 1px solid #090909;
+    background-color: #363636;
+    background-image: none !important;
+    transform: translate(0, 0);
+    transition: outline 0.3s, background-color 0.3s, filter 0.3s;
+    overflow: hidden;
+    pointer-events: none;
+    cursor: pointer;
+}
+#world #canvas #robots-overview:hover .storage-items .team-item,
+#world #canvas #robots-overview.expanded .storage-items .team-item {
+    pointer-events: auto;
+}
+#world #canvas #robots-overview .storage-items .team-item:not(.disabled):hover {
+    transform: translate(0, -1px);
+    outline-color: #ffffff;
+}
+#world #canvas #robots-overview .storage-items .team-item.hidden {
+    display: none;
+}
+#world #canvas #robots-overview .storage-items .team-item .image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: auto;
+    width: 28px;
+    background-color: #292929;
+    border: 1px solid #191919;
+    border-right: none !important;
+    border-radius: 6px 0 0 6px;
+}
+#world #canvas #robots-overview .storage-items .team-item .image > .sprite {
+    position: absolute;
+    left: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.3));
+}
+#world #canvas #robots-overview .storage-items .team-item .name {
+    display: block;
+    padding: 3px 6px;
+    font-size: 11px;
+    line-height: 13px;
+    font-weight: bold;
+    text-align: center;
+    white-space: break-spaces;
+}
+#world #canvas #robots-overview .storage-items .team-item .name.oneline {
+    line-height: 26px;
+}
+#world #canvas #robots-overview .storage-items .team-item .quantity {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: 26px;
+    padding-right: 6px;
+    color: #ffffff;
+    background-color: #292929;
+    border: 1px solid #363636;
+    border-left: none !important;
+    border-radius: 0 6px 6px 0;
+    font-size: 10px;
+    line-height: 30px;
+    text-align: right;
 }
 
 #world #canvas #side-buttons {
