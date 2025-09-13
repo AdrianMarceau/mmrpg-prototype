@@ -77,7 +77,7 @@ gameSettings.worldConfig = {
     allowWorldEvents: false, // default until user interaction
     robotStorageSlotsVisible: 8, // probably wont change as it's what fits
     itemStorageSlotsVisible: 24, // probably wont change as it's what fits
-    abilityStorageSlotsVisible: 12, // probably wont change as it's what fits
+    abilityStorageSlotsVisible: 24, // probably wont change as it's what fits
     robotStatModMax: 5, // match the battle system
     robotStatModMin: -5, // match the battle system
     itemInventoryMax: 99, // match the battle system
@@ -1473,7 +1473,8 @@ class mmrpgWorldMap {
                 // Otherwise we can expand (if not already) the panel and switch to this specific view
                 // and then disable the outside UI buttons to prevent bad-clicks and visual clutter
                 viewToken = viewToken && typeof viewToken === 'string' && viewToken.length ? viewToken : '';
-                $teamRobotsDiv.addClass('focused');
+                $storageRobotsDiv.removeClass('unfocused');
+                $teamRobotsDiv.addClass('focused').removeClass('unfocused');
                 $robotsOverview.addClass('expanded').attr('data-view', viewToken);
                 $storageButtons.removeClass('active').filter('[data-view="' + viewToken + '"]').addClass('active');
                 _world.mapIsHidden = true; // set the map hidden state
@@ -1487,8 +1488,8 @@ class mmrpgWorldMap {
                 _world.mapIsHidden = false;
                 $robotsOverview.removeClass('expanded').attr('data-view', '');
                 $storageButtons.removeClass('active');
-                $teamRobotsDiv.removeClass('focused');
-                $storageBoxes.removeClass('focused');
+                $teamRobotsDiv.removeClass('focused').removeClass('unfocused');
+                $storageBoxes.removeClass('focused').removeClass('unfocused');
                 $('.pages', $storageRobotsDiv).remove();
                 $('.bullets', $storageRobotsDiv).remove();
                 return;
@@ -1960,10 +1961,8 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
-                // ....
-                // make sure we show the first page of storage items by default
-                //makeStoragePages('items');
-                //goToStoragePage('items', 1); // initialize to page 1
+                // TODO: add event bindings for the actual items within the storage panel
+                // ...
                 }
             // Bind a click event to the team-abilities button in the robots overview
             let $abilitiesButton = $('.team-abilities', $robotsOverview);
@@ -1985,10 +1984,26 @@ class mmrpgWorldMap {
                     showRobotsOverviewPanel('abilities');
                     // Now we can run setup for the rest of the UI elements in this view
                     console.warn('TODO: insert the rest of the ability-storage bindings here');
+                    // Remake the storage pages for the abilities now
+                    makeStoragePages('abilities');
+                    goToStoragePage('abilities', 1);
+                    // Mark the team-robots side as the focused one to start
+                    // and the first robot in the overview as selected via class
+                    $teamRobotsDiv.addClass('focused');
+                    $teamRobotsInOverview.removeClass('selected');
+                    let $firstOverviewRobot = $teamRobotsInOverview.first();
+                    $firstOverviewRobot.addClass('selected');
+                    if ($sideButtons.is('.active')){
+                        //console.log('-> side buttons active, make sure we dismiss!');
+                        let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
+                        $sideButtons.removeClass('maybe');
+                        $dismissButton.trigger('click');
+                        }
                     // Return true on success
                     return true;
                     });
-                // ....
+                // TODO: add event bindings for the actual abilities within the storage panel
+                // ...
                 }
             }
 
@@ -2135,8 +2150,9 @@ class mmrpgWorldMap {
                         let $backButton = $('.button[data-page="back"]:not(.disabled)', $storageObjectsDiv);
                         let $nextButton = $('.button[data-page="next"]:not(.disabled)', $storageObjectsDiv);
                         let clickButton = function($button){
-                            $button.addClass('clicked').trigger('click');
-                            setTimeout(function(){ $button.removeClass('clicked'); }, 600);
+                            $button.trigger('click');
+                            //$button.addClass('clicked').trigger('click');
+                            //setTimeout(function(){ $button.removeClass('clicked'); }, 600);
                             };
                         if (activeInputs.L1){
                             let $backOrLastButton;
@@ -2220,8 +2236,8 @@ class mmrpgWorldMap {
                     // If the team robots are focused, clicking A simply affirms the already-selected robot and
                     // then auto-swaps over to the storage panel for actually chosing the robot to swap with
                     if (focusedPanel === 'team'){
-                        $teamRobotsDiv.removeClass('focused');
-                        $storageRobotsDiv.addClass('focused');
+                        $teamRobotsDiv.removeClass('focused').addClass('unfocused');
+                        $storageRobotsDiv.addClass('focused').removeClass('unfocused');
                         $('.team-robot', $teamRobotsDiv).removeClass('hovered');
                         $('.team-robot', $storageRobotsDiv).removeClass('hovered');
                         let $firstRobot = $('.team-robot:not(.hidden)', $storageRobotsDiv).first();
@@ -2241,8 +2257,8 @@ class mmrpgWorldMap {
                         setTimeout(function(){
                             $('.team-robot', $storageRobotsDiv).removeClass('hovered');
                             $('.team-robot', $teamRobotsDiv).removeClass('hovered');
-                            $storageRobotsDiv.removeClass('focused');
-                            $teamRobotsDiv.addClass('focused');
+                            $storageRobotsDiv.removeClass('focused').addClass('unfocused');
+                            $teamRobotsDiv.addClass('focused').removeClass('unfocused');
                             }, 100);
                         }
                     ignoreInputFor(300);
@@ -2260,8 +2276,8 @@ class mmrpgWorldMap {
                         let newPanel = oldPanel === 'team' ? 'storage' : 'team';
                         let $oldPanel = oldPanel === 'team' ? $teamRobotsDiv : $storageRobotsDiv;
                         let $newPanel = newPanel === 'team' ? $teamRobotsDiv : $storageRobotsDiv;
-                        $oldPanel.removeClass('focused');
-                        $newPanel.addClass('focused');
+                        $oldPanel.removeClass('focused').addClass('unfocused');
+                        $newPanel.addClass('focused').removeClass('unfocused');
                         $('.team-robot', $oldPanel).removeClass('hovered');
                         $('.team-robot', $newPanel).removeClass('hovered');
                         if (newPanel === 'team'){

@@ -2110,32 +2110,51 @@ html, body {
     pointer-events: none;
 }
 #robots-overview .storage-box .pages .button.page {
-    position: static;
+    position: relative;
     top: auto;
     bottom: auto;
     left: auto;
     right: auto;
     display: inline-block;
     box-sizing: border-box;
-    min-width: 20px;
+    min-width: 22px;
+    min-width: calc((100% / 5) - 4px);
     background-color: #191919;
     border-color: #393939;
+    color: #cfcfcf;
     margin: 2px 2px 0;
-    padding: 3px 6px;
+    padding: 3px;
+    font-size: 12px;
+    line-height: 1.2;
+    font-weight: bold;
     z-index: 5;
+    user-select: none;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+#robots-overview .storage-box .pages .button.page:hover,
+#robots-overview .storage-box .pages .button.page.clicked {
+    background-color: #292929;
+    border-color: #cfcfcf;
+    color: #ffffff;
+}
+#robots-overview .storage-box .pages .button.page:focus {
+    outline: 0;
 }
 #robots-overview .storage-box .pages .button.page[data-page="back"],
 #robots-overview .storage-box .pages .button.page[data-page="next"] {
     position: absolute;
     z-index: 10;
+    top: 0;
+    min-width: 22px;
 }
 #robots-overview .storage-box .pages .button.page[data-page="back"] {
-    left: 0;
+    left: 12px;
     right: auto;
 }
 #robots-overview .storage-box .pages .button.page[data-page="next"] {
     left: auto;
-    right: 0;
+    right: 12px;
 }
 #robots-overview .storage-box .pages .button.page.active {
     background-color: #efefef;
