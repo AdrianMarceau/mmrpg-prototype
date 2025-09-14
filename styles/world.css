@@ -177,7 +177,7 @@ html, body {
     will-change: transform;
 }
 #world.ready #canvas #map {
-    transition: filter 0.6s ease-in, transform 0.9s ease-out;
+    transition: filter 0.6s ease-in, transform 1.8s ease-in-out;
 }
 #world.ready #canvas #map .layer[data-layer="background"] {
     transition: transform 1s ease-in-out;

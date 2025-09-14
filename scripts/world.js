@@ -81,6 +81,10 @@ gameSettings.worldConfig = {
     robotStatModMax: 5, // match the battle system
     robotStatModMin: -5, // match the battle system
     itemInventoryMax: 99, // match the battle system
+    defaultZoomLevel: 1.0, // slightly zoomed in
+    zoomIncrement: 0.5, // zoom in/out by this amount
+    minZoomLevel: 0.5, // slightly zoomed in
+    maxZoomLevel: 2.0, // slightly zoomed in
     };
 gameSettings.worldState = {
     cursor: {
@@ -134,6 +138,7 @@ class mmrpgWorldMap {
         _self.config = gameSettings.worldConfig;
         _self.elements = gameSettings.worldElements;
         _self.state = gameSettings.worldState;
+        _self.initConfig();
         _self.initWorld($mmrpg);
         }
 
@@ -153,6 +158,18 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let activeWindowEvent = gameSettings.activeWindowEvent ? true : false;
         return _world.mapIsHidden || activeWindowEvent;
+        }
+
+    // Quick function to initialize default settings
+    initConfig(){
+        //console.log('%c' + 'mmrpgWorldMap.initConfig()', 'color: green;');
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        _world.zoomLevel = _config.defaultZoomLevel;
+        _world.userZoomLevel = _config.defaultZoomLevel; // TODO: remember this on reload
+        return true;
         }
 
     // Quick function to initialize world map variables
@@ -2979,6 +2996,7 @@ class mmrpgWorldMap {
         updateUserZoom = typeof updateUserZoom === 'boolean' ? updateUserZoom : false;
         _world.zoomLevel = newZoomLevel;
         if (updateUserZoom){ _world.userZoomLevel = newZoomLevel; }
+        //console.log('-> _world.zoomLevel =', _world.zoomLevel, '\n-> _world.userZoomLevel =', _world.userZoomLevel);
         _self.scrollMap();
         return true;
         }
@@ -2991,26 +3009,36 @@ class mmrpgWorldMap {
             return false;
             }
         let _self = this;
+        let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
-        let userZoomLevel = _world.userZoomLevel || 1;
+        let userZoomLevel = _world.userZoomLevel || _config.defaultZoomLevel;
         userZoomLevel += modAmount;
-        if (userZoomLevel < 0.5){ userZoomLevel = 0.5; }
-        else if (userZoomLevel > 2){ userZoomLevel = 2; }
+        if (userZoomLevel < _config.minZoomLevel){ userZoomLevel = _config.minZoomLevel; }
+        else if (userZoomLevel > _config.maxZoomLevel){ userZoomLevel = _config.maxZoomLevel; }
         return _self.updateZoomLevel(userZoomLevel, updateUserZoom);
         }
-    incZoomLevel(boostAmount, updateUserZoom){ return this.modZoomLevel((boostAmount || 0.25), updateUserZoom); }
-    decZoomLevel(decAmount, updateUserZoom){ return this.modZoomLevel(-(decAmount || 0.25), updateUserZoom); }
+    incZoomLevel(boostAmount, updateUserZoom){
+        let _self = this;
+        let _config = _self.config;
+        return this.modZoomLevel((boostAmount || _config.zoomIncrement), updateUserZoom);
+        }
+    decZoomLevel(decAmount, updateUserZoom){
+        let _self = this;
+        let _config = _self.config;
+        return this.modZoomLevel(-(decAmount || _config.zoomIncrement), updateUserZoom);
+        }
 
     // Quick function for resetting the map's zoom level to the user's current setting
     resetZoomLevel(){
         //console.log('%c' + 'mmrpgWorldMap.resetZoomLevel()', 'color: magenta;');
         let _self = this;
+        let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
-        let userZoomLevel = _world.userZoomLevel || 1;
-        if (userZoomLevel < 0.5){ userZoomLevel = 0.5; }
-        else if (userZoomLevel > 2){ userZoomLevel = 2; }
+        let userZoomLevel = _world.userZoomLevel || _config.defaultZoomLevel;
+        if (userZoomLevel < _config.minZoomLevel){ userZoomLevel = _config.minZoomLevel; }
+        else if (userZoomLevel > _config.maxZoomLevel){ userZoomLevel = _config.maxZoomLevel; }
         _self.updateZoomLevel(userZoomLevel, true);
         return true;
         }
@@ -3034,7 +3062,7 @@ class mmrpgWorldMap {
         let _self = this;
         let _elements = _self.elements;
         let _world = _self.state;
-        let currentZoomLevel = _world.zoomLevel || 1;
+        let currentZoomLevel = _world.zoomLevel || _config.defaultZoomLevel;
         if (currentZoomLevel >= maxZoomLevel){ return true; }
         let newZoomLevel = currentZoomLevel + zoomIncrement;
         if (newZoomLevel > maxZoomLevel){ newZoomLevel = maxZoomLevel; }
