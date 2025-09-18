@@ -5,14 +5,6 @@ let $thisWorld = false;
 let $thisCanvas = false;
 
 // Expand the game settings object with a variable world specific data
-gameSettings.worldElements = {
-    mmrpg: null,
-    world: null,
-    canvas: null,
-    map: null,
-    layers: null,
-    cursor: null,
-    };
 gameSettings.worldConfig = {
     userId: 0,
     playerId: 0,
@@ -126,6 +118,22 @@ gameSettings.worldState = {
     allowHovers: true, // allow hover effects on tiles
     allowClicks: true, // allow click events on tiles
     };
+gameSettings.worldIndexes = {
+    types: {},
+    players: {},
+    robots: {},
+    items: {},
+    abilities: {},
+    fields: {},
+    };
+gameSettings.worldElements = {
+    mmrpg: null,
+    world: null,
+    canvas: null,
+    map: null,
+    layers: null,
+    cursor: null,
+    };
 gameSettings.worldHasLoaded = false;
 
 // Create the mmrpgWorldMap class object for this mode
@@ -136,8 +144,10 @@ class mmrpgWorldMap {
         //console.log('%c' + 'mmrpgWorldMap() constructor', 'color: green;');
         let _self = this;
         _self.config = gameSettings.worldConfig;
+        _self.indexes = gameSettings.worldIndexes;
         _self.elements = gameSettings.worldElements;
         _self.state = gameSettings.worldState;
+        if (!_self.checkIndexes()){ return false; }
         _self.initConfig();
         _self.initWorld($mmrpg);
         }
@@ -169,6 +179,31 @@ class mmrpgWorldMap {
         let _world = _self.state;
         _world.zoomLevel = _config.defaultZoomLevel;
         _world.userZoomLevel = _config.defaultZoomLevel; // TODO: remember this on reload
+        return true;
+        }
+
+    // Quick function to check all indexes are loaded with data
+    checkIndexes(){
+        console.log('%c' + 'mmrpgWorldMap.checkIndexes()', 'color: green;');
+        let _self = this;
+        let _config = _self.config;
+        let _indexes = _self.indexes;
+        let requiredIndexes = Object.keys(_indexes);
+        let missingIndexes = [];
+        //console.log('-> _indexes:', _indexes);
+        //console.log('-> requiredIndexes:', requiredIndexes);
+        for (var i = 0; i < requiredIndexes.length; i++){
+            let indexName = requiredIndexes[i];
+            let indexData = _indexes[indexName] || false;
+            if (!indexData || typeof indexData !== 'object' || !Object.keys(indexData).length){
+                missingIndexes.push(indexName);
+                }
+            }
+        //console.log('-> missingIndexes:', missingIndexes);
+        if (missingIndexes.length){
+            console.error('checkIndexes() missing required indexes:', missingIndexes);
+            return false;
+            }
         return true;
         }
 

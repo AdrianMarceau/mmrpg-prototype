@@ -119,12 +119,14 @@ if (!empty($_POST['action']) && $_POST['action'] === 'save'
 }
 
 // Pull in a few indexes that we'll need for below
+$mmrpg_index_types = rpg_type::get_index(true);
 $mmrpg_index_fields = rpg_field::get_index(true);
 $mmrpg_index_players = rpg_player::get_index(true);
 $mmrpg_index_robots = rpg_robot::get_index(true);
 $mmrpg_index_abilities = rpg_ability::get_index(true);
 $mmrpg_index_items = rpg_item::get_index(true);
 $mmrpg_indexes = array(
+    'types' => &$mmrpg_index_types,
     'fields' => &$mmrpg_index_fields,
     'players' => &$mmrpg_index_players,
     'robots' => &$mmrpg_index_robots,
@@ -593,25 +595,39 @@ $flag_skip_fadein = true;
 <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/world.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="content/all.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript">
 
 // Update relevent game settings and flags
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 
 // Update relevant world-specific game settings and flags
-let _worldConfig = gameSettings.worldConfig;
-_worldConfig.userId = <?= rpg_game::get_userid() ?>;
-_worldConfig.playerId = <?= json_encode($this_prototype_data['this_player_id']) ?>;
-_worldConfig.playerToken = <?= json_encode($this_prototype_data['this_player_token']) ?>;
-_worldConfig.playerRobots = <?= json_encode($this_prototype_data['this_player_robots']) ?>;
-_worldConfig.playerAbilities = <?= json_encode($this_prototype_data['this_player_abilities']) ?>;
-_worldConfig.playerRobotsIndex = <?= json_encode($this_prototype_data['this_player_robots_index']) ?>;
-_worldConfig.playerItemsIndex = <?= json_encode($this_prototype_data['this_player_items_index']) ?>;
-_worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility']) ?>;
-_worldConfig.playerHistory = <?= json_encode($world_player_session_history) ?>;
-_worldConfig.backButtonURL = 'prototype.php';
-_worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=spawn';
-_worldConfig.resetButtonURL = 'world.php?reset=world';
+(function(){
+    let _worldConfig = gameSettings.worldConfig;
+    _worldConfig.userId = <?= rpg_game::get_userid() ?>;
+    _worldConfig.playerId = <?= json_encode($this_prototype_data['this_player_id'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerToken = <?= json_encode($this_prototype_data['this_player_token'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerRobots = <?= json_encode($this_prototype_data['this_player_robots'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerAbilities = <?= json_encode($this_prototype_data['this_player_abilities'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerRobotsIndex = <?= json_encode($this_prototype_data['this_player_robots_index'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerItemsIndex = <?= json_encode($this_prototype_data['this_player_items_index'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerHistory = <?= json_encode($world_player_session_history, JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.backButtonURL = 'prototype.php';
+    _worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=spawn';
+    _worldConfig.resetButtonURL = 'world.php?reset=world';
+    //console.log('_worldConfig:', typeof _worldConfig, _worldConfig);
+    if (typeof mmrpgIndex !== 'undefined'){
+        let _worldIndexes = gameSettings.worldIndexes;
+        _worldIndexes.types = typeof mmrpgIndex.types !== 'undefined' ? mmrpgIndex.types : {};
+        _worldIndexes.players = typeof mmrpgIndex.players !== 'undefined' ? mmrpgIndex.players : {};
+        _worldIndexes.robots = typeof mmrpgIndex.robots !== 'undefined' ? mmrpgIndex.robots : {};
+        _worldIndexes.abilities = typeof mmrpgIndex.abilities !== 'undefined' ? mmrpgIndex.abilities : {};
+        _worldIndexes.items = typeof mmrpgIndex.items !== 'undefined' ? mmrpgIndex.items : {};
+        _worldIndexes.fields = typeof mmrpgIndex.fields !== 'undefined' ? mmrpgIndex.fields : {};gameSettings.worldIndexes = mmrpgIndex;
+        //console.log('_worldIndexes:', typeof _worldIndexes, _worldIndexes);
+        }
+})();
 
 // Create the document ready events
 $(document).ready(function(){
