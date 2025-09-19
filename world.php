@@ -465,10 +465,10 @@ $flag_skip_fadein = true;
 <link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 </head>
 <body id="mmrpg" class="world <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?>">
-<!-- preload content indexes -->
+<!-- (1) preload content indexes -->
 <link type="text/css" href="content/all.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <script type="text/javascript" src="content/all.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<!-- generate world markup -->
+<!-- (2) generate world markup -->
 <div id="world" class="hidden <?= $flag_skip_fadein ? 'fastfade' : '' ?>">
     <div id="canvas">
         <div class="wrapper">
@@ -561,7 +561,6 @@ $flag_skip_fadein = true;
                     echo($rivals_layer_markup);
                 echo('</div>'.PHP_EOL);
 
-
                 // END OF LAYERS
                 ?>
             </div>
@@ -588,18 +587,14 @@ $flag_skip_fadein = true;
             <? if (!empty($player_switcher_markup)){ ?><div id="player-switcher" class="chrome"><?= $player_switcher_markup ?></div><? } ?>
             <? if (!empty($robots_overview_markup)){ ?><div id="robots-overview" class="chrome"><?= $robots_overview_markup ?></div><? } ?>
             <div id="loading-icon" class="chrome"><i class="fa fas fa-spinner"></i></div>
-            <?
-            // DEBUG DEBUG DEBUG
-            echo('<pre data-var="$map_data_parsed" style="display: none;"><!-- $map_data_parsed = '.print_r($map_data_parsed, true).' --></pre>');
-            ?>
         </div>
     </div>
 </div>
-<!-- start loading world scripts and dependencies into memory  -->
+<!-- (3) start to load world scripts  -->
 <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/world.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<!-- define game settings and world config values then preload content indexes -->
+<!-- (4) define game settings/config/indexes -->
 <script type="text/javascript">
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 (function(){
@@ -627,7 +622,7 @@ $flag_skip_fadein = true;
         }
 })();
 </script>
-<!-- queue document ready events for when everything is finally loaded -->
+<!-- (5) queue document ready events -->
 <script type="text/javascript">
 $(document).ready(function(){
 
@@ -658,6 +653,13 @@ $(document).ready(function(){
 require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php');
 // Unset the database variable
 unset($db);
+?>
+<?
+// DEBUG DEBUG DEBUG
+echo('<!-- [[debug]] --//'.PHP_EOL);
+echo('  -> $map_data_parsed = '.trim(print_r($map_data_parsed, true)).PHP_EOL);
+echo('//-- [[debug]] -->'.PHP_EOL);
+// DEBUG DEBUG DEBUG
 ?>
 </body>
 </html>
