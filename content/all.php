@@ -5,6 +5,7 @@ require(MMRPG_CONFIG_ROOTDIR.'content/index.php');
 //echo('<pre>$content_types_index = '.print_r($base_dir, true).'</pre>');
 
 // Define an array to hold the overall JSON data to return
+$auto_parse_fields = isset($auto_parse_fields) ? $auto_parse_fields : true;
 $allowed_indexed = isset($allowed_indexed) ? $allowed_indexed : array('types', 'players', 'robots', 'items', 'skills', 'abilities', 'fields');
 $mmrpg_indexes = isset($mmrpg_indexes) ? $mmrpg_indexes : array();
 $return_only = !empty($_REQUEST['return']) ? explode(',', trim($_REQUEST['return'])) : array();
@@ -13,7 +14,7 @@ foreach ($content_types_index AS $key => $content_info){
     $content_xtype = $content_info['xtoken'];
     if (!in_array($content_xtype, $allowed_indexed)){ continue; }
     if (!empty($return_only) && !in_array($content_xtype, $return_only)){ continue; }
-    $mmrpg_indexes[$content_xtype] = $content_index = array();
+    $content_index = array();
     if ($content_xtype === 'types'){ $content_index = rpg_type::get_index(true); }
     if ($content_xtype === 'players'){ $content_index = rpg_player::get_index(true); }
     if ($content_xtype === 'robots'){ $content_index = rpg_robot::get_index(true); }
@@ -21,7 +22,9 @@ foreach ($content_types_index AS $key => $content_info){
     if ($content_xtype === 'skills'){ $content_index = rpg_skill::get_index(true); }
     if ($content_xtype === 'abilities'){ $content_index = rpg_ability::get_index(true); }
     if ($content_xtype === 'fields'){ $content_index = rpg_field::get_index(true); }
-    if (empty($content_index)){ continue; }
+    $content_index = !empty($content_index) ? $content_index : array();
+    $mmrpg_indexes[$content_xtype] = $content_index;
+    if (empty($content_index) || !$auto_parse_fields){ continue; }
     foreach ($content_index AS $token => $old_info){
         $new_info = array();
         foreach ($old_info AS $old_field => $value){
