@@ -11,7 +11,7 @@
 #---------------------------#
 @field       = prototype-subspace
 #---------------------------#
-@pickups      = space-shard(60),shadow-shard(40),empty-shard(20),super-pellet(10),super-capsule(5),attack-booster(1),defense-booster(1),speed-booster(1)
+@pickups      = space-shard(60),shadow-shard(40),empty-shard(20),super-pellet(10),super-capsule(5),attack-booster(1),defense-booster(1),speed-booster(1),extra-life(1),yashichi(1)
 #---------------------------#
 @encounters = dark-frag(12),trille-bot(6),novamite(3),mega-man-ds(1),bass-ds(1),proto-man-ds(1)
 @groups[]   = no-encounters_da1-exit-buffer(9-5...11-7)
