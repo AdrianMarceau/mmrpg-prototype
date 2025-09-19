@@ -20,12 +20,13 @@ if (!empty($mmrpg_indexes)){
     // Loop through all the index objects that have sprites and generate the styles for them
     rpg_world::preload_indexes($mmrpg_indexes);
     $object_sprite_kinds = array('player', 'robot', 'ability', 'item');
-    $print_index_styles = function($object_kind) use ($mmrpg_indexes){
+    $object_styles_common = '';
+    $object_styles_sprites = '';
+    $object_styles_sprites_alts = '';
+    $get_index_styles = function($object_kind) use ($mmrpg_indexes, &$object_styles_common, &$object_styles_sprites, &$object_styles_sprites_alts){
         $object_xkind = rpg_world::get_xkind($object_kind);
         if (!empty($mmrpg_indexes[$object_xkind])){
             $object_index = $mmrpg_indexes[$object_xkind];
-            //echo ('#mmrpg .sprite.'.$object_kind.' { /* ... */ }'.PHP_EOL);
-            //echo ('#mmrpg .sprite.'.$object_kind.' .wrap { /* ... */ }'.PHP_EOL);
             // Check if this is one of the sprite types that uses one large composite sprite sheet and set a flag
             $use_composite = $object_xkind === 'items' || $object_xkind === 'abilities' ? true : false;
             // If we're using a composite sprite sheet, we need to set some common styles on the inner .sprite element
@@ -39,7 +40,7 @@ if (!empty($mmrpg_indexes)){
                 if (!empty($pseudo_meta['sheetSize'])){ $inner_styles['background-size'] = $pseudo_meta['sheetSize'][0].'px '.$pseudo_meta['sheetSize'][1].'px'; }
                 $inner_styles_string = !empty($inner_styles) ? implode('; ', array_map(function($v, $k){ return $k.': '.$v.' !important'; }, $inner_styles, array_keys($inner_styles))) : '';
                 //error_log('-> $inner_styles_string = '.print_r($inner_styles_string, true));
-                if (!empty($inner_styles_string)){ echo ('#mmrpg .sprite.'.$object_kind.' .wrap .sprite { '.$inner_styles_string.' }'.PHP_EOL); }
+                if (!empty($inner_styles_string)){ $object_styles_common .= ('#mmrpg .sprite.'.$object_kind.' .wrap .sprite { '.$inner_styles_string.' }'.PHP_EOL); }
                 }
             // Now we can loop through the actual objects of this type and generate their individual styles where applicable
             foreach ($object_index AS $object_token => $object_info){
@@ -56,7 +57,7 @@ if (!empty($mmrpg_indexes)){
                 $outer_styles = array();
                 if (!empty($sprite_meta['spriteSpeed']) && $sprite_meta['spriteSpeed'] !== 1){ $outer_styles['--sprite-speed'] = $sprite_meta['spriteSpeed']; }
                 $outer_styles_string = !empty($outer_styles) ? implode('; ', array_map(function($v, $k){ return $k.': '.$v.' !important'; }, $outer_styles, array_keys($outer_styles))) : '';
-                if (!empty($outer_styles_string)){ echo('#mmrpg .sprite.'.$object_kind.'[data-token="'.$object_token.'"] { '.$outer_styles_string.' }'.PHP_EOL); }
+                if (!empty($outer_styles_string)){ $object_styles_sprites .= ('#mmrpg .sprite.'.$object_kind.'[data-token="'.$object_token.'"] { '.$outer_styles_string.' }'.PHP_EOL); }
                 $inner_styles = array();
                 if ($use_composite && !empty($sprite_meta['sheetOffset'])){ $inner_styles['background-position'] = $sprite_meta['sheetOffset'][0].'px '.$sprite_meta['sheetOffset'][1].'px'; }
                 if (!$use_composite && !empty($sprite_meta['sheetPath'])){ $inner_styles['background-image'] = 'url(../'.$sprite_meta['sheetPath'].'?'.MMRPG_CONFIG_CACHE_DATE.')'; }
@@ -68,7 +69,7 @@ if (!empty($mmrpg_indexes)){
                         $data_token2 = '[data-token^="'.$object_token.'__"]';
                         $inner_selector .= ', '.str_replace($data_token, $data_token2, $inner_selector);
                         }
-                    echo($inner_selector.' { '.$inner_styles_string.' }'.PHP_EOL);
+                    $object_styles_sprites .= ($inner_selector.' { '.$inner_styles_string.' }'.PHP_EOL);
                     }
                 // If this particular object has any image alts defined, we'll need to generate styles for them too
                 if (!$use_composite && !empty($object_info[$object_kind.'_image_alts'])){
@@ -88,14 +89,21 @@ if (!empty($mmrpg_indexes)){
                                 $alt_data_token2 = '[data-token^="'.$object_token.'__"]';
                                 $alt_inner_selector .= ', '.str_replace($alt_data_token, $alt_data_token2, $alt_inner_selector);
                                 }
-                            echo($alt_inner_selector.' { '.$alt_inner_styles_string.' }'.PHP_EOL);
+                            $object_styles_sprites_alts .= ($alt_inner_selector.' { '.$alt_inner_styles_string.' }'.PHP_EOL);
                             }
                         }
                     }
                 }
             }
         };
-    foreach ($object_sprite_kinds AS $object_kind){ $print_index_styles($object_kind); }
+    foreach ($object_sprite_kinds AS $object_kind){ $get_index_styles($object_kind); }
+    ob_start();
+    echo(trim($object_styles_common).PHP_EOL);
+    echo(trim($object_styles_sprites).PHP_EOL);
+    echo(trim($object_styles_sprites_alts).PHP_EOL);
+    $object_styles_combined = trim(ob_get_clean());
+    $object_styles_combined = preg_replace('/\s+/', ' ', $object_styles_combined);
+    echo($object_styles_combined.PHP_EOL);
 } else {
     header('HTTP/1.1 500 Internal Server Error');
     echo('/* No index data found in database! */'.PHP_EOL);
