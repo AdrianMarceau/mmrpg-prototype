@@ -866,7 +866,7 @@ html, body {
 }
 
 /* define some bounce animations for the sprites */
-#world #map .layer.objects .sprite {
+#world .layer.objects .sprite {
     --sprite-speed: 1;
     --base-bounce-duration: 1s;
     --base-march-duration: 3s;
