@@ -465,6 +465,10 @@ $flag_skip_fadein = true;
 <link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 </head>
 <body id="mmrpg" class="world <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?>">
+<!-- preload content indexes -->
+<link type="text/css" href="content/all.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<script type="text/javascript" src="content/all.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<!-- generate world markup -->
 <div id="world" class="hidden <?= $flag_skip_fadein ? 'fastfade' : '' ?>">
     <div id="canvas">
         <div class="wrapper">
@@ -591,80 +595,13 @@ $flag_skip_fadein = true;
         </div>
     </div>
 </div>
+<!-- start loading world scripts and dependencies into memory  -->
 <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/world.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="content/all.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<style type="text/css">
-    <?
-    // Loop through all the index objects that have sprites and generate the styles for them
-    $object_sprite_kinds = array('player', 'robot', 'ability', 'item');
-    $get_index_styles = function($object_kind) use ($mmrpg_indexes){
-        $object_xkind = rpg_world::get_xkind($object_kind);
-        if (!empty($mmrpg_indexes[$object_xkind])){
-            $object_index = $mmrpg_indexes[$object_xkind];
-            //echo ('#mmrpg .sprite.'.$object_kind.' { /* ... */ }'.PHP_EOL);
-            //echo ('#mmrpg .sprite.'.$object_kind.' .wrap { /* ... */ }'.PHP_EOL);
-            // Check if this is one of the sprite types that uses one large composite sprite sheet and set a flag
-            $use_composite = $object_xkind === 'items' || $object_xkind === 'abilities' ? true : false;
-            // If we're using a composite sprite sheet, we need to set some common styles on the inner .sprite element
-            // to indicate they all share the same image and background-size, then we can just adjust background-position
-            if ($use_composite){
-                $inner_styles = array();
-                if ($object_xkind === 'items'){ $pseudo_meta = rpg_world::get_sprite_meta($object_kind, 'small-screw'); }
-                elseif ($object_xkind === 'abilities'){ $pseudo_meta = rpg_world::get_sprite_meta($object_kind, 'buster-shot'); }
-                //error_log('-> $pseudo_meta = '.print_r($pseudo_meta, true));
-                if (!empty($pseudo_meta['sheetPath'])){ $inner_styles['background-image'] = 'url('.$pseudo_meta['sheetPath'].'?'.MMRPG_CONFIG_CACHE_DATE.')'; }
-                if (!empty($pseudo_meta['sheetSize'])){ $inner_styles['background-size'] = $pseudo_meta['sheetSize'][0].'px '.$pseudo_meta['sheetSize'][1].'px'; }
-                $inner_styles_string = !empty($inner_styles) ? implode('; ', array_map(function($v, $k){ return $k.': '.$v.' !important'; }, $inner_styles, array_keys($inner_styles))) : '';
-                //error_log('-> $inner_styles_string = '.print_r($inner_styles_string, true));
-                if (!empty($inner_styles_string)){ echo ('#mmrpg .sprite.'.$object_kind.' .wrap .sprite { '.$inner_styles_string.' }'.PHP_EOL); }
-                }
-            // Now we can loop through the actual objects of this type and generate their individual styles where applicable
-            foreach ($object_index AS $object_token => $object_info){
-                //error_log('-> scanning object w/ kind: '.$object_kind.' && token: '.$object_token);
-                if ($object_token === $object_kind){ continue; }
-                if ($object_info[$object_kind.'_class'] === 'system'){ continue; }
-                if (empty($object_info[$object_kind.'_flag_published'])){ continue; }
-                if (empty($object_info[$object_kind.'_flag_complete'])){ continue; }
-                $object_alt = ''; // TODO: maybe expand this later?
-                $sprite_meta = rpg_world::get_sprite_meta($object_kind, $object_token, $object_alt);
-                //error_log('-> $sprite_meta = '.print_r($sprite_meta, true));
-                if (empty($sprite_meta)){ continue; }
-                $outer_styles = array();
-                if (!empty($sprite_meta['spriteSpeed']) && $sprite_meta['spriteSpeed'] !== 1){ $outer_styles['--sprite-speed'] = $sprite_meta['spriteSpeed']; }
-                $outer_styles_string = !empty($outer_styles) ? implode('; ', array_map(function($v, $k){ return $k.': '.$v.' !important'; }, $outer_styles, array_keys($outer_styles))) : '';
-                if (!empty($outer_styles_string)){ echo('#mmrpg .sprite.'.$object_kind.'[data-token="'.$object_token.'"] { '.$outer_styles_string.' }'.PHP_EOL); }
-                $inner_styles = array();
-                if ($use_composite && !empty($sprite_meta['sheetOffset'])){ $inner_styles['background-position'] = $sprite_meta['sheetOffset'][0].'px '.$sprite_meta['sheetOffset'][1].'px'; }
-                if (!$use_composite && !empty($sprite_meta['sheetPath'])){ $inner_styles['background-image'] = 'url('.$sprite_meta['sheetPath'].'?'.MMRPG_CONFIG_CACHE_DATE.')'; }
-                $inner_styles_string = !empty($inner_styles) ? implode('; ', array_map(function($v, $k){ return $k.': '.$v.' !important'; }, $inner_styles, array_keys($inner_styles))) : '';
-                if (!empty($inner_styles_string)){ echo('#mmrpg .sprite.'.$object_kind.'[data-token="'.$object_token.'"] .wrap .sprite { '.$inner_styles_string.' }'.PHP_EOL); }
-                // If this particular object has any image alts defined, we'll need to generate styles for them too
-                if (!$use_composite && !empty($object_info[$object_kind.'_image_alts'])){
-                    $object_image_alts = $object_info[$object_kind.'_image_alts'];
-                    //error_log('-> '.$object_token.' / $object_image_alts = '.print_r($object_image_alts, true));
-                    foreach ($object_image_alts AS $alt_info){
-                        $alt_token = $alt_info['token'];
-                        $alt_meta = rpg_world::get_sprite_meta($object_kind, $object_token, $alt_token);
-                        $alt_inner_styles = array();
-                        if (!empty($alt_meta['sheetPath'])){ $alt_inner_styles['background-image'] = 'url('.$alt_meta['sheetPath'].'?'.MMRPG_CONFIG_CACHE_DATE.')'; }
-                        $alt_inner_styles_string = !empty($alt_inner_styles) ? implode('; ', array_map(function($v, $k){ return $k.': '.$v.' !important'; }, $alt_inner_styles, array_keys($alt_inner_styles))) : '';
-                        if (!empty($alt_inner_styles_string)){ echo('#mmrpg .sprite.'.$object_kind.'[data-token="'.$object_token.'"][data-alt="'.$alt_token.'"] .wrap .sprite { '.$alt_inner_styles_string.' }'.PHP_EOL); }
-                        }
-                    }
-                }
-            }
-        };
-    foreach ($object_sprite_kinds AS $object_kind){ $get_index_styles($object_kind); }
-    ?>
-</style>
+<!-- define game settings and world config values then preload content indexes -->
 <script type="text/javascript">
-
-// Update relevent game settings and flags
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-
-// Update relevant world-specific game settings and flags
 (function(){
     let _worldConfig = gameSettings.worldConfig;
     _worldConfig.userId = <?= rpg_game::get_userid() ?>;
@@ -679,7 +616,6 @@ $flag_skip_fadein = true;
     _worldConfig.backButtonURL = 'prototype.php';
     _worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=spawn';
     _worldConfig.resetButtonURL = 'world.php?reset=world';
-    //console.log('_worldConfig:', typeof _worldConfig, _worldConfig);
     if (typeof mmrpgIndex !== 'undefined'){
         let _worldIndexes = gameSettings.worldIndexes;
         _worldIndexes.types = typeof mmrpgIndex.types !== 'undefined' ? mmrpgIndex.types : {};
@@ -688,56 +624,31 @@ $flag_skip_fadein = true;
         _worldIndexes.abilities = typeof mmrpgIndex.abilities !== 'undefined' ? mmrpgIndex.abilities : {};
         _worldIndexes.items = typeof mmrpgIndex.items !== 'undefined' ? mmrpgIndex.items : {};
         _worldIndexes.fields = typeof mmrpgIndex.fields !== 'undefined' ? mmrpgIndex.fields : {};gameSettings.worldIndexes = mmrpgIndex;
-        //console.log('_worldIndexes:', typeof _worldIndexes, _worldIndexes);
         }
 })();
-
-// Create the document ready events
+</script>
+<!-- queue document ready events for when everything is finally loaded -->
+<script type="text/javascript">
 $(document).ready(function(){
 
-    // Immediately clear the selected player setting as it shouldn't be this
-
-    // Make sure the music button is in the appropriate place
+    // Make sure the music button is in the appropriate place and then
+    // start playing it in the background (use default if none defined)
     top.mmrpg_music_context('world');
-
-    // Start the music playing in the background (default if none for this field)
     parent.mmrpg_music_load('<?= $map_field_music ?>', false, false);
 
     // Collect a ref to the game div then initialize the world map
+    // (make sure to automatically pull events if we have a valid map)
     let $mmrpg = $('#mmrpg');
-    if ($mmrpg.length){
-        //console.log('%c' + 'Creating new mmrpgWorldMap object...', 'color: green;');
-        let worldMapObject = new mmrpgWorldMap($mmrpg);
-        gameSettings.worldMapObject = worldMapObject;
-        window.worldMapObject = worldMapObject;
-        }
+    let worldMapObject = null;
+    if ($mmrpg.length){ worldMapObject = new mmrpgWorldMap($mmrpg); }
+    if (worldMapObject){ worldMapObject.triggerWindowEventsPull(1000); }
+    gameSettings.worldMapObject = worldMapObject;
+    window.worldMapObject = worldMapObject;
 
     <? if (rpg_game::is_user()){ ?>
-        // The user is logged-in so let's keep the session alive
-        mmrpg_keep_session_alive(<?= rpg_game::get_userid() ?>);
+    // The user is logged-in so let's keep the session alive
+    mmrpg_keep_session_alive(<?= rpg_game::get_userid() ?>);
     <? } ?>
-
-    // Make sure we always poll the server for popup events after loading
-    //console.log('queuing the windowEventsPull event (via world)');
-    if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
-        window.top.mmrpg_queue_for_game_start(function(){
-            //console.log('i guess the game has started');
-            setTimeout(function(){
-                //console.log('attempting to pull window events via parent.windowEventsPull()', parent.windowEventsPull);
-                let result = parent.windowEventsPull(true);
-                if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
-                //else { console.log('windowEventsPull returned successfully: ' + result); }
-                }, 1000);
-            });
-        }
-    else if (typeof window.top.windowEventsPull !== 'undefined'){
-        //console.log('i guess we pull events manually via parent.windowEventsPull()', parent.windowEventsPull);
-        setTimeout(function(){
-            let result = parent.windowEventsPull(true);
-            if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
-            //else { console.log('windowEventsPull returned successfully: ' + result); }
-            }, 1000);
-        }
 
 });
 
