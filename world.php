@@ -461,7 +461,6 @@ $flag_skip_fadein = true;
 <link type="text/css" href=".libs/fontawesome/v5.6.3/css/solid.css" rel="stylesheet" />
 <link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/world.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 </head>
