@@ -2633,6 +2633,18 @@ display: block;
     animation: robots-overview-stat-breaked 2s linear forwards;
 }
 
+@keyframes robots-overview-item-given {
+    0% { transform: scale(1.0); filter: brightness(1.0); }
+    50% { transform: scale(1.2); filter: brightness(1.2) saturate(1.1); }
+    100% { transform: scale(1.0); filter: brightness(1.0); }
+}
+#world #canvas #robots-overview .team-robot.item-given {
+    transform-origin: left center;
+    transform: scale(1.0);
+    filter: brightness(1.0);
+    animation: robots-overview-item-given 1s ease-in-out forwards;
+}
+
 #world #canvas #robots-overview .team-robot:nth-child(1) { z-index: 10; }
 #world #canvas #robots-overview .team-robot:nth-child(2) { z-index: 9; }
 #world #canvas #robots-overview .team-robot:nth-child(3) { z-index: 8; }

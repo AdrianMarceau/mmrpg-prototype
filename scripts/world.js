@@ -184,7 +184,7 @@ class mmrpgWorldMap {
 
     // Quick function to check all indexes are loaded with data
     checkIndexes(){
-        console.log('%c' + 'mmrpgWorldMap.checkIndexes()', 'color: green;');
+        //console.log('%c' + 'mmrpgWorldMap.checkIndexes()', 'color: green;');
         let _self = this;
         let _config = _self.config;
         let _indexes = _self.indexes;
@@ -5366,6 +5366,73 @@ class mmrpgWorldMap {
         else { return '03'; } // defeat
         }
 
+    // Quick function for settings a robot's current energy amount to a specific value but without all the effects
+    setRobotEnergy(robotString, newEnergy){
+        //console.log('%c' + 'mmrpgWorldMap.setRobotEnergy(' + robotString + ', ' + newEnergy + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('setRobotEnergy() missing required robotString!'); return false; }
+        if (typeof newEnergy !== 'number' || isNaN(newEnergy) || newEnergy < 0){ console.error('setRobotEnergy() missing or invalid newEnergy!'); return false; }
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        // Break the robot sprite into ID and token and collect its info
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('setRobotEnergy() could not find robot info for robot ' + robotString + '!'); return false; }
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // Collect a reference to this robot's element in the overview panel
+        let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', _elements.robotsOverview);
+        if (!$robotOverview || !$robotOverview.length){ console.warn('setRobotEnergy() could not find overview for robot ' + robotString + '!'); return false; }
+        let $robotIconSprite = $('.icon > .sprite', $robotOverview);
+        let $robotEnergyGuage = $('.guage.energy', $robotOverview);
+        if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('setRobotEnergy() could not find icon sprite for robot ' + robotString + '!'); return false; }
+        if (!$robotEnergyGuage || !$robotEnergyGuage.length){ console.warn('setRobotEnergy() could not find energy guage for robot ' + robotString + '!'); return false; }
+        // Collect the current energy value for this robot
+        let wasDisabled = robotInfo.energy === 0 ? true : false; // was this robot disabled?
+        let currentEnergy = robotInfo.energy || 0;
+        let maxEnergy = robotInfo.energyMax || 0;
+        //console.log('-> currentEnergy =', currentEnergy);
+        //console.log('-> maxEnergy =', maxEnergy);
+        //console.log('-> newEnergy =', newEnergy);
+        // If the new and old energy values are the same, do nothing
+        if (newEnergy === currentEnergy){
+            //console.log('setRobotEnergy() called but energy values are the same, nothing changed!');
+            return true;
+            }
+        // Update the robot info with the new energy value
+        robotInfo.energy = Math.min(newEnergy, maxEnergy);
+        robotInfo.energyPercent = Math.floor((robotInfo.energy / robotInfo.energyMax) * 100);
+        robotInfo.energyRating = _self.getRatingToken(robotInfo.energyPercent);
+        _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
+        // Update the overview with any changes to the status
+        if (robotInfo.energy > 0){
+            robotInfo.disabled = false;
+            $robotOverview.removeClass('disabled');
+            } else {
+            robotInfo.disabled = true;
+            $robotOverview.addClass('disabled');
+            }
+        $robotOverview.attr('data-status', robotInfo.energyRating+'-energy');
+        // Update this robot's sprite on the actual overworld too
+        let $teamSprites = _elements.teamSprites;
+        let $robotSprite = $teamSprites.filter('.sprite[data-token="' + robotToken + '"]');
+        if (robotInfo.energy > 0){ $robotSprite.removeClass('disabled').attr('data-frame', '08'); }
+        else { $robotSprite.addClass('disabled'); }
+        // Update the robot's icon sprite with a new frame matching its new energy value
+        let robotEnergyFrame = _self.getRobotEnergyFrame(robotInfo.energyRating);
+        $robotIconSprite.attr('data-frame', robotEnergyFrame);
+        // Update the energy guage title and bar within with the new energy value
+        $robotEnergyGuage.attr('title', robotInfo.energy + '/' + maxEnergy + ' LE (' + robotInfo.energyPercent + '%)');
+        $('> i', $robotEnergyGuage).css({width: robotInfo.energyPercent + '%'});
+        // Return true on success
+        return true;
+        }
     // Quick function for restoring a robot's energy (if available) by a specific amount (or all if === true)
     restoreRobotEnergy(robotString, restoreAmount, playSound){
         //console.log('%c' + 'mmrpgWorldMap.restoreRobotEnergy(' + robotString + ', ' + restoreAmount + ')', 'color: magenta;');
@@ -5448,6 +5515,55 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Quick function for settings a robot's current weapons amount to a specific value but without all the effects
+    setRobotWeapons(robotString, newEnergy){
+        //console.log('%c' + 'mmrpgWorldMap.setRobotWeapons(' + robotString + ', ' + newEnergy + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('setRobotWeapons() missing required robotString!'); return false; }
+        if (typeof newEnergy !== 'number' || isNaN(newEnergy) || newEnergy < 0){ console.error('setRobotWeapons() missing or invalid newEnergy!'); return false; }
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        // Break the robot sprite into ID and token and collect its info
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('setRobotWeapons() could not find robot info for robot ' + robotString + '!'); return false; }
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // Collect a reference to this robot's element in the overview panel
+        let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', _elements.robotsOverview);
+        if (!$robotOverview || !$robotOverview.length){ console.warn('setRobotWeapons() could not find overview for robot ' + robotString + '!'); return false; }
+        let $robotIconSprite = $('.icon > .sprite', $robotOverview);
+        let $robotWeaponsGuage = $('.guage.weapons', $robotOverview);
+        if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('setRobotWeapons() could not find icon sprite for robot ' + robotString + '!'); return false; }
+        if (!$robotWeaponsGuage || !$robotWeaponsGuage.length){ console.warn('setRobotWeapons() could not find weapons guage for robot ' + robotString + '!'); return false; }
+        // Collect the current weapons value for this robot
+        let currentWeapons = robotInfo.weapons || 0;
+        let maxWeapons = robotInfo.weaponsMax || 0;
+        //console.log('-> currentWeapons =', currentWeapons);
+        //console.log('-> maxWeapons =', maxWeapons);
+        //console.log('-> newEnergy =', newEnergy);
+        // If the new and old weapons values are the same, do nothing
+        if (newEnergy === currentWeapons){
+            //console.log('setRobotWeapons() called but weapons values are the same, nothing changed!');
+            return true;
+            }
+        // Update the robot info with the new weapons value
+        robotInfo.weapons = Math.min(newEnergy, maxWeapons);
+        robotInfo.weaponsPercent = Math.floor((robotInfo.weapons / robotInfo.weaponsMax) * 100);
+        robotInfo.weaponsRating = _self.getRatingToken(robotInfo.weaponsPercent);
+        _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
+        // Update the weapons guage title and bar within with the new weapons value
+        $robotWeaponsGuage.attr('title', robotInfo.weapons + '/' + maxWeapons + ' WE (' + robotInfo.weaponsPercent + '%)');
+        $('> i', $robotWeaponsGuage).css({width: robotInfo.weaponsPercent + '%'});
+        // Return true on success
+        return true;
+        }
     // Quick function for restoring a robot's weapons (if available) by a specific amount (or all if === true)
     restoreRobotWeapons(robotString, restoreAmount, playSound){
         //console.log('%c' + 'mmrpgWorldMap.restoreRobotWeapons(' + robotString + ', ' + restoreAmount + ')', 'color: magenta;');
@@ -5788,6 +5904,121 @@ class mmrpgWorldMap {
         let _self = this; return _self.breakRobotStat(robotString, 'speed', breakAmount, playSound);
         }
 
+    // Quick function for giving a given robot a new hold item and then optionally playing a sound effect
+    giveRobotItem(robotString, itemToken, playSound){
+        //console.log('%c' + 'mmrpgWorldMap.giveRobotItem(robot:' + robotString + ', item:' + itemToken + ', sound:' + playSound + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('giveRobotItem() missing required robotString!'); return false; }
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('giveRobotItem() missing required itemToken!'); return false; }
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _indexes = _self.indexes;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        let _mmrpgItemsIndex = _indexes.items;
+        // Break the robot sprite into ID and token and collect its info
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('giveRobotItem() could not find robot info for robot ' + robotString + '!'); return false; }
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // If this robot already has a hold item, return now
+        if (robotInfo.item && robotInfo.item.length){
+            console.warn('giveRobotItem() called but robot ' + robotString + ' already has an item!');
+            return false;
+            }
+        // If the item token provided is not valid, return now
+        let itemInfo = _mmrpgItemsIndex[itemToken] || false;
+        if (!itemInfo){ console.error('giveRobotItem() could not find item info for item ' + itemToken + '!'); return false; }
+        //console.log('-> itemInfo =', itemInfo);
+        // If the item provided is not holdable, return now
+        if (!_self.itemIsHoldable(itemToken)){
+            console.error('giveRobotItem() cannot give non-holdable item ' + itemToken + ' to robot ' + robotString + '!');
+            return false;
+            }
+        // Update the robot info with the new hold item
+        robotInfo.item = itemToken;
+        _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
+        // Collect a reference to this robot's element in the overview panel
+        let $robotsOverview = _elements.robotsOverview;
+        let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', $robotsOverview);
+        if (!$robotOverview || !$robotOverview.length){ console.warn('giveRobotItem() could not find overview for robot ' + robotString + '!'); return false; }
+        let $robotIconSprite = $('.icon > .sprite.robot', $robotOverview);
+        if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('giveRobotItem() could not find icon sprite for robot ' + robotString + '!'); return false; }
+        // Remove any old item sprite(s) already inside this robot's icon container
+        $('.icon > .sprite.item', $robotOverview).remove();
+        // Create the new item sprite(s) with the appriate classes and attributes
+        let randDelay = -1 * ( Math.floor(Math.random() * 10) / 100 );
+        let itemSpriteClasses = 'sprite item holding';
+        let itemSpriteStyles = 'animation-delay: ' + randDelay + 's; ';
+        let itemSpriteAttrs = 'data-sprite="item" data-token="' + itemToken + '" data-size="' + itemInfo.imageSize + '" data-dir="right" data-frame="00"';
+        let itemSpriteMarkup = '<div class="' + itemSpriteClasses + '" style="' + itemSpriteStyles + '" ' + itemSpriteAttrs + '><span class="wrap"><i class="sprite"></i></span></div>';
+        $robotOverview.find('.icon').append(itemSpriteMarkup);
+        let $robotItemSprite = $('.icon > .sprite.item', $robotOverview);
+        // Add a item-given class to this robot to show it being effected by the action
+        if (playSound){ _self.playSoundEffect('get-item'); }
+        $robotOverview.addClass('item-given');
+        setTimeout(function(){ $robotOverview.removeClass('item-given'); }, 3000);
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState();
+        // Return true on success
+        return true;
+        }
+
+    // Define a quick function for checking if a given item (by token) is a consumable
+    itemIsConsumable(itemToken){
+        //console.log('%c' + 'mmrpgWorldMap.itemIsConsumable(' + itemToken + ')', 'color: magenta;');
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('itemIsConsumable() missing required itemToken!'); return false; }
+        let _self = this;
+        let _indexes = _self.indexes;
+        let _mmrpgItemsIndex = _indexes.items;
+        if (typeof _mmrpgItemsIndex[itemToken] === 'undefined'){
+            console.error('itemIsConsumable() could not find item in index for token ' + itemToken + '!');
+            return false;
+            }
+        let itemInfo = _mmrpgItemsIndex[itemToken];
+        if (itemInfo.subclass === 'consumable'){ return true;  }
+        return false;
+        }
+
+    // Define a quick function for checking if a given item (by token) is holdable
+    itemIsHoldable(itemToken){
+        //console.log('%c' + 'mmrpgWorldMap.itemIsHoldable(' + itemToken + ')', 'color: magenta;');
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('itemIsHoldable() missing required itemToken!'); return false; }
+        let _self = this;
+        let _indexes = _self.indexes;
+        let _mmrpgItemsIndex = _indexes.items;
+        if (typeof _mmrpgItemsIndex[itemToken] === 'undefined'){
+            console.error('itemIsHoldable() could not find item in index for token ' + itemToken + '!');
+            return false;
+            }
+        let itemInfo = _mmrpgItemsIndex[itemToken];
+        if (itemInfo.subclass === 'holdable'){ return true;  }
+        else if (_self.itemIsConsumable(itemToken)){ return true;  }
+        return false;
+        }
+
+    // Define a quick function for checking if the given item (by token) is an event item
+    itemIsEvent(itemToken){
+        //console.log('%c' + 'mmrpgWorldMap.itemIsEvent(' + itemToken + ')', 'color: magenta;');
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('itemIsEvent() missing required itemToken!'); return false; }
+        let _self = this;
+        let _indexes = _self.indexes;
+        let _mmrpgItemsIndex = _indexes.items;
+        if (typeof _mmrpgItemsIndex[itemToken] === 'undefined'){
+            console.error('itemIsEvent() could not find item in index for token ' + itemToken + '!');
+            return false;
+            }
+        let itemInfo = _mmrpgItemsIndex[itemToken];
+        if (itemInfo.subclass === 'event'){ return true;  }
+        return false;
+        }
+
     // Define a quick function for triggering a live item pickup on the field (and any effects that may have
     triggerItemPickup(itemEvent, zoomDelay){
         //console.log('%c' + 'mmrpgWorldMap.triggerItemPickup()', 'color: magenta;');
@@ -5795,16 +6026,20 @@ class mmrpgWorldMap {
         if (!itemEvent || typeof itemEvent !== 'object'){ console.error('triggerItemPickup() missing required itemEvent!'); return false; }
         if (typeof itemEvent.sprite === 'undefined'){ console.error('triggerItemPickup() missing required itemEvent.sprite!'); return false; }
         if (itemEvent.claimed === true){ console.warn('triggerItemPickup() called for item that has already been claimed!'); return false; }
+
         // Collect local references to world objects
         let _self = this;
         let _config = _self.config;
         let _elements = _self.elements;
+        let _indexes = _self.indexes;
         let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
         let _worldItemStates = _world.items;
+        let _mmrpgItemsIndex = _indexes.items;
         let _mapItemsIndex = _config.mapItemsIndex;
         let $teamSprites = _elements.teamSprites;
+
         // Collect as much info about the item as we can from the event data
         let $itemEventSprite = $(itemEvent.sprite);
         let $itemEventLayer = $itemEventSprite.closest('.layer');
@@ -5816,148 +6051,268 @@ class mmrpgWorldMap {
         //console.log('--> itemEventQuantity =', itemEventQuantity);
         //console.log('--> itemEventInfo =', itemEventInfo);
         //console.log('--> itemToken =', itemToken);
+        let itemIndexInfo = _mmrpgItemsIndex[itemToken];
+        //console.log('--> itemIndexInfo =', itemIndexInfo);
+
         // If the quantity is somehow less than one, return early
         if (!itemEventQuantity || itemEventQuantity < 1){ console.error('triggerItemPickup() called for item with quantity less than one!'); return false; }
+
         // Collect some information about the player too
         let numPlayerRobots = Object.keys(_worldPlayerRobots).length;
         if (!numPlayerRobots || numPlayerRobots < 1){ console.error('triggerItemPickup() could not find any player robots!'); return false; }
-        // First zoom the item sprite into the zoom layer so it's more visible to the player
+
+        // Zoom the item sprite into the zoom layer so it's more visible to the player
         //console.log('-> zooming item sprite make it more visible');
         zoomDelay = typeof zoomDelay === 'number' ? zoomDelay : 1200; // default to sync with standard use-case
         setTimeout(function(){
             $itemEventSprite.addClass('zoom');
             $itemEventLayer.addClass('has-zoom');
             }, Math.ceil(zoomDelay / 3));
+
         // Define a variable to hold the pickup action function
         let pickupFunction = function(onComplete, afterDelay){
+            //console.log('-> executing pickupFunction() for item pickup (token:', itemToken, ')');
             if (!onComplete || typeof onComplete !== 'function'){ onComplete = false; }
             if (!afterDelay || typeof afterDelay !== 'number'){ afterDelay = 0; }
+
             // Check to make sure the item token was not empty
             if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){
                 console.error('triggerItemPickup() called for item with empty token!');
                 return false;
                 }
-            // Check if the item was a consumable health or weapon energy item
-            // and apply it to the first robot that needs it, else pocket it
-            else if (itemToken.match(/^(energy|weapon)-(pellet|capsule|tank)$/i)){
-                //console.log('oh this is an restorative-recovery item, so let us apply it');
-                let itemStat = itemToken.split('-')[0];
-                let itemSize = itemToken.split('-')[1];
-                let itemPower = (itemSize === 'tank' ? true : (itemSize === 'capsule' ? 50 : 25));
-                if (itemStat === 'weapon'){ itemStat = 'weapons'; }
-                //console.log('--> itemStat =', itemStat);
-                //console.log('--> itemSize =', itemSize);
-                //console.log('--> itemPower =', itemPower);
-                // Loop through player robots and see if any of them "need" this item
-                let playerRobotKeys = Object.keys(_worldPlayerRobots);
-                for (let i = 0; i < playerRobotKeys.length; i++){
-                    let robotString = playerRobotKeys[i];
-                    let playerRobot = _worldPlayerRobots[robotString];
-                    let statKey = itemStat;
-                    let statMaxKey = itemStat + 'Max';
-                    let robotEnergy = playerRobot[statKey];
-                    let robotEnergyMax = playerRobot[statMaxKey];
-                    //console.log('-> checking robot:', robotString, playerRobot);
-                    //console.log('-> playerRobot[' + statKey + '] =', robotEnergy);
-                    //console.log('-> playerRobot[' + statMaxKey + '] =', robotEnergyMax);
-                    if (robotEnergy >= robotEnergyMax){
-                        //console.log('-> skipping robot', robotString, 'b/c it already has max', itemStat);
-                        continue; // skip this robot if it already has max of this energy
+
+            // First, check to see if this item is consumable so we can maybe apply it to a team robot
+            if (!itemEvent.claimed
+                && _self.itemIsConsumable(itemToken)){
+
+                // Check if the item was a consumable health or weapon energy item
+                // and apply it to the first robot that needs it, else pocket it
+                if (itemToken.match(/^(energy|weapon)-(pellet|capsule|tank)$/i)){
+                    //console.log('oh this is an restorative-recovery item, so let us apply it');
+                    let itemStat = itemToken.split('-')[0];
+                    let itemSize = itemToken.split('-')[1];
+                    let itemPower = (itemSize === 'tank' ? true : (itemSize === 'capsule' ? 50 : 25));
+                    if (itemStat === 'weapon'){ itemStat = 'weapons'; }
+                    //console.log('--> itemStat =', itemStat);
+                    //console.log('--> itemSize =', itemSize);
+                    //console.log('--> itemPower =', itemPower);
+                    // Loop through player robots and see if any of them "need" this item
+                    let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                    for (let i = 0; i < playerRobotKeys.length; i++){
+                        let robotString = playerRobotKeys[i];
+                        let playerRobot = _worldPlayerRobots[robotString];
+                        let statKey = itemStat;
+                        let statMaxKey = itemStat + 'Max';
+                        let robotEnergy = playerRobot[statKey];
+                        let robotEnergyMax = playerRobot[statMaxKey];
+                        //console.log('-> checking robot:', robotString, playerRobot);
+                        //console.log('-> playerRobot[' + statKey + '] =', robotEnergy);
+                        //console.log('-> playerRobot[' + statMaxKey + '] =', robotEnergyMax);
+                        if (robotEnergy >= robotEnergyMax){
+                            //console.log('-> skipping robot', robotString, 'b/c it already has max', itemStat);
+                            continue; // skip this robot if it already has max of this energy
+                            }
+                        //console.log('-> found a robot (', playerRobot, ') that needs their', itemStat, 'stat restored...');
+                        //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
+                        let recoveryPower = Math.ceil(((itemPower === true ? 100 : itemPower)/100) * robotEnergyMax);
+                        //console.log('-> recoveryPower =', recoveryPower);
+                        if (itemStat === 'energy'){ _self.restoreRobotEnergy(robotString, recoveryPower, true); }
+                        else if (itemStat === 'weapons'){ _self.restoreRobotWeapons(robotString, recoveryPower, true); }
+                        itemEvent.claimed = true;
+                        itemEventQuantity--;
+                        if (!itemEventQuantity){ break; } // exit the loop early if none left
                         }
-                    //console.log('-> found a robot (', playerRobot, ') that needs their', itemStat, 'stat restored...');
-                    //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
-                    let recoveryPower = Math.ceil(((itemPower === true ? 100 : itemPower)/100) * robotEnergyMax);
-                    //console.log('-> recoveryPower =', recoveryPower);
-                    if (itemStat === 'energy'){ _self.restoreRobotEnergy(robotString, recoveryPower, true); }
-                    else if (itemStat === 'weapons'){ _self.restoreRobotWeapons(robotString, recoveryPower, true); }
-                    itemEvent.claimed = true;
-                    itemEventQuantity--;
-                    if (!itemEventQuantity){ break; } // exit the loop early if none left
                     }
-                }
-            // Check if the item was a consumable attack, defense, or speed-stat item
-            // and apply it to the first robot that can use a boost to that stat, else pocket it
-            else if (itemToken.match(/^(attack|defense|speed)-(pellet|capsule)$/i)){
-                //console.log('oh this is a stat-boost item, so let us apply it');
-                let itemStat = itemToken.split('-')[0];
-                let itemSize = itemToken.split('-')[1];
-                let itemPower = itemSize === 'capsule' ? 3 : 2;
-                //console.log('--> itemStat =', itemStat);
-                //console.log('--> itemSize =', itemSize);
-                //console.log('--> itemPower =', itemPower);
-                // Loop through player robots and see if any of them "need" this item
-                let playerRobotKeys = Object.keys(_worldPlayerRobots);
-                let robotStatModMax = _config.robotStatModMax;
-                for (let i = 0; i < playerRobotKeys.length; i++){
-                    let robotString = playerRobotKeys[i];
-                    let playerRobot = _worldPlayerRobots[robotString];
-                    if (!playerRobot){ console.warn('-> skipping robot', robotString, 'b/c it is not defined'); continue; }
-                    //console.log('-> checking robotString:', robotString, 'playerRobot:', playerRobot);
-                    let statModKey = itemStat + 'Mods';
-                    let currentModValue = playerRobot[statModKey] || 0;
-                    //console.log('-> statModKey:', statModKey);
-                    //console.log('-> currentModValue:', currentModValue);
-                    //console.log('-> robotStatModMax:', robotStatModMax);
-                    if (currentModValue >= robotStatModMax){
-                        //console.log('-> skipping robot', robotString, 'b/c it already has max stat mods for', itemStat);
-                        continue; // skip this robot if it already has max stat mods for this stat
-                        }
-                    //console.log('-> found a robot (', robotString, ') that we can boost ', itemStat, 'for...');
-                    //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
-                    let boostPower = itemPower;
-                    //console.log('-> boostPower =', boostPower);
-                    _self.boostRobotStat(robotString, itemStat, boostPower, true);
-                    itemEvent.claimed = true;
-                    itemEventQuantity--;
-                    if (!itemEventQuantity){ break; } // exit the loop early if none left
-                    }
-                }
-            // Check if the item was a consumable super-stat item (attack + defense + speed all-in-one)
-            // and apply it to the first robot that can use a boost to any of those stats, else pocket it
-            else if (itemToken.match(/^(super)-(pellet|capsule)$/i)){
-                //console.log('oh this is a super-stat-boost item, so let us apply it');
-                let itemStat = itemToken.split('-')[0];
-                let itemSize = itemToken.split('-')[1];
-                let itemPower = itemSize === 'capsule' ? 2 : 1; // to each stat
-                //console.log('--> itemStat =', itemStat);
-                //console.log('--> itemSize =', itemSize);
-                //console.log('--> itemPower =', itemPower);
-                // Loop through player robots and see if any of them "need" this item
-                let playerRobotKeys = Object.keys(_worldPlayerRobots);
-                let robotStatModMax = _config.robotStatModMax;
-                for (let i = 0; i < playerRobotKeys.length; i++){
-                    let robotString = playerRobotKeys[i];
-                    let playerRobot = _worldPlayerRobots[robotString];
-                    if (!playerRobot){ console.warn('-> skipping robot', robotString, 'b/c it is not defined'); continue; }
-                    //console.log('-> checking robotString:', robotString, 'playerRobot:', playerRobot);
-                    let statModKeys = ['attackMods', 'defenseMods', 'speedMods'];
-                    let canBoostAnyStat = false;
-                    for (let s = 0; s < statModKeys.length; s++){
-                        let statModKey = statModKeys[s];
+                // Check if the item was a consumable attack, defense, or speed-stat item
+                // and apply it to the first robot that can use a boost to that stat, else pocket it
+                else if (itemToken.match(/^(attack|defense|speed)-(pellet|capsule)$/i)){
+                    //console.log('oh this is a stat-boost item, so let us apply it');
+                    let itemStat = itemToken.split('-')[0];
+                    let itemSize = itemToken.split('-')[1];
+                    let itemPower = itemSize === 'capsule' ? 3 : 2;
+                    //console.log('--> itemStat =', itemStat);
+                    //console.log('--> itemSize =', itemSize);
+                    //console.log('--> itemPower =', itemPower);
+                    // Loop through player robots and see if any of them "need" this item
+                    let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                    let robotStatModMax = _config.robotStatModMax;
+                    for (let i = 0; i < playerRobotKeys.length; i++){
+                        let robotString = playerRobotKeys[i];
+                        let playerRobot = _worldPlayerRobots[robotString];
+                        if (!playerRobot){ console.warn('-> skipping robot', robotString, 'b/c it is not defined'); continue; }
+                        //console.log('-> checking robotString:', robotString, 'playerRobot:', playerRobot);
+                        let statModKey = itemStat + 'Mods';
                         let currentModValue = playerRobot[statModKey] || 0;
                         //console.log('-> statModKey:', statModKey);
                         //console.log('-> currentModValue:', currentModValue);
                         //console.log('-> robotStatModMax:', robotStatModMax);
-                        if (currentModValue < robotStatModMax){
-                            canBoostAnyStat = true;
-                            break;
+                        if (currentModValue >= robotStatModMax){
+                            //console.log('-> skipping robot', robotString, 'b/c it already has max stat mods for', itemStat);
+                            continue; // skip this robot if it already has max stat mods for this stat
                             }
+                        //console.log('-> found a robot (', robotString, ') that we can boost ', itemStat, 'for...');
+                        //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
+                        let boostPower = itemPower;
+                        //console.log('-> boostPower =', boostPower);
+                        _self.boostRobotStat(robotString, itemStat, boostPower, true);
+                        itemEvent.claimed = true;
+                        itemEventQuantity--;
+                        if (!itemEventQuantity){ break; } // exit the loop early if none left
                         }
-                    if (!canBoostAnyStat){
-                        //console.log('-> skipping robot', robotString, 'b/c it already has max stat mods for all stats');
-                        continue; // skip this robot if it already has max stat mods for all stats
+                    }
+                // Check if the item was a consumable super-stat item (attack + defense + speed all-in-one)
+                // and apply it to the first robot that can use a boost to any of those stats, else pocket it
+                else if (itemToken.match(/^(super)-(pellet|capsule)$/i)){
+                    //console.log('oh this is a super-stat-boost item, so let us apply it');
+                    let itemStat = itemToken.split('-')[0];
+                    let itemSize = itemToken.split('-')[1];
+                    let itemPower = itemSize === 'capsule' ? 2 : 1; // to each stat
+                    //console.log('--> itemStat =', itemStat);
+                    //console.log('--> itemSize =', itemSize);
+                    //console.log('--> itemPower =', itemPower);
+                    // Loop through player robots and see if any of them "need" this item
+                    let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                    let robotStatModMax = _config.robotStatModMax;
+                    for (let i = 0; i < playerRobotKeys.length; i++){
+                        let robotString = playerRobotKeys[i];
+                        let playerRobot = _worldPlayerRobots[robotString];
+                        if (!playerRobot){ console.warn('-> skipping robot', robotString, 'b/c it is not defined'); continue; }
+                        //console.log('-> checking robotString:', robotString, 'playerRobot:', playerRobot);
+                        let statModKeys = ['attackMods', 'defenseMods', 'speedMods'];
+                        let canBoostAnyStat = false;
+                        for (let s = 0; s < statModKeys.length; s++){
+                            let statModKey = statModKeys[s];
+                            let currentModValue = playerRobot[statModKey] || 0;
+                            //console.log('-> statModKey:', statModKey);
+                            //console.log('-> currentModValue:', currentModValue);
+                            //console.log('-> robotStatModMax:', robotStatModMax);
+                            if (currentModValue < robotStatModMax){
+                                canBoostAnyStat = true;
+                                break;
+                                }
+                            }
+                        if (!canBoostAnyStat){
+                            //console.log('-> skipping robot', robotString, 'b/c it already has max stat mods for all stats');
+                            continue; // skip this robot if it already has max stat mods for all stats
+                            }
+                        //console.log('-> found a robot (', robotString, ') that we can boost some stats for...');
+                        //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
+                        _self.boostRobotAttack(robotString, itemPower, true);
+                        _self.boostRobotDefense(robotString, itemPower, true);
+                        _self.boostRobotSpeed(robotString, itemPower, true);
+                        itemEvent.claimed = true;
+                        itemEventQuantity--;
+                        if (!itemEventQuantity){ break; } // exit the loop early if none left
                         }
-                    //console.log('-> found a robot (', robotString, ') that we can boost some stats for...');
-                    //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken, itemPower);
-                    _self.boostRobotAttack(robotString, itemPower, true);
-                    _self.boostRobotDefense(robotString, itemPower, true);
-                    _self.boostRobotSpeed(robotString, itemPower, true);
-                    itemEvent.claimed = true;
-                    itemEventQuantity--;
+                    }
+                // Check if the item was a consumable yashichi item (fully restores health and weapon energy of one robot)
+                // and apply it to the first robot that needs either stats restored, else pocket it
+                else if (itemToken === 'yashichi'){
+                    //console.log('oh this is a yashichi item, so let us apply it');
+                    // Loop through player robots and see if any of them "need" this item
+                    let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                    for (let i = 0; i < playerRobotKeys.length; i++){
+                        let robotString = playerRobotKeys[i];
+                        let playerRobot = _worldPlayerRobots[robotString];
+                        let robotEnergy = playerRobot.energy || 0;
+                        let robotEnergyMax = playerRobot.energyMax || 0;
+                        let robotWeapons = playerRobot.weapons || 0;
+                        let robotWeaponsMax = playerRobot.weaponsMax || 0;
+                        let itemEnergyRecovery = itemIndexInfo.recovery || 0;
+                        let itemWeaponsRecovery = itemIndexInfo.recovery2 || 0;
+                        //console.log('-> checking robot:', robotString, playerRobot);
+                        //console.log('-> playerRobot[energy] =', robotEnergy);
+                        //console.log('-> playerRobot[energyMax] =', robotEnergyMax);
+                        //console.log('-> playerRobot[weapons] =', robotWeapons);
+                        //console.log('-> playerRobot[weaponsMax] =', robotWeaponsMax);
+                        //console.log('-> itemEnergyRecovery =', itemEnergyRecovery);
+                        //console.log('-> itemWeaponsRecovery =', itemWeaponsRecovery);
+                        if (robotEnergy >= robotEnergyMax && robotWeapons >= robotWeaponsMax){
+                            //console.log('-> skipping robot', robotString, 'b/c it already has max energy and weapons');
+                            continue; // skip this robot if it already has max of both stats
+                            }
+                        //console.log('-> found a robot (', playerRobot, ') that needs their energy and/or weapons restored...');
+                        //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken);
+                        if (robotEnergy < robotEnergyMax){ _self.restoreRobotEnergy(robotString, itemEnergyRecovery); }
+                        if (robotWeapons < robotWeaponsMax){ _self.restoreRobotWeapons(robotString, itemWeaponsRecovery); }
+                        itemEvent.claimed = true;
+                        itemEventQuantity--;
+                        if (!itemEventQuantity){ break; } // exit the loop early if none left
+                        }
+                    }
+                // Check if the item was an extra life item (revives fallen robot w/ life and weapon energy restored to half)
+                // and apply it to the first robot that's been disabled (and/or life energy is zero), else pocket it
+                else if (itemToken === 'extra-life'){
+                    //console.log('oh this is an extra-life item, so let us apply it');
+                    // Loop through player robots and see if any of them "need" this item
+                    let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                    for (let i = 0; i < playerRobotKeys.length; i++){
+                        let robotString = playerRobotKeys[i];
+                        let playerRobot = _worldPlayerRobots[robotString];
+                        let robotEnergy = playerRobot.energy || 0;
+                        let robotEnergyMax = playerRobot.energyMax || 0;
+                        let robotEnergyPercent = playerRobot.energyPercent || 0;
+                        let robotWeapons = playerRobot.weapons || 0;
+                        let robotWeaponsMax = playerRobot.weaponsMax || 0;
+                        let robotWeaponsPercent = playerRobot.weaponsPercent || 0;
+                        let itemEnergyRecovery = itemIndexInfo.recovery || 0;
+                        let itemWeaponsRecovery = itemIndexInfo.recovery2 || 0;
+                        //console.log('-> checking robot:', robotString, playerRobot);
+                        //console.log('-> playerRobot[energy] =', robotEnergy);
+                        //console.log('-> playerRobot[energyMax] =', robotEnergyMax);
+                        //console.log('-> playerRobot[energyPercent] =', robotEnergyPercent);
+                        //console.log('-> playerRobot[weapons] =', robotWeapons);
+                        //console.log('-> playerRobot[weaponsMax] =', robotWeaponsMax);
+                        //console.log('-> playerRobot[weaponsPercent] =', robotWeaponsPercent);
+                        //console.log('-> playerRobot[disabled] =', playerRobot.disabled);
+                        //console.log('-> itemEnergyRecovery =', itemEnergyRecovery);
+                        //console.log('-> itemWeaponsRecovery =', itemWeaponsRecovery);
+                        if (robotEnergy > 0 && playerRobot.disabled !== true){
+                            //console.log('-> skipping robot', robotString, 'b/c it is not disabled and has some energy');
+                            continue; // skip this robot if it is not disabled and has some energy
+                            }
+                        //console.log('-> found a robot (', playerRobot, ') that needs to be revived...');
+                        //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken);
+                        _self.setRobotEnergy(robotString, 0); // just to match below technically
+                        _self.setRobotWeapons(robotString, 0); // so that we see it fill-up from zero
+                        _self.restoreRobotEnergy(robotString, itemEnergyRecovery, true);
+                        _self.restoreRobotWeapons(robotString, itemWeaponsRecovery, true);
+                        itemEvent.claimed = true;
+                        itemEventQuantity--;
+                        if (!itemEventQuantity){ break; } // exit the loop early if none left
+                        }
+                    }
+
+                }
+
+            // As a fallback, check to see if this item can be held so we can maybe give it to a team robot
+            if (!itemEvent.claimed
+                && _self.itemIsHoldable(itemToken)){
+
+                // Loop through the player's robots and try to find one that isn't holding anything yet
+                let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                for (let i = 0; i < playerRobotKeys.length; i++){
+                    let robotString = playerRobotKeys[i];
+                    let playerRobot = _worldPlayerRobots[robotString];
+                    //console.log('-> checking ', robotString, 'for item...', '\n-> playerRobot:', playerRobot);
+                    if (playerRobot.item && playerRobot.item.length){
+                        //console.log('-> skipping robot', robotString, 'b/c already holding ', playerRobot.item);
+                        continue; // skip this robot if it is already holding an item
+                        }
+                    //console.log('-> found a robot (', playerRobot, ') that can hold an item...');
+                    //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken);
+                    if (_self.giveRobotItem(robotString, itemToken)){
+                        itemEvent.claimed = true;
+                        itemEventQuantity--;
+                        }
                     if (!itemEventQuantity){ break; } // exit the loop early if none left
                     }
+                //console.warn('TEMP DISABLED (B) so we can program hold-item functionality');
+                //return false;
+
                 }
-            // If the item has not been claimed it, it means we should (try to) add it to the inventory instead
+
+            // If the item has still not been claimed it, it means we should (try to) add it to the inventory instead
             if (!itemEvent.claimed){
                 //console.log('-> no robots needed this item, so we will add it to the inventory instead');
                 if (_self.addItemToInventory(itemToken, itemEventQuantity)){
@@ -5966,17 +6321,20 @@ class mmrpgWorldMap {
                     itemEventQuantity--;
                     }
                 }
+
             // Update the real copy with any changes to claimed flag
             if (itemEvent.claimed){
                 let claimTime = new Date().getTime();
                 itemEventInfo.claimed = true;
                 _worldItemStates[itemEventToken] = claimTime; // update world item states w/ claim time
                 }
+
             // If an onComplete function was provided, call it now (with delay if requested)
             if (onComplete){
                 if (!afterDelay){ onComplete.call(_self); }
                 else { setTimeout(function(){ onComplete.call(_self); }, afterDelay); }
                 }
+
             };
         // Now we can remove the zoom and delete the item sprite from the events layer
         //console.log('-> zooming and queueing pickup function for item sprite on map');
