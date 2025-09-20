@@ -208,10 +208,14 @@ class rpg_world {
         $allowed_world_sheet_tokens = isset($allowed['world_sheet_tokens']) ? $allowed['world_sheet_tokens'] : array();
         $allowed_player_tokens = isset($allowed['player_tokens']) ? $allowed['player_tokens'] : array();
         $allowed_robot_tokens = isset($allowed['robot_tokens']) ? $allowed['robot_tokens'] : array();
-        $session_key = self::session_token();
-        $WORLD_SESSION = &$_SESSION[$session_key];
+        $world_session_key = self::session_token();
+        $game_session_key = rpg_game::session_token();
+        $WORLD_SESSION = &$_SESSION[$world_session_key];
+        $GAME_SESSION = &$_SESSION[$game_session_key];
         $playerSessions = &$WORLD_SESSION['player_sessions'];
         $robotSessions = &$WORLD_SESSION['robot_sessions'];
+        $battleSettings = &$GAME_SESSION['values']['battle_settings'];
+        $battleRewards = &$GAME_SESSION['values']['battle_rewards'];
         //$world_session_hash = md5(serialize($WORLD_SESSION));
         //error_log('$world_session_hash = '.$world_session_hash);
         if (!empty($worldData['lastPlayer'])
@@ -221,6 +225,8 @@ class rpg_world {
             $lastPlayer = $worldData['lastPlayer'];
             if (!isset($playerSessions[$lastPlayer])){ $playerSessions[$lastPlayer] = array(); }
             $lastPlayerSession = &$playerSessions[$lastPlayer];
+            $lastPlayerSettings = &$battleSettings[$lastPlayer];
+            $lastPlayerRewards = &$battleRewards[$lastPlayer];
             // Collect the cursor player session data so we can update too
             $cursorPlayer = 'player';
             if (!isset($playerSessions[$cursorPlayer])){ $playerSessions[$cursorPlayer] = array(); }
@@ -268,16 +274,27 @@ class rpg_world {
                         list($id, $token) = explode('_', $key, 2);
                         if (!in_array($token, $allowed_robot_tokens)){ continue; }
                         if (!isset($robotSessions[$token])){ $robotSessions[$token] = array(); }
+                        //error_log('-> w/ $data = '. print_r($data, true));
                         // Okay, now we know it exists, we can update values as we find them
                         $robotSession = &$robotSessions[$token];
-                        //error_log('-> (new) $data = '. print_r($data, true));
+                        $robotSettings = &$lastPlayerSettings['player_robots'][$token];
+                        $robotRewards = &$lastPlayerRewards['player_robots'][$token];
                         //error_log('-> $robotSession(before) = '. print_r($robotSession, true));
+                        //error_log('-> $robotSettings(before) = '. print_r($robotSettings, true));
+                        //error_log('-> $robotRewards(before) = '. print_r($robotRewards, true));
+                        // Check for stat changes and update session values accordingly
                         if (isset($data['energy']) && isset($data['energyMax'])){ $robotSession['energy'] = intval($data['energy']) - intval($data['energyMax']); }
                         if (isset($data['weapons']) && isset($data['weaponsMax'])){ $robotSession['weapons'] = intval($data['weapons']) - intval($data['weaponsMax']); }
                         if (isset($data['attackMods'])){ $robotSession['attack'] = intval($data['attackMods']); }
                         if (isset($data['defenseMods'])){ $robotSession['defense'] = intval($data['defenseMods']); }
                         if (isset($data['speedMods'])){ $robotSession['speed'] = intval($data['speedMods']); }
+                        // Check for settings changes and update session values accordingly
+                        if (isset($data['item'])){ $robotSettings['robot_item'] = trim($data['item']); }
+                        // DEBUG DEBUG DEBUG
                         //error_log('-> $robotSession(after) = '. print_r($robotSession, true));
+                        //error_log('-> $robotSettings(after) = '. print_r($robotSettings, true));
+                        //error_log('-> $robotRewards(after) = '. print_r($robotRewards, true));
+                        // DEBUG DEBUG DEBUG
                     }
                     //error_log('$lastPlayerSession = '. print_r($lastPlayerSession, true));
                     //error_log('$robotSessions = '. print_r($robotSessions, true));
