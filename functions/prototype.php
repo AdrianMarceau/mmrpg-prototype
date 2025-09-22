@@ -1139,6 +1139,44 @@ function mmrpg_prototype_items_unlocked($unique = true, &$items_unlocked = array
 
 }
 
+//$equipped_items_count = mmrpg_prototype_items_equipped('', $equipped_player_items);
+
+// Define a function for counting how many items are currently equipped by player robots
+function mmrpg_prototype_items_equipped($player_token = '', &$equipped_player_items = array()){
+    $session_token = mmrpg_game_token();
+    $GAME_SESSION = &$_SESSION[$session_token];
+    $battleSettings = !empty($GAME_SESSION['values']['battle_settings']) ? $GAME_SESSION['values']['battle_settings'] : array();
+    $equipped_items_count = 0;
+    if (!empty($player_token)){
+        if (empty($battleSettings[$player_token])){ return 0; }
+        $playerSettings = $battleSettings[$player_token];
+        if (empty($playerSettings['player_robots'])){ return 0; }
+        $playerRobots = $playerSettings['player_robots'];
+        foreach ($playerRobots AS $robot_token => $robot_info){
+            if (!empty($robot_info['robot_item'])){
+                $item_token = $robot_info['robot_item'];
+                if (!isset($equipped_player_items[$item_token])){ $equipped_player_items[$item_token] = 0; }
+                $equipped_player_items[$item_token]++;
+                $equipped_items_count++;
+            }
+        }
+    } else {
+        foreach ($battleSettings AS $player_token => $playerSettings){
+            if (empty($playerSettings['player_robots'])){ continue; }
+            $playerRobots = $playerSettings['player_robots'];
+            foreach ($playerRobots AS $robot_token => $robot_info){
+                if (!empty($robot_info['robot_item'])){
+                    $item_token = $robot_info['robot_item'];
+                    if (!isset($equipped_player_items[$item_token])){ $equipped_player_items[$item_token] = 0; }
+                    $equipped_player_items[$item_token]++;
+                    $equipped_items_count++;
+                }
+            }
+        }
+    }
+    return $equipped_items_count;
+}
+
 // Define quick functions for getting or setting battle item quantities
 function mmrpg_prototype_init_battle_item_count($item_token){
     $session_token = mmrpg_game_token();
