@@ -1973,6 +1973,11 @@ html, body {
     pointer-events: none;
     transition: opacity 0.3s, top 0.6s;
 }
+#world #canvas #robots-overview .storage-box > .wrapper:after {
+    content: "";
+    display: block;
+    clear: both;
+}
 #world #canvas #robots-overview .storage-robots {
     padding-left: 54px;
 }
@@ -1982,6 +1987,14 @@ html, body {
     opacity: 1.0;
     top: 16px;
     pointer-events: auto;
+}
+#world #canvas #robots-overview .team-robots > .wrapper,
+#world #canvas #robots-overview .storage-box > .wrapper {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
 }
 #robots-overview .storage-box .button {
     display: block;
@@ -2077,23 +2090,40 @@ html, body {
     transform-origin: center center;
 }
 
+#robots-overview .storage-box .sorts,
 #robots-overview .storage-box .pages {
     display: block;
     position: absolute;
     z-index: 20;
-    top: calc(100% - 20px);
-    left: 55px;
-    right: 0px;
-    padding: 0px 46px 9px;
+    padding: 0;
     width: auto;
     height: auto;
     text-align: left;
     color: #cfcfcf;
     text-decoration: none;
     background-color: #191919;
-    border-bottom: 2px solid #090909;
-    border-radius: 0 0 12px 24px;
+    border-style: solid;
+    border-color: #090909;
+    border-width: 0;
+    border-radius: 0;
     user-select: none;
+}
+#robots-overview .storage-box .sorts {
+    top: -20px;
+    left: 26px;
+    right: 26px;
+    padding: 3px 9px 0 6px;
+    border-width: 2px 0 0;
+    border-radius: 24px 24px 0 0;
+    text-align: center;
+}
+#robots-overview .storage-box .pages {
+    top: calc(100% - 20px);
+    left: 55px;
+    right: 0;
+    padding: 0px 46px 9px;
+    border-width: 0 0 2px;
+    border-radius: 0 0 12px 24px;
 }
 #robots-overview .storage-box .pages:before {
     content: "";
@@ -2103,12 +2133,14 @@ html, body {
     left: 39px;
     right: 39px;
     height: 6px;
-    background-color: #202020;
+    background-color: #464646;
     border-radius: 6px;
     pointer-events: none;
     border-bottom: 1px solid #000000;
     pointer-events: none;
 }
+#robots-overview .storage-box .sorts .label,
+#robots-overview .storage-box .sorts .button.sort,
 #robots-overview .storage-box .pages .button.page {
     position: relative;
     top: auto;
@@ -2118,7 +2150,6 @@ html, body {
     display: inline-block;
     box-sizing: border-box;
     min-width: 22px;
-    min-width: calc((100% / 5) - 4px);
     background-color: #191919;
     border-color: #393939;
     color: #cfcfcf;
@@ -2129,15 +2160,31 @@ html, body {
     font-weight: bold;
     z-index: 5;
     user-select: none;
-    cursor: pointer;
     transition: background-color 0.3s, border-color 0.3s, color 0.3s;
 }
+#robots-overview .storage-box .sorts .label {
+    color: #969696;
+    padding-left: 0;
+}
+#robots-overview .storage-box .sorts .button.sort,
+#robots-overview .storage-box .pages .button.page {
+    cursor: pointer;
+}
+#robots-overview .storage-box .sorts .button.sort {
+    padding: 3px 6px;
+}
+#robots-overview .storage-box .pages .button.page {
+    min-width: calc((100% / 5) - 4px);
+}
+#robots-overview .storage-box .sorts .button.sort:hover,
+#robots-overview .storage-box .sorts .button.sort.clicked,
 #robots-overview .storage-box .pages .button.page:hover,
 #robots-overview .storage-box .pages .button.page.clicked {
     background-color: #292929;
     border-color: #cfcfcf;
     color: #ffffff;
 }
+#robots-overview .storage-box .sorts .button.sort:focus,
 #robots-overview .storage-box .pages .button.page:focus {
     outline: 0;
 }
@@ -2146,6 +2193,7 @@ html, body {
     position: absolute;
     z-index: 10;
     top: 0;
+    bottom: 9px;
     min-width: 22px;
 }
 #robots-overview .storage-box .pages .button.page[data-page="back"] {
@@ -2156,10 +2204,44 @@ html, body {
     left: auto;
     right: 12px;
 }
+#robots-overview .storage-box .sorts .button.sort > i {
+    position: relative;
+    margin-left: 3px;
+    right: -1px;
+}
+#robots-overview .storage-box .sorts .button.sort.active,
 #robots-overview .storage-box .pages .button.page.active {
     background-color: #efefef;
     color: #090909;
 }
+#robots-overview .storage-box .sorts .button.sort.active {
+    pointer-events: auto;
+}
+#robots-overview .storage-box .sorts .button.sort.active:after {
+    content: "";
+    position: relative;
+    margin-left: 3px;
+    top: -2px;
+    right: -1px;
+    font-family: 'Font Awesome 5 Pro';
+    font-weight: 900;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+}
+#robots-overview .storage-box .sorts[data-dir="up"] .button.sort.active:after {
+    top: 2px;
+    content: "\f0de";
+}
+#robots-overview .storage-box .sorts[data-dir="down"] .button.sort.active:after {
+    top: -2px;
+    content: "\f0dd";
+}
+#robots-overview .storage-box .sorts .button.sort.disabled,
 #robots-overview .storage-box .pages .button.page.disabled {
     color: #464646;
     cursor: default;
@@ -2845,7 +2927,7 @@ display: block;
     background-image: none !important;
     transform: translate(0, 0);
     transition: outline 0.3s, background-color 0.3s, filter 0.3s;
-    overflow: hidden;
+    overflow: visible;
     pointer-events: none;
     cursor: pointer;
     user-select: none;
@@ -2868,26 +2950,50 @@ display: block;
 }
 #world #canvas #robots-overview .storage-abilities .team-ability .image {
     position: absolute;
+    z-index: 4;
     top: 0;
     left: 0;
     bottom: 0;
     right: auto;
     width: 28px;
-    background-color: #292929;
-    border: 1px solid #191919;
-    border-right: none !important;
-    border-radius: 6px 0 0 6px;
+    background-color: transparent;
+    border: 0 none transparent;
 }
 #world #canvas #robots-overview .storage-abilities .team-ability .image > .sprite {
     position: absolute;
     left: -6px;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translate(0, -50%);
     filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s, filter 0.3s;
+}
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite {
+    transform: translate(0, calc(-50% - 1px));
+    /* filter: drop-shadow(1px 1px 1px rgba(255, 255, 255, 0.3));  */
+}
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back,
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back:after {
+    border-color: #ffffff !important;
+}
+#world #canvas #robots-overview .storage-abilities .team-ability .tint {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: transparent;
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0.5;
+    pointer-events: none;
 }
 #world #canvas #robots-overview .storage-abilities .team-ability .name {
     display: block;
-    padding: 3px 6px;
+    position: relative;
+    z-index: 2;
+    padding: 3px 22px 3px 6px;
     font-size: 11px;
     line-height: 13px;
     font-weight: bold;
@@ -2897,7 +3003,36 @@ display: block;
 #world #canvas #robots-overview .storage-abilities .team-ability .name.oneline {
     line-height: 26px;
 }
-
+#world #canvas #robots-overview .storage-abilities .team-ability .cost {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: 24px;
+    padding-right: 0;
+    color: #ffffff;
+    background-color: #292929;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 1px solid #363636;
+    border-left: none !important;
+    border-radius: 0 6px 6px 0;
+    font-size: 11px;
+    line-height: 26px;
+    text-align: center;
+}
+#world #canvas #robots-overview .storage-abilities .team-ability .cost sup,
+#world #canvas #robots-overview .storage-abilities .team-ability .cost sub {
+    display: block;
+}
+#world #canvas #robots-overview .storage-abilities .team-ability .cost sup {
+    line-height: 18px;
+}
+#world #canvas #robots-overview .storage-abilities .team-ability .cost sub {
+    font-size: 8px;
+    line-height: 1;
+}
 #world #canvas #side-buttons {
     z-index: 1010;
     bottom: 26px;

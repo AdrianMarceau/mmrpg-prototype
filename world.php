@@ -283,12 +283,28 @@ if (!empty($unlocked_player_abilities)
 
 // Collect the user's list of collected items so we know what we already have and how many (all players share)
 $unlocked_player_items = array();
+$equipped_player_items = array();
 $unlocked_items_count = mmrpg_prototype_items_unlocked(true, $unlocked_player_items);
+$equipped_items_count = mmrpg_prototype_items_equipped('', $equipped_player_items);
 //error_log('$unlocked_items_count = '. print_r($unlocked_items_count, true));
 //error_log('$unlocked_player_items = '. print_r($unlocked_player_items, true));
-if (!empty($unlocked_player_items)
-    && empty($this_prototype_data['this_player_items_index'])){
-    $this_prototype_data['this_player_items_index'] = $unlocked_player_items;
+//error_log('$equipped_items_count = '. print_r($equipped_items_count, true));
+//error_log('$equipped_player_items = '. print_r($equipped_player_items, true));
+if (empty($this_prototype_data['this_player_items_index'])){
+    $this_player_items_index = array();
+    if (!empty($unlocked_player_items)){
+        //error_log('$unlocked_player_items = '. print_r($unlocked_player_items, true));
+        $this_player_items_index = array_merge($this_player_items_index, $unlocked_player_items);
+    }
+    if (!empty($equipped_player_items)){
+        //error_log('$equipped_player_items = '. print_r($equipped_player_items, true));
+        foreach ($equipped_player_items AS $token => $equipped){
+            if (!isset($this_player_items_index[$token])){ $this_player_items_index[$token] = 0; }
+            $this_player_items_index[$token.'__equipped'] = $equipped;
+        }
+    }
+    $this_prototype_data['this_player_items_index'] = $this_player_items_index;
+    //error_log('$this_player_items_index(new) = '. print_r($this_player_items_index, true));
 }
 
 // Update the player's mobility with any character-specific bonuses or contextual modifiers

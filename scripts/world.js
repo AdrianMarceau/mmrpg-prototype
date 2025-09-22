@@ -1492,9 +1492,14 @@ class mmrpgWorldMap {
             let $teamSprites = _elements.teamSprites;
             let $robotsOnMap = $teamSprites.filter('.robot:not(.cursor)');
             let $teamRobotsDiv = $('.team-robots', $robotsOverview);
+            let $storageBoxDivs = $('.storage-box', $robotsOverview);
             let $storageRobotsDiv = $('.storage-robots', $robotsOverview);
             let $storageItemsDiv = $('.storage-items', $robotsOverview);
             let $storageAbilitiesDiv = $('.storage-abilities', $robotsOverview);
+            let $teamRobotsWrapper = $('> .wrapper', $teamRobotsDiv);
+            let $storageRobotsWrapper = $('> .wrapper', $storageRobotsDiv);
+            let $storageItemsWrapper = $('> .wrapper', $storageItemsDiv);
+            let $storageAbilitiesWrapper = $('> .wrapper', $storageAbilitiesDiv);
             let $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
             let $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
             let $storageItemsInOverview = $('.team-item[data-item]', $storageItemsDiv);
@@ -1555,6 +1560,7 @@ class mmrpgWorldMap {
                 let storagePagesRequired;
                 let currentStoragePageNum;
                 let $storageObjectsDiv;
+                let $storageObjectsWrapper;
                 let $storageObjectsInOverview;
                 if (storageKind === 'robots'){
                     $storageObjectsDiv = $storageRobotsDiv;
@@ -1572,6 +1578,7 @@ class mmrpgWorldMap {
                     storageSlotsVisible = _config.abilityStorageSlotsVisible;
                     storageObjectSelector = '.team-ability[data-ability]';
                     }
+                $storageObjectsWrapper = $('> .wrapper', $storageObjectsDiv);
                 storageObjectsWaiting = $storageObjectsInOverview.length;
                 storagePagesRequired = storageObjectsWaiting > storageSlotsVisible ? Math.ceil(storageObjectsWaiting / storageSlotsVisible) : 1;
                 currentStoragePageNum = $storageObjectsDiv.is('[data-page]') ? parseInt($storageObjectsDiv.attr('data-page')) : 0;
@@ -1579,6 +1586,7 @@ class mmrpgWorldMap {
                 //console.log('-> storageObjectsWaiting = ', storageObjectsWaiting);
                 let storageConfig = {
                     storageDiv: $storageObjectsDiv,
+                    storageWrapper: $storageObjectsWrapper,
                     storageObjects: $storageObjectsInOverview,
                     objectSelector: storageObjectSelector,
                     numVisible: storageSlotsVisible,
@@ -1597,6 +1605,7 @@ class mmrpgWorldMap {
                 if (!storageConfig){ return false; }
                 //console.log('-> storageConfig = ', storageConfig);
                 let $storageObjectsDiv = storageConfig.storageDiv;
+                let $storageObjectsWrapper = storageConfig.storageWrapper;
                 let $storageObjectsInOverview = storageConfig.storageObjects;
                 let storageObjectSelector = storageConfig.objectSelector;
                 let storageSlotsVisible = storageConfig.numVisible;
@@ -1604,6 +1613,7 @@ class mmrpgWorldMap {
                 let storagePagesRequired = storageConfig.numPages;
                 let currentStoragePageNum = storageConfig.currentPage;
                 //console.log('-> $storageObjectsDiv = ', $storageObjectsDiv);
+                //console.log('-> $storageObjectsWrapper = ', $storageObjectsWrapper);
                 //console.log('-> $storageObjectsInOverview = ', $storageObjectsInOverview);
                 //console.log('-> storageObjectSelector = ', storageObjectSelector);
                 //console.log('-> storageSlotsVisible = ', storageSlotsVisible);
@@ -1658,6 +1668,7 @@ class mmrpgWorldMap {
                 if (!storageConfig){ return false; }
                 //console.log('-> storageConfig = ', storageConfig);
                 let $storageObjectsDiv = storageConfig.storageDiv;
+                let $storageObjectsWrapper = storageConfig.storageWrapper;
                 let $storageObjectsInOverview = storageConfig.storageObjects;
                 let storageObjectSelector = storageConfig.objectSelector;
                 let storageSlotsVisible = storageConfig.numVisible;
@@ -1665,6 +1676,7 @@ class mmrpgWorldMap {
                 let storagePagesRequired = storageConfig.numPages;
                 let currentStoragePageNum = storageConfig.currentPage;
                 //console.log('-> $storageObjectsDiv = ', $storageObjectsDiv);
+                //console.log('-> $storageObjectsWrapper = ', $storageObjectsWrapper);
                 //console.log('-> $storageObjectsInOverview = ', $storageObjectsInOverview);
                 //console.log('-> storageObjectSelector = ', storageObjectSelector);
                 //console.log('-> storageSlotsVisible = ', storageSlotsVisible);
@@ -1704,6 +1716,102 @@ class mmrpgWorldMap {
                     $('.button[data-page="next"]', $storageObjectsDiv).addClass('disabled');
                     }
                 };
+            // Define a function for sorting a given storage page of either robots, items, or abilities by a given sort-token
+            let sortStoragePage = function(storageKind, sortToken, sortDirection, goToPageNum){
+                //console.log('%c' + '-> sortStoragePage(' + storageKind + ', ' + sortToken + ', ' + sortDirection + ') triggered', 'color: magenta;');
+                if (!storageKind || typeof storageKind !== 'string'){ return false; }
+                if (!sortToken || typeof sortToken !== 'string'){ return false; }
+                if (!sortDirection || (sortDirection !== 'up' && sortDirection !== 'down')){ sortDirection = 'down'; }
+                if (!goToPageNum || typeof goToPageNum !== 'number'){ goToPageNum = 0; }
+                let storageConfig = calculateStorage(storageKind);
+                if (!storageConfig){ return false; }
+                //console.log('-> storageConfig = ', storageConfig);
+                let $storageObjectsDiv = storageConfig.storageDiv;
+                let $storageObjectsWrapper = storageConfig.storageWrapper;
+                let $storageObjectsInOverview = storageConfig.storageObjects;
+                let storageObjectSelector = storageConfig.objectSelector;
+                let storageSlotsVisible = storageConfig.numVisible;
+                let storageObjectsWaiting = storageConfig.numTotal;
+                let storagePagesRequired = storageConfig.numPages;
+                let currentStoragePageNum = storageConfig.currentPage;
+                //console.log('-> $storageObjectsDiv = ', $storageObjectsDiv);
+                //console.log('-> $storageObjectsWrapper = ', $storageObjectsWrapper);
+                //console.log('-> $storageObjectsInOverview = ', $storageObjectsInOverview);
+                //console.log('-> storageObjectSelector = ', storageObjectSelector);
+                //console.log('-> storageSlotsVisible = ', storageSlotsVisible);
+                //console.log('-> storageObjectsWaiting = ', storageObjectsWaiting);
+                //console.log('-> storagePagesRequired = ', storagePagesRequired);
+                //console.log('-> currentStoragePageNum = ', currentStoragePageNum);
+                if (!sortToken || !sortDirection){ return false; }
+                // update the parent container and buttons to reflect the current sort
+                let $sortParent = $('.sorts', $storageObjectsDiv);
+                $sortParent.attr('data-dir', sortDirection);
+                $sortParent.find('.sort').removeClass('active');
+                $sortParent.find('.sort[data-sort="' + sortToken + '"]').addClass('active');
+                // sort the objects and then re-display the current page
+                let $objectsList = $(storageObjectSelector, $storageObjectsDiv);
+                let dataSortAttr = 'data-' + sortToken;
+                let fallbackSortAttr = dataSortAttr !== 'data-index-key' ? 'data-index-key' : 'data-storage-key';
+                let reverseSort = sortDirection === 'up' ? true : false;
+                $objectsList.sort(function(a, b){
+                    let aToken = parseFloat($(a).attr(dataSortAttr) || '0');
+                    let bToken = parseFloat($(b).attr(dataSortAttr) || '0');
+                    let aToken2 = parseFloat($(a).attr(fallbackSortAttr) || '0');
+                    let bToken2 = parseFloat($(b).attr(fallbackSortAttr) || '0');
+                    if (aToken < bToken){ return !reverseSort ? -1 : 1; }
+                    if (aToken > bToken){ return !reverseSort ? 1 : -1; }
+                    if (aToken2 < bToken2){ return !reverseSort ? -1 : 1; }
+                    if (aToken2 > bToken2){ return !reverseSort ? 1 : -1; }
+                    return 0;
+                    }
+                );
+                //console.log('-> storageConfig =', storageConfig);
+                //console.log('-> $objectsList =', $objectsList);
+                //console.log('-> dataSortAttr =', dataSortAttr);
+                //console.log('-> reverseSort =', reverseSort);
+                $storageObjectsWrapper.empty().prepend($objectsList);
+                // Re-display the current page to reflect the new sort order
+                if (!goToPageNum){ goToPageNum = parseInt($storageObjectsDiv.attr('data-page') || '0'); }
+                goToStoragePage(storageKind, goToPageNum);
+                // Return true on success
+                return true;
+                };
+            // Bind events to any sort buttons in the storage box divs
+            $storageBoxDivs.delegate('.sort[data-sort]', 'click', function(e){
+                e.preventDefault();
+                if (_self.worldIsBusy()){ return; }
+                if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
+                //console.log('%c' + 'sort button clicked!', 'color: cyan;');
+                let $sortButton = $(this);
+                let $sortParent = $sortButton.closest('.sorts');
+                let $storageBoxDiv = $sortButton.closest('.storage-box');
+                let $storageBoxWrapper = $('> .wrapper', $storageBoxDiv);
+                let storageKind = $storageBoxDiv.attr('data-storage');
+                let storagePage = parseInt($storageBoxDiv.attr('data-page') || '0');
+                let sortToken = $sortButton.attr('data-sort') || false;
+                let sortDirection = $sortParent.is('[data-dir]') ? $sortParent.attr('data-dir') : 'down';
+                if (!$sortButton.is('.active')){ sortDirection = 'down'; storagePage = 1; } // default to down if not active yet
+                else { sortDirection = sortDirection === 'down' ? 'up' : 'down'; }  // reverse if already active
+                //console.log('-> sortToken =', sortToken);
+                //console.log('-> sortDirection =', sortDirection);
+                sortStoragePage(storageKind, sortToken, sortDirection, storagePage);
+                // Return true on success
+                return true;
+                });
+            // Auto-trigger a sort at least once on all the storage boxes to ensure a default order
+            $storageBoxDivs.each(function(){
+                let $storageBoxDiv = $(this);
+                let $sortParent = $('.sorts', $storageBoxDiv);
+                let storageKind = $storageBoxDiv.attr('data-storage');
+                let $activeSortButton = $('.sort.active', $sortParent);
+                let $firstSortButton = $('.sort', $sortParent).first();
+                let selectedSortToken = false;
+                if ($activeSortButton && $activeSortButton.length){ selectedSortToken = $activeSortButton.attr('data-sort') || false; }
+                else if ($firstSortButton && $firstSortButton.length){ selectedSortToken = $firstSortButton.attr('data-sort') || false; }
+                let selectedSortDirection = $sortParent.is('[data-dir]') ? $sortParent.attr('data-dir') : false;
+                //console.log('-> auto-triggering storage-sort for ' + storageKind + ' w/ ' + selectedSortToken + ' (' + selectedSortDirection + ')');
+                if (selectedSortToken){ sortStoragePage(storageKind, selectedSortToken, selectedSortDirection); }
+                });
             // Add all these methods to the API in case future code needs to access them too
             robotsOverviewAPI.disableOtherElements = disableOtherElements;
             robotsOverviewAPI.enableOtherElements = enableOtherElements;
@@ -1830,7 +1938,7 @@ class mmrpgWorldMap {
                     // Remake the storage bullets and pages now
                     makeStorageBullets();
                     makeStoragePages('robots');
-                    goToStoragePage('robots', 1);
+                    goToStoragePage('robots', parseInt($storageRobotsDiv.attr('data-page') || ''));
                     // Mark the team-robots side as the focused one to start
                     // and the first robot in the overview as selected via class
                     $teamRobotsDiv.addClass('focused');
@@ -1942,8 +2050,8 @@ class mmrpgWorldMap {
                     let cancelAction = function(){
                         //console.log('%c' + '-> robot-storage cancelAction() triggered', 'color: magenta;');
                         // First we revert the robots in the overview back to the backup copy we made earlier
-                        $teamRobotsDiv.empty().prepend($teamRobotsInOverviewBackup);
-                        $storageRobotsDiv.empty().prepend($storageRobotsInOverviewBackup);
+                        $teamRobotsWrapper.empty().prepend($teamRobotsInOverviewBackup);
+                        $storageRobotsWrapper.empty().prepend($storageRobotsInOverviewBackup);
                         $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
                         $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
                         // Then we remove the save/cancel button set from the overview panel
@@ -1970,10 +2078,6 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
-                // make sure we show the first page of storage robots by default
-                //makeStorageBullets();
-                //makeStoragePages('robots');
-                //goToStoragePage('robots', 1); // initialize to page 1
                 }
             // Bind a click event to the team-items button in the robots overview
             let $itemsButton = $('.team-items', $robotsOverview);
@@ -1993,11 +2097,9 @@ class mmrpgWorldMap {
                         }
                     // Expand the robot overview to the item-storage view panel
                     showRobotsOverviewPanel('items');
-                    // Now we can run setup for the rest of the UI elements in this view
-                    console.warn('TODO: insert the rest of the item-storage bindings here (WIP)');
                     // Remake the storage pages for the items now
                     makeStoragePages('items');
-                    goToStoragePage('items', 1);
+                    goToStoragePage('items', parseInt($storageItemsDiv.attr('data-page') || ''));
                     // Mark the team-robots side as the focused one to start
                     // and the first robot in the overview as selected via class
                     $teamRobotsDiv.addClass('focused');
@@ -2010,10 +2112,12 @@ class mmrpgWorldMap {
                         $sideButtons.removeClass('maybe');
                         $dismissButton.trigger('click');
                         }
+                    // Now we can run setup for the rest of the UI elements in this view
+                    console.warn('TODO: insert the rest of the item-storage bindings here (WIP)');
                     // Return true on success
                     return true;
                     });
-                // TODO: add event bindings for the actual items within the storage panel
+                // TODO: delegate event bindings for the actual items within the storage panel
                 // ...
                 }
             // Bind a click event to the team-abilities button in the robots overview
@@ -2034,11 +2138,11 @@ class mmrpgWorldMap {
                         }
                     // Expand the robot overview to the ability-storage view panel
                     showRobotsOverviewPanel('abilities');
-                    // Now we can run setup for the rest of the UI elements in this view
-                    console.warn('TODO: insert the rest of the ability-storage bindings here');
+                    // Check to see which page we're on (if already opened before), else default to first
+                    let goToPageNum = $storageAbilitiesDiv.is('[data-page]') ? parseInt($storageAbilitiesDiv.attr('data-page')) : 1;
                     // Remake the storage pages for the abilities now
                     makeStoragePages('abilities');
-                    goToStoragePage('abilities', 1);
+                    goToStoragePage('abilities', goToPageNum);
                     // Mark the team-robots side as the focused one to start
                     // and the first robot in the overview as selected via class
                     $teamRobotsDiv.addClass('focused');
@@ -2051,10 +2155,12 @@ class mmrpgWorldMap {
                         $sideButtons.removeClass('maybe');
                         $dismissButton.trigger('click');
                         }
+                    // Now we can run setup for the rest of the UI elements in this view
+                    console.warn('TODO: insert the rest of the ability-storage bindings here');
                     // Return true on success
                     return true;
                     });
-                // TODO: add event bindings for the actual abilities within the storage panel
+                // TODO: delegate event bindings for the actual abilities within the storage panel
                 // ...
                 }
             }
@@ -5918,6 +6024,7 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
+        let _worldPlayerItems = _worldPlayer.items;
         let _mmrpgItemsIndex = _indexes.items;
         // Break the robot sprite into ID and token and collect its info
         let robotId = parseInt(robotString.split('_')[0]) || false;
@@ -5942,8 +6049,14 @@ class mmrpgWorldMap {
             return false;
             }
         // Update the robot info with the new hold item
+        // then re-sync the robot info with the index
         robotInfo.item = itemToken;
-        _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
+        _worldPlayerRobots[robotString] = robotInfo;
+        // Add this item to the player's equipped items list
+        if (typeof _worldPlayerItems[itemToken + '__equipped'] === 'undefined'){ _worldPlayerItems[itemToken + '__equipped'] = 0; }
+        _worldPlayerItems[itemToken + '__equipped'] += 1;
+        // Add the item to the inventory as if picked-up and let that method handle quantity abstractions
+        _self.addItemToInventory(itemToken, 1);
         // Collect a reference to this robot's element in the overview panel
         let $robotsOverview = _elements.robotsOverview;
         let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', $robotsOverview);
@@ -6444,7 +6557,7 @@ class mmrpgWorldMap {
 
     // Define a quick function for adding an item to the player's inventory if there's room for it
     addItemToInventory(itemToken, itemQuantity, animatePickup, playSound){
-        //console.log('%c' + 'mmrpgWorldMap.addItemToInventory(item:' + itemToken + ', quantity:' + itemQuantity + ')', 'color: magenta;');
+        console.log('%c' + 'mmrpgWorldMap.addItemToInventory(item:' + itemToken + ', quantity:' + itemQuantity + ')', 'color: magenta;');
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('addItemToInventory() missing required itemToken!'); return false; }
         if (typeof itemQuantity !== 'number' || isNaN(itemQuantity) || itemQuantity < 1){ itemQuantity = 1; }
         if (typeof animatePickup !== 'boolean'){ animatePickup = true; } // default to true if not provided
@@ -6457,7 +6570,15 @@ class mmrpgWorldMap {
         let _self = this;
         let _config = _self.config;
         let _elements = _self.elements;
+        let _indexes = _self.indexes;
+        let _mmrpgItemsIndex = _indexes.items;
+        if (typeof _mmrpgItemsIndex[itemToken] === 'undefined'){ console.error('addItemToInventory() could not find item in index for token ' + itemToken + '!'); return false; }
+        let itemIndexInfo = _mmrpgItemsIndex[itemToken];
+        //console.log('--> itemIndexInfo =', itemIndexInfo);
         let $thisWorld = _elements.world;
+        let $robotsOverview = _elements.robotsOverview;
+        let $storageItemsOverview = $('.storage-items', $robotsOverview);
+        let $storageItemInOverview = $('.team-item[data-item="' + itemToken + '"]', $storageItemsOverview);
         let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerItems = _worldPlayer.items;
@@ -6466,7 +6587,11 @@ class mmrpgWorldMap {
         if (typeof _worldPlayerItems[itemToken] === 'undefined'){ _worldPlayerItems[itemToken] = 0; }
         // Check to see if there's room for the item in the inventory
         let currentItemQuantity = _worldPlayerItems[itemToken];
-        //console.log('--> currentItemQuantity =', currentItemQuantity);
+        let equippedItemQuantity = _worldPlayerItems[itemToken + '__equipped'];
+        if (!currentItemQuantity){ currentItemQuantity = 0; }
+        if (!equippedItemQuantity){ equippedItemQuantity = 0; }
+        console.log('--> currentItemQuantity =', currentItemQuantity);
+        console.log('--> equippedItemQuantity =', equippedItemQuantity);
         if (currentItemQuantity >= itemInventoryMax){
             console.warn('addItemToInventory() called for item that is already at max quantity!');
             return false; // no room in the inventory
@@ -6474,7 +6599,7 @@ class mmrpgWorldMap {
         // If there is room, add the item to the inventory
         let overflowQuantity = 0;
         let newItemQuantity = currentItemQuantity + itemQuantity;
-        //console.log('--> newItemQuantity =', newItemQuantity);
+        console.log('--> newItemQuantity =', newItemQuantity);
         if (newItemQuantity > itemInventoryMax){
             console.warn('--> inventory for item', itemToken, 'is full, so capping at max value');
             overflowQuantity = newItemQuantity - itemInventoryMax; // calculate overflow
@@ -6484,6 +6609,7 @@ class mmrpgWorldMap {
             // TODO: do something with overflow later b/c right now we don't wanna
             }
         _worldPlayerItems[itemToken] = newItemQuantity;
+        let displayedItemQuantity = newItemQuantity - equippedItemQuantity;
         //console.log('--> updated _worldPlayerItems['+itemToken+'] => ', _worldPlayerItems[itemToken]);
         // If an animation was requested, make sure we show it above the player's head
         if (animatePickup){
@@ -6492,6 +6618,34 @@ class mmrpgWorldMap {
             }
         // If a sound was requested, play it now
         if (playSound){ _self.playSoundEffect('get-item'); }
+        // If this item exists in the robot overview, update the quantity there as well, else create it
+        if ($storageItemInOverview.length){
+            $storageItemInOverview.attr('data-quantity', displayedItemQuantity);
+            $storageItemInOverview.find('.quantity').html('&times; ' + displayedItemQuantity);
+            } else {
+            let itemName = itemIndexInfo.name;
+            let itemImageSize = itemIndexInfo.imageSize;
+            let itemTypes = [];
+            if (itemIndexInfo.type){ itemTypes.push(itemIndexInfo.type); }
+            if (itemIndexInfo.type2){ itemTypes.push(itemIndexInfo.type2); }
+            let itemTypeClasses = 'type ' + (itemTypes.length ? itemTypes.join(' ') : 'none');
+            let animationDelay = -1 * ( Math.floor(Math.random() * 10) / 100 );
+            let itemSpriteStyles = 'animation-delay: ' + animationDelay + 's;';
+            let itemNameMarkup = itemName.replace(' ', '<br />');
+            let storageItemMarkup = '';
+            storageItemMarkup += '<div class="team-item" data-item="' + itemToken + '" data-quantity="' + displayedItemQuantity + '">';
+                storageItemMarkup += '<div class="image ' + itemTypeClasses + '">';
+                    storageItemMarkup += '<span class="sprite item icon" data-sprite="item" data-token="' + itemToken + '" data-size="' + itemImageSize + '" data-dir="right" data-frame="00" style="' + itemSpriteStyles + '">';
+                        storageItemMarkup += '<span class="wrap"><i class="sprite"></i></span>';
+                    storageItemMarkup += '</span>';
+                storageItemMarkup += '</div>';
+                storageItemMarkup += '<strong class="name">' + itemNameMarkup + '</strong>';
+                storageItemMarkup += '<span class="quantity">&times; ' + displayedItemQuantity + '</span>';
+            storageItemMarkup += '</div>';
+            $storageItemsOverview.append(storageItemMarkup);
+            $storageItemInOverview = $('.team-item[data-item="' + itemToken + '"]', $storageItemsOverview);
+            }
+
         // Trigger a save of the world state to persist this change
         //console.log('-> checking if we should reload the world on save');
         let reloadWorldOnSave = false;
