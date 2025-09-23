@@ -2089,9 +2089,10 @@ html, body {
     animation-fill-mode: forwards;
     transform-origin: center center;
 }
-
 #robots-overview .storage-box .sorts,
-#robots-overview .storage-box .pages {
+#robots-overview .storage-box .pages,
+#robots-overview .storage-box .toggles,
+#robots-overview .storage-box .counter {
     display: block;
     position: absolute;
     z-index: 20;
@@ -2109,6 +2110,7 @@ html, body {
     user-select: none;
 }
 #robots-overview .storage-box .sorts {
+    z-index: 20;
     top: -20px;
     left: 26px;
     right: 26px;
@@ -2118,30 +2120,60 @@ html, body {
     text-align: center;
 }
 #robots-overview .storage-box .pages {
+    z-index: 21;
     top: calc(100% - 20px);
     left: 55px;
     right: 0;
-    padding: 0px 46px 9px;
+    padding: 12px 46px 6px;
     border-width: 0 0 2px;
     border-radius: 0 0 12px 24px;
 }
-#robots-overview .storage-box .pages:before {
+#robots-overview .storage-box .toggles {
+    z-index: 22;
+    top: 20px;
+    left: auto;
+    right: -36px;
+    padding: 6px 3px 6px 6px;
+    border-radius: 0 3px 3px 0;
+    border-width: 0 1px 2px 0;
+}
+#robots-overview .storage-box .counter {
+    z-index: 28;
+    bottom: 12px;
+    left: auto;
+    right: 14px;
+    background-color: #141414;
+    border-width: 1px 0 0 1px;
+    font-size: 11px;
+    line-height: 1;
+    text-align: center;
+    padding: 2px 12px 4px;
+    border-radius: 6px;
+}
+#robots-overview .storage-box .pages:before,
+#robots-overview .storage-box .pages:after {
     content: "";
     display: block;
     position: absolute;
-    top: 10px;
     left: 39px;
     right: 39px;
     height: 6px;
     background-color: #464646;
     border-radius: 6px;
-    pointer-events: none;
     border-bottom: 1px solid #000000;
     pointer-events: none;
 }
+#robots-overview .storage-box .pages:before {
+    top: 22px;
+}
+#robots-overview .storage-box .pages:after {
+    bottom: 13px;
+}
 #robots-overview .storage-box .sorts .label,
+#robots-overview .storage-box .pages .count,
 #robots-overview .storage-box .sorts .button.sort,
-#robots-overview .storage-box .pages .button.page {
+#robots-overview .storage-box .pages .button.page,
+#robots-overview .storage-box .toggles .button.toggle {
     position: relative;
     top: auto;
     bottom: auto;
@@ -2166,8 +2198,32 @@ html, body {
     color: #969696;
     padding-left: 0;
 }
+#robots-overview .storage-box .counter > span {
+    display: inline-block;
+    margin: 0 auto;
+}
+#robots-overview .storage-box .counter > span:not(:last-child):after {
+    content: "/";
+    display: inline-block;
+    margin: 0 6px;
+    color: #464646;
+}
+#robots-overview .storage-box .counter .visible {
+    color: #fefefe;
+}
+#robots-overview .storage-box .counter .current {
+    color: #dedede;
+}
+#robots-overview .storage-box .counter .total {
+    color: #cacaca;
+}
+#robots-overview .storage-box .counter .divider {
+    color: #464646;
+    padding: 0 6px;
+}
 #robots-overview .storage-box .sorts .button.sort,
-#robots-overview .storage-box .pages .button.page {
+#robots-overview .storage-box .pages .button.page,
+#robots-overview .storage-box .toggles .button.toggle {
     cursor: pointer;
 }
 #robots-overview .storage-box .sorts .button.sort {
@@ -2176,24 +2232,30 @@ html, body {
 #robots-overview .storage-box .pages .button.page {
     min-width: calc((100% / 5) - 4px);
 }
+#robots-overview .storage-box .toggles .button.toggle {
+    font-size: 13px;
+}
 #robots-overview .storage-box .sorts .button.sort:hover,
 #robots-overview .storage-box .sorts .button.sort.clicked,
 #robots-overview .storage-box .pages .button.page:hover,
-#robots-overview .storage-box .pages .button.page.clicked {
+#robots-overview .storage-box .pages .button.page.clicked,
+#robots-overview .storage-box .toggles .button.toggle:hover,
+#robots-overview .storage-box .toggles .button.toggle.clicked {
     background-color: #292929;
     border-color: #cfcfcf;
     color: #ffffff;
 }
 #robots-overview .storage-box .sorts .button.sort:focus,
-#robots-overview .storage-box .pages .button.page:focus {
+#robots-overview .storage-box .pages .button.page:focus,
+#robots-overview .storage-box .toggles .button.toggle:focus {
     outline: 0;
 }
 #robots-overview .storage-box .pages .button.page[data-page="back"],
 #robots-overview .storage-box .pages .button.page[data-page="next"] {
     position: absolute;
     z-index: 10;
-    top: 0;
-    bottom: 9px;
+    top: 12px;
+    bottom: 6px;
     min-width: 22px;
 }
 #robots-overview .storage-box .pages .button.page[data-page="back"] {
@@ -2208,6 +2270,14 @@ html, body {
     position: relative;
     margin-left: 3px;
     right: -1px;
+}
+#robots-overview .storage-box .toggles .button.toggle > i {
+    position: relative;
+    display: none;
+}
+#robots-overview .storage-box .toggles .toggle[data-toggle][data-state="visible"] > .icon[data-state="visible"],
+#robots-overview .storage-box .toggles .toggle[data-toggle][data-state="hidden"] > .icon[data-state="hidden"] {
+    display: block;
 }
 #robots-overview .storage-box .sorts .button.sort.active,
 #robots-overview .storage-box .pages .button.page.active {
@@ -2242,11 +2312,15 @@ html, body {
     content: "\f0dd";
 }
 #robots-overview .storage-box .sorts .button.sort.disabled,
-#robots-overview .storage-box .pages .button.page.disabled {
+#robots-overview .storage-box .pages .button.page.disabled,
+#robots-overview .storage-box .toggles .button.toggle.disabled {
     color: #464646;
     cursor: default;
     pointer-events: none;
     border-color: transparent;
+}
+#robots-overview .storage-box .toggles .button.toggle.disabled {
+    background-color: transparent;
 }
 
 #world #canvas #robots-overview .team-robots.focused,
@@ -2944,6 +3018,7 @@ display: block;
     display: none;
 }
 #world #canvas #robots-overview .storage-abilities .team-ability.disabled,
+#world #canvas #robots-overview .storage-abilities .team-ability.incompatible,
 #world #canvas #robots-overview .storage-abilities .team-ability[data-quantity="0"] {
     filter: brightness(0.4);
     cursor: default;

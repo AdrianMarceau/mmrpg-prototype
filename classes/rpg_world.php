@@ -1911,6 +1911,25 @@ class rpg_world {
             $markup .= '</div>';
             return $markup;
             };
+        $get_toggle_options = function($toggle_options){
+            if (empty($toggle_options)){ return false; }
+            $markup = '';
+            $markup .= '<div class="toggles">';
+            foreach ($toggle_options AS $option_token => $option_data){
+                if (empty($option_data) || !is_array($option_data)){ continue; }
+                $option_states = $option_data; unset($option_states['default']);
+                $default_state = isset($option_data['default']) ? $option_data['default'] : array_keys($option_data)[0];
+                $class = 'class="button toggle"';
+                $attrs = 'data-toggle="'.$option_token.'" data-state="'.$default_state.'"';
+                $markup .= '<button type="button" '.$class.' '.$attrs.'>';
+                    foreach ($option_states AS $state => $state_icon){
+                        $markup .= '<i class="icon fas fa-'.$state_icon.'" data-state="'.$state.'"></i>';
+                        }
+                $markup .= '</button>';
+            }
+            $markup .= '</div>';
+            return $markup;
+            };
         // Pre-parse any items that are part of sets so we can display their quantities as normal items
         $get_storage_item_sets = function($storage_item_tokens) use ($mmrpg_index_items){
             //error_log('$parse_storage_item_sets() called!');
@@ -2139,6 +2158,13 @@ class rpg_world {
                 'quantity' => 'owned',
                 'storage-key' => 'new',
                 ));
+            $return_markup .= $get_toggle_options(array(
+                'outofstock' => array(
+                    'visible' => 'eye',
+                    'hidden' => 'eye-slash',
+                    'default' => 'visible',
+                    ),
+                ));
             $return_markup .= '<div class="wrapper">';
             $storage_item_types_revised = array('none', 'energy', 'weapons', 'attack', 'defense', 'speed');
             $storage_item_types_revised = array_unique(array_merge($storage_item_types_revised, array_keys($mmrpg_index_types)));
@@ -2160,6 +2186,7 @@ class rpg_world {
                 elseif ($item_quantity > MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $item_quantity = MMRPG_SETTINGS_ITEMS_MAXQUANTITY; }
                 if (empty($item_quantity) || $item_quantity < 1){ $item_quantity = 0; }
                 $item_info = $mmrpg_index_items[$item_token];
+                $item_id = $item_info['item_id'];
                 $item_type1 = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
                 $item_type2 = !empty($item_info['item_type2']) ? $item_info['item_type2'] : '';
                 $item_index_key = array_search($item_token, array_keys($mmrpg_index_items));
@@ -2179,6 +2206,7 @@ class rpg_world {
                 $item_sprite = self::get_sprite('item', $item_token, '', 'right', 'icon', '', '', 'icon');
                 $markup_attrs = '';
                 $markup_attrs .= 'data-item="'.$item_token.'" ';
+                $markup_attrs .= 'data-item-id="'.$item_id.'" ';
                 $markup_attrs .= 'data-quantity="'.$item_quantity.'" ';
                 $markup_attrs .= 'data-index-key="'.$item_index_key.'" ';
                 $markup_attrs .= 'data-storage-key="'.$item_storage_key.'" ';
@@ -2204,17 +2232,29 @@ class rpg_world {
                 'energy-cost' => 'cost',
                 'storage-key' => 'new',
                 ));
+            $return_markup .= $get_toggle_options(array(
+                'incompatible' => array(
+                    'visible' => 'eye',
+                    'hidden' => 'eye-slash',
+                    'default' => 'visible',
+                    ),
+                ));
             $return_markup .= '<div class="wrapper">';
+            $elemental_type_tokens = rpg_type::get_index_tokens(false, false, false, false);
+            $storage_ability_types_revised = array_unique(array_merge($elemental_type_tokens, array('copy', 'none'), array_keys($mmrpg_index_types)));
+            //error_log('$elemental_type_tokens = '.print_r($elemental_type_tokens, true));
+            //error_log('$storage_ability_types_revised = '.print_r($storage_ability_types_revised, true));
             $storage_ability_tokens_reversed = array_reverse($storage_ability_tokens, true);
             foreach ($storage_ability_tokens AS $ability_key => $ability_token){
                 if ($ability_token === 'ability' || empty($mmrpg_index_abilities[$ability_token])){ continue; }
                 $ability_info = $mmrpg_index_abilities[$ability_token];
+                $ability_id = $ability_info['ability_id'];
                 $ability_type1 = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
                 $ability_type2 = !empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : '';
                 $ability_index_key = array_search($ability_token, array_keys($mmrpg_index_abilities));
-                $ability_type_key = array_search($ability_type1, array_keys($mmrpg_index_types));
+                $ability_type_key = array_search($ability_type1, $storage_ability_types_revised);
                 $ability_storage_key = array_search($ability_token, $storage_ability_tokens_reversed);
-                if (!empty($ability_type2)){ $ability_type_key += (array_search($ability_type2, array_keys($mmrpg_index_types)) / 100); }
+                if (!empty($ability_type2)){ $ability_type_key += (array_search($ability_type2, $storage_ability_types_revised) / 100); }
                 $ability_name = $ability_info['ability_name'];
                 $ability_cost = !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'] : 0;
                 $ability_types = 'type '.(empty($ability_info['ability_type']) ? 'none' : $ability_info['ability_type'].(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : ''));
@@ -2225,6 +2265,7 @@ class rpg_world {
                 $ability_sprite = self::get_sprite('ability', $ability_token, '', 'right', 'icon', '', '', 'icon');
                 $markup_attrs = '';
                 $markup_attrs .= 'data-ability="'.$ability_token.'" ';
+                $markup_attrs .= 'data-ability-id="'.$ability_id.'" ';
                 $markup_attrs .= 'data-energy-cost="'.$ability_cost.'" ';
                 $markup_attrs .= 'data-index-key="'.$ability_index_key.'" ';
                 $markup_attrs .= 'data-storage-key="'.$ability_storage_key.'" ';
@@ -3483,6 +3524,7 @@ class rpg_world {
         if (empty($robot_id) || !is_numeric($robot_id)){ error_log('Invalid robot ID "'.$robot_id.'"'); return false; }
         static $mmrpg_index_players; if (empty($mmrpg_index_players)){ $mmrpg_index_players = self::get_index('players'); }
         static $mmrpg_index_robots; if (empty($mmrpg_index_robots)){ $mmrpg_index_robots = self::get_index('robots'); }
+        static $mmrpg_index_abilities; if (empty($mmrpg_index_abilities)){ $mmrpg_index_abilities = self::get_index('abilities'); }
         if (empty($mmrpg_index_players[$player_token])){ error_log('Invalid player token "'.$player_token.'"'); return false; }
         if (empty($mmrpg_index_robots[$robot_token])){ error_log('Invalid robot token "'.$robot_token.'"'); return false; }
         static $player_starforce; if (empty($player_starforce)){ $player_starforce = rpg_game::starforce_unlocked(); }
@@ -3548,6 +3590,25 @@ class rpg_world {
             $robot_weapons_percent = ceil(($robot_weapons / $robot_weapons_max) * 100);
             $robot_weapons_rating = $get_rating_token($robot_weapons_percent);
             }
+        $temp_ability_token_to_id = function($token) use($mmrpg_index_abilities) {
+            if (!isset($mmrpg_index_abilities[$token])){ return 0; }
+            return intval($mmrpg_index_abilities[$token]['ability_id']);
+            };
+        $robot_abilities = !empty($robot_settings['robot_abilities']) ? array_map(function($a){ return is_array($a) ? array_values($a)[0] : $a; }, array_values($robot_settings['robot_abilities'])) : array();
+        $robot_abilities_compatible = rpg_robot::get_ability_compatibility($robot_token, ''); // omitting $robot_item so we get a base-list instead
+        $robot_abilities_compatible_via_item = rpg_robot::get_ability_compatibility($robot_token, $robot_item); // now we grab a copy w/ item included to get a diff
+        $robot_abilities_via_item = array_values(array_diff($robot_abilities_compatible_via_item, $robot_abilities_compatible));
+        //error_log('['.$robot_token.'] -> $robot_abilities(before) = '.print_r($robot_abilities, true));
+        //error_log('['.$robot_token.'] -> $robot_abilities_compatible(before) = '.print_r($robot_abilities_compatible, true));
+        //error_log('['.$robot_token.'] -> $robot_abilities_compatible_via_item(before) = '.print_r($robot_abilities_compatible_via_item, true));
+        //error_log('['.$robot_token.'] -> $robot_abilities_via_item(before) = '.print_r($robot_abilities_via_item, true));
+        $robot_abilities = array_map($temp_ability_token_to_id, $robot_abilities);
+        $robot_abilities_compatible = array_map($temp_ability_token_to_id, $robot_abilities_compatible);
+        $robot_abilities_via_item = array_map($temp_ability_token_to_id, $robot_abilities_via_item);
+        //$robot_abilities_compatible_base = array_map($temp_ability_token_to_id, $robot_abilities_compatible_base);
+        //error_log('-> $robot_abilities(after) = '.print_r($robot_abilities, true));
+        //error_log('['.$robot_token.'] -> $robot_abilities_compatible(after) = '.print_r($robot_abilities_compatible, true));
+        //error_log('['.$robot_token.'] -> $robot_abilities_via_item(after) = '.print_r($robot_abilities_via_item, true));
         // Collect the above details into a single array and return it
         $robot_overview = array(
             'id' => $robot_id,
@@ -3576,6 +3637,9 @@ class rpg_world {
             'defenseMods' => (isset($robot_session['defense']) ? $robot_session['defense'] : 0),
             'speed' => $robot_stats['speed']['current'],
             'speedMods' => (isset($robot_session['speed']) ? $robot_session['speed'] : 0),
+            'abilities' => $robot_abilities,
+            'abilitiesCompatible' => $robot_abilities_compatible,
+            'abilitiesViaItem' => $robot_abilities_via_item,
             'disabled' => $robot_disabled,
             );
         if (!$has_persona_applied){ unset($robot_overview['persona']); }
