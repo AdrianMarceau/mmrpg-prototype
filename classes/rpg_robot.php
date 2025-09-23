@@ -1619,6 +1619,25 @@ class rpg_robot extends rpg_object {
         return $quote_text;
     }
 
+    // Define a function for getting all abilities compatible with a given robot
+    static public function get_ability_compatibility($robot_token, $item_token = ''){
+        //error_log('get_ability_compatibility('.$robot_token.', '.$item_token.')');
+        if (empty($robot_token)){ error_log('rpg_robot::get_ability_compatibility() error: no robot token given'); return false; }
+        $mmrpg_abilities_index = rpg_ability::get_index(true);
+        $compatible_abilities = array();
+        foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
+            if ($ability_token === 'ability'){ continue; }
+            elseif ($ability_info['ability_class'] === 'system'){ continue; }
+            elseif (empty($ability_info['ability_flag_published'])){ continue; }
+            elseif (empty($ability_info['ability_flag_complete'])){ continue; }
+            elseif (empty($ability_info['ability_flag_unlockable'])){ continue; }
+            if (self::has_ability_compatibility($robot_token, $ability_info, $item_token)){
+                $compatible_abilities[] = $ability_token;
+            }
+        }
+        return $compatible_abilities;
+    }
+
     // Define a function for checking if this robot is compatible with a specific ability
     static public function has_ability_compatibility($robot_token, $ability_token, $item_token = ''){
         if (empty($robot_token) || empty($ability_token)){ return false; }
