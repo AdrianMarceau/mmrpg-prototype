@@ -216,6 +216,15 @@ class rpg_world {
         $robotSessions = &$WORLD_SESSION['robot_sessions'];
         $battleSettings = &$GAME_SESSION['values']['battle_settings'];
         $battleRewards = &$GAME_SESSION['values']['battle_rewards'];
+        // Loop through all the world data fields and parse any json fields provided
+        //error_log('$worldData(before) = '.print_r($worldData, true));
+        foreach ($worldData AS $key => $data){
+            if (!is_string($data) || !(strstr($data, '{') !== false || strstr($data, '[') !== false)){ continue; }
+            $decoded = json_decode($data, true);
+            if (empty($decoded)){ continue; }
+            $worldData[$key] = $decoded;
+        }
+        //error_log('$worldData(after) = '.print_r($worldData, true));
         //$world_session_hash = md5(serialize($WORLD_SESSION));
         //error_log('$world_session_hash = '.$world_session_hash);
         if (!empty($worldData['lastPlayer'])

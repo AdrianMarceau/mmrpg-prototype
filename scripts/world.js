@@ -5239,6 +5239,18 @@ class mmrpgWorldMap {
             lastWorldAbilities,
             lastWorldSymbols,
             };
+        // loop through all the world data fields and json encode them for transport
+        //console.log('-> raw worldData:', worldData);
+        let worldDataKeys = Object.keys(worldData);
+        for (let i = 0; i < worldDataKeys.length; i++){
+            let key = worldDataKeys[i];
+            if (typeof worldData[key] === 'object'
+                && worldData[key] !== null){
+                worldData[key] = JSON.stringify(worldData[key]);
+                }
+            }
+        //console.log('-> compressed worldData for saving:', worldData);
+        // Now we can collect the callback and trigger the save etc.
         let callbackQueue = _selfRef._callbacks;
         let callbackReturn = [];
         let triggerSaveCallbacks = function(returnData){
