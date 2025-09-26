@@ -206,9 +206,13 @@ $(document).ready(function(){
                 if (!thisTooltip.length && $thisElement.attr('data-click-tooltip') != undefined){ thisTooltip = $thisElement.attr('data-click-tooltip'); }
                 if (!thisTitle.length && !thisTooltip.length){ return false; }
                 else if (thisTitle.length && !thisTooltip.length){ thisTooltip = thisTitle; }
-                thisTooltip = thisTooltip.replace(/\n/g, '<br />').replace(/\|\|/g, '<br />').replace(/\|/g, '<span class="pipe">|</span>').replace(/\s?\/\/\s?/g, '<br />').replace(/\[\[([^\[\]]+)\]\]/ig, '<span class="subtext">$1</span>');
+                thisTooltip = thisTooltip.replace(/\n/g, '<br />').replace(/\|\|/g, '<br />').replace(/\s?\/\/\s?/g, '<br />');
+                thisTooltip = thisTooltip.replace(/\|/g, '<span class="pipe">|</span>');
+                thisTooltip = thisTooltip.replace(/\*\*([^\[\]]+)\*\*/ig, '<strong>$1</strong>');
+                thisTooltip = thisTooltip.replace(/\[\[([^\[\]]+)\]\]/ig, '<span class="subtext">$1</span>');
                 var thisTooltipAlign = $thisElement.attr('data-tooltip-align') != undefined ? $thisElement.attr('data-tooltip-align') : 'left';
                 var thisTooltipType = $thisElement.attr('data-tooltip-type') != undefined ? $thisElement.attr('data-tooltip-type') : '';
+                var thisTooltipClass = $thisElement.attr('data-tooltip-class') != undefined ? $thisElement.attr('data-tooltip-class') : '';
                 if (!thisTooltipType.length){
                     for (i in thisClassList){
                         var tempClass = thisClassList[i] != undefined ? thisClassList[i].toString() : '';
@@ -223,15 +227,16 @@ $(document).ready(function(){
                 if (!thisTooltipType.length){
                     thisTooltipType = 'type none';
                     }
+                thisTooltipClass += ' '+thisTooltipType;
                 //console.log('thisTitle : '+thisTitle);
                 //console.log('append and trigger animation at '+thisTime);
                 $thisElement.attr('data-backup-title', thisTitle).removeAttr('title');
                 let messageMarkup = '<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>';
                 if (!$tooltip.length){
-                    $('<p id="mmrpg-tooltip" class="tooltip '+thisTooltipType+'">' + messageMarkup + '</p>').appendTo(mmrpgBody);
+                    $('<p id="mmrpg-tooltip" class="tooltip '+thisTooltipClass+'">' + messageMarkup + '</p>').appendTo(mmrpgBody);
                     $tooltip = $('#mmrpg-tooltip', mmrpgBody);
                     } else {
-                    $tooltip.removeClass().addClass('tooltip '+thisTooltipType).empty().html(messageMarkup);
+                    $tooltip.removeClass().addClass('tooltip '+thisTooltipClass).empty().html(messageMarkup);
                     }
                 $tooltip.addClass('active').fadeIn('fast');
                 // collect the position of the button that spawned the tooltip in the first place

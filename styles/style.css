@@ -104,7 +104,7 @@ body.index #header {
     _width: 400px;
     text-align: left;
     font-size: 12px;
-    line-height: 16px;
+    line-height: 1.6;
     font-weight: normal;
 }
 #mmrpg .tooltip hr {
@@ -162,8 +162,7 @@ body.index #header {
     margin: 0 4px 4px 0;
 }
 #mmrpg .tooltip .subtext {
-    font-size: 9px;
-    line-height: 11px;
+    font-size: 10px;
     font-weight: normal;
     color: #969696;
 }
