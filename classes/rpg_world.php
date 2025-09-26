@@ -2187,7 +2187,7 @@ class rpg_world {
             $return_markup .= '<div class="wrapper">';
             $storage_item_types_revised = array('none', 'energy', 'weapons', 'attack', 'defense', 'speed');
             $storage_item_types_revised = array_unique(array_merge($storage_item_types_revised, array_keys($mmrpg_index_types)));
-            $storage_item_tokens_reversed = array_reverse(array_keys($storage_item_tokens), true);
+            $storage_item_tokens_reversed = array_reverse(array_keys($storage_item_tokens));
             foreach ($storage_item_tokens AS $item_token => $item_quantity){
                 if (empty($item_token) || !is_string($item_token)){ continue; }
                 if ($item_token === 'item' || strstr($item_token, '__equipped')){ continue; }
@@ -2263,7 +2263,7 @@ class rpg_world {
             $storage_ability_types_revised = array_unique(array_merge($elemental_type_tokens, array('copy', 'none'), array_keys($mmrpg_index_types)));
             //error_log('$elemental_type_tokens = '.print_r($elemental_type_tokens, true));
             //error_log('$storage_ability_types_revised = '.print_r($storage_ability_types_revised, true));
-            $storage_ability_tokens_reversed = array_reverse($storage_ability_tokens, true);
+            $storage_ability_tokens_reversed = array_reverse(array_values($storage_ability_tokens));
             foreach ($storage_ability_tokens AS $ability_key => $ability_token){
                 if ($ability_token === 'ability' || empty($mmrpg_index_abilities[$ability_token])){ continue; }
                 $ability_info = $mmrpg_index_abilities[$ability_token];
