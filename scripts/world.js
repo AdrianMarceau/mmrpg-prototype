@@ -1505,6 +1505,8 @@ class mmrpgWorldMap {
             let $storageItemsInOverview = $('.team-item[data-item]', $storageItemsDiv);
             let $storageAbilitiesInOverview = $('.team-ability[data-ability]', $storageAbilitiesDiv);
             let listOfRobotsInOverview = $teamRobotsInOverview.map(function(){ return $(this).attr('data-robot'); }).get();
+            let $teamRobotsInOverviewBackup = $teamRobotsInOverview.clone(true).detach(); // save for later
+            let $storageRobotsInOverviewBackup = $storageRobotsInOverview.clone(true).detach(); // save for later
             //console.log('-> $teamRobotsInOverview = ', $teamRobotsInOverview.length, $teamRobotsInOverview);
             //console.log('-> $storageRobotsInOverview = ', $storageRobotsInOverview.length, $storageRobotsInOverview);
             //console.log('-> listOfRobotsInOverview = ', listOfRobotsInOverview);
@@ -1853,6 +1855,7 @@ class mmrpgWorldMap {
                 let storageConfig = calculateStorage(storageKind, true);
                 if (!storageConfig){ return false; }
                 //console.log('-> storageConfig = ', storageConfig);
+                let overviewIsExpanded = $robotsOverview.is('.expanded') ? true : false;
                 let $storageObjectsDiv = storageConfig.storageDiv;
                 let currentStoragePageNum = storageConfig.currentPage;
                 //console.log('-> $storageObjectsDiv = ', $storageObjectsDiv);
@@ -1866,11 +1869,23 @@ class mmrpgWorldMap {
                 //console.log('-> selectedSortDirection =', selectedSortDirection);
                 if (!selectedSortToken || !selectedSortDirection){ return false; }
                 //console.log('-> re-sorting by ' + selectedSortToken + ' (' + selectedSortDirection + ') and going to page ' + currentStoragePageNum);
-                makeStoragePages(storageKind);
+                if (overviewIsExpanded){ makeStoragePages(storageKind); }
                 sortStoragePage(storageKind, selectedSortToken, selectedSortDirection, currentStoragePageNum);
-                goToStoragePage(storageKind, currentStoragePageNum);
+                if (overviewIsExpanded){ goToStoragePage(storageKind, currentStoragePageNum); }
                 // Return true on success
                 return true;
+                };
+            // Define a function for refreshing the object refs of the robots in the team and storage panels
+            let refreshRobotRefs = function(){
+                //console.log('%c' + '-> refreshRobotRefs() triggered', 'color: magenta;');
+                $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
+                $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
+                };
+            // Define a function for refreshing the backup clones of the robots in the team and storage panels
+            let refreshRobotBackups = function(refreshReferences){
+                //console.log('%c' + '-> refreshRobotBackups() triggered', 'color: magenta;');
+                $teamRobotsInOverviewBackup = $teamRobotsInOverview.clone(true).detach(); // save for later
+                $storageRobotsInOverviewBackup = $storageRobotsInOverview.clone(true).detach(); // save for later
                 };
             // Bind events to any sort buttons in the storage box divs
             $storageBoxDivs.delegate('.sort[data-sort]', 'click', function(e){
@@ -1893,20 +1908,6 @@ class mmrpgWorldMap {
                 sortStoragePage(storageKind, sortToken, sortDirection, storagePage);
                 // Return true on success
                 return true;
-                });
-            // Auto-trigger a sort at least once on all the storage boxes to ensure a default order
-            $storageBoxDivs.each(function(){
-                let $storageBoxDiv = $(this);
-                let $sortParent = $('.sorts', $storageBoxDiv);
-                let storageKind = $storageBoxDiv.attr('data-storage');
-                let $activeSortButton = $('.sort.active', $sortParent);
-                let $firstSortButton = $('.sort', $sortParent).first();
-                let selectedSortToken = false;
-                if ($activeSortButton && $activeSortButton.length){ selectedSortToken = $activeSortButton.attr('data-sort') || false; }
-                else if ($firstSortButton && $firstSortButton.length){ selectedSortToken = $firstSortButton.attr('data-sort') || false; }
-                let selectedSortDirection = $sortParent.is('[data-dir]') ? $sortParent.attr('data-dir') : false;
-                //console.log('-> auto-triggering storage-sort for ' + storageKind + ' w/ ' + selectedSortToken + ' (' + selectedSortDirection + ')');
-                if (selectedSortToken){ sortStoragePage(storageKind, selectedSortToken, selectedSortDirection); }
                 });
             // Bind events to any toggle buttons in the storage box divs
             $storageBoxDivs.delegate('.toggle[data-toggle]', 'click', function(e){
@@ -1942,12 +1943,28 @@ class mmrpgWorldMap {
                 let alreadySelected = $thisRobot.is('.selected') ? true : false;
                 //console.log('-> $thisRobot =', $thisRobot);
                 //console.log('-> alreadySelected =', alreadySelected);
-                $teamRobotsInOverview.removeClass('selected');
+                $('.team-robot[data-robot]', $teamRobotsDiv).removeClass('selected');
                 if (!alreadySelected){ $thisRobot.addClass('selected'); }
                 else { $thisRobot.removeClass('selected'); }
                 // Return true on success
                 return true;
                 });
+            // Auto-trigger a sort at least once on all the storage boxes to ensure a default order
+            $storageBoxDivs.each(function(){
+                let $storageBoxDiv = $(this);
+                let $sortParent = $('.sorts', $storageBoxDiv);
+                let storageKind = $storageBoxDiv.attr('data-storage');
+                let $activeSortButton = $('.sort.active', $sortParent);
+                let $firstSortButton = $('.sort', $sortParent).first();
+                let selectedSortToken = false;
+                if ($activeSortButton && $activeSortButton.length){ selectedSortToken = $activeSortButton.attr('data-sort') || false; }
+                else if ($firstSortButton && $firstSortButton.length){ selectedSortToken = $firstSortButton.attr('data-sort') || false; }
+                let selectedSortDirection = $sortParent.is('[data-dir]') ? $sortParent.attr('data-dir') : false;
+                //console.log('-> auto-triggering storage-sort for ' + storageKind + ' w/ ' + selectedSortToken + ' (' + selectedSortDirection + ')');
+                if (selectedSortToken){ sortStoragePage(storageKind, selectedSortToken, selectedSortDirection); }
+                });
+            // Refresh the backups now that we're done sorting and whatnot
+            refreshRobotBackups();
             // Add all these methods to the API in case future code needs to access them too
             robotsOverviewAPI.disableOtherElements = disableOtherElements;
             robotsOverviewAPI.enableOtherElements = enableOtherElements;
@@ -1994,10 +2011,18 @@ class mmrpgWorldMap {
                     playerRobotKeys = Object.keys(_worldPlayerRobots);
                     //console.log('-> _worldPlayerRobots(keys)(after) =', playerRobotKeys);
                     // Now we rotate the robots in the overview by moving the first robot to the end of the list
-                    $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
+                    refreshRobotRefs();
                     let $firstOverviewRobot = $teamRobotsInOverview.first();
                     //console.log('-> $firstOverviewRobot =', $firstOverviewRobot);
-                    $firstOverviewRobot.appendTo($('.team-robots', $robotsOverview));
+                    $firstOverviewRobot.appendTo($teamRobotsWrapper);
+                    // Re-collect the team robots in overview so we have the new order
+                    refreshRobotRefs();
+                    let newTeamRobotKeys = [];
+                    $teamRobotsInOverview.each(function(){
+                        let robotKey = $(this).attr('data-robot');
+                        newTeamRobotKeys.push(robotKey);
+                        });
+                    //console.log('-> newTeamRobotKeys =', newTeamRobotKeys);
                     // And then finally we need to reposition the robots on the world map too by indexing all their current positions,
                     // then removing the first robot from the map and appending it to the end of the list, then repositioning all the robots
                     let teamPositionsByKey = [];
@@ -2027,7 +2052,18 @@ class mmrpgWorldMap {
                             zIndex: newPositionZ
                             });
                         });
-                    // and then save the world state with the new robot order
+                    // make sure we do the same thing to these current robots in storage
+                    for (var i = 0; i < newTeamRobotKeys.length; i++){
+                        let robotKey = newTeamRobotKeys[i];
+                        let $storageRobot = $('.team-robot[data-robot="' + robotKey + '"]', $storageRobotsDiv);
+                        let storageKey = i;
+                        $storageRobot.attr('data-storage-key', storageKey);
+                        }
+                    // Re-sort the storage page to ensure everything makes sense now
+                    refreshStoragePage('robots');
+                    // Update the team/robot robot backups w/ recent changes
+                    refreshRobotBackups();
+                    // Save the world state w/ these changes
                     _self.saveWorldState();
                     // Return true on success
                     return true;
@@ -2075,12 +2111,15 @@ class mmrpgWorldMap {
                     makeStorageBullets();
                     makeStoragePages('robots');
                     goToStoragePage('robots', parseInt($storageRobotsDiv.attr('data-page') || ''));
+                    // Update the team/robot robot backups w/ recent changes
+                    refreshRobotBackups();
                     // Mark the team-robots side as the focused one to start
                     // and the first robot in the overview as selected via class
+                    refreshRobotRefs();
                     $teamRobotsDiv.addClass('focused');
                     $teamRobotsInOverview.removeClass('selected');
-                    let $firstOverviewRobot = $teamRobotsInOverview.first();
-                    $firstOverviewRobot.addClass('selected');
+                    //let $firstOverviewRobot = $teamRobotsInOverview.first();
+                    //$firstOverviewRobot.addClass('selected');
                     if ($sideButtons.is('.active')){
                         //console.log('-> side buttons active, make sure we dismiss!');
                         let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
@@ -2090,40 +2129,55 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
-                // if the storage tray is open, clicking a robot in the storage-list swaps it with selected team-robot
+                // if the storage tray is open, clicking a robot in the storage-list clones it to the selected team-robot slot
                 $storageRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return; }
                     if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
                     //console.log('%c' + 'Storage robot clicked!', 'color: cyan;');
-                    // Empty the side-button area before starting
+                    // Collect reference to the click storage robot and its slot first
+                    let $clickedStorageRobot = $(this);
+                    let clickedStorageSlot = $clickedStorageRobot.is('[data-slot]') ? $clickedStorageRobot.attr('data-slot') : false;
+                    //console.log('-> $clickedStorageRobot =', $clickedStorageRobot);
+                    //console.log('-> clickedStorageSlot =', clickedStorageSlot);
+                    if (!$clickedStorageRobot || !$clickedStorageRobot.length){ return false; } // if no robot is clicked, ignore clicks
+                    if (!clickedStorageSlot || isNaN(parseInt(clickedStorageSlot))){ return false; } // if no slot, ignore clicks
+                    if ($clickedStorageRobot.is('.current')){ return false; } // already on team, ignore clicks
+                    // Refresh the current list of team robots in the overview and storage
+                    refreshRobotRefs();
+                    // Collect a reference to the old (currently selected) team robot so we can backtrace later
+                    let $oldTeamRobot = $teamRobotsInOverview.filter('.selected').first();
+                    //console.log('-> $oldTeamRobot =', $oldTeamRobot);
+                    if (!$oldTeamRobot || !$oldTeamRobot.length){ return false; } // we need to actually have a robot selected
+                    // Collect the robot tokens for each robot for later and to make sure they're different
+                    let oldRobotToken = $oldTeamRobot.attr('data-robot') || false;
+                    let newRobotToken = $clickedStorageRobot.attr('data-robot') || false;
+                    //console.log('-> oldRobotToken =', oldRobotToken);
+                    //console.log('-> newRobotToken =', newRobotToken);
+                    if (!oldRobotToken || !newRobotToken || oldRobotToken === newRobotToken){ return; }
+                    // Empty the side-button area before starting just in case
                     $sideButtons.removeClass('active');
                     $sideButtonsWrapper.empty();
-                    // First we collect references to the selected team-robot and clicked storage-robot
-                    let $selectedTeamRobot = $teamRobotsInOverview.filter('.selected').first();
-                    if (!$selectedTeamRobot || !$selectedTeamRobot.length){ return; } // if no robot is selected, ignore clicks
-                    let $clickedStorageRobot = $(this);
-                    if (!$clickedStorageRobot || !$clickedStorageRobot.length){ return; } // if no robot is clicked, ignore clicks
-                    //console.log('-> $selectedTeamRobot =', $selectedTeamRobot);
-                    //console.log('-> swap for $clickedStorageRobot =', $clickedStorageRobot);
-                    // Collect the robot tokens for each robot and make sure they're different
-                    let selectedRobotToken = $selectedTeamRobot.attr('data-robot') || false;
-                    let clickedRobotToken = $clickedStorageRobot.attr('data-robot') || false;
-                    let clickedRobotSlot = $clickedStorageRobot.attr('data-slot') || false;
-                    if (!selectedRobotToken || !clickedRobotToken || selectedRobotToken === clickedRobotToken){ return; }
-                    if (!clickedRobotSlot || isNaN(parseInt(clickedRobotSlot))){ return; } // if no slot, ignore clicks
-                    //console.log('-> selectedRobotToken =', selectedRobotToken);
-                    //console.log('-> swap for clickedRobotToken =', clickedRobotToken);
-                    // Clone the current spans so we can easily reset if we have to
-                    let $teamRobotsInOverviewBackup = $teamRobotsInOverview.clone(true).detach(); // save for later
-                    let $storageRobotsInOverviewBackup = $storageRobotsInOverview.clone(true).detach(); // save for later
-                    // Now we swap the two elements at exactly the same position without their respective parent containers
-                    $selectedTeamRobot.clone(true).insertAfter($clickedStorageRobot).removeClass('selected').attr('data-slot', clickedRobotSlot);
-                    $clickedStorageRobot.clone(true).insertBefore($selectedTeamRobot).addClass('selected').removeAttr('data-slot');
-                    $selectedTeamRobot.remove();
-                    $clickedStorageRobot.remove();
-                    $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
-                    $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
+                    // Collect the target storage slot from the old team robot so we can replace it
+                    let targetStorageSlot = $oldTeamRobot.is('[data-slot]') ? $oldTeamRobot.attr('data-slot') : false;
+                    // Create a new team robot by cloning the old storage one, adjusting properties, then replacing current
+                    let $newTeamRobot = $clickedStorageRobot.clone(true);
+                    $newTeamRobot.removeClass('current hovered').addClass('selected');
+                    $newTeamRobot.attr('data-slot', targetStorageSlot);
+                    $newTeamRobot.insertAfter($oldTeamRobot);
+                    $oldTeamRobot.remove();
+                    // Re-pull the lists of robots in the overview now that we've made a change
+                    refreshRobotRefs();
+                    // Refresh and update the list of "current" robots in the storage overview
+                    let currentTeamRobotTokens = $teamRobotsInOverview.map(function(){ return $(this).attr('data-robot'); }).get();
+                    $storageRobotsInOverview.removeClass('current');
+                    $storageRobotsInOverview.each(function(index, robot){
+                        let $robot = $(robot);
+                        let robotToken = $robot.attr('data-robot');
+                        if (!robotToken || !robotToken.length){ return; }
+                        if (currentTeamRobotTokens.indexOf(robotToken) === -1){ return; }
+                        $robot.addClass('current');
+                        });
                     // If this new list of robots in the overview does not match what's saved, add save button
                     let newListOfRobotsInOverview = $teamRobotsInOverview.map(function(){ return $(this).attr('data-robot'); }).get();
                     let listHasChanged = newListOfRobotsInOverview.join(',') !== listOfRobotsInOverview.join(',') ? true : false;
@@ -2143,6 +2197,7 @@ class mmrpgWorldMap {
                         $saveButton.remove();
                         $cancelButton.remove();
                         // Then we update the world player robots data to match the new order in the overview
+                        refreshRobotRefs();
                         let newPlayerRobotList = [];
                         $teamRobotsInOverview.each(function(index, robot){
                             //console.log('-> checking robot', index, robot);
@@ -2175,8 +2230,9 @@ class mmrpgWorldMap {
                         // First we revert the robots in the overview back to the backup copy we made earlier
                         $teamRobotsWrapper.empty().prepend($teamRobotsInOverviewBackup);
                         $storageRobotsWrapper.empty().prepend($storageRobotsInOverviewBackup);
-                        $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
-                        $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
+                        refreshStoragePage('robots');
+                        refreshRobotRefs();
+                        refreshRobotBackups();
                         // Then we remove the save/cancel button set from the overview panel
                         $saveButton.remove();
                         $cancelButton.remove();
@@ -2196,7 +2252,7 @@ class mmrpgWorldMap {
                     $cancelButton.bind('click', function(e){
                         //console.log('%c' + 'Robot swap cancel button clicked!', 'color: cyan;');
                         e.preventDefault();
-                        return cancelAction();
+                        cancelAction();
                         });
                     // Return true on success
                     return true;
@@ -2225,6 +2281,7 @@ class mmrpgWorldMap {
                     goToStoragePage('items', parseInt($storageItemsDiv.attr('data-page') || ''));
                     // Mark the team-robots side as the focused one to start
                     // and the first robot in the overview as selected via class
+                    refreshRobotRefs();
                     $teamRobotsDiv.addClass('focused');
                     $teamRobotsInOverview.removeClass('selected');
                     //let $firstOverviewRobot = $teamRobotsInOverview.first();
@@ -2285,6 +2342,7 @@ class mmrpgWorldMap {
                 let refreshAbilitiesDiv = function(){
                     //console.log('%c' + '-> refreshAbilitiesDiv() triggered', 'color: magenta;');
                     // check if there's a robot to filter abilities to or not
+                    refreshRobotRefs();
                     let $selectedRobot = $teamRobotsInOverview.filter('.selected').first();
                     if ($selectedRobot && $selectedRobot.length){ filterAbilitiesToSelected($selectedRobot); }
                     else { filterAbilitiesToSelected(false); }
@@ -2317,6 +2375,7 @@ class mmrpgWorldMap {
                     goToStoragePage('abilities', goToPageNum);
                     // Mark the team-robots side as the focused one to start
                     // and the first robot in the overview as selected via class
+                    refreshRobotRefs();
                     $teamRobotsDiv.addClass('focused');
                     $teamRobotsInOverview.removeClass('selected');
                     if ($sideButtons.is('.active')){
@@ -2338,16 +2397,6 @@ class mmrpgWorldMap {
                     if (_self.worldIsBusy()){ return; }
                     if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
                     //console.log('%c' + 'Team robot clicked!', 'color: cyan;');
-                    /*
-                    let $thisRobot = $(this);
-                    //console.log('-> $thisRobot =', $thisRobot);
-                    if ($thisRobot.is('.selected')){ filterAbilitiesToSelected($thisRobot); }
-                    else { filterAbilitiesToSelected(false); }
-                    let $selectedRobot = $teamRobotsInOverview.filter('.selected').first();
-                    let $incompatibleToggle = $('.toggle[data-toggle="incompatible"]', $storageAbilitiesDiv);
-                    if ($selectedRobot && $selectedRobot.length){ $incompatibleToggle.removeClass('disabled'); }
-                    else { $incompatibleToggle.addClass('disabled'); }
-                    */
                     refreshAbilitiesDiv();
                     return true;
                     });
@@ -2357,14 +2406,6 @@ class mmrpgWorldMap {
                     if (_self.worldIsBusy()){ return; }
                     if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
                     //console.log('%c' + 'Storage abilities toggle button clicked!', 'color: cyan;');
-                    /*
-                    let $toggleButton = $(this);
-                    let $storageBoxDiv = $toggleButton.closest('.storage-box');
-                    let storageKind = $storageBoxDiv.attr('data-storage');
-                    let $selectedRobot = $teamRobotsInOverview.filter('.selected').first();
-                    if ($selectedRobot && $selectedRobot.length){ filterAbilitiesToSelected($selectedRobot); }
-                    else { filterAbilitiesToSelected(false); }
-                    */
                     refreshAbilitiesDiv();
                     return true;
                     });

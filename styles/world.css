@@ -2815,15 +2815,15 @@ display: block;
 
 #world #canvas #robots-overview:not(:hover):not(.expanded) .team-robots .team-robot:nth-child(n+4) { filter: brightness(0) opacity(0.0); pointer-events: none; }
 
-#world #canvas #robots-overview .team-robots .team-robot:nth-child(1) .icon { filter: brightness(1.0); }
-#world #canvas #robots-overview .team-robots .team-robot:nth-child(2) .icon { filter: brightness(0.9); }
-#world #canvas #robots-overview .team-robots .team-robot:nth-child(3) .icon { filter: brightness(0.81); }
-#world #canvas #robots-overview .team-robots .team-robot:nth-child(4) .icon { filter: brightness(0.729); }
-#world #canvas #robots-overview .team-robots .team-robot:nth-child(5) .icon { filter: brightness(0.6561); }
-#world #canvas #robots-overview .team-robots .team-robot:nth-child(6) .icon { filter: brightness(0.59049); }
-#world #canvas #robots-overview .team-robots .team-robot:nth-child(7) .icon { filter: brightness(0.531441); }
-#world #canvas #robots-overview .team-robots .team-robot:nth-child(8) .icon { filter: brightness(0.4782969); }
-#world #canvas #robots-overview .team-robots .team-robot:nth-child(n+8) .icon { filter: brightness(0.4782969); }
+#world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(1) .icon { filter: brightness(1.0); }
+#world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(2) .icon { filter: brightness(0.9); }
+#world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(3) .icon { filter: brightness(0.81); }
+#world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(4) .icon { filter: brightness(0.729); }
+#world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(5) .icon { filter: brightness(0.6561); }
+#world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(6) .icon { filter: brightness(0.59049); }
+#world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(7) .icon { filter: brightness(0.531441); }
+#world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(8) .icon { filter: brightness(0.4782969); }
+#world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(n+8) .icon { filter: brightness(0.4782969); }
 #world #canvas #robots-overview .team-robots .team-robot:hover .icon { filter: brightness(1.0); }
 #world #canvas #robots-overview .team-robots .team-robot.hovered .icon { filter: brightness(1.0); }
 #world #canvas #robots-overview .team-robots .team-robot.selected .icon { filter: brightness(1.0); }
@@ -2837,15 +2837,15 @@ display: block;
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(7) .icon:after { content: "7th"; }
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(8) .icon:after { content: "8th"; }
 
-#world #canvas #robots-overview .storage-robots .team-robot:not([data-slot]) .icon { filter: brightness(0.1); }
-#world #canvas #robots-overview .storage-robots .team-robot[data-slot="1"] .icon { filter: brightness(1.0); }
-#world #canvas #robots-overview .storage-robots .team-robot[data-slot="2"] .icon { filter: brightness(0.9); }
-#world #canvas #robots-overview .storage-robots .team-robot[data-slot="3"] .icon { filter: brightness(0.81); }
-#world #canvas #robots-overview .storage-robots .team-robot[data-slot="4"] .icon { filter: brightness(0.729); }
-#world #canvas #robots-overview .storage-robots .team-robot[data-slot="5"] .icon { filter: brightness(0.6561); }
-#world #canvas #robots-overview .storage-robots .team-robot[data-slot="6"] .icon { filter: brightness(0.59049); }
-#world #canvas #robots-overview .storage-robots .team-robot[data-slot="7"] .icon { filter: brightness(0.531441); }
-#world #canvas #robots-overview .storage-robots .team-robot[data-slot="8"] .icon { filter: brightness(0.4782969); }
+#world #canvas #robots-overview:not(.expanded) .storage-robots .team-robot:not([data-slot]) .icon { filter: brightness(0.1); }
+#world #canvas #robots-overview:not(.expanded) .storage-robots .team-robot[data-slot="1"] .icon { filter: brightness(1.0); }
+#world #canvas #robots-overview:not(.expanded) .storage-robots .team-robot[data-slot="2"] .icon { filter: brightness(0.9); }
+#world #canvas #robots-overview:not(.expanded) .storage-robots .team-robot[data-slot="3"] .icon { filter: brightness(0.81); }
+#world #canvas #robots-overview:not(.expanded) .storage-robots .team-robot[data-slot="4"] .icon { filter: brightness(0.729); }
+#world #canvas #robots-overview:not(.expanded) .storage-robots .team-robot[data-slot="5"] .icon { filter: brightness(0.6561); }
+#world #canvas #robots-overview:not(.expanded) .storage-robots .team-robot[data-slot="6"] .icon { filter: brightness(0.59049); }
+#world #canvas #robots-overview:not(.expanded) .storage-robots .team-robot[data-slot="7"] .icon { filter: brightness(0.531441); }
+#world #canvas #robots-overview:not(.expanded) .storage-robots .team-robot[data-slot="8"] .icon { filter: brightness(0.4782969); }
 #world #canvas #robots-overview .storage-robots .team-robot[data-slot]:hover .icon { filter: brightness(1.0); }
 #world #canvas #robots-overview .storage-robots .team-robot[data-slot].hovered .icon { filter: brightness(1.0); }
 #world #canvas #robots-overview .storage-robots .team-robot[data-slot].selected .icon { filter: brightness(1.0); }
@@ -2870,8 +2870,17 @@ display: block;
 #world #canvas #robots-overview .storage-robots .team-robot.hasmods:before {
     bottom: -13px;
 }
+#world #canvas #robots-overview .storage-robots .team-robot.current,
+#world #canvas #robots-overview .storage-robots .team-robot.disabled {
+    filter: brightness(0.4);
+    cursor: default;
+}
 #world #canvas #robots-overview .storage-robots .team-robot.hidden {
     display: none;
+}
+#world #canvas #robots-overview .storage-robots .team-robot.current {
+    border-left: 4px solid #fefefe;
+    border-radius: 3px 0 0 3px;
 }
 
 #world #canvas #robots-overview.expanded .team-robots.unfocused:not(:hover) .team-robot,
