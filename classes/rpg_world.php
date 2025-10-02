@@ -1682,7 +1682,7 @@ class rpg_world {
         elseif ($kind === 'item'){ $spriteSpeed = 0.5; }
         elseif ($kind === 'ability'){ $spriteSpeed = 1; }
         if (!empty($spriteSpeed)){ $sprite_meta['spriteSpeed'] = $spriteSpeed; }
-        $sprite_meta['spriteSpeed'] = 1;
+        else { $sprite_meta['spriteSpeed'] = 1; }
         //error_log('$info = '.print_r($info, true));
         //error_log('$spriteSpeed = '.print_r($spriteSpeed, true));
         $dir = $dir;
@@ -1992,10 +1992,10 @@ class rpg_world {
         // [robots-overview][team-switch]
         if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<a class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></a>'; }
         else { $return_markup .= '<span class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></span>'; }
-        // [robots-overview][team-abilities]
-        $return_markup .= '<a class="storage-button team-abilities" data-view="abilities"><i class="fa fas fa-fire-alt"></i><b>abilities</b></a>';
         // [robots-overview][team-items]
         $return_markup .= '<a class="storage-button team-items" data-view="items"><i class="fa fas fa-briefcase"></i><b>items</b></a>';
+        // [robots-overview][team-abilities]
+        $return_markup .= '<a class="storage-button team-abilities" data-view="abilities"><i class="fa fas fa-fire-alt"></i><b>abilities</b></a>';
         // [robots-overview][limit-hearts]
         $return_markup .= '<div class="limit-hearts">';
             $return_markup .= '<i class="player '.$current_player_token.'"></i>';
@@ -2077,18 +2077,12 @@ class rpg_world {
         $return_markup .= '</div>';
         // [robots-overview][storage-robots]
         $return_markup .= '<div class="storage-box storage-robots" data-storage="robots">';
-            $return_markup .= $get_sort_options(array(
-                'storage-key' => 'recent',
-                'index-key' => 'id',
-                'core-key' => 'core',
-                'level-exp' => 'level',
-                ));
-            $return_markup .= '<div class="wrapper">';
             $recent_storage_robot_tokens = array();
             $recent_storage_robot_tokens = array_merge($recent_storage_robot_tokens, $current_robot_tokens);
             $recent_storage_robot_tokens = array_merge($recent_storage_robot_tokens, $battle_robot_tokens);
             $recent_storage_robot_tokens = array_merge($recent_storage_robot_tokens, $storage_robot_tokens);
             $recent_storage_robot_tokens = array_unique($recent_storage_robot_tokens);
+            $return_markup .= '<div class="wrapper">';
             foreach ($storage_robot_tokens AS $robot_key => $robot_token){
                 if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
                 // collect all the info we need about this robot
@@ -2168,26 +2162,19 @@ class rpg_world {
                 $return_markup .= $robot_markup;
             }
             $return_markup .= '</div>';
+            $return_markup .= $get_sort_options(array(
+                'storage-key' => 'recent',
+                'index-key' => 'id',
+                'core-key' => 'core',
+                'level-exp' => 'level',
+                ));
         $return_markup .= '</div>';
         // [robots-overview][storage-items]
         $return_markup .= '<div class="storage-box storage-items" data-storage="items">';
-            $return_markup .= $get_sort_options(array(
-                'index-key' => 'id',
-                'type-key' => 'type',
-                'quantity' => 'owned',
-                'storage-key' => 'new',
-                ));
-            $return_markup .= $get_toggle_options(array(
-                'outofstock' => array(
-                    'visible' => 'eye',
-                    'hidden' => 'eye-slash',
-                    'default' => 'visible',
-                    ),
-                ));
-            $return_markup .= '<div class="wrapper">';
             $storage_item_types_revised = array('none', 'energy', 'weapons', 'attack', 'defense', 'speed');
             $storage_item_types_revised = array_unique(array_merge($storage_item_types_revised, array_keys($mmrpg_index_types)));
             $storage_item_tokens_reversed = array_reverse(array_keys($storage_item_tokens));
+            $return_markup .= '<div class="wrapper">';
             foreach ($storage_item_tokens AS $item_token => $item_quantity){
                 if (empty($item_token) || !is_string($item_token)){ continue; }
                 if ($item_token === 'item' || strstr($item_token, '__equipped')){ continue; }
@@ -2242,28 +2229,28 @@ class rpg_world {
                 $return_markup .= $item_markup;
             }
             $return_markup .= '</div>';
-        $return_markup .= '</div>';
-        // [robots-overview][storage-abilities]
-        $return_markup .= '<div class="storage-box storage-abilities" data-storage="abilities">';
             $return_markup .= $get_sort_options(array(
                 'index-key' => 'id',
                 'type-key' => 'type',
-                'energy-cost' => 'cost',
+                'quantity' => 'owned',
                 'storage-key' => 'new',
                 ));
             $return_markup .= $get_toggle_options(array(
-                'incompatible' => array(
+                'outofstock' => array(
                     'visible' => 'eye',
                     'hidden' => 'eye-slash',
                     'default' => 'visible',
                     ),
                 ));
-            $return_markup .= '<div class="wrapper">';
+        $return_markup .= '</div>';
+        // [robots-overview][storage-abilities]
+        $return_markup .= '<div class="storage-box storage-abilities" data-storage="abilities">';
             $elemental_type_tokens = rpg_type::get_index_tokens(false, false, false, false);
             $storage_ability_types_revised = array_unique(array_merge($elemental_type_tokens, array('copy', 'none'), array_keys($mmrpg_index_types)));
             //error_log('$elemental_type_tokens = '.print_r($elemental_type_tokens, true));
             //error_log('$storage_ability_types_revised = '.print_r($storage_ability_types_revised, true));
             $storage_ability_tokens_reversed = array_reverse(array_values($storage_ability_tokens));
+            $return_markup .= '<div class="wrapper">';
             foreach ($storage_ability_tokens AS $ability_key => $ability_token){
                 if ($ability_token === 'ability' || empty($mmrpg_index_abilities[$ability_token])){ continue; }
                 $ability_info = $mmrpg_index_abilities[$ability_token];
@@ -2301,6 +2288,19 @@ class rpg_world {
                 $return_markup .= $ability_markup;
             }
             $return_markup .= '</div>';
+            $return_markup .= $get_sort_options(array(
+                'index-key' => 'id',
+                'type-key' => 'type',
+                'energy-cost' => 'cost',
+                'storage-key' => 'new',
+                ));
+            $return_markup .= $get_toggle_options(array(
+                'incompatible' => array(
+                    'visible' => 'eye',
+                    'hidden' => 'eye-slash',
+                    'default' => 'visible',
+                    ),
+                ));
         $return_markup .= '</div>';
         // [robots-overview][close-button]
         $return_markup .= '<a class="team-close"><i class="fa fas fa-times"></i></a>';

@@ -73,7 +73,7 @@ gameSettings.worldConfig = {
     robotStatModMax: 5, // match the battle system
     robotStatModMin: -5, // match the battle system
     itemInventoryMax: 99, // match the battle system
-    defaultZoomLevel: 1.0, // slightly zoomed in
+    defaultZoomLevel: 1.5, // slightly zoomed in
     zoomIncrement: 0.5, // zoom in/out by this amount
     minZoomLevel: 0.5, // slightly zoomed in
     maxZoomLevel: 2.0, // slightly zoomed in
@@ -1549,6 +1549,7 @@ class mmrpgWorldMap {
                 $storageButtons.removeClass('active');
                 $teamRobotsDiv.removeClass('focused').removeClass('unfocused');
                 $storageBoxes.removeClass('focused').removeClass('unfocused');
+                $('.details', $storageBoxes).remove();
                 $('.pages', $storageRobotsDiv).remove();
                 $('.bullets', $storageRobotsDiv).remove();
                 return;
@@ -2298,8 +2299,51 @@ class mmrpgWorldMap {
                     return true;
                     });
                 // TODO: delegate event bindings for the actual items within the storage panel
-                // ...
                 // (like, what happens when you actually click an item?)
+                // bind click events to the actual item buttons for showing their details in the side-panel
+                $storageItemsDiv.delegate('.team-item[data-item]', 'click', function(e){
+                    e.preventDefault();
+                    if (_self.worldIsBusy()){ return; }
+                    if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
+                    console.log('%c' + 'Storage item clicked!', 'color: cyan;');
+                    let $item = $(this);
+                    let itemToken = $item.attr('data-item') || false;
+                    if (!itemToken || !itemToken.length){ return false; }
+                    console.log('-> itemToken =', itemToken);
+                    let $detailsDiv = $storageItemsDiv.find('> .details');
+                    if (!$detailsDiv || !$detailsDiv.length){
+                        let itemMarkup = _self.getItemDetailsMarkupForOverview(itemToken) || false;
+                        if (!itemMarkup || !itemMarkup.length){ return false; }
+                        console.log('-> itemMarkup =', itemMarkup);
+                        $storageItemsDiv.append(itemMarkup);
+                        } else {
+                        if ($detailsDiv.attr('data-item') === itemToken){ $detailsDiv.remove(); return; }
+                        let itemDetails = _self.getItemDetailsForOverview(itemToken) || false;
+                        if (!itemDetails || !Object.keys(itemDetails).length){ return false; }
+                        console.log('-> itemDetails =', itemDetails);
+                        let $title = $detailsDiv.find('> .title'),
+                            $image = $detailsDiv.find('> .image'),
+                            $subtitle = $detailsDiv.find('> .subtitle'),
+                            $subtitleName = $subtitle.find('> .name'),
+                            $subtitleQuantity = $subtitle.find('> .quantity'),
+                            $subtitleSubline = $subtitle.find('> hr'),
+                            $infolines = $detailsDiv.find('> .infolines'),
+                            $description = $detailsDiv.find('> .description'),
+                            $actions = $detailsDiv.find('> .actions')
+                            ;
+                        $detailsDiv.attr('data-item', itemToken);
+                        $title.html(itemDetails.title);
+                        $image.html(itemDetails.image);
+                        $subtitleName.html(itemDetails.name);
+                        $subtitleQuantity.html('&times; ' + itemDetails.quantity);
+                        $subtitleSubline.removeClass().addClass('type ' + itemDetails.typeClasses);
+                        $infolines.html(itemDetails.infolinesHTML);
+                        $description.html(itemDetails.description);
+                        $actions.html(itemDetails.actionsHTML);
+                        }
+                    return true;
+                    });
+                // ...
                 }
             // Bind a click event to the team-abilities button in the robots overview
             let $abilitiesButton = $('.team-abilities', $robotsOverview);
@@ -2410,8 +2454,51 @@ class mmrpgWorldMap {
                     return true;
                     });
                 // TODO: delegate event bindings for the actual abilities within the storage panel
-                // ...
                 // (like, what happens when you actually click an ability?)
+                // bind click events to the actual ability buttons for showing their details in the side-panel
+                $storageAbilitiesDiv.delegate('.team-ability[data-ability]', 'click', function(e){
+                    e.preventDefault();
+                    if (_self.worldIsBusy()){ return; }
+                    if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
+                    console.log('%c' + 'Storage ability clicked!', 'color: cyan;');
+                    let $ability = $(this);
+                    let abilityToken = $ability.attr('data-ability') || false;
+                    if (!abilityToken || !abilityToken.length){ return false; }
+                    console.log('-> abilityToken =', abilityToken);
+                    let $detailsDiv = $storageAbilitiesDiv.find('> .details');
+                    if (!$detailsDiv || !$detailsDiv.length){
+                        let abilityMarkup = _self.getAbilityDetailsMarkupForOverview(abilityToken) || false;
+                        if (!abilityMarkup || !abilityMarkup.length){ return false; }
+                        console.log('-> abilityMarkup =', abilityMarkup);
+                        $storageAbilitiesDiv.append(abilityMarkup);
+                        } else {
+                        if ($detailsDiv.attr('data-ability') === abilityToken){ $detailsDiv.remove(); return; }
+                        let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken) || false;
+                        if (!abilityDetails || !Object.keys(abilityDetails).length){ return false; }
+                        console.log('-> abilityDetails =', abilityDetails);
+                        let $title = $detailsDiv.find('> .title'),
+                            $image = $detailsDiv.find('> .image'),
+                            $subtitle = $detailsDiv.find('> .subtitle'),
+                            $subtitleName = $subtitle.find('> .name'),
+                            $subtitleCost = $subtitle.find('> .cost'),
+                            $subtitleSubline = $subtitle.find('> hr'),
+                            $infolines = $detailsDiv.find('> .infolines'),
+                            $description = $detailsDiv.find('> .description'),
+                            $actions = $detailsDiv.find('> .actions')
+                            ;
+                        $detailsDiv.attr('data-ability', abilityToken);
+                        $title.html(abilityDetails.title);
+                        $image.html(abilityDetails.image);
+                        $subtitleName.html(abilityDetails.name);
+                        $subtitleCost.html(abilityDetails.cost + ' WE');
+                        $subtitleSubline.removeClass().addClass('type ' + abilityDetails.typeClasses);
+                        $infolines.html(abilityDetails.infolinesHTML);
+                        $description.html(abilityDetails.description);
+                        $actions.html(abilityDetails.actionsHTML);
+                        }
+                    return true;
+                    });
+                // ...
                 }
             }
 
@@ -6972,6 +7059,415 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Define a quick function for getting the overview details for a given item in the user's inventory
+    getItemDetailsForOverview(itemToken){
+        console.log('%c' + 'mmrpgWorldMap.getItemDetailsForOverview(item:' + itemToken + ')', 'color: magenta;');
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('getItemDetailsForOverview() missing required itemToken!'); return ''; }
+
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerItems = _worldPlayer.items;
+        let _indexes = _self.indexes;
+        let _mmrpgItemsIndex = _indexes.items;
+        if (typeof _mmrpgItemsIndex[itemToken] === 'undefined'){ console.error('getItemDetailsForOverview() could not find item in index for token ' + itemToken + '!'); return false; }
+        let itemIndexInfo = _mmrpgItemsIndex[itemToken];
+        console.log('--> itemIndexInfo =', itemIndexInfo);
+
+        // Generate the markup, classes, styles, etc. that will make up the item details
+        let itemTitle = 'Item Details';
+        let itemName = itemIndexInfo.name;
+        let itemDescription = itemIndexInfo.description;
+        let itemType1 = itemIndexInfo.type || 'none';
+        let itemType2 = itemIndexInfo.type2 || false;
+        let currentItemQuantity = _worldPlayerItems[itemToken] || 0;
+        let equippedItemQuantity = _worldPlayerItems[itemToken + '__equipped'] || 0;
+        let itemQuantity = currentItemQuantity - equippedItemQuantity;
+        let itemImageSize = itemIndexInfo.imageSize;
+        let itemKind = itemIndexInfo.subclass;
+        //console.log('--> itemName =', itemName);
+        //console.log('--> itemDescription =', itemDescription);
+        //console.log('--> itemType1 =', itemType1);
+        //console.log('--> itemType2 =', itemType2);
+        //console.log('--> currentItemQuantity =', currentItemQuantity);
+        //console.log('--> equippedItemQuantity =', equippedItemQuantity);
+        //console.log('--> itemQuantity =', itemQuantity);
+        //console.log('--> itemImageSize =', itemImageSize);
+        //console.log('--> itemKind =', itemKind);
+        //console.log('--> statTokens =', statTokens);
+
+        // Generate type-related markup and spans for use later
+        let statTokens = ['attack', 'defense', 'speed'];
+        let itemTypeClasses = (itemType2 && itemType1 === 'none' ? itemType2 : (itemType1 + (itemType2 ? '_' + itemType2 : '')));
+        let isStatItem = (statTokens.indexOf(itemType1) !== -1 || itemToken.indexOf('super-') === 0 ? true : false);
+        let isSuperItem = (itemToken.indexOf('super-') === 0 ? true : false);
+        //console.log('--> itemTypeClasses =', itemTypeClasses);
+
+        // Determine the icon to use based on the item kind and format the text for display
+        let itemKindIcon = 'dot-circle';
+        if (itemKind === 'consumable'){ itemKindIcon = 'apple-alt'; }
+        else if (itemKind === 'holdable'){ itemKindIcon = 'briefcase'; }
+        else if (itemKind === 'collectable'){ itemKindIcon = 'cubes'; }
+        else if (itemKind === 'event'){ itemKindIcon = 'bookmark'; }
+        else if (itemKind === 'treasure'){ itemKindIcon = 'gem'; }
+        let itemKindName = itemKind.charAt(0).toUpperCase() + itemKind.slice(1);
+        //console.log('--> itemKindName =', itemKindName);
+        //console.log('--> itemKindIcon =', itemKindIcon);
+
+        // Generate the item sprite that will be used in the details
+        let randDelay = -1 * ( Math.floor(Math.random() * 10) / 100 );
+        let itemSpriteClasses = 'sprite item icon';
+        let itemSpriteStyles = 'animation-delay: ' + randDelay + 's; ';
+        let itemSpriteAttrs = 'data-sprite="item" data-token="' + itemToken + '" data-size="' + itemImageSize + '" data-dir="right" data-frame="00"';
+        let itemSprite = '<div class="' + itemSpriteClasses + '" style="' + itemSpriteStyles + '" ' + itemSpriteAttrs + '><span class="wrap"><i class="sprite"></i></span></div>';
+        //console.log('--> itemSpriteClasses =', itemSpriteClasses);
+        //console.log('--> itemSpriteStyles =', itemSpriteStyles);
+        //console.log('--> itemSpriteAttrs =', itemSpriteAttrs);
+        //console.log('--> itemSprite =', itemSprite);
+
+        // Collect details about the power level of this item (if relevant)
+        let itemDamage = itemIndexInfo.damage || 0;
+        let itemDamagePercent = itemIndexInfo.damagePercent || 0;
+        let itemRecovery = itemIndexInfo.recovery || 0;
+        let itemRecoveryPercent = itemIndexInfo.recoveryPercent || 0;
+        let itemDamage2 = itemIndexInfo.damage2 || 0;
+        let itemDamage2Percent = itemIndexInfo.damage2Percent || 0;
+        let itemRecovery2 = itemIndexInfo.recovery2 || 0;
+        let itemRecovery2Percent = itemIndexInfo.recovery2Percent || 0;
+        //console.log('--> itemDamage =', itemDamage);
+        //console.log('--> itemDamagePercent =', itemDamagePercent);
+        //console.log('--> itemRecovery =', itemRecovery);
+        //console.log('--> itemRecoveryPercent =', itemRecoveryPercent);
+        //console.log('--> itemDamage2 =', itemDamage2);
+        //console.log('--> itemDamage2Percent =', itemDamage2Percent);
+        //console.log('--> itemRecovery2 =', itemRecovery2);
+        //console.log('--> itemRecovery2Percent =', itemRecovery2Percent);
+
+        // Parse any value tags in the description before display
+        itemDescription = itemDescription.replace('{DAMAGE}', (itemDamage ? itemDamage : 0));
+        itemDescription = itemDescription.replace('{RECOVERY}', (itemRecovery ? itemRecovery : 0));
+        itemDescription = itemDescription.replace('{DAMAGE2}', (itemDamage2 ? itemDamage2 : 0));
+        itemDescription = itemDescription.replace('{RECOVERY2}', (itemRecovery2 ? itemRecovery2 : 0));
+
+        // Start generating the item details object for the overview
+        let itemDetailsObject = {};
+        itemDetailsObject.title = itemTitle;
+        itemDetailsObject.image = itemSprite;
+        itemDetailsObject.name = itemName;
+        itemDetailsObject.quantity = itemQuantity;
+        itemDetailsObject.typeClasses = itemTypeClasses;
+        itemDetailsObject.infoLines = [];
+        itemDetailsObject.infoLines.push({
+            classes: 'kind',
+            label: 'Kind:',
+            value: itemKindName,
+            valueClasses: itemKind,
+            icon: itemKindIcon
+            });
+        if (itemDamage || itemRecovery){
+            let powerLine = { classes: 'power', label: 'Power:', values: [] };
+            if (itemDamage){
+                let damageValue = {};
+                if (!isSuperItem){ damageValue.value = (isStatItem ? '-' : '') + itemDamage + (itemDamagePercent ? '%' : '') + ' ' + (isStatItem ? 'Break' : 'Damage'); }
+                else { damageValue.value = (isStatItem ? '-' : '') + (Math.ceil(itemDamage / statTokens.length) + '/').repeat(statTokens.length).replace(/\/$/, '') + (itemDamagePercent ? '%' : '') + ' ' + (isStatItem ? 'Break' : 'Damage'); }
+                damageValue.valueClasses = 'damage';
+                if (itemType1 === 'weapons'){ damageValue.icon = 'battery-half'; }
+                else if (isStatItem){ damageValue.icon = 'caret-square-down'; }
+                else { damageValue.icon = 'fist-raised'; }
+                powerLine.values.push(damageValue);
+                }
+            if (itemRecovery){
+                let recoveryValue = {};
+                if (!isSuperItem){ recoveryValue.value = (isStatItem ? '+' : '') + itemRecovery + (itemRecoveryPercent ? '%' : '') + ' ' + (isStatItem ? 'Boost' : 'Recovery'); }
+                else {  recoveryValue.value = (isStatItem ? '+' : '') + (Math.ceil(itemRecovery / statTokens.length) + '/').repeat(statTokens.length).replace(/\/$/, '') + (itemRecoveryPercent ? '%' : '') + ' ' + (isStatItem ? 'Boost' : 'Recovery'); }
+                recoveryValue.valueClasses = 'recovery';
+                if (itemType1 === 'weapons'){ recoveryValue.icon = 'battery-full'; }
+                else if (isStatItem){ recoveryValue.icon = 'caret-square-up'; }
+                else { recoveryValue.icon = 'heart'; }
+                powerLine.values.push(recoveryValue);
+                }
+            itemDetailsObject.infoLines.push(powerLine);
+            }
+        itemDetailsObject.description = itemDescription;
+        itemDetailsObject.actions = [];
+        if (itemKind !== 'event'
+            && itemQuantity > 0){
+            if (itemKind === 'consumable'){
+                itemDetailsObject.actions.push({ type: 'use-item', text: 'Use', item: itemToken });
+                }
+            if (itemKind === 'consumable' || itemKind === 'holdable'){
+                itemDetailsObject.actions.push({ type: 'give-item', text: 'Give', item: itemToken });
+                }
+            itemDetailsObject.actions.push({ type: 'drop-item', text: 'Drop', item: itemToken });
+            }
+
+        // Pre-compile some of the HTML to make it easier for the other functions
+        itemDetailsObject.infolinesHTML = '';
+        for (let i = 0; i < itemDetailsObject.infoLines.length; i++){
+            let infoLine = itemDetailsObject.infoLines[i];
+            itemDetailsObject.infolinesHTML += '<div class="infoline ' + infoLine.classes + '">';
+            itemDetailsObject.infolinesHTML += '<strong class="label">' + infoLine.label + '</strong>';
+            if (infoLine.values){
+                for (let j = 0; j < infoLine.values.length; j++){
+                    let valueInfo = infoLine.values[j];
+                    itemDetailsObject.infolinesHTML += '<span class="value ' + (valueInfo.valueClasses ? valueInfo.valueClasses : '') + '">' + valueInfo.value + '</span>';
+                    if (valueInfo.icon){ itemDetailsObject.infolinesHTML += '<i class="fa fas fa-' + valueInfo.icon + '"></i>'; }
+                    }
+                } else {
+                itemDetailsObject.infolinesHTML += '<span class="value ' + (infoLine.valueClasses ? infoLine.valueClasses : '') + '">' + infoLine.value + '</span>';
+                if (infoLine.icon){ itemDetailsObject.infolinesHTML += '<i class="fa fas fa-' + infoLine.icon + '"></i>'; }
+                }
+            itemDetailsObject.infolinesHTML += '</div>';
+            }
+        itemDetailsObject.actionsHTML = '';
+        for (let i = 0; i < itemDetailsObject.actions.length; i++){
+            let actionInfo = itemDetailsObject.actions[i];
+            itemDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.type + '" data-item="' + actionInfo.item + '">' + actionInfo.text + '</button>';
+            }
+
+        // Return the generated item details object
+        //console.log('--> itemDetailsObject =', itemDetailsObject);
+        return itemDetailsObject;
+        }
+
+    // Define a quick function for getting the details markup for a given item in the user's inventory
+    getItemDetailsMarkupForOverview(itemToken){
+        console.log('%c' + 'mmrpgWorldMap.getItemDetailsMarkupForOverview(item:' + itemToken + ')', 'color: magenta;');
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('getItemDetailsMarkupForOverview() missing required itemToken!'); return ''; }
+        let _self = this;
+        let itemDetailsObject = _self.getItemDetailsForOverview(itemToken) || false;
+        if (!itemDetailsObject || typeof itemDetailsObject !== 'object'){ console.error('getItemDetailsMarkupForOverview() could not generate details object for token ' + itemToken + '!'); return ''; }
+        let itemDetailsMarkup = '';
+        itemDetailsMarkup += '<div class="details" data-item="' + itemToken + '">';
+            itemDetailsMarkup += '<div class="title">' + itemDetailsObject.title + '</div>';
+            itemDetailsMarkup += '<div class="image">' + itemDetailsObject.image + '</div>';
+            itemDetailsMarkup += '<div class="subtitle">';
+                itemDetailsMarkup += '<strong class="name">' + itemDetailsObject.name + '</strong>';
+                itemDetailsMarkup += '<strong class="quantity">&times; ' + itemDetailsObject.quantity + '</strong>';
+                itemDetailsMarkup += '<hr class="type ' + itemDetailsObject.typeClasses + '">';
+            itemDetailsMarkup += '</div>';
+            itemDetailsMarkup += '<div class="infolines">' + itemDetailsObject.infolinesHTML + '</div>';
+            itemDetailsMarkup += '<div class="description"><p>' + itemDetailsObject.description + '</p></div>';
+            itemDetailsMarkup += '<div class="actions">' + itemDetailsObject.actionsHTML + '</div>';
+        itemDetailsMarkup += '</div>';
+        return itemDetailsMarkup;
+        }
+
+    // Define a quick function for getting the overview details for a given ability in the user's inventory
+    getAbilityDetailsForOverview(abilityToken){
+        console.log('%c' + 'mmrpgWorldMap.getAbilityDetailsForOverview(ability:' + abilityToken + ')', 'color: magenta;');
+        if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('getAbilityDetailsForOverview() missing required abilityToken!'); return ''; }
+
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerAbilities = _worldPlayer.abilities;
+        let _indexes = _self.indexes;
+        let _mmrpgTypesIndex = _indexes.types;
+        let _mmrpgAbilitiesIndex = _indexes.abilities;
+        if (typeof _mmrpgAbilitiesIndex[abilityToken] === 'undefined'){ console.error('getAbilityDetailsForOverview() could not find ability in index for token ' + abilityToken + '!'); return false; }
+        let abilityIndexInfo = _mmrpgAbilitiesIndex[abilityToken];
+        let abilityIsUnlocked = _worldPlayerAbilities.indexOf(abilityToken) !== -1 ? true : false;
+        console.log('--> abilityIndexInfo =', abilityIndexInfo);
+        console.log('--> abilityIsUnlocked =', abilityIsUnlocked);
+
+        // Generate the markup, classes, styles, etc. that will make up the ability details
+        let abilityTitle = 'Ability Details';
+        let abilityName = abilityIndexInfo.name;
+        let abilityDescription = abilityIndexInfo.description;
+        let abilityType1 = abilityIndexInfo.type || 'none';
+        let abilityType2 = abilityIndexInfo.type2 || false;
+        let abilityCost = abilityIndexInfo.energy || 0;
+        let abilityImageSize = abilityIndexInfo.imageSize;
+        let abilityKind = abilityIndexInfo.subclass;
+        let abilityKindName = abilityKind.charAt(0).toUpperCase() + abilityKind.slice(1);
+        let abilityTarget = abilityIndexInfo.target || 'auto';
+        let abilityTargetText;
+        if (abilityTarget === 'select_target'){ abilityTargetText = 'Select'; }
+        else if (abilityTarget === 'select_this_ally'){ abilityTargetText = 'Ally'; }
+        else if (abilityTarget === 'select_this'){ abilityTargetText = 'Self or Ally'; }
+        else if (abilityTarget === 'select_disabled'){ abilityTargetText = 'Disabled'; }
+        else { abilityTargetText = abilityTarget.charAt(0).toUpperCase() + abilityTarget.slice(1); }
+        //console.log('--> abilityName =', abilityName);
+        //console.log('--> abilityDescription =', abilityDescription);
+        //console.log('--> abilityType1 =', abilityType1);
+        //console.log('--> abilityType2 =', abilityType2);
+        //console.log('--> abilityCost =', abilityCost);
+        //console.log('--> abilityImageSize =', abilityImageSize);
+        //console.log('--> abilityKind =', abilityKind);
+        //console.log('--> abilityKindName =', abilityKindName);
+        //console.log('--> abilityTarget =', abilityTarget);
+        //console.log('--> abilityTargetText =', abilityTargetText);
+        //console.log('--> statTokens =', statTokens);
+
+        // Generate type-related markup and spans for use later
+        let statTokens = ['attack', 'defense', 'speed'];
+        let abilityTypeClasses = (abilityType2 && abilityType1 === 'none' ? abilityType2 : (abilityType1 + (abilityType2 ? '_' + abilityType2 : '')));
+        let isStatAbility = (statTokens.indexOf(abilityType1) !== -1 || statTokens.indexOf(abilityType2) !== -1 || statTokens.indexOf(abilityToken.split('-')[0]) !== -1 ? true : false);
+        //console.log('--> abilityTypeClasses =', abilityTypeClasses);
+
+        // Determine the icon to use based on the ability kind and format the text for display
+        let abilityKindIcon = 'dot-circle';
+        if (abilityKind === 'consumable'){ abilityKindIcon = 'apple-alt'; }
+        else if (abilityKind === 'holdable'){ abilityKindIcon = 'briefcase'; }
+        else if (abilityKind === 'collectable'){ abilityKindIcon = 'cubes'; }
+        else if (abilityKind === 'event'){ abilityKindIcon = 'bookmark'; }
+        else if (abilityKind === 'treasure'){ abilityKindIcon = 'gem'; }
+        //console.log('--> abilityKindIcon =', abilityKindIcon);
+
+        // Generate the ability sprite that will be used in the details
+        let randDelay = -1 * ( Math.floor(Math.random() * 10) / 100 );
+        let abilitySpriteClasses = 'sprite ability icon';
+        let abilitySpriteStyles = 'animation-delay: ' + randDelay + 's; ';
+        let abilitySpriteAttrs = 'data-sprite="ability" data-token="' + abilityToken + '" data-size="' + abilityImageSize + '" data-dir="right" data-frame="00"';
+        let abilitySprite = '<div class="' + abilitySpriteClasses + '" style="' + abilitySpriteStyles + '" ' + abilitySpriteAttrs + '><span class="wrap"><i class="sprite"></i></span></div>';
+        //console.log('--> abilitySpriteClasses =', abilitySpriteClasses);
+        //console.log('--> abilitySpriteStyles =', abilitySpriteStyles);
+        //console.log('--> abilitySpriteAttrs =', abilitySpriteAttrs);
+        //console.log('--> abilitySprite =', abilitySprite);
+
+        // Collect details about the power level of this ability (if relevant)
+        let abilityDamage = abilityIndexInfo.damage || 0;
+        let abilityDamagePercent = abilityIndexInfo.damagePercent || 0;
+        let abilityRecovery = abilityIndexInfo.recovery || 0;
+        let abilityRecoveryPercent = abilityIndexInfo.recoveryPercent || 0;
+        let abilityDamage2 = abilityIndexInfo.damage2 || 0;
+        let abilityDamage2Percent = abilityIndexInfo.damage2Percent || 0;
+        let abilityRecovery2 = abilityIndexInfo.recovery2 || 0;
+        let abilityRecovery2Percent = abilityIndexInfo.recovery2Percent || 0;
+        //console.log('--> abilityDamage =', abilityDamage);
+        //console.log('--> abilityDamagePercent =', abilityDamagePercent);
+        //console.log('--> abilityRecovery =', abilityRecovery);
+        //console.log('--> abilityRecoveryPercent =', abilityRecoveryPercent);
+        //console.log('--> abilityDamage2 =', abilityDamage2);
+        //console.log('--> abilityDamage2Percent =', abilityDamage2Percent);
+        //console.log('--> abilityRecovery2 =', abilityRecovery2);
+        //console.log('--> abilityRecovery2Percent =', abilityRecovery2Percent);
+
+        // Parse any value tags in the description before display
+        abilityDescription = abilityDescription.replace('{DAMAGE}', (abilityDamage ? abilityDamage : 0));
+        abilityDescription = abilityDescription.replace('{RECOVERY}', (abilityRecovery ? abilityRecovery : 0));
+        abilityDescription = abilityDescription.replace('{DAMAGE2}', (abilityDamage2 ? abilityDamage2 : 0));
+        abilityDescription = abilityDescription.replace('{RECOVERY2}', (abilityRecovery2 ? abilityRecovery2 : 0));
+
+        // Start generating the ability details object for the overview
+        let abilityDetailsObject = {};
+        abilityDetailsObject.title = abilityTitle;
+        abilityDetailsObject.image = abilitySprite;
+        abilityDetailsObject.name = abilityName;
+        abilityDetailsObject.cost = abilityCost;
+        abilityDetailsObject.typeClasses = abilityTypeClasses;
+        abilityDetailsObject.infoLines = [];
+        if (abilityType1 || abilityType2){
+            let typeLine = { classes: 'types', label: 'Type:', values: [] };
+            if (abilityType1){
+                let typeValue1 = {};
+                typeValue1.value = abilityType1 === 'none' ? 'Neutral' : _mmrpgTypesIndex[abilityType1].name;
+                typeValue1.valueClasses = 'type ' + abilityType1;
+                typeLine.values.push(typeValue1);
+                }
+            if (abilityType2){
+                let typeValue2 = {};
+                typeValue2.value = abilityType2 === 'none' ? 'Neutral' : _mmrpgTypesIndex[abilityType2].name;
+                typeValue2.valueClasses = 'type ' + abilityType2;
+                typeLine.values.push(typeValue2);
+                }
+            abilityDetailsObject.infoLines.push(typeLine);
+            }
+        if (abilityDamage || (isStatAbility && abilityDamage2)
+            || abilityRecovery || (isStatAbility && abilityRecovery2)){
+            let powerLine = { classes: 'power', label: 'Power:', values: [] };
+            if (abilityDamage || (isStatAbility && abilityDamage2)){
+                let damageValue = {};
+                if (abilityDamage){ damageValue.value = (isStatAbility ? '-' : '') + abilityDamage + (abilityDamagePercent ? '%' : '') + ' ' +  (isStatAbility ? 'Break' : 'Damage'); }
+                else if (isStatAbility && abilityDamage2){ damageValue.value = (isStatAbility ? '-' : '') + abilityDamage2 + (abilityDamage2Percent ? '%' : '') + ' ' +  (isStatAbility ? 'Break' : 'Damage'); }
+                damageValue.valueClasses = 'damage';
+                if (abilityType1 === 'weapons'){ damageValue.icon = 'battery-half'; }
+                else if (isStatAbility){ damageValue.icon = 'caret-square-down'; }
+                else { damageValue.icon = 'fist-raised'; }
+                powerLine.values.push(damageValue);
+                }
+            if (abilityRecovery || (isStatAbility && abilityRecovery2)){
+                let recoveryValue = {};
+                if (abilityRecovery){ recoveryValue.value = (isStatAbility ? '+' : '') + abilityRecovery + (abilityRecoveryPercent ? '%' : '') + ' ' + (isStatAbility ? 'Boost' : 'Recovery'); }
+                else if (isStatAbility && abilityRecovery2){ recoveryValue.value = (isStatAbility ? '+' : '') + abilityRecovery2 + (abilityRecovery2Percent ? '%' : '') + ' ' + (isStatAbility ? 'Boost' : 'Recovery'); }
+                recoveryValue.valueClasses = 'recovery';
+                if (abilityType1 === 'weapons'){ recoveryValue.icon = 'battery-full'; }
+                else if (isStatAbility){ recoveryValue.icon = 'caret-square-up'; }
+                else { recoveryValue.icon = 'heart'; }
+                powerLine.values.push(recoveryValue);
+                }
+            abilityDetailsObject.infoLines.push(powerLine);
+            }
+        if (abilityTarget){
+            abilityDetailsObject.infoLines.push({
+                classes: 'target',
+                label: 'Target:',
+                value: abilityTargetText,
+                valueClasses: abilityTarget === 'auto' ? 'auto' : 'select'
+                });
+            }
+        abilityDetailsObject.description = abilityDescription;
+        abilityDetailsObject.actions = [];
+        abilityDetailsObject.actions.push({ type: 'equip-ability', text: 'Equip', ability: abilityToken });
+
+        // Pre-compile some of the HTML to make it easier for the other functions
+        abilityDetailsObject.infolinesHTML = '';
+        for (let i = 0; i < abilityDetailsObject.infoLines.length; i++){
+            let infoLine = abilityDetailsObject.infoLines[i];
+            abilityDetailsObject.infolinesHTML += '<div class="infoline ' + infoLine.classes + '">';
+            abilityDetailsObject.infolinesHTML += '<strong class="label">' + infoLine.label + '</strong>';
+            if (infoLine.values){
+                for (let j = 0; j < infoLine.values.length; j++){
+                    let valueInfo = infoLine.values[j];
+                    abilityDetailsObject.infolinesHTML += '<span class="value ' + (valueInfo.valueClasses ? valueInfo.valueClasses : '') + '">' + valueInfo.value + '</span>';
+                    if (valueInfo.icon){ abilityDetailsObject.infolinesHTML += '<i class="fa fas fa-' + valueInfo.icon + '"></i>'; }
+                    }
+                } else {
+                abilityDetailsObject.infolinesHTML += '<span class="value ' + (infoLine.valueClasses ? infoLine.valueClasses : '') + '">' + infoLine.value + '</span>';
+                if (infoLine.icon){ abilityDetailsObject.infolinesHTML += '<i class="fa fas fa-' + infoLine.icon + '"></i>'; }
+                }
+            abilityDetailsObject.infolinesHTML += '</div>';
+            }
+        abilityDetailsObject.actionsHTML = '';
+        for (let i = 0; i < abilityDetailsObject.actions.length; i++){
+            let actionInfo = abilityDetailsObject.actions[i];
+            abilityDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.type + '" data-ability="' + actionInfo.ability + '">' + actionInfo.text + '</button>';
+            }
+
+        // Return the generated ability details object
+        //console.log('--> abilityDetailsObject =', abilityDetailsObject);
+        return abilityDetailsObject;
+        }
+
+    // Define a quick function for getting the details markup for a given ability in the user's arsenal
+    getAbilityDetailsMarkupForOverview(abilityToken){
+        console.log('%c' + 'mmrpgWorldMap.getAbilityDetailsMarkupForOverview(ability:' + abilityToken + ')', 'color: magenta;');
+        if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('getAbilityDetailsMarkupForOverview() missing required abilityToken!'); return ''; }
+        let _self = this;
+        let abilityDetailsObject = _self.getAbilityDetailsForOverview(abilityToken) || false;
+        if (!abilityDetailsObject || typeof abilityDetailsObject !== 'object'){ console.error('getAbilityDetailsMarkupForOverview() could not generate details object for token ' + itemToken + '!'); return ''; }
+        let abilityDetailsMarkup = '';
+        abilityDetailsMarkup += '<div class="details" data-ability="' + abilityToken + '">';
+            abilityDetailsMarkup += '<div class="title">' + abilityDetailsObject.title + '</div>';
+            abilityDetailsMarkup += '<div class="image">' + abilityDetailsObject.image + '</div>';
+            abilityDetailsMarkup += '<div class="subtitle">';
+                abilityDetailsMarkup += '<strong class="name">' + abilityDetailsObject.name + '</strong>';
+                abilityDetailsMarkup += '<strong class="cost">' + abilityDetailsObject.cost + ' <i>WE</i></strong>';
+                abilityDetailsMarkup += '<hr class="type ' + abilityDetailsObject.typeClasses + '">';
+            abilityDetailsMarkup += '</div>';
+            abilityDetailsMarkup += '<div class="infolines">' + abilityDetailsObject.infolinesHTML + '</div>';
+            abilityDetailsMarkup += '<div class="description"><p>' + abilityDetailsObject.description + '</p></div>';
+            abilityDetailsMarkup += '<div class="actions">' + abilityDetailsObject.actionsHTML + '</div>';
+        abilityDetailsMarkup += '</div>';
+        return abilityDetailsMarkup;
+        }
 
     // Define a quick functino for polling the server for new events (but only if we can actually show them)
     triggerWindowEventsPull(afterDelay){
