@@ -1633,7 +1633,7 @@ html, body {
     z-index: 1;
     top: 30px;
     bottom: -10px;
-    left: -480px;
+    left: -540px;
     height: auto;
     width: 645px;
     border-bottom-width: 1px;
@@ -1889,6 +1889,7 @@ html, body {
     font-size: 15px;
     line-height: 1;
     letter-spacing: 1px;
+    white-space: nowrap;
     bottom: 40px;
     left: 50px;
     padding-left: 34px;
@@ -2401,10 +2402,10 @@ html, body {
     width: auto;
     height: 80px;
     background-color: #191919;
-    background-image: url("../images/sprite-grid.gif");
+    background-image: none;
     background-repeat: repeat;
     background-position: 0px 0px;
-    border: 1px solid #292929;
+    border: 1px solid #292929 !important;
     border-radius: 6px;
 }
 #robots-overview .storage-box > .details .image:before,
@@ -2415,16 +2416,19 @@ html, body {
     left: 0px;
     right: 0px;
     height: 40px;
-    background-image: inherit;
+    border: 0px none transparent;
+    background-image: url(../images/sprite-grid.gif);
     background-position: 0 0;
     background-repeat: repeat;
     background-size: auto;
+    background-color: transparent;
+    /* mix-blend-mode: luminosity;  */
+    mix-blend-mode: hard-light;
 }
 #robots-overview .storage-box > .details .image:before {
     z-index: 2;
     top: 0;
     filter: brightness(0.6);
-    border-top: 0px none transparent;
     box-shadow: rgba(0, 0, 0, 0.3) 0px -2px 10px inset;
     animation: 16s linear 0s infinite normal none running storage-object-showcase_grid-pan;
 }
@@ -2432,7 +2436,6 @@ html, body {
     z-index: 1;
     bottom: 0;
     filter: brightness(0.8);
-    border-top: 2px solid rgb(30, 30, 30);
     background-position: 0px -9px;
 }
 #world #robots-overview .storage-box > .details .image > .sprite {
@@ -2478,9 +2481,11 @@ html, body {
 }
 #robots-overview .storage-box > .details .subtitle .name {
     float: left;
+    text-align: left;
     font-size: 13px;
     font-weight: bold;
     color: #efefef;
+    max-width: calc(100% - 40px);
 }
 #robots-overview .storage-box > .details .subtitle .quantity,
 #robots-overview .storage-box > .details .subtitle .cost {
@@ -2635,7 +2640,7 @@ display: block;
     height: auto;
     width: auto;
     min-height: 44px;
-    min-width: 222px;
+    min-width: 120px;
     text-align: center;
     color: #cfcfcf;
     font-size: 12px;
@@ -2644,13 +2649,14 @@ display: block;
     outline: 1px solid transparent;
     background-color: transparent;
     background-image: none !important;
-    transition: outline 0.3s, background-color 0.3s, filter 0.3s;
+    transition: outline 0.3s, background-color 0.3s, filter 0.3s, min-width 0.6s;
     pointer-events: none;
     cursor: pointer;
 }
 #world #canvas #robots-overview:hover .team-robot,
 #world #canvas #robots-overview.expanded .team-robot {
     pointer-events: auto;
+    min-width: 222px;
 }
 #world #canvas #robots-overview .team-robot:before {
     content: "";
@@ -2824,11 +2830,16 @@ display: block;
     white-space: nowrap;
     min-width: 120px;
     border-bottom: 2px solid #000000;
+    transition: min-width 0.6s;
 }
 #world #canvas #robots-overview .team-robot > .label .name {
     float: left;
     font-weight: bold;
     pointer-events: auto;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 120px;
+    transition: max-width 0.6s;
 }
 #world #canvas #robots-overview .team-robot > .label .lvl {
     float: right;
@@ -2837,6 +2848,7 @@ display: block;
     margin-left: 20px;
     border-radius: 2px;
     padding: 0 4px;
+    transition: margin-left 0.6s;
 }
 #world #canvas #robots-overview .team-robot > .label + .guage {
     margin-top: -1px;
@@ -2849,8 +2861,10 @@ display: block;
     overflow: hidden;
     background-color: #191919;
     border-radius: 0 3px 3px 0;
+    border-right: 1px solid #000000;
     border-bottom: 1px solid #000000;
     pointer-events: auto;
+    transition: width 0.6s;
 }
 #world #canvas #robots-overview .team-robot > .guage > i {
     display: block;
@@ -2882,10 +2896,12 @@ display: block;
 #world #canvas #robots-overview .team-robot > .guage.energy {
     width: 120px;
     background-color: #294921;
+    border-color: #64a455;
 }
 #world #canvas #robots-overview .team-robot > .guage.weapons {
     width: 90px;
     background-color: #1b3652;
+    border-color: #3d7cbe;
 }
 #world #canvas #robots-overview .team-robot > .guage.energy > i {
     border-color: #64a455;
@@ -2904,8 +2920,8 @@ display: block;
     background-color: transparent;
 }
 #world #canvas #robots-overview .team-robot > .guage.weapons > i {
-    border-color: rgb(61, 124, 190);
-    background-color: rgb(43, 101, 163);
+    border-color: #3d7cbe;
+    background-color: #2b65a3;
 }
 #world #canvas #robots-overview .team-robot[data-status="no-energy"] > .guage.weapons > i {
     border-color: transparent !important;
@@ -2973,6 +2989,27 @@ display: block;
 #world #canvas #robots-overview .team-robot > .statmods > .mod.up > i:nth-child(3) { animation-delay: 0.2s; }
 #world #canvas #robots-overview .team-robot > .statmods > .mod.up > i:nth-child(4) { animation-delay: 0.3s; }
 #world #canvas #robots-overview .team-robot > .statmods > .mod.up > i:nth-child(5) { animation-delay: 0.4s; }
+
+#world #canvas #robots-overview:not(:hover):not(.expanded) .team-robot > .label {
+    min-width: 60px;
+}
+#world #canvas #robots-overview:not(:hover):not(.expanded) .team-robot > .label .name {
+    max-width: 0px;
+}
+#world #canvas #robots-overview:not(:hover):not(.expanded) .team-robot > .label .name + .lvl {
+    margin-left: 0;
+}
+#world #canvas #robots-overview:not(:hover):not(.expanded) .team-robot > .guage.energy {
+    width: 60px;
+}
+#world #canvas #robots-overview:not(:hover):not(.expanded) .team-robot > .guage.weapons {
+    width: 40px;
+}
+#world #canvas #robots-overview:not(:hover):not(.expanded) .team-robot > .statmods > .mod > i {
+    margin-right: -1px;
+    font-size: 9px;
+    top: 1px;
+}
 
 #world #canvas #robots-overview:after,
 #world #canvas #robots-overview .team-robots:after,
@@ -3184,12 +3221,17 @@ display: block;
 #world #canvas #robots-overview.expanded .storage-items .team-item {
     pointer-events: auto;
 }
-#world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]):hover {
+#world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]):hover,
+#world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]).hovered,
+#world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]).selected {
     transform: translate(0, -1px);
     outline-color: #ffffff;
 }
 #world #canvas #robots-overview .storage-items .team-item.hidden {
     display: none;
+}
+#world #canvas #robots-overview .storage-items.has-selection .team-item:not(.selected):not(.disabled):not([data-quantity="0"]) {
+    filter: brightness(0.6);
 }
 #world #canvas #robots-overview .storage-items .team-item.disabled,
 #world #canvas #robots-overview .storage-items .team-item[data-quantity="0"] {
@@ -3245,8 +3287,6 @@ display: block;
     text-align: right;
 }
 
-
-
 #world #canvas #robots-overview .storage-abilities .team-ability {
     display: block;
     box-sizing: border-box;
@@ -3281,16 +3321,23 @@ display: block;
 #world #canvas #robots-overview.expanded .storage-abilities .team-ability {
     pointer-events: auto;
 }
-#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover {
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover,
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).hovered {
+    transform: translate(0, -1px);
+    outline-color: #dedede;
+}
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).selected {
     transform: translate(0, -1px);
     outline-color: #ffffff;
 }
 #world #canvas #robots-overview .storage-abilities .team-ability.hidden {
     display: none;
 }
+#world #canvas #robots-overview .storage-abilities.has-selection .team-ability:not(.selected):not(.hovered):not(:hover):not(.disabled):not(.incompatible) {
+    filter: brightness(0.8) saturate(1.2);
+}
 #world #canvas #robots-overview .storage-abilities .team-ability.disabled,
-#world #canvas #robots-overview .storage-abilities .team-ability.incompatible,
-#world #canvas #robots-overview .storage-abilities .team-ability[data-quantity="0"] {
+#world #canvas #robots-overview .storage-abilities .team-ability.incompatible {
     filter: brightness(0.4);
     cursor: default;
 }
@@ -3313,12 +3360,18 @@ display: block;
     filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.3));
     transition: transform 0.3s, filter 0.3s;
 }
-#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite {
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite,
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).hovered .image > .sprite,
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).selected .image > .sprite {
     transform: translate(0, calc(-50% - 1px));
     /* filter: drop-shadow(1px 1px 1px rgba(255, 255, 255, 0.3));  */
 }
 #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back,
-#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back:after {
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back:after,
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).hovered .image > .sprite > .wrap > .back,
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).hovered .image > .sprite > .wrap > .back:after,
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).selected .image > .sprite > .wrap > .back,
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).selected .image > .sprite > .wrap > .back:after {
     border-color: #ffffff !important;
 }
 #world #canvas #robots-overview .storage-abilities .team-ability .tint {

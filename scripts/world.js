@@ -1776,6 +1776,35 @@ class mmrpgWorldMap {
                     //console.log('-> disabling next button');
                     $('.button[data-page="next"]', $storageObjectsDiv).addClass('disabled');
                     }
+                // If there's an active selection that is now hidden, clear it and any details panel it invoked
+                let $hiddenSelected = $objectsList.filter('.selected.hidden');
+                //console.log('-> $hiddenSelected =', $hiddenSelected.length, $hiddenSelected);
+                if ($hiddenSelected.length){
+                    //console.log('-> hidden objects selected, so clear selection!', '\n --> $hiddenSelected =', $hiddenSelected);
+                    $hiddenSelected.each(function(){
+                        let $object = $(this);
+                        let objectKind, objectToken;
+                        if ($object.is('[data-ability]')){
+                            objectKind = 'ability';
+                            objectToken = $object.attr('data-ability');
+                            //console.log('-> found hidden selected ability:', objectToken);
+                            } else if ($object.is('[data-item]')){
+                            objectKind = 'item';
+                            objectToken = $object.attr('data-item');
+                            //console.log('-> found hidden selected item:', objectToken);
+                            } else if ($object.is('[data-robot]')){
+                            objectKind = 'robot';
+                            objectToken = $object.attr('data-robot');
+                            //console.log('-> found hidden selected robot:', objectToken);
+                            } else {
+                            //console.log('-> could not determine kind of hidden selected object, skipping...');
+                            return;
+                            }
+                        //console.log('-> clearing selection for hidden selected ' + objectKind + ' ' + objectToken);
+                        $object.removeClass('selected');
+                        $storageObjectsDiv.find('> .details[data-' + objectKind + '="' + objectToken + '"]').remove();
+                        });
+                    }
                 };
             // Define a function for sorting a given storage page of either robots, items, or abilities by a given sort-token
             let sortStoragePage = function(storageKind, sortToken, sortDirection, goToPageNum){
@@ -2294,7 +2323,7 @@ class mmrpgWorldMap {
                         $dismissButton.trigger('click');
                         }
                     // Now we can run setup for the rest of the UI elements in this view
-                    console.warn('TODO: insert the rest of the item-storage bindings here (WIP)');
+                    console.warn('TODO: insert the rest of the item-storage bindings');
                     // Return true on success
                     return true;
                     });
@@ -2305,22 +2334,27 @@ class mmrpgWorldMap {
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return; }
                     if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
-                    console.log('%c' + 'Storage item clicked!', 'color: cyan;');
+                    //console.log('%c' + 'Storage item clicked!', 'color: cyan;');
                     let $item = $(this);
                     let itemToken = $item.attr('data-item') || false;
+                    //console.log('-> itemToken =', itemToken);
                     if (!itemToken || !itemToken.length){ return false; }
-                    console.log('-> itemToken =', itemToken);
+                    let alreadySelected = $item.is('.selected') ? true : false;
+                    $('.team-item[data-item].selected', $storageItemsDiv).removeClass('selected');
+                    $storageItemsDiv.removeClass('has-selection');
                     let $detailsDiv = $storageItemsDiv.find('> .details');
+                    if (alreadySelected){ $detailsDiv.remove(); return; }
+                    $item.addClass('selected');
+                    $storageItemsDiv.addClass('has-selection');
                     if (!$detailsDiv || !$detailsDiv.length){
                         let itemMarkup = _self.getItemDetailsMarkupForOverview(itemToken) || false;
                         if (!itemMarkup || !itemMarkup.length){ return false; }
-                        console.log('-> itemMarkup =', itemMarkup);
+                        //console.log('-> itemMarkup =', itemMarkup);
                         $storageItemsDiv.append(itemMarkup);
                         } else {
-                        if ($detailsDiv.attr('data-item') === itemToken){ $detailsDiv.remove(); return; }
                         let itemDetails = _self.getItemDetailsForOverview(itemToken) || false;
                         if (!itemDetails || !Object.keys(itemDetails).length){ return false; }
-                        console.log('-> itemDetails =', itemDetails);
+                        //console.log('-> itemDetails =', itemDetails);
                         let $title = $detailsDiv.find('> .title'),
                             $image = $detailsDiv.find('> .image'),
                             $subtitle = $detailsDiv.find('> .subtitle'),
@@ -2334,6 +2368,7 @@ class mmrpgWorldMap {
                         $detailsDiv.attr('data-item', itemToken);
                         $title.html(itemDetails.title);
                         $image.html(itemDetails.image);
+                        $image.removeClass().addClass('image type '+ itemDetails.typeClasses);
                         $subtitleName.html(itemDetails.name);
                         $subtitleQuantity.html('&times; ' + itemDetails.quantity);
                         $subtitleSubline.removeClass().addClass('type ' + itemDetails.typeClasses);
@@ -2380,6 +2415,20 @@ class mmrpgWorldMap {
                         if (!isCompatible){ $ability.addClass('incompatible'); }
                         else { $ability.removeClass('incompatible'); }
                         });
+                    // If there's an active selection that is now incompatible, clear it and any details panel it invoked
+                    let $incompatibleSelected = $abilityObjectsInOverview.filter('.selected.incompatible');
+                    //console.log('-> $incompatibleSelected =', $incompatibleSelected.length, $incompatibleSelected);
+                    if ($incompatibleSelected.length){
+                        //console.log('-> incompatible ability selected, so clear selection!');
+                        $incompatibleSelected.each(function(){
+                            let $ability = $(this);
+                            let abilityToken = $ability.attr('data-ability');
+                            //console.log('-> clearing selection for abilityToken =', abilityToken);
+                            $ability.removeClass('selected');
+                            $storageAbilitiesDiv.find('> .details[data-ability="' + abilityToken + '"]').remove();
+                            });
+                        }
+                    // Refresh the ability storage page now that we've updated compatibility
                     refreshStoragePage('abilities');
                     };
                 // define a quick function for refreshing the ability div given conditions
@@ -2431,7 +2480,7 @@ class mmrpgWorldMap {
                     // Refresh the abilities div now that everything is set up
                     refreshAbilitiesDiv();
                     // Now we can run setup for the rest of the UI elements in this view
-                    console.warn('TODO: insert the rest of the ability-storage bindings here');
+                    console.warn('TODO: insert the rest of the ability-storage bindings');
                     // Return true on success
                     return true;
                     });
@@ -2460,22 +2509,29 @@ class mmrpgWorldMap {
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return; }
                     if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
-                    console.log('%c' + 'Storage ability clicked!', 'color: cyan;');
+                    //console.log('%c' + 'Storage ability clicked!', 'color: cyan;');
                     let $ability = $(this);
                     let abilityToken = $ability.attr('data-ability') || false;
+                    //console.log('-> abilityToken =', abilityToken);
                     if (!abilityToken || !abilityToken.length){ return false; }
-                    console.log('-> abilityToken =', abilityToken);
+                    if ($ability.is('.incompatible')){ return false; }
+                    let alreadySelected = $ability.is('.selected') ? true : false;
+                    //console.log('-> alreadySelected =', alreadySelected);
+                    $('.team-ability[data-ability].selected', $storageAbilitiesDiv).removeClass('selected');
+                    $storageAbilitiesDiv.removeClass('has-selection');
                     let $detailsDiv = $storageAbilitiesDiv.find('> .details');
+                    if (alreadySelected){ $detailsDiv.remove(); return; }
+                    $ability.addClass('selected');
+                    $storageAbilitiesDiv.addClass('has-selection');
                     if (!$detailsDiv || !$detailsDiv.length){
                         let abilityMarkup = _self.getAbilityDetailsMarkupForOverview(abilityToken) || false;
                         if (!abilityMarkup || !abilityMarkup.length){ return false; }
-                        console.log('-> abilityMarkup =', abilityMarkup);
+                        //console.log('-> abilityMarkup =', abilityMarkup);
                         $storageAbilitiesDiv.append(abilityMarkup);
                         } else {
-                        if ($detailsDiv.attr('data-ability') === abilityToken){ $detailsDiv.remove(); return; }
                         let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken) || false;
                         if (!abilityDetails || !Object.keys(abilityDetails).length){ return false; }
-                        console.log('-> abilityDetails =', abilityDetails);
+                        //console.log('-> abilityDetails =', abilityDetails);
                         let $title = $detailsDiv.find('> .title'),
                             $image = $detailsDiv.find('> .image'),
                             $subtitle = $detailsDiv.find('> .subtitle'),
@@ -2489,6 +2545,7 @@ class mmrpgWorldMap {
                         $detailsDiv.attr('data-ability', abilityToken);
                         $title.html(abilityDetails.title);
                         $image.html(abilityDetails.image);
+                        $image.removeClass().addClass('image type ' + abilityDetails.typeClasses);
                         $subtitleName.html(abilityDetails.name);
                         $subtitleCost.html(abilityDetails.cost + ' WE');
                         $subtitleSubline.removeClass().addClass('type ' + abilityDetails.typeClasses);
@@ -6906,7 +6963,7 @@ class mmrpgWorldMap {
 
     // Define a quick function for adding an item to the player's inventory if there's room for it
     addItemToInventory(itemToken, itemQuantity, animatePickup, playSound){
-        console.log('%c' + 'mmrpgWorldMap.addItemToInventory(item:' + itemToken + ', quantity:' + itemQuantity + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.addItemToInventory(item:' + itemToken + ', quantity:' + itemQuantity + ')', 'color: magenta;');
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('addItemToInventory() missing required itemToken!'); return false; }
         if (typeof itemQuantity !== 'number' || isNaN(itemQuantity) || itemQuantity < 1){ itemQuantity = 1; }
         if (typeof animatePickup !== 'boolean'){ animatePickup = true; } // default to true if not provided
@@ -6939,8 +6996,8 @@ class mmrpgWorldMap {
         let equippedItemQuantity = _worldPlayerItems[itemToken + '__equipped'];
         if (!currentItemQuantity){ currentItemQuantity = 0; }
         if (!equippedItemQuantity){ equippedItemQuantity = 0; }
-        console.log('--> currentItemQuantity =', currentItemQuantity);
-        console.log('--> equippedItemQuantity =', equippedItemQuantity);
+        //console.log('--> currentItemQuantity =', currentItemQuantity);
+        //console.log('--> equippedItemQuantity =', equippedItemQuantity);
         if (currentItemQuantity >= itemInventoryMax){
             console.warn('addItemToInventory() called for item that is already at max quantity!');
             return false; // no room in the inventory
@@ -6948,7 +7005,7 @@ class mmrpgWorldMap {
         // If there is room, add the item to the inventory
         let overflowQuantity = 0;
         let newItemQuantity = currentItemQuantity + itemQuantity;
-        console.log('--> newItemQuantity =', newItemQuantity);
+        //console.log('--> newItemQuantity =', newItemQuantity);
         if (newItemQuantity > itemInventoryMax){
             console.warn('--> inventory for item', itemToken, 'is full, so capping at max value');
             overflowQuantity = newItemQuantity - itemInventoryMax; // calculate overflow
@@ -7229,13 +7286,13 @@ class mmrpgWorldMap {
             }
 
         // Return the generated item details object
-        //console.log('--> itemDetailsObject =', itemDetailsObject);
+        console.log('--> itemDetailsObject =', itemDetailsObject);
         return itemDetailsObject;
         }
 
     // Define a quick function for getting the details markup for a given item in the user's inventory
     getItemDetailsMarkupForOverview(itemToken){
-        console.log('%c' + 'mmrpgWorldMap.getItemDetailsMarkupForOverview(item:' + itemToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getItemDetailsMarkupForOverview(item:' + itemToken + ')', 'color: magenta;');
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('getItemDetailsMarkupForOverview() missing required itemToken!'); return ''; }
         let _self = this;
         let itemDetailsObject = _self.getItemDetailsForOverview(itemToken) || false;
@@ -7243,7 +7300,7 @@ class mmrpgWorldMap {
         let itemDetailsMarkup = '';
         itemDetailsMarkup += '<div class="details" data-item="' + itemToken + '">';
             itemDetailsMarkup += '<div class="title">' + itemDetailsObject.title + '</div>';
-            itemDetailsMarkup += '<div class="image">' + itemDetailsObject.image + '</div>';
+            itemDetailsMarkup += '<div class="image type ' + itemDetailsObject.typeClasses + '">' + itemDetailsObject.image + '</div>';
             itemDetailsMarkup += '<div class="subtitle">';
                 itemDetailsMarkup += '<strong class="name">' + itemDetailsObject.name + '</strong>';
                 itemDetailsMarkup += '<strong class="quantity">&times; ' + itemDetailsObject.quantity + '</strong>';
@@ -7275,7 +7332,7 @@ class mmrpgWorldMap {
         let abilityIndexInfo = _mmrpgAbilitiesIndex[abilityToken];
         let abilityIsUnlocked = _worldPlayerAbilities.indexOf(abilityToken) !== -1 ? true : false;
         console.log('--> abilityIndexInfo =', abilityIndexInfo);
-        console.log('--> abilityIsUnlocked =', abilityIsUnlocked);
+        //console.log('--> abilityIsUnlocked =', abilityIsUnlocked);
 
         // Generate the markup, classes, styles, etc. that will make up the ability details
         let abilityTitle = 'Ability Details';
@@ -7442,13 +7499,13 @@ class mmrpgWorldMap {
             }
 
         // Return the generated ability details object
-        //console.log('--> abilityDetailsObject =', abilityDetailsObject);
+        console.log('--> abilityDetailsObject =', abilityDetailsObject);
         return abilityDetailsObject;
         }
 
     // Define a quick function for getting the details markup for a given ability in the user's arsenal
     getAbilityDetailsMarkupForOverview(abilityToken){
-        console.log('%c' + 'mmrpgWorldMap.getAbilityDetailsMarkupForOverview(ability:' + abilityToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getAbilityDetailsMarkupForOverview(ability:' + abilityToken + ')', 'color: magenta;');
         if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('getAbilityDetailsMarkupForOverview() missing required abilityToken!'); return ''; }
         let _self = this;
         let abilityDetailsObject = _self.getAbilityDetailsForOverview(abilityToken) || false;
@@ -7456,7 +7513,7 @@ class mmrpgWorldMap {
         let abilityDetailsMarkup = '';
         abilityDetailsMarkup += '<div class="details" data-ability="' + abilityToken + '">';
             abilityDetailsMarkup += '<div class="title">' + abilityDetailsObject.title + '</div>';
-            abilityDetailsMarkup += '<div class="image">' + abilityDetailsObject.image + '</div>';
+            abilityDetailsMarkup += '<div class="image type ' + abilityDetailsObject.typeClasses + '">' + abilityDetailsObject.image + '</div>';
             abilityDetailsMarkup += '<div class="subtitle">';
                 abilityDetailsMarkup += '<strong class="name">' + abilityDetailsObject.name + '</strong>';
                 abilityDetailsMarkup += '<strong class="cost">' + abilityDetailsObject.cost + ' <i>WE</i></strong>';
