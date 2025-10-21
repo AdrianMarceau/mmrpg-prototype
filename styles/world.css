@@ -2747,7 +2747,7 @@ display: block;
     top: -8px;
     z-index: 3;
 }
-#world #canvas #robots-overview .team-robot:not(.disabled):hover .icon > .sprite.robot {
+#world #canvas #robots-overview .team-robot:not(.disabled):not(.incompatible):hover .icon > .sprite.robot {
     top: -10px !important;
 }
 #world #canvas #robots-overview .team-robot .icon > .sprite.item {
@@ -3158,6 +3158,12 @@ display: block;
 }
 #world #canvas #robots-overview .team-robots .team-robot:nth-child(1) > .icon {
     padding: 7px;
+}
+
+#world #canvas #robots-overview .team-robots .team-robot.disabled,
+#world #canvas #robots-overview .team-robots .team-robot.incompatible {
+    filter: brightness(0.4);
+    cursor: default;
 }
 #world #canvas #robots-overview .storage-robots .team-robot .icon:after {
     display: none;

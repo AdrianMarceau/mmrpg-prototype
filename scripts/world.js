@@ -1526,6 +1526,18 @@ class mmrpgWorldMap {
                 $resetButton.removeClass('disabled');
                 $playerSwitcher.removeClass('disabled');
                 };
+            // Define a function for quickly clearing selections and incompatible states from elements
+            let clearSelectionsAndIncompatible = function(){
+                //console.log('%c' + 'clearSelectionsAndIncompatible() called!', 'color: magenta;');
+                $storageBoxes.removeClass('has-selection');
+                $storageBoxes.find('.selected').removeClass('selected');
+                $storageBoxes.removeClass('focused').removeClass('unfocused');
+                $storageBoxes.find('.incompatible').removeClass('incompatible');
+                $teamRobotsDiv.removeClass('focused').removeClass('unfocused');
+                $teamRobotsDiv.find('.incompatible', ).removeClass('incompatible');
+                $('.details', $storageBoxes).remove();
+                return;
+                };
             // Define a function for expanding the robots-overview panel and showing a specific view
             let showRobotsOverviewPanel = function(viewToken){
                 //console.log('%c' + 'showRobotsOverviewPanel(viewToken:' + (viewToken ? viewToken : typeof viewToken) + ') called!', 'color: magenta;');
@@ -1537,19 +1549,18 @@ class mmrpgWorldMap {
                 $robotsOverview.addClass('expanded').attr('data-view', viewToken);
                 $storageButtons.removeClass('active').filter('[data-view="' + viewToken + '"]').addClass('active');
                 _world.mapIsHidden = true; // set the map hidden state
+                clearSelectionsAndIncompatible();
                 disableOtherElements();
                 return;
                 };
             // Define a function for dismissing the whole robots-overview panel and all views at-once
             let disableRobotsOverview = function(){
                 //console.log('%c' + 'disableRobotsOverview() called!', 'color: magenta;');
+                clearSelectionsAndIncompatible();
                 enableOtherElements();
                 _world.mapIsHidden = false;
                 $robotsOverview.removeClass('expanded').attr('data-view', '');
                 $storageButtons.removeClass('active');
-                $teamRobotsDiv.removeClass('focused').removeClass('unfocused');
-                $storageBoxes.removeClass('focused').removeClass('unfocused');
-                $('.details', $storageBoxes).remove();
                 $('.pages', $storageRobotsDiv).remove();
                 $('.bullets', $storageRobotsDiv).remove();
                 return;
@@ -1804,6 +1815,8 @@ class mmrpgWorldMap {
                         $object.removeClass('selected');
                         $storageObjectsDiv.find('> .details[data-' + objectKind + '="' + objectToken + '"]').remove();
                         });
+                    //console.log('-> also remove any lingering incompatibility classes on the team robots');
+                    $('.team-robot[data-robot].incompatible', $teamRobotsDiv).removeClass('incompatible');
                     }
                 };
             // Define a function for sorting a given storage page of either robots, items, or abilities by a given sort-token
@@ -1968,6 +1981,7 @@ class mmrpgWorldMap {
                 e.preventDefault();
                 if (_self.worldIsBusy()){ return; }
                 if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
+                if ($(this).is('.incompatible')){ return; } // if robot was marked incompatible, ignore clicked
                 //console.log('%c' + 'Team robot clicked!', 'color: cyan;');
                 let $thisRobot = $(this);
                 let alreadySelected = $thisRobot.is('.selected') ? true : false;
@@ -2520,7 +2534,11 @@ class mmrpgWorldMap {
                     $('.team-ability[data-ability].selected', $storageAbilitiesDiv).removeClass('selected');
                     $storageAbilitiesDiv.removeClass('has-selection');
                     let $detailsDiv = $storageAbilitiesDiv.find('> .details');
-                    if (alreadySelected){ $detailsDiv.remove(); return; }
+                    if (alreadySelected){
+                        $('.team-robot[data-robot].incompatible', $teamRobotsDiv).removeClass('incompatible');
+                        $detailsDiv.remove();
+                        return;
+                        }
                     $ability.addClass('selected');
                     $storageAbilitiesDiv.addClass('has-selection');
                     if (!$detailsDiv || !$detailsDiv.length){
@@ -2553,6 +2571,26 @@ class mmrpgWorldMap {
                         $description.html(abilityDetails.description);
                         $actions.html(abilityDetails.actionsHTML);
                         }
+                    //console.log('-> mark robots incompatibile w/ abilityToken =', abilityToken);
+                    $('.team-robot[data-robot]', $teamRobotsDiv).each(function(){
+                        let $robot = $(this);
+                        let robotToken = $robot.attr('data-robot') || false;
+                        if (!robotToken || !robotToken.length){ return; }
+                        let robotData = _worldPlayerRobots[robotToken] || false;
+                        if (!robotData){ return; }
+                        //console.log('-> ' + abilityToken + ' vs. ' + robotToken + ' ...', '\n-> robotData =', robotData);
+                        let robotAbilities = [];
+                        let abilitiesCompatible = robotData.abilitiesCompatible;
+                        let abilitiesViaItem = robotData.abilitiesViaItem;
+                        if (typeof abilitiesCompatible !== 'undefined'){ robotAbilities = robotAbilities.concat(abilitiesCompatible); }
+                        if (typeof abilitiesViaItem !== 'undefined'){ robotAbilities = robotAbilities.concat(abilitiesViaItem); }
+                        let abilityID = parseInt($ability.attr('data-ability-id') || '0');
+                        if (!abilityID){ return; }
+                        let isCompatible = robotAbilities.indexOf(abilityID) !== -1 ? true : false;
+                        //console.log('-> isCompatible =', isCompatible);
+                        if (!isCompatible){ $robot.addClass('incompatible'); }
+                        else { $robot.removeClass('incompatible'); }
+                        });
                     return true;
                     });
                 // ...
@@ -7118,7 +7156,7 @@ class mmrpgWorldMap {
 
     // Define a quick function for getting the overview details for a given item in the user's inventory
     getItemDetailsForOverview(itemToken){
-        console.log('%c' + 'mmrpgWorldMap.getItemDetailsForOverview(item:' + itemToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getItemDetailsForOverview(item:' + itemToken + ')', 'color: magenta;');
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('getItemDetailsForOverview() missing required itemToken!'); return ''; }
 
         // Collect references to world objects
@@ -7132,7 +7170,7 @@ class mmrpgWorldMap {
         let _mmrpgItemsIndex = _indexes.items;
         if (typeof _mmrpgItemsIndex[itemToken] === 'undefined'){ console.error('getItemDetailsForOverview() could not find item in index for token ' + itemToken + '!'); return false; }
         let itemIndexInfo = _mmrpgItemsIndex[itemToken];
-        console.log('--> itemIndexInfo =', itemIndexInfo);
+        //console.log('--> itemIndexInfo =', itemIndexInfo);
 
         // Generate the markup, classes, styles, etc. that will make up the item details
         let itemTitle = 'Item Details';
@@ -7286,7 +7324,7 @@ class mmrpgWorldMap {
             }
 
         // Return the generated item details object
-        console.log('--> itemDetailsObject =', itemDetailsObject);
+        //console.log('--> itemDetailsObject =', itemDetailsObject);
         return itemDetailsObject;
         }
 
@@ -7315,7 +7353,7 @@ class mmrpgWorldMap {
 
     // Define a quick function for getting the overview details for a given ability in the user's inventory
     getAbilityDetailsForOverview(abilityToken){
-        console.log('%c' + 'mmrpgWorldMap.getAbilityDetailsForOverview(ability:' + abilityToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getAbilityDetailsForOverview(ability:' + abilityToken + ')', 'color: magenta;');
         if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('getAbilityDetailsForOverview() missing required abilityToken!'); return ''; }
 
         // Collect references to world objects
@@ -7331,7 +7369,7 @@ class mmrpgWorldMap {
         if (typeof _mmrpgAbilitiesIndex[abilityToken] === 'undefined'){ console.error('getAbilityDetailsForOverview() could not find ability in index for token ' + abilityToken + '!'); return false; }
         let abilityIndexInfo = _mmrpgAbilitiesIndex[abilityToken];
         let abilityIsUnlocked = _worldPlayerAbilities.indexOf(abilityToken) !== -1 ? true : false;
-        console.log('--> abilityIndexInfo =', abilityIndexInfo);
+        //console.log('--> abilityIndexInfo =', abilityIndexInfo);
         //console.log('--> abilityIsUnlocked =', abilityIsUnlocked);
 
         // Generate the markup, classes, styles, etc. that will make up the ability details
@@ -7499,7 +7537,7 @@ class mmrpgWorldMap {
             }
 
         // Return the generated ability details object
-        console.log('--> abilityDetailsObject =', abilityDetailsObject);
+        //console.log('--> abilityDetailsObject =', abilityDetailsObject);
         return abilityDetailsObject;
         }
 
