@@ -378,6 +378,17 @@ $map_sprite_sheet = !empty($map_data_parsed) && !empty($map_data_parsed['sheet']
 if (empty($map_data_parsed)){ error_log('MMRPG World Fatal Error - No world data defined for map "'.$world_map_token.'"!'); die(); }
 if (empty($map_sprite_sheet)){ error_log('MMRPG World Fatal Error - No sprite sheet defined for map "'.$world_map_token.'"!'); die(); }
 
+// Update the saved last-world and last-map tokens in the world session and track if they've changed
+$prev_world_token = !empty($WORLD_SESSION['last_world_token']) ? $WORLD_SESSION['last_world_token'] : '';
+$prev_map_token = !empty($WORLD_SESSION['last_map_token']) ? $WORLD_SESSION['last_map_token'] : '';
+$new_world_token = $this_prototype_data['this_current_world'];
+$new_map_token = $this_prototype_data['this_current_map'];
+$WORLD_SESSION['last_world_token'] = $new_world_token;
+$WORLD_SESSION['last_map_token'] = $new_map_token;
+$world_token_changed = $prev_world_token !== $new_world_token ? true : false;
+$map_token_changed = $prev_map_token !== $new_map_token ? true : false;
+$location_has_changed = $world_token_changed || $map_token_changed ? true : false;
+
 // Make sure there's room in relevant session arrays for this map's data
 if (!isset($WORLD_SESSION['world_maps'][$world_map_token])){ $WORLD_SESSION['world_maps'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_events'][$world_map_token])){ $WORLD_SESSION['world_events'][$world_map_token] = array(); }
@@ -509,11 +520,15 @@ $flag_skip_fadein = true;
                 <?
 
                 // GLOBAL MAP DATA
+                //error_log('Generating world map data for map "'.$world_map_token.'"...');
+                //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
                 $data = array();
                 $data['map_world'] = $map_data_parsed['world'];
+                $data['map_world_name'] = $map_data_parsed['world_name'];
                 $data['map_token'] = $map_data_parsed['token'];
                 $data['map_name'] = $map_data_parsed['name'];
                 $data['map_image'] = 'images/maps/'.(!empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : 'undefined.png');
+                $data['map_field'] = $map_field_token;
                 $data['map_size'] = array($map_col_size, $map_row_size);
                 $data['tile_size'] = array($map_tile_width, $map_tile_height);
                 $data['tiles_index'] = $map_data_parsed['tiles'];
@@ -614,6 +629,7 @@ $flag_skip_fadein = true;
 <script type="text/javascript">
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 (function(){
+    // Define the main configuration settings for the world map
     let _worldConfig = gameSettings.worldConfig;
     _worldConfig.userId = <?= rpg_game::get_userid() ?>;
     _worldConfig.playerId = <?= json_encode($this_prototype_data['this_player_id'], JSON_NUMERIC_CHECK) ?>;
@@ -627,6 +643,7 @@ $flag_skip_fadein = true;
     _worldConfig.backButtonURL = 'prototype.php';
     _worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=spawn';
     _worldConfig.resetButtonURL = 'world.php?reset=world';
+    // Load in the main content indexes for the world map if they exist
     if (typeof mmrpgIndex !== 'undefined'){
         let _worldIndexes = gameSettings.worldIndexes;
         _worldIndexes.types = typeof mmrpgIndex.types !== 'undefined' ? mmrpgIndex.types : {};
@@ -636,6 +653,8 @@ $flag_skip_fadein = true;
         _worldIndexes.items = typeof mmrpgIndex.items !== 'undefined' ? mmrpgIndex.items : {};
         _worldIndexes.fields = typeof mmrpgIndex.fields !== 'undefined' ? mmrpgIndex.fields : {};gameSettings.worldIndexes = mmrpgIndex;
         }
+    // Define any additional map settings or flags that are more contextual
+    _worldConfig.locationHasChanged = <?= json_encode($location_has_changed, JSON_NUMERIC_CHECK) ?>;
 })();
 </script>
 <!-- (5) queue document ready events -->
@@ -651,8 +670,32 @@ $(document).ready(function(){
     // (make sure to automatically pull events if we have a valid map)
     let $mmrpg = $('#mmrpg');
     let worldMapObject = null;
-    if ($mmrpg.length){ worldMapObject = new mmrpgWorldMap($mmrpg); }
-    if (worldMapObject){ worldMapObject.triggerWindowEventsPull(1000); }
+    if ($mmrpg.length){
+        worldMapObject = new mmrpgWorldMap($mmrpg, function(){
+            //console.log('triggering custom onReady callback!');
+            let _self = this;
+            let _config = _self.config;
+            let _indexes = _self.indexes;
+            _self.triggerWindowEventsPull(1000);
+            if (_config.locationHasChanged){
+                let _fieldsIndex = _indexes.fields || {};
+                let worldName = _config.mapWorldName;
+                let mapName = _config.mapName;
+                let mapField = _config.mapField;
+                let mapFieldInfo = _fieldsIndex[mapField] || {};
+                let mapFieldName = mapFieldInfo.name || mapField.replace('-', ' ').toUpperCase();
+                //console.log('-> worldName = '+worldName);
+                //console.log('-> mapName = '+mapName);
+                //console.log('-> mapField = '+mapField);
+                //console.log('-> mapFieldInfo = ', mapFieldInfo);
+                //console.log('-> mapFieldName = '+mapFieldName);
+                //let titleText = worldName + ' &raquo; ' + mapName + ' &raquo; ';
+                let titleText = mapName + ' &raquo;';
+                let subtitleText = mapFieldName;
+                _self.showTitleBanner(titleText, subtitleText, false, 3000);
+                }
+            });
+        }
     gameSettings.worldMapObject = worldMapObject;
     window.worldMapObject = worldMapObject;
 

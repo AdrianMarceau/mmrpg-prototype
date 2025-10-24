@@ -219,9 +219,10 @@ class rpg_world {
         // Loop through all the world data fields and parse any json fields provided
         //error_log('$worldData(before) = '.print_r($worldData, true));
         foreach ($worldData AS $key => $data){
-            if (!is_string($data) || !(strstr($data, '{') !== false || strstr($data, '[') !== false)){ continue; }
+            if (!is_string($data)){ continue; }
+            elseif (substr($data, 0, 1) !== '{' && substr($data, 0, 1) !== '['){ continue; }
             $decoded = json_decode($data, true);
-            if (empty($decoded)){ continue; }
+            if (empty($decoded) && !is_array($decoded)){ continue; }
             $worldData[$key] = $decoded;
         }
         //error_log('$worldData(after) = '.print_r($worldData, true));
@@ -268,7 +269,6 @@ class rpg_world {
             if (!empty($worldData['lastPlayerRobots'])){
                 // scan the player robots for changes in: energy, weapons, attack, defense, speed
                 $lastPlayerRobots = $worldData['lastPlayerRobots'];
-                //error_log('$lastPlayerRobots(raw) = '. print_r($lastPlayerRobots, true));
                 if (!empty($lastPlayerRobots)){
                     $old_last_robots = !empty($lastPlayerSession['last_robots']) ? explode(',', $lastPlayerSession['last_robots']) : array();
                     $new_last_robots = !empty($lastPlayerRobots) ? array_keys($lastPlayerRobots) : array();
@@ -536,6 +536,46 @@ class rpg_world {
         if (empty($world_map_token)){ error_log('rpg_world::load_map_data() error - missing world-map token!'); return false; }
         if (!strstr($world_map_token, '__')){ error_log('rpg_world::load_map_data() error - invalid world-map token "'.$world_map_token.'"!'); return false; }
         list($world_token, $map_token) = explode('__', $world_map_token);
+        // first we collect data for the parent world itself
+        $world_basedir = self::$worldmap_basedir.self::$worldmap_basepath;
+        $world_filename = $world_token.'.world';
+        $world_filedir = $world_basedir.$world_filename;
+        if (!file_exists($world_filedir)){
+            //error_log('load_map_data() world file not found "'.$world_filedir.'"!');
+            return false;
+            }
+        $world_data_raw = file_get_contents($world_filedir);
+        if (empty($world_data_raw)){
+            //error_log('load_map_data() world file empty "'.$world_filedir.'"!');
+            return false;
+            }
+        $world_data_array = explode("\n", trim($world_data_raw));
+        $world_data_vars = array();
+        foreach ($world_data_array AS $line){
+            $line = trim($line);
+            // Ignore empty lines and comments
+            if (empty(trim($line))){ continue; }
+            else if (strpos($line, '#') === 0){ continue; } // Ignore comments
+            else if (strpos($line, '//') === 0){ continue; } // Ignore comments
+            // If this is a variable line, pull it (ie. @foo = bar)
+            if (strpos($line, '@') === 0){
+                if (!strstr($line, '=')){ continue; }
+                $line = preg_replace('/\s+\=\s+/i', '=', trim($line, '@ '));
+                list($name, $value) = explode('=', $line, 2);
+                if (strstr($name, '[') && strstr($name, ']')){
+                    $key = substr($name, strpos($name, '[') + 1, -1);
+                    $name = substr($name, 0, strpos($name, '['));
+                    if (!isset($world_data_vars[$name])){ $world_data_vars[$name] = array(); }
+                    if ($key === ''){ $world_data_vars[$name][] = $value; }
+                    else { $world_data_vars[$name][$key] = $value; }
+                    } else {
+                    $world_data_vars[$name] = $value;
+                    }
+                continue;
+                }
+        }
+        //error_log('load_map_data() loaded world data vars: '.print_r($world_data_vars, true));
+        // then we collect data for the actual map within the world
         $map_basedir = self::$worldmap_basedir.self::$worldmap_basepath;
         $map_filename = $world_token.'/'.$map_token.'.map';
         $map_filedir = $map_basedir.$map_filename;
@@ -634,7 +674,8 @@ class rpg_world {
                 };
             }
         //error_log('raw $map_data_vars(before) = '.print_r($map_data_vars, true));
-        $map_data_vars['world'] = isset($map_data_vars['world']) ? $map_data_vars['world'] : '';
+        $map_data_vars['world'] = isset($world_data_vars['token']) ? $world_data_vars['token'] : '';
+        $map_data_vars['world_name'] = isset($world_data_vars['name']) ? $world_data_vars['name'] : '';
         $map_data_vars['token'] = isset($map_data_vars['token']) ? $map_data_vars['token'] : '';
         $map_data_vars['name'] = isset($map_data_vars['name']) ? $map_data_vars['name'] : '';
         $map_data_vars['level'] = isset($map_data_vars['level']) ? $map_data_vars['level'] : 1;
@@ -682,6 +723,7 @@ class rpg_world {
         // Add collected data to the parsed map data
         $map_data_parsed = array();
         $map_data_parsed['world'] = $map_data_vars['world']; unset($map_data_vars['world']);
+        $map_data_parsed['world_name'] = $map_data_vars['world_name']; unset($map_data_vars['world_name']);
         $map_data_parsed['token'] = $map_data_vars['token']; unset($map_data_vars['token']);
         $map_data_parsed['name'] = $map_data_vars['name']; unset($map_data_vars['name']);
         $map_data_parsed['level'] = $map_data_vars['level']; unset($map_data_vars['level']);

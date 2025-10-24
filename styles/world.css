@@ -3707,6 +3707,128 @@ display: block;
     opacity: 1.0;
 }
 
+#world #canvas #title-banner {
+    display: block;
+    left: -10px;
+    right: -10px;
+    top: 150px;
+    height: 150px;
+    bottom: auto;
+    width: auto;
+    z-index: 1009;
+    padding: 0;
+    margin: 0 auto;
+    font-size: 26px;
+    line-height: 1.4;
+    color: #ffffff;
+    text-shadow: 1px 1px 0 #000000;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    opacity: 1.0;
+    transition: opacity 0.6s;
+}
+#world #canvas #title-banner.hidden {
+    display: none;
+}
+#world #canvas #title-banner:before,
+#world #canvas #title-banner:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: auto;
+    background-color: #000000;
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: auto 120px;
+    image-rendering: pixelated;
+    transform: skewX(0);
+    border: none;
+    transition: transform 0.9s, left 0.6s, right 0.6s;
+}
+#world #canvas #title-banner:before {
+    z-index: 1;
+    top: 10px;
+    bottom: 10px;
+    left: 0;
+    right: auto;
+    opacity: 0.6;
+    background-position: top right;
+    background-image: url("../images/assets/website-texture_circuit-board-2k23_corner-white_top-right.png");
+}
+#world #canvas #title-banner:after {
+    z-index: 2;
+    top: 20px;
+    bottom: 20px;
+    right: 0;
+    left: auto;
+    opacity: 0.8;
+    background-position: bottom left;
+    background-image: url("../images/assets/website-texture_circuit-board-2k23_corner-white_bottom-left.png");
+}
+#world #canvas #title-banner > .wrap {
+    z-index: 3;
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: auto;
+    background-color: transparent;
+    border: none;
+    opacity: 1.0;
+    transition: opacity 1.2s;
+}
+#world #canvas #title-banner .title,
+#world #canvas #title-banner .subtitle {
+    display: block;
+    width: auto;
+    position: relative;
+}
+#world #canvas #title-banner .title {
+    font-size: 60%;
+    font-style: italic;
+    text-align: left;
+    right: 0;
+    opacity: 0.9;
+    transition: right 1.6s, opacity 1.9s;
+}
+#world #canvas #title-banner .subtitle {
+    font-size: 120%;
+    font-weight: bold;
+    text-align: right;
+    left: 0;
+    opacity: 1.0;
+    transition: left 1.9s, opacity 2.2s;
+}
+#world #canvas #title-banner:not(.active) {
+    opacity: 0.0;
+}
+#world #canvas #title-banner:not(.active):before {
+    left: -800px;
+    transform: skewX(-60deg);
+}
+#world #canvas #title-banner:not(.active):after {
+    right: -800px;
+    transform: skewX(60deg);
+}
+#world #canvas #title-banner:not(.active) .wrap {
+    opacity: 0.0;
+}
+#world #canvas #title-banner:not(.active) .title {
+    right: 20px;
+    opacity: 0.6;
+}
+#world #canvas #title-banner:not(.active) .subtitle {
+    left: 20px;
+    opacity: 0.7;
+}
+
 /* TEMP TEMP TEMP */
 
 /* use for seeing full map in view when too big during dev */

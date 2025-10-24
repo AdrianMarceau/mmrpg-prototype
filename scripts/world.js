@@ -17,8 +17,10 @@ gameSettings.worldConfig = {
     playerHistory: [], // list of prev-player tokens in rev-chron order
     mapWorld: 'undefined',
     mapToken: 'undefined',
+    worldName: 'Undefined World',
     mapName: 'Undefined Map',
     mapImage: 'undefined.png',
+    mapField: 'field',
     mapSize: [10, 10],
     mapTileSize: [80, 80],
     mapTileSizeOffset: [0, 0],
@@ -117,6 +119,8 @@ gameSettings.worldState = {
     mapIsHidden: false, // map is full visible by default
     allowHovers: true, // allow hover effects on tiles
     allowClicks: true, // allow click events on tiles
+    hasLoaded: false, // has finished loading
+    isReady: false, // is ready for interaction
     };
 gameSettings.worldIndexes = {
     types: {},
@@ -140,14 +144,16 @@ gameSettings.worldHasLoaded = false;
 class mmrpgWorldMap {
 
     // Constructor function for the world map
-    constructor($mmrpg){
+    constructor($mmrpg, onReady){
         //console.log('%c' + 'mmrpgWorldMap() constructor', 'color: green;');
         let _self = this;
         _self.config = gameSettings.worldConfig;
         _self.indexes = gameSettings.worldIndexes;
         _self.elements = gameSettings.worldElements;
         _self.state = gameSettings.worldState;
+        if (!$mmrpg || !$mmrpg.length){ return false; }
         if (!_self.checkIndexes()){ return false; }
+        if (onReady){ _self.onWorldReady(onReady); }
         _self.initConfig();
         _self.initWorld($mmrpg);
         }
@@ -230,6 +236,7 @@ class mmrpgWorldMap {
         let $sideButtons = $('#side-buttons', $thisWorld);
         let $actionDropdown = $('#action-dropdown', $thisWorld);
         let $clickOverlay = $('#click-overlay', $thisWorld);
+        let $titleBanner = $('#title-banner', $thisPrototype);
         let $worldCursor = $('.sprite[data-sprite="team-cursor"]', $canvasMap);
         let $teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap);
         _elements.mmrpg = $thisPrototype;
@@ -247,6 +254,7 @@ class mmrpgWorldMap {
         _elements.sideButtons = $sideButtons;
         _elements.actionDropdown = $actionDropdown;
         _elements.clickOverlay = $clickOverlay;
+        _elements.titleBanner = $titleBanner;
         _elements.worldCursor = $worldCursor;
         _elements.teamSprites = $teamSprites;
         if ($canvasMap.length && $mapLayers.length){
@@ -276,9 +284,11 @@ class mmrpgWorldMap {
         let $mapJson = $('script[data-json]', $canvasMap).first(), mapJson = $mapJson.html(), mapData = mapJson ? JSON.parse(mapJson) : false;
         if (!mapData || typeof mapData !== 'object' || !Object.keys(mapData).length){ console.error('initWorldMap() unable to parse mapData!'); return false; }
         let mapWorld = mapData.map_world || false;
+        let worldName = mapData.map_world_name || false;
         let mapToken = mapData.map_token || false;
         let mapName = mapData.map_name || false;
         let mapImage = mapData.map_image || false;
+        let mapField = mapData.map_field || 'field';
         let mapSize = mapData.map_size || false;
         let tileSize = mapData.tile_size || false;
         let tilesIndex = mapData.tiles_index || false;
@@ -291,13 +301,16 @@ class mmrpgWorldMap {
         if (!tilesIndex  || !spritesIndex){ console.error('initWorldMap() missing required indexes!', {tilesIndex, spritesIndex}); return false; }
         if (!Array.isArray(mapSize) || mapSize.length < 2){ console.error('initWorldMap() mapSize must be an array of at least two values!'); return false; }
         if (!Array.isArray(tileSize) || tileSize.length < 2){ console.error('initWorldMap() tileSize must be an array of at least two values!'); return false; }
+        let defaultWorldName = mapWorld.replace(/-/g, ' ').replace(/\b\w/g, function(l){ return l.toUpperCase(); });
         let defaultMapName = mapToken.replace(/-/g, ' ').replace(/ AREA /g, ' Area ').replace(/\b\w/g, function(l){ return l.toUpperCase(); });
         let defaultMapSize = [_config.mapSize[0], _config.mapSize[1]];
         let defaultMapTileSize = [_config.mapTileSize[0], _config.mapTileSize[1]];
         _config.mapWorld = mapWorld;
+        _config.mapWorldName = worldName || defaultWorldName;
         _config.mapToken = mapToken;
         _config.mapName = mapName || defaultMapName;
         _config.mapImage = mapImage;
+        _config.mapField = mapField;
         _config.mapSize = [parseInt(mapSize[0]), parseInt(mapSize[1])];
         _config.mapTileSize = [parseInt(tileSize[0]), parseInt(tileSize[1])];
         _config.mapTileSizeOffset = [0, 0]; // default values
@@ -371,6 +384,8 @@ class mmrpgWorldMap {
             }
         // Define the function to run when everything is done loading
         let onWorldLoaded = function(){
+                console.log('%c' + 'MMRPG WORLD HAS LOADED!', 'color: cyan;');
+            _world.hasLoaded = true;
             _self.bindEventsToCanvas($canvasMap);
             _self.bindEventsToWorld($thisWorld);
             _self.calculateWalkableMapTiles();
@@ -388,13 +403,14 @@ class mmrpgWorldMap {
             _self.playSoundEffect('teleport-in');
             _self.moveToPosition(startPosition, null, true, false, fakeOldPosition);
             setTimeout(function(){
-                console.log('MMRPG WORLD LOADED & READY!');
-                gameSettings.gameHasStarted = true;
+                console.log('%c' + 'MMRPG WORLD IS READY!', 'color: lime;');
+                _world.isReady = true;
                 $thisWorld.removeClass('hidden');
                 $thisWorld.addClass('ready');
                 $canvasMap.addClass('ready');
                 _self.startIdleAnimation();
                 _self.triggerWindowEventsPull();
+                _self.triggerWorldReadyEvents();
                 }, 100);
             };
         // Define the function for run when each layer is done being rendered
@@ -5522,6 +5538,45 @@ class mmrpgWorldMap {
         return new Promise(resolve => setTimeout(resolve, ms));
         }
 
+    // Quick function for queuing a worldReady event to run when things are loaded
+    onWorldReady(callback){
+        //console.log('%c' + 'mmrpgWorldMap.onWorldReady(callback:' + (callback ? typeof callback : 'false') + ')', 'color: magenta;');
+        if (!callback || typeof callback === 'undefined'){ console.error('onWorldReady() missing required callback function!'); return false; }
+        else if (typeof callback !== 'function'){ console.error('onWorldReady() callback provided is not a function!'); return false; }
+        let _self = this;
+        let _config = _self.config;
+        let _world = _self.state;
+        let xRef = _self.onWorldReady;
+        let xQueue = xRef._queue || [];
+        xQueue.push(callback);
+        xRef._queue = xQueue;
+        _self.triggerWorldReadyEvents();
+        return;
+        }
+
+    // Quick function for triggering any worldReady events that have been queued up
+    triggerWorldReadyEvents(){
+        //console.log('%c' + 'mmrpgWorldMap.triggerWorldReadyEvents()', 'color: magenta;');
+        let _self = this;
+        let _config = _self.config;
+        let _world = _self.state;
+        if (!_world.hasLoaded || !_world.isReady){ return false; }
+        //console.log('%c' + '~mmrpgWorldMap.triggerWorldReadyEvents()', 'color: magenta;');
+        let xRef = _self.onWorldReady;
+        let xQueue = xRef._queue || [];
+        if (!xQueue.length){ return false; }
+        //console.log('-> triggering ' + xQueue.length + ' worldReady events ...');
+        // execute one after another, passing _self as "this", and making sure first returns before next executes
+        let returns = [];
+        do {
+            let callback = xQueue.shift();
+            //console.log('-> executing worldReady event #' + (xRef._queue.length + 1) + ' of ' + (xRef._queue.length + 1));
+            returns.push(callback.call(_self));
+            //console.log('-> remaining worldReady events:', xRef._queue.length);
+            } while (xRef._queue.length);
+        return returns;
+        }
+
     // Quick function for triggering a world event (lol) and any effects that may occur
     triggerWorldEvent(eventAction, eventData, $eventSprite){
         //console.log('%c' + 'mmrpgWorldMap.triggerWorldEvent(' + eventAction + ', ' + eventData + ', $eventSprite:' + typeof $eventSprite + ')', 'color: magenta;');
@@ -7562,6 +7617,51 @@ class mmrpgWorldMap {
             abilityDetailsMarkup += '<div class="actions">' + abilityDetailsObject.actionsHTML + '</div>';
         abilityDetailsMarkup += '</div>';
         return abilityDetailsMarkup;
+        }
+
+    // Define a quick event for showing the title banner w/ whatever title and subtitle text is provided w/ optional custom timeout for autohide
+    showTitleBanner(titleText, subtitleText, showBreadcrumb, autoHideTimeout){
+        //console.log('%c' + 'mmrpgWorldMap.showTitleBanner()', 'color: magenta;');
+        if (!titleText || typeof titleText !== 'string' || !titleText.length){ console.error('showTitleBanner() missing required titleText!'); return; }
+        if (subtitleText && typeof subtitleText !== 'string'){ console.error('showTitleBanner() received invalid subtitleText!'); return; }
+        showBreadcrumb = typeof showBreadcrumb === 'boolean' ? showBreadcrumb : false; // default to false if not provided
+        autoHideTimeout = typeof autoHideTimeout === 'number' ? autoHideTimeout : 3000; // default to 3 seconds if not provided
+        let _self = this;
+        let _elements = _self.elements;
+        let $thisCanvas = _elements.canvas;
+        let $titleBaner = _elements.titleBanner;
+        if (!$titleBaner || !$titleBaner.length){
+            let titleBannerMarkup = '';
+            titleBannerMarkup += '<div id="title-banner" class="chrome">';
+                titleBannerMarkup += '<div class="wrap">';
+                    titleBannerMarkup += '<h1 class="title">' + titleText + (showBreadcrumb ? ' &raquo;' : '') + '</h1>';
+                    titleBannerMarkup += '<h2 class="subtitle">' + subtitleText + '</h2>';
+                titleBannerMarkup += '</div>';
+            titleBannerMarkup += '</div>';
+            $thisCanvas.append(titleBannerMarkup);
+            $titleBaner = $('#title-banner', $thisCanvas);
+            _elements.titleBanner = $titleBaner;
+            } else {
+            $titleBaner.removeClass('active');
+            $titleBaner.find('.title').html(titleText + (showBreadcrumb ? ' &raquo;' : ''));
+            $titleBaner.find('.subtitle').html(subtitleText);
+            }
+        setTimeout(function(){
+            $titleBaner.removeClass('hidden');
+            $titleBaner.addClass('active');
+            }, 100);
+        if (autoHideTimeout > 0){
+            setTimeout(function(){
+                $titleBaner.removeClass('active');
+                setTimeout(function(){
+                    $titleBaner.find('.title').html('');
+                    $titleBaner.find('.subtitle').html('');
+                    $titleBaner.addClass('hidden');
+                    }, (autoHideTimeout * 2));
+                }, autoHideTimeout);
+            }
+        // Return no specific result
+        return;
         }
 
     // Define a quick functino for polling the server for new events (but only if we can actually show them)
