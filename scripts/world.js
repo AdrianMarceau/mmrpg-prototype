@@ -2399,8 +2399,12 @@ class mmrpgWorldMap {
 
                     // TODO: launch a modal for the given action on the selected robot if applicable
                     console.warn('TODO: implement item action ' + actionToken + ' modal functionality! w/', '\n-> actionToken =', actionToken, '\n-> itemToken =', itemToken, '\n-> targetRobotToken =', targetRobotToken);
-                    // ...
+                    if (actionToken === 'use-item'){ _self.showUseItemModal(itemToken, targetRobotToken); }
+                    else if (actionToken === 'give-item'){ _self.showGiveItemModal(itemToken, targetRobotToken); }
+                    else if (actionToken === 'drop-item'){ _self.showDropItemModal(itemToken); }
+                    else { console.warn('-> undefined item action "', actionToken, '", ignoring input'); return false; }
 
+                    // Return true on success
                     return true;
                     });
                 // (like, what happens when you actually click an item?)
@@ -2582,10 +2586,12 @@ class mmrpgWorldMap {
                     let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
                     //console.log('-> targetRobotToken =', targetRobotToken);
 
-                    // TODO: launch a modal for the given action on the selected robot if applicable
+                    // Launch a modal for the given action on the selected robot if applicable
                     console.warn('TODO: implement ability action ' + actionToken + ' modal functionality! w/', '\n-> actionToken =', actionToken, '\n-> abilityToken =', abilityToken, '\n-> targetRobotToken =', targetRobotToken);
-                    // ...
+                    if (actionToken === 'equip-ability'){ _self.showEquipAbilityModal(abilityToken, targetRobotToken); }
+                    else { console.warn('-> undefined ability action "', actionToken, '", ignoring input'); return false; }
 
+                    // Return true on success
                     return true;
                     });
                 // bind click events to the actual ability buttons for showing their details in the side-panel
@@ -7752,6 +7758,48 @@ class mmrpgWorldMap {
         $actions.find('.button:not(.keep)').remove();
         $actions.find('.button.keep').removeClass('keep');
         return true;
+        }
+
+    // Define a quick function for showing a generic action modal for items or abilities
+    showActionModal(actionKind, itemOrAbilityToken, targetRobotToken){
+        console.log('%c' + 'mmrpgWorldMap.showActionModal(actionKind:' + actionKind + ', itemOrAbilityToken:' + itemOrAbilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        return;
+        }
+
+    // Define a quick function for showing an item modal for some kind of item-related action
+    showItemModal(modalKind, itemToken, targetRobotToken){
+        console.log('%c' + 'mmrpgWorldMap.showItemModal(modalKind:' + modalKind + ', itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        return;
+        }
+
+    // Define a quick function for showing an ability modal for some kind of ability-related action
+    showAbilityModal(modalKind, abilityToken, targetRobotToken){
+        console.log('%c' + 'mmrpgWorldMap.showAbilityModal(modalKind:' + modalKind + ', abilityToken:' + abilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        return;
+        }
+
+    // Define quick functions for showing specific modals for items and abilities
+    showUseItemModal(itemToken, targetRobotToken){
+        console.log('%c' + 'mmrpgWorldMap.showUseItemModal(itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        return;
+        }
+
+    // Define a quick function for showing the give item modal
+    showGiveItemModal(itemToken, targetRobotToken){
+        console.log('%c' + 'mmrpgWorldMap.showGiveItemModal(itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        return;
+        }
+
+    // Define a quick function for showing the drop item modal
+    showDropItemModal(itemToken){
+        console.log('%c' + 'mmrpgWorldMap.showDropItemModal(itemToken:' + itemToken + ')', 'color: magenta;');
+        return;
+        }
+
+    // Define a quick function for showing the equip ability modal
+    showEquipAbilityModal(abilityToken, targetRobotToken){
+        console.log('%c' + 'mmrpgWorldMap.showEquipAbilityModal(abilityToken:' + abilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        return;
         }
 
     // Define a quick event for showing the title banner w/ whatever title and subtitle text is provided w/ optional custom timeout for autohide
