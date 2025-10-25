@@ -2370,8 +2370,6 @@ class mmrpgWorldMap {
                         $sideButtons.removeClass('maybe');
                         $dismissButton.trigger('click');
                         }
-                    // Now we can run setup for the rest of the UI elements in this view
-                    console.warn('TODO: insert the rest of the item-storage bindings');
                     // Return true on success
                     return true;
                     });
@@ -2384,7 +2382,27 @@ class mmrpgWorldMap {
                     refreshItemsDiv();
                     return true;
                     });
-                // TODO: delegate event bindings for the actual items within the storage panel
+                // add functionality to the action buttons within item details panels
+                $storageItemsDiv.delegate('.button[data-action]', 'click', function(e){
+                    console.log('%c' + 'Storage item details button clicked!', 'color: cyan;');
+                    e.preventDefault();
+                    let $actionButton = $(this);
+                    let actionToken = $actionButton.attr('data-action');
+                    //console.log('-> actionToken =', actionToken);
+                    let $detailsDiv = $storageItemsDiv.find('> .details');
+                    if (!$detailsDiv.is('[data-item]')){ return; }
+                    let itemToken = $detailsDiv.attr('data-item');
+                    //console.log('-> itemToken =', itemToken);
+                    let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                    let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
+                    //console.log('-> targetRobotToken =', targetRobotToken);
+
+                    // TODO: launch a modal for the given action on the selected robot if applicable
+                    console.warn('TODO: implement item action ' + actionToken + ' modal functionality! w/', '\n-> actionToken =', actionToken, '\n-> itemToken =', itemToken, '\n-> targetRobotToken =', targetRobotToken);
+                    // ...
+
+                    return true;
+                    });
                 // (like, what happens when you actually click an item?)
                 // bind click events to the actual item buttons for showing their details in the side-panel
                 $storageItemsDiv.delegate('.team-item[data-item]', 'click', function(e){
@@ -2528,8 +2546,6 @@ class mmrpgWorldMap {
                         }
                     // Refresh the abilities div now that everything is set up
                     refreshAbilitiesDiv();
-                    // Now we can run setup for the rest of the UI elements in this view
-                    console.warn('TODO: insert the rest of the ability-storage bindings');
                     // Return true on success
                     return true;
                     });
@@ -2551,8 +2567,27 @@ class mmrpgWorldMap {
                     refreshAbilitiesDiv();
                     return true;
                     });
-                // TODO: delegate event bindings for the actual abilities within the storage panel
-                // (like, what happens when you actually click an ability?)
+                // add functionality to the action buttons within ability details panels
+                $storageAbilitiesDiv.delegate('.button[data-action]', 'click', function(e){
+                    console.log('%c' + 'Storage ability details button clicked!', 'color: cyan;');
+                    e.preventDefault();
+                    let $actionButton = $(this);
+                    let actionToken = $actionButton.attr('data-action');
+                    //console.log('-> actionToken =', actionToken);
+                    let $detailsDiv = $storageAbilitiesDiv.find('> .details');
+                    if (!$detailsDiv.is('[data-ability]')){ return; }
+                    let abilityToken = $detailsDiv.attr('data-ability');
+                    //console.log('-> abilityToken =', abilityToken);
+                    let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                    let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
+                    //console.log('-> targetRobotToken =', targetRobotToken);
+
+                    // TODO: launch a modal for the given action on the selected robot if applicable
+                    console.warn('TODO: implement ability action ' + actionToken + ' modal functionality! w/', '\n-> actionToken =', actionToken, '\n-> abilityToken =', abilityToken, '\n-> targetRobotToken =', targetRobotToken);
+                    // ...
+
+                    return true;
+                    });
                 // bind click events to the actual ability buttons for showing their details in the side-panel
                 $storageAbilitiesDiv.delegate('.team-ability[data-ability]', 'click', function(e){
                     e.preventDefault();
@@ -7348,12 +7383,12 @@ class mmrpgWorldMap {
         if (itemKind !== 'event'
             && itemQuantity > 0){
             if (itemKind === 'consumable'){
-                itemDetailsObject.actions.push({ type: 'use-item', text: 'Use', item: itemToken, disabled: !targetSelected });
+                itemDetailsObject.actions.push({ action: 'use-item', text: 'Use', item: itemToken, disabled: !targetSelected });
                 }
             if (itemKind === 'consumable' || itemKind === 'holdable'){
-                itemDetailsObject.actions.push({ type: 'give-item', text: 'Give', item: itemToken, disabled: !targetSelected });
+                itemDetailsObject.actions.push({ action: 'give-item', text: 'Give', item: itemToken, disabled: !targetSelected });
                 }
-            itemDetailsObject.actions.push({ type: 'drop-item', text: 'Drop', item: itemToken, disabled: targetSelected });
+            itemDetailsObject.actions.push({ action: 'drop-item', text: 'Drop', item: itemToken, disabled: targetSelected });
             }
 
         // Pre-compile some of the HTML to make it easier for the other functions
@@ -7378,7 +7413,7 @@ class mmrpgWorldMap {
         for (let i = 0; i < itemDetailsObject.actions.length; i++){
             let actionInfo = itemDetailsObject.actions[i];
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
-            itemDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.type + (actionDisabled ? ' disabled' : '') + '" data-item="' + actionInfo.item + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
+            itemDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + '" data-action="' + actionInfo.action + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
             }
 
         // Return the generated item details object
@@ -7569,7 +7604,7 @@ class mmrpgWorldMap {
             }
         abilityDetailsObject.description = abilityDescription;
         abilityDetailsObject.actions = [];
-        abilityDetailsObject.actions.push({ type: 'equip-ability', text: 'Equip', ability: abilityToken, disabled: !targetSelected });
+        abilityDetailsObject.actions.push({ action: 'equip-ability', text: 'Equip', ability: abilityToken, disabled: !targetSelected });
 
         // Pre-compile some of the HTML to make it easier for the other functions
         abilityDetailsObject.infolinesHTML = '';
@@ -7593,7 +7628,7 @@ class mmrpgWorldMap {
         for (let i = 0; i < abilityDetailsObject.actions.length; i++){
             let actionInfo = abilityDetailsObject.actions[i];
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
-            abilityDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.type + (actionDisabled ? ' disabled' : '') + '" data-ability="' + actionInfo.ability + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
+            abilityDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + '" data-action="' + actionInfo.action + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
             }
 
         // Return the generated ability details object
@@ -7656,14 +7691,14 @@ class mmrpgWorldMap {
         for (let i = 0; i < itemDetails.actions.length; i++){
             let actionInfo = itemDetails.actions[i];
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
-            let $actionButton = $actions.find('.button.' + actionInfo.type);
+            let $actionButton = $actions.find('.button.' + actionInfo.action);
             if ($actionButton && $actionButton.length){
                 if (actionDisabled){ $actionButton.addClass('disabled'); $actionButton.attr('disabled', 'disabled'); }
                 else { $actionButton.removeClass('disabled'); $actionButton.removeAttr('disabled'); }
                 } else {
-                let actionButtonMarkup = '<button type="button" class="button ' + actionInfo.type + (actionDisabled ? ' disabled' : '') + '" data-item="' + actionInfo.item + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
+                let actionButtonMarkup = '<button type="button" class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + '" data-item="' + actionInfo.item + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
                 $actions.append(actionButtonMarkup);
-                $actionButton = $actions.find('.button.' + actionInfo.type);
+                $actionButton = $actions.find('.button.' + actionInfo.action);
                 }
             $actionButton.addClass('keep');
             }
@@ -7703,14 +7738,14 @@ class mmrpgWorldMap {
         for (let i = 0; i < abilityDetails.actions.length; i++){
             let actionInfo = abilityDetails.actions[i];
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
-            let $actionButton = $actions.find('.button.' + actionInfo.type);
+            let $actionButton = $actions.find('.button.' + actionInfo.action);
             if ($actionButton && $actionButton.length){
                 if (actionDisabled){ $actionButton.addClass('disabled'); $actionButton.attr('disabled', 'disabled'); }
                 else { $actionButton.removeClass('disabled'); $actionButton.removeAttr('disabled'); }
                 } else {
-                let actionButtonMarkup = '<button type="button" class="button ' + actionInfo.type + (actionDisabled ? ' disabled' : '') + '" data-ability="' + actionInfo.ability + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
+                let actionButtonMarkup = '<button type="button" class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + '" data-ability="' + actionInfo.ability + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
                 $actions.append(actionButtonMarkup);
-                $actionButton = $actions.find('.button.' + actionInfo.type);
+                $actionButton = $actions.find('.button.' + actionInfo.action);
                 }
             $actionButton.addClass('keep');
             }
