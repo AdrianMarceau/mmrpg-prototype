@@ -384,7 +384,7 @@ class mmrpgWorldMap {
             }
         // Define the function to run when everything is done loading
         let onWorldLoaded = function(){
-                console.log('%c' + 'MMRPG WORLD HAS LOADED!', 'color: cyan;');
+            console.log('%c' + 'MMRPG WORLD HAS LOADED!', 'color: cyan;');
             _world.hasLoaded = true;
             _self.bindEventsToCanvas($canvasMap);
             _self.bindEventsToWorld($thisWorld);
@@ -663,7 +663,7 @@ class mmrpgWorldMap {
         //console.log('---> tile[' + layerToken + '/' + tileKey + '/' + tileSpriteToken + '] tileData =', JSON.stringify(tileData));
         //console.log('---> tile[' + layerToken + '/' + tileKey + ']::tileIsVoid =', tileIsVoid);
         // sprite: draw the main tile sprite at the correct position
-        if (tileIsWater){ ctx.globalAlpha = 0.7; }
+        if (tileIsWater){ ctx.globalAlpha = 0.3; }
         ctx.drawImage(spriteSheet,
             tileSpriteOffset[0], tileSpriteOffset[1], // source offset
             tileSpriteSize[0], tileSpriteSize[1], // source size
@@ -2321,6 +2321,24 @@ class mmrpgWorldMap {
             // Bind a click event to the team-items button in the robots overview
             let $itemsButton = $('.team-items', $robotsOverview);
             if ($itemsButton && $itemsButton.length){
+                // define a quick function for refreshing the items div given conditions
+                let refreshItemsDiv = function(){
+                    //console.log('%c' + '-> refreshItemsDiv() triggered', 'color: magenta;');
+                    // check if there's a robot target for these items to or not
+                    refreshRobotRefs();
+                    let $selectedRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                    let targetSelected = $selectedRobot && $selectedRobot.length ? true : false;
+                    // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
+                    let $detailsDiv = $storageItemsDiv.find('> .details[data-item]');
+                    if ($detailsDiv.length){
+                        let itemToken = $detailsDiv.attr('data-item') || false;
+                        //console.log('-> refreshing details for itemToken =', itemToken);
+                        let itemDetails = _self.getItemDetailsForOverview(itemToken, targetSelected) || false;
+                        if (itemDetails && Object.keys(itemDetails).length){ _self.replaceItemDetailsInOverview($detailsDiv, itemToken, itemDetails); }
+                        }
+                    // return true on success
+                    return true;
+                    };
                 // expand/collapse the item storage tray by clicking the items button
                 $itemsButton.bind('click', function(e){
                     e.preventDefault();
@@ -2357,6 +2375,15 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
+                // if the storage tray is open, clicking a robot in the team-list forces an item panel refresh
+                $teamRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
+                    e.preventDefault();
+                    if (_self.worldIsBusy()){ return; }
+                    if (!$robotsOverview.is('.expanded[data-view="items"]')){ return; } // if we're not expanded, ignore clicks
+                    //console.log('%c' + 'Team robot clicked! (via items)', 'color: cyan;');
+                    refreshItemsDiv();
+                    return true;
+                    });
                 // TODO: delegate event bindings for the actual items within the storage panel
                 // (like, what happens when you actually click an item?)
                 // bind click events to the actual item buttons for showing their details in the side-panel
@@ -2376,35 +2403,17 @@ class mmrpgWorldMap {
                     if (alreadySelected){ $detailsDiv.remove(); return; }
                     $item.addClass('selected');
                     $storageItemsDiv.addClass('has-selection');
+                    let targetSelected = $teamRobotsDiv.find('.team-robot[data-robot].selected').length ? true : false;
                     if (!$detailsDiv || !$detailsDiv.length){
-                        let itemMarkup = _self.getItemDetailsMarkupForOverview(itemToken) || false;
+                        //console.log('-> populate new details div for itemToken =', itemToken);
+                        let itemMarkup = _self.getItemDetailsMarkupForOverview(itemToken, targetSelected) || false;
                         if (!itemMarkup || !itemMarkup.length){ return false; }
-                        //console.log('-> itemMarkup =', itemMarkup);
                         $storageItemsDiv.append(itemMarkup);
                         } else {
-                        let itemDetails = _self.getItemDetailsForOverview(itemToken) || false;
+                        //console.log('-> refresh existing details div for itemToken =', itemToken);
+                        let itemDetails = _self.getItemDetailsForOverview(itemToken, targetSelected) || false;
                         if (!itemDetails || !Object.keys(itemDetails).length){ return false; }
-                        //console.log('-> itemDetails =', itemDetails);
-                        let $title = $detailsDiv.find('> .title'),
-                            $image = $detailsDiv.find('> .image'),
-                            $subtitle = $detailsDiv.find('> .subtitle'),
-                            $subtitleName = $subtitle.find('> .name'),
-                            $subtitleQuantity = $subtitle.find('> .quantity'),
-                            $subtitleSubline = $subtitle.find('> hr'),
-                            $infolines = $detailsDiv.find('> .infolines'),
-                            $description = $detailsDiv.find('> .description'),
-                            $actions = $detailsDiv.find('> .actions')
-                            ;
-                        $detailsDiv.attr('data-item', itemToken);
-                        $title.html(itemDetails.title);
-                        $image.html(itemDetails.image);
-                        $image.removeClass().addClass('image type '+ itemDetails.typeClasses);
-                        $subtitleName.html(itemDetails.name);
-                        $subtitleQuantity.html('&times; ' + itemDetails.quantity);
-                        $subtitleSubline.removeClass().addClass('type ' + itemDetails.typeClasses);
-                        $infolines.html(itemDetails.infolinesHTML);
-                        $description.html(itemDetails.description);
-                        $actions.html(itemDetails.actionsHTML);
+                        _self.replaceItemDetailsInOverview($detailsDiv, itemToken, itemDetails);
                         }
                     return true;
                     });
@@ -2466,9 +2475,19 @@ class mmrpgWorldMap {
                     //console.log('%c' + '-> refreshAbilitiesDiv() triggered', 'color: magenta;');
                     // check if there's a robot to filter abilities to or not
                     refreshRobotRefs();
-                    let $selectedRobot = $teamRobotsInOverview.filter('.selected').first();
-                    if ($selectedRobot && $selectedRobot.length){ filterAbilitiesToSelected($selectedRobot); }
+                    let $selectedRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                    let targetSelected = $selectedRobot && $selectedRobot.length ? true : false;
+                    // filter abilities to selected robot if applicable
+                    if (targetSelected){ filterAbilitiesToSelected($selectedRobot); }
                     else { filterAbilitiesToSelected(false); }
+                    // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
+                    let $detailsDiv = $storageAbilitiesDiv.find('> .details[data-ability]');
+                    if ($detailsDiv.length){
+                        let abilityToken = $detailsDiv.attr('data-ability') || false;
+                        //console.log('-> refreshing details for abilityToken =', abilityToken);
+                        let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken, targetSelected) || false;
+                        if (abilityDetails && Object.keys(abilityDetails).length){ _self.replaceAbilityDetailsInOverview($detailsDiv, abilityToken, abilityDetails); }
+                        }
                     // collect the incompatibilty toggle and show/hide it based on whether something is selected or not
                     let $incompatibleToggle = $('.toggle[data-toggle="incompatible"]', $storageAbilitiesDiv);
                     if ($selectedRobot && $selectedRobot.length){ $incompatibleToggle.removeClass('disabled'); }
@@ -2514,12 +2533,12 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
-                // if the storage tray is open, clicking a robot in the team-list marks it as selected
+                // if the storage tray is open, clicking a robot in the team-list forces an ability panel refresh
                 $teamRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return; }
-                    if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
-                    //console.log('%c' + 'Team robot clicked!', 'color: cyan;');
+                    if (!$robotsOverview.is('.expanded[data-view="abilities"]')){ return; } // if we're not expanded, ignore clicks
+                    //console.log('%c' + 'Team robot clicked! (via abilities)', 'color: cyan;');
                     refreshAbilitiesDiv();
                     return true;
                     });
@@ -2557,35 +2576,17 @@ class mmrpgWorldMap {
                         }
                     $ability.addClass('selected');
                     $storageAbilitiesDiv.addClass('has-selection');
+                    let targetSelected = $teamRobotsDiv.find('.team-robot[data-robot].selected').length ? true : false;
                     if (!$detailsDiv || !$detailsDiv.length){
-                        let abilityMarkup = _self.getAbilityDetailsMarkupForOverview(abilityToken) || false;
+                        //console.log('-> populate new details div for abilityToken =', abilityToken);
+                        let abilityMarkup = _self.getAbilityDetailsMarkupForOverview(abilityToken, targetSelected) || false;
                         if (!abilityMarkup || !abilityMarkup.length){ return false; }
-                        //console.log('-> abilityMarkup =', abilityMarkup);
                         $storageAbilitiesDiv.append(abilityMarkup);
                         } else {
-                        let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken) || false;
+                        //console.log('-> populate existing details div for abilityToken =', abilityToken);
+                        let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken, targetSelected) || false;
                         if (!abilityDetails || !Object.keys(abilityDetails).length){ return false; }
-                        //console.log('-> abilityDetails =', abilityDetails);
-                        let $title = $detailsDiv.find('> .title'),
-                            $image = $detailsDiv.find('> .image'),
-                            $subtitle = $detailsDiv.find('> .subtitle'),
-                            $subtitleName = $subtitle.find('> .name'),
-                            $subtitleCost = $subtitle.find('> .cost'),
-                            $subtitleSubline = $subtitle.find('> hr'),
-                            $infolines = $detailsDiv.find('> .infolines'),
-                            $description = $detailsDiv.find('> .description'),
-                            $actions = $detailsDiv.find('> .actions')
-                            ;
-                        $detailsDiv.attr('data-ability', abilityToken);
-                        $title.html(abilityDetails.title);
-                        $image.html(abilityDetails.image);
-                        $image.removeClass().addClass('image type ' + abilityDetails.typeClasses);
-                        $subtitleName.html(abilityDetails.name);
-                        $subtitleCost.html(abilityDetails.cost + ' WE');
-                        $subtitleSubline.removeClass().addClass('type ' + abilityDetails.typeClasses);
-                        $infolines.html(abilityDetails.infolinesHTML);
-                        $description.html(abilityDetails.description);
-                        $actions.html(abilityDetails.actionsHTML);
+                        _self.replaceAbilityDetailsInOverview($detailsDiv, abilityToken, abilityDetails);
                         }
                     //console.log('-> mark robots incompatibile w/ abilityToken =', abilityToken);
                     $('.team-robot[data-robot]', $teamRobotsDiv).each(function(){
@@ -7210,9 +7211,10 @@ class mmrpgWorldMap {
         }
 
     // Define a quick function for getting the overview details for a given item in the user's inventory
-    getItemDetailsForOverview(itemToken){
-        //console.log('%c' + 'mmrpgWorldMap.getItemDetailsForOverview(item:' + itemToken + ')', 'color: magenta;');
+    getItemDetailsForOverview(itemToken, targetSelected){
+        //console.log('%c' + 'mmrpgWorldMap.getItemDetailsForOverview(item:' + itemToken + ', targetSelected:' + targetSelected + ')', 'color: magenta;');
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('getItemDetailsForOverview() missing required itemToken!'); return ''; }
+        if (typeof targetSelected !== 'boolean'){ targetSelected = false; } // default to false if not provided
 
         // Collect references to world objects
         let _self = this;
@@ -7346,12 +7348,12 @@ class mmrpgWorldMap {
         if (itemKind !== 'event'
             && itemQuantity > 0){
             if (itemKind === 'consumable'){
-                itemDetailsObject.actions.push({ type: 'use-item', text: 'Use', item: itemToken });
+                itemDetailsObject.actions.push({ type: 'use-item', text: 'Use', item: itemToken, disabled: !targetSelected });
                 }
             if (itemKind === 'consumable' || itemKind === 'holdable'){
-                itemDetailsObject.actions.push({ type: 'give-item', text: 'Give', item: itemToken });
+                itemDetailsObject.actions.push({ type: 'give-item', text: 'Give', item: itemToken, disabled: !targetSelected });
                 }
-            itemDetailsObject.actions.push({ type: 'drop-item', text: 'Drop', item: itemToken });
+            itemDetailsObject.actions.push({ type: 'drop-item', text: 'Drop', item: itemToken, disabled: targetSelected });
             }
 
         // Pre-compile some of the HTML to make it easier for the other functions
@@ -7375,7 +7377,8 @@ class mmrpgWorldMap {
         itemDetailsObject.actionsHTML = '';
         for (let i = 0; i < itemDetailsObject.actions.length; i++){
             let actionInfo = itemDetailsObject.actions[i];
-            itemDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.type + '" data-item="' + actionInfo.item + '">' + actionInfo.text + '</button>';
+            let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
+            itemDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.type + (actionDisabled ? ' disabled' : '') + '" data-item="' + actionInfo.item + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
             }
 
         // Return the generated item details object
@@ -7384,11 +7387,12 @@ class mmrpgWorldMap {
         }
 
     // Define a quick function for getting the details markup for a given item in the user's inventory
-    getItemDetailsMarkupForOverview(itemToken){
-        //console.log('%c' + 'mmrpgWorldMap.getItemDetailsMarkupForOverview(item:' + itemToken + ')', 'color: magenta;');
+    getItemDetailsMarkupForOverview(itemToken, targetSelected){
+        //console.log('%c' + 'mmrpgWorldMap.getItemDetailsMarkupForOverview(item:' + itemToken + ', targetSelected:' + targetSelected + ')', 'color: magenta;');
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('getItemDetailsMarkupForOverview() missing required itemToken!'); return ''; }
+        if (typeof targetSelected !== 'boolean'){ targetSelected = false; }
         let _self = this;
-        let itemDetailsObject = _self.getItemDetailsForOverview(itemToken) || false;
+        let itemDetailsObject = _self.getItemDetailsForOverview(itemToken, targetSelected) || false;
         if (!itemDetailsObject || typeof itemDetailsObject !== 'object'){ console.error('getItemDetailsMarkupForOverview() could not generate details object for token ' + itemToken + '!'); return ''; }
         let itemDetailsMarkup = '';
         itemDetailsMarkup += '<div class="details" data-item="' + itemToken + '">';
@@ -7407,10 +7411,10 @@ class mmrpgWorldMap {
         }
 
     // Define a quick function for getting the overview details for a given ability in the user's inventory
-    getAbilityDetailsForOverview(abilityToken){
-        //console.log('%c' + 'mmrpgWorldMap.getAbilityDetailsForOverview(ability:' + abilityToken + ')', 'color: magenta;');
+    getAbilityDetailsForOverview(abilityToken, targetSelected){
+        //console.log('%c' + 'mmrpgWorldMap.getAbilityDetailsForOverview(ability:' + abilityToken + ', targetSelected:' + targetSelected + ')', 'color: magenta;');
         if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('getAbilityDetailsForOverview() missing required abilityToken!'); return ''; }
-
+        if (typeof targetSelected !== 'boolean'){ targetSelected = false; }
         // Collect references to world objects
         let _self = this;
         let _config = _self.config;
@@ -7565,7 +7569,7 @@ class mmrpgWorldMap {
             }
         abilityDetailsObject.description = abilityDescription;
         abilityDetailsObject.actions = [];
-        abilityDetailsObject.actions.push({ type: 'equip-ability', text: 'Equip', ability: abilityToken });
+        abilityDetailsObject.actions.push({ type: 'equip-ability', text: 'Equip', ability: abilityToken, disabled: !targetSelected });
 
         // Pre-compile some of the HTML to make it easier for the other functions
         abilityDetailsObject.infolinesHTML = '';
@@ -7588,7 +7592,8 @@ class mmrpgWorldMap {
         abilityDetailsObject.actionsHTML = '';
         for (let i = 0; i < abilityDetailsObject.actions.length; i++){
             let actionInfo = abilityDetailsObject.actions[i];
-            abilityDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.type + '" data-ability="' + actionInfo.ability + '">' + actionInfo.text + '</button>';
+            let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
+            abilityDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.type + (actionDisabled ? ' disabled' : '') + '" data-ability="' + actionInfo.ability + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
             }
 
         // Return the generated ability details object
@@ -7597,11 +7602,12 @@ class mmrpgWorldMap {
         }
 
     // Define a quick function for getting the details markup for a given ability in the user's arsenal
-    getAbilityDetailsMarkupForOverview(abilityToken){
-        //console.log('%c' + 'mmrpgWorldMap.getAbilityDetailsMarkupForOverview(ability:' + abilityToken + ')', 'color: magenta;');
+    getAbilityDetailsMarkupForOverview(abilityToken, targetSelected){
+        //console.log('%c' + 'mmrpgWorldMap.getAbilityDetailsMarkupForOverview(ability:' + abilityToken + ', targetSelected:' + targetSelected + ')', 'color: magenta;');
         if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('getAbilityDetailsMarkupForOverview() missing required abilityToken!'); return ''; }
+        if (typeof targetSelected !== 'boolean'){ targetSelected = false; }
         let _self = this;
-        let abilityDetailsObject = _self.getAbilityDetailsForOverview(abilityToken) || false;
+        let abilityDetailsObject = _self.getAbilityDetailsForOverview(abilityToken, targetSelected) || false;
         if (!abilityDetailsObject || typeof abilityDetailsObject !== 'object'){ console.error('getAbilityDetailsMarkupForOverview() could not generate details object for token ' + itemToken + '!'); return ''; }
         let abilityDetailsMarkup = '';
         abilityDetailsMarkup += '<div class="details" data-ability="' + abilityToken + '">';
@@ -7617,6 +7623,100 @@ class mmrpgWorldMap {
             abilityDetailsMarkup += '<div class="actions">' + abilityDetailsObject.actionsHTML + '</div>';
         abilityDetailsMarkup += '</div>';
         return abilityDetailsMarkup;
+        }
+
+    // Define a quick function for replacing the item details in an existing details div with new ones
+    replaceItemDetailsInOverview($detailsDiv, itemToken, itemDetails){
+        //console.log('%c' + 'mmrpgWorldMap.replaceItemDetailsInOverview($detailsDiv, itemToken:' + itemToken + ', itemDetails)', 'color: magenta;');
+        if (!$detailsDiv || !$detailsDiv.length){ console.error('replaceItemDetailsInOverview() missing required $detailsDiv!'); return false; }
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('replaceItemDetailsInOverview() missing required itemToken!'); return false; }
+        if (!itemDetails || typeof itemDetails !== 'object'){ console.error('replaceItemDetailsInOverview() missing required itemDetails!'); return false; }
+        //console.log('-> itemDetails =', itemDetails);
+        let $title = $detailsDiv.find('> .title'),
+            $image = $detailsDiv.find('> .image'),
+            $subtitle = $detailsDiv.find('> .subtitle'),
+            $subtitleName = $subtitle.find('> .name'),
+            $subtitleQuantity = $subtitle.find('> .quantity'),
+            $subtitleSubline = $subtitle.find('> hr'),
+            $infolines = $detailsDiv.find('> .infolines'),
+            $description = $detailsDiv.find('> .description'),
+            $actions = $detailsDiv.find('> .actions')
+            ;
+        $detailsDiv.attr('data-item', itemToken);
+        $title.html(itemDetails.title);
+        $image.html(itemDetails.image);
+        $image.removeClass().addClass('image type '+ itemDetails.typeClasses);
+        $subtitleName.html(itemDetails.name);
+        $subtitleQuantity.html('&times; ' + itemDetails.quantity);
+        $subtitleSubline.removeClass().addClass('type ' + itemDetails.typeClasses);
+        $infolines.html(itemDetails.infolinesHTML);
+        $description.html(itemDetails.description);
+        //$actions.html(itemDetails.actionsHTML);
+        // manually update buttons so css transitions can occur properly
+        for (let i = 0; i < itemDetails.actions.length; i++){
+            let actionInfo = itemDetails.actions[i];
+            let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
+            let $actionButton = $actions.find('.button.' + actionInfo.type);
+            if ($actionButton && $actionButton.length){
+                if (actionDisabled){ $actionButton.addClass('disabled'); $actionButton.attr('disabled', 'disabled'); }
+                else { $actionButton.removeClass('disabled'); $actionButton.removeAttr('disabled'); }
+                } else {
+                let actionButtonMarkup = '<button type="button" class="button ' + actionInfo.type + (actionDisabled ? ' disabled' : '') + '" data-item="' + actionInfo.item + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
+                $actions.append(actionButtonMarkup);
+                $actionButton = $actions.find('.button.' + actionInfo.type);
+                }
+            $actionButton.addClass('keep');
+            }
+        $actions.find('.button:not(.keep)').remove();
+        $actions.find('.button.keep').removeClass('keep');
+        return true;
+        }
+
+    // Define a quick function for replacing the ability details in an existing details div with new ones
+    replaceAbilityDetailsInOverview($detailsDiv, abilityToken, abilityDetails){
+        //console.log('%c' + 'mmrpgWorldMap.replaceAbilityDetailsInOverview($detailsDiv, abilityToken:' + abilityToken + ', abilityDetails)', 'color: magenta;');
+        if (!$detailsDiv || !$detailsDiv.length){ console.error('replaceAbilityDetailsInOverview() missing required $detailsDiv!'); return false; }
+        if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('replaceAbilityDetailsInOverview() missing required abilityToken!'); return false; }
+        if (!abilityDetails || typeof abilityDetails !== 'object'){ console.error('replaceAbilityDetailsInOverview() missing required abilityDetails!'); return false; }
+        //console.log('-> abilityDetails =', abilityDetails);
+        let $title = $detailsDiv.find('> .title'),
+            $image = $detailsDiv.find('> .image'),
+            $subtitle = $detailsDiv.find('> .subtitle'),
+            $subtitleName = $subtitle.find('> .name'),
+            $subtitleCost = $subtitle.find('> .cost'),
+            $subtitleSubline = $subtitle.find('> hr'),
+            $infolines = $detailsDiv.find('> .infolines'),
+            $description = $detailsDiv.find('> .description'),
+            $actions = $detailsDiv.find('> .actions')
+            ;
+        $detailsDiv.attr('data-ability', abilityToken);
+        $title.html(abilityDetails.title);
+        $image.html(abilityDetails.image);
+        $image.removeClass().addClass('image type ' + abilityDetails.typeClasses);
+        $subtitleName.html(abilityDetails.name);
+        $subtitleCost.html(abilityDetails.cost + ' WE');
+        $subtitleSubline.removeClass().addClass('type ' + abilityDetails.typeClasses);
+        $infolines.html(abilityDetails.infolinesHTML);
+        $description.html(abilityDetails.description);
+        //$actions.html(abilityDetails.actionsHTML);
+        // manually update buttons so css transitions can occur properly
+        for (let i = 0; i < abilityDetails.actions.length; i++){
+            let actionInfo = abilityDetails.actions[i];
+            let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
+            let $actionButton = $actions.find('.button.' + actionInfo.type);
+            if ($actionButton && $actionButton.length){
+                if (actionDisabled){ $actionButton.addClass('disabled'); $actionButton.attr('disabled', 'disabled'); }
+                else { $actionButton.removeClass('disabled'); $actionButton.removeAttr('disabled'); }
+                } else {
+                let actionButtonMarkup = '<button type="button" class="button ' + actionInfo.type + (actionDisabled ? ' disabled' : '') + '" data-ability="' + actionInfo.ability + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
+                $actions.append(actionButtonMarkup);
+                $actionButton = $actions.find('.button.' + actionInfo.type);
+                }
+            $actionButton.addClass('keep');
+            }
+        $actions.find('.button:not(.keep)').remove();
+        $actions.find('.button.keep').removeClass('keep');
+        return true;
         }
 
     // Define a quick event for showing the title banner w/ whatever title and subtitle text is provided w/ optional custom timeout for autohide

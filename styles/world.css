@@ -2576,13 +2576,20 @@ html, body {
     font-size: 13px;
     text-shadow: 1px 1px 0 #000000;
     filter: brightness(1) saturate(1);
-    transition: background-color 0.3s, border 0.3s, filter 0.3s, color 0.3s;
+    transition: background-color 0.3s, border 0.3s, filter 0.3s, color 0.3s, filter 0.3s;
 }
 #robots-overview .storage-box > .details .actions .button:hover,
 #robots-overview .storage-box > .details .actions .button.hovered {
     border-color: #ffffff;
     filter: brightness(1.2) saturate(1.2);
     color: #ffffff;
+}
+#robots-overview .storage-box > .details .actions .button.disabled {
+    text-shadow: none;
+    font-weight: normal;
+    pointer-events: none;
+    cursor: not-allowed;
+    filter: brightness(0.3) saturate(0.9);
 }
 #robots-overview .storage-box > .details > .subtitle:after,
 #robots-overview .storage-box > .details > .actions:after,
