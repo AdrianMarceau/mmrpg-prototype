@@ -1479,6 +1479,7 @@ function mmrpg_prototype_players_unlocked_index($include_extra = array()){
     foreach ($session_battle_keys AS $session_battle_key){
         if (!empty($_SESSION[$session_token]['values'][$session_battle_key])){
             foreach ($_SESSION[$session_token]['values'][$session_battle_key] AS $player_token => $player_array){
+                if (empty($player_array) || !is_array($player_array)){ continue; }
                 $existing_player_array = array();
                 if (isset($this_unlocked_players_index[$player_token])){ $existing_player_array = $this_unlocked_players_index[$player_token];}
                 $this_unlocked_players_index[$player_token] = array_merge($existing_player_array, $player_array);
