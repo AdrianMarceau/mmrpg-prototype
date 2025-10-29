@@ -2591,6 +2591,9 @@ html, body {
     cursor: not-allowed;
     filter: brightness(0.3) saturate(0.9);
 }
+#robots-overview .storage-box > .details .actions .button.hidden {
+    display: none;
+}
 #robots-overview .storage-box > .details > .subtitle:after,
 #robots-overview .storage-box > .details > .actions:after,
 #robots-overview .storage-box > .details > .infoline:after {
@@ -3835,6 +3838,289 @@ display: block;
     left: 20px;
     opacity: 0.7;
 }
+
+#world #canvas #action-modal {
+    display: block;
+    position: absolute;
+    pointer-events: none;
+    z-index: 1020;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    opacity: 1.0;
+    background-color: transparent;
+    border: none;
+    transition: opacity 0.6s;
+}
+#world #canvas #action-modal.hidden {
+    opacity: 0;
+}
+#world #canvas #action-modal:not(.active) {
+    display: none;
+}
+#world #canvas #action-modal > .overlay {
+    display: block;
+    position: absolute;
+    pointer-events: all;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.6);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: auto;
+}
+#world #canvas #action-modal > .wrapper {
+    display: block;
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+    top: 40%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    width: auto;
+    max-width: 90%;
+    min-width: 300px;
+    background-image: none;
+    background-color: #202020;
+    border: 2px solid #b2b2b2;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    border-radius: 9px;
+    transition: top 0.3s;
+}
+#world #canvas #action-modal.hidden > .wrapper {
+    top: -100%;
+}
+#world #canvas #action-modal > .wrapper:before,
+#world #canvas #action-modal > .wrapper:after {
+    content: "";
+    display: block;
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: auto;
+    height: auto;
+    background-image: none;
+    background-color: transparent;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+#world #canvas #action-modal > .wrapper:before {
+    z-index: 1;
+    background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-white_bottom-right.png');
+    background-position: bottom right;
+}
+#world #canvas #action-modal > .wrapper:after {
+    z-index: 2;
+    background-image: url('../images/assets/website-texture_circuit-board-2k23_corner-white_top-left.png');
+    background-position: top left;
+}
+#world #canvas #action-modal > .wrapper > .content {
+    z-index: 3;
+    display: block;
+    position: relative;
+    pointer-events: all;
+    width: auto;
+    height: auto;
+    min-width: 400px;
+    padding: 12px 36px;
+    margin: 0 auto;
+}
+#world #canvas #action-modal .content .title,
+#world #canvas #action-modal .content .subtitle,
+#world #canvas #action-modal .content .container,
+#world #canvas #action-modal .content .buttons {
+    display: block;
+    margin: 0 auto 6px;
+    padding: 0;
+}
+#world #canvas #action-modal .content .title:empty,
+#world #canvas #action-modal .content .subtitle:empty,
+#world #canvas #action-modal .content .container:empty,
+#world #canvas #action-modal .content .buttons:empty {
+    display: none;
+}
+#world #canvas #action-modal .wrapper:after,
+#world #canvas #action-modal .wrapper .content:after,
+#world #canvas #action-modal .wrapper .content .container:after,
+#world #canvas #action-modal .wrapper .content .actions:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#world #canvas #action-modal .content {
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+}
+#world #canvas #action-modal .content .title  {
+    color: #868686;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 1px solid #464646;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+}
+#world #canvas #action-modal .content .subtitle  {
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: normal;
+    margin-top: 12px;
+    text-shadow: 2px 2px 0 #000000;
+}
+#world #canvas #action-modal .content .subtitle + .subtitle {
+    margin-top: -3px;
+    margin-bottom: 12px;
+}
+#world #canvas #action-modal .content .subtitle strong {
+    font-weight: bold;
+}
+#world #canvas #action-modal .content .subtitle.for-selected {
+    color: #c4c4c4;
+}
+#world #canvas #action-modal .content .subtitle.for-current {
+    font-size: 16px;
+}
+#world #canvas #action-modal .content .subtitle.for-selected:after,
+#world #canvas #action-modal .content .subtitle.for-current:after {
+    content: ":";
+}
+#world #canvas #action-modal .content .subtitle.for-tooltip {
+    color: #bababa;
+    text-shadow: 1px 1px 0 #000000;
+}
+#world #canvas #action-modal .content .subtitle.for-tooltip:before {
+    content: "(";
+}
+#world #canvas #action-modal .content .subtitle.for-tooltip:after {
+    content: ")";
+}
+#world #canvas #action-modal .content .container  {
+    display: block;
+    margin: 0 auto 12px;
+}
+#world #canvas #action-modal .content .button {
+    display: block;
+    position: relative;
+    box-sizing: border-box;
+    margin: 0 0 0 auto;
+    padding: 3px 6px;
+    width: auto;
+    height: auto;
+    min-width: 100px;
+    text-align: center;
+    color: #cfcfcf;
+    font-size: 12px;
+    line-height: 1.2;
+    border: 1px solid transparent;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    transform: scale(1.0);
+    cursor: pointer;
+    user-select: none;
+    pointer-events: all;
+    transition: border 0.2s, background-color 0.2s, min-width 0.3s;
+}
+#world #canvas #action-modal .content .button:not(.disabled):hover {
+    border-color: #cfcfcf;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+#world #canvas #action-modal .content .buttons {
+    display: inline-block;
+    margin: 6px auto 0;
+    transform: translateX(20px);
+}
+#world #canvas #action-modal .content .buttons .button {
+    display: block;
+    width: auto;
+    background-color: #363636;
+    border: 1px solid  #565656;
+    font-weight: bold;
+    padding: 3px;
+    font-size: 14px;
+    text-align: center;
+    z-index: 150;
+    text-shadow: 1px 1px 0 black;
+}
+#world #canvas #action-modal .content .buttons .button strong {
+    display: block;
+    text-align: center;
+    margin: 0 auto;
+    padding: 6px;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+#world #canvas #action-modal .content .buttons .button sup {
+    display: block;
+    text-align: center;
+    font-size: 80%;
+    line-height: 1.2;
+    margin: 0 auto 2px;
+}
+#world #canvas #action-modal .content .buttons .button.disabled {
+    background-color: #292929;
+    border-color: #464646;
+    color: #969696;
+    font-weight: normal;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    filter: saturate(0.5) brightness(0.5);
+}
+#world #canvas #action-modal .content .buttons .button:hover,
+#world #canvas #action-modal .content .buttons .button.maybe {
+    outline: 2px solid rgba(255, 255, 255, 1.0);
+    animation: world-action-button-maybe 1.5s ease-in-out infinite;
+}
+#world #canvas #action-modal .content .buttons .button.clicked {
+    outline: 2px solid rgba(255, 255, 255, 1.0);
+    transform: scale(1.0);
+    animation: world-action-button-clicked 0.9s ease-in-out infinite;
+    animation-fill-mode: forwards;
+    transform-origin: center center;
+}
+#world #canvas #action-modal .content .buttons .button[data-action="confirm"] {
+    background-color: #0e6b0e !important;
+    border-color: #129d12 !important;
+}
+#world #canvas #action-modal .content .buttons .button[data-action="cancel"] {
+    background-color: #8b1d1d !important;
+    border-color: #b23333 !important;
+}
+#world #canvas #action-modal .content .buttons.actions {
+
+}
+#world #canvas #action-modal .content .buttons.actions .button[data-action="confirm"] {
+    float: right;
+    margin-left: 6px;
+    min-width: 240px;
+}
+#world #canvas #action-modal .content .buttons.actions .button[data-action="cancel"] {
+    float: left;
+    margin-right: 6px;
+    min-width: 120px;
+}
+
 
 /* TEMP TEMP TEMP */
 

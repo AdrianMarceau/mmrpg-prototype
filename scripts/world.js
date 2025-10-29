@@ -237,6 +237,7 @@ class mmrpgWorldMap {
         let $actionDropdown = $('#action-dropdown', $thisWorld);
         let $clickOverlay = $('#click-overlay', $thisWorld);
         let $titleBanner = $('#title-banner', $thisPrototype);
+        let $actionModal = $('#action-modal', $thisPrototype);
         let $worldCursor = $('.sprite[data-sprite="team-cursor"]', $canvasMap);
         let $teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap);
         _elements.mmrpg = $thisPrototype;
@@ -255,6 +256,7 @@ class mmrpgWorldMap {
         _elements.actionDropdown = $actionDropdown;
         _elements.clickOverlay = $clickOverlay;
         _elements.titleBanner = $titleBanner;
+        _elements.actionModal = $actionModal;
         _elements.worldCursor = $worldCursor;
         _elements.teamSprites = $teamSprites;
         if ($canvasMap.length && $mapLayers.length){
@@ -7386,16 +7388,12 @@ class mmrpgWorldMap {
             }
         itemDetailsObject.description = itemDescription;
         itemDetailsObject.actions = [];
-        if (itemKind !== 'event'
-            && itemQuantity > 0){
-            if (itemKind === 'consumable'){
-                itemDetailsObject.actions.push({ action: 'use-item', text: 'Use', item: itemToken, disabled: !targetSelected });
-                }
-            if (itemKind === 'consumable' || itemKind === 'holdable'){
-                itemDetailsObject.actions.push({ action: 'give-item', text: 'Give', item: itemToken, disabled: !targetSelected });
-                }
-            itemDetailsObject.actions.push({ action: 'drop-item', text: 'Drop', item: itemToken, disabled: targetSelected });
-            }
+        let showUseItem = itemKind === 'consumable' ? true : false;
+        let showGiveItem = (itemKind === 'consumable' || itemKind === 'holdable') ? true : false;
+        let showDropItem = itemKind !== 'event' && itemQuantity > 0 ? true : false;
+        itemDetailsObject.actions.push({ action: 'use-item', text: 'Use', item: itemToken, disabled: !targetSelected, hidden: !showUseItem });
+        itemDetailsObject.actions.push({ action: 'give-item', text: 'Give', item: itemToken, disabled: !targetSelected, hidden: !showGiveItem });
+        itemDetailsObject.actions.push({ action: 'drop-item', text: 'Drop', item: itemToken, disabled: targetSelected, hidden: !showDropItem });
 
         // Pre-compile some of the HTML to make it easier for the other functions
         itemDetailsObject.infolinesHTML = '';
@@ -7419,7 +7417,11 @@ class mmrpgWorldMap {
         for (let i = 0; i < itemDetailsObject.actions.length; i++){
             let actionInfo = itemDetailsObject.actions[i];
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
-            itemDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + '" data-action="' + actionInfo.action + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
+            let actionHidden = typeof actionInfo.hidden !== 'undefined' && actionInfo.hidden === true ? true : false;
+            itemDetailsObject.actionsHTML += '<button type="button" '
+                + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
+                + 'data-action="' + actionInfo.action + '"' + (actionDisabled ? ' disabled="disabled"' : '') +
+                '>' + actionInfo.text + '</button>';
             }
 
         // Return the generated item details object
@@ -7697,12 +7699,18 @@ class mmrpgWorldMap {
         for (let i = 0; i < itemDetails.actions.length; i++){
             let actionInfo = itemDetails.actions[i];
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
+            let actionHidden = typeof actionInfo.hidden !== 'undefined' && actionInfo.hidden === true ? true : false;
             let $actionButton = $actions.find('.button.' + actionInfo.action);
             if ($actionButton && $actionButton.length){
                 if (actionDisabled){ $actionButton.addClass('disabled'); $actionButton.attr('disabled', 'disabled'); }
                 else { $actionButton.removeClass('disabled'); $actionButton.removeAttr('disabled'); }
+                if (actionHidden){ $actionButton.addClass('hidden'); }
+                else { $actionButton.removeClass('hidden'); }
                 } else {
-                let actionButtonMarkup = '<button type="button" class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + '" data-item="' + actionInfo.item + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
+                let actionButtonMarkup = '<button type="button" '
+                    + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
+                    + 'data-item="' + actionInfo.item + '"' + (actionDisabled ? ' disabled="disabled"' : '')
+                    + '>' + actionInfo.text + '</button>';
                 $actions.append(actionButtonMarkup);
                 $actionButton = $actions.find('.button.' + actionInfo.action);
                 }
@@ -7761,45 +7769,270 @@ class mmrpgWorldMap {
         }
 
     // Define a quick function for showing a generic action modal for items or abilities
-    showActionModal(actionKind, itemOrAbilityToken, targetRobotToken){
-        console.log('%c' + 'mmrpgWorldMap.showActionModal(actionKind:' + actionKind + ', itemOrAbilityToken:' + itemOrAbilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
-        return;
+    showActionModal(actionKind, actionToken, itemOrAbilityToken, targetRobotToken){
+        console.log('%c' + 'mmrpgWorldMap.showActionModal(actionKind:' + actionKind + ', actionToken:' + actionToken + ', itemOrAbilityToken:' + itemOrAbilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        if (!actionKind || typeof actionKind !== 'string' || !actionKind.length){ console.error('showActionModal() missing required actionKind!'); return; }
+        if (!actionToken || typeof actionToken !== 'string' || !actionToken.length){ console.error('showActionModal() missing required actionToken!'); return; }
+        if (!itemOrAbilityToken || typeof itemOrAbilityToken !== 'string' || !itemOrAbilityToken.length){ console.error('showActionModal() missing required itemOrAbilityToken!'); return; }
+        targetRobotToken = targetRobotToken && typeof targetRobotToken === 'string' && targetRobotToken.length ? targetRobotToken : null;
+
+        // Collect references to world objects
+        let _self = this;
+        let _selfRef = _self.showActionModal;
+        let _config = _self.config;
+        let _indexes = _self.indexes;
+        let _elements = _self.elements;
+        let $thisCanvas = _elements.canvas;
+        let $canvasWrapper = $('> .wrapper', $thisCanvas);
+        let $actionModal = _elements.actionModal;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        let _worldPlayerItems = _worldPlayer.items;
+        let _worldPlayerAbilities = _worldPlayer.abilities;
+
+        // Make a backup of values we need to be able to reset
+        _selfRef.mapIsHiddenBackup = _world.mapIsHidden;
+
+        // If a target robot token was provided, collect its info now
+        let targetRobotInfo = null;
+        let targetRobotName = '';
+        if (targetRobotToken
+            && typeof _worldPlayerRobots[targetRobotToken] !== 'undefined'){
+            console.log('--> target robot provided ...', targetRobotToken);
+            targetRobotInfo = _worldPlayerRobots[targetRobotToken];
+            console.log('--> found targetRobotInfo =', targetRobotInfo);
+            targetRobotName = targetRobotInfo.name || '[' + targetRobotToken + ']';
+            }
+
+        // Define template parameters for this modal to be updated as-needed
+        let modalDetails = {};
+        modalDetails.action = actionKind + '_' + actionToken;
+        modalDetails.title = actionToken.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + ' Action';
+        modalDetails.subtitles = {};
+        modalDetails.subtitles.forSelected = 'Selected ' + (actionKind === 'item' ? 'Item' : 'Ability') + (targetRobotName ? ' for <strong>' + targetRobotName + '</strong>' : '');
+        modalDetails.subtitles.forCurrent = (targetRobotName ? '<strong>' + targetRobotName + '</strong>\'s ' : '') + 'Current ' + (actionKind === 'item' ? 'Items' : 'Abilities');
+        modalDetails.subtitles.forTooltip = '';
+        modalDetails.containers = {};
+        modalDetails.containers.forSelected = '';
+        modalDetails.containers.forCurrent = '';
+        modalDetails.buttons = {};
+        modalDetails.buttons.confirm = { action: 'confirm', text: 'Confirm', disabled: false };
+        modalDetails.buttons.cancel = { action: 'cancel', text: 'Cancel', disabled: false };
+
+        // Collect required and necessary data for displaying this action modal
+        if (actionKind === 'item'){
+            console.log('--> actionKind is item ...', itemOrAbilityToken);
+            let itemsIndex = _indexes.items;
+            let itemToken = itemOrAbilityToken;
+            let itemInfo = typeof itemsIndex[itemToken] !== 'undefined' ? itemsIndex[itemToken] : null;
+            console.log('--> found itemInfo =', itemInfo);
+            // ...
+            // ...
+            }
+        else if (actionKind === 'ability'){
+            console.log('--> actionKind is ability ...', itemOrAbilityToken);
+            let abilitiesIndex = _indexes.abilities;
+            let abilityToken = itemOrAbilityToken;
+            let abilityInfo = typeof abilitiesIndex[abilityToken] !== 'undefined' ? abilitiesIndex[abilityToken] : null;
+            console.log('--> found abilityInfo =', abilityInfo);
+            let subtitleTooltip = 'Select Ability To Replace';
+            let selectedAbilityList = '&laquo; show selected ability here &raquo;';
+            let currentAbilityList = '&laquo; show current abilities here &raquo;';
+            // TEMP TEMP TEMP
+            selectedAbilityList = '<img width="140" height="34" src="images/_temp/mmrpg-mockup-2025-10-26_ability-span.png" style="" />';
+            currentAbilityList = '<img width="558" height="72" src="images/_temp/mmrpg-mockup-2025-10-26_ability-span-4x2.png" style="" />';
+            // TEMP TEMP TEMP
+            modalDetails.subtitles.forTooltip = subtitleTooltip;
+            modalDetails.containers.forSelected = '<div class="ability-list selected">' + selectedAbilityList + '</div>';
+            modalDetails.containers.forCurrent = '<div class="ability-list current">' + currentAbilityList + '</div>';
+            modalDetails.buttons.confirm.disabled = true;
+            // ...
+            // ...
+            }
+        else {
+            console.error('showActionModal() received invalid actionKind ' + actionKind + '!');
+            return;
+            }
+
+        console.log('finished calculating modalDetails ...');
+        console.log('-> modalDetails = ', modalDetails);
+
+        // Collect quick references to modal details
+        let modalAction = modalDetails.action;
+        let modalTitle = modalDetails.title;
+        let modalSubtitles = modalDetails.subtitles;
+        let modalContainers = modalDetails.containers;
+        let modalButtons = modalDetails.buttons;
+
+        // Define the actions for a confirm or cancel button click
+        let onConfirmAction = function(){
+            console.log('%c' + '~mmrpgWorldMap.showActionModal.onConfirmAction()', 'color: magenta;');
+            // ...
+            return true;
+            };
+        let onCancelAction = function(){
+            console.log('%c' + '~mmrpgWorldMap.showActionModal.onCancelAction()', 'color: magenta;');
+            $actionModal.addClass('hidden');
+            _world.mapIsHidden = _selfRef.mapIsHiddenBackup;
+            setTimeout(function(){
+                let $content = $actionModal.find('.content');
+                $actionModal.removeClass('active');
+                $content.find('.title').html('');
+                $content.find('.subtitle').html('');
+                $content.find('.container').html('');
+                }, 300);
+            return true;
+            };
+
+        // Check if the action modal already exists and create it if not
+        if (!$actionModal || !$actionModal.length){
+            console.log('--> action modal does not exist yet, creating ...');
+
+            // Generate the action modal markup bow that we've collected all necessary data
+            let actionModalMarkup = '';
+            actionModalMarkup += '<div id="action-modal" class="chrome active hidden" data-action="' + modalAction + '">';
+                actionModalMarkup += '<div class="overlay"></div>';
+                actionModalMarkup += '<div class="wrapper">';
+                    actionModalMarkup += '<div class="content">';
+                        actionModalMarkup += '<h1 class="title">' + modalTitle + '</h1>';
+                        actionModalMarkup += '<h2 class="subtitle for-selected">' + modalSubtitles.forSelected + '</h2>';
+                        actionModalMarkup += '<div class="container for-selected">' + modalContainers.forSelected + '</div>';
+                        actionModalMarkup += '<h2 class="subtitle for-current">' + modalSubtitles.forCurrent + '</h2>';
+                        actionModalMarkup += '<h3 class="subtitle for-tooltip">' + modalSubtitles.forTooltip + '</h3>';
+                        actionModalMarkup += '<div class="container for-current">' + modalContainers.forCurrent + '</div>';
+                        actionModalMarkup += '<div class="buttons actions">';
+                            if (modalButtons){
+                                for (let buttonKey in modalButtons){
+                                    let buttonInfo = modalButtons[buttonKey];
+                                    actionModalMarkup += '<button type="button" class="button ' + buttonInfo.action + (buttonInfo.disabled ? ' disabled' : '') + '" data-action="' + buttonInfo.action + '"' + (buttonInfo.disabled ? ' disabled="disabled"' : '') + '><strong>' + buttonInfo.text + '</strong></button>';
+                                    }
+                                }
+                        actionModalMarkup += '</div>';
+                    actionModalMarkup += '</div>';
+                actionModalMarkup += '</div>';
+            actionModalMarkup += '</div>';
+
+            // Append the action modal to the canvas wrapper and update the reference
+            $canvasWrapper.append(actionModalMarkup);
+            $actionModal = $('#action-modal', $canvasWrapper);
+            _elements.actionModal = $actionModal;
+
+            // Make sure clicking the background automatically closes the modal
+            $actionModal.delegate('.overlay', 'click', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                if (_self.worldIsBusy()){ return; }
+                if (!$actionModal.is('.active')){ return; } // if we're not active, ignore clicks
+                if ($actionModal.is('.hidden')){ return; } // if we're hidden, ignore clicks
+                console.log('%c' + 'Action modal overlay clicked!', 'color: cyan;');
+                return onCancelAction();
+                });
+
+            // (Re) Delegate events to the buttons in the action modal now that its markup is created/updated
+            $actionModal.delegate('.button[data-action]', 'click', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                if (_self.worldIsBusy()){ return; }
+                if (!$actionModal.is('.active')){ return; } // if we're not active, ignore clicks
+                if ($actionModal.is('.hidden')){ return; } // if we're hidden, ignore clicks
+                console.log('%c' + 'Modal action button clicked!', 'color: cyan;');
+                let $button = $(this);
+                let action = $button.attr('data-action');
+                console.log('-> $button =', $button);
+                console.log('-> action =', action);
+                if ($button.is('.disabled') || $button.is('[disabled]')){ return false; }
+                if (action === 'confirm'){ return onConfirmAction(); }
+                else if (action === 'cancel'){ return onCancelAction(); }
+                else { return false; }
+                });
+
+            }
+        else {
+            console.log('--> action modal already exists, updating ...');
+
+            // Update the action modal title, subtitles, containers, and actions
+            let $content = $actionModal.find('.content');
+            $actionModal.addClass('active hidden');
+            $actionModal.attr('data-action', modalAction);
+            let $title = $content.find('.title'); $title.html(modalTitle);
+            let $subForSelected = $content.find('.subtitle.for-selected'); $subForSelected.html(modalSubtitles.forSelected);
+            let $subForCurrent = $content.find('.subtitle.for-current'); $subForCurrent.html(modalSubtitles.forCurrent);
+            let $subForTooltip = $content.find('.subtitle.for-tooltip'); $subForTooltip.html(modalSubtitles.forTooltip);
+            let $contForSelected = $content.find('.container.for-selected'); $contForSelected.html(modalContainers.forSelected);
+            let $contForCurrent = $content.find('.container.for-current'); $contForCurrent.html(modalContainers.forCurrent);
+            let $buttonConfirm = $content.find('.button.confirm'); $buttonConfirm.html('<strong>' + modalButtons.confirm.text + '</strong>');
+            let $buttonCancel = $content.find('.button.cancel'); $buttonCancel.html('<strong>' + modalButtons.cancel.text + '</strong>');
+            if (modalButtons.confirm.disabled){ $buttonConfirm.addClass('disabled'); $buttonConfirm.attr('disabled', 'disabled'); }
+            else { $buttonConfirm.removeClass('disabled'); $buttonConfirm.removeAttr('disabled');  }
+            if (modalButtons.cancel.disabled){ $buttonCancel.addClass('disabled'); $buttonCancel.attr('disabled', 'disabled'); }
+            else { $buttonCancel.removeClass('disabled'); $buttonCancel.removeAttr('disabled'); }
+
+            }
+
+        // Append the action modal to the window and show it (remove any existing one first)
+        setTimeout(function(){
+            console.log('-> showing action modal ...');
+            $actionModal.removeClass('hidden');
+            _world.mapIsHidden = true;
+            }, 100);
+
+        // Return true on success
+        return true;
         }
 
     // Define a quick function for showing an item modal for some kind of item-related action
-    showItemModal(modalKind, itemToken, targetRobotToken){
-        console.log('%c' + 'mmrpgWorldMap.showItemModal(modalKind:' + modalKind + ', itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
-        return;
+    showItemModal(actionToken, itemToken, targetRobotToken){
+        console.log('%c' + 'mmrpgWorldMap.showItemModal(actionToken:' + actionToken + ', itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        if (!actionToken || typeof actionToken !== 'string' || !actionToken.length){ console.error('showItemModal() missing required actionToken!'); return; }
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('showItemModal() missing required itemToken!'); return; }
+        let _self = this;
+        return _self.showActionModal('item', actionToken, itemToken, targetRobotToken);
         }
 
     // Define a quick function for showing an ability modal for some kind of ability-related action
-    showAbilityModal(modalKind, abilityToken, targetRobotToken){
-        console.log('%c' + 'mmrpgWorldMap.showAbilityModal(modalKind:' + modalKind + ', abilityToken:' + abilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
-        return;
+    showAbilityModal(actionToken, abilityToken, targetRobotToken){
+        console.log('%c' + 'mmrpgWorldMap.showAbilityModal(actionToken:' + actionToken + ', abilityToken:' + abilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        if (!actionToken || typeof actionToken !== 'string' || !actionToken.length){ console.error('showAbilityModal() missing required actionToken!'); return; }
+        if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('showAbilityModal() missing required abilityToken!'); return; }
+        targetRobotToken = targetRobotToken && typeof targetRobotToken === 'string' && targetRobotToken.length ? targetRobotToken : null;
+        let _self = this;
+        return _self.showActionModal('ability', actionToken, abilityToken, targetRobotToken);
         }
 
     // Define quick functions for showing specific modals for items and abilities
     showUseItemModal(itemToken, targetRobotToken){
         console.log('%c' + 'mmrpgWorldMap.showUseItemModal(itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
-        return;
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('showUseItemModal() missing required itemToken!'); return; }
+        if (!targetRobotToken || typeof targetRobotToken !== 'string' || !targetRobotToken.length){ console.error('showUseItemModal() missing required targetRobotToken!'); return; }
+        let _self = this;
+        return _self.showItemModal('use-item', itemToken, targetRobotToken);
         }
 
     // Define a quick function for showing the give item modal
     showGiveItemModal(itemToken, targetRobotToken){
         console.log('%c' + 'mmrpgWorldMap.showGiveItemModal(itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
-        return;
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('showGiveItemModal() missing required itemToken!'); return; }
+        if (!targetRobotToken || typeof targetRobotToken !== 'string' || !targetRobotToken.length){ console.error('showGiveItemModal() missing required targetRobotToken!'); return; }
+        let _self = this;
+        return _self.showItemModal('give-item', itemToken, targetRobotToken);
         }
 
     // Define a quick function for showing the drop item modal
     showDropItemModal(itemToken){
         console.log('%c' + 'mmrpgWorldMap.showDropItemModal(itemToken:' + itemToken + ')', 'color: magenta;');
-        return;
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('showDropItemModal() missing required itemToken!'); return; }
+        let _self = this;
+        return _self.showItemModal('drop-item', itemToken, null);
         }
 
     // Define a quick function for showing the equip ability modal
     showEquipAbilityModal(abilityToken, targetRobotToken){
         console.log('%c' + 'mmrpgWorldMap.showEquipAbilityModal(abilityToken:' + abilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
-        return;
+        if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('showEquipAbilityModal() missing required abilityToken!'); return; }
+        if (!targetRobotToken || typeof targetRobotToken !== 'string' || !targetRobotToken.length){ console.error('showEquipAbilityModal() missing required targetRobotToken!'); return; }
+        let _self = this;
+        return _self.showAbilityModal('equip-ability', abilityToken, targetRobotToken);
         }
 
     // Define a quick event for showing the title banner w/ whatever title and subtitle text is provided w/ optional custom timeout for autohide
@@ -7812,8 +8045,9 @@ class mmrpgWorldMap {
         let _self = this;
         let _elements = _self.elements;
         let $thisCanvas = _elements.canvas;
-        let $titleBaner = _elements.titleBanner;
-        if (!$titleBaner || !$titleBaner.length){
+        let $canvasWrapper = $('> .wrapper', $thisCanvas);
+        let $titleBanner = _elements.titleBanner;
+        if (!$titleBanner || !$titleBanner.length){
             let titleBannerMarkup = '';
             titleBannerMarkup += '<div id="title-banner" class="chrome">';
                 titleBannerMarkup += '<div class="wrap">';
@@ -7821,25 +8055,25 @@ class mmrpgWorldMap {
                     titleBannerMarkup += '<h2 class="subtitle">' + subtitleText + '</h2>';
                 titleBannerMarkup += '</div>';
             titleBannerMarkup += '</div>';
-            $thisCanvas.append(titleBannerMarkup);
-            $titleBaner = $('#title-banner', $thisCanvas);
-            _elements.titleBanner = $titleBaner;
+            $canvasWrapper.append(titleBannerMarkup);
+            $titleBanner = $('#title-banner', $thisCanvas);
+            _elements.titleBanner = $titleBanner;
             } else {
-            $titleBaner.removeClass('active');
-            $titleBaner.find('.title').html(titleText + (showBreadcrumb ? ' &raquo;' : ''));
-            $titleBaner.find('.subtitle').html(subtitleText);
+            $titleBanner.removeClass('active');
+            $titleBanner.find('.title').html(titleText + (showBreadcrumb ? ' &raquo;' : ''));
+            $titleBanner.find('.subtitle').html(subtitleText);
             }
         setTimeout(function(){
-            $titleBaner.removeClass('hidden');
-            $titleBaner.addClass('active');
+            $titleBanner.removeClass('hidden');
+            $titleBanner.addClass('active');
             }, 100);
         if (autoHideTimeout > 0){
             setTimeout(function(){
-                $titleBaner.removeClass('active');
+                $titleBanner.removeClass('active');
                 setTimeout(function(){
-                    $titleBaner.find('.title').html('');
-                    $titleBaner.find('.subtitle').html('');
-                    $titleBaner.addClass('hidden');
+                    $titleBanner.find('.title').html('');
+                    $titleBanner.find('.subtitle').html('');
+                    $titleBanner.addClass('hidden');
                     }, (autoHideTimeout * 2));
                 }, autoHideTimeout);
             }
