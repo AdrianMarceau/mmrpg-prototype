@@ -2,6 +2,7 @@
 # DEBUG AREA 1N (TUNDRA)
 @token    = debug-area-1n
 @name     = DEBUG Area 1N
+@type     = freeze
 @level    = 20
 @size     = 15 x 15
 @sheet    = mmrpg-overworld-2k25

@@ -690,6 +690,7 @@ class rpg_world {
         $map_data_vars['world_name'] = isset($world_data_vars['name']) ? $world_data_vars['name'] : '';
         $map_data_vars['token'] = isset($map_data_vars['token']) ? $map_data_vars['token'] : '';
         $map_data_vars['name'] = isset($map_data_vars['name']) ? $map_data_vars['name'] : '';
+        $map_data_vars['type'] = isset($map_data_vars['type']) ? $map_data_vars['type'] : '';
         $map_data_vars['level'] = isset($map_data_vars['level']) ? $map_data_vars['level'] : 1;
         $map_data_vars['size'] = isset($map_data_vars['size']) ? $map_data_vars['size'] : '';
         $map_data_vars['sheet'] = isset($map_data_vars['sheet']) ? $map_data_vars['sheet'] : '';
@@ -748,6 +749,7 @@ class rpg_world {
         $map_data_parsed['world_name'] = $map_data_vars['world_name']; unset($map_data_vars['world_name']);
         $map_data_parsed['token'] = $map_data_vars['token']; unset($map_data_vars['token']);
         $map_data_parsed['name'] = $map_data_vars['name']; unset($map_data_vars['name']);
+        $map_data_parsed['type'] = $map_data_vars['type']; unset($map_data_vars['type']);
         $map_data_parsed['level'] = $map_data_vars['level']; unset($map_data_vars['level']);
         $map_data_parsed['size'] = $map_data_vars['size']; unset($map_data_vars['size']);
         $map_data_parsed['sheet'] = $map_data_vars['sheet']; unset($map_data_vars['sheet']);
