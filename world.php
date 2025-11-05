@@ -365,12 +365,16 @@ if (!empty($_REQUEST['player'])
 // Load map data from the appropriate map file
 $world_map_token = $this_prototype_data['this_current_world'].'__'.$this_prototype_data['this_current_map'];
 $world_token = $this_prototype_data['this_current_world'];
+$world_data_parsed = array();
 $map_token = $this_prototype_data['this_current_map'];
 $map_name = str_replace(' AREA ', ' Area ', strtoupper(str_replace('-', ' ', $map_token)));
-$map_data_parsed = rpg_world::load_map_data($world_token.'__'.$map_token);
+$map_data_parsed = array();
+rpg_world::load_map_data($world_token.'__'.$map_token, $world_data_parsed, $map_data_parsed);
+//$map_data_parsed = rpg_world::load_map_data($world_token.'__'.$map_token);
 $map_sprite_sheet = !empty($map_data_parsed) && !empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : '';
 //error_log('$world_map_token = '.print_r($world_map_token, true));
 //error_log('$world_token = '.print_r($world_token, true));
+//error_log('$world_data_parsed = '.print_r($world_data_parsed, true));
 //error_log('$map_token = '.print_r($map_token, true));
 //error_log('$map_name = '.print_r($map_name, true));
 //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
@@ -471,7 +475,7 @@ rpg_world::refresh_world_map($this_prototype_data, $map_data_parsed);
 
 // Define some fallback values for compatibility
 $debug_flag_animation = true;
-$flag_skip_fadein = true;
+$flag_skip_fadein = !$location_has_changed ? true : false;
 
 ?>
 <!DOCTYPE html>
@@ -692,7 +696,7 @@ $(document).ready(function(){
                 //let titleText = worldName + ' &raquo; ' + mapName + ' &raquo; ';
                 let titleText = mapName + ' &raquo;';
                 let subtitleText = mapFieldName;
-                _self.showTitleBanner(titleText, subtitleText, false, 3000);
+                setTimeout(function(){ _self.showTitleBanner(titleText, subtitleText, false, 3000); }, 300);
                 }
             });
         }

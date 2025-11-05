@@ -531,7 +531,7 @@ class rpg_world {
     // -- WORLD MAP METHODS -- //
 
     // Define a function for loading a given map's data from the filesystem
-    public static function load_map_data($world_map_token){
+    public static function load_map_data($world_map_token, &$world_data_parsed = array(), &$map_data_parsed = array()){
         //error_log('load_map_data() called!');
         if (empty($world_map_token)){ error_log('rpg_world::load_map_data() error - missing world-map token!'); return false; }
         if (!strstr($world_map_token, '__')){ error_log('rpg_world::load_map_data() error - invalid world-map token "'.$world_map_token.'"!'); return false; }
@@ -631,11 +631,11 @@ class rpg_world {
         //$map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
         static $map_custval_parser;
         if (!$map_custval_parser){
-            $map_custval_parser = function($custval_kind, $raw_tiles, $include_keys = false) use ($map_tiles_custval_regex, $map_other_custval_regex, $map_listval_custval_regex){
-                if (empty($raw_tiles)){ return array(); }
+            $map_custval_parser = function($custval_kind, $raw_strings, $include_keys = false) use ($map_tiles_custval_regex, $map_other_custval_regex, $map_listval_custval_regex){
+                if (empty($raw_strings)){ return array(); }
                 $parsed_keys = array();
                 $parsed_tiles = array();
-                foreach ($raw_tiles AS $line){
+                foreach ($raw_strings AS $line){
                     $line = trim(str_replace(' ', '', $line));
                     if (empty($line)){ continue; }
                     //error_log('parsing custval line: '.$line);
@@ -665,7 +665,16 @@ class rpg_world {
                         list($name, $tokens) = $exploded;
                         $tokens = explode(',', $tokens);
                         if (empty($tokens) || count($tokens) < 1){ continue; }
-                        foreach ($tokens AS $token){ if (empty($token)){ continue; } $parsed_tiles[$name][] = trim($token, ','); }
+                        foreach ($tokens AS $token){
+                            $token = trim($token, ',');
+                            if (empty($token)){ continue; }
+                            if (strstr($token, '...')){
+                                $range = self::parse_position_range($token);
+                                foreach ($range AS $pos){ $parsed_tiles[$name][] = $pos; }
+                                continue;
+                                }
+                            $parsed_tiles[$name][] = $token;
+                            }
                         continue;
                         }
                     }
@@ -673,6 +682,9 @@ class rpg_world {
                 return $parsed_tiles;
                 };
             }
+        //error_log('raw $world_data_vars(before) = '.print_r($world_data_vars, true));
+        $world_data_vars['areas'] = $map_custval_parser('areas', $world_data_vars['areas']);
+        //error_log('$world_data_vars(after) = '.print_r($world_data_vars, true));
         //error_log('raw $map_data_vars(before) = '.print_r($map_data_vars, true));
         $map_data_vars['world'] = isset($world_data_vars['token']) ? $world_data_vars['token'] : '';
         $map_data_vars['world_name'] = isset($world_data_vars['name']) ? $world_data_vars['name'] : '';
@@ -720,7 +732,17 @@ class rpg_world {
         foreach (self::$static_encounter_types AS $type){ $map_data_vars[$type] = $map_custval_parser($type, $map_data_vars[$type]); }
         $map_data_vars['items'] = $map_custval_parser('items', $map_data_vars['items']);
         $map_data_vars['abilities'] = $map_custval_parser('abilities', $map_data_vars['abilities']);
-        // Add collected data to the parsed map data
+        // Add collected world data to its parsed data array
+        $world_data_parsed = array();
+        $world_data_parsed['token'] = $world_data_vars['token']; unset($world_data_vars['token']);
+        $world_data_parsed['name'] = $world_data_vars['name']; unset($world_data_vars['name']);
+        $world_data_parsed['size'] = $world_data_vars['size']; unset($world_data_vars['size']);
+        $world_data_parsed['sheet'] = $world_data_vars['sheet']; unset($world_data_vars['sheet']);
+        $world_data_parsed['image'] = $world_data_vars['image']; unset($world_data_vars['image']);
+        $world_data_parsed['areas'] = $world_data_vars['areas']; unset($world_data_vars['areas']);
+        if (!empty($world_data_vars)){ $world_data_parsed['vars'] = $world_data_vars; }
+        //error_log('$world_data_parsed = '.print_r($world_data_parsed, true));
+        // Add collected map data to its parsed map data
         $map_data_parsed = array();
         $map_data_parsed['world'] = $map_data_vars['world']; unset($map_data_vars['world']);
         $map_data_parsed['world_name'] = $map_data_vars['world_name']; unset($map_data_vars['world_name']);
@@ -842,20 +864,10 @@ class rpg_world {
                     //error_log('--> $tile_key = '.print_r($tile_key, true));
                     //error_log('--> $tile_string = '.print_r($tile_string, true));
                     // If this value is using range syntax, parse it into a range
-                    if (preg_match('/^([0-9]{1,}-[0-9]{1,})\.\.\.([0-9]{1,}-[0-9]{1,})$/', $tile_string, $matches)){
+                    if (strstr($tile_string, '...')){
                         //error_log('---> parsing range syntax for tile string "'.$tile_string.'"');
-                        //error_log('---> $matches = '. print_r($matches, true));
-                        $range_start = intval($matches[1]); // will be in format x-y
-                        list($range_start_x, $range_start_y) = explode('-', $matches[1]);
-                        $range_end = intval($matches[2]); // will also be in format x-y
-                        list($range_end_x, $range_end_y) = explode('-', $matches[2]);
-                        $range_tiles = array();
-                        for ($x = $range_start_x; $x <= $range_end_x; $x++){
-                            for ($y = $range_start_y; $y <= $range_end_y; $y++){
-                                $range_tiles[] = $x.'-'.$y; // add the tile to the range
-                            }
-                        }
-                        //error_log('---> $range_tiles = '. print_r($range_tiles, true));
+                        // Parse the range tiles out of the tile string
+                        $range_tiles = self::parse_position_range($tile_string);
                         // Now we can replace the tile string with the range tiles
                         $group_tiles[$tile_key] = '';
                         $group_tiles = array_merge($group_tiles, $range_tiles); // merge the range tiles into the group tiles
@@ -3705,6 +3717,31 @@ class rpg_world {
             );
         if (!$has_persona_applied){ unset($robot_overview['persona']); }
         return $robot_overview;
+    }
+
+    // Define a method for quickly parsing a string representing a position range ("1-2...5-2") into an array and returning it
+    public static function parse_position_range($range_string){
+        //error_log('rpg_world::parse_position_range() called for range string "'.$range_string.'"');
+        $range_positions = array();
+        if (preg_match('/^([0-9]{1,}-[0-9]{1,})\.\.\.([0-9]{1,}-[0-9]{1,})$/', $range_string, $matches)){
+            //error_log('---> parsing range syntax for tile string "'.$range_string.'"');
+            //error_log('---> $matches = '. print_r($matches, true));
+            $range_start = intval($matches[1]); // will be in format x-y
+            list($range_start_x, $range_start_y) = explode('-', $matches[1]);
+            $range_end = intval($matches[2]); // will also be in format x-y
+            list($range_end_x, $range_end_y) = explode('-', $matches[2]);
+            for ($x = $range_start_x; $x <= $range_end_x; $x++){
+                for ($y = $range_start_y; $y <= $range_end_y; $y++){
+                    $range_positions[] = $x.'-'.$y; // add the tile to the range
+                }
+            }
+        } elseif (preg_match('/^([0-9]{1,}-[0-9]{1,})$/', $range_string, $matches)){
+            //error_log('---> parsing single position syntax for tile string "'.$range_string.'"');
+            //error_log('---> $matches = '. print_r($matches, true));
+            $range_positions[] = $matches[1];
+        }
+        //error_log('---> $range_positions = '. print_r($range_positions, true));
+        return $range_positions;
     }
 
 

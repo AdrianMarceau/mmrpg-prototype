@@ -121,6 +121,7 @@ gameSettings.worldState = {
     allowClicks: true, // allow click events on tiles
     hasLoaded: false, // has finished loading
     isReady: false, // is ready for interaction
+    isBusy: false, // is busy doing something
     };
 gameSettings.worldIndexes = {
     types: {},
@@ -164,7 +165,7 @@ class mmrpgWorldMap {
         let _self = this;
         let _world = _self.state;
         let _worldCursor = _world.cursor;
-        return _worldCursor.loading || _worldCursor.busy || _worldCursor.moving;
+        return _world.isBusy || _worldCursor.loading || _worldCursor.busy || _worldCursor.moving;
         }
 
     // Quick function for checking if the world map specifically is busy doing something (either busy because world, or because hidden)
@@ -307,6 +308,7 @@ class mmrpgWorldMap {
         let defaultMapName = mapToken.replace(/-/g, ' ').replace(/ AREA /g, ' Area ').replace(/\b\w/g, function(l){ return l.toUpperCase(); });
         let defaultMapSize = [_config.mapSize[0], _config.mapSize[1]];
         let defaultMapTileSize = [_config.mapTileSize[0], _config.mapTileSize[1]];
+        _world.isBusy = true;
         _config.mapWorld = mapWorld;
         _config.mapWorldName = worldName || defaultWorldName;
         _config.mapToken = mapToken;
@@ -410,9 +412,12 @@ class mmrpgWorldMap {
                 $thisWorld.removeClass('hidden');
                 $thisWorld.addClass('ready');
                 $canvasMap.addClass('ready');
-                _self.startIdleAnimation();
-                _self.triggerWindowEventsPull();
-                _self.triggerWorldReadyEvents();
+                setTimeout(function(){
+                    _self.startIdleAnimation();
+                    _self.triggerWindowEventsPull();
+                    _self.triggerWorldReadyEvents();
+                    _world.isBusy = false;
+                    }, 900);
                 }, 100);
             };
         // Define the function for run when each layer is done being rendered
