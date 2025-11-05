@@ -2363,6 +2363,81 @@ class rpg_world {
         return $return_markup;
     }
 
+    // Define a function for getting the robot switcher markup given current conditions
+    public static function get_mini_map_markup($this_prototype_data, $world_data_parsed, $map_data_parsed){
+        //error_log('rpg_world::get_mini_map_markup() ended!');
+        $return_markup = '';
+        // Collect world session data to reference during minimap generation
+        $WORLD_SESSION = self::get_session();
+        $world_maps = !empty($WORLD_SESSION['world_maps']) ? $WORLD_SESSION['world_maps'] : array();
+        $world_areas = !empty($world_data_parsed['areas']) ? $world_data_parsed['areas'] : array();
+        // Also collect information about the current area'a field (if possible) to determine minimap attributes
+        $mmrpg_index_fields = self::get_index('fields');
+        $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
+        $map_field_info = !empty($mmrpg_index_fields[$map_field_token]) ? $mmrpg_index_fields[$map_field_token] : array();
+        //error_log('$map_field_token = '.$map_field_token);
+        //error_log('$map_field_info = '.print_r($map_field_info, true));
+        // Pull or define some basic details about the minimap from the size/image data
+        if (!empty($map_data_parsed['type'])){ $minimap_type = $map_data_parsed['type']; }
+        elseif (!empty($map_field_info['field_type'])){ $minimap_type = $map_field_info['field_type']; }
+        elseif (!empty($map_field_info['field_type2'])){ $minimap_type = $map_field_info['field_type2']; }
+        else { $minimap_type = 'none'; }
+        $minimap_size = !empty($world_data_parsed['size']) ? $world_data_parsed['size'] : '1 x 1 @ 1 x 1 ^ 1';
+        $minimap_padding = ''; if (strstr($minimap_size, ' ^ ')){ list($minimap_size, $minimap_padding) = explode(' ^ ', $minimap_size); }
+        $minimap_tilesize = ''; if (strstr($minimap_size, ' @ ')){ list($minimap_size, $minimap_tilesize) = explode(' @ ', $minimap_size); }
+        $minimap_padding = explode(' x ', $minimap_padding);
+        $minimap_tilesize = explode(' x ', $minimap_tilesize);
+        $minimap_size = explode(' x ', $minimap_size);
+        $minimap_cols = $minimap_size[0];
+        $minimap_rows = $minimap_size[1];
+        $minimap_image = $world_data_parsed['image']; //'mmrpg-minimap-2025_debug-world.png';
+        $minimap_image_path = 'images/maps/'.$minimap_image;
+        $minimap_image_dir_path = MMRPG_CONFIG_ROOTDIR.$minimap_image_path;
+        $minimap_image_url_path = MMRPG_CONFIG_ROOTURL.$minimap_image_path;
+        $minimap_image_size = file_exists($minimap_image_dir_path) ? getimagesize($minimap_image_dir_path) : array();
+        $minimap_image_width = !empty($minimap_image_size[0]) ? $minimap_image_size[0] : 0;
+        $minimap_image_height = !empty($minimap_image_size[1]) ? $minimap_image_size[1] : 0;
+        $minimap_size_styles = 'width:'.$minimap_image_width.'px; height:'.$minimap_image_height.'px;';
+        $minimap_size_attrs = 'width="'.$minimap_image_width.'" height="'.$minimap_image_height.'"';
+        $minimap_size_string = implode(' x ', $minimap_size).(!empty($minimap_tilesize) ? ' @ '.implode(' x ', $minimap_tilesize) : '').(!empty($minimap_padding) ? ' ^ '.implode(' x ', $minimap_padding) : '');
+        // Review the world areas to see which minimap areas have already been seen or not
+        $world_areas_visible = array();
+        $world_areas_visible_positions = array();
+        $current_world = $this_prototype_data['this_current_world'];
+        $current_world_area = $this_prototype_data['this_current_map'];
+        $current_world_area_position = !empty($world_areas[$current_world_area]) ? $world_areas[$current_world_area][0] : '';
+        foreach ($world_areas AS $area_token => $area_positions){
+            $tmp_world_map_token = $current_world.'__'.$area_token;
+            $area_visited = !empty($world_maps[$tmp_world_map_token]) ? true : false;
+            if (!$area_visited){ continue; }
+            $world_areas_visible[] = $area_token;
+            foreach ($area_positions AS $area_position){ $world_areas_visible_positions[] = $area_position; }
+        }
+        //error_log('$world_areas = '.print_r($world_areas, true));
+        //error_log('$world_areas_visible = '.print_r($world_areas_visible, true));
+        //error_log('$world_areas_visible_positions = '.print_r($world_areas_visible_positions, true));
+        //error_log('$current_world_area = '.print_r($current_world_area, true));
+        //error_log('$current_world_area_position = '.print_r($current_world_area_position, true));
+        // Use the above to generate the minimap image attributes and styles
+        $minimap_image_attrs = '';
+        $minimap_image_attrs .= 'data-image="'.$minimap_image_path.'" ';
+        $minimap_image_attrs .= 'data-size="'.$minimap_size_string.'" ';
+        $minimap_image_attrs .= 'data-cols="'.$minimap_cols.'" ';
+        $minimap_image_attrs .= 'data-rows="'.$minimap_rows.'" ';
+        $minimap_image_attrs .= 'data-show="'.implode(',', $world_areas_visible_positions).'" ';
+        $minimap_image_attrs .= 'data-focus="'.$current_world_area_position.'" ';
+        $minimap_image_attrs .= 'data-zoom="1" ';
+        $minimap_image_styles = '';
+        $minimap_image_styles .= $minimap_size_styles.' ';
+        // Put it all together into the final return markup
+        $return_markup .= '<div class="viewport">';
+            $return_markup .= '<div class="grid type '.$minimap_type.'"></div>';
+            $return_markup .= '<div class="image" '.$minimap_image_attrs.' style="'.$minimap_size_styles.'"></div>';
+            $return_markup .= '<div class="position"><i class="arrow fas fa-caret-down"></i></div>';
+        $return_markup .= '</div>';
+        return $return_markup;
+    }
+
     // Define a function for getting the BACKGROUND LAYER sprite markup for the world map
     public static function get_background_layer_sprite($this_prototype_data, $map_data_parsed, $preview_only = false){
         //error_log('rpg_world::get_background_layer_sprite() called!');

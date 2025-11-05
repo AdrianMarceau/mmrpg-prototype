@@ -151,7 +151,8 @@ html, body {
 }
 #world #canvas #map.has-perspective .layer:not([data-layer="background"]) {
     transform-style: preserve-3d;
-    transform: perspective(var(--map-perspective-width)) rotateX(25deg) rotateY(0deg) scale(1);
+    /* transform: perspective(var(--map-perspective-width)) rotateX(25deg) rotateY(0deg) scale(1);  */
+    transform: perspective(var(--map-perspective-width)) rotateX(67.5deg) rotateY(0deg) scale(1);
 }
 
 /* define an animation for shaking the map back and forth rapidly to simulate damage/explosion/dramtic events */
@@ -193,6 +194,37 @@ html, body {
 }
 #world.redirecting #canvas #map {
     filter: brightness(0.0);
+}
+
+#world #canvas #map .layer[data-layer="background"],
+#world #canvas #map .layer[data-layer="terrain"],
+#world #canvas #map .layer[data-layer^="sprites/"] {
+    filter: brightness(1.0) opacity(1.0);
+}
+#world #canvas #map .layer[data-layer="background"] {
+    transition: filter 0.3s;
+}
+#world #canvas #map .layer[data-layer="terrain"] {
+    transition: filter 0.6s;
+}
+#world #canvas #map .layer[data-layer^="sprites/"] {
+    transition: filter 0.9s;
+    transition-delay: 0.9s;
+}
+#world.fastfade #canvas #map .layer[data-layer="background"],
+#world.fastfade #canvas #map .layer[data-layer="terrain"],
+#world.fastfade #canvas #map .layer[data-layer^="sprites/"] {
+    transition: filter 0.3s;
+    transition-delay: 0;
+}
+#world:not(.ready) #canvas #map .layer[data-layer="background"] {
+    filter: brightness(0.0) opacity(1.0);
+}
+#world:not(.ready) #canvas #map .layer[data-layer="terrain"] {
+    filter: brightness(0.0) opacity(0.0);
+}
+#world:not(.ready) #canvas #map .layer[data-layer^="sprites/"] {
+    filter: brightness(0.0) opacity(0.0);
 }
 
 /* define the rules for sprites that appear on the overworld map */
@@ -1265,16 +1297,17 @@ html, body {
 }
 
 #world #canvas #reset-button {
-    top: 4px;
-    right: 0;
+    top: 0;
+    right: 202px;
     opacity: 1.0;
-    border-radius: 6px 0 0 6px;
-    border-width: 1px 0 1px 1px;
-    transition: right 0.3s, opacity 0.3s;
+    border-radius: 0 0 6px 6px;
+    border-width: 0 1px 1px 1px;
+    transition: top 0.6s, opacity 0.6s;
+    transition-delay: 0.9s;
     font-size: 14px;
 }
 #world #canvas #reset-button:not(:hover) {
-    right: -28px;
+    top: -28px;
     opacity: 0.0;
 }
 #world #canvas #reset-button.disabled {
@@ -3660,29 +3693,41 @@ display: block;
 }
 
 #world #canvas #position-display {
-    bottom: 0;
+    top: 96px;
     right: 0;
     z-index: 1001;
     color: #cfcfcf;
     text-align: right;
     font-size: 12px;
     line-height: 1.2;
-    border-radius: 6px 0 0 0;
-    border-width: 1px 1px 0 1px;
+    border-radius: 6px 0 0 24px;
+    border-width: 0 0 1px 1px;
+    padding: 8px 16px 6px;
     font-family: monospace;
     user-select: auto;
     pointer-events: all;
     transition: padding-right 0.6s;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
 }
 #world.busy #canvas #position-display,
 #world.loading #canvas #position-display,
 #world.saving #canvas #position-display {
     padding-right: 38px;
 }
+#world #canvas #position-display .area,
+#world #canvas #position-display .coords {
+    display: block;
+    margin: 2px auto 4px;
+    font-weight: normal;
+    line-height: 1;
+}
+#world #canvas #position-display .coords {
+    color: #a0a0a0;
+}
 
 #world #canvas #loading-icon {
     display: block;
-    bottom: 4px;
+    top: 104px;
     right: 4px;
     z-index: 1002;
     width: 18px;
@@ -3696,6 +3741,7 @@ display: block;
     border: none;
     border-radius: 0;
     opacity: 0.0;
+    box-shadow: none;
     transition: opacity 0.6s;
 }
 #world #canvas #loading-icon > i {
@@ -4120,6 +4166,162 @@ display: block;
     margin-right: 6px;
     min-width: 120px;
 }
+
+#world #canvas #mini-map {
+    z-index: 1002;
+    top: 0;
+    right: 0;
+    width: 178px;
+    height: 98px;
+    padding: 9px;
+    border-radius: 0 0 0 24px;
+    border-width: 0 0 1px 1px;
+    box-shadow: none;
+    transition: width 0.3s, height 0.3s;
+}
+#world #canvas #mini-map:hover {
+    width: 198px;
+}
+#world #canvas #mini-map > .wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid #090909;
+    border-radius: 6px 6px 6px 16px;
+}
+#world #canvas #mini-map .viewport {
+    display: block;
+    position: absolute;
+    box-sizing: border-box;
+    overflow: hidden;
+    pointer-events: auto;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    min-width: 180px;
+    min-height: 120px;
+    transform: translate(-50%, -50%);
+    border-radius: 6px 6px 6px 16px;
+    border: 0 none transparent;
+    background-color: #393939;
+    background-image: none;
+    background-position: 0 0;
+    background-repeat: repeat;
+    background-size: auto;
+    border-color: #090909 !important;
+    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.3);
+    transition: border-color 0.3s;
+    /* animation: 32s linear 0s infinite normal none running minimap-hud-viewport_grid-pan; */
+}
+#world #canvas #mini-map .viewport:hover {
+    border-color: #dedede !important;
+}
+#world #canvas #mini-map .viewport > .grid {
+    display: block;
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    right: auto;
+    bottom: auto;
+    border: 0 none transparent;
+    background-color: #393939;
+    background-image: url("../images/sprite-grid.gif");
+    background-position: 0 0;
+    background-repeat: repeat;
+    background-size: auto;
+    /* background-blend-mode: hard-light;  */
+    background-blend-mode: multiply;
+    /* mix-blend-mode: multiply;  */
+    transform: translate(0, 0);
+    transition: none;
+}
+#world.ready #canvas #mini-map .viewport > .grid {
+    transition: transform 1.8s ease-in-out;
+}
+#world #canvas #mini-map .viewport > .image,
+#world #canvas #mini-map .viewport > .position {
+    display: block;
+    box-sizing: border-box;
+    image-rendering: pixelated;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: translate(0, 0);
+    transition: none;
+}
+#world.ready #canvas #mini-map .viewport > .image,
+#world.ready #canvas #mini-map .viewport > .position {
+    transition: opacity 0.6s, transform 0.6s;
+}
+#world #canvas #mini-map .viewport > .image {
+    position: relative;
+    z-index: 2;
+    opacity: 1.0;
+}
+#world #canvas #mini-map .viewport > .image:not(.ready) {
+    opacity: 0;
+}
+#world #canvas #mini-map .viewport > .image > .source,
+#world #canvas #mini-map .viewport > .image > .overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#world #canvas #mini-map .viewport > .image > .source {
+    z-index: 1;
+    visibility: hidden;
+}
+#world #canvas #mini-map .viewport > .image > .overlay {
+    z-index: 2;
+}
+#world #canvas #mini-map .viewport > .position {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    outline: 1px solid #ffffff;
+    text-align: center;
+    opacity: 1.0;
+}
+#world #canvas #mini-map .viewport > .position:not(.ready) {
+    opacity: 0;
+}
+#world #canvas #mini-map .viewport > .position > i {
+    display: block;
+    text-align: center;
+    width: 1em;
+    font-size: 24px;
+    line-height: 1;
+    color: #ffffff;
+    text-shadow: 1px 1px 0 #000000;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    animation: minimap-hud-position-bounce 1s steps(1) infinite;
+}
+@keyframes minimap-hud-viewport_grid-pan {
+    from { background-position: 0 0; }
+    to { background-position: -80px 0; }
+}
+@keyframes minimap-hud-position-bounce {
+    0% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-1px); }
+    100% { transform: translateX(-50%) translateY(0); }
+}
+
 
 
 /* TEMP TEMP TEMP */

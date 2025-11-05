@@ -612,6 +612,7 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
             $player_switcher_markup = $wrap_markup(rpg_world::get_player_switcher_markup($this_prototype_data, $player_switcher_players));
             $cursor_palette_markup = $wrap_markup(rpg_world::get_cursor_palette_markup($this_prototype_data));
             $robots_overview_markup = $wrap_markup(rpg_world::get_robots_overview_markup($this_prototype_data, $robot_overview_robots));
+            $mini_map_markup = $wrap_markup(rpg_world::get_mini_map_markup($this_prototype_data, $world_data_parsed, $map_data_parsed));
             ?>
             <div id="back-button" class="chrome chrome-button"><?= $back_button_markup ?></div>
             <div id="home-button" class="chrome chrome-button"><?= $home_button_markup ?></div>
@@ -621,6 +622,7 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
             <? if (!empty($cursor_palette_markup)){ ?><div id="cursor-palette" class="chrome"><?= $cursor_palette_markup ?></div><? } ?>
             <? if (!empty($player_switcher_markup)){ ?><div id="player-switcher" class="chrome"><?= $player_switcher_markup ?></div><? } ?>
             <? if (!empty($robots_overview_markup)){ ?><div id="robots-overview" class="chrome"><?= $robots_overview_markup ?></div><? } ?>
+            <? if (!empty($mini_map_markup)){ ?><div id="mini-map" class="chrome"><?= $mini_map_markup ?></div><? } ?>
             <div id="loading-icon" class="chrome"><i class="fa fas fa-spinner"></i></div>
         </div>
     </div>
