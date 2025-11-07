@@ -8335,26 +8335,123 @@ class mmrpgWorldMap {
 
             // Append the map terrain if it's not there already for visual reference
             let $areaViewportTerrain = $('> canvas.terrain', $areaImage);
-            if (!$areaViewportTerrain || !$areaViewportTerrain.length){
-                let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
-                let $terrainCanvas = $('canvas[data-canvas="terrain"]', $terrainLayer);
-                let terrainCanvas = $terrainCanvas.get(0);
-                let baseTerrainWidth = terrainCanvas.width;
-                let baseTerrainHeight = terrainCanvas.height;
-                let fromTileSize = _config.mapTileSize[0];
-                let toTileSize = _config.minimapAreaTileSize;
+            let $areaViewportOverlay = $('> canvas.overlay', $areaImage);
+            if (!$areaViewportTerrain || !$areaViewportTerrain.length
+                || !$areaViewportOverlay || !$areaViewportOverlay.length){
+
+                // Collect the base terrain layer from the big canvas map to clone into the mini-map area view
+                let $baseTerrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
+                let $baseTerrainCanvas = $('canvas[data-canvas="terrain"]', $baseTerrainLayer);
+                let baseTerrainCanvas = $baseTerrainCanvas.get(0);
+
+                // Determine the scaling necessary to resize the base terrain to the mini-map area size
+                let fullTileSize = _config.mapTileSize[0];
+                let miniTileSize = _config.minimapAreaTileSize;
+                let fromTileSize = fullTileSize;
+                let toTileSize = miniTileSize;
+                let baseTerrainWidth = baseTerrainCanvas.width;
+                let baseTerrainHeight = baseTerrainCanvas.height;
                 let miniTerrainWidth = Math.ceil((toTileSize / fromTileSize) * baseTerrainWidth);
                 let miniTerrainHeight = Math.ceil((toTileSize / fromTileSize) * baseTerrainHeight);
-                let $clonedTerrainCanvas = $terrainCanvas.clone();
-                let clonedTerrainCanvas = $clonedTerrainCanvas.get(0);
-                let clonedContext = clonedTerrainCanvas.getContext('2d');
-                clonedContext.drawImage(terrainCanvas, 0, 0);
-                $clonedTerrainCanvas.removeAttr('data-canvas').removeAttr('style');
-                $clonedTerrainCanvas.addClass('terrain');
+
+                // Define a quick inline function for drawing portal, battle, etc. markers to the map overlay
+                let drawAreaOverlayMarkers = function(ctx){
+                    //console.log('%c' + 'mmrpgWorldMap.initMiniMap.drawAreaOverlayMarkers(ctx)', 'color: orange;');
+                    // Define a quick inline function for drawing markers to this overlay
+                    let drawOverlayMarker = function(col, row, shape, size, color){
+                        //console.log('%c' + 'mmrpgWorldMap.initMiniMap.drawAreaOverlayMarkers.drawOverlayMarker(col:' + col + ', row:' + row + ', shape:' + shape + ', size:' + size + ', color:' + color + ')', 'color: orange;');
+                        if (!col || typeof col !== 'number'){ return false; }
+                        if (!row || typeof row !== 'number'){ return false; }
+                        shape = typeof shape === 'string' && shape.length ? shape : 'square';
+                        size = typeof size === 'number' && size > 0 ? size : 10;
+                        color = typeof color === 'string' && color.length ? color : '#ffffff';
+                        let x = Math.round(((col - 1) * miniTileSize) + (miniTileSize / 2));
+                        let y = Math.round(((row - 1) * miniTileSize) + (miniTileSize / 2));
+                        if (shape !== 'circle'){
+                            x -= Math.round(size / 2);
+                            y -= Math.round(size / 2);
+                            }
+                        if (shape === 'square'){
+                            ctx.fillStyle = color;
+                            ctx.fillRect(x, y, size, size);
+                            }
+                        if (shape === 'circle'){
+                            ctx.fillStyle = color;
+                            ctx.beginPath();
+                            ctx.arc(x, y, size / 2, 0, Math.PI * 2, true);
+                            ctx.fill();
+                            }
+                        return;
+                        };
+                    // Draw blue circles on portal locations
+                    let portalSymbols = _config.mapPortalSymbols || [];
+                    let portalsIndex = _config.mapPortalsIndex || {};
+                    let portalSymbolsKeys = Object.keys(portalSymbols);
+                    if (portalSymbolsKeys.length > 0){
+                        let drawPortalMarker = function(col, row, kind){
+                            let shape = 'square', size = 4, color = '#3f83c7';
+                            if (kind === 'direction'){ color = '#cacaca'; }
+                            return drawOverlayMarker(col, row, shape, size, color);
+                            };
+                        for (let i = 0; i < portalSymbolsKeys.length; i++){
+                            let portalKey = portalSymbolsKeys[i];
+                            let portalToken = portalSymbols[portalKey];
+                            let portalInfo = portalsIndex[portalToken];
+                            //console.log('--> drawing portal marker for ' + portalToken + ' at position key ' + portalKey + ' ...');
+                            //console.log('--> w/ portalInfo =', portalInfo);
+                            let portalPosition = portalKey.split('-').map(function(val){ return parseInt(val); });
+                            let portalKind = portalInfo.direction ? 'direction' : 'teleport';
+                            drawPortalMarker(portalPosition[0], portalPosition[1], portalKind);
+                            }
+                        }
+                    // Draw red squares where enemy encounters
+                    let battleSymbols = _config.mapBattleSymbols || [];
+                    let battlesIndex = _config.mapBattlesIndex || {};
+                    //console.log('--> battleSymbols = ', battleSymbols);
+                    //console.log('--> battlesIndex = ', battlesIndex);
+                    let battleSymbolsKeys = Object.keys(battleSymbols);
+                    if (battleSymbolsKeys.length > 0){
+                        let drawEnemyMarker = function(col, row, kind){
+                            let shape = 'square', color = '#c73f3f', size = 1;
+                            if (kind === 'mecha'){ size = 2; }
+                            else if (kind === 'master'){ size = 3; }
+                            else if (kind === 'boss'){ size = 4; }
+                            return drawOverlayMarker(col, row, shape, size, color);
+                            };
+                        for (let i = 0; i < battleSymbolsKeys.length; i++){
+                            let battleKey = battleSymbolsKeys[i];
+                            let battleToken = battleSymbols[battleKey];
+                            let battleInfo = battlesIndex[battleToken];
+                            //console.log('--> drawing battle symbol for ' + battleToken + ' at position key ' + battleKey + ' ...');
+                            //console.log('--> w/ battleInfo =', battleInfo);
+                            let battlePosition = battleKey.split('-').map(function(val){ return parseInt(val); });
+                            let battleKind = battleInfo.kind2 ? battleInfo.kind2 : battleInfo.kind;
+                            drawEnemyMarker(battlePosition[0], battlePosition[1], battleKind);
+                            }
+                        }
+                    // Return true now that we're done
+                    return true;
+                    };
+
+                // Update the area grid and image containers with the newly calculated mini terrain dimensions
                 $areaGrid.css({width: miniTerrainWidth + 'px', height: miniTerrainHeight + 'px', transform: 'translate(0, 0)'});
                 $areaImage.css({width: miniTerrainWidth + 'px', height: miniTerrainHeight + 'px', transform: 'translate(0, 0)'});
-                $areaImage.append($clonedTerrainCanvas);
+
+                // Clone the actual terrain canvas into the area mini-map and resize it accordingly
+                let $areaTerrainCanvas = $baseTerrainCanvas.clone(); // cloned to keep sizing consistent
+                let areaTerrainContext = $areaTerrainCanvas.get(0).getContext('2d');
+                $areaTerrainCanvas.removeAttr('data-canvas').removeAttr('style').addClass('terrain');
+                areaTerrainContext.drawImage(baseTerrainCanvas, 0, 0);
+                $areaImage.append($areaTerrainCanvas);
                 $areaViewportTerrain = $('> canvas.terrain', $areaImage);
+
+                // Create a secondary canvas for adding dots/markers/symbols on top of the terrain
+                let $areaOverlayCanvas = $('<canvas class="overlay" width="' + miniTerrainWidth + '" height="' + miniTerrainHeight + '"></canvas>');
+                let areaOverlayContext = $areaOverlayCanvas.get(0).getContext('2d');
+                drawAreaOverlayMarkers(areaOverlayContext);
+                $areaImage.append($areaOverlayCanvas);
+                $areaViewportOverlay = $('> canvas.overlay', $areaImage);
+
                 }
 
             // Mark the world mini map as ready and attempt to run the onComplete callback if provided
