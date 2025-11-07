@@ -2364,8 +2364,8 @@ class rpg_world {
     }
 
     // Define a function for getting the robot switcher markup given current conditions
-    public static function get_mini_map_markup($this_prototype_data, $world_data_parsed, $map_data_parsed){
-        //error_log('rpg_world::get_mini_map_markup() ended!');
+    public static function get_minimap_overview_markup($this_prototype_data, $world_data_parsed, $map_data_parsed){
+        //error_log('rpg_world::get_minimap_overview_markup() ended!');
         $return_markup = '';
         // Collect world session data to reference during minimap generation
         $WORLD_SESSION = self::get_session();

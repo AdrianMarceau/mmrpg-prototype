@@ -4190,7 +4190,7 @@ display: block;
     min-width: 120px;
 }
 
-#world #canvas #mini-map {
+#world #canvas #minimap-overview {
     z-index: 1002;
     top: 0;
     right: 0;
@@ -4202,14 +4202,14 @@ display: block;
     box-shadow: none;
     transition: top 0.3s, right 0.3s, width 0.3s, height 0.3s;
 }
-#world:not(.ready) #canvas #mini-map {
+#world:not(.ready) #canvas #minimap-overview {
     top: -100px;
     right: -180px;
 }
-#world #canvas #mini-map:hover {
+#world #canvas #minimap-overview:hover {
     width: 248px;
 }
-#world #canvas #mini-map > .wrapper {
+#world #canvas #minimap-overview > .wrapper {
     position: relative;
     width: 100%;
     height: 100%;
@@ -4219,10 +4219,10 @@ display: block;
     border-radius: 6px 6px 6px 16px;
     transition: border-color 0.3s;
 }
-#world #canvas #mini-map > .wrapper:hover {
+#world #canvas #minimap-overview > .wrapper:hover {
     border-color: #dedede !important;
 }
-#world #canvas #mini-map .viewport {
+#world #canvas #minimap-overview .viewport {
     display: block;
     position: absolute;
     box-sizing: border-box;
@@ -4248,18 +4248,18 @@ display: block;
     transition: opacity 1.2s;
     opacity: 1.0;
 }
-#world:not(.ready) #canvas #mini-map .viewport,
-#world #canvas #mini-map .viewport:not(.ready),
-#world #canvas #mini-map .viewport:not(.active) {
+#world:not(.ready) #canvas #minimap-overview .viewport,
+#world #canvas #minimap-overview .viewport:not(.ready),
+#world #canvas #minimap-overview .viewport:not(.active) {
     opacity: 0.0;
 }
-#world #canvas #mini-map .viewport.world {
+#world #canvas #minimap-overview .viewport.world {
     z-index: 1;
 }
-#world #canvas #mini-map .viewport.area {
+#world #canvas #minimap-overview .viewport.area {
     z-index: 2;
 }
-#world #canvas #mini-map .viewport > .grid {
+#world #canvas #minimap-overview .viewport > .grid {
     display: block;
     position: absolute;
     pointer-events: none;
@@ -4282,7 +4282,7 @@ display: block;
     transform: translate(0, 0);
     transition: none;
 }
-#world #canvas #mini-map .viewport.area > .grid {
+#world #canvas #minimap-overview .viewport.area > .grid {
     display: block;
     box-sizing: content-box;
     width: auto;
@@ -4295,8 +4295,8 @@ display: block;
     transform: translate(0, 0);
     transition: transform 0.3s;
 }
-#world #canvas #mini-map .viewport > .image,
-#world #canvas #mini-map .viewport > .marker {
+#world #canvas #minimap-overview .viewport > .image,
+#world #canvas #minimap-overview .viewport > .marker {
     display: block;
     box-sizing: border-box;
     image-rendering: pixelated;
@@ -4308,12 +4308,12 @@ display: block;
     transform: translate(0, 0);
     transition: none;
 }
-#world #canvas #mini-map .viewport > .image {
+#world #canvas #minimap-overview .viewport > .image {
     position: relative;
     z-index: 2;
     opacity: 1.0;
 }
-#world #canvas #mini-map .viewport.area > .image {
+#world #canvas #minimap-overview .viewport.area > .image {
     filter: drop-shadow(2px 2px 0 #000000);
     position: absolute;
     top: 50%;
@@ -4321,36 +4321,36 @@ display: block;
     transform-origin: top left;
     transition: none;
 }
-#world.ready #canvas #mini-map .viewport > .image {
+#world.ready #canvas #minimap-overview .viewport > .image {
     transition: opacity 0.6s, transform 0.6s;
 }
-#world #canvas #mini-map .viewport.area > .image > canvas.terrain {
+#world #canvas #minimap-overview .viewport.area > .image > canvas.terrain {
     filter: brightness(0) invert(1) opacity(0.20);
     mix-blend-mode: hard-light;
 }
-#world #canvas #mini-map .viewport > .image > .source,
-#world #canvas #mini-map .viewport > .image > .overlay,
-#world #canvas #mini-map .viewport > .image > .terrain {
+#world #canvas #minimap-overview .viewport > .image > .source,
+#world #canvas #minimap-overview .viewport > .image > .overlay,
+#world #canvas #minimap-overview .viewport > .image > .terrain {
     display: block;
     position: absolute;
     top: 0;
     left: 0;
 }
-#world #canvas #mini-map .viewport > .image > .source {
+#world #canvas #minimap-overview .viewport > .image > .source {
     z-index: 1;
     visibility: hidden;
 }
-#world #canvas #mini-map .viewport > .image > .overlay {
+#world #canvas #minimap-overview .viewport > .image > .overlay {
     z-index: 2;
 }
-#world #canvas #mini-map .viewport > .image > .terrain {
+#world #canvas #minimap-overview .viewport > .image > .terrain {
     z-index: 1;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
 }
-#world #canvas #mini-map .viewport > .marker {
+#world #canvas #minimap-overview .viewport > .marker {
     position: absolute;
     z-index: 3;
     top: 50%;
@@ -4362,20 +4362,20 @@ display: block;
     opacity: 1.0;
     transition: none;
 }
-#world.ready #canvas #mini-map .viewport > .marker {
+#world.ready #canvas #minimap-overview .viewport > .marker {
     transition: opacity 0.6s, transform 1.2s;
 }
-#world #canvas #mini-map .viewport.world > .marker {
+#world #canvas #minimap-overview .viewport.world > .marker {
     width: 10px;
     height: 10px;
     outline: 1px solid #ffffff;
 }
-#world #canvas #mini-map .viewport.area > .marker {
+#world #canvas #minimap-overview .viewport.area > .marker {
     width: 8px;
     height: 8px;
     outline: 1px solid rgba(255, 255, 255, 0.5);
 }
-#world #canvas #mini-map .viewport > .marker > i {
+#world #canvas #minimap-overview .viewport > .marker > i {
     display: block;
     text-align: center;
     width: 1em;
@@ -4390,19 +4390,19 @@ display: block;
     animation: minimap-hud-position-bounce 1s steps(1) infinite;
     transition: none;
 }
-#world.ready #canvas #mini-map .viewport > .marker > i {
+#world.ready #canvas #minimap-overview .viewport > .marker > i {
     transition: bottom 0.6s ease-in-out;
 }
-#world #canvas #mini-map .viewport:not(.ready) > .marker > i {
+#world #canvas #minimap-overview .viewport:not(.ready) > .marker > i {
     bottom: 100px;
 }
-#world #canvas #mini-map .buttons {
+#world #canvas #minimap-overview .buttons {
     position: absolute;
     z-index: 3;
     top: 6px;
     right: 6px;
 }
-#world #canvas #mini-map .buttons .button {
+#world #canvas #minimap-overview .buttons .button {
     display: block;
     margin: 0 auto;
     padding: 0;
@@ -4418,13 +4418,13 @@ display: block;
     pointer-events: auto;
     cursor: pointer;
 }
-#world #canvas #mini-map .buttons .button + .button {
+#world #canvas #minimap-overview .buttons .button + .button {
     margin-top: 6px;
 }
-#world #canvas #mini-map .buttons .button:not(.active):not(:hover) {
+#world #canvas #minimap-overview .buttons .button:not(.active):not(:hover) {
     opacity: 0.6;
 }
-#world #canvas #mini-map .buttons .button > i {
+#world #canvas #minimap-overview .buttons .button > i {
 
 }
 @keyframes minimap-hud-position-bounce {

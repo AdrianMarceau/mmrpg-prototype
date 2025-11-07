@@ -57,8 +57,8 @@ gameSettings.worldConfig = {
     mapItemsIndex: {},
     mapAbilitySymbols: {},
     mapAbilitiesIndex: {},
-    miniMapWorldTileSize: 14,
-    miniMapAreaTileSize: 6,
+    minimapWorldTileSize: 14,
+    minimapAreaTileSize: 6,
     windowWidth: 1024, // default only
     widthHeight: 768, // default only
     mmrpgWidth: 800, // default only
@@ -236,11 +236,11 @@ class mmrpgWorldMap {
         let $playerSwitcher = $('#player-switcher', $thisWorld);
         let $cursorPalette = $('#cursor-palette', $thisWorld);
         let $robotsOverview = $('#robots-overview', $thisWorld);
+        let $minimapOverview = $('#minimap-overview', $thisPrototype);
         let $sideButtons = $('#side-buttons', $thisWorld);
         let $actionDropdown = $('#action-dropdown', $thisWorld);
         let $clickOverlay = $('#click-overlay', $thisWorld);
         let $titleBanner = $('#title-banner', $thisPrototype);
-        let $miniMap = $('#mini-map', $thisPrototype);
         let $actionModal = $('#action-modal', $thisPrototype);
         let $worldCursor = $('.sprite[data-sprite="team-cursor"]', $canvasMap);
         let $teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap);
@@ -256,11 +256,11 @@ class mmrpgWorldMap {
         _elements.playerSwitcher = $playerSwitcher;
         _elements.cursorPalette = $cursorPalette;
         _elements.robotsOverview = $robotsOverview;
+        _elements.minimapOverview = $minimapOverview;
         _elements.sideButtons = $sideButtons;
         _elements.actionDropdown = $actionDropdown;
         _elements.clickOverlay = $clickOverlay;
         _elements.titleBanner = $titleBanner;
-        _elements.miniMap = $miniMap;
         _elements.actionModal = $actionModal;
         _elements.worldCursor = $worldCursor;
         _elements.teamSprites = $teamSprites;
@@ -3643,22 +3643,22 @@ class mmrpgWorldMap {
         let _selfRef = self;
         let _config = _self.config;
         let _elements = _self.elements;
-        let $miniMap = _elements.miniMap;
-        if (!$miniMap || !$miniMap.length){ console.error('$miniMap does not exist!'); return false; }
-        //let $worldViewport = $('.viewport.world', $miniMap);
+        let $minimapOverview = _elements.minimapOverview;
+        if (!$minimapOverview || !$minimapOverview.length){ console.error('$minimapOverview does not exist!'); return false; }
+        //let $worldViewport = $('.viewport.world', $minimapOverview);
         //if (!$worldViewport || !$worldViewport.length){ console.error('$worldViewport does not exist!'); return false; }
-        let $areaViewport = $('.viewport.area', $miniMap);
+        let $areaViewport = $('.viewport.area', $minimapOverview);
         if (!$areaViewport || !$areaViewport.length){ console.error('$areaViewport does not exist!'); return false; }
         let $areaViewportGrid = $('.grid', $areaViewport);
         let $areaViewportImage = $('.image', $areaViewport);
-        //let miniMapWorldTileSize = _config.miniMapWorldTileSize;
-        let miniMapAreaTileSize = _config.miniMapAreaTileSize;
-        let areaTranslateX = -1 * (miniMapAreaTileSize * (newCol - 1) + (miniMapAreaTileSize / 2));
-        let areaTranslateY = -1 * (miniMapAreaTileSize * (newRow - 1) + (miniMapAreaTileSize / 2));
+        //let minimapWorldTileSize = _config.minimapWorldTileSize;
+        let minimapAreaTileSize = _config.minimapAreaTileSize;
+        let areaTranslateX = -1 * (minimapAreaTileSize * (newCol - 1) + (minimapAreaTileSize / 2));
+        let areaTranslateY = -1 * (minimapAreaTileSize * (newRow - 1) + (minimapAreaTileSize / 2));
         //console.log('$areaViewportImage =', $areaViewportImage.length, $areaViewportImage);
         //console.log('-> areaImageWidth =', areaImageWidth, 'areaImageHeight =', areaImageHeight);
         //console.log('-> newCol =', newCol, ' newRow =', newRow);
-        //console.log('-> miniMapAreaTileSize =', miniMapAreaTileSize);
+        //console.log('-> minimapAreaTileSize =', minimapAreaTileSize);
         //console.log('-> areaTranslateX =', areaTranslateX, 'areaTranslateY =', areaTranslateY);
         $areaViewportGrid.css({ transform: 'translate(' + areaTranslateX + 'px, ' + areaTranslateY + 'px)' });
         $areaViewportImage.css({ transform: 'translate(' + areaTranslateX + 'px, ' + areaTranslateY + 'px)' });
@@ -8100,12 +8100,12 @@ class mmrpgWorldMap {
         let _elements = _self.elements;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.canvasMap;
-        let $miniMap = _elements.miniMap;
-        let $miniMapButtons = $('.buttons', $miniMap);
-        let $worldViewport = $('.viewport.world', $miniMap);
-        let $areaViewport = $('.viewport.area', $miniMap);
-        let $worldViewButton = $('.button[data-view="world"]', $miniMapButtons);
-        let $areaViewButton = $('.button[data-view="area"]', $miniMapButtons);
+        let $minimapOverview = _elements.minimapOverview;
+        let $minimapButtons = $('.buttons', $minimapOverview);
+        let $worldViewport = $('.viewport.world', $minimapOverview);
+        let $areaViewport = $('.viewport.area', $minimapOverview);
+        let $worldViewButton = $('.button[data-view="world"]', $minimapButtons);
+        let $areaViewButton = $('.button[data-view="area"]', $minimapButtons);
         if (!$worldViewport || !$worldViewport.length){ console.error('initMiniMap() could not find world viewport element!'); return false; }
         if (!$areaViewport || !$areaViewport.length){ console.error('initMiniMap() could not find area viewport element!'); return false; }
         if (!$worldViewButton || !$worldViewButton.length){ console.error('initMiniMap() could not find world view button element!'); return false; }
@@ -8342,7 +8342,7 @@ class mmrpgWorldMap {
                 let baseTerrainWidth = terrainCanvas.width;
                 let baseTerrainHeight = terrainCanvas.height;
                 let fromTileSize = _config.mapTileSize[0];
-                let toTileSize = _config.miniMapAreaTileSize;
+                let toTileSize = _config.minimapAreaTileSize;
                 let miniTerrainWidth = Math.ceil((toTileSize / fromTileSize) * baseTerrainWidth);
                 let miniTerrainHeight = Math.ceil((toTileSize / fromTileSize) * baseTerrainHeight);
                 let $clonedTerrainCanvas = $terrainCanvas.clone();
@@ -8376,8 +8376,8 @@ class mmrpgWorldMap {
             else { console.error('updateMiniMapView() received invalid newView: ' + newView); return false; }
             if ($viewport.is('.active')){ return true; } // already active, no need to change
             let $marker = $('.marker', $viewport);
-            $('.viewport', $miniMap).removeClass('active');
-            $('.button', $miniMapButtons).removeClass('active');
+            $('.viewport', $minimapOverview).removeClass('active');
+            $('.button', $minimapButtons).removeClass('active');
             $viewport.addClass('active');
             $button.addClass('active');
             return true;
@@ -8398,7 +8398,7 @@ class mmrpgWorldMap {
             };
 
         // Delegate click events to the two buttons in the mini-map for changing views
-        $miniMapButtons.delegate('.button[data-view]', 'click', function(e){
+        $minimapButtons.delegate('.button[data-view]', 'click', function(e){
             e.preventDefault();
             e.stopPropagation();
             if (_self.worldIsBusy()){ return; }
