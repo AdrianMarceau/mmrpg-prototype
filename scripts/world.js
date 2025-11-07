@@ -57,6 +57,8 @@ gameSettings.worldConfig = {
     mapItemsIndex: {},
     mapAbilitySymbols: {},
     mapAbilitiesIndex: {},
+    miniMapWorldTileSize: 14,
+    miniMapAreaTileSize: 6,
     windowWidth: 1024, // default only
     widthHeight: 768, // default only
     mmrpgWidth: 800, // default only
@@ -615,6 +617,7 @@ class mmrpgWorldMap {
             let tilesIndexData = _self.getLayerTileIndexData(layerToken, tileKey);
             _self.drawTileToCanvas(layerToken, ctx, thisLayerSheet, tileKey, tilesIndexData);
             }
+        //console.log('%c' + '----> finished drawing ' + thisLayerTilesKeys.length + ' tiles to ' + layerToken + ' layer canvas!', 'color: cyan;');
         return true;
         }
 
@@ -1326,7 +1329,7 @@ class mmrpgWorldMap {
             if (sameAsLast){ return; }
             if (thisPosXY[0] < 1 || thisPosXY[0] > _config.mapCols){ return; }
             if (thisPosXY[1] < 1 || thisPosXY[1] > _config.mapRows){ return; }
-            $clickOverlay.attr('title', ('X' + thisPosXY[0] + '-Y' + thisPosXY[1]));
+            //$clickOverlay.attr('title', ('X' + thisPosXY[0] + '-Y' + thisPosXY[1]));
             let tileData = _self.getLayerTileIndexData(layerToken, thisPos);
             let walkableTiles = _self.getWalkableMapTiles();
             let tilesWithinRange = playerMobility > 0 ? _self.getWalkableMapTilesByProximity(curPos, playerMobility) : walkableTiles;
@@ -1570,10 +1573,15 @@ class mmrpgWorldMap {
                 // Otherwise we can expand (if not already) the panel and switch to this specific view
                 // and then disable the outside UI buttons to prevent bad-clicks and visual clutter
                 viewToken = viewToken && typeof viewToken === 'string' && viewToken.length ? viewToken : '';
+                $('.button', $storageBoxes).attr('disabled', 'disabled');
                 $storageRobotsDiv.removeClass('unfocused');
                 $teamRobotsDiv.addClass('focused').removeClass('unfocused');
                 $robotsOverview.addClass('expanded').attr('data-view', viewToken);
-                $storageButtons.removeClass('active').filter('[data-view="' + viewToken + '"]').addClass('active');
+                $storageButtons.removeClass('active');
+                let $thisStorageBox = $storageBoxes.filter('[data-storage="' + viewToken + '"]');
+                let $thisStorageButton = $storageButtons.filter('[data-view="' + viewToken + '"]');
+                $('.button', $thisStorageBox).removeAttr('disabled');
+                $thisStorageButton.addClass('active');
                 _world.mapIsHidden = true; // set the map hidden state
                 clearSelectionsAndIncompatible();
                 disableOtherElements();
@@ -1589,6 +1597,7 @@ class mmrpgWorldMap {
                 $storageButtons.removeClass('active');
                 $('.pages', $storageRobotsDiv).remove();
                 $('.bullets', $storageRobotsDiv).remove();
+                $('.button', $storageBoxDivs).attr('disabled', 'disabled');
                 return;
                 };
             // Define a function for calculating storage config refs/values for robots, items, or abilities
@@ -2033,6 +2042,8 @@ class mmrpgWorldMap {
                 //console.log('-> auto-triggering storage-sort for ' + storageKind + ' w/ ' + selectedSortToken + ' (' + selectedSortDirection + ')');
                 if (selectedSortToken){ sortStoragePage(storageKind, selectedSortToken, selectedSortDirection); }
                 });
+            // Auto-disable buttons in the storage boxes to prevent tabbing issues in the browser
+            $('.button', $storageBoxes).attr('disabled', 'disabled');
             // Refresh the backups now that we're done sorting and whatnot
             refreshRobotBackups();
             // Add all these methods to the API in case future code needs to access them too
@@ -3385,7 +3396,6 @@ class mmrpgWorldMap {
         let $sideButtons = _elements.sideButtons;
         let $actionDropdown = _elements.actionDropdown;
         let $teamSprites = _elements.teamSprites;
-        let $backgroundLayer = $('.layer[data-layer="background"]', $canvasMap);
         let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap); // later: $('.layer[data-layer="sprites"]', $canvasMap);
         let $cursorSprite = $teamSprites.filter('.cursor');
         let $otherSprites = $teamSprites.filter(':not(.cursor)');
@@ -3538,6 +3548,7 @@ class mmrpgWorldMap {
             }
         // Make sure we start the scroll to the new position
         _self.scrollMap(tileOffsetX, tileOffsetY);
+        _self.scrollMiniMap(thisNewCol, thisNewRow);
         // Start the idle timeout (clearing if already exists) so we can run idle-actions
         if (_selfRef.idleTimeout){ clearTimeout(_selfRef.idleTimeout); }
         _selfRef.idleTimeout = setTimeout(function(){
@@ -3563,11 +3574,7 @@ class mmrpgWorldMap {
         let usePerspective = _mapEffects.usePerspective;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
-        let $backgroundLayer = $('.layer[data-layer="background"]', $canvasMap);
         let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
-        let $miniMap = _elements.miniMap;
-        let $miniMapViewport = $('.viewport', $miniMap);
-        let $miniMapviewportGrid = $('.grid', $miniMapViewport);
         if (typeof scrollX !== 'number'){ scrollX = _worldCursor.positionXY[0] || 0; }
         if (typeof scrollY !== 'number'){ scrollY = _worldCursor.positionXY[1] || 0; }
         // And now we should move the map itself so that the characters are always centered in the viewport
@@ -3621,13 +3628,40 @@ class mmrpgWorldMap {
         if (worldZoom !== _selfRef.lastWorldZoom){ _world.allowClicks = _world.allowHovers = false; }
         $canvasMap.attr('data-zoom', worldZoom);
         $canvasMap.css({ transformOrigin: 'left top', transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) scale(' + worldZoom + ')' });
-        $backgroundLayer.css({ transformOrigin: 'left top', transform: 'translate(' + subTranslateX + 'px, ' + subTranslateY + 'px)' });
         if (worldZoom !== _selfRef.lastWorldZoom){ setTimeout(function(){ _world.allowClicks = _world.allowHovers = true; }, 1000); }
-        // Also apply them to the minimap viewport grid as well to simulate movement up there (in percent, transforming from center center)
-        let percentDiffAllowed = 30; //100;
-        let miniMapTranslateX = ((mapTranslateX / mapWidth) * percentDiffAllowed);
-        let miniMapTranslateY = ((mapTranslateY / mapHeight) * percentDiffAllowed);
-        $miniMapviewportGrid.css({ transform: 'translate(' + miniMapTranslateX + '%, ' + miniMapTranslateY + '%)' });
+        // Return true on success
+        return true;
+        }
+
+    // Quick function for re-centering the mini-map on a given column and row regardless of map zoom levels
+    scrollMiniMap(newCol, newRow){
+        //console.log('%c' + 'mmrpgWorldMap.scrollMiniMap(newCol:' + newCol + ', newRow:' + newRow + ')', 'color: magenta;');
+        if (typeof newCol !== 'number' || typeof newRow !== 'number'){ console.error('newCol is invalid!'); return false; }
+        if (newCol < 1 || newRow < 1){ console.error('newCol and newRow must be greater than zero!'); return false; }
+        // Collect references, indexes, and other variables we need to work with
+        let _self = this;
+        let _selfRef = self;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let $miniMap = _elements.miniMap;
+        if (!$miniMap || !$miniMap.length){ console.error('$miniMap does not exist!'); return false; }
+        //let $worldViewport = $('.viewport.world', $miniMap);
+        //if (!$worldViewport || !$worldViewport.length){ console.error('$worldViewport does not exist!'); return false; }
+        let $areaViewport = $('.viewport.area', $miniMap);
+        if (!$areaViewport || !$areaViewport.length){ console.error('$areaViewport does not exist!'); return false; }
+        let $areaViewportGrid = $('.grid', $areaViewport);
+        let $areaViewportImage = $('.image', $areaViewport);
+        //let miniMapWorldTileSize = _config.miniMapWorldTileSize;
+        let miniMapAreaTileSize = _config.miniMapAreaTileSize;
+        let areaTranslateX = -1 * (miniMapAreaTileSize * (newCol - 1) + (miniMapAreaTileSize / 2));
+        let areaTranslateY = -1 * (miniMapAreaTileSize * (newRow - 1) + (miniMapAreaTileSize / 2));
+        //console.log('$areaViewportImage =', $areaViewportImage.length, $areaViewportImage);
+        //console.log('-> areaImageWidth =', areaImageWidth, 'areaImageHeight =', areaImageHeight);
+        //console.log('-> newCol =', newCol, ' newRow =', newRow);
+        //console.log('-> miniMapAreaTileSize =', miniMapAreaTileSize);
+        //console.log('-> areaTranslateX =', areaTranslateX, 'areaTranslateY =', areaTranslateY);
+        $areaViewportGrid.css({ transform: 'translate(' + areaTranslateX + 'px, ' + areaTranslateY + 'px)' });
+        $areaViewportImage.css({ transform: 'translate(' + areaTranslateX + 'px, ' + areaTranslateY + 'px)' });
         // Return true on success
         return true;
         }
@@ -8057,215 +8091,326 @@ class mmrpgWorldMap {
 
     // Define a quick function for initializing the minimap HUD and its elements, focus, position, and any masking
     initMiniMap(){
-        console.log('%c' + 'mmrpgWorldMap.initMiniMap()', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.initMiniMap()', 'color: magenta;');
 
         // Collect references to world objects
         let _self = this;
         let _config = _self.config;
         let _world = _self.state;
         let _elements = _self.elements;
+        let $thisWorld = _elements.world;
+        let $canvasMap = _elements.canvasMap;
         let $miniMap = _elements.miniMap;
-        let $mapViewport = $('.viewport', $miniMap);
-        let $mapImage = $('.image', $mapViewport);
-        let $mapMarker = $('.position', $mapViewport);
+        let $miniMapButtons = $('.buttons', $miniMap);
+        let $worldViewport = $('.viewport.world', $miniMap);
+        let $areaViewport = $('.viewport.area', $miniMap);
+        let $worldViewButton = $('.button[data-view="world"]', $miniMapButtons);
+        let $areaViewButton = $('.button[data-view="area"]', $miniMapButtons);
+        if (!$worldViewport || !$worldViewport.length){ console.error('initMiniMap() could not find world viewport element!'); return false; }
+        if (!$areaViewport || !$areaViewport.length){ console.error('initMiniMap() could not find area viewport element!'); return false; }
+        if (!$worldViewButton || !$worldViewButton.length){ console.error('initMiniMap() could not find world view button element!'); return false; }
+        if (!$areaViewButton || !$areaViewButton.length){ console.error('initMiniMap() could not find area view button element!'); return false; }
 
-        // Collect viewport dimensions so we can more easily center the map on focused position later
-        let viewportWidth = $mapViewport.width();
-        let viewportHeight = $mapViewport.height();
+        // Initialize the world viewport first within the mini-map (the one with the cols/rows and grid)
+        let worldMiniMapReady = false;
+        let initWorldMiniMap = function(onComplete){
+            //console.log('%c' + '~initWorldMiniMap()', 'color: magenta;');
 
-        // Pull necessary data-attributes from the minimap elements
-        let mapImage = $mapImage.is('[data-image]') ? $mapImage.attr('data-image') : '';
-        let mapCols = $mapImage.is('[data-cols]') ? parseInt($mapImage.attr('data-cols')) : false;
-        let mapRows = $mapImage.is('[data-rows]') ? parseInt($mapImage.attr('data-rows')) : false;
-        let mapSize = $mapImage.is('[data-size]') ? $mapImage.attr('data-size') : false;
-        let dataShow = $mapImage.is('[data-show]') ? $mapImage.attr('data-show') : '';
-        let dataHide = $mapImage.is('[data-hide]') ? $mapImage.attr('data-hide') : '';
-        let dataFocus = $mapImage.is('[data-focus]') ? $mapImage.attr('data-focus') : '';
-        let dataZoom = $mapImage.is('[data-zoom]') ? parseFloat($mapImage.attr('data-zoom')) : 1.0;
-        if (!mapImage || typeof mapImage !== 'string' || !mapImage.length){ console.error('initMiniMap() could not determine valid map image!'); return false; }
-        if (!mapCols || typeof mapCols !== 'number' || mapCols <= 0){ console.error('initMiniMap() could not determine valid mapCols from map image!'); return false; }
-        if (!mapRows || typeof mapRows !== 'number' || mapRows <= 0){ console.error('initMiniMap() could not determine valid mapRows from map image!'); return false; }
-        if (!mapSize || typeof mapSize !== 'string' || !mapSize.length){ console.error('initMiniMap() could not determine valid mapSize from map image!'); return false; }
-        if (dataShow && !dataHide){ dataHide = 'all'; }
-        if (dataHide && !dataShow){ dataShow = 'all'; }
-        //console.log('--> mapCols = ' + mapCols + '\n' + '--> mapRows = ' + mapRows + '\n' + '--> mapSize = ' + mapSize);
-        //console.log('--> dataShow = ' + dataShow + '\n' + '--> dataHide = ' + dataHide + '\n' + '--> dataFocus = ' + dataFocus + '\n' + '--> dataZoom = ' + dataZoom);
+            // Collect references to viewport elements
+            let $worldGrid = $('.grid', $worldViewport);
+            let $worldImage = $('.image', $worldViewport);
+            let $worldMarker = $('.marker', $worldViewport);
 
-        // Break down the map size string to get more detailed dimensions
-        let mapConfig = {};
-        mapConfig.cols = mapCols;
-        mapConfig.rows = mapRows;
-        mapConfig.width = 0;
-        mapConfig.height = 0;
-        mapConfig.padding = 0;
-        mapConfig.tileWidth = 0;
-        mapConfig.tileHeight = 0;
-        mapConfig.realWidth = 0;
-        mapConfig.realHeight = 0;
-        mapConfig.imageSource = mapImage;
-        // check for padding at the end ("^ 123") and crop it off + save it
-        if (mapSize.length
-            && mapSize.indexOf(' ^ ') !== -1){
-            let sizeParts = mapSize.split(' ^ ');
-            mapSize = sizeParts[0];
-            mapConfig.padding = parseInt(sizeParts[1]);
-            }
-        // check for tilesize at the end ("@ 123 x 123") and crop it off + save it
-        if (mapSize.length
-            && mapSize.indexOf(' @ ') !== -1){
-            let sizeParts = mapSize.split(' @ ');
-            mapSize = sizeParts[0];
-            let tileSizeParts = sizeParts[1].split(' x ');
-            mapConfig.tileWidth = parseInt(tileSizeParts[0]);
-            mapConfig.tileHeight = parseInt(tileSizeParts[1]);
-            }
-        // split the remaining part ("123 x 123") to get cols and rows to override
-        if (mapSize.length
-            && mapSize.indexOf(' x ') !== -1){
-            let sizeParts = mapSize.split(' x ');
-            mapConfig.cols = parseInt(sizeParts[0]);
-            mapConfig.rows = parseInt(sizeParts[1]);
-            }
-        // if we're missing any critical information we should abort now
-        if (!mapConfig.cols || typeof mapConfig.cols !== 'number' || mapConfig.cols <= 0){ console.error('initMiniMap() could not determine valid cols from map size!'); return false; }
-        if (!mapConfig.rows || typeof mapConfig.rows !== 'number' || mapConfig.rows <= 0){ console.error('initMiniMap() could not determine valid rows from map size!'); return false; }
-        if (!mapConfig.tileWidth || typeof mapConfig.tileWidth !== 'number' || mapConfig.tileWidth <= 0){ console.error('initMiniMap() could not determine valid tileWidth from map size!'); return false; }
-        if (!mapConfig.tileHeight || typeof mapConfig.tileHeight !== 'number' || mapConfig.tileHeight <= 0){ console.error('initMiniMap() could not determine valid tileHeight from map size!'); return false; }
-        // update values with new calculations
-        mapConfig.width = mapConfig.cols * mapConfig.tileWidth;
-        mapConfig.height = mapConfig.rows * mapConfig.tileHeight;
-        mapConfig.realWidth = mapConfig.width + (mapConfig.padding * 2);
-        mapConfig.realHeight = mapConfig.height + (mapConfig.padding * 2);
-        //console.log('--> mapConfig = ', mapConfig);
-        let allPositions = [];
-        for (let row = 1; row <= mapConfig.rows; row++){
-            for (let col = 1; col <= mapConfig.cols; col++){
-                allPositions.push(col + '-' + row);
+            // Collect viewport dimensions so we can more easily center the map on focused position later
+            let viewportWidth = $worldViewport.width();
+            let viewportHeight = $worldViewport.height();
+
+            // Pull necessary data-attributes from the minimap elements
+            let worldImage = $worldImage.is('[data-image]') ? $worldImage.attr('data-image') : '';
+            let mapCols = $worldImage.is('[data-cols]') ? parseInt($worldImage.attr('data-cols')) : false;
+            let mapRows = $worldImage.is('[data-rows]') ? parseInt($worldImage.attr('data-rows')) : false;
+            let mapSize = $worldImage.is('[data-size]') ? $worldImage.attr('data-size') : false;
+            let dataShow = $worldImage.is('[data-show]') ? $worldImage.attr('data-show') : '';
+            let dataHide = $worldImage.is('[data-hide]') ? $worldImage.attr('data-hide') : '';
+            let dataFocus = $worldImage.is('[data-focus]') ? $worldImage.attr('data-focus') : '';
+            let dataZoom = $worldImage.is('[data-zoom]') ? parseFloat($worldImage.attr('data-zoom')) : 1.0;
+            if (!worldImage || typeof worldImage !== 'string' || !worldImage.length){ console.error('initMiniMap() could not determine valid map image!'); return false; }
+            if (!mapCols || typeof mapCols !== 'number' || mapCols <= 0){ console.error('initMiniMap() could not determine valid mapCols from map image!'); return false; }
+            if (!mapRows || typeof mapRows !== 'number' || mapRows <= 0){ console.error('initMiniMap() could not determine valid mapRows from map image!'); return false; }
+            if (!mapSize || typeof mapSize !== 'string' || !mapSize.length){ console.error('initMiniMap() could not determine valid mapSize from map image!'); return false; }
+            if (dataShow && !dataHide){ dataHide = 'all'; }
+            if (dataHide && !dataShow){ dataShow = 'all'; }
+            //console.log('--> mapCols = ' + mapCols + '\n' + '--> mapRows = ' + mapRows + '\n' + '--> mapSize = ' + mapSize);
+            //console.log('--> dataShow = ' + dataShow + '\n' + '--> dataHide = ' + dataHide + '\n' + '--> dataFocus = ' + dataFocus + '\n' + '--> dataZoom = ' + dataZoom);
+
+            // Break down the map size string to get more detailed dimensions
+            let mapConfig = {};
+            mapConfig.cols = mapCols;
+            mapConfig.rows = mapRows;
+            mapConfig.width = 0;
+            mapConfig.height = 0;
+            mapConfig.padding = 0;
+            mapConfig.tileWidth = 0;
+            mapConfig.tileHeight = 0;
+            mapConfig.realWidth = 0;
+            mapConfig.realHeight = 0;
+            mapConfig.imageSource = worldImage;
+            // check for padding at the end ("^ 123") and crop it off + save it
+            if (mapSize.length
+                && mapSize.indexOf(' ^ ') !== -1){
+                let sizeParts = mapSize.split(' ^ ');
+                mapSize = sizeParts[0];
+                mapConfig.padding = parseInt(sizeParts[1]);
                 }
-            }
-        //console.log('--> allPositions = ', allPositions);
-
-        // Break apart the show/hide arrays of positions if provided and not-empty
-        let showPositions = [];
-        let hidePositions = [];
-        if (dataShow === 'all'){
-            showPositions = Object.values(allPositions);
-            if (dataHide && dataHide !== 'all'){
-                hidePositions = dataHide.split(',');
-                showPositions = Object.values(showPositions.filter(function(pos){ return hidePositions.indexOf(pos) === -1; }));
+            // check for tilesize at the end ("@ 123 x 123") and crop it off + save it
+            if (mapSize.length
+                && mapSize.indexOf(' @ ') !== -1){
+                let sizeParts = mapSize.split(' @ ');
+                mapSize = sizeParts[0];
+                let tileSizeParts = sizeParts[1].split(' x ');
+                mapConfig.tileWidth = parseInt(tileSizeParts[0]);
+                mapConfig.tileHeight = parseInt(tileSizeParts[1]);
                 }
-            }
-        if (dataHide === 'all'){
-            hidePositions = Object.values(allPositions);
-            if (dataShow && dataShow !== 'all'){
-                showPositions = dataShow.split(',');
-                hidePositions = Object.values(hidePositions.filter(function(pos){ return showPositions.indexOf(pos) === -1; }));
+            // split the remaining part ("123 x 123") to get cols and rows to override
+            if (mapSize.length
+                && mapSize.indexOf(' x ') !== -1){
+                let sizeParts = mapSize.split(' x ');
+                mapConfig.cols = parseInt(sizeParts[0]);
+                mapConfig.rows = parseInt(sizeParts[1]);
                 }
-            }
-        //console.log('--> showPositions = ', showPositions);
-        //console.log('--> hidePositions = ', hidePositions);
+            // if we're missing any critical information we should abort now
+            if (!mapConfig.cols || typeof mapConfig.cols !== 'number' || mapConfig.cols <= 0){ console.error('initMiniMap() could not determine valid cols from map size!'); return false; }
+            if (!mapConfig.rows || typeof mapConfig.rows !== 'number' || mapConfig.rows <= 0){ console.error('initMiniMap() could not determine valid rows from map size!'); return false; }
+            if (!mapConfig.tileWidth || typeof mapConfig.tileWidth !== 'number' || mapConfig.tileWidth <= 0){ console.error('initMiniMap() could not determine valid tileWidth from map size!'); return false; }
+            if (!mapConfig.tileHeight || typeof mapConfig.tileHeight !== 'number' || mapConfig.tileHeight <= 0){ console.error('initMiniMap() could not determine valid tileHeight from map size!'); return false; }
+            // update values with new calculations
+            mapConfig.width = mapConfig.cols * mapConfig.tileWidth;
+            mapConfig.height = mapConfig.rows * mapConfig.tileHeight;
+            mapConfig.realWidth = mapConfig.width + (mapConfig.padding * 2);
+            mapConfig.realHeight = mapConfig.height + (mapConfig.padding * 2);
+            //console.log('--> mapConfig = ', mapConfig);
+            let allPositions = [];
+            for (let row = 1; row <= mapConfig.rows; row++){
+                for (let col = 1; col <= mapConfig.cols; col++){
+                    allPositions.push(col + '-' + row);
+                    }
+                }
+            //console.log('--> allPositions = ', allPositions);
 
-        // Collect the source image itself (within the $mapImage div) and then generate a duplicate of it via canvas (so we can mask it)
-        let $mapImageSource = $('> img.source', $mapImage);
-        let $mapImageOverlay = $('> canvas.overlay', $mapImage);
-        //console.log('--> $mapImageSource = ', $mapImageSource.length, $mapImageSource);
-        //console.log('--> $mapImageOverlay = ', $mapImageOverlay.length, $mapImageOverlay);
-        //if (!$mapImageSource || !$mapImageSource.length){ console.error('initMiniMap() could not find map image source!'); return false; }
-        //if (!$mapImageOverlay || !$mapImageOverlay.length){ console.error('initMiniMap() could not find map image overlay canvas!'); return false; }
-        if (!$mapImageSource || !$mapImageSource.length){
-            //let mapImageSourceMarkup = '<img class="source" src="' + mapConfig.imageSource + '" width="' + mapConfig.realWidth + '" height="' + mapConfig.realHeight + '" />';
-            let mapImageSourceMarkup = '<img class="source" width="' + mapConfig.realWidth + '" height="' + mapConfig.realHeight + '" />';
-            $mapImage.append(mapImageSourceMarkup);
-            $mapImageSource = $('> img.source', $mapImage);
-            }
-        if (!$mapImageOverlay || !$mapImageOverlay.length){
-            let mapImageOverlayMarkup = '<canvas class="overlay" width="' + mapConfig.realWidth + '" height="' + mapConfig.realHeight + '" />';
-            $mapImage.append(mapImageOverlayMarkup);
-            $mapImageOverlay = $('> canvas.overlay', $mapImage);
-            }
-        //console.log('--> $mapImageSource = ', $mapImageSource.length, $mapImageSource);
-        //console.log('--> $mapImageOverlay = ', $mapImageOverlay.length, $mapImageOverlay);
-        // Now that we have both elements, we can proceed with loading the image source and drawing it to the overlay canvas
-        let mapImageSource = $mapImageSource.get(0);
-        let mapImageOverlay = $mapImageOverlay.get(0);
-        let mapImageOverlayMask = document.createElement('canvas');
-        mapImageSource.onload = function(){
-            //console.log('--> map image source loaded ...');
+            // Break apart the show/hide arrays of positions if provided and not-empty
+            let showPositions = [];
+            let hidePositions = [];
+            if (dataShow === 'all'){
+                showPositions = Object.values(allPositions);
+                if (dataHide && dataHide !== 'all'){
+                    hidePositions = dataHide.split(',');
+                    showPositions = Object.values(showPositions.filter(function(pos){ return hidePositions.indexOf(pos) === -1; }));
+                    }
+                }
+            if (dataHide === 'all'){
+                hidePositions = Object.values(allPositions);
+                if (dataShow && dataShow !== 'all'){
+                    showPositions = dataShow.split(',');
+                    hidePositions = Object.values(hidePositions.filter(function(pos){ return showPositions.indexOf(pos) === -1; }));
+                    }
+                }
+            //console.log('--> showPositions = ', showPositions);
+            //console.log('--> hidePositions = ', hidePositions);
 
-            // Collect canvas context and start drawing the image to it
-            let ctx = mapImageOverlay.getContext('2d');
-            let ctx2 = mapImageOverlayMask.getContext('2d', { willReadFrequently: true });
-            mapImageOverlay.width = mapConfig.realWidth;
-            mapImageOverlay.height = mapConfig.realHeight;
-            mapImageOverlayMask.width = mapConfig.realWidth;
-            mapImageOverlayMask.height = mapConfig.realHeight;
-            //console.log('--> drawing minimap image to canvas ...');
-            ctx.clearRect(0, 0, mapImageOverlay.width, mapImageOverlay.height);
-            ctx.drawImage(mapImageSource, 0, 0, mapConfig.realWidth, mapConfig.realHeight);
-            ctx2.clearRect(0, 0, mapImageOverlayMask.width, mapImageOverlayMask.height);
-            ctx2.drawImage(mapImageSource, 0, 0, mapConfig.realWidth, mapConfig.realHeight);
-            //console.log('--> mapImageSource = ', mapImageSource);
-            //console.log('--> mapImageOverlay = ', mapImageOverlay);
-            //console.log('--> mapImageOverlayMask = ', mapImageOverlayMask);
+            // Collect the source image itself (within the $worldImage div) and then generate a duplicate of it via canvas (so we can mask it)
+            let $worldImageSource = $('> img.source', $worldImage);
+            let $worldImageOverlay = $('> canvas.overlay', $worldImage);
+            //console.log('--> $worldImageSource = ', $worldImageSource.length, $worldImageSource);
+            //console.log('--> $worldImageOverlay = ', $worldImageOverlay.length, $worldImageOverlay);
+            //if (!$worldImageSource || !$worldImageSource.length){ console.error('initMiniMap() could not find map image source!'); return false; }
+            //if (!$worldImageOverlay || !$worldImageOverlay.length){ console.error('initMiniMap() could not find map image overlay canvas!'); return false; }
+            if (!$worldImageSource || !$worldImageSource.length){
+                //let worldImageSourceMarkup = '<img class="source" src="' + mapConfig.imageSource + '" width="' + mapConfig.realWidth + '" height="' + mapConfig.realHeight + '" />';
+                let worldImageSourceMarkup = '<img class="source" width="' + mapConfig.realWidth + '" height="' + mapConfig.realHeight + '" />';
+                $worldImage.append(worldImageSourceMarkup);
+                $worldImageSource = $('> img.source', $worldImage);
+                }
+            if (!$worldImageOverlay || !$worldImageOverlay.length){
+                let worldImageOverlayMarkup = '<canvas class="overlay" width="' + mapConfig.realWidth + '" height="' + mapConfig.realHeight + '" />';
+                $worldImage.append(worldImageOverlayMarkup);
+                $worldImageOverlay = $('> canvas.overlay', $worldImage);
+                }
+            //console.log('--> $worldImageSource = ', $worldImageSource.length, $worldImageSource);
+            //console.log('--> $worldImageOverlay = ', $worldImageOverlay.length, $worldImageOverlay);
+            // Now that we have both elements, we can proceed with loading the image source and drawing it to the overlay canvas
+            let worldImageSource = $worldImageSource.get(0);
+            let worldImageOverlay = $worldImageOverlay.get(0);
+            let worldImageOverlayMask = document.createElement('canvas');
+            worldImageSource.onload = function(){
+                //console.log('--> map image source loaded ...');
 
-            // Draw over the entire canvas with black to start with for the mask
-            ctx2.save();
-            ctx2.globalCompositeOperation = "source-in";
-            //ctx2.fillStyle = "#303030";
-            //ctx2.fillStyle = "#191919";
-            ctx2.fillStyle = "rgba(0, 0, 0, 0.3)";
-            ctx2.fillRect(0, 0, mapImageOverlay.width, mapImageOverlay.height);
-            ctx2.restore();
+                // Collect canvas context and start drawing the image to it
+                let ctx = worldImageOverlay.getContext('2d');
+                let ctx2 = worldImageOverlayMask.getContext('2d', { willReadFrequently: true });
+                worldImageOverlay.width = mapConfig.realWidth;
+                worldImageOverlay.height = mapConfig.realHeight;
+                worldImageOverlayMask.width = mapConfig.realWidth;
+                worldImageOverlayMask.height = mapConfig.realHeight;
+                //console.log('--> drawing minimap image to canvas ...');
+                ctx.clearRect(0, 0, worldImageOverlay.width, worldImageOverlay.height);
+                ctx.drawImage(worldImageSource, 0, 0, mapConfig.realWidth, mapConfig.realHeight);
+                ctx2.clearRect(0, 0, worldImageOverlayMask.width, worldImageOverlayMask.height);
+                ctx2.drawImage(worldImageSource, 0, 0, mapConfig.realWidth, mapConfig.realHeight);
+                //console.log('--> worldImageSource = ', worldImageSource);
+                //console.log('--> worldImageOverlay = ', worldImageOverlay);
+                //console.log('--> worldImageOverlayMask = ', worldImageOverlayMask);
 
-            // Quick inline function for drawing a black overlay over a given position (considering all dimensions)
-            let getPositionRect = function(position){
-                //console.log('%c' + 'mmrpgWorldMap.initMiniMap.getPositionRect(position:' + position + ')', 'color: orange;');
-                if (!position || typeof position !== 'string' || !position.length){ console.error('hideMiniMapPosition() missing required position!'); return false; }
-                let posXY = position.split('-');
-                let col = parseInt(posXY[0]);
-                let row = parseInt(posXY[1]);
-                let padd = mapConfig.padding;
-                let xPos = padd + ((col - 1) * mapConfig.tileWidth);
-                let yPos = padd + ((row - 1) * mapConfig.tileHeight);
-                let xWidth = mapConfig.tileWidth;
-                let yHeight = mapConfig.tileHeight;
-                let positionRect = { x: xPos, y: yPos, width: xWidth, height: yHeight  };
-                return positionRect;
+                // Draw over the entire canvas with black to start with for the mask
+                ctx2.save();
+                ctx2.globalCompositeOperation = "source-in";
+                //ctx2.fillStyle = "#303030";
+                //ctx2.fillStyle = "#191919";
+                ctx2.fillStyle = "rgba(0, 0, 0, 0.3)";
+                ctx2.fillRect(0, 0, worldImageOverlay.width, worldImageOverlay.height);
+                ctx2.restore();
+
+                // Quick inline function for drawing a black overlay over a given position (considering all dimensions)
+                let getPositionRect = function(position){
+                    //console.log('%c' + 'mmrpgWorldMap.initMiniMap.getPositionRect(position:' + position + ')', 'color: orange;');
+                    if (!position || typeof position !== 'string' || !position.length){ console.error('hideMiniMapPosition() missing required position!'); return false; }
+                    let posXY = position.split('-');
+                    let col = parseInt(posXY[0]);
+                    let row = parseInt(posXY[1]);
+                    let padd = mapConfig.padding;
+                    let xPos = padd + ((col - 1) * mapConfig.tileWidth);
+                    let yPos = padd + ((row - 1) * mapConfig.tileHeight);
+                    let xWidth = mapConfig.tileWidth;
+                    let yHeight = mapConfig.tileHeight;
+                    let positionRect = { x: xPos, y: yPos, width: xWidth, height: yHeight  };
+                    return positionRect;
+                    };
+
+                // Loop through the list of hidden positions and copy over masked pixels to the overlay where hidden
+                for (let i = 0; i < hidePositions.length; i++){
+                    let position = hidePositions[i];
+                    let positionRect = getPositionRect(position);
+                    //console.log('-> hiding position ' + position + ' ...');
+                    //console.log('--> w/ positionRect = ', positionRect);
+                    let imageData = ctx2.getImageData(positionRect.x, positionRect.y, positionRect.width, positionRect.height);
+                    ctx.putImageData(imageData, positionRect.x, positionRect.y);
+                    }
+                // Destroy the other canvas as we don't need it anymore
+                worldImageOverlayMask = null;
+                ctx2 = null;
+
+                // Given what we know about the viewport size, the (real) map size, and the currently focused position
+                // we should adjust the transform on the image container within to ensure focus is in center of viewport
+                if (dataFocus){
+                    //console.log('--> focusing on position ' + dataFocus + ' ...');
+                    let focusRect = getPositionRect(dataFocus);
+                    //console.log('--> w/ focusRect = ', focusRect);
+                    let focusX = focusRect.x + (focusRect.width / 2);
+                    let focusY = focusRect.y + (focusRect.height / 2);
+                    let offsetX = Math.round((viewportWidth / 2) - focusX);
+                    let offsetY = Math.round((viewportHeight / 2) - focusY);
+                    $worldImage.css({transform: 'translate(' + offsetX + 'px, ' + offsetY + 'px)' });
+                    }
+
+                // Mark the world mini map as ready and attempt to run the onComplete callback if provided
+                setTimeout(function(){
+                    worldMiniMapReady = true;
+                    $worldViewport.addClass('ready');
+                    if (onComplete && typeof onComplete === 'function'){ onComplete(); }
+                    }, 100);
+
                 };
+            worldImageSource.src = mapConfig.imageSource;
 
-            // Loop through the list of hidden positions and copy over masked pixels to the overlay where hidden
-            for (let i = 0; i < hidePositions.length; i++){
-                let position = hidePositions[i];
-                let positionRect = getPositionRect(position);
-                //console.log('-> hiding position ' + position + ' ...');
-                //console.log('--> w/ positionRect = ', positionRect);
-                let imageData = ctx2.getImageData(positionRect.x, positionRect.y, positionRect.width, positionRect.height);
-                ctx.putImageData(imageData, positionRect.x, positionRect.y);
+            }
+
+        // Intialize the area viewport next with a cloned version of the terrain (this one shows topography better)
+        let areaMiniMapReady = false;
+        let initAreaMiniMap = function(onComplete){
+            //console.log('%c' + '~initAreaMiniMap()', 'color: magenta;');
+
+            // Collect references to viewport elements
+            let $areaGrid = $('.grid', $areaViewport);
+            let $areaImage = $('.image', $areaViewport);
+            let $areaMarker = $('.marker', $areaViewport);
+
+            // Append the map terrain if it's not there already for visual reference
+            let $areaViewportTerrain = $('> canvas.terrain', $areaImage);
+            if (!$areaViewportTerrain || !$areaViewportTerrain.length){
+                let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
+                let $terrainCanvas = $('canvas[data-canvas="terrain"]', $terrainLayer);
+                let terrainCanvas = $terrainCanvas.get(0);
+                let baseTerrainWidth = terrainCanvas.width;
+                let baseTerrainHeight = terrainCanvas.height;
+                let fromTileSize = _config.mapTileSize[0];
+                let toTileSize = _config.miniMapAreaTileSize;
+                let miniTerrainWidth = Math.ceil((toTileSize / fromTileSize) * baseTerrainWidth);
+                let miniTerrainHeight = Math.ceil((toTileSize / fromTileSize) * baseTerrainHeight);
+                let $clonedTerrainCanvas = $terrainCanvas.clone();
+                let clonedTerrainCanvas = $clonedTerrainCanvas.get(0);
+                let clonedContext = clonedTerrainCanvas.getContext('2d');
+                clonedContext.drawImage(terrainCanvas, 0, 0);
+                $clonedTerrainCanvas.removeAttr('data-canvas').removeAttr('style');
+                $clonedTerrainCanvas.addClass('terrain');
+                $areaGrid.css({width: miniTerrainWidth + 'px', height: miniTerrainHeight + 'px', transform: 'translate(0, 0)'});
+                $areaImage.css({width: miniTerrainWidth + 'px', height: miniTerrainHeight + 'px', transform: 'translate(0, 0)'});
+                $areaImage.append($clonedTerrainCanvas);
+                $areaViewportTerrain = $('> canvas.terrain', $areaImage);
                 }
-            // Destroy the other canvas as we don't need it anymore
-            mapImageOverlayMask = null;
-            ctx2 = null;
 
-            // Given what we know about the viewport size, the (real) map size, and the currently focused position
-            // we should adjust the transform on the image container within to ensure focus is in center of viewport
-            if (dataFocus){
-                //console.log('--> focusing on position ' + dataFocus + ' ...');
-                let focusRect = getPositionRect(dataFocus);
-                //console.log('--> w/ focusRect = ', focusRect);
-                let focusX = focusRect.x + (focusRect.width / 2);
-                let focusY = focusRect.y + (focusRect.height / 2);
-                let offsetX = Math.round((viewportWidth / 2) - focusX);
-                let offsetY = Math.round((viewportHeight / 2) - focusY);
-                $mapImage.css({transform: 'translate(' + offsetX + 'px, ' + offsetY + 'px)' });
-                }
+            // Mark the world mini map as ready and attempt to run the onComplete callback if provided
+            setTimeout(function(){
+                areaMiniMapReady = true;
+                $areaViewport.addClass('ready');
+                if (onComplete && typeof onComplete === 'function'){ onComplete(); }
+                }, 100);
 
-            // Finally, we can mark the image and position markers as ready
-            setTimeout(function(){ $mapViewport.addClass('ready'); }, 100);
-            setTimeout(function(){ $mapImage.addClass('ready'); }, 300);
-            setTimeout(function(){ $mapMarker.addClass('ready'); }, 900);
+            }
 
+        // Define a function for changing the map view when the buttons are clicked
+        let updateMiniMapView = function(newView){
+            //console.log('%c' + '~updateMiniMapView(newView:' + newView + ')', 'color: magenta;');
+            if (!newView || typeof newView !== 'string' || !newView.length){ console.error('updateMiniMapView() missing required newView!'); return false; }
+            let $viewport, $button;
+            if (newView === 'world'){ $viewport = $worldViewport; $button = $worldViewButton; }
+            else if (newView === 'area'){ $viewport = $areaViewport; $button = $areaViewButton; }
+            else { console.error('updateMiniMapView() received invalid newView: ' + newView); return false; }
+            if ($viewport.is('.active')){ return true; } // already active, no need to change
+            let $marker = $('.marker', $viewport);
+            $('.viewport', $miniMap).removeClass('active');
+            $('.button', $miniMapButtons).removeClass('active');
+            $viewport.addClass('active');
+            $button.addClass('active');
+            return true;
             };
-        mapImageSource.src = mapConfig.imageSource;
+
+        // Define an onComplete callback to run once both viewports have been initialized
+        let onComplete = function(){
+            //console.log('%c' + '~initMiniMap.onComplete()', 'color: magenta;');
+            if (!worldMiniMapReady || !areaMiniMapReady){ return false; }
+            let isFastFade = $thisWorld.is('.fastfade') ? true : false;
+            if (!isFastFade){
+                setTimeout(function(){ updateMiniMapView('world', true); }, 100);
+                setTimeout(function(){ updateMiniMapView('area'); }, 2900);
+                } else {
+                setTimeout(function(){ updateMiniMapView('area'); }, 100);
+                }
+            return true;
+            };
+
+        // Delegate click events to the two buttons in the mini-map for changing views
+        $miniMapButtons.delegate('.button[data-view]', 'click', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            if (_self.worldIsBusy()){ return; }
+            //console.log('%c' + 'Mini-map view button clicked!', 'color: cyan;');
+            let $button = $(this);
+            let newView = $button.attr('data-view');
+            return updateMiniMapView(newView);
+            });
+
+        // Initialize the two mini maps and then call the onComplete callback
+        initWorldMiniMap(onComplete);
+        initAreaMiniMap(onComplete);
 
         // Return true on success
         return true;

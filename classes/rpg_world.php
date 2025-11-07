@@ -2446,10 +2446,19 @@ class rpg_world {
         $minimap_image_styles = '';
         $minimap_image_styles .= $minimap_size_styles.' ';
         // Put it all together into the final return markup
-        $return_markup .= '<div class="viewport">';
+        $return_markup .= '<div class="viewport world">';
             $return_markup .= '<div class="grid type '.$minimap_type.'"></div>';
             $return_markup .= '<div class="image" '.$minimap_image_attrs.' style="'.$minimap_size_styles.'"></div>';
-            $return_markup .= '<div class="position"><i class="arrow fas fa-caret-down"></i></div>';
+            $return_markup .= '<div class="marker"><i class="arrow fas fa-caret-down"></i></div>';
+        $return_markup .= '</div>';
+        $return_markup .= '<div class="viewport area">';
+            $return_markup .= '<div class="grid type '.$minimap_type.'"></div>';
+            $return_markup .= '<div class="image"></div>';
+            $return_markup .= '<div class="marker"><i class="arrow fas fa-angle-down"></i></div>';
+        $return_markup .= '</div>';
+        $return_markup .= '<div class="buttons">';
+            $return_markup .= '<button class="button" data-view="world"><i class="fas fa-globe"></i></button>';
+            $return_markup .= '<button class="button" data-view="area"><i class="fas fa-map"></i></button>';
         $return_markup .= '</div>';
         return $return_markup;
     }

@@ -506,7 +506,7 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
             <?
 
             // Grab the background sprite for this map and place a copy of it here behind everything else (for when the user over-zooms)
-            $background_layer_sprite = rpg_world::get_background_layer_sprite($this_prototype_data, $map_data_parsed, true);
+            $background_layer_sprite = rpg_world::get_background_layer_sprite($this_prototype_data, $map_data_parsed, false);
             echo('<div id="bg">'.$background_layer_sprite.'</div>'.PHP_EOL);
 
             // Collect top-level map data and define preset styles for the layers to use
@@ -542,14 +542,6 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
                 $data['start_direction'] = $this_prototype_data['this_current_direction'];
                 $data_json = json_encode($data, JSON_NUMERIC_CHECK);
                 echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
-
-                // BACKGROUND IMAGE
-                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
-                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
-                $background_layer_sprite = rpg_world::get_background_layer_sprite($this_prototype_data, $map_data_parsed);
-                echo('<div class="layer layer-0 background" data-layer="background" '.$map_layer_styles.$map_layer_attrs.'>');
-                    echo($background_layer_sprite);
-                echo('</div>'.PHP_EOL);
 
                 // TERRAIN TILES
                 foreach ($map_data_parsed['layers'] AS $map_layer_key => $map_layer_data){
@@ -614,16 +606,16 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
             $robots_overview_markup = $wrap_markup(rpg_world::get_robots_overview_markup($this_prototype_data, $robot_overview_robots));
             $mini_map_markup = $wrap_markup(rpg_world::get_mini_map_markup($this_prototype_data, $world_data_parsed, $map_data_parsed));
             ?>
-            <div id="back-button" class="chrome chrome-button"><?= $back_button_markup ?></div>
-            <div id="home-button" class="chrome chrome-button"><?= $home_button_markup ?></div>
-            <div id="reset-button" class="chrome chrome-button"><?= $reset_button_markup ?></div>
-            <div id="position-display" class="chrome"><?= $position_display_markup ?></div>
-            <div id="side-buttons" class="chrome"><?= $side_buttons_markup ?></div>
             <? if (!empty($cursor_palette_markup)){ ?><div id="cursor-palette" class="chrome"><?= $cursor_palette_markup ?></div><? } ?>
             <? if (!empty($player_switcher_markup)){ ?><div id="player-switcher" class="chrome"><?= $player_switcher_markup ?></div><? } ?>
             <? if (!empty($robots_overview_markup)){ ?><div id="robots-overview" class="chrome"><?= $robots_overview_markup ?></div><? } ?>
             <? if (!empty($mini_map_markup)){ ?><div id="mini-map" class="chrome"><?= $mini_map_markup ?></div><? } ?>
+            <div id="position-display" class="chrome"><?= $position_display_markup ?></div>
             <div id="loading-icon" class="chrome"><i class="fa fas fa-spinner"></i></div>
+            <div id="back-button" class="chrome chrome-button"><?= $back_button_markup ?></div>
+            <div id="home-button" class="chrome chrome-button"><?= $home_button_markup ?></div>
+            <div id="reset-button" class="chrome chrome-button"><?= $reset_button_markup ?></div>
+            <div id="side-buttons" class="chrome"><?= $side_buttons_markup ?></div>
         </div>
     </div>
 </div>
@@ -722,6 +714,7 @@ unset($db);
 <?
 // DEBUG DEBUG DEBUG
 echo('<!-- [[debug]] --//'.PHP_EOL);
+echo('  -> $world_data_parsed = '.trim(print_r($world_data_parsed, true)).PHP_EOL);
 echo('  -> $map_data_parsed = '.trim(print_r($map_data_parsed, true)).PHP_EOL);
 echo('//-- [[debug]] -->'.PHP_EOL);
 // DEBUG DEBUG DEBUG
