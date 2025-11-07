@@ -627,7 +627,7 @@ class rpg_world {
         $map_autorows = count($map_data_layers[0]);
         $map_tiles_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
         $map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)(,[-_a-z0-9,]+)?\)$/i'; // syntax: name(x,y[,flag1,flag2,etc.]) ie. spawn(4,4) or spawn(4,4,other-area-2) => name:spawn, x:4, y:4
-        $map_listval_custval_regex = '/^([.a-z0-9-_]+)\(([\+\:\.\,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
+        $map_listval_custval_regex = '/^([.a-z0-9-_\+]+)\(([\+\:\.\,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
         //$map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
         static $map_custval_parser;
         if (!$map_custval_parser){
@@ -2407,11 +2407,27 @@ class rpg_world {
         $current_world_area = $this_prototype_data['this_current_map'];
         $current_world_area_position = !empty($world_areas[$current_world_area]) ? $world_areas[$current_world_area][0] : '';
         foreach ($world_areas AS $area_token => $area_positions){
-            $tmp_world_map_token = $current_world.'__'.$area_token;
-            $area_visited = !empty($world_maps[$tmp_world_map_token]) ? true : false;
-            if (!$area_visited){ continue; }
-            $world_areas_visible[] = $area_token;
-            foreach ($area_positions AS $area_position){ $world_areas_visible_positions[] = $area_position; }
+            $is_multi_area = strstr($area_token, '+') ? true : false;
+            if (!$is_multi_area){
+                // Check if this area has been visited yet
+                $tmp_world_map_token = $current_world.'__'.$area_token;
+                $area_visited = !empty($world_maps[$tmp_world_map_token]) ? true : false;
+                if (!$area_visited){ continue; }
+                $world_areas_visible[] = $area_token;
+                foreach ($area_positions AS $area_position){ $world_areas_visible_positions[] = $area_position; }
+            } else {
+                // Explode list of areas and ensure all have been visited before showing
+                $area_tokens = explode('+', $area_token);
+                $areas_visited = 0;
+                foreach ($area_tokens AS $sub_area_token){
+                    $tmp_world_map_token = $current_world.'__'.$sub_area_token;
+                    $area_visited = !empty($world_maps[$tmp_world_map_token]) ? true : false;
+                    if ($area_visited){ $areas_visited++; }
+                }
+                if ($areas_visited < count($area_tokens)){ continue; }
+                $world_areas_visible[] = $area_token;
+                foreach ($area_positions AS $area_position){ $world_areas_visible_positions[] = $area_position; }
+            }
         }
         //error_log('$world_areas = '.print_r($world_areas, true));
         //error_log('$world_areas_visible = '.print_r($world_areas_visible, true));
