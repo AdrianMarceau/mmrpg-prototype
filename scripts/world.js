@@ -3387,6 +3387,8 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let _worldCursor = _world.cursor;
         let _worldPlayer = _world.player;
+        let _worldZoom = _world.zoomLevel;
+        let _reverseWorldZoom = (1 / _worldZoom);
         let _mapEffects = _config.mapEffects;
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
@@ -3398,6 +3400,7 @@ class mmrpgWorldMap {
         let $actionDropdown = _elements.actionDropdown;
         let $teamSprites = _elements.teamSprites;
         let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap); // later: $('.layer[data-layer="sprites"]', $canvasMap);
+        let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
         let $cursorSprite = $teamSprites.filter('.cursor');
         let $otherSprites = $teamSprites.filter(':not(.cursor)');
         let $trackingCursor = $('.sprite.tracking-cursor', $canvasMap);
@@ -3432,9 +3435,19 @@ class mmrpgWorldMap {
             else if (thisShiftDir.indexOf('down') !== -1){ thisVerDir = 'down'; }
             }
         //console.log('-> posHasChanged =', posHasChanged, '\n-> thisOldPos =', thisOldPos, '\n-> thisNewPos =', thisNewPos, '\n-> thisShiftDir =', thisShiftDir, '\n-> thisShiftDist =', thisShiftDist);
-        let tileOffsetX = (((thisNewCol - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0]);
-        let tileOffsetY = (((thisNewRow - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1]) - 10;
-        let tileOffsetZ = tileOffsetY + 1;
+        let tileOffsetX; // = (((thisNewCol - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0]);
+        let tileOffsetY; // = (((thisNewRow - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1]) - 10;
+        let tileOffsetZ; // = tileOffsetY + 1;
+        if (_mapEffects.usePerspective === true){
+            let tileSpriteOffset = _self.getLayerTileSpriteOffset(thisNewCol, thisNewRow);
+            tileOffsetX = tileSpriteOffset.left;
+            tileOffsetY = tileSpriteOffset.top;
+            tileOffsetZ = tileOffsetY + 1;
+            } else {
+            tileOffsetX = (((thisNewCol - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0]);
+            tileOffsetY = (((thisNewRow - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1]) - 10;
+            tileOffsetZ = tileOffsetY + 1;
+            }
         let cursorHasMoved = _worldCursor.moved || thisNewPos !== _mapStartPosition ? true : false;
         _self.resetZoomLevel();
         $canvasMap.addClass('busy');
@@ -4563,8 +4576,18 @@ class mmrpgWorldMap {
             // Move the team sprites in such a way that they point in the direction they're facing
             // We do this by first moving the player sprite(s) to the extreme edge of the panel (top/bottom/left/right/top-right/bottom-left/etc.)
             // Then we can loop through the others in order and position them relative to the player sprite (only align robot sprites to first player)
-            let targetX = (thisNewCol - 1) * _mapTileSize[0];
-            let targetY = (thisNewRow - 1) * _mapTileSize[1];
+            let targetX, targetY, targetZ;
+            if (_mapEffects.usePerspective === true){
+                let targetOffset = _self.getLayerTileSpriteOffset(thisNewCol, thisNewRow);
+                targetX = targetOffset.left;
+                targetY = targetOffset.top;
+                targetZ = targetY + 1;
+                } else {
+                targetX = (thisNewCol - 1) * _mapTileSize[0];
+                targetY = (thisNewRow - 1) * _mapTileSize[1];
+                targetZ = targetY + 1;
+                }
+            //console.log('-> targetX =', targetX, '\n-> targetY =', targetY, '\n-> targetZ =', targetZ);
             let spacingX = Math.ceil(_mapTileSize[0] / 4);
             let spacingY = Math.ceil(_mapTileSize[1] / 6);
             let playerPositions = [];
