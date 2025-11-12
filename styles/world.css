@@ -4445,6 +4445,15 @@ display: block;
     transform-origin: left top !important;
 } */
 
+/*
+#world #canvas #map {
+    background-color: rgb(255 0 0 / 30%);
+}
+#world #canvas #map .layer[data-layer="terrain"] svg {
+    background-color: rgb(0 255 0 / 30%);
+}
+*/
+
 /* TEMP TEMP TEMP */
 
 /* << perfect-scrollbar v0.6.2 start >> */
