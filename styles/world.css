@@ -148,6 +148,15 @@ html, body {
     position: relative;
     z-index: 1;
 }
+#world #canvas #map .layer[data-layer="terrain"] svg {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
 
 /* code for perspective mode (flakey right now, but maybe in future) */
 #world #canvas #map.has-perspective {
@@ -156,9 +165,14 @@ html, body {
 }
 #world #canvas #map.has-perspective .layer[data-layer="terrain"],
 #world #canvas #map.has-perspective .layer[data-layer="sprites/tiles"] {
+    transform-origin: top center;
     transform-style: preserve-3d;
     /* transform: perspective(var(--map-perspective-width)) rotateX(25deg) rotateY(0deg) scale(1);  */
     transform: perspective(var(--map-perspective-width)) rotateX(67.5deg) rotateY(0deg) scale(1);
+}
+#world #canvas #map.has-perspective .layer[data-layer="sprites/objects"] {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 /* define an animation for shaking the map back and forth rapidly to simulate damage/explosion/dramtic events */

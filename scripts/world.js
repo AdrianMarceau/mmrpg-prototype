@@ -114,6 +114,7 @@ gameSettings.worldState = {
     symbols: {},
     layersIndex: {},
     layerTilesIndex: {},
+    layerTileOffsets: {},
     baseMapTileKeys: [], // base array of tile keys that are part of the map
     walkableMapTileKeys: [], // array of tile keys that are specifically walkable
     zoomLevel: 1.0, // default zoom level,
@@ -3752,6 +3753,116 @@ class mmrpgWorldMap {
         _self.updateZoomLevel(newZoomLevel, true);
         await new Promise(resolve => setTimeout(resolve, zoomDelay));
         return _self.animateZoomToMax(maxZoomLevel, zoomIncrement, zoomDelay);
+        }
+
+    // Quick function for (re)generating the terrain tile overlay and indexing the positions of the all the tiles
+    refreshTerrainTileOverlay(){
+        console.log('%c' + 'mmrpgWorldMap.refreshTerrainTileOverlay()', 'color: magenta;');
+        let _self = this;
+        let _selfRef = _self.refreshTerrainTileOverlay;
+        let _config = _self.config;
+        let _mapEffects = _config.mapEffects;
+        let _mapSpriteSize = _config.mapSpriteSize;
+        let _world = _self.state;
+        let _worldZoom = _world.zoomLevel;
+        let _layerTileOffsets = _world.layerTileOffsets;
+        let _reverseWorldZoom = (1 / _worldZoom);
+        let _elements = _self.elements;
+        let $thisWorld = _elements.world;
+        let $canvasMap = _elements.map;
+        let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
+        let $terrainTileOverlay = $('svg[data-overlay="terrain"]', $terrainLayer);
+        let terrainTileOverlayRect = $terrainTileOverlay.length > 0 ? $terrainTileOverlay.get(0).getBoundingClientRect() : null;
+        let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
+        let $objectSprites = $('.sprite[data-sprite][data-col][data-row]', $spriteObjectsLayer);
+        //console.log('$spriteObjectsLayer =', $spriteObjectsLayer.length, $spriteObjectsLayer);
+        //console.log('$objectSprites =', $objectSprites.length, $objectSprites);
+        //console.log('-> _worldZoom =', _worldZoom);
+        //console.log('-> _reverseWorldZoom =', _reverseWorldZoom);
+        // Make sure we add a transparent SVG to the terrain layer to use as reference when positioning sprites in either mode
+        if (!$terrainTileOverlay || !$terrainTileOverlay.length){
+            let tileOverlayMarkup = '';
+            tileOverlayMarkup += '<svg data-overlay="terrain" width="100%" height="100%">';
+                for (let row = 0; row < _config.mapRows; row++){
+                    for (let col = 0; col < _config.mapCols; col++){
+                        let tileX = (col * _config.mapTileSize[0]);
+                        let tileY = (row * _config.mapTileSize[1]);
+                        let tileCol = col + 1;
+                        let tileRow = row + 1;
+                        let tilePos = tileCol + '-' + tileRow;
+                        let tileAttrs = '';
+                        tileAttrs += ' data-pos="' + tilePos + '" data-col="' + tileCol + '" data-row="' + tileRow + '"';
+                        tileAttrs += ' width="' + _config.mapTileSize[0] + '" height="' + _config.mapTileSize[1] + '"';
+                        tileAttrs += ' x="' + tileX + '" y="' + tileY + '"';
+                        tileAttrs += ' fill="transparent"';
+                        tileOverlayMarkup += '<rect' + tileAttrs + '></rect>';
+                        }
+                    }
+            tileOverlayMarkup += '</svg>';
+            $terrainLayer.prepend(tileOverlayMarkup);
+            $terrainTileOverlay = $('svg[data-overlay="terrain"]', $terrainLayer);
+            terrainTileOverlayRect = $terrainTileOverlay.get(0).getBoundingClientRect();
+            }
+        // Define a function for getting the bounding rect of a given element (layer, tile, or otherwise)
+        let getBoundingRect = _selfRef.getBoundingRect;
+        if (typeof getBoundingRect === 'undefined'){
+            getBoundingRect = function($element){
+                if (!$element || !$element.length){ return false; }
+                let boundingRect = $element.get(0).getBoundingClientRect();
+                return boundingRect;
+                };
+            _selfRef.getBoundingRect = getBoundingRect;
+            }
+        // Define a function for getting the reference tile for a given column and row in the terrain layer
+        let getReferenceTile = _selfRef.getReferenceTile;
+        if (typeof getReferenceTile === 'undefined'){
+            getReferenceTile = function($layer, col, row){
+                //console.log('%c' + '~ getReferenceTile($layer, col:' + col + ', row:' + row + ')', 'color: magenta;');
+                let $tileRect = $('rect[data-col="' + col + '"][data-row="' + row + '"]', $layer);
+                if (!$tileRect || !$tileRect.length){ return false; }
+                return $tileRect;
+                };
+            _selfRef.getReferenceTile = getReferenceTile;
+            }
+        // Define a function for getting the external tile offset for a given column and row for placing sprites
+        let getReferenceTileOffset = _selfRef.getReferenceTileOffset;
+        if (typeof getReferenceTileOffset === 'undefined'){
+            getReferenceTileOffset = function($layer, col, row){
+                //console.log('%c' + '~ getReferenceTileOffset(col:' + col + ', row:' + row + ')', 'color: magenta;');
+                let $refLayer = $layer;
+                let $refTile = getReferenceTile($refLayer, col, row);
+                let refTileRect = getBoundingRect($refTile);
+                let refTileOffset = {left: 0, top: 0, width: 0, height: 0};
+                let $targetLayer = $spriteObjectsLayer;
+                let targetLayerRect = getBoundingRect($targetLayer);
+                //console.log('-> $refLayer =', $refLayer.length, $refLayer);
+                //console.log('-> $refTile =', $refTile.length, $refTile);
+                //console.log('-> refTileRect =', JSON.stringify(refTileRect, null, 2));
+                //console.log('-> refTileOffset =', JSON.stringify(refTileOffset, null, 2));
+                //console.log('-> $targetLayer =', $targetLayer.length, $targetLayer);
+                //console.log('-> targetLayerRect =', JSON.stringify(targetLayerRect, null, 2));
+                refTileOffset.left = ((refTileRect.left) * _reverseWorldZoom); // - targetLayerRect.left;
+                refTileOffset.top = ((refTileRect.top) * _reverseWorldZoom) - (targetLayerRect.top * _reverseWorldZoom);
+                refTileOffset.width = (refTileRect.width * _reverseWorldZoom);
+                refTileOffset.height = (refTileRect.height * _reverseWorldZoom);
+                //console.log('-> refTileOffset =', JSON.stringify(refTileOffset, null, 2));
+                return refTileOffset;
+                };
+            _selfRef.getReferenceTileOffset = getReferenceTileOffset;
+            }
+        // Index the offet positions for these new reference tiles and save to the index
+        for (let row = 1; row <= _config.mapRows; row++){
+            for (let col = 1; col <= _config.mapCols; col++){
+                let $refLayer = $terrainTileOverlay;
+                let refTileOffset = getReferenceTileOffset($refLayer, col, row);
+                _layerTileOffsets[col + '-' + row] = refTileOffset;
+                }
+            }
+        _world.layerTileOffsets = _layerTileOffsets;
+        //console.log('-> _layerTileOffsets =', _layerTileOffsets);
+        console.log('-> _world.layerTileOffsets =', JSON.stringify(_world.layerTileOffsets, null, 2));
+        // Return true on success
+        return true;
         }
 
     // Quick function for toggling perspective mode on/off and then re-scrolling the map to refresh
