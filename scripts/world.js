@@ -3593,23 +3593,6 @@ class mmrpgWorldMap {
         let mapScrollY = scrollY;
         let targetX = (mapScrollX + (mapTileSizeX / 2) - (mapTileSizeOffsetX / 2)) * worldZoom;
         let targetY = (mapScrollY + (mapTileSizeY / 2) - (mapTileSizeOffsetY / 2)) * worldZoom;
-        // If perspective mode is currently on, we need to do some other pre-adjustments
-        if (usePerspective){
-            //console.log('-> _config.mapWidth:', _config.mapWidth, '_config.mapHeight:', _config.mapHeight);
-            $canvasMap.addClass('has-perspective');
-            $canvasMap.get(0).style.setProperty('--map-perspective-width', _config.mapWidth+'px');
-            let newLayerRect = $terrainLayer[0].getBoundingClientRect();
-            let newLayerWidth = newLayerRect.width, newLayerHeight = newLayerRect.height;
-            //console.log('-> newLayerRect:', newLayerRect);
-            //console.log('-> newLayerWidth:', newLayerWidth, 'newLayerHeight:', newLayerHeight);
-            $canvasMap.css({ width: newLayerWidth + 'px', height: newLayerHeight + 'px' });
-            mapWidth = newLayerWidth * worldZoom, mapHeight = newLayerHeight * worldZoom;
-            }
-        else {
-            $canvasMap.removeClass('has-perspective');
-            $canvasMap.get(0).style.setProperty('--map-perspective-width', '');
-            $canvasMap.css({ width: _config.mapWidth + 'px', height: _config.mapHeight + 'px' });
-            }
         // Now calculate the new translate values for the map container
         let translateX = 0, translateY = 0;
         if (mapWidth < worldWidth){ translateX = (worldWidth - mapWidth) / 2; }
