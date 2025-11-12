@@ -3858,6 +3858,49 @@ class mmrpgWorldMap {
         else { _mapEffects.usePerspective = false; }
         _self.scrollMap();
         return true;
+
+        }
+
+    // Define a quick function for getting the offset of a given layer tile on the map
+    getLayerTileOffset(col, row){
+        //console.log('%c' + 'mmrpgWorldMap.getLayerTileOffset(col:' + col + ', row:' + row + ')', 'color: magenta;');
+        if (typeof col !== 'number' || typeof row !== 'number'){ console.error('col and row must be numbers!'); return false; }
+        if (col < 1 || row < 1){ console.error('col and row must be greater than zero!'); return false; }
+        let _self = this;
+        let _config = _self.config;
+        let _mapEffects = _config.mapEffects;
+        let _mapSpriteSize = _config.mapSpriteSize;
+        let _world = _self.state;
+        let _worldZoom = _world.zoomLevel;
+        let _layerTileOffsets = _world.layerTileOffsets;
+        let _reverseWorldZoom = (1 / _worldZoom);
+        let refTilePosition = col + '-' + row;
+        let refTileOffset = _layerTileOffsets[refTilePosition];
+        if (!refTileOffset || typeof refTileOffset === 'undefined'){
+            console.error('No tile offset found for position ' + refTilePosition + '!');
+            console.log('_layerTileOffsets =', JSON.stringify(_layerTileOffsets, null, 2));
+            return false;
+            }
+        return refTileOffset;
+        }
+
+    // Define a quick function for getting the sprite offset of a given layer tile on the map
+    getLayerTileSpriteOffset(col, row){
+        //console.log('%c' + 'mmrpgWorldMap.getLayerTileSpriteOffset(col:' + col + ', row:' + row + ')', 'color: magenta;');
+        if (typeof col !== 'number' || typeof row !== 'number'){ console.error('col and row must be numbers!'); return false; }
+        if (col < 1 || row < 1){ console.error('col and row must be greater than zero!'); return false; }
+        let _self = this;
+        let _config = _self.config;
+        let _mapEffects = _config.mapEffects;
+        let _mapSpriteSize = _config.mapSpriteSize;
+        let refTileOffset = _self.getLayerTileOffset(col, row);
+        if (!refTileOffset || typeof refTileOffset === 'undefined'){ return false; }
+        let tileSpriteOffset = {left: 0, top: 0, width: 0, height: 0};
+        tileSpriteOffset.left = refTileOffset.left + (refTileOffset.width / 2) - (_mapSpriteSize[0] / 2);
+        tileSpriteOffset.top = refTileOffset.top + (refTileOffset.height / 2) - (_mapSpriteSize[1] / 2) - (_mapEffects.usePerspective ? 20 : 10);
+        tileSpriteOffset.width = refTileOffset.width;
+        tileSpriteOffset.height = refTileOffset.height;
+        return tileSpriteOffset;
         }
 
     // Quick function for updating the map interface and zoom/scroll after a position change
