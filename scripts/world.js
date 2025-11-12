@@ -24,7 +24,7 @@ gameSettings.worldConfig = {
     mapSize: [10, 10],
     mapTileSize: [80, 80],
     mapTileSizeOffset: [0, 0],
-    mapSpriteSize: [80, 80],
+    mapSpriteSize: [40, 40],
     mapSpriteSizeOffset: [0, 0],
     mapCols: 10, // default only
     mapRows: 10, // default only
@@ -77,6 +77,8 @@ gameSettings.worldConfig = {
     robotStatModMax: 5, // match the battle system
     robotStatModMin: -5, // match the battle system
     itemInventoryMax: 99, // match the battle system
+    //defaultZoomLevel: 1.0,  // DEBUG (normal)
+    //defaultZoomLevel: 0.5, // DEBUG (far out)
     defaultZoomLevel: 1.5, // slightly zoomed in
     zoomIncrement: 0.5, // zoom in/out by this amount
     minZoomLevel: 0.5, // slightly zoomed in
@@ -412,6 +414,7 @@ class mmrpgWorldMap {
             _config.allowWorldEvents = true;
             _self.playSoundEffect('teleport-in');
             _self.moveToPosition(startPosition, null, true, false, fakeOldPosition);
+            //_self.togglePerspectiveMode(); // TEMP TEMP TEMP
             setTimeout(function(){
                 console.log('%c' + 'MMRPG WORLD IS READY!', 'color: lime;');
                 _world.isReady = true;
@@ -419,9 +422,9 @@ class mmrpgWorldMap {
                 $thisWorld.addClass('ready');
                 $canvasMap.addClass('ready');
                 setTimeout(function(){
-                    _self.startIdleAnimation();
                     _self.triggerWindowEventsPull();
                     _self.triggerWorldReadyEvents();
+                    _self.startIdleAnimation();
                     _world.isBusy = false;
                     }, 900);
                 }, 100);
