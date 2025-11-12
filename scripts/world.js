@@ -3867,9 +3867,98 @@ class mmrpgWorldMap {
         let _self = this;
         let _config = _self.config;
         let _mapEffects = _config.mapEffects;
-        if (!_mapEffects.usePerspective){ _mapEffects.usePerspective = true; }
-        else { _mapEffects.usePerspective = false; }
+        let _mapSpriteSize = _config.mapSpriteSize;
+        let _world = _self.state;
+        let _worldZoom = _world.zoomLevel;
+        //let _layerTileOffsets = _world.layerTileOffsets;
+        let _reverseWorldZoom = (1 / _worldZoom);
+        let _elements = _self.elements;
+        let $thisWorld = _elements.world;
+        let $canvasMap = _elements.map;
+        let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
+        //let $terrainTileOverlay = $('svg[data-overlay="terrain"]', $terrainLayer);
+        //let terrainTileOverlayRect = $terrainTileOverlay.length > 0 ? $terrainTileOverlay.get(0).getBoundingClientRect() : null;
+        let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
+        let $objectSprites = $('.sprite[data-sprite][data-col][data-row]', $spriteObjectsLayer);
+        //console.log('$spriteObjectsLayer =', $spriteObjectsLayer.length, $spriteObjectsLayer);
+        //console.log('$objectSprites =', $objectSprites.length, $objectSprites);
+        //console.log('-> _worldZoom =', _worldZoom);
+        //console.log('-> _reverseWorldZoom =', _reverseWorldZoom);
+        // If perspective is turned on, let's apply necessary styles and adjustments then reposition sprites
+        if (!_mapEffects.usePerspective){
+            _mapEffects.usePerspective = true;
+            console.log('-> enabling perspective mode!');
+            //console.log('-> $canvasMap =', $canvasMap);
+            console.log('-> base values:');
+            let baseCanvasWidth = _config.mapWidth;
+            let baseCanvasHeight = _config.mapHeight;
+            let basePerspectiveWidth = 4000; //_config.mapWidth;
+            console.log('-> baseCanvasWidth:', baseCanvasWidth, 'baseCanvasHeight:', baseCanvasHeight);
+            //console.log('-> basePerspectiveWidth:', basePerspectiveWidth);
+            //console.log('-> _config.mapWidth:', _config.mapWidth, '_config.mapHeight:', _config.mapHeight);
+            $canvasMap.addClass('has-perspective');
+            $canvasMap.get(0).style.setProperty('--map-perspective-width', basePerspectiveWidth+'px');
+            // Adjust the map size to account for the perspective transform scaling
+            let newCanvasRect = $terrainLayer[0].getBoundingClientRect();
+            let newCanvasWidth = newCanvasRect.width, newCanvasHeight = newCanvasRect.height;
+            let newMapWidth = newCanvasWidth * (1 / _worldZoom), newMapHeight = newCanvasHeight * (1 / _worldZoom);
+            console.log('-> via getBoundingClientRect()');
+            //console.log('-> newCanvasRect:', newCanvasRect);
+            console.log('-> newCanvasWidth:', newCanvasWidth, 'newCanvasHeight:', newCanvasHeight);
+            console.log('-> newMapWidth:', newMapWidth, 'newMapHeight:', newMapHeight);
+            $canvasMap.css({ width: newMapWidth + 'px', height: newMapHeight + 'px' });
+            }
+        // Otherwise if perspective not enabled, make sure we put everything back to normal and reposition sprites
+        else {
+            _mapEffects.usePerspective = false;
+            //console.log('-> disabling perspective mode!');
+            $canvasMap.removeClass('has-perspective');
+            $canvasMap.get(0).style.setProperty('--map-perspective-width', '');
+            $canvasMap.css({ width: _config.mapWidth + 'px', height: _config.mapHeight + 'px' });
+            }
+        // Re-Index the offet positions for these new reference tiles and save to the index
+        _self.refreshTerrainTileOverlay();
+        // Define a function for aligning a given object sprite to a given column and row using the SVG tile reference we constructed
+        let alignSpriteToMapPosition = function($sprite, col, row){
+            //console.log('-----------------------------');
+            console.log('%c' + 'mmrpgWorldMap...alignSpriteToMapPosition($sprite, col:', col, ', row:', row, ')');
+            if (!$sprite || !$sprite.length){ console.error('$sprite is invalid!'); return false; }
+            if (typeof col !== 'number' || typeof row !== 'number'){ console.error('col and row must be numbers!'); return false; }
+            if (col < 1 || row < 1){ console.error('col and row must be greater than zero!'); return false; }
+            let refTileOffset = _self.getLayerTileOffset(col, row);
+            let spriteTileOffset = _self.getLayerTileSpriteOffset(col, row);
+            /*
+            // DEBUG DEBUG DEBUG
+            let $refDiv = null;
+            $spriteObjectsLayer.append('<div class="test-div" data-col="' + col + '" data-row="' + row + '" style=""></div>');
+            $refDiv = $('.test-div[data-col="' + col + '"][data-row="' + row + '"]', $spriteObjectsLayer);
+            $refDiv.css({display: 'block', position: 'absolute', outline: '2px solid red'});
+            $refDiv.css({left: refTileOffset.left + 'px', top: refTileOffset.top + 'px', zIndex: (refTileOffset.top + 1), width: refTileOffset.width + 'px', height: refTileOffset.height + 'px'});
+            //console.log('-> $refDiv =', $refDiv.length, $refDiv);
+            // DEBUG DEBUG DEBUG
+            $sprite.css({backgroundColor:'cyan'});
+            // DEBUG DEBUG DEBUG
+            */
+            //let spriteTileOffset = {left: 0, top: 0, width: 0, height: 0};
+            //spriteTileOffset.left = refTileOffset.left + (refTileOffset.width / 2) - (_mapSpriteSize[0] / 2);
+            //spriteTileOffset.top = refTileOffset.top + (refTileOffset.height / 2) - (_mapSpriteSize[1] / 2) - (_mapEffects.usePerspective ? 10 : 0);
+            //spriteTileOffset.width = refTileOffset.width;
+            //spriteTileOffset.height = refTileOffset.height;
+            //console.log('-> spriteTileOffset =', JSON.stringify(spriteTileOffset, null, 2));
+            $sprite.css({left: spriteTileOffset.left + 'px', top: spriteTileOffset.top + 'px', zIndex: (spriteTileOffset.top + 1)});
+            //console.log('-> $sprite =', $sprite.length, $sprite);
+            };
+        // Re-align all the object sprites now that we've toggled the perspective and adjusted sizing parameters
+        $objectSprites.each(function(){
+            let $thisSprite = $(this);
+            let spriteCol = parseInt($thisSprite.attr('data-col')) || 1;
+            let spriteRow = parseInt($thisSprite.attr('data-row')) || 1;
+            //let spritePosition = spriteCol + '-' + spriteRow;
+            alignSpriteToMapPosition($thisSprite, spriteCol, spriteRow);
+            });
+        // Re-scoll the map so things are into view now that everything has been fully adjusted
         _self.scrollMap();
+        // Return true on success
         return true;
 
         }
