@@ -161,6 +161,7 @@ class mmrpgWorldMap {
         if (!_self.checkIndexes()){ return false; }
         if (onReady){ _self.onWorldReady(onReady); }
         _self.initConfig();
+        _self.initIndexes();
         _self.initWorld($mmrpg);
         }
 
@@ -191,6 +192,52 @@ class mmrpgWorldMap {
         let _world = _self.state;
         _world.zoomLevel = _config.defaultZoomLevel;
         _world.userZoomLevel = _config.defaultZoomLevel; // TODO: remember this on reload
+        return true;
+        }
+
+    // Quick function to intialize helper methods on indexes for easier lookups and references
+    initIndexes(){
+        //console.log('%c' + 'mmrpgWorldMap.initIndexes()', 'color: orange;');
+        let _self = this;
+        let _config = _self.config;
+        let _indexes = _self.indexes;
+        // Define a quick inline function for generating an ID-to-token lookup
+        let _getIDs = function(index){
+            let tokens = Object.keys(index), ids = {};
+            for (var j = 0; j < tokens.length; j++){
+                let token = tokens[j], data = index[token];
+                if (!data.id){ continue; }
+                ids[data.id] = token;
+                }
+            return ids;
+            };
+        // Define the template function for actually getting the object data by ID
+        let _getByID = function(id){
+            let index = this;
+            let token = index._getByID[id] || false;
+            if (!token || typeof token !== 'string'){ return false; }
+            if (!index[token] || typeof index[token] !== 'object'){ return false; }
+            return index[token];
+            };
+        // Define a template function for getting the object data by token (just for consistency)
+        let _getByToken = function(token){
+            let index = this;
+            if (!token || typeof token !== 'string'){ return false; }
+            if (!index[token] || typeof index[token] !== 'object'){ return false; }
+            return index[token];
+            };
+        // Grab the available indexes and loop through them to add the new methods
+        let _indexKeys = Object.keys(_indexes);
+        for (var i = 0; i < _indexKeys.length; i++){
+            let key = _indexKeys[i], index = _indexes[key];
+            index._getByID = _getIDs(index);
+            index.getByID = _getByID;
+            index.getByToken = _getByToken;
+            _indexes[key] = index;
+            }
+        // Reassign the updated indexes back to the class object
+        _self.indexes = _indexes;
+        // Return true on success
         return true;
         }
 
