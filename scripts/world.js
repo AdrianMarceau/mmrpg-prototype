@@ -3803,7 +3803,7 @@ class mmrpgWorldMap {
 
     // Quick function for (re)generating the terrain tile overlay and indexing the positions of the all the tiles
     refreshTerrainTileOverlay(){
-        console.log('%c' + 'mmrpgWorldMap.refreshTerrainTileOverlay()', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.refreshTerrainTileOverlay()', 'color: magenta;');
         let _self = this;
         let _selfRef = _self.refreshTerrainTileOverlay;
         let _config = _self.config;
@@ -3906,7 +3906,7 @@ class mmrpgWorldMap {
             }
         _world.layerTileOffsets = _layerTileOffsets;
         //console.log('-> _layerTileOffsets =', _layerTileOffsets);
-        console.log('-> _world.layerTileOffsets =', JSON.stringify(_world.layerTileOffsets, null, 2));
+        //console.log('-> _world.layerTileOffsets =', JSON.stringify(_world.layerTileOffsets, null, 2));
         // Return true on success
         return true;
         }
@@ -3937,13 +3937,13 @@ class mmrpgWorldMap {
         // If perspective is turned on, let's apply necessary styles and adjustments then reposition sprites
         if (!_mapEffects.usePerspective){
             _mapEffects.usePerspective = true;
-            console.log('-> enabling perspective mode!');
+            //console.log('-> enabling perspective mode!');
             //console.log('-> $canvasMap =', $canvasMap);
-            console.log('-> base values:');
+            //console.log('-> base values:');
             let baseCanvasWidth = _config.mapWidth;
             let baseCanvasHeight = _config.mapHeight;
             let basePerspectiveWidth = 4000; //_config.mapWidth;
-            console.log('-> baseCanvasWidth:', baseCanvasWidth, 'baseCanvasHeight:', baseCanvasHeight);
+            //console.log('-> baseCanvasWidth:', baseCanvasWidth, 'baseCanvasHeight:', baseCanvasHeight);
             //console.log('-> basePerspectiveWidth:', basePerspectiveWidth);
             //console.log('-> _config.mapWidth:', _config.mapWidth, '_config.mapHeight:', _config.mapHeight);
             $canvasMap.addClass('has-perspective');
@@ -3952,10 +3952,10 @@ class mmrpgWorldMap {
             let newCanvasRect = $terrainLayer[0].getBoundingClientRect();
             let newCanvasWidth = newCanvasRect.width, newCanvasHeight = newCanvasRect.height;
             let newMapWidth = newCanvasWidth * (1 / _worldZoom), newMapHeight = newCanvasHeight * (1 / _worldZoom);
-            console.log('-> via getBoundingClientRect()');
+            //console.log('-> via getBoundingClientRect()');
             //console.log('-> newCanvasRect:', newCanvasRect);
-            console.log('-> newCanvasWidth:', newCanvasWidth, 'newCanvasHeight:', newCanvasHeight);
-            console.log('-> newMapWidth:', newMapWidth, 'newMapHeight:', newMapHeight);
+            //console.log('-> newCanvasWidth:', newCanvasWidth, 'newCanvasHeight:', newCanvasHeight);
+            //console.log('-> newMapWidth:', newMapWidth, 'newMapHeight:', newMapHeight);
             $canvasMap.css({ width: newMapWidth + 'px', height: newMapHeight + 'px' });
             }
         // Otherwise if perspective not enabled, make sure we put everything back to normal and reposition sprites
@@ -3971,7 +3971,7 @@ class mmrpgWorldMap {
         // Define a function for aligning a given object sprite to a given column and row using the SVG tile reference we constructed
         let alignSpriteToMapPosition = function($sprite, col, row){
             //console.log('-----------------------------');
-            console.log('%c' + 'mmrpgWorldMap...alignSpriteToMapPosition($sprite, col:', col, ', row:', row, ')');
+            //console.log('%c' + 'mmrpgWorldMap...alignSpriteToMapPosition($sprite, col:', col, ', row:', row, ')');
             if (!$sprite || !$sprite.length){ console.error('$sprite is invalid!'); return false; }
             if (typeof col !== 'number' || typeof row !== 'number'){ console.error('col and row must be numbers!'); return false; }
             if (col < 1 || row < 1){ console.error('col and row must be greater than zero!'); return false; }
@@ -4030,7 +4030,7 @@ class mmrpgWorldMap {
         let refTileOffset = _layerTileOffsets[refTilePosition];
         if (!refTileOffset || typeof refTileOffset === 'undefined'){
             console.error('No tile offset found for position ' + refTilePosition + '!');
-            console.log('_layerTileOffsets =', JSON.stringify(_layerTileOffsets, null, 2));
+            //console.log('_layerTileOffsets =', JSON.stringify(_layerTileOffsets, null, 2));
             return false;
             }
         return refTileOffset;
