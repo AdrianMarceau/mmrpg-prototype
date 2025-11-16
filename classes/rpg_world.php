@@ -299,6 +299,20 @@ class rpg_world {
                         if (isset($data['speedMods'])){ $robotSession['speed'] = intval($data['speedMods']); }
                         // Check for settings changes and update session values accordingly
                         if (isset($data['item'])){ $robotSettings['robot_item'] = trim($data['item']); }
+                        if (isset($data['abilities'])){
+                            //error_log('-> $data[\'abilities\'] = '. print_r($data['abilities'], true));
+                            $newAbilityIDs = $data['abilities'];
+                            $indexedAbilityIDs = rpg_ability::get_indexed_ids();
+                            $newAbilitySettings = array();
+                            foreach ($newAbilityIDs AS $newID){
+                                if (!isset($indexedAbilityIDs[$newID])){ continue; }
+                                $newToken = $indexedAbilityIDs[$newID];
+                                $newAbilitySettings[$newToken] = array('ability_token' => $newToken);
+                                }
+                            //error_log('-> $newAbilitySettings = '. print_r($newAbilitySettings, true));
+                            if (!empty($newAbilitySettings)){ $robotSettings['robot_abilities'] = $newAbilitySettings; }
+                            //error_log('-> NOT saving yet...');
+                        }
                         // DEBUG DEBUG DEBUG
                         //error_log('-> $robotSession(after) = '. print_r($robotSession, true));
                         //error_log('-> $robotSettings(after) = '. print_r($robotSettings, true));
