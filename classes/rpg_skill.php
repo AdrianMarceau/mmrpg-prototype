@@ -887,6 +887,18 @@ class rpg_skill extends rpg_object {
         return $index;
     }
 
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $skill_index_byid = false;
+        if ($skill_index_byid === false){
+            $skill_index_byid = array();
+            $skill_index = self::get_index(true, true);
+            if (empty($skill_index)){ $skill_index = array(); }
+            foreach ($skill_index AS $token => $skill){ $skill_index_byid[$skill['skill_id']] = $token; }
+        }
+        return $skill_index_byid;
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($skill_token){
 

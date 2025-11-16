@@ -3410,6 +3410,18 @@ class rpg_robot extends rpg_object {
         return $index;
     }
 
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $robot_index_byid = false;
+        if ($robot_index_byid === false){
+            $robot_index_byid = array();
+            $robot_index = self::get_index(true, true);
+            if (empty($robot_index)){ $robot_index = array(); }
+            foreach ($robot_index AS $token => $robot){ $robot_index_byid[$robot['robot_id']] = $token; }
+        }
+        return $robot_index_byid;
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($robot_token){
 

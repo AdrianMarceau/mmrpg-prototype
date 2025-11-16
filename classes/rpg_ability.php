@@ -1159,6 +1159,18 @@ class rpg_ability extends rpg_object {
         return $index;
     }
 
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $ability_index_byid = false;
+        if ($ability_index_byid === false){
+            $ability_index_byid = array();
+            $ability_index = self::get_index(true, true);
+            if (empty($ability_index)){ $ability_index = array(); }
+            foreach ($ability_index AS $token => $ability){ $ability_index_byid[$ability['ability_id']] = $token; }
+        }
+        return $ability_index_byid;
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($ability_token){
 

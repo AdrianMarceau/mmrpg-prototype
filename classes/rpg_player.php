@@ -2500,6 +2500,18 @@ class rpg_player extends rpg_object {
         return $index;
     }
 
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $player_index_byid = false;
+        if ($player_index_byid === false){
+            $player_index_byid = array();
+            $player_index = self::get_index(true, true);
+            if (empty($player_index)){ $player_index = array(); }
+            foreach ($player_index AS $token => $player){ $player_index_byid[$player['player_id']] = $token; }
+        }
+        return $player_index_byid;
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($player_token){
 

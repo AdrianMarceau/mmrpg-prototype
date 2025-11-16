@@ -1103,6 +1103,18 @@ class rpg_item extends rpg_object {
         return $index;
     }
 
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $item_index_byid = false;
+        if ($item_index_byid === false){
+            $item_index_byid = array();
+            $item_index = self::get_index(true, true);
+            if (empty($item_index)){ $item_index = array(); }
+            foreach ($item_index AS $token => $item){ $item_index_byid[$item['item_id']] = $token; }
+        }
+        return $item_index_byid;
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($item_token){
 

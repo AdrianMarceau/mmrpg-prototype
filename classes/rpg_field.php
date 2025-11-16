@@ -353,6 +353,18 @@ class rpg_field extends rpg_object {
         return $index;
     }
 
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $field_index_byid = false;
+        if ($field_index_byid === false){
+            $field_index_byid = array();
+            $field_index = self::get_index(true, true);
+            if (empty($field_index)){ $field_index = array(); }
+            foreach ($field_index AS $token => $field){ $field_index_byid[$field['field_id']] = $token; }
+        }
+        return $field_index_byid;
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($field_token){
 
