@@ -71,6 +71,7 @@ gameSettings.worldConfig = {
     homeButtonURL: '#', // populated on init
     resetButtonURL: '#', // populated on init
     allowWorldEvents: false, // default until user interaction
+    maxAbilitiesPerRobot: 8, // match the battle system b/c duh
     robotStorageSlotsVisible: 8, // probably wont change as it's what fits
     itemStorageSlotsVisible: 24, // probably wont change as it's what fits
     abilityStorageSlotsVisible: 24, // probably wont change as it's what fits
@@ -2659,7 +2660,7 @@ class mmrpgWorldMap {
                     //console.log('-> targetRobotToken =', targetRobotToken);
 
                     // Launch a modal for the given action on the selected robot if applicable
-                    console.warn('TODO: implement ability action ' + actionToken + ' modal functionality! w/', '\n-> actionToken =', actionToken, '\n-> abilityToken =', abilityToken, '\n-> targetRobotToken =', targetRobotToken);
+                    //console.log('ability action ' + actionToken + ' modal functionality! w/', '\n-> actionToken =', actionToken, '\n-> abilityToken =', abilityToken, '\n-> targetRobotToken =', targetRobotToken);
                     if (actionToken === 'equip-ability'){ _self.showEquipAbilityModal(abilityToken, targetRobotToken); }
                     else { console.warn('-> undefined ability action "', actionToken, '", ignoring input'); return false; }
 
@@ -8277,9 +8278,11 @@ class mmrpgWorldMap {
             //console.log('--> actionKind is ability ...', itemOrAbilityToken);
             let abilitiesIndex = _indexes.abilities;
             let currentAbilities = playerRobotInfo.abilities;
+            let maxAbilitiesPerRobot = _config.maxAbilitiesPerRobot;
             let newAbilityToken = itemOrAbilityToken;
             let newAbilityInfo = typeof abilitiesIndex[newAbilityToken] !== 'undefined' ? abilitiesIndex[newAbilityToken] : null;
             let generateAbilitySelectButtonMarkup = _self.generateAbilitySelectButtonMarkup.bind(_self);
+            let generateAbilitySelectPlaceholderMarkup = _self.generateAbilitySelectPlaceholderMarkup.bind(_self);
             if (!newAbilityToken || !newAbilityInfo){ console.error('showActionModal() could not find new ability info for token ' + newAbilityToken + '!'); return; }
             //console.log('--> abilitiesIndex =', abilitiesIndex);
             //console.log('--> currentAbilities =', currentAbilities);
@@ -8289,13 +8292,20 @@ class mmrpgWorldMap {
             let selectedAbilityList = '';
             let currentAbilityList = '';
             selectedAbilityList += generateAbilitySelectButtonMarkup(newAbilityToken, playerRobotInfo, {selected: true});
-            for (var slotKey = 0; slotKey < currentAbilities.length; slotKey++){
-                let currentAbilityID = currentAbilities[slotKey];
-                let currentAbilityInfo = abilitiesIndex.getByID(currentAbilityID);
-                let currentAbilityToken = currentAbilityInfo ? currentAbilityInfo.token : null;
-                if (!currentAbilityInfo || !currentAbilityToken){ continue; }
-                let isDisabled = currentAbilityToken === newAbilityToken ? true : false;
-                currentAbilityList += generateAbilitySelectButtonMarkup(currentAbilityToken, playerRobotInfo, {slot: slotKey, disabled: isDisabled});
+            //for (var slotKey = 0; slotKey < currentAbilities.length; slotKey++){
+            for (var slotKey = 0, numEmpty = 0; slotKey < maxAbilitiesPerRobot; slotKey++){
+                let currentAbilityID = typeof currentAbilities[slotKey] !== 'undefined' ? currentAbilities[slotKey] : null;
+                let currentAbilityInfo = currentAbilityID ? abilitiesIndex.getByID(currentAbilityID) : null;
+                let currentAbilityToken = currentAbilityID && currentAbilityInfo ? currentAbilityInfo.token : null;
+                let isDisabled = currentAbilityToken === newAbilityToken || (!currentAbilityToken && numEmpty > 0) ? true : false;
+                let buttonOptions = {slot: slotKey, disabled: isDisabled};
+                //if (!currentAbilityInfo || !currentAbilityToken){ continue; }
+                if (currentAbilityID && currentAbilityToken && currentAbilityInfo){
+                    currentAbilityList += generateAbilitySelectButtonMarkup(currentAbilityToken, playerRobotInfo, buttonOptions);
+                    } else {
+                    currentAbilityList += generateAbilitySelectPlaceholderMarkup(playerRobotInfo, buttonOptions);
+                    numEmpty++;
+                    }
                 }
             // TEMP TEMP TEMP
             //selectedAbilityList = '<img width="140" height="34" src="images/_temp/mmrpg-mockup-2025-10-26_ability-span.png" style="" />';
@@ -8415,15 +8425,17 @@ class mmrpgWorldMap {
                 //console.log('%c' + 'Ability select button clicked!', 'color: cyan;');
                 let $button = $(this);
                 let $container = $button.closest('.ability-list');
-                let index = _indexes.abilities;
-                let token = $button.attr('data-ability');
-                let info = token ? index[token] : null;
                 //console.log('-> $button =', $button);
-                //console.log('-> token =', token);
-                //console.log('-> info =', info);
+                //console.log('-> $container =', $container);
                 if ($button.is('.disabled') || $button.is('[disabled]')){ return false; }
+                let token = $button.attr('data-ability');
+                //console.log('-> token =', token);
                 if (!token || !token.length){ console.error('Ability select button clicked, but no ability token found!'); return false; }
-                if (!info || typeof info === 'undefined'){ console.error('Ability select button clicked, but ability token ' + token + ' not found in index!'); return false; }
+                let isPlaceholder = token === 'ability' ? true : false;
+                let index = _indexes.abilities;
+                let info = !isPlaceholder ? index[token] : null;
+                if (!isPlaceholder && (!info || typeof info === 'undefined')){ console.error('Ability select button clicked, but ability token ' + token + ' not found in index!'); return false; }
+                //console.log('-> info =', info);
                 if (!$button.is('.selected')){
                     //console.log('--> change selected ability to', token);
                     $container.addClass('has-selection');
@@ -8604,6 +8616,32 @@ class mmrpgWorldMap {
 
         return buttonMarkup;
 
+        }
+
+    // Define a quick function for generating the markup for an ability select placeholder given robot info, and/or optional settings
+    generateAbilitySelectPlaceholderMarkup(playerRobotInfo, buttonOptions){
+        //console.log('%c' + 'mmrpgWorldMap.generateAbilitySelectPlaceholderMarkup(playerRobotInfo, buttonOptions)', 'color: magenta;');
+        //console.log('-> w/ playerRobotInfo =', playerRobotInfo);
+        //console.log('-> w/ buttonOptions =', buttonOptions);
+        if (!playerRobotInfo || typeof playerRobotInfo !== 'object'){ playerRobotInfo = null; }
+        if (!buttonOptions || typeof buttonOptions !== 'object'){ buttonOptions = {}; }
+        let _self = this;
+        let _config = _self.config;
+        buttonOptions.selected = typeof buttonOptions.selected !== 'undefined' ? buttonOptions.selected : false;
+        buttonOptions.disabled = typeof buttonOptions.disabled !== 'undefined' ? buttonOptions.disabled : false;
+        buttonOptions.slot = typeof buttonOptions.slot === 'number' ? buttonOptions.slot : false;
+        let buttonAttrs = '';
+        buttonAttrs += ' data-ability="ability"';
+        let buttonClass = 'team-ability placeholder' + (buttonOptions.selected ? ' selected' : '') + (buttonOptions.disabled ? ' disabled' : '');
+        let buttonStyle = '';
+        buttonAttrs += ' class="' + buttonClass + '"';
+        if (buttonOptions.slot !== false){ buttonAttrs += ' data-slot="' + buttonOptions.slot + '"'; }
+        if (buttonStyle.length){ buttonAttrs += ' style="' + buttonStyle + '"'; }
+        let buttonMarkup = '';
+        buttonMarkup += '<div' + buttonAttrs + '>';
+            buttonMarkup += '<span class="tint type empty"></span>';
+        buttonMarkup += '</div>';
+        return buttonMarkup;
         }
 
     // Define a quick function for initializing the minimap HUD and its elements, focus, position, and any masking
