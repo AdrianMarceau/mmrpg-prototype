@@ -8148,14 +8148,14 @@ class mmrpgWorldMap {
         _selfRef.mapIsHiddenBackup = _world.mapIsHidden;
 
         // If a target robot token was provided, collect its info now
-        let targetRobotInfo = null;
-        let targetRobotName = '';
+        let playerRobotInfo = null;
+        let playerRobotName = '';
         if (targetRobotToken
             && typeof _worldPlayerRobots[targetRobotToken] !== 'undefined'){
-            console.log('--> target robot provided ...', targetRobotToken);
-            targetRobotInfo = _worldPlayerRobots[targetRobotToken];
-            console.log('--> found targetRobotInfo =', targetRobotInfo);
-            targetRobotName = targetRobotInfo.name || '[' + targetRobotToken + ']';
+            //console.log('--> target robot provided ...', targetRobotToken);
+            playerRobotInfo = _worldPlayerRobots[targetRobotToken];
+            //console.log('--> found playerRobotInfo =', playerRobotInfo);
+            playerRobotName = playerRobotInfo.name || '[' + targetRobotToken + ']';
             }
 
         // Define template parameters for this modal to be updated as-needed
@@ -8163,8 +8163,8 @@ class mmrpgWorldMap {
         modalDetails.action = actionKind + '_' + actionToken;
         modalDetails.title = actionToken.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + ' Action';
         modalDetails.subtitles = {};
-        modalDetails.subtitles.forSelected = 'Selected ' + (actionKind === 'item' ? 'Item' : 'Ability') + (targetRobotName ? ' for <strong>' + targetRobotName + '</strong>' : '');
-        modalDetails.subtitles.forCurrent = (targetRobotName ? '<strong>' + targetRobotName + '</strong>\'s ' : '') + 'Current ' + (actionKind === 'item' ? 'Items' : 'Abilities');
+        modalDetails.subtitles.forSelected = 'Selected ' + (actionKind === 'item' ? 'Item' : 'Ability') + (playerRobotName ? ' for <strong>' + playerRobotName + '</strong>' : '');
+        modalDetails.subtitles.forCurrent = (playerRobotName ? '<strong>' + playerRobotName + '</strong>\'s ' : '') + 'Current ' + (actionKind === 'item' ? 'Items' : 'Abilities');
         modalDetails.subtitles.forTooltip = '';
         modalDetails.containers = {};
         modalDetails.containers.forSelected = '';
@@ -8173,6 +8173,97 @@ class mmrpgWorldMap {
         modalDetails.buttons.confirm = { action: 'confirm', text: 'Confirm', disabled: false };
         modalDetails.buttons.cancel = { action: 'cancel', text: 'Cancel', disabled: false };
 
+        // Define a reusable function for resetting the action modal
+        let resetActionModal = function(){
+            //console.log('%c' + '~mmrpgWorldMap.showActionModal.resetActionModal()', 'color: magenta;');
+            let $content = $actionModal.find('.content');
+            $actionModal.removeClass('active');
+            $content.find('.title').html('');
+            $content.find('.subtitle').html('');
+            $content.find('.container').html('');
+            return true;
+            };
+
+        // Define a reusable function for hiding the action modal
+        let hideActionModal = function(alsoReset){
+            //console.log('%c' + '~mmrpgWorldMap.showActionModal.hideActionModal()', 'color: magenta;');
+            $actionModal.addClass('hidden');
+            _world.mapIsHidden = _selfRef.mapIsHiddenBackup;
+            alsoReset = typeof alsoReset === 'boolean' ? alsoReset : false;
+            if (alsoReset){ setTimeout(function(){ resetActionModal(); }, 600); }
+            return true;
+            };
+
+        // Define the action for the cancel button click
+        let onCancelAction = function(action){
+            //console.log('%c' + '~mmrpgWorldMap.showActionModal.onCancelAction(action:' + action + ')', 'color: magenta;');
+            hideActionModal(true);
+            return true;
+            };
+
+        // Define the action for the confirm button click
+        let onConfirmAction = function(action){
+            //console.log('%c' + '~mmrpgWorldMap.showActionModal.onConfirmAction(action:' + action + ')', 'color: magenta;');
+            action = action.split('_');
+            let actionKind = action[0];
+            let actionToken = action[1];
+            if (actionKind === 'item'){ return onConfirmItemAction(actionToken); }
+            else if (actionKind === 'ability'){ return onConfirmAbilityAction(actionToken); }
+            else { console.error('showActionModal.onConfirmAction() received invalid actionKind ' + actionKind + '!'); return false; }
+            };
+        let onConfirmItemAction = function(action){
+            console.log('%c' + '~mmrpgWorldMap.showActionModal.onConfirmItemAction(action:' + action + ')', 'color: magenta;');
+            // TODO: ...
+            return true;
+            };
+        let onConfirmAbilityAction = function(action){
+            console.log('%c' + '~mmrpgWorldMap.showActionModal.onConfirmAbilityAction(action:' + action + ')', 'color: magenta;');
+            $actionModal.addClass('busy');
+            let abilitiesIndex = _indexes.abilities;
+            let currentAbilities = playerRobotInfo.abilities;
+            let $currentAbilitiesList = $actionModal.find('.container.for-current .ability-list.current');
+            if (action === 'equip-ability'){
+                //console.log('--> equipping new ability ...');
+                let $selectedAbilityButton = $currentAbilitiesList.find('.team-ability[data-ability].selected');
+                let selectedAbilityToken = $selectedAbilityButton.length ? $selectedAbilityButton.attr('data-ability') : null;
+                let selectedAbilitySlot = $selectedAbilityButton.length ? parseInt($selectedAbilityButton.attr('data-slot')) : null;
+                let selectedAbilityID = selectedAbilityToken && abilitiesIndex[selectedAbilityToken] ? abilitiesIndex[selectedAbilityToken].id : null;
+                //console.log('--> selectedAbilityToken =', selectedAbilityToken);
+                //console.log('--> selectedAbilitySlot =', selectedAbilitySlot);
+                //console.log('--> selectedAbilityID =', selectedAbilityID);
+                let newAbilityToken = $actionModal.attr('data-action-token'); //itemOrAbilityToken;
+                let newAbilityID = abilitiesIndex[newAbilityToken] ? abilitiesIndex[newAbilityToken].id : null;
+                let newAbilityMarkup = _self.generateAbilitySelectButtonMarkup(newAbilityToken, playerRobotInfo, {slot: selectedAbilitySlot});
+                //console.log('--> newAbilityToken =', newAbilityToken);
+                //console.log('--> newAbilityID =', newAbilityID);
+                //console.log('--> currentAbilities(before) =', JSON.stringify(currentAbilities));
+                // doesn't exist yet so we can just replace at the selected slot
+                if (currentAbilities.indexOf(newAbilityID) === -1){
+                    currentAbilities[selectedAbilitySlot] = newAbilityID;
+                    $selectedAbilityButton.replaceWith(newAbilityMarkup);
+                    }
+                // already there so user must want to swap positions of the two abilities
+                else {
+                    let existingAbilitySlot = currentAbilities.indexOf(newAbilityID);
+                    currentAbilities[selectedAbilitySlot] = newAbilityID;
+                    currentAbilities[existingAbilitySlot] = selectedAbilityID;
+                    let $existingAbilityButton = $currentAbilitiesList.find('.team-ability[data-ability="' + newAbilityToken + '"]');
+                    $existingAbilityButton.replaceWith(_self.generateAbilitySelectButtonMarkup(selectedAbilityToken, playerRobotInfo, {slot: existingAbilitySlot}));
+                    $selectedAbilityButton.replaceWith(newAbilityMarkup);
+                    }
+                //console.log('--> currentAbilities(after) =', JSON.stringify(currentAbilities));
+                playerRobotInfo.abilities = currentAbilities;
+                let $newAbilityButton = $currentAbilitiesList.find('.team-ability[data-ability="' + newAbilityToken + '"]');
+                $newAbilityButton.addClass('selected');
+                _self.saveWorldState(function(){
+                    setTimeout(function(){ $currentAbilitiesList.removeClass('has-selection'); }, 300);
+                    setTimeout(function(){ $newAbilityButton.removeClass('selected'); }, 600);
+                    setTimeout(function(){ hideActionModal(true); }, 900);
+                    });
+                }
+            return true;
+            };
+
         // Collect required and necessary data for displaying this action modal
         if (actionKind === 'item'){
             console.log('--> actionKind is item ...', itemOrAbilityToken);
@@ -8180,36 +8271,48 @@ class mmrpgWorldMap {
             let itemToken = itemOrAbilityToken;
             let itemInfo = typeof itemsIndex[itemToken] !== 'undefined' ? itemsIndex[itemToken] : null;
             console.log('--> found itemInfo =', itemInfo);
-            // ...
-            // ...
+            // TODO: ...
             }
         else if (actionKind === 'ability'){
-            console.log('--> actionKind is ability ...', itemOrAbilityToken);
+            //console.log('--> actionKind is ability ...', itemOrAbilityToken);
             let abilitiesIndex = _indexes.abilities;
-            let abilityToken = itemOrAbilityToken;
-            let abilityInfo = typeof abilitiesIndex[abilityToken] !== 'undefined' ? abilitiesIndex[abilityToken] : null;
-            console.log('--> found abilityInfo =', abilityInfo);
+            let currentAbilities = playerRobotInfo.abilities;
+            let newAbilityToken = itemOrAbilityToken;
+            let newAbilityInfo = typeof abilitiesIndex[newAbilityToken] !== 'undefined' ? abilitiesIndex[newAbilityToken] : null;
+            let generateAbilitySelectButtonMarkup = _self.generateAbilitySelectButtonMarkup.bind(_self);
+            if (!newAbilityToken || !newAbilityInfo){ console.error('showActionModal() could not find new ability info for token ' + newAbilityToken + '!'); return; }
+            //console.log('--> abilitiesIndex =', abilitiesIndex);
+            //console.log('--> currentAbilities =', currentAbilities);
+            //console.log('--> newAbilityToken =', newAbilityToken);
+            //console.log('--> newAbilityInfo =', newAbilityInfo);
             let subtitleTooltip = 'Select Ability To Replace';
-            let selectedAbilityList = '&laquo; show selected ability here &raquo;';
-            let currentAbilityList = '&laquo; show current abilities here &raquo;';
+            let selectedAbilityList = '';
+            let currentAbilityList = '';
+            selectedAbilityList += generateAbilitySelectButtonMarkup(newAbilityToken, playerRobotInfo, {selected: true});
+            for (var slotKey = 0; slotKey < currentAbilities.length; slotKey++){
+                let currentAbilityID = currentAbilities[slotKey];
+                let currentAbilityInfo = abilitiesIndex.getByID(currentAbilityID);
+                let currentAbilityToken = currentAbilityInfo ? currentAbilityInfo.token : null;
+                if (!currentAbilityInfo || !currentAbilityToken){ continue; }
+                let isDisabled = currentAbilityToken === newAbilityToken ? true : false;
+                currentAbilityList += generateAbilitySelectButtonMarkup(currentAbilityToken, playerRobotInfo, {slot: slotKey, disabled: isDisabled});
+                }
             // TEMP TEMP TEMP
-            selectedAbilityList = '<img width="140" height="34" src="images/_temp/mmrpg-mockup-2025-10-26_ability-span.png" style="" />';
-            currentAbilityList = '<img width="558" height="72" src="images/_temp/mmrpg-mockup-2025-10-26_ability-span-4x2.png" style="" />';
+            //selectedAbilityList = '<img width="140" height="34" src="images/_temp/mmrpg-mockup-2025-10-26_ability-span.png" style="" />';
+            //currentAbilityList = '<img width="558" height="72" src="images/_temp/mmrpg-mockup-2025-10-26_ability-span-4x2.png" style="" />';
             // TEMP TEMP TEMP
             modalDetails.subtitles.forTooltip = subtitleTooltip;
             modalDetails.containers.forSelected = '<div class="ability-list selected">' + selectedAbilityList + '</div>';
             modalDetails.containers.forCurrent = '<div class="ability-list current">' + currentAbilityList + '</div>';
             modalDetails.buttons.confirm.disabled = true;
-            // ...
-            // ...
             }
         else {
             console.error('showActionModal() received invalid actionKind ' + actionKind + '!');
             return;
             }
 
-        console.log('finished calculating modalDetails ...');
-        console.log('-> modalDetails = ', modalDetails);
+        //console.log('finished calculating modalDetails ...');
+        //console.log('-> modalDetails = ', modalDetails);
 
         // Collect quick references to modal details
         let modalAction = modalDetails.action;
@@ -8218,33 +8321,13 @@ class mmrpgWorldMap {
         let modalContainers = modalDetails.containers;
         let modalButtons = modalDetails.buttons;
 
-        // Define the actions for a confirm or cancel button click
-        let onConfirmAction = function(){
-            console.log('%c' + '~mmrpgWorldMap.showActionModal.onConfirmAction()', 'color: magenta;');
-            // ...
-            return true;
-            };
-        let onCancelAction = function(){
-            console.log('%c' + '~mmrpgWorldMap.showActionModal.onCancelAction()', 'color: magenta;');
-            $actionModal.addClass('hidden');
-            _world.mapIsHidden = _selfRef.mapIsHiddenBackup;
-            setTimeout(function(){
-                let $content = $actionModal.find('.content');
-                $actionModal.removeClass('active');
-                $content.find('.title').html('');
-                $content.find('.subtitle').html('');
-                $content.find('.container').html('');
-                }, 300);
-            return true;
-            };
-
         // Check if the action modal already exists and create it if not
         if (!$actionModal || !$actionModal.length){
-            console.log('--> action modal does not exist yet, creating ...');
+            //console.log('--> action modal does not exist yet, creating ...');
 
             // Generate the action modal markup bow that we've collected all necessary data
             let actionModalMarkup = '';
-            actionModalMarkup += '<div id="action-modal" class="chrome active hidden" data-action="' + modalAction + '">';
+            actionModalMarkup += '<div id="action-modal" class="chrome active hidden">';
                 actionModalMarkup += '<div class="overlay"></div>';
                 actionModalMarkup += '<div class="wrapper">';
                     actionModalMarkup += '<div class="content">';
@@ -8269,45 +8352,119 @@ class mmrpgWorldMap {
             // Append the action modal to the canvas wrapper and update the reference
             $canvasWrapper.append(actionModalMarkup);
             $actionModal = $('#action-modal', $canvasWrapper);
+            $actionModal.attr('data-action', modalAction);
+            $actionModal.attr('data-action-token', itemOrAbilityToken);
             _elements.actionModal = $actionModal;
+
+            // Some quick functions for checking if the modal is busy or active
+            let actionModalIsActive = function(){ return $actionModal.is('.active') ? true : false; };
+            let actionModalIsHidden = function(){ return $actionModal.is('.hidden') ? true : false; };
+            let actionModalIsBusy = function(){ return $actionModal.is('.busy') ? true : false; };
+            let allowModalActions = function(){
+                if (_self.worldIsBusy()){ return false; }
+                if (!actionModalIsActive()){ return false; } // if we're not active, ignore clicks
+                if (actionModalIsHidden()){ return false; } // if we're hidden, ignore clicks
+                if (actionModalIsBusy()){ return false; } // if we're busy, ignore clicks
+                return true;
+                };
 
             // Make sure clicking the background automatically closes the modal
             $actionModal.delegate('.overlay', 'click', function(e){
                 e.preventDefault();
                 e.stopPropagation();
-                if (_self.worldIsBusy()){ return; }
-                if (!$actionModal.is('.active')){ return; } // if we're not active, ignore clicks
-                if ($actionModal.is('.hidden')){ return; } // if we're hidden, ignore clicks
-                console.log('%c' + 'Action modal overlay clicked!', 'color: cyan;');
+                if (!allowModalActions()){ return; }
+                //console.log('%c' + 'Action modal overlay clicked!', 'color: cyan;');
                 return onCancelAction();
                 });
 
-            // (Re) Delegate events to the buttons in the action modal now that its markup is created/updated
+            // Delegate events to the buttons in the action modal now that its markup is created/updated
             $actionModal.delegate('.button[data-action]', 'click', function(e){
                 e.preventDefault();
                 e.stopPropagation();
-                if (_self.worldIsBusy()){ return; }
-                if (!$actionModal.is('.active')){ return; } // if we're not active, ignore clicks
-                if ($actionModal.is('.hidden')){ return; } // if we're hidden, ignore clicks
-                console.log('%c' + 'Modal action button clicked!', 'color: cyan;');
+                if (!allowModalActions()){ return; }
+                //console.log('%c' + 'Modal action button clicked!', 'color: cyan;');
                 let $button = $(this);
-                let action = $button.attr('data-action');
-                console.log('-> $button =', $button);
-                console.log('-> action =', action);
+                let modalAction = $actionModal.attr('data-action');
+                let buttonAction = $button.attr('data-action');
+                //console.log('-> $button =', $button);
+                //console.log('-> modalAction =', modalAction);
+                //console.log('-> buttonAction =', buttonAction);
                 if ($button.is('.disabled') || $button.is('[disabled]')){ return false; }
-                if (action === 'confirm'){ return onConfirmAction(); }
-                else if (action === 'cancel'){ return onCancelAction(); }
+                if (buttonAction === 'confirm'){ return onConfirmAction(modalAction); }
+                else if (buttonAction === 'cancel'){ return onCancelAction(modalAction); }
                 else { return false; }
                 });
 
+            // Delegate the actions for the team item buttons that can appear within the window
+            $actionModal.delegate('.team-item[data-item]', 'click', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                if (!allowModalActions()){ return; }
+                console.log('%c' + 'Item select button clicked!', 'color: cyan;');
+
+                // TODO: define the click actions for item buttons in the action modal
+
+                return true;
+                });
+
+            // Delegate the actions for the team item ability that can appear within the window
+            $actionModal.delegate('.team-ability[data-ability]', 'click', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                if (!allowModalActions()){ return; }
+                //console.log('%c' + 'Ability select button clicked!', 'color: cyan;');
+                let $button = $(this);
+                let $container = $button.closest('.ability-list');
+                let index = _indexes.abilities;
+                let token = $button.attr('data-ability');
+                let info = token ? index[token] : null;
+                //console.log('-> $button =', $button);
+                //console.log('-> token =', token);
+                //console.log('-> info =', info);
+                if ($button.is('.disabled') || $button.is('[disabled]')){ return false; }
+                if (!token || !token.length){ console.error('Ability select button clicked, but no ability token found!'); return false; }
+                if (!info || typeof info === 'undefined'){ console.error('Ability select button clicked, but ability token ' + token + ' not found in index!'); return false; }
+                if (!$button.is('.selected')){
+                    //console.log('--> change selected ability to', token);
+                    $container.addClass('has-selection');
+                    $('.team-ability[data-ability]', $container).removeClass('selected');
+                    $button.addClass('selected');
+                    } else {
+                    //console.log('--> deselect ability', token);
+                    $container.removeClass('has-selection');
+                    $('.team-ability[data-ability]', $container).removeClass('selected');
+                    }
+                refreshAbilityModal();
+                return true;
+                });
+            let refreshAbilityModal = function(actionKind){
+                //console.log('%c' + '~mmrpgWorldMap.showActionModal.refreshAbilityModal()', 'color: magenta;');
+                // either enable or disable the confirm button based on whether or not a selection has been made
+                let $actionButtons = $actionModal.find('.content .buttons.actions');
+                let $confirmButton = $actionButtons.find('.button[data-action="confirm"]');
+                let $cancelButton = $actionButtons.find('.button[data-action="cancel"]');
+                let $currentAbilities = $actionModal.find('.ability-list.current');
+                let $selectedAbility = $currentAbilities.find('.team-ability[data-ability].selected');
+                if ($selectedAbility && $selectedAbility.length){
+                    //console.log('--> an ability has been selected:', $selectedAbility.attr('data-ability'));
+                    $confirmButton.removeClass('disabled').removeAttr('disabled');
+                    } else {
+                    //console.log('--> an ability has not been selected yet');
+                    $confirmButton.addClass('disabled').attr('disabled', 'disabled');
+                    }
+                return true;
+                };
+
             }
         else {
-            console.log('--> action modal already exists, updating ...');
+            //console.log('--> action modal already exists, updating ...');
 
             // Update the action modal title, subtitles, containers, and actions
             let $content = $actionModal.find('.content');
+            $actionModal.removeClass('busy');
             $actionModal.addClass('active hidden');
             $actionModal.attr('data-action', modalAction);
+            $actionModal.attr('data-action-token', itemOrAbilityToken);
             let $title = $content.find('.title'); $title.html(modalTitle);
             let $subForSelected = $content.find('.subtitle.for-selected'); $subForSelected.html(modalSubtitles.forSelected);
             let $subForCurrent = $content.find('.subtitle.for-current'); $subForCurrent.html(modalSubtitles.forCurrent);
@@ -8325,7 +8482,7 @@ class mmrpgWorldMap {
 
         // Append the action modal to the window and show it (remove any existing one first)
         setTimeout(function(){
-            console.log('-> showing action modal ...');
+            //console.log('-> showing action modal ...');
             $actionModal.removeClass('hidden');
             _world.mapIsHidden = true;
             }, 100);
@@ -8336,7 +8493,7 @@ class mmrpgWorldMap {
 
     // Define a quick function for showing an item modal for some kind of item-related action
     showItemModal(actionToken, itemToken, targetRobotToken){
-        console.log('%c' + 'mmrpgWorldMap.showItemModal(actionToken:' + actionToken + ', itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.showItemModal(actionToken:' + actionToken + ', itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
         if (!actionToken || typeof actionToken !== 'string' || !actionToken.length){ console.error('showItemModal() missing required actionToken!'); return; }
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('showItemModal() missing required itemToken!'); return; }
         let _self = this;
@@ -8345,7 +8502,7 @@ class mmrpgWorldMap {
 
     // Define a quick function for showing an ability modal for some kind of ability-related action
     showAbilityModal(actionToken, abilityToken, targetRobotToken){
-        console.log('%c' + 'mmrpgWorldMap.showAbilityModal(actionToken:' + actionToken + ', abilityToken:' + abilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.showAbilityModal(actionToken:' + actionToken + ', abilityToken:' + abilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
         if (!actionToken || typeof actionToken !== 'string' || !actionToken.length){ console.error('showAbilityModal() missing required actionToken!'); return; }
         if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('showAbilityModal() missing required abilityToken!'); return; }
         targetRobotToken = targetRobotToken && typeof targetRobotToken === 'string' && targetRobotToken.length ? targetRobotToken : null;
@@ -8355,7 +8512,7 @@ class mmrpgWorldMap {
 
     // Define quick functions for showing specific modals for items and abilities
     showUseItemModal(itemToken, targetRobotToken){
-        console.log('%c' + 'mmrpgWorldMap.showUseItemModal(itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.showUseItemModal(itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('showUseItemModal() missing required itemToken!'); return; }
         if (!targetRobotToken || typeof targetRobotToken !== 'string' || !targetRobotToken.length){ console.error('showUseItemModal() missing required targetRobotToken!'); return; }
         let _self = this;
@@ -8364,7 +8521,7 @@ class mmrpgWorldMap {
 
     // Define a quick function for showing the give item modal
     showGiveItemModal(itemToken, targetRobotToken){
-        console.log('%c' + 'mmrpgWorldMap.showGiveItemModal(itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.showGiveItemModal(itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('showGiveItemModal() missing required itemToken!'); return; }
         if (!targetRobotToken || typeof targetRobotToken !== 'string' || !targetRobotToken.length){ console.error('showGiveItemModal() missing required targetRobotToken!'); return; }
         let _self = this;
@@ -8373,7 +8530,7 @@ class mmrpgWorldMap {
 
     // Define a quick function for showing the drop item modal
     showDropItemModal(itemToken){
-        console.log('%c' + 'mmrpgWorldMap.showDropItemModal(itemToken:' + itemToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.showDropItemModal(itemToken:' + itemToken + ')', 'color: magenta;');
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('showDropItemModal() missing required itemToken!'); return; }
         let _self = this;
         return _self.showItemModal('drop-item', itemToken, null);
@@ -8381,11 +8538,72 @@ class mmrpgWorldMap {
 
     // Define a quick function for showing the equip ability modal
     showEquipAbilityModal(abilityToken, targetRobotToken){
-        console.log('%c' + 'mmrpgWorldMap.showEquipAbilityModal(abilityToken:' + abilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.showEquipAbilityModal(abilityToken:' + abilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
         if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('showEquipAbilityModal() missing required abilityToken!'); return; }
         if (!targetRobotToken || typeof targetRobotToken !== 'string' || !targetRobotToken.length){ console.error('showEquipAbilityModal() missing required targetRobotToken!'); return; }
         let _self = this;
         return _self.showAbilityModal('equip-ability', abilityToken, targetRobotToken);
+        }
+
+    // Define a quick function for generating the markup for an ability select button given an ability token, robot info, and/or optional settings
+    generateAbilitySelectButtonMarkup(abilityToken, playerRobotInfo, buttonOptions){
+        //console.log('%c' + 'mmrpgWorldMap.generateAbilitySelectButtonMarkup(abilityToken:' + abilityToken + ', playerRobotInfo, buttonOptions)', 'color: magenta;');
+        //console.log('-> w/ playerRobotInfo =', playerRobotInfo);
+        //console.log('-> w/ buttonOptions =', buttonOptions);
+        if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('generateAbilitySelectButtonMarkup() missing required abilityToken!'); return ''; }
+        if (!playerRobotInfo || typeof playerRobotInfo !== 'object'){ playerRobotInfo = null; }
+        if (!buttonOptions || typeof buttonOptions !== 'object'){ buttonOptions = {}; }
+        let _self = this;
+        let _config = _self.config;
+        let _indexes = _self.indexes;
+        let _world = _self.state;
+        let abilityInfo = _indexes.abilities.getByToken(abilityToken);
+        if (!abilityInfo || typeof abilityInfo !== 'object'){ console.error('generateAbilitySelectButtonMarkup() could not find abilityInfo for token ' + abilityToken + '!'); return ''; }
+
+        buttonOptions.selected = typeof buttonOptions.selected !== 'undefined' ? buttonOptions.selected : false;
+        buttonOptions.disabled = typeof buttonOptions.disabled !== 'undefined' ? buttonOptions.disabled : false;
+        buttonOptions.slot = typeof buttonOptions.slot === 'number' ? buttonOptions.slot : false;
+
+        let abilityAnimationDelay = -1 * ( Math.floor(Math.random() * 10) / 100 );
+        let abilityTypeClasses = abilityInfo.type === '' ? 'none' : (abilityInfo.type + (abilityInfo.type2 !== '' ? '_' + abilityInfo.type2 : ''));
+        let abilityEnergyCost = abilityInfo.energy || 0;
+
+        let abilityNameFormatted = abilityInfo.name.split(' ').join('<br />');
+        let abilityCostFormatted = '<sup>' + abilityEnergyCost + '</sup><sub>WE</sub>';
+
+        let buttonAttrs = '';
+        let buttonClass = 'team-ability' + (buttonOptions.selected ? ' selected' : '') + (buttonOptions.disabled ? ' disabled' : '');
+        let buttonStyle = '';
+        buttonAttrs += ' class="' + buttonClass + '"';
+        buttonAttrs += ' data-ability="' + abilityToken + '"';
+        buttonAttrs += ' data-ability-id="' + abilityInfo.id + '"';
+        buttonAttrs += ' data-energy-cost="' + (abilityInfo.energy || 0) + '"';
+        if (buttonOptions.slot !== false){ buttonAttrs += ' data-slot="' + buttonOptions.slot + '"'; }
+        if (buttonStyle.length){ buttonAttrs += ' style="' + buttonStyle + '"'; }
+
+        let buttonSpriteAttrs = '';
+        let buttonSpriteClass = 'sprite ability icon';
+        let buttonSpriteStyle = 'animation-delay: ' + abilityAnimationDelay + 's;';
+        buttonSpriteAttrs += ' class="' + buttonSpriteClass + '"';
+        buttonSpriteAttrs += ' data-sprite="ability"';
+        buttonSpriteAttrs += ' data-token="' + abilityToken + '"';
+        buttonSpriteAttrs += ' data-alt=""';
+        buttonSpriteAttrs += ' data-size="40"';
+        buttonSpriteAttrs += ' data-dir="right"';
+        buttonSpriteAttrs += ' data-frame="00"';
+        if (buttonSpriteStyle.length){ buttonSpriteAttrs += ' style="' + buttonSpriteStyle + '"'; }
+        let buttonSpriteInner = '<span class="wrap"><i class="back type ' + abilityTypeClasses + '"></i><i class="sprite"></i></span>';
+
+        let buttonMarkup = '';
+        buttonMarkup += '<div' + buttonAttrs + '>';
+            buttonMarkup += '<div class="image"><span' + buttonSpriteAttrs + '>' + buttonSpriteInner + '</span></div>';
+            buttonMarkup += '<span class="tint type ' + abilityTypeClasses + '"></span>';
+            buttonMarkup += '<strong class="name">' + abilityNameFormatted + '</strong>';
+            buttonMarkup += '<span class="cost">' + abilityCostFormatted + '</span>';
+        buttonMarkup += '</div>';
+
+        return buttonMarkup;
+
         }
 
     // Define a quick function for initializing the minimap HUD and its elements, focus, position, and any masking
