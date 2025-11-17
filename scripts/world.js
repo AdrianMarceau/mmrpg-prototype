@@ -1616,15 +1616,28 @@ class mmrpgWorldMap {
                 $storageBoxes.find('.incompatible').removeClass('incompatible');
                 $teamRobotsDiv.removeClass('focused').removeClass('unfocused');
                 $teamRobotsDiv.find('.incompatible', ).removeClass('incompatible');
+                $teamRobotsDiv.find('.selected').removeClass('selected');
                 $('.details', $storageBoxes).remove();
                 return;
                 };
             // Define a function for expanding the robots-overview panel and showing a specific view
-            let showRobotsOverviewPanel = function(viewToken){
+            let showRobotsOverviewPanel = function(viewToken, onComplete, keepSelectedRobot){
                 //console.log('%c' + 'showRobotsOverviewPanel(viewToken:' + (viewToken ? viewToken : typeof viewToken) + ') called!', 'color: magenta;');
                 // Otherwise we can expand (if not already) the panel and switch to this specific view
                 // and then disable the outside UI buttons to prevent bad-clicks and visual clutter
                 viewToken = viewToken && typeof viewToken === 'string' && viewToken.length ? viewToken : '';
+                keepSelectedRobot = typeof keepSelectedRobot === 'boolean' ? keepSelectedRobot : true;
+                let $selectedRobot, selectedRobotToken, selectedRobotClass;
+                if (keepSelectedRobot){
+                    $selectedRobot = $teamRobotsDiv.find('.team-robot[data-robot].selected');
+                    if ($selectedRobot && $selectedRobot.length){
+                        selectedRobotToken = $selectedRobot.attr('data-robot');
+                        selectedRobotClass = '.team-robot[data-robot="' + selectedRobotToken + '"]';
+                        } else {
+                        keepSelectedRobot = false;
+                        }
+                    }
+                //console.log('-> before doing anything, selectedRobotToken = ', selectedRobotToken);
                 $('.button', $storageBoxes).attr('disabled', 'disabled');
                 $storageRobotsDiv.removeClass('unfocused');
                 $teamRobotsDiv.addClass('focused').removeClass('unfocused');
@@ -1637,6 +1650,8 @@ class mmrpgWorldMap {
                 _world.mapIsHidden = true; // set the map hidden state
                 clearSelectionsAndIncompatible();
                 disableOtherElements();
+                if (typeof onComplete === 'function'){ onComplete.call(this); }
+                if (keepSelectedRobot){ setTimeout(function(){ $teamRobotsDiv.find(selectedRobotClass).trigger('click'); }, 100); }
                 return;
                 };
             // Define a function for dismissing the whole robots-overview panel and all views at-once
@@ -2067,10 +2082,10 @@ class mmrpgWorldMap {
             $teamRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
                 e.preventDefault();
                 if (_self.worldIsBusy()){ return; }
-                if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
-                if ($(this).is('.incompatible')){ return; } // if robot was marked incompatible, ignore clicked
-                //console.log('%c' + 'Team robot clicked!', 'color: cyan;');
                 let $thisRobot = $(this);
+                if (!$robotsOverview.is('.expanded')){ return showRobotsOverviewPanel('robots', function(){ $thisRobot.trigger('click'); }); }
+                if ($thisRobot.is('.incompatible')){ return; } // if robot was marked incompatible, ignore clicked
+                //console.log('%c' + 'Team robot clicked!', 'color: cyan;');
                 let alreadySelected = $thisRobot.is('.selected') ? true : false;
                 //console.log('-> $thisRobot =', $thisRobot);
                 //console.log('-> alreadySelected =', alreadySelected);
