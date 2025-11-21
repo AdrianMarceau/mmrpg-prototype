@@ -227,7 +227,7 @@ $(document).ready(function(){
 
     // Define a function for showing/highlighting a robot in the above ready room when possible
     showRobotInReadyRoom = function(playerToken, robotToken){
-        console.log('showRobotInReadyRoom(playerToken:', playerToken, 'robotToken:', robotToken, ')');
+        //console.log('showRobotInReadyRoom(playerToken:', playerToken, 'robotToken:', robotToken, ')');
         // We should add the new robot to the parent ready room
         if (typeof window.parent.mmrpgReadyRoom !== 'undefined'
             && typeof window.parent.mmrpgReadyRoom.updateRobot !== 'undefined'){
