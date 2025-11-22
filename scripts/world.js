@@ -6463,7 +6463,7 @@ class mmrpgWorldMap {
             }
         // Update the robot info with the new energy value
         robotInfo.energy = Math.min(newEnergy, maxEnergy);
-        robotInfo.energyPercent = Math.floor((robotInfo.energy / robotInfo.energyMax) * 100);
+        robotInfo.energyPercent = _self.getRoundedPercent(robotInfo.energy, robotInfo.energyMax);
         robotInfo.energyRating = _self.getRatingToken(robotInfo.energyPercent);
         _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
         // Update the overview with any changes to the status
@@ -6537,7 +6537,7 @@ class mmrpgWorldMap {
             }
         // Update the robot info with the new energy value
         robotInfo.energy = newEnergy;
-        robotInfo.energyPercent = Math.floor((robotInfo.energy / robotInfo.energyMax) * 100);
+        robotInfo.energyPercent = _self.getRoundedPercent(robotInfo.energy, robotInfo.energyMax);
         robotInfo.energyRating = _self.getRatingToken(robotInfo.energyPercent);
         _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
         // Update the overview with any changes to the status
