@@ -6361,6 +6361,44 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Quick function for scaling an array of values to a new min/max range
+    scaleArrayToRange(values, newMin, newMax, rounded){
+        //console.log('%c' + 'mmrpgWorldMap.scaleArrayToRange(values, ' + newMin + ', ' + newMax + ')', 'color: magenta;');
+        if (!Array.isArray(values) || !values.length){ console.error('scaleArrayToRange() missing or invalid values array!'); return false; }
+        if (typeof newMin !== 'number' || isNaN(newMin)){ console.error('scaleArrayToRange() missing or invalid newMin!'); return false; }
+        if (typeof newMax !== 'number' || isNaN(newMax)){ console.error('scaleArrayToRange() missing or invalid newMax!'); return false; }
+        rounded = (typeof rounded === 'boolean' ? rounded : false);
+        const oldMin = Math.min(...values);
+        const oldMax = Math.max(...values);
+        const oldRange = oldMax - oldMin;
+        const newRange = newMax - newMin;
+        if (oldRange === 0) { return values.map(() => (newMin + newMax) / 2); }
+        let range = values.map(value => { return newMin + (value - oldMin) / oldRange * newRange; });
+        if (rounded){ range = range.map(value => { return Math.round(value); }); }
+        return range;
+        }
+
+    // Quick function for normalizing an array of integer values at any min/max range into a 0.00 - 1.00 scale instead
+    translateValueRange(baseValues, newMin, newMax, roundResults){
+        //console.log('%c' + 'mmrpgWorldMap.translateValueRange(baseValues, ' + newMin + ', ' + newMax + ', ' + roundResults + ')', 'color: magenta;');
+        if (!Array.isArray(baseValues) || !baseValues.length){ console.error('translateValueRange() missing or invalid baseValues array!'); return false; }
+        if (typeof newMin !== 'number' || isNaN(newMin)){ console.error('translateValueRange() missing or invalid newMin!'); return false; }
+        if (typeof newMax !== 'number' || isNaN(newMax)){ console.error('translateValueRange() missing or invalid newMax!'); return false; }
+        roundResults = (typeof roundResults === 'boolean' ? roundResults : false);
+        const baseSum = baseValues.reduce((a, b) => a + b, 0);
+        const newRange = newMax - newMin;
+        let basePercents = baseValues.map(value => { return (value / baseSum); });
+        let translatedValues = basePercents.map(percent => { return (newMin + (percent * newRange)); });
+        if (roundResults){ translatedValues = translatedValues.map(value => { return Math.round(value); }); }
+        return translatedValues;
+        }
+
+    // Quick function for getting a robot's rounded energy percent value
+    getRoundedPercent(baseValue, maxValue){
+        let roundedPercent = Math.round((baseValue / maxValue) * 100);
+        if (roundedPercent === 100 && baseValue < maxValue){ roundedPercent -= 1; }
+        return roundedPercent;
+        }
 
     // Quick function for getting a rating token given a percent value
     getRatingToken(percent){
