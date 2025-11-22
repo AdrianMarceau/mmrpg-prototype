@@ -6960,6 +6960,28 @@ class mmrpgWorldMap {
         let _self = this; return _self.breakRobotStat(robotString, 'speed', breakAmount, playSound);
         }
 
+    // Define a function for calculating a robot's current stat value given its base and current mods/stages its been raised/lowered
+    calculateRobotStat(baseValue, modValue){
+        //console.log('%c' + 'mmrpgWorldMap.calculateRobotStat(base:' + baseValue + ', mod:' + modValue + ')', 'color: magenta;');
+        const numerator = 2;
+        const denominator = 2;
+        if (!baseValue || isNaN(baseValue) || baseValue <= 0){ return 0; }
+        if (!modValue || isNaN(modValue) || modValue === 0){ return baseValue; }
+        let newValue = baseValue;
+        if (modValue > 0){
+            let newNumerator = numerator + modValue;
+            //console.log('-> boosting stat via baseValue * (' + newNumerator + ' / ' + denominator + ')');
+            newValue = Math.ceil(baseValue * (newNumerator / denominator));
+            }
+        else if (modValue < 0){
+            let newDenominator = denominator + (modValue * -1);
+            //console.log('-> breaking stat via baseValue * (' + numerator + ' / ' + newDenominator + ')');
+            newValue = Math.ceil(baseValue * (numerator / newDenominator));
+            }
+        //console.log('-> newValue =', newValue);
+        return newValue;
+        }
+
     // Quick function for giving a given robot a new hold item and then optionally playing a sound effect
     giveRobotItem(robotString, itemToken, playSound){
         //console.log('%c' + 'mmrpgWorldMap.giveRobotItem(robot:' + robotString + ', item:' + itemToken + ', sound:' + playSound + ')', 'color: magenta;');
