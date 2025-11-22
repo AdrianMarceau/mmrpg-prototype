@@ -8503,6 +8503,87 @@ class mmrpgWorldMap {
         return abilityDetailsMarkup;
         }
 
+    // Define a quick function for getting the details markup for a given robot in the user's inventory
+    getRobotDetailsMarkupForOverview(robotToken){
+        //console.log('%c' + 'mmrpgWorldMap.getRobotDetailsMarkupForOverview(robot:' + robotToken + ')', 'color: magenta;');
+        if (!robotToken || typeof robotToken !== 'string' || !robotToken.length){ console.error('getRobotDetailsMarkupForOverview() missing required robotToken!'); return ''; }
+        let _self = this;
+        let robotDetailsObject = _self.getRobotDetailsForOverview(robotToken) || false;
+        if (!robotDetailsObject || typeof robotDetailsObject !== 'object'){ console.error('getRobotDetailsMarkupForOverview() could not generate details object for token ' + robotToken + '!'); return ''; }
+        let robotDetailsMarkup = '';
+        robotDetailsMarkup += '<div class="details" data-robot="' + robotToken + '">';
+            robotDetailsMarkup += '<div class="title">' + robotDetailsObject.title + '</div>';
+            robotDetailsMarkup += '<div class="image type ' + robotDetailsObject.typeClasses + '">' + robotDetailsObject.image + '</div>';
+            robotDetailsMarkup += '<div class="subtitle">';
+                robotDetailsMarkup += '<strong class="name">' + robotDetailsObject.name + '</strong>';
+                robotDetailsMarkup += '<strong class="level">' + robotDetailsObject.levelHTML + '</strong>';
+                robotDetailsMarkup += '<em class="experience">' + robotDetailsObject.experienceHTML + '</em>';
+                robotDetailsMarkup += '<sub class="type ' + robotDetailsObject.typeClasses + '">' + robotDetailsObject.typeName + '</sub>';
+                robotDetailsMarkup += '<hr class="type ' + robotDetailsObject.typeClasses + '">';
+            robotDetailsMarkup += '</div>';
+            //robotDetailsMarkup += '<div class="description"><p>' + (robotDetailsObject.classIconHTML ? (robotDetailsObject.classIconHTML + ' ') : '') + robotDetailsObject.description + '</p></div>';
+            robotDetailsMarkup += '<div class="infolines">' + robotDetailsObject.infolinesHTML + '</div>';
+            robotDetailsMarkup += '<div class="actions">' + robotDetailsObject.actionsHTML + '</div>';
+        robotDetailsMarkup += '</div>';
+        return robotDetailsMarkup;
+        }
+
+    // Define a quick function for replacing the robot details in an existing details div with new ones
+    replaceRobotDetailsInOverview($detailsDiv, robotToken, robotDetails){
+        //console.log('%c' + 'mmrpgWorldMap.replaceRobotDetailsInOverview($detailsDiv, robotToken:' + robotToken + ', robotDetails)', 'color: magenta;');
+        if (!$detailsDiv || !$detailsDiv.length){ console.error('replaceRobotDetailsInOverview() missing required $detailsDiv!'); return false; }
+        if (!robotToken || typeof robotToken !== 'string' || !robotToken.length){ console.error('replaceRobotDetailsInOverview() missing required robotToken!'); return false; }
+        if (!robotDetails || typeof robotDetails !== 'object'){ console.error('replaceRobotDetailsInOverview() missing required robotDetails!'); return false; }
+        //console.log('-> robotDetails =', robotDetails);
+        let $title = $detailsDiv.find('> .title'),
+            $image = $detailsDiv.find('> .image'),
+            $subtitle = $detailsDiv.find('> .subtitle'),
+            $subtitleName = $subtitle.find('> .name'),
+            $subtitleLevel = $subtitle.find('> .level'),
+            $subtitleExp = $subtitle.find('> .experience'),
+            $subtitleSubtext = $subtitle.find('> sub'),
+            $subtitleSubline = $subtitle.find('> hr'),
+            $infolines = $detailsDiv.find('> .infolines'),
+            //$description = $detailsDiv.find('> .description'),
+            $actions = $detailsDiv.find('> .actions')
+            ;
+        $detailsDiv.attr('data-robot', robotToken);
+        $title.html(robotDetails.title);
+        $image.html(robotDetails.image);
+        $image.removeClass().addClass('image type ' + robotDetails.typeClasses);
+        $subtitleName.html(robotDetails.name);
+        $subtitleLevel.html(robotDetails.levelHTML);
+        $subtitleExp.html(robotDetails.experienceHTML);
+        $subtitleSubtext.removeClass().addClass('type ' + robotDetails.typeClasses).html(robotDetails.typeName);
+        $subtitleSubline.removeClass().addClass('type ' + robotDetails.typeClasses);
+        $infolines.html(robotDetails.infolinesHTML);
+        //$description.html((robotDetails.classIconHTML ? (robotDetails.classIconHTML + ' ') : '') + robotDetails.description);
+        // manually update buttons so css transitions can occur properly
+        for (let i = 0; i < robotDetails.actions.length; i++){
+            let actionInfo = robotDetails.actions[i];
+            let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
+            let actionHidden = typeof actionInfo.hidden !== 'undefined' && actionInfo.hidden === true ? true : false;
+            let $actionButton = $actions.find('.button.' + actionInfo.action);
+            if ($actionButton && $actionButton.length){
+                if (actionDisabled){ $actionButton.addClass('disabled'); $actionButton.attr('disabled', 'disabled'); }
+                else { $actionButton.removeClass('disabled'); $actionButton.removeAttr('disabled'); }
+                if (actionHidden){ $actionButton.addClass('hidden'); }
+                else { $actionButton.removeClass('hidden'); }
+                } else {
+                let actionButtonMarkup = '<button type="button" '
+                    + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
+                    + 'data-robot="' + actionInfo.robot + '"' + (actionDisabled ? ' disabled="disabled"' : '')
+                    + '>' + actionInfo.text + '</button>';
+                $actions.append(actionButtonMarkup);
+                $actionButton = $actions.find('.button.' + actionInfo.action);
+                }
+            $actionButton.addClass('keep');
+            }
+        $actions.find('.button:not(.keep)').remove();
+        $actions.find('.button.keep').removeClass('keep');
+        return true;
+        }
+
     // Define a quick function for replacing the item details in an existing details div with new ones
     replaceItemDetailsInOverview($detailsDiv, itemToken, itemDetails){
         //console.log('%c' + 'mmrpgWorldMap.replaceItemDetailsInOverview($detailsDiv, itemToken:' + itemToken + ', itemDetails)', 'color: magenta;');
