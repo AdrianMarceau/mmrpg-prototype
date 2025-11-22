@@ -8684,6 +8684,135 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Define a quick function for grabbing the sprite markup of a robot given the token and optional sprite arguments
+    getRobotSpriteMarkup(robotToken, spriteOptions){
+        //console.log('%c' + 'mmrpgWorldMap.getRobotSpriteMarkup(robotToken:' + robotToken + ', spriteOptions:', + JSON.stringify(spriteOptions) + ')', 'color: magenta;');
+        if (!robotToken || typeof robotToken !== 'string' || !robotToken.length){ console.error('getRobotSpriteMarkup() missing required robotToken!'); return ''; }
+        spriteOptions = spriteOptions || {};
+        let _self = this;
+        let _config = _self.config;
+        let _indexes = _self.indexes;
+        let _world = _self.state;
+        let robotInfo = _indexes.robots.getByToken(robotToken);
+        if (!robotInfo || typeof robotInfo !== 'object'){ console.error('getRobotSpriteMarkup() could not find robotInfo for token ' + robotToken + '!'); return ''; }
+        // Collect or define the sprite options with defaults if not provided
+        spriteOptions.alt = typeof spriteOptions.alt === 'string' && spriteOptions.alt.length > 1 ? spriteOptions.alt : '';
+        spriteOptions.size = typeof spriteOptions.size === 'number' && spriteOptions.size > 0 ? spriteOptions.size : (robotInfo.imageSize || 40);
+        spriteOptions.dir = typeof spriteOptions.dir === 'string' && spriteOptions.dir.length ? spriteOptions.dir : 'right';
+        spriteOptions.frame = typeof spriteOptions.frame === 'string' && spriteOptions.frame.length > 0 ? spriteOptions.frame : '00';
+        spriteOptions.delay = typeof spriteOptions.delay === 'number' && spriteOptions.delay !== 0 ? spriteOptions.delay : (-1 * ( Math.floor(Math.random() * 10) / 100 ));
+        spriteOptions.classes = typeof spriteOptions.classes === 'string' && spriteOptions.classes.length > 1 ? spriteOptions.classes : '';
+        spriteOptions.styles = typeof spriteOptions.styles === 'string' && spriteOptions.styles.length > 1 ? spriteOptions.styles : '';
+        // Generate the robot sprite attributes and inner markup given the options
+        let robotSpriteAttrs = '';
+        let robotSpriteClass = 'sprite robot' + (spriteOptions.classes ? ' ' + spriteOptions.classes : '');
+        let robotSpriteStyle = 'animation-delay: ' + spriteOptions.delay + 's;' + (spriteOptions.styles ? ' ' + spriteOptions.styles : '');
+        robotSpriteAttrs += ' class="' + robotSpriteClass + '"';
+        robotSpriteAttrs += ' data-sprite="robot"';
+        robotSpriteAttrs += ' data-token="' + robotToken + '"';
+        robotSpriteAttrs += ' data-alt="' + spriteOptions.alt + '"';
+        robotSpriteAttrs += ' data-size="' + spriteOptions.size + '"';
+        robotSpriteAttrs += ' data-dir="' + spriteOptions.dir + '"';
+        robotSpriteAttrs += ' data-frame="' + spriteOptions.frame + '"';
+        if (robotSpriteStyle.length){ robotSpriteAttrs += ' style="' + robotSpriteStyle + '"'; }
+        let robotSpriteInner = '';
+        robotSpriteInner += '<i class="sprite"></i>';
+        // Put it all together to generate the final markup
+        let robotSpriteMarkup = '';
+        robotSpriteMarkup += '<span' + robotSpriteAttrs + '>';
+            robotSpriteMarkup += '<span class="wrap">' + robotSpriteInner + '</span>';
+        robotSpriteMarkup += '</span>';
+        // Return the generated markup for the robot sprite
+        return robotSpriteMarkup;
+
+        }
+
+    // Define a quick function for grabbing the sprite markup of an item given the token and optional sprite arguments
+    getItemSpriteMarkup(itemToken, spriteOptions){
+        //console.log('%c' + 'mmrpgWorldMap.getItemSpriteMarkup(itemToken:' + itemToken + ', spriteOptions:', + JSON.stringify(spriteOptions) + ')', 'color: magenta;');
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('getItemSpriteMarkup() missing required itemToken!'); return ''; }
+        spriteOptions = spriteOptions || {};
+        let _self = this;
+        let _config = _self.config;
+        let _indexes = _self.indexes;
+        let _world = _self.state;
+        let itemInfo = _indexes.items.getByToken(itemToken);
+        if (!itemInfo || typeof itemInfo !== 'object'){ console.error('getItemSpriteMarkup() could not find itemInfo for token ' + itemToken + '!'); return ''; }
+        // Collect or define the sprite options with defaults if not provided
+        spriteOptions.sheet = typeof spriteOptions.sheet === 'number' && spriteOptions.sheet > 1 ? spriteOptions.sheet : 1;
+        spriteOptions.size = typeof spriteOptions.size === 'number' && spriteOptions.size > 0 ? spriteOptions.size : (itemInfo.imageSize || 40);
+        spriteOptions.dir = typeof spriteOptions.dir === 'string' && spriteOptions.dir.length ? spriteOptions.dir : 'right';
+        spriteOptions.frame = typeof spriteOptions.frame === 'string' && spriteOptions.frame.length > 0 ? spriteOptions.frame : '00';
+        spriteOptions.delay = typeof spriteOptions.delay === 'number' && spriteOptions.delay !== 0 ? spriteOptions.delay : (-1 * ( Math.floor(Math.random() * 10) / 100 ));
+        spriteOptions.showBack = typeof spriteOptions.showBack === 'boolean' ? spriteOptions.showBack : false;
+        spriteOptions.classes = typeof spriteOptions.classes === 'string' && spriteOptions.classes.length > 1 ? spriteOptions.classes : '';
+        spriteOptions.styles = typeof spriteOptions.styles === 'string' && spriteOptions.styles.length > 1 ? spriteOptions.styles : '';
+        // Generate the item sprite attributes and inner markup given the options
+        let itemSpriteAttrs = '';
+        let itemSpriteClass = 'sprite item' + (spriteOptions.classes ? ' ' + spriteOptions.classes : '');
+        let itemSpriteStyle = 'animation-delay: ' + spriteOptions.delay + 's;' + (spriteOptions.styles ? ' ' + spriteOptions.styles : '');
+        let itemTypeClasses = itemInfo.type === '' ? 'none' : (itemInfo.type + (itemInfo.type2 !== '' ? '_' + itemInfo.type2 : ''));
+        itemSpriteAttrs += ' class="' + itemSpriteClass + '"';
+        itemSpriteAttrs += ' data-sprite="item"';
+        itemSpriteAttrs += ' data-token="' + itemToken + '"';
+        itemSpriteAttrs += ' data-sheet="' + spriteOptions.sheet + '"';
+        itemSpriteAttrs += ' data-size="' + spriteOptions.size + '"';
+        itemSpriteAttrs += ' data-dir="' + spriteOptions.dir + '"';
+        itemSpriteAttrs += ' data-frame="' + spriteOptions.frame + '"';
+        if (itemSpriteStyle.length){ itemSpriteAttrs += ' style="' + itemSpriteStyle + '"'; }
+        let itemSpriteInner = '';
+        if (spriteOptions.showBack){ itemSpriteInner += '<i class="back type ' + itemTypeClasses + '"></i>'; }
+        itemSpriteInner += '<i class="sprite"></i>';
+        // Put it all together to generate the final markup
+        let itemSpriteMarkup = '';
+        itemSpriteMarkup += '<span' + itemSpriteAttrs + '>';
+            itemSpriteMarkup += '<span class="wrap">' + itemSpriteInner + '</span>';
+        itemSpriteMarkup += '</span>';
+        // Return the generated markup for the item sprite
+        return itemSpriteMarkup;
+        }
+
+    // Define a quick function for grabbing the sprite markup of an ability given the token and optional sprite arguments
+    getAbilitySpriteMarkup(abilityToken, spriteOptions){
+        //console.log('%c' + 'mmrpgWorldMap.getAbilitySpriteMarkup(abilityToken:' + abilityToken + ', spriteOptions:', + JSON.stringify(spriteOptions) + ')', 'color: magenta;');
+        if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('getAbilitySpriteMarkup() missing required abilityToken!'); return ''; }
+        spriteOptions = spriteOptions || {};
+        let _self = this;
+        let _config = _self.config;
+        let _indexes = _self.indexes;
+        let _world = _self.state;
+        let abilityInfo = _indexes.abilities.getByToken(abilityToken);
+        if (!abilityInfo || typeof abilityInfo !== 'object'){ console.error('getAbilitySpriteMarkup() could not find abilityInfo for token ' + abilityToken + '!'); return ''; }
+        // Collect or define the sprite options with defaults if not provided
+        spriteOptions.sheet = typeof spriteOptions.sheet === 'number' && spriteOptions.sheet > 1 ? spriteOptions.sheet : 1;
+        spriteOptions.size = typeof spriteOptions.size === 'number' && spriteOptions.size > 0 ? spriteOptions.size : (abilityInfo.imageSize || 40);
+        spriteOptions.dir = typeof spriteOptions.dir === 'string' && spriteOptions.dir.length ? spriteOptions.dir : 'right';
+        spriteOptions.frame = typeof spriteOptions.frame === 'string' && spriteOptions.frame.length > 0 ? spriteOptions.frame : '00';
+        spriteOptions.delay = typeof spriteOptions.delay === 'number' && spriteOptions.delay !== 0 ? spriteOptions.delay : (-1 * ( Math.floor(Math.random() * 10) / 100 ));
+        spriteOptions.classes = typeof spriteOptions.classes === 'string' && spriteOptions.classes.length > 1 ? spriteOptions.classes : '';
+        spriteOptions.styles = typeof spriteOptions.styles === 'string' && spriteOptions.styles.length > 1 ? spriteOptions.styles : '';
+        // Generate the ability sprite attributes and inner markup given the options
+        let abilitySpriteAttrs = '';
+        let abilitySpriteClass = 'sprite ability' + (spriteOptions.classes ? ' ' + spriteOptions.classes : '');
+        let abilitySpriteStyle = 'animation-delay: ' + spriteOptions.delay + 's;' + (spriteOptions.styles ? ' ' + spriteOptions.styles : '');
+        abilitySpriteAttrs += ' class="' + abilitySpriteClass + '"';
+        abilitySpriteAttrs += ' data-sprite="ability"';
+        abilitySpriteAttrs += ' data-token="' + abilityToken + '"';
+        abilitySpriteAttrs += ' data-sheet="' + spriteOptions.sheet + '"';
+        abilitySpriteAttrs += ' data-size="' + spriteOptions.size + '"';
+        abilitySpriteAttrs += ' data-dir="' + spriteOptions.dir + '"';
+        abilitySpriteAttrs += ' data-frame="' + spriteOptions.frame + '"';
+        if (abilitySpriteStyle.length){ abilitySpriteAttrs += ' style="' + abilitySpriteStyle + '"'; }
+        let abilitySpriteInner = '<i class="sprite"></i>';
+        // Put it all together to generate the final markup
+        let abilitySpriteMarkup = '';
+        abilitySpriteMarkup += '<span' + abilitySpriteAttrs + '>';
+            abilitySpriteMarkup += '<span class="wrap">' + abilitySpriteInner + '</span>';
+        abilitySpriteMarkup += '</span>';
+        // Return the generated markup for the ability sprite
+        return abilitySpriteMarkup;
+        }
+
     // Define a quick function for showing a generic action modal for items or abilities
     showActionModal(actionKind, actionToken, itemOrAbilityToken, targetRobotToken){
         console.log('%c' + 'mmrpgWorldMap.showActionModal(actionKind:' + actionKind + ', actionToken:' + actionToken + ', itemOrAbilityToken:' + itemOrAbilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
