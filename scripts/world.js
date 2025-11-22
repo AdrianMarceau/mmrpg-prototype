@@ -7682,6 +7682,412 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Define a quick function for getting the overview details for a given robot in the user's inventory
+    getRobotDetailsForOverview(robotToken){
+        //console.log('%c' + 'mmrpgWorldMap.getRobotDetailsForOverview(robot:' + robotToken + ')', 'color: magenta;');
+        if (!robotToken || typeof robotToken !== 'string' || !robotToken.length){ console.error('getRobotDetailsForOverview() missing required robotToken!'); return ''; }
+
+        // parse out the player-specific robot token was provided alongside an ID
+        let playerRobotToken = false;
+        if (robotToken.indexOf('_') !== -1){
+            playerRobotToken = robotToken;
+            robotToken = robotToken.split('_')[1];
+            }
+
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _indexes = _self.indexes;
+        let _mmrpgTypesIndex = _indexes.types;
+        let _mmrpgRobotsIndex = _indexes.robots;
+        let _mmrpgAbilitiesIndex = _indexes.abilities;
+        let _mmrpgItemsIndex = _indexes.items;
+        let _mmrpgFieldsIndex = _indexes.fields;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        let playerRobotInfo = playerRobotToken ? _worldPlayerRobots[playerRobotToken] : false;
+        //console.log('--> _worldPlayer =', _worldPlayer);
+        //console.log('--> _worldPlayerRobots =', _worldPlayerRobots);
+        //console.log('--> playerRobotInfo =', playerRobotInfo);
+        //console.log('--> playerRobotInfo.persona =', (playerRobotInfo ? playerRobotInfo.persona : 'N/A'));
+        if (typeof _mmrpgRobotsIndex[robotToken] === 'undefined'){ console.error('getRobotDetailsForOverview() could not find robot in index for token ' + robotToken + '!'); return false; }
+        let baseRobotIndexInfo = _mmrpgRobotsIndex[robotToken];
+        let robotIndexInfo = playerRobotInfo && playerRobotInfo.persona ? _mmrpgRobotsIndex[playerRobotInfo.persona] : baseRobotIndexInfo;
+        //console.log('--> baseRobotIndexInfo =', baseRobotIndexInfo);
+        //console.log('--> robotIndexInfo =', robotIndexInfo);
+
+        // Generate the markup, classes, styles, etc. that will make up the robot details
+        let robotTitle = 'Robot Details';
+        let robotKind = robotIndexInfo.class;
+        let robotName = robotIndexInfo.name;
+        let robotDescription = robotIndexInfo.description;
+        let robotCore1 = robotIndexInfo.core || 'none';
+        let robotCore2 = robotIndexInfo.core2 || false;
+        let robotCoreName1 = robotIndexInfo.core ? _mmrpgTypesIndex[robotIndexInfo.core].name : 'Neutral';
+        let robotCoreName2 = robotIndexInfo.core2 ? _mmrpgTypesIndex[robotIndexInfo.core2].name : false;
+        let robotImage = robotIndexInfo.image || robotToken;
+        let robotImageSize = robotIndexInfo.imageSize;
+        let robotImageAlt = '';
+        if (playerRobotInfo.name){ robotName = playerRobotInfo.name; }
+        if (playerRobotInfo.image){ robotImage = playerRobotInfo.image; }
+        if (robotImage.indexOf('_') !== -1){ robotImage = robotImage.split('_'); robotImageAlt = robotImage[1]; robotImage = robotImage[0]; }
+        //console.log('--> robotKind =', robotKind);
+        //console.log('--> robotName =', robotName);
+        //console.log('--> robotDescription =', robotDescription);
+        //console.log('--> robotCore1 =', robotCore1);
+        //console.log('--> robotCore2 =', robotCore2);
+        //console.log('--> robotCoreName1 =', robotCoreName1);
+        //console.log('--> robotCoreName2 =', robotCoreName2);
+        //console.log('--> robotImage =', robotImage);
+        //console.log('--> robotImageSize =', robotImageSize);
+        //console.log('--> robotImageAlt =', robotImageAlt);
+
+        // Determine the icon to use based on the robot kind and format the text for display
+        let robotKindIcon = 'dot-circle';
+        let robotKindName = robotKind.charAt(0).toUpperCase() + robotKind.slice(1);
+        if (robotKind === 'master'){ robotKindIcon = 'robot'; }
+        else if (robotKind === 'mecha'){ robotKindIcon = 'ghost'; robotTitle = 'Mecha Details'; }
+        else if (robotKind === 'boss'){ robotKindIcon = 'skull'; robotTitle = 'Bosss Details'; }
+        //console.log('--> robotTitle =', robotTitle);
+        //console.log('--> robotKindName =', robotKindName);
+        //console.log('--> robotKindIcon =', robotKindIcon);
+
+        // Generate the robot sprite that will be used in the details
+        let randDelay = -1 * ( Math.floor(Math.random() * 10) / 100 );
+        let robotSpriteClasses = 'sprite robot icon';
+        let robotSpriteStyles = 'animation-delay: ' + randDelay + 's; ';
+        let robotSpriteAttrs = 'data-sprite="robot" data-token="' + robotImage + '" data-alt="' + robotImageAlt + '" data-size="' + robotImageSize + '" data-dir="left" data-frame="00"';
+        let robotSprite = '<div class="' + robotSpriteClasses + '" style="' + robotSpriteStyles + '" ' + robotSpriteAttrs + '><span class="wrap"><i class="sprite"></i></span></div>';
+        //console.log('--> robotSpriteClasses =', robotSpriteClasses);
+        //console.log('--> robotSpriteStyles =', robotSpriteStyles);
+        //console.log('--> robotSpriteAttrs =', robotSpriteAttrs);
+        //console.log('--> robotSprite =', robotSprite);
+
+        // Collect details about the power level of this robot (if relevant)
+        let robotLevel = playerRobotInfo.level || 0;
+        let robotExperience = playerRobotInfo.experience || 0;
+        let robotEnergy = playerRobotInfo.energy || 0;
+        let robotEnergyMax = playerRobotInfo.energyMax || 0;
+        let robotEnergyPercent = playerRobotInfo.energyPercent || 0;
+        let robotEnergyRating = playerRobotInfo.energyRating || 0;
+        let robotWeapons = playerRobotInfo.weapons || 0;
+        let robotWeaponsMax = playerRobotInfo.weaponsMax || 0;
+        let robotWeaponsPercent = playerRobotInfo.weaponsPercent || 0;
+        let robotWeaponsRating = playerRobotInfo.weaponsRating || 0;
+        let robotAttack = playerRobotInfo.attack || 0;
+        let robotAttackMods = playerRobotInfo.attackMods || 0;
+        let robotDefense = playerRobotInfo.defense || 0;
+        let robotDefenseMods = playerRobotInfo.defenseMods || 0;
+        let robotSpeed = playerRobotInfo.speed || 0;
+        let robotSpeedMods = playerRobotInfo.speedMods || 0;
+        let robotDisabled = playerRobotInfo.disabled === true ? true : false;
+        let robotItem = playerRobotInfo.item || '';
+        let robotItemInfo = robotItem && typeof _mmrpgItemsIndex[robotItem] !== 'undefined' ? _mmrpgItemsIndex[robotItem] : false;
+        let robotSupport = playerRobotInfo.support ? playerRobotInfo.support : (robotIndexInfo.support ? robotIndexInfo.support : '');
+        let robotSupportInfo = robotSupport && typeof _mmrpgRobotsIndex[robotSupport] !== 'undefined' ? _mmrpgRobotsIndex[robotSupport] : false;
+        let robotSupportEquipped = (function(info){
+            let abilities = _mmrpgAbilitiesIndex, equipped = info.abilities || [];
+            let required = ['mecha-support', 'mecha-assault', 'mecha-party', 'friend-share'];
+            for (var i = 0; i < required.length; i++){ if (equipped.indexOf(abilities[required[i]].id) !== -1){ return true; } }
+            return false;
+            })(playerRobotInfo);
+        //console.log('--> robotLevel =', robotLevel);
+        //console.log('--> robotExperience =', robotExperience);
+        //console.log('--> robotEnergy =', robotEnergy, '/', robotEnergyMax, '(', robotEnergyPercent, '% )');
+        //console.log('--> robotWeapons =', robotWeapons, '/', robotWeaponsMax, '(', robotWeaponsPercent, '% )');
+        //console.log('--> robotAttack =', robotAttack, (robotAttackMods > 0 ? '+' + robotAttackMods : robotAttackMods));
+        //console.log('--> robotDefense =', robotDefense, (robotDefenseMods > 0 ? '+' + robotDefenseMods : robotDefenseMods));
+        //console.log('--> robotSpeed =', robotSpeed, (robotSpeedMods > 0 ? '+' + robotSpeedMods : robotSpeedMods));
+        //console.log('--> robotItem =', robotItem);
+        //console.log('--> robotItemInfo =', robotItemInfo);
+        //console.log('--> robotSupport =', robotSupport);
+        //console.log('--> robotSupportInfo =', robotSupportInfo);
+        //console.log('--> robotSupportEquipped =', robotSupportEquipped);
+        //console.log('--> robotDisabled =', robotDisabled);
+
+        // Generate type-related markup and spans for use later
+        let statTokens = ['attack', 'defense', 'speed'];
+        let statTokenCodes = ['ATK', 'DEF', 'SPD'];
+        let weaknessTokens = ['weaknesses', 'resistances', 'affinities', 'immunities'];
+        let robotCoreName = (robotCoreName1 + (robotCoreName2 ? (' / ' + robotCoreName2) : '')) + ' Core';
+        let robotCoreClasses = (robotCore2 && robotCore1 === 'none' ? robotCore2 : (robotCore1 + (robotCore2 ? '_' + robotCore2 : '')));
+        //console.log('--> statTokens =', statTokens);
+        //console.log('--> robotCoreName =', robotCoreName);
+        //console.log('--> robotCoreClasses =', robotCoreClasses);
+
+        // Start generating the robot details object for the overview
+        let robotDetailsObject = {};
+        robotDetailsObject.title = robotTitle;
+        robotDetailsObject.image = robotSprite;
+        robotDetailsObject.name = robotName;
+        robotDetailsObject.level = robotLevel;
+        robotDetailsObject.experience = robotExperience;
+        robotDetailsObject.description = robotDescription;
+        robotDetailsObject.disabled = robotDisabled;
+        robotDetailsObject.classIcon = robotKindIcon;
+        robotDetailsObject.typeName = robotCoreName;
+        robotDetailsObject.typeClasses = robotCoreClasses;
+        robotDetailsObject.infoLines = [];
+
+        // LIFE ENERGY
+        let lifeEnergyLine = { classes: 'life-energy', label: 'Life Energy:', guages: [], values: [] }; {
+            lifeEnergyLine.guages.push({ type: 'energy', percent: robotEnergyPercent });
+            lifeEnergyLine.values.push({ value: robotEnergy, valueClasses: 'current' });
+            lifeEnergyLine.values.push({ value: '/', valueClasses: 'separator' });
+            lifeEnergyLine.values.push({ value: robotEnergyMax, valueClasses: 'max' });
+            lifeEnergyLine.values.push({ value: 'LE', valueClasses: 'unit' });
+            lifeEnergyLine.values.push({ value: '(' + robotEnergyPercent + '%)', valueClasses: 'percent' });
+            }
+        robotDetailsObject.infoLines.push(lifeEnergyLine);
+
+        // WEAPON ENERGY
+        let weaponEnergyLine = { classes: 'weapon-energy', label: 'Weapon Energy:', guages: [], values: [] }; {
+            weaponEnergyLine.guages.push({ type: 'weapons', percent: robotWeaponsPercent });
+            weaponEnergyLine.values.push({ value: robotWeapons, valueClasses: 'current' });
+            weaponEnergyLine.values.push({ value: '/', valueClasses: 'separator' });
+            weaponEnergyLine.values.push({ value: robotWeaponsMax, valueClasses: 'max' });
+            weaponEnergyLine.values.push({ value: 'WE', valueClasses: 'unit' });
+            weaponEnergyLine.values.push({ value: '(' + robotWeaponsPercent + '%)', valueClasses: 'percent' });
+            }
+        robotDetailsObject.infoLines.push(weaponEnergyLine);
+
+        // STATS (ATTACK / DEFENSE / SPEED)
+        let statsLine = { classes: 'base-stats types', label: 'Stats:', values: [] }; {
+            let statValues = [], liveStatValues = [], statValuesRange = [];
+            let marginBase = 16, marginBaseMax = (statTokens.length * (marginBase - 1));
+            for (let i = 0; i < statTokens.length; i++){
+                let statToken = statTokens[i];
+                let statMods = playerRobotInfo[statToken + 'Mods'] || 0;
+                let statBaseValue = playerRobotInfo[statToken] || 0;
+                let liveStatValue = _self.calculateRobotStat(statBaseValue, statMods);
+                statValues.push(statBaseValue);
+                liveStatValues.push(liveStatValue);
+                }
+            //let translatedValuePercents = _self.translateValueRange(liveStatValues, 1, 100, true);
+            //let translatedValueMargins = _self.translateValueRange(liveStatValues, 1, marginBase, true);
+            let scaledValueMargins = _self.scaleArrayToRange(liveStatValues, 1, marginBase, true);
+            //console.log('--> marginBase =', marginBase);
+            //console.log('--> marginBaseMax =', marginBaseMax);
+            //console.log('--> statValues =', statValues);
+            //console.log('--> liveStatValues =', liveStatValues);
+            //console.log('--> translatedValuePercents =', translatedValuePercents);
+            //console.log('--> translatedValueMargins =', translatedValueMargins);
+            //console.log('--> scaledValueMargins =', scaledValueMargins);
+            for (let i = 0; i < statTokens.length; i++){
+                let statToken = statTokens[i];
+                let statCode = statTokenCodes[i];
+                let statMargin = marginBase - scaledValueMargins[i];
+                //let statMargin = marginBase - translatedValueMargins[i];
+                //let statRangeValue = statValuesRange[i];
+                //let statRangeValue = translatedValueMargins[i];
+                let statName = statToken.charAt(0).toUpperCase() + statToken.slice(1);
+                let statMods = playerRobotInfo[statToken + 'Mods'] || 0;
+                let statBaseValue = statValues[i]; //playerRobotInfo[statToken] || 0;
+                let statRealValue = liveStatValues[i]; //_self.calculateRobotStat(statBaseValue, statMods);
+                let statModArrows = '';
+                if (statMods > 0){ statModArrows += ('&#9650;').repeat(statMods); }
+                else if (statMods < 0){ statModArrows += ('&#9660;').repeat(Math.abs(statMods)); }
+                statModArrows = statModArrows.length ? ('<sup class="arrows">' + statModArrows + '</sup>') : '';
+                let statValueClasses = statToken;
+                let statModClasses = !statMods ? '' : (statMods > 0 ? ' raised' : ' lowered');
+                statsLine.values.push({
+                    //value: statRealValue + ' ' + statCode,
+                    value: statRealValue + (true ? '' : '') + ' ' + statCode + statModArrows,
+                    valueClasses: 'type ' + statValueClasses + statModClasses,
+                    valueStyles: 'margin-left: ' + statMargin + 'px;',
+                    });
+                }
+            }
+        robotDetailsObject.infoLines.push(statsLine);
+
+        // HELD ITEM
+        let itemLine = { classes: 'held-item types', label: 'Item:', values: [] }; {
+            let itemToken, itemName, itemSprite, itemTypes;
+            if (robotItem && robotItemInfo){
+                itemToken = robotItem;
+                itemName = robotItemInfo.name;
+                itemSprite = _self.getItemSpriteMarkup(itemToken, {classes: 'icon'});
+                itemTypes = (function(info){
+                    if (!info){ return ''; }
+                    else if (!info.type && !info.type2){ return 'none'; }
+                    else if (!info.type && info.type2){ return info.type2; }
+                    else { return info.type; }
+                    })(robotItemInfo);
+                } else {
+                itemToken = '';
+                itemName = 'None',
+                itemSprite = '<span class="icon"><i class="fa fas fa-times"></i></span>';
+                itemTypes = 'empty';
+                }
+            let itemNameSize = itemName.split(' ').length;
+            let itemNameMarkup = (itemNameSize > 1 ? ('<b>' + itemName.replace(' ', '<br />') + '</b>') : ('<b><b>' + itemName + '</b></b>'));
+            let itemSpriteMarkup = itemSprite;
+            let itemTypeClasses = itemTypes;
+            itemLine.values.push({
+                value: itemNameMarkup + itemSpriteMarkup,
+                valueClasses: 'type ' + itemTypeClasses,
+                });
+            }
+        robotDetailsObject.infoLines.push(itemLine);
+
+        // SUPPORT MECHA
+        let supportLine = { classes: 'support-mecha types', label: 'Support:', values: [] }; {
+            let supportToken, supportName, supportSprite, supportTypes;
+            if (robotSupportEquipped){
+                if (robotSupport && robotSupportInfo){
+                    supportToken = robotSupport;
+                    supportName = robotSupportInfo.name;
+                    supportSprite = _self.getRobotSpriteMarkup(supportToken);
+                    supportTypes = (function(info){
+                        if (!info){ return ''; }
+                        else if (!info.core && !info.core2){ return 'none'; }
+                        else if (!info.core && info.core2){ return info.core2; }
+                        else { return info.core; }
+                        })(robotSupportInfo);
+                    } else {
+                    supportToken = '';
+                    supportName = '&hellip;',
+                    supportSprite = '<span class="icon"><i class="fa fas fa-question"></i></span>';
+                    supportTypes = 'empty';
+                    }
+                } else {
+                supportToken = '';
+                supportName = 'None',
+                supportSprite = '<span class="icon"><i class="fa fas fa-times"></i></span>';
+                supportTypes = 'empty';
+                }
+            let supportNameSize = supportName.split(' ').length;
+            let supportNameMarkup = (supportNameSize > 1 ? ('<b>' + supportName.replace(' ', '<br />') + '</b>') : ('<b><b>' + supportName + '</b></b>'));
+            let supportSpriteMarkup = supportSprite;
+            let supportTypeClasses = supportTypes;
+            supportLine.values.push({
+                value: supportNameMarkup + supportSpriteMarkup,
+                valueClasses: 'type ' + supportTypeClasses,
+                });
+            }
+        robotDetailsObject.infoLines.push(supportLine);
+
+        // EQUIPPED ABILITIES
+        let abilitiesLine = { classes: 'equipped-abilities types', label: 'Abilities:', values: [] }; {
+            let playerRobotAbilities = playerRobotInfo.abilities || [];
+            let maxAbilitiesPerRobot = _config.maxAbilitiesPerRobot;
+            //console.log('--> playerRobotAbilities =', playerRobotAbilities);
+            for (let i = 0; i < maxAbilitiesPerRobot; i++){
+                let abilitySlotKey = i;
+                let abilitySlotNum = abilitySlotKey + 1;
+                let abilityID = typeof playerRobotAbilities[abilitySlotKey] !== 'undefined' ? playerRobotAbilities[abilitySlotKey] : 0;
+                let abilityInfo = _mmrpgAbilitiesIndex.getByID(abilityID);
+                let abilityToken, abilityName, abilityTypeClasses;
+                if (abilityInfo){
+                    abilityToken = abilityInfo.token;
+                    abilityName = abilityInfo.name;
+                    abilityTypeClasses = (abilityInfo.type2 && !abilityInfo.type ? abilityInfo.type2 : ((abilityInfo.type ? abilityInfo.type : 'none') + (abilityInfo.type2 ? '_' + abilityInfo.type2 : '')));
+                    } else {
+                    abilityToken = '';
+                    abilityName = 'None';
+                    abilityTypeClasses = 'empty';
+                    }
+                let abilityNameFormatted = abilityName.replace(' ', '<br />');
+                //console.log('--> abilitySlotKey =', abilitySlotKey);
+                //console.log('--> abilitySlotNum =', abilitySlotNum);
+                //console.log('--> abilityID =', abilityID);
+                //console.log('--> abilityToken =', abilityToken);
+                //console.log('--> abilityInfo =', abilityInfo);
+                abilitiesLine.values.push({
+                    value: abilityNameFormatted,
+                    valueClasses: 'type ' + abilityTypeClasses,
+                    });
+                }
+            }
+        robotDetailsObject.infoLines.push(abilitiesLine);
+
+        // TEMP TEMP TEMP TEMP
+        // TODO: show weaknesses, resistances, affinities, immunities on separate 'page' of details maybe?
+        if (false){
+            // WEAKNESSES / RESISTANCES / AFFINITIES / IMMUNITIES
+            for (let i = 0; i < weaknessTokens.length; i++){
+                let weaknessToken = weaknessTokens[i];
+                let weaknessLine = { classes: weaknessToken + ' types', label: weaknessToken.charAt(0).toUpperCase() + weaknessToken.slice(1) + ':', values: [] };
+                if (robotIndexInfo[weaknessToken] && robotIndexInfo[weaknessToken].length){
+                    for (let j = 0; j < robotIndexInfo[weaknessToken].length; j++){
+                        let weaknessType = robotIndexInfo[weaknessToken][j];
+                        weaknessLine.values.push({
+                            value: _mmrpgTypesIndex[weaknessType].name,
+                            valueClasses: 'type ' + weaknessType
+                            });
+                        }
+                    } else {
+                    weaknessLine.values.push({
+                        value: 'None',
+                        valueClasses: 'type empty'
+                        });
+                    }
+                robotDetailsObject.infoLines.push(weaknessLine);
+                }
+            }
+
+        // ACTION BUTTONS
+        robotDetailsObject.actions = [];
+        let allowButtons = true;
+        let showItemButton = robotKind !== 'boss' ? true : false;
+        let showAbilityButton = robotKind !== 'mecha' ? true : false;
+        robotDetailsObject.actions.push({ action: 'goto-items', text: 'Use / Give Items', robot: robotToken, disabled: !allowButtons, hidden: !showItemButton });
+        robotDetailsObject.actions.push({ action: 'goto-abilities', text: 'Equip Abilities', robot: robotToken, disabled: !allowButtons, hidden: !showAbilityButton });
+
+        // Pre-compile some of the HTML to make it easier for the other functions
+        //robotDetailsObject.levelHTML = (robotDetailsObject.level >= 100 ? '<b>' : '') + 'Level ' + robotDetailsObject.level + (robotDetailsObject.level >= 100 ? '</b>' : '');
+        //robotDetailsObject.levelHTML = (robotDetailsObject.level >= 100 ? '<i class="fas fa-star"></i> Lv. ' : 'Level ') + robotDetailsObject.level;}
+        robotDetailsObject.levelHTML = 'Level ' + robotDetailsObject.level + (robotDetailsObject.level >= 100 ? ' <i class="fa fas fa-star color level"></i>' : '');
+        robotDetailsObject.experienceHTML = (robotDetailsObject.level >= 100 ? '<i>&#8734;</i>' : robotDetailsObject.experience) + ' / 1000 Exp';
+        robotDetailsObject.classIconHTML = '' + (robotDetailsObject.classIcon ? ('<i class="fa fas fa-' + robotDetailsObject.classIcon + '"></i>') : '');
+        robotDetailsObject.infolinesHTML = '';
+        for (let i = 0; i < robotDetailsObject.infoLines.length; i++){
+            let infoLine = robotDetailsObject.infoLines[i];
+            let infoClasses = infoLine.classes || '';
+            if (infoLine.guages && infoLine.guages.length){ infoClasses += ' has-guage'; }
+            robotDetailsObject.infolinesHTML += '<div class="infoline ' + infoClasses + '">';
+                if (infoLine.guages){
+                    for (let j = 0; j < infoLine.guages.length; j++){
+                        let guageInfo = infoLine.guages[j];
+                        robotDetailsObject.infolinesHTML += '<span class="guage' + (guageInfo.guageClasses ? (' ' + guageInfo.guageClasses) : '') + '">'
+                            + '<hr class="type current ' + guageInfo.type + '" style="width: ' + guageInfo.percent + '%;" />'
+                            + '<hr class="type max ' + guageInfo.type + '" />'
+                            + '</span>';
+                        }
+                    }
+                robotDetailsObject.infolinesHTML += '<strong class="label">' + infoLine.label + '</strong>';
+                if (infoLine.values){
+                    for (let j = 0; j < infoLine.values.length; j++){
+                        let valueInfo = infoLine.values[j];
+                        let valueClasses = valueInfo.valueClasses || '';
+                        let valueStyles = valueInfo.valueStyles || '';
+                        robotDetailsObject.infolinesHTML += '<span class="value' + (valueClasses ? (' ' + valueClasses) : '') + '"' + (valueStyles ? (' style="' + valueStyles + '"') : '') + '>' + valueInfo.value + '</span>';
+                        if (valueInfo.icon){ robotDetailsObject.infolinesHTML += '<i class="fa fas fa-' + valueInfo.icon + '"></i>'; }
+                        }
+                    } else {
+                    robotDetailsObject.infolinesHTML += '<span class="value' + (infoLine.valueClasses ? (' ' + infoLine.valueClasses) : '') + '">' + infoLine.value + '</span>';
+                    if (infoLine.icon){ robotDetailsObject.infolinesHTML += '<i class="fa fas fa-' + infoLine.icon + '"></i>'; }
+                    }
+            robotDetailsObject.infolinesHTML += '</div>';
+            }
+        robotDetailsObject.actionsHTML = '';
+        for (let i = 0; i < robotDetailsObject.actions.length; i++){
+            let actionInfo = robotDetailsObject.actions[i];
+            let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
+            let actionHidden = typeof actionInfo.hidden !== 'undefined' && actionInfo.hidden === true ? true : false;
+            robotDetailsObject.actionsHTML += '<button type="button" '
+                + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
+                + 'data-action="' + actionInfo.action + '"' + (actionDisabled ? ' disabled="disabled"' : '') +
+                '>' + actionInfo.text + '</button>';
+            }
+
+        // Return the generated robot details object
+        //console.log('--> robotDetailsObject =', robotDetailsObject);
+        return robotDetailsObject;
+        }
+
     // Define a quick function for getting the overview details for a given item in the user's inventory
     getItemDetailsForOverview(itemToken, targetSelected){
         //console.log('%c' + 'mmrpgWorldMap.getItemDetailsForOverview(item:' + itemToken + ', targetSelected:' + targetSelected + ')', 'color: magenta;');
