@@ -9248,6 +9248,93 @@ class mmrpgWorldMap {
         return _self.showAbilityModal('equip-ability', abilityToken, targetRobotToken);
         }
 
+    // Define a quick function for generating the markup for an item select button given an item token, robot info, and/or optional settings
+    generateItemSelectButtonMarkup(itemToken, playerRobotInfo, buttonOptions){
+        //console.log('%c' + 'mmrpgWorldMap.generateItemSelectButtonMarkup(itemToken:' + itemToken + ', playerRobotInfo, buttonOptions)', 'color: magenta;');
+        //console.log('-> w/ playerRobotInfo =', playerRobotInfo);
+        //console.log('-> w/ buttonOptions =', buttonOptions);
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('generateItemSelectButtonMarkup() missing required itemToken!'); return ''; }
+        if (!playerRobotInfo || typeof playerRobotInfo !== 'object'){ playerRobotInfo = null; }
+        if (!buttonOptions || typeof buttonOptions !== 'object'){ buttonOptions = {}; }
+        let _self = this;
+        let _config = _self.config;
+        let _indexes = _self.indexes;
+        let _world = _self.state;
+        let itemInfo = _indexes.items.getByToken(itemToken);
+        if (!itemInfo || typeof itemInfo !== 'object'){ console.error('generateItemSelectButtonMarkup() could not find itemInfo for token ' + itemToken + '!'); return ''; }
+
+        buttonOptions.selected = typeof buttonOptions.selected !== 'undefined' ? buttonOptions.selected : false;
+        buttonOptions.disabled = typeof buttonOptions.disabled !== 'undefined' ? buttonOptions.disabled : false;
+        buttonOptions.slot = typeof buttonOptions.slot === 'number' ? buttonOptions.slot : false;
+
+        let itemAnimationDelay = -1 * ( Math.floor(Math.random() * 10) / 100 );
+        let itemTypeClasses = itemInfo.type === '' ? 'none' : (itemInfo.type + (itemInfo.type2 !== '' ? '_' + itemInfo.type2 : ''));
+        let itemEnergyCost = itemInfo.energy || 0;
+
+        let itemNameFormatted = itemInfo.name.split(' ').join('<br />');
+        let itemCostFormatted = '<sup>' + itemEnergyCost + '</sup><sub>WE</sub>';
+
+        let buttonAttrs = '';
+        let buttonClass = 'team-item' + (buttonOptions.selected ? ' selected' : '') + (buttonOptions.disabled ? ' disabled' : '');
+        let buttonStyle = '';
+        buttonAttrs += ' class="' + buttonClass + '"';
+        buttonAttrs += ' data-item="' + itemToken + '"';
+        buttonAttrs += ' data-item-id="' + itemInfo.id + '"';
+        buttonAttrs += ' data-energy-cost="' + (itemInfo.energy || 0) + '"';
+        if (buttonOptions.slot !== false){ buttonAttrs += ' data-slot="' + buttonOptions.slot + '"'; }
+        if (buttonStyle.length){ buttonAttrs += ' style="' + buttonStyle + '"'; }
+
+        let buttonSpriteAttrs = '';
+        let buttonSpriteClass = 'sprite item icon';
+        let buttonSpriteStyle = 'animation-delay: ' + itemAnimationDelay + 's;';
+        buttonSpriteAttrs += ' class="' + buttonSpriteClass + '"';
+        buttonSpriteAttrs += ' data-sprite="item"';
+        buttonSpriteAttrs += ' data-token="' + itemToken + '"';
+        buttonSpriteAttrs += ' data-alt=""';
+        buttonSpriteAttrs += ' data-size="40"';
+        buttonSpriteAttrs += ' data-dir="right"';
+        buttonSpriteAttrs += ' data-frame="00"';
+        if (buttonSpriteStyle.length){ buttonSpriteAttrs += ' style="' + buttonSpriteStyle + '"'; }
+        let buttonSpriteInner = '<span class="wrap"><i class="back type ' + itemTypeClasses + '"></i><i class="sprite"></i></span>';
+
+        let buttonMarkup = '';
+        buttonMarkup += '<div' + buttonAttrs + '>';
+            buttonMarkup += '<div class="image"><span' + buttonSpriteAttrs + '>' + buttonSpriteInner + '</span></div>';
+            buttonMarkup += '<span class="tint type ' + itemTypeClasses + '"></span>';
+            buttonMarkup += '<strong class="name">' + itemNameFormatted + '</strong>';
+            buttonMarkup += '<span class="cost">' + itemCostFormatted + '</span>';
+        buttonMarkup += '</div>';
+
+        return buttonMarkup;
+
+        }
+
+    // Define a quick function for generating the markup for an item select placeholder given robot info, and/or optional settings
+    generateItemSelectPlaceholderMarkup(playerRobotInfo, buttonOptions){
+        //console.log('%c' + 'mmrpgWorldMap.generateItemSelectPlaceholderMarkup(playerRobotInfo, buttonOptions)', 'color: magenta;');
+        //console.log('-> w/ playerRobotInfo =', playerRobotInfo);
+        //console.log('-> w/ buttonOptions =', buttonOptions);
+        if (!playerRobotInfo || typeof playerRobotInfo !== 'object'){ playerRobotInfo = null; }
+        if (!buttonOptions || typeof buttonOptions !== 'object'){ buttonOptions = {}; }
+        let _self = this;
+        let _config = _self.config;
+        buttonOptions.selected = typeof buttonOptions.selected !== 'undefined' ? buttonOptions.selected : false;
+        buttonOptions.disabled = typeof buttonOptions.disabled !== 'undefined' ? buttonOptions.disabled : false;
+        buttonOptions.slot = typeof buttonOptions.slot === 'number' ? buttonOptions.slot : false;
+        let buttonAttrs = '';
+        buttonAttrs += ' data-item="item"';
+        let buttonClass = 'team-item placeholder' + (buttonOptions.selected ? ' selected' : '') + (buttonOptions.disabled ? ' disabled' : '');
+        let buttonStyle = '';
+        buttonAttrs += ' class="' + buttonClass + '"';
+        if (buttonOptions.slot !== false){ buttonAttrs += ' data-slot="' + buttonOptions.slot + '"'; }
+        if (buttonStyle.length){ buttonAttrs += ' style="' + buttonStyle + '"'; }
+        let buttonMarkup = '';
+        buttonMarkup += '<div' + buttonAttrs + '>';
+            buttonMarkup += '<span class="tint type empty"></span>';
+        buttonMarkup += '</div>';
+        return buttonMarkup;
+        }
+
     // Define a quick function for generating the markup for an ability select button given an ability token, robot info, and/or optional settings
     generateAbilitySelectButtonMarkup(abilityToken, playerRobotInfo, buttonOptions){
         //console.log('%c' + 'mmrpgWorldMap.generateAbilitySelectButtonMarkup(abilityToken:' + abilityToken + ', playerRobotInfo, buttonOptions)', 'color: magenta;');
