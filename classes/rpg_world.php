@@ -3741,6 +3741,7 @@ class rpg_world {
         $robot_core_types = 'type '.(!empty($robot_info['robot_core']) ? ($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' '.$robot_info['robot_core2'] : '')) : 'none');
         $robot_core_or_none = !empty($robot_core) ? $robot_core : 'none';
         $robot_item = !empty($robot_settings['robot_item']) ? $robot_settings['robot_item'] : '';
+        $robot_support = !empty($robot_settings['robot_support']) ? $robot_settings['robot_support'] : '';
         $has_persona_applied = false;
         if (!empty($robot_settings['robot_persona'])
             && !empty($robot_settings['robot_abilities']['copy-style'])){
@@ -3812,6 +3813,7 @@ class rpg_world {
             'level' => $robot_level,
             'experience' => $robot_experience,
             'item' => $robot_item,
+            'support' => $robot_support,
             'energy' => $robot_energy,
             'energyMax' => $robot_energy_max,
             'energyPercent' => $robot_energy_percent,
