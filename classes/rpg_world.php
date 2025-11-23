@@ -3768,7 +3768,8 @@ class rpg_world {
             $robot_energy = $robot_stats['energy']['current'];
             $robot_energy_max = $robot_stats['energy']['current'];
             if (isset($robot_session['energy'])){ $robot_energy += $robot_session['energy']; }
-            $robot_energy_percent = ceil(($robot_energy / $robot_energy_max) * 100);
+            $robot_energy_percent = round(($robot_energy / $robot_energy_max) * 100);
+            if ($robot_energy_percent === 100 && $robot_energy < $robot_energy_max){ $robot_energy_percent -= 1; }
             $robot_energy_rating = $get_rating_token($robot_energy_percent);
             if (empty($robot_energy)){ $robot_disabled = true; }
             }
