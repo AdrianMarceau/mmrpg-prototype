@@ -1694,7 +1694,13 @@ html, body {
     box-shadow: 0 0 3px rgba(98, 98, 98, 0.3);
     pointer-events: auto;
     transform: skewX(10deg);
-    transition: top 0.9s, left 0.9s, bottom 0.9s, transform 0.9s, background-color 0.3s, border-color 0.3s;
+    /* transition: top 0.9s, left 0.9s, bottom 0.9s, transform 0.9s, background-color 0.3s, border-color 0.3s;  */
+}
+#world #canvas #robots-overview:before {
+    transition: top 0.9s, left 0.3s, bottom 0.9s, transform 0.3s, background-color 0.3s, border-color 0.3s;
+}
+#world #canvas #robots-overview:after {
+    transition: top 0.9s, left 0.6s, bottom 0.9s, transform 0.9s, background-color 0.3s, border-color 0.3s;
 }
 #world #canvas #robots-overview:before {
     z-index: 1;
@@ -2031,7 +2037,7 @@ html, body {
     top: 800px;
     height: calc(100% - 30px);
     max-height: 516px;
-    width: 303px;
+    width: 307px;
     background-color: #191919;
     box-shadow: inset 2px 2px 0 #090909;
     padding: 26px 0 18px 16px;
@@ -2525,6 +2531,15 @@ html, body {
     animation: storage-object-showcase_sprite-bounce 1s linear infinite;
     animation-timing-function: steps(2);
 }
+#world #robots-overview .storage-box > .details .image > .sprite.robot {
+    filter: none;
+}
+#world #robots-overview .storage-box > .details .image > .sprite.robot > .wrap > .sprite {
+    transform-origin: bottom;
+    position: absolute;
+    top: auto;
+    bottom: -15px;
+}
 #world #robots-overview .storage-box > .details .image > .sprite > .wrap > .back {
     transform: translateY(14px) scale(2.0);
     animation: storage-object-showcase_sprite-bounce-back 1s linear infinite;
@@ -2542,7 +2557,9 @@ html, body {
 }
 #robots-overview .storage-box > .details .subtitle .name,
 #robots-overview .storage-box > .details .subtitle .quantity,
-#robots-overview .storage-box > .details .subtitle .cost {
+#robots-overview .storage-box > .details .subtitle .cost,
+#robots-overview .storage-box > .details .subtitle .level,
+#robots-overview .storage-box > .details .subtitle .experience {
     display: block;
     margin: 0 auto 6px;
 }
@@ -2550,19 +2567,32 @@ html, body {
     float: left;
     text-align: left;
     font-size: 13px;
+    line-height: 1.1;
     font-weight: bold;
     color: #efefef;
-    max-width: calc(100% - 40px);
+    max-width: calc(100% - 80px);
 }
 #robots-overview .storage-box > .details .subtitle .quantity,
-#robots-overview .storage-box > .details .subtitle .cost {
+#robots-overview .storage-box > .details .subtitle .cost,
+#robots-overview .storage-box > .details .subtitle .level {
     float: right;
+    clear: right;
     font-size: 12px;
     font-weight: normal;
     color: #cfcfcf;
 }
+#robots-overview .storage-box > .details .subtitle > hr,
+#robots-overview .storage-box > .details .infoline hr {
+    display: block;
+    clear: both;
+    width: auto;
+    height: 6px;
+    margin: 0 0 6px;
+    border: 1px solid #464646;
+    backgound-color: #464646;
+    border-radius: 3px;
+}
 #robots-overview .storage-box > .details .types {
-
 }
 #robots-overview .storage-box > .details .types .type {
     display: inline-block;
@@ -2573,16 +2603,27 @@ html, body {
     border-radius: 3px;
     background-color: #363636;
     border: 1px solid #565656;
+    text-shadow: 1px 1px 0 #000000;
+}
+#robots-overview .storage-box > .details .types .type.empty {
+    color: #868686;
 }
 #robots-overview .storage-box > .details .subtitle > hr {
-    display: block;
-    clear: both;
-    width: auto;
-    height: 6px;
     margin: 6px 0 0;
-    border: 1px solid #464646;
-    backgound-color: #464646;
-    border-radius: 3px;
+}
+#robots-overview .storage-box > .details .subtitle > sub {
+    position: absolute;
+    z-index: 3;
+    display: block;
+    border-radius: 0 3px 3px 12px;
+    font-size: 11px;
+    padding: 0px 6px 0 12px;
+    white-space: nowrap;
+    bottom: 1px;
+    right: 0;
+    border: 1px solid transparent;
+    border-left-color: transparent !important;
+    border-top-color: transparent !important;
 }
 #robots-overview .storage-box > .details .infolines {
     display: block;
@@ -2593,13 +2634,72 @@ html, body {
     font-size: 11px;
     line-height: 1.2;
     color: #fefefe;
-    overflow: hidden;
+    overflow: visible;
     margin-bottom: 6px;
     text-align: right;
+    position: relative;
+    float: none;
+    clear: both;
+}
+#robots-overview .storage-box > .details .infoline:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#robots-overview .storage-box > .details .infoline .guage {
+    display: block;
+    height: auto;
+    margin: 0 auto;
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+#robots-overview .storage-box > .details .infoline .guage hr {
+    margin: 0;
+    position: relative;
+    float: right;
+    z-index: 2;
+}
+#robots-overview .storage-box > .details .infoline .guage hr + hr {
+    position: absolute;
+    float: none;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background-color: #191919 !important;
+}
+#robots-overview .storage-box > .details .infoline .label,
+#robots-overview .storage-box > .details .infoline .value,
+#robots-overview .storage-box > .details .infoline > i {
+    position: relative;
+    z-index: 2;
 }
 #robots-overview .storage-box > .details .infoline .label {
     float: left;
     color: #dedede;
+}
+#robots-overview .storage-box > .details .infoline.has-guage {
+    padding-bottom: 9px;
+}
+#robots-overview .storage-box > .details .infoline.has-guage + .infoline.has-guage {
+    margin-top: -3px;
+}
+#robots-overview .storage-box > .details .infoline.has-guage .value.separator,
+#robots-overview .storage-box > .details .infoline.has-guage .value.max {
+    color: #868686;
+}
+#robots-overview .storage-box > .details .infoline.has-guage .value.separator {
+    margin-left: 9px;
+}
+#robots-overview .storage-box > .details .infoline.has-guage .value.max {
+    margin-left: 3px;
+}
+#robots-overview .storage-box > .details .infoline.has-guage .value.percent {
+    color: #969696;
 }
 #robots-overview .storage-box > .details .infoline .value,
 #robots-overview .storage-box > .details .infoline > i {
@@ -2612,6 +2712,207 @@ html, body {
 #robots-overview .storage-box > .details .infoline > i {
 
 }
+#robots-overview .storage-box > .details[data-robot] .subtitle {
+    padding: 6px 0 12px;
+}
+#robots-overview .storage-box > .details[data-robot] .subtitle .name {
+    font-size: 14px;
+    margin: 0 auto 0 0;
+    position: relative;
+    top: -5px;
+    white-space: nowrap;
+}
+#robots-overview .storage-box > .details[data-robot] .subtitle .level {
+    position: relative;
+    bottom: 9px;
+}
+#robots-overview .storage-box > .details[data-robot] .subtitle .level > i {
+    position: absolute;
+    display: block;
+    top: 2px;
+    right: -16px;
+    font-size: 9px;
+    line-height: 1;
+    text-align: center;
+}
+#robots-overview .storage-box > .details[data-robot] .subtitle .experience {
+    font-weight: normal;
+    font-size: 10px;
+    color: #969696;
+    position: absolute;
+    right: 0;
+    top: 10px;
+    text-align: right;
+}
+#robots-overview .storage-box > .details[data-robot] .life-energy .label,
+#robots-overview .storage-box > .details[data-robot] .weapon-energy .label {
+    display: none;
+}
+#robots-overview .storage-box > .details[data-robot] .life-energy .guage {
+    left: 20px;
+}
+#robots-overview .storage-box > .details[data-robot] .weapon-energy .guage {
+    left: 50px;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item,
+#robots-overview .storage-box > .details[data-robot] .support-mecha,
+#robots-overview .storage-box > .details[data-robot] .base-stats {
+    display: block;
+    box-sizing: border-box;
+    width: calc(50% - 3px);
+    clear: none;
+    border-bottom: 0 none transparent;
+    border-radius: 0 0 6px 6px;
+    background-color: transparent;
+    background-image: linear-gradient(to top, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.0));
+    margin: 0 auto 3px;
+    padding: 0 2px 2px;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item,
+#robots-overview .storage-box > .details[data-robot] .support-mecha {
+    float: left;
+    clear: left;
+    text-align: left;
+    margin-right: 3px;
+    min-height: 52px;
+}
+#robots-overview .storage-box > .details[data-robot] .base-stats {
+    float: right;
+    margin-left: 3px;
+    text-align: right;
+    min-height: 104px;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .label,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .label,
+#robots-overview .storage-box > .details[data-robot] .base-stats .label {
+    display: block;
+    float: none;
+    clear: both;
+    text-align: center;
+    margin-bottom: 3px;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .value,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value,
+#robots-overview .storage-box > .details[data-robot] .base-stats .value {
+    display: block;
+    border: 1px solid #292929;
+    background-color: #191919;
+    border-radius: 3px;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .value,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value {
+    padding: 2px 3px 2px 26px;
+    line-height: 1;
+    text-align: left;
+    margin: 0 auto;
+}
+#robots-overview .storage-box > .details[data-robot] .base-stats .value {
+    margin: 0 1px 3px;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .value > b,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value > b {
+    display: block;
+    border-left: 1px solid rgba(0, 0, 0, 0.2);
+    padding-left: 6px;
+    line-height: 1.3;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .value > b > b,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value > b > b {
+    line-height: 2.6;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 1px);
+    display: inline-block;
+    overflow: hidden;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .value > .sprite,
+#robots-overview .storage-box > .details[data-robot] .held-item .value > .icon,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value > .sprite,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value > .icon {
+    display: block;
+    position: absolute;
+    width: 40px;
+    height: 40px;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .value > .sprite,
+#robots-overview .storage-box > .details[data-robot] .held-item .value > .icon,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value > .icon {
+    top: 50% !important;
+    left: -6px !important;
+    transform: translateY(-50%) !important;
+}
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value > .sprite {
+    top: auto !important;
+    bottom: 6px !important;
+    left: -6px !important;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .value > .icon > i,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value > .icon > i {
+    font-size: 14px;
+    line-height: 1;
+    color: #141414;
+    text-shadow: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#robots-overview .storage-box > .details[data-robot] .base-stats .value {
+    text-align: right;
+    padding: 6px;
+}
+#robots-overview .storage-box > .details[data-robot] .base-stats .value .arrows {
+    display: block;
+    position: absolute;
+    font-size: 6px;
+    line-height: 1;
+    right: 4px;
+    color: #ffffff;
+    letter-spacing: 1px;
+    mix-blend-mode: overlay;
+}
+#robots-overview .storage-box > .details[data-robot] .base-stats .value.raised {
+    padding-top: 3px;
+    padding-bottom: 9px;
+    outline: 1px solid #efefef;
+}
+#robots-overview .storage-box > .details[data-robot] .base-stats .value.lowered {
+    padding-bottom: 3px;
+    padding-top: 9px;
+    outline: 1px dotted #dedede;
+}
+#robots-overview .storage-box > .details[data-robot] .base-stats .value.raised .arrows {
+    bottom: 3px;
+}
+#robots-overview .storage-box > .details[data-robot] .base-stats .value.lowered .arrows {
+    top: 0;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities {
+    padding-top: 4px;
+    margin-bottom: 8px;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .label {
+    display: block;
+    float: none;
+    clear: both;
+    margin: 0 auto 6px;
+    text-align: center;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value {
+    display: block;
+    float: left;
+    clear: none;
+    margin: 0 2px 2px 0;
+    padding: 3px 0;
+    width: calc((100% / 4) - 2px);
+    height: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    font-size: 8px;
+    line-height: 1.4;
+    min-height: 2rem;
+}
 #robots-overview .storage-box > .details .description {
     color: #c0c0c0;
     font-size: 12px;
@@ -2620,6 +2921,15 @@ html, body {
     text-align: left;
     overflow: hidden;
     margin-bottom: 12px;
+}
+#robots-overview .storage-box > .details[data-robot] .description {
+    font-size: 11px;
+    min-height: 16px;
+    text-align: right;
+}
+#robots-overview .storage-box > .details[data-robot] .description i {
+    float: left;
+    margin: 0 6px 0 0;
 }
 #robots-overview .storage-box > .details .actions {
     font-size: 12px;
@@ -2674,6 +2984,15 @@ html, body {
 #robots-overview .storage-box > .details .actions .button.drop-item { background-color: #884d4c; }
 #robots-overview .storage-box > .details .actions .button.equip-ability { background-color: #6f6a7d; }
 */
+#robots-overview .storage-box > .details[data-robot] .actions {
+    max-height: none;
+}
+#robots-overview .storage-box > .details[data-robot] .actions .button {
+    display: block;
+    clear: left;
+    width: 100%;
+    margin: 0 auto 3px 0;
+}
 
 #robots-overview .storage-robots .bullets {
     display: block;
