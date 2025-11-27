@@ -2370,6 +2370,33 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
+                // if the storage tray is open, clicking a robot in the team-list forces an details panel refresh
+                $teamRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
+                    e.preventDefault();
+                    if (_self.worldIsBusy()){ return; }
+                    if (!$robotsOverview.is('.expanded[data-view="robots"]')){ return; } // if we're not expanded, ignore clicks
+                    console.log('%c' + 'Team robot clicked! (via robots)', 'color: cyan;');
+                    let $robot = $(this);
+                    let robotToken = $robot.attr('data-robot') || false;
+                    let robotSelected = $robot.is('.selected') ? true : false;
+                    //console.log('-> $robot =', $robot);
+                    console.log('-> robotToken =', robotToken);
+                    console.log('-> robotSelected =', robotSelected);
+                    let $detailsDiv = $storageRobotsDiv.find('> .details');
+                    if (!robotSelected){ $detailsDiv.remove(); return; }
+                    if (!$detailsDiv || !$detailsDiv.length){
+                        console.log('-> populate new details div for robotToken =', robotToken);
+                        let robotMarkup = _self.getRobotDetailsMarkupForOverview(robotToken) || false;
+                        if (!robotMarkup || !robotMarkup.length){ return false; }
+                        $storageRobotsDiv.append(robotMarkup);
+                        } else {
+                        console.log('-> refresh existing details div for robotToken =', robotToken);
+                        let robotDetails = _self.getRobotDetailsForOverview(robotToken) || false;
+                        if (!robotDetails || !Object.keys(robotDetails).length){ return false; }
+                        _self.replaceRobotDetailsInOverview($detailsDiv, robotToken, robotDetails);
+                        }
+                    return true;
+                    });
                 // if the storage tray is open, clicking a robot in the storage-list clones it to the selected team-robot slot
                 $storageRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
                     e.preventDefault();
