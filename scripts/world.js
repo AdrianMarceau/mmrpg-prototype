@@ -8197,7 +8197,9 @@ class mmrpgWorldMap {
             if (infoLine.values){
                 for (let j = 0; j < infoLine.values.length; j++){
                     let valueInfo = infoLine.values[j];
-                    itemDetailsObject.infolinesHTML += '<span class="value ' + (valueInfo.valueClasses ? valueInfo.valueClasses : '') + '">' + valueInfo.value + '</span>';
+                    let valueClasses = ('value' + (valueInfo.valueClasses ? (' ' + valueInfo.valueClasses) : '')).trim();
+                    let valueStyles = ('' + (valueInfo.valueStyles ? (' ' + valueInfo.valueStyles) : '')).trim();
+                    itemDetailsObject.infolinesHTML += '<span' + (valueClasses ? ' class="' + valueClasses + '"' : '') + (valueStyles ? ' style="' + valueStyles + '"' : '') + '>' + valueInfo.value + '</span>';
                     if (valueInfo.icon){ itemDetailsObject.infolinesHTML += '<i class="fa fas fa-' + valueInfo.icon + '"></i>'; }
                     }
                 } else {
@@ -8416,7 +8418,9 @@ class mmrpgWorldMap {
             if (infoLine.values){
                 for (let j = 0; j < infoLine.values.length; j++){
                     let valueInfo = infoLine.values[j];
-                    abilityDetailsObject.infolinesHTML += '<span class="value ' + (valueInfo.valueClasses ? valueInfo.valueClasses : '') + '">' + valueInfo.value + '</span>';
+                    let valueClasses = ('value' + (valueInfo.valueClasses ? (' ' + valueInfo.valueClasses) : '')).trim();
+                    let valueStyles = ('' + (valueInfo.valueStyles ? (' ' + valueInfo.valueStyles) : '')).trim();
+                    abilityDetailsObject.infolinesHTML += '<span' + (valueClasses ? ' class="' + valueClasses + '"' : '') + (valueStyles ? ' style="' + valueStyles + '"' : '') + '>' + valueInfo.value + '</span>';
                     if (valueInfo.icon){ abilityDetailsObject.infolinesHTML += '<i class="fa fas fa-' + valueInfo.icon + '"></i>'; }
                     }
                 } else {
