@@ -2032,6 +2032,122 @@ class mmrpgWorldMap {
                 $teamRobotsInOverviewBackup = $teamRobotsInOverview.clone(true).detach(); // save for later
                 $storageRobotsInOverviewBackup = $storageRobotsInOverview.clone(true).detach(); // save for later
                 };
+            // Define a function for making the storage bullets to show up on certain storage boxes
+            let makeStorageBullets = function(){
+                //console.log('%c' + 'makeStorageBullets() called!', 'color: magenta;');
+                let storageSlotsPerPage = _config.robotStorageSlotsVisible;
+                $('.bullets', $storageRobotsDiv).remove();
+                let listBulletsMarkup = '';
+                listBulletsMarkup += '<div class="bullets">';
+                    for (var i = 0; i < storageSlotsPerPage; i++){
+                        let key = i;
+                        let position = (i + 1);
+                        let bulletMarkup = '<span class="bullet" data-key="' + key + '">' + position + '</span>';
+                        listBulletsMarkup += bulletMarkup;
+                        }
+                listBulletsMarkup += '</div>';
+                //console.log('-> appending listBulletsMarkup =', listBulletsMarkup);
+                $storageRobotsDiv.append(listBulletsMarkup);
+                return true;
+                };
+            // Define a function for refreshing the robots div in the storage panel given new conditions
+            let refreshRobotsDiv = function(){
+                //console.log('%c' + '-> refreshRobotsDiv() triggered', 'color: magenta;');
+                // ...
+                // return true on success
+                return true;
+                };
+            // Define a function for refreshing the items div in the storage panel given new conditions
+            let refreshItemsDiv = function(){
+                //console.log('%c' + '-> refreshItemsDiv() triggered', 'color: magenta;');
+                // check if there's a robot target for these items to or not
+                refreshRobotRefs();
+                let $selectedRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                let targetSelected = $selectedRobot && $selectedRobot.length ? true : false;
+                // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
+                let $detailsDiv = $storageItemsDiv.find('> .details[data-item]');
+                if ($detailsDiv.length){
+                    let itemToken = $detailsDiv.attr('data-item') || false;
+                    //console.log('-> refreshing details for itemToken =', itemToken);
+                    let itemDetails = _self.getItemDetailsForOverview(itemToken, targetSelected) || false;
+                    if (itemDetails && Object.keys(itemDetails).length){ _self.replaceItemDetailsInOverview($detailsDiv, itemToken, itemDetails); }
+                    }
+                // return true on success
+                return true;
+                };
+            // Define a function for refreshing the ability div in the storage panel given new conditions
+            let refreshAbilitiesDiv = function(){
+                //console.log('%c' + '-> refreshAbilitiesDiv() triggered', 'color: magenta;');
+                // check if there's a robot to filter abilities to or not
+                refreshRobotRefs();
+                let $selectedRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                let targetSelected = $selectedRobot && $selectedRobot.length ? true : false;
+                // filter abilities to selected robot if applicable
+                if (targetSelected){ filterAbilitiesToSelected($selectedRobot); }
+                else { filterAbilitiesToSelected(false); }
+                // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
+                let $detailsDiv = $storageAbilitiesDiv.find('> .details[data-ability]');
+                if ($detailsDiv.length){
+                    let abilityToken = $detailsDiv.attr('data-ability') || false;
+                    //console.log('-> refreshing details for abilityToken =', abilityToken);
+                    let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken, targetSelected) || false;
+                    if (abilityDetails && Object.keys(abilityDetails).length){ _self.replaceAbilityDetailsInOverview($detailsDiv, abilityToken, abilityDetails); }
+                    }
+                // collect the incompatibilty toggle and show/hide it based on whether something is selected or not
+                let $incompatibleToggle = $('.toggle[data-toggle="incompatible"]', $storageAbilitiesDiv);
+                if ($selectedRobot && $selectedRobot.length){ $incompatibleToggle.removeClass('disabled'); }
+                else { $incompatibleToggle.addClass('disabled'); }
+                // return true on success
+                return true;
+                };
+            // Define a quick function for filtering abilities to the currently selected robot
+            let filterAbilitiesToSelected = function($selectedRobot){
+                //console.log('%c' + '-> filterAbilitiesToSelected($selectedRobot) triggered', 'color: magenta;');
+                let $abilityObjectsInOverview = $('.team-ability[data-ability]', $storageAbilitiesDiv);
+                //console.log('-> $abilityObjectsInOverview =', $abilityObjectsInOverview.length, $abilityObjectsInOverview);
+                if (!$selectedRobot || !$selectedRobot.length){
+                    $abilityObjectsInOverview.removeClass('incompatible');
+                    refreshStoragePage('abilities');
+                    return false;
+                    }
+                let selectedRobotToken = $selectedRobot.attr('data-robot') || false;
+                //console.log('-> selectedRobotToken =', selectedRobotToken);
+                if (!selectedRobotToken || !selectedRobotToken.length){ return false; }
+                let selectedRobotData = _worldPlayerRobots[selectedRobotToken] || false;
+                //console.log('-> selectedRobotData =', selectedRobotData);
+                if (!selectedRobotData){ return false; }
+                let selectedRobotAbilities = [];
+                let abilitiesCompatible = selectedRobotData.abilitiesCompatible;
+                let abilitiesViaItem = selectedRobotData.abilitiesViaItem;
+                //console.log('-> abilitiesCompatible =', abilitiesCompatible);
+                //console.log('-> abilitiesViaItem =', abilitiesViaItem);
+                if (typeof abilitiesCompatible !== 'undefined'){ selectedRobotAbilities = selectedRobotAbilities.concat(abilitiesCompatible); }
+                if (typeof abilitiesViaItem !== 'undefined'){ selectedRobotAbilities = selectedRobotAbilities.concat(abilitiesViaItem); }
+                //console.log('-> selectedRobotAbilities =', selectedRobotAbilities);
+                $abilityObjectsInOverview.each(function(){
+                    let $ability = $(this);
+                    let abilityID = parseInt($ability.attr('data-ability-id') || '0');
+                    if (!abilityID){ return; }
+                    let isCompatible = selectedRobotAbilities.indexOf(abilityID) !== -1 ? true : false;
+                    if (!isCompatible){ $ability.addClass('incompatible'); }
+                    else { $ability.removeClass('incompatible'); }
+                    });
+                // If there's an active selection that is now incompatible, clear it and any details panel it invoked
+                let $incompatibleSelected = $abilityObjectsInOverview.filter('.selected.incompatible');
+                //console.log('-> $incompatibleSelected =', $incompatibleSelected.length, $incompatibleSelected);
+                if ($incompatibleSelected.length){
+                    //console.log('-> incompatible ability selected, so clear selection!');
+                    $incompatibleSelected.each(function(){
+                        let $ability = $(this);
+                        let abilityToken = $ability.attr('data-ability');
+                        //console.log('-> clearing selection for abilityToken =', abilityToken);
+                        $ability.removeClass('selected');
+                        $storageAbilitiesDiv.find('> .details[data-ability="' + abilityToken + '"]').remove();
+                        });
+                    }
+                // Refresh the ability storage page now that we've updated compatibility
+                refreshStoragePage('abilities');
+                };
             // Bind events to any sort buttons in the storage box divs
             $storageBoxDivs.delegate('.sort[data-sort]', 'click', function(e){
                 e.preventDefault();
@@ -2120,7 +2236,14 @@ class mmrpgWorldMap {
             robotsOverviewAPI.disableRobotsOverview = disableRobotsOverview;
             robotsOverviewAPI.calculateStorage = calculateStorage;
             robotsOverviewAPI.makeStoragePages = makeStoragePages;
+            robotsOverviewAPI.makeStorageBullets = makeStorageBullets;
             robotsOverviewAPI.goToStoragePage = goToStoragePage;
+            robotsOverviewAPI.refreshStoragePage = refreshStoragePage;
+            robotsOverviewAPI.refreshRobotBackups = refreshRobotBackups;
+            robotsOverviewAPI.refreshRobotsDiv = refreshRobotsDiv;
+            robotsOverviewAPI.refreshItemsDiv = refreshItemsDiv;
+            robotsOverviewAPI.refreshAbilitiesDiv = refreshAbilitiesDiv;
+            robotsOverviewAPI.filterAbilitiesToSelected = filterAbilitiesToSelected;
             //console.log('-> storageSlotsPerPage = ', storageSlotsPerPage);
             //console.log('-> storageRobotsWaiting = ', storageRobotsWaiting);
             //console.log('-> storagePagesRequired = ', storagePagesRequired);
@@ -2220,8 +2343,9 @@ class mmrpgWorldMap {
             // Bind a click event to the team-switch button in the robots overview
             let $switchButton = $('.team-switch', $robotsOverview);
             if ($switchButton && $switchButton.length){
-                // Define a function for making the storage bullets
-                let makeStorageBullets = function(){
+                /*
+                    // Define a function for making the storage bullets
+                    let makeStorageBullets = function(){
                     //console.log('%c' + 'makeStorageBullets() called!', 'color: magenta;');
                     let storageSlotsPerPage = _config.robotStorageSlotsVisible;
                     $('.bullets', $storageRobotsDiv).remove();
@@ -2238,6 +2362,7 @@ class mmrpgWorldMap {
                     $storageRobotsDiv.append(listBulletsMarkup);
                     return true;
                     };
+                */
                 // expand/collapse the robot storage tray by clicking the switch button
                 $switchButton.bind('click', function(e){
                     e.preventDefault();
@@ -2253,27 +2378,29 @@ class mmrpgWorldMap {
                         }
                     // Expand the robot overview to the robot-storage view panel
                     showRobotsOverviewPanel('robots');
-                    // Now we can run setup for the rest of the UI elements in this view
-                    //console.log('-> generating the robot-storage bindings...');
-                    // Remake the storage bullets and pages now
-                    makeStorageBullets();
-                    makeStoragePages('robots');
-                    goToStoragePage('robots', parseInt($storageRobotsDiv.attr('data-page') || ''));
-                    // Update the team/robot robot backups w/ recent changes
-                    refreshRobotBackups();
-                    // Mark the team-robots side as the focused one to start
-                    // and the first robot in the overview as selected via class
-                    refreshRobotRefs();
-                    $teamRobotsDiv.addClass('focused');
-                    $teamRobotsInOverview.removeClass('selected');
-                    //let $firstOverviewRobot = $teamRobotsInOverview.first();
-                    //$firstOverviewRobot.addClass('selected');
-                    if ($sideButtons.is('.active')){
-                        //console.log('-> side buttons active, make sure we dismiss!');
-                        let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
-                        $sideButtons.removeClass('maybe');
-                        $dismissButton.trigger('click');
-                        }
+                    /*
+                        // Now we can run setup for the rest of the UI elements in this view
+                        //console.log('-> generating the robot-storage bindings...');
+                        // Remake the storage bullets and pages now
+                        makeStorageBullets();
+                        makeStoragePages('robots');
+                        goToStoragePage('robots', parseInt($storageRobotsDiv.attr('data-page') || ''));
+                        // Update the team/robot robot backups w/ recent changes
+                        refreshRobotBackups();
+                        // Mark the team-robots side as the focused one to start
+                        // and the first robot in the overview as selected via class
+                        refreshRobotRefs();
+                        $teamRobotsDiv.addClass('focused');
+                        $teamRobotsInOverview.removeClass('selected');
+                        //let $firstOverviewRobot = $teamRobotsInOverview.first();
+                        //$firstOverviewRobot.addClass('selected');
+                        if ($sideButtons.is('.active')){
+                            //console.log('-> side buttons active, make sure we dismiss!');
+                            let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
+                            $sideButtons.removeClass('maybe');
+                            $dismissButton.trigger('click');
+                            }
+                    */
                     // Return true on success
                     return true;
                     });
@@ -2409,24 +2536,26 @@ class mmrpgWorldMap {
             // Bind a click event to the team-items button in the robots overview
             let $itemsButton = $('.team-items', $robotsOverview);
             if ($itemsButton && $itemsButton.length){
-                // define a quick function for refreshing the items div given conditions
-                let refreshItemsDiv = function(){
-                    //console.log('%c' + '-> refreshItemsDiv() triggered', 'color: magenta;');
-                    // check if there's a robot target for these items to or not
-                    refreshRobotRefs();
-                    let $selectedRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
-                    let targetSelected = $selectedRobot && $selectedRobot.length ? true : false;
-                    // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
-                    let $detailsDiv = $storageItemsDiv.find('> .details[data-item]');
-                    if ($detailsDiv.length){
-                        let itemToken = $detailsDiv.attr('data-item') || false;
-                        //console.log('-> refreshing details for itemToken =', itemToken);
-                        let itemDetails = _self.getItemDetailsForOverview(itemToken, targetSelected) || false;
-                        if (itemDetails && Object.keys(itemDetails).length){ _self.replaceItemDetailsInOverview($detailsDiv, itemToken, itemDetails); }
-                        }
-                    // return true on success
-                    return true;
-                    };
+                /*
+                    // define a quick function for refreshing the items div given conditions
+                    let refreshItemsDiv = function(){
+                        //console.log('%c' + '-> refreshItemsDiv() triggered', 'color: magenta;');
+                        // check if there's a robot target for these items to or not
+                        refreshRobotRefs();
+                        let $selectedRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                        let targetSelected = $selectedRobot && $selectedRobot.length ? true : false;
+                        // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
+                        let $detailsDiv = $storageItemsDiv.find('> .details[data-item]');
+                        if ($detailsDiv.length){
+                            let itemToken = $detailsDiv.attr('data-item') || false;
+                            //console.log('-> refreshing details for itemToken =', itemToken);
+                            let itemDetails = _self.getItemDetailsForOverview(itemToken, targetSelected) || false;
+                            if (itemDetails && Object.keys(itemDetails).length){ _self.replaceItemDetailsInOverview($detailsDiv, itemToken, itemDetails); }
+                            }
+                        // return true on success
+                        return true;
+                        };
+                */
                 // expand/collapse the item storage tray by clicking the items button
                 $itemsButton.bind('click', function(e){
                     e.preventDefault();
@@ -2434,30 +2563,27 @@ class mmrpgWorldMap {
                     //console.log('%c' + 'Team-items (inventory) button clicked!', 'color: cyan;');
                     // Check if this panel is already active, and if so we collapse everything
                     let alreadyExpanded = $robotsOverview.is('.expanded[data-view="items"]') ? true : false;
-                    if (alreadyExpanded){
-                        // collapse everything and return as we're done here
-                        //console.log('-> robot-overview already expanded to "items", so collapse!');
-                        disableRobotsOverview();
-                        return;
-                        }
+                    if (alreadyExpanded){ return disableRobotsOverview(); }
                     // Expand the robot overview to the item-storage view panel
                     showRobotsOverviewPanel('items');
-                    // Remake the storage pages for the items now
-                    makeStoragePages('items');
-                    goToStoragePage('items', parseInt($storageItemsDiv.attr('data-page') || ''));
-                    // Mark the team-robots side as the focused one to start
-                    // and the first robot in the overview as selected via class
-                    refreshRobotRefs();
-                    $teamRobotsDiv.addClass('focused');
-                    $teamRobotsInOverview.removeClass('selected');
-                    //let $firstOverviewRobot = $teamRobotsInOverview.first();
-                    //$firstOverviewRobot.addClass('selected');
-                    if ($sideButtons.is('.active')){
-                        //console.log('-> side buttons active, make sure we dismiss!');
-                        let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
-                        $sideButtons.removeClass('maybe');
-                        $dismissButton.trigger('click');
-                        }
+                    /*
+                        // Remake the storage pages for the items now
+                        makeStoragePages('items');
+                        goToStoragePage('items', parseInt($storageItemsDiv.attr('data-page') || ''));
+                        // Mark the team-robots side as the focused one to start
+                        // and the first robot in the overview as selected via class
+                        refreshRobotRefs();
+                        $teamRobotsDiv.addClass('focused');
+                        $teamRobotsInOverview.removeClass('selected');
+                        //let $firstOverviewRobot = $teamRobotsInOverview.first();
+                        //$firstOverviewRobot.addClass('selected');
+                        if ($sideButtons.is('.active')){
+                            //console.log('-> side buttons active, make sure we dismiss!');
+                            let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
+                            $sideButtons.removeClass('maybe');
+                            $dismissButton.trigger('click');
+                            }
+                    */
                     // Return true on success
                     return true;
                     });
@@ -2532,79 +2658,83 @@ class mmrpgWorldMap {
             // Bind a click event to the team-abilities button in the robots overview
             let $abilitiesButton = $('.team-abilities', $robotsOverview);
             if ($abilitiesButton && $abilitiesButton.length){
-                // define a quick function for filtering abilities to current robot
-                let filterAbilitiesToSelected = function($selectedRobot){
-                    //console.log('%c' + '-> filterAbilitiesToSelected($selectedRobot) triggered', 'color: magenta;');
-                    let $abilityObjectsInOverview = $('.team-ability[data-ability]', $storageAbilitiesDiv);
-                    //console.log('-> $abilityObjectsInOverview =', $abilityObjectsInOverview.length, $abilityObjectsInOverview);
-                    if (!$selectedRobot || !$selectedRobot.length){
-                        $abilityObjectsInOverview.removeClass('incompatible');
-                        refreshStoragePage('abilities');
-                        return false;
-                        }
-                    let selectedRobotToken = $selectedRobot.attr('data-robot') || false;
-                    //console.log('-> selectedRobotToken =', selectedRobotToken);
-                    if (!selectedRobotToken || !selectedRobotToken.length){ return false; }
-                    let selectedRobotData = _worldPlayerRobots[selectedRobotToken] || false;
-                    //console.log('-> selectedRobotData =', selectedRobotData);
-                    if (!selectedRobotData){ return false; }
-                    let selectedRobotAbilities = [];
-                    let abilitiesCompatible = selectedRobotData.abilitiesCompatible;
-                    let abilitiesViaItem = selectedRobotData.abilitiesViaItem;
-                    //console.log('-> abilitiesCompatible =', abilitiesCompatible);
-                    //console.log('-> abilitiesViaItem =', abilitiesViaItem);
-                    if (typeof abilitiesCompatible !== 'undefined'){ selectedRobotAbilities = selectedRobotAbilities.concat(abilitiesCompatible); }
-                    if (typeof abilitiesViaItem !== 'undefined'){ selectedRobotAbilities = selectedRobotAbilities.concat(abilitiesViaItem); }
-                    //console.log('-> selectedRobotAbilities =', selectedRobotAbilities);
-                    $abilityObjectsInOverview.each(function(){
-                        let $ability = $(this);
-                        let abilityID = parseInt($ability.attr('data-ability-id') || '0');
-                        if (!abilityID){ return; }
-                        let isCompatible = selectedRobotAbilities.indexOf(abilityID) !== -1 ? true : false;
-                        if (!isCompatible){ $ability.addClass('incompatible'); }
-                        else { $ability.removeClass('incompatible'); }
-                        });
-                    // If there's an active selection that is now incompatible, clear it and any details panel it invoked
-                    let $incompatibleSelected = $abilityObjectsInOverview.filter('.selected.incompatible');
-                    //console.log('-> $incompatibleSelected =', $incompatibleSelected.length, $incompatibleSelected);
-                    if ($incompatibleSelected.length){
-                        //console.log('-> incompatible ability selected, so clear selection!');
-                        $incompatibleSelected.each(function(){
+                /*
+                    // define a quick function for filtering abilities to current robot
+                    let filterAbilitiesToSelected = function($selectedRobot){
+                        //console.log('%c' + '-> filterAbilitiesToSelected($selectedRobot) triggered', 'color: magenta;');
+                        let $abilityObjectsInOverview = $('.team-ability[data-ability]', $storageAbilitiesDiv);
+                        //console.log('-> $abilityObjectsInOverview =', $abilityObjectsInOverview.length, $abilityObjectsInOverview);
+                        if (!$selectedRobot || !$selectedRobot.length){
+                            $abilityObjectsInOverview.removeClass('incompatible');
+                            refreshStoragePage('abilities');
+                            return false;
+                            }
+                        let selectedRobotToken = $selectedRobot.attr('data-robot') || false;
+                        //console.log('-> selectedRobotToken =', selectedRobotToken);
+                        if (!selectedRobotToken || !selectedRobotToken.length){ return false; }
+                        let selectedRobotData = _worldPlayerRobots[selectedRobotToken] || false;
+                        //console.log('-> selectedRobotData =', selectedRobotData);
+                        if (!selectedRobotData){ return false; }
+                        let selectedRobotAbilities = [];
+                        let abilitiesCompatible = selectedRobotData.abilitiesCompatible;
+                        let abilitiesViaItem = selectedRobotData.abilitiesViaItem;
+                        //console.log('-> abilitiesCompatible =', abilitiesCompatible);
+                        //console.log('-> abilitiesViaItem =', abilitiesViaItem);
+                        if (typeof abilitiesCompatible !== 'undefined'){ selectedRobotAbilities = selectedRobotAbilities.concat(abilitiesCompatible); }
+                        if (typeof abilitiesViaItem !== 'undefined'){ selectedRobotAbilities = selectedRobotAbilities.concat(abilitiesViaItem); }
+                        //console.log('-> selectedRobotAbilities =', selectedRobotAbilities);
+                        $abilityObjectsInOverview.each(function(){
                             let $ability = $(this);
-                            let abilityToken = $ability.attr('data-ability');
-                            //console.log('-> clearing selection for abilityToken =', abilityToken);
-                            $ability.removeClass('selected');
-                            $storageAbilitiesDiv.find('> .details[data-ability="' + abilityToken + '"]').remove();
+                            let abilityID = parseInt($ability.attr('data-ability-id') || '0');
+                            if (!abilityID){ return; }
+                            let isCompatible = selectedRobotAbilities.indexOf(abilityID) !== -1 ? true : false;
+                            if (!isCompatible){ $ability.addClass('incompatible'); }
+                            else { $ability.removeClass('incompatible'); }
                             });
-                        }
-                    // Refresh the ability storage page now that we've updated compatibility
-                    refreshStoragePage('abilities');
-                    };
-                // define a quick function for refreshing the ability div given conditions
-                let refreshAbilitiesDiv = function(){
-                    //console.log('%c' + '-> refreshAbilitiesDiv() triggered', 'color: magenta;');
-                    // check if there's a robot to filter abilities to or not
-                    refreshRobotRefs();
-                    let $selectedRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
-                    let targetSelected = $selectedRobot && $selectedRobot.length ? true : false;
-                    // filter abilities to selected robot if applicable
-                    if (targetSelected){ filterAbilitiesToSelected($selectedRobot); }
-                    else { filterAbilitiesToSelected(false); }
-                    // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
-                    let $detailsDiv = $storageAbilitiesDiv.find('> .details[data-ability]');
-                    if ($detailsDiv.length){
-                        let abilityToken = $detailsDiv.attr('data-ability') || false;
-                        //console.log('-> refreshing details for abilityToken =', abilityToken);
-                        let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken, targetSelected) || false;
-                        if (abilityDetails && Object.keys(abilityDetails).length){ _self.replaceAbilityDetailsInOverview($detailsDiv, abilityToken, abilityDetails); }
-                        }
-                    // collect the incompatibilty toggle and show/hide it based on whether something is selected or not
-                    let $incompatibleToggle = $('.toggle[data-toggle="incompatible"]', $storageAbilitiesDiv);
-                    if ($selectedRobot && $selectedRobot.length){ $incompatibleToggle.removeClass('disabled'); }
-                    else { $incompatibleToggle.addClass('disabled'); }
-                    // return true on success
-                    return true;
-                    };
+                        // If there's an active selection that is now incompatible, clear it and any details panel it invoked
+                        let $incompatibleSelected = $abilityObjectsInOverview.filter('.selected.incompatible');
+                        //console.log('-> $incompatibleSelected =', $incompatibleSelected.length, $incompatibleSelected);
+                        if ($incompatibleSelected.length){
+                            //console.log('-> incompatible ability selected, so clear selection!');
+                            $incompatibleSelected.each(function(){
+                                let $ability = $(this);
+                                let abilityToken = $ability.attr('data-ability');
+                                //console.log('-> clearing selection for abilityToken =', abilityToken);
+                                $ability.removeClass('selected');
+                                $storageAbilitiesDiv.find('> .details[data-ability="' + abilityToken + '"]').remove();
+                                });
+                            }
+                        // Refresh the ability storage page now that we've updated compatibility
+                        refreshStoragePage('abilities');
+                        };
+                */
+                /*
+                    // define a quick function for refreshing the ability div given conditions
+                    let refreshAbilitiesDiv = function(){
+                        //console.log('%c' + '-> refreshAbilitiesDiv() triggered', 'color: magenta;');
+                        // check if there's a robot to filter abilities to or not
+                        refreshRobotRefs();
+                        let $selectedRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                        let targetSelected = $selectedRobot && $selectedRobot.length ? true : false;
+                        // filter abilities to selected robot if applicable
+                        if (targetSelected){ filterAbilitiesToSelected($selectedRobot); }
+                        else { filterAbilitiesToSelected(false); }
+                        // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
+                        let $detailsDiv = $storageAbilitiesDiv.find('> .details[data-ability]');
+                        if ($detailsDiv.length){
+                            let abilityToken = $detailsDiv.attr('data-ability') || false;
+                            //console.log('-> refreshing details for abilityToken =', abilityToken);
+                            let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken, targetSelected) || false;
+                            if (abilityDetails && Object.keys(abilityDetails).length){ _self.replaceAbilityDetailsInOverview($detailsDiv, abilityToken, abilityDetails); }
+                            }
+                        // collect the incompatibilty toggle and show/hide it based on whether something is selected or not
+                        let $incompatibleToggle = $('.toggle[data-toggle="incompatible"]', $storageAbilitiesDiv);
+                        if ($selectedRobot && $selectedRobot.length){ $incompatibleToggle.removeClass('disabled'); }
+                        else { $incompatibleToggle.addClass('disabled'); }
+                        // return true on success
+                        return true;
+                        };
+                */
                 // expand/collapse the ability storage tray by clicking the abilities button
                 $abilitiesButton.bind('click', function(e){
                     e.preventDefault();
@@ -2612,32 +2742,29 @@ class mmrpgWorldMap {
                     //console.log('%c' + 'Team-abilities (weapons) button clicked!', 'color: cyan;');
                     // Check if this panel is already active, and if so we collapse everything
                     let alreadyExpanded = $robotsOverview.is('.expanded[data-view="abilities"]') ? true : false;
-                    if (alreadyExpanded){
-                        // collapse everything and return as we're done here
-                        //console.log('-> robot-overview already expanded to "abilities", so collapse!');
-                        disableRobotsOverview();
-                        return;
-                        }
+                    if (alreadyExpanded){ return disableRobotsOverview(); }
                     // Expand the robot overview to the ability-storage view panel
                     showRobotsOverviewPanel('abilities');
-                    // Check to see which page we're on (if already opened before), else default to first
-                    let goToPageNum = $storageAbilitiesDiv.is('[data-page]') ? parseInt($storageAbilitiesDiv.attr('data-page')) : 1;
-                    // Remake the storage pages for the abilities now
-                    makeStoragePages('abilities');
-                    goToStoragePage('abilities', goToPageNum);
-                    // Mark the team-robots side as the focused one to start
-                    // and the first robot in the overview as selected via class
-                    refreshRobotRefs();
-                    $teamRobotsDiv.addClass('focused');
-                    $teamRobotsInOverview.removeClass('selected');
-                    if ($sideButtons.is('.active')){
-                        //console.log('-> side buttons active, make sure we dismiss!');
-                        let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
-                        $sideButtons.removeClass('maybe');
-                        $dismissButton.trigger('click');
-                        }
-                    // Refresh the abilities div now that everything is set up
-                    refreshAbilitiesDiv();
+                    /*
+                        // Check to see which page we're on (if already opened before), else default to first
+                        let goToPageNum = $storageAbilitiesDiv.is('[data-page]') ? parseInt($storageAbilitiesDiv.attr('data-page')) : 1;
+                        // Remake the storage pages for the abilities now
+                        makeStoragePages('abilities');
+                        goToStoragePage('abilities', goToPageNum);
+                        // Mark the team-robots side as the focused one to start
+                        // and the first robot in the overview as selected via class
+                        refreshRobotRefs();
+                        $teamRobotsDiv.addClass('focused');
+                        $teamRobotsInOverview.removeClass('selected');
+                        if ($sideButtons.is('.active')){
+                            //console.log('-> side buttons active, make sure we dismiss!');
+                            let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
+                            $sideButtons.removeClass('maybe');
+                            $dismissButton.trigger('click');
+                            }
+                        // Refresh the abilities div now that everything is set up
+                        refreshAbilitiesDiv();
+                    */
                     // Return true on success
                     return true;
                     });
