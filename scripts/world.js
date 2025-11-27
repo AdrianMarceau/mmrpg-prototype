@@ -2364,37 +2364,9 @@ class mmrpgWorldMap {
                     //console.log('%c' + 'Team-switch (robot-storage) button clicked!', 'color: cyan;');
                     // Check if this panel is already active, and if so we collapse everything
                     let alreadyExpanded = $robotsOverview.is('.expanded[data-view="robots"]') ? true : false;
-                    if (alreadyExpanded){
-                        // collapse everything and return as we're done here
-                        //console.log('-> robot-overview already expanded to "robots", so collapse!');
-                        disableRobotsOverview();
-                        return;
-                        }
+                    if (alreadyExpanded){ disableRobotsOverview(); return; }
                     // Expand the robot overview to the robot-storage view panel
                     showRobotsOverviewPanel('robots');
-                    /*
-                        // Now we can run setup for the rest of the UI elements in this view
-                        //console.log('-> generating the robot-storage bindings...');
-                        // Remake the storage bullets and pages now
-                        makeStorageBullets();
-                        makeStoragePages('robots');
-                        goToStoragePage('robots', parseInt($storageRobotsDiv.attr('data-page') || ''));
-                        // Update the team/robot robot backups w/ recent changes
-                        refreshRobotBackups();
-                        // Mark the team-robots side as the focused one to start
-                        // and the first robot in the overview as selected via class
-                        refreshRobotRefs();
-                        $teamRobotsDiv.addClass('focused');
-                        $teamRobotsInOverview.removeClass('selected');
-                        //let $firstOverviewRobot = $teamRobotsInOverview.first();
-                        //$firstOverviewRobot.addClass('selected');
-                        if ($sideButtons.is('.active')){
-                            //console.log('-> side buttons active, make sure we dismiss!');
-                            let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
-                            $sideButtons.removeClass('maybe');
-                            $dismissButton.trigger('click');
-                            }
-                    */
                     // Return true on success
                     return true;
                     });
