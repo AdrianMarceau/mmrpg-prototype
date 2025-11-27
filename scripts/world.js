@@ -1616,27 +1616,18 @@ class mmrpgWorldMap {
                 $storageBoxes.find('.incompatible').removeClass('incompatible');
                 $teamRobotsDiv.removeClass('focused').removeClass('unfocused');
                 $teamRobotsDiv.find('.incompatible', ).removeClass('incompatible');
-                $teamRobotsDiv.find('.selected').removeClass('selected');
+                $teamRobotsDiv.find('.selected:not(.keep-selected)').removeClass('selected');
                 $('.details', $storageBoxes).remove();
                 return;
                 };
             // Define a function for expanding the robots-overview panel and showing a specific view
-            let showRobotsOverviewPanel = function(viewToken, onComplete, keepSelectedRobot){
+            let showRobotsOverviewPanel = function(viewToken, onComplete, keepSelectedTeamRobot){
                 //console.log('%c' + 'showRobotsOverviewPanel(viewToken:' + (viewToken ? viewToken : typeof viewToken) + ') called!', 'color: magenta;');
                 // Otherwise we can expand (if not already) the panel and switch to this specific view
                 // and then disable the outside UI buttons to prevent bad-clicks and visual clutter
                 viewToken = viewToken && typeof viewToken === 'string' && viewToken.length ? viewToken : '';
-                keepSelectedRobot = typeof keepSelectedRobot === 'boolean' ? keepSelectedRobot : true;
-                let $selectedRobot, selectedRobotToken, selectedRobotClass;
-                if (keepSelectedRobot){
-                    $selectedRobot = $teamRobotsDiv.find('.team-robot[data-robot].selected');
-                    if ($selectedRobot && $selectedRobot.length){
-                        selectedRobotToken = $selectedRobot.attr('data-robot');
-                        selectedRobotClass = '.team-robot[data-robot="' + selectedRobotToken + '"]';
-                        } else {
-                        keepSelectedRobot = false;
-                        }
-                    }
+                keepSelectedTeamRobot = typeof keepSelectedTeamRobot === 'boolean' ? keepSelectedTeamRobot : true;
+                if (keepSelectedTeamRobot){ $teamRobotsDiv.find('.team-robot[data-robot].selected').addClass('keep-selected'); }
                 //console.log('-> before doing anything, selectedRobotToken = ', selectedRobotToken);
                 $('.button', $storageBoxes).attr('disabled', 'disabled');
                 $storageRobotsDiv.removeClass('unfocused');
@@ -1650,8 +1641,28 @@ class mmrpgWorldMap {
                 _world.mapIsHidden = true; // set the map hidden state
                 clearSelectionsAndIncompatible();
                 disableOtherElements();
+                // If there are any side-buttons active, dismiss them first
+                if ($sideButtons.is('.active')){
+                    let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
+                    $sideButtons.removeClass('maybe');
+                    $dismissButton.trigger('click');
+                    }
+                // Regenerate the storage bullets, pages, and go to the correct page for this view
+                if (viewToken === 'robots'){ refreshRobotBackups(); }
+                if (viewToken === 'robots'){ makeStorageBullets(); }
+                makeStoragePages(viewToken);
+                goToStoragePage(viewToken, parseInt($thisStorageBox.attr('data-page') || ''));
+                refreshRobotRefs();
+                $teamRobotsDiv.addClass('focused');
+                $teamRobotsInOverview.filter(':not(.keep-selected)').removeClass('selected');
+                if (viewToken === 'robots'){ refreshRobotsDiv(); }
+                if (viewToken === 'items'){ refreshItemsDiv(); }
+                if (viewToken === 'abilities'){ refreshAbilitiesDiv(); }
+                /// Run the complete callback if one was provided
                 if (typeof onComplete === 'function'){ onComplete.call(this); }
-                if (keepSelectedRobot){ setTimeout(function(){ $teamRobotsDiv.find(selectedRobotClass).trigger('click'); }, 100); }
+                if (keepSelectedTeamRobot){
+                    $teamRobotsDiv.find('.team-robot[data-robot].keep-selected').removeClass('keep-selected');
+                    }
                 return;
                 };
             // Define a function for dismissing the whole robots-overview panel and all views at-once
