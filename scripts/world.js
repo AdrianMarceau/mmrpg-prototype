@@ -2210,7 +2210,10 @@ class mmrpgWorldMap {
                 e.preventDefault();
                 if (_self.worldIsBusy()){ return; }
                 let $thisRobot = $(this);
-                if (!$robotsOverview.is('.expanded')){ return showRobotsOverviewPanel('robots', function(){ $thisRobot.trigger('click'); }); }
+                if (!$robotsOverview.is('.expanded')){
+                    return showRobotsOverviewPanel('robots', function(){
+                        $thisRobot.trigger('click');
+                        }, false); }
                 if ($thisRobot.is('.incompatible')){ return; } // if robot was marked incompatible, ignore clicked
                 //console.log('%c' + 'Team robot clicked!', 'color: cyan;');
                 let alreadySelected = $thisRobot.is('.selected') ? true : false;
