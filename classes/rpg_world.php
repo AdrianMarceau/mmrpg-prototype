@@ -2005,6 +2005,7 @@ class rpg_world {
                 $default_state = isset($option_data['default']) ? $option_data['default'] : array_keys($option_data)[0];
                 $class = 'class="button toggle"';
                 $attrs = 'data-toggle="'.$option_token.'" data-state="'.$default_state.'"';
+                $attrs .= ' title="show/hide '.$option_token.'"';
                 $markup .= '<button type="button" '.$class.' '.$attrs.'>';
                     foreach ($option_states AS $state => $state_icon){
                         $markup .= '<i class="icon fas fa-'.$state_icon.'" data-state="'.$state.'"></i>';
