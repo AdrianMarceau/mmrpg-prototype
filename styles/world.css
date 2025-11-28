@@ -3589,7 +3589,8 @@ display: block;
     opacity: 0.6;
 }
 
-#world #canvas #robots-overview .storage-items .team-item {
+#world #canvas #robots-overview .storage-items .team-item,
+#world #canvas #action-modal .item-list .team-item {
     display: block;
     box-sizing: border-box;
     float: left;
@@ -3625,22 +3626,32 @@ display: block;
 }
 #world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]):hover,
 #world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]).hovered,
-#world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]).selected {
+#world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]).selected,
+#world #canvas #action-modal .item-list .team-item:not(.disabled):not([data-quantity="0"]):hover,
+#world #canvas #action-modal .item-list .team-item:not(.disabled):not([data-quantity="0"]).hovered,
+#world #canvas #action-modal .item-list .team-item:not(.disabled):not([data-quantity="0"]).selected {
     transform: translate(0, -1px);
     outline-color: #ffffff;
 }
-#world #canvas #robots-overview .storage-items .team-item.hidden {
+#world #canvas #robots-overview .storage-items .team-item.hidden,
+#world #canvas #action-modal .item-list .team-item.hidden {
     display: none;
 }
 #world #canvas #robots-overview .storage-items.has-selection .team-item:not(.selected):not(.disabled):not([data-quantity="0"]) {
-    filter: brightness(0.6);
+    filter: brightness(0.8) saturate(1.2);
+}
+#world #canvas #action-modal .item-list.has-selection .team-item:not(.selected):not(.disabled):not([data-quantity="0"]) {
+    filter: brightness(0.8) saturate(1.2);
 }
 #world #canvas #robots-overview .storage-items .team-item.disabled,
-#world #canvas #robots-overview .storage-items .team-item[data-quantity="0"] {
+#world #canvas #robots-overview .storage-items .team-item[data-quantity="0"],
+#world #canvas #action-modal .item-list .team-item.disabled,
+#world #canvas #action-modal .item-list .team-item[data-quantity="0"] {
     filter: brightness(0.4);
     cursor: default;
 }
-#world #canvas #robots-overview .storage-items .team-item .image {
+#world #canvas #robots-overview .storage-items .team-item .image,
+#world #canvas #action-modal .item-list .team-item .image {
     position: absolute;
     top: 0;
     left: 0;
@@ -3652,14 +3663,16 @@ display: block;
     border-right: none !important;
     border-radius: 6px 0 0 6px;
 }
-#world #canvas #robots-overview .storage-items .team-item .image > .sprite {
+#world #canvas #robots-overview .storage-items .team-item .image > .sprite,
+#world #canvas #action-modal .item-list .team-item .image > .sprite {
     position: absolute;
     left: -6px;
     top: 50%;
     transform: translateY(-50%);
     filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.3));
 }
-#world #canvas #robots-overview .storage-items .team-item .name {
+#world #canvas #robots-overview .storage-items .team-item .name,
+#world #canvas #action-modal .item-list .team-item .name {
     display: block;
     padding: 3px 6px;
     font-size: 11px;
@@ -3668,10 +3681,12 @@ display: block;
     text-align: center;
     white-space: break-spaces;
 }
-#world #canvas #robots-overview .storage-items .team-item .name.oneline {
+#world #canvas #robots-overview .storage-items .team-item .name.oneline,
+#world #canvas #action-modal .item-list .team-item .name.oneline {
     line-height: 26px;
 }
-#world #canvas #robots-overview .storage-items .team-item .quantity {
+#world #canvas #robots-overview .storage-items .team-item .quantity,
+#world #canvas #action-modal .item-list .team-item .quantity {
     position: absolute;
     top: 0;
     right: 0;
@@ -3687,6 +3702,10 @@ display: block;
     font-size: 10px;
     line-height: 30px;
     text-align: right;
+}
+#world #canvas #robots-overview .storage-items .team-item .equipped,
+#world #canvas #action-modal .item-list .team-item .equipped {
+    display: none;
 }
 
 #world #canvas #robots-overview .storage-abilities .team-ability,

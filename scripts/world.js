@@ -6838,7 +6838,7 @@ class mmrpgWorldMap {
         //console.log('-> statModKey =', statModKey);
         //console.log('-> robotInfo[statModKey] =', robotInfo[statModKey]);
         if (statModKeys.indexOf(statModKey) === -1){ return false; }
-        if (robotInfo[statModKey] && robotInfo[statModKey] >= statModMax){ return true; }
+        if (robotInfo[statModKey] && robotInfo[statModKey] >= statModMax){ return false; }
         //console.log('-> looks like we can boost ' + statToken + ' for ' + robotToken + '!');
         let robotHasMods = function(){ return (parseInt(robotInfo[statModKeys[0]]) + parseInt(robotInfo[statModKeys[1]]) + parseInt(robotInfo[statModKeys[2]])) !== 0 ? true : false; };
         //console.log('-> robotId =', robotId);
@@ -8098,6 +8098,7 @@ class mmrpgWorldMap {
             }
         //console.log('-> showItemButton =', showItemButton);
         //console.log('-> showAbilityButton =', showAbilityButton);
+        showItemButton = showAbilityButton = false; // TEMP TEMP TEMP (?)
         robotDetailsObject.actions.push({ action: 'goto-items', icon: 'briefcase', text: 'Use / Give Items', robot: robotToken, disabled: !allowButtons, hidden: !showItemButton });
         robotDetailsObject.actions.push({ action: 'goto-abilities', icon: 'fire-alt', text: 'Equip Abilities', robot: robotToken, disabled: !allowButtons, hidden: !showAbilityButton });
 
@@ -8901,6 +8902,10 @@ class mmrpgWorldMap {
         let $thisCanvas = _elements.canvas;
         let $canvasWrapper = $('> .wrapper', $thisCanvas);
         let $actionModal = _elements.actionModal;
+        let $robotsOverview = _elements.robotsOverview;
+        let $robotStorageBox = $robotsOverview.find('.storage-box[data-storage="robots"]');
+        let $itemStorageBox = $robotsOverview.find('.storage-box[data-storage="items"]');
+        let $abilityStorageBox = $robotsOverview.find('.storage-box[data-storage="abilities"]');
         let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
@@ -8923,6 +8928,7 @@ class mmrpgWorldMap {
 
         // Define template parameters for this modal to be updated as-needed
         let modalDetails = {};
+        modalDetails.show = true;
         modalDetails.action = actionKind + '_' + actionToken;
         modalDetails.title = actionToken.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + ' Action';
         modalDetails.subtitles = {};
@@ -9033,8 +9039,115 @@ class mmrpgWorldMap {
             let itemsIndex = _indexes.items;
             let itemToken = itemOrAbilityToken;
             let itemInfo = typeof itemsIndex[itemToken] !== 'undefined' ? itemsIndex[itemToken] : null;
-            console.log('--> found itemInfo =', itemInfo);
-            // TODO: ...
+            let generateItemSelectButtonMarkup = _self.generateItemSelectButtonMarkup.bind(_self);
+            let generateItemSelectPlaceholderMarkup = _self.generateItemSelectPlaceholderMarkup.bind(_self);
+            if (!itemToken || !itemInfo){ console.error('showActionModal() could not find item info for token ' + itemToken + '!'); return; }
+            console.log('--> itemsIndex =', itemsIndex);
+            console.log('--> itemToken =', itemToken);
+            console.log('--> itemInfo =', itemInfo);
+            let $itemInStorage = $itemStorageBox.find('.team-item[data-item="' + itemToken + '"]');
+            let $itemInStorageDetails = $itemStorageBox.find('> .details[data-item="' + itemToken + '"]');
+            // If this is a USE ITEM request, we can apply the item to the selected robot directly
+            if (actionToken === 'use-item'){
+                modalDetails.show = false;
+                console.log('--> preparing to USE ITEM on robot (', targetRobotToken, ') ...');
+                // Check to see which kind of item this is categorically
+                let tokenFrags = itemToken.split('-');
+                let itemToken1 = tokenFrags[0] || '';
+                let itemToken2 = tokenFrags[1] || '';
+                let isPellet = itemToken2 === 'pellet' ? true : false;
+                let isCapsule = itemToken2 === 'capsule' ? true : false;
+                let isTank = itemToken2 === 'tank' ? true : false;
+                let isEnergy = itemToken1 === 'energy' ? true : false;
+                let isWeapons = itemToken1 === 'weapon' ? true : false;
+                let isAttack = itemToken1 === 'attack' ? true : false;
+                let isDefense = itemToken1 === 'defense' ? true : false;
+                let isSpeed = itemToken1 === 'speed' ? true : false;
+                let isSuper = itemToken1 === 'super' ? true : false;
+                let isBasic = isPellet || isCapsule || isTank;
+                let isStatItem = isAttack || isDefense || isSpeed || isSuper;
+                let isRecoveryItem = isEnergy || isWeapons;
+                let removeFromInventory = false;
+                let disableFurtherUsage = false;
+                //console.log('--> { isPellet:', isPellet, ', isCapsule:', isCapsule, ', isTank:', isTank, ', isEnergy:', isEnergy, ', isWeapons:', isWeapons, ', isAttack:', isAttack, ', isDefense:', isDefense, ', isSpeed:', isSpeed, ', isSuper:', isSuper, ', isBasic:', isBasic, ', isStatItem:', isStatItem, ', isRecoveryItem:', isRecoveryItem, ' }');
+                // If this is a stat item (like an attack/defense/speed pellet or capsule) its effects are straightforward
+                if (isBasic && isStatItem){
+                    //console.log('--> using basic stat item ...');
+                    let boostStats = [], boostedToMax = [];
+                    if (isAttack || isSuper){ boostStats.push('attack'); }
+                    if (isDefense || isSuper){ boostStats.push('defense'); }
+                    if (isSpeed || isSuper){ boostStats.push('speed'); }
+                    let boostAmount = Math.floor((itemInfo.recovery || 0) / boostStats.length);
+                    //console.log('--> boosting stats:', boostStats.join('/'), 'by amount:', boostAmount);
+                    if (boostStats.length && boostAmount > 0){
+                        for (var i = 0; i < boostStats.length; i++){
+                            let statToken = boostStats[i], statBoostFunction = _self.boostRobotStat.bind(_self), statMaxValue = _config.robotStatModMax;
+                            let statBoosted = statBoostFunction(targetRobotToken, statToken, boostAmount, true);
+                            //console.log('--> statToken =', statToken, 'statBoosted =', statBoosted);
+                            if (statBoosted){ removeFromInventory = true; }
+                            if (playerRobotInfo[statToken + 'Mods'] >= statMaxValue){ boostedToMax.push(statToken); }
+                            }
+                        if (boostedToMax.length >= boostStats.length){ disableFurtherUsage = true; }
+                        }
+                    }
+                // Else if this is a recovery item (like an energy/weapon pellet, capsule, or tank) its effects are a bit more complex
+                else if (isBasic && isRecoveryItem){
+                    //console.log('--> using basic recovery item ...');
+                    let restoreStats = [], restoredToMax = [];
+                    if (isEnergy){ restoreStats.push('energy'); }
+                    if (isWeapons){ restoreStats.push('weapons'); }
+                    let restoreAmount = itemInfo.recovery || 0;
+                    let restorePercent = itemInfo.recoveryPercent ? true : false;
+                    //console.log('--> recovering stats:', restoreStats.join('/'), 'by amount:', restoreAmount, (restorePercent ? '%' : ''));
+                    if (restoreStats.length && restoreAmount > 0){
+                        for (var i = 0; i < restoreStats.length; i++){
+                            let statToken = restoreStats[i], statRestoreFunction = null, statMaxValue = 0;
+                            if (statToken === 'energy'){ statRestoreFunction = _self.restoreRobotEnergy.bind(_self); statMaxValue = playerRobotInfo.energyMax || 0; }
+                            else if (statToken === 'weapons'){ statRestoreFunction = _self.restoreRobotWeapons.bind(_self); statMaxValue = playerRobotInfo.weaponsMax || 0; }
+                            let realRestoreAmount = restorePercent ? Math.ceil((statMaxValue || 0) * (restoreAmount / 100)) : restoreAmount;
+                            let statRestored = statRestoreFunction(targetRobotToken, realRestoreAmount, true);
+                            //console.log('--> statToken =', statToken, 'statRestored =', statRestored);
+                            if (statRestored){ removeFromInventory = true; }
+                            if (playerRobotInfo[statToken] >= statMaxValue){ restoredToMax.push(statToken); }
+                            }
+                        if (restoredToMax.length >= restoreStats.length){ disableFurtherUsage = true; }
+                        }
+                    }
+                // Else If the item was successfully used, remove it from the player's inventory now
+                if (removeFromInventory
+                    && typeof _worldPlayerItems[itemToken] !== 'undefined'){
+                    //console.log('_worldPlayerItems[itemToken] (before) =', _worldPlayerItems[itemToken]);
+                    _worldPlayerItems[itemToken] -= 1;
+                    if (_worldPlayerItems[itemToken] < 0){ _worldPlayerItems[itemToken] = 0; }
+                    //console.log('_worldPlayerItems[itemToken] (after) =', _worldPlayerItems[itemToken]);
+                    let currentItemQuantity = _worldPlayerItems[itemToken] || 0;
+                    let equippedItemQuantity = _worldPlayerItems[itemToken + '__equipped'] || 0;
+                    let newQuantity = currentItemQuantity - equippedItemQuantity;
+                    //console.log('-> currentItemQuantity =', currentItemQuantity);
+                    //console.log('-> equippedItemQuantity =', equippedItemQuantity);
+                    //console.log('-> newQuantity =', newQuantity);
+                    $itemInStorage.attr('data-quantity', newQuantity);
+                    $itemInStorage.find('> .quantity').html('&times; ' + newQuantity);
+                    $itemInStorageDetails.find('> .subtitle > .quantity').html('&times; ' + newQuantity);
+                    if (newQuantity === 0){ $itemInStorageDetails.find('.button[data-action]').addClass('disabled').attr('disabled', 'disabled'); }
+                    _self.saveWorldState();
+                    }
+                // If the item can no longer be used, disable its use button now (maybe we're already maxed)
+                if (disableFurtherUsage){
+                    //console.log('--> disabling further usage of this item ...');
+                    $itemInStorageDetails.find('.button[data-action="use-item"]').addClass('disabled').attr('disabled', 'disabled');
+                    }
+                }
+            // Else if this is a GIVE ITEM request, we should show the item equip modal now (showing old vs new item)
+            else if (actionToken === 'give-item'){
+                console.log('--> preparing to GIVE ITEM to robot (', targetRobotToken, ') ...');
+                // TODO: ...
+                }
+            // Else if this is the DROP ITEM request, we should confirm the drop now w/ modal
+            else if (actionToken === 'drop-item'){
+                console.log('--> preparing to DROP ITEM at current location ...');
+                // TODO: ...
+                }
             }
         else if (actionKind === 'ability'){
             //console.log('--> actionKind is ability ...', itemOrAbilityToken);
@@ -9069,10 +9182,6 @@ class mmrpgWorldMap {
                     numEmpty++;
                     }
                 }
-            // TEMP TEMP TEMP
-            //selectedAbilityList = '<img width="140" height="34" src="images/_temp/mmrpg-mockup-2025-10-26_ability-span.png" style="" />';
-            //currentAbilityList = '<img width="558" height="72" src="images/_temp/mmrpg-mockup-2025-10-26_ability-span-4x2.png" style="" />';
-            // TEMP TEMP TEMP
             modalDetails.subtitles.forTooltip = subtitleTooltip;
             modalDetails.containers.forSelected = '<div class="ability-list selected">' + selectedAbilityList + '</div>';
             modalDetails.containers.forCurrent = '<div class="ability-list current">' + currentAbilityList + '</div>';
@@ -9085,6 +9194,12 @@ class mmrpgWorldMap {
 
         //console.log('finished calculating modalDetails ...');
         //console.log('-> modalDetails = ', modalDetails);
+
+        // If it was decided not to show the modal, we can be done here
+        if (!modalDetails.show){
+            //console.log('--> modalDetails.show is false, returning right away');
+            return;
+            }
 
         // Collect quick references to modal details
         let modalAction = modalDetails.action;
@@ -9331,6 +9446,8 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _indexes = _self.indexes;
         let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerItems = _worldPlayer.items;
         let itemInfo = _indexes.items.getByToken(itemToken);
         if (!itemInfo || typeof itemInfo !== 'object'){ console.error('generateItemSelectButtonMarkup() could not find itemInfo for token ' + itemToken + '!'); return ''; }
 
@@ -9339,11 +9456,14 @@ class mmrpgWorldMap {
         buttonOptions.slot = typeof buttonOptions.slot === 'number' ? buttonOptions.slot : false;
 
         let itemAnimationDelay = -1 * ( Math.floor(Math.random() * 10) / 100 );
-        let itemTypeClasses = itemInfo.type === '' ? 'none' : (itemInfo.type + (itemInfo.type2 !== '' ? '_' + itemInfo.type2 : ''));
-        let itemEnergyCost = itemInfo.energy || 0;
+        let itemTypeClasses = (itemInfo.type2 && !itemInfo.type ? itemInfo.type2 : (itemInfo.type + (itemInfo.type2 ? '_' + itemInfo.type2 : '')));
+
+        let currentItemQuantity = _worldPlayerItems[itemToken] || 0;
+        let equippedItemQuantity = _worldPlayerItems[itemToken + '__equipped'] || 0;
+        let itemQuantity = currentItemQuantity - equippedItemQuantity;
 
         let itemNameFormatted = itemInfo.name.split(' ').join('<br />');
-        let itemCostFormatted = '<sup>' + itemEnergyCost + '</sup><sub>WE</sub>';
+        let itemQuantityFormatted = '&times; ' + itemQuantity;
 
         let buttonAttrs = '';
         let buttonClass = 'team-item' + (buttonOptions.selected ? ' selected' : '') + (buttonOptions.disabled ? ' disabled' : '');
@@ -9373,7 +9493,7 @@ class mmrpgWorldMap {
             buttonMarkup += '<div class="image"><span' + buttonSpriteAttrs + '>' + buttonSpriteInner + '</span></div>';
             buttonMarkup += '<span class="tint type ' + itemTypeClasses + '"></span>';
             buttonMarkup += '<strong class="name">' + itemNameFormatted + '</strong>';
-            buttonMarkup += '<span class="cost">' + itemCostFormatted + '</span>';
+            buttonMarkup += '<span class="quantity">' + itemQuantityFormatted + '</span>';
         buttonMarkup += '</div>';
 
         return buttonMarkup;
