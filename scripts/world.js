@@ -4415,14 +4415,39 @@ class mmrpgWorldMap {
                 }
             }
         else if (firstEventType === 'portal'){
-            //console.log('-> event at position is a portal, preparing dropdown');
+            //console.log('-> event at position is a portal, preparing redirect', '\n-> firstEvent:', firstEvent);
             // If the cursor is literally on a portal, only one event sprite matters right now
             let $portalEvent = $(firstEvent.sprite);
             let dataLabel = $portalEvent.attr('data-label');
             let dataPortal = $portalEvent.attr('data-portal');
-            if (dataPortal && dataPortal.indexOf('goto__') !== -1){
-                let portalInfo = _config.mapPortalsIndex[dataPortal] || false;
-                //console.log('-> found portalInfo for ' + dataPortal + ':', portalInfo);
+            let portalInfo = dataPortal ? (_config.mapPortalsIndex[dataPortal] || false) : false;
+            let goToDestination = false;
+            let goToWorld, goToMap, goToPosition;
+            //let goToDestination = portalInfo ? (portalInfo['dst'] || false) : false;
+            if (dataPortal.indexOf('goto__') !== -1){
+                goToDestination = true;
+                goToWorld = _config.mapWorld;
+                goToMap = dataPortal.replace(/^goto__/i, '');
+                if (goToMap.indexOf('__') !== -1){ let gtm = goToMap.split('__'); goToWorld = gtm[0]; goToMap = gtm[1]; }
+                if (portalInfo['dst']){ goToPosition = portalInfo['dst']; }
+                } else if (portalInfo['dst']){
+                goToDestination = true;
+                goToWorld = _config.mapWorld;
+                goToMap = portalInfo['dst'];
+                if (goToMap.indexOf('__') !== -1){
+                    let gtm = goToMap.split('__');
+                    //console.log('-> gtm =', gtm);
+                    if (gtm.length >= 3){ goToWorld = gtm[0]; goToMap = gtm[1]; goToPosition = gtm[2]; }
+                    else if (gtm.length >= 2){ goToMap = gtm[0]; goToPosition = gtm[1]; }
+                    }
+                }
+            //console.log('-> found portalInfo for ' + dataPortal + ':', portalInfo);
+            //console.log('-> w/ goToDestination =', goToDestination);
+            //console.log('-> w/ goToWorld =', goToWorld);
+            //console.log('-> w/ goToMap =', goToMap);
+            //console.log('-> w/ goToPosition =', goToPosition);
+            if (portalInfo && goToDestination){
+                //console.log('-> portalInfo has a valid destination!');
                 showActionArea = true;
                 if (!dataLabel){ dataLabel = 'Portal Options'; }
                 actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>';
@@ -4437,21 +4462,22 @@ class mmrpgWorldMap {
                     if (dataPortal === 'spawn'){
                         // TODO: SPAWN PORTAL - make the spawn actually go somewhere specific ?
                         console.warn('-> spawn portals not yet implemented yet');
-                        } else if (dataPortal === 'exit'){
+                        }
+                    else if (dataPortal === 'exit'){
                         // TODO: EXIT PORTAL - make the exit actually go somewhere specific ?
                         autoRedirect = true;
                         showActionArea = false;
                         autoRedirectURL = 'prototype.php';
-                        } else if (dataPortal.indexOf('goto__') !== -1){
+                        }
+                    else {
                         // GOTO PORTAL - use the portal token as worldmap token for redirect
                         autoRedirect = true;
                         showActionArea = false;
-                        let worldToken, mapToken;
-                        let goToPath = dataPortal.replace(/^goto__/i, '').split('__');
-                        if (goToPath[1]){ worldToken = goToPath[0]; mapToken = goToPath[1]; }
-                        else { worldToken = _config.mapWorld; mapToken = goToPath[0]; }
-                        autoRedirectURL = 'world.php?world=' + worldToken + '&map=' + mapToken;
-                        if (portalInfo['dst']){ autoRedirectURL += '&position='+portalInfo['dst']; }
+                        autoRedirectURL = 'world.php?world=' + goToWorld;
+                        if (goToMap){ autoRedirectURL += '&map='+goToMap; }
+                        if (goToPosition){ autoRedirectURL += '&position='+goToPosition; }
+                        //console.log('-> autoRedirectURL =', autoRedirectURL);
+                        //if (!confirm('teleport to ' + autoRedirectURL + '?')){ autoRedirectURL = false; } // TEMP TEMP TEMP
                         autoRedirectSound = 'bounce-sound';
                         readyTeamSprites = true;
                         }

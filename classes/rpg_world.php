@@ -2617,7 +2617,15 @@ class rpg_world {
                 //$top = $mod_top; $left = $mod_left;
                 $hidden = in_array('hidden', $portal_data) ? true : false;
                 $locked = in_array('locked', $portal_data) ? true : false;
+                $colour = false;
                 $direction = false;
+                if (in_array('black-alt', $portal_data)){ $colour = 'black'; }
+                else if (in_array('red-alt', $portal_data)){ $colour = 'red'; }
+                else if (in_array('blue-alt', $portal_data)){ $colour = 'blue'; }
+                else if (in_array('yellow-alt', $portal_data)){ $colour = 'yellow'; }
+                else if (in_array('green-alt', $portal_data)){ $colour = 'green'; }
+                else if (in_array('purple-alt', $portal_data)){ $colour = 'purple'; }
+                else if (in_array('orange-alt', $portal_data)){ $colour = 'orange'; }
                 if (in_array('left-only', $portal_data)){ $direction = 'left'; }
                 elseif (in_array('right-only', $portal_data)){ $direction = 'right'; }
                 elseif (in_array('up-only', $portal_data)){ $direction = 'up'; }
@@ -2626,10 +2634,12 @@ class rpg_world {
                 //if ($this_is_cursor && !$locked && $portal_name !== 'spawn'){ $locked = true; }
                 $sprite = 'portal';
                 if (!empty($direction)){ $sprite .= '-'.$direction; }
-                $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucfirst($portal_name));
+                if (!empty($colour)){ $sprite .= ' portal-'.$colour; }
+                $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucwords(str_replace('-', ' ', $portal_name)));
                 $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                 $classes = 'sprite tile '.$sprite.' '.($portal_name !== 'spawn' && !$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
+                $style .= ' animation-delay: '.(rand(0, 100) / 100).'s;';
                 $portals_markup[] = '<span data-sprite="portal" class="'.$classes.'" '.$attrs.' style="'.$style.'"></span>';
                 $portal_symbols[$pos] = $portal_name;
                 $portals_index[$portal_name] = array(

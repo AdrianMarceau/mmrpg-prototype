@@ -331,7 +331,7 @@ $request_map_token = $this_prototype_data['this_current_map'];
 
 // Collect or define the current map position we'll be spawning into
 $is_spawn_request = !empty($_REQUEST['position']) && $_REQUEST['position'] === 'spawn' ? true : false;
-$request_world_position = isset($_REQUEST['position']) && preg_match('/^([-0-9]+)$/i', $_REQUEST['position']) ? trim($_REQUEST['position']) : '';
+$request_world_position = isset($_REQUEST['position']) && preg_match('/^([-a-z0-9]+)$/i', $_REQUEST['position']) ? trim($_REQUEST['position']) : '';
 $request_world_direction = isset($_REQUEST['direction']) && preg_match('/^([-a-z0-9]+)$/i', $_REQUEST['direction']) ? trim($_REQUEST['direction']) : '';
 if (empty($request_world_position) && !empty($WORLD_PLAYER_SESSION['last_position'])){ $request_world_position = $WORLD_PLAYER_SESSION['last_position']; }
 if (empty($request_world_direction) && !empty($WORLD_PLAYER_SESSION['last_direction'])){ $request_world_direction = $WORLD_PLAYER_SESSION['last_direction']; }
@@ -447,7 +447,17 @@ $WORLD_SESSION['world_maps'][$world_map_token]['spawn_pos'] = $map_spawn_pos;
 $WORLD_SESSION['world_maps'][$world_map_token]['exit_pos'] = $map_exit_pos;
 
 // If the world position has not been set yet, we can use the spawn position for it as well
-if (empty($this_prototype_data['this_current_position'])){ $this_prototype_data['this_current_position'] = $map_spawn_pos; }
+if (empty($this_prototype_data['this_current_position'])){
+    $this_prototype_data['this_current_position'] = $map_spawn_pos;
+} else if (!preg_match('/^([0-9]+)-([0-9]+)$/i', $this_prototype_data['this_current_position'])){
+    // if not an x-y position, this must be the name key of a location like a portal, so we need to look it up
+    $real_position_value = false;
+    $position_key = $this_prototype_data['this_current_position'];
+    if (!empty($map_data_parsed['portals']) && !empty($map_data_parsed['portals'][$position_key])){ $real_position_value = $map_data_parsed['portals'][$position_key][0]; }
+    // if a real position value was found, use it, otherwise default to spawn
+    if (!empty($real_position_value)){ $this_prototype_data['this_current_position'] = $real_position_value; }
+    else { $this_prototype_data['this_current_position'] = $map_spawn_pos; }
+}
 
 // If the encounters for this map have not been generated yet, we can do so now
 $reset_encounters = !empty($_GET['reset']) && $_GET['reset'] === 'encounters' ? true : false;

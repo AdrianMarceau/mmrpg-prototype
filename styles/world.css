@@ -461,6 +461,13 @@ html, body {
 #world #map .sprite.tile.portal-left { background-position: -600px -760px; }
 #world #map .sprite.tile.portal-up { background-position: -600px -680px; }
 #world #map .sprite.tile.portal-down { background-position: -680px -680px; }
+#world #map .sprite.tile.portal-black { background-position: -40px -200px; }
+#world #map .sprite.tile.portal-red { background-position: -120px -200px; }
+#world #map .sprite.tile.portal-blue { background-position: -200px -200px; }
+#world #map .sprite.tile.portal-yellow { background-position: -280px -200px; }
+#world #map .sprite.tile.portal-green { background-position: -360px -200px; }
+#world #map .sprite.tile.portal-purple { background-position: -440px -200px; }
+#world #map .sprite.tile.portal-orange { background-position: -520px -200px; }
 #world #map .sprite.tile[data-portal="spawn"] { background-position: -120px -40px; }
 #world #map .sprite.tile[data-portal="exit"] { background-position: -440px -40px; }
 #world #map .sprite.tile.portal.hidden { display: none; }
