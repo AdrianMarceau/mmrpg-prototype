@@ -7780,9 +7780,20 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
-        let playerRobotInfo = playerRobotToken ? _worldPlayerRobots[playerRobotToken] : false;
+        let _playerRobotsIndex = _config.playerRobotsIndex;
+        let playerRobotInfo = false;
+        if (typeof _worldPlayerRobots[playerRobotToken] !== 'undefined'){
+            playerRobotInfo = _worldPlayerRobots[playerRobotToken];
+            } else if (typeof _playerRobotsIndex[playerRobotToken] !== 'undefined'){
+            playerRobotInfo = JSON.parse(JSON.stringify(_playerRobotsIndex[playerRobotToken]));
+            _worldPlayerRobots[playerRobotToken] = playerRobotInfo;
+            } else {
+            console.error('getRobotDetailsForOverview() could not find player robot info for token ' + playerRobotToken + '!');
+            return false;
+            }
         //console.log('--> _worldPlayer =', _worldPlayer);
         //console.log('--> _worldPlayerRobots =', _worldPlayerRobots);
+        //console.log('--> playerRobotToken =', playerRobotToken);
         //console.log('--> playerRobotInfo =', playerRobotInfo);
         //console.log('--> playerRobotInfo.persona =', (playerRobotInfo ? playerRobotInfo.persona : 'N/A'));
         if (typeof _mmrpgRobotsIndex[robotToken] === 'undefined'){ console.error('getRobotDetailsForOverview() could not find robot in index for token ' + robotToken + '!'); return false; }
