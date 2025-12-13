@@ -5,8 +5,9 @@
 @image    = mmrpg-overworld-2k25_terrain-tiles.png
 @size     = 80 x 80
 #---------------------------#
-@tiles[]    = void(00, 40, 700)
-@tiles[]    = water(99, 440, 40)
+@tiles[]    = void(00, 40, 700, not-walkable)
+@tiles[]    = dotted(80, 280, 520, not-walkable)
+@tiles[]    = water(99, 440, 40, not-walkable)
 @tiles[]    = darkness(88, 200, 40)
 @tiles[]    = darkness-2(89, 280, 40)
 #---------------------------#

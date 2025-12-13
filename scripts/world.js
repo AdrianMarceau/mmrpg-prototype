@@ -597,9 +597,25 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let tileSize = _config.mapTileSize;
         let tilesIndex = _config.mapTilesIndex;
+        let tilesIndexKeys = Object.keys(tilesIndex);
+        for (var t = 0; t < tilesIndexKeys.length; t++){
+            let tileToken = tilesIndexKeys[t];
+            if (tileToken === 'keys'){ continue; }
+            let tileInfo = tilesIndex[tileToken];
+            if (!tileInfo){ console.error('indexCanvasTileData() missing tileInfo for tileToken:', tileToken); continue; }
+            let tileInfoAttrs = {isWalkable: true, isVoid: false, isWater: false};
+            //console.log('typeof tileInfo for tileToken "' + tileToken + '" =', typeof tileInfo, '\n-> w/ value:', tileInfo);
+            (function(indexOfNotWalkable){
+                if (indexOfNotWalkable < 0){ return; }
+                tileInfoAttrs.isWalkable = false;
+                tileInfo.splice(indexOfNotWalkable, 1);
+                })(tileInfo.indexOf('not-walkable'));
+            let tileInfoOffset = [tileInfo[0] || 0, tileInfo[1] || 0];
+            let tileInfoSize = [tileInfo[2] || tileSize[0], tileInfo[3] || tileSize[1]];
+            let newTileInfo = [tileInfoOffset, tileInfoSize, tileInfoAttrs];
+            tilesIndex[tileToken] = newTileInfo;
+            }
         let tileDataKeys = Object.keys(canvasTiles);
-        //console.log('---> found ', tileDataKeys.length, ' layer tiles in data...');
-        //console.log('---> indexing ', tileDataKeys.length, ' tileDataKeys tiles for canvas...');
         let layersIndex = _world.layersIndex || {};
         let layerTilesIndex = _world.layerTilesIndex || {};
         let thisLayerData = layersIndex[layerToken] || {};
@@ -616,15 +632,12 @@ class mmrpgWorldMap {
             let tileSpriteToken = tileValue;
             let tileSpriteInfo = tilesIndex[tileSpriteToken];
             if (!tileSpriteInfo){ console.error('indexCanvasTileData() missing tileSpriteInfo for tileKey:', tileKey, 'and tileValue:', tileValue); continue; }
-            let tileSpriteOffset = [tileSpriteInfo[0] || 0, tileSpriteInfo[1] || 0];
-            let tileSpriteSize = [tileSpriteInfo[2] || tileSize[0], tileSpriteInfo[3] || tileSize[1]];
+            let tileSpriteOffset = tileSpriteInfo[0], tileSpriteSize = tileSpriteInfo[1], tileSpriteAttrs = tileSpriteInfo[2];
             let tileSpritePosition = [tilePos[0], tilePos[1], ((tilePos[0] - 1) * tileSpriteSize[0]), ((tilePos[1] - 1) * tileSpriteSize[1])];
             let tileSpriteEffects = {grid: true, hover: false, outline: false, focus: false, active: false}; // default values
             let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void') !== -1 ? true : false;
             let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water') !== -1 ? true : false;
-            let tileSpriteWalkable = true;
-            if (tileIsVoid){ tileSpriteEffects.grid = false; tileSpriteWalkable = false; } // no grid or walk for void tiles
-            if (tileIsWater){ tileSpriteWalkable = false; } // no walk for water tiles
+            if (tileSpriteAttrs.isVoid){ tileSpriteEffects.grid = false; } // no grid or walk for void tiles
             //console.log('---> tileSpriteKey =', tileSpriteKey);
             //console.log('---> tileSpriteToken =', tileSpriteToken);
             //console.log('---> tileSpriteInfo =', tileSpriteInfo);
@@ -632,7 +645,7 @@ class mmrpgWorldMap {
             tilesIndexData.position = tileSpritePosition;
             tilesIndexData.effects = tileSpriteEffects;
             tilesIndexData.sprite = [tileSpriteKey, tileSpriteToken, tileSpriteOffset, tileSpriteSize];
-            tilesIndexData.walkable = tileSpriteWalkable;
+            tilesIndexData.walkable = tileSpriteAttrs.isWalkable;
             tilesIndexData.dirty = false; // indicates if the tile has been changed since last draw
             //console.log('---> tilesIndexData =', tilesIndexData);
             thisLayerTiles[tileKey] = tilesIndexData;
@@ -739,6 +752,10 @@ class mmrpgWorldMap {
             );
         ctx.globalAlpha = 1.0;
         // gradient-overlay: draw a slice of the gradient overlay on top of this tile for aesthetic purposes
+        //console.log('tileData =', tileData);
+        //console.log('tileSprite =', tileSprite);
+        //console.log('tilePosition =', tilePosition);
+        //console.log('tileSpriteSize =', tileSpriteSize);
         var gradBuf = _self.getOverlayGradientBuffer(layerToken, ctx);
         _self.applyOverlayToRect(ctx, gradBuf,
             tilePosition[2], tilePosition[3],
@@ -915,7 +932,7 @@ class mmrpgWorldMap {
         let mapCols = _config.mapCols;
         let mapRows = _config.mapRows;
         let mapTileSize = _config.mapTileSize;
-        let mapTilesIndex = _config.mapTilesIndex;
+        //let mapTilesIndex = _config.mapTilesIndex;
         let layerTilesIndex = _world.layerTilesIndex;
         let layerTilesKeys = Object.keys(layerTilesIndex);
         //console.log('---> mapCols =', mapCols);
@@ -5108,16 +5125,17 @@ class mmrpgWorldMap {
                             let mapTilesIndex = _config.mapTilesIndex;
                             let layerTilesIndex = _world.layerTilesIndex;
                             let terrainTilesIndex = layerTilesIndex['terrain'] || false;
+                            if (!layerTilesIndex || !terrainTilesIndex){ console.error('-> layerTilesIndex or terrainTilesIndex not found, cannot set terrain!'); return false; }
                             let terrainSpriteData = mapTilesIndex[terrainName] || false;
-                            let terrainIsVoid = terrainName.indexOf('void') !== -1 ? true : false;
-                            let terrainIsWater = terrainName.indexOf('water') !== -1 ? true : false;
-                            let terrainIsWalkable = !terrainIsVoid && !terrainIsWater ? true : false;
+                            if (!terrainSpriteData){ console.error('-> terrainSpriteData not found for terrain', terrainName, ', cannot set terrain!'); return false; }
+                            let terrainSpriteOffset = terrainSpriteData[0], terrainSpriteDataSize = terrainSpriteData[1], terrainSpriteAttrs = terrainSpriteData[2];
+                            //let terrainIsVoid = terrainSpriteAttrs.isVoid ? true : false;
+                            //let terrainIsWater = terrainSpriteAttrs.isWater ? true : false;
+                            let terrainIsWalkable = terrainSpriteAttrs.isWalkable ? true : false;
                             //console.log('-> layerTilesIndex =', layerTilesIndex);
                             //console.log('-> terrainTilesIndex =', terrainTilesIndex);
                             //console.log('-> terrainSpriteData =', terrainSpriteData);
                             //console.log('-> terrainIsWalkable =', terrainIsWalkable);
-                            if (!layerTilesIndex || !terrainTilesIndex){ console.error('-> layerTilesIndex or terrainTilesIndex not found, cannot set terrain!'); return false; }
-                            if (!terrainSpriteData){ console.error('-> terrainSpriteData not found, cannot set terrain!'); return false; }
                             let groupsIndex = _config.mapGroupsIndex;
                             let groupTiles = groupsIndex[groupName] || false;
                             //console.log('-> groupsIndex =', groupsIndex);
