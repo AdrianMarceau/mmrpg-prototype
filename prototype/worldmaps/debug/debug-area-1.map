@@ -4,42 +4,28 @@
 @token       = debug-area-1
 @name        = DEBUG Area 1
 @level       = 1
-@size        = 14 x 26
+@size        = 22 x 30
 @sheet       = mmrpg-overworld-2k25
 #---------------------------#
-@portals[]   = spawn(6-10)
-@portals[]   = goto__debug-area-1n(6-8, 8-12)
-@portals[]   = goto__debug-area-1s(6-12, 5-2)
-@portals[]   = goto__debug-area-1w(4-10, 17-4)
-@portals[]   = goto__debug-area-1e(8-10, 3-4)
-@portals[]   = goto__debug-area-0(6-22, 10-6)
+@portals[]   = spawn(10-14)
 #---------------------------#
-[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
-[__],[13],[11],[11],[11],[11],[11],[11],[11],[11],[11],[14],[__],[__]
-[__],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[__],[__]
-[__],[15],[12],[12],[12],[10],[12],[12],[12],[12],[12],[16],[__],[__]
-[__],[__],[__],[__],[__],[10],[__],[__],[__],[__],[__],[__],[__],[__]
-[__],[__],[__],[__],[__],[10],[__],[__],[__],[__],[__],[__],[__],[__]
-[__],[__],[13],[11],[11],[10],[11],[11],[14],[__],[__],[__],[__],[__]
-[__],[__],[10],[10],[10],[50],[10],[10],[10],[__],[13],[11],[14],[__]
-[__],[__],[10],[10],[10],[10],[10],[10],[10],[__],[10],[10],[10],[__]
-[__],[__],[10],[20],[10],[10],[10],[30],[10],[10],[10],[10],[10],[__]
-[__],[__],[10],[10],[10],[10],[10],[10],[10],[__],[10],[10],[10],[__]
-[__],[__],[10],[10],[10],[40],[10],[10],[10],[__],[15],[12],[16],[__]
-[__],[__],[15],[12],[12],[10],[12],[12],[16],[__],[__],[__],[__],[__]
-[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
-[__],[13],[14],[__],[__],[__],[__],[__],[__],[__],[13],[11],[14],[__]
-[__],[15],[16],[__],[__],[__],[__],[__],[__],[__],[10],[10],[10],[__]
-[__],[__],[__],[__],[__],[91],[__],[__],[__],[__],[15],[12],[16],[__]
-[__],[__],[__],[__],[91],[90],[91],[__],[__],[__],[__],[__],[__],[__]
-[__],[__],[__],[91],[90],[90],[90],[91],[__],[__],[__],[__],[__],[__]
-[__],[__],[91],[90],[90],[90],[90],[90],[91],[__],[__],[__],[__],[__]
-[__],[__],[90],[90],[90],[90],[90],[90],[90],[__],[13],[11],[14],[__]
-[__],[__],[90],[90],[90],[90],[90],[90],[90],[__],[10],[10],[10],[__]
-[__],[__],[92],[90],[90],[90],[90],[90],[92],[__],[15],[12],[16],[__]
-[__],[__],[__],[92],[90],[90],[90],[92],[__],[__],[__],[__],[__],[__]
-[__],[__],[__],[__],[92],[92],[92],[__],[__],[__],[__],[__],[__],[__]
-[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+@portals[]   = subspace-portal(18-26, debug-area-0__surface-portal)
+#---------------------------#
+@portals[]   = north-portal-1(10-12, debug-area-1__north-portal-2)
+@portals[]   = north-portal-2(10-3, debug-area-1__north-portal-1)
+@portals[]   = north-exit(10-1, debug-area-1n__south-exit, up-only)
+#---------------------------#
+@portals[]   = east-portal-1(12-14, debug-area-1__east-portal-2)
+@portals[]   = east-portal-2(20-14, debug-area-1__east-portal-1)
+@portals[]   = east-exit(22-14, debug-area-1e__west-exit, right-only)
+#---------------------------#
+@portals[]   = west-portal-1(8-14, debug-area-1__west-portal-2)
+@portals[]   = west-portal-2(4-14, debug-area-1__west-portal-1)
+@portals[]   = west-exit(1-14, debug-area-1w__east-exit, left-only)
+#---------------------------#
+@portals[]   = south-portal-1(10-16, debug-area-1__south-portal-2)
+@portals[]   = south-portal-2(10-28, debug-area-1__south-portal-1)
+@portals[]   = south-exit(10-30, debug-area-1s__north-exit, down-only)
 #---------------------------#
 # FIELD AND TERRAIN
 #--------------------
@@ -57,88 +43,118 @@
 # + EVENT PANELS
 # + GIFT ITEMS
 #----------------------
-@groups[]    = no-encounters_spawn-buffer(4-7...8-12)
-@events[]    = auto-heal(4-8, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
-@events[]    = auto-reset(8-8, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
-@items[]     = first-consumable-eti(4-12, energy-tank, x1, always)
-@items[]     = first-consumable-wti(8-12, weapon-tank, x1, always)
+@groups[]    = no-encounters_spawn-buffer(8-12...12-16)
+@events[]    = auto-heal(8-12, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
+@events[]    = auto-reset(12-12, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
+@items[]     = first-consumable-eti(8-16, energy-tank, x1, always)
+@items[]     = first-consumable-wti(12-16, weapon-tank, x1, always)
 #---------------------------#
 # LIGHT PLAYER PLATFORM
 # + INIT ITEMS
 #------------------------
-@events[]     = light-platform-left(5-2, lightpad-left, any, drop-zone, item:light-program, activate-player-platform)
-@events[]     = light-platform-middle(6-2, lightpad-middle, any, drop-zone, item:light-heart, activate-player-platform)
-@events[]     = light-platform-right(7-2, lightpad-right, any, drop-zone, item:copy-core, activate-player-platform)
-@items[]      = light-init-program(6-19, light-program, anchored)
-@items[]      = light-init-heart(12-11, light-heart__1, anchored)
-@items[]      = light-init-core(12-16, copy-core, anchored)
-@groups[]     = no-encounters_light-platform(4-2...8-3)
-@groups[]     = no-encounters_light-init-program(5-18...7-20)
-@groups[]     = no-encounters_light-init-heart(11-10...13-12)
-@groups[]     = no-encounters_light-init-core(11-15...13-17)
+@events[]     = light-platform-left(9-6, lightpad-left, any, drop-zone, item:light-program, activate-player-platform)
+@events[]     = light-platform-middle(10-6, lightpad-middle, any, drop-zone, item:light-heart, activate-player-platform)
+@events[]     = light-platform-right(11-6, lightpad-right, any, drop-zone, item:copy-core, activate-player-platform)
+@items[]      = light-init-program(18-24, light-program, anchored)
+@items[]      = light-init-heart(16-14, light-heart__1, anchored)
+@items[]      = light-init-core(13-20, copy-core, anchored)
 #---------------------------#
 # INTRO ENCOUNTER
 #------------------
-@mechas[]    = light-runway-mecha(6-5, met, 1)
-@groups[]    = no-encounters_light-runway(6-4...6-7)
+@mechas[]    = light-runway-mecha(10-10, met, 1)
 #---------------------------#
 # MECHA PORTAL BOSSES
 #----------------------
-@mechas[]    = south-portal-mecha(6-12, octone, 1)
-@mechas[]    = north-portal-mecha(6-8, frosty-throwman, 2)
-@mechas[]    = west-portal-mecha(4-10, rockscotch, 3)
-@mechas[]    = east-portal-mecha(8-10, antlin-g, 4)
-#---------------------------#
-# ROLL RESCUE MISSION
-#----------------------
-@rescues[]   = rescue-roll-robot(13-23, roll, 2)
-@mechas[]    = rescue-roll-guard-1(12-23, sniper-joe, 2)
-@mechas[]    = rescue-roll-guard-2(13-22, sniper-joe, 2)
-@items[]     = rescue-roll-pickup-1(11-21, extra-life)
-@groups[]    = no-encounters_rescue-roll(11-21...13-23)
+@mechas[]    = south-exit-mecha(10-30, octone, 1)
+@mechas[]    = north-exit-mecha(10-1, frosty-throwman, 2)
+@mechas[]    = west-exit-mecha(1-14, rockscotch, 3)
+@mechas[]    = east-exit-mecha(22-14, antlin-g, 4)
 #---------------------------#
 # ITEMS CODES PICKUP
 #---------------------
-@items[]     = item-codes-pickup(2-16, item-codes)
-@groups[]    = no-encounters_item-codes(1-15...3-17)
+@items[]     = item-codes-pickup(2-22, item-codes)
 #---------------------------#
 # ITEM CORRIDOR PICKUPS
 # + STARTER ABILITIES
 #------------------------
-@items[]      = attack-pellet-pickup(10-4, attack-pellet)
-@items[]      = attack-capsule-pickup(10-2, attack-capsule)
-@items[]      = defense-pellet-pickup(11-4, defense-pellet)
-@items[]      = defense-capsule-pickup(11-2, defense-capsule)
-@items[]      = speed-pellet-pickup(12-4, speed-pellet)
-@items[]      = speed-capsule-pickup(12-2, speed-capsule)
-@items[]      = energy-pellet-pickup(8-4, energy-pellet)
-@items[]      = energy-capsule-pickup(8-2, energy-capsule)
-@items[]      = weapon-pellet-pickup(9-4, weapon-pellet)
-@items[]      = weapon-capsule-pickup(9-2, weapon-capsule)
-@abilities[]  = light-buster-pickup(4-2, light-buster)
-@abilities[]  = wily-buster-pickup(3-2, wily-buster)
-@abilities[]  = cossack-buster-pickup(2-2, cossack-buster)
-@abilities[]  = copy-shot-pickup(4-4, copy-shot)
-@abilities[]  = copy-soul-pickup(3-4, copy-soul)
-@abilities[]  = copy-style-pickup(2-4, copy-style)
-@groups[]     = no-encounters_item-ability-corridor(2-2...12-4)
+@items[]      = energy-pellet-pickup(14-8, energy-pellet)
+@items[]      = energy-capsule-pickup(14-6, energy-capsule)
+@items[]      = weapon-pellet-pickup(15-8, weapon-pellet)
+@items[]      = weapon-capsule-pickup(15-6, weapon-capsule)
+@items[]      = attack-pellet-pickup(16-8, attack-pellet)
+@items[]      = attack-capsule-pickup(16-6, attack-capsule)
+@items[]      = defense-pellet-pickup(17-8, defense-pellet)
+@items[]      = defense-capsule-pickup(17-6, defense-capsule)
+@items[]      = speed-pellet-pickup(18-8, speed-pellet)
+@items[]      = speed-capsule-pickup(18-6, speed-capsule)
+#------------------------
+@abilities[]  = light-buster-pickup(6-6, light-buster)
+@abilities[]  = wily-buster-pickup(5-6, wily-buster)
+@abilities[]  = cossack-buster-pickup(4-6, cossack-buster)
+@abilities[]  = copy-shot-pickup(6-8, copy-shot)
+@abilities[]  = copy-soul-pickup(5-8, copy-soul)
+@abilities[]  = copy-style-pickup(4-8, copy-style)
 #---------------------------#
-# ISLAND BUTTON + EVENTS
+# ISLAND BUTTON 1 + EVENTS
 #-------------------------
-@buttons[]   = island-button(12-8, green, up, set-group-terrain, island-paths, grass)
-@groups[]    = no-encounters_island-button(11-7...13-9)
-@groups[]    = island-paths(12-12...12-15, 12-17...12-21)
-@groups[]    = no-encounters_island-paths(12-8...12-13)
-@mechas[]    = island-button-guard-1(11-8, met)
-@mechas[]    = island-button-guard-2(13-8, met)
-@groups[]    = no-encounters_island-button-guard(9-10...11-10)
+@buttons[]   = island-button-1(16-12, green, up, set-group-terrain, island-paths-1, grass)
+@groups[]    = island-paths-1(16-17...16-20, 15-20)
+@mechas[]    = island-button-1-guard-1(15-12, met, 1)
+@mechas[]    = island-button-1-guard-2(17-12, met, 1)
+#---------------------------#
+# ISLAND BUTTON 2 + EVENTS
+#-------------------------
+@buttons[]   = island-button-2(13-19, green, up, set-group-terrain, island-paths-2, grass)
+@groups[]    = island-paths-2(9-20...11-20)
+@mechas[]    = island-button-2-guard-1(12-19, met, 2)
+@mechas[]    = island-button-2-guard-2(14-19, met, 2)
+#---------------------------#
+# ROLL RESCUE MISSION + EVENTS
+#----------------------
+@rescues[]   = rescue-roll-robot(6-21, roll, 2)
+@mechas[]    = rescue-roll-guard-1(6-20, sniper-joe, 2)
+@mechas[]    = rescue-roll-guard-2(7-21, sniper-joe, 2)
+@items[]     = rescue-roll-pickup-1(8-19, extra-life)
 #---------------------------#
 # SUBSPACE BUTTON + EVENTS
 #---------------------------
-@bosses[]    = subspace-portal-boss(6-22, trill, 3, speed)
-@items[]     = subspace-light-heart(6-23, light-heart__2)
-@buttons[]   = subspace-button(6-24, purple, up, set-group-terrain, subspace-path, subspace)
-@groups[]    = subspace-path(6-14, 6-15, 6-16, 6-17)
-@groups[]    = no-encounters_subspace-button(5-24...7-25)
-@groups[]    = no-encounters_subspace-path(6-13...6-17)
+@bosses[]    = subspace-portal-boss(18-26, trill, 3, speed)
+@items[]     = subspace-light-heart(18-27, light-heart__2)
+@buttons[]   = subspace-button(18-28, purple, up, set-group-terrain, subspace-path, subspace)
+@groups[]    = subspace-path(13-22...13-26, 14-26)
+#---------------------------#
+# NO ENCOUNTERS
+#---------------------------
+@groups[]    = no-encounters_temp(1-1...22-30)
+#---------------------------#
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[50],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[53],[50],[54],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[50],[50],[50],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[55],[52],[56],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[13],[11],[14],[__],[13],[11],[11],[11],[14],[__],[13],[11],[11],[11],[14],[__],[__],[__],[__]
+[__],[__],[__],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[__],[__],[__],[__]
+[__],[__],[__],[15],[12],[16],[__],[15],[12],[10],[12],[16],[__],[15],[12],[12],[12],[16],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[10],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[10],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[13],[11],[11],[10],[11],[11],[14],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[10],[10],[10],[50],[10],[10],[10],[__],[13],[11],[14],[__],[__],[__],[__],[__]
+[__],[__],[21],[21],[21],[__],[10],[10],[10],[10],[10],[10],[10],[__],[10],[10],[10],[__],[31],[31],[31],[__]
+[20],[20],[20],[20],[20],[__],[10],[20],[10],[10],[10],[30],[10],[10],[10],[10],[10],[__],[30],[30],[30],[30]
+[__],[__],[22],[22],[22],[__],[10],[10],[10],[10],[10],[10],[10],[__],[10],[10],[10],[__],[32],[32],[32],[__]
+[__],[__],[__],[__],[__],[__],[10],[10],[10],[40],[10],[10],[10],[__],[15],[10],[16],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[15],[12],[12],[12],[12],[12],[16],[__],[__],[80],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[80],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[13],[11],[14],[__],[__],[__],[13],[11],[14],[__],[80],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[10],[10],[10],[80],[80],[80],[10],[10],[10],[80],[80],[__],[__],[__],[__],[__],[__]
+[__],[13],[14],[__],[__],[15],[12],[16],[__],[__],[__],[15],[10],[16],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[15],[16],[__],[__],[__],[__],[__],[__],[__],[__],[__],[80],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[80],[__],[__],[__],[91],[91],[91],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[80],[__],[__],[91],[90],[90],[90],[91],[__],[__]
+[__],[__],[13],[14],[__],[__],[__],[__],[__],[__],[__],[__],[80],[__],[91],[90],[90],[90],[90],[90],[91],[__]
+[__],[__],[15],[16],[__],[__],[__],[__],[__],[__],[__],[__],[80],[80],[90],[90],[90],[90],[90],[90],[90],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[40],[40],[40],[__],[__],[__],[92],[90],[90],[90],[90],[90],[92],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[40],[40],[40],[__],[__],[__],[__],[92],[90],[90],[90],[92],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[40],[40],[40],[__],[__],[__],[__],[__],[92],[92],[92],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[40],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 #---------------------------#

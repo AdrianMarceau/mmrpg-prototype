@@ -8,8 +8,13 @@
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
 @portals[]  = spawn(8-12, hidden)
-@portals[]  = goto__debug-area-1(8-12, 6-8)
-@portals[]  = goto__debug-area-1n2(8-4, 25-13)
+#---------------------------#
+@portals[]  = subspace-portal(8-9, debug-area-0__winter-portal)
+#---------------------------#
+@portals[]  = north-exit(8-1, debug-area-1n2__south-exit, up-only)
+@portals[]  = south-exit(8-15, debug-area-1__north-exit, down-only)
+@groups[]   = no-encounters_north-exit(7-1...9-2)
+@groups[]   = no-encounters_south-exit(7-14...9-15)
 #---------------------------#
 @field        = wintry-forefront
 #---------------------------#
@@ -21,27 +26,27 @@
 @bosses[]     = north-west-boss(4-4, blizzard-man)
 @bosses[]     = north-east-boss(12-4, frost-man)
 #---------------------------#
-@events[]    = cossack-platform-left(7-2, cossackpad-left, any, drop-zone, item:cossack-program, activate-player-platform)
-@events[]    = cossack-platform-middle(8-2, cossackpad-middle, any, drop-zone, item:cossack-heart, activate-player-platform)
-@events[]    = cossack-platform-right(9-2, cossackpad-right, any, drop-zone, item:copy-core, activate-player-platform)
+@events[]    = cossack-platform-left(7-3, cossackpad-left, any, drop-zone, item:cossack-program, activate-player-platform)
+@events[]    = cossack-platform-middle(8-3, cossackpad-middle, any, drop-zone, item:cossack-heart, activate-player-platform)
+@events[]    = cossack-platform-right(9-3, cossackpad-right, any, drop-zone, item:copy-core, activate-player-platform)
 #---------------------------#
 @items[]     = cossack-init-heart(4-3, cossack-heart__2, anchored)
 @items[]     = cossack-init-program(12-3, cossack-program, anchored)
 @items[]     = cossack-init-core(3-9, copy-core, anchored)
 #---------------------------#
-[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[50],[__],[__],[__],[__],[__],[__],[__]
 [__],[53],[51],[51],[51],[51],[51],[51],[51],[51],[51],[51],[51],[54],[__]
 [__],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[__]
 [__],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[__]
 [__],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[__]
 [__],[50],[50],[50],[50],[__],[__],[__],[__],[__],[50],[50],[50],[50],[__]
 [__],[50],[50],[50],[50],[__],[__],[__],[__],[__],[50],[50],[50],[50],[__]
-[__],[50],[50],[50],[50],[__],[__],[__],[__],[__],[50],[50],[50],[50],[__]
-[__],[50],[50],[50],[50],[__],[__],[__],[__],[__],[50],[50],[50],[50],[__]
+[__],[50],[50],[50],[50],[__],[53],[51],[54],[__],[50],[50],[50],[50],[__]
+[__],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[__]
+[__],[50],[50],[50],[50],[__],[55],[52],[56],[__],[50],[50],[50],[50],[__]
 [__],[50],[50],[50],[50],[__],[__],[__],[__],[__],[50],[50],[50],[50],[__]
 [__],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[__]
 [__],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[__]
-[__],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[__]
-[__],[55],[52],[52],[52],[52],[52],[52],[52],[52],[52],[52],[52],[56],[__]
-[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[55],[52],[52],[52],[52],[52],[50],[52],[52],[52],[52],[52],[56],[__]
+[__],[__],[__],[__],[__],[__],[__],[50],[__],[__],[__],[__],[__],[__],[__]
 #---------------------------#
