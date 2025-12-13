@@ -11,6 +11,7 @@ class rpg_disabled {
         // Pull in the global variable
         global $db;
         global $mmrpg_index_players;
+        $session_token = rpg_game::session_token();
         if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
         // Generate default trigger options if not set
@@ -140,6 +141,7 @@ class rpg_disabled {
 
             // Define the item info based on token and load into memory
             $item_token = $this_robot->get_item();
+            $item_equipped_token = $item_token.'__equipped';
             $item_info = array(
                 'flags' => array('is_part' => true),
                 'part_token' => 'item_'.$item_token,
@@ -211,11 +213,23 @@ class rpg_disabled {
                 if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                 // Also remove this robot's item from the session, we're done with it
-                if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
-                    $ptoken = $this_player->player_token;
-                    $rtoken = $this_robot->robot_token;
-                    if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
-                        $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+                $is_human_player = $this_player->player_side == 'left' ? true : false;
+                $is_player_battle = !empty($this_battle->flags['player_battle']) ? true : false;
+                $is_challenge_battle = !empty($this_battle->flags['challenge_battle']) ? true : false;
+                $is_competitive_battle = $is_player_battle || $is_challenge_battle ? true : false;
+                if ($is_human_player && !$is_competitive_battle){
+                    $battleSettingExist = isset($_SESSION[$session_token]['values']['battle_settings']);
+                    $battleItemsExist = isset($_SESSION[$session_token]['values']['battle_items']);
+                    if ($battleSettingExist && $battleItemsExist){
+                        $battleSettings = &$_SESSION[$session_token]['values']['battle_settings'];
+                        $battleItems = &$_SESSION[$session_token]['values']['battle_items'];
+                        if (!isset($battleItems[$item_token])){ $battleItems[$item_token] = 1; }
+                        if (!isset($battleItems[$item_equipped_token])){ $battleItems[$item_equipped_token] = 1; }
+                        $battleItems[$item_token] -= 1;
+                        if (empty($battleItems[$item_token]) || $battleItems[$item_token] < $battleItems[$item_equipped_token]){
+                            $battleItems[$item_token] = $battleItems[$item_equipped_token];
+                            $battleSettings[$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item'] = '';
+                        }
                     }
                 }
 
