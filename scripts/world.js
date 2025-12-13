@@ -7641,7 +7641,8 @@ class mmrpgWorldMap {
         let $thisWorld = _elements.world;
         let $robotsOverview = _elements.robotsOverview;
         let $storageItemsOverview = $('.storage-items', $robotsOverview);
-        let $storageItemInOverview = $('.team-item[data-item="' + itemToken + '"]', $storageItemsOverview);
+        let $storageItemsWrapper = $('> .wrapper', $storageItemsOverview);
+        let $storageItemInOverview = $('.team-item[data-item="' + itemToken + '"]', $storageItemsWrapper);
         let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerItems = _worldPlayer.items;
@@ -7705,8 +7706,8 @@ class mmrpgWorldMap {
                 storageItemMarkup += '<strong class="name">' + itemNameMarkup + '</strong>';
                 storageItemMarkup += '<span class="quantity">&times; ' + displayedItemQuantity + '</span>';
             storageItemMarkup += '</div>';
-            $storageItemsOverview.append(storageItemMarkup);
-            $storageItemInOverview = $('.team-item[data-item="' + itemToken + '"]', $storageItemsOverview);
+            $storageItemsWrapper.append(storageItemMarkup);
+            $storageItemInOverview = $('.team-item[data-item="' + itemToken + '"]', $storageItemsWrapper);
             }
 
         // Trigger a save of the world state to persist this change
