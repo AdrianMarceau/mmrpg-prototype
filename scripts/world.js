@@ -5128,10 +5128,17 @@ class mmrpgWorldMap {
                             if (!layerTilesIndex || !terrainTilesIndex){ console.error('-> layerTilesIndex or terrainTilesIndex not found, cannot set terrain!'); return false; }
                             let terrainSpriteData = mapTilesIndex[terrainName] || false;
                             if (!terrainSpriteData){ console.error('-> terrainSpriteData not found for terrain', terrainName, ', cannot set terrain!'); return false; }
-                            let terrainSpriteOffset = terrainSpriteData[0], terrainSpriteDataSize = terrainSpriteData[1], terrainSpriteAttrs = terrainSpriteData[2];
+                            //console.log('-> terrainSpriteData =', terrainSpriteData);
+                            let terrainSpriteOffset = _self.getClonedObject(terrainSpriteData[0]); // clone the terrain sprite offset array
+                            let terrainSpriteSize = _self.getClonedObject(terrainSpriteData[1]); // clone the terrain sprite size array
+                            let terrainSpriteAttrs = _self.getClonedObject(terrainSpriteData[2]); // clone the terrain sprite attributes object
+                            //console.log('-> terrainSpriteOffset =', terrainSpriteOffset);
+                            //console.log('-> terrainSpriteSize =', terrainSpriteSize);
+                            //console.log('-> terrainSpriteAttrs =', terrainSpriteAttrs);
                             //let terrainIsVoid = terrainSpriteAttrs.isVoid ? true : false;
                             //let terrainIsWater = terrainSpriteAttrs.isWater ? true : false;
                             let terrainIsWalkable = terrainSpriteAttrs.isWalkable ? true : false;
+                            let terrainHasGrid = terrainIsWalkable ? true : false;
                             //console.log('-> layerTilesIndex =', layerTilesIndex);
                             //console.log('-> terrainTilesIndex =', terrainTilesIndex);
                             //console.log('-> terrainSpriteData =', terrainSpriteData);
@@ -5144,17 +5151,20 @@ class mmrpgWorldMap {
                             for (let i = 0; i < groupTiles.length; i++){
                                 let tileKey = groupTiles[i];
                                 let tileData = terrainTilesIndex[tileKey] || false;
-                                if (!tileData){ console.error('-> tile data not found for tile', tileKey, ', cannot set terrain!'); continue; }
-                                //console.log('-> setting terrain for tile', tileKey, 'to', terrainName, 'w/ tileData:', tileData);
+                                if (typeof terrainTilesIndex[tileKey] === 'undefined'){ console.error('-> tile data not found for tile', tileKey, ', cannot set terrain!'); continue; }
+                                //console.log('-> setting terrain for tile', tileKey, 'to', terrainName, '\n-> w/ original tileData:', _self.getClonedObject(tileData));
                                 tileData.sprite[1] = terrainName;
-                                tileData.sprite[2] = [terrainSpriteData[0], terrainSpriteData[1]];
+                                tileData.sprite[2] = [terrainSpriteOffset[0], terrainSpriteOffset[1]];
+                                tileData.sprite[3] = [terrainSpriteSize[0], terrainSpriteSize[1]];
                                 tileData.walkable = terrainIsWalkable;
-                                tileData.effects.grid = terrainIsWalkable;
+                                tileData.effects.grid = terrainHasGrid;
                                 tileData.dirty = true;
                                 terrainTilesIndex[tileKey] = tileData; // sync the tile data back to the index
+                                //console.log('-> added terrainTilesIndex[' + tileKey + ']', '\n-> w/ new tileData:', tileData);
                                 }
                             layerTilesIndex['terrain'] = terrainTilesIndex; // sync the layer tiles index with the new terrain tiles index
                             _world.layerTilesIndex = layerTilesIndex; // sync the world state with the new layer tiles index
+                            //console.log('-> updated _world.layerTilesIndex =', _world.layerTilesIndex);
                             _self.refreshCanvasTiles('terrain'); // refresh the canvas tiles
                             _self.calculateWalkableMapTiles(true); // recalculate walkable tiles
                             _self.refreshMapPositionEvents(); // refresh the map position events
