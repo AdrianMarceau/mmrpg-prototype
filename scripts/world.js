@@ -419,7 +419,7 @@ class mmrpgWorldMap {
                     continue;
                     }
                 //console.log('---> adding robot #' + i + ' w/ robotString = ' + robotString);
-                let liveRobotInfo = JSON.parse(JSON.stringify(robotInfo)); // clone the info object
+                let liveRobotInfo = _self.getClonedObject(robotInfo); // clone the info object
                 livePlayerRobots[robotString] = liveRobotInfo;
                 }
             _worldPlayer.robots = livePlayerRobots;
@@ -429,7 +429,7 @@ class mmrpgWorldMap {
         let _playerAbilities = _config.playerAbilities;
         if (_playerAbilities.length){
             //console.log('---> initWorldMap() found ' + _playerAbilities.length + ' player abilities to initialize!');
-            let livePlayerAbilities = JSON.parse(JSON.stringify(_playerAbilities));
+            let livePlayerAbilities = _self.getClonedObject(_playerAbilities);
             //console.log('---> adding abilities to player state:', livePlayerAbilities);
             _worldPlayer.abilities = livePlayerAbilities;
             //console.log('---> initWorldMap() livePlayerAbilities =', livePlayerAbilities);
@@ -438,7 +438,7 @@ class mmrpgWorldMap {
         let _playerItemsIndex = _config.playerItemsIndex;
         if (Object.keys(_playerItemsIndex).length){
             //console.log('---> initWorldMap() found ' + Object.keys(_playerItemsIndex).length + ' player items to initialize!');
-            let livePlayerItems = JSON.parse(JSON.stringify(_playerItemsIndex));
+            let livePlayerItems = _self.getClonedObject(_playerItemsIndex);
             //console.log('---> adding items to player state:', livePlayerItems);
             _worldPlayer.items = livePlayerItems;
             //console.log('---> initWorldMap() livePlayerItems =', livePlayerItems);
@@ -7804,7 +7804,7 @@ class mmrpgWorldMap {
         if (typeof _worldPlayerRobots[playerRobotToken] !== 'undefined'){
             playerRobotInfo = _worldPlayerRobots[playerRobotToken];
             } else if (typeof _playerRobotsIndex[playerRobotToken] !== 'undefined'){
-            playerRobotInfo = JSON.parse(JSON.stringify(_playerRobotsIndex[playerRobotToken]));
+            playerRobotInfo = _self.getClonedObject(_playerRobotsIndex[playerRobotToken]);
             _worldPlayerRobots[playerRobotToken] = playerRobotInfo;
             } else {
             console.error('getRobotDetailsForOverview() could not find player robot info for token ' + playerRobotToken + '!');
@@ -10169,6 +10169,13 @@ class mmrpgWorldMap {
             }
         // Return no specific result
         return;
+        }
+
+    // -- MISC HELPER METHODS -- //
+
+    // Define a quick reusable method for cloning object data via JSON serialization
+    getClonedObject(obj){
+        return JSON.parse(JSON.stringify(obj));
         }
 
 }
