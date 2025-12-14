@@ -3505,9 +3505,7 @@ class mmrpgWorldMap {
     // Quick function for moving cursor to a given map position
     moveToPosition(newPosition, onComplete, forceMove, animateMove, thisOldPos){
         //console.log('%c' + 'mmrpgWorldMap.moveToPosition(' + newPosition + ')', 'color: magenta;');
-        if (!newPosition || typeof newPosition === 'undefined'){ console.error('newPosition is undefined!'); return false; }
-        else if (typeof newPosition !== 'string' || !newPosition.match(/^[0-9]+\-[0-9]+$/)){ console.error('newPosition is invalid!', newPosition); return false; }
-        else { newPosition = newPosition.split('-'); }
+        if (!newPosition || typeof newPosition !== 'string'){ console.error('newPosition is undefined or invalid!'); return false; }
         forceMove = typeof forceMove === 'boolean' ? forceMove : false;
         animateMove = typeof animateMove === 'boolean' ? animateMove : true;
         let _self = this;
@@ -3524,6 +3522,8 @@ class mmrpgWorldMap {
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
         let _mapSpriteSizeOffset = _config.mapSpriteSizeOffset;
         let _mapStartPosition = _config.mapStartPosition;
+        let _mapPortalSymbols = _config.mapPortalSymbols || [];
+        let _mapPortalsIndex = _config.mapPortalsIndex || {};
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
         let $sideButtons = _elements.sideButtons;
@@ -3540,6 +3540,9 @@ class mmrpgWorldMap {
         if (!thisOldPos){ thisOldPos = [_worldCursor.col, _worldCursor.row]; }
         let thisOldCol = thisOldPos[0]; //_worldCursor.col;
         let thisOldRow = thisOldPos[1]; //_worldCursor.row;
+        if (typeof _mapPortalsIndex[newPosition] !== 'undefined'){ newPosition = _mapPortalsIndex[newPosition].pos; }
+        if (!newPosition || typeof newPosition !== 'string' || !newPosition.match(/^[0-9]+\-[0-9]+$/)){ console.error('newPosition was invalid!', newPosition); return false; }
+        newPosition = newPosition.split('-');
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
         let colHasChanged = thisNewCol !== thisOldCol ? true : false;
@@ -4440,6 +4443,7 @@ class mmrpgWorldMap {
             let portalInfo = dataPortal ? (_config.mapPortalsIndex[dataPortal] || false) : false;
             let goToDestination = false;
             let goToWorld, goToMap, goToPosition;
+            let goToSameWorld, goToSameMap, goToSamePosition;
             //let goToDestination = portalInfo ? (portalInfo['dst'] || false) : false;
             if (dataPortal.indexOf('goto__') !== -1){
                 goToDestination = true;
@@ -4458,22 +4462,24 @@ class mmrpgWorldMap {
                     else if (gtm.length >= 2){ goToMap = gtm[0]; goToPosition = gtm[1]; }
                     }
                 }
+            goToSameWorld = goToWorld === _config.mapWorld ? true : false;
+            goToSameMap = goToSameWorld && goToMap === _config.mapToken ? true : false;
+            goToSamePosition = goToSameWorld && goToSameMap && goToPosition === _worldCursor.position ? true : false;
+            //console.log('----------------------------------');
             //console.log('-> found portalInfo for ' + dataPortal + ':', portalInfo);
-            //console.log('-> w/ goToDestination =', goToDestination);
-            //console.log('-> w/ goToWorld =', goToWorld);
-            //console.log('-> w/ goToMap =', goToMap);
-            //console.log('-> w/ goToPosition =', goToPosition);
+            //console.log('-> w/ goToDestination =', goToDestination, '\n-> w/ goToWorld =', goToWorld, '\n-> w/ goToMap =', goToMap, '\n-> w/ goToPosition =', goToPosition);
+            //console.log('-> w/ goToSameWorld =', goToSameWorld, '\n-> w/ goToSameMap =', goToSameMap, '\n-> w/ goToSamePosition =', goToSamePosition);
             if (portalInfo && goToDestination){
                 //console.log('-> portalInfo has a valid destination!');
                 showActionArea = true;
                 if (!dataLabel){ dataLabel = 'Portal Options'; }
                 actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>';
-                if (dataPortal.indexOf('goto__') !== -1){ sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Enter Teleport</span></a>'; }
-                else if (dataPortal === 'exit'){ sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Return Home</span></a>'; }
+                if (dataPortal === 'exit'){ sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Return Home</span></a>'; }
+                else { sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Enter Teleport</span></a>'; }
                 sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showActionAreaType = 'portal';
                 zoomTimeoutDuration = 500; // if we show a portal dropdown, we want to zoom in quickly
-                // Automatically redirect to this portal if player has moved at least once
+                // Automatically redirect to this portal if cursor has moved at least once
                 if (_worldCursor.moved){
                     //console.log('-> entering portal with name ' + dataPortal + '!');
                     if (dataPortal === 'spawn'){
@@ -4487,18 +4493,40 @@ class mmrpgWorldMap {
                         autoRedirectURL = 'prototype.php';
                         }
                     else {
-                        // GOTO PORTAL - use the portal token as worldmap token for redirect
-                        autoRedirect = true;
-                        showActionArea = false;
-                        autoRedirectURL = 'world.php?world=' + goToWorld;
-                        if (goToMap){ autoRedirectURL += '&map='+goToMap; }
-                        if (goToPosition){ autoRedirectURL += '&position='+goToPosition; }
-                        //console.log('-> autoRedirectURL =', autoRedirectURL);
-                        //if (!confirm('teleport to ' + autoRedirectURL + '?')){ autoRedirectURL = false; } // TEMP TEMP TEMP
-                        autoRedirectSound = 'bounce-sound';
-                        readyTeamSprites = true;
+                        // GOTO PORTAL - use the world, map, and position info collected earlier to redirect
+                        if (goToSameWorld && goToSameMap && !goToSamePosition){
+                            //console.log('-> preparing auto-effect of moving to NEW POSITION on SAME MAP via portal...');
+                            triggerEffect = true;
+                            showActionArea = false;
+                            triggerEffectFunction = function(){
+                                if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
+                                //console.log('-> running triggerEffectFunction for portal to moveWorldCursorToPosition(' + goToPosition + ')');
+                                _config.allowWorldEvents = false; // prevent re-triggering events during teleport
+                                _self.moveToPosition(goToPosition, function(){
+                                    //console.log('-> moveToPosition() complete via portal to new position ' + goToPosition);
+                                    _config.allowWorldEvents = true; // re-allow world events after teleport complete
+                                    return true;
+                                    });
+                                };
+                            triggerEffectSound = 'bounce-sound';
+                            readyTeamSprites = true;
+                            }
+                        else {
+                            //console.log('-> preparing auto-redirect to NEW MAP via portal...');
+                            autoRedirect = true;
+                            showActionArea = false;
+                            autoRedirectURL = 'world.php?world=' + goToWorld;
+                            if (goToMap){ autoRedirectURL += '&map='+goToMap; }
+                            if (goToPosition){ autoRedirectURL += '&position='+goToPosition; }
+                            //console.log('-> autoRedirectURL =', autoRedirectURL);
+                            //if (!confirm('teleport to ' + autoRedirectURL + '?')){ autoRedirectURL = false; } // TEMP TEMP TEMP
+                            autoRedirectSound = 'bounce-sound';
+                            readyTeamSprites = true;
+                            }
                         }
-                    } else {
+                    }
+                // Otherwise we can only prepare the dropdown details and wait
+                else {
                     //console.log('-> portal ' + dataPortal + ' disabled until cursor movement!');
                     showActionArea = false;
                     }
