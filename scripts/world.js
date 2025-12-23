@@ -285,6 +285,7 @@ class mmrpgWorldMap {
         let $backButton = $('#back-button', $thisWorld);
         let $homeButton = $('#home-button', $thisWorld);
         let $resetButton = $('#reset-button', $thisWorld);
+        let $messageDisplay = $('#message-display', $thisWorld);
         let $positionDisplay = $('#position-display', $thisWorld);
         let $playerSwitcher = $('#player-switcher', $thisWorld);
         let $cursorPalette = $('#cursor-palette', $thisWorld);
@@ -305,6 +306,7 @@ class mmrpgWorldMap {
         _elements.backButton = $backButton;
         _elements.homeButton = $homeButton;
         _elements.resetButton = $resetButton;
+        _elements.messageDisplay = $messageDisplay;
         _elements.positionDisplay = $positionDisplay;
         _elements.playerSwitcher = $playerSwitcher;
         _elements.cursorPalette = $cursorPalette;
@@ -476,6 +478,7 @@ class mmrpgWorldMap {
                     _self.triggerWorldReadyEvents();
                     _self.startIdleAnimation();
                     _world.isBusy = false;
+                    _self.showWorldMessage('<span style="color: cyan;">triggerWorldReadyEvents()</span>');
                     }, 900);
                 }, 100);
             };
@@ -10207,6 +10210,36 @@ class mmrpgWorldMap {
             }
         // Return no specific result
         return;
+        }
+
+    // -- MESSAGE HELPER METHODS -- //
+
+    // Define a quick function for showing a message (perhaps for an item pickup) in the map world UI
+    showWorldMessage(messageText, showAfter, $insertAfter){
+        console.log('%c' + 'mmrpgWorldMap.showWorldMessage()', 'color: magenta;');
+        console.log('-> w/ messageText =', messageText, '\n-> w/ showAfter =', showAfter, '\n-> w/ $insertAfter =', $insertAfter);
+        showAfter = showAfter && typeof showAfter !== 'undefined' ? showAfter : 0;
+        $insertAfter = $insertAfter && typeof $insertAfter !== 'undefined' ? $insertAfter : null;
+        let _self = this;
+        let _selfRef = _self.showWorldMessage;
+        let _elements = _self.elements;
+        let $messageDisplay = _elements.messageDisplay;
+        let $messageWrapper = $messageDisplay.find('.wrapper');
+        let delayUntil = showAfter + 100;
+        let hideAfter = delayUntil + 4000;
+        let removeAfter = delayUntil + hideAfter + 1000;
+        let lastKey = typeof _selfRef.lastKey !== 'undefined' ? _selfRef.lastKey : 0;
+        let messageKey = $insertAfter ? parseInt($insertAfter.attr('data-key')) : (lastKey + 1);
+        let messageClass = 'message pending' + ($insertAfter ? ' subtext' : '');
+        let messageMarkup = '<div class="' + messageClass + '" data-key="' + messageKey + '">' + messageText + '</div>';
+        let $message = $(messageMarkup);
+        console.log(messageMarkup);
+        if ($insertAfter){ $message.insertAfter($insertAfter); } else { $message.prependTo($messageWrapper); }
+        setTimeout(function(){ $message.removeClass('pending'); }, delayUntil);
+        setTimeout(function(){ $messageWrapper.find('.message[data-key="' + messageKey + '"]').addClass('hidden'); }, hideAfter);
+        setTimeout(function(){ $messageWrapper.find('.message[data-key="' + messageKey + '"]').remove(); }, removeAfter);
+        _selfRef.lastKey = messageKey;
+        return $message;
         }
 
     // -- MISC HELPER METHODS -- //

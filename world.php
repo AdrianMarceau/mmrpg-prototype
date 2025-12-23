@@ -613,6 +613,7 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
             $home_button_markup = $wrap_markup('<i class="fa fas fa-home"></i>', 'a');
             $reset_button_markup = $wrap_markup('<i class="fa fas fa-bomb"></i>', 'a');
             $position_display_markup = $wrap_markup('&hellip;');
+            $message_display_markup = $wrap_markup('&nbsp;');
             $side_buttons_markup = $wrap_markup('&hellip;');
             $player_switcher_players = $allowed_player_tokens;
             $robot_overview_robots = $current_player_robots;
@@ -626,6 +627,7 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
             <? if (!empty($robots_overview_markup)){ ?><div id="robots-overview" class="chrome"><?= $robots_overview_markup ?></div><? } ?>
             <? if (!empty($minimap_overview_markup)){ ?><div id="minimap-overview" class="chrome"><?= $minimap_overview_markup ?></div><? } ?>
             <div id="position-display" class="chrome"><?= $position_display_markup ?></div>
+            <div id="message-display" class="chrome"><?= $message_display_markup ?></div>
             <div id="loading-icon" class="chrome"><i class="fa fas fa-spinner"></i></div>
             <div id="back-button" class="chrome chrome-button"><?= $back_button_markup ?></div>
             <div id="home-button" class="chrome chrome-button"><?= $home_button_markup ?></div>
