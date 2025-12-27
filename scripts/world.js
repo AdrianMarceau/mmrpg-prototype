@@ -38,6 +38,13 @@ gameSettings.worldConfig = {
         moveTravel: 100, // milliseconds
         usePerspective: false, // make it easy to toggle this during dev
         },
+    mapMessages: {
+        staggerDelay: 600,  // time between sub-messages appearing (milliseconds)
+        queueStagger: 900,  // time between queued messages appearing (milliseconds)
+        holdDuration: 4000, // how long a message stays on screen (milliseconds)
+        fadeDuration: 1000, // css transition time for fading out (milliseconds)
+        maxConcurrent: 3,   // how many messages can be on screen at once
+        },
     mapTilesIndex: {},
     mapGroupsIndex: {},
     mapSpritesIndex: {},
@@ -10214,32 +10221,103 @@ class mmrpgWorldMap {
 
     // -- MESSAGE HELPER METHODS -- //
 
-    // Define a quick function for showing a message (perhaps for an item pickup) in the map world UI
+    // Define a quick function for showing a message (perhaps for an item pickup) immediately in the map world UI
+    // (first by  queuing a world message to be shown when next ready, rather than all at once)
     showWorldMessage(messageText, showAfter, $insertAfter){
-        console.log('%c' + 'mmrpgWorldMap.showWorldMessage()', 'color: magenta;');
-        console.log('-> w/ messageText =', messageText, '\n-> w/ showAfter =', showAfter, '\n-> w/ $insertAfter =', $insertAfter);
-        showAfter = showAfter && typeof showAfter !== 'undefined' ? showAfter : 0;
-        $insertAfter = $insertAfter && typeof $insertAfter !== 'undefined' ? $insertAfter : null;
+        //console.log('%c' + 'mmrpgWorldMap.showWorldMessage()', 'color: magenta;');
+        //console.log('w/ messageText = ', messageText, '\n' + 'w/ showAfter = ' + showAfter + '\n' + 'w/ $insertAfter = ', $insertAfter);
+        showAfter = showAfter || 0;
+        $insertAfter = $insertAfter || null;
         let _self = this;
         let _selfRef = _self.showWorldMessage;
-        let _elements = _self.elements;
-        let $messageDisplay = _elements.messageDisplay;
+        if (typeof _selfRef.messagesQueue === 'undefined'){ _selfRef.messagesQueue = []; }
+        _selfRef.messagesQueue.push({
+            messageText: messageText,
+            showAfter: showAfter,
+            $insertAfter: $insertAfter
+            });
+        _self.__showNextWorldMessage();
+        }
+    __showNextWorldMessage(){
+        //console.log('%c' + 'mmrpgWorldMap.__showNextWorldMessage()', 'color: magenta;');
+        let _self = this;
+        let _selfRef = _self.showWorldMessage;
+        let _config = _self.config.mapMessages;
+        let maxConcurrent = _config.maxConcurrent || 1;
+        let queueStagger = _config.queueStagger || 200;
+        let staggerDelay = _config.staggerDelay || 900;
+        if (typeof _selfRef.activeCount === 'undefined'){ _selfRef.activeCount = 0; }
+        if (typeof _selfRef.isProcessing === 'undefined'){ _selfRef.isProcessing = false; }
+        if (_selfRef.isProcessing === true) return;
+        if (_selfRef.activeCount >= maxConcurrent) return;
+        if (!_selfRef.messagesQueue || _selfRef.messagesQueue.length <= 0) return;
+        let nextMessage = _selfRef.messagesQueue.shift();
+        if (!nextMessage) return;
+        let subCount = Array.isArray(nextMessage.messageText) ? nextMessage.messageText.length : 1;
+        let timeUntilReadyForNext = (subCount > 1)
+            ? ((subCount - 1) * staggerDelay) + queueStagger
+            : queueStagger;
+        _selfRef.isProcessing = true;
+        setTimeout(function(){
+            _selfRef.isProcessing = false;
+            _self.__showNextWorldMessage();
+            }, timeUntilReadyForNext);
+        _selfRef.activeCount++;
+        _selfRef.onMessagesComplete = function(){
+            _selfRef.activeCount--;
+            _self.__showNextWorldMessage();
+            };
+        _self.__actuallyShowWorldMessage(nextMessage);
+        }
+    __actuallyShowWorldMessage(messageData){
+        //console.log('%c' + 'mmrpgWorldMap.__actuallyShowWorldMessage()', 'color: magenta;');
+        let _self = this;
+        let _config = _self.config.mapMessages;
+        let _selfRef = _self.showWorldMessage;
+        let $messageDisplay = _self.elements.messageDisplay;
         let $messageWrapper = $messageDisplay.find('.wrapper');
-        let delayUntil = showAfter + 100;
-        let hideAfter = delayUntil + 4000;
-        let removeAfter = delayUntil + hideAfter + 1000;
-        let lastKey = typeof _selfRef.lastKey !== 'undefined' ? _selfRef.lastKey : 0;
-        let messageKey = $insertAfter ? parseInt($insertAfter.attr('data-key')) : (lastKey + 1);
-        let messageClass = 'message pending' + ($insertAfter ? ' subtext' : '');
-        let messageMarkup = '<div class="' + messageClass + '" data-key="' + messageKey + '">' + messageText + '</div>';
-        let $message = $(messageMarkup);
-        console.log(messageMarkup);
-        if ($insertAfter){ $message.insertAfter($insertAfter); } else { $message.prependTo($messageWrapper); }
-        setTimeout(function(){ $message.removeClass('pending'); }, delayUntil);
-        setTimeout(function(){ $messageWrapper.find('.message[data-key="' + messageKey + '"]').addClass('hidden'); }, hideAfter);
-        setTimeout(function(){ $messageWrapper.find('.message[data-key="' + messageKey + '"]').remove(); }, removeAfter);
-        _selfRef.lastKey = messageKey;
-        return $message;
+        let staggerDelay = _config.staggerDelay || 900;
+        let holdDuration = _config.holdDuration || 4000;
+        let fadeDuration = _config.fadeDuration || 1000;
+        let rawText = messageData.messageText;
+        let baseDelay = messageData.showAfter || 0;
+        let $initialInsert = messageData.$insertAfter || null;
+        let messages = Array.isArray(rawText) ? rawText : [rawText];
+        let $lastBlock = $initialInsert;
+        let batchKeys = []; // To track all IDs in this specific batch
+        let lastRevealTime = 0;
+        let batchTimestamp = Date.now();
+        for (let i = 0; i < messages.length; i++){
+            let text = messages[i];
+            let messageKey = batchTimestamp + '_' + i;
+            batchKeys.push(messageKey);
+            let revealTime = baseDelay + (i * staggerDelay) + 100;
+            if (revealTime > lastRevealTime) { lastRevealTime = revealTime; }
+            let isSubtext = (i > 0) || ($lastBlock && $lastBlock.hasClass('message'));
+            let messageClass = 'message pending' + (isSubtext ? ' subtext' : '');
+            let messageMarkup = '<div class="' + messageClass + '" data-key="' + messageKey + '">' + text + '</div>';
+            let $message = $(messageMarkup);
+            if ($lastBlock){ $message.insertAfter($lastBlock); }
+            else { $message.prependTo($messageWrapper); }
+            $lastBlock = $message;
+            (function(k, rt){
+                setTimeout(function(){
+                    $messageWrapper.find('.message[data-key="' + k + '"]').removeClass('pending');
+                    }, rt);
+                })(messageKey, revealTime);
+            }
+        let sharedHideTime = lastRevealTime + holdDuration;
+        let sharedRemoveTime = sharedHideTime + fadeDuration;
+        setTimeout(function(){
+            for (let j = 0; j < batchKeys.length; j++){ $messageWrapper.find('.message[data-key="' + batchKeys[j] + '"]').addClass('hidden'); }
+            }, sharedHideTime);
+        setTimeout(function(){
+            for (let j = 0; j < batchKeys.length; j++){ $messageWrapper.find('.message[data-key="' + batchKeys[j] + '"]').remove(); }
+            }, sharedRemoveTime);
+        setTimeout(function(){
+            if (typeof _selfRef.onMessagesComplete === 'function'){ _selfRef.onMessagesComplete.call(_self); }
+            }, sharedRemoveTime + 100);
+        return true;
         }
 
     // -- MISC HELPER METHODS -- //
