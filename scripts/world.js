@@ -7311,7 +7311,10 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
+        let _worldPlayerItems = _worldPlayer.items;
         let _worldItemStates = _world.items;
+        let _mmrpgPlayersIndex = _indexes.players;
+        let _mmrpgRobotsIndex = _indexes.robots;
         let _mmrpgItemsIndex = _indexes.items;
         let _mapItemsIndex = _config.mapItemsIndex;
         let $teamSprites = _elements.teamSprites;
@@ -7357,6 +7360,12 @@ class mmrpgWorldMap {
                 return false;
                 }
 
+            // Create an array to hold notification message markup for this event
+            let messageMarkup = [];
+            let itemQtyTextSpan = _self.getCustomNameSpan('&times;' + itemEventQuantity, 'empty');
+            let itemNameTextSpan = _self.getItemNameSpan(itemToken);
+            messageMarkup.push('Found ' + itemQtyTextSpan + ' ' + itemNameTextSpan + '!');
+
             // First, check to see if this item is consumable so we can maybe apply it to a team robot
             if (!itemEvent.claimed
                 && _self.itemIsConsumable(itemToken)){
@@ -7396,6 +7405,7 @@ class mmrpgWorldMap {
                         else if (itemStat === 'weapons'){ _self.restoreRobotWeapons(robotString, recoveryPower, true); }
                         itemEvent.claimed = true;
                         itemEventQuantity--;
+                        messageMarkup.push('Used ' + itemNameTextSpan + ' on team robot ' + _self.getRobotNameSpan(playerRobot.token) + '!');
                         if (!itemEventQuantity){ break; } // exit the loop early if none left
                         }
                     }
@@ -7433,6 +7443,7 @@ class mmrpgWorldMap {
                         _self.boostRobotStat(robotString, itemStat, boostPower, true);
                         itemEvent.claimed = true;
                         itemEventQuantity--;
+                        messageMarkup.push('Used ' + itemNameTextSpan + ' on team robot ' + _self.getRobotNameSpan(playerRobot.token) + '!');
                         if (!itemEventQuantity){ break; } // exit the loop early if none left
                         }
                     }
@@ -7478,6 +7489,7 @@ class mmrpgWorldMap {
                         _self.boostRobotSpeed(robotString, itemPower, true);
                         itemEvent.claimed = true;
                         itemEventQuantity--;
+                        messageMarkup.push('Used ' + itemNameTextSpan + ' on team robot ' + _self.getRobotNameSpan(playerRobot.token) + '!');
                         if (!itemEventQuantity){ break; } // exit the loop early if none left
                         }
                     }
@@ -7513,6 +7525,7 @@ class mmrpgWorldMap {
                         if (robotWeapons < robotWeaponsMax){ _self.restoreRobotWeapons(robotString, itemWeaponsRecovery); }
                         itemEvent.claimed = true;
                         itemEventQuantity--;
+                        messageMarkup.push('Used ' + itemNameTextSpan + ' on team robot ' + _self.getRobotNameSpan(playerRobot.token) + '!');
                         if (!itemEventQuantity){ break; } // exit the loop early if none left
                         }
                     }
@@ -7555,6 +7568,7 @@ class mmrpgWorldMap {
                         _self.restoreRobotWeapons(robotString, itemWeaponsRecovery, true);
                         itemEvent.claimed = true;
                         itemEventQuantity--;
+                        messageMarkup.push('Used ' + itemNameTextSpan + ' on team robot ' + _self.getRobotNameSpan(playerRobot.token) + '!');
                         if (!itemEventQuantity){ break; } // exit the loop early if none left
                         }
                     }
@@ -7580,6 +7594,7 @@ class mmrpgWorldMap {
                     if (_self.giveRobotItem(robotString, itemToken)){
                         itemEvent.claimed = true;
                         itemEventQuantity--;
+                        messageMarkup.push('Gave ' + itemNameTextSpan + ' to team robot ' + _self.getRobotNameSpan(playerRobot.token) + '!');
                         }
                     if (!itemEventQuantity){ break; } // exit the loop early if none left
                     }
@@ -7591,12 +7606,20 @@ class mmrpgWorldMap {
             // If the item has still not been claimed it, it means we should (try to) add it to the inventory instead
             if (!itemEvent.claimed){
                 //console.log('-> no robots needed this item, so we will add it to the inventory instead');
+                let oldItemQuantity = 0, newItemQuantity = 0;
+                oldItemQuantity = _self.getPlayerItemQuantity(itemToken);
                 if (_self.addItemToInventory(itemToken, itemEventQuantity)){
+                    newItemQuantity = _self.getPlayerItemQuantity(itemToken);
                     // only remove if inventory function returns true, that way full-stock players leave it behind
                     itemEvent.claimed = true;
                     itemEventQuantity--;
+                    let itemCountTextSpan = _self.getCustomNameSpan(oldItemQuantity + ' &raquo; <b>' + newItemQuantity + '</b>', 'empty');
+                    messageMarkup.push('Added ' + itemNameTextSpan + ' to inventory! (' + itemCountTextSpan + ')');
                     }
                 }
+
+            // Show the world notification message for this pickup event now
+            _self.showWorldMessage(messageMarkup);
 
             // Update the real copy with any changes to claimed flag
             if (itemEvent.claimed){
