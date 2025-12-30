@@ -485,7 +485,7 @@ class mmrpgWorldMap {
                     _self.triggerWorldReadyEvents();
                     _self.startIdleAnimation();
                     _world.isBusy = false;
-                    _self.showWorldMessage('<span style="color: cyan;">triggerWorldReadyEvents()</span>');
+                    //_self.showWorldMessage('<span style="color: cyan;">triggerWorldReadyEvents()</span>');
                     }, 900);
                 }, 100);
             };
@@ -7201,6 +7201,7 @@ class mmrpgWorldMap {
         let _self = this;
         let _indexes = _self.indexes;
         let _mmrpgItemsIndex = _indexes.items;
+        if (itemToken.indexOf('__') !== -1){ itemToken = itemToken.split('__')[0]; }
         if (typeof _mmrpgItemsIndex[itemToken] === 'undefined'){
             console.error('itemIsConsumable() could not find item in index for token ' + itemToken + '!');
             return false;
@@ -7217,6 +7218,7 @@ class mmrpgWorldMap {
         let _self = this;
         let _indexes = _self.indexes;
         let _mmrpgItemsIndex = _indexes.items;
+        if (itemToken.indexOf('__') !== -1){ itemToken = itemToken.split('__')[0]; }
         if (typeof _mmrpgItemsIndex[itemToken] === 'undefined'){
             console.error('itemIsHoldable() could not find item in index for token ' + itemToken + '!');
             return false;
@@ -7234,6 +7236,7 @@ class mmrpgWorldMap {
         let _self = this;
         let _indexes = _self.indexes;
         let _mmrpgItemsIndex = _indexes.items;
+        if (itemToken.indexOf('__') !== -1){ itemToken = itemToken.split('__')[0]; }
         if (typeof _mmrpgItemsIndex[itemToken] === 'undefined'){
             console.error('itemIsEvent() could not find item in index for token ' + itemToken + '!');
             return false;
@@ -7683,14 +7686,19 @@ class mmrpgWorldMap {
         let _elements = _self.elements;
         let _indexes = _self.indexes;
         let _mmrpgItemsIndex = _indexes.items;
-        if (typeof _mmrpgItemsIndex[itemToken] === 'undefined'){ console.error('addItemToInventory() could not find item in index for token ' + itemToken + '!'); return false; }
-        let itemIndexInfo = _mmrpgItemsIndex[itemToken];
+        let realItemToken = itemToken;
+        if (realItemToken.indexOf('__') !== -1){ realItemToken = realItemToken.split('__')[0]; }
+        if (typeof _mmrpgItemsIndex[realItemToken] === 'undefined'){
+            console.error('addItemToInventory() could not find item in index for token ' + itemToken + (itemToken !== realItemToken ? ('/' + realItemToken) : '') + '!');
+            return false;
+            }
+        let itemIndexInfo = _mmrpgItemsIndex[realItemToken];
         //console.log('--> itemIndexInfo =', itemIndexInfo);
         let $thisWorld = _elements.world;
         let $robotsOverview = _elements.robotsOverview;
         let $storageItemsOverview = $('.storage-items', $robotsOverview);
         let $storageItemsWrapper = $('> .wrapper', $storageItemsOverview);
-        let $storageItemInOverview = $('.team-item[data-item="' + itemToken + '"]', $storageItemsWrapper);
+        let $storageItemInOverview = $('.team-item[data-item="' + realItemToken + '"]', $storageItemsWrapper);
         let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerItems = _worldPlayer.items;
@@ -7745,9 +7753,9 @@ class mmrpgWorldMap {
             let itemSpriteStyles = 'animation-delay: ' + animationDelay + 's;';
             let itemNameMarkup = itemName.replace(' ', '<br />');
             let storageItemMarkup = '';
-            storageItemMarkup += '<div class="team-item" data-item="' + itemToken + '" data-quantity="' + displayedItemQuantity + '">';
+            storageItemMarkup += '<div class="team-item" data-item="' + realItemToken + '" data-quantity="' + displayedItemQuantity + '">';
                 storageItemMarkup += '<div class="image ' + itemTypeClasses + '">';
-                    storageItemMarkup += '<span class="sprite item icon" data-sprite="item" data-token="' + itemToken + '" data-size="' + itemImageSize + '" data-dir="right" data-frame="00" style="' + itemSpriteStyles + '">';
+                    storageItemMarkup += '<span class="sprite item icon" data-sprite="item" data-token="' + realItemToken + '" data-size="' + itemImageSize + '" data-dir="right" data-frame="00" style="' + itemSpriteStyles + '">';
                         storageItemMarkup += '<span class="wrap"><i class="sprite"></i></span>';
                     storageItemMarkup += '</span>';
                 storageItemMarkup += '</div>';
@@ -7755,14 +7763,14 @@ class mmrpgWorldMap {
                 storageItemMarkup += '<span class="quantity">&times; ' + displayedItemQuantity + '</span>';
             storageItemMarkup += '</div>';
             $storageItemsWrapper.append(storageItemMarkup);
-            $storageItemInOverview = $('.team-item[data-item="' + itemToken + '"]', $storageItemsWrapper);
+            $storageItemInOverview = $('.team-item[data-item="' + realItemToken + '"]', $storageItemsWrapper);
             }
 
         // Trigger a save of the world state to persist this change
         //console.log('-> checking if we should reload the world on save');
         let reloadWorldOnSave = false;
         //console.log('-> itemToken =', itemToken);
-        if (itemToken.indexOf('-heart') !== -1){ reloadWorldOnSave = true; } // limit hearts always reload the world
+        if (realItemToken.indexOf('-heart') !== -1){ reloadWorldOnSave = true; } // limit hearts always reload the world
         //console.log('-> reloadWorldOnSave =', reloadWorldOnSave);
         if (reloadWorldOnSave){
             $thisWorld.addClass('busy');
