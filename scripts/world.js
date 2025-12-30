@@ -7121,6 +7121,55 @@ class mmrpgWorldMap {
         return newValue;
         }
 
+    // Define a quick method for getting the array of player item quantities, optionally merging token groups into single values
+    getPlayerItemQuantities(mergeGroups, excludeEquipped){
+        //console.log('%c' + 'mmrpgWorldMap.getPlayerItemQuantities(mergeGroups:' + mergeGroups + ')', 'color: magenta;');
+        if (typeof mergeGroups !== 'boolean'){ mergeGroups = true; }
+        if (typeof excludeEquipped !== 'boolean'){ excludeEquipped = true; }
+        let _self = this;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerItems = _worldPlayer.items;
+        let _worldPlayerItemsTokens = Object.keys(_worldPlayerItems || {});
+        //console.log('-> _worldPlayerItems =', _worldPlayerItems);
+        //console.log('-> _worldPlayerItemsTokens =', _worldPlayerItemsTokens);
+        let itemQuantities = {};
+        for (let i = 0; i < _worldPlayerItemsTokens.length; i++){
+            let itemToken = _worldPlayerItemsTokens[i];
+            let itemQuantity = typeof _worldPlayerItems[itemToken] === 'number' ? _worldPlayerItems[itemToken] : 0;
+            if (itemToken.indexOf('__') !== -1){
+                let tokenParts = itemToken.split('__');
+                itemToken = tokenParts[0];
+                if (tokenParts[1] === 'equipped'){
+                    if (excludeEquipped){ itemQuantity *= -1;  }
+                    else { continue; }
+                    } else {
+                    if (mergeGroups){ itemQuantity = 1; }
+                    else { continue; }
+                    }
+                }
+            if (typeof itemQuantities[itemToken] !== 'number'){ itemQuantities[itemToken] = 0; }
+            itemQuantities[itemToken] += itemQuantity;
+            }
+        //console.log('-> itemQuantities =', itemQuantities);
+        return itemQuantities;
+        }
+
+    // Define a quick method for getting the current items (displayed) quantity in the player's inventory
+    getPlayerItemQuantity(itemToken, includeEquipped){
+        //console.log('%c' + 'mmrpgWorldMap.getPlayerItemQuantity(itemToken:' + itemToken + ', includeEquipped:' + includeEquipped + ')', 'color: magenta;');
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('getPlayerItemQuantity() missing required itemToken!'); return 0; }
+        if (typeof includeEquipped !== 'boolean'){ includeEquipped = false; }
+        if (itemToken.indexOf('__') !== -1){ itemToken = itemToken.split('__')[0]; }
+        let _self = this;
+        let parsedItemQuantities = _self.getPlayerItemQuantities(true, !includeEquipped);
+        let thisItemQuantity = typeof parsedItemQuantities[itemToken] === 'number' ? parsedItemQuantities[itemToken] : 0;
+        //console.log('-> itemToken =', itemToken);
+        //console.log('-> parsedItemQuantities =', parsedItemQuantities);
+        //console.log('-> thisItemQuantity =', thisItemQuantity);
+        return thisItemQuantity;
+        };
+
     // Quick function for giving a given robot a new hold item and then optionally playing a sound effect
     giveRobotItem(robotString, itemToken, playSound){
         //console.log('%c' + 'mmrpgWorldMap.giveRobotItem(robot:' + robotString + ', item:' + itemToken + ', sound:' + playSound + ')', 'color: magenta;');
