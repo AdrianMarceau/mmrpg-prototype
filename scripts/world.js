@@ -9046,6 +9046,64 @@ class mmrpgWorldMap {
         return abilitySpriteMarkup;
         }
 
+    // Define some quick functions for getting type spans for certain object types
+    getCustomNameSpan(customText, typeOrTypes){
+        //console.log('%c' + 'mmrpgWorldMap.getCustomNameSpan(customText:' + customText + ', typeOrTypes:' + typeOrTypes + ')', 'color: magenta;');
+        let spanTypes = 'none';
+        if (typeof typeOrTypes === 'string' && typeOrTypes.length){ spanTypes = typeOrTypes; }
+        else if (Array.isArray(typeOrTypes) && typeOrTypes.length){ spanTypes = typeOrTypes.join(' '); }
+        return '<span class="type ' + spanTypes + '">' + (customText || 'Text') + '</span>';
+        };
+    getPlayerNameSpan(playerToken, customText){
+        //console.log('%c' + 'mmrpgWorldMap.getPlayerNameSpan(playerToken:' + playerToken + ', customText:' + customText + ')', 'color: magenta;');
+        let _self = this;
+        let _indexes = _self.indexes;
+        let _mmrpgPlayersIndex = _indexes.players;
+        let playerInfo = _mmrpgPlayersIndex[playerToken] || false;
+        let playerName = playerInfo ? playerInfo.name : 'Player';
+        let playerType1 = playerInfo.type || '';
+        let playerType2 = playerInfo.type2 || '';
+        let spanTypes = playerType1 !== '' ? playerType1 : (playerType2 !== '' ? playerType2 : 'none');
+        return '<span class="type ' + spanTypes + '">' + (customText || playerName) + '</span>';
+        };
+    getRobotNameSpan(robotToken, customText){
+        //console.log('%c' + 'mmrpgWorldMap.getRobotNameSpan(robotToken:' + robotToken + ', customText:' + customText + ')', 'color: magenta;');
+        let _self = this;
+        let _indexes = _self.indexes;
+        let _mmrpgRobotsIndex = _indexes.robots;
+        let robotInfo = _mmrpgRobotsIndex[robotToken] || false;
+        let robotName = robotInfo ? robotInfo.name : 'Robot';
+        let robotType1 = robotInfo.core || '';
+        let robotType2 = robotInfo.core2 || '';
+        let spanTypes = robotType1 !== '' ? robotType1 : (robotType2 !== '' ? robotType2 : 'none');
+        return '<span class="type ' + spanTypes + '">' + (customText || robotName) + '</span>';
+        };
+    getItemNameSpan(itemToken, customText){
+        //console.log('%c' + 'mmrpgWorldMap.getItemNameSpan(itemToken:' + itemToken + ', customText:' + customText + ')', 'color: magenta;');
+        let _self = this;
+        let _indexes = _self.indexes;
+        let _mmrpgItemsIndex = _indexes.items;
+        if (itemToken.indexOf('__') !== -1){ itemToken = itemToken.split('__')[0]; }
+        let itemInfo = _mmrpgItemsIndex[itemToken] || false;
+        let itemName = itemInfo ? itemInfo.name : 'Item';
+        let itemType1 = itemInfo.type || '';
+        let itemType2 = itemInfo.type2 || '';
+        let spanTypes = itemType1 !== '' ? itemType1 : (itemType2 !== '' ? itemType2 : 'none');
+        return '<span class="type ' + spanTypes + '">' + (customText || itemName) + '</span>';
+        };
+    getAbilityNameSpan(abilityToken, customText){
+        //console.log('%c' + 'mmrpgWorldMap.getAbilityNameSpan(abilityToken:' + abilityToken + ', customText:' + customText + ')', 'color: magenta;');
+        let _self = this;
+        let _indexes = _self.indexes;
+        let _mmrpgAbilitiesIndex = _indexes.abilities;
+        let abilityInfo = _mmrpgAbilitiesIndex[abilityToken] || false;
+        let abilityName = abilityInfo ? abilityInfo.name : 'Ability';
+        let abilityType1 = abilityInfo.type || '';
+        let abilityType2 = abilityInfo.type2 || '';
+        let spanTypes = abilityType1 !== '' ? abilityType1 : (abilityType2 !== '' ? abilityType2 : 'none');
+        return '<span class="type ' + spanTypes + '">' + (customText || abilityName) + '</span>';
+        };
+
     // Define a quick function for showing a generic action modal for items or abilities
     showActionModal(actionKind, actionToken, itemOrAbilityToken, targetRobotToken){
         console.log('%c' + 'mmrpgWorldMap.showActionModal(actionKind:' + actionKind + ', actionToken:' + actionToken + ', itemOrAbilityToken:' + itemOrAbilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
