@@ -7715,11 +7715,18 @@ class mmrpgWorldMap {
                 console.error('triggerAbilityPickup() called for ability with empty token!');
                 return false;
                 }
+            // Create an array to hold notification message markup for this event
+            let messageMarkup = [];
+            let abilityNameTextSpan = _self.getAbilityNameSpan(abilityToken);
+            messageMarkup.push('Discovered the ' + abilityNameTextSpan + ' ability!');
             // We can add this ability directly to the player's collection
             if (_self.addAbilityToCollection(abilityToken)){
                 // only remove if collection function returns true, though it should never technically be false
                 abilityEvent.claimed = true;
+                messageMarkup.push('Added ' + abilityNameTextSpan + ' to ability collection!');
                 }
+            // Show the world notification message for this pickup event now
+            _self.showWorldMessage(messageMarkup);
             // Update the real copy with any changes to claimed flag
             if (abilityEvent.claimed){
                 let claimTime = new Date().getTime();
