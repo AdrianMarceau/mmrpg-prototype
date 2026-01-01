@@ -211,6 +211,7 @@ class mmrpgWorldMap {
         let _self = this;
         let _config = _self.config;
         let _indexes = _self.indexes;
+        let _indexKeys = Object.keys(_indexes);
         // Define a quick inline function for generating an ID-to-token lookup
         let _getIDs = function(index){
             let tokens = Object.keys(index), ids = {};
@@ -221,10 +222,19 @@ class mmrpgWorldMap {
                 }
             return ids;
             };
+        // Define a quick inline function for generating a list of all tokens in an index
+        let _getTokens = function(index){
+            let tokens = Object.keys(index), tokenList = [];
+            for (var j = 0; j < tokens.length; j++){
+                let token = tokens[j];
+                tokenList.push(token);
+                }
+            return tokenList;
+            };
         // Define the template function for actually getting the object data by ID
         let _getByID = function(id){
             let index = this;
-            let token = index._getByID[id] || false;
+            let token = index._indexIDs[id] || false;
             if (!token || typeof token !== 'string'){ return false; }
             if (!index[token] || typeof index[token] !== 'object'){ return false; }
             return index[token];
@@ -237,12 +247,16 @@ class mmrpgWorldMap {
             return index[token];
             };
         // Grab the available indexes and loop through them to add the new methods
-        let _indexKeys = Object.keys(_indexes);
         for (var i = 0; i < _indexKeys.length; i++){
             let key = _indexKeys[i], index = _indexes[key];
-            index._getByID = _getIDs(index);
+            let _indexIDs = _getIDs(index);
+            let _indexTokens = _getTokens(index);
+            index._indexIDs = _indexIDs;
+            index._indexTokens = _indexTokens;
             index.getByID = _getByID;
             index.getByToken = _getByToken;
+            index.getIDs = function(){ return Object.values(_indexIDs); };
+            index.getTokens = function(){ return Object.values(_indexTokens); };
             _indexes[key] = index;
             }
         // Reassign the updated indexes back to the class object
