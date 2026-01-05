@@ -85,9 +85,9 @@ gameSettings.worldConfig = {
     robotStatModMax: 5, // match the battle system
     robotStatModMin: -5, // match the battle system
     itemInventoryMax: 99, // match the battle system
-    //defaultZoomLevel: 1.0,  // DEBUG (normal)
-    //defaultZoomLevel: 0.5, // DEBUG (far out)
-    defaultZoomLevel: 1.5, // slightly zoomed in
+    defaultZoomLevel: 1.0,  // normal
+    //defaultZoomLevel: 0.5, // far out
+    //defaultZoomLevel: 1.5, // slightly zoomed in
     zoomIncrement: 0.5, // zoom in/out by this amount
     minZoomLevel: 0.5, // slightly zoomed in
     maxZoomLevel: 2.0, // slightly zoomed in
@@ -1720,10 +1720,11 @@ class mmrpgWorldMap {
                 _world.currentScreen = 'world-map';
                 _world.currentSubScreen = '';
                 $robotsOverview.removeClass('expanded').attr('data-view', '');
-                $storageButtons.removeClass('active');
+                $storageButtons.removeClass('active').removeClass('new');
                 $('.pages', $storageRobotsDiv).remove();
                 $('.bullets', $storageRobotsDiv).remove();
                 $('.button', $storageBoxDivs).attr('disabled', 'disabled');
+                $('.new', $storageBoxDivs).removeClass('new');
                 return;
                 };
             // Define a function for calculating storage config refs/values for robots, items, or abilities
@@ -2125,6 +2126,8 @@ class mmrpgWorldMap {
                 refreshRobotRefs();
                 let $selectedRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
                 let targetSelected = $selectedRobot && $selectedRobot.length ? true : false;
+                // refresh items to make sure they're sorted
+                refreshStoragePage('items');
                 // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
                 let $detailsDiv = $storageItemsDiv.find('> .details[data-item]');
                 if ($detailsDiv.length){
@@ -4912,7 +4915,7 @@ class mmrpgWorldMap {
                 let spriteHeight = parseInt($sprite.attr('data-size')) || 40;
                 let posKey = robotSpriteKey++;
                 let posX = firstPlayerPosition[0];
-                let posY = firstPlayerPosition[1];
+                let posY = firstPlayerPosition[1] - 4;
                 let horzSpacing = Math.ceil(spacingX * (posKey + 1));
                 let vertSpacing = Math.ceil(spacingY * (posKey + 1));
                 if (goingHorz && goingVert){ horzSpacing = Math.ceil(horzSpacing / 2); }
@@ -7588,9 +7591,8 @@ class mmrpgWorldMap {
                     }
 
                 }
-
             // As a fallback, check to see if this item can be held so we can maybe give it to a team robot
-            if (!itemEvent.claimed
+            else if (!itemEvent.claimed
                 && _self.itemIsHoldable(itemToken)){
 
                 // Loop through the player's robots and try to find one that isn't holding anything yet
@@ -7775,10 +7777,18 @@ class mmrpgWorldMap {
         //console.log('--> playSound =', playSound);
         // Collect references to world objects
         let _self = this;
+        let _world = _self.state;
         let _config = _self.config;
         let _elements = _self.elements;
         let _indexes = _self.indexes;
+        let _mmrpgTypesIndex = _indexes.types;
+        let _mmrpgTypesIndexKeys = _mmrpgTypesIndex.getTokens();
+        let _mmrpgTypesIndexKeysRevised = ['none', 'copy', 'energy', 'weapons', 'attack', 'defense', 'speed'].concat(_mmrpgTypesIndexKeys).filter(function(value, index, self){ return self.indexOf(value) === index; });
         let _mmrpgItemsIndex = _indexes.items;
+        let _mmrpgItemsIndexKeys = _mmrpgItemsIndex.getTokens();
+        //console.log('--> _mmrpgTypesIndexKeys =', _mmrpgTypesIndexKeys);
+        //console.log('--> _mmrpgTypesIndexKeysRevised =', _mmrpgTypesIndexKeysRevised);
+        //console.log('--> _mmrpgItemsIndexKeys =', _mmrpgItemsIndexKeys);
         let realItemToken = itemToken;
         if (realItemToken.indexOf('__') !== -1){ realItemToken = realItemToken.split('__')[0]; }
         if (typeof _mmrpgItemsIndex[realItemToken] === 'undefined'){
@@ -7786,13 +7796,14 @@ class mmrpgWorldMap {
             return false;
             }
         let itemIndexInfo = _mmrpgItemsIndex[realItemToken];
+        if (typeof itemIndexInfo === 'undefined'){ console.error('addItemToCollection() could not find item in index for token ' + realItemToken + '!'); return false; }
         //console.log('--> itemIndexInfo =', itemIndexInfo);
         let $thisWorld = _elements.world;
         let $robotsOverview = _elements.robotsOverview;
-        let $storageItemsOverview = $('.storage-items', $robotsOverview);
+        let $storageItemsButton = $('.storage-button[data-view="items"]', $robotsOverview);
+        let $storageItemsOverview = $('.storage-box[data-storage="items"]', $robotsOverview);
         let $storageItemsWrapper = $('> .wrapper', $storageItemsOverview);
         let $storageItemInOverview = $('.team-item[data-item="' + realItemToken + '"]', $storageItemsWrapper);
-        let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerItems = _worldPlayer.items;
         let itemInventoryMax = _config.playerInventoryMax; // 99;
@@ -7845,20 +7856,16 @@ class mmrpgWorldMap {
             let animationDelay = -1 * ( Math.floor(Math.random() * 10) / 100 );
             let itemSpriteStyles = 'animation-delay: ' + animationDelay + 's;';
             let itemNameMarkup = itemName.replace(' ', '<br />');
-            let storageItemMarkup = '';
-            storageItemMarkup += '<div class="team-item" data-item="' + realItemToken + '" data-quantity="' + displayedItemQuantity + '">';
-                storageItemMarkup += '<div class="image ' + itemTypeClasses + '">';
-                    storageItemMarkup += '<span class="sprite item icon" data-sprite="item" data-token="' + realItemToken + '" data-size="' + itemImageSize + '" data-dir="right" data-frame="00" style="' + itemSpriteStyles + '">';
-                        storageItemMarkup += '<span class="wrap"><i class="sprite"></i></span>';
-                    storageItemMarkup += '</span>';
-                storageItemMarkup += '</div>';
-                storageItemMarkup += '<strong class="name">' + itemNameMarkup + '</strong>';
-                storageItemMarkup += '<span class="quantity">&times; ' + displayedItemQuantity + '</span>';
-            storageItemMarkup += '</div>';
+            let newIndexKey = _mmrpgItemsIndexKeys.indexOf(itemToken) || 0;
+            let newTypeKey = _mmrpgTypesIndexKeysRevised.indexOf(itemIndexInfo.type) || 0;
+            let newStorageKey = $('.team-item[data-item]', $storageItemsWrapper).length || 0;
+            if (itemIndexInfo.type2){ newTypeKey += (_mmrpgTypesIndexKeysRevised.indexOf(itemIndexInfo.type2) / 100); }
+            let itemButtonConfig = {new: true, slot: 0, indexKey: newIndexKey, storageKey: newStorageKey, typeKey: newTypeKey};
+            let storageItemMarkup = _self.generateItemSelectButtonMarkup(itemToken, null, itemButtonConfig);
             $storageItemsWrapper.append(storageItemMarkup);
             $storageItemInOverview = $('.team-item[data-item="' + realItemToken + '"]', $storageItemsWrapper);
+            $storageItemsButton.addClass('new');
             }
-
         // Trigger a save of the world state to persist this change
         //console.log('-> checking if we should reload the world on save');
         let reloadWorldOnSave = false;
@@ -7893,13 +7900,31 @@ class mmrpgWorldMap {
         //console.log('--> playSound =', playSound);
         // Collect references to world objects
         let _self = this;
+        let _world = _self.state;
         let _config = _self.config;
         let _elements = _self.elements;
-        let _world = _self.state;
+        let _indexes = _self.indexes;
+        let _mmrpgTypesIndex = _indexes.types;
+        let _mmrpgTypesIndexKeys = _mmrpgTypesIndex.getTokens();
+        let _mmrpgTypesIndexKeysRevised = ['copy', 'none'].concat(_mmrpgTypesIndexKeys).filter(function(value, index, self){ return self.indexOf(value) === index; });
+        let _mmrpgAbilitiesIndex = _indexes.abilities;
+        let _mmrpgAbilitiesIndexKeys = Object.keys(_mmrpgAbilitiesIndex);
+        let abilityIndexInfo = _mmrpgAbilitiesIndex[abilityToken];
+        if (typeof abilityIndexInfo === 'undefined'){ console.error('addAbilityToCollection() could not find ability in index for token ' + abilityToken + '!'); return false; }
+        //console.log('--> _mmrpgTypesIndexKeys =', _mmrpgTypesIndexKeys);
+        //console.log('--> _mmrpgTypesIndexKeysRevised =', _mmrpgTypesIndexKeysRevised);
+        //console.log('--> _mmrpgAbilitiesIndexKeys =', _mmrpgAbilitiesIndexKeys);
+        //console.log('--> abilityIndexInfo =', abilityIndexInfo);
         let _worldPlayer = _world.player;
         let _worldPlayerAbilities = _worldPlayer.abilities;
-        let abilityInventoryMax = _config.playerInventoryMax; // 99;
+        let $thisWorld = _elements.world;
+        let $robotsOverview = _elements.robotsOverview;
+        let $storageAbilitiesButton = $('.storage-button[data-view="abilities"]', $robotsOverview);
+        let $storageAbilitiesOverview = $('.storage-box[data-storage="abilities"]', $robotsOverview);
+        let $storageAbilitiesWrapper = $('> .wrapper', $storageAbilitiesOverview);
+        let $storageAbilityInOverview = $('.team-ability[data-ability="' + abilityToken + '"]', $storageAbilitiesWrapper);
         // Check to see if there's room for the ability in the collection
+        let abilityInventoryMax = _config.playerInventoryMax; // 99;
         let abilityAlreadyUnlocked = _worldPlayerAbilities.indexOf(abilityToken) !== -1 ? true : false;
         //console.log('--> abilityAlreadyUnlocked =', abilityAlreadyUnlocked);
         if (abilityAlreadyUnlocked){
@@ -7917,6 +7942,29 @@ class mmrpgWorldMap {
             }
         // If a sound was requested, play it now
         if (playSound){ _self.playSoundEffect('get-ability'); }
+        // If this ability exists in the robot overview, update the display there as well, else create it
+        if ($storageAbilityInOverview.length){
+            // nothing to update here really since abilities are unique
+            } else {
+            let abilityName = abilityIndexInfo.name;
+            let abilityImageSize = abilityIndexInfo.imageSize;
+            let abilityTypes = [];
+            if (abilityIndexInfo.type){ abilityTypes.push(abilityIndexInfo.type); }
+            if (abilityIndexInfo.type2){ abilityTypes.push(abilityIndexInfo.type2); }
+            let abilityTypeClasses = 'type ' + (abilityTypes.length ? abilityTypes.join(' ') : 'none');
+            let animationDelay = -1 * ( Math.floor(Math.random() * 10) / 100 );
+            let abilitySpriteStyles = 'animation-delay: ' + animationDelay + 's;';
+            let abilityNameMarkup = abilityName.replace(' ', '<br />');
+            let newIndexKey = _mmrpgAbilitiesIndexKeys.indexOf(abilityToken) || 0;
+            let newTypeKey = _mmrpgTypesIndexKeysRevised.indexOf(abilityIndexInfo.type) || 0;
+            let newStorageKey = $('.team-ability[data-ability]', $storageAbilitiesWrapper).length || 0;
+            if (abilityIndexInfo.type2){ newTypeKey += (_mmrpgTypesIndexKeysRevised.indexOf(abilityIndexInfo.type2) / 100); }
+            let abilityButtonConfig = {new: true, slot: 0, indexKey: newIndexKey, storageKey: newStorageKey, typeKey: newTypeKey};
+            let storageAbilityMarkup = _self.generateAbilitySelectButtonMarkup(abilityToken, null, abilityButtonConfig);
+            $storageAbilitiesWrapper.append(storageAbilityMarkup);
+            $storageAbilityInOverview = $('.team-ability[data-ability="' + abilityToken + '"]', $storageAbilitiesWrapper);
+            $storageAbilitiesButton.addClass('new');
+            }
         // Trigger a save of the world state to persist this change
         _self.saveWorldState();
         // Return true on success
@@ -9714,6 +9762,10 @@ class mmrpgWorldMap {
         let itemInfo = _indexes.items.getByToken(itemToken);
         if (!itemInfo || typeof itemInfo !== 'object'){ console.error('generateItemSelectButtonMarkup() could not find itemInfo for token ' + itemToken + '!'); return ''; }
 
+        buttonOptions.indexKey = typeof buttonOptions.indexKey === 'number' ? buttonOptions.indexKey : false;
+        buttonOptions.storageKey = typeof buttonOptions.storageKey === 'number' ? buttonOptions.storageKey : false;
+        buttonOptions.typeKey = typeof buttonOptions.typeKey === 'number' ? buttonOptions.typeKey : false;
+        buttonOptions.new = typeof buttonOptions.new !== 'undefined' ? buttonOptions.new : false;
         buttonOptions.selected = typeof buttonOptions.selected !== 'undefined' ? buttonOptions.selected : false;
         buttonOptions.disabled = typeof buttonOptions.disabled !== 'undefined' ? buttonOptions.disabled : false;
         buttonOptions.slot = typeof buttonOptions.slot === 'number' ? buttonOptions.slot : false;
@@ -9729,12 +9781,16 @@ class mmrpgWorldMap {
         let itemQuantityFormatted = '&times; ' + itemQuantity;
 
         let buttonAttrs = '';
-        let buttonClass = 'team-item' + (buttonOptions.selected ? ' selected' : '') + (buttonOptions.disabled ? ' disabled' : '');
+        let buttonClass = 'team-item' + (buttonOptions.new ? ' new' : '') + (buttonOptions.selected ? ' selected' : '') + (buttonOptions.disabled ? ' disabled' : '');
         let buttonStyle = '';
         buttonAttrs += ' class="' + buttonClass + '"';
         buttonAttrs += ' data-item="' + itemToken + '"';
         buttonAttrs += ' data-item-id="' + itemInfo.id + '"';
         buttonAttrs += ' data-energy-cost="' + (itemInfo.energy || 0) + '"';
+        buttonAttrs += ' data-quantity="' + itemQuantity + '"';
+        if (buttonOptions.indexKey !== false){ buttonAttrs += ' data-index-key="' + buttonOptions.indexKey + '"'; }
+        if (buttonOptions.storageKey !== false){ buttonAttrs += ' data-storage-key="' + buttonOptions.storageKey + '"'; }
+        if (buttonOptions.typeKey !== false){ buttonAttrs += ' data-type-key="' + buttonOptions.typeKey + '"'; }
         if (buttonOptions.slot !== false){ buttonAttrs += ' data-slot="' + buttonOptions.slot + '"'; }
         if (buttonStyle.length){ buttonAttrs += ' style="' + buttonStyle + '"'; }
 
@@ -9749,12 +9805,13 @@ class mmrpgWorldMap {
         buttonSpriteAttrs += ' data-dir="right"';
         buttonSpriteAttrs += ' data-frame="00"';
         if (buttonSpriteStyle.length){ buttonSpriteAttrs += ' style="' + buttonSpriteStyle + '"'; }
-        let buttonSpriteInner = '<span class="wrap"><i class="back type ' + itemTypeClasses + '"></i><i class="sprite"></i></span>';
+        let buttonSpriteInner = '<span class="wrap"><i class="sprite"></i></span>';
 
         let buttonMarkup = '';
         buttonMarkup += '<div' + buttonAttrs + '>';
-            buttonMarkup += '<div class="image"><span' + buttonSpriteAttrs + '>' + buttonSpriteInner + '</span></div>';
-            buttonMarkup += '<span class="tint type ' + itemTypeClasses + '"></span>';
+            buttonMarkup += '<div class="image type ' + itemTypeClasses + '">';
+                buttonMarkup += '<span' + buttonSpriteAttrs + '>' + buttonSpriteInner + '</span>';
+            buttonMarkup += '</div>';
             buttonMarkup += '<strong class="name">' + itemNameFormatted + '</strong>';
             buttonMarkup += '<span class="quantity">' + itemQuantityFormatted + '</span>';
         buttonMarkup += '</div>';
@@ -9804,6 +9861,10 @@ class mmrpgWorldMap {
         let abilityInfo = _indexes.abilities.getByToken(abilityToken);
         if (!abilityInfo || typeof abilityInfo !== 'object'){ console.error('generateAbilitySelectButtonMarkup() could not find abilityInfo for token ' + abilityToken + '!'); return ''; }
 
+        buttonOptions.indexKey = typeof buttonOptions.indexKey === 'number' ? buttonOptions.indexKey : false;
+        buttonOptions.storageKey = typeof buttonOptions.storageKey === 'number' ? buttonOptions.storageKey : false;
+        buttonOptions.typeKey = typeof buttonOptions.typeKey === 'number' ? buttonOptions.typeKey : false;
+        buttonOptions.new = typeof buttonOptions.new !== 'undefined' ? buttonOptions.new : false;
         buttonOptions.selected = typeof buttonOptions.selected !== 'undefined' ? buttonOptions.selected : false;
         buttonOptions.disabled = typeof buttonOptions.disabled !== 'undefined' ? buttonOptions.disabled : false;
         buttonOptions.slot = typeof buttonOptions.slot === 'number' ? buttonOptions.slot : false;
@@ -9816,12 +9877,15 @@ class mmrpgWorldMap {
         let abilityCostFormatted = '<sup>' + abilityEnergyCost + '</sup><sub>WE</sub>';
 
         let buttonAttrs = '';
-        let buttonClass = 'team-ability' + (buttonOptions.selected ? ' selected' : '') + (buttonOptions.disabled ? ' disabled' : '');
+        let buttonClass = 'team-ability' + (buttonOptions.new ? ' new' : '') + (buttonOptions.selected ? ' selected' : '') + (buttonOptions.disabled ? ' disabled' : '');
         let buttonStyle = '';
         buttonAttrs += ' class="' + buttonClass + '"';
         buttonAttrs += ' data-ability="' + abilityToken + '"';
         buttonAttrs += ' data-ability-id="' + abilityInfo.id + '"';
         buttonAttrs += ' data-energy-cost="' + (abilityInfo.energy || 0) + '"';
+        if (buttonOptions.indexKey !== false){ buttonAttrs += ' data-index-key="' + buttonOptions.indexKey + '"'; }
+        if (buttonOptions.storageKey !== false){ buttonAttrs += ' data-storage-key="' + buttonOptions.storageKey + '"'; }
+        if (buttonOptions.typeKey !== false){ buttonAttrs += ' data-type-key="' + buttonOptions.typeKey + '"'; }
         if (buttonOptions.slot !== false){ buttonAttrs += ' data-slot="' + buttonOptions.slot + '"'; }
         if (buttonStyle.length){ buttonAttrs += ' style="' + buttonStyle + '"'; }
 

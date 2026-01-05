@@ -1862,6 +1862,22 @@ html, body {
 #world #canvas #robots-overview .team-abilities:hover b {
     background-color: #464646;
 }
+#world #canvas #robots-overview .team-switch.new:after,
+#world #canvas #robots-overview .team-items.new:after,
+#world #canvas #robots-overview .team-abilities.new:after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -2px;
+    left: 4px;
+    z-index: 100;
+    background-color: #888a14;
+    border: 1px solid #a7a12a;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+}
 #world #canvas #robots-overview[data-view="robots"].expanded .team-switch b,
 #world #canvas #robots-overview[data-view="items"].expanded .team-items b,
 #world #canvas #robots-overview[data-view="abilities"].expanded .team-abilities b {
@@ -3622,10 +3638,16 @@ display: block;
     background-image: none !important;
     transform: translate(0, 0);
     transition: outline 0.3s, background-color 0.3s, filter 0.3s;
-    overflow: hidden;
+    overflow: visible;
     pointer-events: none;
     cursor: pointer;
     user-select: none;
+}
+#world #canvas #robots-overview .storage-items .team-item:after,
+#world #canvas #action-modal .item-list .team-item:after {
+    content: "";
+    display: block;
+    clear: both;
 }
 #world #canvas #robots-overview:hover .storage-items .team-item,
 #world #canvas #robots-overview.expanded .storage-items .team-item {
@@ -3643,6 +3665,27 @@ display: block;
 #world #canvas #robots-overview .storage-items .team-item.hidden,
 #world #canvas #action-modal .item-list .team-item.hidden {
     display: none;
+}
+#world #canvas #robots-overview .storage-items .team-item.new:before,
+#world #canvas #action-modal .item-list .team-item.new:before {
+    content: "New!";
+    display: block;
+    position: absolute;
+    z-index: 100;
+    top: -10px;
+    right: -4px;
+    padding: 2px 6px;
+    font-size: 9px;
+    line-height: 1;
+    background-color: #888a14;
+    border: 1px solid #a7a12a;
+    border-radius: 6px;
+    transform: translate(0, 0);
+    animation: robots-overview-item-new-float 2s steps(2) infinite;
+}
+@keyframes robots-overview-item-new-float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(0, -2px); }
 }
 #world #canvas #robots-overview .storage-items.has-selection .team-item:not(.selected):not(.disabled):not([data-quantity="0"]) {
     filter: brightness(0.8) saturate(1.2);
@@ -3746,7 +3789,12 @@ display: block;
     cursor: pointer;
     user-select: none;
 }
-
+#world #canvas #robots-overview .storage-abilities .team-ability:after,
+#world #canvas #action-modal .ability-list .team-ability:after {
+    content: "";
+    display: block;
+    clear: both;
+}
 #world #canvas #robots-overview:hover .storage-abilities .team-ability,
 #world #canvas #robots-overview.expanded .storage-abilities .team-ability,
 #world #canvas #action-modal.active .ability-list .team-ability {
@@ -3767,6 +3815,27 @@ display: block;
 #world #canvas #robots-overview .storage-abilities .team-ability.hidden,
 #world #canvas #action-modal .ability-list .team-ability.hidden {
     display: none;
+}
+#world #canvas #robots-overview .storage-abilities .team-ability.new:before,
+#world #canvas #action-modal .ability-list .team-ability.new:before {
+    content: "New!";
+    display: block;
+    position: absolute;
+    z-index: 100;
+    top: -10px;
+    right: -4px;
+    padding: 2px 6px;
+    font-size: 9px;
+    line-height: 1;
+    background-color: #888a14;
+    border: 1px solid #a7a12a;
+    border-radius: 6px;
+    transform: translate(0, 0);
+    animation: robots-overview-ability-new-float 2s steps(2) infinite;
+}
+@keyframes robots-overview-ability-new-float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(0, -2px); }
 }
 #world #canvas #robots-overview .storage-abilities.has-selection .team-ability:not(.selected):not(.hovered):not(:hover):not(.disabled):not(.incompatible) {
     filter: brightness(0.8) saturate(1.2);

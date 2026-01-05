@@ -2245,7 +2245,7 @@ class rpg_world {
         $return_markup .= '</div>';
         // [robots-overview][storage-items]
         $return_markup .= '<div class="storage-box storage-items" data-storage="items">';
-            $storage_item_types_revised = array('none', 'energy', 'weapons', 'attack', 'defense', 'speed');
+            $storage_item_types_revised = array('none', 'copy', 'energy', 'weapons', 'attack', 'defense', 'speed');
             $storage_item_types_revised = array_unique(array_merge($storage_item_types_revised, array_keys($mmrpg_index_types)));
             $storage_item_tokens_reversed = array_reverse(array_keys($storage_item_tokens));
             $return_markup .= '<div class="wrapper">';
