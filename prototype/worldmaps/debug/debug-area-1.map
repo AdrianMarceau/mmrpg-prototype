@@ -57,7 +57,7 @@
 @events[]     = light-platform-right(11-6, lightpad-right, any, drop-zone, item:copy-core, activate-player-platform)
 @items[]      = light-init-program(18-24, light-program, anchored)
 @items[]      = light-init-heart(16-14, light-heart__1, anchored)
-@items[]      = light-init-core(13-20, copy-core, anchored)
+@items[]      = light-init-core(2-22, copy-core, anchored)
 #---------------------------#
 # INTRO ENCOUNTER
 #------------------
@@ -72,7 +72,7 @@
 #---------------------------#
 # ITEMS CODES PICKUP
 #---------------------
-@items[]     = item-codes-pickup(2-22, item-codes)
+@items[]     = item-codes-pickup(13-20, item-codes)
 #---------------------------#
 # ITEM CORRIDOR PICKUPS
 # + STARTER ABILITIES
