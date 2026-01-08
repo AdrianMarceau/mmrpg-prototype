@@ -2684,7 +2684,7 @@ class mmrpgWorldMap {
                     });
                 // add functionality to the action buttons within item details panels
                 $storageItemsDiv.delegate('.button[data-action]', 'click', function(e){
-                    console.log('%c' + 'Storage item details button clicked!', 'color: cyan;');
+                    //console.log('%c' + 'Storage item details button clicked!', 'color: cyan;');
                     e.preventDefault();
                     let $actionButton = $(this);
                     let actionToken = $actionButton.attr('data-action');
@@ -2765,7 +2765,7 @@ class mmrpgWorldMap {
                     });
                 // add functionality to the action buttons within ability details panels
                 $storageAbilitiesDiv.delegate('.button[data-action]', 'click', function(e){
-                    console.log('%c' + 'Storage ability details button clicked!', 'color: cyan;');
+                    //console.log('%c' + 'Storage ability details button clicked!', 'color: cyan;');
                     e.preventDefault();
                     let $actionButton = $(this);
                     let actionToken = $actionButton.attr('data-action');
@@ -9198,7 +9198,7 @@ class mmrpgWorldMap {
 
     // Define a quick function for showing a generic action modal for items or abilities
     showActionModal(actionKind, actionToken, itemOrAbilityToken, targetRobotToken){
-        console.log('%c' + 'mmrpgWorldMap.showActionModal(actionKind:' + actionKind + ', actionToken:' + actionToken + ', itemOrAbilityToken:' + itemOrAbilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.showActionModal(actionKind:' + actionKind + ', actionToken:' + actionToken + ', itemOrAbilityToken:' + itemOrAbilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
         if (!actionKind || typeof actionKind !== 'string' || !actionKind.length){ console.error('showActionModal() missing required actionKind!'); return; }
         if (!actionToken || typeof actionToken !== 'string' || !actionToken.length){ console.error('showActionModal() missing required actionToken!'); return; }
         if (!itemOrAbilityToken || typeof itemOrAbilityToken !== 'string' || !itemOrAbilityToken.length){ console.error('showActionModal() missing required itemOrAbilityToken!'); return; }
@@ -9291,13 +9291,15 @@ class mmrpgWorldMap {
             else if (actionKind === 'ability'){ return onConfirmAbilityAction(actionToken); }
             else { console.error('showActionModal.onConfirmAction() received invalid actionKind ' + actionKind + '!'); return false; }
             };
+        // Define the action and dependent functions for confirming an item action
         let onConfirmItemAction = function(action){
             console.log('%c' + '~mmrpgWorldMap.showActionModal.onConfirmItemAction(action:' + action + ')', 'color: magenta;');
             // TODO: ...
             return true;
             };
+        // Define the action and dependent functions for confirming an ability action
         let onConfirmAbilityAction = function(action){
-            console.log('%c' + '~mmrpgWorldMap.showActionModal.onConfirmAbilityAction(action:' + action + ')', 'color: magenta;');
+            //console.log('%c' + '~mmrpgWorldMap.showActionModal.onConfirmAbilityAction(action:' + action + ')', 'color: magenta;');
             $actionModal.addClass('busy');
             let abilitiesIndex = _indexes.abilities;
             let currentAbilities = playerRobotInfo.abilities;
@@ -9343,25 +9345,70 @@ class mmrpgWorldMap {
                 }
             return true;
             };
+        let clickTeamAbilityButton = function(button){
+            //console.log('%c' + '~mmrpgWorldMap.showActionModal.clickTeamAbilityButton(button)', 'color: magenta;');
+            let $button = $(button);
+            let $container = $button.closest('.ability-list');
+            //console.log('-> $button =', $button);
+            //console.log('-> $container =', $container);
+            if ($button.is('.disabled') || $button.is('[disabled]')){ return false; }
+            let token = $button.attr('data-ability');
+            //console.log('-> token =', token);
+            if (!token || !token.length){ console.error('Ability select button clicked, but no ability token found!'); return false; }
+            let isPlaceholder = token === 'ability' ? true : false;
+            let index = _indexes.abilities;
+            let info = !isPlaceholder ? index[token] : null;
+            if (!isPlaceholder && (!info || typeof info === 'undefined')){ console.error('Ability select button clicked, but ability token ' + token + ' not found in index!'); return false; }
+            //console.log('-> info =', info);
+            if (!$button.is('.selected')){
+                //console.log('--> change selected ability to', token);
+                $container.addClass('has-selection');
+                $('.team-ability[data-ability]', $container).removeClass('selected');
+                $button.addClass('selected');
+                } else {
+                //console.log('--> deselect ability', token);
+                $container.removeClass('has-selection');
+                $('.team-ability[data-ability]', $container).removeClass('selected');
+                }
+            refreshAbilityModal();
+            return true;
+            };
+        let refreshAbilityModal = function(actionKind){
+            //console.log('%c' + '~mmrpgWorldMap.showActionModal.refreshAbilityModal()', 'color: magenta;');
+            // either enable or disable the confirm button based on whether or not a selection has been made
+            let $actionButtons = $actionModal.find('.content .buttons.actions');
+            let $confirmButton = $actionButtons.find('.button[data-action="confirm"]');
+            let $cancelButton = $actionButtons.find('.button[data-action="cancel"]');
+            let $currentAbilities = $actionModal.find('.ability-list.current');
+            let $selectedAbility = $currentAbilities.find('.team-ability[data-ability].selected');
+            if ($selectedAbility && $selectedAbility.length){
+                //console.log('--> an ability has been selected:', $selectedAbility.attr('data-ability'));
+                $confirmButton.removeClass('disabled').removeAttr('disabled');
+                } else {
+                //console.log('--> an ability has not been selected yet');
+                $confirmButton.addClass('disabled').attr('disabled', 'disabled');
+                }
+            return true;
+            };
 
         // Collect required and necessary data for displaying this action modal
         if (actionKind === 'item'){
-            console.log('--> actionKind is item ...', itemOrAbilityToken);
+            //console.log('--> actionKind is item ...', itemOrAbilityToken);
             let itemsIndex = _indexes.items;
             let itemToken = itemOrAbilityToken;
             let itemInfo = typeof itemsIndex[itemToken] !== 'undefined' ? itemsIndex[itemToken] : null;
             let generateItemSelectButtonMarkup = _self.generateItemSelectButtonMarkup.bind(_self);
             let generateItemSelectPlaceholderMarkup = _self.generateItemSelectPlaceholderMarkup.bind(_self);
             if (!itemToken || !itemInfo){ console.error('showActionModal() could not find item info for token ' + itemToken + '!'); return; }
-            console.log('--> itemsIndex =', itemsIndex);
-            console.log('--> itemToken =', itemToken);
-            console.log('--> itemInfo =', itemInfo);
+            //console.log('--> itemsIndex =', itemsIndex);
+            //console.log('--> itemToken =', itemToken);
+            //console.log('--> itemInfo =', itemInfo);
             let $itemInStorage = $itemStorageBox.find('.team-item[data-item="' + itemToken + '"]');
             let $itemInStorageDetails = $itemStorageBox.find('> .details[data-item="' + itemToken + '"]');
             // If this is a USE ITEM request, we can apply the item to the selected robot directly
             if (actionToken === 'use-item'){
                 modalDetails.show = false;
-                console.log('--> preparing to USE ITEM on robot (', targetRobotToken, ') ...');
+                //console.log('--> preparing to USE ITEM on robot (', targetRobotToken, ') ...');
                 // Check to see which kind of item this is categorically
                 let tokenFrags = itemToken.split('-');
                 let itemToken1 = tokenFrags[0] || '';
@@ -9478,14 +9525,12 @@ class mmrpgWorldMap {
             let selectedAbilityList = '';
             let currentAbilityList = '';
             selectedAbilityList += generateAbilitySelectButtonMarkup(newAbilityToken, playerRobotInfo, {selected: true});
-            //for (var slotKey = 0; slotKey < currentAbilities.length; slotKey++){
             for (var slotKey = 0, numEmpty = 0; slotKey < maxAbilitiesPerRobot; slotKey++){
                 let currentAbilityID = typeof currentAbilities[slotKey] !== 'undefined' ? currentAbilities[slotKey] : null;
                 let currentAbilityInfo = currentAbilityID ? abilitiesIndex.getByID(currentAbilityID) : null;
                 let currentAbilityToken = currentAbilityID && currentAbilityInfo ? currentAbilityInfo.token : null;
                 let isDisabled = currentAbilityToken === newAbilityToken || (!currentAbilityToken && numEmpty > 0) ? true : false;
                 let buttonOptions = {slot: slotKey, disabled: isDisabled};
-                //if (!currentAbilityInfo || !currentAbilityToken){ continue; }
                 if (currentAbilityID && currentAbilityToken && currentAbilityInfo){
                     currentAbilityList += generateAbilitySelectButtonMarkup(currentAbilityToken, playerRobotInfo, buttonOptions);
                     } else {
@@ -9611,49 +9656,8 @@ class mmrpgWorldMap {
                 e.stopPropagation();
                 if (!allowModalActions()){ return; }
                 //console.log('%c' + 'Ability select button clicked!', 'color: cyan;');
-                let $button = $(this);
-                let $container = $button.closest('.ability-list');
-                //console.log('-> $button =', $button);
-                //console.log('-> $container =', $container);
-                if ($button.is('.disabled') || $button.is('[disabled]')){ return false; }
-                let token = $button.attr('data-ability');
-                //console.log('-> token =', token);
-                if (!token || !token.length){ console.error('Ability select button clicked, but no ability token found!'); return false; }
-                let isPlaceholder = token === 'ability' ? true : false;
-                let index = _indexes.abilities;
-                let info = !isPlaceholder ? index[token] : null;
-                if (!isPlaceholder && (!info || typeof info === 'undefined')){ console.error('Ability select button clicked, but ability token ' + token + ' not found in index!'); return false; }
-                //console.log('-> info =', info);
-                if (!$button.is('.selected')){
-                    //console.log('--> change selected ability to', token);
-                    $container.addClass('has-selection');
-                    $('.team-ability[data-ability]', $container).removeClass('selected');
-                    $button.addClass('selected');
-                    } else {
-                    //console.log('--> deselect ability', token);
-                    $container.removeClass('has-selection');
-                    $('.team-ability[data-ability]', $container).removeClass('selected');
-                    }
-                refreshAbilityModal();
-                return true;
+                return clickTeamAbilityButton(this);
                 });
-            let refreshAbilityModal = function(actionKind){
-                //console.log('%c' + '~mmrpgWorldMap.showActionModal.refreshAbilityModal()', 'color: magenta;');
-                // either enable or disable the confirm button based on whether or not a selection has been made
-                let $actionButtons = $actionModal.find('.content .buttons.actions');
-                let $confirmButton = $actionButtons.find('.button[data-action="confirm"]');
-                let $cancelButton = $actionButtons.find('.button[data-action="cancel"]');
-                let $currentAbilities = $actionModal.find('.ability-list.current');
-                let $selectedAbility = $currentAbilities.find('.team-ability[data-ability].selected');
-                if ($selectedAbility && $selectedAbility.length){
-                    //console.log('--> an ability has been selected:', $selectedAbility.attr('data-ability'));
-                    $confirmButton.removeClass('disabled').removeAttr('disabled');
-                    } else {
-                    //console.log('--> an ability has not been selected yet');
-                    $confirmButton.addClass('disabled').attr('disabled', 'disabled');
-                    }
-                return true;
-                };
 
             }
         else {
