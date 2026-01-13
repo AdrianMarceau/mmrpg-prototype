@@ -152,6 +152,8 @@ function mmrpg_formatting_decode($string){
         $mmrpg_formatting_array += array(
             // image-inline (no hover, no link)
             '/\[image\]\((.*?).(jpg|jpeg|gif|png|bmp)\)/i' => '<span class="link_image_inline"><img src="$1.$2" /></span>',
+            // video-inline (no hover, no link)
+            '/\[video\]\((.*?).(mp4|webm|ogv)\)/i' => '<span class="link_video_inline"><video src="$1.$2" controls></video></span>',
             );
         $mmrpg_formatting_array += array(
             // sprite 40x40
@@ -394,6 +396,12 @@ function mmrpg_formatting_decode($string){
 
     // Recusively replace all the inline images with their span markup
     do { $string = preg_replace('/\[([^\[\]]+)\]\(([^\s]+).(jpg|jpeg|gif|png|bmp)\)/i', '<a class="link_image_inline" href="$2.$3" target="_blank"><img src="$2.$3" alt="$1" title="$1" /></a>', $string, -1, $count); }
+    while ($count > 0);
+
+    // -- REPLACE VIDEOS -- //
+
+    // Recusively replace all the inline videos with their embed markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\(([^\s]+).(mp4|webm|ogv)\)/i', '<span class="link_video_inline"><video src="$2.$3" controls loop>$1</video><a href="$2.$3" target="_blank">$1</a></span>', $string, -1, $count); }
     while ($count > 0);
 
     // -- REPLACE LINKS -- //

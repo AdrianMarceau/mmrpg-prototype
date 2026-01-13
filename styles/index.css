@@ -6019,6 +6019,32 @@ body.windowFlag_landscapeMode #window .page .type_block {
     max-width: 600px;
     max-height: 300px;
 }
+#window .page .body .community .link_video_inline {
+    display: inline-block;
+    zoom: 1;
+    text-decoration: none;
+    max-width: 600px;
+    max-height: 300px;
+    border: 1px solid #222222;
+}
+#window .page .body .community .link_video_inline video {
+    display: inline-block;
+    margin: 0;
+    max-width: 600px;
+    max-height: 300px;
+}
+#window .page .body .community .link_video_inline a {
+    display: block;
+    text-decoration: none;
+    color: #666666;
+    background-color: #181818;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-size: 80%;
+    line-height: 1;
+    text-align: center;
+    margin: -3px auto 0;
+}
 
 #window .page .body .community .formatting {
     float: right;
