@@ -8341,6 +8341,7 @@ class mmrpgWorldMap {
         // EQUIPPED ABILITIES
         let abilitiesLine = { classes: 'equipped-abilities types', label: 'Abilities:', values: [] }; {
             let playerRobotAbilities = playerRobotInfo.abilities || [];
+            let newPlayerRobotAbilities = playerRobotInfo.abilitiesAdded || [];
             let maxAbilitiesPerRobot = _config.maxAbilitiesPerRobot;
             //console.log('--> playerRobotAbilities =', playerRobotAbilities);
             for (let i = 0; i < maxAbilitiesPerRobot; i++){
@@ -8353,20 +8354,24 @@ class mmrpgWorldMap {
                     abilityToken = abilityInfo.token;
                     abilityName = abilityInfo.name;
                     abilityTypeClasses = (abilityInfo.type2 && !abilityInfo.type ? abilityInfo.type2 : ((abilityInfo.type ? abilityInfo.type : 'none') + (abilityInfo.type2 ? '_' + abilityInfo.type2 : '')));
+                    if (newPlayerRobotAbilities.indexOf(abilityToken) !== -1){ abilityTypeClasses += ' new'; }
                     } else {
                     abilityToken = '';
                     abilityName = 'None';
                     abilityTypeClasses = 'empty';
                     }
-                let abilityNameFormatted = abilityName.replace(' ', '<br />');
+                let abilityNameFormatted = '<span class="name"><strong>' + abilityName.replace(' ', '<br />') + '</strong></span>';;
+                let abilityIconSprite = abilityToken ? _self.getAbilitySpriteMarkup(abilityToken, {classes: 'icon', showBack: true}) : '';
+                let abilityValueMarkup = abilityIconSprite + abilityNameFormatted;
                 //console.log('--> abilitySlotKey =', abilitySlotKey);
                 //console.log('--> abilitySlotNum =', abilitySlotNum);
                 //console.log('--> abilityID =', abilityID);
                 //console.log('--> abilityToken =', abilityToken);
                 //console.log('--> abilityInfo =', abilityInfo);
                 abilitiesLine.values.push({
-                    value: abilityNameFormatted,
+                    value: abilityValueMarkup,
                     valueClasses: 'type ' + abilityTypeClasses,
+                    valueAttrs: {'ability-id': abilityID, 'ability-token': abilityToken, 'ability-slot': abilitySlotNum},
                     });
                 }
             }
@@ -8451,7 +8456,12 @@ class mmrpgWorldMap {
                         let valueInfo = infoLine.values[j];
                         let valueClasses = valueInfo.valueClasses || '';
                         let valueStyles = valueInfo.valueStyles || '';
-                        robotDetailsObject.infolinesHTML += '<span class="value' + (valueClasses ? (' ' + valueClasses) : '') + '"' + (valueStyles ? (' style="' + valueStyles + '"') : '') + '>' + valueInfo.value + '</span>';
+                        let valueAttrs = valueInfo.valueAttrs || '';
+                        if (valueAttrs && typeof valueAttrs === 'object'){
+                            let k = 0, attrs = Object.keys(valueAttrs), vals = Object.values(valueAttrs);
+                            for (valueAttrs = ''; k < attrs.length; k++){ valueAttrs += ' data-' + attrs[k] + '="' + vals[k] + '"'; }
+                            }
+                        robotDetailsObject.infolinesHTML += '<span class="value' + (valueClasses ? (' ' + valueClasses) : '') + '"' + (valueAttrs ? (' ' + valueAttrs) : '') + (valueStyles ? (' style="' + valueStyles + '"') : '') + '>' + valueInfo.value + '</span>';
                         if (valueInfo.icon){ robotDetailsObject.infolinesHTML += '<i class="fa fas fa-' + valueInfo.icon + '"></i>'; }
                         }
                     } else {
