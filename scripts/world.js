@@ -9281,12 +9281,14 @@ class mmrpgWorldMap {
         spriteOptions.dir = typeof spriteOptions.dir === 'string' && spriteOptions.dir.length ? spriteOptions.dir : 'right';
         spriteOptions.frame = typeof spriteOptions.frame === 'string' && spriteOptions.frame.length > 0 ? spriteOptions.frame : '00';
         spriteOptions.delay = typeof spriteOptions.delay === 'number' && spriteOptions.delay !== 0 ? spriteOptions.delay : (-1 * ( Math.floor(Math.random() * 10) / 100 ));
+        spriteOptions.showBack = typeof spriteOptions.showBack === 'boolean' ? spriteOptions.showBack : false;
         spriteOptions.classes = typeof spriteOptions.classes === 'string' && spriteOptions.classes.length > 1 ? spriteOptions.classes : '';
         spriteOptions.styles = typeof spriteOptions.styles === 'string' && spriteOptions.styles.length > 1 ? spriteOptions.styles : '';
         // Generate the ability sprite attributes and inner markup given the options
         let abilitySpriteAttrs = '';
         let abilitySpriteClass = 'sprite ability' + (spriteOptions.classes ? ' ' + spriteOptions.classes : '');
         let abilitySpriteStyle = 'animation-delay: ' + spriteOptions.delay + 's;' + (spriteOptions.styles ? ' ' + spriteOptions.styles : '');
+        let abilityTypeClasses = abilityInfo.type === '' ? 'none' : (abilityInfo.type + (abilityInfo.type2 !== '' ? '_' + abilityInfo.type2 : ''));
         abilitySpriteAttrs += ' class="' + abilitySpriteClass + '"';
         abilitySpriteAttrs += ' data-sprite="ability"';
         abilitySpriteAttrs += ' data-token="' + abilityToken + '"';
@@ -9296,6 +9298,7 @@ class mmrpgWorldMap {
         abilitySpriteAttrs += ' data-frame="' + spriteOptions.frame + '"';
         if (abilitySpriteStyle.length){ abilitySpriteAttrs += ' style="' + abilitySpriteStyle + '"'; }
         let abilitySpriteInner = '<i class="sprite"></i>';
+        if (spriteOptions.showBack){ abilitySpriteInner += '<i class="back type ' + abilityTypeClasses + '"></i>'; }
         // Put it all together to generate the final markup
         let abilitySpriteMarkup = '';
         abilitySpriteMarkup += '<span' + abilitySpriteAttrs + '>';
