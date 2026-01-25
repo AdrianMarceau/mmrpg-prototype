@@ -137,6 +137,8 @@ gameSettings.worldState = {
     isBusy: false, // is busy doing something,
     currentScreen: 'world-map', // which screen is visible
     currentSubScreen: '', // if a subscreen is visible (like inventory, robot management, etc)
+    autoApplyConsumables: true, // automatically apply consumable items to party robots on pickup
+    autoEquipHoldables: true, // automatically hold equippable items to party robots on pickup
     };
 gameSettings.worldIndexes = {
     types: {},
@@ -3500,9 +3502,68 @@ class mmrpgWorldMap {
                         //console.log('%c' + 'X key fresh press, open menu (not implemented yet)!', 'color: orange;');
                         if (userInputVars.xTimeout){ clearTimeout(userInputVars.xTimeout);  }
                         userInputVars.xTimeout = setTimeout(function(){
-                            console.warn('Menu functionality not implemented yet!');
+                            console.warn('X functionality not implemented yet!');
                             }, (timeThreshold * 2));
                         }
+                    }
+                // If the user is holding the B button, we need to implement some nuanced functionality
+                // -> if it's a simple press, ignore it so that it can do its job in other contexts
+                // -> else if it's a long-press (user is holding button) then we need to temporarily disable the auto-use functionality for item pickups
+                // The important thing here is to disable the auto-use functionality as long as the user is holding the button down, then re-enable it when they let go (via timeout)
+                if (typeof userInputVars.bTimeout === 'undefined'){ userInputVars.bTimeout = false; }
+                if (typeof userInputVars.bWasPressedAt === 'undefined'){ userInputVars.bWasPressedAt = null; }
+                if (typeof userInputVars.bTimeSincePress === 'undefined'){ userInputVars.bTimeSincePress = null; }
+                if (typeof userInputVars.bCallbacksTriggered === 'undefined'){ userInputVars.bCallbacksTriggered = []; }
+                if (activeInputs.B){
+                    let holdTimeThreshold = 900, unpressTimeout = 300, allowRepeatCallbacks = false;
+                    if (event){ event.preventDefault(); }
+                    if (!userInputVars.bWasPressedAt){ userInputVars.bWasPressedAt = Date.now(); }
+                    userInputVars.bTimeSincePress = Date.now() - userInputVars.bWasPressedAt;
+                    //console.log('-> bWasPressedAt =', userInputVars.bWasPressedAt);
+                    //console.log('-> bTimeSincePress =', userInputVars.bTimeSincePress);
+                    let callbacksTriggered = userInputVars.bCallbacksTriggered;
+                    //console.log('-> callbacksTriggered =', callbacksTriggered);
+                    let pressButtonCallback = function(){
+                        //console.log('%c' + 'B key pressButtonCallback()', 'color: green;');
+                        /* ... */
+                        };
+                    let unpressButtonCallback = function(){
+                        //console.log('%c' + 'B key unpressButtonCallback()', 'color: red;');
+                        /* ... */
+                        };
+                    let holdButtonCallback = function(){
+                        //console.log('%c' + 'B key holdButtonCallback()', 'color: magenta;');
+                        /* ... */
+                        //console.log('Toggling auto-pickup flags ...');
+                        _world.autoApplyConsumables = !_world.autoApplyConsumables ? true : false;
+                        _world.autoEquipHoldables = !_world.autoEquipHoldables ? true : false;
+                        //console.log('_world.autoApplyConsumables =', _world.autoApplyConsumables);
+                        //console.log('_world.autoEquipHoldables =', _world.autoEquipHoldables);
+                        let messageMarkup = [], onFlagMarkup = _self.getCustomNameSpan('ON', 'nature'), offFlagMarkup = _self.getCustomNameSpan('OFF', 'flame');
+                        messageMarkup.push('Toggling overworld pickup flags ...');
+                        messageMarkup.push('Auto-Apply Consumables: ' + (_world.autoApplyConsumables ? onFlagMarkup : offFlagMarkup));
+                        messageMarkup.push('Auto-Equip Holdables:  ' + (_world.autoEquipHoldables ? onFlagMarkup : offFlagMarkup));
+                        _self.showWorldMessage(messageMarkup); //12345
+                        };
+                    if (userInputVars.bTimeSincePress < holdTimeThreshold){
+                        //console.log('%c' + 'B key pressed!', 'color: orange;');
+                        //console.log('-> bTimeSincePress(', userInputVars.bTimeSincePress, ') < holdTimeThreshold(', holdTimeThreshold, ')');
+                        //console.log('callbacksTriggered.indexOf(\'pressed\') =', callbacksTriggered.indexOf('pressed'));
+                        if (callbacksTriggered.indexOf('pressed') < 0 || allowRepeatCallbacks){ pressButtonCallback(); callbacksTriggered.push('pressed'); }
+                        } else {
+                        //console.log('%c' + 'B key holding!', 'color: orange;');
+                        //console.log('--> bTimeSincePress(', userInputVars.bTimeSincePress, ') >= holdTimeThreshold(', holdTimeThreshold, ')');
+                        if (callbacksTriggered.indexOf('holding') < 0 || allowRepeatCallbacks){ holdButtonCallback(); callbacksTriggered.push('holding'); }
+                        }
+                    if (userInputVars.bTimeout){ clearTimeout(userInputVars.bTimeout);  }
+                    userInputVars.bTimeout = setTimeout(function(){
+                        if (!activeInputs.B){
+                            //console.log('%c' + 'B key unpressed!', 'color: orange;');
+                            userInputVars.bWasPressedAt = 0;
+                            userInputVars.bCallbacksTriggered = [];
+                            unpressButtonCallback();
+                            }
+                        }, unpressTimeout);
                     }
                 }
             };
@@ -7385,7 +7446,8 @@ class mmrpgWorldMap {
 
             // First, check to see if this item is consumable so we can maybe apply it to a team robot
             if (!itemEvent.claimed
-                && _self.itemIsConsumable(itemToken)){
+                && _self.itemIsConsumable(itemToken)
+                && _world.autoApplyConsumables === true){
 
                 // Check if the item was a consumable health or weapon energy item
                 // and apply it to the first robot that needs it, else pocket it
@@ -7593,7 +7655,8 @@ class mmrpgWorldMap {
                 }
             // As a fallback, check to see if this item can be held so we can maybe give it to a team robot
             else if (!itemEvent.claimed
-                && _self.itemIsHoldable(itemToken)){
+                && _self.itemIsHoldable(itemToken)
+                && _world.autoEquipHoldables === true){
 
                 // Loop through the player's robots and try to find one that isn't holding anything yet
                 let playerRobotKeys = Object.keys(_worldPlayerRobots);
