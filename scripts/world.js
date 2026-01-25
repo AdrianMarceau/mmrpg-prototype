@@ -8673,6 +8673,43 @@ class mmrpgWorldMap {
         return itemDetailsMarkup;
         }
 
+    // Define a function for getting the id-token for the currently selected overview robot, if any
+    // TODO: we should store and retrieve this value somewhere local instead of grabbing it from the DOM every time
+    getSelectedRobotInOverview(returnObject){
+        //console.log('%c' + 'mmrpgWorldMap.getSelectedRobotInOverview()', 'color: magenta;');
+        returnObject = typeof returnObject === 'boolean' ? returnObject : false;
+        let _self = this;
+        let _elements = _self.elements;
+        let $robotsOverview = _elements.robotsOverview;
+        //console.log('--> $robotsOverview =', $robotsOverview);
+        let $teamRobotsDiv = $robotsOverview.find('.team-robots');
+        let $selectedTeamRobot = $teamRobotsDiv.find('.team-robot[data-robot].selected').first();
+        if ($selectedTeamRobot.length === 0){ return false; }
+        let selectedRobot = $selectedTeamRobot.attr('data-robot');
+        //console.log('--> selectedRobot =', selectedRobot);
+        if (!selectedRobot){ console.error('getSelectedRobotInOverview() could not find selected robot token!'); return false; }
+        if (!returnObject){ return selectedRobot; }
+        let _config = _self.config;
+        let _indexes = _self.indexes;
+        let _mmrpgRobotsIndex = _indexes.robots;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        let _playerRobotsIndex = _config.playerRobotsIndex;
+        let frags = selectedRobot.indexOf('_') !== -1 ? selectedRobot.split('_') : [];
+        let robotID = parseInt(frags[0]), robotToken = frags[1];
+        //console.log('--> selectedRobot =', selectedRobot);
+        //console.log('--> robotID =', robotID, 'robotToken =', robotToken);
+        let selectedRobotData = false, selectedRobotInfo = false;
+        if (typeof _mmrpgRobotsIndex[robotToken] === 'undefined'){ console.error('getRobotDetailsForOverview() could not find robot in index for token ' + robotToken + '!'); return false; }
+        if (typeof _worldPlayerRobots[selectedRobot] === 'undefined'){ console.error('getRobotDetailsForOverview() could not find player robot info for token ' + selectedRobot + '!'); return false; }
+        selectedRobotInfo = _mmrpgRobotsIndex[robotToken];
+        selectedRobotData = _worldPlayerRobots[selectedRobot];
+        //console.log('--> selectedRobotInfo =', selectedRobotInfo);
+        //console.log('--> selectedRobotData =', selectedRobotData);
+        return {key: selectedRobot, id: robotID, token: robotToken, info: selectedRobotInfo, data: selectedRobotData};
+        }
+
     // Define a quick function for getting the overview details for a given ability in the user's inventory
     getAbilityDetailsForOverview(abilityToken, targetSelected){
         //console.log('%c' + 'mmrpgWorldMap.getAbilityDetailsForOverview(ability:' + abilityToken + ', targetSelected:' + targetSelected + ')', 'color: magenta;');
