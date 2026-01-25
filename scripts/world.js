@@ -9919,6 +9919,15 @@ class mmrpgWorldMap {
         return _self.showAbilityModal('equip-ability', abilityToken, targetRobotToken);
         }
 
+    // Define a quick function for showing the remove ability modal
+    showRemoveAbilityModal(abilityToken, targetRobotToken){
+        //console.log('%c' + 'mmrpgWorldMap.showRemoveAbilityModal(abilityToken:' + abilityToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        if (!abilityToken || typeof abilityToken !== 'string' || !abilityToken.length){ console.error('showRemoveAbilityModal() missing required abilityToken!'); return; }
+        if (!targetRobotToken || typeof targetRobotToken !== 'string' || !targetRobotToken.length){ console.error('showRemoveAbilityModal() missing required targetRobotToken!'); return; }
+        let _self = this;
+        return _self.showAbilityModal('remove-ability', abilityToken, targetRobotToken);
+        }
+
     // Define a quick function for generating the markup for an item select button given an item token, robot info, and/or optional settings
     generateItemSelectButtonMarkup(itemToken, playerRobotInfo, buttonOptions){
         //console.log('%c' + 'mmrpgWorldMap.generateItemSelectButtonMarkup(itemToken:' + itemToken + ', playerRobotInfo, buttonOptions)', 'color: magenta;');
