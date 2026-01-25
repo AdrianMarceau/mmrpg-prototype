@@ -2393,6 +2393,41 @@ class mmrpgWorldMap {
                 // Return true on success
                 return true;
                 });
+            // Make sure clicking relevant areas in the robot details triggers relevant functionality
+            // - make sure clicking any of the abilities quick-swaps to the abilities tab
+            // - make sure clicking the item slot (empty or not) quick-swaps to the items tab
+            // - make sure clicking the support tab ?????? (for now just show console.warn of TODO)
+            $storageBoxDivs.delegate('.details[data-robot] .equipped-abilities .value', 'click', function(e){
+                e.preventDefault();
+                if (_self.worldIsBusy()){ return; }
+                //console.log('%c' + 'robot equipped ability value clicked!', 'color: cyan;');
+                //console.log('_world.currentScreen = ', _world.currentScreen);
+                //console.log('_world.currentSubScreen = ', _world.currentSubScreen);
+                if (_world.currentScreen !== 'robots-overview'){ return; }
+                let $abilityValue = $(this);
+                let abilityValueID = $abilityValue.attr('data-ability-id') || false;
+                let $abilityInStorage = abilityValueID ? $storageAbilitiesDiv.find('.team-ability[data-ability-id="' + abilityValueID + '"]').first() : false;
+                if (!$abilityInStorage || !$abilityInStorage.length){ $abilityInStorage = false; }
+                let abilityClickFunction = function(delay){
+                    //console.log('abilityClickFunction()');
+                    delay = typeof delay === 'number' ? delay : 600;
+                    //console.log('$abilityInStorage.length =', $abilityInStorage.length);
+                    if (!$abilityInStorage){ return; }
+                    let callback = function(){
+                        //console.log('abilityClickFunction().callback()');
+                        let abilityStoragePageNum = $abilityInStorage ? parseInt($abilityInStorage.attr('data-sort-page')) : 1;
+                        goToStoragePage('abilities', abilityStoragePageNum);
+                        $abilityInStorage.trigger('click');
+                        };
+                    if (!delay){ callback(); }
+                    else { setTimeout(callback, delay); }
+                    };
+                $abilityValue.addClass('selected');
+                if (_world.currentSubScreen === 'abilities'){ abilityClickFunction(0); }
+                else { showRobotsOverviewPanel('abilities', function(){ abilityClickFunction(); }); }
+                // Return true on success
+                return true;
+                });
             // Auto-trigger a sort at least once on all the storage boxes to ensure a default order
             $storageBoxDivs.each(function(){
                 let $storageBoxDiv = $(this);
