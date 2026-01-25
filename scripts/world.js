@@ -2789,6 +2789,7 @@ class mmrpgWorldMap {
                     // Launch a modal for the given action on the selected robot if applicable
                     //console.log('ability action ' + actionToken + ' modal functionality! w/', '\n-> actionToken =', actionToken, '\n-> abilityToken =', abilityToken, '\n-> targetRobotToken =', targetRobotToken);
                     if (actionToken === 'equip-ability'){ _self.showEquipAbilityModal(abilityToken, targetRobotToken); }
+                    else if (actionToken === 'remove-ability'){ _self.showRemoveAbilityModal(abilityToken, targetRobotToken); }
                     else { console.warn('-> undefined ability action "', actionToken, '", ignoring input'); return false; }
 
                     // Return true on success
