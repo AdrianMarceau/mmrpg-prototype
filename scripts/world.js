@@ -8727,9 +8727,13 @@ class mmrpgWorldMap {
         let _mmrpgAbilitiesIndex = _indexes.abilities;
         if (typeof _mmrpgAbilitiesIndex[abilityToken] === 'undefined'){ console.error('getAbilityDetailsForOverview() could not find ability in index for token ' + abilityToken + '!'); return false; }
         let abilityIndexInfo = _mmrpgAbilitiesIndex[abilityToken];
-        let abilityIsUnlocked = _worldPlayerAbilities.indexOf(abilityToken) !== -1 ? true : false;
         //console.log('--> abilityIndexInfo =', abilityIndexInfo);
+        let selectedPlayerRobot = targetSelected ? _self.getSelectedRobotInOverview(true) : false;
+        //console.log('--> selectedPlayerRobot =', selectedPlayerRobot);
+        let abilityIsUnlocked = _worldPlayerAbilities.indexOf(abilityToken) !== -1 ? true : false;
         //console.log('--> abilityIsUnlocked =', abilityIsUnlocked);
+        let abilityIsEquipped = selectedPlayerRobot && selectedPlayerRobot.data.abilities.includes(abilityIndexInfo.id) ? true : false;
+        //console.log('--> abilityIsEquipped =', abilityIsEquipped);
 
         // Generate the markup, classes, styles, etc. that will make up the ability details
         let abilityTitle = 'Ability Details';
@@ -8869,7 +8873,8 @@ class mmrpgWorldMap {
             }
         abilityDetailsObject.description = abilityDescription;
         abilityDetailsObject.actions = [];
-        abilityDetailsObject.actions.push({ action: 'equip-ability', text: 'Equip', ability: abilityToken, disabled: !targetSelected });
+        abilityDetailsObject.actions.push({ action: 'equip-ability', text: (!abilityIsEquipped ? 'Equip' : 'Equipped'), ability: abilityToken, disabled: !targetSelected });
+        abilityDetailsObject.actions.push({ action: 'remove-ability', text: 'Remove', ability: abilityToken, disabled: !abilityIsEquipped });
 
         // Pre-compile some of the HTML to make it easier for the other functions
         abilityDetailsObject.infolinesHTML = '';
@@ -8895,7 +8900,8 @@ class mmrpgWorldMap {
         for (let i = 0; i < abilityDetailsObject.actions.length; i++){
             let actionInfo = abilityDetailsObject.actions[i];
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
-            abilityDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + '" data-action="' + actionInfo.action + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
+            let actionHidden = typeof actionInfo.hidden !== 'undefined' && actionInfo.hidden === true ? true : false;
+            abilityDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" data-action="' + actionInfo.action + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
             }
 
         // Return the generated ability details object
@@ -8910,7 +8916,7 @@ class mmrpgWorldMap {
         if (typeof targetSelected !== 'boolean'){ targetSelected = false; }
         let _self = this;
         let abilityDetailsObject = _self.getAbilityDetailsForOverview(abilityToken, targetSelected) || false;
-        if (!abilityDetailsObject || typeof abilityDetailsObject !== 'object'){ console.error('getAbilityDetailsMarkupForOverview() could not generate details object for token ' + itemToken + '!'); return ''; }
+        if (!abilityDetailsObject || typeof abilityDetailsObject !== 'object'){ console.error('getAbilityDetailsMarkupForOverview() could not generate details object for token ' + abilityToken + '!'); return ''; }
         let abilityDetailsMarkup = '';
         abilityDetailsMarkup += '<div class="details" data-ability="' + abilityToken + '">';
             abilityDetailsMarkup += '<div class="title">' + abilityDetailsObject.title + '</div>';
