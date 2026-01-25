@@ -1610,7 +1610,7 @@ class mmrpgWorldMap {
             }
         // Check to make sure the robotsOverview exists, and then bind events to its elements
         let $robotsOverview = _elements.robotsOverview;
-        let robotsOverviewAPI = {};
+        let robotsOverviewAPI = _self.robotsOverviewAPI || {};
         if ($robotsOverview && $robotsOverview.length){
             // Collect some commonly used elements and data for use below and pre-calculate some values
             let $storageButtons = $('.storage-button', $robotsOverview);
@@ -2847,6 +2847,7 @@ class mmrpgWorldMap {
                 // ...
                 }
             }
+        _self.robotsOverviewAPI = robotsOverviewAPI;
 
         // Define a function to run each time user inputs are updated so we can react
         let listenForInput = true;
