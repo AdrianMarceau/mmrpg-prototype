@@ -1999,6 +1999,7 @@ class mmrpgWorldMap {
                 let $storageObjectsWrapper = storageConfig.storageWrapper;
                 let storageObjectSelector = storageConfig.objectSelector;
                 let storageObjectFilter = storageConfig.objectFilter;
+                let storageSlotsPerPage = storageConfig.numSlotsPerPage;
                 let currentToggleStates = storageConfig.toggleStates;
                 //console.log('-> $storageObjectsDiv = ', $storageObjectsDiv);
                 //console.log('-> $storageObjectsWrapper = ', $storageObjectsWrapper);
@@ -2050,6 +2051,11 @@ class mmrpgWorldMap {
                 //console.log('-> dataSortAttr =', dataSortAttr);
                 //console.log('-> reverseSort =', reverseSort);
                 $storageObjectsWrapper.empty().prepend($objectsList);
+                //console.log('%c' + 'Time to re-key the data-sort-page for all ' + $objectsList.length + ' storage objects', 'color: lime;');
+                $objectsList.each(function(index){
+                    let $object = $(this), page = Math.ceil((index + 1) / storageSlotsPerPage);
+                    $object.attr('data-sort-page', page);
+                    });
                 // Re-display the current page to reflect the new sort order
                 if (!goToPageNum){ goToPageNum = parseInt($storageObjectsDiv.attr('data-page') || '0'); }
                 goToStoragePage(storageKind, goToPageNum);
