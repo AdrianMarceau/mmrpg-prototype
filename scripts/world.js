@@ -2190,8 +2190,9 @@ class mmrpgWorldMap {
                 //console.log('-> selectedRobotData =', selectedRobotData);
                 if (!selectedRobotData){ return false; }
                 let selectedRobotAbilities = [];
-                let abilitiesCompatible = selectedRobotData.abilitiesCompatible;
-                let abilitiesViaItem = selectedRobotData.abilitiesViaItem;
+                let abilitiesEquipped = selectedRobotData.abilities || [];
+                let abilitiesCompatible = selectedRobotData.abilitiesCompatible || [];
+                let abilitiesViaItem = selectedRobotData.abilitiesViaItem || [];
                 //console.log('-> abilitiesCompatible =', abilitiesCompatible);
                 //console.log('-> abilitiesViaItem =', abilitiesViaItem);
                 if (typeof abilitiesCompatible !== 'undefined'){ selectedRobotAbilities = selectedRobotAbilities.concat(abilitiesCompatible); }
