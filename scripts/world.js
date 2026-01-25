@@ -1659,6 +1659,7 @@ class mmrpgWorldMap {
                 $storageBoxes.find('.selected').removeClass('selected');
                 $storageBoxes.removeClass('focused').removeClass('unfocused');
                 $storageBoxes.find('.incompatible').removeClass('incompatible');
+                $storageBoxes.find('.equipped').removeClass('equipped');
                 $teamRobotsDiv.removeClass('focused').removeClass('unfocused');
                 $teamRobotsDiv.find('.incompatible', ).removeClass('incompatible');
                 $teamRobotsDiv.find('.selected:not(.keep-selected)').removeClass('selected');
@@ -2178,7 +2179,7 @@ class mmrpgWorldMap {
                 let $abilityObjectsInOverview = $('.team-ability[data-ability]', $storageAbilitiesDiv);
                 //console.log('-> $abilityObjectsInOverview =', $abilityObjectsInOverview.length, $abilityObjectsInOverview);
                 if (!$selectedRobot || !$selectedRobot.length){
-                    $abilityObjectsInOverview.removeClass('incompatible');
+                    $abilityObjectsInOverview.removeClass('incompatible equipped');
                     refreshStoragePage('abilities');
                     return false;
                     }
@@ -2200,7 +2201,10 @@ class mmrpgWorldMap {
                     let $ability = $(this);
                     let abilityID = parseInt($ability.attr('data-ability-id') || '0');
                     if (!abilityID){ return; }
+                    let isEquipped = abilitiesEquipped.indexOf(abilityID) !== -1 ? true : false;
                     let isCompatible = selectedRobotAbilities.indexOf(abilityID) !== -1 ? true : false;
+                    if (isEquipped){ $ability.addClass('equipped'); }
+                    else { $ability.removeClass('equipped'); }
                     if (!isCompatible){ $ability.addClass('incompatible'); }
                     else { $ability.removeClass('incompatible'); }
                     });
@@ -9017,6 +9021,7 @@ class mmrpgWorldMap {
                 else { $actionButton.removeClass('disabled'); $actionButton.removeAttr('disabled'); }
                 if (actionHidden){ $actionButton.addClass('hidden'); }
                 else { $actionButton.removeClass('hidden'); }
+                $actionButton.html(actionInfo.text);
                 } else {
                 let actionButtonMarkup = '<button type="button" '
                     + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
@@ -9070,6 +9075,7 @@ class mmrpgWorldMap {
                 else { $actionButton.removeClass('disabled'); $actionButton.removeAttr('disabled'); }
                 if (actionHidden){ $actionButton.addClass('hidden'); }
                 else { $actionButton.removeClass('hidden'); }
+                $actionButton.html(actionInfo.text);
                 } else {
                 let actionButtonMarkup = '<button type="button" '
                     + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
@@ -9120,6 +9126,7 @@ class mmrpgWorldMap {
             if ($actionButton && $actionButton.length){
                 if (actionDisabled){ $actionButton.addClass('disabled'); $actionButton.attr('disabled', 'disabled'); }
                 else { $actionButton.removeClass('disabled'); $actionButton.removeAttr('disabled'); }
+                $actionButton.html(actionInfo.text);
                 } else {
                 let actionButtonMarkup = '<button type="button" class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + '" data-ability="' + actionInfo.ability + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
                 $actions.append(actionButtonMarkup);
