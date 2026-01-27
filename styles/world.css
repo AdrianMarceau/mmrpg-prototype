@@ -2036,19 +2036,29 @@ html, body {
 #world #canvas #robots-overview .limit-hearts > .player.dr-lalinde { background-image: url("../images/players/dr-lalinde/chapter-sprite.gif"); }
 
 #world #canvas #robots-overview .team-robots {
+    box-sizing: border-box;
     padding: 50px 50px 50px 8px;
-    max-height: 128px;
-    min-height: 44px;
+    max-height: 228px;
+    min-height: 144px;
     overflow: hidden;
     transition: min-height 0.9s, max-height 0.9s, background-color 0.3s;
     pointer-events: none;
 }
-#world #canvas #robots-overview:hover .team-robots,
-#world #canvas #robots-overview.expanded .team-robots {
-    max-height: 422px;
+#world #canvas #robots-overview:hover .team-robots {
+    transition-delay: 2s;
+}
+#world #canvas #robots-overview .team-robots[data-team-size="1"] {
+    max-height: 140px;
+}
+#world #canvas #robots-overview .team-robots[data-team-size="2"] {
+    max-height: 184px;
+}
+#world #canvas #robots-overview .team-robots[data-team-size="3"] {
+    max-height: 228px;
 }
 #world #canvas #robots-overview.expanded .team-robots {
-    min-height: 422px;
+    transition-delay: 0s;
+    min-height: 522px;
 }
 
 #world #canvas #robots-overview .storage-box {
@@ -2186,6 +2196,7 @@ html, body {
     animation: storage 0.9s ease-in-out infinite;
     animation-fill-mode: forwards;
     transform-origin: center center;
+    pointer-events: none;
 }
 #robots-overview .storage-box .sorts,
 #robots-overview .storage-box .pages,
@@ -2925,16 +2936,90 @@ html, body {
     display: block;
     float: left;
     clear: none;
-    margin: 0 2px 2px 0;
-    padding: 3px 0;
+    margin: 0 2px 5px 0;
+    padding: 28px 0 0;
     width: calc((100% / 4) - 2px);
     height: auto;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
     text-align: center;
     font-size: 8px;
     line-height: 1.4;
-    min-height: 2rem;
+    min-height: 60px;
+    position: relative;
+    transform: scale(1.0);
+    transform-origin: center;
+    outline: 0 none transparent;
+    transition: outline 0.3s, transform 0.3s;
+    z-index: 1;
+    cursor: pointer;
+}
+@keyframes equipped-ability-glowing-outline {
+    0%, 100% { outline-color: transparent; transform: scale(1.0); }
+    50% { outline-color: white; transform: scale(1.1); }
+}
+@keyframes new-ability-golden-outline {
+    0%, 100% { outline-color: yellow; box-shadow: 0 0 6px yellow; }
+    50% { outline-color: orange; box-shadow: 0 0 12px orange; }
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover,
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.new,
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected {
+    outline: 1px solid #ffffff;
+    z-index: 30;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.new,
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected {
+    outline-color: transparent;
+    animation: equipped-ability-glowing-outline 2s linear infinite;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value > .name {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    min-height: 26px;
+    clear: both;
+    overflow: visible;
+    text-overflow: ellipsis;
+    background-color: rgba(0, 0, 0, 0.6);
+    text-shadow: 1px 1px 0 #000000;
+    border-radius: 0 0 3px 3px;
+    padding: 2px 4px;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value > .name > strong {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-shadow: inherit;
+    transition: width 0.3s, text-shadow 0.3s;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover > .name > strong,
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected > .name > strong {
+    width: 200%;
+    text-shadow: 0 0 4px #000000;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value[data-ability-id="0"] > .name {
+    line-height: 26px;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value > .sprite {
+    top: -7px !important;
+    left: -5px !important;
+    transition: top 0.3s;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value > .sprite .sprite {
+    left: 1px !important;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover > .sprite,
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected > .sprite {
+    top: -9px !important;
 }
 #robots-overview .storage-box > .details .description {
     color: #c0c0c0;
@@ -2960,7 +3045,7 @@ html, body {
     color: #cfcfcf;
     min-height: 24px;
     max-height: 48px;
-    overflow: hidden;
+    overflow: visible;
     padding: 6px 0 0;
 }
 #robots-overview .storage-box > .details .actions .button {
@@ -2968,18 +3053,22 @@ html, body {
     position: relative;
     box-sizing: border-box;
     margin: 0 6px 0 0;
-    width: calc((100% / 3) - 6px);
+    width: auto;
     min-width: 46px;
+    /* max-width: calc((100% / 3) - 6px);  */
+    max-width: calc(100% - 6px);
     color: #fefefe;
     border-color: #191919;
     background-color: #6f6a7d;
     font-size: 13px;
     text-shadow: 1px 1px 0 #000000;
+    transform: scale(1.0);
     filter: brightness(1) saturate(1);
     transition: background-color 0.3s, border 0.3s, filter 0.3s, color 0.3s, filter 0.3s;
 }
 #robots-overview .storage-box > .details .actions .button:hover,
-#robots-overview .storage-box > .details .actions .button.hovered {
+#robots-overview .storage-box > .details .actions .button.hovered,
+#robots-overview .storage-box > .details .actions .button.clicked {
     border-color: #ffffff;
     filter: brightness(1.2) saturate(1.2);
     color: #ffffff;
@@ -2993,6 +3082,12 @@ html, body {
 }
 #robots-overview .storage-box > .details .actions .button.hidden {
     display: none !important;
+}
+#robots-overview .storage-box > .details .actions .button.clicked {
+    animation-fill-mode: forwards;
+    transform-origin: center center;
+    animation: world-action-button-clicked-subtle 0.3s ease-in-out 1;
+    pointer-events: none;
 }
 #robots-overview .storage-box > .details > .subtitle:after,
 #robots-overview .storage-box > .details > .actions:after,
@@ -3090,6 +3185,7 @@ display: block;
     border-radius: 6px;
     pointer-events: none;
 }
+#world #canvas #robots-overview .team-robot:hover:before,
 #world #canvas #robots-overview.expanded .team-robot:hover:before,
 #world #canvas #robots-overview.expanded .team-robot.hovered:before {
     border-color: rgba(255, 255, 255, 0.5);
@@ -3268,6 +3364,30 @@ display: block;
     border-radius: 2px;
     padding: 0 4px;
     transition: margin-left 0.6s;
+    position: relative;
+}
+#world #canvas #robots-overview.expanded .team-robot > .label .lvl:after {
+    content: "";
+    display: none;
+    position: absolute;
+    z-index: 1;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    padding: 0;
+    background-color: transparent;
+    border: 0 none transparent;
+    border-radius: 6px;
+    transform: translate(0, 0);
+    font-size: 24px;
+    line-height: 13px;
+    color: #ffffff;
+}
+#world #canvas #robots-overview.expanded .team-robot.equipped > .label .lvl:after {
+    display: block;
+    content: "\002713";
+    background-color: #0a0a0a;
 }
 #world #canvas #robots-overview .team-robot > .label + .guage {
     margin-top: -1px;
@@ -3612,6 +3732,17 @@ display: block;
     opacity: 0.6;
 }
 
+@keyframes modal-select-action-button-clicked {
+    0% { transform: scale(1.0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1.0); }
+}
+@keyframes modal-select-action-button-pulse {
+    0% { transform: scale(1.0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1.0); }
+}
+
 #world #canvas #robots-overview .storage-items .team-item,
 #world #canvas #action-modal .item-list .team-item {
     display: block;
@@ -3700,6 +3831,14 @@ display: block;
     filter: brightness(0.4);
     cursor: default;
 }
+#world #canvas #robots-overview .storage-items .team-item.saving,
+#world #canvas #action-modal .item-list .team-item.saving {
+    transform: scale(1.0);
+    animation: modal-select-action-button-pulse 1.8s ease-in-out infinite;
+    animation-fill-mode: forwards;
+    transform-origin: center center;
+    z-index: 30;
+}
 #world #canvas #robots-overview .storage-items .team-item .image,
 #world #canvas #action-modal .item-list .team-item .image {
     position: absolute;
@@ -3753,8 +3892,8 @@ display: block;
     line-height: 30px;
     text-align: right;
 }
-#world #canvas #robots-overview .storage-items .team-item .equipped,
-#world #canvas #action-modal .item-list .team-item .equipped {
+#world #canvas #robots-overview .storage-items .team-item .qty-equipped,
+#world #canvas #action-modal .item-list .team-item .qty-equipped {
     display: none;
 }
 
@@ -3800,17 +3939,21 @@ display: block;
 #world #canvas #action-modal.active .ability-list .team-ability {
     pointer-events: auto;
 }
-#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover,
-#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).hovered,
-#world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]):hover,
-#world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]).hovered {
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):hover,
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled).hovered,
+#world #canvas #action-modal .ability-list .team-ability:not(.disabled):hover,
+#world #canvas #action-modal .ability-list .team-ability:not(.disabled).hovered {
     transform: translate(0, -1px);
     outline-color: #dedede;
 }
-#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).selected,
-#world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]).selected {
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled).selected,
+#world #canvas #action-modal .ability-list .team-ability:not(.disabled).selected {
     transform: translate(0, -1px);
     outline-color: #ffffff;
+}
+#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled).equipped,
+#world #canvas #action-modal .ability-list .team-ability:not(.disabled).equipped {
+
 }
 #world #canvas #robots-overview .storage-abilities .team-ability.hidden,
 #world #canvas #action-modal .ability-list .team-ability.hidden {
@@ -3837,6 +3980,39 @@ display: block;
     0%, 100% { transform: translate(0, 0); }
     50% { transform: translate(0, -2px); }
 }
+#world #canvas #robots-overview .storage-abilities .team-ability.equipped:before,
+#world #canvas #action-modal .ability-list .team-ability.equipped:before {
+    content: "\002713";
+    display: block;
+    position: absolute;
+    z-index: 100;
+    top: 2px;
+    right: 5px;
+    padding: 0;
+    font-size: 24px;
+    line-height: 1;
+    background-color: transparent;
+    border: 0 none transparent;
+    border-radius: 6px;
+    transform: translate(0, 0);
+}
+#world #canvas #robots-overview .storage-abilities .team-ability.equipped .name,
+#world #canvas #action-modal .ability-list .team-ability.equipped .name {
+    color: #868686;
+}
+#world #canvas #robots-overview .storage-abilities .team-ability.equipped .image,
+#world #canvas #robots-overview .storage-abilities .team-ability.equipped .tint,
+#world #canvas #action-modal .ability-list .team-ability.equipped .image,
+#world #canvas #action-modal .ability-list .team-ability.equipped .tint {
+    opacity: 1.0;
+    filter: brightness(0.4);
+}
+#world #canvas #robots-overview .storage-abilities .team-ability.equipped .cost,
+#world #canvas #action-modal .ability-list .team-ability.equipped .cost {
+    color: transparent;
+    text-shadow: none;
+    border-color: #202020;
+}
 #world #canvas #robots-overview .storage-abilities.has-selection .team-ability:not(.selected):not(.hovered):not(:hover):not(.disabled):not(.incompatible) {
     filter: brightness(0.8) saturate(1.2);
 }
@@ -3849,6 +4025,18 @@ display: block;
 #world #canvas #action-modal .ability-list .team-ability.incompatible {
     filter: brightness(0.4);
     cursor: default;
+}
+#world #canvas #robots-overview .storage-abilities .team-ability.disabled.equipped,
+#world #canvas #action-modal .ability-list .team-ability.disabled.equipped {
+    filter: brightness(0.8);
+}
+#world #canvas #robots-overview .storage-abilities .team-ability.saving,
+#world #canvas #action-modal .ability-list .team-ability.saving {
+    transform: scale(1.0);
+    animation: modal-select-action-button-pulse 1.8s ease-in-out infinite;
+    animation-fill-mode: forwards;
+    transform-origin: center center;
+    z-index: 30;
 }
 #world #canvas #robots-overview .storage-abilities .team-ability .image,
 #world #canvas #action-modal .ability-list .team-ability .image {
@@ -4095,12 +4283,18 @@ display: block;
     50% { transform: scale(1.2); }
     100% { transform: scale(1.0); }
 }
+@keyframes world-action-button-clicked-subtle {
+    0% { transform: scale(1.0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1.0); }
+}
 #world #canvas #side-buttons .button.clicked {
     outline: 2px solid rgba(255, 255, 255, 1.0);
     transform: scale(1.0);
     animation: world-action-button-clicked 0.9s ease-in-out infinite;
     animation-fill-mode: forwards;
     transform-origin: center center;
+    pointer-events: none;
 }
 
 #world #canvas #side-buttons .button[data-save],
@@ -4676,17 +4870,22 @@ display: block;
     line-height: 1.2;
     margin: 0 auto 2px;
 }
-#world #canvas #action-modal .content .buttons .button.disabled {
+#world #canvas #action-modal.busy .content .buttons .button,
+#world #canvas #action-modal .content .buttons .button.disabled  {
+    cursor: not-allowed;
+}
+#world #canvas #action-modal .content .buttons .button.hidden {
+    display: none;
+}
+#world #canvas #action-modal.busy .content .buttons .button:not(.clicked) {
+    filter: saturate(0.5) brightness(0.5);
+}
+#world #canvas #action-modal .content .buttons .button.disabled:not(.clicked) {
     background-color: #292929;
     border-color: #464646;
     color: #969696;
     font-weight: normal;
-    cursor: not-allowed;
     text-decoration: line-through;
-    filter: saturate(0.5) brightness(0.5);
-}
-#world #canvas #action-modal.busy .content .buttons .button {
-    cursor: not-allowed;
     filter: saturate(0.5) brightness(0.5);
 }
 #world #canvas #action-modal .content .buttons .button:hover,
@@ -4697,9 +4896,10 @@ display: block;
 #world #canvas #action-modal .content .buttons .button.clicked {
     outline: 2px solid rgba(255, 255, 255, 1.0);
     transform: scale(1.0);
-    animation: world-action-button-clicked 0.9s ease-in-out infinite;
+    animation: world-action-button-clicked-subtle 2.7s ease-in-out infinite;
     animation-fill-mode: forwards;
     transform-origin: center center;
+    pointer-events: none;
 }
 #world #canvas #action-modal .content .buttons .button[data-action="confirm"] {
     background-color: #0e6b0e !important;
@@ -4716,11 +4916,16 @@ display: block;
     float: right;
     margin-left: 6px;
     min-width: 240px;
+    z-index: 2;
 }
 #world #canvas #action-modal .content .buttons.actions .button[data-action="cancel"] {
     float: left;
     margin-right: 6px;
     min-width: 120px;
+    z-index: 1;
+}
+#world #canvas #action-modal .content .buttons.actions .button[data-action].clicked {
+    z-index: 10;
 }
 
 #world #canvas #action-modal .content .container .ability-list,

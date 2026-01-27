@@ -2076,7 +2076,7 @@ class rpg_world {
             $return_markup .= str_repeat('<i class="heart fa fas fa-heart"></i>', $limit_hearts);
         $return_markup .= '</div>';
         // [robots-overview][team-robots]
-        $return_markup .= '<div class="team-robots">';
+        $return_markup .= '<div class="team-robots" data-team-size="'.count($current_robot_tokens).'">';
             $return_markup .= '<div class="wrapper">';
             foreach ($current_robot_tokens AS $robot_key => $robot_token){
                 if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
@@ -2297,8 +2297,8 @@ class rpg_world {
                         $item_markup .= $item_sprite;
                     $item_markup .= '</div>';
                     $item_markup .= '<strong class="name'.(!strstr($item_name, ' ') ? ' oneline' : '').'">'.str_replace(' ', '<br />', $item_name).'</strong>';
-                    if (!empty($item_quantity_equipped)){ $item_markup .= '<span class="equipped">&minus; '.$item_quantity_equipped.'</span>'; }
                     if (true){ $item_markup .= '<span class="quantity">&times; '.$item_quantity.'</span>'; }
+                    if (!empty($item_quantity_equipped)){ $item_markup .= '<span class="qty-equipped">&minus; '.$item_quantity_equipped.'</span>'; }
                 $item_markup .= '</div>';
                 $return_markup .= $item_markup;
             }
@@ -2370,9 +2370,9 @@ class rpg_world {
                 ));
             $return_markup .= $get_toggle_options(array(
                 'incompatible' => array(
-                    'visible' => 'eye',
-                    'hidden' => 'eye-slash',
-                    'default' => 'visible',
+                    'visible' => 'eye-slash', //'eye',
+                    'hidden' => 'eye', //'eye-slash',
+                    'default' => 'hidden',
                     ),
                 ));
         $return_markup .= '</div>';
