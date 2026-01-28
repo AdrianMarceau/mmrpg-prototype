@@ -2396,9 +2396,40 @@ class mmrpgWorldMap {
                 return true;
                 });
             // Make sure clicking relevant areas in the robot details triggers relevant functionality
-            // - make sure clicking any of the abilities quick-swaps to the abilities tab
             // - make sure clicking the item slot (empty or not) quick-swaps to the items tab
             // - make sure clicking the support tab ?????? (for now just show console.warn of TODO)
+            // - make sure clicking any of the ability slots (empty or not) quick-swaps to the abilities tab
+            $storageBoxDivs.delegate('.details[data-robot] .held-item .value', 'click', function(e){
+                e.preventDefault();
+                if (_self.worldIsBusy()){ return; }
+                //console.log('%c' + 'robot equipped item value clicked!', 'color: cyan;');
+                //console.log('_world.currentScreen = ', _world.currentScreen);
+                //console.log('_world.currentSubScreen = ', _world.currentSubScreen);
+                if (_world.currentScreen !== 'robots-overview'){ return; }
+                let $itemValue = $(this);
+                let itemValueID = $itemValue.attr('data-item-id') || false;
+                let $itemInStorage = itemValueID ? $storageItemsDiv.find('.team-item[data-item-id="' + itemValueID + '"]').first() : false;
+                if (!$itemInStorage || !$itemInStorage.length){ $itemInStorage = false; }
+                let itemClickFunction = function(delay){
+                    //console.log('itemClickFunction()');
+                    delay = typeof delay === 'number' ? delay : 600;
+                    //console.log('$itemInStorage.length =', $itemInStorage.length);
+                    if (!$itemInStorage){ return; }
+                    let callback = function(){
+                        //console.log('itemClickFunction().callback()');
+                        let itemStoragePageNum = $itemInStorage ? parseInt($itemInStorage.attr('data-sort-page')) : 1;
+                        goToStoragePage('items', itemStoragePageNum);
+                        $itemInStorage.trigger('click');
+                        };
+                    if (!delay){ callback(); }
+                    else { setTimeout(callback, delay); }
+                    };
+                $itemValue.addClass('selected');
+                if (_world.currentSubScreen === 'items'){ itemClickFunction(0); }
+                else { showRobotsOverviewPanel('items', function(){ itemClickFunction(); }); }
+                // Return true on success
+                return true;
+                });
             $storageBoxDivs.delegate('.details[data-robot] .equipped-abilities .value', 'click', function(e){
                 e.preventDefault();
                 if (_self.worldIsBusy()){ return; }
@@ -2746,16 +2777,13 @@ class mmrpgWorldMap {
                     let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
                     let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
                     //console.log('-> targetRobotToken =', targetRobotToken);
-
-                    // TODO: launch a modal for the given action on the selected robot if applicable
-                    console.warn('TODO: refine item actions for ' + actionToken + ' modal functionality! w/', '\n-> actionToken =', actionToken, '\n-> itemToken =', itemToken, '\n-> targetRobotToken =', targetRobotToken);
-                    $actionButton.addClass('clicked');
+                    let autoClickAction = function(){ $actionButton.addClass('clicked'); };
                     let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
-                    if (actionToken === 'use-item'){ _self.showUseItemModal(itemToken, targetRobotToken, actionModalConfig); }
-                    else if (actionToken === 'give-item'){ _self.showGiveItemModal(itemToken, targetRobotToken, actionModalConfig); }
-                    else if (actionToken === 'drop-item'){ _self.showDropItemModal(itemToken, actionModalConfig); }
+                    if (actionToken === 'use-item'){ autoClickAction(); _self.showUseItemModal(itemToken, targetRobotToken, actionModalConfig); }
+                    else if (actionToken === 'give-item'){ autoClickAction(); _self.showGiveItemModal(itemToken, targetRobotToken, actionModalConfig); }
+                    else if (actionToken === 'take-item'){ autoClickAction(); _self.showTakeItemModal(itemToken, targetRobotToken, actionModalConfig); }
+                    else if (actionToken === 'drop-item'){ autoClickAction(); _self.showDropItemModal(itemToken, actionModalConfig); }
                     else { console.warn('-> undefined item action "', actionToken, '", ignoring input'); return false; }
-
                     // Return true on success
                     return true;
                     });
@@ -7310,11 +7338,12 @@ class mmrpgWorldMap {
         };
 
     // Quick function for giving a given robot a new hold item and then optionally playing a sound effect
-    giveRobotItem(robotString, itemToken, playSound){
+    giveRobotItem(robotString, itemToken, playSound, playAnimation){
         //console.log('%c' + 'mmrpgWorldMap.giveRobotItem(robot:' + robotString + ', item:' + itemToken + ', sound:' + playSound + ')', 'color: magenta;');
         if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('giveRobotItem() missing required robotString!'); return false; }
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('giveRobotItem() missing required itemToken!'); return false; }
         if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        if (typeof playAnimation !== 'boolean'){ playAnimation = true; } // default to true if not provided
         // Collect references to world objects
         let _self = this;
         let _config = _self.config;
@@ -7325,6 +7354,7 @@ class mmrpgWorldMap {
         let _worldPlayerRobots = _worldPlayer.robots;
         let _worldPlayerItems = _worldPlayer.items;
         let _mmrpgItemsIndex = _indexes.items;
+        let _mmrpgAbilitiesIndex = _indexes.abilities;
         // Break the robot sprite into ID and token and collect its info
         let robotId = parseInt(robotString.split('_')[0]) || false;
         let robotToken = robotString.split('_')[1] || false;
@@ -7350,12 +7380,46 @@ class mmrpgWorldMap {
         // Update the robot info with the new hold item
         // then re-sync the robot info with the index
         robotInfo.item = itemToken;
+        if (itemToken.indexOf('-core') !== -1){
+            let coreType = itemInfo.type;
+            //console.log('equipping a core to this robot! itemToken =', itemToken);
+            if (coreType && coreType !== 'empty'){
+                //console.log('-> update compatibility for coreType =', coreType);
+                let abilitiesViaItem = (function(robot, type){
+                    let abilitiesCompatible = [];
+                    let abilitiesIndex = _mmrpgAbilitiesIndex;
+                    let indexTokens = abilitiesIndex._indexTokens, indexIDs = abilitiesIndex._indexIDs;
+                    for (var i = 0; i < indexTokens.length; i++){
+                        let token = indexTokens[i], info = abilitiesIndex[token];
+                        //console.log('--> checking ' + token + ' w/ info =', info);
+                        if (!info.flagComplete || !info.flagPublished || !info.flagUnlockable){ continue; }
+                        if (info.class !== 'master'){ continue; }
+                        //console.log('--> checking if ' + token + ' is ' + coreType + ' type ...');
+                        if (info.type !== coreType && info.type2 !== coreType){ continue; }
+                        abilitiesCompatible.push(info.id);
+                        }
+                    return abilitiesCompatible;
+                    })(robotInfo, coreType);
+                //console.log('-> abilitiesViaItem =', abilitiesViaItem);
+                robotInfo.abilitiesViaItem = abilitiesViaItem;
+                robotInfo.abilities = (function(currentAbilities, robotInfo){
+                    let filteredAbilities = [];
+                    let abilitiesCompatible = robotInfo.abilitiesCompatible || [];
+                    let abilitiesViaItem = robotInfo.abilitiesViaItem || [];
+                    for (var i = 0; i < currentAbilities.length; i++){
+                        let id = currentAbilities[i], compatible = false;
+                        if (abilitiesCompatible.indexOf(id) !== -1){ compatible = true; }
+                        else if (abilitiesViaItem.indexOf(id) !== -1){ compatible = true; }
+                        if (compatible){ filteredAbilities.push(id); }
+                        }
+                    return filteredAbilities;
+                    })(robotInfo.abilities, robotInfo);
+                }
+            }
         _worldPlayerRobots[robotString] = robotInfo;
         // Add this item to the player's equipped items list
         if (typeof _worldPlayerItems[itemToken + '__equipped'] === 'undefined'){ _worldPlayerItems[itemToken + '__equipped'] = 0; }
         _worldPlayerItems[itemToken + '__equipped'] += 1;
-        // Add the item to the inventory as if picked-up and let that method handle quantity abstractions
-        _self.addItemToInventory(itemToken, 1);
         // Collect a reference to this robot's element in the overview panel
         let $robotsOverview = _elements.robotsOverview;
         let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', $robotsOverview);
@@ -7374,8 +7438,79 @@ class mmrpgWorldMap {
         let $robotItemSprite = $('.icon > .sprite.item', $robotOverview);
         // Add a item-given class to this robot to show it being effected by the action
         if (playSound){ _self.playSoundEffect('get-item'); }
-        $robotOverview.addClass('item-given');
-        setTimeout(function(){ $robotOverview.removeClass('item-given'); }, 3000);
+        if (playAnimation){ $robotOverview.addClass('item-given'); setTimeout(function(){ $robotOverview.removeClass('item-given'); }, 2000); }
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState();
+        // Return true on success
+        return true;
+        }
+
+    // Quick function for giving a given robot a new hold item and then optionally playing a sound effect
+    takeRobotItem(robotString, playSound, playAnimation){
+        //console.log('%c' + 'mmrpgWorldMap.takeRobotItem(robot:' + robotString + ', sound:' + playSound + ', animate:' + playAnimation + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('takeRobotItem() missing required robotString!'); return false; }
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        if (typeof playAnimation !== 'boolean'){ playAnimation = true; } // default to true if not provided
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _indexes = _self.indexes;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        let _worldPlayerItems = _worldPlayer.items;
+        let _mmrpgItemsIndex = _indexes.items;
+        // Break the robot sprite into ID and token and collect its info
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('takeRobotItem() could not find robot info for robot ' + robotString + '!'); return false; }
+        //console.log('-> robotId =', robotId);
+        //console.log('-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        // If this robot doesn't have a hold item, return now
+        if (!robotInfo.item || !robotInfo.item.length){
+            console.warn('takeRobotItem() called but robot ' + robotString + ' does not have an item!');
+            return false;
+            }
+        // If the item token provided is not valid, return now
+        let itemToken = robotInfo.item;
+        let itemInfo = _mmrpgItemsIndex[itemToken] || false;
+        if (!itemInfo){ console.error('takeRobotItem() could not find item info for item ' + itemToken + '!'); return false; }
+        //console.log('-> itemInfo =', itemInfo);
+        // Update the robot info to remove hold item
+        // then re-sync the robot info with the index
+        robotInfo.item = '';
+        robotInfo.abilitiesViaItem = [];
+        robotInfo.abilities = (function(currentAbilities, robotInfo){
+            let filteredAbilities = [];
+            let abilitiesCompatible = robotInfo.abilitiesCompatible || [];
+            let abilitiesViaItem = robotInfo.abilitiesViaItem || [];
+            for (var i = 0; i < currentAbilities.length; i++){
+                let id = currentAbilities[i], compatible = false;
+                if (abilitiesCompatible.indexOf(id) !== -1){ compatible = true; }
+                else if (abilitiesViaItem.indexOf(id) !== -1){ compatible = true; }
+                if (compatible){ filteredAbilities.push(id); }
+                }
+            return filteredAbilities;
+            })(robotInfo.abilities, robotInfo);
+        _worldPlayerRobots[robotString] = robotInfo;
+        // Add this item to the player's equipped items list
+        if (typeof _worldPlayerItems[itemToken + '__equipped'] === 'undefined'){ _worldPlayerItems[itemToken + '__equipped'] = 1; }
+        else if (_worldPlayerItems[itemToken + '__equipped'] < 1){ _worldPlayerItems[itemToken + '__equipped'] = 1; }
+        _worldPlayerItems[itemToken + '__equipped'] -= 1;
+        // Collect a reference to this robot's element in the overview panel
+        let $robotsOverview = _elements.robotsOverview;
+        let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', $robotsOverview);
+        if (!$robotOverview || !$robotOverview.length){ console.warn('takeRobotItem() could not find overview for robot ' + robotString + '!'); return false; }
+        let $robotIconSprite = $('.icon > .sprite.robot', $robotOverview);
+        if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('takeRobotItem() could not find icon sprite for robot ' + robotString + '!'); return false; }
+        // Remove any old item sprite(s) already inside this robot's icon container
+        $('.icon > .sprite.item', $robotOverview).remove();
+        // Add a item-given class to this robot to show it being effected by the action
+        if (playSound){ _self.playSoundEffect('bounce-sound'); }
+        if (playAnimation){ $robotOverview.addClass('item-given'); setTimeout(function(){ $robotOverview.removeClass('item-given'); }, 2000); }
         // Trigger a save of the world state to persist this change
         _self.saveWorldState();
         // Return true on success
@@ -7732,6 +7867,7 @@ class mmrpgWorldMap {
                     //console.log('-> found a robot (', playerRobot, ') that can hold an item...');
                     //console.log('-> giving them the item:', itemEventToken, itemEventInfo, itemToken);
                     if (_self.giveRobotItem(robotString, itemToken)){
+                        _self.addItemToInventory(itemToken, 1);
                         itemEvent.claimed = true;
                         itemEventQuantity--;
                         messageMarkup.push('Gave ' + itemNameTextSpan + ' to team robot ' + _self.getRobotNameSpan(playerRobot.token) + '!');
@@ -8328,9 +8464,10 @@ class mmrpgWorldMap {
 
         // HELD ITEM
         let itemLine = { classes: 'held-item types', label: 'Item:', values: [] }; {
-            let itemToken, itemName, itemSprite, itemTypes;
+            let itemID, itemToken, itemName, itemSprite, itemTypes;
             if (robotItem && robotItemInfo){
-                itemToken = robotItem;
+                itemID = robotItemInfo.id;
+                itemToken = robotItemInfo.token;
                 itemName = robotItemInfo.name;
                 itemSprite = _self.getItemSpriteMarkup(itemToken, {classes: 'icon'});
                 itemTypes = (function(info){
@@ -8340,6 +8477,7 @@ class mmrpgWorldMap {
                     else { return info.type; }
                     })(robotItemInfo);
                 } else {
+                itemID = 0;
                 itemToken = '';
                 itemName = 'None',
                 itemSprite = '<span class="icon"><i class="fa fas fa-times"></i></span>';
@@ -8352,6 +8490,7 @@ class mmrpgWorldMap {
             itemLine.values.push({
                 value: itemNameMarkup + itemSpriteMarkup,
                 valueClasses: 'type ' + itemTypeClasses,
+                valueAttrs: {'item-id': itemID, 'item-token': itemToken},
                 });
             }
         robotDetailsObject.infoLines.push(itemLine);
@@ -8560,6 +8699,14 @@ class mmrpgWorldMap {
         if (typeof _mmrpgItemsIndex[itemToken] === 'undefined'){ console.error('getItemDetailsForOverview() could not find item in index for token ' + itemToken + '!'); return false; }
         let itemIndexInfo = _mmrpgItemsIndex[itemToken];
         //console.log('--> itemIndexInfo =', itemIndexInfo);
+        let selectedPlayerRobot = targetSelected ? _self.getSelectedRobotInOverview(true) : false;
+        let selectedPlayerRobotData = selectedPlayerRobot && selectedPlayerRobot.data ? selectedPlayerRobot.data : false;
+        let selectedPlayerRobotInfo = selectedPlayerRobot && selectedPlayerRobot.info ? selectedPlayerRobot.info : false;
+        //console.log('--> selectedPlayerRobot =', selectedPlayerRobot);
+        let itemIsUnlocked = typeof _worldPlayerItems[itemToken] !== 'undefined' ? true : false;
+        //console.log('--> itemIsUnlocked =', itemIsUnlocked);
+        let itemIsEquipped = selectedPlayerRobot && selectedPlayerRobotData.item === itemIndexInfo.token ? true : false;
+        //console.log('--> itemIsEquipped =', itemIsEquipped);
 
         // Generate the markup, classes, styles, etc. that will make up the item details
         let itemTitle = 'Item Details';
@@ -8585,10 +8732,46 @@ class mmrpgWorldMap {
 
         // Generate type-related markup and spans for use later
         let statTokens = ['attack', 'defense', 'speed'];
+        let statConsumables = ['pellet', 'capsule', 'tank'];
+        let tokenFrags = itemToken.indexOf('-') !== -1 ? itemToken.split('-') : [itemToken, itemToken];
         let itemTypeClasses = (itemType2 && itemType1 === 'none' ? itemType2 : (itemType1 + (itemType2 ? '_' + itemType2 : '')));
         let isStatItem = (statTokens.indexOf(itemType1) !== -1 || itemToken.indexOf('super-') === 0 ? true : false);
         let isSuperItem = (itemToken.indexOf('super-') === 0 ? true : false);
+        let isStatConsumable = statConsumables.indexOf(tokenFrags[1]) !== -1 ? true : false;
         //console.log('--> itemTypeClasses =', itemTypeClasses);
+        //console.log('tokenFrags =', tokenFrags);
+        //console.log('isStatItem =', isStatItem);
+        //console.log('isSuperItem =', isSuperItem);
+        //console.log('isStatConsumable =', isStatConsumable);
+
+        // Manually disable consumable items that cannot actually be used on the given robot for contextual reasons
+        // TODO: figure out a better place for this maybe?
+        let itemIsUnusable = !selectedPlayerRobot ? true : false;
+        if (itemKind === 'consumable'){
+            //console.log('checking if this item should be unusable ...');
+            let playerRobot = selectedPlayerRobot, robotData = selectedPlayerRobotData, robotInfo = selectedPlayerRobotInfo;
+            let robotIsDisabled = robotData.disabled ? true : false;
+            let robotHasFullEnergy = robotData.energy >= robotData.energyMax, robotHasFullWeapons = robotData.weapons >= robotData.weaponsMax;
+            let robotHasMaxAttack = robotData.attackMods >= _config.robotStatModMax, robotHasMaxDefense = robotData.defenseMods >= _config.robotStatModMax, robotHasMaxSpeed = robotData.speedMods >= _config.robotStatModMax;
+            //console.log('playerRobot =', playerRobot);
+            //console.log('-> robotIsDisabled =', robotIsDisabled);
+            //console.log('-> robotHasFullEnergy =', robotHasFullEnergy, ' | energy(', robotData.energy, ') vs energyMax(', robotData.energyMax, ')');
+            //console.log('-> robotHasFullWeapons =', robotHasFullWeapons, ' | weapons(', robotData.weapons, ') vs weaponsMax(', robotData.weaponsMax, ')');
+            //console.log('-> robotHasMaxAttack =', robotHasMaxAttack, ' | attackMods(', robotData.attackMods, ') vs robotStatModMax(', _config.robotStatModMax, ')');
+            //console.log('-> robotHasMaxDefense =', robotHasMaxDefense, ' | defenseMods(', robotData.defenseMods, ') vs robotStatModMax(', _config.robotStatModMax, ')');
+            //console.log('-> robotHasMaxSpeed =', robotHasMaxSpeed, ' | speedMods(', robotData.speedMods, ') vs robotStatModMax(', _config.robotStatModMax, ')');
+            if (robotIsDisabled && itemToken !== 'extra-life'){ itemIsUnusable = true; }
+            else if (itemToken === 'yashichi' && (robotHasFullEnergy && robotHasFullWeapons)){ itemIsUnusable = true; }
+            else if (isStatConsumable){
+                if (tokenFrags[0] === 'energy' && robotHasFullEnergy){ itemIsUnusable = true; }
+                else if (tokenFrags[0] === 'weapon' && robotHasFullWeapons){ itemIsUnusable = true; }
+                else if (tokenFrags[0] === 'attack' && robotHasMaxAttack){ itemIsUnusable = true; }
+                else if (tokenFrags[0] === 'defense' && robotHasMaxDefense){ itemIsUnusable = true; }
+                else if (tokenFrags[0] === 'speed' && robotHasMaxSpeed){ itemIsUnusable = true; }
+                else if (tokenFrags[0] === 'super' && (robotHasMaxAttack && robotHasMaxDefense && robotHasMaxSpeed)){ itemIsUnusable = true; }
+                }
+            //console.log('itemIsUnusable =', itemIsUnusable);
+            }
 
         // Determine the icon to use based on the item kind and format the text for display
         let itemKindIcon = 'dot-circle';
@@ -8680,9 +8863,10 @@ class mmrpgWorldMap {
         let showUseItem = itemKind === 'consumable' ? true : false;
         let showGiveItem = (itemKind === 'consumable' || itemKind === 'holdable') ? true : false;
         let showDropItem = itemKind !== 'event' && itemQuantity > 0 ? true : false;
-        itemDetailsObject.actions.push({ action: 'use-item', text: 'Use', item: itemToken, disabled: !targetSelected, hidden: !showUseItem });
-        itemDetailsObject.actions.push({ action: 'give-item', text: 'Give', item: itemToken, disabled: !targetSelected, hidden: !showGiveItem });
-        itemDetailsObject.actions.push({ action: 'drop-item', text: 'Drop', item: itemToken, disabled: targetSelected, hidden: !showDropItem });
+        itemDetailsObject.actions.push({ action: 'use-item', text: 'Use', item: itemToken, disabled: (!targetSelected || itemIsUnusable), hidden: !showUseItem });
+        itemDetailsObject.actions.push({ action: 'give-item', text: 'Give', item: itemToken, disabled: (!targetSelected || itemIsEquipped), hidden: !showGiveItem });
+        itemDetailsObject.actions.push({ action: 'take-item', text: 'Take', item: itemToken, disabled: (!targetSelected || !itemIsEquipped), hidden: !showGiveItem });
+        //itemDetailsObject.actions.push({ action: 'drop-item', text: 'Drop', item: itemToken, disabled: targetSelected, hidden: !showDropItem });
 
         // Pre-compile some of the HTML to make it easier for the other functions
         itemDetailsObject.infolinesHTML = '';
@@ -9694,6 +9878,21 @@ class mmrpgWorldMap {
                 }
             return true;
             };
+        let updateItemQuantityInStorage = function(itemToken){
+            //console.log('%c' + '~mmrpgWorldMap.showActionModal.updateItemQuantityInStorage()', 'color: magenta;');
+            let $storageItem = $itemStorageBox.find('.team-item[data-item="' + itemToken + '"]');
+            let $storageItemDetails = $itemStorageBox.find('> .details[data-item="' + itemToken + '"]');
+            let totalItemQuantity = _worldPlayerItems[itemToken] || 0;
+            let equippedItemQuantity = _worldPlayerItems[itemToken + '__equipped'] || 0;
+            let availableQuantity = totalItemQuantity - equippedItemQuantity;
+            //console.log('-> totalItemQuantity =', totalItemQuantity);
+            //console.log('-> equippedItemQuantity =', equippedItemQuantity);
+            //console.log('-> availableQuantity =', availableQuantity);
+            $storageItem.attr('data-quantity', availableQuantity);
+            $storageItem.find('> .quantity').html('&times; ' + availableQuantity);
+            $storageItemDetails.find('> .subtitle > .quantity').html('&times; ' + availableQuantity);
+            if (availableQuantity === 0){ $storageItemDetails.find('.button[data-action]').addClass('disabled').attr('disabled', 'disabled'); }
+            };
 
         // Collect required and necessary data for displaying this action modal
         if (actionKind === 'item'){
@@ -9715,11 +9914,13 @@ class mmrpgWorldMap {
                 let tokenFrags = itemToken.split('-');
                 let itemToken1 = tokenFrags[0] || '';
                 let itemToken2 = tokenFrags[1] || '';
+                let isYashichi = itemToken === 'yashichi' ? true : false;
+                let isExtraLife = itemToken === 'extra-life' ? true : false;
                 let isPellet = itemToken2 === 'pellet' ? true : false;
                 let isCapsule = itemToken2 === 'capsule' ? true : false;
                 let isTank = itemToken2 === 'tank' ? true : false;
-                let isEnergy = itemToken1 === 'energy' ? true : false;
-                let isWeapons = itemToken1 === 'weapon' ? true : false;
+                let isEnergy = itemToken1 === 'energy' || isYashichi || isExtraLife ? true : false;
+                let isWeapons = itemToken1 === 'weapon' || isYashichi || isExtraLife ? true : false;
                 let isAttack = itemToken1 === 'attack' ? true : false;
                 let isDefense = itemToken1 === 'defense' ? true : false;
                 let isSpeed = itemToken1 === 'speed' ? true : false;
@@ -9751,7 +9952,7 @@ class mmrpgWorldMap {
                         }
                     }
                 // Else if this is a recovery item (like an energy/weapon pellet, capsule, or tank) its effects are a bit more complex
-                else if (isBasic && isRecoveryItem){
+                else if ((isBasic && isRecoveryItem) || isYashichi){
                     //console.log('--> using basic recovery item ...');
                     let restoreStats = [], restoredToMax = [];
                     if (isEnergy){ restoreStats.push('energy'); }
@@ -9780,16 +9981,16 @@ class mmrpgWorldMap {
                     _worldPlayerItems[itemToken] -= 1;
                     if (_worldPlayerItems[itemToken] < 0){ _worldPlayerItems[itemToken] = 0; }
                     //console.log('_worldPlayerItems[itemToken] (after) =', _worldPlayerItems[itemToken]);
-                    let currentItemQuantity = _worldPlayerItems[itemToken] || 0;
+                    let totalItemQuantity = _worldPlayerItems[itemToken] || 0;
                     let equippedItemQuantity = _worldPlayerItems[itemToken + '__equipped'] || 0;
-                    let newQuantity = currentItemQuantity - equippedItemQuantity;
-                    //console.log('-> currentItemQuantity =', currentItemQuantity);
+                    let availableQuantity = totalItemQuantity - equippedItemQuantity;
+                    //console.log('-> totalItemQuantity =', totalItemQuantity);
                     //console.log('-> equippedItemQuantity =', equippedItemQuantity);
-                    //console.log('-> newQuantity =', newQuantity);
-                    $itemInStorage.attr('data-quantity', newQuantity);
-                    $itemInStorage.find('> .quantity').html('&times; ' + newQuantity);
-                    $itemInStorageDetails.find('> .subtitle > .quantity').html('&times; ' + newQuantity);
-                    if (newQuantity === 0){ $itemInStorageDetails.find('.button[data-action]').addClass('disabled').attr('disabled', 'disabled'); }
+                    //console.log('-> availableQuantity =', availableQuantity);
+                    $itemInStorage.attr('data-quantity', availableQuantity);
+                    $itemInStorage.find('> .quantity').html('&times; ' + availableQuantity);
+                    $itemInStorageDetails.find('> .subtitle > .quantity').html('&times; ' + availableQuantity);
+                    if (availableQuantity === 0){ $itemInStorageDetails.find('.button[data-action]').addClass('disabled').attr('disabled', 'disabled'); }
                     _self.saveWorldState();
                     }
                 // If the item can no longer be used, disable its use button now (maybe we're already maxed)
@@ -9800,12 +10001,46 @@ class mmrpgWorldMap {
                 }
             // Else if this is a GIVE ITEM request, we should show the item equip modal now (showing old vs new item)
             else if (actionToken === 'give-item'){
-                console.log('--> preparing to GIVE ITEM to robot (', targetRobotToken, ') ...');
-                // TODO: ...
+                modalDetails.show = false;
+                //console.log('--> preparing to GIVE ITEM to robot (', targetRobotToken, ') ...');
+                let saveWorldState = false;
+                if (playerRobotInfo.item){
+                    let existingItemToken = playerRobotInfo.item;
+                    //console.log('-> removing existingItemToken =', existingItemToken);
+                    _self.takeRobotItem(targetRobotToken, false, false);
+                    updateItemQuantityInStorage(existingItemToken);
+                    saveWorldState = true;
+                    }
+                if (typeof _worldPlayerItems[itemToken] !== 'undefined'){
+                    let newItemToken = itemToken;
+                    //console.log('-> equipping newItemToken =', newItemToken);
+                    _self.giveRobotItem(targetRobotToken, newItemToken);
+                    $itemInStorageDetails.find('.button[data-action="give-item"]').addClass('disabled').attr('disabled', 'disabled');
+                    $itemInStorageDetails.find('.button[data-action="take-item"]').removeClass('disabled').removeAttr('disabled');
+                    updateItemQuantityInStorage(newItemToken);
+                    saveWorldState = true;
+                    }
+                if (saveWorldState){ _self.saveWorldState(); }
+                }
+            // Else if this is a TAKE ITEM request, we should show the item unequip modal now (showing item removal)
+            else if (actionToken === 'take-item'){
+                modalDetails.show = false;
+                //console.log('--> preparing to TAKE ITEM from robot (', targetRobotToken, ') ...');
+                let saveWorldState = false;
+                if (playerRobotInfo.item){
+                    let existingItemToken = playerRobotInfo.item;
+                    //console.log('-> removing existingItemToken =', existingItemToken);
+                    _self.takeRobotItem(targetRobotToken);
+                    $itemInStorageDetails.find('.button[data-action="take-item"]').addClass('disabled').attr('disabled', 'disabled');
+                    $itemInStorageDetails.find('.button[data-action="give-item"]').removeClass('disabled').removeAttr('disabled');
+                    updateItemQuantityInStorage(existingItemToken);
+                    saveWorldState = true;
+                    }
+                if (saveWorldState){ _self.saveWorldState(); }
                 }
             // Else if this is the DROP ITEM request, we should confirm the drop now w/ modal
             else if (actionToken === 'drop-item'){
-                console.log('--> preparing to DROP ITEM at current location ...');
+                //console.log('--> preparing to DROP ITEM at current location ...');
                 // TODO: ...
                 }
             }
@@ -10070,6 +10305,15 @@ class mmrpgWorldMap {
         if (!targetRobotToken || typeof targetRobotToken !== 'string' || !targetRobotToken.length){ console.error('showGiveItemModal() missing required targetRobotToken!'); return; }
         let _self = this;
         return _self.showItemModal('give-item', itemToken, targetRobotToken, configCustom);
+        }
+
+    // Define a quick function for showing the take item modal
+    showTakeItemModal(itemToken, targetRobotToken, configCustom){
+        //console.log('%c' + 'mmrpgWorldMap.showTakeItemModal(itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('showTakeItemModal() missing required itemToken!'); return; }
+        if (!targetRobotToken || typeof targetRobotToken !== 'string' || !targetRobotToken.length){ console.error('showTakeItemModal() missing required targetRobotToken!'); return; }
+        let _self = this;
+        return _self.showItemModal('take-item', itemToken, targetRobotToken, configCustom);
         }
 
     // Define a quick function for showing the drop item modal

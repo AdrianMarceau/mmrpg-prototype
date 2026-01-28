@@ -2746,6 +2746,15 @@ html, body {
 #robots-overview .storage-box > .details .infoline > i {
 
 }
+@keyframes details-overview-value-glowing-outline {
+    0%, 100% { outline-color: transparent; transform: scale(1.0); }
+    50% { outline-color: white; transform: scale(1.1); }
+}
+@keyframes details-overview-value-golden-outline {
+    0%, 100% { outline-color: yellow; box-shadow: 0 0 6px yellow; }
+    50% { outline-color: orange; box-shadow: 0 0 12px orange; }
+}
+
 #robots-overview .storage-box > .details[data-robot] .subtitle {
     padding: 6px 0 12px;
 }
@@ -2839,6 +2848,29 @@ html, body {
     line-height: 1;
     text-align: left;
     margin: 0 auto;
+    position: relative;
+    transform: scale(1.0);
+    transform-origin: center;
+    outline: 0 none transparent;
+    transition: outline 0.3s, transform 0.3s;
+    cursor: pointer;
+    z-index: 1;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .value:hover,
+#robots-overview .storage-box > .details[data-robot] .held-item .value.new,
+#robots-overview .storage-box > .details[data-robot] .held-item .value.selected,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value:hover,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value.new,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value.selected {
+    outline: 1px solid #ffffff;
+    z-index: 30;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .value.new,
+#robots-overview .storage-box > .details[data-robot] .held-item .value.selected,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value.new,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value.selected {
+    outline-color: transparent;
+    animation: details-overview-value-glowing-outline 2s linear infinite;
 }
 #robots-overview .storage-box > .details[data-robot] .base-stats .value {
     margin: 0 1px 3px;
@@ -2950,16 +2982,8 @@ html, body {
     transform-origin: center;
     outline: 0 none transparent;
     transition: outline 0.3s, transform 0.3s;
-    z-index: 1;
     cursor: pointer;
-}
-@keyframes equipped-ability-glowing-outline {
-    0%, 100% { outline-color: transparent; transform: scale(1.0); }
-    50% { outline-color: white; transform: scale(1.1); }
-}
-@keyframes new-ability-golden-outline {
-    0%, 100% { outline-color: yellow; box-shadow: 0 0 6px yellow; }
-    50% { outline-color: orange; box-shadow: 0 0 12px orange; }
+    z-index: 1;
 }
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover,
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.new,
@@ -2970,7 +2994,7 @@ html, body {
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.new,
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected {
     outline-color: transparent;
-    animation: equipped-ability-glowing-outline 2s linear infinite;
+    animation: details-overview-value-glowing-outline 2s linear infinite;
 }
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value > .name {
     display: block;
