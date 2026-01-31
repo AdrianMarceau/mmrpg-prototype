@@ -2150,12 +2150,18 @@ class rpg_world {
             $return_markup .= '</div>';
         $return_markup .= '</div>';
         // [robots-overview][storage-robots]
+        //error_log('$current_robot_tokens = '.print_r($current_robot_tokens, true));
+        //error_log('$battle_robot_tokens = '.print_r($battle_robot_tokens, true));
+        //error_log('$storage_robot_tokens = '.print_r($storage_robot_tokens, true));
         $return_markup .= '<div class="storage-box storage-robots" data-storage="robots">';
             $recent_storage_robot_tokens = array();
             $recent_storage_robot_tokens = array_merge($recent_storage_robot_tokens, $current_robot_tokens);
             $recent_storage_robot_tokens = array_merge($recent_storage_robot_tokens, $battle_robot_tokens);
             $recent_storage_robot_tokens = array_merge($recent_storage_robot_tokens, $storage_robot_tokens);
+            //$recent_storage_robot_tokens = array_diff($recent_storage_robot_tokens, $current_robot_tokens);
+            //$recent_storage_robot_tokens = array_merge($recent_storage_robot_tokens, $current_robot_tokens);
             $recent_storage_robot_tokens = array_unique($recent_storage_robot_tokens);
+            //error_log('$recent_storage_robot_tokens = '.print_r($recent_storage_robot_tokens, true));
             $return_markup .= '<div class="wrapper">';
             foreach ($storage_robot_tokens AS $robot_key => $robot_token){
                 if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
@@ -2242,6 +2248,13 @@ class rpg_world {
                 'core-key' => 'core',
                 'level-exp' => 'level',
                 ));
+            $return_markup .= $get_toggle_options(array(
+                'disabled' => array(
+                    'visible' => 'eye-slash',
+                    'hidden' => 'eye',
+                    'default' => 'hidden',
+                    ),
+                ));
         $return_markup .= '</div>';
         // [robots-overview][storage-items]
         $return_markup .= '<div class="storage-box storage-items" data-storage="items">';
@@ -2311,9 +2324,9 @@ class rpg_world {
                 ));
             $return_markup .= $get_toggle_options(array(
                 'outofstock' => array(
-                    'visible' => 'eye',
-                    'hidden' => 'eye-slash',
-                    'default' => 'visible',
+                    'visible' => 'eye-slash',
+                    'hidden' => 'eye',
+                    'default' => 'hidden',
                     ),
                 ));
         $return_markup .= '</div>';
@@ -2370,8 +2383,8 @@ class rpg_world {
                 ));
             $return_markup .= $get_toggle_options(array(
                 'incompatible' => array(
-                    'visible' => 'eye-slash', //'eye',
-                    'hidden' => 'eye', //'eye-slash',
+                    'visible' => 'eye-slash',
+                    'hidden' => 'eye',
                     'default' => 'hidden',
                     ),
                 ));
