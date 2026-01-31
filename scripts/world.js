@@ -1777,7 +1777,7 @@ class mmrpgWorldMap {
                 //console.log('-> storageObjectsTotal = ', storageObjectsTotal);
                 //console.log('-> storageObjectsVisible = ', storageObjectsVisible);
                 // check for any filters and re-count objects if necessary to do so
-                let toggleTokens = ['disabled', 'incompatible', 'outofstock'];
+                let toggleTokens = ['current', 'disabled', 'incompatible', 'outofstock'];
                 (function(tokens){
                     //console.log('-> checking toggles for tokens = ', tokens);
                     for (var i = 0; i < tokens.length; i++){
@@ -1792,6 +1792,7 @@ class mmrpgWorldMap {
                 //console.log('-> currentToggleStates = ', currentToggleStates);
                 if (Object.keys(currentToggleStates).length){
                     //console.log('-> currentToggleStates = ', currentToggleStates);
+                    if (currentToggleStates['current'] === 'hidden'){ storageObjectFilter += ':not(.current)'; }
                     if (currentToggleStates['disabled'] === 'hidden'){ storageObjectFilter += ':not(.disabled)'; }
                     if (currentToggleStates['incompatible'] === 'hidden'){ storageObjectFilter += ':not(.incompatible)'; }
                     if (currentToggleStates['outofstock'] === 'hidden'){ storageObjectFilter += ':not([data-quantity="0"])'; }
