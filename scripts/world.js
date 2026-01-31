@@ -2662,6 +2662,19 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
+                // if the storage tray is open, clicking a robot in the team-list unselects any storage-robots that are focused
+                $teamRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
+                    e.preventDefault();
+                    if (_self.worldIsBusy()){ return; }
+                    if (!$robotsOverview.is('.expanded[data-view="robots"]')){ return; } // if we're not expanded, ignore clicks
+                    //console.log('%c' + 'Team robot clicked! (via robots)', 'color: cyan;');
+                    let $selectedStorageRobot = $storageRobotsDiv.find('.team-robot[data-robot].selected');
+                    if ($selectedStorageRobot && $selectedStorageRobot.length){
+                        $selectedStorageRobot.removeClass('selected');
+                        refreshDetailsPanel();
+                        }
+                    return true;
+                    });
                 // if the storage tray is open, clicking a robot in the storage-list clones it to the selected team-robot slot
                 $storageRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
                     e.preventDefault();
@@ -2678,10 +2691,22 @@ class mmrpgWorldMap {
                     if ($clickedStorageRobot.is('.current')){ return false; } // already on team, ignore clicks
                     // Refresh the current list of team robots in the overview and storage
                     refreshRobotRefs();
+                    // Unselect any team robots that might have been selected beforehand
+                    $teamRobotsInOverview.filter('.selected').removeClass('selected');
+                    // Toggle the selected state of the clicked storage robot
+                    $clickedStorageRobot.siblings().removeClass('selected');
+                    if (!$clickedStorageRobot.is('.selected')){ $clickedStorageRobot.addClass('selected'); }
+                    else { $clickedStorageRobot.removeClass('selected'); }
+                    // Refresh the details panel with the new changes and then return
+                    refreshDetailsPanel();
+                    // Return true on success
+                    return true;
+                    /*
                     // Collect a reference to the old (currently selected) team robot so we can backtrace later
                     let $oldTeamRobot = $teamRobotsInOverview.filter('.selected').first();
                     //console.log('-> $oldTeamRobot =', $oldTeamRobot);
-                    if (!$oldTeamRobot || !$oldTeamRobot.length){ return false; } // we need to actually have a robot selected
+                    // we need to actually have a robot selected to do any switching
+                    if (!$oldTeamRobot || !$oldTeamRobot.length){ return false; }
                     // Collect the robot tokens for each robot for later and to make sure they're different
                     let oldRobotToken = $oldTeamRobot.attr('data-robot') || false;
                     let newRobotToken = $clickedStorageRobot.attr('data-robot') || false;
@@ -2695,7 +2720,7 @@ class mmrpgWorldMap {
                     let targetStorageSlot = $oldTeamRobot.is('[data-slot]') ? $oldTeamRobot.attr('data-slot') : false;
                     // Create a new team robot by cloning the old storage one, adjusting properties, then replacing current
                     let $newTeamRobot = $clickedStorageRobot.clone(true);
-                    $newTeamRobot.removeClass('current hovered').addClass('selected');
+                    $newTeamRobot.removeClass('current hovered'); //.addClass('selected');
                     $newTeamRobot.attr('data-slot', targetStorageSlot);
                     $newTeamRobot.insertAfter($oldTeamRobot);
                     $oldTeamRobot.remove();
@@ -2791,6 +2816,7 @@ class mmrpgWorldMap {
                         });
                     // Return true on success
                     return true;
+                    */
                     });
                 }
             // Bind a click event to the team-items button in the robots overview
