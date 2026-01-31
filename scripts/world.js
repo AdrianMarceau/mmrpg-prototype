@@ -11,8 +11,9 @@ gameSettings.worldConfig = {
     playerToken: 'player',
     playerRobots: ['0_robot'],
     playerAbilities: ['buster-shot'],
-    playerRobotsIndex: {},
     playerItemsIndex: {},
+    playerRobotsIndex: {},
+    playerRobotsLimit: -1,
     playerMobility: 1, // default only
     playerHistory: [], // list of prev-player tokens in rev-chron order
     mapWorld: 'undefined',
@@ -78,6 +79,7 @@ gameSettings.worldConfig = {
     homeButtonURL: '#', // populated on init
     resetButtonURL: '#', // populated on init
     allowWorldEvents: false, // default until user interaction
+    maxRobotsPerPlayer: 8, // match the battle system b/c duh
     maxAbilitiesPerRobot: 8, // match the battle system b/c duh
     robotStorageSlotsVisible: 8, // probably wont change as it's what fits
     itemStorageSlotsVisible: 24, // probably wont change as it's what fits
@@ -8308,6 +8310,7 @@ class mmrpgWorldMap {
         let _worldPlayerRobots = _worldPlayer.robots;
         let _playerRobotsIndex = _config.playerRobotsIndex;
         let playerRobotInfo = false;
+        let playerRobotsCurrent = Object.keys(_worldPlayerRobots).slice(0, 8);
         if (typeof _worldPlayerRobots[playerRobotToken] !== 'undefined'){
             playerRobotInfo = _worldPlayerRobots[playerRobotToken];
             } else if (typeof _playerRobotsIndex[playerRobotToken] !== 'undefined'){
@@ -8321,6 +8324,7 @@ class mmrpgWorldMap {
         //console.log('--> _worldPlayerRobots =', _worldPlayerRobots);
         //console.log('--> playerRobotToken =', playerRobotToken);
         //console.log('--> playerRobotInfo =', playerRobotInfo);
+        //console.log('--> playerRobotsCurrent =', playerRobotsCurrent);
         //console.log('--> playerRobotInfo.persona =', (playerRobotInfo ? playerRobotInfo.persona : 'N/A'));
         if (typeof _mmrpgRobotsIndex[robotToken] === 'undefined'){ console.error('getRobotDetailsForOverview() could not find robot in index for token ' + robotToken + '!'); return false; }
         let baseRobotIndexInfo = _mmrpgRobotsIndex[robotToken];
@@ -8393,6 +8397,7 @@ class mmrpgWorldMap {
         let robotSpeed = playerRobotInfo.speed || 0;
         let robotSpeedMods = playerRobotInfo.speedMods || 0;
         let robotDisabled = playerRobotInfo.disabled === true ? true : false;
+        let robotCurrent = playerRobotsCurrent.indexOf(playerRobotToken) !== -1 ? true : false;
         let robotItem = playerRobotInfo.item || '';
         let robotItemInfo = robotItem && typeof _mmrpgItemsIndex[robotItem] !== 'undefined' ? _mmrpgItemsIndex[robotItem] : false;
         let robotSupport = playerRobotInfo.support ? playerRobotInfo.support : (robotIndexInfo.support ? robotIndexInfo.support : '');
@@ -8651,27 +8656,17 @@ class mmrpgWorldMap {
         let currentSubScreen = _world.currentSubScreen;
 
         // ACTION BUTTONS
+        // withdraw/deposit,take-out/put-away,activate/bench,add-to-team/remove-from-team
         robotDetailsObject.actions = [];
-        let allowButtons = true;
-        let showItemButton = robotKind !== 'boss' ? true : false;
-        let showAbilityButton = robotKind !== 'mecha' ? true : false;
-        //console.log('which panel are we in right now?', currentScreen, '>>', currentSubScreen);
-        if (currentScreen === 'robots-overview'){
-            //console.log('we are in the robots-overview panel');
-            if (currentSubScreen === 'items'){
-                //console.log('we are in the items sub-panel, hiding the items button');
-                showItemButton = false;
-                }
-            if (currentSubScreen === 'abilities'){
-                //console.log('we are in the abilities sub-panel, hiding the abilities button');
-                showAbilityButton = false;
-                }
-            }
-        //console.log('-> showItemButton =', showItemButton);
-        //console.log('-> showAbilityButton =', showAbilityButton);
-        showItemButton = showAbilityButton = false; // TEMP TEMP TEMP (?)
-        robotDetailsObject.actions.push({ action: 'goto-items', icon: 'briefcase', text: 'Use / Give Items', robot: robotToken, disabled: !allowButtons, hidden: !showItemButton });
-        robotDetailsObject.actions.push({ action: 'goto-abilities', icon: 'fire-alt', text: 'Equip Abilities', robot: robotToken, disabled: !allowButtons, hidden: !showAbilityButton });
+        let showStorageButtons = (currentScreen === 'robots-overview' && currentSubScreen === 'robots') ? true : false;
+        let showTeamAddButton = showStorageButtons && !robotCurrent ? true : false;
+        let showTeamRemoveButton = showStorageButtons && robotCurrent ? true : false;
+        let allowTeamAddButton = showTeamAddButton, allowTeamRemoveButton = showTeamRemoveButton;
+        if (playerRobotsCurrent.length === 1){ allowTeamRemoveButton = false; }
+        else if (playerRobotsCurrent.length >= _config.playerRobotsLimit){ allowTeamAddButton = false; }
+        else if (playerRobotsCurrent.length >= _config.maxRobotsPerPlayer){ allowTeamAddButton = false; }
+        robotDetailsObject.actions.push({ action: 'add-team-robot', text: 'Add To Team', robot: robotToken, disabled: !allowTeamAddButton, hidden: !showStorageButtons || !showTeamAddButton });
+        robotDetailsObject.actions.push({ action: 'remove-team-robot', text: 'Remove From Team', robot: robotToken, disabled: !allowTeamRemoveButton, hidden: !showStorageButtons || !showTeamRemoveButton });
 
         // Pre-compile some of the HTML to make it easier for the other functions
         //robotDetailsObject.levelHTML = (robotDetailsObject.level >= 100 ? '<b>' : '') + 'Level ' + robotDetailsObject.level + (robotDetailsObject.level >= 100 ? '</b>' : '');

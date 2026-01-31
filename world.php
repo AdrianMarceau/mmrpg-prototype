@@ -181,8 +181,9 @@ $this_prototype_data['this_player_id'] = $this_player_id; // required
 $this_prototype_data['this_player_token'] = $this_player_token; // required
 $this_prototype_data['this_player_robots'] = $this_player_robots; // required
 $this_prototype_data['this_player_abilities'] = $this_player_abilities; // required
-$this_prototype_data['this_player_robots_index'] = $this_player_robots_index; // required
 $this_prototype_data['this_player_items_index'] = $this_player_items_index; // required
+$this_prototype_data['this_player_robots_index'] = $this_player_robots_index; // required
+$this_prototype_data['this_player_robots_limit'] = -1; // required
 $this_prototype_data['this_player_mobility'] = MMRPG_WORLD_DEFAULT_MOBILITY; // required
 if (!empty($this_prototype_data['this_current_player'])){
     $this_player_token = $this_prototype_data['this_current_player'];
@@ -315,6 +316,9 @@ if (empty($this_prototype_data['this_player_items_index'])){
 // Update the player's mobility with any character-specific bonuses or contextual modifiers
 if ($this_prototype_data['this_player_token'] === 'player'){ $this_prototype_data['this_player_mobility'] = -1; }
 else { $this_prototype_data['this_player_mobility'] = MMRPG_WORLD_DEFAULT_MOBILITY; }
+// Update the player's max robots value so we can pass it off to the client-side script
+if ($this_prototype_data['this_player_token'] !== 'player'){ $this_prototype_data['this_player_robots_limit'] = $max_player_robots; }
+
 
 // Collect or define the current map token we'll be loading from
 $request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
@@ -651,8 +655,9 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
     _worldConfig.playerToken = <?= json_encode($this_prototype_data['this_player_token'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerRobots = <?= json_encode($this_prototype_data['this_player_robots'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerAbilities = <?= json_encode($this_prototype_data['this_player_abilities'], JSON_NUMERIC_CHECK) ?>;
-    _worldConfig.playerRobotsIndex = <?= json_encode($this_prototype_data['this_player_robots_index'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerItemsIndex = <?= json_encode($this_prototype_data['this_player_items_index'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerRobotsIndex = <?= json_encode($this_prototype_data['this_player_robots_index'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerRobotsLimit = <?= json_encode($this_prototype_data['this_player_robots_limit'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerHistory = <?= json_encode($world_player_session_history, JSON_NUMERIC_CHECK) ?>;
     _worldConfig.backButtonURL = 'prototype.php';
