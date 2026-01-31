@@ -3266,31 +3266,28 @@ class mmrpgWorldMap {
                     else if (activeInputs.Up || activeInputs.Down){
                         let $nextRobot = false;
                         let $focusedRobot = $robotsInFocusedDiv.filter('.' + focusedClass).first();
-                        if (!$focusedRobot.length){ $focusedRobot = $robotsInFocusedDiv.first(); }
-                        $robotsInFocusedDiv.removeClass(focusedClass);
-                        $focusedRobot.addClass(focusedClass);
-                        if (activeInputs.Up){
-                            if ($focusedRobot && $focusedRobot.length){
+                        if (!$focusedRobot || !$focusedRobot.length){
+                            $focusedRobot = activeInputs.Down ? $robotsInFocusedDiv.first() : $robotsInFocusedDiv.last();
+                            $focusedRobot.addClass(focusedClass);
+                            refreshRobotsOverviewDetailsPanel();
+                            return true;
+                            }
+                        else {
+                            if (activeInputs.Up){
                                 $nextRobot = $focusedRobot.prevAll('.team-robot:not(.hidden)').first();
+                                if (!$nextRobot || !$nextRobot.length){ $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').last(); }
                                 }
-                            if (!$nextRobot || !$nextRobot.length){
-                                $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').last();
-                                }
-                            }
-                        else if (activeInputs.Down){
-                            if ($focusedRobot && $focusedRobot.length){
+                            else if (activeInputs.Down){
                                 $nextRobot = $focusedRobot.nextAll('.team-robot:not(.hidden)').first();
+                                if (!$nextRobot || !$nextRobot.length){ $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').first(); }
                                 }
-                            if (!$nextRobot || !$nextRobot.length){
-                                $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').first();
+                            if ($nextRobot && $nextRobot.length){
+                                $robotsInFocusedDiv.removeClass(focusedClass);
+                                $nextRobot.addClass(focusedClass);
+                                refreshRobotsOverviewDetailsPanel();
+                                return true;
                                 }
                             }
-                        if ($nextRobot && $nextRobot.length){
-                            $focusedRobot.removeClass(focusedClass);
-                            $nextRobot.addClass(focusedClass);
-                            }
-                        refreshRobotsOverviewDetailsPanel();
-                        return true;
                         }
                     }
                 return;
