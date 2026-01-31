@@ -2263,6 +2263,15 @@ class mmrpgWorldMap {
                 //console.log('-> $detailsDiv = ', $detailsDiv.length, $detailsDiv);
                 //console.log('-> detailsDivExists = ', detailsDivExists);
                 //console.log('-> detailsDivSameKind = ', detailsDivSameKind);
+                // Define some reusable inline functions for less code
+                let showRobotIntroAnimation = function(){
+                    //console.log('showing intro animation for robot!');
+                    let $robotSprite = $detailsDiv.find('.image > .sprite');
+                    if (_selfRef.onRobotIntro){ clearTimeout(_selfRef.onRobotIntro); }
+                    if (_selfRef.onAfterRobotIntro){ clearTimeout(_selfRef.onAfterRobotIntro); }
+                    _selfRef.onRobotIntro = setTimeout(function(){ $robotSprite.attr('data-frame', '01'); }, 0);
+                    _selfRef.onAfterRobotIntro = setTimeout(function(){ if ($robotSprite.attr('data-frame') !== '01'){ return; } $robotSprite.attr('data-frame', '00'); }, 900);
+                    };
                 // If there isn't anything selected, we need to clear any existing details panel
                 if (!teamRobotSelected && !storageObjectSelected){
                     //console.log('%c' + '-> no objects selected, so clear any existing details panel!', 'color: orange;');
@@ -2271,8 +2280,32 @@ class mmrpgWorldMap {
                     }
                 // Else if there's a storage object selected, show the details for that object
                 else if (storageObjectSelected){
-                    //console.log('%c' + '-> storage object selected....', 'color: cyan;');
-                    if (objectKind === 'item'){
+                    //console.log('%c' + '-> storage object (' + objectKind + ') selected....', 'color: cyan;');
+                    if (objectKind === 'robot'){
+                        let robotToken = $selectedStorageObject.attr('data-robot') || false;
+                        //console.log('%c' + '-> storage robot selected (' + robotToken + '), so show its details panel!', 'color: cyan;');
+                        let detailsDivSameKind = detailsDivExists && $detailsDiv.is('[data-robot]') ? true : false;
+                        let detailsDivSameRobot = detailsDivSameKind && $detailsDiv.attr('data-robot') === robotToken ? true : false;
+                        let showIntroAnimation = !detailsDivSameKind || !detailsDivSameRobot ? true : false;
+                        //console.log('detailsDivSameKind =', detailsDivSameKind);
+                        //console.log('detailsDivSameRobot =', detailsDivSameRobot);
+                        //console.log('showIntroAnimation =', showIntroAnimation);
+                        if (!detailsDivExists || !detailsDivSameKind){
+                            //console.log('-> populate new details div for robotToken =', robotToken);
+                            if (detailsDivExists){ $detailsDiv.remove(); }
+                            let robotMarkup = _self.getRobotDetailsMarkupForOverview(robotToken) || false;
+                            if (!robotMarkup || !robotMarkup.length){ return false; }
+                            $storageObjectsDiv.append(robotMarkup);
+                            $detailsDiv = $storageObjectsDiv.find('> .details');
+                            } else {
+                            //console.log('-> refresh existing details div for robotToken =', robotToken);
+                            let robotDetails = _self.getRobotDetailsForOverview(robotToken) || false;
+                            if (!robotDetails || !Object.keys(robotDetails).length){ return false; }
+                            _self.replaceRobotDetailsInOverview($detailsDiv, robotToken, robotDetails);
+                            }
+                        if (showIntroAnimation){ showRobotIntroAnimation(); }
+                        }
+                    else if (objectKind === 'item'){
                         let itemToken = $selectedStorageObject.attr('data-item') || false;
                         //console.log('%c' + '-> storage object is an item (' + itemToken + '), so show its details panel!', 'color: cyan;');
                         let detailsDivSameKind = detailsDivExists && $detailsDiv.is('[data-item]') ? true : false;
@@ -2282,6 +2315,7 @@ class mmrpgWorldMap {
                             let itemMarkup = _self.getItemDetailsMarkupForOverview(itemToken, teamRobotSelected) || false;
                             if (!itemMarkup || !itemMarkup.length){ return false; }
                             $storageObjectsDiv.append(itemMarkup);
+                            $detailsDiv = $storageObjectsDiv.find('> .details');
                             } else {
                             //console.log('-> refresh existing details div for itemToken =', itemToken);
                             let itemDetails = _self.getItemDetailsForOverview(itemToken, teamRobotSelected) || false;
@@ -2299,6 +2333,7 @@ class mmrpgWorldMap {
                             let abilityMarkup = _self.getAbilityDetailsMarkupForOverview(abilityToken, teamRobotSelected) || false;
                             if (!abilityMarkup || !abilityMarkup.length){ return false; }
                             $storageObjectsDiv.append(abilityMarkup);
+                            $detailsDiv = $storageObjectsDiv.find('> .details');
                             } else {
                             //console.log('-> populate existing details div for abilityToken =', abilityToken);
                             let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken, teamRobotSelected) || false;
@@ -2312,18 +2347,25 @@ class mmrpgWorldMap {
                     let robotToken = $selectedTeamRobot.attr('data-robot') || false;
                     //console.log('%c' + '-> team robot selected (' + robotToken + '), so show its details panel!', 'color: cyan;');
                     let detailsDivSameKind = detailsDivExists && $detailsDiv.is('[data-robot]') ? true : false;
+                    let detailsDivSameRobot = detailsDivSameKind && $detailsDiv.attr('data-robot') === robotToken ? true : false;
+                    let showIntroAnimation = !detailsDivSameKind || !detailsDivSameRobot ? true : false;
+                    //console.log('detailsDivSameKind =', detailsDivSameKind);
+                    //console.log('detailsDivSameRobot =', detailsDivSameRobot);
+                    //console.log('showIntroAnimation =', showIntroAnimation);
                     if (!detailsDivExists || !detailsDivSameKind){
                         //console.log('-> populate new details div for robotToken =', robotToken);
                         if (detailsDivExists){ $detailsDiv.remove(); }
                         let robotMarkup = _self.getRobotDetailsMarkupForOverview(robotToken) || false;
                         if (!robotMarkup || !robotMarkup.length){ return false; }
                         $storageObjectsDiv.append(robotMarkup);
+                        $detailsDiv = $storageObjectsDiv.find('> .details');
                         } else {
                         //console.log('-> refresh existing details div for robotToken =', robotToken);
                         let robotDetails = _self.getRobotDetailsForOverview(robotToken) || false;
                         if (!robotDetails || !Object.keys(robotDetails).length){ return false; }
                         _self.replaceRobotDetailsInOverview($detailsDiv, robotToken, robotDetails);
                         }
+                    if (showIntroAnimation){ showRobotIntroAnimation(); }
                     }
                 //console.warn('TODO: check selected objects and show/hide details panel as needed!');
                 // Return true on success
@@ -2396,6 +2438,16 @@ class mmrpgWorldMap {
                 // Return true on success
                 return true;
                 });
+            // Make sure hovering over the robot sprite shifts its pose for a bit of animation
+            let updateRobotImageFrame = function(image, newFrame, onlyWhen){
+                if (_self.worldIsBusy()){ return; }
+                let $image = $(image), $sprite = $image.find('> .sprite'), frame = $sprite.attr('data-frame');
+                if (Array.isArray(onlyWhen) && onlyWhen.indexOf(frame) === -1){ return; }
+                $sprite.attr('data-frame', newFrame);
+                };
+            $storageBoxDivs.delegate('.details[data-robot] > .image', 'click', function(e){ updateRobotImageFrame(this, '02'); }); // victory on click
+            $storageBoxDivs.delegate('.details[data-robot] > .image', 'mouseenter', function(e){ updateRobotImageFrame(this, '08'); }); // defend on hover
+            $storageBoxDivs.delegate('.details[data-robot] > .image', 'mouseleave', function(e){ updateRobotImageFrame(this, '00', ['02', '08']); }); // base on reset
             // Make sure clicking relevant areas in the robot details triggers relevant functionality
             // - make sure clicking the item slot (empty or not) quick-swaps to the items tab
             // - make sure clicking the support tab ?????? (for now just show console.warn of TODO)

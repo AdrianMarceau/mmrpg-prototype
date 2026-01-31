@@ -2604,7 +2604,10 @@ html, body {
     line-height: 1.1;
     font-weight: bold;
     color: #efefef;
-    max-width: calc(100% - 80px);
+    max-width: calc(100% - 30px);
+}
+#robots-overview .storage-box > .details[data-robot] .subtitle .name {
+    max-width: calc(100% - 70px);
 }
 #robots-overview .storage-box > .details .subtitle .quantity,
 #robots-overview .storage-box > .details .subtitle .cost,
@@ -2955,7 +2958,7 @@ html, body {
 }
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities {
     padding-top: 4px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .label {
     display: block;
@@ -3408,7 +3411,8 @@ display: block;
     line-height: 13px;
     color: #ffffff;
 }
-#world #canvas #robots-overview.expanded .team-robot.equipped > .label .lvl:after {
+#world #canvas #robots-overview.expanded .team-robot.equipped > .label .lvl:after,
+#world #canvas #robots-overview.expanded .storage-robots .team-robot.current > .label .lvl:after {
     display: block;
     content: "\002713";
     background-color: #0a0a0a;
