@@ -241,18 +241,22 @@ elseif (!empty($WORLD_PLAYER_SESSION['last_robots'])){
     $last_robots = explode(',', $WORLD_PLAYER_SESSION['last_robots']);
     $current_player_robots += array_map(function($r){ return explode('_', $r, 2)[1]; }, $last_robots);
 }
-if (!empty($allowed_player_robots)
-    && (count($current_player_robots) < $max_player_robots
-        || count($current_player_robots) > $max_player_robots)){
-    //error_log('Because $current_player_robots = '. print_r($current_player_robots, true));
-    //error_log('Adding from $allowed_player_robots = '. print_r($allowed_player_robots, true));
-    //error_log('-> count($current_player_robots)='.count($current_player_robots).' < $max_player_robots='.$max_player_robots);
-    $slots_open = $max_player_robots - count($current_player_robots);
-    $robots_not_yet_included = array_diff($allowed_player_robots, $current_player_robots);
-    $current_player_robots = array_merge($current_player_robots, array_slice($robots_not_yet_included, 0, $slots_open));
-    //error_log('-> $slots_open = '. print_r($slots_open, true));
-    //error_log('-> $robots_not_yet_included = '. print_r($robots_not_yet_included, true));
-    //error_log('-> new $current_player_robots = '. print_r($current_player_robots, true));
+if (!empty($allowed_player_robots)){
+    if (empty($current_player_robots)){
+        //error_log('Because empty $current_player_robots = '. print_r($current_player_robots, true));
+        //error_log('Adding from $allowed_player_robots = '. print_r($allowed_player_robots, true));
+        //error_log('-> count($current_player_robots)='.count($current_player_robots).' < $max_player_robots='.$max_player_robots);
+        $slots_open = $max_player_robots - count($current_player_robots);
+        $robots_not_yet_included = array_diff($allowed_player_robots, $current_player_robots);
+        $current_player_robots = array_merge($current_player_robots, array_slice($robots_not_yet_included, 0, $slots_open));
+        //error_log('-> $slots_open = '. print_r($slots_open, true));
+        //error_log('-> $robots_not_yet_included = '. print_r($robots_not_yet_included, true));
+        //error_log('-> new $current_player_robots = '. print_r($current_player_robots, true));
+    } elseif (count($current_player_robots) > $max_player_robots){
+        //error_log('Because too many $current_player_robots = '. print_r($current_player_robots, true));
+        $current_player_robots = array_slice(0, $max_player_robots);
+        //error_log('-> new $current_player_robots = '. print_r($current_player_robots, true));
+    }
 }
 if (!empty($current_player_robots) && !empty($allowed_player_robots)){
     $index_tokens_required = array_values(array_unique(array_merge($current_player_robots, $allowed_player_robots)));
