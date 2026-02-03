@@ -265,17 +265,32 @@ class rpg_world {
                 $lastPlayerSession['last_direction'] = $worldData['lastPlayerDirection'];
                 $cursorPlayerSession['last_direction'] = $worldData['lastPlayerDirection'];
             }
+            // If the last player team was provided, update it to the world session
+            if (!empty($worldData['lastPlayerTeam'])){
+                // collect the new list of team robots and save to session if valid
+                $lastPlayerTeam = $worldData['lastPlayerTeam'];
+                //error_log('$lastPlayerTeam = '. print_r($lastPlayerTeam, true));
+                if (!empty($lastPlayerTeam)){
+                    $old_last_robots = !empty($lastPlayerSession['last_robots']) ? explode(',', $lastPlayerSession['last_robots']) : array();
+                    $new_last_robots = !empty($lastPlayerTeam) ? array_values($lastPlayerTeam) : array();
+                    //error_log('$old_last_robots = '. print_r($old_last_robots, true));
+                    //error_log('$new_last_robots = '. print_r($new_last_robots, true));
+                    $lastPlayerSession['last_robots'] = implode(',', $new_last_robots);
+                }
+            }
             // If the last player robots were provided, update their world sessions
             if (!empty($worldData['lastPlayerRobots'])){
                 // scan the player robots for changes in: energy, weapons, attack, defense, speed
                 $lastPlayerRobots = $worldData['lastPlayerRobots'];
                 if (!empty($lastPlayerRobots)){
+                    /*
                     $old_last_robots = !empty($lastPlayerSession['last_robots']) ? explode(',', $lastPlayerSession['last_robots']) : array();
                     $new_last_robots = !empty($lastPlayerRobots) ? array_keys($lastPlayerRobots) : array();
                     //error_log('$old_last_robots = '. print_r($old_last_robots, true));
                     //error_log('$new_last_robots = '. print_r($new_last_robots, true));
-                    // update the player's last robots string and then any relevant session values per-robot
                     $lastPlayerSession['last_robots'] = implode(',', $new_last_robots);
+                    */
+                    // update the player's last robots string and then any relevant session values per-robot
                     foreach ($lastPlayerRobots AS $key => $data){
                         //error_log('-> checking robot key "'.$key.'"');
                         if (!strstr($key, '_')){ continue; }
@@ -2184,7 +2199,7 @@ class rpg_world {
                 $robot_core_key = array_search($robot_core1, array_keys($mmrpg_index_types));
                 $robot_storage_key = array_search($robot_token, $recent_storage_robot_tokens);
                 if (!empty($robot_core2)){ $robot_core_key += (array_search($robot_core2, array_keys($mmrpg_index_types)) / 100); }
-                $robot_sprite = self::get_sprite('robot', $robot_image, '', 'right', 'character', '');
+                $robot_sprite = self::get_sprite('robot', $robot_image, '', 'left', 'character', '');
                 $item_sprite = !empty($robot_item) ? self::get_sprite('item', $robot_item, '', 'right', 'holding', '', '', 'icon') : '';
                 $robot_current = in_array($robot_token, $current_robot_tokens) ? true : false;
                 $robot_disabled = empty($robot_overview['energy']) ? true : false;
