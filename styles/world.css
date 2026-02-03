@@ -2544,7 +2544,14 @@ html, body {
     bottom: 0;
     filter: brightness(0.8);
     background-position: 0px -9px;
+    transition: none;
 }
+
+#robots-overview .storage-box > .details .image.animate:before { transition: filter 0.9s; }
+#robots-overview .storage-box > .details .image.animate:after { transition: background-position 0.9s, filter 0.9s; }
+#robots-overview .storage-box > .details .image.inactive:before { filter: brightness(0.4); }
+#robots-overview .storage-box > .details .image.inactive:after { background-position: -160px -9px; filter: brightness(0.6); }
+
 #world #robots-overview .storage-box > .details .image > .sprite {
     position: absolute;
     z-index: 3;
@@ -3655,16 +3662,32 @@ display: block;
     animation: robots-overview-stat-breaked 2s linear forwards;
 }
 
-@keyframes robots-overview-item-given {
+@keyframes robots-overview-avatar-zoom-in {
     0% { transform: scale(1.0); filter: brightness(1.0); }
     50% { transform: scale(1.2); filter: brightness(1.2) saturate(1.1); }
     100% { transform: scale(1.0); filter: brightness(1.0); }
 }
+@keyframes robots-overview-avatar-zoom-out {
+    0% { transform: scale(1.0); filter: brightness(1.0); }
+    50% { transform: scale(0.9); filter: brightness(0.9) saturate(1.1); }
+    100% { transform: scale(1.0); filter: brightness(1.0); }
+}
+#world #canvas #robots-overview .team-robot.robot-added,
+#world #canvas #robots-overview .team-robot.ability-equipped,
+#world #canvas #robots-overview .team-robot.ability-swapped,
 #world #canvas #robots-overview .team-robot.item-given {
     transform-origin: left center;
     transform: scale(1.0);
     filter: brightness(1.0);
-    animation: robots-overview-item-given 1s ease-in-out forwards;
+    animation: robots-overview-avatar-zoom-in 0.9s ease-in-out forwards;
+}
+#world #canvas #robots-overview .team-robot.robot-removed,
+#world #canvas #robots-overview .team-robot.ability-removed,
+#world #canvas #robots-overview .team-robot.item-taken {
+    transform-origin: left center;
+    transform: scale(1.0);
+    filter: brightness(1.0);
+    animation: robots-overview-avatar-zoom-out 0.6s ease-in-out forwards;
 }
 
 #world #canvas #robots-overview .team-robot:nth-child(1) { z-index: 10; }

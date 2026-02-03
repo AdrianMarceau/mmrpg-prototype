@@ -115,6 +115,7 @@ gameSettings.worldState = {
         token: 'player',
         position: '0-0',
         direction: '',
+        team: [],
         robots: {},
         items: {},
         abilities: {},
@@ -124,6 +125,7 @@ gameSettings.worldState = {
     buttons: {},
     switches: {},
     symbols: {},
+    callbacks: {},
     layersIndex: {},
     layerTilesIndex: {},
     layerTileOffsets: {},
@@ -437,6 +439,7 @@ class mmrpgWorldMap {
         let _playerRobotsIndex = _config.playerRobotsIndex;
         if (_playerRobots.length && Object.keys(_playerRobotsIndex).length){
             //console.log('---> initWorldMap() found ' + _playerRobots.length + ' player robots to initialize!');
+            let livePlayerTeam = [];
             let livePlayerRobots = {};
             for (var i = 0; i < _playerRobots.length; i++){
                 let robotString = _playerRobots[i];
@@ -447,10 +450,14 @@ class mmrpgWorldMap {
                     }
                 //console.log('---> adding robot #' + i + ' w/ robotString = ' + robotString);
                 let liveRobotInfo = _self.getClonedObject(robotInfo); // clone the info object
+                livePlayerTeam.push(robotString);
                 livePlayerRobots[robotString] = liveRobotInfo;
                 }
+            _worldPlayer.team = livePlayerTeam;
             _worldPlayer.robots = livePlayerRobots;
             //console.log('---> initWorldMap() livePlayerRobots =', livePlayerRobots);
+            //console.log('---> initWorldMap() _worldPlayer.team =', _worldPlayer.team);
+            //console.log('---> initWorldMap() _worldPlayer.robots =', _worldPlayer.robots);
             }
         // If player abilities were defined [list] in the predefined config, copy them over to the state
         let _playerAbilities = _config.playerAbilities;
@@ -1471,6 +1478,7 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let _worldCursor = _world.cursor;
         let _worldPlayer = _world.player;
+        let _worldPlayerTeam = _worldPlayer.team;
         let _worldPlayerRobots = _worldPlayer.robots;
         let $sideButtons = _elements.sideButtons;
         let $sideButtonsWrapper = $('> .wrapper', $sideButtons);
@@ -2099,6 +2107,7 @@ class mmrpgWorldMap {
             // Define a function for refreshing the object refs of the robots in the team and storage panels
             let refreshRobotRefs = function(){
                 //console.log('%c' + '-> refreshRobotRefs() triggered', 'color: magenta;');
+                $robotsOnMap = $teamSprites.filter('.robot:not(.cursor)');
                 $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
                 $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
                 };
@@ -2573,25 +2582,21 @@ class mmrpgWorldMap {
                     if (_self.worldIsBusy()){ return false; }
                     if (_self.worldMapIsHidden()){ return false; }
                     //console.log('%c' + 'Team rotate button clicked!', 'color: cyan;');
+                    let _worldPlayerTeam = _worldPlayer.team;
+                    if (_worldPlayerTeam.length < 2){ return; } // nothing to rotate
                     // First we rotate the actual robot data in the world state by one position (if allowed)
-                    let playerRobotKeys = Object.keys(_worldPlayerRobots);
-                    //console.log('-> playerRobotKeys =', playerRobotKeys);
-                    if (playerRobotKeys.length < 2){ return; } // nothing to rotate
-                    //console.log('-> _worldPlayerRobots(keys)(before) =', playerRobotKeys);
-                    _self.playSoundEffect('switch-in');
-                    let firstRobotKey = playerRobotKeys[0];
-                    let firstPlayerRobot = _worldPlayerRobots[firstRobotKey];
-                    //console.log('-> firstRobotKey =', firstRobotKey);
-                    //console.log('-> firstPlayerRobot =', firstPlayerRobot);
-                    delete _worldPlayerRobots[firstRobotKey];
-                    _worldPlayerRobots[firstRobotKey] = firstPlayerRobot;
-                    playerRobotKeys = Object.keys(_worldPlayerRobots);
-                    //console.log('-> _worldPlayerRobots(keys)(after) =', playerRobotKeys);
+                    //console.log('-> _worldPlayerTeam(before) =', _worldPlayerTeam.join(', '));
+                    let firstRobotKey = _worldPlayerTeam.shift();
+                    _worldPlayerTeam.push(firstRobotKey);
+                    //console.log('-> _worldPlayerTeam(after) =', _worldPlayerTeam);
+                    //console.log('-> _worldPlayer.team(after) =', _worldPlayer.team);
                     // Now we rotate the robots in the overview by moving the first robot to the end of the list
                     refreshRobotRefs();
                     let $firstOverviewRobot = $teamRobotsInOverview.first();
                     //console.log('-> $firstOverviewRobot =', $firstOverviewRobot);
                     $firstOverviewRobot.appendTo($teamRobotsWrapper);
+                    // Play a sound effect to go along with the adding
+                    _self.playSoundEffect('switch-in');
                     // Re-collect the team robots in overview so we have the new order
                     refreshRobotRefs();
                     let newTeamRobotKeys = [];
@@ -2673,6 +2678,29 @@ class mmrpgWorldMap {
                         $selectedStorageRobot.removeClass('selected');
                         refreshDetailsPanel();
                         }
+                    return true;
+                    });
+                // add functionality to the action buttons within robot details panels
+                $storageRobotsDiv.delegate('.button[data-action]', 'click', function(e){
+                    //console.log('%c' + 'Storage robot details button clicked!', 'color: cyan;');
+                    e.preventDefault();
+                    let $actionButton = $(this);
+                    let actionToken = $actionButton.attr('data-action');
+                    //console.log('-> actionToken =', actionToken);
+                    let $detailsDiv = $robotsOverview.find('.details[data-robot]');
+                    //console.log('-> $detailsDiv =', $detailsDiv.length, $detailsDiv);
+                    if (!$detailsDiv.is('[data-robot]')){ return; }
+                    let robotToken = $detailsDiv.attr('data-robot');
+                    //console.log('-> robotToken =', robotToken);
+                    let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                    let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
+                    //console.log('-> targetRobotToken =', targetRobotToken);
+                    let autoClickAction = function(){ $actionButton.addClass('clicked'); };
+                    let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
+                    if (actionToken === 'add-robot'){ autoClickAction(); _self.showAddRobotModal(robotToken, actionModalConfig); }
+                    else if (actionToken === 'remove-robot'){ autoClickAction(); _self.showRemoveRobotModal(robotToken, actionModalConfig); }
+                    else { console.warn('-> undefined robot action "', actionToken, '", ignoring input'); return false; }
+                    // Return true on success
                     return true;
                     });
                 // if the storage tray is open, clicking a robot in the storage-list clones it to the selected team-robot slot
@@ -4477,6 +4505,7 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let _worldCursor = _world.cursor;
         let _worldPlayer = _world.player;
+        let _worldPlayerTeam = _worldPlayer.team;
         let _worldPlayerRobots = _worldPlayer.robots;
         let _worldPlayerRobotsKeys = Object.keys(_worldPlayerRobots);
         let _worldSymbols = _world.symbols;
@@ -5288,17 +5317,7 @@ class mmrpgWorldMap {
                         alert('Battle ID: ' + battleId + '\n\nThis is where you would show battle details.');
                         }
                     else if (action === 'start-battle'){
-                        //console.log('-> starting battle with ID ' + battleId + '!');
-                        _worldPlayerRobotsKeys = Object.keys(_worldPlayerRobots); // refresh in case changed
-                        //console.log('_worldPlayerRobots = ', _worldPlayerRobots);
-                        //console.log('_worldPlayerRobotsKeys = ', _worldPlayerRobotsKeys);
-                        let activeRobots = [];
-                        for (let i = 0; i < _worldPlayerRobotsKeys.length; i++){
-                            let token = _worldPlayerRobotsKeys[i];
-                            let info = _worldPlayerRobots[token] || false;
-                            if (!info || info.disabled){ continue; }
-                            activeRobots.push(token);
-                            }
+                        let activeRobots = Object.values(_worldPlayerTeam);
                         //console.log('activeRobots = ', activeRobots);
                         _self.playSoundEffect('lets-go-robots');
                         let battleVars = [];
@@ -6248,6 +6267,7 @@ class mmrpgWorldMap {
         let _worldSymbols = _world.symbols;
         let $thisWorld = _elements.world;
         let lastPlayer = _worldPlayer.token;
+        let lastPlayerTeam = _worldPlayer.team;
         let lastPlayerRobots = _worldPlayer.robots;
         let lastPlayerAbilities = _worldPlayer.abilities;
         let lastPlayerItems = _worldPlayer.items;
@@ -6262,6 +6282,7 @@ class mmrpgWorldMap {
         let lastWorldSymbols = {}; lastWorldSymbols[lastPlayerWorldMap] = _worldSymbols;
         let worldData = {
             lastPlayer,
+            lastPlayerTeam,
             lastPlayerRobots,
             lastPlayerAbilities,
             lastPlayerItems,
@@ -7523,6 +7544,217 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Quick function for adding a given storage robot to the team and then optionally playing a sound effect
+    addTeamRobot(robotString, playSound, playAnimation){
+        //console.log('%c' + 'mmrpgWorldMap.addTeamRobot(robot:' + robotString + ', sound:' + playSound + ', animate:' + playAnimation + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('addTeamRobot() missing required robotString!'); return false; }
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        if (typeof playAnimation !== 'boolean'){ playAnimation = true; } // default to true if not provided
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerTeam = _worldPlayer.team;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        let _worldCallbacks = _world.callbacks;
+        // If this robot is already actually on the team, return now
+        if (_worldPlayerTeam.indexOf(robotString) !== -1){
+            console.warn('addTeamRobot() called but robot ' + robotString + ' is already on the team!');
+            return false;
+            }
+        // Break the robot string into ID and token and collect its info
+        let _indexes = _self.indexes;
+        let _mmrpgRobotsIndex = _indexes.robots;
+        let _playerRobotsIndex = _config.playerRobotsIndex;
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _mmrpgRobotsIndex[robotToken] || false;
+        let robotData = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('addTeamRobot() could not find robot info for robot ' + robotToken + '!'); return false; }
+        if (!robotData){ robotData = _self.getClonedObject(_playerRobotsIndex[robotString]); _worldPlayerRobots[robotString] = robotData; }
+        //console.log('-> robotString =', robotString);
+        //console.log('-> robotId =', robotId, '-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        //console.log('-> robotData =', robotData);
+        // Add this robot's string to the team array first
+        //console.log('-> old _worldPlayerTeam =', _worldPlayerTeam.join(', '));
+        _worldPlayerTeam.push(robotString);
+        _worldPlayerTeam = Object.values(_worldPlayerTeam);
+        //console.log('-> new _worldPlayerTeam =', _worldPlayerTeam.join(', '));
+        _worldPlayer.team = _worldPlayerTeam;
+        //console.log('-> _worldPlayer.team =', _worldPlayer.team);
+        // Collect a reference to this robot's element in the overview panel
+        let $robotsOverview = _elements.robotsOverview;
+        let $teamRobotsDiv = $robotsOverview.find('.team-robots');
+        let $storageRobotsDiv = $robotsOverview.find('.storage-robots');
+        let $selectedStorageRobot = $storageRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
+        if (!$selectedStorageRobot || !$selectedStorageRobot.length){ console.warn('addTeamRobot() could not find storage robot div for ' + robotString + '!'); return false; }
+        let $robotDetailsDiv = $robotsOverview.find('.details[data-robot="' + robotString + '"]');
+        let $detailsImage = $robotDetailsDiv.find('.image');
+        let $detailsImageSprite = $detailsImage.find('> .sprite.robot');
+        // Add the robot to the team view so it's visible to the player
+        let $newTeamRobot = $('<div class="team-robot">' + $selectedStorageRobot.html() + '</div>');
+        $newTeamRobot.attr('data-robot', robotString).attr('data-status', robotData.energyRating);
+        $teamRobotsDiv.attr('data-team-size', _worldPlayerTeam.length);
+        $('> .wrapper', $teamRobotsDiv).append($newTeamRobot);
+        // Re-collect a reference to make sure it was actually created properly
+        $newTeamRobot = $teamRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
+        if (!$newTeamRobot || !$newTeamRobot.length){ console.warn('addTeamRobot() could not create team robot div for ' + robotString + '!'); return false; }
+        // Add the current class from the storage robot and update the frame
+        $newTeamRobot.addClass('selected');
+        $newTeamRobot.find('.icon > .sprite.robot').attr('data-dir', 'right').attr('data-frame', '01');
+        $selectedStorageRobot.addClass('current').removeClass('selected');
+        $selectedStorageRobot.find('.icon > .sprite.robot').attr('data-dir', 'left').attr('data-frame', '01');
+        // Add a robot-given class to this robot to show it being effected by the action
+        if (playSound){ _self.playSoundEffect('bounce-sound'); }
+        if (playAnimation){
+            // Add the robot-added animation class for the avatar then auto-remove later
+            $newTeamRobot.addClass('robot-added');
+            setTimeout(function(){ $newTeamRobot.removeClass('robot-added'); }, 2000);
+            // Now shift the background while making the robot appear to slide into the team view
+            let _selfRef = _self.addTeamRobot, _relRef = _self.removeTeamRobot;
+            if (_relRef.callback){ clearTimeout(_relRef.callback); delete _relRef.callback; }
+            if (_selfRef.callback){ clearTimeout(_selfRef.callback); delete _selfRef.callback; }
+            _selfRef.callback = setTimeout(function(){
+                if (!_selfRef.callback){ return; }
+                $detailsImage.addClass('animate').removeClass('inactive');
+                $detailsImageSprite.attr('data-frame', '07');
+                setTimeout(function(){
+                    if (!_selfRef.callback){ return; }
+                    $detailsImageSprite.attr('data-frame', '08');
+                    setTimeout(function(){
+                        if (!_selfRef.callback){ return; }
+                        $detailsImageSprite.attr('data-frame', '00');
+                        }, 1000);
+                    }, 600);
+                }, 10);
+            }
+        // Add the robot to the world map with the others on this team
+        let $canvasMap = $('#map', $thisCanvas);
+        let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap);
+        let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
+        let $teamPlayerSprite = $spriteObjectsLayer.find('.sprite[data-sprite="team-player"]').first();
+        let $newRobotSprite = null, newSpriteMarkup = _self.getRobotSpriteMarkup(robotString);
+        if (newSpriteMarkup){
+            let newRobotOffsets = {
+                top: (parseInt($teamPlayerSprite.css('top')) - 4) + 'px',
+                left: (parseInt($teamPlayerSprite.css('left')) - 8) + 'px',
+                zIndex: (parseInt($teamPlayerSprite.css('z-index')) - 4)
+                };
+            //console.log('newRobotOffsets =', newRobotOffsets);
+            $newRobotSprite = $(newSpriteMarkup);
+            $newRobotSprite.addClass('team bounce').css(newRobotOffsets);
+            $newRobotSprite.attr('data-sprite', 'team-robot').attr('data-id', robotId).attr('data-token', robotToken);
+            $spriteObjectsLayer.append($newRobotSprite);
+            _elements.teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap);
+            }
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState();
+        // Return true on success
+        return true;
+        }
+
+    // Quick function for removing a given robot from the team and then optionally playing a sound effect
+    removeTeamRobot(robotString, playSound, playAnimation){
+        //console.log('%c' + 'mmrpgWorldMap.removeTeamRobot(robot:' + robotString + ', sound:' + playSound + ', animate:' + playAnimation + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('removeTeamRobot() missing required robotString!'); return false; }
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        if (typeof playAnimation !== 'boolean'){ playAnimation = true; } // default to true if not provided
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerTeam = _worldPlayer.team;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        let _worldCallbacks = _world.callbacks;
+        // If this robot isn't actually on the team, return now
+        if (_worldPlayerTeam.indexOf(robotString) === -1){
+            console.warn('removeTeamRobot() called but robot ' + robotString + ' is not on the team!');
+            return false;
+            }
+        // Break the robot string into ID and token and collect its info
+        let _indexes = _self.indexes;
+        let _mmrpgRobotsIndex = _indexes.robots;
+        let robotKey = _worldPlayerTeam.indexOf(robotString);
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _mmrpgRobotsIndex[robotToken] || false;
+        let robotData = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('removeTeamRobot() could not find robot info for robot ' + robotToken + '!'); return false; }
+        if (!robotData){ console.error('removeTeamRobot() could not find robot info for robot ' + robotData + '!'); return false; }
+        //console.log('-> robotString =', robotString);
+        //console.log('-> robotKey =', robotKey, '-> robotId =', robotId, '-> robotToken =', robotToken);
+        //console.log('-> robotInfo =', robotInfo);
+        //console.log('-> robotData =', robotData);
+        // Remove this robot's string from the team array first
+        //console.log('-> old _worldPlayerTeam =', _worldPlayerTeam.join(', '));
+        delete _worldPlayerTeam[robotKey];
+        _worldPlayerTeam = Object.values(_worldPlayerTeam);
+        //console.log('-> new _worldPlayerTeam =', _worldPlayerTeam.join(', '));
+        _worldPlayer.team = _worldPlayerTeam;
+        //console.log('-> _worldPlayer.team =', _worldPlayer.team);
+        // Collect a reference to this robot's element in the overview panel
+        let $robotsOverview = _elements.robotsOverview;
+        let $teamRobotsDiv = $robotsOverview.find('.team-robots');
+        let $selectedTeamRobot = $teamRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
+        if (!$selectedTeamRobot || !$selectedTeamRobot.length){ console.warn('removeTeamRobot() could not find team robot div for ' + robotString + '!'); return false; }
+        let $storageRobotsDiv = $robotsOverview.find('.storage-robots');
+        let $selectedStorageRobot = $storageRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
+        if (!$selectedStorageRobot || !$selectedStorageRobot.length){ console.warn('removeTeamRobot() could not find storage robot div for ' + robotString + '!'); return false; }
+        let $robotDetailsDiv = $robotsOverview.find('.details[data-robot="' + robotString + '"]');
+        let $detailsImage = $robotDetailsDiv.find('.image');
+        let $detailsImageSprite = $detailsImage.find('> .sprite.robot');
+        // Remove the robot from the team view as that's not needed anymore
+        $selectedTeamRobot.remove();
+        $teamRobotsDiv.attr('data-team-size', _worldPlayerTeam.length);
+        // Remove the current class from the storage robot and update the frame
+        $selectedStorageRobot.removeClass('current').addClass('selected');
+        $selectedStorageRobot.find('.icon > .sprite.robot').attr('data-dir', 'left').attr('data-frame', '00');
+        // Add a robot-given class to this robot to show it being effected by the action
+        if (playSound){ _self.playSoundEffect('bounce-sound'); }
+        if (playAnimation){
+            // Add the robot-removed animation class for the avatar then auto-remove later
+            $selectedStorageRobot.addClass('robot-removed');
+            setTimeout(function(){ $selectedStorageRobot.removeClass('robot-removed'); }, 2000);
+            // Now shift the background while making the robot appear to slide away from the team
+            let _selfRef = _self.removeTeamRobot, _relRef = _self.addTeamRobot;
+            if (_relRef.callback){ clearTimeout(_relRef.callback); delete _relRef.callback; }
+            if (_selfRef.callback){ clearTimeout(_selfRef.callback); delete _selfRef.callback; }
+            _selfRef.callback = setTimeout(function(){
+                if (!_selfRef.callback){ return; }
+                $detailsImage.addClass('animate').addClass('inactive');
+                $detailsImageSprite.attr('data-dir', 'right').attr('data-frame', '07');
+                setTimeout(function(){
+                    if (!_selfRef.callback){ return; }
+                    $detailsImageSprite.attr('data-frame', '08');
+                    setTimeout(function(){
+                        if (!_selfRef.callback){ return; }
+                        $detailsImageSprite.attr('data-dir', 'left');
+                        setTimeout(function(){
+                            if (!_selfRef.callback){ return; }
+                            $detailsImageSprite.attr('data-frame', '00');
+                            }, 400);
+                        }, 600);
+                    }, 600);
+                }, 10);
+            }
+        // Remove this robot from the world map as it's no longer on the team
+        let $canvasMap = $('#map', $thisCanvas);
+        let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap);
+        let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
+        let $selectedMapRobot = $spriteObjectsLayer.find('.sprite[data-sprite="team-robot"][data-id="' + robotId + '"][data-token="' + robotToken + '"]');
+        $selectedMapRobot.animate({opacity: 0}, 300, function(){ $selectedMapRobot.remove(); });
+        _elements.teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap);
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState();
+        // Return true on success
+        return true;
+        }
+
     // Quick function for giving a given robot a new hold item and then optionally playing a sound effect
     takeRobotItem(robotString, playSound, playAnimation){
         //console.log('%c' + 'mmrpgWorldMap.takeRobotItem(robot:' + robotString + ', sound:' + playSound + ', animate:' + playAnimation + ')', 'color: magenta;');
@@ -8336,12 +8568,12 @@ class mmrpgWorldMap {
         let _worldPlayerRobots = _worldPlayer.robots;
         let _playerRobotsIndex = _config.playerRobotsIndex;
         let playerRobotInfo = false;
-        let playerRobotsCurrent = Object.keys(_worldPlayerRobots).slice(0, 8);
+        let playerRobotsCurrent = _worldPlayer.team;
         if (typeof _worldPlayerRobots[playerRobotToken] !== 'undefined'){
             playerRobotInfo = _worldPlayerRobots[playerRobotToken];
             } else if (typeof _playerRobotsIndex[playerRobotToken] !== 'undefined'){
             playerRobotInfo = _self.getClonedObject(_playerRobotsIndex[playerRobotToken]);
-            _worldPlayerRobots[playerRobotToken] = playerRobotInfo;
+            //_worldPlayerRobots[playerRobotToken] = playerRobotInfo; // removed: no need to save unless we actually swap
             } else {
             console.error('getRobotDetailsForOverview() could not find player robot info for token ' + playerRobotToken + '!');
             return false;
@@ -8423,7 +8655,7 @@ class mmrpgWorldMap {
         let robotSpeed = playerRobotInfo.speed || 0;
         let robotSpeedMods = playerRobotInfo.speedMods || 0;
         let robotDisabled = playerRobotInfo.disabled === true ? true : false;
-        let robotCurrent = playerRobotsCurrent.indexOf(playerRobotToken) !== -1 ? true : false;
+        let robotIsCurrent = playerRobotsCurrent.indexOf(playerRobotToken) !== -1 ? true : false;
         let robotItem = playerRobotInfo.item || '';
         let robotItemInfo = robotItem && typeof _mmrpgItemsIndex[robotItem] !== 'undefined' ? _mmrpgItemsIndex[robotItem] : false;
         let robotSupport = playerRobotInfo.support ? playerRobotInfo.support : (robotIndexInfo.support ? robotIndexInfo.support : '');
@@ -8447,6 +8679,7 @@ class mmrpgWorldMap {
         //console.log('--> robotSupportInfo =', robotSupportInfo);
         //console.log('--> robotSupportEquipped =', robotSupportEquipped);
         //console.log('--> robotDisabled =', robotDisabled);
+        //console.log('--> robotIsCurrent =', robotIsCurrent);
 
         // Generate type-related markup and spans for use later
         let statTokens = ['attack', 'defense', 'speed'];
@@ -8454,6 +8687,7 @@ class mmrpgWorldMap {
         let weaknessTokens = ['weaknesses', 'resistances', 'affinities', 'immunities'];
         let robotCoreName = (robotCoreName1 + (robotCoreName2 ? (' / ' + robotCoreName2) : '')) + ' Core';
         let robotCoreClasses = (robotCore2 && robotCore1 === 'none' ? robotCore2 : (robotCore1 + (robotCore2 ? '_' + robotCore2 : '')));
+        if (!robotIsCurrent){ robotCoreClasses += ' inactive'; }
         //console.log('--> statTokens =', statTokens);
         //console.log('--> robotCoreName =', robotCoreName);
         //console.log('--> robotCoreClasses =', robotCoreClasses);
@@ -8685,14 +8919,14 @@ class mmrpgWorldMap {
         // withdraw/deposit,take-out/put-away,activate/bench,add-to-team/remove-from-team
         robotDetailsObject.actions = [];
         let showStorageButtons = (currentScreen === 'robots-overview' && currentSubScreen === 'robots') ? true : false;
-        let showTeamAddButton = showStorageButtons && !robotCurrent ? true : false;
-        let showTeamRemoveButton = showStorageButtons && robotCurrent ? true : false;
+        let showTeamAddButton = showStorageButtons && !robotIsCurrent ? true : false;
+        let showTeamRemoveButton = showStorageButtons && robotIsCurrent ? true : false;
         let allowTeamAddButton = showTeamAddButton, allowTeamRemoveButton = showTeamRemoveButton;
         if (playerRobotsCurrent.length === 1){ allowTeamRemoveButton = false; }
         else if (playerRobotsCurrent.length >= _config.playerRobotsLimit){ allowTeamAddButton = false; }
         else if (playerRobotsCurrent.length >= _config.maxRobotsPerPlayer){ allowTeamAddButton = false; }
-        robotDetailsObject.actions.push({ action: 'add-team-robot', text: 'Add To Team', robot: robotToken, disabled: !allowTeamAddButton, hidden: !showStorageButtons || !showTeamAddButton });
-        robotDetailsObject.actions.push({ action: 'remove-team-robot', text: 'Remove From Team', robot: robotToken, disabled: !allowTeamRemoveButton, hidden: !showStorageButtons || !showTeamRemoveButton });
+        robotDetailsObject.actions.push({ action: 'add-robot', text: 'Add To Team', robot: robotToken, disabled: !allowTeamAddButton, hidden: !showStorageButtons || !showTeamAddButton });
+        robotDetailsObject.actions.push({ action: 'remove-robot', text: 'Remove From Team', robot: robotToken, disabled: !allowTeamRemoveButton, hidden: !showStorageButtons || !showTeamRemoveButton });
 
         // Pre-compile some of the HTML to make it easier for the other functions
         //robotDetailsObject.levelHTML = (robotDetailsObject.level >= 100 ? '<b>' : '') + 'Level ' + robotDetailsObject.level + (robotDetailsObject.level >= 100 ? '</b>' : '');
@@ -9448,6 +9682,8 @@ class mmrpgWorldMap {
     getRobotSpriteMarkup(robotToken, spriteOptions){
         //console.log('%c' + 'mmrpgWorldMap.getRobotSpriteMarkup(robotToken:' + robotToken + ', spriteOptions:', + JSON.stringify(spriteOptions) + ')', 'color: magenta;');
         if (!robotToken || typeof robotToken !== 'string' || !robotToken.length){ console.error('getRobotSpriteMarkup() missing required robotToken!'); return ''; }
+        let robotId = 0; if (robotToken.indexOf('_') !== -1){ robotId = robotToken.split('_')[0]; robotToken = robotToken.split('_')[1];  }
+        //console.log('-> robotId =', robotId, '-> robotToken =', robotToken);
         spriteOptions = spriteOptions || {};
         let _self = this;
         let _config = _self.config;
@@ -9658,11 +9894,11 @@ class mmrpgWorldMap {
         }
 
     // Define a quick function for showing a generic action modal for items or abilities
-    showActionModal(actionKind, actionToken, itemOrAbilityToken, targetRobotToken, configCustom){
-        //console.log('%c' + 'mmrpgWorldMap.showActionModal(actionKind:' + actionKind + ', actionToken:' + actionToken + ', itemOrAbilityToken:' + itemOrAbilityToken + ', targetRobotToken:' + targetRobotToken + ', configCustom: ' + typeof configCustom + ')', 'color: magenta;');
+    showActionModal(actionKind, actionToken, actionObjectToken, targetRobotToken, configCustom){
+        //console.log('%c' + 'mmrpgWorldMap.showActionModal(actionKind:' + actionKind + ', actionToken:' + actionToken + ', actionObjectToken:' + actionObjectToken + ', targetRobotToken:' + targetRobotToken + ', configCustom: ' + typeof configCustom + ')', 'color: magenta;');
         if (!actionKind || typeof actionKind !== 'string' || !actionKind.length){ console.error('showActionModal() missing required actionKind!'); return; }
         if (!actionToken || typeof actionToken !== 'string' || !actionToken.length){ console.error('showActionModal() missing required actionToken!'); return; }
-        if (!itemOrAbilityToken || typeof itemOrAbilityToken !== 'string' || !itemOrAbilityToken.length){ console.error('showActionModal() missing required itemOrAbilityToken!'); return; }
+        if (!actionObjectToken || typeof actionObjectToken !== 'string' || !actionObjectToken.length){ console.error('showActionModal() missing required actionObjectToken!'); return; }
         targetRobotToken = targetRobotToken && typeof targetRobotToken === 'string' && targetRobotToken.length ? targetRobotToken : null;
         configCustom = configCustom && typeof configCustom === 'object' && Object.keys(configCustom).length ? configCustom : {};
         //console.log('w/ configCustom =', configCustom);
@@ -9677,11 +9913,13 @@ class mmrpgWorldMap {
         let $canvasWrapper = $('> .wrapper', $thisCanvas);
         let $actionModal = _elements.actionModal;
         let $robotsOverview = _elements.robotsOverview;
+        let $teamRobotsDiv = $robotsOverview.find('.team-robots');
         let $robotStorageBox = $robotsOverview.find('.storage-box[data-storage="robots"]');
         let $itemStorageBox = $robotsOverview.find('.storage-box[data-storage="items"]');
         let $abilityStorageBox = $robotsOverview.find('.storage-box[data-storage="abilities"]');
         let _world = _self.state;
         let _worldPlayer = _world.player;
+        let _worldPlayerTeam = _worldPlayer.team;
         let _worldPlayerRobots = _worldPlayer.robots;
         let _worldPlayerItems = _worldPlayer.items;
         let _worldPlayerAbilities = _worldPlayer.abilities;
@@ -9805,16 +10043,23 @@ class mmrpgWorldMap {
             let $cancelButton = $actionModal.find('.content .actions .button[data-action="cancel"]');
             if ($confirmButton.length){ $confirmButton.html('<strong>Saving</strong>').addClass('clicked'); }
             if ($cancelButton.length){ $cancelButton.addClass('hidden'); }
-            if (actionKind === 'item'){ onConfirmItemAction(actionToken); }
+            if (actionKind === 'robot'){ onConfirmRobotAction(actionToken); }
+            else if (actionKind === 'item'){ onConfirmItemAction(actionToken); }
             else if (actionKind === 'ability'){ onConfirmAbilityAction(actionToken); }
             else { console.error('showActionModal.onConfirmAction() received invalid actionKind ' + actionKind + '!'); return false; }
             runModalCallback('onConfirm', {actionKind, actionToken});
             return true;
             };
+        // Define the action and dependent functions for confirming an robot action
+        let onConfirmRobotAction = function(action){
+            //console.log('%c' + '~mmrpgWorldMap.showActionModal.onConfirmRobotAction(action:' + action + ')', 'color: magenta;');
+            // TODO: maybe?
+            return true;
+            };
         // Define the action and dependent functions for confirming an item action
         let onConfirmItemAction = function(action){
             //console.log('%c' + '~mmrpgWorldMap.showActionModal.onConfirmItemAction(action:' + action + ')', 'color: magenta;');
-            // TODO: ...
+            // TODO: maybe?
             return true;
             };
         // Define the action and dependent functions for confirming an ability action
@@ -9878,7 +10123,7 @@ class mmrpgWorldMap {
                 };
             if (action === 'equip-ability'){
                 //console.log('--> equipping new ability ...');
-                let newAbilityToken = $actionModal.attr('data-action-token'); //itemOrAbilityToken;
+                let newAbilityToken = $actionModal.attr('data-action-token'); //actionObjectToken;
                 let newAbilityID = abilitiesIndex[newAbilityToken] ? abilitiesIndex[newAbilityToken].id : null;
                 let newAbilityMarkup = _self.generateAbilitySelectButtonMarkup(newAbilityToken, playerRobotInfo, {slot: selectedAbilitySlot});
                 //console.log('--> newAbilityToken =', newAbilityToken);
@@ -9950,7 +10195,7 @@ class mmrpgWorldMap {
             return true;
             };
         let updateItemQuantityInStorage = function(itemToken){
-            //console.log('%c' + '~mmrpgWorldMap.showActionModal.updateItemQuantityInStorage()', 'color: magenta;');
+            //console.log('%c' + '~mmrpgWorldMap.showActionModal.updateItemQuantityInStorage(itemToken: ' + itemToken + ')', 'color: magenta;');
             let $storageItem = $itemStorageBox.find('.team-item[data-item="' + itemToken + '"]');
             let $storageItemDetails = $itemStorageBox.find('> .details[data-item="' + itemToken + '"]');
             let totalItemQuantity = _worldPlayerItems[itemToken] || 0;
@@ -9966,10 +10211,62 @@ class mmrpgWorldMap {
             };
 
         // Collect required and necessary data for displaying this action modal
-        if (actionKind === 'item'){
-            //console.log('--> actionKind is item ...', itemOrAbilityToken);
+        if (actionKind === 'robot'){
+            //console.log('--> actionKind is robot ...', actionObjectToken);
+            let robotsIndex = _indexes.robots;
+            //console.log('--> robotsIndex =', robotsIndex);
+            let robotString = actionObjectToken;
+            let robotID = robotString.split('_')[0];
+            let robotToken = robotString.split('_')[1];
+            //let robotInfo = typeof robotsIndex[robotToken] !== 'undefined' ? robotsIndex[robotToken] : null;
+            //if (!robotToken || !robotInfo){ console.error('showActionModal() could not find robot info for token ' + robotToken + '!'); return; }
+            //let robotData = typeof _worldPlayerRobots[robotString] !== 'undefined' ? _worldPlayerRobots[robotString] : null;
+            //if (!robotToken || !robotData){ console.error('showActionModal() could not find player robot data for token ' + robotToken + '!'); return; }
+            //console.log('--> robotID =', robotID);
+            //console.log('--> robotToken =', robotToken);
+            //console.log('--> robotInfo =', robotInfo);
+            //console.log('--> robotData =', robotData);
+            //let $robotOnTeam = $teamRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
+            //let $robotInStorage = $robotStorageBox.find('.team-robot[data-robot="' + robotString + '"]');
+            let $robotDetailsDiv = $robotsOverview.find('.details[data-robot="' + robotString + '"]');
+            //console.log('--> $robotOnTeam =', $robotOnTeam.length, $robotOnTeam);
+            //console.log('--> $robotInStorage =', $robotInStorage.length, $robotInStorage);
+            //console.log('--> $robotDetailsDiv =', $robotDetailsDiv.length, $robotDetailsDiv);
+            // If this is an ADD ROBOT request, we can add the robot to the player's team array and update
+            if (actionToken === 'add-robot'){
+                modalDetails.show = false;
+                //console.log('--> preparing to ADD ROBOT (', robotString, ') to team (', _worldPlayerTeam.join(','), ') ...');
+                let saveWorldState = false;
+                if (_worldPlayerTeam.indexOf(robotString) === -1){
+                    let teamRobotString = robotString;
+                    //console.log('-> adding teamRobotString =', teamRobotString);
+                    _self.addTeamRobot(teamRobotString);
+                    $robotDetailsDiv.find('.button[data-action="add-robot"]').addClass('disabled hidden').attr('disabled', 'disabled');
+                    $robotDetailsDiv.find('.button[data-action="remove-robot"]').removeClass('disabled hidden').removeAttr('disabled');
+                    saveWorldState = true;
+                    }
+                if (saveWorldState){ _self.saveWorldState(); }
+                }
+            // Else if this is a REMOVE ROBOT request, we should remove the robot from the player's team array and update
+            else if (actionToken === 'remove-robot'){
+                modalDetails.show = false;
+                //console.log('--> preparing to REMOVE ROBOT (', robotString, ') from team (', _worldPlayerTeam.join(','), ') ...');
+                let saveWorldState = false;
+                if (_worldPlayerTeam.indexOf(robotString) !== -1){
+                    let teamRobotString = robotString;
+                    //console.log('-> removing teamRobotString =', teamRobotString);
+                    _self.removeTeamRobot(teamRobotString);
+                    $robotDetailsDiv.find('.button[data-action="remove-robot"]').addClass('disabled hidden').attr('disabled', 'disabled');
+                    $robotDetailsDiv.find('.button[data-action="add-robot"]').removeClass('disabled hidden').removeAttr('disabled');
+                    saveWorldState = true;
+                    }
+                if (saveWorldState){ _self.saveWorldState(); }
+                }
+            }
+        else if (actionKind === 'item'){
+            //console.log('--> actionKind is item ...', actionObjectToken);
             let itemsIndex = _indexes.items;
-            let itemToken = itemOrAbilityToken;
+            let itemToken = actionObjectToken;
             let itemInfo = typeof itemsIndex[itemToken] !== 'undefined' ? itemsIndex[itemToken] : null;
             if (!itemToken || !itemInfo){ console.error('showActionModal() could not find item info for token ' + itemToken + '!'); return; }
             //console.log('--> itemsIndex =', itemsIndex);
@@ -10116,7 +10413,7 @@ class mmrpgWorldMap {
                 }
             }
         else if (actionKind === 'ability'){
-            //console.log('--> actionKind is ability ...', itemOrAbilityToken);
+            //console.log('--> actionKind is ability ...', actionObjectToken);
             //console.log('--> ability actionToken is ...', actionToken);
             let abilitiesIndex = _indexes.abilities;
             let currentAbilities = playerRobotInfo.abilities;
@@ -10124,7 +10421,7 @@ class mmrpgWorldMap {
             //console.log('--> abilitiesIndex =', abilitiesIndex);
             //console.log('--> currentAbilities =', currentAbilities);
             //console.log('--> maxAbilitiesPerRobot =', maxAbilitiesPerRobot);
-            let selectedAbilityToken = itemOrAbilityToken;
+            let selectedAbilityToken = actionObjectToken;
             let selectedAbilityInfo = typeof abilitiesIndex[selectedAbilityToken] !== 'undefined' ? abilitiesIndex[selectedAbilityToken] : null;
             if (!selectedAbilityToken || !selectedAbilityInfo){ console.error('showActionModal() could not find new ability info for token ' + selectedAbilityToken + '!'); return; }
             //console.log('--> selectedAbilityToken =', selectedAbilityToken);
@@ -10237,7 +10534,7 @@ class mmrpgWorldMap {
             $canvasWrapper.append(actionModalMarkup);
             $actionModal = $('#action-modal', $canvasWrapper);
             $actionModal.attr('data-action', modalAction);
-            $actionModal.attr('data-action-token', itemOrAbilityToken);
+            $actionModal.attr('data-action-token', actionObjectToken);
             _elements.actionModal = $actionModal;
 
             // Some quick functions for checking if the modal is busy or active
@@ -10308,7 +10605,7 @@ class mmrpgWorldMap {
             $actionModal.removeClass('busy');
             $actionModal.addClass('active hidden');
             $actionModal.attr('data-action', modalAction);
-            $actionModal.attr('data-action-token', itemOrAbilityToken);
+            $actionModal.attr('data-action-token', actionObjectToken);
             let $title = $content.find('.title'); $title.html(modalTitle);
             let $subForSelected = $content.find('.subtitle.for-selected'); $subForSelected.html(modalSubtitles.forSelected);
             let $subForCurrent = $content.find('.subtitle.for-current'); $subForCurrent.html(modalSubtitles.forCurrent);
@@ -10341,6 +10638,15 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Define a quick function for showing an robot modal for some kind of robot-related action
+    showRobotModal(actionToken, robotToken, configCustom){
+        //console.log('%c' + 'mmrpgWorldMap.showRobotModal(actionToken:' + actionToken + ', robotToken:' + robotToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
+        if (!actionToken || typeof actionToken !== 'string' || !actionToken.length){ console.error('showRobotModal() missing required actionToken!'); return; }
+        if (!robotToken || typeof robotToken !== 'string' || !robotToken.length){ console.error('showRobotModal() missing required robotToken!'); return; }
+        let _self = this;
+        return _self.showActionModal('robot', actionToken, robotToken, null, configCustom);
+        }
+
     // Define a quick function for showing an item modal for some kind of item-related action
     showItemModal(actionToken, itemToken, targetRobotToken, configCustom){
         //console.log('%c' + 'mmrpgWorldMap.showItemModal(actionToken:' + actionToken + ', itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
@@ -10360,7 +10666,23 @@ class mmrpgWorldMap {
         return _self.showActionModal('ability', actionToken, abilityToken, targetRobotToken, configCustom);
         }
 
-    // Define quick functions for showing specific modals for items and abilities
+    // Define quick functions for showing the modal that adds a robot to the team from storage
+    showAddRobotModal(robotToken, configCustom){
+        //console.log('%c' + 'mmrpgWorldMap.showAddRobotModal(robotToken:' + robotToken + ')', 'color: magenta;');
+        if (!robotToken || typeof robotToken !== 'string' || !robotToken.length){ console.error('showAddRobotModal() missing required robotToken!'); return; }
+        let _self = this;
+        return _self.showRobotModal('add-robot', robotToken, configCustom);
+        }
+
+    // Define quick functions for showing the modal that removes a robot from the team to storage
+    showRemoveRobotModal(robotToken, configCustom){
+        //console.log('%c' + 'mmrpgWorldMap.showRemoveRobotModal(robotToken:' + robotToken + ')', 'color: magenta;');
+        if (!robotToken || typeof robotToken !== 'string' || !robotToken.length){ console.error('showRemoveRobotModal() missing required robotToken!'); return; }
+        let _self = this;
+        return _self.showRobotModal('remove-robot', robotToken, configCustom);
+        }
+
+    // Define quick functions for showing specific modals for items
     showUseItemModal(itemToken, targetRobotToken, configCustom){
         //console.log('%c' + 'mmrpgWorldMap.showUseItemModal(itemToken:' + itemToken + ', targetRobotToken:' + targetRobotToken + ')', 'color: magenta;');
         if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('showUseItemModal() missing required itemToken!'); return; }
