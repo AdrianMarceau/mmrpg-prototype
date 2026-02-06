@@ -2079,8 +2079,9 @@ class rpg_world {
         // [robots-overview][team-rotate]
         if ($num_robot_unlocked > 1){ $return_markup .= '<a class="team-rotate"><i class="fa fas fa-sync"></i></a>'; }
         // [robots-overview][team-switch]
-        if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<a class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></a>'; }
-        else { $return_markup .= '<span class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></span>'; }
+        if ($num_robot_unlocked > 0){ $return_markup .= '<a class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></a>'; }
+        //if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<a class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></a>'; }
+        //else { $return_markup .= '<span class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></span>'; }
         // [robots-overview][team-items]
         $return_markup .= '<a class="storage-button team-items" data-view="items"><i class="fa fas fa-briefcase"></i><b>items</b></a>';
         // [robots-overview][team-abilities]
@@ -2263,13 +2264,13 @@ class rpg_world {
                 'core-key' => 'core',
                 'level-exp' => 'level',
                 ));
-            $return_markup .= $get_toggle_options(array(
+            /* $return_markup .= $get_toggle_options(array(
                 'disabled' => array(
                     'visible' => 'eye-slash',
                     'hidden' => 'eye',
                     'default' => 'hidden',
                     ),
-                ));
+                )); */
         $return_markup .= '</div>';
         // [robots-overview][storage-items]
         $return_markup .= '<div class="storage-box storage-items" data-storage="items">';
