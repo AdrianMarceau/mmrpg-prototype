@@ -3415,6 +3415,8 @@ class mmrpgUserInputWatcher {
         _self.events = null;
         _self.userInputs = {}; // all possible inputs
         _self.activeInputs = {}; // currently active inputs
+        _self.lastInputKind = null;
+        _self.lastInputEvent = null;
 
         // Define the config object and its defaults
         let _config = {};
@@ -3422,6 +3424,7 @@ class mmrpgUserInputWatcher {
         _config.inputTimeout = typeof config.inputTimeout === 'number' ? config.inputTimeout : (1000 / 60); // 60fps
         _config.wheelTimeout = typeof config.wheelTimeout === 'number' ?  config.wheelTimeout : _config.inputTimeout;
         _config.gamepadTimeout = typeof config.gamepadTimeout === 'number' ? config.gamepadTimeout : _config.inputTimeout;
+        _config.autoRunCallbacks = typeof config.autoRunCallbacks === 'boolean' ? config.autoRunCallbacks : true;
         _self.config = _config;
 
         // Define the events object and its defaults
@@ -3457,7 +3460,14 @@ class mmrpgUserInputWatcher {
         _self.userInputs = userInputs;
 
         // Define the abstraction method for handling user input events
-        let onUserInput = function(kind, event){ _events.onUserInput.call(_self, kind, event, activeInputs, userInputs); };
+        let onUserInput = function(kind, event){
+            //console.log('mmrpgUserInputWatcher.onUserInput(kind:', kind, ', event:', event, ')');
+            _self.lastInputKind = kind;
+            _self.lastInputEvent = event;
+            if (_config.autoRunCallbacks){
+                _events.onUserInput.call(_self, kind, event, activeInputs, userInputs);
+                }
+            };
 
         // If toggled, make sure we swap the A and B buttons for a Nintendo-style layout
         let useNintendoLayout = true; // TODO: make this customizable later
@@ -3495,7 +3505,7 @@ class mmrpgUserInputWatcher {
             //console.log('%c' + 'getUserInputFromGamepadKey(keyNum:', keyNum, ') called!', 'color: magenta;');
             //console.log('-> keyNum =', keyNum);
             if (typeof keyNum !== 'number'){ keyNum = parseInt(keyNum); }
-            if (isNaN(keyNum)){ return foundInput; }
+            if (isNaN(keyNum)){ return false; }
             let returnKey = false;
             Object.keys(userInputs).forEach(function(inputKey){
                 let inputData = userInputs[inputKey];
@@ -3534,43 +3544,33 @@ class mmrpgUserInputWatcher {
 
         // Define a function for watching gamepad inputs and updating the activeInputs object accordingly
         let connectedGamepad = null;
-        let gamepadTimeout = null;
         let watchGamepadInputs = function(gamepad){
             if (gamepad === null){ connectedGamepad = null; return; }
             else if (typeof gamepad !== 'undefined'){ connectedGamepad = gamepad; }
             if (!connectedGamepad || typeof connectedGamepad.index === 'undefined'){ return false; }
             let gp = navigator.getGamepads()[connectedGamepad.index];
             if (!gp){ return false; }
-            //console.log('-> gp.buttons:', gp.buttons);
             gp.buttons.forEach((button, index) => {
                 let inputKey = getUserInputFromGamepadKey(index);
                 let inputChange = false;
                 if (!inputKey){ return; }
-                if (button.pressed
-                    && typeof activeInputs[inputKey] === 'undefined'){
+                if (button.pressed && typeof activeInputs[inputKey] === 'undefined'){
                     activeInputs[inputKey] = true;
                     inputChange = true;
-                    }
-                else if (!button.pressed
-                    && typeof activeInputs[inputKey] !== 'undefined') {
+                    } else if (!button.pressed && typeof activeInputs[inputKey] !== 'undefined') {
                     delete activeInputs[inputKey];
                     inputChange = true;
                     }
+                // Optional: Emit event if you really need it (careful of spamming this!)
                 //console.log('-> trying to emit gamepadinput event on input (inputChange:', inputChange, ')');
-                if (inputChange
-                    || Object.keys(activeInputs).length > 0){
+                if (inputChange){
                     let nullfn = function(){};
                     let event = new Event('gamepadinput', { bubbles: true, cancelable: true, preventDefault: nullfn, stopPropagation: nullfn });
                     document.dispatchEvent(event);
                     onUserInput('gamepadinput', event);
                     }
                 });
-            if (gamepadTimeout){ clearTimeout(gamepadTimeout); }
-            gamepadTimeout = setTimeout(function(){
-                requestAnimationFrame(function(){
-                    watchGamepadInputs();
-                    });
-                }, _config.gamepadTimeout);
+            requestAnimationFrame(function(){ watchGamepadInputs(); });
             };
 
         // Define an object to hold all currently pressed keys individually or in combo
@@ -3629,11 +3629,19 @@ class mmrpgUserInputWatcher {
             events: _self.events,
             userInputs: _self.userInputs,
             activeInputs: _self.activeInputs,
+            lastInputKind: _self.lastInputKind,
+            lastInputEvent: _self.lastInputEvent,
             startWatching: startWatchingInputs,
             stopWatching: stopWatchingInputs,
             onUserInput: function(callback){
                 if (typeof callback !== 'function'){ return false; }
                 _self.events.onUserInput = callback;
+                return true;
+                },
+            checkUserInputs: function(){
+                if (!_events.onUserInput){ return false; }
+                let kind = _self.lastInputKind, event = _self.lastInputEvent;
+                _events.onUserInput.call(_self, kind, event, activeInputs, userInputs);
                 return true;
                 }
             };
