@@ -3036,22 +3036,15 @@ class mmrpgWorldMap {
         _self.robotsOverviewAPI = robotsOverviewAPI;
 
         // Define a function to run each time user inputs are updated so we can react
-        let listenForInput = true;
-        let ignoreTimeout = null;
-        let ignoreInputFor = function(delay){
-            delay = typeof delay === 'number' ? delay : 250;
-            if (delay < 1){ listenForInput = true; return; }
-            listenForInput = false;
-            if (ignoreTimeout){ clearTimeout(ignoreTimeout); }
-            ignoreTimeout = setTimeout(function(){ listenForInput = true; }, delay);
-            };
+        let listenForInput = function(){ return Date.now() >= nextInputAllowedTime; }, nextInputAllowedTime = 0;
+        let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 200; nextInputAllowedTime = Date.now() + delay; };
         let userInputVars = {};
         let checkUserInputs = function(kind, event, activeInputs, userInputs){
             //console.log('%c' + 'mmrpgWorldMap.checkUserInputs(kind:' + kind + ', event, activeInputs, userInputs)', 'color: cyan;');
             //event.preventDefault();
             //event.stopPropagation();
             //console.log('-> event:', e);
-            if (!listenForInput){ return false; }
+            if (!listenForInput()){ return false; }
             if (_self.worldIsBusy()){ return false; }
             if (!Object.keys(activeInputs).length){ return false; } // nothing pressed, ignore
             _worldCursor.othered = true;
@@ -3403,7 +3396,7 @@ class mmrpgWorldMap {
                         $switchButton.addClass('clicked');
                         $switchButton.trigger('click');
                         setTimeout(function(){ $switchButton.removeClass('clicked'); }, 200);
-                        ignoreInputFor(1000);
+                        ignoreInputFor(300);
                         return true;
                         }
                     }
@@ -3764,9 +3757,14 @@ class mmrpgWorldMap {
             };
 
         // Start the user input watcher and collect reference to active inputs
-        let userInputWatcher = new mmrpgUserInputWatcher();
+        let userInputWatcher = new mmrpgUserInputWatcher({ autoStart: true, autoRunCallbacks: false });
         userInputWatcher.onUserInput(checkUserInputs);
         userInputWatcher.startWatching();
+        let checkUserInputWatcher = function(){
+            userInputWatcher.checkUserInputs();
+            requestAnimationFrame(checkUserInputWatcher);
+            };
+        checkUserInputWatcher();
 
         // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed
         $(window).bind('resize', function(e){
@@ -3878,6 +3876,17 @@ class mmrpgWorldMap {
         let moveTimeout;
         let timeoutDuration = _mapEffects.moveTimeout;
         let travelDuration = _mapEffects.moveTravel * thisShiftDist;
+        let onTeamMoveComplete = _selfRef.onTeamMoveComplete;
+        if (typeof onTeamMoveComplete === 'undefined'){
+            onTeamMoveComplete = function(index, callback, clearExisting){
+                if (typeof index !== 'number' && typeof index !== 'string'){ return false; }
+                if (typeof onTeamMoveComplete.queue === 'undefined'){ onTeamMoveComplete.queue = {}; }
+                if (typeof onTeamMoveComplete.queue[index] === 'undefined'){ onTeamMoveComplete.queue[index] = []; }
+                let queue = onTeamMoveComplete.queue[index]; if (clearExisting){ queue.length = 0; }
+                if (callback){ if (typeof callback === 'function'){ queue.push(callback); } return true; }
+                else { while (queue.length > 0){ callback = queue.shift(); callback.call(); } return true; }
+                };
+            }
         let onMoveComplete = function(){
             _worldCursor.col = thisNewCol;
             _worldCursor.row = thisNewRow;
@@ -3916,6 +3925,7 @@ class mmrpgWorldMap {
             }
         // If there are any team sprites, move them as well (it's okay if they lay behind the cursor)
         if ($otherSprites && $otherSprites.length){
+            //console.log('moving other team sprites to thisVerDir:', thisVerDir, 'thisHorDir:', thisHorDir);
             let $otherSpritesInOrder = $(Array.from($otherSprites).sort(function(a, b){
                 const aKey = parseInt($(a).attr('data-key'));
                 const bKey = parseInt($(b).attr('data-key'));
@@ -3938,40 +3948,48 @@ class mmrpgWorldMap {
                 let $innerSprite = $('.sprite', $thisSprite);
                 let imgSize = $thisSprite.attr('data-size') || 40;
                 let imgSizeX = imgSize + 'x' + imgSize;
+                //console.log('checking index:', index, ' w/ spriteKind:', spriteKind, ' && imgSizeX:', imgSizeX);
                 teamTravelDuration += 50; // add a little extra time for the team sprites to move
                 if (!lastTeamSpriteKind){ lastTeamSpriteKind = spriteKind; }
                 if (lastTeamSpriteKind !== spriteKind){
-                    if (thisVerDir === 'up'){ teamOffsetY += 15; }
+                    if (thisVerDir === 'up'){ teamOffsetY += !thisHorDir ? 12 : 6; }
+                    else if (thisVerDir === 'down'){ teamOffsetY -= !thisHorDir ? 10 : 5; }
+                    if (thisHorDir === 'left'){ teamOffsetX += !thisVerDir ? 6 : 3; }
+                    else if (thisHorDir === 'right'){ teamOffsetX -= !thisVerDir ? 6 : 3; }
                     }
-                if (thisVerDir === 'up'){ teamOffsetY += 10; }
-                else if (thisVerDir === 'down'){ teamOffsetY -= 20; }
+                if (thisVerDir === 'up'){ teamOffsetY += !thisHorDir ? 16 : 8; }
+                else if (thisVerDir === 'down'){ teamOffsetY -= !thisHorDir ? 20 : 10; }
                 else { teamOffsetY -= 1; }
-                if (thisHorDir === 'left'){ teamOffsetX += 20; }
-                else if (thisHorDir === 'right'){ teamOffsetX -= 20; }
+                if (thisHorDir === 'left'){ teamOffsetX += !thisVerDir ? 20 : 10; }
+                else if (thisHorDir === 'right'){ teamOffsetX -= !thisVerDir ? 20 : 10; }
                 teamOffsetZ = teamOffsetY + 1;
                 if (thisHorDir){ $thisSprite.attr('data-dir', thisHorDir); }
-                let onTeamMoveComplete = function(){};
                 let newFrame = false;
-                if (!$thisSprite.is('.disabled')){
+                let preFrameDelay = 0;
+                if (animateMove && !$thisSprite.is('.disabled')){
+                    $thisSprite.attr('data-frame', '00');
                     newFrame = $thisSprite.is('.player') ? '09' : $thisSprite.is('.robot') ? '07' : '00'; // run for players, slide for robots
-                    $thisSprite.attr('data-frame', newFrame);
-                    onTeamMoveComplete = function(){ $thisSprite.attr('data-frame', '00'); };
+                    if (newFrame !== '00'){
+                        preFrameDelay = 50;
+                        setTimeout(function(){ $thisSprite.attr('data-frame', newFrame); }, preFrameDelay);
+                        onTeamMoveComplete(index, function(){ $thisSprite.attr('data-frame', '00'); }, true);
+                        }
                     }
                 $thisSprite.prop('worldX', teamOffsetX);
                 $thisSprite.prop('worldY', teamOffsetY);
                 $thisSprite.prop('worldZ', teamOffsetZ);
                 if (animateMove){
-                    $thisSprite.stop(true, true).animate({
+                    $thisSprite.stop(true, false).animate({
                         left: teamOffsetX + 'px',
                         top: teamOffsetY + 'px',
                         zIndex: teamOffsetZ,
-                        }, teamTravelDuration, 'swing', onTeamMoveComplete);
+                        }, (teamTravelDuration + preFrameDelay), 'swing', function(){ onTeamMoveComplete(index); });
                     } else {
                     $thisSprite.css({
                         left: teamOffsetX + 'px',
                         top: teamOffsetY + 'px',
                         zIndex: teamOffsetZ,
-                        }); onTeamMoveComplete();
+                        });
                     }
                 lastTeamSpriteKind = spriteKind;
                 });
@@ -6335,17 +6353,21 @@ class mmrpgWorldMap {
                 //console.log('%c' + '... World State Saved!', 'color: green;');
                 //console.log('saveWorldState() returned successfully! w/', '\n-> response:', response);
                 _selfRef._busy = false;
-                $thisWorld.removeClass('saving');
+                //$thisWorld.removeClass('saving');
                 triggerSaveCallbacks({response});
                 if (pullEvents){ _self.triggerWindowEventsPull(0); }
+                if (_selfRef._cleanup){ clearTimeout(_selfRef._cleanup); }
+                _selfRef._cleanup = setTimeout(function(){ $thisWorld.removeClass('saving'); }, 1000);
                 },
             error: function(xhr, status, error){
                 //console.log('%c' + '... World State Not Saved!', 'color: red;');
                 console.error('saveWorldState() failed to save world state! w/', '\n-> status:', status, '\n-> error:', error);
                 _selfRef._busy = false;
-                $thisWorld.removeClass('saving');
+                //$thisWorld.removeClass('saving');
                 triggerSaveCallbacks({xhr, status, error});
                 if (pullEvents){ _self.triggerWindowEventsPull(0); }
+                if (_selfRef._cleanup){ clearTimeout(_selfRef._cleanup); }
+                _selfRef._cleanup = setTimeout(function(){ $thisWorld.removeClass('saving'); }, 1000);
                 }
             });
         return;
@@ -9292,7 +9314,9 @@ class mmrpgWorldMap {
         //console.log('--> selectedPlayerRobot =', selectedPlayerRobot);
         let abilityIsUnlocked = _worldPlayerAbilities.indexOf(abilityToken) !== -1 ? true : false;
         //console.log('--> abilityIsUnlocked =', abilityIsUnlocked);
-        let abilityIsEquipped = selectedPlayerRobot && selectedPlayerRobot.data.abilities.includes(abilityIndexInfo.id) ? true : false;
+        let playerRobotAbilities = selectedPlayerRobot && selectedPlayerRobot.data.abilities ? selectedPlayerRobot.data.abilities : [];
+        let abilitySlotsAvailable = selectedPlayerRobot && _config.maxAbilitiesPerRobot ? (_config.maxAbilitiesPerRobot - playerRobotAbilities.length) : 0;
+        let abilityIsEquipped = selectedPlayerRobot && playerRobotAbilities.includes(abilityIndexInfo.id) ? true : false;
         //console.log('--> abilityIsEquipped =', abilityIsEquipped);
 
         // Generate the markup, classes, styles, etc. that will make up the ability details
@@ -9433,7 +9457,7 @@ class mmrpgWorldMap {
             }
         abilityDetailsObject.description = abilityDescription;
         abilityDetailsObject.actions = [];
-        abilityDetailsObject.actions.push({ action: 'equip-ability', text: (!abilityIsEquipped ? 'Equip' : 'Equipped'), ability: abilityToken, disabled: !targetSelected });
+        abilityDetailsObject.actions.push({ action: 'equip-ability', text: (!abilityIsEquipped ? (abilitySlotsAvailable ? 'Equip' : 'Replace') : 'Equipped'), ability: abilityToken, disabled: !targetSelected });
         abilityDetailsObject.actions.push({ action: 'remove-ability', text: 'Remove', ability: abilityToken, disabled: !abilityIsEquipped });
 
         // Pre-compile some of the HTML to make it easier for the other functions
