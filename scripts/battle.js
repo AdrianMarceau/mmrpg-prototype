@@ -171,7 +171,8 @@ $(document).ready(function(){
         lastWrapperToken = currentWrapperToken;
         lastWrapperPage = currentWrapperPage;
         let buttonRows = [];
-        let buttonSelector = '.button:visible:not(.button_disabled):not(.float_links *)';
+        //let buttonSelector = '.button:visible:not(.button_disabled):not(.float_links *)';
+        let buttonSelector = '.button:visible:not(.float_links *)';
         let $currentMainActions = $('.main_actions', $currentWrapper);
         let $currentSubActions = $('.sub_actions', $currentWrapper);
         let $currentMainActionButtons = $(buttonSelector, $currentMainActions);
@@ -233,12 +234,12 @@ $(document).ready(function(){
         };
 
     // Define a function to run each time user inputs are updated so we can react
-    let listenForInput = true;
     let battleIsBusy = function(){ return gameSettings.currentActionPanel === 'loading' ? true : false; };
-    let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 250; listenForInput = false; setTimeout(function(){ listenForInput = true; }, delay); };
+    let listenForInput = function(){ return Date.now() >= nextInputAllowedTime; }, nextInputAllowedTime = 0;
+    let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 200; nextInputAllowedTime = Date.now() + delay; };
     let checkUserInputs = function(kind, event, activeInputs, userInputs){
         //console.log('%c' + 'mmrpgBattleWindow.checkUserInputs(kind:' + kind + ', event)', 'color: cyan;');
-        if (!listenForInput){ return false; }
+        if (!listenForInput()){ return false; }
         if (battleIsBusy()){ return false; }
         if (!Object.keys(activeInputs).length){ return false; } // nothing pressed, ignore
         //console.log('-> gameSettings.currentActionPanel:', gameSettings.currentActionPanel);
@@ -277,7 +278,8 @@ $(document).ready(function(){
             if (!allowClick){ return false; }
             }
         // With those out of the way, let's continue with normal menu interaction processing
-        let buttonSelector = '.button:visible:not(.button_disabled):not(.float_links *)';
+        //let buttonSelector = '.button:visible:not(.button_disabled):not(.float_links *)';
+        let buttonSelector = '.button:visible:not(.float_links *)';
         let hoverButtonSelector = buttonSelector+'.button_hover';
         let $currentMainActions = $('.main_actions', $currentWrapper);
         let $currentSubActions = $('.sub_actions', $currentWrapper);
@@ -298,18 +300,23 @@ $(document).ready(function(){
                 && $continueButtton.is(':visible')
                 && $continueButtton.not('.button_disabled')){
                 $buttonToClick = $continueButtton;
+                //console.log('setting $buttonToClick to $continueButtton:', $continueButtton.length, $continueButtton);
                 }
             else if ($hoverButton.length
                 && $hoverButton.is(':visible')
-                && !$hoverButton.is('.button_disabled')){
+                && $hoverButton.not('.button_disabled')){
                 $buttonToClick = $hoverButton;
+                //console.log('setting $buttonToClick to $hoverButton:', $hoverButton.length, $hoverButton);
                 }
             else if ($firstButton.length
                 && $firstButton.is(':visible')
-                && !$firstButton.is('.button_disabled')){
+                && $firstButton.not('.button_disabled')){
                 $buttonToClick = $firstButton;
+                //console.log('setting $buttonToClick to $firstButton:', $firstButton.length, $firstButton);
                 }
             if ($buttonToClick){
+                //console.log('clicking $buttonToClick w/', $buttonToClick.length, $buttonToClick);
+                //console.log('$buttonToClick is disabled? ', $buttonToClick.is('.button_disabled'));
                 $buttonToClick.trigger('click');
                 if ($buttonToClick.is('[data-panel]')){
                     let $newWrapper = $('#actions_' + $buttonToClick.attr('data-panel'), $battleActions);
@@ -317,6 +324,7 @@ $(document).ready(function(){
                     let $hoverButton = $(hoverButtonSelector, $newWrapper);
                     if (!$hoverButton.length || $hoverButton.is('.action_back')){
                         let $newFirstButton = $newButtons.first();
+                        //console.log('$newFirstButton set to', $newFirstButton.length, $newFirstButton);
                         if ($newFirstButton.length){
                             $(buttonSelector, $newWrapper).removeClass('button_hover');
                             $newFirstButton.addClass('button_hover');
@@ -572,9 +580,15 @@ $(document).ready(function(){
         };
 
     // Start the user input watcher and collect reference to active inputs
-    let userInputWatcher = new mmrpgUserInputWatcher();
+    let userInputWatcher = new mmrpgUserInputWatcher({ autoStart: true, autoRunCallbacks: false });
     userInputWatcher.onUserInput(checkUserInputs);
     userInputWatcher.startWatching();
+    let checkUserInputWatcher = function(){
+        userInputWatcher.checkUserInputs();
+        requestAnimationFrame(checkUserInputWatcher);
+        };
+    checkUserInputWatcher();
+
 
     // Define the live Rogue Star ticker functionality if present
     $rogueStar = $('#canvas .rogue_star', $thisPrototype);
