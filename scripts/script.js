@@ -3470,7 +3470,7 @@ class mmrpgUserInputWatcher {
             };
 
         // If toggled, make sure we swap the A and B buttons for a Nintendo-style layout
-        let useNintendoLayout = true; // TODO: make this customizable later
+        let useNintendoLayout = false; // TODO: make this customizable later
         if (useNintendoLayout){
             // Swap the A and B buttons with each other
             let aButtonGamepad = userInputs.A.gamepad;
