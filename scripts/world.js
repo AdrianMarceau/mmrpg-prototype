@@ -134,15 +134,18 @@ gameSettings.worldState = {
     zoomLevel: 1.0, // default zoom level,
     userZoomLevel: 1.0, // current zoom level set by user
     mapIsHidden: false, // map is full visible by default
+    storageBoxesVisible: false, // map hidden by storage boxes capturing input
+    actionModalVisible: false, // map hidden by action modal capturing input
     allowHovers: true, // allow hover effects on tiles
     allowClicks: true, // allow click events on tiles
     hasLoaded: false, // has finished loading
     isReady: false, // is ready for interaction
     isBusy: false, // is busy doing something,
+    isBusyWith: {}, // for when multiple things happen at once
     currentScreen: 'world-map', // which screen is visible
     currentSubScreen: '', // if a subscreen is visible (like inventory, robot management, etc)
-    autoApplyConsumables: true, // automatically apply consumable items to party robots on pickup
-    autoEquipHoldables: true, // automatically hold equippable items to party robots on pickup
+    autoApplyConsumables: false, // automatically apply consumable items to party robots on pickup
+    autoEquipHoldables: false, // automatically hold equippable items to party robots on pickup
     };
 gameSettings.worldIndexes = {
     types: {},
@@ -187,7 +190,8 @@ class mmrpgWorldMap {
         let _self = this;
         let _world = _self.state;
         let _worldCursor = _world.cursor;
-        return _world.isBusy || _worldCursor.loading || _worldCursor.busy || _worldCursor.moving;
+        let busyWithKeys = Object.keys(_world.isBusyWith);;
+        return _world.isBusy || busyWithKeys.length > 0 || _worldCursor.loading || _worldCursor.busy || _worldCursor.moving;
         }
 
     // Quick function for checking if the world map specifically is busy doing something (either busy because world, or because hidden)
@@ -1696,6 +1700,7 @@ class mmrpgWorldMap {
                 $('.button', $thisStorageBox).removeAttr('disabled');
                 $thisStorageButton.addClass('active');
                 _world.mapIsHidden = true; // set the map hidden state
+                _world.storageBoxesVisible = true; // set the storage to a visible state
                 _world.currentScreen = 'robots-overview';
                 _world.currentSubScreen = viewToken;
                 clearSelectionsAndIncompatible();
@@ -1731,6 +1736,7 @@ class mmrpgWorldMap {
                 clearSelectionsAndIncompatible();
                 enableOtherElements();
                 _world.mapIsHidden = false;
+                _world.storageBoxesVisible = false;
                 _world.currentScreen = 'world-map';
                 _world.currentSubScreen = '';
                 $robotsOverview.removeClass('expanded').attr('data-view', '');
@@ -3406,10 +3412,17 @@ class mmrpgWorldMap {
                     if (event){ event.preventDefault(); }
                     // Only allow this if the map is not currently animating and the player is not currently moving
                     if (_world.mapIsAnimating || _world.playerIsMoving){ return false; }
+                    // Turn ON the auto-options in case there are pickups about to happen
+                    _world.autoApplyConsumables = true;
+                    _world.autoEquipHoldables = true;
                     // If there are any nearby events, re-init them now
                     //console.log('-> checking for nearby events to re-init...');
                     _self.refreshMapPositionEvents(0, true);
                     ignoreInputFor(100);
+                    } else {
+                    // Turn OFF the auto-options since A isn't being held anymore
+                    _world.autoApplyConsumables = false;
+                    _world.autoEquipHoldables = false;
                     }
                 // If the player has pressed either of the triggers we should let them scroll within the player-switcher
                 if (activeInputs.L2 || activeInputs.R2 || activeInputs.LR2){
@@ -3631,7 +3644,7 @@ class mmrpgWorldMap {
                     //console.log('%c' + 'New position is walkable, moving there now!', 'color: orange;');
                     let forceMove = inPlaceMovement ? true : false;
                     _self.makeLayerTileActive(newPos);
-                    _self.playSoundEffect('no-effect');
+                    _self.playSoundEffect('land_mmv-gb');
                     _self.moveToPosition(newPos, function(){
                         _self.makeLayerTileInactive(oldPos);
                         if (thisHorDir && thisVerDir){ ignoreInputFor(); }
@@ -3694,6 +3707,7 @@ class mmrpgWorldMap {
                             }, (timeThreshold * 2));
                         }
                     }
+                /*
                 // If the user is holding the B button, we need to implement some nuanced functionality
                 // -> if it's a simple press, ignore it so that it can do its job in other contexts
                 // -> else if it's a long-press (user is holding button) then we need to temporarily disable the auto-use functionality for item pickups
@@ -3713,15 +3727,12 @@ class mmrpgWorldMap {
                     //console.log('-> callbacksTriggered =', callbacksTriggered);
                     let pressButtonCallback = function(){
                         //console.log('%c' + 'B key pressButtonCallback()', 'color: green;');
-                        /* ... */
                         };
                     let unpressButtonCallback = function(){
                         //console.log('%c' + 'B key unpressButtonCallback()', 'color: red;');
-                        /* ... */
                         };
                     let holdButtonCallback = function(){
                         //console.log('%c' + 'B key holdButtonCallback()', 'color: magenta;');
-                        /* ... */
                         //console.log('Toggling auto-pickup flags ...');
                         _world.autoApplyConsumables = !_world.autoApplyConsumables ? true : false;
                         _world.autoEquipHoldables = !_world.autoEquipHoldables ? true : false;
@@ -3753,6 +3764,7 @@ class mmrpgWorldMap {
                             }
                         }, unpressTimeout);
                     }
+                */
                 }
             };
 
@@ -4686,12 +4698,15 @@ class mmrpgWorldMap {
         let autoRedirect = false;
         let autoRedirectURL = '';
         let autoRedirectSound = '';
+        let autoRedirectEffect = '';
+        let autoRedirectAnimation = '';
         let showActionArea = false;
         let showActionAreaType = '';
         let showActionAreaSound = '';
         let actionAreaMarkup = '';
         let sideButtonsMarkup = '';
         let readyTeamSprites = false;
+        let readyTeamSpritesAnyway = false;
         if (firstEventType === 'event'){
             //console.log('-> event at position is custom, checking what comes next...');
             // If the cursor is literally on a event, only one event sprite matters right now
@@ -4804,6 +4819,7 @@ class mmrpgWorldMap {
                                 if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
                                 //console.log('-> running triggerEffectFunction for portal to moveWorldCursorToPosition(' + goToPosition + ')');
                                 _config.allowWorldEvents = false; // prevent re-triggering events during teleport
+                                if (triggerEffectSound){ _self.playSoundEffect(triggerEffectSound); }
                                 _self.moveToPosition(goToPosition, function(){
                                     //console.log('-> moveToPosition() complete via portal to new position ' + goToPosition);
                                     _config.allowWorldEvents = true; // re-allow world events after teleport complete
@@ -4815,6 +4831,8 @@ class mmrpgWorldMap {
                             }
                         else {
                             //console.log('-> preparing auto-redirect to NEW MAP via portal...');
+                            //console.log('-> w/ portalInfo =', portalInfo);
+                            //alert('portalInfo =' + JSON.stringify(portalInfo));
                             autoRedirect = true;
                             showActionArea = false;
                             autoRedirectURL = 'world.php?world=' + goToWorld;
@@ -4822,8 +4840,17 @@ class mmrpgWorldMap {
                             if (goToPosition){ autoRedirectURL += '&position='+goToPosition; }
                             //console.log('-> autoRedirectURL =', autoRedirectURL);
                             //if (!confirm('teleport to ' + autoRedirectURL + '?')){ autoRedirectURL = false; } // TEMP TEMP TEMP
-                            autoRedirectSound = 'bounce-sound';
                             readyTeamSprites = true;
+                            readyTeamSpritesAnyway = true;
+                            teamReadyDuration = 600; // we want the animation to start right away
+                            autoRedirectSound = portalInfo.direction ? 'lets-go-robots' : 'intense-growing-sound'; //'bounce-sound';
+                            autoRedirectEffect = portalInfo.direction ? 'leaving' : 'glowing';
+                            autoRedirectAnimation = portalInfo.direction ? 'slide-' + portalInfo.direction : 'ascend-upward';
+                            //triggerEffect = true;
+                            /* triggerEffectFunction = function(){
+                                if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
+                                console.log('testing 123?');
+                                }; */
                             }
                         }
                     }
@@ -5076,8 +5103,8 @@ class mmrpgWorldMap {
 
         // Define an inline function to put the team into their battle-ready poses
         let getTeamSpritesReady = function(){
-            //console.log('%c' + 'getTeamSpritesReady()', 'color: cyan;');
-            if (_self.worldIsBusy()){ return; }
+            console.log('%c' + 'getTeamSpritesReady()', 'color: cyan;');
+            if (_self.worldIsBusy() && !readyTeamSpritesAnyway){ return; }
             if (!stillAtPosition() || otherMenusActiveNow()){ return; }
 
             // Add the shake class to the cursor so it hides behind the player
@@ -5129,8 +5156,28 @@ class mmrpgWorldMap {
             //console.log(('-> rushDistanceX =', rushDistanceX, '| rushDistanceY =', rushDistanceY);
             //console.log('-> $otherSprites =', $otherSprites);
 
+            // If there are any effect to apply beforehand, do it now
+            let spriteClassBeforeMove = '', spriteClassAfterMove = '';
+            if (autoRedirectEffect){
+                if (autoRedirectEffect === 'glowing'){ spriteClassBeforeMove = 'glowing'; }
+                else if (autoRedirectEffect === 'leaving'){ spriteClassBeforeMove = 'leaving'; }
+                }
+            if (autoRedirectAnimation){
+                if (autoRedirectAnimation === 'ascend-upward'){ spriteClassAfterMove = 'ascending'; }
+                else if (autoRedirectAnimation === 'slide-right'){ spriteClassAfterMove = 'sliding'; }
+                }
+            let spriteBeforeMove = function(){
+                if (!spriteClassBeforeMove){ return; }
+                $(this).addClass(spriteClassBeforeMove);
+                };
+            let spriteAfterMove = function(){
+                if (!spriteClassAfterMove){ return; }
+                $(this).addClass(spriteClassAfterMove);
+                };
+
             // Change all team sprite frames and directions where needed
             $cursorSprite.attr('data-frame', '01');
+            spriteBeforeMove.call($cursorSprite);
             $playerSprites.each(function(index){
                 let $sprite = $(this);
                 if ($sprite.is('.disabled')){ return; }
@@ -5138,6 +5185,7 @@ class mmrpgWorldMap {
                 if (goingLeft && dataDir !== 'left'){ $sprite.attr('data-dir', 'left'); }
                 else if (goingRight && dataDir !== 'right'){ $sprite.attr('data-dir', 'right'); }
                 $sprite.attr('data-frame', playerFrames[index % playerFrames.length] || '00');
+                spriteBeforeMove.call($sprite);
                 });
             $robotSprites.each(function(index){
                 let $sprite = $(this);
@@ -5146,6 +5194,7 @@ class mmrpgWorldMap {
                 if (goingLeft && dataDir !== 'left'){ $sprite.attr('data-dir', 'left'); }
                 else if (goingRight && dataDir !== 'right'){ $sprite.attr('data-dir', 'right'); }
                 $sprite.attr('data-frame', robotFrames[index % robotFrames.length] || '00');
+                spriteBeforeMove.call($sprite);
                 });
 
             // Move the team sprites in such a way that they point in the direction they're facing
@@ -5180,7 +5229,7 @@ class mmrpgWorldMap {
                 else if (goingDown){ posY = targetY + _mapTileSize[1] - spriteHeight - _mapTileSizeOffset[1]; } // align-bottom
                 else { posY = targetY + Math.ceil((_mapTileSize[1] - spriteHeight) / 2) - (_mapSpriteSizeOffset[1] / 2); } // align-middle
                 playerPositions.push([posX, posY]);
-                $sprite.animate({left: posX + 'px', top: posY + 'px', zIndex: (posY + 10) }, teamRushDuration);
+                $sprite.animate({left: posX + 'px', top: posY + 'px', zIndex: (posY + 10) }, teamRushDuration, spriteAfterMove);
                 });
             let firstPlayerPosition = playerPositions[0] || [targetX, targetY];
             let robotSpriteKey = 0;
@@ -5198,7 +5247,7 @@ class mmrpgWorldMap {
                 else if (goingLeft){ posX += horzSpacing; } // align-left
                 if (goingUp){ posY += vertSpacing; } // align-top
                 else if (goingDown){ posY -= vertSpacing; } // align-bottom
-                $sprite.animate({left: posX + 'px', top: posY + 'px', zIndex: (posY + 10) }, teamRushDuration);
+                $sprite.animate({left: posX + 'px', top: posY + 'px', zIndex: (posY + 10) }, teamRushDuration, spriteAfterMove);
                 });
             // Make sure we put the cursor sprite lower (in z-index) than the team so it's like it's hiding
             //console.log('-> $otherSprites =', $otherSprites);
@@ -5214,22 +5263,40 @@ class mmrpgWorldMap {
                 })($otherSprites);
             //console.log('-> lowestOtherSpriteZ =', lowestOtherSpriteZ);
             $cursorSprite.attr('data-frame', '01').css({zIndex:(lowestOtherSpriteZ - 1)});
+            spriteAfterMove.call($cursorSprite);
 
             };
+
+        /*
+        // Define an inline function for applying various effects
+        let applyTeamEffect = function(effect){
+            console.log('%c' + '~ applyTeamEffect(effect:' + effect + ')', 'color: cyan;');
+            if (effect === 'leaving'){ $teamSprites.addClass('leaving'); }
+            else if (effect === 'glowing'){ $teamSprites.addClass('glowing'); }
+            };
+        let applyTeamAnimation = function(animation){
+            console.log('%c' + '~ applyTeamAnimation(animation:' + animation + ')', 'color: cyan;');
+            if (animation === 'hover-upward'){ $teamSprites.animate({top: '-80px'}, 300); }
+            else if (animation === 'slide-left'){ $teamSprites.animate({left: '-80px'}, 300); }
+            else if (animation === 'slide-right'){ $teamSprites.animate({left: '+=80px'}, 300); }
+            };
+        */
 
         // Define an inline function to redirect to the portal if needed
         let redirectToLocation = function(){
             //console.log('%c' + 'redirectToLocation()', 'color: cyan;');
             if (_self.worldIsBusy()){ return; }
             if (!stillAtPosition() || otherMenusActiveNow()){ return; }
-            if (autoRedirectSound){
-                _self.playSoundEffect(autoRedirectSound);
-                }
+            if (autoRedirectSound){ _self.playSoundEffect(autoRedirectSound); }
+            //if (autoRedirectEffect){ applyTeamEffect(autoRedirectEffect); }
+            //if (autoRedirectAnimation){ applyTeamAnimation(autoRedirectAnimation); }
             if (autoRedirectURL){
                 _self.incZoomLevel();
                 $thisWorld.addClass('busy');
+                //console.log('we should block input now...');
+                _world.isBusyWith.redirectToLocation = true;
                 _self.saveWorldState(function(){
-                    if (_self.worldIsBusy()){ return; }
+                    //if (_self.worldIsBusy()){ return; }
                     if (!stillAtPosition() || otherMenusActiveNow()){ return; }
                     else { _self.resetZoomLevel(); }
                     _self.incZoomLevel();
@@ -5808,14 +5875,14 @@ class mmrpgWorldMap {
             //console.log('%c' + 'triggerEffectFunction()', 'color: cyan;');
             if (_selfRef.zoomEffectTimeout){ clearTimeout(_selfRef.zoomEffectTimeout); }
             _selfRef.zoomEffectTimeout = setTimeout(triggerEffectFunction, (zoomTimeoutDuration * timeoutMultiplier));
-            return true;
+            if (!autoRedirect){ return true; }
             }
 
         // If a redirect was requested, this is where we exit actually
         if (autoRedirect){
             if (_selfRef.zoomRedirectTimeout){ clearTimeout(_selfRef.zoomRedirectTimeout); }
             _selfRef.zoomRedirectTimeout = setTimeout(redirectToLocation, (zoomTimeoutDuration * timeoutMultiplier));
-            return true;
+            if (!showActionArea){ return true; }
             }
 
         // Otherwise we can actually trigger the dropdown and zoom in on the events
@@ -7902,12 +7969,13 @@ class mmrpgWorldMap {
         }
 
     // Define a quick function for triggering a live item pickup on the field (and any effects that may have
-    triggerItemPickup(itemEvent, zoomDelay){
+    triggerItemPickup(itemEvent, zoomDelay, playSound){
         //console.log('%c' + 'mmrpgWorldMap.triggerItemPickup()', 'color: magenta;');
         //console.log('--> itemEvent =', itemEvent);
         if (!itemEvent || typeof itemEvent !== 'object'){ console.error('triggerItemPickup() missing required itemEvent!'); return false; }
         if (typeof itemEvent.sprite === 'undefined'){ console.error('triggerItemPickup() missing required itemEvent.sprite!'); return false; }
         if (itemEvent.claimed === true){ console.warn('triggerItemPickup() called for item that has already been claimed!'); return false; }
+        playSound = typeof playSound === 'boolean' ? playSound : true; // default to true if not provided
 
         // Collect local references to world objects
         let _self = this;
@@ -8246,6 +8314,14 @@ class mmrpgWorldMap {
         // Now we can remove the zoom and delete the item sprite from the events layer
         //console.log('-> zooming and queueing pickup function for item sprite on map');
         _self.incZoomLevel();
+        if (playSound){
+            _self.playSoundEffect('pickup-sound');
+            let playAutoSound = false;
+            if (_self.itemIsConsumable(itemToken) && _world.autoApplyConsumables === true){ playAutoSound = true; }
+            else if (_self.itemIsHoldable(itemToken) && _world.autoEquipHoldables === true){ playAutoSound = true; }
+            if (playAutoSound){ _self.playSoundEffect('confirm-sound'); }
+            }
+        _world.isBusyWith.itemPickup = true;
         setTimeout(function(){
             // call the pickup function to apply the item effects
             pickupFunction(function(){
@@ -8260,6 +8336,7 @@ class mmrpgWorldMap {
                     $itemEventSprite.animate({opacity: 0, filter: 'brightness(2)'}, zoomDelay, function(){ $itemEventSprite.remove(); });
                     }
                 // Trigger a save of the world state to persist this change
+                delete _world.isBusyWith.itemPickup;
                 _self.saveWorldState();
                 });
             }, (zoomDelay * 2));
@@ -8268,12 +8345,14 @@ class mmrpgWorldMap {
         }
 
     // Define a quick function for triggering a live ability pickup on the field (and any effects that may have
-    triggerAbilityPickup(abilityEvent, zoomDelay){
+    triggerAbilityPickup(abilityEvent, zoomDelay, playSound){
         //console.log('%c' + 'mmrpgWorldMap.triggerAbilityPickup()', 'color: magenta;');
         //console.log('--> abilityEvent =', abilityEvent);
         if (!abilityEvent || typeof abilityEvent !== 'object'){ console.error('triggerAbilityPickup() missing required abilityEvent!'); return false; }
         if (typeof abilityEvent.sprite === 'undefined'){ console.error('triggerAbilityPickup() missing required abilityEvent.sprite!'); return false; }
         if (abilityEvent.claimed === true){ console.warn('triggerAbilityPickup() called for ability that has already been claimed!'); return false; }
+        playSound = typeof playSound === 'boolean' ? playSound : true; // default to true if not provided
+
         // Collect local references to world objects
         let _self = this;
         let _config = _self.config;
@@ -8309,6 +8388,8 @@ class mmrpgWorldMap {
                 console.error('triggerAbilityPickup() called for ability with empty token!');
                 return false;
                 }
+            // If a sound was requested, play it now
+            if (playSound){ _self.playSoundEffect('pickup-sound'); }
             // Create an array to hold notification message markup for this event
             let messageMarkup = [];
             let abilityNameTextSpan = _self.getAbilityNameSpan(abilityToken);
@@ -8337,6 +8418,8 @@ class mmrpgWorldMap {
         // TODO: we need to actually save the ability to the player's inventory and save the event to permanently remove it
         //console.log('-> zooming and queueing pickup function for ability sprite on map');
         _self.incZoomLevel();
+        if (playSound){ _self.playSoundEffect('pickup-sound'); }
+        _world.isBusyWith.abilityPickup = true;
         setTimeout(function(){
             // call the pickup function to apply the ability effects
             pickupFunction(function(){
@@ -8349,6 +8432,7 @@ class mmrpgWorldMap {
                 //console.log('--> removing ability sprite from the map');
                 $abilityEventSprite.animate({opacity: 0, filter: 'brightness(2)'}, zoomDelay, function(){ $abilityEventSprite.remove(); });
                 // Trigger a save of the world state to persist this change
+                delete _world.isBusyWith.abilityPickup;
                 _self.saveWorldState();
                 });
             }, (zoomDelay * 2));
@@ -10041,6 +10125,7 @@ class mmrpgWorldMap {
             //console.log('%c' + '~mmrpgWorldMap.showActionModal.hideActionModal()', 'color: magenta;');
             $actionModal.addClass('hidden');
             _world.mapIsHidden = _selfRef.mapIsHiddenBackup;
+            _world.actionModalVisible = false;
             alsoReset = typeof alsoReset === 'boolean' ? alsoReset : false;
             if (alsoReset){ setTimeout(function(){ resetActionModal(); }, 600); }
             runModalCallback('onHide');
@@ -10654,6 +10739,7 @@ class mmrpgWorldMap {
             //console.log('-> showing action modal ...');
             $actionModal.removeClass('hidden');
             _world.mapIsHidden = true;
+            _world.actionModalVisible = true;
             runModalCallback('onShow');
             }, 100);
 
