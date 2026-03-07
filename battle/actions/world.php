@@ -74,6 +74,14 @@ if (!empty($this_player->player_token)
         $robot_session['attack'] = !$is_disabled && !empty($robot_info['counters']['attack_mods']) ? $robot_info['counters']['attack_mods'] : 0;
         $robot_session['defense'] = !$is_disabled && !empty($robot_info['counters']['defense_mods']) ? $robot_info['counters']['defense_mods'] : 0;
         $robot_session['speed'] = !$is_disabled && !empty($robot_info['counters']['speed_mods']) ? $robot_info['counters']['speed_mods'] : 0;
+        if (isset($robot_info['robot_base_energy_backup']) && $robot_info['robot_base_energy_backup'] !== $robot_info['robot_base_energy']){ $robot_session['energy'] *= ($robot_info['robot_base_energy'] / $robot_info['robot_base_energy_backup']); }
+        if (isset($robot_info['robot_base_weapons_backup']) && $robot_info['robot_base_weapons_backup'] !== $robot_info['robot_base_weapons']){ $robot_session['weapons'] *= ($robot_info['robot_base_weapons'] / $robot_info['robot_base_weapons_backup']); }
+        if ($robot_session['attack'] > MMRPG_SETTINGS_STATS_MOD_MAX){ $robot_session['attack'] = MMRPG_SETTINGS_STATS_MOD_MAX; }
+        else if ($robot_session['attack'] < MMRPG_SETTINGS_STATS_MOD_MIN){ $robot_session['attack'] = MMRPG_SETTINGS_STATS_MOD_MIN; }
+        if ($robot_session['defense'] > MMRPG_SETTINGS_STATS_MOD_MAX){ $robot_session['defense'] = MMRPG_SETTINGS_STATS_MOD_MAX; }
+        else if ($robot_session['defense'] < MMRPG_SETTINGS_STATS_MOD_MIN){ $robot_session['defense'] = MMRPG_SETTINGS_STATS_MOD_MIN; }
+        if ($robot_session['speed'] > MMRPG_SETTINGS_STATS_MOD_MAX){ $robot_session['speed'] = MMRPG_SETTINGS_STATS_MOD_MAX; }
+        else if ($robot_session['speed'] < MMRPG_SETTINGS_STATS_MOD_MIN){ $robot_session['speed'] = MMRPG_SETTINGS_STATS_MOD_MIN; }
         //error_log('Saving robot session for '.$robot_token.' : '.print_r($robot_session, true));
         $WORLD_ROBOT_SESSIONS[$robot_token] = $robot_session;
     }
