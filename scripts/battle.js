@@ -7,6 +7,7 @@ var $rogueStar = false;
 gameSettings.currentGameState = {}; // default to empty but may be filled at runtime and used later
 gameSettings.currentBattleData = {};
 gameSettings.currentBattleState = {};
+gameSettings.battleLoaded = false;
 gameSettings.battleHasStarted = false;
 
 // Create the document ready events
@@ -53,6 +54,7 @@ $(document).ready(function(){
             $('#animate').css({opacity:1});
             $('#canvas .canvas_overlay_header').css({opacity:1}).removeClass('canvas_overlay_hidden');
             mmrpg_start_animation();
+            gameSettings.battleLoaded = true;
             mmrpg_action_trigger('start', false);
             }, false, true);
         }
@@ -76,6 +78,7 @@ $(document).ready(function(){
                             $('#animate').css({opacity:1});
                             $('#canvas .canvas_overlay_header').animate({opacity:1}, Math.ceil(gameSettings.eventTimeout * 2), 'swing', function(){ $(this).removeClass('canvas_overlay_hidden'); });
                             mmrpg_start_animation();
+                            gameSettings.battleLoaded = true;
                             mmrpg_action_trigger('start', false);
                             gameSettings.battleHasStarted = true;
                             }
@@ -88,9 +91,13 @@ $(document).ready(function(){
     // -- SOUND EFFECT FUNCTIONALITY -- //
 
     // Define some interaction sound effects for the battle menu
-    var thisContext = $('#battle');
-    var playSoundEffect = function(){};
-    if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+    let $thisBattle = $('#battle');
+    let playSoundEffect = function(){};
+    let soundEffectFunction = null;
+    if (typeof top.mmrpg_play_sound_effect !== 'undefined'){ soundEffectFunction = top.mmrpg_play_sound_effect; }
+    else if (typeof self.mmrpg_play_sound_effect !== 'undefined'){ soundEffectFunction = self.mmrpg_play_sound_effect; }
+    if (soundEffectFunction){
+        //console.log('assigning sound effects w/ soundEffectFunction:', soundEffectFunction);
 
         // Define a quick local function for routing sound effect plays to the parent
         playSoundEffect = function(soundName, options){
@@ -99,27 +106,37 @@ $(document).ready(function(){
                 if ($(this).is('.disabled')){ return; }
                 if ($(this).is('.button_disabled')){ return; }
                 }
-            top.mmrpg_play_sound_effect(soundName, options);
+            soundEffectFunction(soundName, options);
             };
 
         // MENU LINKS
 
         // Add hover and click sounds to the buttons in the main menu
-        $('#actions .main_actions .button', thisContext).live('mouseenter', function(){
-            playSoundEffect.call(this, 'link-hover');
+        $('#actions .main_actions .button', $thisBattle).live('mouseenter', function(){
+            playSoundEffect.call(this, 'icon-hover');
             });
-        $('#actions .main_actions .button', thisContext).live('click', function(){
-            playSoundEffect.call(this, 'link-click');
+        $('#actions .main_actions .button', $thisBattle).live('click', function(){
+            playSoundEffect.call(this, 'icon-click');
             });
 
         // Add hover and click sounds to any buttons in the sub menu
-        $('#actions .sub_actions .button', thisContext).live('mouseenter', function(){
+        $('#actions .sub_actions .button', $thisBattle).live('mouseenter', function(){
             if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-hover'); }
-            else { playSoundEffect.call(this, 'link-hover'); }
+            else { playSoundEffect.call(this, 'icon-hover'); }
             });
-        $('#actions .sub_actions .button', thisContext).live('click', function(){
+        $('#actions .sub_actions .button', $thisBattle).live('click', function(){
             if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-click'); }
-            else { playSoundEffect.call(this, 'link-click'); }
+            else { playSoundEffect.call(this, 'icon-click'); }
+            });
+
+        // Add hover and click sounds to any buttons in the float menu
+        $('#actions .float_links .button', $thisBattle).live('mouseenter', function(){
+            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-hover'); }
+            else { playSoundEffect.call(this, 'icon-hover'); }
+            });
+        $('#actions .float_links .button', $thisBattle).live('click', function(){
+            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-click'); }
+            else { playSoundEffect.call(this, 'icon-click'); }
             });
 
         }
@@ -283,6 +300,7 @@ $(document).ready(function(){
         let hoverButtonSelector = buttonSelector+'.button_hover';
         let $currentMainActions = $('.main_actions', $currentWrapper);
         let $currentSubActions = $('.sub_actions', $currentWrapper);
+        let $currentFloatLinks = $('.float_links', $currentMainActions);
         let $currentButtons = $(buttonSelector, $currentWrapper);
         let $currentMainActionButtons = $(buttonSelector, $currentMainActions);
         let $currentSubActionButtons = $(buttonSelector, $currentSubActions);
@@ -345,7 +363,7 @@ $(document).ready(function(){
             if (event){ event.preventDefault(); }
             if ($currentSubActions.is(':visible')){
                 let $backButton = $currentSubActionButtons.first();
-                if ($backButton.length){
+                if ($backButton.length && $backButton.is('.action_back')){
                     $backButton.trigger('click');
                     return true;
                     }
@@ -380,6 +398,7 @@ $(document).ready(function(){
                     let $firstMainButton = $currentMainActionButtons.first();
                     if ($firstMainButton.length){
                         $firstMainButton.addClass('button_hover');
+                        playSoundEffect.call(this, 'icon-hover');
                         return true;
                         }
                     }
@@ -389,6 +408,7 @@ $(document).ready(function(){
                     let $firstSubButton = $currentSubActionButtons.first();
                     if ($firstSubButton.length){
                         $firstSubButton.addClass('button_hover');
+                        playSoundEffect.call(this, 'icon-hover');
                         return true;
                         }
                     }
@@ -401,11 +421,13 @@ $(document).ready(function(){
                         if ($firstMainButton.length){
                             $currentButtons.removeClass('button_hover');
                             $firstMainButton.addClass('button_hover');
+                            playSoundEffect.call(this, 'icon-hover');
                             return true;
                             }
                         else if ($firstSubButton.length){
                             $currentButtons.removeClass('button_hover');
                             $firstSubButton.addClass('button_hover');
+                            playSoundEffect.call(this, 'icon-hover');
                             return true;
                             }
                         }
@@ -420,6 +442,7 @@ $(document).ready(function(){
                         let $nextButton = $currentSubActionButtons.eq(nextIndex);
                         if ($nextButton.length){
                             $nextButton.addClass('button_hover');
+                            playSoundEffect.call(this, 'icon-hover');
                             return true;
                             }
                         }
@@ -440,6 +463,7 @@ $(document).ready(function(){
                             $currentButtons.removeClass('button_hover');
                             $firstButton.addClass('button_hover');
                             lastWrapperPosition = [0,0];
+                            playSoundEffect.call(this, 'icon-hover');
                             return true;
                             }
                         }
@@ -531,6 +555,7 @@ $(document).ready(function(){
                             let $nextButton = $(buttonRows[nextRow][nextIndex]);
                             $currentButtons.removeClass('button_hover');
                             $nextButton.addClass('button_hover');
+                            playSoundEffect.call(this, 'icon-hover');
                             lastWrapperPosition = [nextRow, nextIndex];
                             let $tooltip = $('#mmrpg-tooltip', $mmrpgDiv);
                             let tooltipActive = $tooltip.length && $tooltip.hasClass('active');
@@ -547,24 +572,40 @@ $(document).ready(function(){
 
                 }
             }
+        // If the player has pressed the L2+R2 button, we should try to click the top-right support button (if exists)
+        if (activeInputs.LR2){
+            console.log('%c' + 'L2+R2 key pressed!', 'color: orange;');
+            if (event){ event.preventDefault(); }
+            if ($currentFloatLinks.length){
+                let $floatButtons = $('.button[data-action]:not(.num):not(.disabled)', $currentFloatLinks);
+                //console.log('$currentFloatLinks =', $currentFloatLinks.length, $currentFloatLinks);
+                //console.log('$floatButtons =', $floatButtons.length, $floatButtons);
+                let $firstButton = $floatButtons.length && $floatButtons.length ? $floatButtons.first() : null;
+                if ($firstButton){
+                    console.log('-> clicking $firstButton =', $firstButton.length, $firstButton);
+                    $firstButton.addClass('button_hover');
+                    $firstButton.trigger('click');
+                    return true;
+                    }
+                }
+            }
         // If the user has pressed the L1/R1 bumpers to scoll sub-pages
         // if the mainactions have .float_links and .button.num pages inside
         // then the L1/R1 buttons should scroll through them and "click"
-        if (activeInputs.L1 || activeInputs.R1){ // L1/R1 bumpers
+        else if (activeInputs.L1 || activeInputs.R1){ // L1/R1 bumpers
             //console.log('%c' + 'L1 or R1 bumper pressed!', 'color: orange;');
             if (event){ event.preventDefault(); }
-            let $floatLinks = $('.float_links', $currentMainActions);
-            if ($floatLinks.length){
-                let $allButtons = $('.button.num:not(.disabled):not([data-action])', $floatLinks);
-                let $activeButton = $allButtons.filter('[href="#' + lastWrapperPage + '"]');
-                if ($activeButton.length && $allButtons.length > 1){
-                    let visibleIndex = $allButtons.index($activeButton);
+            if ($currentFloatLinks.length){
+                let $numButtons = $('.button.num:not([data-action]):not(.disabled)', $currentFloatLinks);
+                let $activeButton = $numButtons.filter('[href="#' + lastWrapperPage + '"]');
+                if ($activeButton.length && $numButtons.length > 1){
+                    let visibleIndex = $numButtons.index($activeButton);
                     let nextIndex = visibleIndex;
                     if (activeInputs.L1){ nextIndex = visibleIndex - 1; }
                     else if (activeInputs.R1){ nextIndex = visibleIndex + 1; }
-                    if (nextIndex < 0){ nextIndex = $allButtons.length - 1; }
-                    if (nextIndex >= $allButtons.length){ nextIndex = 0; }
-                    let $nextButton = $allButtons.eq(nextIndex);
+                    if (nextIndex < 0){ nextIndex = $numButtons.length - 1; }
+                    if (nextIndex >= $numButtons.length){ nextIndex = 0; }
+                    let $nextButton = $numButtons.eq(nextIndex);
                     if ($nextButton.length){
                         $nextButton.trigger('click');
                         // also update the hover class to match
