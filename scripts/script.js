@@ -3449,6 +3449,9 @@ class mmrpgUserInputWatcher {
         _config.wheelTimeout = typeof config.wheelTimeout === 'number' ?  config.wheelTimeout : _config.inputTimeout;
         _config.gamepadTimeout = typeof config.gamepadTimeout === 'number' ? config.gamepadTimeout : _config.inputTimeout;
         _config.autoRunCallbacks = typeof config.autoRunCallbacks === 'boolean' ? config.autoRunCallbacks : true;
+        _config.stickDeadzone = typeof config.stickDeadzone === 'number' ? config.stickDeadzone : 0.25;
+        _config.diagonalBias = typeof config.diagonalBias === 'number' ? config.diagonalBias : 0.4;
+        _config.gamepadKind = typeof config.gamepadKind === 'number' ? config.gamepadKind : null;
         _self.config = _config;
 
         // Define the events object and its defaults
@@ -3465,16 +3468,16 @@ class mmrpgUserInputWatcher {
         // Define an index of symbolic "userInputs" we can abstract actions behind, and then
         // worry about specific key-bindings and button-mappings later on to keep things clean
         let userInputs = {}; // below will be the default for now, but we'll allow customizing later
-        userInputs.A = {icon: 'Ⓐ', keyboard: ['d', 'Space'], gamepad: [0]};
-        userInputs.B = {icon: 'Ⓑ', keyboard: ['s', 'Backspace'], gamepad: [1]};
-        userInputs.X = {icon: 'Ⓧ', keyboard: ['f', 'Escape', '\\'], gamepad: [2]};
-        userInputs.Y = {icon: 'Ⓨ', keyboard: ['a', 'Tab'], gamepad: [3]};
-        userInputs.L1 = {icon: 'L1', keyboard: ['q', '['], gamepad: [4]};
-        userInputs.R1 = {icon: 'R1', keyboard: ['e', ']'], gamepad: [5]};
-        userInputs.LR1 = {icon: 'L1+R1', keyboard: ['w'], gamepad: []};
-        userInputs.L2 = {icon: 'L2', keyboard: ['z', '-'], gamepad: [6]};
-        userInputs.R2 = {icon: 'R2', keyboard: ['c', '='], gamepad: [7]};
-        userInputs.LR2 = {icon: 'L2+R2', keyboard: ['x'], gamepad: []};
+        userInputs.A = {icon: 'Ⓐ', sonyIcon: '⨯', keyboard: ['d', 'Space'], gamepad: [0]};
+        userInputs.B = {icon: 'Ⓑ', sonyIcon: '◯', keyboard: ['s', 'Backspace'], gamepad: [1]};
+        userInputs.X = {icon: 'Ⓧ', sonyIcon: '□', keyboard: ['f', 'Escape', '\\'], gamepad: [2]};
+        userInputs.Y = {icon: 'Ⓨ', sonyIcon: '△', keyboard: ['a', 'Tab'], gamepad: [3]};
+        userInputs.L1 = {icon: 'L1', keyboard: ['z', '['], gamepad: [4]};
+        userInputs.R1 = {icon: 'R1', keyboard: ['c', ']'], gamepad: [5]};
+        userInputs.LR1 = {icon: 'L1+R1', keyboard: ['x'], gamepad: [4, 5], isCombo: true};
+        userInputs.L2 = {icon: 'L2', keyboard: ['q', '-'], gamepad: [6]};
+        userInputs.R2 = {icon: 'R2', keyboard: ['e', '='], gamepad: [7]};
+        userInputs.LR2 = {icon: 'L2+R2', keyboard: ['w'], gamepad: [6, 7], isCombo: true};
         userInputs.Start = {icon: '+', keyboard: ['Enter', 'Home'], gamepad: [9]};
         userInputs.Select = {icon: '−', keyboard: ['Shift', 'End'], gamepad: [8]};
         userInputs.Up = {icon: '⏶', keyboard: ['ArrowUp'], gamepad: [12]};
@@ -3482,6 +3485,7 @@ class mmrpgUserInputWatcher {
         userInputs.Left = {icon: '⏴', keyboard: ['ArrowLeft'], gamepad: [14]};
         userInputs.Right = {icon: '⏵', keyboard: ['ArrowRight'], gamepad: [15]};
         _self.userInputs = userInputs;
+        _self.baseUserInputs = JSON.parse(JSON.stringify(userInputs));
 
         // Define the abstraction method for handling user input events
         let onUserInput = function(kind, event){
@@ -3493,19 +3497,19 @@ class mmrpgUserInputWatcher {
                 }
             };
 
-        // If toggled, make sure we swap the A and B buttons for a Nintendo-style layout
-        let useNintendoLayout = false; // TODO: make this customizable later
-        if (useNintendoLayout){
-            // Swap the A and B buttons with each other
-            let aButtonGamepad = userInputs.A.gamepad;
-            let bButtonGamepad = userInputs.B.gamepad;
-            userInputs.A.gamepad = Object.values(bButtonGamepad);
-            userInputs.B.gamepad = Object.values(aButtonGamepad);
-            // Do the same for the X and Y buttons too
-            let xButtonGamepad = userInputs.X.gamepad;
-            let yButtonGamepad = userInputs.Y.gamepad;
-            userInputs.X.gamepad = Object.values(yButtonGamepad);
-            userInputs.Y.gamepad = Object.values(xButtonGamepad);
+        // If toggled, make sure we allow left-stick input to count as directional-input
+        let allowStickMovement = true; // TODO: make this customizable later
+        if (allowStickMovement){
+            // Grab the deadzone from config to use as our threshold
+            let dz = _config.stickDeadzone;
+            // axes[0] = Left Stick X, axes[1] = Left Stick Y
+            // axes[2] = Right Stick X, axes[3] = Right Stick Y
+            // Add an extra listener for gamepad axis to the directional inputs
+            userInputs.Left.axis = [0, -dz];
+            userInputs.Right.axis = [0, dz];
+            userInputs.Up.axis = [1, -dz];
+            userInputs.Down.axis = [1, dz];
+            //console.log('userInputs =', userInputs);
             }
 
         // Define a quick function that takes a given keyboard press (mixed) and returns the user input key for it
@@ -3517,23 +3521,6 @@ class mmrpgUserInputWatcher {
             Object.keys(userInputs).forEach(function(inputKey){
                 let inputData = userInputs[inputKey];
                 if (inputData.keyboard && inputData.keyboard.indexOf(keyCode) !== -1){
-                    //console.log('-> inputKey =', inputKey);
-                    returnKey = inputKey;
-                    return;
-                    }
-                });
-            return returnKey;
-            };
-        // Define a quick function that takes a given gamepad key (numeric) and returns the input key for it
-        let getUserInputFromGamepadKey = function(keyNum){
-            //console.log('%c' + 'getUserInputFromGamepadKey(keyNum:', keyNum, ') called!', 'color: magenta;');
-            //console.log('-> keyNum =', keyNum);
-            if (typeof keyNum !== 'number'){ keyNum = parseInt(keyNum); }
-            if (isNaN(keyNum)){ return false; }
-            let returnKey = false;
-            Object.keys(userInputs).forEach(function(inputKey){
-                let inputData = userInputs[inputKey];
-                if (inputData.gamepad && inputData.gamepad.indexOf(keyNum) !== -1){
                     //console.log('-> inputKey =', inputKey);
                     returnKey = inputKey;
                     return;
@@ -3566,29 +3553,99 @@ class mmrpgUserInputWatcher {
             return inputKey;
             };
 
+        // Define a function for determining the current controller type (for button icons) if possible
+        let gamepadKind = null, gamepadKinds = {
+            other: {id: 0, token: 'other', name: 'Generic/Other'},
+            nintendo: {id: 1, token: 'nintendo', name: 'Nintendo'},
+            sony: {id: 2, token: 'sony', name: 'PlayStation'},
+            xbox: {id: 3, token: 'xbox', name: 'Xbox'}
+            };
+        let updateGamepadKind = function(gamepad){
+            if (_config.gamepadKind && _config.gamepadKind !== null){ return _config.gamepadKind; }
+            else if (gamepadKind && gamepadKind !== null){ return gamepadKind; }
+            //console.log('updateGamepadKind() w/ gamepad:', gamepad);
+            let gamepadID = gamepad.id, gamepadToken = 'other';
+            //console.log('...and gamepadID:', gamepadID);
+            if (gamepadID.includes("Nintendo") || gamepadID.includes("Joy-Con") || gamepadID.includes("Pro Controller")){ gamepadToken = 'nintendo'; }
+            else if (gamepadID.includes("Sony") || gamepadID.includes("DualSense") || gamepadID.includes("DualShock")){ gamepadToken = 'sony'; }
+            else if (gamepadID.includes("Xbox") || gamepadID.includes("X-Input")){ gamepadToken = 'xbox'; }
+            //console.log('...gives gamepadToken:', gamepadToken);
+            if (typeof gamepadKinds[gamepadToken] !== 'undefined'){ gamepadKind = gamepadToken; } else { gamepadKind = null; }
+            //console.log('...resulting in gamepadKind =', gamepadKind);
+            updateGamepadInputs(gamepadKind);
+            return gamepadKind;
+            };
+        let updateGamepadInputs = function(gamepadKind){
+            let userInputs = _self.userInputs;
+            let baseUserInputs = _self.baseUserInputs, baseButtonKeys = {};
+            baseButtonKeys.A = baseUserInputs.A.gamepad, baseButtonKeys.B = baseUserInputs.B.gamepad;
+            baseButtonKeys.X = baseUserInputs.X.gamepad, baseButtonKeys.Y = baseUserInputs.Y.gamepad;
+            if (gamepadKind === 'nintendo'){
+                // nintendo controllers use original A/B and X/Y placement
+                userInputs.A.gamepad = Object.values(baseButtonKeys.B);
+                userInputs.B.gamepad = Object.values(baseButtonKeys.A);
+                userInputs.X.gamepad = Object.values(baseButtonKeys.Y);
+                userInputs.Y.gamepad = Object.values(baseButtonKeys.X);
+                }
+            else {
+                // xbox and playstation controllers have different icons, but button placement is consistent
+                userInputs.A.gamepad = Object.values(baseButtonKeys.A);
+                userInputs.B.gamepad = Object.values(baseButtonKeys.B);
+                userInputs.X.gamepad = Object.values(baseButtonKeys.X);
+                userInputs.Y.gamepad = Object.values(baseButtonKeys.Y);
+                }
+            };
+
         // Define a function for watching gamepad inputs and updating the activeInputs object accordingly
         let connectedGamepad = null;
         let watchGamepadInputs = function(gamepad){
-            if (gamepad === null){ connectedGamepad = null; return; }
+            if (gamepad === null){ connectedGamepad = null; gamepadKind = null; return; }
             else if (typeof gamepad !== 'undefined'){ connectedGamepad = gamepad; }
             if (!connectedGamepad || typeof connectedGamepad.index === 'undefined'){ return false; }
             let gp = navigator.getGamepads()[connectedGamepad.index];
             if (!gp){ return false; }
-            gp.buttons.forEach((button, index) => {
-                let inputKey = getUserInputFromGamepadKey(index);
-                let inputChange = false;
-                if (!inputKey){ return; }
-                if (button.pressed && typeof activeInputs[inputKey] === 'undefined'){
-                    activeInputs[inputKey] = true;
-                    inputChange = true;
-                    } else if (!button.pressed && typeof activeInputs[inputKey] !== 'undefined') {
-                    delete activeInputs[inputKey];
-                    inputChange = true;
+            else { updateGamepadKind(gp); }
+            //console.log('watchGamepadInputs -> gamepadKind:', gamepadKind);
+            let consumedButtons = new Set();
+            let newActiveStates = {};
+            let isBtnPressed = (idx) => gp.buttons[idx] && gp.buttons[idx].pressed;
+            let isAxisPushed = (axisData) => {
+                if (!allowStickMovement || !axisData){ return false; }
+                let [axisIndex, threshold] = axisData;
+                let val = gp.axes[axisIndex];
+                let passesDeadzone = (threshold < 0 && val <= threshold) || (threshold > 0 && val >= threshold);
+                if (!passesDeadzone){ return false; }
+                let pairedAxisIndex = axisIndex % 2 === 0 ? axisIndex + 1 : axisIndex - 1;
+                let pairedVal = gp.axes[pairedAxisIndex];
+                if (Math.abs(val) < Math.abs(pairedVal) * _config.diagonalBias){ return false; }
+                return true;
+                };
+            Object.keys(userInputs).forEach(key => { // PASS 1: Check Combos First
+                let data = userInputs[key], gamepad = data.gamepad;
+                if (!data.isCombo){ return; } // skip if not a checkable combo
+                if (gamepad && gamepad.length && gamepad.every(isBtnPressed)) {
+                    newActiveStates[key] = true;
+                    gamepad.forEach(btn => consumedButtons.add(btn));
                     }
-                // Optional: Emit event if you really need it (careful of spamming this!)
-                //console.log('-> trying to emit gamepadinput event on input (inputChange:', inputChange, ')');
-                if (inputChange){
-                    let nullfn = function(){};
+                });
+            //console.log('consumedButtons =', consumedButtons);
+            Object.keys(userInputs).forEach(key => { // PASS 2: Check Standard Inputs & Axes
+                if (newActiveStates[key]){ return; } // Skip if already handled by Pass 1
+                let data = userInputs[key], gamepad = data.gamepad, axis = data.axis;
+                if (data.isCombo){ return; } // skip if already-checked combo
+                let btnPressed = gamepad && gamepad.length && gamepad.some(btn => isBtnPressed(btn) && !consumedButtons.has(btn));
+                let axisPressed = isAxisPushed(axis);
+                if (btnPressed || axisPressed) {
+                    newActiveStates[key] = true;
+                    }
+                });
+            let nullfn = function(){};
+            Object.keys(userInputs).forEach(key => { // PASS 3: Update State & Fire Events
+                let isPressed = !!newActiveStates[key];
+                let wasPressed = !!activeInputs[key];
+                if (isPressed !== wasPressed) {
+                    if (isPressed) { activeInputs[key] = true; }
+                    else { delete activeInputs[key]; }
                     let event = new Event('gamepadinput', { bubbles: true, cancelable: true, preventDefault: nullfn, stopPropagation: nullfn });
                     document.dispatchEvent(event);
                     onUserInput('gamepadinput', event);
