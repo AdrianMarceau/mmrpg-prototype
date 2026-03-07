@@ -356,6 +356,73 @@ $(document).ready(function(){
 
     }
 
+    // -- GAME AUDIO SETUP -- //
+
+    // Only run audio setup on the top-most layer of windows
+    if (window.top === window.self){
+        //console.log('%c' + 'Loading Game Audio ... ', 'color: magenta;');
+
+        // Autmatically load the music index in json format via ajax into memory for later if not there
+        if (typeof gameSettings.customIndex.musicIndex === 'undefined'
+            || !Object.keys(gameSettings.customIndex.musicIndex).length){
+            gameSettings.customIndex.musicIndex = {};
+            //console.log('gameSettings.customIndex.musicIndex =', gameSettings.customIndex.musicIndex);
+            if (!Object.keys(gameSettings.customIndex.musicIndex).length){
+                //console.log('loading the music index!');
+                $.ajax({
+                    url: 'api/v2/music/index',
+                    dataType: 'json',
+                    success: function(response){
+                        //console.log('api/v2/music/index returned ', response);
+                        if (typeof response.data !== 'undefined'
+                            && typeof response.data.music !== 'undefined'){
+                            gameSettings.customIndex.musicIndex = response.data.music;
+                            //console.log('gameSettings.customIndex.musicIndex =', gameSettings.customIndex.musicIndex);
+                            }
+                        }
+                    });
+                }
+            }
+
+        // Automatically define the sounds index to we don't get errors if it hasn't been defined
+        if (typeof gameSettings.customIndex.soundsIndex === 'undefined'
+            || !Object.keys(gameSettings.customIndex.soundsIndex).length){
+            gameSettings.customIndex.soundsIndex = {};
+            }
+
+        // If a sounds index exists, use it to populate the internal effect sources and sprites index
+        //console.log('gameSettings.customIndex.soundsIndex =', gameSettings.customIndex.soundsIndex);
+        if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
+            && Object.keys(gameSettings.customIndex.soundsIndex).length){
+            var soundsIndexIndex = gameSettings.customIndex.soundsIndex;
+            var rawSoundSources = soundsIndexIndex.src;
+            var soundSources = [];
+            for (var i = 0; i < rawSoundSources.length; i++){
+                var sourcePath = 'sounds/'+rawSoundSources[i];
+                var sourcePathFull = gameSettings.audioBaseHref+sourcePath;
+                soundSources.push(sourcePathFull);
+                }
+            var rawSoundSprites = soundsIndexIndex.sprite;
+            var soundSprites = {};
+            var soundSpritesTokens = [];
+            soundSpritesTokens = Object.keys(rawSoundSprites);
+            for (var i = 0; i < soundSpritesTokens.length; i++){
+                var spriteToken = soundSpritesTokens[i];
+                var spriteData = rawSoundSprites[spriteToken];
+                soundSprites[spriteToken] = [spriteData['start'], spriteData['duration'], spriteData['loop']];
+                }
+            gameSettings.soundEffectSources = soundSources;
+            gameSettings.soundEffectSprites = soundSprites;
+            //console.log('rawSoundSources = ', rawSoundSources);
+            //console.log('rawSoundSprites = ', rawSoundSprites);
+            //console.log('soundSources = ', soundSources);
+            //console.log('soundSprites = ', soundSprites);
+            //console.log('gameSettings.soundEffectSources = ', gameSettings.soundEffectSources);
+            //console.log('gameSettings.soundEffectSprites = ', gameSettings.soundEffectSprites);
+            }
+
+        }
+
     // Ensure this is the battle document
     if (gameWindow.length){
 
@@ -381,64 +448,6 @@ $(document).ready(function(){
 
         // Set up the game music options
         if (gameMusic.length){
-
-            // Autmatically load the music index in json format via ajax into memory for later if not there
-            if (typeof gameSettings.customIndex.musicIndex === 'undefined'
-                || !Object.keys(gameSettings.customIndex.musicIndex).length){
-                gameSettings.customIndex.musicIndex = {};
-                //console.log('gameSettings.customIndex.musicIndex =', gameSettings.customIndex.musicIndex);
-                if (!Object.keys(gameSettings.customIndex.musicIndex).length){
-                    //console.log('loading the music index!');
-                    $.ajax({
-                        url: 'api/v2/music/index',
-                        dataType: 'json',
-                        success: function(response){
-                            //console.log('api/v2/music/index returned ', response);
-                            if (typeof response.data !== 'undefined'
-                                && typeof response.data.music !== 'undefined'){
-                                gameSettings.customIndex.musicIndex = response.data.music;
-                                //console.log('gameSettings.customIndex.musicIndex =', gameSettings.customIndex.musicIndex);
-                                }
-                            }
-                        });
-                    }
-                }
-
-            // Automatically define the sounds index to we don't get errors if it hasn't been defined
-            if (typeof gameSettings.customIndex.soundsIndex === 'undefined'
-                || !Object.keys(gameSettings.customIndex.soundsIndex).length){
-                gameSettings.customIndex.soundsIndex = {};
-                }
-
-            // If a sounds index exists, use it to populate the internal effect sources and sprites index
-            //console.log('gameSettings.customIndex.soundsIndex =', gameSettings.customIndex.soundsIndex);
-            if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
-                && Object.keys(gameSettings.customIndex.soundsIndex).length){
-                var soundsIndexIndex = gameSettings.customIndex.soundsIndex;
-                var rawSoundSources = soundsIndexIndex.src;
-                var soundSources = [];
-                for (var i = 0; i < rawSoundSources.length; i++){
-                    var sourcePath = 'sounds/'+rawSoundSources[i];
-                    var sourcePathFull = gameSettings.audioBaseHref+sourcePath;
-                    soundSources.push(sourcePathFull);
-                    }
-                var rawSoundSprites = soundsIndexIndex.sprite;
-                var soundSprites = {};
-                var soundSpritesTokens = [];
-                soundSpritesTokens = Object.keys(rawSoundSprites);
-                for (var i = 0; i < soundSpritesTokens.length; i++){
-                    var spriteToken = soundSpritesTokens[i];
-                    var spriteData = rawSoundSprites[spriteToken];
-                    soundSprites[spriteToken] = [spriteData['start'], spriteData['duration'], spriteData['loop']];
-                    }
-                gameSettings.soundEffectSources = soundSources;
-                gameSettings.soundEffectSprites = soundSprites;
-                //console.log('rawSoundSources = ', rawSoundSources);
-                //console.log('rawSoundSprites = ', rawSoundSprites);
-                //console.log('soundSources = ', soundSources);
-                //console.log('soundSprites = ', soundSprites);
-                }
-
 
             // Automatically load the title screen music
             mmrpg_music_load('misc/player-select', true, false);
@@ -2423,14 +2432,25 @@ if (typeof window.Howl === 'undefined'){
     var no = function(){ return false; };
     Howl = function(){
         return {
+            error: 'window.Howl not loaded',
             play: no,
             playing: no,
             stop: no,
             pause: no,
             volume: no,
-            fade: no
+            state: no,
+            once: no,
+            fade: no,
             }
         };
+    let scripts = [], sources = [], loaded = 0;
+    sources.push('.libs/howler-js/howler.core.min.js', '.libs/howler-js/howler.min.js');
+    let onLoadComplete = function(){ };
+    for (var i = 0; i < sources.length; i++){
+        let source = sources[i], script = document.createElement('script');
+        script.onload = function(){ loaded++; if (loaded >= sources.length){ onLoadComplete(); } };;
+        script.src = source; document.head.appendChild(script);
+        }
 }
 
 // Define required music objects to handle audio playback and set up some defaults
@@ -2819,14 +2839,17 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     //console.log('gameSettings.soundEffectSprites =', Object.keys(gameSettings.soundEffectSprites).length, gameSettings.soundEffectSprites);
 
     // If the game hasn't loaded we shoudln't be playing anything
-    if (!gameSettings.indexLoaded){ return false; }
-    if (gameSettings.enableSoundEffects === false){ return false; }
-    if (!mmrpgMusicSound.playing()){ return false; }
-    if (mmrpgMusicSound === false){ return false; }
+    let somethingHasLoaded = gameSettings.indexLoaded  || gameSettings.worldLoaded || gameSettings.battleLoaded ? true : false;
+    if (!somethingHasLoaded){ console.warn('aaa'); return false; }
+    if (gameSettings.enableSoundEffects === false){ console.warn('bbb'); return false; }
+    if (gameSettings.indexLoaded){
+        if (!mmrpgMusicSound.playing()){ console.warn('ccc'); return false; }
+        if (mmrpgMusicSound === false){ console.warn('ddd'); return false; }
+        }
 
     // If we don't have sound effect sounces or sprites loaded, we can't do anything
-    if (!gameSettings.soundEffectSources.length){ return false; }
-    if (gameSettings.soundEffectSprites === {}){ return false; }
+    if (!gameSettings.soundEffectSources.length){ console.warn('eee'); return false; }
+    if (gameSettings.soundEffectSprites === {}){ console.warn('fff'); return false; }
 
     // Otherwise, define a base volume for these sound effects to use
     var baseEffectVolume = gameSettings.effectVolume * gameSettings.masterVolume;
@@ -2846,6 +2869,7 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     //console.log('mmrpg_play_sound_effect // effectName:', effectName, 'effectVolume:', effectVolume, 'effectRate:', effectRate, 'effectLoop:', effectLoop);
 
     // Get the next sound object from the pool
+    let sound;
     gameSettings.soundEffectPoolKey++;
     if (gameSettings.soundEffectPoolKey >= gameSettings.soundEffectPoolLimit){ gameSettings.soundEffectPoolKey = 0; }
     var soundEffectPoolKey = gameSettings.soundEffectPoolKey;
@@ -2853,7 +2877,7 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
         || typeof gameSettings.soundEffectPool[soundEffectPoolKey].sound === 'undefined'){
 
         // We must create a new sound object before we can use it
-        var sound = new Howl({
+        sound = new Howl({
             src: gameSettings.soundEffectSources,
             sprite: gameSettings.soundEffectSprites,
             autoplay: false,
@@ -2873,7 +2897,7 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
 
         // We can pull an existing sound object to use from the pool
         var effect = gameSettings.soundEffectPool[soundEffectPoolKey];
-        var sound = effect.sound;
+        sound = effect.sound;
         effect.time = Date.now();
 
         }
@@ -2882,23 +2906,23 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     // TODO:  Make sure this effectName actually exists in the index of sound effect sprites
     if (typeof gameSettings.customIndex.soundsAliasesIndex !== 'undefined'
         && typeof gameSettings.customIndex.soundsAliasesIndex[effectName] !== 'undefined'){
-        //console.log('alias triggered // new effectName =', effectName);
         // Pull the actual effect name from the index based on the alias provided
         effectName = gameSettings.customIndex.soundsAliasesIndex[effectName];
+        //console.log('alias triggered // new effectName =', effectName);
         } else if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
         && typeof gameSettings.customIndex.soundsIndex.sprite[effectName] !== 'undefined'){
         //console.log('using RAW name // effectName =', effectName);
         // We should be using aliases but the effect name is technically fine as-is
         } else {
-        //console.log('using UNKNOWN name // effectName =', effectName);
         // Immediately return as this isn't real and might cause audio bugs
+        //console.log('not using UNKNOWN name // effectName =', effectName);
         return false;
         }
 
     //console.log('sound =', sound);
     //console.log('sound._volume', sound._volume);
     //console.log('sound.volume() =', sound.volume());
-    //console.log('sound._sprite['+effectName+'] =', sound._sprite[effectName]);
+    //console.log('sound._sprite['+effectName+'] =', (sound._sprite &&  sound._sprite[effectName] ? sound._sprite[effectName] : undefined));
 
     // Stop any currently playing sound
     sound.stop();
@@ -2936,7 +2960,7 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
         var oldestSound = false;
         var oldestSoundTime = false;
         for (var soundName in gameSettings.soundEffectPool){
-            var sound = gameSettings.soundEffectPool[soundName];
+            sound = gameSettings.soundEffectPool[soundName];
             if (oldestSoundTime === false || sound.time < oldestSoundTime){
                 oldestSound = sound;
                 oldestSoundTime = sound.time;
