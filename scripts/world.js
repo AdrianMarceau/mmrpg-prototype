@@ -87,12 +87,12 @@ gameSettings.worldConfig = {
     robotStatModMax: 5, // match the battle system
     robotStatModMin: -5, // match the battle system
     itemInventoryMax: 99, // match the battle system
-    defaultZoomLevel: 1.0,  // normal
+    //defaultZoomLevel: 1.0,  // normal
+    defaultZoomLevel: 1.5, // slightly zoomed in
     //defaultZoomLevel: 0.5, // far out
-    //defaultZoomLevel: 1.5, // slightly zoomed in
     zoomIncrement: 0.5, // zoom in/out by this amount
-    minZoomLevel: 0.5, // slightly zoomed in
-    maxZoomLevel: 2.0, // slightly zoomed in
+    minZoomLevel: 0.5, // very zoomed out
+    maxZoomLevel: 2.0, // very zoomed in
     };
 gameSettings.worldState = {
     cursor: {
@@ -163,7 +163,15 @@ gameSettings.worldElements = {
     layers: null,
     cursor: null,
     };
-gameSettings.worldHasLoaded = false;
+gameSettings.userInputWatcher = {
+    config: null,
+    events: null,
+    userInputs: {},
+    activeInputs: {},
+    lastInputKind: null,
+    lastInputEvent: null,
+    };
+gameSettings.worldLoaded = false;
 
 // Create the mmrpgWorldMap class object for this mode
 class mmrpgWorldMap {
@@ -176,6 +184,7 @@ class mmrpgWorldMap {
         _self.indexes = gameSettings.worldIndexes;
         _self.elements = gameSettings.worldElements;
         _self.state = gameSettings.worldState;
+        _self.inputs = gameSettings.userInputWatcher;
         if (!$mmrpg || !$mmrpg.length){ return false; }
         if (!_self.checkIndexes()){ return false; }
         if (onReady){ _self.onWorldReady(onReady); }
@@ -484,6 +493,7 @@ class mmrpgWorldMap {
         // Define the function to run when everything is done loading
         let onWorldLoaded = function(){
             console.log('%c' + 'MMRPG WORLD HAS LOADED!', 'color: cyan;');
+            gameSettings.worldLoaded = true;
             _world.hasLoaded = true;
             _self.bindEventsToCanvas($canvasMap);
             _self.bindEventsToWorld($thisWorld);
@@ -1484,13 +1494,31 @@ class mmrpgWorldMap {
         let _worldPlayer = _world.player;
         let _worldPlayerTeam = _worldPlayer.team;
         let _worldPlayerRobots = _worldPlayer.robots;
+        let $thisCanvas = _elements.canvas;
         let $sideButtons = _elements.sideButtons;
         let $sideButtonsWrapper = $('> .wrapper', $sideButtons);
         let $actionDropdown = _elements.actionDropdown;
         let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
+        let hoverCanvasObject = function(e, sfx){
+            let $object = $(this);
+            if (_self.worldIsBusy()){ return; }
+            if ($object.is('.disabled')){ return; }
+            if ($object.closest('.chrome').is('.disabled')){ return; }
+            $thisCanvas.find('.hovered').removeClass('hovered');
+            if (sfx){ _self.playSoundEffect(sfx); }
+            $object.addClass('hovered');
+            return true;
+            };
+        let unhoverCanvasObject = function(e){
+            let $object = $(this);
+            $object.removeClass('hovered');
+            return true;
+            };
         // Bind a click event to the back button in the header that'll bring us to prototype menu
         let $backButton = _elements.backButton;
         if ($backButton && $backButton.length){
+            $backButton.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
+            $backButton.bind('mouseleave', unhoverCanvasObject);
             $backButton.bind('click', function(e){
                 e.preventDefault();
                 if ($(this).is('.disabled')){ return false; }
@@ -1510,17 +1538,12 @@ class mmrpgWorldMap {
                     });
                 return true;
                 });
-            $backButton.bind('mouseenter', function(e){
-                //e.preventDefault();
-                if ($(this).is('.disabled')){ return false; }
-                //console.log('%c' + 'Back button hovered!', 'color: cyan;');
-                _self.playSoundEffect('icon-hover');
-                return true;
-                });
             }
         // Bind a click event to the home button in the header that'll bring us to prototype menu
         let $homeButton = _elements.homeButton;
         if ($homeButton && $homeButton.length){
+            $homeButton.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
+            $homeButton.bind('mouseleave', unhoverCanvasObject);
             $homeButton.bind('click', function(e){
                 e.preventDefault();
                 if ($(this).is('.disabled')){ return false; }
@@ -1540,17 +1563,12 @@ class mmrpgWorldMap {
                     });
                 return true;
                 });
-            $homeButton.bind('mouseenter', function(e){
-                //e.preventDefault();
-                if ($(this).is('.disabled')){ return false; }
-                //console.log('%c' + 'Home button hovered!', 'color: cyan;');
-                _self.playSoundEffect('icon-hover');
-                return true;
-                });
             }
         // Bind a click event to the reset button in the header that'll clear world data to start over (dev/debug only)
         let $resetButton = _elements.resetButton;
         if ($resetButton && $resetButton.length){
+            $resetButton.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
+            $resetButton.bind('mouseleave', unhoverCanvasObject);
             $resetButton.bind('click', function(e){
                 e.preventDefault();
                 if ($(this).is('.disabled')){ return false; }
@@ -1571,17 +1589,14 @@ class mmrpgWorldMap {
                     });
                 return true;
                 });
-            $resetButton.bind('mouseenter', function(e){
-                e.preventDefault();
-                if ($(this).is('.disabled')){ return false; }
-                //console.log('%c' + 'Reset button hovered!', 'color: cyan;');
-                _self.playSoundEffect('icon-hover');
-                });
             }
         // Bind click events to the player switcher options in the world map header
         let $playerSwitcher = _elements.playerSwitcher;
         if ($playerSwitcher && $playerSwitcher.length){
-            $('.team-player[data-player]', $playerSwitcher).bind('click', function(e){
+            let $playerButtons = $('.team-player[data-player]', $playerSwitcher);
+            $playerButtons.bind('mouseenter', function(e){ if (hoverCanvasObject.call(this, e, 'icon-hover')){ $(this).find('.sprite.player > .sprite').attr('data-frame', '01'); } }); // taunt
+            $playerButtons.bind('mouseleave', function(e){ if (unhoverCanvasObject.call(this, e)){ $(this).find('.sprite.player > .sprite').attr('data-frame', '00'); } }); // base
+            $playerButtons.bind('click', function(e){
                 //console.log('%c' + 'Player switcher clicked for ' + playerToken + '!', 'color: cyan;');
                 e.preventDefault();
                 if ($(this).is('.disabled')){ return false; }
@@ -1591,7 +1606,7 @@ class mmrpgWorldMap {
                 let $option = $(this);
                 let playerToken = $option.attr('data-player') || false;
                 $option.addClass('active');
-                _self.playSoundEffect('switch-in');
+                _self.playSoundEffect('lets-go-robots');
                 $thisWorld.addClass('loading');
                 let worldReloadURL = 'world.php?player=' + playerToken;
                 _self.decZoomLevel();
@@ -1603,23 +1618,6 @@ class mmrpgWorldMap {
                     _self.decZoomLevel();
                     });
                 return true;
-                });
-            $('.team-player[data-player]', $playerSwitcher).bind('mouseenter', function(e){
-                //console.log('%c' + 'Player switcher hovered!', 'color: cyan;');
-                e.preventDefault();
-                if ($(this).is('.disabled')){ return false; }
-                if ($playerSwitcher.is('.disabled')){ return false; }
-                let $option = $(this);
-                $('.sprite.player > .sprite', $option).attr('data-frame', '01'); // taunt
-                _self.playSoundEffect('icon-hover');
-                });
-            $('.team-player[data-player]', $playerSwitcher).bind('mouseleave', function(e){
-                //console.log('%c' + 'Player switcher mouseleave!', 'color: cyan;');
-                e.preventDefault();
-                if ($(this).is('.disabled')){ return false; }
-                if ($playerSwitcher.is('.disabled')){ return false; }
-                let $option = $(this);
-                $('.sprite.player > .sprite', $option).attr('data-frame', '00'); // base
                 });
             }
         // Check to make sure the robotsOverview exists, and then bind events to its elements
@@ -1650,6 +1648,20 @@ class mmrpgWorldMap {
             //console.log('-> $teamRobotsInOverview = ', $teamRobotsInOverview.length, $teamRobotsInOverview);
             //console.log('-> $storageRobotsInOverview = ', $storageRobotsInOverview.length, $storageRobotsInOverview);
             //console.log('-> listOfRobotsInOverview = ', listOfRobotsInOverview);
+            // Define reusable functions for applying/removing the hover state to given element
+            let hoverOverviewObject = function(e, sfx){
+                let $object = $(this);
+                if (_self.worldIsBusy()){ return; }
+                if ($object.is('.disabled')){ return; }
+                if ($object.closest('.listing').is('.disabled')){ return; }
+                $robotsOverview.find('.hovered').removeClass('hovered');
+                if (sfx){ _self.playSoundEffect(sfx); }
+                else { _self.playSoundEffect('icon-hover'); }
+                $object.addClass('hovered');
+                };
+            let unhoverOverviewObject = function(e){
+                $(this).removeClass('hovered');
+                };
             // Define a function for disabling incompatible or distraction UI elements
             let disableOtherElements = function(){
                 //console.log('%c' + 'disableOtherElements() called!', 'color: magenta;');
@@ -1671,6 +1683,7 @@ class mmrpgWorldMap {
                 //console.log('%c' + 'clearSelectionsAndIncompatible() called!', 'color: magenta;');
                 $storageBoxes.removeClass('has-selection');
                 $storageBoxes.find('.selected').removeClass('selected');
+                $storageBoxes.find('.hovered').removeClass('hovered');
                 $storageBoxes.removeClass('focused').removeClass('unfocused');
                 $storageBoxes.find('.incompatible').removeClass('incompatible');
                 $storageBoxes.find('.equipped').removeClass('equipped');
@@ -1678,6 +1691,7 @@ class mmrpgWorldMap {
                 $teamRobotsDiv.find('.incompatible', ).removeClass('incompatible');
                 $teamRobotsDiv.find('.equipped', ).removeClass('equipped');
                 $teamRobotsDiv.find('.selected:not(.keep-selected)').removeClass('selected');
+                $teamRobotsDiv.find('.hovered:not(.keep-hovered)').removeClass('hovered');
                 $('.details', $storageBoxes).remove();
                 return;
                 };
@@ -1690,13 +1704,16 @@ class mmrpgWorldMap {
                 keepSelectedTeamRobot = typeof keepSelectedTeamRobot === 'boolean' ? keepSelectedTeamRobot : true;
                 if (keepSelectedTeamRobot){ $teamRobotsDiv.find('.team-robot[data-robot].selected').addClass('keep-selected'); }
                 //console.log('-> before doing anything, selectedRobotToken = ', selectedRobotToken);
+                //console.log('_world.currentScreen(before) =', _world.currentScreen);
+                let alreadyShowing = _world.currentScreen === 'robots-overview' ? true : false;
+                //console.log('alreadyShowing =', alreadyShowing);
+                let $thisStorageBox = $storageBoxes.filter('[data-storage="' + viewToken + '"]');
+                let $thisStorageButton = $storageButtons.filter('[data-view="' + viewToken + '"]');
                 $('.button', $storageBoxes).attr('disabled', 'disabled');
                 $storageRobotsDiv.removeClass('unfocused');
                 $teamRobotsDiv.addClass('focused').removeClass('unfocused');
-                $robotsOverview.addClass('expanded').attr('data-view', viewToken);
+                $storageBoxes.removeClass('disabled');
                 $storageButtons.removeClass('active');
-                let $thisStorageBox = $storageBoxes.filter('[data-storage="' + viewToken + '"]');
-                let $thisStorageButton = $storageButtons.filter('[data-view="' + viewToken + '"]');
                 $('.button', $thisStorageBox).removeAttr('disabled');
                 $thisStorageButton.addClass('active');
                 _world.mapIsHidden = true; // set the map hidden state
@@ -1711,23 +1728,35 @@ class mmrpgWorldMap {
                     $sideButtons.removeClass('maybe');
                     $dismissButton.trigger('click');
                     }
-                // Regenerate the storage bullets, pages, and go to the correct page for this view
-                if (viewToken === 'robots'){ refreshRobotBackups(); }
-                if (viewToken === 'robots'){ makeStorageBullets(); }
-                makeStoragePages(viewToken);
-                goToStoragePage(viewToken, parseInt($thisStorageBox.attr('data-page') || ''));
-                refreshRobotRefs();
-                $teamRobotsDiv.addClass('focused');
-                $teamRobotsInOverview.filter(':not(.keep-selected)').removeClass('selected');
-                if (viewToken === 'robots'){ refreshRobotsDiv(); }
-                if (viewToken === 'items'){ refreshItemsDiv(); }
-                if (viewToken === 'abilities'){ refreshAbilitiesDiv(); }
-                refreshDetailsPanel();
-                /// Run the complete callback if one was provided
-                if (typeof onComplete === 'function'){ onComplete.call(this); }
-                if (keepSelectedTeamRobot){
-                    $teamRobotsDiv.find('.team-robot[data-robot].keep-selected').removeClass('keep-selected');
-                    }
+                requestAnimationFrame(function(){
+                    // Play a sound effect + an extra if this is a fresh open
+                    _self.playSoundEffect('link-click');
+                    if (!alreadyShowing){ _self.playSoundEffect('inventory-open'); }
+                    // Update the main overview div with new view
+                    $robotsOverview.addClass('expanded').attr('data-view', viewToken);
+                    // Regenerate the storage bullets, pages, and go to the correct page for this view
+                    if (viewToken === 'robots'){ refreshRobotBackups(); }
+                    if (viewToken === 'robots'){ makeStorageBullets(); }
+                    makeStoragePages(viewToken);
+                    goToStoragePage(viewToken, parseInt($thisStorageBox.attr('data-page') || ''));
+                    refreshRobotRefs();
+                    $teamRobotsDiv.addClass('focused');
+                    $teamRobotsInOverview.filter(':not(.keep-selected)').removeClass('selected');
+                    if (viewToken === 'robots'){ refreshRobotsDiv(); }
+                    if (viewToken === 'items'){ refreshItemsDiv(); }
+                    if (viewToken === 'abilities'){ refreshAbilitiesDiv(); }
+                    refreshDetailsPanel();
+                    /// Run the complete callback if one was provided
+                    if (typeof onComplete === 'function'){ onComplete.call(this); }
+                    if (keepSelectedTeamRobot){ $teamRobotsDiv.find('.team-robot[data-robot].keep-selected').removeClass('keep-selected'); }
+                    if (!alreadyShowing && viewToken === 'robots'){
+                        //console.log('hovering first team robot');
+                        $teamRobotsDiv.find('.team-robot[data-robot]').first().addClass('hovered');
+                        }
+                    });
+                // Make sure we create a timeout to disable inactive panels after animation complete
+                if (_selfRef.showOverviewTimeout){ clearTimeout(_selfRef.showOverviewTimeout); }
+                _selfRef.showOverviewTimeout = setTimeout(function(){ $storageBoxes.not($thisStorageBox).addClass('disabled'); }, 1200);
                 return;
                 };
             // Define a function for dismissing the whole robots-overview panel and all views at-once
@@ -1745,6 +1774,8 @@ class mmrpgWorldMap {
                 $('.bullets', $storageRobotsDiv).remove();
                 $('.button', $storageBoxDivs).attr('disabled', 'disabled');
                 $('.new', $storageBoxDivs).removeClass('new');
+                _self.playSoundEffect('back-click');
+                _self.playSoundEffect('inventory-close');
                 return;
                 };
             // Define a function for calculating storage config refs/values for robots, items, or abilities
@@ -1889,6 +1920,7 @@ class mmrpgWorldMap {
                 $storageObjectsDiv.append(pageButtonMarkup).attr('data-page', currentStoragePageNum);
                 $storageObjectsDiv.append(objectCounterMarkup);
                 //console.log('-> binding click events to page buttons...');
+                $('.button[data-page]', $storageObjectsDiv).bind('mouseenter', function(e){ _self.playSoundEffect('icon-hover'); });
                 $('.button[data-page]', $storageObjectsDiv).bind('click', function(e){
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return; }
@@ -1896,6 +1928,7 @@ class mmrpgWorldMap {
                     //console.log('%c' + 'Storage (' + storageKind + ') page button clicked!', 'color: cyan;');
                     let $button = $(this);
                     if ($button.is('.active')){ return; } // already on this page, ignore clicks
+                    _self.playSoundEffect('icon-click-mini');
                     let curNum = parseInt($storageObjectsDiv.attr('data-page'));
                     let pageNum = $button.attr('data-page');
                     //console.log('-> curNum =', curNum);
@@ -1957,6 +1990,7 @@ class mmrpgWorldMap {
                     $object.attr('data-slot', newSlot);
                     $('.bullet[data-key="'+index+'"]', $storageObjectsDiv).text(overallPosition);
                     });
+                $objectsList.filter('.hidden').removeClass('hovered selected');
                 currentStoragePageNum = pageNum;
                 $storageObjectsDiv.attr('data-page', currentStoragePageNum);
                 //console.log('-> currentStoragePageNum =', currentStoragePageNum);
@@ -2144,7 +2178,40 @@ class mmrpgWorldMap {
             // Define a function for refreshing the robots div in the storage panel given new conditions
             let refreshRobotsDiv = function(){
                 //console.log('%c' + '-> refreshRobotsDiv() triggered', 'color: magenta;');
-                // ...
+                if ($robotsOverview.is('[data-view="abilities"]')){
+                    let $currentTeamRobots = $('.team-robot[data-robot]', $teamRobotsDiv);
+                    let $selectedAbility = $('.team-ability[data-ability].selected', $storageAbilitiesDiv);
+                    let abilitySelected = $selectedAbility.length ? true : false;
+                    let abilityToken = abilitySelected ? $selectedAbility.attr('data-ability') : '';
+                    let abilityID = abilitySelected ? parseInt($selectedAbility.attr('data-ability-id') || '0') : 0;
+                    //console.log('-> mark robots incompatibile and/or equipped w/ abilityToken =', abilityToken);
+                    if (!abilitySelected){
+                        $currentTeamRobots.removeClass('equipped incompatible');
+                        } else {
+                        $currentTeamRobots.each(function(){
+                            let $robot = $(this);
+                            let robotToken = $robot.attr('data-robot') || false;
+                            let robotData = _worldPlayerRobots[robotToken] || false;
+                            if (!robotToken || !robotData){ $robot.removeClass('equipped incompatible'); return; }
+                            //console.log('-> ' + abilityToken + ' vs. ' + robotToken + ' ...');
+                            //console.log('-> ' + abilityToken + ' vs. ' + robotToken + ' ...', '\n-> robotData =', robotData);
+                            let robotAbilities = [];
+                            let abilitiesEquipped = robotData.abilities;
+                            let abilitiesCompatible = robotData.abilitiesCompatible;
+                            let abilitiesViaItem = robotData.abilitiesViaItem;
+                            if (typeof abilitiesCompatible !== 'undefined'){ robotAbilities = robotAbilities.concat(abilitiesCompatible); }
+                            if (typeof abilitiesViaItem !== 'undefined'){ robotAbilities = robotAbilities.concat(abilitiesViaItem); }
+                            let isEquipped = abilitiesEquipped.indexOf(abilityID) !== -1 ? true : false;
+                            let isCompatible = robotAbilities.indexOf(abilityID) !== -1 ? true : false;
+                            //console.log('--> isEquipped =', isEquipped);
+                            //console.log('--> isCompatible =', isCompatible);
+                            if (isEquipped){ $robot.addClass('equipped'); }
+                            else { $robot.removeClass('equipped'); }
+                            if (!isCompatible){ $robot.addClass('incompatible'); }
+                            else { $robot.removeClass('incompatible'); }
+                            });
+                        }
+                    }
                 // return true on success
                 return true;
                 };
@@ -2394,6 +2461,7 @@ class mmrpgWorldMap {
                 if (_self.worldIsBusy()){ return; }
                 if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
                 //console.log('%c' + 'sort button clicked!', 'color: cyan;');
+                _self.playSoundEffect('icon-click-mini');
                 let $sortButton = $(this);
                 let $sortParent = $sortButton.closest('.sorts');
                 let $storageBoxDiv = $sortButton.closest('.storage-box');
@@ -2434,12 +2502,15 @@ class mmrpgWorldMap {
                 $toggleButton.attr('data-state', nextToggleState);
                 refreshStoragePage(storageKind);
                 });
-            // If the storage tray is open, clicking a robot in the team-list marks it as selected
+            // Bind hover events to the robot buttons so they show appropriate state
+            $teamRobotsDiv.delegate('.team-robot[data-robot]', 'mouseenter', hoverOverviewObject);
+            $teamRobotsDiv.delegate('.team-robot[data-robot]', 'mouseleave', unhoverOverviewObject);
             $teamRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
                 e.preventDefault();
                 if (_self.worldIsBusy()){ return; }
                 let $thisRobot = $(this);
                 if (!$robotsOverview.is('.expanded')){
+                    _self.playSoundEffect('icon-click-mini');
                     return showRobotsOverviewPanel('robots', function(){
                         $thisRobot.trigger('click');
                         }, false); }
@@ -2448,9 +2519,13 @@ class mmrpgWorldMap {
                 let alreadySelected = $thisRobot.is('.selected') ? true : false;
                 //console.log('-> $thisRobot =', $thisRobot);
                 //console.log('-> alreadySelected =', alreadySelected);
-                $('.team-robot[data-robot]', $teamRobotsDiv).removeClass('selected');
-                if (!alreadySelected){ $thisRobot.addClass('selected'); }
-                else { $thisRobot.removeClass('selected'); }
+                $storageRobotsDiv.find('.team-robot[data-robot]').removeClass('selected');
+                $teamRobotsDiv.find('.team-robot[data-robot]').not($thisRobot).removeClass('selected');
+                if (!alreadySelected){ _self.playSoundEffect('icon-click-mini'); $thisRobot.addClass('selected'); }
+                else { _self.playSoundEffect('back-click'); $thisRobot.removeClass('selected'); }
+                if ($robotsOverview.is('[data-view="robots"]')){ refreshRobotsDiv(); }
+                if ($robotsOverview.is('[data-view="items"]')){ refreshItemsDiv(); }
+                if ($robotsOverview.is('[data-view="abilities"]')){ refreshAbilitiesDiv(); }
                 refreshDetailsPanel();
                 // Return true on success
                 return true;
@@ -2462,13 +2537,14 @@ class mmrpgWorldMap {
                 if (Array.isArray(onlyWhen) && onlyWhen.indexOf(frame) === -1){ return; }
                 $sprite.attr('data-frame', newFrame);
                 };
-            $storageBoxDivs.delegate('.details[data-robot] > .image', 'click', function(e){ updateRobotImageFrame(this, '02'); }); // victory on click
-            $storageBoxDivs.delegate('.details[data-robot] > .image', 'mouseenter', function(e){ updateRobotImageFrame(this, '08'); }); // defend on hover
-            $storageBoxDivs.delegate('.details[data-robot] > .image', 'mouseleave', function(e){ updateRobotImageFrame(this, '00', ['02', '08']); }); // base on reset
+            $storageBoxDivs.delegate('.details[data-robot] > .image', 'click', function(e){ _self.playSoundEffect('link-click-robot'); updateRobotImageFrame(this, '02'); }); // victory on click
+            $storageBoxDivs.delegate('.details[data-robot] > .image', 'mouseenter', function(e){ hoverOverviewObject.call(this); updateRobotImageFrame(this, '08'); }); // defend on hover
+            $storageBoxDivs.delegate('.details[data-robot] > .image', 'mouseleave', function(e){ unhoverOverviewObject.call(this); updateRobotImageFrame(this, '00', ['02', '08']); }); // base on reset
             // Make sure clicking relevant areas in the robot details triggers relevant functionality
             // - make sure clicking the item slot (empty or not) quick-swaps to the items tab
             // - make sure clicking the support tab ?????? (for now just show console.warn of TODO)
             // - make sure clicking any of the ability slots (empty or not) quick-swaps to the abilities tab
+            // [held-item]
             $storageBoxDivs.delegate('.details[data-robot] .held-item .value', 'click', function(e){
                 e.preventDefault();
                 if (_self.worldIsBusy()){ return; }
@@ -2490,6 +2566,7 @@ class mmrpgWorldMap {
                         let itemStoragePageNum = $itemInStorage ? parseInt($itemInStorage.attr('data-sort-page')) : 1;
                         goToStoragePage('items', itemStoragePageNum);
                         $itemInStorage.trigger('click');
+                        $itemInStorage.addClass('hovered');
                         };
                     if (!delay){ callback(); }
                     else { setTimeout(callback, delay); }
@@ -2500,6 +2577,9 @@ class mmrpgWorldMap {
                 // Return true on success
                 return true;
                 });
+            $storageBoxDivs.delegate('.details[data-robot] .held-item .value', 'mouseenter', hoverOverviewObject);
+            $storageBoxDivs.delegate('.details[data-robot] .held-item .value', 'mouseleave', unhoverOverviewObject);
+            // [equipped-abilities]
             $storageBoxDivs.delegate('.details[data-robot] .equipped-abilities .value', 'click', function(e){
                 e.preventDefault();
                 if (_self.worldIsBusy()){ return; }
@@ -2531,6 +2611,8 @@ class mmrpgWorldMap {
                 // Return true on success
                 return true;
                 });
+            $storageBoxDivs.delegate('.details[data-robot] .equipped-abilities .value', 'mouseenter', hoverOverviewObject);
+            $storageBoxDivs.delegate('.details[data-robot] .equipped-abilities .value', 'mouseleave', unhoverOverviewObject);
             // Auto-trigger a sort at least once on all the storage boxes to ensure a default order
             $storageBoxDivs.each(function(){
                 let $storageBoxDiv = $(this);
@@ -2583,10 +2665,11 @@ class mmrpgWorldMap {
             // Bind a click event to the team-rotate button in the robots overview
             let $rotateButton = $('.team-rotate', $robotsOverview);
             if ($rotateButton && $rotateButton.length){
+                $rotateButton.bind('mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
                 $rotateButton.bind('click', function(e){
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return false; }
-                    if (_self.worldMapIsHidden()){ return false; }
+                    //if (_self.worldMapIsHidden()){ return false; }
                     //console.log('%c' + 'Team rotate button clicked!', 'color: cyan;');
                     let _worldPlayerTeam = _worldPlayer.team;
                     if (_worldPlayerTeam.length < 2){ return; } // nothing to rotate
@@ -2661,6 +2744,7 @@ class mmrpgWorldMap {
             let $switchButton = $('.team-switch', $robotsOverview);
             if ($switchButton && $switchButton.length){
                 // expand/collapse the robot storage tray by clicking the switch button
+                $switchButton.bind('mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
                 $switchButton.bind('click', function(e){
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return; }
@@ -2673,20 +2757,8 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
-                // if the storage tray is open, clicking a robot in the team-list unselects any storage-robots that are focused
-                $teamRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
-                    e.preventDefault();
-                    if (_self.worldIsBusy()){ return; }
-                    if (!$robotsOverview.is('.expanded[data-view="robots"]')){ return; } // if we're not expanded, ignore clicks
-                    //console.log('%c' + 'Team robot clicked! (via robots)', 'color: cyan;');
-                    let $selectedStorageRobot = $storageRobotsDiv.find('.team-robot[data-robot].selected');
-                    if ($selectedStorageRobot && $selectedStorageRobot.length){
-                        $selectedStorageRobot.removeClass('selected');
-                        refreshDetailsPanel();
-                        }
-                    return true;
-                    });
                 // add functionality to the action buttons within robot details panels
+                $storageRobotsDiv.delegate('.button[data-action]', 'mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
                 $storageRobotsDiv.delegate('.button[data-action]', 'click', function(e){
                     //console.log('%c' + 'Storage robot details button clicked!', 'color: cyan;');
                     e.preventDefault();
@@ -2701,7 +2773,7 @@ class mmrpgWorldMap {
                     let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
                     let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
                     //console.log('-> targetRobotToken =', targetRobotToken);
-                    let autoClickAction = function(){ $actionButton.addClass('clicked'); };
+                    let autoClickAction = function(){ $actionButton.addClass('clicked'); _self.playSoundEffect('icon-click'); };
                     let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
                     if (actionToken === 'add-robot'){ autoClickAction(); _self.showAddRobotModal(robotToken, actionModalConfig); }
                     else if (actionToken === 'remove-robot'){ autoClickAction(); _self.showRemoveRobotModal(robotToken, actionModalConfig); }
@@ -2709,7 +2781,9 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
-                // if the storage tray is open, clicking a robot in the storage-list clones it to the selected team-robot slot
+                // if the storage tray is open, clicking a robot in the storage-list  highlights it for interaction
+                $storageRobotsDiv.delegate('.team-robot[data-robot]', 'mouseenter', hoverOverviewObject);
+                $storageRobotsDiv.delegate('.team-robot[data-robot]', 'mouseleave', unhoverOverviewObject);
                 $storageRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return; }
@@ -2718,6 +2792,7 @@ class mmrpgWorldMap {
                     // Collect reference to the click storage robot and its slot first
                     let $clickedStorageRobot = $(this);
                     let clickedStorageSlot = $clickedStorageRobot.is('[data-slot]') ? $clickedStorageRobot.attr('data-slot') : false;
+                    let alreadySelected = $clickedStorageRobot.is('.selected') ? true : false;
                     //console.log('-> $clickedStorageRobot =', $clickedStorageRobot);
                     //console.log('-> clickedStorageSlot =', clickedStorageSlot);
                     if (!$clickedStorageRobot || !$clickedStorageRobot.length){ return false; } // if no robot is clicked, ignore clicks
@@ -2725,138 +2800,22 @@ class mmrpgWorldMap {
                     if ($clickedStorageRobot.is('.current')){ return false; } // already on team, ignore clicks
                     // Refresh the current list of team robots in the overview and storage
                     refreshRobotRefs();
-                    // Unselect any team robots that might have been selected beforehand
-                    $teamRobotsInOverview.filter('.selected').removeClass('selected');
                     // Toggle the selected state of the clicked storage robot
-                    $clickedStorageRobot.siblings().removeClass('selected');
-                    if (!$clickedStorageRobot.is('.selected')){ $clickedStorageRobot.addClass('selected'); }
-                    else { $clickedStorageRobot.removeClass('selected'); }
+                    $teamRobotsDiv.find('.team-robot[data-robot]').removeClass('selected');
+                    $storageRobotsDiv.find('.team-robot[data-robot]').not($clickedStorageRobot).removeClass('selected');
+                    if (!alreadySelected){ _self.playSoundEffect('icon-click-mini'); $clickedStorageRobot.addClass('selected'); }
+                    else { _self.playSoundEffect('back-click'); $clickedStorageRobot.removeClass('selected'); }
                     // Refresh the details panel with the new changes and then return
                     refreshDetailsPanel();
                     // Return true on success
                     return true;
-                    /*
-                    // Collect a reference to the old (currently selected) team robot so we can backtrace later
-                    let $oldTeamRobot = $teamRobotsInOverview.filter('.selected').first();
-                    //console.log('-> $oldTeamRobot =', $oldTeamRobot);
-                    // we need to actually have a robot selected to do any switching
-                    if (!$oldTeamRobot || !$oldTeamRobot.length){ return false; }
-                    // Collect the robot tokens for each robot for later and to make sure they're different
-                    let oldRobotToken = $oldTeamRobot.attr('data-robot') || false;
-                    let newRobotToken = $clickedStorageRobot.attr('data-robot') || false;
-                    //console.log('-> oldRobotToken =', oldRobotToken);
-                    //console.log('-> newRobotToken =', newRobotToken);
-                    if (!oldRobotToken || !newRobotToken || oldRobotToken === newRobotToken){ return; }
-                    // Empty the side-button area before starting just in case
-                    $sideButtons.removeClass('active');
-                    $sideButtonsWrapper.empty();
-                    // Collect the target storage slot from the old team robot so we can replace it
-                    let targetStorageSlot = $oldTeamRobot.is('[data-slot]') ? $oldTeamRobot.attr('data-slot') : false;
-                    // Create a new team robot by cloning the old storage one, adjusting properties, then replacing current
-                    let $newTeamRobot = $clickedStorageRobot.clone(true);
-                    $newTeamRobot.removeClass('current hovered'); //.addClass('selected');
-                    $newTeamRobot.attr('data-slot', targetStorageSlot);
-                    $newTeamRobot.insertAfter($oldTeamRobot);
-                    $oldTeamRobot.remove();
-                    // Refresh the details panel to reflect the new selection
-                    refreshDetailsPanel();
-                    // Re-pull the lists of robots in the overview now that we've made a change
-                    refreshRobotRefs();
-                    // Refresh and update the list of "current" robots in the storage overview
-                    let currentTeamRobotTokens = $teamRobotsInOverview.map(function(){ return $(this).attr('data-robot'); }).get();
-                    $storageRobotsInOverview.removeClass('current');
-                    $storageRobotsInOverview.each(function(index, robot){
-                        let $robot = $(robot);
-                        let robotToken = $robot.attr('data-robot');
-                        if (!robotToken || !robotToken.length){ return; }
-                        if (currentTeamRobotTokens.indexOf(robotToken) === -1){ return; }
-                        $robot.addClass('current');
-                        });
-                    // If this new list of robots in the overview does not match what's saved, add save button
-                    let newListOfRobotsInOverview = $teamRobotsInOverview.map(function(){ return $(this).attr('data-robot'); }).get();
-                    let listHasChanged = newListOfRobotsInOverview.join(',') !== listOfRobotsInOverview.join(',') ? true : false;
-                    //console.log('-> newListOfRobotsInOverview = ', newListOfRobotsInOverview);
-                    //console.log('-> listHasChanged = ', listHasChanged);
-                    if (!listHasChanged){ return; }
-                    $switchButton.addClass('disabled'); // do not allow going back until either saving or reverting
-                    // Generate the save/cancel buttons and append them to the side-buttons panel
-                    let $saveButton = $('<a class="button big-button narrow" data-action="save-reload"><span>Save &amp Reload</span></a>');
-                    let $cancelButton = $('<a class="button sub-button narrow" data-action="dismiss"><span>Cancel</span></a>');
-                    $sideButtonsWrapper.append($saveButton).append($cancelButton);
-                    $sideButtons.addClass('active');
-                    // Define the save/cancel actions to bind to the buttons
-                    let saveAction = function(){
-                        //console.log('%c' + '-> robot-storage saveAction() triggered', 'color: magenta;');
-                        // First we remove the save/cancel button set from the overview panel
-                        $saveButton.remove();
-                        $cancelButton.remove();
-                        // Then we update the world player robots data to match the new order in the overview
-                        refreshRobotRefs();
-                        let newPlayerRobotList = [];
-                        $teamRobotsInOverview.each(function(index, robot){
-                            //console.log('-> checking robot', index, robot);
-                            let $robot = $(robot);
-                            let robotString = $robot.attr('data-robot') || false;
-                            if (!robotString || !robotString.length){ return; }
-                            //console.log('-> robotString =', robotString);
-                            newPlayerRobotList.push(robotString);
-                            });
-                        //console.log('-> newPlayerRobotList =', newPlayerRobotList);
-                        // Make sure we have new robots selected, else abort the save
-                        if (!newPlayerRobotList.length){ cancelAction(); return false; }
-                        // Then we save the world state with the new robot order and reload the page to reflect changes
-                        // NOTE: We don't need to actually swap robots on the map since we're reloading the page
-                        //console.log('okay time to save the world state!');
-                        _self.incZoomLevel();
-                        $thisWorld.addClass('busy');
-                        _self.saveWorldState(function(){
-                            _self.playSoundEffect('switch-in');
-                            let worldReloadURL = 'world.php?robots=' + newPlayerRobotList.join(',');
-                            //console.log('-> worldReloadURL =', worldReloadURL);
-                            $thisWorld.addClass('loading');
-                            window.location.href = worldReloadURL;
-                            });
-                        // Return true on success
-                        return true;
-                        };
-                    let cancelAction = function(){
-                        //console.log('%c' + '-> robot-storage cancelAction() triggered', 'color: magenta;');
-                        // First we revert the robots in the overview back to the backup copy we made earlier
-                        $teamRobotsWrapper.empty().prepend($teamRobotsInOverviewBackup);
-                        $storageRobotsWrapper.empty().prepend($storageRobotsInOverviewBackup);
-                        refreshStoragePage('robots');
-                        refreshRobotRefs();
-                        refreshRobotBackups();
-                        // Then we remove the save/cancel button set from the overview panel
-                        $saveButton.remove();
-                        $cancelButton.remove();
-                        $switchButton.removeClass('disabled');
-                        $sideButtons.removeClass('active');
-                        $sideButtonsWrapper.empty();
-                        // Return true on success
-                        return true;
-                        };
-                    // Bind events to the save button that'll save the changes we've made
-                    $saveButton.bind('click', function(e){
-                        //console.log('%c' + 'Robot swap save button clicked!', 'color: cyan;');
-                        e.preventDefault();
-                        saveAction();
-                        });
-                    // Bind events to the cancel button that'll revert the changes we've mapStartDirection made
-                    $cancelButton.bind('click', function(e){
-                        //console.log('%c' + 'Robot swap cancel button clicked!', 'color: cyan;');
-                        e.preventDefault();
-                        cancelAction();
-                        });
-                    // Return true on success
-                    return true;
-                    */
                     });
                 }
             // Bind a click event to the team-items button in the robots overview
             let $itemsButton = $('.team-items', $robotsOverview);
             if ($itemsButton && $itemsButton.length){
                 // expand/collapse the item storage tray by clicking the items button
+                $itemsButton.bind('mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
                 $itemsButton.bind('click', function(e){
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return; }
@@ -2869,16 +2828,8 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
-                // if the storage tray is open, clicking a robot in the team-list forces an item panel refresh
-                $teamRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
-                    e.preventDefault();
-                    if (_self.worldIsBusy()){ return; }
-                    if (!$robotsOverview.is('.expanded[data-view="items"]')){ return; } // if we're not expanded, ignore clicks
-                    //console.log('%c' + 'Team robot clicked! (via items)', 'color: cyan;');
-                    refreshItemsDiv();
-                    return true;
-                    });
                 // add functionality to the action buttons within item details panels
+                $storageItemsDiv.delegate('.button[data-action]', 'mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
                 $storageItemsDiv.delegate('.button[data-action]', 'click', function(e){
                     //console.log('%c' + 'Storage item details button clicked!', 'color: cyan;');
                     e.preventDefault();
@@ -2892,7 +2843,7 @@ class mmrpgWorldMap {
                     let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
                     let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
                     //console.log('-> targetRobotToken =', targetRobotToken);
-                    let autoClickAction = function(){ $actionButton.addClass('clicked'); };
+                    let autoClickAction = function(){ $actionButton.addClass('clicked'); _self.playSoundEffect('icon-click'); };
                     let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
                     if (actionToken === 'use-item'){ autoClickAction(); _self.showUseItemModal(itemToken, targetRobotToken, actionModalConfig); }
                     else if (actionToken === 'give-item'){ autoClickAction(); _self.showGiveItemModal(itemToken, targetRobotToken, actionModalConfig); }
@@ -2902,8 +2853,9 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
-                // (like, what happens when you actually click an item?)
                 // bind click events to the actual item buttons for showing their details in the side-panel
+                $storageItemsDiv.delegate('.team-item[data-item]', 'mouseenter', hoverOverviewObject);
+                $storageItemsDiv.delegate('.team-item[data-item]', 'mouseleave', unhoverOverviewObject);
                 $storageItemsDiv.delegate('.team-item[data-item]', 'click', function(e){
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return; }
@@ -2916,7 +2868,8 @@ class mmrpgWorldMap {
                     let alreadySelected = $item.is('.selected') ? true : false;
                     $('.team-item[data-item].selected', $storageItemsDiv).removeClass('selected');
                     $storageItemsDiv.removeClass('has-selection');
-                    if (alreadySelected){ refreshDetailsPanel(); return; }
+                    if (!alreadySelected){ _self.playSoundEffect('icon-click-mini'); }
+                    else if (alreadySelected){ _self.playSoundEffect('back-click');  refreshDetailsPanel(); return; }
                     $item.addClass('selected');
                     $storageItemsDiv.addClass('has-selection');
                     refreshDetailsPanel();
@@ -2928,6 +2881,7 @@ class mmrpgWorldMap {
             let $abilitiesButton = $('.team-abilities', $robotsOverview);
             if ($abilitiesButton && $abilitiesButton.length){
                 // expand/collapse the ability storage tray by clicking the abilities button
+                $abilitiesButton.bind('mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
                 $abilitiesButton.bind('click', function(e){
                     e.preventDefault();
                     if (_self.worldIsBusy()){ return; }
@@ -2940,15 +2894,6 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
-                // if the storage tray is open, clicking a robot in the team-list forces an ability panel refresh
-                $teamRobotsDiv.delegate('.team-robot[data-robot]', 'click', function(e){
-                    e.preventDefault();
-                    if (_self.worldIsBusy()){ return; }
-                    if (!$robotsOverview.is('.expanded[data-view="abilities"]')){ return; } // if we're not expanded, ignore clicks
-                    //console.log('%c' + 'Team robot clicked! (via abilities)', 'color: cyan;');
-                    refreshAbilitiesDiv();
-                    return true;
-                    });
                 // make sure the abilities are re-filtered whenever the toggle button is clicked
                 $storageAbilitiesDiv.delegate('.toggle[data-toggle]', 'click', function(e){
                     e.preventDefault();
@@ -2959,6 +2904,7 @@ class mmrpgWorldMap {
                     return true;
                     });
                 // add functionality to the action buttons within ability details panels
+                $storageAbilitiesDiv.delegate('.button[data-action]', 'mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
                 $storageAbilitiesDiv.delegate('.button[data-action]', 'click', function(e){
                     //console.log('%c' + 'Storage ability details button clicked!', 'color: cyan;');
                     e.preventDefault();
@@ -2972,18 +2918,19 @@ class mmrpgWorldMap {
                     let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
                     let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
                     //console.log('-> targetRobotToken =', targetRobotToken);
-
                     // Launch a modal for the given action on the selected robot if applicable
                     //console.log('ability action ' + actionToken + ' modal functionality! w/', '\n-> actionToken =', actionToken, '\n-> abilityToken =', abilityToken, '\n-> targetRobotToken =', targetRobotToken);
-                    $actionButton.addClass('clicked');
+                    let autoClickAction = function(){ $actionButton.addClass('clicked'); _self.playSoundEffect('icon-click'); };
                     let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
-                    if (actionToken === 'equip-ability'){ _self.showEquipAbilityModal(abilityToken, targetRobotToken, actionModalConfig); }
-                    else if (actionToken === 'remove-ability'){ _self.showRemoveAbilityModal(abilityToken, targetRobotToken, actionModalConfig); }
+                    if (actionToken === 'equip-ability'){ autoClickAction(); _self.showEquipAbilityModal(abilityToken, targetRobotToken, actionModalConfig); }
+                    else if (actionToken === 'remove-ability'){ autoClickAction(); _self.showRemoveAbilityModal(abilityToken, targetRobotToken, actionModalConfig); }
                     else { console.warn('-> undefined ability action "', actionToken, '", ignoring input'); return false; }
-
                     // Return true on success
                     return true;
                     });
+                // if the storage tray is open, hovering a robot in the storage-list  highlights it for interaction
+                $storageAbilitiesDiv.delegate('.team-ability[data-ability]', 'mouseenter', hoverOverviewObject);
+                $storageAbilitiesDiv.delegate('.team-ability[data-ability]', 'mouseleave', unhoverOverviewObject);
                 // bind click events to the actual ability buttons for showing their details in the side-panel
                 $storageAbilitiesDiv.delegate('.team-ability[data-ability]', 'click', function(e){
                     e.preventDefault();
@@ -2999,7 +2946,11 @@ class mmrpgWorldMap {
                     //console.log('-> alreadySelected =', alreadySelected);
                     $('.team-ability[data-ability].selected', $storageAbilitiesDiv).removeClass('selected');
                     $storageAbilitiesDiv.removeClass('has-selection');
-                    if (alreadySelected){
+                    if (!alreadySelected){
+                        _self.playSoundEffect('icon-click-mini');
+                        }
+                    else if (alreadySelected){
+                        _self.playSoundEffect('back-click');
                         $('.team-robot[data-robot].incompatible', $teamRobotsDiv).removeClass('incompatible');
                         $('.team-robot[data-robot].equipped', $teamRobotsDiv).removeClass('equipped');
                         refreshDetailsPanel();
@@ -3008,32 +2959,7 @@ class mmrpgWorldMap {
                     $ability.addClass('selected');
                     $storageAbilitiesDiv.addClass('has-selection');
                     refreshDetailsPanel();
-                    //console.log('-> mark robots incompatibile and/or equipped w/ abilityToken =', abilityToken);
-                    $('.team-robot[data-robot]', $teamRobotsDiv).each(function(){
-                        let $robot = $(this);
-                        let robotToken = $robot.attr('data-robot') || false;
-                        if (!robotToken || !robotToken.length){ return; }
-                        let robotData = _worldPlayerRobots[robotToken] || false;
-                        if (!robotData){ return; }
-                        //console.log('-> ' + abilityToken + ' vs. ' + robotToken + ' ...');
-                        //console.log('-> ' + abilityToken + ' vs. ' + robotToken + ' ...', '\n-> robotData =', robotData);
-                        let robotAbilities = [];
-                        let abilitiesEquipped = robotData.abilities;
-                        let abilitiesCompatible = robotData.abilitiesCompatible;
-                        let abilitiesViaItem = robotData.abilitiesViaItem;
-                        if (typeof abilitiesCompatible !== 'undefined'){ robotAbilities = robotAbilities.concat(abilitiesCompatible); }
-                        if (typeof abilitiesViaItem !== 'undefined'){ robotAbilities = robotAbilities.concat(abilitiesViaItem); }
-                        let abilityID = parseInt($ability.attr('data-ability-id') || '0');
-                        if (!abilityID){ return; }
-                        let isEquipped = abilitiesEquipped.indexOf(abilityID) !== -1 ? true : false;
-                        let isCompatible = robotAbilities.indexOf(abilityID) !== -1 ? true : false;
-                        //console.log('--> isEquipped =', isEquipped);
-                        //console.log('--> isCompatible =', isCompatible);
-                        if (isEquipped){ $robot.addClass('equipped'); }
-                        else { $robot.removeClass('equipped'); }
-                        if (!isCompatible){ $robot.addClass('incompatible'); }
-                        else { $robot.removeClass('incompatible'); }
-                        });
+                    refreshRobotsDiv();
                     return true;
                     });
                 // ...
@@ -3115,43 +3041,74 @@ class mmrpgWorldMap {
                 }
             // If the robots overview is open, make sure we respond to panel-agnostic inputs
             if (robotsOverviewIsExpanded){
-                // If the side buttons are active, then we use Start and B to control them specifically
-                if (sideButtonsActive){
-                    // If the side buttons are available, we can use Start to click the save button and B to click cancel
-                    // (make sure we do the usual requirement of adding the maybe class first THEN clicking if already there)
-                    let $saveButton = $('.button[data-action="save-reload"]', $sideButtons);
-                    let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
-                    if (activeInputs.Start && $saveButton.length && !$saveButton.is('.disabled')){
-                        //console.log('%c' + 'Start key pressed!', 'color: orange;');
-                        if (event){ event.preventDefault(); }
-                        if (!$saveButton.is('.maybe')){ $saveButton.addClass('maybe'); }
-                        else {
-                            $saveButton.removeClass('maybe').addClass('clicked');
-                            $saveButton.trigger('click');
-                            setTimeout(function(){ $saveButton.removeClass('clicked'); }, 600);
-                            ignoreInputFor(1200);
-                            return true;
-                            }
-                        }
-                    if (activeInputs.B && $dismissButton.length && !$dismissButton.is('.disabled')){
-                        //console.log('%c' + 'B key pressed!', 'color: orange;');
-                        if (event){ event.preventDefault(); }
-                        if (!$dismissButton.is('.maybe')){ $dismissButton.addClass('maybe'); }
-                        else {
-                            $dismissButton.removeClass('maybe').addClass('clicked');
-                            $dismissButton.trigger('click');
-                            setTimeout(function(){ $dismissButton.removeClass('clicked'); }, 600);
-                            ignoreInputFor(1200);
-                            return true;
-                            }
-                        }
+                //console.log('-> robotsOverviewIsExpanded =', robotsOverviewIsExpanded);
+                // Collect references to key elements within the robots overview
+                let $teamRobotsDiv = $('.team-robots', $robotsOverview);
+                let $storageBoxDivs = $('.storage-box', $robotsOverview);
+                let $storageRobotsDiv = $('.storage-robots', $robotsOverview);
+                let $storageItemsDiv = $('.storage-items', $robotsOverview);
+                let $storageAbilitiesDiv = $('.storage-abilities', $robotsOverview);
+                let $storageDetailsDiv = $('.details', $robotsOverview);
+                let $teamRobotsInOverview = $('.team-robot[data-robot]:not(.hidden)', $teamRobotsDiv);
+                let $storageRobotsInOverview = $('.team-robot[data-robot]:not(.hidden)', $storageRobotsDiv);
+                let $storageItemsInOverview = $('.team-item[data-item]:not(.hidden)', $storageItemsDiv);
+                let $storageAbilitiesInOverview = $('.team-ability[data-ability]:not(.hidden)', $storageAbilitiesDiv);
+                let $storageSortsInOverview = $('.storage-box:not(.disabled) .button[data-sort]:not(.hidden)', $robotsOverview);
+                //console.log('--> $teamRobotsDiv =', $teamRobotsDiv.length); //, $teamRobotsDiv);
+                //console.log('--> $storageRobotsDiv =', $storageRobotsDiv.length); //, $storageRobotsDiv);
+                //console.log('--> $storageItemsDiv =', $storageItemsDiv.length); //, $storageItemsDiv);
+                //console.log('--> $storageAbilitiesDiv =', $storageAbilitiesDiv.length); //, $storageAbilitiesDiv);
+                //console.log('--> $storageDetailsDiv =', $storageDetailsDiv.length); //, $storageDetailsDiv);
+                //console.log('--> $storageSortsInOverview =', $storageSortsInOverview.length, $storageSortsInOverview);
+                let currentStorageView = $robotsOverview.is('[data-view]') ? $robotsOverview.attr('data-view') : '';
+                //console.log('--> currentStorageView =', currentStorageView);
+                let $storageObjectsDiv, $storageObjectsInOverview;
+                if (currentStorageView === 'robots'){ $storageObjectsDiv = $storageRobotsDiv; $storageObjectsInOverview = $storageRobotsInOverview; }
+                else if (currentStorageView === 'items'){ $storageObjectsDiv = $storageItemsDiv; $storageObjectsInOverview = $storageItemsInOverview; }
+                else if (currentStorageView === 'abilities'){ $storageObjectsDiv = $storageAbilitiesDiv; $storageObjectsInOverview = $storageAbilitiesInOverview; }
+                //console.log('--> $storageObjectsDiv(', currentStorageView, ') =', $storageObjectsDiv.length); //, $storageObjectsDiv);
+                //console.log('--> $storageObjectsInOverview(', currentStorageView, ') =', $storageObjectsInOverview.length); //, $storageObjectsInOverview);
+                let $actionButtonsInDetails = $('.action-button:not(.hidden)', $storageDetailsDiv);
+                let $imageDiv = $('.image:not(.hidden)', $storageDetailsDiv).first();
+                $actionButtonsInDetails = $actionButtonsInDetails.add($imageDiv);
+                //console.log('--> $imageDiv =', $imageDiv.length); //, $imageDiv);
+                if ($storageDetailsDiv.length && $storageDetailsDiv.is('[data-robot]')){
+                    let $heldItem = $('.infoline.held-item .value:not(.hidden)', $storageDetailsDiv);
+                    let $supportMecha = $('.infoline.support-mecha .value:not(.hidden)', $storageDetailsDiv);
+                    let $equippedAbilities = $('.infoline.equipped-abilities .value:not(.hidden)', $storageDetailsDiv);
+                    $actionButtonsInDetails = $actionButtonsInDetails.add($heldItem);
+                    $actionButtonsInDetails = $actionButtonsInDetails.add($supportMecha);
+                    $actionButtonsInDetails = $actionButtonsInDetails.add($equippedAbilities);
+                    //console.log('--> $heldItem =', $heldItem.length); //, $heldItem);
+                    //console.log('--> $supportMecha =', $supportMecha.length); //, $supportMecha);
+                    //console.log('--> $equippedAbilities =', $equippedAbilities.length); //, $equippedAbilities);
                     }
-                // Otherwise if no side buttons yet, then we use either Start or B to close the panel instead
-                else {
-                    // If the player has pressed the start button again, attempt to close the storage area via the same button
-                    if (activeInputs.Start){
-                        // removed: || activeInputs.B  reason: we need B for other actions in-menu sorry
-                        //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                let $subActionButtons = $('.actions .button[data-action]:not(.hidden)', $storageDetailsDiv);
+                $actionButtonsInDetails = $actionButtonsInDetails.add($subActionButtons);
+                //console.log('--> $subActionButtons =', $subActionButtons.length); //, $subActionButtons);
+                //console.log('--> $actionButtonsInDetails(', currentStorageView, ') =', $actionButtonsInDetails.length); //, $storageObjectsDiv);
+                // Check to see if the action modal is visible before delegating events in case storage hidden
+                let currentFocus = !_world.actionModalVisible ? 'storage-boxes' : 'action-modal';
+                //console.log('_world.actionModalVisible = ', _world.actionModalVisible);
+                //console.log('currentFocus =', currentFocus);
+                if (currentFocus === 'storage-boxes'){
+                    //console.log('delegate events relevant to storage boxes only');
+                    let $hoveredButton = $('.team-robot.hovered, .team-item.hovered, .team-ability.hovered, .value.hovered, .button.hovered, .image.hovered', $robotsOverview);
+                    let $selectedButton = $('.team-robot.selected', $teamRobotsDiv);
+                    $selectedButton = $selectedButton.add('.team-robot.selected, .team-item.selected, .team-ability.selected', $storageBoxDivs);
+                    //console.log('--> $hoveredButton =', $hoveredButton.length); //, $hoveredButton);
+                    //console.log('--> $selectedButton =', $selectedButton.length); //, $selectedButton);
+                    let hoverButton = function($button){ if (!$button){ return; } $('.hovered', $robotsOverview).removeClass('hovered'); $button.addClass('hovered'); $button.trigger('mouseenter'); };
+                    let selectButton = function($button){ if (!$button){ return; } $('.selected', $robotsOverview).removeClass('selected'); $button.addClass('selected'); };
+                    let clickButton = function($button){ if (!$button){ return; } $button.trigger('click'); };
+                    let hoverFirstTeamRobot = function(){ hoverButton($teamRobotsInOverview.first()); };
+                    let hoverLastTeamRobot = function(){ hoverButton($teamRobotsInOverview.last()); };
+                    let hoverFirstStorageObject = function(){ hoverButton($storageObjectsInOverview.not('.hidden').first()); };
+                    let hoverLastStorageObject = function(){ hoverButton($storageObjectsInOverview.not('.hidden').last()); };
+                    let hoverFirstDetailsButton = function(){ hoverButton($actionButtonsInDetails.not('.hidden').first()); };
+                    let hoverLastDetailsButton = function(){ hoverButton($actionButtonsInDetails.not('.hidden').last()); };
+                    let closeRobotsOverviewPanel = function(){
+                        //console.log('closeRobotsOverviewPanel() ...');
                         if (event){ event.preventDefault(); }
                         let $closeButton = $('.team-close', $robotsOverview);
                         if ($closeButton.length
@@ -3161,6 +3118,78 @@ class mmrpgWorldMap {
                             $closeButton.trigger('click');
                             setTimeout(function(){ $closeButton.removeClass('clicked'); }, 600);
                             ignoreInputFor(900);
+                            return true;
+                            } else {
+                            return false;
+                            }
+                        };
+                    // If the player has pressed the start button again, attempt to close the storage area via the same button
+                    if (activeInputs.Start){
+                        // removed: || activeInputs.B  reason: we need B for other actions in-menu sorry
+                        //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                        return closeRobotsOverviewPanel();
+                        }
+                    // If the player has pressed the select button, try to click the team-rotate button if exists/not-disabled
+                    if (activeInputs.Select){
+                        //console.log('%c' + 'Select key pressed!', 'color: orange;');
+                        if (event){ event.preventDefault(); }
+                        let $rotateButton = $('.team-rotate', $robotsOverview);
+                        if ($rotateButton.length
+                            && $rotateButton.is(':visible')
+                            && !$rotateButton.is('.disabled')){
+                            $rotateButton.addClass('clicked');
+                            $rotateButton.trigger('click');
+                            setTimeout(function(){ $rotateButton.removeClass('clicked'); }, 300);
+                            ignoreInputFor(600);
+                            return true;
+                            }
+                        }
+                    // If the player has pressed the A button, try to click whatever button is currently hovered
+                    if (activeInputs.A){
+                        //console.log('%c' + 'A key pressed!', 'color: orange;');
+                        if ($hoveredButton
+                            && $hoveredButton.length
+                            && !$hoveredButton.is('.hidden')){
+                            return clickButton($hoveredButton);
+                            }
+                        }
+                    // If the player has pressed the B button, try to unclick whatever button is current selected
+                    if (activeInputs.B){
+                        //console.log('%c' + 'B key pressed!', 'color: orange;');
+                        if ($selectedButton
+                            && $selectedButton.length
+                            && !$selectedButton.is('.disabled')){
+                            let $lastSelected = $selectedButton.last();
+                            clickButton($lastSelected);
+                            return hoverButton($lastSelected);
+                            } else {
+                            return closeRobotsOverviewPanel();
+                            }
+                        }
+                    // If the player has pressed the X button, and there's an element with a data-button value of X, try to click it
+                    if (activeInputs.X){
+                        //console.log('%c' + 'X key pressed!', 'color: orange;');
+                        let $dataButtonX = $('.button[data-action][data-button="X"]:not(.disabled)', $robotsOverview);
+                        //console.log('$dataButtonX =', $dataButtonX.length, $dataButtonX); /// CHECKPOINT 2026/03/06
+                        if (!$dataButtonX || !$dataButtonX.length){ $dataButtonX = false; }
+                        else { $dataButtonX = $dataButtonX.first(); }
+                        if ($dataButtonX && $dataButtonX.is(':visible')){
+                            $dataButtonX.addClass('clicked').trigger('click');
+                            setTimeout(function(){ $dataButtonX.removeClass('clicked'); }, 600);
+                            ignoreInputFor(300);
+                            return true;
+                            }
+                        }
+                    // If the player has pressed the Y button, and there's an element with a data-button value of Y, try to click it
+                    if (activeInputs.Y){
+                        //console.log('%c' + 'Y key pressed!', 'color: orange;');
+                        let $dataButtonY = $('.button[data-action][data-button="Y"]:not(.disabled)', $robotsOverview);
+                        if (!$dataButtonY || !$dataButtonY.length){ $dataButtonY = false; }
+                        else { $dataButtonY = $dataButtonY.first(); }
+                        if ($dataButtonY && $dataButtonY.is(':visible')){
+                            $dataButtonY.addClass('clicked').trigger('click');
+                            setTimeout(function(){ $dataButtonY.removeClass('clicked'); }, 600);
+                            ignoreInputFor(300);
                             return true;
                             }
                         }
@@ -3195,6 +3224,37 @@ class mmrpgWorldMap {
                             return true;
                             }
                         return;
+                        }
+                    // If the player has pressed the L+R button, we should try to click any visible sort buttons in sequence
+                    if (activeInputs.LR1){
+                        //console.log('%c' + 'L1+R1 key pressed!', 'color: orange;');
+                        if (event){ event.preventDefault(); }
+                        let $sortContainer = $('.sorts[data-dir]', $storageObjectsDiv);
+                        let $sortButtons = $('.button[data-sort]', $sortContainer);
+                        //console.log('$sortContainer =', $sortContainer.length, $sortContainer);
+                        //console.log('$sortButtons =', $sortButtons.length, $sortButtons);
+                        if (($sortButtons && $sortButtons.length)
+                            && ($sortContainer && $sortContainer.length)){
+                            let $activeSort = $sortButtons.filter('.active');
+                            let activeDir = $sortContainer.attr('data-dir');
+                            //console.log('$activeSort =', $activeSort.length, $activeSort);
+                            //console.log('activeDir =', activeDir);
+                            let clickAgain = activeDir === 'down' ? true : false;
+                            let clickNext = !clickAgain && $sortButtons.length > 1 ? true : false;
+                            if (clickAgain){
+                                //console.log('click the same button again!');
+                                clickButton($activeSort);
+                                return hoverButton($activeSort);
+                                }
+                            else if (clickNext){
+                                //console.log('click the next button in sequence w/ rollover!');
+                                let currIndex = $sortButtons.index($activeSort);
+                                let nextIndex = (currIndex < $sortButtons.length - 1) ? (currIndex + 1) : 0;
+                                let $nextButton = $sortButtons.eq(nextIndex);
+                                clickButton($nextButton);
+                                return hoverButton($nextButton);
+                                }
+                            }
                         }
                     // If the player has pressed the L2 or R2 buttons, we should switch to other available buttons (robots/abilities/items)
                     if (activeInputs.L2 || activeInputs.R2){
@@ -3234,118 +3294,213 @@ class mmrpgWorldMap {
                             return true;
                             }
                         }
-                    }
-                }
-            // If the robot storage area is currently open, process those actions too
-            if (robotsOverviewIsExpanded
-                && currentRobotsOverviewPanel === 'robots'){
-                // Collect references to key elements within the robots overview
-                let $teamRobotsDiv = $('.team-robots', $robotsOverview);
-                let $storageRobotsDiv = $('.storage-robots', $robotsOverview);
-                let $storageItemsDiv = $('.storage-items', $robotsOverview);
-                let $storageAbilitiesDiv = $('.storage-abilities', $robotsOverview);
-                let $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
-                let $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
-                let focusedPanel = $storageRobotsDiv.is('.focused') ? 'storage' : 'team';
-                let focusedClass = focusedPanel === 'storage' ? 'hovered' : 'selected';
-                let $focusedDiv = focusedPanel === 'storage' ? $storageRobotsDiv : $teamRobotsDiv;
-                let $robotsInFocusedDiv = focusedPanel === 'storage' ? $storageRobotsInOverview : $teamRobotsInOverview;
-                //console.log('-> robotsOverviewIsExpanded =', robotsOverviewIsExpanded);
-                //console.log('-> focusedPanel =', focusedPanel, ' && focusedClass =', focusedClass);
-                //console.log('-> sideButtonsActive =', sideButtonsActive);
-                // If the player has pressed the A button, we can simply click whichever team-robot is currently focused
-                if (activeInputs.A){
-                    //console.log('%c' + 'Confirm robot swap!', 'color: orange;');
-                    if (event){ event.preventDefault(); }
-                    // If the team robots are focused, clicking A simply affirms the already-selected robot and
-                    // then auto-swaps over to the storage panel for actually chosing the robot to swap with
-                    if (focusedPanel === 'team'){
-                        $teamRobotsDiv.removeClass('focused').addClass('unfocused');
-                        $storageRobotsDiv.addClass('focused').removeClass('unfocused');
-                        $('.team-robot', $teamRobotsDiv).removeClass('hovered');
-                        $('.team-robot', $storageRobotsDiv).removeClass('hovered');
-                        let $firstRobot = $('.team-robot:not(.hidden)', $storageRobotsDiv).first();
-                        $firstRobot.addClass('hovered');
-                        ignoreInputFor(300);
-                        return true;
-                        }
-                    // Otherwise if the storage panel is focused, whichever hovered robot we click is the one
-                    // we swap with the selected robot in the team view on the left (auto-switch when done)
-                    else if (focusedPanel === 'storage'){
-                        let $selectedRobot = $('.team-robot.selected', $teamRobotsDiv).first();
-                        let $hoveredRobot = $('.team-robot.hovered', $storageRobotsDiv).first();
-                        if (!$selectedRobot || !$selectedRobot.length){ return false; }
-                        if (!$hoveredRobot || !$hoveredRobot.length){ return false; }
-                        //console.log('Triggering click on hovered robot:', $hoveredRobot.attr('class'), $hoveredRobot);
-                        $hoveredRobot.trigger('click');
-                        setTimeout(function(){
-                            $('.team-robot', $storageRobotsDiv).removeClass('hovered');
-                            $('.team-robot', $teamRobotsDiv).removeClass('hovered');
-                            $storageRobotsDiv.removeClass('focused').addClass('unfocused');
-                            $teamRobotsDiv.addClass('focused').removeClass('unfocused');
-                            }, 100);
-                        }
-                    ignoreInputFor(300);
-                    return true;
-                    }
-                // If the player has pressed an arrow key, move the "hover" class accordingly in the appropriate of the two columns
-                // Left/Right directional inputs switch which panel is "focused" between team-robots (left) and storage-robots (right)
-                // Up/Down directional inputs then move the "hovered" class up and down within the currently active panel (selected for left, hover for right)
-                if (activeInputs.Up || activeInputs.Down || activeInputs.Left || activeInputs.Right){
-                    //console.log('%c' + 'Arrow key pressed!', 'color: orange;');
-                    if (event){ event.preventDefault(); }
-                    if (activeInputs.Left || activeInputs.Right){
-                        //console.log('-> switching focused panel to ' + (focusedPanel === 'team' ? 'storage' : 'team'));
-                        let oldPanel = focusedPanel;
-                        let newPanel = oldPanel === 'team' ? 'storage' : 'team';
-                        let $oldPanel = oldPanel === 'team' ? $teamRobotsDiv : $storageRobotsDiv;
-                        let $newPanel = newPanel === 'team' ? $teamRobotsDiv : $storageRobotsDiv;
-                        $oldPanel.removeClass('focused').addClass('unfocused');
-                        $newPanel.addClass('focused').removeClass('unfocused');
-                        $('.team-robot', $oldPanel).removeClass('hovered');
-                        $('.team-robot', $newPanel).removeClass('hovered');
-                        if (newPanel === 'team'){
-                            let $selectedRobot = $('.team-robot.selected', $newPanel).first();
-                            if (!$selectedRobot.length){
-                                $selectedRobot = $('.team-robot:not(.hidden)', $newPanel).first();
-                                $selectedRobot.addClass('selected');
-                                }
-                            }
-                        else if (newPanel === 'storage'){
-                            let $firstRobot = $('.team-robot:not(.hidden)', $newPanel).first();
-                            $firstRobot.addClass('hovered');
-                            }
-                        refreshRobotsOverviewDetailsPanel();
-                        return true;
-                        }
-                    else if (activeInputs.Up || activeInputs.Down){
-                        let $nextRobot = false;
-                        let $focusedRobot = $robotsInFocusedDiv.filter('.' + focusedClass).first();
-                        if (!$focusedRobot || !$focusedRobot.length){
-                            $focusedRobot = activeInputs.Down ? $robotsInFocusedDiv.first() : $robotsInFocusedDiv.last();
-                            $focusedRobot.addClass(focusedClass);
-                            refreshRobotsOverviewDetailsPanel();
-                            return true;
+                    // If the player has pressed any of the directional inputs, we should navigate within the open panels
+                    if (activeInputs.Up || activeInputs.Down || activeInputs.Left || activeInputs.Right){
+                        //console.log('%c' + 'Up/Down/Left/Right key pressed!', 'color: orange;');
+                        let $referenceButton = ($hoveredButton && $hoveredButton.length ? $hoveredButton : ($selectedButton && $selectedButton.length ? $selectedButton : false));
+                        if (!$referenceButton || !$referenceButton.length){
+                            //console.log('---> No hovered nor selected overview buttons found! Auto-hovering given input ...');
+                            if (activeInputs.Down){ return hoverFirstTeamRobot(); }
+                            else if (activeInputs.Up){ return hoverLastTeamRobot(); }
+                            else if (activeInputs.Right){ return hoverFirstStorageObject(); }
+                            else if (activeInputs.Left){ return hoverLastStorageObject(); }
                             }
                         else {
-                            if (activeInputs.Up){
-                                $nextRobot = $focusedRobot.prevAll('.team-robot:not(.hidden)').first();
-                                if (!$nextRobot || !$nextRobot.length){ $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').last(); }
+                            //console.log('---> Found ' + ($referenceButton.is($hoveredButton) ? 'hovered' : 'selected') + ' overview button ref! Moving hover given input ...');
+                            let $currentGroup = [], currentIndex = -1;
+                            let $buttonGroups = [$teamRobotsInOverview, $storageRobotsInOverview, $storageItemsInOverview, $storageAbilitiesInOverview, $storageSortsInOverview, $actionButtonsInDetails];
+                            $buttonGroups.forEach(function($group){ let index = $group.index($referenceButton); if (index === -1){ return; } $currentGroup = $group; currentIndex = index; });
+                            let panelOrder = ['team', 'storage'];
+                            let startKey = -1, startPanel = '', nextKey = -1, nextPanel = '';
+                            if ($actionButtonsInDetails.length){ panelOrder.push('details'); }
+                            if ($referenceButton.is($teamRobotsInOverview)){ startPanel = 'team'; }
+                            else if ($referenceButton.is($storageObjectsInOverview)){ startPanel = 'storage'; }
+                            else if ($referenceButton.is($storageSortsInOverview)){ startPanel = 'storage'; }
+                            else if ($referenceButton.is($actionButtonsInDetails)){ startPanel = 'details'; }
+                            let isRobotButton = $referenceButton.is('[data-robot-id]');
+                            let isAbilityButton = $referenceButton.is('[data-ability-id]');
+                            let isItemButton = $referenceButton.is('[data-item-id]');
+                            let prevIndex, realPrevIndex, nextIndex, realNextIndex, incIndexBy = 1;
+                            if (startPanel === 'storage' && (activeInputs.Up || activeInputs.Down) && !isRobotButton){ incIndexBy = 2; }
+                            else if (startPanel === 'details' && (activeInputs.Up || activeInputs.Down) && isAbilityButton){ incIndexBy = 4; }
+                            prevIndex = currentIndex - incIndexBy, realPrevIndex = prevIndex; if (prevIndex < 0){ prevIndex = $currentGroup.length - 1; realPrevIndex = false; }
+                            nextIndex = currentIndex + incIndexBy, realNextIndex = nextIndex; if (nextIndex > $currentGroup.length - 1){ nextIndex = 0; realNextIndex = false; }
+                            //console.log('$referenceButton =', $referenceButton.length, $referenceButton);
+                            //console.log('isRobotButton:', isRobotButton, 'isAbilityButton:', isAbilityButton, 'isItemButton:', isItemButton);
+                            //console.log('$currentGroup =', $currentGroup.length, $currentGroup);
+                            //console.log('currentIndex =', currentIndex, 'prevIndex =', prevIndex, 'nextIndex =', nextIndex);
+                            if (activeInputs.Up || activeInputs.Down){
+                                //console.log('----> Vertical direction clicked (' + (activeInputs.Up ? 'UP' : 'DOWN') + ')!');
+                                if (!$currentGroup || !$currentGroup.length){ return hoverButton($teamRobotsInOverview.first()); }
+                                else if ($currentGroup === $storageSortsInOverview){ return hoverButton($storageObjectsInOverview.first()); }
+                                else if (activeInputs.Up){ return hoverButton($currentGroup.eq(prevIndex)); }
+                                else if (activeInputs.Down){ return hoverButton($currentGroup.eq(nextIndex)); }
                                 }
-                            else if (activeInputs.Down){
-                                $nextRobot = $focusedRobot.nextAll('.team-robot:not(.hidden)').first();
-                                if (!$nextRobot || !$nextRobot.length){ $nextRobot = $robotsInFocusedDiv.filter('.team-robot:not(.hidden)').first(); }
-                                }
-                            if ($nextRobot && $nextRobot.length){
-                                $robotsInFocusedDiv.removeClass(focusedClass);
-                                $nextRobot.addClass(focusedClass);
-                                refreshRobotsOverviewDetailsPanel();
-                                return true;
+                            else if (activeInputs.Left || activeInputs.Right){
+                                //console.log('--> Horizontal direction clicked (' + (activeInputs.Left ? 'LEFT' : 'RIGHT') + ')!');
+                                if (startPanel){
+                                    startKey = panelOrder.indexOf(startPanel), nextKey = 0;
+                                    if (activeInputs.Left){ nextKey = startKey - 1; nextPanel = panelOrder[nextKey] || panelOrder[panelOrder.length - 1]; }
+                                    else if (activeInputs.Right){ nextKey = startKey + 1; nextPanel = panelOrder[nextKey] || panelOrder[0]; }
+                                    }
+                                //console.log('---> panelOrder =', panelOrder);
+                                //console.log('---> startPanel =', startPanel);
+                                //console.log('---> startKey =', startKey);
+                                if (startPanel === 'storage' && !isRobotButton){
+                                    //console.log('... in storage, might navigate to within ...');
+                                    //console.log('----> realPrevIndex =', realPrevIndex, 'realNextIndex =', realNextIndex);
+                                    let dataSlot = parseInt($referenceButton.attr('data-slot'));
+                                    let isEven = dataSlot % 2 === 0, isOdd = !isEven;
+                                    //console.log('----> dataSlot =', dataSlot);
+                                    if (isEven && activeInputs.Left && realPrevIndex !== false){ return hoverButton($currentGroup.eq(realPrevIndex)); }
+                                    else if (isOdd && activeInputs.Right && realNextIndex !== false){ return hoverButton($currentGroup.eq(realNextIndex)); }
+                                    }
+                                if (startPanel === 'details'){
+                                    //console.log('... in details, might navigate to within ...');
+                                    //console.log('realPrevIndex =', realPrevIndex, 'realNextIndex =', realNextIndex);
+                                    if (activeInputs.Left && realPrevIndex !== false){ return hoverButton($currentGroup.eq(realPrevIndex)); }
+                                    else if (activeInputs.Right && realNextIndex !== false){ return hoverButton($currentGroup.eq(realNextIndex)); }
+                                    }
+                                //console.log('----> inner navigation not triggered, moving to nextPanel =', nextPanel);
+                                if (nextPanel === 'team'){
+                                    let $selected = $teamRobotsInOverview.filter('.selected');
+                                    if ($selected.length){ return hoverButton($selected); }
+                                    else { return hoverFirstTeamRobot(); }
+                                    }
+                                else if (nextPanel === 'storage'){
+                                    let $selected = $storageObjectsInOverview.filter('.selected');
+                                    if ($selected.length){ return hoverButton($selected); }
+                                    else { return hoverFirstStorageObject(); }
+                                    }
+                                else if (nextPanel === 'details'){
+                                    let $hovered = $actionButtonsInDetails.filter('.hovered');
+                                    if (!$hovered.length){ return hoverFirstDetailsButton(); }
+                                    }
                                 }
                             }
                         }
                     }
-                return;
+                else if (currentFocus === 'action-modal'){
+                    //console.log('delegate events relevant to action modal only');
+                    let $actionModal = _elements.actionModal;
+                    let currentAction = $actionModal.is('[data-action]') ? $actionModal.attr('data-action') : false;
+                    let currentActionKind = currentAction && currentAction.indexOf('_') !== -1 ? currentAction.split('_')[0] : currentAction;
+                    let currentActionToken = $actionModal.is('[data-action-token]') ? $actionModal.attr('data-action-token') : false;
+                    let $actionModalContent = $('.content', $actionModal);
+                    let $containerForObjects = $('.container.for-current', $actionModalContent);
+                    let $containerForButtons = $('.buttons.actions', $actionModalContent);
+                    let actionObjectClass = '.team-' + currentActionKind + '[data-' + currentActionKind + ']';
+                    let actionButtonClass = '.button[data-action]';
+                    let actionObjectsPerRow = 4;
+                    let $actionObjectsInModal = $(actionObjectClass, $containerForObjects);
+                    let $actionButtonsInModal = $(actionButtonClass, $containerForButtons);
+                    //console.log('--> $actionModal =', $actionModal.length); //, $actionModal);
+                    //console.log('--> currentAction =', currentAction);
+                    //console.log('--> currentActionKind =', currentActionKind);
+                    //console.log('--> currentActionToken =', currentActionToken);
+                    //console.log('--> actionObjectClass =', actionObjectClass);
+                    //console.log('--> $actionModalContent =', $actionModalContent.length); //, $actionModalContent);
+                    //console.log('--> $containerForObjects =', $containerForObjects.length); //, $containerForObjects);
+                    //console.log('--> $containerForButtons =', $containerForButtons.length); //, $containerForButtons);
+                    //console.log('--> $actionButtonsInModal =', $actionButtonsInModal.length); //, $actionButtonsInModal);
+                    //console.log('--> $actionObjectsInModal =', $actionObjectsInModal.length); //, $actionObjectsInModal);
+                    let hoveredButtonClasses = [actionObjectClass, actionButtonClass].map((cls) => (cls + '.hovered')).join(', ');
+                    let selectedButtonClasses = [actionObjectClass, actionButtonClass].map((cls) => (cls + '.selected')).join(', ');
+                    let $hoveredButton = $(hoveredButtonClasses, $actionModalContent);
+                    let $selectedButton = $(selectedButtonClasses, $actionModalContent);
+                    //let $hoveredButton = $([actionObjectClass + '.hovered', actionButtonClass + '.hovered'].join(', '), $actionModalContent);
+                    //let $selectedButton = $([actionObjectClass + '.selected', actionButtonClass + '.selected'].join(', '), $actionModalContent);
+                    //console.log('--> hoveredButtonClasses =', hoveredButtonClasses);
+                    //console.log('--> selectedButtonClasses =', selectedButtonClasses);
+                    //console.log('--> $hoveredButton =', $hoveredButton.length); //, $hoveredButton);
+                    //console.log('--> $selectedButton =', $selectedButton.length); //, $selectedButton);
+                    let hoverButton = function($button, $context){ if (!$button){ return; } $(hoveredButtonClasses, ($context && $context.length ? $context : $actionModalContent)).removeClass('hovered'); $button.addClass('hovered'); $button.trigger('mouseenter'); };
+                    let selectButton = function($button, $context){ if (!$button){ return; } $(selectedButtonClasses, ($context && $context.length ? $context : $actionModalContent)).removeClass('selected'); $button.addClass('selected'); };
+                    let clickButton = function($button){ if (!$button){ return; } $button.trigger('click'); };
+                    let hoverFirstActionObject = function(){ hoverButton($actionObjectsInModal.first()); };
+                    let hoverLastActionObject = function(){ hoverButton($actionObjectsInModal.last()); };
+                    let hoverSelectedActionObject = function(){ let $selected = $actionModalContent.find(actionObjectClass + '.selected'); if (!$selected || !$selected.length){ return false; } hoverButton($selected); return true; };
+                    let hoverSelectedActionButton = function(){ let $selected = $actionModalContent.find(actionButtonClass + '.selected'); if (!$selected || !$selected.length){ return false; } hoverButton($selected); return true; };
+                    let $confirmButton = $actionButtonsInModal.length ? $actionButtonsInModal.filter('[data-action="confirm"]') : false;
+                    let $cancelButton = $actionButtonsInModal.length ? $actionButtonsInModal.filter('[data-action="cancel"]') : false;
+                    let hoverConfirmButton = function(){ if (!$confirmButton){ return; } hoverButton($confirmButton); };
+                    let hoverCancelButton = function(){ if (!$cancelButton){ return; } hoverButton($cancelButton); };
+                    let dismissActionModal = function(){ let $overlay = $('> .overlay', $actionModal); if ($overlay.length){ $overlay.trigger('click'); } ignoreInputFor(200); };
+                    // If the player has pressed the start button again, attempt to close the modal via the close button
+                    if (activeInputs.Start){
+                        //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                        return dismissActionModal();
+                        }
+                    // If the player has pressed the A button, try to click whatever button is currently hovered
+                    if (activeInputs.A){
+                        //console.log('%c' + 'A key pressed!', 'color: orange;');
+                        if ($hoveredButton
+                            && $hoveredButton.length
+                            && !$hoveredButton.is('.disabled')){
+                            return clickButton($hoveredButton);
+                            }
+                        }
+                    // If the player has pressed the B button, try to unclick whatever button is current selected
+                    if (activeInputs.B){
+                        //console.log('%c' + 'B key pressed!', 'color: orange;');
+                        if ($selectedButton
+                            && $selectedButton.length
+                            && !$selectedButton.is('.disabled')){
+                            return clickButton($selectedButton.last());
+                            } else {
+                            return dismissActionModal();
+                            }
+                        }
+                    // If the player has pressed any of the directional inputs, we should navigate within the open modal
+                    if (activeInputs.Up || activeInputs.Down || activeInputs.Left || activeInputs.Right){
+                        //console.log('%c' + [(activeInputs.Up ? 'Up' : ''), (activeInputs.Down ? 'Down' : ''), (activeInputs.Left ? 'Left' : ''), (activeInputs.Right ? 'Right' : '')].filter((s) => !!s).join(', ') + ' key(s) pressed!', 'color: orange;');
+                        let $referenceButton = ($hoveredButton && $hoveredButton.length ? $hoveredButton : ($selectedButton && $selectedButton.length ? $selectedButton : false));
+                        if (!$referenceButton || !$referenceButton.length){
+                            //console.log('---> No hovered nor selected modal buttons found! Auto-hovering given input ...');
+                            if (activeInputs.Down || activeInputs.Right){ hoverFirstActionObject(); }
+                            else if (activeInputs.Up || activeInputs.Left){ hoverLastActionObject(); }
+                            }
+                        else {
+                            //console.log('---> Found ' + ($referenceButton.is($hoveredButton) ? 'hovered' : 'selected') + ' modal button ref! Moving hover given input ...');
+                            let $currentGroup = [], currentIndex = -1;
+                            let $buttonGroups = [$actionObjectsInModal, $actionButtonsInModal];
+                            $buttonGroups.forEach(function($group){ let index = $group.index($referenceButton); if (index === -1){ return; } $currentGroup = $group; currentIndex = index; });
+                            let prevIndex = currentIndex - 1; if (prevIndex < 0){ prevIndex = $currentGroup.length - 1; }
+                            let nextIndex = currentIndex + 1; if (nextIndex > $currentGroup.length - 1){ nextIndex = 0; }
+                            let prevRowIndex = currentIndex - actionObjectsPerRow; if (prevIndex < 0){ prevRowIndex = false; }
+                            let nextRowIndex = currentIndex + actionObjectsPerRow; if (nextRowIndex > $currentGroup.length - 1){ nextRowIndex = false; }
+                            //console.log('$referenceButton =', $referenceButton.length, $referenceButton);
+                            //console.log('$currentGroup =', $currentGroup.length, $currentGroup);
+                            //console.log('currentIndex =', currentIndex, 'prevIndex =', prevIndex, 'nextIndex =', nextIndex);
+                            if (activeInputs.Left || activeInputs.Right){
+                                //console.log('----> Horizontal direction clicked (' + (activeInputs.Left ? 'LEFT' : 'RIGHT') + ')!');
+                                if (activeInputs.Left){ hoverButton($currentGroup.eq(prevIndex)); }
+                                else if (activeInputs.Right){ hoverButton($currentGroup.eq(nextIndex)); }
+                                }
+                            else if (activeInputs.Up || activeInputs.Down){
+                                //console.log('----> Vertical direction clicked (' + (activeInputs.Up ? 'UP' : 'DOWN') + ')!');
+                                if ($referenceButton.is($actionObjectsInModal)){
+                                    //console.log('----> is action object ...');
+                                    if (activeInputs.Up){
+                                        if (prevRowIndex !== false){ hoverButton($currentGroup.eq(prevRowIndex)); }
+                                        }
+                                    else if (activeInputs.Down){
+                                        if (nextRowIndex !== false){ hoverButton($currentGroup.eq(nextRowIndex)); }
+                                        else if ($confirmButton && $confirmButton.is(':not(.disabled)')){ hoverConfirmButton(); }
+                                        else if ($cancelButton && $cancelButton.is(':not(.disabled)')){ hoverCancelButton(); }
+                                        }
+                                    }
+                                else if ($referenceButton.is($actionButtonsInModal)){
+                                    //console.log('----> is action button ...');
+                                    if (!hoverSelectedActionObject()){
+                                        if (activeInputs.Up){ hoverLastActionObject(); }
+                                        else if (activeInputs.Down){ hoverFirstActionObject(); }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             // If the side buttons panel is currently open, process those actions too
             if (sideButtonsActive){
@@ -3387,7 +3542,7 @@ class mmrpgWorldMap {
                         $rotateButton.addClass('clicked');
                         $rotateButton.trigger('click');
                         setTimeout(function(){ $rotateButton.removeClass('clicked'); }, 300);
-                        ignoreInputFor(900);
+                        ignoreInputFor(600);
                         return true;
                         }
                     }
@@ -3777,6 +3932,8 @@ class mmrpgWorldMap {
             requestAnimationFrame(checkUserInputWatcher);
             };
         checkUserInputWatcher();
+        _self.inputs = userInputWatcher;
+        //console.log('check if loaded _self.inputs.userInputs:', _self.inputs.userInputs);
 
         // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed
         $(window).bind('resize', function(e){
@@ -4052,6 +4209,10 @@ class mmrpgWorldMap {
         let mapScrollY = scrollY;
         let targetX = (mapScrollX + (mapTileSizeX / 2) - (mapTileSizeOffsetX / 2)) * worldZoom;
         let targetY = (mapScrollY + (mapTileSizeY / 2) - (mapTileSizeOffsetY / 2)) * worldZoom;
+        if (usePerspective){
+            console.warn('scrollMap() disabled for perspective mode temporarily!');
+            return false;
+            }
         // Now calculate the new translate values for the map container
         let translateX = 0, translateY = 0;
         if (mapWidth < worldWidth){ translateX = (worldWidth - mapWidth) / 2; }
@@ -4308,7 +4469,7 @@ class mmrpgWorldMap {
         }
 
     // Quick function for toggling perspective mode on/off and then re-scrolling the map to refresh
-    togglePerspectiveMode(){
+    togglePerspectiveMode(state){
         //console.log('%c' + 'mmrpgWorldMap.togglePerspectiveMode()', 'color: magenta;');
         let _self = this;
         let _config = _self.config;
@@ -4331,7 +4492,9 @@ class mmrpgWorldMap {
         //console.log('-> _worldZoom =', _worldZoom);
         //console.log('-> _reverseWorldZoom =', _reverseWorldZoom);
         // If perspective is turned on, let's apply necessary styles and adjustments then reposition sprites
-        if (!_mapEffects.usePerspective){
+        let oldState = _mapEffects.usePerspective;
+        let newState = typeof state === 'boolean' ? state : !_mapEffects.usePerspective;
+        if (newState === true){
             _mapEffects.usePerspective = true;
             //console.log('-> enabling perspective mode!');
             //console.log('-> $canvasMap =', $canvasMap);
@@ -4843,14 +5006,13 @@ class mmrpgWorldMap {
                             readyTeamSprites = true;
                             readyTeamSpritesAnyway = true;
                             teamReadyDuration = 600; // we want the animation to start right away
-                            autoRedirectSound = portalInfo.direction ? 'lets-go-robots' : 'intense-growing-sound'; //'bounce-sound';
-                            autoRedirectEffect = portalInfo.direction ? 'leaving' : 'glowing';
-                            autoRedirectAnimation = portalInfo.direction ? 'slide-' + portalInfo.direction : 'ascend-upward';
-                            //triggerEffect = true;
-                            /* triggerEffectFunction = function(){
-                                if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
-                                console.log('testing 123?');
-                                }; */
+                            let isExitPortal = portalInfo.direction ? true : false;
+                            let isTelePortal = !portalInfo.direction ? true : false;
+                            let isSubTelePortal = goToMap === 'debug-area-0' ? true : false;
+                            autoRedirectSound = isExitPortal ? 'lets-go-robots' : 'intense-growing-sound'; //'bounce-sound';
+                            autoRedirectEffect = isExitPortal ? 'leaving' : 'glowing';
+                            if (isExitPortal){ autoRedirectAnimation = 'slide-' + portalInfo.direction; }
+                            else if (isTelePortal){ autoRedirectAnimation = isSubTelePortal ? 'descend-downward' : 'ascend-upward'; }
                             }
                         }
                     }
@@ -5103,7 +5265,7 @@ class mmrpgWorldMap {
 
         // Define an inline function to put the team into their battle-ready poses
         let getTeamSpritesReady = function(){
-            console.log('%c' + 'getTeamSpritesReady()', 'color: cyan;');
+            //console.log('%c' + 'getTeamSpritesReady()', 'color: cyan;');
             if (_self.worldIsBusy() && !readyTeamSpritesAnyway){ return; }
             if (!stillAtPosition() || otherMenusActiveNow()){ return; }
 
@@ -5157,17 +5319,25 @@ class mmrpgWorldMap {
             //console.log('-> $otherSprites =', $otherSprites);
 
             // If there are any effect to apply beforehand, do it now
+            let willAscendUpward = autoRedirectAnimation === 'ascend-upward' ? true : false;
+            let willDescendDownward = autoRedirectAnimation === 'descend-downward' ? true : false;
+            let willFloatVertically = willAscendUpward || willDescendDownward ? true : false;
+            let willSlideHorizontally = autoRedirectAnimation.indexOf('slide-') === 0 ? true : false;
+            let willSlideDirection = willSlideHorizontally ? autoRedirectAnimation.replace('slide-', '') : false;
+            //console.log('willSlideHorizontally =', willSlideHorizontally);
+            //console.log('willSlideDirection =', willSlideDirection);
             let spriteClassBeforeMove = '', spriteClassAfterMove = '';
             if (autoRedirectEffect){
                 if (autoRedirectEffect === 'glowing'){ spriteClassBeforeMove = 'glowing'; }
                 else if (autoRedirectEffect === 'leaving'){ spriteClassBeforeMove = 'leaving'; }
                 }
             if (autoRedirectAnimation){
-                if (autoRedirectAnimation === 'ascend-upward'){ spriteClassAfterMove = 'ascending'; }
-                else if (autoRedirectAnimation === 'slide-right'){ spriteClassAfterMove = 'sliding'; }
+                if (willAscendUpward){ spriteClassAfterMove = 'ascending'; }
+                else if (willDescendDownward){ spriteClassAfterMove = 'descending'; }
                 }
             let spriteBeforeMove = function(){
                 if (!spriteClassBeforeMove){ return; }
+                $(this).removeClass('shake bounce idle');
                 $(this).addClass(spriteClassBeforeMove);
                 };
             let spriteAfterMove = function(){
@@ -5184,7 +5354,8 @@ class mmrpgWorldMap {
                 let dataDir = $sprite.attr('data-dir') || 'right';
                 if (goingLeft && dataDir !== 'left'){ $sprite.attr('data-dir', 'left'); }
                 else if (goingRight && dataDir !== 'right'){ $sprite.attr('data-dir', 'right'); }
-                $sprite.attr('data-frame', playerFrames[index % playerFrames.length] || '00');
+                let dataFrame = spriteClassAfterMove !== 'sliding' ? (playerFrames[index % playerFrames.length] || '00') : '07';
+                $sprite.attr('data-frame', dataFrame);
                 spriteBeforeMove.call($sprite);
                 });
             $robotSprites.each(function(index){
@@ -5193,7 +5364,8 @@ class mmrpgWorldMap {
                 let dataDir = $sprite.attr('data-dir') || 'right';
                 if (goingLeft && dataDir !== 'left'){ $sprite.attr('data-dir', 'left'); }
                 else if (goingRight && dataDir !== 'right'){ $sprite.attr('data-dir', 'right'); }
-                $sprite.attr('data-frame', robotFrames[index % robotFrames.length] || '00');
+                let dataFrame = spriteClassAfterMove !== 'sliding' ? (robotFrames[index % robotFrames.length] || '00') : '07';
+                $sprite.attr('data-frame', dataFrame);
                 spriteBeforeMove.call($sprite);
                 });
 
@@ -5263,24 +5435,28 @@ class mmrpgWorldMap {
                 })($otherSprites);
             //console.log('-> lowestOtherSpriteZ =', lowestOtherSpriteZ);
             $cursorSprite.attr('data-frame', '01').css({zIndex:(lowestOtherSpriteZ - 1)});
-            spriteAfterMove.call($cursorSprite);
-
+            setTimeout(function(){ spriteAfterMove.call($cursorSprite); }, Math.ceil(teamRushDuration * 0.8));
+            // If we need to do a slide animation as well, do it after everything else
+            if (willSlideHorizontally){
+                let rushDuration = Math.ceil(teamRushDuration * 1.6);
+                setTimeout(function(){
+                    let $sprites = $cursorSprite.add($playerSprites).add($robotSprites);
+                    let offsetDst = (_mapTileSize[0] * 2);
+                    let offsreenCss = {}; //{left: (willSlideDirection === 'left' ? (targetX - offsetDst) : (targetX + offsetDst)) + 'px'};
+                    if (willSlideDirection === 'left'){ offsreenCss.left = (targetX - offsetDst); }
+                    else if (willSlideDirection === 'right'){ offsreenCss.left = (targetX + offsetDst); }
+                    else if (willSlideDirection === 'up'){ offsreenCss.top = (targetY - offsetDst); }
+                    else if (willSlideDirection === 'down'){ offsreenCss.top = (targetY + offsetDst); }
+                    if (offsreenCss.top){ offsreenCss.zIndex = offsreenCss.top - 1; }
+                    $playerSprites.attr('data-frame', '07'); $robotSprites.attr('data-frame', '07');
+                    //$sprites.animate(offsreenCss, Math.ceil(teamRushDuration * 3.2));
+                    $sprites.each(function(){
+                        rushDuration = Math.ceil(rushDuration * 1.2);
+                        $(this).animate(offsreenCss, rushDuration);
+                        });
+                    }, rushDuration);
+                }
             };
-
-        /*
-        // Define an inline function for applying various effects
-        let applyTeamEffect = function(effect){
-            console.log('%c' + '~ applyTeamEffect(effect:' + effect + ')', 'color: cyan;');
-            if (effect === 'leaving'){ $teamSprites.addClass('leaving'); }
-            else if (effect === 'glowing'){ $teamSprites.addClass('glowing'); }
-            };
-        let applyTeamAnimation = function(animation){
-            console.log('%c' + '~ applyTeamAnimation(animation:' + animation + ')', 'color: cyan;');
-            if (animation === 'hover-upward'){ $teamSprites.animate({top: '-80px'}, 300); }
-            else if (animation === 'slide-left'){ $teamSprites.animate({left: '-80px'}, 300); }
-            else if (animation === 'slide-right'){ $teamSprites.animate({left: '+=80px'}, 300); }
-            };
-        */
 
         // Define an inline function to redirect to the portal if needed
         let redirectToLocation = function(){
@@ -5823,14 +5999,18 @@ class mmrpgWorldMap {
                 };
 
             // Define the event to run when hovering one of these new action buttons
-            let onActionButtonHover = function(e){
-                //e.preventDefault();
+            let hoverActionButton = function(e){
                 _self.playSoundEffect('icon-hover');
+                hoverOverviewObject.call(this, e);
+                };
+            let unhoverActionButton = function(e){
+                unhoverOverviewObject.call(this, e);
                 };
 
             // Bind click events to the newly created action buttons in the dropdown
+            $('.button[data-action]', $sideButtons).bind('mouseenter', hoverActionButton);
+            $('.button[data-action]', $sideButtons).bind('mouseleave', unhoverActionButton);
             $('.button[data-action]', $sideButtons).bind('click', onActionButtonClick);
-            $('.button[data-action]', $sideButtons).bind('mouseenter', onActionButtonHover);
 
             // Bind an event to the side-button area itself for showing/hiding action labels on hover
             $sideButtons.bind('mouseenter', function(e){ $actionDropdown.addClass('hover'); });
@@ -6278,11 +6458,11 @@ class mmrpgWorldMap {
                     if ($(this).is('.disabled')){ return; }
                     if ($(this).is('.button_disabled')){ return; }
                     }
-                if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
-                    top.mmrpg_play_sound_effect(soundName, options);
-                    } else {
-                    console.warn('mmrpgWorldMap.playSoundEffect() unable to play sound effect "' + soundName + '" because top.mmrpg_play_sound_effect is not defined!');
-                    }
+                let soundEffectFunction = null;
+                if (typeof top.mmrpg_play_sound_effect !== 'undefined'){ soundEffectFunction = top.mmrpg_play_sound_effect; }
+                else if (typeof self.mmrpg_play_sound_effect !== 'undefined'){ soundEffectFunction = self.mmrpg_play_sound_effect; }
+                if (soundEffectFunction){ soundEffectFunction(soundName, options); }
+                else { console.warn('mmrpgWorldMap.playSoundEffect() unable to play sound effect "' + soundName + '" because mmrpg_play_sound_effect is not defined!'); }
                 };
                 _selfReference.mmrpgPlaySoundEffect = mmrpgPlaySoundEffect;
             }
@@ -9022,6 +9202,10 @@ class mmrpgWorldMap {
         let currentSubScreen = _world.currentSubScreen;
 
         // ACTION BUTTONS
+        let _inputs = _self.inputs;
+        let _userInputs = _inputs.userInputs
+        let aButtonIcon = _userInputs.A.icon, bButtonIcon = _userInputs.B.icon;
+        let xButtonIcon = _userInputs.X.icon, yButtonIcon = _userInputs.Y.icon;
         // withdraw/deposit,take-out/put-away,activate/bench,add-to-team/remove-from-team
         robotDetailsObject.actions = [];
         let showStorageButtons = (currentScreen === 'robots-overview' && currentSubScreen === 'robots') ? true : false;
@@ -9031,8 +9215,10 @@ class mmrpgWorldMap {
         if (playerRobotsCurrent.length === 1){ allowTeamRemoveButton = false; }
         else if (playerRobotsCurrent.length >= _config.playerRobotsLimit){ allowTeamAddButton = false; }
         else if (playerRobotsCurrent.length >= _config.maxRobotsPerPlayer){ allowTeamAddButton = false; }
-        robotDetailsObject.actions.push({ action: 'add-robot', text: 'Add To Team', robot: robotToken, disabled: !allowTeamAddButton, hidden: !showStorageButtons || !showTeamAddButton });
-        robotDetailsObject.actions.push({ action: 'remove-robot', text: 'Remove From Team', robot: robotToken, disabled: !allowTeamRemoveButton, hidden: !showStorageButtons || !showTeamRemoveButton });
+        robotDetailsObject.actions.push({ action: 'robot-info', text: yButtonIcon + ' Details', button: 'Y', robot: robotToken, disabled: false, hidden: !showStorageButtons });
+        robotDetailsObject.actions.push({ action: 'add-robot', text: xButtonIcon + ' Summon', button: 'X', robot: robotToken, disabled: !allowTeamAddButton, hidden: !showStorageButtons || !showTeamAddButton });
+        robotDetailsObject.actions.push({ action: 'remove-robot', text: xButtonIcon + ' Dismiss', button: 'X', robot: robotToken, disabled: !allowTeamRemoveButton, hidden: !showStorageButtons || !showTeamRemoveButton });
+        // TODO (!!!) Add an "swap-in" option to storage robots when the player only has one robot and it's disabled
 
         // Pre-compile some of the HTML to make it easier for the other functions
         //robotDetailsObject.levelHTML = (robotDetailsObject.level >= 100 ? '<b>' : '') + 'Level ' + robotDetailsObject.level + (robotDetailsObject.level >= 100 ? '</b>' : '');
@@ -9078,12 +9264,15 @@ class mmrpgWorldMap {
         robotDetailsObject.actionsHTML = '';
         for (let i = 0; i < robotDetailsObject.actions.length; i++){
             let actionInfo = robotDetailsObject.actions[i];
+            let actionButton = typeof actionInfo.button !== 'undefined' ? actionInfo.button : false;
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
             let actionHidden = typeof actionInfo.hidden !== 'undefined' && actionInfo.hidden === true ? true : false;
             let actionIcon = actionInfo.icon ? '<i class="fa fas fa-' + actionInfo.icon + '"></i> ' : '';
             robotDetailsObject.actionsHTML += '<button type="button" '
                 + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
-                + 'data-action="' + actionInfo.action + '"' + (actionDisabled ? ' disabled="disabled"' : '') +
+                + 'data-action="' + actionInfo.action + '"'
+                + (actionButton ? ' data-button="' + actionButton + '"' : '')
+                + (actionDisabled ? ' disabled="disabled"' : '') +
                 '>' + actionIcon + actionInfo.text + '</button>';
             }
 
@@ -9158,6 +9347,7 @@ class mmrpgWorldMap {
         // Manually disable consumable items that cannot actually be used on the given robot for contextual reasons
         // TODO: figure out a better place for this maybe?
         let itemIsUnusable = !selectedPlayerRobot ? true : false;
+        let itemIsUngivable = !selectedPlayerRobot ? true : false;
         if (itemKind === 'consumable'){
             //console.log('checking if this item should be unusable ...');
             let playerRobot = selectedPlayerRobot, robotData = selectedPlayerRobotData, robotInfo = selectedPlayerRobotInfo;
@@ -9270,13 +9460,20 @@ class mmrpgWorldMap {
             itemDetailsObject.infoLines.push(powerLine);
             }
         itemDetailsObject.description = itemDescription;
+
+        // ACTION BUTTONS
+        let _inputs = _self.inputs;
+        let _userInputs = _inputs.userInputs
+        let aButtonIcon = _userInputs.A.icon, bButtonIcon = _userInputs.B.icon;
+        let xButtonIcon = _userInputs.X.icon, yButtonIcon = _userInputs.Y.icon;
         itemDetailsObject.actions = [];
         let showUseItem = itemKind === 'consumable' ? true : false;
         let showGiveItem = (itemKind === 'consumable' || itemKind === 'holdable') ? true : false;
+        let showTakeItem = showGiveItem && itemIsEquipped ? true : false; if (showTakeItem){ showGiveItem = false; }
         let showDropItem = itemKind !== 'event' && itemQuantity > 0 ? true : false;
-        itemDetailsObject.actions.push({ action: 'use-item', text: 'Use', item: itemToken, disabled: (!targetSelected || itemIsUnusable), hidden: !showUseItem });
-        itemDetailsObject.actions.push({ action: 'give-item', text: 'Give', item: itemToken, disabled: (!targetSelected || itemIsEquipped), hidden: !showGiveItem });
-        itemDetailsObject.actions.push({ action: 'take-item', text: 'Take', item: itemToken, disabled: (!targetSelected || !itemIsEquipped), hidden: !showGiveItem });
+        itemDetailsObject.actions.push({ action: 'use-item', text: yButtonIcon + ' Use', button: 'Y', item: itemToken, disabled: (!targetSelected || itemIsUnusable), hidden: !showUseItem });
+        itemDetailsObject.actions.push({ action: 'give-item', text: xButtonIcon + ' Give', button: 'X', item: itemToken, disabled: (!targetSelected || itemIsEquipped), hidden: !showGiveItem });
+        itemDetailsObject.actions.push({ action: 'take-item', text: xButtonIcon + ' Take', button: 'X', item: itemToken, disabled: (!targetSelected || !itemIsEquipped), hidden: !showTakeItem });
         //itemDetailsObject.actions.push({ action: 'drop-item', text: 'Drop', item: itemToken, disabled: targetSelected, hidden: !showDropItem });
 
         // Pre-compile some of the HTML to make it easier for the other functions
@@ -9302,11 +9499,14 @@ class mmrpgWorldMap {
         itemDetailsObject.actionsHTML = '';
         for (let i = 0; i < itemDetailsObject.actions.length; i++){
             let actionInfo = itemDetailsObject.actions[i];
-            let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
-            let actionHidden = typeof actionInfo.hidden !== 'undefined' && actionInfo.hidden === true ? true : false;
+            let actionButton = typeof actionInfo.button !== 'undefined' ? actionInfo.button : false;
+            let actionDisabled = typeof actionInfo.disabled === 'boolean' && actionInfo.disabled === true ? true : false;
+            let actionHidden = typeof actionInfo.hidden === 'boolean' && actionInfo.hidden === true ? true : false;
             itemDetailsObject.actionsHTML += '<button type="button" '
                 + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
-                + 'data-action="' + actionInfo.action + '"' + (actionDisabled ? ' disabled="disabled"' : '') +
+                + 'data-action="' + actionInfo.action + '"'
+                + (actionButton ? ' data-button="' + actionButton + '"' : '')
+                + (actionDisabled ? ' disabled="disabled"' : '') +
                 '>' + actionInfo.text + '</button>';
             }
 
@@ -9539,10 +9739,20 @@ class mmrpgWorldMap {
                 valueClasses: abilityTarget === 'auto' ? 'auto' : 'select'
                 });
             }
+        let equipAbilityText = 'Equip';
+        let removeAbilityText = 'Remove';
+        if (selectedPlayerRobot && abilityIsEquipped){ equipAbilityText = 'Equipped'; }
+        if (selectedPlayerRobot && !abilityIsEquipped && !abilitySlotsAvailable){ equipAbilityText = 'Replace'; }
         abilityDetailsObject.description = abilityDescription;
+
+        // ACTION BUTTONS
+        let _inputs = _self.inputs;
+        let _userInputs = _inputs.userInputs
+        let aButtonIcon = _userInputs.A.icon, bButtonIcon = _userInputs.B.icon;
+        let xButtonIcon = _userInputs.X.icon, yButtonIcon = _userInputs.Y.icon;
         abilityDetailsObject.actions = [];
-        abilityDetailsObject.actions.push({ action: 'equip-ability', text: (!abilityIsEquipped ? (abilitySlotsAvailable ? 'Equip' : 'Replace') : 'Equipped'), ability: abilityToken, disabled: !targetSelected });
-        abilityDetailsObject.actions.push({ action: 'remove-ability', text: 'Remove', ability: abilityToken, disabled: !abilityIsEquipped });
+        abilityDetailsObject.actions.push({ action: 'equip-ability', text: yButtonIcon + ' ' + equipAbilityText, button: 'Y', ability: abilityToken, disabled: !targetSelected });
+        abilityDetailsObject.actions.push({ action: 'remove-ability', text: xButtonIcon + ' ' + removeAbilityText, button: 'X', ability: abilityToken, disabled: !abilityIsEquipped });
 
         // Pre-compile some of the HTML to make it easier for the other functions
         abilityDetailsObject.infolinesHTML = '';
@@ -9567,9 +9777,15 @@ class mmrpgWorldMap {
         abilityDetailsObject.actionsHTML = '';
         for (let i = 0; i < abilityDetailsObject.actions.length; i++){
             let actionInfo = abilityDetailsObject.actions[i];
+            let actionButton = typeof actionInfo.button !== 'undefined' ? actionInfo.button : false;
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
             let actionHidden = typeof actionInfo.hidden !== 'undefined' && actionInfo.hidden === true ? true : false;
-            abilityDetailsObject.actionsHTML += '<button type="button" class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" data-action="' + actionInfo.action + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
+            abilityDetailsObject.actionsHTML += '<button type="button" '
+                + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
+                + 'data-action="' + actionInfo.action + '"'
+                + (actionButton ? ' data-button="' + actionButton + '"' : '')
+                + (actionDisabled ? ' disabled="disabled"' : '')
+                + '>' + actionInfo.text + '</button>';
             }
 
         // Return the generated ability details object
@@ -9660,6 +9876,7 @@ class mmrpgWorldMap {
         // manually update buttons so css transitions can occur properly
         for (let i = 0; i < robotDetails.actions.length; i++){
             let actionInfo = robotDetails.actions[i];
+            let actionButton = typeof actionInfo.button !== 'undefined' ? actionInfo.button : false;
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
             let actionHidden = typeof actionInfo.hidden !== 'undefined' && actionInfo.hidden === true ? true : false;
             let $actionButton = $actions.find('.button.' + actionInfo.action);
@@ -9672,7 +9889,9 @@ class mmrpgWorldMap {
                 } else {
                 let actionButtonMarkup = '<button type="button" '
                     + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
-                    + 'data-robot="' + actionInfo.robot + '"' + (actionDisabled ? ' disabled="disabled"' : '')
+                    + 'data-robot="' + actionInfo.robot + '"'
+                    + (actionButton ? ' data-button="' + actionButton + '"' : '')
+                    + (actionDisabled ? ' disabled="disabled"' : '')
                     + '>' + actionInfo.text + '</button>';
                 $actions.append(actionButtonMarkup);
                 $actionButton = $actions.find('.button.' + actionInfo.action);
@@ -9714,6 +9933,7 @@ class mmrpgWorldMap {
         // manually update buttons so css transitions can occur properly
         for (let i = 0; i < itemDetails.actions.length; i++){
             let actionInfo = itemDetails.actions[i];
+            let actionButton = typeof actionInfo.button !== 'undefined' ? actionInfo.button : false;
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
             let actionHidden = typeof actionInfo.hidden !== 'undefined' && actionInfo.hidden === true ? true : false;
             let $actionButton = $actions.find('.button.' + actionInfo.action);
@@ -9726,7 +9946,9 @@ class mmrpgWorldMap {
                 } else {
                 let actionButtonMarkup = '<button type="button" '
                     + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
-                    + 'data-item="' + actionInfo.item + '"' + (actionDisabled ? ' disabled="disabled"' : '')
+                    + 'data-item="' + actionInfo.item + '"'
+                    + (actionButton ? ' data-button="' + actionButton + '"' : '')
+                    + (actionDisabled ? ' disabled="disabled"' : '')
                     + '>' + actionInfo.text + '</button>';
                 $actions.append(actionButtonMarkup);
                 $actionButton = $actions.find('.button.' + actionInfo.action);
@@ -9768,6 +9990,7 @@ class mmrpgWorldMap {
         // manually update buttons so css transitions can occur properly
         for (let i = 0; i < abilityDetails.actions.length; i++){
             let actionInfo = abilityDetails.actions[i];
+            let actionButton = typeof actionInfo.button !== 'undefined' ? actionInfo.button : false;
             let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
             let $actionButton = $actions.find('.button.' + actionInfo.action);
             if ($actionButton && $actionButton.length){
@@ -9775,7 +9998,12 @@ class mmrpgWorldMap {
                 else { $actionButton.removeClass('disabled'); $actionButton.removeAttr('disabled'); }
                 $actionButton.html(actionInfo.text);
                 } else {
-                let actionButtonMarkup = '<button type="button" class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + '" data-ability="' + actionInfo.ability + '"' + (actionDisabled ? ' disabled="disabled"' : '') + '>' + actionInfo.text + '</button>';
+                let actionButtonMarkup = '<button type="button" '
+                    + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + '" '
+                    + 'data-ability="' + actionInfo.ability + '"'
+                    + (actionButton ? ' data-button="' + actionButton + '"' : '')
+                    + (actionDisabled ? ' disabled="disabled"' : '')
+                    + '>' + actionInfo.text + '</button>';
                 $actions.append(actionButtonMarkup);
                 $actionButton = $actions.find('.button.' + actionInfo.action);
                 }
@@ -10097,6 +10325,9 @@ class mmrpgWorldMap {
             //console.log('-> callbackFunction =', callbackFunction);
             //console.log('-> callbackQueue =', callbackQueue);
             //console.log('-> callbackReturns =', callbackReturns);
+            //if (callbackName === 'onConfirm'){ _self.playSoundEffect('link-click-action'); }
+            //else if (callbackName === 'onCancel'){ _self.playSoundEffect('back-click'); }
+            //else if (callbackName === 'onHide'){ _self.playSoundEffect('no-effect'); }
             if (typeof callbackFunction === 'function'){ callbackFunction(callbackArgs); callbackReturns++; }
             if (Array.isArray(callbackQueue)){
                 for (var i = 0; i < callbackQueue.length; i++){
@@ -10128,6 +10359,7 @@ class mmrpgWorldMap {
             _world.actionModalVisible = false;
             alsoReset = typeof alsoReset === 'boolean' ? alsoReset : false;
             if (alsoReset){ setTimeout(function(){ resetActionModal(); }, 600); }
+            _self.playSoundEffect('no-effect');
             runModalCallback('onHide');
             return true;
             };
@@ -10138,6 +10370,7 @@ class mmrpgWorldMap {
             let $cancelButton = $actionModal.find('.content .actions .button[data-action="cancel"]');
             if ($cancelButton.length){ $cancelButton.addClass('clicked'); }
             hideActionModal(true);
+            _self.playSoundEffect('back-click');
             runModalCallback('onCancel');
             return true;
             };
@@ -10221,6 +10454,7 @@ class mmrpgWorldMap {
                 //console.log('%c' + '--> refreshing equipped abilities in storage ...', 'color: magenta;');
                 //console.log('----> currentAbilities =', currentAbilities);
                 //console.log('----> $abilitiesInStorage =', $abilitiesInStorage.length, $abilitiesInStorage);
+                $abilitiesInStorage.filter('.hidden').removeClass('equipped');
                 $abilitiesInStorage.not('.hidden').each(function(){
                     let $abilityButton = $(this);
                     let abilityID = parseInt($abilityButton.attr('data-ability-id'));
@@ -10259,6 +10493,7 @@ class mmrpgWorldMap {
                 playerRobotInfo.abilities = currentAbilities;
                 playerRobotInfo.abilitiesAdded = [newAbilityToken];
                 _self.saveWorldState(function(){
+                    _self.playSoundEffect('link-click-action');
                     setTimeout(function(){ $currentAbilitiesList.removeClass('has-selection'); }, 300);
                     setTimeout(function(){ $newAbilityButton.removeClass('selected'); }, 600);
                     setTimeout(function(){ hideActionModal(true); }, 900);
@@ -10279,6 +10514,7 @@ class mmrpgWorldMap {
                 let $abilityInStorage = $abilitiesInStorage.filter('[data-ability="' + selectedAbilityToken + '"].selected');
                 playerRobotInfo.abilities = currentAbilities;
                 _self.saveWorldState(function(){
+                    _self.playSoundEffect('link-click-action');
                     setTimeout(function(){ $currentAbilitiesList.removeClass('has-selection'); }, 300);
                     setTimeout(function(){ hideActionModal(true); }, 600);
                     setTimeout(function(){ refreshEquippedAbilities(); $abilityInStorage.trigger('click'); }, 900);
@@ -10350,11 +10586,11 @@ class mmrpgWorldMap {
                     let teamRobotString = robotString;
                     //console.log('-> adding teamRobotString =', teamRobotString);
                     _self.addTeamRobot(teamRobotString);
-                    $robotDetailsDiv.find('.button[data-action="add-robot"]').addClass('disabled hidden').attr('disabled', 'disabled');
-                    $robotDetailsDiv.find('.button[data-action="remove-robot"]').removeClass('disabled hidden').removeAttr('disabled');
+                    $robotDetailsDiv.find('.button[data-action="add-robot"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
+                    $robotDetailsDiv.find('.button[data-action="remove-robot"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled');
                     saveWorldState = true;
                     }
-                if (saveWorldState){ _self.saveWorldState(); }
+                if (saveWorldState){ _self.saveWorldState(function(){ _self.playSoundEffect('link-click-action'); }); }
                 }
             // Else if this is a REMOVE ROBOT request, we should remove the robot from the player's team array and update
             else if (actionToken === 'remove-robot'){
@@ -10365,11 +10601,11 @@ class mmrpgWorldMap {
                     let teamRobotString = robotString;
                     //console.log('-> removing teamRobotString =', teamRobotString);
                     _self.removeTeamRobot(teamRobotString);
-                    $robotDetailsDiv.find('.button[data-action="remove-robot"]').addClass('disabled hidden').attr('disabled', 'disabled');
-                    $robotDetailsDiv.find('.button[data-action="add-robot"]').removeClass('disabled hidden').removeAttr('disabled');
+                    $robotDetailsDiv.find('.button[data-action="remove-robot"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
+                    $robotDetailsDiv.find('.button[data-action="add-robot"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled');
                     saveWorldState = true;
                     }
-                if (saveWorldState){ _self.saveWorldState(); }
+                if (saveWorldState){ _self.saveWorldState(function(){ _self.playSoundEffect('link-click-action'); }); }
                 }
             }
         else if (actionKind === 'item'){
@@ -10451,6 +10687,32 @@ class mmrpgWorldMap {
                         if (restoredToMax.length >= restoreStats.length){ disableFurtherUsage = true; }
                         }
                     }
+                // Else if this was an extra life specifically, make sure we revive the robot with appropriate resources
+                else if (isExtraLife){
+                    //console.log('--> using extra life item ...');
+                    let energyMaxValue = playerRobotInfo.energyMax || 0;
+                    let energyRestoreAmount = itemInfo.recovery || 0;
+                    let energyRestorePercent = itemInfo.recoveryPercent ? true : false;
+                    let realEnergyRestoreAmount = energyRestorePercent ? Math.ceil((energyMaxValue || 0) * (energyRestoreAmount / 100)) : energyRestoreAmount;
+                    let weaponsMaxValue = playerRobotInfo.weaponsMax || 0;
+                    let weaponsRestoreAmount = itemInfo.recovery2 || 0;
+                    let weaponsRestorePercent = itemInfo.recovery2Percent ? true : false;
+                    let realWeaponsRestoreAmount = weaponsRestorePercent ? Math.ceil((weaponsMaxValue || 0) * (weaponsRestoreAmount / 100)) : weaponsRestoreAmount;
+                    //console.log('--> recovering energy by amount:', energyRestoreAmount, (energyRestorePercent ? '%' : ''), ' => (', realEnergyRestoreAmount, ' LE)');
+                    //console.log('--> recovering weapons by amount:', weaponsRestoreAmount, (weaponsRestorePercent ? '%' : ''), ' => (', realWeaponsRestoreAmount, ' WE)');
+                    if ((playerRobotInfo.disabled === true || playerRobotInfo.energy === 0)
+                        && (realEnergyRestoreAmount > 0 || realWeaponsRestoreAmount > 0)){
+                        //console.log('--> first flooring to zero...');
+                        _self.setRobotEnergy(targetRobotToken, 0); // just to match below technically
+                        _self.setRobotWeapons(targetRobotToken, 0); // so that we see it fill-up from zero
+                        //console.log('--> now recoverying energy and weapons ...');
+                        _self.restoreRobotEnergy(targetRobotToken, realEnergyRestoreAmount, true);
+                        _self.restoreRobotWeapons(targetRobotToken, realWeaponsRestoreAmount, true);
+                        //console.log('--> okay we should be revived now!');
+                        removeFromInventory = true;
+                        disableFurtherUsage = true;
+                        }
+                    }
                 // Else If the item was successfully used, remove it from the player's inventory now
                 if (removeFromInventory
                     && typeof _worldPlayerItems[itemToken] !== 'undefined'){
@@ -10468,7 +10730,7 @@ class mmrpgWorldMap {
                     $itemInStorage.find('> .quantity').html('&times; ' + availableQuantity);
                     $itemInStorageDetails.find('> .subtitle > .quantity').html('&times; ' + availableQuantity);
                     if (availableQuantity === 0){ $itemInStorageDetails.find('.button[data-action]').addClass('disabled').attr('disabled', 'disabled'); }
-                    _self.saveWorldState();
+                    _self.saveWorldState(function(){ _self.playSoundEffect('link-click-action'); });
                     }
                 // If the item can no longer be used, disable its use button now (maybe we're already maxed)
                 if (disableFurtherUsage){
@@ -10497,7 +10759,7 @@ class mmrpgWorldMap {
                     updateItemQuantityInStorage(newItemToken);
                     saveWorldState = true;
                     }
-                if (saveWorldState){ _self.saveWorldState(); }
+                if (saveWorldState){ _self.saveWorldState(function(){ _self.playSoundEffect('link-click-action'); }); }
                 }
             // Else if this is a TAKE ITEM request, we should show the item unequip modal now (showing item removal)
             else if (actionToken === 'take-item'){
@@ -10513,7 +10775,7 @@ class mmrpgWorldMap {
                     updateItemQuantityInStorage(existingItemToken);
                     saveWorldState = true;
                     }
-                if (saveWorldState){ _self.saveWorldState(); }
+                if (saveWorldState){ _self.saveWorldState(function(){ _self.playSoundEffect('link-click-action'); }); }
                 }
             // Else if this is the DROP ITEM request, we should confirm the drop now w/ modal
             else if (actionToken === 'drop-item'){
@@ -10536,7 +10798,7 @@ class mmrpgWorldMap {
             //console.log('--> selectedAbilityToken =', selectedAbilityToken);
             //console.log('--> selectedAbilityInfo =', selectedAbilityInfo);
             if (actionToken === 'equip-ability'){
-                let selectedAbilityList = '' + generateAbilitySelectButtonMarkup(selectedAbilityToken, playerRobotInfo, {selected: true});
+                let selectedAbilityList = '' + generateAbilitySelectButtonMarkup(selectedAbilityToken, playerRobotInfo, {selected: false});
                 modalDetails.subtitles.forTooltip = 'Select Ability To Replace';
                 modalDetails.containers.forSelected = '<div class="ability-list selected">' + selectedAbilityList + '</div>';
                 }
@@ -10646,6 +10908,17 @@ class mmrpgWorldMap {
             $actionModal.attr('data-action-token', actionObjectToken);
             _elements.actionModal = $actionModal;
 
+            // Define reusable functions for applying/removing the hover state to given element
+            let hoverModalObject = function(e){
+                if (_self.worldIsBusy()){ return; }
+                $actionModal.find('.hovered').removeClass('hovered');
+                $(this).addClass('hovered');
+                _self.playSoundEffect('icon-hover');
+                };
+            let unhoverModalObject = function(e){
+                $(this).removeClass('hovered');
+                };
+
             // Some quick functions for checking if the modal is busy or active
             let actionModalIsActive = function(){ return $actionModal.is('.active') ? true : false; };
             let actionModalIsHidden = function(){ return $actionModal.is('.hidden') ? true : false; };
@@ -10668,6 +10941,8 @@ class mmrpgWorldMap {
                 });
 
             // Delegate events to the buttons in the action modal now that its markup is created/updated
+            $actionModal.delegate('.button[data-action]', 'mouseenter', hoverModalObject);
+            $actionModal.delegate('.button[data-action]', 'mouseleave', unhoverModalObject);
             $actionModal.delegate('.button[data-action]', 'click', function(e){
                 e.preventDefault();
                 e.stopPropagation();
@@ -10681,27 +10956,33 @@ class mmrpgWorldMap {
                 //console.log('-> buttonAction =', buttonAction);
                 if ($button.is('.disabled') || $button.is('[disabled]')){ return false; }
                 $button.addClass('clicked');
-                if (buttonAction === 'confirm'){ return onConfirmAction(modalAction); }
-                else if (buttonAction === 'cancel'){ return onCancelAction(modalAction); }
+                if (buttonAction === 'confirm'){ _self.playSoundEffect('icon-click'); return onConfirmAction(modalAction); }
+                else if (buttonAction === 'cancel'){ _self.playSoundEffect('back-click'); return onCancelAction(modalAction); }
                 else { return false; }
                 });
 
             // Delegate the actions for the team item buttons that can appear within the window
-            $actionModal.delegate('.team-item[data-item]', 'click', function(e){
+            $actionModal.delegate('.container.for-current .team-item[data-item]', 'mouseenter', hoverModalObject);
+            $actionModal.delegate('.container.for-current .team-item[data-item]', 'mouseleave', unhoverModalObject);
+            $actionModal.delegate('.container.for-current .team-item[data-item]', 'click', function(e){
                 e.preventDefault();
                 e.stopPropagation();
                 if (!allowModalActions()){ return; }
                 //console.log('%c' + 'Item select button clicked!', 'color: cyan;');
                 // TODO: define the click actions for item buttons in the action modal (???)
+                _self.playSoundEffect('icon-click-mini');
                 return true;
                 });
 
             // Delegate the actions for the team item ability that can appear within the window
-            $actionModal.delegate('.team-ability[data-ability]', 'click', function(e){
+            $actionModal.delegate('.container.for-current .team-ability[data-ability]', 'mouseenter', hoverModalObject);
+            $actionModal.delegate('.container.for-current .team-ability[data-ability]', 'mouseleave', unhoverModalObject);
+            $actionModal.delegate('.container.for-current .team-ability[data-ability]', 'click', function(e){
                 e.preventDefault();
                 e.stopPropagation();
                 if (!allowModalActions()){ return; }
                 //console.log('%c' + 'Ability select button clicked!', 'color: cyan;');
+                _self.playSoundEffect('icon-click-mini');
                 return clickTeamAbilityButton(this);
                 });
 
@@ -10908,13 +11189,13 @@ class mmrpgWorldMap {
         let buttonSpriteInner = '<span class="wrap"><i class="sprite"></i></span>';
 
         let buttonMarkup = '';
-        buttonMarkup += '<div' + buttonAttrs + '>';
+        buttonMarkup += '<a' + buttonAttrs + '>';
             buttonMarkup += '<div class="image type ' + itemTypeClasses + '">';
                 buttonMarkup += '<span' + buttonSpriteAttrs + '>' + buttonSpriteInner + '</span>';
             buttonMarkup += '</div>';
             buttonMarkup += '<strong class="name">' + itemNameFormatted + '</strong>';
             buttonMarkup += '<span class="quantity">' + itemQuantityFormatted + '</span>';
-        buttonMarkup += '</div>';
+        buttonMarkup += '</a>';
 
         return buttonMarkup;
 
@@ -11003,12 +11284,12 @@ class mmrpgWorldMap {
         let buttonSpriteInner = '<span class="wrap"><i class="back type ' + abilityTypeClasses + '"></i><i class="sprite"></i></span>';
 
         let buttonMarkup = '';
-        buttonMarkup += '<div' + buttonAttrs + '>';
+        buttonMarkup += '<a' + buttonAttrs + '>';
             buttonMarkup += '<div class="image"><span' + buttonSpriteAttrs + '>' + buttonSpriteInner + '</span></div>';
             buttonMarkup += '<span class="tint type ' + abilityTypeClasses + '"></span>';
             buttonMarkup += '<strong class="name">' + abilityNameFormatted + '</strong>';
             buttonMarkup += '<span class="cost">' + abilityCostFormatted + '</span>';
-        buttonMarkup += '</div>';
+        buttonMarkup += '</a>';
 
         return buttonMarkup;
 

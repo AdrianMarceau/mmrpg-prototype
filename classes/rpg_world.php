@@ -2092,7 +2092,7 @@ class rpg_world {
             $return_markup .= str_repeat('<i class="heart fa fas fa-heart"></i>', $limit_hearts);
         $return_markup .= '</div>';
         // [robots-overview][team-robots]
-        $return_markup .= '<div class="team-robots" data-team-size="'.count($current_robot_tokens).'">';
+        $return_markup .= '<div class="team-robots listing" data-team-size="'.count($current_robot_tokens).'">';
             $return_markup .= '<div class="wrapper">';
             foreach ($current_robot_tokens AS $robot_key => $robot_token){
                 if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
@@ -2169,7 +2169,7 @@ class rpg_world {
         //error_log('$current_robot_tokens = '.print_r($current_robot_tokens, true));
         //error_log('$battle_robot_tokens = '.print_r($battle_robot_tokens, true));
         //error_log('$storage_robot_tokens = '.print_r($storage_robot_tokens, true));
-        $return_markup .= '<div class="storage-box storage-robots" data-storage="robots">';
+        $return_markup .= '<div class="storage-robots storage-box listing" data-storage="robots">';
             $recent_storage_robot_tokens = array();
             $recent_storage_robot_tokens = array_merge($recent_storage_robot_tokens, $current_robot_tokens);
             $recent_storage_robot_tokens = array_merge($recent_storage_robot_tokens, $battle_robot_tokens);
@@ -2238,6 +2238,8 @@ class rpg_world {
                 $markup_class = 'team-robot'.($robot_current ? ' current' : '').($robot_disabled ? ' disabled' : '');
                 $markup_attrs = '';
                 $markup_attrs .= 'data-robot="'.$robot_id.'_'.$robot_token.'" ';
+                $markup_attrs .= 'data-robot-id="'.$robot_id.'" ';
+                $markup_attrs .= 'data-robot-token="'.$robot_token.'" ';
                 $markup_attrs .= 'data-status="'.$robot_energy_rating.'-energy" ';
                 $markup_attrs .= 'data-level-exp="'.$robot_level_exp.'" ';
                 $markup_attrs .= 'data-index-key="'.$robot_index_key.'" ';
@@ -2273,7 +2275,7 @@ class rpg_world {
                 )); */
         $return_markup .= '</div>';
         // [robots-overview][storage-items]
-        $return_markup .= '<div class="storage-box storage-items" data-storage="items">';
+        $return_markup .= '<div class="storage-items storage-box listing" data-storage="items">';
             $storage_item_types_revised = array('none', 'copy', 'energy', 'weapons', 'attack', 'defense', 'speed');
             $storage_item_types_revised = array_unique(array_merge($storage_item_types_revised, array_keys($mmrpg_index_types)));
             $storage_item_tokens_reversed = array_reverse(array_keys($storage_item_tokens));
@@ -2347,7 +2349,7 @@ class rpg_world {
                 ));
         $return_markup .= '</div>';
         // [robots-overview][storage-abilities]
-        $return_markup .= '<div class="storage-box storage-abilities" data-storage="abilities">';
+        $return_markup .= '<div class="storage-abilities storage-box listing" data-storage="abilities">';
             $elemental_type_tokens = rpg_type::get_index_tokens(false, false, false, false);
             $storage_ability_types_revised = array_unique(array_merge($elemental_type_tokens, array('copy', 'none'), array_keys($mmrpg_index_types)));
             //error_log('$elemental_type_tokens = '.print_r($elemental_type_tokens, true));
@@ -3801,6 +3803,7 @@ class rpg_world {
         $base_stats_ref = $has_persona_applied ? array_merge($robot_info, array('robot_token' => $robot_settings['robot_persona'])) : $robot_info;
         $robot_stats = rpg_robot::calculate_stat_values($robot_level, $base_stats_ref, $robot_rewards, true, $base_core_type, $player_starforce);
         //error_log($robot_token.' | $robot_stats = '.print_r($robot_stats, true));
+        //error_log($robot_token.' | $robot_session = '.print_r($robot_session, true));
         $robot_disabled = false;
         $robot_image = $robot_token;
         if (!empty($robot_settings['robot_persona_image'])){ $robot_image = $robot_settings['robot_persona_image']; }
@@ -3810,7 +3813,7 @@ class rpg_world {
         if (!empty($robot_info['robot_energy'])){
             $robot_energy = $robot_stats['energy']['current'];
             $robot_energy_max = $robot_stats['energy']['current'];
-            if (isset($robot_session['energy'])){ $robot_energy += $robot_session['energy']; }
+            if (!empty($robot_session['energy']) && is_numeric($robot_session['energy'])){ $robot_energy += $robot_session['energy']; }
             $robot_energy_percent = round(($robot_energy / $robot_energy_max) * 100);
             if ($robot_energy_percent === 100 && $robot_energy < $robot_energy_max){ $robot_energy_percent -= 1; }
             $robot_energy_rating = $get_rating_token($robot_energy_percent);
@@ -3820,7 +3823,7 @@ class rpg_world {
         if (!empty($robot_info['robot_weapons'])){
             $robot_weapons = $robot_stats['weapons']['current'];
             $robot_weapons_max = $robot_stats['weapons']['current'];
-            if (isset($robot_session['weapons'])){ $robot_weapons += $robot_session['weapons']; }
+            if (!empty($robot_session['weapons']) && is_numeric($robot_session['weapons'])){ $robot_weapons += $robot_session['weapons']; }
             $robot_weapons_percent = ceil(($robot_weapons / $robot_weapons_max) * 100);
             $robot_weapons_rating = $get_rating_token($robot_weapons_percent);
             }

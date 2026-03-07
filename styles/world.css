@@ -938,6 +938,43 @@ html, body {
 #world #map .layer.objects .sprite.bounce {
     animation: world-sprite-bounce calc(var(--base-bounce-duration) * var(--sprite-speed)) steps(1) infinite;
 }
+#world #map .layer.objects .sprite.aggro {
+    filter: drop-shadow(-2px 0px 4px red);
+    animation-duration: calc(var(--base-bounce-duration) * var(--sprite-speed) * 0.25);
+}
+#world #map .layer.objects .sprite.leaving {
+    filter: brightness(0.2) saturate(1.6);
+    animation-duration: calc(var(--base-bounce-duration) * var(--sprite-speed) * 0.25);
+    transition-duration: 0.9s;
+}
+#world #map .layer.objects .sprite.glowing {
+    filter: brightness(0) invert(1);
+    animation-duration: calc(var(--base-bounce-duration) * var(--sprite-speed) * 0.25);
+    transition-duration: 1.2s;
+}
+#world #map .layer.objects .sprite.ascending {
+
+}
+#world #map .layer.objects .sprite.ascending > .wrap {
+    transform: translateY(-100vh) !important;
+    transition-duration: 1.2s;
+    transition-delay: 0.3s;
+}
+#world #map .layer.objects .sprite.descending > .wrap {
+    transform: translateY(-10px) scale(0.1) !important;
+    transition-duration: 1.2s;
+    transition-delay: 0.3s;
+}
+#world #map .layer.objects .sprite.slide-right > .wrap {
+    transform: translateX(100vh) !important;
+    transition-duration: 1.2s;
+    transition-delay: 0.3s;
+}
+#world #map .layer.objects .sprite.slide-left > .wrap {
+    transform: translateX(-100vh) !important;
+    transition-duration: 1.2s;
+    transition-delay: 0.3s;
+}
 #world #map .layer .sprite[data-dir].march > .wrap {
     transition: transform calc(var(--base-march-duration) * var(--sprite-speed)) steps(32);
 }
@@ -1109,7 +1146,8 @@ html, body {
     pointer-events: all;
     transition: border 0.2s, background-color 0.2s, box-shadow 0.2s, transform 0.3s;
 }
-#world #canvas #action-dropdown .button:hover {
+#world #canvas #action-dropdown .button:hover,
+#world #canvas #action-dropdown .button.hovered {
     border: 1px solid #cfcfcf;
     background-color: rgba(0, 0, 0, 0.7);
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
@@ -1213,7 +1251,9 @@ html, body {
 #world #canvas #action-dropdown[data-type="battle"]:hover .label,
 #world #canvas #action-dropdown[data-type="battle"]:hover .sublabel,
 #world #canvas #action-dropdown[data-type="battle"].hover .label,
-#world #canvas #action-dropdown[data-type="battle"].hover .sublabel {
+#world #canvas #action-dropdown[data-type="battle"].hover .sublabel,
+#world #canvas #action-dropdown[data-type="battle"].hovered .label,
+#world #canvas #action-dropdown[data-type="battle"].hovered .sublabel {
     opacity: 1.0;
 }
 #world #canvas #action-dropdown[data-type="battle"] .sublabel.left { right: calc(100% - 8px); }
@@ -1228,6 +1268,23 @@ html, body {
 #world #canvas #action-dropdown[data-type="battle"] .sublabel.right.down { transform: translate(-8px, -16px); }
 
 /* define the styles for the user-interface chrome, butons, and labels */
+
+@keyframes chrome-button-hover-border {
+    0%, 100% { border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 0 3px transparent; }
+    50% { border-color: rgba(255, 255, 255, 0.9); box-shadow: 0 0 6px white; }
+}
+@keyframes chrome-button-hover-outline {
+    0%, 100% { outline-color: rgba(255, 255, 255, 0.3); box-shadow: 0 0 3px transparent; }
+    50% { outline-color: rgba(255, 255, 255, 0.9); box-shadow: 0 0 6px white; }
+}
+@keyframes chrome-button-hover-border-stronger {
+    0%, 100% { border-color: rgba(255, 255, 255, 0.6); box-shadow: 0 0 3px transparent; }
+    50% { border-color: rgba(255, 255, 255, 1.0); box-shadow: 0 0 6px white; }
+}
+@keyframes chrome-button-hover-outline-stronger {
+    0%, 100% { outline-color: rgba(255, 255, 255, 0.6); box-shadow: 0 0 3px transparent; }
+    50% { outline-color: rgba(255, 255, 255, 1.0); box-shadow: 0 0 6px white; }
+}
 
 #world #canvas .chrome {
     position: absolute;
@@ -1284,7 +1341,15 @@ html, body {
     transform: scale(1.0);
     transition: transform 0.3s;
 }
-#world #canvas .chrome-button:hover > a > i {
+/* #world #canvas .chrome-button:hover, */
+#world #canvas .chrome-button.hovered {
+    z-index: 1004;
+    outline: 1px solid #ffffff;
+    box-shadow: 0 0 0 transparent;
+    animation: chrome-button-hover-outline 1s infinite;
+}
+/* #world #canvas .chrome-button:hover > a > i, */
+#world #canvas .chrome-button.hovered > a > i {
     transform: scale(1.2);
 }
 #world #canvas .chrome-button.disabled {
@@ -1294,7 +1359,6 @@ html, body {
     pointer-events: none;
     filter: opacity(0.1);
 }
-
 
 #world #canvas #back-button {
     top: 0;
@@ -1419,6 +1483,8 @@ html, body {
 #world #canvas #player-switcher .team-player:hover,
 #world #canvas #player-switcher .team-player.hovered {
     outline: 1px solid #ffffff !important;
+    box-shadow: 0 0 0 transparent;
+    animation: chrome-button-hover-outline 1s infinite;
 }
 #world #canvas #player-switcher .team-player.active {
     outline: 1px solid #969696;
@@ -1805,7 +1871,12 @@ html, body {
 #world #canvas #robots-overview .team-rotate:hover i,
 #world #canvas #robots-overview .team-switch:hover i,
 #world #canvas #robots-overview .team-items:hover i,
-#world #canvas #robots-overview .team-abilities:hover i {
+#world #canvas #robots-overview .team-abilities:hover i,
+#world #canvas #robots-overview .team-close.hovered i,
+#world #canvas #robots-overview .team-rotate.hovered i,
+#world #canvas #robots-overview .team-switch.hovered i,
+#world #canvas #robots-overview .team-items.hovered i,
+#world #canvas #robots-overview .team-abilities.hovered i {
     transform: translate(-50%, -50%) scale(1.4);
     color: #ffffff;
 }
@@ -1951,7 +2022,7 @@ html, body {
 #world #canvas #robots-overview .team-rotate.clicked i {
     transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
 }
-#world #canvas #robots-overview.expanded .team-rotate,
+/* #world #canvas #robots-overview.expanded .team-rotate, */
 #world #canvas #robots-overview:not(.expanded) .team-close {
     opacity: 0;
     bottom: -9999px;
@@ -2045,7 +2116,7 @@ html, body {
     pointer-events: none;
 }
 #world #canvas #robots-overview:hover .team-robots {
-    transition-delay: 2s;
+    /* transition-delay: 2s; */
 }
 #world #canvas #robots-overview .team-robots[data-team-size="1"] {
     max-height: 140px;
@@ -2057,7 +2128,7 @@ html, body {
     max-height: 228px;
 }
 #world #canvas #robots-overview.expanded .team-robots {
-    transition-delay: 0s;
+    /* transition-delay: 0s; */
     min-height: 522px;
 }
 
@@ -2079,6 +2150,10 @@ html, body {
     opacity: 0.0;
     pointer-events: none;
     transition: opacity 0.3s, top 0.6s;
+}
+#world #canvas #robots-overview.expanded .storage-box.disabled {
+    display: none;
+    pointer-events: none;
 }
 #world #canvas #robots-overview .storage-box > .wrapper:after {
     content: "";
@@ -2135,7 +2210,8 @@ html, body {
     transition: border 0.2s, background-color 0.2s, min-width 0.3s;
 }
 #robots-overview .storage-box .button.active,
-#robots-overview .storage-box .button:not(.disabled):hover {
+/* #robots-overview .storage-box .button:not(.disabled):hover, */
+#robots-overview .storage-box .button:not(.disabled).hovered {
     border-color: #cfcfcf;
     background-color: rgba(0, 0, 0, 0.7);
 }
@@ -2274,6 +2350,7 @@ html, body {
     padding: 9px 12px;
     border-radius: 6px;
 }
+
 #robots-overview .storage-box .pages:before,
 #robots-overview .storage-box .pages:after {
     content: "";
@@ -2536,6 +2613,7 @@ html, body {
     z-index: 2;
     top: 0;
     filter: brightness(0.6);
+    border-radius: 6px 6px 0 0;
     box-shadow: rgba(0, 0, 0, 0.3) 0px -2px 10px inset;
     animation: 16s linear 0s infinite normal none running storage-object-showcase_grid-pan;
 }
@@ -2543,8 +2621,15 @@ html, body {
     z-index: 1;
     bottom: 0;
     filter: brightness(0.8);
+    border-radius: 0 0 6px 6px;
     background-position: 0px -9px;
     transition: none;
+}
+#robots-overview .storage-box > .details .image.hovered {
+    outline-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 transparent;
+    animation: team-object-hover-outline 3s infinite;
+    border-color: #b6b6b6 !important;
 }
 
 #robots-overview .storage-box > .details .image.animate:before { transition: filter 0.9s; }
@@ -2764,7 +2849,22 @@ html, body {
     0%, 100% { outline-color: yellow; box-shadow: 0 0 6px yellow; }
     50% { outline-color: orange; box-shadow: 0 0 12px orange; }
 }
-
+@keyframes team-object-hover-border {
+    0%, 100% { border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 0 3px transparent; }
+    50% { border-color: rgba(255, 255, 255, 0.9); box-shadow: 0 0 6px white; }
+}
+@keyframes team-object-hover-outline {
+    0%, 100% { outline-color: rgba(255, 255, 255, 0.3); box-shadow: 0 0 3px transparent; }
+    50% { outline-color: rgba(255, 255, 255, 0.9); box-shadow: 0 0 6px white; }
+}
+@keyframes team-object-hover-border-stronger {
+    0%, 100% { border-color: rgba(255, 255, 255, 0.6); box-shadow: 0 0 3px transparent; }
+    50% { border-color: rgba(255, 255, 255, 1.0); box-shadow: 0 0 6px white; }
+}
+@keyframes team-object-hover-outline-stronger {
+    0%, 100% { outline-color: rgba(255, 255, 255, 0.6); box-shadow: 0 0 3px transparent; }
+    50% { outline-color: rgba(255, 255, 255, 1.0); box-shadow: 0 0 6px white; }
+}
 #robots-overview .storage-box > .details[data-robot] .subtitle {
     padding: 6px 0 12px;
 }
@@ -2866,14 +2966,25 @@ html, body {
     cursor: pointer;
     z-index: 1;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .value:hover,
+#robots-overview .storage-box > .details[data-robot] .image.hovered {
+
+}
+/* #robots-overview .storage-box > .details[data-robot] .held-item .value:hover, */
+#robots-overview .storage-box > .details[data-robot] .held-item .value.hovered,
 #robots-overview .storage-box > .details[data-robot] .held-item .value.new,
 #robots-overview .storage-box > .details[data-robot] .held-item .value.selected,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value:hover,
+/* #robots-overview .storage-box > .details[data-robot] .support-mecha .value:hover, */
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value.hovered,
 #robots-overview .storage-box > .details[data-robot] .support-mecha .value.new,
 #robots-overview .storage-box > .details[data-robot] .support-mecha .value.selected {
     outline: 1px solid #ffffff;
     z-index: 30;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .value.hovered,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value.hovered {
+    outline-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 transparent;
+    animation: team-object-hover-outline 3s infinite;
 }
 #robots-overview .storage-box > .details[data-robot] .held-item .value.new,
 #robots-overview .storage-box > .details[data-robot] .held-item .value.selected,
@@ -2881,6 +2992,10 @@ html, body {
 #robots-overview .storage-box > .details[data-robot] .support-mecha .value.selected {
     outline-color: transparent;
     animation: details-overview-value-glowing-outline 2s linear infinite;
+}
+#robots-overview .storage-box > .details[data-robot] .held-item .value.hovered.selected,
+#robots-overview .storage-box > .details[data-robot] .support-mecha .value.hovered.selected {
+    animation-name: team-object-hover-outline-stronger;
 }
 #robots-overview .storage-box > .details[data-robot] .base-stats .value {
     margin: 0 1px 3px;
@@ -2995,16 +3110,25 @@ html, body {
     cursor: pointer;
     z-index: 1;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover,
+/* #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover, */
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.hovered,
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.new,
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected {
     outline: 1px solid #ffffff;
     z-index: 30;
 }
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.hovered {
+    outline-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 transparent;
+    animation: team-object-hover-outline 3s infinite;
+}
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.new,
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected {
     outline-color: transparent;
     animation: details-overview-value-glowing-outline 2s linear infinite;
+}
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.hovered.selected {
+    animation-name: team-object-hover-outline-stronger;
 }
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value > .name {
     display: block;
@@ -3035,7 +3159,8 @@ html, body {
     text-shadow: inherit;
     transition: width 0.3s, text-shadow 0.3s;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover > .name > strong,
+/* #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover > .name > strong, */
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.hovered > .name > strong,
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected > .name > strong {
     width: 200%;
     text-shadow: 0 0 4px #000000;
@@ -3051,7 +3176,8 @@ html, body {
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value > .sprite .sprite {
     left: 1px !important;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover > .sprite,
+/* #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover > .sprite, */
+#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.hovered > .sprite,
 #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected > .sprite {
     top: -9px !important;
 }
@@ -3094,18 +3220,27 @@ html, body {
     color: #fefefe;
     border-color: #191919;
     background-color: #6f6a7d;
-    font-size: 13px;
+    font-size: 12px;
+    line-height: 16px;
     text-shadow: 1px 1px 0 #000000;
     transform: scale(1.0);
     filter: brightness(1) saturate(1);
     transition: background-color 0.3s, border 0.3s, filter 0.3s, color 0.3s, filter 0.3s;
 }
-#robots-overview .storage-box > .details .actions .button:hover,
+/* #robots-overview .storage-box > .details .actions .button:hover, */
 #robots-overview .storage-box > .details .actions .button.hovered,
 #robots-overview .storage-box > .details .actions .button.clicked {
     border-color: #ffffff;
     filter: brightness(1.2) saturate(1.2);
     color: #ffffff;
+}
+#robots-overview .storage-box > .details .actions .button.hovered {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 transparent;
+    animation: team-object-hover-border 3s infinite;
+}
+#robots-overview .storage-box > .details .actions .button.hovered.clicked {
+    animation-name: team-object-hover-border-stronger;
 }
 #robots-overview .storage-box > .details .actions .button.disabled {
     text-shadow: none;
@@ -3138,13 +3273,41 @@ html, body {
 */
 #robots-overview .storage-box > .details[data-robot] .actions {
     max-height: none;
-    padding-right: 20px;
+    /* padding-right: 20px; */
 }
+/*
 #robots-overview .storage-box > .details[data-robot] .actions .button {
     display: block;
-    clear: left;
-    width: 100%;
-    margin: 0 auto 3px 0;
+    float: left;
+    width: calc(50% - 3px);
+    margin: 0 3px 0 0;
+}
+#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="add-robot"] {
+    background-color: #598a4e;
+    border-color: #44693b;
+}
+#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="remove-robot"] {
+    background-color: #8b5050;
+    border-color: #6b3f3f;
+}
+#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="robot-info"] {
+    background-color: #8b739b;
+    border-color: #695775;
+}
+*/
+#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="robot-info"],
+#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="use-item"],
+#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="equip-ability"] {
+    background-color: #6e6e6e;
+    border-color: #606060;
+}
+#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="add-robot"],
+#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="remove-robot"],
+#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="give-item"],
+#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="take-item"],
+#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="remove-ability"] {
+    background-color: #3b3b3b;
+    border-color: #7b7b7b;
 }
 
 #robots-overview .storage-robots .bullets {
@@ -3220,13 +3383,19 @@ display: block;
     border-radius: 6px;
     pointer-events: none;
 }
-#world #canvas #robots-overview .team-robot:hover:before,
-#world #canvas #robots-overview.expanded .team-robot:hover:before,
-#world #canvas #robots-overview.expanded .team-robot.hovered:before {
+/* #world #canvas #robots-overview .team-robot:hover:before,
+#world #canvas #robots-overview.expanded .team-robot:hover:before, */
+#world #canvas #robots-overview .team-robot.hovered:before {
     border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 transparent;
+    animation: team-object-hover-border 3s infinite;
 }
 #world #canvas #robots-overview.expanded .team-robot.selected:before {
+    background-color: rgba(255, 255, 255, 0.2);
     border-color: #ffffff;
+}
+#world #canvas #robots-overview .team-robot.hovered.selected:before {
+    animation-name: team-object-hover-border-stronger;
 }
 #world #canvas #robots-overview .team-robot:last-child {
     margin-bottom: 0;
@@ -3241,6 +3410,7 @@ display: block;
 #world #canvas #robots-overview .team-robot .icon {
     display: block;
     position: absolute;
+    z-index: 14;
     top: 0;
     left: 0;
     margin: 0;
@@ -3297,7 +3467,8 @@ display: block;
     top: -8px;
     z-index: 3;
 }
-#world #canvas #robots-overview .team-robot:not(.disabled):not(.incompatible):hover .icon > .sprite.robot {
+/* #world #canvas #robots-overview .team-robot:not(.disabled):not(.incompatible):hover .icon > .sprite.robot, */
+#world #canvas #robots-overview .team-robot:not(.disabled):not(.incompatible).hovered .icon > .sprite.robot {
     top: -10px !important;
 }
 #world #canvas #robots-overview .team-robot .icon > .sprite.item {
@@ -3363,12 +3534,14 @@ display: block;
 #world #canvas #robots-overview .team-robot[data-status="no-energy"] .icon .sprite .sprite {
     filter: drop-shadow(1px 1px 0 red);
 }
-#world #canvas #robots-overview .team-robot:hover .icon .sprite .sprite {
+#world #canvas #robots-overview .team-robot.hovered .icon .sprite .sprite {
     animation-play-state: paused !important;
 }
 
 #world #canvas #robots-overview .team-robot > .label {
     display: block;
+    position: relative;
+    z-index: 12;
     background-color: #292929;
     border-radius: 0 6px 6px 0;
     margin: 0 auto 0 0;
@@ -3430,6 +3603,8 @@ display: block;
 }
 #world #canvas #robots-overview .team-robot > .guage {
     display: block;
+    position: relative;
+    z-index: 12;
     margin: 0 auto 0 0;
     width: auto;
     height: 6px;
@@ -3506,6 +3681,7 @@ display: block;
 #world #canvas #robots-overview .team-robot > .statmods {
     display: block;
     position: absolute;
+    z-index: 12;
     bottom: -10px;
     width: auto;
     height: 10px;
@@ -3515,7 +3691,7 @@ display: block;
     overflow: hidden;
     background-color: rgba(0, 0, 0, 0.7);
     background-color: transparent;
-    background-color: #202020;
+    /* background-color: #202020; */
     padding: 0 2px 0px 4px;
     border-radius: 0 3px 3px 3px;
     pointer-events: none;
@@ -3541,6 +3717,7 @@ display: block;
     font-size: 14px;
     top: -3px;
     transform: translate(0, 0);
+    filter: drop-shadow(1px 1px 0 #202020);
 }
 @keyframes robots-overview-mod-down {
     0% { transform: translate(0, 0); }
@@ -3699,11 +3876,11 @@ display: block;
 #world #canvas #robots-overview .team-robot:nth-child(6) { z-index: 5; }
 #world #canvas #robots-overview .team-robot:nth-child(7) { z-index: 4; }
 #world #canvas #robots-overview .team-robot:nth-child(8) { z-index: 3; }
-#world #canvas #robots-overview .team-robot:hover { z-index: 20; }
+/* #world #canvas #robots-overview .team-robot:hover { z-index: 20; } */
 #world #canvas #robots-overview .team-robot.hovered { z-index: 20; }
 #world #canvas #robots-overview .team-robot.selected { z-index: 20; }
 
-#world #canvas #robots-overview:not(:hover):not(.expanded) .team-robots .team-robot:nth-child(n+4) { filter: brightness(0) opacity(0.0); pointer-events: none; }
+#world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(n+4) { filter: brightness(0) opacity(0.0); pointer-events: none; transition-duration: 1s; }
 
 #world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(1) .icon { filter: brightness(1.0); }
 #world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(2) .icon { filter: brightness(0.9); }
@@ -3714,7 +3891,7 @@ display: block;
 #world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(7) .icon { filter: brightness(0.531441); }
 #world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(8) .icon { filter: brightness(0.4782969); }
 #world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(n+8) .icon { filter: brightness(0.4782969); }
-#world #canvas #robots-overview .team-robots .team-robot:hover .icon { filter: brightness(1.0); }
+/* #world #canvas #robots-overview .team-robots .team-robot:hover .icon { filter: brightness(1.0); } */
 #world #canvas #robots-overview .team-robots .team-robot.hovered .icon { filter: brightness(1.0); }
 #world #canvas #robots-overview .team-robots .team-robot.selected .icon { filter: brightness(1.0); }
 
@@ -3836,14 +4013,24 @@ display: block;
 #world #canvas #robots-overview.expanded .storage-items .team-item {
     pointer-events: auto;
 }
-#world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]):hover,
+/*#world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]):hover,*/
 #world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]).hovered,
 #world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]).selected,
-#world #canvas #action-modal .item-list .team-item:not(.disabled):not([data-quantity="0"]):hover,
+/*#world #canvas #action-modal .item-list .team-item:not(.disabled):not([data-quantity="0"]):hover,*/
 #world #canvas #action-modal .item-list .team-item:not(.disabled):not([data-quantity="0"]).hovered,
 #world #canvas #action-modal .item-list .team-item:not(.disabled):not([data-quantity="0"]).selected {
     transform: translate(0, -1px);
     outline-color: #ffffff;
+}
+#world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]).hovered,
+#world #canvas #action-modal .item-list .team-item:not(.disabled):not([data-quantity="0"]).hovered {
+    outline-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 transparent;
+    animation: team-object-hover-outline 3s infinite;
+}
+#world #canvas #robots-overview .storage-items .team-item:not(.disabled):not([data-quantity="0"]).hovered.selected,
+#world #canvas #action-modal .item-list .team-item:not(.disabled):not([data-quantity="0"]).hovered.selected {
+    animation-name: team-object-hover-outline-stronger;
 }
 #world #canvas #robots-overview .storage-items .team-item.hidden,
 #world #canvas #action-modal .item-list .team-item.hidden {
@@ -3991,17 +4178,25 @@ display: block;
 #world #canvas #action-modal.active .ability-list .team-ability {
     pointer-events: auto;
 }
-#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):hover,
-#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled).hovered,
-#world #canvas #action-modal .ability-list .team-ability:not(.disabled):hover,
-#world #canvas #action-modal .ability-list .team-ability:not(.disabled).hovered {
+/* #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):hover, */
+#world #canvas #robots-overview .storage-abilities .team-ability.hovered,
+/* #world #canvas #action-modal .ability-list .team-ability:not(.disabled):hover, */
+#world #canvas #action-modal .ability-list .team-ability.hovered {
     transform: translate(0, -1px);
-    outline-color: #dedede;
+    outline-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 transparent;
+    animation: team-object-hover-outline 3s infinite;
 }
 #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled).selected,
-#world #canvas #action-modal .ability-list .team-ability:not(.disabled).selected {
+#world #canvas #action-modal .ability-list .team-ability:not(.disabled).selected,
+#world #canvas #action-modal .container.for-selected .ability-list .team-ability:not(.disabled) {
     transform: translate(0, -1px);
     outline-color: #ffffff;
+    outline-width: 2px;
+}
+#world #canvas #robots-overview .storage-abilities .team-ability.hovered.selected,
+#world #canvas #action-modal .ability-list .team-ability.hovered.selected {
+    animation-name: team-object-hover-outline-stronger;
 }
 #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled).equipped,
 #world #canvas #action-modal .ability-list .team-ability:not(.disabled).equipped {
@@ -4065,10 +4260,12 @@ display: block;
     text-shadow: none;
     border-color: #202020;
 }
-#world #canvas #robots-overview .storage-abilities.has-selection .team-ability:not(.selected):not(.hovered):not(:hover):not(.disabled):not(.incompatible) {
+/* #world #canvas #robots-overview .storage-abilities.has-selection .team-ability:not(.selected):not(.hovered):not(:hover):not(.disabled):not(.incompatible), */
+#world #canvas #robots-overview .storage-abilities.has-selection .team-ability:not(.selected):not(.hovered):not(.disabled):not(.incompatible) {
     filter: brightness(0.8) saturate(1.2);
 }
-#world #canvas #action-modal .ability-list.has-selection .team-ability:not(.selected):not(.hovered):not(:hover):not(.disabled):not(.incompatible) {
+/* #world #canvas #action-modal .ability-list.has-selection .team-ability:not(.selected):not(.hovered):not(:hover):not(.disabled):not(.incompatible), */
+#world #canvas #action-modal .ability-list.has-selection .team-ability:not(.selected):not(.hovered):not(.disabled):not(.incompatible) {
     filter: brightness(0.6) saturate(1.2);
 }
 #world #canvas #robots-overview .storage-abilities .team-ability.disabled,
@@ -4111,23 +4308,23 @@ display: block;
     filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.3));
     transition: transform 0.3s, filter 0.3s;
 }
-#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite,
+/* #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite, */
 #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).hovered .image > .sprite,
 #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).selected .image > .sprite,
-#world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite,
+/* #world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite, */
 #world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]).hovered .image > .sprite,
 #world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]).selected .image > .sprite {
     transform: translate(0, calc(-50% - 1px));
     /* filter: drop-shadow(1px 1px 1px rgba(255, 255, 255, 0.3));  */
 }
-#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back,
-#world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back:after,
+/* #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back, */
+/* #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back:after, */
 #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).hovered .image > .sprite > .wrap > .back,
 #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).hovered .image > .sprite > .wrap > .back:after,
 #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).selected .image > .sprite > .wrap > .back,
 #world #canvas #robots-overview .storage-abilities .team-ability:not(.disabled):not([data-quantity="0"]).selected .image > .sprite > .wrap > .back:after,
-#world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back,
-#world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back:after,
+/* #world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back, */
+/* #world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]):hover .image > .sprite > .wrap > .back:after, */
 #world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]).hovered .image > .sprite > .wrap > .back,
 #world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]).hovered .image > .sprite > .wrap > .back:after,
 #world #canvas #action-modal .ability-list .team-ability:not(.disabled):not([data-quantity="0"]).selected .image > .sprite > .wrap > .back,
@@ -4248,7 +4445,8 @@ display: block;
     pointer-events: all;
     transition: border 0.2s, background-color 0.2s, min-width 0.3s;
 }
-#world #canvas #side-buttons .button:not(.disabled):hover {
+/* #world #canvas #side-buttons .button:not(.disabled):hover, */
+#world #canvas #side-buttons .button:not(.disabled).hovered {
     border-color: #cfcfcf;
     background-color: rgba(0, 0, 0, 0.7);
 }
@@ -4289,22 +4487,26 @@ display: block;
     margin: -6px -16px;
     border-radius: 6px;
 }
-#world #canvas #side-buttons .big-button:not(.disabled):hover {
+/* #world #canvas #side-buttons .big-button:not(.disabled):hover, */
+#world #canvas #side-buttons .big-button:not(.disabled).hovered {
     min-width: 280px;
 }
-#world #canvas #side-buttons .sub-button:not(.disabled):hover {
+/* #world #canvas #side-buttons .sub-button:not(.disabled):hover, */
+#world #canvas #side-buttons .sub-button:not(.disabled).hovered {
     min-width: 220px;
 }
 #world #canvas #side-buttons .big-button.narrow {
     min-width: 180px;
 }
-#world #canvas #side-buttons .big-button.narrow:not(.disabled):hover {
+/* #world #canvas #side-buttons .big-button.narrow:not(.disabled):hover, */
+#world #canvas #side-buttons .big-button.narrow:not(.disabled).hovered {
     min-width: 220px;
 }
 #world #canvas #side-buttons .sub-button.narrow {
     min-width: 160px;
 }
-#world #canvas #side-buttons .sub-button.narrow:not(.disabled):hover {
+/* #world #canvas #side-buttons .sub-button.narrow:not(.disabled):hover, */
+#world #canvas #side-buttons .sub-button.narrow:not(.disabled).hovered {
     min-width: 180px;
 }
 #world #canvas #side-buttons .button.disabled {
@@ -4323,7 +4525,8 @@ display: block;
     50% { outline: 2px solid rgba(255, 255, 255, 0.6); }
     100% { outline: 2px solid rgba(255, 255, 255, 1.0); }
 }
-#world #canvas #side-buttons .button:hover,
+/* #world #canvas #side-buttons .button:hover, */
+#world #canvas #side-buttons .button.hovered,
 #world #canvas #side-buttons .button.maybe {
     outline: 2px solid rgba(255, 255, 255, 1.0);
     animation: world-action-button-maybe 1.5s ease-in-out infinite;
@@ -4366,19 +4569,22 @@ display: block;
 }
 #world #canvas #side-buttons .button[data-button],
 #world #canvas #side-buttons .button[data-action="push-button"],
-#world #canvas #side-buttons .button[data-action="push-button"]:hover {
+/* #world #canvas #side-buttons .button[data-action="push-button"]:hover, */
+#world #canvas #side-buttons .button[data-action="push-button"].hovered {
     background-color: #1e2736;
     border-color: #354d75;
 }
 #world #canvas #side-buttons .button[data-item],
 #world #canvas #side-buttons .button[data-action="pickup-item"],
-#world #canvas #side-buttons .button[data-action="pickup-item"]:hover {
+/* #world #canvas #side-buttons .button[data-action="pickup-item"]:hover, */
+#world #canvas #side-buttons .button[data-action="pickup-item"].hovered {
     background-color: #0e6b0e;
     border-color: #129d12;
 }
 #world #canvas #side-buttons .button[data-ability],
 #world #canvas #side-buttons .button[data-action="pickup-ability"],
-#world #canvas #side-buttons .button[data-action="pickup-ability"]:hover {
+/* #world #canvas #side-buttons .button[data-action="pickup-ability"]:hover, */
+#world #canvas #side-buttons .button[data-action="pickup-ability"].hovered {
     background-color: #0e6b0e;
     border-color: #129d12;
 }
@@ -4882,7 +5088,8 @@ display: block;
     pointer-events: all;
     transition: border 0.2s, background-color 0.2s, min-width 0.3s;
 }
-#world #canvas #action-modal .content .button:not(.disabled):hover {
+/* #world #canvas #action-modal .content .button:not(.disabled):hover, */
+#world #canvas #action-modal .content .button:not(.disabled).hovered {
     border-color: #cfcfcf;
     background-color: rgba(0, 0, 0, 0.7);
 }
@@ -4940,7 +5147,8 @@ display: block;
     text-decoration: line-through;
     filter: saturate(0.5) brightness(0.5);
 }
-#world #canvas #action-modal .content .buttons .button:hover,
+/* #world #canvas #action-modal .content .buttons .button:hover, */
+#world #canvas #action-modal .content .buttons .button.hovered,
 #world #canvas #action-modal .content .buttons .button.maybe {
     outline: 2px solid rgba(255, 255, 255, 1.0);
     animation: world-action-button-maybe 1.5s ease-in-out infinite;
@@ -4994,6 +5202,7 @@ display: block;
 }
 #world #canvas #action-modal .content .container.for-selected .ability-list {
     width: 200px;
+    pointer-events: none;
 }
 #world #canvas #action-modal .content .container.for-selected .ability-list .team-ability {
     width: calc(100% - 4px);
@@ -5022,7 +5231,8 @@ display: block;
     top: -100px;
     right: -180px;
 }
-#world #canvas #minimap-overview:hover {
+#world #canvas #minimap-overview:hover,
+#world #canvas #minimap-overview.hovered {
     /* width: 248px; */
     width: 248px;
     height: 148px;
@@ -5037,7 +5247,8 @@ display: block;
     border-radius: 6px 6px 6px 16px;
     transition: border-color 0.3s;
 }
-#world #canvas #minimap-overview > .wrapper:hover {
+#world #canvas #minimap-overview > .wrapper:hover,
+#world #canvas #minimap-overview > .wrapper.hovered {
     border-color: #dedede !important;
 }
 #world #canvas #minimap-overview .viewport {
@@ -5244,7 +5455,7 @@ display: block;
 #world #canvas #minimap-overview .buttons .button + .button {
     margin-top: 6px;
 }
-#world #canvas #minimap-overview .buttons .button:not(.active):not(:hover) {
+#world #canvas #minimap-overview .buttons .button:not(.active):not(:hover):not(.hovered) {
     opacity: 0.6;
 }
 #world #canvas #minimap-overview .buttons .button > i {
