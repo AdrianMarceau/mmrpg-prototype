@@ -2341,7 +2341,7 @@ html, body {
     position: absolute;
     z-index: 30;
     top: 16px;
-    left: 308px;
+    left: 560px;
     right: auto;
     bottom: auto;
     width: 172px;
@@ -2358,6 +2358,9 @@ html, body {
     border-width: 1px 0 0 1px;
     border-radius: 6px;
     user-select: none;
+}
+#robots-overview .storage-box .storage-details {
+    left: 308px;
 }
 
 #robots-overview .storage-box .pages:before,

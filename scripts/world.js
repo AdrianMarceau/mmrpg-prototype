@@ -2032,7 +2032,7 @@ class mmrpgWorldMap {
                             }
                         //console.log('-> clearing selection for hidden selected ' + objectKind + ' ' + objectToken);
                         $object.removeClass('selected');
-                        $storageObjectsDiv.find('> .storage-details[data-' + objectKind + '="' + objectToken + '"]').remove();
+                        $robotsOverview.find('.storage-details[data-' + objectKind + '="' + objectToken + '"]').remove();
                         });
                     //console.log('-> also remove any lingering incompatibility classes on the team robots');
                     $('.team-robot[data-robot].incompatible', $teamRobotsDiv).removeClass('incompatible');
@@ -2225,7 +2225,7 @@ class mmrpgWorldMap {
                 // refresh items to make sure they're sorted
                 refreshStoragePage('items');
                 // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
-                let $detailsDiv = $storageItemsDiv.find('> .storage-details[data-item]');
+                let $detailsDiv = $robotsOverview.find('.storage-details[data-item]');
                 if ($detailsDiv.length){
                     let itemToken = $detailsDiv.attr('data-item') || false;
                     //console.log('-> refreshing details for itemToken =', itemToken);
@@ -2246,7 +2246,7 @@ class mmrpgWorldMap {
                 if (targetSelected){ filterAbilitiesToSelected($selectedRobot); }
                 else { filterAbilitiesToSelected(false); }
                 // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
-                let $detailsDiv = $storageAbilitiesDiv.find('> .storage-details[data-ability]');
+                let $detailsDiv = $robotsOverview.find('.storage-details[data-ability]');
                 if ($detailsDiv.length){
                     let abilityToken = $detailsDiv.attr('data-ability') || false;
                     //console.log('-> refreshing details for abilityToken =', abilityToken);
@@ -2306,7 +2306,7 @@ class mmrpgWorldMap {
                         let abilityToken = $ability.attr('data-ability');
                         //console.log('-> clearing selection for abilityToken =', abilityToken);
                         $ability.removeClass('selected');
-                        $storageAbilitiesDiv.find('> .storage-details[data-ability="' + abilityToken + '"]').remove();
+                        $robotsOverview.find('.storage-details[data-ability="' + abilityToken + '"]').remove();
                         });
                     }
                 // Refresh the ability storage page now that we've updated compatibility
@@ -2341,7 +2341,7 @@ class mmrpgWorldMap {
                 //console.log('-> $storageObjectsDiv = ', $storageObjectsDiv.length, $storageObjectsDiv);
                 //console.log('-> $selectedStorageObject = ', $selectedStorageObject.length, $selectedStorageObject);
                 // Check to see if a details div has already been added
-                let $detailsDiv = $storageObjectsDiv.find('> .storage-details');
+                let $detailsDiv = $robotsOverview.find('.storage-details');
                 let detailsDivExists = $detailsDiv && $detailsDiv.length ? true : false;
                 //let detailsDivSameKind = false; //detailsDivExists && $detailsDiv.is('[data-' + objectKind + ']') ? true : false;
                 //console.log('-> $detailsDiv = ', $detailsDiv.length, $detailsDiv);
@@ -2380,7 +2380,7 @@ class mmrpgWorldMap {
                             let robotMarkup = _self.getRobotDetailsMarkupForOverview(robotToken) || false;
                             if (!robotMarkup || !robotMarkup.length){ return false; }
                             $storageObjectsDiv.append(robotMarkup);
-                            $detailsDiv = $storageObjectsDiv.find('> .storage-details');
+                            $detailsDiv = $robotsOverview.find('.storage-details');
                             } else {
                             //console.log('-> refresh existing details div for robotToken =', robotToken);
                             let robotDetails = _self.getRobotDetailsForOverview(robotToken) || false;
@@ -2399,7 +2399,7 @@ class mmrpgWorldMap {
                             let itemMarkup = _self.getItemDetailsMarkupForOverview(itemToken, teamRobotSelected) || false;
                             if (!itemMarkup || !itemMarkup.length){ return false; }
                             $storageObjectsDiv.append(itemMarkup);
-                            $detailsDiv = $storageObjectsDiv.find('> .storage-details');
+                            $detailsDiv = $robotsOverview.find('.storage-details');
                             } else {
                             //console.log('-> refresh existing details div for itemToken =', itemToken);
                             let itemDetails = _self.getItemDetailsForOverview(itemToken, teamRobotSelected) || false;
@@ -2417,7 +2417,7 @@ class mmrpgWorldMap {
                             let abilityMarkup = _self.getAbilityDetailsMarkupForOverview(abilityToken, teamRobotSelected) || false;
                             if (!abilityMarkup || !abilityMarkup.length){ return false; }
                             $storageObjectsDiv.append(abilityMarkup);
-                            $detailsDiv = $storageObjectsDiv.find('> .storage-details');
+                            $detailsDiv = $robotsOverview.find('.storage-details');
                             } else {
                             //console.log('-> populate existing details div for abilityToken =', abilityToken);
                             let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken, teamRobotSelected) || false;
@@ -2442,7 +2442,7 @@ class mmrpgWorldMap {
                         let robotMarkup = _self.getRobotDetailsMarkupForOverview(robotToken) || false;
                         if (!robotMarkup || !robotMarkup.length){ return false; }
                         $storageObjectsDiv.append(robotMarkup);
-                        $detailsDiv = $storageObjectsDiv.find('> .storage-details');
+                        $detailsDiv = $robotsOverview.find('.storage-details');
                         } else {
                         //console.log('-> refresh existing details div for robotToken =', robotToken);
                         let robotDetails = _self.getRobotDetailsForOverview(robotToken) || false;
@@ -2537,15 +2537,15 @@ class mmrpgWorldMap {
                 if (Array.isArray(onlyWhen) && onlyWhen.indexOf(frame) === -1){ return; }
                 $sprite.attr('data-frame', newFrame);
                 };
-            $storageBoxDivs.delegate('.storage-details[data-robot] > .image', 'click', function(e){ _self.playSoundEffect('link-click-robot'); updateRobotImageFrame(this, '02'); }); // victory on click
-            $storageBoxDivs.delegate('.storage-details[data-robot] > .image', 'mouseenter', function(e){ hoverOverviewObject.call(this); updateRobotImageFrame(this, '08'); }); // defend on hover
-            $storageBoxDivs.delegate('.storage-details[data-robot] > .image', 'mouseleave', function(e){ unhoverOverviewObject.call(this); updateRobotImageFrame(this, '00', ['02', '08']); }); // base on reset
+            $robotsOverview.delegate('.storage-details[data-robot] > .image', 'click', function(e){ _self.playSoundEffect('link-click-robot'); updateRobotImageFrame(this, '02'); }); // victory on click
+            $robotsOverview.delegate('.storage-details[data-robot] > .image', 'mouseenter', function(e){ hoverOverviewObject.call(this); updateRobotImageFrame(this, '08'); }); // defend on hover
+            $robotsOverview.delegate('.storage-details[data-robot] > .image', 'mouseleave', function(e){ unhoverOverviewObject.call(this); updateRobotImageFrame(this, '00', ['02', '08']); }); // base on reset
             // Make sure clicking relevant areas in the robot details triggers relevant functionality
             // - make sure clicking the item slot (empty or not) quick-swaps to the items tab
             // - make sure clicking the support tab ?????? (for now just show console.warn of TODO)
             // - make sure clicking any of the ability slots (empty or not) quick-swaps to the abilities tab
             // [held-item]
-            $storageBoxDivs.delegate('.storage-details[data-robot] .held-item .value', 'click', function(e){
+            $robotsOverview.delegate('.storage-details[data-robot] .held-item .value', 'click', function(e){
                 e.preventDefault();
                 if (_self.worldIsBusy()){ return; }
                 //console.log('%c' + 'robot equipped item value clicked!', 'color: cyan;');
@@ -2577,10 +2577,10 @@ class mmrpgWorldMap {
                 // Return true on success
                 return true;
                 });
-            $storageBoxDivs.delegate('.storage-details[data-robot] .held-item .value', 'mouseenter', hoverOverviewObject);
-            $storageBoxDivs.delegate('.storage-details[data-robot] .held-item .value', 'mouseleave', unhoverOverviewObject);
+            $robotsOverview.delegate('.storage-details[data-robot] .held-item .value', 'mouseenter', hoverOverviewObject);
+            $robotsOverview.delegate('.storage-details[data-robot] .held-item .value', 'mouseleave', unhoverOverviewObject);
             // [equipped-abilities]
-            $storageBoxDivs.delegate('.storage-details[data-robot] .equipped-abilities .value', 'click', function(e){
+            $robotsOverview.delegate('.storage-details[data-robot] .equipped-abilities .value', 'click', function(e){
                 e.preventDefault();
                 if (_self.worldIsBusy()){ return; }
                 //console.log('%c' + 'robot equipped ability value clicked!', 'color: cyan;');
@@ -2611,8 +2611,8 @@ class mmrpgWorldMap {
                 // Return true on success
                 return true;
                 });
-            $storageBoxDivs.delegate('.storage-details[data-robot] .equipped-abilities .value', 'mouseenter', hoverOverviewObject);
-            $storageBoxDivs.delegate('.storage-details[data-robot] .equipped-abilities .value', 'mouseleave', unhoverOverviewObject);
+            $robotsOverview.delegate('.storage-details[data-robot] .equipped-abilities .value', 'mouseenter', hoverOverviewObject);
+            $robotsOverview.delegate('.storage-details[data-robot] .equipped-abilities .value', 'mouseleave', unhoverOverviewObject);
             // Auto-trigger a sort at least once on all the storage boxes to ensure a default order
             $storageBoxDivs.each(function(){
                 let $storageBoxDiv = $(this);
@@ -2836,7 +2836,7 @@ class mmrpgWorldMap {
                     let $actionButton = $(this);
                     let actionToken = $actionButton.attr('data-action');
                     //console.log('-> actionToken =', actionToken);
-                    let $detailsDiv = $storageItemsDiv.find('> .storage-details');
+                    let $detailsDiv = $robotsOverview.find('.storage-details');
                     if (!$detailsDiv.is('[data-item]')){ return; }
                     let itemToken = $detailsDiv.attr('data-item');
                     //console.log('-> itemToken =', itemToken);
@@ -2911,7 +2911,7 @@ class mmrpgWorldMap {
                     let $actionButton = $(this);
                     let actionToken = $actionButton.attr('data-action');
                     //console.log('-> actionToken =', actionToken);
-                    let $detailsDiv = $storageAbilitiesDiv.find('> .storage-details');
+                    let $detailsDiv = $robotsOverview.find('.storage-details');
                     if (!$detailsDiv.is('[data-ability]')){ return; }
                     let abilityToken = $detailsDiv.attr('data-ability');
                     //console.log('-> abilityToken =', abilityToken);
