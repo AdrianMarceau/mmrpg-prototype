@@ -651,6 +651,8 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
 <!-- (4) define game settings/config/indexes -->
 <script type="text/javascript">
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.music.js.php'); ?>
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.sounds.js.php'); ?>
 (function(){
     // Define the main configuration settings for the world map
     let _worldConfig = gameSettings.worldConfig;
@@ -675,7 +677,8 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
         _worldIndexes.robots = typeof mmrpgIndex.robots !== 'undefined' ? mmrpgIndex.robots : {};
         _worldIndexes.abilities = typeof mmrpgIndex.abilities !== 'undefined' ? mmrpgIndex.abilities : {};
         _worldIndexes.items = typeof mmrpgIndex.items !== 'undefined' ? mmrpgIndex.items : {};
-        _worldIndexes.fields = typeof mmrpgIndex.fields !== 'undefined' ? mmrpgIndex.fields : {};gameSettings.worldIndexes = mmrpgIndex;
+        _worldIndexes.fields = typeof mmrpgIndex.fields !== 'undefined' ? mmrpgIndex.fields : {};
+        gameSettings.worldIndexes = mmrpgIndex;
         }
     // Define any additional map settings or flags that are more contextual
     _worldConfig.locationHasChanged = <?= json_encode($location_has_changed, JSON_NUMERIC_CHECK) ?>;
@@ -688,7 +691,8 @@ $(document).ready(function(){
     // Make sure the music button is in the appropriate place and then
     // start playing it in the background (use default if none defined)
     top.mmrpg_music_context('world');
-    parent.mmrpg_music_load('<?= $map_field_music ?>', false, false);
+    top.mmrpg_music_preload('misc/sound-effects-curated');
+    top.mmrpg_music_load('<?= $map_field_music ?>', false, false);
 
     // Collect a ref to the game div then initialize the world map
     // (make sure to automatically pull events if we have a valid map)
