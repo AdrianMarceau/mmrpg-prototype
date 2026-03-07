@@ -2165,7 +2165,8 @@ html, body {
 }
 #world #canvas #robots-overview[data-view="robots"].expanded .storage-robots,
 #world #canvas #robots-overview[data-view="items"].expanded .storage-items,
-#world #canvas #robots-overview[data-view="abilities"].expanded .storage-abilities {
+#world #canvas #robots-overview[data-view="abilities"].expanded .storage-abilities,
+#world #canvas #robots-overview[data-view].expanded .storage-common {
     opacity: 1.0;
     top: 16px;
     pointer-events: auto;
@@ -2277,8 +2278,7 @@ html, body {
 #robots-overview .storage-box .sorts,
 #robots-overview .storage-box .pages,
 #robots-overview .storage-box .toggles,
-#robots-overview .storage-box .counter,
-#robots-overview .storage-box .details {
+#robots-overview .storage-box .counter {
     display: block;
     position: absolute;
     z-index: 20;
@@ -2336,19 +2336,28 @@ html, body {
     padding: 2px 12px 4px;
     border-radius: 6px;
 }
-#robots-overview .storage-box .details {
+#robots-overview .storage-details {
+    display: block;
+    position: absolute;
     z-index: 30;
     top: 16px;
     left: 308px;
     right: auto;
+    bottom: auto;
     width: 172px;
-    background-color: #141414;
-    border-width: 1px 0 0 1px;
+    height: auto;
+    color: #cfcfcf;
+    padding: 9px 12px;
     font-size: 11px;
     line-height: 1;
     text-align: center;
-    padding: 9px 12px;
+    text-decoration: none;
+    background-color: #141414;
+    border-style: solid;
+    border-color: #090909;
+    border-width: 1px 0 0 1px;
     border-radius: 6px;
+    user-select: none;
 }
 
 #robots-overview .storage-box .pages:before,
@@ -2532,11 +2541,11 @@ html, body {
     background-color: rgba(0, 0, 0, 0.6);
 }
 
-#robots-overview .storage-box > .details .title,
-#robots-overview .storage-box > .details .image,
-#robots-overview .storage-box > .details .subtitle,
-#robots-overview .storage-box > .details .description,
-#robots-overview .storage-box > .details .actions {
+#robots-overview .storage-details .title,
+#robots-overview .storage-details .image,
+#robots-overview .storage-details .subtitle,
+#robots-overview .storage-details .description,
+#robots-overview .storage-details .actions {
     display: block;
     box-sizing: border-box;
     position: relative;
@@ -2552,7 +2561,7 @@ html, body {
     text-decoration: none;
     user-select: none;
 }
-#robots-overview .storage-box > .details .title {
+#robots-overview .storage-details .title {
     color: #868686;
     font-size: 11px;
     line-height: 1.2;
@@ -2578,7 +2587,7 @@ html, body {
     0%, 100% { transform: translateY(14px) scale(2.0); }
     50% { transform: translateY(12px) scale(2.0); }
 }
-#robots-overview .storage-box > .details .image {
+#robots-overview .storage-details .image {
     display: block;
     box-sizing: border-box;
     margin: 12px auto 9px;
@@ -2592,8 +2601,8 @@ html, body {
     border: 1px solid #292929 !important;
     border-radius: 6px;
 }
-#robots-overview .storage-box > .details .image:before,
-#robots-overview .storage-box > .details .image:after {
+#robots-overview .storage-details .image:before,
+#robots-overview .storage-details .image:after {
     content: "";
     display: block;
     position: absolute;
@@ -2609,7 +2618,7 @@ html, body {
     /* mix-blend-mode: luminosity;  */
     mix-blend-mode: hard-light;
 }
-#robots-overview .storage-box > .details .image:before {
+#robots-overview .storage-details .image:before {
     z-index: 2;
     top: 0;
     filter: brightness(0.6);
@@ -2617,7 +2626,7 @@ html, body {
     box-shadow: rgba(0, 0, 0, 0.3) 0px -2px 10px inset;
     animation: 16s linear 0s infinite normal none running storage-object-showcase_grid-pan;
 }
-#robots-overview .storage-box > .details .image:after {
+#robots-overview .storage-details .image:after {
     z-index: 1;
     bottom: 0;
     filter: brightness(0.8);
@@ -2625,19 +2634,19 @@ html, body {
     background-position: 0px -9px;
     transition: none;
 }
-#robots-overview .storage-box > .details .image.hovered {
+#robots-overview .storage-details .image.hovered {
     outline-color: rgba(255, 255, 255, 0.5);
     box-shadow: 0 0 0 transparent;
     animation: team-object-hover-outline 3s infinite;
     border-color: #b6b6b6 !important;
 }
 
-#robots-overview .storage-box > .details .image.animate:before { transition: filter 0.9s; }
-#robots-overview .storage-box > .details .image.animate:after { transition: background-position 0.9s, filter 0.9s; }
-#robots-overview .storage-box > .details .image.inactive:before { filter: brightness(0.4); }
-#robots-overview .storage-box > .details .image.inactive:after { background-position: -160px -9px; filter: brightness(0.6); }
+#robots-overview .storage-details .image.animate:before { transition: filter 0.9s; }
+#robots-overview .storage-details .image.animate:after { transition: background-position 0.9s, filter 0.9s; }
+#robots-overview .storage-details .image.inactive:before { filter: brightness(0.4); }
+#robots-overview .storage-details .image.inactive:after { background-position: -160px -9px; filter: brightness(0.6); }
 
-#world #robots-overview .storage-box > .details .image > .sprite {
+#world #robots-overview .storage-details .image > .sprite {
     position: absolute;
     z-index: 3;
     top: 50%;
@@ -2646,50 +2655,50 @@ html, body {
     filter: drop-shadow(1px 1px 0 #000000);
     pointer-events: none;
 }
-#world #robots-overview .storage-box > .details .image > .sprite,
-#world #robots-overview .storage-box > .details .image > .sprite > .wrap,
-#world #robots-overview .storage-box > .details .image > .sprite > .wrap > .sprite {
+#world #robots-overview .storage-details .image > .sprite,
+#world #robots-overview .storage-details .image > .sprite > .wrap,
+#world #robots-overview .storage-details .image > .sprite > .wrap > .sprite {
     transform-origin: center;
     image-rendering: pixelated;
 }
-#world #robots-overview .storage-box > .details .image > .sprite > .wrap > .sprite {
+#world #robots-overview .storage-details .image > .sprite > .wrap > .sprite {
     transform: translateY(0) scale(3.0);
     animation: storage-object-showcase_sprite-bounce 1s linear infinite;
     animation-timing-function: steps(2);
 }
-#world #robots-overview .storage-box > .details .image > .sprite.robot {
+#world #robots-overview .storage-details .image > .sprite.robot {
     filter: none;
 }
-#world #robots-overview .storage-box > .details .image > .sprite.robot > .wrap > .sprite {
+#world #robots-overview .storage-details .image > .sprite.robot > .wrap > .sprite {
     transform-origin: bottom;
     position: absolute;
     top: auto;
     bottom: -15px;
 }
-#world #robots-overview .storage-box > .details .image > .sprite > .wrap > .back {
+#world #robots-overview .storage-details .image > .sprite > .wrap > .back {
     transform: translateY(14px) scale(2.0);
     animation: storage-object-showcase_sprite-bounce-back 1s linear infinite;
     animation-timing-function: steps(2);
 }
-#world #robots-overview .storage-box > .details .image > .sprite > .wrap > .back + .sprite {
+#world #robots-overview .storage-details .image > .sprite > .wrap > .back + .sprite {
     transform: translateY(0) scale(2.0);
     animation-name: storage-object-showcase_sprite-bounce-small;
 }
-#robots-overview .storage-box > .details .subtitle {
+#robots-overview .storage-details .subtitle {
     line-height: 16px;
     text-shadow: 1px 1px 0 #000000;
     font-weight: bold;
     margin-bottom: 6px;
 }
-#robots-overview .storage-box > .details .subtitle .name,
-#robots-overview .storage-box > .details .subtitle .quantity,
-#robots-overview .storage-box > .details .subtitle .cost,
-#robots-overview .storage-box > .details .subtitle .level,
-#robots-overview .storage-box > .details .subtitle .experience {
+#robots-overview .storage-details .subtitle .name,
+#robots-overview .storage-details .subtitle .quantity,
+#robots-overview .storage-details .subtitle .cost,
+#robots-overview .storage-details .subtitle .level,
+#robots-overview .storage-details .subtitle .experience {
     display: block;
     margin: 0 auto 6px;
 }
-#robots-overview .storage-box > .details .subtitle .name {
+#robots-overview .storage-details .subtitle .name {
     float: left;
     text-align: left;
     font-size: 13px;
@@ -2698,20 +2707,20 @@ html, body {
     color: #efefef;
     max-width: calc(100% - 30px);
 }
-#robots-overview .storage-box > .details[data-robot] .subtitle .name {
+#robots-overview .storage-details[data-robot] .subtitle .name {
     max-width: calc(100% - 70px);
 }
-#robots-overview .storage-box > .details .subtitle .quantity,
-#robots-overview .storage-box > .details .subtitle .cost,
-#robots-overview .storage-box > .details .subtitle .level {
+#robots-overview .storage-details .subtitle .quantity,
+#robots-overview .storage-details .subtitle .cost,
+#robots-overview .storage-details .subtitle .level {
     float: right;
     clear: right;
     font-size: 12px;
     font-weight: normal;
     color: #cfcfcf;
 }
-#robots-overview .storage-box > .details .subtitle > hr,
-#robots-overview .storage-box > .details .infoline hr {
+#robots-overview .storage-details .subtitle > hr,
+#robots-overview .storage-details .infoline hr {
     display: block;
     clear: both;
     width: auto;
@@ -2721,9 +2730,9 @@ html, body {
     backgound-color: #464646;
     border-radius: 3px;
 }
-#robots-overview .storage-box > .details .types {
+#robots-overview .storage-details .types {
 }
-#robots-overview .storage-box > .details .types .type {
+#robots-overview .storage-details .types .type {
     display: inline-block;
     box-sizing: border-box;
     font-size: 10px;
@@ -2734,13 +2743,13 @@ html, body {
     border: 1px solid #565656;
     text-shadow: 1px 1px 0 #000000;
 }
-#robots-overview .storage-box > .details .types .type.empty {
+#robots-overview .storage-details .types .type.empty {
     color: #868686;
 }
-#robots-overview .storage-box > .details .subtitle > hr {
+#robots-overview .storage-details .subtitle > hr {
     margin: 6px 0 0;
 }
-#robots-overview .storage-box > .details .subtitle > sub {
+#robots-overview .storage-details .subtitle > sub {
     position: absolute;
     z-index: 3;
     display: block;
@@ -2754,12 +2763,12 @@ html, body {
     border-left-color: transparent !important;
     border-top-color: transparent !important;
 }
-#robots-overview .storage-box > .details .infolines {
+#robots-overview .storage-details .infolines {
     display: block;
     clear: both;
     margin: 0 auto;
 }
-#robots-overview .storage-box > .details .infoline {
+#robots-overview .storage-details .infoline {
     font-size: 11px;
     line-height: 1.2;
     color: #fefefe;
@@ -2770,12 +2779,12 @@ html, body {
     float: none;
     clear: both;
 }
-#robots-overview .storage-box > .details .infoline:after {
+#robots-overview .storage-details .infoline:after {
     content: "";
     display: block;
     clear: both;
 }
-#robots-overview .storage-box > .details .infoline .guage {
+#robots-overview .storage-details .infoline .guage {
     display: block;
     height: auto;
     margin: 0 auto;
@@ -2785,13 +2794,13 @@ html, body {
     left: 0;
     right: 0;
 }
-#robots-overview .storage-box > .details .infoline .guage hr {
+#robots-overview .storage-details .infoline .guage hr {
     margin: 0;
     position: relative;
     float: right;
     z-index: 2;
 }
-#robots-overview .storage-box > .details .infoline .guage hr + hr {
+#robots-overview .storage-details .infoline .guage hr + hr {
     position: absolute;
     float: none;
     z-index: 1;
@@ -2801,44 +2810,44 @@ html, body {
     left: 0;
     background-color: #191919 !important;
 }
-#robots-overview .storage-box > .details .infoline .label,
-#robots-overview .storage-box > .details .infoline .value,
-#robots-overview .storage-box > .details .infoline > i {
+#robots-overview .storage-details .infoline .label,
+#robots-overview .storage-details .infoline .value,
+#robots-overview .storage-details .infoline > i {
     position: relative;
     z-index: 2;
 }
-#robots-overview .storage-box > .details .infoline .label {
+#robots-overview .storage-details .infoline .label {
     float: left;
     color: #dedede;
 }
-#robots-overview .storage-box > .details .infoline.has-guage {
+#robots-overview .storage-details .infoline.has-guage {
     padding-bottom: 9px;
 }
-#robots-overview .storage-box > .details .infoline.has-guage + .infoline.has-guage {
+#robots-overview .storage-details .infoline.has-guage + .infoline.has-guage {
     margin-top: -3px;
 }
-#robots-overview .storage-box > .details .infoline.has-guage .value.separator,
-#robots-overview .storage-box > .details .infoline.has-guage .value.max {
+#robots-overview .storage-details .infoline.has-guage .value.separator,
+#robots-overview .storage-details .infoline.has-guage .value.max {
     color: #868686;
 }
-#robots-overview .storage-box > .details .infoline.has-guage .value.separator {
+#robots-overview .storage-details .infoline.has-guage .value.separator {
     margin-left: 9px;
 }
-#robots-overview .storage-box > .details .infoline.has-guage .value.max {
+#robots-overview .storage-details .infoline.has-guage .value.max {
     margin-left: 3px;
 }
-#robots-overview .storage-box > .details .infoline.has-guage .value.percent {
+#robots-overview .storage-details .infoline.has-guage .value.percent {
     color: #969696;
 }
-#robots-overview .storage-box > .details .infoline .value,
-#robots-overview .storage-box > .details .infoline > i {
+#robots-overview .storage-details .infoline .value,
+#robots-overview .storage-details .infoline > i {
     display: inline-block;
     margin: 0 0 0 6px;
 }
-#robots-overview .storage-box > .details .infoline .value {
+#robots-overview .storage-details .infoline .value {
 
 }
-#robots-overview .storage-box > .details .infoline > i {
+#robots-overview .storage-details .infoline > i {
 
 }
 @keyframes details-overview-value-glowing-outline {
@@ -2865,21 +2874,21 @@ html, body {
     0%, 100% { outline-color: rgba(255, 255, 255, 0.6); box-shadow: 0 0 3px transparent; }
     50% { outline-color: rgba(255, 255, 255, 1.0); box-shadow: 0 0 6px white; }
 }
-#robots-overview .storage-box > .details[data-robot] .subtitle {
+#robots-overview .storage-details[data-robot] .subtitle {
     padding: 6px 0 12px;
 }
-#robots-overview .storage-box > .details[data-robot] .subtitle .name {
+#robots-overview .storage-details[data-robot] .subtitle .name {
     font-size: 14px;
     margin: 0 auto 0 0;
     position: relative;
     top: -5px;
     white-space: nowrap;
 }
-#robots-overview .storage-box > .details[data-robot] .subtitle .level {
+#robots-overview .storage-details[data-robot] .subtitle .level {
     position: relative;
     bottom: 9px;
 }
-#robots-overview .storage-box > .details[data-robot] .subtitle .level > i {
+#robots-overview .storage-details[data-robot] .subtitle .level > i {
     position: absolute;
     display: block;
     top: 2px;
@@ -2888,7 +2897,7 @@ html, body {
     line-height: 1;
     text-align: center;
 }
-#robots-overview .storage-box > .details[data-robot] .subtitle .experience {
+#robots-overview .storage-details[data-robot] .subtitle .experience {
     font-weight: normal;
     font-size: 10px;
     color: #969696;
@@ -2897,19 +2906,19 @@ html, body {
     top: 10px;
     text-align: right;
 }
-#robots-overview .storage-box > .details[data-robot] .life-energy .label,
-#robots-overview .storage-box > .details[data-robot] .weapon-energy .label {
+#robots-overview .storage-details[data-robot] .life-energy .label,
+#robots-overview .storage-details[data-robot] .weapon-energy .label {
     display: none;
 }
-#robots-overview .storage-box > .details[data-robot] .life-energy .guage {
+#robots-overview .storage-details[data-robot] .life-energy .guage {
     left: 20px;
 }
-#robots-overview .storage-box > .details[data-robot] .weapon-energy .guage {
+#robots-overview .storage-details[data-robot] .weapon-energy .guage {
     left: 50px;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item,
-#robots-overview .storage-box > .details[data-robot] .support-mecha,
-#robots-overview .storage-box > .details[data-robot] .base-stats {
+#robots-overview .storage-details[data-robot] .held-item,
+#robots-overview .storage-details[data-robot] .support-mecha,
+#robots-overview .storage-details[data-robot] .base-stats {
     display: block;
     box-sizing: border-box;
     width: calc(50% - 3px);
@@ -2921,39 +2930,39 @@ html, body {
     margin: 0 auto 3px;
     padding: 0 2px 2px;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item,
-#robots-overview .storage-box > .details[data-robot] .support-mecha {
+#robots-overview .storage-details[data-robot] .held-item,
+#robots-overview .storage-details[data-robot] .support-mecha {
     float: left;
     clear: left;
     text-align: left;
     margin-right: 3px;
     min-height: 52px;
 }
-#robots-overview .storage-box > .details[data-robot] .base-stats {
+#robots-overview .storage-details[data-robot] .base-stats {
     float: right;
     margin-left: 3px;
     text-align: right;
     min-height: 104px;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .label,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .label,
-#robots-overview .storage-box > .details[data-robot] .base-stats .label {
+#robots-overview .storage-details[data-robot] .held-item .label,
+#robots-overview .storage-details[data-robot] .support-mecha .label,
+#robots-overview .storage-details[data-robot] .base-stats .label {
     display: block;
     float: none;
     clear: both;
     text-align: center;
     margin-bottom: 3px;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .value,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value,
-#robots-overview .storage-box > .details[data-robot] .base-stats .value {
+#robots-overview .storage-details[data-robot] .held-item .value,
+#robots-overview .storage-details[data-robot] .support-mecha .value,
+#robots-overview .storage-details[data-robot] .base-stats .value {
     display: block;
     border: 1px solid #292929;
     background-color: #191919;
     border-radius: 3px;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .value,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value {
+#robots-overview .storage-details[data-robot] .held-item .value,
+#robots-overview .storage-details[data-robot] .support-mecha .value {
     padding: 2px 3px 2px 26px;
     line-height: 1;
     text-align: left;
@@ -2966,49 +2975,49 @@ html, body {
     cursor: pointer;
     z-index: 1;
 }
-#robots-overview .storage-box > .details[data-robot] .image.hovered {
+#robots-overview .storage-details[data-robot] .image.hovered {
 
 }
-/* #robots-overview .storage-box > .details[data-robot] .held-item .value:hover, */
-#robots-overview .storage-box > .details[data-robot] .held-item .value.hovered,
-#robots-overview .storage-box > .details[data-robot] .held-item .value.new,
-#robots-overview .storage-box > .details[data-robot] .held-item .value.selected,
-/* #robots-overview .storage-box > .details[data-robot] .support-mecha .value:hover, */
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value.hovered,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value.new,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value.selected {
+/* #robots-overview .storage-details[data-robot] .held-item .value:hover, */
+#robots-overview .storage-details[data-robot] .held-item .value.hovered,
+#robots-overview .storage-details[data-robot] .held-item .value.new,
+#robots-overview .storage-details[data-robot] .held-item .value.selected,
+/* #robots-overview .storage-details[data-robot] .support-mecha .value:hover, */
+#robots-overview .storage-details[data-robot] .support-mecha .value.hovered,
+#robots-overview .storage-details[data-robot] .support-mecha .value.new,
+#robots-overview .storage-details[data-robot] .support-mecha .value.selected {
     outline: 1px solid #ffffff;
     z-index: 30;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .value.hovered,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value.hovered {
+#robots-overview .storage-details[data-robot] .held-item .value.hovered,
+#robots-overview .storage-details[data-robot] .support-mecha .value.hovered {
     outline-color: rgba(255, 255, 255, 0.5);
     box-shadow: 0 0 0 transparent;
     animation: team-object-hover-outline 3s infinite;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .value.new,
-#robots-overview .storage-box > .details[data-robot] .held-item .value.selected,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value.new,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value.selected {
+#robots-overview .storage-details[data-robot] .held-item .value.new,
+#robots-overview .storage-details[data-robot] .held-item .value.selected,
+#robots-overview .storage-details[data-robot] .support-mecha .value.new,
+#robots-overview .storage-details[data-robot] .support-mecha .value.selected {
     outline-color: transparent;
     animation: details-overview-value-glowing-outline 2s linear infinite;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .value.hovered.selected,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value.hovered.selected {
+#robots-overview .storage-details[data-robot] .held-item .value.hovered.selected,
+#robots-overview .storage-details[data-robot] .support-mecha .value.hovered.selected {
     animation-name: team-object-hover-outline-stronger;
 }
-#robots-overview .storage-box > .details[data-robot] .base-stats .value {
+#robots-overview .storage-details[data-robot] .base-stats .value {
     margin: 0 1px 3px;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .value > b,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value > b {
+#robots-overview .storage-details[data-robot] .held-item .value > b,
+#robots-overview .storage-details[data-robot] .support-mecha .value > b {
     display: block;
     border-left: 1px solid rgba(0, 0, 0, 0.2);
     padding-left: 6px;
     line-height: 1.3;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .value > b > b,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value > b > b {
+#robots-overview .storage-details[data-robot] .held-item .value > b > b,
+#robots-overview .storage-details[data-robot] .support-mecha .value > b > b {
     line-height: 2.6;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -3016,29 +3025,29 @@ html, body {
     display: inline-block;
     overflow: hidden;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .value > .sprite,
-#robots-overview .storage-box > .details[data-robot] .held-item .value > .icon,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value > .sprite,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value > .icon {
+#robots-overview .storage-details[data-robot] .held-item .value > .sprite,
+#robots-overview .storage-details[data-robot] .held-item .value > .icon,
+#robots-overview .storage-details[data-robot] .support-mecha .value > .sprite,
+#robots-overview .storage-details[data-robot] .support-mecha .value > .icon {
     display: block;
     position: absolute;
     width: 40px;
     height: 40px;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .value > .sprite,
-#robots-overview .storage-box > .details[data-robot] .held-item .value > .icon,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value > .icon {
+#robots-overview .storage-details[data-robot] .held-item .value > .sprite,
+#robots-overview .storage-details[data-robot] .held-item .value > .icon,
+#robots-overview .storage-details[data-robot] .support-mecha .value > .icon {
     top: 50% !important;
     left: -6px !important;
     transform: translateY(-50%) !important;
 }
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value > .sprite {
+#robots-overview .storage-details[data-robot] .support-mecha .value > .sprite {
     top: auto !important;
     bottom: 6px !important;
     left: -6px !important;
 }
-#robots-overview .storage-box > .details[data-robot] .held-item .value > .icon > i,
-#robots-overview .storage-box > .details[data-robot] .support-mecha .value > .icon > i {
+#robots-overview .storage-details[data-robot] .held-item .value > .icon > i,
+#robots-overview .storage-details[data-robot] .support-mecha .value > .icon > i {
     font-size: 14px;
     line-height: 1;
     color: #141414;
@@ -3048,11 +3057,11 @@ html, body {
     left: 50%;
     transform: translate(-50%, -50%);
 }
-#robots-overview .storage-box > .details[data-robot] .base-stats .value {
+#robots-overview .storage-details[data-robot] .base-stats .value {
     text-align: right;
     padding: 6px;
 }
-#robots-overview .storage-box > .details[data-robot] .base-stats .value .arrows {
+#robots-overview .storage-details[data-robot] .base-stats .value .arrows {
     display: block;
     position: absolute;
     font-size: 6px;
@@ -3062,34 +3071,34 @@ html, body {
     letter-spacing: 1px;
     mix-blend-mode: overlay;
 }
-#robots-overview .storage-box > .details[data-robot] .base-stats .value.raised {
+#robots-overview .storage-details[data-robot] .base-stats .value.raised {
     padding-top: 3px;
     padding-bottom: 9px;
     outline: 1px solid #efefef;
 }
-#robots-overview .storage-box > .details[data-robot] .base-stats .value.lowered {
+#robots-overview .storage-details[data-robot] .base-stats .value.lowered {
     padding-bottom: 3px;
     padding-top: 9px;
     outline: 1px dotted #dedede;
 }
-#robots-overview .storage-box > .details[data-robot] .base-stats .value.raised .arrows {
+#robots-overview .storage-details[data-robot] .base-stats .value.raised .arrows {
     bottom: 3px;
 }
-#robots-overview .storage-box > .details[data-robot] .base-stats .value.lowered .arrows {
+#robots-overview .storage-details[data-robot] .base-stats .value.lowered .arrows {
     top: 0;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities {
+#robots-overview .storage-details[data-robot] .equipped-abilities {
     padding-top: 4px;
     margin-bottom: 4px;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .label {
+#robots-overview .storage-details[data-robot] .equipped-abilities .label {
     display: block;
     float: none;
     clear: both;
     margin: 0 auto 6px;
     text-align: center;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value {
+#robots-overview .storage-details[data-robot] .equipped-abilities .value {
     display: block;
     float: left;
     clear: none;
@@ -3110,27 +3119,27 @@ html, body {
     cursor: pointer;
     z-index: 1;
 }
-/* #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover, */
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.hovered,
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.new,
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected {
+/* #robots-overview .storage-details[data-robot] .equipped-abilities .value:hover, */
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.hovered,
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.new,
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.selected {
     outline: 1px solid #ffffff;
     z-index: 30;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.hovered {
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.hovered {
     outline-color: rgba(255, 255, 255, 0.5);
     box-shadow: 0 0 0 transparent;
     animation: team-object-hover-outline 3s infinite;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.new,
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected {
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.new,
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.selected {
     outline-color: transparent;
     animation: details-overview-value-glowing-outline 2s linear infinite;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.hovered.selected {
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.hovered.selected {
     animation-name: team-object-hover-outline-stronger;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value > .name {
+#robots-overview .storage-details[data-robot] .equipped-abilities .value > .name {
     display: block;
     position: absolute;
     left: 0;
@@ -3148,7 +3157,7 @@ html, body {
     border-radius: 0 0 3px 3px;
     padding: 2px 4px;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value > .name > strong {
+#robots-overview .storage-details[data-robot] .equipped-abilities .value > .name > strong {
     display: block;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3159,29 +3168,29 @@ html, body {
     text-shadow: inherit;
     transition: width 0.3s, text-shadow 0.3s;
 }
-/* #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover > .name > strong, */
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.hovered > .name > strong,
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected > .name > strong {
+/* #robots-overview .storage-details[data-robot] .equipped-abilities .value:hover > .name > strong, */
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.hovered > .name > strong,
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.selected > .name > strong {
     width: 200%;
     text-shadow: 0 0 4px #000000;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value[data-ability-id="0"] > .name {
+#robots-overview .storage-details[data-robot] .equipped-abilities .value[data-ability-id="0"] > .name {
     line-height: 26px;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value > .sprite {
+#robots-overview .storage-details[data-robot] .equipped-abilities .value > .sprite {
     top: -7px !important;
     left: -5px !important;
     transition: top 0.3s;
 }
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value > .sprite .sprite {
+#robots-overview .storage-details[data-robot] .equipped-abilities .value > .sprite .sprite {
     left: 1px !important;
 }
-/* #robots-overview .storage-box > .details[data-robot] .equipped-abilities .value:hover > .sprite, */
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.hovered > .sprite,
-#robots-overview .storage-box > .details[data-robot] .equipped-abilities .value.selected > .sprite {
+/* #robots-overview .storage-details[data-robot] .equipped-abilities .value:hover > .sprite, */
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.hovered > .sprite,
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.selected > .sprite {
     top: -9px !important;
 }
-#robots-overview .storage-box > .details .description {
+#robots-overview .storage-details .description {
     color: #c0c0c0;
     font-size: 12px;
     line-height: 1.4;
@@ -3190,16 +3199,16 @@ html, body {
     overflow: hidden;
     margin-bottom: 12px;
 }
-#robots-overview .storage-box > .details[data-robot] .description {
+#robots-overview .storage-details[data-robot] .description {
     font-size: 11px;
     min-height: 16px;
     text-align: right;
 }
-#robots-overview .storage-box > .details[data-robot] .description i {
+#robots-overview .storage-details[data-robot] .description i {
     float: left;
     margin: 0 6px 0 0;
 }
-#robots-overview .storage-box > .details .actions {
+#robots-overview .storage-details .actions {
     font-size: 12px;
     line-height: 1.2;
     color: #cfcfcf;
@@ -3208,7 +3217,7 @@ html, body {
     overflow: visible;
     padding: 6px 0 0;
 }
-#robots-overview .storage-box > .details .actions .button {
+#robots-overview .storage-details .actions .button {
     display: inline-block;
     position: relative;
     box-sizing: border-box;
@@ -3227,85 +3236,85 @@ html, body {
     filter: brightness(1) saturate(1);
     transition: background-color 0.3s, border 0.3s, filter 0.3s, color 0.3s, filter 0.3s;
 }
-/* #robots-overview .storage-box > .details .actions .button:hover, */
-#robots-overview .storage-box > .details .actions .button.hovered,
-#robots-overview .storage-box > .details .actions .button.clicked {
+/* #robots-overview .storage-details .actions .button:hover, */
+#robots-overview .storage-details .actions .button.hovered,
+#robots-overview .storage-details .actions .button.clicked {
     border-color: #ffffff;
     filter: brightness(1.2) saturate(1.2);
     color: #ffffff;
 }
-#robots-overview .storage-box > .details .actions .button.hovered {
+#robots-overview .storage-details .actions .button.hovered {
     border-color: rgba(255, 255, 255, 0.5);
     box-shadow: 0 0 0 transparent;
     animation: team-object-hover-border 3s infinite;
 }
-#robots-overview .storage-box > .details .actions .button.hovered.clicked {
+#robots-overview .storage-details .actions .button.hovered.clicked {
     animation-name: team-object-hover-border-stronger;
 }
-#robots-overview .storage-box > .details .actions .button.disabled {
+#robots-overview .storage-details .actions .button.disabled {
     text-shadow: none;
     font-weight: normal;
     pointer-events: none;
     cursor: not-allowed;
     filter: brightness(0.3) saturate(0.9);
 }
-#robots-overview .storage-box > .details .actions .button.hidden {
+#robots-overview .storage-details .actions .button.hidden {
     display: none !important;
 }
-#robots-overview .storage-box > .details .actions .button.clicked {
+#robots-overview .storage-details .actions .button.clicked {
     animation-fill-mode: forwards;
     transform-origin: center center;
     animation: world-action-button-clicked-subtle 0.3s ease-in-out 1;
     pointer-events: none;
 }
-#robots-overview .storage-box > .details > .subtitle:after,
-#robots-overview .storage-box > .details > .actions:after,
-#robots-overview .storage-box > .details > .infoline:after {
+#robots-overview .storage-details > .subtitle:after,
+#robots-overview .storage-details > .actions:after,
+#robots-overview .storage-details > .infoline:after {
     content: "";
     display: block;
     clear: both;
 }
 /*
-#robots-overview .storage-box > .details .actions .button.use-item { background-color: #507c46; }
-#robots-overview .storage-box > .details .actions .button.give-item { background-color: #265b92; }
-#robots-overview .storage-box > .details .actions .button.drop-item { background-color: #884d4c; }
-#robots-overview .storage-box > .details .actions .button.equip-ability { background-color: #6f6a7d; }
+#robots-overview .storage-details .actions .button.use-item { background-color: #507c46; }
+#robots-overview .storage-details .actions .button.give-item { background-color: #265b92; }
+#robots-overview .storage-details .actions .button.drop-item { background-color: #884d4c; }
+#robots-overview .storage-details .actions .button.equip-ability { background-color: #6f6a7d; }
 */
-#robots-overview .storage-box > .details[data-robot] .actions {
+#robots-overview .storage-details[data-robot] .actions {
     max-height: none;
     /* padding-right: 20px; */
 }
 /*
-#robots-overview .storage-box > .details[data-robot] .actions .button {
+#robots-overview .storage-details[data-robot] .actions .button {
     display: block;
     float: left;
     width: calc(50% - 3px);
     margin: 0 3px 0 0;
 }
-#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="add-robot"] {
+#robots-overview .storage-details[data-robot] .actions .button[data-action="add-robot"] {
     background-color: #598a4e;
     border-color: #44693b;
 }
-#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="remove-robot"] {
+#robots-overview .storage-details[data-robot] .actions .button[data-action="remove-robot"] {
     background-color: #8b5050;
     border-color: #6b3f3f;
 }
-#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="robot-info"] {
+#robots-overview .storage-details[data-robot] .actions .button[data-action="robot-info"] {
     background-color: #8b739b;
     border-color: #695775;
 }
 */
-#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="robot-info"],
-#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="use-item"],
-#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="equip-ability"] {
+#robots-overview .storage-details[data-robot] .actions .button[data-action="robot-info"],
+#robots-overview .storage-details[data-robot] .actions .button[data-action="use-item"],
+#robots-overview .storage-details[data-robot] .actions .button[data-action="equip-ability"] {
     background-color: #6e6e6e;
     border-color: #606060;
 }
-#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="add-robot"],
-#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="remove-robot"],
-#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="give-item"],
-#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="take-item"],
-#robots-overview .storage-box > .details[data-robot] .actions .button[data-action="remove-ability"] {
+#robots-overview .storage-details[data-robot] .actions .button[data-action="add-robot"],
+#robots-overview .storage-details[data-robot] .actions .button[data-action="remove-robot"],
+#robots-overview .storage-details[data-robot] .actions .button[data-action="give-item"],
+#robots-overview .storage-details[data-robot] .actions .button[data-action="take-item"],
+#robots-overview .storage-details[data-robot] .actions .button[data-action="remove-ability"] {
     background-color: #3b3b3b;
     border-color: #7b7b7b;
 }

@@ -1692,7 +1692,7 @@ class mmrpgWorldMap {
                 $teamRobotsDiv.find('.equipped', ).removeClass('equipped');
                 $teamRobotsDiv.find('.selected:not(.keep-selected)').removeClass('selected');
                 $teamRobotsDiv.find('.hovered:not(.keep-hovered)').removeClass('hovered');
-                $('.details', $storageBoxes).remove();
+                $('.storage-details', $storageBoxes).remove();
                 return;
                 };
             // Define a function for expanding the robots-overview panel and showing a specific view
@@ -2032,7 +2032,7 @@ class mmrpgWorldMap {
                             }
                         //console.log('-> clearing selection for hidden selected ' + objectKind + ' ' + objectToken);
                         $object.removeClass('selected');
-                        $storageObjectsDiv.find('> .details[data-' + objectKind + '="' + objectToken + '"]').remove();
+                        $storageObjectsDiv.find('> .storage-details[data-' + objectKind + '="' + objectToken + '"]').remove();
                         });
                     //console.log('-> also remove any lingering incompatibility classes on the team robots');
                     $('.team-robot[data-robot].incompatible', $teamRobotsDiv).removeClass('incompatible');
@@ -2225,7 +2225,7 @@ class mmrpgWorldMap {
                 // refresh items to make sure they're sorted
                 refreshStoragePage('items');
                 // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
-                let $detailsDiv = $storageItemsDiv.find('> .details[data-item]');
+                let $detailsDiv = $storageItemsDiv.find('> .storage-details[data-item]');
                 if ($detailsDiv.length){
                     let itemToken = $detailsDiv.attr('data-item') || false;
                     //console.log('-> refreshing details for itemToken =', itemToken);
@@ -2246,7 +2246,7 @@ class mmrpgWorldMap {
                 if (targetSelected){ filterAbilitiesToSelected($selectedRobot); }
                 else { filterAbilitiesToSelected(false); }
                 // if there's a details popup onscreen, make sure we refresh w/ targetSelected status
-                let $detailsDiv = $storageAbilitiesDiv.find('> .details[data-ability]');
+                let $detailsDiv = $storageAbilitiesDiv.find('> .storage-details[data-ability]');
                 if ($detailsDiv.length){
                     let abilityToken = $detailsDiv.attr('data-ability') || false;
                     //console.log('-> refreshing details for abilityToken =', abilityToken);
@@ -2306,7 +2306,7 @@ class mmrpgWorldMap {
                         let abilityToken = $ability.attr('data-ability');
                         //console.log('-> clearing selection for abilityToken =', abilityToken);
                         $ability.removeClass('selected');
-                        $storageAbilitiesDiv.find('> .details[data-ability="' + abilityToken + '"]').remove();
+                        $storageAbilitiesDiv.find('> .storage-details[data-ability="' + abilityToken + '"]').remove();
                         });
                     }
                 // Refresh the ability storage page now that we've updated compatibility
@@ -2341,7 +2341,7 @@ class mmrpgWorldMap {
                 //console.log('-> $storageObjectsDiv = ', $storageObjectsDiv.length, $storageObjectsDiv);
                 //console.log('-> $selectedStorageObject = ', $selectedStorageObject.length, $selectedStorageObject);
                 // Check to see if a details div has already been added
-                let $detailsDiv = $storageObjectsDiv.find('> .details');
+                let $detailsDiv = $storageObjectsDiv.find('> .storage-details');
                 let detailsDivExists = $detailsDiv && $detailsDiv.length ? true : false;
                 //let detailsDivSameKind = false; //detailsDivExists && $detailsDiv.is('[data-' + objectKind + ']') ? true : false;
                 //console.log('-> $detailsDiv = ', $detailsDiv.length, $detailsDiv);
@@ -2380,7 +2380,7 @@ class mmrpgWorldMap {
                             let robotMarkup = _self.getRobotDetailsMarkupForOverview(robotToken) || false;
                             if (!robotMarkup || !robotMarkup.length){ return false; }
                             $storageObjectsDiv.append(robotMarkup);
-                            $detailsDiv = $storageObjectsDiv.find('> .details');
+                            $detailsDiv = $storageObjectsDiv.find('> .storage-details');
                             } else {
                             //console.log('-> refresh existing details div for robotToken =', robotToken);
                             let robotDetails = _self.getRobotDetailsForOverview(robotToken) || false;
@@ -2399,7 +2399,7 @@ class mmrpgWorldMap {
                             let itemMarkup = _self.getItemDetailsMarkupForOverview(itemToken, teamRobotSelected) || false;
                             if (!itemMarkup || !itemMarkup.length){ return false; }
                             $storageObjectsDiv.append(itemMarkup);
-                            $detailsDiv = $storageObjectsDiv.find('> .details');
+                            $detailsDiv = $storageObjectsDiv.find('> .storage-details');
                             } else {
                             //console.log('-> refresh existing details div for itemToken =', itemToken);
                             let itemDetails = _self.getItemDetailsForOverview(itemToken, teamRobotSelected) || false;
@@ -2417,7 +2417,7 @@ class mmrpgWorldMap {
                             let abilityMarkup = _self.getAbilityDetailsMarkupForOverview(abilityToken, teamRobotSelected) || false;
                             if (!abilityMarkup || !abilityMarkup.length){ return false; }
                             $storageObjectsDiv.append(abilityMarkup);
-                            $detailsDiv = $storageObjectsDiv.find('> .details');
+                            $detailsDiv = $storageObjectsDiv.find('> .storage-details');
                             } else {
                             //console.log('-> populate existing details div for abilityToken =', abilityToken);
                             let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken, teamRobotSelected) || false;
@@ -2442,7 +2442,7 @@ class mmrpgWorldMap {
                         let robotMarkup = _self.getRobotDetailsMarkupForOverview(robotToken) || false;
                         if (!robotMarkup || !robotMarkup.length){ return false; }
                         $storageObjectsDiv.append(robotMarkup);
-                        $detailsDiv = $storageObjectsDiv.find('> .details');
+                        $detailsDiv = $storageObjectsDiv.find('> .storage-details');
                         } else {
                         //console.log('-> refresh existing details div for robotToken =', robotToken);
                         let robotDetails = _self.getRobotDetailsForOverview(robotToken) || false;
@@ -2537,15 +2537,15 @@ class mmrpgWorldMap {
                 if (Array.isArray(onlyWhen) && onlyWhen.indexOf(frame) === -1){ return; }
                 $sprite.attr('data-frame', newFrame);
                 };
-            $storageBoxDivs.delegate('.details[data-robot] > .image', 'click', function(e){ _self.playSoundEffect('link-click-robot'); updateRobotImageFrame(this, '02'); }); // victory on click
-            $storageBoxDivs.delegate('.details[data-robot] > .image', 'mouseenter', function(e){ hoverOverviewObject.call(this); updateRobotImageFrame(this, '08'); }); // defend on hover
-            $storageBoxDivs.delegate('.details[data-robot] > .image', 'mouseleave', function(e){ unhoverOverviewObject.call(this); updateRobotImageFrame(this, '00', ['02', '08']); }); // base on reset
+            $storageBoxDivs.delegate('.storage-details[data-robot] > .image', 'click', function(e){ _self.playSoundEffect('link-click-robot'); updateRobotImageFrame(this, '02'); }); // victory on click
+            $storageBoxDivs.delegate('.storage-details[data-robot] > .image', 'mouseenter', function(e){ hoverOverviewObject.call(this); updateRobotImageFrame(this, '08'); }); // defend on hover
+            $storageBoxDivs.delegate('.storage-details[data-robot] > .image', 'mouseleave', function(e){ unhoverOverviewObject.call(this); updateRobotImageFrame(this, '00', ['02', '08']); }); // base on reset
             // Make sure clicking relevant areas in the robot details triggers relevant functionality
             // - make sure clicking the item slot (empty or not) quick-swaps to the items tab
             // - make sure clicking the support tab ?????? (for now just show console.warn of TODO)
             // - make sure clicking any of the ability slots (empty or not) quick-swaps to the abilities tab
             // [held-item]
-            $storageBoxDivs.delegate('.details[data-robot] .held-item .value', 'click', function(e){
+            $storageBoxDivs.delegate('.storage-details[data-robot] .held-item .value', 'click', function(e){
                 e.preventDefault();
                 if (_self.worldIsBusy()){ return; }
                 //console.log('%c' + 'robot equipped item value clicked!', 'color: cyan;');
@@ -2577,10 +2577,10 @@ class mmrpgWorldMap {
                 // Return true on success
                 return true;
                 });
-            $storageBoxDivs.delegate('.details[data-robot] .held-item .value', 'mouseenter', hoverOverviewObject);
-            $storageBoxDivs.delegate('.details[data-robot] .held-item .value', 'mouseleave', unhoverOverviewObject);
+            $storageBoxDivs.delegate('.storage-details[data-robot] .held-item .value', 'mouseenter', hoverOverviewObject);
+            $storageBoxDivs.delegate('.storage-details[data-robot] .held-item .value', 'mouseleave', unhoverOverviewObject);
             // [equipped-abilities]
-            $storageBoxDivs.delegate('.details[data-robot] .equipped-abilities .value', 'click', function(e){
+            $storageBoxDivs.delegate('.storage-details[data-robot] .equipped-abilities .value', 'click', function(e){
                 e.preventDefault();
                 if (_self.worldIsBusy()){ return; }
                 //console.log('%c' + 'robot equipped ability value clicked!', 'color: cyan;');
@@ -2611,8 +2611,8 @@ class mmrpgWorldMap {
                 // Return true on success
                 return true;
                 });
-            $storageBoxDivs.delegate('.details[data-robot] .equipped-abilities .value', 'mouseenter', hoverOverviewObject);
-            $storageBoxDivs.delegate('.details[data-robot] .equipped-abilities .value', 'mouseleave', unhoverOverviewObject);
+            $storageBoxDivs.delegate('.storage-details[data-robot] .equipped-abilities .value', 'mouseenter', hoverOverviewObject);
+            $storageBoxDivs.delegate('.storage-details[data-robot] .equipped-abilities .value', 'mouseleave', unhoverOverviewObject);
             // Auto-trigger a sort at least once on all the storage boxes to ensure a default order
             $storageBoxDivs.each(function(){
                 let $storageBoxDiv = $(this);
@@ -2765,7 +2765,7 @@ class mmrpgWorldMap {
                     let $actionButton = $(this);
                     let actionToken = $actionButton.attr('data-action');
                     //console.log('-> actionToken =', actionToken);
-                    let $detailsDiv = $robotsOverview.find('.details[data-robot]');
+                    let $detailsDiv = $robotsOverview.find('.storage-details[data-robot]');
                     //console.log('-> $detailsDiv =', $detailsDiv.length, $detailsDiv);
                     if (!$detailsDiv.is('[data-robot]')){ return; }
                     let robotToken = $detailsDiv.attr('data-robot');
@@ -2836,7 +2836,7 @@ class mmrpgWorldMap {
                     let $actionButton = $(this);
                     let actionToken = $actionButton.attr('data-action');
                     //console.log('-> actionToken =', actionToken);
-                    let $detailsDiv = $storageItemsDiv.find('> .details');
+                    let $detailsDiv = $storageItemsDiv.find('> .storage-details');
                     if (!$detailsDiv.is('[data-item]')){ return; }
                     let itemToken = $detailsDiv.attr('data-item');
                     //console.log('-> itemToken =', itemToken);
@@ -2911,7 +2911,7 @@ class mmrpgWorldMap {
                     let $actionButton = $(this);
                     let actionToken = $actionButton.attr('data-action');
                     //console.log('-> actionToken =', actionToken);
-                    let $detailsDiv = $storageAbilitiesDiv.find('> .details');
+                    let $detailsDiv = $storageAbilitiesDiv.find('> .storage-details');
                     if (!$detailsDiv.is('[data-ability]')){ return; }
                     let abilityToken = $detailsDiv.attr('data-ability');
                     //console.log('-> abilityToken =', abilityToken);
@@ -3048,7 +3048,7 @@ class mmrpgWorldMap {
                 let $storageRobotsDiv = $('.storage-robots', $robotsOverview);
                 let $storageItemsDiv = $('.storage-items', $robotsOverview);
                 let $storageAbilitiesDiv = $('.storage-abilities', $robotsOverview);
-                let $storageDetailsDiv = $('.details', $robotsOverview);
+                let $storageDetailsDiv = $('.storage-details', $robotsOverview);
                 let $teamRobotsInOverview = $('.team-robot[data-robot]:not(.hidden)', $teamRobotsDiv);
                 let $storageRobotsInOverview = $('.team-robot[data-robot]:not(.hidden)', $storageRobotsDiv);
                 let $storageItemsInOverview = $('.team-item[data-item]:not(.hidden)', $storageItemsDiv);
@@ -7860,7 +7860,7 @@ class mmrpgWorldMap {
         let $storageRobotsDiv = $robotsOverview.find('.storage-robots');
         let $selectedStorageRobot = $storageRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
         if (!$selectedStorageRobot || !$selectedStorageRobot.length){ console.warn('addTeamRobot() could not find storage robot div for ' + robotString + '!'); return false; }
-        let $robotDetailsDiv = $robotsOverview.find('.details[data-robot="' + robotString + '"]');
+        let $robotDetailsDiv = $robotsOverview.find('.storage-details[data-robot="' + robotString + '"]');
         let $detailsImage = $robotDetailsDiv.find('.image');
         let $detailsImageSprite = $detailsImage.find('> .sprite.robot');
         // Add the robot to the team view so it's visible to the player
@@ -7974,7 +7974,7 @@ class mmrpgWorldMap {
         let $storageRobotsDiv = $robotsOverview.find('.storage-robots');
         let $selectedStorageRobot = $storageRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
         if (!$selectedStorageRobot || !$selectedStorageRobot.length){ console.warn('removeTeamRobot() could not find storage robot div for ' + robotString + '!'); return false; }
-        let $robotDetailsDiv = $robotsOverview.find('.details[data-robot="' + robotString + '"]');
+        let $robotDetailsDiv = $robotsOverview.find('.storage-details[data-robot="' + robotString + '"]');
         let $detailsImage = $robotDetailsDiv.find('.image');
         let $detailsImageSprite = $detailsImage.find('> .sprite.robot');
         // Remove the robot from the team view as that's not needed anymore
@@ -9524,7 +9524,7 @@ class mmrpgWorldMap {
         let itemDetailsObject = _self.getItemDetailsForOverview(itemToken, targetSelected) || false;
         if (!itemDetailsObject || typeof itemDetailsObject !== 'object'){ console.error('getItemDetailsMarkupForOverview() could not generate details object for token ' + itemToken + '!'); return ''; }
         let itemDetailsMarkup = '';
-        itemDetailsMarkup += '<div class="details" data-item="' + itemToken + '">';
+        itemDetailsMarkup += '<div class="storage-details" data-item="' + itemToken + '">';
             itemDetailsMarkup += '<div class="title">' + itemDetailsObject.title + '</div>';
             itemDetailsMarkup += '<div class="image type ' + itemDetailsObject.typeClasses + '">' + itemDetailsObject.image + '</div>';
             itemDetailsMarkup += '<div class="subtitle">';
@@ -9802,7 +9802,7 @@ class mmrpgWorldMap {
         let abilityDetailsObject = _self.getAbilityDetailsForOverview(abilityToken, targetSelected) || false;
         if (!abilityDetailsObject || typeof abilityDetailsObject !== 'object'){ console.error('getAbilityDetailsMarkupForOverview() could not generate details object for token ' + abilityToken + '!'); return ''; }
         let abilityDetailsMarkup = '';
-        abilityDetailsMarkup += '<div class="details" data-ability="' + abilityToken + '">';
+        abilityDetailsMarkup += '<div class="storage-details" data-ability="' + abilityToken + '">';
             abilityDetailsMarkup += '<div class="title">' + abilityDetailsObject.title + '</div>';
             abilityDetailsMarkup += '<div class="image type ' + abilityDetailsObject.typeClasses + '">' + abilityDetailsObject.image + '</div>';
             abilityDetailsMarkup += '<div class="subtitle">';
@@ -9825,7 +9825,7 @@ class mmrpgWorldMap {
         let robotDetailsObject = _self.getRobotDetailsForOverview(robotToken) || false;
         if (!robotDetailsObject || typeof robotDetailsObject !== 'object'){ console.error('getRobotDetailsMarkupForOverview() could not generate details object for token ' + robotToken + '!'); return ''; }
         let robotDetailsMarkup = '';
-        robotDetailsMarkup += '<div class="details" data-robot="' + robotToken + '">';
+        robotDetailsMarkup += '<div class="storage-details" data-robot="' + robotToken + '">';
             robotDetailsMarkup += '<div class="title">' + robotDetailsObject.title + '</div>';
             robotDetailsMarkup += '<div class="image type ' + robotDetailsObject.typeClasses + '">' + robotDetailsObject.image + '</div>';
             robotDetailsMarkup += '<div class="subtitle">';
@@ -10542,7 +10542,7 @@ class mmrpgWorldMap {
         let updateItemQuantityInStorage = function(itemToken){
             //console.log('%c' + '~mmrpgWorldMap.showActionModal.updateItemQuantityInStorage(itemToken: ' + itemToken + ')', 'color: magenta;');
             let $storageItem = $itemStorageBox.find('.team-item[data-item="' + itemToken + '"]');
-            let $storageItemDetails = $itemStorageBox.find('> .details[data-item="' + itemToken + '"]');
+            let $storageItemDetails = $itemStorageBox.find('> .storage-details[data-item="' + itemToken + '"]');
             let totalItemQuantity = _worldPlayerItems[itemToken] || 0;
             let equippedItemQuantity = _worldPlayerItems[itemToken + '__equipped'] || 0;
             let availableQuantity = totalItemQuantity - equippedItemQuantity;
@@ -10573,7 +10573,7 @@ class mmrpgWorldMap {
             //console.log('--> robotData =', robotData);
             //let $robotOnTeam = $teamRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
             //let $robotInStorage = $robotStorageBox.find('.team-robot[data-robot="' + robotString + '"]');
-            let $robotDetailsDiv = $robotsOverview.find('.details[data-robot="' + robotString + '"]');
+            let $robotDetailsDiv = $robotsOverview.find('.storage-details[data-robot="' + robotString + '"]');
             //console.log('--> $robotOnTeam =', $robotOnTeam.length, $robotOnTeam);
             //console.log('--> $robotInStorage =', $robotInStorage.length, $robotInStorage);
             //console.log('--> $robotDetailsDiv =', $robotDetailsDiv.length, $robotDetailsDiv);
@@ -10618,7 +10618,7 @@ class mmrpgWorldMap {
             //console.log('--> itemToken =', itemToken);
             //console.log('--> itemInfo =', itemInfo);
             let $itemInStorage = $itemStorageBox.find('.team-item[data-item="' + itemToken + '"]');
-            let $itemInStorageDetails = $itemStorageBox.find('> .details[data-item="' + itemToken + '"]');
+            let $itemInStorageDetails = $itemStorageBox.find('> .storage-details[data-item="' + itemToken + '"]');
             // If this is a USE ITEM request, we can apply the item to the selected robot directly
             if (actionToken === 'use-item'){
                 modalDetails.show = false;
