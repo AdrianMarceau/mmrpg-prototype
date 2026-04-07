@@ -1252,6 +1252,32 @@
     pointer-events: none;
 }
 
+/*
+#canvas .event_frame,
+#canvas .event_details {
+    opacity: 0;
+    z-index: 100;
+}
+#canvas .event_frame.animate,
+#canvas .event_details.animate {
+    will-change: opacity;
+    transition: opacity 0.1s;
+}
+#canvas .event_frame.hidden,
+#canvas .event_details.hidden {
+    opacity: 0;
+    z-index: 499;
+}
+#canvas .event_frame.pending {
+    opacity: 0;
+    z-index: 600;
+}
+#canvas .event_frame.current {
+    opacity: 1;
+    z-index: 500;
+}
+*/
+
 :root {
     --camera-shift-transition-duration: 0.250s;
     --camera-shift-transition-timing: ease;

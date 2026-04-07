@@ -1,6 +1,7 @@
 
 // Define global variables
-var $thisPrototype = false;
+let $mmrpgWrapper = false;
+var $thisBattle = false;
 var $rogueStar = false;
 
 // Expand the game settings object with a variable battle specific data
@@ -12,11 +13,19 @@ gameSettings.battleHasStarted = false;
 
 // Create the document ready events
 $(document).ready(function(){
-    $thisPrototype = $('#mmrpg');
-    $thisCanvas = $('#canvas', $thisPrototype);
+    $mmrpgWrapper = $('#mmrpg');
+    $thisBattle = $('#battle', $mmrpgWrapper);
+    $thisCanvas = $('#canvas', $mmrpgWrapper);
 
     // Preload battle related image files
     mmrpg_preload_assets();
+
+    // Make sure we mark the game as loaded when assets are done
+    let wait = new mmrpgWaitForIt();
+    wait.waitFor('foobar', function(){ setTimeout(function(){ wait.doneWaitingFor('foobar'); }, 1000); });
+    wait.waitFor('images', function(){ $mmrpgWrapper.waitForImages(function(){ wait.doneWaitingFor('images'); }); });
+    wait.onWaitComplete(function(){ /*console.log('onWaitComplete() // gameHasLoaded');*/ gameSettings.gameHasLoaded = true; });
+    wait.startWaiting();
 
     // Attempt to define the top frame
     var topFrame = window.top;
@@ -54,6 +63,7 @@ $(document).ready(function(){
             $('#animate').css({opacity:1});
             $('#canvas .canvas_overlay_header').css({opacity:1}).removeClass('canvas_overlay_hidden');
             mmrpg_start_animation();
+            gameSettings.gameHasLoaded = true;
             gameSettings.battleLoaded = true;
             mmrpg_action_trigger('start', false);
             }, false, true);
@@ -78,6 +88,7 @@ $(document).ready(function(){
                             $('#animate').css({opacity:1});
                             $('#canvas .canvas_overlay_header').animate({opacity:1}, Math.ceil(gameSettings.eventTimeout * 2), 'swing', function(){ $(this).removeClass('canvas_overlay_hidden'); });
                             mmrpg_start_animation();
+                            gameSettings.gameHasLoaded = true;
                             gameSettings.battleLoaded = true;
                             mmrpg_action_trigger('start', false);
                             gameSettings.battleHasStarted = true;
@@ -91,7 +102,6 @@ $(document).ready(function(){
     // -- SOUND EFFECT FUNCTIONALITY -- //
 
     // Define some interaction sound effects for the battle menu
-    let $thisBattle = $('#battle');
     let playSoundEffect = function(){};
     let soundEffectFunction = null;
     if (typeof top.mmrpg_play_sound_effect !== 'undefined'){ soundEffectFunction = top.mmrpg_play_sound_effect; }
@@ -263,7 +273,6 @@ $(document).ready(function(){
         //console.log('-> activeInputs:', activeInputs);
         ignoreInputFor();
         // Quickly check to see which menu we're on first
-        let $thisBattle = $('#battle', $thisPrototype);
         let $battleActions = $('#actions', $thisBattle);
         let $currentWrapper = $('.wrapper:visible', $battleActions).first();
         let currentWrapperToken = $currentWrapper.attr('id').replace('actions_', '');
@@ -632,7 +641,7 @@ $(document).ready(function(){
 
 
     // Define the live Rogue Star ticker functionality if present
-    $rogueStar = $('#canvas .rogue_star', $thisPrototype);
+    $rogueStar = $('#canvas .rogue_star', $mmrpgWrapper);
     if ($rogueStar.length){
 
         // Collect the details of this rogue star

@@ -865,7 +865,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             $animation_effects_index = rpg_canvas::get_animation_effects_index();
 
             // Predefine the game speeds index so we can use it later
-            $game_speeds_index = array(
+            /* $game_speeds_index = array(
                 1600 => array('token' => 'super-slow', 'name' => 'Super Slow', 'value' => 1600),
                 1250 => array('token' => 'medium-slow', 'name' => 'Medium Slow', 'value' => 1250),
                 1000 => array('token' => 'normal-slow', 'name' => 'Normal Slow', 'value' => 1000),
@@ -874,6 +874,11 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                 700 => array('token' => 'medium-fast', 'name' => 'Medium Fast', 'value' => 700),
                 600 => array('token' => 'super-fast', 'name' => 'Super Fast', 'value' => 600),
                 250 => array('token' => 'ultra-fast', 'name' => 'Ultra Fast', 'value' => 250)
+                ); */
+            $game_speeds_index = array(
+                900 => array('token' => 'normal', 'name' => 'Slow', 'value' => 900),
+                600 => array('token' => 'super-fast', 'name' => 'Normal', 'value' => 600),
+                300 => array('token' => 'ultra-fast', 'name' => 'Fast', 'value' => 300)
                 );
 
             ?>
@@ -964,7 +969,6 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                         echo('</span></label>');
                     echo('</a>');
 
-
                 }
 
                 // If there were less than eight buttons, we should print spacers
@@ -984,11 +988,14 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
         </div>
         <div id="actions_settings_eventTimeout" class="actions_settings actions_settings_eventTimeout wrapper">
-            <div class="main_actions">
-                <? $block_num = 0;
-                foreach ($game_speeds_index as $value => $speed){ $block_num++; ?>
-                    <a data-order="<?= $block_num ?>" class="button action_setting block_<?= $block_num ?>" type="button" data-action="settings_eventTimeout_<?= $speed['value'] ?>"><label><span class="multi"><?= $speed['name'] ?><br />(1f/<?= $speed['value'] ?>ms)</span></label></a>
-                <? } ?>
+            <div class="main_actions main_actions_hastitle">
+                <span class="main_actions_title">Select Game Speed</span>
+                <?
+                $block_num = 0;
+                foreach ($game_speeds_index as $value => $speed){ $block_num++; ?><a data-order="<?= $block_num ?>" class="button action_setting block_<?= $block_num ?>" type="button" data-action="settings_eventTimeout_<?= $speed['value'] ?>"><label><span class="multi"><?= $speed['name'] ?><br />(1f/<?= $speed['value'] ?>ms)</span></label></a><? }
+                while ($block_num < 4){ $block_num++; echo('<a class="button action_setting button_disabled block_'.$block_num.'" type="button">&nbsp;</a>'); }
+                while ($block_num < 8){ $block_num++; echo('<a class="button action_setting button_disabled block_'.$block_num.'" type="button">&nbsp;</a>'); }
+                ?>
             </div>
             <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="settings_animationEffects"><label>Back</label></a></div>
         </div>

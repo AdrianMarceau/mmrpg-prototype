@@ -931,6 +931,19 @@ function localFunction(myMessage){
     alert(myMessage);
 }
 
+// Define a function for quickly checking if cross-fade is currently enabled by the user
+function mmrpg_cross_fade_enabled(){
+    let eventCrossFadeEnabled = gameSettings.eventCrossFade === true ? true : false;
+    let eventTimeoutAboveThreshold = gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold ? true : false;
+    if (!eventTimeoutAboveThreshold){ eventCrossFadeEnabled = false; }
+    //console.log('gameSettings.eventCrossFade = ', gameSettings.eventCrossFade);
+    //console.log('gameSettings.eventTimeout = ', gameSettings.eventTimeout);
+    //console.log('gameSettings.eventTimeoutThreshold = ', gameSettings.eventTimeoutThreshold);
+    //console.log('eventTimeoutAboveThreshold = ', eventTimeoutAboveThreshold);
+    //console.log('eventCrossFadeEnabled = ', eventCrossFadeEnabled);
+    return eventCrossFadeEnabled;
+}
+
 // Define a function for randomly animating canvas robots (idle animation, background animation, more)
 var backgroundDirection = 'left';
 var canvasAnimationTimeout = false;
@@ -1055,15 +1068,15 @@ function mmrpg_canvas_animate(){
             //var detailsSprite = $('.sprite[data-detailsid='+spriteID+']', gameCanvas);
             //var mugshotSprite = $('.sprite[data-mugshotid='+spriteID+']', gameCanvas);
             //alert('Shadowsprite '+(shadowSprite.length ? 'exists' : 'does not exist')+'!');
-            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
-                //console.log('normal animation');
+            if (mmrpg_cross_fade_enabled()){
+                console.log('normal animation');
                 // We're at a normal speed, so we can animate normally
                 thisSprite.stop(true, true).animate({opacity:0},Math.ceil(gameSettings.eventTimeout / 2),'linear',function(){
                     $(this).remove();
                     if (shadowSprite.length){ shadowSprite.stop(true, true).animate({opacity:0},Math.ceil(gameSettings.eventTimeout / 2),'linear',function(){ $(this).remove(); }); }
                     });
                 } else {
-                //console.log('speedy animation');
+                console.log('speedy animation');
                 // We're at a super-fast speed, so we should NOT cross-fade
                 thisSprite.stop(true, true).remove();
                 if (shadowSprite.length){ shadowSprite.stop(true, true).remove(); }
@@ -1072,7 +1085,6 @@ function mmrpg_canvas_animate(){
         }
 
         });
-
 
     // Loop through all players on the field
     $('.sprite[data-type="player"]', gameCanvas).each(function(){
@@ -1286,7 +1298,7 @@ function mmrpg_canvas_field_frame(thisField, newFrame){
     var currentClass = fieldLayer+'_'+thisFrame;
     var newClass = fieldLayer+'_'+newFrame;
     // Check to make sure event crossfade is enabled
-    if (gameSettings.eventCrossFade == true){
+    if (mmrpg_cross_fade_enabled()){
         // Create a clone object with the new class and crossfade it into view
         var cloneField = thisField.clone().css('z-index', '10').appendTo(thisField.parent());
         thisField.stop(true, true).css({opacity:0}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
@@ -1331,7 +1343,7 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
     // Stop this robot from animating further
     thisRobot.stop(true, true);
     // Check to make sure event crossfade is enabled
-    if (gameSettings.eventCrossFade == true){
+    if (mmrpg_cross_fade_enabled()){
         // Create a clone object with the new class and crossfade it into view
         var cloneRobot = thisRobot.clone().css('z-index', '-=1').appendTo(thisRobot.parent());
         thisRobot.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
@@ -1359,8 +1371,6 @@ function mmrpg_canvas_robot_frame(thisRobot, newFrame){
     // Return true on success
     return true;
 }
-// DEBUG
-//function mmrpg_canvas_robot_frame_
 
 // Define a function for updating a player's frame with animation
 spriteFrameIndex.players = ['base','taunt','victory','defeat','command','damage','base2'];
@@ -1385,7 +1395,7 @@ function mmrpg_canvas_player_frame(thisPlayer, newFrame, extraStyles){
     var backgroundOffset = -1 * Math.ceil(newFramePosition * thisSize);
     //if (backgroundOffset > 0){ alert('newFrame : '+newFrame+', newFramePosition : '+newFramePosition+', backgroundOffset : '+backgroundOffset+''); }
     // Check to make sure event crossfade is enabled
-    if (gameSettings.eventCrossFade == true){
+    if (mmrpg_cross_fade_enabled()){
         // Create a clone object with the new class and crossfade it into view
         var clonePlayer = thisPlayer.clone().css('z-index', '-=1').appendTo(thisPlayer.parent());
         thisPlayer.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
@@ -1461,22 +1471,15 @@ function mmrpg_canvas_attachment_frame(thisAttachment, newFrame){
     if (thisFrame != newFrame || thisAnimateFrameShift){
         //console.log('checkpoint3');
         // Check to make sure event crossfade is enabled
-        if ((thisPosition != 'background' && thisPosition != 'foreground') && gameSettings.eventCrossFade == true){
+        if ((thisPosition !== 'background' && thisPosition !== 'foreground') && mmrpg_cross_fade_enabled()){
             // Create a clone object with the new class and crossfade it into view
             var cloneAttachment = thisAttachment.clone().css('z-index', '-=1').appendTo(thisAttachment.parent());
             thisAttachment.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).attr('data-animate-index', newIndex).removeClass(currentClass).addClass(newClass);
             // If the frame's offsets have changed, update the css offsets
             if (thisAnimateFrameShift){ thisAttachment.stop(true, true).css(thisFloat, newFrameShiftX).css('bottom', newFrameShiftY); }
             // Fade this attachment back into view and fade the cloned attachment in the old frame out
-            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
-                // We're at a normal speed, so we can animate normally
-                thisAttachment.stop(true, true).animate({opacity:1}, {duration:Math.ceil(gameSettings.eventTimeout / 2),easing:'swing',queue:false});
-                cloneAttachment.stop(true, true).animate({opacity:0}, {duration:Math.ceil(gameSettings.eventTimeout / 2),easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
-                } else {
-                // We're at a super-fast speed, so we should NOT cross-fade
-                thisAttachment.stop(true, true).css({opacity:1});
-                cloneAttachment.stop(true, true).remove();
-                }
+            thisAttachment.stop(true, true).animate({opacity:1}, {duration:Math.ceil(gameSettings.eventTimeout / 2),easing:'swing',queue:false});
+            cloneAttachment.stop(true, true).animate({opacity:0}, {duration:Math.ceil(gameSettings.eventTimeout / 2),easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
             } else {
             // If the frame's offsets have changed, update the css offsets
             if (thisAnimateFrameShift){ thisAttachment.stop(true, true).css(thisFloat, newFrameShiftX).css('bottom', newFrameShiftY); }
@@ -2149,58 +2152,34 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
             //let eventCrossFade = Math.ceil(gameSettings.eventTimeout / 2);
             let eventCrossFadeOutDuration = 100;
             let eventCrossFadeInDuration = 50;
-            let eventTimeout = gameSettings.eventTimeout;
-            let eventTimeoutThreshold = gameSettings.eventTimeoutThreshold;
-            let eventTimeoutAboveThreshold = eventTimeout > eventTimeoutThreshold ? true : false;
-            if (gameSettings.eventCrossFade === true){
-
+            if (mmrpg_cross_fade_enabled()){
                 // Animate a fade out of the other events
                 $otherEvents.css({zIndex:499}).removeClass('current');
-                if (eventTimeoutAboveThreshold){
-                    // We're at a normal speed, so we can animate normally
-                    $otherEvents.animate({opacity:0},{
-                        duration: eventCrossFadeOutDuration,
-                        easing: 'linear',
-                        queue: false
-                        });
-                    } else {
-                    // We're at a super-fast speed, so we should NOT cross-fade
-                    $otherEvents.css({opacity:0});
-                    }
-
+                $otherEvents.animate({opacity:0},{
+                    duration: eventCrossFadeOutDuration,
+                    easing: 'linear',
+                    queue: false
+                    });
                 // Animate a fade in, and the remove the old images
-                if (eventTimeoutAboveThreshold){
-                    // We're at a normal speed, so we can animate normally
-                    $thisEvent.animate({opacity:1.0}, {
-                        duration: eventCrossFadeInDuration,
-                        easing: 'linear',
-                        complete: function(){
-                            $('.details:not(.hidden)', thisContext).remove();
-                            $('.details', thisContext).css({opacity:1}).removeClass('hidden');
-                            $otherEvents.remove();
-                            $thisEvent.css({zIndex:500});
-                            },
-                        queue: false
-                        });
-                    } else {
-                    // We're at a super-fast speed, so we should NOT cross-fade
-                    $thisEvent.css({opacity:1.0});
-                    $('.details:not(.hidden)', thisContext).remove();
-                    $('.details', thisContext).css({opacity:1}).removeClass('hidden');
-                    $otherEvents.remove();
-                    $thisEvent.css({zIndex:500});
-                    }
-
-            }
+                $thisEvent.animate({opacity:1.0}, {
+                    duration: eventCrossFadeInDuration,
+                    easing: 'linear',
+                    complete: function(){
+                        $('.details:not(.hidden)', thisContext).remove();
+                        $('.details', thisContext).css({opacity:1}).removeClass('hidden');
+                        $otherEvents.remove();
+                        $thisEvent.css({zIndex:500});
+                        },
+                    queue: false
+                    });
+                }
             else {
-
                     // Make sure the new event is visible then remove the old ones
                     $thisEvent.css({opacity:1.0,zIndex:500});
                     $otherEvents.css({opacity:0,zIndex:499});
                     $('.details:not(.hidden)', thisContext).remove();
                     $('.details', thisContext).css({opacity:1}).removeClass('hidden');
                     $otherEvents.remove();
-
             }
 
             // Loop through all field layers on the canvas and trigger animations
@@ -2352,13 +2331,13 @@ function mmrpg_console_event(thisMarkup, eventFlags){ //, flagsMarkup
         thisContext.prepend(thisMarkup);
         gameConsole.find('.wrapper').scrollTop(0);
         $('.event:first-child', thisContext).css({top:-100});
-            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
-                // We're at a normal speed, so we can animate normally
-                $('.event:first-child', thisContext).animate({top:0}, 400, 'swing');
-                } else {
-                // We're at a super-fast speed, so we should NOT cross-fade
-                $('.event:first-child', thisContext).css({top:0});
-                }
+        if (mmrpg_cross_fade_enabled()){
+            // We're at a normal speed, so we can animate normally
+            $('.event:first-child', thisContext).animate({top:0}, 400, 'swing');
+            } else {
+            // We're at a super-fast speed, so we should NOT cross-fade
+            $('.event:first-child', thisContext).css({top:0});
+            }
         // Hide any leftover boxes from previous events over the limit
         $('.event:gt(50)', thisContext).appendTo('#event_console_backup');
         // Remove any leftover boxes from previous events
@@ -2836,13 +2815,13 @@ function mmrpg_music_context(newContext){
 gameSettings.soundEffectSources = [];
 gameSettings.soundEffectSprites = {};
 gameSettings.soundEffectPool = [];
-gameSettings.soundEffectPoolKey = -1;
+gameSettings.soundEffectPoolKey = 0; // -1;
 gameSettings.soundEffectPoolLimit = 10;
 // Define a list of sound effect aliases we can use in the code to abstract a bit
 gameSettings.customIndex.soundsIndex = {};
 gameSettings.customIndex.soundsAliasesIndex = {};
 // Define a function to play sound effects during game runtime
-function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
+async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     if (typeof effectConfig !== 'object'){ effectConfig = {}; }
     if (typeof isMenuSound !== 'boolean'){ isMenuSound = true; }
     //console.log('%cmmrpg_play_sound_effect', 'color: cyan;', '(effectName:', effectName, 'effectConfig:', typeof effectConfig, effectConfig, 'isMenuSound:', isMenuSound, ')');
@@ -2851,8 +2830,9 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     //console.log('gameSettings.soundEffectSprites =', Object.keys(gameSettings.soundEffectSprites).length, gameSettings.soundEffectSprites);
 
     // If the game hasn't loaded we shoudln't be playing anything
-    let somethingHasLoaded = gameSettings.indexLoaded  || gameSettings.worldLoaded || gameSettings.battleLoaded ? true : false;
-    if (!somethingHasLoaded){ console.warn('aaa'); return false; }
+    //let somethingHasLoaded = gameSettings.indexLoaded  || gameSettings.worldLoaded || gameSettings.battleLoaded ? true : false;
+    //if (!somethingHasLoaded){ console.warn('aaa'); return false; }
+    if (!gameSettings.gameHasLoaded){ console.warn('aaa'); return false; }
     if (gameSettings.enableSoundEffects === false){ console.warn('bbb'); return false; }
     if (gameSettings.indexLoaded){
         if (!mmrpgMusicSound.playing()){ console.warn('ccc'); return false; }
@@ -2865,54 +2845,6 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
 
     // Otherwise, define a base volume for these sound effects to use
     var baseEffectVolume = gameSettings.effectVolume * gameSettings.masterVolume;
-
-    // Collect this effect's volume, rate factor, and loop boolean for use
-    var effectVolume = baseEffectVolume;
-    var effectRate = 1;
-    var effectLoop = false;
-    if (isMenuSound === true){ effectVolume *= gameSettings.menuEffectVolume; }
-    if (typeof effectConfig.volume === 'number'){ effectVolume *= effectConfig.volume; }
-    if (typeof effectConfig.rate === 'number'){ effectRate = effectConfig.rate; }
-    if (typeof effectConfig.loop === 'boolean'){ effectLoop = effectConfig.loop; }
-    if (!gameSettings.effectVolumeEnabled){ effectVolume = 0; }
-    if (effectVolume < 0){ effectVolume = 0; }
-    if (effectVolume > 1){ effectVolume = 1; }
-    effectVolume = (Math.round(effectVolume * 1000) / 1000);
-    //console.log('mmrpg_play_sound_effect // effectName:', effectName, 'effectVolume:', effectVolume, 'effectRate:', effectRate, 'effectLoop:', effectLoop);
-
-    // Get the next sound object from the pool
-    let sound;
-    gameSettings.soundEffectPoolKey++;
-    if (gameSettings.soundEffectPoolKey >= gameSettings.soundEffectPoolLimit){ gameSettings.soundEffectPoolKey = 0; }
-    var soundEffectPoolKey = gameSettings.soundEffectPoolKey;
-    if (typeof gameSettings.soundEffectPool[soundEffectPoolKey] === 'undefined'
-        || typeof gameSettings.soundEffectPool[soundEffectPoolKey].sound === 'undefined'){
-
-        // We must create a new sound object before we can use it
-        sound = new Howl({
-            src: gameSettings.soundEffectSources,
-            sprite: gameSettings.soundEffectSprites,
-            autoplay: false,
-            volume: effectVolume,
-            rate: effectRate,
-            loop: effectLoop,
-            pool: 8
-            });
-        gameSettings.soundEffectPool[soundEffectPoolKey] = {
-            key: soundEffectPoolKey,
-            name: effectName,
-            sound: sound,
-            time: Date.now()
-            };
-
-        } else {
-
-        // We can pull an existing sound object to use from the pool
-        var effect = gameSettings.soundEffectPool[soundEffectPoolKey];
-        sound = effect.sound;
-        effect.time = Date.now();
-
-        }
 
     // Replace the effect name if we're using an alias at the moment
     // TODO:  Make sure this effectName actually exists in the index of sound effect sprites
@@ -2931,6 +2863,53 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
         return false;
         }
 
+    // Collect this effect's volume, rate factor, and loop boolean for use
+    var effectVolume = baseEffectVolume;
+    var effectRate = 1.0;
+    var effectLoop = false;
+    if (isMenuSound === true){ effectVolume *= gameSettings.menuEffectVolume; }
+    if (typeof effectConfig.volume === 'number'){ effectVolume *= effectConfig.volume; }
+    if (typeof effectConfig.rate === 'number'){ effectRate = effectConfig.rate; }
+    if (typeof effectConfig.loop === 'boolean'){ effectLoop = effectConfig.loop; }
+    if (!gameSettings.effectVolumeEnabled){ effectVolume = 0; }
+    if (effectVolume < 0){ effectVolume = 0; }
+    if (effectVolume > 1){ effectVolume = 1; }
+    effectVolume = (Math.round(effectVolume * 1000) / 1000);
+    //console.log('mmrpg_play_sound_effect // effectName:', effectName, 'effectVolume:', effectVolume, 'effectRate:', effectRate, 'effectLoop:', effectLoop);
+
+    // Get the next sound object from the pool
+    let sound;
+    //gameSettings.soundEffectPoolKey++;
+    //if (gameSettings.soundEffectPoolKey >= gameSettings.soundEffectPoolLimit){ gameSettings.soundEffectPoolKey = 0; }
+    var soundEffectPoolKey = gameSettings.soundEffectPoolKey;
+    if (typeof gameSettings.soundEffectPool[soundEffectPoolKey] === 'undefined'
+        || typeof gameSettings.soundEffectPool[soundEffectPoolKey].sound === 'undefined'){
+
+        // We must create a new sound object before we can use it
+        sound = new Howl({
+            src: gameSettings.soundEffectSources,
+            sprite: gameSettings.soundEffectSprites,
+            pool: gameSettings.soundEffectPoolLimit,
+            autoplay: false,
+            volume: 1.0,
+            rate: 1.0,
+            loop: false,
+            html5: true,
+            html5PoolSize: 3,
+            });
+        gameSettings.soundEffectPool[soundEffectPoolKey] = {
+            key: soundEffectPoolKey,
+            name: effectName,
+            sound: sound,
+            time: Date.now()
+            };
+
+        }
+
+    // We can pull an existing sound object to use from the pool
+    var effect = gameSettings.soundEffectPool[soundEffectPoolKey];
+    effect.time = Date.now();
+    sound = effect.sound;
     //console.log('sound =', sound);
     //console.log('sound._volume', sound._volume);
     //console.log('sound.volume() =', sound.volume());
@@ -2941,29 +2920,41 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
 
     // Play the sound when ready using a function that checks load status
     var playSoundWhenReady = function(effectName){
-        if (sound.state() !== 'loaded'){
-            sound.once('play', function(){
-                //console.log('sound on play w/ effectVolume:', effectVolume);
-                this.volume(effectVolume);
-                this.rate(effectRate);
-                this.loop(effectLoop);
-                });
-            sound.once('load', function(){
-                //console.log('sound on loaded w/ effectVolume:', effectVolume);
-                this.stop();
-                this.volume(effectVolume);
-                this.play(effectName);
-                });
-            } else {
-            //console.log('sound immediate invoke w/ effectVolume:', effectVolume);
+        let playSound = function(sound){
             sound.stop();
+            //console.log('set rate to ', effectRate);
+            sound.rate(effectRate, effect.id);
             sound.volume(effectVolume);
             sound.play(effectName);
+            };
+        if (sound.state() !== 'loaded'){
+            /* sound.once('play', function(){
+                //console.log('sound on play w/ effectVolume:', effectVolume, '&& effectRate:', effectRate);
+                this.rate(effectRate);
+                this.volume(effectVolume);
+                this.loop(effectLoop);
+                }); */
+            sound.once('load', function(){
+                //console.log('sound on loaded w/ effectVolume:', effectVolume, '&& effectRate:', effectRate);
+                playSound(sound);
+                //this.stop();
+                //this.rate(effectRate);
+                //this.volume(effectVolume);
+                //this.play(effectName);
+                });
+            } else {
+            //console.log('sound immediate invoke w/ effectVolume:', effectVolume, '&& effectRate:', effectRate);
+            playSound(sound);
+            //sound.stop();
+            //sound.rate(effectRate);
+            //sound.volume(effectVolume);
+            //sound.play(effectName);
             }
         return true;
         };
     playSoundWhenReady(effectName);
 
+    /*
     // Now that the sound is actually playing we can do cleanup
     // If the sound effect pool is full, we need to remove the oldest sound
     var effectPoolSizeCurrent = Object.keys(gameSettings.soundEffectPool).length;
@@ -2984,6 +2975,7 @@ function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             delete gameSettings.soundEffectPool[oldestSound.name];
             }
         }
+    */
 
     // Return now that we're done
     return true;
@@ -3444,18 +3436,18 @@ let mmrpgWaitForIt = function(){
     let _self = this;
     let waitingFor, waitFor, onWaitComplete, doneWaitingFor, checkWaitComplete, startWaiting;
     waitingFor = {};
-    waitFor = function(name, callback){ console.log('waitFor(', name, ', callback)'); waitingFor[name] = callback; };
-    onWaitComplete = function(callback){ console.log('onWaitComplete(callback)'); onWaitCompleteCallback = callback; };
-    doneWaitingFor = function(name){ console.log('doneWaitingFor(', name, ')'); delete waitingFor[name]; checkWaitComplete(); };
-    checkWaitComplete = function(){ console.log('checkWaitComplete()'); if (Object.keys(waitingFor).length < 1){ onWaitCompleteCallback(); } };
+    waitFor = function(name, callback){ /*console.log('waitFor(', name, ', callback)');*/ waitingFor[name] = callback; };
+    onWaitComplete = function(callback){ /*console.log('onWaitComplete(callback)');*/ onWaitCompleteCallback = callback; };
+    doneWaitingFor = function(name){ /*console.log('doneWaitingFor(', name, ')');*/ delete waitingFor[name]; checkWaitComplete(); };
+    checkWaitComplete = function(){ /*console.log('checkWaitComplete()');*/ if (Object.keys(waitingFor).length < 1){ onWaitCompleteCallback(); } };
     startWaiting = function(){
-        console.log('startWaiting()');
+        //console.log('startWaiting()');
         let waitingForKeys = Object.keys(waitingFor);
-        console.log('waitingForKeys =', waitingForKeys);
+        //console.log('waitingForKeys =', waitingForKeys);
         if (waitingForKeys.length < 1){ return false; }
         for (var i = 0; i < waitingForKeys.length; i++){
             let key = waitingForKeys[i], callback = waitingFor[key];
-            console.log('running callback for key ', key);
+            //console.log('running callback for key ', key);
             callback.call(_self);
             }
         };
