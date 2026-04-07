@@ -2144,53 +2144,62 @@ function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
             }
 
             // If we're allowed to cross-fade transition the normal way, otherwise straight-up replace the event
+            let $thisEvent = $(this);
+            let $otherEvents = $('.event:not(.sticky):gt(0)', thisContext);
+            //let eventCrossFade = Math.ceil(gameSettings.eventTimeout / 2);
+            let eventCrossFadeOutDuration = 100;
+            let eventCrossFadeInDuration = 50;
+            let eventTimeout = gameSettings.eventTimeout;
+            let eventTimeoutThreshold = gameSettings.eventTimeoutThreshold;
+            let eventTimeoutAboveThreshold = eventTimeout > eventTimeoutThreshold ? true : false;
             if (gameSettings.eventCrossFade === true){
 
                 // Animate a fade out of the other events
-                if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
+                $otherEvents.css({zIndex:499}).removeClass('current');
+                if (eventTimeoutAboveThreshold){
                     // We're at a normal speed, so we can animate normally
-                    $('.event:not(.sticky):gt(0)', thisContext).animate({opacity:0},{
-                        duration: Math.ceil(gameSettings.eventTimeout / 2),
+                    $otherEvents.animate({opacity:0},{
+                        duration: eventCrossFadeOutDuration,
                         easing: 'linear',
                         queue: false
                         });
                     } else {
                     // We're at a super-fast speed, so we should NOT cross-fade
-                    $('.event:not(.sticky):gt(0)', thisContext).css({opacity:0});
+                    $otherEvents.css({opacity:0});
                     }
 
                 // Animate a fade in, and the remove the old images
-                if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
+                if (eventTimeoutAboveThreshold){
                     // We're at a normal speed, so we can animate normally
-                    $(this).animate({opacity:1.0}, {
-                        duration: Math.ceil(gameSettings.eventTimeout / 2),
+                    $thisEvent.animate({opacity:1.0}, {
+                        duration: eventCrossFadeInDuration,
                         easing: 'linear',
                         complete: function(){
                             $('.details:not(.hidden)', thisContext).remove();
                             $('.details', thisContext).css({opacity:1}).removeClass('hidden');
-                            $('.event:not(.sticky):gt(0)', thisContext).remove();
-                            $(this).css({zIndex:500});
+                            $otherEvents.remove();
+                            $thisEvent.css({zIndex:500});
                             },
                         queue: false
                         });
                     } else {
                     // We're at a super-fast speed, so we should NOT cross-fade
-                    $(this).css({opacity:1.0});
+                    $thisEvent.css({opacity:1.0});
                     $('.details:not(.hidden)', thisContext).remove();
                     $('.details', thisContext).css({opacity:1}).removeClass('hidden');
-                    $('.event:not(.sticky):gt(0)', thisContext).remove();
-                    $(this).css({zIndex:500});
+                    $otherEvents.remove();
+                    $thisEvent.css({zIndex:500});
                     }
 
             }
             else {
 
                     // Make sure the new event is visible then remove the old ones
-                    $(this).css({opacity:1.0,zIndex:500});
-                    $('.event:not(.sticky):gt(0)', thisContext).css({opacity:0});
+                    $thisEvent.css({opacity:1.0,zIndex:500});
+                    $otherEvents.css({opacity:0,zIndex:499});
                     $('.details:not(.hidden)', thisContext).remove();
                     $('.details', thisContext).css({opacity:1}).removeClass('hidden');
-                    $('.event:not(.sticky):gt(0)', thisContext).remove();
+                    $otherEvents.remove();
 
             }
 
@@ -2321,9 +2330,11 @@ function updateCameraShiftTransitionDuration(newValue){
         //console.log('transitionDurationValue(', modValue, ')');
         if (typeof modValue !== 'number'){ modValue = 1; }
         var duration = Math.ceil(gameSettings.eventTimeout * modValue);
-        if (!gameSettings.eventCrossFade){ duration = 0; }
-        else if (!gameSettings.eventCameraShift){ duration = 0; }
-        else if (gameSettings.eventTimeout <= gameSettings.eventTimeoutThreshold){ duration = 0; }
+        //if (!gameSettings.eventCrossFade){ duration = 0; }
+        //else if (!gameSettings.eventCameraShift){ duration = 0; }
+        //else if (gameSettings.eventTimeout <= gameSettings.eventTimeoutThreshold){ duration = 0; }
+        if (!gameSettings.eventCameraShift){ duration = 0; }
+        if (gameSettings.eventTimeout <= gameSettings.eventTimeoutThreshold){ duration = gameSettings.eventTimeoutThreshold; }
         var cssValue = duration > 0 ? (duration / 1000)+'s' : 'none';
         //console.log('duration:', duration, 'cssValue:', cssValue);
         return cssValue;
