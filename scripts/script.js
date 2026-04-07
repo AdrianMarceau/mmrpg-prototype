@@ -29,6 +29,7 @@ gameSettings.eventCrossFade = true; // whether or not to canvas events have cros
 gameSettings.eventCameraShift = true; // whether or not to canvas events have camera shifts
 gameSettings.eventSoundEffects = true; // whether or not to use sound effects for battle events
 gameSettings.eventHooks = []; // default to empty but may be filled at runtime and used later
+gameSettings.gameHasLoaded = false; // default to false so we can only set to true when ready
 gameSettings.gameHasStarted = false; // default to false so we can only set to true when ready
 gameSettings.idleAnimation = true; // default to allow idle animations
 gameSettings.indexLoaded = false; // default to false until the index is loaded
@@ -3234,6 +3235,7 @@ function mmrpg_toggle_index_loaded(toggleValue){
                 //$('iframe', gameWindow).css({opacity:0}).removeClass('loading').animate({opacity:1}, 1000, 'swing'); // DEBUG
                 // Set the toggle loader flag to true
                 gameSettings.indexLoaded = true;
+                gameSettings.gameHasLoaded = true;
                 });
             });
         }
@@ -3425,6 +3427,29 @@ function mmrpg_align_element_to_target($element, targetX, targetY){
     $element.css({left:newPosLeft, top:newPosTop, right:newPosRight, bottom:newPosBottom});
     return true;
 }
+
+// Define a reusable wait-for method and its sister functions
+let mmrpgWaitForIt = function(){
+    let _self = this;
+    let waitingFor, waitFor, onWaitComplete, doneWaitingFor, checkWaitComplete, startWaiting;
+    waitingFor = {};
+    waitFor = function(name, callback){ console.log('waitFor(', name, ', callback)'); waitingFor[name] = callback; };
+    onWaitComplete = function(callback){ console.log('onWaitComplete(callback)'); onWaitCompleteCallback = callback; };
+    doneWaitingFor = function(name){ console.log('doneWaitingFor(', name, ')'); delete waitingFor[name]; checkWaitComplete(); };
+    checkWaitComplete = function(){ console.log('checkWaitComplete()'); if (Object.keys(waitingFor).length < 1){ onWaitCompleteCallback(); } };
+    startWaiting = function(){
+        console.log('startWaiting()');
+        let waitingForKeys = Object.keys(waitingFor);
+        console.log('waitingForKeys =', waitingForKeys);
+        if (waitingForKeys.length < 1){ return false; }
+        for (var i = 0; i < waitingForKeys.length; i++){
+            let key = waitingForKeys[i], callback = waitingFor[key];
+            console.log('running callback for key ', key);
+            callback.call(_self);
+            }
+        };
+    return {waitFor, onWaitComplete, doneWaitingFor, startWaiting};
+    };
 
 // Define a reusable object for watching user input and storing it button abstractions we can work with elsewhere
 class mmrpgUserInputWatcher {
@@ -3729,7 +3754,6 @@ class mmrpgUserInputWatcher {
 
     }
 }
-
 
 /**
  * Function : dump()
