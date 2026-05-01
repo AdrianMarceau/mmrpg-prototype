@@ -1341,19 +1341,12 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
 
         </div>
     </div>
-    <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-    <script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
-    <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-    <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.prototype.php'); ?>
     <script type="text/javascript" src="scripts/settings.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-    <script type="text/javascript">
-    // Update game settings for this page
-    <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-    gameSettings.autoScrollTop = false;
-    </script>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
     <script type="text/javascript">
     // Print out profile settings in case we need to update parent frame
-    var profileSettings = <?= json_encode(array(
+    let profileSettings = <?= json_encode(array(
         'user_name_display' => (!empty($current_user_info['user_name_public']) ? $current_user_info['user_name_public'] : $current_user_info['user_name']),
         'user_image_path' => $current_user_info['user_image_path'],
         'user_background_path' => $current_user_info['user_background_path'],

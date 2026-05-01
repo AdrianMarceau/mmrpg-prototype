@@ -332,7 +332,7 @@ if (true){
             <span class="count">
                 <i class="fa fas fa-shopping-cart"></i>
                 Item Shop
-                <span class="progress">(<span id="zenny_counter"><?= number_format($global_zenny_counter, 0, '.', ',') ?></span> Zenny)</span>
+                <span class="progress"><span id="zenny_counter"><?= number_format($global_zenny_counter, 0, '.', ',') ?></span></span>
             </span>
         </span>
 
@@ -397,18 +397,12 @@ if (true){
             <?= $this_shop_markup ?>
         </div>
     </div>
-<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-<script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.prototype.php'); ?>
 <script type="text/javascript" src="scripts/shop.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <script type="text/javascript">
-
 // Update game settings for this page
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-gameSettings.autoScrollTop = false;
 gameSettings.allowShopping = true;
-
 // Update the player and player count by counting elements
 thisShopData.unlockedPlayers = <?= json_encode(array_keys($_SESSION[$session_token]['values']['battle_rewards'])) ?>;
 thisShopData.zennyCounter = <?= $global_zenny_counter ?>;
@@ -417,11 +411,9 @@ thisShopData.itemQuantities = <?= json_encode($global_item_quantities) ?>;
 <?= isset($_SESSION['GAME']['battle_settings']['last_shop_token'])
     ? "thisShopData.lastShopToken = '{$_SESSION['GAME']['battle_settings']['last_shop_token']}';".PHP_EOL
     : '' ?>
-
 // Define the global arrays to hold the shop console and canvas markup
 var shopCanvasMarkup = '<?= str_replace("'", "\'", $shop_canvas_markup) ?>';
 var shopConsoleMarkup = '<?= str_replace("'", "\'", $shop_console_markup) ?>';
-
 </script>
 <?
 

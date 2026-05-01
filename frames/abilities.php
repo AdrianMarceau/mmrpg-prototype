@@ -351,16 +351,10 @@ if (true){
             <?= $this_ability_markup ?>
         </div>
     </div>
-    <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-    <script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
-    <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-    <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.prototype.php'); ?>
     <script type="text/javascript" src="scripts/abilities.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
     <script type="text/javascript">
-    // Update game settings for this page
-    <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-    gameSettings.autoScrollTop = false;
-    gameSettings.allowShopping = true;
     // Define the global arrays to hold the ability console markup
     var abilityConsoleMarkup = '<?= str_replace("'", "\'", $ability_console_markup) ?>';
     </script>
