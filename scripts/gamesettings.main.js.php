@@ -1,7 +1,18 @@
 <?
 
-// Require the top file if not already
-if (!defined('MMRPG_CONFIG_ROOTURL')){ require_once('../top.php'); }
+// Require the top file if not already included
+require_once(dirname(dirname(__FILE__)).'/top.php');
+
+// If the return value was set explicitly as javascript, update headers
+$return_type = !empty($_REQUEST['return']) && is_string($_REQUEST['return']) ? $_REQUEST['return'] : 'default';
+if ($return_type === 'javascript'){
+    // Explicitly set the content type as javascript
+    header('Content-type: text/javascript;');
+    // Ensure this settings file is never cached as it changes
+    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+    header("Cache-Control: post-check=0, pre-check=0", false);
+    header("Pragma: no-cache");
+}
 
 // Print out common game settings (the script wrappers are assumed there already)
 echo('gameSettings.baseHref = "'.MMRPG_CONFIG_ROOTURL.'";'.PHP_EOL);
