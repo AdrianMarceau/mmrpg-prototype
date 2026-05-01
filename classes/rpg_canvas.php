@@ -462,6 +462,7 @@ class rpg_canvas {
                 $temp_rotate_amount = $this_data['canvas_offset_rotate'];
                 if ($this_data['robot_direction'] == 'right'){ $temp_rotate_amount = $temp_rotate_amount * -1; }
                 self::update_or_append_css_transform($this_data['robot_markup_style'], 'rotate('.$temp_rotate_amount.'deg)');
+                $this_data['robot_markup_style'] .= '--sprite-rotate-amount: '.$temp_rotate_amount.'deg; ';;
             }
 
             // Check if this robot has any camera action and collect the styles if so
@@ -536,7 +537,7 @@ class rpg_canvas {
 
             // Display this ROBOT SPRITE for the battle canvas
             echo '<div '.
-                'data-robotid="'.$this_data['robot_id'].'" '.
+                'data-robot-id="'.$this_data['robot_id'].'" '.
                 'class="'.$this_data['robot_markup_class'].'" '.
                 'style="'.$this_data['robot_markup_style'].'" '.
                 'data-key="'.$this_data['robot_key'].'" '.
@@ -556,7 +557,7 @@ class rpg_canvas {
                     $overlay_offset_z = $this_data['canvas_offset_z'] + 2;
                     $overlay_styles = ' z-index: '.$overlay_offset_z.'; ';
                     echo '<div '.
-                        'data-overlayid="'.$this_data['robot_id'].'" '.
+                        'data-overlay-id="'.$this_data['robot_id'].'" '.
                         'class="'.str_replace($this_data['robot_token'], $overlay_token, $this_data['robot_markup_class']).'" '.
                         'style="'.str_replace('robots/'.$this_data['robot_image'], 'robots/'.$overlay_token, $this_data['robot_markup_style']).$overlay_styles.'" '.
                         'data-key="'.$this_data['robot_key'].'" '.
@@ -2995,10 +2996,13 @@ class rpg_canvas {
             }
         }
 
+        // Check to see if this markup contains anything that should trigger a scene effect
+        $this_scene_classes = '';
+
         // Put everything together into the final markup
         $final_markup = '';
         if (!empty($this_underlay_markup)){ $final_markup .= '<div class="battle_overlay under">'.$this_underlay_markup.'</div>'; }
-        $final_markup .= '<div class="battle_scene">'.$this_markup.'</div>';
+        $final_markup .= '<div class="battle_scene'.(!empty($this_scene_classes) ? ' '.trim($this_scene_classes) : '').'">'.$this_markup.'</div>';
         if (!empty($this_overlay_markup)){ $final_markup .= '<div class="battle_overlay over">'.$this_overlay_markup.'</div>'; }
 
         // Return the final markup with everything together
@@ -3064,7 +3068,7 @@ class rpg_canvas {
 
         // Generate the markup
         echo '<div '.
-            'data-shadowid="'.$object_data[$object_kind.'_id'].'" '.
+            'data-shadow-id="'.$object_data[$object_kind.'_id'].'" '.
             'class="'.$shadow_class.'" '.
             'style="'.$shadow_styles.'" '.
             'data-key="'.(isset($object_data[$object_kind.'_key']) ? $object_data[$object_kind.'_key'] : 0).'" '.
