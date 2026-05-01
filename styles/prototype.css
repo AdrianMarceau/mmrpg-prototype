@@ -14,8 +14,6 @@ body.prototype {
     transition: background 0.3s, padding 0.3s, min-height 0.3s;
 }
 
-
-
 /* GLOBAL PROTOTYPE STYLES */
 
 #mmrpg .ability_damage,
@@ -1589,15 +1587,36 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     -webkit-border-radius: 0;
     text-align: center;
     background-color: #2a2a2a;
+    overflow: visible;
 }
 #prototype .banner .options_fullmenu .link,
 #prototype .banner .options_fullmenu .pipe {
-    display: inline-block;
     float: none;
+    display: inline-block;
     position: relative;
+    top: -4px;
 }
 #prototype .banner .options_fullmenu .link {
     z-index: 2;
+    top: -3px;
+    padding: 3px;
+    transition: top 0.3s;
+    font-size: 9px;
+    text-transform: uppercase;
+}
+#prototype .banner .options_fullmenu .link:hover,
+#prototype .banner .options_fullmenu .link_hovered,
+#prototype .banner .options_fullmenu .link_active {
+    text-decoration: none;
+    outline: 1px solid white;
+    background-color: #262626;
+    background-image: inherit;
+    border-radius: 6px;
+    position: relative;
+    top: -8px;
+}
+#prototype .banner .options_fullmenu .link > label {
+    padding-right: 3px;
 }
 #prototype .banner .options_fullmenu .pipe {
     bottom: 2px;

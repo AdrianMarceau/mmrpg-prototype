@@ -534,10 +534,10 @@ if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-scr
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/ready-room.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <script type="text/javascript">
 
 // Update relevent game settings and flags
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.fadeIn = <?= isset($_GET['flag_skip_fadein']) && $_GET['flag_skip_fadein'] == 'true' ? 'false' : 'true' ?>;
 gameSettings.demo = false;
 gameSettings.passwordUnlocked = 0;
