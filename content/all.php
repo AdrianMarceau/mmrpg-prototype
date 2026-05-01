@@ -6,13 +6,13 @@ require(MMRPG_CONFIG_ROOTDIR.'content/index.php');
 
 // Define an array to hold the overall JSON data to return
 $auto_parse_fields = isset($auto_parse_fields) ? $auto_parse_fields : true;
-$allowed_indexed = isset($allowed_indexed) ? $allowed_indexed : array('types', 'players', 'robots', 'items', 'skills', 'abilities', 'fields');
+$allowed_indexes = isset($allowed_indexes) ? $allowed_indexes : array('types', 'players', 'robots', 'items', 'skills', 'abilities', 'fields');
 $mmrpg_indexes = isset($mmrpg_indexes) ? $mmrpg_indexes : array();
 $return_only = !empty($_REQUEST['return']) ? explode(',', trim($_REQUEST['return'])) : array();
 foreach ($content_types_index AS $key => $content_info){
     $content_type = $content_info['token'];
     $content_xtype = $content_info['xtoken'];
-    if (!in_array($content_xtype, $allowed_indexed)){ continue; }
+    if (!in_array($content_xtype, $allowed_indexes)){ continue; }
     if (!empty($return_only) && !in_array($content_xtype, $return_only)){ continue; }
     $content_index = array();
     if ($content_xtype === 'types'){ $content_index = rpg_type::get_index(true); }

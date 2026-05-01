@@ -6,15 +6,34 @@ $base_dir = rtrim(dirname(dirname(__FILE__)), '/').'/';
 // Require the top file and the content index
 $auto_parse_fields = false;
 require($base_dir.'top.php');
-require($base_dir.'content/all.php');
 
-// Return the content in the appropriate format and make sure it's cached
+// Set the content type to the appropriate format and make sure it's cached
 header('Content-Type: text/css');
 header('Cache-Control: public, max-age=86400');
 header('Expires: '.gmdate('D, d M Y H:i:s', time() + 86400).' GMT');
 header('Pragma: public');
+
+// If there's already a locally-cached version of this file, grab that instead
+$cached_files_enabled = true;
+$cached_files_dir = MMRPG_CONFIG_ROOTDIR.'.cache/indexes/';
+$cached_date_cutoff = substr(MMRPG_CONFIG_CACHE_DATE, 0, 8);
+$cached_markup_file = 'cache.mmrpg-content-styles.css';
+if ($cached_files_enabled
+    && file_exists($cached_files_dir.$cached_markup_file)
+    && date('Ymd', filemtime($cached_files_dir.$cached_markup_file)) >= $cached_date_cutoff){
+    error_log(basename(__FILE__).' is pulling mmrpg content index css from cache !');
+    header('HTTP/1.1 200 OK');
+    $content_index_css = file_get_contents($cached_files_dir.$cached_markup_file);
+    echo(trim($content_index_css).PHP_EOL);
+    exit();
+}
+
+// Otherwise we will have to generate it from scratch at runtime
+require($base_dir.'content/all.php');
+error_log(basename(__FILE__).' is generating mmrpg content index css from scratch ...');
 if (!empty($mmrpg_indexes)){
     header('HTTP/1.1 200 OK');
+    ob_start();
     echo('/* -- MMRPG CONTENT STYLES | Updated: '.MMRPG_CONFIG_CACHE_DATE.' -- */'.PHP_EOL);
     //echo('/* $mmrpg_indexes = '.print_r($mmrpg_indexes, true).' */'.PHP_EOL.PHP_EOL);
     // Loop through all the index objects that have sprites and generate the styles for them
@@ -104,6 +123,14 @@ if (!empty($mmrpg_indexes)){
     $object_styles_combined = trim(ob_get_clean());
     $object_styles_combined = preg_replace('/\s+/', ' ', $object_styles_combined);
     echo($object_styles_combined.PHP_EOL);
+    $content_index_css = ob_get_clean();
+    if (!empty($content_index_css)){
+        if (file_exists($cached_files_dir.$cached_markup_file)){ @unlink($cached_files_dir.$cached_markup_file); }
+        $f = fopen($cached_files_dir.$cached_markup_file, 'w');
+        fwrite($f, $content_index_css);
+        fclose($f);
+    }
+    echo(trim($content_index_css).PHP_EOL);
 } else {
     header('HTTP/1.1 500 Internal Server Error');
     echo('/* No index data found in database! */'.PHP_EOL);
