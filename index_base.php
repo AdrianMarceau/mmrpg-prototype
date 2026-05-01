@@ -533,9 +533,9 @@ if ($this_current_page == 'file' // File sub-pages
     <? if ($this_current_page == 'dev'): ?>
     <script type="text/javascript" src="scripts/dev.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
     <? endif; ?>
+    <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
     <script type="text/javascript">
     // Define the key client variables
-    <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
     gameSettings.autoScrollTop = false;
     gameSettings.autoResizeHeight = false;
     <? if($this_current_page == 'community' && $this_current_cat == 'chat'): ?>
