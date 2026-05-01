@@ -63,8 +63,9 @@ $(document).ready(function(){
             $('#animate').css({opacity:1});
             $('#canvas .canvas_overlay_header').css({opacity:1}).removeClass('canvas_overlay_hidden');
             mmrpg_start_animation();
-            gameSettings.gameHasLoaded = true;
             gameSettings.battleLoaded = true;
+            gameSettings.gameHasLoaded = true;
+            $('#mmrpg').removeClass('loading');
             mmrpg_action_trigger('start', false);
             }, false, true);
         }

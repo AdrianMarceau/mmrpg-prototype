@@ -1355,8 +1355,52 @@
     filter: brightness(0.8);
 }
 
+#canvas .event .battle_scene .sprite[data-robot-id][data-direction] {
+    --sprite-direction-mod: 0;
+}
+#canvas .event .battle_scene .sprite[data-robot-id][data-direction="left"] { --sprite-direction-mod: 1; }
+#canvas .event .battle_scene .sprite[data-robot-id][data-direction="right"] { --sprite-direction-mod: -1;  }
 
+#canvas .event .battle_scene .sprite[data-robot-id][data-frame="damage"] {
+    --sprite-rotate-amount: 0;
+    animation-name: battle-scene-sprite-shake;
+    animation-duration: 0.3s;
+    animation-iteration-count: 1;
+}
+@keyframes battle-scene-sprite-shake {
+    0%, 100% { transform: rotate(var(--sprite-rotate-amount)) translateX(0); }
+    25% { transform: rotate(var(--sprite-rotate-amount)) translateX(calc(9% * var(--sprite-direction-mod))); } /* Initial hit from the side */
+    50% { transform: rotate(var(--sprite-rotate-amount)) translateX(0); }
+    75% { transform: rotate(var(--sprite-rotate-amount)) translateX(calc(6% * var(--sprite-direction-mod))); } /* Smaller recoil from same side */
+}
 
+#canvas .event .battle_scene .sprite[data-robot-id][data-frame="defeat"] {
+    animation-name: battle-scene-sprite-defeat;
+    animation-duration: 0.6s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    transform-origin: bottom center;
+    transform: scaleY(1);
+    filter: brightness(1);
+}
+@keyframes battle-scene-sprite-defeat {
+    0%, 100% { filter: brightness(1) invert(0.0); }
+    50% { filter: brightness(0.3) invert(0.1); }
+}
+
+#canvas .event .battle_scene .sprite[data-item-id*="field-boost"].sprite_fullscreen,
+#canvas .event .battle_scene .sprite[data-skill-id*="field-boost"].sprite_fullscreen {
+    animation-name: battle-scene-rising-background;
+    animation-duration: 0.6s;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-out;
+    background-position: 0 0;
+    filter: opacity(0.1);
+}
+@keyframes battle-scene-rising-background {
+    0% { background-position: 0 0; filter: opacity(0.1); }
+    100% { background-position: 0 -80px; filter: opacity(1.0); }
+}
 
 /* LEFT and ACTIVE-focused camera angles */
 #canvas [data-camera-shift="left"] .event .background_canvas,
@@ -1602,15 +1646,15 @@
 
 
 /*
-#canvas .event .battle_scene .sprite[data-robotid] {
+#canvas .event .battle_scene .sprite[data-robot-id] {
     box-sizing: border-box;
     border-bottom: 2px solid red;
 }
-#canvas .event .battle_scene .sprite[data-robotid][data-direction="left"] {
+#canvas .event .battle_scene .sprite[data-robot-id][data-direction="left"] {
     border-left: 2px solid rgba(255, 0, 0, 0.25);
     border-right: 2px solid rgba(0, 0, 255, 0.25);
 }
-#canvas .event .battle_scene .sprite[data-robotid][data-direction="right"] {
+#canvas .event .battle_scene .sprite[data-robot-id][data-direction="right"] {
     border-right: 2px solid rgba(255, 0, 0, 0.25);
     border-left: 2px solid rgba(0, 0, 255, 0.25);
 }
