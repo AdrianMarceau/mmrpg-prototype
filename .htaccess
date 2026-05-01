@@ -143,6 +143,10 @@ RewriteRule ^content/all\.json(\?.*?)?$ content/index.json.php [L]
 RewriteRule ^content/all\.css(\?.*?)?$ content/index.css.php [L]
 RewriteRule ^styles/style\.css$ styles/style.php?files=fonts.css,style.css,types.css [L]
 RewriteRule ^styles/robots\.css$ styles/style.php?file=robots.css [L]
+RewriteRule ^scripts/gamesettings\.js$ scripts/gamesettings.all.php?return=javascript [L]
+RewriteRule ^scripts/gamesettings\.main\.js$ scripts/gamesettings.main.js.php?return=javascript [L]
+RewriteRule ^scripts/gamesettings\.music\.js$ scripts/gamesettings.music.js.php?return=javascript [L]
+RewriteRule ^scripts/gamesettings\.sounds\.js$ scripts/gamesettings.sounds.js.php?return=javascript [L]
 
 
 ################################
