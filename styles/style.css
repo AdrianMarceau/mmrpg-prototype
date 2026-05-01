@@ -64,6 +64,33 @@ body.index #header {
     top: -9999px;
 }
 
+#mmrpg.first-focus-required:after {
+    content: "\0022ef";
+    display: block;
+    position: absolute;
+    z-index: 9999;
+    width: auto;
+    height: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #efefef;
+    font-size: 30px;
+    line-height: 622px;
+    transition: background-color 0.1s, font-size 0.1s;
+    cursor: pointer;
+}
+#mmrpg.first-focus-required:not(.loading):after {
+    content: "\0025b6";
+}
+#mmrpg.first-focus-required:not(.loading):hover:after {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    font-size: 36px;
+}
+
 #mmrpg .tooltip {
     display:none;
     position: absolute !important;
@@ -283,7 +310,7 @@ body.index #header {
     position: absolute;
     background: transparent none scroll no-repeat 0 0;
 }
-#mmrpg .sprite[data-shadowid] {
+#mmrpg .sprite[data-shadow-id] {
     display: none;
     filter: brightness(0) opacity(0.2);
     -moz-mix-blend-mode: multiply;
@@ -291,7 +318,7 @@ body.index #header {
     mix-blend-mode: multiply;
 }
 @supports (filter: grayscale(1)) and (transform: skewX(10deg)) {
-    #mmrpg .sprite[data-shadowid] {
+    #mmrpg .sprite[data-shadow-id] {
         display: block;
     }
 }
