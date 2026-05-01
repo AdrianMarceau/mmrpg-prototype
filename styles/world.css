@@ -2180,7 +2180,8 @@ html, body {
     bottom: auto;
 }
 
-#robots-overview .storage-box .button {
+#robots-overview .storage-box .button,
+#robots-overview .storage-details .button {
     display: block;
     position: absolute;
     z-index: 20;
@@ -2211,27 +2212,33 @@ html, body {
     transition: border 0.2s, background-color 0.2s, min-width 0.3s;
 }
 #robots-overview .storage-box .button.active,
-/* #robots-overview .storage-box .button:not(.disabled):hover, */
-#robots-overview .storage-box .button:not(.disabled).hovered {
+#robots-overview .storage-box .button:not(.disabled).hovered,
+#robots-overview .storage-details .button.active,
+#robots-overview .storage-details .button:not(.disabled).hovered {
     border-color: #cfcfcf;
     background-color: rgba(0, 0, 0, 0.7);
 }
-#robots-overview .storage-box .button.active {
+#robots-overview .storage-box .button.active,
+#robots-overview .storage-details .button.active {
     cursor: default;
     pointer-events: none;
 }
-#robots-overview .storage-box .button.save {
+#robots-overview .storage-box .button.save,
+#robots-overview .storage-details .button.save {
     left: calc(100% - 12px);
     bottom: 40px;
     font-size: 18px;
     line-height: 1.4;
 }
-#robots-overview .storage-box .button.cancel {
+#robots-overview .storage-box .button.cancel,
+#robots-overview .storage-details .button.cancel {
     left: calc(100% - 12px);
     bottom: 12px;
 }
 #robots-overview .storage-box .button.save.disabled,
-#robots-overview .storage-box .button.cancel.disabled {
+#robots-overview .storage-box .button.cancel.disabled,
+#robots-overview .storage-details .button.save.disabled,
+#robots-overview .storage-details .button.cancel.disabled {
     background-color: #292929;
     border-color: #464646;
     color: #969696;
@@ -2239,11 +2246,13 @@ html, body {
     cursor: not-allowed;
     text-decoration: line-through;
 }
-#robots-overview .storage-box .button.save {
+#robots-overview .storage-box .button.save,
+#robots-overview .storage-details .button.save {
     background-color: #0e6b0e !important;
     border-color: #129d12 !important;
 }
-#robots-overview .storage-box .button.cancel {
+#robots-overview .storage-box .button.cancel,
+#robots-overview .storage-details .button.cancel {
     background-color: #8b1d1d !important;
     border-color: #b23333 !important;
 }
@@ -2256,7 +2265,11 @@ html, body {
 #robots-overview .storage-box .button.save:hover,
 #robots-overview .storage-box .button.cancel:hover,
 #robots-overview .storage-box .button.save.maybe,
-#robots-overview .storage-box .button.cancel.maybe {
+#robots-overview .storage-box .button.cancel.maybe,
+#robots-overview .storage-details .button.save:hover,
+#robots-overview .storage-details .button.cancel:hover,
+#robots-overview .storage-details .button.save.maybe,
+#robots-overview .storage-details .button.cancel.maybe {
     outline: 2px solid rgba(255, 255, 255, 1.0);
     animation: world-storage-button-maybe 1.5s ease-in-out infinite;
 }
@@ -2267,7 +2280,9 @@ html, body {
     100% { transform: scale(1.0); }
 }
 #robots-overview .storage-box .button.save.clicked,
-#robots-overview .storage-box .button.cancel.clicked {
+#robots-overview .storage-box .button.cancel.clicked,
+#robots-overview .storage-details .button.save.clicked,
+#robots-overview .storage-details .button.cancel.clicked {
     outline: 2px solid rgba(255, 255, 255, 1.0);
     transform: scale(1.0);
     animation: storage 0.9s ease-in-out infinite;
@@ -2340,10 +2355,10 @@ html, body {
     display: block;
     position: absolute;
     z-index: 30;
-    top: 16px;
-    left: 560px;
     right: auto;
     bottom: auto;
+    top: 100vh;
+    left: 560px;
     width: 172px;
     height: auto;
     color: #cfcfcf;
@@ -2358,9 +2373,22 @@ html, body {
     border-width: 1px 0 0 1px;
     border-radius: 6px;
     user-select: none;
+    pointer-events: none;
+    opacity: 0.0;
+    /* transition: bottom 0.3s, opacity 0.3s; */
+    transition: top 0.3s, opacity 0.3s;
 }
+#robots-overview.expanded .wrapper:not(.wait) .storage-details {
+    /* bottom: 6px;  */
+    top: 16px;
+    opacity: 1.0;
+    pointer-events: auto;
+}
+
+/* legacy code detection - delete afterward */
 #robots-overview .storage-box .storage-details {
     left: 308px;
+    outline: 1px solid magenta;
 }
 
 #robots-overview .storage-box .pages:before,
@@ -3218,6 +3246,7 @@ html, body {
     min-height: 24px;
     max-height: 48px;
     overflow: visible;
+    white-space: nowrap;
     padding: 6px 0 0;
 }
 #robots-overview .storage-details .actions .button {
@@ -3277,36 +3306,12 @@ html, body {
     display: block;
     clear: both;
 }
-/*
-#robots-overview .storage-details .actions .button.use-item { background-color: #507c46; }
-#robots-overview .storage-details .actions .button.give-item { background-color: #265b92; }
-#robots-overview .storage-details .actions .button.drop-item { background-color: #884d4c; }
-#robots-overview .storage-details .actions .button.equip-ability { background-color: #6f6a7d; }
-*/
+#robots-overview .storage-details[data-robot] {
+    min-height: 534px;
+}
 #robots-overview .storage-details[data-robot] .actions {
     max-height: none;
-    /* padding-right: 20px; */
 }
-/*
-#robots-overview .storage-details[data-robot] .actions .button {
-    display: block;
-    float: left;
-    width: calc(50% - 3px);
-    margin: 0 3px 0 0;
-}
-#robots-overview .storage-details[data-robot] .actions .button[data-action="add-robot"] {
-    background-color: #598a4e;
-    border-color: #44693b;
-}
-#robots-overview .storage-details[data-robot] .actions .button[data-action="remove-robot"] {
-    background-color: #8b5050;
-    border-color: #6b3f3f;
-}
-#robots-overview .storage-details[data-robot] .actions .button[data-action="robot-info"] {
-    background-color: #8b739b;
-    border-color: #695775;
-}
-*/
 #robots-overview .storage-details[data-robot] .actions .button[data-action="robot-info"],
 #robots-overview .storage-details[data-robot] .actions .button[data-action="use-item"],
 #robots-overview .storage-details[data-robot] .actions .button[data-action="equip-ability"] {

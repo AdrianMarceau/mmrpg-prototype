@@ -367,6 +367,12 @@ $request_world_direction = $this_prototype_data['this_current_direction'];
 //error_log('$this_prototype_data = '. print_r($this_prototype_data, true));
 //error_log('$WORLD_PLAYER_SESSION = '. print_r($WORLD_PLAYER_SESSION, true));
 
+// Create arrays for pending actions and transitions before switching just-in-case they're needed
+if (empty($WORLD_PLAYER_SESSION['recent_actions'])){ $WORLD_PLAYER_SESSION['recent_actions'] = array(); }
+if (empty($WORLD_PLAYER_SESSION['pending_actions'])){ $WORLD_PLAYER_SESSION['pending_actions'] = array(); }
+$recent_world_actions = &$WORLD_PLAYER_SESSION['recent_actions'];
+$pending_world_actions = &$WORLD_PLAYER_SESSION['pending_actions'];
+
 // Now that we've collected required args that may have been passed in the URL, reload w/o them to prevent double-entry
 if (!empty($_REQUEST['player'])
     || !empty($_REQUEST['robots'])
@@ -374,7 +380,10 @@ if (!empty($_REQUEST['player'])
     || !empty($_REQUEST['map'])
     || !empty($_REQUEST['position'])
     || !empty($_REQUEST['direction'])){
-    // Redirect to the clean world URL
+    // Check for pending actions or transitions before redirecting
+    if (!empty($_REQUEST['player']) && !empty($_REQUEST['switch']) && $_REQUEST['switch'] === 'true'){ array_unshift($recent_world_actions, 'player-switch'); }
+    if (!empty($_REQUEST['robots']) && !empty($_REQUEST['switch']) && $_REQUEST['switch'] === 'true'){ array_unshift($recent_world_actions, 'team-switch'); }
+    // Redirect to the clean world URL without any arguments to prevent double-entry
     $allowed_returns = array('world' => 'world.php', 'prototype' => 'prototype.php');
     $return_to = !empty($_REQUEST['return']) && in_array($_REQUEST['return'], array_keys($allowed_returns)) ? $_REQUEST['return'] : 'world';
     $return_url = $allowed_returns[$return_to];
@@ -411,7 +420,15 @@ $WORLD_SESSION['last_world_token'] = $new_world_token;
 $WORLD_SESSION['last_map_token'] = $new_map_token;
 $world_token_changed = $prev_world_token !== $new_world_token ? true : false;
 $map_token_changed = $prev_map_token !== $new_map_token ? true : false;
+
+// Check if the location (world map) or player (via switch) have changed since last
 $location_has_changed = $world_token_changed || $map_token_changed ? true : false;
+$player_has_changed = !empty($recent_world_actions) && $recent_world_actions[0] === 'player-switch' ? true : false;
+$robots_have_changed = !empty($recent_world_actions) && $recent_world_actions[0] === 'team-switch' ? true : false;
+
+// Make sure we add a start action otherwise to ensure we don't double-up on things
+array_unshift($recent_world_actions, 'start');
+$recent_world_actions = array_slice($recent_world_actions, 0, 9);
 
 // Make sure there's room in relevant session arrays for this map's data
 if (!isset($WORLD_SESSION['world_maps'][$world_map_token])){ $WORLD_SESSION['world_maps'][$world_map_token] = array(); }
@@ -652,14 +669,11 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
     </div>
 </div>
 <!-- (3) start to load world scripts  -->
-<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.world.php'); ?>
 <script type="text/javascript" src="scripts/world.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <!-- (4) define game settings/config/indexes -->
 <script type="text/javascript">
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.music.js.php'); ?>
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.sounds.js.php'); ?>
 (function(){
     // Define the main configuration settings for the world map
     let _worldConfig = gameSettings.worldConfig;
@@ -689,6 +703,7 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
         }
     // Define any additional map settings or flags that are more contextual
     _worldConfig.locationHasChanged = <?= json_encode($location_has_changed, JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerHasChanged = <?= json_encode($player_has_changed, JSON_NUMERIC_CHECK) ?>;
 })();
 </script>
 <!-- (5) queue document ready events -->
@@ -706,13 +721,26 @@ $(document).ready(function(){
     let $mmrpg = $('#mmrpg');
     let worldMapObject = null;
     if ($mmrpg.length){
+        // Define objects for any custom config values or indexes
+        let _config = gameSettings.worldConfig;
+        let _indexes = gameSettings.worldIndexes;
+        let customConfig = {};
+        let customIndexes = {};
+        // If the player was recently switched, make sure we start the zoom far-out
+        let showPlayerSwitchIn = _config.playerHasChanged ? true : false;
+        if (showPlayerSwitchIn){ customConfig.onReadyZoomIntoPlayer = true; }
+        // If the location was recently changed, make sure we show the title banner
+        let showLocationBanner = _config.locationHasChanged ? true : false;
+        if (showLocationBanner){ customConfig.onReadyShowLocationBanner = true; }
+        // Initialize the world map object with any config/settings predetermined
         worldMapObject = new mmrpgWorldMap($mmrpg, function(){
             //console.log('triggering custom onReady callback!');
             let _self = this;
-            let _config = _self.config;
-            let _indexes = _self.indexes;
+            //let _config = _self.config;
+            //let _indexes = _self.indexes;
             _self.triggerWindowEventsPull(1000);
-            if (_config.locationHasChanged){
+            if (showPlayerSwitchIn){ _self.resetZoomLevel(true); }
+            if (showLocationBanner){
                 let _fieldsIndex = _indexes.fields || {};
                 let worldName = _config.mapWorldName;
                 let mapName = _config.mapName;
@@ -729,7 +757,7 @@ $(document).ready(function(){
                 let subtitleText = mapFieldName;
                 setTimeout(function(){ _self.showTitleBanner(titleText, subtitleText, false, 2000); }, 300);
                 }
-            });
+            }, customConfig, customIndexes);
         }
     gameSettings.worldMapObject = worldMapObject;
     window.worldMapObject = worldMapObject;
@@ -739,10 +767,16 @@ $(document).ready(function(){
     mmrpg_keep_session_alive(<?= rpg_game::get_userid() ?>);
     <? } ?>
 
+    console.log('$WORLD_PLAYER_SESSION[\'recent_actions\'] =', <?= json_encode($WORLD_PLAYER_SESSION['recent_actions'], true) ?>);
+    console.log('$WORLD_PLAYER_SESSION[\'pending_actions\'] =', <?= json_encode($WORLD_PLAYER_SESSION['pending_actions'], true) ?>);
+
 });
 
 </script>
 <?
+// Clear any temp session variables we shouldn't repeat (nope, we have a queue limit and handling for this now)
+//unset($WORLD_PLAYER_SESSION['recent_actions']);
+//unset($WORLD_PLAYER_SESSION['pending_actions']);
 // Require the analytics file for tracking purposes
 require(MMRPG_CONFIG_ROOTDIR.'includes/analytics.php');
 // Unset the database variable

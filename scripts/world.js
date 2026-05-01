@@ -92,7 +92,9 @@ gameSettings.worldConfig = {
     //defaultZoomLevel: 0.5, // far out
     zoomIncrement: 0.5, // zoom in/out by this amount
     minZoomLevel: 0.5, // very zoomed out
-    maxZoomLevel: 2.0, // very zoomed in
+    maxZoomLevel: 2.0, // very zoomed in,
+    onReadyZoomIntoPlayer: false, // automatically zoom into player (from a distance) on ready
+    onReadyShowLocationBanner: false, // automatically show the current location banner on ready
     };
 gameSettings.worldState = {
     cursor: {
@@ -177,7 +179,7 @@ gameSettings.worldLoaded = false;
 class mmrpgWorldMap {
 
     // Constructor function for the world map
-    constructor($mmrpg, onReady){
+    constructor($mmrpg, onReady, custConfig, custIndexes){
         //console.log('%c' + 'mmrpgWorldMap() constructor', 'color: green;');
         let _self = this;
         _self.config = gameSettings.worldConfig;
@@ -188,8 +190,8 @@ class mmrpgWorldMap {
         if (!$mmrpg || !$mmrpg.length){ return false; }
         if (!_self.checkIndexes()){ return false; }
         if (onReady){ _self.onWorldReady(onReady); }
-        _self.initConfig();
-        _self.initIndexes();
+        _self.initConfig(custConfig);
+        _self.initIndexes(custIndexes);
         _self.initWorld($mmrpg);
         }
 
@@ -213,20 +215,38 @@ class mmrpgWorldMap {
         }
 
     // Quick function to initialize default settings
-    initConfig(){
+    initConfig(custConfig){
         //console.log('%c' + 'mmrpgWorldMap.initConfig()', 'color: green;');
+        if (!custConfig || typeof custConfig !== 'object'){ custConfig = {}; }
+        //console.log('custConfig =', custConfig);
         let _self = this;
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
+        // Collect custom location banner settings if they've been set
+        let onReadyShowLocationBanner = custConfig.onReadyShowLocationBanner;
+        if (typeof onReadyShowLocationBanner === 'boolean'){ _config.onReadyShowLocationBanner = onReadyShowLocationBanner; }
+        // Set and/or collect custom zoom level settings if they exist
         _world.zoomLevel = _config.defaultZoomLevel;
         _world.userZoomLevel = _config.defaultZoomLevel; // TODO: remember this on reload
+        let onReadyZoomIntoPlayer = custConfig.onReadyZoomIntoPlayer;
+        if (typeof onReadyZoomIntoPlayer === 'boolean'){ _config.onReadyZoomIntoPlayer = onReadyZoomIntoPlayer; }
+        if (onReadyZoomIntoPlayer){
+            //console.log('setting zoom level to min...');
+            _world.zoomLevel = _config.minZoomLevel;
+            _world.userZoomLevel = _config.minZoomLevel;
+            }
+        //console.log('_config.onReadyZoomIntoPlayer =', _config.onReadyZoomIntoPlayer);
+        //console.log('_config.onReadyShowLocationBanner =', _config.onReadyShowLocationBanner);
+        //console.log('_world.zoomLevel =', _world.zoomLevel);
+        // Return true on success
         return true;
         }
 
     // Quick function to intialize helper methods on indexes for easier lookups and references
-    initIndexes(){
+    initIndexes(custIndexes){
         //console.log('%c' + 'mmrpgWorldMap.initIndexes()', 'color: orange;');
+        if (!custIndexes || typeof custIndexes !== 'object'){ custIndexes = {}; }
         let _self = this;
         let _config = _self.config;
         let _indexes = _self.indexes;
@@ -494,6 +514,8 @@ class mmrpgWorldMap {
         let onWorldLoaded = function(){
             console.log('%c' + 'MMRPG WORLD HAS LOADED!', 'color: cyan;');
             gameSettings.worldLoaded = true;
+            gameSettings.gameHasLoaded = true;
+            $('#mmrpg').removeClass('loading');
             _world.hasLoaded = true;
             _self.bindEventsToCanvas($canvasMap);
             _self.bindEventsToWorld($thisWorld);
@@ -1597,7 +1619,7 @@ class mmrpgWorldMap {
             $playerButtons.bind('mouseenter', function(e){ if (hoverCanvasObject.call(this, e, 'icon-hover')){ $(this).find('.sprite.player > .sprite').attr('data-frame', '01'); } }); // taunt
             $playerButtons.bind('mouseleave', function(e){ if (unhoverCanvasObject.call(this, e)){ $(this).find('.sprite.player > .sprite').attr('data-frame', '00'); } }); // base
             $playerButtons.bind('click', function(e){
-                //console.log('%c' + 'Player switcher clicked for ' + playerToken + '!', 'color: cyan;');
+                //console.log('%c' + 'Player switcher clicked!', 'color: cyan;');
                 e.preventDefault();
                 if ($(this).is('.disabled')){ return false; }
                 if ($playerSwitcher.is('.disabled')){ return false; }
@@ -1608,14 +1630,15 @@ class mmrpgWorldMap {
                 $option.addClass('active');
                 _self.playSoundEffect('lets-go-robots');
                 $thisWorld.addClass('loading');
-                let worldReloadURL = 'world.php?player=' + playerToken;
+                let worldReloadURL = 'world.php?player=' + playerToken + '&switch=true';
                 _self.decZoomLevel();
                 $thisWorld.addClass('busy');
                 _self.saveWorldState(function(){
-                    _self.decZoomLevel();
+                    //_self.decZoomLevel();
+                    _self.updateZoomLevel(_config.minZoomLevel);
                     $thisWorld.addClass('loading');
                     window.location.href = worldReloadURL;
-                    _self.decZoomLevel();
+                    //_self.decZoomLevel();
                     });
                 return true;
                 });
@@ -1625,6 +1648,7 @@ class mmrpgWorldMap {
         let robotsOverviewAPI = _self.robotsOverviewAPI || {};
         if ($robotsOverview && $robotsOverview.length){
             // Collect some commonly used elements and data for use below and pre-calculate some values
+            let $overviewWrapper = $('> .wrapper', $robotsOverview);
             let $storageButtons = $('.storage-button', $robotsOverview);
             let $storageBoxes = $('.storage-box', $robotsOverview);
             let $teamSprites = _elements.teamSprites;
@@ -1634,6 +1658,7 @@ class mmrpgWorldMap {
             let $storageRobotsDiv = $('.storage-robots', $robotsOverview);
             let $storageItemsDiv = $('.storage-items', $robotsOverview);
             let $storageAbilitiesDiv = $('.storage-abilities', $robotsOverview);
+            let $storageDetailsDiv = $('.storage-details', $robotsOverview);
             let $teamRobotsWrapper = $('> .wrapper', $teamRobotsDiv);
             let $storageRobotsWrapper = $('> .wrapper', $storageRobotsDiv);
             let $storageItemsWrapper = $('> .wrapper', $storageItemsDiv);
@@ -1692,12 +1717,13 @@ class mmrpgWorldMap {
                 $teamRobotsDiv.find('.equipped', ).removeClass('equipped');
                 $teamRobotsDiv.find('.selected:not(.keep-selected)').removeClass('selected');
                 $teamRobotsDiv.find('.hovered:not(.keep-hovered)').removeClass('hovered');
-                $('.storage-details', $storageBoxes).remove();
+                $robotsOverview.find('.storage-details').remove();
                 return;
                 };
             // Define a function for expanding the robots-overview panel and showing a specific view
+            let overviewIsOpening = false;
             let showRobotsOverviewPanel = function(viewToken, onComplete, keepSelectedTeamRobot){
-                //console.log('%c' + 'showRobotsOverviewPanel(viewToken:' + (viewToken ? viewToken : typeof viewToken) + ') called!', 'color: magenta;');
+                console.log('%c' + 'showRobotsOverviewPanel(viewToken:' + (viewToken ? viewToken : typeof viewToken) + ') called!', 'color: magenta;');
                 // Otherwise we can expand (if not already) the panel and switch to this specific view
                 // and then disable the outside UI buttons to prevent bad-clicks and visual clutter
                 viewToken = viewToken && typeof viewToken === 'string' && viewToken.length ? viewToken : '';
@@ -1706,6 +1732,7 @@ class mmrpgWorldMap {
                 //console.log('-> before doing anything, selectedRobotToken = ', selectedRobotToken);
                 //console.log('_world.currentScreen(before) =', _world.currentScreen);
                 let alreadyShowing = _world.currentScreen === 'robots-overview' ? true : false;
+                if (!alreadyShowing){ overviewIsOpening = true; }
                 //console.log('alreadyShowing =', alreadyShowing);
                 let $thisStorageBox = $storageBoxes.filter('[data-storage="' + viewToken + '"]');
                 let $thisStorageButton = $storageButtons.filter('[data-view="' + viewToken + '"]');
@@ -1756,7 +1783,7 @@ class mmrpgWorldMap {
                     });
                 // Make sure we create a timeout to disable inactive panels after animation complete
                 if (_selfRef.showOverviewTimeout){ clearTimeout(_selfRef.showOverviewTimeout); }
-                _selfRef.showOverviewTimeout = setTimeout(function(){ $storageBoxes.not($thisStorageBox).addClass('disabled'); }, 1200);
+                _selfRef.showOverviewTimeout = setTimeout(function(){ overviewIsOpening = false; $storageBoxes.not($thisStorageBox).addClass('disabled'); }, 1200);
                 return;
                 };
             // Define a function for dismissing the whole robots-overview panel and all views at-once
@@ -2340,13 +2367,27 @@ class mmrpgWorldMap {
                 //console.log('-> objectClass = ', objectClass);
                 //console.log('-> $storageObjectsDiv = ', $storageObjectsDiv.length, $storageObjectsDiv);
                 //console.log('-> $selectedStorageObject = ', $selectedStorageObject.length, $selectedStorageObject);
-                // Check to see if a details div has already been added
-                let $detailsDiv = $robotsOverview.find('.storage-details');
+                // Update the reference to the storage details div (in case already exists)
+                $storageDetailsDiv = $robotsOverview.find('.storage-details');
+                // Check to see if a details div has already been added given above
+                let $detailsDiv = $storageDetailsDiv;
                 let detailsDivExists = $detailsDiv && $detailsDiv.length ? true : false;
                 //let detailsDivSameKind = false; //detailsDivExists && $detailsDiv.is('[data-' + objectKind + ']') ? true : false;
                 //console.log('-> $detailsDiv = ', $detailsDiv.length, $detailsDiv);
                 //console.log('-> detailsDivExists = ', detailsDivExists);
                 //console.log('-> detailsDivSameKind = ', detailsDivSameKind);
+                // Make sure we pre-queue a removal of the wait class for animation purposes
+                let delayAnimationsThen = function(callback){
+                    //console.log('delayAnimationsThen()');
+                    //console.log('overviewIsOpening =', overviewIsOpening);
+                    if (overviewIsOpening){
+                        let delayFor = 300;
+                        $overviewWrapper.addClass('wait');
+                        if (_selfRef.detailsTimeout){ clearTimeout(_selfRef.detailsTimeout); }
+                        _selfRef.detailsTimeout = setTimeout(function(){ $overviewWrapper.removeClass('wait'); }, delayFor);
+                        }
+                    if (typeof callback === 'function'){ callback.call(this); }
+                    };
                 // Define some reusable inline functions for less code
                 let showRobotIntroAnimation = function(){
                     //console.log('showing intro animation for robot!');
@@ -2379,8 +2420,10 @@ class mmrpgWorldMap {
                             if (detailsDivExists){ $detailsDiv.remove(); }
                             let robotMarkup = _self.getRobotDetailsMarkupForOverview(robotToken) || false;
                             if (!robotMarkup || !robotMarkup.length){ return false; }
-                            $storageObjectsDiv.append(robotMarkup);
-                            $detailsDiv = $robotsOverview.find('.storage-details');
+                            delayAnimationsThen(function(){
+                                $overviewWrapper.append(robotMarkup);
+                                $detailsDiv = $robotsOverview.find('.storage-details');
+                                });
                             } else {
                             //console.log('-> refresh existing details div for robotToken =', robotToken);
                             let robotDetails = _self.getRobotDetailsForOverview(robotToken) || false;
@@ -2398,8 +2441,10 @@ class mmrpgWorldMap {
                             if (detailsDivExists){ $detailsDiv.remove(); }
                             let itemMarkup = _self.getItemDetailsMarkupForOverview(itemToken, teamRobotSelected) || false;
                             if (!itemMarkup || !itemMarkup.length){ return false; }
-                            $storageObjectsDiv.append(itemMarkup);
-                            $detailsDiv = $robotsOverview.find('.storage-details');
+                            delayAnimationsThen(function(){
+                                $overviewWrapper.append(itemMarkup);
+                                $detailsDiv = $robotsOverview.find('.storage-details');
+                                });
                             } else {
                             //console.log('-> refresh existing details div for itemToken =', itemToken);
                             let itemDetails = _self.getItemDetailsForOverview(itemToken, teamRobotSelected) || false;
@@ -2416,8 +2461,10 @@ class mmrpgWorldMap {
                             if (detailsDivExists){ $detailsDiv.remove(); }
                             let abilityMarkup = _self.getAbilityDetailsMarkupForOverview(abilityToken, teamRobotSelected) || false;
                             if (!abilityMarkup || !abilityMarkup.length){ return false; }
-                            $storageObjectsDiv.append(abilityMarkup);
-                            $detailsDiv = $robotsOverview.find('.storage-details');
+                            delayAnimationsThen(function(){
+                                $overviewWrapper.append(abilityMarkup);
+                                $detailsDiv = $robotsOverview.find('.storage-details');
+                                });
                             } else {
                             //console.log('-> populate existing details div for abilityToken =', abilityToken);
                             let abilityDetails = _self.getAbilityDetailsForOverview(abilityToken, teamRobotSelected) || false;
@@ -2441,8 +2488,10 @@ class mmrpgWorldMap {
                         if (detailsDivExists){ $detailsDiv.remove(); }
                         let robotMarkup = _self.getRobotDetailsMarkupForOverview(robotToken) || false;
                         if (!robotMarkup || !robotMarkup.length){ return false; }
-                        $storageObjectsDiv.append(robotMarkup);
-                        $detailsDiv = $robotsOverview.find('.storage-details');
+                        delayAnimationsThen(function(){
+                            $overviewWrapper.append(robotMarkup);
+                            $detailsDiv = $robotsOverview.find('.storage-details');
+                            });
                         } else {
                         //console.log('-> refresh existing details div for robotToken =', robotToken);
                         let robotDetails = _self.getRobotDetailsForOverview(robotToken) || false;
@@ -2757,30 +2806,6 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
-                // add functionality to the action buttons within robot details panels
-                $storageRobotsDiv.delegate('.button[data-action]', 'mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
-                $storageRobotsDiv.delegate('.button[data-action]', 'click', function(e){
-                    //console.log('%c' + 'Storage robot details button clicked!', 'color: cyan;');
-                    e.preventDefault();
-                    let $actionButton = $(this);
-                    let actionToken = $actionButton.attr('data-action');
-                    //console.log('-> actionToken =', actionToken);
-                    let $detailsDiv = $robotsOverview.find('.storage-details[data-robot]');
-                    //console.log('-> $detailsDiv =', $detailsDiv.length, $detailsDiv);
-                    if (!$detailsDiv.is('[data-robot]')){ return; }
-                    let robotToken = $detailsDiv.attr('data-robot');
-                    //console.log('-> robotToken =', robotToken);
-                    let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
-                    let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
-                    //console.log('-> targetRobotToken =', targetRobotToken);
-                    let autoClickAction = function(){ $actionButton.addClass('clicked'); _self.playSoundEffect('icon-click'); };
-                    let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
-                    if (actionToken === 'add-robot'){ autoClickAction(); _self.showAddRobotModal(robotToken, actionModalConfig); }
-                    else if (actionToken === 'remove-robot'){ autoClickAction(); _self.showRemoveRobotModal(robotToken, actionModalConfig); }
-                    else { console.warn('-> undefined robot action "', actionToken, '", ignoring input'); return false; }
-                    // Return true on success
-                    return true;
-                    });
                 // if the storage tray is open, clicking a robot in the storage-list  highlights it for interaction
                 $storageRobotsDiv.delegate('.team-robot[data-robot]', 'mouseenter', hoverOverviewObject);
                 $storageRobotsDiv.delegate('.team-robot[data-robot]', 'mouseleave', unhoverOverviewObject);
@@ -2810,6 +2835,30 @@ class mmrpgWorldMap {
                     // Return true on success
                     return true;
                     });
+                // add functionality to the action buttons within robot details panels
+                $robotsOverview.delegate('.storage-details[data-robot] .button[data-action]', 'mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
+                $robotsOverview.delegate('.storage-details[data-robot] .button[data-action]', 'click', function(e){
+                    //console.log('%c' + 'Storage robot details button clicked!', 'color: cyan;');
+                    e.preventDefault();
+                    let $actionButton = $(this);
+                    let actionToken = $actionButton.attr('data-action');
+                    //console.log('-> actionToken =', actionToken);
+                    let $detailsDiv = $robotsOverview.find('.storage-details[data-robot]');
+                    //console.log('-> $detailsDiv =', $detailsDiv.length, $detailsDiv);
+                    if (!$detailsDiv.is('[data-robot]')){ return; }
+                    let robotToken = $detailsDiv.attr('data-robot');
+                    //console.log('-> robotToken =', robotToken);
+                    let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                    let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
+                    //console.log('-> targetRobotToken =', targetRobotToken);
+                    let autoClickAction = function(){ $actionButton.addClass('clicked'); _self.playSoundEffect('icon-click'); };
+                    let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
+                    if (actionToken === 'add-robot'){ autoClickAction(); _self.showAddRobotModal(robotToken, actionModalConfig); }
+                    else if (actionToken === 'remove-robot'){ autoClickAction(); _self.showRemoveRobotModal(robotToken, actionModalConfig); }
+                    else { console.warn('-> undefined robot action "', actionToken, '", ignoring input'); return false; }
+                    // Return true on success
+                    return true;
+                    });
                 }
             // Bind a click event to the team-items button in the robots overview
             let $itemsButton = $('.team-items', $robotsOverview);
@@ -2825,31 +2874,6 @@ class mmrpgWorldMap {
                     if (alreadyExpanded){ return disableRobotsOverview(); }
                     // Expand the robot overview to the item-storage view panel
                     showRobotsOverviewPanel('items');
-                    // Return true on success
-                    return true;
-                    });
-                // add functionality to the action buttons within item details panels
-                $storageItemsDiv.delegate('.button[data-action]', 'mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
-                $storageItemsDiv.delegate('.button[data-action]', 'click', function(e){
-                    //console.log('%c' + 'Storage item details button clicked!', 'color: cyan;');
-                    e.preventDefault();
-                    let $actionButton = $(this);
-                    let actionToken = $actionButton.attr('data-action');
-                    //console.log('-> actionToken =', actionToken);
-                    let $detailsDiv = $robotsOverview.find('.storage-details');
-                    if (!$detailsDiv.is('[data-item]')){ return; }
-                    let itemToken = $detailsDiv.attr('data-item');
-                    //console.log('-> itemToken =', itemToken);
-                    let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
-                    let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
-                    //console.log('-> targetRobotToken =', targetRobotToken);
-                    let autoClickAction = function(){ $actionButton.addClass('clicked'); _self.playSoundEffect('icon-click'); };
-                    let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
-                    if (actionToken === 'use-item'){ autoClickAction(); _self.showUseItemModal(itemToken, targetRobotToken, actionModalConfig); }
-                    else if (actionToken === 'give-item'){ autoClickAction(); _self.showGiveItemModal(itemToken, targetRobotToken, actionModalConfig); }
-                    else if (actionToken === 'take-item'){ autoClickAction(); _self.showTakeItemModal(itemToken, targetRobotToken, actionModalConfig); }
-                    else if (actionToken === 'drop-item'){ autoClickAction(); _self.showDropItemModal(itemToken, actionModalConfig); }
-                    else { console.warn('-> undefined item action "', actionToken, '", ignoring input'); return false; }
                     // Return true on success
                     return true;
                     });
@@ -2873,6 +2897,31 @@ class mmrpgWorldMap {
                     $item.addClass('selected');
                     $storageItemsDiv.addClass('has-selection');
                     refreshDetailsPanel();
+                    return true;
+                    });
+                // add functionality to the action buttons within item details panels
+                $robotsOverview.delegate('.storage-details[data-item] .button[data-action]', 'mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
+                $robotsOverview.delegate('.storage-details[data-item] .button[data-action]', 'click', function(e){
+                    //console.log('%c' + 'Storage item details button clicked!', 'color: cyan;');
+                    e.preventDefault();
+                    let $actionButton = $(this);
+                    let actionToken = $actionButton.attr('data-action');
+                    //console.log('-> actionToken =', actionToken);
+                    let $detailsDiv = $robotsOverview.find('.storage-details');
+                    if (!$detailsDiv.is('[data-item]')){ return; }
+                    let itemToken = $detailsDiv.attr('data-item');
+                    //console.log('-> itemToken =', itemToken);
+                    let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                    let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
+                    //console.log('-> targetRobotToken =', targetRobotToken);
+                    let autoClickAction = function(){ $actionButton.addClass('clicked'); _self.playSoundEffect('icon-click'); };
+                    let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
+                    if (actionToken === 'use-item'){ autoClickAction(); _self.showUseItemModal(itemToken, targetRobotToken, actionModalConfig); }
+                    else if (actionToken === 'give-item'){ autoClickAction(); _self.showGiveItemModal(itemToken, targetRobotToken, actionModalConfig); }
+                    else if (actionToken === 'take-item'){ autoClickAction(); _self.showTakeItemModal(itemToken, targetRobotToken, actionModalConfig); }
+                    else if (actionToken === 'drop-item'){ autoClickAction(); _self.showDropItemModal(itemToken, actionModalConfig); }
+                    else { console.warn('-> undefined item action "', actionToken, '", ignoring input'); return false; }
+                    // Return true on success
                     return true;
                     });
                 // ...
@@ -2901,31 +2950,6 @@ class mmrpgWorldMap {
                     if (!$robotsOverview.is('.expanded')){ return; } // if we're not expanded, ignore clicks
                     //console.log('%c' + 'Storage abilities toggle button clicked!', 'color: cyan;');
                     refreshAbilitiesDiv();
-                    return true;
-                    });
-                // add functionality to the action buttons within ability details panels
-                $storageAbilitiesDiv.delegate('.button[data-action]', 'mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
-                $storageAbilitiesDiv.delegate('.button[data-action]', 'click', function(e){
-                    //console.log('%c' + 'Storage ability details button clicked!', 'color: cyan;');
-                    e.preventDefault();
-                    let $actionButton = $(this);
-                    let actionToken = $actionButton.attr('data-action');
-                    //console.log('-> actionToken =', actionToken);
-                    let $detailsDiv = $robotsOverview.find('.storage-details');
-                    if (!$detailsDiv.is('[data-ability]')){ return; }
-                    let abilityToken = $detailsDiv.attr('data-ability');
-                    //console.log('-> abilityToken =', abilityToken);
-                    let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
-                    let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
-                    //console.log('-> targetRobotToken =', targetRobotToken);
-                    // Launch a modal for the given action on the selected robot if applicable
-                    //console.log('ability action ' + actionToken + ' modal functionality! w/', '\n-> actionToken =', actionToken, '\n-> abilityToken =', abilityToken, '\n-> targetRobotToken =', targetRobotToken);
-                    let autoClickAction = function(){ $actionButton.addClass('clicked'); _self.playSoundEffect('icon-click'); };
-                    let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
-                    if (actionToken === 'equip-ability'){ autoClickAction(); _self.showEquipAbilityModal(abilityToken, targetRobotToken, actionModalConfig); }
-                    else if (actionToken === 'remove-ability'){ autoClickAction(); _self.showRemoveAbilityModal(abilityToken, targetRobotToken, actionModalConfig); }
-                    else { console.warn('-> undefined ability action "', actionToken, '", ignoring input'); return false; }
-                    // Return true on success
                     return true;
                     });
                 // if the storage tray is open, hovering a robot in the storage-list  highlights it for interaction
@@ -2962,7 +2986,31 @@ class mmrpgWorldMap {
                     refreshRobotsDiv();
                     return true;
                     });
-                // ...
+                // add functionality to the action buttons within ability details panels
+                $robotsOverview.delegate('.storage-details[data-ability] .button[data-action]', 'mouseenter', function(){ _self.playSoundEffect('icon-hover'); });
+                $robotsOverview.delegate('.storage-details[data-ability] .button[data-action]', 'click', function(e){
+                    //console.log('%c' + 'Storage ability details button clicked!', 'color: cyan;');
+                    e.preventDefault();
+                    let $actionButton = $(this);
+                    let actionToken = $actionButton.attr('data-action');
+                    //console.log('-> actionToken =', actionToken);
+                    let $detailsDiv = $robotsOverview.find('.storage-details');
+                    if (!$detailsDiv.is('[data-ability]')){ return; }
+                    let abilityToken = $detailsDiv.attr('data-ability');
+                    //console.log('-> abilityToken =', abilityToken);
+                    let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+                    let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
+                    //console.log('-> targetRobotToken =', targetRobotToken);
+                    // Launch a modal for the given action on the selected robot if applicable
+                    //console.log('ability action ' + actionToken + ' modal functionality! w/', '\n-> actionToken =', actionToken, '\n-> abilityToken =', abilityToken, '\n-> targetRobotToken =', targetRobotToken);
+                    let autoClickAction = function(){ $actionButton.addClass('clicked'); _self.playSoundEffect('icon-click'); };
+                    let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
+                    if (actionToken === 'equip-ability'){ autoClickAction(); _self.showEquipAbilityModal(abilityToken, targetRobotToken, actionModalConfig); }
+                    else if (actionToken === 'remove-ability'){ autoClickAction(); _self.showRemoveAbilityModal(abilityToken, targetRobotToken, actionModalConfig); }
+                    else { console.warn('-> undefined ability action "', actionToken, '", ignoring input'); return false; }
+                    // Return true on success
+                    return true;
+                    });
                 }
             }
         _self.robotsOverviewAPI = robotsOverviewAPI;
@@ -4317,13 +4365,14 @@ class mmrpgWorldMap {
         }
 
     // Quick function for resetting the map's zoom level to the user's current setting
-    resetZoomLevel(){
+    resetZoomLevel(toDefault){
         //console.log('%c' + 'mmrpgWorldMap.resetZoomLevel()', 'color: magenta;');
+        toDefault = typeof toDefault === 'boolean' ? toDefault : false;
         let _self = this;
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
-        let userZoomLevel = _world.userZoomLevel || _config.defaultZoomLevel;
+        let userZoomLevel = toDefault ? _config.defaultZoomLevel : (_world.userZoomLevel || _config.defaultZoomLevel);
         if (userZoomLevel < _config.minZoomLevel){ userZoomLevel = _config.minZoomLevel; }
         else if (userZoomLevel > _config.maxZoomLevel){ userZoomLevel = _config.maxZoomLevel; }
         _self.updateZoomLevel(userZoomLevel, true);
@@ -9206,6 +9255,7 @@ class mmrpgWorldMap {
         let _userInputs = _inputs.userInputs
         let aButtonIcon = _userInputs.A.icon, bButtonIcon = _userInputs.B.icon;
         let xButtonIcon = _userInputs.X.icon, yButtonIcon = _userInputs.Y.icon;
+        console.log('_userInputs =', _userInputs);
         // withdraw/deposit,take-out/put-away,activate/bench,add-to-team/remove-from-team
         robotDetailsObject.actions = [];
         let showStorageButtons = (currentScreen === 'robots-overview' && currentSubScreen === 'robots') ? true : false;
