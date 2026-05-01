@@ -513,6 +513,7 @@ $(document).ready(function(){
                     //console.log(data);
 
                     // Update this item's global quantity
+                    var oldZennyTotal = thisShopData.zennyCounter;
                     var newItemCount = data[2] != undefined ? parseInt(data[2]) : false;
                     var newZennyTotal = data[3] != undefined ? parseInt(data[3]) : false;
                     var newPointsTotal = data[4] != undefined && data[4].indexOf('points:') !== -1 ? parseInt(data[4].replace('points:', '')) : false;
@@ -544,7 +545,8 @@ $(document).ready(function(){
                         */
 
                     var thisZennyFormatted = printNumberWithCommas(newZennyTotal);
-                    $('#zenny_counter', thisBody).css({color:'#8CEB80'}).html(thisZennyFormatted);
+                    var thisZennyDiffClass = (newZennyTotal - oldZennyTotal) > 0 ? 'increased' : 'decreased';
+                    $('#zenny_counter', thisBody).addClass(thisZennyDiffClass).html(thisZennyFormatted);
                     if (window.self !== window.parent){
                         parent.prototype_update_zenny(thisZennyFormatted+' z');
                         if (newPointsTotal !== false){
@@ -579,9 +581,9 @@ $(document).ready(function(){
 
                     // Animate the cell to show that an action has been completed
                     thisConfirmCell.stop().animate({opacity:1.0},300,'swing',function(){
-                        thisConfirmCell.animate({opacity:0.3},600,'swing',function(){
+                        thisConfirmCell.animate({opacity:0.3},300,'swing',function(){
                             $(this).css({opacity:1.0}).empty().append('<div class="placeholder">&hellip;</div>');
-                            $('#zenny_counter', thisBody).css({color:''});
+                            $('#zenny_counter', thisBody).removeClass(thisZennyDiffClass);
                             //console.log('we just completed an action... postData = ', postData);
 
                             // If the completed action was buying a new robot, refresh page

@@ -8,6 +8,33 @@
 #shop .header {
     width: 100%;
 }
+#prototype .header .count .progress {
+    position: absolute;
+    right: 6px;
+    color: #ffffff;
+    font-weight: bold;
+}
+#prototype .header #zenny_counter {
+    display: inline-block;
+    color: #ffffff;
+    transform: scale(1.0);
+    transform-origin: right;
+    transition: color 0.6s, transform 0.6s;
+    transition-timing-function: ease-in-out;
+}
+#prototype .header #zenny_counter:after {
+    content: "\0001b6";
+    padding-left: 1px;
+}
+#prototype .header #zenny_counter.increased {
+    color: #8CEB80;
+    transform: scale(1.1);
+}
+#prototype .header #zenny_counter.decreased {
+    color: #eb8080;
+    transform: scale(0.9);
+
+}
 #shop #canvas {
     display: block;
     float: none;

@@ -1,25 +1,21 @@
 // Generate the document ready events for this page
-var $thisBody = false;
-var $thisPrototype = false;
-var $thisWindow = false;
-var $thisSettings = false;
-var $thisSettingsPanel = false;
-var thisScrollbarSettings = {wheelSpeed:0.3,suppressScrollX:true,scrollYMarginOffset:6};
-var resizeSettingsWrapper = function(){};
+let $thisSettings = false;
+let $thisSettingsPanel = false;
+let resizeSettingsWrapper = function(){};
 $(document).ready(function(){
 
     // Update global reference variables
-    $thisBody = $('#mmrpg');
-    $thisPrototype = $('#prototype', $thisBody);
-    $thisWindow = $(window);
-    $thisSettings = $('#settings', $thisBody);
+    if (!$thisWindow){ console.error('$thisWindow not found!'); return false; }
+    if (!$mmrpgWrapper){ console.error('$mmrpgWrapper not found!'); return false; }
+    if (!$mmrpgElements){ console.error('$mmrpgElements not found!'); return false; }
+    $thisSettings = $('#settings', $mmrpgWrapper);
     $thisSettingsPanel = $('.settings_panel', $thisSettings);
 
     // -- SOUND EFFECT FUNCTIONALITY -- //
 
     // Define some interaction sound effects for the items menu
-    var thisContext = $('#settings');
-    var playSoundEffect = function(){};
+    let thisContext = $('#settings');
+    let playSoundEffect = function(){};
     if (typeof parent.mmrpg_play_sound_effect !== 'undefined'){
 
         // Define a quick local function for routing sound effect plays to the parent
@@ -108,7 +104,7 @@ $(document).ready(function(){
     if ($thisSettingsPanel.length){
 
         // Attach the scrollbar to the battle events container
-        $('.tab_sections', $thisSettingsPanel).perfectScrollbar(thisScrollbarSettings);
+        $('.tab_sections', $thisSettingsPanel).perfectScrollbar(gameSettings.perfectScrollbar);
         $('.tab_sections', $thisSettingsPanel).perfectScrollbar('update');
         $thisWindow.resize(function(){ $('.tab_sections', $thisSettingsPanel).perfectScrollbar('update'); });
 
@@ -205,7 +201,7 @@ $(document).ready(function(){
     // -- SETTINGS HELPER FUNCTIONS -- //
 
     // Define a function that updates the range labels for the game settings w/ current values
-    var updateRangeLabelValue = function($input, $value, value){
+    let updateRangeLabelValue = function($input, $value, value){
         //console.log('updateRangeLabelValue() w/' + '\n$input:', $input, '\n$value:', $value, '\nvalue:', value);
         var text = value;
         if ($input.is('[min][max][data-percent]')){
@@ -241,7 +237,7 @@ $(document).ready(function(){
         };
 
     // Define a function that takes a given settings panel and binds relevant events to all range inputs
-    var bindRangeInputEvents = function($settings){
+    let bindRangeInputEvents = function($settings){
         $('input[type="range"]', $settings).each(function(){
             var $input = $(this);
             var $parent = $input.closest('.subfield') || $input.closest('.field');
@@ -267,7 +263,7 @@ $(document).ready(function(){
 
     // Define a function that takes a given settings panel and binds relevant events to all radio inputs,
     // making it so clicking a radio button's container automatically triggers the radio button inside too
-    var bindRadioInputEvents = function($settings){
+    let bindRadioInputEvents = function($settings){
         var $radioFields = $('.radiofield', $settings);
         $.each($radioFields, function(i, $radioField){
             var $radioFieldParent = $(this).closest('.subfield') || $(this).closest('.field');
@@ -289,7 +285,7 @@ $(document).ready(function(){
     // -- SETTINGS FUNCTIONALITY BY TAB -- //
 
     // Process complex player setting updates and pass them to the parent window
-    var $proxySettings = $('.proxy-settings', $thisSettings);
+    let $proxySettings = $('.proxy-settings', $thisSettings);
     if ($proxySettings.length){
         //console.log('we have player settings specifically');
 
@@ -317,7 +313,7 @@ $(document).ready(function(){
         }
 
     // Process complex audio setting updates and pass them to the parent window
-    var $audioSettings = $('.audio-settings', $thisSettings);
+    let $audioSettings = $('.audio-settings', $thisSettings);
     if ($audioSettings.length){
         //console.log('we have game settings specifically');
 
@@ -328,16 +324,16 @@ $(document).ready(function(){
         bindRadioInputEvents($audioSettings);
 
         // Collect references to the appropriate windows for updating
-        var thisMusicWindow = window.top;
-        var thisGameSettings = window.top.gameSettings;
+        let thisMusicWindow = window.top;
+        let thisGameSettings = window.top.gameSettings;
 
         // ---
 
         // Collect references to the applicable form fields
-        var $audioBalanceConfigField = $('.field[data-setting="audioBalanceConfig"]', $audioSettings);
+        let $audioBalanceConfigField = $('.field[data-setting="audioBalanceConfig"]', $audioSettings);
 
         // Backup the user's audio changes in case we need to reset them
-        var userAudioConfigBackup = {};
+        let userAudioConfigBackup = {};
         userAudioConfigBackup = parseAudioBalanceConfig();
 
         // Define a function for parsing the audio balance config from the form
@@ -360,9 +356,9 @@ $(document).ready(function(){
             };
 
         // Define a function for updating the audio balance config w/ form changes
-        var prevMasterVolume = false;
-        var prevMusicVolume = false;
-        var prevEffectVolume = false;
+        let prevMasterVolume = false;
+        let prevMusicVolume = false;
+        let prevEffectVolume = false;
         function updateAudioBalanceConfig(newConfig){
             //console.log('updateAudioBalanceConfig(newConfig) w/', newConfig);
             if (typeof newConfig !== 'object'){ return false; }
@@ -398,12 +394,12 @@ $(document).ready(function(){
         // ---
 
         // Reset back to backup values if the user switches windows without saving
-        var resetGameSettings = function(){
+        let resetGameSettings = function(){
             //console.log('resetGameSettings()');
             //console.log('userAudioConfigBackup = ', userAudioConfigBackup);
             updateAudioBalanceConfig(userAudioConfigBackup);
             };
-        var applyGameSettings = function(){
+        let applyGameSettings = function(){
             //console.log('applyGameSettings()');
             //console.log('parseAudioBalanceConfig() = ', parseAudioBalanceConfig());
             updateAudioBalanceConfig(parseAudioBalanceConfig());
@@ -433,7 +429,7 @@ $(document).ready(function(){
         }
 
     // Process complex game setting updates and pass them to the parent window
-    var $performanceSettings = $('.performance-settings', $thisSettings);
+    let $performanceSettings = $('.performance-settings', $thisSettings);
     if ($performanceSettings.length){
         //console.log('we have game settings specifically');
 
@@ -481,8 +477,8 @@ $(document).ready(function(){
             if (typeof newMotion !== 'number'){ return false; }
             var newMotionValue = newMotion;
             thisGameSettings.menuButtonSpriteMotion = newMotionValue;
-            if (newMotionValue){ $thisBody.addClass('menuButtonSpriteMotion'); }
-            else { $thisBody.removeClass('menuButtonSpriteMotion'); }
+            if (newMotionValue){ $mmrpgWrapper.addClass('menuButtonSpriteMotion'); }
+            else { $mmrpgWrapper.removeClass('menuButtonSpriteMotion'); }
             return true;
             };
         function updateMenuBackgroundImageMotion(newMotion){
@@ -490,8 +486,8 @@ $(document).ready(function(){
             if (typeof newMotion !== 'number'){ return false; }
             var newMotionValue = newMotion;
             thisGameSettings.menuBackgroundImageMotion = newMotionValue;
-            if (newMotionValue){ $thisBody.addClass('menuBackgroundImageMotion'); }
-            else { $thisBody.removeClass('menuBackgroundImageMotion'); }
+            if (newMotionValue){ $mmrpgWrapper.addClass('menuBackgroundImageMotion'); }
+            else { $mmrpgWrapper.removeClass('menuBackgroundImageMotion'); }
             return true;
             };
 
@@ -553,12 +549,12 @@ $(document).ready(function(){
             var newToggleValue = newToggle;
             thisGameSettings.allowReadyRoomSprites = newToggleValue;
             if (newToggleValue){
-                $thisBody.addClass('allowReadyRoomSprites');
+                $mmrpgWrapper.addClass('allowReadyRoomSprites');
                 $readyRoomSpriteMotionField.removeClass('redundant-disabled');
                 $readyRoomSpriteLimitField.removeClass('redundant-disabled');
                 }
             else {
-                $thisBody.removeClass('allowReadyRoomSprites');
+                $mmrpgWrapper.removeClass('allowReadyRoomSprites');
                 $readyRoomSpriteMotionField.addClass('redundant-disabled');
                 $readyRoomSpriteLimitField.addClass('redundant-disabled');
                 }
@@ -571,8 +567,8 @@ $(document).ready(function(){
             if (typeof newMotion !== 'number'){ return false; }
             var newMotionValue = newMotion;
             thisGameSettings.readyRoomSpriteMotion = newMotionValue;
-            if (newMotionValue){ $thisBody.addClass('readyRoomSpriteMotion'); }
-            else { $thisBody.removeClass('readyRoomSpriteMotion'); }
+            if (newMotionValue){ $mmrpgWrapper.addClass('readyRoomSpriteMotion'); }
+            else { $mmrpgWrapper.removeClass('readyRoomSpriteMotion'); }
             return true;
             };
 
@@ -628,7 +624,7 @@ $(document).ready(function(){
         window.addEventListener('message', function(event){
             //console.log('iframe received a message from', event.origin);
             // IMPORTANT: Check the origin of the data!
-            if (event.origin.startsWith(performanceSettings.baseHref)){
+            if (event.origin.startsWith(gameSettings.baseHref)){
                 if (event.data === 'hidden'){
                     //console.log('The iframe was hidden!');
                     resetGameSettings();
@@ -692,8 +688,8 @@ $(document).ready(function(){
             var oldButtonMode = thisGameSettings.battleButtonMode;
             var newButtonMode = newMode.length ? newMode : thisGameSettings.battleButtonMode;
             thisGameSettings.battleButtonMode = newButtonMode;
-            $thisBody.removeClassByRegex(/^battleButtonMode_/);
-            $thisBody.addClass('battleButtonMode_'+newButtonMode);
+            $mmrpgWrapper.removeClassByRegex(/^battleButtonMode_/);
+            $mmrpgWrapper.addClass('battleButtonMode_'+newButtonMode);
             if (typeof window.parent.prototype_update_game_settings !== 'undefined'){
                 //console.log('sending update request to parent prototype_update_game_settings() w/ '+newButtonMode);
                 window.parent.prototype_update_game_settings({'battleButtonMode': newButtonMode}, saveChanges);
@@ -759,10 +755,10 @@ $(document).ready(function(){
     var htmlScroll = $('html').scrollTop();
 
     // Fade in the leaderboard screen slowly
-    $thisBody.waitForImages(function(){
+    $mmrpgWrapper.waitForImages(function(){
         var tempTimeout = setTimeout(function(){
-            if (gameSettings.fadeIn){ $thisBody.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing'); }
-            else { $thisBody.removeClass('hidden').css({opacity:1}); }
+            if (gameSettings.fadeIn){ $mmrpgWrapper.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing'); }
+            else { $mmrpgWrapper.removeClass('hidden').css({opacity:1}); }
             //console.log('updating perfect scrollbar 4');
             $('#console .scroll_wrapper', $thisSettings).perfectScrollbar('update');
             // Let the parent window know the menu has loaded
@@ -777,14 +773,14 @@ function windowResizeFrame(){
 
     var windowWidth = $thisWindow.width();
     var windowHeight = $thisWindow.height();
-    var headerHeight = $('.header', $thisBody).outerHeight(true);
+    var headerHeight = $('.header', $mmrpgWrapper).outerHeight(true);
 
     var newBodyHeight = windowHeight;
     var newFrameHeight = newBodyHeight - headerHeight;
     var newScrollWrapperHeight = newFrameHeight - 142;
 
-    if (windowWidth > 800){ $thisBody.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
-    else { $thisBody.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
+    if (windowWidth > 800){ $mmrpgWrapper.addClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
+    else { $mmrpgWrapper.removeClass((gameSettings.wapFlag ? 'mobileFlag' : 'windowFlag')+'_landscapeMode'); }
 
     //console.log('windowWidth = '+windowWidth+'; parentWidth = '+parentWidth+'; thisTypeContainerWidth = '+thisTypeContainerWidth+'; thisStarContainerWidth = '+thisStarContainerWidth+'; ');
 
