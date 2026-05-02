@@ -23,7 +23,7 @@ $cached_music_tracks_index = 'cache.game-music-tracks_index.json';
 if ($cached_files_enabled
     && file_exists($cached_files_dir.$cached_music_tracks_index)
     && date('Ymd', filemtime($cached_files_dir.$cached_music_tracks_index)) >= $cached_date_cutoff){
-    error_log(basename(__FILE__).' is pulling music tracks index from cache !');
+    //error_log(basename(__FILE__).' is pulling music tracks index from cache !');
     $this_music_track_index = json_decode(file_get_contents($cached_files_dir.$cached_music_tracks_index));
 }
 
@@ -34,7 +34,7 @@ $mmrpg_music_rooturl = MMRPG_CONFIG_CDN_ROOTURL.$mmrpg_music_path;
 
 // Collect the music index from the database and then output to the JS
 if (empty($this_music_track_index)){
-    error_log(basename(__FILE__).' is generated music tracks index from scratch ...');
+    //error_log(basename(__FILE__).' is generated music tracks index from scratch ...');
     $this_music_track_index = rpg_music_track::get_index(true, false, 'music_token', 'music_album+/+music_token');
     $this_music_track_index = array_map(function($info){ return array(
         'token' => $info['music_token'],

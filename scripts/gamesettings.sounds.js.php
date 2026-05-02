@@ -24,13 +24,13 @@ $cached_sound_effects_aliases_index = 'cache.game-sound-effects-aliases_index.js
 if ($cached_files_enabled
     && file_exists($cached_files_dir.$cached_sound_effects_index)
     && date('Ymd', filemtime($cached_files_dir.$cached_sound_effects_index)) >= $cached_date_cutoff){
-    error_log(basename(__FILE__).' is pulling sound effects index from cache !');
+    //error_log(basename(__FILE__).' is pulling sound effects index from cache !');
     $this_sound_effects_index = json_decode(file_get_contents($cached_files_dir.$cached_sound_effects_index));
 }
 if ($cached_files_enabled
     && file_exists($cached_files_dir.$cached_sound_effects_aliases_index)
     && date('Ymd', filemtime($cached_files_dir.$cached_sound_effects_aliases_index)) >= $cached_date_cutoff){
-    error_log(basename(__FILE__).' is pulling sound effects aliases index from cache !');
+    //error_log(basename(__FILE__).' is pulling sound effects aliases index from cache !');
     $sound_effects_aliases_index = json_decode(file_get_contents($cached_files_dir.$cached_sound_effects_aliases_index));
 }
 
@@ -41,7 +41,7 @@ $mmrpg_sounds_rooturl = MMRPG_CONFIG_CDN_ROOTURL.$mmrpg_sounds_path;
 
 // Collect the sound effects index from the file and then output to the JS
 if (empty($this_sound_effects_index)){
-    error_log(basename(__FILE__).' is generated sound effects index from scratch ...');
+    //error_log(basename(__FILE__).' is generated sound effects index from scratch ...');
     $this_sound_effects_path = $mmrpg_sounds_rootdir.'misc/sound-effects-curated/';
     $this_sound_effects_index = array();
     $this_sound_effects_index_raw = file_exists($this_sound_effects_path.'audio.json') ? json_decode(file_get_contents($this_sound_effects_path.'audio.json'), true) : array();

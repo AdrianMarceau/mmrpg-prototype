@@ -21,7 +21,7 @@ $cached_markup_file = 'cache.mmrpg-content-styles.css';
 if ($cached_files_enabled
     && file_exists($cached_files_dir.$cached_markup_file)
     && date('Ymd', filemtime($cached_files_dir.$cached_markup_file)) >= $cached_date_cutoff){
-    error_log(basename(__FILE__).' is pulling mmrpg content index css from cache !');
+    //error_log(basename(__FILE__).' is pulling mmrpg content index css from cache !');
     header('HTTP/1.1 200 OK');
     $content_index_css = file_get_contents($cached_files_dir.$cached_markup_file);
     echo(trim($content_index_css).PHP_EOL);
@@ -30,7 +30,7 @@ if ($cached_files_enabled
 
 // Otherwise we will have to generate it from scratch at runtime
 require($base_dir.'content/all.php');
-error_log(basename(__FILE__).' is generating mmrpg content index css from scratch ...');
+//error_log(basename(__FILE__).' is generating mmrpg content index css from scratch ...');
 if (!empty($mmrpg_indexes)){
     header('HTTP/1.1 200 OK');
     ob_start();
