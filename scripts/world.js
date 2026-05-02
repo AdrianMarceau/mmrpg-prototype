@@ -558,6 +558,7 @@ class mmrpgWorldMap {
             else { return true; }
             };
         let onLayersLoaded = function(){
+            _self.refreshTerrainTileOverlay();
             let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
             if ($terrainLayer.length){
                 let dropdownRequired = !_elements.actionDropdown || !_elements.actionDropdown.length;
@@ -4409,7 +4410,7 @@ class mmrpgWorldMap {
 
     // Quick function for (re)generating the terrain tile overlay and indexing the positions of the all the tiles
     refreshTerrainTileOverlay(){
-        //console.log('%c' + 'mmrpgWorldMap.refreshTerrainTileOverlay()', 'color: magenta;');
+        console.log('%c' + 'mmrpgWorldMap.refreshTerrainTileOverlay()', 'color: magenta;');
         let _self = this;
         let _selfRef = _self.refreshTerrainTileOverlay;
         let _config = _self.config;
@@ -4646,7 +4647,7 @@ class mmrpgWorldMap {
 
     // Define a quick function for getting the sprite offset of a given layer tile on the map
     getLayerTileSpriteOffset(col, row){
-        //console.log('%c' + 'mmrpgWorldMap.getLayerTileSpriteOffset(col:' + col + ', row:' + row + ')', 'color: magenta;');
+        console.log('%c' + 'mmrpgWorldMap.getLayerTileSpriteOffset(col:' + col + ', row:' + row + ')', 'color: magenta;');
         if (typeof col !== 'number' || typeof row !== 'number'){ console.error('col and row must be numbers!'); return false; }
         if (col < 1 || row < 1){ console.error('col and row must be greater than zero!'); return false; }
         let _self = this;
@@ -4657,9 +4658,10 @@ class mmrpgWorldMap {
         if (!refTileOffset || typeof refTileOffset === 'undefined'){ return false; }
         let tileSpriteOffset = {left: 0, top: 0, width: 0, height: 0};
         tileSpriteOffset.left = refTileOffset.left + (refTileOffset.width / 2) - (_mapSpriteSize[0] / 2);
-        tileSpriteOffset.top = refTileOffset.top + (refTileOffset.height / 2) - (_mapSpriteSize[1] / 2) - (_mapEffects.usePerspective ? 20 : 10);
+        tileSpriteOffset.top = refTileOffset.top + (refTileOffset.height / 2) - (_mapSpriteSize[1] / 2) - 10; // why 10?
         tileSpriteOffset.width = refTileOffset.width;
         tileSpriteOffset.height = refTileOffset.height;
+        console.log('return tileSpriteOffset', tileSpriteOffset);
         return tileSpriteOffset;
         }
 
