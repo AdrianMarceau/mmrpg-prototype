@@ -635,6 +635,18 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
                     echo($rivals_layer_markup);
                 echo('</div>'.PHP_EOL);
 
+                // LABELS AND OVERLAYS
+                $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
+                $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
+                echo('<div class="layer layer-4 sprites overlays" data-layer="sprites/overlays" '.$map_layer_styles.$map_layer_attrs.'>');
+                    // (populated at runtime)
+                    // DEBUG DEBUG DEBUG
+                    // echo('<div class="sprite overlay position-overlay debug">');
+                    //    echo('<strong class="label position-label debug">X12-Y34</strong>');
+                    // echo('</div>'.PHP_EOL);
+                    // DEBUG DEBUG DEBUG
+                echo('</div>'.PHP_EOL);
+
                 // END OF LAYERS
                 ?>
             </div>

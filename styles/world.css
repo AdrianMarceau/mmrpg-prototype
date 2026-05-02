@@ -141,6 +141,7 @@ html, body {
 #world #canvas #map .layer[data-layer^="sprites/"] { z-index: 20; }
 #world #canvas #map .layer[data-layer="sprites/tiles"] { z-index: 30; }
 #world #canvas #map .layer[data-layer="sprites/objects"] { z-index: 40; }
+#world #canvas #map .layer[data-layer="sprites/overlays"] { z-index: 50; }
 
 /* define some special-effect styles for the terrain layer specifically */
 #world #canvas #map .layer[data-layer="terrain"] canvas {
@@ -409,6 +410,42 @@ html, body {
 }
 #world #map .layer .sprite.field.background {
     filter: blur(6px);
+}
+
+/* define the rules for overlay sprites specifically */
+#world #map .layer .sprite.overlay {
+    display: block;
+    position: absolute;
+    overflow: visible;
+    top: 0;
+    left: 0;
+    transform: translate(0, 0);
+}
+#world #map .layer .sprite.overlay .label {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0 3px;
+    background-color: #262626;
+    color: #efefef;
+    font-size: 8px;
+    line-height: 1.4;
+    text-indent: 0;
+    font-weight: normal;
+    border-radius: 3px;
+}
+#world #map .layer .sprite.position-overlay {
+    border: 1px solid red;
+    width: 80px;
+    height: 80px;
+}
+
+#world #map .layer .sprite.overlay.debug {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 /* define the rules for all the tile sprites (that aren't embeded in a canvas)  */
