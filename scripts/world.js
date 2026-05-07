@@ -4846,21 +4846,21 @@ class mmrpgWorldMap {
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
 
+        // First we update the cursor sprite position and attributes
+        let $positionDisplay = $('#position-display', $thisWorld);
+        let $positionDisplayWrapper = $('> .wrapper', $positionDisplay);
+        //let newPositionText = _config.mapName + ' | ' + ('X' + thisNewCol + '-Y' + thisNewRow);
+        //$positionDisplayWrapper.text('X:' + thisNewCol + ' Y:' + thisNewRow);
+        //$positionDisplayWrapper.text(newPositionText);
+        let newPositionText = '';
+        newPositionText += '<strong class="area">' + _config.mapName + '</strong>';
+        newPositionText += '<data class="coords">' + ('X' + thisNewCol + '-Y' + thisNewRow) + '</data>';
+        $positionDisplayWrapper.html(newPositionText);
+
         // Make sure we start the scroll to the new position if not already there
         let worldScroll = _world.scrollPosition || [-1, -1];
         if (worldScroll[0] !== cursorPositionXY[0]
             || worldScroll[1] !== cursorPositionXY[1]){
-
-            // First we update the cursor sprite position and attributes
-            let $positionDisplay = $('#position-display', $thisWorld);
-            let $positionDisplayWrapper = $('> .wrapper', $positionDisplay);
-            //let newPositionText = _config.mapName + ' | ' + ('X' + thisNewCol + '-Y' + thisNewRow);
-            //$positionDisplayWrapper.text('X:' + thisNewCol + ' Y:' + thisNewRow);
-            //$positionDisplayWrapper.text(newPositionText);
-            let newPositionText = '';
-            newPositionText += '<strong class="area">' + _config.mapName + '</strong>';
-            newPositionText += '<data class="coords">' + ('X' + thisNewCol + '-Y' + thisNewRow) + '</data>';
-            $positionDisplayWrapper.html(newPositionText);
 
             // Then we actually scroll the map to the requested position on-screen
             _self.scrollMap(cursorPositionXY[0], cursorPositionXY[1]);
