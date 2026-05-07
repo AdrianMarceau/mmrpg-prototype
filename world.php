@@ -779,8 +779,8 @@ $(document).ready(function(){
     mmrpg_keep_session_alive(<?= rpg_game::get_userid() ?>);
     <? } ?>
 
-    console.log('$WORLD_PLAYER_SESSION[\'recent_actions\'] =', <?= json_encode($WORLD_PLAYER_SESSION['recent_actions'], true) ?>);
-    console.log('$WORLD_PLAYER_SESSION[\'pending_actions\'] =', <?= json_encode($WORLD_PLAYER_SESSION['pending_actions'], true) ?>);
+    //console.log('$WORLD_PLAYER_SESSION[\'recent_actions\'] =', <?= json_encode($WORLD_PLAYER_SESSION['recent_actions'], true) ?>);
+    //console.log('$WORLD_PLAYER_SESSION[\'pending_actions\'] =', <?= json_encode($WORLD_PLAYER_SESSION['pending_actions'], true) ?>);
 
 });
 

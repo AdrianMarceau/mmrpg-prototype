@@ -135,6 +135,7 @@ gameSettings.worldState = {
     walkableMapTileKeys: [], // array of tile keys that are specifically walkable
     zoomLevel: 1.0, // default zoom level,
     userZoomLevel: 1.0, // current zoom level set by user
+    scrollPosition: [-1, -1], // current scroll XY position of visible map
     mapIsHidden: false, // map is full visible by default
     storageBoxesVisible: false, // map hidden by storage boxes capturing input
     actionModalVisible: false, // map hidden by action modal capturing input
@@ -533,6 +534,7 @@ class mmrpgWorldMap {
             else if (startDirection.indexOf('up') !== -1){ fakeOldPosition[1] = fakeOldPosition[1] + 1; }
             _config.allowWorldEvents = true;
             _self.playSoundEffect('teleport-in');
+            //_self.togglePerspectiveMode(); // TEMP TEMP TEMP
             _self.moveToPosition(startPosition, null, true, false, fakeOldPosition);
             //_self.togglePerspectiveMode(); // TEMP TEMP TEMP
             setTimeout(function(){
@@ -546,6 +548,7 @@ class mmrpgWorldMap {
                     _self.triggerWorldReadyEvents();
                     _self.startIdleAnimation();
                     _world.isBusy = false;
+                    gameSettings.gameHasStarted = true;
                     //_self.showWorldMessage('<span style="color: cyan;">triggerWorldReadyEvents()</span>');
                     }, 900);
                 }, 100);
@@ -1454,6 +1457,7 @@ class mmrpgWorldMap {
                 _self.moveToPosition(thisPos, function(){
                     _self.makeLayerTileInactive(oldPos);
                     }, true);
+                clearTimeout(activeTimeouts[thisPos]);
                 }, activeTimeoutDuration);
             });
         $clickOverlay.bind('mousemove', function(e){
@@ -1724,7 +1728,7 @@ class mmrpgWorldMap {
             // Define a function for expanding the robots-overview panel and showing a specific view
             let overviewIsOpening = false;
             let showRobotsOverviewPanel = function(viewToken, onComplete, keepSelectedTeamRobot){
-                console.log('%c' + 'showRobotsOverviewPanel(viewToken:' + (viewToken ? viewToken : typeof viewToken) + ') called!', 'color: magenta;');
+                //console.log('%c' + 'showRobotsOverviewPanel(viewToken:' + (viewToken ? viewToken : typeof viewToken) + ') called!', 'color: magenta;');
                 // Otherwise we can expand (if not already) the panel and switch to this specific view
                 // and then disable the outside UI buttons to prevent bad-clicks and visual clutter
                 viewToken = viewToken && typeof viewToken === 'string' && viewToken.length ? viewToken : '';
@@ -4001,6 +4005,19 @@ class mmrpgWorldMap {
         return true;
         }
 
+    // Quick function for refreshing the cursor's current map position
+    refreshPosition(onComplete, forceMove, animateMove, thisOldPos){
+        //console.log('%c' + 'mmrpgWorldMap.refreshPosition()', 'color: magenta;');
+        let _self = this;
+        let _world = _self.state;
+        let _worldCursor = _world.cursor;
+        forceMove = typeof forceMove === 'boolean' ? forceMove : true;
+        animateMove = typeof animateMove === 'boolean' ? animateMove : false;
+        if (!thisOldPos){ thisOldPos = [_worldCursor.col, _worldCursor.row]; }
+        let newPosition = _worldCursor.col + '-' + _worldCursor.row;
+        return _self.moveToPosition(newPosition, onComplete, forceMove, animateMove, thisOldPos);
+        }
+
     // Quick function for moving cursor to a given map position
     moveToPosition(newPosition, onComplete, forceMove, animateMove, thisOldPos){
         //console.log('%c' + 'mmrpgWorldMap.moveToPosition(' + newPosition + ')', 'color: magenta;');
@@ -4225,8 +4242,8 @@ class mmrpgWorldMap {
         }
 
     // Quick function for re-centering the map on the player's position and the map's current zoom level
-    scrollMap(scrollX, scrollY){
-        //console.log('%c' + 'mmrpgWorldMap.scrollMap(scrollX:' + scrollX + ', scrollY:' + scrollY + ')', 'color: magenta;');
+    scrollMap(scrollX, scrollY, forceRefresh){
+        //console.log('%c' + 'mmrpgWorldMap.scrollMap(scrollX:' + scrollX + ', scrollY:' + scrollY + ', forceRefresh:' + forceRefresh + ')', 'color: magenta;');
         // Collect references, indexes, and other variables we need to work with
         let _self = this;
         let _selfRef = self;
@@ -4243,6 +4260,9 @@ class mmrpgWorldMap {
         let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
         if (typeof scrollX !== 'number'){ scrollX = _worldCursor.positionXY[0] || 0; }
         if (typeof scrollY !== 'number'){ scrollY = _worldCursor.positionXY[1] || 0; }
+        if (typeof forceRefresh !== 'boolean'){ forceRefresh = false; }
+        let worldScroll = _world.scrollPosition || [-1, -1];
+        if (!forceRefresh && worldScroll[0] === scrollX && worldScroll[1] === scrollY){ return true; }
         // And now we should move the map itself so that the characters are always centered in the viewport
         if (!_selfRef.lastWorldZoom){ _selfRef.lastWorldZoom = _world.zoomLevel; }
         let worldZoom = _world.zoomLevel;
@@ -4258,10 +4278,6 @@ class mmrpgWorldMap {
         let mapScrollY = scrollY;
         let targetX = (mapScrollX + (mapTileSizeX / 2) - (mapTileSizeOffsetX / 2)) * worldZoom;
         let targetY = (mapScrollY + (mapTileSizeY / 2) - (mapTileSizeOffsetY / 2)) * worldZoom;
-        if (usePerspective){
-            console.warn('scrollMap() disabled for perspective mode temporarily!');
-            return false;
-            }
         // Now calculate the new translate values for the map container
         let translateX = 0, translateY = 0;
         if (mapWidth < worldWidth){ translateX = (worldWidth - mapWidth) / 2; }
@@ -4276,12 +4292,27 @@ class mmrpgWorldMap {
         let mapTranslateY = translateY;
         let subTranslateX = Math.round(-1 * (translateX * 0.1));
         let subTranslateY = Math.round(-1 * (translateY * 0.1));
+        let mapSkewSeed = Math.abs(mapTranslateX);
+        let mapSkewCenter = Math.abs(worldWidth / 2);
+        let mapSkewValue = mapSkewSeed !== mapSkewCenter ? ((mapSkewSeed - mapSkewCenter) / worldWidth) : 0;
+        //console.log('mapSkewSeed =', mapSkewSeed, 'mapSkewCenter =', mapSkewCenter, 'mapSkewValue =', mapSkewValue);
         // Apply the new translate values to the map container
+        //console.warn('applying the new translate values to the map container', '\n-> old:', worldScroll, '\n-> new:', [scrollX, scrollY]);
+        _world.scrollPosition = [scrollX, scrollY];
         //$canvasMap.css({ transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px)' });
         if (worldZoom !== _selfRef.lastWorldZoom){ _world.allowClicks = _world.allowHovers = false; }
         $canvasMap.attr('data-zoom', worldZoom);
         $canvasMap.css({ transformOrigin: 'left top', transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) scale(' + worldZoom + ')' });
-        if (worldZoom !== _selfRef.lastWorldZoom){ setTimeout(function(){ _world.allowClicks = _world.allowHovers = true; }, 1000); }
+        if (usePerspective){ $canvasMap.get(0).style.setProperty('--map-perspective-skew', mapSkewValue+'deg'); }
+        else { $canvasMap.get(0).style.setProperty('--map-perspective-skew', '0deg'); }
+        if (worldZoom !== _selfRef.lastWorldZoom){
+            if (typeof _selfRef.allowClicksTimeout !== 'undefined'){ clearTimeout(_selfRef.allowClicksTimeout); }
+            _selfRef.allowClicksTimeout = setTimeout(function(){ _world.allowClicks = _world.allowHovers = true; }, 1000);
+            if (usePerspective){
+                if (typeof _selfRef.refreshTerrainTimeout !== 'undefined'){ clearTimeout(_selfRef.refreshTerrainTimeout); }
+                _selfRef.refreshTerrainTimeout = setTimeout(function(){ _self.refreshTerrainTileOverlay(); }, 100);
+                }
+            }
         // Return true on success
         return true;
         }
@@ -4320,20 +4351,24 @@ class mmrpgWorldMap {
         }
 
     // Quick function for updating the map's current zoom level
-    updateZoomLevel(newZoomLevel, updateUserZoom){
+    updateZoomLevel(newZoomLevel, updateUserZoom, forceZoom){
         //console.log('%c' + 'mmrpgWorldMap.updateZoomLevel(newZoomLevel:' + newZoomLevel + ')', 'color: magenta;');
         if (!newZoomLevel || typeof newZoomLevel !== 'number' || newZoomLevel <= 0){
             console.error('updateZoomLevel() requires a valid zoom level!');
             return false;
             }
         let _self = this;
+        let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
         updateUserZoom = typeof updateUserZoom === 'boolean' ? updateUserZoom : false;
+        forceZoom = typeof updateUserZoom === 'boolean' ? updateUserZoom : false;
+        //console.log('-> newZoomLevel =', newZoomLevel, '-> _config.defaultZoomLevel =', _config.defaultZoomLevel, '\n-> _world.userZoomLevel =', _world.userZoomLevel);
+        if (!forceZoom && newZoomLevel === _world.zoomLevel){ return true; } // we are already at the requested zoom level
         _world.zoomLevel = newZoomLevel;
         if (updateUserZoom){ _world.userZoomLevel = newZoomLevel; }
-        //console.log('-> _world.zoomLevel =', _world.zoomLevel, '\n-> _world.userZoomLevel =', _world.userZoomLevel);
-        _self.scrollMap();
+        //console.log('-> re-scrolling map to update zoom...');
+        _self.scrollMap(null, null, true);
         return true;
         }
 
@@ -4373,6 +4408,7 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
+        if (_world.zoomLevel === _config.defaultZoomLevel && _world.userZoomLevel === _config.defaultZoomLevel){ return true; } // we are already at the requested zoom level
         let userZoomLevel = toDefault ? _config.defaultZoomLevel : (_world.userZoomLevel || _config.defaultZoomLevel);
         if (userZoomLevel < _config.minZoomLevel){ userZoomLevel = _config.minZoomLevel; }
         else if (userZoomLevel > _config.maxZoomLevel){ userZoomLevel = _config.maxZoomLevel; }
@@ -4410,23 +4446,35 @@ class mmrpgWorldMap {
 
     // Quick function for (re)generating the terrain tile overlay and indexing the positions of the all the tiles
     refreshTerrainTileOverlay(){
-        console.log('%c' + 'mmrpgWorldMap.refreshTerrainTileOverlay()', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.refreshTerrainTileOverlay()', 'color: pink;');
+        let _self = this;
+        if (_self.refreshTerrainTileOverlay._scheduled){ return; }
+        _self.refreshTerrainTileOverlay._scheduled = true;
+        requestAnimationFrame(() => {
+            _self.refreshTerrainTileOverlay._scheduled = false;
+            _self.refreshTerrainTileOverlayForReal();
+            });
+        return;
+        }
+    refreshTerrainTileOverlayForReal(){
+        //console.log('%c' + 'mmrpgWorldMap.refreshTerrainTileOverlayForReal()', 'color: magenta;');
         let _self = this;
         let _selfRef = _self.refreshTerrainTileOverlay;
         let _config = _self.config;
         let _mapEffects = _config.mapEffects;
         let _mapSpriteSize = _config.mapSpriteSize;
         let _world = _self.state;
-        let _worldZoom = _world.zoomLevel;
+        //let _worldZoom = _world.zoomLevel;
+        //let _reverseWorldZoom = (1 / _worldZoom);
         let _layerTileOffsets = _world.layerTileOffsets;
-        let _reverseWorldZoom = (1 / _worldZoom);
         let _elements = _self.elements;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
         let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
         let $terrainTileOverlay = $('svg[data-overlay="terrain"]', $terrainLayer);
-        let terrainTileOverlayRect = $terrainTileOverlay.length > 0 ? $terrainTileOverlay.get(0).getBoundingClientRect() : null;
+        //let terrainTileOverlayRect = $terrainTileOverlay.length > 0 ? $terrainTileOverlay.get(0).getBoundingClientRect() : null;
         let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
+        let $spriteOverlaysLayer = $('.layer[data-layer="sprites/overlays"]', $canvasMap);
         let $objectSprites = $('.sprite[data-sprite][data-col][data-row]', $spriteObjectsLayer);
         //console.log('$spriteObjectsLayer =', $spriteObjectsLayer.length, $spriteObjectsLayer);
         //console.log('$objectSprites =', $objectSprites.length, $objectSprites);
@@ -4454,7 +4502,7 @@ class mmrpgWorldMap {
             tileOverlayMarkup += '</svg>';
             $terrainLayer.prepend(tileOverlayMarkup);
             $terrainTileOverlay = $('svg[data-overlay="terrain"]', $terrainLayer);
-            terrainTileOverlayRect = $terrainTileOverlay.get(0).getBoundingClientRect();
+            //terrainTileOverlayRect = $terrainTileOverlay.get(0).getBoundingClientRect();
             }
         // Define a function for getting the bounding rect of a given element (layer, tile, or otherwise)
         let getBoundingRect = _selfRef.getBoundingRect;
@@ -4467,54 +4515,152 @@ class mmrpgWorldMap {
             _selfRef.getBoundingRect = getBoundingRect;
             }
         // Define a function for getting the reference tile for a given column and row in the terrain layer
+        let $referenceTiles = _selfRef.referenceTiles;
         let getReferenceTile = _selfRef.getReferenceTile;
+        if (typeof $referenceTiles === 'undefined'){
+            $referenceTiles = {};
+            _selfRef.referenceTiles = $referenceTiles;
+            }
         if (typeof getReferenceTile === 'undefined'){
             getReferenceTile = function($layer, col, row){
                 //console.log('%c' + '~ getReferenceTile($layer, col:' + col + ', row:' + row + ')', 'color: magenta;');
-                let $tileRect = $('rect[data-col="' + col + '"][data-row="' + row + '"]', $layer);
+                let $tileRect, tileKey = col + '-' + row;
+                if (typeof $referenceTiles[tileKey] !== 'undefined'){ $tileRect = $referenceTiles[tileKey]; }
+                else { $tileRect = $('rect[data-col="' + col + '"][data-row="' + row + '"]', $layer); }
                 if (!$tileRect || !$tileRect.length){ return false; }
                 return $tileRect;
                 };
             _selfRef.getReferenceTile = getReferenceTile;
             }
+        // Define a function for getting the relative position of a theoretical element given a target and destination wrapper
+        let getTilePositionRelative = _selfRef.getTilePositionRelative;
+        if (typeof getTilePositionRelative === 'undefined'){
+            getTilePositionRelative = function($target, $destinationWrapper){
+                let targetRect = $target[0].getBoundingClientRect();
+                let wrapperRect = $destinationWrapper[0].getBoundingClientRect();
+                let wrapperLeft = wrapperRect.left / _world.zoomLevel, wrapperTop = wrapperRect.top / _world.zoomLevel;
+                let targetLeft = ((targetRect.left - wrapperRect.left) / _world.zoomLevel), targetTop = ((targetRect.top - wrapperRect.top) / _world.zoomLevel);
+                let targetWidth = targetRect.width / _world.zoomLevel, targetHeight = targetRect.height / _world.zoomLevel;
+                let targetCenter = { x: targetLeft + (targetWidth / 2), y: targetTop + (targetHeight / 2) };
+                let adjustedValues = {
+                    left: Math.round(targetCenter.x * 100) / 100,
+                    top: Math.round(targetCenter.y * 100) / 100,
+                    width: Math.round(targetWidth * 100) / 100,
+                    height: Math.round(targetHeight * 100) / 100,
+                    };
+                //console.log('wrapperRect: ', wrapperRect, {wrapperLeft, wrapperTop});
+                //console.log('targetRect: ', targetRect, {targetLeft, targetTop, targetWidth, targetHeight}, '\n' + 'targetCenter: ', targetCenter);
+                //console.log('return adjustedValues:', adjustedValues);
+                return adjustedValues;
+                };
+            _selfRef.getTilePositionRelative = getTilePositionRelative;
+            }
         // Define a function for getting the external tile offset for a given column and row for placing sprites
-        let getReferenceTileOffset = _selfRef.getReferenceTileOffset;
-        if (typeof getReferenceTileOffset === 'undefined'){
-            getReferenceTileOffset = function($layer, col, row){
-                //console.log('%c' + '~ getReferenceTileOffset(col:' + col + ', row:' + row + ')', 'color: magenta;');
+        let getLayerTileOffset = _selfRef.getLayerTileOffset;
+        //console.log('gameSettings.gameHasLoaded =', gameSettings.gameHasLoaded);
+        //console.log('gameSettings.gameHasStarted =', gameSettings.gameHasStarted);
+        //console.log('_world.zoomLevel =', _world.zoomLevel);
+        //console.log('_reverseWorldZoom =', _reverseWorldZoom);
+        if (typeof getLayerTileOffset === 'undefined'){
+            getLayerTileOffset = function($layer, col, row){
+                //console.log('%c' + '~ getLayerTileOffset(col:' + col + ', row:' + row + ')', 'color: magenta;');
                 let $refLayer = $layer;
-                let $refTile = getReferenceTile($refLayer, col, row);
-                let refTileRect = getBoundingRect($refTile);
-                let refTileOffset = {left: 0, top: 0, width: 0, height: 0};
+                let $refTile = _selfRef.getReferenceTile($refLayer, col, row);
                 let $targetLayer = $spriteObjectsLayer;
-                let targetLayerRect = getBoundingRect($targetLayer);
+                let layerTileOffset = _selfRef.getTilePositionRelative($refTile, $targetLayer);
                 //console.log('-> $refLayer =', $refLayer.length, $refLayer);
                 //console.log('-> $refTile =', $refTile.length, $refTile);
                 //console.log('-> refTileRect =', JSON.stringify(refTileRect, null, 2));
-                //console.log('-> refTileOffset =', JSON.stringify(refTileOffset, null, 2));
-                //console.log('-> $targetLayer =', $targetLayer.length, $targetLayer);
-                //console.log('-> targetLayerRect =', JSON.stringify(targetLayerRect, null, 2));
-                refTileOffset.left = ((refTileRect.left) * _reverseWorldZoom); // - targetLayerRect.left;
-                refTileOffset.top = ((refTileRect.top) * _reverseWorldZoom) - (targetLayerRect.top * _reverseWorldZoom);
-                refTileOffset.width = (refTileRect.width * _reverseWorldZoom);
-                refTileOffset.height = (refTileRect.height * _reverseWorldZoom);
-                //console.log('-> refTileOffset =', JSON.stringify(refTileOffset, null, 2));
-                return refTileOffset;
+                //console.log('-> layerTileOffset =', JSON.stringify(layerTileOffset, null, 2));
+                return layerTileOffset;
                 };
-            _selfRef.getReferenceTileOffset = getReferenceTileOffset;
+            _selfRef.getLayerTileOffset = getLayerTileOffset;
             }
+
+        // Refresh (or create) the terrain layer tile offsets for everything to reference
+        _self.refreshTerrainTileOffsets();
+
+        // Refresh (or create) the position overlays to ensure everything is working
+        _self.refreshTerrainPositionOverlays();
+
+        // Return true on success
+        return true;
+        }
+
+    // Define a quick function for refreshing the index of terrain tile offsets for positioning purposes
+    refreshTerrainTileOffsets(){
+        //console.log('%c' + 'mmrpgWorldMap.refreshTerrainTileOffsets()', 'color: magenta;');
+        let _self = this;
+        let _selfRef = _self.refreshTerrainTileOverlay;
+        let _config = _self.config;
+        let _world = _self.state;
+        let _layerTileOffsets = _world.layerTileOffsets;
+        let _elements = _self.elements;
+        let $thisWorld = _elements.world;
+        let $canvasMap = _elements.map;
+        let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
+        let $terrainTileOverlay = $('svg[data-overlay="terrain"]', $terrainLayer);
+        let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
+        let $objectSprites = $('.sprite[data-sprite][data-col][data-row]', $spriteObjectsLayer);
+        //console.log('$spriteObjectsLayer =', $spriteObjectsLayer.length, $spriteObjectsLayer);
+        //console.log('$objectSprites =', $objectSprites.length, $objectSprites);
+        //console.log('-> _worldZoom =', _worldZoom);
+        //console.log('-> _reverseWorldZoom =', _reverseWorldZoom);
+
         // Index the offet positions for these new reference tiles and save to the index
         for (let row = 1; row <= _config.mapRows; row++){
             for (let col = 1; col <= _config.mapCols; col++){
                 let $refLayer = $terrainTileOverlay;
-                let refTileOffset = getReferenceTileOffset($refLayer, col, row);
-                _layerTileOffsets[col + '-' + row] = refTileOffset;
+                let $refTile = _selfRef.getReferenceTile($refLayer, col, row);
+                let layerTileOffset = _selfRef.getLayerTileOffset($refLayer, col, row);
+                //console.log('(re) setting _layerTileOffsets[', (col + '-' + row), '] = ', JSON.stringify(layerTileOffset));
+                _layerTileOffsets[col + '-' + row] = layerTileOffset;
+                layerTileOffset.element = $refTile;
                 }
             }
         _world.layerTileOffsets = _layerTileOffsets;
         //console.log('-> _layerTileOffsets =', _layerTileOffsets);
         //console.log('-> _world.layerTileOffsets =', JSON.stringify(_world.layerTileOffsets, null, 2));
-        // Return true on success
+
+        }
+
+    // Quick function for adding position overlays to all tiles on the map
+    refreshTerrainPositionOverlays(){
+        //console.log('%c' + 'mmrpgWorldMap.refreshTerrainPositionOverlays()', 'color: magenta;');
+        let _self = this;
+        let _config = _self.config;
+        let _world = _self.state;
+        //let _worldZoom = _world.zoomLevel;
+        //let _reverseWorldZoom = (1 / _worldZoom);
+        //let _layerTileOffsets = _world.layerTileOffsets;
+        let _elements = _self.elements;
+        let $thisWorld = _elements.world;
+        let $canvasMap = _elements.map;
+        let $spriteOverlaysLayer = $('.layer[data-layer="sprites/overlays"]', $canvasMap);
+        let positionOverlaysMarkup = '';
+        for (let row = 1; row <= _config.mapRows; row++){
+            for (let col = 1; col <= _config.mapCols; col++){
+                let positionText = 'X' + col + '-' + 'Y' + row;
+                let positionOffset = _world.layerTileOffsets[col + '-' + row];
+                let positionLabelLeft = positionOffset.left - (positionOffset.width / 2);
+                let positionLabelTop = positionOffset.top - (positionOffset.height / 2);
+                let positionLabelOffset = {
+                    left: Math.round(positionLabelLeft * 100) / 100,
+                    top: Math.round(positionLabelTop * 100) / 100,
+                    width: Math.round(positionOffset.width * 100) / 100,
+                    height: Math.round(positionOffset.height * 100) / 100,
+                    };
+                let positionLabelStyles = 'top: ' + positionLabelOffset.top + 'px; left: ' + positionLabelOffset.left + 'px;';
+                positionLabelStyles += 'width: ' + positionLabelOffset.width + 'px; height: ' + positionLabelOffset.height + 'px;';
+                let positionLabelMarkup = '';
+                positionLabelMarkup += '<div class="sprite overlay position-overlay" data-pos="' + (col + '-' + row) + '" style="' + positionLabelStyles + '">';
+                    positionLabelMarkup += '<strong class="label position-label">' + positionText + '</strong>';
+                positionLabelMarkup += '</div>';
+                positionOverlaysMarkup += positionLabelMarkup;
+            }
+        }
+        $spriteOverlaysLayer.find('.position-overlay').remove();
+        $spriteOverlaysLayer.append(positionOverlaysMarkup);
         return true;
         }
 
@@ -4526,9 +4672,9 @@ class mmrpgWorldMap {
         let _mapEffects = _config.mapEffects;
         let _mapSpriteSize = _config.mapSpriteSize;
         let _world = _self.state;
-        let _worldZoom = _world.zoomLevel;
+        //let _worldZoom = _world.zoomLevel;
         //let _layerTileOffsets = _world.layerTileOffsets;
-        let _reverseWorldZoom = (1 / _worldZoom);
+        //let _reverseWorldZoom = (1 / _worldZoom);
         let _elements = _self.elements;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
@@ -4541,6 +4687,9 @@ class mmrpgWorldMap {
         //console.log('$objectSprites =', $objectSprites.length, $objectSprites);
         //console.log('-> _worldZoom =', _worldZoom);
         //console.log('-> _reverseWorldZoom =', _reverseWorldZoom);
+        // Back-up the canvas width and height in case we end up changing it
+        if (!_config.baseMapWidth){ _config.baseMapWidth = _config.mapWidth; }
+        if (!_config.baseMapHeight){ _config.baseMapHeight = _config.mapHeight; }
         // If perspective is turned on, let's apply necessary styles and adjustments then reposition sprites
         let oldState = _mapEffects.usePerspective;
         let newState = typeof state === 'boolean' ? state : !_mapEffects.usePerspective;
@@ -4549,22 +4698,25 @@ class mmrpgWorldMap {
             //console.log('-> enabling perspective mode!');
             //console.log('-> $canvasMap =', $canvasMap);
             //console.log('-> base values:');
-            let baseCanvasWidth = _config.mapWidth;
-            let baseCanvasHeight = _config.mapHeight;
+            let baseCanvasWidth = _config.baseMapWidth;
+            let baseCanvasHeight = _config.baseMapHeight;
             let basePerspectiveWidth = 4000; //_config.mapWidth;
+            let basePerspectiveSkew = 0;
             //console.log('-> baseCanvasWidth:', baseCanvasWidth, 'baseCanvasHeight:', baseCanvasHeight);
             //console.log('-> basePerspectiveWidth:', basePerspectiveWidth);
             //console.log('-> _config.mapWidth:', _config.mapWidth, '_config.mapHeight:', _config.mapHeight);
             $canvasMap.addClass('has-perspective');
             $canvasMap.get(0).style.setProperty('--map-perspective-width', basePerspectiveWidth+'px');
-            // Adjust the map size to account for the perspective transform scaling
+            $canvasMap.get(0).style.setProperty('--map-perspective-skew', basePerspectiveSkew+'deg');
+            // // Adjust the map size to account for the perspective transform scaling
             let newCanvasRect = $terrainLayer[0].getBoundingClientRect();
             let newCanvasWidth = newCanvasRect.width, newCanvasHeight = newCanvasRect.height;
-            let newMapWidth = newCanvasWidth * (1 / _worldZoom), newMapHeight = newCanvasHeight * (1 / _worldZoom);
+            let newMapWidth = newCanvasWidth / _world.zoomLevel, newMapHeight = newCanvasHeight / _world.zoomLevel;
             //console.log('-> via getBoundingClientRect()');
             //console.log('-> newCanvasRect:', newCanvasRect);
             //console.log('-> newCanvasWidth:', newCanvasWidth, 'newCanvasHeight:', newCanvasHeight);
             //console.log('-> newMapWidth:', newMapWidth, 'newMapHeight:', newMapHeight);
+            _config.mapWidth = newMapWidth, _config.mapHeight = newMapHeight;
             $canvasMap.css({ width: newMapWidth + 'px', height: newMapHeight + 'px' });
             }
         // Otherwise if perspective not enabled, make sure we put everything back to normal and reposition sprites
@@ -4573,50 +4725,52 @@ class mmrpgWorldMap {
             //console.log('-> disabling perspective mode!');
             $canvasMap.removeClass('has-perspective');
             $canvasMap.get(0).style.setProperty('--map-perspective-width', '');
-            $canvasMap.css({ width: _config.mapWidth + 'px', height: _config.mapHeight + 'px' });
+            $canvasMap.get(0).style.setProperty('--map-perspective-skew', '');
+            //console.log('-> revert to _config.mapWidth:', _config.mapWidth, '_config.mapHeight:', _config.mapHeight);
+            let baseCanvasWidth = _config.baseMapWidth;
+            let baseCanvasHeight = _config.baseMapHeight;
+            _config.mapWidth = baseCanvasWidth, _config.mapHeight = baseCanvasHeight;
+            $canvasMap.css({ width: baseCanvasWidth + 'px', height: baseCanvasHeight + 'px' });
             }
+
+        // If the world is not ready, we shouldn't do anything yet
+        //if (!_world.hasLoaded || !_world.isReady){ return; }
+
         // Re-Index the offet positions for these new reference tiles and save to the index
         _self.refreshTerrainTileOverlay();
-        // Define a function for aligning a given object sprite to a given column and row using the SVG tile reference we constructed
-        let alignSpriteToMapPosition = function($sprite, col, row){
-            //console.log('-----------------------------');
-            //console.log('%c' + 'mmrpgWorldMap...alignSpriteToMapPosition($sprite, col:', col, ', row:', row, ')');
-            if (!$sprite || !$sprite.length){ console.error('$sprite is invalid!'); return false; }
-            if (typeof col !== 'number' || typeof row !== 'number'){ console.error('col and row must be numbers!'); return false; }
-            if (col < 1 || row < 1){ console.error('col and row must be greater than zero!'); return false; }
-            let refTileOffset = _self.getLayerTileOffset(col, row);
-            let spriteTileOffset = _self.getLayerTileSpriteOffset(col, row);
-            /*
-            // DEBUG DEBUG DEBUG
-            let $refDiv = null;
-            $spriteObjectsLayer.append('<div class="test-div" data-col="' + col + '" data-row="' + row + '" style=""></div>');
-            $refDiv = $('.test-div[data-col="' + col + '"][data-row="' + row + '"]', $spriteObjectsLayer);
-            $refDiv.css({display: 'block', position: 'absolute', outline: '2px solid red'});
-            $refDiv.css({left: refTileOffset.left + 'px', top: refTileOffset.top + 'px', zIndex: (refTileOffset.top + 1), width: refTileOffset.width + 'px', height: refTileOffset.height + 'px'});
-            //console.log('-> $refDiv =', $refDiv.length, $refDiv);
-            // DEBUG DEBUG DEBUG
-            $sprite.css({backgroundColor:'cyan'});
-            // DEBUG DEBUG DEBUG
-            */
-            //let spriteTileOffset = {left: 0, top: 0, width: 0, height: 0};
-            //spriteTileOffset.left = refTileOffset.left + (refTileOffset.width / 2) - (_mapSpriteSize[0] / 2);
-            //spriteTileOffset.top = refTileOffset.top + (refTileOffset.height / 2) - (_mapSpriteSize[1] / 2) - (_mapEffects.usePerspective ? 10 : 0);
-            //spriteTileOffset.width = refTileOffset.width;
-            //spriteTileOffset.height = refTileOffset.height;
-            //console.log('-> spriteTileOffset =', JSON.stringify(spriteTileOffset, null, 2));
-            $sprite.css({left: spriteTileOffset.left + 'px', top: spriteTileOffset.top + 'px', zIndex: (spriteTileOffset.top + 1)});
-            //console.log('-> $sprite =', $sprite.length, $sprite);
-            };
-        // Re-align all the object sprites now that we've toggled the perspective and adjusted sizing parameters
-        $objectSprites.each(function(){
-            let $thisSprite = $(this);
-            let spriteCol = parseInt($thisSprite.attr('data-col')) || 1;
-            let spriteRow = parseInt($thisSprite.attr('data-row')) || 1;
-            //let spritePosition = spriteCol + '-' + spriteRow;
-            alignSpriteToMapPosition($thisSprite, spriteCol, spriteRow);
-            });
+
         // Re-scoll the map so things are into view now that everything has been fully adjusted
-        _self.scrollMap();
+        _self.onWorldReady(function(){
+
+            // Define a function for aligning a given object sprite to a given column and row using the SVG tile reference we constructed
+            let alignSpriteToMapPosition = function($sprite, col, row){
+                //console.log('-----------------------------');
+                //console.log('%c' + 'mmrpgWorldMap...alignSpriteToMapPosition($sprite, col:', col, ', row:', row, ')');
+                if (!$sprite || !$sprite.length){ console.error('$sprite is invalid!'); return false; }
+                if (typeof col !== 'number' || typeof row !== 'number'){ console.error('col and row must be numbers!'); return false; }
+                if (col < 1 || row < 1){ console.error('col and row must be greater than zero!'); return false; }
+                let refTileOffset = _self.getLayerTileOffset(col, row);
+                let spriteTileOffset = _self.getLayerTileSpriteOffset(col, row);
+                //let spriteTileOffset = _world.layerTileOffsets[col + '-' + row];
+                //console.log('-> spriteTileOffset =', JSON.stringify(spriteTileOffset, null, 2));
+                $sprite.css({left: spriteTileOffset.left + 'px', top: spriteTileOffset.top + 'px', zIndex: (spriteTileOffset.top + 1)});
+                //console.log('-> $sprite =', $sprite.length, $sprite);
+                };
+            // Re-align all the object sprites now that we've toggled the perspective and adjusted sizing parameters
+            $objectSprites.each(function(){
+                let $thisSprite = $(this);
+                let spriteCol = parseInt($thisSprite.attr('data-col')) || 1;
+                let spriteRow = parseInt($thisSprite.attr('data-row')) || 1;
+                //let spritePosition = spriteCol + '-' + spriteRow;
+                alignSpriteToMapPosition($thisSprite, spriteCol, spriteRow);
+                });
+
+            // Refresh the camera position to the cursor
+            _self.refreshPosition();
+            _self.scrollMap();
+
+            });
+
         // Return true on success
         return true;
 
@@ -4647,7 +4801,7 @@ class mmrpgWorldMap {
 
     // Define a quick function for getting the sprite offset of a given layer tile on the map
     getLayerTileSpriteOffset(col, row){
-        console.log('%c' + 'mmrpgWorldMap.getLayerTileSpriteOffset(col:' + col + ', row:' + row + ')', 'color: magenta;');
+        //console.log('%c' + 'mmrpgWorldMap.getLayerTileSpriteOffset(col:' + col + ', row:' + row + ')', 'color: magenta;');
         if (typeof col !== 'number' || typeof row !== 'number'){ console.error('col and row must be numbers!'); return false; }
         if (col < 1 || row < 1){ console.error('col and row must be greater than zero!'); return false; }
         let _self = this;
@@ -4657,11 +4811,11 @@ class mmrpgWorldMap {
         let refTileOffset = _self.getLayerTileOffset(col, row);
         if (!refTileOffset || typeof refTileOffset === 'undefined'){ return false; }
         let tileSpriteOffset = {left: 0, top: 0, width: 0, height: 0};
-        tileSpriteOffset.left = refTileOffset.left + (refTileOffset.width / 2) - (_mapSpriteSize[0] / 2);
-        tileSpriteOffset.top = refTileOffset.top + (refTileOffset.height / 2) - (_mapSpriteSize[1] / 2) - 10; // why 10?
+        tileSpriteOffset.left = refTileOffset.left - (_mapSpriteSize[0] / 2); //- (refTileOffset.width / 2); // - (_mapSpriteSize[0] / 2);
+        tileSpriteOffset.top = refTileOffset.top - (refTileOffset.height / 2) - (_mapSpriteSize[1] / 2); // - 10; // why 10?
         tileSpriteOffset.width = refTileOffset.width;
         tileSpriteOffset.height = refTileOffset.height;
-        console.log('return tileSpriteOffset', tileSpriteOffset);
+        //console.log('return tileSpriteOffset', tileSpriteOffset);
         return tileSpriteOffset;
         }
 
@@ -4692,19 +4846,26 @@ class mmrpgWorldMap {
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
 
-        // First we update the cursor sprite position and attributes
-        let $positionDisplay = $('#position-display', $thisWorld);
-        let $positionDisplayWrapper = $('> .wrapper', $positionDisplay);
-        //let newPositionText = _config.mapName + ' | ' + ('X' + thisNewCol + '-Y' + thisNewRow);
-        //$positionDisplayWrapper.text('X:' + thisNewCol + ' Y:' + thisNewRow);
-        //$positionDisplayWrapper.text(newPositionText);
-        let newPositionText = '';
-        newPositionText += '<strong class="area">' + _config.mapName + '</strong>';
-        newPositionText += '<data class="coords">' + ('X' + thisNewCol + '-Y' + thisNewRow) + '</data>';
-        $positionDisplayWrapper.html(newPositionText);
+        // Make sure we start the scroll to the new position if not already there
+        let worldScroll = _world.scrollPosition || [-1, -1];
+        if (worldScroll[0] !== cursorPositionXY[0]
+            || worldScroll[1] !== cursorPositionXY[1]){
 
-        // Make sure we start the scroll to the new position
-        _self.scrollMap(cursorPositionXY[0], cursorPositionXY[1]);
+            // First we update the cursor sprite position and attributes
+            let $positionDisplay = $('#position-display', $thisWorld);
+            let $positionDisplayWrapper = $('> .wrapper', $positionDisplay);
+            //let newPositionText = _config.mapName + ' | ' + ('X' + thisNewCol + '-Y' + thisNewRow);
+            //$positionDisplayWrapper.text('X:' + thisNewCol + ' Y:' + thisNewRow);
+            //$positionDisplayWrapper.text(newPositionText);
+            let newPositionText = '';
+            newPositionText += '<strong class="area">' + _config.mapName + '</strong>';
+            newPositionText += '<data class="coords">' + ('X' + thisNewCol + '-Y' + thisNewRow) + '</data>';
+            $positionDisplayWrapper.html(newPositionText);
+
+            // Then we actually scroll the map to the requested position on-screen
+            _self.scrollMap(cursorPositionXY[0], cursorPositionXY[1]);
+
+            }
 
         // Update the walkable map tiles now that things have changed slightly
         _self.calculateWalkableMapTiles(true);
@@ -9257,7 +9418,7 @@ class mmrpgWorldMap {
         let _userInputs = _inputs.userInputs
         let aButtonIcon = _userInputs.A.icon, bButtonIcon = _userInputs.B.icon;
         let xButtonIcon = _userInputs.X.icon, yButtonIcon = _userInputs.Y.icon;
-        console.log('_userInputs =', _userInputs);
+        //console.log('_userInputs =', _userInputs);
         // withdraw/deposit,take-out/put-away,activate/bench,add-to-team/remove-from-team
         robotDetailsObject.actions = [];
         let showStorageButtons = (currentScreen === 'robots-overview' && currentSubScreen === 'robots') ? true : false;

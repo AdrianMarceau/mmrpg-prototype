@@ -162,16 +162,20 @@ html, body {
 /* code for perspective mode (flakey right now, but maybe in future) */
 #world #canvas #map.has-perspective {
     --base-perspective-width: 800px;
+    --base-perspective-skew: 0deg;
     --map-perspective-width: var(--base-perspective-width);
+    --map-perspective-skew: var(--base-perspective-skew);
 }
 #world #canvas #map.has-perspective .layer[data-layer="terrain"],
 #world #canvas #map.has-perspective .layer[data-layer="sprites/tiles"] {
     transform-origin: top center;
     transform-style: preserve-3d;
     /* transform: perspective(var(--map-perspective-width)) rotateX(25deg) rotateY(0deg) scale(1);  */
-    transform: perspective(var(--map-perspective-width)) rotateX(67.5deg) rotateY(0deg) scale(1);
+    transform: perspective(var(--map-perspective-width)) rotateX(67.5deg) rotateY(0deg) scale(1) skewX(var(--map-perspective-skew));
+    transition: transform 1.8s ease-in;
 }
-#world #canvas #map.has-perspective .layer[data-layer="sprites/objects"] {
+#world #canvas #map.has-perspective .layer[data-layer="sprites/objects"],
+#world #canvas #map.has-perspective .layer[data-layer="sprites/overlays"] {
     width: 100% !important;
     height: 100% !important;
 }
@@ -199,7 +203,8 @@ html, body {
     will-change: transform;
 }
 #world.ready #canvas #map {
-    transition: filter 0.6s ease-in, transform 1.8s ease-in-out;
+    /* transition: filter 0.6s ease-in, transform 1.8s ease-in-out;  */
+    transition: filter 0.6s ease-in, transform 1.8s ease-out;
 }
 #world.ready #canvas #map .layer[data-layer="background"] {
     transition: transform 1s ease-in-out;
@@ -438,8 +443,11 @@ html, body {
 }
 #world #map .layer .sprite.position-overlay {
     border: 1px solid red;
+    background-color: rgba(255, 0, 0, 0.2);
     width: 80px;
     height: 80px;
+
+    display: none;
 }
 
 #world #map .layer .sprite.overlay.debug {
@@ -645,8 +653,10 @@ html, body {
     filter: none;
 }
 #world #map .layer.objects .sprite:not(.tile) > .wrap > .sprite {
-    /* filter: drop-shadow(-1px 1px 0 white); */
     filter: drop-shadow(4px -1px 0 rgba(0, 0, 0, 0.2));
+}
+#world #map.has-perspective .layer.objects .sprite:not(.tile) > .wrap > .sprite {
+    filter: drop-shadow(-6px -1px 0 rgba(0, 0, 0, 0.2));
 }
 
 /* define cursor-specific rules and animations for the pointer character */
@@ -761,8 +771,15 @@ html, body {
     bottom: 10px;
     z-index: 1;
 }
-#world #map .layer.objects .sprite.item > .wrap > .sprite {
-    filter: none;
+#world #map.has-perspective .layer.objects .sprite.item > .wrap {
+    bottom: -10px;
+}
+#world #map.has-perspective .layer.objects .sprite.item[data-token*="-tank"] > .wrap {
+    bottom: -20px;
+}
+#world #map .layer.objects .sprite.item > .wrap > .sprite,
+#world #map.has-perspective .layer.objects .sprite.item > .wrap > .sprite {
+    filter: none !important;
 }
 #world #map .layer.objects .sprite.item.animate > .wrap {
     animation: world-sprite-item-hover 2s steps(4) infinite;
@@ -790,26 +807,44 @@ html, body {
 #world #map .layer.objects .sprite.item.always-zoom:after {
     bottom: 18px;
 }
-#world #map .layer.objects .sprite.item[data-token*="-pellet"]:after {
-    left: 15px;
-    right: 15px;
-    height: 4px;
-    bottom: 20px;
-}
+#world #map .layer.objects .sprite.item[data-token*="-pellet"]:after,
 #world #map .layer.objects .sprite.item[data-token="small-screw"]:after {
     left: 15px;
     right: 15px;
-    height: 6px;
-    bottom: 14px;
 }
 #world #map .layer.objects .sprite.item[data-token="large-screw"]:after {
     left: 11px;
     right: 11px;
+}
+#world #map .layer.objects .sprite.item[data-token*="-pellet"]:after {
+    height: 4px;
+    bottom: 20px;
+}
+#world #map .layer.objects .sprite.item[data-token="small-screw"]:after {
+    height: 6px;
+    bottom: 14px;
+}
+#world #map .layer.objects .sprite.item[data-token="large-screw"]:after {
     height: 7px;
     bottom: 12px;
 }
+#world #map.has-perspective .layer.objects .sprite.item[data-token*="-pellet"]:after,
+#world #map.has-perspective .layer.objects .sprite.item[data-token*="-capsule"]:after {
+    bottom: 0;
+}
+#world #map.has-perspective .layer.objects .sprite.item[data-token="small-screw"]:after {
+    bottom: 7px;
+}
+#world #map.has-perspective .layer.objects .sprite.item[data-token="large-screw"]:after {
+    bottom: 6px;
+}
+#world #map.has-perspective .layer.objects .sprite.item[data-token*="tank"]:after {
+    bottom: -14px;
+}
+
 #world #map .layer.objects .sprite.item.animate:after {
     animation: world-sprite-item-shadow-hover 2s steps(4) infinite;
+    animation-delay: inherit;
 }
 #world #map .layer.objects .sprite.item[data-token$="-link"] .wrap,
 #world #map .layer.objects .sprite.item[data-token$="-codes"] .wrap,
@@ -1054,6 +1089,10 @@ html, body {
     image-rendering: pixelated;
     filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.6));
     transform: scale(2);
+}
+#world #map.has-perspective .layer .sprite:not(.tile).zoom > .wrap > .sprite,
+#world #map.has-perspective .layer .sprite:not(.tile).always-zoom > .wrap > .sprite {
+    filter: drop-shadow(-3px -1px 0 rgba(0, 0, 0, 0.4));
 }
 #world #map .layer .sprite:not(.tile).zoom > .wrap > .back + .sprite,
 #world #map .layer .sprite:not(.tile).always-zoom > .wrap > .back + .sprite {
