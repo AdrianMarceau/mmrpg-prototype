@@ -3729,8 +3729,8 @@ class mmrpgWorldMap {
                         //console.log('%c' + 'Both triggers held, reset zoom!', 'color: orange;');
                         // when both are held, we reset the zoom
                         let oldZoom = _world.zoomLevel || 1;
-                        _self.updateZoomLevel(1, true);
-                        let newZoom = _world.zoomLevel || 1;
+                        let newZoom = _config.defaultZoomLevel || 1;
+                        _self.updateZoomLevel(newZoom, true);
                         if (newZoom !== oldZoom){
                             _self.playSoundEffect('spawn-sound');
                             ignoreInputFor(1000);
@@ -4736,12 +4736,8 @@ class mmrpgWorldMap {
         // If the world is not ready, we shouldn't do anything yet
         //if (!_world.hasLoaded || !_world.isReady){ return; }
 
-        // Re-Index the offet positions for these new reference tiles and save to the index
-        _self.refreshTerrainTileOverlay();
-
-        // Re-scoll the map so things are into view now that everything has been fully adjusted
-        _self.onWorldReady(function(){
-
+        // Define a method for aligning all objects sprites to the appropriate perspective position
+        let alignSpritesToPositions = function(){
             // Define a function for aligning a given object sprite to a given column and row using the SVG tile reference we constructed
             let alignSpriteToMapPosition = function($sprite, col, row){
                 //console.log('-----------------------------');
@@ -4764,6 +4760,26 @@ class mmrpgWorldMap {
                 //let spritePosition = spriteCol + '-' + spriteRow;
                 alignSpriteToMapPosition($thisSprite, spriteCol, spriteRow);
                 });
+            // Return true on success
+            return true;
+            };
+
+        // Update the scrollMap method so that it also re-aligns sprites
+        if (typeof _self.__scrollMap === 'undefined'){ _self.__scrollMap = _self.scrollMap; }
+        if (newState === true){
+            _self.scrollMap = function(){
+                alignSpritesToPositions();
+                return _self.__scrollMap();
+                };
+            } else {
+            _self.scrollMap = _self.__scrollMap;
+            }
+
+        // Re-Index the offet positions for these new reference tiles and save to the index
+        _self.refreshTerrainTileOverlay();
+
+        // Re-scoll the map so things are into view now that everything has been fully adjusted
+        _self.onWorldReady(function(){
 
             // Refresh the camera position to the cursor
             _self.refreshPosition();
