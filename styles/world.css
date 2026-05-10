@@ -5340,8 +5340,8 @@ display: block;
     border-radius: 6px 6px 6px 16px;
     transition: border-color 0.3s;
 }
-#world #canvas #minimap-overview > .wrapper:hover,
-#world #canvas #minimap-overview > .wrapper.hovered {
+#world #canvas #minimap-overview:hover > .wrapper,
+#world #canvas #minimap-overview.hovered > .wrapper {
     border-color: #dedede !important;
 }
 #world #canvas #minimap-overview .viewport {

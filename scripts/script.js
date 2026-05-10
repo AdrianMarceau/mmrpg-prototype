@@ -3468,8 +3468,10 @@ class mmrpgUserInputWatcher {
         _self.events = null;
         _self.userInputs = {}; // all possible inputs
         _self.activeInputs = {}; // currently active inputs
+        _self.activeTimeouts = {}; // currently active timeout
         _self.lastInputKind = null;
         _self.lastInputEvent = null;
+        _self.lastInputKey = null;
 
         // Define the config object and its defaults
         let _config = {};
@@ -3552,6 +3554,7 @@ class mmrpgUserInputWatcher {
                 if (inputData.keyboard && inputData.keyboard.indexOf(keyCode) !== -1){
                     //console.log('-> inputKey =', inputKey);
                     returnKey = inputKey;
+                    _self.lastInputKey = returnKey;
                     return;
                     }
                 });

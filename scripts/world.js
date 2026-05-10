@@ -3037,6 +3037,7 @@ class mmrpgWorldMap {
             //console.log('-> activeInputs:', activeInputs);
             ignoreInputFor();
             // Collect references and checks on certain key elements
+            let _selfRef = this;
             let worldMapIsHidden = _self.worldMapIsHidden();
             let sideButtonsActive = $sideButtons.is('.active') ? true : false;
             let playerSwitcherFocused = $playerSwitcher.is('.focused') ? true : false;
@@ -3088,6 +3089,36 @@ class mmrpgWorldMap {
                     if (event){ event.preventDefault(); }
                     $('.team-player', $playerSwitcher).removeClass('hovered');
                     $playerSwitcher.removeClass('focused');
+                    ignoreInputFor(600);
+                    return true;
+                    }
+                }
+            // If the back or home button is currently focused, we should listen for a confirmation button
+            if (_selfRef.leftSideButtonHovered){
+                //console.log('-> _selfRef.leftSideButtonHovered!');
+                let $hoveredButton, hoveredButtonKind;
+                let $possibleButtons = $('').add($backButton).add($homeButton);
+                if ($backButton.is('.hovered')){ $hoveredButton = $backButton.first(); hoveredButtonKind = 'back'; }
+                if ($homeButton.is('.hovered')){ $hoveredButton = $homeButton.first(); hoveredButtonKind = 'home'; }
+                // Should not be open while back/home-switching is being used
+                dismissSideButtonAction();
+                // If the player has pressed the A button, we can simply click whichever button is currently "hovered"
+                if (activeInputs.A || activeInputs.Start){
+                    //console.log('%c' + 'Confirm ' + hoveredButtonKind + ' button!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    if (!$hoveredButton || !$hoveredButton.length){ return false; }
+                    //console.log('Triggering click on hovered ', hoveredButtonKind, ' button:', $hoveredButton);
+                    $hoveredButton.trigger('click');
+                    $hoveredButton.addClass('clicked');
+                    $hoveredButton.removeClass('hovered');
+                    ignoreInputFor(1200);
+                    return true;
+                    }
+                // If the player has pressed the B button instead, we should dismiss the player switcher
+                if (activeInputs.B){
+                    //console.log('%c' + 'Dismiss ' + hoveredButtonKind + ' button!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    $hoveredButton.removeClass('hovered');
                     ignoreInputFor(600);
                     return true;
                     }
@@ -3584,24 +3615,55 @@ class mmrpgWorldMap {
                 }
             // Otherwise if the world map is NOT hidden, so the arrow keys must be controlling the player
             if (!worldMapIsHidden){
-                // If the player has pressed the select button, try to click the team-rotate button if exists/not-disabled
+                // Collect reference to the minimap in case we need it for menu interactions
+                let $minimapOverview = _elements.minimapOverview;
+                // If the player has pressed the Select button, try to click one of the left-side exit/home-buttons if either exists/not-disabled
                 if (activeInputs.Select){
                     //console.log('%c' + 'Select key pressed!', 'color: orange;');
                     if (event){ event.preventDefault(); }
-                    let $rotateButton = $('.team-rotate', $robotsOverview);
-                    if ($rotateButton.length
-                        && $rotateButton.is(':visible')
-                        && !$rotateButton.is('.disabled')){
-                        $rotateButton.addClass('clicked');
-                        $rotateButton.trigger('click');
-                        setTimeout(function(){ $rotateButton.removeClass('clicked'); }, 300);
-                        ignoreInputFor(600);
-                        return true;
-                        }
+                    let $hoveredButton, hoveredButtonKind, nextButtonKind;
+                    let $possibleButtons = $('').add($backButton).add($homeButton);
+                    if ($backButton.is('.hovered')){ $hoveredButton = $backButton.first(); hoveredButtonKind = 'back'; }
+                    if ($homeButton.is('.hovered')){ $hoveredButton = $homeButton.first(); hoveredButtonKind = 'home'; }
+                    if (!hoveredButtonKind){ nextButtonKind = 'back'; }
+                    else if (hoveredButtonKind === 'back'){ nextButtonKind = 'home'; }
+                    else if (hoveredButtonKind === 'home'){ nextButtonKind = false; }
+                    $possibleButtons.removeClass('hovered');
+                    _selfRef.leftSideButtonHovered = false;
+                    if (nextButtonKind === 'back'){ $backButton.addClass('hovered'); _selfRef.leftSideButtonHovered = true; }
+                    else if (nextButtonKind === 'home'){ $homeButton.addClass('hovered'); _selfRef.leftSideButtonHovered = true; }
+                    ignoreInputFor(600);
+                    return true;
+                    } else if (_selfRef.leftSideButtonHovered){
+                    let $possibleButtons = $('').add($backButton).add($homeButton);
+                    clearTimeout(_selfRef.leftSideButtonTimeout);
+                    _selfRef.leftSideButtonTimeout = setTimeout(function(){
+                        $possibleButtons.removeClass('hovered');
+                        _selfRef.leftSideButtonHovered = false;
+                        }, 200);
                     }
-                // If the player has pressed the start button, try to click the team-switch button if exists/not-disabled
+                // If the player has pressed the Start button, try to click the minimap-overview button if exists/not-disabled
                 if (activeInputs.Start){
                     //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                    if (event){ event.preventDefault(); }
+                    if ($minimapOverview.length
+                        && $minimapOverview.is(':visible')
+                        && !$minimapOverview.is('.disabled')){
+                        $minimapOverview.addClass('hovered');
+                        _selfRef.minimapOverviewHovered = true;
+                        ignoreInputFor(300);
+                        return true;
+                        }
+                    } else if (_selfRef.minimapOverviewHovered){
+                    clearTimeout(_selfRef.minimapOverviewTimeout);
+                    _selfRef.minimapOverviewTimeout = setTimeout(function(){
+                        if ($minimapOverview.is('.hovered')){ $minimapOverview.removeClass('hovered'); }
+                        }, 200);
+
+                    }
+                // If the player has pressed the X button, try to click the robots-overview button (team-switch) button if exists/not-disabled
+                if (activeInputs.X){
+                    //console.log('%c' + 'X key pressed!', 'color: orange;');
                     if (event){ event.preventDefault(); }
                     let $switchButton = $('.team-switch', $robotsOverview);
                     if ($switchButton.length
@@ -3858,121 +3920,6 @@ class mmrpgWorldMap {
                         if (thisHorDir && thisVerDir){ ignoreInputFor(); }
                         }, forceMove);
                     }
-                // If the user has pressed the X button, we need to implement some nuanced functionality
-                // -> if it's a simple press, it's for the "menu" (not implemented yet, so just show a console.warn message)
-                // -> else if it's a long-press (user is holding button) then add the "focused" class to the home button, wait an appropriate amount of time, then click it
-                // The important thing here is to zoom the map in closer and closer as the user holds the button until we reach a threshold, and THEN click it, but if the user stops pressing the button then the focused class is removed and the zoom is reset and the whole thing is cancelled
-                if (typeof userInputVars.xTimeout === 'undefined'){ userInputVars.xTimeout = false; }
-                if (typeof userInputVars.xWasPressedAt === 'undefined'){ userInputVars.xWasPressedAt = null; }
-                if (typeof userInputVars.xWasPressedFor === 'undefined'){ userInputVars.xWasPressedFor = 0; }
-                if (activeInputs.X){
-                    //console.log('%c' + 'X key pressed!', 'color: orange;');
-                    if (event){ event.preventDefault(); }
-                    if (!userInputVars.xWasPressedAt){ userInputVars.xWasPressedAt = Date.now(); }
-                    // throttle the zooming action to every 300ms
-                    let timeThreshold = 300;
-                    let timeToIgnoreAfter = 3000;
-                    let timeoutRefresh = 1200;
-                    let timeSincePress = Date.now() - userInputVars.xWasPressedAt;
-                    // If it's been a while since the last press, we know this is a home-button request
-                    if (timeSincePress >= timeThreshold){
-                        $homeButton.addClass('focused');
-                        userInputVars.xWasPressedAt = Date.now();
-                        userInputVars.xWasPressedFor++;
-                        let newZoomLevel = 1.00 + (0.25 * (userInputVars.xWasPressedFor - 1));
-                        //console.log('%c' + 'X key has been pressed for ' + userInputVars.xWasPressedFor + 'x times!', 'color: orange;');
-                        _self.updateZoomLevel(newZoomLevel);
-                        let $teamSprites = _elements.teamSprites;
-                        let $cursorSprite = $teamSprites.filter('.cursor');
-                        let $otherSprites = $teamSprites.filter(':not(.cursor)');
-                        $cursorSprite.addClass('shake');
-                        $otherSprites.filter(':not([data-frame="06"])').first().attr('data-frame', '06'); // summon
-                        if (userInputVars.xTimeout){ clearTimeout(userInputVars.xTimeout);  }
-                        if (userInputVars.xWasPressedFor >= 5){
-                            //console.log('%c' + 'X key held long enough, triggering home button!', 'color: orange;');
-                            $homeButton.trigger('click');
-                            userInputVars.xWasPressedAt = null;
-                            userInputVars.xWasPressedFor = 0;
-                            ignoreInputFor(timeToIgnoreAfter);
-                            } else {
-                            userInputVars.xTimeout = setTimeout(function(){
-                                //console.log('%c' + 'X key timeout!', 'color: orange;');
-                                userInputVars.xWasPressedAt = null;
-                                userInputVars.xWasPressedFor = 0;
-                                $homeButton.removeClass('focused');
-                                _self.resetZoomLevel();
-                                $otherSprites.attr('data-frame', '00');
-                                $cursorSprite.removeClass('shake');
-                                }, timeoutRefresh);
-                            }
-                        }
-                    // Otherwise if this is a fresh press, the user must be trying to open the main menu
-                    else {
-                        //console.log('%c' + 'X key fresh press, open menu (not implemented yet)!', 'color: orange;');
-                        if (userInputVars.xTimeout){ clearTimeout(userInputVars.xTimeout);  }
-                        userInputVars.xTimeout = setTimeout(function(){
-                            console.warn('X functionality not implemented yet!');
-                            }, (timeThreshold * 2));
-                        }
-                    }
-                /*
-                // If the user is holding the B button, we need to implement some nuanced functionality
-                // -> if it's a simple press, ignore it so that it can do its job in other contexts
-                // -> else if it's a long-press (user is holding button) then we need to temporarily disable the auto-use functionality for item pickups
-                // The important thing here is to disable the auto-use functionality as long as the user is holding the button down, then re-enable it when they let go (via timeout)
-                if (typeof userInputVars.bTimeout === 'undefined'){ userInputVars.bTimeout = false; }
-                if (typeof userInputVars.bWasPressedAt === 'undefined'){ userInputVars.bWasPressedAt = null; }
-                if (typeof userInputVars.bTimeSincePress === 'undefined'){ userInputVars.bTimeSincePress = null; }
-                if (typeof userInputVars.bCallbacksTriggered === 'undefined'){ userInputVars.bCallbacksTriggered = []; }
-                if (activeInputs.B){
-                    let holdTimeThreshold = 900, unpressTimeout = 300, allowRepeatCallbacks = false;
-                    if (event){ event.preventDefault(); }
-                    if (!userInputVars.bWasPressedAt){ userInputVars.bWasPressedAt = Date.now(); }
-                    userInputVars.bTimeSincePress = Date.now() - userInputVars.bWasPressedAt;
-                    //console.log('-> bWasPressedAt =', userInputVars.bWasPressedAt);
-                    //console.log('-> bTimeSincePress =', userInputVars.bTimeSincePress);
-                    let callbacksTriggered = userInputVars.bCallbacksTriggered;
-                    //console.log('-> callbacksTriggered =', callbacksTriggered);
-                    let pressButtonCallback = function(){
-                        //console.log('%c' + 'B key pressButtonCallback()', 'color: green;');
-                        };
-                    let unpressButtonCallback = function(){
-                        //console.log('%c' + 'B key unpressButtonCallback()', 'color: red;');
-                        };
-                    let holdButtonCallback = function(){
-                        //console.log('%c' + 'B key holdButtonCallback()', 'color: magenta;');
-                        //console.log('Toggling auto-pickup flags ...');
-                        _world.autoApplyConsumables = !_world.autoApplyConsumables ? true : false;
-                        _world.autoEquipHoldables = !_world.autoEquipHoldables ? true : false;
-                        //console.log('_world.autoApplyConsumables =', _world.autoApplyConsumables);
-                        //console.log('_world.autoEquipHoldables =', _world.autoEquipHoldables);
-                        let messageMarkup = [], onFlagMarkup = _self.getCustomNameSpan('ON', 'nature'), offFlagMarkup = _self.getCustomNameSpan('OFF', 'flame');
-                        messageMarkup.push('Toggling overworld pickup flags ...');
-                        messageMarkup.push('Auto-Apply Consumables: ' + (_world.autoApplyConsumables ? onFlagMarkup : offFlagMarkup));
-                        messageMarkup.push('Auto-Equip Holdables:  ' + (_world.autoEquipHoldables ? onFlagMarkup : offFlagMarkup));
-                        _self.showWorldMessage(messageMarkup); //12345
-                        };
-                    if (userInputVars.bTimeSincePress < holdTimeThreshold){
-                        //console.log('%c' + 'B key pressed!', 'color: orange;');
-                        //console.log('-> bTimeSincePress(', userInputVars.bTimeSincePress, ') < holdTimeThreshold(', holdTimeThreshold, ')');
-                        //console.log('callbacksTriggered.indexOf(\'pressed\') =', callbacksTriggered.indexOf('pressed'));
-                        if (callbacksTriggered.indexOf('pressed') < 0 || allowRepeatCallbacks){ pressButtonCallback(); callbacksTriggered.push('pressed'); }
-                        } else {
-                        //console.log('%c' + 'B key holding!', 'color: orange;');
-                        //console.log('--> bTimeSincePress(', userInputVars.bTimeSincePress, ') >= holdTimeThreshold(', holdTimeThreshold, ')');
-                        if (callbacksTriggered.indexOf('holding') < 0 || allowRepeatCallbacks){ holdButtonCallback(); callbacksTriggered.push('holding'); }
-                        }
-                    if (userInputVars.bTimeout){ clearTimeout(userInputVars.bTimeout);  }
-                    userInputVars.bTimeout = setTimeout(function(){
-                        if (!activeInputs.B){
-                            //console.log('%c' + 'B key unpressed!', 'color: orange;');
-                            userInputVars.bWasPressedAt = 0;
-                            userInputVars.bCallbacksTriggered = [];
-                            unpressButtonCallback();
-                            }
-                        }, unpressTimeout);
-                    }
-                */
                 }
             };
 
