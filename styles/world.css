@@ -172,6 +172,10 @@ html, body {
     transform-style: preserve-3d;
     /* transform: perspective(var(--map-perspective-width)) rotateX(25deg) rotateY(0deg) scale(1);  */
     transform: perspective(var(--map-perspective-width)) rotateX(67.5deg) rotateY(0deg) scale(1) skewX(var(--map-perspective-skew));
+    transition: none;
+}
+#world.ready #canvas #map.has-perspective .layer[data-layer="terrain"],
+#world.ready #canvas #map.has-perspective .layer[data-layer="sprites/tiles"] {
     transition: transform 2.0s ease-in;
 }
 #world #canvas #map.has-perspective .layer[data-layer="sprites/objects"],
@@ -1424,9 +1428,14 @@ html, body {
     box-shadow: 0 0 0 transparent;
     animation: chrome-button-hover-outline 1s infinite;
 }
+@keyframes chrome-button-hover-zoom {
+    0%, 100% { transform: scale(1.0); }
+    50% { transform: scale(1.4); }
+}
 /* #world #canvas .chrome-button:hover > a > i, */
 #world #canvas .chrome-button.hovered > a > i {
-    transform: scale(1.2);
+    transform: scale(1.0);
+    animation: chrome-button-hover-zoom 1s linear infinite;
 }
 #world #canvas .chrome-button.disabled {
     pointer-events: none;

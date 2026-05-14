@@ -731,6 +731,7 @@ class rpg_world {
         $map_data_vars['buttons'] = isset($map_data_vars['buttons']) ? $map_data_vars['buttons'] : array();
         $map_data_vars['switches'] = isset($map_data_vars['switches']) ? $map_data_vars['switches'] : array();
         $map_data_vars['field'] = isset($map_data_vars['field']) ? $map_data_vars['field'] : '';
+        $map_data_vars['music'] = isset($map_data_vars['music']) ? $map_data_vars['music'] : array();
         $map_data_vars['terrain'] = isset($map_data_vars['terrain']) ? $map_data_vars['terrain'] : array();
         $map_data_vars['encounters'] = isset($map_data_vars['encounters']) ? $map_data_vars['encounters'] : '';
         $map_data_vars['pickups'] = isset($map_data_vars['pickups']) ? $map_data_vars['pickups'] : '';
@@ -748,6 +749,7 @@ class rpg_world {
         if (!isset($map_data_vars['size'][1])){ $map_data_vars['size'][1] = $map_autorows; }
         if (!isset($map_data_vars['size'][2])){ $map_data_vars['size'][2] = $map_tilesize; }
         if (empty($map_data_vars['field'])){ $map_data_vars['field'] = 'field'; }
+        if (empty($map_data_vars['music'])){ $map_data_vars['music'] = array(); }
         if (!empty($map_data_vars['encounters'])){ $map_data_vars['encounters'] = explode(',', str_replace(' ', '', $map_data_vars['encounters'])); }
         if (!empty($map_data_vars['pickups'])){ $map_data_vars['pickups'] = explode(',', str_replace(' ', '', $map_data_vars['pickups'])); }
         $map_data_vars['tiles'] = $map_custval_parser('tiles', $map_data_vars['tiles'], true);
@@ -758,6 +760,7 @@ class rpg_world {
         $map_data_vars['buttons'] = $map_custval_parser('buttons', $map_data_vars['buttons']);
         $map_data_vars['switches'] = $map_custval_parser('switches', $map_data_vars['switches']);
         $map_data_vars['terrain'] = $map_custval_parser('terrain', $map_data_vars['terrain']);
+        $map_data_vars['music'] = $map_custval_parser('music', $map_data_vars['music']);
         $map_data_vars['habitats'] = $map_custval_parser('habitats', $map_data_vars['habitats']);
         foreach (self::$static_encounter_types AS $type){ $map_data_vars[$type] = $map_custval_parser($type, $map_data_vars[$type]); }
         $map_data_vars['items'] = $map_custval_parser('items', $map_data_vars['items']);
@@ -790,6 +793,7 @@ class rpg_world {
         $map_data_parsed['buttons'] = $map_data_vars['buttons']; unset($map_data_vars['buttons']);
         $map_data_parsed['switches'] = $map_data_vars['switches']; unset($map_data_vars['switches']);
         $map_data_parsed['field'] = $map_data_vars['field']; unset($map_data_vars['field']);
+        $map_data_parsed['music'] = $map_data_vars['music']; unset($map_data_vars['music']);
         $map_data_parsed['terrain'] = $map_data_vars['terrain']; unset($map_data_vars['terrain']);
         $map_data_parsed['encounters'] = $map_data_vars['encounters']; unset($map_data_vars['encounters']);
         $map_data_parsed['pickups'] = $map_data_vars['pickups']; unset($map_data_vars['pickups']);
@@ -1396,6 +1400,12 @@ class rpg_world {
             $battle_background = $map_field_token;
             $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
             $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
+            $battle_music = $map_field_music;
+            if (!empty($map_data_parsed['music'])){
+                $possible_music = $map_data_parsed['music'];
+                if (!empty($possible_music[$robot_class.'-battle'])){ $possible_music = $possible_music[$robot_class.'-battle'][0]; }
+                elseif (!empty($possible_music['battle'])){ $possible_music = $possible_music['battle'][0]; }
+                }
             $battle_turns = $rewards_matrix[$robot_class]['turns'];
             $battle_zenny = $rewards_matrix[$robot_class]['zenny'];
             $world_map_encounters[] = array('robot/'.$robot_class, $robot_token, '', $robot_pos, $battle_token, $robot_label);
@@ -1406,6 +1416,7 @@ class rpg_world {
                 'turns' => $battle_turns,
                 'zenny' => $battle_zenny,
                 'field' => $battle_field,
+                'music' => $battle_music,
                 'target' => array('robots' => array(array(
                     'token' => $robot_token,
                     'level' => $robot_level,
@@ -1477,6 +1488,12 @@ class rpg_world {
                     $battle_background = $map_field_token;
                     $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
                     $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
+                    $battle_music = $map_field_music;
+                    if (!empty($map_data_parsed['music'])){
+                        $possible_music = $map_data_parsed['music'];
+                        if (!empty($possible_music[$encounter_class.'-battle'])){ $possible_music = $possible_music[$encounter_class.'-battle'][0]; }
+                        elseif (!empty($possible_music['battle'])){ $possible_music = $possible_music['battle'][0]; }
+                        }
                     $battle_turns = $rewards_matrix[$robot_class]['turns'];
                     $battle_zenny = $rewards_matrix[$robot_class]['zenny'];
                     $battle_rewards = array();
@@ -1542,6 +1559,7 @@ class rpg_world {
                         'name' => $battle_name,
                         'description' => $battle_description,
                         'field' => $battle_field,
+                        'music' => $battle_music,
                         'turns' => $battle_turns,
                         'zenny' => $battle_zenny,
                         'target' => array('robots' => array(array(

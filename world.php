@@ -443,14 +443,16 @@ if (!isset($WORLD_SESSION['world_symbols'][$world_map_token])){ $WORLD_SESSION['
 // Collect the map's field token and mecha encounters
 $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
 $map_field_info = !empty($mmrpg_index_fields[$map_field_token]) ? $mmrpg_index_fields[$map_field_token] : array();
+//error_log('$map_field_token = '.print_r($map_field_token, true));
 $map_field_background = !empty($map_field_info['field_background']) ? $map_field_info['field_background'] : 'field';
 $map_field_foreground = !empty($map_field_info['field_foreground']) ? $map_field_info['field_foreground'] : 'field';
 $map_field_music = !empty($map_field_info['field_music']) ? $map_field_info['field_music'] : 'misc/star-force'; // TODO: find a better default for this
-//error_log('$map_field_token = '.print_r($map_field_token, true));
-//error_log('$map_field_info = '.print_r($map_field_info, true));
+if (!empty($map_data_parsed['background'])){ $map_field_background = $map_data_parsed['background']; }
+if (!empty($map_data_parsed['foreground'])){ $map_field_foreground = $map_data_parsed['foreground']; }
 //error_log('$map_field_background = '.print_r($map_field_background, true));
 //error_log('$map_field_foreground = '.print_r($map_field_foreground, true));
-//error_log('$map_field_music = '.print_r($map_field_music, true));
+//error_log('b/c -> $map_field_info = '.print_r($map_field_info, true));
+//error_log('b/c -> $map_data_parsed = '.print_r($map_data_parsed, true));
 
 // Collect the overall size variables for this map
 $map_base_size = $map_data_parsed['size'];
@@ -514,8 +516,43 @@ if (empty($world_map_pickups) || $reset_pickups === true){
     rpg_world::update_session('world_pickups', $world_map_token, $world_map_pickups);
 }
 
+// Calculate remaining encounters for this area for later reference
+$battles_remaining = array();
+foreach ($world_map_encounters AS $namekey => $encounter){
+        $kind = $encounter[0]; $subkind = '';
+        if (strstr($kind, '/')){ list($kind, $subkind) = explode('/', $kind, 2); }
+        $token = $encounter[1]; $alt = $encounter[2]; $pos = $encounter[3]; $battle = $encounter[4]; $name = $encounter[5];
+        //error_log('-> processing battle w/'.PHP_EOL.'-> $token ='.' '.$token.PHP_EOL.'-> $kind = '.$kind.PHP_EOL.'-> $subkind = '.$subkind.PHP_EOL.'-> $alt = '.$alt.PHP_EOL.'-> $pos = '.$pos.PHP_EOL.'-> $battle = '.$battle);
+        if (!rpg_battle::has_index_info($battle)){ continue; }
+        if ($subkind === 'rescue' && mmrpg_prototype_robot_unlocked('', $token)){ continue; }
+        if (!isset($battles_remaining['all'])){ $battles_remaining['all'] = 0; }
+        if (!isset($battles_remaining[$subkind])){ $battles_remaining[$subkind] = 0; }
+        if ($subkind !== 'rescue'){ $battles_remaining['all']++; }
+        $battles_remaining[$subkind]++;
+    }
+//error_log('$battles_remaining = '.print_r($battles_remaining, true));
+$map_data_parsed['battles'] = $battles_remaining;
+//error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
+
 // Refresh the world map with any persistent changes that have occurred
 rpg_world::refresh_world_map($this_prototype_data, $map_data_parsed);
+
+// Now that we have encounter and other data, let's see if we should change the music at all
+if (!empty($map_data_parsed['music'])){
+    $music_tracks = $map_data_parsed['music'];
+    if (!!empty($music_tracks['safezone']) && empty($battles_remaining['all'])){ $map_field_music = $music_tracks['safezone'][0]; }
+    elseif (!empty($music_tracks['dangerzone']) && !empty($battles_remaining['all'])){ $map_field_music = $music_tracks['dangerzone'][0]; }
+    elseif (!empty($music_tracks['boss-nearby']) && !empty($battles_remaining['boss'])){ $map_field_music = $music_tracks['boss-nearby'][0]; }
+    elseif (!empty($music_tracks['master-nearby']) && !empty($battles_remaining['master'])){ $map_field_music = $music_tracks['master-nearby'][0]; }
+    elseif (!empty($music_tracks['mecha-nearby']) && !empty($battles_remaining['mecha'])){ $map_field_music = $music_tracks['mecha-nearby'][0]; }
+    elseif (!empty($music_tracks['default'])){ $map_field_music = $music_tracks['default'][0]; }
+    //error_log('$music_tracks = '.print_r($music_tracks, true));
+    }
+if (!strstr($map_field_music, '/')){ $map_field_music = 'sega-remix/'.$map_field_music; }
+//error_log('$map_field_music = '.print_r($map_field_music, true));
+//error_log('b/c -> $map_field_info = '.print_r($map_field_info, true));
+//error_log('b/c -> $map_data_parsed = '.print_r($map_data_parsed, true));
+//error_log('b/c -> $world_map_encounters = '.print_r($world_map_encounters, true));
 
 // Automatically save the world session w/ any recent changes
 //rpg_world::save_session();

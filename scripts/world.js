@@ -534,12 +534,10 @@ class mmrpgWorldMap {
             else if (startDirection.indexOf('up') !== -1){ fakeOldPosition[1] = fakeOldPosition[1] + 1; }
             _config.allowWorldEvents = true;
             _self.playSoundEffect('teleport-in');
-            //_self.togglePerspectiveMode(); // TEMP TEMP TEMP
-            _self.moveToPosition(startPosition, null, true, false, fakeOldPosition);
-            //_self.togglePerspectiveMode(); // TEMP TEMP TEMP
-            setTimeout(function(){
+            _self.moveToPosition(startPosition, function(){
                 console.log('%c' + 'MMRPG WORLD IS READY!', 'color: lime;');
                 _world.isReady = true;
+                //_self.togglePerspectiveMode(true); // TEMP TEMP TEMP
                 $thisWorld.removeClass('hidden');
                 $thisWorld.addClass('ready');
                 $canvasMap.addClass('ready');
@@ -551,6 +549,8 @@ class mmrpgWorldMap {
                     gameSettings.gameHasStarted = true;
                     //_self.showWorldMessage('<span style="color: cyan;">triggerWorldReadyEvents()</span>');
                     }, 900);
+                }, true, false, fakeOldPosition);
+            setTimeout(function(){
                 }, 100);
             };
         // Define the function for run when each layer is done being rendered
@@ -1423,6 +1423,7 @@ class mmrpgWorldMap {
         let $clickOverlay = _elements.clickOverlay;
         let $sideButtons = _elements.sideButtons;
         let $robotsOverview = _elements.robotsOverview;
+        // Bind a click event to the overlap that lets us calculate where the user actually clicked below
         $clickOverlay.bind('click', function(e){
             e.preventDefault();
             if (_self.worldMapIsHidden()){
@@ -1504,6 +1505,16 @@ class mmrpgWorldMap {
             if (!sameAsLast){  _self.playSoundEffect('icon-hover'); }
             });
         $clickOverlay.addClass('active');
+        // Prevent default Enter/Space events if the user is not explicitly inside a text input
+        document.addEventListener('keydown', function(event){
+            if (event.key === 'Enter' || event.key === ' '){
+                if (event.target.tagName !== 'INPUT'
+                    && event.target.tagName !== 'TEXTAREA') {
+                    //console.log('Preventing default Enter or Space!');
+                    event.preventDefault();
+                    }
+                }
+            });
         // Return true on success
         return true;
         }
@@ -1647,6 +1658,14 @@ class mmrpgWorldMap {
                     });
                 return true;
                 });
+            }
+        // Bind a click event to the minimap overview in the header that expands on mouseover to show more
+        let $minimapOverview = _elements.minimapOverview;
+        if ($minimapOverview && $minimapOverview.length){
+            $minimapOverview.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
+            $minimapOverview.bind('mouseleave', unhoverCanvasObject);
+            $minimapOverview.find('.button').bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
+            $minimapOverview.find('.button').bind('mouseleave', unhoverCanvasObject);
             }
         // Check to make sure the robotsOverview exists, and then bind events to its elements
         let $robotsOverview = _elements.robotsOverview;
@@ -3630,8 +3649,16 @@ class mmrpgWorldMap {
                     else if (hoveredButtonKind === 'home'){ nextButtonKind = false; }
                     $possibleButtons.removeClass('hovered');
                     _selfRef.leftSideButtonHovered = false;
-                    if (nextButtonKind === 'back'){ $backButton.addClass('hovered'); _selfRef.leftSideButtonHovered = true; }
-                    else if (nextButtonKind === 'home'){ $homeButton.addClass('hovered'); _selfRef.leftSideButtonHovered = true; }
+                    if (nextButtonKind === 'back'){
+                        //$backButton.addClass('hovered');
+                        $backButton.trigger('mouseenter');
+                        _selfRef.leftSideButtonHovered = true;
+                        }
+                    else if (nextButtonKind === 'home'){
+                        //$homeButton.addClass('hovered');
+                        $homeButton.trigger('mouseenter');
+                        _selfRef.leftSideButtonHovered = true;
+                        }
                     ignoreInputFor(600);
                     return true;
                     } else if (_selfRef.leftSideButtonHovered){
@@ -3649,17 +3676,28 @@ class mmrpgWorldMap {
                     if ($minimapOverview.length
                         && $minimapOverview.is(':visible')
                         && !$minimapOverview.is('.disabled')){
-                        $minimapOverview.addClass('hovered');
-                        _selfRef.minimapOverviewHovered = true;
+                        if (!_selfRef.minimapOverviewHovered){
+                            //$minimapOverview.addClass('hovered');
+                            $minimapOverview.trigger('mouseenter');
+                            _selfRef.minimapOverviewHovered = true;
+                            } else {
+                            let $active = $minimapOverview.find('.button.active').first();
+                            let $next = $minimapOverview.find('.button:not(.active)').first();
+                            if ($active && $active.length){
+                                let $maybeNext = $active.next('.button:not(.active)');
+                                if ($maybeNext && $maybeNext.length){ $next = $maybeNext; }
+                                }
+                            if ($next && $next.length){ $next.trigger('click'); }
+                            }
                         ignoreInputFor(300);
                         return true;
                         }
                     } else if (_selfRef.minimapOverviewHovered){
                     clearTimeout(_selfRef.minimapOverviewTimeout);
                     _selfRef.minimapOverviewTimeout = setTimeout(function(){
-                        if ($minimapOverview.is('.hovered')){ $minimapOverview.removeClass('hovered'); }
+                        $minimapOverview.trigger('mouseleave');
+                        _selfRef.minimapOverviewHovered = false;
                         }, 200);
-
                     }
                 // If the player has pressed the X button, try to click the robots-overview button (team-switch) button if exists/not-disabled
                 if (activeInputs.X){
@@ -3669,7 +3707,7 @@ class mmrpgWorldMap {
                     if ($switchButton.length
                         && $switchButton.is(':visible')
                         && !$switchButton.is('.disabled')){
-                        $switchButton.addClass('clicked');
+                        //$switchButton.addClass('clicked');
                         $switchButton.trigger('click');
                         setTimeout(function(){ $switchButton.removeClass('clicked'); }, 200);
                         ignoreInputFor(300);
@@ -3712,16 +3750,21 @@ class mmrpgWorldMap {
                             let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
                             let playerHistory = _config.playerHistory || [];
                             if (!playerIsCursor){
-                                $cursorPlayer.addClass('hovered');
+                                //$cursorPlayer.addClass('hovered');
+                                $cursorPlayer.trigger('mouseenter');
                                 }
                             else if (playerHistory.length > 1){
                                 let lastPlayerToken = (function(a, t){ for (let i = 0; i < a.length; i++){ if (a[i] !== t){ return a[i]; } } })(playerHistory, _worldPlayer.token);
                                 let $lastPlayerButton = lastPlayerToken.length ? $playerButtons.filter('[data-player="' + lastPlayerToken + '"]').first() : false;
-                                if ($lastPlayerButton.length){ $lastPlayerButton.addClass('hovered'); }
+                                if ($lastPlayerButton.length){
+                                    //$lastPlayerButton.addClass('hovered');
+                                    $lastPlayerButton.trigger('mouseenter');
+                                    }
                                 }
                             }
                         else {
-                            $activePlayer.addClass('hovered');
+                            //$activePlayer.addClass('hovered');
+                            $activePlayer.trigger('mouseenter');
                             }
                         ignoreInputFor(300);
                         return true;
@@ -3762,12 +3805,18 @@ class mmrpgWorldMap {
                             if (activeInputs.L2){
                                 let $prevPlayer = $hoveredPlayer.prevAll('.team-player').first();
                                 if (!$prevPlayer || !$prevPlayer.length){ $prevPlayer = $playerButtons.last(); }
-                                if ($prevPlayer.length){ $prevPlayer.addClass('hovered'); }
+                                if ($prevPlayer.length){
+                                    //$prevPlayer.addClass('hovered');
+                                    $prevPlayer.trigger('mouseenter');
+                                    }
                                 }
                             else if (activeInputs.R2){
                                 let $nextPlayer = $hoveredPlayer.nextAll('.team-player').first();
                                 if (!$nextPlayer || !$nextPlayer.length){ $nextPlayer = $playerButtons.first(); }
-                                if ($nextPlayer.length){ $nextPlayer.addClass('hovered'); }
+                                if ($nextPlayer.length){
+                                    //$nextPlayer.addClass('hovered');
+                                    $nextPlayer.trigger('mouseenter');
+                                    }
                                 }
                             ignoreInputFor(300);
                             return true;
@@ -4729,8 +4778,10 @@ class mmrpgWorldMap {
         _self.onWorldReady(function(){
 
             // Refresh the camera position to the cursor
-            _self.refreshPosition();
-            _self.scrollMap();
+            setTimeout(function(){
+                _self.refreshPosition(null, true, false);
+                _self.scrollMap(null, null, true);
+                }, 100);
 
             });
 
@@ -11910,6 +11961,7 @@ class mmrpgWorldMap {
             //console.log('%c' + 'Mini-map view button clicked!', 'color: cyan;');
             let $button = $(this);
             let newView = $button.attr('data-view');
+            _self.playSoundEffect('icon-click-mini');
             return updateMiniMapView(newView);
             });
 

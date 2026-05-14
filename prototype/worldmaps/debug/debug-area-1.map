@@ -33,6 +33,13 @@
 @terrain[]   = grass(gentle-countryside)
 @terrain[]   = subspace(prototype-subspace)
 #---------------------------#
+# FIELD MUSIC CONFIG
+#--------------------
+@music[]     = default(opening-1-mm9)
+@music[]     = dangerzone(opening-stage-rnf)
+@music[]     = mecha-battle(opening-stage-mm7)
+@music[]     = boss-battle(wily-fortress-1-mm7)
+#---------------------------#
 # ENCOUNTERS AND HABITATS
 #--------------------------
 @encounters  = met(2),trille-bot(1)

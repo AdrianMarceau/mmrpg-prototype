@@ -1948,6 +1948,9 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
     $session_token = mmrpg_game_token();
 
     // If a specific robot token was provided
+    if (!is_string($player_token)){ $player_token = ''; }
+    if (!is_string($robot_token)){ $robot_token = ''; }
+    if (!is_array($ability_tokens)){ $ability_tokens = array(); }
     if (!empty($player_token) && !empty($robot_token)){
         // Check if this battle has been completed and return true is it was
         $ability_tokens = isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) ? ($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) : array();
@@ -1971,7 +1974,7 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
         elseif (empty($info['ability_flag_complete'])){ unset($ability_tokens[$key]); }
         elseif (!empty($info['ability_flag_hidden'])){ unset($ability_tokens[$key]); }
     }
-    $ability_tokens = array_values($ability_tokens);
+    $ability_tokens = !empty($ability_tokens) ? array_values($ability_tokens) : array();
 
     // Return the total amount of ability tokens pulled
     return !empty($ability_tokens) ? count($ability_tokens) : 0;

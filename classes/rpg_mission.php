@@ -87,6 +87,11 @@ class rpg_mission {
                 if (isset($field_config['background'])){ $field_base['field_background'] = $field_config['background']; }
             }
         }
+        if (!empty($battle_config['music']) && is_string($battle_config['music'])){
+            $field_music = $battle_config['music'];
+            if (!strstr($battle_config['music'], '/')){ $field_music = 'sega-remix/'.$field_music; }
+            $field_base['field_music'] = $field_music;
+        }
         $battle_omega['battle_field_base'] = $field_base;
         //error_log('rpg_mission::generate_mission()::'.__LINE__.' | $field_base = '.print_r($field_base, true));
         //error_log('rpg_mission::generate_mission()::'.__LINE__.' | $battle_omega = '.print_r($battle_omega, true));
