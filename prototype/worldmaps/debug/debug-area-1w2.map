@@ -14,6 +14,7 @@
 @portals[]  = south-exit(5-25, debug-area-1sw__north-exit, down-only)
 #---------------------------#
 @field      = preserved-forest
+@music[]    = default(plant-man-mm6)
 #---------------------------#
 @pickups      = attack-pellet(2),attack-capsule(1),defense-pellet(2),defense-capsule(1),speed-pellet(2),speed-capsule(1)
 #---------------------------#

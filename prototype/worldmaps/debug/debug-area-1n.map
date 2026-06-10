@@ -34,6 +34,15 @@
 @items[]     = cossack-init-program(12-3, cossack-program, anchored)
 @items[]     = cossack-init-core(3-9, copy-core, anchored)
 #---------------------------#
+@hazards[]    = frozen-hazard-1(6-9, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+@hazards[]    = frozen-hazard-2(10-9, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+#---------------------------#
+@hazards[]    = frozen-hazard-3(2-11, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+@hazards[]    = frozen-hazard-4(3-11, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+@hazards[]    = frozen-hazard-5(4-11, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+@hazards[]    = frozen-hazard-6(4-10, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+@hazards[]    = frozen-hazard-7(5-10, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+#---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[50],[__],[__],[__],[__],[__],[__],[__]
 [__],[53],[51],[51],[51],[51],[51],[51],[51],[51],[51],[51],[51],[54],[__]
 [__],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[50],[__]
