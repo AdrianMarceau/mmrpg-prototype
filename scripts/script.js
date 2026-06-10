@@ -2867,10 +2867,12 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     var effectVolume = baseEffectVolume;
     var effectRate = 1.0;
     var effectLoop = false;
+    var effectDelay = 0;
     if (isMenuSound === true){ effectVolume *= gameSettings.menuEffectVolume; }
     if (typeof effectConfig.volume === 'number'){ effectVolume *= effectConfig.volume; }
     if (typeof effectConfig.rate === 'number'){ effectRate = effectConfig.rate; }
     if (typeof effectConfig.loop === 'boolean'){ effectLoop = effectConfig.loop; }
+    if (typeof effectConfig.delay === 'number'){ effectDelay = effectConfig.delay; }
     if (!gameSettings.effectVolumeEnabled){ effectVolume = 0; }
     if (effectVolume < 0){ effectVolume = 0; }
     if (effectVolume > 1){ effectVolume = 1; }
@@ -2881,7 +2883,7 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     let sound;
     //gameSettings.soundEffectPoolKey++;
     //if (gameSettings.soundEffectPoolKey >= gameSettings.soundEffectPoolLimit){ gameSettings.soundEffectPoolKey = 0; }
-    var soundEffectPoolKey = gameSettings.soundEffectPoolKey;
+    let soundEffectPoolKey = gameSettings.soundEffectPoolKey;
     if (typeof gameSettings.soundEffectPool[soundEffectPoolKey] === 'undefined'
         || typeof gameSettings.soundEffectPool[soundEffectPoolKey].sound === 'undefined'){
 
@@ -2907,7 +2909,7 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
         }
 
     // We can pull an existing sound object to use from the pool
-    var effect = gameSettings.soundEffectPool[soundEffectPoolKey];
+    let effect = gameSettings.soundEffectPool[soundEffectPoolKey];
     effect.time = Date.now();
     sound = effect.sound;
     //console.log('sound =', sound);
@@ -2915,11 +2917,11 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     //console.log('sound.volume() =', sound.volume());
     //console.log('sound._sprite['+effectName+'] =', (sound._sprite &&  sound._sprite[effectName] ? sound._sprite[effectName] : undefined));
 
-    // Stop any currently playing sound
-    sound.stop();
+    // Stop any currently playing sound (?)
+    //sound.stop();
 
     // Play the sound when ready using a function that checks load status
-    var playSoundWhenReady = function(effectName){
+    let playSoundWhenReady = function(effectName, effectVolume, effectRate){
         let playSound = function(sound){
             sound.stop();
             //console.log('set rate to ', effectRate);
@@ -2952,7 +2954,9 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             }
         return true;
         };
-    playSoundWhenReady(effectName);
+    if (effectDelay){ setTimeout(function(){ playSoundWhenReady(effectName, effectVolume, effectRate); }, effectDelay); }
+    else { playSoundWhenReady(effectName, effectVolume, effectRate); }
+
 
     /*
     // Now that the sound is actually playing we can do cleanup
@@ -4010,6 +4014,10 @@ if (typeof window.calcDistance === 'undefined'){
     function calculateDistance(x1, y1, x2, y2) {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
         }
+    }
+
+if (typeof window.toUpperCaseWords === 'undefined'){
+    function toUpperCaseWords(str){ return str.toLowerCase().replace(/\b[a-z]/g, (l) => l.toUpperCase()); }
     }
 
 // Fix the indexOf issue for IE8 and lower
