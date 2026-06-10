@@ -117,6 +117,8 @@ class rpg_world {
         if (!isset($WORLD_SESSION['world_maps'])){ $WORLD_SESSION['world_maps'] = array(); }
         if (!isset($WORLD_SESSION['world_buttons'])){ $WORLD_SESSION['world_buttons'] = array(); }
         if (!isset($WORLD_SESSION['world_switches'])){ $WORLD_SESSION['world_switches'] = array(); }
+        if (!isset($WORLD_SESSION['world_blocks'])){ $WORLD_SESSION['world_blocks'] = array(); }
+        if (!isset($WORLD_SESSION['world_hazards'])){ $WORLD_SESSION['world_hazards'] = array(); }
         if (!isset($WORLD_SESSION['world_items'])){ $WORLD_SESSION['world_items'] = array(); }
         if (!isset($WORLD_SESSION['world_abilities'])){ $WORLD_SESSION['world_abilities'] = array(); }
         if (!isset($WORLD_SESSION['world_encounters'])){ $WORLD_SESSION['world_encounters'] = array(); }
@@ -188,8 +190,18 @@ class rpg_world {
         $user_group = $is_member ? 'members' : 'guests';
         $user_id = $is_member ? rpg_user::get_current_userid() : rpg_user::get_current_userip();
         $json_session_path = MMRPG_CONFIG_ROOTDIR.'.cache/sessions/'.$user_group.'/'.$user_id.'/';
+        $json_session_keys = array(
+            'player_sessions',
+            'world_maps',
+            'world_encounters',
+            'world_pickups',
+            'world_buttons',
+            'world_switches',
+            'world_blocks',
+            'world_hazards',
+            );
         foreach ($WORLD_SESSION AS $key => $values){
-            if (in_array($key, array('player_sessions', 'world_maps', 'world_encounters', 'world_pickups', 'world_buttons', 'world_switches'))){
+            if (in_array($key, $json_session_keys)){
                 $json_session_file = 'WORLD__'.$key.'.json';
                 $json_session_file_path = $json_session_path.$json_session_file;
                 if (!is_dir(dirname($json_session_file_path))){ mkdir(dirname($json_session_file_path), 0755, true); }
@@ -509,9 +521,29 @@ class rpg_world {
                     $worldSwitchStates[$map_token] = array_merge($worldSwitchStates[$map_token], $switch_states);
                 }
             }
+            // If world block states were provided, save them to the session
+            if (!empty($worldData['lastWorldBlocks'])){
+                if (!isset($WORLD_SESSION['world_blocks'])){ $WORLD_SESSION['world_blocks'] = array(); }
+                $worldBlockStates = &$WORLD_SESSION['world_blocks'];
+                foreach ($worldData['lastWorldBlocks'] AS $map_token => $block_states){
+                    if (!in_array($map_token, $allowed_world_map_tokens)){ continue; }
+                    if (!isset($worldBlockStates[$map_token])){ $worldBlockStates[$map_token] = array(); }
+                    $worldBlockStates[$map_token] = array_merge($worldBlockStates[$map_token], $block_states);
+                }
+            }
+            // If world hazard states were provided, save them to the session
+            if (!empty($worldData['lastWorldHazards'])){
+                if (!isset($WORLD_SESSION['world_hazards'])){ $WORLD_SESSION['world_hazards'] = array(); }
+                $worldHazardStates = &$WORLD_SESSION['world_hazards'];
+                foreach ($worldData['lastWorldHazards'] AS $map_token => $hazard_states){
+                    if (!in_array($map_token, $allowed_world_map_tokens)){ continue; }
+                    if (!isset($worldHazardStates[$map_token])){ $worldHazardStates[$map_token] = array(); }
+                    $worldHazardStates[$map_token] = array_merge($worldHazardStates[$map_token], $hazard_states);
+                }
+            }
             // If world symbol position changes were provided, save them to the session
             if (!empty($worldData['lastWorldSymbols'])){
-                $allowed_world_symbol_kinds = array('items', 'abilities', 'encounters', 'pickups'); // for the moment, 'buttons' and 'switches' cannot be moved
+                $allowed_world_symbol_kinds = array('items', 'abilities', 'encounters', 'pickups', 'blocks', 'hazards'); // for the moment, 'buttons' and 'switches' cannot be moved
                 if (!isset($WORLD_SESSION['world_symbols'])){ $WORLD_SESSION['world_symbols'] = array(); }
                 $worldSymbolStates = &$WORLD_SESSION['world_symbols'];
                 foreach ($worldData['lastWorldSymbols'] AS $map_token => $symbol_kinds){
@@ -730,6 +762,8 @@ class rpg_world {
         $map_data_vars['portals'] = isset($map_data_vars['portals']) ? $map_data_vars['portals'] : array();
         $map_data_vars['buttons'] = isset($map_data_vars['buttons']) ? $map_data_vars['buttons'] : array();
         $map_data_vars['switches'] = isset($map_data_vars['switches']) ? $map_data_vars['switches'] : array();
+        $map_data_vars['blocks'] = isset($map_data_vars['blocks']) ? $map_data_vars['blocks'] : array();
+        $map_data_vars['hazards'] = isset($map_data_vars['hazards']) ? $map_data_vars['hazards'] : array();
         $map_data_vars['field'] = isset($map_data_vars['field']) ? $map_data_vars['field'] : '';
         $map_data_vars['music'] = isset($map_data_vars['music']) ? $map_data_vars['music'] : array();
         $map_data_vars['terrain'] = isset($map_data_vars['terrain']) ? $map_data_vars['terrain'] : array();
@@ -759,6 +793,8 @@ class rpg_world {
         $map_data_vars['portals'] = $map_custval_parser('portals', $map_data_vars['portals']);
         $map_data_vars['buttons'] = $map_custval_parser('buttons', $map_data_vars['buttons']);
         $map_data_vars['switches'] = $map_custval_parser('switches', $map_data_vars['switches']);
+        $map_data_vars['blocks'] = $map_custval_parser('blocks', $map_data_vars['blocks']);
+        $map_data_vars['hazards'] = $map_custval_parser('hazards', $map_data_vars['hazards']);
         $map_data_vars['terrain'] = $map_custval_parser('terrain', $map_data_vars['terrain']);
         $map_data_vars['music'] = $map_custval_parser('music', $map_data_vars['music']);
         $map_data_vars['habitats'] = $map_custval_parser('habitats', $map_data_vars['habitats']);
@@ -792,6 +828,8 @@ class rpg_world {
         $map_data_parsed['portals'] = $map_data_vars['portals']; unset($map_data_vars['portals']);
         $map_data_parsed['buttons'] = $map_data_vars['buttons']; unset($map_data_vars['buttons']);
         $map_data_parsed['switches'] = $map_data_vars['switches']; unset($map_data_vars['switches']);
+        $map_data_parsed['blocks'] = $map_data_vars['blocks']; unset($map_data_vars['blocks']);
+        $map_data_parsed['hazards'] = $map_data_vars['hazards']; unset($map_data_vars['hazards']);
         $map_data_parsed['field'] = $map_data_vars['field']; unset($map_data_vars['field']);
         $map_data_parsed['music'] = $map_data_vars['music']; unset($map_data_vars['music']);
         $map_data_parsed['terrain'] = $map_data_vars['terrain']; unset($map_data_vars['terrain']);
@@ -1114,6 +1152,26 @@ class rpg_world {
                 if (empty($button_data) || !is_array($button_data)){ continue; }
                 $pos = $button_data[0];
                 //error_log('-> removing button position "'.$pos.'" from available cells');
+                unset($available_cells[$pos]);
+            }
+        }
+        // Now let's loop through blocks and remove spaces that have active blocks on them
+        if (!empty($map_data['blocks']) && is_array($map_data['blocks'])){
+            foreach ($map_data['blocks'] AS $block_name => $block_data){
+                if (empty($block_data) || !is_array($block_data)){ continue; }
+                if (in_array('removed', $block_data)){ continue; } // don't block if it was removed
+                $pos = $block_data[0];
+                //error_log('-> removing block position "'.$pos.'" from available cells');
+                unset($available_cells[$pos]);
+            }
+        }
+        // Now let's loop through hazards and remove spaces that have active hazards on them
+        if (!empty($map_data['hazards']) && is_array($map_data['hazards'])){
+            foreach ($map_data['hazards'] AS $hazard_name => $hazard_data){
+                if (empty($hazard_data) || !is_array($hazard_data)){ continue; }
+                if (in_array('removed', $hazard_data)){ continue; } // don't block if it was removed
+                $pos = $hazard_data[0];
+                //error_log('-> removing hazard position "'.$pos.'" from available cells');
                 unset($available_cells[$pos]);
             }
         }
@@ -2774,6 +2832,333 @@ class rpg_world {
         return implode(PHP_EOL, $buttons_markup);
     }
 
+    // Define a function for getting the SWITCHES LAYER sprite markup for the world map
+    public static function get_switches_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_switches_layer_markup() called!');
+        // BUTTONS LAYER
+        $WORLD_SESSION = self::get_session();
+        $world_switches = !empty($WORLD_SESSION['world_switches']) ? $WORLD_SESSION['world_switches'] : array();
+        $map_config = $map_data_parsed['config'];
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_tilesize_offset = $map_config['tilesize_offset'];
+        $switches_markup = array();
+        $switch_symbols = array();
+        $switches_index = array();
+        if (!empty($map_data_parsed['switches'])){
+            $switch_sprites = $map_data_parsed['switches'];
+            $world_map_switches = !empty($world_switches[$world_map_token]) ? $world_switches[$world_map_token] : array();
+            foreach ($switch_sprites AS $switch_namekey => $switch_data){
+                if (empty($switch_data) || !is_array($switch_data) || count($switch_data) < 2){ continue; }
+                $pos = $switch_data[0]; list($col, $row) = explode('-', $pos); unset($switch_data[0]);
+                $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                $z_index = $top + 1;
+                $colour = !empty($switch_data[1]) ? $switch_data[1] : 'black'; unset($switch_data[1]);
+                $state = !empty($switch_data[2]) ? $switch_data[2] : 'up'; unset($switch_data[2]);
+                $action = !empty($switch_data[3]) ? $switch_data[3] : ''; unset($switch_data[3]);
+                $hidden = false; if (in_array('hidden', $switch_data)){ $hidden = true; unset($switch_data[array_search('hidden', $switch_data)]); }
+                $locked = false; if (in_array('locked', $switch_data)){ $locked = true; unset($switch_data[array_search('locked', $switch_data)]); }
+                if (!empty($world_map_switches[$switch_namekey])){ $state = $world_map_switches[$switch_namekey]; }
+                $data = array_values($switch_data);
+                $is_glowing = $state !== 'down' && !$hidden && !$locked ? true : false;
+                $base_classes = 'sprite tile switch';
+                $kind_classes = $colour.' '.$state;
+                $sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
+                $attrs = 'data-switch="'.$switch_namekey.'" data-colour="'.$colour.'" data-state="'.$state.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
+                $classes = $base_classes.($is_glowing ? ' glow' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $switches_markup[] = '<span data-sprite="switch" class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$sprite.'</span>';
+                $switch_symbols[$pos] = $switch_namekey;
+                $switches_index[$switch_namekey] = array(
+                    'pos' => $pos,
+                    'col' => $col,
+                    'row' => $row,
+                    'colour' => $colour,
+                    'state' => $state,
+                    'action' => $action,
+                    'data' => $data,
+                    'hidden' => $hidden,
+                    'locked' => $locked,
+                    );
+            }
+        }
+        $switch_symbols_json = json_encode($switch_symbols, JSON_NUMERIC_CHECK);
+        $switches_index_json = json_encode($switches_index, JSON_NUMERIC_CHECK);
+        $switches_markup[] = '<script data-json="switchSymbols" type="application/json">'.$switch_symbols_json.'</script>';
+        $switches_markup[] = '<script data-json="switchesIndex" type="application/json">'.$switches_index_json.'</script>';
+        return implode(PHP_EOL, $switches_markup);
+    }
+
+    // Define a function that returns the BLOCKS INDEX with details for usage on the world map
+    public static function get_static_blocks_index(){
+        $mmrpg_blocks_index = array(
+            'super-block' => array(
+                'name' => 'Super Block',
+                'type' => 'earth',
+                'weaknesses' => array('impact', 'explode')
+                ),
+            'fence-block' => array(
+                'name' => 'Fence Block',
+                'type' => 'nature',
+                'weaknesses' => array('flame', 'cutter'),
+                ),
+            'cyber-block' => array(
+                'name' => 'Virtual Block',
+                'type' => 'electric',
+                'weaknesses' => array('electric'),
+                ),
+            'phantom-block' => array(
+                'name' => 'Phantom Block',
+                'type' => 'shadow',
+                'weaknesses' => array('shadow'),
+                ),
+            );
+        return $mmrpg_blocks_index;
+    }
+
+    // Define a function for getting the BLOCKS LAYER sprite markup for the world map
+    public static function get_blocks_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_blocks_layer_markup() called!');
+        // BLOCKS LAYER
+        $WORLD_SESSION = self::get_session();
+        $world_blocks = !empty($WORLD_SESSION['world_blocks']) ? $WORLD_SESSION['world_blocks'] : array();
+        $map_config = $map_data_parsed['config'];
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_tilesize_offset = $map_config['tilesize_offset'];
+        $this_player_token = $this_prototype_data['this_player_token'];
+        $this_is_cursor = $this_player_token === 'player' ? true : false;
+        $mmrpg_index_blocks = self::get_index('blocks');
+        $blocks_markup = array();
+        $block_symbols = array();
+        $blocks_index = array();
+        if (!empty($map_data_parsed['blocks'])){
+            $block_sprites = $map_data_parsed['blocks'];
+            $world_map_blocks = !empty($world_blocks[$world_map_token]) ? $world_blocks[$world_map_token] : array();
+            foreach ($block_sprites AS $block_namekey => $block_data){
+                if (empty($block_data) || !is_array($block_data) || count($block_data) < 2){ continue; }
+                $hidden = in_array('hidden', $block_data) ? true : false; if ($hidden){ unset($block_data[array_search('hidden', $block_data)]); }
+                $locked = in_array('locked', $block_data) ? true : false; if ($locked){ unset($block_data[array_search('locked', $block_data)]); }
+                $removed = in_array('removed', $block_data) ? true : false; if ($removed){ unset($block_data[array_search('removed', $block_data)]); }
+                if (!empty($world_map_blocks[$block_namekey])){ $removed = true; }
+                if ($removed){ continue; }
+                $pos = $block_data[0]; list($col, $row) = explode('-', $pos); unset($block_data[0]);
+                $sprite = !empty($block_data[1]) ? $block_data[1] : 'super-block'; unset($block_data[1]);
+                $image = !empty($block_data[2]) ? $block_data[2] : ''; unset($block_data[2]);
+                if (empty($image) && $sprite === 'super-block'){ $image = $map_data_parsed['field']; }
+                $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                $z_index = $top + 1;
+                $data = array_values($block_data);
+                $info = !empty($mmrpg_index_blocks[$sprite]) ? $mmrpg_index_blocks[$sprite] : array();
+                $type = !empty($info['type']) ? $info['type'] : '';
+                $weaknesses = !empty($info['weaknesses']) ? $info['weaknesses'] : array();
+                $colour = !empty($type) ? $type : 'none';
+                $base_classes = 'sprite tile block';
+                $kind_classes = $sprite.($image ? ' '.$image : '');
+                $inner_sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
+                $attrs = 'data-block="'.$block_namekey.'" data-type="'.$type.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
+                $classes = $base_classes.($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $blocks_markup[] = '<span data-sprite="block" class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$inner_sprite.'</span>';
+                $block_symbols[$pos] = $block_namekey;
+                $blocks_index[$block_namekey] = array(
+                    'pos' => $pos,
+                    'sprite' => $sprite,
+                    'image' => $image,
+                    'colour' => $colour,
+                    'col' => $col,
+                    'row' => $row,
+                    'hidden' => $hidden,
+                    'locked' => $locked,
+                    'removed' => $removed,
+                    'data' => $data,
+                    'type' => $type,
+                    'weaknesses' => $weaknesses,
+                    );
+            }
+        }
+        $block_symbols_json = json_encode($block_symbols, JSON_NUMERIC_CHECK);
+        $blocks_index_json = json_encode($blocks_index, JSON_NUMERIC_CHECK);
+        $blocks_markup[] = '<script data-json="blockSymbols" type="application/json">'.$block_symbols_json.'</script>';
+        $blocks_markup[] = '<script data-json="blocksIndex" type="application/json">'.$blocks_index_json.'</script>';
+        return implode(PHP_EOL, $blocks_markup);
+    }
+
+    // Define a function that returns the HAZARDS INDEX with details for usage on the world map
+    public static function get_static_hazards_index(){
+        $mmrpg_hazards_index = array(
+            // Early-Game
+            'crude-oil' => array(
+                'name' => 'Crude Oil',
+                'type' => 'earth',
+                'weaknesses' => array('flame', 'water', 'earth'),
+                'effects' => array('lower-team-attack', 1)
+                ),
+            'foamy-bubbles' => array(
+                'name' => 'Foamy Bubbles',
+                'type' => 'water',
+                'weaknesses' => array('wind', 'cutter', 'missle'),
+                'effects' => array('lower-team-defense', 1)
+                ),
+            'frozen-foothold' => array(
+                'name' => 'Frozen Foothold',
+                'type' => 'freeze',
+                'weaknesses' => array('flame', 'impact', 'explode'),
+                'effects' => array('lower-team-speed', 1)
+                ),
+            'flame-pillar' => array(
+                'name' => 'Flame Pillar',
+                'type' => 'flame',
+                'weaknesses' => array('water', 'earth', 'freeze'),
+                'effects' => array('lower-team-energy', 10)
+                ),
+            // Mid-Game
+            'bramble-patch' => array(
+                'name' => 'Bramble Patch',
+                'type' => 'nature',
+                'weaknesses' => array('flame', 'cutter'),
+                'effects' => array('lower-team-attack', 2)
+                ),
+            'toxic-sludge' => array(
+                'name' => 'Toxic Sludge',
+                'type' => 'shadow',
+                'weaknesses' => array('water', 'crystal'),
+                'effects' => array('lower-team-defense', 2)
+                ),
+            'shifting-sands' => array(
+                'name' => 'Shifting Sands',
+                'type' => 'earth',
+                'weaknesses' => array('nature', 'wind'),
+                'effects' => array('lower-team-speed', 2)
+                ),
+            'woolly-clouds' => array(
+                'name' => 'Woolly Clouds',
+                'type' => 'electric',
+                'weaknesses' => array('wind', 'swift'),
+                'effects' => array('lower-team-energy', 25)
+                ),
+            // Late-Game
+            'jagged-crystals' => array(
+                'name' => 'Jagged Crystals',
+                'type' => 'crystal',
+                'weaknesses' => array('laser'),
+                'effects' => array('lower-team-attack', 5)
+                ),
+            'laser-trap' => array(
+                'name' => 'Laser Trap',
+                'type' => 'laser',
+                'weaknesses' => array('shield'),
+                'effects' => array('lower-team-defense', 5)
+                ),
+            'gravity-well' => array(
+                'name' => 'Gravity Well',
+                'type' => 'space',
+                'weaknesses' => array('space'),
+                'effects' => array('lower-team-speed', 5)
+                ),
+            'tachyon-rift' => array(
+                'name' => 'Tachyon Rift',
+                'type' => 'time',
+                'weaknesses' => array('time'),
+                'effects' => array('lower-team-energy', 50)
+                ),
+            );
+        return $mmrpg_hazards_index;
+    }
+
+    // Define a function for getting the HAZARDS LAYER sprite markup for the world map
+    public static function get_hazards_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_hazards_layer_sprites() called!');
+        // HAZARDS LAYER
+        $WORLD_SESSION = self::get_session();
+        $world_hazards = !empty($WORLD_SESSION['world_hazards']) ? $WORLD_SESSION['world_hazards'] : array();
+        $map_config = $map_data_parsed['config'];
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+        $map_width = $map_config['pixel_width'];
+        $map_height = $map_config['pixel_height'];
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_tilesize_offset = $map_config['tilesize_offset'];
+        $this_player_token = $this_prototype_data['this_player_token'];
+        $this_is_cursor = $this_player_token === 'player' ? true : false;
+        $mmrpg_index_hazards = self::get_index('hazards');
+        $hazards_markup = array();
+        $hazard_symbols = array();
+        $hazards_index = array();
+        if (!empty($map_data_parsed['hazards'])){
+            $hazard_sprites = $map_data_parsed['hazards'];
+            $world_map_hazards = !empty($world_hazards[$world_map_token]) ? $world_hazards[$world_map_token] : array();
+            foreach ($hazard_sprites AS $hazard_namekey => $hazard_data){
+                if (empty($hazard_data) || !is_array($hazard_data)){ continue; }
+                $hidden = in_array('hidden', $hazard_data) ? true : false; if ($hidden){ unset($hazard_data[array_search('hidden', $hazard_data)]); }
+                $locked = in_array('locked', $hazard_data) ? true : false; if ($locked){ unset($hazard_data[array_search('locked', $hazard_data)]); }
+                $removed = in_array('removed', $hazard_data) ? true : false; if ($removed){ unset($hazard_data[array_search('removed', $hazard_data)]); }
+                if (!empty($world_map_hazards[$hazard_namekey])){ $removed = true; }
+                if ($removed){ continue; }
+                $pos = $hazard_data[0]; unset($hazard_data[0]);
+                $sprite = !empty($hazard_data[1]) ? ($hazard_data[1] !== '-' ? $hazard_data[1] : '') : ''; unset($hazard_data[1]);
+                $colour = !empty($hazard_data[2]) ? ($hazard_data[2] !== '-' ? $hazard_data[2] : '') : ''; unset($hazard_data[2]);
+                $filter = !empty($hazard_data[3]) ? ($hazard_data[3] !== '-' ? $hazard_data[3] : '') : ''; unset($hazard_data[3]);
+                $action = !empty($hazard_data[4]) ? ($hazard_data[4] !== '-' ? $hazard_data[4] : '') : ''; unset($hazard_data[4]);
+                //error_log('processing hazard "'.$hazard_namekey.'" with pos "'.$pos.'"'.PHP_EOL.'-> $sprite = "'.$sprite.'"'.PHP_EOL.'-> filter = "'.$filter.'"'.PHP_EOL.'-> $action = "'.$action.'"');
+                list($col, $row) = explode('-', $pos);
+                $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                $z_index = $top + 1;
+                $data = array_values($hazard_data); // remaining vaules if any
+                $info = !empty($mmrpg_index_hazards[$sprite]) ? $mmrpg_index_hazards[$sprite] : array();
+                $type = !empty($info['type']) ? $info['type'] : '';
+                $weaknesses = !empty($info['weaknesses']) ? $info['weaknesses'] : array();
+                $effects = !empty($info['effects']) ? $info['effects'] : array();
+                if (empty($colour) && !empty($type)){ $colour = $type; }
+                if (empty($filter) && !empty($effects)){ $filter = 'any'; }
+                if (empty($action) && !empty($effects)){ $action = 'trigger-effects'; }
+                if (empty($data) && !empty($effects)){ $data = $effects; }
+                $label = ucwords(str_replace('-', ' ', $sprite)); //ucwords(str_replace('-', ' ', $hazard_namekey));
+                $base_classes = 'sprite object hazard';
+                $kind_classes = $colour.' '.$sprite;
+                $inner_sprite = '<span class="wrap"><i class="'.$base_classes.' '.$kind_classes.'"></i></span>';
+                $attrs = 'data-hazard="'.$hazard_namekey.'" data-colour="'.$colour.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                $classes = $base_classes.' '.$kind_classes.(!$hidden && !$locked  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
+                $hazards_markup[] = '<span data-sprite="hazard" class="'.$classes.'" '.$attrs.' style="'.$style.'">'.$inner_sprite.'</span>';
+                $hazard_symbols[$pos] = $hazard_namekey;
+                $hazards_index[$hazard_namekey] = array(
+                    'pos' => $pos,
+                    'sprite' => $sprite,
+                    'colour' => $colour,
+                    'filter' => $filter,
+                    'action' => $action,
+                    'col' => $col,
+                    'row' => $row,
+                    'label' => $label,
+                    'hidden' => $hidden,
+                    'locked' => $locked,
+                    'removed' => $removed,
+                    'data' => $data,
+                    'type' => $type,
+                    'weaknesses' => $weaknesses,
+                    'effects' => $effects,
+                    );
+            }
+        }
+        $hazard_symbols_json = json_encode($hazard_symbols, JSON_NUMERIC_CHECK);
+        $hazards_index_json = json_encode($hazards_index, JSON_NUMERIC_CHECK);
+        $hazards_markup[] = '<script data-json="hazardSymbols" type="application/json">'.$hazard_symbols_json.'</script>';
+        $hazards_markup[] = '<script data-json="hazardsIndex" type="application/json">'.$hazards_index_json.'</script>';
+        return implode(PHP_EOL, $hazards_markup);
+    }
+
     // Define a function for getting the BATTLES LAYER sprite markup for the world map
     public static function get_battles_layer_markup($this_prototype_data, $map_data_parsed){
         //error_log('rpg_world::get_battles_layer_markup() called!');
@@ -2886,7 +3271,7 @@ class rpg_world {
             $attrs = 'data-key="'.$key.'"';
             if (!empty($id)){ $attrs .= ' data-id="'.$id.'"'; }
             $markup = self::get_sprite($kind, $img, $alt, $dir, $class, $styles, $attrs);
-            $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$team_class.'-'.$kind.'"', $markup);
+            $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$team_class.'-'.$kind.'" data-'.$kind.'="'.$id.'_'.$token.'"', $markup);
             if ($disabled){ $markup = str_replace('data-frame="00"', 'data-frame="03"', $markup); }
             if (!empty($markup)){ $sprites[] = $markup; }
             }
@@ -3281,6 +3666,12 @@ class rpg_world {
         // If there are any switches defined, check to see if any of them have been interacted with already
         self::refresh_map_switches($this_prototype_data, $map_data_parsed);
 
+        // If there are any blocks defined, check to see if any of them have been interacted with already
+        self::refresh_map_blocks($this_prototype_data, $map_data_parsed);
+
+        // If there are any hazards defined, check to see if any of them have been interacted with already
+        self::refresh_map_hazards($this_prototype_data, $map_data_parsed);
+
         // If there are any platforms defined, check to see if any of them have been interacted with already
         self::refresh_map_platforms($this_prototype_data, $map_data_parsed);
 
@@ -3540,6 +3931,52 @@ class rpg_world {
 
         // TODO: implement switch refresh functionality
 
+        // Return true on success
+        return true;
+    }
+
+    // If there are any blocks defined, check to see if any of them have been interacted with already
+    public static function refresh_map_blocks($this_prototype_data, &$map_data_parsed){
+        //error_log('rpg_world::refresh_map_blocks() called!');
+        if (empty($map_data_parsed['blocks'])){ return; }
+        $game_session_token = rpg_game::session_token();
+        $world_session_token = self::session_token();
+        $GAME_SESSION = &$_SESSION[$game_session_token];
+        $WORLD_SESSION = &$_SESSION[$world_session_token];
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+
+        // TODO: implement block refresh functionality
+
+        // Return true on success
+        return true;
+    }
+
+    // If there are any hazards defined, check to see if any of them have been interacted with already
+    public static function refresh_map_hazards($this_prototype_data, &$map_data_parsed){
+        //error_log('rpg_world::refresh_map_hazards() called!');
+        if (empty($map_data_parsed['hazards'])){ return; }
+        $game_session_token = rpg_game::session_token();
+        $world_session_token = self::session_token();
+        $GAME_SESSION = &$_SESSION[$game_session_token];
+        $WORLD_SESSION = &$_SESSION[$world_session_token];
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+        $hazard_sprites = $map_data_parsed['hazards'];
+        $world_hazards = !empty($WORLD_SESSION['world_hazards'][$world_map_token]) ? $WORLD_SESSION['world_hazards'][$world_map_token] : array();
+        foreach ($hazard_sprites AS $hazard_name => $hazard_data){
+            if (empty($hazard_data) || !is_array($hazard_data)){ continue; }
+            // If this hazard has a timestamp in the session, it means the player removed it
+            if (!empty($world_hazards[$hazard_name])){
+                // Append the 'removed' flag to the hazard's data array so the rest of the engine knows
+                if (!in_array('removed', $hazard_data)){
+                    $hazard_data[] = 'removed';
+                    $map_data_parsed['hazards'][$hazard_name] = $hazard_data;
+                }
+            }
+        }
         // Return true on success
         return true;
     }

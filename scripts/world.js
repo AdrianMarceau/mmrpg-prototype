@@ -1,9 +1,4 @@
 
-// Define global variables
-let $thisPrototype = false;
-let $thisWorld = false;
-let $thisCanvas = false;
-
 // Expand the game settings object with a variable world specific data
 gameSettings.worldConfig = {
     userId: 0,
@@ -44,7 +39,7 @@ gameSettings.worldConfig = {
         queueStagger: 900,  // time between queued messages appearing (milliseconds)
         holdDuration: 4000, // how long a message stays on screen (milliseconds)
         fadeDuration: 1000, // css transition time for fading out (milliseconds)
-        maxConcurrent: 3,   // how many messages can be on screen at once
+        maxConcurrent: 8,   // how many messages can be on screen at once
         },
     mapTilesIndex: {},
     mapGroupsIndex: {},
@@ -57,6 +52,10 @@ gameSettings.worldConfig = {
     mapButtonsIndex: {},
     mapSwitchSymbols: {},
     mapSwitchesIndex: {},
+    mapBlockSymbols: {},
+    mapBlocksIndex: {},
+    mapHazardSymbols: {},
+    mapHazardsIndex: {},
     mapBattleSymbols: {},
     mapBattlesIndex: {},
     mapRivalSymbols: {},
@@ -114,6 +113,7 @@ gameSettings.worldState = {
         row: 0,
         },
     player: {
+        id: 0,
         token: 'player',
         position: '0-0',
         direction: '',
@@ -126,6 +126,8 @@ gameSettings.worldState = {
     abilities: {},
     buttons: {},
     switches: {},
+    blocks: {},
+    hazards: {},
     symbols: {},
     callbacks: {},
     layersIndex: {},
@@ -986,6 +988,8 @@ class mmrpgWorldMap {
         exclude.portals = typeof exclude.portals === 'boolean' ? exclude.portals : true;
         exclude.buttons = typeof exclude.buttons === 'boolean' ? exclude.buttons : true;
         exclude.switches = typeof exclude.switches === 'boolean' ? exclude.switches : true;
+        exclude.blocks = typeof exclude.blocks === 'boolean' ? exclude.blocks : true;
+        exclude.hazards = typeof exclude.hazards === 'boolean' ? exclude.hazards : true;
         exclude.battles = typeof exclude.battles === 'boolean' ? exclude.battles : true;
         exclude.players = typeof exclude.players === 'boolean' ? exclude.players : true;
         exclude.rivals = typeof exclude.rivals === 'boolean' ? exclude.rivals : true;
@@ -1019,10 +1023,14 @@ class mmrpgWorldMap {
 
         // Collect references to other indexes we'll need to review tile properties
         let portalsIndex = _config.mapPortalsIndex;
+        let blocksIndex = _config.mapBlocksIndex;
+        let hazardsIndex = _config.mapHazardsIndex;
         let battlesIndex = _config.mapBattlesIndex;
         let battleSymbols = _config.mapBattleSymbols;
         let rivalSymbols = _config.mapRivalSymbols;
         let portalSymbols = _config.mapPortalSymbols;
+        let blockSymbols = _config.mapBlockSymbols;
+        let hazardSymbols = _config.mapHazardSymbols;
         let buttonSymbols = _config.mapButtonSymbols;
         let switchSymbols = _config.mapSwitchSymbols;
         //console.log('---> portalsIndex =', portalsIndex);
@@ -1146,6 +1154,45 @@ class mmrpgWorldMap {
             //console.log('---> walkableMapTiles (post-buttons) =', walkableMapTiles);
             }
 
+        // If we are to exclude blocks, make sure we remove those positions
+        let battleBlockKeys = Object.keys(blockSymbols);
+        if (exclude.blocks && blockSymbols){
+            //console.log('---> checking battleBlockKeys =', battleBlockKeys);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                //console.log('---> checking tileKey:', tileKey, 'against blockSymbols:', battleBlockKeys);
+                if (battleBlockKeys.includes(tileKey)){
+                    //console.log('---> tileKey:', tileKey, 'is a block, removing from walkableMapTiles');
+                    return false; // remove this tile
+                    } else {
+                    //console.log('---> tileKey:', tileKey, 'is not a block, keeping in walkableMapTiles');
+                    }
+                return true; // keep this tile
+                }));
+            //console.log('---> walkableMapTiles (post-blocks) =', walkableMapTiles);
+            }
+
+        // If we are to exclude hazards, make sure we remove those positions (only when not removed though)
+        let battleHazardKeys = Object.keys(hazardSymbols);
+        if (exclude.hazards && hazardSymbols){
+            //console.log('---> checking hazardSymbolKeys =', battleHazardKeys);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                //console.log('---> checking tileKey:', tileKey, 'against hazardSymbolKeys:', battleHazardKeys);
+                if (battleHazardKeys.includes(tileKey)){
+                    //console.log('---> tileKey:', tileKey, 'is a hazard, checking if locked...');
+                    let hazardInfo = hazardsIndex[hazardSymbols[tileKey]] || false;
+                    //console.log('---> hazardInfo =', hazardInfo);
+                    if (hazardInfo.locked){
+                        //console.log('---> hazard at ' + tileKey + ' is locked, excluding from walkableMapTiles');
+                        return false; // remove this tile
+                        } else {
+                        //console.log('---> hazard at ' + tileKey + ' is not locked, keeping in walkableMapTiles');
+                        }
+                    }
+                return true; // keep this tile
+                }));
+            //console.log('---> walkableMapTiles (post-hazards) =', walkableMapTiles);
+            }
+
         // If we are to exclude the cursor, make sure we remove that position too
         //console.log('filtering walkableMapTiles by cursor position ...');
         let cursorPosition = _world.cursor.position;
@@ -1221,6 +1268,24 @@ class mmrpgWorldMap {
         let positionRelative = [position2[0] - position1[0], position2[1] - position1[1]];
         return positionRelative;
         }
+
+    // Quick function for getting the position a given player/cursor/etc. is facing given current position, direction facing, and range
+    getRelativePositionByDirection(position, direction, range){
+        //console.log('%c' + 'mmrpgWorldMap.getRelativePositionByDirection(position:' + position + ', direction:' + direction + ', range:' + range + ')', 'color: magenta;');
+        if (!position || typeof position !== 'string'){ console.warn('position should be non-empty string!'); return false; }
+        if (!direction || typeof direction !== 'string'){ console.warn('direction should be non-empty string!'); return false; }
+        range = typeof range === 'number' ? range : 1;
+        let curPos = position.split('-').map(function(n){ return parseInt(n); });
+        let relDir = direction.split('-');
+        let newPos = Object.values(curPos);
+        newPos[0] += relDir.includes('left') ? (range * -1) : relDir.includes('right') ? range : 0;
+        newPos[1] += relDir.includes('up') ? (range * -1) : relDir.includes('down') ? range : 0;
+        newPos = newPos.join('-');
+        //console.log('-> curPos: ', curPos);
+        //console.log('-> relDir: ', relDir);
+        //console.log('-> newPos: ', newPos);
+        return newPos;
+        };
 
     // Quick function for getting a given layer tile's index data provided the layer token and tile key
     getLayerTileIndexData(layerToken, tileKey){
@@ -1451,7 +1516,10 @@ class mmrpgWorldMap {
             else if (sameAsCurrent){ _self.refreshMapPositionEvents(0, true); }
             if (!tileIsWithinRange || sameAsLast || sameAsCurrent){ return false; }
             //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
-            if (!sameAsLast){ _self.playSoundEffect('link-click'); }
+            if (!sameAsLast){
+                _self.playSoundEffect('glass-klink', {volume:0.5});
+                _self.playSoundEffect('land_mmv-gb', {delay:600});
+                }
             _self.makeLayerTileActive(thisPos);
             if (activeTimeouts[oldPos]){ clearTimeout(activeTimeouts[oldPos]); }
             activeTimeouts[thisPos] = setTimeout(function(){
@@ -1488,7 +1556,8 @@ class mmrpgWorldMap {
             //console.log('-> tileIsWalkable:', tileIsWalkable);
             //console.log('-> tileIsWithinRange:', tileIsWithinRange);
             let showPointer = thisPos !== curPos && tileIsWithinRange ? true : false;
-            $clickOverlay.css({cursor: showPointer ? 'pointer' : 'default'});
+            //$clickOverlay.css({cursor: showPointer ? 'pointer' : 'default'});
+            $clickOverlay.css({cursor: showPointer ? 'cell' : 'crosshair'});
             if (hoverTiles.length){
                 for (var i = 0; i < hoverTiles.length; i++){
                     let hoverPos = hoverTiles[i];
@@ -3068,7 +3137,10 @@ class mmrpgWorldMap {
             // Define some quick actions that we may need to re-use a few times over
             let confirmSideButtonAction = function(){
                 if (!sideButtonsActive){ return; }
-                let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
+                let $bigButtons = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons);
+                let $confirmButton = $bigButtons.filter('.maybe');
+                if (!$confirmButton || !$confirmButton.length){ $confirmButton = $bigButtons.first(); }
+                //let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
                 if (!$confirmButton || !$confirmButton.length){ /* console.error('bindEventsToWorld() unable to find confirm button!'); */ return false; }
                 if ($confirmButton.is('.clicked')){ return }
                 if (!$confirmButton.is('.maybe')){ $confirmButton.addClass('maybe'); return; }
@@ -3607,29 +3679,62 @@ class mmrpgWorldMap {
                 }
             // If the side buttons panel is currently open, process those actions too
             if (sideButtonsActive){
-                // If the player has pressed the space or enter keys, let's confirm the side-button action if it's open
+                // If the player has pressed the A button, let's confirm the side-button action if it's open
                 if (activeInputs.A || activeInputs.Start){
-                    //console.log('%c' + 'Confirm action popup!', 'color: orange;');
+                    //console.log('%c' + 'A key pressed! Confirm action popup!', 'color: orange;');
                     if (event){ event.preventDefault(); }
                     if (!$sideButtons.is('.active')){ return false; }
                     confirmSideButtonAction();
                     return true;
                     }
-                // Else if the player has pressed the backspace or escape keys, let's close the side-button action if it's open
+                // Else if the player has pressed the B button, let's close the side-button action if it's open
                 else if (activeInputs.B){
-                    //console.log('%c' + 'Dismiss action popup!', 'color: orange;');
+                    //console.log('%c' + 'B key pressed! Dismiss action popup!', 'color: orange;');
                     if (event){ event.preventDefault(); }
                     if (!$sideButtons.is('.active')){ return false; }
                     dismissSideButtonAction();
                     return true;
                     }
-                // Else if the player has just pressed shift, make sure we add the hover class to the action-dropdown
+                // Else if the player has just pressed Y, make sure we add the hover class to the action-dropdown
                 else if (activeInputs.Y){
-                    //console.log('%c' + 'Shift key pressed!', 'color: orange;');
+                    //console.log('%c' + 'Y key pressed!', 'color: orange;');
                     if (event){ event.preventDefault(); }
                     if (!$sideButtons.is('.active')){ return false; }
                     $actionDropdown.toggleClass('hover');
                     return true;
+                    }
+                // Else if the player has pressed up/down trying to scroll to a different button
+                else if (activeInputs.Up || activeInputs.Down){
+                    //console.log('----> Vertical direction clicked (' + (activeInputs.Up ? 'UP' : 'DOWN') + ')!');
+                    if (event){ event.preventDefault(); }
+                    let $bigButtons = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons);
+                    let numBigButtons = $bigButtons ? $bigButtons.length : 0;
+                    let maxBigButtonIndex = numBigButtons - 1;
+                    let hoverBigButton = function($button){ $bigButtons.removeClass('maybe'); $button.addClass('maybe'); };
+                    let hoverFirstBigButton = function(){ hoverBigButton($bigButtons.first()); };
+                    let hoverLastBigButton = function(){ hoverBigButton($bigButtons.last()); };
+                    //console.log('$sideButtons = ', $sideButtons.length, $sideButtons);
+                    //console.log('$bigButtons = ', $bigButtons.length, $bigButtons);
+                    //console.log('numBigButtons = ', numBigButtons, numBigButtons);
+                    if (numBigButtons > 1){
+                        let $maybeButton = $bigButtons.filter('.maybe');
+                        if (!$maybeButton || !$maybeButton.length){ $maybeButton = null; }
+                        let maybeButtonIndex = $maybeButton ? $bigButtons.index($maybeButton) : -1;
+                        if (activeInputs.Up){
+                            if (!$maybeButton){ hoverLastBigButton(); return true; }
+                            let prevButtonIndex = maybeButtonIndex - 1;
+                            if (prevButtonIndex < 0){ prevButtonIndex = maxBigButtonIndex; }
+                            hoverBigButton($bigButtons.eq(prevButtonIndex));
+                            return true;
+                            }
+                        else if (activeInputs.Down){
+                            if (!$maybeButton){ hoverFirstBigButton(); return true; }
+                            let nextButtonIndex = maybeButtonIndex + 1;
+                            if (nextButtonIndex > maxBigButtonIndex){ nextButtonIndex = 0; }
+                            hoverBigButton($bigButtons.eq(nextButtonIndex));
+                            return true;
+                            }
+                        }
                     }
                 }
             // Otherwise if the world map is NOT hidden, so the arrow keys must be controlling the player
@@ -4061,7 +4166,6 @@ class mmrpgWorldMap {
         let rowHasChanged = thisNewRow !== thisOldRow ? true : false;
         let posHasChanged = colHasChanged || rowHasChanged ? true : false;
         if (!posHasChanged && !forceMove){ console.error('$cursorSprite already at position!'); return false; }
-        let thisNewPos = thisNewCol + '-' + thisNewRow;
         let thisHorDir = false;
         let thisVerDir = false;
         let thisShiftDir = '';
@@ -4079,6 +4183,8 @@ class mmrpgWorldMap {
             if (thisShiftDir.indexOf('up') !== -1){ thisVerDir = 'up'; }
             else if (thisShiftDir.indexOf('down') !== -1){ thisVerDir = 'down'; }
             }
+        let thisNewPos = thisNewCol + '-' + thisNewRow;
+        let thisNewDir = thisShiftDir.replace(/ and /g, '-');
         //console.log('-> posHasChanged =', posHasChanged, '\n-> thisOldPos =', thisOldPos, '\n-> thisNewPos =', thisNewPos, '\n-> thisShiftDir =', thisShiftDir, '\n-> thisShiftDist =', thisShiftDist);
         let tileOffsetX; // = (((thisNewCol - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0]);
         let tileOffsetY; // = (((thisNewRow - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1]) - 10;
@@ -4122,14 +4228,15 @@ class mmrpgWorldMap {
             _worldCursor.col = thisNewCol;
             _worldCursor.row = thisNewRow;
             _worldCursor.position = thisNewPos;
-            _worldCursor.direction = thisShiftDir.replace(/ and /g, '-');
+            _worldCursor.direction = thisNewDir;
             _worldCursor.moved = cursorHasMoved;
             _worldPlayer.position = _worldCursor.position;
             _worldPlayer.direction = _worldCursor.direction;
             _worldCursor.positionXY = [tileOffsetX, tileOffsetY];
             //console.log('_worldCursor =', '\n-> col =', _worldCursor.col, '\n-> row =', _worldCursor.row, '\n-> position =', _worldCursor.position, '\n-> direction =', _worldCursor.direction, '\n-> moved =', _worldCursor.moved);
-            $cursorSprite.attr('data-col', thisNewCol);
-            $cursorSprite.attr('data-row', thisNewRow);
+            $cursorSprite.attr('data-col', _worldCursor.col);
+            $cursorSprite.attr('data-row', _worldCursor.row);
+            $cursorSprite.attr('data-dir', _worldCursor.direction);
             $cursorSprite.attr('data-pos', _worldCursor.position);
             _self.resetZoomLevel();
             _self.updateMapPosition();
@@ -4298,7 +4405,7 @@ class mmrpgWorldMap {
         //$canvasMap.css({ transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px)' });
         if (worldZoom !== _selfRef.lastWorldZoom){ _world.allowClicks = _world.allowHovers = false; }
         $canvasMap.attr('data-zoom', worldZoom);
-        $canvasMap.css({ transformOrigin: 'left top', transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) scale(' + worldZoom + ')' });
+        $canvasMap.css({ transformOrigin: 'left top', transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) translateZ(0) scale(' + worldZoom + ')' });
         if (usePerspective){ $canvasMap.get(0).style.setProperty('--map-perspective-skew', mapSkewValue+'deg'); }
         else { $canvasMap.get(0).style.setProperty('--map-perspective-skew', '0deg'); }
         if (worldZoom !== _selfRef.lastWorldZoom){
@@ -4921,6 +5028,7 @@ class mmrpgWorldMap {
         let _selfRef = _self.refreshMapPositionEvents;
         let _config = _self.config;
         let _elements = _self.elements;
+        let _indexes = _self.indexes;
         let _world = _self.state;
         let _worldCursor = _world.cursor;
         let _worldPlayer = _world.player;
@@ -4975,6 +5083,9 @@ class mmrpgWorldMap {
         // Update the "last" variables for next time
         _selfRef.lastPosition = cursorPosition;
         _selfRef.lastDirection = cursorDirection;
+
+        // Check if the current player is in-fact the cursor
+        let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
 
         // Before we do anything else, check to see if this player has any active robots
         //console.log('_worldPlayerRobots = ', _worldPlayerRobots);
@@ -5045,23 +5156,61 @@ class mmrpgWorldMap {
         //console.log('-> firstEvent =', JSON.parse(JSON.stringify(firstEvent)));
         //console.log('-> firstEventType =', firstEventType);
 
-        // Sort the events at this position by priority with sanctuaries > portals > battles > everything-else
+        // Sort the events at this position by priority with sanctuaries > portals > hazard > battles > everything-else
+        let eventsPriority = ['sanctuary', 'portal', 'hazard', 'battle', 'item', 'ability', 'button', 'switch', 'block'];
         eventsAtPosition = eventsAtPosition.sort(function(a, b){
+            let aKind = a.kind2 === 'sanctuary' ? 'sanctuary' : a.kind;
+            let bKind = b.kind2 === 'sanctuary' ? 'sanctuary' : b.kind;
+            let aIndex = eventsPriority.indexOf(aKind); if (aIndex === -1){ aIndex = 99; }
+            let bIndex = eventsPriority.indexOf(bKind); if (bIndex === -1){ bIndex = 99; }
+            if (aIndex < bIndex){ return -1; }
+            else if (aIndex > bIndex){ return 1; }
+            else { return 0; }
+            /*
             if (a.kind2 === 'sanctuary' && b.kind2 !== 'sanctuary'){ return -1; } // a is sanctuary, b is not
             else if (a.kind2 !== 'sanctuary' && b.kind2 === 'sanctuary'){ return 1; } // a is not sanctuary, but b is
             else if (a.kind === 'portal' && b.kind !== 'portal'){ return -1; } // a is portal, b is not
             else if (a.kind !== 'portal' && b.kind === 'portal'){ return 1; } // a is not portal, but b is
+            else if (a.kind === 'hazard' && b.kind !== 'hazard'){ return -1; } // a is hazard, b is not
+            else if (a.kind !== 'hazard' && b.kind === 'hazard'){ return 1; } // a is not hazard, but b is
             else if (a.kind === 'battle' && b.kind !== 'battle'){ return -1; } // a is battle, b is not
             else if (a.kind !== 'battle' && b.kind === 'battle'){ return 1; } // a is not battle, but b is
             else { return 0; } // both are same or of irrelevant kind
+            */
             });
         //console.log('-> eventsAtPosition(after-sort) = ', JSON.parse(JSON.stringify(eventsAtPosition)));
+
+        // Before we remove anything, check to see if we're standing on any events
+        let standingOnEvent = null;
+        let standingOnEventKey = null;
+        let standingOnEventType = null;
+        let standingOnHazardEvent = false;
+        for (let key = 0; key < eventsAtPosition.length; key++){
+            if (eventsAtPosition[key].position === cursorPosition){
+                standingOnEventKey = key;
+                standingOnEvent = eventsAtPosition[key];
+                standingOnEventType = standingOnEvent.kind;
+                break;
+                }
+            }
+        //console.log('standingOnEvent =', standingOnEvent);
+        //console.log('standingOnEventType =', standingOnEventType);
+        // If we're standing on a hazard, move it to the front of the queue
+        if (standingOnEvent
+            && standingOnEventKey !== null
+            && standingOnEventType === 'hazard'){
+            //console.log('standing on HAZARD! moving it to front of queue ...');
+            delete eventsAtPosition[standingOnEventKey];
+            eventsAtPosition.unshift(standingOnEvent);
+            standingOnHazardEvent = true;
+            }
 
         // Refresh the first event variables in case they've changed
         firstEvent = eventsAtPosition[0];
         firstEventType = firstEvent.kind;
         //console.log('-> firstEvent =', JSON.parse(JSON.stringify(firstEvent)));
         //console.log('-> firstEventType =', firstEventType);
+        //console.log('-> firstEventInfo =', firstEventType);
 
         // Unless this is a battle (where it's possible to fight many at once), we should
         // filter out all the other event types than the first so we only show one dropdown
@@ -5096,6 +5245,8 @@ class mmrpgWorldMap {
         let sideButtonsMarkup = '';
         let readyTeamSprites = false;
         let readyTeamSpritesAnyway = false;
+        let readyTeamPlayerFrames = [];
+        let readyTeamRobotFrames = [];
         if (firstEventType === 'event'){
             //console.log('-> event at position is custom, checking what comes next...');
             // If the cursor is literally on a event, only one event sprite matters right now
@@ -5266,6 +5417,249 @@ class mmrpgWorldMap {
                 sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showActionAreaType = 'button';
                 zoomTimeoutDuration = 500; // if we show a button dropdown, we want to zoom in quickly
+                }
+            }
+        else if (firstEventType === 'block'){
+            //console.log('-> event at position is a block, preparing dropdown');
+            // If the cursor is literally on a block, only one event sprite matters right now
+            let $blockEvent = $(firstEvent.sprite);
+            let dataLabel = $blockEvent.attr('data-label');
+            let dataBlock = $blockEvent.attr('data-block');
+            let dataType = $blockEvent.attr('data-type') || 'none';
+            let blockInfo = _config.mapBlocksIndex[dataBlock] || false;
+            let blockKind = firstEvent.kind;
+            let blockKind2 = firstEvent.kind2;
+            let blockType = blockInfo.type ? blockInfo.type : '';
+            let blockWeaknesses = blockInfo.weaknesses ? blockInfo.weaknesses : [];
+            if (dataBlock && blockInfo && !playerIsCursor){
+                //console.log('-> found blockInfo for ' + dataBlock + ':', blockInfo);
+                //console.log('-> blockType:', blockType);
+                //console.log('-> blockWeaknesses:', blockWeaknesses);
+                showActionArea = true;
+                //var blockName = (dataType ? (dataType[0].toUpperCase() + dataType.slice(1) + ' ') : '') + 'Button';
+                //if (!dataLabel){ dataLabel = 'Button Options'; }
+                if (dataLabel){ actionAreaMarkup += '<strong class="label'+(dataType ? ' type '+dataType : '')+'"><span class="inner">' + dataLabel + '</span></strong>'; }
+                //sideButtonsMarkup += '<strong class="button big-title'+(blockKind2 ? ' '+blockKind2 : '')+''+(dataType ? ' type '+dataType : '')+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(blockKind2.replace('-', ' ')) + ' ?</span></strong>';
+                //sideButtonsMarkup += '<strong class="button big-button'+(blockKind2 ? ' '+blockKind2 : '')+' type empty disabled"><span><sup>Remove The</sup> ' + toUpperCaseWords(blockKind2.replace('-', ' ')) + ' ?</span></strong>';
+                sideButtonsMarkup += '<strong class="button big-button-title type empty'+(blockKind2 ? ' '+blockKind2 : '')+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(blockKind2.replace('-', ' ')) + ' ?</span></strong>';
+                if (blockWeaknesses.length){
+                    let robotsIndex = _indexes.robots;
+                    let abilitiesIndex = _indexes.abilities;
+                    for (let i = 0; i < blockWeaknesses.length; i++){
+                            let weaknessType = blockWeaknesses[i];
+                            let buttonColour = weaknessType;
+                            //console.log('checking for weaknessType:' + weaknessType + ' ... ');
+                            let robotsWithAbilityType = _self.getPlayerRobotsWithAbilityType(weaknessType);
+                            let firstRobotWithAbilityType = robotsWithAbilityType ? robotsWithAbilityType[0] : false;
+                            let playerRobotAvailable = firstRobotWithAbilityType ? true : false;
+                            let playerRobotName = '', playerRobotToken = '', playerRobotId = 0;
+                            let $playerRobotSprite = null, robotSpriteMarkup = null;
+                            if (playerRobotAvailable){ robotSpriteMarkup = _self.getRobotSpriteMarkup(firstRobotWithAbilityType[0], {dir: 'left', frame: '10'}); }
+                            if (playerRobotAvailable && robotSpriteMarkup){
+                                playerRobotId = parseInt(firstRobotWithAbilityType[0].split('_')[0]);
+                                playerRobotToken = firstRobotWithAbilityType[0].split('_')[1];
+                                playerRobotName = toUpperCaseWords(playerRobotToken.replace('-', ' '));
+                                $playerRobotSprite = $(robotSpriteMarkup);
+                                $playerRobotSprite.addClass('team bounce');
+                                $playerRobotSprite.attr('data-sprite', 'team-robot').attr('data-id', playerRobotId).attr('data-token', playerRobotToken).attr('data-frame', '10');
+                                robotSpriteMarkup = $playerRobotSprite[0].outerHTML;
+                                let abilityInfo = abilitiesIndex[firstRobotWithAbilityType[1]];
+                                //console.log('abilitiesIndex =', abilitiesIndex);
+                                //console.log('firstRobotWithAbilityType[1] =', firstRobotWithAbilityType[1]);
+                                //console.log('abilityInfo =', abilityInfo);
+                                buttonColour = abilityInfo.type + (abilityInfo.type2 ? '_' + abilityInfo.type2 : '');
+                                }
+                            //console.log('-> robotsWithAbilityType:', robotsWithAbilityType, '\n-> playerRobotAvailable:', playerRobotAvailable);
+                            //console.log('-> playerRobotName:', playerRobotName, '\n-> playerRobotId:', playerRobotId);
+                            sideButtonsMarkup += '<a '
+                                + ('class="button big-button'
+                                    + (blockKind2 ? ' '+blockKind2 : '')
+                                    + (buttonColour ? ' type '+buttonColour : '')
+                                    + (!playerRobotAvailable ? ' disabled' : '')
+                                    + '"')
+                                + (playerRobotAvailable ?
+                                    ' data-action="remove-block"'
+                                    + ' data-block="'+dataBlock+'"'
+                                    + ' data-block-robot="'+firstRobotWithAbilityType[0]+'"'
+                                    + ' data-block-ability="'+firstRobotWithAbilityType[1]+'"'
+                                    : '')
+                                + '>';
+                            sideButtonsMarkup += (playerRobotAvailable
+                                ? '<span class="has-sprite"><sup>Use</sup> ' + toUpperCaseWords(firstRobotWithAbilityType[1].replace('-', ' ')) + robotSpriteMarkup + '</span>'
+                                : '<span>Use ' + toUpperCaseWords(weaknessType.replace('-', ' ')) + '</span>'
+                                );
+                            sideButtonsMarkup += '</a>';
+                        }
+                    }
+                //sideButtonsMarkup += '<a class="button big-button'+(blockKind2 ? ' '+blockKind2 : '')+''+(dataType ? ' type '+dataColour2 : '')+'" data-action="remove-block" data-block="'+dataBlock+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(blockKind2.replace('-', ' ')) + '</span></a>';
+                sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                showActionAreaType = 'block';
+                zoomTimeoutDuration = 0; // if we show a block dropdown, we want to zoom in quickly
+                }
+            }
+        else if (firstEventType === 'hazard'){
+            //console.log('-> event at position is a hazard, preparing dropdown');
+            // If the cursor is literally on a hazard, only one event sprite matters right now
+            let $hazardEvent = $(firstEvent.sprite);
+            let dataLabel = $hazardEvent.attr('data-label');
+            let dataHazard = $hazardEvent.attr('data-hazard');
+            let dataColour = $hazardEvent.attr('data-colour') || 'none';
+            let hazardInfo = _config.mapHazardsIndex[dataHazard] || false;
+            let hazardKind = firstEvent.kind;
+            let hazardKind2 = firstEvent.kind2;
+            let hazardType = hazardInfo.type ? hazardInfo.type : '';
+            let hazardWeaknesses = hazardInfo.weaknesses ? hazardInfo.weaknesses : [];
+            let hazardEffects = hazardInfo.effects ? hazardInfo.effects : [];
+            let preventStartupHazard = !_worldCursor.moved && standingOnHazardEvent ? true : false;
+            if (dataHazard && hazardInfo && !preventStartupHazard && !playerIsCursor){
+                //console.log('-> found hazardInfo for ' + dataHazard + ':', hazardInfo);
+                //console.log('-> hazardType:', hazardType);
+                //console.log('-> hazardWeaknesses:', hazardWeaknesses);
+                //console.log('-> hazardEffects:', hazardEffects);
+                showActionArea = true;
+                //var hazardName = (dataColour ? (dataColour[0].toUpperCase() + dataColour.slice(1) + ' ') : '') + 'Button';
+                //if (!dataLabel){ dataLabel = 'Button Options'; }
+                if (dataLabel){ actionAreaMarkup += '<strong class="label'+(dataColour ? ' type '+dataColour : '')+'"><span class="inner">' + dataLabel + '</span></strong>'; }
+                //sideButtonsMarkup += '<strong class="button big-title'+(hazardKind2 ? ' '+hazardKind2 : '')+''+(dataColour ? ' type '+dataColour : '')+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(hazardKind2.replace('-', ' ')) + ' ?</span></strong>';
+                //sideButtonsMarkup += '<strong class="button big-button'+(hazardKind2 ? ' '+hazardKind2 : '')+' type empty disabled"><span><sup>Remove The</sup> ' + toUpperCaseWords(hazardKind2.replace('-', ' ')) + ' ?</span></strong>';
+                sideButtonsMarkup += '<strong class="button big-button-title type empty'+(hazardKind2 ? ' '+hazardKind2 : '')+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(hazardKind2.replace('-', ' ')) + ' ?</span></strong>';
+                if (hazardWeaknesses.length){
+                    let robotsIndex = _indexes.robots;
+                    let abilitiesIndex = _indexes.abilities;
+                    for (let i = 0; i < hazardWeaknesses.length; i++){
+                            let weaknessType = hazardWeaknesses[i];
+                            let buttonColour = weaknessType;
+                            //console.log('checking for weaknessType:' + weaknessType + ' ... ');
+                            let robotsWithAbilityType = _self.getPlayerRobotsWithAbilityType(weaknessType);
+                            let firstRobotWithAbilityType = robotsWithAbilityType ? robotsWithAbilityType[0] : false;
+                            let playerRobotAvailable = firstRobotWithAbilityType ? true : false;
+                            let playerRobotName = '', playerRobotToken = '', playerRobotId = 0;
+                            let $playerRobotSprite = null, robotSpriteMarkup = null;
+                            if (playerRobotAvailable){ robotSpriteMarkup = _self.getRobotSpriteMarkup(firstRobotWithAbilityType[0], {dir: 'left', frame: '10'}); }
+                            if (playerRobotAvailable && robotSpriteMarkup){
+                                playerRobotId = parseInt(firstRobotWithAbilityType[0].split('_')[0]);
+                                playerRobotToken = firstRobotWithAbilityType[0].split('_')[1];
+                                playerRobotName = toUpperCaseWords(playerRobotToken.replace('-', ' '));
+                                $playerRobotSprite = $(robotSpriteMarkup);
+                                $playerRobotSprite.addClass('team bounce');
+                                $playerRobotSprite.attr('data-sprite', 'team-robot').attr('data-id', playerRobotId).attr('data-token', playerRobotToken).attr('data-frame', '10');
+                                robotSpriteMarkup = $playerRobotSprite[0].outerHTML;
+                                let abilityInfo = abilitiesIndex[firstRobotWithAbilityType[1]];
+                                //console.log('abilitiesIndex =', abilitiesIndex);
+                                //console.log('firstRobotWithAbilityType[1] =', firstRobotWithAbilityType[1]);
+                                //console.log('abilityInfo =', abilityInfo);
+                                buttonColour = abilityInfo.type + (abilityInfo.type2 ? '_' + abilityInfo.type2 : '');
+                                }
+                            //console.log('-> robotsWithAbilityType:', robotsWithAbilityType, '\n-> playerRobotAvailable:', playerRobotAvailable);
+                            //console.log('-> playerRobotName:', playerRobotName, '\n-> playerRobotId:', playerRobotId);
+                            sideButtonsMarkup += '<a '
+                                + ('class="button big-button'
+                                    + (hazardKind2 ? ' '+hazardKind2 : '')
+                                    + (buttonColour ? ' type '+buttonColour : '')
+                                    + (!playerRobotAvailable ? ' disabled' : '')
+                                    + '"')
+                                + (playerRobotAvailable ?
+                                    ' data-action="remove-hazard"'
+                                    + ' data-hazard="'+dataHazard+'"'
+                                    + ' data-hazard-robot="'+firstRobotWithAbilityType[0]+'"'
+                                    + ' data-hazard-ability="'+firstRobotWithAbilityType[1]+'"'
+                                    : '')
+                                + '>';
+                            sideButtonsMarkup += (playerRobotAvailable
+                                ? '<span class="has-sprite"><sup>Use</sup> ' + toUpperCaseWords(firstRobotWithAbilityType[1].replace('-', ' ')) + robotSpriteMarkup + '</span>'
+                                : '<span>Use ' + toUpperCaseWords(weaknessType.replace('-', ' ')) + '</span>'
+                                );
+                            sideButtonsMarkup += '</a>';
+                        }
+                    }
+                //sideButtonsMarkup += '<a class="button big-button'+(hazardKind2 ? ' '+hazardKind2 : '')+''+(dataColour2 ? ' type '+dataColour2 : '')+'" data-action="remove-hazard" data-hazard="'+dataHazard+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(hazardKind2.replace('-', ' ')) + '</span></a>';
+                sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                showActionAreaType = 'hazard';
+                zoomTimeoutDuration = 0; // if we show a hazard dropdown, we want to zoom in quickly
+                // if we're standing on the hazard, make sure we also trigger the relevant effect
+                if (standingOnHazardEvent
+                    && hazardInfo.action === 'trigger-effects'){
+                    //console.log('-> standing on a hazard "' + dataHazard + '" (' + hazardInfo.sprite + ')!!', '\n', 'defining trigger effects ...');
+                    let hazardToken = hazardInfo.sprite;
+                    let hazardEffect = hazardInfo.effects;
+                    let hazardTriggered = 0;
+                    let hazardEffectFunction = function(){
+                        if (_selfRef.hazardTrapTimeout){ clearTimeout(_selfRef.hazardTrapTimeout); }
+                        //if (_selfRef.hazardEffectTimeout){ clearTimeout(_selfRef.hazardEffectTimeout); }
+                        $hazardEvent.addClass('always-zoom');
+                        _world.isBusyWith.hazardEffectFunction = true;
+                        let cancelHazardTrap = function(){
+                            delete _world.isBusyWith.hazardEffectFunction;
+                            $hazardEvent.removeClass('always-zoom');
+                            };
+                        if (!stillAtPosition()){ cancelHazardTrap(); return; }
+                        _selfRef.hazardTrapTimeout = setTimeout(function(){ cancelHazardTrap(); }, 1600);
+                        //_selfRef.hazardEffectTimeout = setTimeout(function(){ hazardEffectFunction.call(_self);  }, 3200);
+                        //console.log('--> now executing trigger effect "', hazardEffect, '" !');
+                        let effect = '', range = '', kind = '';
+                        if (!hazardEffect || !hazardEffect.length){ return; }
+                        let hazardEffectTokens = hazardEffect[0] ? (hazardEffect[0].split('-')) : [];
+                        let hazardEffectValue = hazardEffect[1] ? parseInt(hazardEffect[1]) : 0;
+                        if (hazardEffectTokens[0]){ effect = hazardEffectTokens[0]; }
+                        if (hazardEffectTokens[1]){ range = hazardEffectTokens[1]; }
+                        if (hazardEffectTokens[2]){ kind = hazardEffectTokens[2]; }
+                        //console.log('breaking down to:', {effect, range, kind});
+                        if (!effect || !range || !kind){ return; }
+                        let _mapMessagesConfig = _config.mapMessages;
+                        let kindIsEnergy = kind === 'energy';
+                        let playSound = true;
+                        let playAnimation = true;
+                        let showMessage = true;
+                        let effectsTriggered = 0;
+                        let triggerFunction = null;
+                        if (kind === 'energy'){
+                            hazardEffectValue += '%';
+                            if (effect === 'lower'){ triggerFunction = _self.damageRobotEnergy; }
+                            else if (effect === 'raise') { triggerFunction = _self.restoreRobotEnergy; }
+                            }
+                        else if (kind === 'attack'){
+                            if (effect === 'lower'){ triggerFunction = _self.breakRobotAttack; }
+                            else if (effect === 'raise') { triggerFunction = _self.boostRobotAttack; }
+                            }
+                        else if (kind === 'defense'){
+                            if (effect === 'lower'){ triggerFunction = _self.breakRobotDefense; }
+                            else if (effect === 'raise') { triggerFunction = _self.boostRobotDefense; }
+                            }
+                        else if (kind === 'speed'){
+                            if (effect === 'lower'){ triggerFunction = _self.breakRobotSpeed; }
+                            else if (effect === 'raise') { triggerFunction = _self.boostRobotSpeed; }
+                            }
+                        for (let teamRobotKey = 0; teamRobotKey < _worldPlayerTeam.length; teamRobotKey++){
+                            let teamRobotString = _worldPlayerTeam[teamRobotKey];
+                            let effectTriggered = false;
+                            _mapMessagesConfig.nextQueueStagger = 0; //Math.ceil(_mapMessagesConfig.queueStagger / _worldPlayerTeam.length);
+                            //console.log('checking teamRobotString', teamRobotString, 'w/', {effect, range, kind});
+                            if (typeof triggerFunction === 'function'){
+                                effectTriggered = triggerFunction.call(_self, teamRobotString, hazardEffectValue, playSound, playAnimation, showMessage);
+                                }
+                            //console.log('effectTriggered =', effectTriggered);
+                            if (effectTriggered){ effectsTriggered++; }
+                            if (range !== 'team'){ break; }
+                            // .... TODO: program the rest?
+                            }
+                        hazardTriggered++;
+                        //console.log('effectsTriggered =', effectsTriggered);
+                        //console.log('hazardTriggered =', hazardTriggered);
+                        if (!effectsTriggered){
+                            cancelHazardTrap();
+                            clearTimeout(_selfRef.hazardTrapTimeout);
+                            clearTimeout(_selfRef.hazardEffectTimeout);
+                            }
+                        };
+                    triggerEffect = true;
+                    readyTeamSprites = true;
+                    readyTeamSpritesAnyway = true;
+                    readyTeamPlayerFrames = ['05'];
+                    readyTeamRobotFrames = ['08'];
+                    teamReadyDuration = 300;
+                    triggerEffectFunction = function(){ hazardEffectFunction.call(_self); };
+                    triggerEffectSound = 'traintrack-sound';
+                    }
                 }
             }
         else if (firstEventType === 'battle'){
@@ -5533,8 +5927,8 @@ class mmrpgWorldMap {
             // Collect all the team sprites and details about their current positions
             let rushDistanceX = Math.ceil(_mapTileSize[0] / 4);
             let rushDistanceY = Math.ceil(_mapTileSize[1] / 2); //Math.ceil(_mapTileSize[1] / 4);
-            let playerFrames = ['06', '01', '04'];
-            let robotFrames = ['04', '08', '01', '06', '10', '00', '04', '01'];
+            let playerFrames = readyTeamPlayerFrames.length ? readyTeamPlayerFrames : ['06', '01', '04'];
+            let robotFrames = readyTeamRobotFrames.length ? readyTeamRobotFrames : ['04', '08', '01', '06', '10', '00', '04', '01'];
             let $cursorSprite = $teamSprites.filter('.sprite.cursor');
             let $otherSprites = $teamSprites.filter('.sprite:not(.cursor)');
             let $playerSprites = $otherSprites.filter('.sprite.player');
@@ -5794,6 +6188,8 @@ class mmrpgWorldMap {
                 let isButton = action.indexOf('button') !== -1;
                 let isItem = action.indexOf('item') !== -1;
                 let isAbility = action.indexOf('ability') !== -1;
+                let isBlock = action.indexOf('block') !== -1;
+                let isHazard = action.indexOf('hazard') !== -1;
                 let isDismiss = action === 'dismiss';
                 if (!isDismiss){ $button.addClass('clicked'); }
                 if (isBattle){
@@ -6214,6 +6610,100 @@ class mmrpgWorldMap {
                         _self.saveWorldState();
                         }
                     }
+                else if (isBlock){
+                    //console.log('-> block-related action button clicked with action:', action);
+                    let blockSymbols = _config.mapBlockSymbols;
+                    let blocksIndex = _config.mapBlocksIndex;
+                    let blockRemovals = _world.blocks;
+                    let blockName = $button.attr('data-block') || false;
+                    let blockRobot = $button.attr('data-block-robot') || false;
+                    let blockAbility = $button.attr('data-block-ability') || false;
+                    let blockInfo = blockName && (blocksIndex && blocksIndex[blockName]) ? blocksIndex[blockName] : false;
+                    //console.log('-> blockName =', blockName);
+                    //console.log('-> blockRobot =', blockRobot);
+                    //console.log('-> blockAbility =', blockAbility);
+                    //console.log('-> blockInfo =', blockInfo);
+                    if (!blockName || !blockInfo){ console.error('-> block name or info not found, cannot remove block!'); return false; }
+                    if (!blockRobot || !blockAbility){ console.error('-> block robot and name are both required, cannot remove block!'); return false; }
+                    let $eventSprite = $(firstEvent.sprite);
+                    let $innerSprite = $eventSprite ? $('.sprite', $eventSprite) : false;
+                    //console.log('-> $eventSprite =', $eventSprite);
+                    //console.log('-> $innerSprite =', $innerSprite);
+                    let blockKind = blockInfo.sprite ? blockInfo.sprite : false;
+                    let blockPosition = blockInfo.pos ? blockInfo.pos : false;
+                    //console.log('-> blockKind =', blockKind);
+                    //console.log('-> blockPosition =', blockPosition);
+                    let blockType = blockInfo.type ? blockInfo.type : '';
+                    let blockWeaknesses = blockInfo.weaknesses ? blockInfo.weaknesses : [];
+                    let blockEffects = blockInfo.effects ? blockInfo.effects : [];
+                    //console.log('-> blockType =', blockType);
+                    //console.log('-> blockWeaknesses =', blockWeaknesses);
+                    //console.log('-> blockEffects =', blockEffects);
+                    dismissDropdown(false);
+                    blockInfo.removed = true;
+                    delete blockSymbols[blockInfo.pos];
+                    blocksIndex[blockName] = blockInfo; // Sync block info back to the config index
+                    blockRemovals[blockName] = new Date().getTime(); // Sync block claim/removal timestamp with world state
+                    $eventSprite.attr('data-state', 'removed');
+                    $eventSprite.removeClass('glow');
+                    //_self.playSoundEffect('icon-click');
+                    _self.playSoundEffect('block-destroyed-sound', {delay: 200});
+                    $canvasMap.addClass('shake-once');
+                    $eventSprite.animate({opacity: 0, filter: 'brightness(2)'}, 600, function(){
+                        $eventSprite.remove();
+                        $canvasMap.removeClass('shake-once');
+                        _self.calculateWalkableMapTiles(true);
+                        _self.refreshMapPositionEvents();
+                        });
+                    _self.saveWorldState();
+                    }
+                else if (isHazard){
+                    //console.log('-> hazard-related action button clicked with action:', action);
+                    let hazardSymbols = _config.mapHazardSymbols;
+                    let hazardsIndex = _config.mapHazardsIndex;
+                    let hazardRemovals = _world.hazards;
+                    let hazardName = $button.attr('data-hazard') || false;
+                    let hazardRobot = $button.attr('data-hazard-robot') || false;
+                    let hazardAbility = $button.attr('data-hazard-ability') || false;
+                    let hazardInfo = hazardName && (hazardsIndex && hazardsIndex[hazardName]) ? hazardsIndex[hazardName] : false;
+                    //console.log('-> hazardName =', hazardName);
+                    //console.log('-> hazardRobot =', hazardRobot);
+                    //console.log('-> hazardAbility =', hazardAbility);
+                    //console.log('-> hazardInfo =', hazardInfo);
+                    if (!hazardName || !hazardInfo){ console.error('-> hazard name or info not found, cannot remove hazard!'); return false; }
+                    if (!hazardRobot || !hazardAbility){ console.error('-> hazard robot and name are both required, cannot remove hazard!'); return false; }
+                    let $eventSprite = $(firstEvent.sprite);
+                    let $innerSprite = $eventSprite ? $('.sprite', $eventSprite) : false;
+                    //console.log('-> $eventSprite =', $eventSprite);
+                    //console.log('-> $innerSprite =', $innerSprite);
+                    let hazardKind = hazardInfo.sprite ? hazardInfo.sprite : false;
+                    let hazardPosition = hazardInfo.pos ? hazardInfo.pos : false;
+                    //console.log('-> hazardKind =', hazardKind);
+                    //console.log('-> hazardPosition =', hazardPosition);
+                    let hazardType = hazardInfo.type ? hazardInfo.type : '';
+                    let hazardWeaknesses = hazardInfo.weaknesses ? hazardInfo.weaknesses : [];
+                    let hazardEffects = hazardInfo.effects ? hazardInfo.effects : [];
+                    //console.log('-> hazardType =', hazardType);
+                    //console.log('-> hazardWeaknesses =', hazardWeaknesses);
+                    //console.log('-> hazardEffects =', hazardEffects);
+                    dismissDropdown(false);
+                    hazardInfo.removed = true;
+                    delete hazardSymbols[hazardInfo.pos];
+                    hazardsIndex[hazardName] = hazardInfo; // Sync hazard info back to the config index
+                    hazardRemovals[hazardName] = new Date().getTime(); // Sync hazard claim/removal timestamp with world state
+                    $eventSprite.attr('data-state', 'removed');
+                    $eventSprite.removeClass('glow');
+                    //_self.playSoundEffect('icon-click');
+                    _self.playSoundEffect('hazard-destroyed-sound', {delay: 200});
+                    $canvasMap.addClass('shake-once');
+                    $eventSprite.animate({opacity: 0, filter: 'brightness(2)'}, 600, function(){
+                        $eventSprite.remove();
+                        $canvasMap.removeClass('shake-once');
+                        _self.calculateWalkableMapTiles(true);
+                        _self.refreshMapPositionEvents();
+                        });
+                    _self.saveWorldState();
+                    }
                 else if (isDismiss){
                     //console.log('-> dismissing action dropdown!');
                     dismissDropdown(true);
@@ -6342,7 +6832,7 @@ class mmrpgWorldMap {
         //console.log('-> positionsToCheck =', positionsToCheck);
         //console.log('-> _worldCursor.moved =', _worldCursor.moved);
         //console.log('-> _worldCursor.othered =', _worldCursor.othered);
-        let eventKinds = ['event', 'portal', 'button', 'battle', 'item', 'ability'];
+        let eventKinds = ['event', 'portal', 'button', 'switch', 'block', 'hazard', 'battle', 'item', 'ability'];
         for (let e = 0; e < eventKinds.length; e++){
             let eventKind = eventKinds[e];
             let eventKindPlural = eventKind + 's';
@@ -6410,6 +6900,30 @@ class mmrpgWorldMap {
                         && eventInfo.direction !== _worldCursor.direction){
                         continue;
                         }
+                    }
+                else if (eventKind === 'block' || eventKind === 'hazard'){
+                    // skip if block/hazard already removed by the player
+                    //console.log('Found ' + eventKind + ' event kind!', eventToken, '@', eventPosition);
+                    //console.log('-> eventPosition: ', eventPosition);
+                    //console.log('-> eventToken: ', eventToken);
+                    //console.log('-> eventInfo: ', eventInfo);
+                    //console.log('-> eventsIndex: ', eventsIndex);
+                    if (eventInfo.removed){ continue; }
+                    // skip if not facing direction of block/hazard
+                    // (or directly on top of it in case of hazard)
+                    let standingAtPosition = _worldCursor.position;
+                    let lookingAtPosition = _self.getRelativePositionByDirection(_worldCursor.position, _worldCursor.direction);
+                    let isSamePosition = eventPosition === standingAtPosition;
+                    let isFacingPosition = eventPosition === lookingAtPosition;
+                    //console.log('-> eventPosition:', eventPosition, '\n-> vs. standingAtPosition:', standingAtPosition, '\n-> vs. lookingAtPosition:', lookingAtPosition);
+                    //console.log('-> isSamePosition: ', isSamePosition, '-> isFacingPosition: ', isFacingPosition);
+                    if (!isSamePosition && !isFacingPosition){ continue; }
+                    //console.log('--> Yay! Found ' + eventKind + ' event kind ' + (isSamePosition ? 'at' : isFacingPosition ? 'in front of' : 'around') + ' current position!');
+                    //console.log('--> eventPosition: ', eventPosition);
+                    //console.log('--> eventToken: ', eventToken);
+                    //console.log('--> eventInfo: ', eventInfo);
+                    // collect the sprite as the second "kind"
+                    eventKind2 = eventInfo.sprite;
                     }
                 else if (eventKind === 'item' || eventKind === 'ability'){
                     // skip if already claimed by the player
@@ -6547,7 +7061,7 @@ class mmrpgWorldMap {
                 }
             }
         //console.log('-> positionsToCheck =', positionsToCheck);
-        let eventSpriteKinds = ['event', 'portal', 'button', 'battle'];
+        let eventSpriteKinds = ['event', 'portal', 'button', 'switch', 'block', 'hazard', 'battle'];
         for (let i = 0; i < positionsToCheck.length; i++){
             let checkPosition = positionsToCheck[i];
             let eventPosition = checkPosition.split('-');
@@ -6570,8 +7084,10 @@ class mmrpgWorldMap {
                 // skip portals unless it's the exact position
                 let eventIsCustom = spriteKind === 'event';
                 let eventIsPortal = spriteKind === 'portal';
+                let eventIsHazard = spriteKind === 'hazard';
                 if (eventIsCustom && checkPosition !== searchPosition){ return; } // skip custom unless it's the exact position
                 if (eventIsPortal && checkPosition !== searchPosition){ return; } // skip portals unless it's the exact position
+                if (eventIsHazard && checkPosition !== searchPosition){ return; } // skip hazards unless it's the exact position
                 // otherwise we are fine to add to the events array
                 //console.log('%c' + '-> found valid '+ spriteKind + ' event at position ' + checkPosition, 'color: lime;');
                 $eventSpritesAtPosition.push($eventAtPosition);
@@ -6756,6 +7272,8 @@ class mmrpgWorldMap {
         let _worldItems = _world.items;
         let _worldAbilities = _world.abilities;
         let _worldSymbols = _world.symbols;
+        let _worldBlocks = _world.blocks;
+        let _worldHazards = _world.hazards;
         let $thisWorld = _elements.world;
         let lastPlayer = _worldPlayer.token;
         let lastPlayerTeam = _worldPlayer.team;
@@ -6771,6 +7289,8 @@ class mmrpgWorldMap {
         let lastWorldItems = {}; lastWorldItems[lastPlayerWorldMap] = _worldItems;
         let lastWorldAbilities = {}; lastWorldAbilities[lastPlayerWorldMap] = _worldAbilities;
         let lastWorldSymbols = {}; lastWorldSymbols[lastPlayerWorldMap] = _worldSymbols;
+        let lastWorldBlocks = {}; lastWorldBlocks[lastPlayerWorldMap] = _worldBlocks;
+        let lastWorldHazards = {}; lastWorldHazards[lastPlayerWorldMap] = _worldHazards;
         let worldData = {
             lastPlayer,
             lastPlayerTeam,
@@ -6786,6 +7306,8 @@ class mmrpgWorldMap {
             lastWorldItems,
             lastWorldAbilities,
             lastWorldSymbols,
+            lastWorldBlocks,
+            lastWorldHazards,
             };
         // loop through all the world data fields and json encode them for transport
         //console.log('-> raw worldData:', worldData);
@@ -6898,6 +7420,7 @@ class mmrpgWorldMap {
         let _self = this;
         let _selfRef = _self.triggerWorldEvent;
         let _config = _self.config;
+        let _mapMessagesConfig = _config.mapMessages;
         let _elements = _self.elements;
         let _world = _self.state;
         let _worldCursor = _world.cursor;
@@ -6938,6 +7461,7 @@ class mmrpgWorldMap {
                         //console.log('%c' + '-> team-effect via event panel: ' + effect, 'color: lime;');
                         for (let j = 0; j < _playerRobots.length; j++){
                             let robot = _playerRobots[j];
+                            _mapMessagesConfig.nextQueueStagger = Math.ceil(_mapMessagesConfig.queueStagger / _playerRobots.length);
                             // If this is a RESTORE TEAM ENERGY effect, let's process that now
                             if (effect === 'restore-team-energy'){
                                 //console.log('%c' + '-> restoring energy for ' + robot + ' via event panel', 'color: #64a455;');
@@ -7390,12 +7914,13 @@ class mmrpgWorldMap {
         return true;
         }
     // Quick function for restoring a robot's energy (if available) by a specific amount (or all if === true)
-    restoreRobotEnergy(robotString, restoreAmount, playSound){
+    restoreRobotEnergy(robotString, restoreAmount, playSound, playAnimation, showMessage){
         //console.log('%c' + 'mmrpgWorldMap.restoreRobotEnergy(' + robotString + ', ' + restoreAmount + ')', 'color: magenta;');
         if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('restoreRobotEnergy() missing required robotString!'); return false; }
         if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
-        // If restoreAmount is true, restore all energy, otherwise restore the amount provided
-        restoreAmount = (typeof restoreAmount === 'number' ? restoreAmount : (restoreAmount === true ? true : 0));
+        if (typeof playAnimation !== 'boolean'){ playAnimation = true; } // default to true if not provided
+        if (typeof showMessage !== 'boolean'){ showMessage = true; } // default to true if not provided
+
         // Collect references to world objects
         let _self = this;
         let _config = _self.config;
@@ -7403,14 +7928,18 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let _worldPlayer = _world.player;
         let _worldPlayerRobots = _worldPlayer.robots;
+
         // Break the robot sprite into ID and token and collect its info
         let robotId = parseInt(robotString.split('_')[0]) || false;
         let robotToken = robotString.split('_')[1] || false;
         let robotInfo = _worldPlayerRobots[robotString] || false;
         if (!robotInfo){ console.error('restoreRobotEnergy() could not find robot info for robot ' + robotString + '!'); return false; }
-        //console.log('-> robotId =', robotId);
-        //console.log('-> robotToken =', robotToken);
-        //console.log('-> robotInfo =', robotInfo);
+        let playerString = _worldPlayer.id + '_' + _worldPlayer.token;
+
+        // Collect references to canvas map sprites for overworld animations
+        let $canvasRobotSprite = $('.sprite[data-robot="' + robotString + '"]', _elements.canvasMap);
+        let $canvasPlayerSprite = $('.sprite[data-player="' + playerString + '"]', _elements.canvasMap);
+
         // Collect a reference to this robot's element in the overview panel
         let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', _elements.robotsOverview);
         if (!$robotOverview || !$robotOverview.length){ console.warn('restoreRobotEnergy() could not find overview for robot ' + robotString + '!'); return false; }
@@ -7418,55 +7947,216 @@ class mmrpgWorldMap {
         let $robotEnergyGuage = $('.guage.energy', $robotOverview);
         if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('restoreRobotEnergy() could not find icon sprite for robot ' + robotString + '!'); return false; }
         if (!$robotEnergyGuage || !$robotEnergyGuage.length){ console.warn('restoreRobotEnergy() could not find energy guage for robot ' + robotString + '!'); return false; }
+
         // Collect the current energy value for this robot
         let wasDisabled = robotInfo.energy === 0 ? true : false; // was this robot disabled?
         let currentEnergy = robotInfo.energy || 0;
         let maxEnergy = robotInfo.energyMax || 0;
-        //console.log('-> currentEnergy =', currentEnergy);
-        //console.log('-> maxEnergy =', maxEnergy);
-        //console.log('-> restoreAmount =', restoreAmount);
+        if (typeof restoreAmount === 'string' && restoreAmount.endsWith('%')) {
+            restoreAmount = Math.ceil((parseFloat(restoreAmount) / 100) * maxEnergy);
+        } else {
+            restoreAmount = (typeof restoreAmount === 'number' ? restoreAmount : (restoreAmount === true ? true : 0));
+        }
+        //console.log('%c' + 'healing ' + restoreAmount + ' energy to ' + robotString + '(or ' + ((restoreAmount / maxEnergy) * 100) + ' percent)', 'color: green;');
+
         // If restoreAmount is true, restore all energy, otherwise restore the amount provided
         let newEnergy = 0;
-        if (restoreAmount === true){ newEnergy = maxEnergy; }
+        if (restoreAmount === true){ restoreAmount = (maxEnergy - currentEnergy); newEnergy = maxEnergy; }
         else if (typeof restoreAmount === 'number' && restoreAmount > 0){ newEnergy = Math.min(currentEnergy + restoreAmount, maxEnergy); }
-        //console.log('-> newEnergy =', newEnergy);
+
         // If the new and old energy values are the same, do nothing
         if (newEnergy === currentEnergy){
             //console.log('restoreRobotEnergy() called but energy values are the same, nothing changed!');
-            return true;
+            return false;
             }
-        // Update the robot info with the new energy value
+
+        // Update state data immediately so memory registers the changes securely
         robotInfo.energy = newEnergy;
         robotInfo.energyPercent = _self.getRoundedPercent(robotInfo.energy, robotInfo.energyMax);
         robotInfo.energyRating = _self.getRatingToken(robotInfo.energyPercent);
         _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
-        // Update the overview with any changes to the status
-        if (robotInfo.energy > 0){
-            robotInfo.disabled = false;
-            $robotOverview.removeClass('disabled');
-            } else {
-            robotInfo.disabled = true;
-            $robotOverview.addClass('disabled');
-            }
-        $robotOverview.attr('data-status', robotInfo.energyRating+'-energy');
-        // Update this robot's sprite on the actual overworld too
-        let $teamSprites = _elements.teamSprites;
-        let $robotSprite = $teamSprites.filter('.sprite[data-token="' + robotToken + '"]');
-        if (robotInfo.energy > 0){ $robotSprite.removeClass('disabled').attr('data-frame', '08'); }
-        else { $robotSprite.addClass('disabled'); }
-        // Update the robot's icon sprite with a new frame matching its new energy value
-        let robotEnergyFrame = _self.getRobotEnergyFrame(robotInfo.energyRating);
-        $robotIconSprite.attr('data-frame', robotEnergyFrame);
-        // Update the energy guage title and bar within with the new energy value
-        $robotEnergyGuage.attr('title', newEnergy + '/' + maxEnergy + ' LE (' + robotInfo.energyPercent + '%)');
-        $('> i', $robotEnergyGuage).css({width: robotInfo.energyPercent + '%'}).removeClass().addClass(robotInfo.energyRating);
-        // Add a restored class to this robot to show it being effected by the action
-        if (playSound){ _self.playSoundEffect('recovery-energy'); }
+
+        // Sync UI, play audio, and execute canvas frame shifts after a 1-second delay (matches breakRobotStat timing)
+        setTimeout(function(){
+            // Update the overview with any changes to the status
+            if (robotInfo.energy > 0){
+                robotInfo.disabled = false;
+                $robotOverview.removeClass('disabled');
+                } else {
+                robotInfo.disabled = true;
+                $robotOverview.addClass('disabled');
+                }
+            $robotOverview.attr('data-status', robotInfo.energyRating+'-energy');
+
+            // Update this robot's sprite on the actual overworld too
+            let $teamSprites = _elements.teamSprites;
+            let $robotSprite = $teamSprites.filter('.sprite[data-token="' + robotToken + '"]');
+            if (robotInfo.energy > 0){ $robotSprite.removeClass('disabled').attr('data-frame', '08'); }
+            else { $robotSprite.addClass('disabled'); }
+
+            // Update the robot's icon sprite with a new frame matching its new energy value
+            let robotEnergyFrame = _self.getRobotEnergyFrame(robotInfo.energyRating);
+            $robotIconSprite.attr('data-frame', robotEnergyFrame);
+
+            // Update the energy guage title and bar within with the new energy value
+            $robotEnergyGuage.attr('title', newEnergy + '/' + maxEnergy + ' LE (' + robotInfo.energyPercent + '%)');
+            $('> i', $robotEnergyGuage).removeClass().addClass(robotInfo.energyRating).css({width: robotInfo.energyPercent + '%'});
+
+            // Trigger recovery sound effects and map canvas animations
+            if (playSound){ _self.playSoundEffect('recovery-energy'); }
+            if (playAnimation){
+                $canvasRobotSprite.attr('data-frame', '07'); // robot cheer frame
+                $canvasPlayerSprite.attr('data-frame', '04'); // player victory frame
+                setTimeout(function(){
+                    $canvasRobotSprite.attr('data-frame', '00'); // reset to base idle
+                    $canvasPlayerSprite.attr('data-frame', '00'); // reset to base idle
+                    }, 600);
+                }
+
+            // Print a status message about the restore
+            if (showMessage){
+                let messageMarkup = [];
+                let robotNameTextSpan = _self.getRobotNameSpan(robotToken);
+                let restoreAmountTextSpan = _self.getCustomNameSpan(restoreAmount, 'none');
+                messageMarkup.push(robotNameTextSpan + ' had ' + restoreAmountTextSpan + ' energy restored!');
+                if (wasDisabled && !robotInfo.disabled){ messageMarkup.push(robotNameTextSpan + ' was revived!'); }
+                _self.showWorldMessage(messageMarkup);
+                }
+
+        }, 1000);
+
+        // Flash the sidebar panel immediately to give the player instant button-click/step responsive feedback
         $robotOverview.addClass('energy-restored life-energy-restored');
         setTimeout(function(){ $robotOverview.removeClass('life-energy-restored'); }, 2000);
         setTimeout(function(){ $robotOverview.removeClass('energy-restored'); }, 3000);
+
         // Trigger a save of the world state to persist this change
         _self.saveWorldState();
+
+        // Return true on success
+        return true;
+        }
+    // Quick function for damaging a robot's energy (if available) by a specific amount (or all if === true)
+    damageRobotEnergy(robotString, damageAmount, playSound, playAnimation, showMessage){
+        //console.log('%c' + 'mmrpgWorldMap.damageRobotEnergy(' + robotString + ', ' + damageAmount + ')', 'color: magenta;');
+        if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('damageRobotEnergy() missing required robotString!'); return false; }
+        if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        if (typeof playAnimation !== 'boolean'){ playAnimation = true; } // default to true if not provided
+        if (typeof showMessage !== 'boolean'){ showMessage = true; } // default to true if not provided
+
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+
+        // Break the robot sprite into ID and token and collect its info
+        let robotId = parseInt(robotString.split('_')[0]) || false;
+        let robotToken = robotString.split('_')[1] || false;
+        let robotInfo = _worldPlayerRobots[robotString] || false;
+        if (!robotInfo){ console.error('damageRobotEnergy() could not find robot info for robot ' + robotString + '!'); return false; }
+        let playerString = _worldPlayer.id + '_' + _worldPlayer.token;
+
+        // Collect references to canvas map sprites for overworld animations
+        let $canvasRobotSprite = $('.sprite[data-robot="' + robotString + '"]', _elements.canvasMap);
+        let $canvasPlayerSprite = $('.sprite[data-player="' + playerString + '"]', _elements.canvasMap);
+
+        // Collect a reference to this robot's element in the overview panel
+        let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', _elements.robotsOverview);
+        if (!$robotOverview || !$robotOverview.length){ console.warn('damageRobotEnergy() could not find overview for robot ' + robotString + '!'); return false; }
+        let $robotIconSprite = $('.icon > .sprite', $robotOverview);
+        let $robotEnergyGuage = $('.guage.energy', $robotOverview);
+        if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('damageRobotEnergy() could not find icon sprite for robot ' + robotString + '!'); return false; }
+        if (!$robotEnergyGuage || !$robotEnergyGuage.length){ console.warn('damageRobotEnergy() could not find energy guage for robot ' + robotString + '!'); return false; }
+
+        // Collect the current energy value for this robot
+        let wasDisabled = robotInfo.energy === 0 ? true : false; // was this robot disabled?
+        let currentEnergy = robotInfo.energy || 0;
+        let maxEnergy = robotInfo.energyMax || 0;
+        if (typeof damageAmount === 'string' && damageAmount.endsWith('%')) {
+            damageAmount = Math.ceil((parseFloat(damageAmount) / 100) * maxEnergy);
+        } else {
+            damageAmount = (typeof damageAmount === 'number' ? damageAmount : (damageAmount === true ? true : 0));
+        }
+        //console.log('%c' + 'dealing ' + damageAmount + ' damage to ' + robotString + '(or ' + ((damageAmount / maxEnergy) * 100) + ' percent)', 'color: red;');
+
+        // If damageAmount is true, drop energy straight to 0, otherwise calculate floor
+        let newEnergy = currentEnergy;
+        if (damageAmount === true){ damageAmount = currentEnergy; newEnergy = 0; }
+        else if (typeof damageAmount === 'number' && damageAmount > 0){ newEnergy = Math.max(0, currentEnergy - damageAmount); }
+
+        // If the new and old energy values are the same, do nothing
+        if (newEnergy === currentEnergy){
+            //console.log('damageRobotEnergy() called but energy values are the same, nothing changed!');
+            return false;
+            }
+
+        // Update state data immediately so memory registers the changes securely
+        robotInfo.energy = newEnergy;
+        robotInfo.energyPercent = _self.getRoundedPercent(robotInfo.energy, robotInfo.energyMax);
+        robotInfo.energyRating = _self.getRatingToken(robotInfo.energyPercent);
+        _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
+
+        // Sync UI, play audio, and execute canvas frame shifts after a 1-second delay (matches breakRobotStat timing)
+        setTimeout(function(){
+
+            // Update the overview with any changes to the status
+            if (robotInfo.energy > 0){
+                robotInfo.disabled = false;
+                $robotOverview.removeClass('disabled');
+                } else {
+                robotInfo.disabled = true;
+                $robotOverview.addClass('disabled');
+                }
+            $robotOverview.attr('data-status', robotInfo.energyRating+'-energy');
+
+            // Update this robot's sprite on the actual overworld too
+            let $teamSprites = _elements.teamSprites;
+            let $robotSprite = $teamSprites.filter('.sprite[data-token="' + robotToken + '"]');
+            if (robotInfo.energy > 0){ $robotSprite.removeClass('disabled').attr('data-frame', '08'); }
+            else { $robotSprite.addClass('disabled'); }
+
+            // Update the robot's icon sprite with a new frame matching its new energy value
+            let robotEnergyFrame = _self.getRobotEnergyFrame(robotInfo.energyRating);
+            $robotIconSprite.attr('data-frame', robotEnergyFrame);
+
+            // Update the energy guage title and bar within with the new energy value
+            $robotEnergyGuage.attr('title', newEnergy + '/' + maxEnergy + ' LE (' + robotInfo.energyPercent + '%)');
+            $('> i', $robotEnergyGuage).removeClass().addClass(robotInfo.energyRating).css({width: robotInfo.energyPercent + '%'});
+
+            // Trigger damage sound effects and map canvas animations
+            if (playSound){ _self.playSoundEffect('damage-reverb'); }
+            if (playAnimation){
+                $canvasRobotSprite.attr('data-frame', '09'); // robot flinch frame
+                $canvasPlayerSprite.attr('data-frame', '05'); // player flinch frame
+                setTimeout(function(){
+                    $canvasRobotSprite.attr('data-frame', '00'); // reset to base idle
+                    $canvasPlayerSprite.attr('data-frame', '00'); // reset to base idle
+                    }, 600);
+                }
+
+            // Print a status message about the damage
+            if (showMessage){
+                let messageMarkup = [];
+                let robotNameTextSpan = _self.getRobotNameSpan(robotToken);
+                let damageAmountTextSpan = _self.getCustomNameSpan(damageAmount, 'none');
+                messageMarkup.push(robotNameTextSpan + ' took ' + damageAmountTextSpan + ' energy damage!');
+                if (!wasDisabled && robotInfo.disabled){ messageMarkup.push(robotNameTextSpan + ' was disabled!'); }
+                _self.showWorldMessage(messageMarkup);
+                }
+
+        }, 1000);
+
+        // Flash the sidebar panel immediately to give the player instant button-click/step responsive feedback
+        $robotOverview.addClass('energy-damaged life-energy-damaged');
+        setTimeout(function(){ $robotOverview.removeClass('life-energy-damaged'); }, 2000);
+        setTimeout(function(){ $robotOverview.removeClass('energy-damaged'); }, 3000);
+
+        // Trigger a save of the world state to persist this change
+        _self.saveWorldState();
+
         // Return true on success
         return true;
         }
@@ -7678,6 +8368,7 @@ class mmrpgWorldMap {
         let robotToken = robotString.split('_')[1] || false;
         let robotInfo = _worldPlayerRobots[robotString] || false;
         if (!robotInfo){ console.error('boostRobotStat() could not find robot info for robot ' + robotString + '!'); return false; }
+        if (robotInfo.disabled === true){ return false; }
         //console.log('-> robotId =', robotId);
         //console.log('-> robotToken =', robotToken);
         //console.log('-> robotInfo =', robotInfo);
@@ -7758,12 +8449,13 @@ class mmrpgWorldMap {
         }
 
     // Quick function for breaking (decrementing) a given robots stat by a specific amount (down to min of -5)
-    breakRobotStat(robotString, statToken, breakAmount, playSound){
+    breakRobotStat(robotString, statToken, breakAmount, playSound, playAnimation){
         //console.log('%c' + 'mmrpgWorldMap.breakRobotStat(robot:' + robotString + ', stat:' + statToken + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
         if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('breakRobotStat() missing required robotString!'); return false; }
         if (!statToken || typeof statToken !== 'string' || !statToken.length){ console.error('breakRobotStat() missing required statToken!'); return false; }
         if (typeof breakAmount !== 'number' || isNaN(breakAmount) || breakAmount < 1){ console.error('breakRobotStat() missing or invalid breakAmount!'); return false; }
         if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+        if (typeof playAnimation !== 'boolean'){ playAnimation = true; } // default to true if not provided
         // Collect references to world objects
         let _self = this;
         let _config = _self.config;
@@ -7776,6 +8468,8 @@ class mmrpgWorldMap {
         let robotToken = robotString.split('_')[1] || false;
         let robotInfo = _worldPlayerRobots[robotString] || false;
         if (!robotInfo){ console.error('breakRobotStat() could not find robot info for robot ' + robotString + '!'); return false; }
+        if (robotInfo.disabled === true){ return false; }
+        let playerString = _worldPlayer.id + '_' + _worldPlayer.token;
         //console.log('-> robotId =', robotId);
         //console.log('-> robotToken =', robotToken);
         //console.log('-> robotInfo =', robotInfo);
@@ -7789,12 +8483,17 @@ class mmrpgWorldMap {
         //console.log('-> statModKey =', statModKey);
         //console.log('-> robotInfo[statModKey] =', robotInfo[statModKey]);
         if (statModKeys.indexOf(statModKey) === -1){ return false; }
-        if (robotInfo[statModKey] && robotInfo[statModKey] <= statModMin){ return true; }
+        if (robotInfo[statModKey] && robotInfo[statModKey] <= statModMin){ return false; }
         //console.log('-> looks like we can break ' + statToken + ' for ' + robotToken + '!');
         let robotHasMods = function(){ return (parseInt(robotInfo[statModKeys[0]]) + parseInt(robotInfo[statModKeys[1]]) + parseInt(robotInfo[statModKeys[2]])) !== 0 ? true : false; };
         //console.log('-> robotId =', robotId);
         //console.log('-> robotToken =', robotToken);
         //console.log('-> robotInfo =', robotInfo);
+        // Collect a reference to this robot's canvas sprite for later
+        let $canvasRobotSprite = $('.sprite[data-robot="' + robotString + '"]', _elements.canvasMap);
+        let $canvasPlayerSprite = $('.sprite[data-player="' + playerString + '"]', _elements.canvasMap);
+        //console.log('$canvasRobotSprite =', $canvasRobotSprite);
+        //console.log('$canvasPlayerSprite =', $canvasPlayerSprite);
         // Collect a reference to this robot's element in the overview panel
         let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', _elements.robotsOverview);
         if (!$robotOverview || !$robotOverview.length){ console.warn('breakRobotStat() could not find overview for robot ' + robotString + '!'); return false; }
@@ -7831,6 +8530,14 @@ class mmrpgWorldMap {
         // Update the overview with any changes to the status and the arrows we just created
         setTimeout(function(){
             if (playSound){ _self.playSoundEffect('damage-stats'); }
+            if (playAnimation){
+                $canvasRobotSprite.attr('data-frame', '09'); // robot damage
+                $canvasPlayerSprite.attr('data-frame', '05'); // player damage
+                setTimeout(function(){
+                    $canvasRobotSprite.attr('data-frame', '00'); // reset to base
+                    $canvasPlayerSprite.attr('data-frame', '00'); // reset to base
+                    }, 600);
+                }
             $robotStatModDiv.empty().append(arrowMarkup);
             $robotStatModDiv.removeClass('up down').addClass(arrowDir);
             let hasModsNow = robotHasMods();
@@ -7847,17 +8554,17 @@ class mmrpgWorldMap {
         return true;
         }
     // Define some quick alias functions for the above (attack, defense, and speed varieties)
-    breakRobotAttack(robotString, breakAmount, playSound){
+    breakRobotAttack(robotString, breakAmount, playSound, playAnimation){
         //console.log('%c' + 'mmrpgWorldMap.breakRobotAttack(robot:' + robotString + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
-        let _self = this; return _self.breakRobotStat(robotString, 'attack', breakAmount, playSound);
+        let _self = this; return _self.breakRobotStat(robotString, 'attack', breakAmount, playSound, playAnimation);
         }
-    breakRobotDefense(robotString, breakAmount, playSound){
+    breakRobotDefense(robotString, breakAmount, playSound, playAnimation){
         //console.log('%c' + 'mmrpgWorldMap.breakRobotDefense(robot:' + robotString + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
-        let _self = this; return _self.breakRobotStat(robotString, 'defense', breakAmount, playSound);
+        let _self = this; return _self.breakRobotStat(robotString, 'defense', breakAmount, playSound, playAnimation);
         }
-    breakRobotSpeed(robotString, breakAmount, playSound){
+    breakRobotSpeed(robotString, breakAmount, playSound, playAnimation){
         //console.log('%c' + 'mmrpgWorldMap.breakRobotSpeed(robot:' + robotString + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
-        let _self = this; return _self.breakRobotStat(robotString, 'speed', breakAmount, playSound);
+        let _self = this; return _self.breakRobotStat(robotString, 'speed', breakAmount, playSound, playAnimation);
         }
 
     // Define a function for calculating a robot's current stat value given its base and current mods/stages its been raised/lowered
@@ -8127,6 +8834,7 @@ class mmrpgWorldMap {
                 }, 10);
             }
         // Add the robot to the world map with the others on this team
+        let $thisCanvas = _elements.canvas;
         let $canvasMap = $('#map', $thisCanvas);
         let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap);
         let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
@@ -8238,6 +8946,7 @@ class mmrpgWorldMap {
                 }, 10);
             }
         // Remove this robot from the world map as it's no longer on the team
+        let $thisCanvas = _elements.canvas;
         let $canvasMap = $('#map', $thisCanvas);
         let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap);
         let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
@@ -10433,6 +11142,43 @@ class mmrpgWorldMap {
         return '<span class="type ' + spanTypes + '">' + (customText || abilityName) + '</span>';
         };
 
+    // Quick function to check if the player has a certain ability type available, either via team robots or storage if requested
+    getPlayerRobotsWithAbilityType(typeToken, includeStorage, includeDisabled){
+        //console.log('%c' + 'mmrpgWorldMap.getPlayerRobotsWithAbilityType(typeToken: ' + typeToken + ')', 'color: magenta;');
+        if (!typeToken || typeof typeToken !== 'string' || !typeToken.length){ console.error('getPlayerRobotsWithAbilityType() missing required typeToken!'); return false; }
+        includeStorage = typeof includeStorage === 'boolean' ? includeStorage : false;
+        includeDisabled = typeof includeDisabled === 'boolean' ? includeDisabled : false;
+        // Collect references to world objects
+        let _self = this;
+        let _config = _self.config;
+        let _indexes = _self.indexes;
+        let _mmrpgAbilitiesIndex = _indexes.abilities;
+        let _world = _self.state;
+        let _worldPlayer = _world.player;
+        let _worldPlayerRobots = _worldPlayer.robots;
+        let _worldPlayerTeam = _worldPlayer.team;
+        let returnData = [];
+        for (let i = 0; i < _worldPlayerTeam.length; i++){
+            let robotString = _worldPlayerTeam[i];
+            let playerRobot = _worldPlayerRobots[robotString];
+            //console.log('now checking', robotString, 'for a', typeToken, 'type ability \n -> playerRobot:', playerRobot);
+            if (playerRobot.disabled === true && !includeDisabled){ continue; }
+            let playerRobotAbilities = playerRobot.abilities || [];
+            for (let j = 0; j < playerRobotAbilities.length; j++){
+                let abilityID = playerRobotAbilities[j];
+                let abilityInfo = _mmrpgAbilitiesIndex.getByID(abilityID) || {};
+                let abilityToken = abilityInfo.token || false;
+                //console.log('reviewing abilityID:', abilityID, ' w/ abilityToken:', abilityToken, '\n-> w/ abilityInfo:', abilityInfo);
+                if (abilityInfo.type === ''){ continue; }
+                if (abilityInfo.type === typeToken
+                    || abilityInfo.type2 === typeToken){
+                    returnData.push([robotString, abilityToken]);
+                    }
+                }
+            }
+        return returnData.length ? returnData : false;
+    }
+
     // Define a quick function for queueing custom action-modal callbacks that should be auto-run after named events
     queueActionModalCallback(callbackName, callbackFunction){
         //console.log('%c' + 'mmrpgWorldMap.queueActionModalCallback(callbackName:' + callbackName + ', callbackFunction:' + typeof callbackFunction + ')', 'color: magenta;');
@@ -12076,8 +12822,11 @@ class mmrpgWorldMap {
         let _selfRef = _self.showWorldMessage;
         let _config = _self.config.mapMessages;
         let maxConcurrent = _config.maxConcurrent || 1;
-        let queueStagger = _config.queueStagger || 200;
-        let staggerDelay = _config.staggerDelay || 900;
+        let queueStagger = typeof _config.nextQueueStagger === 'number' ? _config.nextQueueStagger : _config.queueStagger;
+        let staggerDelay = typeof _config.nextStaggerDelay === 'number' ? _config.nexStaggerDelay : _config.staggerDelay;
+        //console.log('_config.nextQueueStagger = ', _config.nextQueueStagger);
+        //console.log('_config.queueStagger = ', _config.queueStagger);
+        //console.log('queueStagger = ', queueStagger);
         if (typeof _selfRef.activeCount === 'undefined'){ _selfRef.activeCount = 0; }
         if (typeof _selfRef.isProcessing === 'undefined'){ _selfRef.isProcessing = false; }
         if (_selfRef.isProcessing === true) return;
@@ -12108,9 +12857,9 @@ class mmrpgWorldMap {
         let _selfRef = _self.showWorldMessage;
         let $messageDisplay = _self.elements.messageDisplay;
         let $messageWrapper = $messageDisplay.find('.wrapper');
-        let staggerDelay = _config.staggerDelay || 900;
-        let holdDuration = _config.holdDuration || 4000;
-        let fadeDuration = _config.fadeDuration || 1000;
+        let staggerDelay = typeof _config.nextStaggerDelay === 'number' ? _config.nexStaggerDelay : _config.staggerDelay;
+        let holdDuration = typeof _config.nextHoldDuration === 'number' ? _config.nextHoldDuration : _config.holdDuration;
+        let fadeDuration = typeof _config.nextFadeDuration === 'number' ? _config.nextFadeDuration : _config.fadeDuration;
         let rawText = messageData.messageText;
         let baseDelay = messageData.showAfter || 0;
         let $initialInsert = messageData.$insertAfter || null;
@@ -12140,6 +12889,7 @@ class mmrpgWorldMap {
             }
         let sharedHideTime = lastRevealTime + holdDuration;
         let sharedRemoveTime = sharedHideTime + fadeDuration;
+        let nextMessageTime = sharedRemoveTime + 100;
         setTimeout(function(){
             for (let j = 0; j < batchKeys.length; j++){ $messageWrapper.find('.message[data-key="' + batchKeys[j] + '"]').addClass('hidden'); }
             }, sharedHideTime);
@@ -12148,7 +12898,14 @@ class mmrpgWorldMap {
             }, sharedRemoveTime);
         setTimeout(function(){
             if (typeof _selfRef.onMessagesComplete === 'function'){ _selfRef.onMessagesComplete.call(_self); }
-            }, sharedRemoveTime + 100);
+            }, nextMessageTime);
+        if (!_selfRef.messagesQueue
+            || _selfRef.messagesQueue.length === 0){
+            delete _config.nextQueueStagger;
+            delete _config.nextStaggerDelay;
+            delete _config.nextHoldDuration;
+            delete _config.nextFadeDuration;
+            }
         return true;
         }
 

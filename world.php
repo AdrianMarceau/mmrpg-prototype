@@ -125,6 +125,8 @@ $mmrpg_index_players = rpg_player::get_index(true);
 $mmrpg_index_robots = rpg_robot::get_index(true);
 $mmrpg_index_abilities = rpg_ability::get_index(true);
 $mmrpg_index_items = rpg_item::get_index(true);
+$mmrpg_index_blocks = rpg_world::get_static_blocks_index();
+$mmrpg_index_hazards = rpg_world::get_static_hazards_index();
 $mmrpg_indexes = array(
     'types' => &$mmrpg_index_types,
     'fields' => &$mmrpg_index_fields,
@@ -132,6 +134,8 @@ $mmrpg_indexes = array(
     'robots' => &$mmrpg_index_robots,
     'abilities' => &$mmrpg_index_abilities,
     'items' => &$mmrpg_index_items,
+    'blocks' => &$mmrpg_index_blocks,
+    'hazards' => &$mmrpg_index_hazards,
     );
 rpg_world::preload_indexes($mmrpg_indexes);
 
@@ -435,6 +439,8 @@ if (!isset($WORLD_SESSION['world_maps'][$world_map_token])){ $WORLD_SESSION['wor
 if (!isset($WORLD_SESSION['world_events'][$world_map_token])){ $WORLD_SESSION['world_events'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_buttons'][$world_map_token])){ $WORLD_SESSION['world_buttons'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_switches'][$world_map_token])){ $WORLD_SESSION['world_switches'][$world_map_token] = array(); }
+if (!isset($WORLD_SESSION['world_blocks'][$world_map_token])){ $WORLD_SESSION['world_blocks'][$world_map_token] = array(); }
+if (!isset($WORLD_SESSION['world_hazards'][$world_map_token])){ $WORLD_SESSION['world_hazards'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_items'][$world_map_token])){ $WORLD_SESSION['world_items'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_abilities'][$world_map_token])){ $WORLD_SESSION['world_abilities'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_encounters'][$world_map_token])){ $WORLD_SESSION['world_encounters'][$world_map_token] = array(); }
@@ -650,6 +656,12 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
                     // BUTTON TILE SPRITES
                     $buttons_layer_markup = rpg_world::get_buttons_layer_markup($this_prototype_data, $map_data_parsed);
                     echo($buttons_layer_markup);
+                    // SWITCH TILE SPRITES
+                    $switches_layer_markup = rpg_world::get_switches_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($switches_layer_markup);
+                    // BLOCK TILE SPRITES
+                    $blocks_layer_markup = rpg_world::get_blocks_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($blocks_layer_markup);
                 echo('</div>'.PHP_EOL);
 
                 // ALL OBJECT SPRITES
@@ -665,6 +677,9 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
                     // ABILITY OBJECT SPRITES
                     $abilities_layer_markup = rpg_world::get_abilities_layer_markup($this_prototype_data, $map_data_parsed);
                     echo($abilities_layer_markup);
+                    // HAZARD TILE SPRITES
+                    $hazards_layer_markup = rpg_world::get_hazards_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($hazards_layer_markup);
                     // TEAM & RIVAL OBJECT SPRITES
                     $team_layer_markup = rpg_world::get_team_layer_markup($this_prototype_data, $map_data_parsed);
                     $rivals_layer_markup = rpg_world::get_rivals_layer_markup($this_prototype_data, $map_data_parsed);

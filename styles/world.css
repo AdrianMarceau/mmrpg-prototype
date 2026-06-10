@@ -104,10 +104,11 @@ html, body {
     right: auto;
     left: auto;
     z-index: 10;
-    transform: translate(0, 0);
+    transform: translate(0, 0, 0);
     transform-origin: center;
     transition: none;
     will-change: transform;
+
 }
 
 #world #canvas #map div,
@@ -461,7 +462,9 @@ html, body {
 }
 
 /* define the rules for all the tile sprites (that aren't embeded in a canvas)  */
-#world #map .layer .sprite.tile {
+#world #map .layer .sprite.tile,
+#world #map .layer .sprite.block,
+#world #map .layer .sprite.hazard {
     background-color: transparent;
     /* background-image: url(../images/maps/overworld-experiment-v2024-tileset.png);  */
     /* background-image: url(../images/maps/overworld-experiment-v2025-tileset.png);  */
@@ -478,24 +481,34 @@ html, body {
     cursor: pointer;
     pointer-events: auto;
 }
-#world #map.busy .layer .sprite.tile {
+#world #map.busy .layer .sprite.tile,
+#world #map.busy .layer .sprite.block,
+#world #map.busy .layer .sprite.hazard {
     cursor: default;
     pointer-events: none;
 }
 
 #world #map .layer > .sprite.tile.button,
-#world #map .layer > .sprite.tile.switch {
+#world #map .layer > .sprite.tile.switch,
+#world #map .layer > .sprite.object.block,
+#world #map .layer > .sprite.object.hazard {
     transform-origin: bottom;
     transform: scale(1.0);
 }
 #world #map .layer .sprite.tile.button > .sprite,
-#world #map .layer .sprite.tile.switch > .sprite {
+#world #map .layer .sprite.tile.switch > .sprite,
+#world #map .layer .sprite.object.block > .sprite,
+#world #map .layer .sprite.object.hazard > .sprite {
     transform-origin: bottom;
     transform: scale(2.0) translateY(25%);
     transition-duration: 1.5s;
     transition-timing-function: swing;
     filter: drop-shadow(1px -2px 2px rgba(0, 0, 0, 0.1));
     image-rendering: pixelated;
+}
+#world #map .layer .sprite.object.block > .sprite,
+#world #map .layer .sprite.object.hazard > .sprite {
+    transform: scale(1.0) translateY(-10%);
 }
 #world #map .layer .sprite.tile.button > .sprite.up {
     filter: drop-shadow(1px -2px 2px rgba(0, 0, 0, 0.3));
@@ -617,7 +630,91 @@ html, body {
 #world #map .sprite.tile.button.orange.up { background-position: -520px -280px; }
 #world #map .sprite.tile.button.orange.down { background-position: -520px -360px; }
 
-#world #map .layer.tiles .sprite {
+#world #map .sprite.block.fence-block { background-position: -120px -840px; }
+
+#world #map .sprite.block.super-block { background-position: -40px -840px; }
+#world #map .sprite.block.super-block.plain { background-position: -40px -840px; }
+#world #map .sprite.block.super-block.fence { background-position: -120px -840px; }
+
+#world #map .sprite.block.super-block.field { background-position: -40px -840px; }
+#world #map .sprite.block.super-block.gentle-countryside { background-position: -120px -840px; }
+#world #map .sprite.block.super-block.maniacal-hideaway { background-position: -200px -840px; }
+#world #map .sprite.block.super-block.wintry-forefront { background-position: -280px -840px; }
+#world #map .sprite.block.super-block.bonus-field { background-position: -360px -840px; }
+#world #map .sprite.block.super-block.mountain-mines { background-position: -440px -840px; }
+#world #map .sprite.block.super-block.arctic-jungle { background-position: -520px -840px; }
+#world #map .sprite.block.super-block.steel-mill { background-position: -600px -840px; }
+#world #map .sprite.block.super-block.electrical-tower { background-position: -680px -840px; }
+#world #map .sprite.block.super-block.abandoned-warehouse { background-position: -760px -840px; }
+
+#world #map .sprite.block.super-block.oil-wells { background-position: -40px -920px; }
+#world #map .sprite.block.super-block.clock-citadel { background-position: -120px -920px; }
+#world #map .sprite.block.super-block.orb-city { background-position: -200px -920px; }
+#world #map .sprite.block.super-block.pipe-station { background-position: -280px -920px; }
+#world #map .sprite.block.super-block.atomic-furnace { background-position: -360px -920px; }
+#world #map .sprite.block.super-block.industrial-facility { background-position: -440px -920px; }
+#world #map .sprite.block.super-block.underground-laboratory { background-position: -520px -920px; }
+#world #map .sprite.block.super-block.preserved-forest { background-position: -600px -920px; }
+#world #map .sprite.block.super-block.photon-collider { background-position: -680px -920px; }
+#world #map .sprite.block.super-block.waterfall-institute { background-position: -760px -920px; }
+
+#world #map .sprite.block.super-block.sky-ridge { background-position: -40px -1000px; }
+#world #map .sprite.block.super-block.mineral-quarry { background-position: -120px -1000px; }
+#world #map .sprite.block.super-block.lighting-control { background-position: -200px -1000px; }
+#world #map .sprite.block.super-block.robosaur-boneyard { background-position: -280px -1000px; }
+#world #map .sprite.block.super-block.space-simulator { background-position: -360px -1000px; }
+#world #map .sprite.block.super-block.submerged-armory { background-position: -440px -1000px; }
+#world #map .sprite.block.super-block.egyptian-excavation { background-position: -520px -1000px; }
+#world #map .sprite.block.super-block.rusty-scrapheap { background-position: -600px -1000px; }
+#world #map .sprite.block.super-block.rainy-sewers { background-position: -680px -1000px; }
+#world #map .sprite.block.super-block.construction-site { background-position: -760px -1000px; }
+
+#world #map .sprite.block.super-block.magnetic-generator { background-position: -40px -1080px; }
+#world #map .sprite.block.super-block.power-plant { background-position: -120px -1080px; }
+#world #map .sprite.block.super-block.reflection-chamber { background-position: -200px -1080px; }
+#world #map .sprite.block.super-block.rocky-plateau { background-position: -280px -1080px; }
+#world #map .sprite.block.super-block.septic-system { background-position: -360px -1080px; }
+#world #map .sprite.block.super-block.serpent-column { background-position: -440px -1080px; }
+#world #map .sprite.block.super-block.spinning-greenhouse { background-position: -520px -1080px; }
+#world #map .sprite.block.super-block.wily-castle { background-position: -600px -1080px; }
+#world #map .sprite.block.super-block.light-laboratory { background-position: -680px -1080px; }
+#world #map .sprite.block.super-block.cossack-citadel { background-position: -760px -1080px; }
+
+#world #map .sprite.block.super-block.prototype-subspace { background-position: -40px -1160px; }
+#world #map .sprite.block.super-block.robot-museum { background-position: -120px -1160px; }
+#world #map .sprite.block.super-block.genesis-tower { background-position: -200px -1160px; }
+#world #map .sprite.block.super-block.royal-palace { background-position: -280px -1160px; }
+#world #map .sprite.block.super-block.hunter-compound { background-position: -360px -1160px; }
+#world #map .sprite.block.super-block.prototype-subspace-alt { background-position: -440px -1160px; }
+#world #map .sprite.block.super-block.final-destination { background-position: -520px -1160px; }
+#world #map .sprite.block.super-block.final-destination-2 { background-position: -600px -1160px; }
+#world #map .sprite.block.super-block.final-destination-3 { background-position: -680px -1160px; }
+#world #map .sprite.block.super-block.xxxxxx-xxxxxxxxx { background-position: -760px -1160px; }
+
+@keyframes sprite-hazard-crude-oil { 0%, 100% { background-position: -840px -840px; } 50% { background-position: -840px -920px;  }  }
+@keyframes sprite-hazard-foamy-bubbles { 0%, 100% { background-position: -920px -840px; } 50% { background-position: -920px -920px;  }  }
+@keyframes sprite-hazard-frozen-foothold { 0%, 100% { background-position: -1000px -840px; } 50% { background-position: -1000px -920px;  }  }
+@keyframes sprite-hazard-flame-pillar { 0%, 100% { background-position: -1080px -840px; } 50% { background-position: -1080px -920px;  }  }
+#world #map .sprite.hazard.crude-oil { background-position: -840px -840px; animation: sprite-hazard-crude-oil 0.6s steps(1) infinite; }
+#world #map .sprite.hazard.foamy-bubbles { background-position: -920px -840px; animation: sprite-hazard-foamy-bubbles 0.8s steps(1) infinite; }
+#world #map .sprite.hazard.frozen-foothold { background-position: -1000px -840px; animation: sprite-hazard-frozen-foothold 1.2s steps(1) infinite; }
+#world #map .sprite.hazard.flame-pillar { background-position: -1080px -840px; animation: sprite-hazard-flame-pillar 1.0s steps(1) infinite; }
+
+@keyframes sprite-hazard-bramble-patch { 0%, 100% { background-position: -840px -1000px; } 50% { background-position: -840px -1080px;  }  }
+@keyframes sprite-hazard-toxic-sludge { 0%, 100% { background-position: -920px -1000px; } 50% { background-position: -920px -1080px;  }  }
+@keyframes sprite-hazard-shifting-sands { 0%, 100% { background-position: -1000px -1000px; } 50% { background-position: -1000px -1080px;  }  }
+@keyframes sprite-hazard-woolly-clouds { 0%, 100% { background-position: -1080px -1000px; } 50% { background-position: -1080px -1080px;  }  }
+#world #map .sprite.hazard.bramble-patch { background-position: -840px -1000px; animation: sprite-hazard-bramble-patch 0.6s steps(1) infinite; }
+#world #map .sprite.hazard.toxic-sludge { background-position: -920px -840-1000pxpx; animation: sprite-hazard-toxic-sludge 0.8s steps(1) infinite; }
+#world #map .sprite.hazard.shifting-sands { background-position: -1000px -1000px; animation: sprite-hazard-shifting-sands 1.2s steps(1) infinite; }
+#world #map .sprite.hazard.woolly-clouds { background-position: -1080px -1000px; animation: sprite-hazard-woolly-clouds 1.0s steps(1) infinite; }
+
+@keyframes sprite-hazard-gravity-well { 0%, 100% { background-position: -1000px -1160px; } 50% { background-position: -1000px -1240px;  }  }
+#world #map .sprite.hazard.gravity-well { background-position: -1000px -1160px; animation: sprite-hazard-gravity-well 1.2s steps(1) infinite; }
+
+#world #map .layer.tiles .sprite,
+#world #map .layer.objects .sprite.block,
+#world #map .layer.objects .sprite.hazard {
     top: 0;
     left: 0;
     z-index: 1;
@@ -625,9 +722,15 @@ html, body {
 }
 
 /* define the base rules for the event sprites */
-#world #map .layer.sprites.tiles .sprite {
+#world #map .layer.sprites.tiles .sprite,
+#world #map .layer.sprites.objects .sprite.block,
+#world #map .layer.sprites.objects .sprite.hazard {
     width: 80px;
     height: 80px;
+}
+#world #map .layer.sprites.objects .sprite.block,
+#world #map .layer.sprites.objects .sprite.hazard {
+    transform-origin: center;
 }
 
 /* define some animations for the portals appearing on the map */
@@ -651,12 +754,15 @@ html, body {
     overflow: visible;
     pointer-events: none;
 }
-#world #map .layer.objects .sprite:not(.tile) {
+#world #map .layer.objects > .sprite:not(.tile),
+#world #map .layer.objects > .sprite.block,
+#world #map .layer.objects > .sprite.hazard {
     background-image: none;
     transform: translate(0, 0);
     filter: none;
 }
-#world #map .layer.objects .sprite:not(.tile) > .wrap > .sprite {
+#world #map .layer.objects .sprite:not(.tile) > .wrap > .sprite,
+#world #map .layer.tiles .sprite.tile.block > .sprite {
     filter: drop-shadow(4px -1px 0 rgba(0, 0, 0, 0.2));
 }
 #world #map.has-perspective .layer.objects .sprite:not(.tile) > .wrap > .sprite {
@@ -698,6 +804,23 @@ html, body {
 }
 #world #map .layer.objects .sprite.cursor.bounce.idle > .wrap {
     transform: translate(80%, -10%);
+}
+#world #map .layer.objects .sprite.cursor.bounce.idle[data-dir] > .wrap {
+    --cursor-sprite-idle-drift-x: 0%;
+    --cursor-sprite-idle-drift-y: 10%;
+    transform: translate(var(--cursor-sprite-idle-drift-x), var(--cursor-sprite-idle-drift-y));
+}
+#world #map .layer.objects .sprite.cursor.bounce.idle[data-dir*="left"] > .wrap {
+    --cursor-sprite-idle-drift-x: -80%;
+}
+#world #map .layer.objects .sprite.cursor.bounce.idle[data-dir*="right"] > .wrap {
+    --cursor-sprite-idle-drift-x: 80%;
+}
+#world #map .layer.objects .sprite.cursor.bounce.idle[data-dir*="up"] > .wrap {
+    --cursor-sprite-idle-drift-y: -60%;
+}
+#world #map .layer.objects .sprite.cursor.bounce.idle[data-dir*="down"] > .wrap {
+    --cursor-sprite-idle-drift-y: 60%;
 }
 
 /* add a 'shake' effect to the shake cursor to show its scared */
@@ -1259,19 +1382,81 @@ html, body {
     transform: translate(calc(-50% + 20px), 0);
 }
 
-/* define the battle-specific rules for the action dropdown that look like a line-of-sight radius */
-#world #canvas #action-dropdown[data-type="battle"] > .wrapper {
+#world #canvas #action-dropdown[data-type] > .wrapper {
     top: 50%;
     left: 50%;
     right: auto;
     bottom: auto;
     transform: translate(-50%, -50%);
-    width: 240px;
-    height: 240px;
+    /* width: 240px; */
+    /* height: 240px; */
+    width: 160px;
+    height: 160px;
     border: 0 none transparent;
     box-shadow: none;
     background-image: none;
     background-color: transparent;
+}
+#world #canvas #action-dropdown[data-type] > .wrapper,
+#world #canvas #action-dropdown[data-type] > .wrapper:before,
+#world #canvas #action-dropdown[data-type] > .wrapper * {
+    pointer-events: none;
+}
+#world #canvas #action-dropdown[data-type] .label {
+    position: absolute;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: auto;
+    height: auto;
+    background-color: #090909;
+    border-radius: 6px;
+    padding: 9px 12px;
+    z-index: 100;
+}
+#world #canvas #action-dropdown[data-type] .sublabel {
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    transform: translate(0, 0);
+    z-index: 50;
+    opacity: 0.0;
+    transition: opacity 0.3s;
+}
+#world #canvas #action-dropdown[data-type] .label,
+#world #canvas #action-dropdown[data-type] .sublabel {
+    opacity: 0.0;
+    transition: opacity 0.3s;
+}
+#world #canvas #action-dropdown[data-type]:hover .label,
+#world #canvas #action-dropdown[data-type]:hover .sublabel,
+#world #canvas #action-dropdown[data-type].hover .label,
+#world #canvas #action-dropdown[data-type].hover .sublabel,
+#world #canvas #action-dropdown[data-type].hovered .label,
+#world #canvas #action-dropdown[data-type].hovered .sublabel {
+    opacity: 1.0;
+}
+#world #canvas #action-dropdown[data-type] .label > .inner,
+#world #canvas #action-dropdown[data-type] .sublabel > .inner {
+    display: inline-block;
+    background-color: #090909;
+    border-radius: 3px;
+    padding: 3px 6px;
+    margin-top: -3px;
+    margin-bottom: -3px;
+    margin-left: -3px;
+    margin-right: -3px;
+}
+
+/* define the battle-specific rules for the action dropdown that look like a line-of-sight radius */
+#world #canvas #action-dropdown[data-type="battle"] > .wrapper {
+    width: 240px;
+    height: 240px;
 }
 #world #canvas #action-dropdown[data-type="battle"] > .wrapper:before {
     content: "";
@@ -1292,60 +1477,32 @@ html, body {
     background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.0) 30%, rgba(0, 0, 0, 0.15));
     background-blend-mode: overlay;
 }
-#world #canvas #action-dropdown[data-type="battle"] > .wrapper,
-#world #canvas #action-dropdown[data-type="battle"] > .wrapper:before,
-#world #canvas #action-dropdown[data-type="battle"] > .wrapper * {
-    pointer-events: none;
-}
 #world #canvas #action-dropdown[data-type="battle"] .label {
-    position: absolute;
     top: -40px;
     left: -40px;
     right: -40px;
     bottom: auto;
-    width: auto;
-    height: auto;
-    background-color: #090909;
-    border-radius: 6px;
-    padding: 9px 12px;
-    z-index: 100;
 }
 #world #canvas #action-dropdown[data-type="battle"] .sublabel {
     top: auto;
     left: auto;
     right: auto;
     bottom: auto;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    transform: translate(0, 0);
-    z-index: 50;
-    opacity: 0.0;
-    transition: opacity 0.3s;
 }
-#world #canvas #action-dropdown[data-type="battle"] .label,
-#world #canvas #action-dropdown[data-type="battle"] .sublabel {
-    opacity: 0.0;
-    transition: opacity 0.3s;
-}
-#world #canvas #action-dropdown[data-type="battle"]:hover .label,
-#world #canvas #action-dropdown[data-type="battle"]:hover .sublabel,
-#world #canvas #action-dropdown[data-type="battle"].hover .label,
-#world #canvas #action-dropdown[data-type="battle"].hover .sublabel,
-#world #canvas #action-dropdown[data-type="battle"].hovered .label,
-#world #canvas #action-dropdown[data-type="battle"].hovered .sublabel {
-    opacity: 1.0;
-}
-#world #canvas #action-dropdown[data-type="battle"] .sublabel.left { right: calc(100% - 8px); }
-#world #canvas #action-dropdown[data-type="battle"] .sublabel.right { left: calc(100% - 8px); }
-#world #canvas #action-dropdown[data-type="battle"] .sublabel.center { left: 50%; transform: translateX(-50%); }
-#world #canvas #action-dropdown[data-type="battle"] .sublabel.up { bottom: calc(100% - 6px); }
-#world #canvas #action-dropdown[data-type="battle"] .sublabel.down { top: calc(100% - 2px); }
-#world #canvas #action-dropdown[data-type="battle"] .sublabel.middle { top: 50%; transform: translateY(-50%); }
-#world #canvas #action-dropdown[data-type="battle"] .sublabel.left.up { transform: translate(8px, 16px); }
-#world #canvas #action-dropdown[data-type="battle"] .sublabel.right.up { transform: translate(-8px, 16px); }
-#world #canvas #action-dropdown[data-type="battle"] .sublabel.left.down { transform: translate(8px, -16px); }
-#world #canvas #action-dropdown[data-type="battle"] .sublabel.right.down { transform: translate(-8px, -16px); }
+
+/* define the direction-specific rules for the action dropdown that align with player direction */
+#world #canvas #action-dropdown[data-type] .sublabel.left { right: calc(100% - 8px); }
+#world #canvas #action-dropdown[data-type] .sublabel.right { left: calc(100% - 8px); }
+#world #canvas #action-dropdown[data-type] .sublabel.center { left: 50%; transform: translateX(-50%); }
+#world #canvas #action-dropdown[data-type] .sublabel.up { bottom: calc(100% - 6px); }
+#world #canvas #action-dropdown[data-type] .sublabel.down { top: calc(100% - 2px); }
+#world #canvas #action-dropdown[data-type] .sublabel.middle { top: 50%; transform: translateY(-50%); }
+#world #canvas #action-dropdown[data-type] .sublabel.left.up { transform: translate(8px, 16px); }
+#world #canvas #action-dropdown[data-type] .sublabel.right.up { transform: translate(-8px, 16px); }
+#world #canvas #action-dropdown[data-type] .sublabel.left.down { transform: translate(8px, -16px); }
+#world #canvas #action-dropdown[data-type] .sublabel.right.down { transform: translate(-8px, -16px); }
+
+
 
 /* define the styles for the user-interface chrome, butons, and labels */
 
@@ -4572,7 +4729,8 @@ display: block;
     line-height: 1.2;
     margin: 0 auto 2px;
 }
-#world #canvas #side-buttons .big-button {
+#world #canvas #side-buttons .big-button,
+#world #canvas #side-buttons .big-button-title {
     min-width: 240px;
     font-size: 18px;
     padding: 12px 24px;
@@ -4582,12 +4740,34 @@ display: block;
     font-size: 12px;
     padding: 6px 12px;
 }
-#world #canvas #side-buttons .big-button > span {
+#world #canvas #side-buttons .big-button-title {
+    cursor: default;
+}
+#world #canvas #side-buttons .big-button > span,
+#world #canvas #side-buttons .big-button-title > span {
     display: block;
     background-color: rgba(0, 0, 0, 0.6);
     padding: 3px 12px;
     margin: -6px -16px;
     border-radius: 6px;
+}
+#world #canvas #side-buttons .big-button > span.has-sprite,
+#world #canvas #side-buttons .big-button-title > span.has-sprite {
+    text-align: left;
+}
+#world #canvas #side-buttons .big-button > span.has-sprite sup,
+#world #canvas #side-buttons .big-button-title > span.has-sprite sup {
+    display: inline-block;
+    margin: 0 2px 0 0;
+    position: relative;
+    bottom: 2px;
+}
+#world #canvas #side-buttons .big-button > span > .sprite,
+#world #canvas #side-buttons .big-button-title > span > .sprite {
+    top: auto;
+    left: auto;
+    right: 6px;
+    bottom: 9px;
 }
 /* #world #canvas #side-buttons .big-button:not(.disabled):hover, */
 #world #canvas #side-buttons .big-button:not(.disabled).hovered {
