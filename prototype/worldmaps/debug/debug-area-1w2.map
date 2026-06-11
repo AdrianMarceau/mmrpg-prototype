@@ -57,6 +57,20 @@
 @items[]     = wily-heart-5(5-4, wily-heart__5)
 @items[]     = wily-heart-6(16-4, wily-heart__6)
 #---------------------------#
+@hazards[]    = bramble-hazard-01(16-24, bramble-patch)
+@hazards[]    = bramble-hazard-02(16-23, bramble-patch)
+@hazards[]    = bramble-hazard-03(15-23, bramble-patch)
+@hazards[]    = bramble-hazard-04(15-22, bramble-patch)
+@hazards[]    = bramble-hazard-05(14-22, bramble-patch)
+@hazards[]    = bramble-hazard-06(14-21, bramble-patch)
+@hazards[]    = bramble-hazard-07(13-21, bramble-patch)
+@hazards[]    = bramble-hazard-08(13-20, bramble-patch)
+@hazards[]    = bramble-hazard-09(4-14, bramble-patch)
+@hazards[]    = bramble-hazard-10(6-14, bramble-patch)
+@hazards[]    = bramble-hazard-11(4-16, bramble-patch)
+@hazards[]    = bramble-hazard-12(6-16, bramble-patch)
+#---------------------------#
+#---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[21],[21],[21],[21],[21],[__],[__],[__],[__],[21],[21],[21],[21],[21],[__],[__],[__]

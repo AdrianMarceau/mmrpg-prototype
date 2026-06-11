@@ -41,8 +41,15 @@
 @items[]     = light-heart-5(34-7, light-heart__5)
 @items[]     = light-heart-6(44-7, light-heart__6)
 #---------------------------#
-@hazards[]    = oil-hazard-1(5-8, crude-oil)
-@hazards[]    = oil-hazard-2(6-8, crude-oil)
+@hazards[]    = oil-hazard-01(5-8, crude-oil)
+@hazards[]    = oil-hazard-02(6-8, crude-oil)
+@hazards[]    = oil-hazard-03(9-11, crude-oil)
+@hazards[]    = oil-hazard-04(9-12, crude-oil)
+@hazards[]    = oil-hazard-05(10-13, crude-oil)
+@hazards[]    = oil-hazard-06(10-14, crude-oil)
+@hazards[]    = oil-hazard-07(5-11, crude-oil)
+@hazards[]    = oil-hazard-08(3-13, crude-oil)
+@hazards[]    = oil-hazard-09(7-14, crude-oil)
 #---------------------------#
 @blocks[]    = super-block-1(29-10, super-block)
 @blocks[]    = super-block-2(29-11, super-block)

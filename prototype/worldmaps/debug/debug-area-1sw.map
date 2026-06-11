@@ -43,6 +43,22 @@
 @bosses[]     = roaming-boss-5(5-26, dynamo-man)
 @bosses[]     = roaming-boss-6(4-34, plug-man)
 #---------------------------#
+@hazards[]    = cloud-hazard-01(4-36, woolly-clouds)
+@hazards[]    = cloud-hazard-02(3-30, woolly-clouds)
+@hazards[]    = cloud-hazard-03(5-30, woolly-clouds)
+@hazards[]    = cloud-hazard-04(4-25, woolly-clouds)
+@hazards[]    = cloud-hazard-05(5-25, woolly-clouds)
+@hazards[]    = cloud-hazard-06(6-25, woolly-clouds)
+@hazards[]    = cloud-hazard-07(3-17, woolly-clouds)
+@hazards[]    = cloud-hazard-08(4-16, woolly-clouds)
+@hazards[]    = cloud-hazard-09(5-15, woolly-clouds)
+@hazards[]    = cloud-hazard-10(3-11, woolly-clouds)
+@hazards[]    = cloud-hazard-11(4-10, woolly-clouds)
+@hazards[]    = cloud-hazard-12(6-9, woolly-clouds)
+@hazards[]    = cloud-hazard-13(4-6, woolly-clouds)
+@hazards[]    = cloud-hazard-14(5-4, woolly-clouds)
+#---------------------------#
+#---------------------------#
 [__],[__],[__],[20],[__],[__],[__],[__]
 [__],[__],[02],[20],[02],[02],[__],[__]
 [__],[__],[01],[20],[01],[01],[__],[__]
