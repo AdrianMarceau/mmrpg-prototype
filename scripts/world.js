@@ -7471,7 +7471,12 @@ class mmrpgWorldMap {
             if (eventAction === 'trigger-effects'){
                 //console.log('-> triggering effects for event with data:', eventData);
                 _self.playSoundEffect('use-recovery-item');
-                let _playerRobots = _config.playerRobots || [];
+                //let _playerRobots = _config.playerRobots || [];
+                //let _allPlayerRobots = Object.keys(_worldPlayer.robots) || [];
+                let _playerRobots = _worldPlayer.robots || {};
+                let _playerRobotsIndex = _config.playerRobotsIndex || {};
+                //let _allPlayerRobots = Object.keys(_playerRobots) + Object.keys(_playerRobotsIndex);
+                let _allPlayerRobots = [...new Set([...Object.keys(_playerRobots), ...Object.keys(_playerRobotsIndex)])];
                 let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
                 let eventEffects = Object.values(eventData);
                 for (let i = 0; i < eventEffects.length; i++){
@@ -7483,41 +7488,48 @@ class mmrpgWorldMap {
                         // If this is a cursor player, we don't have a team
                         if (playerIsCursor){ continue; }
                         //console.log('%c' + '-> team-effect via event panel: ' + effect, 'color: lime;');
-                        for (let j = 0; j < _playerRobots.length; j++){
-                            let robot = _playerRobots[j];
-                            _mapMessagesConfig.nextQueueStagger = Math.ceil(_mapMessagesConfig.queueStagger / _playerRobots.length);
+                        for (let j = 0; j < _allPlayerRobots.length; j++){
+                            let robotString = _allPlayerRobots[j];
+                            let robotInfo = _playerRobots[robotString] ? _playerRobots[robotString] : _playerRobotsIndex[robotString];
+                            //console.log('-> checking if ', robotString, ' needs ' + effect + ' w/ robotInfo =', robotInfo);
+                            _mapMessagesConfig.nextQueueStagger = Math.ceil(_mapMessagesConfig.queueStagger / _allPlayerRobots.length);
                             // If this is a RESTORE TEAM ENERGY effect, let's process that now
-                            if (effect === 'restore-team-energy'){
-                                //console.log('%c' + '-> restoring energy for ' + robot + ' via event panel', 'color: #64a455;');
-                                _self.restoreRobotEnergy(robot, true);
+                            if (effect === 'restore-team-energy'
+                                && robotInfo.energyPercent !== 100){
+                                //console.log('%c' + '-> restoring energy for ' + robotString + ' via event panel', 'color: #64a455;');
+                                _self.restoreRobotEnergy(robotString, true);
                                 _self.playSoundEffect('recovery-energy');
                                 actionsCompleted++;
                                 }
                             // If this is a RESTORE TEAM WEAPONS effect, let's process that now
-                            if (effect === 'restore-team-weapons'){
-                                //console.log('%c' + '-> restoring weapons for ' + robot + ' via event panel', 'color: #3d7cbe;');
-                                _self.restoreRobotWeapons(robot, true);
+                            if (effect === 'restore-team-weapons'
+                                && robotInfo.weaponsPercent !== 100){
+                                //console.log('%c' + '-> restoring weapons for ' + robotString + ' via event panel', 'color: #3d7cbe;');
+                                _self.restoreRobotWeapons(robotString, true);
                                 _self.playSoundEffect('recovery-weapons');
                                 actionsCompleted++;
                                 }
                             // If this is a RESET TEAM ATTACK effect, let's process that now
-                            if (effect === 'reset-team-attack'){
-                                //console.log('%c' + '-> resetting attack for ' + robot + ' via event panel', 'color: #8b5050;');
-                                _self.resetRobotAttack(robot, false);
+                            if (effect === 'reset-team-attack'
+                                && robotInfo.attackMods !== 0){
+                                //console.log('%c' + '-> resetting attack for ' + robotString + ' via event panel', 'color: #8b5050;');
+                                _self.resetRobotAttack(robotString, false);
                                 _self.playSoundEffect('small-buff-received');
                                 actionsCompleted++;
                                 }
                             // If this is a RESET TEAM DEFENSE effect, let's process that now
-                            if (effect === 'reset-team-defense'){
-                                //console.log('%c' + '-> resetting ' + robot + ' defense for event panel', 'color: #50638a;');
-                                _self.resetRobotDefense(robot, false);
+                            if (effect === 'reset-team-defense'
+                                && robotInfo.defenseMods !== 0){
+                                //console.log('%c' + '-> resetting ' + robotString + ' defense for event panel', 'color: #50638a;');
+                                _self.resetRobotDefense(robotString, false);
                                 _self.playSoundEffect('small-buff-received');
                                 actionsCompleted++;
                                 }
                             // If this is a RESET TEAM SPEED effect, let's process that now
-                            if (effect === 'reset-team-speed'){
-                                //console.log('%c' + '-> resetting ' + robot + ' speed for event panel', 'color: #8b739b;');
-                                _self.resetRobotSpeed(robot, false);
+                            if (effect === 'reset-team-speed'
+                                && robotInfo.speedMods !== 0){
+                                //console.log('%c' + '-> resetting ' + robotString + ' speed for event panel', 'color: #8b739b;');
+                                _self.resetRobotSpeed(robotString, false);
                                 _self.playSoundEffect('small-buff-received');
                                 actionsCompleted++;
                                 }

@@ -1,6 +1,86 @@
 
 // -- WORLD ROBOT METHODS -- //
 
+// Quick function for gettign a team robot, auto-loading it into memory first if it doesn't exist yet
+function getTeamRobot(robotString){
+    //console.log('%c' + 'mmrpgWorldMap.getTeamRobot(robot:' + robotString + ')', 'color: magenta;');
+    if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('getTeamRobot() missing required robotString!'); return false; }
+    // Collect references to world objects
+    let _self = this;
+    let _config = _self.config;
+    let _world = _self.state;
+    let _worldPlayer = _world.player;
+    let _worldPlayerRobots = _worldPlayer.robots;
+    // If the robot has already been loaded, we can return it right away
+    if (typeof _worldPlayerRobots[robotString] !== 'undefined'){  return _worldPlayerRobots[robotString]; }
+    // Otherwise, attempt to lazy-load it now and then check again
+    //console.log('_worldPlayerRobots (before) = ', Object.keys(_worldPlayerRobots), _worldPlayerRobots);
+    _self.loadTeamRobot(robotString);
+    //console.log('_worldPlayerRobots (after) = ', Object.keys(_worldPlayerRobots), _worldPlayerRobots);
+    if (typeof _worldPlayerRobots[robotString] !== 'undefined'){  return _worldPlayerRobots[robotString]; }
+    // Else it just doesn't exist
+    return false;
+    }
+// Quick function for loading a robot into memory without adding it to the active team
+function loadTeamRobot(robotString){
+    //console.log('%c' + 'mmrpgWorldMap.loadTeamRobot(robot:' + robotString + ')', 'color: magenta;');
+    if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('loadTeamRobot() missing required robotString!'); return false; }
+
+    // Collect references to world objects
+    let _self = this;
+    let _config = _self.config;
+    let _indexes = _self.indexes;
+    let _world = _self.state;
+    let _worldPlayer = _world.player;
+    let _worldPlayerRobots = _worldPlayer.robots;
+
+    // If the robot is already loaded in memory, we can just return true
+    if (typeof _worldPlayerRobots[robotString] !== 'undefined'){ return true; }
+
+    // Otherwise, we need to clone it from the index into the active state
+    let _mmrpgRobotsIndex = _indexes.robots;
+    let _playerRobotsIndex = _config.playerRobotsIndex;
+
+    // Validate the robot token and ensure it exists in both indexes
+    let robotToken = robotString.split('_')[1] || false;
+    if (!_mmrpgRobotsIndex[robotToken]){ console.error('loadTeamRobot() could not find base info for robot ' + robotToken + '!'); return false; }
+    if (typeof _playerRobotsIndex[robotString] === 'undefined'){ console.error('loadTeamRobot() could not find player data for robot ' + robotString + '!'); return false; }
+
+    // Clone the object and assign it to the world player's robots array
+    let robotData = _self.getClonedObject(_playerRobotsIndex[robotString]);
+    _worldPlayerRobots[robotString] = robotData;
+
+    // Return true on success
+    return true;
+    }
+// Quick function for unloading a robot from memory (provided it is not on the active team)
+function unloadTeamRobot(robotString){
+    //console.log('%c' + 'mmrpgWorldMap.unloadTeamRobot(robot:' + robotString + ')', 'color: magenta;');
+    if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('unloadTeamRobot() missing required robotString!'); return false; }
+
+    // Collect references to world objects
+    let _self = this;
+    let _world = _self.state;
+    let _worldPlayer = _world.player;
+    let _worldPlayerTeam = _worldPlayer.team;
+    let _worldPlayerRobots = _worldPlayer.robots;
+
+    // If the robot is not loaded in memory, we can just return true
+    if (typeof _worldPlayerRobots[robotString] === 'undefined'){ return true; }
+
+    // If the robot is currently on the active team, we absolutely should not unload it
+    if (_worldPlayerTeam.indexOf(robotString) !== -1){
+        console.warn('unloadTeamRobot() cannot unload robot ' + robotString + ' because it is on the active team!');
+        return false;
+    }
+
+    // Otherwise, it is safe to delete from memory
+    delete _worldPlayerRobots[robotString];
+
+    // Return true on success
+    return true;
+    }
+
 // Quick function for adding a given storage robot to the team and then optionally playing a sound effect
 function addTeamRobot(robotString, playSound, playAnimation){
     //console.log('%c' + 'mmrpgWorldMap.addTeamRobot(robot:' + robotString + ', sound:' + playSound + ', animate:' + playAnimation + ')', 'color: magenta;');
@@ -228,7 +308,7 @@ function setRobotEnergy(robotString, newEnergy){
     // Break the robot sprite into ID and token and collect its info
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
-    let robotInfo = _worldPlayerRobots[robotString] || false;
+    let robotInfo = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('setRobotEnergy() could not find robot info for robot ' + robotString + '!'); return false; }
     //console.log('-> robotId =', robotId);
     //console.log('-> robotToken =', robotToken);
@@ -299,7 +379,7 @@ function restoreRobotEnergy(robotString, restoreAmount, playSound, playAnimation
     // Break the robot sprite into ID and token and collect its info
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
-    let robotInfo = _worldPlayerRobots[robotString] || false;
+    let robotInfo = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('restoreRobotEnergy() could not find robot info for robot ' + robotString + '!'); return false; }
     let playerString = _worldPlayer.id + '_' + _worldPlayer.token;
 
@@ -422,7 +502,7 @@ function damageRobotEnergy(robotString, damageAmount, playSound, playAnimation, 
     // Break the robot sprite into ID and token and collect its info
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
-    let robotInfo = _worldPlayerRobots[robotString] || false;
+    let robotInfo = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('damageRobotEnergy() could not find robot info for robot ' + robotString + '!'); return false; }
     let playerString = _worldPlayer.id + '_' + _worldPlayer.token;
 
@@ -543,7 +623,7 @@ function setRobotWeapons(robotString, newEnergy){
     // Break the robot sprite into ID and token and collect its info
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
-    let robotInfo = _worldPlayerRobots[robotString] || false;
+    let robotInfo = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('setRobotWeapons() could not find robot info for robot ' + robotString + '!'); return false; }
     //console.log('-> robotId =', robotId);
     //console.log('-> robotToken =', robotToken);
@@ -594,7 +674,7 @@ function restoreRobotWeapons(robotString, restoreAmount, playSound){
     // Break the robot sprite into ID and token and collect its info
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
-    let robotInfo = _worldPlayerRobots[robotString] || false;
+    let robotInfo = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('restoreRobotWeapons() could not find robot info for robot ' + robotString + '!'); return false; }
     //console.log('-> robotId =', robotId);
     //console.log('-> robotToken =', robotToken);
@@ -657,7 +737,7 @@ function resetRobotStat(robotString, statToken, playSound){
     // Break the robot sprite into ID and token and collect its info
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
-    let robotInfo = _worldPlayerRobots[robotString] || false;
+    let robotInfo = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('resetRobotStat() could not find robot info for robot ' + robotString + '!'); return false; }
     //console.log('-> robotId =', robotId);
     //console.log('-> robotToken =', robotToken);
@@ -733,7 +813,7 @@ function boostRobotStat(robotString, statToken, boostAmount, playSound){
     // Break the robot sprite into ID and token and collect its info
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
-    let robotInfo = _worldPlayerRobots[robotString] || false;
+    let robotInfo = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('boostRobotStat() could not find robot info for robot ' + robotString + '!'); return false; }
     if (robotInfo.disabled === true){ return false; }
     //console.log('-> robotId =', robotId);
@@ -833,7 +913,7 @@ function breakRobotStat(robotString, statToken, breakAmount, playSound, playAnim
     // Break the robot sprite into ID and token and collect its info
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
-    let robotInfo = _worldPlayerRobots[robotString] || false;
+    let robotInfo = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('breakRobotStat() could not find robot info for robot ' + robotString + '!'); return false; }
     if (robotInfo.disabled === true){ return false; }
     let playerString = _worldPlayer.id + '_' + _worldPlayer.token;
@@ -955,7 +1035,7 @@ function giveRobotItem(robotString, itemToken, playSound, playAnimation){
     // Break the robot sprite into ID and token and collect its info
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
-    let robotInfo = _worldPlayerRobots[robotString] || false;
+    let robotInfo = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('giveRobotItem() could not find robot info for robot ' + robotString + '!'); return false; }
     //console.log('-> robotId =', robotId);
     //console.log('-> robotToken =', robotToken);
@@ -1060,7 +1140,7 @@ function takeRobotItem(robotString, playSound, playAnimation){
     // Break the robot sprite into ID and token and collect its info
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
-    let robotInfo = _worldPlayerRobots[robotString] || false;
+    let robotInfo = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('takeRobotItem() could not find robot info for robot ' + robotString + '!'); return false; }
     //console.log('-> robotId =', robotId);
     //console.log('-> robotToken =', robotToken);
@@ -1801,6 +1881,10 @@ function showRemoveRobotModal(robotToken, configCustom){
     }
 
 // Assign the sub-functions to the main class's prototype
+
+mmrpgWorldMap.prototype.getTeamRobot = getTeamRobot;
+mmrpgWorldMap.prototype.loadTeamRobot = loadTeamRobot;
+mmrpgWorldMap.prototype.unloadTeamRobot = unloadTeamRobot;
 
 mmrpgWorldMap.prototype.addTeamRobot = addTeamRobot;
 mmrpgWorldMap.prototype.removeTeamRobot = removeTeamRobot;
