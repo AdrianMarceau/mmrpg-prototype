@@ -7867,18 +7867,6 @@ class mmrpgWorldMap {
         else if (Array.isArray(typeOrTypes) && typeOrTypes.length){ spanTypes = typeOrTypes.join(' '); }
         return '<span class="type ' + spanTypes + '">' + (customText || 'Text') + '</span>';
         };
-    getPlayerNameSpan(playerToken, customText){
-        //console.log('%c' + 'mmrpgWorldMap.getPlayerNameSpan(playerToken:' + playerToken + ', customText:' + customText + ')', 'color: magenta;');
-        let _self = this;
-        let _indexes = _self.indexes;
-        let _mmrpgPlayersIndex = _indexes.players;
-        let playerInfo = _mmrpgPlayersIndex[playerToken] || false;
-        let playerName = playerInfo ? playerInfo.name : 'Player';
-        let playerType1 = playerInfo.type || '';
-        let playerType2 = playerInfo.type2 || '';
-        let spanTypes = playerType1 !== '' ? playerType1 : (playerType2 !== '' ? playerType2 : 'none');
-        return '<span class="type ' + spanTypes + '">' + (customText || playerName) + '</span>';
-        };
 
     // Define a quick function for queueing custom action-modal callbacks that should be auto-run after named events
     queueActionModalCallback(callbackName, callbackFunction){

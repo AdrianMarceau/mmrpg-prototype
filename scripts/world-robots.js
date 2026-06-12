@@ -1800,43 +1800,6 @@ function showRemoveRobotModal(robotToken, configCustom){
     return _self.showRobotModal('remove-robot', robotToken, configCustom);
     }
 
-// Quick function to check if the player has a certain ability type available, either via team robots or storage if requested
-function getPlayerRobotsWithAbilityType(typeToken, includeStorage, includeDisabled){
-    //console.log('%c' + 'mmrpgWorldMap.getPlayerRobotsWithAbilityType(typeToken: ' + typeToken + ')', 'color: magenta;');
-    if (!typeToken || typeof typeToken !== 'string' || !typeToken.length){ console.error('getPlayerRobotsWithAbilityType() missing required typeToken!'); return false; }
-    includeStorage = typeof includeStorage === 'boolean' ? includeStorage : false;
-    includeDisabled = typeof includeDisabled === 'boolean' ? includeDisabled : false;
-    // Collect references to world objects
-    let _self = this;
-    let _config = _self.config;
-    let _indexes = _self.indexes;
-    let _mmrpgAbilitiesIndex = _indexes.abilities;
-    let _world = _self.state;
-    let _worldPlayer = _world.player;
-    let _worldPlayerRobots = _worldPlayer.robots;
-    let _worldPlayerTeam = _worldPlayer.team;
-    let returnData = [];
-    for (let i = 0; i < _worldPlayerTeam.length; i++){
-        let robotString = _worldPlayerTeam[i];
-        let playerRobot = _worldPlayerRobots[robotString];
-        //console.log('now checking', robotString, 'for a', typeToken, 'type ability \n -> playerRobot:', playerRobot);
-        if (playerRobot.disabled === true && !includeDisabled){ continue; }
-        let playerRobotAbilities = playerRobot.abilities || [];
-        for (let j = 0; j < playerRobotAbilities.length; j++){
-            let abilityID = playerRobotAbilities[j];
-            let abilityInfo = _mmrpgAbilitiesIndex.getByID(abilityID) || {};
-            let abilityToken = abilityInfo.token || false;
-            //console.log('reviewing abilityID:', abilityID, ' w/ abilityToken:', abilityToken, '\n-> w/ abilityInfo:', abilityInfo);
-            if (abilityInfo.type === ''){ continue; }
-            if (abilityInfo.type === typeToken
-                || abilityInfo.type2 === typeToken){
-                returnData.push([robotString, abilityToken]);
-                }
-            }
-        }
-    return returnData.length ? returnData : false;
-    }
-
 // Assign the sub-functions to the main class's prototype
 
 mmrpgWorldMap.prototype.addTeamRobot = addTeamRobot;
@@ -1881,5 +1844,3 @@ mmrpgWorldMap.prototype.getRobotSpriteMarkup = getRobotSpriteMarkup;
 mmrpgWorldMap.prototype.showRobotModal = showRobotModal;
 mmrpgWorldMap.prototype.showAddRobotModal = showAddRobotModal;
 mmrpgWorldMap.prototype.showRemoveRobotModal = showRemoveRobotModal;
-
-mmrpgWorldMap.prototype.getPlayerRobotsWithAbilityType = getPlayerRobotsWithAbilityType;
