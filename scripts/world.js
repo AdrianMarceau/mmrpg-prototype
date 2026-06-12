@@ -851,6 +851,18 @@ class mmrpgWorldMap {
         if (!outlineSpriteData){ console.warn('drawTileToCanvas() unable to find outline sprite data for layer ' + layerToken + '!'); }
         if (!focusSpriteData){ console.warn('drawTileToCanvas() unable to find focus sprite data for layer ' + layerToken + '!'); }
         if (!activeSpriteData){ console.warn('drawTileToCanvas() unable to find active sprite data for layer ' + layerToken + '!'); }
+        let activeSpriteDirections = ['up', 'up-right', 'right', 'down-right', 'down', 'down-left', 'left', 'up-left'];
+        let activeSpriteDirectionsData = (function(directions){
+            let data = {};
+            for (let key = 0; key < directions.length; key++){
+                let dir = directions[key];
+                data[dir] = _self.getSpriteData('active-' + dir);
+                if (!data[dir]){ console.warn('drawTileToCanvas() unable to find active-' + dir + ' sprite data for layer ' + layerToken + '!'); }
+                }
+            return data;
+            })(activeSpriteDirections);
+        //console.log('activeSpriteDirections = ', activeSpriteDirections);
+        //console.log('activeSpriteDirectionsData = ', activeSpriteDirectionsData);
         // [GRID]: draw another image at the same positon but w/ the grid sprite
         if (tileHasGrid && gridSpriteData){
             var gridSpriteAlpha = 0.3;
@@ -882,7 +894,10 @@ class mmrpgWorldMap {
             }
         // [ACTIVE]: draw another image at the same positon but w/ the border sprite
         if (tileIsActive && activeSpriteData){
-            drawSpriteFromData(activeSpriteData);
+            //drawSpriteFromData(activeSpriteData);
+            let playerDirection = _world.player.direction;
+            drawSpriteFromData(activeSpriteDirectionsData[playerDirection]);
+            //console.log('playerDirection =', playerDirection);
             }
         // Return true on success
         return true;
@@ -1520,11 +1535,11 @@ class mmrpgWorldMap {
                 _self.playSoundEffect('glass-klink', {volume:0.5});
                 _self.playSoundEffect('land_mmv-gb', {delay:600});
                 }
-            _self.makeLayerTileActive(thisPos);
+            //_self.makeLayerTileActive(thisPos);
             if (activeTimeouts[oldPos]){ clearTimeout(activeTimeouts[oldPos]); }
             activeTimeouts[thisPos] = setTimeout(function(){
                 _self.moveToPosition(thisPos, function(){
-                    _self.makeLayerTileInactive(oldPos);
+                    if (thisPos !== oldPos){ _self.makeLayerTileInactive(oldPos); }
                     }, true);
                 clearTimeout(activeTimeouts[thisPos]);
                 }, activeTimeoutDuration);
@@ -3191,27 +3206,29 @@ class mmrpgWorldMap {
                 let $possibleButtons = $('').add($backButton).add($homeButton);
                 if ($backButton.is('.hovered')){ $hoveredButton = $backButton.first(); hoveredButtonKind = 'back'; }
                 if ($homeButton.is('.hovered')){ $hoveredButton = $homeButton.first(); hoveredButtonKind = 'home'; }
-                // Should not be open while back/home-switching is being used
-                dismissSideButtonAction();
-                // If the player has pressed the A button, we can simply click whichever button is currently "hovered"
-                if (activeInputs.A || activeInputs.Start){
-                    //console.log('%c' + 'Confirm ' + hoveredButtonKind + ' button!', 'color: orange;');
-                    if (event){ event.preventDefault(); }
-                    if (!$hoveredButton || !$hoveredButton.length){ return false; }
-                    //console.log('Triggering click on hovered ', hoveredButtonKind, ' button:', $hoveredButton);
-                    $hoveredButton.trigger('click');
-                    $hoveredButton.addClass('clicked');
-                    $hoveredButton.removeClass('hovered');
-                    ignoreInputFor(1200);
-                    return true;
-                    }
-                // If the player has pressed the B button instead, we should dismiss the player switcher
-                if (activeInputs.B){
-                    //console.log('%c' + 'Dismiss ' + hoveredButtonKind + ' button!', 'color: orange;');
-                    if (event){ event.preventDefault(); }
-                    $hoveredButton.removeClass('hovered');
-                    ignoreInputFor(600);
-                    return true;
+                if ($hoveredButton && $hoveredButton.length){
+                    // Should not be open while back/home-switching is being used
+                    dismissSideButtonAction();
+                    // If the player has pressed the A button, we can simply click whichever button is currently "hovered"
+                    if (activeInputs.A || activeInputs.Start){
+                        //console.log('%c' + 'Confirm ' + hoveredButtonKind + ' button!', 'color: orange;');
+                        if (event){ event.preventDefault(); }
+                        if (!$hoveredButton || !$hoveredButton.length){ return false; }
+                        //console.log('Triggering click on hovered ', hoveredButtonKind, ' button:', $hoveredButton);
+                        $hoveredButton.trigger('click');
+                        $hoveredButton.addClass('clicked');
+                        $hoveredButton.removeClass('hovered');
+                        ignoreInputFor(1200);
+                        return true;
+                        }
+                    // If the player has pressed the B button instead, we should dismiss the player switcher
+                    if (activeInputs.B){
+                        //console.log('%c' + 'Dismiss ' + hoveredButtonKind + ' button!', 'color: orange;');
+                        if (event){ event.preventDefault(); }
+                        $hoveredButton.removeClass('hovered');
+                        ignoreInputFor(600);
+                        return true;
+                        }
                     }
                 }
             // If the robots overview is open, make sure we respond to panel-agnostic inputs
@@ -3982,8 +3999,8 @@ class mmrpgWorldMap {
                     let newCol = thisCol, newRow = thisRow;
                     let newDir = (function(a){
                         let d = [];
-                        if (a.Left){ d.push('left'); } else if (a.Right){ d.push('right'); }
                         if (a.Up){ d.push('up'); } else if (a.Down){ d.push('down'); }
+                        if (a.Left){ d.push('left'); } else if (a.Right){ d.push('right'); }
                         return d.join('-');
                         })(activeInputs);
                     let inPlaceMovement = activeInputs.B ? true : false;
@@ -3997,10 +4014,10 @@ class mmrpgWorldMap {
                     let newPos = newCol + '-' + newRow;
                     // Always set this just in case the player gets stuck somewhere
                     _worldCursor.moved = true; // represents them at least trying to move
-                    let thisHorDir = (newCol > thisCol) ? 'right' : (newCol < thisCol) ? 'left' : false;
                     let thisVerDir = (newRow > thisRow) ? 'down' : (newRow < thisRow) ? 'up' : false;
+                    let thisHorDir = (newCol > thisCol) ? 'right' : (newCol < thisCol) ? 'left' : false;
                     if (!inPlaceMovement){
-                        let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join('-'); })(thisHorDir, thisVerDir);
+                        let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join('-'); })(thisVerDir, thisHorDir);
                         _worldCursor.direction = thisShiftDir; // the direction they are trying to move
                         _worldPlayer.direction = _worldCursor.direction;
                         //console.log('-> _worldCursor.direction to thisShiftDir(', thisShiftDir, ')');
@@ -4067,10 +4084,10 @@ class mmrpgWorldMap {
                     // Otherwise, let's move the cursor to the new position
                     //console.log('%c' + 'New position is walkable, moving there now!', 'color: orange;');
                     let forceMove = inPlaceMovement ? true : false;
-                    _self.makeLayerTileActive(newPos);
+                    if (newPos !== oldPos){ _self.makeLayerTileInactive(oldPos); }
+                    //_self.makeLayerTileActive(newPos);
                     _self.playSoundEffect('land_mmv-gb');
                     _self.moveToPosition(newPos, function(){
-                        _self.makeLayerTileInactive(oldPos);
                         if (thisHorDir && thisVerDir){ ignoreInputFor(); }
                         }, forceMove);
                     }
@@ -5441,7 +5458,8 @@ class mmrpgWorldMap {
                 if (dataLabel){ actionAreaMarkup += '<strong class="label'+(dataType ? ' type '+dataType : '')+'"><span class="inner">' + dataLabel + '</span></strong>'; }
                 //sideButtonsMarkup += '<strong class="button big-title'+(blockKind2 ? ' '+blockKind2 : '')+''+(dataType ? ' type '+dataType : '')+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(blockKind2.replace('-', ' ')) + ' ?</span></strong>';
                 //sideButtonsMarkup += '<strong class="button big-button'+(blockKind2 ? ' '+blockKind2 : '')+' type empty disabled"><span><sup>Remove The</sup> ' + toUpperCaseWords(blockKind2.replace('-', ' ')) + ' ?</span></strong>';
-                sideButtonsMarkup += '<strong class="button big-button-title type empty'+(blockKind2 ? ' '+blockKind2 : '')+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(blockKind2.replace('-', ' ')) + ' ?</span></strong>';
+                //sideButtonsMarkup += '<strong class="button big-button-title type empty'+(blockKind2 ? ' '+blockKind2 : '')+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(blockKind2.replace('-', ' ')) + ' ?</span></strong>';
+                sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Remove The</sup> ' + toUpperCaseWords(blockKind2.replace('-', ' ')) + ' ?</span></strong>';
                 if (blockWeaknesses.length){
                     let robotsIndex = _indexes.robots;
                     let abilitiesIndex = _indexes.abilities;
@@ -5522,7 +5540,8 @@ class mmrpgWorldMap {
                 if (dataLabel){ actionAreaMarkup += '<strong class="label'+(dataColour ? ' type '+dataColour : '')+'"><span class="inner">' + dataLabel + '</span></strong>'; }
                 //sideButtonsMarkup += '<strong class="button big-title'+(hazardKind2 ? ' '+hazardKind2 : '')+''+(dataColour ? ' type '+dataColour : '')+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(hazardKind2.replace('-', ' ')) + ' ?</span></strong>';
                 //sideButtonsMarkup += '<strong class="button big-button'+(hazardKind2 ? ' '+hazardKind2 : '')+' type empty disabled"><span><sup>Remove The</sup> ' + toUpperCaseWords(hazardKind2.replace('-', ' ')) + ' ?</span></strong>';
-                sideButtonsMarkup += '<strong class="button big-button-title type empty'+(hazardKind2 ? ' '+hazardKind2 : '')+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(hazardKind2.replace('-', ' ')) + ' ?</span></strong>';
+                //sideButtonsMarkup += '<strong class="button big-button-title type empty'+(hazardKind2 ? ' '+hazardKind2 : '')+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(hazardKind2.replace('-', ' ')) + ' ?</span></strong>';
+                sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Remove The</sup> ' + toUpperCaseWords(hazardKind2.replace('-', ' ')) + ' ?</span></strong>';
                 if (hazardWeaknesses.length){
                     let robotsIndex = _indexes.robots;
                     let abilitiesIndex = _indexes.abilities;
@@ -5735,8 +5754,13 @@ class mmrpgWorldMap {
                     })(dataLabels).join('');
                 //console.log('generated dataBattlesJoined:', '\n->', dataBattlesJoined.split(',').join('\n-> '));
                 actionAreaMarkup += dataLabelsJoined;
-                if (playerActiveRobots >= 1){  sideButtonsMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span><sup>Ready To</sup> Start Battle</span></a>'; }
-                else { sideButtonsMarkup += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span><sup>Ready To</sup> Start Battle</span></a>'; }
+                sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Ready To</sup> Start Battle ?</span></strong>';
+                if (playerActiveRobots >= 1){
+                    //sideButtonsMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span><sup>Ready To</sup> Start Battle</span></a>';
+                    sideButtonsMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span>Let\'s Go!</span></a>';
+                    } else {
+                    sideButtonsMarkup += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span>Let\'s Go!</span></a>';
+                    }
                 sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 //console.log('sideButtonsMarkup =', sideButtonsMarkup);
                 showActionAreaType = 'battle';
