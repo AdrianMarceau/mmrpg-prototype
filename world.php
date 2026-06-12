@@ -736,6 +736,7 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
 <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.world.php'); ?>
 <script type="text/javascript" src="scripts/world.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/world-messages.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/world-robots.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <!-- (4) define game settings/config/indexes -->
 <script type="text/javascript">
