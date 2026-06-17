@@ -50,13 +50,13 @@
 
 
 #prototype .stars .starchart {
-    float: left;
+    float: right;
     width: 384px;
     min-height: 384px;
     overflow: hidden;
 }
 #prototype .stars .starforce {
-    float: right;
+    float: left;
     width: 384px;
     height: 384px;
     width: calc((100% - 384px) - 10px);
@@ -173,13 +173,14 @@
     vertical-align: top;
 }
 #prototype .stars .starchart .corner .bullets.topbar {
-    width: 40px;
+    width: auto;
     height: 6px;
     top: 57px;
     left: 198px;
+    white-space: nowrap;
 }
 #prototype .stars .starchart .corner .bullets.sidebar {
-    height: 40px;
+    height: auto;
     width: 6px;
     left: 57px;
     top: 198px;
@@ -359,7 +360,8 @@
 }
 
 
-#prototype .stars .starchart .grouplist .group .robots {
+#prototype .stars .starchart .grouplist .group .robots,
+#prototype .stars .starchart .grouplist .group .fields {
     display: block;
     width: auto;
     height: auto;
@@ -368,7 +370,8 @@
     overflow: hidden;
     box-sizing: border-box;
 }
-#prototype .stars .starchart .grouplist .group .robots .robot {
+#prototype .stars .starchart .grouplist .group .robots .robot,
+#prototype .stars .starchart .grouplist .group .fields .field {
     display: block;
     float: left;
     width: auto;
@@ -398,7 +401,8 @@
     -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
 }
-#prototype .stars .starchart .grouplist .group .robots .icon {
+#prototype .stars .starchart .grouplist .group .robots .icon,
+#prototype .stars .starchart .grouplist .group .fields .icon {
     display: block;
     width: 26px;
     height: 26px;
@@ -413,15 +417,18 @@
     transform: translate(0, 0);
     transition: box-shadow 0.3s, transform 0.3s;
 }
-#prototype .stars .starchart .grouplist .group .robots .icon:hover {
+#prototype .stars .starchart .grouplist .group .robots .icon:hover,
+#prototype .stars .starchart .grouplist .group .fields .icon:hover {
     box-shadow: 1px 1px 0 #000000;
     transform: translate(-1px, -1px);
 
 }
-#prototype .stars .starchart .grouplist .group .robots .icon.robot_type_empty {
+#prototype .stars .starchart .grouplist .group .robots .icon.robot_type_empty,
+#prototype .stars .starchart .grouplist .group .fields .icon.robot_type_empty {
     cursor: default;
 }
-#prototype .stars .starchart .grouplist .group .robots .icon .sprite {
+#prototype .stars .starchart .grouplist .group .robots .icon .sprite,
+#prototype .stars .starchart .grouplist .group .fields .icon .sprite {
     display: block;
     width: 26px;
     height: 26px;
@@ -429,19 +436,22 @@
     margin: 0;
     padding: 0;
 }
-#prototype .stars .starchart .grouplist.topbar .group .robots .robot {
+#prototype .stars .starchart .grouplist.topbar .group .robots .robot,
+#prototype .stars .starchart .grouplist.topbar .group .fields .field {
     margin-right: 5px;
 }
-#prototype .stars .starchart .grouplist.sidebar .group .robots .robot {
+#prototype .stars .starchart .grouplist.sidebar .group .robots .robot,
+#prototype .stars .starchart .grouplist.sidebar .group .fields .field {
     margin-bottom: 5px;
     clear: left;
 }
 #prototype .stars .starchart .grouplist.topbar .group .robots .robot:last-child,
-#prototype .stars .starchart .grouplist.sidebar .group .robots .robot:last-child {
+#prototype .stars .starchart .grouplist.sidebar .group .robots .robot:last-child,
+#prototype .stars .starchart .grouplist.topbar .group .fields .field:last-child,
+#prototype .stars .starchart .grouplist.sidebar .group .field .field:last-child {
     margin-right: 0;
     margin-bottom: 0;
 }
-
 
 
 #prototype .stars .starchart .starlist {

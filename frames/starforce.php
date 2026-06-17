@@ -33,27 +33,52 @@ $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega
 $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); $unlocked_factor_two_robots = true;
 $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); $unlocked_factor_three_robots = true;
 $temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_four); $unlocked_factor_four_robots = true;
+//error_log('$temp_omega_factor_options = '.print_r($temp_omega_factor_options, true));
 
 // Collect any fields unlocked via other means
 $temp_unlocked_fields = mmrpg_prototype_unlocked_field_tokens();
+//error_log('$temp_unlocked_fields = '.print_r($temp_unlocked_fields, true));
 
 // Loop through the collected options and pull just the robot tokens
 foreach ($temp_omega_factor_options AS $key => $factor){
     $temp_omega_factor_options_unlocked[] = $factor['field'];
 }
+//error_log('$temp_omega_factor_options_unlocked = '.print_r($temp_omega_factor_options_unlocked, true));
 
 // Require the types and starforce data files
 require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
 
-// Collect the robot's index for names and fields
+// Collect the type, robot, and field indexes for names and such
+$rpg_types_index = rpg_type::get_index();
+$rpg_types_index_tokens = array_keys($rpg_types_index);
+//error_log('$rpg_types_index_tokens = '.print_r($rpg_types_index_tokens, true));
 $rpg_robots_index = rpg_robot::get_index();
+$rpg_robots_index_tokens = array_keys($rpg_robots_index);
+//error_log('$rpg_robots_index_tokens = '.print_r($rpg_robots_index_tokens, true));
+$rpg_fields_index = rpg_field::get_index();
+$rpg_fields_index_tokens = array_keys($rpg_fields_index);
+//error_log('$rpg_fields_index_tokens = '.print_r($rpg_fields_index_tokens, true));
 
 // Collect all the robots that have been unlocked by the player
 $rpg_robots_encountered = array();
 if (!empty($_SESSION[$session_token]['values']['robot_database'])){
     $rpg_robots_encountered = array_keys($_SESSION[$session_token]['values']['robot_database']);
 }
+
+// Count the number of unlockable robots so we can calculate the number of boss stars
+$temp_unlockable_robots_tokens = array_filter($rpg_robots_index_tokens,
+    function($token) use ($rpg_robots_index){
+        $info = $rpg_robots_index[$token];
+        if ($info['robot_class'] !== 'master'){ return false; }
+        else if (empty($info['robot_flag_published'])){ return false; }
+        else if (empty($info['robot_flag_complete'])){ return false; }
+        else if (empty($info['robot_flag_unlockable'])){ return false; }
+        return true;
+    });
+$temp_unlockable_robots_total = !empty($temp_unlockable_robots_tokens) ? count($temp_unlockable_robots_tokens) : 0;
+//error_log('$temp_unlockable_robots_tokens = '.print_r($temp_unlockable_robots_tokens, true));
+//error_log('$temp_unlockable_robots_total = '.print_r($temp_unlockable_robots_total, true));
 
 // Collect the omega factors that we should be printing links for
 $temp_omega_factors_unlocked = array();
@@ -62,6 +87,8 @@ if ($unlocked_factor_two_robots){ $temp_omega_factors_unlocked = array_merge($te
 if ($unlocked_factor_four_robots){ $temp_omega_factors_unlocked = array_merge($temp_omega_factors_unlocked, $this_omega_factors_four); }
 if ($unlocked_factor_three_robots){ $temp_omega_factors_unlocked = array_merge($temp_omega_factors_unlocked, $this_omega_factors_three); }
 $temp_omega_factors_unlocked_total = count($temp_omega_factors_unlocked);
+//error_log('$temp_omega_factors_unlocked = '.print_r($temp_omega_factors_unlocked, true));
+//error_log('$temp_omega_factors_unlocked_total = '.print_r($temp_omega_factors_unlocked_total, true));
 
 // Collect the omega groups that we should be printing links for
 $temp_omega_groups_unlocked = array();
@@ -69,9 +96,10 @@ if ($unlocked_factor_one_robots){ $temp_omega_groups_unlocked[] = array('token' 
 if ($unlocked_factor_two_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM2', 'omega' => $this_omega_factors_two); }
 if ($unlocked_factor_four_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM4', 'omega' => $this_omega_factors_four); }
 if ($unlocked_factor_three_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM3', 'omega' => $this_omega_factors_three); }
+//error_log('$temp_omega_groups_unlocked = '.print_r($temp_omega_groups_unlocked, true));
 
 // Define a function for printing out the robot links
-function print_starchart_omega($info, $key, $kind){
+function print_starchart_omega_robot($info, $key, $kind){
     global $rpg_robots_encountered, $rpg_robots_index;
     $robot = $info['robot'];
     $type = $info['type'];
@@ -81,7 +109,8 @@ function print_starchart_omega($info, $key, $kind){
         $info = $rpg_robots_index[$robot];
         $name = $info['robot_name'];
         $size = $info['robot_image_size'] ? $info['robot_image_size'] : 40;
-        list($field_one, $field_two) = explode('-', $field);
+        if (!empty($field)){ list($field_one, $field_two) = explode('-', $field); }
+        else { $field_one = ''; $field_two = ''; }
 
         $title = '<div style="text-align: center;">';
             $title .= $name.' <br /> ';
@@ -91,7 +120,7 @@ function print_starchart_omega($info, $key, $kind){
 
         $mug_dir = $kind == 'side' ? 'right' : 'left';
         $sprite_class = 'sprite sprite_'.$size.'x'.$size.' robot_type robot_type_empty';
-        $sprite_style = 'background-image: url(images/robots/'.$robot.'/mug_'.$mug_dir.'_'.$size.'x'.$size.'.png); ';
+        $sprite_style = 'background-image: url(images/robots/'.$robot.'/mug_'.$mug_dir.'_'.$size.'x'.$size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); ';
         $sprite_markup = '<span class="'.$sprite_class.'" style="'.$sprite_style.'">&nbsp;</span>';
 
         $icon_class = 'icon robot_type robot_type_'.$type.' ';
@@ -107,6 +136,55 @@ function print_starchart_omega($info, $key, $kind){
         $sprite_markup = '<span class="'.$sprite_class.'">&nbsp;</span>';
 
         $icon_class = 'icon robot_type robot_type_empty ';
+        $icon_markup = '<a class="'.$icon_class.'" data-'.$kind.'-key="'.$key.'">%s</a>';
+
+        $return_markup = sprintf($icon_markup, $sprite_markup)."\n";
+
+        return $return_markup;
+
+    }
+}
+
+// Define a function for printing out the field links
+function print_starchart_omega_field($info, $key, $kind){
+    global $rpg_robots_encountered, $rpg_robots_index, $rpg_fields_index;
+    $field = $info['field'];
+    $robot = $info['robot'];
+    $type = $info['type'];
+    if (in_array($robot, $rpg_robots_encountered)){
+
+        $field_info = $rpg_fields_index[$field];
+        $field_name = $field_info['field_name'];
+        $robot_info = $rpg_robots_index[$robot];
+        $robot_name = $robot_info['robot_name'];
+        $size = 100;
+        if (!empty($field)){ list($field_one, $field_two) = explode('-', $field); }
+        else { $field_one = ''; $field_two = ''; }
+
+        $title = '<div style="text-align: center;">';
+            $title .= $field_name.' <br /> ';
+            $title .= '<span style="font-size: 10px;">('.$robot_name.')</span>';
+        $title .= '</div>';
+        $title = htmlentities($title, ENT_QUOTES, 'UTF-8');
+
+        $mug_dir = $kind == 'side' ? 'right' : 'left';
+        $sprite_class = 'sprite sprite_'.$size.'x'.$size.' field_type field_type_empty';
+        $sprite_style = 'background-image: url(images/fields/'.$field.'/battle-field_avatar.png?'.MMRPG_CONFIG_CACHE_DATE.'); ';
+        $sprite_markup = '<span class="'.$sprite_class.'" style="'.$sprite_style.'">&nbsp;</span>';
+
+        $icon_class = 'icon field_type field_type_'.$type.' ';
+        $icon_markup = '<a class="'.$icon_class.'" data-'.$kind.'-key="'.$key.'" data-click-tooltip="'.$title.'">%s</a>';
+
+        $return_markup = sprintf($icon_markup, $sprite_markup)."\n";
+
+        return $return_markup;
+
+    } else {
+
+        $sprite_class = 'sprite sprite_40x40 field_type field_type_empty';
+        $sprite_markup = '<span class="'.$sprite_class.'">&nbsp;</span>';
+
+        $icon_class = 'icon field_type field_type_empty ';
         $icon_markup = '<a class="'.$icon_class.'" data-'.$kind.'-key="'.$key.'">%s</a>';
 
         $return_markup = sprintf($icon_markup, $sprite_markup)."\n";
@@ -174,16 +252,25 @@ function temp_combination_number($k,$n){
 
             <?php
             $temp_total_stars_label = $this_battle_stars_count;
-            $temp_potential_count = ((temp_combination_number(2, $temp_omega_factors_unlocked_total) * 2) + $temp_omega_factors_unlocked_total);
+            $temp_potential_count = ((temp_combination_number(2, $temp_omega_factors_unlocked_total) * 2) + $temp_omega_factors_unlocked_total + $temp_unlockable_robots_total);
             $temp_potential_stars_label = $temp_potential_count == 1 ? '1 Star' : $temp_potential_count.' Stars';
 
             ?>
             <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
+                <? /*
                 <span class="count">
                     <i class="fa fas fa-star"></i>
                     Star Collection <span class="progress">(
                         <span><?= $temp_total_stars_label ?></span> /
                         <span><?= $temp_potential_stars_label ?></span>
+                        )</span>
+                </span>
+                */ ?>
+                <span class="count">
+                    <i class="fa fas fa-star"></i>
+                    Star Collection
+                    <span class="progress">(
+                        <span><?= $this_battle_stars_count.' '.($this_battle_stars_count === 1 ? 'Star' : 'Stars') ?></span>
                         )</span>
                 </span>
             </span>
@@ -212,12 +299,16 @@ function temp_combination_number($k,$n){
                             $force_type_backgrounds = array();
                             $force_type_borders = array();
 
-                            $ordered_type_tokens = $this_star_force_strict;
-                            asort($ordered_type_tokens, SORT_NUMERIC);
-                            $ordered_type_tokens = array_keys($ordered_type_tokens);
-                            $ordered_type_tokens = array_reverse($ordered_type_tokens);
+                            //$ordered_type_tokens = $this_star_force_strict;
+                            //asort($ordered_type_tokens, SORT_NUMERIC);
+                            //$ordered_type_tokens = array_keys($ordered_type_tokens);
+                            //$ordered_type_tokens = array_reverse($ordered_type_tokens);
+                            $ordered_type_tokens = array_filter($rpg_types_index_tokens,
+                                function($type_token) use ($this_star_force_strict){
+                                    return !empty($this_star_force_strict[$type_token]);
+                                });
 
-                            $star_kind_tokens = array('field', 'fusion', 'perfect-fusion');
+                            $star_kind_tokens = array('boss', 'field', 'fusion', 'perfect-fusion');
                             foreach ($star_kind_tokens AS $kind){
                                 $star_type_counts[$kind] = array();
                                 $star_type_backgrounds[$kind] = array();
@@ -247,7 +338,8 @@ function temp_combination_number($k,$n){
 
                                 foreach ($star_kind_tokens AS $kind_token){
 
-                                    if ($kind_token == 'field'){ $alpha = '0.6'; }
+                                    if ($kind_token == 'boss'){ $alpha = '0.5'; }
+                                    elseif ($kind_token == 'field'){ $alpha = '0.6'; }
                                     elseif ($kind_token == 'fusion'){ $alpha = '0.7'; }
                                     elseif ($kind_token == 'perfect-fusion'){ $alpha = '1.0'; }
 
@@ -296,35 +388,11 @@ function temp_combination_number($k,$n){
                             </script>
 
                             <div class="chart_wrapper">
-                                <canvas class="chart_canvas" data-source="forceData" width="350" height="180"></canvas>
-                                <script type="text/javascript">
-
-                                    var thisChartOptions = jQuery.extend(true, {}, baseChartOptions);
-                                    thisChartOptions.title.text = 'Starforce Level <?= $force_type_counts_total ?>';
-                                    thisStarSettings.forceData = {
-                                        type: 'bar',
-                                        data: {
-                                            labels: <?= json_encode($type_labels) ?>,
-                                            datasets: [{
-                                                label: 'Level',
-                                                data: <?= json_encode($force_type_counts) ?>,
-                                                backgroundColor: <?= json_encode($force_type_backgrounds) ?>,
-                                                borderColor: <?= json_encode($force_type_borders) ?>,
-                                                borderWidth: 1
-                                                }]
-                                            },
-                                        options: thisChartOptions
-                                        };
-
-                                </script>
-                            </div>
-
-                            <div class="chart_wrapper">
                                 <canvas class="chart_canvas" data-source="starData" width="350" height="180"></canvas>
                                 <script type="text/javascript">
 
                                     var thisChartOptions = jQuery.extend(true, {}, baseChartOptions);
-                                    thisChartOptions.title.text = '<?= $temp_total_stars_label.' / '.$temp_potential_stars_label ?>';
+                                    thisChartOptions.title.text = '<?= $this_battle_stars_count.' '.($this_battle_stars_count === 1 ? 'Star' : 'Stars') ?>';
                                     thisChartOptions.tooltips = {
                                         callbacks: {
                                             title: function (tooltipItem, data) {
@@ -355,6 +423,12 @@ function temp_combination_number($k,$n){
                                         data: {
                                             labels: <?= json_encode($type_labels) ?>,
                                             datasets: [{
+                                                label: 'Boss Stars',
+                                                data: <?= json_encode($star_type_counts['boss']) ?>,
+                                                backgroundColor: <?= json_encode($star_type_backgrounds['boss']) ?>,
+                                                borderColor: <?= json_encode($star_type_borders['boss']) ?>,
+                                                borderWidth: 1
+                                                },{
                                                 label: 'Field Stars',
                                                 data: <?= json_encode($star_type_counts['field']) ?>,
                                                 backgroundColor: <?= json_encode($star_type_backgrounds['field']) ?>,
@@ -371,6 +445,30 @@ function temp_combination_number($k,$n){
                                                 data: <?= json_encode($star_type_counts['perfect-fusion']) ?>,
                                                 backgroundColor: <?= json_encode($star_type_backgrounds['perfect-fusion']) ?>,
                                                 borderColor: <?= json_encode($star_type_borders['perfect-fusion']) ?>,
+                                                borderWidth: 1
+                                                }]
+                                            },
+                                        options: thisChartOptions
+                                        };
+
+                                </script>
+                            </div>
+
+                            <div class="chart_wrapper">
+                                <canvas class="chart_canvas" data-source="forceData" width="350" height="180"></canvas>
+                                <script type="text/javascript">
+
+                                    var thisChartOptions = jQuery.extend(true, {}, baseChartOptions);
+                                    thisChartOptions.title.text = 'Starforce Levels';
+                                    thisStarSettings.forceData = {
+                                        type: 'bar',
+                                        data: {
+                                            labels: <?= json_encode($type_labels) ?>,
+                                            datasets: [{
+                                                label: 'Level',
+                                                data: <?= json_encode($force_type_counts) ?>,
+                                                backgroundColor: <?= json_encode($force_type_backgrounds) ?>,
+                                                borderColor: <?= json_encode($force_type_borders) ?>,
                                                 borderWidth: 1
                                                 }]
                                             },
@@ -433,16 +531,35 @@ function temp_combination_number($k,$n){
                                     ob_start();
                                     ?>
                                     <div class="group <?= $group_current ? 'current' : '' ?>" data-group="<?= $group_token ?>" data-size="<?= $group_size ?>">
-                                        <ul class="robots">
+                                        <? /*
+                                        <ul class="options robots">
                                             <?
                                             // Loop through and print omega robots
                                             foreach ($group_omega AS $key2 => $omega){
                                                 $omega_robot = $omega['robot'];
                                                 $omega_field = $omega['field'];
-                                                $omega_cell = print_starchart_omega($omega, $chart_keys_counter, $bar_kind);
+                                                $omega_cell = print_starchart_omega_robot($omega, $chart_keys_counter, $bar_kind);
                                                 if ($group_current){ $chart_keys_visible[$bar_kind][] = $chart_keys_counter; }
                                                 ?>
-                                                <li class="robot">
+                                                <li class="option robot">
+                                                    <?= $omega_cell ?>
+                                                </li>
+                                                <?
+                                                $chart_keys_counter++;
+                                            }
+                                            ?>
+                                        </ul>
+                                        */ ?>
+                                        <ul class="options fields">
+                                            <?
+                                            // Loop through and print omega fields
+                                            foreach ($group_omega AS $key2 => $omega){
+                                                $omega_robot = $omega['robot'];
+                                                $omega_field = $omega['field'];
+                                                $omega_cell = print_starchart_omega_field($omega, $chart_keys_counter, $bar_kind);
+                                                if ($group_current){ $chart_keys_visible[$bar_kind][] = $chart_keys_counter; }
+                                                ?>
+                                                <li class="option field">
                                                     <?= $omega_cell ?>
                                                 </li>
                                                 <?
@@ -477,20 +594,29 @@ function temp_combination_number($k,$n){
                                     // Loop through all the field stars and print them out one-by-one
                                     if (!empty($this_battle_stars)){
 
+                                        // Define the minimum grid size (rows/columns)
+                                        $grid_size = 8;
+
+                                        // Pad the array with dummy data if it has fewer than 8 elements
+                                        $padded_omega_factors = array_pad($temp_omega_factors_unlocked, $grid_size, ['field' => 'dummy-dummy']);
+
                                         // Loop through all the omega factors firstly to create the side fields
                                         $temp_key = 0;
                                         foreach ($temp_omega_factors_unlocked AS $side_key => $side_field_info){
 
                                             // Define the tokens for this field
                                             $side_field_token = $side_field_info['field'];
-                                            list($side_field_token_one, $side_field_token_two) = explode('-', $side_field_token);
+                                            if (!empty($side_field_token)){ list($side_field_token_one, $side_field_token_two) = explode('-', $side_field_token); }
+                                            else { $side_field_token_one = ''; $side_field_token_two = ''; }
 
-                                            // Loop through all the omega factors firstly to create the side fields
+                                            // Loop through all the omega factors firstly to create the top fields
                                             foreach ($temp_omega_factors_unlocked AS $top_key => $top_field_info){
 
                                                 // Define the tokens for this field
                                                 $top_field_token = $top_field_info['field'];
-                                                list($top_field_token_one, $top_field_token_two) = explode('-', $top_field_token);
+                                                if (!empty($top_field_token)){ list($top_field_token_one, $top_field_token_two) = explode('-', $top_field_token); }
+                                                else { $top_field_token_one = ''; $top_field_token_two = ''; }
+
 
                                                 // Generate the star token based on the two field tokens
                                                 $star_token = $side_field_token_one.'-'.$top_field_token_two;
@@ -511,16 +637,6 @@ function temp_combination_number($k,$n){
                                                     if ($temp_star_kind == 'fusion' && $temp_field_type_1 == $temp_field_type_2){
                                                         //$temp_star_kind_name = 'Perfect '.$temp_star_kind_name;
                                                     }
-
-                                                    /*
-                                                    if ($temp_star_kind == 'field'){
-                                                        $temp_star_front = array('path' => 'images/items/field-star_'.$temp_field_type_1.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '02', 'size' => 40);
-                                                        $temp_star_back = array('path' => 'images/items/field-star_'.$temp_field_type_2.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '01', 'size' => 40);
-                                                    } elseif ($temp_star_kind == 'fusion'){
-                                                        $temp_star_front = array('path' => 'images/items/fusion-star_'.$temp_field_type_1.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '02', 'size' => 40);
-                                                        $temp_star_back = array('path' => 'images/items/fusion-star_'.$temp_field_type_2.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '01', 'size' => 40);
-                                                    }
-                                                    */
 
                                                     if ($temp_star_kind == 'field'){
                                                         $type = $temp_field_type_1;
@@ -546,21 +662,6 @@ function temp_combination_number($k,$n){
 
                                                         $temp_star_title .= ' | '.$temp_star_kind_name.' Star';
 
-                                                        /*
-                                                        if ($temp_field_type_1 != 'none'){
-                                                            if ($temp_star_kind == 'field'){
-                                                                $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
-                                                            } elseif ($temp_star_kind == 'fusion'){
-                                                                if ($temp_field_type_1 != $temp_field_type_2){
-                                                                    $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
-                                                                    $temp_star_title .= ' | '.ucfirst($temp_field_type_2).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT);
-                                                                } else {
-                                                                    $temp_star_title .= ' <br />'.ucfirst($temp_field_type_1).' +'.(MMRPG_SETTINGS_STARFORCE_BOOSTPERCENT * 2);
-                                                                }
-                                                            }
-                                                        }
-                                                        */
-
                                                         if (!empty($temp_star_date)){
                                                             $temp_star_title .= ' <br />Found '.date('Y/m/d', $temp_star_date);
                                                         }
@@ -573,15 +674,7 @@ function temp_combination_number($k,$n){
                                                     echo '<a data-side-key="'.$side_key.'" data-top-key="'.$top_key.'" data-click-tooltip="'.$temp_star_title.'" data-tooltip-type="field_type field_type_'.$temp_field_type_1.(!empty($temp_field_type_2) && ($temp_field_type_1 != $temp_field_type_2) ? '_'.$temp_field_type_2 : '').'" class="sprite sprite_40x40 sprite_star '.($is_visible ? 'visible' : '').'" style="">';
                                                         echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_'.$temp_star_back['frame'].'" style="background-image: url('.$temp_star_back['path'].'); z-index: 10;">&nbsp;</div>';
                                                         echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_'.$temp_star_back['frame'].'" style="background-image: url('.$temp_star_back['path'].'); z-index: 8;">&nbsp;</div>';
-                                                        //echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_'.$temp_star_front['frame'].'" style="background-image: url('.$temp_star_front['path'].'); z-index: 20;">&nbsp;</div>';
                                                     echo '</a>';
-
-
-                                                    //echo('<pre>$star_data = $this_battle_stars['.$star_token.'] = '.print_r($star_data, true).'</pre>');
-                                                    //echo('<pre>$this_star_force = '.print_r($this_star_force, true).'</pre>');
-                                                    //echo('<pre>$this_battle_stars = '.print_r($this_battle_stars, true).'</pre>');
-                                                    //echo('<pre>$chart_keys_visible = '.print_r($chart_keys_visible, true).'</pre>');
-                                                    //exit();
 
                                                 }
                                                 // Otherwise, print out an empty star placeholder

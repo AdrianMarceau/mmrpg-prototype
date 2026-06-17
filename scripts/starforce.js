@@ -50,7 +50,7 @@ $(document).ready(function(){
         $('.starchart .grouplist .arrow', thisContext).live('mouseenter', function(){
             playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
             });
-        $('.starchart .grouplist .group .robots .icon', thisContext).live('mouseenter', function(){
+        $('.starchart .grouplist .group .icon', thisContext).live('mouseenter', function(){
             playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
             });
 
@@ -209,9 +209,9 @@ function refreshStarchart(){
 
     // Loop through current groups and collect keys
     currentGroups.each(function(){
-        var thisGroup = $(this);
-        var thisGroupRobots = thisGroup.find('.robot');
-        thisGroupRobots.each(function(){
+        let thisGroup = $(this);
+        let thisGroupOptions = thisGroup.find('.option');
+        thisGroupOptions.each(function(){
             var thisRobot = $(this);
             var thisRobotIcon = thisRobot.find('.icon');
             if (thisRobotIcon.attr('data-top-key') != undefined){
