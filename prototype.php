@@ -207,7 +207,7 @@ if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-scr
 ?>
 <body id="mmrpg" class="prototype <?= 'env_'.MMRPG_CONFIG_SERVER_ENV ?> <?= implode(' ', $mmrpgBodyClasses) ?>">
 
-<div id="prototype" class="hidden">
+<div id="prototype" class="main_menu hidden">
     <div class="bgfx-layer layer-1"></div>
     <div class="bgfx-layer layer-2"></div>
 
