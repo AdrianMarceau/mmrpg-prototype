@@ -60,6 +60,8 @@ $rpg_fields_index = rpg_field::get_index();
 $rpg_fields_index_tokens = array_keys($rpg_fields_index);
 //error_log('$rpg_fields_index_tokens = '.print_r($rpg_fields_index_tokens, true));
 
+//error_log('$this_battle_stars = '.print_r($this_battle_stars, true));
+
 // Collect all the robots that have been unlocked by the player
 $rpg_robots_encountered = array();
 if (!empty($_SESSION[$session_token]['values']['robot_database'])){
@@ -67,18 +69,21 @@ if (!empty($_SESSION[$session_token]['values']['robot_database'])){
 }
 
 // Count the number of unlockable robots so we can calculate the number of boss stars
-$temp_unlockable_robots_tokens = array_filter($rpg_robots_index_tokens,
+$temp_boss_stars_available = array_filter($rpg_robots_index_tokens,
     function($token) use ($rpg_robots_index){
         $info = $rpg_robots_index[$token];
         if ($info['robot_class'] !== 'master'){ return false; }
         else if (empty($info['robot_flag_published'])){ return false; }
         else if (empty($info['robot_flag_complete'])){ return false; }
-        else if (empty($info['robot_flag_unlockable'])){ return false; }
+        //else if (empty($info['robot_flag_unlockable'])){ return false; }
+        if ($info['robot_core'] === ''){ return false; }
+        else if ($info['robot_core'] === 'copy'){ return false; }
         return true;
     });
-$temp_unlockable_robots_total = !empty($temp_unlockable_robots_tokens) ? count($temp_unlockable_robots_tokens) : 0;
-//error_log('$temp_unlockable_robots_tokens = '.print_r($temp_unlockable_robots_tokens, true));
-//error_log('$temp_unlockable_robots_total = '.print_r($temp_unlockable_robots_total, true));
+$temp_boss_stars_available = array_values($temp_boss_stars_available);
+$temp_boss_stars_total = !empty($temp_boss_stars_available) ? count($temp_boss_stars_available) : 0;
+//error_log('$temp_boss_stars_total = '.print_r($temp_boss_stars_total, true));
+//error_log('$temp_boss_stars_available = '.print_r($temp_boss_stars_available, true));
 
 // Collect the omega factors that we should be printing links for
 $temp_omega_factors_unlocked = array();
@@ -97,6 +102,115 @@ if ($unlocked_factor_two_robots){ $temp_omega_groups_unlocked[] = array('token' 
 if ($unlocked_factor_four_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM4', 'omega' => $this_omega_factors_four); }
 if ($unlocked_factor_three_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM3', 'omega' => $this_omega_factors_three); }
 //error_log('$temp_omega_groups_unlocked = '.print_r($temp_omega_groups_unlocked, true));
+
+// Define a function for printing robots in the boss stars list
+function print_starlist_omega_robot($robot, $key = 0, $visible = true){
+    global $rpg_robots_encountered, $rpg_robots_index, $this_battle_stars;
+    $robot_info = !empty($robot) && !empty($rpg_robots_index[$robot]) ? $rpg_robots_index[$robot] : false;
+    $star_info = !empty($robot) && !empty($this_battle_stars[$robot]) ? $this_battle_stars[$robot] : false;
+    if (!empty($robot) && !empty($robot_info)){
+
+        $robot_name = $robot_info['robot_name'];
+        $robot_type = $robot_info['robot_core'];
+        $robot_size = $robot_info['robot_image_size'] ? $robot_info['robot_image_size'] : 40;
+
+        $robot_was_encountered = in_array($robot, $rpg_robots_encountered) ? true : false;
+        $star_was_collected = !empty($star_info) ? true : false;
+
+        $tooltip_title = '';
+        $tooltip_type = '';
+        if ($robot_was_encountered && $star_was_collected){
+            $tooltip_title = '<div style="text-align: center;">';
+                $tooltip_title .= $robot_name.' Star <br /> ';
+                $tooltip_title .= '<span style="font-size: 80%;">+1 '.ucfirst($robot_type).' | Boss Star</span> <br />';
+                if (!empty($star_info['star_date'])){ $tooltip_title .= '<span style="font-size: 80%;">Found '.date('Y/m/d', $star_info['star_date']).'</span> '; }
+            $tooltip_title .= '</div>';
+            $tooltip_title = htmlentities($tooltip_title, ENT_QUOTES, 'UTF-8');
+            $tooltip_type = 'robot_type robot_type_'.$robot_type;
+        } elseif ($robot_was_encountered){
+            $tooltip_title = '<div style="text-align: center;">';
+                $tooltip_title .= $robot_name.' Star <br /> ';
+                $tooltip_title .= '<span style="font-size: 80%; opacity: 0.6;">Not Yet Found</span>';
+            $tooltip_title .= '</div>';
+            $tooltip_title = htmlentities($tooltip_title, ENT_QUOTES, 'UTF-8');
+            $tooltip_type = 'robot_type robot_type_'.$robot_type;
+        } else {
+            $tooltip_title = false;
+            $tooltip_type = false;
+        }
+
+        $icon_class = '';
+        $icon_sprite_class = '';
+        $icon_sprite_style = '';
+        $icon_sprite_markup = '';
+        if ($robot_was_encountered){
+            $icon_class = 'icon robot_type robot_type_'.$robot_type.' ';
+            $icon_sprite_class = 'sprite sprite_'.$robot_size.'x'.$robot_size.' robot_type robot_type_empty';
+            $icon_sprite_style = 'background-image: url(images/robots/'.$robot.'/mug_right_'.$robot_size.'x'.$robot_size.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); ';
+            $icon_sprite_markup = '<span class="'.$icon_sprite_class.'" style="'.$icon_sprite_style.'">&nbsp;</span>';
+        } else {
+            $icon_class = 'icon robot_type robot_type_empty shadow ';
+            $icon_sprite_class = 'sprite sprite_40x40 robot_type robot_type_empty';
+            $icon_sprite_markup = '<span class="'.$icon_sprite_class.'">&nbsp;</span>';
+        }
+
+        $star_class = '';
+        $star_sprite_class = '';
+        $star_sprite_style = '';
+        $star_sprite_markup = '';
+        if ($star_was_collected){
+            $star_class = 'star sprite sprite_40x40 sprite_star visible ';
+            $star_sprite_class = 'sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_00';
+            $star_sprite_style = 'background-image: url(images/items/field-star_'.$robot_type.'/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');';
+            $star_sprite_markup = '<div class="'.$star_sprite_class.'" style="'.$star_sprite_style.' z-index: 2;">&nbsp;</div>';
+            $star_sprite_markup .= '<div class="'.$star_sprite_class.'" style="'.$star_sprite_style.' z-index: 1;">&nbsp;</div>'; // shadow sprite
+        } else {
+            $star_class = 'star sprite sprite_40x40 sprite_star visible shadow ';
+            $star_sprite_class = 'sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_00';
+            $star_sprite_style = 'background-image: url(images/items/field-star_empty/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');';
+            $star_sprite_markup .= '<div class="'.$star_sprite_class.'" style="'.$star_sprite_style.' z-index: 1;">&nbsp;</div>'; // shadow sprite
+        }
+
+        $return_markup = '';
+            $return_markup .= '<li class="robot'.
+                    ($robot_was_encountered ? ' encountered' : '').
+                    ($star_was_collected ? ' collected' : '').
+                    (!$visible ? ' hidden' : '').
+                    '"'.
+                ($tooltip_title ? ' data-click-tooltip="'.$tooltip_title.'"' : '').
+                ($tooltip_type ? ' data-tooltip-type="'.$tooltip_type.'' : '').
+                '" data-key="'.$key.'">';
+                $return_markup .= '<div class="'.$icon_class.'">'.$icon_sprite_markup.'</div>';
+                $return_markup .= '<div class="'.$star_class.'">'.$star_sprite_markup.'</div>';
+            $return_markup .= '</li>';
+        $return_markup .= "\n";
+
+        return $return_markup;
+
+    } else {
+
+        $icon_class = 'icon robot_type robot_type_empty ';
+        $icon_sprite_class = 'sprite sprite_40x40 robot_type robot_type_empty';
+        $icon_sprite_markup = '<span class="'.$icon_sprite_class.'">&nbsp;</span>';
+
+        $star_class = 'star sprite sprite_40x40 sprite_star visible shadow ';
+        $star_sprite_class = 'sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_00';
+        $star_sprite_style = 'background-image: url(images/items/field-star_empty/icon_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');';
+        $star_sprite_markup = '<div class="'.$star_sprite_class.'" style="'.$star_sprite_style.' z-index: 1;">&nbsp;</div>'; // shadow sprite
+
+        $return_markup = '';
+            $return_markup .= '<li class="robot unknown '.(!$visible ? ' hidden' : '').'" data-key="'.$key.'">';
+                $return_markup .= '<div class="'.$icon_class.'">'.$icon_sprite_markup.'</div>';
+                $return_markup .= '<div class="'.$star_class.'">'.$star_sprite_markup.'</div>';
+            $return_markup .= '</li>';
+        $return_markup .= "\n";
+
+        return $return_markup;
+
+    }
+
+
+}
 
 // Define a function for printing out the robot links
 function print_starchart_omega_robot($info, $key, $kind){
@@ -198,27 +312,16 @@ function print_starchart_omega_field($info, $key, $kind){
 function temp_combination_number($k,$n){
     $n = intval($n);
     $k = intval($k);
-    if ($k > $n){
-            return 0;
-    } elseif ($n == $k) {
-            return 1;
-    } else {
-            if ($k >= $n - $k){
-                    $l = $k+1;
-                    for ($i = $l+1 ; $i <= $n ; $i++)
-                            $l *= $i;
-                    $m = 1;
-                    for ($i = 2 ; $i <= $n-$k ; $i++)
-                            $m *= $i;
-            } else {
-                    $l = ($n-$k) + 1;
-                    for ($i = $l+1 ; $i <= $n ; $i++)
-                            $l *= $i;
-                    $m = 1;
-                    for ($i = 2 ; $i <= $k ; $i++)
-                            $m *= $i;
-            }
-    }
+    if ($k > $n){ return 0; }
+    elseif ($n == $k){ return 1; }
+    if ($k >= $n - $k){
+        $l = $k+1; for ($i = $l+1 ; $i <= $n ; $i++){ $l *= $i; }
+        $m = 1; for ($i = 2 ; $i <= $n-$k ; $i++){ $m *= $i; }
+        }
+    else {
+        $l = ($n-$k) + 1; for ($i = $l+1 ; $i <= $n ; $i++){ $l *= $i; }
+        $m = 1; for ($i = 2 ; $i <= $k ; $i++){ $m *= $i; }
+        }
     return $l/$m;
 }
 
@@ -252,9 +355,8 @@ function temp_combination_number($k,$n){
 
             <?php
             $temp_total_stars_label = $this_battle_stars_count;
-            $temp_potential_count = ((temp_combination_number(2, $temp_omega_factors_unlocked_total) * 2) + $temp_omega_factors_unlocked_total + $temp_unlockable_robots_total);
+            $temp_potential_count = ((temp_combination_number(2, $temp_omega_factors_unlocked_total) * 2) + $temp_omega_factors_unlocked_total + $temp_boss_stars_total);
             $temp_potential_stars_label = $temp_potential_count == 1 ? '1 Star' : $temp_potential_count.' Stars';
-
             ?>
             <span class="header block_1 header_types type_<?= defined('MMRPG_SETTINGS_REMOTE_FIELDTYPE') ? MMRPG_SETTINGS_REMOTE_FIELDTYPE : MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                 <? /*
@@ -273,222 +375,71 @@ function temp_combination_number($k,$n){
                         <span><?= $this_battle_stars_count.' '.($this_battle_stars_count === 1 ? 'Star' : 'Stars') ?></span>
                         )</span>
                 </span>
+                <div class="toggle" data-view="list">
+                    <a class="option" data-view="list"><i class="fa fas fa-th"></i> <strong>List</strong></a>
+                    <a class="option" data-view="stats"><i class="fa fas fa-signal"></i> <strong>Stats</strong></a>
+                </div>
             </span>
 
-            <div class="stars">
+            <div class="content stars fullsize" data-view="list">
                 <div class="wrapper">
 
-                    <div class="starforce">
+                    <?
+                    $bosses_per_row = 8;
+                    $bosses_per_page = 32;
+                    $num_boss_pages = ceil($temp_boss_stars_total / $bosses_per_page);
+                    $current_boss_page = 1;
+                    ?>
+                    <div class="container starlist">
+                        <strong class="title">Boss Stars</strong>
                         <div class="wrapper">
-                            <a class="size_toggle">
-                                <span class="maximize"><i class="fa fas fa-window-maximize"></i></span>
-                                <span class="restore"><i class="fa fas fa-window-restore"></i></span>
-                            </a>
-
-                            <?
-
-                            // Collect the data for this type chart
-                            $type_labels = array();
-
-                            $star_type_counts = array();
-                            $star_type_backgrounds = array();
-                            $star_type_borders = array();
-
-                            $force_type_counts = array();
-                            $force_type_counts_total = 0;
-                            $force_type_backgrounds = array();
-                            $force_type_borders = array();
-
-                            //$ordered_type_tokens = $this_star_force_strict;
-                            //asort($ordered_type_tokens, SORT_NUMERIC);
-                            //$ordered_type_tokens = array_keys($ordered_type_tokens);
-                            //$ordered_type_tokens = array_reverse($ordered_type_tokens);
-                            $ordered_type_tokens = array_filter($rpg_types_index_tokens,
-                                function($type_token) use ($this_star_force_strict){
-                                    return !empty($this_star_force_strict[$type_token]);
-                                });
-
-                            $star_kind_tokens = array('boss', 'field', 'fusion', 'perfect-fusion');
-                            foreach ($star_kind_tokens AS $kind){
-                                $star_type_counts[$kind] = array();
-                                $star_type_backgrounds[$kind] = array();
-                                $star_type_borders[$kind] = array();
-                            }
-                            //error_log('$star_type_counts = '.print_r($star_type_counts, true));
-
-                            foreach($ordered_type_tokens AS $type_key => $type_token){
-
-                                $type_info = $mmrpg_database_types[$type_token];
-
-                                $star_count = $this_star_force_strict[$type_token];
-                                $star_force = $this_star_force[$type_token];
-
-                                $light_colour = implode(', ', $type_info['type_colour_light']);
-                                $dark_colour = implode(', ', $type_info['type_colour_dark']);
-
-                                $force_background = 'rgba('.$light_colour.', 0.9)';
-                                $force_border = 'rgba('.$dark_colour.', 1.0)';
-
-                                $type_labels[] = $type_info['type_name'];
-
-                                $force_type_counts[] = $star_force;
-                                $force_type_counts_total += $star_force;
-                                $force_type_backgrounds[] = $force_background;
-                                $force_type_borders[] = $force_border;
-
-                                foreach ($star_kind_tokens AS $kind_token){
-
-                                    if ($kind_token == 'boss'){ $alpha = '0.5'; }
-                                    elseif ($kind_token == 'field'){ $alpha = '0.6'; }
-                                    elseif ($kind_token == 'fusion'){ $alpha = '0.7'; }
-                                    elseif ($kind_token == 'perfect-fusion'){ $alpha = '1.0'; }
-
-                                    $star_background = 'rgba('.$light_colour.', '.$alpha.')';
-                                    $star_border = 'rgba('.$dark_colour.', 1.0)';
-
-                                    $star_kind_count = !empty($this_star_kind_counts[$kind_token][$type_token]) ? $this_star_kind_counts[$kind_token][$type_token] : 0;
-
-                                    $star_type_counts[$kind_token][] = $star_kind_count;
-                                    $star_type_backgrounds[$kind_token][] = $star_background;
-                                    $star_type_borders[$kind_token][] = $star_border;
-
+                            <div class="pages" data-per-page="<?= $bosses_per_page ?>" data-current-page="<?= $current_boss_page ?>">
+                                <a class="arrow prev" data-page="prev"></a>
+                                <?
+                                for ($key = 0; $key < $num_boss_pages; $key++){
+                                    $page = $key + 1; $active = $page === $current_boss_page ? true : false;
+                                    echo('<a class="page'.($active ? ' active' : '').'" data-page="'.$page.'">Page '.$page.'</a>');
                                 }
-
-                            }
-
-                            ?>
-
-                            <script type="text/javascript">
-                                var baseChartOptions = {
-                                    title: {
-                                        display: true,
-                                        text: '<title>'
-                                        },
-                                    legend: {
-                                        display: false,
-                                        },
-                                    scales: {
-                                        xAxes: [{
-                                            stacked:true,
-                                            ticks: {
-                                                beginAtZero:true
-                                                }
-                                            }],
-                                        yAxes: [{
-                                            stacked:true,
-                                            ticks: {
-                                                beginAtZero:true
-                                                }
-                                            }]
-                                        },
-                                    responsive: true,
-                                    maintainAspectRatio: false
-                                    };
-
-                            </script>
-
-                            <div class="chart_wrapper">
-                                <canvas class="chart_canvas" data-source="starData" width="350" height="180"></canvas>
-                                <script type="text/javascript">
-
-                                    var thisChartOptions = jQuery.extend(true, {}, baseChartOptions);
-                                    thisChartOptions.title.text = '<?= $this_battle_stars_count.' '.($this_battle_stars_count === 1 ? 'Star' : 'Stars') ?>';
-                                    thisChartOptions.tooltips = {
-                                        callbacks: {
-                                            title: function (tooltipItem, data) {
-                                                //console.log('-------------------------');
-                                                //console.log('TITLE');
-                                                //console.log('tooltipItem[0]', tooltipItem[0]);
-                                                //console.log('data.datasets', data.datasets);
-                                                //console.log('data.datasets[0].label', data.datasets[0].label);
-                                                var returnText = data.labels[tooltipItem[0].index];
-                                                //if (tooltipItem[0].datasetIndex == 0){ returnText += ' +1'; }
-                                                //else if (tooltipItem[0].datasetIndex == 1){ returnText += ' +1'; }
-                                                //else if (tooltipItem[0].datasetIndex == 2){ returnText += ' +2'; }
-                                                //console.log('returnText', returnText);
-                                                return returnText;
-                                                },
-                                            label: function(tooltipItems, data) {
-                                                //console.log('LABEL');
-                                                //console.log('tooltipItems', tooltipItems);
-                                                //console.log('data.datasets', data.datasets);
-                                                var returnText =  'x' + tooltipItems.yLabel + ' ' + data.datasets[tooltipItems.datasetIndex].label;
-                                                //console.log('returnText', returnText);
-                                                return returnText;
-                                                }
-                                            }
-                                        };
-                                    thisStarSettings.starData = {
-                                        type: 'bar',
-                                        data: {
-                                            labels: <?= json_encode($type_labels) ?>,
-                                            datasets: [{
-                                                label: 'Boss Stars',
-                                                data: <?= json_encode($star_type_counts['boss']) ?>,
-                                                backgroundColor: <?= json_encode($star_type_backgrounds['boss']) ?>,
-                                                borderColor: <?= json_encode($star_type_borders['boss']) ?>,
-                                                borderWidth: 1
-                                                },{
-                                                label: 'Field Stars',
-                                                data: <?= json_encode($star_type_counts['field']) ?>,
-                                                backgroundColor: <?= json_encode($star_type_backgrounds['field']) ?>,
-                                                borderColor: <?= json_encode($star_type_borders['field']) ?>,
-                                                borderWidth: 1
-                                                },{
-                                                label: 'Fusion Star Halves',
-                                                data: <?= json_encode($star_type_counts['fusion']) ?>,
-                                                backgroundColor: <?= json_encode($star_type_backgrounds['fusion']) ?>,
-                                                borderColor: <?= json_encode($star_type_borders['fusion']) ?>,
-                                                borderWidth: 1
-                                                },{
-                                                label: 'Whole Fusion Stars',
-                                                data: <?= json_encode($star_type_counts['perfect-fusion']) ?>,
-                                                backgroundColor: <?= json_encode($star_type_backgrounds['perfect-fusion']) ?>,
-                                                borderColor: <?= json_encode($star_type_borders['perfect-fusion']) ?>,
-                                                borderWidth: 1
-                                                }]
-                                            },
-                                        options: thisChartOptions
-                                        };
-
-                                </script>
+                                ?>
+                                <a class="arrow next" data-page="next"></a>
                             </div>
-
-                            <div class="chart_wrapper">
-                                <canvas class="chart_canvas" data-source="forceData" width="350" height="180"></canvas>
-                                <script type="text/javascript">
-
-                                    var thisChartOptions = jQuery.extend(true, {}, baseChartOptions);
-                                    thisChartOptions.title.text = 'Starforce Levels';
-                                    thisStarSettings.forceData = {
-                                        type: 'bar',
-                                        data: {
-                                            labels: <?= json_encode($type_labels) ?>,
-                                            datasets: [{
-                                                label: 'Level',
-                                                data: <?= json_encode($force_type_counts) ?>,
-                                                backgroundColor: <?= json_encode($force_type_backgrounds) ?>,
-                                                borderColor: <?= json_encode($force_type_borders) ?>,
-                                                borderWidth: 1
-                                                }]
-                                            },
-                                        options: thisChartOptions
-                                        };
-
-                                </script>
-                            </div>
-
-                            <?
-
-                            //echo('<pre>$this_star_force = '.print_r($this_star_force, true).'</pre>');
-                            //echo('<pre>$this_star_force_strict = '.print_r($this_star_force_strict, true).'</pre>');
-
-                            ?>
-
+                            <ul class="robots">
+                                <?
+                                $robot_key = 0;
+                                $last_game = '';
+                                $game_counts = array();
+                                foreach ($temp_boss_stars_available AS $key => $robot){
+                                    $info = !empty($rpg_robots_index[$robot]) ? $rpg_robots_index[$robot] : false;
+                                    $new_last_game = $info['robot_game']; if ($new_last_game === 'MMPU'){ $new_last_game = 'MM1'; }
+                                    $last_game_count = !empty($last_game) ? $game_counts[$last_game] : -1;
+                                    $last_game_changed = false;
+                                    if (empty($last_game)
+                                        || $last_game !== $new_last_game){
+                                        if (!isset($game_counts[$new_last_game])){ $game_counts[$new_last_game] = 0; }
+                                        $last_game_changed = !empty($last_game) ? true : false;
+                                        $last_game = $new_last_game;
+                                    }
+                                    $game_counts[$last_game]++;
+                                    if ($last_game_changed
+                                        && $last_game_count < $bosses_per_row){
+                                        $spacers_required = $bosses_per_row - $last_game_count;
+                                        //error_log('$last_game_changed | $last_game_count '.$last_game_count.' | $spacers_required = '.$spacers_required);
+                                        for ($i = 0; $i < $spacers_required; $i++){
+                                            echo(print_starlist_omega_robot(false, $robot_key, ($robot_key < $bosses_per_page)));
+                                            $robot_key++;
+                                        }
+                                    }
+                                    echo(print_starlist_omega_robot($robot, $robot_key, ($robot_key < $bosses_per_page)));
+                                    $robot_key++;
+                                }
+                                error_log('$game_counts = '.print_r($game_counts, true));
+                                ?>
+                            </ul>
                         </div>
                     </div>
 
-                    <div class="starchart">
+                    <div class="container starchart">
+                        <strong class="title">Field / Fusion Stars</strong>
                         <div class="wrapper">
 
                             <div class="corner">
@@ -702,6 +653,248 @@ function temp_combination_number($k,$n){
 
                                 </div>
                             </div>
+
+                        </div>
+                    </div>
+
+                    <div class="container starforce">
+                        <div class="wrapper">
+                            <a class="size_toggle">
+                                <span class="maximize"><i class="fa fas fa-window-maximize"></i></span>
+                                <span class="restore"><i class="fa fas fa-window-restore"></i></span>
+                            </a>
+
+                            <?
+
+                            // Collect the data for this type chart
+                            $star_type_labels = array();
+                            $star_force_labels = array();
+
+                            $star_type_counts = array();
+                            $star_type_backgrounds = array();
+                            $star_type_borders = array();
+
+                            $force_type_counts = array();
+                            $force_type_counts_total = 0;
+                            $force_type_backgrounds = array();
+                            $force_type_borders = array();
+
+                            $sorted_type_tokens = $this_star_force_strict;
+                            asort($sorted_type_tokens, SORT_NUMERIC);
+                            $sorted_type_tokens = array_keys($sorted_type_tokens);
+                            //$sorted_type_tokens = array_reverse($sorted_type_tokens);
+
+                            $ordered_type_tokens = array_filter($rpg_types_index_tokens,
+                                function($type_token) use ($this_star_force_strict){
+                                    return !empty($this_star_force_strict[$type_token]);
+                                });
+
+                            $star_kind_tokens = array('boss', 'field', 'fusion', 'perfect-fusion');
+                            $star_type_counts['all'] = array();
+                            $star_type_backgrounds['all'] = array();
+                            $star_type_borders['all'] = array();
+                            foreach ($star_kind_tokens AS $kind){
+                                $star_type_counts[$kind] = array();
+                                $star_type_backgrounds[$kind] = array();
+                                $star_type_borders[$kind] = array();
+                            }
+                            //error_log('$star_type_counts = '.print_r($star_type_counts, true));
+
+                            // First we grab the data for stars-collected overall in type-index order
+                            foreach($ordered_type_tokens AS $type_key => $type_token){
+
+                                $type_info = $mmrpg_database_types[$type_token];
+
+                                $light_colour = implode(', ', $type_info['type_colour_light']);
+                                $dark_colour = implode(', ', $type_info['type_colour_dark']);
+
+                                $star_type_labels[] = $type_info['type_name'];
+
+                                $star_total_kind_count = 0;
+                                $star_total_background = 'rgba('.$light_colour.', 1.0)';
+                                $star_total_border = 'rgba('.$dark_colour.', 1.0)';
+                                foreach ($star_kind_tokens AS $kind_token){
+
+                                    if ($kind_token == 'boss'){ $alpha = '0.5'; }
+                                    elseif ($kind_token == 'field'){ $alpha = '0.6'; }
+                                    elseif ($kind_token == 'fusion'){ $alpha = '0.7'; }
+                                    elseif ($kind_token == 'perfect-fusion'){ $alpha = '1.0'; }
+
+                                    $star_background = 'rgba('.$light_colour.', '.$alpha.')';
+                                    $star_border = 'rgba('.$dark_colour.', 1.0)';
+
+                                    $star_kind_count = !empty($this_star_kind_counts[$kind_token][$type_token]) ? $this_star_kind_counts[$kind_token][$type_token] : 0;
+                                    $star_total_kind_count += $star_kind_count;
+
+                                    $star_type_counts[$kind_token][] = $star_kind_count;
+                                    $star_type_backgrounds[$kind_token][] = $star_background;
+                                    $star_type_borders[$kind_token][] = $star_border;
+
+                                }
+
+                                $star_type_counts['all'][] = $star_total_kind_count;
+                                $star_type_backgrounds['all'][] = $star_total_background;
+                                $star_type_borders['all'][] = $star_total_border;
+
+                            }
+
+                            // Then we grab the data for the starforce-levels using least-to-most order
+                            foreach($sorted_type_tokens AS $type_key => $type_token){
+
+                                $type_info = $mmrpg_database_types[$type_token];
+
+                                $star_force = $this_star_force[$type_token];
+                                $star_force *= 10;
+
+                                $light_colour = implode(', ', $type_info['type_colour_light']);
+                                $dark_colour = implode(', ', $type_info['type_colour_dark']);
+
+                                $force_background = 'rgba('.$light_colour.', 0.9)';
+                                $force_border = 'rgba('.$dark_colour.', 1.0)';
+
+                                $star_force_labels[] = $type_info['type_name'];
+
+                                $force_type_counts[] = $star_force;
+                                $force_type_counts_total += $star_force;
+                                $force_type_backgrounds[] = $force_background;
+                                $force_type_borders[] = $force_border;
+
+                            }
+
+                            ?>
+
+                            <script type="text/javascript">
+                                var baseChartOptions = {
+                                    title: {
+                                        display: true,
+                                        text: '<title>'
+                                        },
+                                    legend: {
+                                        display: false,
+                                        },
+                                    scales: {
+                                        xAxes: [{
+                                            stacked:true,
+                                            ticks: {
+                                                beginAtZero:true
+                                                }
+                                            }],
+                                        yAxes: [{
+                                            stacked:true,
+                                            ticks: {
+                                                beginAtZero:true
+                                                }
+                                            }]
+                                        },
+                                    responsive: true,
+                                    maintainAspectRatio: false
+                                    };
+
+                            </script>
+
+                            <div class="chart_wrapper">
+                                <canvas class="chart_canvas" data-source="starData" width="350" height="180"></canvas>
+                                <script type="text/javascript">
+
+                                    var thisChartOptions = jQuery.extend(true, {}, baseChartOptions);
+                                    thisChartOptions.title.text = '<?= $this_battle_stars_count.' '.($this_battle_stars_count === 1 ? 'Star' : 'Stars') ?>';
+                                    thisChartOptions.tooltips = {
+                                        callbacks: {
+                                            title: function (tooltipItem, data) {
+                                                //console.log('-------------------------');
+                                                //console.log('TITLE');
+                                                //console.log('tooltipItem[0]', tooltipItem[0]);
+                                                //console.log('data.datasets', data.datasets);
+                                                //console.log('data.datasets[0].label', data.datasets[0].label);
+                                                var returnText = data.labels[tooltipItem[0].index];
+                                                //if (tooltipItem[0].datasetIndex == 0){ returnText += ' +1'; }
+                                                //else if (tooltipItem[0].datasetIndex == 1){ returnText += ' +1'; }
+                                                //else if (tooltipItem[0].datasetIndex == 2){ returnText += ' +2'; }
+                                                //console.log('returnText', returnText);
+                                                return returnText;
+                                                },
+                                            label: function(tooltipItems, data) {
+                                                //console.log('LABEL');
+                                                //console.log('tooltipItems', tooltipItems);
+                                                //console.log('data.datasets', data.datasets);
+                                                var returnText =  'x' + tooltipItems.yLabel + ' ' + data.datasets[tooltipItems.datasetIndex].label;
+                                                //console.log('returnText', returnText);
+                                                return returnText;
+                                                }
+                                            }
+                                        };
+                                    thisStarSettings.starData = {
+                                        type: 'bar',
+                                        data: {
+                                            labels: <?= json_encode($star_type_labels) ?>,
+                                            datasets: [{
+                                                label: 'Stars',
+                                                data: <?= json_encode($star_type_counts['all']) ?>,
+                                                backgroundColor: <?= json_encode($star_type_backgrounds['all']) ?>,
+                                                borderColor: <?= json_encode($star_type_borders['all']) ?>,
+                                                borderWidth: 1
+                                                }/*,{
+                                                label: 'Boss Stars',
+                                                data: <?= json_encode($star_type_counts['boss']) ?>,
+                                                backgroundColor: <?= json_encode($star_type_backgrounds['boss']) ?>,
+                                                borderColor: <?= json_encode($star_type_borders['boss']) ?>,
+                                                borderWidth: 1
+                                                },{
+                                                label: 'Field Stars',
+                                                data: <?= json_encode($star_type_counts['field']) ?>,
+                                                backgroundColor: <?= json_encode($star_type_backgrounds['field']) ?>,
+                                                borderColor: <?= json_encode($star_type_borders['field']) ?>,
+                                                borderWidth: 1
+                                                },{
+                                                label: 'Fusion Stars',
+                                                data: <?= json_encode($star_type_counts['perfect-fusion']) ?>,
+                                                backgroundColor: <?= json_encode($star_type_backgrounds['perfect-fusion']) ?>,
+                                                borderColor: <?= json_encode($star_type_borders['perfect-fusion']) ?>,
+                                                borderWidth: 1
+                                                },{
+                                                label: 'Fusion Star Halves',
+                                                data: <?= json_encode($star_type_counts['fusion']) ?>,
+                                                backgroundColor: <?= json_encode($star_type_backgrounds['fusion']) ?>,
+                                                borderColor: <?= json_encode($star_type_borders['fusion']) ?>,
+                                                borderWidth: 1
+                                                }*/]
+                                            },
+                                        options: thisChartOptions
+                                        };
+
+                                </script>
+                            </div>
+
+                            <div class="chart_wrapper">
+                                <canvas class="chart_canvas" data-source="forceData" width="350" height="180"></canvas>
+                                <script type="text/javascript">
+
+                                    var thisChartOptions = jQuery.extend(true, {}, baseChartOptions);
+                                    thisChartOptions.title.text = 'Starforce Levels';
+                                    thisStarSettings.forceData = {
+                                        type: 'bar',
+                                        data: {
+                                            labels: <?= json_encode($star_force_labels) ?>,
+                                            datasets: [{
+                                                label: 'Level',
+                                                data: <?= json_encode($force_type_counts) ?>,
+                                                backgroundColor: <?= json_encode($force_type_backgrounds) ?>,
+                                                borderColor: <?= json_encode($force_type_borders) ?>,
+                                                borderWidth: 1
+                                                }]
+                                            },
+                                        options: thisChartOptions
+                                        };
+
+                                </script>
+                            </div>
+
+                            <?
+
+                            //echo('<pre>$this_star_force = '.print_r($this_star_force, true).'</pre>');
+                            //echo('<pre>$this_star_force_strict = '.print_r($this_star_force_strict, true).'</pre>');
+
+                            ?>
 
                         </div>
                     </div>

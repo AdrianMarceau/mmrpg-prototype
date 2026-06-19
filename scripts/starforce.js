@@ -92,7 +92,71 @@ $(document).ready(function(){
         window.location.href = $(this).attr('href');
         });
 
-    // Define click events for the prev and next buttons
+    // Define the click events for the view toggle buttons in the header
+    let $viewToggle = $('.toggle[data-view]', thisPrototype);
+    let $viewContent = $('.content[data-view]', thisPrototype);
+    if ($viewToggle && $viewToggle.length
+        && $viewContent && $viewContent.length){
+        let switchContentView = function(newView){
+            let currentView = $viewContent.attr('data-view');
+            if (newView === currentView){ return; }
+            $viewToggle.attr('data-view', newView);
+            $viewContent.attr('data-view', newView);
+            };
+        $('.option[data-view]', $viewToggle).bind('click', function(){
+            let $option = $(this);
+            let view = $option.attr('data-view');
+            switchContentView(view);
+            });
+        }
+
+    // Define click events for the prev, next, and page buttons in the starlist
+    let $starList = $('.starlist', thisBody);
+    if (!$starList || !$starList.length){ $starList = null; }
+    let $starListPages = $starList ? $('.pages', $starList) : null;
+    if (!$starListPages || !$starListPages.length){ $starListPages = null; }
+    let $starListRobots = $starList ? $('.robots', $starList) : null;
+    if (!$starListRobots || !$starListRobots.length){ $starListRobots = null; }
+    if ($starList && $starListPages){
+        let showStarListPage = function(pageNum){
+            console.log('showStarListPage() w/ pageNum =', pageNum);
+            $starListPages.attr('data-current-page', pageNum);
+            $('a[data-page]', $starListPages).removeClass('active');
+            $starListPages.find('a[data-page="' + pageNum + '"]').addClass('active');
+            let numPerPage = $starListPages.is('[data-per-page]') ? parseInt($starListPages.attr('data-per-page')) : 1;
+            let minKey = (pageNum - 1) * numPerPage;
+            let maxKey = (pageNum * numPerPage) - 1;
+            $('.robot[data-key]', $starListRobots).each(function(){
+                let $robot = $(this);
+                let key = parseInt($robot.attr('data-key'));
+                if (key >= minKey && key <= maxKey){ $robot.removeClass('hidden'); }
+                else { $robot.addClass('hidden'); }
+                });
+            };
+        $('a[data-page]', $starListPages).bind('click', function(e){
+            e.preventDefault();
+            let $pageLink = $(this);
+            let pageNum = $pageLink.attr('data-page');
+            console.log('starlist page clicked, pageNum =', pageNum);
+            if (pageNum === 'prev' || pageNum === 'next'){
+                let shiftDirection = pageNum;
+                let currentPageNum = $starListPages.is('[data-current-page]') ? parseInt($starListPages.attr('data-current-page')) : 1;
+                let maxPageNum = (function(){ let $realPages = $('a[data-page]:not(.arrow)', $starListPages); return $realPages ? $realPages.length : 0; })();
+                let newPageNum = shiftDirection === 'prev' ? currentPageNum - 1 : currentPageNum + 1;
+                if (newPageNum < 1){ newPageNum = maxPageNum; }
+                else if (newPageNum > maxPageNum){ newPageNum = 1; }
+                console.log('moving', shiftDirection, 'from', currentPageNum, 'to', newPageNum);
+                showStarListPage(newPageNum);
+                }
+            else {
+                let newPageNum = parseInt(pageNum);
+                showStarListPage(newPageNum);
+                }
+            });
+
+        }
+
+    // Define click events for the prev and next arrow buttons in the starchart
     var groupLists = $('.starchart .grouplist', thisBody);
     $('.arrow[data-dir]', groupLists).bind('click', function(e){
         e.preventDefault();
