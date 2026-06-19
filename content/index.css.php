@@ -15,6 +15,7 @@ header('Pragma: public');
 
 // If there's already a locally-cached version of this file, grab that instead
 $cached_files_enabled = true;
+if (!empty($_REQUEST['refresh']) && $_REQUEST['refresh'] === 'true'){ $cached_files_enabled = false; }
 $cached_files_dir = MMRPG_CONFIG_ROOTDIR.'.cache/indexes/';
 $cached_date_cutoff = substr(MMRPG_CONFIG_CACHE_DATE, 0, 8);
 $cached_markup_file = 'cache.mmrpg-content-styles.css';
