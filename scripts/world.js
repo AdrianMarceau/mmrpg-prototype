@@ -1494,6 +1494,7 @@ class mmrpgWorldMap {
         let _elements = _self.elements;
         let _world = _self.state;
         let _worldCursor = _world.cursor;
+        let _worldPlayer = _world.player;
         let layerToken = 'terrain'; // TODO: make this dynamic maybe?
         let playerMobility = _config.playerMobility || 1;
         let activeTimeouts = {}, activeTimeoutDuration = _config.mapEffects.activeTimeout;
@@ -1529,7 +1530,33 @@ class mmrpgWorldMap {
             lastMouseClick = thisPos;
             if ($sideButtons.is('.active')){ $sideButtons.find('.button[data-action="dismiss"]').trigger('click'); }
             else if (sameAsCurrent){ _self.refreshMapPositionEvents(0, true); }
-            if (!tileIsWithinRange || sameAsLast || sameAsCurrent){ return false; }
+            //if (!tileIsWithinRange || sameAsLast || sameAsCurrent){ return false; }
+            // If the clicked tile is non-walkable or out of range, change direction to face it
+            if (!tileIsWithinRange){
+                if (!sameAsCurrent){
+                    // Calculate the difference between the clicked tile and the player's current tile
+                    let curPosXY = curPos.split('-');
+                    let thisPosXY = thisPos.split('-');
+                    let dx = parseInt(thisPosXY[0]) - parseInt(curPosXY[0]);
+                    let dy = parseInt(thisPosXY[1]) - parseInt(curPosXY[1]);
+                    // Determine X and Y direction strings
+                    let dirY = dy > 0 ? 'down' : (dy < 0 ? 'up' : '');
+                    let dirX = dx > 0 ? 'right' : (dx < 0 ? 'left' : '');
+                    // Combine them (e.g., 'down-right', 'up', 'left')
+                    let newDirection = (dirY && dirX) ? `${dirY}-${dirX}` : (dirY || dirX);
+                    // If the direction changed, update the cursor and force an in-place sprite update
+                    if (newDirection && _worldCursor.direction !== newDirection){
+                        _worldCursor.direction = newDirection;
+                        _worldPlayer.direction = newDirection;
+                        // Calling moveToPosition on the current tile with forceMove = true mimics the B-button!
+                        _self.playSoundEffect('land_mmv-gb');
+                        _self.moveToPosition(curPos, null, true);
+                        }
+                    }
+                return false; // Exit out of the click handler since we aren't actually moving
+                }
+            // Normal exit for walkable tiles that we don't want to re-trigger
+            if (sameAsLast || sameAsCurrent){ return false; }
             //console.log('%c' + 'Mouse click event triggered for position ' + thisPos + '!', 'color: orange;');
             if (!sameAsLast){
                 _self.playSoundEffect('glass-klink', {volume:0.5});
@@ -5222,6 +5249,16 @@ class mmrpgWorldMap {
             standingOnHazardEvent = true;
             }
 
+        // Check to see if the user is standing
+        let standingAtPosition = _worldCursor.position;
+        let lookingAtPosition = _self.getRelativePositionByDirection(_worldCursor.position, _worldCursor.direction);
+        //let isSamePosition = eventPosition === standingAtPosition;
+        //let isFacingPosition = eventPosition === lookingAtPosition;
+        //console.log('_worldCursor.position =', _worldCursor.position);
+        //console.log('_worldCursor.direction =', _worldCursor.direction);
+        //console.log('standingAtPosition =', standingAtPosition);
+        //console.log('lookingAtPosition =', lookingAtPosition);
+
         // Refresh the first event variables in case they've changed
         firstEvent = eventsAtPosition[0];
         firstEventType = firstEvent.kind;
@@ -5258,6 +5295,7 @@ class mmrpgWorldMap {
         let showActionArea = false;
         let showActionAreaType = '';
         let showActionAreaSound = '';
+        let showActionAreaAnyway = false;
         let actionAreaMarkup = '';
         let sideButtonsMarkup = '';
         let readyTeamSprites = false;
@@ -5453,6 +5491,7 @@ class mmrpgWorldMap {
                 //console.log('-> blockType:', blockType);
                 //console.log('-> blockWeaknesses:', blockWeaknesses);
                 showActionArea = true;
+                if (!standingOnHazardEvent){ showActionAreaAnyway = true; }
                 //var blockName = (dataType ? (dataType[0].toUpperCase() + dataType.slice(1) + ' ') : '') + 'Button';
                 //if (!dataLabel){ dataLabel = 'Button Options'; }
                 if (dataLabel){ actionAreaMarkup += '<strong class="label'+(dataType ? ' type '+dataType : '')+'"><span class="inner">' + dataLabel + '</span></strong>'; }
@@ -5512,7 +5551,7 @@ class mmrpgWorldMap {
                 //sideButtonsMarkup += '<a class="button big-button'+(blockKind2 ? ' '+blockKind2 : '')+''+(dataType ? ' type '+dataColour2 : '')+'" data-action="remove-block" data-block="'+dataBlock+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(blockKind2.replace('-', ' ')) + '</span></a>';
                 sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showActionAreaType = 'block';
-                zoomTimeoutDuration = 0; // if we show a block dropdown, we want to zoom in quickly
+                zoomTimeoutDuration = 300; // if we show a block dropdown, we want to zoom in quickly
                 }
             }
         else if (firstEventType === 'hazard'){
@@ -5529,12 +5568,14 @@ class mmrpgWorldMap {
             let hazardWeaknesses = hazardInfo.weaknesses ? hazardInfo.weaknesses : [];
             let hazardEffects = hazardInfo.effects ? hazardInfo.effects : [];
             let preventStartupHazard = !_worldCursor.moved && standingOnHazardEvent ? true : false;
+            //console.log('-> preventStartupHazard:', preventStartupHazard);
             if (dataHazard && hazardInfo && !preventStartupHazard && !playerIsCursor){
                 //console.log('-> found hazardInfo for ' + dataHazard + ':', hazardInfo);
                 //console.log('-> hazardType:', hazardType);
                 //console.log('-> hazardWeaknesses:', hazardWeaknesses);
                 //console.log('-> hazardEffects:', hazardEffects);
                 showActionArea = true;
+                if (!standingOnHazardEvent){ showActionAreaAnyway = true; }
                 //var hazardName = (dataColour ? (dataColour[0].toUpperCase() + dataColour.slice(1) + ' ') : '') + 'Button';
                 //if (!dataLabel){ dataLabel = 'Button Options'; }
                 if (dataLabel){ actionAreaMarkup += '<strong class="label'+(dataColour ? ' type '+dataColour : '')+'"><span class="inner">' + dataLabel + '</span></strong>'; }
@@ -5594,7 +5635,7 @@ class mmrpgWorldMap {
                 //sideButtonsMarkup += '<a class="button big-button'+(hazardKind2 ? ' '+hazardKind2 : '')+''+(dataColour2 ? ' type '+dataColour2 : '')+'" data-action="remove-hazard" data-hazard="'+dataHazard+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(hazardKind2.replace('-', ' ')) + '</span></a>';
                 sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 showActionAreaType = 'hazard';
-                zoomTimeoutDuration = 0; // if we show a hazard dropdown, we want to zoom in quickly
+                zoomTimeoutDuration = 300; // if we show a hazard dropdown, we want to zoom in quickly
                 // if we're standing on the hazard, make sure we also trigger the relevant effect
                 if (standingOnHazardEvent
                     && hazardInfo.action === 'trigger-effects'){
@@ -5766,7 +5807,7 @@ class mmrpgWorldMap {
                 showActionAreaType = 'battle';
                 //showActionAreaSound = 'background-spawn';
                 showActionAreaSound = 'mecha-taunt-sound' + (dataBattles.length > 1 ? '*'+dataBattles.length : '');
-                zoomTimeoutDuration = 1500; // otherwise if this is a battle we wait a moment
+                zoomTimeoutDuration = 1000; // otherwise if this is a battle we wait a moment
                 }
             }
         else if (firstEventType === 'item'){
@@ -6131,7 +6172,7 @@ class mmrpgWorldMap {
         // Define an inline function to zoom and show the dropdown which we'll call after a timeout
         let zoomAndShowDropdown = function(){
             //console.log('%c' + 'zoomAndShowDropdown()', 'color: cyan;');
-            if (_self.worldIsBusy()){ return; }
+            if (_self.worldIsBusy() && !showActionAreaAnyway){ return; }
             if (!stillAtPosition() || otherMenusActiveNow()){ return; }
 
             // Elevate the event sprite(s) to the zoom layer and add a zoom class to it so it's more visible
@@ -6788,18 +6829,22 @@ class mmrpgWorldMap {
 
         // Make the cursor shake so it trembles a bit before the encounter
         if (_selfRef.teamSpritesTimeout){ clearTimeout(_selfRef.teamSpritesTimeout); }
-        if (readyTeamSprites){ _selfRef.teamSpritesTimeout = setTimeout(getTeamSpritesReady, teamReadyDuration); }
+        if (readyTeamSprites){
+            //console.log('%c' + 'readyTeamSpritesFunction()', 'color: cyan;');
+            _selfRef.teamSpritesTimeout = setTimeout(getTeamSpritesReady, teamReadyDuration);
+            }
 
         // If an effect is being triggered, run it and then exit here
         if (triggerEffect){
             //console.log('%c' + 'triggerEffectFunction()', 'color: cyan;');
             if (_selfRef.zoomEffectTimeout){ clearTimeout(_selfRef.zoomEffectTimeout); }
             _selfRef.zoomEffectTimeout = setTimeout(triggerEffectFunction, (zoomTimeoutDuration * timeoutMultiplier));
-            if (!autoRedirect){ return true; }
+            if (!autoRedirect && !showActionArea){ return true; }
             }
 
         // If a redirect was requested, this is where we exit actually
         if (autoRedirect){
+            //console.log('%c' + 'autoRedirectFunction()', 'color: cyan;');
             if (_selfRef.zoomRedirectTimeout){ clearTimeout(_selfRef.zoomRedirectTimeout); }
             _selfRef.zoomRedirectTimeout = setTimeout(redirectToLocation, (zoomTimeoutDuration * timeoutMultiplier));
             if (!showActionArea){ return true; }
@@ -6807,6 +6852,7 @@ class mmrpgWorldMap {
 
         // Otherwise we can actually trigger the dropdown and zoom in on the events
         if (showActionArea){
+            //console.log('%c' + 'showActionAreaFunction()', 'color: cyan;');
             if (_selfRef.zoomDropdownTimeout){ clearTimeout(_selfRef.zoomDropdownTimeout); }
             _selfRef.zoomDropdownTimeout = setTimeout(zoomAndShowDropdown, (zoomTimeoutDuration * timeoutMultiplier));
             return true;
