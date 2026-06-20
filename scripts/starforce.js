@@ -119,7 +119,7 @@ $(document).ready(function(){
     if (!$starListRobots || !$starListRobots.length){ $starListRobots = null; }
     if ($starList && $starListPages){
         let showStarListPage = function(pageNum){
-            console.log('showStarListPage() w/ pageNum =', pageNum);
+            //console.log('showStarListPage() w/ pageNum =', pageNum);
             $starListPages.attr('data-current-page', pageNum);
             $('a[data-page]', $starListPages).removeClass('active');
             $starListPages.find('a[data-page="' + pageNum + '"]').addClass('active');
@@ -137,7 +137,7 @@ $(document).ready(function(){
             e.preventDefault();
             let $pageLink = $(this);
             let pageNum = $pageLink.attr('data-page');
-            console.log('starlist page clicked, pageNum =', pageNum);
+            //console.log('starlist page clicked, pageNum =', pageNum);
             if (pageNum === 'prev' || pageNum === 'next'){
                 let shiftDirection = pageNum;
                 let currentPageNum = $starListPages.is('[data-current-page]') ? parseInt($starListPages.attr('data-current-page')) : 1;
@@ -145,7 +145,7 @@ $(document).ready(function(){
                 let newPageNum = shiftDirection === 'prev' ? currentPageNum - 1 : currentPageNum + 1;
                 if (newPageNum < 1){ newPageNum = maxPageNum; }
                 else if (newPageNum > maxPageNum){ newPageNum = 1; }
-                console.log('moving', shiftDirection, 'from', currentPageNum, 'to', newPageNum);
+                //console.log('moving', shiftDirection, 'from', currentPageNum, 'to', newPageNum);
                 showStarListPage(newPageNum);
                 }
             else {

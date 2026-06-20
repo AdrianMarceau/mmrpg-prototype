@@ -432,7 +432,7 @@ function temp_combination_number($k,$n){
                                     echo(print_starlist_omega_robot($robot, $robot_key, ($robot_key < $bosses_per_page)));
                                     $robot_key++;
                                 }
-                                error_log('$game_counts = '.print_r($game_counts, true));
+                                //error_log('$game_counts = '.print_r($game_counts, true));
                                 ?>
                             </ul>
                         </div>
@@ -625,7 +625,7 @@ function temp_combination_number($k,$n){
                                                     echo '<a data-side-key="'.$side_key.'" data-top-key="'.$top_key.'" data-click-tooltip="'.$temp_star_title.'" data-tooltip-type="field_type field_type_'.$temp_field_type_1.(!empty($temp_field_type_2) && ($temp_field_type_1 != $temp_field_type_2) ? '_'.$temp_field_type_2 : '').'" class="sprite sprite_40x40 sprite_star '.($is_visible ? 'visible' : '').'" style="">';
                                                         echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_'.$temp_star_back['frame'].'" style="background-image: url('.$temp_star_back['path'].'); z-index: 10;">&nbsp;</div>';
                                                         echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_'.$temp_star_back['frame'].'" style="background-image: url('.$temp_star_back['path'].'); z-index: 8;">&nbsp;</div>';
-                                                    echo '</a>';
+                                                    echo '</a>'."\n";
 
                                                 }
                                                 // Otherwise, print out an empty star placeholder
@@ -636,7 +636,7 @@ function temp_combination_number($k,$n){
                                                     echo '<a data-side-key="'.$side_key.'" data-top-key="'.$top_key.'" data-tooltip-type="field_type field_type_empty" class="sprite sprite_40x40 sprite_star empty_star '.($is_visible ? 'visible' : '').'" style="">';
                                                         echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_00" style="">&nbsp;</div>';
                                                         echo '<div class="sprite sprite_40x40 sprite_40x40_left sprite_40x40_left_00" style="">&nbsp;</div>';
-                                                    echo '</a>';
+                                                    echo '</a>'."\n";
 
                                                 }
 
@@ -665,6 +665,9 @@ function temp_combination_number($k,$n){
                             </a>
 
                             <?
+
+                            // Create an image helper for colour stuff
+                            $cms_image = new cms_image();
 
                             // Collect the data for this type chart
                             $star_type_labels = array();
@@ -715,31 +718,46 @@ function temp_combination_number($k,$n){
                                 $star_total_border = 'rgba('.$dark_colour.', 1.0)';
                                 foreach ($star_kind_tokens AS $kind_token){
 
-                                    if ($kind_token == 'boss'){ $alpha = '0.5'; }
-                                    elseif ($kind_token == 'field'){ $alpha = '0.6'; }
+                                    /*
+                                    if ($kind_token == 'boss'){ $alpha = '1.0'; }
+                                    elseif ($kind_token == 'field'){ $alpha = '0.9'; }
+                                    elseif ($kind_token == 'perfect-fusion'){ $alpha = '0.8'; }
                                     elseif ($kind_token == 'fusion'){ $alpha = '0.7'; }
-                                    elseif ($kind_token == 'perfect-fusion'){ $alpha = '1.0'; }
 
                                     $star_background = 'rgba('.$light_colour.', '.$alpha.')';
+                                    $star_border = 'rgba('.$dark_colour.', 1.0)';
+                                    */
+
+                                    if ($kind_token == 'boss'){ $darken = 0; }
+                                    elseif ($kind_token == 'field'){ $darken = 10; }
+                                    elseif ($kind_token == 'perfect-fusion'){ $darken = 20; }
+                                    elseif ($kind_token == 'fusion'){ $darken = 40; }
+                                    //error_log('$light_colour = '.print_r($light_colour, true));
+                                    $adjusted_bar_colour = $cms_image->colour_darken(explode(',', $light_colour), $darken);
+                                    //error_log('$adjusted_bar_colour = '.print_r($adjusted_bar_colour, true));
+                                    $adjusted_bar_colour = implode(',', array($adjusted_bar_colour[0], $adjusted_bar_colour[1], $adjusted_bar_colour[2]));
+                                    //error_log('$adjusted_bar_colour = '.print_r($adjusted_bar_colour, true));
+
+                                    $star_background = 'rgba('.$adjusted_bar_colour.', 1.0)';
                                     $star_border = 'rgba('.$dark_colour.', 1.0)';
 
                                     $star_kind_count = !empty($this_star_kind_counts[$kind_token][$type_token]) ? $this_star_kind_counts[$kind_token][$type_token] : 0;
                                     $star_total_kind_count += $star_kind_count;
 
-                                    $star_type_counts[$kind_token][] = $star_kind_count;
+                                    $star_type_counts[$kind_token][] = !empty($star_kind_count) ? $star_kind_count : null;
                                     $star_type_backgrounds[$kind_token][] = $star_background;
                                     $star_type_borders[$kind_token][] = $star_border;
 
                                 }
 
-                                $star_type_counts['all'][] = $star_total_kind_count;
+                                $star_type_counts['all'][] = !empty($star_total_kind_count) ? $star_total_kind_count : null;
                                 $star_type_backgrounds['all'][] = $star_total_background;
                                 $star_type_borders['all'][] = $star_total_border;
 
                             }
 
                             // Then we grab the data for the starforce-levels using least-to-most order
-                            foreach($sorted_type_tokens AS $type_key => $type_token){
+                            foreach($ordered_type_tokens AS $type_key => $type_token){
 
                                 $type_info = $mmrpg_database_types[$type_token];
 
@@ -786,13 +804,15 @@ function temp_combination_number($k,$n){
                                                 }
                                             }]
                                         },
+                                    skipNull: true,
                                     responsive: true,
-                                    maintainAspectRatio: false
+                                    maintainAspectRatio: false,
+                                    borderSkipped: 'bottom',
                                     };
 
                             </script>
 
-                            <div class="chart_wrapper">
+                            <div class="chart_wrapper star_totals">
                                 <canvas class="chart_canvas" data-source="starData" width="350" height="180"></canvas>
                                 <script type="text/javascript">
 
@@ -827,45 +847,45 @@ function temp_combination_number($k,$n){
                                         type: 'bar',
                                         data: {
                                             labels: <?= json_encode($star_type_labels) ?>,
-                                            datasets: [{
+                                            datasets: [/*{
                                                 label: 'Stars',
                                                 data: <?= json_encode($star_type_counts['all']) ?>,
                                                 backgroundColor: <?= json_encode($star_type_backgrounds['all']) ?>,
                                                 borderColor: <?= json_encode($star_type_borders['all']) ?>,
                                                 borderWidth: 1
-                                                }/*,{
+                                                },*/{
                                                 label: 'Boss Stars',
                                                 data: <?= json_encode($star_type_counts['boss']) ?>,
                                                 backgroundColor: <?= json_encode($star_type_backgrounds['boss']) ?>,
                                                 borderColor: <?= json_encode($star_type_borders['boss']) ?>,
-                                                borderWidth: 1
+                                                borderWidth: 0,
                                                 },{
                                                 label: 'Field Stars',
                                                 data: <?= json_encode($star_type_counts['field']) ?>,
                                                 backgroundColor: <?= json_encode($star_type_backgrounds['field']) ?>,
                                                 borderColor: <?= json_encode($star_type_borders['field']) ?>,
-                                                borderWidth: 1
+                                                borderWidth: 0,
                                                 },{
                                                 label: 'Fusion Stars',
                                                 data: <?= json_encode($star_type_counts['perfect-fusion']) ?>,
                                                 backgroundColor: <?= json_encode($star_type_backgrounds['perfect-fusion']) ?>,
                                                 borderColor: <?= json_encode($star_type_borders['perfect-fusion']) ?>,
-                                                borderWidth: 1
+                                                borderWidth: 0,
                                                 },{
                                                 label: 'Fusion Star Halves',
                                                 data: <?= json_encode($star_type_counts['fusion']) ?>,
                                                 backgroundColor: <?= json_encode($star_type_backgrounds['fusion']) ?>,
                                                 borderColor: <?= json_encode($star_type_borders['fusion']) ?>,
-                                                borderWidth: 1
-                                                }*/]
+                                                borderWidth: 0,
+                                                }]
                                             },
-                                        options: thisChartOptions
+                                        options: thisChartOptions,
                                         };
 
                                 </script>
                             </div>
 
-                            <div class="chart_wrapper">
+                            <div class="chart_wrapper star_forces">
                                 <canvas class="chart_canvas" data-source="forceData" width="350" height="180"></canvas>
                                 <script type="text/javascript">
 

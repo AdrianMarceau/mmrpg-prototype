@@ -891,6 +891,12 @@
     width: 50%;
     height: 360px;
 }
+#prototype .content.fullsize .starforce .chart_wrapper.star_totals {
+    width: 55%;
+}
+#prototype .content.fullsize .starforce .chart_wrapper.star_forces {
+    width: 45%;
+}
 #prototype .content.xforce .starforce .size_toggle span.maximize {
     display: none;
 }
