@@ -2669,7 +2669,8 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
         volume: musicBaseVolume,
         loop: isPlayOnce ? false : true,
         onplay: onplayFunction,
-        onend: onendFunction
+        onend: onendFunction,
+        html5: false,
         };
     //console.log('musicMeta =', musicMeta);
     if (musicMeta !== false
@@ -2896,8 +2897,8 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             volume: 1.0,
             rate: 1.0,
             loop: false,
-            html5: true,
-            html5PoolSize: 3,
+            html5: false,
+            //html5PoolSize: 3,
             });
         gameSettings.soundEffectPool[soundEffectPoolKey] = {
             key: soundEffectPoolKey,
