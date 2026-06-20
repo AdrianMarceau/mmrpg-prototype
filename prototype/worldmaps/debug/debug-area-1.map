@@ -125,7 +125,7 @@
 #---------------------------#
 # SUBSPACE BUTTON + EVENTS
 #---------------------------
-@bosses[]    = subspace-portal-boss(19-28, trill, 3, speed)
+@bosses[]    = subspace-portal-boss(19-28, trill, 10, speed)
 @items[]     = subspace-light-heart(19-29, light-heart__2)
 @buttons[]   = subspace-button(19-30, purple, up, set-group-terrain, subspace-path, subspace)
 @groups[]    = subspace-path(14-24...14-28, 15-28)
