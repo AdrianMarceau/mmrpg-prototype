@@ -32,14 +32,20 @@
 #---------------------------#
 @bosses[]    = roaming-boss-1(6-12, oil-man)
 @bosses[]    = roaming-boss-2(23-7, heat-man)
-@bosses[]    = roaming-boss-3(31-12, charge-man)
 @bosses[]    = roaming-boss-4(42-4, pharaoh-man)
+@bosses[]    = roaming-boss-3(31-12, charge-man)
 @bosses[]    = roaming-boss-5(43-13, solar-man)
 #---------------------------#
-@items[]     = light-heart-3(5-13, light-heart__3)
-@items[]     = light-heart-4(23-6, light-heart__4)
-@items[]     = light-heart-5(34-7, light-heart__5)
-@items[]     = light-heart-6(44-7, light-heart__6)
+@items[]     = fallen-star-1(6-12, earth-star, oil-man)
+@items[]     = fallen-star-2(23-7, flame-star, heat-man)
+@items[]     = fallen-star-3(42-4, flame-star, pharaoh-man)
+@items[]     = fallen-star-4(31-12, swift-star, charge-man)
+@items[]     = fallen-star-5(43-13, flame-star, solar-man)
+#---------------------------#
+#@items[]     = light-heart-3(5-13, light-heart__3)
+#@items[]     = light-heart-4(23-6, light-heart__4)
+#@items[]     = light-heart-5(34-7, light-heart__5)
+#@items[]     = light-heart-6(44-7, light-heart__6)
 #---------------------------#
 @hazards[]    = oil-hazard-01(5-8, crude-oil)
 @hazards[]    = oil-hazard-02(6-8, crude-oil)
