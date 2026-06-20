@@ -22,8 +22,11 @@
 @groups[]     = no-encounters_da1-exit-buffer(15-3...20-5)
 @groups[]     = no-encounters_da1w2-exit-buffer(3-9...5-11)
 #---------------------------#
-@bosses[]    = upper-boss(6-4, drill-man)
-@bosses[]    = lower-boss(15-10, ground-man)
+@bosses[]    = roamin-boss-1(6-4, drill-man)
+@bosses[]    = roaming-boss-2(15-10, ground-man)
+#---------------------------#
+@items[]    = boss-star-1(6-4, earth-star, drill-man)
+@items[]    = boss-star-2(15-10, earth-star, ground-man)
 #---------------------------#
 @events[]    = wily-platform-left(5-2, wilypad-left, any, drop-zone, item:wily-program, activate-player-platform)
 @events[]    = wily-platform-middle(6-2, wilypad-middle, any, drop-zone, item:wily-heart, activate-player-platform)

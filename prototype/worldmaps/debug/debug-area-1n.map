@@ -22,9 +22,13 @@
 #---------------------------#
 @encounters   = curlinger,frosty-throwman,tel-tel
 #---------------------------#
-@bosses[]     = south-spawn-boss(8-13, ice-man)
-@bosses[]     = north-west-boss(4-4, blizzard-man)
-@bosses[]     = north-east-boss(12-4, frost-man)
+@bosses[]     = roaming-boss-1(8-13, ice-man)
+@bosses[]     = roaming-boss-2(4-4, blizzard-man)
+@bosses[]     = roaming-boss-3(12-4, frost-man)
+#---------------------------#
+@items[]     = boss-star-1(8-13, freeze-star, ice-man)
+@items[]     = boss-star-2(4-4, freeze-star, blizzard-man)
+@items[]     = boss-star-3(12-4, freeze-star, frost-man)
 #---------------------------#
 @events[]    = cossack-platform-left(7-3, cossackpad-left, any, drop-zone, item:cossack-program, activate-player-platform)
 @events[]    = cossack-platform-middle(8-3, cossackpad-middle, any, drop-zone, item:cossack-heart, activate-player-platform)

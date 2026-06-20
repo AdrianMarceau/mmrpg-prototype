@@ -43,6 +43,13 @@
 @bosses[]     = roaming-boss-5(5-26, dynamo-man)
 @bosses[]     = roaming-boss-6(4-34, plug-man)
 #---------------------------#
+@items[]     = boss-star-1(4-3, electric-star, elec-man)
+@items[]     = boss-star-2(5-6, electric-star, bright-man)
+@items[]     = boss-star-3(5-10, electric-star, fuse-man)
+@items[]     = boss-star-4(4-16, electric-star, spark-man)
+@items[]     = boss-star-5(5-26, electric-star, dynamo-man)
+@items[]     = boss-star-6(4-34, electric-star, plug-man)
+#---------------------------#
 @hazards[]    = cloud-hazard-01(4-36, woolly-clouds)
 @hazards[]    = cloud-hazard-02(3-30, woolly-clouds)
 @hazards[]    = cloud-hazard-03(5-30, woolly-clouds)

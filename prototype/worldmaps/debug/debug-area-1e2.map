@@ -34,11 +34,17 @@
 @habitats[] = air-stone(ground)
 @habitats[] = robo-fishtot(water)
 #---------------------------#
-@bosses[]   = north-dam-boss(8-6, concrete-man)
-@bosses[]   = south-dam-boss(8-12, guts-man)
-@bosses[]   = west-dam-boss(6-9, pump-man)
-@bosses[]   = east-dam-boss(10-9, wave-man)
-@bosses[]   = lower-grounds-boss(8-19, block-man)
+@bosses[]   = roaming-boss-1(8-6, concrete-man)
+@bosses[]   = roaming-boss-2(8-12, guts-man)
+@bosses[]   = roaming-boss-3(6-9, pump-man)
+@bosses[]   = roaming-boss-4(10-9, wave-man)
+@bosses[]   = roaming-boss-5(8-19, block-man)
+#---------------------------#
+@items[]   = boss-star-1(8-6, earth-star, concrete-man)
+@items[]   = boss-star-2(8-12, impact-star, guts-man)
+@items[]   = boss-star-3(6-9, water-star, pump-man)
+@items[]   = boss-star-4(10-9, water-star, wave-man)
+@items[]   = boss-star-5(8-19, earth-star, block-man)
 #---------------------------#
 @groups[]    = entrance-area(1-11, 2-11, 3-11, 2-10, 2-12)
 @groups[]    = no-encounters(entrance-area)
