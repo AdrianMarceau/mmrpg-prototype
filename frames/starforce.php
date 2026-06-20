@@ -61,6 +61,12 @@ $rpg_fields_index_tokens = array_keys($rpg_fields_index);
 //error_log('$rpg_fields_index_tokens = '.print_r($rpg_fields_index_tokens, true));
 
 //error_log('$this_battle_stars = '.print_r($this_battle_stars, true));
+//error_log('$this_star_kind_counts = '.print_r($this_star_kind_counts, true));
+// Check if the user has unlocked any boss or any field/fusion stars beforehand
+$user_has_boss_stars = !empty($this_star_kind_counts['boss']) ? true : false;
+$user_has_field_stars = !empty($this_star_kind_counts['field']) ? true : false;
+$user_has_fusion_stars = !empty($this_star_kind_counts['fusion']) || !empty($this_star_kind_counts['perfect-fusion']) ? true : false;
+$hide_field_fusion_stars = !$user_has_field_stars && !$user_has_fusion_stars ? true : false;
 
 // Collect all the robots that have been unlocked by the player
 $rpg_robots_encountered = array();
@@ -390,8 +396,8 @@ function temp_combination_number($k,$n){
                     $num_boss_pages = ceil($temp_boss_stars_total / $bosses_per_page);
                     $current_boss_page = 1;
                     ?>
-                    <div class="container starlist">
-                        <strong class="title">Boss Stars</strong>
+                    <div class="container starlist<?= !$user_has_boss_stars ? ' none-found' : ''?><?= $hide_field_fusion_stars ? ' fullsize' : '' ?>">
+                        <strong class="title"><?= $user_has_boss_stars || !$hide_field_fusion_stars ? 'Boss Stars' : '???' ?></strong>
                         <div class="wrapper">
                             <div class="pages" data-per-page="<?= $bosses_per_page ?>" data-current-page="<?= $current_boss_page ?>">
                                 <a class="arrow prev" data-page="prev"></a>
@@ -421,7 +427,8 @@ function temp_combination_number($k,$n){
                                     }
                                     $game_counts[$last_game]++;
                                     if ($last_game_changed
-                                        && $last_game_count < $bosses_per_row){
+                                        && $last_game_count < $bosses_per_row
+                                        && !$hide_field_fusion_stars){
                                         $spacers_required = $bosses_per_row - $last_game_count;
                                         //error_log('$last_game_changed | $last_game_count '.$last_game_count.' | $spacers_required = '.$spacers_required);
                                         for ($i = 0; $i < $spacers_required; $i++){
@@ -438,8 +445,8 @@ function temp_combination_number($k,$n){
                         </div>
                     </div>
 
-                    <div class="container starchart">
-                        <strong class="title">Field / Fusion Stars</strong>
+                    <div class="container starchart<?= !$user_has_field_stars && !$user_has_fusion_stars ? ' none-found' : ''?><?= $hide_field_fusion_stars ? ' hidden' : '' ?>">
+                        <strong class="title"><?= $user_has_field_stars || $user_has_fusion_stars ? 'Field / Fusion Stars' : '???' ?></strong>
                         <div class="wrapper">
 
                             <div class="corner">
@@ -482,25 +489,6 @@ function temp_combination_number($k,$n){
                                     ob_start();
                                     ?>
                                     <div class="group <?= $group_current ? 'current' : '' ?>" data-group="<?= $group_token ?>" data-size="<?= $group_size ?>">
-                                        <? /*
-                                        <ul class="options robots">
-                                            <?
-                                            // Loop through and print omega robots
-                                            foreach ($group_omega AS $key2 => $omega){
-                                                $omega_robot = $omega['robot'];
-                                                $omega_field = $omega['field'];
-                                                $omega_cell = print_starchart_omega_robot($omega, $chart_keys_counter, $bar_kind);
-                                                if ($group_current){ $chart_keys_visible[$bar_kind][] = $chart_keys_counter; }
-                                                ?>
-                                                <li class="option robot">
-                                                    <?= $omega_cell ?>
-                                                </li>
-                                                <?
-                                                $chart_keys_counter++;
-                                            }
-                                            ?>
-                                        </ul>
-                                        */ ?>
                                         <ul class="options fields">
                                             <?
                                             // Loop through and print omega fields
@@ -543,7 +531,7 @@ function temp_combination_number($k,$n){
                                     <?php
 
                                     // Loop through all the field stars and print them out one-by-one
-                                    if (!empty($this_battle_stars)){
+                                    if (!empty($temp_omega_factors_unlocked)){ //!empty($this_battle_stars)
 
                                         // Define the minimum grid size (rows/columns)
                                         $grid_size = 8;
@@ -866,13 +854,13 @@ function temp_combination_number($k,$n){
                                                 borderColor: <?= json_encode($star_type_borders['field']) ?>,
                                                 borderWidth: 0,
                                                 },{
-                                                label: 'Fusion Stars',
+                                                label: 'Fusion Stars (Perfect)',
                                                 data: <?= json_encode($star_type_counts['perfect-fusion']) ?>,
                                                 backgroundColor: <?= json_encode($star_type_backgrounds['perfect-fusion']) ?>,
                                                 borderColor: <?= json_encode($star_type_borders['perfect-fusion']) ?>,
                                                 borderWidth: 0,
                                                 },{
-                                                label: 'Fusion Star Halves',
+                                                label: 'Fusion Stars (Mixed)',
                                                 data: <?= json_encode($star_type_counts['fusion']) ?>,
                                                 backgroundColor: <?= json_encode($star_type_backgrounds['fusion']) ?>,
                                                 borderColor: <?= json_encode($star_type_borders['fusion']) ?>,
