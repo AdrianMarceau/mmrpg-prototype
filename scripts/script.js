@@ -238,7 +238,7 @@ $(document).ready(function(){
                 $thisElement.attr('data-backup-title', thisTitle).removeAttr('title');
                 let messageMarkup = '<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>';
                 if (!$tooltip.length){
-                    $('<p id="mmrpg-tooltip" class="tooltip '+thisTooltipClass+'">' + messageMarkup + '</p>').appendTo(mmrpgBody);
+                    $('<div id="mmrpg-tooltip" class="tooltip '+thisTooltipClass+'">' + messageMarkup + '</div>').appendTo(mmrpgBody);
                     $tooltip = $('#mmrpg-tooltip', mmrpgBody);
                     } else {
                     $tooltip.removeClass().addClass('tooltip '+thisTooltipClass).empty().html(messageMarkup);
