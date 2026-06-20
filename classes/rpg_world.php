@@ -3520,6 +3520,7 @@ class rpg_world {
                 $label = $info['item_name'];
                 $class = $token.($animated  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 if ($subclass === 'event'){ $class .= ' always-zoom'; }
+                elseif (strstr($token, '-star')){ $class .= ' always-zoom'; $z_index -= 2; }
                 elseif (strstr($token, '-core') && $anchored){ $class .= ' always-zoom'; }
                 $colour = !empty($subtypes) ? implode(' ', array_filter($subtypes)) : '';
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
