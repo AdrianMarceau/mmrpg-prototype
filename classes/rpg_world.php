@@ -3021,16 +3021,16 @@ class rpg_world {
                 'effects' => array('lower-team-energy', 10)
                 ),
             // Mid-Game
-            'bramble-patch' => array(
-                'name' => 'Bramble Patch',
-                'type' => 'nature',
-                'weaknesses' => array('flame', 'cutter'),
-                'effects' => array('lower-team-attack', 2)
-                ),
             'toxic-sludge' => array(
                 'name' => 'Toxic Sludge',
                 'type' => 'shadow',
                 'weaknesses' => array('water', 'crystal'),
+                'effects' => array('lower-team-attack', 2)
+                ),
+            'bramble-patch' => array(
+                'name' => 'Bramble Patch',
+                'type' => 'nature',
+                'weaknesses' => array('flame', 'cutter'),
                 'effects' => array('lower-team-defense', 2)
                 ),
             'shifting-sands' => array(

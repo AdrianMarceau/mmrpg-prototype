@@ -700,12 +700,12 @@ html, body {
 #world #map .sprite.hazard.frozen-foothold { background-position: -1000px -840px; animation: sprite-hazard-frozen-foothold 1.2s steps(1) infinite; }
 #world #map .sprite.hazard.flame-pillar { background-position: -1080px -840px; animation: sprite-hazard-flame-pillar 1.0s steps(1) infinite; }
 
-@keyframes sprite-hazard-bramble-patch { 0%, 100% { background-position: -840px -1000px; } 50% { background-position: -840px -1080px;  }  }
-@keyframes sprite-hazard-toxic-sludge { 0%, 100% { background-position: -920px -1000px; } 50% { background-position: -920px -1080px;  }  }
+@keyframes sprite-hazard-bramble-patch { 0%, 100% { background-position: -920px -1000px; } 50% { background-position: -920px -1080px;  }  }
+@keyframes sprite-hazard-toxic-sludge { 0%, 100% { background-position: -840px -1000px; } 50% { background-position: -840px -1080px;  }  }
 @keyframes sprite-hazard-shifting-sands { 0%, 100% { background-position: -1000px -1000px; } 50% { background-position: -1000px -1080px;  }  }
 @keyframes sprite-hazard-woolly-clouds { 0%, 100% { background-position: -1080px -1000px; } 50% { background-position: -1080px -1080px;  }  }
-#world #map .sprite.hazard.bramble-patch { background-position: -840px -1000px; animation: sprite-hazard-bramble-patch 0.6s steps(1) infinite; }
-#world #map .sprite.hazard.toxic-sludge { background-position: -920px -840-1000pxpx; animation: sprite-hazard-toxic-sludge 0.8s steps(1) infinite; }
+#world #map .sprite.hazard.bramble-patch { background-position: -920px -1000px; animation: sprite-hazard-bramble-patch 0.8s steps(1) infinite; }
+#world #map .sprite.hazard.toxic-sludge { background-position: -840px -1000px; animation: sprite-hazard-toxic-sludge 0.6s steps(1) infinite; }
 #world #map .sprite.hazard.shifting-sands { background-position: -1000px -1000px; animation: sprite-hazard-shifting-sands 1.2s steps(1) infinite; }
 #world #map .sprite.hazard.woolly-clouds { background-position: -1080px -1000px; animation: sprite-hazard-woolly-clouds 1.0s steps(1) infinite; }
 
