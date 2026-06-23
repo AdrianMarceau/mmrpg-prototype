@@ -5,6 +5,7 @@ require_once(dirname(dirname(__FILE__)).'/top.php');
 
 // If the return value was set explicitly as javascript, update headers
 $return_type = !empty($_REQUEST['return']) && is_string($_REQUEST['return']) ? $_REQUEST['return'] : 'default';
+$force_refresh = !empty($_REQUEST['refresh']) && $_REQUEST['refresh'] === 'true' ? true : false;
 if ($return_type === 'javascript'){
     // Explicitly set the content type as javascript
     header('Content-type: text/javascript;');
@@ -21,7 +22,8 @@ $cached_files_dir = MMRPG_CONFIG_ROOTDIR.'.cache/indexes/';
 $cached_date_cutoff = substr(MMRPG_CONFIG_CACHE_DATE, 0, 8);
 $cached_sound_effects_index = 'cache.game-sound-effects_index.json';
 $cached_sound_effects_aliases_index = 'cache.game-sound-effects-aliases_index.json';
-if ($cached_files_enabled
+if (!$force_refresh
+    && $cached_files_enabled
     && file_exists($cached_files_dir.$cached_sound_effects_index)
     && date('Ymd', filemtime($cached_files_dir.$cached_sound_effects_index)) >= $cached_date_cutoff){
     //error_log(basename(__FILE__).' is pulling sound effects index from cache !');
