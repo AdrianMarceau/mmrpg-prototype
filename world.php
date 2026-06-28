@@ -125,6 +125,7 @@ $mmrpg_index_players = rpg_player::get_index(true);
 $mmrpg_index_robots = rpg_robot::get_index(true);
 $mmrpg_index_abilities = rpg_ability::get_index(true);
 $mmrpg_index_items = rpg_item::get_index(true);
+$mmrpg_index_stars = rpg_world::get_stars_index();
 $mmrpg_index_blocks = rpg_world::get_static_blocks_index();
 $mmrpg_index_hazards = rpg_world::get_static_hazards_index();
 $mmrpg_indexes = array(
@@ -134,6 +135,7 @@ $mmrpg_indexes = array(
     'robots' => &$mmrpg_index_robots,
     'abilities' => &$mmrpg_index_abilities,
     'items' => &$mmrpg_index_items,
+    'stars' => &$mmrpg_index_stars,
     'blocks' => &$mmrpg_index_blocks,
     'hazards' => &$mmrpg_index_hazards,
     );
@@ -326,6 +328,22 @@ if (empty($this_prototype_data['this_player_items_index'])){
     }
     $this_prototype_data['this_player_items_index'] = $this_player_items_index;
     //error_log('$this_player_items_index(new) = '. print_r($this_player_items_index, true));
+}
+
+// Collect the user's list of collects stars so we know what we already have and their metadata (all players share)
+$unlocked_player_stars = rpg_world::get_battle_stars();
+if (empty($this_prototype_data['this_player_stars_index'])){
+    $this_player_stars_index = array();
+    if (!empty($unlocked_player_stars)){
+        //error_log('$unlocked_player_stars = '. print_r($unlocked_player_stars, true));
+        $new_stars_index = array();
+        foreach ($unlocked_player_stars AS $star_token => $star_data){
+            $new_stars_index[$star_token] = !empty($star_data['star_date']) ? $star_data['star_date'] : true;
+            }
+        $this_player_stars_index = array_merge($this_player_stars_index, $new_stars_index);
+    }
+    $this_prototype_data['this_player_stars_index'] = $this_player_stars_index;
+    //error_log('$this_player_stars_index(new) = '. print_r($this_player_stars_index, true));
 }
 
 // Update the player's mobility with any character-specific bonuses or contextual modifiers
@@ -773,6 +791,7 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
     _worldConfig.playerRobots = <?= json_encode($this_prototype_data['this_player_robots'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerAbilities = <?= json_encode($this_prototype_data['this_player_abilities'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerItemsIndex = <?= json_encode($this_prototype_data['this_player_items_index'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerStarsIndex = <?= json_encode($this_prototype_data['this_player_stars_index'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerRobotsIndex = <?= json_encode($this_prototype_data['this_player_robots_index'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerRobotsLimit = <?= json_encode($this_prototype_data['this_player_robots_limit'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility'], JSON_NUMERIC_CHECK) ?>;
@@ -789,6 +808,7 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
         _worldIndexes.abilities = typeof mmrpgIndex.abilities !== 'undefined' ? mmrpgIndex.abilities : {};
         _worldIndexes.items = typeof mmrpgIndex.items !== 'undefined' ? mmrpgIndex.items : {};
         _worldIndexes.fields = typeof mmrpgIndex.fields !== 'undefined' ? mmrpgIndex.fields : {};
+        _worldIndexes.stars = typeof mmrpgIndex.stars !== 'undefined' ? mmrpgIndex.stars : {};
         gameSettings.worldIndexes = mmrpgIndex;
         }
     // Define any additional map settings or flags that are more contextual

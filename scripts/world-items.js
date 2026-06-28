@@ -34,6 +34,17 @@ function itemIsHoldable(itemToken){
     else if (_self.itemIsConsumable(itemToken)){ return true;  }
     return false;
     }
+// Define a quick function for checking if a given item (by token) is holdable
+function itemIsStarforce(itemToken){
+    //console.log('%c' + 'mmrpgWorldMap.itemIsStarforce(' + itemToken + ')', 'color: magenta;');
+    if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('itemIsHoldable() missing required itemToken!'); return false; }
+    let _self = this;
+    let _indexes = _self.indexes;
+    let _mmrpgItemsIndex = _indexes.items;
+    if (itemToken.indexOf('__') !== -1){ itemToken = itemToken.split('__')[0]; }
+    if (itemToken.match(/^([a-z]+)-star$/i)){ return true;  }
+    return false;
+    }
 // Define a quick function for checking if the given item (by token) is an event item
 function itemIsEvent(itemToken){
     //console.log('%c' + 'mmrpgWorldMap.itemIsEvent(' + itemToken + ')', 'color: magenta;');
@@ -69,10 +80,12 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
     let _worldPlayer = _world.player;
     let _worldPlayerRobots = _worldPlayer.robots;
     let _worldPlayerItems = _worldPlayer.items;
+    let _worldPlayerStars = _worldPlayer.stars;
     let _worldItemStates = _world.items;
     let _mmrpgPlayersIndex = _indexes.players;
     let _mmrpgRobotsIndex = _indexes.robots;
     let _mmrpgItemsIndex = _indexes.items;
+    let _mmrpgStarsIndex = _indexes.stars;
     let _mapItemsIndex = _config.mapItemsIndex;
     let $teamSprites = _elements.teamSprites;
 
@@ -95,7 +108,7 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
 
     // Collect some information about the player too
     let numPlayerRobots = Object.keys(_worldPlayerRobots).length;
-    if (!numPlayerRobots || numPlayerRobots < 1){ console.error('triggerItemPickup() could not find any player robots!'); return false; }
+    //if (!numPlayerRobots || numPlayerRobots < 1){ console.error('triggerItemPickup() could not find any player robots!'); return false; }
 
     // Zoom the item sprite into the zoom layer so it's more visible to the player
     //console.log('-> zooming item sprite make it more visible');
@@ -104,6 +117,9 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
         $itemEventSprite.addClass('zoom');
         $itemEventLayer.addClass('has-zoom');
         }, Math.ceil(zoomDelay / 3));
+
+    // Predefine a variable to a post-pickup function for timing-reasons
+    let postPickupFunction = null;
 
     // Define a variable to hold the pickup action function
     let pickupFunction = function(onComplete, afterDelay){
@@ -125,6 +141,7 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
 
         // First, check to see if this item is consumable so we can maybe apply it to a team robot
         if (!itemEvent.claimed
+            && numPlayerRobots > 0
             && _self.itemIsConsumable(itemToken)
             && _world.autoApplyConsumables === true){
 
@@ -334,6 +351,7 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
             }
         // As a fallback, check to see if this item can be held so we can maybe give it to a team robot
         else if (!itemEvent.claimed
+            && numPlayerRobots > 0
             && _self.itemIsHoldable(itemToken)
             && _world.autoEquipHoldables === true){
 
@@ -362,6 +380,58 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
 
             }
 
+        // We should also check to see if this is a force star and collect it properly if so
+        if (!itemEvent.claimed
+            && _self.itemIsStarforce(itemToken)
+            && typeof itemEventInfo['subtoken'] !== 'undefined'){
+            //console.log('-> item is a force star, so skip adding to inventory and collect properly');
+            let starToken = itemEventInfo['subtoken'] || false;
+            let starInfo = _mmrpgStarsIndex[starToken] || false;
+            let starClaimed = _worldPlayerStars[starToken] || false;
+            //console.log('-> starToken = ', starToken);
+            //console.log('-> starInfo = ', starInfo);
+            //console.log('-> starClaimed = ', starClaimed);
+            //console.log('-> collecting a star w/', '\n-> starToken =', starToken, '\n-> starInfo =', starInfo, '\n-> starClaimed =', starClaimed);
+            let oldStarQuantity = 0, newStarQuantity = 0;
+            oldStarQuantity = Object.keys(_worldPlayerStars).length;
+            if (starToken && starInfo){
+                let claimDate = Math.floor(Date.now() / 1000);
+                //console.log('--> adding the star to the player\'s collect w/ claimDate =', claimDate);
+                if (!starClaimed){
+                    _worldPlayerStars[starToken] = claimDate;
+                    //console.log('_worldPlayerStars[', starToken, '] = ', claimDate, ';');
+                    newStarQuantity = Object.keys(_worldPlayerStars).length;
+                    } else {
+                    newStarQuantity = oldStarQuantity;
+                    }
+                itemEvent.claimed = true;
+                itemEventQuantity--;
+                let starNameTextSpan = _self.getCustomNameSpan(starInfo.name + ' Star', starInfo.type);
+                let starCountTextSpan = _self.getCustomNameSpan(oldStarQuantity + ' &raquo; <b>' + newStarQuantity + '</b>', 'empty');
+                //console.log('--> adding ' + starNameTextSpan + ' to the collection! (' + starCountTextSpan + ')');
+                messageMarkup = [];
+                messageMarkup.push('Found the ' + starNameTextSpan + '!');
+                messageMarkup.push('Added ' + itemNameTextSpan + ' to collection! (' + starCountTextSpan + ')');
+                postPickupFunction = function(){
+                    console.warn('running the post-pickup function!');
+                    let $progressTracker = _elements.progressTracker;
+                    let $starCounter = $('.counter.stars[data-count]', $progressTracker);
+                    if (!$starCounter || !$starCounter.length){
+                        let starCounterMarkup = '<div class="counter stars" data-count="0">'
+                                + '<span class="icon"><i class="fa fa-star"></i><i class="fa fa-times"></i></span>'
+                                + '<strong class="count">0</strong>'
+                            + '</div>';
+                        $progressTracker.prepend(starCounterMarkup);
+                        $starCounter = $('.counter.stars[data-count]', $progressTracker);
+                        }
+                    let $starCounterValue = $('.count', $starCounter);
+                    $starCounterValue.text(newStarQuantity);
+                    $starCounter.attr('data-count', );
+                    $starCounterValue.text(newStarQuantity);
+                    };
+                }
+            }
+
         // If the item has still not been claimed it, it means we should (try to) add it to the inventory instead
         if (!itemEvent.claimed){
             //console.log('-> no robots needed this item, so we will add it to the inventory instead');
@@ -382,6 +452,7 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
 
         // Update the real copy with any changes to claimed flag
         if (itemEvent.claimed){
+            //console.log('updating _worldItemStates with claim time');
             let claimTime = new Date().getTime();
             itemEventInfo.claimed = true;
             _worldItemStates[itemEventToken] = claimTime; // update world item states w/ claim time
@@ -416,7 +487,12 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
             $teamSprites.filter(':not(.disabled):not(.frame-lock)').attr('data-frame', '00');
             if (!itemEventQuantity){
                 //console.log('--> removing item sprite from the map', '\n--> b/c itemEventQuantity =', itemEventQuantity);
-                $itemEventSprite.animate({opacity: 0, filter: 'brightness(2)'}, zoomDelay, function(){ $itemEventSprite.remove(); });
+                $itemEventSprite.animate({opacity: 0, filter: 'brightness(2)'}, zoomDelay, function(){
+                    $itemEventSprite.remove();
+                    if (typeof postPickupFunction === 'function'){ postPickupFunction.call(_self); }
+                    });
+                } else {
+                if (typeof postPickupFunction === 'function'){ postPickupFunction.call(_self); }
                 }
             // Trigger a save of the world state to persist this change
             delete _world.isBusyWith.itemPickup;
@@ -427,16 +503,18 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
     return true;
     }
 // Define a quick function for adding an item to the player's inventory if there's room for it
-function addItemToInventory(itemToken, itemQuantity, animatePickup, playSound){
+function addItemToInventory(itemToken, itemQuantity, animatePickup, playSound, customOptions){
     //console.log('%c' + 'mmrpgWorldMap.addItemToInventory(item:' + itemToken + ', quantity:' + itemQuantity + ')', 'color: magenta;');
     if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('addItemToInventory() missing required itemToken!'); return false; }
     if (typeof itemQuantity !== 'number' || isNaN(itemQuantity) || itemQuantity < 1){ itemQuantity = 1; }
     if (typeof animatePickup !== 'boolean'){ animatePickup = true; } // default to true if not provided
     if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+    if (typeof customOptions !== 'object'){ customOptions = {}; } // default to false if not provided
     //console.log('--> itemToken =', itemToken);
     //console.log('--> itemQuantity =', itemQuantity);
     //console.log('--> animatePickup =', animatePickup);
     //console.log('--> playSound =', playSound);
+    //console.log('--> customOptions =', customOptions);
     // Collect references to world objects
     let _self = this;
     let _world = _self.state;
@@ -451,6 +529,7 @@ function addItemToInventory(itemToken, itemQuantity, animatePickup, playSound){
     //console.log('--> _mmrpgTypesIndexKeys =', _mmrpgTypesIndexKeys);
     //console.log('--> _mmrpgTypesIndexKeysRevised =', _mmrpgTypesIndexKeysRevised);
     //console.log('--> _mmrpgItemsIndexKeys =', _mmrpgItemsIndexKeys);
+    // Back up the real item token in case we need it later
     let realItemToken = itemToken;
     if (realItemToken.indexOf('__') !== -1){ realItemToken = realItemToken.split('__')[0]; }
     if (typeof _mmrpgItemsIndex[realItemToken] === 'undefined'){
@@ -1066,6 +1145,7 @@ function generateItemSelectPlaceholderMarkup(playerRobotInfo, buttonOptions){
 
 mmrpgWorldMap.prototype.itemIsConsumable = itemIsConsumable;
 mmrpgWorldMap.prototype.itemIsHoldable = itemIsHoldable;
+mmrpgWorldMap.prototype.itemIsStarforce = itemIsStarforce;
 mmrpgWorldMap.prototype.itemIsEvent = itemIsEvent;
 
 mmrpgWorldMap.prototype.triggerItemPickup = triggerItemPickup;

@@ -7,6 +7,7 @@ gameSettings.worldConfig = {
     playerRobots: ['0_robot'],
     playerAbilities: ['buster-shot'],
     playerItemsIndex: {},
+    playerStarsIndex: {},
     playerRobotsIndex: {},
     playerRobotsLimit: -1,
     playerMobility: 1, // default only
@@ -121,8 +122,10 @@ gameSettings.worldState = {
         robots: {},
         items: {},
         abilities: {},
+        stars: {},
         },
     items: {},
+    stars: {},
     abilities: {},
     buttons: {},
     switches: {},
@@ -512,6 +515,15 @@ class mmrpgWorldMap {
             //console.log('---> adding items to player state:', livePlayerItems);
             _worldPlayer.items = livePlayerItems;
             //console.log('---> initWorldMap() livePlayerItems =', livePlayerItems);
+            }
+        // If player stars were defined [index] in the predefined config, copy them over to the state
+        let _playerStarsIndex = _config.playerStarsIndex;
+        if (Object.keys(_playerStarsIndex).length){
+            //console.log('---> initWorldMap() found ' + Object.keys(_playerStarsIndex).length + ' player stars to initialize!');
+            let livePlayerStars = _self.getClonedObject(_playerStarsIndex);
+            //console.log('---> adding stars to player state:', livePlayerStars);
+            _worldPlayer.stars = livePlayerStars;
+            //console.log('---> initWorldMap() livePlayerStars =', livePlayerStars);
             }
         // Define the function to run when everything is done loading
         let onWorldLoaded = function(){
@@ -5080,6 +5092,8 @@ class mmrpgWorldMap {
         let _worldPlayerRobots = _worldPlayer.robots;
         let _worldPlayerRobotsKeys = Object.keys(_worldPlayerRobots);
         let _worldSymbols = _world.symbols;
+        let _worldToken = _config.mapWorld;
+        let _mapToken = _config.mapToken;
         let _mapEffects = _config.mapEffects;
         let _mapTileSize = _config.mapTileSize;
         let _mapTileSizeOffset = _config.mapTileSizeOffset;
@@ -5192,7 +5206,7 @@ class mmrpgWorldMap {
             }
         //console.log('-> found ' + eventsAtPosition.length + ' events at position');
         //console.log('-> eventsAtPosition =', eventsAtPosition);
-        //console.log('-> found ' + eventsAtPosition.length + ' eventsAtPosition =', eventsAtPosition);
+        //console.log('-> found ' + eventsAtPosition.length + ' eventsAtPosition =', JSON.parse(JSON.stringify(eventsAtPosition)));
 
         // Check to see what the very first event type is
         let firstEvent = eventsAtPosition[0];
@@ -5210,17 +5224,6 @@ class mmrpgWorldMap {
             if (aIndex < bIndex){ return -1; }
             else if (aIndex > bIndex){ return 1; }
             else { return 0; }
-            /*
-            if (a.kind2 === 'sanctuary' && b.kind2 !== 'sanctuary'){ return -1; } // a is sanctuary, b is not
-            else if (a.kind2 !== 'sanctuary' && b.kind2 === 'sanctuary'){ return 1; } // a is not sanctuary, but b is
-            else if (a.kind === 'portal' && b.kind !== 'portal'){ return -1; } // a is portal, b is not
-            else if (a.kind !== 'portal' && b.kind === 'portal'){ return 1; } // a is not portal, but b is
-            else if (a.kind === 'hazard' && b.kind !== 'hazard'){ return -1; } // a is hazard, b is not
-            else if (a.kind !== 'hazard' && b.kind === 'hazard'){ return 1; } // a is not hazard, but b is
-            else if (a.kind === 'battle' && b.kind !== 'battle'){ return -1; } // a is battle, b is not
-            else if (a.kind !== 'battle' && b.kind === 'battle'){ return 1; } // a is not battle, but b is
-            else { return 0; } // both are same or of irrelevant kind
-            */
             });
         //console.log('-> eventsAtPosition(after-sort) = ', JSON.parse(JSON.stringify(eventsAtPosition)));
 
@@ -5246,10 +5249,24 @@ class mmrpgWorldMap {
             //console.log('standing on HAZARD! moving it to front of queue ...');
             delete eventsAtPosition[standingOnEventKey];
             eventsAtPosition.unshift(standingOnEvent);
+            eventsAtPosition = Object.values(eventsAtPosition);
             standingOnHazardEvent = true;
             }
 
-        // Check to see if the user is standing
+        // Backup any star data found in the event list in case we need to check for it later
+        let starsNearPosition = [];
+        for (let key = 0; key < eventsAtPosition.length; key++){
+            let eventAtPosition = eventsAtPosition[key];
+            //console.log('eventsAtPosition[', key, '] =', eventAtPosition);
+            if (eventAtPosition.token.indexOf('-star') !== -1){
+                let eventBackup = _self.getClonedObject(eventsAtPosition[key]);
+                eventBackup.key = key;
+                starsNearPosition.push(eventBackup);
+                }
+            }
+        //console.log('starsNearPosition =', starsNearPosition);
+
+        // Check to see what position the player is looking at in case we need it later
         let standingAtPosition = _worldCursor.position;
         let lookingAtPosition = _self.getRelativePositionByDirection(_worldCursor.position, _worldCursor.direction);
         //let isSamePosition = eventPosition === standingAtPosition;
@@ -5737,8 +5754,23 @@ class mmrpgWorldMap {
                     dataBattles.push([dataBattle, dataPosition]);
                     }
                 }
+            let dataBattleStars = [];
+            if (starsNearPosition.length){
+                for (var i = 0; i < starsNearPosition.length; i++){
+                    //console.log('-> parsing starEvent from starsNearPosition[i]', starsNearPosition[i]);
+                    let starEvent = starsNearPosition[i];
+                    let dataPosition = starEvent.position;
+                    var dataStar = 'world-star_' + _worldToken + '_' + _mapToken + '_' + starEvent.token;
+                    //var dataLabel = starEvent.label;
+                    if (dataStar){
+                        //dataLabels.push([dataLabel, dataPosition]);
+                        dataBattleStars.push([dataStar, dataPosition]);
+                        }
+                    }
+                }
             //console.log('-> dataLabels =', dataLabels);
             //console.log('-> dataBattles =', dataBattles);
+            //console.log('-> dataBattleStars =', dataBattleStars);
             //console.log('check the direction the player is facing and sort the battle events accordingly');
             //console.log('-> cursorDirection =', cursorDirection);
             //console.log('-> cursorPosition =', cursorPosition);
@@ -5782,6 +5814,12 @@ class mmrpgWorldMap {
                         list.push(battle);
                         } return list;
                     })(dataBattles).join(',');
+                let dataBattleStarsJoined = (function(stars){
+                    for (var i = 0, list = []; i < stars.length; i++){
+                        let star = stars[i][0], starPosition = stars[i][1];
+                        list.push(star);
+                        } return list;
+                    })(dataBattleStars).join(',');
                 let dataLabelsJoined = (function(labels){
                     for (var i = 0, markup = []; i < labels.length; i++){
                         let label = labels[i][0], labelPosition = labels[i][1];
@@ -5794,13 +5832,17 @@ class mmrpgWorldMap {
                         } return markup;
                     })(dataLabels).join('');
                 //console.log('generated dataBattlesJoined:', '\n->', dataBattlesJoined.split(',').join('\n-> '));
+                //console.log('generated dataBattleStarsJoined:', '\n->', dataBattleStarsJoined.split(',').join('\n-> '));
+                let joinedDataAttrs = '';
+                if (dataBattles.length){ joinedDataAttrs += ' data-battle="'+dataBattlesJoined+'"'; }
+                if (dataBattleStars.length){ joinedDataAttrs += ' data-battle-star="'+dataBattleStarsJoined+'"'; }
                 actionAreaMarkup += dataLabelsJoined;
                 sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Ready To</sup> Start Battle ?</span></strong>';
                 if (playerActiveRobots >= 1){
                     //sideButtonsMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span><sup>Ready To</sup> Start Battle</span></a>';
-                    sideButtonsMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span>Let\'s Go!</span></a>';
+                    sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span>Let\'s Go!</span></a>';
                     } else {
-                    sideButtonsMarkup += '<a class="button big-button disabled" data-battle="'+dataBattlesJoined+'"><span>Let\'s Go!</span></a>';
+                    sideButtonsMarkup += '<a class="button big-button disabled"' + joinedDataAttrs + '><span>Let\'s Go!</span></a>';
                     }
                 sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
                 //console.log('sideButtonsMarkup =', sideButtonsMarkup);
@@ -5829,7 +5871,7 @@ class mmrpgWorldMap {
             if (dataItem && dataItemToken){
                 // If the player is the cursor player, we should show the item pickup dropdown
                 if (playerIsCursor){
-                    //console.log('-> player is cursor, preparing item pickup dropdown');
+                    //console.log('-> player is cursor, preparing item pickup/putdown dropdown');
                     showActionArea = true;
                     if (!_worldCursor.holding){
                         // Normal item pickup, not already holding anything
@@ -6259,6 +6301,7 @@ class mmrpgWorldMap {
                 if (!isDismiss){ $button.addClass('clicked'); }
                 if (isBattle){
                     let battleId = $button.attr('data-battle') || false;
+                    let battleStarId = $button.attr('data-battle-star') || false;
                     //console.log('-> battleId =', battleId);
                     if (action === 'battle-info'){
                         //console.log('-> showing battle info for ID ' + battleId + '!');
@@ -6276,6 +6319,7 @@ class mmrpgWorldMap {
                         battleVars.push('this_player_token=' + _playerToken);
                         battleVars.push('this_player_robots=' + activeRobots.join(','));
                         battleVars.push('this_battle_token=' + battleId);
+                        if (battleStarId){ battleVars.push('this_star_token=' + battleStarId); }
                         let battleHref = 'battle.php?' + battleVars.join('&');
                         $thisWorld.addClass('busy');
                         _self.incZoomLevel();
@@ -6925,6 +6969,7 @@ class mmrpgWorldMap {
             if (!eventKeys.length){ continue; }
             // Loop through the event symbols and check if any of them are at the positions to check
             for (let i = 0; i < positionsToCheck.length; i++){
+                let eventKey = i;
                 let eventPosition = positionsToCheck[i];
                 let eventPositionXY = eventPosition.split('-');
                 //console.log('-> checking ' + symbolsKey + ' for ' + eventPosition);
@@ -6963,7 +7008,7 @@ class mmrpgWorldMap {
                     // if we haven't moved, never trigger a portal
                     if (!_worldCursor.moved){ continue; }
                     // spawns are usually hidden behind other portals, never interactable directly
-                    if (eventToken === 'spawn'){ continue; }
+                    if (eventToken === 'spawn' && eventKey > 0){ continue; }
                     // if this portal has an assosiated direction, only trigger if player is facing that way
                     if (eventInfo.direction
                         && typeof eventInfo.direction === 'string'
@@ -7063,6 +7108,7 @@ class mmrpgWorldMap {
                 continue; // skip the rest of this loop
                 }
             }
+
         // Now that we have our events, we need to do some serious sorting given the direction we're facing
         // Most important is the first event, so decide which panel we're "facing" given direction and work out way outward
         let searchPositionXY = searchPosition.split('-').map(function(v){ return parseInt(v); });
@@ -7093,8 +7139,19 @@ class mmrpgWorldMap {
             let bDelta = bDeltaX + bDeltaY;
             return aDelta - bDelta;
             });
+        // Check if there is a battle anywhere in the collected events
+        let hasBattleNearby = eventsAtPosition.some(function(event){ return event.kind === 'battle'; });
+        // If there are no battles nearby, filter out any stars that aren't on the exact position
+        if (!hasBattleNearby){
+            eventsAtPosition = eventsAtPosition.filter(function(event){
+                let isStar = event.kind === 'item' && event.token.indexOf('-star') !== -1;
+                let isAdjacent = event.position !== searchPosition;
+                return !(isStar && isAdjacent);
+                });
+            eventsAtPosition = Object.values(eventsAtPosition);
+            }
         // Return the found events
-        //console.log('-> Found ' + eventsAtPosition.length + ' events at position ' + searchPosition + ':', eventsAtPosition);
+        //console.log('-> Found ' + eventsAtPosition.length + ' events at position ' + searchPosition + ':', JSON.parse(JSON.stringify(eventsAtPosition)));
         return eventsAtPosition;
         }
 
@@ -7350,6 +7407,7 @@ class mmrpgWorldMap {
         let lastPlayerRobots = _worldPlayer.robots;
         let lastPlayerAbilities = _worldPlayer.abilities;
         let lastPlayerItems = _worldPlayer.items;
+        let lastPlayerStars = _worldPlayer.stars;
         let lastPlayerWorld = _config.mapWorld;
         let lastPlayerWorldMap = _config.mapWorld + '__' + _config.mapToken;
         let lastPlayerPosition = _worldPlayer.position;
@@ -7367,6 +7425,7 @@ class mmrpgWorldMap {
             lastPlayerRobots,
             lastPlayerAbilities,
             lastPlayerItems,
+            lastPlayerStars,
             lastPlayerWorld,
             lastPlayerWorldMap,
             lastPlayerPosition,

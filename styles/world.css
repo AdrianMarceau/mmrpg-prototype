@@ -279,6 +279,9 @@ html, body {
     will-change: transform, opacity, filter;
     image-rendering: auto;
 }
+#mmrpg #world .sprite > .wrap > .back {
+    image-rendering: auto;
+}
 
 #mmrpg #world .layer > .sprite {
     /* outline: 1px solid magenta; */
@@ -2932,6 +2935,8 @@ html, body {
 #world #robots-overview .storage-details .image > .sprite > .wrap,
 #world #robots-overview .storage-details .image > .sprite > .wrap > .sprite {
     transform-origin: center;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
     image-rendering: pixelated;
 }
 #world #robots-overview .storage-details .image > .sprite > .wrap > .sprite {
