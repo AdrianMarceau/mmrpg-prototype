@@ -653,6 +653,22 @@ body.index #header {
     height: 100% !important;
 }
 
+#mmrpg.index[data-cinema-mode="true"] {
+    padding-top: 0 !important;
+    height: 100vh !important;
+    overflow: hidden;
+}
+#mmrpg.index[data-cinema-mode="true"] #credits,
+#mmrpg.index[data-cinema-mode="true"] #winmods {
+    display: none;
+}
+#mmrpg.index[data-cinema-mode="true"] #window {
+    position: absolute !important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 #canvas {
     overflow: hidden;
     z-index: 12;
