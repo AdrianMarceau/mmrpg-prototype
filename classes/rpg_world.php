@@ -10,7 +10,7 @@ define('MMRPG_WORLD_DEFAULT_TILESIZE', 80);
 define('MMRPG_WORLD_DEFAULT_SPRITESITE', 40);
 define('MMRPG_WORLD_DEFAULT_TEAMSIZE', 8); // TODO: hardcode for now, review later
 define('MMRPG_WORLD_DEFAULT_MOBILITY', 1); // TODO: make this dependant on player skill
-define('MMRPG_WORLD_DEFAULT_BASEPATH', '/');
+define('MMRPG_WORLD_DEFAULT_BASEPATH', 'prototype/worldmaps/'); // TODO: move this to the main config file
 
 // Define the actual RPG_WORLD class that uses the above constants and methods
 class rpg_world {
@@ -1978,6 +1978,14 @@ class rpg_world {
         if (empty($record_token)){ return $player_battle_history; }
         $battle_history_record = !empty($player_battle_history[$record_token]) ? $player_battle_history[$record_token] : array();
         return $battle_history_record;
+    }
+
+    // Define a function for getting the battle stars collected so far
+    public static function get_battle_stars(){
+        //error_log('rpg_world::get_battle_stars()');
+        $session_token = rpg_game::session_token();
+        $this_battle_stars = !empty($_SESSION[$session_token]['values']['battle_stars']) ? $_SESSION[$session_token]['values']['battle_stars'] : array();
+        return $this_battle_stars;
     }
 
     // Define a function for getting the player switcher markup given current conditions
@@ -4363,6 +4371,108 @@ class rpg_world {
         }
         //error_log('---> $range_positions = '. print_r($range_positions, true));
         return $range_positions;
+    }
+
+    // Define a method for grabbing a battle star's data from the session given a token
+    public static function get_star_info($star_token){
+        //error_log('rpg_world::get_star_info() called for star token "'.$star_token.'"');
+        if (empty($star_token) || !is_string($star_token)){ return false; }
+        $star_token_clean = str_replace('world-star_', '', $star_token);
+        list($world_token, $map_token, $real_star_token) = explode('_', $star_token_clean);
+        $star_world_map = $world_token.'__'.$map_token;
+        //error_log('$star_token_clean = '.print_r($star_token_clean, true));
+        //error_log('$world_token = '.print_r($world_token, true));
+        //error_log('$map_token = '.print_r($map_token, true));
+        //error_log('$star_world_map = '.print_r($star_world_map, true));
+        //error_log('$real_star_token = '.print_r($real_star_token, true));
+        $world_data_parsed = array();
+        $map_data_parsed = array();
+        rpg_world::parse_map_data($star_world_map, $world_data_parsed, $map_data_parsed);
+        //error_log('$world_data_parsed = '.print_r($world_data_parsed, true));
+        //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
+        //error_log('$world_data_parsed = '.(!empty($world_data_parsed) ? gettype($world_data_parsed) : '-'));
+        //error_log('$map_data_parsed = '.(!empty($map_data_parsed) ? gettype($map_data_parsed) : '-'));
+        $this_star_data = array();
+        if (!empty($map_data_parsed['items'])
+            && !empty($map_data_parsed['items'][$real_star_token])){
+            $raw_star_data = $map_data_parsed['items'][$real_star_token];
+            $this_star_data['position'] = $raw_star_data[0];
+            $this_star_data['kind'] = $raw_star_data[1];
+            $this_star_data['type'] = str_replace('-star', '', $raw_star_data[1]);
+            $this_star_data['owner'] = $raw_star_data[2];
+        }
+        return $this_star_data;
+    }
+
+    // Define a method for generating a star force index with all star tokens and info together
+    public static function get_stars_index(){
+        //error_log('rpg_world::get_stars_index() called!');
+        $mmrpg_index_robots = rpg_robot::get_index(true);
+        $mmrpg_index_fields = rpg_field::get_index(true);
+        $mmrpg_index_stars = array();
+        if (!empty($mmrpg_index_robots)){
+            $mmrpg_robots_tokens = array_keys($mmrpg_index_robots);
+            foreach ($mmrpg_robots_tokens AS $robot_key => $robot_token){
+                $robot_info = $mmrpg_index_robots[$robot_token];
+                if (empty($robot_info['robot_core'])){ continue; }
+                if ($robot_info['robot_core'] === 'copy'){ continue; }
+                if ($robot_info['robot_class'] !== 'master'){ continue; }
+                if (!empty($robot_info['robot_flag_hidden'])){ continue; }
+                $new_star_data = array();
+                $new_star_data['star_token'] = $robot_token;
+                $new_star_data['star_name'] = $robot_info['robot_name'];
+                $new_star_data['star_kind'] = 'boss';
+                $new_star_data['star_type'] = $robot_info['robot_core'];
+                $new_star_data['star_type2'] = !empty($robot_info['robot_core2']) ? $robot_info['robot_core2'] : '';
+                $new_star_data['star_robot'] = $robot_token;
+                $new_star_data['star_robot2'] = '';
+                $new_star_data['star_order'] = count($mmrpg_index_stars) + 1;
+                $mmrpg_index_stars[$new_star_data['star_token']] = array_filter($new_star_data);
+            }
+        }
+        if (!empty($mmrpg_index_fields)){
+            $mmrpg_fields_tokens = array_keys($mmrpg_index_fields);
+            $allowed_field_games = array('MM1', 'MM2', 'MM3', 'MM4'); // TEMP!
+            foreach ($mmrpg_fields_tokens AS $field1_key => $field1_token){
+                $field1_info = $mmrpg_index_fields[$field1_token];
+                if (empty($field1_info['field_type'])){ continue; }
+                if ($field1_info['field_type'] === 'copy'){ continue; }
+                if ($field1_info['field_class'] !== 'master'){ continue; }
+                if (!empty($field1_info['field_flag_hidden'])){ continue; }
+                //if (!in_array($field1_info['field_game'], $allowed_field_games)){ continue; }
+                $new_star_data = array();
+                $new_star_data['star_token'] = $field1_token;
+                $new_star_data['star_name'] = $field1_info['field_name'];
+                $new_star_data['star_kind'] = 'field';
+                $new_star_data['star_type'] = $field1_info['field_type'];
+                $new_star_data['star_type2'] = !empty($field1_info['field_type2']) ? $field1_info['field_type2'] : '';
+                $new_star_data['star_field'] = $field1_token;
+                $new_star_data['star_field2'] = '';
+                $new_star_data['star_order'] = count($mmrpg_index_stars) + 1;
+                $mmrpg_index_stars[$new_star_data['star_token']] = array_filter($new_star_data);
+                foreach ($mmrpg_fields_tokens AS $field2_key => $field2_token){
+                    $field2_info = $mmrpg_index_fields[$field2_token];
+                    if (empty($field2_info['field_type'])){ continue; }
+                    if ($field2_info['field_type'] === 'copy'){ continue; }
+                    if ($field2_info['field_class'] !== 'master'){ continue; }
+                    if (!empty($field2_info['field_flag_hidden'])){ continue; }
+                    //if (!in_array($field2_info['field_game'], $allowed_field_games)){ continue; }
+                    $fusion_token = explode('-', $field1_token)[0].'-'.explode('-', $field2_token)[1];
+                    $fusion_name = explode(' ', $field1_info['field_name'])[0].'-'.explode(' ', $field2_info['field_name'])[1];
+                    $new_star_data = array();
+                    $new_star_data['star_token'] = $fusion_token;
+                    $new_star_data['star_name'] = $fusion_name;
+                    $new_star_data['star_kind'] = 'fusion';
+                    $new_star_data['star_type'] = $field1_info['field_type'];
+                    $new_star_data['star_type2'] = $field2_info['field_type'];
+                    $new_star_data['star_field'] = $field1_token;
+                    $new_star_data['star_field2'] = $field2_token;
+                    $new_star_data['star_order'] = count($mmrpg_index_stars) + 1;
+                    $mmrpg_index_stars[$new_star_data['star_token']] = array_filter($new_star_data);
+                }
+            }
+        }
+        return $mmrpg_index_stars;
     }
 
 
