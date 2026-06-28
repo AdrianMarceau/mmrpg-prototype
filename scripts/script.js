@@ -376,9 +376,9 @@ $(document).ready(function(){
         /* (function(){
             let $mmrpg = $('#mmrpg');
             let userHasClicked = false, updateUserHasClicked = function(e){
-                console.log('...click detected...');
+                //console.log('...click detected...');
                 if (typeof e.originalEvent === 'undefined'){ return; }
-                console.log('User has clicked!');
+                //console.log('User has clicked!');
                 $mmrpg.unbind('click', updateUserHasClicked);
                 $mmrpg.removeClass('first-focus-required');
                 userHasClicked = true;
@@ -469,7 +469,7 @@ $(document).ready(function(){
                         gameMusic.removeClass('onload');
                         gameMusic.find('.start').remove();
                         mmrpg_music_toggle();
-                        setTimeout(function(){ mmrpg_play_sound_effect('game-start'); }, 100);
+                        setTimeout(function(){ top.mmrpg_play_sound_effect('game-start'); }, 100);
                         setTimeout(function(){ gameSettings.gameHasStarted = true; }, 200);
                         if (gameSettings.onGameStart.length){
                             //console.log('gameSettings.onGameStart =', gameSettings.onGameStart);
@@ -845,10 +845,10 @@ function windowResizeUpdate(updateType){
         } else {
         // Collect the parent window's width and height
         var windowType = 'child';
-        var windowWidth = $(parent.window).width();
-        var windowHeight = $(parent.window).height();
-        var gameWidth = parent.gameWindow.width();
-        var gameHeight = parent.gameWindow.height();
+        var windowWidth = $(top.window).width();
+        var windowHeight = $(top.window).height();
+        var gameWidth = top.gameWindow.width();
+        var gameHeight = top.gameWindow.height();
         }
 
     var bodyInnerHeight = mmrpgBody.innerHeight();
@@ -914,7 +914,7 @@ function windowResizeUpdate(updateType){
     if (gameSettings.autoScrollTop === true && updateType != 'onscroll'){
         //console.log('gameSettings.autoScrollTop == true;\nwindow.scrollTo(0, 1);');
         window.scrollTo(0, 1);
-        if (window !== window.top){ parent.window.scrollTo(0, 1); }
+        if (window !== window.top){ top.window.scrollTo(0, 1); }
         }
 
 
@@ -2021,20 +2021,21 @@ function mmrpg_events(){
             && thisEvent.event_flags.victory === true){
             // Play the victory music
             //console.log('mmrpg_events() / Play the victory music');
+            //top.mmrpg_play_sound_effect('battle-victory-sound');
             if (gameSettings.playVictorySound){
                 let victorySound = 'battle-victory-sound';
                 let victoryMusic = 'misc/leader-board';
-                parent.mmrpg_music_volume(0, false);
-                parent.mmrpg_play_sound_effect(victorySound);
+                top.mmrpg_music_volume(0, false);
+                top.mmrpg_play_sound_effect(victorySound);
                 setTimeout(function(){
                     if (gameSettings.playVictoryMusic){
-                        parent.mmrpg_music_load(victoryMusic, true, false);
+                        top.mmrpg_music_load(victoryMusic, true, false);
                         } else {
-                        parent.mmrpg_reset_music_volume();
+                        top.mmrpg_reset_music_volume();
                         }
                     }, 1000);
                 } else if (gameSettings.playVictoryMusic){
-                parent.mmrpg_music_load(victoryMusic, true, false);
+                top.mmrpg_music_load(victoryMusic, true, false);
                 }
             if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
             battleResultsDisplayed = true;
@@ -2047,17 +2048,17 @@ function mmrpg_events(){
             if (gameSettings.playDefeatSound){
                 let defeatSound = 'battle-defeat-sound';
                 let defeatMusic = 'misc/leader-board';
-                parent.mmrpg_music_volume(0, false);
-                parent.mmrpg_play_sound_effect(defeatSound);
+                top.mmrpg_music_volume(0, false);
+                top.mmrpg_play_sound_effect(defeatSound);
                 setTimeout(function(){
                     if (gameSettings.playDefeatMusic){
-                        parent.mmrpg_music_load(defeatMusic, true, false);
+                        top.mmrpg_music_load(defeatMusic, true, false);
                         } else {
-                        parent.mmrpg_reset_music_volume();
+                        top.mmrpg_reset_music_volume();
                         }
                     }, 1000);
                 } else if (gameSettings.playDefeatMusic){
-                parent.mmrpg_music_load(defeatMusic, true, false);
+                top.mmrpg_music_load(defeatMusic, true, false);
                 }
             if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
             battleResultsDisplayed = true;
@@ -3375,8 +3376,8 @@ function mmrpg_keep_session_alive(sessionUserID){
             + 'You will now be redirected to the login page... '
             );
         if (!confirmRedirect){ return; }
-        if (window.self !== window.parent){
-            window.parent.location.href = loginPageURL;
+        if (window.self !== window.top){
+            window.top.location.href = loginPageURL;
             } else {
             window.location.href = loginPageURL;
             }
