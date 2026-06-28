@@ -26,8 +26,8 @@ if (!empty($_REQUEST['reset'])
 }
 
 // Preset critical world-map constants before we do anything else
-$mapfile_basepath = 'prototype/worldmaps/';
-rpg_world::set_basepath($mapfile_basepath);
+//$mapfile_basepath = 'prototype/worldmaps/';
+//rpg_world::set_basepath($mapfile_basepath);
 $mapfile_basedir = rpg_world::$worldmap_basedir.rpg_world::$worldmap_basepath;
 //error_log('$mapfile_basedir = '. print_r($mapfile_basedir, true));
 
