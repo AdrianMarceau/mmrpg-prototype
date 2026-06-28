@@ -518,8 +518,29 @@ $reset_pickups = !empty($_GET['reset']) && $_GET['reset'] === 'pickups' ? true :
 $world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
 $world_map_pickups = !empty($world_pickups[$world_map_token]) ? $world_pickups[$world_map_token] : array();
 if (empty($world_map_pickups) || $reset_pickups === true){
+    error_log('regenerating pickups!');
     $world_map_pickups = rpg_world::generate_worldmap_pickups($this_prototype_data, $map_data_parsed);
     rpg_world::update_session('world_pickups', $world_map_token, $world_map_pickups);
+    //rpg_world::update_session('world_items', $world_map_token, array());  // clear all "claimed" datestamps
+    //rpg_world::update_session('world_abilities', $world_map_token, array());  // clear all "claimed" datestamps
+}
+
+// If requested to do so, make sure we reset the world items
+$reset_items = !empty($_GET['reset']) && $_GET['reset'] === 'items' ? true : false;
+$world_items = !empty($WORLD_SESSION['world_items']) ? $WORLD_SESSION['world_items'] : array();
+$world_map_items = !empty($world_items[$world_map_token]) ? $world_items[$world_map_token] : array();
+if ($reset_items === true){
+    //error_log('clearing claimed items!');
+    rpg_world::update_session('world_items', $world_map_token, array());  // clear all "claimed" datestamps
+}
+
+// If requested to do so, make sure we reset the world abilities
+$reset_abilities = !empty($_GET['reset']) && $_GET['reset'] === 'abilities' ? true : false;
+$world_abilities = !empty($WORLD_SESSION['world_abilities']) ? $WORLD_SESSION['world_abilities'] : array();
+$world_map_abilities = !empty($world_abilities[$world_map_token]) ? $world_abilities[$world_map_token] : array();
+if ($reset_abilities === true){
+    //error_log('clearing claimed abilities!');
+    rpg_world::update_session('world_abilities', $world_map_token, array());  // clear all "claimed" datestamps
 }
 
 // Calculate remaining encounters for this area for later reference
