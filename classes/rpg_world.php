@@ -2046,6 +2046,32 @@ class rpg_world {
         return $return_markup;
     }
 
+    // Define a function for getting the progress tracker's markup given current progress
+    public static function get_progress_tracker_markup($this_prototype_data){
+        //error_log('rpg_world::get_progress_tracker_markup() called!');
+        if (empty($this_prototype_data)){ return ''; }
+        $return_markup = '';
+        // Collect the player's relevant progress so we can show it on-screen
+        $player_battle_zenny = rpg_game::zenny_unlocked();
+        $player_battle_zenny_formatted = number_format($player_battle_zenny, 0, '.', ',');
+        $player_battle_stars = self::get_battle_stars();
+        $player_battle_stars_total = count($player_battle_stars);
+        // Define the markup for the area that shows collected stars, money, etc.
+        if (!empty($player_battle_stars)){
+            $return_markup .= '<div class="counter stars" data-count="'.$player_battle_stars_total.'">';
+                $return_markup .= '<span class="icon"><i class="fa fa-star"></i><i class="fa fa-times"></i></span>';
+                $return_markup .= '<strong class="count">'.$player_battle_stars_total.'</strong>';
+            $return_markup .= '</div>';
+        }
+        if (!empty($player_battle_zenny)){
+            $return_markup .= '<div class="counter zenny" data-count="'.$player_battle_zenny.'">';
+                $return_markup .= '<strong class="count">'.$player_battle_zenny_formatted.'</strong>';
+                $return_markup .= '<span class="icon"><i class="fa fa-zenny"></i></span>';
+            $return_markup .= '</div>';
+        }
+        return $return_markup;
+    }
+
     // Define a function for getting the robot switcher markup given current conditions
     public static function get_robots_overview_markup($this_prototype_data, $current_robot_tokens){
         //error_log('rpg_world::get_robot_overview_markup() called!');

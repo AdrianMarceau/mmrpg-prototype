@@ -353,6 +353,7 @@ class mmrpgWorldMap {
         let $resetButton = $('#reset-button', $thisWorld);
         let $messageDisplay = $('#message-display', $thisWorld);
         let $positionDisplay = $('#position-display', $thisWorld);
+        let $progressTracker = $('#progress-tracker', $thisWorld);
         let $playerSwitcher = $('#player-switcher', $thisWorld);
         let $cursorPalette = $('#cursor-palette', $thisWorld);
         let $robotsOverview = $('#robots-overview', $thisWorld);
@@ -374,6 +375,7 @@ class mmrpgWorldMap {
         _elements.resetButton = $resetButton;
         _elements.messageDisplay = $messageDisplay;
         _elements.positionDisplay = $positionDisplay;
+        _elements.progressTracker = $progressTracker;
         _elements.playerSwitcher = $playerSwitcher;
         _elements.cursorPalette = $cursorPalette;
         _elements.robotsOverview = $robotsOverview;

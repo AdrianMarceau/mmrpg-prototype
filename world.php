@@ -756,11 +756,13 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
             $cursor_palette_markup = $wrap_markup(rpg_world::get_cursor_palette_markup($this_prototype_data));
             $robots_overview_markup = $wrap_markup(rpg_world::get_robots_overview_markup($this_prototype_data, $robot_overview_robots));
             $minimap_overview_markup = $wrap_markup(rpg_world::get_minimap_overview_markup($this_prototype_data, $world_data_parsed, $map_data_parsed));
+            $progress_tracker_markup = $wrap_markup(rpg_world::get_progress_tracker_markup($this_prototype_data));
             ?>
             <? if (!empty($cursor_palette_markup)){ ?><div id="cursor-palette" class="chrome"><?= $cursor_palette_markup ?></div><? } ?>
             <? if (!empty($player_switcher_markup)){ ?><div id="player-switcher" class="chrome"><?= $player_switcher_markup ?></div><? } ?>
             <? if (!empty($robots_overview_markup)){ ?><div id="robots-overview" class="chrome"><?= $robots_overview_markup ?></div><? } ?>
             <? if (!empty($minimap_overview_markup)){ ?><div id="minimap-overview" class="chrome"><?= $minimap_overview_markup ?></div><? } ?>
+            <? if (!empty($progress_tracker_markup)){ ?><div id="progress-tracker" class="chrome"><?= $progress_tracker_markup ?></div><? } ?>
             <div id="position-display" class="chrome"><?= $position_display_markup ?></div>
             <div id="message-display" class="chrome"><?= $message_display_markup ?></div>
             <div id="loading-icon" class="chrome"><i class="fa fas fa-spinner"></i></div>
