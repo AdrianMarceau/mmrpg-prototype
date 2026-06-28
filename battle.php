@@ -33,6 +33,7 @@ $debug_flag_scanlines = true;
 // Collect the battle tokens from the URL
 $this_battle_id = isset($_GET['this_battle_id']) ? $_GET['this_battle_id'] : 0;
 $this_battle_token = isset($_GET['this_battle_token']) ? $_GET['this_battle_token'] : '';
+$this_star_token = isset($_GET['this_star_token']) ? $_GET['this_star_token'] : '';
 $this_field_id = isset($_GET['this_field_id']) ? $_GET['this_field_id'] : 0;
 $this_field_token = isset($_GET['this_field_token']) ? $_GET['this_field_token'] : '';
 $this_player_id = isset($_GET['this_player_id']) ? $_GET['this_player_id'] : 0;
@@ -43,6 +44,9 @@ $target_player_token = isset($_GET['target_player_token']) ? $_GET['target_playe
 $flag_skip_fadein = isset($_GET['flag_skip_fadein']) && $_GET['flag_skip_fadein'] == 'true' ? true : false;
 //echo('<pre>$this_battle_token = '.print_r($this_battle_token, true).'</pre>');
 //exit();
+//error_log('----------');
+//error_log('$this_battle_token = '.print_r($this_battle_token, true));
+//error_log('$this_star_token = '.print_r($this_star_token, true));
 
 // Collect the battle index data if available
 if (!empty($this_battle_token)){
@@ -169,7 +173,47 @@ else {
     $this_field_token = '';
     $this_field_data = array();
 }
-// If any extra field multipliers were defined, let's add them now
+
+// Remove any leftover boss stars added in previous sessions just-in-case
+if (!empty($this_battle_data['values']['field_star'])
+    && !empty($this_battle_data['values']['field_star']['star_kind'])
+    && $this_battle_data['values']['field_star']['star_kind'] === 'boss'){
+    //error_log('removing leftover boss star from previous session');
+    unset($this_battle_data['values']['field_star']);
+    rpg_battle::update_index_info($this_battle_token, $this_battle_data);
+    //error_log('new $this_battle_data = '.print_r($this_battle_data, true));
+}
+// Check to see if there's any star data included in the request headers
+$this_star_data = null;
+if (!empty($this_star_token)){
+
+    // Try to collect star data from the world class first as that's the likely source
+    if (strstr($this_star_token, 'world-star_')){
+        $this_star_data = rpg_world::get_star_info($this_star_token);
+        //error_log('$this_star_data = '.print_r($this_star_data, true));
+        if (!empty($this_star_data) && !empty($this_star_data['owner'])){
+            $boss_robot_info = rpg_robot::get_index_info($this_star_data['owner']);
+            $boss_field_star = array(
+                'star_token' => $boss_robot_info['robot_token'],
+                'star_name' => $boss_robot_info['robot_name'],
+                'star_kind' => 'boss',
+                'star_type' => $boss_robot_info['robot_core'],
+                'star_type2' => '',
+                'star_field' => $this_field_data['field_background'],
+                'star_field2' => $this_field_data['field_foreground'],
+                'star_player' => $this_player_token,
+                'star_date' => time(),
+                );
+            //error_log('adding boss star to battle index info');
+            //error_log('$boss_field_star = '.print_r($boss_field_star, true));
+            $this_battle_data['values']['field_star'] = $boss_field_star;
+            rpg_battle::update_index_info($this_battle_token, $this_battle_data);
+            //error_log('new $this_battle_data = '.print_r($this_battle_data, true));
+        }
+    }
+
+
+}
 
 // Collect this player's index data if available
 $temp_this_robot_classes = array();
@@ -561,16 +605,25 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                     if (!empty($this_battle_data['values']['field_star'])){
 
                         // Check if this is a field star or fusion star
-                        $temp_star_kind = !empty($this_field_data['field_type2']) ? 'fusion' : 'field';
-                        $temp_star_name = $this_field_data['field_name'].' Star';
-                        $temp_field_type_1 = !empty($this_field_data['field_type']) ? $this_field_data['field_type'] : 'none';
-                        $temp_field_type_2 = !empty($this_field_data['field_type2']) ? $this_field_data['field_type2'] : $temp_field_type_1;
+                        $temp_field_star = $this_battle_data['values']['field_star'];
+                        $temp_star_token = !empty($temp_field_star['star_token']) ? $temp_field_star['star_token'] : 'undefined';
+                        $temp_star_kind = !empty($temp_field_star['star_kind']) ? $temp_field_star['star_kind'] : (!empty($this_field_data['field_type2']) ? 'fusion' : 'field');
+                        //$temp_star_name = $this_field_data['field_name'].' Star';
+                        if ($temp_star_kind === 'boss'){
+                            $temp_star_name = ucwords(str_replace('-', ' ', $temp_star_token)).' Star';
+                            $temp_field_type_1 = !empty($temp_field_star['star_type']) ? $temp_field_star['star_type'] : 'none';
+                            $temp_field_type_2 = !empty($temp_field_star['star_type2']) ? $temp_field_star['star_type2'] : $temp_field_type_1;
+                        } else {
+                            $temp_star_name = $this_field_data['field_name'].' Star';
+                            $temp_field_type_1 = !empty($this_field_data['field_type']) ? $this_field_data['field_type'] : 'none';
+                            $temp_field_type_2 = !empty($this_field_data['field_type2']) ? $this_field_data['field_type2'] : $temp_field_type_1;
+                        }
                         if ($temp_field_type_1 == $temp_field_type_2){ $temp_star_text = ucfirst($temp_field_type_1).' Type | '; }
                         else { $temp_star_text = ucfirst($temp_field_type_1).' / '.ucfirst($temp_field_type_1).' Type | '; }
                         $temp_star_text .= ucfirst($temp_star_kind).' Class';
 
                         // Generate the star image info based on the kind and type(s)
-                        $temp_star_image = $temp_star_kind.'-star';
+                        $temp_star_image = $temp_star_kind !== 'boss' ? $temp_star_kind.'-star' : 'field-star';
                         if (!empty($temp_field_type_1)){ $temp_star_image .= '_'.$temp_field_type_1; }
                         if (!empty($temp_field_type_2) && $temp_field_type_2 != $temp_field_type_1){ $temp_star_image .= '-'.$temp_field_type_2; }
 
@@ -607,6 +660,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             );
 
                     }
+
                     // Check if this field has a challenge marker in it
                     if (!empty($this_battle_data['values']['challenge_marker'])){
 

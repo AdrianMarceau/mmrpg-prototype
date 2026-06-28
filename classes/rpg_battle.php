@@ -3630,7 +3630,8 @@ class rpg_battle extends rpg_object {
         $temp_star_kind = $options['star_kind'];
         $temp_field_type_1 = !empty($options['star_type']) ? $options['star_type'] : 'none';
         $temp_field_type_2 = !empty($options['star_type2']) ? $options['star_type2'] : $temp_field_type_1;
-        if ($temp_star_kind == 'field'){
+        if ($temp_star_kind == 'boss'
+            || $temp_star_kind == 'field'){
             $temp_star_front = array('path' => 'images/items/field-star_'.$temp_field_type_1.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '02', 'size' => 40);
             $temp_star_back = array('path' => 'images/items/field-star_'.$temp_field_type_2.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '01', 'size' => 40);
         } elseif ($temp_star_kind == 'fusion'){

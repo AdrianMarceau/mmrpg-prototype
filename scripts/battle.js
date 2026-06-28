@@ -584,7 +584,7 @@ $(document).ready(function(){
             }
         // If the player has pressed the L2+R2 button, we should try to click the top-right support button (if exists)
         if (activeInputs.LR2){
-            console.log('%c' + 'L2+R2 key pressed!', 'color: orange;');
+            //console.log('%c' + 'L2+R2 key pressed!', 'color: orange;');
             if (event){ event.preventDefault(); }
             if ($currentFloatLinks.length){
                 let $floatButtons = $('.button[data-action]:not(.num):not(.disabled)', $currentFloatLinks);
@@ -592,7 +592,7 @@ $(document).ready(function(){
                 //console.log('$floatButtons =', $floatButtons.length, $floatButtons);
                 let $firstButton = $floatButtons.length && $floatButtons.length ? $floatButtons.first() : null;
                 if ($firstButton){
-                    console.log('-> clicking $firstButton =', $firstButton.length, $firstButton);
+                    //console.log('-> clicking $firstButton =', $firstButton.length, $firstButton);
                     $firstButton.addClass('button_hover');
                     $firstButton.trigger('click');
                     return true;
