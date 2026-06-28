@@ -9,6 +9,8 @@ $auto_parse_fields = isset($auto_parse_fields) ? $auto_parse_fields : true;
 $allowed_indexes = isset($allowed_indexes) ? $allowed_indexes : array('types', 'players', 'robots', 'items', 'skills', 'abilities', 'fields');
 $mmrpg_indexes = isset($mmrpg_indexes) ? $mmrpg_indexes : array();
 $return_only = !empty($_REQUEST['return']) ? explode(',', trim($_REQUEST['return'])) : array();
+$content_types_index['stars'] = array('token' => 'star', 'xtoken' => 'stars', 'object_class' => false);
+$allowed_indexes[] = 'stars';
 foreach ($content_types_index AS $key => $content_info){
     $content_type = $content_info['token'];
     $content_xtype = $content_info['xtoken'];
@@ -22,6 +24,7 @@ foreach ($content_types_index AS $key => $content_info){
     if ($content_xtype === 'skills'){ $content_index = rpg_skill::get_index(true); }
     if ($content_xtype === 'abilities'){ $content_index = rpg_ability::get_index(true); }
     if ($content_xtype === 'fields'){ $content_index = rpg_field::get_index(true); }
+    if ($content_xtype === 'stars'){ $content_index = rpg_world::get_stars_index(); }
     $content_index = !empty($content_index) ? $content_index : array();
     $mmrpg_indexes[$content_xtype] = $content_index;
     if (empty($content_index) || !$auto_parse_fields){ continue; }
