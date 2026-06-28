@@ -891,12 +891,13 @@
     float: left;
     width: 50%;
     height: 360px;
+    position: relative;
 }
 #prototype .content.fullsize .starforce .chart_wrapper.star_totals {
-    width: 55%;
+    width: 40%;
 }
 #prototype .content.fullsize .starforce .chart_wrapper.star_forces {
-    width: 45%;
+    width: 60%;
 }
 #prototype .content.xforce .starforce .size_toggle span.maximize {
     display: none;
@@ -922,6 +923,10 @@
     width: auto;
     height: auto;
 }
+#prototype .content.fullsize .starlist.fullsize .robots .robot {
+    min-width: calc((100% / 8) - 5px);
+}
+
 #prototype .content.fullsize .starchart.none-found {
     display: none;
 }

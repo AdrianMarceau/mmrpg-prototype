@@ -426,9 +426,7 @@ function temp_combination_number($k,$n){
                                         $last_game = $new_last_game;
                                     }
                                     $game_counts[$last_game]++;
-                                    if ($last_game_changed
-                                        && $last_game_count < $bosses_per_row
-                                        && !$hide_field_fusion_stars){
+                                    if ($last_game_changed && $last_game_count < $bosses_per_row){
                                         $spacers_required = $bosses_per_row - $last_game_count;
                                         //error_log('$last_game_changed | $last_game_count '.$last_game_count.' | $spacers_required = '.$spacers_required);
                                         for ($i = 0; $i < $spacers_required; $i++){
@@ -778,20 +776,6 @@ function temp_combination_number($k,$n){
                                     legend: {
                                         display: false,
                                         },
-                                    scales: {
-                                        xAxes: [{
-                                            stacked:true,
-                                            ticks: {
-                                                beginAtZero:true
-                                                }
-                                            }],
-                                        yAxes: [{
-                                            stacked:true,
-                                            ticks: {
-                                                beginAtZero:true
-                                                }
-                                            }]
-                                        },
                                     skipNull: true,
                                     responsive: true,
                                     maintainAspectRatio: false,
@@ -805,7 +789,8 @@ function temp_combination_number($k,$n){
                                 <script type="text/javascript">
 
                                     var thisChartOptions = jQuery.extend(true, {}, baseChartOptions);
-                                    thisChartOptions.title.text = '<?= $this_battle_stars_count.' '.($this_battle_stars_count === 1 ? 'Star' : 'Stars') ?>';
+                                    //thisChartOptions.title.text = '<?= $this_battle_stars_count.' '.($this_battle_stars_count === 1 ? 'Star' : 'Stars') ?>';
+                                    thisChartOptions.title.text = 'Stars Collected';
                                     thisChartOptions.tooltips = {
                                         callbacks: {
                                             title: function (tooltipItem, data) {
@@ -825,14 +810,14 @@ function temp_combination_number($k,$n){
                                                 //console.log('LABEL');
                                                 //console.log('tooltipItems', tooltipItems);
                                                 //console.log('data.datasets', data.datasets);
-                                                var returnText =  'x' + tooltipItems.yLabel + ' ' + data.datasets[tooltipItems.datasetIndex].label;
+                                                var returnText =  'x' + data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index] + ' ' + data.datasets[tooltipItems.datasetIndex].label;
                                                 //console.log('returnText', returnText);
                                                 return returnText;
                                                 }
                                             }
                                         };
                                     thisStarSettings.starData = {
-                                        type: 'bar',
+                                        type: 'pie',
                                         data: {
                                             labels: <?= json_encode($star_type_labels) ?>,
                                             datasets: [/*{
@@ -878,13 +863,38 @@ function temp_combination_number($k,$n){
                                 <script type="text/javascript">
 
                                     var thisChartOptions = jQuery.extend(true, {}, baseChartOptions);
-                                    thisChartOptions.title.text = 'Starforce Levels';
+                                    thisChartOptions.title.text = 'Starforce Boosts';
+                                    thisChartOptions.tooltips = {
+                                        callbacks: {
+                                            title: function (tooltipItem, data) {
+                                                var returnText = data.labels[tooltipItem[0].index];
+                                                return returnText;
+                                                },
+                                            label: function(tooltipItems, data) {
+                                                var returnText =  '+' + tooltipItems.yLabel + ' ' + data.datasets[tooltipItems.datasetIndex].label;
+                                                return returnText;
+                                                }
+                                            }
+                                        };
+                                    thisChartOptions.scale = {
+                                            ticks: { beginAtZero:true, precision: 0 }
+                                          };
+                                    thisChartOptions.scales = {
+                                            xAxes: [{
+                                                stacked:true,
+                                                ticks: { beginAtZero:true, precision: 0 }
+                                                }],
+                                            yAxes: [{
+                                                stacked:true,
+                                                ticks: { beginAtZero:true, precision: 0 }
+                                                }]
+                                            };
                                     thisStarSettings.forceData = {
                                         type: 'bar',
                                         data: {
                                             labels: <?= json_encode($star_force_labels) ?>,
                                             datasets: [{
-                                                label: 'Level',
+                                                label: 'All Stats',
                                                 data: <?= json_encode($force_type_counts) ?>,
                                                 backgroundColor: <?= json_encode($force_type_backgrounds) ?>,
                                                 borderColor: <?= json_encode($force_type_borders) ?>,
