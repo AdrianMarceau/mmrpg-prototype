@@ -6323,14 +6323,19 @@ class mmrpgWorldMap {
                         battleVars.push('this_battle_token=' + battleId);
                         if (battleStarId){ battleVars.push('this_star_token=' + battleStarId); }
                         let battleHref = 'battle.php?' + battleVars.join('&');
-                        $thisWorld.addClass('busy');
-                        _self.incZoomLevel();
-                        _self.saveWorldState(function(){
+                        if (true){
+                            $thisWorld.addClass('busy');
                             _self.incZoomLevel();
-                            $thisWorld.addClass('loading');
-                            window.location.href = battleHref;
-                            _self.incZoomLevel();
-                            }, true, false);
+                            _self.saveWorldState(function(){
+                                _self.incZoomLevel();
+                                $thisWorld.addClass('loading');
+                                window.location.href = battleHref;
+                                _self.incZoomLevel();
+                                }, true, false);
+                            } else {
+                            console.warn('battles disabled for testing!');
+                            console.warn('-> battleHref =', battleHref);
+                            }
                         }
                     }
                 else if (isPortal){
