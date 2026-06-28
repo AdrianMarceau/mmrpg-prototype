@@ -559,8 +559,7 @@ $(document).ready(function(){
     // -- READY ROOM INIT AND TRANSITIONS -- //
 
     // If we're on the actual prototype parent frame, load the ready room now
-    if (!prototypeIsFramed
-        && !prototypeIsSubmenu){
+    if (!(prototypeIsFramed && prototypeIsSubmenu)){
         // Only add the ready room to the banner after the player has unlocked their first homebase
         if (thisReadyRoom !== false
             && gameSettings.readyRoomEnabled){
@@ -607,7 +606,7 @@ function triggerWindowEventsPull(afterDelay){
                 //console.log('attempting to pull window events via parent.windowEventsPull()', parent.windowEventsPull);
                 let result = topFrame.windowEventsPull(true);
                 if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
-                else { console.log('windowEventsPull returned successfully: ' + result); }
+                //else { console.log('windowEventsPull returned successfully: ' + result); }
                 }, afterDelay);
             });
         }
@@ -616,7 +615,7 @@ function triggerWindowEventsPull(afterDelay){
         setTimeout(function(){
             let result = topFrame.windowEventsPull(true);
             if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
-            else { console.log('windowEventsPull returned successfully: ' + result); }
+            //else { console.log('windowEventsPull returned successfully: ' + result); }
             }, afterDelay);
         }
     else {
@@ -628,7 +627,7 @@ function triggerWindowEventsPull(afterDelay){
 
 // Create the windowResize event for this page
 function windowResizePrototype(){
-    console.log('%c' + 'windowResizePrototype() called!', 'color: orange;');
+    //console.log('%c' + 'windowResizePrototype() called!', 'color: orange;');
     let $thisPrototype = $mmrpgElements.thisPrototype;
     let $thisBanner = $mmrpgElements.thisBanner;
     let $thisFalloff = $mmrpgElements.thisFalloff;
