@@ -1484,7 +1484,7 @@ function mmrpg_game_zenny_unlocked(){
     // Define the game session helper var
     $session_token = mmrpg_game_token();
     // Collect the zenny count and return it
-    if (!empty($_SESSION[$session_token]['values']['battle_zenny'])){ return $_SESSION[$session_token]['values']['battle_zenny']; }
+    if (!empty($_SESSION[$session_token]['counters']['battle_zenny'])){ return $_SESSION[$session_token]['counters']['battle_zenny']; }
     else { return 0; }
 }
 
