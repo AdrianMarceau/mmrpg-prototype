@@ -3567,8 +3567,22 @@ class mmrpgUserInputWatcher {
                 userInputs.X.gamepad = Object.values(baseButtonKeys.Y);
                 userInputs.Y.gamepad = Object.values(baseButtonKeys.X);
                 }
+            else if (gamepadKind === 'xbox'){
+                // xbox controllers have different icons, but button placement is consistent
+                userInputs.A.gamepad = Object.values(baseButtonKeys.A);
+                userInputs.B.gamepad = Object.values(baseButtonKeys.B);
+                userInputs.X.gamepad = Object.values(baseButtonKeys.X);
+                userInputs.Y.gamepad = Object.values(baseButtonKeys.Y);
+                }
+            else if (gamepadKind === 'sony'){
+                // xbox controllers have different icons, but button placement is consistent
+                userInputs.A.gamepad = Object.values(baseButtonKeys.A);
+                userInputs.B.gamepad = Object.values(baseButtonKeys.B);
+                userInputs.X.gamepad = Object.values(baseButtonKeys.Y);
+                userInputs.Y.gamepad = Object.values(baseButtonKeys.X);
+                }
             else {
-                // xbox and playstation controllers have different icons, but button placement is consistent
+                // otherwise use the default button values and just leave it be
                 userInputs.A.gamepad = Object.values(baseButtonKeys.A);
                 userInputs.B.gamepad = Object.values(baseButtonKeys.B);
                 userInputs.X.gamepad = Object.values(baseButtonKeys.X);
