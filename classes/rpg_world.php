@@ -428,6 +428,29 @@ class rpg_world {
                     }
                 }
             }
+            // If world star claim-times were provided, save them to the session
+            if (!empty($worldData['lastPlayerStars'])){
+                //error_log('lastPlayerStars provided = '.print_r($worldData['lastPlayerStars'], true));
+                $game_session_token = rpg_game::session_token();
+                $GAME_SESSION = &$_SESSION[$game_session_token];
+                $mmrpg_index_stars = self::get_stars_index();
+                $collected_battle_stars = self::get_battle_stars();
+                //error_log('$mmrpg_index_stars = '.print_r(array_keys($mmrpg_index_stars), true));
+                //error_log('$collected_battle_stars = '.print_r(array_keys($collected_battle_stars), true));
+                foreach ($worldData['lastPlayerStars'] AS $star_token => $claim_date){
+                    //error_log('reviewing "'.$star_token.'" star w/ claim date = '.print_r($claim_date, true));
+                    if (!isset($mmrpg_index_stars[$star_token])){ continue; }
+                    if (isset($collected_battle_stars[$star_token])){ continue; }
+                    $star_info = $mmrpg_index_stars[$star_token];
+                    //error_log('the "'.$star_token.'" star is new! we should save it now...');
+                    //error_log('-> $star_info = '.print_r($star_info, true));
+                    $new_star_data = array('star_date' => time());
+                    $new_star_data = array_merge($star_info, $new_star_data);
+                    unset($new_star_data['star_order']);
+                    $GAME_SESSION['values']['battle_stars'][$star_token] = $new_star_data;
+                    //error_log('--> saved to $GAME_SESSION[\'values\'][\'battle_stars\']['.$star_token.'] w/ $new_star_data = '.print_r($new_star_data, true));
+                }
+            }
             // If the last player abilities were provided, update their game session quantities w/ any changes
             if (!empty($worldData['lastPlayerAbilities'])){
                 //error_log('scanning last player abilities for changes...');
@@ -483,6 +506,7 @@ class rpg_world {
             }
             // If world item claim-times were provided, save them to the session
             if (!empty($worldData['lastWorldItems'])){
+                //error_log('lastWorldItems provided = '.print_r($worldData['lastWorldItems'], true));
                 if (!isset($WORLD_SESSION['world_items'])){ $WORLD_SESSION['world_items'] = array(); }
                 $worldItemStates = &$WORLD_SESSION['world_items'];
                 foreach ($worldData['lastWorldItems'] AS $map_token => $item_states){
@@ -592,24 +616,19 @@ class rpg_world {
     // -- WORLD MAP METHODS -- //
 
     // Define a function for loading a given map's data from the filesystem
-    public static function load_map_data($world_map_token, &$world_data_parsed = array(), &$map_data_parsed = array()){
-        //error_log('load_map_data() called!');
-        if (empty($world_map_token)){ error_log('rpg_world::load_map_data() error - missing world-map token!'); return false; }
-        if (!strstr($world_map_token, '__')){ error_log('rpg_world::load_map_data() error - invalid world-map token "'.$world_map_token.'"!'); return false; }
+    // TODO: the function should cache the result and only refresh when needed
+    public static function parse_map_data($world_map_token, &$world_data_parsed = array(), &$map_data_parsed = array()){
+        //error_log('parse_map_data() called!');
+        if (empty($world_map_token)){ error_log('rpg_world::parse_map_data() error - missing world-map token!'); return false; }
+        if (!strstr($world_map_token, '__')){ error_log('rpg_world::parse_map_data() error - invalid world-map token "'.$world_map_token.'"!'); return false; }
         list($world_token, $map_token) = explode('__', $world_map_token);
         // first we collect data for the parent world itself
         $world_basedir = self::$worldmap_basedir.self::$worldmap_basepath;
         $world_filename = $world_token.'.world';
         $world_filedir = $world_basedir.$world_filename;
-        if (!file_exists($world_filedir)){
-            //error_log('load_map_data() world file not found "'.$world_filedir.'"!');
-            return false;
-            }
+        if (!file_exists($world_filedir)){ error_log('parse_map_data() world file not found "'.$world_filedir.'"!'); return false; }
         $world_data_raw = file_get_contents($world_filedir);
-        if (empty($world_data_raw)){
-            //error_log('load_map_data() world file empty "'.$world_filedir.'"!');
-            return false;
-            }
+        if (empty($world_data_raw)){ error_log('parse_map_data() world file empty "'.$world_filedir.'"!'); return false; }
         $world_data_array = explode("\n", trim($world_data_raw));
         $world_data_vars = array();
         foreach ($world_data_array AS $line){
@@ -635,20 +654,14 @@ class rpg_world {
                 continue;
                 }
         }
-        //error_log('load_map_data() loaded world data vars: '.print_r($world_data_vars, true));
+        //error_log('parse_map_data() loaded world data vars: '.print_r($world_data_vars, true));
         // then we collect data for the actual map within the world
         $map_basedir = self::$worldmap_basedir.self::$worldmap_basepath;
         $map_filename = $world_token.'/'.$map_token.'.map';
         $map_filedir = $map_basedir.$map_filename;
-        if (!file_exists($map_filedir)){
-            //error_log('load_map_data() file not found "'.$map_filedir.'"!');
-            return false;
-            }
+        if (!file_exists($map_filedir)){ error_log('parse_map_data() $map_filedir not found "'.$map_filedir.'"!'); return false; }
         $map_data_raw = file_get_contents($map_filedir);
-        if (empty($map_data_raw)){
-            //error_log('load_map_data() file empty "'.$map_filedir.'"!');
-            return false;
-            }
+        if (empty($map_data_raw)){ error_log('parse_map_data() $map_data_raw from via "'.$map_filedir.'" was empty!'); return false; }
         $map_data_array = explode("\n", trim($map_data_raw));
         $map_data_vars = array();
         $map_layer_key = 0;
@@ -1332,7 +1345,7 @@ class rpg_world {
         $world_token = $map_data_parsed['world'];
         $map_token = $map_data_parsed['token'];
         $world_map_token = $world_token.'__'.$map_token;
-        $world_battle_token = 'world-battle_'.str_replace('__', '-', $world_map_token);
+        $world_battle_token = 'world-battle_'.str_replace('__', '_', $world_map_token);
         $map_name = !empty($map_data_parsed['name']) ? $map_data_parsed['name'] : 'Undefined';
         $map_level = !empty($map_data_parsed['level']) ? $map_data_parsed['level'] : 1;
         $map_encounters = !empty($map_data_parsed['encounters']) ? $map_data_parsed['encounters'] : array();
@@ -3456,9 +3469,11 @@ class rpg_world {
             $item_sprites = $world_map_items;
             $world_map_items = !empty($world_items[$world_map_token]) ? $world_items[$world_map_token] : array();
             $world_map_item_symbols = !empty($world_symbols[$world_map_token]['items']) ? $world_symbols[$world_map_token]['items'] : array();
+            $collected_battle_stars = null;
             //error_log('$item_sprites = '.print_r($item_sprites, true));
             //error_log('$world_map_items = '.print_r($world_map_items, true));
             //error_log('$world_map_item_symbols = '.print_r($world_map_item_symbols, true));
+            //error_log('$collected_battle_stars = '.print_r($collected_battle_stars, true));
             foreach ($item_sprites AS $item_namekey => $item_data){
                 //error_log('----------');
                 //error_log('Processing item "'.$item_namekey.'" with data: '.print_r($item_data, true));
@@ -3466,6 +3481,18 @@ class rpg_world {
                 if (empty($item_data[0]) || !is_string($item_data[0]) || !preg_match('/^\d+-\d+$/', $item_data[0])){ continue; } // skip if no position
                 if (empty($item_data[1]) || !is_string($item_data[1])){ continue; } // skip if no token
                 $claimed = !empty($world_map_items[$item_namekey]) ? $world_map_items[$item_namekey] : 0; // unix-timestamp
+                //error_log('Looking for "'.$item_namekey.'" in $world_map_items: '.print_r($world_map_items, true));
+                if (!$claimed && strstr($item_data[1], '-star') && !empty($item_data[2])){
+                    $star = $item_data[1]; $owner = $item_data[2];
+                    if ($collected_battle_stars === null){ $collected_battle_stars = self::get_battle_stars(); }
+                    if (!empty($collected_battle_stars[$owner])
+                        && !empty($collected_battle_stars[$owner]['star_date'])){
+                        $claimed = $collected_battle_stars[$owner]['star_date'];  // unix-timestamp
+                        $session_token = self::session_token();
+                        $_SESSION[$session_token]['world_items'][$world_map_token][$item_namekey] = $claimed;
+                        //error_log('$_SESSION['.$session_token.'][\'world_items\']['.$world_map_token.']['.$item_namekey.']');
+                        }
+                    }
                 //error_log('-> '.$item_namekey.' already claimed, skipping...');
                 $kind = 'item';
                 $hidden = in_array('hidden', $item_data) ? true : false; if ($hidden){ unset($item_data[array_search('hidden', $item_data)]); }
@@ -3478,11 +3505,19 @@ class rpg_world {
                     } // skip if already claimed but not anchored
                 $pos = $item_data[0]; unset($item_data[0]);
                 $token = !empty($item_data[1]) ? $item_data[1] : ''; unset($item_data[1]);
-                $quantity = !empty($item_data[2]) ? $item_data[2] : ''; unset($item_data[2]);
-                $repeat = !empty($item_data[3]) ? $item_data[3] : ''; unset($item_data[3]);
+                $subtoken = '';
+                $quantity = 1;
+                $repeat = 'once';
+                if (strstr($token, '-star')){
+                    $subtoken = !empty($item_data[2]) ? $item_data[2] : ''; unset($item_data[2]);
+                    } else {
+                    $quantity = !empty($item_data[2]) ? $item_data[2] : ''; unset($item_data[2]);
+                    $repeat = !empty($item_data[3]) ? $item_data[3] : ''; unset($item_data[3]);
+                    }
                 $num_in_set = false; $set_token = false;
                 if (strstr($token, '__')){  $set_token = $token; list($token, $num_in_set) = explode('__', $set_token, 2); }
                 $unlock_token = !empty($set_token) ? $set_token : $token;
+                $unlock_subtoken = !empty($subtoken) ? $subtoken : '';
                 $quantity = intval(trim($quantity, 'x')); if (!$quantity){ $quantity = 1; }
                 if (!empty($world_map_item_symbols[$item_namekey])){ $pos = $world_map_item_symbols[$item_namekey]; }
                 list($col, $row) = explode('-', $pos);
@@ -3541,6 +3576,7 @@ class rpg_world {
                 $items_index[$item_namekey] = array(
                     'pos' => $pos,
                     'token' => $unlock_token,
+                    'subtoken' => $unlock_subtoken,
                     'quantity' => $quantity,
                     'repeat' => $repeat,
                     'col' => $col,
