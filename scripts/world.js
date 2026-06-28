@@ -3877,6 +3877,13 @@ class mmrpgWorldMap {
                         return true;
                         }
                     }
+                // If the player has pressed the Y button, ?????
+                if (activeInputs.Y){
+                    //console.log('%c' + 'Y key pressed!', 'color: orange;');
+                    //if (event){ event.preventDefault(); }
+                    // ?????
+                    //return true;
+                    }
                 // If the player has pressed the A button without any menus open, perhaps they're trying to re-init nearby events
                 if (activeInputs.A){
                     //console.log('%c' + 'A key pressed!', 'color: orange;');
@@ -3894,6 +3901,13 @@ class mmrpgWorldMap {
                     // Turn OFF the auto-options since A isn't being held anymore
                     _world.autoApplyConsumables = false;
                     _world.autoEquipHoldables = false;
+                    }
+                // If the player has pressed the B button, ?????
+                if (activeInputs.B){
+                    //console.log('%c' + 'B key pressed!', 'color: orange;');
+                    //if (event){ event.preventDefault(); }
+                    // ?????
+                    //return true;
                     }
                 // If the player has pressed either of the triggers we should let them scroll within the player-switcher
                 if (activeInputs.L2 || activeInputs.R2 || activeInputs.LR2){
