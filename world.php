@@ -776,6 +776,7 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
 <!-- (3) start to load world scripts  -->
 <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.world.php'); ?>
 <script type="text/javascript" src="scripts/world.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/world-bindings.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/world-messages.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/world-players.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/world-robots.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
