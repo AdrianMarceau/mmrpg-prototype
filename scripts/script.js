@@ -2723,65 +2723,6 @@ function mmrpg_music_speed(newSpeed, fadeMusic){
     if (fadeMusic){ mmrpg_reset_music_volume(); }
 }
 
-// Define a function for playing a specific fanfare track
-function mmrpg_fanfare_load(newTrack, resartTrack, playOnce, fadeMusic, onendFunction){
-    //console.log('mmrpg_fanfare_load(', newTrack, resartTrack, playOnce, ')');
-    var fanfareStream = $('.audio-stream.fanfare', gameMusic);
-    //console.log('fanfareStream =', fanfareStream.length, fanfareStream);
-    var thisTrack = fanfareStream.attr('data-track');
-    var isRestart = typeof resartTrack === 'boolean' ? resartTrack : true;
-    var isPlayOnce = typeof playOnce === 'boolean' ? playOnce : true;
-    var fadeMusic = typeof fadeMusic === 'boolean' ? fadeMusic : true;
-    var onendFunction = typeof onendFunction === 'function' ? onendFunction : mmrpgFanfareEndedDefault;
-    if (newTrack == 'last-track'){
-        var lastTrack = fanfareStream.attr('data-last-track');
-        if (lastTrack.length){ newTrack = lastTrack; }
-        }
-    if (isRestart == false && newTrack == thisTrack){
-        return false;
-        }
-    if (mmrpgFanfareSound !== false
-        && mmrpgFanfareSound.playing()){
-        mmrpgFanfareSound.stop();
-        }
-    fanfareStream.attr('data-track', newTrack);
-    fanfareStream.attr('data-last-track', thisTrack);
-    // Create a new Howl object and load the new track
-    if (fadeMusic){ mmrpg_music_volume(0, false, 300); }
-    var fanfareVolume = gameSettings.musicVolume * gameSettings.masterVolume;
-    if (!gameSettings.musicVolumeEnabled){ musicBaseVolume = 0; }
-    if (mmrpgFanfareSound === false){
-
-        mmrpgFanfareSound = new Howl({
-            src: [gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime,
-                  gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime],
-            autoplay: false,
-            volume: fanfareVolume,
-            loop: isPlayOnce ? false : true,
-            onend: function(){
-                if (fadeMusic){ mmrpg_reset_music_volume(); }
-                onendFunction();
-                },
-            onload: function(){
-                this.volume(fanfareVolume);
-                }
-            });
-        mmrpgFanfareSound.once('load', function(){
-            this.stop();
-            this.volume(fanfareVolume);
-            this.play();
-            });
-
-        } else {
-
-        mmrpgFanfareSound.stop();
-        mmrpgFanfareSound.volume(fanfareVolume);
-        mmrpgFanfareSound.play();
-
-        }
-
-}
-
 // Define a function for preloading music files
 var musicCache = [];
 var cacheList = [];
