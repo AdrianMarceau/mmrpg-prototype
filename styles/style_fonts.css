@@ -78,7 +78,8 @@
 /* Custom FontAwesome Icons (CSS) */
 .fa-delta,
 .fa-sigma,
-.fa-bullet {
+.fa-bullet,
+.fa-zenny {
     font-family: "Font Awesome 5 Free"; /* Ensure compatibility with FontAwesome font family */
     font-weight: 900; /* Match the weight used in FontAwesome icons (adjust as needed) */
     font-style: normal; /* Prevent italic styling */
@@ -93,4 +94,7 @@
 }
 .fa-bullet:before {
     content: "\2022";
+}
+.fa-zenny:before {
+    content: "\0001b6";
 }
