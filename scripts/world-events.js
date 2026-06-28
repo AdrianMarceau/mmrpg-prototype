@@ -1306,6 +1306,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     let cancelHazardTrap = function(){
                         delete _world.isBusyWith.hazardEffectFunction;
                         $hazardEvent.removeClass('always-zoom');
+                        $canvasMap.removeClass('shake-once');
                         };
                     if (!stillAtPosition()){ cancelHazardTrap(); return; }
                     _selfRef.hazardTrapTimeout = setTimeout(function(){ cancelHazardTrap(); }, 1600);
@@ -1360,10 +1361,13 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     hazardTriggered++;
                     //console.log('effectsTriggered =', effectsTriggered);
                     //console.log('hazardTriggered =', hazardTriggered);
-                    if (!effectsTriggered){
+                    if (effectsTriggered){
+                        $canvasMap.addClass('shake-once');
+                        } else {
                         cancelHazardTrap();
                         clearTimeout(_selfRef.hazardTrapTimeout);
                         clearTimeout(_selfRef.hazardEffectTimeout);
+                        $canvasMap.removeClass('shake-once');
                         }
                     };
                 triggerEffect = true;
