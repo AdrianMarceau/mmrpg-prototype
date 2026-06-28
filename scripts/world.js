@@ -7068,22 +7068,28 @@ class mmrpgWorldMap {
                 let eventIsPortal = eventKind === 'portal';
                 let eventIsSanctuary = eventKind2 === 'sanctuary';
                 let eventIsPickup = eventKind === 'item' || eventKind === 'ability';
-                //console.log('--> eventIsCustom =', eventIsCustom, '| eventIsPortal =', eventIsPortal, '| eventIsSanctuary =', eventIsSanctuary, '| eventIsPickup =', eventIsPickup);
+                let eventIsStar = eventKind === 'item' && eventInfo.token.indexOf('-star') !== -1;
+                //console.log('--> eventIsCustom =', eventIsCustom, '| eventIsPortal =', eventIsPortal, '| eventIsSanctuary =', eventIsSanctuary, '| eventIsPickup =', eventIsPickup, '| eventIsStar =', eventIsStar);
                 if (eventPosition !== searchPosition
-                    && (eventIsCustom || eventIsPortal || eventIsSanctuary || eventIsPickup)){
+                    && (eventIsCustom || eventIsPortal || eventIsSanctuary || eventIsPickup)
+                    && !eventIsStar){
                     // skip custom unless it's the exact position
-                    //console.log('----> skipping ' + eventKind + ' at ' + eventPosition + ' because it is not the exact position');
+                    //console.log('----> skipping ' + eventKind + ' at ' + eventPosition + ' (' + eventToken + ') because it is not the exact position', '\n-> eventInfo =', eventInfo);
                     continue;
                     }
                 // otherwise we are fine to add to the events array
                 //console.log('--> adding ' + eventKind + ' at ' + eventPosition + ' to eventsAtPosition array', '\n--> w/ eventAtPosition = ', eventAtPosition);
                 eventsAtPosition.push(eventAtPosition);
                 }
+            // Check if there is a battle anywhere in the collected events
+            let hasBattleNearby = eventsAtPosition.some(function(event){ return event.kind === 'battle'; });
             // Check to see if the cursor is holding any events, if so they are "at this position"
             // (putting this last so that the cursor can't drop items where another event already is)
             //console.log('-> checking cursor holding for ' + eventKind + ' at position ' + searchPosition);
             //console.log('-> but only if no events found in eventsAtPosition =', eventsAtPosition.length, eventsAtPosition);
-            if (!eventsAtPosition.length && _worldCursor.holding && _worldCursor.holding.indexOf(eventKind + '/') === 0){
+            //if (!eventsAtPosition.length && _worldCursor.holding && _worldCursor.holding.indexOf(eventKind + '/') === 0){
+            if ((!eventsAtPosition.length || !hasBattleNearby)
+                && _worldCursor.holding && _worldCursor.holding.indexOf(eventKind + '/') === 0){
                 //console.log('-> cursor is holding an event of kind ' + eventKind + ', adding to eventsAtPosition array');
                 let eventToken = _worldCursor.holding.split('/')[1] || false;
                 let eventInfo = eventsIndex[eventToken] || false;
