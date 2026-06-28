@@ -19,7 +19,7 @@
 #---------------------------#
 @encounters   = bombomboy(10),blocky(12),arc-weldy(12),picket-man(6),tosanaizer-v(3),air-stone(9),robo-fishtot(10)
 @groups[]     = no-encounters_da1-exit-buffer(1-11...3-13)
-@groups[]     = no-encounters_da1s2-exit-buffer(7-19...9-21)
+@groups[]     = no-encounters_da1s2-exit-buffer(14-11...15-13)
 #---------------------------#
 @terrain[]   = grass(gentle-countryside)
 @terrain[]   = plain(waterworks-dam)
