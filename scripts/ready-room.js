@@ -369,7 +369,9 @@
             var thisPlayerSprite = thisReadyRoomConfig.spritesIndex[thisPlayerToken];
             //console.log('thisPlayerToken/Info =', thisPlayerToken, thisPlayerInfo, thisPlayerSprite);
             if (thisPlayerSprite.frame !== 0){ thisPlayerSprite.cooldown = 0; }
-            if (!thisReadyRoom.animateSpeedCheck(thisPlayerInfo)){
+            var speedCheckPassed = thisReadyRoom.animateSpeedCheck(thisPlayerInfo);
+            var needsFrameCleanup = (thisPlayerSprite.cooldown === 0 && thisPlayerSprite.frame !== 0);
+            if (!speedCheckPassed && !needsFrameCleanup){
                 //console.warn('Skipping player', thisPlayerToken, 'due to animateSpeedCheck failure', '\n-> thisPlayerInfo:', thisPlayerInfo, '\n-> thisPlayerSprite:', thisPlayerSprite);
                 continue;
                 }
@@ -392,7 +394,9 @@
             var thisRobotSprite = thisReadyRoomConfig.spritesIndex[thisRobotToken];
             //console.log('thisRobotToken/Info/Sprite =', thisRobotToken, thisRobotInfo, thisRobotSprite);
             if (thisRobotSprite.frame !== 0){ thisRobotSprite.cooldown = 0; }
-            if (!thisReadyRoom.animateSpeedCheck(thisRobotInfo)){
+            var speedCheckPassed = thisReadyRoom.animateSpeedCheck(thisRobotInfo);
+            var needsFrameCleanup = (thisRobotSprite.cooldown === 0 && thisRobotSprite.frame !== 0);
+            if (!speedCheckPassed && !needsFrameCleanup){
                 //console.warn('Skipping robot', thisRobotToken, 'due to animateSpeedCheck failure', '\n-> thisRobotInfo:', thisRobotInfo, '\n-> thisRobotSprite:', thisRobotSprite);
                 continue;
                 }
