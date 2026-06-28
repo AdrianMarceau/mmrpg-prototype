@@ -170,7 +170,7 @@ class rpg_world {
         $value = array_pop($args);
         $keys  = $args;
         foreach ($keys as $k){ if (empty($k) || !is_string($k)) { return false; } }
-        if (empty($value) || !is_array($value)) { return false; }
+        if (!is_array($value)) { return false; }
         if (!isset($_SESSION[$session_token])){ $_SESSION[$session_token] = array(); }
         $ref =& $_SESSION[$session_token];
         foreach ($keys as $k){
