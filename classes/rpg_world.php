@@ -3026,7 +3026,7 @@ class rpg_world {
             'foamy-bubbles' => array(
                 'name' => 'Foamy Bubbles',
                 'type' => 'water',
-                'weaknesses' => array('wind', 'cutter', 'missle'),
+                'weaknesses' => array('wind', 'cutter', 'missile'),
                 'effects' => array('lower-team-defense', 1)
                 ),
             'frozen-foothold' => array(
