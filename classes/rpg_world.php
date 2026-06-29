@@ -3988,6 +3988,35 @@ class rpg_world {
                     $map_data_parsed['layers'][$layer_key] = $layer_tiles;
                 }
             }
+            // event action REMOVE-GROUP-BLOCKS for buttons, switches, etc. to use
+            if ($action === 'remove-group-blocks'){
+                error_log('world map button "'.$button_name.'" is removing group blocks');
+                //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
+                $group_name = !empty($data[0]) ? $data[0] : '';
+                $block_filter = !empty($data[1]) ? $data[1] : '';
+                error_log('$group_name = '.print_r($group_name, true));
+                error_log('$block_filter = '.print_r($block_filter, true));
+                if (!$group_name){ error_log('-> missing group name for button "'.$button_name.'"'); continue; }
+                $groups_index = !empty($map_data_parsed['groups']) ? $map_data_parsed['groups'] : array();
+                $group_tiles = !empty($groups_index[$group_name]) ? $groups_index[$group_name] : array();
+                if (empty($groups_index)){ error_log('-> no groups defined for this map'); continue; }
+                if (empty($group_tiles)){ error_log('-> no group tiles defined for "'.$group_name.'"'); continue; }
+                $map_blocks = !empty($map_data_parsed['blocks']) ? $map_data_parsed['blocks'] : array();
+                if (!empty($map_blocks)){
+                    foreach ($map_blocks AS $block_name => $block_data){
+                        if (empty($block_data) || !is_array($block_data)){ continue; }
+                        $block_pos = $block_data[0];
+                        $block_sprite = isset($block_data[1]) ? $block_data[1] : '';
+                        if (in_array($block_pos, $group_tiles)){
+                            if (!empty($block_filter) && $block_filter !== 'any' && $block_sprite !== $block_filter){ continue; }
+                            if (!in_array('removed', $block_data)){
+                                $block_data[] = 'removed';
+                                $map_data_parsed['blocks'][$block_name] = $block_data;
+                            }
+                        }
+                    }
+                }
+            }
             // ...
         }
         // Return true on success

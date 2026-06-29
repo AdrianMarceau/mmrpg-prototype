@@ -2111,6 +2111,50 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         _self.refreshMapPositionEvents(); // refresh the map position events
                         _self.saveWorldState();
                         }
+                    // event action REMOVE-GROUP-BLOCKS for buttons, switches, etc. to use
+                    if (buttonAction === 'remove-group-blocks'){
+                        console.log('-> removing group blocks for button', buttonName);
+                        let groupName = buttonData[0] || false;
+                        let blockFilter = buttonData[1] || false;
+                        console.log('-> groupName =', groupName, '\n', '-> blockFilter =', blockFilter);
+                        if (!groupName){ console.error('-> groupName not provided, cannot remove group blocks!'); return false; }
+                        let groupsIndex = _config.mapGroupsIndex;
+                        let groupTiles = groupsIndex[groupName] || false;
+                        if (!groupsIndex || !groupTiles){ console.error('-> groupsIndex not found, cannot remove group blocks!'); return false; }
+                        let blockSymbols = _config.mapBlockSymbols;
+                        let blocksIndex = _config.mapBlocksIndex;
+                        let blockRemovals = _world.blocks;
+                        let blocksRemoved = 0;
+                        for (let i = 0; i < groupTiles.length; i++){
+                            let tilePosition = groupTiles[i];
+                            let targetBlockName = blockSymbols[tilePosition] || false;
+                            if (!targetBlockName){ continue; }
+                            let blockInfo = blocksIndex[targetBlockName] || false;
+                            if (!blockInfo || blockInfo.removed){ continue; }
+                            if (blockFilter && blockFilter !== 'any' && blockInfo.sprite !== blockFilter){ continue; }
+                            blockInfo.removed = true;
+                            delete blockSymbols[tilePosition];
+                            blocksIndex[targetBlockName] = blockInfo; // Sync block info back to the config index
+                            blockRemovals[targetBlockName] = new Date().getTime(); // Sync claim timestamp with world state
+                            let $blockSprite = $('.sprite.block[data-block="' + targetBlockName + '"]', $canvasMap);
+                            if ($blockSprite.length){
+                                $blockSprite.attr('data-state', 'removed').removeClass('glow');
+                                $blockSprite.animate({opacity: 0, filter: 'brightness(2)'}, 600, function(){
+                                    $(this).remove();
+                                    });
+                                blocksRemoved++;
+                                }
+                            }
+                        if (blocksRemoved > 0){
+                            _self.playSoundEffect('block-destroyed-sound', {delay: 200});
+                            setTimeout(function(){
+                                _self.calculateWalkableMapTiles(true);
+                                _self.refreshMapPositionEvents();
+                                }, 600);
+                            _self.saveWorldState();
+                            }
+                        }
+
                     })(buttonInfo);
                 }
             else if (isItem){

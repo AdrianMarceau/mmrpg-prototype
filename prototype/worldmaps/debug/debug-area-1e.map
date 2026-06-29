@@ -64,7 +64,7 @@
 #---------------------------#
 # YELLOW BARRIERS w/ BUTTON
 #---------------------------#
-@buttons[]   = barrier-button-1(18-7, yellow, up, remove-group-blocks, barrier-blocks-1)
+@buttons[]   = barrier-button-1(18-7, yellow, up, remove-group-blocks, barrier-blocks-1, barrier-block)
 @groups[]    = barrier-blocks-1(10-3...10-6, 14-10...17-10, 25-11...25-15)
 #---------------------------#
 @blocks[]    = barrier-block-1-1(10-3, barrier-block, yellow-vert)
