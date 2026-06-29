@@ -694,6 +694,36 @@ html, body {
 #world #map .sprite.block.super-block.final-destination-3 { background-position: -680px -1160px; }
 #world #map .sprite.block.super-block.xxxxxx-xxxxxxxxx { background-position: -760px -1160px; }
 
+#world #map .sprite.block.barrier-block { background-position: -40px -440px; }
+
+#world #map .sprite.block.barrier-block.black-midd { background-position: -40px -440px; }
+#world #map .sprite.block.barrier-block.black-vert { background-position: -40px -520px; }
+#world #map .sprite.block.barrier-block.black-horz { background-position: -40px -600px; }
+
+#world #map .sprite.block.barrier-block.red-midd { background-position: -120px -440px; }
+#world #map .sprite.block.barrier-block.red-vert { background-position: -120px -520px; }
+#world #map .sprite.block.barrier-block.red-horz { background-position: -120px -600px; }
+
+#world #map .sprite.block.barrier-block.blue-midd { background-position: -200px -440px; }
+#world #map .sprite.block.barrier-block.blue-vert { background-position: -200px -520px; }
+#world #map .sprite.block.barrier-block.blue-horz { background-position: -200px -600px; }
+
+#world #map .sprite.block.barrier-block.yellow-midd { background-position: -280px -440px; }
+#world #map .sprite.block.barrier-block.yellow-vert { background-position: -280px -520px; }
+#world #map .sprite.block.barrier-block.yellow-horz { background-position: -280px -600px; }
+
+#world #map .sprite.block.barrier-block.green-midd { background-position: -360px -440px; }
+#world #map .sprite.block.barrier-block.green-vert { background-position: -360px -520px; }
+#world #map .sprite.block.barrier-block.green-horz { background-position: -360px -600px; }
+
+#world #map .sprite.block.barrier-block.purple-midd { background-position: -440px -440px; }
+#world #map .sprite.block.barrier-block.purple-vert { background-position: -440px -520px; }
+#world #map .sprite.block.barrier-block.purple-horz { background-position: -440px -600px; }
+
+#world #map .sprite.block.barrier-block.orange-midd { background-position: -520px -440px; }
+#world #map .sprite.block.barrier-block.orange-vert { background-position: -520px -520px; }
+#world #map .sprite.block.barrier-block.orange-horz { background-position: -520px -600px; }
+
 @keyframes sprite-hazard-crude-oil { 0%, 100% { background-position: -840px -840px; } 50% { background-position: -840px -920px;  }  }
 @keyframes sprite-hazard-foamy-bubbles { 0%, 100% { background-position: -920px -840px; } 50% { background-position: -920px -920px;  }  }
 @keyframes sprite-hazard-frozen-foothold { 0%, 100% { background-position: -1000px -840px; } 50% { background-position: -1000px -920px;  }  }
@@ -4895,8 +4925,8 @@ display: block;
     border-color: #354d75 !important;
 }
 #world #canvas #side-buttons .button[data-action="push-button"].yellow {
-    background-color: #4d3d1e !important;
-    border-color: #6e5d34 !important;
+    background-color: #b3871f !important;
+    border-color: #8e6609 !important;
 }
 #world #canvas #side-buttons .button[data-action="push-button"].green {
     background-color: #3e7a2e !important;

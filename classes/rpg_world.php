@@ -2963,6 +2963,11 @@ class rpg_world {
                 'type' => 'shadow',
                 'weaknesses' => array('shadow'),
                 ),
+            'barrier-block' => array(
+                'name' => 'Barrier Block',
+                'type' => '',
+                'weaknesses' => array()
+                ),
             );
         return $mmrpg_blocks_index;
     }
@@ -3000,6 +3005,7 @@ class rpg_world {
                 $sprite = !empty($block_data[1]) ? $block_data[1] : 'super-block'; unset($block_data[1]);
                 $image = !empty($block_data[2]) ? $block_data[2] : ''; unset($block_data[2]);
                 if (empty($image) && $sprite === 'super-block'){ $image = $map_data_parsed['field']; }
+                if (empty($image) && $sprite === 'barrier-block'){ $image = 'black-vert'; }
                 $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                 $z_index = $top + 1;
