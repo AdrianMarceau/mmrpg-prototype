@@ -1654,14 +1654,14 @@ html, body {
 }
 
 #world #canvas #home-button {
-    top: 51px;
-    left: 0;
-    border-radius: 0 6px 6px 0;
-    font-size: 14px;
-    border-width: 1px 1px 1px 0;
+    top: 0;
+    left: 47px;
+    border-radius: 0 0 6px 6px;
+    font-size: 20px;
+    border-width: 0 1px 1px;
 }
 #world:not(.ready) #canvas #home-button {
-    left: -60px;
+    top: -60px;
 }
 #world #canvas #home-button.focused {
     outline: 1px solid white;
@@ -1695,7 +1695,7 @@ html, body {
     width: auto;
     height: auto;
     top: 0;
-    left: 47px;
+    left: 106px;
     pointer-events: all;
     cursor: default;
     padding: 4px 9px 3px;
@@ -2385,22 +2385,38 @@ html, body {
     box-sizing: border-box;
     padding: 50px 50px 50px 8px;
     max-height: 228px;
-    min-height: 144px;
+    min-height: 100px;
     overflow: hidden;
     transition: min-height 0.9s, max-height 0.9s, background-color 0.3s;
     pointer-events: none;
 }
-#world #canvas #robots-overview:hover .team-robots {
-    /* transition-delay: 2s; */
-}
 #world #canvas #robots-overview .team-robots[data-team-size="1"] {
-    max-height: 140px;
+    max-height: 110px;
 }
 #world #canvas #robots-overview .team-robots[data-team-size="2"] {
-    max-height: 184px;
+    max-height: 170px;
 }
 #world #canvas #robots-overview .team-robots[data-team-size="3"] {
-    max-height: 228px;
+    max-height: 226px;
+}
+#world #canvas #robots-overview .team-robots[data-team-size="4"] {
+    max-height: 282px;
+}
+#world #canvas #robots-overview .team-robots[data-team-size="5"] {
+    max-height: 342px;
+}
+#world #canvas #robots-overview .team-robots[data-team-size="6"] {
+    max-height: 400px;
+}
+#world #canvas #robots-overview .team-robots[data-team-size="7"] {
+    max-height: 458px;
+}
+#world #canvas #robots-overview .team-robots[data-team-size="8"] {
+    max-height: 516px;
+}
+
+#world #canvas #robots-overview:hover .team-robots {
+    /* transition-delay: 2s; */
 }
 #world #canvas #robots-overview.expanded .team-robots {
     /* transition-delay: 0s; */
@@ -4174,7 +4190,7 @@ display: block;
 #world #canvas #robots-overview .team-robot.hovered { z-index: 20; }
 #world #canvas #robots-overview .team-robot.selected { z-index: 20; }
 
-#world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(n+4) { filter: brightness(0) opacity(0.0); pointer-events: none; transition-duration: 1s; }
+/* #world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(n+4) { filter: brightness(0) opacity(0.0); pointer-events: none; transition-duration: 1s; } */
 
 #world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(1) .icon { filter: brightness(1.0); }
 #world #canvas #robots-overview:not(.expanded) .team-robots .team-robot:nth-child(2) .icon { filter: brightness(0.9); }
