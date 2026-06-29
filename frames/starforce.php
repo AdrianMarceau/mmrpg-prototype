@@ -128,7 +128,7 @@ function print_starlist_omega_robot($robot, $key = 0, $visible = true){
         if ($robot_was_encountered && $star_was_collected){
             $tooltip_title = '<div style="text-align: center;">';
                 $tooltip_title .= $robot_name.' Star <br /> ';
-                $tooltip_title .= '<span style="font-size: 80%;">+1 '.ucfirst($robot_type).' | Boss Star</span> <br />';
+                $tooltip_title .= '<span style="font-size: 80%;">+10 '.ucfirst($robot_type).' | Boss Star</span> <br />';
                 if (!empty($star_info['star_date'])){ $tooltip_title .= '<span style="font-size: 80%;">Found '.date('Y/m/d', $star_info['star_date']).'</span> '; }
             $tooltip_title .= '</div>';
             $tooltip_title = htmlentities($tooltip_title, ENT_QUOTES, 'UTF-8');
@@ -589,7 +589,7 @@ function temp_combination_number($k,$n){
                                                     $temp_star_title .= '<span style="font-size:80%;">';
 
                                                         if ($temp_field_type_1 != $temp_field_type_2){
-                                                            $temp_star_title .= '+1 '.ucfirst($temp_field_type_1).(!empty($temp_field_type_2) ? ' / +1 '.ucfirst($temp_field_type_2) : '').'';
+                                                            $temp_star_title .= '+10 '.ucfirst($temp_field_type_1).(!empty($temp_field_type_2) ? ' / +10 '.ucfirst($temp_field_type_2) : '').'';
                                                         } else {
                                                             if ($temp_star_kind == 'field'){ $temp_star_title .= '+1 '.ucfirst($temp_field_type_1).''; }
                                                             elseif ($temp_star_kind == 'fusion'){ $temp_star_title .= '+2 '.ucfirst($temp_field_type_1).''; }
@@ -716,8 +716,8 @@ function temp_combination_number($k,$n){
 
                                     if ($kind_token == 'boss'){ $darken = 0; }
                                     elseif ($kind_token == 'field'){ $darken = 10; }
-                                    elseif ($kind_token == 'perfect-fusion'){ $darken = 20; }
-                                    elseif ($kind_token == 'fusion'){ $darken = 40; }
+                                    elseif ($kind_token == 'fusion'){ $darken = 20; }
+                                    elseif ($kind_token == 'perfect-fusion'){ $darken = 30; }
                                     //error_log('$light_colour = '.print_r($light_colour, true));
                                     $adjusted_bar_colour = $cms_image->colour_darken(explode(',', $light_colour), $darken);
                                     //error_log('$adjusted_bar_colour = '.print_r($adjusted_bar_colour, true));
@@ -839,16 +839,16 @@ function temp_combination_number($k,$n){
                                                 borderColor: <?= json_encode($star_type_borders['field']) ?>,
                                                 borderWidth: 0,
                                                 },{
-                                                label: 'Fusion Stars (Perfect)',
-                                                data: <?= json_encode($star_type_counts['perfect-fusion']) ?>,
-                                                backgroundColor: <?= json_encode($star_type_backgrounds['perfect-fusion']) ?>,
-                                                borderColor: <?= json_encode($star_type_borders['perfect-fusion']) ?>,
-                                                borderWidth: 0,
-                                                },{
                                                 label: 'Fusion Stars (Mixed)',
                                                 data: <?= json_encode($star_type_counts['fusion']) ?>,
                                                 backgroundColor: <?= json_encode($star_type_backgrounds['fusion']) ?>,
                                                 borderColor: <?= json_encode($star_type_borders['fusion']) ?>,
+                                                borderWidth: 0,
+                                                },{
+                                                label: 'Fusion Stars (Perfect)',
+                                                data: <?= json_encode($star_type_counts['perfect-fusion']) ?>,
+                                                backgroundColor: <?= json_encode($star_type_backgrounds['perfect-fusion']) ?>,
+                                                borderColor: <?= json_encode($star_type_borders['perfect-fusion']) ?>,
                                                 borderWidth: 0,
                                                 }]
                                             },
