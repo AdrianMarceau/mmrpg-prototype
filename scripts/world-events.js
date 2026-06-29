@@ -1141,7 +1141,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         let blockKind2 = firstEvent.kind2;
         let blockType = blockInfo.type ? blockInfo.type : '';
         let blockWeaknesses = blockInfo.weaknesses ? blockInfo.weaknesses : [];
-        if (dataBlock && blockInfo && !playerIsCursor){
+        if (dataBlock && blockInfo && !playerIsCursor && blockWeaknesses.length){
             //console.log('-> found blockInfo for ' + dataBlock + ':', blockInfo);
             //console.log('-> blockType:', blockType);
             //console.log('-> blockWeaknesses:', blockWeaknesses);
