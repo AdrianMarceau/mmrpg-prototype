@@ -1709,9 +1709,9 @@ function bindEventsToWorld($thisWorld){
             };
         let dismissSideButtonAction = function(){
             if (!sideButtonsActive){ return; }
-            let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
-            if (!$dismissButton || !$dismissButton.length){ console.error('bindEventsToWorld() unable to find dismiss button!'); return false; }
             $sideButtons.removeClass('maybe');
+            let $dismissButton = $('.button[data-action="dismiss"]', $sideButtons);
+            if (!$dismissButton || !$dismissButton.length){ return; }
             $dismissButton.trigger('click');
             return true;
             };
@@ -2420,8 +2420,9 @@ function bindEventsToWorld($thisWorld){
                 let $cursorPlayer = $playerButtons.filter('[data-player="player"]').first();
                 let $activePlayer = $playerButtons.filter('.active').first();
                 let $hoveredPlayer = $playerButtons.filter('.hovered').first();
+                if (!$hoveredPlayer || !$hoveredPlayer.length){ $hoveredPlayer = $activePlayer; }
                 // We must first focus the player switcher if not already focused
-                if (!$playerSwitcher.is('.focused') || !$hoveredPlayer.length){
+                if (!$playerSwitcher.is('.focused')){
                     //console.log('%c' + 'Focusing player switcher!', 'color: orange;');
                     $playerSwitcher.addClass('focused');
                     $playerButtons.removeClass('hovered');
@@ -2484,17 +2485,27 @@ function bindEventsToWorld($thisWorld){
                         if (activeInputs.L2){
                             let $prevPlayer = $hoveredPlayer.prevAll('.team-player').first();
                             if (!$prevPlayer || !$prevPlayer.length){ $prevPlayer = $playerButtons.last(); }
+                            //console.log('-> trying to switch to $prevPlayer', $prevPlayer);
                             if ($prevPlayer.length){
                                 //$prevPlayer.addClass('hovered');
                                 $prevPlayer.trigger('mouseenter');
+                                //console.log('-> triggered mouseenter on $prevPlayer');
+                                } else {
+                                $activePlayer.trigger('mouseenter');
+                                //console.log('-> triggered mouseenter on $activePlayer instead of prev');
                                 }
                             }
                         else if (activeInputs.R2){
                             let $nextPlayer = $hoveredPlayer.nextAll('.team-player').first();
                             if (!$nextPlayer || !$nextPlayer.length){ $nextPlayer = $playerButtons.first(); }
+                            //console.log('-> trying to switch to $nextPlayer', $nextPlayer);
                             if ($nextPlayer.length){
                                 //$nextPlayer.addClass('hovered');
                                 $nextPlayer.trigger('mouseenter');
+                                //console.log('-> triggered mouseenter on $nextPlayer');
+                                } else {
+                                $activePlayer.trigger('mouseenter');
+                                //console.log('-> triggered mouseenter on $activePlayer instead of next');
                                 }
                             }
                         ignoreInputFor(300);
