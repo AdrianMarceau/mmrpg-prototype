@@ -1183,6 +1183,23 @@ class mmrpgWorldMap {
             //console.log('---> walkableMapTiles (post-buttons) =', walkableMapTiles);
             }
 
+        // If we are to exclude switches, make sure we remove those positions
+        let battleSwitchKeys = Object.keys(switchSymbols);
+        if (exclude.switches && switchSymbols){
+            //console.log('---> checking battleSwitchKeys =', battleSwitchKeys);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                //console.log('---> checking tileKey:', tileKey, 'against switchSymbols:', battleSwitchKeys);
+                if (battleSwitchKeys.includes(tileKey)){
+                    //console.log('---> tileKey:', tileKey, 'is a switch, removing from walkableMapTiles');
+                    return false; // remove this tile
+                    } else {
+                    //console.log('---> tileKey:', tileKey, 'is not a switch, keeping in walkableMapTiles');
+                    }
+                return true; // keep this tile
+                }));
+            //console.log('---> walkableMapTiles (post-switches) =', walkableMapTiles);
+            }
+
         // If we are to exclude blocks, make sure we remove those positions
         let battleBlockKeys = Object.keys(blockSymbols);
         if (exclude.blocks && blockSymbols){

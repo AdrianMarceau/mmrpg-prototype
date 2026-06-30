@@ -351,7 +351,9 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
         let eventKindPlural = eventKind + 's';
         eventKindPlural = eventKindPlural.replace(/ys/i, 'ies'); // fix pluralization issues
         eventKindPlural = eventKindPlural.replace(/ss/i, 'ses'); // fix pluralization issues
-        //console.log('checking for ' + eventKind+'s at: ' + positionsToCheck.join(', '));
+        eventKindPlural = eventKindPlural.replace(/chs/i, 'ches'); // fix pluralization issues
+        eventKindPlural = eventKindPlural.replace(/shs/i, 'shes'); // fix pluralization issues
+        //console.log('checking for ' + eventKind + '/' + eventKindPlural + ' at: ' + positionsToCheck.join(', '));
         // ie: mapKindSymbols
         let symbolsKey = 'map' + (eventKind[0].toUpperCase() + eventKind.slice(1)) + 'Symbols';
         let indexKey = 'map' + (eventKindPlural[0].toUpperCase() + eventKindPlural.slice(1)) + 'Index';
@@ -375,6 +377,7 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
             if (!eventSymbols[eventPosition]){ continue; } // skip if no event symbols at this position
             let eventToken = eventSymbols[eventPosition];
             let eventInfo = eventsIndex[eventToken];
+            //console.log('-> checking ' + eventKind + ' at position ' + eventPosition + ' for token ' + eventToken, ' and info ', eventInfo);
             if (!eventToken || !eventInfo){ console.warn('-> no event token or info found for ' + eventKind + ' at position ' + eventPosition + ', skipping!'); continue; }
             //console.log('-> found ' + eventKind + ' at position ' + eventPosition + ' with token ' + eventToken, eventInfo);
             if (eventInfo.disabled){ continue; }
@@ -402,6 +405,13 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
                 //console.log('-> eventInfo: ', eventInfo);
                 //console.log('-> eventsIndex: ', eventsIndex);
                 if (eventInfo.state === 'down'){ continue; }
+                }
+            else if (eventKind === 'switch'){
+                // if the switch has already been pushed (state:down), that's okay
+                //console.log('-> eventPosition: ', eventPosition);
+                //console.log('-> eventToken: ', eventToken);
+                //console.log('-> eventInfo: ', eventInfo);
+                //console.log('-> eventsIndex: ', eventsIndex);
                 }
             else if (eventKind === 'portal'){
                 // if we haven't moved, never trigger a portal
@@ -1127,6 +1137,23 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
             showActionAreaType = 'button';
             zoomTimeoutDuration = 500; // if we show a button dropdown, we want to zoom in quickly
+            }
+        }
+    else if (firstEventType === 'switch'){
+        //console.log('-> event at position is a switch, preparing dropdown');
+        // If the cursor is literally on a switch, only one event sprite matters right now
+        let $switchEvent = $(firstEvent.sprite);
+        let dataLabel = $switchEvent.attr('data-label');
+        let dataSwitch = $switchEvent.attr('data-switch');
+        let dataColour = $switchEvent.attr('data-colour');
+        let dataState = $switchEvent.attr('data-state');
+        if (dataSwitch){
+            showActionArea = true;
+            if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+            sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' '+dataColour : '')+'" data-action="toggle-switch" data-switch="'+dataSwitch+'"><span><sup>Toggle The</sup> ' + dataColour.split('-').map(function(colour){ return colour[0].toUpperCase() + colour.slice(1); }).join(' & ') + ' Switch</span></a>';
+            sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+            showActionAreaType = 'switch';
+            zoomTimeoutDuration = 500; // if we show a switch dropdown, we want to zoom in quickly
             }
         }
     else if (firstEventType === 'block'){
@@ -1935,6 +1962,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             let isBattle = action.indexOf('battle') !== -1;
             let isPortal = action.indexOf('portal') !== -1;
             let isButton = action.indexOf('button') !== -1;
+            let isSwitch = action.indexOf('switch') !== -1;
             let isItem = action.indexOf('item') !== -1;
             let isAbility = action.indexOf('ability') !== -1;
             let isBlock = action.indexOf('block') !== -1;
@@ -2016,6 +2044,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     }
                 }
             else if (isButton){
+                // TODO: action will always equal "push-button" but we should verify
                 //console.log('-> world-button clicked with action:', action);
                 let buttonsIndex = _config.mapButtonsIndex;
                 let buttonStates = _world.buttons;
@@ -2113,10 +2142,10 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         }
                     // event action REMOVE-GROUP-BLOCKS for buttons, switches, etc. to use
                     if (buttonAction === 'remove-group-blocks'){
-                        console.log('-> removing group blocks for button', buttonName);
+                        //console.log('-> removing group blocks for button', buttonName);
                         let groupName = buttonData[0] || false;
                         let blockFilter = buttonData[1] || false;
-                        console.log('-> groupName =', groupName, '\n', '-> blockFilter =', blockFilter);
+                        //console.log('-> groupName =', groupName, '\n', '-> blockFilter =', blockFilter);
                         if (!groupName){ console.error('-> groupName not provided, cannot remove group blocks!'); return false; }
                         let groupsIndex = _config.mapGroupsIndex;
                         let groupTiles = groupsIndex[groupName] || false;
@@ -2156,6 +2185,87 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         }
 
                     })(buttonInfo);
+                }
+            else if (isSwitch){
+                // TODO: action will always equal "toggle-switch" but we should verify
+                //console.log('-> world-switch clicked with action:', action);
+                let switchesIndex = _config.mapSwitchesIndex;
+                let switchStates = _world.switches;
+                let switchName = $button.attr('data-switch') || false;
+                let switchInfo = switchName && (switchesIndex && switchesIndex[switchName]) ? switchesIndex[switchName] : false;
+                let $eventSprite = $(firstEvent.sprite);
+                let $innerSprite = $eventSprite ? $('> .sprite', $eventSprite) : false;
+                if (!switchName || !switchInfo){ console.error('-> switch name or info not found, cannot toggle switch!'); return false; }
+                if (!$eventSprite || !$eventSprite.length){ console.error('-> event sprite not found, cannot toggle switch!'); return false; }
+                if (!$innerSprite || !$innerSprite.length){ console.error('-> inner sprite not found, cannot toggle switch!'); return false; }
+                dismissDropdown(false);
+                let oldState = switchInfo.state || 'up';
+                let newState = oldState === 'up' ? 'down' : 'up';
+                switchInfo.state = newState;
+                switchesIndex[switchName] = switchInfo;
+                switchStates[switchName] = newState;
+                $eventSprite.attr('data-state', newState);
+                $innerSprite.removeClass(oldState).addClass(newState);
+                $eventSprite.removeClass('glow');
+                _self.playSoundEffect('button-click');
+                _self.playSoundEffect('hyper-stomp-sound', {delay: 200});
+                $canvasMap.addClass('shake-once');
+                setTimeout(function(){ $canvasMap.removeClass('shake-once'); }, 1000);
+                (function(switchInfo, newState){
+                    if (!switchInfo.action){ return false; }
+                    let switchAction = switchInfo.action;
+                    let switchData = switchInfo.data || {};
+
+                    // event action TOGGLE-GROUP-TERRAIN for toggling two terrain types
+                    if (switchAction === 'toggle-group-terrain'){
+                        let groupName = switchData[0] || false;
+                        let terrainUp = switchData[1] || false;
+                        let terrainDown = switchData[2] || false;
+                        if (!groupName){ console.error('-> groupName not provided, cannot set group terrain!'); return false; }
+                        if (!terrainUp || !terrainDown){ console.error('-> terrainUp or terrainDown not provided, cannot toggle group terrain!'); return false; }
+                        let mapTilesIndex = _config.mapTilesIndex;
+                        let layerTilesIndex = _world.layerTilesIndex;
+                        let terrainTilesIndex = layerTilesIndex['terrain'] || false;
+                        if (!layerTilesIndex || !terrainTilesIndex){ console.error('-> layerTilesIndex or terrainTilesIndex not found!'); return false; }
+                        let groupsIndex = _config.mapGroupsIndex;
+                        let groupTiles = groupsIndex[groupName] || false;
+                        if (!groupsIndex || !groupTiles){ console.error('-> groupsIndex not found for groupName "' + groupName + '"!'); return false; }
+                        for (let i = 0; i < groupTiles.length; i++){
+                            let tileKey = groupTiles[i];
+                            let tileData = terrainTilesIndex[tileKey] || false;
+                            if (typeof terrainTilesIndex[tileKey] === 'undefined'){ continue; }
+                            let currentTerrain = tileData.sprite[1];
+                            let currentTerrainBase = currentTerrain.split('-')[0];
+                            console.log('currentTerrain =', currentTerrain);
+                            console.log('currentTerrainBase =', currentTerrainBase);
+                            //let targetTerrain = currentTerrainBase === terrainUp ? terrainDown : terrainUp;
+                            let targetTerrain = currentTerrain;
+                            if (currentTerrain === terrainUp || currentTerrainBase === terrainUp){ targetTerrain = terrainDown; }
+                            else if (currentTerrain === terrainDown || currentTerrainBase === terrainDown){ targetTerrain = terrainUp; }
+                            let terrainSpriteData = mapTilesIndex[targetTerrain] || false;
+                            if (!terrainSpriteData){ console.error('-> terrainSpriteData not found for terrain', targetTerrain); continue; }
+                            let terrainSpriteOffset = _self.getClonedObject(terrainSpriteData[0]);
+                            let terrainSpriteSize = _self.getClonedObject(terrainSpriteData[1]);
+                            let terrainSpriteAttrs = _self.getClonedObject(terrainSpriteData[2]);
+                            let terrainIsWalkable = terrainSpriteAttrs.isWalkable ? true : false;
+                            let terrainHasGrid = terrainIsWalkable ? true : false;
+                            tileData.sprite[1] = targetTerrain;
+                            tileData.sprite[2] = [terrainSpriteOffset[0], terrainSpriteOffset[1]];
+                            tileData.sprite[3] = [terrainSpriteSize[0], terrainSpriteSize[1]];
+                            tileData.walkable = terrainIsWalkable;
+                            tileData.effects.grid = terrainHasGrid;
+                            tileData.dirty = true;
+                            terrainTilesIndex[tileKey] = tileData;
+                            }
+                        layerTilesIndex['terrain'] = terrainTilesIndex;
+                        _world.layerTilesIndex = layerTilesIndex;
+                        _self.refreshCanvasTiles('terrain');
+                        _self.calculateWalkableMapTiles(true);
+                        _self.refreshMapPositionEvents();
+                        _self.saveWorldState();
+                        }
+
+                    })(switchInfo, newState);
                 }
             else if (isItem){
                 //console.log('-> item button clicked with action:', action);

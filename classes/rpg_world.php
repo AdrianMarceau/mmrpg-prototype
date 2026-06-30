@@ -1168,6 +1168,15 @@ class rpg_world {
                 unset($available_cells[$pos]);
             }
         }
+        // Now let's loop through switches and remove spaces that have switches on them
+        if (!empty($map_data['switches']) && is_array($map_data['switches'])){
+            foreach ($map_data['switches'] AS $switch_name => $switch_data){
+                if (empty($switch_data) || !is_array($switch_data)){ continue; }
+                $pos = $switch_data[0];
+                //error_log('-> removing switch position "'.$pos.'" from available cells');
+                unset($available_cells[$pos]);
+            }
+        }
         // Now let's loop through blocks and remove spaces that have active blocks on them
         if (!empty($map_data['blocks']) && is_array($map_data['blocks'])){
             foreach ($map_data['blocks'] AS $block_name => $block_data){
@@ -2911,7 +2920,8 @@ class rpg_world {
                 $locked = false; if (in_array('locked', $switch_data)){ $locked = true; unset($switch_data[array_search('locked', $switch_data)]); }
                 if (!empty($world_map_switches[$switch_namekey])){ $state = $world_map_switches[$switch_namekey]; }
                 $data = array_values($switch_data);
-                $is_glowing = $state !== 'down' && !$hidden && !$locked ? true : false;
+                //$is_glowing = $state !== 'down' && !$hidden && !$locked ? true : false;
+                $is_glowing = !$hidden && !$locked ? true : false;
                 $base_classes = 'sprite tile switch';
                 $kind_classes = $colour.' '.$state;
                 $sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
@@ -3988,14 +3998,15 @@ class rpg_world {
                     $map_data_parsed['layers'][$layer_key] = $layer_tiles;
                 }
             }
+
             // event action REMOVE-GROUP-BLOCKS for buttons, switches, etc. to use
-            if ($action === 'remove-group-blocks'){
-                error_log('world map button "'.$button_name.'" is removing group blocks');
+            elseif ($action === 'remove-group-blocks'){
+                //error_log('world map button "'.$button_name.'" is removing group blocks');
                 //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
                 $group_name = !empty($data[0]) ? $data[0] : '';
                 $block_filter = !empty($data[1]) ? $data[1] : '';
-                error_log('$group_name = '.print_r($group_name, true));
-                error_log('$block_filter = '.print_r($block_filter, true));
+                //error_log('$group_name = '.print_r($group_name, true));
+                //error_log('$block_filter = '.print_r($block_filter, true));
                 if (!$group_name){ error_log('-> missing group name for button "'.$button_name.'"'); continue; }
                 $groups_index = !empty($map_data_parsed['groups']) ? $map_data_parsed['groups'] : array();
                 $group_tiles = !empty($groups_index[$group_name]) ? $groups_index[$group_name] : array();
@@ -4017,6 +4028,7 @@ class rpg_world {
                     }
                 }
             }
+
             // ...
         }
         // Return true on success
@@ -4025,7 +4037,7 @@ class rpg_world {
 
     // If there are any switches defined, check to see if any of them have been interacted with already
     public static function refresh_map_switches($this_prototype_data, &$map_data_parsed){
-        //error_log('rpg_world::refresh_map_switches() called!');
+        error_log('rpg_world::refresh_map_switches() called!');
         if (empty($map_data_parsed['switches'])){ return; }
         $game_session_token = rpg_game::session_token();
         $world_session_token = self::session_token();
@@ -4034,8 +4046,57 @@ class rpg_world {
         $world_token = $map_data_parsed['world'];
         $map_token = $map_data_parsed['token'];
         $world_map_token = $world_token.'__'.$map_token;
+        $switch_sprites = $map_data_parsed['switches'];
+        $world_switches = !empty($WORLD_SESSION['world_switches'][$world_map_token]) ? $WORLD_SESSION['world_switches'][$world_map_token] : array();
+        foreach ($switch_sprites AS $switch_name => $switch_data){
+            if (empty($switch_data) || !is_array($switch_data)){ continue; }
+            $position = $switch_data[0]; unset($switch_data[0]);
+            $colour = !empty($switch_data[1]) ? $switch_data[1] : 'black'; unset($switch_data[1]);
+            $default_state = !empty($switch_data[2]) ? $switch_data[2] : 'up'; unset($switch_data[2]);
+            $action = !empty($switch_data[3]) ? $switch_data[3] : ''; unset($switch_data[3]);
+            $hidden = false; if (in_array('hidden', $switch_data)){ $hidden = true; unset($switch_data[array_search('hidden', $switch_data)]); }
+            $locked = false; if (in_array('locked', $switch_data)){ $locked = true; unset($switch_data[array_search('locked', $switch_data)]); }
+            $data = array_values($switch_data);
+            $state = !empty($world_switches[$switch_name]) ? $world_switches[$switch_name] : $default_state;
 
-        // TODO: implement switch refresh functionality
+            // event action TOGGLE-GROUP-TERRAIN for toggling terrain based on state
+            if ($action === 'toggle-group-terrain'){
+                if ($state === $default_state){ continue; }
+                $group_name = !empty($data[0]) ? $data[0] : '';
+                $terrain_up = !empty($data[1]) ? $data[1] : '';
+                $terrain_down = !empty($data[2]) ? $data[2] : '';
+                if (!$group_name || !$terrain_up || !$terrain_down){ continue; }
+                $groups_index = !empty($map_data_parsed['groups']) ? $map_data_parsed['groups'] : array();
+                $group_tiles = !empty($groups_index[$group_name]) ? $groups_index[$group_name] : array();
+                $tiles_index = !empty($map_data_parsed['tiles']) ? $map_data_parsed['tiles'] : array();
+                $layer_key = 0; // currently, this is the main and only terrain layer
+                $layer_tiles = !empty($map_data_parsed['layers'][$layer_key]) ? $map_data_parsed['layers'][$layer_key] : array();
+                if (!$groups_index || !$group_tiles || !$tiles_index || !$layer_tiles){ continue; }
+                if (!empty($group_tiles)){
+                    foreach ($group_tiles AS $tile_key){
+                        list($col, $row) = explode('-', $tile_key);
+                        $tx = $col - 1; $ty = $row - 1;
+                        if (!isset($layer_tiles[$ty])){ continue; }
+                        $row_tiles = !empty($layer_tiles[$ty]) ? $layer_tiles[$ty] : '';
+                        $row_tiles = !empty($row_tiles) ? str_replace(array('[', ']'), '', $row_tiles) : '';
+                        $row_tiles = !empty($row_tiles) ? (strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles)) : array();
+                        if (empty($row_tiles[$tx])){ continue; }
+                        $current_terrain = $row_tiles[$tx];
+                        $current_terrain_base = explode('-', $current_terrain)[0];
+                        error_log('$current_terrain = '.print_r($current_terrain, true));
+                        error_log('$current_terrain_base = '.print_r($current_terrain_base, true));
+                        if ($current_terrain === $terrain_up || $current_terrain_base === $terrain_up){ $row_tiles[$tx] = $terrain_down; }
+                        elseif ($current_terrain === $terrain_down || $current_terrain_base === $terrain_down){ $row_tiles[$tx] = $terrain_up; }
+                        error_log('new terrain = '.print_r($row_tiles[$tx], true));
+                        $row_tiles = implode(',', $row_tiles);
+                        $layer_tiles[$ty] = $row_tiles;
+                    }
+                    $map_data_parsed['layers'][$layer_key] = $layer_tiles;
+                }
+            }
+
+            // ...
+        }
 
         // Return true on success
         return true;
