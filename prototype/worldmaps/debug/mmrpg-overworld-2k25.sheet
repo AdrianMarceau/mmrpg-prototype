@@ -14,6 +14,7 @@
 @tiles[]    = plain(01, 40, 200)
 @tiles[]    = plain-top(02, 40, 120)
 @tiles[]    = plain-bottom(03, 40, 280)
+@tiles[]    = plain-single(09, 40, 360)
 #---------------------------#
 @tiles[]    = grass(10, 200, 200)
 @tiles[]    = grass-top(11, 200, 120)
