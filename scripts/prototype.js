@@ -555,12 +555,9 @@ $(document).ready(function(){
 
         // Make sure we always poll the server for popup events after loading
         triggerWindowEventsPull();
-        /* if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
-            window.top.mmrpg_queue_for_game_start(function(){
-                //console.log('i guess the game has started');
-                setTimeout(function(){ windowEventsPull(); }, 1000);
-                });
-            } */
+
+        // Start watching for user input (the function will handle context queues)
+        initUserInputWatcher();
 
         }
 
@@ -599,10 +596,282 @@ $(document).ready(function(){
             }
         }
 
-
     // -- end of document ready markup -- //
 
 });
+
+// Define a function for checking if mmrpg is busy right now
+function mmrpg_is_busy(){
+    if (!gameSettings.gameHasLoaded){ return true; }
+    if (!gameSettings.prototypeLoaded){ return true; }
+    return false;
+}
+
+// Define a quick function for initializing the user input watcher
+// as well as custom instructions for what to do based on context
+function initUserInputWatcher(){
+    //console.log('%c' + 'prototypeReady.initUserInputWatcher()', 'color: magenta;');
+    let playSoundEffect = mmrpgPrototype.playSoundEffect;
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
+    let $thisBannerMenu = $('> .options_fullmenu', $thisBanner);
+    let $thisLeaderboardLink = $('> .points[data-step="leaderboard"]', $thisBanner);
+    let $thisSettingsLink = $('> .options_userinfo[data-step="file_save"]', $thisBanner);
+    //console.log('$thisPrototype =', $thisPrototype);
+    //console.log('$thisBanner =', $thisBanner);
+    //console.log('$thisBannerMenu =', $thisBannerMenu);
+
+    // Define a function to run each time user inputs are updated so we can react
+    let listenForInput = function(){ return Date.now() >= nextInputAllowedTime; }, nextInputAllowedTime = 0;
+    let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 200; nextInputAllowedTime = Date.now() + delay; };
+    let userInputVars = {};
+    let checkUserInputs = function(kind, event, activeInputs, userInputs){
+        //console.log('%c' + 'mmrpgPrototype.checkUserInputs(kind:' + kind + ', event, activeInputs, userInputs)', 'color: cyan;');
+        //console.log('-> event:', e);
+        if (!listenForInput()){ return false; }
+        if (mmrpg_is_busy()){ return false; }
+        if (!Object.keys(activeInputs).length){ return false; } // nothing pressed, ignore
+        //console.log('-> activeInputs:', activeInputs);
+        ignoreInputFor();
+
+        // Collect the current step so we know when we can listen
+        let currentStepName = $thisPrototype.attr('data-step-name') || false;
+        //console.log('-> currentStepName:', currentStepName);
+
+        // MMRPG BANNER MENU TRIGGERS
+        if ($thisBannerMenu && $thisBannerMenu.length){
+
+            // If the user has pressed the SELECT key, we click the leaderboard button
+            if (activeInputs.Select){
+                //console.log('%c' + 'Select key pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                $thisLeaderboardLink.trigger('click');
+                return;
+                }
+
+            // If the user has pressed the START key, we click the settings button
+            if (activeInputs.Start){
+                //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                $thisSettingsLink.trigger('click');
+                return;
+                }
+
+            // If the user has pressed the L1 or R1 trigger key, we move through the menu buttons
+            if (activeInputs.L1 || activeInputs.R1){
+                //console.log('%c' + (activeInputs.L1 ? 'L1' : 'R1') + ' trigger key pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                let $focusedMenuLink, $gotoMenuLink;
+                if (!$thisBannerMenu.hasClass('hovered')){
+                    //console.log('-> banner menu not hovered yet, hovering it now');
+                    $thisBannerMenu.addClass('hovered');
+                    //playSoundEffect.call($thisBannerMenu, 'link-hover');
+                    let $activeMenuLink, $nextMenuLink, $prevMenuLink;
+                    $activeMenuLink = $('.link_active', $thisBannerMenu).first();
+                    //console.log('$activeMenuLink =', typeof $activeMenuLink, $activeMenuLink);
+                    if (!$activeMenuLink || !$activeMenuLink.length){ $activeMenuLink = null; }
+                    $focusedMenuLink = $activeMenuLink;
+                    //console.log('setting $focusedMenuLink to $activeMenuLink');
+                    } else {
+                    //console.log('-> banner already hovered, what now?');
+                    let $hoveredMenuLink, $nextMenuLink, $prevMenuLink;
+                    $hoveredMenuLink = $('.link[data-step].hovered', $thisBannerMenu).first();
+                    //console.log('$hoveredMenuLink =', typeof $hoveredMenuLink, $hoveredMenuLink);
+                    if (!$hoveredMenuLink || !$hoveredMenuLink.length){ $hoveredMenuLink = null; }
+                    $focusedMenuLink = $hoveredMenuLink;
+                    //console.log('setting $focusedMenuLink to $hoveredMenuLink');
+                    }
+                if (!$focusedMenuLink || typeof $focusedMenuLink === 'undefined'){
+                    if (activeInputs.R1){ $focusedMenuLink = $('.link[data-step]', $thisBannerMenu).last(); }
+                    else if (activeInputs.L1){ $focusedMenuLink = $('.link[data-step]', $thisBannerMenu).first(); }
+                    $('.link[data-step]', $thisBannerMenu).removeClass('link_active hovered');
+                    }
+                if ($focusedMenuLink && $focusedMenuLink.length){
+                    let focusedLinkIndex = parseInt($focusedMenuLink.attr('data-index'));
+                    //console.log('using $focusedMenuLink to find next/prev from index ', focusedLinkIndex, '...');
+                    if (activeInputs.R1){
+                        let nextIndex = focusedLinkIndex + 1;
+                        $nextMenuLink = $('.link[data-step][data-index="' + nextIndex + '"]', $thisBannerMenu);
+                        if (!$nextMenuLink || !$nextMenuLink.length){ $nextMenuLink = $('.link[data-step][data-index]', $thisBannerMenu).first(); }
+                        //console.log('$nextMenuLink =', typeof $nextMenuLink, $nextMenuLink);
+                        if ($nextMenuLink && $nextMenuLink.length){ $gotoMenuLink = $nextMenuLink; }
+                        } else if (activeInputs.L1){
+                        let prevIndex = focusedLinkIndex - 1;
+                        $prevMenuLink = $('.link[data-step][data-index="' + prevIndex + '"]', $thisBannerMenu);
+                        if (!$prevMenuLink || !$prevMenuLink.length){ $prevMenuLink = $('.link[data-step][data-index]', $thisBannerMenu).last(); }
+                        //console.log('$prevMenuLink =', typeof $prevMenuLink, $prevMenuLink);
+                        if ($prevMenuLink && $prevMenuLink.length){ $gotoMenuLink = $prevMenuLink; }
+                        }
+                    }
+                //console.log('$gotoMenuLink =', typeof $gotoMenuLink, $gotoMenuLink);
+                if (typeof userInputVars.bannerMenuTimeout !== 'undefined'){ clearTimeout(userInputVars.bannerMenuTimeout); }
+                if ($gotoMenuLink && $gotoMenuLink.length){
+                    $('.link[data-step]', $thisBannerMenu).removeClass('hovered');
+                    $gotoMenuLink.trigger('mouseenter');
+                    $gotoMenuLink.addClass('hovered');
+                    userInputVars.bannerMenuTimeout = setTimeout(function(){
+                        //console.log('bannerMenuTimeout() triggered! time to click the hovered link');
+                        $thisBannerMenu.removeClass('hovered');
+                        let $hoveredMenuLink = $('.link[data-step].hovered', $thisBannerMenu).first();
+                        if (!$hoveredMenuLink || !$hoveredMenuLink.length){ return; }
+                        $hoveredMenuLink.removeClass('hovered');
+                        $hoveredMenuLink.trigger('click');
+                        }, 900);
+                    }
+
+                // Regardless, return so L1/R1 don't do anything else
+                return;
+                }
+
+            }
+
+        // MMRPG BATTLE MENU TRIGGERS
+        if (currentStepName === 'home'){
+
+            // Collect a reference to the main menu itself
+            let $thisBattleMenu = $('> .menu:not(.menu_hide)', $thisPrototype).first();
+            let $thisOptionWrapper = $('> .option_wrapper:not(.option_wrapper_hidden)', $thisBattleMenu).first();
+            //console.log('-> $thisBattleMenu:', typeof $thisBattleMenu, $thisBattleMenu);
+            //console.log('-> $thisOptionWrapper:', typeof $thisOptionWrapper, $thisOptionWrapper);
+
+            // If the user pressed the A button, we should try to click whatever is currently hovered
+            if (activeInputs.A){
+                //console.log('%c' + 'A button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                let $hoveredMenuButton = $('.option[data-token].hovered', $thisOptionWrapper);
+                if ($hoveredMenuButton && $hoveredMenuButton.length){ $hoveredMenuButton.trigger('click'); }
+                return;
+                }
+
+            // If the user pressed the B button, we should try to click whichever back button is visible
+            if (activeInputs.B){
+                //console.log('%c' + 'B button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                // Check if the reselect button exists in the header of the current menu
+                let $reselectButton = $('.header .reselect', $thisBattleMenu);
+                // Check if it's actually active by ensuring it lacks the 'hidden' class and is visible
+                let isReselectVisible = $reselectButton.length &&  !$reselectButton.hasClass('hidden') &&  $reselectButton.is(':visible');
+                // If the reselect button is active, click it and immediately return so we don't hit the back button
+                if (isReselectVisible){ $reselectButton.trigger('click'); return; }
+                // Otherwise, proceed with the standard back button logic
+                let $currentBackButton = $('.option_back', $thisBattleMenu);
+                if ($currentBackButton && $currentBackButton.length){ $currentBackButton.trigger('click'); }
+                return;
+                }
+
+            // If the user pressed the Y button, check for and click any info tooltips on the hovered option
+            if (activeInputs.Y){
+                //console.log('%c' + 'Y button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                // Find the currently hovered menu option
+                let $hoveredMenuButton = $('.option.hovered', $thisOptionWrapper);
+                if ($hoveredMenuButton && $hoveredMenuButton.length){
+                    // Look for the info tooltip span inside this specific hovered button
+                    let $infoButton = $('.info[data-click-tooltip]', $hoveredMenuButton);
+                    // If the info button exists, trigger a click on it
+                    if ($infoButton && $infoButton.length){ $infoButton.trigger('click'); }
+                    }
+                // Return so the Y button doesn't trigger anything else
+                return;
+                }
+
+            // If the user pressed the L2 or R2 bumpers, we should try to shift between different chapters
+            if (activeInputs.L2 || activeInputs.R2){
+                //console.log('%c' + (activeInputs.L2 ? 'L2' : 'R2') + ' bumper pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                let shiftDirection = activeInputs.R2 ? 'next' : 'back';
+                let $currentChaptersAvailable = $('.chapter_select .chapter_link:not(.chapter_link_disabled)', $thisOptionWrapper);
+                if (!$currentChaptersAvailable || !$currentChaptersAvailable.length){ return; }
+                let $currentChapterActive = $currentChaptersAvailable.filter('.chapter_link_active');
+                let currentChapterActiveIndex = $currentChaptersAvailable.index($currentChapterActive);
+                let nextChapterActiveIndex = currentChapterActiveIndex + (shiftDirection === 'next' ? 1 : -1);
+                let maxChapterActiveIndex = $currentChaptersAvailable.length - 1;
+                if (nextChapterActiveIndex > maxChapterActiveIndex){ nextChapterActiveIndex = 0; }
+                if (nextChapterActiveIndex < 0){ nextChapterActiveIndex = maxChapterActiveIndex; }
+                $currentChaptersAvailable.eq(nextChapterActiveIndex).trigger('click');
+                return;
+                }
+
+            // Otherwise if the user has pressed any of the directional buttons, we shift the current hover
+            if (activeInputs.Up || activeInputs.Down || activeInputs.Left || activeInputs.Right){
+                //console.log('%c' + Object.keys(activeInputs).join('/') + ' directional button(s) pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                let shiftDirection = activeInputs.Down || activeInputs.Right ? 'next' : 'back';
+                let $currentOptionsAvailable = $('.option[data-token]:visible', $thisOptionWrapper);
+                let $currentOptionHovered = $currentOptionsAvailable.filter('.hovered');
+                //console.log('-> shiftDirection:', shiftDirection);
+                //console.log('-> $currentOptionsAvailable:', typeof $currentOptionsAvailable, $currentOptionsAvailable);
+                //console.log('-> $currentOptionHovered:', typeof $currentOptionHovered, $currentOptionHovered);
+                $thisOptionWrapper.find('.option[data-token]').removeClass('hovered');
+                if (!$currentOptionHovered || !$currentOptionHovered.length){
+                    if (shiftDirection === 'next'){ $currentOptionsAvailable.first().addClass('hovered'); }
+                    else if (shiftDirection === 'back'){ $currentOptionsAvailable.last().addClass('hovered'); }
+                    } else {
+                    let currentOptionHoveredIndex = $currentOptionsAvailable.index($currentOptionHovered);
+                    let shiftAmount = 1;
+                    if (activeInputs.Up || activeInputs.Down){
+                        if ($currentOptionHovered.is('.starfield')){ shiftAmount = 4; }
+                        else if ($currentOptionHovered.is('.versus')){ shiftAmount = 2; }
+                        else if ($currentOptionHovered.is('.option_this-robot-select')){ shiftAmount = 4; }
+                        }
+                    let nextOptionHoveredIndex = currentOptionHoveredIndex + (shiftDirection === 'next' ? shiftAmount : (-1 * shiftAmount));
+                    let maxOptionHoveredIndex = $currentOptionsAvailable.length - 1;
+                    if (nextOptionHoveredIndex > maxOptionHoveredIndex){ nextOptionHoveredIndex = 0; }
+                    if (nextOptionHoveredIndex < 0){ nextOptionHoveredIndex = maxOptionHoveredIndex; }
+                    //$currentOptionsAvailable.eq(nextOptionHoveredIndex).addClass('hovered');
+                    let $newHoveredOption = $currentOptionsAvailable.eq(nextOptionHoveredIndex);
+                    $newHoveredOption.addClass('hovered');
+                    // Find the closest parent that actually handles the scrolling (e.g., the perfectScrollbar .wrap)
+                    // If it's the sticky button outside the wrap, this grabs .option_wrapper instead
+                    let $scrollContainer = $newHoveredOption.closest('.wrap, .option_wrapper');
+                    let scrollContainer = $scrollContainer[0];
+                    // Only attempt to scroll if the container is actually scrollable
+                    if (scrollContainer && scrollContainer.scrollHeight > scrollContainer.clientHeight){
+                        // Get the top and bottom edges of the visible container
+                        let containerTop = $scrollContainer.offset().top;
+                        let containerBottom = containerTop + $scrollContainer.innerHeight();
+                        // Get the top and bottom edges of the newly highlighted option
+                        let optionTop = $newHoveredOption.offset().top;
+                        let optionBottom = optionTop + $newHoveredOption.outerHeight();
+                        // Define a small padding so the item doesn't stop exactly on the pixel edge
+                        let scrollPadding = 10;
+                        let currentScroll = $scrollContainer.scrollTop();
+                        // If the option is hiding above the visible area, scroll up
+                        if (optionTop < containerTop){
+                            let scrollDistance = containerTop - optionTop;
+                            $scrollContainer.scrollTop(currentScroll - scrollDistance - scrollPadding);
+                            // $scrollContainer.trigger('perfect-scrollbar-update');
+                            }
+                        // Else if the option is hiding below the visible area, scroll down
+                        else if (optionBottom > containerBottom){
+                            let scrollDistance = optionBottom - containerBottom;
+                            $scrollContainer.scrollTop(currentScroll + scrollDistance + scrollPadding);
+                            // $scrollContainer.trigger('perfect-scrollbar-update');
+                            }
+                        }
+
+
+                    }
+                }
+
+            }
+
+
+        // MMRPG IFRAME MENU TRIGGERS
+
+        };
+
+    // Start the user input watcher and collect reference to active inputs
+    let userInputWatcher = new mmrpgUserInputWatcher({ autoStart: true, autoRunCallbacks: false });
+    userInputWatcher.onUserInput(checkUserInputs);
+    userInputWatcher.startWatching();
+    let checkUserInputWatcher = function(){
+        userInputWatcher.checkUserInputs();
+        requestAnimationFrame(checkUserInputWatcher);
+        };
+    checkUserInputWatcher();
+
+}
 
 // Define a quick function for polling the server for new events (but only if we can actually show them)
 function triggerWindowEventsPull(afterDelay){
