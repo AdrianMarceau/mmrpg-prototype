@@ -1065,10 +1065,10 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
         // If robots have not been selected, hide the reselector
         if (tokenParentCount < 1){
             //alert('hide reselect '+tokenParentCount);
-            $('.reselect', thisParent).css({opacity:0});
+            $('.reselect', thisParent).addClass('hidden');
             } else {
             //alert('show reselect '+tokenParentCount);
-            $('.reselect', thisParent).css({opacity:1});
+            $('.reselect', thisParent).removeClass('hidden');
             }
 
         /*
@@ -1183,7 +1183,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
                     $('.option[data-parent] .sprite:not(.sticky)', tempMenu).remove();
                     $('.sprite_40x40_placeholder', tempMenu).css({display:''});
                     delete battleOptions['this_player_robots'];
-                    $(this).css({opacity:0});
+                    $(this).addClass('hidden');
                     return true;
                     });
                 tempMenuHeader.append(tempReselect);
@@ -1197,10 +1197,10 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
             // If robots have not been selected, hide the reselector
             if (battleOptions['this_player_robots'] === undefined || battleOptions['this_player_robots'].length < 1){
                 //console.log('hide reselect');
-                $('.reselect', tempMenuHeader).css({opacity:0});
+                $('.reselect', tempMenuHeader).addClass('hidden');
                 } else {
                 //console.log('show reselect');
-                $('.reselect', tempMenuHeader).css({opacity:1});
+                $('.reselect', tempMenuHeader).removeClass('hidden');
                 }
 
             // Generate the placeholder sprite markup

@@ -1605,6 +1605,7 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     text-transform: uppercase;
 }
 #prototype .banner .options_fullmenu .link:hover,
+#prototype .banner .options_fullmenu .link.hovered,
 #prototype .banner .options_fullmenu .link_hovered,
 #prototype .banner .options_fullmenu .link_active {
     text-decoration: none;
@@ -1614,6 +1615,10 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
     border-radius: 6px;
     position: relative;
     top: -8px;
+}
+#prototype .banner .options_fullmenu:hover .link_active:not(:hover):not(.hovered),
+#prototype .banner .options_fullmenu.hovered .link_active:not(:hover):not(.hovered) {
+    filter: brightness(0.6);
 }
 #prototype .banner .options_fullmenu .link > label {
     padding-right: 3px;
@@ -1822,6 +1827,11 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 #prototype .header .next:hover {
     transform: scale(1.2);
     color: #cacaca;
+}
+#prototype .header .reselect.hidden,
+#prototype .header .prev.hidden,
+#prototype .header .next.hidden {
+    display: none;
 }
 #prototype .header .prev {
     right: auto;
@@ -3208,7 +3218,8 @@ body[data-source="website"] #prototype .menu {
     -webkit-transition: border 0.1s linear;
     transition: border 0.1s linear;
 }
-#mmrpg #prototype.main_menu .option[data-token]:hover {
+#mmrpg #prototype.main_menu .option[data-token]:hover,
+#mmrpg #prototype.main_menu .option[data-token].hovered {
     -moz-animation: border-pulsate 2s infinite;
     -ms-animation: border-pulsate 2s infinite;
     -o-animation: border-pulsate 2s infinite;
