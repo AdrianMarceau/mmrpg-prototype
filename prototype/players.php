@@ -17,6 +17,9 @@ if (!empty($_SESSION[$session_token]['DEMO'])){
  */
 else {
 
+    // Start the option wrapper for these buttons
+    echo('<div class="option_wrapper option_wrapper_start">');
+
     // Define the button size based on player count
     $this_button_size = '1x4';
 
@@ -309,6 +312,9 @@ else {
             echo '</div></div></div>';
         echo '</a>'."\n";
     }
+
+    // End the option wrapper for these buttons
+    echo('</div>'.PHP_EOL);
 
 }
 

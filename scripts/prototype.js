@@ -807,11 +807,11 @@ function prototype_menu_loaded(){
     if (gameSettings.nextStepName.length
         && gameSettings.nextSlideDirection.length){
         // SWITCH TO NEXT MENU
-        console.log('SWITCH TO NEXT MENU '+gameSettings.nextStepName);
+        //console.log('SWITCH TO NEXT MENU '+gameSettings.nextStepName);
         prototype_menu_switch({stepName:gameSettings.nextStepName,slideDirection:gameSettings.nextSlideDirection,onComplete:function(){
             var animateReadyRoom = true;
             if (animateReadyRoom){
-                console.log('menu '+gameSettings.nextStepName+' has loaded');
+                //console.log('menu '+gameSettings.nextStepName+' has loaded');
                 var newRobotFrame = 0;
                 if (gameSettings.nextStepName === 'abilities'){ newRobotFrame = 'shoot'; } // shoot
                 else if (gameSettings.nextStepName === 'items'){ newRobotFrame = 'summon'; } // summon
@@ -826,7 +826,7 @@ function prototype_menu_loaded(){
             gameSettings.nextStepName = false;
             gameSettings.nextSlideDirection = false;
             // Fade out the overlay to prevent clicking other banner links
-            console.log('$thisBannerOverlay =', $thisBannerOverlay.length, $thisBannerOverlay);
+            //console.log('$thisBannerOverlay =', $thisBannerOverlay.length, $thisBannerOverlay);
             $('.points, .subpoints, .options, .tooltip', $thisBanner).stop().animate({opacity:1},500,'swing');
             $thisBannerOverlay.stop().css({opacity:0.33}).animate({opacity:0.0},{duration:1000,easing:'swing',queue:false,complete:function(){
                 $thisBannerOverlay.addClass('overlay_hidden');
@@ -1527,7 +1527,7 @@ function prototype_menu_switch(switchOptions){
 
 // Create a function for switching to a specific menu step
 function prototype_menu_switch_action(switchOptions){
-    console.log('prototype_menu_switch_action(switchOptions:', switchOptions, ')');
+    //console.log('prototype_menu_switch_action(switchOptions:', switchOptions, ')');
 
     // Redefine the options array populating defaults
     switchOptions = {
@@ -1802,7 +1802,7 @@ function prototype_menu_switch_action(switchOptions){
                 //console.log('RELOAD TRIGGERED for "'+currentMenuTitle+'" with currentMenuStep = '+currentMenuStep+', currentMenuSelect = '+currentMenuSelect+', currentMenuCondition = '+currentMenuCondition+'!');
 
                 // Check to see if there are conditional wrappers to populate
-                if (!currentMenu.find('.option_wrapper').length){
+                if (!currentMenu.find('.option_wrapper:not(.option_wrapper_start)').length){
 
                     // DEBUG
                     //console.log('AJAX POST to MENU-TOP :');
@@ -1836,7 +1836,7 @@ function prototype_menu_switch_action(switchOptions){
                 } else {
 
                     // Option wrappers were found, so loop through each and update markup
-                    $('.option_wrapper', currentMenu).not('.option_wrapper_hidden').each(function(){
+                    $('.option_wrapper:not(.option_wrapper_start):not(.option_wrapper_hidden)', currentMenu).each(function(){
 
                         // Collect the condition for this particular wrapper
                         var tempMenuWrapper = $(this);
