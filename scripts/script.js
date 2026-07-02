@@ -3427,6 +3427,8 @@ class mmrpgUserInputWatcher {
         _config.wheelTimeout = typeof config.wheelTimeout === 'number' ?  config.wheelTimeout : _config.inputTimeout;
         _config.gamepadTimeout = typeof config.gamepadTimeout === 'number' ? config.gamepadTimeout : _config.inputTimeout;
         _config.autoRunCallbacks = typeof config.autoRunCallbacks === 'boolean' ? config.autoRunCallbacks : true;
+        _config.bubbleIframeInputs = typeof config.bubbleIframeInputs === 'boolean' ? config.bubbleIframeInputs : true;
+        _config.catchIframeInputs = typeof config.catchIframeInputs === 'boolean' ? config.catchIframeInputs : true;
         _config.stickDeadzone = typeof config.stickDeadzone === 'number' ? config.stickDeadzone : 0.25;
         _config.diagonalBias = typeof config.diagonalBias === 'number' ? config.diagonalBias : 0.4;
         _config.gamepadKind = typeof config.gamepadKind === 'number' ? config.gamepadKind : null;
@@ -3448,14 +3450,14 @@ class mmrpgUserInputWatcher {
         let userInputs = {}; // below will be the default for now, but we'll allow customizing later
         userInputs.A = {name: 'A', icon: 'Ⓐ', keyboard: ['d', 'Space'], gamepad: [0], sonyIcon: '⨯', sonyName: 'Cross'};
         userInputs.B = {name: 'B', icon: 'Ⓑ', keyboard: ['s', 'Backspace'], gamepad: [1], sonyIcon: '◯', sonyName: 'Circle'};
-        userInputs.X = {name: 'X', icon: 'Ⓧ', keyboard: ['f', 'Escape', '\\'], gamepad: [2], sonyIcon: '□', sonyName: 'Square'};
-        userInputs.Y = {name: 'Y', icon: 'Ⓨ', keyboard: ['a', 'Tab'], gamepad: [3], sonyIcon: '△', sonyName: 'Triangle'};
-        userInputs.L1 = {name: 'L1', icon: 'L1', keyboard: ['z', '['], gamepad: [4]};
-        userInputs.R1 = {name: 'R1', icon: 'R1', keyboard: ['c', ']'], gamepad: [5]};
-        userInputs.LR1 = {name: 'L1+R1', icon: 'L1+R1', keyboard: ['x'], gamepad: [4, 5], isCombo: true};
-        userInputs.L2 = {name: 'L2', icon: 'L2', keyboard: ['q', '-'], gamepad: [6], nintendoIcon: 'ZL', nintendoName: 'ZL'};
-        userInputs.R2 = {name: 'R2', icon: 'R2', keyboard: ['e', '='], gamepad: [7], nintendoIcon: 'ZR', nintendoName: 'ZR'};
-        userInputs.LR2 = {name: 'L2+R2', icon: 'L2+R2', keyboard: ['w'], gamepad: [6, 7], isCombo: true, nintendoIcon: 'ZL+ZR', nintendoName: 'ZL+ZR'};
+        userInputs.X = {name: 'X', icon: 'Ⓧ', keyboard: ['f', 'Escape', '\\'], gamepad: [2], sonyIcon: '△', sonyName: 'Triangle'};
+        userInputs.Y = {name: 'Y', icon: 'Ⓨ', keyboard: ['a', 'Tab'], gamepad: [3], sonyIcon: '□', sonyName: 'Square'};
+        userInputs.L1 = {name: 'L1', icon: 'L1', keyboard: ['q', '['], gamepad: [4]};
+        userInputs.R1 = {name: 'R1', icon: 'R1', keyboard: ['e', ']'], gamepad: [5]};
+        userInputs.LR1 = {name: 'L1+R1', icon: 'L1+R1', keyboard: ['w'], gamepad: [4, 5], isCombo: true};
+        userInputs.L2 = {name: 'L2', icon: 'L2', keyboard: ['z', '-'], gamepad: [6], nintendoIcon: 'ZL', nintendoName: 'ZL'};
+        userInputs.R2 = {name: 'R2', icon: 'R2', keyboard: ['c', '='], gamepad: [7], nintendoIcon: 'ZR', nintendoName: 'ZR'};
+        userInputs.LR2 = {name: 'L2+R2', icon: 'L2+R2', keyboard: ['x'], gamepad: [6, 7], isCombo: true, nintendoIcon: 'ZL+ZR', nintendoName: 'ZL+ZR'};
         userInputs.Start = {name: 'Start', icon: '+', keyboard: ['Enter', 'Home'], gamepad: [9], nintendoIcon: '+', nintendoName: 'Plus', sonyIcon: ']', sonyName: 'Option'};
         userInputs.Select = {name: 'Select', icon: '−', keyboard: ['Shift', 'End'], gamepad: [8], nintendoIcon: '-', nintendoName: 'Minus', sonyIcon: '[', sonyName: 'Share'};
         userInputs.Up = {name: 'Up', icon: '⏶', keyboard: ['ArrowUp'], gamepad: [12]};
@@ -3470,6 +3472,16 @@ class mmrpgUserInputWatcher {
             //console.log('mmrpgUserInputWatcher.onUserInput(kind:', kind, ', event:', event, ')');
             _self.lastInputKind = kind;
             _self.lastInputEvent = event;
+            if (_config.bubbleIframeInputs && window !== window.parent){
+                let isGamepadEvent = (kind === 'gamepadinput' || kind === 'gamepadconnected' || kind === 'gamepaddisconnected');
+                if (!isGamepadEvent){
+                    window.parent.postMessage({
+                        action: 'bubbleUserInput',
+                        kind: kind,
+                        activeInputs: activeInputs
+                        }, window.location.origin);
+                    }
+                }
             if (_config.autoRunCallbacks){
                 _events.onUserInput.call(_self, kind, event, activeInputs, userInputs);
                 }
@@ -3678,6 +3690,16 @@ class mmrpgUserInputWatcher {
         eventListeners.mousewheel = function(event){ getUserInputFromWheelEvent(event); onUserInput('mousewheel', event); };
         eventListeners.gamepadconnected = function(event){ watchGamepadInputs(event.gamepad); onUserInput('gamepadconnected', event); };
         eventListeners.gamepaddisconnected = function(event){ watchGamepadInputs(null); onUserInput('gamepaddisconnected', event); };
+        eventListeners.message = function(messageEvent){
+            let data = messageEvent.data;
+            if (data && data.action === 'bubbleUserInput'){
+                _self.lastInputKind = data.kind;
+                _self.lastInputEvent = null;
+                if (_config.autoRunCallbacks || _events.onUserInput){
+                    _events.onUserInput.call(_self, data.kind, null, data.activeInputs, userInputs);
+                    }
+                }
+            };
 
         // Define an event to call when we want to start watching all the inputs
         let startWatchingInputs = function(){
@@ -3695,6 +3717,11 @@ class mmrpgUserInputWatcher {
             window.addEventListener("gamepadconnected", eventListeners.gamepadconnected, { passive: false });
             window.addEventListener("gamepaddisconnected", eventListeners.gamepaddisconnected, { passive: false });
 
+            // Only listen for bubbled messages if we are the top-level parent window
+            if (_config.catchIframeInputs && window === window.parent){
+                window.addEventListener('message', eventListeners.message, { passive: false });
+                }
+
             };
 
         // Define an event to call when we want to stop watching all the inputs
@@ -3711,6 +3738,11 @@ class mmrpgUserInputWatcher {
             // Remove events from any connected gamepads
             window.removeEventListener("gamepadconnected", eventListeners.gamepadconnected);
             window.removeEventListener("gamepaddisconnected", eventListeners.gamepaddisconnected);
+
+            // Clean up the message listener as well
+            if (_config.catchIframeInputs && window === window.parent){
+                window.removeEventListener('message', eventListeners.message);
+                }
 
             };
 
