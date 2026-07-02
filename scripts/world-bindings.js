@@ -1666,6 +1666,64 @@ function bindEventsToWorld($thisWorld){
         }
     _self.robotsOverviewAPI = robotsOverviewAPI;
 
+    // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed
+    $(window).bind('resize', function(e){
+        //console.log('%c' + 'World map window resize event!', 'color: cyan;');
+        //e.preventDefault();
+        //e.stopPropagation();
+        //console.log('-> event:', e);
+        //console.log('-> window.devicePixelRatio:', window.devicePixelRatio);
+        let pixelRatio = window.devicePixelRatio || 1;
+        let imageRendering = pixelRatio === 1 || pixelRatio % 2 === 0 ? 'pixelated' : 'auto';
+        //console.log('-> pixelRatio:', pixelRatio, '\n', '-> imageRendering:', imageRendering);
+        $thisWorld.attr('data-rendering', imageRendering);
+        }).trigger('resize');
+
+    // Return true on success
+    return true;
+    }
+
+// Quick function for binding events to the user's keyboard/gamepad inputs
+function bindEventsToInputs($thisWorld){
+    //console.log('%c' + 'mmrpgWorldMap.bindEventsToInputs($thisWorld:' + typeof $thisWorld + ')', 'color: magenta;');
+    if (!$thisWorld || !$thisWorld.length){ console.error('bindEventsToInputs() missing required $thisWorld!'); return false; }
+    let _self = this;
+    let _selfRef = _self.bindEventsToInputs;
+    let _config = _self.config;
+    let _elements = _self.elements;
+    let _world = _self.state;
+    let _worldCursor = _world.cursor;
+    let _worldPlayer = _world.player;
+    let _worldPlayerTeam = _worldPlayer.team;
+    let _worldPlayerRobots = _worldPlayer.robots;
+    let $thisCanvas = _elements.canvas;
+    let $sideButtons = _elements.sideButtons;
+    let $sideButtonsWrapper = $('> .wrapper', $sideButtons);
+    let $actionDropdown = _elements.actionDropdown;
+    let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
+    let hoverCanvasObject = function(e, sfx){
+        let $object = $(this);
+        if (_self.worldIsBusy()){ return; }
+        if ($object.is('.disabled')){ return; }
+        if ($object.closest('.chrome').is('.disabled')){ return; }
+        $thisCanvas.find('.hovered').removeClass('hovered');
+        if (sfx){ _self.playSoundEffect(sfx); }
+        $object.addClass('hovered');
+        return true;
+        };
+    let unhoverCanvasObject = function(e){
+        let $object = $(this);
+        $object.removeClass('hovered');
+        return true;
+        };
+    let $backButton = _elements.backButton;
+    let $homeButton = _elements.homeButton;
+    let $resetButton = _elements.resetButton;
+    let $playerSwitcher = _elements.playerSwitcher;
+    let $minimapOverview = _elements.minimapOverview;
+    let $robotsOverview = _elements.robotsOverview;
+    let robotsOverviewAPI = _self.robotsOverviewAPI;
+
     // Define a function to run each time user inputs are updated so we can react
     let listenForInput = function(){ return Date.now() >= nextInputAllowedTime; }, nextInputAllowedTime = 0;
     let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 200; nextInputAllowedTime = Date.now() + delay; };
@@ -2674,19 +2732,6 @@ function bindEventsToWorld($thisWorld){
     _self.inputs = userInputWatcher;
     //console.log('check if loaded _self.inputs.userInputs:', _self.inputs.userInputs);
 
-    // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed
-    $(window).bind('resize', function(e){
-        //console.log('%c' + 'World map window resize event!', 'color: cyan;');
-        //e.preventDefault();
-        //e.stopPropagation();
-        //console.log('-> event:', e);
-        //console.log('-> window.devicePixelRatio:', window.devicePixelRatio);
-        let pixelRatio = window.devicePixelRatio || 1;
-        let imageRendering = pixelRatio === 1 || pixelRatio % 2 === 0 ? 'pixelated' : 'auto';
-        //console.log('-> pixelRatio:', pixelRatio, '\n', '-> imageRendering:', imageRendering);
-        $thisWorld.attr('data-rendering', imageRendering);
-        }).trigger('resize');
-
     // Return true on success
     return true;
     }
@@ -2695,4 +2740,5 @@ function bindEventsToWorld($thisWorld){
 
 mmrpgWorldMap.prototype.bindEventsToCanvas = bindEventsToCanvas;
 mmrpgWorldMap.prototype.bindEventsToWorld = bindEventsToWorld;
+mmrpgWorldMap.prototype.bindEventsToInputs = bindEventsToInputs;
 

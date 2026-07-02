@@ -536,6 +536,7 @@ class mmrpgWorldMap {
             _world.hasLoaded = true;
             _self.bindEventsToCanvas($canvasMap);
             _self.bindEventsToWorld($thisWorld);
+            _self.bindEventsToInputs($thisWorld);
             _self.calculateWalkableMapTiles();
             _self.initMiniMap();
             let startPosition = '1-1';
