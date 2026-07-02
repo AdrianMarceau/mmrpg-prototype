@@ -2082,6 +2082,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             $is_player_battle = !empty($this_battleinfo['flags']['player_battle']) ? true : false;
             $is_challenge_battle = !empty($this_battleinfo['flags']['challenge_battle']) ? true : false;
             $is_endless_battle = !empty($this_battleinfo['flags']['endless_battle']) ? true : false;
+            $is_starfield_mission = !empty($this_battleinfo['flags']['starfield_mission']) ? true : false;
             $is_battle_counts = isset($this_battleinfo['battle_counts']) && $this_battleinfo['battle_counts'] == false ? false : true;
 
             // Check the GAME session to see if this battle has been completed, increment the counter if it was
@@ -2542,12 +2543,19 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             }
             $temp_field_multipliers = !empty($temp_field_multipliers) ? implode('|', $temp_field_multipliers) : '';
 
+            // Add extra option classes based on the type of mission we're dealing with
+            /* $is_starter_battle, $is_player_battle, $is_challenge_battle, $is_endless_battle, $is_starfield_mission */
+            if ($is_starter_battle){ $this_option_class .= ' starter'; }
+            elseif ($is_player_battle){ $this_option_class .= ' versus'; }
+            elseif ($is_challenge_battle){ $this_option_class .= ' challenge'; }
+            elseif ($is_endless_battle){ $this_option_class .= ' endless'; }
+            elseif ($is_starfield_mission){ $this_option_class .= ' starfield'; }
+            $this_option_class = trim(preg_replace('/\s+/', ' ', $this_option_class));
 
             // Check if this is a starfield mission or not
             $this_image_style = '';
-            $is_starfield_mission = !empty($this_battleinfo['flags']['starfield_mission']) ? true : false;
             if ($is_starfield_mission){
-                $this_option_class .= ' starfield';
+                //$this_option_class .= ' starfield';
                 if (!empty($this_battleinfo['battle_complete_redirect_token'])){
                     $this_option_class .= ' starshake';
                     $this_option_class .= ' dx';
