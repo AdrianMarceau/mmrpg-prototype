@@ -4037,7 +4037,7 @@ class rpg_world {
 
     // If there are any switches defined, check to see if any of them have been interacted with already
     public static function refresh_map_switches($this_prototype_data, &$map_data_parsed){
-        error_log('rpg_world::refresh_map_switches() called!');
+        //error_log('rpg_world::refresh_map_switches() called!');
         if (empty($map_data_parsed['switches'])){ return; }
         $game_session_token = rpg_game::session_token();
         $world_session_token = self::session_token();
@@ -4083,11 +4083,11 @@ class rpg_world {
                         if (empty($row_tiles[$tx])){ continue; }
                         $current_terrain = $row_tiles[$tx];
                         $current_terrain_base = explode('-', $current_terrain)[0];
-                        error_log('$current_terrain = '.print_r($current_terrain, true));
-                        error_log('$current_terrain_base = '.print_r($current_terrain_base, true));
+                        //error_log('$current_terrain = '.print_r($current_terrain, true));
+                        //error_log('$current_terrain_base = '.print_r($current_terrain_base, true));
                         if ($current_terrain === $terrain_up || $current_terrain_base === $terrain_up){ $row_tiles[$tx] = $terrain_down; }
                         elseif ($current_terrain === $terrain_down || $current_terrain_base === $terrain_down){ $row_tiles[$tx] = $terrain_up; }
-                        error_log('new terrain = '.print_r($row_tiles[$tx], true));
+                        //error_log('new terrain = '.print_r($row_tiles[$tx], true));
                         $row_tiles = implode(',', $row_tiles);
                         $layer_tiles[$ty] = $row_tiles;
                     }
