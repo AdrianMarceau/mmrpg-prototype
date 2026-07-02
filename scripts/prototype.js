@@ -2,11 +2,13 @@
 let $thisWindow = null;
 let $mmrpgWrapper = null;
 let $mmrpgElements = {};
+let mmrpgPrototype = {};
 //let $thisPrototype = false; // TODO: remove global and use $mmrpgElements.get()
 //let $thisBanner = false; // TODO: remove global and use $mmrpgElements.get()
 
 // Define the prototype game settings
 if (typeof gameSettings === 'undefined' || !gameSettings){ window.gameSettings = {}; }
+mmrpgPrototype.gameSettings = gameSettings;
 gameSettings.gameHasLoaded = false;
 gameSettings.prototypeLoaded = false;
 gameSettings.totalRobotLimit = 8;
@@ -28,6 +30,7 @@ gameSettings.fadeIn = false;
 
 // Define the prototype battle options
 if (typeof battleOptions === 'undefined' || !battleOptions){ window.battleOptions = {}; }
+mmrpgPrototype.battleOptions = battleOptions;
 battleOptions.this_player_id = 0;
 battleOptions.this_player_token = '';
 battleOptions.this_player_robots = [];
@@ -58,9 +61,6 @@ $(document).ready(function(){
     $mmrpgElements.thisBannerOverlay = $thisBannerOverlay;
     $mmrpgElements.thisFalloff = $thisFalloff;
 
-    // Update the ready room ref with the global object if exists
-    thisReadyRoom = typeof window.mmrpgReadyRoom !== 'undefined' ? window.mmrpgReadyRoom : false;
-
     // Check if this instance has been loaded in an iframe
     prototypeIsHome = window.top === window.self && !$('#mmrpg').hasClass('iframe') ? true : false;
     prototypeIsFramed = window.top !== window.self ? true : false;
@@ -68,6 +68,13 @@ $(document).ready(function(){
     //console.log('prototypeIsHome =', prototypeIsHome);
     //console.log('prototypeIsFramed =', prototypeIsFramed);
     //console.log('prototypeIsSubmenu =', prototypeIsSubmenu);
+    mmrpgPrototype.prototypeIsHome = prototypeIsHome;
+    mmrpgPrototype.prototypeIsFramed = prototypeIsFramed;
+    mmrpgPrototype.prototypeIsSubmenu = prototypeIsSubmenu;
+
+    // Update the ready room ref with the global object if exists
+    thisReadyRoom = typeof window.mmrpgReadyRoom !== 'undefined' ? window.mmrpgReadyRoom : false;
+    mmrpgPrototype.thisReadyRoom = thisReadyRoom;
 
     // If we're not in an iframe, adjust background
     if (!prototypeIsFramed){ $('html').css({backgroundColor:'#262626'}); }
@@ -86,9 +93,25 @@ $(document).ready(function(){
         $mmrpgDiv.attr('data-rendering', imageRendering);
         }).trigger('resize');
 
+    // Define some interaction sound effects for the prototype main menu
+    let playSoundEffect = function(){};
+    if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+
+        // Define a quick local function for routing sound effect plays to the parent
+        playSoundEffect = function(soundName, options){
+            if (this instanceof jQuery || this instanceof Element){
+                if ($(this).data('silentClick')){ return; }
+                if ($(this).is('.disabled')){ return; }
+                if ($(this).is('.option_disabled')){ return; }
+                }
+            top.mmrpg_play_sound_effect(soundName, options);
+            };
+
+        }
+    mmrpgPrototype.playSoundEffect = playSoundEffect;
+
     // Define the prototype context
-    var thisContext = $('#prototype');
-    if (thisContext.length){
+    if ($thisPrototype.length){
 
         // Define the window resize event so we can adapt to changes
         $thisWindow.resize(function(){ windowResizePrototype(); });
@@ -98,54 +121,43 @@ $(document).ready(function(){
         // -- SOUND EFFECT FUNCTIONALITY -- //
 
         // Define some interaction sound effects for the prototype main menu
-        var playSoundEffect = function(){};
-        if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
-
-            // Define a quick local function for routing sound effect plays to the parent
-            playSoundEffect = function(soundName, options){
-                if (this instanceof jQuery || this instanceof Element){
-                    if ($(this).data('silentClick')){ return; }
-                    if ($(this).is('.disabled')){ return; }
-                    if ($(this).is('.option_disabled')){ return; }
-                    }
-                top.mmrpg_play_sound_effect(soundName, options);
-                };
+        if (typeof playSoundEffect !== 'undefined'){
 
             // HOME LINKS
 
             // Add hover and click sounds to the links in the main menu
-            $('.banner .options_fullmenu .link', thisContext).live('mouseenter', function(){
+            $('.banner .options_fullmenu .link', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'link-hover');
                 });
-            $('.banner .options_fullmenu .link', thisContext).live('click', function(){
+            $('.banner .options_fullmenu .link', $thisPrototype).live('click', function(){
                 if ($(this).is('.link_home')){ playSoundEffect.call(this, 'link-click-special'); }
                 else { playSoundEffect.call(this, 'link-click'); }
                 });
 
             // Add hover and click sounds to the user config button in the main menu
-            $('.banner .options_userinfo[data-step]', thisContext).live('mouseenter', function(){
+            $('.banner .options_userinfo[data-step]', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'link-hover');
                 });
-            $('.banner .options_userinfo[data-step]', thisContext).live('click', function(){
+            $('.banner .options_userinfo[data-step]', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'link-click');
                 });
 
             // Add hover and click sounds to the leaderboard button in the main menu
-            $('.banner .points[data-step]', thisContext).live('mouseenter', function(){
+            $('.banner .points[data-step]', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'link-hover');
                 });
-            $('.banner .points[data-step]', thisContext).live('click', function(){
+            $('.banner .points[data-step]', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'link-click');
                 });
 
             // CHAPTER SELECT
 
             // Add hover and click sounds to the chapter select buttons
-            $('.menu .chapter_select .chapter_link', thisContext).live('mouseenter', function(){
+            $('.menu .chapter_select .chapter_link', $thisPrototype).live('mouseenter', function(){
                 if ($(this).is('.chapter_link_disabled')){ return; }
                 playSoundEffect.call(this, 'icon-hover');
                 });
-            $('.menu .chapter_select .chapter_link', thisContext).live('click', function(){
+            $('.menu .chapter_select .chapter_link', $thisPrototype).live('click', function(){
                 if ($(this).is('.chapter_link_disabled')){ return; }
                 playSoundEffect.call(this, 'link-click');
                 });
@@ -153,43 +165,43 @@ $(document).ready(function(){
             // PLAYER SELECT
 
             // Add hover and click sounds to the player select buttons
-            $('.menu .option_this-player-select', thisContext).live('mouseenter', function(){
+            $('.menu .option_this-player-select', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'link-hover');
                 });
-            $('.menu .option_this-player-select', thisContext).live('click', function(){
+            $('.menu .option_this-player-select', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'lets-go');
                 });
 
             // MISSION SELECT (BATTLE SELECT)
 
             // Add hover and click sounds to the battle select buttons
-            $('.menu .option_this-battle-select', thisContext).live('mouseenter', function(){
+            $('.menu .option_this-battle-select', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'link-hover');
                 });
-            $('.menu .option_this-battle-select', thisContext).live('click', function(){
+            $('.menu .option_this-battle-select', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'lets-go');
                 });
 
             // ROBOT SELECT
 
             // Add hover and click sounds to the robot select buttons
-            $('.menu .option_this-robot-select', thisContext).live('mouseenter', function(){
+            $('.menu .option_this-robot-select', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'icon-hover');
                 });
-            $('.menu .option_this-robot-select', thisContext).live('click', function(){
+            $('.menu .option_this-robot-select', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'link-click-robot');
                 });
-            $('.menu .option_this-team-select', thisContext).live('click', function(){
+            $('.menu .option_this-team-select', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'lets-go-robots');
                 });
 
             // BACK BUTTON(s)
 
             // Add hover and click sounds to any back buttons
-            $('.menu .option_back', thisContext).live('mouseenter', function(){
+            $('.menu .option_back', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'back-hover');
                 });
-            $('.menu .option_back', thisContext).live('click', function(){
+            $('.menu .option_back', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'back-click');
                 setTimeout(function(){
                     playSoundEffect.call(this, 'back-click-loading');
@@ -199,18 +211,17 @@ $(document).ready(function(){
             // READY ROOM GLASS
 
             // Add a click sound to the ready-room glass if it exists
-            $('.ready_room .wrapper.inner > .clicker', thisContext).live('click', function(){
+            $('.ready_room .wrapper.inner > .clicker', $thisPrototype).live('click', function(){
                 //console.log('testing 123');
                 playSoundEffect.call(this, 'glass-klink');
                 });
-
 
             }
 
 
         // -- MENU FUNCTIONALITY -- //
 
-        $('.option_wrapper', thisContext).scroll(function(e){
+        $('.option_wrapper', $thisPrototype).scroll(function(e){
             var scrollTop = $(this).scrollTop();
             var wrapperHeight = $(this).height();
             var scrollHeight = scrollTop + wrapperHeight;
@@ -220,47 +231,47 @@ $(document).ready(function(){
             });
 
         // Define the action for the page link
-        $('.banner .link[data-href]', thisContext).live('click', function(e){
+        $('.banner .link[data-href]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype redirect function
-            prototype_trigger_redirect(thisContext, this);
+            prototype_trigger_redirect($thisPrototype, this);
             });
 
         // Create click events for the battle redirect links
-        $('a[data-redirect]', thisContext).live('click', function(e){
+        $('a[data-redirect]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype redirect function
-            prototype_trigger_redirect(thisContext, this);
+            prototype_trigger_redirect($thisPrototype, this);
             });
 
         // Define the action for the banner step links
-        $('.banner .link[data-step]', thisContext).live('click', function(e){
+        $('.banner .link[data-step]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype step function
-            prototype_menu_click_step(thisContext, this);
+            prototype_menu_click_step($thisPrototype, this);
             });
 
         // Define the action for the banner step divs
-        $('.banner div[data-step]', thisContext).live('click', function(e){
+        $('.banner div[data-step]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype step function
-            prototype_menu_click_step(thisContext, this);
+            prototype_menu_click_step($thisPrototype, this);
             });
 
         // Define the confirmation event for the exit action
-        $('.banner .link_exit', thisContext).live('click', function(e){
+        $('.banner .link_exit', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype exit function
-            prototype_trigger_exit(thisContext, this);
+            prototype_trigger_exit($thisPrototype, this);
             });
 
         // Define the confirmation event for the reset action
-        $('.banner .link_reset', thisContext).live('click', function(e){
+        $('.banner .link_reset', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the game reset function
@@ -268,13 +279,13 @@ $(document).ready(function(){
             });
 
         // Load content into any requested elements
-        $('.menu[data-source]', thisContext).each(function(){
+        $('.menu[data-source]', $thisPrototype).each(function(){
             // Trigger the prototype source function
-            prototype_menu_preload_source(thisContext, this);
+            prototype_menu_preload_source($thisPrototype, this);
             });
 
         // Define the click event for menu items that require a reload
-        $('.menu a[data-reload="true"]', thisContext).live('click', function(e){
+        $('.menu a[data-reload="true"]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Collect the parent variables
@@ -315,7 +326,7 @@ $(document).ready(function(){
             }
 
         // Define the click event for the chapter select menu links
-        var thisChapterSelects = $('.option_wrapper_missions .chapter_select', thisContext);
+        var thisChapterSelects = $('.option_wrapper_missions .chapter_select', $thisPrototype);
         if (thisChapterSelects.length){
             // Attach a live click event to the chapter link buttons
             $('.chapter_link[data-chapter]', thisChapterSelects).live('click', function(e){
@@ -348,7 +359,7 @@ $(document).ready(function(){
             }
 
         // Create the click events for the prototype menu option buttons
-        $('.option[data-token]', thisContext).live('click', function(e){
+        $('.option[data-token]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             //console.log('option clicked!');
@@ -371,7 +382,7 @@ $(document).ready(function(){
                 }, 1000);
 
             // Trigger the prototype option function
-            prototype_menu_click_option(thisContext, this, function(){
+            prototype_menu_click_option($thisPrototype, this, function(){
                 //console.log('onComplete triggered for optionClicked');
                 clearTimeout(gameSettings.customValues.optionClicked);
                 delete gameSettings.customValues.optionClicked;
@@ -380,11 +391,11 @@ $(document).ready(function(){
             });
 
         // Create the click events for the prototype menu back button
-        $('.option[data-back]', thisContext).live('click', function(e){
+        $('.option[data-back]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype back function
-            prototype_menu_click_back(thisContext, this);
+            prototype_menu_click_back($thisPrototype, this);
             });
 
         // Check if the player token has already been selected
@@ -398,7 +409,7 @@ $(document).ready(function(){
 
             //alert('player selected : '+battleOptions['this_player_token']);
             gameSettings.skipPlayerSelect = true;
-            var thisMenu = $('.menu[data-select="this_player_token"]', thisContext);
+            var thisMenu = $('.menu[data-select="this_player_token"]', $thisPrototype);
             $('.option[data-token="'+battleOptions['this_player_token']+'"]', thisMenu).triggerSilentClick();
 
             if (dataStepNumber === 1){ dataStepNumber = 2; }
@@ -421,9 +432,9 @@ $(document).ready(function(){
             // Fade in the prototype screen slowly if allowed
             if (gameSettings.fadeIn == true){
                 //alert('gameSettings.fadeIn == true? '+(gameSettings.fadeIn ? 'true' : 'false'));
-                thisContext.waitForImages(function(){
+                $thisPrototype.waitForImages(function(){
                     var tempTimeout = setTimeout(function(){
-                        thisContext.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing');
+                        $thisPrototype.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing');
                         windowResizePrototype();
                         gameSettings.prototypeLoaded = true;
                         gameSettings.gameHasLoaded = true;
@@ -436,7 +447,7 @@ $(document).ready(function(){
                 } else {
                 //alert('gameSettings.fadeIn == false');
                 // Trigger the prototype step function if not home
-                thisContext.css({opacity:1}).removeClass('hidden');
+                $thisPrototype.css({opacity:1}).removeClass('hidden');
                 windowResizePrototype();
                 gameSettings.prototypeLoaded = true;
                 gameSettings.gameHasLoaded = true;
@@ -534,8 +545,8 @@ $(document).ready(function(){
         // Trigger the prototype step function if not home
         if (gameSettings.startLink !== 'home'){
             //gameSettings.skipPlayerSelect = true;
-            var thisLink = $('.banner .link[data-step="'+gameSettings.startLink+'"]', thisContext);
-            prototype_menu_click_step(thisContext, thisLink, thisFadeCallback, 10); //CHECKPOINT
+            var thisLink = $('.banner .link[data-step="'+gameSettings.startLink+'"]', $thisPrototype);
+            prototype_menu_click_step($thisPrototype, thisLink, thisFadeCallback, 10); //CHECKPOINT
             //prototype_menu_switch({stepName:gameSettings.startLink,onComplete:thisFadeCallback,slideDuration:600});
             } else {
             //gameSettings.skipPlayerSelect = true;
@@ -799,7 +810,7 @@ function prototype_trigger_redirect(thisContext, thisLink){
 
 // Define a function for automatically going to the next menu, if defined
 function prototype_menu_loaded(){
-    console.log('prototype_menu_loaded()');
+    //console.log('prototype_menu_loaded()');
     let $thisPrototype = $mmrpgElements.thisPrototype;
     let $thisBanner = $mmrpgElements.thisBanner;
     let $thisBannerOverlay = $mmrpgElements.thisBannerOverlay;
