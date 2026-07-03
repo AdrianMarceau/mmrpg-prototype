@@ -585,7 +585,7 @@ rpg_world::refresh_world_map($this_prototype_data, $map_data_parsed);
 // Now that we have encounter and other data, let's see if we should change the music at all
 if (!empty($map_data_parsed['music'])){
     $music_tracks = $map_data_parsed['music'];
-    if (!!empty($music_tracks['safezone']) && empty($battles_remaining['all'])){ $map_field_music = $music_tracks['safezone'][0]; }
+    if (!empty($music_tracks['safezone']) && empty($battles_remaining['all'])){ $map_field_music = $music_tracks['safezone'][0]; }
     elseif (!empty($music_tracks['dangerzone']) && !empty($battles_remaining['all'])){ $map_field_music = $music_tracks['dangerzone'][0]; }
     elseif (!empty($music_tracks['boss-nearby']) && !empty($battles_remaining['boss'])){ $map_field_music = $music_tracks['boss-nearby'][0]; }
     elseif (!empty($music_tracks['master-nearby']) && !empty($battles_remaining['master'])){ $map_field_music = $music_tracks['master-nearby'][0]; }
