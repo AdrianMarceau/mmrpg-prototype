@@ -662,6 +662,10 @@ function initUserInputWatcher(){
                 //console.log('%c' + (activeInputs.L1 ? 'L1' : 'R1') + ' trigger key pressed!', 'color: orange;');
                 if (event){ event.preventDefault(); }
                 let $focusedMenuLink, $gotoMenuLink;
+                let $availableMenuLinks = $('.link[data-step]:visible', $thisBannerMenu);
+                let maxMenuLinkIndex = $availableMenuLinks.length - 1;
+                //console.log('$availableMenuLinks =', $availableMenuLinks);
+                //console.log('maxMenuLinkIndex =', maxMenuLinkIndex);
                 if (!$thisBannerMenu.hasClass('hovered')){
                     //console.log('-> banner menu not hovered yet, hovering it now');
                     $thisBannerMenu.addClass('hovered');
@@ -687,18 +691,22 @@ function initUserInputWatcher(){
                     $('.link[data-step]', $thisBannerMenu).removeClass('link_active hovered');
                     }
                 if ($focusedMenuLink && $focusedMenuLink.length){
-                    let focusedLinkIndex = parseInt($focusedMenuLink.attr('data-index'));
+                    let focusedLinkIndex = $availableMenuLinks.index($focusedMenuLink);
                     //console.log('using $focusedMenuLink to find next/prev from index ', focusedLinkIndex, '...');
                     if (activeInputs.R1){
                         let nextIndex = focusedLinkIndex + 1;
-                        $nextMenuLink = $('.link[data-step][data-index="' + nextIndex + '"]', $thisBannerMenu);
-                        if (!$nextMenuLink || !$nextMenuLink.length){ $nextMenuLink = $('.link[data-step][data-index]', $thisBannerMenu).first(); }
+                        if (nextIndex > maxMenuLinkIndex){ nextIndex = 0; }
+                        else if (nextIndex < 0){ nextIndex = maxMenuLinkIndex; }
+                        //console.log('nextIndex =', nextIndex);
+                        $nextMenuLink = $availableMenuLinks.eq(nextIndex);
                         //console.log('$nextMenuLink =', typeof $nextMenuLink, $nextMenuLink);
                         if ($nextMenuLink && $nextMenuLink.length){ $gotoMenuLink = $nextMenuLink; }
                         } else if (activeInputs.L1){
                         let prevIndex = focusedLinkIndex - 1;
-                        $prevMenuLink = $('.link[data-step][data-index="' + prevIndex + '"]', $thisBannerMenu);
-                        if (!$prevMenuLink || !$prevMenuLink.length){ $prevMenuLink = $('.link[data-step][data-index]', $thisBannerMenu).last(); }
+                        if (prevIndex < 0){ prevIndex = maxMenuLinkIndex; }
+                        else if (prevIndex > maxMenuLinkIndex){ prevIndex = 0; }
+                        //console.log('prevIndex =', prevIndex);
+                        $prevMenuLink = $availableMenuLinks.eq(prevIndex);
                         //console.log('$prevMenuLink =', typeof $prevMenuLink, $prevMenuLink);
                         if ($prevMenuLink && $prevMenuLink.length){ $gotoMenuLink = $prevMenuLink; }
                         }
@@ -821,6 +829,7 @@ function initUserInputWatcher(){
                     //$currentOptionsAvailable.eq(nextOptionHoveredIndex).addClass('hovered');
                     let $newHoveredOption = $currentOptionsAvailable.eq(nextOptionHoveredIndex);
                     $newHoveredOption.addClass('hovered');
+                    $newHoveredOption.trigger('mouseenter');
                     // Find the closest parent that actually handles the scrolling (e.g., the perfectScrollbar .wrap)
                     // If it's the sticky button outside the wrap, this grabs .option_wrapper instead
                     let $scrollContainer = $newHoveredOption.closest('.wrap, .option_wrapper');
