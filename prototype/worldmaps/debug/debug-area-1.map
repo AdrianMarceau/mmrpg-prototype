@@ -68,7 +68,7 @@
 #---------------------------#
 # INTRO ENCOUNTER
 #------------------
-@mechas[]    = light-runway-mecha(11-12, met, 1)
+@mechas[]    = light-runway-mecha(11-12, sniper-joe, 2)
 #---------------------------#
 # MECHA PORTAL BOSSES
 #----------------------
