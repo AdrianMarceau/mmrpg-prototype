@@ -1064,3 +1064,88 @@ function windowResizeFrame(){
     //console.log('windowWidth = '+windowWidth+'; parentWidth = '+parentWidth+'; thisTypeContainerWidth = '+thisTypeContainerWidth+'; thisStarContainerWidth = '+thisStarContainerWidth+'; ');
 
 }
+
+// Define a player-specific function to call when polling user input variables
+function checkUserInputsForPlayersFrame(kind, event, activeInputs, userInputs){
+    //console.log('%c' + 'prototypeReady.checkUserInputsForPlayersFrame()', 'color: magenta;');
+    let _self = this;
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let playSoundEffect = mmrpgPrototype.playSoundEffect;
+    //console.log('-> playSoundEffect:', typeof playSoundEffect, playSoundEffect);
+    //console.log('-> $thisPrototype:', typeof $thisPrototype, $thisPrototype);
+
+    // Collect references to available panels, tabs, and buttons before starting
+    let $thisEditor = $('#edit', $thisPrototype);
+    let $availablePanels = $('#canvas #links .sprite_player', $thisEditor);
+    //let $availableTabs = $('#console #players .event_visible .tab_link', $thisEditor);
+    //console.log('-> $thisEditor:', ($thisEditor ? $thisEditor.length : 0), typeof $thisEditor, $thisEditor);
+    //console.log('-> $availablePanels:', ($availablePanels ? $availablePanels.length : 0), typeof $availablePanels, $availablePanels);
+    //console.log('-> $availableTabs:', ($availableTabs ? $availableTabs.length : 0), typeof $availableTabs, $availableTabs);
+
+    // COMMON CONTROLS: Try to keep these consistent!
+
+    // If the user pressed the X button, we should scroll through visible panels
+    if (activeInputs.X){
+        //console.log('%c' + 'X button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activePanel = $availablePanels.filter('.sprite_player_current');
+        let activePanelIndex = $activePanel && $activePanel.length ? $availablePanels.index($activePanel) : -1;
+        let maxPanelIndex = $availablePanels.length - 1;
+        let nextPanelIndex = activePanelIndex + 1;
+        if (nextPanelIndex > maxPanelIndex){ nextPanelIndex = 0; }
+        let $nextPanel = $availablePanels.eq(nextPanelIndex);
+        if ($nextPanel && $nextPanel.length){
+            $nextPanel.trigger('mouseenter');
+            $nextPanel.trigger('click');
+            }
+        return;
+        }
+
+    // If the user pressed the L2/R2 button2, we should scroll through visible tabs
+    if (activeInputs.L2 || activeInputs.R2){
+        //console.log('%c' + (activeInputs.L2 ? 'L2' : 'L1') + ' trigger button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        // Player Editor Has No Tabs !!!
+        /* let $activeTab = $availableTabs.filter('.tab_link_active');
+        let activeTabIndex = $activeTab && $activeTab.length ? $availableTabs.index($activeTab) : -1;
+        let maxTabIndex = $availableTabs.length - 1;
+        let nextTabIndex = activeTabIndex + (activeInputs.L2 ? -1 : 1);
+        if (nextTabIndex > maxTabIndex){ nextTabIndex = 0; }
+        let $nextTab = $availableTabs.eq(nextTabIndex);
+        if ($nextTab && $nextTab.length){
+            $nextTab.trigger('mouseenter');
+            $nextTab.trigger('click');
+            } */
+        return;
+        }
+
+    // PLAYERS CONTROLS: These controls only apply to the player menu
+
+    // If the user pressed the Y button, we should ?????
+    if (activeInputs.B){
+        //console.log('%c' + 'B button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+
+    // If the user pressed the A button, we should ?????
+    if (activeInputs.A){
+        //console.log('%c' + 'A button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+
+    // If the user pressed the B button, we should ?????
+    if (activeInputs.B){
+        //console.log('%c' + 'B button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+
+
+
+
+}
