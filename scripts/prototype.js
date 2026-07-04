@@ -1872,6 +1872,20 @@ function prototype_menu_switch_action(switchOptions){
     // Collect the current step token
     var currentStepToken = $('.menu[data-step]:not(.menu_hide)', $thisPrototype).attr('data-step');
 
+    // Unload the previous menu's iframe after the slide animation finishes
+    if (currentStepToken && currentStepToken !== switchOptions.stepName && currentStepToken !== switchOptions.stepNumber){
+        var cleanupDuration = (switchOptions.slideDuration || 600) + 100; // slide duration + 100ms buffer
+        setTimeout(function(){
+            var $oldMenu = $('.menu[data-step="' + currentStepToken + '"]', $thisPrototype);
+            var $oldIframe = $oldMenu.find('iframe');
+            // If an active source iframe exists, replace it with the default blank state
+            if ($oldIframe.length
+                && $oldIframe.attr('src') !== 'blank.php'){
+                $oldMenu.empty().append('<iframe name="' + currentStepToken + '" class="blank" src="blank.php" width="100%" height="340" frameborder="1" scrolling="no"></iframe>');
+                }
+            }, cleanupDuration);
+        }
+
     // Update the prototype element with data attributes for styling
     //console.log('johto');
     var dataStepName = switchOptions.stepName;
