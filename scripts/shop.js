@@ -870,18 +870,10 @@ function printNumberWithCommas(x) {
 function checkUserInputsForShopFrame(kind, event, activeInputs, userInputs){
     //console.log('%c' + 'prototypeReady.checkUserInputsForShopFrame()', 'color: magenta;');
     let _self = this;
-    let playSoundEffect = mmrpgPrototype.playSoundEffect;
     let $thisPrototype = $mmrpgElements.thisPrototype;
+    let playSoundEffect = mmrpgPrototype.playSoundEffect;
     //console.log('-> playSoundEffect:', typeof playSoundEffect, playSoundEffect);
     //console.log('-> $thisPrototype:', typeof $thisPrototype, $thisPrototype);
-    let prototypeIsHome = mmrpgPrototype.prototypeIsHome;
-    let prototypeIsFramed = mmrpgPrototype.prototypeIsFramed;
-    let prototypeIsTopmenu = mmrpgPrototype.prototypeIsTopmenu;
-    let prototypeIsSubmenu = mmrpgPrototype.prototypeIsSubmenu;
-    //console.log('-> prototypeIsHome:', prototypeIsHome);
-    //console.log('-> prototypeIsFramed:', prototypeIsFramed);
-    //console.log('-> prototypeIsTopmenu:', prototypeIsTopmenu);
-    //console.log('-> prototypeIsSubmenu:', prototypeIsSubmenu);
 
     // Collect references to available panels, tabs, and buttons before starting
     let $thisShop = $('#shop', $thisPrototype);

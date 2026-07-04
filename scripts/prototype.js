@@ -627,6 +627,18 @@ function initUserInputWatcher(){
     //console.log('$thisBanner =', $thisBanner);
     //console.log('$thisBannerMenu =', $thisBannerMenu);
 
+    // Define the relevant user input watches for each subframe
+    let checkUserInputsForFrame = {};
+    checkUserInputsForFrame['shop'] = 'checkUserInputsForShopFrame';
+    checkUserInputsForFrame['edit_robots'] = 'checkUserInputsForRobotsFrame';
+    checkUserInputsForFrame['edit_players'] = 'checkUserInputsForPlayersFrame';
+    checkUserInputsForFrame['abilities'] = 'checkUserInputsForAbilitiesFrame';
+    checkUserInputsForFrame['items'] = 'checkUserInputsForItemsFrame';
+    checkUserInputsForFrame['stars'] = 'checkUserInputsForStarsFrame';
+    checkUserInputsForFrame['database'] = 'checkUserInputsForDatabaseFrame';
+    checkUserInputsForFrame['leaderboard'] = 'checkUserInputsForLeaderboardFrame';
+    checkUserInputsForFrame['settings'] = 'checkUserInputsForSettingsFrame';
+
     // Define a function to run each time user inputs are updated so we can react
     let listenForInput = function(){ return Date.now() >= nextInputAllowedTime; }, nextInputAllowedTime = 0;
     let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 200; nextInputAllowedTime = Date.now() + delay; };
@@ -876,15 +888,15 @@ function initUserInputWatcher(){
                 }
             }
 
-        // MMRPG SHOP MENU TRIGGERS (SHOP-FRAME ONLY)
+        // MMRPG FRAMED SUBMENU TRIGGERS (iFRAME-STEPS ONLY)
         if (!prototypeIsHome
-            && prototypeIsSubmenu === 'shop'
-            && typeof checkUserInputsForShop !== 'undefined'){
-            //console.log('MMRPG SHOP MENU TRIGGERS (SHOP-FRAME ONLY)');
-            checkUserInputsForShopFrame.call(this, kind, event, activeInputs, userInputs);
+            && prototypeIsSubmenu
+            && typeof checkUserInputsForFrame[prototypeIsSubmenu] !== 'undefined'
+            && typeof window[checkUserInputsForFrame[prototypeIsSubmenu]] !== 'undefined'){
+            console.log('MMRPG ' + prototypeIsSubmenu.toUpperCase() + ' MENU TRIGGERS (SUB-FRAME ONLY)');
+            let checkUserInputsFunction = window[checkUserInputsForFrame[prototypeIsSubmenu]];
+            checkUserInputsFunction.call(this, kind, event, activeInputs, userInputs);
             }
-
-
 
         };
 
