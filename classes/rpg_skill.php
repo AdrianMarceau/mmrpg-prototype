@@ -73,7 +73,7 @@ class rpg_skill extends rpg_object {
         }
         // Otherwise if the ID appears to have already been set
         elseif (!empty($this_skillinfo['skill_id'])
-            && strstr($this_skillinfo['skill_id'], $this->robot_id)){
+            && strstr($this_skillinfo['skill_id'], strval($this->robot_id))){
             $skill_id = $this_skillinfo['skill_id'];
         }
         // Otherwise base the ID off of the robot
