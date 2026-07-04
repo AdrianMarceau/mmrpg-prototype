@@ -39,6 +39,7 @@ battleOptions.this_battle_token = '';
 // Define the prototype context variables
 let prototypeIsHome = false;
 let prototypeIsFramed = false;
+let prototypeIsTopmenu = false;
 let prototypeIsSubmenu = false;
 
 // Define a global ready room variable for later
@@ -64,12 +65,17 @@ $(document).ready(function(){
     // Check if this instance has been loaded in an iframe
     prototypeIsHome = window.top === window.self && !$('#mmrpg').hasClass('iframe') ? true : false;
     prototypeIsFramed = window.top !== window.self ? true : false;
+    prototypeIsTopmenu = !$('#mmrpg').hasClass('iframe') && $thisPrototype.is('[data-step-name]') ? $thisPrototype.attr('data-step-name') : false;
     prototypeIsSubmenu = $('#mmrpg').hasClass('iframe') ? $('#mmrpg').attr('data-frame') : false;
+    if (prototypeIsSubmenu){ prototypeIsTopmenu = false; }
+    else if (!prototypeIsTopmenu){ prototypeIsTopmenu = 'home'; }
     //console.log('prototypeIsHome =', prototypeIsHome);
     //console.log('prototypeIsFramed =', prototypeIsFramed);
+    //console.log('prototypeIsTopmenu =', prototypeIsTopmenu);
     //console.log('prototypeIsSubmenu =', prototypeIsSubmenu);
     mmrpgPrototype.prototypeIsHome = prototypeIsHome;
     mmrpgPrototype.prototypeIsFramed = prototypeIsFramed;
+    mmrpgPrototype.prototypeIsTopmenu = prototypeIsTopmenu;
     mmrpgPrototype.prototypeIsSubmenu = prototypeIsSubmenu;
 
     // Update the ready room ref with the global object if exists
@@ -1807,6 +1813,7 @@ function prototype_menu_click_back(thisContext, thisLink){
 var menuSwitchTimeout = false;
 function prototype_menu_switch(switchOptions){
     //console.log('prototype_menu_switch(switchOptions:', switchOptions, ')');
+    if (mmrpgPrototype.prototypeIsSubmenu){ return false; }
 
     // Clear any existing timeout and then set a new one a little bit in the future
     if (menuSwitchTimeout){ clearTimeout(menuSwitchTimeout); }
@@ -1817,6 +1824,7 @@ function prototype_menu_switch(switchOptions){
 // Create a function for switching to a specific menu step
 function prototype_menu_switch_action(switchOptions){
     //console.log('prototype_menu_switch_action(switchOptions:', switchOptions, ')');
+    if (mmrpgPrototype.prototypeIsSubmenu){ return false; }
 
     // Redefine the options array populating defaults
     switchOptions = {
@@ -1886,6 +1894,7 @@ function prototype_menu_switch_action(switchOptions){
         }
     $thisPrototype.attr('data-step-name', dataStepName);
     $thisPrototype.attr('data-step-number', dataStepNumber);
+    mmrpgPrototype.prototypeIsTopmenu = dataStepName;
     //console.log('dataStepName =>', typeof switchOptions.stepName, switchOptions.stepName, '=>', typeof dataStepName, dataStepName);
     //console.log('dataStepNumber =>', typeof switchOptions.stepNumber, switchOptions.stepNumber, '=>', typeof dataStepNumber, dataStepNumber);
     // If we're on the mission select screen, let's shrink the spriteBounds a bit for the ready room, else revert to default
