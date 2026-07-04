@@ -616,7 +616,7 @@ function mmrpg_is_busy(){
 // Define a quick function for initializing the user input watcher
 // as well as custom instructions for what to do based on context
 function initUserInputWatcher(){
-    //console.log('%c' + 'prototypeReady.initUserInputWatcher()', 'color: magenta;');
+    console.log('%c' + 'prototypeReady.initUserInputWatcher()', 'color: magenta;');
     let playSoundEffect = mmrpgPrototype.playSoundEffect;
     let $thisPrototype = $mmrpgElements.thisPrototype;
     let $thisBanner = $mmrpgElements.thisBanner;
@@ -640,12 +640,19 @@ function initUserInputWatcher(){
         //console.log('-> activeInputs:', activeInputs);
         ignoreInputFor();
 
-        // Collect the current step so we know when we can listen
-        let currentStepName = $thisPrototype.attr('data-step-name') || false;
-        //console.log('-> currentStepName:', currentStepName);
+        // COLLECT CONTEXT INFO
+        let prototypeIsHome = mmrpgPrototype.prototypeIsHome;
+        let prototypeIsFramed = mmrpgPrototype.prototypeIsFramed;
+        let prototypeIsTopmenu = mmrpgPrototype.prototypeIsTopmenu;
+        let prototypeIsSubmenu = mmrpgPrototype.prototypeIsSubmenu;
+        console.log('-> prototypeIsHome:', prototypeIsHome);
+        console.log('-> prototypeIsFramed:', prototypeIsFramed);
+        console.log('-> prototypeIsTopmenu:', prototypeIsTopmenu);
+        console.log('-> prototypeIsSubmenu:', prototypeIsSubmenu);
 
-        // MMRPG BANNER MENU TRIGGERS
+        // MMRPG BANNER MENU TRIGGERS (ALWAYS ON)
         if ($thisBannerMenu && $thisBannerMenu.length){
+            console.log('MMRPG BANNER MENU TRIGGERS (ALWAYS ON)');
 
             // If the user has pressed the SELECT key, we click the leaderboard button
             if (activeInputs.Select){
@@ -739,8 +746,9 @@ function initUserInputWatcher(){
 
             }
 
-        // MMRPG BATTLE MENU TRIGGERS
-        if (currentStepName === 'home'){
+        // MMRPG MISSION MENU TRIGGERS (HOME-STEP ONLY)
+        if (prototypeIsHome && prototypeIsTopmenu === 'home'){
+            console.log('MMRPG MISSION MENU TRIGGERS (HOME-STEP ONLY)');
 
             // Collect a reference to the main menu itself
             let $thisBattleMenu = $('> .menu:not(.menu_hide)', $thisPrototype).first();
@@ -872,7 +880,85 @@ function initUserInputWatcher(){
             }
 
 
-        // MMRPG IFRAME MENU TRIGGERS
+        // MMRPG SHOP MENU TRIGGERS (SHOP-FRAME ONLY)
+        if (!prototypeIsHome && prototypeIsSubmenu === 'shop'){
+            console.log('// MMRPG SHOP MENU TRIGGERS (SHOP-FRAME ONLY)');
+
+            // Collect references to available panels, tabs, and buttons before starting
+            let $thisShop = $('#shop', $thisPrototype);
+            let $availablePanels = $('#canvas #links .wrapper[data-shop]', $thisShop);
+            let $availableTabs = $('#console #shops .event_visible .tab_link', $thisShop);
+            console.log('-> $thisShop:', ($thisShop ? $thisShop.length : 0), typeof $thisShop, $thisShop);
+            console.log('-> $availablePanels:', ($availablePanels ? $availablePanels.length : 0), typeof $availablePanels, $availablePanels);
+            console.log('-> $availableTabs:', ($availableTabs ? $availableTabs.length : 0), typeof $availableTabs, $availableTabs);
+
+            // Common Controls: Try to keep these consistent!
+
+            // If the user pressed the X button, we should scroll through visible panels
+            if (activeInputs.X){
+                top.console.log('%c' + 'X button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                let $activePanel = $availablePanels.filter('.wrapper_active');
+                let activePanelIndex = $activePanel && $activePanel.length ? $availablePanels.index($activePanel) : -1;
+                let maxPanelIndex = $availablePanels.length - 1;
+                let nextPanelIndex = activePanelIndex + 1;
+                if (nextPanelIndex > maxPanelIndex){ nextPanelIndex = 0; }
+                let $nextPanel = $availablePanels.eq(nextPanelIndex);
+                if ($nextPanel && $nextPanel.length){
+                    $nextPanel.trigger('mouseenter');
+                    $nextPanel.trigger('click');
+                    }
+                return;
+                }
+
+            // If the user pressed the L2/R2 button2, we should scroll through visible tabs
+            if (activeInputs.L2 || activeInputs.R2){
+                top.console.log('%c' + (activeInputs.L2 ? 'L2' : 'L1') + ' trigger button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                let $activeTab = $availableTabs.filter('.tab_link_active');
+                let activeTabIndex = $activeTab && $activeTab.length ? $availableTabs.index($activeTab) : -1;
+                let maxTabIndex = $availableTabs.length - 1;
+                let nextTabIndex = activeTabIndex + (activeInputs.L2 ? -1 : 1);
+                if (nextTabIndex > maxTabIndex){ nextTabIndex = 0; }
+                let $nextTab = $availableTabs.eq(nextTabIndex);
+                if ($nextTab && $nextTab.length){
+                    $nextTab.trigger('mouseenter');
+                    $nextTab.trigger('click');
+                    }
+                return;
+                }
+
+            // Shop Controls: These controls only apply to the shop menu
+
+            // If the user pressed the Y button, we should ?????
+            if (activeInputs.B){
+                top.console.log('%c' + 'B button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+
+                return;
+                }
+
+            // If the user pressed the A button, we should ?????
+            if (activeInputs.A){
+                top.console.log('%c' + 'A button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+
+                return;
+                }
+
+            // If the user pressed the B button, we should ?????
+            if (activeInputs.B){
+                top.console.log('%c' + 'B button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+
+                return;
+                }
+
+
+
+            }
+
+
 
         };
 

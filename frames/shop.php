@@ -339,7 +339,7 @@ if (true){
         <div style="float: left; width: 100%;">
             <table class="formatter" style="width: 100%; table-layout: fixed;">
                 <colgroup>
-                    <col width="70" />
+                    <col width="74" />
                     <col width="" />
                 </colgroup>
                 <tbody>
