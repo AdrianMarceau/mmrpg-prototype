@@ -865,3 +865,95 @@ function windowResizeFrame(){
 function printNumberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+// Define a shop-specific function to call when polling user input variables
+function checkUserInputsForShopFrame(kind, event, activeInputs, userInputs){
+    //console.log('%c' + 'prototypeReady.checkUserInputsForShopFrame()', 'color: magenta;');
+    let _self = this;
+    let playSoundEffect = mmrpgPrototype.playSoundEffect;
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    //console.log('-> playSoundEffect:', typeof playSoundEffect, playSoundEffect);
+    //console.log('-> $thisPrototype:', typeof $thisPrototype, $thisPrototype);
+    let prototypeIsHome = mmrpgPrototype.prototypeIsHome;
+    let prototypeIsFramed = mmrpgPrototype.prototypeIsFramed;
+    let prototypeIsTopmenu = mmrpgPrototype.prototypeIsTopmenu;
+    let prototypeIsSubmenu = mmrpgPrototype.prototypeIsSubmenu;
+    //console.log('-> prototypeIsHome:', prototypeIsHome);
+    //console.log('-> prototypeIsFramed:', prototypeIsFramed);
+    //console.log('-> prototypeIsTopmenu:', prototypeIsTopmenu);
+    //console.log('-> prototypeIsSubmenu:', prototypeIsSubmenu);
+
+    // Collect references to available panels, tabs, and buttons before starting
+    let $thisShop = $('#shop', $thisPrototype);
+    let $availablePanels = $('#canvas #links .wrapper[data-shop]', $thisShop);
+    let $availableTabs = $('#console #shops .event_visible .tab_link', $thisShop);
+    //console.log('-> $thisShop:', ($thisShop ? $thisShop.length : 0), typeof $thisShop, $thisShop);
+    //console.log('-> $availablePanels:', ($availablePanels ? $availablePanels.length : 0), typeof $availablePanels, $availablePanels);
+    //console.log('-> $availableTabs:', ($availableTabs ? $availableTabs.length : 0), typeof $availableTabs, $availableTabs);
+
+    // COMMON CONTROLS: Try to keep these consistent!
+
+    // If the user pressed the X button, we should scroll through visible panels
+    if (activeInputs.X){
+        //console.log('%c' + 'X button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activePanel = $availablePanels.filter('.wrapper_active');
+        let activePanelIndex = $activePanel && $activePanel.length ? $availablePanels.index($activePanel) : -1;
+        let maxPanelIndex = $availablePanels.length - 1;
+        let nextPanelIndex = activePanelIndex + 1;
+        if (nextPanelIndex > maxPanelIndex){ nextPanelIndex = 0; }
+        let $nextPanel = $availablePanels.eq(nextPanelIndex);
+        if ($nextPanel && $nextPanel.length){
+            $nextPanel.trigger('mouseenter');
+            $nextPanel.trigger('click');
+            }
+        return;
+        }
+
+    // If the user pressed the L2/R2 button2, we should scroll through visible tabs
+    if (activeInputs.L2 || activeInputs.R2){
+        //console.log('%c' + (activeInputs.L2 ? 'L2' : 'L1') + ' trigger button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activeTab = $availableTabs.filter('.tab_link_active');
+        let activeTabIndex = $activeTab && $activeTab.length ? $availableTabs.index($activeTab) : -1;
+        let maxTabIndex = $availableTabs.length - 1;
+        let nextTabIndex = activeTabIndex + (activeInputs.L2 ? -1 : 1);
+        if (nextTabIndex > maxTabIndex){ nextTabIndex = 0; }
+        let $nextTab = $availableTabs.eq(nextTabIndex);
+        if ($nextTab && $nextTab.length){
+            $nextTab.trigger('mouseenter');
+            $nextTab.trigger('click');
+            }
+        return;
+        }
+
+    // SHOP CONTROLS: These controls only apply to the shop menu
+
+    // If the user pressed the Y button, we should ?????
+    if (activeInputs.B){
+        //console.log('%c' + 'B button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+
+    // If the user pressed the A button, we should ?????
+    if (activeInputs.A){
+        //console.log('%c' + 'A button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+
+    // If the user pressed the B button, we should ?????
+    if (activeInputs.B){
+        //console.log('%c' + 'B button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+
+
+
+
+}
