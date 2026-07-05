@@ -1106,7 +1106,8 @@ function checkUserInputsForPlayersFrame(kind, event, activeInputs, userInputs){
         //console.log('%c' + (activeInputs.L2 ? 'L2' : 'L1') + ' trigger button pressed!', 'color: orange;');
         if (event){ event.preventDefault(); }
         // Player Editor Has No Tabs !!!
-        /* let $activeTab = $availableTabs.filter('.tab_link_active');
+        /*
+        let $activeTab = $availableTabs.filter('.tab_link_active');
         let activeTabIndex = $activeTab && $activeTab.length ? $availableTabs.index($activeTab) : -1;
         let maxTabIndex = $availableTabs.length - 1;
         let nextTabIndex = activeTabIndex + (activeInputs.L2 ? -1 : 1);
@@ -1115,20 +1116,14 @@ function checkUserInputsForPlayersFrame(kind, event, activeInputs, userInputs){
         if ($nextTab && $nextTab.length){
             $nextTab.trigger('mouseenter');
             $nextTab.trigger('click');
-            } */
+            }
+        */
         return;
         }
 
     // PLAYERS CONTROLS: These controls only apply to the player menu
 
-    // If the user pressed the Y button, we should ?????
-    if (activeInputs.B){
-        //console.log('%c' + 'B button pressed!', 'color: orange;');
-        if (event){ event.preventDefault(); }
-
-        return;
-        }
-
+    /*
     // If the user pressed the A button, we should ?????
     if (activeInputs.A){
         //console.log('%c' + 'A button pressed!', 'color: orange;');
@@ -1145,7 +1140,13 @@ function checkUserInputsForPlayersFrame(kind, event, activeInputs, userInputs){
         return;
         }
 
+    // If the user pressed the Y button, we should ?????
+    if (activeInputs.Y){
+        //console.log('%c' + 'Y button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
 
-
+        return;
+        }
+    */
 
 }
