@@ -921,14 +921,7 @@ function checkUserInputsForShopFrame(kind, event, activeInputs, userInputs){
 
     // SHOP CONTROLS: These controls only apply to the shop menu
 
-    // If the user pressed the Y button, we should ?????
-    if (activeInputs.B){
-        //console.log('%c' + 'B button pressed!', 'color: orange;');
-        if (event){ event.preventDefault(); }
-
-        return;
-        }
-
+    /*
     // If the user pressed the A button, we should ?????
     if (activeInputs.A){
         //console.log('%c' + 'A button pressed!', 'color: orange;');
@@ -945,6 +938,14 @@ function checkUserInputsForShopFrame(kind, event, activeInputs, userInputs){
         return;
         }
 
+    // If the user pressed the Y button, we should ?????
+    if (activeInputs.Y){
+        //console.log('%c' + 'Y button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+    */
 
 
 
