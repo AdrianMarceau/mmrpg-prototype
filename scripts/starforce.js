@@ -328,3 +328,132 @@ function refreshArrowButtons(){
         else { $thisButton.addClass('disabled'); }
         });
 }
+
+// Define a star-specific function to call when polling user input variables
+function checkUserInputsForStarsFrame(kind, event, activeInputs, userInputs){
+    //console.log('%c' + 'prototypeReady.checkUserInputsForStarsFrame()', 'color: magenta;');
+    let _self = this;
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let playSoundEffect = mmrpgPrototype.playSoundEffect;
+    //console.log('-> playSoundEffect:', typeof playSoundEffect, playSoundEffect);
+    //console.log('-> $thisPrototype:', typeof $thisPrototype, $thisPrototype);
+
+    // Collect references to available containers, views, and buttons before starting
+    let $thisViewsToggle = $('.header_types .toggle[data-view]', $thisPrototype);
+    let $availableViews = $('.option[data-view]', $thisViewsToggle);
+    let currentView = $thisViewsToggle.attr('data-view');
+    let $thisStarsContent = $('.content.stars', $thisPrototype);
+    let $availableContainers = $('.wrapper .container', $thisStarsContent);
+    let $availableContainersFiltered;
+    if (currentView === 'list'){ $availableContainersFiltered = $availableContainers.filter(function(){ return $(this).is('.starlist') || $(this).is('.starchart'); }); }
+    else if (currentView === 'stats'){ $availableContainersFiltered = $availableContainers.filter(function(){ return $(this).is('.starforce'); }); }
+    //console.log('-> $thisViewsToggle:', ($thisViewsToggle ? $thisViewsToggle.length : 0), typeof $thisViewsToggle, $thisViewsToggle);
+    //console.log('-> $availableViews:', ($availableViews ? $availableViews.length : 0), typeof $availableViews, $availableViews);
+    //console.log('-> currentView:', typeof currentView, currentView);
+    //console.log('-> $thisStarsContent:', ($thisStarsContent ? $thisStarsContent.length : 0), typeof $thisStarsContent, $thisStarsContent);
+    //console.log('-> $availableContainers:', ($availableContainers ? $availableContainers.length : 0), typeof $availableContainers, $availableContainers);
+    //console.log('-> $availableContainersFiltered:', ($availableContainersFiltered ? $availableContainersFiltered.length : 0), typeof $availableContainersFiltered, $availableContainersFiltered);
+
+    // COMMON CONTROLS: Try to keep these consistent!
+
+    // If the user pressed the X button, we should scroll through visible containers
+    if (activeInputs.X){
+        //console.log('%c' + 'X button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activeContainer = $availableContainersFiltered.filter('.container_active');
+        let activeContainerIndex = $activeContainer && $activeContainer.length ? $availableContainersFiltered.index($activeContainer) : -1;
+        let maxContainerIndex = $availableContainersFiltered.length - 1;
+        let nextContainerIndex = activeContainerIndex + 1;
+        if (nextContainerIndex > maxContainerIndex){ nextContainerIndex = 0; }
+        let $nextContainer = $availableContainersFiltered.eq(nextContainerIndex);
+        if ($nextContainer && $nextContainer.length){
+            //$nextContainer.trigger('mouseenter');
+            //$nextContainer.trigger('click');
+            $availableContainers.removeClass('container_active');
+            $nextContainer.addClass('container_active');
+            playSoundEffect('icon-click-mini');
+            }
+        return;
+        }
+
+    // If the user pressed the L2/R2 button2, we should scroll through visible views
+    if (activeInputs.L2 || activeInputs.R2){
+        //console.log('%c' + (activeInputs.L2 ? 'L2' : 'L1') + ' trigger button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activeView = $availableViews.filter('.option[data-view="' + currentView + '"]');
+        let activeViewIndex = $activeView && $activeView.length ? $availableViews.index($activeView) : -1;
+        let maxViewIndex = $availableViews.length - 1;
+        let nextViewIndex = activeInputs.L2 ? 0 : maxViewIndex;
+        if (nextViewIndex > maxViewIndex){ nextViewIndex = 0; }
+        let $nextView = $availableViews.eq(nextViewIndex);
+        if ($nextView && $nextView.length){
+            $nextView.trigger('mouseenter');
+            $nextView.trigger('click');
+            }
+        return;
+        }
+
+    // STARFORCE CONTROLS: These controls only apply to the star menu
+
+    // If the user pressed a directional button, we should try to scroll through pages
+    if (activeInputs.Up || activeInputs.Down
+        || activeInputs.Left || activeInputs.Right){
+        let whichDirection = activeInputs.Up ? 'up' : activeInputs.Down ? 'down' : activeInputs.Left ? 'left' : activeInputs.Right ? 'right' : '';
+        //console.log('%c' + 'Directional button (' + whichDirection.toUpperCase() + ') pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activeContainer, activeContainerKind;
+        $activeContainer = $availableContainersFiltered.filter('.container_active');
+        //console.log('-> $activeContainer:', ($activeContainer ? $activeContainer.length : 0), typeof $activeContainer, $activeContainer);
+        if (!$activeContainer || !$activeContainer.length){ return; }
+        if ($activeContainer.is('.starlist')){  activeContainerKind = 'starlist'; }
+        else if ($activeContainer.is('.starchart')){  activeContainerKind = 'starchart'; }
+        //console.log('activeContainerKind = ', activeContainerKind);
+        if (!activeContainerKind){ return; }
+        let $scrollButtons = {};
+        if (activeContainerKind === 'starlist'){
+            $scrollButtons.left = $('.pages .arrow.prev', $activeContainer);
+            $scrollButtons.right = $('.pages .arrow.next', $activeContainer);
+            } else if (activeContainerKind === 'starchart'){
+            $scrollButtons.up = $('.grouplist.sidebar .arrow.prev', $activeContainer);
+            $scrollButtons.down = $('.grouplist.sidebar .arrow.next', $activeContainer);
+            $scrollButtons.left = $('.grouplist.topbar .arrow.prev', $activeContainer);
+            $scrollButtons.right = $('.grouplist.topbar .arrow.next', $activeContainer);
+            }
+        let $clickButton;
+        if (typeof $scrollButtons[whichDirection] === 'object'
+            && $scrollButtons[whichDirection].length > 0
+            && !$scrollButtons[whichDirection].is('.disabled')){
+            $clickButton = $scrollButtons[whichDirection];
+            }
+        if (!$clickButton || !$clickButton.length){ return; }
+        $clickButton.trigger('mouseenter');
+        $clickButton.trigger('click');
+        return;
+        }
+
+    /*
+    // If the user pressed the A button, we should ?????
+    if (activeInputs.A){
+        //console.log('%c' + 'A button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+    // If the user pressed the B button, we should ?????
+    if (activeInputs.B){
+        //console.log('%c' + 'B button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+    // If the user pressed the Y button, we should ?????
+    if (activeInputs.Y){
+        //console.log('%c' + 'Y button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+    */
+
+
+}
