@@ -12,12 +12,12 @@
     <thead>
         <tr>
             <th class="left">
-                <span class="sell_button sell_button_header">&nbsp;</span>
+                <span class="button sell_button sell_button_header">&nbsp;</span>
                 <label class="item_quantity item_quantity_header">Own</label>
                 <label class="item_price item_price_header">Sell</label>
             </th>
             <th class="right">
-                <span class="sell_button sell_button_header">&nbsp;</span>
+                <span class="button sell_button sell_button_header">&nbsp;</span>
                 <label class="item_quantity item_quantity_header">Own</label>
                 <label class="item_price item_price_header">Sell</label>
             </th>
@@ -77,7 +77,7 @@
                     ?>
                         <td class="<?= $item_cell_float ?> item_cell" data-kind="item" data-action="sell" data-token="<?= $item_info_token ?>">
                             <span class="item_name ability_type ability_type_<?= $item_info_type ?>" data-click-tooltip="<?= $temp_info_tooltip ?>"><?= $item_info_name ?></span>
-                            <a class="sell_button ability_type ability_type_none" href="#">Sell</a>
+                            <a class="button sell_button ability_type ability_type_none" href="#">Sell</a>
                             <label class="item_quantity" data-quantity="0">x 0</label>
                             <label class="item_price" data-price="<?= $item_info_price ?>">&hellip; <?= $item_info_price ?>z</label>
                         </td>
