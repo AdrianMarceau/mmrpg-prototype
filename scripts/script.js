@@ -253,6 +253,7 @@ $(document).ready(function(){
                     top.mmrpg_play_sound_effect('tooltip-text');
                     }
                 };
+            window.mmrpgShowTooltipFunction = showTooltipFunction;
 
             // Define the function for positioning the tooltip (v2)
             let alignTooltipFunction = function(event){
@@ -280,13 +281,26 @@ $(document).ready(function(){
                     }
                 return mmrpg_align_element_to_target($tooltip, targetX, targetY);
                 };
+            window.mmrpgAlignTooltipFunction = alignTooltipFunction;
+
+            // Define the function for closing the tooltip
+            let closeTooltipFunction = function(event){
+                $('#mmrpg-tooltip', mmrpgBody).empty();
+                clearTimeout(tooltipTimeout);
+                tooltipTimeout = false;
+                tooltipShowing = false;
+                };
+            window.mmrpgCloseTooltipFunction = closeTooltipFunction;
+
+            // Create a variable to hold the tooltip selector
+            let tooltipSelector;
 
             // If we're on the main website, we can use the standard hover events
             if (mmrpgBody.is('.index')){
                 //console.log('we are on the website');
 
                 // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
-                var tooltipSelector = '*[title],*[data-backup-title]:not([data-click-tooltip]),*[data-tooltip]';
+                tooltipSelector = '*[title],*[data-backup-title]:not([data-click-tooltip]),*[data-tooltip]';
                 $(tooltipSelector, mmrpgBody).live('mouseenter', function(event){
                     event.preventDefault();
                     if (tooltipTimeout == false){
@@ -312,7 +326,7 @@ $(document).ready(function(){
                 //console.log('we are in the game somewhere');
 
                 // Define the live CLICK events for any elements with a click-title tag (which should be a few)
-                let tooltipSelector = '*[data-click-tooltip]';
+                tooltipSelector = '*[data-click-tooltip]';
                 $(tooltipSelector, mmrpgBody).live('click', function(event){
                     //console.log('tooltip click event!');
                     event.preventDefault();
@@ -342,19 +356,25 @@ $(document).ready(function(){
             // Define the live MOUSELEAVE events for any elements with a title tag (which should be many)
             $(tooltipSelector, mmrpgBody).live('mouseleave', function(e){
                 e.preventDefault();
+                closeTooltipFunction.call(this, e);
+                /*
                 $('#mmrpg-tooltip', mmrpgBody).empty();
                 clearTimeout(tooltipTimeout);
                 tooltipTimeout = false;
                 tooltipShowing = false;
+                */
                 });
 
             // If the user clicks somewhere in the body, immediately remove the tooltip
             $('*', mmrpgBody).click(function(e){
                 if (e.target === tooltipInitiator){ return; }
+                closeTooltipFunction.call(this, e);
+                /*
                 $('#mmrpg-tooltip', mmrpgBody).empty();
                 clearTimeout(tooltipTimeout);
                 tooltipTimeout = false;
                 tooltipShowing = false;
+                */
                 });
 
             }
