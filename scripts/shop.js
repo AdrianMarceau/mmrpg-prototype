@@ -137,6 +137,8 @@ $(document).ready(function(){
         var dataSelectorCurrent = '#'+dataSelect+' .event_visible';
         var dataSelectorNext = '#'+dataSelect+' .event[data-token='+dataToken+']';
         //console.log('.sprite[data-token] clicked!', {dataToken:dataToken,dataShop:dataShop,dataSelectorCurrent:dataSelectorCurrent,dataSelectorNext:dataSelectorNext});
+        $('.item_cell', gameCanvas).removeClass('hovered');
+        $('.item_cell_confirm', gameCanvas).removeClass('hovered');
         $('.wrapper_active', gameCanvas).removeClass('wrapper_active');
         $('.sprite_shop_current', gameCanvas).removeClass('sprite_shop_current');
         //console.log('updating perfect scrollbar 1');
@@ -877,8 +879,10 @@ function checkUserInputsForShopFrame(kind, event, activeInputs, userInputs){
 
     // Collect references to available panels, tabs, and buttons before starting
     let $thisShop = $('#shop', $thisPrototype);
-    let $availablePanels = $('#canvas #links .wrapper[data-shop]', $thisShop);
-    let $availableTabs = $('#console #shops .event_visible .tab_link', $thisShop);
+    let $thisShopCanvas = $('#canvas', $thisShop);
+    let $thisShopConsole = $('#console', $thisShop);
+    let $availablePanels = $('#links .wrapper[data-shop]', $thisShopCanvas);
+    let $availableTabs = $('#shops .event_visible .tab_link', $thisShopConsole);
     //console.log('-> $thisShop:', ($thisShop ? $thisShop.length : 0), typeof $thisShop, $thisShop);
     //console.log('-> $availablePanels:', ($availablePanels ? $availablePanels.length : 0), typeof $availablePanels, $availablePanels);
     //console.log('-> $availableTabs:', ($availableTabs ? $availableTabs.length : 0), typeof $availableTabs, $availableTabs);
@@ -921,20 +925,146 @@ function checkUserInputsForShopFrame(kind, event, activeInputs, userInputs){
 
     // SHOP CONTROLS: These controls only apply to the shop menu
 
-    /*
+    // Collect refs to important elements we'll be checking below
+    let $activePanel, $activeTab, activePanelToken, activeTabToken;
+    $activePanel = $('#shops .event_visible[data-token]', $thisShopConsole);
+    $activeTab = $('.shop_tabs_containers .tab_container_active', $activePanel);
+    activePanelToken = $activePanel && $activePanel.length ? $activePanel.attr('data-token') : false;
+    activeTabToken = $activeTab && $activeTab.length ? $activeTab.attr('data-tab') : false;
+    //console.log('-> $activePanel:', ($activePanel ? $activePanel.length : 0), typeof $activePanel, $activePanel);
+    //console.log('-> $activeTab:', ($activeTab ? $activeTab.length : 0), typeof $activeTab, $activeTab);
+    //console.log('-> activePanelToken:', typeof activePanelToken, activePanelToken);
+    //console.log('-> activeTabToken:', typeof activeTabToken, activeTabToken);
+    let $availableItemCells, $activeConfirmCell, $activeItemCell;
+    $availableItemCells = $('.item_cell:not([data-kind=""])', $activeTab); if (!$availableItemCells || !$availableItemCells.length){ $availableItemCells = null; }
+    $activeConfirmCell = $('.item_cell_confirm:not([data-kind=""])', $activeTab); if (!$activeConfirmCell || !$activeConfirmCell.length){ $activeConfirmCell = null; }
+    $activeItemCell = $availableItemCells.filter('.hovered').first(); if (!$activeItemCell || !$activeItemCell.length){ $activeItemCell = null; }
+    //console.log('-> $availableItemCells:', ($availableItemCells ? $availableItemCells.length : 0), typeof $availableItemCells, $availableItemCells);
+    //console.log('-> $activeConfirmCell:', ($activeConfirmCell ? $activeConfirmCell.length : 0), typeof $activeConfirmCell, $activeConfirmCell);
+    //console.log('-> $activeItemCell:', ($activeItemCell ? $activeItemCell.length : 0), typeof $activeItemCell, $activeItemCell);
+
+    let closeTooltipFunction;
+    if (typeof window.mmrpgCloseTooltipFunction !== 'undefined'){ closeTooltipFunction = window.mmrpgCloseTooltipFunction; }
+    else { closeTooltipFunction = function(){ $('#mmrpg-tooltip').empty(); }; }
+
+    // If the user pressed a directional button, we should try to scroll through pages
+    if (activeInputs.Up || activeInputs.Down
+        || activeInputs.Left || activeInputs.Right){
+        let whichDirection = activeInputs.Up ? 'up' : activeInputs.Down ? 'down' : activeInputs.Left ? 'left' : activeInputs.Right ? 'right' : '';
+        //console.log('%c' + 'Directional button (' + whichDirection.toUpperCase() + ') pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        if ($activeConfirmCell){
+            //console.log('we are in checkout mode!');
+            // up/down = quantity +1/-1, left/right = quantity -10/+10
+            $availableItemCells.removeClass('hovered');
+            $activeConfirmCell.addClass('hovered');
+            let modValue, $modButtons, $modButton;
+            modValue = whichDirection === 'up' ? 1 : whichDirection === 'down' ? -1 : whichDirection === 'right' ? 10 : whichDirection === 'left' ? -10 : 0;
+            $modIncButtons = $('.item_quantity_mods a[data-inc]', $activeConfirmCell);
+            $modDecButtons = $('.item_quantity_mods a[data-dec]', $activeConfirmCell);
+            if (modValue > 0){ $modButton = $modIncButtons.filter('[data-inc="' + modValue + '"]'); }
+            else if (modValue < 0){ $modButton = $modDecButtons.filter('[data-dec="' + Math.abs(modValue) + '"]'); }
+            if ($modButton && $modButton.length){
+                $modIncButtons.removeClass('hovered');
+                $modDecButtons.removeClass('hovered');
+                $modButton.addClass('hovered');
+                $modButton.trigger('mouseenter');
+                $modButton.trigger('click');
+                if (typeof userInputs.modButtonHoverTimeout !== 'undefined'){ clearTimeout(userInputs.modButtonHoverTimeout); }
+                userInputs.modButtonHoverTimeout = setTimeout(function(){
+                    $modIncButtons.removeClass('hovered');
+                    $modDecButtons.removeClass('hovered');
+                    }, 100);
+                return;
+                }
+            }
+        else {
+            //console.log('we are in browsing mode!');
+            // up/down/left/right navigate 2 columns of item cells
+            closeTooltipFunction();
+            let $nextItemCell;
+            if (!$activeItemCell || !$activeItemCell.length){
+                if (whichDirection === 'down' || whichDirection === 'right'){ $nextItemCell = $availableItemCells.first(); }
+                else if (whichDirection === 'up' || whichDirection === 'left'){ $nextItemCell = $availableItemCells.last(); }
+                } else {
+                let activeItemCellIndex = $availableItemCells.index($activeItemCell);
+                let maxItemCellIndex = $availableItemCells.length - 1;
+                //console.log('activeItemCellIndex =', activeItemCellIndex);
+                //console.log('maxItemCellIndex =', maxItemCellIndex);
+                let nextItemCellIndex = activeItemCellIndex;
+                if (whichDirection === 'right'){ nextItemCellIndex += 1; }
+                else if (whichDirection === 'left'){ nextItemCellIndex -= 1; }
+                else if (whichDirection === 'down'){ nextItemCellIndex += 2; }
+                else if (whichDirection === 'up'){ nextItemCellIndex -= 2; }
+                //console.log('nextItemCellIndex(A) =', nextItemCellIndex);
+                if (nextItemCellIndex < 0){ nextItemCellIndex = maxItemCellIndex; }
+                else if (nextItemCellIndex > maxItemCellIndex){ nextItemCellIndex = 0;}
+                //console.log('nextItemCellIndex(B) =', nextItemCellIndex);
+                $nextItemCell = $availableItemCells.eq(nextItemCellIndex);
+                }
+            if ($nextItemCell && $nextItemCell.length){
+                $availableItemCells.removeClass('hovered');
+                $nextItemCell.addClass('hovered');
+                let $scrollWrapper = $nextItemCell.closest('.scroll_wrapper');
+                if ($scrollWrapper.length){
+                    let containerTop = $scrollWrapper.offset().top;
+                    let containerBottom = containerTop + $scrollWrapper.height();
+                    let elemTop = $nextItemCell.offset().top;
+                    let elemBottom = elemTop + $nextItemCell.outerHeight();
+                    if (elemTop < containerTop){ $scrollWrapper.scrollTop($scrollWrapper.scrollTop() - (containerTop - elemTop)); }
+                    else if (elemBottom > containerBottom){ $scrollWrapper.scrollTop($scrollWrapper.scrollTop() + (elemBottom - containerBottom)); }
+                    if (typeof $scrollWrapper.perfectScrollbar === 'function'){ $scrollWrapper.perfectScrollbar('update'); }
+                    return;
+                    }
+                }
+            }
+        return;
+        }
+
+    // Define a quick function for hovering + clicking a given item cell button
+    let hoverClickCellButton = function($button, mouseLeave){
+        mouseLeave = typeof mouseLeave === 'boolean' ? mouseLeave : true;
+        let $parent = $button.closest('td[data-kind]');
+        $('.button', $parent).removeClass('hovered');
+        $button.addClass('hovered');
+        $button.trigger('mouseenter');
+        $button.trigger('click');
+        if (typeof userInputs.hoverClickButtonTimeout !== 'undefined'){ clearTimeout(userInputs.hoverClickButtonTimeout); }
+        userInputs.hoverClickButtonTimeout = setTimeout(function(){
+            $('.button', $parent).removeClass('hovered');
+            if (mouseLeave){ $button.trigger('mouseleave'); }
+            $button.removeClass('hovered');
+            }, 100);
+        };
+
     // If the user pressed the A button, we should ?????
     if (activeInputs.A){
         //console.log('%c' + 'A button pressed!', 'color: orange;');
         if (event){ event.preventDefault(); }
-
-        return;
-        }
-
-    // If the user pressed the B button, we should ?????
-    if (activeInputs.B){
-        //console.log('%c' + 'B button pressed!', 'color: orange;');
-        if (event){ event.preventDefault(); }
-
+        if ($activeConfirmCell){
+            //console.log('we are in checkout mode!');
+            let $confirmButton = $('.confirm_button', $activeConfirmCell);
+            //console.log('-> $confirmButton:', ($confirmButton ? $confirmButton.length : 0), typeof $confirmButton, $confirmButton);
+            if (!$confirmButton || !$confirmButton.length){ return; }
+            //closeTooltipFunction();
+            hoverClickCellButton($confirmButton);
+            $activeConfirmCell.removeClass('hovered');
+            if (typeof userInputs.lastItemCell === 'undefined'){ return; }
+            userInputs.lastItemCell.addClass('hovered');
+            delete userInputs.lastItemCell;
+            } else {
+            //console.log('we are in browsing mode!');
+            let $actionButton = $activeItemCell ? $('a.button', $activeItemCell) : null;
+            //console.log('-> $actionButton:', ($actionButton ? $actionButton.length : 0), typeof $actionButton, $actionButton);
+            if (!$actionButton || !$actionButton.length){ return; }
+            //closeTooltipFunction();
+            hoverClickCellButton($actionButton);
+            $activeConfirmCell = $('.item_cell_confirm:not([data-kind=""])', $activeTab);
+            if (!$activeConfirmCell || !$activeConfirmCell.length){ return; }
+            userInputs.lastItemCell = $activeItemCell;
+            $activeItemCell.removeClass('hovered');
+            $activeConfirmCell.addClass('hovered');
+            }
         return;
         }
 
@@ -942,11 +1072,41 @@ function checkUserInputsForShopFrame(kind, event, activeInputs, userInputs){
     if (activeInputs.Y){
         //console.log('%c' + 'Y button pressed!', 'color: orange;');
         if (event){ event.preventDefault(); }
-
+        if ($activeConfirmCell){
+            //console.log('we are in checkout mode!');
+            let $tooltipButton = $activeConfirmCell ? $('span[data-click-tooltip]', $activeConfirmCell) : null;
+            //console.log('-> $tooltipButton:', ($tooltipButton ? $tooltipButton.length : 0), typeof $tooltipButton, $tooltipButton);
+            if (!$tooltipButton || !$tooltipButton.length){ return; }
+            hoverClickCellButton($tooltipButton, false);
+            } else {
+            //console.log('we are in browsing mode!');
+            let $tooltipButton = $activeItemCell ? $('span[data-click-tooltip]', $activeItemCell) : null;
+            //console.log('-> $tooltipButton:', ($tooltipButton ? $tooltipButton.length : 0), typeof $tooltipButton, $tooltipButton);
+            if (!$tooltipButton || !$tooltipButton.length){ return; }
+            hoverClickCellButton($tooltipButton, false);
+            }
         return;
         }
-    */
 
-
+    // If the user pressed the B button, we should ?????
+    if (activeInputs.B){
+        //console.log('%c' + 'B button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        if ($activeConfirmCell){
+            //console.log('we are in checkout mode!');
+            $activeConfirmCell.removeClass('hovered');
+            let $cancelButton = $('.cancel_button', $activeConfirmCell);
+            //console.log('-> $cancelButton:', ($cancelButton ? $cancelButton.length : 0), typeof $cancelButton, $cancelButton);
+            if (!$cancelButton || !$cancelButton.length){ return; }
+            hoverClickCellButton($cancelButton);
+            if (typeof userInputs.lastItemCell === 'undefined'){ return; }
+            userInputs.lastItemCell.addClass('hovered');
+            delete userInputs.lastItemCell;
+            } else {
+            //console.log('we are in browsing mode!');
+            //console.log('-> nothing to dismiss!');
+            }
+        return;
+        }
 
 }

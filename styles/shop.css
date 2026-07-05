@@ -433,13 +433,43 @@
     overflow: hidden;
     position: relative;
     padding-right: 9px;
+    padding-top: 2px;
 }
 
 #shop #console .event .item_cell,
 #shop #console .event .item_confirm {
 
 }
+#shop #console .event .item_cell.hovered,
+#shop #console .event .item_cell_confirm.hovered {
+    position: relative;
+}
+#shop #console .event .item_cell.hovered:after,
+#shop #console .event .item_cell_confirm.hovered:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: -1px;
+    left: 1px;
+    width: calc(100% - 2px);
+    height: calc(100% - -1px);
+    outline: 1px solid white;
+    border-radius: 6px;
+    pointer-events: none;
+}
+#shop #console .event .item_cell_confirm.hovered:after {
+    outline: 1px solid rgba(255, 255, 255, 0.5);
+}
 #shop #console .event .item_cell_disabled {
+    /*
+    opacity: 0.15;
+    filter: alpha(opacity=15);
+    */
+}
+#shop #console .event .item_cell_disabled > a,
+#shop #console .event .item_cell_disabled > span,
+#shop #console .event .item_cell_disabled > label,
+#shop #console .event .item_cell_disabled > div {
     opacity: 0.15;
     filter: alpha(opacity=15);
 }
@@ -717,6 +747,10 @@
     float: left;
     transition: opacity 0.3s;
 }
+#shop #console .event .item_quantity_mods a:hover,
+#shop #console .event .item_quantity_mods a.hovered {
+    outline: 1px solid white;
+}
 #shop #console .event .item_quantity_mods a i {
     display: inline-block;
     direction: ltr;
@@ -734,7 +768,8 @@
     background-size: auto;
     transition: top 0.2s;
 }
-#shop #console .event .item_quantity_mods a:hover i {
+#shop #console .event .item_quantity_mods a:hover i,
+#shop #console .event .item_quantity_mods a.hovered i {
     top: -4px;
 }
 #shop #console .event .item_quantity_mods a[data-dec="10"] i {
