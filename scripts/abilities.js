@@ -131,3 +131,161 @@ function windowResizeFrame(){
 function printNumberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+// Define a ability-specific function to call when polling user input variables
+function checkUserInputsForAbilitiesFrame(kind, event, activeInputs, userInputs){
+    //console.log('%c' + 'prototypeReady.checkUserInputsForAbilitiesFrame()', 'color: magenta;');
+    let _self = this;
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let playSoundEffect = mmrpgPrototype.playSoundEffect;
+    //console.log('-> playSoundEffect:', typeof playSoundEffect, playSoundEffect);
+    //console.log('-> $thisPrototype:', typeof $thisPrototype, $thisPrototype);
+
+    // Collect references to available panels, tabs, and buttons before starting
+    let $thisAbilities = $('#ability', $thisPrototype);
+    let $thisAbilitiesConsole = $('#console', $thisAbilities);
+    //let $availablePanels = $('#links .wrapper[data-ability]', $thisAbilitiesCanvas);
+    //let $availableTabs = $('#abilities .event_visible .tab_link', $thisAbilitiesConsole);
+    //console.log('-> $thisAbilities:', ($thisAbilities ? $thisAbilities.length : 0), typeof $thisAbilities, $thisAbilities);
+    //console.log('-> $availablePanels:', ($availablePanels ? $availablePanels.length : 0), typeof $availablePanels, $availablePanels);
+    //console.log('-> $availableTabs:', ($availableTabs ? $availableTabs.length : 0), typeof $availableTabs, $availableTabs);
+
+    // COMMON CONTROLS: Try to keep these consistent!
+
+    /*
+    // If the user pressed the X button, we should scroll through visible panels
+    if (activeInputs.X){
+        //console.log('%c' + 'X button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activePanel = $availablePanels.filter('.wrapper_active');
+        let activePanelIndex = $activePanel && $activePanel.length ? $availablePanels.index($activePanel) : -1;
+        let maxPanelIndex = $availablePanels.length - 1;
+        let nextPanelIndex = activePanelIndex + 1;
+        if (nextPanelIndex > maxPanelIndex){ nextPanelIndex = 0; }
+        let $nextPanel = $availablePanels.eq(nextPanelIndex);
+        if ($nextPanel && $nextPanel.length){
+            $nextPanel.trigger('mouseenter');
+            $nextPanel.trigger('click');
+            }
+        return;
+        }
+    */
+
+    /*
+    // If the user pressed the L2/R2 button2, we should scroll through visible tabs
+    if (activeInputs.L2 || activeInputs.R2){
+        //console.log('%c' + (activeInputs.L2 ? 'L2' : 'L1') + ' trigger button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activeTab = $availableTabs.filter('.tab_link_active');
+        let activeTabIndex = $activeTab && $activeTab.length ? $availableTabs.index($activeTab) : -1;
+        let maxTabIndex = $availableTabs.length - 1;
+        let nextTabIndex = activeTabIndex + (activeInputs.L2 ? -1 : 1);
+        if (nextTabIndex > maxTabIndex){ nextTabIndex = 0; }
+        let $nextTab = $availableTabs.eq(nextTabIndex);
+        if ($nextTab && $nextTab.length){
+            $nextTab.trigger('mouseenter');
+            $nextTab.trigger('click');
+            }
+        return;
+        }
+    */
+
+    // ABILITY CONTROLS: These controls only apply to the ability menu
+
+    // Collect refs to important elements we'll be checking below
+    let $activePanel, $activeTab, activePanelToken, activeTabToken;
+    $activePanel = $('#abilities .event_visible[data-token]', $thisAbilitiesConsole);
+    $activeTab = $('.ability_tabs_containers .tab_container_active', $activePanel);
+    activePanelToken = $activePanel && $activePanel.length ? $activePanel.attr('data-token') : false;
+    activeTabToken = $activeTab && $activeTab.length ? $activeTab.attr('data-tab') : false;
+    //console.log('-> $activePanel:', ($activePanel ? $activePanel.length : 0), typeof $activePanel, $activePanel);
+    //console.log('-> $activeTab:', ($activeTab ? $activeTab.length : 0), typeof $activeTab, $activeTab);
+    //console.log('-> activePanelToken:', typeof activePanelToken, activePanelToken);
+    //console.log('-> activeTabToken:', typeof activeTabToken, activeTabToken);
+    let $availableAbilityCells, $activeAbilityCell;
+    $availableAbilityCells = $('.ability_cell:not([data-kind=""])', $activeTab); if (!$availableAbilityCells || !$availableAbilityCells.length){ $availableAbilityCells = null; }
+    $activeAbilityCell = $availableAbilityCells ? $availableAbilityCells.filter('.hovered') : null; if (!$activeAbilityCell || !$activeAbilityCell.length){ $activeAbilityCell = null; }
+    //console.log('-> $availableAbilityCells:', ($availableAbilityCells ? $availableAbilityCells.length : 0), typeof $availableAbilityCells, $availableAbilityCells);
+    //console.log('-> $activeAbilityCell:', ($activeAbilityCell ? $activeAbilityCell.length : 0), typeof $activeAbilityCell, $activeAbilityCell);
+
+    let closeTooltipFunction;
+    if (typeof window.mmrpgCloseTooltipFunction !== 'undefined'){ closeTooltipFunction = window.mmrpgCloseTooltipFunction; }
+    else { closeTooltipFunction = function(){ $('#mmrpg-tooltip').empty(); }; }
+
+    // If the user pressed a directional button, we should try to scroll through pages
+    if (activeInputs.Up || activeInputs.Down
+        || activeInputs.Left || activeInputs.Right){
+        let whichDirection = activeInputs.Up ? 'up' : activeInputs.Down ? 'down' : activeInputs.Left ? 'left' : activeInputs.Right ? 'right' : '';
+        //console.log('%c' + 'Directional button (' + whichDirection.toUpperCase() + ') pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        //console.log('we are in browsing mode!');
+        // up/down/left/right navigate 2 columns of ability cells
+        closeTooltipFunction();
+        let $nextAbilityCell;
+        if (!$activeAbilityCell || !$activeAbilityCell.length){
+            if (whichDirection === 'down' || whichDirection === 'right'){ $nextAbilityCell = $availableAbilityCells.first(); }
+            else if (whichDirection === 'up' || whichDirection === 'left'){ $nextAbilityCell = $availableAbilityCells.last(); }
+            } else {
+            let activeAbilityCellIndex = $availableAbilityCells.index($activeAbilityCell);
+            let maxAbilityCellIndex = $availableAbilityCells.length - 1;
+            //console.log('activeAbilityCellIndex =', activeAbilityCellIndex);
+            //console.log('maxAbilityCellIndex =', maxAbilityCellIndex);
+            let nextAbilityCellIndex = activeAbilityCellIndex;
+            if (whichDirection === 'right'){ nextAbilityCellIndex += 1; }
+            else if (whichDirection === 'left'){ nextAbilityCellIndex -= 1; }
+            else if (whichDirection === 'down'){ nextAbilityCellIndex += 2; }
+            else if (whichDirection === 'up'){ nextAbilityCellIndex -= 2; }
+            //console.log('nextAbilityCellIndex(A) =', nextAbilityCellIndex);
+            if (nextAbilityCellIndex < 0){ nextAbilityCellIndex = maxAbilityCellIndex; }
+            else if (nextAbilityCellIndex > maxAbilityCellIndex){ nextAbilityCellIndex = 0;}
+            //console.log('nextAbilityCellIndex(B) =', nextAbilityCellIndex);
+            $nextAbilityCell = $availableAbilityCells.eq(nextAbilityCellIndex);
+            }
+        if ($nextAbilityCell && $nextAbilityCell.length){
+            $availableAbilityCells.removeClass('hovered');
+            $nextAbilityCell.addClass('hovered');
+            let $scrollWrapper = $nextAbilityCell.closest('.scroll_wrapper');
+            if ($scrollWrapper.length){
+                let containerTop = $scrollWrapper.offset().top;
+                let containerBottom = containerTop + $scrollWrapper.height();
+                let elemTop = $nextAbilityCell.offset().top;
+                let elemBottom = elemTop + $nextAbilityCell.outerHeight();
+                if (elemTop < containerTop){ $scrollWrapper.scrollTop($scrollWrapper.scrollTop() - (containerTop - elemTop)); }
+                else if (elemBottom > containerBottom){ $scrollWrapper.scrollTop($scrollWrapper.scrollTop() + (elemBottom - containerBottom)); }
+                if (typeof $scrollWrapper.perfectScrollbar === 'function'){ $scrollWrapper.perfectScrollbar('update'); }
+                return;
+                }
+            }
+
+        return;
+        }
+
+    // Define a quick function for hovering + clicking a given ability cell button
+    let hoverClickCellButton = function($button, mouseLeave){
+        mouseLeave = typeof mouseLeave === 'boolean' ? mouseLeave : true;
+        let $parent = $button.closest('td[data-kind]');
+        $('.button', $parent).removeClass('hovered');
+        $button.addClass('hovered');
+        $button.trigger('mouseenter');
+        $button.trigger('click');
+        if (typeof userInputs.hoverClickButtonTimeout !== 'undefined'){ clearTimeout(userInputs.hoverClickButtonTimeout); }
+        userInputs.hoverClickButtonTimeout = setTimeout(function(){
+            $('.button', $parent).removeClass('hovered');
+            if (mouseLeave){ $button.trigger('mouseleave'); }
+            $button.removeClass('hovered');
+            }, 100);
+        };
+
+    // If the user pressed the Y button, we should ?????
+    if (activeInputs.Y){
+        //console.log('%c' + 'Y button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        //console.log('we are in browsing mode!');
+        let $tooltipButton = $activeAbilityCell ? $('span[data-click-tooltip]', $activeAbilityCell) : null;
+        //console.log('-> $tooltipButton:', ($tooltipButton ? $tooltipButton.length : 0), typeof $tooltipButton, $tooltipButton);
+        if (!$tooltipButton || !$tooltipButton.length){ return; }
+        hoverClickCellButton($tooltipButton, false);
+        return;
+        }
+
+}

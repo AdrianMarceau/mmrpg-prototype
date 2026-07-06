@@ -288,6 +288,7 @@ body.windowFlag_landscapeMode #prototype {
     overflow: hidden;
     position: relative;
     padding-right: 9px;
+    padding-top: 4px;
 }
 #mmrpg[data-mode="editor"] #ability #console .event .scroll_wrapper {
     max-height: calc(100vh - 190px);
@@ -296,6 +297,23 @@ body.windowFlag_landscapeMode #prototype {
 #ability #console .event .ability_cell,
 #ability #console .event .ability_confirm {
 
+}
+#ability #console .event .ability_cell.hovered,
+#ability #console .event .ability_cell_confirm.hovered {
+    position: relative;
+}
+#ability #console .event .ability_cell.hovered:after,
+#ability #console .event .ability_cell_confirm.hovered:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: -1px;
+    left: 1px;
+    width: calc(100% - 2px);
+    height: calc(100% - -1px);
+    outline: 1px solid white;
+    border-radius: 6px;
+    pointer-events: none;
 }
 #ability #console .event .ability_cell[data-count="0"] {
     opacity: 0.55;

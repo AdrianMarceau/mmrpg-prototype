@@ -288,7 +288,7 @@ body.windowFlag_landscapeMode #prototype {
     overflow: hidden;
     position: relative;
     padding-right: 9px;
-    padding-top: 2px;
+    padding-top: 4px;
 }
 #mmrpg[data-mode="editor"] #item #console .event .scroll_wrapper {
     max-height: calc(100vh - 190px);
