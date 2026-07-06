@@ -124,7 +124,7 @@ if (true){
 
         // Collect and print the editor markup for this player
         ?>
-        <div class="event event_double event_visible">
+        <div class="event event_double event_visible" data-token="items">
 
             <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/prototype-complete/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
                 <div class="<?= $category_image_class ?>" style="background-image: url(<?= $category_image_path ?>); "></div>
