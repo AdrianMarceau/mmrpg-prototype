@@ -631,7 +631,13 @@ $(document).ready(function(){
         };
 
     // Start the user input watcher and collect reference to active inputs
-    let userInputWatcher = new mmrpgUserInputWatcher({ autoStart: true, autoRunCallbacks: false });
+    let gamepadLayout = null; // TODO: pull this from settings later
+    let userInputWatcher = new mmrpgUserInputWatcher({
+        autoStart: true,
+        autoRunCallbacks: false,
+        autoButtonMapping: true,
+        gamepadLayout: gamepadLayout,
+        });
     userInputWatcher.onUserInput(checkUserInputs);
     userInputWatcher.startWatching();
     let checkUserInputWatcher = function(){

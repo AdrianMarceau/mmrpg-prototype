@@ -1739,6 +1739,7 @@ function bindEventsToInputs($thisWorld){
         _worldCursor.othered = true;
         _worldCursor.pressed = true;
         //console.log('-> activeInputs:', activeInputs);
+        //console.log('-------------------');
         ignoreInputFor();
         // Collect references and checks on certain key elements
         let _selfRef = this;
@@ -2721,7 +2722,13 @@ function bindEventsToInputs($thisWorld){
         };
 
     // Start the user input watcher and collect reference to active inputs
-    let userInputWatcher = new mmrpgUserInputWatcher({ autoStart: true, autoRunCallbacks: false });
+    let gamepadLayout = null; // TODO: pull this from settings later
+    let userInputWatcher = new mmrpgUserInputWatcher({
+        autoStart: true,
+        autoRunCallbacks: false,
+        autoButtonMapping: true,
+        gamepadLayout: gamepadLayout,
+        });
     userInputWatcher.onUserInput(checkUserInputs);
     userInputWatcher.startWatching();
     let checkUserInputWatcher = function(){
