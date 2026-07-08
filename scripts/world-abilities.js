@@ -349,7 +349,7 @@ function getAbilityDetailsForOverview(abilityToken, targetSelected){
 
     // ACTION BUTTONS
     let _inputs = _self.inputs;
-    let _userInputs = _inputs.userInputs
+    let _userInputs = _inputs.getUserInputs();
     let aButtonIcon = _userInputs.A.icon, bButtonIcon = _userInputs.B.icon;
     let xButtonIcon = _userInputs.X.icon, yButtonIcon = _userInputs.Y.icon;
     abilityDetailsObject.actions = [];
