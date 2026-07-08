@@ -3462,22 +3462,114 @@ class mmrpgUserInputWatcher {
         // Define an index of symbolic "userInputs" we can abstract actions behind, and then
         // worry about specific key-bindings and button-mappings later on to keep things clean
         let userInputs = {}; // below will be the default for now, but we'll allow customizing later
-        userInputs.A = {name: 'A', icon: 'Ⓐ', keyboard: ['d', 'Space'], gamepad: [0], sonyIcon: '⨯', sonyName: 'Cross'};
-        userInputs.B = {name: 'B', icon: 'Ⓑ', keyboard: ['s', 'Backspace'], gamepad: [1], sonyIcon: '◯', sonyName: 'Circle'};
-        userInputs.X = {name: 'X', icon: 'Ⓧ', keyboard: ['f', 'Escape', '\\'], gamepad: [2], sonyIcon: '▢', sonyName: 'Square'};
-        userInputs.Y = {name: 'Y', icon: 'Ⓨ', keyboard: ['a', 'Tab'], gamepad: [3], sonyIcon: '△', sonyName: 'Triangle'};
-        userInputs.L1 = {name: 'L1', icon: 'L1', keyboard: ['q', '['], gamepad: [4]};
-        userInputs.R1 = {name: 'R1', icon: 'R1', keyboard: ['e', ']'], gamepad: [5]};
-        userInputs.LR1 = {name: 'L1+R1', icon: 'L1+R1', keyboard: ['w'], gamepad: [4, 5], isCombo: true};
-        userInputs.L2 = {name: 'L2', icon: 'L2', keyboard: ['z', '-'], gamepad: [6], nintendoIcon: 'ZL', nintendoName: 'ZL'};
-        userInputs.R2 = {name: 'R2', icon: 'R2', keyboard: ['c', '='], gamepad: [7], nintendoIcon: 'ZR', nintendoName: 'ZR'};
-        userInputs.LR2 = {name: 'L2+R2', icon: 'L2+R2', keyboard: ['x'], gamepad: [6, 7], isCombo: true, nintendoIcon: 'ZL+ZR', nintendoName: 'ZL+ZR'};
-        userInputs.Start = {name: 'Start', icon: '+', keyboard: ['Enter', 'Home'], gamepad: [9], nintendoIcon: '+', nintendoName: 'Plus', sonyIcon: ']', sonyName: 'Option'};
-        userInputs.Select = {name: 'Select', icon: '−', keyboard: ['Shift', 'End'], gamepad: [8], nintendoIcon: '-', nintendoName: 'Minus', sonyIcon: '[', sonyName: 'Share'};
-        userInputs.Up = {name: 'Up', icon: '⏶', keyboard: ['ArrowUp'], gamepad: [12]};
-        userInputs.Down = {name: 'Down', icon: '⏷', keyboard: ['ArrowDown'], gamepad: [13]};
-        userInputs.Left = {name: 'Left', icon: '⏴', keyboard: ['ArrowLeft'], gamepad: [14]};
-        userInputs.Right = {name: 'Right', icon: '⏵', keyboard: ['ArrowRight'], gamepad: [15]};
+        userInputs.A = {
+            gamepad: [0],
+            keyboard: ['d', 'Space'],
+            icon: 'Ⓐ', name: 'A',
+            sonyIcon: '⨯', sonyName: 'Cross',
+            keyboardIcon: '[D]', keyboardName: 'D'
+            };
+        userInputs.B = {
+            gamepad: [1],
+            keyboard: ['s', 'Backspace'],
+            icon: 'Ⓑ', name: 'B',
+            sonyIcon: '◯', sonyName: 'Circle',
+            keyboardIcon: '[S]', keyboardName: 'S'
+            };
+        userInputs.X = {
+            gamepad: [2],
+            keyboard: ['f', 'Escape', '\\'],
+            icon: 'Ⓧ', name: 'X',
+            sonyIcon: '▢', sonyName: 'Square',
+            keyboardIcon: '[F]', keyboardName: 'F'
+            };
+        userInputs.Y = {
+            gamepad: [3], keyboard: ['a', 'Tab'],
+            icon: 'Ⓨ', name: 'Y',
+            sonyIcon: '△', sonyName: 'Triangle',
+            keyboardIcon: '[A]', keyboardName: 'A'
+            };
+        userInputs.L1 = {
+            gamepad: [4],
+            keyboard: ['q', '['],
+            icon: 'L1', name: 'L1',
+            keyboardIcon: '[Q]', keyboardName: 'Q'
+            };
+        userInputs.R1 = {
+            gamepad: [5],
+            keyboard: ['e', ']'],
+            icon: 'R1', name: 'R1',
+            keyboardIcon: '[E]', keyboardName: 'E'
+            };
+        userInputs.L2 = {
+            gamepad: [6],
+            keyboard: ['z', '-'],
+            icon: 'L2', name: 'L2',
+            nintendoIcon: 'ZL', nintendoName: 'ZL',
+            keyboardIcon: '[Z]', keyboardName: 'Z'
+            };
+        userInputs.R2 = {
+            gamepad: [7],
+            keyboard: ['c', '='],
+            icon: 'R2', name: 'R2',
+            nintendoIcon: 'ZR', nintendoName: 'ZR',
+            keyboardIcon: '[C]', keyboardName: 'C'
+            };
+        userInputs.Start = {
+            gamepad: [9],
+            keyboard: ['Enter', 'Home'],
+            icon: '+', name: 'Start',
+            sonyIcon: ']', sonyName: 'Option',
+            nintendoIcon: '+', nintendoName: 'Plus',
+            keyboardIcon: '[_↵]', keyboardName: 'Enter'
+            };
+        userInputs.Select = {
+            gamepad: [8],
+            keyboard: ['Shift', 'End'],
+            icon: '−', name: 'Select',
+            sonyIcon: '[', sonyName: 'Share',
+            nintendoIcon: '-', nintendoName: 'Minus',
+            keyboardIcon: '[↑_]', keyboardName: 'Shift'
+            };
+        userInputs.Up = {
+            gamepad: [12],
+            keyboard: ['ArrowUp'],
+            icon: '⏶', name: 'Up',
+            keyboardIcon: '[⏶]', keyboardName: 'Up'
+            };
+        userInputs.Down = {
+            gamepad: [13],
+            keyboard: ['ArrowDown'],
+            icon: '⏷', name: 'Down',
+            keyboardIcon: '[⏷]', keyboardName: 'Down'
+            };
+        userInputs.Left = {
+            gamepad: [14],
+            keyboard: ['ArrowLeft'],
+            icon: '⏴', name: 'Left',
+            keyboardIcon: '[⏴]', keyboardName: 'Left'
+            };
+        userInputs.Right = {
+            gamepad: [15],
+            keyboard: ['ArrowRight'],
+            icon: '⏵', name: 'Right',
+            keyboardIcon: '[⏵]', keyboardName: 'Right'
+            };
+        userInputs.LR1 = {
+            gamepad: [4, 5],
+            keyboard: ['w'],
+            isCombo: true,
+            icon: 'L1+R1', name: 'L1+R1',
+            keyboardIcon: '[W]', keyboardName: 'W'
+            };
+        userInputs.LR2 = {
+            gamepad: [6, 7],
+            keyboard: ['x'],
+            isCombo: true,
+            icon: 'L2+R2', name: 'L2+R2',
+            nintendoIcon: 'ZL+ZR', nintendoName: 'ZL+ZR',
+            keyboardIcon: '[X]', keyboardName: 'X'
+            };
         _self.userInputs = userInputs;
         _self.baseUserInputs = JSON.parse(JSON.stringify(userInputs));
 
@@ -3498,6 +3590,8 @@ class mmrpgUserInputWatcher {
         // Create separate objects to return to listening functions post-mods in case of button mapping
         let returnUserInputs = {};
         let returnActiveInputs = {};
+        returnUserInputs = JSON.parse(JSON.stringify(userInputs));
+        returnActiveInputs = JSON.parse(JSON.stringify(activeInputs));
 
         // Collect (or set) the button mapping customizations if any
         let buttonMapping = _config.buttonMapping;
@@ -3643,7 +3737,7 @@ class mmrpgUserInputWatcher {
             };
 
         // Define a function for determining the current controller type (for button icons) if possible
-        let gamepadKind = null, gamepadLayout = null, gamepadKinds = {
+        let gamepadLayout = null, gamepadKind = null, gamepadKinds = {
             other: {id: 0, token: 'other', name: 'Generic/Other'},
             nintendo: {id: 1, token: 'nintendo', name: 'Nintendo'},
             sony: {id: 2, token: 'sony', name: 'PlayStation'},
@@ -3669,9 +3763,12 @@ class mmrpgUserInputWatcher {
             };
         let updateGamepadInputs = function(gamepadKind, gamepadLayout){
             // Swap the A and B, X and Y buttons if we're on Nintendo, else default
+            if (!gamepadKind){ gamepadKind = _self.gamepadKind; }
+            if (!gamepadLayout){ gamepadLayout = _self.gamepadLayout; }
             _self.gamepadKind = gamepadKind;
             _self.gamepadLayout = gamepadLayout;
             let userInputs = _self.userInputs;
+            let returnUserInputs = _self.returnUserInputs;
             let baseUserInputs = _self.baseUserInputs, baseButtonKeys = {};
             baseButtonKeys.A = baseUserInputs.A.gamepad, baseButtonKeys.B = baseUserInputs.B.gamepad;
             baseButtonKeys.X = baseUserInputs.X.gamepad, baseButtonKeys.Y = baseUserInputs.Y.gamepad;
@@ -3696,19 +3793,28 @@ class mmrpgUserInputWatcher {
                 let inputKey = userInputKeys[i];
                 let inputDefaults = userInputDefaults[i];
                 let userInput = userInputs[inputKey];
+                let returnUserInput = returnUserInputs[inputKey];
                 //console.log('checking inputKey', inputKey, 'w/ inputDefaults', inputDefaults);
-                let inputIcon = inputDefaults.icon;
-                //console.log('-> default is ', inputDefaults.icon, ', checking for console-specific icon ...');
+                let inputIcon = inputDefaults.icon, newInputIcon = inputIcon;
+                //console.log('-> default is ', inputDefaults.icon, ', checking for console-specific (', gamepadKind, ') icon ...');
                 if (gamepadKind && inputDefaults[gamepadKind + 'Icon']){
                     //console.log('--> ', gamepadKind, 'gamepad connected, getting custom icon ...');
-                    userInput.icon = inputDefaults[gamepadKind + 'Icon'];
+                    newInputIcon = inputDefaults[gamepadKind + 'Icon'];
+                    } else if (!gamepadKind && inputDefaults['keyboardIcon']){
+                    //console.log('--> gamepad not connected, resetting to keyboard ....');
+                    newInputIcon = inputDefaults['keyboardIcon'];
                     } else {
-                    //console.log('--> gamepad not connected, resetting to default ....');
-                    userInput.icon = inputDefaults['icon'];
+                    //console.log('--> keyboard not defined, resetting to default ....');
+                    newInputIcon = inputDefaults['icon'];
                     }
+                userInput.icon = newInputIcon;
+                returnUserInput.icon = newInputIcon;
                 //console.log('-> final icon is ', userInput.icon);
                 }
             };
+        _self.gamepadKind = gamepadKind;
+        _self.gamepadKinds = gamepadKinds;
+        _self.gamepadLayout = gamepadLayout;
 
         // Define a function for watching gamepad inputs and updating the activeInputs object accordingly
         let connectedGamepad = null;
@@ -3773,6 +3879,10 @@ class mmrpgUserInputWatcher {
         // Update the parent with these new return objects separate from the source data (in case of mods)
         _self.returnUserInputs = returnUserInputs;
         _self.returnActiveInputs = returnActiveInputs;
+
+        // Run these functions at least once to ensure things are generated properly
+        updateGamepadInputs();
+        watchGamepadInputs();
 
         // Define a quick object to hold all the listening objects (in case we need to remove them)
         let eventListeners = {};
