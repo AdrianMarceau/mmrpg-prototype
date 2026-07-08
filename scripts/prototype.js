@@ -63,7 +63,8 @@ $(document).ready(function(){
     $mmrpgElements.thisFalloff = $thisFalloff;
 
     // Check if this instance has been loaded in an iframe
-    prototypeIsHome = window.top === window.self && !$('#mmrpg').hasClass('iframe') ? true : false;
+    //prototypeIsHome = window.top === window.self && !$('#mmrpg').hasClass('iframe') ? true : false;
+    prototypeIsHome = !$('#mmrpg').hasClass('iframe') ? true : false;
     prototypeIsFramed = window.top !== window.self ? true : false;
     prototypeIsTopmenu = !$('#mmrpg').hasClass('iframe') && $thisPrototype.is('[data-step-name]') ? $thisPrototype.attr('data-step-name') : false;
     prototypeIsSubmenu = $('#mmrpg').hasClass('iframe') ? $('#mmrpg').attr('data-frame') : false;
@@ -901,14 +902,40 @@ function initUserInputWatcher(){
         };
 
     // Start the user input watcher and collect reference to active inputs
-    let userInputWatcher = new mmrpgUserInputWatcher({ autoStart: true, autoRunCallbacks: false });
-    userInputWatcher.onUserInput(checkUserInputs);
-    userInputWatcher.startWatching();
-    let checkUserInputWatcher = function(){
-        userInputWatcher.checkUserInputs();
-        requestAnimationFrame(checkUserInputWatcher);
-        };
-    checkUserInputWatcher();
+    let userInputWatcher, userInputWatcherConfig;
+    let gamepadLayout = null; // TODO: pull this from settings later
+    let prototypeIsHome = mmrpgPrototype.prototypeIsHome;
+    //console.log('gamepadLayout =', gamepadLayout);
+    //console.log('prototypeIsHome =', prototypeIsHome);
+    if (mmrpgPrototype.prototypeIsHome){
+        userInputWatcherConfig = {
+            autoStart: true,
+            autoRunCallbacks: false,
+            autoButtonMapping: true, // map buttons based on gamepad layout
+            catchIframeInputs: true,
+            drillIframeInputs: true,
+            gamepadLayout: gamepadLayout, // pass in case custom settings
+            };
+        } else {
+        userInputWatcherConfig = {
+            autoStart: true,
+            autoRunCallbacks: false,
+            autoButtonMapping: true,
+            catchIframeInputs: true,
+            listenToIframeInputs: true,
+            gamepadLayout: gamepadLayout, // pass in case custom settings
+            };
+        }
+    userInputWatcher = new mmrpgUserInputWatcher(userInputWatcherConfig);
+    if (userInputWatcher){
+        userInputWatcher.onUserInput(checkUserInputs);
+        userInputWatcher.startWatching();
+        let checkUserInputWatcher = function(){
+            userInputWatcher.checkUserInputs();
+            requestAnimationFrame(checkUserInputWatcher);
+            };
+        checkUserInputWatcher();
+        }
 
 }
 
