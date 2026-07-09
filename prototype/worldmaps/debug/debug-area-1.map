@@ -95,6 +95,7 @@
 @items[]      = speed-pellet-pickup(19-10, speed-pellet)
 @items[]      = speed-capsule-pickup(19-8, speed-capsule)
 #------------------------
+@abilities[]  = buster-shot-pickup(5-9, buster-shot)
 @abilities[]  = light-buster-pickup(7-8, light-buster)
 @abilities[]  = wily-buster-pickup(6-8, wily-buster)
 @abilities[]  = cossack-buster-pickup(5-8, cossack-buster)
