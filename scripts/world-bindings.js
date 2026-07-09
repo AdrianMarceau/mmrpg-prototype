@@ -2673,7 +2673,9 @@ function bindEventsToInputs($thisWorld){
                     //_self.playSoundEffect('glass-klink');
                     if (!playerIsCursor){
                         //console.log('%c' + 'Player is human, can only walk to adjacent tiles!', 'color: red;');
-                        _self.refreshMapPositionEvents(0);
+                        _self.moveToPosition(oldPos, function(){
+                            _self.refreshMapPositionEvents(0);
+                            }, true);
                         return false;
                         } else {
                         //console.log('%c' + 'Player is cursor, can cross voids if walkable tiles on other side!', 'color: green;');
