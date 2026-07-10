@@ -538,8 +538,49 @@ html, body {
 #world #map .sprite.tile[data-portal="exit"] { background-position: -440px -40px; }
 #world #map .sprite.tile.portal.hidden { display: none; }
 
-#world #map .sprite.event.healpad { background-position: -600px -600px; }
-#world #map .sprite.event.resetpad { background-position: -680px -600px; }
+@keyframes world-sprite-playerpad-glow {
+    0%, 100% { filter: brightness(1.0) opacity(0.6); }
+    50% { filter: brightness(1.6) opacity(0.9); }
+    }
+#world #map .sprite.event[data-event*="-platform-"] {
+    /* ... */
+}
+#world #map .sprite.event[data-event*="-platform-"]:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: inherit;
+    height: inherit;
+    background: inherit;
+    filter: brightness(1) opacity(0.6);
+    transition: filter 0.3s;
+}
+#world #map .sprite.event[data-event*="-platform-"]:not(.active):before {
+    filter: brightness(1) opacity(0);
+}
+#world #map .sprite.event[data-event*="-platform-"].active.animate:before {
+    animation: world-sprite-playerpad-glow 3s ease-out infinite;
+}
+#world #map .sprite.event.lightpad-left { background-position: -1080px -40px; }
+#world #map .sprite.event.lightpad-middle { background-position: -1160px -40px; }
+#world #map .sprite.event.lightpad-right { background-position: -1240px -40px; }
+#world #map .sprite.event.wilypad-left { background-position: -1080px -120px; }
+#world #map .sprite.event.wilypad-middle { background-position: -1160px -120px; }
+#world #map .sprite.event.wilypad-right { background-position: -1240px -120px; }
+#world #map .sprite.event.cossackpad-left { background-position: -1080px -200px; }
+#world #map .sprite.event.cossackpad-middle { background-position: -1160px -200px; }
+#world #map .sprite.event.cossackpad-right { background-position: -1240px -200px; }
+#world #map .sprite.event.lalindepad-left { background-position: -1080px -280px; }
+#world #map .sprite.event.lalindepad-middle { background-position: -1160px -280px; }
+#world #map .sprite.event.lalindepad-right { background-position: -1240px -280px; }
+#world #map .sprite.event[data-event*="-platform-left"]:before { background-position: -1080px -360px; }
+#world #map .sprite.event[data-event*="-platform-middle"]:before { background-position: -1160px -360px; }
+#world #map .sprite.event[data-event*="-platform-right"]:before { background-position: -1240px -360px; }
+
+#world #map .sprite.event.healpad { background-position: -1080px -440px; }
+#world #map .sprite.event.resetpad { background-position: -1160px -440px; }
 @keyframes world-sprite-statpad-glow {
     0%, 100% { filter: brightness(1.1) saturate(2.0) opacity(1.0); }
     50% { filter: brightness(2.0) saturate(2.0) opacity(0.8); }
@@ -568,54 +609,13 @@ html, body {
 }
 #world #map .sprite.event.resetpad.animate { animation-delay: -3s; }
 
-@keyframes world-sprite-playerpad-glow {
-    0%, 100% { filter: brightness(1.0) opacity(0.6); }
-    50% { filter: brightness(1.6) opacity(0.9); }
-    }
-#world #map .sprite.event[data-event*="-platform-"] {
-    /* ... */
-}
-#world #map .sprite.event[data-event*="-platform-"]:before {
-    content: "";
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: inherit;
-    height: inherit;
-    background: inherit;
-    filter: brightness(1) opacity(0.6);
-    transition: filter 0.3s;
-}
-#world #map .sprite.event[data-event*="-platform-"]:not(.active):before {
-    filter: brightness(1) opacity(0);
-}
-#world #map .sprite.event[data-event*="-platform-"].active.animate:before {
-    animation: world-sprite-playerpad-glow 3s ease-out infinite;
-}
-#world #map .sprite.event.lightpad-left { background-position: -600px -40px; }
-#world #map .sprite.event.lightpad-middle { background-position: -680px -40px; }
-#world #map .sprite.event.lightpad-right { background-position: -760px -40px; }
-#world #map .sprite.event.wilypad-left { background-position: -600px -120px; }
-#world #map .sprite.event.wilypad-middle { background-position: -680px -120px; }
-#world #map .sprite.event.wilypad-right { background-position: -760px -120px; }
-#world #map .sprite.event.cossackpad-left { background-position: -600px -200px; }
-#world #map .sprite.event.cossackpad-middle { background-position: -680px -200px; }
-#world #map .sprite.event.cossackpad-right { background-position: -760px -200px; }
-#world #map .sprite.event.lalindepad-left { background-position: -600px -280px; }
-#world #map .sprite.event.lalindepad-middle { background-position: -680px -280px; }
-#world #map .sprite.event.lalindepad-right { background-position: -760px -280px; }
-#world #map .sprite.event[data-event*="-platform-left"]:before { background-position: -600px -360px; }
-#world #map .sprite.event[data-event*="-platform-middle"]:before { background-position: -680px -360px; }
-#world #map .sprite.event[data-event*="-platform-right"]:before { background-position: -760px -360px; }
-
-#world #map .sprite.event.console { background-position: -600px -40px; }
-#world #map .sprite.event.console.multi { background-position: -680px -40px; }
-#world #map .sprite.event.console.healing { background-position: -600px -120px; }
-#world #map .sprite.event.console.weapons { background-position: -680px -120px; }
-#world #map .sprite.event.console.items { background-position: -600px -200px; }
-#world #map .sprite.event.console.misc { background-position: -680px -200px; }
-#world #map .sprite.event.console.off { background-position: -600px -40px; }
+#world #map .sprite.event.console { background-position: 0 0; }
+#world #map .sprite.event.console.off { background-position: -920px -40px; }
+#world #map .sprite.event.console.multi { background-position: -1000px -40px; }
+#world #map .sprite.event.console.auto { background-position: -920px -120px; }
+#world #map .sprite.event.console.reggae { background-position: -1000px -120px; }
+#world #map .sprite.event.console.kalinka { background-position: -920px -200px; }
+#world #map .sprite.event.console.plum { background-position: -1000px -200px; }
 
 #world #map .sprite.tile.button-up { background-position: -40px -280px; }
 #world #map .sprite.tile.button-down { background-position: -40px -360px; }
@@ -634,12 +634,14 @@ html, body {
 #world #map .sprite.tile.button.orange.up { background-position: -520px -280px; }
 #world #map .sprite.tile.button.orange.down { background-position: -520px -360px; }
 
-#world #map .sprite.tile.switch-up { background-position: -600px -440px; }
-#world #map .sprite.tile.switch-down { background-position: -680px -440px; }
-#world #map .sprite.tile.switch.black-white.up { background-position: -600px -440px; }
-#world #map .sprite.tile.switch.black-white.down { background-position: -680px -440px; }
-#world #map .sprite.tile.switch.red-blue.up { background-position: -600px -520px; }
-#world #map .sprite.tile.switch.red-blue.down { background-position: -680px -520px; }
+#world #map .sprite.tile.switch-up { background-position: 0 0; }
+#world #map .sprite.tile.switch-down { background-position: 0 0; }
+#world #map .sprite.tile.switch.black-white.up { background-position: -840px -280px; }
+#world #map .sprite.tile.switch.black-white.down { background-position: -840px -360px; }
+#world #map .sprite.tile.switch.red-blue.up { background-position: -920px -280px; }
+#world #map .sprite.tile.switch.red-blue.down { background-position: -920px -360px; }
+#world #map .sprite.tile.switch.green-purple.up { background-position: -1000px -280px; }
+#world #map .sprite.tile.switch.green-purple.down { background-position: -1000px -360px; }
 
 #world #map .sprite.block.fence-block { background-position: -120px -840px; }
 
@@ -731,6 +733,10 @@ html, body {
 #world #map .sprite.block.barrier-block.orange-midd { background-position: -520px -440px; }
 #world #map .sprite.block.barrier-block.orange-vert { background-position: -520px -520px; }
 #world #map .sprite.block.barrier-block.orange-horz { background-position: -520px -600px; }
+
+#world #map .sprite.gate.star-gate { background-position: -40px -520px; }
+#world #map .sprite.gate.star-gate.vertical { background-position: -440px -520px; }
+#world #map .sprite.gate.star-gate.horizontal { background-position: -440px -600px; }
 
 @keyframes sprite-hazard-crude-oil { 0%, 100% { background-position: -840px -840px; } 50% { background-position: -840px -920px;  }  }
 @keyframes sprite-hazard-foamy-bubbles { 0%, 100% { background-position: -920px -840px; } 50% { background-position: -920px -920px;  }  }
