@@ -3447,6 +3447,7 @@ class mmrpgUserInputWatcher {
         _config.wheelTimeout = typeof config.wheelTimeout === 'number' ?  config.wheelTimeout : _config.inputTimeout;
         _config.gamepadTimeout = typeof config.gamepadTimeout === 'number' ? config.gamepadTimeout : _config.inputTimeout;
         _config.autoRunCallbacks = typeof config.autoRunCallbacks === 'boolean' ? config.autoRunCallbacks : true;
+        _config.autoWheelMapping = typeof config.autoWheelMapping === 'number' ?  config.autoWheelMapping : false;
         _config.autoButtonMapping = typeof config.autoButtonMapping === 'boolean' ? config.autoButtonMapping : false;
         _config.catchIframeInputs = typeof config.catchIframeInputs === 'boolean' ? config.catchIframeInputs : false;
         _config.bubbleIframeInputs = typeof config.bubbleIframeInputs === 'boolean' ? config.bubbleIframeInputs : false;
@@ -3719,8 +3720,9 @@ class mmrpgUserInputWatcher {
         let wheelThreshold = 150;
         let wheelTimeout = _config.wheelTimeout;
         let getUserInputFromWheelEvent = function(event){
-            if (busyScrolling){ return false; }
+            if (!_config.autoWheelMapping){ return false; }
             if (!event.wheelDelta){ return false; }
+            if (busyScrolling){ return false; }
             //console.log('event.wheelDelta =', event.wheelDelta);
             if (event.wheelDelta > 0 && event.wheelDelta < wheelThreshold){ return false; }
             else if (event.wheelDelta < 0 && event.wheelDelta > (-1 * wheelThreshold)){ return false; }
@@ -3888,7 +3890,7 @@ class mmrpgUserInputWatcher {
         let eventListeners = {};
         eventListeners.keydown = function(event){ let input = getUserInputFromKeyboardEvent(event.key); if (input){ activeInputs[input] = true; } onUserInput('keydown', event); };
         eventListeners.keyup = function(event){ let input = getUserInputFromKeyboardEvent(event.key); if (input){ delete activeInputs[input]; } onUserInput('keyup', event); };
-        eventListeners.mousewheel = function(event){ getUserInputFromWheelEvent(event); onUserInput('mousewheel', event); };
+        if (_config.autoWheelMapping){ eventListeners.mousewheel = function(event){ getUserInputFromWheelEvent(event); onUserInput('mousewheel', event); }; }
         eventListeners.gamepadconnected = function(event){ watchGamepadInputs(event.gamepad); onUserInput('gamepadconnected', event); };
         eventListeners.gamepaddisconnected = function(event){ watchGamepadInputs(null); onUserInput('gamepaddisconnected', event); };
         eventListeners.message = function(event){
@@ -3918,13 +3920,13 @@ class mmrpgUserInputWatcher {
             document.addEventListener('keydown', eventListeners.keydown, { passive: false });
             document.addEventListener('keyup', eventListeners.keyup, { passive: false });
 
-            // Bind events to the scrolling of the user's mouse if detected and map to L2 + R2 button inputs
-            document.addEventListener('mousewheel', eventListeners.mousewheel, { passive: false });
-
             // Beind events to any connected gamepads to allow for the same
             // functionality as the keyboard arrow keys (mirror for easier coding)
             window.addEventListener("gamepadconnected", eventListeners.gamepadconnected, { passive: false });
             window.addEventListener("gamepaddisconnected", eventListeners.gamepaddisconnected, { passive: false });
+
+            // Bind events to the scrolling of the user's mouse if detected and map to L2 + R2 button inputs
+            if (_config.autoWheelMapping){ document.addEventListener('mousewheel', eventListeners.mousewheel, { passive: false }); }
 
             // Only listen for bubbled messages if we are the top-level parent window
             if (_config.catchIframeInputs){ window.addEventListener('message', eventListeners.message, { passive: false }); }
@@ -3939,12 +3941,12 @@ class mmrpgUserInputWatcher {
             document.removeEventListener('keydown', eventListeners.keydown);
             document.removeEventListener('keyup', eventListeners.keyup);
 
-            // Remove events from the scrolling of the user's mouse
-            document.removeEventListener('mousewheel', eventListeners.mousewheel);
-
             // Remove events from any connected gamepads
             window.removeEventListener("gamepadconnected", eventListeners.gamepadconnected);
             window.removeEventListener("gamepaddisconnected", eventListeners.gamepaddisconnected);
+
+            // Remove events from the scrolling of the user's mouse
+            if (_config.autoWheelMapping){ document.removeEventListener('mousewheel', eventListeners.mousewheel); }
 
             // Clean up the message listener as well
             if (_config.catchIframeInputs){ window.removeEventListener('message', eventListeners.message); }
