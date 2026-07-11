@@ -2531,10 +2531,10 @@ function bindEventsToInputs($thisWorld){
                 let thisVerDir = (newRow > thisRow) ? 'down' : (newRow < thisRow) ? 'up' : false;
                 let thisHorDir = (newCol > thisCol) ? 'right' : (newCol < thisCol) ? 'left' : false;
                 if (!inPlaceMovement){
-                    let thisShiftDir = (function(h, v){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join('-'); })(thisVerDir, thisHorDir);
+                    let thisShiftDir = (function(v, h){ var s = []; if (v){ s.push(v); } if (h){ s.push(h); } return s.join('-'); })(thisVerDir, thisHorDir);
                     _worldCursor.direction = thisShiftDir; // the direction they are trying to move
-                    _worldPlayer.direction = _worldCursor.direction;
-                    //console.log('-> _worldCursor.direction to thisShiftDir(', thisShiftDir, ')');
+                    _worldPlayer.direction = thisShiftDir;
+                    //console.log('-> _worldCursor.direction to thisShiftDir(', thisShiftDir, ')', '\n--> (via thisVerDir = ', thisVerDir, '& thisHorDir =', thisHorDir, ')');
                     } else {
                     _worldCursor.direction = newDir;
                     _worldPlayer.direction = _worldCursor.direction;
@@ -2559,7 +2559,7 @@ function bindEventsToInputs($thisWorld){
                     //console.log('%c' + 'New position is not walkable!', 'color: orange;');
                     //_self.playSoundEffect('glass-klink');
                     if (!playerIsCursor){
-                        //console.log('%c' + 'Player is human, can only walk to adjacent tiles!', 'color: red;');
+                        //console.log('%c' + 'Player is human, can only walk to adjacent tiles! (going ' + _worldCursor.direction + ')', 'color: red;');
                         _self.moveToPosition(oldPos, function(){
                             _self.refreshMapPositionEvents(0);
                             }, true);
