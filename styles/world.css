@@ -523,10 +523,10 @@ html, body {
 
 #world #map .sprite.tile.portal { background-position: -360px -40px; }
 #world #map .sprite.tile.portal.locked { background-position: -440px -40px; }
-#world #map .sprite.tile.portal-right { background-position: -680px -760px; }
-#world #map .sprite.tile.portal-left { background-position: -600px -760px; }
-#world #map .sprite.tile.portal-up { background-position: -600px -680px; }
-#world #map .sprite.tile.portal-down { background-position: -680px -680px; }
+#world #map .sprite.tile.portal-up { background-position: -600px -40px; }
+#world #map .sprite.tile.portal-down { background-position: -680px -40px; }
+#world #map .sprite.tile.portal-left { background-position: -760px -40px; }
+#world #map .sprite.tile.portal-right { background-position: -840px -40px; }
 #world #map .sprite.tile.portal-black { background-position: -40px -200px; }
 #world #map .sprite.tile.portal-red { background-position: -120px -200px; }
 #world #map .sprite.tile.portal-blue { background-position: -200px -200px; }
@@ -734,9 +734,15 @@ html, body {
 #world #map .sprite.block.barrier-block.orange-vert { background-position: -520px -520px; }
 #world #map .sprite.block.barrier-block.orange-horz { background-position: -520px -600px; }
 
-#world #map .sprite.gate.star-gate { background-position: -40px -520px; }
-#world #map .sprite.gate.star-gate.vertical { background-position: -440px -520px; }
-#world #map .sprite.gate.star-gate.horizontal { background-position: -440px -600px; }
+#world #map .sprite.block.star-block { background-position: 0 0; }
+#world #map .sprite.block.star-block.horz-down { background-position: -680px -680px; }
+#world #map .sprite.block.star-block.horz-up { background-position: -680px -760px; }
+#world #map .sprite.block.star-block.vert-left { background-position: -760px -680px; }
+#world #map .sprite.block.star-block.vert-right { background-position: -760px -760px; }
+
+#world #map .sprite.gate.star-gate { background-position: 0 0; }
+#world #map .sprite.gate.star-gate.vertical { background-position: -600px -680px; }
+#world #map .sprite.gate.star-gate.horizontal { background-position: -600px -760px; }
 
 @keyframes sprite-hazard-crude-oil { 0%, 100% { background-position: -840px -840px; } 50% { background-position: -840px -920px;  }  }
 @keyframes sprite-hazard-foamy-bubbles { 0%, 100% { background-position: -920px -840px; } 50% { background-position: -920px -920px;  }  }
