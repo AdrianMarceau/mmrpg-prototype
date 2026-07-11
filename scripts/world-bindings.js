@@ -164,136 +164,23 @@ function bindEventsToWorld($thisWorld){
     let $sideButtonsWrapper = $('> .wrapper', $sideButtons);
     let $actionDropdown = _elements.actionDropdown;
     let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
-    let hoverCanvasObject = function(e, sfx){
-        let $object = $(this);
-        if (_self.worldIsBusy()){ return; }
-        if ($object.is('.disabled')){ return; }
-        if ($object.closest('.chrome').is('.disabled')){ return; }
-        $thisCanvas.find('.hovered').removeClass('hovered');
-        if (sfx){ _self.playSoundEffect(sfx); }
-        $object.addClass('hovered');
-        return true;
-        };
-    let unhoverCanvasObject = function(e){
-        let $object = $(this);
-        $object.removeClass('hovered');
-        return true;
-        };
+    let hoverCanvasObject = _self.hoverCanvasMenuObject;
+    let unhoverCanvasObject = _self.unhoverCanvasMenuObject;
     // Bind a click event to the back button in the header that'll bring us to prototype menu
     let $backButton = _elements.backButton;
-    if ($backButton && $backButton.length){
-        $backButton.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
-        $backButton.bind('mouseleave', unhoverCanvasObject);
-        $backButton.bind('click', function(e){
-            e.preventDefault();
-            if ($(this).is('.disabled')){ return false; }
-            //console.log('%c' + 'Back button clicked!', 'color: cyan;');
-            //if (!confirm('Are you sure you want to leave the world map?')){ return; }
-            _self.playSoundEffect('bounce-sound');
-            let backButtonURL = $backButton.attr('data-url') || _config.backButtonURL;
-            _self.decZoomLevel();
-            $thisWorld.addClass('busy');
-            _self.saveWorldState(function(){
-                _self.decZoomLevel(0.5);
-                $thisWorld.addClass('loading');
-                window.location.href = backButtonURL;
-                });
-            $thisWorld.animate({opacity: 0}, 900, function(){
-                $thisWorld.addClass('hidden');
-                });
-            return true;
-            });
-        }
+    if ($backButton && $backButton.length){ _self.initMenuBackButton($thisWorld, $backButton); }
     // Bind a click event to the home button in the header that'll bring us to prototype menu
     let $homeButton = _elements.homeButton;
-    if ($homeButton && $homeButton.length){
-        $homeButton.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
-        $homeButton.bind('mouseleave', unhoverCanvasObject);
-        $homeButton.bind('click', function(e){
-            e.preventDefault();
-            if ($(this).is('.disabled')){ return false; }
-            //console.log('%c' + 'Home button clicked!', 'color: cyan;');
-            //if (!confirm('Are you sure you want to return to the home area?')){ return; }
-            _self.playSoundEffect('bounce-sound');
-            let homeButtonURL = $homeButton.attr('data-url') || _config.homeButtonURL;
-            _self.decZoomLevel();
-            $thisWorld.addClass('busy');
-            _self.saveWorldState(function(){
-                _self.decZoomLevel();
-                $thisWorld.addClass('loading');
-                window.location.href = homeButtonURL;
-                });
-            $thisWorld.animate({opacity: 0}, 600, function(){
-                $thisWorld.addClass('hidden');
-                });
-            return true;
-            });
-        }
+    if ($homeButton && $homeButton.length){ _self.initMenuHomeButton($thisWorld, $homeButton); }
     // Bind a click event to the reset button in the header that'll clear world data to start over (dev/debug only)
     let $resetButton = _elements.resetButton;
-    if ($resetButton && $resetButton.length){
-        $resetButton.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
-        $resetButton.bind('mouseleave', unhoverCanvasObject);
-        $resetButton.bind('click', function(e){
-            e.preventDefault();
-            if ($(this).is('.disabled')){ return false; }
-            //console.log('%c' + 'Reset button clicked!', 'color: cyan;');
-            if (!confirm('Are you sure you want to reset the world map?')){ return; }
-            _self.playSoundEffect('destroyed-sound');
-            _self.loadMusicTrack('current-track', true);
-            let resetButtonURL = $resetButton.attr('data-url') || _config.resetButtonURL;
-            _self.decZoomLevel(0.5);
-            $thisWorld.addClass('busy');
-            _self.saveWorldState(function(){
-                _self.decZoomLevel(1.0);
-                $thisWorld.addClass('loading');
-                window.location.href = resetButtonURL;
-                });
-            $thisWorld.animate({opacity: 0}, 1200, function(){
-                $thisWorld.addClass('hidden');
-                });
-            return true;
-            });
-        }
+    if ($resetButton && $resetButton.length){ _self.initMenuResetButton($thisWorld, $resetButton); }
     // Bind click events to the player switcher options in the world map header
     let $playerSwitcher = _elements.playerSwitcher;
-    if ($playerSwitcher && $playerSwitcher.length){
-        let $playerButtons = $('.team-player[data-player]', $playerSwitcher);
-        $playerButtons.bind('mouseenter', function(e){ if (hoverCanvasObject.call(this, e, 'icon-hover')){ $(this).find('.sprite.player > .sprite').attr('data-frame', '01'); } }); // taunt
-        $playerButtons.bind('mouseleave', function(e){ if (unhoverCanvasObject.call(this, e)){ $(this).find('.sprite.player > .sprite').attr('data-frame', '00'); } }); // base
-        $playerButtons.bind('click', function(e){
-            //console.log('%c' + 'Player switcher clicked!', 'color: cyan;');
-            e.preventDefault();
-            if ($(this).is('.disabled')){ return false; }
-            if ($playerSwitcher.is('.disabled')){ return false; }
-            if (_self.worldIsBusy()){ return false; }
-            $('.team-player', $playerSwitcher).removeClass('active');
-            let $option = $(this);
-            let playerToken = $option.attr('data-player') || false;
-            $option.addClass('active');
-            _self.playSoundEffect('lets-go-robots');
-            $thisWorld.addClass('loading');
-            let worldReloadURL = 'world.php?player=' + playerToken + '&switch=true';
-            _self.decZoomLevel();
-            $thisWorld.addClass('busy');
-            _self.saveWorldState(function(){
-                //_self.decZoomLevel();
-                _self.updateZoomLevel(_config.minZoomLevel);
-                $thisWorld.addClass('loading');
-                window.location.href = worldReloadURL;
-                //_self.decZoomLevel();
-                });
-            return true;
-            });
-        }
+    if ($playerSwitcher && $playerSwitcher.length){ _self.initMenuPlayerSwitcher($thisWorld, $playerSwitcher); }
     // Bind a click event to the minimap overview in the header that expands on mouseover to show more
     let $minimapOverview = _elements.minimapOverview;
-    if ($minimapOverview && $minimapOverview.length){
-        $minimapOverview.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
-        $minimapOverview.bind('mouseleave', unhoverCanvasObject);
-        $minimapOverview.find('.button').bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
-        $minimapOverview.find('.button').bind('mouseleave', unhoverCanvasObject);
-        }
+    if ($minimapOverview && $minimapOverview.length){ _self.initMenuMinimapOverview($thisWorld, $minimapOverview); }
     // Check to make sure the robotsOverview exists, and then bind events to its elements
     let $robotsOverview = _elements.robotsOverview;
     let robotsOverviewAPI = _self.robotsOverviewAPI || {};
