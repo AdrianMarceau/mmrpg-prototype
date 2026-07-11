@@ -320,6 +320,10 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
     let _world = _self.state;
     let _worldCursor = _world.cursor;
     let $canvasMap = _elements.map;
+    // Collect the player's position and direction then determine field of view
+    let standingAtPosition = _worldCursor.position;
+    let lookingInDirection = _worldCursor.direction;
+    let lookingAtPosition = _self.getRelativePositionByDirection(standingAtPosition, lookingInDirection);
     // Define an array to hold the events at this position
     let eventsAtPosition = [];
     // If we haven't actually moved/othered yet, don't return anything yet
@@ -345,14 +349,11 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
     //console.log('-> positionsToCheck =', positionsToCheck);
     //console.log('-> _worldCursor.moved =', _worldCursor.moved);
     //console.log('-> _worldCursor.othered =', _worldCursor.othered);
-    let eventKinds = ['event', 'portal', 'button', 'switch', 'block', 'hazard', 'battle', 'item', 'ability'];
+    let eventKinds = ['event', 'portal', 'button', 'switch', 'gate', 'block', 'hazard', 'battle', 'item', 'ability'];
+    let eventKindsPlural = ['events', 'portals', 'buttons', 'switches', 'gates', 'blocks', 'hazards', 'battles', 'items', 'abilities'];
     for (let e = 0; e < eventKinds.length; e++){
         let eventKind = eventKinds[e];
-        let eventKindPlural = eventKind + 's';
-        eventKindPlural = eventKindPlural.replace(/ys/i, 'ies'); // fix pluralization issues
-        eventKindPlural = eventKindPlural.replace(/ss/i, 'ses'); // fix pluralization issues
-        eventKindPlural = eventKindPlural.replace(/chs/i, 'ches'); // fix pluralization issues
-        eventKindPlural = eventKindPlural.replace(/shs/i, 'shes'); // fix pluralization issues
+        let eventKindPlural = eventKindsPlural[e];
         //console.log('checking for ' + eventKind + '/' + eventKindPlural + ' at: ' + positionsToCheck.join(', '));
         // ie: mapKindSymbols
         let symbolsKey = 'map' + (eventKind[0].toUpperCase() + eventKind.slice(1)) + 'Symbols';
@@ -377,6 +378,8 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
             if (!eventSymbols[eventPosition]){ continue; } // skip if no event symbols at this position
             let eventToken = eventSymbols[eventPosition];
             let eventInfo = eventsIndex[eventToken];
+            let isSamePosition = eventPosition === standingAtPosition;
+            let isFacingPosition = eventPosition === lookingAtPosition;
             //console.log('-> checking ' + eventKind + ' at position ' + eventPosition + ' for token ' + eventToken, ' and info ', eventInfo);
             if (!eventToken || !eventInfo){ console.warn('-> no event token or info found for ' + eventKind + ' at position ' + eventPosition + ', skipping!'); continue; }
             //console.log('-> found ' + eventKind + ' at position ' + eventPosition + ' with token ' + eventToken, eventInfo);
@@ -398,21 +401,6 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
                 // otherwise it's just a generic custom event tile
                 else { eventKind2 = 'custom'; }
                 }
-            else if (eventKind === 'button'){
-                // if the button has already been pushed (state:down), just continue
-                //console.log('-> eventPosition: ', eventPosition);
-                //console.log('-> eventToken: ', eventToken);
-                //console.log('-> eventInfo: ', eventInfo);
-                //console.log('-> eventsIndex: ', eventsIndex);
-                if (eventInfo.state === 'down'){ continue; }
-                }
-            else if (eventKind === 'switch'){
-                // if the switch has already been pushed (state:down), that's okay
-                //console.log('-> eventPosition: ', eventPosition);
-                //console.log('-> eventToken: ', eventToken);
-                //console.log('-> eventInfo: ', eventInfo);
-                //console.log('-> eventsIndex: ', eventsIndex);
-                }
             else if (eventKind === 'portal'){
                 // if we haven't moved, never trigger a portal
                 if (!_worldCursor.moved){ continue; }
@@ -425,6 +413,34 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
                     continue;
                     }
                 }
+            else if (eventKind === 'button'){
+                // if the button has already been pushed (state:down), just continue
+                //console.log('-> eventPosition: ', eventPosition);
+                //console.log('-> eventToken: ', eventToken);
+                //console.log('-> eventInfo: ', eventInfo);
+                //console.log('-> eventsIndex: ', eventsIndex);
+                if (eventInfo.state === 'down'){ continue; }
+                if (!isSamePosition && !isFacingPosition){ continue; }
+                }
+            else if (eventKind === 'switch'){
+                // if the switch has already been pushed (state:down), that's okay
+                //console.log('-> eventPosition: ', eventPosition);
+                //console.log('-> eventToken: ', eventToken);
+                //console.log('-> eventInfo: ', eventInfo);
+                //console.log('-> eventsIndex: ', eventsIndex);
+                if (!isSamePosition && !isFacingPosition){ continue; }
+                }
+            else if (eventKind === 'gate'){
+                // if the gate has already been removed, just continue
+                //console.log('-> eventPosition: ', eventPosition);
+                //console.log('-> eventToken: ', eventToken);
+                //console.log('-> eventInfo: ', eventInfo);
+                //console.log('-> eventsIndex: ', eventsIndex);
+                if (eventInfo.removed){ continue; }
+                if (!isSamePosition && !isFacingPosition){ continue; }
+                // collect the sprite as the second "kind"
+                eventKind2 = eventInfo.sprite;
+                }
             else if (eventKind === 'block' || eventKind === 'hazard'){
                 // skip if block/hazard already removed by the player
                 //console.log('Found ' + eventKind + ' event kind!', eventToken, '@', eventPosition);
@@ -433,14 +449,6 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
                 //console.log('-> eventInfo: ', eventInfo);
                 //console.log('-> eventsIndex: ', eventsIndex);
                 if (eventInfo.removed){ continue; }
-                // skip if not facing direction of block/hazard
-                // (or directly on top of it in case of hazard)
-                let standingAtPosition = _worldCursor.position;
-                let lookingAtPosition = _self.getRelativePositionByDirection(_worldCursor.position, _worldCursor.direction);
-                let isSamePosition = eventPosition === standingAtPosition;
-                let isFacingPosition = eventPosition === lookingAtPosition;
-                //console.log('-> eventPosition:', eventPosition, '\n-> vs. standingAtPosition:', standingAtPosition, '\n-> vs. lookingAtPosition:', lookingAtPosition);
-                //console.log('-> isSamePosition: ', isSamePosition, '-> isFacingPosition: ', isFacingPosition);
                 if (!isSamePosition && !isFacingPosition){ continue; }
                 //console.log('--> Yay! Found ' + eventKind + ' event kind ' + (isSamePosition ? 'at' : isFacingPosition ? 'in front of' : 'around') + ' current position!');
                 //console.log('--> eventPosition: ', eventPosition);
@@ -1523,7 +1531,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         }
     else if (firstEventType === 'item'){
         //console.log('-> event at position is an item, preparing either dropdown or pickup');
-        // If the cursor is literally on a button, only one event sprite matters right now
+        // If the cursor is literally on an item, only one event sprite matters right now
         let eventInfo = firstEvent;
         let itemInfo = _mapItemsIndex[eventInfo.token];
         let $itemEvent = $(firstEvent.sprite);
