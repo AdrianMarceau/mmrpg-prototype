@@ -2,10 +2,12 @@
 // -- WORLD MENUS METHODS -- //
 
 // Define a quick function for hovering a canvas UI object
-function hoverCanvasMenuObject(e, sfx){
+function hoverCanvasMenuObject(obj, e, sfx){
     //console.log('%c' + 'mmrpgWorldMap.hoverCanvasMenuObject()', 'color: magenta;');
     let _self = this;
-    let $object = $(this);
+    let _elements = _self.elements;
+    let $thisCanvas = _elements.canvas;
+    let $object = $(obj);
     if (_self.worldIsBusy()){ return; }
     if ($object.is('.disabled')){ return; }
     if ($object.closest('.chrome').is('.disabled')){ return; }
@@ -14,9 +16,10 @@ function hoverCanvasMenuObject(e, sfx){
     $object.addClass('hovered');
     return true;
     }
-function unhoverCanvasMenuObject(e){
+function unhoverCanvasMenuObject(obj, e){
     //console.log('%c' + 'mmrpgWorldMap.unhoverCanvasMenuObject()', 'color: magenta;');
-    let $object = $(this);
+    let _self = this;
+    let $object = $(obj);
     $object.removeClass('hovered');
     return true;
     }
@@ -32,8 +35,8 @@ function initMenuBackButton($thisWorld, $backButton){
     let _world = _self.state;
     let hoverCanvasObject = _self.hoverCanvasMenuObject;
     let unhoverCanvasObject = _self.unhoverCanvasMenuObject;
-    $backButton.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
-    $backButton.bind('mouseleave', unhoverCanvasObject);
+    $backButton.bind('mouseenter', function(e){ hoverCanvasObject.call(_self, this, e, 'icon-hover'); });
+    $backButton.bind('mouseleave', function(e){ unhoverCanvasObject.call(_self, this, e); });
     $backButton.bind('click', function(e){
         e.preventDefault();
         if ($(this).is('.disabled')){ return false; }
@@ -67,8 +70,8 @@ function initMenuHomeButton($thisWorld, $homeButton){
     let _world = _self.state;
     let hoverCanvasObject = _self.hoverCanvasMenuObject;
     let unhoverCanvasObject = _self.unhoverCanvasMenuObject;
-    $homeButton.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
-    $homeButton.bind('mouseleave', unhoverCanvasObject);
+    $homeButton.bind('mouseenter', function(e){ hoverCanvasObject.call(_self, this, e, 'icon-hover'); });
+    $homeButton.bind('mouseleave', function(e){ unhoverCanvasObject.call(_self, this, e); });
     $homeButton.bind('click', function(e){
         e.preventDefault();
         if ($(this).is('.disabled')){ return false; }
@@ -102,8 +105,8 @@ function initMenuResetButton($thisWorld, $resetButton){
     let _world = _self.state;
     let hoverCanvasObject = _self.hoverCanvasMenuObject;
     let unhoverCanvasObject = _self.unhoverCanvasMenuObject;
-    $resetButton.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
-    $resetButton.bind('mouseleave', unhoverCanvasObject);
+    $resetButton.bind('mouseenter', function(e){ hoverCanvasObject.call(_self, this, e, 'icon-hover'); });
+    $resetButton.bind('mouseleave', function(e){ unhoverCanvasObject.call(_self, this, e); });
     $resetButton.bind('click', function(e){
         e.preventDefault();
         if ($(this).is('.disabled')){ return false; }
@@ -139,8 +142,8 @@ function initMenuPlayerSwitcher($thisWorld, $playerSwitcher){
     let hoverCanvasObject = _self.hoverCanvasMenuObject;
     let unhoverCanvasObject = _self.unhoverCanvasMenuObject;
     let $playerButtons = $('.team-player[data-player]', $playerSwitcher);
-    $playerButtons.bind('mouseenter', function(e){ if (hoverCanvasObject.call(this, e, 'icon-hover')){ $(this).find('.sprite.player > .sprite').attr('data-frame', '01'); } }); // taunt
-    $playerButtons.bind('mouseleave', function(e){ if (unhoverCanvasObject.call(this, e)){ $(this).find('.sprite.player > .sprite').attr('data-frame', '00'); } }); // base
+    $playerButtons.bind('mouseenter', function(e){ if (hoverCanvasObject.call(_self, this, e, 'icon-hover')){ $(this).find('.sprite.player > .sprite').attr('data-frame', '01'); } }); // taunt
+    $playerButtons.bind('mouseleave', function(e){ if (unhoverCanvasObject.call(_self, this, e)){ $(this).find('.sprite.player > .sprite').attr('data-frame', '00'); } }); // base
     $playerButtons.bind('click', function(e){
         //console.log('%c' + 'Player switcher clicked!', 'color: cyan;');
         e.preventDefault();
@@ -179,10 +182,10 @@ function initMenuMinimapOverview($thisWorld, $minimapOverview){
     let _world = _self.state;
     let hoverCanvasObject = _self.hoverCanvasMenuObject;
     let unhoverCanvasObject = _self.unhoverCanvasMenuObject;
-    $minimapOverview.bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
-    $minimapOverview.bind('mouseleave', unhoverCanvasObject);
-    $minimapOverview.find('.button').bind('mouseenter', function(e){ hoverCanvasObject.call(this, e, 'icon-hover'); });
-    $minimapOverview.find('.button').bind('mouseleave', unhoverCanvasObject);
+    $minimapOverview.bind('mouseenter', function(e){ hoverCanvasObject.call(_self, this, e, 'icon-hover'); });
+    $minimapOverview.bind('mouseleave', function(e){ unhoverCanvasObject.call(_self, this, e); });
+    $minimapOverview.find('.button').bind('mouseenter', function(e){ hoverCanvasObject.call(_self, this, e, 'icon-hover'); });
+    $minimapOverview.find('.button').bind('mouseleave', function(e){ unhoverCanvasObject.call(_self, this, e); });
     return true;
     }
 
