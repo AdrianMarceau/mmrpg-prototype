@@ -734,15 +734,105 @@ html, body {
 #world #map .sprite.block.barrier-block.orange-vert { background-position: -520px -520px; }
 #world #map .sprite.block.barrier-block.orange-horz { background-position: -520px -600px; }
 
+@keyframes world-sprite-gate-block-spin {
+    0% { transform: scaleX(1.0);  }
+    25% {  transform: scaleX(0); }
+    50% {  transform: scaleX(-1.0); }
+    75% {  transform: scaleX(0); }
+    100% { transform: scaleX(1.0); }
+}
+@keyframes world-sprite-gate-block-spin-text {
+    0% { transform: scaleX(1.0);  }
+    25% {  transform: scaleX(0); }
+    50% {  transform: scaleX(1.0); }
+    75% {  transform: scaleX(0); }
+    100% { transform: scaleX(1.0); }
+}
+
+#world #map .sprite.block.boss-block,
+#world #map .sprite.block.star-block {
+    animation: inherit;
+}
+#world #map .sprite.block.boss-block:before,
+#world #map .sprite.block.boss-block:after,
+#world #map .sprite.block.star-block:before,
+#world #map .sprite.block.star-block:after {
+    display: block;
+    position: absolute;
+    line-height: 1;
+    text-indent: 0;
+    text-align: center;
+    height: auto;
+    width: auto;
+    transform: scaleX(1);
+    animation: inherit;
+}
+#world #map .sprite.block.boss-block:before,
+#world #map .sprite.block.star-block:before {
+    z-index: 1;
+    font-family: 'Font Awesome 5 Pro';
+    font-weight: 900;
+    font-size: 40px;
+    bottom: 64px;
+    left: 14px;
+    right: 14px;
+    border-radius: 0 0 9px 9px;
+    background-color: transparent;
+    background-image: none;
+    color: #ffffff;
+    filter: drop-shadow(0px 0 3px #ffffff) opacity(0.7);
+    animation: world-sprite-gate-block-spin 9s infinite ease-in-out;
+    animation-delay: inherit;
+}
+#world #map .sprite.block.boss-block::after,
+#world #map .sprite.block.star-block::after {
+    z-index: 2;
+    bottom: 78px;
+    left: 0;
+    width: 100%;
+    font-size: 11px;
+    font-weight: bold;
+    color: #ffffff;
+    mix-blend-mode: luminosity;
+    filter: drop-shadow(0 2px 0 #101010);
+    animation: world-sprite-gate-block-spin-text 9s infinite ease-in-out;
+}
+
+#world #map .sprite.gate.boss-door { background-position: 0 0; }
+#world #map .sprite.gate.boss-door.vertical { background-position: -600px -520px; }
+#world #map .sprite.gate.boss-door.horizontal { background-position: -600px -600px; }
+
+#world #map .sprite.block.boss-block:before {
+    content: "\f54c";
+    font-size: 30px;
+    bottom: 48px;
+}
+
+#world #map .sprite.block.boss-block { background-position: 0 0; }
+#world #map .sprite.block.boss-block.horz-down { background-position: -680px -520px; }
+#world #map .sprite.block.boss-block.horz-up { background-position: -680px -600px; }
+#world #map .sprite.block.boss-block.vert-left { background-position: -760px -520px; }
+#world #map .sprite.block.boss-block.vert-right { background-position: -760px -600px; }
+
+#world #map .sprite.gate.star-gate { background-position: 0 0; }
+#world #map .sprite.gate.star-gate.vertical { background-position: -600px -680px; }
+#world #map .sprite.gate.star-gate.horizontal { background-position: -600px -760px; }
+
 #world #map .sprite.block.star-block { background-position: 0 0; }
 #world #map .sprite.block.star-block.horz-down { background-position: -680px -680px; }
 #world #map .sprite.block.star-block.horz-up { background-position: -680px -760px; }
 #world #map .sprite.block.star-block.vert-left { background-position: -760px -680px; }
 #world #map .sprite.block.star-block.vert-right { background-position: -760px -760px; }
 
-#world #map .sprite.gate.star-gate { background-position: 0 0; }
-#world #map .sprite.gate.star-gate.vertical { background-position: -600px -680px; }
-#world #map .sprite.gate.star-gate.horizontal { background-position: -600px -760px; }
+#world #map .sprite.block.star-block:before {
+    content: "\f005";
+}
+#world #map .sprite.block.star-block::after {
+    content: "0";
+}
+#world #map .sprite.block.star-block[data-extra]::after {
+    content: attr(data-extra);
+}
 
 @keyframes sprite-hazard-crude-oil { 0%, 100% { background-position: -840px -840px; } 50% { background-position: -840px -920px;  }  }
 @keyframes sprite-hazard-foamy-bubbles { 0%, 100% { background-position: -920px -840px; } 50% { background-position: -920px -920px;  }  }
@@ -4828,6 +4918,11 @@ display: block;
 #world #canvas #side-buttons .big-button-title > span.has-sprite {
     text-align: left;
 }
+#world #canvas #side-buttons .big-button > span.has-sprite.one-row,
+#world #canvas #side-buttons .big-button-title > span.has-sprite.one-row {
+    line-height: 2;
+    min-height: 40px;
+}
 #world #canvas #side-buttons .big-button > span.has-sprite sup,
 #world #canvas #side-buttons .big-button-title > span.has-sprite sup {
     display: inline-block;
@@ -4842,6 +4937,24 @@ display: block;
     right: 6px;
     bottom: 9px;
 }
+
+#world #canvas #side-buttons .big-button > span > .sprite[data-sprite="item"],
+#world #canvas #side-buttons .big-button-title > span > .sprite[data-sprite="item"],
+#world #canvas #side-buttons .big-button > span > .sprite[data-sprite="object"],
+#world #canvas #side-buttons .big-button-title > span > .sprite[data-sprite="object"] {
+    right: 10px;
+    bottom: 10px;
+}
+
+#world #canvas #side-buttons .big-button .sprite[data-token="challenge-marker"] {
+    display: block;
+}
+#world #canvas #side-buttons .big-button .sprite[data-token="challenge-marker"] > .wrap > .sprite {
+    background-image: url(../images/objects/challenge-markers/base/icon_left_80x80.png);
+    background-size: 40px 40px;
+}
+
+
 /* #world #canvas #side-buttons .big-button:not(.disabled):hover, */
 #world #canvas #side-buttons .big-button:not(.disabled).hovered {
     min-width: 280px;
@@ -4872,6 +4985,14 @@ display: block;
     cursor: not-allowed;
     text-decoration: line-through;
     filter: saturate(0.5) brightness(0.5);
+}
+#world #canvas #side-buttons .button.disabled.inner-strike,
+#world #canvas #side-buttons .button.disabled.inner-strike .no-strike {
+    text-decoration: none;
+}
+#world #canvas #side-buttons .button.disabled.inner-strike sup:not(.no-strike),
+#world #canvas #side-buttons .button.disabled.inner-strike sub:not(.no-strike) {
+    text-decoration: line-through;
 }
 
 /* define an glowing outline to show this button has been focused by the user */
