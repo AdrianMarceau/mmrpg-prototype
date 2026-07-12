@@ -253,13 +253,28 @@ function initMenuRobotsOverview($thisWorld, $robotsOverview){
     goToStoragePage = robotsOverviewAPI.goToStoragePage;
     sortStoragePage = robotsOverviewAPI.sortStoragePage;
     refreshStoragePage = robotsOverviewAPI.refreshStoragePage;
-    refreshRobotBackups = robotsOverviewAPI.refreshRobotBackups;
+    //refreshRobotRefs = robotsOverviewAPI.refreshRobotRefs;
+    //refreshRobotBackups = robotsOverviewAPI.refreshRobotBackups;
     refreshRobotsDiv = robotsOverviewAPI.refreshRobotsDiv;
     refreshItemsDiv = robotsOverviewAPI.refreshItemsDiv;
     refreshAbilitiesDiv = robotsOverviewAPI.refreshAbilitiesDiv;
     filterAbilitiesToSelected = robotsOverviewAPI.filterAbilitiesToSelected;
     refreshDetailsPanel = robotsOverviewAPI.refreshDetailsPanel;
     updateRobotImageFrame = robotsOverviewAPI.updateRobotImageFrame;
+
+    // Define a function for refreshing the object refs of the robots in the team and storage panels
+    let refreshRobotRefs = function(){
+        //console.log('%c' + '-> refreshRobotRefs() triggered', 'color: magenta;');
+        $robotsOnMap = $teamSprites.filter('.robot:not(.cursor)');
+        $teamRobotsInOverview = $('.team-robot[data-robot]', $teamRobotsDiv);
+        $storageRobotsInOverview = $('.team-robot[data-robot]', $storageRobotsDiv);
+        };
+    // Define a function for refreshing the backup clones of the robots in the team and storage panels
+    let refreshRobotBackups = function(refreshReferences){
+        //console.log('%c' + '-> refreshRobotBackups() triggered', 'color: magenta;');
+        $teamRobotsInOverviewBackup = $teamRobotsInOverview.clone(true).detach(); // save for later
+        $storageRobotsInOverviewBackup = $storageRobotsInOverview.clone(true).detach(); // save for later
+        };
 
     // Bind events to any sort buttons in the storage box divs
     $storageBoxDivs.delegate('.sort[data-sort]', 'click', function(e){
@@ -1659,6 +1674,7 @@ function initRobotsOverviewAPI($thisWorld, $robotsOverview){
     robotsOverviewAPI.goToStoragePage = goToStoragePage;
     robotsOverviewAPI.sortStoragePage = sortStoragePage;
     robotsOverviewAPI.refreshStoragePage = refreshStoragePage;
+    robotsOverviewAPI.refreshRobotRefs = refreshRobotRefs;
     robotsOverviewAPI.refreshRobotBackups = refreshRobotBackups;
     robotsOverviewAPI.refreshRobotsDiv = refreshRobotsDiv;
     robotsOverviewAPI.refreshItemsDiv = refreshItemsDiv;

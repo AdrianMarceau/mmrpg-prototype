@@ -53,6 +53,8 @@ gameSettings.worldConfig = {
     mapButtonsIndex: {},
     mapSwitchSymbols: {},
     mapSwitchesIndex: {},
+    mapGateSymbols: {},
+    mapGatesIndex: {},
     mapBlockSymbols: {},
     mapBlocksIndex: {},
     mapHazardSymbols: {},
@@ -129,6 +131,7 @@ gameSettings.worldState = {
     abilities: {},
     buttons: {},
     switches: {},
+    gates: {},
     blocks: {},
     hazards: {},
     symbols: {},
@@ -1018,6 +1021,7 @@ class mmrpgWorldMap {
         exclude.portals = typeof exclude.portals === 'boolean' ? exclude.portals : true;
         exclude.buttons = typeof exclude.buttons === 'boolean' ? exclude.buttons : true;
         exclude.switches = typeof exclude.switches === 'boolean' ? exclude.switches : true;
+        exclude.gates = typeof exclude.gates === 'boolean' ? exclude.gates : true;
         exclude.blocks = typeof exclude.blocks === 'boolean' ? exclude.blocks : true;
         exclude.hazards = typeof exclude.hazards === 'boolean' ? exclude.hazards : true;
         exclude.battles = typeof exclude.battles === 'boolean' ? exclude.battles : true;
@@ -1059,10 +1063,11 @@ class mmrpgWorldMap {
         let battleSymbols = _config.mapBattleSymbols;
         let rivalSymbols = _config.mapRivalSymbols;
         let portalSymbols = _config.mapPortalSymbols;
-        let blockSymbols = _config.mapBlockSymbols;
-        let hazardSymbols = _config.mapHazardSymbols;
         let buttonSymbols = _config.mapButtonSymbols;
         let switchSymbols = _config.mapSwitchSymbols;
+        let gateSymbols = _config.mapGateSymbols;
+        let blockSymbols = _config.mapBlockSymbols;
+        let hazardSymbols = _config.mapHazardSymbols;
         //console.log('---> portalsIndex =', portalsIndex);
         //console.log('---> battlesIndex =', battlesIndex);
         //console.log('---> battleSymbols =', battleSymbols);
@@ -1146,12 +1151,12 @@ class mmrpgWorldMap {
             }
 
         // If we are to exclude portals, make sure we remove those positions (only when locked though)
-        let battlePortalKeys = Object.keys(portalSymbols);
+        let worldPortalKeys = Object.keys(portalSymbols);
         if (exclude.portals && portalSymbols){
-            //console.log('---> checking portalSymbolKeys =', battlePortalKeys);
+            //console.log('---> checking portalSymbolKeys =', worldPortalKeys);
             walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
-                //console.log('---> checking tileKey:', tileKey, 'against portalSymbolKeys:', battlePortalKeys);
-                if (battlePortalKeys.includes(tileKey)){
+                //console.log('---> checking tileKey:', tileKey, 'against portalSymbolKeys:', worldPortalKeys);
+                if (worldPortalKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a portal, checking if locked...');
                     let portalInfo = portalsIndex[portalSymbols[tileKey]] || false;
                     //console.log('---> portalInfo =', portalInfo);
@@ -1168,12 +1173,12 @@ class mmrpgWorldMap {
             }
 
         // If we are to exclude buttons, make sure we remove those positions
-        let battleButtonKeys = Object.keys(buttonSymbols);
+        let worldButtonKeys = Object.keys(buttonSymbols);
         if (exclude.buttons && buttonSymbols){
-            //console.log('---> checking battleButtonKeys =', battleButtonKeys);
+            //console.log('---> checking worldButtonKeys =', worldButtonKeys);
             walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
-                //console.log('---> checking tileKey:', tileKey, 'against buttonSymbols:', battleButtonKeys);
-                if (battleButtonKeys.includes(tileKey)){
+                //console.log('---> checking tileKey:', tileKey, 'against buttonSymbols:', worldButtonKeys);
+                if (worldButtonKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a button, removing from walkableMapTiles');
                     return false; // remove this tile
                     } else {
@@ -1185,12 +1190,12 @@ class mmrpgWorldMap {
             }
 
         // If we are to exclude switches, make sure we remove those positions
-        let battleSwitchKeys = Object.keys(switchSymbols);
+        let worldSwitchKeys = Object.keys(switchSymbols);
         if (exclude.switches && switchSymbols){
-            //console.log('---> checking battleSwitchKeys =', battleSwitchKeys);
+            //console.log('---> checking worldSwitchKeys =', worldSwitchKeys);
             walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
-                //console.log('---> checking tileKey:', tileKey, 'against switchSymbols:', battleSwitchKeys);
-                if (battleSwitchKeys.includes(tileKey)){
+                //console.log('---> checking tileKey:', tileKey, 'against switchSymbols:', worldSwitchKeys);
+                if (worldSwitchKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a switch, removing from walkableMapTiles');
                     return false; // remove this tile
                     } else {
@@ -1201,13 +1206,30 @@ class mmrpgWorldMap {
             //console.log('---> walkableMapTiles (post-switches) =', walkableMapTiles);
             }
 
-        // If we are to exclude blocks, make sure we remove those positions
-        let battleBlockKeys = Object.keys(blockSymbols);
-        if (exclude.blocks && blockSymbols){
-            //console.log('---> checking battleBlockKeys =', battleBlockKeys);
+        // If we are to exclude gates, make sure we remove those positions
+        let worldGateKeys = Object.keys(gateSymbols);
+        if (exclude.gates && gateSymbols){
+            //console.log('---> checking worldGateKeys =', worldGateKeys);
             walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
-                //console.log('---> checking tileKey:', tileKey, 'against blockSymbols:', battleBlockKeys);
-                if (battleBlockKeys.includes(tileKey)){
+                //console.log('---> checking tileKey:', tileKey, 'against gateSymbols:', worldGateKeys);
+                if (worldGateKeys.includes(tileKey)){
+                    //console.log('---> tileKey:', tileKey, 'is a gate, removing from walkableMapTiles');
+                    return false; // remove this tile
+                    } else {
+                    //console.log('---> tileKey:', tileKey, 'is not a gate, keeping in walkableMapTiles');
+                    }
+                return true; // keep this tile
+                }));
+            //console.log('---> walkableMapTiles (post-gates) =', walkableMapTiles);
+            }
+
+        // If we are to exclude blocks, make sure we remove those positions
+        let worldBlockKeys = Object.keys(blockSymbols);
+        if (exclude.blocks && blockSymbols){
+            //console.log('---> checking worldBlockKeys =', worldBlockKeys);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                //console.log('---> checking tileKey:', tileKey, 'against blockSymbols:', worldBlockKeys);
+                if (worldBlockKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a block, removing from walkableMapTiles');
                     return false; // remove this tile
                     } else {
@@ -1219,12 +1241,12 @@ class mmrpgWorldMap {
             }
 
         // If we are to exclude hazards, make sure we remove those positions (only when not removed though)
-        let battleHazardKeys = Object.keys(hazardSymbols);
+        let worldHazardKeys = Object.keys(hazardSymbols);
         if (exclude.hazards && hazardSymbols){
-            //console.log('---> checking hazardSymbolKeys =', battleHazardKeys);
+            //console.log('---> checking hazardSymbolKeys =', worldHazardKeys);
             walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
-                //console.log('---> checking tileKey:', tileKey, 'against hazardSymbolKeys:', battleHazardKeys);
-                if (battleHazardKeys.includes(tileKey)){
+                //console.log('---> checking tileKey:', tileKey, 'against hazardSymbolKeys:', worldHazardKeys);
+                if (worldHazardKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a hazard, checking if locked...');
                     let hazardInfo = hazardsIndex[hazardSymbols[tileKey]] || false;
                     //console.log('---> hazardInfo =', hazardInfo);
@@ -2599,6 +2621,7 @@ class mmrpgWorldMap {
         let _worldPlayer = _world.player;
         let _worldButtons = _world.buttons;
         let _worldSwitches = _world.switches;
+        let _worldGates = _world.gates;
         let _worldItems = _world.items;
         let _worldAbilities = _world.abilities;
         let _worldSymbols = _world.symbols;
@@ -2617,6 +2640,7 @@ class mmrpgWorldMap {
         let lastPlayerDirection = _worldPlayer.direction;
         let lastWorldButtons = {}; lastWorldButtons[lastPlayerWorldMap] = _worldButtons;
         let lastWorldSwitches = {}; lastWorldSwitches[lastPlayerWorldMap] = _worldSwitches;
+        let lastWorldGates = {}; lastWorldGates[lastPlayerWorldMap] = _worldGates;
         let lastWorldItems = {}; lastWorldItems[lastPlayerWorldMap] = _worldItems;
         let lastWorldAbilities = {}; lastWorldAbilities[lastPlayerWorldMap] = _worldAbilities;
         let lastWorldSymbols = {}; lastWorldSymbols[lastPlayerWorldMap] = _worldSymbols;
@@ -2635,6 +2659,7 @@ class mmrpgWorldMap {
             lastPlayerDirection,
             lastWorldButtons,
             lastWorldSwitches,
+            lastWorldGates,
             lastWorldItems,
             lastWorldAbilities,
             lastWorldSymbols,
@@ -4133,6 +4158,17 @@ class mmrpgWorldMap {
     // Define a quick reusable method for cloning object data via JSON serialization
     getClonedObject(obj){
         return JSON.parse(JSON.stringify(obj));
+        }
+
+    // Quick function for grabbing a cache object with a specific name (or creating one if not exists)
+    getCachedObject(name){
+        let _self = this;
+        let _cache = _self.cache;
+        if (typeof _cache === 'undefined'){ _cache = {}; _self.cache = _cache;  }
+        if (typeof name === 'undefined'){ return _cache; }
+        let thisCache = _cache[name];
+        if (typeof thisCache === 'undefined'){ thisCache = {}; _cache[name] = thisCache;  }
+        return thisCache;
         }
 
 }

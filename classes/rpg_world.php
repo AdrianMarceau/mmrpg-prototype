@@ -117,6 +117,7 @@ class rpg_world {
         if (!isset($WORLD_SESSION['world_maps'])){ $WORLD_SESSION['world_maps'] = array(); }
         if (!isset($WORLD_SESSION['world_buttons'])){ $WORLD_SESSION['world_buttons'] = array(); }
         if (!isset($WORLD_SESSION['world_switches'])){ $WORLD_SESSION['world_switches'] = array(); }
+        if (!isset($WORLD_SESSION['world_gates'])){ $WORLD_SESSION['world_gates'] = array(); }
         if (!isset($WORLD_SESSION['world_blocks'])){ $WORLD_SESSION['world_blocks'] = array(); }
         if (!isset($WORLD_SESSION['world_hazards'])){ $WORLD_SESSION['world_hazards'] = array(); }
         if (!isset($WORLD_SESSION['world_items'])){ $WORLD_SESSION['world_items'] = array(); }
@@ -197,6 +198,7 @@ class rpg_world {
             'world_pickups',
             'world_buttons',
             'world_switches',
+            'world_gates',
             'world_blocks',
             'world_hazards',
             );
@@ -545,6 +547,16 @@ class rpg_world {
                     $worldSwitchStates[$map_token] = array_merge($worldSwitchStates[$map_token], $switch_states);
                 }
             }
+            // If world gate states were provided, save them to the session
+            if (!empty($worldData['lastWorldGates'])){
+                if (!isset($WORLD_SESSION['world_gates'])){ $WORLD_SESSION['world_gates'] = array(); }
+                $worldGateStates = &$WORLD_SESSION['world_gates'];
+                foreach ($worldData['lastWorldGates'] AS $map_token => $gate_states){
+                    if (!in_array($map_token, $allowed_world_map_tokens)){ continue; }
+                    if (!isset($worldGateStates[$map_token])){ $worldGateStates[$map_token] = array(); }
+                    $worldGateStates[$map_token] = array_merge($worldGateStates[$map_token], $gate_states);
+                }
+            }
             // If world block states were provided, save them to the session
             if (!empty($worldData['lastWorldBlocks'])){
                 if (!isset($WORLD_SESSION['world_blocks'])){ $WORLD_SESSION['world_blocks'] = array(); }
@@ -567,7 +579,8 @@ class rpg_world {
             }
             // If world symbol position changes were provided, save them to the session
             if (!empty($worldData['lastWorldSymbols'])){
-                $allowed_world_symbol_kinds = array('items', 'abilities', 'encounters', 'pickups', 'blocks', 'hazards'); // for the moment, 'buttons' and 'switches' cannot be moved
+                // for the moment, 'buttons', 'switches', etc. cannot be moved, only specific things allowed
+                $allowed_world_symbol_kinds = array('items', 'abilities', 'encounters', 'pickups', 'hazards');
                 if (!isset($WORLD_SESSION['world_symbols'])){ $WORLD_SESSION['world_symbols'] = array(); }
                 $worldSymbolStates = &$WORLD_SESSION['world_symbols'];
                 foreach ($worldData['lastWorldSymbols'] AS $map_token => $symbol_kinds){
@@ -775,6 +788,7 @@ class rpg_world {
         $map_data_vars['portals'] = isset($map_data_vars['portals']) ? $map_data_vars['portals'] : array();
         $map_data_vars['buttons'] = isset($map_data_vars['buttons']) ? $map_data_vars['buttons'] : array();
         $map_data_vars['switches'] = isset($map_data_vars['switches']) ? $map_data_vars['switches'] : array();
+        $map_data_vars['gates'] = isset($map_data_vars['gates']) ? $map_data_vars['gates'] : array();
         $map_data_vars['blocks'] = isset($map_data_vars['blocks']) ? $map_data_vars['blocks'] : array();
         $map_data_vars['hazards'] = isset($map_data_vars['hazards']) ? $map_data_vars['hazards'] : array();
         $map_data_vars['field'] = isset($map_data_vars['field']) ? $map_data_vars['field'] : '';
@@ -806,6 +820,7 @@ class rpg_world {
         $map_data_vars['portals'] = $map_custval_parser('portals', $map_data_vars['portals']);
         $map_data_vars['buttons'] = $map_custval_parser('buttons', $map_data_vars['buttons']);
         $map_data_vars['switches'] = $map_custval_parser('switches', $map_data_vars['switches']);
+        $map_data_vars['gates'] = $map_custval_parser('gates', $map_data_vars['gates']);
         $map_data_vars['blocks'] = $map_custval_parser('blocks', $map_data_vars['blocks']);
         $map_data_vars['hazards'] = $map_custval_parser('hazards', $map_data_vars['hazards']);
         $map_data_vars['terrain'] = $map_custval_parser('terrain', $map_data_vars['terrain']);
@@ -841,6 +856,7 @@ class rpg_world {
         $map_data_parsed['portals'] = $map_data_vars['portals']; unset($map_data_vars['portals']);
         $map_data_parsed['buttons'] = $map_data_vars['buttons']; unset($map_data_vars['buttons']);
         $map_data_parsed['switches'] = $map_data_vars['switches']; unset($map_data_vars['switches']);
+        $map_data_parsed['gates'] = $map_data_vars['gates']; unset($map_data_vars['gates']);
         $map_data_parsed['blocks'] = $map_data_vars['blocks']; unset($map_data_vars['blocks']);
         $map_data_parsed['hazards'] = $map_data_vars['hazards']; unset($map_data_vars['hazards']);
         $map_data_parsed['field'] = $map_data_vars['field']; unset($map_data_vars['field']);
@@ -1177,11 +1193,21 @@ class rpg_world {
                 unset($available_cells[$pos]);
             }
         }
+        // Now let's loop through gates and remove spaces that have active gates on them
+        if (!empty($map_data['gates']) && is_array($map_data['gates'])){
+            foreach ($map_data['gates'] AS $gate_name => $gate_data){
+                if (empty($gate_data) || !is_array($gate_data)){ continue; }
+                if (in_array('removed', $gate_data)){ continue; } // don't exclude if it was removed
+                $pos = $gate_data[0];
+                //error_log('-> removing gate position "'.$pos.'" from available cells');
+                unset($available_cells[$pos]);
+            }
+        }
         // Now let's loop through blocks and remove spaces that have active blocks on them
         if (!empty($map_data['blocks']) && is_array($map_data['blocks'])){
             foreach ($map_data['blocks'] AS $block_name => $block_data){
                 if (empty($block_data) || !is_array($block_data)){ continue; }
-                if (in_array('removed', $block_data)){ continue; } // don't block if it was removed
+                if (in_array('removed', $block_data)){ continue; } // don't exclude if it was removed
                 $pos = $block_data[0];
                 //error_log('-> removing block position "'.$pos.'" from available cells');
                 unset($available_cells[$pos]);
@@ -2950,6 +2976,111 @@ class rpg_world {
         return implode(PHP_EOL, $switches_markup);
     }
 
+    // Define a function that returns the GATES INDEX with details for usage on the world map
+    public static function get_static_gates_index(){
+        $mmrpg_gates_index = array(
+            'boss-door' => array(
+                'name' => 'Boss Door',
+                'type' => 'none',
+                'wants' => '',
+                'method' => '',
+                ),
+            'star-gate' => array(
+                'name' => 'Star Gate',
+                'type' => 'space',
+                'wants' => 'stars',
+                'method' => 'show'
+                ),
+            'portal-flower' => array(
+                'name' => 'Portal Flower',
+                'type' => 'empty',
+                'wants' => 'cores',
+                'method' => 'give'
+                ),
+            );
+        return $mmrpg_gates_index;
+    }
+
+    // Define a function for getting the GATES LAYER sprite markup for the world map
+    public static function get_gates_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_gates_layer_markup() called!');
+        // GATES LAYER
+        $WORLD_SESSION = self::get_session();
+        $world_gates = !empty($WORLD_SESSION['world_gates']) ? $WORLD_SESSION['world_gates'] : array();
+        $map_config = $map_data_parsed['config'];
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_tilesize_offset = $map_config['tilesize_offset'];
+        $this_player_token = $this_prototype_data['this_player_token'];
+        $this_is_cursor = $this_player_token === 'player' ? true : false;
+        $mmrpg_index_gates = self::get_index('gates');
+        $gates_markup = array();
+        $gate_symbols = array();
+        $gates_index = array();
+        if (!empty($map_data_parsed['gates'])){
+            $gate_sprites = $map_data_parsed['gates'];
+            $world_map_gates = !empty($world_gates[$world_map_token]) ? $world_gates[$world_map_token] : array();
+            foreach ($gate_sprites AS $gate_namekey => $gate_data){
+                if (empty($gate_data) || !is_array($gate_data) || count($gate_data) < 2){ continue; }
+                $hidden = in_array('hidden', $gate_data) ? true : false; if ($hidden){ unset($gate_data[array_search('hidden', $gate_data)]); }
+                $locked = in_array('locked', $gate_data) ? true : false; if ($locked){ unset($gate_data[array_search('locked', $gate_data)]); }
+                $removed = in_array('removed', $gate_data) ? true : false; if ($removed){ unset($gate_data[array_search('removed', $gate_data)]); }
+                if (!empty($world_map_gates[$gate_namekey])){ $removed = true; }
+                if ($removed){ continue; }
+                $pos = $gate_data[0]; list($col, $row) = explode('-', $pos); unset($gate_data[0]);
+                $sprite = !empty($gate_data[1]) ? $gate_data[1] : ''; unset($gate_data[1]);
+                $image = !empty($gate_data[2]) ? $gate_data[2] : ''; unset($gate_data[2]);
+                $price = !empty($gate_data[3]) ? $gate_data[3] : ''; unset($gate_data[3]);
+                if (empty($pos) || empty($sprite)){ continue; }
+                if (empty($image) && $sprite === 'boss-door'){ $image = 'vertical'; }
+                if (empty($image) && $sprite === 'star-gate'){ $image = 'vertical'; }
+                if (empty($image) && $sprite === 'flower-portal'){ $image = 'closed'; }
+                $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                $z_index = $top + 1;
+                $data = array_values($gate_data);
+                $info = !empty($mmrpg_index_gates[$sprite]) ? $mmrpg_index_gates[$sprite] : array();
+                $type = !empty($info['type']) ? $info['type'] : '';
+                $wants = !empty($info['wants']) ? $info['wants'] : '';
+                $method = !empty($info['method']) ? $info['method'] : '';
+                $price = !empty($price) ? intval(trim($price, 'x')) : 0;
+                $colour = !empty($type) ? $type : 'none';
+                $base_classes = 'sprite tile gate';
+                $kind_classes = $sprite.($image ? ' '.$image : '');
+                $inner_sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
+                $attrs = 'data-gate="'.$gate_namekey.'" data-type="'.$type.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
+                $classes = $base_classes.($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $gates_markup[] = '<span data-sprite="gate" class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$inner_sprite.'</span>';
+                $gate_symbols[$pos] = $gate_namekey;
+                $gates_index[$gate_namekey] = array(
+                    'pos' => $pos,
+                    'sprite' => $sprite,
+                    'image' => $image,
+                    'colour' => $colour,
+                    'col' => $col,
+                    'row' => $row,
+                    'hidden' => $hidden,
+                    'locked' => $locked,
+                    'removed' => $removed,
+                    'data' => $data,
+                    'type' => $type,
+                    'wants' => $wants,
+                    'method' => $method,
+                    'price' => $price,
+                    );
+            }
+        }
+        $gate_symbols_json = json_encode($gate_symbols, JSON_NUMERIC_CHECK);
+        $gates_index_json = json_encode($gates_index, JSON_NUMERIC_CHECK);
+        $gates_markup[] = '<script data-json="gateSymbols" type="application/json">'.$gate_symbols_json.'</script>';
+        $gates_markup[] = '<script data-json="gatesIndex" type="application/json">'.$gates_index_json.'</script>';
+        return implode(PHP_EOL, $gates_markup);
+    }
+
     // Define a function that returns the BLOCKS INDEX with details for usage on the world map
     public static function get_static_blocks_index(){
         $mmrpg_blocks_index = array(
@@ -2975,7 +3106,17 @@ class rpg_world {
                 ),
             'barrier-block' => array(
                 'name' => 'Barrier Block',
-                'type' => '',
+                'type' => 'none',
+                'weaknesses' => array()
+                ),
+            'boss-block' => array(
+                'name' => 'Boss Block',
+                'type' => 'none',
+                'weaknesses' => array()
+                ),
+            'star-block' => array(
+                'name' => 'Star Block',
+                'type' => 'space',
                 'weaknesses' => array()
                 ),
             );
@@ -3014,8 +3155,10 @@ class rpg_world {
                 $pos = $block_data[0]; list($col, $row) = explode('-', $pos); unset($block_data[0]);
                 $sprite = !empty($block_data[1]) ? $block_data[1] : 'super-block'; unset($block_data[1]);
                 $image = !empty($block_data[2]) ? $block_data[2] : ''; unset($block_data[2]);
+                $extra = !empty($block_data[3]) ? $block_data[3] : ''; unset($block_data[3]);
                 if (empty($image) && $sprite === 'super-block'){ $image = $map_data_parsed['field']; }
                 if (empty($image) && $sprite === 'barrier-block'){ $image = 'black-vert'; }
+                if (empty($extra) && $sprite === 'star-block'){ $extra = 'x1'; }
                 $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
                 $z_index = $top + 1;
@@ -3025,11 +3168,12 @@ class rpg_world {
                 $weaknesses = !empty($info['weaknesses']) ? $info['weaknesses'] : array();
                 $colour = !empty($type) ? $type : 'none';
                 $base_classes = 'sprite tile block';
-                $kind_classes = $sprite.($image ? ' '.$image : '');
-                $inner_sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
+                $kind_classes = $sprite.($image ? ' '.$image : '').($extra ? ' '.$extra : '');
+                $inner_sprite = '<span class="'.$base_classes.' '.$kind_classes.'"'.($extra ? ' data-extra="'.trim($extra, 'x').'"' : '').'></span>';
                 $attrs = 'data-block="'.$block_namekey.'" data-type="'.$type.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
-                $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
+                $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
                 $classes = $base_classes.($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                if ($sprite === 'boss-block' || $sprite === 'star-block'){ $styles .= ' animation-delay: '.(-1 * (mt_rand(1, 10) / 10)).'s;'; }
                 $blocks_markup[] = '<span data-sprite="block" class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$inner_sprite.'</span>';
                 $block_symbols[$pos] = $block_namekey;
                 $blocks_index[$block_namekey] = array(
@@ -3753,6 +3897,9 @@ class rpg_world {
         // If there are any switches defined, check to see if any of them have been interacted with already
         self::refresh_map_switches($this_prototype_data, $map_data_parsed);
 
+        // If there are any gates defined, check to see if any of them have been interacted with already
+        self::refresh_map_gates($this_prototype_data, $map_data_parsed);
+
         // If there are any blocks defined, check to see if any of them have been interacted with already
         self::refresh_map_blocks($this_prototype_data, $map_data_parsed);
 
@@ -4097,6 +4244,24 @@ class rpg_world {
 
             // ...
         }
+
+        // Return true on success
+        return true;
+    }
+
+    // If there are any gates defined, check to see if any of them have been interacted with already
+    public static function refresh_map_gates($this_prototype_data, &$map_data_parsed){
+        //error_log('rpg_world::refresh_map_gates() called!');
+        if (empty($map_data_parsed['gates'])){ return; }
+        $game_session_token = rpg_game::session_token();
+        $world_session_token = self::session_token();
+        $GAME_SESSION = &$_SESSION[$game_session_token];
+        $WORLD_SESSION = &$_SESSION[$world_session_token];
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+
+        // TODO: implement gate refresh functionality
 
         // Return true on success
         return true;

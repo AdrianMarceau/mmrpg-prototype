@@ -126,6 +126,7 @@ $mmrpg_index_robots = rpg_robot::get_index(true);
 $mmrpg_index_abilities = rpg_ability::get_index(true);
 $mmrpg_index_items = rpg_item::get_index(true);
 $mmrpg_index_stars = rpg_world::get_stars_index();
+$mmrpg_index_gates = rpg_world::get_static_gates_index();
 $mmrpg_index_blocks = rpg_world::get_static_blocks_index();
 $mmrpg_index_hazards = rpg_world::get_static_hazards_index();
 $mmrpg_indexes = array(
@@ -136,6 +137,7 @@ $mmrpg_indexes = array(
     'abilities' => &$mmrpg_index_abilities,
     'items' => &$mmrpg_index_items,
     'stars' => &$mmrpg_index_stars,
+    'gates' => &$mmrpg_index_gates,
     'blocks' => &$mmrpg_index_blocks,
     'hazards' => &$mmrpg_index_hazards,
     );
@@ -457,6 +459,7 @@ if (!isset($WORLD_SESSION['world_maps'][$world_map_token])){ $WORLD_SESSION['wor
 if (!isset($WORLD_SESSION['world_events'][$world_map_token])){ $WORLD_SESSION['world_events'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_buttons'][$world_map_token])){ $WORLD_SESSION['world_buttons'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_switches'][$world_map_token])){ $WORLD_SESSION['world_switches'][$world_map_token] = array(); }
+if (!isset($WORLD_SESSION['world_gates'][$world_map_token])){ $WORLD_SESSION['world_gates'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_blocks'][$world_map_token])){ $WORLD_SESSION['world_blocks'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_hazards'][$world_map_token])){ $WORLD_SESSION['world_hazards'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_items'][$world_map_token])){ $WORLD_SESSION['world_items'][$world_map_token] = array(); }
@@ -559,6 +562,15 @@ $world_map_abilities = !empty($world_abilities[$world_map_token]) ? $world_abili
 if ($reset_abilities === true){
     //error_log('clearing claimed abilities!');
     rpg_world::update_session('world_abilities', $world_map_token, array());  // clear all "claimed" datestamps
+}
+
+// If requested to do so, make sure we reset the world gates
+$reset_gates = !empty($_GET['reset']) && $_GET['reset'] === 'gates' ? true : false;
+$world_gates = !empty($WORLD_SESSION['world_gates']) ? $WORLD_SESSION['world_gates'] : array();
+$world_map_gates = !empty($world_gates[$world_map_token]) ? $world_gates[$world_map_token] : array();
+if ($reset_gates === true){
+    //error_log('clearing removed gates!');
+    rpg_world::update_session('world_gates', $world_map_token, array());  // clear all "removed" datestamps
 }
 
 // Calculate remaining encounters for this area for later reference
@@ -698,6 +710,9 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
                     // SWITCH TILE SPRITES
                     $switches_layer_markup = rpg_world::get_switches_layer_markup($this_prototype_data, $map_data_parsed);
                     echo($switches_layer_markup);
+                    // GATE TILE SPRITES
+                    $gates_layer_markup = rpg_world::get_gates_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($gates_layer_markup);
                     // BLOCK TILE SPRITES
                     $blocks_layer_markup = rpg_world::get_blocks_layer_markup($this_prototype_data, $map_data_parsed);
                     echo($blocks_layer_markup);

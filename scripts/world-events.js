@@ -437,7 +437,7 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
                 //console.log('-> eventInfo: ', eventInfo);
                 //console.log('-> eventsIndex: ', eventsIndex);
                 if (eventInfo.removed){ continue; }
-                if (!isSamePosition && !isFacingPosition){ continue; }
+                //if (!isSamePosition && !isFacingPosition){ continue; }
                 // collect the sprite as the second "kind"
                 eventKind2 = eventInfo.sprite;
                 }
@@ -479,10 +479,11 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
             let eventIsSanctuary = eventKind2 === 'sanctuary';
             let eventIsPickup = eventKind === 'item' || eventKind === 'ability';
             let eventIsStar = eventKind === 'item' && eventInfo.token.indexOf('-star') !== -1;
+            let eventIsGate = eventKind === 'gate';
             //console.log('--> eventIsCustom =', eventIsCustom, '| eventIsPortal =', eventIsPortal, '| eventIsSanctuary =', eventIsSanctuary, '| eventIsPickup =', eventIsPickup, '| eventIsStar =', eventIsStar);
             if (eventPosition !== searchPosition
                 && (eventIsCustom || eventIsPortal || eventIsSanctuary || eventIsPickup)
-                && !eventIsStar){
+                && !eventIsStar ){
                 // skip custom unless it's the exact position
                 //console.log('----> skipping ' + eventKind + ' at ' + eventPosition + ' (' + eventToken + ') because it is not the exact position', '\n-> eventInfo =', eventInfo);
                 continue;
@@ -871,7 +872,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
     //console.log('-> firstEventType =', firstEventType);
 
     // Sort the events at this position by priority with sanctuaries > portals > hazard > battles > everything-else
-    let eventsPriority = ['sanctuary', 'portal', 'hazard', 'battle', 'item', 'ability', 'button', 'switch', 'block'];
+    let eventsPriority = ['sanctuary', 'portal', 'hazard', 'battle', 'item', 'ability', 'button', 'switch', 'gate', 'block'];
     eventsAtPosition = eventsAtPosition.sort(function(a, b){
         let aKind = a.kind2 === 'sanctuary' ? 'sanctuary' : a.kind;
         let bKind = b.kind2 === 'sanctuary' ? 'sanctuary' : b.kind;
@@ -909,16 +910,27 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         standingOnHazardEvent = true;
         }
 
+    // Backup any gate data found in the event list in case we need to check for it later
+    let gatesNearPosition = [];
+    for (let key = 0; key < eventsAtPosition.length; key++){
+        let eventAtPosition = eventsAtPosition[key];
+        //console.log('eventsAtPosition[', key, '] =', eventAtPosition);
+        if (eventAtPosition.kind !== 'gate'){ continue; }
+        let eventBackup = _self.getClonedObject(eventsAtPosition[key]);
+        eventBackup.key = key;
+        gatesNearPosition.push(eventBackup);
+        }
+    //console.log('gatesNearPosition =', gatesNearPosition);
+
     // Backup any star data found in the event list in case we need to check for it later
     let starsNearPosition = [];
     for (let key = 0; key < eventsAtPosition.length; key++){
         let eventAtPosition = eventsAtPosition[key];
         //console.log('eventsAtPosition[', key, '] =', eventAtPosition);
-        if (eventAtPosition.token.indexOf('-star') !== -1){
-            let eventBackup = _self.getClonedObject(eventsAtPosition[key]);
-            eventBackup.key = key;
-            starsNearPosition.push(eventBackup);
-            }
+        if (eventAtPosition.token.indexOf('-star') === -1){ continue; }
+        let eventBackup = _self.getClonedObject(eventsAtPosition[key]);
+        eventBackup.key = key;
+        starsNearPosition.push(eventBackup);
         }
     //console.log('starsNearPosition =', starsNearPosition);
 
@@ -1162,6 +1174,96 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
             showActionAreaType = 'switch';
             zoomTimeoutDuration = 500; // if we show a switch dropdown, we want to zoom in quickly
+            }
+        }
+    else if (firstEventType === 'gate'){
+        //console.log('-> event at position is a gate, preparing either popup or removal');
+        let eventInfo = firstEvent;
+        let eventPosition = eventInfo.position;
+        let $eventSprite = $(eventInfo.sprite);
+        let isSamePosition = eventPosition === standingAtPosition;
+        let isFacingPosition = eventPosition === lookingAtPosition;
+        let dataLabel = $eventSprite.attr('data-label');
+        let dataGate = $eventSprite.attr('data-gate');
+        let dataType = $eventSprite.attr('data-type') || 'none';
+        let gateInfo = _config.mapGatesIndex[dataGate] || false;
+        let gateKind = eventInfo.kind;
+        let gateKind2 = eventInfo.kind2;
+        let gateType = gateInfo.type ? gateInfo.type : '';
+        let gatePrice = gateInfo.price ? gateInfo.price : 0;
+        //console.log('-> eventInfo =', eventInfo);
+        //console.log('-> dataLabel =', dataLabel);
+        //console.log('-> dataGate =', dataGate);
+        //console.log('-> dataType =', dataType);
+        //console.log('-> gateInfo =', gateInfo);
+        //console.log('-> gateKind =', gateKind);
+        //console.log('-> gateKind2 =', gateKind2);
+        //console.log('-> gateType =', gateType);
+        //console.log('-> gatePrice =', gatePrice);
+        if (dataGate && gateInfo && !playerIsCursor && (isSamePosition || isFacingPosition)){
+            //console.log('-> found gateInfo for ' + dataGate + ':', gateInfo);
+            //console.log('-> gateType:', gateType);
+            //console.log('-> gatePrice:', gatePrice);
+            showActionArea = true;
+            if (!standingOnHazardEvent){ showActionAreaAnyway = true; }
+            if (dataLabel){ actionAreaMarkup += '<strong class="label'+(dataType ? ' type '+dataType : '')+'"><span class="inner">' + dataLabel + '</span></strong>'; }
+            sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Open The</sup> ' + (gatePrice ? '&times; ' + gatePrice + ' ' : '') + toUpperCaseWords(gateKind2.replace('-', ' ')) + ' ?</span></strong>';
+            let gateCurrency = 'whatevers';
+            if (gateKind2 === 'boss-door'){ gateCurrency = 'none'; }
+            else if (gateKind2 === 'star-gate'){ gateCurrency = 'stars'; }
+            let playerHasNow = 0; // TODO: make this dynamically pull the core/star/whatever count
+            if (gateCurrency === 'none'){ playerHasNow = 0; }
+            else if (gateCurrency === 'stars'){ playerHasNow = Object.keys(_worldPlayer.stars).length; }
+            let playerHasEnough = playerHasNow >= gatePrice ? true : false;
+            let playerCountLabel = (playerHasNow + ' / ' + gatePrice) + ' ' + toUpperCaseWords(gateCurrency);
+            let currencySpriteMarkup;
+            if (gateCurrency === 'screws'){
+                currencySpriteMarkup = _self.getItemSpriteMarkup('hyper-screw', {dir: 'left', frame: '00'});
+                } else if (gateCurrency === 'cores'){
+                currencySpriteMarkup = _self.getItemSpriteMarkup('none-core', {dir: 'left', frame: '00'});
+                } else if (gateCurrency === 'stars'){
+                currencySpriteMarkup = _self.getItemSpriteMarkup('field-star', {dir: 'left', frame: '00'});
+                } else {
+                if (gateKind2 === 'boss-door'){ currencySpriteMarkup = '<span class="sprite" data-sprite="object" data-token="challenge-marker"><span class="wrap"><i class="sprite"></i></span></span>'; }
+                else { currencySpriteMarkup = ''; }
+                }
+            let openTheGateLabel = 'Open the ' + toUpperCaseWords(gateKind2.split('-')[1]);
+            if (playerHasEnough){
+                //console.log('-> player has enough whatevers! allow them to lower the gate now');
+                // ...
+                } else {
+                //console.log('-> player doesn\'t have enough whatevers! cannot remove the gate yet');
+                // ...
+                }
+            sideButtonsMarkup += '<a '
+                + ('class="button big-button inner-strike'
+                    + (gateKind2 ? ' '+gateKind2 : '')
+                    + (dataType ? ' type '+dataType : '')
+                    + (!playerHasEnough ? ' disabled' : '')
+                    + '"')
+                + (playerHasEnough ?
+                    ' data-action="open-gate"'
+                    + ' data-gate="'+dataGate+'"'
+                    : '')
+                + '>';
+                sideButtonsMarkup += '<span class="has-sprite' + (!gatePrice ? ' one-row' : '') + '">';
+                if (!gatePrice){
+                    sideButtonsMarkup += '<sub>' + openTheGateLabel + '</sub> ';
+                    sideButtonsMarkup += currencySpriteMarkup;
+                    } else if (playerHasEnough){
+                    sideButtonsMarkup += '<sub>' + openTheGateLabel + '</sub> ';
+                    sideButtonsMarkup += '<br /><sup class="no-strike">' + playerCountLabel + '</sup> ';
+                    sideButtonsMarkup += currencySpriteMarkup;
+                    } else {
+                    sideButtonsMarkup += '<sup>' + openTheGateLabel + '</sup> ';
+                    sideButtonsMarkup += '<br /><sub class="no-strike">' + playerCountLabel + '</sub> ';
+                    sideButtonsMarkup += currencySpriteMarkup;
+                    }
+                sideButtonsMarkup += '</span>';
+            sideButtonsMarkup += '</a>';
+            sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+            showActionAreaType = 'gate';
+            zoomTimeoutDuration = 300; // if we show a gate dropdown, we want to zoom in quickly
             }
         }
     else if (firstEventType === 'block'){
@@ -1514,12 +1616,12 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             if (dataBattles.length){ joinedDataAttrs += ' data-battle="'+dataBattlesJoined+'"'; }
             if (dataBattleStars.length){ joinedDataAttrs += ' data-battle-star="'+dataBattleStarsJoined+'"'; }
             actionAreaMarkup += dataLabelsJoined;
-            sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Ready To</sup> Start Battle ?</span></strong>';
+            sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Engage With</sup> Target' + (dataBattles.length > 1 ? 's' : '') + ' ?</span></strong>';
             if (playerActiveRobots >= 1){
-                //sideButtonsMarkup += '<a class="button big-button" data-action="start-battle" data-battle="'+dataBattlesJoined+'"><span><sup>Ready To</sup> Start Battle</span></a>';
-                sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span>Let\'s Go!</span></a>';
+                sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
+                //sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span>Start Battle!</span></a>';
                 } else {
-                sideButtonsMarkup += '<a class="button big-button disabled"' + joinedDataAttrs + '><span>Let\'s Go!</span></a>';
+                sideButtonsMarkup += '<a class="button big-button disabled"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
                 }
             sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
             //console.log('sideButtonsMarkup =', sideButtonsMarkup);
@@ -1967,14 +2069,15 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             let $button = $(this);
             let action = $button.attr('data-action') || false;
             if (!action){ console.error('-> no action found on button, skipping!'); return false; }
-            let isBattle = action.indexOf('battle') !== -1;
-            let isPortal = action.indexOf('portal') !== -1;
-            let isButton = action.indexOf('button') !== -1;
-            let isSwitch = action.indexOf('switch') !== -1;
-            let isItem = action.indexOf('item') !== -1;
-            let isAbility = action.indexOf('ability') !== -1;
-            let isBlock = action.indexOf('block') !== -1;
-            let isHazard = action.indexOf('hazard') !== -1;
+            let isBattle = action.indexOf('-battle') !== -1 || action.indexOf('battle-') !== -1;
+            let isPortal = action.indexOf('-portal') !== -1 || action.indexOf('portal-') !== -1;
+            let isButton = action.indexOf('-button') !== -1 || action.indexOf('button-') !== -1;
+            let isSwitch = action.indexOf('-switch') !== -1 || action.indexOf('switch-') !== -1;
+            let isGate = action.indexOf('-gate') !== -1 || action.indexOf('gate-') !== -1;
+            let isItem = action.indexOf('-item') !== -1 || action.indexOf('item-') !== -1;
+            let isAbility = action.indexOf('-ability') !== -1 || action.indexOf('ability-') !== -1;
+            let isBlock = action.indexOf('-block') !== -1 || action.indexOf('block-') !== -1;
+            let isHazard = action.indexOf('-hazard') !== -1 || action.indexOf('hazard-') !== -1;
             let isDismiss = action === 'dismiss';
             if (!isDismiss){ $button.addClass('clicked'); }
             if (isBattle){
@@ -2244,8 +2347,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                             if (typeof terrainTilesIndex[tileKey] === 'undefined'){ continue; }
                             let currentTerrain = tileData.sprite[1];
                             let currentTerrainBase = currentTerrain.split('-')[0];
-                            console.log('currentTerrain =', currentTerrain);
-                            console.log('currentTerrainBase =', currentTerrainBase);
+                            //console.log('currentTerrain =', currentTerrain);
+                            //console.log('currentTerrainBase =', currentTerrainBase);
                             //let targetTerrain = currentTerrainBase === terrainUp ? terrainDown : terrainUp;
                             let targetTerrain = currentTerrain;
                             if (currentTerrain === terrainUp || currentTerrainBase === terrainUp){ targetTerrain = terrainDown; }
@@ -2274,6 +2377,76 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         }
 
                     })(switchInfo, newState);
+                }
+            else if (isGate){
+                // TODO: action will always equal "open-gate" but we should verify
+                //console.log('-> gate-related action button clicked with action:', action);
+                //console.log('--> gatesNearPosition =', gatesNearPosition);
+                let gateSymbols = _config.mapGateSymbols;
+                let gatesIndex = _config.mapGatesIndex;
+                let gateRemovals = _world.gates;
+                let baseGateName = $button.attr('data-gate') || false;
+                let baseGateInfo = baseGateName && (gatesIndex && gatesIndex[baseGateName]) ? gatesIndex[baseGateName] : false;
+                //console.log('-> baseGateName =', baseGateName);
+                //console.log('-> baseGateInfo =', baseGateInfo);
+                if (!baseGateName || !baseGateInfo){ console.error('-> gate name or info not found, cannot remove gate!'); return false; }
+                let gatesToRemove = [];
+                gatesToRemove.push({
+                    name: baseGateName,
+                    info: baseGateInfo,
+                    $sprite: $(firstEvent.sprite),
+                    position: baseGateInfo.pos
+                    });
+                for (let i = 0; i < gatesNearPosition.length; i++){
+                    let adjGateInfo = gatesNearPosition[i];
+                    let adjGatePosition = adjGateInfo.position;
+                    let adjGateName = adjGatePosition && (gateSymbols && gateSymbols[adjGatePosition]) ? gateSymbols[adjGatePosition] : false;
+                    if (adjGateName === baseGateName){ continue; }
+                    //console.log('-> adjGateInfo =', adjGateInfo);
+                    //console.log('-> adjGatePosition =', adjGatePosition);
+                    //console.log('-> adjGateName =', adjGateName);
+                    if (adjGateName && adjGateInfo && adjGateInfo.kind2 === baseGateInfo.sprite){
+                        let $adjSprite = $('.sprite[data-gate="' + adjGateName + '"]', $canvasMap);
+                        gatesToRemove.push({
+                            name: adjGateName,
+                            info: adjGateInfo,
+                            $sprite: $adjSprite.length ? $adjSprite : null,
+                            position: adjGateInfo.position
+                            });
+                        }
+                    }
+                //console.log('-> gatesToRemove =', gatesToRemove.length, gatesToRemove);
+                dismissDropdown(false);
+                let $allSprites = $();
+                for (let i = 0; i < gatesToRemove.length; i++) {
+                    let gName = gatesToRemove[i].name;
+                    let gInfo = gatesToRemove[i].info;
+                    let $sprite = gatesToRemove[i].$sprite;
+                    let gPosition = gatesToRemove[i].position;
+                    gInfo.removed = true;
+                    delete gateSymbols[gPosition];
+                    gatesIndex[gName] = gInfo;
+                    gateRemovals[gName] = new Date().getTime();
+                    if ($sprite) {
+                        $sprite.attr('data-state', 'removed');
+                        $sprite.removeClass('animate');
+                        $allSprites = $allSprites.add($sprite);
+                        }
+                    }
+                $canvasMap.addClass('shake-once');
+                _self.playSoundEffect('gate-destroyed-sound', {delay: 100});
+                $allSprites.css({transition:'none'});
+                let animateInSteps = 4;
+                $({stepTracker: 0}).animate({stepTracker: animateInSteps}, {duration: 400, easing: "linear", step: function(now){
+                    let currentStep = Math.floor(now), progressFactor = currentStep / animateInSteps;
+                    $allSprites.css({opacity: 1 - progressFactor, filter: 'brightness(' + (1 + progressFactor) + ')'});
+                    }}).promise().done(function(){
+                    $allSprites.remove();
+                    $canvasMap.removeClass('shake-once');
+                    _self.calculateWalkableMapTiles(true);
+                    _self.refreshMapPositionEvents();
+                    });
+                _self.saveWorldState();
                 }
             else if (isItem){
                 //console.log('-> item button clicked with action:', action);
