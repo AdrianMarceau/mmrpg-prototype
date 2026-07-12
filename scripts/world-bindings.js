@@ -268,10 +268,10 @@ function bindEventsToInputs($thisWorld){
         let worldMapIsHidden = _self.worldMapIsHidden();
         let sideButtonsActive = $sideButtons.is('.active') ? true : false;
         let playerSwitcherFocused = $playerSwitcher.is('.focused') ? true : false;
-        let robotsOverviewIsExpanded = $robotsOverview.is('.expanded') ? true : false;
-        let currentRobotsOverviewPanel = robotsOverviewIsExpanded ? $robotsOverview.attr('data-view') : false;
-        let calculateRobotsOverviewStorage = robotsOverviewAPI.calculateStorage;
-        let refreshRobotsOverviewDetailsPanel = robotsOverviewAPI.refreshDetailsPanel;
+        let robotsOverviewIsExpanded = $robotsOverview && $robotsOverview.length && $robotsOverview.is('.expanded') ? true : false;
+        let currentRobotsOverviewPanel = $robotsOverview && $robotsOverview.length && robotsOverviewIsExpanded ? $robotsOverview.attr('data-view') : false;
+        let calculateRobotsOverviewStorage = robotsOverviewAPI && typeof robotsOverviewAPI.calculateStorage !== 'undefined' ? robotsOverviewAPI.calculateStorage : function(){ return null; };
+        let refreshRobotsOverviewDetailsPanel = robotsOverviewAPI && typeof robotsOverviewAPI.refreshDetailsPanel !== 'undefined' ?  robotsOverviewAPI.refreshDetailsPanel : function(){ return null; };
         //console.log('-> robotsOverviewIsExpanded =', robotsOverviewIsExpanded, '\n-> currentRobotsOverviewPanel =', currentRobotsOverviewPanel);
         // Define some quick actions that we may need to re-use a few times over
         let confirmSideButtonAction = function(){
@@ -1141,6 +1141,7 @@ function bindEventsToInputs($thisWorld){
                 //console.log('_worldCursor.position = ' + _worldCursor.position);
                 //console.log('_worldCursor.direction = ' + _worldCursor.direction);
                 if (event){ event.preventDefault(); }
+                if (sideButtonsActive){ dismissSideButtonAction(); }
                 let oldPos = _worldCursor.position, curPos = oldPos;
                 let thisPos = oldPos.split('-');
                 let thisCol = parseInt(thisPos[0]);
