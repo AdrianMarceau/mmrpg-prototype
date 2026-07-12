@@ -125,6 +125,7 @@
             "master-destroyed-sound": "dead_mmi-gb",
             "mecha-destroyed-sound": "dead_mmv-gb",
             "boss-destroyed-sound": "dead_mmii-gb",
+            "gate-destroyed-sound": "shutter_mmv-gb",
             "block-destroyed-sound": "dark-moon-stomp_mmv-gb",
             "hazard-destroyed-sound": "dark-moon-stomp_mmv-gb",
             "super-boss-destroyed-sound": "biggest-boom_mmv-gb",
