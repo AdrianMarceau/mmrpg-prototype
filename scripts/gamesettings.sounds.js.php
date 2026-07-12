@@ -29,7 +29,8 @@ if (!$force_refresh
     //error_log(basename(__FILE__).' is pulling sound effects index from cache !');
     $this_sound_effects_index = json_decode(file_get_contents($cached_files_dir.$cached_sound_effects_index));
 }
-if ($cached_files_enabled
+if (!$force_refresh
+    && $cached_files_enabled
     && file_exists($cached_files_dir.$cached_sound_effects_aliases_index)
     && date('Ymd', filemtime($cached_files_dir.$cached_sound_effects_aliases_index)) >= $cached_date_cutoff){
     //error_log(basename(__FILE__).' is pulling sound effects aliases index from cache !');
@@ -76,6 +77,7 @@ echo 'gameSettings.customIndex.soundsIndex = '.json_encode($this_sound_effects_i
 
 // Collect the sound effect aliases index from teh file and then outpyt to the JS
 if (empty($sound_effects_aliases_index)){
+    //error_log(basename(__FILE__).' is generated sound effect aliases from scratch ...');
     $raw_json = trim(file_get_contents(MMRPG_CONFIG_ROOTDIR.'includes/sounds.json'));
     $raw_json = !empty($raw_json) ? preg_replace('!//.*$!m', '', $raw_json) : '';
     $raw_json_array = !empty($raw_json) ? json_decode($raw_json, true) : array();
