@@ -781,7 +781,7 @@ html, body {
     background-image: none;
     color: #ffffff;
     filter: drop-shadow(0px 0 3px #ffffff) opacity(0.7);
-    animation: world-sprite-gate-block-spin 9s infinite ease-in-out;
+    animation: world-sprite-gate-block-spin 4s infinite linear;
     animation-delay: inherit;
 }
 #world #map .sprite.block.boss-block::after,
@@ -795,7 +795,8 @@ html, body {
     color: #ffffff;
     mix-blend-mode: luminosity;
     filter: drop-shadow(0 2px 0 #101010);
-    animation: world-sprite-gate-block-spin-text 9s infinite ease-in-out;
+    animation: world-sprite-gate-block-spin-text 4s infinite linear;
+    animation-delay: inherit;
 }
 
 #world #map .sprite.gate.boss-door { background-position: 0 0; }
@@ -832,6 +833,65 @@ html, body {
 }
 #world #map .sprite.block.star-block[data-extra]::after {
     content: attr(data-extra);
+}
+
+#world #map .sprite.lock.portal-flower { background-position: -840px -760px; }
+
+#world #map .sprite.lock.portal-flower.none { background-position: -920px -520px; }
+#world #map .sprite.lock.portal-flower.cutter { background-position: -1000px -520px; }
+#world #map .sprite.lock.portal-flower.impact { background-position: -1080px -520px; }
+#world #map .sprite.lock.portal-flower.freeze { background-position: -1160px -520px; }
+#world #map .sprite.lock.portal-flower.explode { background-position: -1240px -520px; }
+
+#world #map .sprite.lock.portal-flower.flame { background-position: -920px -600px; }
+#world #map .sprite.lock.portal-flower.electric { background-position: -1000px -600px; }
+#world #map .sprite.lock.portal-flower.time { background-position: -1080px -600px; }
+#world #map .sprite.lock.portal-flower.earth { background-position: -1160px -600px; }
+#world #map .sprite.lock.portal-flower.nature { background-position: -1240px -600px; }
+
+#world #map .sprite.lock.portal-flower.water { background-position: -920px -680px; }
+#world #map .sprite.lock.portal-flower.swift { background-position: -1000px -680px; }
+#world #map .sprite.lock.portal-flower.wind { background-position: -1080px -680px; }
+#world #map .sprite.lock.portal-flower.missile { background-position: -1160px -680px; }
+#world #map .sprite.lock.portal-flower.crystal { background-position: -1240px -680px; }
+
+#world #map .sprite.lock.portal-flower.shadow { background-position: -920px -760px; }
+#world #map .sprite.lock.portal-flower.space { background-position: -1000px -760px; }
+#world #map .sprite.lock.portal-flower.shield { background-position: -1080px -760px; }
+#world #map .sprite.lock.portal-flower.laser { background-position: -1160px -760px; }
+#world #map .sprite.lock.portal-flower.copy { background-position: -1240px -760px; }
+
+#world #map .sprite.locked .sprite.lock.portal-flower { background-position: -840px -520px;  }
+
+#world #map .sprite:not(.locked) .sprite.lock.portal-flower {
+    transform-origin: center;
+    animation: world-sprite-portal-flower-spin-outer 12s infinite linear;
+    animation-delay: inherit;
+}
+#world #map .sprite:not(.locked) .sprite.lock.portal-flower:before {
+    content: "";
+    display: block;
+    background: inherit;
+    width: 100%;
+    height: 100%;
+    transform-origin: center;
+    animation: world-sprite-portal-flower-spin-inner 24s infinite linear;
+    animation-delay: inherit;
+}
+
+@keyframes world-sprite-portal-flower-spin-outer {
+    0% { transform: rotate(0deg); filter: brightness(1) drop-shadow(0 0 2px #0a0a0a);  }
+    25% {  transform: rotate(90deg); filter: brightness(2) drop-shadow(0 0 4px #0a0a0a); }
+    50% {  transform: rotate(180deg); filter: brightness(1) drop-shadow(0 0 2px #0a0a0a); }
+    75% {  transform: rotate(270deg); filter: brightness(2) drop-shadow(0 0 4px #0a0a0a); }
+    100% { transform: rotate(360deg); filter: brightness(1) drop-shadow(0 0 2px #0a0a0a); }
+}
+@keyframes world-sprite-portal-flower-spin-inner {
+    0% { transform: rotate(0deg); filter: brightness(1) drop-shadow(0 0 2px #0a0a0a);  }
+    25% {  transform: rotate(-90deg); filter: brightness(2) drop-shadow(0 0 4px #0a0a0a); }
+    50% {  transform: rotate(-180deg); filter: brightness(1) drop-shadow(0 0 2px #0a0a0a); }
+    75% {  transform: rotate(-270deg); filter: brightness(2) drop-shadow(0 0 4px #0a0a0a); }
+    100% { transform: rotate(-360deg); filter: brightness(1) drop-shadow(0 0 2px #0a0a0a); }
 }
 
 @keyframes sprite-hazard-crude-oil { 0%, 100% { background-position: -840px -840px; } 50% { background-position: -840px -920px;  }  }
@@ -6036,7 +6096,8 @@ display: block;
 #world #canvas #progress-tracker .counter.zenny .icon {
     font-size: 24px;
     line-height: 1;
-    color: #64a455;
+    /* color: #64a455;  */
+    color: #cfcfcf;
     margin: -3px 5px 0 0;
 }
 #world #canvas #progress-tracker .counter.stars .icon {
@@ -6046,7 +6107,8 @@ display: block;
 }
 #world #canvas #progress-tracker .counter.stars .icon i:first-child  {
     font-size: 16px;
-    color: #888916;
+    /* color: #888916; */
+    color: #cfcfcf;
 }
 #world #canvas #progress-tracker .counter.stars .icon i:last-child {
     font-size: 12px;
