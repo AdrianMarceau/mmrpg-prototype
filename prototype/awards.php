@@ -4,7 +4,8 @@
 $this_prototype_awards = !empty($_SESSION[$session_token]['values']['prototype_awards']) ? $_SESSION[$session_token]['values']['prototype_awards'] : array();
 
 // Ensure we're not in the demo before we worry about ranking stuff
-if (empty($_SESSION[$session_token]['DEMO'])){
+if (empty($_SESSION[$session_token]['DEMO'])
+  && !empty($this_boardinfo)){
 
   
   /*
