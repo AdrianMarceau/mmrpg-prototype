@@ -3,6 +3,9 @@
 define('MMRPG_INDEX_STYLES', true);
 require_once('../top.php');
 
+// Sets the maximum execution time to 5 minutes (300 seconds)
+set_time_limit(300);
+
 // Change the content header to that of CSS
 $cache_time = 60 * 60 * 24;
 header("Content-type: text/css; charset=UTF-8");
