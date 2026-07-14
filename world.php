@@ -127,6 +127,7 @@ $mmrpg_index_abilities = rpg_ability::get_index(true);
 $mmrpg_index_items = rpg_item::get_index(true);
 $mmrpg_index_stars = rpg_world::get_stars_index();
 $mmrpg_index_gates = rpg_world::get_static_gates_index();
+$mmrpg_index_locks = rpg_world::get_static_locks_index();
 $mmrpg_index_blocks = rpg_world::get_static_blocks_index();
 $mmrpg_index_hazards = rpg_world::get_static_hazards_index();
 $mmrpg_indexes = array(
@@ -138,6 +139,7 @@ $mmrpg_indexes = array(
     'items' => &$mmrpg_index_items,
     'stars' => &$mmrpg_index_stars,
     'gates' => &$mmrpg_index_gates,
+    'locks' => &$mmrpg_index_locks,
     'blocks' => &$mmrpg_index_blocks,
     'hazards' => &$mmrpg_index_hazards,
     );
@@ -460,6 +462,7 @@ if (!isset($WORLD_SESSION['world_events'][$world_map_token])){ $WORLD_SESSION['w
 if (!isset($WORLD_SESSION['world_buttons'][$world_map_token])){ $WORLD_SESSION['world_buttons'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_switches'][$world_map_token])){ $WORLD_SESSION['world_switches'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_gates'][$world_map_token])){ $WORLD_SESSION['world_gates'][$world_map_token] = array(); }
+if (!isset($WORLD_SESSION['world_locks'][$world_map_token])){ $WORLD_SESSION['world_locks'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_blocks'][$world_map_token])){ $WORLD_SESSION['world_blocks'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_hazards'][$world_map_token])){ $WORLD_SESSION['world_hazards'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_items'][$world_map_token])){ $WORLD_SESSION['world_items'][$world_map_token] = array(); }
@@ -542,8 +545,11 @@ if (empty($world_map_pickups) || $reset_pickups === true){
     //error_log('regenerating pickups!');
     $world_map_pickups = rpg_world::generate_worldmap_pickups($this_prototype_data, $map_data_parsed);
     rpg_world::update_session('world_pickups', $world_map_token, $world_map_pickups);
-    //rpg_world::update_session('world_items', $world_map_token, array());  // clear all "claimed" datestamps
-    //rpg_world::update_session('world_abilities', $world_map_token, array());  // clear all "claimed" datestamps
+    $world_map_items = !empty($WORLD_SESSION['world_items'][$world_map_token]) ? $WORLD_SESSION['world_items'][$world_map_token] : array();
+    $world_map_abilities = !empty($WORLD_SESSION['world_abilities'][$world_map_token]) ? $WORLD_SESSION['world_abilities'][$world_map_token] : array();
+    foreach ($world_map_pickups AS $key => $pickup){ unset($world_map_items[$pickup[3]]); unset($world_map_abilities[$pickup[3]]); } // clear all "claimed" datestamps
+    rpg_world::update_session('world_items', $world_map_token, $world_map_items);
+    rpg_world::update_session('world_abilities', $world_map_token, $world_map_abilities);
 }
 
 // If requested to do so, make sure we reset the world items
@@ -571,6 +577,29 @@ $world_map_gates = !empty($world_gates[$world_map_token]) ? $world_gates[$world_
 if ($reset_gates === true){
     //error_log('clearing removed gates!');
     rpg_world::update_session('world_gates', $world_map_token, array());  // clear all "removed" datestamps
+}
+
+// If requested to do so, make sure we reset the world locks
+$reset_locks = !empty($_GET['reset']) && $_GET['reset'] === 'locks' ? true : false;
+$world_locks = !empty($WORLD_SESSION['world_locks']) ? $WORLD_SESSION['world_locks'] : array();
+$world_map_locks = !empty($world_locks[$world_map_token]) ? $world_locks[$world_map_token] : array();
+if ($reset_locks === true){
+    error_log('clearing opened locks!');
+    error_log('-> $world_locks was '.print_r($world_locks, true));
+    error_log('-> $world_map_locks was '.print_r($world_map_locks, true));
+    rpg_world::update_session('world_locks', $world_map_token, array());  // clear all "removed" datestamps
+    if (!empty($world_locks)){
+        foreach ($world_locks AS $temp_maptoken => $temp_maplocks){
+            if (empty($temp_maplocks)){ continue; }
+            foreach ($temp_maplocks AS $lock_namekey => $timestamp){
+                if (!isset($world_map_locks[$lock_namekey])){ continue; }
+                elseif ($world_map_locks[$lock_namekey] !== $timestamp){ continue; }
+                $WORLD_SESSION['world_locks'][$temp_maptoken][$lock_namekey] = 0;
+                $WORLD_SESSION['world_locks'][$temp_maptoken] = array_filter($WORLD_SESSION['world_locks'][$temp_maptoken]);
+                //error_log('removed '.$lock_namekey.' from $WORLD_SESSION[\'world_locks\']['.$temp_maptoken.'], now = '.print_r($WORLD_SESSION['world_locks'][$temp_maptoken], true));
+            }
+        }
+    }
 }
 
 // Calculate remaining encounters for this area for later reference
@@ -713,6 +742,9 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
                     // GATE TILE SPRITES
                     $gates_layer_markup = rpg_world::get_gates_layer_markup($this_prototype_data, $map_data_parsed);
                     echo($gates_layer_markup);
+                    // LOCK TILE SPRITES
+                    $locks_layer_markup = rpg_world::get_locks_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($locks_layer_markup);
                     // BLOCK TILE SPRITES
                     $blocks_layer_markup = rpg_world::get_blocks_layer_markup($this_prototype_data, $map_data_parsed);
                     echo($blocks_layer_markup);

@@ -659,6 +659,7 @@ function initMenuRobotsOverview($thisWorld, $robotsOverview){
             if (!$detailsDiv.is('[data-item]')){ return; }
             let itemToken = $detailsDiv.attr('data-item');
             //console.log('-> itemToken =', itemToken);
+            refreshRobotRefs();
             let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
             let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
             //console.log('-> targetRobotToken =', targetRobotToken);

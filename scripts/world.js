@@ -11,6 +11,7 @@ gameSettings.worldConfig = {
     playerRobotsIndex: {},
     playerRobotsLimit: -1,
     playerMobility: 1, // default only
+    playerZenny: 0,
     playerHistory: [], // list of prev-player tokens in rev-chron order
     mapWorld: 'undefined',
     mapToken: 'undefined',
@@ -55,6 +56,8 @@ gameSettings.worldConfig = {
     mapSwitchesIndex: {},
     mapGateSymbols: {},
     mapGatesIndex: {},
+    mapLockSymbols: {},
+    mapLocksIndex: {},
     mapBlockSymbols: {},
     mapBlocksIndex: {},
     mapHazardSymbols: {},
@@ -125,6 +128,7 @@ gameSettings.worldState = {
         items: {},
         abilities: {},
         stars: {},
+        zenny: 0,
         },
     items: {},
     stars: {},
@@ -132,6 +136,7 @@ gameSettings.worldState = {
     buttons: {},
     switches: {},
     gates: {},
+    locks: {},
     blocks: {},
     hazards: {},
     symbols: {},
@@ -475,9 +480,12 @@ class mmrpgWorldMap {
         _config.canvasHeight = _elements.canvas.outerHeight();
         if (startPosition){ _worldCursor.position = startPosition; }
         if (startDirection){ _worldCursor.direction = startDirection; }
+        _worldPlayer.id = _config.playerId || 0;
         _worldPlayer.token = _config.playerToken || 'player';
         _worldPlayer.position = _worldCursor.position || '0-0';
         _worldPlayer.direction = _worldCursor.direction || 'down-right';
+        _worldPlayer.mobility = _config.playerMobility || 1;
+        _worldPlayer.zenny = _worldCursor.playerZenny || 0;
         // If player robots were defined [list + index] in the predefined config, copy them over to the state
         let _playerRobots = _config.playerRobots;
         let _playerRobotsIndex = _config.playerRobotsIndex;
@@ -1022,6 +1030,7 @@ class mmrpgWorldMap {
         exclude.buttons = typeof exclude.buttons === 'boolean' ? exclude.buttons : true;
         exclude.switches = typeof exclude.switches === 'boolean' ? exclude.switches : true;
         exclude.gates = typeof exclude.gates === 'boolean' ? exclude.gates : true;
+        exclude.locks = typeof exclude.locks === 'boolean' ? exclude.locks : true;
         exclude.blocks = typeof exclude.blocks === 'boolean' ? exclude.blocks : true;
         exclude.hazards = typeof exclude.hazards === 'boolean' ? exclude.hazards : true;
         exclude.battles = typeof exclude.battles === 'boolean' ? exclude.battles : true;
@@ -1057,6 +1066,7 @@ class mmrpgWorldMap {
 
         // Collect references to other indexes we'll need to review tile properties
         let portalsIndex = _config.mapPortalsIndex;
+        let locksIndex = _config.mapLocksIndex;
         let blocksIndex = _config.mapBlocksIndex;
         let hazardsIndex = _config.mapHazardsIndex;
         let battlesIndex = _config.mapBattlesIndex;
@@ -1066,6 +1076,7 @@ class mmrpgWorldMap {
         let buttonSymbols = _config.mapButtonSymbols;
         let switchSymbols = _config.mapSwitchSymbols;
         let gateSymbols = _config.mapGateSymbols;
+        let lockSymbols = _config.mapLockSymbols;
         let blockSymbols = _config.mapBlockSymbols;
         let hazardSymbols = _config.mapHazardSymbols;
         //console.log('---> portalsIndex =', portalsIndex);
@@ -1221,6 +1232,28 @@ class mmrpgWorldMap {
                 return true; // keep this tile
                 }));
             //console.log('---> walkableMapTiles (post-gates) =', walkableMapTiles);
+            }
+
+        // If we are to exclude locks, make sure we remove those positions (only when locked though)
+        let worldLockKeys = Object.keys(lockSymbols);
+        if (exclude.locks && lockSymbols){
+            //console.log('---> checking lockSymbolKeys =', worldLockKeys);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                //console.log('---> checking tileKey:', tileKey, 'against lockSymbolKeys:', worldLockKeys);
+                if (worldLockKeys.includes(tileKey)){
+                    //console.log('---> tileKey:', tileKey, 'is a lock, checking if locked...');
+                    let lockInfo = locksIndex[lockSymbols[tileKey]] || false;
+                    //console.log('---> lockInfo =', lockInfo);
+                    if (lockInfo.locked){
+                        //console.log('---> lock at ' + tileKey + ' is locked, removing from walkableMapTiles');
+                        return false; // remove this tile
+                        } else {
+                        //console.log('---> lock at ' + tileKey + ' is open, keeping in walkableMapTiles');
+                        }
+                    }
+                return true; // keep this tile
+                }));
+            //console.log('---> walkableMapTiles (post-locks) =', walkableMapTiles);
             }
 
         // If we are to exclude blocks, make sure we remove those positions
@@ -2622,6 +2655,7 @@ class mmrpgWorldMap {
         let _worldButtons = _world.buttons;
         let _worldSwitches = _world.switches;
         let _worldGates = _world.gates;
+        let _worldLocks = _world.locks;
         let _worldItems = _world.items;
         let _worldAbilities = _world.abilities;
         let _worldSymbols = _world.symbols;
@@ -2641,6 +2675,7 @@ class mmrpgWorldMap {
         let lastWorldButtons = {}; lastWorldButtons[lastPlayerWorldMap] = _worldButtons;
         let lastWorldSwitches = {}; lastWorldSwitches[lastPlayerWorldMap] = _worldSwitches;
         let lastWorldGates = {}; lastWorldGates[lastPlayerWorldMap] = _worldGates;
+        let lastWorldLocks = {}; lastWorldLocks[lastPlayerWorldMap] = _worldLocks;
         let lastWorldItems = {}; lastWorldItems[lastPlayerWorldMap] = _worldItems;
         let lastWorldAbilities = {}; lastWorldAbilities[lastPlayerWorldMap] = _worldAbilities;
         let lastWorldSymbols = {}; lastWorldSymbols[lastPlayerWorldMap] = _worldSymbols;
@@ -2660,6 +2695,7 @@ class mmrpgWorldMap {
             lastWorldButtons,
             lastWorldSwitches,
             lastWorldGates,
+            lastWorldLocks,
             lastWorldItems,
             lastWorldAbilities,
             lastWorldSymbols,

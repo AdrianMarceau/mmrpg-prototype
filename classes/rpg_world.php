@@ -118,6 +118,7 @@ class rpg_world {
         if (!isset($WORLD_SESSION['world_buttons'])){ $WORLD_SESSION['world_buttons'] = array(); }
         if (!isset($WORLD_SESSION['world_switches'])){ $WORLD_SESSION['world_switches'] = array(); }
         if (!isset($WORLD_SESSION['world_gates'])){ $WORLD_SESSION['world_gates'] = array(); }
+        if (!isset($WORLD_SESSION['world_locks'])){ $WORLD_SESSION['world_locks'] = array(); }
         if (!isset($WORLD_SESSION['world_blocks'])){ $WORLD_SESSION['world_blocks'] = array(); }
         if (!isset($WORLD_SESSION['world_hazards'])){ $WORLD_SESSION['world_hazards'] = array(); }
         if (!isset($WORLD_SESSION['world_items'])){ $WORLD_SESSION['world_items'] = array(); }
@@ -199,6 +200,7 @@ class rpg_world {
             'world_buttons',
             'world_switches',
             'world_gates',
+            'world_locks',
             'world_blocks',
             'world_hazards',
             );
@@ -557,6 +559,16 @@ class rpg_world {
                     $worldGateStates[$map_token] = array_merge($worldGateStates[$map_token], $gate_states);
                 }
             }
+            // If world lock states were provided, save them to the session
+            if (!empty($worldData['lastWorldLocks'])){
+                if (!isset($WORLD_SESSION['world_locks'])){ $WORLD_SESSION['world_locks'] = array(); }
+                $worldLockStates = &$WORLD_SESSION['world_locks'];
+                foreach ($worldData['lastWorldLocks'] AS $map_token => $lock_states){
+                    if (!in_array($map_token, $allowed_world_map_tokens)){ continue; }
+                    if (!isset($worldLockStates[$map_token])){ $worldLockStates[$map_token] = array(); }
+                    $worldLockStates[$map_token] = array_merge($worldLockStates[$map_token], $lock_states);
+                }
+            }
             // If world block states were provided, save them to the session
             if (!empty($worldData['lastWorldBlocks'])){
                 if (!isset($WORLD_SESSION['world_blocks'])){ $WORLD_SESSION['world_blocks'] = array(); }
@@ -789,6 +801,7 @@ class rpg_world {
         $map_data_vars['buttons'] = isset($map_data_vars['buttons']) ? $map_data_vars['buttons'] : array();
         $map_data_vars['switches'] = isset($map_data_vars['switches']) ? $map_data_vars['switches'] : array();
         $map_data_vars['gates'] = isset($map_data_vars['gates']) ? $map_data_vars['gates'] : array();
+        $map_data_vars['locks'] = isset($map_data_vars['locks']) ? $map_data_vars['locks'] : array();
         $map_data_vars['blocks'] = isset($map_data_vars['blocks']) ? $map_data_vars['blocks'] : array();
         $map_data_vars['hazards'] = isset($map_data_vars['hazards']) ? $map_data_vars['hazards'] : array();
         $map_data_vars['field'] = isset($map_data_vars['field']) ? $map_data_vars['field'] : '';
@@ -821,6 +834,7 @@ class rpg_world {
         $map_data_vars['buttons'] = $map_custval_parser('buttons', $map_data_vars['buttons']);
         $map_data_vars['switches'] = $map_custval_parser('switches', $map_data_vars['switches']);
         $map_data_vars['gates'] = $map_custval_parser('gates', $map_data_vars['gates']);
+        $map_data_vars['locks'] = $map_custval_parser('locks', $map_data_vars['locks']);
         $map_data_vars['blocks'] = $map_custval_parser('blocks', $map_data_vars['blocks']);
         $map_data_vars['hazards'] = $map_custval_parser('hazards', $map_data_vars['hazards']);
         $map_data_vars['terrain'] = $map_custval_parser('terrain', $map_data_vars['terrain']);
@@ -857,6 +871,7 @@ class rpg_world {
         $map_data_parsed['buttons'] = $map_data_vars['buttons']; unset($map_data_vars['buttons']);
         $map_data_parsed['switches'] = $map_data_vars['switches']; unset($map_data_vars['switches']);
         $map_data_parsed['gates'] = $map_data_vars['gates']; unset($map_data_vars['gates']);
+        $map_data_parsed['locks'] = $map_data_vars['locks']; unset($map_data_vars['locks']);
         $map_data_parsed['blocks'] = $map_data_vars['blocks']; unset($map_data_vars['blocks']);
         $map_data_parsed['hazards'] = $map_data_vars['hazards']; unset($map_data_vars['hazards']);
         $map_data_parsed['field'] = $map_data_vars['field']; unset($map_data_vars['field']);
@@ -1200,6 +1215,16 @@ class rpg_world {
                 if (in_array('removed', $gate_data)){ continue; } // don't exclude if it was removed
                 $pos = $gate_data[0];
                 //error_log('-> removing gate position "'.$pos.'" from available cells');
+                unset($available_cells[$pos]);
+            }
+        }
+        // Now let's loop through locks and remove spaces that have active locks on them
+        if (!empty($map_data['locks']) && is_array($map_data['locks'])){
+            foreach ($map_data['locks'] AS $lock_name => $lock_data){
+                if (empty($lock_data) || !is_array($lock_data)){ continue; }
+                if (in_array('removed', $lock_data)){ continue; } // don't exclude if it was removed
+                $pos = $lock_data[0];
+                //error_log('-> removing lock position "'.$pos.'" from available cells');
                 unset($available_cells[$pos]);
             }
         }
@@ -2779,6 +2804,8 @@ class rpg_world {
     public static function get_portals_layer_markup($this_prototype_data, $map_data_parsed){
         //error_log('rpg_world::get_portals_layer_sprites() called!');
         // PORTALS LAYER
+        $WORLD_SESSION = self::get_session();
+        $world_session_token = self::session_token();
         $map_config = $map_data_parsed['config'];
         $map_width = $map_config['pixel_width'];
         $map_height = $map_config['pixel_height'];
@@ -2991,12 +3018,6 @@ class rpg_world {
                 'wants' => 'stars',
                 'method' => 'show'
                 ),
-            'portal-flower' => array(
-                'name' => 'Portal Flower',
-                'type' => 'empty',
-                'wants' => 'cores',
-                'method' => 'give'
-                ),
             );
         return $mmrpg_gates_index;
     }
@@ -3079,6 +3100,122 @@ class rpg_world {
         $gates_markup[] = '<script data-json="gateSymbols" type="application/json">'.$gate_symbols_json.'</script>';
         $gates_markup[] = '<script data-json="gatesIndex" type="application/json">'.$gates_index_json.'</script>';
         return implode(PHP_EOL, $gates_markup);
+    }
+
+    // Define a function that returns the GATES INDEX with details for usage on the world map
+    public static function get_static_locks_index(){
+        $mmrpg_locks_index = array(
+            'zenny-lock' => array(
+                'name' => 'Zenny Lock',
+                'type' => 'none',
+                'currency' => 'zenny',
+                'price' => 'x1000',
+                ),
+            'portal-flower' => array(
+                'name' => 'Portal Flower',
+                'type' => 'none',
+                'currency' => 'item:none-core',
+                'price' => 'x10',
+                ),
+            );
+        return $mmrpg_locks_index;
+    }
+
+    // Define a function for getting the GATES LAYER sprite markup for the world map
+    public static function get_locks_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_locks_layer_markup() called!');
+        //error_log('$map_data_parsed = '.print_r($map_data_parsed, true));
+        // GATES LAYER
+        $WORLD_SESSION = self::get_session();
+        $world_session_token = self::session_token();
+        $world_locks = !empty($WORLD_SESSION['world_locks']) ? $WORLD_SESSION['world_locks'] : array();
+        $map_config = $map_data_parsed['config'];
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_tilesize_offset = $map_config['tilesize_offset'];
+        $this_player_token = $this_prototype_data['this_player_token'];
+        $this_is_cursor = $this_player_token === 'player' ? true : false;
+        $mmrpg_index_locks = self::get_index('locks');
+        $locks_markup = array();
+        $lock_symbols = array();
+        $locks_index = array();
+        $get_all_unlocked = function($world_locks){ $tokens = array();
+            foreach ($world_locks AS $temp_maptoken => $temp_maplocks){
+                $temp_maplocks = array_filter($temp_maplocks); // just in case zero-values
+                $tokens = array_merge($tokens, array_keys($temp_maplocks));
+                } return array_unique($tokens); };
+        $all_unlocked_tokens = $get_all_unlocked($world_locks);
+        //error_log('$all_unlocked_tokens = '.print_r($all_unlocked_tokens, true));
+        if (!empty($map_data_parsed['locks'])){
+            //error_log('$map_data_parsed[\'locks\'] = '.print_r($map_data_parsed['locks'], true));
+            $lock_sprites = $map_data_parsed['locks'];
+            $world_map_locks = !empty($world_locks[$world_map_token]) ? $world_locks[$world_map_token] : array();
+            foreach ($lock_sprites AS $lock_namekey => $lock_data){
+                //error_log('parsing $lock_sprites['.$lock_namekey.'] = $lock_data '.print_r($lock_data, true));
+                if (empty($lock_data) || !is_array($lock_data) || count($lock_data) < 2){ continue; }
+                $hidden = in_array('hidden', $lock_data) ? true : false; if ($hidden){ unset($lock_data[array_search('hidden', $lock_data)]); }
+                $locked = in_array('locked', $lock_data) ? true : false; if ($locked){ unset($lock_data[array_search('locked', $lock_data)]); }
+                $removed = in_array('removed', $lock_data) ? true : false; if ($removed){ unset($lock_data[array_search('removed', $lock_data)]); }
+                if (!empty($world_map_locks[$lock_namekey])){ $locked = false; }
+                elseif (in_array($lock_namekey, $all_unlocked_tokens)){
+                    /* $opened_at = time();
+                    $_SESSION[$world_session_token]['world_locks'][$world_map_token][$lock_namekey] = $opened_at;
+                    $WORLD_SESSION['world_locks'][$world_map_token][$lock_namekey] = $opened_at;
+                    $world_locks[$world_map_token][$lock_namekey] = $opened_at; */
+                    $locked = false;
+                    }
+                if ($removed){ continue; }
+                $pos = $lock_data[0]; list($col, $row) = explode('-', $pos); unset($lock_data[0]);
+                $sprite = !empty($lock_data[1]) ? $lock_data[1] : ''; unset($lock_data[1]);
+                $image = !empty($lock_data[2]) ? $lock_data[2] : ''; unset($lock_data[2]);
+                $currency = !empty($lock_data[3]) ? $lock_data[3] : ''; unset($lock_data[3]);
+                $price = !empty($lock_data[4]) ? $lock_data[4] : ''; unset($lock_data[4]);
+                if (empty($pos) || empty($sprite) || empty($image)){ continue; }
+                $top = ($row - 1) * $map_tile_height + $map_tilesize_offset[0];
+                $left = ($col - 1) * $map_tile_width + $map_tilesize_offset[1];
+                $z_index = $top + 1;
+                $data = array_values($lock_data);
+                $info = !empty($mmrpg_index_locks[$sprite]) ? $mmrpg_index_locks[$sprite] : array();
+                $type = !empty($info['type']) ? $info['type'] : '';
+                if ($sprite === 'portal-flower'){ $type = $image; }
+                if (empty($currency) && !empty($info['currency'])){ $currency = $info['currency']; }
+                if (empty($price) && !empty($info['price'])){ $price = $info['price']; }
+                $price = !empty($price) ? intval(trim($price, 'x')) : 0;
+                $colour = !empty($type) ? $type : 'none';
+                $base_classes = 'sprite tile lock';
+                $kind_classes = $sprite.($image ? ' '.$image : '');
+                $inner_sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
+                $attrs = 'data-lock="'.$lock_namekey.'" data-type="'.$type.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
+                if ($sprite === 'portal-flower'){ $styles .= ' animation-delay: '.(-1 * mt_rand(1, 10)).'s;'; }
+                $classes = $base_classes.($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                $locks_markup[] = '<span data-sprite="lock" class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$inner_sprite.'</span>';
+                $lock_symbols[$pos] = $lock_namekey;
+                $locks_index[$lock_namekey] = array(
+                    'pos' => $pos,
+                    'sprite' => $sprite,
+                    'image' => $image,
+                    'colour' => $colour,
+                    'col' => $col,
+                    'row' => $row,
+                    'hidden' => $hidden,
+                    'locked' => $locked,
+                    'removed' => $removed,
+                    'data' => $data,
+                    'type' => $type,
+                    'currency' => $currency,
+                    'price' => $price,
+                    );
+            }
+        }
+        $lock_symbols_json = json_encode($lock_symbols, JSON_NUMERIC_CHECK);
+        $locks_index_json = json_encode($locks_index, JSON_NUMERIC_CHECK);
+        $locks_markup[] = '<script data-json="lockSymbols" type="application/json">'.$lock_symbols_json.'</script>';
+        $locks_markup[] = '<script data-json="locksIndex" type="application/json">'.$locks_index_json.'</script>';
+        return implode(PHP_EOL, $locks_markup);
     }
 
     // Define a function that returns the BLOCKS INDEX with details for usage on the world map
@@ -3885,11 +4022,7 @@ class rpg_world {
     public static function refresh_world_map($this_prototype_data, &$map_data_parsed){
         //error_log('rpg_world::refresh_map() called!');
 
-        // If there are any portals define, check to see if any are being covered by battles or obstacles
-        self::refresh_map_portals($this_prototype_data, $map_data_parsed);
-
-        // If there are any events defined, check to see if any of them have been interacted with already
-        self::refresh_map_events($this_prototype_data, $map_data_parsed);
+        // ---
 
         // If there are any buttons defined, check to see if any of them have been interacted with already
         self::refresh_map_buttons($this_prototype_data, $map_data_parsed);
@@ -3900,11 +4033,22 @@ class rpg_world {
         // If there are any gates defined, check to see if any of them have been interacted with already
         self::refresh_map_gates($this_prototype_data, $map_data_parsed);
 
+        // If there are any locks defined, check to see if any of them have been interacted with already
+        self::refresh_map_locks($this_prototype_data, $map_data_parsed);
+
         // If there are any blocks defined, check to see if any of them have been interacted with already
         self::refresh_map_blocks($this_prototype_data, $map_data_parsed);
 
         // If there are any hazards defined, check to see if any of them have been interacted with already
         self::refresh_map_hazards($this_prototype_data, $map_data_parsed);
+
+        // ---
+
+        // If there are any portals define, check to see if any are being covered by battles or obstacles
+        self::refresh_map_portals($this_prototype_data, $map_data_parsed);
+
+        // If there are any events defined, check to see if any of them have been interacted with already
+        self::refresh_map_events($this_prototype_data, $map_data_parsed);
 
         // If there are any platforms defined, check to see if any of them have been interacted with already
         self::refresh_map_platforms($this_prototype_data, $map_data_parsed);
@@ -3925,7 +4069,7 @@ class rpg_world {
         $map_token = $map_data_parsed['token'];
         $world_map_token = $world_token.'__'.$map_token;
         $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
-        $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array();
+        $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array(); // all encounters generated
         //error_log('[portal-check] checking for world map portals on map "'.$world_map_token.'"');
         //error_log('-> $map_data_parsed[\'portals\'] = '.print_r($map_data_parsed['portals'], true));
         //error_log('-> $world_map_encounters = '.print_r($world_map_encounters, true));
@@ -3933,15 +4077,35 @@ class rpg_world {
             $battle = $encounter[4]; return rpg_battle::has_index_info($battle);
             });
         $active_encounter_cells = array_map(function($encounter){
-            $battle = $encounter[3]; return $battle;
+            $cell = $encounter[3]; return $cell;
             }, $active_map_encounters);
         //error_log('-> $active_map_encounters = '.print_r($active_map_encounters, true));
         //error_log('-> $active_encounter_cells = '.print_r($active_encounter_cells, true));
+        $world_locks = !empty($WORLD_SESSION['world_locks']) ? $WORLD_SESSION['world_locks'] : array();
+        $world_map_locks = !empty($world_locks[$world_map_token]) ? $world_locks[$world_map_token] : array(); // which locks have been opened
+        $parsed_map_locks = !empty($map_data_parsed['locks']) ? $map_data_parsed['locks'] : array(); // all locks programmed for this map
+        //error_log('-> $world_map_locks = '.print_r($world_map_locks, true));
+        //error_log('-> $parsed_map_locks = '.print_r($parsed_map_locks, true));
+        $active_map_locks = array();
+        $active_lock_cells = array();
+        foreach ($parsed_map_locks AS $lock_namekey => $lock_data){
+            $unlocked = false;
+            if (!in_array('locked', $lock_data)){ $unlocked = true; }
+            if (!empty($world_map_locks[$lock_namekey])){ $unlocked = true; }
+            if ($unlocked === true){ continue; }
+            $active_map_locks[$lock_namekey] = $lock_data;
+            $active_lock_cells[] = $lock_data[0];
+            }
+        //error_log('-> $active_map_locks = '.print_r($active_map_locks, true));
+        //error_log('-> $active_lock_cells = '.print_r($active_lock_cells, true));
         foreach ($map_data_parsed['portals'] AS $portal_name => $portal_data){
             if (empty($portal_data) || !is_array($portal_data)){ continue; }
             //error_log('[portal-check] checking portal w/ name "'.$portal_name.'" & data ['.implode(', ', $portal_data).']');
-            if (!in_array($portal_data[0], $active_encounter_cells)){ continue; }
-            //error_log('[portal-check] portal "'.$portal_name.'" at position "'.$portal_data[0].'" is occupied by an encounter!');
+            $auto_lock = false; $occupied_by = 'unknown';
+            if (in_array($portal_data[0], $active_encounter_cells)){ $auto_lock = true; $occupied_by = 'encounter'; }
+            elseif (in_array($portal_data[0], $active_lock_cells)){ $auto_lock = true; $occupied_by = 'lock'; }
+            if (!$auto_lock){ continue; }
+            //error_log('[portal-check] portal "'.$portal_name.'" at position "'.$portal_data[0].'" is occupied by '.$occupied_by.'!');
             // lock this portal as it's currently occupied by an encounter
             $portal_data[] = 'locked';
             $map_data_parsed['portals'][$portal_name] = $portal_data;
@@ -4263,6 +4427,45 @@ class rpg_world {
 
         // TODO: implement gate refresh functionality
 
+        // Return true on success
+        return true;
+    }
+
+    // If there are any locks defined, check to see if any of them have been interacted with already
+    public static function refresh_map_locks($this_prototype_data, &$map_data_parsed){
+        //error_log('rpg_world::refresh_map_locks() called!');
+        if (empty($map_data_parsed['locks'])){ return; }
+        $game_session_token = rpg_game::session_token();
+        $world_session_token = self::session_token();
+        $GAME_SESSION = &$_SESSION[$game_session_token];
+        $WORLD_SESSION = &$_SESSION[$world_session_token];
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+        if (!isset($WORLD_SESSION['world_locks'])){ $WORLD_SESSION['world_locks'] = array(); }
+        $WORLD_LOCKS = &$WORLD_SESSION['world_locks'];
+        // Gather all globally unlocked tokens and their original timestamps
+        $global_unlocked_timestamps = array();
+        foreach ($WORLD_LOCKS as $temp_maptoken => $temp_maplocks){
+            $temp_maplocks = array_filter($temp_maplocks); // remove zero-values
+            foreach ($temp_maplocks as $lock_key => $timestamp){
+                // If we haven't tracked this lock yet, or we found an older timestamp, save it
+                if (!isset($global_unlocked_timestamps[$lock_key]) || $timestamp < $global_unlocked_timestamps[$lock_key]){
+                    $global_unlocked_timestamps[$lock_key] = $timestamp;
+                }
+            }
+        }
+        $lock_sprites = $map_data_parsed['locks'];
+        $world_map_locks = !empty($WORLD_LOCKS[$world_map_token]) ? $WORLD_LOCKS[$world_map_token] : array();
+        // Process locks and update the session if a globally opened lock exists on this map
+        foreach ($lock_sprites as $lock_namekey => $lock_data){
+            if (empty($lock_data) || !is_array($lock_data) || count($lock_data) < 2){ continue; }
+            // If it's not unlocked locally yet, but IS unlocked globally, carry over the original timestamp
+            if (empty($world_map_locks[$lock_namekey]) && isset($global_unlocked_timestamps[$lock_namekey])) {
+                $opened_at = $global_unlocked_timestamps[$lock_namekey];
+                $WORLD_LOCKS[$world_map_token][$lock_namekey] = $opened_at;
+            }
+        }
         // Return true on success
         return true;
     }

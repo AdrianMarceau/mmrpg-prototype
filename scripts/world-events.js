@@ -349,8 +349,8 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
     //console.log('-> positionsToCheck =', positionsToCheck);
     //console.log('-> _worldCursor.moved =', _worldCursor.moved);
     //console.log('-> _worldCursor.othered =', _worldCursor.othered);
-    let eventKinds = ['event', 'portal', 'button', 'switch', 'gate', 'block', 'hazard', 'battle', 'item', 'ability'];
-    let eventKindsPlural = ['events', 'portals', 'buttons', 'switches', 'gates', 'blocks', 'hazards', 'battles', 'items', 'abilities'];
+    let eventKinds = ['event', 'portal', 'button', 'switch', 'gate', 'lock', 'block', 'hazard', 'battle', 'item', 'ability'];
+    let eventKindsPlural = ['events', 'portals', 'buttons', 'switches', 'gates', 'locks', 'blocks', 'hazards', 'battles', 'items', 'abilities'];
     for (let e = 0; e < eventKinds.length; e++){
         let eventKind = eventKinds[e];
         let eventKindPlural = eventKindsPlural[e];
@@ -385,7 +385,7 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
             //console.log('-> found ' + eventKind + ' at position ' + eventPosition + ' with token ' + eventToken, eventInfo);
             if (eventInfo.disabled){ continue; }
             if (eventInfo.beingHeld){ continue; }
-            if (eventInfo.locked && !includeLocked){ continue; }
+            if (eventInfo.locked && !includeLocked && eventKind !== 'lock'){ continue; }
             if (eventInfo.action === 'drop-zone'){ continue; }
             let $eventSprite = $('.sprite[data-' + eventKind + '="'+eventToken+'"]', $canvasMap);
             let eventLabel = $eventSprite.length ? $eventSprite.attr('data-label') : '';
@@ -441,6 +441,17 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
                 // collect the sprite as the second "kind"
                 eventKind2 = eventInfo.sprite;
                 }
+            else if (eventKind === 'lock'){
+                // if the lock has been removed entirely, just continue
+                //console.log('-> eventPosition: ', eventPosition);
+                //console.log('-> eventToken: ', eventToken);
+                //console.log('-> eventInfo: ', eventInfo);
+                //console.log('-> eventsIndex: ', eventsIndex);
+                if (eventInfo.removed){ continue; }
+                //if (!isSamePosition && !isFacingPosition){ continue; }
+                // collect the sprite as the second "kind"
+                eventKind2 = eventInfo.sprite;
+                }
             else if (eventKind === 'block' || eventKind === 'hazard'){
                 // skip if block/hazard already removed by the player
                 //console.log('Found ' + eventKind + ' event kind!', eventToken, '@', eventPosition);
@@ -480,10 +491,11 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
             let eventIsPickup = eventKind === 'item' || eventKind === 'ability';
             let eventIsStar = eventKind === 'item' && eventInfo.token.indexOf('-star') !== -1;
             let eventIsGate = eventKind === 'gate';
+            let eventIsLock = eventKind === 'lock';
             //console.log('--> eventIsCustom =', eventIsCustom, '| eventIsPortal =', eventIsPortal, '| eventIsSanctuary =', eventIsSanctuary, '| eventIsPickup =', eventIsPickup, '| eventIsStar =', eventIsStar);
             if (eventPosition !== searchPosition
                 && (eventIsCustom || eventIsPortal || eventIsSanctuary || eventIsPickup)
-                && !eventIsStar ){
+                && !eventIsStar){
                 // skip custom unless it's the exact position
                 //console.log('----> skipping ' + eventKind + ' at ' + eventPosition + ' (' + eventToken + ') because it is not the exact position', '\n-> eventInfo =', eventInfo);
                 continue;
@@ -1264,6 +1276,109 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
             showActionAreaType = 'gate';
             zoomTimeoutDuration = 300; // if we show a gate dropdown, we want to zoom in quickly
+            }
+        }
+
+    else if (firstEventType === 'lock'){
+        //console.log('-> event at position is a lock, preparing either popup or removal');
+        let eventInfo = firstEvent;
+        let eventPosition = eventInfo.position;
+        let $eventSprite = $(eventInfo.sprite);
+        let isSamePosition = eventPosition === standingAtPosition;
+        let isFacingPosition = eventPosition === lookingAtPosition;
+        let dataLabel = $eventSprite.attr('data-label');
+        let dataLock = $eventSprite.attr('data-lock');
+        let dataType = $eventSprite.attr('data-type') || 'none';
+        let lockInfo = _config.mapLocksIndex[dataLock] || false;
+        let lockKind = eventInfo.kind;
+        let lockKind2 = eventInfo.kind2;
+        let lockType = lockInfo.type ? lockInfo.type : '';
+        let lockCurrency = lockInfo.currency ? lockInfo.currency : '';
+        let lockPrice = lockInfo.price ? lockInfo.price : 0;
+        //console.log('-> eventInfo =', eventInfo);
+        //console.log('-> dataLabel =', dataLabel);
+        //console.log('-> dataLock =', dataLock);
+        //console.log('-> dataType =', dataType);
+        //console.log('-> lockInfo =', lockInfo);
+        //console.log('-> lockKind =', lockKind);
+        //console.log('-> lockKind2 =', lockKind2);
+        //console.log('-> lockType =', lockType);
+        //console.log('-> lockCurrency =', lockCurrency);
+        //console.log('-> lockPrice =', lockPrice);
+        if (dataLock && lockInfo && !playerIsCursor && (isSamePosition || isFacingPosition) && lockInfo.locked){
+            //console.log('-> found lockInfo for ' + dataLock + ':', lockInfo);
+            //console.log('-> lockType:', lockType);
+            //console.log('-> lockPrice:', lockPrice);
+            showActionArea = true;
+            if (!standingOnHazardEvent){ showActionAreaAnyway = true; }
+            if (dataLabel){ actionAreaMarkup += '<strong class="label'+(dataType ? ' type '+dataType : '')+'"><span class="inner">' + dataLabel + '</span></strong>'; }
+            let sideButtonLabel = lockKind2 === 'portal-flower' ? 'Feed The' : 'Open The';
+            sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>' + sideButtonLabel + '</sup> ' + toUpperCaseWords(lockKind2.replace('-', ' ')) + ' ?</span></strong>';
+            let playerHasNow = 0;
+            let currencyKind = lockCurrency.indexOf(':') !== -1 ? lockCurrency.split(':')[0] : lockCurrency;
+            let currencySubKind = lockCurrency.indexOf(':') !== -1 ? lockCurrency.split(':')[1] : false;
+            if (currencyKind === 'stars'){ playerHasNow = Object.keys(_worldPlayer.stars).length; }
+            else if (currencyKind === 'zenny'){ playerHasNow = _worldPlayer.zenny; }
+            else if (currencyKind === 'items'){
+                if (currencySubKind.length
+                    && typeof _worldPlayer.items[currencySubKind] !== 'undefined'){
+                    playerHasNow = _worldPlayer.items[currencySubKind];
+                    if (typeof _worldPlayer.items[currencySubKind + '__equipped'] !== 'undefined'){
+                        playerHasNow -= _worldPlayer.items[currencySubKind + '__equipped'];
+                        }
+                    }
+                }
+            let playerHasEnough = playerHasNow >= lockPrice ? true : false;
+            let playerCountLabel = (playerHasNow + ' / ' + lockPrice) + ' ' + toUpperCaseWords(currencySubKind ? currencySubKind.replace('-', ' ') : currencyKind);
+            if (currencyKind !== 'zenny' && lockPrice > 1){ playerCountLabel += 's'; }
+            let currencySpriteMarkup;
+            if (currencyKind === 'stars'){
+                currencySpriteMarkup = _self.getItemSpriteMarkup('field-star', {dir: 'left', frame: '00'});
+                } else if (currencyKind === 'screws'){
+                currencySpriteMarkup = _self.getItemSpriteMarkup('hyper-screw', {dir: 'left', frame: '00'});
+                } else if (currencyKind === 'items' && currencySubKind.length){
+                currencySpriteMarkup = _self.getItemSpriteMarkup(currencySubKind, {dir: 'left', frame: '00'});
+                } else {
+                currencySpriteMarkup = '';
+                }
+            //let openTheLockLabel = 'Give ' + toUpperCaseWords(currencyKind) + ' To ' + toUpperCaseWords(lockKind2.split('-')[1]) + '';
+                let openTheLockLabel = 'Give ' + toUpperCaseWords(currencyKind);
+            if (playerHasEnough){
+                //console.log('-> player has enough whatevers! allow them to lower the lock now');
+                // ...
+                } else {
+                //console.log('-> player doesn\'t have enough whatevers! cannot remove the lock yet');
+                // ...
+                }
+            sideButtonsMarkup += '<a '
+                + ('class="button big-button inner-strike'
+                    + (lockKind2 ? ' '+lockKind2 : '')
+                    + (dataType ? ' type '+dataType : '')
+                    + (!playerHasEnough ? ' disabled' : '')
+                    + '"')
+                + (playerHasEnough ?
+                    ' data-action="open-lock"'
+                    + ' data-lock="'+dataLock+'"'
+                    : '')
+                + '>';
+                sideButtonsMarkup += '<span class="has-sprite' + (!lockPrice ? ' one-row' : '') + '">';
+                if (!lockPrice){
+                    sideButtonsMarkup += '<sub>' + openTheLockLabel + '</sub> ';
+                    sideButtonsMarkup += currencySpriteMarkup;
+                    } else if (playerHasEnough){
+                    sideButtonsMarkup += '<sub>' + openTheLockLabel + '</sub> ';
+                    sideButtonsMarkup += '<br /><sup class="no-strike">' + playerCountLabel + '</sup> ';
+                    sideButtonsMarkup += currencySpriteMarkup;
+                    } else {
+                    sideButtonsMarkup += '<sup>' + openTheLockLabel + '</sup> ';
+                    sideButtonsMarkup += '<br /><sub class="no-strike">' + playerCountLabel + '</sub> ';
+                    sideButtonsMarkup += currencySpriteMarkup;
+                    }
+                sideButtonsMarkup += '</span>';
+            sideButtonsMarkup += '</a>';
+            sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+            showActionAreaType = 'lock';
+            zoomTimeoutDuration = 300; // if we show a lock dropdown, we want to zoom in quickly
             }
         }
     else if (firstEventType === 'block'){
@@ -2074,6 +2189,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             let isButton = action.indexOf('-button') !== -1 || action.indexOf('button-') !== -1;
             let isSwitch = action.indexOf('-switch') !== -1 || action.indexOf('switch-') !== -1;
             let isGate = action.indexOf('-gate') !== -1 || action.indexOf('gate-') !== -1;
+            let isLock = action.indexOf('-lock') !== -1 || action.indexOf('lock-') !== -1;
             let isItem = action.indexOf('-item') !== -1 || action.indexOf('item-') !== -1;
             let isAbility = action.indexOf('-ability') !== -1 || action.indexOf('ability-') !== -1;
             let isBlock = action.indexOf('-block') !== -1 || action.indexOf('block-') !== -1;
@@ -2446,6 +2562,89 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     _self.calculateWalkableMapTiles(true);
                     _self.refreshMapPositionEvents();
                     });
+                _self.saveWorldState();
+                }
+            else if (isLock){
+                // TODO: action will always equal "open-lock" but we should verify
+                //console.log('-> lock-related action button clicked with action:', action);
+                let lockSymbols = _config.mapLockSymbols;
+                let locksIndex = _config.mapLocksIndex;
+                let lockStates = _world.locks;
+                let lockName = $button.attr('data-lock') || false;
+                let lockInfo = lockName && (locksIndex && locksIndex[lockName]) ? locksIndex[lockName] : false;
+                //console.log('-> lockName =', lockName);
+                //console.log('-> lockInfo =', lockInfo);
+                if (!lockName || !lockInfo){ console.error('-> lock name or info not found, cannot remove lock!'); return false; }
+                else if (!lockInfo.locked){ console.error('-> lock is already opened, cannot open again!'); return false; }
+                let $eventSprite = $(firstEvent.sprite);
+                let $innerSprite = $eventSprite ? $('.sprite', $eventSprite) : false;
+                //console.log('-> $eventSprite =', $eventSprite);
+                //console.log('-> $innerSprite =', $innerSprite);
+                let lockKind = lockInfo.sprite ? lockInfo.sprite : false;
+                let lockKind2 = lockInfo.image ? lockInfo.image : false;
+                let lockPosition = lockInfo.pos ? lockInfo.pos : false;
+                //console.log('-> lockKind =', lockKind);
+                //console.log('-> lockKind2 =', lockKind2);
+                //console.log('-> lockPosition =', lockPosition);
+                let lockType = lockInfo.type ? lockInfo.type : '';
+                let lockCurrency = lockInfo.currency ? lockInfo.currency : '';
+                let lockPrice = lockInfo.price ? lockInfo.price : 0;
+                let currencyKind = lockCurrency.indexOf(':') !== -1 ? lockCurrency.split(':')[0] : lockCurrency;
+                let currencySubKind = lockCurrency.indexOf(':') !== -1 ? lockCurrency.split(':')[1] : false;
+                //console.log('-> lockType =', lockType);
+                //console.log('-> lockCurrency =', lockCurrency);
+                //console.log('-> lockPrice =', lockPrice);
+                //console.log('-> currencyKind =', currencyKind);
+                //console.log('-> currencySubKind =', currencySubKind);
+                dismissDropdown(false);
+                lockInfo.locked = false;
+                locksIndex[lockName] = lockInfo; // Sync lock info back to the config index
+                lockStates[lockName] = new Date().getTime(); // Sync lock claim/removal timestamp with world state
+                _self.playSoundEffect('lock-opening-sound', {delay: 200});
+                $canvasMap.addClass('shake-once');
+                $eventSprite.css({filter: 'brightness(1)'});
+                $eventSprite.animate({filter: 'brightness(2)'}, 600, function(){
+                    $eventSprite.removeClass('locked');
+                    $canvasMap.removeClass('shake-once');
+                    $eventSprite.animate({filter: 'brightness(1)'}, 600);
+                    if (lockKind === 'portal-flower'){ _self.playSoundEffect('lock-activated-sound', {delay: 200}); }
+                    else { _self.playSoundEffect('lock-destroyed-sound', {delay: 200}); }
+                    _self.calculateWalkableMapTiles(true);
+                    _self.refreshMapPositionEvents();
+                    });
+                // Deduct the required currency from the player's inventory (maybe)
+                if (currencyKind === 'stars'){
+                    // Stars are special and aren't "taken away" when used, they are just shown
+                    //console.log('-> stars open locks without being consumed');
+                    }
+                else if (currencyKind === 'zenny'){
+                    // Deduct zenny from the player
+                    //console.log('-> deducting ', lockPrice, ' zenny from player, new zenny = ', (_worldPlayer.zenny - lockPrice));
+                    _worldPlayer.zenny -= lockPrice;
+                    if (_worldPlayer.zenny < 0){ _worldPlayer.zenny = 0; }
+                    }
+                else if (currencyKind === 'items'){
+                    // Deduct the specific item from the player
+                    //console.log('-> checking player has ', currencySubKind, ' in inventory ...');
+                    if (currencySubKind.length && typeof _worldPlayer.items[currencySubKind] !== 'undefined'){
+                        //console.log('-> deducting ', lockPrice, currencySubKind, ' from player, new amount = ', (_worldPlayer.items[currencySubKind] - lockPrice));
+                        _worldPlayer.items[currencySubKind] -= lockPrice;
+                        if (_worldPlayer.items[currencySubKind] < 0){ _worldPlayer.items[currencySubKind] = 0; }
+                        }
+                    }
+                // Check if there's a portal below to be unlocked with this change
+                if (typeof _config.mapPortalSymbols[lockPosition] !== 'undefined'){
+                    //console.log('-> portal to unlock at position ', lockPosition, '!');
+                    let portalSymbols = _config.mapPortalSymbols;
+                    let portalsIndex = _config.mapPortalsIndex;
+                    let portalName = portalSymbols[lockPosition];
+                    let portalInfo = portalName ? portalsIndex[portalName] : false;
+                    let $portalEvent = portalName ? $('.sprite[data-portal="' + portalName + '"]', $canvasMap) : false;
+                    if (portalInfo && portalInfo.locked){ portalInfo.locked = false; portalsIndex[portalName] = portalInfo; } // sync to parent
+                    if ($portalEvent && $portalEvent.length && $portalEvent.is('.locked')){ $portalEvent.removeClass('locked'); } // update the map
+                    _self.calculateWalkableMapTiles(true);
+                    }
+                // Now we can save the game proper
                 _self.saveWorldState();
                 }
             else if (isItem){
