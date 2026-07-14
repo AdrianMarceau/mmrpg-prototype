@@ -258,7 +258,10 @@
             "vector-sound": "grab-buster_mmv-gb",
             "ambush-sound": "shadow-man-attack_mmv-gb",
             "shining-sound": "selected-mod-1_mmv-gb",
-            "blade-sound": "ring-boomerang_mmv-gb"
+            "blade-sound": "ring-boomerang_mmv-gb",
+            "lock-opening-sound": "wily-fortress-appear_mmv-gb",
+            "lock-destroyed-sound": "punk-dig_mmv-gb",
+            "lock-activated-sound": "wpn-get-iii_mmv-gb"
         }
     },
 
