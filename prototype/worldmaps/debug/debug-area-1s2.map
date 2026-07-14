@@ -9,6 +9,7 @@
 @portals[]  = spawn(4-1, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(13-11, debug-area-0__ocean-portal, blue-alt)
+@locks[]    = explode-portal-flower(13-11, portal-flower, explode, items:explode-core, x10, locked)
 #---------------------------#
 @portals[]  = north-west-exit(4-1, debug-area-1s__south-exit, up-only)
 @portals[]  = north-east-exit(19-1, debug-area-1e2__south-exit, up-only)
@@ -16,7 +17,7 @@
 #---------------------------#
 @field    = rainy-sewers
 #---------------------------#
-@pickups      = weapon-pellet(10),weapon-capsule(5),defense-pellet(6),defense-capsule(3)
+@pickups      = explode-core(10),weapon-pellet(10),weapon-capsule(5),defense-pellet(6),defense-capsule(3)
 #---------------------------#
 @encounters  = shelln(6),snapper(5),pelicanu(4),robo-fishtot(3),octone(2),bui-boi(1),manta-missile(1)
 @groups[]    = no-encounters_da1s-exit-buffer(3-1...5-3)

@@ -12,14 +12,31 @@
 @portals[]  = surface-portal(13-14, debug-area-1__subspace-portal)
 #---------------------------#
 @portals[]  = winter-portal(28-6, debug-area-1n__subspace-portal, purple-alt)
+@locks[]    = freeze-portal-flower(28-6, portal-flower, freeze, items:freeze-core, x10, locked)
+#---------------------------#
 @portals[]  = arctic-portal(28-4, debug-area-1n2__subspace-portal, purple-alt)
+@locks[]    = crystal-portal-flower(28-4, portal-flower, crystal, items:crystal-core, x10, locked)
+#---------------------------#
 @portals[]  = desert-portal(30-8, debug-area-1e__subspace-portal, yellow-alt)
+@locks[]    = flame-portal-flower(30-8, portal-flower, flame, items:flame-core, x10, locked)
+#---------------------------#
 @portals[]  = works-portal(32-8, debug-area-1e2__subspace-portal, orange-alt)
+@locks[]    = impact-portal-flower(32-8, portal-flower, impact, items:impact-core, x10, locked)
+#---------------------------#
 @portals[]  = beach-portal(28-10, debug-area-1s__subspace-portal, blue-alt)
+@locks[]    = water-portal-flower(28-10, portal-flower, water, items:water-core, x10, locked)
+#---------------------------#
 @portals[]  = ocean-portal(28-12, debug-area-1s2__subspace-portal, blue-alt)
+@locks[]    = explode-portal-flower(28-12, portal-flower, explode, items:explode-core, x10, locked)
+#---------------------------#
 @portals[]  = hideaway-portal(26-8, debug-area-1w__subspace-portal, red-alt)
+@locks[]    = earth-portal-flower(26-8, portal-flower, earth, items:earth-core, x10, locked)
+#---------------------------#
 @portals[]  = forest-portal(24-8, debug-area-1w2__subspace-portal, green-alt)
+@locks[]    = nature-portal-flower(24-8, portal-flower, nature, items:nature-core, x10, locked)
+#---------------------------#
 @portals[]  = tower-portal(25-11, debug-area-1sw__subspace-portal, yellow-alt)
+@locks[]    = electric-portal-flower(25-11, portal-flower, electric, items:electric-core, x10, locked)
 #---------------------------#
 @field      = prototype-subspace
 #---------------------------#

@@ -9,6 +9,7 @@
 @portals[]  = spawn(14-22, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(13-16, debug-area-0__forest-portal, green-alt)
+@locks[]    = nature-portal-flower(13-16, portal-flower, nature, items:nature-core, x10, locked)
 #---------------------------#
 @portals[]  = east-exit(20-22, debug-area-1w__west-exit, right-only)
 @portals[]  = south-exit(5-25, debug-area-1sw__north-exit, down-only)
@@ -16,7 +17,7 @@
 @field      = preserved-forest
 @music[]    = default(plant-man-mm6)
 #---------------------------#
-@pickups      = attack-pellet(2),attack-capsule(1),defense-pellet(2),defense-capsule(1),speed-pellet(2),speed-capsule(1)
+@pickups      = nature-core(10),attack-pellet(2),attack-capsule(1),defense-pellet(2),defense-capsule(1),speed-pellet(2),speed-capsule(1)
 #---------------------------#
 @encounters = batton(20),monking-r(10),eggalodon(5),petal-anne(20),petit-snakey(10),bombomboy(5),kabuton(5),merserker(5)
 @groups[]   = no-encounters_da1w-exit-buffer(13-21...15-23)

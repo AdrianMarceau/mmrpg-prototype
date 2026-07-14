@@ -10,6 +10,7 @@
 @portals[]  = spawn(8-12, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(8-9, debug-area-0__winter-portal)
+@locks[]    = freeze-portal-flower(8-9, portal-flower, freeze, items:freeze-core, x10, locked)
 #---------------------------#
 @portals[]  = north-exit(8-1, debug-area-1n2__south-exit, up-only)
 @portals[]  = south-exit(8-15, debug-area-1__north-exit, down-only)
@@ -18,7 +19,7 @@
 #---------------------------#
 @field        = wintry-forefront
 #---------------------------#
-@pickups      = speed-pellet(6),energy-pellet(4),speed-capsule(2),small-screw(1)
+@pickups      = freeze-core(10),speed-pellet(6),energy-pellet(4),speed-capsule(2),small-screw(1)
 #---------------------------#
 @encounters   = curlinger,frosty-throwman,tel-tel
 #---------------------------#

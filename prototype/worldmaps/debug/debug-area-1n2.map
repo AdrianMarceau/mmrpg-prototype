@@ -9,13 +9,14 @@
 @portals[]  = spawn(25-13, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(23-5, debug-area-0__arctic-portal, purple-alt)
+@locks[]    = crystal-portal-flower(23-5, portal-flower, crystal, items:crystal-core, x10, locked)
 #---------------------------#
 @portals[]  = south-exit(25-16, debug-area-1n__north-exit, down-only)
 @groups[]   = no-encounters_south-exit(24-15...26-16)
 #---------------------------#
 @field      = arctic-jungle
 #---------------------------#
-@pickups      = speed-pellet(6),speed-capsule(3),energy-pellet(2),energy-capsule(1),small-screw(10),large-screw(5)
+@pickups      = crystal-core(10),speed-pellet(6),speed-capsule(3),energy-pellet(2),energy-capsule(1),small-screw(10),large-screw(5)
 #---------------------------#
 @encounters = frosty-throwman(123),curlinger(64),tel-tel(48),bomb-sleigh(24),nitron-b(12),peng(12),eggalodon(6),cline(1)
 #---------------------------#

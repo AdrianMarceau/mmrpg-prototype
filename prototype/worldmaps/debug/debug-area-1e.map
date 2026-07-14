@@ -9,13 +9,14 @@
 @portals[]  = spawn(3-4, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(35-13, debug-area-0__desert-portal, yellow-alt)
+@locks[]    = flame-portal-flower(35-13, portal-flower, flame, items:flame-core, x10, locked)
 #---------------------------#
 @portals[]  = west-exit(1-4, debug-area-1__east-exit, left-only)
 @portals[]  = east-exit(50-11, debug-area-1e2__west-exit, right-only)
 #---------------------------#
 @field      = oil-wells
 #---------------------------#
-@pickups    = small-screw(12),large-screw(6),defense-pellet(8),defense-capsule(4),energy-pellet(2),weapon-pellet(2)
+@pickups    = earth-core(10),small-screw(12),large-screw(6),defense-pellet(8),defense-capsule(4),energy-pellet(2),weapon-pellet(2)
 #---------------------------#
 @encounters = gockroach-s(70),beetle-borg(70),antlin-g(20),bombomboy(5),power-muscler(1)
 @groups[]   = no-encounters_da1-exit-buffer(2-3...4-5)

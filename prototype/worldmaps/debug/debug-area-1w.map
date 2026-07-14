@@ -10,13 +10,14 @@
 @portals[]  = spawn(17-4, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(3-10, debug-area-0__hideaway-portal, red-alt)
+@locks[]    = earth-portal-flower(3-10, portal-flower, earth, items:earth-core, x10, locked)
 #---------------------------#
 @portals[]  = east-exit(20-4, debug-area-1__west-exit, right-only)
 @portals[]  = west-exit(1-13, debug-area-1w2__east-exit, left-only)
 #---------------------------#
 @field    = maniacal-hideaway
 #---------------------------#
-@pickups      = attack-pellet(6),weapon-pellet(4),attack-capsule(2),small-screw(1)
+@pickups      = earth-core(10),attack-pellet(6),weapon-pellet(4),attack-capsule(2),small-screw(1)
 #---------------------------#
 @encounters   = drill-mole,molier,rockscotch
 @groups[]     = no-encounters_da1-exit-buffer(15-3...20-5)
