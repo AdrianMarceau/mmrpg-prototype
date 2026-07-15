@@ -84,6 +84,10 @@
 # ITEM CORRIDOR PICKUPS
 # + STARTER ABILITIES
 #------------------------
+@blocks[]    = star-gate-01-b1(15-8, star-block, vert-left, x1)
+@gates[]     = star-gate-01-g1(15-9, star-gate, vertical, x1)
+@blocks[]    = star-gate-01-b2(15-10, star-block, vert-left, x1)
+#------------------------
 @items[]      = energy-pellet-pickup(15-10, energy-pellet)
 @items[]      = energy-capsule-pickup(15-8, energy-capsule)
 @items[]      = weapon-pellet-pickup(16-10, weapon-pellet)
@@ -95,13 +99,28 @@
 @items[]      = speed-pellet-pickup(19-10, speed-pellet)
 @items[]      = speed-capsule-pickup(19-8, speed-capsule)
 #------------------------
-@abilities[]  = buster-shot-pickup(5-9, buster-shot)
-@abilities[]  = light-buster-pickup(7-8, light-buster)
-@abilities[]  = wily-buster-pickup(6-8, wily-buster)
-@abilities[]  = cossack-buster-pickup(5-8, cossack-buster)
-@abilities[]  = copy-shot-pickup(7-10, copy-shot)
-@abilities[]  = copy-soul-pickup(6-10, copy-soul)
-@abilities[]  = copy-style-pickup(5-10, copy-style)
+@abilities[]  = buster-shot-pickup(8-9, buster-shot)
+#------------------------
+@blocks[]    = star-gate-02-b1(7-8, star-block, vert-right, x3)
+@gates[]     = star-gate-02-g1(7-9, star-gate, vertical, x3)
+@blocks[]    = star-gate-02-b2(7-10, star-block, vert-right, x3)
+#------------------------
+@abilities[]  = light-buster-pickup(6-8, light-buster)
+@abilities[]  = wily-buster-pickup(6-9, wily-buster)
+@abilities[]  = cossack-buster-pickup(6-10, cossack-buster)
+#------------------------
+@blocks[]    = star-gate-03-b1(5-8, star-block, vert-right, x6)
+@gates[]     = star-gate-03-g1(5-9, star-gate, vertical, x6)
+@blocks[]    = star-gate-03-b2(5-10, star-block, vert-right, x6)
+#------------------------
+@abilities[]  = copy-shot-pickup(4-8, copy-shot)
+@abilities[]  = copy-soul-pickup(4-10, copy-soul)
+#------------------------
+@blocks[]    = star-gate-04-b1(3-8, star-block, vert-right, x9)
+@gates[]     = star-gate-04-g1(3-9, star-gate, vertical, x9)
+@blocks[]    = star-gate-04-b2(3-10, star-block, vert-right, x9)
+#------------------------
+@abilities[]  = copy-style-pickup(2-9, copy-style)
 #---------------------------#
 # ISLAND BUTTON 1 + EVENTS
 #-------------------------
@@ -127,7 +146,7 @@
 # SUBSPACE BUTTON + EVENTS
 #---------------------------
 @bosses[]    = subspace-portal-boss(19-28, trill, 10, speed)
-@items[]     = subspace-light-heart(19-29, light-heart__2)
+#@items[]     = subspace-light-heart(19-29, light-heart__2)
 @buttons[]   = subspace-button(19-30, purple, up, set-group-terrain, subspace-path, subspace)
 @groups[]    = subspace-path(14-24...14-28, 15-28)
 #---------------------------#
@@ -182,9 +201,9 @@
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[50],[50],[50],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[55],[52],[56],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
-[__],[__],[__],[__],[13],[11],[14],[__],[13],[11],[11],[11],[14],[__],[13],[11],[11],[11],[14],[__],[__],[__],[__],[__],[__]
-[__],[__],[__],[__],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[__],[__],[__],[__],[__],[__]
-[__],[__],[__],[__],[15],[12],[16],[__],[15],[12],[10],[12],[16],[__],[15],[12],[12],[12],[16],[__],[__],[__],[__],[__],[__]
+[__],[13],[11],[11],[11],[11],[14],[__],[13],[11],[11],[11],[14],[__],[13],[11],[11],[11],[11],[14],[__],[__],[__],[__],[__]
+[__],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[10],[__],[__],[__],[__],[__]
+[__],[15],[12],[12],[12],[12],[16],[__],[15],[12],[10],[12],[16],[__],[15],[12],[12],[12],[12],[16],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[10],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[10],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[13],[11],[11],[10],[11],[11],[14],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]

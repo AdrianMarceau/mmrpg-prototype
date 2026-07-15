@@ -57,6 +57,14 @@
 @habitats[] = bass-ds(subspace)
 @habitats[] = proto-man-ds(subspace)
 #---------------------------#
+@blocks[]    = star-gate-west-b1(18-9, star-block, horz-down, x12)
+@gates[]     = star-gate-west-g1(19-9, star-gate, horizontal, x12)
+@blocks[]    = star-gate-west-b2(20-9, star-block, horz-down, x12)
+#------------------------
+@blocks[]    = star-gate-east-b1(37-3, star-block, vert-left, x15)
+@gates[]     = star-gate-east-g1(37-4, star-gate, vertical, x15)
+@blocks[]    = star-gate-east-b2(37-5, star-block, vert-left, x15)
+#------------------------
 @items[]     = slur-module-1(47-8, chrono-circuit)
 @items[]     = slur-module-2(47-9, cosmo-circuit)
 @items[]     = slur-omega-seed(47-7, omega-seed)
