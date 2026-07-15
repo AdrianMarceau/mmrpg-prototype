@@ -68,9 +68,10 @@ if (!empty($this_player->player_token)
         $robot_token = $robot_info['robot_token'];
         if (!isset($WORLD_ROBOT_SESSIONS[$robot_token])){ $WORLD_ROBOT_SESSIONS[$robot_token] = array(); }
         $is_disabled = empty($robot_info['robot_energy']) ? true : false;
+        $weapon_energy_recovery = 1;
         $robot_session = &$WORLD_ROBOT_SESSIONS[$robot_token];
         $robot_session['energy'] = $robot_info['robot_energy'] - $robot_info['robot_base_energy'];
-        $robot_session['weapons'] = $robot_info['robot_weapons'] - $robot_info['robot_base_weapons'];
+        $robot_session['weapons'] = $robot_info['robot_weapons'] + (!$is_disabled ? $weapon_energy_recovery : 0) - $robot_info['robot_base_weapons'];
         $robot_session['attack'] = !$is_disabled && !empty($robot_info['counters']['attack_mods']) ? $robot_info['counters']['attack_mods'] : 0;
         $robot_session['defense'] = !$is_disabled && !empty($robot_info['counters']['defense_mods']) ? $robot_info['counters']['defense_mods'] : 0;
         $robot_session['speed'] = !$is_disabled && !empty($robot_info['counters']['speed_mods']) ? $robot_info['counters']['speed_mods'] : 0;
