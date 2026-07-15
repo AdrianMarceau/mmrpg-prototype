@@ -1731,7 +1731,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             if (dataBattles.length){ joinedDataAttrs += ' data-battle="'+dataBattlesJoined+'"'; }
             if (dataBattleStars.length){ joinedDataAttrs += ' data-battle-star="'+dataBattleStarsJoined+'"'; }
             actionAreaMarkup += dataLabelsJoined;
-            sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Engage With</sup> Target' + (dataBattles.length > 1 ? 's' : '') + ' ?</span></strong>';
+            sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Engage With</sup> ' + (dataBattles.length > 1 ? dataBattles.length+' ' : '') + 'Target' + (dataBattles.length > 1 ? 's' : '') + ' ?</span></strong>';
             if (playerActiveRobots >= 1){
                 sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
                 //sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span>Start Battle!</span></a>';

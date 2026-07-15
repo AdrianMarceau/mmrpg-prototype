@@ -2574,9 +2574,6 @@ class mmrpgWorldMap {
         if (typeof options !== 'object' || !options){ options = {}; }
         let _self = this;
         let _selfReference = _self.playSoundEffect;
-        let _config = _self.config;
-        let _world = _self.state;
-        let _elements = _self.elements;
         let mmrpgPlaySoundEffect = _selfReference.mmrpgPlaySoundEffect;
         if (!mmrpgPlaySoundEffect){
             mmrpgPlaySoundEffect = function(soundName, options){
