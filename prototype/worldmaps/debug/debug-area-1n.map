@@ -7,6 +7,8 @@
 @size     = 15 x 15
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
+@field       = wintry-forefront
+#---------------------------#
 @portals[]  = spawn(8-12, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(8-9, debug-area-0__winter-portal)
@@ -16,8 +18,6 @@
 @portals[]  = south-exit(8-15, debug-area-1__north-exit, down-only)
 @groups[]   = no-encounters_north-exit(7-1...9-2)
 @groups[]   = no-encounters_south-exit(7-14...9-15)
-#---------------------------#
-@field        = wintry-forefront
 #---------------------------#
 @pickups      = freeze-core(10),speed-pellet(6),energy-pellet(4),speed-capsule(2),small-screw(1)
 #---------------------------#

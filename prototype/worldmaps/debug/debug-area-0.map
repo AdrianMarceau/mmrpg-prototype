@@ -7,6 +7,8 @@
 @size     = 50 x 16
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
+@field      = prototype-subspace
+#---------------------------#
 @portals[]  = spawn(28-8)
 #---------------------------#
 @portals[]  = surface-portal(13-14, debug-area-1__subspace-portal)
@@ -37,8 +39,6 @@
 #---------------------------#
 @portals[]  = tower-portal(25-11, debug-area-1sw__subspace-portal, yellow-alt)
 @locks[]    = electric-portal-flower(25-11, portal-flower, electric, items:electric-core, x10, locked)
-#---------------------------#
-@field      = prototype-subspace
 #---------------------------#
 @pickups    = space-shard(40),shadow-shard(30),empty-shard(20),super-pellet(10),super-capsule(5),attack-booster(3),defense-booster(3),speed-booster(3),extra-life(1),yashichi(1)
 #---------------------------#

@@ -7,6 +7,8 @@
 @size     = 20 x 15
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
+@field    = maniacal-hideaway
+#---------------------------#
 @portals[]  = spawn(17-4, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(3-10, debug-area-0__hideaway-portal, red-alt)
@@ -14,8 +16,6 @@
 #---------------------------#
 @portals[]  = east-exit(20-4, debug-area-1__west-exit, right-only)
 @portals[]  = west-exit(1-13, debug-area-1w2__east-exit, left-only)
-#---------------------------#
-@field    = maniacal-hideaway
 #---------------------------#
 @pickups      = earth-core(10),attack-pellet(6),weapon-pellet(4),attack-capsule(2),small-screw(1)
 #---------------------------#

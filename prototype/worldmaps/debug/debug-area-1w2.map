@@ -6,6 +6,8 @@
 @size     = 20 x 25
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
+@field      = preserved-forest
+#---------------------------#
 @portals[]  = spawn(14-22, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(13-16, debug-area-0__forest-portal, green-alt)

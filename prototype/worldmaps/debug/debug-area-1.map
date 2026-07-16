@@ -7,6 +7,8 @@
 @size        = 25 x 34
 @sheet       = mmrpg-overworld-2k25
 #---------------------------#
+@field       = gentle-countryside
+#---------------------------#
 @portals[]   = spawn(11-16)
 #---------------------------#
 @portals[]   = subspace-portal(19-28, debug-area-0__surface-portal)
@@ -27,9 +29,8 @@
 @portals[]   = south-portal-2(11-30, debug-area-1__south-portal-1)
 @portals[]   = south-exit(11-34, debug-area-1s__north-exit, down-only)
 #---------------------------#
-# FIELD AND TERRAIN
+# FIELD TERRAIN CONFIG
 #--------------------
-@field       = gentle-countryside
 @terrain[]   = grass(gentle-countryside)
 @terrain[]   = subspace(prototype-subspace)
 #---------------------------#

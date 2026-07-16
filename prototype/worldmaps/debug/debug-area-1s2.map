@@ -6,6 +6,8 @@
 @size     = 20 x 14
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
+@field    = rainy-sewers
+#---------------------------#
 @portals[]  = spawn(4-1, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(13-11, debug-area-0__ocean-portal, blue-alt)
@@ -14,8 +16,6 @@
 @portals[]  = north-west-exit(4-1, debug-area-1s__south-exit, up-only)
 @portals[]  = north-east-exit(19-1, debug-area-1e2__south-exit, up-only)
 @portals[]  = west-exit(1-8, debug-area-1sw__east-exit, left-only)
-#---------------------------#
-@field    = rainy-sewers
 #---------------------------#
 @pickups      = explode-core(10),weapon-pellet(10),weapon-capsule(5),defense-pellet(6),defense-capsule(3)
 #---------------------------#

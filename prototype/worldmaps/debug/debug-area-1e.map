@@ -6,6 +6,8 @@
 @size     = 50 x 16
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
+@field      = oil-wells
+#---------------------------#
 @portals[]  = spawn(3-4, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(35-13, debug-area-0__desert-portal, yellow-alt)
@@ -13,8 +15,6 @@
 #---------------------------#
 @portals[]  = west-exit(1-4, debug-area-1__east-exit, left-only)
 @portals[]  = east-exit(50-11, debug-area-1e2__west-exit, right-only)
-#---------------------------#
-@field      = oil-wells
 #---------------------------#
 @pickups    = earth-core(10),small-screw(12),large-screw(6),defense-pellet(8),defense-capsule(4),energy-pellet(2),weapon-pellet(2)
 #---------------------------#

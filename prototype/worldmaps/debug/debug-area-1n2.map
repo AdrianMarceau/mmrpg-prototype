@@ -6,6 +6,8 @@
 @size     = 50 x 16
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
+@field      = arctic-jungle
+#---------------------------#
 @portals[]  = spawn(25-13, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(23-5, debug-area-0__arctic-portal, purple-alt)
@@ -13,8 +15,6 @@
 #---------------------------#
 @portals[]  = south-exit(25-16, debug-area-1n__north-exit, down-only)
 @groups[]   = no-encounters_south-exit(24-15...26-16)
-#---------------------------#
-@field      = arctic-jungle
 #---------------------------#
 @pickups      = crystal-core(10),speed-pellet(6),speed-capsule(3),energy-pellet(2),energy-capsule(1),small-screw(10),large-screw(5)
 #---------------------------#

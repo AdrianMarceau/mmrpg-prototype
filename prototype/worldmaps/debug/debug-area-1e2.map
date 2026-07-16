@@ -6,6 +6,8 @@
 @size     = 15 x 21
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
+@field        = waterworks-dam
+#---------------------------#
 @portals[]  = spawn(1-12, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(15-12, debug-area-0__works-portal, orange-alt)
@@ -13,8 +15,6 @@
 #---------------------------#
 @portals[]  = west-exit(1-12, debug-area-1e__east-exit, left-only)
 @portals[]  = south-exit(8-21, debug-area-1s2__east-exit, down-only)
-#---------------------------#
-@field        = waterworks-dam
 #---------------------------#
 @pickups      = impact-core(10),small-screw(2),large-screw(3),super-pellet(5),super-capsule(4),energy-capsule(2)
 #---------------------------#

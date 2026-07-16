@@ -6,6 +6,8 @@
 @size     = 13 x 13
 @sheet    = mmrpg-overworld-2k25
 #---------------------------#
+@field      = waterfall-institute
+#---------------------------#
 @portals[]  = spawn(6-2, hidden)
 #---------------------------#
 @portals[]  = subspace-portal(10-9, debug-area-0__beach-portal, blue-alt)
@@ -13,8 +15,6 @@
 #---------------------------#
 @portals[]  = north-exit(6-1, debug-area-1__south-exit, up-only)
 @portals[]  = south-exit(5-13, debug-area-1s2__north-west-exit, down-only)
-#---------------------------#
-@field    = waterfall-institute
 #---------------------------#
 @pickups      = water-core(10),weapon-pellet(5),energy-capsule(1)
 #---------------------------#
