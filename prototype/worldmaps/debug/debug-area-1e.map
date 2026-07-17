@@ -23,6 +23,8 @@
 @groups[]   = no-encounters_da1e2-exit-buffer(48-10...50-12)
 @groups[]   = no-encounters_desert-portal-buffer(34-12...36-14)
 #---------------------------#
+@actors[]     = purple-reset-dude(48-13, robot, anti-eddie, -, default)
+#---------------------------#
 @terrain[]   = desert(oil-wells)
 @terrain[]   = grass(gentle-countryside)
 #---------------------------#

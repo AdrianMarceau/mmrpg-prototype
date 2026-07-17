@@ -55,7 +55,7 @@
 @events[]    = auto-heal(9-14, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
 @events[]    = auto-reset(13-14, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
 @items[]     = first-consumable-eti(8-19, energy-tank, x1, always)
-@items[]     = first-consumable-wti(14-19, weapon-tank, x1, always)
+#@items[]     = first-consumable-wti(14-19, weapon-tank, x1, always)
 #---------------------------#
 # LIGHT PLAYER PLATFORM
 # + INIT ITEMS
@@ -84,6 +84,8 @@
 #---------------------------#
 # ITEM CORRIDOR PICKUPS
 # + STARTER ABILITIES
+# + COPY ABILITIES
+# + FIRST NPCs
 #------------------------
 @blocks[]    = star-gate-01-b1(15-8, star-block, vert-left, x1)
 @gates[]     = star-gate-01-g1(15-9, star-gate, vertical, x1)
@@ -99,6 +101,11 @@
 @items[]      = defense-capsule-pickup(18-8, defense-capsule)
 @items[]      = speed-pellet-pickup(19-10, speed-pellet)
 @items[]      = speed-capsule-pickup(19-8, speed-capsule)
+#------------------------
+@actors[]     = good-friend-auto(20-9, robot, auto, -, first-encounter)
+@actors[]     = purple-reset-dude(23-28, robot, anti-eddie, -, first-encounter)
+@actors[]     = hello-world-npc(9-10, robot, heal-bot, -, hello-world)
+@actors[]     = helpless-stuck-npc(14-19, robot, heal-bot, -, helpless-stuck)
 #------------------------
 @abilities[]  = buster-shot-pickup(8-9, buster-shot)
 #------------------------
@@ -222,7 +229,7 @@
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[80],[__],[__],[__],[91],[91],[91],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[80],[__],[__],[91],[90],[90],[90],[91],[__],[__],[__],[__]
 [__],[__],[__],[13],[14],[__],[__],[__],[__],[__],[__],[__],[__],[80],[__],[91],[90],[90],[90],[90],[90],[91],[__],[__],[__]
-[__],[__],[__],[15],[16],[__],[__],[__],[__],[__],[__],[__],[__],[80],[80],[90],[90],[90],[90],[90],[90],[90],[__],[__],[__]
+[__],[__],[__],[15],[16],[__],[__],[__],[__],[__],[__],[__],[__],[80],[80],[90],[90],[90],[90],[90],[90],[90],[90],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[40],[40],[40],[__],[__],[__],[92],[90],[90],[90],[90],[90],[92],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[40],[40],[40],[__],[__],[__],[__],[92],[90],[90],[90],[92],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[40],[40],[40],[__],[__],[__],[__],[__],[92],[92],[92],[__],[__],[__],[__],[__]

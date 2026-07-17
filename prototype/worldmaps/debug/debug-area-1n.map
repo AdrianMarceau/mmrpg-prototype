@@ -23,6 +23,8 @@
 #---------------------------#
 @encounters   = curlinger,frosty-throwman,tel-tel
 #---------------------------#
+@actors[]     = purple-reset-dude(14-14, robot, anti-eddie, -, default)
+#---------------------------#
 @bosses[]     = roaming-boss-1(8-13, ice-man)
 @bosses[]     = roaming-boss-2(4-4, blizzard-man)
 @bosses[]     = roaming-boss-3(12-4, frost-man)

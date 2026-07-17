@@ -46,6 +46,11 @@
 @groups[]   = no-encounters_da1-exit-buffer(9-5...11-7)
 @groups[]   = no-encounters_world-portals-buffer(24-4...32-12)
 #---------------------------#
+@actors[]     = purple-reset-dude(23-28, robot, anti-eddie, -, first-encounter)
+@actors[]     = maylu-lost-alone(9-3, player, proxy, alt9, first-encounter)
+@actors[]     = regal-lost-alone(44-2, player, proxy, alt10, first-encounter)
+@actors[]     = match-lost-alone(30-15, player, proxy, alt20, first-encounter)
+#---------------------------#
 @terrain[]   = darkness(genesis-tower)
 @terrain[]   = subspace(prototype-subspace)
 @terrain[]   = water(reflection-chamber)

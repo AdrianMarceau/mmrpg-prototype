@@ -22,6 +22,8 @@
 @groups[]     = no-encounters_da1-exit-buffer(1-11...3-13)
 @groups[]     = no-encounters_da1s2-exit-buffer(14-11...15-13)
 #---------------------------#
+@actors[]     = purple-reset-dude(14-14, robot, anti-eddie, -, default)
+#---------------------------#
 @terrain[]   = grass(gentle-countryside)
 @terrain[]   = plain(waterworks-dam)
 @terrain[]   = ground(maniacal-hideaway)

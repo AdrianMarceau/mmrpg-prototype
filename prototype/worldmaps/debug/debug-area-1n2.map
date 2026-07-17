@@ -18,7 +18,10 @@
 #---------------------------#
 @pickups      = crystal-core(10),speed-pellet(6),speed-capsule(3),energy-pellet(2),energy-capsule(1),small-screw(10),large-screw(5)
 #---------------------------#
-@encounters = frosty-throwman(123),curlinger(64),tel-tel(48),bomb-sleigh(24),nitron-b(12),peng(12),eggalodon(6),cline(1)
+@encounters   = frosty-throwman(120),tel-tel(48),curlinger(48),crystal-joe(24),bomb-sleigh(24),nitron-b(12),peng(12),eggalodon(6),cline(1)
+#---------------------------#
+@actors[]     = purple-reset-dude(48-14, robot, anti-eddie, -, default)
+@actors[]     = stellar-lady-kalinka(28-4, player, kalinka, -, first-encounter)
 #---------------------------#
 @terrain[]   = tundra(arctic-jungle)
 @terrain[]   = water(wintry-forefront)

@@ -26,6 +26,8 @@
 @groups[]     = no-encounters_da1w2-exit-buffer(3-1...5-3)
 @groups[]     = no-encounters_da1s2-exit-buffer(6-40...8-42)
 #---------------------------#
+@actors[]     = purple-reset-dude(3-43, robot, anti-eddie, -, default)
+#---------------------------#
 @habitats[]  = spine(ground)
 @habitats[]  = elec-n(plain)
 @habitats[]  = bulb-blaster(plain)
