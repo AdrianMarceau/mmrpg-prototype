@@ -349,8 +349,8 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
     //console.log('-> positionsToCheck =', positionsToCheck);
     //console.log('-> _worldCursor.moved =', _worldCursor.moved);
     //console.log('-> _worldCursor.othered =', _worldCursor.othered);
-    let eventKinds = ['event', 'portal', 'button', 'switch', 'gate', 'lock', 'block', 'hazard', 'battle', 'item', 'ability'];
-    let eventKindsPlural = ['events', 'portals', 'buttons', 'switches', 'gates', 'locks', 'blocks', 'hazards', 'battles', 'items', 'abilities'];
+    let eventKinds = ['event', 'portal', 'button', 'switch', 'gate', 'lock', 'block', 'hazard', 'battle', 'actor', 'item', 'ability'];
+    let eventKindsPlural = ['events', 'portals', 'buttons', 'switches', 'gates', 'locks', 'blocks', 'hazards', 'battles', 'actors', 'items', 'abilities'];
     for (let e = 0; e < eventKinds.length; e++){
         let eventKind = eventKinds[e];
         let eventKindPlural = eventKindsPlural[e];
@@ -467,6 +467,22 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
                 //console.log('--> eventInfo: ', eventInfo);
                 // collect the sprite as the second "kind"
                 eventKind2 = eventInfo.sprite;
+                }
+            else if (eventKind === 'actor'){
+                // skip if actor already removed for some reason
+                //console.log('Found ' + eventKind + ' event kind!', eventToken, '@', eventPosition);
+                //console.log('-> eventPosition: ', eventPosition);
+                //console.log('-> eventToken: ', eventToken);
+                //console.log('-> eventInfo: ', eventInfo);
+                //console.log('-> eventsIndex: ', eventsIndex);
+                if (eventInfo.removed){ continue; }
+                if (!isSamePosition && !isFacingPosition){ continue; }
+                //console.log('--> Yay! Found ' + eventKind + ' event kind ' + (isSamePosition ? 'at' : isFacingPosition ? 'in front of' : 'around') + ' current position!');
+                //console.log('--> eventPosition: ', eventPosition);
+                //console.log('--> eventToken: ', eventToken);
+                //console.log('--> eventInfo: ', eventInfo);
+                // collect the sprite as the second "kind"
+                eventKind2 = eventInfo.kind + '/' + eventInfo.sprite;
                 }
             else if (eventKind === 'item' || eventKind === 'ability'){
                 // skip if already claimed by the player
@@ -591,76 +607,6 @@ function getEventsAtPosition(searchPosition, searchDirection, searchRadius, incl
     return eventsAtPosition;
     }
 
-// Quick function that, given a column and row returns any event sprites on or around that position on the map
-function getEventSpritesAtPosition(searchPosition, searchRadius){
-    //console.log('%c' + 'mmrpgWorldMap.getEventSpritesAtPosition(searchPosition:' + searchPosition + ', searchRadius:' + searchRadius + ')', 'color: magenta;');
-    if (!searchPosition || (typeof searchPosition !== 'string' && !Array.isArray(searchPosition))){ console.error('getEventSpritesAtPosition() missing or invalid searchPosition!'); return false; }
-    searchPosition = typeof searchPosition !== 'string' ? searchPosition.join('-') : searchPosition; // join if provided as array
-    searchRadius = typeof searchRadius === 'number' ? searchRadius : 1; // default to one if not provided
-    let _self = this;
-    let _config = _self.config;
-    let _elements = _self.elements;
-    let _world = _self.state;
-    let _worldCursor = _world.cursor;
-    let layerTilesIndex = _world.layerTilesIndex;
-    let mapBattleSymbols = _config.mapBattleSymbols;
-    let $canvasMap = _elements.map;
-    let $eventSpritesAtPosition = [];
-    let positionsToCheck = [];
-    positionsToCheck.push(searchPosition); // always check the exact position first
-    // If a search radius is provided, add the surrounding positions to check
-    // including diagonal positions
-    if (searchRadius > 0){
-        let searchCol = parseInt(searchPosition.split('-')[0]);
-        let searchRow = parseInt(searchPosition.split('-')[1]);
-        for (let colOffset = -searchRadius; colOffset <= searchRadius; colOffset++){
-            for (let rowOffset = -searchRadius; rowOffset <= searchRadius; rowOffset++){
-                if (colOffset === 0 && rowOffset === 0){ continue; } // skip the center position
-                let newCol = searchCol + colOffset;
-                let newRow = searchRow + rowOffset;
-                if (newCol < 1 || newRow < 1){ continue; } // skip invalid positions
-                positionsToCheck.push(newCol + '-' + newRow);
-                }
-            }
-        }
-    //console.log('-> positionsToCheck =', positionsToCheck);
-    let eventSpriteKinds = ['event', 'portal', 'button', 'switch', 'block', 'hazard', 'battle'];
-    for (let i = 0; i < positionsToCheck.length; i++){
-        let checkPosition = positionsToCheck[i];
-        let eventPosition = checkPosition.split('-');
-        let $spritesAtPosition = $('.sprite[data-sprite][data-col="' + eventPosition[0] + '"][data-row="' + eventPosition[1] + '"]', $canvasMap);
-        //console.log('-> checking position', checkPosition, 'for sprites...');
-        //console.log('-> $spritesAtPosition = ', $spritesAtPosition);
-        if (!$spritesAtPosition || !$spritesAtPosition.length){ continue; }
-        $spritesAtPosition.each(function(){
-            let $spriteAtPosition = $(this);
-            let spriteKind = $spriteAtPosition.attr('data-sprite') || false, baseSpriteKind = spriteKind.indexOf('-') !== -1 ? spriteKind.split('-')[0] : spriteKind;
-            //console.log('-> checking spriteKind =', spriteKind);
-            //console.log('-> checking baseSpriteKind =', baseSpriteKind);
-            // skip if not an event sprite
-            if (!spriteKind || !baseSpriteKind || eventSpriteKinds.indexOf(baseSpriteKind) === -1){
-                //console.log('getEventSpritesAtPosition() skipping position', checkPosition, 'because it is not an event sprite:', $spriteAtPosition);
-                return;
-                }
-            // collect sprite ref as we know its an event now
-            let $eventAtPosition = $spriteAtPosition;
-            // skip portals unless it's the exact position
-            let eventIsCustom = spriteKind === 'event';
-            let eventIsPortal = spriteKind === 'portal';
-            let eventIsHazard = spriteKind === 'hazard';
-            if (eventIsCustom && checkPosition !== searchPosition){ return; } // skip custom unless it's the exact position
-            if (eventIsPortal && checkPosition !== searchPosition){ return; } // skip portals unless it's the exact position
-            if (eventIsHazard && checkPosition !== searchPosition){ return; } // skip hazards unless it's the exact position
-            // otherwise we are fine to add to the events array
-            //console.log('%c' + '-> found valid '+ spriteKind + ' event at position ' + checkPosition, 'color: lime;');
-            $eventSpritesAtPosition.push($eventAtPosition);
-            });
-        }
-    // Return the found events
-    //console.log('-> Found ' + $eventSpritesAtPosition.length + ' events at position ' + searchPosition + ':', $eventSpritesAtPosition);
-    return $eventSpritesAtPosition;
-    }
-
 // Quick function for checking if any player platforms are on this map and their drop-status
 // Basically, we check each one to see if all parts of "active" status and if so, that means
 // the platform has been activated and that player can be unlocked (we just need to reload)
@@ -773,11 +719,16 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
     let _mapItemsIndex = _config.mapItemsIndex;
     let _mapAbilitySymbols = _config.mapAbilitySymbols;
     let _mapAbilitiesIndex = _config.mapAbilitiesIndex;
+    let _mapActorSymbols = _config.mapActorSymbols;
+    let _mapActorsIndex = _config.mapActorsIndex;
+    let _mmrpgPlayersIndex = _indexes.players;
+    let _mmrpgRobotsIndex = _indexes.robots;
     let _userId = _config.userId;
     let _playerId = _config.playerId;
     let _playerToken = _config.playerToken;
     let _playerRobots = _config.playerRobots;
     let _playerRobotsIndex = _config.playerRobotsIndex;
+    let _playerIndexInfo = _mmrpgPlayersIndex[_playerToken];
     let $thisWorld = _elements.world;
     let $canvasMap = _elements.map;
     let $worldCursor = _elements.worldCursor;
@@ -793,6 +744,9 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
     let sameAsLastDirection = lastDirection === cursorDirection ? true : false;
     let stillAtPosition = function(){ return (_worldCursor.position === cursorPosition) ? true : false; };
     let otherMenusActiveNow = function(){ return ( _elements.robotsOverview.is('.expanded') ) ? true : false; };
+    let robotsOverviewAPI = _self.robotsOverviewAPI || false;
+    let hoverOverviewObject = robotsOverviewAPI ? robotsOverviewAPI.hoverOverviewObject : false;
+    let unhoverOverviewObject = robotsOverviewAPI ? robotsOverviewAPI.unhoverOverviewObject : false;
     //let otherMenusActiveNow = function(){ return (_elements.robotsOverview.is('.expanded') || _elements.sideButtons.is('.active')) ? true : false; };
     //console.log('-> lastPosition (old):', lastPosition);
     //console.log('-> lastDirection (old):', lastDirection);
@@ -800,6 +754,25 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
     //console.log('-> cursorDirection (new):', cursorDirection);
     //console.log('-> sameAsLastPosition:', sameAsLastPosition);
     //console.log('-> sameAsLastDirection:', sameAsLastDirection);
+
+    // Define reusable functions for applying/removing the hover state to given element
+    if (!hoverOverviewObject){
+        hoverOverviewObject = function(e, sfx){
+            let $object = $(this);
+            if (_self.worldIsBusy()){ return; }
+            if ($object.is('.disabled')){ return; }
+            if ($object.closest('.listing').is('.disabled')){ return; }
+            //$robotsOverview.find('.hovered').removeClass('hovered');
+            if (sfx){ _self.playSoundEffect(sfx); }
+            else { _self.playSoundEffect('icon-hover'); }
+            $object.addClass('hovered');
+            };
+        }
+    if (!unhoverOverviewObject){
+        unhoverOverviewObject = function(e){
+            $(this).removeClass('hovered');
+            };
+        }
 
     // If nothing has changed, we should not do anything further
     if (sameAsLastPosition && sameAsLastDirection && !forceRefresh){
@@ -862,7 +835,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
     if (!sameAsLastPosition){
         $worldCursor.removeClass('shake');
         $spritesLayer.removeClass('has-zoom');
-        setTimeout(function(){ $('.sprite', $canvasMap).removeClass('zoom'); }, 100);
+        setTimeout(function(){ $('.sprite', $canvasMap).removeClass('zoom').removeClass('busy'); }, 100);
         }
 
     // Search for events at the new position so we can show the action dropdown if needed
@@ -1278,7 +1251,6 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             zoomTimeoutDuration = 300; // if we show a gate dropdown, we want to zoom in quickly
             }
         }
-
     else if (firstEventType === 'lock'){
         //console.log('-> event at position is a lock, preparing either popup or removal');
         let eventInfo = firstEvent;
@@ -1305,6 +1277,42 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         //console.log('-> lockType =', lockType);
         //console.log('-> lockCurrency =', lockCurrency);
         //console.log('-> lockPrice =', lockPrice);
+        if (dataLock && lockInfo && !playerIsCursor && (isSamePosition || isFacingPosition) && lockInfo.locked){
+            showActionArea = true;
+            if (!standingOnHazardEvent){ showActionAreaAnyway = true; }
+            if (dataLabel){ actionAreaMarkup += '<strong class="label'+(dataType ? ' type '+dataType : '')+'"><span class="inner">' + dataLabel + '</span></strong>'; }
+            let sideButtonLabel = lockKind2 === 'portal-flower' ? 'Feed The' : 'Open The';
+            sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>' + sideButtonLabel + '</sup> ' + toUpperCaseWords(lockKind2.replace('-', ' ')) + ' ?</span></strong>';
+            let currencyCheck = _self.checkMenuButtonCurrency(lockCurrency, lockPrice);
+            let playerHasEnough = currencyCheck.hasEnough;
+            let openTheLockLabel = 'Give ' + toUpperCaseWords(currencyCheck.kind);
+            sideButtonsMarkup += '<a '
+                + ('class="button big-button inner-strike'
+                    + (lockKind2 ? ' '+lockKind2 : '')
+                    + (dataType ? ' type '+dataType : '')
+                    + (!playerHasEnough ? ' disabled' : '')
+                    + '"')
+                + (playerHasEnough ? ' data-action="open-lock" data-lock="'+dataLock+'"' : '')
+                + '>';
+            sideButtonsMarkup += '<span class="has-sprite' + (!lockPrice ? ' one-row' : '') + '">';
+            if (!lockPrice){
+                sideButtonsMarkup += '<sub>' + openTheLockLabel + '</sub> ';
+                sideButtonsMarkup += currencyCheck.spriteMarkup;
+            } else if (playerHasEnough){
+                sideButtonsMarkup += '<sub>' + openTheLockLabel + '</sub> ';
+                sideButtonsMarkup += '<br /><sup class="no-strike">' + currencyCheck.countLabel + '</sup> ';
+                sideButtonsMarkup += currencyCheck.spriteMarkup;
+            } else {
+                sideButtonsMarkup += '<sup>' + openTheLockLabel + '</sup> ';
+                sideButtonsMarkup += '<br /><sub class="no-strike">' + currencyCheck.countLabel + '</sub> ';
+                sideButtonsMarkup += currencyCheck.spriteMarkup;
+            }
+            sideButtonsMarkup += '</span></a>';
+            sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+            showActionAreaType = 'lock';
+            zoomTimeoutDuration = 300;
+        }
+        /*
         if (dataLock && lockInfo && !playerIsCursor && (isSamePosition || isFacingPosition) && lockInfo.locked){
             //console.log('-> found lockInfo for ' + dataLock + ':', lockInfo);
             //console.log('-> lockType:', lockType);
@@ -1380,6 +1388,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             showActionAreaType = 'lock';
             zoomTimeoutDuration = 300; // if we show a lock dropdown, we want to zoom in quickly
             }
+        */
         }
     else if (firstEventType === 'block'){
         //console.log('-> event at position is a block, preparing dropdown');
@@ -1880,6 +1889,64 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 }
             }
         }
+    else if (firstEventType === 'actor'){
+        //console.log('-> event at position is a actor, preparing dropdown');
+        // If the cursor is literally on a actor, only one event sprite matters right now
+        let eventInfo = firstEvent;
+        let actorInfo = _mapActorsIndex[eventInfo.token];
+        let actorSymbol = _mapActorSymbols[eventInfo.position];
+        let $actorEvent = $(eventInfo.sprite);
+        let dataActor = $actorEvent.attr('data-actor');
+        let dataLabel = $actorEvent.attr('data-label');
+        let dataColour = $actorEvent.attr('data-colour');
+        //console.log('eventInfo =', eventInfo);
+        //console.log('actorInfo =', actorInfo);
+        //console.log('actorSymbol =', actorSymbol);
+        //console.log('$actorEvent =', typeof $actorEvent, $actorEvent);
+        //console.log('dataActor =', dataActor);
+        //console.log('dataLabel =', dataLabel);
+        //console.log('dataColour =', dataColour);
+        //console.log('_playerIndexInfo =', _playerIndexInfo);
+        if (dataActor && !actorInfo.removed){
+            showActionArea = true;
+            if (!dataLabel){ dataLabel = 'Denizen'; }
+            if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+            if (actorInfo.messages){
+                let messagesText = typeof actorInfo.messages === 'object' ? actorInfo.messages.join('\n') : actorInfo.messages;
+                messagesText = messagesText.replaceAll('//', '<br />');
+                messagesText = messagesText.replaceAll('{player_name}', _playerIndexInfo['name']);
+                sideButtonsMarkup += '<div class="button big-button-title'+(dataColour ? ' type '+dataColour : '')+'"><p>' + messagesText + '</p></div>';
+                }
+            //sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="greet-actor" data-actor="'+dataActor+'"><span>Talk To ' + dataLabel + '</span></a>';
+            if (actorInfo.actions && actorInfo.actions.length){
+                for (let i = 0; i < actorInfo.actions.length; i++){
+                    let action = actorInfo.actions[i];
+                    let label = typeof action[0] !== 'undefined' && action[0] ? action[0] : false;
+                    let token = typeof action[1] !== 'undefined' && action[1] ? action[1] : false;
+                    let colour = typeof action[2] !== 'undefined' && action[2] ? action[2] : false;
+                    if (!label || !token){ continue; }
+                    let enabled = true;
+                    let currency = typeof action[3] !== 'undefined' && action[3] ? action[3] : false;
+                    let price = typeof action[4] !== 'undefined' && action[4] ? action[4] : false;
+                    let innerHtml = '<span>' + label + '</span>';
+                    if (currency && price){
+                        let currencyCheck = _self.checkMenuButtonCurrency(currency, price);
+                        enabled = currencyCheck.hasEnough;
+                        innerHtml = '<span class="has-sprite">'
+                            + '<sub>' + label + '</sub> '
+                            + '<br /><sup class="no-strike">' + currencyCheck.countLabel + '</sup> '
+                            + currencyCheck.spriteMarkup
+                            + '</span>';
+                        }
+                    if (enabled){ sideButtonsMarkup += '<a class="button big-button'+(colour ? ' type '+colour : '')+'" data-actor="'+dataActor+'" data-action="'+token+'">' + innerHtml + '</a>'; }
+                    else { sideButtonsMarkup += '<a class="button big-button'+(colour ? ' type '+colour : '')+' disabled">' + innerHtml + '</a>'; }
+                    }
+                }
+            sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+            showActionAreaType = 'actor';
+            zoomTimeoutDuration = 500; // if we show an actor dropdown, we want to zoom in quickly
+            }
+        }
 
     // If there's no dropdown to show, we can return early
     if (!showActionArea && !autoRedirect && !triggerEffect){ return; }
@@ -2123,6 +2190,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             let isMaster = $eventSprite.hasClass('vs-master');
             let isBoss = $eventSprite.hasClass('vs-boss');
             let isRescue = $eventSprite.hasClass('vs-rescue');
+            let isActor = $eventSprite.hasClass('vs-actor');
             //console.log('-> eventsAtPosition['+i+'] / isRobot = ', isRobot);
             let dataSize = $eventSprite.attr('data-size') || 40;
             let $eventLayer = $eventSprite.closest('.layer');
@@ -2137,7 +2205,9 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             //$eventSprite.attr('data-layer', eventLayer);
             //console.log('-> moving event sprite to zoom layer', eventLayer, 'from events layer');
             setTimeout(function(){
-                $eventSprite.filter(':not(.vs-rescue)').addClass('zoom');
+                $eventSprite.filter(':not(.vs-rescue):not(.vs-actor)').addClass('zoom');
+                $eventSprite.filter('.vs-rescue').addClass('busy');
+                $eventSprite.filter('.vs-actor').addClass('busy');
                 $eventLayer.addClass('has-zoom');
                 if (newDirection){ $eventSprite.attr('data-dir', newDirection); }
                 if (isRobot){
@@ -2145,6 +2215,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     else if (isMaster){ $eventSprite.attr('data-frame', '01'); }
                     else if (isBoss){ $eventSprite.attr('data-frame', '06'); }
                     else if (isRescue){ $eventSprite.attr('data-frame', '08'); }
+                    else if (isActor){ $eventSprite.attr('data-frame', '01'); }
                     }
                 }, 100);
             }
@@ -2166,14 +2237,29 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             //console.log('-> dismissing action dropdown!');
             playSound = typeof playSound === 'boolean' ? playSound : true;
             if (playSound){ _self.playSoundEffect('back-click'); }
+            enableDropdownButtons();
             $actionDropdown.removeClass('active');
             $actionDropdownWrapper.empty();
             $sideButtons.removeClass('active');
             $sideButtonsWrapper.empty();
             $worldCursor.removeClass('shake');
             $spritesLayer.removeClass('has-zoom');
-            $('.sprite.zoom', $canvasMap).removeClass('zoom');
+            $('.sprite.zoom', $canvasMap).removeClass('zoom').removeClass('busy');
             $('.sprite[data-frame]:not(.disabled):not(.frame-lock)', $canvasMap).attr('data-frame', '00');
+            };
+
+        // Define a function for disabling a dropdown after an option's been clicked
+        let disableDropdownButtons = function(){
+            //console.log('disableDropdownButtons');
+            $sideButtons.addClass('busy');
+            $('.big-button', $sideButtons).attr('disabled', 'disabled');
+            };
+
+        // Define a function for re-enabling a dropdown after an option's done running
+        let enableDropdownButtons = function(){
+            //console.log('enableDropdownButtons');
+            $sideButtons.removeClass('busy');
+            $('.big-button', $sideButtons).removeAttr('disabled');
             };
 
         // Define the event to run when clicking one of these new action buttons
@@ -2183,6 +2269,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             e.preventDefault();
             let $button = $(this);
             let action = $button.attr('data-action') || false;
+            if ($button.is('.disabled') || $button.is('[disabled]')){ return false; }
             if (!action){ console.error('-> no action found on button, skipping!'); return false; }
             let isBattle = action.indexOf('-battle') !== -1 || action.indexOf('battle-') !== -1;
             let isPortal = action.indexOf('-portal') !== -1 || action.indexOf('portal-') !== -1;
@@ -2196,6 +2283,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             let isHazard = action.indexOf('-hazard') !== -1 || action.indexOf('hazard-') !== -1;
             let isDismiss = action === 'dismiss';
             if (!isDismiss){ $button.addClass('clicked'); }
+            if ($sideButtons.is('.busy') && !isDismiss){ return false; }
+            disableDropdownButtons();
             if (isBattle){
                 let battleId = $button.attr('data-battle') || false;
                 let battleStarId = $button.attr('data-battle-star') || false;
@@ -2682,7 +2771,9 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     let newTop = _config.worldHeight + 200;
                     let newLeft = (parseInt($eventSprite.css('left')) || 0) - 200;
                     let $clonedEventSprite = $eventSprite.clone();
+                    _self.playSoundEffect('upward-impact');
                     setTimeout(function(){
+                        _self.playSoundEffect('suck-sound');
                         $clonedEventSprite.css({top:'',left:'',zIndex:''}); // reset the event sprite position
                         $clonedEventSprite.appendTo($firstOpenTempSlot).addClass('new');; // move the event sprite to the temp item slot
                         $firstOpenTempSlot.addClass('active').attr('data-item', itemName);
@@ -2727,6 +2818,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     // remove the item from the cursor pallet first and formost
                     let $clonedEventSprite = $firstActiveTempSlot.find('.sprite');
                     $clonedEventSprite.addClass('dropped');
+                    _self.playSoundEffect('suck-sound');
+                    _self.playSoundEffect('downward-impact', {delay:400});
                     setTimeout(function(){
                         $firstActiveTempSlot.removeClass('active').attr('data-item', '');
                         setTimeout(function(){
@@ -2998,14 +3091,86 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 //console.log('-> dismissing action dropdown!');
                 dismissDropdown(true);
                 }
+            else if (action === 'shop-with-auto'){
+                //console.log('-> special action "', action, '", time to open auto\'s shop');
+
+
+                }
+            else if (action === 'advice-from-auto'){
+                //console.log('-> special action "', action, '", time to give some advice');
+
+                }
+            else if (action === 'reset-world-pickups' || action === 'reset-world-encounters'){
+                //console.log('-> special action "', action, '", time to reset the ', action.split('-')[2]);
+                let actorSymbols = _config.mapActorSymbols;
+                let actorsIndex = _config.mapActorsIndex;
+                let actorStates = _world.actors;
+                let actorName = $button.attr('data-actor') || false;
+                let actorInfo = actorName && (actorsIndex && actorsIndex[actorName]) ? actorsIndex[actorName] : false;
+                //console.log('-> actorName =', actorName);
+                //console.log('-> actorInfo =', actorInfo);
+                if (!actorName || !actorInfo){ console.error('-> actor name or info not found, cannot trigger actions!'); return false; }
+                let actionList = typeof actorInfo.actions === 'object' && actorInfo.actions.length ? actorInfo.actions : false;
+                if (!actionList){ console.error('-> actor actionlist is empty, nothing to trigger!'); return false; }
+                let actionListKeys = (function(list){ let keys = []; for (let i = 0; i < list.length; i++){ keys.push(list[i][1]); } return keys; })(actionList);
+                let actionInfo = actionListKeys.indexOf(action) !== -1 ? actionList[actionListKeys.indexOf(action)] : false;
+                //console.log('-> actionList =', actionList);
+                //console.log('-> actionListKeys =', actionListKeys);
+                //console.log('-> actionInfo =', actionInfo);
+                if (!actionInfo){ console.error('-> actor action info could not be found!'); return false; }
+                let currency = actionInfo[3], price = actionInfo[4];
+                let currencyCheck = _self.checkMenuButtonCurrency(currency, price);
+                let currencyKind = currencyCheck.kind, currencySubKind = currencyCheck.subKind;
+                let playerHasEnough = currencyCheck.hasEnough;
+                //console.log('-> currencyCheck =', currencyCheck);
+                //console.log('-> playerHasEnough =', playerHasEnough);
+                if (currencyKind === 'stars'){
+                    /* do nothing, stars are only ever shown */
+                    }
+                else if (currencyKind === 'zenny'){
+                    _self.playSoundEffect('zenny-spent');
+                    _worldPlayer.zenny -= price;
+                    if (_worldPlayer.zenny < 0){ _worldPlayer.zenny = 0; }
+                    }
+                else if (currencyKind === 'items'){
+                    if (currencySubKind.length && typeof _worldPlayer.items[currencySubKind] !== 'undefined'){
+                        _self.playSoundEffect('zenny-spent');
+                        _worldPlayer.items[currencySubKind] -= price;
+                        if (_worldPlayer.items[currencySubKind] < 0){ _worldPlayer.items[currencySubKind] = 0; }
+                        }
+                    }
+                let resetHref = false;
+                if (action === 'reset-world-pickups'){ resetHref = 'world.php?reset=pickups'; }
+                else if (action === 'reset-world-encounters'){ resetHref = 'world.php?reset=encounters'; }
+                if (resetHref){
+                    //console.log('resetting w/ resetHref =', resetHref);
+                    _self.playSoundEffect('bounce-sound');
+                    _self.incZoomLevel();
+                    $thisWorld.addClass('busy');
+                    _self.saveWorldState(function(){
+                        _self.incZoomLevel();
+                        $thisWorld.addClass('loading');
+                        //console.log('let\'s go!');
+                        window.location.href = resetHref;
+                        _self.incZoomLevel();
+                        }, true, false);
+                    $thisWorld.animate({opacity: 0}, 1200, function(){
+                        $thisWorld.addClass('hidden');
+                        });
+                    }
+                }
             else {
                 // no compatible action found, do nothing
+                enableDropdownButtons();
                 return false;
                 }
+            // compatible action complete, return true
+            return true;
             };
 
         // Define the event to run when hovering one of these new action buttons
         let hoverActionButton = function(e){
+            if ($sideButtons.is('.busy')){ return; }
             _self.playSoundEffect('icon-hover');
             hoverOverviewObject.call(this, e);
             };
@@ -3097,7 +3262,6 @@ mmrpgWorldMap.prototype.triggerDropZoneEmpty = triggerDropZoneEmpty;
 mmrpgWorldMap.prototype.triggerWindowEventsPull = triggerWindowEventsPull;
 
 mmrpgWorldMap.prototype.getEventsAtPosition = getEventsAtPosition;
-mmrpgWorldMap.prototype.getEventSpritesAtPosition = getEventSpritesAtPosition;
 
 mmrpgWorldMap.prototype.refreshPlayerPlatforms = refreshPlayerPlatforms;
 mmrpgWorldMap.prototype.refreshMapPositionEvents = refreshMapPositionEvents;

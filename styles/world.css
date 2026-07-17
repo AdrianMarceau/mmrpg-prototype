@@ -1438,6 +1438,12 @@ html, body {
 #world #map .layer.has-zoom .sprite:not(.tile):not(.zoom):not(.team) > .wrap > .sprite {
     filter: brightness(0.6) drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.6));
 }
+#world #map .layer.has-zoom .sprite.vs-rescue:not(.tile):not(.zoom):not(.team).busy > .wrap > .back,
+#world #map .layer.has-zoom .sprite.vs-rescue:not(.tile):not(.zoom):not(.team).busy > .wrap > .sprite,
+#world #map .layer.has-zoom .sprite.vs-actor:not(.tile):not(.zoom):not(.team).busy > .wrap > .back,
+#world #map .layer.has-zoom .sprite.vs-actor:not(.tile):not(.zoom):not(.team).busy > .wrap > .sprite {
+    filter: brightness(1) drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.6));
+}
 
 /* define the rules for the click-overlay that captures clicks for event binding */
 #world #canvas #click-overlay {
@@ -4885,7 +4891,8 @@ display: block;
     bottom: 26px;
     right: 0;
     text-align: right;
-    border-radius: 6px 0 0 6px;
+    /* border-radius: 6px 0 0 6px; */
+    border-radius: 6px 0 0 60px;
     min-height: 80px;
     max-width: 999px;
     padding: 9px 9px 12px;
@@ -4967,12 +4974,24 @@ display: block;
     cursor: default;
 }
 #world #canvas #side-buttons .big-button > span,
-#world #canvas #side-buttons .big-button-title > span {
+#world #canvas #side-buttons .big-button-title > span,
+#world #canvas #side-buttons .big-button > p,
+#world #canvas #side-buttons .big-button-title > p {
     display: block;
     background-color: rgba(0, 0, 0, 0.6);
     padding: 3px 12px;
     margin: -6px -16px;
     border-radius: 6px;
+}
+#world #canvas #side-buttons .big-button > p,
+#world #canvas #side-buttons .big-button-title > p {
+    width: 400px;
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: left;
+    padding: 9px 12px 9px 90px;
+    box-sizing: border-box;
+    font-weight: bold;
 }
 #world #canvas #side-buttons .big-button > span.has-sprite,
 #world #canvas #side-buttons .big-button-title > span.has-sprite {
@@ -5037,14 +5056,17 @@ display: block;
 #world #canvas #side-buttons .sub-button.narrow:not(.disabled).hovered {
     min-width: 180px;
 }
-#world #canvas #side-buttons .button.disabled {
+#world #canvas #side-buttons .button.disabled,
+#world #canvas #side-buttons.busy .big-button:not(.clicked) {
     background-color: #292929;
     border-color: #464646;
     color: #969696;
     font-weight: normal;
     cursor: not-allowed;
-    text-decoration: line-through;
     filter: saturate(0.5) brightness(0.5);
+}
+#world #canvas #side-buttons .button.disabled {
+    text-decoration: line-through;
 }
 #world #canvas #side-buttons .button.disabled.inner-strike,
 #world #canvas #side-buttons .button.disabled.inner-strike .no-strike {
@@ -5054,6 +5076,7 @@ display: block;
 #world #canvas #side-buttons .button.disabled.inner-strike sub:not(.no-strike) {
     text-decoration: line-through;
 }
+
 
 /* define an glowing outline to show this button has been focused by the user */
 @keyframes world-action-button-maybe {
@@ -5085,7 +5108,7 @@ display: block;
     animation: world-action-button-clicked 0.9s ease-in-out infinite;
     animation-fill-mode: forwards;
     transform-origin: center center;
-    pointer-events: none;
+    /* pointer-events: none; */
 }
 
 #world #canvas #side-buttons .button[data-save],

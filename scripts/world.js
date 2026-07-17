@@ -64,6 +64,8 @@ gameSettings.worldConfig = {
     mapHazardsIndex: {},
     mapBattleSymbols: {},
     mapBattlesIndex: {},
+    mapActorSymbols: {},
+    mapActorsIndex: {},
     mapRivalSymbols: {},
     mapRivalsIndex: {},
     mapItemSymbols: {},
@@ -139,6 +141,7 @@ gameSettings.worldState = {
     locks: {},
     blocks: {},
     hazards: {},
+    actors: {},
     symbols: {},
     callbacks: {},
     layersIndex: {},
@@ -1034,6 +1037,7 @@ class mmrpgWorldMap {
         exclude.blocks = typeof exclude.blocks === 'boolean' ? exclude.blocks : true;
         exclude.hazards = typeof exclude.hazards === 'boolean' ? exclude.hazards : true;
         exclude.battles = typeof exclude.battles === 'boolean' ? exclude.battles : true;
+        exclude.actors = typeof exclude.actors === 'boolean' ? exclude.actors : true;
         exclude.players = typeof exclude.players === 'boolean' ? exclude.players : true;
         exclude.rivals = typeof exclude.rivals === 'boolean' ? exclude.rivals : true;
         exclude.cursor = typeof exclude.cursor === 'boolean' ? exclude.cursor : true;
@@ -1069,6 +1073,7 @@ class mmrpgWorldMap {
         let locksIndex = _config.mapLocksIndex;
         let blocksIndex = _config.mapBlocksIndex;
         let hazardsIndex = _config.mapHazardsIndex;
+        let actorsIndex = _config.mapActorsIndex;
         let battlesIndex = _config.mapBattlesIndex;
         let battleSymbols = _config.mapBattleSymbols;
         let rivalSymbols = _config.mapRivalSymbols;
@@ -1079,6 +1084,7 @@ class mmrpgWorldMap {
         let lockSymbols = _config.mapLockSymbols;
         let blockSymbols = _config.mapBlockSymbols;
         let hazardSymbols = _config.mapHazardSymbols;
+        let actorSymbols = _config.mapActorSymbols;
         //console.log('---> portalsIndex =', portalsIndex);
         //console.log('---> battlesIndex =', battlesIndex);
         //console.log('---> battleSymbols =', battleSymbols);
@@ -1293,6 +1299,23 @@ class mmrpgWorldMap {
                 return true; // keep this tile
                 }));
             //console.log('---> walkableMapTiles (post-hazards) =', walkableMapTiles);
+            }
+
+        // If we are to exclude actors, make sure we remove those positions
+        let worldActorKeys = Object.keys(actorSymbols);
+        if (exclude.actors && actorSymbols){
+            //console.log('---> checking worldActorKeys =', worldActorKeys);
+            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+                //console.log('---> checking tileKey:', tileKey, 'against actorSymbols:', worldActorKeys);
+                if (worldActorKeys.includes(tileKey)){
+                    //console.log('---> tileKey:', tileKey, 'is a actor, removing from walkableMapTiles');
+                    return false; // remove this tile
+                    } else {
+                    //console.log('---> tileKey:', tileKey, 'is not a actor, keeping in walkableMapTiles');
+                    }
+                return true; // keep this tile
+                }));
+            //console.log('---> walkableMapTiles (post-actors) =', walkableMapTiles);
             }
 
         // If we are to exclude the cursor, make sure we remove that position too
@@ -2493,12 +2516,14 @@ class mmrpgWorldMap {
         let $vsMechas = $('.sprite.vs-mecha', $canvasMap);
         let $vsBosses = $('.sprite.vs-boss', $canvasMap);
         let $vsRescues = $('.sprite.vs-rescue', $canvasMap);
+        let $npcActors = $('.sprite.vs-actor', $canvasMap);
         $vsMechas.addClass('march');
         $vsBosses.addClass('march');
         $vsRescues.addClass('shake');
+        $npcActors.addClass('march');
         if (_selfRef._interval){ clearInterval(_selfRef._interval); }
         _selfRef._interval = setInterval(function(){
-            $vsMechas = $('.sprite.vs-mecha:not(.zoom)', $canvasMap);
+            $vsMechas = $('.sprite.vs-mecha:not(.zoom):not(.busy)', $canvasMap);
             $vsMechas.each(function(){
                 let $mecha = $(this);
                 if ($mecha.data('cooldown') && $mecha.data('cooldown') > 0){
@@ -2521,7 +2546,7 @@ class mmrpgWorldMap {
                 let randCooldown = 4 + Math.ceil(Math.random() * 6);
                 $mecha.data('cooldown', randCooldown);
                 });
-            $vsBosses = $('.sprite.vs-boss:not(.zoom)', $canvasMap);
+            $vsBosses = $('.sprite.vs-boss:not(.zoom):not(.busy)', $canvasMap);
             $vsBosses.each(function(){
                 let $boss = $(this);
                 if ($boss.data('cooldown') && $boss.data('cooldown') > 0){
@@ -2542,7 +2567,7 @@ class mmrpgWorldMap {
                 let randCooldown = 4 + Math.ceil(Math.random() * 6);
                 $boss.data('cooldown', randCooldown);
                 });
-            $vsRescues = $('.sprite.vs-rescue:not(.zoom)', $canvasMap);
+            $vsRescues = $('.sprite.vs-rescue:not(.zoom):not(.busy)', $canvasMap);
             $vsRescues.each(function(){
                 let $rescue = $(this);
                 if ($rescue.data('cooldown') && $rescue.data('cooldown') > 0){
@@ -2561,6 +2586,31 @@ class mmrpgWorldMap {
                 if (!changed){ return true; }
                 let randCooldown = 4 + Math.ceil(Math.random() * 6);
                 $rescue.data('cooldown', randCooldown);
+                });
+            $npcActors = $('.sprite.vs-actor:not(.zoom):not(.busy)', $canvasMap);
+            $npcActors.each(function(){
+                let $actor = $(this);
+                if ($actor.data('cooldown') && $actor.data('cooldown') > 0){
+                    $actor.data('cooldown', $actor.data('cooldown') - 1);
+                    return true;
+                    }
+                let isPlayer = $actor.is('.player');
+                let isRobot = $actor.is('.robot');
+                let curDir = $actor.attr('data-dir') || 'right';
+                let newDir = curDir === 'right' ? 'left' : 'right';
+                let curFrame = $actor.attr('data-frame') || '00';
+                let newFrame = isPlayer ? (curFrame !== '06' ? '06' : '00') : (curFrame !== '08' ? '08' : '00');
+                let hasMarch = $actor.hasClass('march');
+                let changed = false;
+                let changeDirection = Math.random() > 0.5 ? true : false;
+                let changeFrame = Math.random() > 0.9 ? true : false;
+                //let changeMarch = Math.random() > 0.5 ? true : false;
+                if (changeDirection){ $actor.attr('data-dir', newDir); changed = true; }
+                if (changeFrame){ $actor.attr('data-frame', newFrame); changed = true; }
+                //if (changeMarch){ $actor.addClass('march'); changed = true; }
+                if (!changed){ return true; }
+                let randCooldown = 4 + Math.ceil(Math.random() * 6);
+                $actor.data('cooldown', randCooldown);
                 });
             }, 500);
         // Return true on success
@@ -2658,6 +2708,7 @@ class mmrpgWorldMap {
         let _worldSymbols = _world.symbols;
         let _worldBlocks = _world.blocks;
         let _worldHazards = _world.hazards;
+        let _worldActors = _world.actors;
         let $thisWorld = _elements.world;
         let lastPlayer = _worldPlayer.token;
         let lastPlayerTeam = _worldPlayer.team;
@@ -2678,6 +2729,7 @@ class mmrpgWorldMap {
         let lastWorldSymbols = {}; lastWorldSymbols[lastPlayerWorldMap] = _worldSymbols;
         let lastWorldBlocks = {}; lastWorldBlocks[lastPlayerWorldMap] = _worldBlocks;
         let lastWorldHazards = {}; lastWorldHazards[lastPlayerWorldMap] = _worldHazards;
+        let lastWorldActors = {}; lastWorldActors[lastPlayerWorldMap] = _worldActors;
         let worldData = {
             lastPlayer,
             lastPlayerTeam,
@@ -2698,6 +2750,7 @@ class mmrpgWorldMap {
             lastWorldSymbols,
             lastWorldBlocks,
             lastWorldHazards,
+            lastWorldActors,
             };
         // loop through all the world data fields and json encode them for transport
         //console.log('-> raw worldData:', worldData);

@@ -227,7 +227,9 @@ function bindEventsToInputs($thisWorld){
         let $object = $(this);
         if (_self.worldIsBusy()){ return; }
         if ($object.is('.disabled')){ return; }
+        if ($object.is('[disabled]')){ return; }
         if ($object.closest('.chrome').is('.disabled')){ return; }
+        if ($object.closest('.chrome').is('.busy')){ return; }
         $thisCanvas.find('.hovered').removeClass('hovered');
         if (sfx){ _self.playSoundEffect(sfx); }
         $object.addClass('hovered');
@@ -821,10 +823,11 @@ function bindEventsToInputs($thisWorld){
         // If the side buttons panel is currently open, process those actions too
         if (sideButtonsActive){
             // If the player has pressed the A button, let's confirm the side-button action if it's open
-            if (activeInputs.A || activeInputs.Start){
+            if (activeInputs.A){
                 //console.log('%c' + 'A key pressed! Confirm action popup!', 'color: orange;');
                 if (event){ event.preventDefault(); }
                 if (!$sideButtons.is('.active')){ return false; }
+                if ($sideButtons.is('.busy')){ return false; }
                 confirmSideButtonAction();
                 return true;
                 }
@@ -848,10 +851,16 @@ function bindEventsToInputs($thisWorld){
             else if (activeInputs.Up || activeInputs.Down){
                 //console.log('----> Vertical direction clicked (' + (activeInputs.Up ? 'UP' : 'DOWN') + ')!');
                 if (event){ event.preventDefault(); }
+                if ($sideButtons.is('.busy')){ return false; }
                 let $bigButtons = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons);
                 let numBigButtons = $bigButtons ? $bigButtons.length : 0;
                 let maxBigButtonIndex = numBigButtons - 1;
-                let hoverBigButton = function($button){ $bigButtons.removeClass('maybe'); $button.addClass('maybe'); };
+                let hoverBigButton = function($button){
+                    $bigButtons.removeClass('maybe');
+                    $bigButtons.trigger('mouseleave');
+                    $button.addClass('maybe');
+                    $button.trigger('mouseenter');
+                    };
                 let hoverFirstBigButton = function(){ hoverBigButton($bigButtons.first()); };
                 let hoverLastBigButton = function(){ hoverBigButton($bigButtons.last()); };
                 //console.log('$sideButtons = ', $sideButtons.length, $sideButtons);
@@ -876,6 +885,11 @@ function bindEventsToInputs($thisWorld){
                         return true;
                         }
                     }
+                }
+            // Else if the player has pressed left/right, we do nothing if the panel is busy
+            else if (activeInputs.Left || activeInputs.Right){
+                if (event){ event.preventDefault(); }
+                if ($sideButtons.is('.busy')){ return false; }
                 }
             }
         // Otherwise if the world map is NOT hidden, so the arrow keys must be controlling the player

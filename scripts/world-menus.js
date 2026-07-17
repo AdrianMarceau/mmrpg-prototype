@@ -1691,6 +1691,53 @@ function initRobotsOverviewAPI($thisWorld, $robotsOverview){
     return true;
 }
 
+// Add this to world.js or wherever your prototype injections live
+function checkMenuButtonCurrency(currency, price){
+    //console.log('%c' + 'mmrpgWorldMap.checkMenuButtonCurrency($thisWorld: ' + typeof $thisWorld + ', $robotsOverview: ' + typeof $robotsOverview + ')', 'color: magenta;');
+    if (!currency || !currency.length){ console.error('checkMenuButtonCurrency() missing required currency!'); return false; }
+    if (!price || typeof price !== 'number'){ console.error('checkMenuButtonCurrency() missing required price!'); return false; }
+    let _self = this;
+    let _config = _self.config;
+    let _world = _self.state;
+    let _worldCursor = _world.cursor;
+    let _worldPlayer = _world.player;
+    let _worldPlayerTeam = _worldPlayer.team;
+    let _worldPlayerRobots = _worldPlayer.robots;
+    // Split apart the currency string
+    let currencyKind = currency.indexOf(':') !== -1 ? currency.split(':')[0] : currency;
+    let currencySubKind = currency.indexOf(':') !== -1 ? currency.split(':')[1] : false;
+    let playerHasNow = 0;
+    // Check player inventory
+    if (currencyKind === 'stars'){ playerHasNow = Object.keys(_worldPlayer.stars).length; }
+    else if (currencyKind === 'zenny'){ playerHasNow = _worldPlayer.zenny; }
+    else if (currencyKind === 'items'){
+        if (currencySubKind && typeof _worldPlayer.items[currencySubKind] !== 'undefined'){
+            playerHasNow = _worldPlayer.items[currencySubKind];
+            if (typeof _worldPlayer.items[currencySubKind + '__equipped'] !== 'undefined'){
+                playerHasNow -= _worldPlayer.items[currencySubKind + '__equipped'];
+                }
+            }
+        }
+    let hasEnough = playerHasNow >= price;
+    // Generate formatted labels
+    let countLabelName = currencySubKind ? currencySubKind.replace('-', ' ') : currencyKind;
+    let playerCountLabel = (playerHasNow + ' / ' + price) + ' ' + toUpperCaseWords(countLabelName);
+    if (currencyKind !== 'zenny' && price > 1){ playerCountLabel += 's'; }
+    // Generate sprite markup
+    let currencySpriteMarkup = '';
+    if (currencyKind === 'stars'){ currencySpriteMarkup = _self.getItemSpriteMarkup('field-star', {dir: 'left', frame: '00'}); }
+    else if (currencyKind === 'screws'){ currencySpriteMarkup = _self.getItemSpriteMarkup('hyper-screw', {dir: 'left', frame: '00'}); }
+    else if (currencyKind === 'items' && currencySubKind){ currencySpriteMarkup = _self.getItemSpriteMarkup(currencySubKind, {dir: 'left', frame: '00'}); }
+    return {
+        hasEnough: hasEnough,
+        hasNow: playerHasNow,
+        kind: currencyKind,
+        subKind: currencySubKind,
+        countLabel: playerCountLabel,
+        spriteMarkup: currencySpriteMarkup
+        };
+}
+
 
 /*
 
@@ -1726,3 +1773,5 @@ mmrpgWorldMap.prototype.initMenuMinimapOverview = initMenuMinimapOverview;
 mmrpgWorldMap.prototype.initMenuRobotsOverview = initMenuRobotsOverview;
 
 mmrpgWorldMap.prototype.initRobotsOverviewAPI = initRobotsOverviewAPI;
+
+mmrpgWorldMap.prototype.checkMenuButtonCurrency = checkMenuButtonCurrency;

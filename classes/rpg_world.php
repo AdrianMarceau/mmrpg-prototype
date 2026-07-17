@@ -125,6 +125,7 @@ class rpg_world {
         if (!isset($WORLD_SESSION['world_abilities'])){ $WORLD_SESSION['world_abilities'] = array(); }
         if (!isset($WORLD_SESSION['world_encounters'])){ $WORLD_SESSION['world_encounters'] = array(); }
         if (!isset($WORLD_SESSION['world_pickups'])){ $WORLD_SESSION['world_pickups'] = array(); }
+        if (!isset($WORLD_SESSION['world_actors'])){ $WORLD_SESSION['world_actors'] = array(); }
         if (!isset($WORLD_SESSION['world_symbols'])){ $WORLD_SESSION['world_symbols'] = array(); }
         // ...as well as any nested variables inside those parent arrays
         if (!isset($WORLD_SESSION['player_sessions']['last_player'])){ $WORLD_SESSION['player_sessions']['last_player'] = ''; }
@@ -194,15 +195,20 @@ class rpg_world {
         $json_session_path = MMRPG_CONFIG_ROOTDIR.'.cache/sessions/'.$user_group.'/'.$user_id.'/';
         $json_session_keys = array(
             'player_sessions',
+            'robot_sessions',
             'world_maps',
-            'world_encounters',
-            'world_pickups',
             'world_buttons',
             'world_switches',
             'world_gates',
             'world_locks',
             'world_blocks',
             'world_hazards',
+            'world_items',
+            'world_abilities',
+            'world_encounters',
+            'world_pickups',
+            'world_actors',
+            'world_symbols',
             );
         foreach ($WORLD_SESSION AS $key => $values){
             if (in_array($key, $json_session_keys)){
@@ -589,10 +595,20 @@ class rpg_world {
                     $worldHazardStates[$map_token] = array_merge($worldHazardStates[$map_token], $hazard_states);
                 }
             }
+            // If world actor states were provided, save them to the session
+            if (!empty($worldData['lastWorldActors'])){
+                if (!isset($WORLD_SESSION['world_actors'])){ $WORLD_SESSION['world_actors'] = array(); }
+                $worldActorStates = &$WORLD_SESSION['world_actors'];
+                foreach ($worldData['lastWorldActors'] AS $map_token => $actor_states){
+                    if (!in_array($map_token, $allowed_world_map_tokens)){ continue; }
+                    if (!isset($worldActorStates[$map_token])){ $worldActorStates[$map_token] = array(); }
+                    $worldActorStates[$map_token] = array_merge($worldActorStates[$map_token], $actor_states);
+                }
+            }
             // If world symbol position changes were provided, save them to the session
             if (!empty($worldData['lastWorldSymbols'])){
                 // for the moment, 'buttons', 'switches', etc. cannot be moved, only specific things allowed
-                $allowed_world_symbol_kinds = array('items', 'abilities', 'encounters', 'pickups', 'hazards');
+                $allowed_world_symbol_kinds = array('items', 'abilities', 'encounters', 'pickups', 'hazards', 'actors');
                 if (!isset($WORLD_SESSION['world_symbols'])){ $WORLD_SESSION['world_symbols'] = array(); }
                 $worldSymbolStates = &$WORLD_SESSION['world_symbols'];
                 foreach ($worldData['lastWorldSymbols'] AS $map_token => $symbol_kinds){
@@ -804,6 +820,7 @@ class rpg_world {
         $map_data_vars['locks'] = isset($map_data_vars['locks']) ? $map_data_vars['locks'] : array();
         $map_data_vars['blocks'] = isset($map_data_vars['blocks']) ? $map_data_vars['blocks'] : array();
         $map_data_vars['hazards'] = isset($map_data_vars['hazards']) ? $map_data_vars['hazards'] : array();
+        $map_data_vars['actors'] = isset($map_data_vars['actors']) ? $map_data_vars['actors'] : array();
         $map_data_vars['field'] = isset($map_data_vars['field']) ? $map_data_vars['field'] : '';
         $map_data_vars['music'] = isset($map_data_vars['music']) ? $map_data_vars['music'] : array();
         $map_data_vars['terrain'] = isset($map_data_vars['terrain']) ? $map_data_vars['terrain'] : array();
@@ -837,6 +854,7 @@ class rpg_world {
         $map_data_vars['locks'] = $map_custval_parser('locks', $map_data_vars['locks']);
         $map_data_vars['blocks'] = $map_custval_parser('blocks', $map_data_vars['blocks']);
         $map_data_vars['hazards'] = $map_custval_parser('hazards', $map_data_vars['hazards']);
+        $map_data_vars['actors'] = $map_custval_parser('actors', $map_data_vars['actors']);
         $map_data_vars['terrain'] = $map_custval_parser('terrain', $map_data_vars['terrain']);
         $map_data_vars['music'] = $map_custval_parser('music', $map_data_vars['music']);
         $map_data_vars['habitats'] = $map_custval_parser('habitats', $map_data_vars['habitats']);
@@ -874,6 +892,7 @@ class rpg_world {
         $map_data_parsed['locks'] = $map_data_vars['locks']; unset($map_data_vars['locks']);
         $map_data_parsed['blocks'] = $map_data_vars['blocks']; unset($map_data_vars['blocks']);
         $map_data_parsed['hazards'] = $map_data_vars['hazards']; unset($map_data_vars['hazards']);
+        $map_data_parsed['actors'] = $map_data_vars['actors']; unset($map_data_vars['actors']);
         $map_data_parsed['field'] = $map_data_vars['field']; unset($map_data_vars['field']);
         $map_data_parsed['music'] = $map_data_vars['music']; unset($map_data_vars['music']);
         $map_data_parsed['terrain'] = $map_data_vars['terrain']; unset($map_data_vars['terrain']);
@@ -1245,6 +1264,16 @@ class rpg_world {
                 if (in_array('removed', $hazard_data)){ continue; } // don't block if it was removed
                 $pos = $hazard_data[0];
                 //error_log('-> removing hazard position "'.$pos.'" from available cells');
+                unset($available_cells[$pos]);
+            }
+        }
+        // Now let's loop through actors and remove spaces that have active actors on them
+        if (!empty($map_data['actors']) && is_array($map_data['actors'])){
+            foreach ($map_data['actors'] AS $actor_name => $actor_data){
+                if (empty($actor_data) || !is_array($actor_data)){ continue; }
+                if (in_array('removed', $actor_data)){ continue; } // don't block if it was removed
+                $pos = $actor_data[0];
+                //error_log('-> removing actor position "'.$pos.'" from available cells');
                 unset($available_cells[$pos]);
             }
         }
@@ -3546,7 +3575,7 @@ class rpg_world {
             list($col, $row) = explode('-', $pos);
             $maxcols = $map_col_size;
             $maxrows = $map_row_size;
-            $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
+            $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0] - 10;
             $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
             $z_index = $top + 1;
             $dir = ($col > ($map_col_size / 2)) ? 'left' : 'right';
@@ -3577,6 +3606,203 @@ class rpg_world {
         $battles_markup[] = '<script data-json="battleSymbols" type="application/json">'.$battle_symbols_json.'</script>';
         $battles_markup[] = '<script data-json="battlesIndex" type="application/json">'.$battles_index_json.'</script>';
         return implode(PHP_EOL, $battles_markup);
+    }
+
+    // Define a function that returns the ACTORS INDEX with details for usage on the world map
+    public static function get_static_actors_index(){
+        $mmrpg_actors_index = array(
+            'heal-bot' => array(
+                'name' => 'Heal Bot',
+                'type' => 'none',
+                'colour' => 'energy',
+                'messages' => array(
+                    'default' => array('...?'),
+                    'hello-world' => array('Welcome to the world!', '//...', 'Hello world!'),
+                    'helpless-stuck' => array('Thanks for breaking me out of there!', 'I thought I\'d be stuck between those rocks forever.'),
+                    ),
+                ),
+            'auto' => array(
+                'name' => 'Auto',
+                'type' => 'none',
+                'colour' => 'nature',
+                'messages' => array(
+                    'default' => array('Hey there, {player_name}!', 'Hope you\'re collecting lots of bolts!', 'Now, what can I do for you today?'),
+                    'first-encounter' => array('Hey there, {player_name}!', 'Fancy meeting you here!', 'Where is here, anyway?'),
+                    ),
+                'actions' => array(
+                    'default' => array(
+                        array('Open The Shop', 'shop-with-auto', 'none'),
+                        array('Get Some Advice', 'advice-from-auto', 'none'),
+                        )
+                    ),
+                ),
+            'kalinka' => array(
+                'name' => 'Kalinka',
+                'type' => 'none',
+                'colour' => 'freeze',
+                'messages' => array(
+                    'default' => array('Greetings {player_name}, welcome back.', 'Is there something you\'d like to discuss with me?'),
+                    'first-encounter' => array('Greetings {player_name}.', 'It is good to see you again.', 'Perhaps under better circumstances next time?'),
+                    ),
+                ),
+            'anti-eddie' => array(
+                'name' => 'Anti Eddie',
+                'type' => 'none',
+                'colour' => 'shadow',
+                'messages' => array(
+                    'default' => array('Like I said , I can "reset" parts of this area for you if you\'ve got the goods.', 'So whaddya say?'),
+                    'first-encounter' => array('Psst, can you keep a secret?', 'I can "reset" parts of this area.', 'You gotta have the goods though!'),
+                    ),
+                'actions' => array(
+                    'default' => array(
+                        array('Reset Pickups', 'reset-world-pickups', 'none', 'items:small-screw', 10),
+                        array('Reset Encounters', 'reset-world-encounters', 'none', 'items:large-screw', 10),
+                        ),
+                    ),
+                ),
+            'proxy' => array(
+                'name' => 'Proxy',
+                'type' => 'none',
+                'colour' => 'copy',
+                'messages' => array(
+                    'default' => array('...?'),
+                    ),
+                'alt9_messages' => array( // Mayl
+                    'default' => array('Oh, hello there.', 'Do you know where I am?', 'Can you tell me where my friends are?'),
+                    ),
+                ),
+            );
+        return $mmrpg_actors_index;
+    }
+
+    // Define a function for getting the ACTORS LAYER sprite markup for the world map
+    public static function get_actors_layer_markup($this_prototype_data, $map_data_parsed){
+        //error_log('rpg_world::get_actors_layer_markup() called!');
+        // BLOCKS LAYER
+        $WORLD_SESSION = self::get_session();
+        $world_actors = !empty($WORLD_SESSION['world_actors']) ? $WORLD_SESSION['world_actors'] : array();
+        $map_config = $map_data_parsed['config'];
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+        $map_tile_height = $map_config['tile_height'];
+        $map_tile_width = $map_config['tile_width'];
+        $map_tilesize_offset = $map_config['tilesize_offset'];
+        $map_spritesize_offset = $map_config['spritesize_offset'];
+        $this_player_token = $this_prototype_data['this_player_token'];
+        $this_is_cursor = $this_player_token === 'player' ? true : false;
+        $mmrpg_index_actors = self::get_index('actors');
+        $mmrpg_index_players = self::get_index('players');
+        $mmrpg_index_robots = self::get_index('robots');
+        $actors_markup = array();
+        $actor_symbols = array();
+        $actors_index = array();
+        if (!empty($map_data_parsed['actors'])){
+            $actor_sprites = $map_data_parsed['actors'];
+            $world_map_actors = !empty($world_actors[$world_map_token]) ? $world_actors[$world_map_token] : array();
+            foreach ($actor_sprites AS $actor_namekey => $actor_data){
+                if (empty($actor_data) || !is_array($actor_data) || count($actor_data) < 2){ continue; }
+                $hidden = in_array('hidden', $actor_data) ? true : false; if ($hidden){ unset($actor_data[array_search('hidden', $actor_data)]); }
+                $locked = in_array('locked', $actor_data) ? true : false; if ($locked){ unset($actor_data[array_search('locked', $actor_data)]); }
+                $removed = in_array('removed', $actor_data) ? true : false; if ($removed){ unset($actor_data[array_search('removed', $actor_data)]); }
+                if (!empty($world_map_actors[$actor_namekey])){ $removed = true; }
+                if ($removed){ continue; }
+                $pos = $actor_data[0]; list($col, $row) = explode('-', $pos); unset($actor_data[0]);
+                $kind = !empty($actor_data[1]) ? $actor_data[1] : ''; unset($actor_data[1]);
+                $sprite = !empty($actor_data[2]) ? $actor_data[2] : ''; unset($actor_data[2]);
+                $image = !empty($actor_data[3]) ? $actor_data[3] : ''; unset($actor_data[3]);
+                $context = !empty($actor_data[4]) ? $actor_data[4] : ''; unset($actor_data[4]);
+                //$action2 = !empty($actor_data[5]) ? $actor_data[5] : ''; unset($actor_data[5]);
+                if (empty($image) || $image === '-'){ $image = ''; }
+                $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0] - 10;
+                $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
+                $z_index = $top + 1;
+                $data = array_values($actor_data);
+                $actor_info = !empty($mmrpg_index_actors[$sprite]) ? $mmrpg_index_actors[$sprite] : array();
+                $index_info = array();
+                if ($kind === 'object' || $kind === 'actor'){ $index_info = !empty($mmrpg_index_actors[$sprite]) ? $mmrpg_index_actors[$sprite] : array(); }
+                elseif ($kind === 'player'){ $index_info = !empty($mmrpg_index_players[$sprite]) ? $mmrpg_index_players[$sprite] : array(); }
+                elseif ($kind === 'robot'){ $index_info = !empty($mmrpg_index_robots[$sprite]) ? $mmrpg_index_robots[$sprite] : array(); }
+                //error_log('$actor_info for '.$actor_namekey.' = '.print_r($actor_info, true));
+                //error_log('$index_info for '.$actor_namekey.' = '.print_r($index_info, true));
+                $name = !empty($index_info[$kind.'_name']) ? $index_info[$kind.'_name'] : (!empty($index_info[$kind.'_token']) ? ucwords(str_replace('-', ' ', $index_info[$kind.'_token'])) : '');
+                $type = !empty($index_info[$kind.'_type']) ? $index_info[$kind.'_type'] : (!empty($index_info[$kind.'_core']) ? $index_info[$kind.'_core'] : '');
+                $colour = !empty($actor_info['colour']) ? $actor_info['colour'] : (!empty($type) ? $type : 'none');
+                if ($sprite === 'proxy' && !empty($image)){
+                    //error_log('$sprite = '.print_r($sprite, true).' && $image = '.print_r($image, true));
+                    $proxy_info = $mmrpg_index_players['proxy'];
+                    $proxy_alt_info = false;
+                    //error_log('$proxy_info ='.print_r($proxy_info, true));
+                    if (!empty($proxy_info['player_image_alts'])){
+                        $proxy_image_alts = $proxy_info['player_image_alts'];
+                        $proxy_image_alts_tokens = array_map(function($alt){ return $alt['token']; }, $proxy_image_alts);
+                        //error_log('$proxy_image_alts = '.print_r($proxy_image_alts, true));
+                        //error_log('$proxy_image_alts_tokens = '.print_r($proxy_image_alts_tokens, true));
+                        if (in_array($image, $proxy_image_alts_tokens)){ $proxy_alt_info = $proxy_image_alts[array_search($image, $proxy_image_alts_tokens)]; }
+                        }
+                    if (!empty($proxy_alt_info)){
+                        //error_log('$proxy_alt_info = '.print_r($proxy_alt_info, true));
+                        $alt_name = $proxy_alt_info['name'];
+                        $alt_colour = $proxy_alt_info['colour'];
+                        $name = preg_replace('/^(?:Proxy)\s+\((?:[^\/\(\)]+)\/\/([^\/\(\)]+)\)$/i', '$1', $alt_name);
+                        $colour = $alt_colour;
+                        if (!empty($actor_info[$image.'_messages'])){ $actor_info['messages'] = $actor_info[$image.'_messages']; }
+                        if (!empty($actor_info[$image.'_actions'])){ $actor_info['actions'] = $actor_info[$image.'_actions']; }
+                        //error_log('$alt_name = '.print_r($alt_name, true));
+                        //error_log('$name = '.print_r($name, true));
+                        //error_log('$colour = '.print_r($colour, true));
+                        }
+                    }
+                $messages = '...';
+                if (!empty($actor_info['messages'][$context])){ $messages = $actor_info['messages'][$context]; }
+                else if (!empty($actor_info['messages']['default'])){ $messages = $actor_info['messages']['default']; }
+                $actions = array();
+                if (!empty($actor_info['actions'][$context])){ $actions = $actor_info['actions'][$context]; }
+                else if (!empty($actor_info['actions']['default'])){ $actions = $actor_info['actions']['default']; }
+                $base_classes = 'sprite object vs-actor bounce';
+                $kind_classes = $kind.' '.$sprite.($image ? ' '.$image : '');
+                $inner_sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
+                $attrs = 'data-actor="'.$actor_namekey.'" data-colour="'.$colour.'" data-label="'.$name.'" data-type="'.$type.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
+                $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
+                $classes = $base_classes.($hidden ? ' hidden' : '').($locked ? ' locked' : '');
+                if ($kind !== 'object'){ $styles .= ' animation-delay: '.(-1 * (mt_rand(1, 10) / 10)).'s;'; }
+                //$actors_markup[] = '<span data-sprite="actor" class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$inner_sprite.'</span>';
+                if ($kind === 'object' || $kind === 'actor') {
+                    $kind_classes = $sprite.($image ? ' '.$image : '');
+                    $inner_sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
+                    $actors_markup[] = '<span data-sprite="actor" class="'.$classes.'" '.$attrs.' style="'.$styles.'">'.$inner_sprite.'</span>';
+                } else {
+                    // Map variables to get_sprite argument expectations: ($kind, $token, $alt, $dir, $class, $style, $attrs)
+                    $dir = 'left'; // Default facing direction for actors on the map
+                    $actors_markup[] = self::get_sprite($kind, $sprite, $image, $dir, $classes, $styles, $attrs);
+                }
+                $actor_symbols[$pos] = $actor_namekey;
+                $actors_index[$actor_namekey] = array(
+                    'pos' => $pos,
+                    'kind' => $kind,
+                    'sprite' => $sprite,
+                    'image' => $image,
+                    'context' => $context,
+                    'messages' => $messages,
+                    'actions' => $actions,
+                    'colour' => $colour,
+                    'col' => $col,
+                    'row' => $row,
+                    'hidden' => $hidden,
+                    'locked' => $locked,
+                    'removed' => $removed,
+                    'data' => $data,
+                    'type' => $type,
+                    );
+            }
+        }
+
+        $actor_symbols_json = json_encode($actor_symbols, JSON_NUMERIC_CHECK);
+        $actors_index_json = json_encode($actors_index, JSON_NUMERIC_CHECK);
+        $actors_markup[] = '<script data-json="actorSymbols" type="application/json">'.$actor_symbols_json.'</script>';
+        $actors_markup[] = '<script data-json="actorsIndex" type="application/json">'.$actors_index_json.'</script>';
+
+        return implode(PHP_EOL, $actors_markup);
     }
 
     // Define a function for getting the TEAM LAYER sprite markup for the world map
@@ -4050,6 +4276,9 @@ class rpg_world {
         // If there are any events defined, check to see if any of them have been interacted with already
         self::refresh_map_events($this_prototype_data, $map_data_parsed);
 
+        // If there are any actors defined, check to see if any of them have been interacted with already
+        self::refresh_map_actors($this_prototype_data, $map_data_parsed);
+
         // If there are any platforms defined, check to see if any of them have been interacted with already
         self::refresh_map_platforms($this_prototype_data, $map_data_parsed);
 
@@ -4512,6 +4741,24 @@ class rpg_world {
                 }
             }
         }
+        // Return true on success
+        return true;
+    }
+
+    // If there are any actors defined, check to see if any of them have been interacted with already
+    public static function refresh_map_actors($this_prototype_data, &$map_data_parsed){
+        //error_log('rpg_world::refresh_map_actors() called!');
+        if (empty($map_data_parsed['actors'])){ return; }
+        $game_session_token = rpg_game::session_token();
+        $world_session_token = self::session_token();
+        $GAME_SESSION = &$_SESSION[$game_session_token];
+        $WORLD_SESSION = &$_SESSION[$world_session_token];
+        $world_token = $map_data_parsed['world'];
+        $map_token = $map_data_parsed['token'];
+        $world_map_token = $world_token.'__'.$map_token;
+
+        // TODO: implement actor refresh functionality
+
         // Return true on success
         return true;
     }

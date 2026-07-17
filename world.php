@@ -130,6 +130,7 @@ $mmrpg_index_gates = rpg_world::get_static_gates_index();
 $mmrpg_index_locks = rpg_world::get_static_locks_index();
 $mmrpg_index_blocks = rpg_world::get_static_blocks_index();
 $mmrpg_index_hazards = rpg_world::get_static_hazards_index();
+$mmrpg_index_actors = rpg_world::get_static_actors_index();
 $mmrpg_indexes = array(
     'types' => &$mmrpg_index_types,
     'fields' => &$mmrpg_index_fields,
@@ -142,6 +143,7 @@ $mmrpg_indexes = array(
     'locks' => &$mmrpg_index_locks,
     'blocks' => &$mmrpg_index_blocks,
     'hazards' => &$mmrpg_index_hazards,
+    'actors' => &$mmrpg_index_actors,
     );
 rpg_world::preload_indexes($mmrpg_indexes);
 
@@ -468,6 +470,7 @@ if (!isset($WORLD_SESSION['world_hazards'][$world_map_token])){ $WORLD_SESSION['
 if (!isset($WORLD_SESSION['world_items'][$world_map_token])){ $WORLD_SESSION['world_items'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_abilities'][$world_map_token])){ $WORLD_SESSION['world_abilities'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_encounters'][$world_map_token])){ $WORLD_SESSION['world_encounters'][$world_map_token] = array(); }
+if (!isset($WORLD_SESSION['world_actors'][$world_map_token])){ $WORLD_SESSION['world_actors'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_symbols'][$world_map_token])){ $WORLD_SESSION['world_symbols'][$world_map_token] = array(); } // represents changes to the other symbols
 
 // Collect the map's field token and mecha encounters
@@ -535,6 +538,10 @@ $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_enc
 if (empty($world_map_encounters) || $reset_encounters === true){
     $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed);
     rpg_world::update_session('world_encounters', $world_map_token, $world_map_encounters);
+    if ($reset_encounters === true){
+        header('Location: world.php');
+        exit();
+    }
 }
 
 // If the pickups for this map have not been generated yet, we can do so now
@@ -550,6 +557,10 @@ if (empty($world_map_pickups) || $reset_pickups === true){
     foreach ($world_map_pickups AS $key => $pickup){ unset($world_map_items[$pickup[3]]); unset($world_map_abilities[$pickup[3]]); } // clear all "claimed" datestamps
     rpg_world::update_session('world_items', $world_map_token, $world_map_items);
     rpg_world::update_session('world_abilities', $world_map_token, $world_map_abilities);
+    if ($reset_pickups === true){
+        header('Location: world.php');
+        exit();
+    }
 }
 
 // If requested to do so, make sure we reset the world items
@@ -559,6 +570,8 @@ $world_map_items = !empty($world_items[$world_map_token]) ? $world_items[$world_
 if ($reset_items === true){
     //error_log('clearing claimed items!');
     rpg_world::update_session('world_items', $world_map_token, array());  // clear all "claimed" datestamps
+    header('Location: world.php');
+    exit();
 }
 
 // If requested to do so, make sure we reset the world abilities
@@ -568,6 +581,8 @@ $world_map_abilities = !empty($world_abilities[$world_map_token]) ? $world_abili
 if ($reset_abilities === true){
     //error_log('clearing claimed abilities!');
     rpg_world::update_session('world_abilities', $world_map_token, array());  // clear all "claimed" datestamps
+    header('Location: world.php');
+    exit();
 }
 
 // If requested to do so, make sure we reset the world gates
@@ -577,6 +592,19 @@ $world_map_gates = !empty($world_gates[$world_map_token]) ? $world_gates[$world_
 if ($reset_gates === true){
     //error_log('clearing removed gates!');
     rpg_world::update_session('world_gates', $world_map_token, array());  // clear all "removed" datestamps
+    header('Location: world.php');
+    exit();
+}
+
+// If requested to do so, make sure we reset the world actors
+$reset_actors = !empty($_GET['reset']) && $_GET['reset'] === 'actors' ? true : false;
+$world_actors = !empty($WORLD_SESSION['world_actors']) ? $WORLD_SESSION['world_actors'] : array();
+$world_map_actors = !empty($world_actors[$world_map_token]) ? $world_actors[$world_map_token] : array();
+if ($reset_actors === true){
+    //error_log('clearing removed actors!');
+    rpg_world::update_session('world_actors', $world_map_token, array());  // clear all "removed" datestamps
+    header('Location: world.php');
+    exit();
 }
 
 // If requested to do so, make sure we reset the world locks
@@ -584,9 +612,9 @@ $reset_locks = !empty($_GET['reset']) && $_GET['reset'] === 'locks' ? true : fal
 $world_locks = !empty($WORLD_SESSION['world_locks']) ? $WORLD_SESSION['world_locks'] : array();
 $world_map_locks = !empty($world_locks[$world_map_token]) ? $world_locks[$world_map_token] : array();
 if ($reset_locks === true){
-    error_log('clearing opened locks!');
-    error_log('-> $world_locks was '.print_r($world_locks, true));
-    error_log('-> $world_map_locks was '.print_r($world_map_locks, true));
+    //error_log('clearing opened locks!');
+    //error_log('-> $world_locks was '.print_r($world_locks, true));
+    //error_log('-> $world_map_locks was '.print_r($world_map_locks, true));
     rpg_world::update_session('world_locks', $world_map_token, array());  // clear all "removed" datestamps
     if (!empty($world_locks)){
         foreach ($world_locks AS $temp_maptoken => $temp_maplocks){
@@ -600,6 +628,8 @@ if ($reset_locks === true){
             }
         }
     }
+    header('Location: world.php');
+    exit();
 }
 
 // Calculate remaining encounters for this area for later reference
@@ -757,6 +787,9 @@ $flag_skip_fadein = !$location_has_changed ? true : false;
                     // BATTLE OBJECT SPRITES
                     $battles_layer_markup = rpg_world::get_battles_layer_markup($this_prototype_data, $map_data_parsed);
                     echo($battles_layer_markup);
+                    // ACTOR TILE SPRITES
+                    $actors_layer_markup = rpg_world::get_actors_layer_markup($this_prototype_data, $map_data_parsed);
+                    echo($actors_layer_markup);
                     // ITEM OBJECT SPRITES
                     $items_layer_markup = rpg_world::get_items_layer_markup($this_prototype_data, $map_data_parsed);
                     echo($items_layer_markup);
