@@ -677,6 +677,30 @@ if (!strstr($map_field_music, '/')){ $map_field_music = 'sega-remix/'.$map_field
 $debug_flag_animation = true;
 $flag_skip_fadein = !$location_has_changed ? true : false;
 
+/*
+// DEBUG DEBUG DEBUG DEBUG
+// Append this event to the global events array
+$session_token = rpg_game::session_token();
+$_SESSION[$session_token]['EVENTS'][] = array(
+    'canvas_markup' => '&hellip;',
+    'console_markup' => '<p>Testing 123</p>',
+    'player_token' => 'dr-light',
+    'event_type' => 'other'
+    );
+$_SESSION[$session_token]['EVENTS'][] = array(
+    'canvas_markup' => '&hellip;',
+    'console_markup' => '<p>Testing 456</p>',
+    'player_token' => 'dr-wily',
+    'event_type' => 'other'
+    );
+$_SESSION[$session_token]['EVENTS'][] = array(
+    'canvas_markup' => '&hellip;',
+    'console_markup' => '<p>Testing 789</p>',
+    'player_token' => 'dr-cossack',
+    'event_type' => 'other'
+    );
+*/
+
 ?>
 <!DOCTYPE html>
 <html>
