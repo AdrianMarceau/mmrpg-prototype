@@ -1907,7 +1907,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         //console.log('dataLabel =', dataLabel);
         //console.log('dataColour =', dataColour);
         //console.log('_playerIndexInfo =', _playerIndexInfo);
-        if (dataActor && !actorInfo.removed){
+        if (dataActor && !actorInfo.removed && !playerIsCursor){
             showActionArea = true;
             if (!dataLabel){ dataLabel = 'Denizen'; }
             if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
