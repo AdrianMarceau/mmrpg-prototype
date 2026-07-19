@@ -1242,7 +1242,9 @@ function bindEventsToInputs($thisWorld){
                             }
                         if (!foundWalkableTile){
                             //console.log('%c' + 'No walkable tile found in that direction!', 'color: orange;');
-                            _self.refreshMapPositionEvents(0);
+                            _self.moveToPosition(oldPos, function(){
+                                _self.refreshMapPositionEvents(0);
+                                }, true);
                             return false;
                             }
                         }
