@@ -62,10 +62,10 @@
 #------------------------
 @events[]     = light-platform-left(10-8, lightpad-left, any, drop-zone, item:light-program, activate-player-platform)
 @events[]     = light-platform-middle(11-8, lightpad-middle, any, drop-zone, item:light-heart, activate-player-platform)
-@events[]     = light-platform-right(12-8, lightpad-right, any, drop-zone, item:copy-core, activate-player-platform)
+@events[]     = light-platform-right(12-8, lightpad-right, any, drop-zone, item:defense-core, activate-player-platform)
 @items[]      = light-init-program(19-26, light-program, anchored)
 @items[]      = light-init-heart(17-16, light-heart__1, anchored)
-@items[]      = light-init-core(3-24, copy-core, anchored)
+@items[]      = light-init-core(3-24, defense-core, anchored)
 #---------------------------#
 # INTRO ENCOUNTER
 #------------------
@@ -91,16 +91,16 @@
 @gates[]     = star-gate-01-g1(15-9, star-gate, vertical, x1)
 @blocks[]    = star-gate-01-b2(15-10, star-block, vert-left, x1)
 #------------------------
-@items[]      = energy-pellet-pickup(15-10, energy-pellet)
-@items[]      = energy-capsule-pickup(15-8, energy-capsule)
-@items[]      = weapon-pellet-pickup(16-10, weapon-pellet)
-@items[]      = weapon-capsule-pickup(16-8, weapon-capsule)
-@items[]      = attack-pellet-pickup(17-10, attack-pellet)
-@items[]      = attack-capsule-pickup(17-8, attack-capsule)
-@items[]      = defense-pellet-pickup(18-10, defense-pellet)
-@items[]      = defense-capsule-pickup(18-8, defense-capsule)
-@items[]      = speed-pellet-pickup(19-10, speed-pellet)
-@items[]      = speed-capsule-pickup(19-8, speed-capsule)
+@items[]      = energy-pellet-pickup(16-10, energy-pellet)
+@items[]      = energy-capsule-pickup(16-8, energy-capsule)
+@items[]      = weapon-pellet-pickup(17-10, weapon-pellet)
+@items[]      = weapon-capsule-pickup(17-8, weapon-capsule)
+@items[]      = attack-pellet-pickup(18-10, attack-pellet)
+@items[]      = attack-capsule-pickup(18-8, attack-capsule)
+@items[]      = defense-pellet-pickup(19-10, defense-pellet)
+@items[]      = defense-capsule-pickup(19-8, defense-capsule)
+@items[]      = speed-pellet-pickup(20-10, speed-pellet)
+@items[]      = speed-capsule-pickup(20-8, speed-capsule)
 #------------------------
 @actors[]     = good-friend-auto(20-9, robot, auto, -, first-encounter)
 @actors[]     = purple-reset-dude(23-28, robot, anti-eddie, -, first-encounter)
