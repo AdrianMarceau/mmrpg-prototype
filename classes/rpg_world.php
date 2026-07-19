@@ -1563,9 +1563,13 @@ class rpg_world {
             $battle_music = $map_field_music;
             if (!empty($map_data_parsed['music'])){
                 $possible_music = $map_data_parsed['music'];
+                //error_log('RANDOM ENCOUNTERS ('.$robot_class.') // $possible_music = '.print_r($possible_music, true));
                 if (!empty($possible_music[$robot_class.'-battle'])){ $possible_music = $possible_music[$robot_class.'-battle'][0]; }
                 elseif (!empty($possible_music['battle'])){ $possible_music = $possible_music['battle'][0]; }
+                elseif (!empty($possible_music['default'])){ $possible_music = $possible_music['default'][0]; }
+                if (!empty($possible_music)){ $battle_music = $possible_music; }
                 }
+            //error_log('RANDOM ENCOUNTERS ('.$robot_class.') // $battle_music = '.print_r($battle_music, true));
             $battle_turns = $rewards_matrix[$robot_class]['turns'];
             $battle_zenny = $rewards_matrix[$robot_class]['zenny'];
             $world_map_encounters[] = array('robot/'.$robot_class, $robot_token, '', $robot_pos, $battle_token, $robot_label);
@@ -1651,9 +1655,13 @@ class rpg_world {
                     $battle_music = $map_field_music;
                     if (!empty($map_data_parsed['music'])){
                         $possible_music = $map_data_parsed['music'];
+                        //error_log('STATIC ENCOUNTERS ('.$robot_class.') // $possible_music = '.print_r($possible_music, true));
                         if (!empty($possible_music[$encounter_class.'-battle'])){ $possible_music = $possible_music[$encounter_class.'-battle'][0]; }
                         elseif (!empty($possible_music['battle'])){ $possible_music = $possible_music['battle'][0]; }
+                        elseif (!empty($possible_music['default'])){ $possible_music = $possible_music['default'][0]; }
+                        if (!empty($possible_music)){ $battle_music = $possible_music; }
                         }
+                    //error_log('STATIC ENCOUNTERS ('.$robot_class.') // $battle_music = '.print_r($battle_music, true));
                     $battle_turns = $rewards_matrix[$robot_class]['turns'];
                     $battle_zenny = $rewards_matrix[$robot_class]['zenny'];
                     $battle_rewards = array();
@@ -4057,7 +4065,9 @@ class rpg_world {
                 $subtoken = '';
                 $quantity = 1;
                 $repeat = 'once';
+                $is_star = false;
                 if (strstr($token, '-star')){
+                    $is_star = true;
                     $subtoken = !empty($item_data[2]) ? $item_data[2] : ''; unset($item_data[2]);
                     } else {
                     $quantity = !empty($item_data[2]) ? $item_data[2] : ''; unset($item_data[2]);
@@ -4109,6 +4119,7 @@ class rpg_world {
                 $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
                 $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
                 $z_index = $top + 1;
+                if ($is_star){ $z_index -= 10; }
                 $label = $info['item_name'];
                 $class = $token.($animated  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 if ($subclass === 'event'){ $class .= ' always-zoom'; }
