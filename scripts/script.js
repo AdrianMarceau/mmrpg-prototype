@@ -498,6 +498,8 @@ $(document).ready(function(){
                         mmrpg_music_toggle();
                         setTimeout(function(){ top.mmrpg_play_sound_effect('game-start'); }, 100);
                         setTimeout(function(){ gameSettings.gameHasStarted = true; }, 200);
+                        let gameIframe = document.querySelector('#mmrpg iframe:not(.blank)');
+                        if (gameIframe){ gameIframe.focus(); if (gameIframe.contentWindow){ gameIframe.contentWindow.focus(); } }
                         if (gameSettings.onGameStart.length){
                             //console.log('gameSettings.onGameStart =', gameSettings.onGameStart);
                             while (gameSettings.onGameStart.length){
