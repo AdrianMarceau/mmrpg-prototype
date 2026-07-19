@@ -132,6 +132,12 @@ $(document).ready(function(){
     // If we're on either iPhone or iPad, we can't handle both music and sfx
     if (gameSettings.wapFlagiOS){ gameSettings.enableSoundEffects = false; }
 
+    // If this window is we need to clear the localStorage for a fresh start
+    if (window.self === window.top){
+        //console.log('clearing localStorage for a fresh start');
+        resetPendingEventsCount();
+        }
+
     // If this window is not running as top, we need to overwrite some variables and functions
     if (window.self !== window.top){
 
@@ -470,6 +476,7 @@ $(document).ready(function(){
 
     // Ensure this is the battle document
     if (gameWindow.length){
+        //console.log('gameWindow exists!');
 
         // -- GAME MUSIC & AUDIO FUNCTIONS -- //
 
@@ -2404,6 +2411,26 @@ function windowEventsPull(forcePull, butForReal){
     return true;
 }
 
+// Define a helper to resetting the events count stored in localStorage
+function resetPendingEventsCount(){
+    //console.log('resetPendingEventsCount()');
+    localStorage.setItem('pendingWindowEvents', 0);
+}
+
+// Define a helper to keep localStorage synced with the pending events count
+function updatePendingEventsCount(){
+    //console.log('updatePendingEventsCount()');
+    var pendingCount = gameSettings.messagesMarkupArray.length + (gameSettings.activeWindowEvent ? 1 : 0);
+    localStorage.setItem('pendingWindowEvents', pendingCount);
+}
+
+// Define a helper to get the events count stored in the localStorage
+function getPendingEventsCount(){
+    //console.log('getPendingEventsCount()');
+    let pendingEvents = Number(localStorage.getItem('pendingWindowEvents')) || 0;
+    return pendingEvents;
+}
+
 // Define a function for displaying event messages to the player
 gameSettings.canvasMarkupArray = [];
 gameSettings.messagesMarkupArray = [];
@@ -2412,6 +2439,7 @@ function windowEventCreate(canvasMarkupArray, messagesMarkupArray, autoDisplay){
     if (typeof autoDisplay !== 'boolean'){ autoDisplay = true; }
     for (var i = 0; i < canvasMarkupArray.length; i++){ gameSettings.canvasMarkupArray.push(canvasMarkupArray[i]); }
     for (var i = 0; i < messagesMarkupArray.length; i++){ gameSettings.messagesMarkupArray.push(messagesMarkupArray[i]); }
+    updatePendingEventsCount();
     if (autoDisplay){
         if (!gameSettings.gameHasStarted){
             gameSettings.onGameStart.push(function(){ setTimeout(windowEventDisplay, 1000); });
@@ -2465,6 +2493,7 @@ function windowEventDisplay(){
                 }
             windowEventDestroy();
             gameSettings.activeWindowEvent = false;
+            updatePendingEventsCount();
             if (gameSettings.canvasMarkupArray.length || gameSettings.messagesMarkupArray.length){
                 windowEventDisplay();
                 } else {
@@ -2583,13 +2612,14 @@ function windowEventDisplay(){
 
 // Define a function for displaying event messages to the player
 function windowEventDestroy(){
+    //console.log('windowEventDestroy()');
     var $eventContainer = $('#events');
     //console.log('windowEventDestroy()');
     $('#canvas', $eventContainer).empty();
     $('#messages', $eventContainer).empty();
     $('.event_container', $eventContainer).removeClass('animate');
     $eventContainer.addClass('hidden');
-    //alert(eventMarkup);
+    updatePendingEventsCount();
 }
 
 // Define a function for updating the loaded status of the main index page
