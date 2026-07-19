@@ -8,7 +8,12 @@ $restart_player_id = $battle_players_index[$this_player->player_token]['player_i
 $restart_player_token = $this_player->player_token;
 
 // Collect the battle token in case we need to change it
-$restart_battle_token = $this_battle->battle_token;
+// If this is a multi-battle, rebuild the comma-separated string so we don't lose guests
+if (!empty($this_battle->values['multi_battle_tokens'])){
+    $restart_battle_token = implode(',', $this_battle->values['multi_battle_tokens']);
+} else {
+    $restart_battle_token = $this_battle->battle_token;
+}
 
 // Redefine the player's robots string
 $this_player_robots = !empty($_REQUEST['this_player_robots']) ? $_REQUEST['this_player_robots'] : '00_robot';
@@ -30,6 +35,9 @@ if ($this_action == 'restart_whole-mission'){
     }
 }
 
+// Collect the star token if one was active during this battle
+$restart_star_token = !empty($_REQUEST['this_star_token']) ? $_REQUEST['this_star_token'] : '';
+
 // Redirect the user back to the prototype screen
 $this_redirect = 'battle.php?'.
     ($flag_wap ? 'wap=true' : 'wap=false').
@@ -44,6 +52,7 @@ $this_redirect = 'battle.php?'.
     //'&target_player_id='.$target_player->player_id.
     //'&target_player_token='.$target_player->player_token.
     //(!empty($_SESSION['BATTLES_CHAIN'][$this_battle->battle_chain_token]) ? '&flag_skip_fadein=true' : '').
+    (!empty($restart_star_token) ? '&this_star_token='.$restart_star_token : '').
     '&flag_skip_fadein=true'.
     '';
 

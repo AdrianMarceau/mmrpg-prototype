@@ -67,6 +67,18 @@ if (!empty($this_battle_token)){
         $this_battle_data['battle_id'] = $this_battle_id;
     }
 
+    // Pre-emptively remove any lingering "guest" robots from previous multi-battle sessions
+    // This ensures a clean slate whether this is a new multi-battle or reverting to a single encounter
+    if (!empty($this_battle_data['battle_target_player']['player_robots'])){
+        $clean_target_robots = array();
+        foreach ($this_battle_data['battle_target_player']['player_robots'] AS $robot_data){
+            if (empty($robot_data['flags']['guest'])){
+                $clean_target_robots[] = $robot_data;
+            }
+        }
+        $this_battle_data['battle_target_player']['player_robots'] = $clean_target_robots;
+    }
+
     // MULTI-BATTLE-TOKEN-POST-CHECK
     // If multiple battle tokens were provided, loop through them and merge-in target robots, rewards, etc.
     if ($multi_battle_tokens){
@@ -428,6 +440,8 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
         <input type="hidden" name="this_field_id" value="<?= $this_field_data['field_id'] ?>" />
         <input type="hidden" name="this_field_token" value="<?= $this_field_data['field_token'] ?>" />
 
+        <input type="hidden" name="this_star_token" value="<?= $this_star_token ?>" />
+
         <input type="hidden" name="this_user_id" value="<?= $this_player_data['user_id'] ?>" />
         <input type="hidden" name="this_player_id" value="<?= $this_player_data['player_id'] ?>" />
         <input type="hidden" name="this_player_token" value="<?= $this_player_data['player_token'] ?>" />
@@ -643,7 +657,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             );
 
                         // Append the new field star to the foreground attachment array
-                        $temp_shadow_image = $temp_star_kind.'-star';
+                        $temp_shadow_image = $temp_star_kind !== 'boss' ? $temp_star_kind.'-star' : 'field-star';
                         $this_field_data['field_foreground_attachments'][$temp_star_kind.'-star_shadow'] = array(
                             'class' => 'item',
                             'is_shadow' => true,
