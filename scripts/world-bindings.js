@@ -250,7 +250,7 @@ function bindEventsToInputs($thisWorld){
 
     // Define a function to run each time user inputs are updated so we can react
     let listenForInput = function(){ return Date.now() >= nextInputAllowedTime; }, nextInputAllowedTime = 0;
-    let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 200; nextInputAllowedTime = Date.now() + delay; };
+    let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 250; nextInputAllowedTime = Date.now() + delay; };
     let userInputVars = {};
     let checkUserInputs = function(kind, event, activeInputs, userInputs){
         //console.log('%c' + 'mmrpgWorldMap.checkUserInputs(kind:' + kind + ', event, activeInputs, userInputs)', 'color: cyan;');
