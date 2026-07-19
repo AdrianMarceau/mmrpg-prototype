@@ -219,7 +219,8 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let _worldCursor = _world.cursor;
         let busyWithKeys = Object.keys(_world.isBusyWith);;
-        return _world.isBusy || busyWithKeys.length > 0 || _worldCursor.loading || _worldCursor.busy || _worldCursor.moving;
+        let pendingEventsCount = typeof getPendingEventsCount === 'function' ? getPendingEventsCount() : 0;
+        return _world.isBusy || busyWithKeys.length > 0 || pendingEventsCount > 0 || _worldCursor.loading || _worldCursor.busy || _worldCursor.moving;
         }
 
     // Quick function for checking if the world map specifically is busy doing something (either busy because world, or because hidden)
@@ -228,7 +229,12 @@ class mmrpgWorldMap {
         let _self = this;
         let _world = _self.state;
         let activeWindowEvent = gameSettings.activeWindowEvent ? true : false;
-        return _world.mapIsHidden || activeWindowEvent;
+        let pendingEventsCount = typeof getPendingEventsCount === 'function' ? getPendingEventsCount() : 0;
+        let mapIsHidden = _world.mapIsHidden || activeWindowEvent || pendingEventsCount;
+        //console.log('activeWindowEvent =', activeWindowEvent);
+        //console.log('pendingEventsCount =', pendingEventsCount);
+        //console.log('mapIsHidden =', mapIsHidden);
+        return mapIsHidden;
         }
 
     // Quick function to initialize default settings

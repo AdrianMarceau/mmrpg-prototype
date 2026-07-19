@@ -228,10 +228,10 @@ $(document).ready(function(){
             //console.log('min debug' + '\nvalue: ', typeof value, value, '\nmin: ', typeof min, min, '\nminText: ', typeof minText, minText, '\ntext: ', typeof text, text);
             }
         if ($input.is('[data-show-sign]')){
-            console.log('input has show-sign flag');
+            //console.log('input has show-sign flag');
             if (value > 0){ text = '+' + text; }
             else if (value < 0){ text = '-' + text; }
-            console.log('sign debug' + '\nvalue: ', typeof value, value, '\ntext: ', typeof text, text);
+            //console.log('sign debug' + '\nvalue: ', typeof value, value, '\ntext: ', typeof text, text);
             }
         $value.text(text);
         };
@@ -699,7 +699,7 @@ $(document).ready(function(){
 
         // Make sure any updates to these fields are correctly parsed and applied
         $('input[type="radio"]', $battleButtonModeField).bind('change', function(e){
-            console.log('change event on battleButtonMode field');
+            //console.log('change event on battleButtonMode field');
             updateBattleButtonMode(parseBattleButtonMode());
             });
 

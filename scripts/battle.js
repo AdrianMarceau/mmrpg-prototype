@@ -248,7 +248,7 @@ $(document).ready(function(){
         };
 
     // Define a function to run each time user inputs are updated so we can react
-    let battleIsBusy = function(){ return gameSettings.currentActionPanel === 'loading' ? true : false; };
+    let battleIsBusy = function(){ return gameSettings.currentActionPanel === 'loading' || getPendingEventsCount() > 0 ? true : false; };
     let listenForInput = function(){ return Date.now() >= nextInputAllowedTime; }, nextInputAllowedTime = 0;
     let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 200; nextInputAllowedTime = Date.now() + delay; };
     let checkUserInputs = function(kind, event, activeInputs, userInputs){

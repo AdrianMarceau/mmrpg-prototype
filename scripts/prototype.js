@@ -611,6 +611,7 @@ $(document).ready(function(){
 function mmrpg_is_busy(){
     if (!gameSettings.gameHasLoaded){ return true; }
     if (!gameSettings.prototypeLoaded){ return true; }
+    if (getPendingEventsCount() > 0){ return true; }
     return false;
 }
 
@@ -894,7 +895,7 @@ function initUserInputWatcher(){
             && prototypeIsSubmenu
             && typeof checkUserInputsForFrame[prototypeIsSubmenu] !== 'undefined'
             && typeof window[checkUserInputsForFrame[prototypeIsSubmenu]] !== 'undefined'){
-            console.log('MMRPG ' + prototypeIsSubmenu.toUpperCase() + ' MENU TRIGGERS (SUB-FRAME ONLY)');
+            //console.log('MMRPG ' + prototypeIsSubmenu.toUpperCase() + ' MENU TRIGGERS (SUB-FRAME ONLY)');
             let checkUserInputsFunction = window[checkUserInputsForFrame[prototypeIsSubmenu]];
             checkUserInputsFunction.call(this, kind, event, activeInputs, userInputs);
             }
