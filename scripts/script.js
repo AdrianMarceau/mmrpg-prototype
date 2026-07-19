@@ -3322,6 +3322,7 @@ class mmrpgUserInputWatcher {
         let eventListeners = {};
         eventListeners.keydown = function(event){ let input = getUserInputFromKeyboardEvent(event.key); if (input){ activeInputs[input] = true; } onUserInput('keydown', event); };
         eventListeners.keyup = function(event){ let input = getUserInputFromKeyboardEvent(event.key); if (input){ delete activeInputs[input]; } onUserInput('keyup', event); };
+        eventListeners.blur = function(event){ Object.keys(activeInputs).forEach(function(key){ delete activeInputs[key]; }); onUserInput('blur', event); };
         if (_config.autoWheelMapping){ eventListeners.mousewheel = function(event){ getUserInputFromWheelEvent(event); onUserInput('mousewheel', event); }; }
         eventListeners.gamepadconnected = function(event){ watchGamepadInputs(event.gamepad); onUserInput('gamepadconnected', event); };
         eventListeners.gamepaddisconnected = function(event){ watchGamepadInputs(null); onUserInput('gamepaddisconnected', event); };
@@ -3351,6 +3352,7 @@ class mmrpgUserInputWatcher {
             // Bind events to the keyboard arrow keys if detected to allow for it
             document.addEventListener('keydown', eventListeners.keydown, { passive: false });
             document.addEventListener('keyup', eventListeners.keyup, { passive: false });
+            window.addEventListener('blur', eventListeners.blur, { passive: false });
 
             // Beind events to any connected gamepads to allow for the same
             // functionality as the keyboard arrow keys (mirror for easier coding)
@@ -3372,6 +3374,7 @@ class mmrpgUserInputWatcher {
             // Remove events from the keyboard arrow keys
             document.removeEventListener('keydown', eventListeners.keydown);
             document.removeEventListener('keyup', eventListeners.keyup);
+            window.removeEventListener('blur', eventListeners.blur);
 
             // Remove events from any connected gamepads
             window.removeEventListener("gamepadconnected", eventListeners.gamepadconnected);
