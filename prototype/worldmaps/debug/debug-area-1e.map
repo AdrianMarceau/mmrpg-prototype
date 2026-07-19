@@ -16,9 +16,9 @@
 @portals[]  = west-exit(1-4, debug-area-1__east-exit, left-only)
 @portals[]  = east-exit(50-11, debug-area-1e2__west-exit, right-only)
 #---------------------------#
-@pickups    = earth-core(10),small-screw(12),large-screw(6),defense-pellet(8),defense-capsule(4),energy-pellet(2),weapon-pellet(2)
+@pickups    = flame-core(10),earth-core(5),small-screw(12),large-screw(6),defense-pellet(8),defense-capsule(4),energy-pellet(2),weapon-pellet(2)
 #---------------------------#
-@encounters = gockroach-s(70),beetle-borg(70),antlin-g(20),bombomboy(5),power-muscler(1)
+@encounters = gockroach-s(70),beetle-borg(70),pyre-fly(30),antlin-g(20),bombomboy(10),power-muscler(1)
 @groups[]   = no-encounters_da1-exit-buffer(2-3...4-5)
 @groups[]   = no-encounters_da1e2-exit-buffer(48-10...50-12)
 @groups[]   = no-encounters_desert-portal-buffer(34-12...36-14)
@@ -27,6 +27,8 @@
 #---------------------------#
 @terrain[]   = desert(oil-wells)
 @terrain[]   = grass(gentle-countryside)
+#---------------------------#
+@music[]     = default(pharaoh-man-mm4)
 #---------------------------#
 @habitats[] = gockroach-s(desert)
 @habitats[] = beetle-borg(desert)
