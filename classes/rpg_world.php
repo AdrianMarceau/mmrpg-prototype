@@ -3663,8 +3663,8 @@ class rpg_world {
                     ),
                 'actions' => array(
                     'default' => array(
-                        array('Reset Pickups', 'reset-world-pickups', 'none', 'items:small-screw', 10),
-                        array('Reset Encounters', 'reset-world-encounters', 'none', 'items:large-screw', 10),
+                        array('Reset Encounters', 'reset-world-encounters', 'none', 'items:small-screw', 20),
+                        array('Reset Pickups', 'reset-world-pickups', 'none', 'items:large-screw', 20),
                         ),
                     ),
                 ),
