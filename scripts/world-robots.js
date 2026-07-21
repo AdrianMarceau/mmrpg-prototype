@@ -1897,12 +1897,14 @@ function getRobotSpriteMarkup(robotToken, spriteOptions){
     spriteOptions.delay = typeof spriteOptions.delay === 'number' && spriteOptions.delay !== 0 ? spriteOptions.delay : (-1 * ( Math.floor(Math.random() * 10) / 100 ));
     spriteOptions.classes = typeof spriteOptions.classes === 'string' && spriteOptions.classes.length > 1 ? spriteOptions.classes : '';
     spriteOptions.styles = typeof spriteOptions.styles === 'string' && spriteOptions.styles.length > 1 ? spriteOptions.styles : '';
+    spriteOptions.kind = typeof spriteOptions.kind === 'string' && spriteOptions.kind.length > 1 ? spriteOptions.kind : 'sprite';
     // Generate the robot sprite attributes and inner markup given the options
     let robotSpriteAttrs = '';
     let robotSpriteClass = 'sprite robot' + (spriteOptions.classes ? ' ' + spriteOptions.classes : '');
     let robotSpriteStyle = 'animation-delay: ' + spriteOptions.delay + 's;' + (spriteOptions.styles ? ' ' + spriteOptions.styles : '');
     robotSpriteAttrs += ' class="' + robotSpriteClass + '"';
     robotSpriteAttrs += ' data-sprite="robot"';
+    robotSpriteAttrs += ' data-kind="' + spriteOptions.kind + '"';
     robotSpriteAttrs += ' data-token="' + robotToken + '"';
     robotSpriteAttrs += ' data-alt="' + spriteOptions.alt + '"';
     robotSpriteAttrs += ' data-size="' + spriteOptions.size + '"';
