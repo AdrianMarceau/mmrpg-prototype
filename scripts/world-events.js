@@ -3059,6 +3059,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 $eventSprite.attr('data-state', 'removed');
                 $eventSprite.removeClass('glow');
                 //_self.playSoundEffect('icon-click');
+                _self.reduceRobotWeapons(blockRobot, 1, false);
                 _self.playSoundEffect('block-destroyed-sound', {delay: 200});
                 $canvasMap.addClass('shake-once');
                 $eventSprite.animate({opacity: 0, filter: 'brightness(2)'}, 600, function(){
@@ -3107,6 +3108,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 $eventSprite.attr('data-state', 'removed');
                 $eventSprite.removeClass('glow');
                 //_self.playSoundEffect('icon-click');
+                _self.reduceRobotWeapons(hazardRobot, 1, false);
                 _self.playSoundEffect('hazard-destroyed-sound', {delay: 200});
                 $canvasMap.addClass('shake-once');
                 $eventSprite.animate({opacity: 0, filter: 'brightness(2)'}, 600, function(){
