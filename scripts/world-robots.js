@@ -720,6 +720,69 @@ function restoreRobotWeapons(robotString, restoreAmount, playSound){
     // Return true on success
     return true;
     }
+// Quick function for reducing a robot's weapons (if available) by a specific amount (or all if === true)
+function reduceRobotWeapons(robotString, reduceAmount, playSound){
+    console.log('%c' + 'mmrpgWorldMap.reduceRobotWeapons(' + robotString + ', ' + reduceAmount + ')', 'color: magenta;');
+    if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('reduceRobotWeapons() missing required robotString!'); return false; }
+    if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+    // If reduceAmount is true, reduce all weapons, otherwise reduce the amount provided
+    reduceAmount = (typeof reduceAmount === 'number' ? reduceAmount : (reduceAmount === true ? true : 0));
+    // Collect references to world objects
+    let _self = this;
+    let _config = _self.config;
+    let _elements = _self.elements;
+    let _world = _self.state;
+    let _worldPlayer = _world.player;
+    let _worldPlayerRobots = _worldPlayer.robots;
+    // Break the robot sprite into ID and token and collect its info
+    let robotId = parseInt(robotString.split('_')[0]) || false;
+    let robotToken = robotString.split('_')[1] || false;
+    let robotInfo = _self.getTeamRobot(robotString) || false;
+    if (!robotInfo){ console.error('reduceRobotWeapons() could not find robot info for robot ' + robotString + '!'); return false; }
+    //console.log('-> robotId =', robotId);
+    //console.log('-> robotToken =', robotToken);
+    //console.log('-> robotInfo =', robotInfo);
+    // Collect a reference to this robot's element in the overview panel
+    let $robotOverview = $('.team-robot[data-robot="' + robotString + '"]', _elements.robotsOverview);
+    if (!$robotOverview || !$robotOverview.length){ console.warn('reduceRobotWeapons() could not find overview for robot ' + robotString + '!'); return false; }
+    let $robotIconSprite = $('.icon > .sprite', $robotOverview);
+    let $robotWeaponsGuage = $('.guage.weapons', $robotOverview);
+    if (!$robotIconSprite || !$robotIconSprite.length){ console.warn('reduceRobotWeapons() could not find icon sprite for robot ' + robotString + '!'); return false; }
+    if (!$robotWeaponsGuage || !$robotWeaponsGuage.length){ console.warn('reduceRobotWeapons() could not find weapons guage for robot ' + robotString + '!'); return false; }
+    // Collect the current weapons value for this robot
+    let currentWeapons = robotInfo.weapons || 0;
+    let maxWeapons = robotInfo.weaponsMax || 0;
+    //console.log('-> currentWeapons =', currentWeapons);
+    //console.log('-> maxWeapons =', maxWeapons);
+    //console.log('-> reduceAmount =', reduceAmount);
+    // If reduceAmount is true, reduce all weapons, otherwise reduce the amount provided
+    let newWeapons = currentWeapons;
+    if (reduceAmount === true){ newWeapons = 0; }
+    else if (typeof reduceAmount === 'number' && reduceAmount > 0){ newWeapons = Math.max(currentWeapons - reduceAmount, 0); }
+    //console.log('-> newWeapons =', newWeapons);
+    // If the new and old weapons values are the same, do nothing
+    if (newWeapons === currentWeapons){
+        //console.log('reduceRobotWeapons() called but weapons values are the same, nothing changed!');
+        return true;
+        }
+    // Update the robot info with the new weapons value
+    robotInfo.weapons = newWeapons;
+    robotInfo.weaponsPercent = Math.floor((robotInfo.weapons / robotInfo.weaponsMax) * 100);
+    robotInfo.weaponsRating = _self.getRatingToken(robotInfo.weaponsPercent);
+    _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
+    // Update the weapons guage title and bar within with the new weapons value
+    $robotWeaponsGuage.attr('title', newWeapons + '/' + maxWeapons + ' WE (' + robotInfo.weaponsPercent + '%)');
+    $('> i', $robotWeaponsGuage).css({width: robotInfo.weaponsPercent + '%'}).removeClass().addClass(robotInfo.weaponsRating);
+    // Add a reduced class to this robot to show it being effected by the action
+    if (playSound){ _self.playSoundEffect('deplete-weapons'); }
+    $robotOverview.addClass('energy-reduced weapon-energy-reduced');
+    setTimeout(function(){ $robotOverview.removeClass('weapon-energy-reduced'); }, 2000);
+    setTimeout(function(){ $robotOverview.removeClass('energy-reduced'); }, 3000);
+    // Trigger a save of the world state to persist this change
+    _self.saveWorldState();
+    // Return true on success
+    return true;
+    }
 
 // Quick function for resetting a robot's stat mods for a given stat back to zero
 function resetRobotStat(robotString, statToken, playSound){
@@ -1895,6 +1958,7 @@ mmrpgWorldMap.prototype.damageRobotEnergy = damageRobotEnergy;
 
 mmrpgWorldMap.prototype.setRobotWeapons = setRobotWeapons;
 mmrpgWorldMap.prototype.restoreRobotWeapons = restoreRobotWeapons;
+mmrpgWorldMap.prototype.reduceRobotWeapons = reduceRobotWeapons;
 
 mmrpgWorldMap.prototype.resetRobotStat = resetRobotStat;
 mmrpgWorldMap.prototype.resetRobotAttack = resetRobotAttack;
