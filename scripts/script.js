@@ -2184,62 +2184,47 @@ function mmrpg_music_context(newContext){
 gameSettings.soundEffectSources = [];
 gameSettings.soundEffectSprites = {};
 gameSettings.soundEffectPool = [];
-gameSettings.soundEffectPoolKey = 0; // -1;
+gameSettings.soundEffectPoolKey = 0;
 gameSettings.soundEffectPoolLimit = 10;
-// Define a list of sound effect aliases we can use in the code to abstract a bit
 gameSettings.customIndex.soundsIndex = {};
 gameSettings.customIndex.soundsAliasesIndex = {};
-// Define a function to play sound effects during game runtime
 async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     if (typeof effectConfig !== 'object'){ effectConfig = {}; }
     if (typeof isMenuSound !== 'boolean'){ isMenuSound = true; }
-    //console.log('%cmmrpg_play_sound_effect', 'color: cyan;', '(effectName:', effectName, 'effectConfig:', typeof effectConfig, effectConfig, 'isMenuSound:', isMenuSound, ')');
-    //console.log('gameSettings.soundEffectPool =', Object.keys(gameSettings.soundEffectPool).length, gameSettings.soundEffectPool);
-    //console.log('gameSettings.soundEffectSources =', gameSettings.soundEffectSources.length, gameSettings.soundEffectSources);
-    //console.log('gameSettings.soundEffectSprites =', Object.keys(gameSettings.soundEffectSprites).length, gameSettings.soundEffectSprites);
 
-    // If the game hasn't loaded we shoudln't be playing anything
-    //let somethingHasLoaded = gameSettings.indexLoaded  || gameSettings.worldLoaded || gameSettings.battleLoaded ? true : false;
-    //if (!somethingHasLoaded){ console.warn('aaa'); return false; }
     if (!gameSettings.gameHasLoaded){ console.warn('aaa', effectName, gameSettings); return false; }
     if (gameSettings.enableSoundEffects === false){ console.warn('bbb', effectName, gameSettings); return false; }
+
     if (gameSettings.indexLoaded){
         if (typeof gameSettings.musicHasStarted === 'undefined'){ gameSettings.musicHasStarted = false; }
         if (!gameSettings.musicHasStarted && mmrpgMusicSound.playing()){ gameSettings.musicHasStarted = true; }
         if (!gameSettings.musicVolumeEnabled){ console.warn('ccc', effectName, gameSettings); return false; }
         if (mmrpgMusicSound === false){ console.warn('ddd(1)', effectName, gameSettings); return false; }
         else if (gameSettings.gameHasStarted && !gameSettings.musicHasStarted){ console.error('ddd(2)', effectName, gameSettings); return false; }
-        }
+    }
 
-    // If we don't have sound effect sounces or sprites loaded, we can't do anything
     if (!gameSettings.soundEffectSources.length){ console.warn('eee', effectName, gameSettings); return false; }
-    if (gameSettings.soundEffectSprites === {}){ console.warn('fff', effectName, gameSettings); return false; }
 
-    // Otherwise, define a base volume for these sound effects to use
+    // FIX 1: Correctly check if the sprite object is actually empty
+    if (Object.keys(gameSettings.soundEffectSprites).length === 0){ console.warn('fff', effectName, gameSettings); return false; }
+
     var baseEffectVolume = gameSettings.effectVolume * gameSettings.masterVolume;
 
-    // Replace the effect name if we're using an alias at the moment
-    // TODO:  Make sure this effectName actually exists in the index of sound effect sprites
     if (typeof gameSettings.customIndex.soundsAliasesIndex !== 'undefined'
         && typeof gameSettings.customIndex.soundsAliasesIndex[effectName] !== 'undefined'){
-        // Pull the actual effect name from the index based on the alias provided
         effectName = gameSettings.customIndex.soundsAliasesIndex[effectName];
-        //console.log('alias triggered // new effectName =', effectName);
-        } else if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
+    } else if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
         && typeof gameSettings.customIndex.soundsIndex.sprite[effectName] !== 'undefined'){
-        //console.log('using RAW name // effectName =', effectName);
-        // We should be using aliases but the effect name is technically fine as-is
-        } else {
-        // Immediately return as this isn't real and might cause audio bugs
-        //console.log('not using UNKNOWN name // effectName =', effectName);
+        // Valid
+    } else {
         return false;
-        }
+    }
 
-    // Collect this effect's volume, rate factor, and loop boolean for use
     var effectVolume = baseEffectVolume;
     var effectRate = 1.0;
     var effectLoop = false;
     var effectDelay = 0;
+
     if (isMenuSound === true){ effectVolume *= gameSettings.menuEffectVolume; }
     if (typeof effectConfig.volume === 'number'){ effectVolume *= effectConfig.volume; }
     if (typeof effectConfig.rate === 'number'){ effectRate = effectConfig.rate; }
@@ -2249,17 +2234,13 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     if (effectVolume < 0){ effectVolume = 0; }
     if (effectVolume > 1){ effectVolume = 1; }
     effectVolume = (Math.round(effectVolume * 1000) / 1000);
-    //console.log('mmrpg_play_sound_effect // effectName:', effectName, 'effectVolume:', effectVolume, 'effectRate:', effectRate, 'effectLoop:', effectLoop);
 
-    // Get the next sound object from the pool
     let sound;
-    //gameSettings.soundEffectPoolKey++;
-    //if (gameSettings.soundEffectPoolKey >= gameSettings.soundEffectPoolLimit){ gameSettings.soundEffectPoolKey = 0; }
     let soundEffectPoolKey = gameSettings.soundEffectPoolKey;
+
     if (typeof gameSettings.soundEffectPool[soundEffectPoolKey] === 'undefined'
         || typeof gameSettings.soundEffectPool[soundEffectPoolKey].sound === 'undefined'){
 
-        // We must create a new sound object before we can use it
         sound = new Howl({
             src: gameSettings.soundEffectSources,
             sprite: gameSettings.soundEffectSprites,
@@ -2269,93 +2250,47 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             rate: 1.0,
             loop: false,
             html5: false,
-            //html5PoolSize: 3,
-            });
+        });
+
         gameSettings.soundEffectPool[soundEffectPoolKey] = {
             key: soundEffectPoolKey,
             name: effectName,
             sound: sound,
             time: Date.now()
-            };
+        };
+    }
 
-        }
-
-    // We can pull an existing sound object to use from the pool
     let effect = gameSettings.soundEffectPool[soundEffectPoolKey];
     effect.time = Date.now();
     sound = effect.sound;
-    //console.log('sound =', sound);
-    //console.log('sound._volume', sound._volume);
-    //console.log('sound.volume() =', sound.volume());
-    //console.log('sound._sprite['+effectName+'] =', (sound._sprite &&  sound._sprite[effectName] ? sound._sprite[effectName] : undefined));
 
-    // Stop any currently playing sound (?)
-    //sound.stop();
-
-    // Play the sound when ready using a function that checks load status
     let playSoundWhenReady = function(effectName, effectVolume, effectRate){
         let playSound = function(sound){
-            //sound.stop();
-            //console.log('set rate to ', effectRate);
-            sound.rate(effectRate, effect.id);
-            sound.volume(effectVolume);
-            sound.play(effectName);
-            };
-        if (sound.state() !== 'loaded'){
-            /* sound.once('play', function(){
-                //console.log('sound on play w/ effectVolume:', effectVolume, '&& effectRate:', effectRate);
-                this.rate(effectRate);
-                this.volume(effectVolume);
-                this.loop(effectLoop);
-                }); */
-            sound.once('load', function(){
-                //console.log('sound on loaded w/ effectVolume:', effectVolume, '&& effectRate:', effectRate);
-                playSound(sound);
-                //this.stop();
-                //this.rate(effectRate);
-                //this.volume(effectVolume);
-                //this.play(effectName);
-                });
-            } else {
-            //console.log('sound immediate invoke w/ effectVolume:', effectVolume, '&& effectRate:', effectRate);
-            playSound(sound);
-            //sound.stop();
-            //sound.rate(effectRate);
-            //sound.volume(effectVolume);
-            //sound.play(effectName);
-            }
-        return true;
+            // FIX 2: Trigger play FIRST to get the unique ID for this specific playback
+            let playId = sound.play(effectName);
+
+            // FIX 3: Apply rate and volume strictly to this playId so it doesn't corrupt others
+            sound.rate(effectRate, playId);
+            sound.volume(effectVolume, playId);
+
+            // Store the id back into your effect object if you need to manipulate it later
+            effect.id = playId;
         };
+
+        if (sound.state() !== 'loaded'){
+            sound.once('load', function(){
+                playSound(sound);
+            });
+        } else {
+            playSound(sound);
+        }
+        return true;
+    };
+
     if (effectDelay){ setTimeout(function(){ playSoundWhenReady(effectName, effectVolume, effectRate); }, effectDelay); }
     else { playSoundWhenReady(effectName, effectVolume, effectRate); }
 
-
-    /*
-    // Now that the sound is actually playing we can do cleanup
-    // If the sound effect pool is full, we need to remove the oldest sound
-    var effectPoolSizeCurrent = Object.keys(gameSettings.soundEffectPool).length;
-    if (effectPoolSizeCurrent > gameSettings.soundEffectPoolLimit){
-        //console.log('soundEffectPool is full (', effectPoolSizeCurrent, ' / ', gameSettings.soundEffectPoolLimit, '), removing oldest sound');
-        var oldestSound = false;
-        var oldestSoundTime = false;
-        for (var soundName in gameSettings.soundEffectPool){
-            sound = gameSettings.soundEffectPool[soundName];
-            if (oldestSoundTime === false || sound.time < oldestSoundTime){
-                oldestSound = sound;
-                oldestSoundTime = sound.time;
-                }
-            }
-        if (oldestSound !== false){
-            //console.log('removing oldest sound:', oldestSound.name);
-            oldestSound.sound.unload();
-            delete gameSettings.soundEffectPool[oldestSound.name];
-            }
-        }
-    */
-
-    // Return now that we're done
     return true;
-
 }
 
 // Define a function for queueing something for when the game has started
