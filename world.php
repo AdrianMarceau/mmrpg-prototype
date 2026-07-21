@@ -4,6 +4,9 @@
 require_once('top.php');
 //error_log('---------------------------------');
 
+// Adjust some important settings to prevent server issues
+set_time_limit(30);
+
 // Automatically empty temporary session vars from this or other pages
 $_SESSION['BATTLES'] = array();
 $_SESSION['FIELDS'] = array();
@@ -36,9 +39,63 @@ $game_session_token = rpg_game::session_token();
 $GAME_SESSION = &$_SESSION[$game_session_token];
 
 // Define a reference object for storing temporary world data
-rpg_world::init_session();
 $world_session_token = rpg_world::session_token();
+$world_session_empty = false;
 $WORLD_SESSION = &$_SESSION[$world_session_token];
+if (empty($WORLD_SESSION)){ $world_session_empty = true; }
+if ($world_session_empty){
+    if (empty($this_userid) || $this_userid < 0){ die('world session is empty, and no user_id to load from!'); die(); }
+    echo('world session is empty, but loading from user_id '.$this_userid.'!');
+    //rpg_world::init_session();
+    //rpg_world::load_session($this_userid);
+    $world_data = $db->get_array("SELECT
+        `last_world_token`,
+        `last_map_token`,
+        `last_player_token`,
+        `player_sessions`,
+        `robot_sessions`,
+        `mecha_sessions`,
+        `world_maps`,
+        `world_buttons`,
+        `world_switches`,
+        `world_gates`,
+        `world_locks`,
+        `world_blocks`,
+        `world_hazards`,
+        `world_items`,
+        `world_abilities`,
+        `world_encounters`,
+        `world_pickups`,
+        `world_actors`,
+        `world_symbols`,
+        `world_events`
+        FROM `mmrpg_users_worlds`
+        WHERE `user_id` = {$this_userid}
+        ;");
+    if (!empty($world_data)){
+        // user already has world save data
+        rpg_world::init_session();
+        //error_log('$world_data = '.print_r($world_data, true));
+        foreach ($world_data AS $key => $value){
+            if (empty($value) || !isset($WORLD_SESSION[$key])){ continue; }
+            if (!is_numeric($value)
+                && (substr($value, 0, 1) === '{' && substr($value, -1, 1) === '}')
+                || (substr($value, 0, 1) === '[' && substr($value, -1, 1) === ']')){
+                $value = json_decode($value, true);
+                $world_data[$key] = $value;
+                }
+            $WORLD_SESSION[$key] = $value;
+            }
+        //error_log('$WORLD_SESSION = '.print_r($WORLD_SESSION, true));
+        } else {
+        // must be a totally new world file
+        rpg_world::init_session();
+        }
+    header('Location: world.php');
+    exit();
+} else {
+    rpg_world::init_session(); // must have refreshed page
+}
 
 // Scan for allowed world directories and the map + sheet files within
 //error_log('scanning for existing worldmap files ...');
@@ -111,7 +168,7 @@ if (!empty($_POST['action']) && $_POST['action'] === 'save'
         'robot_tokens' => $allowed_robot_tokens,
         ));
     // save the session with any new changes we just made
-    //rpg_world::save_session();
+    mmrpg_save_game_session();
     // Now that we're done saving, return a success response
     header('Content-Type: application/json');
     echo(json_encode(array('status' => 'success', 'message' => 'World data saved successfully.')));
@@ -165,6 +222,7 @@ if (empty($request_player_token) && !empty($WORLD_SESSION['player_sessions']['la
 if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){ $this_prototype_data['this_current_player'] = $request_player_token; }
 if (empty($this_prototype_data['this_current_player'])){ $this_prototype_data['this_current_player'] = $default_player_token; }
 //$WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
+$WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
 $WORLD_SESSION['player_sessions']['last_player'] = $this_prototype_data['this_current_player'];
 $WORLD_SESSION['player_sessions']['allowed'] = $allowed_player_tokens; // store the allowed player tokens in the session
 //error_log('$WORLD_SESSION[\'player_sessions\'][\'allowed\'] = '. print_r($WORLD_SESSION['player_sessions']['allowed'], true));
