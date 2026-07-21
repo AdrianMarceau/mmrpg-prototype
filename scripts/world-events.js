@@ -1424,13 +1424,13 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         let buttonColour = weaknessType;
                         //console.log('checking for weaknessType:' + weaknessType + ' ... ');
                         let robotsWithAbilityType = _self.getPlayerRobotsWithAbilityType(weaknessType);
-                        robotsWithAbilityType = robotsWithAbilityType.filter(function(robot){
+                        robotsWithAbilityType = robotsWithAbilityType ? robotsWithAbilityType.filter(function(robot){
                             let robotString = robot[0], robotData = _worldPlayerRobots[robotString];
                             if (robotStringsUsed.indexOf(robotString) !== -1){ return false; }
                             if (!robotData || !robotData.weapons){ return false; }
                             if (robotData.weapons < 1){ return false; }
                             return true;
-                            });
+                            }) : false;
                         //console.log('robotsWithAbilityTypee(filtered) =', robotsWithAbilityType);
                         let firstRobotWithAbilityType = robotsWithAbilityType ? robotsWithAbilityType[0] : false;
                         if (firstRobotWithAbilityType){ robotStringsUsed.push(firstRobotWithAbilityType[0]); }
@@ -1519,13 +1519,13 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         let buttonColour = weaknessType;
                         //console.log('checking for weaknessType:' + weaknessType + ' ... ');
                         let robotsWithAbilityType = _self.getPlayerRobotsWithAbilityType(weaknessType);
-                        robotsWithAbilityType = robotsWithAbilityType.filter(function(robot){
+                        robotsWithAbilityType = robotsWithAbilityType ? robotsWithAbilityType.filter(function(robot){
                             let robotString = robot[0], robotData = _worldPlayerRobots[robotString];
                             if (robotStringsUsed.indexOf(robotString) !== -1){ return false; }
                             if (!robotData || !robotData.weapons){ return false; }
                             if (robotData.weapons < 1){ return false; }
                             return true;
-                            });
+                            }) : false;
                         //console.log('robotsWithAbilityTypee(filtered) =', robotsWithAbilityType);
                         let firstRobotWithAbilityType = robotsWithAbilityType ? robotsWithAbilityType[0] : false;
                         if (firstRobotWithAbilityType){ robotStringsUsed.push(firstRobotWithAbilityType[0]); }
