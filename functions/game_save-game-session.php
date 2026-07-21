@@ -486,7 +486,7 @@ function mmrpg_save_game_session(){
 
         // Wrao the collection of world data in a function to limit scope and reduce markup
         $get_json_encoded = function($array){ return json_encode($array, JSON_NUMERIC_CHECK); };
-        $get_world_save_data = function($WORLD_SESSION, $world_id, $user_id) use ($get_json_encoded) {
+        $get_world_save_data = function($WORLD_SESSION, $world_id, $user_id) use ($GAME_SESSION, $get_json_encoded){
 
             // Collect the rest of the world info from the session
             $world_cache_date = MMRPG_CONFIG_CACHE_DATE;
@@ -524,6 +524,15 @@ function mmrpg_save_game_session(){
             $world_actors = !empty($WORLD_SESSION['world_actors']) ? $WORLD_SESSION['world_actors'] : array();
             $world_symbols = !empty($WORLD_SESSION['world_symbols']) ? $WORLD_SESSION['world_symbols'] : array();
             $world_events = !empty($WORLD_SESSION['world_events']) ? $WORLD_SESSION['world_events'] : array();
+            $world_battles = !empty($GAME_SESSION['values']['battle_index']) ? $GAME_SESSION['values']['battle_index'] : array();
+            foreach ($world_battles AS $token => $battle){
+                if (substr($token, 0, 13) !== 'world-battle_'){
+                    unset($world_battles[$token]);
+                    continue;
+                    } else {
+                    $world_battles[$token] = json_decode($battle, true);
+                    }
+                }
             //error_log('$world_maps = '.print_r($world_maps, true));
             //error_log('$world_buttons = '.print_r($world_buttons, true));
             //error_log('$world_switches = '.print_r($world_switches, true));
@@ -538,6 +547,7 @@ function mmrpg_save_game_session(){
             //error_log('$world_actors = '.print_r($world_actors, true));
             //error_log('$world_symbols = '.print_r($world_symbols, true));
             //error_log('$world_events = '.print_r($world_events, true));
+            //error_log('$world_battles = '.print_r($world_battles, true));
             // Generate the return array with any encoding necessary
             $return_array = array(
                 'world_cache_date' => $world_cache_date,
@@ -563,6 +573,7 @@ function mmrpg_save_game_session(){
                 'world_actors' => $get_json_encoded($world_actors),
                 'world_symbols' => $get_json_encoded($world_symbols),
                 'world_events' => $get_json_encoded($world_events),
+                'world_battles' => $get_json_encoded($world_battles),
                 );
             // Return the generated world save data array
             return $return_array;

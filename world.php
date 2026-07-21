@@ -45,7 +45,7 @@ $WORLD_SESSION = &$_SESSION[$world_session_token];
 if (empty($WORLD_SESSION)){ $world_session_empty = true; }
 if ($world_session_empty){
     if (empty($this_userid) || $this_userid < 0){ die('world session is empty, and no user_id to load from!'); die(); }
-    echo('world session is empty, but loading from user_id '.$this_userid.'!');
+    //error_log('world session is empty, but loading from user_id '.$this_userid.'!');
     //rpg_world::init_session();
     //rpg_world::load_session($this_userid);
     $world_data = $db->get_array("SELECT
@@ -68,11 +68,18 @@ if ($world_session_empty){
         `world_pickups`,
         `world_actors`,
         `world_symbols`,
-        `world_events`
+        `world_events`,
+        `world_battles`
         FROM `mmrpg_users_worlds`
         WHERE `user_id` = {$this_userid}
         ;");
     if (!empty($world_data)){
+        // Extract the battle data for later
+        $world_battles = !empty($world_data['world_battles']) ? $world_data['world_battles'] : '';
+        error_log('$world_battles(A) = '.print_r($world_battles, true));
+        $world_battles = !empty($world_battles) ? json_decode($world_battles, true) : array();
+        error_log('$world_battles(B) = '.print_r($world_battles, true));
+        unset($world_data['world_battles']);
         // user already has world save data
         rpg_world::init_session();
         //error_log('$world_data = '.print_r($world_data, true));
@@ -87,12 +94,16 @@ if ($world_session_empty){
             $WORLD_SESSION[$key] = $value;
             }
         //error_log('$WORLD_SESSION = '.print_r($WORLD_SESSION, true));
+        if (!isset($GAME_SESSION['values']['battle_index'])){ $GAME_SESSION['values']['battle_index'] = array(); }
+        foreach ($world_battles AS $token => $battle){ $GAME_SESSION['values']['battle_index'][$token] = json_encode($battle, JSON_NUMERIC_CHECK); }
+        // clean up now that we're done
+        unset($world_data);
         } else {
         // must be a totally new world file
         rpg_world::init_session();
         }
-    header('Location: world.php');
-    exit();
+    //header('Location: world.php');
+    //exit();
 } else {
     rpg_world::init_session(); // must have refreshed page
 }
