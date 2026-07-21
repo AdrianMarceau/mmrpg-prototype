@@ -526,12 +526,8 @@ function mmrpg_save_game_session(){
             $world_events = !empty($WORLD_SESSION['world_events']) ? $WORLD_SESSION['world_events'] : array();
             $world_battles = !empty($GAME_SESSION['values']['battle_index']) ? $GAME_SESSION['values']['battle_index'] : array();
             foreach ($world_battles AS $token => $battle){
-                if (substr($token, 0, 13) !== 'world-battle_'){
-                    unset($world_battles[$token]);
-                    continue;
-                    } else {
-                    $world_battles[$token] = json_decode($battle, true);
-                    }
+                if (substr($token, 0, 13) !== 'world-battle_'){ unset($world_battles[$token]); continue; }
+                $world_battles[$token] = json_decode($battle, true);
                 }
             //error_log('$world_maps = '.print_r($world_maps, true));
             //error_log('$world_buttons = '.print_r($world_buttons, true));
