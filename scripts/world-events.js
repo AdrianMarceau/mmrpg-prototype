@@ -1418,12 +1418,22 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             if (blockWeaknesses.length){
                 let robotsIndex = _indexes.robots;
                 let abilitiesIndex = _indexes.abilities;
+                let robotStringsUsed = [];
                 for (let i = 0; i < blockWeaknesses.length; i++){
                         let weaknessType = blockWeaknesses[i];
                         let buttonColour = weaknessType;
                         //console.log('checking for weaknessType:' + weaknessType + ' ... ');
                         let robotsWithAbilityType = _self.getPlayerRobotsWithAbilityType(weaknessType);
+                        robotsWithAbilityType = robotsWithAbilityType.filter(function(robot){
+                            let robotString = robot[0], robotData = _worldPlayerRobots[robotString];
+                            if (robotStringsUsed.indexOf(robotString) !== -1){ return false; }
+                            if (!robotData || !robotData.weapons){ return false; }
+                            if (robotData.weapons < 1){ return false; }
+                            return true;
+                            });
+                        //console.log('robotsWithAbilityTypee(filtered) =', robotsWithAbilityType);
                         let firstRobotWithAbilityType = robotsWithAbilityType ? robotsWithAbilityType[0] : false;
+                        if (firstRobotWithAbilityType){ robotStringsUsed.push(firstRobotWithAbilityType[0]); }
                         let playerRobotAvailable = firstRobotWithAbilityType ? true : false;
                         let playerRobotName = '', playerRobotToken = '', playerRobotId = 0;
                         let $playerRobotSprite = null, robotSpriteMarkup = null;
@@ -1463,6 +1473,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                             );
                         sideButtonsMarkup += '</a>';
                     }
+                //console.log('robotStringsUsed =', robotStringsUsed);
                 }
             //sideButtonsMarkup += '<a class="button big-button'+(blockKind2 ? ' '+blockKind2 : '')+''+(dataType ? ' type '+dataColour2 : '')+'" data-action="remove-block" data-block="'+dataBlock+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(blockKind2.replace('-', ' ')) + '</span></a>';
             sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
@@ -1502,12 +1513,22 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             if (hazardWeaknesses.length){
                 let robotsIndex = _indexes.robots;
                 let abilitiesIndex = _indexes.abilities;
+                let robotStringsUsed = [];
                 for (let i = 0; i < hazardWeaknesses.length; i++){
                         let weaknessType = hazardWeaknesses[i];
                         let buttonColour = weaknessType;
                         //console.log('checking for weaknessType:' + weaknessType + ' ... ');
                         let robotsWithAbilityType = _self.getPlayerRobotsWithAbilityType(weaknessType);
+                        robotsWithAbilityType = robotsWithAbilityType.filter(function(robot){
+                            let robotString = robot[0], robotData = _worldPlayerRobots[robotString];
+                            if (robotStringsUsed.indexOf(robotString) !== -1){ return false; }
+                            if (!robotData || !robotData.weapons){ return false; }
+                            if (robotData.weapons < 1){ return false; }
+                            return true;
+                            });
+                        //console.log('robotsWithAbilityTypee(filtered) =', robotsWithAbilityType);
                         let firstRobotWithAbilityType = robotsWithAbilityType ? robotsWithAbilityType[0] : false;
+                        if (firstRobotWithAbilityType){ robotStringsUsed.push(firstRobotWithAbilityType[0]); }
                         let playerRobotAvailable = firstRobotWithAbilityType ? true : false;
                         let playerRobotName = '', playerRobotToken = '', playerRobotId = 0;
                         let $playerRobotSprite = null, robotSpriteMarkup = null;
@@ -1547,6 +1568,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                             );
                         sideButtonsMarkup += '</a>';
                     }
+                //console.log('robotStringsUsed =', robotStringsUsed);
                 }
             //sideButtonsMarkup += '<a class="button big-button'+(hazardKind2 ? ' '+hazardKind2 : '')+''+(dataColour2 ? ' type '+dataColour2 : '')+'" data-action="remove-hazard" data-hazard="'+dataHazard+'"><span><sup>Remove The</sup> ' + toUpperCaseWords(hazardKind2.replace('-', ' ')) + '</span></a>';
             sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
