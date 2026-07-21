@@ -1675,8 +1675,8 @@ class rpg_game {
     public static function get_cdn_index($project, $content){
 
         // Return false if either argument is invalid
-        if (!preg_match('/^[-_a-z0-9]+$/i', $project)){ return false; }
-        if (!preg_match('/^[-_a-z0-9\/]+$/i', $content)){ return false; }
+        if (!preg_match('/^[-_a-z0-9]+$/i', $project)){ error_log('rpg_game::get_cdn_index() $project string was invalid ('.gettype($project).' '.print_r($project, type).')'); return false; }
+        if (!preg_match('/^[-_a-z0-9\/]+$/i', $content)){ error_log('rpg_game::get_cdn_index() $content string was invalid ('.gettype($content).' '.print_r($content, type).')'); return false; }
 
         // Define the cache file name and path given everything we've learned
         $cache_file_name = 'cache.cdn_'.$project.'-'.str_replace('/', '-', $content).'.json';
@@ -2396,6 +2396,7 @@ class rpg_game {
 
     // Define a function for exiting the game session
     public static function exit_session(){
+        //error_log('rpg_game::exit_session() called!');
 
         // Clear the current session objects
         unset($_SESSION['GAME']);
