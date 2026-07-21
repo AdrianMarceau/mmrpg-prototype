@@ -100,6 +100,53 @@ function getPlayerRobotsWithAbilityType(typeToken, includeStorage, includeDisabl
     return returnData.length ? returnData : false;
     }
 
+
+// Define a quick function for grabbing the sprite markup of a player given the token and optional sprite arguments
+function getPlayerSpriteMarkup(playerToken, spriteOptions){
+    //console.log('%c' + 'mmrpgWorldMap.getPlayerSpriteMarkup(playerToken:' + playerToken + ', spriteOptions:', + JSON.stringify(spriteOptions) + ')', 'color: magenta;');
+    if (!playerToken || typeof playerToken !== 'string' || !playerToken.length){ console.error('getPlayerSpriteMarkup() missing required playerToken!'); return ''; }
+    let playerId = 0; if (playerToken.indexOf('_') !== -1){ playerId = playerToken.split('_')[0]; playerToken = playerToken.split('_')[1];  }
+    //console.log('-> playerId =', playerId, '-> playerToken =', playerToken);
+    spriteOptions = spriteOptions || {};
+    let _self = this;
+    let _config = _self.config;
+    let _indexes = _self.indexes;
+    let _world = _self.state;
+    let playerInfo = _indexes.players.getByToken(playerToken);
+    if (!playerInfo || typeof playerInfo !== 'object'){ console.error('getPlayerSpriteMarkup() could not find playerInfo for token ' + playerToken + '!'); return ''; }
+    // Collect or define the sprite options with defaults if not provided
+    spriteOptions.alt = typeof spriteOptions.alt === 'string' && spriteOptions.alt.length > 1 ? spriteOptions.alt : '';
+    spriteOptions.size = typeof spriteOptions.size === 'number' && spriteOptions.size > 0 ? spriteOptions.size : (playerInfo.imageSize || 40);
+    spriteOptions.dir = typeof spriteOptions.dir === 'string' && spriteOptions.dir.length ? spriteOptions.dir : 'right';
+    spriteOptions.frame = typeof spriteOptions.frame === 'string' && spriteOptions.frame.length > 0 ? spriteOptions.frame : '00';
+    spriteOptions.delay = typeof spriteOptions.delay === 'number' && spriteOptions.delay !== 0 ? spriteOptions.delay : (-1 * ( Math.floor(Math.random() * 10) / 100 ));
+    spriteOptions.classes = typeof spriteOptions.classes === 'string' && spriteOptions.classes.length > 1 ? spriteOptions.classes : '';
+    spriteOptions.styles = typeof spriteOptions.styles === 'string' && spriteOptions.styles.length > 1 ? spriteOptions.styles : '';
+    spriteOptions.kind = typeof spriteOptions.kind === 'string' && spriteOptions.kind.length > 1 ? spriteOptions.kind : 'sprite';
+    // Generate the player sprite attributes and inner markup given the options
+    let playerSpriteAttrs = '';
+    let playerSpriteClass = 'sprite player' + (spriteOptions.classes ? ' ' + spriteOptions.classes : '');
+    let playerSpriteStyle = 'animation-delay: ' + spriteOptions.delay + 's;' + (spriteOptions.styles ? ' ' + spriteOptions.styles : '');
+    playerSpriteAttrs += ' class="' + playerSpriteClass + '"';
+    playerSpriteAttrs += ' data-sprite="player"';
+    playerSpriteAttrs += ' data-kind="' + spriteOptions.kind + '"';
+    playerSpriteAttrs += ' data-token="' + playerToken + '"';
+    playerSpriteAttrs += ' data-alt="' + spriteOptions.alt + '"';
+    playerSpriteAttrs += ' data-size="' + spriteOptions.size + '"';
+    playerSpriteAttrs += ' data-dir="' + spriteOptions.dir + '"';
+    playerSpriteAttrs += ' data-frame="' + spriteOptions.frame + '"';
+    if (playerSpriteStyle.length){ playerSpriteAttrs += ' style="' + playerSpriteStyle + '"'; }
+    let playerSpriteInner = '';
+    playerSpriteInner += '<i class="sprite"></i>';
+    // Put it all together to generate the final markup
+    let playerSpriteMarkup = '';
+    playerSpriteMarkup += '<span' + playerSpriteAttrs + '>';
+        playerSpriteMarkup += '<span class="wrap">' + playerSpriteInner + '</span>';
+    playerSpriteMarkup += '</span>';
+    // Return the generated markup for the player sprite
+    return playerSpriteMarkup;
+    }
+
 // Assign the sub-functions to the main class's prototype
 
 mmrpgWorldMap.prototype.getPlayerNameSpan = getPlayerNameSpan;
@@ -108,3 +155,5 @@ mmrpgWorldMap.prototype.getPlayerItemQuantity = getPlayerItemQuantity;
 mmrpgWorldMap.prototype.getPlayerItemQuantities = getPlayerItemQuantities;
 
 mmrpgWorldMap.prototype.getPlayerRobotsWithAbilityType = getPlayerRobotsWithAbilityType;
+
+mmrpgWorldMap.prototype.getPlayerSpriteMarkup = getPlayerSpriteMarkup;
