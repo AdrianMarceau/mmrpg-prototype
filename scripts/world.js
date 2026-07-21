@@ -1900,7 +1900,7 @@ class mmrpgWorldMap {
         //$canvasMap.css({ transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px)' });
         if (worldZoom !== _selfRef.lastWorldZoom){ _world.allowClicks = _world.allowHovers = false; }
         $canvasMap.attr('data-zoom', worldZoom);
-        $canvasMap.css({ transformOrigin: 'left top', transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) translateZ(0) scale(' + worldZoom + ')' });
+        $canvasMap.css({ transform: 'translate(' + mapTranslateX + 'px, ' + mapTranslateY + 'px) translateZ(0) scale(' + worldZoom + ')' });
         if (usePerspective){ $canvasMap.get(0).style.setProperty('--map-perspective-skew', mapSkewValue+'deg'); }
         else { $canvasMap.get(0).style.setProperty('--map-perspective-skew', '0deg'); }
         if (worldZoom !== _selfRef.lastWorldZoom){

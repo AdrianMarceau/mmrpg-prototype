@@ -105,7 +105,7 @@ html, body {
     left: auto;
     z-index: 10;
     transform: translate(0, 0, 0);
-    transform-origin: center;
+    transform-origin: left top;
     transform-style: preserve-3d;
     transition: none;
     will-change: transform;
@@ -210,7 +210,7 @@ html, body {
     will-change: transform;
 }
 #world.ready #canvas #map {
-    transition: filter 0.6s ease-in, transform 1.8s ease-in-out;
+    transition: filter 0.6s ease-in, transform 2.4s ease-out;
 }
 #world.ready #canvas #map .layer[data-layer="background"] {
     transition: transform 1s ease-in-out;
