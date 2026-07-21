@@ -22,6 +22,7 @@
 @groups[]   = no-encounters_da1-exit-buffer(2-3...4-5)
 @groups[]   = no-encounters_da1e2-exit-buffer(48-10...50-12)
 @groups[]   = no-encounters_desert-portal-buffer(34-12...36-14)
+@groups[]   = no-encounters_desert-barrier-button(17-6...19-8)
 #---------------------------#
 @actors[]     = purple-reset-dude(48-13, robot, anti-eddie, -, default)
 #---------------------------#
@@ -61,6 +62,15 @@
 @hazards[]    = oil-hazard-07(5-11, crude-oil)
 @hazards[]    = oil-hazard-08(3-13, crude-oil)
 @hazards[]    = oil-hazard-09(7-14, crude-oil)
+#---------------------------#
+@hazards[]    = flame-hazard-01(22-7, flame-pillar)
+@hazards[]    = flame-hazard-02(24-7, flame-pillar)
+@hazards[]    = flame-hazard-03(21-9, flame-pillar)
+@hazards[]    = flame-hazard-04(23-9, flame-pillar)
+@hazards[]    = flame-hazard-05(36-2, flame-pillar)
+@hazards[]    = flame-hazard-06(37-3, flame-pillar)
+@hazards[]    = flame-hazard-07(38-4, flame-pillar)
+@hazards[]    = flame-hazard-08(39-4, flame-pillar)
 #---------------------------#
 @blocks[]    = super-block-1(29-10, super-block)
 @blocks[]    = super-block-2(29-11, super-block)
