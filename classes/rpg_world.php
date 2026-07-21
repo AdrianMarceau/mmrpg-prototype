@@ -1939,7 +1939,7 @@ class rpg_world {
     }
 
     // Define a reusable function for grabbing the markup for a given character sprite (player or robot)
-    public static function get_sprite_meta($kind, $token, $alt = '', $dir = 'left'){
+    public static function get_sprite_meta($kind, $token, $alt = '', $dir = 'left', $prefix = ''){
         //error_log('rpg_world::get_sprite_meta(kind:'.$kind.', token:'.$token.') called!');
         $mmrpg_indexes = self::$mmrpg_indexes;
         $xkind = self::get_xkind($kind);
@@ -1961,13 +1961,12 @@ class rpg_world {
         elseif ($kind === 'ability'){ $spriteSpeed = 1; }
         if (!empty($spriteSpeed)){ $sprite_meta['spriteSpeed'] = $spriteSpeed; }
         else { $sprite_meta['spriteSpeed'] = 1; }
-        //error_log('$info = '.print_r($info, true));
-        //error_log('$spriteSpeed = '.print_r($spriteSpeed, true));
         $dir = $dir;
         $img = $info[$kind.'_image'];
         $img_dir = 'both';
         $img_size = $info[$kind.'_image_size'];
-        $img_prefix = '';
+        // Grab the optional prefix, then fall back to defaults if not provided
+        $img_prefix = $prefix;
         if (empty($img_prefix) && ($kind === 'player' || $kind === 'robot')){ $img_prefix = 'sprite'; }
         if (empty($img_prefix) && ($kind === 'ability' || $kind === 'item')){ $img_prefix = 'icon'; }
         $img_xsize = $img_size. 'x'.$img_size;
@@ -1987,87 +1986,70 @@ class rpg_world {
             $sprite_meta['sheetOffset'] = array(0, 0);
         } elseif ($kind === 'ability' || $kind === 'item'){
             if ($kind === 'ability'){
-                static $composite_ability_sprite_zoom = 80;
-                static $composite_ability_sprite_config, $composite_ability_sprite_image, $composite_ability_sprite_index, $composite_ability_sprite_size;
-                if (empty($composite_ability_sprite_config)
-                    || empty($composite_ability_sprite_image)
-                    || empty($composite_ability_sprite_index)
-                    || empty($composite_ability_sprite_size)){
-                    $composite_ability_sprite_config = array('kind' => 'abilities', 'image' => 'icon_right_40x40', 'size' => $composite_ability_sprite_zoom, 'frame' => 'icon', 'zoom' => 'true');
-                    //error_log('$composite_ability_sprite_config = '.print_r($composite_ability_sprite_config, true));
-                    $composite_ability_sprite_image = rpg_game::get_sprite_composite_path($composite_ability_sprite_config);
-                    $composite_ability_sprite_index = rpg_game::get_sprite_composite_index($composite_ability_sprite_config);
-                    $composite_ability_sprite_size = array(0, 0);
-                    if (!empty($composite_ability_sprite_index)){
-                        foreach ($composite_ability_sprite_index AS $key => $ability){
-                            //error_log('$composite_ability_sprite_index['.$key.'] = '.print_r($ability, true));
+                static $composite_ability_cache = array(); // Refactored to key-based cache
+                if (empty($composite_ability_cache[$img_prefix])){
+                    // Dynamically set 'image' and 'frame' using the active prefix
+                    $config = array('kind' => 'abilities', 'image' => $img_prefix.'_right_40x40', 'size' => 80, 'frame' => $img_prefix, 'zoom' => 'true');
+                    $image = rpg_game::get_sprite_composite_path($config);
+                    $index = rpg_game::get_sprite_composite_index($config);
+                    $size = array(0, 0);
+                    if (!empty($index)){
+                        foreach ($index AS $key => $ability){
                             if (!isset($ability['position'])){ continue; }
                             $col = $ability['position']['col'] + 1;
                             $row = $ability['position']['row'] + 1;
-                            if ($col > $composite_ability_sprite_size[0]){ $composite_ability_sprite_size[0] = $col; }
-                            if ($row > $composite_ability_sprite_size[1]){ $composite_ability_sprite_size[1] = $row; }
-                            }
-                        $composite_ability_sprite_size[0] *= $composite_ability_sprite_zoom;
-                        $composite_ability_sprite_size[1] *= $composite_ability_sprite_zoom;
+                            if ($col > $size[0]){ $size[0] = $col; }
+                            if ($row > $size[1]){ $size[1] = $row; }
                         }
-                    //error_log('$composite_ability_sprite_image = '.print_r($composite_ability_sprite_image, true));
-                    //error_log('$composite_ability_sprite_index = '.print_r($composite_ability_sprite_index, true));
-                    //error_log('$composite_ability_sprite_size = '.print_r($composite_ability_sprite_size, true));
+                        $size[0] *= 80;
+                        $size[1] *= 80;
+                    }
+                    $composite_ability_cache[$img_prefix] = array('image' => $image, 'index' => $index, 'size' => $size);
                 }
-                $sprite_path = $composite_ability_sprite_image;
-                $sprite_composite = !empty($composite_ability_sprite_index[$token]) ? $composite_ability_sprite_index[$token] : array();
+                $cache = $composite_ability_cache[$img_prefix];
+                $sprite_path = $cache['image'];
+                $sprite_composite = !empty($cache['index'][$token]) ? $cache['index'][$token] : array();
                 $sprite_offset = !empty($sprite_composite['offset']) ? array_values($sprite_composite['offset']) : array(0,0);
-                $sprite_bgsize = array($composite_ability_sprite_size[0], $composite_ability_sprite_size[1]);
+                $sprite_bgsize = array($cache['size'][0], $cache['size'][1]);
                 $sprite_offset = array_map(function($i){ return -1 * ($i / 2); }, $sprite_offset);
                 $sprite_bgsize = array_map(function($i){ return $i / 2; }, $sprite_bgsize);
-                //error_log('$sprite_path('.$token.') = '.print_r($sprite_path, true));
-                //error_log('$sprite_composite('.$token.') = '.print_r($sprite_composite, true));
-                //error_log('$sprite_offset('.$token.') = '.print_r($sprite_offset, true));
                 $sprite_meta['sheetPath'] = $sprite_path;
                 $sprite_meta['sheetSize'] = $sprite_bgsize;
                 $sprite_meta['sheetOffset'] = $sprite_offset;
             } elseif ($kind === 'item'){
-                static $composite_item_sprite_zoom = 80;
-                static $composite_item_sprite_config, $composite_item_sprite_image, $composite_item_sprite_index, $composite_item_sprite_size;
-                if (empty($composite_item_sprite_config)
-                    || empty($composite_item_sprite_image)
-                    || empty($composite_item_sprite_index)
-                    || empty($composite_item_sprite_size)){
-                    $composite_item_sprite_config = array('kind' => 'items', 'image' => 'icon_right_40x40', 'size' => $composite_item_sprite_zoom, 'frame' => 'icon', 'zoom' => 'true');
-                    //error_log('$composite_item_sprite_config = '.print_r($composite_item_sprite_config, true));
-                    $composite_item_sprite_image = rpg_game::get_sprite_composite_path($composite_item_sprite_config);
-                    $composite_item_sprite_index = rpg_game::get_sprite_composite_index($composite_item_sprite_config);
-                    $composite_item_sprite_size = array(0, 0);
-                    if (!empty($composite_item_sprite_index)){
-                        foreach ($composite_item_sprite_index AS $key => $item){
-                            //error_log('$composite_item_sprite_index['.$key.'] = '.print_r($item, true));
+                static $composite_item_cache = array(); // Refactored to key-based cache
+                if (empty($composite_item_cache[$img_prefix])){
+                    // Dynamically set 'image' and 'frame' using the active prefix
+                    $config = array('kind' => 'items', 'image' => $img_prefix.'_right_40x40', 'size' => 80, 'frame' => $img_prefix, 'zoom' => 'true');
+                    $image = rpg_game::get_sprite_composite_path($config);
+                    $index = rpg_game::get_sprite_composite_index($config);
+                    $size = array(0, 0);
+                    if (!empty($index)){
+                        foreach ($index AS $key => $item){
                             if (!isset($item['position'])){ continue; }
                             $col = $item['position']['col'] + 1;
                             $row = $item['position']['row'] + 1;
-                            if ($col > $composite_item_sprite_size[0]){ $composite_item_sprite_size[0] = $col; }
-                            if ($row > $composite_item_sprite_size[1]){ $composite_item_sprite_size[1] = $row; }
-                            }
-                        $composite_item_sprite_size[0] *= $composite_item_sprite_zoom;
-                        $composite_item_sprite_size[1] *= $composite_item_sprite_zoom;
+                            if ($col > $size[0]){ $size[0] = $col; }
+                            if ($row > $size[1]){ $size[1] = $row; }
                         }
-                    //error_log('$composite_item_sprite_image = '.print_r($composite_item_sprite_image, true));
-                    //error_log('$composite_item_sprite_index = '.print_r($composite_item_sprite_index, true));
-                    //error_log('$composite_item_sprite_size = '.print_r($composite_item_sprite_size, true));
+                        $size[0] *= 80;
+                        $size[1] *= 80;
+                    }
+                    $composite_item_cache[$img_prefix] = array('image' => $image, 'index' => $index, 'size' => $size);
                 }
-                $sprite_path = $composite_item_sprite_image;
-                $sprite_composite = !empty($composite_item_sprite_index[$token]) ? $composite_item_sprite_index[$token] : array();
+                $cache = $composite_item_cache[$img_prefix];
+                $sprite_path = $cache['image'];
+                $sprite_composite = !empty($cache['index'][$token]) ? $cache['index'][$token] : array();
                 $sprite_offset = !empty($sprite_composite['offset']) ? array_values($sprite_composite['offset']) : array(0,0);
-                $sprite_bgsize = array($composite_item_sprite_size[0], $composite_item_sprite_size[1]);
+                $sprite_bgsize = array($cache['size'][0], $cache['size'][1]);
                 $sprite_offset = array_map(function($i){ return -1 * ($i / 2); }, $sprite_offset);
                 $sprite_bgsize = array_map(function($i){ return $i / 2; }, $sprite_bgsize);
-                //error_log('$sprite_path('.$token.') = '.PHP_EOL.print_r($sprite_path, true));
-                //error_log('$sprite_meta'.$token.') = '.print_r($sprite_meta, true));
-                //error_log('$sprite_offset'.$token.') = '.print_r($sprite_offset, true));
                 $sprite_meta['sheetPath'] = $sprite_path;
                 $sprite_meta['sheetSize'] = $sprite_bgsize;
                 $sprite_meta['sheetOffset'] = $sprite_offset;
             }
         }
+
         // Return the generated sprite metadata
         return $sprite_meta;
     }
