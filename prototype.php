@@ -3,7 +3,9 @@
 // Include the TOP file
 //require('admin/includes/debug_profiler_top.php');
 //debug_profiler_checkpoint('before-top');
+//error_log('before-top');
 require_once('top.php');
+//error_log('after-top');
 //debug_profiler_checkpoint('after-top');
 
 // If the user is not logged in, don't allow them here
@@ -11,15 +13,18 @@ if (!rpg_game::is_user()){
     header('Location: '.MMRPG_CONFIG_ROOTURL.'frames/login.php');
     exit();
 }
+//error_log('after-login-check');
 
 // Collect the game's session token
 $session_token = mmrpg_game_token();
 
 // Pull in necessary indexes in case we need them later
 if (!isset($mmrpg_index_players) || empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+//error_log('after-get-player');
 
 // Apply any patches that need to be applied on start (should only need to run once)
 mmrpg_prototype_apply_patches();
+//error_log('after-apply-patches');
 
 // Restore any dropped items to their owners if able to
 //mmrpg_prototype_restore_dropped_items();
@@ -48,6 +53,7 @@ $prototype_window_event_canvas = array();
 $prototype_window_event_messages = array();
 
 //debug_profiler_checkpoint('before-actions');
+//error_log('before-actions');
 
 // Check if a reset request has been placed
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'reset'){
@@ -86,6 +92,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'exit'){
 }
 
 //debug_profiler_checkpoint('after-actions');
+//error_log('after-actions');
 
 // Cache the currently online players
 if (!isset($_SESSION['LEADERBOARD']['online_timestamp'])
