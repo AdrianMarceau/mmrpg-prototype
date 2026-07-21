@@ -1934,10 +1934,16 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             if (!dataLabel){ dataLabel = 'Denizen'; }
             if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
             if (actorInfo.messages){
+                let avatarSprite = '&hellip;';
+                if (actorInfo.kind === 'player'){ avatarSprite = _self.getPlayerSpriteMarkup(actorInfo.sprite, {alt: actorInfo.image, kind: 'mug'}); }
+                else if (actorInfo.kind === 'robot'){ avatarSprite = _self.getRobotSpriteMarkup(actorInfo.sprite, {alt: actorInfo.image, kind: 'mug'}); }
                 let messagesText = typeof actorInfo.messages === 'object' ? actorInfo.messages.join('\n') : actorInfo.messages;
                 messagesText = messagesText.replaceAll('//', '<br />');
                 messagesText = messagesText.replaceAll('{player_name}', _playerIndexInfo['name']);
-                sideButtonsMarkup += '<div class="button big-button-title'+(dataColour ? ' type '+dataColour : '')+'"><p>' + messagesText + '</p></div>';
+                sideButtonsMarkup += '<div class="button-title big-button-title'+(dataColour ? ' type '+dataColour : '')+'">';
+                    sideButtonsMarkup += '<i class="icon">' + avatarSprite + '</i>';
+                    sideButtonsMarkup += '<p class="text">' + messagesText + '</p>';
+                sideButtonsMarkup += '</div>';
                 }
             //sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="greet-actor" data-actor="'+dataActor+'"><span>Talk To ' + dataLabel + '</span></a>';
             if (actorInfo.actions && actorInfo.actions.length){
@@ -3016,6 +3022,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     }
                 }
             else if (isBlock){
+                // TODO: action will always equal "remove-block" but we should verify
                 //console.log('-> block-related action button clicked with action:', action);
                 let blockSymbols = _config.mapBlockSymbols;
                 let blocksIndex = _config.mapBlocksIndex;
@@ -3063,6 +3070,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 _self.saveWorldState();
                 }
             else if (isHazard){
+                // TODO: action will always equal "remove-hazard" but we should verify
                 //console.log('-> hazard-related action button clicked with action:', action);
                 let hazardSymbols = _config.mapHazardSymbols;
                 let hazardsIndex = _config.mapHazardsIndex;

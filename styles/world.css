@@ -4909,12 +4909,14 @@ display: block;
     padding: 9px 0 12px 0;
     opacity: 0.0;
 }
-#world #canvas #side-buttons .button {
+#world #canvas #side-buttons .button,
+#world #canvas #side-buttons .button-title {
     display: block;
     float: right;
     position: relative;
     box-sizing: border-box;
     clear: both;
+    z-index: 150;
     margin: 0 0 0 auto;
     padding: 3px 6px;
     width: auto;
@@ -4923,10 +4925,12 @@ display: block;
     text-align: center;
     color: #cfcfcf;
     font-size: 12px;
+    font-weight: bold;
     line-height: 1.2;
     border: 1px solid transparent;
     background-color: rgba(0, 0, 0, 0.5);
     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 0 black;
     border-radius: 6px;
     transform: scale(1.0);
     cursor: pointer;
@@ -4939,7 +4943,8 @@ display: block;
     border-color: #cfcfcf;
     background-color: rgba(0, 0, 0, 0.7);
 }
-#world #canvas #side-buttons .button + .button {
+#world #canvas #side-buttons .button + .button,
+#world #canvas #side-buttons .button-title + .button {
     margin-top: 6px;
 }
 #world #canvas #side-buttons .button {
@@ -4973,6 +4978,31 @@ display: block;
 #world #canvas #side-buttons .big-button-title {
     cursor: default;
 }
+#world #canvas #side-buttons .big-button-title .text {
+    clear: both;
+    min-height: 96px;
+}
+#world #canvas #side-buttons .big-button-title .icon {
+    position: absolute;
+    left: 34px;
+    top: 36px;
+    width: 34px;
+    height: 33px;
+    transform: scale(2);
+    background-color: #0a0a0a;
+    border-radius: 4px;
+    border: 2px solid #020202;
+    overflow: hidden;
+}
+#world #canvas #side-buttons .big-button-title .icon > .sprite {
+    top: auto;
+    bottom: -4px;
+    left: -3px;
+}
+#world #canvas #side-buttons .big-button-title .icon > .sprite[data-size="80"] {
+    bottom: -24px;
+}
+
 #world #canvas #side-buttons .big-button > span,
 #world #canvas #side-buttons .big-button-title > span,
 #world #canvas #side-buttons .big-button > p,
@@ -4989,7 +5019,7 @@ display: block;
     font-size: 16px;
     line-height: 1.6;
     text-align: left;
-    padding: 9px 12px 9px 90px;
+    padding: 9px 12px 9px 96px;
     box-sizing: border-box;
     font-weight: bold;
 }
