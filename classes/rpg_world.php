@@ -112,6 +112,9 @@ class rpg_world {
         if (!isset($_SESSION[$session_token])){ $_SESSION[$session_token] = array(); }
         $WORLD_SESSION = &$_SESSION[$session_token];
         // Predefine any missing world session variables so they're available
+        if (!isset($WORLD_SESSION['last_world_token'])){ $WORLD_SESSION['last_world_token'] = ''; }
+        if (!isset($WORLD_SESSION['last_map_token'])){ $WORLD_SESSION['last_map_token'] = ''; }
+        if (!isset($WORLD_SESSION['last_player_token'])){ $WORLD_SESSION['last_player_token'] = ''; }
         if (!isset($WORLD_SESSION['player_sessions'])){ $WORLD_SESSION['player_sessions'] = array(); }
         if (!isset($WORLD_SESSION['robot_sessions'])){ $WORLD_SESSION['robot_sessions'] = array(); }
         if (!isset($WORLD_SESSION['world_maps'])){ $WORLD_SESSION['world_maps'] = array(); }
@@ -127,6 +130,7 @@ class rpg_world {
         if (!isset($WORLD_SESSION['world_pickups'])){ $WORLD_SESSION['world_pickups'] = array(); }
         if (!isset($WORLD_SESSION['world_actors'])){ $WORLD_SESSION['world_actors'] = array(); }
         if (!isset($WORLD_SESSION['world_symbols'])){ $WORLD_SESSION['world_symbols'] = array(); }
+        if (!isset($WORLD_SESSION['world_events'])){ $WORLD_SESSION['world_events'] = array(); }
         // ...as well as any nested variables inside those parent arrays
         if (!isset($WORLD_SESSION['player_sessions']['last_player'])){ $WORLD_SESSION['player_sessions']['last_player'] = ''; }
         // Return true now that we're done preparing the session
