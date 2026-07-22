@@ -1850,7 +1850,7 @@ html, body {
 
 #world #canvas #reset-button {
     top: 0;
-    right: 202px;
+    left: 354px;
     opacity: 1.0;
     border-radius: 0 0 6px 6px;
     border-width: 0 1px 1px 1px;
@@ -5812,6 +5812,47 @@ display: block;
 }
 #world #canvas #action-modal .content .container.for-current .ability-list .team-ability {
     width: calc((100% / 4) - 4px);
+}
+
+#world #canvas #zoom-controls {
+    top: 0;
+    right: 174px;
+    z-index: 1001;
+    padding: 4px;
+    border-radius: 0 0 6px 12px;
+}
+#world:not(.ready) #canvas #zoom-controls {
+    top: -90px;
+}
+#world #canvas #zoom-controls a.zoom-control {
+    display: block;
+    margin: 0 auto;
+    cursor: pointer;
+    background-color: transparent;
+    border: 0 none transparent;
+    font-size: 18px;
+    line-height: 1.3;
+    pointer-events: auto;
+    color: #696969;
+}
+#world #canvas #zoom-controls a.zoom-control i {
+    display: inline-block;
+    margin: 0 auto;
+    padding: 6px 9px;
+    transform: scale(1.0);
+    transition: transform 0.3s;
+}
+#world #canvas #zoom-controls a.zoom-control:hover,
+#world #canvas #zoom-controls a.zoom-control.hovered {
+    color: #dedede;
+}
+#world #canvas #zoom-controls a.zoom-control:hover i,
+#world #canvas #zoom-controls a.zoom-control.hovered i {
+    transform: scale(1.2);
+}
+#world #canvas #zoom-controls a.zoom-control.disabled {
+    color: #393939;
+    cursor: default;
 }
 
 #world #canvas #minimap-overview {

@@ -181,6 +181,9 @@ function bindEventsToWorld($thisWorld){
     // Bind a click event to the minimap overview in the header that expands on mouseover to show more
     let $minimapOverview = _elements.minimapOverview;
     if ($minimapOverview && $minimapOverview.length){ _self.initMenuMinimapOverview($thisWorld, $minimapOverview); }
+    // Bind a click event to the zoom control buttons in the header for more easily zooming in or out
+    let $zoomControls = _elements.zoomControls;
+    if ($zoomControls && $zoomControls.length){ _self.initMenuZoomControls($thisWorld, $zoomControls); }
     // Check to make sure the robotsOverview exists, and then bind events to its elements
     let $robotsOverview = _elements.robotsOverview;
     if ($robotsOverview && $robotsOverview.length){

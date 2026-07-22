@@ -189,6 +189,47 @@ function initMenuMinimapOverview($thisWorld, $minimapOverview){
     return true;
     }
 
+// Quick function for initializing the menu's ZOOM CONTROLS buttons w/ relevant click events
+function initMenuZoomControls($thisWorld, $zoomControls){
+    //console.log('%c' + 'mmrpgWorldMap.initMenuZoomControls($thisWorld: ' + typeof $thisWorld + ', $zoomControls: ' + typeof $zoomControls + ')', 'color: magenta;');
+    if (!$thisWorld || !$thisWorld.length){ console.error('initMenuZoomControls() missing required $thisWorld!'); return false; }
+    if (!$zoomControls || !$zoomControls.length){ console.error('initMenuZoomControls() missing required $zoomControls!'); return false; }
+    let _self = this;
+    let _config = _self.config;
+    let _elements = _self.elements;
+    let _world = _self.state;
+    let hoverCanvasObject = _self.hoverCanvasMenuObject;
+    let unhoverCanvasObject = _self.unhoverCanvasMenuObject;
+    let $zoomButtons = $('.zoom-control', $zoomControls);
+    let $zoomInButton = $zoomButtons.filter('.zoom-in');
+    let $zoomOutButton = $zoomButtons.filter('.zoom-out');
+    $zoomButtons.bind('mouseenter', function(e){ hoverCanvasObject.call(_self, this, e, 'icon-hover'); });
+    $zoomButtons.bind('mouseleave', function(e){ unhoverCanvasObject.call(_self, this, e); });
+    $zoomButtons.bind('click', function(e){
+        //console.log('zoom button has been clicked');
+        let $zoomButton = $(this);
+        if ($zoomButton.is('.disabled')){ return false; }
+        let zoomDir = false;
+        if ($zoomButton.is('.zoom-out')){ zoomDir = 'out'; }
+        else if ($zoomButton.is('.zoom-in')){ zoomDir = 'in'; }
+        //console.log('-> zoomDir =', zoomDir);
+        if (!zoomDir){ return false; }
+        let maxZoom = _config.maxZoomLevel;
+        let minZoom = _config.minZoomLevel;
+        let oldZoom = _world.zoomLevel || 1;
+        if (zoomDir === 'out'){ _self.decZoomLevel(null, true); }
+        else if (zoomDir === 'in'){ _self.incZoomLevel(null, true); }
+        let newZoom = _world.zoomLevel || 1;
+        if (newZoom !== oldZoom){ _self.playSoundEffect('spawn-sound'); }
+        if (newZoom >= maxZoom){ $zoomInButton.addClass('disabled'); }
+        else { $zoomInButton.removeClass('disabled'); }
+        if (newZoom <= minZoom){ $zoomOutButton.addClass('disabled'); }
+        else { $zoomOutButton.removeClass('disabled'); }
+        return true;
+        });
+    return true;
+    }
+
 // Complicated function for generating the ROBOTS OVERVIEW API so we can reuse it multiple times
 function initMenuRobotsOverview($thisWorld, $robotsOverview){
     //console.log('%c' + 'mmrpgWorldMap.initMenuRobotsOverview($thisWorld: ' + typeof $thisWorld + ', $robotsOverview: ' + typeof $robotsOverview + ')', 'color: magenta;');
@@ -1770,6 +1811,7 @@ mmrpgWorldMap.prototype.initMenuHomeButton = initMenuHomeButton;
 mmrpgWorldMap.prototype.initMenuResetButton = initMenuResetButton;
 mmrpgWorldMap.prototype.initMenuPlayerSwitcher = initMenuPlayerSwitcher;
 mmrpgWorldMap.prototype.initMenuMinimapOverview = initMenuMinimapOverview;
+mmrpgWorldMap.prototype.initMenuZoomControls = initMenuZoomControls;
 mmrpgWorldMap.prototype.initMenuRobotsOverview = initMenuRobotsOverview;
 
 mmrpgWorldMap.prototype.initRobotsOverviewAPI = initRobotsOverviewAPI;
