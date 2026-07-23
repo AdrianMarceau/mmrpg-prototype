@@ -2819,6 +2819,10 @@ class mmrpgUserInputWatcher {
         _config.gamepadTimeout = typeof config.gamepadTimeout === 'number' ? config.gamepadTimeout : _config.inputTimeout;
         _config.autoRunCallbacks = typeof config.autoRunCallbacks === 'boolean' ? config.autoRunCallbacks : true;
         _config.autoWheelMapping = typeof config.autoWheelMapping === 'number' ?  config.autoWheelMapping : false;
+        _config.autoTouchMapping = typeof config.autoTouchMapping === 'boolean' ? config.autoTouchMapping : true;
+        _config.swipeThreshold = typeof config.swipeThreshold === 'number' ? config.swipeThreshold : 30; // Minimum distance (px)
+        _config.swipeTimeout = typeof config.swipeTimeout === 'number' ? config.swipeTimeout : 300; // Max time to complete swipe (ms)
+        _config.swipeActiveDuration = typeof config.swipeActiveDuration === 'number' ? config.swipeActiveDuration : _config.inputTimeout; // Duration D-Pad inputs stay active
         _config.autoButtonMapping = typeof config.autoButtonMapping === 'boolean' ? config.autoButtonMapping : false;
         _config.catchIframeInputs = typeof config.catchIframeInputs === 'boolean' ? config.catchIframeInputs : false;
         _config.bubbleIframeInputs = typeof config.bubbleIframeInputs === 'boolean' ? config.bubbleIframeInputs : false;
@@ -3109,6 +3113,53 @@ class mmrpgUserInputWatcher {
             return inputKey;
             };
 
+        // Unified Swipe detection (Touch & Mouse)
+        let swipeStartX = 0;
+        let swipeStartY = 0;
+        let swipeStartTime = 0;
+        let busySwiping = false;
+        let isMouseDown = false; // To track if the user is actually dragging the mouse
+        // Generic start function that accepts X/Y coordinates
+        let onSwipeStart = function(x, y){
+            if (!_config.autoTouchMapping) return;
+            swipeStartX = x;
+            swipeStartY = y;
+            swipeStartTime = Date.now();
+            };
+        // Generic end function that accepts X/Y coordinates and the raw event
+        let onSwipeEnd = function(x, y, event){
+            if (!_config.autoTouchMapping || busySwiping){ return; }
+            let elapsed = Date.now() - swipeStartTime;
+            if (elapsed > _config.swipeTimeout){ return; } // Took too long, probably a slow drag
+            let dx = x - swipeStartX;
+            let dy = y - swipeStartY;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < _config.swipeThreshold){ return; } // Too short to register
+            // Calculate angle in degrees (0 to 360)
+            let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            if (angle < 0) angle += 360;
+            let directions = [];
+            // Map angle to 8 directional sectors (45 degrees each)
+            if (angle >= 337.5 || angle < 22.5) { directions = ['Right']; }
+            else if (angle >= 22.5 && angle < 67.5) { directions = ['Right', 'Down']; }
+            else if (angle >= 67.5 && angle < 112.5) { directions = ['Down']; }
+            else if (angle >= 112.5 && angle < 157.5) { directions = ['Left', 'Down']; }
+            else if (angle >= 157.5 && angle < 202.5) { directions = ['Left']; }
+            else if (angle >= 202.5 && angle < 247.5) { directions = ['Left', 'Up']; }
+            else if (angle >= 247.5 && angle < 292.5) { directions = ['Up']; }
+            else if (angle >= 292.5 && angle < 337.5) { directions = ['Right', 'Up']; }
+            if (directions.length > 0){
+                busySwiping = true;
+                directions.forEach(dir => { activeInputs[dir] = true; });
+                onUserInput('swipe', event); // Registers the keydown and updates cache
+                setTimeout(() => {
+                    directions.forEach(dir => { delete activeInputs[dir]; });
+                    busySwiping = false;
+                    onUserInput('swipeend', event);
+                    }, _config.swipeActiveDuration);
+                }
+            };
+
         // Define a function for determining the current controller type (for button icons) if possible
         let gamepadLayout = null, gamepadKind = null, gamepadKinds = {
             other: {id: 0, token: 'other', name: 'Generic/Other'},
@@ -3263,6 +3314,12 @@ class mmrpgUserInputWatcher {
         eventListeners.keyup = function(event){ let input = getUserInputFromKeyboardEvent(event.key); if (input){ delete activeInputs[input]; } onUserInput('keyup', event); };
         eventListeners.blur = function(event){ Object.keys(activeInputs).forEach(function(key){ delete activeInputs[key]; }); onUserInput('blur', event); };
         if (_config.autoWheelMapping){ eventListeners.mousewheel = function(event){ getUserInputFromWheelEvent(event); onUserInput('mousewheel', event); }; }
+        if (_config.autoTouchMapping){
+            eventListeners.touchstart = function(event){ if (event.touches.length > 0) onSwipeStart(event.touches[0].clientX, event.touches[0].clientY); };
+            eventListeners.touchend = function(event){ if (event.changedTouches.length > 0) onSwipeEnd(event.changedTouches[0].clientX, event.changedTouches[0].clientY, event); };
+            eventListeners.mousedown = function(event){ isMouseDown = true; onSwipeStart(event.clientX, event.clientY); };
+            eventListeners.mouseup = function(event){ if (isMouseDown){ isMouseDown = false; onSwipeEnd(event.clientX, event.clientY, event); } };
+            }
         eventListeners.gamepadconnected = function(event){ watchGamepadInputs(event.gamepad); onUserInput('gamepadconnected', event); };
         eventListeners.gamepaddisconnected = function(event){ watchGamepadInputs(null); onUserInput('gamepaddisconnected', event); };
         eventListeners.message = function(event){
@@ -3301,6 +3358,14 @@ class mmrpgUserInputWatcher {
             // Bind events to the scrolling of the user's mouse if detected and map to L2 + R2 button inputs
             if (_config.autoWheelMapping){ document.addEventListener('mousewheel', eventListeners.mousewheel, { passive: false }); }
 
+            // Bind events to touch screen and mouse actions to allow for directional swiping
+            if (_config.autoTouchMapping){
+                document.addEventListener('touchstart', eventListeners.touchstart, { passive: false });
+                document.addEventListener('touchend', eventListeners.touchend, { passive: false });
+                document.addEventListener('mousedown', eventListeners.mousedown, { passive: false });
+                document.addEventListener('mouseup', eventListeners.mouseup, { passive: false });
+                }
+
             // Only listen for bubbled messages if we are the top-level parent window
             if (_config.catchIframeInputs){ window.addEventListener('message', eventListeners.message, { passive: false }); }
 
@@ -3321,6 +3386,14 @@ class mmrpgUserInputWatcher {
 
             // Remove events from the scrolling of the user's mouse
             if (_config.autoWheelMapping){ document.removeEventListener('mousewheel', eventListeners.mousewheel); }
+
+            // Remove touch screen and mouse swiping listeners
+            if (_config.autoTouchMapping){
+                document.removeEventListener('touchstart', eventListeners.touchstart);
+                document.removeEventListener('touchend', eventListeners.touchend);
+                document.removeEventListener('mousedown', eventListeners.mousedown);
+                document.removeEventListener('mouseup', eventListeners.mouseup);
+                }
 
             // Clean up the message listener as well
             if (_config.catchIframeInputs){ window.removeEventListener('message', eventListeners.message); }
