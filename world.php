@@ -919,7 +919,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
             $wrap_markup = function($markup, $tag = 'div', $cls = 'wrapper'){ if (empty($markup)){ return ''; } return '<'.$tag.' class="'.$cls.'">'.$markup.'</'.$tag.'>'; };
             $back_button_markup = $wrap_markup('<i class="fa fas fa-sign-out"></i>', 'a');
             $home_button_markup = $wrap_markup('<i class="fa fas fa-home"></i>', 'a');
-            $reset_button_markup = $wrap_markup('<i class="fa fas fa-bomb"></i>', 'a');
+            //$reset_button_markup = $wrap_markup('<i class="fa fas fa-bomb"></i>', 'a');
             $zoom_controls_markup = $wrap_markup('<i class="fa fas fa-search-plus"></i>', 'a', 'zoom-control zoom-in');
             $zoom_controls_markup .= $wrap_markup('<i class="fa fas fa-search-minus"></i>', 'a', 'zoom-control zoom-out');
             $position_display_markup = $wrap_markup('&hellip;');
@@ -943,7 +943,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
             <div id="message-display" class="chrome"><?= $message_display_markup ?></div>
             <div id="back-button" class="chrome chrome-button"><?= $back_button_markup ?></div>
             <div id="home-button" class="chrome chrome-button"><?= $home_button_markup ?></div>
-            <div id="reset-button" class="chrome chrome-button"><?= $reset_button_markup ?></div>
+            <? /* <div id="reset-button" class="chrome chrome-button"><?= $reset_button_markup ?></div> */ ?>
             <div id="side-buttons" class="chrome"><?= $side_buttons_markup ?></div>
             <div id="loading-icon" class="chrome"><i class="fa fas fa-spinner"></i></div>
         </div>
