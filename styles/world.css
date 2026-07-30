@@ -5816,17 +5816,18 @@ display: block;
 
 #world #canvas #zoom-controls {
     top: 0;
-    right: 174px;
+    right: 0;
     z-index: 1001;
-    padding: 4px;
-    border-radius: 0 0 6px 12px;
+    padding: 8px 4px;
+    border-radius: 0;
+    height: 98px;
 }
 #world:not(.ready) #canvas #zoom-controls {
-    top: -90px;
+    right: -90px;
 }
 #world #canvas #zoom-controls a.zoom-control {
     display: block;
-    margin: 0 auto;
+    margin: 0 auto 4px;
     cursor: pointer;
     background-color: transparent;
     border: 0 none transparent;
@@ -5858,7 +5859,7 @@ display: block;
 #world #canvas #minimap-overview {
     z-index: 1003;
     top: 0;
-    right: 0;
+    right: 40px;
     width: 178px;
     height: 98px;
     padding: 9px;

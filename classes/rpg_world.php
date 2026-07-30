@@ -744,7 +744,7 @@ class rpg_world {
         $map_tilesize = self::$worldmap_tilesize;
         $map_autocols = strlen($map_data_layers[0][0]);
         $map_autorows = count($map_data_layers[0]);
-        $map_tiles_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,]+)?\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
+        $map_tiles_custval_regex = '/^([.a-z0-9-_]+)\(([a-z0-9]{2}),(-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,]+)?\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
         $map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,]+)?\)$/i'; // syntax: name(x,y[,flag1,flag2,etc.]) ie. spawn(4,4) or spawn(4,4,other-area-2) => name:spawn, x:4, y:4
         $map_listval_custval_regex = '/^([.a-z0-9-_\+]+)\(([\+\:\.\,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
         //$map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
@@ -767,7 +767,8 @@ class rpg_world {
                         //error_log($custval_kind.' tile $exploded ='.print_r($exploded, true));
                         list($name, $k, $x, $y) = $exploded;
                         $parsed_tiles[$name] = array($x, $y);
-                        $parsed_keys[intval($k)] = $name;
+                        //$parsed_keys[intval($k)] = $name;
+                        $parsed_keys[trim($k)] = $name;
                         continue;
                         }
                     if ($is_other_custval){
@@ -964,7 +965,7 @@ class rpg_world {
         if (!empty($map_sprite_sheet)){
             if (substr($map_sprite_sheet, -4) !== '.png'){
                 $sheet_token = $map_sprite_sheet;
-                $sheet_data_parsed = !empty($sheet_token) ? self::load_sheet_data($world_token.'__'.$sheet_token) : array();
+                $sheet_data_parsed = !empty($sheet_token) ? self::parse_sheet_data($world_token.'__'.$sheet_token) : array();
                 //error_log('$sheet_data_parsed = '.print_r($sheet_data_parsed, true));
                 if (!empty($sheet_data_parsed)){
                     $map_sheet = !empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : '';
@@ -1038,7 +1039,7 @@ class rpg_world {
                         //error_log('----> checking $col_key = '.$col_key.' w/ $col_tile = '.print_r($col_tile, true));
                         if (substr($col_tile, 0, 1) === '[' && substr($col_tile, -1) === ']'){ $col_tile = substr($col_tile, 1, -1); } // remove brackets if present
                         if (!is_numeric($col_tile)){ $col_tile = 0; } // ensure this is a numeric tile key
-                        $col_tile = intval($col_tile); // ensure this is an integer tile key
+                        //$col_tile = intval($col_tile); // ensure this is an integer tile key
                         $col_tile_key = isset($raw_tile_keys[$col_tile]) ? $raw_tile_keys[$col_tile] : ''; // get the tile key from the raw keys
                         //error_log('----> parsed $col_tile '.print_r($row_tiles[$col_key], true).' => '.print_r($col_tile, true).' => '.print_r($col_tile_key, true));
                         $parsed_map_layers[$layer_key][$row_key][$col_key] = $col_tile_key; // add the tile key to the parsed map layers
@@ -1055,18 +1056,18 @@ class rpg_world {
     }
 
     // Define a function for loading a given sheet's data from the filesystem
-    public static function load_sheet_data($world_sheet_token){
-        //error_log('load_sheet_data() called!');
-        if (empty($world_sheet_token)){ error_log('rpg_world::load_sheet_data() error - missing world-sheet token!'); return false; }
-        elseif (!strstr($world_sheet_token, '__')){ error_log('rpg_world::load_sheet_data() error - invalid world-sheet token "'.$world_sheet_token.'"!'); return false; }
+    public static function parse_sheet_data($world_sheet_token){
+        //error_log('parse_sheet_data() called!');
+        if (empty($world_sheet_token)){ error_log('rpg_world::parse_sheet_data() error - missing world-sheet token!'); return false; }
+        elseif (!strstr($world_sheet_token, '__')){ error_log('rpg_world::parse_sheet_data() error - invalid world-sheet token "'.$world_sheet_token.'"!'); return false; }
         list($world_token, $sheet_token) = explode('__', $world_sheet_token);
         $sheet_basedir = self::$worldmap_basedir.self::$worldmap_basepath;
         $sheet_tilesize = self::$worldmap_tilesize;
         $sheet_filename = $world_token.'/'.$sheet_token.'.sheet';
         $sheet_filedir = $sheet_basedir.$sheet_filename;
-        if (!file_exists($sheet_filedir)){ error_log('rpg_world::load_sheet_data() error - file not found "'.$sheet_filedir.'"!'); return false; }
+        if (!file_exists($sheet_filedir)){ error_log('rpg_world::parse_sheet_data() error - file not found "'.$sheet_filedir.'"!'); return false; }
         $sheet_data_raw = file_get_contents($sheet_filedir);
-        if (empty($sheet_data_raw)){ error_log('rpg_world::load_sheet_data() error - file empty "'.$sheet_filedir.'"!'); return false; }
+        if (empty($sheet_data_raw)){ error_log('rpg_world::parse_sheet_data() error - file empty "'.$sheet_filedir.'"!'); return false; }
         $sheet_data_array = explode("\n", trim($sheet_data_raw));
         $sheet_data_vars = array();
         foreach ($sheet_data_array AS $line){
@@ -1094,7 +1095,7 @@ class rpg_world {
         }
         //error_log('$sheet_data_vars = '.print_r($sheet_data_vars, true));
         // Review and process the sheet layer data
-        $sheet_tiles_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,!]+)?\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
+        $sheet_tiles_custval_regex = '/^([.a-z0-9-_]+)\(([a-z0-9]{2}),(-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,!]+)?\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
         $sheet_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)(,[-_a-z0-9,]+)?\)$/i'; // syntax: name(x,y[,flag1,flag2,etc.]) ie. spawn(4,4) or spawn(4,4,other-area-2) => name:spawn, x:4, y:4
         $sheet_listval_custval_regex = '/^([.a-z0-9-_]+)\(([,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
         //$sheet_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
@@ -1120,7 +1121,8 @@ class rpg_world {
                         //error_log('tile $exploded ='.print_r($exploded, true));
                         //error_log('$name ='.print_r($name, true).' $k ='.print_r($k, true).' $values ='.print_r($values, true));
                         $parsed_tiles[$name] = $values;
-                        $parsed_keys[intval($k)] = $name;
+                        //$parsed_keys[intval($k)] = $name;
+                        $parsed_keys[trim($k)] = $name;
                         continue;
                         }
                     if ($is_other_custval){
@@ -1398,7 +1400,7 @@ class rpg_world {
                         $pos = ($col_key + 1).'-'.($row_key + 1);
                         if (!isset($available_cells[$pos])){ continue; }
                         // If this tile is a "void" type, remove it from the available cells
-                        if ($tile_token === 'void' || strpos($tile_token, 'void') === 0){
+                        if ($tile_token === '' || $tile_token === 'void' || strpos($tile_token, 'void-') === 0){
                             //error_log('-> removing tile position "'.$pos.'" from available cells (tile: '.$tile_token.')');
                             unset($available_cells[$pos]);
                         }

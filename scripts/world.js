@@ -737,15 +737,46 @@ class mmrpgWorldMap {
         thisLayerData.token = layerToken;
         thisLayerData.sheet = spriteSheet;
         thisLayerData.tiles = canvasTiles;
+        //console.log('tilesIndex =', tilesIndex);
+        //console.log('thisLayerData =', thisLayerData);
+        let getTileKeyDiff = function(tileKey, xDiff, yDiff){
+            if (typeof xDiff !== 'number'){ xDiff = 0; } if (typeof yDiff !== 'number'){ yDiff = 0; }
+            let x = parseInt(tileKey.split('-')[0]); let y = parseInt(tileKey.split('-')[1]);
+            return (x + xDiff) + '-' + (y + yDiff);
+            }
         for (var i = 0; i < tileDataKeys.length; i++){
             let tileKey = tileDataKeys[i];
-            let tileValue = canvasTiles[tileKey];
+            let tileValue = canvasTiles[tileKey]; if (!tileValue.length){ tileValue = 'void'; }
             let tilePos = tileKey.split('-').map(function(val){ return parseInt(val.trim()); });
             //console.log('---> processing tile #' + i + ' w/ tileKey = ' + tileKey + ' and tileValue = ' + tileValue);
             let tileSpriteKey = tileKey;
             let tileSpriteToken = tileValue;
+            let tileSpriteBitmask = 0;
+            if (tileSpriteToken !== 'void'
+                && tileSpriteToken !== 'dotted'){
+                let topTileValue = canvasTiles[getTileKeyDiff(tileSpriteKey, 0, -1)];
+                let rightTileValue = canvasTiles[getTileKeyDiff(tileSpriteKey, 1, 0)];
+                let bottomTileValue = canvasTiles[getTileKeyDiff(tileSpriteKey, 0, 1)];
+                let leftTileValue = canvasTiles[getTileKeyDiff(tileSpriteKey, -1, 0)];
+                if (topTileValue === ''){ topTileValue = 'void'; }
+                if (rightTileValue === ''){ rightTileValue = 'void'; }
+                if (bottomTileValue === ''){ bottomTileValue = 'void'; }
+                if (leftTileValue === ''){ leftTileValue = 'void'; }
+                if (topTileValue !== 'void'){ tileSpriteBitmask += 1; }
+                if (rightTileValue !== 'void'){ tileSpriteBitmask += 2; }
+                if (bottomTileValue !== 'void'){ tileSpriteBitmask += 4; }
+                if (leftTileValue !== 'void'){ tileSpriteBitmask += 8; }
+                //console.log('tileSpriteKey =', tileSpriteKey);
+                //console.log('topTileValue =', topTileValue);
+                //console.log('rightTileValue =', rightTileValue);
+                //console.log('bottomTileValue =', bottomTileValue);
+                //console.log('leftTileValue =', leftTileValue);
+                //console.log('tileSpriteBitmask =', tileSpriteBitmask);
+                let possibleTileSpriteToken = tileSpriteToken + '-' + tileSpriteBitmask;
+                if (typeof tilesIndex[possibleTileSpriteToken] !== 'undefined'){ tileSpriteToken = possibleTileSpriteToken; }
+                }
             let tileSpriteInfo = tilesIndex[tileSpriteToken];
-            if (!tileSpriteInfo){ console.error('indexCanvasTileData() missing tileSpriteInfo for tileKey:', tileKey, 'and tileValue:', tileValue); continue; }
+            if (!tileSpriteInfo){ console.error('indexCanvasTileData() missing tileSpriteInfo for tileKey:', tileKey, 'and tileValue:', tileValue, 'and bitMask:', tileSpriteBitmask); continue; }
             let tileSpriteOffset = tileSpriteInfo[0], tileSpriteSize = tileSpriteInfo[1], tileSpriteAttrs = tileSpriteInfo[2];
             let tileSpritePosition = [tilePos[0], tilePos[1], ((tilePos[0] - 1) * tileSpriteSize[0]), ((tilePos[1] - 1) * tileSpriteSize[1])];
             let tileSpriteEffects = {grid: true, hover: false, outline: false, focus: false, active: false}; // default values
@@ -795,6 +826,7 @@ class mmrpgWorldMap {
         let $canvas = $('canvas', $thisLayer), canvas = $canvas[0], ctx = canvas.getContext('2d');
         for (var i = 0; i < thisLayerTilesKeys.length; i++){
             let tileKey = thisLayerTilesKeys[i];
+            //console.log('-----> tileKey =', tileKey);
             let tilesIndexData = _self.getLayerTileIndexData(layerToken, tileKey);
             _self.drawTileToCanvas(layerToken, ctx, thisLayerSheet, tileKey, tilesIndexData);
             }
@@ -817,6 +849,11 @@ class mmrpgWorldMap {
         let tileSpriteToken = tileSprite[1];
         let tileSpriteOffset = tileSprite[2];
         let tileSpriteSize = tileSprite[3];
+        //console.log('-> tileSprite =', tileSprite);
+        //console.log('-> tileSpriteKey =', tileSpriteKey);
+        //console.log('-> tileSpriteToken =', tileSpriteToken);
+        //console.log('-> tileSpriteOffset =', tileSpriteOffset);
+        //console.log('-> tileSpriteSize =', tileSpriteSize);
         // define some internal methods we can use for effect-drawingoptimization
         let _saveDrawRestore = function(callback){
             ctx.save(); callback.call(this); ctx.restore();
@@ -847,9 +884,9 @@ class mmrpgWorldMap {
         let tileIsFocused = tileEffects.focus;
         let tileIsActive = tileEffects.active;
         // check if this tile falls into any oft-used categories
-        let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void') !== -1 ? true : false;
-        let tileIsGrass = tileSpriteToken === 'grass' || tileSpriteToken.indexOf('grass') !== -1 ? true : false;
-        let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water') !== -1 ? true : false;
+        let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void-') !== -1 ? true : false;
+        let tileIsGrass = tileSpriteToken === 'grass' || tileSpriteToken.indexOf('grass-') !== -1 ? true : false;
+        let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water-') !== -1 ? true : false;
         // clear a rect at the exact position and no larger
         ctx.clearRect(tilePosition[2], tilePosition[3], tileSpriteSize[0], tileSpriteSize[1]);
         // void tiles have no sprite, so we skip drawing them
