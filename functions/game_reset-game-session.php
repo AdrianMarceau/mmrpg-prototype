@@ -97,6 +97,7 @@ function mmrpg_reset_game_session($delete_db_records = false, $delete_db_records
             && !empty($delete_db_records_user_id)
             && $delete_db_records_user_id === $user_id
             && rpg_user::is_member()){
+            $db->delete('mmrpg_users_worlds', array('user_id' => $delete_db_records_user_id));
             $db->delete('mmrpg_users_save_counters', array('user_id' => $delete_db_records_user_id));
             $db->delete('mmrpg_users_robots_records', array('user_id' => $delete_db_records_user_id));
             $db->delete('mmrpg_users_items_unlocked', array('user_id' => $delete_db_records_user_id));
