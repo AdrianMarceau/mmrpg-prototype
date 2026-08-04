@@ -85,6 +85,17 @@
 @hazards[]    = bramble-hazard-11(4-16, bramble-patch)
 @hazards[]    = bramble-hazard-12(6-16, bramble-patch)
 #---------------------------#
+# LALINDE PLAYER PLATFORM
+# + INIT ITEMS
+#------------------------
+@events[]     = lalinde-platform-left(8-23, lalindepad-left, any, drop-zone, item:lalinde-program, activate-player-platform)
+@events[]     = lalinde-platform-middle(9-23, lalindepad-middle, any, drop-zone, item:empty-heart, activate-player-platform)
+@events[]     = lalinde-platform-right(10-23, lalindepad-right, any, drop-zone, item:empty-core, activate-player-platform)
+@items[]      = lalinde-init-program(8-24, lalinde-program, anchored)
+@items[]      = lalinde-init-heart(9-24, empty-heart, anchored)
+@items[]      = lalinde-init-core(10-24, empty-core, anchored)
+@groups[]     = no-encounters_lalinde-platform-buffer(7-22...11-24)
+#---------------------------#
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
