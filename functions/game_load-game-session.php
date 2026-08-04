@@ -1,6 +1,7 @@
 <?
 // Define a function for loading the game session
 function mmrpg_load_game_session(){
+    //error_log('mmrpg_load_game_session() called!');
 
     // Reference global variables
     global $db;
@@ -143,6 +144,67 @@ function mmrpg_load_game_session(){
 
         $new_game_data['battle_settings'] = !empty($this_database_save['save_settings']) ? json_decode($this_database_save['save_settings'], true) : array();
 
+
+        // LOAD WORLD INFO
+
+        // Collect the world save info from the database
+        $this_database_world = $db->get_array("SELECT
+            `last_world_token`,
+            `last_map_token`,
+            `last_player_token`,
+            `player_sessions`,
+            `robot_sessions`,
+            `mecha_sessions`,
+            `world_maps`,
+            `world_buttons`,
+            `world_switches`,
+            `world_gates`,
+            `world_locks`,
+            `world_blocks`,
+            `world_hazards`,
+            `world_items`,
+            `world_abilities`,
+            `world_encounters`,
+            `world_pickups`,
+            `world_actors`,
+            `world_symbols`,
+            `world_events`,
+            `world_battles`
+            FROM `mmrpg_users_worlds`
+            WHERE `user_id` = {$login_user_id}
+            LIMIT 1;");
+
+        // Initialize the world session in case it's new/empty
+        rpg_world::init_session();
+        $world_session_token = rpg_world::session_token();
+
+        if (!empty($this_database_world)){
+
+            // Extract the battle data for later
+            $world_battles = !empty($this_database_world['world_battles']) ? $this_database_world['world_battles'] : '';
+            $world_battles = !empty($world_battles) ? json_decode($world_battles, true) : array();
+            unset($this_database_world['world_battles']);
+
+            // Loop through world data and assign to world session
+            foreach ($this_database_world AS $key => $value){
+                if (empty($value) || !isset($_SESSION[$world_session_token][$key])){ continue; }
+                if (!is_numeric($value)
+                    && (substr($value, 0, 1) === '{' && substr($value, -1, 1) === '}')
+                    || (substr($value, 0, 1) === '[' && substr($value, -1, 1) === ']')){
+                    $value = json_decode($value, true);
+                    }
+                $_SESSION[$world_session_token][$key] = $value;
+            }
+
+            // Push world battles into the game data battle index
+            if (!isset($new_game_data['values']['battle_index'])){ $new_game_data['values']['battle_index'] = array(); }
+            foreach ($world_battles AS $token => $battle){
+                $new_game_data['values']['battle_index'][$token] = json_encode($battle, JSON_NUMERIC_CHECK);
+            }
+
+        }
+
+
         // Update the session with the new save info
         $_SESSION[$session_token] = array_merge($_SESSION[$session_token], $new_game_data);
         unset($new_game_data);
@@ -166,17 +228,6 @@ function mmrpg_load_game_session(){
                 'user_ip_addresses' => implode(',', $ip_list)
                 ), "user_id = {$this_database_user['user_id']}");
         }
-
-        /*
-        // Update the user table in the database if not done already
-        if (empty($_SESSION[$session_token]['DEMO'])){
-            $db->update('mmrpg_users', array(
-                'user_last_login' => time(),
-                'user_backup_login' => $this_database_user['user_last_login'],
-                'user_ip_addresses' => implode(',', $ip_list)
-                ), "user_id = {$this_database_user['user_id']}");
-        }
-        */
 
         // Clear the pending login ID
         unset($_SESSION[$session_token]['PENDING_LOGIN_ID']);
