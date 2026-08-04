@@ -33,11 +33,11 @@
 #---------------------------#
 @events[]    = wily-platform-left(5-2, wilypad-left, any, drop-zone, item:wily-program, activate-player-platform)
 @events[]    = wily-platform-middle(6-2, wilypad-middle, any, drop-zone, item:wily-heart, activate-player-platform)
-@events[]    = wily-platform-right(7-2, wilypad-right, any, drop-zone, item:attack-core, activate-player-platform)
+@events[]    = wily-platform-right(7-2, wilypad-right, any, drop-zone, item:copy-core, activate-player-platform)
 #---------------------------#
 @items[]     = wily-init-program(14-10, wily-program, anchored)
 @items[]     = wily-init-heart(6-3, wily-heart__2, anchored)
-@items[]     = wily-init-core(11-7, attack-core, anchored)
+@items[]     = wily-init-core(11-7, copy-core, anchored)
 #---------------------------#
 @hazards[]    = fire-hazard-01(12-4, flame-pillar)
 @hazards[]    = fire-hazard-02(9-4, flame-pillar)

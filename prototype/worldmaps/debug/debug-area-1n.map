@@ -35,11 +35,11 @@
 #---------------------------#
 @events[]    = cossack-platform-left(7-3, cossackpad-left, any, drop-zone, item:cossack-program, activate-player-platform)
 @events[]    = cossack-platform-middle(8-3, cossackpad-middle, any, drop-zone, item:cossack-heart, activate-player-platform)
-@events[]    = cossack-platform-right(9-3, cossackpad-right, any, drop-zone, item:speed-core, activate-player-platform)
+@events[]    = cossack-platform-right(9-3, cossackpad-right, any, drop-zone, item:copy-core, activate-player-platform)
 #---------------------------#
 @items[]     = cossack-init-heart(4-3, cossack-heart__2, anchored)
 @items[]     = cossack-init-program(12-3, cossack-program, anchored)
-@items[]     = cossack-init-core(3-9, speed-core, anchored)
+@items[]     = cossack-init-core(3-9, copy-core, anchored)
 #---------------------------#
 @hazards[]    = frozen-hazard-1(6-9, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
 @hazards[]    = frozen-hazard-2(10-9, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)

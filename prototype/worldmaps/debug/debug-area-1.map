@@ -62,10 +62,10 @@
 #------------------------
 @events[]     = light-platform-left(10-8, lightpad-left, any, drop-zone, item:light-program, activate-player-platform)
 @events[]     = light-platform-middle(11-8, lightpad-middle, any, drop-zone, item:light-heart, activate-player-platform)
-@events[]     = light-platform-right(12-8, lightpad-right, any, drop-zone, item:defense-core, activate-player-platform)
+@events[]     = light-platform-right(12-8, lightpad-right, any, drop-zone, item:copy-core, activate-player-platform)
 @items[]      = light-init-program(19-26, light-program, anchored)
 @items[]      = light-init-heart(17-16, light-heart__1, anchored)
-@items[]      = light-init-core(3-24, defense-core, anchored)
+@items[]      = light-init-core(3-24, copy-core, anchored)
 #---------------------------#
 # INTRO ENCOUNTER
 #------------------
