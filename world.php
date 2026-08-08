@@ -221,9 +221,10 @@ if (!isset($WORLD_PLAYER_SESSION['last_robots'])){ $WORLD_PLAYER_SESSION['last_r
 $this_prototype_data['this_player_id'] = $this_player_info['player_id'];
 $this_prototype_data['this_player_token'] = $this_player_info['player_token'];
 $max_player_robots = mmrpg_prototype_limit_hearts_earned($this_player_token);
-$allowed_player_robots = mmrpg_prototype_robots_unlocked($this_player_token, true);
-//$summoned_player_robots = rpg_world::get_battle_history($this_player_token, 'robots_summoned');
+$unlocked_robot_tokens = mmrpg_prototype_robots_unlocked($this_player_token, true);
+$allowed_player_robots = mmrpg_prototype_robots_unlocked($this_player_token, true, true);
 //error_log('$max_player_robots = '.print_r($max_player_robots, true));
+//error_log('$unlocked_robot_tokens = '.print_r($unlocked_robot_tokens, true));
 //error_log('$allowed_player_robots = '.print_r($allowed_player_robots, true));
 ////error_log('$summoned_player_robots = '.print_r($summoned_player_robots, true));
 //error_log('-> $_REQUEST[robots] = '. print_r((isset($_REQUEST['robots']) ? $_REQUEST['robots'] : null), true));
@@ -245,7 +246,8 @@ if (!empty($_REQUEST['robots'])){
     //error_log('-> $request_robots_filtered = '. print_r($request_robots_filtered, true));
     //error_log('-> $request_robots_tokens = '. print_r($request_robots_tokens, true));
     if (!empty($request_robots_filtered)){
-        $current_player_robots = $request_robots_tokens;
+        //$current_player_robots = $request_robots_tokens;
+        $current_player_robots = $request_robots_filtered;
         $last_robots = $request_robots_filtered;
         $WORLD_PLAYER_SESSION['last_robots'] = implode(',', $last_robots);
         //error_log('-> $current_player_robots (new) = '. print_r($current_player_robots, true));
@@ -255,11 +257,12 @@ if (!empty($_REQUEST['robots'])){
 elseif (!empty($WORLD_PLAYER_SESSION['last_robots'])){
     //error_log('Adding from $WORLD_PLAYER_SESSION[last_robots] = '. print_r($WORLD_PLAYER_SESSION['last_robots'], true));
     $last_robots = explode(',', $WORLD_PLAYER_SESSION['last_robots']);
-    $current_player_robots += array_map(function($r){ return explode('_', $r, 2)[1]; }, $last_robots);
+    //$current_player_robots += array_map(function($r){ return explode('_', $r, 2)[1]; }, $last_robots);
+    $current_player_robots += $last_robots;
 }
 if (!empty($allowed_player_robots)){
     if (empty($current_player_robots)){
-        //error_log('Because empty $current_player_robots = '. print_r($current_player_robots, true));
+        //error_log('Because empty w/ $current_player_robots = '. print_r($current_player_robots, true));
         //error_log('Adding from $allowed_player_robots = '. print_r($allowed_player_robots, true));
         //error_log('-> count($current_player_robots)='.count($current_player_robots).' < $max_player_robots='.$max_player_robots);
         $slots_open = $max_player_robots - count($current_player_robots);
@@ -270,9 +273,11 @@ if (!empty($allowed_player_robots)){
         //error_log('-> new $current_player_robots = '. print_r($current_player_robots, true));
     }
     if (!empty($current_player_robots)){
+        //error_log('Because NOT empty w/ $current_player_robots = '. print_r($current_player_robots, true));
+        //error_log('Filtering by $allowed_player_robots = '. print_r($allowed_player_robots, true));
         $current_player_robots = array_values(array_filter($current_player_robots,
-            function($token) use ($allowed_player_robots){
-                return in_array($token, $allowed_player_robots);
+            function($string) use ($allowed_player_robots){
+                return in_array($string, $allowed_player_robots);
                 }));
     }
     if (count($current_player_robots) > $max_player_robots){
@@ -283,16 +288,14 @@ if (!empty($allowed_player_robots)){
 }
 if (!empty($current_player_robots) && !empty($allowed_player_robots)){
     $index_tokens_required = array_values(array_unique(array_merge($current_player_robots, $allowed_player_robots)));
-    //error_log('$current_player_robots = '.print_r($current_player_robots, true));
+    //error_log('(world.php) $current_player_robots = '.print_r($current_player_robots, true));
     //error_log('$allowed_player_robots = '.print_r($allowed_player_robots, true));
     //error_log('$index_tokens_required = '.print_r($index_tokens_required, true));
-    foreach ($index_tokens_required AS $robot_token){
+    foreach ($index_tokens_required AS $robot_string){
+        list($robot_id, $robot_token) = explode('_', $robot_string);
         if (empty($mmrpg_index_robots[$robot_token])){ continue; }
-        $robot_info = $mmrpg_index_robots[$robot_token];
-        $robot_id = $robot_info['robot_id'];
-        $robot_string = $robot_id . '_' . $robot_token;
         $robot_info = rpg_world::get_player_robot_overview($this_player_token, $robot_token, $robot_id);
-        if (in_array($robot_token, $current_player_robots)){ $this_player_robots[] = $robot_string; }
+        if (in_array($robot_string, $current_player_robots)){ $this_player_robots[] = $robot_string; }
         $this_player_robots_index[$robot_string] = $robot_info;
     }
     //error_log('$this_player_token = '.print_r($this_player_token, true));
