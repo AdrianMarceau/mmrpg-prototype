@@ -81,6 +81,7 @@
 # ITEMS CODES PICKUP
 #---------------------
 @items[]     = item-codes-pickup(14-22, item-codes)
+@items[]     = equip-codes-pickup(8-22, equip-codes)
 #---------------------------#
 # ITEM CORRIDOR PICKUPS
 # + STARTER ABILITIES
