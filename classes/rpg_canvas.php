@@ -1017,16 +1017,13 @@ class rpg_canvas {
         }
 
         // Define the rest of the display variables
-        if (!preg_match('/^images/i', $this_data['ability_image'])){ $this_data['ability_image_path'] = 'images/abilities/'.$this_data['ability_image'].'/sprite_'.$this_data['ability_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
-        else { $this_data['ability_image_path'] = $this_data['ability_image']; }
+        $ability_image = !empty($this_data['ability_image']) ? $this_data['ability_image'] : 'ability';
+        if (!preg_match('/^images/i', $ability_image)){ $this_data['ability_image_path'] = 'images/abilities/'.$ability_image.'/sprite_'.$this_data['ability_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
+        else { $this_data['ability_image_path'] = $ability_image; }
         $this_data['ability_markup_class'] = 'sprite sprite_ability ';
         $this_data['ability_markup_class'] .= 'sprite_'.$this_data['ability_sprite_size'].'x'.$this_data['ability_sprite_size'].' sprite_'.$this_data['ability_sprite_size'].'x'.$this_data['ability_sprite_size'].'_'.$this_data['ability_frame'].' ';
         $this_data['ability_markup_class'] .= 'ability_status_'.$this_data['ability_status'].' ability_position_'.$this_data['ability_position'].' ';
-
-        if ($this_data['ability_scale'] !== 1){
-            $this_data['ability_markup_class'] .= 'scaled ';
-        }
-
+        if ($this_data['ability_scale'] !== 1){ $this_data['ability_markup_class'] .= 'scaled '; }
         $frame_position = is_numeric($this_data['ability_frame']) ? (int)($this_data['ability_frame']) : array_search($this_data['ability_frame'], $this_data['ability_frame_index']);
         if ($frame_position === false){ $frame_position = 0; }
         $frame_background_offset = -1 * ceil(($this_data['ability_sprite_size'] * $frame_position));
@@ -1043,6 +1040,7 @@ class rpg_canvas {
 
             // Display the ability's battle sprite
             $temp_markup = '<div '.
+                'data-ability="'.$this_data['ability_token'].'" '.
                 'data-ability-id="'.$this_data['ability_id_token'].'" '.
                 'data-robot-id="'.$robot_data['robot_id_token'].'" '.
                 'class="'.($this_data['ability_markup_class'].$this_data['ability_frame_classes']).'" '.
@@ -1140,8 +1138,9 @@ class rpg_canvas {
         else { $this_data['canvas_offset_z'] = $robot_data['canvas_base_offset_z'];  }
 
         // Define the rest of the display variables
-        if (!preg_match('/^images/i', $this_data['ability_image'])){ $this_data['ability_image_path'] = 'images/abilities/'.$this_data['ability_image'].'/sprite_'.$this_data['ability_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
-        else { $this_data['ability_image_path'] = $this_data['ability_image']; }
+        $ability_image = !empty($this_data['ability_image']) ? $this_data['ability_image'] : 'ability';
+        if (!preg_match('/^images/i', $ability_image)){ $this_data['ability_image_path'] = 'images/abilities/'.$ability_image.'/sprite_'.$this_data['ability_direction'].'_80x80.png?'.MMRPG_CONFIG_CACHE_DATE; }
+        else { $this_data['ability_image_path'] = $ability_image; }
         $this_data['ability_markup_class'] = 'sprite sprite_ability ';
         $this_data['ability_markup_class'] .= 'sprite_'.$this_data['ability_sprite_size'].'x'.$this_data['ability_sprite_size'].' sprite_'.$this_data['ability_sprite_size'].'x'.$this_data['ability_sprite_size'].'_'.$this_data['ability_frame'].' ';
         $this_data['ability_markup_class'] .= 'ability_status_'.$this_data['ability_status'].' ability_position_'.$this_data['ability_position'].' ';
@@ -1157,6 +1156,7 @@ class rpg_canvas {
 
             // Display the ability's battle sprite
             $temp_markup = '<div '.
+                'data-ability="'.$this_data['ability_token'].'" '.
                 'data-ability-id="'.$this_data['ability_id_token'].'" '.
                 'class="'.($this_data['ability_markup_class'].$this_data['ability_frame_classes']).'" '.
                 'style="'.($this_data['ability_markup_style'].$this_data['ability_frame_styles']).'" '.
