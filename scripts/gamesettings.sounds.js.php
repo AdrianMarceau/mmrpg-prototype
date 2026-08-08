@@ -2,6 +2,7 @@
 
 // Require the top file if not already included
 require_once(dirname(dirname(__FILE__)).'/top.php');
+session_write_close();
 
 // If the return value was set explicitly as javascript, update headers
 $return_type = !empty($_REQUEST['return']) && is_string($_REQUEST['return']) ? $_REQUEST['return'] : 'default';
