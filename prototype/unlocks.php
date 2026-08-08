@@ -937,7 +937,7 @@ if ($unlock_flag_light){
         $temp_console_markup = '';
         $temp_console_markup .= '<p class="ability_type ability_type_defense" style="margin: 5px auto 10px; text-align: center;">Congratulations!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span('defense', 'Dr. Light').' has been unlocked as a player character!</p>';
-        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Light</strong> and <strong>Mega Man</strong> to experience the story from their perspective.  This beginner-level campaign teaches you the basics while you fight through an army of powered up opponents!</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Light</strong> and <strong>Mega Man</strong> to experience the story from their perspective. This beginner-level campaign teaches you the basics while you fight through an army of powered up opponents!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_defense">Dr. Light</strong> from the player select menu to play through his campaign at any time.</p>';
         array_push($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
@@ -976,7 +976,7 @@ if ($unlock_flag_wily){
         $temp_console_markup = '';
         $temp_console_markup .= '<p class="ability_type ability_type_attack" style="margin: 5px auto 10px; text-align: center;">Congratulations!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span('attack', 'Dr. Wily').' has been unlocked as a player character!</p>';
-        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Wily</strong> and <strong>Bass</strong> to continue the story from their perspective.  Unlock even more new robots, abilities, and items as you continue your fight against the prototype\'s army of powered up opponents!</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Wily</strong> and <strong>Bass</strong> to continue the story from their perspective. This intermediate-level campaign offers a bit more challenge and expects you to already-know the basics of battle!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_attack">Dr. Wily</strong> from the player select menu to continue the campaign.<br />  You can also go back to replay <strong class="ability_type ability_type_defense">Dr. Light</strong> missions at any time.</p>';
         array_push($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
@@ -1015,7 +1015,7 @@ if ($unlock_flag_cossack){
         $temp_console_markup = '';
         $temp_console_markup .= '<p class="ability_type ability_type_speed" style="margin: 5px auto 10px; text-align: center;">Congratulations!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span('speed', 'Dr. Cossack').' has been unlocked as a player character!</p>';
-        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Cossack</strong> and <strong>Proto Man</strong> to continue the story from their perspective.  Unlock even more new robots, abilities, and items as you continue your fight against the prototype\'s army of powered up opponents!</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Cossack</strong> and <strong>Proto Man</strong> to continue the story from their perspective. This advanced-level campaign packs the hardest punch of all and acts as the final player-story before the end-game!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_speed">Dr. Cossack</strong> from the player select menu to continue the campaign.<br />  You can also go back to replay <strong class="ability_type ability_type_defense">Dr. Light</strong> or <strong class="ability_type ability_type_attack">Dr. Wily</strong> missions at any time.</p>';
         array_push($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
