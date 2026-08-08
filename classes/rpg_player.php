@@ -3530,6 +3530,9 @@ class rpg_player extends rpg_object {
         } elseif ($player_info['player_token'] == 'dr-cossack'){
             $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['proto-man']);
             $player_info['player_field'] = 'cossack-citadel';
+        } elseif ($player_info['player_token'] == 'dr-lalinde'){
+            $robot_info = rpg_robot::parse_index_info($mmrpg_database_robots['quake-woman']);
+            $player_info['player_field'] = 'mineral-quarry';
         }
 
         // Start the output buffer
@@ -4324,7 +4327,8 @@ class rpg_player extends rpg_object {
             'default' => 'intro-field',
             'dr-light' => 'gentle-countryside',
             'dr-wily' => 'maniacal-hideaway',
-            'dr-cossack' => 'wintry-forefront'
+            'dr-cossack' => 'wintry-forefront',
+            'dr-lalinde' => 'rocky-plateau'
             );
     }
 
@@ -4349,7 +4353,8 @@ class rpg_player extends rpg_object {
             'default' => 'intro-field',
             'dr-light' => 'light-laboratory',
             'dr-wily' => 'wily-castle',
-            'dr-cossack' => 'cossack-citadel'
+            'dr-cossack' => 'cossack-citadel',
+            'dr-lalinde' => 'mineral-quarry'
             );
     }
 
@@ -4375,7 +4380,8 @@ class rpg_player extends rpg_object {
             'default' => 'robot',
             'dr-light' => 'mega-man',
             'dr-wily' => 'bass',
-            'dr-cossack' => 'proto-man'
+            'dr-cossack' => 'proto-man',
+            'dr-lalinde' => 'quake-woman'
             );
     }
 
@@ -4400,7 +4406,8 @@ class rpg_player extends rpg_object {
             'default' => 'robot',
             'dr-light' => 'roll',
             'dr-wily' => 'disco',
-            'dr-cossack' => 'rhythm'
+            'dr-cossack' => 'rhythm',
+            'dr-lalinde' => 'vesper-woman'
             );
     }
 
@@ -4425,7 +4432,8 @@ class rpg_player extends rpg_object {
             'default' => 'met',
             'dr-light' => 'sniper-joe',
             'dr-wily' => 'skeleton-joe',
-            'dr-cossack' => 'crystal-joe'
+            'dr-cossack' => 'crystal-joe',
+            'dr-lalinde' => 'hammer-joe'
             );
     }
 
