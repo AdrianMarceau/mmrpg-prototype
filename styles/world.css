@@ -2268,6 +2268,24 @@ html, body {
 #world #canvas #robots-overview.expanded:after {
 
 }
+#world #canvas #robots-overview.no-robots:before,
+#world #canvas #robots-overview.no-robots:hover:before {
+    left: -580px;
+}
+#world #canvas #robots-overview.expanded.no-robots:before {
+    left: -84px;
+    width: 415px;
+}
+#world #canvas #robots-overview.no-robots .storage-box {
+    left: 10px;
+}
+#world #canvas #robots-overview.no-robots .storage-details {
+    left: 330px;
+}
+#world #canvas #robots-overview.no-robots .team-close {
+    left: 315px;
+}
+
 #world #canvas #robots-overview > .wrapper {
     pointer-events: none;
 }
@@ -2435,6 +2453,16 @@ html, body {
 }
 #world #canvas #robots-overview .team-abilities i {
     top: calc(50% + 2px);
+}
+
+#world #canvas #robots-overview.no-robots:after {
+    width: 230px;
+}
+#world #canvas #robots-overview.no-robots .team-items {
+    left: 44px;
+}
+#world #canvas #robots-overview.no-robots .team-abilities {
+    left: 112px;
 }
 
 #world #canvas #robots-overview .team-close,
@@ -5034,6 +5062,7 @@ display: block;
 #world #canvas #side-buttons .big-button > span.has-sprite,
 #world #canvas #side-buttons .big-button-title > span.has-sprite {
     text-align: left;
+    padding-right: 40px;
 }
 #world #canvas #side-buttons .big-button > span.has-sprite.one-row,
 #world #canvas #side-buttons .big-button-title > span.has-sprite.one-row {
@@ -5046,6 +5075,14 @@ display: block;
     margin: 0 2px 0 0;
     position: relative;
     bottom: 2px;
+}
+#world #canvas #side-buttons .big-button > span.has-sprite sub,
+#world #canvas #side-buttons .big-button-title > span.has-sprite sub {
+    position: absolute;
+    bottom: 8px;
+    right: 23px;
+    font-size: 12px;
+    line-height: 1;
 }
 #world #canvas #side-buttons .big-button > span > .sprite,
 #world #canvas #side-buttons .big-button-title > span > .sprite {
