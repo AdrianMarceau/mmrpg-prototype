@@ -873,7 +873,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
             ?>
             <? if (!empty($cursor_palette_markup)){ ?><div id="cursor-palette" class="chrome"><?= $cursor_palette_markup ?></div><? } ?>
             <? if (!empty($player_switcher_markup)){ ?><div id="player-switcher" class="chrome"><?= $player_switcher_markup ?></div><? } ?>
-            <? if (!empty($robots_overview_markup)){ ?><div id="robots-overview" class="chrome"><?= $robots_overview_markup ?></div><? } ?>
+            <? if (!empty($robots_overview_markup)){ ?><div id="robots-overview" class="chrome<?= empty($robot_overview_robots) ? ' no-robots' : ''?>"><?= $robots_overview_markup ?></div><? } ?>
             <? if (!empty($minimap_overview_markup)){ ?><div id="minimap-overview" class="chrome"><?= $minimap_overview_markup ?></div><? } ?>
             <? if (!empty($progress_tracker_markup)){ ?><div id="progress-tracker" class="chrome"><?= $progress_tracker_markup ?></div><? } ?>
             <div id="zoom-controls" class="chrome"><?= $zoom_controls_markup ?></div>
