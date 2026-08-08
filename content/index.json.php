@@ -6,6 +6,7 @@ $base_dir = rtrim(dirname(dirname(__FILE__)), '/').'/';
 // Require the top file and the content index
 require($base_dir.'top.php');
 require($base_dir.'content/all.php');
+session_write_close();
 
 // Return the content in the appropriate format
 header('Content-Type: application/json');

@@ -6,6 +6,7 @@ $base_dir = rtrim(dirname(dirname(__FILE__)), '/').'/';
 // Require the top file and the content index
 $auto_parse_fields = false;
 require($base_dir.'top.php');
+session_write_close();
 
 // Set the content type to the appropriate format and make sure it's cached
 header('Content-Type: text/css');
