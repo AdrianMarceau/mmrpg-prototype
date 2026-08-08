@@ -1303,6 +1303,8 @@ function getRobotDetailsForOverview(robotToken){
     let _world = _self.state;
     let _worldPlayer = _world.player;
     let _worldPlayerRobots = _worldPlayer.robots;
+    let _worldPlayerItems = _worldPlayer.items;
+    let _worldPlayerAbilities = _worldPlayer.abilities;
     let _playerRobotsIndex = _config.playerRobotsIndex;
     let playerRobotInfo = false;
     let playerRobotsCurrent = _worldPlayer.team;
@@ -1397,12 +1399,18 @@ function getRobotDetailsForOverview(robotToken){
     let robotItemInfo = robotItem && typeof _mmrpgItemsIndex[robotItem] !== 'undefined' ? _mmrpgItemsIndex[robotItem] : false;
     let robotSupport = playerRobotInfo.support ? playerRobotInfo.support : (robotIndexInfo.support ? robotIndexInfo.support : '');
     let robotSupportInfo = robotSupport && typeof _mmrpgRobotsIndex[robotSupport] !== 'undefined' ? _mmrpgRobotsIndex[robotSupport] : false;
+    let robotSupportAbilities = ['mecha-support', 'mecha-assault', 'mecha-party', 'friend-share'];
     let robotSupportEquipped = (function(info){
-        let abilities = _mmrpgAbilitiesIndex, equipped = info.abilities || [];
-        let required = ['mecha-support', 'mecha-assault', 'mecha-party', 'friend-share'];
+        let abilities = _mmrpgAbilitiesIndex, required = robotSupportAbilities, equipped = info.abilities || [];
         for (var i = 0; i < required.length; i++){ if (equipped.indexOf(abilities[required[i]].id) !== -1){ return true; } }
         return false;
         })(playerRobotInfo);
+    let equipCodesUnlocked = typeof _worldPlayerItems['equip-codes'] !== 'undefined' && _worldPlayerItems['equip-codes'] >= 1 ? true : false;
+    let robotSupportUnlocked = (function(unlocked){
+        let abilities = _mmrpgAbilitiesIndex, required = robotSupportAbilities;
+        for (var i = 0; i < required.length; i++){ if (unlocked.indexOf(required[i]) !== -1){ return true; } }
+        return false;
+        })(_worldPlayerAbilities);
     //console.log('--> robotLevel =', robotLevel);
     //console.log('--> robotExperience =', robotExperience);
     //console.log('--> robotEnergy =', robotEnergy, '/', robotEnergyMax, '(', robotEnergyPercent, '% )');
@@ -1515,74 +1523,78 @@ function getRobotDetailsForOverview(robotToken){
     robotDetailsObject.infoLines.push(statsLine);
 
     // HELD ITEM
-    let itemLine = { classes: 'held-item types', label: 'Item:', values: [] }; {
-        let itemID, itemToken, itemName, itemSprite, itemTypes;
-        if (robotItem && robotItemInfo){
-            itemID = robotItemInfo.id;
-            itemToken = robotItemInfo.token;
-            itemName = robotItemInfo.name;
-            itemSprite = _self.getItemSpriteMarkup(itemToken, {classes: 'icon'});
-            itemTypes = (function(info){
-                if (!info){ return ''; }
-                else if (!info.type && !info.type2){ return 'none'; }
-                else if (!info.type && info.type2){ return info.type2; }
-                else { return info.type; }
-                })(robotItemInfo);
-            } else {
-            itemID = 0;
-            itemToken = '';
-            itemName = 'None',
-            itemSprite = '<span class="icon"><i class="fa fas fa-times"></i></span>';
-            itemTypes = 'empty';
+    if (equipCodesUnlocked){
+        let itemLine = { classes: 'held-item types', label: 'Item:', values: [] }; {
+            let itemID, itemToken, itemName, itemSprite, itemTypes;
+            if (robotItem && robotItemInfo){
+                itemID = robotItemInfo.id;
+                itemToken = robotItemInfo.token;
+                itemName = robotItemInfo.name;
+                itemSprite = _self.getItemSpriteMarkup(itemToken, {classes: 'icon'});
+                itemTypes = (function(info){
+                    if (!info){ return ''; }
+                    else if (!info.type && !info.type2){ return 'none'; }
+                    else if (!info.type && info.type2){ return info.type2; }
+                    else { return info.type; }
+                    })(robotItemInfo);
+                } else {
+                itemID = 0;
+                itemToken = '';
+                itemName = 'None',
+                itemSprite = '<span class="icon"><i class="fa fas fa-times"></i></span>';
+                itemTypes = 'empty';
+                }
+            let itemNameSize = itemName.split(' ').length;
+            let itemNameMarkup = (itemNameSize > 1 ? ('<b>' + itemName.replace(' ', '<br />') + '</b>') : ('<b><b>' + itemName + '</b></b>'));
+            let itemSpriteMarkup = itemSprite;
+            let itemTypeClasses = itemTypes;
+            itemLine.values.push({
+                value: itemNameMarkup + itemSpriteMarkup,
+                valueClasses: 'type ' + itemTypeClasses,
+                valueAttrs: {'item-id': itemID, 'item-token': itemToken},
+                });
             }
-        let itemNameSize = itemName.split(' ').length;
-        let itemNameMarkup = (itemNameSize > 1 ? ('<b>' + itemName.replace(' ', '<br />') + '</b>') : ('<b><b>' + itemName + '</b></b>'));
-        let itemSpriteMarkup = itemSprite;
-        let itemTypeClasses = itemTypes;
-        itemLine.values.push({
-            value: itemNameMarkup + itemSpriteMarkup,
-            valueClasses: 'type ' + itemTypeClasses,
-            valueAttrs: {'item-id': itemID, 'item-token': itemToken},
-            });
+        robotDetailsObject.infoLines.push(itemLine);
         }
-    robotDetailsObject.infoLines.push(itemLine);
 
     // SUPPORT MECHA
-    let supportLine = { classes: 'support-mecha types', label: 'Support:', values: [] }; {
-        let supportToken, supportName, supportSprite, supportTypes;
-        if (robotSupportEquipped){
-            if (robotSupport && robotSupportInfo){
-                supportToken = robotSupport;
-                supportName = robotSupportInfo.name;
-                supportSprite = _self.getRobotSpriteMarkup(supportToken);
-                supportTypes = (function(info){
-                    if (!info){ return ''; }
-                    else if (!info.core && !info.core2){ return 'none'; }
-                    else if (!info.core && info.core2){ return info.core2; }
-                    else { return info.core; }
-                    })(robotSupportInfo);
+    if (robotSupportUnlocked){
+        let supportLine = { classes: 'support-mecha types', label: 'Support:', values: [] }; {
+            let supportToken, supportName, supportSprite, supportTypes;
+            if (robotSupportEquipped){
+                if (robotSupport && robotSupportInfo){
+                    supportToken = robotSupport;
+                    supportName = robotSupportInfo.name;
+                    supportSprite = _self.getRobotSpriteMarkup(supportToken);
+                    supportTypes = (function(info){
+                        if (!info){ return ''; }
+                        else if (!info.core && !info.core2){ return 'none'; }
+                        else if (!info.core && info.core2){ return info.core2; }
+                        else { return info.core; }
+                        })(robotSupportInfo);
+                    } else {
+                    supportToken = '';
+                    supportName = '&hellip;',
+                    supportSprite = '<span class="icon"><i class="fa fas fa-question"></i></span>';
+                    supportTypes = 'empty';
+                    }
                 } else {
                 supportToken = '';
-                supportName = '&hellip;',
-                supportSprite = '<span class="icon"><i class="fa fas fa-question"></i></span>';
+                supportName = 'None',
+                supportSprite = '<span class="icon"><i class="fa fas fa-times"></i></span>';
                 supportTypes = 'empty';
                 }
-            } else {
-            supportToken = '';
-            supportName = 'None',
-            supportSprite = '<span class="icon"><i class="fa fas fa-times"></i></span>';
-            supportTypes = 'empty';
+            let supportNameSize = supportName.split(' ').length;
+            let supportNameMarkup = (supportNameSize > 1 ? ('<b>' + supportName.replace(' ', '<br />') + '</b>') : ('<b><b>' + supportName + '</b></b>'));
+            let supportSpriteMarkup = supportSprite;
+            let supportTypeClasses = supportTypes;
+            supportLine.values.push({
+                value: supportNameMarkup + supportSpriteMarkup,
+                valueClasses: 'type ' + supportTypeClasses,
+                });
             }
-        let supportNameSize = supportName.split(' ').length;
-        let supportNameMarkup = (supportNameSize > 1 ? ('<b>' + supportName.replace(' ', '<br />') + '</b>') : ('<b><b>' + supportName + '</b></b>'));
-        let supportSpriteMarkup = supportSprite;
-        let supportTypeClasses = supportTypes;
-        supportLine.values.push({
-            value: supportNameMarkup + supportSpriteMarkup,
-            valueClasses: 'type ' + supportTypeClasses,
-            });
+        robotDetailsObject.infoLines.push(supportLine);
         }
-    robotDetailsObject.infoLines.push(supportLine);
 
     // EQUIPPED ABILITIES
     let abilitiesLine = { classes: 'equipped-abilities types', label: 'Abilities:', values: [] }; {
