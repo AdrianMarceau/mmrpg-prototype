@@ -125,7 +125,9 @@ if (!empty($this_battle_token)){
                     $temp_robot_data['values']['source_battle'] = $temp_battle_token;
                     $robot_key = count($new_target_robots);
                     $robot_info = rpg_robot::get_index_info($temp_robot_data['robot_token']);
-                    $temp_robot_data['robot_id'] = rpg_game::unique_robot_id($temp_target_playerid, $robot_info['robot_id'], ($robot_key + 1));
+                    $robot_base_id = $robot_info['robot_id'];
+                    $temp_robot_data['robot_id'] = rpg_game::unique_robot_id($temp_target_playerid, $robot_base_id, ($robot_key + 1));
+                    $temp_robot_data['robot_base_id'] = $robot_base_id;
                     $new_target_robots[] = $temp_robot_data;
                 }
             }
@@ -236,6 +238,7 @@ if (!empty($this_player_token)){
     $this_player_data['user_id'] = $temp_user_id;
     $this_player_data['player_id'] = $temp_player_id;
     if (!empty($this_player_robots)){
+        //error_log('(battle.php) -> $this_player_robots (before) = '.print_r($this_player_robots, true));
         $allowed_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
         $allowed_robots_parsed = array();
         $this_player_data['player_robots'] = array();
@@ -246,13 +249,15 @@ if (!empty($this_player_token)){
             if (!isset($temp_this_robot_classes[$temp_robot_class])){ $temp_this_robot_classes[$temp_robot_class] = 0; }
             $temp_this_robot_classes[$temp_robot_class] += 1;
             if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_token)){
-                $temp_robot_id = strstr($robot_id, $temp_player_id) ? $robot_id : rpg_game::unique_robot_id($temp_player_id, $temp_robot_data['robot_id'], ($key + 1));
-                $this_player_data['player_robots'][] = array('robot_id' => $temp_robot_id, 'robot_token' => $robot_token);
+                $temp_robot_id = strstr($robot_id, $temp_player_id) ? $robot_id : rpg_game::unique_robot_id($temp_player_id, $robot_id, ($key + 1));
+                $this_player_data['player_robots'][] = array('robot_id' => $temp_robot_id, 'robot_base_id' => $robot_id, 'robot_token' => $robot_token);
                 $allowed_robots_parsed[] = $temp_robot_id.'_'.$robot_token;
             }
         }
         $this_player_robots = implode(',', $allowed_robots_parsed);
         $this_player_data['player_robots'] = array_values($this_player_data['player_robots']);
+        //error_log('(battle.php) -> $this_player_robots (after) = '.print_r($this_player_robots, true));
+        //error_log('(battle.php) -> $this_player_data[\'player_robots\'] = '.print_r($this_player_data['player_robots'], true));
     }
 }
 else {
