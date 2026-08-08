@@ -228,8 +228,9 @@ class rpg_robot extends rpg_object {
         $this->robot_pseudo_token = !empty($this->robot_persona) ? $this->robot_persona : $this->robot_token;
 
         // Define the internal robot base values using the robots index array
-        $this->robot_base_name = isset($this_robotinfo['robot_base_name']) ? $this_robotinfo['robot_base_name'] : $this->robot_name;
+        $this->robot_base_id = isset($this_robotinfo['robot_base_id']) ? $this_robotinfo['robot_base_id'] : 0;
         $this->robot_base_token = isset($this_robotinfo['robot_base_token']) ? $this_robotinfo['robot_base_token'] : $this->robot_token;
+        $this->robot_base_name = isset($this_robotinfo['robot_base_name']) ? $this_robotinfo['robot_base_name'] : $this->robot_name;
 
         $this->robot_base_image = isset($this_robotinfo['robot_base_image']) ? $this_robotinfo['robot_base_image'] : $this->robot_image;
         $this->robot_base_image_size = isset($this_robotinfo['robot_base_image_size']) ? $this_robotinfo['robot_base_image_size'] : $this->robot_image_size;
@@ -3786,8 +3787,9 @@ class rpg_robot extends rpg_object {
             'robot_attachments' => $this->robot_attachments,
             'robot_quotes' => $this->robot_quotes,
             'robot_rewards' => $this->robot_rewards,
-            'robot_base_name' => $this->robot_base_name,
+            'robot_base_id' => $this->robot_base_id,
             'robot_base_token' => $this->robot_base_token,
+            'robot_base_name' => $this->robot_base_name,
             'robot_base_item' => $this->robot_base_item,
             'robot_base_image' => $this->robot_base_image,
             'robot_base_image_size' => $this->robot_base_image_size,
