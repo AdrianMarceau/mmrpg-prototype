@@ -630,6 +630,38 @@ function addItemToInventory(itemToken, itemQuantity, animatePickup, playSound, c
     return true;
     }
 
+// Define a quick function for getting the current quantity of an item in the player's inventory
+function getItemQuantity(itemToken, excludeEquipped){
+    //console.log('%c' + 'mmrpgWorldMap.getItemQuantity(item:' + itemToken + ', excludeEquipped:' + excludeEquipped + ')', 'color: magenta;');
+    if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('getItemQuantity() missing required itemToken!'); return 0; }
+    if (typeof excludeEquipped !== 'boolean'){ excludeEquipped = true; } // default to true if not provided
+
+    // Collect references to world objects
+    let _self = this;
+    let _world = _self.state;
+    let _worldPlayer = _world.player;
+    let _worldPlayerItems = _worldPlayer.items;
+
+    // Check to see how many of this item are currently in the inventory
+    let currentItemQuantity = _worldPlayerItems[itemToken];
+    let equippedItemQuantity = _worldPlayerItems[itemToken + '__equipped'];
+
+    if (!currentItemQuantity){ currentItemQuantity = 0; }
+    if (!equippedItemQuantity){ equippedItemQuantity = 0; }
+
+    // Calculate the actual available quantity based on the exclude flag
+    let finalItemQuantity = currentItemQuantity;
+    if (excludeEquipped){
+        finalItemQuantity = currentItemQuantity - equippedItemQuantity;
+        }
+
+    // Prevent returning negative values just in case
+    if (finalItemQuantity < 0){ finalItemQuantity = 0; }
+
+    // Return the calculated quantity
+    return finalItemQuantity;
+    }
+
 // Define a quick function for getting the overview details for a given item in the user's inventory
 function getItemDetailsForOverview(itemToken, targetSelected){
     //console.log('%c' + 'mmrpgWorldMap.getItemDetailsForOverview(item:' + itemToken + ', targetSelected:' + targetSelected + ')', 'color: magenta;');
@@ -1150,6 +1182,8 @@ mmrpgWorldMap.prototype.itemIsEvent = itemIsEvent;
 
 mmrpgWorldMap.prototype.triggerItemPickup = triggerItemPickup;
 mmrpgWorldMap.prototype.addItemToInventory = addItemToInventory;
+
+mmrpgWorldMap.prototype.getItemQuantity = getItemQuantity;
 
 mmrpgWorldMap.prototype.getItemDetailsForOverview = getItemDetailsForOverview;
 mmrpgWorldMap.prototype.getItemDetailsMarkupForOverview = getItemDetailsMarkupForOverview;
