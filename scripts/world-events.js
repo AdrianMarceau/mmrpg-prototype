@@ -1298,97 +1298,22 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             if (!lockPrice){
                 sideButtonsMarkup += '<sub>' + openTheLockLabel + '</sub> ';
                 sideButtonsMarkup += currencyCheck.spriteMarkup;
-            } else if (playerHasEnough){
+                }
+            else if (playerHasEnough){
                 sideButtonsMarkup += '<sub>' + openTheLockLabel + '</sub> ';
                 sideButtonsMarkup += '<br /><sup class="no-strike">' + currencyCheck.countLabel + '</sup> ';
                 sideButtonsMarkup += currencyCheck.spriteMarkup;
-            } else {
+                }
+            else {
                 sideButtonsMarkup += '<sup>' + openTheLockLabel + '</sup> ';
                 sideButtonsMarkup += '<br /><sub class="no-strike">' + currencyCheck.countLabel + '</sub> ';
                 sideButtonsMarkup += currencyCheck.spriteMarkup;
-            }
+                }
             sideButtonsMarkup += '</span></a>';
             sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
             showActionAreaType = 'lock';
             zoomTimeoutDuration = 300;
-        }
-        /*
-        if (dataLock && lockInfo && !playerIsCursor && (isSamePosition || isFacingPosition) && lockInfo.locked){
-            //console.log('-> found lockInfo for ' + dataLock + ':', lockInfo);
-            //console.log('-> lockType:', lockType);
-            //console.log('-> lockPrice:', lockPrice);
-            showActionArea = true;
-            if (!standingOnHazardEvent){ showActionAreaAnyway = true; }
-            if (dataLabel){ actionAreaMarkup += '<strong class="label'+(dataType ? ' type '+dataType : '')+'"><span class="inner">' + dataLabel + '</span></strong>'; }
-            let sideButtonLabel = lockKind2 === 'portal-flower' ? 'Feed The' : 'Open The';
-            sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>' + sideButtonLabel + '</sup> ' + toUpperCaseWords(lockKind2.replace('-', ' ')) + ' ?</span></strong>';
-            let playerHasNow = 0;
-            let currencyKind = lockCurrency.indexOf(':') !== -1 ? lockCurrency.split(':')[0] : lockCurrency;
-            let currencySubKind = lockCurrency.indexOf(':') !== -1 ? lockCurrency.split(':')[1] : false;
-            if (currencyKind === 'stars'){ playerHasNow = Object.keys(_worldPlayer.stars).length; }
-            else if (currencyKind === 'zenny'){ playerHasNow = _worldPlayer.zenny; }
-            else if (currencyKind === 'items'){
-                if (currencySubKind.length
-                    && typeof _worldPlayer.items[currencySubKind] !== 'undefined'){
-                    playerHasNow = _worldPlayer.items[currencySubKind];
-                    if (typeof _worldPlayer.items[currencySubKind + '__equipped'] !== 'undefined'){
-                        playerHasNow -= _worldPlayer.items[currencySubKind + '__equipped'];
-                        }
-                    }
-                }
-            let playerHasEnough = playerHasNow >= lockPrice ? true : false;
-            let playerCountLabel = (playerHasNow + ' / ' + lockPrice) + ' ' + toUpperCaseWords(currencySubKind ? currencySubKind.replace('-', ' ') : currencyKind);
-            if (currencyKind !== 'zenny' && lockPrice > 1){ playerCountLabel += 's'; }
-            let currencySpriteMarkup;
-            if (currencyKind === 'stars'){
-                currencySpriteMarkup = _self.getItemSpriteMarkup('field-star', {dir: 'left', frame: '00'});
-                } else if (currencyKind === 'screws'){
-                currencySpriteMarkup = _self.getItemSpriteMarkup('hyper-screw', {dir: 'left', frame: '00'});
-                } else if (currencyKind === 'items' && currencySubKind.length){
-                currencySpriteMarkup = _self.getItemSpriteMarkup(currencySubKind, {dir: 'left', frame: '00'});
-                } else {
-                currencySpriteMarkup = '';
-                }
-            //let openTheLockLabel = 'Give ' + toUpperCaseWords(currencyKind) + ' To ' + toUpperCaseWords(lockKind2.split('-')[1]) + '';
-                let openTheLockLabel = 'Give ' + toUpperCaseWords(currencyKind);
-            if (playerHasEnough){
-                //console.log('-> player has enough whatevers! allow them to lower the lock now');
-                // ...
-                } else {
-                //console.log('-> player doesn\'t have enough whatevers! cannot remove the lock yet');
-                // ...
-                }
-            sideButtonsMarkup += '<a '
-                + ('class="button big-button inner-strike'
-                    + (lockKind2 ? ' '+lockKind2 : '')
-                    + (dataType ? ' type '+dataType : '')
-                    + (!playerHasEnough ? ' disabled' : '')
-                    + '"')
-                + (playerHasEnough ?
-                    ' data-action="open-lock"'
-                    + ' data-lock="'+dataLock+'"'
-                    : '')
-                + '>';
-                sideButtonsMarkup += '<span class="has-sprite' + (!lockPrice ? ' one-row' : '') + '">';
-                if (!lockPrice){
-                    sideButtonsMarkup += '<sub>' + openTheLockLabel + '</sub> ';
-                    sideButtonsMarkup += currencySpriteMarkup;
-                    } else if (playerHasEnough){
-                    sideButtonsMarkup += '<sub>' + openTheLockLabel + '</sub> ';
-                    sideButtonsMarkup += '<br /><sup class="no-strike">' + playerCountLabel + '</sup> ';
-                    sideButtonsMarkup += currencySpriteMarkup;
-                    } else {
-                    sideButtonsMarkup += '<sup>' + openTheLockLabel + '</sup> ';
-                    sideButtonsMarkup += '<br /><sub class="no-strike">' + playerCountLabel + '</sub> ';
-                    sideButtonsMarkup += currencySpriteMarkup;
-                    }
-                sideButtonsMarkup += '</span>';
-            sideButtonsMarkup += '</a>';
-            sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-            showActionAreaType = 'lock';
-            zoomTimeoutDuration = 300; // if we show a lock dropdown, we want to zoom in quickly
             }
-        */
         }
     else if (firstEventType === 'block'){
         //console.log('-> event at position is a block, preparing dropdown');
@@ -1961,7 +1886,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         let currencyCheck = _self.checkMenuButtonCurrency(currency, price);
                         enabled = currencyCheck.hasEnough;
                         innerHtml = '<span class="has-sprite">'
-                            + '<sub>' + label + '</sub> '
+                            + '<strong>' + label + '</strong> '
                             + '<br /><sup class="no-strike">' + currencyCheck.countLabel + '</sup> '
                             + currencyCheck.spriteMarkup
                             + '</span>';
