@@ -59,7 +59,7 @@ if (!empty($mmrpg_indexes)){
                     if ($object_xkind === 'items'){ $pseudo_meta = rpg_world::get_sprite_meta($object_kind, 'small-screw', '', 'left', $prefix); }
                     elseif ($object_xkind === 'abilities'){ $pseudo_meta = rpg_world::get_sprite_meta($object_kind, 'buster-shot', '', 'left', $prefix); }
 
-                    if (!empty($pseudo_meta['sheetPath'])){ $inner_styles['background-image'] = 'url(../'.$pseudo_meta['sheetPath'].'?'.MMRPG_CONFIG_CACHE_DATE.')'; }
+                    if (!empty($pseudo_meta['sheetPath'])){ $inner_styles['background-image'] = 'url(../'.$pseudo_meta['sheetPath'].')'; }
                     if (!empty($pseudo_meta['sheetSize'])){ $inner_styles['background-size'] = $pseudo_meta['sheetSize'][0].'px '.$pseudo_meta['sheetSize'][1].'px'; }
                     $inner_styles_string = !empty($inner_styles) ? implode('; ', array_map(function($v, $k){ return $k.': '.$v.' !important'; }, $inner_styles, array_keys($inner_styles))) : '';
 
@@ -102,7 +102,7 @@ if (!empty($mmrpg_indexes)){
 
                     $inner_styles = array();
                     if ($use_composite && !empty($sprite_meta['sheetOffset'])){ $inner_styles['background-position'] = $sprite_meta['sheetOffset'][0].'px '.$sprite_meta['sheetOffset'][1].'px'; }
-                    if (!$use_composite && !empty($sprite_meta['sheetPath'])){ $inner_styles['background-image'] = 'url(../'.$sprite_meta['sheetPath'].'?'.MMRPG_CONFIG_CACHE_DATE.')'; }
+                    if (!$use_composite && !empty($sprite_meta['sheetPath'])){ $inner_styles['background-image'] = 'url(../'.$sprite_meta['sheetPath'].')'; }
                     $inner_styles_string = !empty($inner_styles) ? implode('; ', array_map(function($v, $k){ return $k.': '.$v.' !important'; }, $inner_styles, array_keys($inner_styles))) : '';
 
                     if (!empty($inner_styles_string)){
@@ -136,7 +136,7 @@ if (!empty($mmrpg_indexes)){
                             $alt_token = $alt_info['token'];
                             $alt_meta = rpg_world::get_sprite_meta($object_kind, $object_token, $alt_token, 'left', $prefix);
                             $alt_inner_styles = array();
-                            if (!empty($alt_meta['sheetPath'])){ $alt_inner_styles['background-image'] = 'url(../'.$alt_meta['sheetPath'].'?'.MMRPG_CONFIG_CACHE_DATE.')'; }
+                            if (!empty($alt_meta['sheetPath'])){ $alt_inner_styles['background-image'] = 'url(../'.$alt_meta['sheetPath'].')'; }
                             $alt_inner_styles_string = !empty($alt_inner_styles) ? implode('; ', array_map(function($v, $k){ return $k.': '.$v.' !important'; }, $alt_inner_styles, array_keys($alt_inner_styles))) : '';
 
                             if (!empty($alt_inner_styles_string)){
