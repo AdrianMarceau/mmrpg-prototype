@@ -3446,6 +3446,9 @@ html, body {
     text-align: right;
     min-height: 104px;
 }
+#robots-overview .storage-details[data-robot] .base-stats.bigger {
+    width: calc(100% - 70px);
+}
 #robots-overview .storage-details[data-robot] .held-item .label,
 #robots-overview .storage-details[data-robot] .support-mecha .label,
 #robots-overview .storage-details[data-robot] .base-stats .label {
@@ -3692,6 +3695,11 @@ html, body {
 #robots-overview .storage-details[data-robot] .equipped-abilities .value.selected > .sprite {
     top: -9px !important;
 }
+
+#robots-overview .storage-details[data-robot] .infoline.extra {
+
+}
+
 #robots-overview .storage-details .description {
     color: #c0c0c0;
     font-size: 12px;

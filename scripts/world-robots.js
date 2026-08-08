@@ -1474,7 +1474,7 @@ function getRobotDetailsForOverview(robotToken){
     robotDetailsObject.infoLines.push(weaponEnergyLine);
 
     // STATS (ATTACK / DEFENSE / SPEED)
-    let statsLine = { classes: 'base-stats types', label: 'Stats:', values: [] }; {
+    let statsLine = { classes: 'base-stats types' + (!equipCodesUnlocked && !robotSupportUnlocked ? ' bigger' : ''), label: 'Stats:', values: [] }; {
         let statValues = [], liveStatValues = [], statValuesRange = [];
         let marginBase = 16, marginBaseMax = (statTokens.length * (marginBase - 1));
         for (let i = 0; i < statTokens.length; i++){
@@ -1641,7 +1641,7 @@ function getRobotDetailsForOverview(robotToken){
         // WEAKNESSES / RESISTANCES / AFFINITIES / IMMUNITIES
         for (let i = 0; i < weaknessTokens.length; i++){
             let weaknessToken = weaknessTokens[i];
-            let weaknessLine = { classes: weaknessToken + ' types', label: weaknessToken.charAt(0).toUpperCase() + weaknessToken.slice(1) + ':', values: [] };
+            let weaknessLine = { classes: 'extra ' + weaknessToken + ' types', label: weaknessToken.charAt(0).toUpperCase() + weaknessToken.slice(1) + ':', values: [] };
             if (robotIndexInfo[weaknessToken] && robotIndexInfo[weaknessToken].length){
                 for (let j = 0; j < robotIndexInfo[weaknessToken].length; j++){
                     let weaknessType = robotIndexInfo[weaknessToken][j];
