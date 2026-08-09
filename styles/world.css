@@ -5147,6 +5147,7 @@ display: block;
 #world #canvas #side-buttons .button.disabled.inner-strike .no-strike {
     text-decoration: none;
 }
+#world #canvas #side-buttons .button.disabled.inner-strike strong:not(.no-strike),
 #world #canvas #side-buttons .button.disabled.inner-strike sup:not(.no-strike),
 #world #canvas #side-buttons .button.disabled.inner-strike sub:not(.no-strike) {
     text-decoration: line-through;

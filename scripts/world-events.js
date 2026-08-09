@@ -1296,17 +1296,17 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 + '>';
             sideButtonsMarkup += '<span class="has-sprite' + (!lockPrice ? ' one-row' : '') + '">';
             if (!lockPrice){
-                sideButtonsMarkup += '<sub>' + openTheLockLabel + '</sub> ';
+                sideButtonsMarkup += '<strong>' + openTheLockLabel + '</strong> ';
                 sideButtonsMarkup += currencyCheck.spriteMarkup;
                 }
             else if (playerHasEnough){
-                sideButtonsMarkup += '<sub>' + openTheLockLabel + '</sub> ';
+                sideButtonsMarkup += '<strong>' + openTheLockLabel + '</strong> ';
                 sideButtonsMarkup += '<br /><sup class="no-strike">' + currencyCheck.countLabel + '</sup> ';
                 sideButtonsMarkup += currencyCheck.spriteMarkup;
                 }
             else {
-                sideButtonsMarkup += '<sup>' + openTheLockLabel + '</sup> ';
-                sideButtonsMarkup += '<br /><sub class="no-strike">' + currencyCheck.countLabel + '</sub> ';
+                sideButtonsMarkup += '<strong>' + openTheLockLabel + '</strong> ';
+                sideButtonsMarkup += '<br /><sup class="no-strike">' + currencyCheck.countLabel + '</sup> ';
                 sideButtonsMarkup += currencyCheck.spriteMarkup;
                 }
             sideButtonsMarkup += '</span></a>';
