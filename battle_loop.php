@@ -236,11 +236,13 @@ elseif ($this_action == 'start'){
     // Break apart and filter this player's robots
     $this_playerinfo['player_robots'] = array();
     $temp_this_player_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
+    //error_log('-> start action w/ $temp_this_player_robots = '.print_r($temp_this_player_robots, true));
     foreach ($temp_this_player_robots AS $temp_string){
         list($temp_id, $temp_token) = explode('_', $temp_string);
+        $temp_base_id = is_numeric($temp_id) ? $temp_id : (strstr($temp_id, 'x') ? explode('x', $temp_id)[2] : 0);
         $temp_settings = mmrpg_prototype_robot_settings($this_playerinfo['player_token'], $temp_token);
         $temp_abilities = !empty($temp_settings['robot_abilities']) ? array_keys($temp_settings['robot_abilities']) : array();
-        $this_playerinfo['player_robots'][] = array('robot_id' => $temp_id, 'robot_token' => $temp_token, 'robot_abilities' => $temp_abilities);
+        $this_playerinfo['player_robots'][] = array('robot_id' => $temp_id, 'robot_base_id' => $temp_base_id, 'robot_token' => $temp_token, 'robot_abilities' => $temp_abilities);
         unset($temp_settings, $temp_abilities);
     }
 
@@ -496,7 +498,8 @@ if (!empty($this_player->player_robots)){
     // Otherwise define the robotinfo array manually
     else {
         // Create the robotinfo array with engine data
-        $this_robotinfo = array('robot_id' => $this_robot_id, 'robot_token' => $this_robot_token);
+        $temp_base_id = is_numeric($this_robot_id) ? $this_robot_id : (strstr($this_robot_id, 'x') ? explode('x', $this_robot_id)[2] : 0);
+        $this_robotinfo = array('robot_id' => $this_robot_id, 'robot_base_id' => $temp_base_id, 'robot_token' => $this_robot_token);
     }
 }
 // Otherwise, if this player has no robots
@@ -518,7 +521,8 @@ if (!empty($target_player->player_robots)){
     // Otherwise define the robotinfo array manually
     else {
         // Create the robotinfo array with engine data
-        $target_robotinfo = array('robot_id' => $target_robot_id, 'robot_token' => $target_robot_token);
+        $temp_base_id = is_numeric($target_robot_id) ? $target_robot_id : (strstr($target_robot_id, 'x') ? explode('x', $target_robot_id)[2] : 0);
+        $target_robotinfo = array('robot_id' => $target_robot_id, 'robot_base_id' => $temp_base_id, 'robot_token' => $target_robot_token);
     }
 }
 // Otherwise, if the target player has no robots
@@ -690,8 +694,8 @@ if (!isset($_SESSION['GAME']['values']['battle_items'])){
 $actions_markup = array();
 
 // Define the default this and target ids and tokens to reload
-$temp_this_reload_robot = array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token);
-$temp_target_reload_robot = array('robot_id' => $target_robot->robot_id, 'robot_token' => $target_robot->robot_token);
+$temp_this_reload_robot = array('robot_id' => $this_robot->robot_id, 'robot_base_id' => $this_robot->robot_base_id, 'robot_token' => $this_robot->robot_token);
+$temp_target_reload_robot = array('robot_id' => $target_robot->robot_id, 'robot_base_id' => $target_robot->robot_base_id, 'robot_token' => $target_robot->robot_token);
 
 // If this robot is not active, check to see if there's one that is
 if ($this_robot->robot_position != 'active'){
