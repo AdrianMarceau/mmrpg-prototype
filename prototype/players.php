@@ -25,6 +25,7 @@ else {
 
     // Collect the player index
     $mmrpg_player_index = rpg_player::get_index();
+    //error_log('$mmrpg_player_index = '.print_r($mmrpg_player_index, true));
 
     // Define a quick function for getting the current chapter text
     $get_current_chapter_text = function($player_token, $player_chapters_unlocked){
@@ -113,17 +114,31 @@ else {
         $text_button_label = 'Free Roam'; // None (Free Roam)
         $text_player_hearts = $get_current_limit_hearts($doctor_token, $heart_icons[0], $heart_icons[1]);
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' option_free-roam block_1 type_none';
+        $last_world_token = !empty($_SESSION['WORLD']['last_world_token']) ? $_SESSION['WORLD']['last_world_token'] : '';
+        $last_map_token = !empty($_SESSION['WORLD']['last_map_token']) ? $_SESSION['WORLD']['last_map_token'] : '';
         $text_world_location = 'Area Unknown'; // DOTNET Area 3
+        if (!empty($last_world_token) && !empty($last_map_token)){
+            $map_frags = explode('-', $last_map_token);
+            $text_world_location = strtoupper($last_world_token).' // ';
+            if (count($map_frags) === 2){ $text_world_location .= strtoupper($map_frags[0]).' '.ucfirst($map_frags[1]); }
+            elseif (count($map_frags) >= 3){ $text_world_location .= strtoupper($map_frags[0]).' '.ucfirst($map_frags[1]).' '.strtoupper($map_frags[2]); }
+        }
         $last_player_token = !empty($_SESSION['WORLD']['last_player_token']) ? $_SESSION['WORLD']['last_player_token'] : '';
-        $last_player_sessions = !empty($_SESSION['WORLD']['last_player_sessions']) ? $_SESSION['WORLD']['last_player_sessions'] : array();
+        $last_player_sessions = !empty($_SESSION['WORLD']['player_sessions']) ? $_SESSION['WORLD']['player_sessions'] : array();
         $last_player_session = !empty($last_player_sessions[$last_player_token]) ? $last_player_sessions[$last_player_token] : array();
+        //error_log('$last_player_token = '.print_r($last_player_token, true));
+        //error_log('$last_player_sessions = '.print_r($last_player_sessions, true));
+        //error_log('$last_player_session = '.print_r($last_player_session, true));
         if (!empty($last_player_token) && !empty($last_player_session)){
             $last_player_info = isset($mmrpg_player_index[$last_player_token]) ? $mmrpg_player_index[$last_player_token] : false;
             $last_player_name = !empty($last_player_info) && !empty($last_player_info['player_name']) ? $last_player_info['player_name'] : false;
-            $last_world_token = $last_player_session['last_world_token'];
-            $last_world_name = str_replace(' AREA ', ' Area ', strtoupper(str_replace('-', ' ', $last_world_token)));
+            //error_log('$last_player_info = '.print_r($last_player_info, true));
+            //error_log('$last_player_name = '.print_r($last_player_name, true));
+            //$last_world_token = $last_player_session['last_world_token'];
+            //$last_world_name = str_replace(' AREA ', ' Area ', strtoupper(str_replace('-', ' ', $last_world_token)));
             //$last_world_name = strtoupper(str_replace('-', ' ', $last_world_token));
-            $text_world_location = $last_world_name.(!empty($last_player_name) ? ' ('.$last_player_name.')' : '');
+            //$text_world_location = $last_world_name.(!empty($last_player_name) ? ' ('.$last_player_name.')' : '');
+            if (!empty($last_player_name)){ $text_world_location .= ' ('.$last_player_name.')'; }
         }
         echo '<a class="'.$text_option_classes.'"  data-token="'.$doctor_token.'" data-token-id="0" data-next-href="world.php">';
             echo '<div class="platform"><div class="chrome"><div class="inset">';
@@ -135,6 +150,54 @@ else {
     // Define the button size for the next group of buttons
     $this_button_size = '1x2';
 
+    // Define an empty template for when prototype data doesn't exist for a doctor
+    $template_prototype_data = array('robots_unlocked' => 0, 'points_unlocked' => 0, 'battles_complete' => 0, 'prototype_complete' => false);
+
+    // Print out the normal mode's player select screen for Dr. LaLinde
+    $doctor_token = 'dr-lalinde';
+    $doctor_info = isset($mmrpg_player_index[$doctor_token]) ? $mmrpg_player_index[$doctor_token] : array();
+    if ($unlock_flag_lalinde){
+        $doctor_is_away = isset($endless_attack_savedata[$doctor_token]) ? true : false;
+        $doctor_settings = mmrpg_prototype_player_settings($doctor_token);
+        $doctor_image = !empty($doctor_settings['player_image']) ? $doctor_settings['player_image'] : $doctor_token;
+        $doctor_sprite_path = 'images/players/'.$doctor_image.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
+        $doctor_prototype_data = isset($prototype_data[$doctor_token]) ? $prototype_data[$doctor_token] : $template_prototype_data;
+        $text_robots_unlocked = $doctor_prototype_data['robots_unlocked'].' Robot'.($doctor_prototype_data['robots_unlocked'] != 1 ? 's' : '');
+        $text_points_unlocked = number_format($doctor_prototype_data['points_unlocked'], 0, '.', ',').' Point'.($doctor_prototype_data['points_unlocked'] != 1 ? 's' : '');
+        $text_battles_complete = $doctor_prototype_data['battles_complete'].' Mission'.($doctor_prototype_data['battles_complete'] != 1 ? 's' : '');
+        $text_player_special = $doctor_prototype_data['prototype_complete'] ? true : false;
+        $text_sprites_markup = $get_doctor_sprite_markup($doctor_token, $doctor_info, $doctor_sprite_path, $doctor_is_away);
+        //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
+        $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
+        $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_lalinde);
+        $text_player_hearts = $get_current_limit_hearts($doctor_token);
+        $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_energy ';
+        $text_button_label = str_replace('Dr. ', '', $doctor_info['player_name']).' Story';
+        if (!empty($doctor_prototype_data['robots_unlocked'])){
+            error_log('$doctor_prototype_data ('.$doctor_token.') = '.print_r($doctor_prototype_data, true));
+            echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_lalinde.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
+                echo '<div class="platform"><div class="chrome"><div class="inset">';
+                    echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$text_button_label.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="LaLinde Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
+                echo '</div></div></div>';
+            echo '</a>'."\n";
+        } else {
+            $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_energy option_disabled';
+            echo '<a class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="0">';
+                echo '<div class="platform"><div class="chrome"><div class="inset">';
+                    echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext"><s>'.$text_button_label.'</s></span><span class="subtext">&cross; Limit Heart Not Found</span><span class="subtext2">&cross; Init Core Not Found</span></span><span class="arrow">&nbsp;</span></label>';
+                echo '</div></div></div>';
+            echo '</a>'."\n";
+        }
+    } else {
+        $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_energy option_disabled';
+        echo '<a class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="0">';
+            echo '<div class="platform"><div class="chrome"><div class="inset">';
+                echo '<label class="has_image"><span class="multi"><span class="maintext">......</span><span class="subtext">...</span><span class="subtext2">...</span></span><span class="arrow">&nbsp;</span></label>';
+            echo '</div></div></div>';
+        echo '</a>'."\n";
+    }
+
     // Print out the normal mode's player select screen for Dr. Light
     $doctor_token = 'dr-light';
     $doctor_info = isset($mmrpg_player_index[$doctor_token]) ? $mmrpg_player_index[$doctor_token] : array();
@@ -144,10 +207,11 @@ else {
         $doctor_image = !empty($doctor_settings['player_image']) ? $doctor_settings['player_image'] : $doctor_token;
         $doctor_sprite_path = 'images/players/'.$doctor_image.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
-        $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
-        $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
-        $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
-        $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
+        $doctor_prototype_data = isset($prototype_data[$doctor_token]) ? $prototype_data[$doctor_token] : $template_prototype_data;
+        $text_robots_unlocked = $doctor_prototype_data['robots_unlocked'].' Robot'.($doctor_prototype_data['robots_unlocked'] != 1 ? 's' : '');
+        $text_points_unlocked = number_format($doctor_prototype_data['points_unlocked'], 0, '.', ',').' Point'.($doctor_prototype_data['points_unlocked'] != 1 ? 's' : '');
+        $text_battles_complete = $doctor_prototype_data['battles_complete'].' Mission'.($doctor_prototype_data['battles_complete'] != 1 ? 's' : '');
+        $text_player_special = $doctor_prototype_data['prototype_complete'] ? true : false;
         $text_sprites_markup = $get_doctor_sprite_markup($doctor_token, $doctor_info, $doctor_sprite_path, $doctor_is_away);
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
         $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
@@ -178,10 +242,11 @@ else {
         $doctor_image = !empty($doctor_settings['player_image']) ? $doctor_settings['player_image'] : $doctor_token;
         $doctor_sprite_path = 'images/players/'.$doctor_image.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
-        $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
-        $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
-        $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
-        $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
+        $doctor_prototype_data = isset($prototype_data[$doctor_token]) ? $prototype_data[$doctor_token] : $template_prototype_data;
+        $text_robots_unlocked = $doctor_prototype_data['robots_unlocked'].' Robot'.($doctor_prototype_data['robots_unlocked'] != 1 ? 's' : '');
+        $text_points_unlocked = number_format($doctor_prototype_data['points_unlocked'], 0, '.', ',').' Point'.($doctor_prototype_data['points_unlocked'] != 1 ? 's' : '');
+        $text_battles_complete = $doctor_prototype_data['battles_complete'].' Mission'.($doctor_prototype_data['battles_complete'] != 1 ? 's' : '');
+        $text_player_special = $doctor_prototype_data['prototype_complete'] ? true : false;
         $text_sprites_markup = $get_doctor_sprite_markup($doctor_token, $doctor_info, $doctor_sprite_path, $doctor_is_away);
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
         $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
@@ -212,10 +277,11 @@ else {
         $doctor_image = !empty($doctor_settings['player_image']) ? $doctor_settings['player_image'] : $doctor_token;
         $doctor_sprite_path = 'images/players/'.$doctor_image.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
         $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
-        $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
-        $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
-        $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
-        $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
+        $doctor_prototype_data = isset($prototype_data[$doctor_token]) ? $prototype_data[$doctor_token] : $template_prototype_data;
+        $text_robots_unlocked = $doctor_prototype_data['robots_unlocked'].' Robot'.($doctor_prototype_data['robots_unlocked'] != 1 ? 's' : '');
+        $text_points_unlocked = number_format($doctor_prototype_data['points_unlocked'], 0, '.', ',').' Point'.($doctor_prototype_data['points_unlocked'] != 1 ? 's' : '');
+        $text_battles_complete = $doctor_prototype_data['battles_complete'].' Mission'.($doctor_prototype_data['battles_complete'] != 1 ? 's' : '');
+        $text_player_special = $doctor_prototype_data['prototype_complete'] ? true : false;
         $text_sprites_markup = $get_doctor_sprite_markup($doctor_token, $doctor_info, $doctor_sprite_path, $doctor_is_away);
         //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
         $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
@@ -230,41 +296,6 @@ else {
         echo '</a>'."\n";
     } else {
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_speed option_disabled';
-        echo '<a class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="0">';
-            echo '<div class="platform"><div class="chrome"><div class="inset">';
-                echo '<label class="has_image"><span class="multi"><span class="maintext">......</span><span class="subtext">...</span><span class="subtext2">...</span></span><span class="arrow">&nbsp;</span></label>';
-            echo '</div></div></div>';
-        echo '</a>'."\n";
-    }
-
-    // TODO: download LaLinde from live so she works!!!
-    // Print out the normal mode's player select screen for Dr. LaLinde
-    $doctor_token = 'dr-lalinde';
-    $doctor_info = isset($mmrpg_player_index[$doctor_token]) ? $mmrpg_player_index[$doctor_token] : array();
-    if (false && $unlock_flag_lalinde){
-        $doctor_is_away = isset($endless_attack_savedata[$doctor_token]) ? true : false;
-        $doctor_settings = mmrpg_prototype_player_settings($doctor_token);
-        $doctor_image = !empty($doctor_settings['player_image']) ? $doctor_settings['player_image'] : $doctor_token;
-        $doctor_sprite_path = 'images/players/'.$doctor_image.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE;
-        $doctor_current_chapter = mmrpg_prototype_player_currently_selected_chapter($doctor_token);
-        $text_robots_unlocked = $prototype_data[$doctor_token]['robots_unlocked'].' Robot'.($prototype_data[$doctor_token]['robots_unlocked'] != 1 ? 's' : '');
-        $text_points_unlocked = number_format($prototype_data[$doctor_token]['points_unlocked'], 0, '.', ',').' Point'.($prototype_data[$doctor_token]['points_unlocked'] != 1 ? 's' : '');
-        $text_battles_complete = $prototype_data[$doctor_token]['battles_complete'].' Mission'.($prototype_data[$doctor_token]['battles_complete'] != 1 ? 's' : '');
-        $text_player_special = $prototype_data[$doctor_token]['prototype_complete'] ? true : false;
-        $text_sprites_markup = $get_doctor_sprite_markup($doctor_token, $doctor_info, $doctor_sprite_path, $doctor_is_away);
-        //$text_player_music = mmrpg_prototype_get_player_mission_music($doctor_token, $session_token);
-        $text_player_music = mmrpg_prototype_get_chapter_music($doctor_token, $doctor_current_chapter, $session_token);
-        $text_player_chapter = $get_current_chapter_text($doctor_token, $chapters_unlocked_lalinde);
-        $text_player_hearts = $get_current_limit_hearts($doctor_token);
-        $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_energy ';
-        $text_button_label = str_replace('Dr. ', '', $doctor_info['player_name']).' Story';
-        echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_lalinde.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
-            echo '<div class="platform"><div class="chrome"><div class="inset">';
-                echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$text_button_label.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="LaLinde Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
-            echo '</div></div></div>';
-        echo '</a>'."\n";
-    } else {
-        $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_energy option_disabled';
         echo '<a class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="0">';
             echo '<div class="platform"><div class="chrome"><div class="inset">';
                 echo '<label class="has_image"><span class="multi"><span class="maintext">......</span><span class="subtext">...</span><span class="subtext2">...</span></span><span class="arrow">&nbsp;</span></label>';
