@@ -966,13 +966,16 @@ function bindEventsToInputs($thisWorld){
             if (activeInputs.X){
                 //console.log('%c' + 'X key pressed!', 'color: orange;');
                 if (event){ event.preventDefault(); }
-                let $switchButton = $('.team-switch', $robotsOverview);
-                if ($switchButton.length
-                    && $switchButton.is(':visible')
-                    && !$switchButton.is('.disabled')){
+                //let $switchButton = $('.team-switch', $robotsOverview);
+                let $storageButtons = $('.storage-button', $robotsOverview);
+                let $firstButton = $storageButtons && $storageButtons.length ? $storageButtons.first() : false;
+                if ($firstButton
+                    && $firstButton.length
+                    && $firstButton.is(':visible')
+                    && !$firstButton.is('.disabled')){
                     //$switchButton.addClass('clicked');
-                    $switchButton.trigger('click');
-                    setTimeout(function(){ $switchButton.removeClass('clicked'); }, 200);
+                    $firstButton.trigger('click');
+                    setTimeout(function(){ $firstButton.removeClass('clicked'); }, 200);
                     ignoreInputFor(300);
                     return true;
                     }
