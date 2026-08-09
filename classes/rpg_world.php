@@ -4985,6 +4985,96 @@ class rpg_world {
 
     // -- MISC HELPER METHODS -- //
 
+    // Define a quick function that unlocks a player character and queues the associated event markup.
+    public static function unlock_player_character($player_token){
+        //error_log('rpg_world::unlock_player_character() called for player "'.$player_token.'"');
+        $game_session_token = rpg_game::session_token();
+        $GAME_SESSION = &$_SESSION[$game_session_token];
+        $mmrpg_index_players = self::get_index('players');
+        $mmrpg_index_robots = self::get_index('robots');
+        $player_info = $mmrpg_index_players[$player_token];
+        $player_size = !empty($player_info['player_image_size']) ? $player_info['player_image_size'] : 40;
+        $player_xsize = $player_size.'x'.$player_size;
+        $player_zoom_size = $player_size * 2;
+        $player_zoom_xsize = $player_zoom_size.'x'.$player_zoom_size;
+        $player_type = !empty($player_info['player_type']) ? $player_info['player_type'] : 'none';
+        $player_name = !empty($player_info['player_name']) ? $player_info['player_name'] : ucwords(str_replace('-', ' ', $player_token));
+        $player_story = ucfirst(explode('-', $player_token)[1]).' Story';
+        $player_pronoun = rpg_player::get_player_pronoun($player_info['player_gender'], 'possessive2');
+        $player_intro_field = rpg_player::get_intro_field($player_token);
+        $player_starter_robot = rpg_player::get_starter_robot($player_token);
+        $auto_unlock_robots = true;
+        $auto_unlock_heart = true;
+        $auto_unlock_campaign = true;
+        $player_unlock_subtext = 'This campaign is undefined and this text should not appear. Do no engage.';
+        $player_heart_token = str_replace('dr-', '', $player_token).'-heart__1'; // player's first limit heart
+        if ($player_token === 'dr-light'){
+            $player_unlock_subtext = 'This beginner-level campaign teaches you the basics while you fight through an army of powered-up opponents!';
+        } elseif ($player_token === 'dr-wily'){
+            $player_unlock_subtext = 'This intermediate-level campaign offers a bit more challenge and expects you to already-know the basics of battle!';
+        } elseif ($player_token === 'dr-cossack'){
+            $player_unlock_subtext = 'This advanced-level campaign packs the hardest punch of all and acts as the final player-story before the end-game!';
+        } elseif ($player_token === 'dr-lalinde'){
+            $player_unlock_subtext = '<span style="color: red;">[System Error: Story Campaign File Is Corrupted]</span>';
+            $auto_unlock_robots = false;
+            $auto_unlock_campaign = false;
+            $auto_unlock_heart = false;
+        }
+        mmrpg_game_unlock_player(array('player_token' => $player_token), $auto_unlock_robots, true);
+        if ($auto_unlock_heart){ mmrpg_game_unlock_item($player_heart_token, false); }
+        $player_robots_unlocked = mmrpg_prototype_robots_unlocked($player_token, true);
+        $first_robot = !empty($player_robots_unlocked[0]) ? $player_robots_unlocked[0] : 'robot';
+        $first_robot_info = !empty($mmrpg_index_robots[$first_robot]) ? $mmrpg_index_robots[$first_robot] : array();
+        $first_robot_size = !empty($first_robot_info['robot_image_size']) ? $first_robot_info['robot_image_size'] : 40;
+        $first_robot_xsize = $first_robot_size.'x'.$first_robot_size;
+        $first_robot_zoom_size = $first_robot_size * 2;
+        $first_robot_zoom_xsize = $first_robot_zoom_size.'x'.$first_robot_zoom_size;
+        $first_robot_name = !empty($first_robot_info['robot_name']) ? $first_robot_info['robot_name'] : ucwords(str_replace('-', ' ', $first_robot));
+        $first_robot_core = !empty($first_robot_info['robot_core']) ? $first_robot_info['robot_core'] : 'none';
+        $temp_event_flag = $player_token.'-event-00_player-unlocked';
+        $temp_game_flags = &$GAME_SESSION['flags'];
+        if (empty($temp_game_flags['events'][$temp_event_flag])){
+            $temp_game_flags['events'][$temp_event_flag] = true;
+            // canvas
+            $temp_canvas_markup = '';
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$player_intro_field.'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(1px) brightness(0.8);"></div>';
+            $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$player_intro_field.'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+            $temp_canvas_markup .= '<div class="sprite_wrapper breathing_animation" style="bottom: 20px; left: calc(50% + 100px);"><div class="wrap">';
+            $temp_canvas_markup .= '<div class="sprite sprite_player sprite_shadow sprite_'.$player_zoom_xsize.' sprite_'.$player_zoom_xsize.'_victory" style="background-image: url(images/players/'.$player_token.'/sprite_left_'.$player_zoom_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 0; left: 0; transform: scale(1.5, 0.5) translate('.(-50 + ($player_zoom_size > 80 ? 5 : 0)).'%, 0) skew(26deg, 0); transform-origin: bottom left; filter: brightness(0); opacity: 0.1;"></div>';
+            $temp_canvas_markup .= '<div class="sprite sprite_player sprite_'.$player_zoom_xsize.' sprite_'.$player_zoom_xsize.'_victory" style="background-image: url(images/players/'.$player_token.'/sprite_left_'.$player_zoom_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 0; left: 0; transform: scale(1.5) translate('.(-50 + ($player_zoom_size > 80 ? 5 : 0)).'%, 0); transform-origin: bottom center; image-rendering: pixelated;"></div>';
+            $temp_canvas_markup .= '</div></div>';
+            if ($first_robot !== 'robot'){
+                $temp_canvas_markup .= '<div class="sprite_wrapper breathing_animation" style="bottom: 20px; left: calc(50% - 50px);"><div class="wrap">';
+                $temp_canvas_markup .= '<div class="sprite sprite_robot sprite_shadow sprite_'.$first_robot_zoom_xsize.' sprite_'.$first_robot_zoom_xsize.'_victory" style="background-image: url(images/robots/'.$first_robot.'/sprite_right_'.$first_robot_zoom_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 0; left: 0; transform: scale(1.5, 0.5) translate('.(-50 + ($first_robot_zoom_size > 80 ? 5 : 0)).'%, 0) skew(26deg, 0); transform-origin: bottom right; filter: brightness(0); opacity: 0.1;"></div>';
+                $temp_canvas_markup .= '<div class="sprite sprite_robot sprite_'.$first_robot_zoom_xsize.' sprite_'.$first_robot_zoom_xsize.'_victory" style="background-image: url(images/robots/'.$first_robot.'/sprite_right_'.$first_robot_zoom_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 0; left: 0; transform: scale(1.5) translate('.(-50 + ($first_robot_zoom_size > 80 ? 5 : 0)).'%, 0); transform-origin: bottom center; image-rendering: pixelated;"></div>';
+                $temp_canvas_markup .= '</div></div>';
+            }
+            // console
+            $temp_console_markup = '';
+            $temp_console_markup .= '<p class="ability_type ability_type_'.$player_type.'" style="margin: 5px auto 10px; text-align: center;">Congratulations!</p>';
+            if ($auto_unlock_campaign){
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span($player_type, $player_name).' has been unlocked as a playable character in Free Roam and <br /> the '.rpg_type::print_span($player_type, $player_story).' campaign has been unlocked on the Main Menu!</p>';
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>'.$player_name.'</strong>'.($first_robot !== 'robot' ? ' and <strong>'.$first_robot_name.'</strong>' : '').' to experience events from '.$player_pronoun.' perspective! Unlock new robots, items, and abilities using '.$player_pronoun.' unique skills while you search for answers. '.$player_unlock_subtext.'</p>';
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="player_type type '.$player_type.'">'.$player_name.'</strong> from the player select menu to play through '.$player_pronoun.' story missions at any time.</p>';
+            } else {
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span($player_type, $player_name).' has been unlocked as a playable character in Free Roam <s>and <br /> the '.rpg_type::print_span($player_type, $player_story).' campaign has been unlocked on the Main Menu</s>!</p>';
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Explore the world as brilliant scientist <strong>'.$player_name.'</strong> and experience events from '.$player_pronoun.' perspective! Discover new items and abilities using '.$player_pronoun.' unique skills while you search for answers. '.$player_unlock_subtext.'</p>';
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;"><s>Select <strong class="player_type type '.$player_type.'">'.$player_name.'</strong> from the player select menu to play through '.$player_pronoun.' story missions at any time.</s></p>';
+            }
+            if (!isset($GAME_SESSION['EVENTS'])){ $GAME_SESSION['EVENTS'] = array(); }
+            array_push($GAME_SESSION['EVENTS'], array(
+                'canvas_markup' => $temp_canvas_markup,
+                'console_markup' => $temp_console_markup,
+                'player_token' => $player_token,
+                'event_type' => 'new-player'
+                ));
+            $clear_seen_frame_token = 'edit_players';
+            rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
+        }
+        // Return true on success
+        return true;
+    }
+
     // Define a method for quickly grabbing an overview of a given player's robot (including name, level, stats, etc.)
     public static function get_player_robot_overview($player_token, $robot_token, $robot_id){
         //error_log('rpg_world::get_player_robot_overview() called for player "'.$player_token.'" and robot "'.$robot_token.'"');
