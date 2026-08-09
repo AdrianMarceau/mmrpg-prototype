@@ -2356,71 +2356,39 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 // shake the map briefly to indicate button has been pushed
                 $canvasMap.addClass('shake-once');
                 setTimeout(function(){ $canvasMap.removeClass('shake-once'); }, 1000);
-
                 // If the button has a callback function, run it now
                 (function(buttonInfo){
                     if (!buttonInfo.action){ return false; }
                     let buttonAction = buttonInfo.action;
                     let buttonData = buttonInfo.data || {};
 
-                    // ...
-
                     // event action SET-GROUP-TERRAIN for buttons, switches, etc. to use
                     if (buttonAction === 'set-group-terrain'){
-                        //console.log('-> setting group terrain for button', buttonName);
                         let groupName = buttonData[0] || false;
                         let terrainName = buttonData[1] || false;
-                        //console.log('-> groupName =', groupName, '\n', '-> terrainName =', terrainName);
                         if (!groupName){ console.error('-> groupName not provided, cannot set group terrain!'); return false; }
                         if (!terrainName){ console.error('-> terrainName not provided, cannot set group terrain!'); return false; }
-                        let mapTilesIndex = _config.mapTilesIndex;
-                        let layerTilesIndex = _world.layerTilesIndex;
-                        let terrainTilesIndex = layerTilesIndex['terrain'] || false;
-                        if (!layerTilesIndex || !terrainTilesIndex){ console.error('-> layerTilesIndex or terrainTilesIndex not found, cannot set terrain!'); return false; }
-                        let terrainSpriteData = mapTilesIndex[terrainName] || false;
-                        if (!terrainSpriteData){ console.error('-> terrainSpriteData not found for terrain', terrainName, ', cannot set terrain!'); return false; }
-                        //console.log('-> terrainSpriteData =', terrainSpriteData);
-                        let terrainSpriteOffset = _self.getClonedObject(terrainSpriteData[0]); // clone the terrain sprite offset array
-                        let terrainSpriteSize = _self.getClonedObject(terrainSpriteData[1]); // clone the terrain sprite size array
-                        let terrainSpriteAttrs = _self.getClonedObject(terrainSpriteData[2]); // clone the terrain sprite attributes object
-                        //console.log('-> terrainSpriteOffset =', terrainSpriteOffset);
-                        //console.log('-> terrainSpriteSize =', terrainSpriteSize);
-                        //console.log('-> terrainSpriteAttrs =', terrainSpriteAttrs);
-                        //let terrainIsVoid = terrainSpriteAttrs.isVoid ? true : false;
-                        //let terrainIsWater = terrainSpriteAttrs.isWater ? true : false;
-                        let terrainIsWalkable = terrainSpriteAttrs.isWalkable ? true : false;
-                        let terrainHasGrid = terrainIsWalkable ? true : false;
-                        //console.log('-> layerTilesIndex =', layerTilesIndex);
-                        //console.log('-> terrainTilesIndex =', terrainTilesIndex);
-                        //console.log('-> terrainSpriteData =', terrainSpriteData);
-                        //console.log('-> terrainIsWalkable =', terrainIsWalkable);
+                        let terrainTilesIndex = _world.layerTilesIndex['terrain'] || false;
+                        if (!terrainTilesIndex){ console.error('-> terrainTilesIndex not found, cannot set terrain!'); return false; }
                         let groupsIndex = _config.mapGroupsIndex;
                         let groupTiles = groupsIndex[groupName] || false;
-                        //console.log('-> groupsIndex =', groupsIndex);
-                        //console.log('-> groupTiles =', groupTiles);
                         if (!groupsIndex || !groupTiles){ console.error('-> groupsIndex not found, cannot set terrain!'); return false; }
+                        // --- PASS 1: Set the new base terrain strings ---
                         for (let i = 0; i < groupTiles.length; i++){
                             let tileKey = groupTiles[i];
-                            let tileData = terrainTilesIndex[tileKey] || false;
-                            if (typeof terrainTilesIndex[tileKey] === 'undefined'){ console.error('-> tile data not found for tile', tileKey, ', cannot set terrain!'); continue; }
-                            //console.log('-> setting terrain for tile', tileKey, 'to', terrainName, '\n-> w/ original tileData:', _self.getClonedObject(tileData));
-                            tileData.sprite[1] = terrainName;
-                            tileData.sprite[2] = [terrainSpriteOffset[0], terrainSpriteOffset[1]];
-                            tileData.sprite[3] = [terrainSpriteSize[0], terrainSpriteSize[1]];
-                            tileData.walkable = terrainIsWalkable;
-                            tileData.effects.grid = terrainHasGrid;
-                            tileData.dirty = true;
-                            terrainTilesIndex[tileKey] = tileData; // sync the tile data back to the index
-                            //console.log('-> added terrainTilesIndex[' + tileKey + ']', '\n-> w/ new tileData:', tileData);
+                            let tileData = terrainTilesIndex[tileKey];
+                            if (!tileData) {
+                                console.error('-> tile data not found for tile', tileKey, ', cannot set terrain!');
+                                continue;
                             }
-                        layerTilesIndex['terrain'] = terrainTilesIndex; // sync the layer tiles index with the new terrain tiles index
-                        _world.layerTilesIndex = layerTilesIndex; // sync the world state with the new layer tiles index
-                        //console.log('-> updated _world.layerTilesIndex =', _world.layerTilesIndex);
-                        _self.refreshCanvasTiles('terrain'); // refresh the canvas tiles
-                        _self.calculateWalkableMapTiles(true); // recalculate walkable tiles
-                        _self.refreshMapPositionEvents(); // refresh the map position events
-                        _self.saveWorldState();
+                            // Ensure we are assigning just the base terrain name (strip any bitmasks if accidentally provided in config)
+                            let targetTerrainBase = terrainName.split('-')[0];
+                            tileData.sprite[1] = targetTerrainBase;
                         }
+                        // --- PASS 2: Hand off to the helper to calculate edges and refresh the map! ---
+                        _self.refreshTerrainEdges(groupTiles);
+                        }
+
                     // event action REMOVE-GROUP-BLOCKS for buttons, switches, etc. to use
                     if (buttonAction === 'remove-group-blocks'){
                         //console.log('-> removing group blocks for button', buttonName);
@@ -2504,46 +2472,26 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         let terrainDown = switchData[2] || false;
                         if (!groupName){ console.error('-> groupName not provided, cannot set group terrain!'); return false; }
                         if (!terrainUp || !terrainDown){ console.error('-> terrainUp or terrainDown not provided, cannot toggle group terrain!'); return false; }
-                        let mapTilesIndex = _config.mapTilesIndex;
-                        let layerTilesIndex = _world.layerTilesIndex;
-                        let terrainTilesIndex = layerTilesIndex['terrain'] || false;
-                        if (!layerTilesIndex || !terrainTilesIndex){ console.error('-> layerTilesIndex or terrainTilesIndex not found!'); return false; }
+                        let terrainTilesIndex = _world.layerTilesIndex['terrain'] || false;
+                        if (!terrainTilesIndex){ console.error('-> terrainTilesIndex not found!'); return false; }
                         let groupsIndex = _config.mapGroupsIndex;
                         let groupTiles = groupsIndex[groupName] || false;
-                        if (!groupsIndex || !groupTiles){ console.error('-> groupsIndex not found for groupName "' + groupName + '"!'); return false; }
+                        if (!groupTiles){ console.error('-> groupsIndex not found for groupName "' + groupName + '"!'); return false; }
+                        // --- PASS 1: Only change the base strings ---
                         for (let i = 0; i < groupTiles.length; i++){
                             let tileKey = groupTiles[i];
-                            let tileData = terrainTilesIndex[tileKey] || false;
-                            if (typeof terrainTilesIndex[tileKey] === 'undefined'){ continue; }
+                            let tileData = terrainTilesIndex[tileKey];
+                            if (!tileData) continue;
                             let currentTerrain = tileData.sprite[1];
                             let currentTerrainBase = currentTerrain.split('-')[0];
-                            //console.log('currentTerrain =', currentTerrain);
-                            //console.log('currentTerrainBase =', currentTerrainBase);
-                            //let targetTerrain = currentTerrainBase === terrainUp ? terrainDown : terrainUp;
-                            let targetTerrain = currentTerrain;
-                            if (currentTerrain === terrainUp || currentTerrainBase === terrainUp){ targetTerrain = terrainDown; }
-                            else if (currentTerrain === terrainDown || currentTerrainBase === terrainDown){ targetTerrain = terrainUp; }
-                            let terrainSpriteData = mapTilesIndex[targetTerrain] || false;
-                            if (!terrainSpriteData){ console.error('-> terrainSpriteData not found for terrain', targetTerrain); continue; }
-                            let terrainSpriteOffset = _self.getClonedObject(terrainSpriteData[0]);
-                            let terrainSpriteSize = _self.getClonedObject(terrainSpriteData[1]);
-                            let terrainSpriteAttrs = _self.getClonedObject(terrainSpriteData[2]);
-                            let terrainIsWalkable = terrainSpriteAttrs.isWalkable ? true : false;
-                            let terrainHasGrid = terrainIsWalkable ? true : false;
-                            tileData.sprite[1] = targetTerrain;
-                            tileData.sprite[2] = [terrainSpriteOffset[0], terrainSpriteOffset[1]];
-                            tileData.sprite[3] = [terrainSpriteSize[0], terrainSpriteSize[1]];
-                            tileData.walkable = terrainIsWalkable;
-                            tileData.effects.grid = terrainHasGrid;
-                            tileData.dirty = true;
-                            terrainTilesIndex[tileKey] = tileData;
+                            let targetTerrainBase = currentTerrainBase;
+                            if (currentTerrain === terrainUp || currentTerrainBase === terrainUp){ targetTerrainBase = terrainDown; }
+                            else if (currentTerrain === terrainDown || currentTerrainBase === terrainDown){ targetTerrainBase = terrainUp; }
+                            // Temporarily update just the base string in the index
+                            tileData.sprite[1] = targetTerrainBase;
                             }
-                        layerTilesIndex['terrain'] = terrainTilesIndex;
-                        _world.layerTilesIndex = layerTilesIndex;
-                        _self.refreshCanvasTiles('terrain');
-                        _self.calculateWalkableMapTiles(true);
-                        _self.refreshMapPositionEvents();
-                        _self.saveWorldState();
+                        // --- PASS 2: Hand off to the helper to do the rest! ---
+                        _self.refreshTerrainEdges(groupTiles);
                         }
 
                     })(switchInfo, newState);
