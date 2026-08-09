@@ -4839,8 +4839,10 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
     if (empty($player_robot_favourites)){ $player_robot_favourites = array(); }
 
     // Collect the player's robot settings and rewards arrays then marge 'em for reference
-    $temp_player_robots_settings = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'];
-    $temp_player_robots_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'];
+    $temp_player_battle_settings = !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]) ? $_SESSION[$session_token]['values']['battle_settings'][$player_token] : array();
+    $temp_player_battle_rewards = !empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]) ? $_SESSION[$session_token]['values']['battle_rewards'][$player_token] : array();
+    $temp_player_robots_settings = !empty($temp_player_battle_settings['player_robots']) ? $temp_player_battle_settings['player_robots'] : array();
+    $temp_player_robots_rewards = !empty($temp_player_battle_rewards['player_robots']) ? $temp_player_battle_rewards['player_robots'] : array();
     $temp_player_robots_tokens = array_unique(array_merge(array_keys($temp_player_robots_settings), array_keys($temp_player_robots_rewards)));
 
     //error_log('$temp_player_robots_tokens(before): '.print_r($temp_player_robots_tokens, true));
