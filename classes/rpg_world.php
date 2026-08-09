@@ -744,7 +744,7 @@ class rpg_world {
         $map_tilesize = self::$worldmap_tilesize;
         $map_autocols = strlen($map_data_layers[0][0]);
         $map_autorows = count($map_data_layers[0]);
-        $map_tiles_custval_regex = '/^([.a-z0-9-_]+)\(([a-z0-9]{2}),(-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,]+)?\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
+        $map_tiles_custval_regex = '/^([.a-z0-9-_]+)\(([a-z0-9]+),(-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,]+)?\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
         $map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,]+)?\)$/i'; // syntax: name(x,y[,flag1,flag2,etc.]) ie. spawn(4,4) or spawn(4,4,other-area-2) => name:spawn, x:4, y:4
         $map_listval_custval_regex = '/^([.a-z0-9-_\+]+)\(([\+\:\.\,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
         //$map_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
@@ -1095,7 +1095,7 @@ class rpg_world {
         }
         //error_log('$sheet_data_vars = '.print_r($sheet_data_vars, true));
         // Review and process the sheet layer data
-        $sheet_tiles_custval_regex = '/^([.a-z0-9-_]+)\(([a-z0-9]{2}),(-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,!]+)?\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
+        $sheet_tiles_custval_regex = '/^([.a-z0-9-_]+)\(([a-z0-9]+),(-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,!]+)?\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
         $sheet_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)(,[-_a-z0-9,]+)?\)$/i'; // syntax: name(x,y[,flag1,flag2,etc.]) ie. spawn(4,4) or spawn(4,4,other-area-2) => name:spawn, x:4, y:4
         $sheet_listval_custval_regex = '/^([.a-z0-9-_]+)\(([,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
         //$sheet_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
