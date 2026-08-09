@@ -321,12 +321,13 @@ class rpg_world {
                         //error_log('-> checking robot key "'.$key.'"');
                         if (!strstr($key, '_')){ continue; }
                         if (empty($data) || !is_array($data)){ continue; }
+                        $string = $key;
                         list($id, $token) = explode('_', $key, 2);
                         if (!in_array($token, $allowed_robot_tokens)){ continue; }
-                        if (!isset($robotSessions[$token])){ $robotSessions[$token] = array(); }
+                        if (!isset($robotSessions[$string])){ $robotSessions[$string] = array(); }
                         //error_log('-> w/ $data = '. print_r($data, true));
                         // Okay, now we know it exists, we can update values as we find them
-                        $robotSession = &$robotSessions[$token];
+                        $robotSession = &$robotSessions[$string];
                         $robotSettings = &$lastPlayerSettings['player_robots'][$token];
                         $robotRewards = &$lastPlayerRewards['player_robots'][$token];
                         //error_log('-> $robotSession(before) = '. print_r($robotSession, true));
@@ -2158,10 +2159,24 @@ class rpg_world {
     }
 
     // Define a function for getting the robot switcher markup given current conditions
-    public static function get_robots_overview_markup($this_prototype_data, $current_robot_tokens){
+    public static function get_robots_overview_markup($this_prototype_data, $current_player_robots){
         //error_log('rpg_world::get_robot_overview_markup() called!');
-        if (empty($this_prototype_data) || empty($current_robot_tokens)){ return ''; }
+        //error_log('w/ $current_player_robots = '.print_r($current_player_robots, true));
+        if (empty($this_prototype_data) || !is_array($current_player_robots)){ return ''; }
         if ($this_prototype_data['this_player_token'] === 'player'){ return ''; }
+        // Parse the provided current player robots array to extract IDs and tokens
+        $current_robot_tokens = array(); $current_robot_ids = array();
+        foreach ($current_player_robots AS $robot_key => $robot_string){
+            if (strpos($robot_string, '_') !== false){
+                list($id, $token) = explode('_', $robot_string, 2);
+                $current_robot_ids[$token] = $id;
+                $current_robot_tokens[] = $token;
+                } else {
+                $current_robot_tokens[] = $robot_string;
+                }
+            }
+        //error_log('$current_robot_tokens = '.print_r($current_robot_tokens, true));
+        //error_log('$current_robot_ids = '.print_r($current_robot_ids, true));
         $return_markup = '';
         $WORLD_SESSION = self::get_session();
         $WORLD_ROBOT_SESSIONS = &$WORLD_SESSION['robot_sessions'];
@@ -2173,8 +2188,17 @@ class rpg_world {
         $player_starforce = rpg_game::starforce_unlocked();
         $limit_hearts = mmrpg_prototype_limit_hearts_earned($current_player_token);
         $num_robot_unlocked = mmrpg_prototype_robots_unlocked($current_player_token);
-        $storage_robot_tokens = mmrpg_prototype_robots_unlocked($current_player_token, true);
-        //$storage_robot_tokens = array_diff($storage_robot_tokens, $current_robot_tokens);
+        //$storage_robot_tokens = mmrpg_prototype_robots_unlocked($current_player_token, true);
+        //$storage_robot_ids = array_filter(array_map(function($string){ return explode('_', $string)[0]; }, $storage_robot_strings));
+        $storage_robot_strings = mmrpg_prototype_robots_unlocked($current_player_token, true, true);
+        $storage_robot_tokens = array(); $storage_robot_ids = array();
+        foreach ($storage_robot_strings AS $key => $string){
+            list($id, $token) = explode('_', $string);
+            $storage_robot_tokens[] = $token;
+            $storage_robot_ids[$token] = $id;
+        }
+        //error_log('$storage_robot_tokens = '.print_r($storage_robot_tokens, true));
+        //error_log('$storage_robot_ids = '.print_r($storage_robot_ids, true));
         $storage_item_tokens = array(); mmrpg_prototype_items_unlocked(true, $storage_item_tokens);
         $storage_ability_tokens = array(); mmrpg_prototype_abilities_unlocked('', '', $storage_ability_tokens);
         $equipped_player_items = array(); mmrpg_prototype_items_equipped('', $equipped_player_items);
@@ -2295,20 +2319,25 @@ class rpg_world {
         // [robots-overview][team-abilities]
         $return_markup .= '<a class="storage-button team-abilities" data-view="abilities"><i class="fa fas fa-fire-alt"></i><b>abilities</b></a>';
         // [robots-overview][limit-hearts]
-        $return_markup .= '<div class="limit-hearts">';
+        $return_markup .= '<div class="limit-hearts" data-count="'.$limit_hearts.'">';
             $return_markup .= '<i class="player '.$current_player_token.'"></i>';
-            $return_markup .= str_repeat('<i class="heart fa fas fa-heart"></i>', $limit_hearts);
+            if (!empty($limit_hearts)){ $return_markup .= str_repeat('<i class="heart fa fas fa-heart"></i>', $limit_hearts); }
+            else { $return_markup .= '<i class="heart fa fas fa-heart-broken"></i>'; }
         $return_markup .= '</div>';
         // [robots-overview][team-robots]
         $return_markup .= '<div class="team-robots listing" data-team-size="'.count($current_robot_tokens).'">';
             $return_markup .= '<div class="wrapper">';
             foreach ($current_robot_tokens AS $robot_key => $robot_token){
+                //error_log('checking $current_robot_tokens['.$robot_key.']['.$robot_token.'] ...');
                 if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
+                if (!isset($current_robot_ids[$robot_token])){ continue; }
+                //error_log('-> generating markup for current $robot_token = '.print_r($robot_token, true));
                 // collect all the info we need about this robot
                 $robot_index_info = $mmrpg_index_robots[$robot_token];
                 $robot_info = $robot_index_info;
-                $robot_id = $robot_info['robot_id'];
+                $robot_id = $current_robot_ids[$robot_token]; // TODO: get this ID from somewhere permanent
                 $robot_overview = self::get_player_robot_overview($current_player_token, $robot_token, $robot_id);
+                //error_log('-> $robot_overview = '.print_r($robot_overview, true));
                 $robot_name = $robot_overview['name'];
                 $robot_level = $robot_overview['level'];
                 $robot_core = $robot_overview['core'];
@@ -2388,12 +2417,16 @@ class rpg_world {
             //error_log('$recent_storage_robot_tokens = '.print_r($recent_storage_robot_tokens, true));
             $return_markup .= '<div class="wrapper">';
             foreach ($storage_robot_tokens AS $robot_key => $robot_token){
+                //error_log('checking $storage_robot_tokens['.$robot_key.']['.$robot_token.'] ...');
                 if ($robot_token === 'robot' || empty($mmrpg_index_robots[$robot_token])){ continue; }
+                if (!isset($storage_robot_ids[$robot_token])){ continue; }
+                //error_log('-> generating markup for storage $robot_token = '.print_r($robot_token, true));
                 // collect all the info we need about this robot
                 $robot_index_info = $mmrpg_index_robots[$robot_token];
                 $robot_info = $robot_index_info;
-                $robot_id = $robot_info['robot_id'];
+                $robot_id = $storage_robot_ids[$robot_token]; // TODO: get this ID from somewhere permanent
                 $robot_overview = self::get_player_robot_overview($current_player_token, $robot_token, $robot_id);
+                //error_log('-> $robot_overview = '.print_r($robot_overview, true));
                 $robot_name = $robot_overview['name'];
                 $robot_level = $robot_overview['level'];
                 $robot_experience = $robot_overview['experience'];
@@ -5044,10 +5077,11 @@ class rpg_world {
         $WORLD_SESSION = self::get_session();
         $WORLD_ROBOT_SESSIONS = &$WORLD_SESSION['robot_sessions'];
         // Start grabbing the robot data from their index info and any session states
+        $robot_session_token = $robot_id.'_'.$robot_token;
         $robot_info = $robot_index_info;
         $robot_rewards = rpg_game::robot_rewards($player_token, $robot_token);
         $robot_settings = rpg_game::robot_settings($player_token, $robot_token);
-        $robot_session = !empty($WORLD_ROBOT_SESSIONS[$robot_token]) ? $WORLD_ROBOT_SESSIONS[$robot_token] : array();
+        $robot_session = !empty($WORLD_ROBOT_SESSIONS[$robot_session_token]) ? $WORLD_ROBOT_SESSIONS[$robot_session_token] : array();
         $robot_level = !empty($robot_rewards['robot_level']) ? $robot_rewards['robot_level'] : 1;
         $robot_experience = !empty($robot_rewards['robot_experience']) ? $robot_rewards['robot_experience'] : 0;
         $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
