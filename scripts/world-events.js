@@ -1694,6 +1694,18 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 } else {
                 sideButtonsMarkup += '<a class="button big-button disabled"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
                 }
+            if (!playerIsCursor
+                && dataBattles.length === 1
+                && eventsAtPosition[0].kind2 === 'mecha'){
+                let hasPermanentWhistle = _playerToken === 'dr-lalinde';
+                let mechaWhistleQuantity = _self.getItemQuantity('mecha-whistle');
+                let mechaWhistleSpriteMarkup = _self.getItemSpriteMarkup('mecha-whistle');
+                let mechaWhistleSpanLabel = '<sup>Use</sup> Mecha Whistle';
+                if (!hasPermanentWhistle){ mechaWhistleSpanLabel += ' <sub>&times; ' + mechaWhistleQuantity + '</sub>' ; }
+                let playerCanUseWhistle = mechaWhistleQuantity > 0 || hasPermanentWhistle ? true : false;
+                if (playerCanUseWhistle){ sideButtonsMarkup += '<a class="button big-button type shield" data-action="use-whistle"><span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span></a>'; }
+                else { sideButtonsMarkup += '<a class="button big-button disabled"><span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span></a>'; }
+                }
             sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
             //console.log('sideButtonsMarkup =', sideButtonsMarkup);
             showActionAreaType = 'battle';
