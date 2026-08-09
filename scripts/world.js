@@ -739,11 +739,6 @@ class mmrpgWorldMap {
         thisLayerData.tiles = canvasTiles;
         //console.log('tilesIndex =', tilesIndex);
         //console.log('thisLayerData =', thisLayerData);
-        let getTileKeyDiff = function(tileKey, xDiff, yDiff){
-            if (typeof xDiff !== 'number'){ xDiff = 0; } if (typeof yDiff !== 'number'){ yDiff = 0; }
-            let x = parseInt(tileKey.split('-')[0]); let y = parseInt(tileKey.split('-')[1]);
-            return (x + xDiff) + '-' + (y + yDiff);
-            }
         for (var i = 0; i < tileDataKeys.length; i++){
             let tileKey = tileDataKeys[i];
             let tileValue = canvasTiles[tileKey]; if (!tileValue.length){ tileValue = 'void'; }
@@ -753,15 +748,16 @@ class mmrpgWorldMap {
             let tileSpriteToken = tileValue;
             let tileSpriteBitmask = 0;
             if (tileSpriteToken !== 'void'
-                && tileSpriteToken !== 'dotted'){
-                let topTileValue = canvasTiles[getTileKeyDiff(tileSpriteKey, 0, -1)];
-                let rightTileValue = canvasTiles[getTileKeyDiff(tileSpriteKey, 1, 0)];
-                let bottomTileValue = canvasTiles[getTileKeyDiff(tileSpriteKey, 0, 1)];
-                let leftTileValue = canvasTiles[getTileKeyDiff(tileSpriteKey, -1, 0)];
-                if (topTileValue === ''){ topTileValue = 'void'; }
-                if (rightTileValue === ''){ rightTileValue = 'void'; }
-                if (bottomTileValue === ''){ bottomTileValue = 'void'; }
-                if (leftTileValue === ''){ leftTileValue = 'void'; }
+                && tileSpriteToken !== 'dotted'
+                && typeof tilesIndex[tileSpriteToken + '-0'] !== 'undefined'){
+                let topTileValue = canvasTiles[_self.getRelativeTileKey(tileSpriteKey, 0, -1)];
+                let rightTileValue = canvasTiles[_self.getRelativeTileKey(tileSpriteKey, 1, 0)];
+                let bottomTileValue = canvasTiles[_self.getRelativeTileKey(tileSpriteKey, 0, 1)];
+                let leftTileValue = canvasTiles[_self.getRelativeTileKey(tileSpriteKey, -1, 0)];
+                if (topTileValue === '' || topTileValue === 'dotted'){ topTileValue = 'void'; }
+                if (rightTileValue === '' || rightTileValue === 'dotted'){ rightTileValue = 'void'; }
+                if (bottomTileValue === '' || bottomTileValue === 'dotted'){ bottomTileValue = 'void'; }
+                if (leftTileValue === '' || leftTileValue === 'dotted'){ leftTileValue = 'void'; }
                 if (topTileValue !== 'void'){ tileSpriteBitmask += 1; }
                 if (rightTileValue !== 'void'){ tileSpriteBitmask += 2; }
                 if (bottomTileValue !== 'void'){ tileSpriteBitmask += 4; }
@@ -1457,6 +1453,86 @@ class mmrpgWorldMap {
         return newPos;
         };
 
+    // Define a function that allows us to quickly calculate which tile is relative to another (x+2, y-1, etc.), then return the position
+    getRelativeTileKey(tileKey, xDiff, yDiff){
+        if (typeof xDiff !== 'number'){ xDiff = 0; } if (typeof yDiff !== 'number'){ yDiff = 0; }
+        let x = parseInt(tileKey.split('-')[0]); let y = parseInt(tileKey.split('-')[1]);
+        return (x + xDiff) + '-' + (y + yDiff);
+        };
+
+    // Define a function that calculates the correct bitmask string for a tile based on its neighbors
+    calculateTileBitmask(tileKey, baseTerrain){
+        let mapTilesIndex = this.config.mapTilesIndex;
+        let terrainTilesIndex = this.state.layerTilesIndex['terrain'] || {};
+        // Skip tiles that don't auto-tile
+        if (baseTerrain === 'void'
+            || baseTerrain === 'dotted'
+            || typeof mapTilesIndex[baseTerrain + '-0'] === 'undefined'){
+            return baseTerrain;
+            }
+        // Quick function to grab the base string of a neighbor tile
+        let getBase = (key) => {
+            let t = terrainTilesIndex[key];
+            let b = t && t.sprite ? t.sprite[1].split('-')[0] : 'void';
+            return (b === 'dotted' || b === '') ? 'void' : b;
+            };
+        let bitmask = 0;
+        if (getBase(this.getRelativeTileKey(tileKey, 0, -1)) !== 'void') bitmask += 1; // Top
+        if (getBase(this.getRelativeTileKey(tileKey, 1, 0)) !== 'void') bitmask += 2; // Right
+        if (getBase(this.getRelativeTileKey(tileKey, 0, 1)) !== 'void') bitmask += 4; // Bottom
+        if (getBase(this.getRelativeTileKey(tileKey, -1, 0)) !== 'void') bitmask += 8; // Left
+        let possibleToken = baseTerrain + '-' + bitmask;
+        return typeof mapTilesIndex[possibleToken] !== 'undefined' ? possibleToken : baseTerrain;
+        }
+
+    // Quick function that refreshes edges for an array of tiles, applies sprite data, and triggers map updates
+    refreshTerrainEdges(changedTileKeys){
+        let mapTilesIndex = this.config.mapTilesIndex;
+        let layerTilesIndex = this.state.layerTilesIndex;
+        let terrainTilesIndex = layerTilesIndex['terrain'];
+        if (!terrainTilesIndex) return false;
+        let neighborsToUpdate = new Set();
+        let groupTiles = Array.isArray(changedTileKeys) ? changedTileKeys : Array.from(changedTileKeys);
+        // Collect neighbors for all changed tiles
+        for (let i = 0; i < groupTiles.length; i++){
+            let tileKey = groupTiles[i];
+            neighborsToUpdate.add(this.getRelativeTileKey(tileKey, 0, -1));
+            neighborsToUpdate.add(this.getRelativeTileKey(tileKey, 1, 0));
+            neighborsToUpdate.add(this.getRelativeTileKey(tileKey, 0, 1));
+            neighborsToUpdate.add(this.getRelativeTileKey(tileKey, -1, 0));
+            }
+        // Combine changed tiles and neighbors into a unique list
+        let allAffectedTiles = new Set([...groupTiles, ...neighborsToUpdate]);
+        allAffectedTiles.forEach(tileKey => {
+            let tileData = terrainTilesIndex[tileKey];
+            if (!tileData) return; // Skip if tile is out of bounds
+            let baseTerrain = tileData.sprite[1].split('-')[0];
+            let finalTerrainToken = this.calculateTileBitmask(tileKey, baseTerrain);
+            let terrainSpriteData = mapTilesIndex[finalTerrainToken] || false;
+            if (!terrainSpriteData){ console.error('-> terrainSpriteData not found for terrain', finalTerrainToken); return; }
+            let terrainSpriteOffset = this.getClonedObject(terrainSpriteData[0]);
+            let terrainSpriteSize = this.getClonedObject(terrainSpriteData[1]);
+            let terrainSpriteAttrs = this.getClonedObject(terrainSpriteData[2]);
+            let terrainIsWalkable = terrainSpriteAttrs.isWalkable ? true : false;
+            // Apply the final validated sprite data
+            tileData.sprite[1] = finalTerrainToken;
+            tileData.sprite[2] = [terrainSpriteOffset[0], terrainSpriteOffset[1]];
+            tileData.sprite[3] = [terrainSpriteSize[0], terrainSpriteSize[1]];
+            tileData.walkable = terrainIsWalkable;
+            tileData.effects.grid = terrainIsWalkable;
+            tileData.dirty = true;
+            });
+        // Save states and trigger standard map redraw updates
+        layerTilesIndex['terrain'] = terrainTilesIndex;
+        this.state.layerTilesIndex = layerTilesIndex;
+        this.refreshCanvasTiles('terrain');
+        this.calculateWalkableMapTiles(true);
+        this.refreshMapPositionEvents();
+        this.saveWorldState();
+        // Return true on success
+        return true;
+        }
+
     // Quick function for getting a given layer tile's index data provided the layer token and tile key
     getLayerTileIndexData(layerToken, tileKey){
         //console.log('%c' + 'mmrpgWorldMap.getLayerTileIndexData(layerToken:' + layerToken + ', tileKey:' + tileKey + ')', 'color: magenta;');
@@ -1774,6 +1850,7 @@ class mmrpgWorldMap {
             $cursorSprite.attr('data-pos', _worldCursor.position);
             _self.resetZoomLevel();
             _self.updateMapPosition();
+            _self.makeLayerTilesInactive();
             _self.makeLayerTileActive(_worldCursor.position);
             if (moveTimeout){ clearTimeout(moveTimeout); }
             let delay = timeoutDuration - travelDuration;
