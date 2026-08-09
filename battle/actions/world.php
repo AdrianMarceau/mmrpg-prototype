@@ -65,11 +65,16 @@ if (!empty($this_player->player_token)
     $WORLD_ROBOT_SESSIONS = &$WORLD_SESSION['robot_sessions'];
     //error_log('Saving robot sessions for player '.$this_player->player_token.PHP_EOL.' w/ $this_player->player_robots = '.print_r($this_player->player_robots, true));
     foreach ($this_player->player_robots AS $robot_key => $robot_info){
+        if (empty($robot_info['robot_base_id'])){ continue; }
+        $robot_id = $robot_info['robot_base_id'];
         $robot_token = $robot_info['robot_token'];
-        if (!isset($WORLD_ROBOT_SESSIONS[$robot_token])){ $WORLD_ROBOT_SESSIONS[$robot_token] = array(); }
+        if (empty($robot_id) || empty($robot_token)){ continue; }
+        $robot_session_token = $robot_id.'_'.$robot_token;
+        //error_log('-> now saving WORLD data for '.$robot_session_token.' ...');
+        if (!isset($WORLD_ROBOT_SESSIONS[$robot_session_token])){ $WORLD_ROBOT_SESSIONS[$robot_session_token] = array(); }
         $is_disabled = empty($robot_info['robot_energy']) ? true : false;
         $weapon_energy_recovery = 1;
-        $robot_session = &$WORLD_ROBOT_SESSIONS[$robot_token];
+        $robot_session = &$WORLD_ROBOT_SESSIONS[$robot_session_token];
         $robot_session['energy'] = $robot_info['robot_energy'] - $robot_info['robot_base_energy'];
         $robot_session['weapons'] = $robot_info['robot_weapons'] + (!$is_disabled ? $weapon_energy_recovery : 0) - $robot_info['robot_base_weapons'];
         $robot_session['attack'] = !$is_disabled && !empty($robot_info['counters']['attack_mods']) ? $robot_info['counters']['attack_mods'] : 0;
@@ -84,7 +89,7 @@ if (!empty($this_player->player_token)
         if ($robot_session['speed'] > MMRPG_SETTINGS_STATS_MOD_MAX){ $robot_session['speed'] = MMRPG_SETTINGS_STATS_MOD_MAX; }
         else if ($robot_session['speed'] < MMRPG_SETTINGS_STATS_MOD_MIN){ $robot_session['speed'] = MMRPG_SETTINGS_STATS_MOD_MIN; }
         //error_log('Saving robot session for '.$robot_token.' : '.print_r($robot_session, true));
-        $WORLD_ROBOT_SESSIONS[$robot_token] = $robot_session;
+        $WORLD_ROBOT_SESSIONS[$robot_session_token] = $robot_session;
     }
 
 }

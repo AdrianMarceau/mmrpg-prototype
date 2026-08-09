@@ -112,17 +112,21 @@ if (!empty($this_battle->flags['world_battle'])){
     $apply_session_mods = function($battle, $player, $key, $info) use ($WORLD_ROBOT_SESSIONS){
         //error_log('$apply_session_mods() w/ $player = '.$player->player_token.' and $key = '.$key.' and $info = '.print_r($info, true));
         $robot = rpg_game::get_robot($battle, $player, $info);
-        $token = $robot->robot_token;
-        if (isset($WORLD_ROBOT_SESSIONS[$token])){
-            //error_log('Applying WORLD robot session for '.$token.' : '.print_r($WORLD_ROBOT_SESSIONS[$token], true));
-            $robot->robot_energy += $WORLD_ROBOT_SESSIONS[$token]['energy'];
-            $robot->robot_weapons += $WORLD_ROBOT_SESSIONS[$token]['weapons'];
-            if (!empty($WORLD_ROBOT_SESSIONS[$token]['attack'])){ $robot->counters['attack_mods'] += $WORLD_ROBOT_SESSIONS[$token]['attack']; }
-            if (!empty($WORLD_ROBOT_SESSIONS[$token]['defense'])){ $robot->counters['defense_mods'] += $WORLD_ROBOT_SESSIONS[$token]['defense']; }
-            if (!empty($WORLD_ROBOT_SESSIONS[$token]['speed'])){ $robot->counters['speed_mods'] += $WORLD_ROBOT_SESSIONS[$token]['speed']; }
-            // Update the session with any changes
-            $robot->update_session();
-            }
+        if (empty($robot->robot_base_id)){ return; }
+        $robot_id = $robot->robot_base_id;
+        $robot_token = $robot->robot_token;
+        if (empty($robot_id) || empty($robot_token)){ return; }
+        $robot_session_token = $robot_id.'_'.$robot_token;
+        if (!isset($WORLD_ROBOT_SESSIONS[$robot_session_token])){ return; }
+        //error_log('-> now loading WORLD data for '.$robot_session_token.' ...');
+        //error_log('-> now loading WORLD data for '.$robot_session_token.' ... w/ '.print_r($WORLD_ROBOT_SESSIONS[$robot_session_token], true));
+        $robot->robot_energy += $WORLD_ROBOT_SESSIONS[$robot_session_token]['energy'];
+        $robot->robot_weapons += $WORLD_ROBOT_SESSIONS[$robot_session_token]['weapons'];
+        if (!empty($WORLD_ROBOT_SESSIONS[$robot_session_token]['attack'])){ $robot->counters['attack_mods'] += $WORLD_ROBOT_SESSIONS[$robot_session_token]['attack']; }
+        if (!empty($WORLD_ROBOT_SESSIONS[$robot_session_token]['defense'])){ $robot->counters['defense_mods'] += $WORLD_ROBOT_SESSIONS[$robot_session_token]['defense']; }
+        if (!empty($WORLD_ROBOT_SESSIONS[$robot_session_token]['speed'])){ $robot->counters['speed_mods'] += $WORLD_ROBOT_SESSIONS[$robot_session_token]['speed']; }
+        // Update the session with any changes
+        $robot->update_session();
         };
     foreach ($this_player->values['robots_active'] AS $key => $info){ $apply_session_mods($this_battle, $this_player, $key, $info); }
     $this_robot->robot_reload();

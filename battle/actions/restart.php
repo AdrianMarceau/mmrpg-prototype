@@ -17,6 +17,15 @@ if (!empty($this_battle->values['multi_battle_tokens'])){
 
 // Redefine the player's robots string
 $this_player_robots = !empty($_REQUEST['this_player_robots']) ? $_REQUEST['this_player_robots'] : '00_robot';
+if (!empty($this_player_robots)){
+    $this_player_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
+    foreach ($this_player_robots AS $key => $string){
+        list($xid, $token) = explode('_', $string);
+        $id = is_numeric($xid) ? $xid : (strstr($xid, 'x') ? explode('x', $xid)[2] : 0);
+        $this_player_robots[$key] = $id.'_'.$token;
+    }
+    $this_player_robots = implode(',', $this_player_robots);
+}
 
 // If rotation was requested, we should break apart the csv player robots and rotate positions first
 if ($this_action == 'restart_with-rotate'){
