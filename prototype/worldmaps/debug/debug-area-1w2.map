@@ -29,7 +29,7 @@
 #---------------------------#
 @terrain[]   = ground(preserved-forest)
 @terrain[]   = grass(gentle-countryside)
-@terrain[]   = water(rainey-sewers)
+@terrain[]   = water(rainy-sewers)
 #---------------------------#
 @habitats[] = batton(ground)
 @habitats[] = monking-r(ground)
