@@ -110,31 +110,42 @@ $(document).ready(function(){
 
         // Add hover and click sounds to the buttons in the main menu
         $('#actions .main_actions .button', $thisBattle).live('mouseenter', function(){
+            //console.log('this = ', this);
             playSoundEffect.call(this, 'icon-hover');
             });
         $('#actions .main_actions .button', $thisBattle).live('click', function(){
+            //console.log('this = ', this);
             playSoundEffect.call(this, 'icon-click');
             });
 
         // Add hover and click sounds to any buttons in the sub menu
+        let ignoreSubButtons = false, ignoreSubButtonsTimeout = null;
         $('#actions .sub_actions .button', $thisBattle).live('mouseenter', function(){
-            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-hover'); }
-            else { playSoundEffect.call(this, 'icon-hover'); }
+            if (ignoreSubButtons){ return; }
+            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-hover', {volume: 0.5}); }
+            else { playSoundEffect.call(this, 'icon-hover', {volume: 1.0}); }
             });
         $('#actions .sub_actions .button', $thisBattle).live('click', function(){
-            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-click'); }
-            else { playSoundEffect.call(this, 'icon-click'); }
+            if (ignoreSubButtons){ return; }
+            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-click', {volume: 0.5}); }
+            else { playSoundEffect.call(this, 'icon-click', {volume: 1.0}); }
+            ignoreSubButtons = true;
+            if (ignoreSubButtonsTimeout){ clearTimeout(ignoreSubButtonsTimeout); }
+            ignoreSubButtonsTimeout = setTimeout(function(){ ignoreSubButtons = false; }, 100);
             });
 
+        /*
         // Add hover and click sounds to any buttons in the float menu
         $('#actions .float_links .button', $thisBattle).live('mouseenter', function(){
             if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-hover'); }
             else { playSoundEffect.call(this, 'icon-hover'); }
             });
         $('#actions .float_links .button', $thisBattle).live('click', function(){
+            console.log('this = ', this);
             if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-click'); }
             else { playSoundEffect.call(this, 'icon-click'); }
             });
+        */
 
         }
 
@@ -980,8 +991,8 @@ function mmrpg_action_panel(thisPanel, currentPanel){
 
         var activeLink = $('.active', floatLinkContainer);
         var firstLink = $('.num', floatLinkContainer).first();
-        if (activeLink.length){ activeLink.trigger('click'); }
-        else if (firstLink.length){ firstLink.trigger('click'); }
+        if (activeLink.length){ activeLink.triggerSilentClick(); }
+        else if (firstLink.length){ firstLink.triggerSilentClick(); }
 
         }
 
@@ -1500,7 +1511,8 @@ function mmrpg_stop_animation(){
 // Quick function for playing a sound effect (if available)
 let mmrpgPlaySoundEffect;
 async function playSoundEffect(soundName, options){
-    //console.log('%c' + 'mmrpgBattle.playSoundEffect(' + soundName + ')', 'color: green;');
+    //console.log('%c' + 'mmrpgBattle.playSoundEffect(' + soundName + ', ' + JSON.stringify(options) + ')', 'color: green;');
+    //console.error('use this to trace backward');
     if (!soundName || typeof soundName !== 'string' || !soundName.length){ console.error('playSoundEffect() missing required soundName!'); return false; }
     if (typeof options !== 'object' || !options){ options = {}; }
     let _self = this;
@@ -1519,7 +1531,7 @@ async function playSoundEffect(soundName, options){
             else { console.warn('mmrpgWorldMap.playSoundEffect() unable to play sound effect "' + soundName + '" because mmrpg_play_sound_effect is not defined!'); }
             };
         }
-    return mmrpgPlaySoundEffect.call(_selfReference, soundName, options);
+    return mmrpgPlaySoundEffect.call(_self, soundName, options);
     }
 
 // Define a quick functino for polling the server for new events (but only if we can actually show them)
