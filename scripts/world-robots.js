@@ -1541,11 +1541,11 @@ function getRobotDetailsForOverview(robotToken){
         return false;
         })(playerRobotInfo);
     let equipCodesUnlocked = typeof _worldPlayerItems['equip-codes'] !== 'undefined' && _worldPlayerItems['equip-codes'] >= 1 ? true : false;
-    let robotSupportUnlocked = (function(unlocked){
+    let robotSupportUnlocked = robotKind === 'master' ? (function(unlocked){
         let abilities = _mmrpgAbilitiesIndex, required = robotSupportAbilities;
         for (var i = 0; i < required.length; i++){ if (unlocked.indexOf(required[i]) !== -1){ return true; } }
         return false;
-        })(_worldPlayerAbilities);
+        })(_worldPlayerAbilities) : false;
     //console.log('--> robotLevel =', robotLevel);
     //console.log('--> robotExperience =', robotExperience);
     //console.log('--> robotEnergy =', robotEnergy, '/', robotEnergyMax, '(', robotEnergyPercent, '% )');
@@ -1609,7 +1609,8 @@ function getRobotDetailsForOverview(robotToken){
     robotDetailsObject.infoLines.push(weaponEnergyLine);
 
     // STATS (ATTACK / DEFENSE / SPEED)
-    let statsLine = { classes: 'base-stats types' + (!equipCodesUnlocked && !robotSupportUnlocked ? ' bigger' : ''), label: 'Stats:', values: [] }; {
+    let showStatsBigger = !equipCodesUnlocked && !robotSupportUnlocked;
+    let statsLine = { classes: 'base-stats types' + (showStatsBigger ? ' bigger' : ''), label: 'Stats:', values: [] }; {
         let statValues = [], liveStatValues = [], statValuesRange = [];
         let marginBase = 16, marginBaseMax = (statTokens.length * (marginBase - 1));
         for (let i = 0; i < statTokens.length; i++){
@@ -1809,14 +1810,17 @@ function getRobotDetailsForOverview(robotToken){
     robotDetailsObject.actions = [];
     let showStorageButtons = (currentScreen === 'robots-overview' && currentSubScreen === 'robots') ? true : false;
     let showTeamAddButton = showStorageButtons && !robotIsCurrent ? true : false;
-    let showTeamRemoveButton = showStorageButtons && robotIsCurrent ? true : false;
-    let allowTeamAddButton = showTeamAddButton, allowTeamRemoveButton = showTeamRemoveButton;
-    if (playerRobotsCurrent.length === 1){ allowTeamRemoveButton = false; }
-    else if (playerRobotsCurrent.length >= _config.playerRobotsLimit){ allowTeamAddButton = false; }
+    let showTeamRemoveButton = robotKind === 'master' && showStorageButtons && robotIsCurrent ? true : false;
+    let showTeamReleaseButton = robotKind === 'mecha' && showStorageButtons && robotIsCurrent ? true : false;
+    let allowTeamAddButton = showTeamAddButton, allowTeamRemoveButton = showTeamRemoveButton, allowTeamReleaseButton = showTeamReleaseButton;
+    if (playerRobotsCurrent.length === 1){ allowTeamRemoveButton = false; allowTeamReleaseButton = false; }
+    else if (playerRobotsCurrent.length >= _config.playerRobotsLimit && robotKind !== 'mecha'){ allowTeamAddButton = false; }
     else if (playerRobotsCurrent.length >= _config.maxRobotsPerPlayer){ allowTeamAddButton = false; }
-    robotDetailsObject.actions.push({ action: 'robot-info', text: yButtonIcon + ' Details', button: 'Y', robot: robotToken, disabled: false, hidden: !showStorageButtons });
-    robotDetailsObject.actions.push({ action: 'add-robot', text: xButtonIcon + ' Summon', button: 'X', robot: robotToken, disabled: !allowTeamAddButton, hidden: !showStorageButtons || !showTeamAddButton });
-    robotDetailsObject.actions.push({ action: 'remove-robot', text: xButtonIcon + ' Dismiss', button: 'X', robot: robotToken, disabled: !allowTeamRemoveButton, hidden: !showStorageButtons || !showTeamRemoveButton });
+    robotDetailsObject.actions.push({ action: 'robot-info', text: yButtonIcon + ' Details', button: 'Y', robot: robotString, disabled: false, hidden: !showStorageButtons });
+    robotDetailsObject.actions.push({ action: 'add-robot', text: xButtonIcon + ' Summon', button: 'X', robot: robotString, disabled: !allowTeamAddButton, hidden: !showStorageButtons || !showTeamAddButton });
+    robotDetailsObject.actions.push({ action: 'remove-robot', text: xButtonIcon + ' Dismiss', button: 'X', robot: robotString, disabled: !allowTeamRemoveButton, hidden: !showStorageButtons || !showTeamRemoveButton });
+    robotDetailsObject.actions.push({ action: 'release-robot', text: xButtonIcon + ' Release', button: 'X', robot: robotString, disabled: !allowTeamReleaseButton, hidden: !showStorageButtons || !showTeamReleaseButton });
+
     // TODO (!!!) Add an "swap-in" option to storage robots when the player only has one robot and it's disabled
 
     // Pre-compile some of the HTML to make it easier for the other functions
