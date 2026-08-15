@@ -148,6 +148,7 @@ if (!empty($this_battle_token)){
 
 }
 else {
+    //error_log('(battle.php) battle token was empty! redirecting home...');
     $this_battle_id = 0;
     $this_battle_token = '';
     $this_battle_data = array();
@@ -248,7 +249,7 @@ if (!empty($this_player_token)){
             $temp_robot_class = $temp_robot_data['robot_class'];
             if (!isset($temp_this_robot_classes[$temp_robot_class])){ $temp_this_robot_classes[$temp_robot_class] = 0; }
             $temp_this_robot_classes[$temp_robot_class] += 1;
-            if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_token)){
+            if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_token, $robot_id)){
                 $temp_robot_id = strstr($robot_id, $temp_player_id) ? $robot_id : rpg_game::unique_robot_id($temp_player_id, $robot_id, ($key + 1));
                 $this_player_data['player_robots'][] = array('robot_id' => $temp_robot_id, 'robot_base_id' => $robot_id, 'robot_token' => $robot_token);
                 $allowed_robots_parsed[] = $temp_robot_id.'_'.$robot_token;
@@ -324,6 +325,7 @@ if (empty($this_player_robots)){
     }
 
     // We have to redirect back to the home page of the prototype
+    //error_log('(battle.php) player has no robots! redirecting home...');
     header('Location: '.$this_redirect);
     exit();
 }
