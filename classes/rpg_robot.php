@@ -323,7 +323,7 @@ class rpg_robot extends rpg_object {
         if ($this->player->player_side == 'left' && empty($this->flags['apply_session_settings'])){
 
             // Collect the abilities for this robot from the session
-            $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token);
+            $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token, $this->robot_base_id);
             //error_log('$temp_robot_settings('.$this->player_token.'/'.$this->robot_token.') = '.print_r($temp_robot_settings, true));
 
             // If this is a player-controlled robot, load abilities from session
@@ -422,6 +422,7 @@ class rpg_robot extends rpg_object {
         unset($this->robot_function);
         $this->robot_load(array(
             'robot_id' => $this->robot_id,
+            'robot_base_id' => $this->robot_base_id,
             'robot_token' => $this->robot_token,
             'robot_pseudo_token' => !empty($this->robot_persona) ? $this->robot_persona : $this->robot_token
             ));
@@ -1239,11 +1240,11 @@ class rpg_robot extends rpg_object {
         if ($this->player->player_autopilot != true && $this->robot_class == 'master'){
 
             // Collect this robot's rewards and settings
-            $this_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token);
-            $this_rewards = mmrpg_prototype_robot_rewards($this->player_token, $this->robot_token);
+            $this_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token, $this->robot_base_id);
+            $this_rewards = mmrpg_prototype_robot_rewards($this->player_token, $this->robot_token, $this->robot_base_id);
 
             // Update this robot's original player with any session settings
-            $this->robot_original_player = mmrpg_prototype_robot_original_player($this->player_token, $this->robot_token);
+            $this->robot_original_player = mmrpg_prototype_robot_original_player($this->player_token, $this->robot_token, $this->robot_base_id);
 
             // If we're in a player battle, cast all robots as level 100
             if (!empty($this->battle->flags['player_battle'])
@@ -1253,8 +1254,8 @@ class rpg_robot extends rpg_object {
             }
             // Otherwise collect this robot's level and experience from session
             else {
-                $this->robot_base_experience = $this->robot_experience = mmrpg_prototype_robot_experience($this->player_token, $this->robot_token);
-                $this->robot_base_level = $this->robot_level = mmrpg_prototype_robot_level($this->player_token, $this->robot_token);
+                $this->robot_base_experience = $this->robot_experience = mmrpg_prototype_robot_experience($this->player_token, $this->robot_token, $this->robot_base_id);
+                $this->robot_base_level = $this->robot_level = mmrpg_prototype_robot_level($this->player_token, $this->robot_token, $this->robot_base_id);
             }
 
 
@@ -7049,8 +7050,12 @@ class rpg_robot extends rpg_object {
             && empty($this->battle->flags['player_battle'])
             && empty($this->battle->flags['challenge_battle'])){
             $ptoken = $this->player->player_token;
+            $rid = $this->robot_base_id;
             $rtoken = $this->robot_token;
-            if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
+            $rstring = $rid.'_'.$rtoken;
+            if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_item'])){
+                $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_item'] = '';
+            } elseif (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
                 $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
             }
         }
@@ -7069,8 +7074,12 @@ class rpg_robot extends rpg_object {
             && empty($this->battle->flags['player_battle'])
             && empty($this->battle->flags['challenge_battle'])){
             $ptoken = $this->player->player_token;
+            $rid = $this->robot_base_id;
             $rtoken = $this->robot_token;
-            if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
+            $rstring = $rid.'_'.$rtoken;
+            if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring])){
+                $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_item'] = $new_item_token;
+            } elseif (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
                 $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = $new_item_token;
             }
         }
