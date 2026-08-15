@@ -819,14 +819,18 @@ class rpg_game {
 
 
     // Define a function for checking is a prototype robot has been unlocked
-    public static function robot_unlocked($player_token = '', $robot_token = ''){
+    public static function robot_unlocked($player_token = '', $robot_token = '', $robot_id = 0){
         // Define the game session helper var
         $session_token = self::session_token();
+        $robot_string = $robot_id.'_'.$robot_token;
         // If the player token was not false, check to see if that particular player has unlocked
         if (empty($robot_token)){ return false; }
         if (!empty($player_token)){
             // Check if this battle has been completed and return true is it was
-            if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])
+            if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string])
+                && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string])){
+                return true;
+            } elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])
                 && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
                 return true;
             } else {
@@ -838,7 +842,12 @@ class rpg_game {
             // Loop through all the player tokens in the battle rewards
             $robot_unlocked = false;
             foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_info){
-                if (isset($player_info['player_robots'][$robot_token])
+                if (isset($player_info['player_robots'][$robot_string])
+                    && !empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string])
+                    && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string])){
+                    $robot_unlocked = true;
+                    break;
+                } elseif (isset($player_info['player_robots'][$robot_token])
                     && !empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])
                     && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
                     $robot_unlocked = true;
@@ -903,10 +912,11 @@ class rpg_game {
 
 
     // Define a function for collecting all robots unlocked by player or all
-    public static function robot_tokens_unlocked($player_token = ''){
+    public static function robot_tokens_unlocked($player_token = '', $return_keys = false){
         // Define the game session helper var
         $session_token = self::session_token();
         // Define the temp robot and return arrays
+        $unlocked_robots_keys = array();
         $unlocked_robots_tokens = array();
         // If the player token was not false, attempt to collect rewards and settings arrays for that player
         if (!empty($player_token)){
@@ -914,10 +924,11 @@ class rpg_game {
             $battle_values = array('battle_rewards', 'battle_settings');
             foreach ($battle_values AS $value_token){
                 if (!empty($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'])){
-                    foreach ($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'] AS $robot_token => $robot_info){
-                        if (!empty($robot_token) && !empty($robot_info) && !in_array($robot_token, $unlocked_robots_tokens)){
-                            $unlocked_robots_tokens[] = $robot_token;
-                        }
+                    foreach ($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'] AS $robot_key => $robot_info){
+                        $robot_token = !empty($robot_info['robot_token']) ? $robot_info['robot_token'] : '';
+                        if (empty($robot_key) || empty($robot_token) || empty($robot_info)){ continue; }
+                        if (!in_array($robot_key, $unlocked_robots_keys)){ $unlocked_robots_keys[] = $robot_key; }
+                        if (!empty($robot_token) && !in_array($robot_token, $unlocked_robots_tokens)){ $unlocked_robots_keys[] = $robot_token; }
                     }
                 }
             }
@@ -929,10 +940,11 @@ class rpg_game {
             foreach ($battle_values AS $value_token){
                 foreach ($_SESSION[$session_token]['values'][$value_token] AS $player_token => $player_info){
                     if (!empty($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'])){
-                        foreach ($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'] AS $robot_token => $robot_info){
-                            if (!empty($robot_token) && !empty($robot_info) && !in_array($robot_token, $unlocked_robots_tokens)){
-                                $unlocked_robots_tokens[] = $robot_token;
-                            }
+                        foreach ($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'] AS $robot_key => $robot_info){
+                        $robot_token = !empty($robot_info['robot_token']) ? $robot_info['robot_token'] : '';
+                        if (empty($robot_key) || empty($robot_token) || empty($robot_info)){ continue; }
+                        if (!in_array($robot_key, $unlocked_robots_keys)){ $unlocked_robots_keys[] = $robot_key; }
+                        if (!empty($robot_token) && !in_array($robot_token, $unlocked_robots_tokens)){ $unlocked_robots_keys[] = $robot_token; }
                         }
                     }
                 }
@@ -954,52 +966,69 @@ class rpg_game {
         // Update or create the player setting in the session
         $player_token = $player_info['player_token'];
         $robot_token = $robot_info['robot_token'];
-        $_SESSION[self::session_token()]['values']['battle_settings'][$player_token]['player_robots'][$robot_token][$setting_token] = $setting_value;
+        if (!empty($robot_info['robot_id'])){
+            $robot_id = $robot_info['robot_id'];
+            $robot_string = $robot_id.'_'.$robot_token;
+            $_SESSION[self::session_token()]['values']['battle_settings'][$player_token]['player_robots'][$robot_string][$setting_token] = $setting_value;
+        } else {
+            $_SESSION[self::session_token()]['values']['battle_settings'][$player_token]['player_robots'][$robot_token][$setting_token] = $setting_value;
+        }
         // Return true on success
         return true;
     }
 
 
     // Define a function for checking a robot's prototype experience total
-    public static function robot_experience($player_token, $robot_token){
+    public static function robot_experience($player_token, $robot_token, $robot_id = 0){
         // Return the current point total for this robot
         $session_token = self::session_token();
-        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience']; }
+        $robot_string = $robot_id.'_'.$robot_token;
+        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_experience'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_experience']; }
+        elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience']; }
         elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_points'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_points']; }
         else { return 0; }
     }
 
 
     // Define a function for checking a robot's prototype current level
-    public static function robot_level($player_token, $robot_token){
+    public static function robot_level($player_token, $robot_token, $robot_id = 0){
         // Return the current level total for this robot
         $session_token = self::session_token();
-        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level']; }
+        $robot_string = $robot_id.'_'.$robot_token;
+        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_level'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_level']; }
+        elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level']; }
         else { return 1; }
     }
 
 
     // Define a function for checking a robot's prototype current level
-    public static function robot_original_player($player_token, $robot_token){
+    public static function robot_original_player($player_token, $robot_token, $robot_id = 0){
         // Return the current level total for this robot
         $session_token = self::session_token();
-        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player'])){ return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player']; }
+        $robot_string = $robot_id.'_'.$robot_token;
+        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string]['original_player'])){ return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string]['original_player']; }
+        elseif (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player'])){ return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player']; }
         else { return $player_token; }
     }
 
 
     // Define a function for checking a robot's prototype reward array
-    public static function robot_rewards($player_token = '', $robot_token){
+    public static function robot_rewards($player_token = '', $robot_token, $robot_id = 0){
         // Define the game session helper var
         $session_token = self::session_token();
+        $robot_string = $robot_id.'_'.$robot_token;
         // Return the current reward array for this robot
         if (!empty($player_token)){
-            if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])){
+            if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string])){
+                return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string];
+            } elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])){
                 return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token];
             }
         } elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
             foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_info){
-                if (!empty($player_info['player_robots'][$robot_token])){
+                if (!empty($player_info['player_robots'][$robot_string])){
+                    return $player_info['player_robots'][$robot_string];
+                } elseif (!empty($player_info['player_robots'][$robot_token])){
                     return $player_info['player_robots'][$robot_token];
                 }
             }
@@ -1009,17 +1038,22 @@ class rpg_game {
 
 
     // Define a function for checking a robot's prototype settings array
-    public static function robot_settings($player_token = '', $robot_token){
+    public static function robot_settings($player_token = '', $robot_token, $robot_id = 0){
         // Define the game session helper var
         $session_token = self::session_token();
+        $robot_string = $robot_id.'_'.$robot_token;
         // Return the current setting array for this robot
         if (!empty($player_token)){
-            if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
+            if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string])){
+                return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string];
+            } elseif (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
                 return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token];
             }
         } elseif (!empty($_SESSION[$session_token]['values']['battle_settings'])){
             foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token => $player_info){
-                if (!empty($player_info['player_robots'][$robot_token])){
+                if (!empty($player_info['player_robots'][$robot_string])){
+                    return $player_info['player_robots'][$robot_string];
+                } elseif (!empty($player_info['player_robots'][$robot_token])){
                     return $player_info['player_robots'][$robot_token];
                 }
             }
@@ -1029,9 +1063,9 @@ class rpg_game {
 
 
     // Define a function for checking a robot's prototype settings array
-    public static function robot_settings_abilities($player_token = '', $robot_token){
+    public static function robot_settings_abilities($player_token = '', $robot_token, $robot_id = 0){
         // Direct collect the settings for this robot
-        $this_settings = self::robot_settings($player_token, $robot_token);
+        $this_settings = self::robot_settings($player_token, $robot_token, $robot_id);
         $this_abilities = !empty($this_settings['robot_abilities']) ? array_keys($this_settings['robot_abilities']) : array();
         return $this_abilities;
     }
