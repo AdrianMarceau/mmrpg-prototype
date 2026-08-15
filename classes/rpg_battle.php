@@ -1264,12 +1264,21 @@ class rpg_battle extends rpg_object {
                         // DEBUG
                         //$this->events_create(false, false, 'DEBUG', 'Checking '.$temp_info['robot_name'].' for compatibility with the '.$ability_info['ability_name']);
                         //$debug_fragment = '';
-                        // If this robot is a mecha, skip it!
-                        if (!empty($temp_info['robot_class']) && $temp_info['robot_class'] == 'mecha'){ continue; }
-                        // Equip this ability to the robot is there was a match found
+                        // Equip this ability to the robot is there was a match found (differently for non-masters)
                         if (rpg_robot::has_ability_compatibility($temp_info['robot_token'], $ability_info['ability_token'])){
-                            if (!isset( $_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities'] )){ $_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities'] = array(); }
-                            if (count($_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities']) < 8){ $_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities'][$ability_info['ability_token']] = array('ability_token' => $ability_info['ability_token']); }
+                            $ptoken = $this_player_info['player_token'];
+                            $rclass = $temp_info['robot_class'];
+                            $rid = $temp_info['robot_base_id'];
+                            $rtoken = $temp_info['robot_token'];
+                            $rstring = $rid.'_'.$rtoken;
+                            $atoken = $ability_info['ability_token'];
+                            if (isset($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_abilities'])
+                                && count($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_abilities']) < 8){
+                                $_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_abilities'][$atoken] = array('ability_token' => $atoken);
+                            } elseif (isset($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_abilities'])
+                                && count($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_abilities']) < 8){
+                                $_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_abilities'][$atoken] = array('ability_token' => $atoken);
+                            }
                         }
                     }
 
