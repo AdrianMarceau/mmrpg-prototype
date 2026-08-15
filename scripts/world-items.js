@@ -854,6 +854,8 @@ function getItemDetailsForOverview(itemToken, targetSelected){
     let showDropItem = itemKind !== 'event' && itemQuantity > 0 ? true : false;
     if (typeof _worldPlayerItems['item-codes'] === 'undefined' || _worldPlayerItems['item-codes'] < 1){ showUseItem = false; }
     if (typeof _worldPlayerItems['equip-codes'] === 'undefined' || _worldPlayerItems['equip-codes'] < 1){ showGiveItem = false; }
+    //console.log('selectedPlayerRobotData = ', selectedPlayerRobotData);
+    //console.log('selectedPlayerRobotInfo = ', selectedPlayerRobotInfo);
     itemDetailsObject.actions.push({ action: 'use-item', text: yButtonIcon + ' Use', button: 'Y', item: itemToken, disabled: (!targetSelected || itemIsUnusable), hidden: !showUseItem });
     itemDetailsObject.actions.push({ action: 'give-item', text: xButtonIcon + ' Give', button: 'X', item: itemToken, disabled: (!targetSelected || itemIsEquipped), hidden: !showGiveItem });
     itemDetailsObject.actions.push({ action: 'take-item', text: xButtonIcon + ' Take', button: 'X', item: itemToken, disabled: (!targetSelected || !itemIsEquipped), hidden: !showTakeItem });
