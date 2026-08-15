@@ -94,12 +94,16 @@ ob_start();
         // If this robot has more than eight abilities, slice to only eight
         if (count($current_robot_abilities) > 8){
             $current_robot_abilities = array_slice($current_robot_abilities, 0, 8);
-            $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'] = $current_robot_abilities;
+            $ptoken = $this_player->player_token;
+            $rid = $this_robot->robot_base_id;
+            $rtoken = $this_robot->robot_token;
+            $rstring = $rid.'_'.$rtoken;
+            if (isset($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_abilities'])){
+                $_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_abilities'] = $current_robot_abilities;
+            } elseif (isset($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_abilities'])){
+                $_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_abilities'] = $current_robot_abilities;
+            }
         }
-
-        // Collect the robot's held item if any
-        //if (!empty($_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item'])){ $current_robot_item = $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item']; }
-        //else { $current_robot_item = ''; }
 
     } elseif ($this_robot->robot_class !== 'master'){
 
